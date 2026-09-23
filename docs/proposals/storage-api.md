@@ -16,9 +16,9 @@ with the operations; the common element model is selected.
 
 The interface hierarchy is now integrated in the development library, with
 provider-owned sample implementations and compiler/importer closure checks. It is
-not in Preview 9. The separate StorageLookup and byte-first provider shape still
-require alignment before promoting a host adapter; GetItem/GetItems are not yet
-implemented. The [roadmap](../platform-roadmap.md) governs the bounded
+not in Preview 9. StorageProvider now resolves GetItem/GetFile/GetDirectory; the
+separate StorageLookup and byte-first provider contract are removed. Platform host
+integration, directory traversal and GetItems remain next. The [roadmap](../platform-roadmap.md) governs the bounded
 implementation sequence. Optional topology, rich metadata and unneeded mutations
 in this proposal are not prerequisites for the initial POC.
 

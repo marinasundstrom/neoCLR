@@ -41,7 +41,7 @@ items:
   - NeoCLR.CoreProbe
   namespace: System.Storage
   summary: Opens existing bytes for reading.
-  remarks: Delegates to the provider with Path. The caller closes a successful stream. Opening can fail even after successful lookup. Creation never overwrites an existing entry; later write failure does not roll back creation.
+  remarks: The provider-specific File implementation opens its represented address. The caller closes a successful stream. Opening can fail even after successful lookup. Creation never overwrites an existing entry; later write failure does not roll back creation.
   example: []
   syntax:
     content: Result<InputStream, StreamError> OpenRead()
@@ -65,7 +65,7 @@ items:
   - NeoCLR.CoreProbe
   namespace: System.Storage
   summary: Exclusively creates an empty file for writing.
-  remarks: Delegates to the provider with Path. The caller closes a successful stream. Opening can fail even after successful lookup. Creation never overwrites an existing entry; later write failure does not roll back creation.
+  remarks: The provider-specific File implementation opens its represented address. The caller closes a successful stream. Opening can fail even after successful lookup. Creation never overwrites an existing entry; later write failure does not roll back creation.
   example: []
   syntax:
     content: Result<OutputStream, StreamError> CreateNew()

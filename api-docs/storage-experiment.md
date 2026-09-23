@@ -1,7 +1,7 @@
 # Storage provider experiment
 
 **Development exploration after Preview 9.** The sample imports platform
-[StorageItem, File, Directory and StorageLookup](storage-items.md), Path and directional stream
+[StorageItem, File, Directory and StorageProvider](storage-items.md), Path and directional stream
 interfaces. Its concrete HostStorage, MemoryStorage and memory streams remain
 application-owned fixtures for comparing provider ownership and path interpretation.
 ProviderFile and ProviderDirectory are concrete sample implementations, not public platform classes.
@@ -51,8 +51,8 @@ actual bytes, error handling and independent provider state.
 ## StorageProvider
 
 The sample interface extends the integrated
-[System.Storage.StorageLookup](xref:System.Storage.StorageLookup) capability, which
-inherits the [byte contract](storage-provider.md). Only ReadText and WriteText below
+[System.Storage.StorageProvider](xref:System.Storage.StorageProvider)
+[item lookup contract](storage-provider.md). Byte routing and ReadText/WriteText below
 remain sample conveniences.
 
 Implementations resolve validated logical Path values in their own namespace. Text methods remain temporary
@@ -61,6 +61,7 @@ above them.
 
 | Member | Contract |
 | --- | --- |
+| `GetItem(path: Path) -> Result<StorageItem, StorageLookupError>` | Resolve either branch through the common interface, without creating an entry. |
 | `GetDirectory(path: Path) -> Result<Directory, StorageLookupError>` | Query an existing directory through its public interface. Disk checks native kind; memory exposes only its root. Missing returns NotFound, file returns WrongKind. |
 | `GetFile(path: Path) -> Result<File, StorageLookupError>` | Query a current file and return a provider-bound descriptor; does not retain a stream or guarantee later availability. Root/directory returns WrongKind and missing entries return NotFound. |
 | `OpenRead(path: Path) -> Result<InputStream, StreamError>` | Open an existing byte file with a new read cursor at zero, or report an expected error. |
@@ -80,7 +81,7 @@ The sample ProviderDirectory implements the platform Directory interface. Constr
 
 | Member | Contract |
 | --- | --- |
-| `ProviderDirectory(provider: StorageLookup, path: Path)` | Retain the provider and its directory address. |
+| `ProviderDirectory(provider: StorageProvider, path: Path)` | Retain the provider and its directory address. |
 | `Path: Path` | Return the validated logical path without querying storage. |
 | `GetFile(relativePath: Path) -> Result<File, StorageLookupError>` | Resolve a relative logical path against this directory and query through its retained provider. Nested segments are accepted. Absolute values return InvalidPath without querying; `.` queries this directory address as a file and normally returns WrongKind. |
 | `GetFile(name: string) -> Result<File, StorageLookupError>` | Validate a direct child name, then query the provider. Invalid names return InvalidPath; provider lookup errors are preserved. |

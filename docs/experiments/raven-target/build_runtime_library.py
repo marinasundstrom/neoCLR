@@ -11,7 +11,6 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
     'StorageItems': 'System.Storage.StorageItem',
-    'StorageLookup': 'System.Storage.StorageLookup',
     'StorageProvider': 'System.Storage.StorageProvider',
     'InputStream': 'System.Streams.InputStream',
     'OutputStream': 'System.Streams.OutputStream',
@@ -114,7 +113,6 @@ SLICES = {
 }
 SOURCES = {
     'StorageItems': 'runtime/raven/src/System/Storage/StorageItems.rvn',
-    'StorageLookup': 'runtime/raven/src/System/Storage/StorageLookup.rvn',
     'StorageProvider': 'runtime/raven/src/System/Storage/StorageProvider.rvn',
     'InputStream': 'runtime/raven/src/System/Streams/InputStream.rvn',
     'OutputStream': 'runtime/raven/src/System/Streams/OutputStream.rvn',

@@ -2,7 +2,7 @@ namespace StorageExperiment
 
 import System.Storage.File
 import System.Storage.Directory
-import System.Storage.StorageLookup
+import System.Storage.StorageItem
 
 import System.*
 import System.Storage.Path
@@ -14,17 +14,23 @@ import System.Storage.FileReadError
 import System.Storage.FileWriteError
 import System.Storage.StorageLookupError
 
-// Fixture-only text conveniences; platform descriptors use byte/lookup capabilities.
-interface StorageProvider : System.Storage.StorageLookup {
+// Provider-private byte routing is not part of the platform lookup contract.
+interface ByteStorage {
+    func OpenRead(path: Path) -> Result<InputStream, StreamError>
+    func CreateNew(path: Path) -> Result<OutputStream, StreamError>
+}
+
+// Fixture conveniences; consumers of lookup need only System.Storage.StorageProvider.
+interface StorageProvider : System.Storage.StorageProvider, ByteStorage {
     func ReadText(path: Path, maxBytes: int) -> Result<string, FileReadError>
     func WriteText(path: Path, text: string, maxBytes: int) -> Result<unit, FileWriteError>
 }
 
 class ProviderFile : File {
-    private field provider: System.Storage.StorageProvider
+    private field provider: ByteStorage
     private field path: Path
 
-    init(provider: System.Storage.StorageProvider, path: Path) {
+    init(provider: ByteStorage, path: Path) {
         self.provider = provider
         self.path = path
     }
@@ -43,10 +49,10 @@ class ProviderFile : File {
 }
 
 class ProviderDirectory : Directory {
-    private field provider: StorageLookup
+    private field provider: StorageProvider
     private field path: Path
 
-    init(provider: StorageLookup, path: Path) {
+    init(provider: StorageProvider, path: Path) {
         self.provider = provider
         self.path = path
     }
@@ -127,6 +133,20 @@ class HostStorage : StorageProvider {
             }
         }
         return System.Storage.Path.Combine(root, text)
+    }
+
+    func GetItem(path: Path) -> Result<StorageItem, StorageLookupError> {
+        return match System.Storage.Metadata.GetKind(Resolve(path)) {
+            Ok(let kind) => {
+                if kind.IsFile {
+                    let fileItem: StorageItem = ProviderFile(self, path)
+                    return Ok(fileItem)
+                }
+                let item: StorageItem = ProviderDirectory(self, path)
+                Ok(item)
+            }
+            Error(let error) => Error(error)
+        }
     }
 
     func GetDirectory(path: Path) -> Result<Directory, StorageLookupError> {
@@ -213,6 +233,18 @@ class MemoryStorage : StorageProvider {
 
     // This bounded provider has one directory: its root. Slash-containing keys
     // do not implicitly create a directory tree.
+    func GetItem(path: Path) -> Result<StorageItem, StorageLookupError> {
+        if Key(path) == "/" {
+            let directoryItem: StorageItem = ProviderDirectory(self, path)
+            return Ok(directoryItem)
+        }
+        if Find(path) < 0 {
+            return Error(StorageLookupError(StorageLookupError.NotFound()))
+        }
+        let item: StorageItem = ProviderFile(self, path)
+        return Ok(item)
+    }
+
     func GetDirectory(path: Path) -> Result<Directory, StorageLookupError> {
         if Key(path) == "/" {
             let directory: Directory = ProviderDirectory(self, path)

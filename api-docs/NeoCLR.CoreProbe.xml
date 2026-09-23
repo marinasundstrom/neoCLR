@@ -5,20 +5,14 @@
   </assembly>
   <members>
     <member name="T:System.Storage.StorageProvider">
-      <summary>Opens directional byte streams at validated logical storage paths.</summary>
-      <remarks>Development API after Preview 9. Implementations resolve Path in their own address space. Parsing validates syntax only; it does not grant access or establish existence. Operations are synchronous and may block. The caller closes each successful stream. This contract requires neither text helpers nor descriptor lookup. See the [provider guide](/docs/storage-provider.html).</remarks>
+      <summary>Resolves logical storage addresses to provider-implemented item interfaces.</summary>
+      <remarks>Development API after Preview 9. GetItem returns StorageItem; typed lookup returns File or Directory. Calls are synchronous and may block. Lookup observes current existence and kind without creating an entry or retaining an open content stream. Implementations own identity and byte access; this contract requires no byte-opening or text helper methods. Parsing does not grant access. Replaces the transitional StorageLookup and byte-provider split. See the [provider guide](/docs/storage-provider.html).</remarks>
     </member>
-    <member name="M:System.Storage.StorageProvider.OpenRead(System.Storage.Path)">
-      <summary>Opens an existing file for byte reads starting at offset zero.</summary>
+    <member name="M:System.Storage.StorageProvider.GetItem(System.Storage.Path)">
+      <summary>Looks up a file or directory without requiring its kind in advance.</summary>
       <param name="path">Validated logical address interpreted by this provider.</param>
-      <returns>A new InputStream, or a StreamError such as NotFound, AccessDenied, WrongKind, InvalidPath, LimitExceeded or IoFailure.</returns>
-      <remarks>A successful open owns a separate cursor and requires Close. An accepted Path can still be unsupported by a provider. Subsequent reads may fail; concurrent modification and replacement visibility depend on the provider.</remarks>
-    </member>
-    <member name="M:System.Storage.StorageProvider.CreateNew(System.Storage.Path)">
-      <summary>Exclusively creates an empty file and opens it for byte writes.</summary>
-      <param name="path">Validated destination address interpreted by this provider.</param>
-      <returns>A new OutputStream, or a StreamError such as AlreadyExists, NotFound, AccessDenied, WrongKind, InvalidPath, LimitExceeded or IoFailure.</returns>
-      <remarks>Existing entries must not be overwritten. Successful creation is visible even before writing. Close the stream after use. A later write failure does not roll back creation or earlier writes. Parent creation, replacement and durable flushing are not promised.</remarks>
+      <returns>A provider-owned File or Directory through StorageItem, or StorageLookupError such as NotFound, AccessDenied, InvalidPath or IoFailure.</returns>
+      <remarks>Does not create entries or open content. An unsupported native entry kind can return WrongKind. Success does not guarantee later access or stable identity. Consumers can inspect the closed File/Directory branches without depending on concrete implementation classes.</remarks>
     </member>
     <member name="T:System.Tasks.Task`1">
       <summary>A consumer handle for one eventual value or cancellation.</summary>
@@ -656,12 +650,12 @@
     <member name="M:System.Storage.File.OpenRead">
       <summary>Opens existing bytes for reading.</summary>
       <returns>InputStream on success, or the retained provider's StreamError unchanged.</returns>
-      <remarks>Delegates to the provider with Path. The caller closes a successful stream. Opening can fail even after successful lookup. Creation never overwrites an existing entry; later write failure does not roll back creation.</remarks>
+      <remarks>The provider-specific File implementation opens its represented address. The caller closes a successful stream. Opening can fail even after successful lookup. Creation never overwrites an existing entry; later write failure does not roll back creation.</remarks>
     </member>
     <member name="M:System.Storage.File.CreateNew">
       <summary>Exclusively creates an empty file for writing.</summary>
       <returns>OutputStream on success, or the retained provider's StreamError unchanged.</returns>
-      <remarks>Delegates to the provider with Path. The caller closes a successful stream. Opening can fail even after successful lookup. Creation never overwrites an existing entry; later write failure does not roll back creation.</remarks>
+      <remarks>The provider-specific File implementation opens its represented address. The caller closes a successful stream. Opening can fail even after successful lookup. Creation never overwrites an existing entry; later write failure does not roll back creation.</remarks>
     </member>
     <member name="M:System.Storage.FileText.ReadAllText(System.String,System.Int32)">
       <summary>Reads a bounded native file as strict UTF-8.</summary>
@@ -678,17 +672,13 @@
       <returns>Success unit or FileWriteError.</returns>
       <remarks>The exact method is documented in the [manual reference](/docs/storage-items.html#writealltext) because DocFX cannot render its unit-valued Result. Invalid limits and oversized text are rejected before modification. Later I/O failures can leave partial output; this is not atomic replacement.</remarks>
     </member>
-    <member name="T:System.Storage.StorageLookup">
-      <summary>A byte provider that can query file and directory addresses without retaining streams.</summary>
-      <remarks>Extends StorageProvider. GetFile and GetDirectory return interface descriptors bound to the queried provider and logical address, or StorageLookupError. Implementations inspect current kind/existence rather than opening content. Success is an observation, not a guarantee of later access. Byte-only providers need not implement this interface.</remarks>
-    </member>
-    <member name="M:System.Storage.StorageLookup.GetFile(System.Storage.Path)">
+    <member name="M:System.Storage.StorageProvider.GetFile(System.Storage.Path)">
       <summary>Looks up an existing file and returns its provider-bound descriptor.</summary>
       <param name="path">Validated logical file address.</param>
       <returns>A File retaining this provider and address, or StorageLookupError such as NotFound, WrongKind, AccessDenied, InvalidPath or IoFailure.</returns>
       <remarks>Must not create the file or retain an open stream. Provider-specific aliases and concurrent changes do not establish stable item identity.</remarks>
     </member>
-    <member name="M:System.Storage.StorageLookup.GetDirectory(System.Storage.Path)">
+    <member name="M:System.Storage.StorageProvider.GetDirectory(System.Storage.Path)">
       <summary>Looks up an existing directory and returns its provider-owned interface.</summary>
       <param name="path">Validated logical directory address interpreted by this provider.</param>
       <returns>A Directory retaining its provider context and logical address, or StorageLookupError such as NotFound, WrongKind, AccessDenied, InvalidPath or IoFailure.</returns>
@@ -708,7 +698,7 @@
       <summary>Validates one child name and explicitly looks up its file.</summary>
       <param name="name">One direct child name, not a relative path containing separators.</param>
       <returns>A provider-bound File, InvalidPath for an invalid name, or the provider lookup error unchanged.</returns>
-      <remarks>Equivalent to resolving FileAt and querying StorageLookup.GetFile; it owns no stream.</remarks>
+      <remarks>Equivalent to resolving FileAt and querying StorageProvider.GetFile; it owns no stream.</remarks>
     </member>
     <member name="M:System.Storage.Directory.GetFile(System.Storage.Path)">
       <summary>Resolves a relative logical path in this directory and looks up its file.</summary>

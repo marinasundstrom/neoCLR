@@ -1246,3 +1246,11 @@ interface in Result with StorageLookupError. The matching strict bridge validate
 this member and the regenerated reference/runtime must be used together. This
 extends the transitional lookup capability toward the selected provider model;
 no new native method, compiler policy or Runtime Contract setting is introduced.
+
+
+Provider-resolution consolidation: System.Storage.StorageProvider now admits only
+GetItem/GetFile/GetDirectory, returning interface-valued Results. StorageLookup and
+its inherited byte-provider conversion are removed from declarations, strict binding
+and runtime bootstrap selection. Byte routing stays in provider implementations.
+This is a development API migration requiring matching generated artifacts; no
+Raven compiler changes or Runtime Contract settings are introduced.

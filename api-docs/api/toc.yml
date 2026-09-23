@@ -95,9 +95,6 @@ items:
   - uid: System.Storage.StorageItem
     name: StorageItem
     type: Interface
-  - uid: System.Storage.StorageLookup
-    name: StorageLookup
-    type: Interface
   - uid: System.Storage.StorageLookupError
     name: StorageLookupError
     type: Struct

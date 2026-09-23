@@ -68,6 +68,15 @@ with tempfile.TemporaryDirectory(prefix='neoclr-storage-provider-') as folder:
     assert found.stdout == 'Typed disk and memory lookup contracts: passed\n', found.stdout
     print(found.stdout, end='')
 
+    shutil.copyfile(HERE / 'ItemContracts.rvn', root / 'Main.rvn')
+    items = subprocess.run(['dotnet', 'msbuild', str(root / 'StorageExplorer.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=120)
+    assert items.returncode == 0, items.stdout + items.stderr
+    queried = subprocess.run([str(bundle / 'bin/neoclr'), 'run', str(root / 'bin/neoclr/Debug/App.neoil'), '--system', str(bundle / 'lib/System.neoil')], cwd=work / 'sandbox', capture_output=True, text=True, timeout=60)
+    assert queried.returncode == 0, queried.stdout + queried.stderr
+    assert queried.stdout == 'Provider item interfaces: passed\n', queried.stdout
+    assert not (work / 'sandbox/missing-item').exists(), 'Generic lookup created an entry'
+    print(queried.stdout, end='')
+
     (work / 'sandbox/context').mkdir()
     (work / 'sandbox/context/nested').mkdir()
     shutil.copyfile(HERE / 'DirectoryContracts.rvn', root / 'Main.rvn')

@@ -1,9 +1,9 @@
 namespace System.Storage
 
 import System.*
-import System.Streams.*
 
 public interface StorageProvider {
-    func OpenRead(path: Path) -> Result<InputStream, StreamError>
-    func CreateNew(path: Path) -> Result<OutputStream, StreamError>
+    func GetItem(path: Path) -> Result<StorageItem, StorageLookupError>
+    func GetFile(path: Path) -> Result<File, StorageLookupError>
+    func GetDirectory(path: Path) -> Result<Directory, StorageLookupError>
 }

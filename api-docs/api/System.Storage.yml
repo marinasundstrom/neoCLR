@@ -31,7 +31,6 @@ items:
   - System.Storage.Metadata
   - System.Storage.Path
   - System.Storage.StorageItem
-  - System.Storage.StorageLookup
   - System.Storage.StorageLookupError
   - System.Storage.StorageLookupError.AccessDenied
   - System.Storage.StorageLookupError.InvalidPath
@@ -93,16 +92,8 @@ references:
   name: Directory
   nameWithType: Directory
   fullName: System.Storage.Directory
-- uid: System.Storage.StorageLookup
-  commentId: T:System.Storage.StorageLookup
-  isExternal: true
-  href: System.Storage.StorageLookup.html
-  name: StorageLookup
-  nameWithType: StorageLookup
-  fullName: System.Storage.StorageLookup
 - uid: System.Storage.StorageProvider
   commentId: T:System.Storage.StorageProvider
-  parent: System.Storage
   isExternal: true
   href: System.Storage.StorageProvider.html
   name: StorageProvider

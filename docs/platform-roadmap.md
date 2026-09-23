@@ -195,10 +195,11 @@ Directory in Raven metadata and the strict importer, while provider implementati
 of either branch are accepted. The disk/memory sample owns ProviderFile and
 ProviderDirectory. Raw neoIL does not enforce that metadata. Native static text
 helpers move to FileText in the development Raven API; legacy raw aliases remain.
-Provider GetDirectory now returns the Directory interface through the transitional
-StorageLookup capability. The disk/memory product resolves its root through that
-contract; disk checks current kind and memory exposes only its root. Missing/wrong-kind
-results and retained provider context are covered by the directory contract sample.
+Provider resolution is now consolidated on StorageProvider: GetItem returns
+StorageItem, and GetFile/GetDirectory return their branch interfaces. The temporary
+StorageLookup type and platform provider byte methods are removed. Byte routing
+belongs to concrete item implementations; the sample keeps that helper private to
+its own provider model. Concrete platform host integration remains next.
 **POC scope reaffirmed by the author, 2026-09-23:** deliver a small Storage API that
 can demonstrate the abstraction and real file access. The completion evidence is a
 runnable, documented app obtaining a directory through the provider contract and
@@ -212,13 +213,16 @@ The author also suggests StreamReader for this POC and specifies a TextReader
 interface. Consumers depend on TextReader; StreamReader implements it as a minimal
 provider-independent UTF-8 reader over InputStream to remove byte-buffer/decoding plumbing from the text
 consumer; [scope and contract questions](proposals/streams-api.md#minimal-text-reader-for-the-storage-poc--2026-09-23)
-cover bounds, partial reads, errors and ownership. This is planned work, not an
-implemented API or a requirement for full .NET StreamReader parity.
+cover bounds, partial reads, errors and ownership. The author includes these readers,
+a small seekability case and the System.IO grouping in the POC objective, alongside
+provider integration and enumeration. Move byte streams and text readers together
+to System.IO; keep storage item/provider/path abstractions in System.Storage. These
+remaining capabilities are planned, not implemented or full .NET parity requirements.
 
-**Next:** consolidate provider resolution (including GetItem) and directory traversal, then
-integrate the minimal host provider and mixed GetItems enumeration with explicit
-bounds and failure semantics. StorageLookup and the byte-provider-first shape are
-still transitional, as are FileAt/CreateNew address operations. Keep the disk/memory
+**Next:** integrate the minimal host provider, directory traversal and bounded mixed
+GetItems enumeration; move streams/readers to System.IO; implement minimal
+TextReader/StreamReader and a seek-and-reread case. Finish with one documented POC
+covering this surface. FileAt/CreateNew address operations remain transitional. Keep the disk/memory
 consumer working; update `/docs/` and document migrations in each slice. Do not
 expand the previous split as an alternative model.
 Task-based interaction is the intended extension direction; its scheduling and

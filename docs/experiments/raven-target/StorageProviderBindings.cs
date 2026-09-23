@@ -1,22 +1,18 @@
 using Mono.Cecil;
 
-// Provider byte access is independent of text helpers and descriptor lookup.
+// Providers resolve logical addresses; returned items own byte-access behavior.
 static class StorageProviderBindings
 {
     public const string Name = "System.Storage.StorageProvider";
-    public const string Lookup = "System.Storage.StorageLookup";
-    public static bool IsName(string name) => name == Name || name == Lookup;
+    public static bool IsName(string name) => name == Name;
     public static bool SameType(TypeReference left, TypeReference right) => IsName(left.FullName)
         && right.FullName == left.FullName && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
     public const string Declarations = """
         namespace Storage {
-            public interface StorageLookup : StorageProvider {
-                Result<Directory, StorageLookupError> GetDirectory(Path path);
-                Result<File, StorageLookupError> GetFile(Path path);
-            }
             public interface StorageProvider {
-                Result<Streams.InputStream, Streams.StreamError> OpenRead(Path path);
-                Result<Streams.OutputStream, Streams.StreamError> CreateNew(Path path);
+                Result<StorageItem, StorageLookupError> GetItem(Path path);
+                Result<File, StorageLookupError> GetFile(Path path);
+                Result<Directory, StorageLookupError> GetDirectory(Path path);
             }
         }
         """;
@@ -26,10 +22,9 @@ static class StorageProviderBindings
         if (owner is null || !IsName(owner)) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var expected = (owner, reference.Name) switch {
-            (Lookup, "GetDirectory") => ("System.Storage.Path", "System.Result<System.Storage.Directory,System.Storage.StorageLookupError>"),
-            (Lookup, "GetFile") => ("System.Storage.Path", "System.Result<System.Storage.File,System.Storage.StorageLookupError>"),
-            (Name, "OpenRead") => ("System.Storage.Path", "System.Result<System.Streams.InputStream,System.Streams.StreamError>"),
-            (Name, "CreateNew") => ("System.Storage.Path", "System.Result<System.Streams.OutputStream,System.Streams.StreamError>"),
+            (Name, "GetDirectory") => ("System.Storage.Path", "System.Result<System.Storage.Directory,System.Storage.StorageLookupError>"),
+            (Name, "GetFile") => ("System.Storage.Path", "System.Result<System.Storage.File,System.Storage.StorageLookupError>"),
+            (Name, "GetItem") => ("System.Storage.Path", "System.Result<System.Storage.StorageItem,System.Storage.StorageLookupError>"),
             _ => throw new InvalidDataException("Unsupported storage provider member.")
         };
         if (!definition.DeclaringType.IsInterface || definition.DeclaringType.HasGenericParameters
@@ -43,12 +38,11 @@ static class StorageProviderBindings
     public static void Validate(ModuleDefinition module)
     {
         foreach (var (name, members) in new[] {
-            (Name, new[] { "OpenRead", "CreateNew" }),
-            (Lookup, new[] { "GetFile", "GetDirectory" }) })
+            (Name, new[] { "GetItem", "GetFile", "GetDirectory" }) })
         {
             var type = module.GetType(name);
             if (type is null || !type.IsPublic || !type.IsInterface || type.HasGenericParameters
-                || type.HasFields || (name == Name ? type.HasInterfaces : type.Interfaces.Count != 1 || type.Interfaces[0].InterfaceType.FullName != Name) || type.Methods.Count != members.Length
+                || type.HasFields || type.HasInterfaces || type.Methods.Count != members.Length
                 || members.Any(m => type.Methods.Count(method => method.Name == m) != 1))
                 throw new InvalidDataException("Unsupported storage provider metadata: " + name);
             foreach (var method in type.Methods) _ = Bind(method, method);

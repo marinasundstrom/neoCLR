@@ -8,8 +8,8 @@ import System.Storage.Directory
 import System.Storage.StorageItem
 import System.Streams.*
 
-// A provider needs only byte access: no File descriptor or text helper members.
-class UnavailableStorage : System.Storage.StorageProvider {
+// Byte routing is a sample implementation detail, not a platform provider contract.
+class UnavailableStorage : ByteStorage {
     private field calls: int
     val Calls: int => calls
 
@@ -26,7 +26,7 @@ class UnavailableStorage : System.Storage.StorageProvider {
 
 func Main() {
     let concrete = UnavailableStorage()
-    let provider: System.Storage.StorageProvider = concrete
+    let provider: ByteStorage = concrete
     let path = RequirePath("item.txt")
     let file = ProviderFile(provider, path)
     if file.Name != "item.txt" || !file.Path.Equals(path) || concrete.Calls != 0 {

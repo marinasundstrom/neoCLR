@@ -29,9 +29,6 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StorageItems'">
     <Compile Include="src/System/Storage/StorageItems.rvn" />
   </ItemGroup>
-  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StorageLookup'">
-    <Compile Include="src/System/Storage/StorageLookup.rvn" />
-  </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Clock'">
     <Compile Include="src/System/Clock.rvn" />
   </ItemGroup>

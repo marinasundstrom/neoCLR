@@ -806,3 +806,11 @@ StorageLookupError>. Reference declarations, strict signature validation and the
 Raven bootstrap contract include it. Provider implementations return the core
 interface; the importer requires no provider-specific concrete class. This is a
 development contract change with no Raven compiler or Runtime Contract setting change.
+
+
+Provider-resolution consolidation: System.Storage.StorageProvider now admits only
+GetItem/GetFile/GetDirectory, returning interface-valued Results. StorageLookup and
+its inherited byte-provider conversion are removed from declarations, strict binding
+and runtime bootstrap selection. Byte routing stays in provider implementations.
+This is a development API migration requiring matching generated artifacts; no
+Raven compiler changes or Runtime Contract settings are introduced.

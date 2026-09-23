@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Consolidate StorageProvider around GetItem/GetFile/GetDirectory with interface
+  results. Remove the temporary StorageLookup contract and provider-level byte
+  methods; byte routing belongs to concrete File implementations. Development
+  consumers must migrate lookup to StorageProvider and keep byte helper contracts
+  inside implementations. Add generic disk/memory lookup and resolution-only provider
+  coverage; refresh runtime and API reference artifacts. Record the complete POC
+  scope, including System.IO alignment, text readers and a seekability case.
+  Validation: full SDK sample/contract suite, strict interface import, bootstrap
+  snapshot, 243 documented API items and combined website pass.
+
 - Add synchronous StorageLookup.GetDirectory(Path), returning the public Directory
   interface with typed missing/wrong-kind errors. The disk/memory product obtains
   its root through provider lookup. Disk validates native kind; the bounded memory

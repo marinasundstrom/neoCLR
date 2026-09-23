@@ -1,8 +1,0 @@
-; Generated from runtime/raven/src/System/Storage/StorageLookup.rvn. Regenerate with build_runtime_library.py.
-.interface System.Storage.StorageLookup
-.implements System.Storage.StorageProvider
-.method instance GetDirectory(System.Storage.Path path) -> System.Result<System.Storage.Directory,System.Storage.StorageLookupError>
-.end
-.method instance GetFile(System.Storage.Path path) -> System.Result<System.Storage.File,System.Storage.StorageLookupError>
-.end
-.end

@@ -10,7 +10,7 @@ storage query. A Path describes an address in a provider namespace; it does not
 establish access or stable identity. Callers depend on the interfaces rather than
 constructing File or Directory themselves.
 Provider methods return the interfaces, even when they instantiate concrete classes
-internally. StorageLookup.GetFile returns Result<File, StorageLookupError> and
+internally. StorageProvider.GetFile returns Result<File, StorageLookupError> and
 GetDirectory returns Result<Directory, StorageLookupError>. The product sample now
 obtains its root through GetDirectory; consumer functions accept Directory.
 Generic item lookup and enumeration must preserve the same boundary.
@@ -40,11 +40,10 @@ Directory implementation handles `/` and `.` prefixes without doubling separator
 `.` lookup normally returns WrongKind. String traversal accepts one child name.
 The memory fixture uses flat keys and does not model a full directory hierarchy.
 
-StorageProvider's byte methods and the separate StorageLookup capability remain
-transitional. The selected model moves path resolution onto StorageProvider, with
-GetItem/GetFile/GetDirectory, and adds Directory traversal and GetItems enumeration
-of StorageItem values. Provider GetDirectory now works through StorageLookup;
-Directory.GetDirectory, GetItem and GetItems are **not implemented yet**.
+StorageProvider now resolves GetItem/GetFile/GetDirectory. GetItem returns the
+common StorageItem interface. The former StorageLookup split is removed; byte
+opening belongs to File implementations. Directory.GetDirectory, Directory.GetItem
+and GetItems enumeration remain **unimplemented**.
 Creation/address factories will be aligned with resolved storage objects in that
 work; FileAt/CreateNew should not be treated as the final creation model. Async
 interaction needs scheduling and cancellation contracts before claiming nonblocking I/O.
@@ -59,6 +58,8 @@ API is implemented yet.
 
 ## Development migration
 
+- StorageLookup is removed; StorageProvider now requires GetItem/GetFile/GetDirectory
+  instead of OpenRead/CreateNew. Byte routing is an implementation detail.
 - File and Directory are interfaces; providers supply concrete implementations.
   The sample's former descriptor logic is now ProviderFile/ProviderDirectory.
 - Native static text callers use `System.Storage.FileText.ReadAllText/WriteAllText`

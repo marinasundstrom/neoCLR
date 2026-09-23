@@ -521,3 +521,25 @@ entry. The expanded contract fixture was reduced to one run of each existing cas
 after duplicated runs hit the VM instruction budget; the runtime limit is unchanged.
 Strict interface import, bootstrap snapshot hashes, 245 documented API items and
 the combined website pass. No native runtime or Raven compiler changes were required.
+
+
+### Consolidated provider resolution — 2026-09-23
+
+System.Storage.StorageProvider now requires GetItem, GetFile and GetDirectory.
+All return core interfaces in Result with StorageLookupError. StorageLookup is
+removed. The former provider OpenRead/CreateNew methods are now a sample-owned
+ByteStorage detail used by ProviderFile; applications can implement a platform
+provider without any byte or text helper methods. This follows the author's selected
+resolution-centered proposal and the .NET/WinRT comparison above. Keeping the
+previous split would preserve development source compatibility but make the public
+provider contract describe backend plumbing rather than item lookup.
+
+GetItem queries current kind once on disk, returning File or Directory as
+StorageItem; unsupported native kinds preserve WrongKind. Memory resolves its root
+or one of its stored file keys. Missing entries remain NotFound; no entry is created
+and no content stream is held by lookup. Generic item tests inspect both interface
+branches and a resolution-only provider. No compiler or native runtime change is
+needed. Regenerate core/runtime artifacts together; Preview 9 is unchanged.
+
+The host/memory implementations are still sample-owned at this checkpoint.
+Platform host integration and enumeration follow; metadata breadth is not required.

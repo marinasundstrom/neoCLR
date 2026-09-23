@@ -5544,3 +5544,19 @@ and recorded the convention for runtime code as well as examples.
 - **Action:** recorded the alternatives, .NET comparison and seek-and-reread
   validation scenario in the Streams proposal. No seek API was implemented and no
   author decision on the recommended name or signature is assumed.
+
+
+### 2026-09-23 — Complete the Storage POC across the specified slices
+
+- **Author:** suggested System.IO for readers and moving streams there too; then
+  reaffirmed that presenting a POC is the first objective and all specified work is
+  part of it. Asked to continue through the slices until done.
+- **Assistant:** recommended System.IO for byte streams and text readers while
+  retaining System.Storage for providers/items/paths. Committed to completing
+  provider integration and enumeration, namespace alignment, text readers and a
+  small seekability case in a coherent sample, validating each slice.
+- **Current action:** consolidating provider resolution on StorageProvider with
+  GetItem/GetFile/GetDirectory. Concrete implementations remain behind interfaces.
+- **Remaining:** the roadmap now explicitly includes those pieces in the POC exit
+  evidence. The exact seek signature and text-reader bounds/ownership policies still
+  need implementation decisions and tests; completion has not yet been claimed.

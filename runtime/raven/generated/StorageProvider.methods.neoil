@@ -1,7 +1,9 @@
 ; Generated from runtime/raven/src/System/Storage/StorageProvider.rvn. Regenerate with build_runtime_library.py.
 .interface System.Storage.StorageProvider
-.method instance OpenRead(System.Storage.Path path) -> System.Result<System.Streams.InputStream,System.Streams.StreamError>
+.method instance GetItem(System.Storage.Path path) -> System.Result<System.Storage.StorageItem,System.Storage.StorageLookupError>
 .end
-.method instance CreateNew(System.Storage.Path path) -> System.Result<System.Streams.OutputStream,System.Streams.StreamError>
+.method instance GetFile(System.Storage.Path path) -> System.Result<System.Storage.File,System.Storage.StorageLookupError>
+.end
+.method instance GetDirectory(System.Storage.Path path) -> System.Result<System.Storage.Directory,System.Storage.StorageLookupError>
 .end
 .end

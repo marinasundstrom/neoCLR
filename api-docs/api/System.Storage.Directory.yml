@@ -73,7 +73,7 @@ items:
   - NeoCLR.CoreProbe
   namespace: System.Storage
   summary: Validates one child name and explicitly looks up its file.
-  remarks: Equivalent to resolving FileAt and querying StorageLookup.GetFile; it owns no stream.
+  remarks: Equivalent to resolving FileAt and querying StorageProvider.GetFile; it owns no stream.
   example: []
   syntax:
     content: Result<File, StorageLookupError> GetFile(string name)

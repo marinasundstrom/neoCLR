@@ -21,7 +21,7 @@ static class InterfaceBindings
         var element = parameterMap?.Invoke(g.GenericArguments[0]) ?? ReflectionBindings.Type(g.GenericArguments[0]) ?? GenericUnionBindings.Type(g.GenericArguments[0]);
         return element is null ? null : name + "<" + element + ">";
     }
-    public static bool Converts(string source, string target) => StorageItemBindings.Assignable(source, target) || source == StorageProviderBindings.Lookup && target == StorageProviderBindings.Name || StreamBindings.Assignable(source, target) || source == "String" && target == "System.Collections.Iterable<Char>" || IsInterface(target)
+    public static bool Converts(string source, string target) => StorageItemBindings.Assignable(source, target) || StreamBindings.Assignable(source, target) || source == "String" && target == "System.Collections.Iterable<Char>" || IsInterface(target)
         && (source == "System.Object" || source == "String" || ReflectionBindings.IsReference(source) || CalendarBindings.IsReference(source));
     public static string Convert(string source, string target) => Converts(source,target) ? "castclass " + target + "\n" : "";
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)

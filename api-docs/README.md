@@ -110,12 +110,12 @@ reference synchronized with `src/fault_code.rs` and the debugger snapshot.
 
 System.Storage.Metadata, EntryKind and StorageLookupError are now included in DocFX
 selection. Their complete metadata reference and [lookup guide](storage-lookup.md)
-describe development host-path lookup. StorageLookup.GetFile/GetDirectory are the integrated optional lookup capability; concrete
+describe development host-path lookup. StorageProvider.GetItem/GetFile/GetDirectory are the integrated lookup contract; concrete
 providers remain [sample implementations](storage-experiment.md).
 No renderer exclusion is needed for these new signatures. FileText and its legacy text error types are now selected too; only WriteAllText is
 excluded because DocFX 2.80.1 cannot render Result<System.Void, FileWriteError>. Its
 complete manual reference is [WriteAllText](storage-items.md#writealltext).
-StorageItem, File, Directory and StorageLookup have generated type/member coverage.
+StorageItem, File, Directory and StorageProvider have generated type/member coverage.
 File/Directory are provider-implemented interfaces; inherited Name/Path are documented
 on StorageItem. FileText contains the renamed native static helpers. Path coverage follows.
 
@@ -124,8 +124,9 @@ lexical equality, alongside the existing static native string helpers. Path and
 InvalidPathError are selected for generated reference, including both legacy methods.
 The Storage sample imports this platform type rather than defining its own. Its
 provider classes remain application-owned until the next integration slices.
-The two-member System.Storage.StorageProvider byte contract is integrated and
-selected for generated documentation; lookup/text methods are not required by it.
+System.Storage.StorageProvider resolves items through three documented members.
+The transitional StorageLookup type and provider byte methods have been removed;
+byte opening belongs to File implementations.
 
 InputStream and OutputStream are selected with their concrete file implementations.
 OutputStream.Flush shares the exact unit-valued Result renderer exclusion; its

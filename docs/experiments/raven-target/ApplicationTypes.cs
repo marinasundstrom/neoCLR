@@ -125,7 +125,6 @@ static class ApplicationTypes
                 && (Type(parent) == to || Visit(parent.Resolve()))) return true;
             return current.Interfaces.Any(i => GenericUnionBindings.Type(i.InterfaceType) == to ||
                 StorageItemBindings.Assignable(GenericUnionBindings.Type(i.InterfaceType) ?? "", to) ||
-                GenericUnionBindings.Type(i.InterfaceType) == StorageProviderBindings.Lookup && to == StorageProviderBindings.Name ||
                 IsModule(i.InterfaceType.Resolve()?.Module) && Visit(i.InterfaceType.Resolve()));
         }
         return Visit(type);

@@ -5,8 +5,9 @@ items:
   id: StorageProvider
   parent: System.Storage
   children:
-  - System.Storage.StorageProvider.CreateNew(System.Storage.Path)
-  - System.Storage.StorageProvider.OpenRead(System.Storage.Path)
+  - System.Storage.StorageProvider.GetDirectory(System.Storage.Path)
+  - System.Storage.StorageProvider.GetFile(System.Storage.Path)
+  - System.Storage.StorageProvider.GetItem(System.Storage.Path)
   langs:
   - csharp
   - vb
@@ -17,68 +18,96 @@ items:
   assemblies:
   - NeoCLR.CoreProbe
   namespace: System.Storage
-  summary: Opens directional byte streams at validated logical storage paths.
-  remarks: Development API after Preview 9. Implementations resolve Path in their own address space. Parsing validates syntax only; it does not grant access or establish existence. Operations are synchronous and may block. The caller closes each successful stream. This contract requires neither text helpers nor descriptor lookup. See the [provider guide](/docs/storage-provider.html).
+  summary: Resolves logical storage addresses to provider-implemented item interfaces.
+  remarks: Development API after Preview 9. GetItem returns StorageItem; typed lookup returns File or Directory. Calls are synchronous and may block. Lookup observes current existence and kind without creating an entry or retaining an open content stream. Implementations own identity and byte access; this contract requires no byte-opening or text helper methods. Parsing does not grant access. Replaces the transitional StorageLookup and byte-provider split. See the [provider guide](/docs/storage-provider.html).
   example: []
   syntax:
     content: public interface StorageProvider
     content.vb: Public Interface StorageProvider
-- uid: System.Storage.StorageProvider.OpenRead(System.Storage.Path)
-  commentId: M:System.Storage.StorageProvider.OpenRead(System.Storage.Path)
-  id: OpenRead(System.Storage.Path)
+- uid: System.Storage.StorageProvider.GetItem(System.Storage.Path)
+  commentId: M:System.Storage.StorageProvider.GetItem(System.Storage.Path)
+  id: GetItem(System.Storage.Path)
   parent: System.Storage.StorageProvider
   langs:
   - csharp
   - vb
-  name: OpenRead(Path)
-  nameWithType: StorageProvider.OpenRead(Path)
-  fullName: System.Storage.StorageProvider.OpenRead(System.Storage.Path)
+  name: GetItem(Path)
+  nameWithType: StorageProvider.GetItem(Path)
+  fullName: System.Storage.StorageProvider.GetItem(System.Storage.Path)
   type: Method
   assemblies:
   - NeoCLR.CoreProbe
   namespace: System.Storage
-  summary: Opens an existing file for byte reads starting at offset zero.
-  remarks: A successful open owns a separate cursor and requires Close. An accepted Path can still be unsupported by a provider. Subsequent reads may fail; concurrent modification and replacement visibility depend on the provider.
+  summary: Looks up a file or directory without requiring its kind in advance.
+  remarks: Does not create entries or open content. An unsupported native entry kind can return WrongKind. Success does not guarantee later access or stable identity. Consumers can inspect the closed File/Directory branches without depending on concrete implementation classes.
   example: []
   syntax:
-    content: Result<InputStream, StreamError> OpenRead(Path path)
+    content: Result<StorageItem, StorageLookupError> GetItem(Path path)
     parameters:
     - id: path
       type: System.Storage.Path
       description: Validated logical address interpreted by this provider.
     return:
-      type: System.Result{System.Streams.InputStream,System.Streams.StreamError}
-      description: A new InputStream, or a StreamError such as NotFound, AccessDenied, WrongKind, InvalidPath, LimitExceeded or IoFailure.
-    content.vb: Function OpenRead(path As Path) As Result(Of InputStream, StreamError)
-  overload: System.Storage.StorageProvider.OpenRead*
-- uid: System.Storage.StorageProvider.CreateNew(System.Storage.Path)
-  commentId: M:System.Storage.StorageProvider.CreateNew(System.Storage.Path)
-  id: CreateNew(System.Storage.Path)
+      type: System.Result{System.Storage.StorageItem,System.Storage.StorageLookupError}
+      description: A provider-owned File or Directory through StorageItem, or StorageLookupError such as NotFound, AccessDenied, InvalidPath or IoFailure.
+    content.vb: Function GetItem(path As Path) As Result(Of StorageItem, StorageLookupError)
+  overload: System.Storage.StorageProvider.GetItem*
+- uid: System.Storage.StorageProvider.GetFile(System.Storage.Path)
+  commentId: M:System.Storage.StorageProvider.GetFile(System.Storage.Path)
+  id: GetFile(System.Storage.Path)
   parent: System.Storage.StorageProvider
   langs:
   - csharp
   - vb
-  name: CreateNew(Path)
-  nameWithType: StorageProvider.CreateNew(Path)
-  fullName: System.Storage.StorageProvider.CreateNew(System.Storage.Path)
+  name: GetFile(Path)
+  nameWithType: StorageProvider.GetFile(Path)
+  fullName: System.Storage.StorageProvider.GetFile(System.Storage.Path)
   type: Method
   assemblies:
   - NeoCLR.CoreProbe
   namespace: System.Storage
-  summary: Exclusively creates an empty file and opens it for byte writes.
-  remarks: Existing entries must not be overwritten. Successful creation is visible even before writing. Close the stream after use. A later write failure does not roll back creation or earlier writes. Parent creation, replacement and durable flushing are not promised.
+  summary: Looks up an existing file and returns its provider-bound descriptor.
+  remarks: Must not create the file or retain an open stream. Provider-specific aliases and concurrent changes do not establish stable item identity.
   example: []
   syntax:
-    content: Result<OutputStream, StreamError> CreateNew(Path path)
+    content: Result<File, StorageLookupError> GetFile(Path path)
     parameters:
     - id: path
       type: System.Storage.Path
-      description: Validated destination address interpreted by this provider.
+      description: Validated logical file address.
     return:
-      type: System.Result{System.Streams.OutputStream,System.Streams.StreamError}
-      description: A new OutputStream, or a StreamError such as AlreadyExists, NotFound, AccessDenied, WrongKind, InvalidPath, LimitExceeded or IoFailure.
-    content.vb: Function CreateNew(path As Path) As Result(Of OutputStream, StreamError)
-  overload: System.Storage.StorageProvider.CreateNew*
+      type: System.Result{System.Storage.File,System.Storage.StorageLookupError}
+      description: A File retaining this provider and address, or StorageLookupError such as NotFound, WrongKind, AccessDenied, InvalidPath or IoFailure.
+    content.vb: Function GetFile(path As Path) As Result(Of File, StorageLookupError)
+  overload: System.Storage.StorageProvider.GetFile*
+- uid: System.Storage.StorageProvider.GetDirectory(System.Storage.Path)
+  commentId: M:System.Storage.StorageProvider.GetDirectory(System.Storage.Path)
+  id: GetDirectory(System.Storage.Path)
+  parent: System.Storage.StorageProvider
+  langs:
+  - csharp
+  - vb
+  name: GetDirectory(Path)
+  nameWithType: StorageProvider.GetDirectory(Path)
+  fullName: System.Storage.StorageProvider.GetDirectory(System.Storage.Path)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Looks up an existing directory and returns its provider-owned interface.
+  remarks: 'Synchronous; may block. Does not create directories or retain an open stream. Success observes current kind, not stable identity or guaranteed later access. Providers define their directory model: the sample memory provider exposes only its root.'
+  example: []
+  syntax:
+    content: Result<Directory, StorageLookupError> GetDirectory(Path path)
+    parameters:
+    - id: path
+      type: System.Storage.Path
+      description: Validated logical directory address interpreted by this provider.
+    return:
+      type: System.Result{System.Storage.Directory,System.Storage.StorageLookupError}
+      description: A Directory retaining its provider context and logical address, or StorageLookupError such as NotFound, WrongKind, AccessDenied, InvalidPath or IoFailure.
+    content.vb: Function GetDirectory(path As Path) As Result(Of Directory, StorageLookupError)
+  overload: System.Storage.StorageProvider.GetDirectory*
 references:
 - uid: System.Storage
   commentId: N:System.Storage
@@ -107,13 +136,13 @@ references:
     name: Storage
     isExternal: true
     href: System.Storage.html
-- uid: System.Storage.StorageProvider.OpenRead*
-  commentId: Overload:System.Storage.StorageProvider.OpenRead
+- uid: System.Storage.StorageProvider.GetItem*
+  commentId: Overload:System.Storage.StorageProvider.GetItem
   isExternal: true
-  href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_OpenRead_System_Storage_Path_
-  name: OpenRead
-  nameWithType: StorageProvider.OpenRead
-  fullName: System.Storage.StorageProvider.OpenRead
+  href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_GetItem_System_Storage_Path_
+  name: GetItem
+  nameWithType: StorageProvider.GetItem
+  fullName: System.Storage.StorageProvider.GetItem
 - uid: System.Storage.Path
   commentId: T:System.Storage.Path
   parent: System.Storage
@@ -122,32 +151,32 @@ references:
   name: Path
   nameWithType: Path
   fullName: System.Storage.Path
-- uid: System.Result{System.Streams.InputStream,System.Streams.StreamError}
-  commentId: T:System.Result{System.Streams.InputStream,System.Streams.StreamError}
+- uid: System.Result{System.Storage.StorageItem,System.Storage.StorageLookupError}
+  commentId: T:System.Result{System.Storage.StorageItem,System.Storage.StorageLookupError}
   parent: System
   definition: System.Result`2
-  href: System.Streams.InputStream.html
-  name: Result<InputStream, StreamError>
-  nameWithType: Result<InputStream, StreamError>
-  fullName: System.Result<System.Streams.InputStream, System.Streams.StreamError>
-  nameWithType.vb: Result(Of InputStream, StreamError)
-  fullName.vb: System.Result(Of System.Streams.InputStream, System.Streams.StreamError)
-  name.vb: Result(Of InputStream, StreamError)
+  href: System.Storage.StorageItem.html
+  name: Result<StorageItem, StorageLookupError>
+  nameWithType: Result<StorageItem, StorageLookupError>
+  fullName: System.Result<System.Storage.StorageItem, System.Storage.StorageLookupError>
+  nameWithType.vb: Result(Of StorageItem, StorageLookupError)
+  fullName.vb: System.Result(Of System.Storage.StorageItem, System.Storage.StorageLookupError)
+  name.vb: Result(Of StorageItem, StorageLookupError)
   spec.csharp:
   - uid: System.Result`2
     name: Result
     isExternal: true
   - name: <
-  - uid: System.Streams.InputStream
-    name: InputStream
+  - uid: System.Storage.StorageItem
+    name: StorageItem
     isExternal: true
-    href: System.Streams.InputStream.html
+    href: System.Storage.StorageItem.html
   - name: ','
   - name: " "
-  - uid: System.Streams.StreamError
-    name: StreamError
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
     isExternal: true
-    href: System.Streams.StreamError.html
+    href: System.Storage.StorageLookupError.html
   - name: '>'
   spec.vb:
   - uid: System.Result`2
@@ -156,16 +185,16 @@ references:
   - name: (
   - name: Of
   - name: " "
-  - uid: System.Streams.InputStream
-    name: InputStream
+  - uid: System.Storage.StorageItem
+    name: StorageItem
     isExternal: true
-    href: System.Streams.InputStream.html
+    href: System.Storage.StorageItem.html
   - name: ','
   - name: " "
-  - uid: System.Streams.StreamError
-    name: StreamError
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
     isExternal: true
-    href: System.Streams.StreamError.html
+    href: System.Storage.StorageLookupError.html
   - name: )
 - uid: System.Result`2
   commentId: T:System.Result`2
@@ -205,39 +234,39 @@ references:
   name: System
   nameWithType: System
   fullName: System
-- uid: System.Storage.StorageProvider.CreateNew*
-  commentId: Overload:System.Storage.StorageProvider.CreateNew
+- uid: System.Storage.StorageProvider.GetFile*
+  commentId: Overload:System.Storage.StorageProvider.GetFile
   isExternal: true
-  href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_CreateNew_System_Storage_Path_
-  name: CreateNew
-  nameWithType: StorageProvider.CreateNew
-  fullName: System.Storage.StorageProvider.CreateNew
-- uid: System.Result{System.Streams.OutputStream,System.Streams.StreamError}
-  commentId: T:System.Result{System.Streams.OutputStream,System.Streams.StreamError}
+  href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_GetFile_System_Storage_Path_
+  name: GetFile
+  nameWithType: StorageProvider.GetFile
+  fullName: System.Storage.StorageProvider.GetFile
+- uid: System.Result{System.Storage.File,System.Storage.StorageLookupError}
+  commentId: T:System.Result{System.Storage.File,System.Storage.StorageLookupError}
   parent: System
   definition: System.Result`2
-  href: System.Streams.OutputStream.html
-  name: Result<OutputStream, StreamError>
-  nameWithType: Result<OutputStream, StreamError>
-  fullName: System.Result<System.Streams.OutputStream, System.Streams.StreamError>
-  nameWithType.vb: Result(Of OutputStream, StreamError)
-  fullName.vb: System.Result(Of System.Streams.OutputStream, System.Streams.StreamError)
-  name.vb: Result(Of OutputStream, StreamError)
+  href: System.Storage.File.html
+  name: Result<File, StorageLookupError>
+  nameWithType: Result<File, StorageLookupError>
+  fullName: System.Result<System.Storage.File, System.Storage.StorageLookupError>
+  nameWithType.vb: Result(Of File, StorageLookupError)
+  fullName.vb: System.Result(Of System.Storage.File, System.Storage.StorageLookupError)
+  name.vb: Result(Of File, StorageLookupError)
   spec.csharp:
   - uid: System.Result`2
     name: Result
     isExternal: true
   - name: <
-  - uid: System.Streams.OutputStream
-    name: OutputStream
+  - uid: System.Storage.File
+    name: File
     isExternal: true
-    href: System.Streams.OutputStream.html
+    href: System.Storage.File.html
   - name: ','
   - name: " "
-  - uid: System.Streams.StreamError
-    name: StreamError
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
     isExternal: true
-    href: System.Streams.StreamError.html
+    href: System.Storage.StorageLookupError.html
   - name: '>'
   spec.vb:
   - uid: System.Result`2
@@ -246,14 +275,66 @@ references:
   - name: (
   - name: Of
   - name: " "
-  - uid: System.Streams.OutputStream
-    name: OutputStream
+  - uid: System.Storage.File
+    name: File
     isExternal: true
-    href: System.Streams.OutputStream.html
+    href: System.Storage.File.html
   - name: ','
   - name: " "
-  - uid: System.Streams.StreamError
-    name: StreamError
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
     isExternal: true
-    href: System.Streams.StreamError.html
+    href: System.Storage.StorageLookupError.html
+  - name: )
+- uid: System.Storage.StorageProvider.GetDirectory*
+  commentId: Overload:System.Storage.StorageProvider.GetDirectory
+  isExternal: true
+  href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_GetDirectory_System_Storage_Path_
+  name: GetDirectory
+  nameWithType: StorageProvider.GetDirectory
+  fullName: System.Storage.StorageProvider.GetDirectory
+- uid: System.Result{System.Storage.Directory,System.Storage.StorageLookupError}
+  commentId: T:System.Result{System.Storage.Directory,System.Storage.StorageLookupError}
+  parent: System
+  definition: System.Result`2
+  href: System.Storage.Directory.html
+  name: Result<Directory, StorageLookupError>
+  nameWithType: Result<Directory, StorageLookupError>
+  fullName: System.Result<System.Storage.Directory, System.Storage.StorageLookupError>
+  nameWithType.vb: Result(Of Directory, StorageLookupError)
+  fullName.vb: System.Result(Of System.Storage.Directory, System.Storage.StorageLookupError)
+  name.vb: Result(Of Directory, StorageLookupError)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - uid: System.Storage.Directory
+    name: Directory
+    isExternal: true
+    href: System.Storage.Directory.html
+  - name: ','
+  - name: " "
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Storage.Directory
+    name: Directory
+    isExternal: true
+    href: System.Storage.Directory.html
+  - name: ','
+  - name: " "
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
   - name: )
