@@ -1,0 +1,93 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+
+// Experiment only: completed scalars are validated by the existing strict codec.
+// At most three trailing bytes survive a successful non-final call.
+public class ChunkDecoder {
+    private field pending: ArrayList<byte>
+    private field expected: int
+    private field stopped: bool
+
+    init() {
+        pending = ArrayList<byte>(4)
+        expected = 0
+        stopped = false
+    }
+
+    func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, string> {
+        if stopped {
+            return Error("Decoder is finished")
+        }
+        if !ValidRange(source.Length, offset, count) {
+            return Error("Invalid input range")
+        }
+        if count > 256 {
+            return Error("Chunk exceeds the experiment limit")
+        }
+        var text = ""
+        var index = 0
+        while index < count {
+            let value = source[offset + index]
+            if pending.Count == 0 {
+                if value <= 127 {
+                    expected = 1
+                } else if value >= 194 && value <= 223 {
+                    expected = 2
+                } else if value >= 224 && value <= 239 {
+                    expected = 3
+                } else if value >= 240 && value <= 244 {
+                    expected = 4
+                } else {
+                    stopped = true
+                    return Error("Invalid UTF-8")
+                }
+            } else if !(value >= 128 && value <= 191) {
+                stopped = true
+                return Error("Invalid UTF-8")
+            }
+            pending.Add(value)
+            if pending.Count == expected {
+                match Utf8.Decode(pending) {
+                    Ok(let scalar) => text = String.Concat(text, scalar)
+                    Error(_) => {
+                        stopped = true
+                        return Error("Invalid UTF-8")
+                    }
+                }
+                pending = ArrayList<byte>(4)
+                expected = 0
+            }
+            index = index + 1
+        }
+        if final {
+            stopped = true
+            if pending.Count != 0 {
+                return Error("Truncated UTF-8")
+            }
+        }
+        return Ok(text)
+    }
+}
+
+public func ReadText(input: MemoryInput, scratch: byte[]) -> Result<string, string> {
+    if scratch.Length == 0 || scratch.Length > 256 {
+        return Error("Scratch length must be 1 through 256")
+    }
+    let decoder = ChunkDecoder()
+    var text = ""
+    var finished = false
+    var totalBytes = 0
+    while !finished {
+        let count = input.Read(scratch, 0, scratch.Length)?
+        if count > 4096 - totalBytes {
+            return Error("Text exceeds the experiment limit")
+        }
+        totalBytes = totalBytes + count
+        finished = count == 0
+        let part = decoder.Decode(scratch, 0, count, finished)?
+        text = String.Concat(text, part)
+    }
+    return Ok(text)
+}

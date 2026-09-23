@@ -1,0 +1,6 @@
+Text reconstructed from short byte reads:
+Aé€😀é
+UTF-8 bytes:
+13
+Graphemes:
+5

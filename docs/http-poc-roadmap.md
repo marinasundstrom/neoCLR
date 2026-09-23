@@ -124,7 +124,7 @@ and a short contract/comparison note. The isolated S0 host probe is only partial
 | --- | --- | --- |
 | S0 — in exploration; host probe passes, runtime bridge open | Fake delayed I/O producer plus a buffer and native-resource stand-in; reuse Task | Empty-queue wakeup, immediate/delayed completion, unrelated continuation progress, GC retention, cancellation/completion race and teardown; record backend choice and rejected alternatives |
 | S1 — partial; checked memory-copy fixture runs | In-memory input/output and copy case; can start alongside S0 | Directional contracts, partial transfers, empty-buffer rules, EOF only for nonempty reads, truncated ReadExactly, no-progress WriteAll, bounds errors, repeated cleanup and injected failures; copy helpers require no sockets |
-| S2 — planned | Encode/decode a multilingual message split at every UTF-8 byte boundary; depends on S1 | Strict invalid/truncated input outcomes, carried decoder state, final-flush behavior and byte counts; reuse current whole-buffer conversions rather than change Char again |
+| S2 — partial; strict chunk decoder experiment | Encode/decode a multilingual message split at every UTF-8 byte boundary; depends on S1 | Strict invalid/truncated input outcomes, carried decoder state, final-flush behavior and byte counts; reuse current whole-buffer conversions rather than change Char again |
 | S3 — planned | Small JSON round trip in memory; depends on S2 | Read/write object, array, string, number, boolean and null; escaped strings and Unicode, malformed syntax, duplicate-key policy, numeric limits/precision and nesting/size bounds are explicit. Prefer explicit field access and construction; benchmark only if making performance claims |
 | S1F — planned learning checkpoint | Reuse the memory/text/JSON pipeline with bounded file input/output; after S1–S3 and the delayed-lifetime checkpoint | Shared stream behavior, open/read/write errors, cleanup and a declared failed-save policy; no directory/provider redesign or claim of nonblocking I/O |
 | S4 — exploration then implementation | TCP listener and echo client; depends on S0/S1 and resolved ownership | Bind/listen/accept/connect/read/write/close, endpoint reporting, short transfers, peer EOF/reset, refused connection, pending accept/read cancellation and repeated shutdown. A stalled connection must not freeze unrelated work; bound admitted connections |
@@ -144,6 +144,18 @@ buffer lifetime. Prototype both on the echo document if the choice is unclear. T
 JSON number grammar must not silently become Int32-only: either retain number text
 with checked conversions or document and reject unsupported values. Streaming JSON
 can follow bounded body buffering; incremental UTF-8 decoding still gets its own case.
+
+## S2 evidence — 2026-09-23
+
+The [UTF-8 chunk experiment](experiments/utf8-chunks/README.md) reuses S1's memory
+input and checked ranges. A Raven sample reconstructs multilingual text from short
+reads and counts bytes separately from graphemes. The strict stateful adapter carries
+incomplete scalar bytes, finalizes explicitly and survives caller buffer reuse and
+synchronous guest GC. A 41-case corpus compares final acceptance/text with .NET 10's
+strict Decoder; lifecycle checks cover range errors and terminal states.
+This is partial evidence: public Encoding APIs, output-capacity reporting, efficient
+buffering, error offsets and suspended/native I/O remain open. Whole-buffer decoding
+remains a valid alternative for the upcoming small JSON consumer.
 
 ## S1 evidence — 2026-09-23
 

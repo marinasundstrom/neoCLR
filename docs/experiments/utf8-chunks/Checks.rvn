@@ -1,0 +1,63 @@
+import System.*
+import System.Result.*
+import System.Console.*
+
+func Check(value: bool) {
+    if !value {
+        System.Fault("UTF-8 chunk check failed")
+    }
+}
+
+func Text(result: Result<string, string>) -> string {
+    var text = ""
+    match result {
+        Ok(let value) => text = value
+        Error(_) => System.Fault("Unexpected decoding failure")
+    }
+    return text
+}
+
+func Rejected(result: Result<string, string>) {
+    match result {
+        Ok(_) => System.Fault("Expected decoding failure")
+        Error(_) => { }
+    }
+}
+
+func Main() {
+    let empty: byte[] = []
+    let prefix: byte[] = [(byte)195]
+    let tail: byte[] = [(byte)169]
+    let decoder = ChunkDecoder()
+    Check(Text(decoder.Decode(prefix, 0, 1, false)).Equals(""))
+    prefix[0] = (byte)65
+    Rejected(decoder.Decode(tail, 2147483647, 1, false))
+    Rejected(decoder.Decode(tail, 1, 2147483647, false))
+    Check(Text(decoder.Decode(empty, 0, 0, false)).Equals(""))
+    Check(Text(decoder.Decode(tail, 0, 1, true)).Equals("é"))
+    Rejected(decoder.Decode(empty, 0, 0, true))
+    WriteLine("Owned carry, unchanged state after invalid ranges and finalization: passed")
+
+    let invalid: byte[] = [(byte)255]
+    let broken = ChunkDecoder()
+    Rejected(broken.Decode(invalid, 0, 1, false))
+    Rejected(broken.Decode(tail, 0, 1, true))
+    let truncated = ChunkDecoder()
+    Check(Text(truncated.Decode(tail, 1, 0, false)).Equals(""))
+    let lead: byte[] = [(byte)226]
+    Check(Text(truncated.Decode(lead, 0, 1, false)).Equals(""))
+    Rejected(truncated.Decode(empty, 0, 0, true))
+    Rejected(truncated.Decode(empty, 0, 0, false))
+    WriteLine("Malformed and truncated inputs stop the decoder: passed")
+
+    let retained = ChunkDecoder()
+    let start: byte[] = [(byte)240, (byte)159]
+    Check(Text(retained.Decode(start, 0, 2, false)).Equals(""))
+    for index in 0..<1200 {
+        _ = MemoryInput([(byte)0])
+    }
+    let end: byte[] = [(byte)152, (byte)128]
+    Check(Text(retained.Decode(end, 0, 2, true)).Equals("😀"))
+    Rejected(ReadText(MemoryInput(end), empty))
+    WriteLine("Pending scalar retained through guest GC: passed")
+}

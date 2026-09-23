@@ -315,8 +315,9 @@ host completion delivery with actual guest GC retention and a Raven consumer.
 S1 now has a [runnable Byte Copy checkpoint](experiments/byte-copy/README.md):
 checked ranges, overlapping copies and short reads/writes over ordinary managed
 arrays, with synchronous GC-retention checks. It is an application-local experiment,
-not a completed general stream API. The next small consumer should test these
-primitives with text processing before new storage representations are selected;
+not a completed general stream API. S2 now has a [UTF-8 chunk consumer](experiments/utf8-chunks/README.md)
+that reuses those primitives, preserves incomplete scalars across reads and compares
+strict decoding with .NET. Neither experiment selects a new storage representation;
 the host probe does not make networking urgent.
 No later major milestone has started.
 
@@ -334,9 +335,9 @@ its feature plan, and update changelog, relevant feature pages and integration d
 Samples begin as small programs, not miniature frameworks. Existing release/debugging
 requirements and Raven branch/integration rules continue to apply.
 
-**Next:** build on S1's checked in-memory Byte Copy sample. Use a small text
-consumer to test the range and partial-transfer contracts before selecting general
-stream interfaces or Memory/Span types, then
-validate guest lifetimes with controlled delayed completion and reuse the pipeline
-for files before tackling sockets. Reassess priorities at each checkpoint and M2
+**Next:** use the byte-copy and UTF-8 evidence to scope the smallest explicit JSON
+round trip. Compare whole-buffer processing with the incremental text adapter;
+do not require a general serializer, stream hierarchy or Memory/Span family first.
+Then validate guest lifetimes with controlled delayed completion and reuse the
+pipeline for files before tackling sockets. Reassess priorities at each checkpoint and M2
 onward after the first major HTTP application milestone.

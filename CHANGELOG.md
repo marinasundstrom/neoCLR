@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Add an application-local UTF-8 chunk decoder experiment reusing Byte Copy's
+  managed arrays and short reads. Demonstrate scalar boundaries versus graphemes,
+  strict finalization, caller-buffer reuse and synchronous GC retention. Compare
+  41 valid/malformed/split-input cases with strict .NET 10 decoding; keep public
+  Encoding contracts, efficient output buffering and pending native I/O open.
+  Record partial S2 evidence and link the experiment from the Strings feature page.
+
 - Add a Raven Byte Copy experiment over existing managed arrays: validate ranges
   before mutation, preserve overlapping copies and demonstrate partial reads/writes
   with a greeting transfer. Validate 1,024 range/alias cases, extreme/empty ranges,

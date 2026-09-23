@@ -1,0 +1,9 @@
+<Project DefaultTargets="Build">
+  <Import Project="$(NeoCLRRoot)/build/NeoCLR.Raven.props" />
+  <ItemGroup>
+    <Compile Include="../byte-copy/ByteCopy.rvn" />
+    <Compile Include="Utf8Chunks.rvn" />
+    <Compile Include="Main.rvn" />
+  </ItemGroup>
+  <Import Project="$(NeoCLRRoot)/build/NeoCLR.Raven.targets" />
+</Project>

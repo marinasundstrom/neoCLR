@@ -1,0 +1,22 @@
+import System.*
+import System.Result.*
+import System.Console.*
+import System.Text.*
+
+func Main() {
+    // "Aé€😀é": 13 bytes, 6 scalars and 5 graphemes. The final accent
+    // combines with the preceding e even when they arrive in separate chunks.
+    let wire: byte[] = [(byte)65, (byte)195, (byte)169, (byte)226, (byte)130, (byte)172, (byte)240, (byte)159, (byte)152, (byte)128, (byte)101, (byte)204, (byte)129]
+    let scratch: byte[] = [(byte)0, (byte)0, (byte)0]
+    match ReadText(MemoryInput(wire), scratch) {
+        Ok(let text) => {
+            WriteLine("Text reconstructed from short byte reads:")
+            WriteLine(text)
+            WriteLine("UTF-8 bytes:")
+            WriteLine(Utf8.Encode(text).Count)
+            WriteLine("Graphemes:")
+            WriteLine(text.Length)
+        }
+        Error(let message) => WriteLine(message)
+    }
+}
