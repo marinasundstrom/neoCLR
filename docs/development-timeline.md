@@ -5193,3 +5193,17 @@ and recorded the convention for runtime code as well as examples.
   criteria rather than changing the active release or workflow.
 - **Status:** planning only. Preview 9 passed the existing six-job matrix. Job
   classification, duplicate removal and the revised matrix remain future work.
+
+
+### 2026-09-23 — Stop documentation pushes starting full runtime CI
+
+- **Author:** observed that pushing the docs changes had started full runs and said
+  this should be avoided. This is an immediate correction to triggers, separate from
+  the broader next-release CI redesign previously deferred.
+- **Assistant action:** cancelled the redundant docs-push and release-tag runs;
+  added documentation/site path exclusions to runtime push/PR triggers and made
+  automatic pushes branch-only. Explicit manual candidate validation remains
+  available, and executable experiments still trigger the unchanged six-job matrix.
+- **Validation:** actionlint passed for both workflows. The documentation closeout
+  uses a normal commit, without a skip marker, to check the new path filtering.
+  Published release validation and website deployment were not cancelled.

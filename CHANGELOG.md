@@ -11,6 +11,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Skip the runtime matrix for documentation, website and API-reference-only pushes
   and pull requests; keep executable experiments covered and provide manual runs.
   Release tags no longer automatically repeat the validated candidate matrix.
+  Document the trigger rules and retain the broader CI redesign for the next release.
 
 - Record publication of Preview 9 at `834028c` with six passing platform/toolchain
   jobs and extracted macOS arm64 package/editor evidence; mark the async checkpoint

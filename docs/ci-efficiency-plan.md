@@ -3,7 +3,8 @@
 Author direction recorded 2026-09-23, after Preview 9 publication: improve CI for the
 **next release, not this release**. Avoid running the entire sample and validation
 suite on every platform. Isolate platform-specific behavior so validation remains
-useful without multiplying identical work. No workflow change is made by this plan.
+useful without multiplying identical work. The broader matrix redesign remains planned; the immediate trigger correction
+below was separately directed after publication.
 
 ## Evidence and problem
 
@@ -48,3 +49,29 @@ it. Avoid merely deleting coverage or labelling mixed tests platform-independent
 
 Implement this before the next release's validation cycle. It does not change the
 published Preview 9 gates or displace the foundational Streams/Storage/Encoding work.
+
+
+## Immediate trigger correction — 2026-09-23
+
+After observing new full runs from documentation changes, the author directed that
+those runs be avoided now. The runtime workflow now ignores Markdown, top-level
+JSON evidence records in docs/, website/API-reference files and their build tooling.
+It still runs for runtime/source/tests, Cargo inputs, release validation tooling and
+executable code or fixtures under docs/experiments/. Mixed code/documentation changes
+still run the matrix. Website validation retains its own relevant-path workflow.
+
+Automatic push validation is branch-only: creating a release tag no longer repeats
+an already validated candidate. `workflow_dispatch` permits an explicit full run on
+a selected branch or tag. The six jobs themselves are unchanged; their future split
+and duplicate-work reduction remain the next-release task.
+
+The trigger-only change was checked with actionlint. A subsequent ordinary docs-only
+push is used to verify filtering without a skip directive. No full matrix is needed
+to validate these trigger rules. Redundant runs 35876872188 (docs/site push) and
+35876772578 (release tag) were cancelled; the successful release matrix 35868351666
+and successful website deployment were retained.
+
+These filters use [GitHub's documented path and branch rules](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax).
+If runtime jobs later become required PR checks, account for path-skipped workflows
+remaining pending; do not enable that branch policy without an appropriate lightweight
+required check. Main had no branch protection when this correction was made.
