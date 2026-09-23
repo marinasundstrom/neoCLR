@@ -63,7 +63,7 @@ above them.
 | `WriteText(path: Path, text: string, maxBytes: int) -> Result<unit, FileWriteError>` | Create or replace text within a byte limit. The supplied providers reject an oversized value before modifying storage. |
 
 Path values describe logical syntax; addresses are meaningful only with a provider.
-HostStorage maps them under its configured native root; MemorySlotStorage uses
+HostStorage maps them under its configured native root; MemoryStorage uses
 rooted logical string keys. Providers choose resolution rules, not Path parsing.
 In this experiment, relative provider operations start at the provider root.
 Directory.FileAt instead appends a direct child to that directory's Path.
@@ -107,17 +107,34 @@ means the configured provider root, not the OS filesystem root. A relative root
 configuration remains relative to the process working directory; no canonicalization
 or sandbox claim is made. There is no sandbox or read-only capability here.
 
-`MemorySlotStorage()` has a text slot and a separate byte slot per instance during
-this migration experiment. They are separate stores, even for the same address;
-do not mix text helpers and byte streams as though they were a coherent filesystem. Writing another text address replaces the text slot. Reads at a missing address
-return NotFound. Negative limits return InvalidLimit; UTF-8 byte counts above the
-limit return TooLarge. Rejected writes preserve the previous entry. Distinct
-instances do not share state. The byte slot uses a shared mutable list, with a separate cursor on each input.
-CreateNew rejects the same existing address with AlreadyExists and a different
-second byte-file address with LimitExceeded. Memory streams cap file size at
-64 KiB and each successful transfer at two bytes. An open reader sees subsequently
-appended bytes; there is no snapshot or concurrency guarantee. It is a test
-provider, not a general memory filesystem.
+`MemoryStorage()` replaces the earlier experimental MemorySlotStorage. It implements
+all five StorageProvider methods using one byte payload per logical address; text
+reads decode that payload and text writes encode UTF-8 without a BOM. Files written
+through either API are visible through the other. Instances do not share state.
+Relative and absolute spellings with the same names resolve to the same entry.
+Logical `/` and `.` denote the root and cannot be opened or written as files.
+Nested names are flat keys; this is not a directory tree or a general filesystem.
+
+The store permits eight addresses, each with at most 64 KiB of current contents.
+CreateNew rejects an existing address with AlreadyExists and a new address at
+capacity with LimitExceeded. Text writes reject negative limits with InvalidLimit,
+root paths with NotRegularFile, and contents beyond the caller limit or 64 KiB with
+TooLarge. At address capacity, a new text address returns WriteFailed because the
+temporary FileWriteError family lacks a capacity case. Existing addresses remain
+writable. Rejected writes preserve their previous contents and publish no new entry.
+
+ReadText checks negative limits, root kind, existence and byte count before strict
+UTF-8 decoding. It reports InvalidLimit, NotRegularFile, NotFound, TooLarge or
+InvalidUtf8 respectively. OpenRead reports WrongKind for the root and NotFound for
+missing addresses. Stream methods retain the buffer/error rules below.
+
+Each successful text write publishes a fresh byte payload. Already-open memory
+inputs and outputs retain the previous payload; later reads/opens use the replacement.
+Within one payload, readers have separate cursors and observe appended bytes.
+This is a provisional memory-provider replacement policy, not a snapshot guarantee
+or a common disk/memory contract. Old streams can keep old payloads alive; the limits
+are not a bound on total retained VM memory. No concurrency guarantee is provided.
+Streams still transfer at most two bytes per call to exercise partial-transfer loops.
 
 ## Directional capability interfaces
 
@@ -158,7 +175,9 @@ The byte workflow uses a three-byte reusable buffer, writes and flushes, closes
 before inspecting the result, then reads and closes before decoding. UTF-8 decoding
 uses the collected bytes, not individual chunks. This is not an incremental decoder.
 It checks exclusive creation, repeated close and Closed outcomes in both backends.
-The separate verifier also checks the exact disk bytes and text workflow failures.
+The same sample checks text-to-stream and stream-to-text reads on disk and in memory.
+The verifier also checks exact disk bytes, invalid UTF-8, address capacity, replacement
+with retained streams and text workflow failures.
 
 ## What remains open
 
@@ -174,9 +193,9 @@ while an open stream can retain an old file after its address is replaced. A
 proposed GetFile would query kind/existence and return a provider-bound descriptor;
 it is not implemented. Each later open must still report its own failures. Opening
 content merely to check existence would add read-access requirements and consume
-the stream budget. A native metadata query is the next candidate to evaluate after
-the memory provider has coherent text/byte contents. The separate text and byte slots are a
-visible limitation of the test provider, not a final storage model. General stream
+the stream budget. With memory contents unified, a native metadata query is the next candidate to
+evaluate against both providers. Replacement while streams remain open, directory
+structure and provider identity still need a common contract. General stream
 capabilities, automatic disposal, cleanup across await and async scheduling also
 remain design work.
 

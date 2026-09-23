@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Replace the experimental MemorySlotStorage with MemoryStorage: text helpers and
+  streams now share byte contents per address. Support up to eight addresses with 64 KiB
+  current payloads, strict UTF-8 reads and cross-API exclusive creation. Keep old
+  payloads alive for existing streams after text replacement; this provisional
+  memory policy is not a disk/portable identity guarantee. Extend the disk/memory
+  sample and contract checks, and update the on-site API reference and roadmap.
+
 - Add isolated host Storage lookup probes comparing .NET FileInfo caching with
   metadata observations, path replacement, open-handle identity and provider roots.
   Record typed metadata lookup as a provisional direction, not an implemented

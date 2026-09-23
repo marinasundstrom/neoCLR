@@ -3,6 +3,7 @@ namespace StorageExperiment
 import System.*
 import System.Console.*
 import System.Result.*
+import System.Text.*
 
 // This workflow receives a directory; it does not select the storage provider.
 func RoundTrip(directory: Directory) {
@@ -41,6 +42,27 @@ func RoundTrip(directory: Directory) {
                 }
                 Ok(_) => System.Fault("Byte limit counted characters")
             }
+            match file.OpenRead() {
+                Ok(let input) => {
+                    let result = ReadMessage(input)
+                    input.Close()
+                    match result {
+                        Ok(let bytes) => {
+                            match Utf8.Decode(bytes) {
+                                Ok(let text) => {
+                                    if text != "Hello, värld!" {
+                                        System.Fault("Text and byte reads disagree")
+                                    }
+                                }
+                                Error(_) => System.Fault("Written text was not valid UTF-8")
+                            }
+                        }
+                        Error(let error) => System.Fault(error.ToString())
+                    }
+                }
+                Error(let error) => System.Fault(error.ToString())
+            }
+            WriteLine("Text write visible through byte stream")
             WriteLine("Rejected write preserved contents")
         }
         Error(let error) => System.Fault(error.ToString())
@@ -60,7 +82,7 @@ func RejectChild(directory: Directory, name: string) {
 
 func Main() {
     let host: StorageProvider = HostStorage("sandbox")
-    let memory: StorageProvider = MemorySlotStorage()
+    let memory: StorageProvider = MemoryStorage()
     // Parsing does not open storage. The same logical root works for both providers.
     let root = RequirePath("/")
     let disk = Directory(host, root)
@@ -95,7 +117,7 @@ func Main() {
     RejectChild(disk, "child\\name")
     RejectChild(disk, "child\u0000name")
     WriteLine("Direct child required")
-    let otherMemory: StorageProvider = MemorySlotStorage()
+    let otherMemory: StorageProvider = MemoryStorage()
     let other = otherMemory.FileAt(RequirePath("/notes.txt"), "notes.txt")
     match other.ReadText(64) {
         Error(let error) => {

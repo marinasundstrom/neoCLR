@@ -2,15 +2,19 @@ Disk
 notes.txt
 Written
 Hello, värld!
+Text write visible through byte stream
 Rejected write preserved contents
 Byte stream round trip: Hello, värld!
+Byte stream write visible through text helper
 Exclusive creation and closed streams checked
 Memory
 notes.txt
 Written
 Hello, värld!
+Text write visible through byte stream
 Rejected write preserved contents
 Byte stream round trip: Hello, värld!
+Byte stream write visible through text helper
 Exclusive creation and closed streams checked
 Direct child required
 Providers remain independent

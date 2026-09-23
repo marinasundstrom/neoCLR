@@ -144,8 +144,10 @@ The [lookup/identity probes](experiments/storage-provider/README.md#lookup-and-i
 now distinguish metadata observations, provider-bound addresses and open handles,
 with a .NET FileInfo comparison. They support typed metadata lookup rather than
 opening content to probe existence; no GetFile API has been implemented yet.
-Next, unify the memory provider's text/byte contents so one address denotes one file,
-then test a native metadata lookup adapter and typed errors across disk/memory
+The memory provider now shares byte payloads across text helpers and streams, with
+cross-API sample checks and bounded multi-file storage. Its replacement policy
+retains old payloads for open streams; common identity semantics remain exploratory.
+Next, test a native metadata lookup adapter and typed errors across disk/memory
 before promoting the Storage surface. Preserve the tested stream operations. The
 current application-owned File/Directory and capability interfaces remain
 exploratory; do not promote their string-address/text-helper shape unchanged merely

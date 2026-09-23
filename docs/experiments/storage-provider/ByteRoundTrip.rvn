@@ -125,6 +125,15 @@ func ByteRoundTrip(directory: Directory) {
                 }
                 Error(let error) => System.Fault(error.ToString())
             }
+            match file.ReadText(14) {
+                Ok(let text) => {
+                    if text != "Hello, värld!" {
+                        System.Fault("Byte writes not visible through text helper")
+                    }
+                }
+                Error(let error) => System.Fault(error.ToString())
+            }
+            WriteLine("Byte stream write visible through text helper")
             WriteLine("Exclusive creation and closed streams checked")
         }
         Error(let error) => System.Fault(error.ToString())

@@ -59,7 +59,7 @@ func Main() {
     if RequirePath("/notes.txt").Equals(RequirePath("notes.txt")) {
         System.Fault("Path equality silently resolved relative addresses")
     }
-    let memory: StorageProvider = MemorySlotStorage()
+    let memory: StorageProvider = MemoryStorage()
     let root = Directory(memory, RequirePath("/"))
     let current = Directory(memory, RequirePath("."))
     match root.FileAt("note") {

@@ -1,0 +1,136 @@
+namespace StorageExperiment
+
+import System.*
+import System.Console.*
+import System.Result.*
+
+func CheckText(provider: StorageProvider, path: Path, expected: string) {
+    match provider.ReadText(path, 65536) {
+        Ok(let text) => {
+            if text != expected {
+                System.Fault("Unexpected stored text")
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+}
+
+func PutText(provider: StorageProvider, path: Path, text: string) {
+    match provider.WriteText(path, text, 65536) {
+        Ok(_) => { }
+        Error(let error) => System.Fault(error.ToString())
+    }
+}
+
+func Main() {
+    let provider: StorageProvider = MemoryStorage()
+    let path = RequirePath("/data")
+    // A stream-created empty file already exists for text reads and creation.
+    match provider.CreateNew(path) {
+        Ok(let output) => {
+            CheckText(provider, path, "")
+            let invalid: byte[] = [(byte)255]
+            match output.Write(invalid, 0, 1) {
+                Ok(let count) => {
+                    if count != 1 {
+                        System.Fault("Unexpected byte write count")
+                    }
+                }
+                Error(let error) => System.Fault(error.ToString())
+            }
+            match provider.ReadText(path, 0) {
+                Error(let error) => {
+                    if !error.IsTooLarge {
+                        System.Fault("Read limit must precede decoding")
+                    }
+                }
+                Ok(_) => System.Fault("Read limit ignored")
+            }
+            match provider.ReadText(path, 1) {
+                Error(let error) => {
+                    if !error.IsInvalidUtf8 {
+                        System.Fault("Expected invalid UTF-8")
+                    }
+                }
+                Ok(_) => System.Fault("Invalid bytes decoded")
+            }
+            // Replacing contents detaches old streams in this memory experiment.
+            PutText(provider, path, "new")
+            match output.Write(invalid, 0, 1) {
+                Ok(_) => { }
+                Error(let error) => System.Fault(error.ToString())
+            }
+            output.Close()
+            CheckText(provider, path, "new")
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    match provider.OpenRead(path) {
+        Ok(let input) => {
+            PutText(provider, path, "replacement")
+            let buffer: byte[] = [(byte)0, (byte)0]
+            match input.Read(buffer, 0, 2) {
+                Ok(let count) => {
+                    if count != 2 || buffer[0] != (byte)110 || buffer[1] != (byte)101 {
+                        System.Fault("Old reader lost its byte payload")
+                    }
+                }
+                Error(let error) => System.Fault(error.ToString())
+            }
+            input.Close()
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    CheckText(provider, RequirePath("data"), "replacement")
+    match provider.CreateNew(RequirePath("data")) {
+        Error(let error) => {
+            if !error.IsAlreadyExists {
+                System.Fault("Text file not visible to exclusive creation")
+            }
+        }
+        Ok(_) => System.Fault("Existing text file replaced by creation")
+    }
+    match provider.OpenRead(RequirePath("/")) {
+        Error(let error) => {
+            if !error.IsWrongKind {
+                System.Fault("Root is not a file")
+            }
+        }
+        Ok(_) => System.Fault("Root opened as file")
+    }
+    // Fill the bounded store. Rejected additions cannot evict existing contents.
+    var index = 1
+    while index < 8 {
+        PutText(provider, RequirePath("/file" + index.ToString()), "kept")
+        index += 1
+    }
+    let extra = RequirePath("/extra")
+    match provider.CreateNew(extra) {
+        Error(let error) => {
+            if !error.IsLimitExceeded {
+                System.Fault("Wrong storage capacity error")
+            }
+        }
+        Ok(_) => System.Fault("Storage capacity ignored")
+    }
+    match provider.WriteText(extra, "rejected", 64) {
+        Error(let error) => {
+            if !error.IsWriteFailed {
+                System.Fault("Wrong temporary text capacity error")
+            }
+        }
+        Ok(_) => System.Fault("Text write exceeded storage capacity")
+    }
+    PutText(provider, path, "still writable")
+    CheckText(provider, path, "still writable")
+    CheckText(provider, RequirePath("/file1"), "kept")
+    match provider.OpenRead(extra) {
+        Error(let error) => {
+            if !error.IsNotFound {
+                System.Fault("Rejected creation left an entry")
+            }
+        }
+        Ok(_) => System.Fault("Rejected creation published an entry")
+    }
+    WriteLine("Coherent memory storage contracts: passed")
+}

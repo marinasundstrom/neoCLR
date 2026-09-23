@@ -3,6 +3,7 @@ namespace StorageExperiment
 import System.*
 import System.Collections.*
 import System.Streams.*
+import System.Text.*
 import System.Result.*
 import System.Storage.FileReadError
 import System.Storage.FileWriteError
@@ -134,9 +135,11 @@ class HostStorage : StorageProvider {
     }
 }
 
-// Deliberately one slot: enough to check provider retention and the sample's
-// behavior without pretending to implement a general in-memory filesystem.
-class MemorySlotStorage : StorageProvider {
+// Bounded application-owned provider: one byte payload per logical address.
+class MemoryStorage : StorageProvider {
+    private field keys: List<string> = ArrayList<string>()
+    private field contents: List<List<byte>> = ArrayList<List<byte>>()
+
     private func Key(path: Path) -> string {
         if path.Text == "." {
             return "/"
@@ -147,28 +150,43 @@ class MemorySlotStorage : StorageProvider {
         return "/" + path.Text
     }
 
-    // Separate byte slot while the old whole-text adapter remains in the sample.
-    private field bytePresent: bool = false
-    private field bytePath: string = ""
-    private field bytes: List<byte> = ArrayList<byte>()
+    private func Find(path: Path) -> int {
+        let key = Key(path)
+        var index = 0
+        while index < keys.Count {
+            if keys[index] == key {
+                return index
+            }
+            index += 1
+        }
+        return -1
+    }
 
     func OpenRead(path: Path) -> Result<InputStream, StreamError> {
-        if !bytePresent || bytePath != Key(path) {
+        if Key(path) == "/" {
+            return Error(StreamError(StreamError.WrongKind()))
+        }
+        let index = Find(path)
+        if index < 0 {
             return Error(StreamError(StreamError.NotFound()))
         }
-        let stream: InputStream = MemoryInput(bytes)
+        let stream: InputStream = MemoryInput(contents[index])
         return Ok(stream)
     }
 
     func CreateNew(path: Path) -> Result<OutputStream, StreamError> {
-        if bytePresent {
-            if bytePath == Key(path) {
-                return Error(StreamError(StreamError.AlreadyExists()))
-            }
+        if Key(path) == "/" {
+            return Error(StreamError(StreamError.WrongKind()))
+        }
+        if Find(path) >= 0 {
+            return Error(StreamError(StreamError.AlreadyExists()))
+        }
+        if keys.Count >= 8 {
             return Error(StreamError(StreamError.LimitExceeded()))
         }
-        bytePresent = true
-        bytePath = Key(path)
+        let bytes: List<byte> = ArrayList<byte>()
+        keys.Add(Key(path))
+        contents.Add(bytes)
         let stream: OutputStream = MemoryOutput(bytes)
         return Ok(stream)
     }
@@ -177,33 +195,57 @@ class MemorySlotStorage : StorageProvider {
         return File(self, path, name)
     }
 
-    private field present: bool = false
-    private field storedPath: string = ""
-    private field text: string = ""
-
     func ReadText(path: Path, maxBytes: int) -> Result<string, FileReadError> {
         if maxBytes < 0 {
             return Error(FileReadError(FileReadError.InvalidLimit()))
         }
-        if !present || storedPath != Key(path) {
+        if Key(path) == "/" {
+            return Error(FileReadError(FileReadError.NotRegularFile()))
+        }
+        let index = Find(path)
+        if index < 0 {
             return Error(FileReadError(FileReadError.NotFound()))
         }
-        if text.GetUtf8ByteCount() > maxBytes {
+        let bytes = contents[index]
+        if bytes.Count > maxBytes {
             return Error(FileReadError(FileReadError.TooLarge()))
         }
-        return Ok(text)
+        return match Utf8.Decode(bytes) {
+            Ok(let text) => Ok(text)
+            Error(_) => Error(FileReadError(FileReadError.InvalidUtf8()))
+        }
     }
 
     func WriteText(path: Path, text: string, maxBytes: int) -> Result<unit, FileWriteError> {
         if maxBytes < 0 {
             return Error(FileWriteError(FileWriteError.InvalidLimit()))
         }
-        if text.GetUtf8ByteCount() > maxBytes {
+        if Key(path) == "/" {
+            return Error(FileWriteError(FileWriteError.NotRegularFile()))
+        }
+        let count = text.GetUtf8ByteCount()
+        if count > maxBytes || count > 65536 {
             return Error(FileWriteError(FileWriteError.TooLarge()))
         }
-        storedPath = Key(path)
-        self.text = text
-        present = true
+        let index = Find(path)
+        if index < 0 && keys.Count >= 8 {
+            // The temporary whole-text error family has no capacity case.
+            return Error(FileWriteError(FileWriteError.WriteFailed()))
+        }
+        let encoded = Utf8.Encode(text)
+        let bytes: List<byte> = ArrayList<byte>()
+        var position = 0
+        while position < encoded.Count {
+            bytes.Add(encoded[position])
+            position += 1
+        }
+        // Publish only after validation/encoding. Existing streams retain old bytes.
+        if index < 0 {
+            keys.Add(Key(path))
+            contents.Add(bytes)
+        } else {
+            contents[index] = bytes
+        }
         return Ok(())
     }
 }

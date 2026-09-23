@@ -2,7 +2,7 @@
 
 **Development experiment, 2026-09-23. Application-owned Storage/capability types using development System.Streams APIs.**
 The same Raven `RoundTrip(Directory)` workflow writes and reads a real UTF-8 file
-and then runs against a one-slot memory provider. The application sees File and
+and then runs against a bounded memory provider. The application sees File and
 Directory objects; each retains the provider that interprets its address.
 
 Run against matching development artifacts:
@@ -26,7 +26,7 @@ syntax on memory, archive or remote providers. The earlier tested revision deleg
 address resolution to the provider and used `directory::name` memory keys. The next
 exploration now introduces shared validated logical Path syntax: Directory parses
 child paths, while providers resolve them. HostStorage maps them under a configured
-native root; MemorySlotStorage uses rooted logical keys. File retains its display
+native root; MemoryStorage uses rooted logical keys. File retains its display
 name separately. Both experiments use ordinary Raven interface dispatch without
 runtime or compiler changes.
 
@@ -65,10 +65,14 @@ claim that these types are part of the platform's core reference assembly.
 - **Lifetime:** these descriptors hold no open file; the existing helper opens and
   closes per text operation. Byte streams require explicit Close and otherwise live
   until invocation teardown. Disposal across suspension is still unproven.
-- **Memory provider:** retains one text slot and one separate byte slot during this
-  migration experiment. They are not coherent views of the same file. Byte streams
-  share a list, have separate input cursors and transfer at most two bytes per call.
-  This tests application progress loops, not filesystem conformance or concurrency.
+- **Memory provider:** MemoryStorage replaces MemorySlotStorage. Text and stream
+  operations share one byte payload per address. There are at most eight addresses,
+  each with at most 64 KiB of current contents; nested paths are flat keys, not a
+  directory tree. Separate input cursors and two-byte transfers exercise loops.
+  Text replacement publishes a new payload; already-open streams retain the old
+  one. This is a provisional policy, not a common host/memory identity guarantee.
+  Retained old payloads are outside the current-content limits.
+
 
 The existing compiler reference's error cases require explicit carrier construction
 inside inferred Result.Error values; direct nested case construction did not compile.
@@ -190,8 +194,43 @@ Proposed contract for the next implementation slice, **not shipped API**:
   does not confer sandbox authority. Async completion remains open with scheduling;
   do not advertise synchronous experiments as the final provider contract.
 
-Before a shared lookup interface, make the memory provider's text and byte views
-coherent: its current separate slots cannot honestly answer a single file lookup.
-Then add a native metadata adapter and matched disk/memory checks, including a
+The subsequent coherent-memory slice resolves the separate text/byte slot obstacle.
+Next add a native metadata adapter and matched disk/memory checks, including a
 failed open after successful lookup. Independent .NET filesystem abstractions and
 permission-error portability remain research gaps before promoting this API family.
+
+## Coherent text and byte contents (2026-09-23)
+
+The same disk/memory product now reads a text-created file through an input stream,
+then reads a stream-created file through the text helper. The verifier checks
+`MemoryContracts.rvn` separately: invalid UTF-8 and byte-limit ordering, empty files,
+exclusive creation after text writes, relative/rooted aliases, root kind, replacement
+with retained input/output streams, capacity and preservation after rejection.
+The eight-address limit returns StreamError.LimitExceeded for creation; the temporary
+text error family can only return FileWriteError.WriteFailed for address exhaustion.
+This mismatch is evidence for the next Storage error design, not an ideal final API.
+
+The implementation uses ordinary Raven lists, UTF-8 conversion and interface dispatch.
+No runtime hooks or compiler changes are needed. A small linear address search keeps
+this bounded prototype readable; there is no performance claim. Text conversion
+copies bytes and publishes a replacement list only after validation. Existing streams
+retain their original list, including readers observing writes to that original list.
+An alternative shared resizable file object could preserve item identity through
+truncation, but adds a lifetime/mutation contract to settle with disk providers.
+
+Compared with [.NET File.WriteAllText](https://learn.microsoft.com/en-us/dotnet/api/system.io.file.writealltext?view=net-10.0)
+(reviewed 2026-09-23), the UTF-8-without-BOM representation is familiar. .NET truncates
+and overwrites an existing file; this memory prototype publishes a different payload.
+Do not infer matching already-open-handle behavior. The benefit is that rejected text
+writes cannot alter visible contents; costs include copying and retained old payloads.
+The earlier [lookup probes](#lookup-and-identity-evidence-2026-09-23) demonstrate why
+address identity and retained stream identity must be described separately. The
+on-site reference records all new behavior and the experimental type rename.
+
+Validation on 2026-09-23: normal SDK compilation and execution passed for the product
+sample, stream contracts, Path contracts and coherent-memory contracts; private Path
+construction/mutation rejection checks also passed. The API snapshot, combined site
+and four website tooling tests passed. An initial 64-entry capacity test exceeded the
+VM's 100,000-instruction default with linear lookup; the fixture provider now uses
+eight entries so this bounded case fits the unchanged runtime budget. This does not
+establish scalable storage performance. No cross-platform matrix was rerun.
