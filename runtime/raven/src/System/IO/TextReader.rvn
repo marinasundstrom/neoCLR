@@ -3,6 +3,7 @@ namespace System.IO
 import System.*
 
 public interface TextReader {
+    func ReadLine(maxUtf8Bytes: int) -> Result<Option<string>, TextReadError>
     func ReadToEnd(maxUtf8Bytes: int) -> Result<string, TextReadError>
     func Close()
 }

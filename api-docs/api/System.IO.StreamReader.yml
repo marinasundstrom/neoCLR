@@ -8,6 +8,7 @@ items:
   - System.IO.StreamReader.#ctor(System.IO.InputStream)
   - System.IO.StreamReader.#ctor(System.IO.InputStream,System.Boolean)
   - System.IO.StreamReader.Close
+  - System.IO.StreamReader.ReadLine(System.Int32)
   - System.IO.StreamReader.ReadToEnd(System.Int32)
   langs:
   - csharp
@@ -86,6 +87,39 @@ items:
   nameWithType.vb: StreamReader.New(InputStream, Boolean)
   fullName.vb: System.IO.StreamReader.New(System.IO.InputStream, Boolean)
   name.vb: New(InputStream, Boolean)
+- uid: System.IO.StreamReader.ReadLine(System.Int32)
+  commentId: M:System.IO.StreamReader.ReadLine(System.Int32)
+  id: ReadLine(System.Int32)
+  parent: System.IO.StreamReader
+  langs:
+  - csharp
+  - vb
+  name: ReadLine(int)
+  nameWithType: StreamReader.ReadLine(int)
+  fullName: System.IO.StreamReader.ReadLine(int)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Reads one strict UTF-8 line without its LF or CRLF terminator.
+  remarks: StreamReader performs one-byte reads to avoid read-ahead. A lone CR is data. A BOM is preserved. An unterminated final line is returned once. Invalid bounds consume nothing; decoding, I/O and length errors may advance input. Close is checked first. No rollback or asynchronous behavior is promised.
+  example: []
+  syntax:
+    content: public Result<Option<string>, TextReadError> ReadLine(int maxUtf8Bytes)
+    parameters:
+    - id: maxUtf8Bytes
+      type: System.Int32
+      description: Maximum content bytes, 0 through 65536 for StreamReader.
+    return:
+      type: System.Result{System.Option{System.String},System.IO.TextReadError}
+      description: Some text for a line; None for EOF before any data; or TextReadError.
+    content.vb: Public Function ReadLine(maxUtf8Bytes As Integer) As Result(Of [Option](Of String), TextReadError)
+  overload: System.IO.StreamReader.ReadLine*
+  implements:
+  - System.IO.TextReader.ReadLine(System.Int32)
+  nameWithType.vb: StreamReader.ReadLine(Integer)
+  fullName.vb: System.IO.StreamReader.ReadLine(Integer)
+  name.vb: ReadLine(Integer)
 - uid: System.IO.StreamReader.ReadToEnd(System.Int32)
   commentId: M:System.IO.StreamReader.ReadToEnd(System.Int32)
   id: ReadToEnd(System.Int32)
@@ -223,6 +257,140 @@ references:
   nameWithType.vb: Boolean
   fullName.vb: Boolean
   name.vb: Boolean
+- uid: System.IO.StreamReader.ReadLine*
+  commentId: Overload:System.IO.StreamReader.ReadLine
+  isExternal: true
+  href: System.IO.StreamReader.html#System_IO_StreamReader_ReadLine_System_Int32_
+  name: ReadLine
+  nameWithType: StreamReader.ReadLine
+  fullName: System.IO.StreamReader.ReadLine
+- uid: System.IO.TextReader.ReadLine(System.Int32)
+  commentId: M:System.IO.TextReader.ReadLine(System.Int32)
+  parent: System.IO.TextReader
+  isExternal: true
+  href: System.IO.TextReader.html#System_IO_TextReader_ReadLine_System_Int32_
+  name: ReadLine(int)
+  nameWithType: TextReader.ReadLine(int)
+  fullName: System.IO.TextReader.ReadLine(int)
+  nameWithType.vb: TextReader.ReadLine(Integer)
+  fullName.vb: System.IO.TextReader.ReadLine(Integer)
+  name.vb: ReadLine(Integer)
+  spec.csharp:
+  - uid: System.IO.TextReader.ReadLine(System.Int32)
+    name: ReadLine
+    isExternal: true
+    href: System.IO.TextReader.html#System_IO_TextReader_ReadLine_System_Int32_
+  - name: (
+  - uid: System.Int32
+    name: int
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: System.IO.TextReader.ReadLine(System.Int32)
+    name: ReadLine
+    isExternal: true
+    href: System.IO.TextReader.html#System_IO_TextReader_ReadLine_System_Int32_
+  - name: (
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+  - name: )
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System.Result{System.Option{System.String},System.IO.TextReadError}
+  commentId: T:System.Result{System.Option{System.String},System.IO.TextReadError}
+  parent: System
+  definition: System.Result`2
+  href: System.IO.TextReadError.html
+  name: Result<Option<string>, TextReadError>
+  nameWithType: Result<Option<string>, TextReadError>
+  fullName: System.Result<System.Option<string>, System.IO.TextReadError>
+  nameWithType.vb: Result(Of Option(Of String), TextReadError)
+  fullName.vb: System.Result(Of System.Option(Of String), System.IO.TextReadError)
+  name.vb: Result(Of Option(Of String), TextReadError)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+  - name: '>'
+  - name: ','
+  - name: " "
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+  - name: )
+  - name: ','
+  - name: " "
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: )
+- uid: System.Result`2
+  commentId: T:System.Result`2
+  isExternal: true
+  name: Result<T, E>
+  nameWithType: Result<T, E>
+  fullName: System.Result<T, E>
+  nameWithType.vb: Result(Of T, E)
+  fullName.vb: System.Result(Of T, E)
+  name.vb: Result(Of T, E)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: )
 - uid: System.IO.StreamReader.ReadToEnd*
   commentId: Overload:System.IO.StreamReader.ReadToEnd
   isExternal: true
@@ -261,16 +429,6 @@ references:
     name: Integer
     isExternal: true
   - name: )
-- uid: System.Int32
-  commentId: T:System.Int32
-  parent: System
-  isExternal: true
-  name: int
-  nameWithType: int
-  fullName: int
-  nameWithType.vb: Integer
-  fullName.vb: Integer
-  name.vb: Integer
 - uid: System.Result{System.String,System.IO.TextReadError}
   commentId: T:System.Result{System.String,System.IO.TextReadError}
   parent: System
@@ -313,37 +471,6 @@ references:
     name: TextReadError
     isExternal: true
     href: System.IO.TextReadError.html
-  - name: )
-- uid: System.Result`2
-  commentId: T:System.Result`2
-  isExternal: true
-  name: Result<T, E>
-  nameWithType: Result<T, E>
-  fullName: System.Result<T, E>
-  nameWithType.vb: Result(Of T, E)
-  fullName.vb: System.Result(Of T, E)
-  name.vb: Result(Of T, E)
-  spec.csharp:
-  - uid: System.Result`2
-    name: Result
-    isExternal: true
-  - name: <
-  - name: T
-  - name: ','
-  - name: " "
-  - name: E
-  - name: '>'
-  spec.vb:
-  - uid: System.Result`2
-    name: Result
-    isExternal: true
-  - name: (
-  - name: Of
-  - name: " "
-  - name: T
-  - name: ','
-  - name: " "
-  - name: E
   - name: )
 - uid: System.IO.StreamReader.Close*
   commentId: Overload:System.IO.StreamReader.Close

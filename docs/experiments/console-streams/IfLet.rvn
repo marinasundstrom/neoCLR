@@ -1,0 +1,31 @@
+import System.*
+import System.IO.*
+import System.Result.*
+import System.Option.*
+
+func ReadInput() -> Result<unit, TextReadError> {
+    if let Some(input) = Console.ReadLine()? {
+        Console.WriteLine("Input is: $input")
+    } else {
+        Console.WriteLine("No input")
+        return Ok(())
+    }
+    return Ok(())
+}
+
+func Main() {
+    match ReadInput() {
+        Ok(_) => { }
+        Error(_) => {
+            let diagnostics = Console.Error
+            let Ok(_) = diagnostics.WriteLine("Could not read input") else {
+                System.Fault("Could not write diagnostic")
+                return
+            }
+            let Ok(_) = diagnostics.Flush() else {
+                System.Fault("Could not write diagnostic")
+                return
+            }
+        }
+    }
+}

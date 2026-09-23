@@ -1,0 +1,64 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.ConsoleReadError.ReadFailed
+  commentId: T:System.ConsoleReadError.ReadFailed
+  id: ConsoleReadError.ReadFailed
+  parent: System
+  children:
+  - System.ConsoleReadError.ReadFailed.#ctor
+  langs:
+  - csharp
+  - vb
+  name: ConsoleReadError.ReadFailed
+  nameWithType: ConsoleReadError.ReadFailed
+  fullName: System.ConsoleReadError.ReadFailed
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: The host input operation failed.
+  example: []
+  syntax:
+    content: public struct ConsoleReadError.ReadFailed
+    content.vb: Public Structure ConsoleReadError.ReadFailed
+- uid: System.ConsoleReadError.ReadFailed.#ctor
+  commentId: M:System.ConsoleReadError.ReadFailed.#ctor
+  id: '#ctor'
+  parent: System.ConsoleReadError.ReadFailed
+  langs:
+  - csharp
+  - vb
+  name: ReadFailed()
+  nameWithType: ConsoleReadError.ReadFailed.ReadFailed()
+  fullName: System.ConsoleReadError.ReadFailed.ReadFailed()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Creates a ReadFailed case marker.
+  example: []
+  syntax:
+    content: public ReadFailed()
+    content.vb: Public Sub New()
+  overload: System.ConsoleReadError.ReadFailed.#ctor*
+  nameWithType.vb: ConsoleReadError.ReadFailed.New()
+  fullName.vb: System.ConsoleReadError.ReadFailed.New()
+  name.vb: New()
+references:
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.ConsoleReadError.ReadFailed.#ctor*
+  commentId: Overload:System.ConsoleReadError.ReadFailed.#ctor
+  isExternal: true
+  href: System.ConsoleReadError.ReadFailed.html#System_ConsoleReadError_ReadFailed__ctor
+  name: ReadFailed
+  nameWithType: ConsoleReadError.ReadFailed.ReadFailed
+  fullName: System.ConsoleReadError.ReadFailed.ReadFailed
+  nameWithType.vb: ConsoleReadError.ReadFailed.New
+  fullName.vb: System.ConsoleReadError.ReadFailed.New
+  name.vb: New

@@ -1,0 +1,112 @@
+; Generated from runtime/raven/src/System/IO/StreamWriter.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeStringGetUtf8ByteCount(String source) -> Int32
+ldarg source
+call instance System.String::GetUtf8ByteCount()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorClosed(System.IO.StreamError.Closed value) -> System.IO.StreamError
+ldarg value
+newobj instance System.IO.StreamError::.ctor(System.IO.StreamError.Closed)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorLimitExceeded(System.IO.StreamError.LimitExceeded value) -> System.IO.StreamError
+ldarg value
+newobj instance System.IO.StreamError::.ctor(System.IO.StreamError.LimitExceeded)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorIoFailure(System.IO.StreamError.IoFailure value) -> System.IO.StreamError
+ldarg value
+newobj instance System.IO.StreamError::.ctor(System.IO.StreamError.IoFailure)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorClosedNew() -> System.IO.StreamError.Closed
+newobj instance System.IO.StreamError.Closed::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorLimitExceededNew() -> System.IO.StreamError.LimitExceeded
+newobj instance System.IO.StreamError.LimitExceeded::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorIoFailureNew() -> System.IO.StreamError.IoFailure
+newobj instance System.IO.StreamError.IoFailure::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError arg0) -> System.Result.Error<System.IO.StreamError>
+ldarg arg0
+newobj instance System.Result.Error<System.IO.StreamError>::.ctor(System.IO.StreamError)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError> arg0) -> System.Result<Int32,System.IO.StreamError>
+ldarg arg0
+newobj instance System.Result<Int32,System.IO.StreamError>::.ctor(System.Result.Error<System.IO.StreamError>)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion2(Int32 arg0) -> System.Result.Ok<Int32>
+ldarg arg0
+newobj instance System.Result.Ok<Int32>::.ctor(Int32)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion3(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.IO.StreamError>
+ldarg arg0
+newobj instance System.Result<Int32,System.IO.StreamError>::.ctor(System.Result.Ok<Int32>)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion4(System.Result<Int32,System.IO.StreamError>& arg0,out(true) System.Result.Ok<Int32>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Result<Int32,System.IO.StreamError>
+ldarg arg1
+call instance System.Result<Int32,System.IO.StreamError>::TryGet(System.Result.Ok<Int32>&)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Ok<Int32>& receiver,out Int32& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Result.Ok<Int32>
+call instance System.Result.Ok<Int32>::get_Value()
+stobj Int32
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion6(System.Result<Int32,System.IO.StreamError>& arg0,out(true) System.Result.Error<System.IO.StreamError>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Result<Int32,System.IO.StreamError>
+ldarg arg1
+call instance System.Result<Int32,System.IO.StreamError>::TryGet(System.Result.Error<System.IO.StreamError>&)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion7(System.Result.Error<System.IO.StreamError>& receiver,out System.IO.StreamError& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Result.Error<System.IO.StreamError>
+call instance System.Result.Error<System.IO.StreamError>::get_Value()
+stobj System.IO.StreamError
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion8(System.Result.Error<System.IO.StreamError> arg0) -> System.Result<Void,System.IO.StreamError>
+ldarg arg0
+newobj instance System.Result<Void,System.IO.StreamError>::.ctor(System.Result.Error<System.IO.StreamError>)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

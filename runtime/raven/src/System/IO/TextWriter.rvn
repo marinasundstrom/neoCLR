@@ -1,0 +1,10 @@
+namespace System.IO
+
+import System.*
+
+public interface TextWriter {
+    func Write(text: string) -> Result<int, StreamError>
+    func WriteLine(text: string) -> Result<int, StreamError>
+    func Flush() -> Result<unit, StreamError>
+    func Close()
+}

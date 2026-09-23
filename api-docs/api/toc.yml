@@ -1,5 +1,21 @@
 ### YamlMime:TableOfContent
 items:
+- uid: System
+  name: System
+  type: Namespace
+  items:
+  - uid: System.Console
+    name: Console
+    type: Class
+  - uid: System.ConsoleReadError
+    name: ConsoleReadError
+    type: Struct
+  - uid: System.ConsoleReadError.ReadFailed
+    name: ConsoleReadError.ReadFailed
+    type: Struct
+  - uid: System.ConsoleReadError.Unavailable
+    name: ConsoleReadError.Unavailable
+    type: Struct
 - uid: System.Concurrency
   name: System.Concurrency
   type: Namespace
@@ -65,6 +81,9 @@ items:
   - uid: System.IO.StreamReader
     name: StreamReader
     type: Class
+  - uid: System.IO.StreamWriter
+    name: StreamWriter
+    type: Class
   - uid: System.IO.TextReadError
     name: TextReadError
     type: Struct
@@ -103,6 +122,9 @@ items:
     type: Struct
   - uid: System.IO.TextReader
     name: TextReader
+    type: Interface
+  - uid: System.IO.TextWriter
+    name: TextWriter
     type: Interface
 - uid: System.Storage
   name: System.Storage

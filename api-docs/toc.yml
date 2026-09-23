@@ -25,3 +25,6 @@
   href: file-transformer.md
 - name: Pending-read experiment
   href: pending-read.md
+
+- name: Console and standard streams
+  href: console.md

@@ -226,3 +226,19 @@ into a language tutorial. For example, the development outcome sample currently 
 `Then((value: int) -> Result<int, string> => Ok(value + 1))`; the shorter
 union-returning callback fails inference in Raven SDK .15. Both OrElse callbacks
 in that sample compile without annotations.
+
+
+## Presenting Result and Option APIs
+
+Author direction, 2026-09-23: ordinary samples should prefer `?` for propagating
+errors through a compatible Result and pattern bindings for optional values, rather
+than requiring a match at every call. Combined Result<Option<T>, E> is a useful
+example: propagate E, then bind Some or handle None. Use match when explaining case
+structure, applying different policies to cases, or handling the final error at an
+application boundary. Do not silently discard errors merely to shorten a sample.
+
+For code after a successful binding, the current toolchain uses
+`let Some(input) = expression else { return ... }`. The else branch must exit.
+For a success block, use `if let Some(input) = expression { ... } else { ... }`.
+Compile the sample before publishing syntax or interpolation examples. See the
+[Console propagation examples](experiments/console-streams/README.md).

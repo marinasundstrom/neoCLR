@@ -80,6 +80,13 @@ fn worker_results_share_a_byte_budget_with_captured_output() {
                 let execution =
                     result.unwrap_or_else(|e| panic!("{name} {callback} {input:?} {budget}: {e}"));
                 assert_eq!(execution.value, Value::String(input.into()));
+                let expected_bytes = if callback == "Print" {
+                    format!("\n{input}\n").into_bytes()
+                } else {
+                    vec![]
+                };
+                assert_eq!(execution.stdout, expected_bytes);
+                assert!(execution.stderr.is_empty());
                 assert_eq!(
                     execution.output,
                     if callback == "Print" {

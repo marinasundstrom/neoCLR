@@ -9,6 +9,20 @@ pub trait Console: std::fmt::Debug + Send + Sync {
     fn read_byte(&self) -> io::Result<Option<u8>>;
     /// Write text followed by a line ending and make it visible before returning.
     fn write_line(&self, text: &str) -> io::Result<()>;
+    /// Write raw stdout (false) or stderr (true) bytes. Hosts opt in explicitly.
+    fn write_bytes(&self, _error: bool, _bytes: &[u8]) -> io::Result<usize> {
+        Err(io::Error::new(
+            io::ErrorKind::Unsupported,
+            "console byte output unavailable",
+        ))
+    }
+    /// Flush the selected output channel without closing the host resource.
+    fn flush(&self, _error: bool) -> io::Result<()> {
+        Err(io::Error::new(
+            io::ErrorKind::Unsupported,
+            "console flush unavailable",
+        ))
+    }
 }
 
 /// Explicit opt-in to process stdin/stdout. Uses UTF-8 bytes and LF output endings.
@@ -29,6 +43,20 @@ impl Console for StdioConsole {
         }
     }
 
+    fn write_bytes(&self, error: bool, bytes: &[u8]) -> io::Result<usize> {
+        if error {
+            io::stderr().lock().write(bytes)
+        } else {
+            io::stdout().lock().write(bytes)
+        }
+    }
+    fn flush(&self, error: bool) -> io::Result<()> {
+        if error {
+            io::stderr().lock().flush()
+        } else {
+            io::stdout().lock().flush()
+        }
+    }
     fn write_line(&self, text: &str) -> io::Result<()> {
         let mut output = io::stdout().lock();
         output.write_all(text.as_bytes())?;

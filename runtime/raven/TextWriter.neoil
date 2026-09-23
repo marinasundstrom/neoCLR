@@ -1,0 +1,2 @@
+.include "generated/TextWriter.methods.neoil"
+.include "generated/TextWriter.helpers.neoil"

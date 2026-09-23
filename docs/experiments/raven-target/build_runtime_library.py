@@ -12,6 +12,8 @@ ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
     'TextReadError': 'System.IO.TextReadError',
     'TextReader': 'System.IO.TextReader',
+    'TextWriter': 'System.IO.TextWriter',
+    'StreamWriter': 'System.IO.StreamWriter',
     'StreamReader': 'System.IO.StreamReader',
     'SeekableStream': 'System.IO.SeekableStream',
 
@@ -120,6 +122,8 @@ SLICES = {
 SOURCES = {
     'TextReadError': 'runtime/raven/src/System/IO/TextReadError.rvn',
     'TextReader': 'runtime/raven/src/System/IO/TextReader.rvn',
+    'TextWriter': 'runtime/raven/src/System/IO/TextWriter.rvn',
+    'StreamWriter': 'runtime/raven/src/System/IO/StreamWriter.rvn',
     'StreamReader': 'runtime/raven/src/System/IO/StreamReader.rvn',
     'SeekableStream': 'runtime/raven/src/System/IO/SeekableStream.rvn',
     'FileSystem': 'runtime/raven/src/System/Storage/FileSystem.rvn',
@@ -358,7 +362,7 @@ def main():
                         raise SystemExit('Regenerated library differs: ' + output)
                 continue
             inputs = [ROOT / path for path in SOURCES.values()]
-            inputs += [ROOT / "runtime/raven/src/System/Tasks/TaskOperators.rvn"]
+            inputs += [ROOT / "runtime/raven/src/System/Tasks/TaskOperators.rvn", ROOT / "runtime/raven/src/System/Console/Streams.rvn"]
             inputs += [PROJECT, ROOT / 'build/NeoCLR.Raven.props']
             data = {'format': 'raven-library-bootstrap-v1', 'owner': owner,
                     'inputs': {str(p.relative_to(ROOT)): digest(p) for p in inputs},

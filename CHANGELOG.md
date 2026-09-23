@@ -8,6 +8,22 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Keep Console a static class and add In/Out/Error, standard byte-stream factories,
+  bounded UTF-8 ReadLine, Write and blank WriteLine. Add TextWriter and StreamWriter;
+  extend TextReader with ReadLine (implementers must supply the new member).
+  Calls remain synchronous; lines use LF/CRLF, with lone CR preserved as data.
+  Add opt-in host byte-write/flush hooks and byte-exact Execution.stdout/stderr
+  capture without a live host. Existing hosts retain WriteLine; new output hooks
+  default to Unsupported until implemented. Refresh reference metadata, generated
+  library and API docs. Adapt importer dispatch and Console's legacy Void returns.
+  Show tested Result propagation and Option bindings on the Console feature page
+  and dedicated Raven error-handling section; reserve match for useful case handling.
+  Validation: three native boundary tests; greeting input cases; reader/writer
+  ownership, partial-write and range contracts; both propagation/binding samples;
+  dedicated/pooled worker output capture and budget regression;
+  library/API snapshots and combined website build. The older raw-System Console
+  suite remains blocked by an unresolved StorageItem dependency in that library.
+
 - Characterize queue ownership in the isolated worker adapter with a pending await
   entered from an explicit caller queue: the body resumes through the producer's
   queue, while result observation waits for the caller queue to drain. Keep this as

@@ -42,6 +42,9 @@ pub struct Execution {
     pub value: Value,
     /// Captured lines when no host console is supplied; empty with live console I/O.
     pub output: Vec<String>,
+    /// Exact stdout/stderr captured without a host console, including byte writes.
+    pub stdout: Vec<u8>,
+    pub stderr: Vec<u8>,
     /// Objects reachable from the returned value; identities may contain gaps.
     pub heap: crate::ManagedHeap,
     pub memory: crate::memory::PointerHeap,
@@ -1475,6 +1478,7 @@ fn interpret_frames(
     let mut heap = crate::ManagedHeap::default();
     let mut memory = crate::memory::PointerHeap::default();
     let mut output = vec![];
+    let mut console_bytes = [Vec::new(), Vec::new()];
     let result = interpret_instructions(
         module,
         frames,
@@ -1483,6 +1487,7 @@ fn interpret_frames(
         &mut heap,
         &mut memory,
         &mut output,
+        &mut console_bytes,
     );
     if let Some(debugger) = &options.debugger {
         let mut snapshot = debug_snapshot(module, frames, &heap, &memory, &output, result.is_err());
@@ -1494,6 +1499,8 @@ fn interpret_frames(
     result.map(|value| Execution {
         value,
         output,
+        stdout: std::mem::take(&mut console_bytes[0]),
+        stderr: std::mem::take(&mut console_bytes[1]),
         heap,
         memory,
         native_libraries,
@@ -1536,6 +1543,7 @@ fn interpret_instructions(
     heap: &mut crate::ManagedHeap,
     memory: &mut crate::memory::PointerHeap,
     output: &mut Vec<String>,
+    console_bytes: &mut [Vec<u8>; 2],
 ) -> Result<Value, Fault> {
     let limits = options.limits;
     let mut collection_threshold = limits.heap_objects.min(64);
@@ -2642,6 +2650,7 @@ fn interpret_instructions(
                         ) {
                             arrays_used = true;
                         }
+                        let prior_output = output.len();
                         let value = if matches!(binding, crate::native::Binding::CurrentTaskQueue) {
                             current_task_queue
                                 .clone()
@@ -2687,7 +2696,9 @@ fn interpret_instructions(
                         ) {
                             workers.request_cancellation(args)?
                         } else if matches!(binding, crate::native::Binding::JoinWorkerResult) {
-                            Value::Erased(Box::new(workers.join_result(args, output, options, true)?))
+                            Value::Erased(Box::new(
+                                workers.join_result(args, output, options, true)?,
+                            ))
                         } else if matches!(binding, crate::native::Binding::JoinWorker) {
                             workers.join(args, output, options)?
                         } else {
@@ -2697,9 +2708,22 @@ fn interpret_instructions(
                                 module,
                                 &limits,
                                 output,
+                                console_bytes,
                                 options,
                             )?
                         };
+                        if options.console.is_none()
+                            && matches!(
+                                binding,
+                                crate::native::Binding::JoinWorker
+                                    | crate::native::Binding::JoinWorkerResult
+                            )
+                        {
+                            for line in &output[prior_output..] {
+                                console_bytes[0].extend_from_slice(line.as_bytes());
+                                console_bytes[0].push(b'\n');
+                            }
+                        }
                         let value = if matches!(
                             binding,
                             crate::native::Binding::Reflection(_)

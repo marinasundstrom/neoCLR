@@ -169,6 +169,7 @@
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Console'">
     <Compile Include="src/System/Console/Functions.rvn" />
+    <Compile Include="src/System/Console/Streams.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'String'">
     <Compile Include="src/System/String.rvn" />
@@ -299,5 +300,11 @@
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'OutputStream'">
     <Compile Include="src/System/IO/OutputStream.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TextWriter'">
+    <Compile Include="src/System/IO/TextWriter.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StreamWriter'">
+    <Compile Include="src/System/IO/StreamWriter.rvn" />
   </ItemGroup>
 </Project>

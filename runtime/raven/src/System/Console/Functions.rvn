@@ -1,35 +1,88 @@
-namespace System.Console
+namespace System
 
+import System.*
+import System.IO.*
 import System.ConsoleReadError
 import System.Result.*
 import System.Option.*
 import System.Runtime.CompilerServices.RuntimeServices
 
-public func ReadByte() -> System.Result<System.Option<byte>, ConsoleReadError> {
-    let payload = RuntimeServices.ConsoleReadByte()
-    if RuntimeServices.IsValue<int>(payload) {
-        let status = RuntimeServices.UnpackValue<int>(payload)
-        if status == 1 {
-            return Error(ConsoleReadError(ConsoleReadError.Unavailable()))
+public static class Console {
+    static func ReadByte() -> System.Result<System.Option<byte>, ConsoleReadError> {
+        let payload = RuntimeServices.ConsoleReadByte()
+        if RuntimeServices.IsValue<int>(payload) {
+            let status = RuntimeServices.UnpackValue<int>(payload)
+            if status == 1 {
+                return System.Result<System.Option<byte>, ConsoleReadError>.Error(ConsoleReadError(ConsoleReadError.Unavailable()))
+            }
+            if status == 2 {
+                return System.Result<System.Option<byte>, ConsoleReadError>.Error(ConsoleReadError(ConsoleReadError.ReadFailed()))
+            }
+            System.Fault("invalid native I/O status")
+            return System.Result<System.Option<byte>, ConsoleReadError>.Error(ConsoleReadError(ConsoleReadError.ReadFailed()))
         }
-        if status == 2 {
-            return Error(ConsoleReadError(ConsoleReadError.ReadFailed()))
+        if RuntimeServices.IsValue<System.Void>(payload) {
+            let absent: System.Option<byte> = None()
+            return Ok(absent)
         }
-        System.Fault("invalid native I/O status")
-        return Error(ConsoleReadError(ConsoleReadError.ReadFailed()))
+        let present: System.Option<byte> = Some(RuntimeServices.UnpackValue<byte>(payload))
+        return Ok(present)
     }
-    if RuntimeServices.IsValue<System.Void>(payload) {
-        let absent: System.Option<byte> = None()
-        return Ok(absent)
+
+    static func WriteLine(value0: string) {
+        RuntimeServices.WriteLine(value0)
     }
-    let present: System.Option<byte> = Some(RuntimeServices.UnpackValue<byte>(payload))
-    return Ok(present)
-}
 
-public func WriteLine(value0: string) {
-    RuntimeServices.WriteLine(value0)
-}
+    static func WriteLine(value0: int) {
+        RuntimeServices.WriteLine(RuntimeServices.Int32ToString(value0))
+    }
 
-public func WriteLine(value0: int) {
-    RuntimeServices.WriteLine(RuntimeServices.Int32ToString(value0))
+    // Fresh non-owning wrappers share the host's channels; closing one closes only it.
+    static val In: TextReader {
+        get {
+            return StreamReader(OpenStandardInput())
+        }
+    }
+    static val Out: TextWriter {
+        get {
+            return StreamWriter(OpenStandardOutput())
+        }
+    }
+    static val Error: TextWriter {
+        get {
+            return StreamWriter(OpenStandardError())
+        }
+    }
+
+    static func OpenStandardInput() -> InputStream => ConsoleInputStream()
+    static func OpenStandardOutput() -> OutputStream => ConsoleOutputStream(false)
+    static func OpenStandardError() -> OutputStream => ConsoleOutputStream(true)
+
+    static func ReadLine() -> System.Result<System.Option<string>, TextReadError> {
+        return In.ReadLine(65536)
+    }
+
+    static func ReadLine(maxUtf8Bytes: int) -> System.Result<System.Option<string>, TextReadError> {
+        return In.ReadLine(maxUtf8Bytes)
+    }
+
+    static func Write(value0: string) {
+        let writer = Out
+        match writer.Write(value0) {
+            Ok(_) => { }
+            Error(_) => System.Fault("console output failed")
+        }
+        match writer.Flush() {
+            Ok(_) => { }
+            Error(_) => System.Fault("console output failed")
+        }
+    }
+
+    static func Write(value0: int) {
+        Write(RuntimeServices.Int32ToString(value0))
+    }
+
+    static func WriteLine() {
+        RuntimeServices.WriteLine("")
+    }
 }

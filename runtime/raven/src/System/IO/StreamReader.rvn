@@ -3,6 +3,7 @@ namespace System.IO
 import System.*
 import System.Collections.*
 import System.Result.*
+import System.Option.*
 import System.Text.*
 import System.Runtime.CompilerServices.*
 
@@ -19,6 +20,73 @@ public class StreamReader : TextReader {
     init(input: InputStream, leaveOpen: bool) {
         self.input = input
         self.leaveOpen = leaveOpen
+    }
+
+    // LF and CRLF delimit lines; a lone CR is data. No read-ahead across lines.
+    func ReadLine(maxUtf8Bytes: int) -> Result<Option<string>, TextReadError> {
+        if closed {
+            return Error(TextReadError(TextReadError.Closed()))
+        }
+        if maxUtf8Bytes < 0 {
+            return Error(TextReadError(TextReadError.InvalidRange()))
+        }
+        if maxUtf8Bytes > 65536 {
+            return Error(TextReadError(TextReadError.LimitExceeded()))
+        }
+        let bytes: List<byte> = ArrayList<byte>()
+        let buffer: byte[] = [(byte)0]
+        while true {
+            match input.Read(buffer, 0, 1) {
+                Ok(let count) => {
+                    if count < 0 {
+                        System.Fault("Invalid input read count")
+                    }
+                    if count > 1 {
+                        System.Fault("Invalid input read count")
+                    }
+                    if count == 0 {
+                        if bytes.Count == 0 {
+                            let absent: Option<string> = None()
+                            return Ok(absent)
+                        }
+                        if bytes.Count > maxUtf8Bytes {
+                            return Error(TextReadError(TextReadError.LimitExceeded()))
+                        }
+                        return DecodeLine(bytes, bytes.Count)
+                    }
+                    let value = buffer[0]
+                    if value == 10 {
+                        var length = bytes.Count
+                        if length > 0 && bytes[length - 1] == 13 {
+                            length -= 1
+                        }
+                        return DecodeLine(bytes, length)
+                    }
+                    if bytes.Count >= maxUtf8Bytes && (bytes.Count > maxUtf8Bytes || value != 13) {
+                        return Error(TextReadError(TextReadError.LimitExceeded()))
+                    }
+                    bytes.Add(value)
+                }
+                Error(let error) => return Error(FromStream(error))
+            }
+        }
+        return Error(TextReadError(TextReadError.IoFailure()))
+    }
+
+    private static func DecodeLine(bytes: Sequence<byte>, length: int) -> Result<Option<string>, TextReadError> {
+        let line = CheckedStorage.Reserve<byte>(length)
+        var index = 0
+        while index < length {
+            line[index] = bytes[index]
+            index += 1
+        }
+        return match Utf8.Decode(line) {
+            Ok(let text) => {
+                let present: Option<string> = Some(text)
+                Ok(present)
+            }
+            Error(_) => Error(TextReadError(TextReadError.InvalidUtf8()))
+        }
     }
 
     func ReadToEnd(maxUtf8Bytes: int) -> Result<string, TextReadError> {

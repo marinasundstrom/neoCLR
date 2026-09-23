@@ -111,3 +111,37 @@ Reduce them into independent CLI-metadata/emission cases before changing Raven;
 retain them as deferred general integration candidates. Runtime Contract settings,
 compiler code and target policy are unchanged. See the
 [fixture notes](../experiments/worker-task-cancellation/README.md#queue-ownership-characterization).
+
+## Console integration — 2026-09-23
+
+neoCLR now projects System.Console as a static class with text reader/writer
+properties and standard byte-stream factories. The reference/importer catalogs
+admit TextReader.ReadLine, TextWriter, StreamWriter and the internal Console stream
+providers. Internal constructor access is allowed for verified library exports
+inside their module; these providers are not public application contracts.
+Runtime Contract configuration is unchanged: unit uses System.Void. The neoCLR
+importer retains legacy Console value-Void exports, inserts/discards their value
+at static call boundaries, and preserves no-result instance provider methods.
+This is target adaptation, not a Raven compiler emission change.
+
+Validation uses matching regenerated reference/library snapshots, a greeting,
+short-write/ownership tests and both Result/Option patterns: `?` plus
+`let Some(input) = ... else` and `if let Some(input) = ... { ... } else { ... }`.
+The else guard returns before later use of input. The samples pass normal input,
+EOF, empty lines and malformed UTF-8. APIs are development-only after Preview 9.
+
+Deferred general compiler candidates, observed on the integration branch and
+requiring independent reduction/testing before any main-branch fix:
+
+- Expression-bodied static Console properties emitted null instead of the factory
+  result; explicit getter bodies work in this slice.
+- A nested match returning configured unit produced incompatible branch stacks;
+  a propagation helper avoided that shape.
+- Expression-bodied custom stream methods returning Result emitted a case rather
+  than its carrier in this experiment; block-bodied returns work.
+
+No general compiler fix was made or merged as part of this work. These observations
+are not intended language restrictions. Existing neoCLR-specific configuration
+and experiments remain isolated on the integration feature branch.
+
+See [Console contracts](../../api-docs/console.md) and [tested samples](../experiments/console-streams/README.md).

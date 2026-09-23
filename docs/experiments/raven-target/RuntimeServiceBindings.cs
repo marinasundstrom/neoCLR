@@ -50,6 +50,8 @@ static class RuntimeServiceBindings
             ("StringSliceUtf8", ["String", "Int32", "Int32"], "Value"),
             ("ReadAllText", ["String", "Int32"], "Value"),
             ("ParseInt32", ["String"], "Value"),
+            ("ConsoleWriteBytes", ["Boolean", "arrayref<Byte>", "Int32", "Int32"], "Value"),
+            ("ConsoleFlush", ["Boolean"], "Value"),
             ("ConsoleReadByte", [], "Value"),
             ("WriteLine", ["String"], "noresult"),
             ("EnvironmentArguments", [], "arrayref<String>"),

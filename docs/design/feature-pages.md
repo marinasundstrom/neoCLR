@@ -43,6 +43,7 @@ the homepage provides current status and feature entry points.
 Feature pages currently cover [Introspection](../../website/features/introspection/index.html)
 and [Strings](../../website/features/strings/index.html), with additional notes for
 [Option/Result](../../website/features/outcomes/index.html),
+[Console](../../website/features/console/index.html),
 [arrays](../../website/features/arrays/index.html),
 [collections/queries](../../website/features/collections/index.html),
 [dates/clocks](../../website/features/time/index.html) and

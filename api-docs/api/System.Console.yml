@@ -1,0 +1,701 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Console
+  commentId: T:System.Console
+  id: Console
+  parent: System
+  children:
+  - System.Console.Error
+  - System.Console.In
+  - System.Console.OpenStandardError
+  - System.Console.OpenStandardInput
+  - System.Console.OpenStandardOutput
+  - System.Console.Out
+  - System.Console.ReadByte
+  - System.Console.ReadLine
+  - System.Console.ReadLine(System.Int32)
+  - System.Console.Write(System.Int32)
+  - System.Console.Write(System.String)
+  - System.Console.WriteLine
+  - System.Console.WriteLine(System.Int32)
+  - System.Console.WriteLine(System.String)
+  langs:
+  - csharp
+  - vb
+  name: Console
+  nameWithType: Console
+  fullName: System.Console
+  type: Class
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Static access to standard input, output and error.
+  remarks: Development API. UTF-8 and synchronous host calls. In/Out/Error create fresh wrappers; Close affects only that wrapper. See the Console guide for ownership, limits and embedding behavior.
+  example: []
+  syntax:
+    content: public static class Console
+    content.vb: Public Module Console
+  inheritance:
+  - System.Object
+- uid: System.Console.ReadByte
+  commentId: M:System.Console.ReadByte
+  id: ReadByte
+  parent: System.Console
+  langs:
+  - csharp
+  - vb
+  name: ReadByte()
+  nameWithType: Console.ReadByte()
+  fullName: System.Console.ReadByte()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Reads one raw input byte.
+  example: []
+  syntax:
+    content: public static Result<Option<byte>, ConsoleReadError> ReadByte()
+    return:
+      type: System.Result{System.Option{System.Byte},System.ConsoleReadError}
+      description: Some byte, None at EOF, or ConsoleReadError when unavailable or failed.
+    content.vb: Public Shared Function ReadByte() As Result(Of [Option](Of Byte), ConsoleReadError)
+  overload: System.Console.ReadByte*
+- uid: System.Console.OpenStandardInput
+  commentId: M:System.Console.OpenStandardInput
+  id: OpenStandardInput
+  parent: System.Console
+  langs:
+  - csharp
+  - vb
+  name: OpenStandardInput()
+  nameWithType: Console.OpenStandardInput()
+  fullName: System.Console.OpenStandardInput()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Opens a non-owning byte-stream wrapper for standard input.
+  remarks: Each call creates an independent wrapper; Close closes only the wrapper. Input may return a one-byte short read. Calls are synchronous; operations are limited to 65536 bytes.
+  example: []
+  syntax:
+    content: public static InputStream OpenStandardInput()
+    return:
+      type: System.IO.InputStream
+      description: An InputStream for input or OutputStream for either output channel.
+    content.vb: Public Shared Function OpenStandardInput() As InputStream
+  overload: System.Console.OpenStandardInput*
+- uid: System.Console.OpenStandardOutput
+  commentId: M:System.Console.OpenStandardOutput
+  id: OpenStandardOutput
+  parent: System.Console
+  langs:
+  - csharp
+  - vb
+  name: OpenStandardOutput()
+  nameWithType: Console.OpenStandardOutput()
+  fullName: System.Console.OpenStandardOutput()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Opens a non-owning byte-stream wrapper for standard output.
+  remarks: Each call creates an independent wrapper; Close closes only the wrapper. Input may return a one-byte short read. Calls are synchronous; operations are limited to 65536 bytes.
+  example: []
+  syntax:
+    content: public static OutputStream OpenStandardOutput()
+    return:
+      type: System.IO.OutputStream
+      description: An InputStream for input or OutputStream for either output channel.
+    content.vb: Public Shared Function OpenStandardOutput() As OutputStream
+  overload: System.Console.OpenStandardOutput*
+- uid: System.Console.OpenStandardError
+  commentId: M:System.Console.OpenStandardError
+  id: OpenStandardError
+  parent: System.Console
+  langs:
+  - csharp
+  - vb
+  name: OpenStandardError()
+  nameWithType: Console.OpenStandardError()
+  fullName: System.Console.OpenStandardError()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Opens a non-owning byte-stream wrapper for standard error.
+  remarks: Each call creates an independent wrapper; Close closes only the wrapper. Input may return a one-byte short read. Calls are synchronous; operations are limited to 65536 bytes.
+  example: []
+  syntax:
+    content: public static OutputStream OpenStandardError()
+    return:
+      type: System.IO.OutputStream
+      description: An InputStream for input or OutputStream for either output channel.
+    content.vb: Public Shared Function OpenStandardError() As OutputStream
+  overload: System.Console.OpenStandardError*
+- uid: System.Console.ReadLine
+  commentId: M:System.Console.ReadLine
+  id: ReadLine
+  parent: System.Console
+  langs:
+  - csharp
+  - vb
+  name: ReadLine()
+  nameWithType: Console.ReadLine()
+  fullName: System.Console.ReadLine()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Reads one bounded strict UTF-8 line.
+  remarks: The parameterless overload uses 65536. LF and CRLF delimit lines; a lone CR is data. No read-ahead past LF. A limit error consumes input without rollback. Unavailable input maps to IoFailure. See StreamReader.ReadLine.
+  example: []
+  syntax:
+    content: public static Result<Option<string>, TextReadError> ReadLine()
+    return:
+      type: System.Result{System.Option{System.String},System.IO.TextReadError}
+      description: Some text, including empty text for an empty line; None for EOF before any data; or TextReadError.
+    content.vb: Public Shared Function ReadLine() As Result(Of [Option](Of String), TextReadError)
+  overload: System.Console.ReadLine*
+- uid: System.Console.ReadLine(System.Int32)
+  commentId: M:System.Console.ReadLine(System.Int32)
+  id: ReadLine(System.Int32)
+  parent: System.Console
+  langs:
+  - csharp
+  - vb
+  name: ReadLine(int)
+  nameWithType: Console.ReadLine(int)
+  fullName: System.Console.ReadLine(int)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Reads one bounded strict UTF-8 line.
+  remarks: The parameterless overload uses 65536. LF and CRLF delimit lines; a lone CR is data. No read-ahead past LF. A limit error consumes input without rollback. Unavailable input maps to IoFailure. See StreamReader.ReadLine.
+  example: []
+  syntax:
+    content: public static Result<Option<string>, TextReadError> ReadLine(int maxUtf8Bytes)
+    parameters:
+    - id: maxUtf8Bytes
+      type: System.Int32
+      description: Maximum returned UTF-8 bytes, from 0 through 65536.
+    return:
+      type: System.Result{System.Option{System.String},System.IO.TextReadError}
+      description: Some text, including empty text for an empty line; None for EOF before any data; or TextReadError.
+    content.vb: Public Shared Function ReadLine(maxUtf8Bytes As Integer) As Result(Of [Option](Of String), TextReadError)
+  overload: System.Console.ReadLine*
+  nameWithType.vb: Console.ReadLine(Integer)
+  fullName.vb: System.Console.ReadLine(Integer)
+  name.vb: ReadLine(Integer)
+- uid: System.Console.Write(System.String)
+  commentId: M:System.Console.Write(System.String)
+  id: Write(System.String)
+  parent: System.Console
+  langs:
+  - csharp
+  - vb
+  name: Write(string)
+  nameWithType: Console.Write(string)
+  fullName: System.Console.Write(string)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Writes text without a line ending to stdout.
+  remarks: Flushes before returning. Output failure is a terminal Fault. For recoverable output errors, use Console.Out. Write(string) is bounded to 65536 UTF-8 bytes; existing WriteLine overloads retain their prior behavior.
+  example: []
+  syntax:
+    content: public static void Write(string value0)
+    parameters:
+    - id: value0
+      type: System.String
+      description: Value to write.
+    content.vb: Public Shared Sub Write(value0 As String)
+  overload: System.Console.Write*
+  nameWithType.vb: Console.Write(String)
+  fullName.vb: System.Console.Write(String)
+  name.vb: Write(String)
+- uid: System.Console.Write(System.Int32)
+  commentId: M:System.Console.Write(System.Int32)
+  id: Write(System.Int32)
+  parent: System.Console
+  langs:
+  - csharp
+  - vb
+  name: Write(int)
+  nameWithType: Console.Write(int)
+  fullName: System.Console.Write(int)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Writes a decimal integer without a line ending to stdout.
+  remarks: Flushes before returning. Output failure is a terminal Fault. For recoverable output errors, use Console.Out. Write(string) is bounded to 65536 UTF-8 bytes; existing WriteLine overloads retain their prior behavior.
+  example: []
+  syntax:
+    content: public static void Write(int value0)
+    parameters:
+    - id: value0
+      type: System.Int32
+      description: Value to write.
+    content.vb: Public Shared Sub Write(value0 As Integer)
+  overload: System.Console.Write*
+  nameWithType.vb: Console.Write(Integer)
+  fullName.vb: System.Console.Write(Integer)
+  name.vb: Write(Integer)
+- uid: System.Console.WriteLine
+  commentId: M:System.Console.WriteLine
+  id: WriteLine
+  parent: System.Console
+  langs:
+  - csharp
+  - vb
+  name: WriteLine()
+  nameWithType: Console.WriteLine()
+  fullName: System.Console.WriteLine()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Writes an empty line to stdout and flushes it.
+  example: []
+  syntax:
+    content: public static void WriteLine()
+    content.vb: Public Shared Sub WriteLine()
+  overload: System.Console.WriteLine*
+- uid: System.Console.WriteLine(System.String)
+  commentId: M:System.Console.WriteLine(System.String)
+  id: WriteLine(System.String)
+  parent: System.Console
+  langs:
+  - csharp
+  - vb
+  name: WriteLine(string)
+  nameWithType: Console.WriteLine(string)
+  fullName: System.Console.WriteLine(string)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Writes text followed by LF to stdout.
+  remarks: Flushes before returning. Output failure is a terminal Fault. For recoverable output errors, use Console.Out. Write(string) is bounded to 65536 UTF-8 bytes; existing WriteLine overloads retain their prior behavior.
+  example: []
+  syntax:
+    content: public static void WriteLine(string value0)
+    parameters:
+    - id: value0
+      type: System.String
+      description: Value to write.
+    content.vb: Public Shared Sub WriteLine(value0 As String)
+  overload: System.Console.WriteLine*
+  nameWithType.vb: Console.WriteLine(String)
+  fullName.vb: System.Console.WriteLine(String)
+  name.vb: WriteLine(String)
+- uid: System.Console.WriteLine(System.Int32)
+  commentId: M:System.Console.WriteLine(System.Int32)
+  id: WriteLine(System.Int32)
+  parent: System.Console
+  langs:
+  - csharp
+  - vb
+  name: WriteLine(int)
+  nameWithType: Console.WriteLine(int)
+  fullName: System.Console.WriteLine(int)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Writes a decimal integer followed by LF to stdout.
+  remarks: Flushes before returning. Output failure is a terminal Fault. For recoverable output errors, use Console.Out. Write(string) is bounded to 65536 UTF-8 bytes; existing WriteLine overloads retain their prior behavior.
+  example: []
+  syntax:
+    content: public static void WriteLine(int value0)
+    parameters:
+    - id: value0
+      type: System.Int32
+      description: Value to write.
+    content.vb: Public Shared Sub WriteLine(value0 As Integer)
+  overload: System.Console.WriteLine*
+  nameWithType.vb: Console.WriteLine(Integer)
+  fullName.vb: System.Console.WriteLine(Integer)
+  name.vb: WriteLine(Integer)
+- uid: System.Console.In
+  commentId: P:System.Console.In
+  id: In
+  parent: System.Console
+  langs:
+  - csharp
+  - vb
+  name: In
+  nameWithType: Console.In
+  fullName: System.Console.In
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Gets a fresh TextReader wrapper for standard input.
+  remarks: Wrappers share the underlying host channel. Closing a wrapper never closes the process stream. Cache it locally when making repeated calls. No redirection setter is provided.
+  example: []
+  syntax:
+    content: public static TextReader In { get; }
+    parameters: []
+    return:
+      type: System.IO.TextReader
+    content.vb: Public Shared ReadOnly Property [In] As TextReader
+  overload: System.Console.In*
+- uid: System.Console.Out
+  commentId: P:System.Console.Out
+  id: Out
+  parent: System.Console
+  langs:
+  - csharp
+  - vb
+  name: Out
+  nameWithType: Console.Out
+  fullName: System.Console.Out
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Gets a fresh TextWriter wrapper for standard output.
+  remarks: Wrappers share the underlying host channel. Closing a wrapper never closes the process stream. Cache it locally when making repeated calls. No redirection setter is provided.
+  example: []
+  syntax:
+    content: public static TextWriter Out { get; }
+    parameters: []
+    return:
+      type: System.IO.TextWriter
+    content.vb: Public Shared ReadOnly Property Out As TextWriter
+  overload: System.Console.Out*
+- uid: System.Console.Error
+  commentId: P:System.Console.Error
+  id: Error
+  parent: System.Console
+  langs:
+  - csharp
+  - vb
+  name: Error
+  nameWithType: Console.Error
+  fullName: System.Console.Error
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Gets a fresh TextWriter wrapper for standard error.
+  remarks: Wrappers share the underlying host channel. Closing a wrapper never closes the process stream. Cache it locally when making repeated calls. No redirection setter is provided.
+  example: []
+  syntax:
+    content: public static TextWriter Error { get; }
+    parameters: []
+    return:
+      type: System.IO.TextWriter
+    content.vb: Public Shared ReadOnly Property [Error] As TextWriter
+  overload: System.Console.Error*
+references:
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Console.ReadByte*
+  commentId: Overload:System.Console.ReadByte
+  isExternal: true
+  href: System.Console.html#System_Console_ReadByte
+  name: ReadByte
+  nameWithType: Console.ReadByte
+  fullName: System.Console.ReadByte
+- uid: System.Result{System.Option{System.Byte},System.ConsoleReadError}
+  commentId: T:System.Result{System.Option{System.Byte},System.ConsoleReadError}
+  parent: System
+  definition: System.Result`2
+  href: System.ConsoleReadError.html
+  name: Result<Option<byte>, ConsoleReadError>
+  nameWithType: Result<Option<byte>, ConsoleReadError>
+  fullName: System.Result<System.Option<byte>, System.ConsoleReadError>
+  nameWithType.vb: Result(Of Option(Of Byte), ConsoleReadError)
+  fullName.vb: System.Result(Of System.Option(Of Byte), System.ConsoleReadError)
+  name.vb: Result(Of Option(Of Byte), ConsoleReadError)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: <
+  - uid: System.Byte
+    name: byte
+    isExternal: true
+  - name: '>'
+  - name: ','
+  - name: " "
+  - uid: System.ConsoleReadError
+    name: ConsoleReadError
+    isExternal: true
+    href: System.ConsoleReadError.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Byte
+    name: Byte
+    isExternal: true
+  - name: )
+  - name: ','
+  - name: " "
+  - uid: System.ConsoleReadError
+    name: ConsoleReadError
+    isExternal: true
+    href: System.ConsoleReadError.html
+  - name: )
+- uid: System.Result`2
+  commentId: T:System.Result`2
+  isExternal: true
+  name: Result<T, E>
+  nameWithType: Result<T, E>
+  fullName: System.Result<T, E>
+  nameWithType.vb: Result(Of T, E)
+  fullName.vb: System.Result(Of T, E)
+  name.vb: Result(Of T, E)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: )
+- uid: System.Console.OpenStandardInput*
+  commentId: Overload:System.Console.OpenStandardInput
+  isExternal: true
+  href: System.Console.html#System_Console_OpenStandardInput
+  name: OpenStandardInput
+  nameWithType: Console.OpenStandardInput
+  fullName: System.Console.OpenStandardInput
+- uid: System.IO.InputStream
+  commentId: T:System.IO.InputStream
+  parent: System.IO
+  isExternal: true
+  href: System.IO.InputStream.html
+  name: InputStream
+  nameWithType: InputStream
+  fullName: System.IO.InputStream
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.Console.OpenStandardOutput*
+  commentId: Overload:System.Console.OpenStandardOutput
+  isExternal: true
+  href: System.Console.html#System_Console_OpenStandardOutput
+  name: OpenStandardOutput
+  nameWithType: Console.OpenStandardOutput
+  fullName: System.Console.OpenStandardOutput
+- uid: System.IO.OutputStream
+  commentId: T:System.IO.OutputStream
+  parent: System.IO
+  isExternal: true
+  href: System.IO.OutputStream.html
+  name: OutputStream
+  nameWithType: OutputStream
+  fullName: System.IO.OutputStream
+- uid: System.Console.OpenStandardError*
+  commentId: Overload:System.Console.OpenStandardError
+  isExternal: true
+  href: System.Console.html#System_Console_OpenStandardError
+  name: OpenStandardError
+  nameWithType: Console.OpenStandardError
+  fullName: System.Console.OpenStandardError
+- uid: System.Console.ReadLine*
+  commentId: Overload:System.Console.ReadLine
+  isExternal: true
+  href: System.Console.html#System_Console_ReadLine
+  name: ReadLine
+  nameWithType: Console.ReadLine
+  fullName: System.Console.ReadLine
+- uid: System.Result{System.Option{System.String},System.IO.TextReadError}
+  commentId: T:System.Result{System.Option{System.String},System.IO.TextReadError}
+  parent: System
+  definition: System.Result`2
+  href: System.IO.TextReadError.html
+  name: Result<Option<string>, TextReadError>
+  nameWithType: Result<Option<string>, TextReadError>
+  fullName: System.Result<System.Option<string>, System.IO.TextReadError>
+  nameWithType.vb: Result(Of Option(Of String), TextReadError)
+  fullName.vb: System.Result(Of System.Option(Of String), System.IO.TextReadError)
+  name.vb: Result(Of Option(Of String), TextReadError)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+  - name: '>'
+  - name: ','
+  - name: " "
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+  - name: )
+  - name: ','
+  - name: " "
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: )
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System.Console.Write*
+  commentId: Overload:System.Console.Write
+  isExternal: true
+  href: System.Console.html#System_Console_Write_System_String_
+  name: Write
+  nameWithType: Console.Write
+  fullName: System.Console.Write
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System.Console.WriteLine*
+  commentId: Overload:System.Console.WriteLine
+  isExternal: true
+  href: System.Console.html#System_Console_WriteLine
+  name: WriteLine
+  nameWithType: Console.WriteLine
+  fullName: System.Console.WriteLine
+- uid: System.Console.In*
+  commentId: Overload:System.Console.In
+  isExternal: true
+  href: System.Console.html#System_Console_In
+  name: In
+  nameWithType: Console.In
+  fullName: System.Console.In
+- uid: System.IO.TextReader
+  commentId: T:System.IO.TextReader
+  parent: System.IO
+  isExternal: true
+  href: System.IO.TextReader.html
+  name: TextReader
+  nameWithType: TextReader
+  fullName: System.IO.TextReader
+- uid: System.Console.Out*
+  commentId: Overload:System.Console.Out
+  isExternal: true
+  href: System.Console.html#System_Console_Out
+  name: Out
+  nameWithType: Console.Out
+  fullName: System.Console.Out
+- uid: System.IO.TextWriter
+  commentId: T:System.IO.TextWriter
+  parent: System.IO
+  isExternal: true
+  href: System.IO.TextWriter.html
+  name: TextWriter
+  nameWithType: TextWriter
+  fullName: System.IO.TextWriter
+- uid: System.Console.Error*
+  commentId: Overload:System.Console.Error
+  isExternal: true
+  href: System.Console.html#System_Console_Error
+  name: Error
+  nameWithType: Console.Error
+  fullName: System.Console.Error

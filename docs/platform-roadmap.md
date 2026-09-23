@@ -22,6 +22,12 @@ An explicit author instruction takes precedence, including a bounded task outsid
 the current milestone. Such a task does not silently reorder the entire roadmap;
 record a lasting change in direction when the author makes one.
 
+**Author-directed focus, 2026-09-23:** develop the common Console API and standard
+streams. Console stays a class, with static In/Out/Error access. The bounded
+[Console sample](experiments/console-streams/README.md) exercises line input, separate
+text/byte output channels and reader/writer ownership. This is synchronous I/O;
+TaskQueue/suspension exploration remains open and networking stays later.
+
 When choosing work autonomously, follow the immediate checkpoint below: complete the post-release concurrency, Storage and file Stream checkpoint below
 within M1. The async/Tasks preview has shipped.
 The early memory-copy checkpoint has evidence; sockets and HTTP remain later.

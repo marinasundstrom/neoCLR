@@ -1,0 +1,586 @@
+; Generated from runtime/raven/src/System/IO/StreamWriter.rvn. Regenerate with build_runtime_library.py.
+.type class System.IO.StreamWriter
+.implements System.IO.TextWriter
+.field private output System.IO.OutputStream
+.field private leaveOpen Boolean
+.field private closed Boolean
+.method instance .ctor(System.IO.OutputStream output) -> noresult
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 0
+M00000001_IL_0009:
+ldc.i4 0
+M00000001_IL_000a:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanFromInt32(Int32)
+stfld System.IO.StreamWriter::closed
+M00000001_IL_000f:
+M00000001_IL_0010:
+ldarg 0
+M00000001_IL_0011:
+ldarg 1
+M00000001_IL_0012:
+stfld System.IO.StreamWriter::output
+M00000001_IL_0017:
+M00000001_IL_0018:
+ldarg 0
+M00000001_IL_0019:
+ldc.i4 0
+M00000001_IL_001a:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanFromInt32(Int32)
+stfld System.IO.StreamWriter::leaveOpen
+M00000001_IL_001f:
+ret
+.end
+.method instance .ctor(System.IO.OutputStream output,Boolean leaveOpen) -> noresult
+M00000002_IL_0000:
+M00000002_IL_0001:
+ldarg 0
+M00000002_IL_0002:
+pop
+M00000002_IL_0007:
+M00000002_IL_0008:
+ldarg 0
+M00000002_IL_0009:
+ldc.i4 0
+M00000002_IL_000a:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanFromInt32(Int32)
+stfld System.IO.StreamWriter::closed
+M00000002_IL_000f:
+M00000002_IL_0010:
+ldarg 0
+M00000002_IL_0011:
+ldarg 1
+M00000002_IL_0012:
+stfld System.IO.StreamWriter::output
+M00000002_IL_0017:
+M00000002_IL_0018:
+ldarg 0
+M00000002_IL_0019:
+ldarg 2
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_001a:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanFromInt32(Int32)
+stfld System.IO.StreamWriter::leaveOpen
+M00000002_IL_001f:
+ret
+.end
+.method instance Write(String text) -> System.Result<Int32,System.IO.StreamError>
+.local System.Collections.Sequence<Byte> local0
+.local arrayref<Byte> local1
+.local Int32 local2
+.local Int32 local3
+.local System.Result<Int32,System.IO.StreamError> local4
+.local Int32 local5
+.local System.IO.StreamError local6
+.local System.Result<Int32,System.IO.StreamError> local7
+.local System.Result.Ok<Int32> local8
+.local System.Result.Ok<Int32> local9
+.local Int32 local10
+.local System.Result<Int32,System.IO.StreamError> local11
+.local System.Result.Error<System.IO.StreamError> local12
+.local System.Result.Error<System.IO.StreamError> local13
+.local System.IO.StreamError local14
+ldloca local0
+initobj System.Collections.Sequence<Byte>
+ldloca local1
+initobj arrayref<Byte>
+ldc.i4 0
+stloc local2
+ldc.i4 0
+stloc local3
+ldc.i4 0
+stloc local5
+ldloca local8
+initobj System.Result.Ok<Int32>
+ldloca local9
+initobj System.Result.Ok<Int32>
+ldc.i4 0
+stloc local10
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.IO.StreamWriter::closed
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0008:
+brtrue M00000003_IL_0012
+M00000003_IL_000d:
+br M00000003_IL_0027
+M00000003_IL_0012:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorClosedNew()
+M00000003_IL_0017:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorClosed(System.IO.StreamError.Closed)
+M00000003_IL_001c:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
+M00000003_IL_0021:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+M00000003_IL_0026:
+ret
+M00000003_IL_0027:
+M00000003_IL_0028:
+M00000003_IL_0029:
+ldarg 1
+M00000003_IL_002a:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeStringGetUtf8ByteCount(String)
+M00000003_IL_002f:
+ldc.i4 65536
+M00000003_IL_0034:
+cgt
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0036:
+brtrue M00000003_IL_0040
+M00000003_IL_003b:
+br M00000003_IL_0055
+M00000003_IL_0040:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorLimitExceededNew()
+M00000003_IL_0045:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorLimitExceeded(System.IO.StreamError.LimitExceeded)
+M00000003_IL_004a:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
+M00000003_IL_004f:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+M00000003_IL_0054:
+ret
+M00000003_IL_0055:
+M00000003_IL_0056:
+M00000003_IL_0057:
+ldarg 1
+M00000003_IL_0058:
+call System.Text.Utf8::Encode(String)
+M00000003_IL_005d:
+stloc local0
+M00000003_IL_005e:
+M00000003_IL_005f:
+ldloc local0
+M00000003_IL_0060:
+callvirt instance System.Collections.Collection<Byte>::get_Count()
+M00000003_IL_0065:
+array.reserve Byte
+M00000003_IL_006a:
+stloc local1
+M00000003_IL_006b:
+M00000003_IL_006c:
+ldc.i4 0
+M00000003_IL_006d:
+stloc local2
+M00000003_IL_006e:
+M00000003_IL_006f:
+M00000003_IL_0070:
+ldloc local2
+M00000003_IL_0071:
+ldloc local0
+M00000003_IL_0072:
+callvirt instance System.Collections.Collection<Byte>::get_Count()
+M00000003_IL_0077:
+clt
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0079:
+brtrue M00000003_IL_0083
+M00000003_IL_007e:
+br M00000003_IL_0098
+M00000003_IL_0083:
+M00000003_IL_0084:
+ldloc local1
+M00000003_IL_0085:
+ldloc local2
+M00000003_IL_0086:
+ldloc local0
+M00000003_IL_0087:
+ldloc local2
+M00000003_IL_0088:
+callvirt instance System.Collections.Sequence<Byte>::get_Item(Int32)
+M00000003_IL_008d:
+stelem Byte
+M00000003_IL_008e:
+M00000003_IL_008f:
+ldloc local2
+M00000003_IL_0090:
+ldc.i4 1
+M00000003_IL_0091:
+add
+M00000003_IL_0092:
+stloc local2
+M00000003_IL_0093:
+br M00000003_IL_006f
+M00000003_IL_0098:
+M00000003_IL_0099:
+M00000003_IL_009a:
+ldc.i4 0
+M00000003_IL_009b:
+stloc local3
+M00000003_IL_009c:
+M00000003_IL_009d:
+M00000003_IL_009e:
+ldloc local3
+M00000003_IL_009f:
+ldloc local1
+M00000003_IL_00a0:
+ldlen
+conv.i4
+M00000003_IL_00a5:
+clt
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_00a7:
+brtrue M00000003_IL_00b1
+M00000003_IL_00ac:
+br M00000003_IL_01ca
+M00000003_IL_00b1:
+M00000003_IL_00b2:
+M00000003_IL_00b3:
+ldarg 0
+M00000003_IL_00b4:
+ldfld System.IO.StreamWriter::output
+M00000003_IL_00b9:
+ldloc local1
+M00000003_IL_00ba:
+ldloc local3
+M00000003_IL_00bb:
+ldloc local1
+M00000003_IL_00bc:
+ldlen
+conv.i4
+M00000003_IL_00c1:
+ldloc local3
+M00000003_IL_00c2:
+sub
+M00000003_IL_00c3:
+callvirt instance System.IO.OutputStream::Write(arrayref<Byte>,Int32,Int32)
+M00000003_IL_00c8:
+stloc local4
+M00000003_IL_00ca:
+ldloc local4
+M00000003_IL_00cc:
+stloc local7
+M00000003_IL_00ce:
+ldloca local7
+M00000003_IL_00d0:
+ldloca local8
+M00000003_IL_00d2:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion4(System.Result<Int32,System.IO.StreamError>&,System.Result.Ok<Int32>&)
+M00000003_IL_00d7:
+brfalse M00000003_IL_0175
+M00000003_IL_00dc:
+ldloc local8
+M00000003_IL_00de:
+stloc local9
+M00000003_IL_00e0:
+ldloca local9
+M00000003_IL_00e2:
+ldloca local10
+M00000003_IL_00e4:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Ok<Int32>&,Int32&)
+M00000003_IL_00e9:
+ldloc local10
+M00000003_IL_00eb:
+stloc local5
+M00000003_IL_00ed:
+ldc.i4 1
+M00000003_IL_00ee:
+br M00000003_IL_00f4
+M00000003_IL_00f4:
+brfalse M00000003_IL_0175
+M00000003_IL_00f9:
+M00000003_IL_00fa:
+br M00000003_IL_0105
+M00000003_IL_0105:
+M00000003_IL_0106:
+ldloc local5
+M00000003_IL_0108:
+ldc.i4 0
+M00000003_IL_0109:
+clt
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_010b:
+brtrue M00000003_IL_0115
+M00000003_IL_0110:
+br M00000003_IL_0120
+M00000003_IL_0115:
+M00000003_IL_0116:
+ldstr "Invalid output write count"
+M00000003_IL_011b:
+call System.Fault(String)
+M00000003_IL_0120:
+M00000003_IL_0121:
+M00000003_IL_0122:
+ldloc local5
+M00000003_IL_0124:
+ldloc local1
+M00000003_IL_0125:
+ldlen
+conv.i4
+M00000003_IL_012a:
+ldloc local3
+M00000003_IL_012b:
+sub
+M00000003_IL_012c:
+cgt
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_012e:
+brtrue M00000003_IL_0138
+M00000003_IL_0133:
+br M00000003_IL_0143
+M00000003_IL_0138:
+M00000003_IL_0139:
+ldstr "Invalid output write count"
+M00000003_IL_013e:
+call System.Fault(String)
+M00000003_IL_0143:
+M00000003_IL_0144:
+M00000003_IL_0145:
+ldloc local5
+M00000003_IL_0147:
+ldc.i4 0
+M00000003_IL_0148:
+ceq
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_014a:
+brtrue M00000003_IL_0154
+M00000003_IL_014f:
+br M00000003_IL_0169
+M00000003_IL_0154:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorIoFailureNew()
+M00000003_IL_0159:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorIoFailure(System.IO.StreamError.IoFailure)
+M00000003_IL_015e:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
+M00000003_IL_0163:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+M00000003_IL_0168:
+ret
+M00000003_IL_0169:
+M00000003_IL_016a:
+M00000003_IL_016b:
+ldloc local3
+M00000003_IL_016c:
+ldloc local5
+M00000003_IL_016e:
+add
+M00000003_IL_016f:
+stloc local3
+M00000003_IL_0170:
+br M00000003_IL_01c4
+M00000003_IL_0175:
+M00000003_IL_0176:
+ldloc local4
+M00000003_IL_0178:
+stloc local11
+M00000003_IL_017a:
+ldloca local11
+M00000003_IL_017c:
+ldloca local12
+M00000003_IL_017e:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion6(System.Result<Int32,System.IO.StreamError>&,System.Result.Error<System.IO.StreamError>&)
+M00000003_IL_0183:
+brfalse M00000003_IL_01bf
+M00000003_IL_0188:
+ldloc local12
+M00000003_IL_018a:
+stloc local13
+M00000003_IL_018c:
+ldloca local13
+M00000003_IL_018e:
+ldloca local14
+M00000003_IL_0190:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion7(System.Result.Error<System.IO.StreamError>&,System.IO.StreamError&)
+M00000003_IL_0195:
+ldloc local14
+M00000003_IL_0197:
+stloc local6
+M00000003_IL_0199:
+ldc.i4 1
+M00000003_IL_019a:
+br M00000003_IL_01a0
+M00000003_IL_01a0:
+brfalse M00000003_IL_01bf
+M00000003_IL_01a5:
+M00000003_IL_01a6:
+br M00000003_IL_01b1
+M00000003_IL_01b1:
+M00000003_IL_01b2:
+ldloc local6
+M00000003_IL_01b4:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
+M00000003_IL_01b9:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+M00000003_IL_01be:
+ret
+M00000003_IL_01bf:
+M00000003_IL_01c0:
+M00000003_IL_01c1:
+M00000003_IL_01c2:
+M00000003_IL_01c3:
+fault "Guest program reached a terminal failure"
+M00000003_IL_01c4:
+M00000003_IL_01c5:
+br M00000003_IL_009d
+M00000003_IL_01ca:
+M00000003_IL_01cb:
+M00000003_IL_01cc:
+ldloc local3
+M00000003_IL_01cd:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion2(Int32)
+M00000003_IL_01d2:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion3(System.Result.Ok<Int32>)
+M00000003_IL_01d7:
+ret
+.end
+.method instance WriteLine(String text) -> System.Result<Int32,System.IO.StreamError>
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.IO.StreamWriter::closed
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_0008:
+brtrue M00000004_IL_0012
+M00000004_IL_000d:
+br M00000004_IL_0027
+M00000004_IL_0012:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorClosedNew()
+M00000004_IL_0017:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorClosed(System.IO.StreamError.Closed)
+M00000004_IL_001c:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
+M00000004_IL_0021:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+M00000004_IL_0026:
+ret
+M00000004_IL_0027:
+M00000004_IL_0028:
+M00000004_IL_0029:
+ldarg 1
+M00000004_IL_002a:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeStringGetUtf8ByteCount(String)
+M00000004_IL_002f:
+ldc.i4 65536
+M00000004_IL_0034:
+clt
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_0036:
+ldc.i4 0
+M00000004_IL_0037:
+ceq
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_0039:
+brtrue M00000004_IL_0043
+M00000004_IL_003e:
+br M00000004_IL_0058
+M00000004_IL_0043:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorLimitExceededNew()
+M00000004_IL_0048:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorLimitExceeded(System.IO.StreamError.LimitExceeded)
+M00000004_IL_004d:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
+M00000004_IL_0052:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+M00000004_IL_0057:
+ret
+M00000004_IL_0058:
+M00000004_IL_0059:
+M00000004_IL_005a:
+ldarg 0
+M00000004_IL_005b:
+ldarg 1
+M00000004_IL_005c:
+ldstr "\n"
+M00000004_IL_0061:
+call System.String::Concat(String,String)
+M00000004_IL_0066:
+callvirt instance System.IO.StreamWriter::Write(String)
+M00000004_IL_006b:
+ret
+.end
+.method instance Flush() -> System.Result<Void,System.IO.StreamError>
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.IO.StreamWriter::closed
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0008:
+brtrue M00000005_IL_0012
+M00000005_IL_000d:
+br M00000005_IL_0027
+M00000005_IL_0012:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorClosedNew()
+M00000005_IL_0017:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorClosed(System.IO.StreamError.Closed)
+M00000005_IL_001c:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
+M00000005_IL_0021:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion8(System.Result.Error<System.IO.StreamError>)
+M00000005_IL_0026:
+ret
+M00000005_IL_0027:
+M00000005_IL_0028:
+M00000005_IL_0029:
+ldarg 0
+M00000005_IL_002a:
+ldfld System.IO.StreamWriter::output
+M00000005_IL_002f:
+callvirt instance System.IO.OutputStream::Flush()
+M00000005_IL_0034:
+ret
+.end
+.method instance Close() -> noresult
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.IO.StreamWriter::closed
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0008:
+ldc.i4 0
+M00000006_IL_0009:
+ceq
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_000b:
+brtrue M00000006_IL_0015
+M00000006_IL_0010:
+br M00000006_IL_003e
+M00000006_IL_0015:
+M00000006_IL_0016:
+ldarg 0
+M00000006_IL_0017:
+ldc.i4 1
+M00000006_IL_0018:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanFromInt32(Int32)
+stfld System.IO.StreamWriter::closed
+M00000006_IL_001d:
+M00000006_IL_001e:
+ldarg 0
+M00000006_IL_001f:
+ldfld System.IO.StreamWriter::leaveOpen
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0024:
+ldc.i4 0
+M00000006_IL_0025:
+ceq
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0027:
+brtrue M00000006_IL_0031
+M00000006_IL_002c:
+br M00000006_IL_003d
+M00000006_IL_0031:
+M00000006_IL_0032:
+ldarg 0
+M00000006_IL_0033:
+ldfld System.IO.StreamWriter::output
+M00000006_IL_0038:
+callvirt instance System.IO.OutputStream::Close()
+M00000006_IL_003d:
+M00000006_IL_003e:
+M00000006_IL_003f:
+M00000006_IL_0040:
+ret
+.end
+.end

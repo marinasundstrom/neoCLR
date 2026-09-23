@@ -64,7 +64,8 @@ static class UnionImport
         if (collectionProfile) { InterfaceBindings.Validate(library.MainModule); CollectionBindings.Validate(library.MainModule); ReflectionBindings.Validate(library.MainModule); NativeMemoryBindings.Validate(library.MainModule); }
         bool InternalLibraryAccess(MethodDefinition target, MethodDefinition caller) => libraryOwner is not null
             && target.IsAssembly && target.Module == caller.Module
-            && ApplicationTypes.IsLibrary(target.DeclaringType) && ApplicationTypes.IsLibrary(caller.DeclaringType);
+            && ApplicationTypes.IsLibrary(target.DeclaringType)
+            && (ApplicationTypes.IsLibrary(caller.DeclaringType) || exports.Contains(caller));
         MethodDefinition? activeLibraryMethod = null;
         string ProfileType(TypeReference type, bool result = false)
         {
@@ -721,6 +722,8 @@ static class UnionImport
                                 call = targetMethod.HasThis && (libraryOwner is not null || !(targetMethod.IsConstructor && targetMethod.DeclaringType.IsValueType))
                                     ? new("", new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray(), ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true), Instruction: $"{(instruction.OpCode.Code == Code.Callvirt ? "callvirt" : "call")} instance {ProfileType(reference.DeclaringType)}::{ApplicationTypes.MethodName(targetMethod)}({string.Join(',', parameters)})" + (targetMethod.DeclaringType.IsValueType && targetMethod.ReturnType.MetadataType == MetadataType.Void ? "\npop" : ""))
                                     : new(libraryOwner is not null && targetMethod.IsStatic && ((((StorageItemBindings.IsName(targetMethod.DeclaringType.FullName) || PathBindings.IsName(targetMethod.DeclaringType.FullName)) || StreamBindings.IsName(targetMethod.DeclaringType.FullName)) || WorkerBindings.IsName(targetMethod.DeclaringType.FullName)) || AsyncBindings.IsName(targetMethod.DeclaringType.FullName) || targetMethod.DeclaringType.FullName == "System.Tasks.TaskQueue" || targetMethod.DeclaringType.IsValueType || DescriptorLibrary.IsProvider(targetMethod.DeclaringType)) ? ProfileType(reference.DeclaringType) + "::" + targetMethod.Name : Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray() : parameters, ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true));
+                                if (libraryOwner == "System.Console" && targetMethod.IsStatic && targetMethod.ReturnType.MetadataType == MetadataType.Void)
+                                    call = call with { Instruction = $"call {call.Name}({string.Join(',', call.Arguments)})\npop" };
                             }
                         }
                         else if (targetMethod.Module == library.MainModule)
@@ -811,7 +814,7 @@ static class UnionImport
                     case Code.Ret:
                         if (result != "noresult") ConvertTop(result);
                         if (stack.Count != 0) throw new InvalidDataException($"Input ret stack not empty in {method.FullName}, expected {result}, remaining {string.Join(',', stack.Select(s => s.Type))}.");
-                        if ((emitInstance && method.DeclaringType.IsValueType || libraryOwner == "System.Console") && result == "noresult") code.AppendLine("ldvoid");
+                        if ((emitInstance && method.DeclaringType.IsValueType || libraryOwner == "System.Console" && !emitInstance && !emitOwnedStatic) && result == "noresult") code.AppendLine("ldvoid");
                         code.AppendLine("ret"); terminates = true; break;
                     default: throw new InvalidDataException("Unsupported reachable instruction: " + instruction.OpCode);
                 }

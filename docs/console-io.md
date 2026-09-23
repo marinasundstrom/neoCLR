@@ -121,3 +121,16 @@ ReadFailed; Byte remains reserved for successful data, including 0 and 255. Unkn
 statuses or payload types Fault. The interactive sample explicitly converts these errors
 into an application-level string message when combining input and validation failures.
 Reassemble applications and System together for the new error parameter and native payload.
+
+## Development Console streams — 2026-09-23
+
+The [Console guide](../api-docs/console.md) documents the new text/byte surface.
+Console stays a static class. Rust hosts can implement `write_bytes(error, bytes)`
+and `flush(error)`; their defaults return Unsupported so existing hosts still
+compile. StdioConsole implements both channels. These methods are synchronous.
+Without a live host, Execution.stdout and Execution.stderr capture exact bytes;
+Execution.output remains the legacy line record rather than a complete rendering
+of stream writes. Legacy WriteLine also contributes text plus LF to stdout capture.
+With a live host, output goes to the host and capture vectors stay empty.
+Closing a guest wrapper never closes the process channel. Worker/debugger hosts
+need byte-hook implementations before they support the new output streams.

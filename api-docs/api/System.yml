@@ -1,0 +1,97 @@
+### YamlMime:ManagedReference
+items:
+- uid: System
+  commentId: N:System
+  id: System
+  children:
+  - System.Console
+  - System.ConsoleReadError
+  - System.ConsoleReadError.ReadFailed
+  - System.ConsoleReadError.Unavailable
+  langs:
+  - csharp
+  - vb
+  name: System
+  nameWithType: System
+  fullName: System
+  type: Namespace
+  assemblies:
+  - NeoCLR.CoreProbe
+references:
+- uid: System.Console
+  commentId: T:System.Console
+  isExternal: true
+  href: System.Console.html
+  name: Console
+  nameWithType: Console
+  fullName: System.Console
+- uid: System.ConsoleReadError
+  commentId: T:System.ConsoleReadError
+  isExternal: true
+  href: System.ConsoleReadError.html
+  name: ConsoleReadError
+  nameWithType: ConsoleReadError
+  fullName: System.ConsoleReadError
+- uid: System.ConsoleReadError.Unavailable
+  commentId: T:System.ConsoleReadError.Unavailable
+  parent: System
+  isExternal: true
+  href: System.ConsoleReadError.html
+  name: ConsoleReadError.Unavailable
+  nameWithType: ConsoleReadError.Unavailable
+  fullName: System.ConsoleReadError.Unavailable
+  spec.csharp:
+  - uid: System.ConsoleReadError
+    name: ConsoleReadError
+    isExternal: true
+    href: System.ConsoleReadError.html
+  - name: .
+  - uid: System.ConsoleReadError.Unavailable
+    name: Unavailable
+    isExternal: true
+    href: System.ConsoleReadError.Unavailable.html
+  spec.vb:
+  - uid: System.ConsoleReadError
+    name: ConsoleReadError
+    isExternal: true
+    href: System.ConsoleReadError.html
+  - name: .
+  - uid: System.ConsoleReadError.Unavailable
+    name: Unavailable
+    isExternal: true
+    href: System.ConsoleReadError.Unavailable.html
+- uid: System.ConsoleReadError.ReadFailed
+  commentId: T:System.ConsoleReadError.ReadFailed
+  parent: System
+  isExternal: true
+  href: System.ConsoleReadError.html
+  name: ConsoleReadError.ReadFailed
+  nameWithType: ConsoleReadError.ReadFailed
+  fullName: System.ConsoleReadError.ReadFailed
+  spec.csharp:
+  - uid: System.ConsoleReadError
+    name: ConsoleReadError
+    isExternal: true
+    href: System.ConsoleReadError.html
+  - name: .
+  - uid: System.ConsoleReadError.ReadFailed
+    name: ReadFailed
+    isExternal: true
+    href: System.ConsoleReadError.ReadFailed.html
+  spec.vb:
+  - uid: System.ConsoleReadError
+    name: ConsoleReadError
+    isExternal: true
+    href: System.ConsoleReadError.html
+  - name: .
+  - uid: System.ConsoleReadError.ReadFailed
+    name: ReadFailed
+    isExternal: true
+    href: System.ConsoleReadError.ReadFailed.html
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System

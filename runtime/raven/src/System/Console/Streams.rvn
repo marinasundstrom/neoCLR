@@ -1,0 +1,92 @@
+namespace System.IO
+
+import System.*
+import System.Result.*
+import System.Option.*
+import System.Runtime.CompilerServices.*
+
+internal class ConsoleInputStream : InputStream {
+    private field closed: bool = false
+
+    internal init() { }
+
+    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError(StreamError.Closed()))
+        }
+        if offset < 0 {
+            return Error(StreamError(StreamError.InvalidRange()))
+        }
+        if count < 0 {
+            return Error(StreamError(StreamError.InvalidRange()))
+        }
+        if offset > buffer.Length {
+            return Error(StreamError(StreamError.InvalidRange()))
+        }
+        if count > buffer.Length - offset {
+            return Error(StreamError(StreamError.InvalidRange()))
+        }
+        if count > 65536 {
+            return Error(StreamError(StreamError.LimitExceeded()))
+        }
+        if count == 0 {
+            return Ok(0)
+        }
+        return match System.Console.ReadByte() {
+            Ok(let item) => match item {
+                Some(let value) => {
+                    buffer[offset] = value
+                    Ok(1)
+                }
+                None => Ok(0)
+            }
+            Error(_) => Error(StreamError(StreamError.IoFailure()))
+        }
+    }
+
+    func Close() {
+        closed = true
+    }
+}
+
+internal class ConsoleOutputStream : OutputStream {
+    private field error: bool
+    private field closed: bool = false
+
+    internal init(error: bool) {
+        self.error = error
+    }
+
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError(StreamError.Closed()))
+        }
+        let payload = RuntimeServices.ConsoleWriteBytes(error, buffer, offset, count)
+        if RuntimeServices.IsValue<byte>(payload) {
+            let status = RuntimeServices.UnpackValue<byte>(payload)
+            if status == 7 {
+                return Error(StreamError(StreamError.InvalidRange()))
+            }
+            if status == 8 {
+                return Error(StreamError(StreamError.LimitExceeded()))
+            }
+            return Error(StreamError(StreamError.IoFailure()))
+        }
+        return Ok(RuntimeServices.UnpackValue<int>(payload))
+    }
+
+    func Flush() -> Result<unit, StreamError> {
+        if closed {
+            return Error(StreamError(StreamError.Closed()))
+        }
+        let payload = RuntimeServices.ConsoleFlush(error)
+        if RuntimeServices.IsValue<byte>(payload) {
+            return Error(StreamError(StreamError.IoFailure()))
+        }
+        return Ok(())
+    }
+
+    func Close() {
+        closed = true
+    }
+}

@@ -52,6 +52,12 @@ static class LibraryImplementation
         }
         if (owner is "System.Option" or "System.Result" or "System.Tasks.TaskOutcome")
             return GenericUnionLibrary.Roots(source, core, owner, InstanceRoots);
+        var consoleProviders = Array.Empty<MethodDefinition>();
+        if (owner == "System.Console") {
+            var names = new[] { "System.IO.ConsoleInputStream", "System.IO.ConsoleOutputStream" };
+            foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name);
+            consoleProviders = names.SelectMany(name => InstanceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
+        }
         var type = source.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? source.Types.SingleOrDefault(t => t.FullName.Split('`')[0] == owner)
             ?? throw new InvalidDataException("Missing namespace implementation: " + owner);
         var contract = core.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? core.Types.SingleOrDefault(t => t.FullName.Split('`')[0] == owner)
@@ -84,7 +90,7 @@ static class LibraryImplementation
             if (owner is "System.Linq.Operators" or "System.OptionOperators" or "System.OptionNestedOperators" or "System.ResultOperators" or "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators")
                 CheckExtensionContract(method, matches[0]);
         }
-        return methods;
+        return methods.Concat(consoleProviders).ToArray();
     }
 
     public static void CheckExtensionContract(MethodDefinition implementation, MethodDefinition declaration)
@@ -154,7 +160,7 @@ static class LibraryImplementation
         // A single explicitly selected reference/implementation pair. Never alias arbitrary
         // guest types by namespace/name, and never execute reference-assembly stub bodies.
         foreach (var candidate in new[] { type, contract })
-            if (!(candidate.IsPublic || candidate.IsNotPublic && (DescriptorLibrary.IsProvider(candidate) || WorkerBindings.IsProvider(candidate)) || candidate.IsNestedPublic && GenericUnionLibrary.IsCase(candidate)) || candidate.IsInterface || candidate.IsAbstract != (DescriptorLibrary.IsDescriptor(candidate) && candidate.Name == "RuntimeMemberInfo")
+            if (!(candidate.IsPublic || candidate.IsNotPublic && (DescriptorLibrary.IsProvider(candidate) || WorkerBindings.IsProvider(candidate) || ReaderBindings.IsProvider(candidate)) || candidate.IsNestedPublic && GenericUnionLibrary.IsCase(candidate)) || candidate.IsInterface || candidate.IsAbstract != (DescriptorLibrary.IsDescriptor(candidate) && candidate.Name == "RuntimeMemberInfo")
                 || candidate.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant) || candidate.HasNestedTypes && !ErrorCarrierLibrary.IsCarrier(candidate) || candidate.HasEvents
                 || candidate.BaseType?.FullName != (DescriptorLibrary.IsDescriptor(candidate) ? DescriptorLibrary.Base(candidate) : candidate.IsValueType ? "System.ValueType" : "System.Object") || candidate.IsExplicitLayout)
                 throw new InvalidDataException($"Unsupported instance library owner: {candidate.FullName}, base={candidate.BaseType}, public={candidate.IsPublic}, abstract={candidate.IsAbstract}, nested={candidate.HasNestedTypes}, value={candidate.IsValueType}.");

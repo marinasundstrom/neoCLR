@@ -1,0 +1,64 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.ConsoleReadError.Unavailable
+  commentId: T:System.ConsoleReadError.Unavailable
+  id: ConsoleReadError.Unavailable
+  parent: System
+  children:
+  - System.ConsoleReadError.Unavailable.#ctor
+  langs:
+  - csharp
+  - vb
+  name: ConsoleReadError.Unavailable
+  nameWithType: ConsoleReadError.Unavailable
+  fullName: System.ConsoleReadError.Unavailable
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: No host input is available, including isolated workers.
+  example: []
+  syntax:
+    content: public struct ConsoleReadError.Unavailable
+    content.vb: Public Structure ConsoleReadError.Unavailable
+- uid: System.ConsoleReadError.Unavailable.#ctor
+  commentId: M:System.ConsoleReadError.Unavailable.#ctor
+  id: '#ctor'
+  parent: System.ConsoleReadError.Unavailable
+  langs:
+  - csharp
+  - vb
+  name: Unavailable()
+  nameWithType: ConsoleReadError.Unavailable.Unavailable()
+  fullName: System.ConsoleReadError.Unavailable.Unavailable()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Creates an Unavailable case marker.
+  example: []
+  syntax:
+    content: public Unavailable()
+    content.vb: Public Sub New()
+  overload: System.ConsoleReadError.Unavailable.#ctor*
+  nameWithType.vb: ConsoleReadError.Unavailable.New()
+  fullName.vb: System.ConsoleReadError.Unavailable.New()
+  name.vb: New()
+references:
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.ConsoleReadError.Unavailable.#ctor*
+  commentId: Overload:System.ConsoleReadError.Unavailable.#ctor
+  isExternal: true
+  href: System.ConsoleReadError.Unavailable.html#System_ConsoleReadError_Unavailable__ctor
+  name: Unavailable
+  nameWithType: ConsoleReadError.Unavailable.Unavailable
+  fullName: System.ConsoleReadError.Unavailable.Unavailable
+  nameWithType.vb: ConsoleReadError.Unavailable.New
+  fullName.vb: System.ConsoleReadError.Unavailable.New
+  name.vb: New

@@ -68,7 +68,7 @@ Existing reference coverage gaps (not exemptions from the policy):
 
 - Arrays and collection interfaces/implementations, delegates, queries and operators.
 - Option/Result carriers, TaskOutcome and composition/propagation helpers.
-- Primitives, text/encoding and process/console APIs.
+- Primitives, text/encoding and process APIs (Console is now covered).
 - Time/calendar, introspection and public resource/interop contracts.
 
 Backfill these as each area is developed. The next Storage/Streams slice must include
@@ -150,3 +150,15 @@ The provisional raw worker cancellation services are not managed reference-core
 members. Their exact low-level signatures, outcomes and limitations are documented
 in [Pending reads](pending-read.md#experimental-per-worker-cancellation-services).
 No public Thread/Task member was added by that runtime experiment.
+
+
+## Console and text output (development)
+
+Console remains a static class. Its common methods and In/Out/Error properties,
+byte-stream factories, ConsoleReadError, TextReader.ReadLine and TextWriter/StreamWriter
+are selected and documented from the matching reference assembly. The Console
+[guide](console.md) covers ownership, bounds, Result/Option outcomes and host support.
+DocFX excludes exactly TextWriter.Flush and StreamWriter.Flush because their
+Result<System.Void, StreamError> signatures hit the existing renderer limitation;
+that guide is their linked manual reference. Internal ConsoleInputStream and
+ConsoleOutputStream are provider implementation classes, not public APIs.

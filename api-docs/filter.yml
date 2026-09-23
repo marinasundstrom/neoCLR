@@ -3,7 +3,7 @@ apiRules:
     uidRegex: '^System\.Storage\.FileText\.WriteAllText($|\()'
     type: Method
 - exclude:
-    uidRegex: '^System\.IO\.(FileOutputStream|OutputStream)\.Flush($|\()'
+    uidRegex: '^System\.IO\.(FileOutputStream|OutputStream|TextWriter|StreamWriter)\.Flush($|\()'
     type: Method
 - exclude:
     uidRegex: '^System\.Concurrency\.ThreadPool\.#ctor'
@@ -24,11 +24,18 @@ apiRules:
     uidRegex: '^System\.IO$'
     type: Namespace
 - include:
-    uidRegex: '^System\.IO\.(InputStream|OutputStream|FileInputStream|FileOutputStream|StreamError|TextReader|StreamReader|TextReadError|SeekableStream)($|\.)'
+    uidRegex: '^System\.IO\.(InputStream|OutputStream|FileInputStream|FileOutputStream|StreamError|TextReader|StreamReader|TextReadError|SeekableStream|TextWriter|StreamWriter)($|\.)'
 - include:
     uidRegex: '^System\.Storage$'
     type: Namespace
 - include:
     uidRegex: '^System\.Storage\.(StorageItem|File|Directory|FileText|FileSystem|FileReadError|FileWriteError|StorageProvider|Metadata|EntryKind|StorageLookupError|Path|InvalidPathError)($|\.)'
+- include:
+    uidRegex: '^System$'
+    type: Namespace
+- include:
+    uidRegex: '^System\.Console($|\.)'
+- include:
+    uidRegex: '^System\.ConsoleReadError($|\.)'
 - exclude:
     uidRegex: '.*'

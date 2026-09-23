@@ -1,0 +1,326 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.ConsoleReadError
+  commentId: T:System.ConsoleReadError
+  id: ConsoleReadError
+  parent: System
+  children:
+  - System.ConsoleReadError.#ctor(System.ConsoleReadError.ReadFailed)
+  - System.ConsoleReadError.#ctor(System.ConsoleReadError.Unavailable)
+  - System.ConsoleReadError.GetReadFailed
+  - System.ConsoleReadError.GetUnavailable
+  - System.ConsoleReadError.IsReadFailed
+  - System.ConsoleReadError.IsUnavailable
+  - System.ConsoleReadError.ToString
+  langs:
+  - csharp
+  - vb
+  name: ConsoleReadError
+  nameWithType: ConsoleReadError
+  fullName: System.ConsoleReadError
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Failure to read raw standard input.
+  example: []
+  syntax:
+    content: public struct ConsoleReadError
+    content.vb: Public Structure ConsoleReadError
+- uid: System.ConsoleReadError.ToString
+  commentId: M:System.ConsoleReadError.ToString
+  id: ToString
+  parent: System.ConsoleReadError
+  langs:
+  - csharp
+  - vb
+  name: ToString()
+  nameWithType: ConsoleReadError.ToString()
+  fullName: System.ConsoleReadError.ToString()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Returns the raw console input error name.
+  example: []
+  syntax:
+    content: public string ToString()
+    return:
+      type: System.String
+    content.vb: Public Function ToString() As String
+  overload: System.ConsoleReadError.ToString*
+- uid: System.ConsoleReadError.#ctor(System.ConsoleReadError.Unavailable)
+  commentId: M:System.ConsoleReadError.#ctor(System.ConsoleReadError.Unavailable)
+  id: '#ctor(System.ConsoleReadError.Unavailable)'
+  parent: System.ConsoleReadError
+  langs:
+  - csharp
+  - vb
+  name: ConsoleReadError(Unavailable)
+  nameWithType: ConsoleReadError.ConsoleReadError(ConsoleReadError.Unavailable)
+  fullName: System.ConsoleReadError.ConsoleReadError(System.ConsoleReadError.Unavailable)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Creates the Unavailable case.
+  example: []
+  syntax:
+    content: public ConsoleReadError(ConsoleReadError.Unavailable value)
+    parameters:
+    - id: value
+      type: System.ConsoleReadError.Unavailable
+      description: Case marker.
+    content.vb: Public Sub New(value As ConsoleReadError.Unavailable)
+  overload: System.ConsoleReadError.#ctor*
+  nameWithType.vb: ConsoleReadError.New(ConsoleReadError.Unavailable)
+  fullName.vb: System.ConsoleReadError.New(System.ConsoleReadError.Unavailable)
+  name.vb: New(Unavailable)
+- uid: System.ConsoleReadError.GetUnavailable
+  commentId: M:System.ConsoleReadError.GetUnavailable
+  id: GetUnavailable
+  parent: System.ConsoleReadError
+  langs:
+  - csharp
+  - vb
+  name: GetUnavailable()
+  nameWithType: ConsoleReadError.GetUnavailable()
+  fullName: System.ConsoleReadError.GetUnavailable()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Gets the Unavailable case marker.
+  remarks: Faults when this is a different case. Prefer a union pattern.
+  example: []
+  syntax:
+    content: public ConsoleReadError.Unavailable GetUnavailable()
+    return:
+      type: System.ConsoleReadError.Unavailable
+    content.vb: Public Function GetUnavailable() As ConsoleReadError.Unavailable
+  overload: System.ConsoleReadError.GetUnavailable*
+- uid: System.ConsoleReadError.#ctor(System.ConsoleReadError.ReadFailed)
+  commentId: M:System.ConsoleReadError.#ctor(System.ConsoleReadError.ReadFailed)
+  id: '#ctor(System.ConsoleReadError.ReadFailed)'
+  parent: System.ConsoleReadError
+  langs:
+  - csharp
+  - vb
+  name: ConsoleReadError(ReadFailed)
+  nameWithType: ConsoleReadError.ConsoleReadError(ConsoleReadError.ReadFailed)
+  fullName: System.ConsoleReadError.ConsoleReadError(System.ConsoleReadError.ReadFailed)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Creates the ReadFailed case.
+  example: []
+  syntax:
+    content: public ConsoleReadError(ConsoleReadError.ReadFailed value)
+    parameters:
+    - id: value
+      type: System.ConsoleReadError.ReadFailed
+      description: Case marker.
+    content.vb: Public Sub New(value As ConsoleReadError.ReadFailed)
+  overload: System.ConsoleReadError.#ctor*
+  nameWithType.vb: ConsoleReadError.New(ConsoleReadError.ReadFailed)
+  fullName.vb: System.ConsoleReadError.New(System.ConsoleReadError.ReadFailed)
+  name.vb: New(ReadFailed)
+- uid: System.ConsoleReadError.GetReadFailed
+  commentId: M:System.ConsoleReadError.GetReadFailed
+  id: GetReadFailed
+  parent: System.ConsoleReadError
+  langs:
+  - csharp
+  - vb
+  name: GetReadFailed()
+  nameWithType: ConsoleReadError.GetReadFailed()
+  fullName: System.ConsoleReadError.GetReadFailed()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Gets the ReadFailed case marker.
+  remarks: Faults when this is a different case. Prefer a union pattern.
+  example: []
+  syntax:
+    content: public ConsoleReadError.ReadFailed GetReadFailed()
+    return:
+      type: System.ConsoleReadError.ReadFailed
+    content.vb: Public Function GetReadFailed() As ConsoleReadError.ReadFailed
+  overload: System.ConsoleReadError.GetReadFailed*
+- uid: System.ConsoleReadError.IsUnavailable
+  commentId: P:System.ConsoleReadError.IsUnavailable
+  id: IsUnavailable
+  parent: System.ConsoleReadError
+  langs:
+  - csharp
+  - vb
+  name: IsUnavailable
+  nameWithType: ConsoleReadError.IsUnavailable
+  fullName: System.ConsoleReadError.IsUnavailable
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Whether this is the Unavailable case.
+  example: []
+  syntax:
+    content: public bool IsUnavailable { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public ReadOnly Property IsUnavailable As Boolean
+  overload: System.ConsoleReadError.IsUnavailable*
+- uid: System.ConsoleReadError.IsReadFailed
+  commentId: P:System.ConsoleReadError.IsReadFailed
+  id: IsReadFailed
+  parent: System.ConsoleReadError
+  langs:
+  - csharp
+  - vb
+  name: IsReadFailed
+  nameWithType: ConsoleReadError.IsReadFailed
+  fullName: System.ConsoleReadError.IsReadFailed
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Whether this is the ReadFailed case.
+  example: []
+  syntax:
+    content: public bool IsReadFailed { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public ReadOnly Property IsReadFailed As Boolean
+  overload: System.ConsoleReadError.IsReadFailed*
+references:
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.ConsoleReadError.ToString*
+  commentId: Overload:System.ConsoleReadError.ToString
+  isExternal: true
+  href: System.ConsoleReadError.html#System_ConsoleReadError_ToString
+  name: ToString
+  nameWithType: ConsoleReadError.ToString
+  fullName: System.ConsoleReadError.ToString
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System.ConsoleReadError.#ctor*
+  commentId: Overload:System.ConsoleReadError.#ctor
+  isExternal: true
+  href: System.ConsoleReadError.html#System_ConsoleReadError__ctor_System_ConsoleReadError_Unavailable_
+  name: ConsoleReadError
+  nameWithType: ConsoleReadError.ConsoleReadError
+  fullName: System.ConsoleReadError.ConsoleReadError
+  nameWithType.vb: ConsoleReadError.New
+  fullName.vb: System.ConsoleReadError.New
+  name.vb: New
+- uid: System.ConsoleReadError.Unavailable
+  commentId: T:System.ConsoleReadError.Unavailable
+  parent: System
+  isExternal: true
+  href: System.ConsoleReadError.html
+  name: ConsoleReadError.Unavailable
+  nameWithType: ConsoleReadError.Unavailable
+  fullName: System.ConsoleReadError.Unavailable
+  spec.csharp:
+  - uid: System.ConsoleReadError
+    name: ConsoleReadError
+    isExternal: true
+    href: System.ConsoleReadError.html
+  - name: .
+  - uid: System.ConsoleReadError.Unavailable
+    name: Unavailable
+    isExternal: true
+    href: System.ConsoleReadError.Unavailable.html
+  spec.vb:
+  - uid: System.ConsoleReadError
+    name: ConsoleReadError
+    isExternal: true
+    href: System.ConsoleReadError.html
+  - name: .
+  - uid: System.ConsoleReadError.Unavailable
+    name: Unavailable
+    isExternal: true
+    href: System.ConsoleReadError.Unavailable.html
+- uid: System.ConsoleReadError.GetUnavailable*
+  commentId: Overload:System.ConsoleReadError.GetUnavailable
+  isExternal: true
+  href: System.ConsoleReadError.html#System_ConsoleReadError_GetUnavailable
+  name: GetUnavailable
+  nameWithType: ConsoleReadError.GetUnavailable
+  fullName: System.ConsoleReadError.GetUnavailable
+- uid: System.ConsoleReadError.ReadFailed
+  commentId: T:System.ConsoleReadError.ReadFailed
+  parent: System
+  isExternal: true
+  href: System.ConsoleReadError.html
+  name: ConsoleReadError.ReadFailed
+  nameWithType: ConsoleReadError.ReadFailed
+  fullName: System.ConsoleReadError.ReadFailed
+  spec.csharp:
+  - uid: System.ConsoleReadError
+    name: ConsoleReadError
+    isExternal: true
+    href: System.ConsoleReadError.html
+  - name: .
+  - uid: System.ConsoleReadError.ReadFailed
+    name: ReadFailed
+    isExternal: true
+    href: System.ConsoleReadError.ReadFailed.html
+  spec.vb:
+  - uid: System.ConsoleReadError
+    name: ConsoleReadError
+    isExternal: true
+    href: System.ConsoleReadError.html
+  - name: .
+  - uid: System.ConsoleReadError.ReadFailed
+    name: ReadFailed
+    isExternal: true
+    href: System.ConsoleReadError.ReadFailed.html
+- uid: System.ConsoleReadError.GetReadFailed*
+  commentId: Overload:System.ConsoleReadError.GetReadFailed
+  isExternal: true
+  href: System.ConsoleReadError.html#System_ConsoleReadError_GetReadFailed
+  name: GetReadFailed
+  nameWithType: ConsoleReadError.GetReadFailed
+  fullName: System.ConsoleReadError.GetReadFailed
+- uid: System.ConsoleReadError.IsUnavailable*
+  commentId: Overload:System.ConsoleReadError.IsUnavailable
+  isExternal: true
+  href: System.ConsoleReadError.html#System_ConsoleReadError_IsUnavailable
+  name: IsUnavailable
+  nameWithType: ConsoleReadError.IsUnavailable
+  fullName: System.ConsoleReadError.IsUnavailable
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System.ConsoleReadError.IsReadFailed*
+  commentId: Overload:System.ConsoleReadError.IsReadFailed
+  isExternal: true
+  href: System.ConsoleReadError.html#System_ConsoleReadError_IsReadFailed
+  name: IsReadFailed
+  nameWithType: ConsoleReadError.IsReadFailed
+  fullName: System.ConsoleReadError.IsReadFailed

@@ -1,0 +1,6 @@
+.function neoCLR.Runtime.ConsoleWriteBytes(Boolean error,arrayref<Byte> buffer,Int32 offset,Int32 count) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ConsoleFlush(Boolean error) -> Value
+.methodimpl InternalCall
+.end

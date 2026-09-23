@@ -5616,3 +5616,49 @@ and recorded the convention for runtime code as well as examples.
   API snapshot and combined website checks pass; no publication is claimed.
 - **Evidence:** [contracts](task-contracts.md#scheduling-and-suspension-exploration--2026-09-23),
   [fixture](experiments/worker-task-cancellation/Affinity.rvn).
+
+
+### 2026-09-23 — Console and standard streams
+
+- **Author:** directed focus to common Console methods and stream support through
+  Console.In, Console.Out and Console.Error. Clarified: “Console should stay a class”.
+- **Assistant action:** implemented System.Console as a static class, with text
+  reader/writer properties and separate byte-stream factories. Added bounded line
+  reading and a reusable UTF-8 StreamWriter, plus a greeting/diagnostic sample.
+- **Design choices:** keep calls synchronous; distinguish EOF from an empty line
+  through Option, preserve stdout/stderr separately and close only the wrapper for
+  process channels. Fresh wrappers, fixed UTF-8 and LF/CRLF line parsing are explicit
+  provisional limits; no encoding, redirection or scheduler API is added.
+- **Remaining:** runtime suspension, broader terminal controls, lone-CR line endings,
+  host-specific byte output for workers/debugger and more efficient input buffering.
+- **Evidence:** [Console guide](../api-docs/console.md),
+  [sample and checks](experiments/console-streams/README.md).
+
+
+### 2026-09-23 — Showing Result/Option ergonomics through Console
+
+- **Author:** proposed Console.ReadLine followed by `?` and an optional binding,
+  so errors propagate without an explicit Error branch. Confirmed that the else
+  branch must return before input is used afterward. Requested a website section
+  on Raven error/Result handling and samples that prefer these forms over match
+  unless matching demonstrates a useful case distinction.
+- **Assistant action:** added guard and if-let examples to the Console sample and
+  an error/optional-result section to the existing outcomes feature page. The current
+  compiler supports `let Some(input) = ... else` for the linear guard and
+  `if let Some(input) = ... { ... } else { ... }` for a branch. The initially
+  suggested `if let input = ... else` spelling was rejected by this compiler;
+  examples use the supported explicit Some pattern instead.
+- **Behavior to demonstrate:** `?` propagates decoding/I/O failure through a compatible
+  Result return type; the optional binding handles EOF, not failure. An empty input
+  line remains Some(""). The application boundary reports the propagated error once.
+- **Evidence:** [guard sample](experiments/console-streams/Propagation.rvn),
+  [if-let sample](experiments/console-streams/IfLet.rvn),
+  [on-site guide](../api-docs/console.md#propagation-and-optional-input).
+
+- **Observed outcome:** both pattern samples passed all four input cases. Native
+  byte-output tests (three), greeting cases and reader/writer contract checks passed.
+  The dedicated Console feature page links these tested examples and the on-site
+  API guide; samples are bundled for download. The generated API snapshot covers
+  371 items. The older raw-System Console tests are blocked by that library's
+  unresolved StorageItem dependency, independently of the composed Raven library
+  used by the new checks.

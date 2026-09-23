@@ -1,0 +1,40 @@
+import System.*
+import System.Result.*
+import System.Option.*
+
+func Main() {
+    Console.Write("Name: ")
+    let diagnostics = Console.Error
+    let Ok(line) = Console.ReadLine(128) else {
+        let Ok(_) = diagnostics.WriteLine("Could not read a UTF-8 line (maximum 128 bytes)") else {
+            System.Fault("Could not write diagnostic")
+            return
+        }
+        let Ok(_) = diagnostics.Flush() else {
+            System.Fault("Could not write diagnostic")
+            return
+        }
+        return
+    }
+    let Some(name) = line else {
+        Console.WriteLine("End of input")
+        return
+    }
+    let output = Console.Out
+    let Ok(_) = output.WriteLine("Hello, $name") else {
+        System.Fault("Could not write greeting")
+        return
+    }
+    let Ok(_) = output.Flush() else {
+        System.Fault("Could not flush greeting")
+        return
+    }
+    let Ok(_) = diagnostics.WriteLine("Read one line") else {
+        System.Fault("Could not write diagnostic")
+        return
+    }
+    let Ok(_) = diagnostics.Flush() else {
+        System.Fault("Could not write diagnostic")
+        return
+    }
+}

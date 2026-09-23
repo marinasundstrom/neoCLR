@@ -1,0 +1,11 @@
+; Generated from runtime/raven/src/System/IO/TextWriter.rvn. Regenerate with build_runtime_library.py.
+.interface System.IO.TextWriter
+.method instance Write(String text) -> System.Result<Int32,System.IO.StreamError>
+.end
+.method instance WriteLine(String text) -> System.Result<Int32,System.IO.StreamError>
+.end
+.method instance Flush() -> System.Result<Void,System.IO.StreamError>
+.end
+.method instance Close() -> noresult
+.end
+.end

@@ -1,0 +1,84 @@
+namespace System.IO
+
+import System.*
+import System.Result.*
+import System.Text.*
+import System.Runtime.CompilerServices.*
+
+public class StreamWriter : TextWriter {
+    private field output: OutputStream
+    private field leaveOpen: bool
+    private field closed: bool = false
+
+    init(output: OutputStream) {
+        self.output = output
+        leaveOpen = false
+    }
+
+    init(output: OutputStream, leaveOpen: bool) {
+        self.output = output
+        self.leaveOpen = leaveOpen
+    }
+
+    func Write(text: string) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError(StreamError.Closed()))
+        }
+        if text.GetUtf8ByteCount() > 65536 {
+            return Error(StreamError(StreamError.LimitExceeded()))
+        }
+        let bytes = Utf8.Encode(text)
+        let buffer = CheckedStorage.Reserve<byte>(bytes.Count)
+        var index = 0
+        while index < bytes.Count {
+            buffer[index] = bytes[index]
+            index += 1
+        }
+        var written = 0
+        while written < buffer.Length {
+            match output.Write(buffer, written, buffer.Length - written) {
+                Ok(let count) => {
+                    if count < 0 {
+                        System.Fault("Invalid output write count")
+                    }
+                    if count > buffer.Length - written {
+                        System.Fault("Invalid output write count")
+                    }
+                    if count == 0 {
+                        return Error(StreamError(StreamError.IoFailure()))
+                    }
+                    written += count
+                }
+                Error(let error) => return Error(error)
+            }
+        }
+        return Ok(written)
+    }
+
+    func WriteLine(text: string) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError(StreamError.Closed()))
+        }
+        if text.GetUtf8ByteCount() >= 65536 {
+            return Error(StreamError(StreamError.LimitExceeded()))
+        }
+        return self.Write(text + "\n")
+    }
+
+    func Flush() -> Result<unit, StreamError> {
+        if closed {
+            return Error(StreamError(StreamError.Closed()))
+        }
+        return output.Flush()
+    }
+
+    // Unbuffered: Close releases ownership; use Flush explicitly to observe errors.
+    func Close() {
+        if !closed {
+            closed = true
+            if !leaveOpen {
+                output.Close()
+            }
+        }
+    }
+}

@@ -112,7 +112,9 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::ReadAllText => RuntimeService::FileInput,
             crate::native::Binding::ParseInt32 => RuntimeService::ParseInt32,
             crate::native::Binding::Int32ToString => RuntimeService::FormatInt32,
-            crate::native::Binding::WriteLine => RuntimeService::ConsoleOutput,
+            crate::native::Binding::WriteLine
+            | crate::native::Binding::ConsoleWriteBytes
+            | crate::native::Binding::ConsoleFlush => RuntimeService::ConsoleOutput,
             crate::native::Binding::CharCategory => RuntimeService::CharacterClassification,
             crate::native::Binding::Utf8Encode
             | crate::native::Binding::Utf8Decode

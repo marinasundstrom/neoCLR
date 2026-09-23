@@ -21,6 +21,7 @@ items:
   - System.IO.StreamError.WrongAccess
   - System.IO.StreamError.WrongKind
   - System.IO.StreamReader
+  - System.IO.StreamWriter
   - System.IO.TextReadError
   - System.IO.TextReadError.AccessDenied
   - System.IO.TextReadError.AlreadyExists
@@ -34,6 +35,7 @@ items:
   - System.IO.TextReadError.WrongAccess
   - System.IO.TextReadError.WrongKind
   - System.IO.TextReader
+  - System.IO.TextWriter
   langs:
   - csharp
   - vb
@@ -82,6 +84,21 @@ references:
   name: FileOutputStream
   nameWithType: FileOutputStream
   fullName: System.IO.FileOutputStream
+- uid: System.IO.TextWriter
+  commentId: T:System.IO.TextWriter
+  parent: System.IO
+  isExternal: true
+  href: System.IO.TextWriter.html
+  name: TextWriter
+  nameWithType: TextWriter
+  fullName: System.IO.TextWriter
+- uid: System.IO.StreamWriter
+  commentId: T:System.IO.StreamWriter
+  isExternal: true
+  href: System.IO.StreamWriter.html
+  name: StreamWriter
+  nameWithType: StreamWriter
+  fullName: System.IO.StreamWriter
 - uid: System.IO.TextReader
   commentId: T:System.IO.TextReader
   parent: System.IO

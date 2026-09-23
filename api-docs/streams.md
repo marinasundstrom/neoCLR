@@ -123,8 +123,8 @@ disposal, asynchronous I/O and suspension-aware buffer ownership remain open.
 [TextReader](xref:System.IO.TextReader) is the consumer interface.
 [StreamReader](xref:System.IO.StreamReader) reads strict UTF-8 from an InputStream.
 It works with host files and the sample's partial-read memory input. The POC exposes
-ReadToEnd(maxUtf8Bytes) and Close; line reading, other encodings and async work remain
-future extensions. A BOM is preserved as text, rather than detecting other encodings.
+ReadToEnd(maxUtf8Bytes), ReadLine(maxUtf8Bytes) and Close. The [Console guide](console.md)
+describes line reading; other encodings and async work remain future extensions. A BOM is preserved as text, rather than detecting other encodings.
 
 Bounds are 0–65536 UTF-8 bytes. Negative bounds fail before reading; zero accepts
 only EOF. One excess byte may be consumed to detect overflow. Invalid UTF-8 has a
@@ -160,3 +160,10 @@ work after Preview 9; published downloads are unchanged.
 The [pending-read experiment](pending-read.md) explores cancellation requests versus
 terminal completion using Task/Promise, private buffers and queued producer events.
 It exercises real await and GC, but does not introduce asynchronous stream methods.
+
+
+## Console and text output
+
+TextReader/StreamReader now also support bounded ReadLine. TextWriter/StreamWriter
+provide UTF-8 output over any OutputStream. See the [Console guide](console.md) for
+the standard channels, line endings, byte bounds and manual Flush reference.

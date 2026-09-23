@@ -154,6 +154,8 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'CONSOLE_PROPAGATION_SAMPLE': ('docs/experiments/console-streams/Propagation.rvn', 'func ReadInput()', '\n}', True),
+        'CONSOLE_IF_LET_SAMPLE': ('docs/experiments/console-streams/IfLet.rvn', 'func ReadInput()', '\n}', True),
         'STORAGE_POC_SAMPLE': ('docs/experiments/storage-poc/Main.rvn', 'func Main()', '\n}', True),
         'ARRAY_TOUR': (raven + 'library-array-tour.rvn', 'import System.*', '\n}', True),
         'TASK_AWAIT_SAMPLE': ('website/samples/preview9/library-async-default-queue.rvn', 'func Describe', '\n    return ()\n}', True),
@@ -236,6 +238,12 @@ def main():
         shutil.copyfile(ROOT / 'docs/experiments/host-pending-read' / name, host_pending_sources / name)
     shutil.make_archive(str(downloads / 'host-pending-read'), 'zip', host_pending_sources.parent)
     shutil.rmtree(host_pending_sources.parent)
+    console_sources = OUTPUT / '_console-source' / 'console-streams'
+    console_sources.mkdir(parents=True)
+    for name in ('Main.rvn', 'Contracts.rvn', 'Propagation.rvn', 'IfLet.rvn', 'ConsoleStreams.rvnproj', 'verify.py', 'README.md'):
+        shutil.copyfile(ROOT / 'docs/experiments/console-streams' / name, console_sources / name)
+    shutil.make_archive(str(downloads / 'console-streams'), 'zip', console_sources.parent)
+    shutil.rmtree(console_sources.parent)
     cancel_sources = OUTPUT / '_worker-cancel-source' / 'worker-task-cancellation'
     cancel_sources.mkdir(parents=True)
     for name in ('Workers.rvn', 'Copy.rvn', 'Main.rvn', 'DelayedCopy.rvnproj', 'Fault.rvn', 'Forbidden.rvn', 'Affinity.rvn', 'affinity.expected.txt', 'expected.txt', 'README.md'):

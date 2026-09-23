@@ -53,6 +53,8 @@ pub(crate) enum Binding {
     ReadAllText,
     WriteAllText,
     ConsoleReadByte,
+    ConsoleWriteBytes,
+    ConsoleFlush,
 }
 
 pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
@@ -242,6 +244,16 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.ReadAllText", [Type::String, Type::Int32]) => {
             (Binding::ReadAllText, Type::Value)
         }
+        (
+            "neoCLR.Runtime.ConsoleWriteBytes",
+            [
+                Type::Boolean,
+                Type::ArrayRef(element),
+                Type::Int32,
+                Type::Int32,
+            ],
+        ) if **element == Type::Byte => (Binding::ConsoleWriteBytes, Type::Value),
+        ("neoCLR.Runtime.ConsoleFlush", [Type::Boolean]) => (Binding::ConsoleFlush, Type::Value),
         ("neoCLR.Runtime.ConsoleReadByte", []) => (Binding::ConsoleReadByte, Type::Value),
         (
             "neoCLR.Runtime.StartWorker",
@@ -270,7 +282,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.RequestWorkerCancellation", [Type::Int32]) => {
             (Binding::RequestWorkerCancellation, Type::Boolean)
         }
-        ("neoCLR.Runtime.JoinWorkerResult", [Type::Int32]) => (Binding::JoinWorkerResult, Type::Value),
+        ("neoCLR.Runtime.JoinWorkerResult", [Type::Int32]) => {
+            (Binding::JoinWorkerResult, Type::Value)
+        }
         ("neoCLR.Runtime.JoinWorker", [Type::Int32]) => (Binding::JoinWorker, Type::String),
         ("neoCLR.Runtime.NotifyWorker", [Type::Int32, callback])
             if *callback == crate::assembler::parse_type("System.Func<Void>")? =>
@@ -331,6 +345,7 @@ impl Binding {
         module: &crate::Module,
         limits: &crate::Limits,
         output: &mut Vec<String>,
+        console_bytes: &mut [Vec<u8>; 2],
         options: &crate::ExecutionOptions,
     ) -> Result<Value, Fault> {
         let console = options.console.as_deref();
@@ -428,6 +443,63 @@ impl Binding {
                     .ok_or_else(|| Fault::new("generic argument index out of range"))?;
                 Ok(Value::RuntimeTypeHandle(Box::new(argument.clone())))
             }
+            (
+                Self::ConsoleWriteBytes,
+                [
+                    Value::Boolean(error),
+                    Value::ObjectReference(array),
+                    Value::Int32(offset),
+                    Value::Int32(count),
+                ],
+            ) => {
+                let Value::Array {
+                    element: Type::Byte,
+                    elements,
+                } = array.reference.read()?
+                else {
+                    return Err(Fault::new("Console write requires a byte array"));
+                };
+                let payload = match (usize::try_from(*offset), usize::try_from(*count)) {
+                    (Ok(offset), Ok(count))
+                        if offset <= elements.len() && count <= elements.len() - offset =>
+                    {
+                        if count > 65536 {
+                            Value::Byte(8)
+                        } else if count == 0 {
+                            Value::Int32(0)
+                        } else {
+                            let bytes = elements[offset..offset + count]
+                                .iter()
+                                .map(|v| match v {
+                                    Value::Byte(b) => Ok(*b),
+                                    _ => {
+                                        Err(Fault::new("Console write requires initialized bytes"))
+                                    }
+                                })
+                                .collect::<Result<Vec<_>, _>>()?;
+                            match console {
+                                Some(host) => match host.write_bytes(*error, &bytes) {
+                                    Ok(written) if written <= count => Value::Int32(written as i32),
+                                    _ => Value::Byte(10),
+                                },
+                                None => {
+                                    console_bytes[usize::from(*error)].extend_from_slice(&bytes);
+                                    Value::Int32(count as i32)
+                                }
+                            }
+                        }
+                    }
+                    _ => Value::Byte(7),
+                };
+                Ok(Value::Erased(Box::new(payload)))
+            }
+            (Self::ConsoleFlush, [Value::Boolean(error)]) => {
+                let payload = match console {
+                    Some(host) if host.flush(*error).is_err() => Value::Byte(10),
+                    _ => Value::Int32(0),
+                };
+                Ok(Value::Erased(Box::new(payload)))
+            }
             (Self::ConsoleReadByte, []) => {
                 // Byte = data, Void = EOF; Int32 1 = Unavailable, 2 = ReadFailed.
                 // A worker's bounded output sink does not provide console input.
@@ -484,6 +556,8 @@ impl Binding {
                         .map_err(|_| Fault::new("console output failed"))?;
                 } else {
                     output.push(text.clone());
+                    console_bytes[0].extend_from_slice(text.as_bytes());
+                    console_bytes[0].push(b'\n');
                 }
                 Ok(Value::Void)
             }
