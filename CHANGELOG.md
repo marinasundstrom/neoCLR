@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Record the future minimal HTTP application namespace map, optional HTTPS
+  dependencies, conceptual System.Web.WebApplication and longer-term time/String/
+  StringBuilder needs. Extend the roadmap and HTTP plan with provisional layering,
+  .NET comparisons and validation questions; no APIs or milestone priorities change.
+
 - Extend experimental Raven record components to non-null strings and nested
   same-compilation record classes. Preserve Equatable<Record>, use content/typed
   equality and matching hashes, and support string/reference deconstruction outputs.

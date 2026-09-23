@@ -376,6 +376,60 @@ proposed split with retaining .NET names or placing HTTP under System.Networking
 when the samples establish the API boundaries. Do not infer a web framework scope
 from this naming suggestion.
 
+## Minimal HTTP application dependencies — consideration, 2026-09-24
+
+The author expands the future minimal HttpServer application direction with this
+candidate namespace map. These are planning boundaries, not implemented APIs or
+an instruction to move networking ahead of the current Object/record work.
+
+| Candidate namespace | Role in the future application |
+| --- | --- |
+| `System.Cryptography` | Cryptographic and certificate support if HTTPS is included; the TLS transport/provider boundary still needs design. |
+| `System.Data.Json` | JSON request/response data, independently usable outside HTTP. |
+| `System.Networking.Sockets` | Socket transport primitives beneath HTTP. |
+| `System.Web.Http` | HTTP serving, client, request and response contracts. |
+| `System.Text` | Encoding support; evaluate an Encoding abstraction against the existing bounded Utf8 API. |
+| `System.Web` | Possible home for a conceptual WebApplication above the HTTP layer. |
+
+The author also identifies a potentially richer time API, more String methods and
+StringBuilder as longer-term needs. Candidate application cases include deadlines,
+HTTP date formatting, token parsing and response construction; these examples are
+assistant proposals, not selected member contracts. String remains in System;
+System.Text is a candidate home for StringBuilder. Reuse existing clocks and text
+support first, and select additions through bounded application cases. The initial
+cleartext POC still precedes HTTPS, and a WebApplication framework is not required
+for its low-level server acceptance case. Shared System.IO streams and System.Tasks
+completion remain supporting foundations; the namespace map is not an exhaustive
+list of imports every application must use.
+
+**Comparison and tradeoffs.** Primary .NET documentation checked 2026-09-24:
+[System.Text.Json](https://learn.microsoft.com/en-us/dotnet/api/system.text.json?view=net-10.0)
+places JSON under text, whereas the proposed System.Data.Json emphasizes structured
+data. [System.Text](https://learn.microsoft.com/en-us/dotnet/api/system.text?view=net-10.0)
+already groups Encoding and StringBuilder in .NET, while
+[TimeProvider](https://learn.microsoft.com/en-us/dotnet/api/system.timeprovider?view=net-10.0)
+is a clock/time abstraction to compare before inventing new time machinery.
+.NET separates TLS streams in
+[System.Net.Security.SslStream](https://learn.microsoft.com/en-us/dotnet/api/system.net.security.sslstream?view=net-9.0)
+from cryptographic/certificate APIs in System.Security.Cryptography. HTTPS therefore
+needs an authenticated transport contract as well as cryptographic capabilities;
+the proposed System.Cryptography name alone does not settle that contract.
+ASP.NET Core's [WebApplication](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/webapplication?view=aspnetcore-10.0)
+provides an application-level comparison for the conceptual System.Web layer.
+These are library/framework boundaries, not evidence that new CLR mechanisms are
+needed. The proposed grouping may make application roles clearer, at the cost of
+different imports and possible confusion with existing .NET namespace meanings.
+
+Compare retaining .NET names, using this role-based split, and keeping a small
+HttpServer API without WebApplication before settling public contracts. Namespace
+placement does not decide assemblies or require applications to configure sockets
+or cryptography directly. Validate layering with the existing TCP/HTTP slices;
+later HTTPS cases must cover authentication failures and ownership, time cases
+must separate elapsed time from civil timestamps, and text cases must distinguish
+Unicode text from protocol bytes. Broader platform/library comparisons and exact
+API design remain open under the design-research process; this records a scenario
+and candidate organization, not a completed design review.
+
 ## Progressive delivery before networking — revised 2026-09-23
 
 The author asks whether sockets/HTTP should move down in priority so that features

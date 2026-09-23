@@ -25,6 +25,25 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-24 — Future minimal HTTP application namespace map
+
+**Author direction.** Described a future minimal HttpServer application using
+System.Cryptography if HTTPS is supported, System.Data.Json,
+System.Networking.Sockets, System.Web.Http and System.Text for encoding. Identified
+potential longer-term needs for a better time API, String methods and StringBuilder,
+and suggested that a conceptual WebApplication would probably live in System.Web.
+
+**Assistant action and interpretation.** Extended the existing namespace
+consideration in the [platform roadmap](platform-roadmap.md#minimal-http-application-dependencies--consideration-2026-09-24)
+and linked it from the detailed HTTP plan. Recorded the names as candidates and
+WebApplication as a layer above HTTP. Added a bounded .NET comparison and distinguished
+TLS transport from cryptographic primitives. Suggested deadlines, HTTP dates, token
+parsing and response construction as future validation cases; these remain assistant
+proposals. No APIs were implemented, current work was not reprioritized, and exact
+time/text contracts, TLS placement and application framework scope remain open.
+Reviewed the website namespace overview: it intentionally inventories implemented
+APIs, so these candidate namespaces remain in planning documentation.
+
 ## 2026-09-24 — Map record interfaces and extend component semantics
 
 **Author question and direction.** Asked whether Raven should map the right

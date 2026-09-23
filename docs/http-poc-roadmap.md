@@ -62,6 +62,13 @@ wording establishes the serving use case, not three required public types. Compa
 a bounded accept/respond model with a handler model during the HTTP slice and choose
 one. Keep backend details out of the public contract.
 
+The author's [2026-09-24 dependency map](platform-roadmap.md#minimal-http-application-dependencies--consideration-2026-09-24)
+adds candidate System.Data.Json and optional System.Cryptography support alongside
+System.Networking.Sockets, System.Web.Http and System.Text encoding. A conceptual
+WebApplication could live above HTTP in System.Web. Richer time and String APIs,
+including StringBuilder, are longer-term needs to investigate through small cases;
+this does not expand the first cleartext envelope or require a web framework.
+
 ## Starting evidence and gaps
 
 | Foundation | Current evidence | Gap relevant to this milestone |
