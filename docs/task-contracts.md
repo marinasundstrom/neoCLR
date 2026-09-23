@@ -413,3 +413,26 @@ type-substitution emission error. The implementation uses an explicit continuati
 which also makes all outcome paths visible. Reproduce and validate the generic
 projection issue independently on Raven's ordinary CLI target before integration
 into Raven main; no neoCLR policy change is required by this helper.
+
+
+## Awaited propagation and precedence — 2026-09-23
+
+`let value = (await input)?` awaits a Task<Result<T,E>> and then propagates the
+Result. Equivalent separate statements are `let result = await input` followed by
+`let value = result?`. Error completes the outer Task with Error; a cancelled input
+cancels it. Neither form introduces a Task failure state. Postfix propagation
+currently binds before prefix await: `await input?` attempts propagation on the
+Task and is rejected. An ergonomic shorthand is a future proposal, not shipped.
+
+General Raven lowering now initializes the propagation operand temporary directly
+when no catch conversion is required, avoiding an uninitialized union field in a
+heap state machine. No new Runtime Contract option is needed. Protected exception
+conversion remains unchanged; neoCLR's existing no-exception policy still applies.
+
+
+Validation: six combined-expression cases cover immediate/resumed Ok, Error and
+cancellation, alongside the two existing before/after-await propagation cases.
+The general fix is independently tested on ordinary Raven CLI metadata contracts
+(21 focused tests) and integrated into Raven main as c51c69bad; neoclr carries the
+same lowering fix as e56fc1ddf (40 focused tests). The target-specific branch remains
+separate. No parser or Task failure-state change was integrated into main.

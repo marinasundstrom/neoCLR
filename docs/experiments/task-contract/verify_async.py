@@ -206,6 +206,32 @@ public async func Outer(input: Task<PAYLOAD>, effects: Effects) -> Task<PAYLOAD>
     .replace('AFTER', '' if timing == 'immediate' else 'Check(!answer.IsCompleted)\n    source.Cancel()\n    queue.Drain()')
     .replace('DEFAULT', {'int': '42', 'Result<int, string>': 'Error("ordinary")', 'unit': '()'}[payload])))
 
+# Parentheses await first; postfix propagation then handles only the Result.
+for timing in ('immediate', 'resumed'):
+    for outcome in ('Ok', 'Error', 'Cancelled'):
+        complete = {'Ok': 'source.Complete(Ok(41))', 'Error': 'source.Complete(Error("unavailable"))', 'Cancelled': 'source.Cancel()'}[outcome]
+        check = {
+            'Ok': 'if answer.GetResult() is Ok(let value) { Check(value == 42) } else { System.Fault("Expected Ok") }',
+            'Error': 'if answer.GetResult() is Error(let message) { Check(message == "unavailable") } else { System.Fault("Expected Error") }',
+            'Cancelled': 'Check(answer.IsCancelled)',
+        }[outcome]
+        cases[f'{timing} combined awaited propagation {outcome}'] = ("""
+public async func Read(input: Task<Result<int, string>>) -> Task<Result<int, string>> {
+    let value = (await input)?
+    return Ok(value + 1)
+}
+""", """
+    let queue = TaskQueue()
+    let source = Promise<Result<int, string>>(queue)
+    var answer = source.Task
+    BEFORE
+    queue.Run(() => { answer = Read(source.Task) })
+    AFTER
+    CHECK
+""".replace('BEFORE', complete if timing == 'immediate' else '')
+    .replace('AFTER', '' if timing == 'immediate' else 'Check(!answer.IsCompleted)\n    ' + complete + '\n    queue.Drain()')
+    .replace('CHECK', check))
+
 with tempfile.TemporaryDirectory(prefix='neoclr-generated-async-') as directory:
     root = Path(directory)
     for name in ('Demo.rvnproj', 'NeoCLR.CoreProbe.dll'):

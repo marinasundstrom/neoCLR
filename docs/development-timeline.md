@@ -4859,3 +4859,22 @@ and recorded the convention for runtime code as well as examples.
   Tasks feature page clearly distinguishing development from published Preview 8.
 - **Open:** cancellation requests/tokens, host event progress, protected cleanup
   and broader suspension support; this exchange does not settle scheduler design.
+
+
+### 2026-09-23 — Propagation and await precedence
+
+- **Author:** asked whether propagation works in async methods, then asked how
+  `await Foo()?` should behave. Suggested a special ergonomic interpretation
+  equivalent to `(await Foo())?`, but explicitly said it is not the priority.
+- **Assistant:** verified current postfix-first parsing and the existing passing
+  separate-statement propagation tests. A combined `(await input)?` experiment
+  exposed an uninitialized carrier field in the generated state machine. Fixed
+  the temporary lifetime in general lowering and added immediate/resumed Ok,
+  Error and cancellation regression cases. Kept parsing precedence unchanged.
+- **Direction, not implemented:** revisit await/propagation shorthand as a language
+  design question after the provisional Task surface and local editor experience.
+
+- **Validated outcome:** six combined-expression cases and two separate-statement
+  cases pass on neoCLR. Raven main received only the independently tested general
+  fix (c51c69bad, 21 tests); neoclr retains its separate policies (e56fc1ddf,
+  40 tests). The temporary main-fix branch was removed after fast-forward integration.

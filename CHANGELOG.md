@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Integrate Raven's propagation-temporary lifetime fix for `(await input)?`, with
+  immediate and resumed Ok, Error and cancellation regressions. Preserve current
+  postfix-first precedence; record ergonomic shorthand as future design work.
+  Validate eight target propagation cases, 40 focused Raven target-branch tests
+  and 21 independent Raven main tests; integrate only the general lowering fix.
+
 - Add the explicit Task<Result<T,E>>.MapResult extension: queue Ok transformations,
   preserve Error payloads and propagate cancellation without invoking the mapper.
   Ordinary Task.Map still handles the complete value. Include a runnable sample
