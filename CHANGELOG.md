@@ -8,11 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
-- Add a bounded JSON string-message experiment using existing text primitives,
-  with Unicode escape/surrogate validation, reply writing and explicit byte limits.
-  Compare string materialization with .NET 10 and check target round trips and
-  writer expansion. Record partial S3 evidence; object/array JSON and public APIs
-  remain future work.
+- Add bounded JSON string-message and sensor-report document experiments using
+  existing text primitives. Validate Unicode escapes, read/write all six value
+  kinds, preserve number spellings, check Int32 conversion and reject duplicate
+  decoded keys; bound bytes, nesting and value counts. Compare behavior with .NET
+  10 and check construction, round trips and writer failures. Record importer
+  limitations and advance the roadmap to delayed guest lifetimes. These are
+  application-local experiments, not a public JSON library.
 
 - Add an application-local UTF-8 chunk decoder experiment reusing Byte Copy's
   managed arrays and short reads. Demonstrate scalar boundaries versus graphemes,

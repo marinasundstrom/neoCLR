@@ -1,0 +1,33 @@
+import System.*
+import System.Result.*
+import System.Console.*
+
+// A small sensor report: inspect fields and construct an explicit acknowledgement.
+func Acknowledge(payload: string) -> Result<string, string> {
+    let report = ReadDocument(payload)?
+    let stationValue = report.Field("station")?
+    let station = stationValue.AsString()?
+    let readings = report.Field("readings")?
+    if !(readings is JsonArray) {
+        return Error("Expected readings array")
+    }
+    let first = readings.Item(0)?
+    let reading = first.AsInt32()?
+    WriteLine(station)
+    WriteLine(reading)
+    let reply = JsonValue.ObjectValue()
+    _ = reply.Put("station", JsonValue.StringValue(station))?
+    _ = reply.Put("accepted", JsonValue.BooleanValue(true))?
+    let count = JsonValue.NumberValue(readings.Count.ToString())?
+    _ = reply.Put("count", count)?
+    _ = reply.Put("note", JsonValue.NullValue())?
+    return WriteDocument(reply)
+}
+
+func Main() {
+    let payload = "{\"station\":\"Café\",\"readings\":[21,22.5]}"
+    match Acknowledge(payload) {
+        Ok(let reply) => WriteLine(reply)
+        Error(let message) => WriteLine(message)
+    }
+}

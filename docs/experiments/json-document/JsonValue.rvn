@@ -1,0 +1,210 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+
+public func Digit(value: byte) -> bool {
+    return value >= 48 && value <= 57
+}
+
+// Preserve number text: recognizing JSON grammar must not round to a host number.
+public func ValidNumber(text: string) -> bool {
+    let bytes = Utf8.Encode(text)
+    let count = bytes.Count
+    if count == 0 || count > 128 {
+        return false
+    }
+    var index = 0
+    if bytes[index] == 45 {
+        index += 1
+    }
+    if index == count {
+        return false
+    }
+    if bytes[index] == 48 {
+        index += 1
+    } else {
+        if !(bytes[index] >= 49 && bytes[index] <= 57) {
+            return false
+        }
+        while index < count && Digit(bytes[index]) {
+            index += 1
+        }
+    }
+    if index < count && bytes[index] == 46 {
+        index += 1
+        let start = index
+        while index < count && Digit(bytes[index]) {
+            index += 1
+        }
+        if index == start {
+            return false
+        }
+    }
+    if index < count && (bytes[index] == 101 || bytes[index] == 69) {
+        index += 1
+        if index < count && (bytes[index] == 43 || bytes[index] == 45) {
+            index += 1
+        }
+        let start = index
+        while index < count && Digit(bytes[index]) {
+            index += 1
+        }
+        if index == start {
+            return false
+        }
+    }
+    return index == count
+}
+
+// Encapsulated, application-local tree. Factories preserve kind/payload agreement.
+public sealed class JsonValue {
+    private field text: string
+    private field names: ArrayList<string>
+    private field items: ArrayList<JsonValue>
+
+    init(valueText: string) {
+        text = valueText
+        names = ArrayList<string>()
+        items = ArrayList<JsonValue>()
+    }
+
+    static func ObjectValue() -> JsonValue {
+        return JsonObject()
+    }
+
+    static func ArrayValue() -> JsonValue {
+        return JsonArray()
+    }
+
+    static func StringValue(value: string) -> JsonValue {
+        return JsonString(value)
+    }
+
+    static func NumberValue(value: string) -> Result<JsonValue, string> {
+        return JsonNumber.Create(value)
+    }
+
+    static func BooleanValue(value: bool) -> JsonValue {
+        if value {
+            return JsonBoolean(true)
+        }
+        return JsonBoolean(false)
+    }
+
+    static func NullValue() -> JsonValue {
+        return JsonNull()
+    }
+
+    val Count: int => items.Count
+
+    func AsString() -> Result<string, string> {
+        if !(self is JsonString) {
+            return Error("Expected string")
+        }
+        return Ok(text)
+    }
+
+    func NumberText() -> Result<string, string> {
+        if !(self is JsonNumber) {
+            return Error("Expected number")
+        }
+        return Ok(text)
+    }
+
+    func AsInt32() -> Result<int, string> {
+        let number = NumberText()?
+        match Int32.Parse(number) {
+            Ok(let value) => return Ok(value)
+            Error(_) => return Error("Number is not an Int32 integer token")
+        }
+    }
+
+    func AsBoolean() -> Result<bool, string> {
+        if !(self is JsonBoolean) {
+            return Error("Expected boolean")
+        }
+        return Ok(text.Equals("true"))
+    }
+
+    func Field(name: string) -> Result<JsonValue, string> {
+        if !(self is JsonObject) {
+            return Error("Expected object")
+        }
+        for index in 0..<names.Count {
+            if names[index].Equals(name) {
+                return Ok(items[index])
+            }
+        }
+        return Error("Missing field")
+    }
+
+    // Object entries retain insertion order; arrays have no names.
+    func Item(index: int) -> Result<JsonValue, string> {
+        if index < 0 || index >= items.Count {
+            return Error("Invalid item index")
+        }
+        return Ok(items[index])
+    }
+
+    func Name(index: int) -> Result<string, string> {
+        if !(self is JsonObject) || index < 0 || index >= names.Count {
+            return Error("Invalid field index")
+        }
+        return Ok(names[index])
+    }
+
+    func Add(value: JsonValue) -> Result<unit, string> {
+        if !(self is JsonArray) || items.Count >= 31 {
+            return Error("Expected array with room for an item")
+        }
+        items.Add(value)
+        return Ok(())
+    }
+
+    func Put(name: string, value: JsonValue) -> Result<unit, string> {
+        if !(self is JsonObject) || items.Count >= 31 {
+            return Error("Expected object with room for a field")
+        }
+        for previous in names {
+            if previous.Equals(name) {
+                return Error("Duplicate field")
+            }
+        }
+        names.Add(name)
+        items.Add(value)
+        return Ok(())
+    }
+}
+
+public class JsonObject : JsonValue {
+    init(): base("") { }
+}
+
+public class JsonArray : JsonValue {
+    init(): base("") { }
+}
+
+public class JsonString : JsonValue {
+    init(value: string): base(value) { }
+}
+
+public class JsonNumber : JsonValue {
+    private init(value: string): base(value) { }
+
+    static func Create(value: string) -> Result<JsonValue, string> {
+        if !ValidNumber(value) {
+            return Error("Invalid JSON number")
+        }
+        let number: JsonValue = JsonNumber(value)
+        return Ok(number)
+    }
+}
+
+public class JsonBoolean : JsonValue {
+    init(value: bool): base(if value { "true" } else { "false" }) { }
+}
+
+public class JsonNull : JsonValue {
+    init(): base("null") { }
+}

@@ -1,0 +1,10 @@
+<Project DefaultTargets="Build">
+  <Import Project="$(NeoCLRRoot)/build/NeoCLR.Raven.props" />
+  <ItemGroup>
+    <Compile Include="../json-message/JsonMessage.rvn" />
+    <Compile Include="JsonValue.rvn" />
+    <Compile Include="JsonDocument.rvn" />
+    <Compile Include="Main.rvn" />
+  </ItemGroup>
+  <Import Project="$(NeoCLRRoot)/build/NeoCLR.Raven.targets" />
+</Project>

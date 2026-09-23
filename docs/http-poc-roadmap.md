@@ -125,7 +125,7 @@ and a short contract/comparison note. The isolated S0 host probe is only partial
 | S0 — in exploration; host probe passes, runtime bridge open | Fake delayed I/O producer plus a buffer and native-resource stand-in; reuse Task | Empty-queue wakeup, immediate/delayed completion, unrelated continuation progress, GC retention, cancellation/completion race and teardown; record backend choice and rejected alternatives |
 | S1 — partial; checked memory-copy fixture runs | In-memory input/output and copy case; can start alongside S0 | Directional contracts, partial transfers, empty-buffer rules, EOF only for nonempty reads, truncated ReadExactly, no-progress WriteAll, bounds errors, repeated cleanup and injected failures; copy helpers require no sockets |
 | S2 — partial; strict chunk decoder experiment | Encode/decode a multilingual message split at every UTF-8 byte boundary; depends on S1 | Strict invalid/truncated input outcomes, carried decoder state, final-flush behavior and byte counts; reuse current whole-buffer conversions rather than change Char again |
-| S3 — partial; string-message round trip | Small JSON round trip in memory; depends on S2 | Read/write object, array, string, number, boolean and null; escaped strings and Unicode, malformed syntax, duplicate-key policy, numeric limits/precision and nesting/size bounds are explicit. Prefer explicit field access and construction; benchmark only if making performance claims |
+| S3 — partial; document consumer runs | Small JSON round trip in memory; depends on S2 | Read/write object, array, string, number, boolean and null; escaped strings and Unicode, malformed syntax, duplicate-key policy, numeric limits/precision and nesting/size bounds are explicit. Prefer explicit field access and construction; benchmark only if making performance claims |
 | S1F — planned learning checkpoint | Reuse the memory/text/JSON pipeline with bounded file input/output; after S1–S3 and the delayed-lifetime checkpoint | Shared stream behavior, open/read/write errors, cleanup and a declared failed-save policy; no directory/provider redesign or claim of nonblocking I/O |
 | S4 — exploration then implementation | TCP listener and echo client; depends on S0/S1 and resolved ownership | Bind/listen/accept/connect/read/write/close, endpoint reporting, short transfers, peer EOF/reset, refused connection, pending accept/read cancellation and repeated shutdown. A stalled connection must not freeze unrelated work; bound admitted connections |
 | S5 — planned | HTTP server returns text to an independent client; depends on S2/S4 | Split start lines/headers/body boundaries, methods/targets/status/headers, byte Content-Length, case-insensitive header names, bounded input and explicit rejection of unsupported/ambiguous framing. Choose accept/respond versus handler API using this case |
@@ -144,6 +144,23 @@ buffer lifetime. Prototype both on the echo document if the choice is unclear. T
 JSON number grammar must not silently become Int32-only: either retain number text
 with checked conversions or document and reject unsupported values. Streaming JSON
 can follow bounded body buffering; incremental UTF-8 decoding still gets its own case.
+
+## S3 document evidence — 2026-09-23
+
+The [sensor-report JSON consumer](experiments/json-document/README.md) extends the
+string checkpoint into an explicit mutable value tree and acknowledgement builder.
+It reads/writes all six JSON value kinds, retains number spellings, checks Int32
+conversion and rejects duplicate decoded names. The experiment sets 128-byte,
+four-container-depth and 32-value limits. A .NET comparison and independent output
+reader exercise grammar, conversion and boundary behavior; construction checks cover
+missing versus null, wrong-type access, cycles and output limits. These are fixture
+policies, not production defaults or a selected public serializer API.
+
+The target admitted this application without runtime changes. Application-defined
+enums and protected cross-type constructor calls remain bridge limitations; the
+experiment records its sealed-family representation and required source spellings.
+Keep those follow-ups bounded. The next delivery checkpoint is actual guest lifetime
+retention across controlled delayed completion before the file consumer.
 
 ## S3 first evidence — 2026-09-23
 

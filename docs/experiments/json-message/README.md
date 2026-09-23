@@ -97,10 +97,10 @@ dotnet msbuild docs/experiments/json-message/JsonMessage.rvnproj -nologo
 "$NeoCLRRoot/bin/neoclr" run docs/experiments/json-message/bin/neoclr/Debug/App.neoil --system "$NeoCLRRoot/lib/System.neoil"
 ```
 
-## Next bounded case
+## Following checkpoint
 
-Extend the consumer into a small object document with explicit field access and
-construction, then arrays, booleans, null and preserved JSON number text with checked
-conversions. Select duplicate-key, depth and size policies explicitly; do not silently
-restrict number grammar to Int32. This string fixture does not settle a DOM shape,
-recursive value representation, parser offsets, public error types or final API names.
+The [JSON document experiment](../json-document/README.md) now extends this consumer
+with a sensor report and acknowledgement, explicit fields, all JSON value kinds,
+preserved number text and checked conversions. It records provisional duplicate-key,
+depth and size policies. Neither fixture settles the public DOM shape, parser offsets,
+error types or final API names.

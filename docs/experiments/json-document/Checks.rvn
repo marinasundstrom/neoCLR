@@ -1,0 +1,111 @@
+import System.*
+import System.Result.*
+import System.Console.*
+
+func Check(value: bool) {
+    if !value {
+        System.Fault("JSON document check failed")
+    }
+}
+
+func Show(result: Result<string, string>) {
+    match result {
+        Ok(let text) => WriteLine(text)
+        Error(_) => WriteLine("ERROR")
+    }
+}
+
+func RoundTrip(input: string) -> Result<string, string> {
+    let document = ReadDocument(input)?
+    return WriteDocument(document)
+}
+
+func Integer(input: string) -> Result<string, string> {
+    let value = ReadDocument(input)?
+    let integer = value.AsInt32()?
+    return Ok(integer.ToString())
+}
+
+func ContractChecks() -> Result<string, string> {
+    let document = ReadDocument("{\"a\":null,\"A\":false}")?
+    Check(document.Count == 2)
+    let absentValue = document.Field("a")?
+    Check(absentValue is JsonNull)
+    match document.Field("missing") {
+        Error(_) => { }
+        Ok(_) => System.Fault("Missing field accepted")
+    }
+    match absentValue.AsString() {
+        Error(_) => { }
+        Ok(_) => System.Fault("Wrong type accepted")
+    }
+    match document.Put("a", JsonValue.StringValue("replacement")) {
+        Error(_) => Check(document.Count == 2)
+        Ok(_) => System.Fault("Duplicate field accepted")
+    }
+    let retained = document.Field("a")?
+    Check(retained is JsonNull)
+    let array = JsonValue.ArrayValue()
+    _ = array.Add(JsonValue.BooleanValue(false))?
+    match array.Item(-1) {
+        Error(_) => { }
+        Ok(_) => System.Fault("Negative index accepted")
+    }
+    match array.Item(1) {
+        Error(_) => { }
+        Ok(_) => System.Fault("Past-end index accepted")
+    }
+    match array.Put("x", JsonValue.NullValue()) {
+        Error(_) => { }
+        Ok(_) => System.Fault("Array field accepted")
+    }
+    let child = array.Item(0)?
+    Check(!(child.AsBoolean()?))
+    match JsonValue.NumberValue("01") {
+        Error(_) => { }
+        Ok(_) => System.Fault("Malformed constructed number accepted")
+    }
+    return Ok("contracts passed")
+}
+
+func WriterChecks() -> Result<string, string> {
+    let cycle = JsonValue.ArrayValue()
+    _ = cycle.Add(cycle)?
+    match WriteDocument(cycle) {
+        Error(_) => { }
+        Ok(_) => System.Fault("Cyclic tree accepted")
+    }
+    let root = JsonValue.ArrayValue()
+    let wide = JsonValue.ArrayValue()
+    let zero = JsonValue.NumberValue("0")?
+    for index in 0..<31 {
+        _ = wide.Add(zero)?
+    }
+    _ = root.Add(wide)?
+    match WriteDocument(root) {
+        Error(_) => { }
+        Ok(_) => System.Fault("Oversized tree accepted")
+    }
+    // Each string fits the message codec, but the combined document does not.
+    let large = JsonValue.ArrayValue()
+    _ = large.Add(JsonValue.StringValue("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))?
+    _ = large.Add(JsonValue.StringValue("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"))?
+    match WriteDocument(large) {
+        Error(_) => { }
+        Ok(_) => System.Fault("Oversized output accepted")
+    }
+    return Ok("writer limits passed")
+}
+
+func Main() {
+    let arguments = Environment.GetCommandLineArgs()
+    if arguments[1].Equals("roundtrip") {
+        Show(RoundTrip(arguments[2]))
+    } else if arguments[1].Equals("integer") {
+        Show(Integer(arguments[2]))
+    } else if arguments[1].Equals("contracts") {
+        Show(ContractChecks())
+    } else if arguments[1].Equals("writer") {
+        Show(WriterChecks())
+    }
+}
