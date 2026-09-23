@@ -361,6 +361,69 @@ fn cancellation_after_registration_stops_invocation_and_worker() {
     assert!(result.unwrap_err().message.contains("cancel"));
 }
 
+#[test]
+fn cancellation_during_worker_output_stops_delivery_and_guest_continuation() {
+    #[derive(Debug)]
+    struct CancelAfterLine {
+        token: neoclr::CancellationToken,
+        lines: std::sync::Mutex<Vec<String>>,
+        after: usize,
+    }
+    impl neoclr::Console for CancelAfterLine {
+        fn read_byte(&self) -> std::io::Result<Option<u8>> {
+            Ok(None)
+        }
+        fn write_line(&self, text: &str) -> std::io::Result<()> {
+            let mut lines = self.lines.lock().unwrap();
+            lines.push(text.into());
+            if lines.len() == self.after {
+                self.token.cancel();
+            }
+            Ok(())
+        }
+    }
+    let producer = ".function Print(String input) -> String\nldstr \"first\"\ncall neoCLR.Runtime.WriteLine(String)\npop\nldstr \"second\"\ncall neoCLR.Runtime.WriteLine(String)\npop\nldarg input\nret\n.end";
+    for name in ["StartWorker", "QueueWorker"] {
+        for notified in [false, true] {
+            for after in [1, 2] {
+                let console = std::sync::Arc::new(CancelAfterLine {
+                    token: neoclr::CancellationToken::new(),
+                    lines: Default::default(),
+                    after,
+                });
+                let (body, extra) = if notified {
+                    (
+                        "call Launch()\npop\nldstr \"entry\"".into(),
+                        NOTIFY_TYPES
+                            .replace("= Echo(String)", "= Print(String)")
+                            .replace("Runtime.StartWorker", &format!("Runtime.{name}"))
+                            + producer,
+                    )
+                } else {
+                    (
+                        format!(
+                            "delegate.bind System.Func<String,String> = Print(String)\nldstr \"data\"\ncall neoCLR.Runtime.{name}(System.Func<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)"
+                        ),
+                        producer.into(),
+                    )
+                };
+                let fault = execute_options(
+                    &body,
+                    &extra,
+                    neoclr::ExecutionOptions {
+                        cancellation: Some(console.token.clone()),
+                        console: Some(console.clone()),
+                        ..Default::default()
+                    },
+                )
+                .unwrap_err();
+                assert_eq!(fault.message, "execution cancelled");
+                assert_eq!(*console.lines.lock().unwrap(), ["first", "second"][..after]);
+            }
+        }
+    }
+}
+
 const BUSY_QUEUE: &str = r#"
 .type class BusyQueue
 .field Handle Int32

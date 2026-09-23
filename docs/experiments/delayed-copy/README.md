@@ -121,18 +121,24 @@ The `.rvnproj` can build independently, but reproducing this notification experi
 requires the verifier's temporary library replacement; the normal worker library
 still runs queued joins.
 
-Thirteen worker integration tests cover both GC paths, ready callback order,
+Fourteen worker integration tests cover both GC paths, ready callback order,
 invalid/duplicate registration, invocation failure/budget exhaustion, producer failure
 and cancellation after registration, alongside existing worker behavior. The busy
 queue test runs a self-reposting callback until worker delivery stops it; an explicit
-queue negative case exhausts its budget without running default notifications. Two
+queue negative case exhausts its budget without running default notifications. A new
+output-delivery case requests cancellation during the first or final host write on
+dedicated/pooled workers with direct and notification-driven joins. Six
 registry tests cover out-of-order readiness, one-shot join, pending-join rejection,
-cancelled waiting and producer disconnection. All seven existing Task tests pass.
+cancelled waiting, producer disconnection, cancellation before/after notification
+dispatch, final-write cancellation/error precedence and producer acknowledgement
+before teardown releases the result channel. All seven existing Task tests pass.
 
 ## Next bounded work
 
-Keep S0 partial. Extend the real invocation evidence to cancellation/completion races,
-explicit queue affinity and broader host-memory accounting. Successful text/output
+Keep S0 partial. [Host invocation cancellation orderings](../../cancellation.md#worker-completion-boundaries--development)
+now have controlled evidence, including cancellation during completed-result delivery.
+Guest operation cancellation/completion races, explicit queue affinity and broader
+host-memory accounting remain open. Successful text/output
 payload quotas are checked on both worker paths and notification failure delivery.
 Cooperative progress under
 self-reposting ready work now has direct-IL and Raven evidence; broader scheduling

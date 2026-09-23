@@ -315,12 +315,16 @@ impl Workers {
                     .unwrap()
                     .recv_timeout(std::time::Duration::from_millis(10))
             };
+            // Cancellation may have arrived during recv_timeout. Observe it
+            // before accepting success/failure or forwarding producer output.
+            options.check_cancellation("Worker.Join", 0)?;
             match next {
                 Ok(outcome) => {
                     let (value, lines) = outcome?;
                     // Keep worker output isolated until explicitly joined.
                     if let Some(console) = &options.console {
                         for line in lines {
+                            options.check_cancellation("Worker.Join", 0)?;
                             console
                                 .write_line(&line)
                                 .map_err(|_| Fault::new("console output failed"))?;
@@ -328,6 +332,8 @@ impl Workers {
                     } else {
                         output.extend(lines);
                     }
+                    // The last host write may itself request cancellation.
+                    options.check_cancellation("Worker.Join", 0)?;
                     return Ok(Value::String(value));
                 }
                 Err(mpsc::RecvTimeoutError::Timeout) => {}
@@ -423,5 +429,138 @@ mod tests {
                 .contains("without a result")
         );
         assert_eq!(workers.wait_notification(&options).unwrap(), None);
+    }
+
+    #[test]
+    fn cancellation_before_dispatch_retains_registration_for_teardown() {
+        // Both producer outcomes can be ready before cancellation is observed.
+        for outcome in [
+            Ok(("done".into(), vec!["hidden".into()])),
+            Err(Fault::new("producer failed")),
+        ] {
+            let (send, receive) = mpsc::channel();
+            send.send(outcome).unwrap();
+            let mut workers = Workers::default();
+            workers.results.push(pending(receive, 1));
+            let token = CancellationToken::new();
+            token.cancel();
+            let options = ExecutionOptions {
+                cancellation: Some(token),
+                ..Default::default()
+            };
+            assert_eq!(
+                workers.wait_notification(&options).unwrap_err().message,
+                "execution cancelled"
+            );
+            assert_eq!(workers.results[0].notification, Some(Value::Int32(1)));
+            assert!(workers.results[0].receive.is_some());
+        }
+    }
+
+    #[test]
+    fn cancellation_after_dispatch_discards_cached_success_or_failure() {
+        for outcome in [
+            Ok(("done".into(), vec!["hidden".into()])),
+            Err(Fault::new("producer failed")),
+        ] {
+            let (send, receive) = mpsc::channel();
+            send.send(outcome).unwrap();
+            let mut workers = Workers::default();
+            workers.results.push(pending(receive, 1));
+            assert_eq!(workers.poll_notification(), Some(Value::Int32(1)));
+            let token = CancellationToken::new();
+            token.cancel();
+            let options = ExecutionOptions {
+                cancellation: Some(token),
+                ..Default::default()
+            };
+            let mut output = vec![];
+            assert_eq!(
+                workers
+                    .join(vec![Value::Int32(0)], &mut output, &options)
+                    .unwrap_err()
+                    .message,
+                "execution cancelled"
+            );
+            assert!(output.is_empty());
+            assert!(workers.results[0].ready.is_none());
+            assert!(workers.results[0].receive.is_none());
+            assert_eq!(workers.poll_notification(), None);
+        }
+    }
+
+    #[test]
+    fn teardown_waits_for_producer_cancellation_acknowledgement() {
+        let mut workers = Workers::default();
+        let cancellation = workers.cancellation.clone();
+        let (send, receive) = mpsc::channel();
+        workers.results.push(pending(receive, 1));
+        let acknowledged = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let finished = acknowledged.clone();
+        workers.threads.push(std::thread::spawn(move || {
+            let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+            while !cancellation.is_cancelled() {
+                assert!(
+                    std::time::Instant::now() < deadline,
+                    "teardown never requested cancellation"
+                );
+                std::thread::yield_now();
+            }
+            // Teardown must retain the receiver until the producer has stopped.
+            send.send(Err(Fault::new("cancelled producer"))).unwrap();
+            finished.store(true, std::sync::atomic::Ordering::SeqCst);
+        }));
+        drop(workers);
+        assert!(acknowledged.load(std::sync::atomic::Ordering::SeqCst));
+    }
+
+    #[test]
+    fn last_output_write_observes_cancellation_without_overriding_write_failure() {
+        #[derive(Debug)]
+        struct CancelOnWrite {
+            token: CancellationToken,
+            fail: bool,
+        }
+        impl crate::Console for CancelOnWrite {
+            fn read_byte(&self) -> std::io::Result<Option<u8>> {
+                Ok(None)
+            }
+            fn write_line(&self, _: &str) -> std::io::Result<()> {
+                self.token.cancel();
+                if self.fail {
+                    Err(std::io::Error::other("write failed"))
+                } else {
+                    Ok(())
+                }
+            }
+        }
+        for fail in [false, true] {
+            let console = Arc::new(CancelOnWrite {
+                token: CancellationToken::new(),
+                fail,
+            });
+            let options = ExecutionOptions {
+                cancellation: Some(console.token.clone()),
+                console: Some(console),
+                ..Default::default()
+            };
+            let (send, receive) = mpsc::channel();
+            send.send(Ok(("done".into(), vec!["last line".into()])))
+                .unwrap();
+            let mut workers = Workers::default();
+            workers.results.push(pending(receive, 1));
+            workers.poll_notification();
+            let fault = workers
+                .join(vec![Value::Int32(0)], &mut vec![], &options)
+                .unwrap_err();
+            assert_eq!(
+                fault.message,
+                if fail {
+                    "console output failed"
+                } else {
+                    "execution cancelled"
+                }
+            );
+        }
     }
 }

@@ -158,6 +158,8 @@ through an isolated worker-library adapter. Polling at default-queue callback re
 now permits completion during continuously reposted work, verified in direct IL and
 Raven. [Worker result/output quotas](isolated-workers.md#completion-payload-quota)
 now bound successful retained text payloads; this is not a total host-memory limit.
+[Host cancellation tests and sample](cancellation.md#worker-completion-boundaries--development)
+cover ready-result orderings, interrupted output forwarding and teardown acknowledgement.
 This is cooperative progress, not preemption. Queue affinity, operation-level
 cancellation races and bounded native payloads remain open. No public I/O contract
 or backend is selected by these results.

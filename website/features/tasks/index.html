@@ -23,7 +23,7 @@
     <div class="actions"><a class="button" href="#await">See a working example <span aria-hidden="true">↓</span></a><a class="text-link" href="../../samples/library-async-default-queue.rvn" download>Download the complete example</a></div>
   </div>
   <div class="feature-layout">
-    <aside class="feature-toc" aria-label="On this page"><p class="eyebrow">CURRENT STATE</p><nav aria-label="Feature sections"><a href="#await">Await an operation</a><a href="#promise">Produce a value</a><a href="#outcomes">Cancellation and errors</a><a href="#worker-limits">Worker limits</a><a href="#dispatch">Automatic progress</a><a href="#try">Try it</a><a href="#direction">Where we’re heading</a></nav></aside>
+    <aside class="feature-toc" aria-label="On this page"><p class="eyebrow">CURRENT STATE</p><nav aria-label="Feature sections"><a href="#await">Await an operation</a><a href="#promise">Produce a value</a><a href="#outcomes">Cancellation and errors</a><a href="#worker-limits">Worker limits</a><a href="#host-cancellation">Host cancellation</a><a href="#dispatch">Automatic progress</a><a href="#try">Try it</a><a href="#direction">Where we’re heading</a></nav></aside>
     <article class="feature-body">
       <section id="await">
         <h2>Starting and awaiting a worker</h2>
@@ -64,6 +64,11 @@
         <p>Each worker has a default 1 MiB quota shared by its returned text and captured console output. Accounting uses UTF-8 bytes plus one byte per output line, including empty lines. Output is checked before copying a line; returned text is checked before publishing success. Exceeding the quota faults when the caller joins the result, without forwarding partial output.</p>
         <p>The embedding host can change this quota. With the existing 64-submission limit, default successful payloads total at most 64 MiB. This is not a process-memory limit: inputs, temporary strings, diagnostics and allocation overhead are excluded. A worker printing an empty line and <code>é</code>, then returning <code>é</code>, uses six logical bytes.</p>
         <p>The limit applies to dedicated and pooled workers, including the experimental completion adapter. Its per-worker accounting is predictable, but a future shared budget could distribute capacity more flexibly.</p>
+      </section>
+      <section id="host-cancellation">
+        <h2>Host cancellation during completion</h2>
+        <p>The embedding host can request cancellation of an entire invocation. Worker joins check that request around waits, between forwarded output lines and before returning the value. For example, if the host requests cancellation while writing the first of two buffered worker lines, that line remains visible, the second is skipped and the invocation ends with an <code>execution cancelled</code> Fault. A fresh invocation can still run the same program.</p>
+        <p>This is separate from a producer calling <code>Promise.Cancel()</code>: host cancellation does not complete an individual Task as Cancelled. Requests are cooperative and cannot interrupt an active host call or undo output. Teardown requests worker cancellation and waits for its threads to stop. Guest operation tokens, native I/O acknowledgement and bounded shutdown remain open.</p>
       </section>
       <section id="dispatch">
         <h2>Default TaskQueue dispatch</h2>

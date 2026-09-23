@@ -59,6 +59,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Cover UTF-8, empty lines and notification failure delivery. Larger worker outputs
   now fault unless an embedder raises `Limits.worker_result_bytes`; exhaustive Rust
   Limits literals need the new field. This is not a total host-memory bound.
+  Poll host cancellation after worker waits and between output writes; a request
+  observed during delivery now skips remaining lines and stops before returning the
+  joined value. Keep already written output. Add a runnable host/guest-IL sample,
+  controlled notification orderings and teardown acknowledgement checks; guest
+  operation cancellation remains unimplemented.
   Normal Thread/ThreadPool implementations retain queued
   joins; preemption, per-operation cancellation, bounded native I/O ownership and
   real I/O remain open.

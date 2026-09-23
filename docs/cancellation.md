@@ -61,3 +61,61 @@ this slice does not establish their polling frequency or maximum response latenc
 
 `cargo run --example cancellation` requests cancellation from another thread, joins the
 worker, then invokes another function using the same loaded program.
+
+## Worker completion boundaries — development
+
+A worker may have completed while its caller is still waiting to consume the result.
+Host cancellation controls the caller's invocation; worker completion does not
+prevent that invocation from being cancelled. `JoinWorker` polls before waiting, after receiving a result, between
+forwarded console lines and before returning the value. Observed cancellation ends
+the invocation with `execution cancelled`, including when a success or producer Fault
+was waiting to be consumed. It does not produce a guest `TaskOutcome.Cancelled`.
+
+| Controlled ordering | Checked behavior |
+| --- | --- |
+| Result ready, cancellation observed before notification dispatch | The callback stays registered for teardown; no notification is delivered. |
+| Notification dispatched, cancellation observed before join | Cached success or producer failure is discarded; no worker output is forwarded. |
+| Cancellation requested by the first of two host writes | The first line remains visible; the second line and result delivery are skipped. |
+| Cancellation requested by the final host write | The invocation still stops before returning the joined value. |
+| Fresh invocation after cancellation | The same loaded program can deliver both lines and the result with independent options. |
+
+The invocation registry requests producer cancellation and joins its threads before
+releasing retained registrations/results. A controlled registry test checks that a
+producer can acknowledge cancellation through its still-live result channel and has
+stopped when teardown returns. These are selected orderings, not exhaustive concurrency
+verification or a bounded shutdown guarantee for blocking native calls. There is still
+a race after every poll; requesting cancellation does not synchronously stop delivery.
+An observed host-write error remains an output Fault, even if the host also requested
+cancellation inside that failing write. Previously delivered side effects remain.
+
+Run the small [host sample](../examples/worker_cancellation.rs):
+
+```sh
+cargo run --locked --example worker_cancellation
+```
+
+It supplies provisional worker imports for its [guest IL](../examples/worker_cancellation.neoil).
+This is a runtime embedding example; ordinary Raven applications use library APIs.
+Expected output (also asserted by the executable):
+
+```text
+First worker line
+Invocation: execution cancelled
+Fresh invocation: both lines and result delivered
+```
+
+### Comparison and choice
+
+[.NET cooperative cancellation](https://learn.microsoft.com/en-us/dotnet/standard/threading/cancellation-in-managed-threads)
+(primary documentation checked 2026-09-23) leaves observing and responding to the
+request to the operation. This is the relevant baseline; it does not impose a CLR
+poll before every console line. neoCLR's existing host token stops an entire interpreter
+invocation with a terminal Fault. Guest operation tokens and Task cancellation are
+separate design work.
+
+Keeping worker output delivery as one uninterrupted batch was simpler but postponed
+observation across multiple host calls. Polling at line boundaries uses the existing
+runtime control surface, with an extra flag read per line and explicitly partial
+output on cancellation. No atomic delivery, rollback or performance improvement is
+claimed. Operation cancellation/acknowledgement for native I/O remains provisional;
+these host checks do not select that contract.

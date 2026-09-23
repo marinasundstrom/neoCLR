@@ -1,0 +1,22 @@
+.module WorkerCancellation
+.entry Main
+
+; The worker finishes both writes before its result is joined. Output is buffered.
+.function Produce(String input) -> String
+    ldstr "First worker line"
+    call neoCLR.Runtime.WriteLine(String)
+    pop
+    ldstr "Second worker line"
+    call neoCLR.Runtime.WriteLine(String)
+    pop
+    ldarg input
+    ret
+.end
+
+.function Main() -> String
+    delegate.bind System.Func<String,String> = Produce(String)
+    ldstr "completed result"
+    call neoCLR.Runtime.StartWorker(System.Func<String,String>,String)
+    call neoCLR.Runtime.JoinWorker(Int32)
+    ret
+.end

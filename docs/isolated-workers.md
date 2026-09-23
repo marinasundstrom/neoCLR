@@ -31,7 +31,10 @@ At most 64 jobs may be submitted in one invocation. Worker creation inside a wor
 is rejected. A callback Fault becomes a terminal Fault when the queue processes completion; it is not a Task
 failure state or a Result conversion. Captured callbacks fault. Bootstrap handles are invocation-scoped and single-use. Unjoined work is cancelled cooperatively and all OS threads are joined
 when the owning invocation exits. Blocking host operations cannot be interrupted,
-so cleanup may wait for them. Parent cancellation is observed while waiting during completion waits.
+so cleanup may wait for them. Parent cancellation is polled before and after waiting
+for a result, between forwarded output lines and before returning the value.
+Already written lines remain visible; cancellation does not roll them back. See the
+[controlled completion orderings and host sample](cancellation.md#worker-completion-boundaries--development).
 
 Worker console input is unavailable. Output is buffered and forwarded during completion, in
 submission order, rather than interleaved with the parent's console. Output from unjoined
