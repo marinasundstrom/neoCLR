@@ -7,7 +7,7 @@ static class ErrorBindings
     public static readonly Dictionary<string, string[]> Cases = new() {
         ["System.Storage.InvalidPathError"] = [],
         ["System.Storage.EntryKind"] = ["File", "Directory"],
-        ["System.Storage.StorageLookupError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "IoFailure"],
+        ["System.Storage.StorageLookupError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "IoFailure", "InvalidRange", "LimitExceeded"],
         ["System.Streams.StreamError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "AlreadyExists", "Closed", "InvalidRange", "LimitExceeded", "WrongAccess", "IoFailure"],
         ["System.Storage.FileReadError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "ReadFailed", "InvalidUtf8"],
         ["System.Storage.FileWriteError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "WriteFailed"],

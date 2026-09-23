@@ -89,6 +89,17 @@ with tempfile.TemporaryDirectory(prefix='neoclr-storage-provider-') as folder:
     assert (work / 'sandbox/context/nested/note.txt').read_text() == 'lookup contents'
     print(resolved.stdout, end='')
 
+    (work / 'sandbox/listing').mkdir()
+    (work / 'sandbox/listing/a-dir').mkdir()
+    (work / 'sandbox/listing/z.txt').write_text('z')
+    shutil.copyfile(HERE / 'HostContracts.rvn', root / 'Main.rvn')
+    host = subprocess.run(['dotnet', 'msbuild', str(root / 'StorageExplorer.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=120)
+    assert host.returncode == 0, host.stdout + host.stderr
+    listed = subprocess.run([str(bundle / 'bin/neoclr'), 'run', str(root / 'bin/neoclr/Debug/App.neoil'), '--system', str(bundle / 'lib/System.neoil')], cwd=work / 'sandbox', capture_output=True, text=True, timeout=60)
+    assert listed.returncode == 0, listed.stdout + listed.stderr
+    assert listed.stdout == 'Integrated host provider and mixed enumeration: passed\n', listed.stdout
+    print(listed.stdout, end='')
+
     shutil.copyfile(HERE / 'ProviderContracts.rvn', root / 'Main.rvn')
     provider = subprocess.run(['dotnet', 'msbuild', str(root / 'StorageExplorer.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=120)
     assert provider.returncode == 0, provider.stdout + provider.stderr

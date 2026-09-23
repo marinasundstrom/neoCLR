@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.StorageLookupError.InvalidRange
+  commentId: T:System.Storage.StorageLookupError.InvalidRange
+  id: StorageLookupError.InvalidRange
+  parent: System.Storage
+  children:
+  - System.Storage.StorageLookupError.InvalidRange.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StorageLookupError.InvalidRange
+  nameWithType: StorageLookupError.InvalidRange
+  fullName: System.Storage.StorageLookupError.InvalidRange
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: The enumeration bound is negative.
+  example: []
+  syntax:
+    content: public struct StorageLookupError.InvalidRange
+    content.vb: Public Structure StorageLookupError.InvalidRange
+- uid: System.Storage.StorageLookupError.InvalidRange.#ctor
+  commentId: M:System.Storage.StorageLookupError.InvalidRange.#ctor
+  id: '#ctor'
+  parent: System.Storage.StorageLookupError.InvalidRange
+  langs:
+  - csharp
+  - vb
+  name: InvalidRange()
+  nameWithType: StorageLookupError.InvalidRange.InvalidRange()
+  fullName: System.Storage.StorageLookupError.InvalidRange.InvalidRange()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Creates the InvalidRange case.
+  example: []
+  syntax:
+    content: public InvalidRange()
+    content.vb: Public Sub New()
+  overload: System.Storage.StorageLookupError.InvalidRange.#ctor*
+  nameWithType.vb: StorageLookupError.InvalidRange.New()
+  fullName.vb: System.Storage.StorageLookupError.InvalidRange.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.StorageLookupError.InvalidRange.#ctor*
+  commentId: Overload:System.Storage.StorageLookupError.InvalidRange.#ctor
+  isExternal: true
+  href: System.Storage.StorageLookupError.InvalidRange.html#System_Storage_StorageLookupError_InvalidRange__ctor
+  name: InvalidRange
+  nameWithType: StorageLookupError.InvalidRange.InvalidRange
+  fullName: System.Storage.StorageLookupError.InvalidRange.InvalidRange
+  nameWithType.vb: StorageLookupError.InvalidRange.New
+  fullName.vb: System.Storage.StorageLookupError.InvalidRange.New
+  name.vb: New

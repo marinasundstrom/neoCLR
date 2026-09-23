@@ -1,6 +1,7 @@
 namespace System.Storage
 
 import System.*
+import System.Collections.*
 import System.Streams.*
 
 public sealed interface StorageItem {
@@ -14,6 +15,10 @@ public interface File : StorageItem {
 }
 
 public interface Directory : StorageItem {
+    func GetItems(maxItems: int) -> Result<Sequence<StorageItem>, StorageLookupError>
+    func GetItem(relativePath: Path) -> Result<StorageItem, StorageLookupError>
+    func GetDirectory(name: string) -> Result<Directory, StorageLookupError>
+    func GetDirectory(relativePath: Path) -> Result<Directory, StorageLookupError>
     func FileAt(name: string) -> Result<File, StorageLookupError>
     func GetFile(name: string) -> Result<File, StorageLookupError>
     func GetFile(relativePath: Path) -> Result<File, StorageLookupError>

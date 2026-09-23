@@ -27,6 +27,7 @@ pub(crate) enum Operation {
     Close,
     Kind,
     CreateDirectory,
+    List,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -151,6 +152,29 @@ impl Files {
         self.open.remove(&id);
         Ok(0)
     }
+    fn list(name: &str, max_items: i32, limits: &Limits) -> Result<Vec<String>, Error> {
+        let bound = usize::try_from(max_items).map_err(|_| Error::InvalidRange)?;
+        if bound > 1024 || bound > limits.array_elements {
+            return Err(Error::LimitExceeded);
+        }
+        let mut names = Vec::new();
+        let mut bytes = 0usize;
+        for entry in std::fs::read_dir(path(name)?)? {
+            let entry = entry?;
+            if names.len() == bound {
+                return Err(Error::LimitExceeded);
+            }
+            let name = entry.file_name().into_string().map_err(|_| Error::InvalidPath)?;
+            bytes = bytes.checked_add(name.len()).ok_or(Error::LimitExceeded)?;
+            if bytes > 64 * 1024 || bytes > limits.array_bytes {
+                return Err(Error::LimitExceeded);
+            }
+            names.push(name);
+        }
+        names.sort();
+        Ok(names)
+    }
+
     pub(crate) fn invoke(
         &mut self,
         op: Operation,
@@ -255,6 +279,14 @@ impl Files {
                     Err(Error::WrongKind)
                 }
             }),
+            (Operation::List, [Value::String(name), Value::Int32(max_items)]) => {
+                match Self::list(name, *max_items, limits) {
+                    Ok(names) => Ok(crate::reflection::array(
+                        "String", names.into_iter().map(|name| Ok(Value::String(name))), limits,
+                    )?),
+                    Err(error) => Err(error),
+                }
+            }
             (Operation::CreateDirectory, [Value::String(name)]) => path(name).and_then(|p| {
                 std::fs::create_dir(p)?;
                 Ok(Value::Int32(0))
@@ -292,6 +324,22 @@ mod tests {
             std::fs::remove_dir_all(&self.0).unwrap();
         }
     }
+    #[test]
+    fn bounded_directory_snapshot_preserves_names_and_errors() {
+        let fixture = Fixture::new();
+        std::fs::write(fixture.path("z.txt"), b"z").unwrap();
+        std::fs::create_dir(fixture.path("a-dir")).unwrap();
+        let root = fixture.0.to_str().unwrap();
+        let limits = Limits::default();
+        assert_eq!(Files::list(root, 2, &limits).unwrap(), ["a-dir", "z.txt"]);
+        assert_eq!(Files::list(root, 1, &limits), Err(Error::LimitExceeded));
+        assert_eq!(Files::list(root, -1, &limits), Err(Error::InvalidRange));
+        assert_eq!(Files::list(root, 1025, &limits), Err(Error::LimitExceeded));
+        assert_eq!(Files::list(&fixture.path("absent"), 2, &limits), Err(Error::NotFound));
+        assert_eq!(Files::list(&fixture.path("z.txt"), 2, &limits), Err(Error::WrongKind));
+        assert_eq!(Files::list(&fixture.path("a-dir"), 0, &limits).unwrap(), Vec::<String>::new());
+    }
+
     #[test]
     fn round_trip_partial_reads_eof_and_close() {
         let fixture = Fixture::new();

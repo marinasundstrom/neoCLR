@@ -100,6 +100,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
                 crate::file_streams::Operation::OpenRead
                 | crate::file_streams::Operation::Read
                 | crate::file_streams::Operation::ReadInto
+                | crate::file_streams::Operation::List
                 | crate::file_streams::Operation::Kind => RuntimeService::FileInput,
                 _ => RuntimeService::FileOutput,
             },

@@ -65,7 +65,37 @@ public struct StorageLookupError {
         return ValueStorage.Unpack<StorageLookupError.IoFailure>(Stored)
     }
 
+    public struct InvalidRange { }
+
+    init(value: StorageLookupError.InvalidRange) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsInvalidRange: bool => ValueStorage.Is<StorageLookupError.InvalidRange>(Stored)
+
+    func GetInvalidRange() -> StorageLookupError.InvalidRange {
+        return ValueStorage.Unpack<StorageLookupError.InvalidRange>(Stored)
+    }
+
+    public struct LimitExceeded { }
+
+    init(value: StorageLookupError.LimitExceeded) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsLimitExceeded: bool => ValueStorage.Is<StorageLookupError.LimitExceeded>(Stored)
+
+    func GetLimitExceeded() -> StorageLookupError.LimitExceeded {
+        return ValueStorage.Unpack<StorageLookupError.LimitExceeded>(Stored)
+    }
+
     func ToString() -> string {
+        if IsInvalidRange {
+            return "InvalidRange"
+        }
+        if IsLimitExceeded {
+            return "LimitExceeded"
+        }
         if IsInvalidPath {
             return "InvalidPath"
         }

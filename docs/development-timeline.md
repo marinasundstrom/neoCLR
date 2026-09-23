@@ -5560,3 +5560,14 @@ and recorded the convention for runtime code as well as examples.
 - **Remaining:** the roadmap now explicitly includes those pieces in the POC exit
   evidence. The exact seek signature and text-reader bounds/ownership policies still
   need implementation decisions and tests; completion has not yet been claimed.
+
+
+### 2026-09-23 — Future asynchronous Storage contracts
+
+- **Author:** asked whether some future Storage methods should be asynchronous and
+  return Task.
+- **Assistant recommendation:** consider Task<Result<…>> for lookup, listing and
+  stream opening/creation, retaining synchronous parsing and represented properties.
+  Scheduling, cancellation, ownership and closing races must be defined first.
+- **Action:** recorded this as future direction. The active POC remains synchronous;
+  no completed-task wrapper or automatic thread spawning is being presented as async I/O.

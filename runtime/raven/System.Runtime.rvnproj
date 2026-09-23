@@ -11,6 +11,9 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TaskOutcome'">
     <Compile Include="src/System/Tasks/TaskOutcome.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileSystem'">
+    <Compile Include="src/System/Storage/FileSystem.rvn" />
+  </ItemGroup>
   <!-- Declaration slices shadow core types and contain no typeof expressions. -->
   <PropertyGroup>
     <RavenTypeOfAssemblyName></RavenTypeOfAssemblyName>

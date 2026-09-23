@@ -26,6 +26,9 @@ not enforce this compiler metadata; closure is not a native runtime security bou
 | --- | --- |
 | `File.OpenRead()` | Open existing bytes as an InputStream or return StreamError. Close the successful stream. |
 | `File.CreateNew()` | POC operation for exclusive creation at an address; no overwrite. Returns OutputStream or StreamError. |
+| `Directory.GetItems(maxItems)` | Return a bounded snapshot of direct child StorageItem interfaces or an error; never silently truncate. |
+| `Directory.GetItem(relativePath)` | Look up either child kind, retaining directory context. |
+| `Directory.GetDirectory(name or relativePath)` | Look up a child directory; string accepts one name, Path accepts relative segments. |
 | `Directory.FileAt(name)` | POC operation constructing a child File address without I/O; invalid names return StorageLookupError.InvalidPath. |
 | `Directory.GetFile(name)` | Resolve one child name and explicitly look up its file. |
 | `Directory.GetFile(relativePath)` | Resolve a relative Path, including nested segments; reject absolute inputs. |
@@ -34,16 +37,17 @@ Operations are currently synchronous. Read/write counts can be partial. Creation
 is not a transaction; a later write failure can leave an empty or partial file.
 See the [stream contract](streams.md).
 
-The tested [sample](storage-experiment.md) owns ProviderFile and ProviderDirectory
-implementations which retain their disk/memory provider and logical Path. Its
+FileSystem owns internal host File/Directory implementations. The tested
+[sample](storage-experiment.md) retains ProviderFile/ProviderDirectory for its
+memory comparison and address-only fixtures. Its
 Directory implementation handles `/` and `.` prefixes without doubling separators;
 `.` lookup normally returns WrongKind. String traversal accepts one child name.
 The memory fixture uses flat keys and does not model a full directory hierarchy.
 
 StorageProvider now resolves GetItem/GetFile/GetDirectory. GetItem returns the
 common StorageItem interface. The former StorageLookup split is removed; byte
-opening belongs to File implementations. Directory.GetDirectory, Directory.GetItem
-and GetItems enumeration remain **unimplemented**.
+opening belongs to File implementations. Relative Directory.GetDirectory/GetItem and bounded GetItems are now implemented.
+FileSystem supplies the host-backed implementation.
 Creation/address factories will be aligned with resolved storage objects in that
 work; FileAt/CreateNew should not be treated as the final creation model. Async
 interaction needs scheduling and cancellation contracts before claiming nonblocking I/O.

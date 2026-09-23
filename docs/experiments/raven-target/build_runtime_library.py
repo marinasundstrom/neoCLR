@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'FileSystem': 'System.Storage.FileSystem',
     'StorageItems': 'System.Storage.StorageItem',
     'StorageProvider': 'System.Storage.StorageProvider',
     'InputStream': 'System.Streams.InputStream',
@@ -112,6 +113,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'FileSystem': 'runtime/raven/src/System/Storage/FileSystem.rvn',
     'StorageItems': 'runtime/raven/src/System/Storage/StorageItems.rvn',
     'StorageProvider': 'runtime/raven/src/System/Storage/StorageProvider.rvn',
     'InputStream': 'runtime/raven/src/System/Streams/InputStream.rvn',

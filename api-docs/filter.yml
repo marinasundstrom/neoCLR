@@ -29,6 +29,6 @@ apiRules:
     uidRegex: '^System\.Storage$'
     type: Namespace
 - include:
-    uidRegex: '^System\.Storage\.(StorageItem|File|Directory|FileText|FileReadError|FileWriteError|StorageProvider|Metadata|EntryKind|StorageLookupError|Path|InvalidPathError)($|\.)'
+    uidRegex: '^System\.Storage\.(StorageItem|File|Directory|FileText|FileSystem|FileReadError|FileWriteError|StorageProvider|Metadata|EntryKind|StorageLookupError|Path|InvalidPathError)($|\.)'
 - exclude:
     uidRegex: '.*'

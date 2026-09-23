@@ -17,6 +17,12 @@
 .property instance IsIoFailure() -> Boolean
 .get instance System.Storage.StorageLookupError::get_IsIoFailure()
 .end
+.property instance IsInvalidRange() -> Boolean
+.get instance System.Storage.StorageLookupError::get_IsInvalidRange()
+.end
+.property instance IsLimitExceeded() -> Boolean
+.get instance System.Storage.StorageLookupError::get_IsLimitExceeded()
+.end
 .method instance .ctor(System.Storage.StorageLookupError.InvalidPath value) -> Void
 ldarg value
 value.pack System.Storage.StorageLookupError.InvalidPath
@@ -187,97 +193,197 @@ value.unpack System.Storage.StorageLookupError.IoFailure
 M0000000f_IL_000d:
 ret
 .end
-.method instance ToString() -> String
-M00000010_IL_0000:
-M00000010_IL_0001:
-M00000010_IL_0002:
+.method instance .ctor(System.Storage.StorageLookupError.InvalidRange value) -> Void
+ldarg value
+value.pack System.Storage.StorageLookupError.InvalidRange
+newobj System.Storage.StorageLookupError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsInvalidRange() -> Boolean
+M00000011_IL_0000:
+M00000011_IL_0001:
+M00000011_IL_0002:
 ldarg 0
-M00000010_IL_0003:
+M00000011_IL_0003:
+ldfld System.Storage.StorageLookupError::Stored
+M00000011_IL_0008:
+value.is System.Storage.StorageLookupError.InvalidRange
+call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_000d:
+call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetInvalidRange() -> System.Storage.StorageLookupError.InvalidRange
+M00000012_IL_0000:
+M00000012_IL_0001:
+M00000012_IL_0002:
+ldarg 0
+M00000012_IL_0003:
+ldfld System.Storage.StorageLookupError::Stored
+M00000012_IL_0008:
+value.unpack System.Storage.StorageLookupError.InvalidRange
+M00000012_IL_000d:
+ret
+.end
+.method instance .ctor(System.Storage.StorageLookupError.LimitExceeded value) -> Void
+ldarg value
+value.pack System.Storage.StorageLookupError.LimitExceeded
+newobj System.Storage.StorageLookupError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsLimitExceeded() -> Boolean
+M00000014_IL_0000:
+M00000014_IL_0001:
+M00000014_IL_0002:
+ldarg 0
+M00000014_IL_0003:
+ldfld System.Storage.StorageLookupError::Stored
+M00000014_IL_0008:
+value.is System.Storage.StorageLookupError.LimitExceeded
+call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
+M00000014_IL_000d:
+call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetLimitExceeded() -> System.Storage.StorageLookupError.LimitExceeded
+M00000015_IL_0000:
+M00000015_IL_0001:
+M00000015_IL_0002:
+ldarg 0
+M00000015_IL_0003:
+ldfld System.Storage.StorageLookupError::Stored
+M00000015_IL_0008:
+value.unpack System.Storage.StorageLookupError.LimitExceeded
+M00000015_IL_000d:
+ret
+.end
+.method instance ToString() -> String
+M00000016_IL_0000:
+M00000016_IL_0001:
+M00000016_IL_0002:
+ldarg 0
+M00000016_IL_0003:
+call instance System.Storage.StorageLookupError::get_IsInvalidRange()
+call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
+M00000016_IL_0008:
+brtrue M00000016_IL_0012
+M00000016_IL_000d:
+br M00000016_IL_0019
+M00000016_IL_0012:
+M00000016_IL_0013:
+ldstr "InvalidRange"
+M00000016_IL_0018:
+ret
+M00000016_IL_0019:
+M00000016_IL_001a:
+M00000016_IL_001b:
+ldarg 0
+M00000016_IL_001c:
+call instance System.Storage.StorageLookupError::get_IsLimitExceeded()
+call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
+M00000016_IL_0021:
+brtrue M00000016_IL_002b
+M00000016_IL_0026:
+br M00000016_IL_0032
+M00000016_IL_002b:
+M00000016_IL_002c:
+ldstr "LimitExceeded"
+M00000016_IL_0031:
+ret
+M00000016_IL_0032:
+M00000016_IL_0033:
+M00000016_IL_0034:
+ldarg 0
+M00000016_IL_0035:
 call instance System.Storage.StorageLookupError::get_IsInvalidPath()
 call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
-M00000010_IL_0008:
-brtrue M00000010_IL_0012
-M00000010_IL_000d:
-br M00000010_IL_0019
-M00000010_IL_0012:
-M00000010_IL_0013:
+M00000016_IL_003a:
+brtrue M00000016_IL_0044
+M00000016_IL_003f:
+br M00000016_IL_004b
+M00000016_IL_0044:
+M00000016_IL_0045:
 ldstr "InvalidPath"
-M00000010_IL_0018:
+M00000016_IL_004a:
 ret
-M00000010_IL_0019:
-M00000010_IL_001a:
-M00000010_IL_001b:
+M00000016_IL_004b:
+M00000016_IL_004c:
+M00000016_IL_004d:
 ldarg 0
-M00000010_IL_001c:
+M00000016_IL_004e:
 call instance System.Storage.StorageLookupError::get_IsNotFound()
 call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
-M00000010_IL_0021:
-brtrue M00000010_IL_002b
-M00000010_IL_0026:
-br M00000010_IL_0032
-M00000010_IL_002b:
-M00000010_IL_002c:
+M00000016_IL_0053:
+brtrue M00000016_IL_005d
+M00000016_IL_0058:
+br M00000016_IL_0064
+M00000016_IL_005d:
+M00000016_IL_005e:
 ldstr "NotFound"
-M00000010_IL_0031:
+M00000016_IL_0063:
 ret
-M00000010_IL_0032:
-M00000010_IL_0033:
-M00000010_IL_0034:
+M00000016_IL_0064:
+M00000016_IL_0065:
+M00000016_IL_0066:
 ldarg 0
-M00000010_IL_0035:
+M00000016_IL_0067:
 call instance System.Storage.StorageLookupError::get_IsAccessDenied()
 call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
-M00000010_IL_003a:
-brtrue M00000010_IL_0044
-M00000010_IL_003f:
-br M00000010_IL_004b
-M00000010_IL_0044:
-M00000010_IL_0045:
+M00000016_IL_006c:
+brtrue M00000016_IL_0076
+M00000016_IL_0071:
+br M00000016_IL_007d
+M00000016_IL_0076:
+M00000016_IL_0077:
 ldstr "AccessDenied"
-M00000010_IL_004a:
+M00000016_IL_007c:
 ret
-M00000010_IL_004b:
-M00000010_IL_004c:
-M00000010_IL_004d:
+M00000016_IL_007d:
+M00000016_IL_007e:
+M00000016_IL_007f:
 ldarg 0
-M00000010_IL_004e:
+M00000016_IL_0080:
 call instance System.Storage.StorageLookupError::get_IsWrongKind()
 call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
-M00000010_IL_0053:
-brtrue M00000010_IL_005d
-M00000010_IL_0058:
-br M00000010_IL_0064
-M00000010_IL_005d:
-M00000010_IL_005e:
+M00000016_IL_0085:
+brtrue M00000016_IL_008f
+M00000016_IL_008a:
+br M00000016_IL_0096
+M00000016_IL_008f:
+M00000016_IL_0090:
 ldstr "WrongKind"
-M00000010_IL_0063:
+M00000016_IL_0095:
 ret
-M00000010_IL_0064:
-M00000010_IL_0065:
-M00000010_IL_0066:
+M00000016_IL_0096:
+M00000016_IL_0097:
+M00000016_IL_0098:
 ldarg 0
-M00000010_IL_0067:
+M00000016_IL_0099:
 call instance System.Storage.StorageLookupError::get_IsIoFailure()
 call neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean)
-M00000010_IL_006c:
-brtrue M00000010_IL_0076
-M00000010_IL_0071:
-br M00000010_IL_007d
-M00000010_IL_0076:
-M00000010_IL_0077:
+M00000016_IL_009e:
+brtrue M00000016_IL_00a8
+M00000016_IL_00a3:
+br M00000016_IL_00af
+M00000016_IL_00a8:
+M00000016_IL_00a9:
 ldstr "IoFailure"
-M00000010_IL_007c:
+M00000016_IL_00ae:
 ret
-M00000010_IL_007d:
-M00000010_IL_007e:
-M00000010_IL_007f:
+M00000016_IL_00af:
+M00000016_IL_00b0:
+M00000016_IL_00b1:
 ldstr "Invalid StorageLookupError case"
-M00000010_IL_0084:
+M00000016_IL_00b6:
 call System.Fault(String)
-M00000010_IL_0089:
-M00000010_IL_008a:
+M00000016_IL_00bb:
+M00000016_IL_00bc:
 ldstr ""
-M00000010_IL_008f:
+M00000016_IL_00c1:
 ret
 .end
 .end

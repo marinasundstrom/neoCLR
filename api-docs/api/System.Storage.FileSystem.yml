@@ -1,0 +1,506 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.FileSystem
+  commentId: T:System.Storage.FileSystem
+  id: FileSystem
+  parent: System.Storage
+  children:
+  - System.Storage.FileSystem.#ctor(System.String)
+  - System.Storage.FileSystem.GetDirectory(System.Storage.Path)
+  - System.Storage.FileSystem.GetFile(System.Storage.Path)
+  - System.Storage.FileSystem.GetItem(System.Storage.Path)
+  langs:
+  - csharp
+  - vb
+  name: FileSystem
+  nameWithType: FileSystem
+  fullName: System.Storage.FileSystem
+  type: Class
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: A synchronous host-filesystem implementation of StorageProvider.
+  remarks: Development after Preview 9. Maps logical paths beneath a configured native root; this is not a symlink-safe sandbox. Returns File and Directory interfaces backed by internal implementation classes. Construction performs no I/O. Relative native roots use the host working directory. Lookup observes current state and does not retain content handles. See the [provider guide](/docs/storage-provider.html).
+  example: []
+  syntax:
+    content: 'public sealed class FileSystem : StorageProvider'
+    content.vb: Public NotInheritable Class FileSystem Implements StorageProvider
+  inheritance:
+  - System.Object
+  implements:
+  - System.Storage.StorageProvider
+- uid: System.Storage.FileSystem.#ctor(System.String)
+  commentId: M:System.Storage.FileSystem.#ctor(System.String)
+  id: '#ctor(System.String)'
+  parent: System.Storage.FileSystem
+  langs:
+  - csharp
+  - vb
+  name: FileSystem(string)
+  nameWithType: FileSystem.FileSystem(string)
+  fullName: System.Storage.FileSystem.FileSystem(string)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Creates a provider mapping logical addresses beneath a native root.
+  example: []
+  syntax:
+    content: public FileSystem(string root)
+    parameters:
+    - id: root
+      type: System.String
+      description: Native root path string; existence and access are checked by subsequent operations.
+    content.vb: Public Sub New(root As String)
+  overload: System.Storage.FileSystem.#ctor*
+  nameWithType.vb: FileSystem.New(String)
+  fullName.vb: System.Storage.FileSystem.New(String)
+  name.vb: New(String)
+- uid: System.Storage.FileSystem.GetItem(System.Storage.Path)
+  commentId: M:System.Storage.FileSystem.GetItem(System.Storage.Path)
+  id: GetItem(System.Storage.Path)
+  parent: System.Storage.FileSystem
+  langs:
+  - csharp
+  - vb
+  name: GetItem(Path)
+  nameWithType: FileSystem.GetItem(Path)
+  fullName: System.Storage.FileSystem.GetItem(System.Storage.Path)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Resolves a logical address to the StorageItem interface.
+  remarks: Synchronous. Follows host metadata semantics, including symbolic links; no sandbox or stable identity is promised. Does not create an entry or retain a content stream.
+  example: []
+  syntax:
+    content: public Result<StorageItem, StorageLookupError> GetItem(Path path)
+    parameters:
+    - id: path
+      type: System.Storage.Path
+      description: Validated logical address; absolute logical paths are mapped beneath the configured root.
+    return:
+      type: System.Result{System.Storage.StorageItem,System.Storage.StorageLookupError}
+      description: A provider-owned StorageItem, or StorageLookupError preserving missing, wrong-kind, access and I/O failures.
+    content.vb: Public Function GetItem(path As Path) As Result(Of StorageItem, StorageLookupError)
+  overload: System.Storage.FileSystem.GetItem*
+  implements:
+  - System.Storage.StorageProvider.GetItem(System.Storage.Path)
+- uid: System.Storage.FileSystem.GetFile(System.Storage.Path)
+  commentId: M:System.Storage.FileSystem.GetFile(System.Storage.Path)
+  id: GetFile(System.Storage.Path)
+  parent: System.Storage.FileSystem
+  langs:
+  - csharp
+  - vb
+  name: GetFile(Path)
+  nameWithType: FileSystem.GetFile(Path)
+  fullName: System.Storage.FileSystem.GetFile(System.Storage.Path)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Resolves a logical address to the File interface.
+  remarks: Synchronous. Follows host metadata semantics, including symbolic links; no sandbox or stable identity is promised. Does not create an entry or retain a content stream.
+  example: []
+  syntax:
+    content: public Result<File, StorageLookupError> GetFile(Path path)
+    parameters:
+    - id: path
+      type: System.Storage.Path
+      description: Validated logical address; absolute logical paths are mapped beneath the configured root.
+    return:
+      type: System.Result{System.Storage.File,System.Storage.StorageLookupError}
+      description: A provider-owned File, or StorageLookupError preserving missing, wrong-kind, access and I/O failures.
+    content.vb: Public Function GetFile(path As Path) As Result(Of File, StorageLookupError)
+  overload: System.Storage.FileSystem.GetFile*
+  implements:
+  - System.Storage.StorageProvider.GetFile(System.Storage.Path)
+- uid: System.Storage.FileSystem.GetDirectory(System.Storage.Path)
+  commentId: M:System.Storage.FileSystem.GetDirectory(System.Storage.Path)
+  id: GetDirectory(System.Storage.Path)
+  parent: System.Storage.FileSystem
+  langs:
+  - csharp
+  - vb
+  name: GetDirectory(Path)
+  nameWithType: FileSystem.GetDirectory(Path)
+  fullName: System.Storage.FileSystem.GetDirectory(System.Storage.Path)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Resolves a logical address to the Directory interface.
+  remarks: Synchronous. Follows host metadata semantics, including symbolic links; no sandbox or stable identity is promised. Does not create an entry or retain a content stream.
+  example: []
+  syntax:
+    content: public Result<Directory, StorageLookupError> GetDirectory(Path path)
+    parameters:
+    - id: path
+      type: System.Storage.Path
+      description: Validated logical address; absolute logical paths are mapped beneath the configured root.
+    return:
+      type: System.Result{System.Storage.Directory,System.Storage.StorageLookupError}
+      description: A provider-owned Directory, or StorageLookupError preserving missing, wrong-kind, access and I/O failures.
+    content.vb: Public Function GetDirectory(path As Path) As Result(Of Directory, StorageLookupError)
+  overload: System.Storage.FileSystem.GetDirectory*
+  implements:
+  - System.Storage.StorageProvider.GetDirectory(System.Storage.Path)
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Storage.StorageProvider
+  commentId: T:System.Storage.StorageProvider
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageProvider.html
+  name: StorageProvider
+  nameWithType: StorageProvider
+  fullName: System.Storage.StorageProvider
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Storage.FileSystem.#ctor*
+  commentId: Overload:System.Storage.FileSystem.#ctor
+  isExternal: true
+  href: System.Storage.FileSystem.html#System_Storage_FileSystem__ctor_System_String_
+  name: FileSystem
+  nameWithType: FileSystem.FileSystem
+  fullName: System.Storage.FileSystem.FileSystem
+  nameWithType.vb: FileSystem.New
+  fullName.vb: System.Storage.FileSystem.New
+  name.vb: New
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System.Storage.FileSystem.GetItem*
+  commentId: Overload:System.Storage.FileSystem.GetItem
+  isExternal: true
+  href: System.Storage.FileSystem.html#System_Storage_FileSystem_GetItem_System_Storage_Path_
+  name: GetItem
+  nameWithType: FileSystem.GetItem
+  fullName: System.Storage.FileSystem.GetItem
+- uid: System.Storage.StorageProvider.GetItem(System.Storage.Path)
+  commentId: M:System.Storage.StorageProvider.GetItem(System.Storage.Path)
+  parent: System.Storage.StorageProvider
+  isExternal: true
+  href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_GetItem_System_Storage_Path_
+  name: GetItem(Path)
+  nameWithType: StorageProvider.GetItem(Path)
+  fullName: System.Storage.StorageProvider.GetItem(System.Storage.Path)
+  spec.csharp:
+  - uid: System.Storage.StorageProvider.GetItem(System.Storage.Path)
+    name: GetItem
+    isExternal: true
+    href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_GetItem_System_Storage_Path_
+  - name: (
+  - uid: System.Storage.Path
+    name: Path
+    isExternal: true
+    href: System.Storage.Path.html
+  - name: )
+  spec.vb:
+  - uid: System.Storage.StorageProvider.GetItem(System.Storage.Path)
+    name: GetItem
+    isExternal: true
+    href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_GetItem_System_Storage_Path_
+  - name: (
+  - uid: System.Storage.Path
+    name: Path
+    isExternal: true
+    href: System.Storage.Path.html
+  - name: )
+- uid: System.Storage.Path
+  commentId: T:System.Storage.Path
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.Path.html
+  name: Path
+  nameWithType: Path
+  fullName: System.Storage.Path
+- uid: System.Result{System.Storage.StorageItem,System.Storage.StorageLookupError}
+  commentId: T:System.Result{System.Storage.StorageItem,System.Storage.StorageLookupError}
+  parent: System
+  definition: System.Result`2
+  href: System.Storage.StorageItem.html
+  name: Result<StorageItem, StorageLookupError>
+  nameWithType: Result<StorageItem, StorageLookupError>
+  fullName: System.Result<System.Storage.StorageItem, System.Storage.StorageLookupError>
+  nameWithType.vb: Result(Of StorageItem, StorageLookupError)
+  fullName.vb: System.Result(Of System.Storage.StorageItem, System.Storage.StorageLookupError)
+  name.vb: Result(Of StorageItem, StorageLookupError)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - uid: System.Storage.StorageItem
+    name: StorageItem
+    isExternal: true
+    href: System.Storage.StorageItem.html
+  - name: ','
+  - name: " "
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Storage.StorageItem
+    name: StorageItem
+    isExternal: true
+    href: System.Storage.StorageItem.html
+  - name: ','
+  - name: " "
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: )
+- uid: System.Result`2
+  commentId: T:System.Result`2
+  isExternal: true
+  name: Result<T, E>
+  nameWithType: Result<T, E>
+  fullName: System.Result<T, E>
+  nameWithType.vb: Result(Of T, E)
+  fullName.vb: System.Result(Of T, E)
+  name.vb: Result(Of T, E)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: )
+- uid: System.Storage.FileSystem.GetFile*
+  commentId: Overload:System.Storage.FileSystem.GetFile
+  isExternal: true
+  href: System.Storage.FileSystem.html#System_Storage_FileSystem_GetFile_System_Storage_Path_
+  name: GetFile
+  nameWithType: FileSystem.GetFile
+  fullName: System.Storage.FileSystem.GetFile
+- uid: System.Storage.StorageProvider.GetFile(System.Storage.Path)
+  commentId: M:System.Storage.StorageProvider.GetFile(System.Storage.Path)
+  parent: System.Storage.StorageProvider
+  isExternal: true
+  href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_GetFile_System_Storage_Path_
+  name: GetFile(Path)
+  nameWithType: StorageProvider.GetFile(Path)
+  fullName: System.Storage.StorageProvider.GetFile(System.Storage.Path)
+  spec.csharp:
+  - uid: System.Storage.StorageProvider.GetFile(System.Storage.Path)
+    name: GetFile
+    isExternal: true
+    href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_GetFile_System_Storage_Path_
+  - name: (
+  - uid: System.Storage.Path
+    name: Path
+    isExternal: true
+    href: System.Storage.Path.html
+  - name: )
+  spec.vb:
+  - uid: System.Storage.StorageProvider.GetFile(System.Storage.Path)
+    name: GetFile
+    isExternal: true
+    href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_GetFile_System_Storage_Path_
+  - name: (
+  - uid: System.Storage.Path
+    name: Path
+    isExternal: true
+    href: System.Storage.Path.html
+  - name: )
+- uid: System.Result{System.Storage.File,System.Storage.StorageLookupError}
+  commentId: T:System.Result{System.Storage.File,System.Storage.StorageLookupError}
+  parent: System
+  definition: System.Result`2
+  href: System.Storage.File.html
+  name: Result<File, StorageLookupError>
+  nameWithType: Result<File, StorageLookupError>
+  fullName: System.Result<System.Storage.File, System.Storage.StorageLookupError>
+  nameWithType.vb: Result(Of File, StorageLookupError)
+  fullName.vb: System.Result(Of System.Storage.File, System.Storage.StorageLookupError)
+  name.vb: Result(Of File, StorageLookupError)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - uid: System.Storage.File
+    name: File
+    isExternal: true
+    href: System.Storage.File.html
+  - name: ','
+  - name: " "
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Storage.File
+    name: File
+    isExternal: true
+    href: System.Storage.File.html
+  - name: ','
+  - name: " "
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: )
+- uid: System.Storage.FileSystem.GetDirectory*
+  commentId: Overload:System.Storage.FileSystem.GetDirectory
+  isExternal: true
+  href: System.Storage.FileSystem.html#System_Storage_FileSystem_GetDirectory_System_Storage_Path_
+  name: GetDirectory
+  nameWithType: FileSystem.GetDirectory
+  fullName: System.Storage.FileSystem.GetDirectory
+- uid: System.Storage.StorageProvider.GetDirectory(System.Storage.Path)
+  commentId: M:System.Storage.StorageProvider.GetDirectory(System.Storage.Path)
+  parent: System.Storage.StorageProvider
+  isExternal: true
+  href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_GetDirectory_System_Storage_Path_
+  name: GetDirectory(Path)
+  nameWithType: StorageProvider.GetDirectory(Path)
+  fullName: System.Storage.StorageProvider.GetDirectory(System.Storage.Path)
+  spec.csharp:
+  - uid: System.Storage.StorageProvider.GetDirectory(System.Storage.Path)
+    name: GetDirectory
+    isExternal: true
+    href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_GetDirectory_System_Storage_Path_
+  - name: (
+  - uid: System.Storage.Path
+    name: Path
+    isExternal: true
+    href: System.Storage.Path.html
+  - name: )
+  spec.vb:
+  - uid: System.Storage.StorageProvider.GetDirectory(System.Storage.Path)
+    name: GetDirectory
+    isExternal: true
+    href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_GetDirectory_System_Storage_Path_
+  - name: (
+  - uid: System.Storage.Path
+    name: Path
+    isExternal: true
+    href: System.Storage.Path.html
+  - name: )
+- uid: System.Result{System.Storage.Directory,System.Storage.StorageLookupError}
+  commentId: T:System.Result{System.Storage.Directory,System.Storage.StorageLookupError}
+  parent: System
+  definition: System.Result`2
+  href: System.Storage.Directory.html
+  name: Result<Directory, StorageLookupError>
+  nameWithType: Result<Directory, StorageLookupError>
+  fullName: System.Result<System.Storage.Directory, System.Storage.StorageLookupError>
+  nameWithType.vb: Result(Of Directory, StorageLookupError)
+  fullName.vb: System.Result(Of System.Storage.Directory, System.Storage.StorageLookupError)
+  name.vb: Result(Of Directory, StorageLookupError)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - uid: System.Storage.Directory
+    name: Directory
+    isExternal: true
+    href: System.Storage.Directory.html
+  - name: ','
+  - name: " "
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Storage.Directory
+    name: Directory
+    isExternal: true
+    href: System.Storage.Directory.html
+  - name: ','
+  - name: " "
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: )

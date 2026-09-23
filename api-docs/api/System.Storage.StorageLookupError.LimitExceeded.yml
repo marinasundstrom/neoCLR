@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.StorageLookupError.LimitExceeded
+  commentId: T:System.Storage.StorageLookupError.LimitExceeded
+  id: StorageLookupError.LimitExceeded
+  parent: System.Storage
+  children:
+  - System.Storage.StorageLookupError.LimitExceeded.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StorageLookupError.LimitExceeded
+  nameWithType: StorageLookupError.LimitExceeded
+  fullName: System.Storage.StorageLookupError.LimitExceeded
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: The enumeration exceeds the requested or provider resource bound.
+  example: []
+  syntax:
+    content: public struct StorageLookupError.LimitExceeded
+    content.vb: Public Structure StorageLookupError.LimitExceeded
+- uid: System.Storage.StorageLookupError.LimitExceeded.#ctor
+  commentId: M:System.Storage.StorageLookupError.LimitExceeded.#ctor
+  id: '#ctor'
+  parent: System.Storage.StorageLookupError.LimitExceeded
+  langs:
+  - csharp
+  - vb
+  name: LimitExceeded()
+  nameWithType: StorageLookupError.LimitExceeded.LimitExceeded()
+  fullName: System.Storage.StorageLookupError.LimitExceeded.LimitExceeded()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Creates the LimitExceeded case.
+  example: []
+  syntax:
+    content: public LimitExceeded()
+    content.vb: Public Sub New()
+  overload: System.Storage.StorageLookupError.LimitExceeded.#ctor*
+  nameWithType.vb: StorageLookupError.LimitExceeded.New()
+  fullName.vb: System.Storage.StorageLookupError.LimitExceeded.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.StorageLookupError.LimitExceeded.#ctor*
+  commentId: Overload:System.Storage.StorageLookupError.LimitExceeded.#ctor
+  isExternal: true
+  href: System.Storage.StorageLookupError.LimitExceeded.html#System_Storage_StorageLookupError_LimitExceeded__ctor
+  name: LimitExceeded
+  nameWithType: StorageLookupError.LimitExceeded.LimitExceeded
+  fullName: System.Storage.StorageLookupError.LimitExceeded.LimitExceeded
+  nameWithType.vb: StorageLookupError.LimitExceeded.New
+  fullName.vb: System.Storage.StorageLookupError.LimitExceeded.New
+  name.vb: New

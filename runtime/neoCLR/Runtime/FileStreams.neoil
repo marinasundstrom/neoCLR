@@ -29,3 +29,12 @@
 .function neoCLR.Runtime.FileReadInto(Int32 handle,arrayref<Byte> buffer,Int32 offset,Int32 count) -> Value
 .methodimpl InternalCall
 .end
+
+.function neoCLR.Runtime.StorageList(String path,Int32 maxItems) -> Value
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StorageNames(Value payload) -> String[]
+    ldarg payload
+    value.unpack String[]
+    ret
+.end

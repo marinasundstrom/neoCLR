@@ -567,7 +567,7 @@ static class UnionImport
                             code.AppendLine($"delegate.bind {delegateType} = {targetName}({string.Join(',', targetArguments)})");
                             Push(new(delegateType)); break;
                         }
-                        if (collectionProfile && (StorageItemBindings.Bind(constructor, constructorDefinition, true) ?? StreamBindings.Bind(constructor, constructorDefinition, true, libraryOwner is not null) ?? WorkerBindings.Bind(constructor, constructorDefinition, true, libraryOwner is not null) ?? AsyncBindings.Bind(constructor, constructorDefinition, true) ?? TaskBindings.Bind(constructor, constructorDefinition, true, libraryOwner is not null)) is { } taskConstruction)
+                        if (collectionProfile && (FileSystemBindings.Bind(constructor, constructorDefinition, true) ?? StorageItemBindings.Bind(constructor, constructorDefinition, true) ?? StreamBindings.Bind(constructor, constructorDefinition, true, libraryOwner is not null) ?? WorkerBindings.Bind(constructor, constructorDefinition, true, libraryOwner is not null) ?? AsyncBindings.Bind(constructor, constructorDefinition, true) ?? TaskBindings.Bind(constructor, constructorDefinition, true, libraryOwner is not null)) is { } taskConstruction)
                         {
                             for (var n = taskConstruction.Arguments.Length - 1; n >= 0; n--) Argument(taskConstruction.Arguments[n]);
                             Push(new(taskConstruction.Result));
@@ -763,7 +763,7 @@ static class UnionImport
                             else
                             {
                                 var binding = collectionProfile ? CollectionBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt, libraryOwner is null ? null : t => ProfileType(t)) : null;
-                                var taskBinding = collectionProfile ? StorageItemBindings.Bind(reference, targetMethod, false) ?? StreamBindings.Bind(reference, targetMethod, false, libraryOwner is not null) ?? WorkerBindings.Bind(reference, targetMethod, false, libraryOwner is not null) ?? AsyncBindings.Bind(reference, targetMethod, false) ?? TaskBindings.Bind(reference, targetMethod, false, libraryOwner is not null) : null;
+                                var taskBinding = collectionProfile ? FileSystemBindings.Bind(reference, targetMethod, false) ?? StorageItemBindings.Bind(reference, targetMethod, false) ?? StreamBindings.Bind(reference, targetMethod, false, libraryOwner is not null) ?? WorkerBindings.Bind(reference, targetMethod, false, libraryOwner is not null) ?? AsyncBindings.Bind(reference, targetMethod, false) ?? TaskBindings.Bind(reference, targetMethod, false, libraryOwner is not null) : null;
                                 var textBinding = StringBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt);
                                 if (taskBinding is not null) call = new("", taskBinding.Arguments, taskBinding.Result, Instruction: taskBinding.Instruction);
                                 else if (textBinding is not null) call = new("", textBinding.Arguments, textBinding.Result, Instruction: textBinding.Instruction);

@@ -8,6 +8,14 @@
 .end
 .interface System.Storage.Directory
 .implements System.Storage.StorageItem
+.method instance GetItems(Int32 maxItems) -> System.Result<System.Collections.Sequence<System.Storage.StorageItem>,System.Storage.StorageLookupError>
+.end
+.method instance GetItem(System.Storage.Path relativePath) -> System.Result<System.Storage.StorageItem,System.Storage.StorageLookupError>
+.end
+.method instance GetDirectory(String name) -> System.Result<System.Storage.Directory,System.Storage.StorageLookupError>
+.end
+.method instance GetDirectory(System.Storage.Path relativePath) -> System.Result<System.Storage.Directory,System.Storage.StorageLookupError>
+.end
 .method instance FileAt(String name) -> System.Result<System.Storage.File,System.Storage.StorageLookupError>
 .end
 .method instance GetFile(String name) -> System.Result<System.Storage.File,System.Storage.StorageLookupError>

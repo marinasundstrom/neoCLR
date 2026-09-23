@@ -18,6 +18,7 @@ items:
   - System.Storage.FileReadError.NotRegularFile
   - System.Storage.FileReadError.ReadFailed
   - System.Storage.FileReadError.TooLarge
+  - System.Storage.FileSystem
   - System.Storage.FileText
   - System.Storage.FileWriteError
   - System.Storage.FileWriteError.AccessDenied
@@ -34,7 +35,9 @@ items:
   - System.Storage.StorageLookupError
   - System.Storage.StorageLookupError.AccessDenied
   - System.Storage.StorageLookupError.InvalidPath
+  - System.Storage.StorageLookupError.InvalidRange
   - System.Storage.StorageLookupError.IoFailure
+  - System.Storage.StorageLookupError.LimitExceeded
   - System.Storage.StorageLookupError.NotFound
   - System.Storage.StorageLookupError.WrongKind
   - System.Storage.StorageProvider
@@ -94,11 +97,19 @@ references:
   fullName: System.Storage.Directory
 - uid: System.Storage.StorageProvider
   commentId: T:System.Storage.StorageProvider
+  parent: System.Storage
   isExternal: true
   href: System.Storage.StorageProvider.html
   name: StorageProvider
   nameWithType: StorageProvider
   fullName: System.Storage.StorageProvider
+- uid: System.Storage.FileSystem
+  commentId: T:System.Storage.FileSystem
+  isExternal: true
+  href: System.Storage.FileSystem.html
+  name: FileSystem
+  nameWithType: FileSystem
+  fullName: System.Storage.FileSystem
 - uid: System.Storage.InvalidPathError
   commentId: T:System.Storage.InvalidPathError
   isExternal: true
@@ -316,6 +327,62 @@ references:
     name: IoFailure
     isExternal: true
     href: System.Storage.StorageLookupError.IoFailure.html
+- uid: System.Storage.StorageLookupError.InvalidRange
+  commentId: T:System.Storage.StorageLookupError.InvalidRange
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageLookupError.html
+  name: StorageLookupError.InvalidRange
+  nameWithType: StorageLookupError.InvalidRange
+  fullName: System.Storage.StorageLookupError.InvalidRange
+  spec.csharp:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.InvalidRange
+    name: InvalidRange
+    isExternal: true
+    href: System.Storage.StorageLookupError.InvalidRange.html
+  spec.vb:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.InvalidRange
+    name: InvalidRange
+    isExternal: true
+    href: System.Storage.StorageLookupError.InvalidRange.html
+- uid: System.Storage.StorageLookupError.LimitExceeded
+  commentId: T:System.Storage.StorageLookupError.LimitExceeded
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageLookupError.html
+  name: StorageLookupError.LimitExceeded
+  nameWithType: StorageLookupError.LimitExceeded
+  fullName: System.Storage.StorageLookupError.LimitExceeded
+  spec.csharp:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.LimitExceeded
+    name: LimitExceeded
+    isExternal: true
+    href: System.Storage.StorageLookupError.LimitExceeded.html
+  spec.vb:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.LimitExceeded
+    name: LimitExceeded
+    isExternal: true
+    href: System.Storage.StorageLookupError.LimitExceeded.html
 - uid: System.Storage.FileReadError
   commentId: T:System.Storage.FileReadError
   isExternal: true

@@ -199,7 +199,9 @@ Provider resolution is now consolidated on StorageProvider: GetItem returns
 StorageItem, and GetFile/GetDirectory return their branch interfaces. The temporary
 StorageLookup type and platform provider byte methods are removed. Byte routing
 belongs to concrete item implementations; the sample keeps that helper private to
-its own provider model. Concrete platform host integration remains next.
+its own provider model. FileSystem now integrates the host provider with internal
+File/Directory implementations, relative directory traversal and bounded mixed
+GetItems snapshots.
 **POC scope reaffirmed by the author, 2026-09-23:** deliver a small Storage API that
 can demonstrate the abstraction and real file access. The completion evidence is a
 runnable, documented app obtaining a directory through the provider contract and
@@ -207,7 +209,8 @@ resolving/creating a file, writing bytes and reading them back through streams, 
 expected failures visible. Keep the selected StorageItem/File/Directory interface
 model; finish the minimal provider integration needed by this product before
 expanding metadata, mutation operations or provider breadth. The current disk/memory
-sample demonstrates the workflow, but its concrete providers remain sample-owned.
+sample demonstrates the workflow using the platform FileSystem provider; the memory
+provider remains a sample comparison.
 
 The author also suggests StreamReader for this POC and specifies a TextReader
 interface. Consumers depend on TextReader; StreamReader implements it as a minimal
@@ -219,8 +222,7 @@ provider integration and enumeration. Move byte streams and text readers togethe
 to System.IO; keep storage item/provider/path abstractions in System.Storage. These
 remaining capabilities are planned, not implemented or full .NET parity requirements.
 
-**Next:** integrate the minimal host provider, directory traversal and bounded mixed
-GetItems enumeration; move streams/readers to System.IO; implement minimal
+**Next:** move streams/readers to System.IO; implement minimal
 TextReader/StreamReader and a seek-and-reread case. Finish with one documented POC
 covering this surface. FileAt/CreateNew address operations remain transitional. Keep the disk/memory
 consumer working; update `/docs/` and document migrations in each slice. Do not

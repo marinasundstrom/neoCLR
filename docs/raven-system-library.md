@@ -1254,3 +1254,11 @@ its inherited byte-provider conversion are removed from declarations, strict bin
 and runtime bootstrap selection. Byte routing stays in provider implementations.
 This is a development API migration requiring matching generated artifacts; no
 Raven compiler changes or Runtime Contract settings are introduced.
+
+
+FileSystem is now a Raven-authored public host provider with internal LocalFile and
+LocalDirectory dependencies. The reference/importer maps only the explicit public
+constructor and lookup signatures. Directory traversal and bounded GetItems return
+core interfaces; StorageList and StorageNames are bootstrap transport helpers. No
+Raven compiler or Runtime Contract configuration changes are introduced. Generated
+core/runtime artifacts must match this development contract.

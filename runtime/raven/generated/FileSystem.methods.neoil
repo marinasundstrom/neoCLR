@@ -1,0 +1,760 @@
+; Generated from runtime/raven/src/System/Storage/FileSystem.rvn. Regenerate with build_runtime_library.py.
+.type class System.Storage.FileSystem
+.implements System.Storage.StorageProvider
+.field private root String
+.method instance .ctor(String root) -> noresult
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 0
+M00000001_IL_0009:
+ldarg 1
+M00000001_IL_000a:
+stfld System.Storage.FileSystem::root
+M00000001_IL_000f:
+ret
+.end
+.method private instance Resolve(System.Storage.Path path) -> String
+.local String local0
+.local System.Result<String,System.Text.Utf8SliceError> local1
+.local String local2
+.local System.Result<String,System.Text.Utf8SliceError> local3
+.local System.Result.Ok<String> local4
+.local System.Result.Ok<String> local5
+.local String local6
+.local System.Result<String,System.Text.Utf8SliceError> local7
+.local System.Result.Error<System.Text.Utf8SliceError> local8
+.local System.Result.Error<System.Text.Utf8SliceError> local9
+.local System.Text.Utf8SliceError local10
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 1
+M00000002_IL_0003:
+call instance System.Storage.Path::get_Text()
+M00000002_IL_0008:
+stloc local0
+M00000002_IL_0009:
+M00000002_IL_000a:
+ldloc local0
+M00000002_IL_000b:
+ldstr "/"
+M00000002_IL_0010:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0015:
+brtrue M00000002_IL_002a
+M00000002_IL_001a:
+ldloc local0
+M00000002_IL_001b:
+ldstr "."
+M00000002_IL_0020:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0025:
+br M00000002_IL_002b
+M00000002_IL_002a:
+ldc.i4 1
+M00000002_IL_002b:
+brtrue M00000002_IL_0035
+M00000002_IL_0030:
+br M00000002_IL_003d
+M00000002_IL_0035:
+M00000002_IL_0036:
+ldarg 0
+M00000002_IL_0037:
+ldfld System.Storage.FileSystem::root
+M00000002_IL_003c:
+ret
+M00000002_IL_003d:
+M00000002_IL_003e:
+M00000002_IL_003f:
+ldarg 1
+M00000002_IL_0040:
+call instance System.Storage.Path::get_IsAbsolute()
+call neoCLR.Library.System.Storage.FileSystem.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0045:
+brtrue M00000002_IL_004f
+M00000002_IL_004a:
+br M00000002_IL_00f7
+M00000002_IL_004f:
+M00000002_IL_0050:
+M00000002_IL_0051:
+ldloc local0
+M00000002_IL_0052:
+ldc.i4 1
+M00000002_IL_0053:
+ldloc local0
+M00000002_IL_0054:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeStringGetUtf8ByteCount(String)
+M00000002_IL_0059:
+ldc.i4 1
+M00000002_IL_005a:
+sub
+M00000002_IL_005b:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeStringSliceUtf8(String,Int32,Int32)
+M00000002_IL_0060:
+stloc local1
+M00000002_IL_0061:
+ldloc local1
+M00000002_IL_0062:
+stloc local3
+M00000002_IL_0063:
+ldloca local3
+M00000002_IL_0065:
+ldloca local4
+M00000002_IL_0067:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion0(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Ok<String>&)
+M00000002_IL_006c:
+brfalse M00000002_IL_00a7
+M00000002_IL_0071:
+ldloc local4
+M00000002_IL_0073:
+stloc local5
+M00000002_IL_0075:
+ldloca local5
+M00000002_IL_0077:
+ldloca local6
+M00000002_IL_0079:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion1(System.Result.Ok<String>&,String&)
+M00000002_IL_007e:
+ldloc local6
+M00000002_IL_0080:
+stloc local2
+M00000002_IL_0081:
+ldc.i4 1
+M00000002_IL_0082:
+br M00000002_IL_0088
+M00000002_IL_0088:
+brfalse M00000002_IL_00a7
+M00000002_IL_008d:
+M00000002_IL_008e:
+br M00000002_IL_0099
+M00000002_IL_0099:
+M00000002_IL_009a:
+ldarg 0
+M00000002_IL_009b:
+ldfld System.Storage.FileSystem::root
+M00000002_IL_00a0:
+ldloc local2
+M00000002_IL_00a1:
+call System.Storage.Path::Combine(String,String)
+M00000002_IL_00a6:
+ret
+M00000002_IL_00a7:
+M00000002_IL_00a8:
+ldloc local1
+M00000002_IL_00a9:
+stloc local7
+M00000002_IL_00ab:
+ldloca local7
+M00000002_IL_00ad:
+ldloca local8
+M00000002_IL_00af:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion2(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Error<System.Text.Utf8SliceError>&)
+M00000002_IL_00b4:
+brfalse M00000002_IL_00f1
+M00000002_IL_00b9:
+ldloc local8
+M00000002_IL_00bb:
+stloc local9
+M00000002_IL_00bd:
+ldloca local9
+M00000002_IL_00bf:
+ldloca local10
+M00000002_IL_00c1:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion3(System.Result.Error<System.Text.Utf8SliceError>&,System.Text.Utf8SliceError&)
+M00000002_IL_00c6:
+ldloc local10
+M00000002_IL_00c8:
+pop
+M00000002_IL_00c9:
+ldc.i4 1
+M00000002_IL_00ca:
+br M00000002_IL_00d0
+M00000002_IL_00d0:
+brfalse M00000002_IL_00f1
+M00000002_IL_00d5:
+M00000002_IL_00d6:
+br M00000002_IL_00e1
+M00000002_IL_00e1:
+M00000002_IL_00e2:
+ldstr "Invalid parsed path boundary"
+M00000002_IL_00e7:
+call System.Fault(String)
+M00000002_IL_00ec:
+br M00000002_IL_00f6
+M00000002_IL_00f1:
+M00000002_IL_00f2:
+M00000002_IL_00f3:
+M00000002_IL_00f4:
+M00000002_IL_00f5:
+fault "Guest program reached a terminal failure"
+M00000002_IL_00f6:
+M00000002_IL_00f7:
+M00000002_IL_00f8:
+M00000002_IL_00f9:
+ldarg 0
+M00000002_IL_00fa:
+ldfld System.Storage.FileSystem::root
+M00000002_IL_00ff:
+ldloc local0
+M00000002_IL_0100:
+call System.Storage.Path::Combine(String,String)
+M00000002_IL_0105:
+ret
+.end
+.method instance GetItem(System.Storage.Path path) -> System.Result<System.Storage.StorageItem,System.Storage.StorageLookupError>
+.local System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError> local0
+.local System.Result<System.Storage.StorageItem,System.Storage.StorageLookupError> local1
+.local System.Storage.EntryKind local2
+.local System.Storage.StorageLookupError local3
+.local System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError> local4
+.local System.Result.Ok<System.Storage.EntryKind> local5
+.local System.Result.Ok<System.Storage.EntryKind> local6
+.local System.Storage.EntryKind local7
+.local System.Storage.StorageItem local8
+.local System.Storage.StorageItem local9
+.local System.Result.Ok<System.Storage.StorageItem> local10
+.local System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError> local11
+.local System.Result.Error<System.Storage.StorageLookupError> local12
+.local System.Result.Error<System.Storage.StorageLookupError> local13
+.local System.Storage.StorageLookupError local14
+ldloca local8
+initobj System.Storage.StorageItem
+ldloca local9
+initobj System.Storage.StorageItem
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldarg 1
+M00000003_IL_0004:
+callvirt instance System.Storage.FileSystem::Resolve(System.Storage.Path)
+M00000003_IL_0009:
+call System.Storage.Metadata::GetKind(String)
+M00000003_IL_000e:
+stloc local0
+M00000003_IL_000f:
+ldloca local1
+M00000003_IL_0011:
+pop
+M00000003_IL_0017:
+M00000003_IL_0018:
+ldloc local0
+M00000003_IL_0019:
+stloc local4
+M00000003_IL_001b:
+ldloca local4
+M00000003_IL_001d:
+ldloca local5
+M00000003_IL_001f:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion4(System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError>&,System.Result.Ok<System.Storage.EntryKind>&)
+M00000003_IL_0024:
+brfalse M00000003_IL_00a9
+M00000003_IL_0029:
+ldloc local5
+M00000003_IL_002b:
+stloc local6
+M00000003_IL_002d:
+ldloca local6
+M00000003_IL_002f:
+ldloca local7
+M00000003_IL_0031:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion5(System.Result.Ok<System.Storage.EntryKind>&,System.Storage.EntryKind&)
+M00000003_IL_0036:
+ldloc local7
+M00000003_IL_0038:
+stloc local2
+M00000003_IL_0039:
+ldc.i4 1
+M00000003_IL_003a:
+br M00000003_IL_0040
+M00000003_IL_0040:
+brfalse M00000003_IL_00a9
+M00000003_IL_0045:
+M00000003_IL_0046:
+br M00000003_IL_0051
+M00000003_IL_0051:
+M00000003_IL_0052:
+ldloca local2
+M00000003_IL_0054:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeErrorSystemStorageEntryKindgetIsFile(System.Storage.EntryKind&)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0059:
+brtrue M00000003_IL_0063
+M00000003_IL_005e:
+br M00000003_IL_0081
+M00000003_IL_0063:
+M00000003_IL_0064:
+ldarg 1
+M00000003_IL_0065:
+ldarg 0
+M00000003_IL_0066:
+ldarg 1
+M00000003_IL_0067:
+callvirt instance System.Storage.FileSystem::Resolve(System.Storage.Path)
+M00000003_IL_006c:
+newobj instance neoCLR.Library.System.Storage.FileSystem.Type_53797374656D2E53746F726167652E4C6F63616C46696C65::.ctor(System.Storage.Path,String)
+M00000003_IL_0071:
+stloc local8
+M00000003_IL_0073:
+M00000003_IL_0074:
+ldloc local8
+M00000003_IL_0076:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion10(System.Storage.StorageItem)
+M00000003_IL_007b:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion11(System.Result.Ok<System.Storage.StorageItem>)
+M00000003_IL_0080:
+ret
+M00000003_IL_0081:
+M00000003_IL_0082:
+M00000003_IL_0083:
+ldarg 0
+M00000003_IL_0084:
+ldarg 1
+M00000003_IL_0085:
+ldarg 0
+M00000003_IL_0086:
+ldarg 1
+M00000003_IL_0087:
+callvirt instance System.Storage.FileSystem::Resolve(System.Storage.Path)
+M00000003_IL_008c:
+newobj instance neoCLR.Library.System.Storage.FileSystem.Type_53797374656D2E53746F726167652E4C6F63616C4469726563746F7279::.ctor(System.Storage.FileSystem,System.Storage.Path,String)
+M00000003_IL_0091:
+stloc local9
+M00000003_IL_0093:
+ldloc local9
+M00000003_IL_0095:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion10(System.Storage.StorageItem)
+M00000003_IL_009a:
+stloc local10
+M00000003_IL_009c:
+ldloc local10
+M00000003_IL_009e:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion11(System.Result.Ok<System.Storage.StorageItem>)
+M00000003_IL_00a3:
+stloc local1
+M00000003_IL_00a4:
+br M00000003_IL_00fa
+M00000003_IL_00a9:
+M00000003_IL_00aa:
+ldloc local0
+M00000003_IL_00ab:
+stloc local11
+M00000003_IL_00ad:
+ldloca local11
+M00000003_IL_00af:
+ldloca local12
+M00000003_IL_00b1:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion6(System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError>&,System.Result.Error<System.Storage.StorageLookupError>&)
+M00000003_IL_00b6:
+brfalse M00000003_IL_00f5
+M00000003_IL_00bb:
+ldloc local12
+M00000003_IL_00bd:
+stloc local13
+M00000003_IL_00bf:
+ldloca local13
+M00000003_IL_00c1:
+ldloca local14
+M00000003_IL_00c3:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion7(System.Result.Error<System.Storage.StorageLookupError>&,System.Storage.StorageLookupError&)
+M00000003_IL_00c8:
+ldloc local14
+M00000003_IL_00ca:
+stloc local3
+M00000003_IL_00cb:
+ldc.i4 1
+M00000003_IL_00cc:
+br M00000003_IL_00d2
+M00000003_IL_00d2:
+brfalse M00000003_IL_00f5
+M00000003_IL_00d7:
+M00000003_IL_00d8:
+br M00000003_IL_00e3
+M00000003_IL_00e3:
+M00000003_IL_00e4:
+ldloc local3
+M00000003_IL_00e5:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion8(System.Storage.StorageLookupError)
+M00000003_IL_00ea:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion9(System.Result.Error<System.Storage.StorageLookupError>)
+M00000003_IL_00ef:
+stloc local1
+M00000003_IL_00f0:
+br M00000003_IL_00fa
+M00000003_IL_00f5:
+M00000003_IL_00f6:
+M00000003_IL_00f7:
+M00000003_IL_00f8:
+M00000003_IL_00f9:
+fault "Guest program reached a terminal failure"
+M00000003_IL_00fa:
+M00000003_IL_00fb:
+ldloc local1
+M00000003_IL_00fc:
+ret
+.end
+.method instance GetDirectory(System.Storage.Path path) -> System.Result<System.Storage.Directory,System.Storage.StorageLookupError>
+.local System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError> local0
+.local System.Result<System.Storage.Directory,System.Storage.StorageLookupError> local1
+.local System.Storage.EntryKind local2
+.local System.Storage.StorageLookupError local3
+.local System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError> local4
+.local System.Result.Ok<System.Storage.EntryKind> local5
+.local System.Result.Ok<System.Storage.EntryKind> local6
+.local System.Storage.EntryKind local7
+.local System.Storage.Directory local8
+.local System.Result.Error<System.Storage.StorageLookupError> local9
+.local System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError> local10
+.local System.Result.Error<System.Storage.StorageLookupError> local11
+.local System.Result.Error<System.Storage.StorageLookupError> local12
+.local System.Storage.StorageLookupError local13
+ldloca local8
+initobj System.Storage.Directory
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldarg 1
+M00000004_IL_0004:
+callvirt instance System.Storage.FileSystem::Resolve(System.Storage.Path)
+M00000004_IL_0009:
+call System.Storage.Metadata::GetKind(String)
+M00000004_IL_000e:
+stloc local0
+M00000004_IL_000f:
+ldloca local1
+M00000004_IL_0011:
+pop
+M00000004_IL_0017:
+M00000004_IL_0018:
+ldloc local0
+M00000004_IL_0019:
+stloc local4
+M00000004_IL_001b:
+ldloca local4
+M00000004_IL_001d:
+ldloca local5
+M00000004_IL_001f:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion4(System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError>&,System.Result.Ok<System.Storage.EntryKind>&)
+M00000004_IL_0024:
+brfalse M00000004_IL_00a1
+M00000004_IL_0029:
+ldloc local5
+M00000004_IL_002b:
+stloc local6
+M00000004_IL_002d:
+ldloca local6
+M00000004_IL_002f:
+ldloca local7
+M00000004_IL_0031:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion5(System.Result.Ok<System.Storage.EntryKind>&,System.Storage.EntryKind&)
+M00000004_IL_0036:
+ldloc local7
+M00000004_IL_0038:
+stloc local2
+M00000004_IL_0039:
+ldc.i4 1
+M00000004_IL_003a:
+br M00000004_IL_0040
+M00000004_IL_0040:
+brfalse M00000004_IL_00a1
+M00000004_IL_0045:
+M00000004_IL_0046:
+br M00000004_IL_0051
+M00000004_IL_0051:
+M00000004_IL_0052:
+ldloca local2
+M00000004_IL_0054:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeErrorSystemStorageEntryKindgetIsDirectory(System.Storage.EntryKind&)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_0059:
+brtrue M00000004_IL_0063
+M00000004_IL_005e:
+br M00000004_IL_0082
+M00000004_IL_0063:
+M00000004_IL_0064:
+ldarg 0
+M00000004_IL_0065:
+ldarg 1
+M00000004_IL_0066:
+ldarg 0
+M00000004_IL_0067:
+ldarg 1
+M00000004_IL_0068:
+callvirt instance System.Storage.FileSystem::Resolve(System.Storage.Path)
+M00000004_IL_006d:
+newobj instance neoCLR.Library.System.Storage.FileSystem.Type_53797374656D2E53746F726167652E4C6F63616C4469726563746F7279::.ctor(System.Storage.FileSystem,System.Storage.Path,String)
+M00000004_IL_0072:
+stloc local8
+M00000004_IL_0074:
+M00000004_IL_0075:
+ldloc local8
+M00000004_IL_0077:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion13(System.Storage.Directory)
+M00000004_IL_007c:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion14(System.Result.Ok<System.Storage.Directory>)
+M00000004_IL_0081:
+ret
+M00000004_IL_0082:
+M00000004_IL_0083:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeErrorSystemStorageStorageLookupErrorWrongKindNew()
+M00000004_IL_0088:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorWrongKind(System.Storage.StorageLookupError.WrongKind)
+M00000004_IL_008d:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion8(System.Storage.StorageLookupError)
+M00000004_IL_0092:
+stloc local9
+M00000004_IL_0094:
+ldloc local9
+M00000004_IL_0096:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion12(System.Result.Error<System.Storage.StorageLookupError>)
+M00000004_IL_009b:
+stloc local1
+M00000004_IL_009c:
+br M00000004_IL_00f2
+M00000004_IL_00a1:
+M00000004_IL_00a2:
+ldloc local0
+M00000004_IL_00a3:
+stloc local10
+M00000004_IL_00a5:
+ldloca local10
+M00000004_IL_00a7:
+ldloca local11
+M00000004_IL_00a9:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion6(System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError>&,System.Result.Error<System.Storage.StorageLookupError>&)
+M00000004_IL_00ae:
+brfalse M00000004_IL_00ed
+M00000004_IL_00b3:
+ldloc local11
+M00000004_IL_00b5:
+stloc local12
+M00000004_IL_00b7:
+ldloca local12
+M00000004_IL_00b9:
+ldloca local13
+M00000004_IL_00bb:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion7(System.Result.Error<System.Storage.StorageLookupError>&,System.Storage.StorageLookupError&)
+M00000004_IL_00c0:
+ldloc local13
+M00000004_IL_00c2:
+stloc local3
+M00000004_IL_00c3:
+ldc.i4 1
+M00000004_IL_00c4:
+br M00000004_IL_00ca
+M00000004_IL_00ca:
+brfalse M00000004_IL_00ed
+M00000004_IL_00cf:
+M00000004_IL_00d0:
+br M00000004_IL_00db
+M00000004_IL_00db:
+M00000004_IL_00dc:
+ldloc local3
+M00000004_IL_00dd:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion8(System.Storage.StorageLookupError)
+M00000004_IL_00e2:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion12(System.Result.Error<System.Storage.StorageLookupError>)
+M00000004_IL_00e7:
+stloc local1
+M00000004_IL_00e8:
+br M00000004_IL_00f2
+M00000004_IL_00ed:
+M00000004_IL_00ee:
+M00000004_IL_00ef:
+M00000004_IL_00f0:
+M00000004_IL_00f1:
+fault "Guest program reached a terminal failure"
+M00000004_IL_00f2:
+M00000004_IL_00f3:
+ldloc local1
+M00000004_IL_00f4:
+ret
+.end
+.method instance GetFile(System.Storage.Path path) -> System.Result<System.Storage.File,System.Storage.StorageLookupError>
+.local System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError> local0
+.local System.Result<System.Storage.File,System.Storage.StorageLookupError> local1
+.local System.Storage.EntryKind local2
+.local System.Storage.StorageLookupError local3
+.local System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError> local4
+.local System.Result.Ok<System.Storage.EntryKind> local5
+.local System.Result.Ok<System.Storage.EntryKind> local6
+.local System.Storage.EntryKind local7
+.local System.Storage.File local8
+.local System.Result.Error<System.Storage.StorageLookupError> local9
+.local System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError> local10
+.local System.Result.Error<System.Storage.StorageLookupError> local11
+.local System.Result.Error<System.Storage.StorageLookupError> local12
+.local System.Storage.StorageLookupError local13
+ldloca local8
+initobj System.Storage.File
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldarg 1
+M00000005_IL_0004:
+callvirt instance System.Storage.FileSystem::Resolve(System.Storage.Path)
+M00000005_IL_0009:
+call System.Storage.Metadata::GetKind(String)
+M00000005_IL_000e:
+stloc local0
+M00000005_IL_000f:
+ldloca local1
+M00000005_IL_0011:
+pop
+M00000005_IL_0017:
+M00000005_IL_0018:
+ldloc local0
+M00000005_IL_0019:
+stloc local4
+M00000005_IL_001b:
+ldloca local4
+M00000005_IL_001d:
+ldloca local5
+M00000005_IL_001f:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion4(System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError>&,System.Result.Ok<System.Storage.EntryKind>&)
+M00000005_IL_0024:
+brfalse M00000005_IL_00a0
+M00000005_IL_0029:
+ldloc local5
+M00000005_IL_002b:
+stloc local6
+M00000005_IL_002d:
+ldloca local6
+M00000005_IL_002f:
+ldloca local7
+M00000005_IL_0031:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion5(System.Result.Ok<System.Storage.EntryKind>&,System.Storage.EntryKind&)
+M00000005_IL_0036:
+ldloc local7
+M00000005_IL_0038:
+stloc local2
+M00000005_IL_0039:
+ldc.i4 1
+M00000005_IL_003a:
+br M00000005_IL_0040
+M00000005_IL_0040:
+brfalse M00000005_IL_00a0
+M00000005_IL_0045:
+M00000005_IL_0046:
+br M00000005_IL_0051
+M00000005_IL_0051:
+M00000005_IL_0052:
+ldloca local2
+M00000005_IL_0054:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeErrorSystemStorageEntryKindgetIsFile(System.Storage.EntryKind&)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0059:
+brtrue M00000005_IL_0063
+M00000005_IL_005e:
+br M00000005_IL_0081
+M00000005_IL_0063:
+M00000005_IL_0064:
+ldarg 1
+M00000005_IL_0065:
+ldarg 0
+M00000005_IL_0066:
+ldarg 1
+M00000005_IL_0067:
+callvirt instance System.Storage.FileSystem::Resolve(System.Storage.Path)
+M00000005_IL_006c:
+newobj instance neoCLR.Library.System.Storage.FileSystem.Type_53797374656D2E53746F726167652E4C6F63616C46696C65::.ctor(System.Storage.Path,String)
+M00000005_IL_0071:
+stloc local8
+M00000005_IL_0073:
+M00000005_IL_0074:
+ldloc local8
+M00000005_IL_0076:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion16(System.Storage.File)
+M00000005_IL_007b:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion17(System.Result.Ok<System.Storage.File>)
+M00000005_IL_0080:
+ret
+M00000005_IL_0081:
+M00000005_IL_0082:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeErrorSystemStorageStorageLookupErrorWrongKindNew()
+M00000005_IL_0087:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorWrongKind(System.Storage.StorageLookupError.WrongKind)
+M00000005_IL_008c:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion8(System.Storage.StorageLookupError)
+M00000005_IL_0091:
+stloc local9
+M00000005_IL_0093:
+ldloc local9
+M00000005_IL_0095:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion15(System.Result.Error<System.Storage.StorageLookupError>)
+M00000005_IL_009a:
+stloc local1
+M00000005_IL_009b:
+br M00000005_IL_00f1
+M00000005_IL_00a0:
+M00000005_IL_00a1:
+ldloc local0
+M00000005_IL_00a2:
+stloc local10
+M00000005_IL_00a4:
+ldloca local10
+M00000005_IL_00a6:
+ldloca local11
+M00000005_IL_00a8:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion6(System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError>&,System.Result.Error<System.Storage.StorageLookupError>&)
+M00000005_IL_00ad:
+brfalse M00000005_IL_00ec
+M00000005_IL_00b2:
+ldloc local11
+M00000005_IL_00b4:
+stloc local12
+M00000005_IL_00b6:
+ldloca local12
+M00000005_IL_00b8:
+ldloca local13
+M00000005_IL_00ba:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion7(System.Result.Error<System.Storage.StorageLookupError>&,System.Storage.StorageLookupError&)
+M00000005_IL_00bf:
+ldloc local13
+M00000005_IL_00c1:
+stloc local3
+M00000005_IL_00c2:
+ldc.i4 1
+M00000005_IL_00c3:
+br M00000005_IL_00c9
+M00000005_IL_00c9:
+brfalse M00000005_IL_00ec
+M00000005_IL_00ce:
+M00000005_IL_00cf:
+br M00000005_IL_00da
+M00000005_IL_00da:
+M00000005_IL_00db:
+ldloc local3
+M00000005_IL_00dc:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion8(System.Storage.StorageLookupError)
+M00000005_IL_00e1:
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion15(System.Result.Error<System.Storage.StorageLookupError>)
+M00000005_IL_00e6:
+stloc local1
+M00000005_IL_00e7:
+br M00000005_IL_00f1
+M00000005_IL_00ec:
+M00000005_IL_00ed:
+M00000005_IL_00ee:
+M00000005_IL_00ef:
+M00000005_IL_00f0:
+fault "Guest program reached a terminal failure"
+M00000005_IL_00f1:
+M00000005_IL_00f2:
+ldloc local1
+M00000005_IL_00f3:
+ret
+.end
+.end

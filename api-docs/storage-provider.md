@@ -22,7 +22,9 @@ interface requires neither byte methods nor text encoding helpers.
 
 ## Disk and memory sample
 
-The [tested sample](storage-experiment.md) supplies HostStorage and MemoryStorage.
+The platform [FileSystem](xref:System.Storage.FileSystem) implements host storage.
+The [tested sample](storage-experiment.md) wraps it in HostStorage for temporary text
+conveniences and supplies MemoryStorage as a bounded comparison.
 The product obtains its root Directory through GetDirectory, writes and reads a
 file through directional streams, and checks expected failures. Generic lookup
 returns both branches through StorageItem; contract tests check their interface types.
@@ -33,8 +35,9 @@ root (`/`, also addressed by `.`); slash-containing keys do not imply directorie
 Sample ByteStorage routes stream operations inside the provider implementation;
 it is not a platform interface. The sample's extended StorageProvider additionally
 includes temporary whole-text helpers. Applications needing lookup use only
-System.Storage.StorageProvider. Concrete host integration, directory traversal,
-GetItems enumeration and final creation semantics remain follow-up work.
+System.Storage.StorageProvider. The host provider and directory traversal are integrated. GetItems returns a
+bounded snapshot of direct child StorageItem values. The final creation model and
+async I/O remain follow-up work.
 
 ## Development migration
 
@@ -52,3 +55,25 @@ The selected neoCLR contract follows that separation while returning interfaces 
 typed errors over a provider's logical namespace. It allows the same consumer to
 use disk and memory, at the cost of dispatch and provider-specific identity rules.
 Async operation, metadata queries and portable replacement semantics remain open.
+
+## Bounded enumeration
+
+`Directory.GetItems(maxItems)` returns `Result<Sequence<StorageItem>, StorageLookupError>`.
+No partial successful result is returned. FileSystem accepts 0–1024 items and at
+most 64 KiB of native names, subject to host array limits. Negative bounds return
+InvalidRange; count/resource overflow returns LimitExceeded. Zero succeeds only
+for an empty directory. Native names are sorted ordinally before resolving items.
+
+There is no retained enumeration handle. Enumeration and child lookup are separate
+observations; concurrent removal or an unsupported child name/kind can fail the
+whole operation. Symlinks follow host metadata behavior. The memory fixture lists
+only direct root children and does not promise host ordering. Metadata queries,
+recursive traversal and stable snapshot identity are not implied.
+
+
+## Future asynchronous operations
+
+Lookup, enumeration and stream opening may later return Task-wrapped Results to
+support providers with asynchronous I/O. Parsing and represented properties can
+remain synchronous. Current methods block; task signatures, scheduling, cancellation
+and ownership rules are not implemented by this POC.

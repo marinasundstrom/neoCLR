@@ -4,6 +4,63 @@
     <name>NeoCLR.CoreProbe</name>
   </assembly>
   <members>
+    <member name="T:System.Storage.FileSystem">
+      <summary>A synchronous host-filesystem implementation of StorageProvider.</summary>
+      <remarks>Development after Preview 9. Maps logical paths beneath a configured native root; this is not a symlink-safe sandbox. Returns File and Directory interfaces backed by internal implementation classes. Construction performs no I/O. Relative native roots use the host working directory. Lookup observes current state and does not retain content handles. See the [provider guide](/docs/storage-provider.html).</remarks>
+    </member>
+    <member name="M:System.Storage.FileSystem.#ctor(System.String)">
+      <summary>Creates a provider mapping logical addresses beneath a native root.</summary>
+      <param name="root">Native root path string; existence and access are checked by subsequent operations.</param>
+    </member>
+    <member name="M:System.Storage.FileSystem.GetItem(System.Storage.Path)">
+      <summary>Resolves a logical address to the StorageItem interface.</summary>
+      <param name="path">Validated logical address; absolute logical paths are mapped beneath the configured root.</param>
+      <returns>A provider-owned StorageItem, or StorageLookupError preserving missing, wrong-kind, access and I/O failures.</returns>
+      <remarks>Synchronous. Follows host metadata semantics, including symbolic links; no sandbox or stable identity is promised. Does not create an entry or retain a content stream.</remarks>
+    </member>
+    <member name="M:System.Storage.FileSystem.GetFile(System.Storage.Path)">
+      <summary>Resolves a logical address to the File interface.</summary>
+      <param name="path">Validated logical address; absolute logical paths are mapped beneath the configured root.</param>
+      <returns>A provider-owned File, or StorageLookupError preserving missing, wrong-kind, access and I/O failures.</returns>
+      <remarks>Synchronous. Follows host metadata semantics, including symbolic links; no sandbox or stable identity is promised. Does not create an entry or retain a content stream.</remarks>
+    </member>
+    <member name="M:System.Storage.FileSystem.GetDirectory(System.Storage.Path)">
+      <summary>Resolves a logical address to the Directory interface.</summary>
+      <param name="path">Validated logical address; absolute logical paths are mapped beneath the configured root.</param>
+      <returns>A provider-owned Directory, or StorageLookupError preserving missing, wrong-kind, access and I/O failures.</returns>
+      <remarks>Synchronous. Follows host metadata semantics, including symbolic links; no sandbox or stable identity is promised. Does not create an entry or retain a content stream.</remarks>
+    </member>
+    <member name="T:System.Storage.StorageLookupError.InvalidRange"><summary>The enumeration bound is negative.</summary></member>
+    <member name="M:System.Storage.StorageLookupError.InvalidRange.#ctor"><summary>Creates the InvalidRange case.</summary></member>
+    <member name="M:System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.InvalidRange)"><summary>Creates a lookup error containing InvalidRange.</summary><param name="value">The error case.</param></member>
+    <member name="P:System.Storage.StorageLookupError.IsInvalidRange"><summary>Whether the error is InvalidRange.</summary><returns>True for this case.</returns></member>
+    <member name="M:System.Storage.StorageLookupError.GetInvalidRange"><summary>Extracts the InvalidRange case.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
+    <member name="T:System.Storage.StorageLookupError.LimitExceeded"><summary>The enumeration exceeds the requested or provider resource bound.</summary></member>
+    <member name="M:System.Storage.StorageLookupError.LimitExceeded.#ctor"><summary>Creates the LimitExceeded case.</summary></member>
+    <member name="M:System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.LimitExceeded)"><summary>Creates a lookup error containing LimitExceeded.</summary><param name="value">The error case.</param></member>
+    <member name="P:System.Storage.StorageLookupError.IsLimitExceeded"><summary>Whether the error is LimitExceeded.</summary><returns>True for this case.</returns></member>
+    <member name="M:System.Storage.StorageLookupError.GetLimitExceeded"><summary>Extracts the LimitExceeded case.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
+    <member name="M:System.Storage.Directory.GetItems(System.Int32)">
+      <summary>Retrieves a bounded snapshot of direct child item interfaces.</summary>
+      <param name="maxItems">Maximum number of items to return. Negative values return InvalidRange; exceeding provider bounds or the requested count returns LimitExceeded.</param>
+      <returns>A Sequence of File and Directory values exposed as StorageItem, or StorageLookupError. No partial successful listing is returned.</returns>
+      <remarks>Synchronous; callers own no enumeration handle. FileSystem accepts 0 through 1024 items, bounds native child-name bytes to 64 KiB, and sorts names ordinally. Zero succeeds only for an empty directory. Listing is not atomic with child lookup; concurrent changes can fail the whole operation. Unsupported child kinds or names can fail the listing. Provider ordering and snapshot consistency can differ; no live sequence or stable identity is promised.</remarks>
+    </member>
+    <member name="M:System.Storage.Directory.GetItem(System.Storage.Path)">
+      <summary>Resolves an existing file or directory relative to this directory.</summary>
+      <param name="relativePath">A relative Path; absolute inputs return InvalidPath and dot refers to this directory.</param>
+      <returns>A provider-owned StorageItem or StorageLookupError.</returns>
+    </member>
+    <member name="M:System.Storage.Directory.GetDirectory(System.String)">
+      <summary>Looks up one direct child directory.</summary>
+      <param name="name">One valid child name; nested strings and dot/parent names return InvalidPath.</param>
+      <returns>A Directory or the provider lookup error.</returns>
+    </member>
+    <member name="M:System.Storage.Directory.GetDirectory(System.Storage.Path)">
+      <summary>Looks up a directory by a relative logical path.</summary>
+      <param name="relativePath">Relative path allowing nested segments; absolute inputs return InvalidPath and dot resolves this directory.</param>
+      <returns>A Directory or StorageLookupError.</returns>
+    </member>
     <member name="T:System.Storage.StorageProvider">
       <summary>Resolves logical storage addresses to provider-implemented item interfaces.</summary>
       <remarks>Development API after Preview 9. GetItem returns StorageItem; typed lookup returns File or Directory. Calls are synchronous and may block. Lookup observes current existence and kind without creating an entry or retaining an open content stream. Implementations own identity and byte access; this contract requires no byte-opening or text helper methods. Parsing does not grant access. Replaces the transitional StorageLookup and byte-provider split. See the [provider guide](/docs/storage-provider.html).</remarks>
@@ -686,7 +743,7 @@
     </member>
     <member name="T:System.Storage.Directory">
       <summary>The directory branch of StorageItem, implemented by storage providers.</summary>
-      <remarks>Development interface after Preview 9. Providers supply Name, Path, child-address construction and explicit relative file lookup. There is no public constructor. Current sample implementations retain provider context; no metadata cache or native filesystem identity is required. FileAt remains a transitional POC address operation. GetItem, GetDirectory and GetItems are follow-up work, not implemented members.</remarks>
+      <remarks>Development interface after Preview 9. Providers supply Name, Path, child-address construction and explicit relative file lookup. There is no public constructor. Current sample implementations retain provider context; no metadata cache or native filesystem identity is required. FileAt remains a transitional POC address operation. Relative GetItem/GetDirectory and bounded GetItems are now implemented. Metadata queries and asynchronous operations remain follow-ups.</remarks>
     </member>
     <member name="M:System.Storage.Directory.FileAt(System.String)">
       <summary>Constructs a direct-child file address without performing I/O.</summary>

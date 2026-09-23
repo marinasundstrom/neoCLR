@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Integrate FileSystem as the host StorageProvider with internal File/Directory
+  implementations. Add relative Directory.GetItem/GetDirectory and bounded
+  GetItems snapshots of mixed StorageItem interfaces. Bounds fail explicitly
+  rather than truncating; StorageLookupError gains InvalidRange and LimitExceeded.
+  Enumeration is synchronous and non-atomic with child lookup. Update the disk/memory
+  sample to exercise platform host resolution and refresh API/runtime documentation.
+  Validation: eight native file-resource tests, full SDK product/contracts and
+  negative callers, runtime/API snapshots, 262 documented API items and the
+  combined website pass.
+
 - Consolidate StorageProvider around GetItem/GetFile/GetDirectory with interface
   results. Remove the temporary StorageLookup contract and provider-level byte
   methods; byte routing belongs to concrete File implementations. Development

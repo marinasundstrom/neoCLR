@@ -18,6 +18,10 @@ static class StorageItemBindings
                 Result<Streams.OutputStream, Streams.StreamError> CreateNew();
             }
             public interface Directory : StorageItem {
+                Result<Collections.Sequence<StorageItem>, StorageLookupError> GetItems(int maxItems);
+                Result<StorageItem, StorageLookupError> GetItem(Path relativePath);
+                Result<Directory, StorageLookupError> GetDirectory(string name);
+                Result<Directory, StorageLookupError> GetDirectory(Path relativePath);
                 Result<File, StorageLookupError> FileAt(string name);
                 Result<File, StorageLookupError> GetFile(string name);
                 Result<File, StorageLookupError> GetFile(Path relativePath);
@@ -34,6 +38,9 @@ static class StorageItemBindings
             (Root, "get_Name") => ("", "String"),
             ("System.Storage.File", "OpenRead") => ("", "System.Result<System.Streams.InputStream,System.Streams.StreamError>"),
             ("System.Storage.File", "CreateNew") => ("", "System.Result<System.Streams.OutputStream,System.Streams.StreamError>"),
+            ("System.Storage.Directory", "GetItems") => ("Int32", "System.Result<System.Collections.Sequence<System.Storage.StorageItem>,System.Storage.StorageLookupError>"),
+            ("System.Storage.Directory", "GetItem") => ("System.Storage.Path", "System.Result<System.Storage.StorageItem,System.Storage.StorageLookupError>"),
+            ("System.Storage.Directory", "GetDirectory") => (args.Length == 1 && args[0] == "System.Storage.Path" ? "System.Storage.Path" : "String", "System.Result<System.Storage.Directory,System.Storage.StorageLookupError>"),
             ("System.Storage.Directory", "FileAt") => ("String", "System.Result<System.Storage.File,System.Storage.StorageLookupError>"),
             ("System.Storage.Directory", "GetFile") => (args.Length == 1 && args[0] == "System.Storage.Path" ? "System.Storage.Path" : "String", "System.Result<System.Storage.File,System.Storage.StorageLookupError>"),
             _ => throw new InvalidDataException("Unsupported storage item member.")
@@ -55,7 +62,7 @@ static class StorageItemBindings
     }
     public static void Validate(ModuleDefinition module)
     {
-        foreach (var (name, count) in new[] { (Root, 2), ("System.Storage.File", 2), ("System.Storage.Directory", 3) })
+        foreach (var (name, count) in new[] { (Root, 2), ("System.Storage.File", 2), ("System.Storage.Directory", 7) })
         {
             var type = module.GetType(name);
             if (type is null || !type.IsPublic || !type.IsInterface || type.HasFields || type.HasGenericParameters

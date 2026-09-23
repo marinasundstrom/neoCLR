@@ -214,6 +214,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Binding::FileResource(crate::file_streams::Operation::Close),
             Type::Value,
         ),
+        ("neoCLR.Runtime.StorageList", [Type::String, Type::Int32]) => (
+            Binding::FileResource(crate::file_streams::Operation::List),
+            Type::Value,
+        ),
         ("neoCLR.Runtime.StorageKind", [Type::String]) => (
             Binding::FileResource(crate::file_streams::Operation::Kind),
             Type::Value,

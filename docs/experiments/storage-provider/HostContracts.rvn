@@ -1,0 +1,78 @@
+namespace StorageExperiment
+
+import System.*
+import System.Result.*
+import System.Storage.File
+import System.Storage.Directory
+import System.Storage.StorageItem
+import System.Storage.StorageLookupError
+
+func Main() {
+    let provider: System.Storage.StorageProvider = System.Storage.FileSystem("listing")
+    let root = RequireDirectory(provider, RequirePath("/"))
+    match root.GetItems(2) {
+        Ok(let items) => {
+            if items.Count != 2 || items[0].Name != "a-dir" || items[1].Name != "z.txt" {
+                System.Fault("Mixed snapshot changed names or order")
+            }
+            if !(items[0] is Directory) || !(items[1] is File) {
+                System.Fault("Mixed snapshot lost its interface branches")
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    match root.GetItems(1) {
+        Error(let error) => {
+            if !error.IsLimitExceeded {
+                System.Fault("Over-bound listing changed error")
+            }
+        }
+        Ok(_) => System.Fault("Listing silently truncated")
+    }
+    match root.GetItems(-1) {
+        Error(let error) => {
+            if !error.IsInvalidRange {
+                System.Fault("Invalid listing bound changed error")
+            }
+        }
+        Ok(_) => System.Fault("Negative listing bound accepted")
+    }
+    match root.GetDirectory("a-dir") {
+        Ok(let child) => {
+            match child.GetItems(0) {
+                Ok(let items) => {
+                    if items.Count != 0 {
+                        System.Fault("Empty directory contains items")
+                    }
+                }
+                Error(let error) => System.Fault(error.ToString())
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    match root.GetDirectory(RequirePath("a-dir")) {
+        Ok(let child) => {
+            if child.Path.Text != "/a-dir" {
+                System.Fault("Relative directory traversal changed path")
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    match root.GetItem(RequirePath("z.txt")) {
+        Ok(let item) => {
+            if !(item is File) || item.Path.Text != "/z.txt" {
+                System.Fault("Relative generic lookup changed item")
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    match root.GetDirectory(RequirePath("/a-dir")) {
+        Error(let error) => {
+            if !error.IsInvalidPath {
+                System.Fault("Absolute child lookup changed error")
+            }
+        }
+        Ok(_) => System.Fault("Absolute child replaced context")
+    }
+    System.Console.WriteLine("Integrated host provider and mixed enumeration: passed")
+}

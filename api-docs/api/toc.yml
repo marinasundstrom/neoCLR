@@ -56,6 +56,9 @@ items:
   - uid: System.Storage.FileReadError.TooLarge
     name: FileReadError.TooLarge
     type: Struct
+  - uid: System.Storage.FileSystem
+    name: FileSystem
+    type: Class
   - uid: System.Storage.FileText
     name: FileText
     type: Class
@@ -104,8 +107,14 @@ items:
   - uid: System.Storage.StorageLookupError.InvalidPath
     name: StorageLookupError.InvalidPath
     type: Struct
+  - uid: System.Storage.StorageLookupError.InvalidRange
+    name: StorageLookupError.InvalidRange
+    type: Struct
   - uid: System.Storage.StorageLookupError.IoFailure
     name: StorageLookupError.IoFailure
+    type: Struct
+  - uid: System.Storage.StorageLookupError.LimitExceeded
+    name: StorageLookupError.LimitExceeded
     type: Struct
   - uid: System.Storage.StorageLookupError.NotFound
     name: StorageLookupError.NotFound

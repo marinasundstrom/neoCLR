@@ -123,7 +123,7 @@ System.Storage.Path is now a platform class with Parse, immutable properties and
 lexical equality, alongside the existing static native string helpers. Path and
 InvalidPathError are selected for generated reference, including both legacy methods.
 The Storage sample imports this platform type rather than defining its own. Its
-provider classes remain application-owned until the next integration slices.
+memory provider remains application-owned; FileSystem is now an integrated host provider.
 System.Storage.StorageProvider resolves items through three documented members.
 The transitional StorageLookup type and provider byte methods have been removed;
 byte opening belongs to File implementations.
@@ -133,3 +133,8 @@ OutputStream.Flush shares the exact unit-valued Result renderer exclusion; its
 signature and provider contract are linked from the generated type page to
 [the Flush reference](streams.md#flush). Directional interface dispatch is exercised
 by the disk/memory SDK sample; memory stream classes remain sample implementations.
+
+
+FileSystem and the Directory traversal/GetItems members have generated API entries.
+StorageLookupError.InvalidRange and LimitExceeded cover the bounded snapshot contract.
+LocalFile/LocalDirectory are internal implementation classes and are not public APIs.

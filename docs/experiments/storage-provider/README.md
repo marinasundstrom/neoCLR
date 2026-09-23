@@ -543,3 +543,32 @@ needed. Regenerate core/runtime artifacts together; Preview 9 is unchanged.
 
 The host/memory implementations are still sample-owned at this checkpoint.
 Platform host integration and enumeration follow; metadata breadth is not required.
+
+
+### Integrated FileSystem and bounded enumeration — 2026-09-23
+
+FileSystem(root) now implements the platform StorageProvider. LocalFile and
+LocalDirectory remain internal; provider results expose only public interfaces.
+The sample HostStorage delegates lookup to FileSystem, retaining text helpers only
+as fixture conveniences. Directory supports GetItem(relativePath), both directory
+lookup overloads and GetItems(maxItems). Enumeration returns a complete bounded
+Sequence<StorageItem>, with no retained native cursor or partial-success result.
+
+Primary comparison checked 2026-09-23:
+[.NET 10 DirectoryInfo.GetFileSystemInfos](https://learn.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.getfilesysteminfos?view=net-10.0)
+returns an array of file/directory objects, while
+[WinRT GetItemsAsync](https://learn.microsoft.com/en-us/uwp/api/windows.storage.storagefolder.getitemsasync?view=winrt-26100)
+returns storage items asynchronously. The POC chooses a synchronous bounded
+snapshot rather than a resource-owning iterator or async stream. This reduces
+lifetime/scheduling machinery but allocates all names and descriptors up front;
+large directories fail instead of paging. FileSystem sorts names, caps count at
+1024 and native UTF-8 names at 64 KiB, and observes runtime array limits. Invalid
+bounds use InvalidRange; overflow uses LimitExceeded. Enumeration and child lookup
+are not atomic. Unsupported names/kinds, deletion or permission failures fail the
+operation. No metadata cache, immutable identity or symlink-safe sandbox is claimed.
+Memory lists only direct root children, preserving its explicitly bounded model.
+
+StorageList is a FileInput runtime service. Its tagged transport is bootstrap-only;
+StorageNames unpacks a checked names array for copying into managed storage. The
+strict bridge admits FileSystem's constructor and three lookup methods and the
+new Directory signatures. No Raven compiler configuration change is required.

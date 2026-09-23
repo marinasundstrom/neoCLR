@@ -24,6 +24,8 @@ items:
   syntax:
     content: public interface StorageProvider
     content.vb: Public Interface StorageProvider
+  derivedClasses:
+  - System.Storage.FileSystem
 - uid: System.Storage.StorageProvider.GetItem(System.Storage.Path)
   commentId: M:System.Storage.StorageProvider.GetItem(System.Storage.Path)
   id: GetItem(System.Storage.Path)

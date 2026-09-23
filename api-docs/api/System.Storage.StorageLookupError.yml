@@ -7,17 +7,23 @@ items:
   children:
   - System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.AccessDenied)
   - System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.InvalidPath)
+  - System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.InvalidRange)
   - System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.IoFailure)
+  - System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.LimitExceeded)
   - System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.NotFound)
   - System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.WrongKind)
   - System.Storage.StorageLookupError.GetAccessDenied
   - System.Storage.StorageLookupError.GetInvalidPath
+  - System.Storage.StorageLookupError.GetInvalidRange
   - System.Storage.StorageLookupError.GetIoFailure
+  - System.Storage.StorageLookupError.GetLimitExceeded
   - System.Storage.StorageLookupError.GetNotFound
   - System.Storage.StorageLookupError.GetWrongKind
   - System.Storage.StorageLookupError.IsAccessDenied
   - System.Storage.StorageLookupError.IsInvalidPath
+  - System.Storage.StorageLookupError.IsInvalidRange
   - System.Storage.StorageLookupError.IsIoFailure
+  - System.Storage.StorageLookupError.IsLimitExceeded
   - System.Storage.StorageLookupError.IsNotFound
   - System.Storage.StorageLookupError.IsWrongKind
   - System.Storage.StorageLookupError.ToString
@@ -315,6 +321,106 @@ items:
       description: The held case value.
     content.vb: Public Function GetIoFailure() As StorageLookupError.IoFailure
   overload: System.Storage.StorageLookupError.GetIoFailure*
+- uid: System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.InvalidRange)
+  commentId: M:System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.InvalidRange)
+  id: '#ctor(System.Storage.StorageLookupError.InvalidRange)'
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: StorageLookupError(InvalidRange)
+  nameWithType: StorageLookupError.StorageLookupError(StorageLookupError.InvalidRange)
+  fullName: System.Storage.StorageLookupError.StorageLookupError(System.Storage.StorageLookupError.InvalidRange)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Creates a lookup error containing InvalidRange.
+  example: []
+  syntax:
+    content: public StorageLookupError(StorageLookupError.InvalidRange value)
+    parameters:
+    - id: value
+      type: System.Storage.StorageLookupError.InvalidRange
+      description: The error case.
+    content.vb: Public Sub New(value As StorageLookupError.InvalidRange)
+  overload: System.Storage.StorageLookupError.#ctor*
+  nameWithType.vb: StorageLookupError.New(StorageLookupError.InvalidRange)
+  fullName.vb: System.Storage.StorageLookupError.New(System.Storage.StorageLookupError.InvalidRange)
+  name.vb: New(InvalidRange)
+- uid: System.Storage.StorageLookupError.GetInvalidRange
+  commentId: M:System.Storage.StorageLookupError.GetInvalidRange
+  id: GetInvalidRange
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: GetInvalidRange()
+  nameWithType: StorageLookupError.GetInvalidRange()
+  fullName: System.Storage.StorageLookupError.GetInvalidRange()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the InvalidRange case.
+  example: []
+  syntax:
+    content: public StorageLookupError.InvalidRange GetInvalidRange()
+    return:
+      type: System.Storage.StorageLookupError.InvalidRange
+      description: The case value; a mismatched extraction faults.
+    content.vb: Public Function GetInvalidRange() As StorageLookupError.InvalidRange
+  overload: System.Storage.StorageLookupError.GetInvalidRange*
+- uid: System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.LimitExceeded)
+  commentId: M:System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.LimitExceeded)
+  id: '#ctor(System.Storage.StorageLookupError.LimitExceeded)'
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: StorageLookupError(LimitExceeded)
+  nameWithType: StorageLookupError.StorageLookupError(StorageLookupError.LimitExceeded)
+  fullName: System.Storage.StorageLookupError.StorageLookupError(System.Storage.StorageLookupError.LimitExceeded)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Creates a lookup error containing LimitExceeded.
+  example: []
+  syntax:
+    content: public StorageLookupError(StorageLookupError.LimitExceeded value)
+    parameters:
+    - id: value
+      type: System.Storage.StorageLookupError.LimitExceeded
+      description: The error case.
+    content.vb: Public Sub New(value As StorageLookupError.LimitExceeded)
+  overload: System.Storage.StorageLookupError.#ctor*
+  nameWithType.vb: StorageLookupError.New(StorageLookupError.LimitExceeded)
+  fullName.vb: System.Storage.StorageLookupError.New(System.Storage.StorageLookupError.LimitExceeded)
+  name.vb: New(LimitExceeded)
+- uid: System.Storage.StorageLookupError.GetLimitExceeded
+  commentId: M:System.Storage.StorageLookupError.GetLimitExceeded
+  id: GetLimitExceeded
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: GetLimitExceeded()
+  nameWithType: StorageLookupError.GetLimitExceeded()
+  fullName: System.Storage.StorageLookupError.GetLimitExceeded()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the LimitExceeded case.
+  example: []
+  syntax:
+    content: public StorageLookupError.LimitExceeded GetLimitExceeded()
+    return:
+      type: System.Storage.StorageLookupError.LimitExceeded
+      description: The case value; a mismatched extraction faults.
+    content.vb: Public Function GetLimitExceeded() As StorageLookupError.LimitExceeded
+  overload: System.Storage.StorageLookupError.GetLimitExceeded*
 - uid: System.Storage.StorageLookupError.IsInvalidPath
   commentId: P:System.Storage.StorageLookupError.IsInvalidPath
   id: IsInvalidPath
@@ -435,6 +541,54 @@ items:
       description: True only for this case.
     content.vb: Public ReadOnly Property IsIoFailure As Boolean
   overload: System.Storage.StorageLookupError.IsIoFailure*
+- uid: System.Storage.StorageLookupError.IsInvalidRange
+  commentId: P:System.Storage.StorageLookupError.IsInvalidRange
+  id: IsInvalidRange
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: IsInvalidRange
+  nameWithType: StorageLookupError.IsInvalidRange
+  fullName: System.Storage.StorageLookupError.IsInvalidRange
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Whether the error is InvalidRange.
+  example: []
+  syntax:
+    content: public bool IsInvalidRange { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True for this case.
+    content.vb: Public ReadOnly Property IsInvalidRange As Boolean
+  overload: System.Storage.StorageLookupError.IsInvalidRange*
+- uid: System.Storage.StorageLookupError.IsLimitExceeded
+  commentId: P:System.Storage.StorageLookupError.IsLimitExceeded
+  id: IsLimitExceeded
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: IsLimitExceeded
+  nameWithType: StorageLookupError.IsLimitExceeded
+  fullName: System.Storage.StorageLookupError.IsLimitExceeded
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Whether the error is LimitExceeded.
+  example: []
+  syntax:
+    content: public bool IsLimitExceeded { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True for this case.
+    content.vb: Public ReadOnly Property IsLimitExceeded As Boolean
+  overload: System.Storage.StorageLookupError.IsLimitExceeded*
 references:
 - uid: System.Storage
   commentId: N:System.Storage
@@ -672,6 +826,76 @@ references:
   name: GetIoFailure
   nameWithType: StorageLookupError.GetIoFailure
   fullName: System.Storage.StorageLookupError.GetIoFailure
+- uid: System.Storage.StorageLookupError.InvalidRange
+  commentId: T:System.Storage.StorageLookupError.InvalidRange
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageLookupError.html
+  name: StorageLookupError.InvalidRange
+  nameWithType: StorageLookupError.InvalidRange
+  fullName: System.Storage.StorageLookupError.InvalidRange
+  spec.csharp:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.InvalidRange
+    name: InvalidRange
+    isExternal: true
+    href: System.Storage.StorageLookupError.InvalidRange.html
+  spec.vb:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.InvalidRange
+    name: InvalidRange
+    isExternal: true
+    href: System.Storage.StorageLookupError.InvalidRange.html
+- uid: System.Storage.StorageLookupError.GetInvalidRange*
+  commentId: Overload:System.Storage.StorageLookupError.GetInvalidRange
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError_GetInvalidRange
+  name: GetInvalidRange
+  nameWithType: StorageLookupError.GetInvalidRange
+  fullName: System.Storage.StorageLookupError.GetInvalidRange
+- uid: System.Storage.StorageLookupError.LimitExceeded
+  commentId: T:System.Storage.StorageLookupError.LimitExceeded
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageLookupError.html
+  name: StorageLookupError.LimitExceeded
+  nameWithType: StorageLookupError.LimitExceeded
+  fullName: System.Storage.StorageLookupError.LimitExceeded
+  spec.csharp:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.LimitExceeded
+    name: LimitExceeded
+    isExternal: true
+    href: System.Storage.StorageLookupError.LimitExceeded.html
+  spec.vb:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.LimitExceeded
+    name: LimitExceeded
+    isExternal: true
+    href: System.Storage.StorageLookupError.LimitExceeded.html
+- uid: System.Storage.StorageLookupError.GetLimitExceeded*
+  commentId: Overload:System.Storage.StorageLookupError.GetLimitExceeded
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError_GetLimitExceeded
+  name: GetLimitExceeded
+  nameWithType: StorageLookupError.GetLimitExceeded
+  fullName: System.Storage.StorageLookupError.GetLimitExceeded
 - uid: System.Storage.StorageLookupError.IsInvalidPath*
   commentId: Overload:System.Storage.StorageLookupError.IsInvalidPath
   isExternal: true
@@ -717,3 +941,17 @@ references:
   name: IsIoFailure
   nameWithType: StorageLookupError.IsIoFailure
   fullName: System.Storage.StorageLookupError.IsIoFailure
+- uid: System.Storage.StorageLookupError.IsInvalidRange*
+  commentId: Overload:System.Storage.StorageLookupError.IsInvalidRange
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError_IsInvalidRange
+  name: IsInvalidRange
+  nameWithType: StorageLookupError.IsInvalidRange
+  fullName: System.Storage.StorageLookupError.IsInvalidRange
+- uid: System.Storage.StorageLookupError.IsLimitExceeded*
+  commentId: Overload:System.Storage.StorageLookupError.IsLimitExceeded
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError_IsLimitExceeded
+  name: IsLimitExceeded
+  nameWithType: StorageLookupError.IsLimitExceeded
+  fullName: System.Storage.StorageLookupError.IsLimitExceeded

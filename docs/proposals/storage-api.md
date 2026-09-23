@@ -17,8 +17,9 @@ with the operations; the common element model is selected.
 The interface hierarchy is now integrated in the development library, with
 provider-owned sample implementations and compiler/importer closure checks. It is
 not in Preview 9. StorageProvider now resolves GetItem/GetFile/GetDirectory; the
-separate StorageLookup and byte-first provider contract are removed. Platform host
-integration, directory traversal and GetItems remain next. The [roadmap](../platform-roadmap.md) governs the bounded
+separate StorageLookup and byte-first provider contract are removed. FileSystem host integration, relative directory traversal and bounded synchronous
+GetItems(maxItems) snapshots are now implemented. Async/incremental enumeration
+remains a future alternative. The [roadmap](../platform-roadmap.md) governs the bounded
 implementation sequence. Optional topology, rich metadata and unneeded mutations
 in this proposal are not prerequisites for the initial POC.
 
@@ -1615,3 +1616,22 @@ It is **access to stored objects through explicit storage capabilities**.
 `StorageUnit` and `StorageMedium` describe additional topology where that topology is meaningful.
 
 **NeoCLR models the storage that code can access without requiring that code to understand the machinery behind it.**
+
+
+## Future task-returning operations — 2026-09-23
+
+The author raised whether future Storage methods should return Task. The assistant
+recommends evaluating Task<Result<T, StorageLookupError>> for provider GetItem,
+GetFile and GetDirectory and directory GetItems, and Task<Result<T, StreamError>>
+for opening/creating content streams. These operations may involve remote or other
+latency-bearing providers. This is future direction, not a POC signature change.
+WinRT's retrieval methods illustrate this separation; the current .NET directory
+retrieval comparison above remains synchronous. A completed Task around blocking
+work does not make it nonblocking.
+
+Path.Parse and represented Name/Path properties should remain synchronous. Establish
+execution/suspension policy, cancellation outcomes, buffer ownership and races with
+Close before claiming asynchronous I/O. Do not assume a thread pool exists on every
+platform or implement general storage concurrency by indiscriminately spawning
+threads. The synchronous POC should explicitly document blocking behavior. Whether
+to replace signatures or retain a separately named sync/async pair remains open.

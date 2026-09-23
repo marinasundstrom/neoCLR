@@ -22,6 +22,7 @@ interface ByteStorage {
 
 // Fixture conveniences; consumers of lookup need only System.Storage.StorageProvider.
 interface StorageProvider : System.Storage.StorageProvider, ByteStorage {
+    func ListItems(path: Path, maxItems: int) -> Result<Sequence<StorageItem>, StorageLookupError>
     func ReadText(path: Path, maxBytes: int) -> Result<string, FileReadError>
     func WriteText(path: Path, text: string, maxBytes: int) -> Result<unit, FileWriteError>
 }
@@ -59,6 +60,51 @@ class ProviderDirectory : Directory {
 
     val Path: Path => path
     val Name: string => System.Storage.Path.GetFileName(path.Text)
+
+    private func Resolve(relativePath: Path) -> Result<Path, StorageLookupError> {
+        if relativePath.IsAbsolute {
+            return Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+        if relativePath.Text == "." {
+            return Ok(path)
+        }
+        var resolved = path.Text + "/" + relativePath.Text
+        if path.Text == "/" {
+            resolved = "/" + relativePath.Text
+        }
+        if path.Text == "." {
+            resolved = relativePath.Text
+        }
+        return match System.Storage.Path.Parse(resolved) {
+            Ok(let child) => Ok(child)
+            Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+    }
+
+    func GetItem(relativePath: Path) -> Result<StorageItem, StorageLookupError> {
+        return match Resolve(relativePath) {
+            Ok(let child) => provider.GetItem(child)
+            Error(let error) => Error(error)
+        }
+    }
+
+    func GetDirectory(relativePath: Path) -> Result<Directory, StorageLookupError> {
+        return match Resolve(relativePath) {
+            Ok(let child) => provider.GetDirectory(child)
+            Error(let error) => Error(error)
+        }
+    }
+
+    func GetDirectory(name: string) -> Result<Directory, StorageLookupError> {
+        return match FileAt(name) {
+            Ok(let child) => provider.GetDirectory(child.Path)
+            Error(let error) => Error(error)
+        }
+    }
+
+    func GetItems(maxItems: int) -> Result<Sequence<StorageItem>, StorageLookupError> {
+        return provider.ListItems(path, maxItems)
+    }
 
     // This resolves a direct child address; it does not query existence.
     func FileAt(name: string) -> Result<File, StorageLookupError> {
@@ -114,9 +160,11 @@ class ProviderDirectory : Directory {
 
 class HostStorage : StorageProvider {
     private field root: string
+    private field storage: System.Storage.FileSystem
 
     init(root: string) {
         self.root = root
+        storage = System.Storage.FileSystem(root)
     }
 
     // Both absolute logical paths and relative paths resolve beneath this root.
@@ -136,41 +184,20 @@ class HostStorage : StorageProvider {
     }
 
     func GetItem(path: Path) -> Result<StorageItem, StorageLookupError> {
-        return match System.Storage.Metadata.GetKind(Resolve(path)) {
-            Ok(let kind) => {
-                if kind.IsFile {
-                    let fileItem: StorageItem = ProviderFile(self, path)
-                    return Ok(fileItem)
-                }
-                let item: StorageItem = ProviderDirectory(self, path)
-                Ok(item)
-            }
-            Error(let error) => Error(error)
-        }
+        return storage.GetItem(path)
     }
 
     func GetDirectory(path: Path) -> Result<Directory, StorageLookupError> {
-        return match System.Storage.Metadata.GetKind(Resolve(path)) {
-            Ok(let kind) => {
-                if kind.IsDirectory {
-                    let directory: Directory = ProviderDirectory(self, path)
-                    return Ok(directory)
-                }
-                Error(StorageLookupError(StorageLookupError.WrongKind()))
-            }
-            Error(let error) => Error(error)
-        }
+        return storage.GetDirectory(path)
     }
 
     func GetFile(path: Path) -> Result<File, StorageLookupError> {
-        return match System.Storage.Metadata.GetKind(Resolve(path)) {
-            Ok(let kind) => {
-                if kind.IsFile {
-                    let file: File = ProviderFile(self, path)
-                    return Ok(file)
-                }
-                Error(StorageLookupError(StorageLookupError.WrongKind()))
-            }
+        return storage.GetFile(path)
+    }
+
+    func ListItems(path: Path, maxItems: int) -> Result<Sequence<StorageItem>, StorageLookupError> {
+        return match storage.GetDirectory(path) {
+            Ok(let directory) => directory.GetItems(maxItems)
             Error(let error) => Error(error)
         }
     }
@@ -233,6 +260,38 @@ class MemoryStorage : StorageProvider {
 
     // This bounded provider has one directory: its root. Slash-containing keys
     // do not implicitly create a directory tree.
+    func ListItems(path: Path, maxItems: int) -> Result<Sequence<StorageItem>, StorageLookupError> {
+        if maxItems < 0 {
+            return Error(StorageLookupError(StorageLookupError.InvalidRange()))
+        }
+        if maxItems > 1024 {
+            return Error(StorageLookupError(StorageLookupError.LimitExceeded()))
+        }
+        if Key(path) != "/" {
+            return Error(StorageLookupError(StorageLookupError.NotFound()))
+        }
+        let items: List<StorageItem> = ArrayList<StorageItem>()
+        for key in keys {
+            match System.Storage.Path.Parse(key) {
+                Ok(let child) => {
+                    // The bounded fixture has only root children; nested address tests
+                    // do not imply a directory tree.
+                    let name = System.Storage.Path.GetFileName(key)
+                    if key == "/" + name {
+                        if items.Count == maxItems {
+                            return Error(StorageLookupError(StorageLookupError.LimitExceeded()))
+                        }
+                        let item: StorageItem = ProviderFile(self, child)
+                        items.Add(item)
+                    }
+                }
+                Error(_) => System.Fault("Stored invalid memory key")
+            }
+        }
+        let result: Sequence<StorageItem> = items
+        return Ok(result)
+    }
+
     func GetItem(path: Path) -> Result<StorageItem, StorageLookupError> {
         if Key(path) == "/" {
             let directoryItem: StorageItem = ProviderDirectory(self, path)
