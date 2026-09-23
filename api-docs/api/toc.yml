@@ -16,6 +16,12 @@ items:
   - uid: System.ConsoleReadError.Unavailable
     name: ConsoleReadError.Unavailable
     type: Struct
+  - uid: System.Object
+    name: object
+    type: Class
+  - uid: System.Value
+    name: Value
+    type: Struct
 - uid: System.Concurrency
   name: System.Concurrency
   type: Namespace

@@ -30,6 +30,8 @@ items:
   - System.Object
   implements:
   - System.IO.TextWriter
+  inheritedMembers:
+  - System.Object.GetType
 - uid: System.IO.StreamWriter.#ctor(System.IO.OutputStream)
   commentId: M:System.IO.StreamWriter.#ctor(System.IO.OutputStream)
   id: '#ctor(System.IO.OutputStream)'
@@ -210,6 +212,7 @@ references:
   commentId: T:System.Object
   parent: System
   isExternal: true
+  href: System.Object.html
   name: object
   nameWithType: object
   fullName: object
@@ -224,6 +227,30 @@ references:
   name: TextWriter
   nameWithType: TextWriter
   fullName: System.IO.TextWriter
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: System.Object.html#System_Object_GetType
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: System.Object.html#System_Object_GetType
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: System.Object.html#System_Object_GetType
+  - name: (
+  - name: )
 - uid: System
   commentId: N:System
   isExternal: true

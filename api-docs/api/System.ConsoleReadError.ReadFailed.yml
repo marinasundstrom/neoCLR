@@ -21,6 +21,8 @@ items:
   syntax:
     content: public struct ConsoleReadError.ReadFailed
     content.vb: Public Structure ConsoleReadError.ReadFailed
+  inheritedMembers:
+  - System.Object.GetType
 - uid: System.ConsoleReadError.ReadFailed.#ctor
   commentId: M:System.ConsoleReadError.ReadFailed.#ctor
   id: '#ctor'
@@ -52,6 +54,41 @@ references:
   name: System
   nameWithType: System
   fullName: System
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: System.Object.html#System_Object_GetType
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: System.Object.html#System_Object_GetType
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: System.Object.html#System_Object_GetType
+  - name: (
+  - name: )
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: System.Object.html
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
 - uid: System.ConsoleReadError.ReadFailed.#ctor*
   commentId: Overload:System.ConsoleReadError.ReadFailed.#ctor
   isExternal: true

@@ -28,3 +28,6 @@
 
 - name: Console and standard streams
   href: console.md
+
+- name: Object and Value
+  href: objects.md

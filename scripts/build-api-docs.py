@@ -25,7 +25,7 @@ def inputs():
     paths += list((ROOT / 'runtime/raven/src/System/Concurrency').glob('*.rvn'))
     paths += list((ROOT / 'runtime/raven/src/System/IO').glob('*.rvn'))
     paths += list((ROOT / 'runtime/raven/src/System/Console').glob('*.rvn'))
-    paths += [ROOT / 'runtime/raven/src/System/ConsoleReadError.rvn']
+    paths += [ROOT / 'runtime/raven/src/System' / name for name in ('ConsoleReadError.rvn', 'Object.rvn', 'Value.rvn')]
     paths += list((ROOT / 'runtime/raven/src/System/Storage').rglob('*.rvn'))
     paths += [DOCS / name for name in ('NeoCLR.CoreProbe.xml', 'filter.yml', 'docfx.json')]
     paths += [ROOT / '.config/dotnet-tools.json']
@@ -34,6 +34,18 @@ def inputs():
 
 def generated():
     return {str(p.relative_to(DOCS)): digest(p) for p in sorted((DOCS / 'api').glob('*.yml'))}
+
+
+def normalize_intrinsic_metadata():
+    # DocFX treats the core Object declaration as C#'s object keyword even in a
+    # declaration, and infers GetType on Value through reference-only ValueType.
+    # Neither rendering describes the executable neoCLR intrinsic contract.
+    path = DOCS / 'api/System.Object.yml'
+    if path.exists():
+        path.write_text(path.read_text().replace('content: public object\n', 'content: public class Object\n').replace('content.vb: Public Object\n', 'content.vb: Public Class Object\n'))
+    path = DOCS / 'api/System.Value.yml'
+    if path.exists():
+        path.write_text(path.read_text().replace('  inheritedMembers:\n  - System.Object.GetType\n', ''))
 
 
 def check_descriptions():
@@ -67,6 +79,7 @@ def main():
         shutil.copyfile(DOCS / 'NeoCLR.CoreProbe.xml', assembly.with_suffix('.xml'))
         shutil.rmtree(DOCS / 'api', ignore_errors=True)
         subprocess.run(['dotnet', 'tool', 'run', 'docfx', 'metadata', str(DOCS / 'docfx.json'), '--warningsAsErrors'], cwd=ROOT, check=True)
+        normalize_intrinsic_metadata()
         check_descriptions()
         MANIFEST.write_text(json.dumps({'assemblySha256': digest(assembly), 'inputs': inputs(), 'generated': generated()}, indent=2) + '\n')
     recorded = json.loads(MANIFEST.read_text())

@@ -22,11 +22,19 @@ An explicit author instruction takes precedence, including a bounded task outsid
 the current milestone. Such a task does not silently reorder the entire roadmap;
 record a lasting change in direction when the author makes one.
 
-**Author-directed focus, 2026-09-23:** develop the common Console API and standard
+**Completed author-directed slice, 2026-09-23:** develop the common Console API and standard
 streams. Console stays a class, with static In/Out/Error access. The bounded
 [Console sample](experiments/console-streams/README.md) exercises line input, separate
 text/byte output channels and reader/writer ownership. This is synchronous I/O;
 TaskQueue/suspension exploration remains open and networking stays later.
+
+**Current author-directed focus, 2026-09-23:** review System.Object and System.Value,
+then address Object's missing behavior. Harmonize with .NET where useful, especially
+reference/value semantics. Finish existing slices before switching. The
+[consistency review](object-model-review.md) records implemented GetType, compiler-only
+member stubs, a tested .NET baseline and Value's live dependencies. Next is a bounded
+Object.ToString/override sample; equality and hashing follow as a pair. Value removal
+requires its own storage migration, not a rename to Object.
 
 When choosing work autonomously, follow the current author-directed focus and the
 [immediate next step](#working-rules-and-immediate-next-step). The post-release
@@ -613,8 +621,10 @@ The library composition repair is complete before the author-selected Object/Val
 review. StorageProvider belongs to the composed Raven library alongside StorageItem,
 File and Directory; the legacy bootstrap library keeps its static File helpers.
 The repair restores the existing Console regression suite without changing public APIs.
-Next, assess System.Object's implemented and missing members and System.Value's
-remaining dependencies before proposing additions or a payload migration.
+The [Object/Value review](object-model-review.md) now records those dependencies and
+missing members. Next implement the bounded Object display/override case, preserving
+.NET-style class reference sharing and value copying. Equality/hash policy and Value
+retirement remain separate, explicitly scoped follow-ups.
 This is a bounded foundation review; networking remains later. Console ownership,
 cleanup on propagated errors and buffering remain follow-up questions, not selected
 redesigns. The scheduling/operation-cancellation work below remains open.

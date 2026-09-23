@@ -30,6 +30,8 @@ items:
   - System.Object
   implements:
   - System.IO.TextReader
+  inheritedMembers:
+  - System.Object.GetType
 - uid: System.IO.StreamReader.#ctor(System.IO.InputStream)
   commentId: M:System.IO.StreamReader.#ctor(System.IO.InputStream)
   id: '#ctor(System.IO.InputStream)'
@@ -208,6 +210,7 @@ references:
   commentId: T:System.Object
   parent: System
   isExternal: true
+  href: System.Object.html
   name: object
   nameWithType: object
   fullName: object
@@ -222,6 +225,30 @@ references:
   name: TextReader
   nameWithType: TextReader
   fullName: System.IO.TextReader
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: System.Object.html#System_Object_GetType
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: System.Object.html#System_Object_GetType
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: System.Object.html#System_Object_GetType
+  - name: (
+  - name: )
 - uid: System
   commentId: N:System
   isExternal: true

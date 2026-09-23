@@ -1,4 +1,15 @@
-# Optional object hierarchy and common value methods
+# Object hierarchy and common value methods
+
+## Current direction — 2026-09-23
+
+Follow the [Object/value consistency review](object-model-review.md). The author
+directs harmonization with .NET reference/value semantics: classes share reference
+identity, values copy their fields, and boxing is separate. Object.GetType is
+implemented in the Raven library; other common Object methods remain incomplete.
+The old proposal below predates nominal classes and must not guide new Object APIs.
+Its universal value-equality policy and value-like Object inheritance are superseded.
+
+## Historical proposal (superseded where noted)
 
 The [library-focused next preview](library-preview.md) prioritizes shared type
 relationships, interface inheritance and class inheritance to support useful library

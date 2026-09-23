@@ -1,0 +1,105 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Object
+  commentId: T:System.Object
+  id: Object
+  parent: System
+  children:
+  - System.Object.GetType
+  langs:
+  - csharp
+  - vb
+  name: object
+  nameWithType: object
+  fullName: object
+  type: Class
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Provides the common object-reference view and runtime type inspection.
+  remarks: 'Development support is bounded: GetType is implemented. Equals, GetHashCode, ToString and the constructor declarations in the compiler reference do not establish executable public API support. See the Object and Value guide. Ordinary class assignment shares a reference; value assignment copies fields.'
+  example: []
+  syntax:
+    content: public class Object
+    content.vb: Public Class Object
+  inheritance: []
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  id: GetType
+  parent: System.Object
+  langs:
+  - csharp
+  - vb
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Returns metadata for the concrete runtime type of this instance.
+  remarks: Implemented for supported class references, arrays, strings and boxed values. A null receiver raises a terminal NullReference fault. This operation does not change value/reference semantics.
+  example: []
+  syntax:
+    content: public TypeInfo GetType()
+    return:
+      type: System.Introspection.TypeInfo
+      description: The concrete type descriptor, preserving the type through supported base and interface views.
+    content.vb: Public Function [GetType]() As TypeInfo
+  overload: System.Object.GetType*
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+references:
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Object.GetType*
+  commentId: Overload:System.Object.GetType
+  isExternal: true
+  href: System.Object.html#System_Object_GetType
+  name: GetType
+  nameWithType: object.GetType
+  fullName: object.GetType
+  nameWithType.vb: Object.GetType
+  fullName.vb: Object.GetType
+- uid: System.Introspection.TypeInfo
+  commentId: T:System.Introspection.TypeInfo
+  parent: System.Introspection
+  isExternal: true
+  name: TypeInfo
+  nameWithType: TypeInfo
+  fullName: System.Introspection.TypeInfo
+- uid: System.Introspection
+  commentId: N:System.Introspection
+  isExternal: true
+  href: System.html
+  name: System.Introspection
+  nameWithType: System.Introspection
+  fullName: System.Introspection
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Introspection
+    name: Introspection
+    isExternal: true
+    href: System.Introspection.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Introspection
+    name: Introspection
+    isExternal: true
+    href: System.Introspection.html

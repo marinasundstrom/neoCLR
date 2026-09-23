@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Review Object and temporary Value storage against .NET reference/value semantics.
+  Supersede older value-like Object inheritance and universal structural-equality
+  proposals; record current implementation gaps and the next Object display/override
+  slice. Add a pinned .NET 10 comparison program and generated reference coverage
+  for Object.GetType and Value, with compiler-only Object members clearly separated.
+  No Object runtime method or Value representation changes in this review.
+  Validation: eight .NET baseline assertions, 32 focused runtime regressions,
+  374 documented API items and the combined website build.
+
 - Repair library composition: include StorageProvider only with the Raven
   StorageItem/File/Directory hierarchy, rather than in the legacy bootstrap library
   with static File helpers. Restore the legacy Console suite (11 tests); preserve

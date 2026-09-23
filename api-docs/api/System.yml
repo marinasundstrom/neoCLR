@@ -8,6 +8,8 @@ items:
   - System.ConsoleReadError
   - System.ConsoleReadError.ReadFailed
   - System.ConsoleReadError.Unavailable
+  - System.Object
+  - System.Value
   langs:
   - csharp
   - vb
@@ -18,6 +20,24 @@ items:
   assemblies:
   - NeoCLR.CoreProbe
 references:
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: System.Object.html
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Value
+  commentId: T:System.Value
+  isExternal: true
+  href: System.Value.html
+  name: Value
+  nameWithType: Value
+  fullName: System.Value
 - uid: System.Console
   commentId: T:System.Console
   isExternal: true

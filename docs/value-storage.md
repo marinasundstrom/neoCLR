@@ -24,6 +24,15 @@ conversion or shared mutable box. The interpreter does allocate host heap storag
 when packing; this is an explicit cost, not an allocation-free operation. Distinct instruction
 spellings make those semantic differences explicit.
 
+## Relationship to Object — 2026-09-23
+
+Object now exists as a library class, with GetType and supported boxed/reference
+views. It does not replace this facility: erased carrier copies and shared boxes
+have different observable semantics. System.Value is also not System.ValueType.
+The [consistency review](object-model-review.md) retains Value temporarily while
+prioritizing Object's missing behavior. The retirement goal below remains a future
+migration, not authorization to remove live dependencies without replacements.
+
 ## Retirement decision
 
 System.Value is a temporary interpreter facility, not a permanent platform type.
@@ -67,7 +76,7 @@ slot remains an unmanaged `Ptr<T>` and follows the existing lifetime checks. Fut
 allocators or collectors may choose where such storage lives without changing the
 metadata contract.
 
-`System.Object` is reserved for a later common object API. It should not be used as
+`System.Object` supplies the evolving common object API. It should not be used as
 the backing representation for arbitrary slots, and introducing it does not make
 all values reference-compatible. This keeps the low-level machine model explicit
 while leaving higher-level languages free to provide ergonomic object semantics.

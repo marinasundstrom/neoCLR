@@ -1,4 +1,9 @@
 apiRules:
+# Object's remaining reference members are compiler scaffolding, not executable APIs.
+- include:
+    uidRegex: '^System\.Object($|\.GetType($|\())'
+- include:
+    uidRegex: '^System\.Value$'
 - exclude:
     uidRegex: '^System\.Storage\.FileText\.WriteAllText($|\()'
     type: Method

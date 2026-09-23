@@ -5677,3 +5677,23 @@ and recorded the convention for runtime code as well as examples.
 - **Next:** review Object and Value independently of this repair. Initial source
   inspection shows Value is an erased payload facility, not the Object base class;
   no removal or universal Object equality policy has been selected.
+
+### 2026-09-23 — Harmonize reference and value semantics with .NET
+
+- **Author:** “We should harmonize what we can with .NET. The reference type and
+  value type semantics is imporant.” This follows the request to assess Object's
+  missing behavior and System.Value's role, while completing unfinished work first.
+- **Assistant action:** completed and committed the composition repair first. Then
+  compared Object, Value, boxing and nominal class/value assignment, added a pinned
+  .NET 10 baseline probe and documented actual public API coverage. Object.GetType
+  is executable; Equals/GetHashCode/ToString remain reference scaffolding.
+- **Revised direction:** supersede older value-like Object inheritance and universal
+  structural Object equality proposals. Use class reference sharing, shallow value
+  copying and explicit boxing as the baseline. Recommend overridable Object.ToString
+  first, then identity/equality/hashing with their .NET contracts considered together.
+- **Kept open:** Value removal requires carrier/native/host migration; Object does
+  not automatically supply its copy/extraction semantics. No new Object runtime
+  methods, hash policy or storage replacement were implemented in this review.
+- **Evidence:** [review](object-model-review.md),
+  [.NET baseline](experiments/object-baseline/README.md),
+  [on-site reference guide](../api-docs/objects.md).

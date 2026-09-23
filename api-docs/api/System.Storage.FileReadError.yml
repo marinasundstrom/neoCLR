@@ -46,6 +46,8 @@ items:
   syntax:
     content: public struct FileReadError
     content.vb: Public Structure FileReadError
+  inheritedMembers:
+  - System.Object.GetType
 - uid: System.Storage.FileReadError.ToString
   commentId: M:System.Storage.FileReadError.ToString
   id: ToString
@@ -697,6 +699,48 @@ references:
     name: Storage
     isExternal: true
     href: System.Storage.html
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: System.Object.html#System_Object_GetType
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: System.Object.html#System_Object_GetType
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: System.Object.html#System_Object_GetType
+  - name: (
+  - name: )
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: System.Object.html
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
 - uid: System.Storage.FileReadError.ToString*
   commentId: Overload:System.Storage.FileReadError.ToString
   isExternal: true
@@ -714,13 +758,6 @@ references:
   nameWithType.vb: String
   fullName.vb: String
   name.vb: String
-- uid: System
-  commentId: N:System
-  isExternal: true
-  href: System.html
-  name: System
-  nameWithType: System
-  fullName: System
 - uid: System.Storage.FileReadError.#ctor*
   commentId: Overload:System.Storage.FileReadError.#ctor
   isExternal: true
