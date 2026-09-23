@@ -93,6 +93,25 @@ func Main() {
     WriteLine("Memory")
     RoundTrip(temporary)
     ByteRoundTrip(temporary)
+    for directory in [disk, temporary] {
+        match directory.GetFile("notes.txt") {
+            Ok(let file) => {
+                if file.Name != "notes.txt" {
+                    System.Fault("Lookup lost the child name")
+                }
+                match file.ReadText(14) {
+                    Ok(let text) => {
+                        if text != "Hello, värld!" {
+                            System.Fault("Lookup changed provider ownership")
+                        }
+                    }
+                    Error(let error) => System.Fault(error.ToString())
+                }
+            }
+            Error(let error) => System.Fault(error.ToString())
+        }
+    }
+    WriteLine("File lookup reads the same contents on disk and memory")
     match temporary.FileAt("notes.txt") {
         Ok(let file) => {
             if !file.Path.Equals(RequirePath("/notes.txt")) {

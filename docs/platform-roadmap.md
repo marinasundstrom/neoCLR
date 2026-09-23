@@ -138,17 +138,25 @@ object: static Parse returns Result<Path, InvalidPathError>, with a private
 constructor and explicit logical grammar. The disk/memory sample now passes Path
 values and maps host storage beneath a configured native root. This is exploration,
 not a new System.Storage.Path contract. The author defers broader Path operations
-and leaves string overloads on path-taking APIs open; the assistant recommends
+and leaves string overloads on Storage APIs open. The author further clarifies
+that Path belongs to Storage rather than being imposed system-wide: other APIs may
+accept strings, with callers optionally parsing and passing Text. The native metadata
+and file-stream APIs retain string parameters; the assistant recommends
 convenience overloads that parse and forward, not a separate unchecked path.
 The [lookup/identity probes](experiments/storage-provider/README.md#lookup-and-identity-evidence-2026-09-23)
 now distinguish metadata observations, provider-bound addresses and open handles,
 with a .NET FileInfo comparison. They support typed metadata lookup rather than
-opening content to probe existence; no GetFile API has been implemented yet.
+opening content to probe existence. The first provider lookup implementation follows below.
 The memory provider now shares byte payloads across text helpers and streams, with
 cross-API sample checks and bounded multi-file storage. Its replacement policy
 retains old payloads for open streams; common identity semantics remain exploratory.
-Next, test a native metadata lookup adapter and typed errors across disk/memory
-before promoting the Storage surface. Preserve the tested stream operations. The
+The existing native metadata service now has a typed development wrapper:
+System.Storage.Metadata.GetKind(string) returns Result<EntryKind, StorageLookupError>.
+The sample providers expose GetFile(Path) and Directory.GetFile(name), preserving
+missing versus wrong-kind errors without retaining a stream. These remain blocking
+observations, not stable item identity or a finalized provider surface.
+Next, compare directory context/resolution and shared provider errors, including
+replacement behavior, before promoting the Storage surface. Preserve the tested stream operations. The
 current application-owned File/Directory and capability interfaces remain
 exploratory; do not promote their string-address/text-helper shape unchanged merely
 because this sample works. Public stream wrappers have on-site reference coverage.

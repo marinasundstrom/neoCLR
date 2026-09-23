@@ -1,0 +1,270 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage
+  commentId: N:System.Storage
+  id: System.Storage
+  children:
+  - System.Storage.EntryKind
+  - System.Storage.EntryKind.Directory
+  - System.Storage.EntryKind.File
+  - System.Storage.Metadata
+  - System.Storage.StorageLookupError
+  - System.Storage.StorageLookupError.AccessDenied
+  - System.Storage.StorageLookupError.InvalidPath
+  - System.Storage.StorageLookupError.IoFailure
+  - System.Storage.StorageLookupError.NotFound
+  - System.Storage.StorageLookupError.WrongKind
+  langs:
+  - csharp
+  - vb
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  type: Namespace
+  assemblies:
+  - NeoCLR.CoreProbe
+references:
+- uid: System.Storage.Metadata
+  commentId: T:System.Storage.Metadata
+  isExternal: true
+  href: System.Storage.Metadata.html
+  name: Metadata
+  nameWithType: Metadata
+  fullName: System.Storage.Metadata
+- uid: System.Storage.EntryKind
+  commentId: T:System.Storage.EntryKind
+  isExternal: true
+  href: System.Storage.EntryKind.html
+  name: EntryKind
+  nameWithType: EntryKind
+  fullName: System.Storage.EntryKind
+- uid: System.Storage.EntryKind.File
+  commentId: T:System.Storage.EntryKind.File
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.EntryKind.html
+  name: EntryKind.File
+  nameWithType: EntryKind.File
+  fullName: System.Storage.EntryKind.File
+  spec.csharp:
+  - uid: System.Storage.EntryKind
+    name: EntryKind
+    isExternal: true
+    href: System.Storage.EntryKind.html
+  - name: .
+  - uid: System.Storage.EntryKind.File
+    name: File
+    isExternal: true
+    href: System.Storage.EntryKind.File.html
+  spec.vb:
+  - uid: System.Storage.EntryKind
+    name: EntryKind
+    isExternal: true
+    href: System.Storage.EntryKind.html
+  - name: .
+  - uid: System.Storage.EntryKind.File
+    name: File
+    isExternal: true
+    href: System.Storage.EntryKind.File.html
+- uid: System.Storage.EntryKind.Directory
+  commentId: T:System.Storage.EntryKind.Directory
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.EntryKind.html
+  name: EntryKind.Directory
+  nameWithType: EntryKind.Directory
+  fullName: System.Storage.EntryKind.Directory
+  spec.csharp:
+  - uid: System.Storage.EntryKind
+    name: EntryKind
+    isExternal: true
+    href: System.Storage.EntryKind.html
+  - name: .
+  - uid: System.Storage.EntryKind.Directory
+    name: Directory
+    isExternal: true
+    href: System.Storage.EntryKind.Directory.html
+  spec.vb:
+  - uid: System.Storage.EntryKind
+    name: EntryKind
+    isExternal: true
+    href: System.Storage.EntryKind.html
+  - name: .
+  - uid: System.Storage.EntryKind.Directory
+    name: Directory
+    isExternal: true
+    href: System.Storage.EntryKind.Directory.html
+- uid: System.Storage.StorageLookupError
+  commentId: T:System.Storage.StorageLookupError
+  isExternal: true
+  href: System.Storage.StorageLookupError.html
+  name: StorageLookupError
+  nameWithType: StorageLookupError
+  fullName: System.Storage.StorageLookupError
+- uid: System.Storage.StorageLookupError.InvalidPath
+  commentId: T:System.Storage.StorageLookupError.InvalidPath
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageLookupError.html
+  name: StorageLookupError.InvalidPath
+  nameWithType: StorageLookupError.InvalidPath
+  fullName: System.Storage.StorageLookupError.InvalidPath
+  spec.csharp:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.Storage.StorageLookupError.InvalidPath.html
+  spec.vb:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.Storage.StorageLookupError.InvalidPath.html
+- uid: System.Storage.StorageLookupError.NotFound
+  commentId: T:System.Storage.StorageLookupError.NotFound
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageLookupError.html
+  name: StorageLookupError.NotFound
+  nameWithType: StorageLookupError.NotFound
+  fullName: System.Storage.StorageLookupError.NotFound
+  spec.csharp:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.Storage.StorageLookupError.NotFound.html
+  spec.vb:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.Storage.StorageLookupError.NotFound.html
+- uid: System.Storage.StorageLookupError.AccessDenied
+  commentId: T:System.Storage.StorageLookupError.AccessDenied
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageLookupError.html
+  name: StorageLookupError.AccessDenied
+  nameWithType: StorageLookupError.AccessDenied
+  fullName: System.Storage.StorageLookupError.AccessDenied
+  spec.csharp:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.Storage.StorageLookupError.AccessDenied.html
+  spec.vb:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.Storage.StorageLookupError.AccessDenied.html
+- uid: System.Storage.StorageLookupError.WrongKind
+  commentId: T:System.Storage.StorageLookupError.WrongKind
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageLookupError.html
+  name: StorageLookupError.WrongKind
+  nameWithType: StorageLookupError.WrongKind
+  fullName: System.Storage.StorageLookupError.WrongKind
+  spec.csharp:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.WrongKind
+    name: WrongKind
+    isExternal: true
+    href: System.Storage.StorageLookupError.WrongKind.html
+  spec.vb:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.WrongKind
+    name: WrongKind
+    isExternal: true
+    href: System.Storage.StorageLookupError.WrongKind.html
+- uid: System.Storage.StorageLookupError.IoFailure
+  commentId: T:System.Storage.StorageLookupError.IoFailure
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageLookupError.html
+  name: StorageLookupError.IoFailure
+  nameWithType: StorageLookupError.IoFailure
+  fullName: System.Storage.StorageLookupError.IoFailure
+  spec.csharp:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.IoFailure
+    name: IoFailure
+    isExternal: true
+    href: System.Storage.StorageLookupError.IoFailure.html
+  spec.vb:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.IoFailure
+    name: IoFailure
+    isExternal: true
+    href: System.Storage.StorageLookupError.IoFailure.html
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html

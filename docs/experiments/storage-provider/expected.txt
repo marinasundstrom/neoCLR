@@ -16,5 +16,6 @@ Rejected write preserved contents
 Byte stream round trip: Hello, värld!
 Byte stream write visible through text helper
 Exclusive creation and closed streams checked
+File lookup reads the same contents on disk and memory
 Direct child required
 Providers remain independent

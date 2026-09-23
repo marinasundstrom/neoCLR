@@ -715,3 +715,15 @@ its verifier separately checks wrapper error paths, managed-array aliasing and
 resource-slot reuse. Stream wrappers are synchronous and invocation-bound; see the
 [stream guide](../../../api-docs/streams.md) for API details and the DocFX Flush
 renderer exclusion. This is development work after Preview 9.
+
+
+### Development Storage metadata adapter
+
+The reference catalog includes System.Storage.Metadata.GetKind(string), EntryKind
+and StorageLookupError. The implementation is Raven-authored; the bootstrap-only
+RuntimeServices.StorageKind maps to the existing neoCLR.Runtime.StorageKind service.
+The reference uses the existing value-carrier/Result metadata contract. There is no
+Raven compiler, Runtime Contract configuration or emission-policy change. The normal
+Storage provider SDK sample and LookupContracts exercise reference import and execution.
+Metadata takes a native string; application-owned provider GetFile consumes its
+validated logical Path. These are development additions after Preview 9.

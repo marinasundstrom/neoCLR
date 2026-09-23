@@ -1,0 +1,87 @@
+namespace System.Storage
+
+import System.Runtime.CompilerServices.ValueStorage
+
+public struct StorageLookupError {
+    private field Stored: System.Value
+
+    public struct InvalidPath { }
+
+    init(value: StorageLookupError.InvalidPath) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsInvalidPath: bool => ValueStorage.Is<StorageLookupError.InvalidPath>(Stored)
+
+    func GetInvalidPath() -> StorageLookupError.InvalidPath {
+        return ValueStorage.Unpack<StorageLookupError.InvalidPath>(Stored)
+    }
+
+    public struct NotFound { }
+
+    init(value: StorageLookupError.NotFound) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsNotFound: bool => ValueStorage.Is<StorageLookupError.NotFound>(Stored)
+
+    func GetNotFound() -> StorageLookupError.NotFound {
+        return ValueStorage.Unpack<StorageLookupError.NotFound>(Stored)
+    }
+
+    public struct AccessDenied { }
+
+    init(value: StorageLookupError.AccessDenied) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsAccessDenied: bool => ValueStorage.Is<StorageLookupError.AccessDenied>(Stored)
+
+    func GetAccessDenied() -> StorageLookupError.AccessDenied {
+        return ValueStorage.Unpack<StorageLookupError.AccessDenied>(Stored)
+    }
+
+    public struct WrongKind { }
+
+    init(value: StorageLookupError.WrongKind) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsWrongKind: bool => ValueStorage.Is<StorageLookupError.WrongKind>(Stored)
+
+    func GetWrongKind() -> StorageLookupError.WrongKind {
+        return ValueStorage.Unpack<StorageLookupError.WrongKind>(Stored)
+    }
+
+    public struct IoFailure { }
+
+    init(value: StorageLookupError.IoFailure) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsIoFailure: bool => ValueStorage.Is<StorageLookupError.IoFailure>(Stored)
+
+    func GetIoFailure() -> StorageLookupError.IoFailure {
+        return ValueStorage.Unpack<StorageLookupError.IoFailure>(Stored)
+    }
+
+    func ToString() -> string {
+        if IsInvalidPath {
+            return "InvalidPath"
+        }
+        if IsNotFound {
+            return "NotFound"
+        }
+        if IsAccessDenied {
+            return "AccessDenied"
+        }
+        if IsWrongKind {
+            return "WrongKind"
+        }
+        if IsIoFailure {
+            return "IoFailure"
+        }
+        System.Fault("Invalid StorageLookupError case")
+        return ""
+    }
+}

@@ -1,0 +1,234 @@
+; Generated from runtime/raven/src/System/Storage/Metadata.rvn. Regenerate with build_runtime_library.py.
+.method static GetKind(String path) -> System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError>
+.local Value local0
+.local Byte local1
+.local Int32 local2
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local2
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldarg 0
+M00000001_IL_0003:
+call neoCLR.Runtime.StorageKind(String)
+M00000001_IL_0008:
+stloc local0
+M00000001_IL_0009:
+M00000001_IL_000a:
+ldloc local0
+M00000001_IL_000b:
+value.is Byte
+call neoCLR.Library.System.Storage.Metadata.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0010:
+brtrue M00000001_IL_001a
+M00000001_IL_0015:
+br M00000001_IL_00ec
+M00000001_IL_001a:
+M00000001_IL_001b:
+ldloc local0
+M00000001_IL_001c:
+value.unpack Byte
+M00000001_IL_0021:
+stloc local1
+M00000001_IL_0022:
+M00000001_IL_0023:
+ldloc local1
+M00000001_IL_0024:
+conv.i4
+M00000001_IL_0025:
+ldc.i4 1
+M00000001_IL_0026:
+ceq
+call neoCLR.Library.System.Storage.Metadata.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0028:
+brtrue M00000001_IL_0032
+M00000001_IL_002d:
+br M00000001_IL_0047
+M00000001_IL_0032:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorInvalidPathNew()
+M00000001_IL_0037:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorInvalidPath(System.Storage.StorageLookupError.InvalidPath)
+M00000001_IL_003c:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion0(System.Storage.StorageLookupError)
+M00000001_IL_0041:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Error<System.Storage.StorageLookupError>)
+M00000001_IL_0046:
+ret
+M00000001_IL_0047:
+M00000001_IL_0048:
+M00000001_IL_0049:
+ldloc local1
+M00000001_IL_004a:
+conv.i4
+M00000001_IL_004b:
+ldc.i4 2
+M00000001_IL_004c:
+ceq
+call neoCLR.Library.System.Storage.Metadata.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_004e:
+brtrue M00000001_IL_0058
+M00000001_IL_0053:
+br M00000001_IL_006d
+M00000001_IL_0058:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNotFoundNew()
+M00000001_IL_005d:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorNotFound(System.Storage.StorageLookupError.NotFound)
+M00000001_IL_0062:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion0(System.Storage.StorageLookupError)
+M00000001_IL_0067:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Error<System.Storage.StorageLookupError>)
+M00000001_IL_006c:
+ret
+M00000001_IL_006d:
+M00000001_IL_006e:
+M00000001_IL_006f:
+ldloc local1
+M00000001_IL_0070:
+conv.i4
+M00000001_IL_0071:
+ldc.i4 3
+M00000001_IL_0072:
+ceq
+call neoCLR.Library.System.Storage.Metadata.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0074:
+brtrue M00000001_IL_007e
+M00000001_IL_0079:
+br M00000001_IL_0093
+M00000001_IL_007e:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorAccessDeniedNew()
+M00000001_IL_0083:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorAccessDenied(System.Storage.StorageLookupError.AccessDenied)
+M00000001_IL_0088:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion0(System.Storage.StorageLookupError)
+M00000001_IL_008d:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Error<System.Storage.StorageLookupError>)
+M00000001_IL_0092:
+ret
+M00000001_IL_0093:
+M00000001_IL_0094:
+M00000001_IL_0095:
+ldloc local1
+M00000001_IL_0096:
+conv.i4
+M00000001_IL_0097:
+ldc.i4 4
+M00000001_IL_0098:
+ceq
+call neoCLR.Library.System.Storage.Metadata.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_009a:
+brtrue M00000001_IL_00a4
+M00000001_IL_009f:
+br M00000001_IL_00b9
+M00000001_IL_00a4:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorWrongKindNew()
+M00000001_IL_00a9:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorWrongKind(System.Storage.StorageLookupError.WrongKind)
+M00000001_IL_00ae:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion0(System.Storage.StorageLookupError)
+M00000001_IL_00b3:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Error<System.Storage.StorageLookupError>)
+M00000001_IL_00b8:
+ret
+M00000001_IL_00b9:
+M00000001_IL_00ba:
+M00000001_IL_00bb:
+ldloc local1
+M00000001_IL_00bc:
+conv.i4
+M00000001_IL_00bd:
+ldc.i4 10
+M00000001_IL_00bf:
+ceq
+call neoCLR.Library.System.Storage.Metadata.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_00c1:
+brtrue M00000001_IL_00cb
+M00000001_IL_00c6:
+br M00000001_IL_00e0
+M00000001_IL_00cb:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorIoFailureNew()
+M00000001_IL_00d0:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorIoFailure(System.Storage.StorageLookupError.IoFailure)
+M00000001_IL_00d5:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion0(System.Storage.StorageLookupError)
+M00000001_IL_00da:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Error<System.Storage.StorageLookupError>)
+M00000001_IL_00df:
+ret
+M00000001_IL_00e0:
+M00000001_IL_00e1:
+M00000001_IL_00e2:
+ldstr "Unexpected metadata error status"
+M00000001_IL_00e7:
+call System.Fault(String)
+M00000001_IL_00ec:
+M00000001_IL_00ed:
+M00000001_IL_00ee:
+ldloc local0
+M00000001_IL_00ef:
+value.unpack Int32
+M00000001_IL_00f4:
+stloc local2
+M00000001_IL_00f5:
+M00000001_IL_00f6:
+ldloc local2
+M00000001_IL_00f7:
+ldc.i4 1
+M00000001_IL_00f8:
+ceq
+call neoCLR.Library.System.Storage.Metadata.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_00fa:
+brtrue M00000001_IL_0104
+M00000001_IL_00ff:
+br M00000001_IL_0119
+M00000001_IL_0104:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageEntryKindFileNew()
+M00000001_IL_0109:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageEntryKindNewSystemStorageEntryKindFile(System.Storage.EntryKind.File)
+M00000001_IL_010e:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion2(System.Storage.EntryKind)
+M00000001_IL_0113:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion3(System.Result.Ok<System.Storage.EntryKind>)
+M00000001_IL_0118:
+ret
+M00000001_IL_0119:
+M00000001_IL_011a:
+M00000001_IL_011b:
+ldloc local2
+M00000001_IL_011c:
+ldc.i4 2
+M00000001_IL_011d:
+ceq
+call neoCLR.Library.System.Storage.Metadata.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_011f:
+brtrue M00000001_IL_0129
+M00000001_IL_0124:
+br M00000001_IL_013e
+M00000001_IL_0129:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageEntryKindDirectoryNew()
+M00000001_IL_012e:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageEntryKindNewSystemStorageEntryKindDirectory(System.Storage.EntryKind.Directory)
+M00000001_IL_0133:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion2(System.Storage.EntryKind)
+M00000001_IL_0138:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion3(System.Result.Ok<System.Storage.EntryKind>)
+M00000001_IL_013d:
+ret
+M00000001_IL_013e:
+M00000001_IL_013f:
+M00000001_IL_0140:
+ldstr "Unexpected metadata kind"
+M00000001_IL_0145:
+call System.Fault(String)
+M00000001_IL_014a:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorIoFailureNew()
+M00000001_IL_014f:
+call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorIoFailure(System.Storage.StorageLookupError.IoFailure)
+M00000001_IL_0154:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion0(System.Storage.StorageLookupError)
+M00000001_IL_0159:
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Error<System.Storage.StorageLookupError>)
+M00000001_IL_015e:
+ret
+.end

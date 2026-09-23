@@ -5333,3 +5333,18 @@ and recorded the convention for runtime code as well as examples.
   [complete sample API reference](../api-docs/storage-experiment.md#path-value-object).
   Explicit parsing remains visible in the sample so overload ergonomics can be judged
   before finalizing the Storage contract.
+
+
+### 2026-09-23 — Path is a Storage value, not a system-wide requirement
+
+- **Author:** said it is wise to keep the path primitive as something Storage uses,
+  rather than imposing it everywhere. Callers may use it to verify/parse a path but
+  still pass a string to certain APIs.
+- **Assistant:** agreed to distinguish the Storage value from other APIs' string
+  parameters. Suggested optional parsing followed by passing path.Text; this is not
+  a decision to add implicit conversions or provider string overloads.
+- **Action:** preserved string parameters on file streams and the new host metadata
+  wrapper while adding Path-taking GetFile to the application-owned Storage provider
+  experiment. Updated the roadmap and on-site reference with this boundary.
+- **Open:** exact grammar, convenience overloads within Storage, provider identity,
+  directory resolution and asynchronous lookup remain under exploration.

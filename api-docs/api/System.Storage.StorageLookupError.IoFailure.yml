@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.StorageLookupError.IoFailure
+  commentId: T:System.Storage.StorageLookupError.IoFailure
+  id: StorageLookupError.IoFailure
+  parent: System.Storage
+  children:
+  - System.Storage.StorageLookupError.IoFailure.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StorageLookupError.IoFailure
+  nameWithType: StorageLookupError.IoFailure
+  fullName: System.Storage.StorageLookupError.IoFailure
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Another host I/O failure prevented lookup.
+  example: []
+  syntax:
+    content: public struct StorageLookupError.IoFailure
+    content.vb: Public Structure StorageLookupError.IoFailure
+- uid: System.Storage.StorageLookupError.IoFailure.#ctor
+  commentId: M:System.Storage.StorageLookupError.IoFailure.#ctor
+  id: '#ctor'
+  parent: System.Storage.StorageLookupError.IoFailure
+  langs:
+  - csharp
+  - vb
+  name: IoFailure()
+  nameWithType: StorageLookupError.IoFailure.IoFailure()
+  fullName: System.Storage.StorageLookupError.IoFailure.IoFailure()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the IoFailure case.
+  example: []
+  syntax:
+    content: public IoFailure()
+    content.vb: Public Sub New()
+  overload: System.Storage.StorageLookupError.IoFailure.#ctor*
+  nameWithType.vb: StorageLookupError.IoFailure.New()
+  fullName.vb: System.Storage.StorageLookupError.IoFailure.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.StorageLookupError.IoFailure.#ctor*
+  commentId: Overload:System.Storage.StorageLookupError.IoFailure.#ctor
+  isExternal: true
+  href: System.Storage.StorageLookupError.IoFailure.html#System_Storage_StorageLookupError_IoFailure__ctor
+  name: IoFailure
+  nameWithType: StorageLookupError.IoFailure.IoFailure
+  fullName: System.Storage.StorageLookupError.IoFailure.IoFailure
+  nameWithType.vb: StorageLookupError.IoFailure.New
+  fullName.vb: System.Storage.StorageLookupError.IoFailure.New
+  name.vb: New

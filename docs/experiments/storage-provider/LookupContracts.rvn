@@ -1,0 +1,73 @@
+namespace StorageExperiment
+
+import System.*
+import System.Console.*
+import System.Result.*
+import System.Streams.*
+
+func LookupCases(provider: StorageProvider) {
+    match provider.GetFile(RequirePath("/missing")) {
+        Error(let error) => {
+            if !error.IsNotFound {
+                System.Fault("Missing lookup did not return NotFound")
+            }
+        }
+        Ok(_) => System.Fault("Lookup created a missing file")
+    }
+    match provider.GetFile(RequirePath("/")) {
+        Error(let error) => {
+            if !error.IsWrongKind {
+                System.Fault("Directory lookup did not return WrongKind")
+            }
+        }
+        Ok(_) => System.Fault("Directory returned as file")
+    }
+    let directory = Directory(provider, RequirePath("/"))
+    match directory.GetFile("../escape") {
+        Error(let error) => {
+            if !error.IsInvalidPath {
+                System.Fault("Invalid child has wrong lookup error")
+            }
+        }
+        Ok(_) => System.Fault("Lookup bypassed child validation")
+    }
+    match provider.WriteText(RequirePath("/lookup.txt"), "found", 5) {
+        Ok(_) => { }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    // Repeat lookup to check stable descriptor construction.
+    var index = 0
+    while index < 3 {
+        match directory.GetFile("lookup.txt") {
+            Ok(let file) => {
+                if file.Name != "lookup.txt" || !file.Path.Equals(RequirePath("/lookup.txt")) {
+                    System.Fault("Lookup descriptor changed address")
+                }
+            }
+            Error(let error) => System.Fault(error.ToString())
+        }
+        index += 1
+    }
+}
+
+func Main() {
+    LookupCases(HostStorage("."))
+    LookupCases(MemoryStorage())
+    match System.Storage.Metadata.GetKind("") {
+        Error(let error) => {
+            if !error.IsInvalidPath {
+                System.Fault("Empty native path has wrong error")
+            }
+        }
+        Ok(_) => System.Fault("Empty native path accepted")
+    }
+    match System.Storage.Metadata.GetKind(".") {
+        Ok(let kind) => {
+            if !kind.IsDirectory {
+                System.Fault("Directory metadata lost its kind")
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    WriteLine("Typed disk and memory lookup contracts: passed")
+}

@@ -1,0 +1,2 @@
+.include "generated/EntryKind.methods.neoil"
+.include "generated/EntryKind.helpers.neoil"

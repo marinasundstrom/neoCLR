@@ -178,7 +178,7 @@ lookup. Prefer investigating metadata lookup with typed errors while keeping the
 actual open operation authoritative. This adds an I/O operation and does not remove
 races; consumers only needing bytes should be able to open directly.
 
-Proposed contract for the next implementation slice, **not shipped API**:
+Provisional contract recorded before the lookup implementation below (historical design input):
 
 - Keep FileAt as descriptor construction without I/O. Add GetFile only when a
   provider can actually query kind/existence without opening content.
@@ -195,8 +195,8 @@ Proposed contract for the next implementation slice, **not shipped API**:
   do not advertise synchronous experiments as the final provider contract.
 
 The subsequent coherent-memory slice resolves the separate text/byte slot obstacle.
-Next add a native metadata adapter and matched disk/memory checks, including a
-failed open after successful lookup. Independent .NET filesystem abstractions and
+The typed metadata adapter and matched disk/memory lookup checks are now implemented
+as described below, including a native failed open after successful lookup. Independent .NET filesystem abstractions and
 permission-error portability remain research gaps before promoting this API family.
 
 ## Coherent text and byte contents (2026-09-23)
@@ -234,3 +234,40 @@ and four website tooling tests passed. An initial 64-entry capacity test exceede
 VM's 100,000-instruction default with linear lookup; the fixture provider now uses
 eight entries so this bounded case fits the unchanged runtime budget. This does not
 establish scalable storage performance. No cross-platform matrix was rerun.
+
+
+## Typed metadata and provider lookup (2026-09-23)
+
+System.Storage.Metadata.GetKind(string) wraps the existing StorageKind internal
+service as Result<EntryKind, StorageLookupError>. It accepts native strings and
+observes regular files/directories; it does not open contents or retain resources.
+EntryKind and the five lookup error cases have generated on-site reference coverage.
+StorageProvider.GetFile(Path) and Directory.GetFile(name) are still application-owned
+experiments. Both providers distinguish missing entries and wrong kind; Directory
+also rejects invalid direct-child names. FileAt remains pure descriptor construction.
+The author clarifies that Path belongs to Storage, not every API in the platform.
+Strings remain valid API parameters elsewhere; callers may opt into parsing and
+pass Text. No implicit conversion or new string-overload family was added.
+
+The product sample now looks up the written notes on both providers and reads the
+same content. LookupContracts checks missing/root/invalid-child outcomes, repeated
+lookup, native invalid paths and directory kind. Native service tests establish
+that lookup still succeeds at the 64-live-handle limit, consumes no IDs and leaves
+an open reader's position unchanged. A separate test removes a file after successful
+lookup and confirms a later open fails. The Unix VM case covers a followed link and
+its dangling target. Actual permission-denial portability remains untested; existing
+host error mapping is retained. No cross-platform matrix was rerun.
+
+GetFile derives the display name using the existing filename helper on the current
+shared slash-only logical grammar. This remains a limitation for broader provider
+naming. Common directory structure, replacement identity and async lookup are next
+design questions; do not infer a final capability or security contract from this
+blocking sample. The .NET/Rust comparison above still applies.
+
+Validation on 2026-09-23: all Raven library slices regenerated; bootstrap and API
+snapshot checks passed. The normal SDK product sample, stream/Path/memory/lookup
+contracts and negative Path construction/mutation checks passed. Seven native
+file-resource unit cases and twelve VM file-resource cases passed (eleven existing
+cases plus the targeted Unix link case). DocFX checked summaries for 130 generated
+items; the combined site and four website tooling tests passed. No Raven compiler
+change or cross-platform run was required for this bounded library adapter.

@@ -1,0 +1,359 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.EntryKind
+  commentId: T:System.Storage.EntryKind
+  id: EntryKind
+  parent: System.Storage
+  children:
+  - System.Storage.EntryKind.#ctor(System.Storage.EntryKind.Directory)
+  - System.Storage.EntryKind.#ctor(System.Storage.EntryKind.File)
+  - System.Storage.EntryKind.GetDirectory
+  - System.Storage.EntryKind.GetFile
+  - System.Storage.EntryKind.IsDirectory
+  - System.Storage.EntryKind.IsFile
+  - System.Storage.EntryKind.ToString
+  langs:
+  - csharp
+  - vb
+  name: EntryKind
+  nameWithType: EntryKind
+  fullName: System.Storage.EntryKind
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: The supported kinds observed by a metadata query.
+  remarks: Development after Preview 9. Use a named case; an uninitialized carrier is not a valid value. Prefer union patterns when supported by the consuming frontend.
+  example: []
+  syntax:
+    content: public struct EntryKind
+    content.vb: Public Structure EntryKind
+- uid: System.Storage.EntryKind.ToString
+  commentId: M:System.Storage.EntryKind.ToString
+  id: ToString
+  parent: System.Storage.EntryKind
+  langs:
+  - csharp
+  - vb
+  name: ToString()
+  nameWithType: EntryKind.ToString()
+  fullName: System.Storage.EntryKind.ToString()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Returns the selected case name.
+  example: []
+  syntax:
+    content: public string ToString()
+    return:
+      type: System.String
+      description: The stable case label for display, not a filesystem diagnostic.
+    content.vb: Public Function ToString() As String
+  overload: System.Storage.EntryKind.ToString*
+- uid: System.Storage.EntryKind.#ctor(System.Storage.EntryKind.File)
+  commentId: M:System.Storage.EntryKind.#ctor(System.Storage.EntryKind.File)
+  id: '#ctor(System.Storage.EntryKind.File)'
+  parent: System.Storage.EntryKind
+  langs:
+  - csharp
+  - vb
+  name: EntryKind(File)
+  nameWithType: EntryKind.EntryKind(EntryKind.File)
+  fullName: System.Storage.EntryKind.EntryKind(System.Storage.EntryKind.File)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding File.
+  example: []
+  syntax:
+    content: public EntryKind(EntryKind.File value)
+    parameters:
+    - id: value
+      type: System.Storage.EntryKind.File
+      description: The File case to hold.
+    content.vb: Public Sub New(value As EntryKind.File)
+  overload: System.Storage.EntryKind.#ctor*
+  nameWithType.vb: EntryKind.New(EntryKind.File)
+  fullName.vb: System.Storage.EntryKind.New(System.Storage.EntryKind.File)
+  name.vb: New(File)
+- uid: System.Storage.EntryKind.GetFile
+  commentId: M:System.Storage.EntryKind.GetFile
+  id: GetFile
+  parent: System.Storage.EntryKind
+  langs:
+  - csharp
+  - vb
+  name: GetFile()
+  nameWithType: EntryKind.GetFile()
+  fullName: System.Storage.EntryKind.GetFile()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the File case.
+  remarks: Requires the matching case; a mismatch is a runtime fault.
+  example: []
+  syntax:
+    content: public EntryKind.File GetFile()
+    return:
+      type: System.Storage.EntryKind.File
+      description: The held case value.
+    content.vb: Public Function GetFile() As EntryKind.File
+  overload: System.Storage.EntryKind.GetFile*
+- uid: System.Storage.EntryKind.#ctor(System.Storage.EntryKind.Directory)
+  commentId: M:System.Storage.EntryKind.#ctor(System.Storage.EntryKind.Directory)
+  id: '#ctor(System.Storage.EntryKind.Directory)'
+  parent: System.Storage.EntryKind
+  langs:
+  - csharp
+  - vb
+  name: EntryKind(Directory)
+  nameWithType: EntryKind.EntryKind(EntryKind.Directory)
+  fullName: System.Storage.EntryKind.EntryKind(System.Storage.EntryKind.Directory)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding Directory.
+  example: []
+  syntax:
+    content: public EntryKind(EntryKind.Directory value)
+    parameters:
+    - id: value
+      type: System.Storage.EntryKind.Directory
+      description: The Directory case to hold.
+    content.vb: Public Sub New(value As EntryKind.Directory)
+  overload: System.Storage.EntryKind.#ctor*
+  nameWithType.vb: EntryKind.New(EntryKind.Directory)
+  fullName.vb: System.Storage.EntryKind.New(System.Storage.EntryKind.Directory)
+  name.vb: New(Directory)
+- uid: System.Storage.EntryKind.GetDirectory
+  commentId: M:System.Storage.EntryKind.GetDirectory
+  id: GetDirectory
+  parent: System.Storage.EntryKind
+  langs:
+  - csharp
+  - vb
+  name: GetDirectory()
+  nameWithType: EntryKind.GetDirectory()
+  fullName: System.Storage.EntryKind.GetDirectory()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the Directory case.
+  remarks: Requires the matching case; a mismatch is a runtime fault.
+  example: []
+  syntax:
+    content: public EntryKind.Directory GetDirectory()
+    return:
+      type: System.Storage.EntryKind.Directory
+      description: The held case value.
+    content.vb: Public Function GetDirectory() As EntryKind.Directory
+  overload: System.Storage.EntryKind.GetDirectory*
+- uid: System.Storage.EntryKind.IsFile
+  commentId: P:System.Storage.EntryKind.IsFile
+  id: IsFile
+  parent: System.Storage.EntryKind
+  langs:
+  - csharp
+  - vb
+  name: IsFile
+  nameWithType: EntryKind.IsFile
+  fullName: System.Storage.EntryKind.IsFile
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether this value holds File.
+  example: []
+  syntax:
+    content: public bool IsFile { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for this case.
+    content.vb: Public ReadOnly Property IsFile As Boolean
+  overload: System.Storage.EntryKind.IsFile*
+- uid: System.Storage.EntryKind.IsDirectory
+  commentId: P:System.Storage.EntryKind.IsDirectory
+  id: IsDirectory
+  parent: System.Storage.EntryKind
+  langs:
+  - csharp
+  - vb
+  name: IsDirectory
+  nameWithType: EntryKind.IsDirectory
+  fullName: System.Storage.EntryKind.IsDirectory
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether this value holds Directory.
+  example: []
+  syntax:
+    content: public bool IsDirectory { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for this case.
+    content.vb: Public ReadOnly Property IsDirectory As Boolean
+  overload: System.Storage.EntryKind.IsDirectory*
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.EntryKind.ToString*
+  commentId: Overload:System.Storage.EntryKind.ToString
+  isExternal: true
+  href: System.Storage.EntryKind.html#System_Storage_EntryKind_ToString
+  name: ToString
+  nameWithType: EntryKind.ToString
+  fullName: System.Storage.EntryKind.ToString
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Storage.EntryKind.#ctor*
+  commentId: Overload:System.Storage.EntryKind.#ctor
+  isExternal: true
+  href: System.Storage.EntryKind.html#System_Storage_EntryKind__ctor_System_Storage_EntryKind_File_
+  name: EntryKind
+  nameWithType: EntryKind.EntryKind
+  fullName: System.Storage.EntryKind.EntryKind
+  nameWithType.vb: EntryKind.New
+  fullName.vb: System.Storage.EntryKind.New
+  name.vb: New
+- uid: System.Storage.EntryKind.File
+  commentId: T:System.Storage.EntryKind.File
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.EntryKind.html
+  name: EntryKind.File
+  nameWithType: EntryKind.File
+  fullName: System.Storage.EntryKind.File
+  spec.csharp:
+  - uid: System.Storage.EntryKind
+    name: EntryKind
+    isExternal: true
+    href: System.Storage.EntryKind.html
+  - name: .
+  - uid: System.Storage.EntryKind.File
+    name: File
+    isExternal: true
+    href: System.Storage.EntryKind.File.html
+  spec.vb:
+  - uid: System.Storage.EntryKind
+    name: EntryKind
+    isExternal: true
+    href: System.Storage.EntryKind.html
+  - name: .
+  - uid: System.Storage.EntryKind.File
+    name: File
+    isExternal: true
+    href: System.Storage.EntryKind.File.html
+- uid: System.Storage.EntryKind.GetFile*
+  commentId: Overload:System.Storage.EntryKind.GetFile
+  isExternal: true
+  href: System.Storage.EntryKind.html#System_Storage_EntryKind_GetFile
+  name: GetFile
+  nameWithType: EntryKind.GetFile
+  fullName: System.Storage.EntryKind.GetFile
+- uid: System.Storage.EntryKind.Directory
+  commentId: T:System.Storage.EntryKind.Directory
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.EntryKind.html
+  name: EntryKind.Directory
+  nameWithType: EntryKind.Directory
+  fullName: System.Storage.EntryKind.Directory
+  spec.csharp:
+  - uid: System.Storage.EntryKind
+    name: EntryKind
+    isExternal: true
+    href: System.Storage.EntryKind.html
+  - name: .
+  - uid: System.Storage.EntryKind.Directory
+    name: Directory
+    isExternal: true
+    href: System.Storage.EntryKind.Directory.html
+  spec.vb:
+  - uid: System.Storage.EntryKind
+    name: EntryKind
+    isExternal: true
+    href: System.Storage.EntryKind.html
+  - name: .
+  - uid: System.Storage.EntryKind.Directory
+    name: Directory
+    isExternal: true
+    href: System.Storage.EntryKind.Directory.html
+- uid: System.Storage.EntryKind.GetDirectory*
+  commentId: Overload:System.Storage.EntryKind.GetDirectory
+  isExternal: true
+  href: System.Storage.EntryKind.html#System_Storage_EntryKind_GetDirectory
+  name: GetDirectory
+  nameWithType: EntryKind.GetDirectory
+  fullName: System.Storage.EntryKind.GetDirectory
+- uid: System.Storage.EntryKind.IsFile*
+  commentId: Overload:System.Storage.EntryKind.IsFile
+  isExternal: true
+  href: System.Storage.EntryKind.html#System_Storage_EntryKind_IsFile
+  name: IsFile
+  nameWithType: EntryKind.IsFile
+  fullName: System.Storage.EntryKind.IsFile
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System.Storage.EntryKind.IsDirectory*
+  commentId: Overload:System.Storage.EntryKind.IsDirectory
+  isExternal: true
+  href: System.Storage.EntryKind.html#System_Storage_EntryKind_IsDirectory
+  name: IsDirectory
+  nameWithType: EntryKind.IsDirectory
+  fullName: System.Storage.EntryKind.IsDirectory

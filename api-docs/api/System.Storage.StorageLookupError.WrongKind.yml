@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.StorageLookupError.WrongKind
+  commentId: T:System.Storage.StorageLookupError.WrongKind
+  id: StorageLookupError.WrongKind
+  parent: System.Storage
+  children:
+  - System.Storage.StorageLookupError.WrongKind.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StorageLookupError.WrongKind
+  nameWithType: StorageLookupError.WrongKind
+  fullName: System.Storage.StorageLookupError.WrongKind
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: The item does not have the requested or supported kind.
+  example: []
+  syntax:
+    content: public struct StorageLookupError.WrongKind
+    content.vb: Public Structure StorageLookupError.WrongKind
+- uid: System.Storage.StorageLookupError.WrongKind.#ctor
+  commentId: M:System.Storage.StorageLookupError.WrongKind.#ctor
+  id: '#ctor'
+  parent: System.Storage.StorageLookupError.WrongKind
+  langs:
+  - csharp
+  - vb
+  name: WrongKind()
+  nameWithType: StorageLookupError.WrongKind.WrongKind()
+  fullName: System.Storage.StorageLookupError.WrongKind.WrongKind()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the WrongKind case.
+  example: []
+  syntax:
+    content: public WrongKind()
+    content.vb: Public Sub New()
+  overload: System.Storage.StorageLookupError.WrongKind.#ctor*
+  nameWithType.vb: StorageLookupError.WrongKind.New()
+  fullName.vb: System.Storage.StorageLookupError.WrongKind.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.StorageLookupError.WrongKind.#ctor*
+  commentId: Overload:System.Storage.StorageLookupError.WrongKind.#ctor
+  isExternal: true
+  href: System.Storage.StorageLookupError.WrongKind.html#System_Storage_StorageLookupError_WrongKind__ctor
+  name: WrongKind
+  nameWithType: StorageLookupError.WrongKind.WrongKind
+  fullName: System.Storage.StorageLookupError.WrongKind.WrongKind
+  nameWithType.vb: StorageLookupError.WrongKind.New
+  fullName.vb: System.Storage.StorageLookupError.WrongKind.New
+  name.vb: New

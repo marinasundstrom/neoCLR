@@ -10,6 +10,40 @@ items:
   - uid: System.Concurrency.ThreadPool
     name: ThreadPool
     type: Class
+- uid: System.Storage
+  name: System.Storage
+  type: Namespace
+  items:
+  - uid: System.Storage.EntryKind
+    name: EntryKind
+    type: Struct
+  - uid: System.Storage.EntryKind.Directory
+    name: EntryKind.Directory
+    type: Struct
+  - uid: System.Storage.EntryKind.File
+    name: EntryKind.File
+    type: Struct
+  - uid: System.Storage.Metadata
+    name: Metadata
+    type: Class
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    type: Struct
+  - uid: System.Storage.StorageLookupError.AccessDenied
+    name: StorageLookupError.AccessDenied
+    type: Struct
+  - uid: System.Storage.StorageLookupError.InvalidPath
+    name: StorageLookupError.InvalidPath
+    type: Struct
+  - uid: System.Storage.StorageLookupError.IoFailure
+    name: StorageLookupError.IoFailure
+    type: Struct
+  - uid: System.Storage.StorageLookupError.NotFound
+    name: StorageLookupError.NotFound
+    type: Struct
+  - uid: System.Storage.StorageLookupError.WrongKind
+    name: StorageLookupError.WrongKind
+    type: Struct
 - uid: System.Streams
   name: System.Streams
   type: Namespace

@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.EntryKind.File
+  commentId: T:System.Storage.EntryKind.File
+  id: EntryKind.File
+  parent: System.Storage
+  children:
+  - System.Storage.EntryKind.File.#ctor
+  langs:
+  - csharp
+  - vb
+  name: EntryKind.File
+  nameWithType: EntryKind.File
+  fullName: System.Storage.EntryKind.File
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: A regular file was observed.
+  example: []
+  syntax:
+    content: public struct EntryKind.File
+    content.vb: Public Structure EntryKind.File
+- uid: System.Storage.EntryKind.File.#ctor
+  commentId: M:System.Storage.EntryKind.File.#ctor
+  id: '#ctor'
+  parent: System.Storage.EntryKind.File
+  langs:
+  - csharp
+  - vb
+  name: File()
+  nameWithType: EntryKind.File.File()
+  fullName: System.Storage.EntryKind.File.File()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the File case.
+  example: []
+  syntax:
+    content: public File()
+    content.vb: Public Sub New()
+  overload: System.Storage.EntryKind.File.#ctor*
+  nameWithType.vb: EntryKind.File.New()
+  fullName.vb: System.Storage.EntryKind.File.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.EntryKind.File.#ctor*
+  commentId: Overload:System.Storage.EntryKind.File.#ctor
+  isExternal: true
+  href: System.Storage.EntryKind.File.html#System_Storage_EntryKind_File__ctor
+  name: File
+  nameWithType: EntryKind.File.File
+  fullName: System.Storage.EntryKind.File.File
+  nameWithType.vb: EntryKind.File.New
+  fullName.vb: System.Storage.EntryKind.File.New
+  name.vb: New

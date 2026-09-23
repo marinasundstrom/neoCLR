@@ -7,11 +7,13 @@ import System.Text.*
 import System.Result.*
 import System.Storage.FileReadError
 import System.Storage.FileWriteError
+import System.Storage.StorageLookupError
 
 // Experimental application-owned contract. Text methods are a temporary adapter
 // over existing helpers; byte streams are a separate incremental experiment.
 interface StorageProvider {
     func FileAt(path: Path, name: string) -> File
+    func GetFile(path: Path) -> Result<File, StorageLookupError>
     func OpenRead(path: Path) -> Result<InputStream, StreamError>
     func CreateNew(path: Path) -> Result<OutputStream, StreamError>
     func ReadText(path: Path, maxBytes: int) -> Result<string, FileReadError>
@@ -77,6 +79,15 @@ class Directory {
             Error(_) => Error(FileReadError(FileReadError.InvalidPath()))
         }
     }
+
+    // Validate a direct child, then query its provider. The result owns no stream.
+    func GetFile(name: string) -> Result<File, StorageLookupError> {
+        return match FileAt(name) {
+            Ok(let descriptor) => provider.GetFile(descriptor.Path)
+            Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+    }
+
 }
 
 class HostStorage : StorageProvider {
@@ -100,6 +111,18 @@ class HostStorage : StorageProvider {
             }
         }
         return System.Storage.Path.Combine(root, text)
+    }
+
+    func GetFile(path: Path) -> Result<File, StorageLookupError> {
+        return match System.Storage.Metadata.GetKind(Resolve(path)) {
+            Ok(let kind) => {
+                if kind.IsFile {
+                    return Ok(File(self, path, System.Storage.Path.GetFileName(path.Text)))
+                }
+                Error(StorageLookupError(StorageLookupError.WrongKind()))
+            }
+            Error(let error) => Error(error)
+        }
     }
 
     func OpenRead(path: Path) -> Result<InputStream, StreamError> {
@@ -160,6 +183,16 @@ class MemoryStorage : StorageProvider {
             index += 1
         }
         return -1
+    }
+
+    func GetFile(path: Path) -> Result<File, StorageLookupError> {
+        if Key(path) == "/" {
+            return Error(StorageLookupError(StorageLookupError.WrongKind()))
+        }
+        if Find(path) < 0 {
+            return Error(StorageLookupError(StorageLookupError.NotFound()))
+        }
+        return Ok(File(self, path, System.Storage.Path.GetFileName(path.Text)))
     }
 
     func OpenRead(path: Path) -> Result<InputStream, StreamError> {

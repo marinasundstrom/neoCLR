@@ -1,0 +1,42 @@
+namespace System.Storage
+
+import System.Runtime.CompilerServices.ValueStorage
+
+public struct EntryKind {
+    private field Stored: System.Value
+
+    public struct File { }
+
+    init(value: EntryKind.File) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsFile: bool => ValueStorage.Is<EntryKind.File>(Stored)
+
+    func GetFile() -> EntryKind.File {
+        return ValueStorage.Unpack<EntryKind.File>(Stored)
+    }
+
+    public struct Directory { }
+
+    init(value: EntryKind.Directory) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsDirectory: bool => ValueStorage.Is<EntryKind.Directory>(Stored)
+
+    func GetDirectory() -> EntryKind.Directory {
+        return ValueStorage.Unpack<EntryKind.Directory>(Stored)
+    }
+
+    func ToString() -> string {
+        if IsFile {
+            return "File"
+        }
+        if IsDirectory {
+            return "Directory"
+        }
+        System.Fault("Invalid EntryKind case")
+        return ""
+    }
+}

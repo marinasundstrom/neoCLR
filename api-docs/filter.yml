@@ -22,5 +22,10 @@ apiRules:
     type: Namespace
 - include:
     uidRegex: '^System\.Streams\.(FileInputStream|FileOutputStream|StreamError)($|\.)'
+- include:
+    uidRegex: '^System\.Storage$'
+    type: Namespace
+- include:
+    uidRegex: '^System\.Storage\.(Metadata|EntryKind|StorageLookupError)($|\.)'
 - exclude:
     uidRegex: '.*'

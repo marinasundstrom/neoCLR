@@ -1,0 +1,39 @@
+namespace System.Storage.Metadata
+
+import System.*
+import System.Storage.*
+import System.Result.*
+import System.Runtime.CompilerServices.RuntimeServices
+
+// Synchronous host-path lookup; no file contents or open resource are retained.
+public func GetKind(path: string) -> Result<EntryKind, StorageLookupError> {
+    let payload = RuntimeServices.StorageKind(path)
+    if RuntimeServices.IsValue<byte>(payload) {
+        let status = RuntimeServices.UnpackValue<byte>(payload)
+        if status == 1 {
+            return Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+        if status == 2 {
+            return Error(StorageLookupError(StorageLookupError.NotFound()))
+        }
+        if status == 3 {
+            return Error(StorageLookupError(StorageLookupError.AccessDenied()))
+        }
+        if status == 4 {
+            return Error(StorageLookupError(StorageLookupError.WrongKind()))
+        }
+        if status == 10 {
+            return Error(StorageLookupError(StorageLookupError.IoFailure()))
+        }
+        System.Fault("Unexpected metadata error status")
+    }
+    let kind = RuntimeServices.UnpackValue<int>(payload)
+    if kind == 1 {
+        return Ok(EntryKind(EntryKind.File()))
+    }
+    if kind == 2 {
+        return Ok(EntryKind(EntryKind.Directory()))
+    }
+    System.Fault("Unexpected metadata kind")
+    return Error(StorageLookupError(StorageLookupError.IoFailure()))
+}

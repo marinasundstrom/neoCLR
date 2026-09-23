@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.EntryKind.Directory
+  commentId: T:System.Storage.EntryKind.Directory
+  id: EntryKind.Directory
+  parent: System.Storage
+  children:
+  - System.Storage.EntryKind.Directory.#ctor
+  langs:
+  - csharp
+  - vb
+  name: EntryKind.Directory
+  nameWithType: EntryKind.Directory
+  fullName: System.Storage.EntryKind.Directory
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: A directory was observed.
+  example: []
+  syntax:
+    content: public struct EntryKind.Directory
+    content.vb: Public Structure EntryKind.Directory
+- uid: System.Storage.EntryKind.Directory.#ctor
+  commentId: M:System.Storage.EntryKind.Directory.#ctor
+  id: '#ctor'
+  parent: System.Storage.EntryKind.Directory
+  langs:
+  - csharp
+  - vb
+  name: Directory()
+  nameWithType: EntryKind.Directory.Directory()
+  fullName: System.Storage.EntryKind.Directory.Directory()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the Directory case.
+  example: []
+  syntax:
+    content: public Directory()
+    content.vb: Public Sub New()
+  overload: System.Storage.EntryKind.Directory.#ctor*
+  nameWithType.vb: EntryKind.Directory.New()
+  fullName.vb: System.Storage.EntryKind.Directory.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.EntryKind.Directory.#ctor*
+  commentId: Overload:System.Storage.EntryKind.Directory.#ctor
+  isExternal: true
+  href: System.Storage.EntryKind.Directory.html#System_Storage_EntryKind_Directory__ctor
+  name: Directory
+  nameWithType: EntryKind.Directory.Directory
+  fullName: System.Storage.EntryKind.Directory.Directory
+  nameWithType.vb: EntryKind.Directory.New
+  fullName.vb: System.Storage.EntryKind.Directory.New
+  name.vb: New

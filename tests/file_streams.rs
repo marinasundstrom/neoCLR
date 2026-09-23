@@ -1,5 +1,5 @@
 //! Exercise the experimental resource protocol below any frontend/library checks.
-use neoclr::{Limits, LoadedProgram, Value, assemble, assembler::parse_function_ref};
+use neoclr::{assemble, assembler::parse_function_ref, Limits, LoadedProgram, Value};
 const SERVICES: &str = include_str!("../runtime/neoCLR/Runtime/FileStreams.neoil");
 struct Fixture(std::path::PathBuf);
 impl Fixture {
@@ -387,4 +387,36 @@ fn read_into_requires_read_access_and_exact_byte_array_signature() {
     assert_eq!(std::fs::read(fixture.path()).unwrap(), b"unchanged");
     let invalid = ".module Bad\n.function neoCLR.Runtime.FileReadInto(Int32 handle,arrayref<Int32> bytes,Int32 offset,Int32 count) -> Value\n.methodimpl InternalCall\n.end";
     assert!(assemble(invalid).is_err());
+}
+
+#[cfg(unix)]
+#[test]
+fn metadata_follows_links_and_reports_dangling_targets() {
+    let fixture = Fixture::new();
+    let target = fixture.path();
+    let link = fixture.0.join("link");
+    std::fs::write(&target, b"data").unwrap();
+    std::os::unix::fs::symlink(&target, &link).unwrap();
+    let path = link.to_str().unwrap();
+    assert_eq!(
+        invoke(
+            "ldarg path\ncall neoCLR.Runtime.StorageKind(String)\nvalue.unpack Int32",
+            "Int32",
+            path
+        )
+        .unwrap()
+        .value,
+        Value::Int32(1)
+    );
+    std::fs::remove_file(&target).unwrap();
+    assert_eq!(
+        invoke(
+            "ldarg path\ncall neoCLR.Runtime.StorageKind(String)\nvalue.unpack Byte",
+            "Byte",
+            path
+        )
+        .unwrap()
+        .value,
+        Value::Byte(2)
+    );
 }

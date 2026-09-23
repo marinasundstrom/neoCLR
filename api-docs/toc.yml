@@ -6,6 +6,8 @@
   href: api/
 - name: Callback methods
   href: callbacks.md
+- name: Storage lookup
+  href: storage-lookup.md
 - name: Storage experiment
   href: storage-experiment.md
 - name: File streams

@@ -1,0 +1,195 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.Metadata
+  commentId: T:System.Storage.Metadata
+  id: Metadata
+  parent: System.Storage
+  children:
+  - System.Storage.Metadata.GetKind(System.String)
+  langs:
+  - csharp
+  - vb
+  name: Metadata
+  nameWithType: Metadata
+  fullName: System.Storage.Metadata
+  type: Class
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Synchronous metadata queries for native host paths.
+  remarks: Development after Preview 9. This static host adapter is separate from the experimental provider API. It performs no content read and retains no stream handle.
+  example: []
+  syntax:
+    content: public static class Metadata
+    content.vb: Public Module Metadata
+  inheritance:
+  - System.Object
+- uid: System.Storage.Metadata.GetKind(System.String)
+  commentId: M:System.Storage.Metadata.GetKind(System.String)
+  id: GetKind(System.String)
+  parent: System.Storage.Metadata
+  langs:
+  - csharp
+  - vb
+  name: GetKind(string)
+  nameWithType: Metadata.GetKind(string)
+  fullName: System.Storage.Metadata.GetKind(string)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Queries whether a host path currently denotes a regular file or directory.
+  remarks: Follows symbolic links. Results are observations, not stable identity or authority; later opens can fail. Empty or NUL-containing paths return InvalidPath; missing or dangling targets return NotFound; denied access returns AccessDenied; unsupported kinds return WrongKind; other I/O errors return IoFailure. Calls can block. No sandbox or permission-to-read guarantee is implied.
+  example: []
+  syntax:
+    content: public static Result<EntryKind, StorageLookupError> GetKind(string path)
+    parameters:
+    - id: path
+      type: System.String
+      description: A native host path. Relative paths use the process working directory, not a provider root.
+    return:
+      type: System.Result{System.Storage.EntryKind,System.Storage.StorageLookupError}
+      description: Ok with File or Directory, or a typed StorageLookupError. No resource is retained.
+    content.vb: Public Shared Function GetKind(path As String) As Result(Of EntryKind, StorageLookupError)
+  overload: System.Storage.Metadata.GetKind*
+  nameWithType.vb: Metadata.GetKind(String)
+  fullName.vb: System.Storage.Metadata.GetKind(String)
+  name.vb: GetKind(String)
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Storage.Metadata.GetKind*
+  commentId: Overload:System.Storage.Metadata.GetKind
+  isExternal: true
+  href: System.Storage.Metadata.html#System_Storage_Metadata_GetKind_System_String_
+  name: GetKind
+  nameWithType: Metadata.GetKind
+  fullName: System.Storage.Metadata.GetKind
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System.Result{System.Storage.EntryKind,System.Storage.StorageLookupError}
+  commentId: T:System.Result{System.Storage.EntryKind,System.Storage.StorageLookupError}
+  parent: System
+  definition: System.Result`2
+  href: System.Storage.EntryKind.html
+  name: Result<EntryKind, StorageLookupError>
+  nameWithType: Result<EntryKind, StorageLookupError>
+  fullName: System.Result<System.Storage.EntryKind, System.Storage.StorageLookupError>
+  nameWithType.vb: Result(Of EntryKind, StorageLookupError)
+  fullName.vb: System.Result(Of System.Storage.EntryKind, System.Storage.StorageLookupError)
+  name.vb: Result(Of EntryKind, StorageLookupError)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - uid: System.Storage.EntryKind
+    name: EntryKind
+    isExternal: true
+    href: System.Storage.EntryKind.html
+  - name: ','
+  - name: " "
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Storage.EntryKind
+    name: EntryKind
+    isExternal: true
+    href: System.Storage.EntryKind.html
+  - name: ','
+  - name: " "
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: )
+- uid: System.Result`2
+  commentId: T:System.Result`2
+  isExternal: true
+  name: Result<T, E>
+  nameWithType: Result<T, E>
+  fullName: System.Result<T, E>
+  nameWithType.vb: Result(Of T, E)
+  fullName.vb: System.Result(Of T, E)
+  name.vb: Result(Of T, E)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: )

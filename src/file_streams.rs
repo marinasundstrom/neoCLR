@@ -1,6 +1,6 @@
 //! Invocation-owned, blocking regular-file resources for the file-stream experiment.
 //! Integer handles are private runtime transport, not OS descriptors or capabilities.
-use crate::{Fault, Limits, Value, metadata::Type};
+use crate::{metadata::Type, Fault, Limits, Value};
 use std::{
     collections::{HashMap, HashSet},
     fs::{File, OpenOptions},
@@ -182,12 +182,7 @@ impl Files {
             }
             (
                 Operation::ReadInto,
-                [
-                    Value::Int32(id),
-                    Value::ObjectReference(array),
-                    Value::Int32(offset),
-                    Value::Int32(count),
-                ],
+                [Value::Int32(id), Value::ObjectReference(array), Value::Int32(offset), Value::Int32(count)],
             ) => {
                 if array.reference.target() != &Type::Array(Box::new(Type::Byte)) {
                     return Err(Fault::new("File read requires a byte array"));
@@ -216,12 +211,7 @@ impl Files {
             }
             (
                 Operation::Write,
-                [
-                    Value::Int32(id),
-                    Value::ObjectReference(array),
-                    Value::Int32(offset),
-                    Value::Int32(count),
-                ],
+                [Value::Int32(id), Value::ObjectReference(array), Value::Int32(offset), Value::Int32(count)],
             ) => {
                 let Value::Array {
                     element: Type::Byte,
@@ -397,5 +387,53 @@ mod tests {
         let next = files.open(&path, Operation::OpenRead).unwrap();
         assert!(!handles.contains(&next));
         assert_eq!(files.read(handles[0], 1), Err(Error::Closed));
+    }
+    #[test]
+    fn metadata_does_not_use_handles_or_advance_readers() {
+        let fixture = Fixture::new();
+        let path = fixture.path("data");
+        std::fs::write(&path, b"abc").unwrap();
+        let mut files = Files::default();
+        let handles: Vec<_> = (0..MAX_OPEN_FILES)
+            .map(|_| files.open(&path, Operation::OpenRead).unwrap())
+            .collect();
+        let issued = files.issued.len();
+        for _ in 0..70 {
+            let result = files
+                .invoke(
+                    Operation::Kind,
+                    &[Value::String(path.clone())],
+                    &Limits::default(),
+                )
+                .unwrap();
+            assert_eq!(result, Value::Erased(Box::new(Value::Int32(1))));
+        }
+        assert_eq!(files.issued.len(), issued);
+        assert_eq!(files.open.len(), MAX_OPEN_FILES);
+        assert_eq!(files.read(handles[0], 1).unwrap(), b"a");
+        assert_eq!(
+            files.open(&path, Operation::OpenRead),
+            Err(Error::LimitExceeded)
+        );
+    }
+
+    #[test]
+    fn lookup_success_does_not_guarantee_later_open() {
+        let fixture = Fixture::new();
+        let path = fixture.path("data");
+        std::fs::write(&path, b"abc").unwrap();
+        let mut files = Files::default();
+        assert_eq!(
+            files
+                .invoke(
+                    Operation::Kind,
+                    &[Value::String(path.clone())],
+                    &Limits::default()
+                )
+                .unwrap(),
+            Value::Erased(Box::new(Value::Int32(1)))
+        );
+        std::fs::remove_file(&path).unwrap();
+        assert_eq!(files.open(&path, Operation::OpenRead), Err(Error::NotFound));
     }
 }

@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.StorageLookupError.NotFound
+  commentId: T:System.Storage.StorageLookupError.NotFound
+  id: StorageLookupError.NotFound
+  parent: System.Storage
+  children:
+  - System.Storage.StorageLookupError.NotFound.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StorageLookupError.NotFound
+  nameWithType: StorageLookupError.NotFound
+  fullName: System.Storage.StorageLookupError.NotFound
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: The path or followed target does not exist.
+  example: []
+  syntax:
+    content: public struct StorageLookupError.NotFound
+    content.vb: Public Structure StorageLookupError.NotFound
+- uid: System.Storage.StorageLookupError.NotFound.#ctor
+  commentId: M:System.Storage.StorageLookupError.NotFound.#ctor
+  id: '#ctor'
+  parent: System.Storage.StorageLookupError.NotFound
+  langs:
+  - csharp
+  - vb
+  name: NotFound()
+  nameWithType: StorageLookupError.NotFound.NotFound()
+  fullName: System.Storage.StorageLookupError.NotFound.NotFound()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the NotFound case.
+  example: []
+  syntax:
+    content: public NotFound()
+    content.vb: Public Sub New()
+  overload: System.Storage.StorageLookupError.NotFound.#ctor*
+  nameWithType.vb: StorageLookupError.NotFound.New()
+  fullName.vb: System.Storage.StorageLookupError.NotFound.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.StorageLookupError.NotFound.#ctor*
+  commentId: Overload:System.Storage.StorageLookupError.NotFound.#ctor
+  isExternal: true
+  href: System.Storage.StorageLookupError.NotFound.html#System_Storage_StorageLookupError_NotFound__ctor
+  name: NotFound
+  nameWithType: StorageLookupError.NotFound.NotFound
+  fullName: System.Storage.StorageLookupError.NotFound.NotFound
+  nameWithType.vb: StorageLookupError.NotFound.New
+  fullName.vb: System.Storage.StorageLookupError.NotFound.New
+  name.vb: New

@@ -10,6 +10,9 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    "EntryKind": "System.Storage.EntryKind",
+    "StorageLookupError": "System.Storage.StorageLookupError",
+    "StorageMetadata": "System.Storage.Metadata",
     'StreamError': 'System.Streams.StreamError',
     'FileInputStream': 'System.Streams.FileInputStream',
     'FileOutputStream': 'System.Streams.FileOutputStream',
@@ -104,6 +107,9 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    "EntryKind": "runtime/raven/src/System/Storage/EntryKind.rvn",
+    "StorageLookupError": "runtime/raven/src/System/Storage/StorageLookupError.rvn",
+    "StorageMetadata": "runtime/raven/src/System/Storage/Metadata.rvn",
     'StreamError': 'runtime/raven/src/System/Streams/StreamError.rvn',
     'FileInputStream': 'runtime/raven/src/System/Streams/FileInputStream.rvn',
     'FileOutputStream': 'runtime/raven/src/System/Streams/FileOutputStream.rvn',

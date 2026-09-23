@@ -257,4 +257,13 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileOutputStream'">
     <Compile Include="src/System/Streams/FileOutputStream.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EntryKind'">
+    <Compile Include="src/System/Storage/EntryKind.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StorageLookupError'">
+    <Compile Include="src/System/Storage/StorageLookupError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StorageMetadata'">
+    <Compile Include="src/System/Storage/Metadata.rvn" />
+  </ItemGroup>
 </Project>

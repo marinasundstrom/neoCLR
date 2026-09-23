@@ -1,7 +1,7 @@
 # neoCLR API reference
 
 neoCLR is an **experimental application platform**. This reference describes the
-development API following Preview 9, covering Tasks, explicit threads and the first file streams.
+development API following Preview 9, covering Tasks, explicit threads and the first file streams and host metadata lookup.
 The new System.Concurrency APIs require matching development artifacts; Preview 9
 downloads retain System.Threading. Names and contracts remain experimental;
 this reference does not promise compatibility with future releases.
@@ -35,6 +35,7 @@ being expanded beyond the initial Preview 9 async overview.
 
 | Namespace | Types and purpose |
 | --- | --- |
+| [System.Storage](xref:System.Storage) | [Metadata.GetKind](xref:System.Storage.Metadata), EntryKind and StorageLookupError; see the [lookup guide](storage-lookup.md) |
 | [System.Tasks](xref:System.Tasks) | Task, Promise, TaskQueue and completion state |
 | [System.Streams](xref:System.Streams) | Directional file streams and typed errors; see the [stream guide](streams.md), including Flush |
 | [System.Concurrency](xref:System.Concurrency) | Explicit Thread lifecycle and the isolated ThreadPool; development after Preview 9 |

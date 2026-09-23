@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Add development System.Storage.Metadata.GetKind(string), EntryKind and
+  StorageLookupError over the existing native metadata service, with generated API
+  reference coverage. Add typed GetFile lookup to the disk/memory provider sample;
+  distinguish missing and wrong-kind outcomes without opening file contents.
+  Lookup is an observation, not stable identity or a guarantee of later access.
+  Record Path as Storage-specific rather than mandatory throughout the platform;
+  host metadata and file-stream APIs retain string parameters. Matching regenerated
+  development runtime/reference artifacts are required for these additions.
+
 - Replace the experimental MemorySlotStorage with MemoryStorage: text helpers and
   streams now share byte contents per address. Support up to eight addresses with 64 KiB
   current payloads, strict UTF-8 reads and cross-API exclusive creation. Keep old

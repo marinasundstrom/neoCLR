@@ -56,6 +56,7 @@ above them.
 
 | Member | Contract |
 | --- | --- |
+| `GetFile(path: Path) -> Result<File, StorageLookupError>` | Query a current file and return a provider-bound descriptor; does not retain a stream or guarantee later availability. Root/directory returns WrongKind and missing entries return NotFound. |
 | `FileAt(path: Path, name: string) -> File` | Construct a descriptor retaining a parsed path and display name; does not check existence. Directory.FileAt constructs and validates child paths for ordinary callers. |
 | `OpenRead(path: Path) -> Result<InputStream, StreamError>` | Open an existing byte file with a new read cursor at zero, or report an expected error. |
 | `CreateNew(path: Path) -> Result<OutputStream, StreamError>` | Exclusively create a byte file. Existing entries are not overwritten. |
@@ -76,10 +77,11 @@ A provider-bound directory address. Construction does not create or verify a dir
 | --- | --- |
 | `Directory(provider: StorageProvider, path: Path)` | Retain the provider and its directory address. |
 | `Path: Path` | Return the validated logical path without querying storage. |
+| `GetFile(name: string) -> Result<File, StorageLookupError>` | Validate a direct child name, then query the provider. Invalid names return InvalidPath; provider lookup errors are preserved. |
 | `FileAt(name: string) -> Result<File, FileReadError>` | Validate a direct child name, parse the combined logical path, then construct the File descriptor through the retained provider. Empty names, `.`, `..` and names containing separators, colon or NUL are rejected with InvalidPath. |
 
-FileAt resolves an address; it is not the proposal's existence-checking GetFile.
-It can describe a file that will be created later. Validation is not a security
+FileAt constructs an address without I/O and can describe a file to create later.
+GetFile queries its current kind/existence. Validation is not a security
 boundary or a restriction on the provider's other operations.
 
 ## File
@@ -99,8 +101,8 @@ handle and has no disposal requirement in this experiment.
 
 ## Supplied providers
 
-`HostStorage(root: string)` configures a native disk root and implements all five
-StorageProvider methods using native path combination, the existing whole-file helpers, and FileInputStream/FileOutputStream.
+`HostStorage(root: string)` configures a native disk root and implements all six
+StorageProvider methods using native path combination, [Metadata.GetKind](xref:System.Storage.Metadata), the existing whole-file helpers, and FileInputStream/FileOutputStream.
 Calls block. Whole-text helpers close per operation; byte streams remain open until
 the caller closes them or the invocation ends. Its permissions, symlinks and native path validity follow the host. Logical `/`
 means the configured provider root, not the OS filesystem root. A relative root
@@ -108,11 +110,13 @@ configuration remains relative to the process working directory; no canonicaliza
 or sandbox claim is made. There is no sandbox or read-only capability here.
 
 `MemoryStorage()` replaces the earlier experimental MemorySlotStorage. It implements
-all five StorageProvider methods using one byte payload per logical address; text
+all six StorageProvider methods using one byte payload per logical address; text
 reads decode that payload and text writes encode UTF-8 without a BOM. Files written
 through either API are visible through the other. Instances do not share state.
 Relative and absolute spellings with the same names resolve to the same entry.
 Logical `/` and `.` denote the root and cannot be opened or written as files.
+GetFile checks this same address table without opening a stream. Missing entries
+return NotFound and the root returns WrongKind.
 Nested names are flat keys; this is not a directory tree or a general filesystem.
 
 The store permits eight addresses, each with at most 64 KiB of current contents.
@@ -181,23 +185,26 @@ with retained streams and text workflow failures.
 
 ## What remains open
 
-Storage now consumes the first validated Path value object described below. The
-exact grammar and whether path-taking public APIs should also accept string overloads
-remain exploratory. A proposed string overload would parse and forward to the Path
-version, preserving the same validation and typed errors; no overload family is
-added by this slice.
-Eager lookup, item identity, provider-specific File implementations and common
-StorageItem contracts remain exploratory. Host comparison probes show why a future
-lookup must not promise that a file remains available: metadata is an observation,
-while an open stream can retain an old file after its address is replaced. A
-proposed GetFile would query kind/existence and return a provider-bound descriptor;
-it is not implemented. Each later open must still report its own failures. Opening
-content merely to check existence would add read-access requirements and consume
-the stream budget. With memory contents unified, a native metadata query is the next candidate to
-evaluate against both providers. Replacement while streams remain open, directory
+Storage consumes the validated Path value object described below. The author's
+intended boundary is Storage-specific: other APIs can continue accepting strings.
+Callers may optionally parse a Path, then pass Text to a string-taking API. The native
+metadata and file-stream APIs accept strings. String overloads on provider APIs
+remain an open ergonomic choice; this slice does not add them.
+
+GetFile now queries kind/existence and returns a provider-bound address. It does not
+promise stable filesystem identity or later availability, nor does success grant
+read/write permission. Later opens perform their own checks and can fail. Metadata
+lookup adds an I/O operation; callers who only need bytes may still open directly.
+Host lookup follows symlinks and uses the process's normal permissions. Name uses
+the existing host filename helper on the experiment's shared slash-only logical
+syntax; general provider-specific naming remains open.
+
+Common item identity, provider-specific File implementations and StorageItem
+contracts remain exploratory. Replacement while streams remain open, directory
 structure and provider identity still need a common contract. General stream
 capabilities, automatic disposal, cleanup across await and async scheduling also
-remain design work.
+remain design work. The sample APIs currently block and are not an async-first
+provider contract.
 
 For comparison, .NET's [FileInfo constructor](https://learn.microsoft.com/en-us/dotnet/api/system.io.fileinfo.-ctor?view=net-10.0)
 creates a path wrapper. This experiment also retains a storage provider, allowing

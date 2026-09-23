@@ -1,0 +1,93 @@
+; Generated from runtime/raven/src/System/Storage/Metadata.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageEntryKindNewSystemStorageEntryKindFile(System.Storage.EntryKind.File value) -> System.Storage.EntryKind
+ldarg value
+newobj instance System.Storage.EntryKind::.ctor(System.Storage.EntryKind.File)
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageEntryKindNewSystemStorageEntryKindDirectory(System.Storage.EntryKind.Directory value) -> System.Storage.EntryKind
+ldarg value
+newobj instance System.Storage.EntryKind::.ctor(System.Storage.EntryKind.Directory)
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorInvalidPath(System.Storage.StorageLookupError.InvalidPath value) -> System.Storage.StorageLookupError
+ldarg value
+newobj instance System.Storage.StorageLookupError::.ctor(System.Storage.StorageLookupError.InvalidPath)
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorNotFound(System.Storage.StorageLookupError.NotFound value) -> System.Storage.StorageLookupError
+ldarg value
+newobj instance System.Storage.StorageLookupError::.ctor(System.Storage.StorageLookupError.NotFound)
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorAccessDenied(System.Storage.StorageLookupError.AccessDenied value) -> System.Storage.StorageLookupError
+ldarg value
+newobj instance System.Storage.StorageLookupError::.ctor(System.Storage.StorageLookupError.AccessDenied)
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorWrongKind(System.Storage.StorageLookupError.WrongKind value) -> System.Storage.StorageLookupError
+ldarg value
+newobj instance System.Storage.StorageLookupError::.ctor(System.Storage.StorageLookupError.WrongKind)
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorIoFailure(System.Storage.StorageLookupError.IoFailure value) -> System.Storage.StorageLookupError
+ldarg value
+newobj instance System.Storage.StorageLookupError::.ctor(System.Storage.StorageLookupError.IoFailure)
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageEntryKindFileNew() -> System.Storage.EntryKind.File
+newobj instance System.Storage.EntryKind.File::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageEntryKindDirectoryNew() -> System.Storage.EntryKind.Directory
+newobj instance System.Storage.EntryKind.Directory::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorInvalidPathNew() -> System.Storage.StorageLookupError.InvalidPath
+newobj instance System.Storage.StorageLookupError.InvalidPath::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNotFoundNew() -> System.Storage.StorageLookupError.NotFound
+newobj instance System.Storage.StorageLookupError.NotFound::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorAccessDeniedNew() -> System.Storage.StorageLookupError.AccessDenied
+newobj instance System.Storage.StorageLookupError.AccessDenied::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorWrongKindNew() -> System.Storage.StorageLookupError.WrongKind
+newobj instance System.Storage.StorageLookupError.WrongKind::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorIoFailureNew() -> System.Storage.StorageLookupError.IoFailure
+newobj instance System.Storage.StorageLookupError.IoFailure::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeUnion0(System.Storage.StorageLookupError arg0) -> System.Result.Error<System.Storage.StorageLookupError>
+ldarg arg0
+newobj instance System.Result.Error<System.Storage.StorageLookupError>::.ctor(System.Storage.StorageLookupError)
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Error<System.Storage.StorageLookupError> arg0) -> System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError>
+ldarg arg0
+newobj instance System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError>::.ctor(System.Result.Error<System.Storage.StorageLookupError>)
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeUnion2(System.Storage.EntryKind arg0) -> System.Result.Ok<System.Storage.EntryKind>
+ldarg arg0
+newobj instance System.Result.Ok<System.Storage.EntryKind>::.ctor(System.Storage.EntryKind)
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeUnion3(System.Result.Ok<System.Storage.EntryKind> arg0) -> System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError>
+ldarg arg0
+newobj instance System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError>::.ctor(System.Result.Ok<System.Storage.EntryKind>)
+ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

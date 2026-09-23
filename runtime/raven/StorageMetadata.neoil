@@ -1,0 +1,4 @@
+.type System.Storage.Metadata
+.include "generated/StorageMetadata.methods.neoil"
+.end
+.include "generated/StorageMetadata.helpers.neoil"

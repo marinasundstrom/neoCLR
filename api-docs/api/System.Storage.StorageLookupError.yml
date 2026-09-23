@@ -1,0 +1,719 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.StorageLookupError
+  commentId: T:System.Storage.StorageLookupError
+  id: StorageLookupError
+  parent: System.Storage
+  children:
+  - System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.AccessDenied)
+  - System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.InvalidPath)
+  - System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.IoFailure)
+  - System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.NotFound)
+  - System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.WrongKind)
+  - System.Storage.StorageLookupError.GetAccessDenied
+  - System.Storage.StorageLookupError.GetInvalidPath
+  - System.Storage.StorageLookupError.GetIoFailure
+  - System.Storage.StorageLookupError.GetNotFound
+  - System.Storage.StorageLookupError.GetWrongKind
+  - System.Storage.StorageLookupError.IsAccessDenied
+  - System.Storage.StorageLookupError.IsInvalidPath
+  - System.Storage.StorageLookupError.IsIoFailure
+  - System.Storage.StorageLookupError.IsNotFound
+  - System.Storage.StorageLookupError.IsWrongKind
+  - System.Storage.StorageLookupError.ToString
+  langs:
+  - csharp
+  - vb
+  name: StorageLookupError
+  nameWithType: StorageLookupError
+  fullName: System.Storage.StorageLookupError
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Expected failures from metadata queries and experimental provider lookup.
+  remarks: Development after Preview 9. Use a named case; an uninitialized carrier is not a valid value. Prefer union patterns when supported by the consuming frontend.
+  example: []
+  syntax:
+    content: public struct StorageLookupError
+    content.vb: Public Structure StorageLookupError
+- uid: System.Storage.StorageLookupError.ToString
+  commentId: M:System.Storage.StorageLookupError.ToString
+  id: ToString
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: ToString()
+  nameWithType: StorageLookupError.ToString()
+  fullName: System.Storage.StorageLookupError.ToString()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Returns the selected case name.
+  example: []
+  syntax:
+    content: public string ToString()
+    return:
+      type: System.String
+      description: The stable case label for display, not a filesystem diagnostic.
+    content.vb: Public Function ToString() As String
+  overload: System.Storage.StorageLookupError.ToString*
+- uid: System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.InvalidPath)
+  commentId: M:System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.InvalidPath)
+  id: '#ctor(System.Storage.StorageLookupError.InvalidPath)'
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: StorageLookupError(InvalidPath)
+  nameWithType: StorageLookupError.StorageLookupError(StorageLookupError.InvalidPath)
+  fullName: System.Storage.StorageLookupError.StorageLookupError(System.Storage.StorageLookupError.InvalidPath)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding InvalidPath.
+  example: []
+  syntax:
+    content: public StorageLookupError(StorageLookupError.InvalidPath value)
+    parameters:
+    - id: value
+      type: System.Storage.StorageLookupError.InvalidPath
+      description: The InvalidPath case to hold.
+    content.vb: Public Sub New(value As StorageLookupError.InvalidPath)
+  overload: System.Storage.StorageLookupError.#ctor*
+  nameWithType.vb: StorageLookupError.New(StorageLookupError.InvalidPath)
+  fullName.vb: System.Storage.StorageLookupError.New(System.Storage.StorageLookupError.InvalidPath)
+  name.vb: New(InvalidPath)
+- uid: System.Storage.StorageLookupError.GetInvalidPath
+  commentId: M:System.Storage.StorageLookupError.GetInvalidPath
+  id: GetInvalidPath
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: GetInvalidPath()
+  nameWithType: StorageLookupError.GetInvalidPath()
+  fullName: System.Storage.StorageLookupError.GetInvalidPath()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the InvalidPath case.
+  remarks: Requires the matching case; a mismatch is a runtime fault.
+  example: []
+  syntax:
+    content: public StorageLookupError.InvalidPath GetInvalidPath()
+    return:
+      type: System.Storage.StorageLookupError.InvalidPath
+      description: The held case value.
+    content.vb: Public Function GetInvalidPath() As StorageLookupError.InvalidPath
+  overload: System.Storage.StorageLookupError.GetInvalidPath*
+- uid: System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.NotFound)
+  commentId: M:System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.NotFound)
+  id: '#ctor(System.Storage.StorageLookupError.NotFound)'
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: StorageLookupError(NotFound)
+  nameWithType: StorageLookupError.StorageLookupError(StorageLookupError.NotFound)
+  fullName: System.Storage.StorageLookupError.StorageLookupError(System.Storage.StorageLookupError.NotFound)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding NotFound.
+  example: []
+  syntax:
+    content: public StorageLookupError(StorageLookupError.NotFound value)
+    parameters:
+    - id: value
+      type: System.Storage.StorageLookupError.NotFound
+      description: The NotFound case to hold.
+    content.vb: Public Sub New(value As StorageLookupError.NotFound)
+  overload: System.Storage.StorageLookupError.#ctor*
+  nameWithType.vb: StorageLookupError.New(StorageLookupError.NotFound)
+  fullName.vb: System.Storage.StorageLookupError.New(System.Storage.StorageLookupError.NotFound)
+  name.vb: New(NotFound)
+- uid: System.Storage.StorageLookupError.GetNotFound
+  commentId: M:System.Storage.StorageLookupError.GetNotFound
+  id: GetNotFound
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: GetNotFound()
+  nameWithType: StorageLookupError.GetNotFound()
+  fullName: System.Storage.StorageLookupError.GetNotFound()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the NotFound case.
+  remarks: Requires the matching case; a mismatch is a runtime fault.
+  example: []
+  syntax:
+    content: public StorageLookupError.NotFound GetNotFound()
+    return:
+      type: System.Storage.StorageLookupError.NotFound
+      description: The held case value.
+    content.vb: Public Function GetNotFound() As StorageLookupError.NotFound
+  overload: System.Storage.StorageLookupError.GetNotFound*
+- uid: System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.AccessDenied)
+  commentId: M:System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.AccessDenied)
+  id: '#ctor(System.Storage.StorageLookupError.AccessDenied)'
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: StorageLookupError(AccessDenied)
+  nameWithType: StorageLookupError.StorageLookupError(StorageLookupError.AccessDenied)
+  fullName: System.Storage.StorageLookupError.StorageLookupError(System.Storage.StorageLookupError.AccessDenied)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding AccessDenied.
+  example: []
+  syntax:
+    content: public StorageLookupError(StorageLookupError.AccessDenied value)
+    parameters:
+    - id: value
+      type: System.Storage.StorageLookupError.AccessDenied
+      description: The AccessDenied case to hold.
+    content.vb: Public Sub New(value As StorageLookupError.AccessDenied)
+  overload: System.Storage.StorageLookupError.#ctor*
+  nameWithType.vb: StorageLookupError.New(StorageLookupError.AccessDenied)
+  fullName.vb: System.Storage.StorageLookupError.New(System.Storage.StorageLookupError.AccessDenied)
+  name.vb: New(AccessDenied)
+- uid: System.Storage.StorageLookupError.GetAccessDenied
+  commentId: M:System.Storage.StorageLookupError.GetAccessDenied
+  id: GetAccessDenied
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: GetAccessDenied()
+  nameWithType: StorageLookupError.GetAccessDenied()
+  fullName: System.Storage.StorageLookupError.GetAccessDenied()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the AccessDenied case.
+  remarks: Requires the matching case; a mismatch is a runtime fault.
+  example: []
+  syntax:
+    content: public StorageLookupError.AccessDenied GetAccessDenied()
+    return:
+      type: System.Storage.StorageLookupError.AccessDenied
+      description: The held case value.
+    content.vb: Public Function GetAccessDenied() As StorageLookupError.AccessDenied
+  overload: System.Storage.StorageLookupError.GetAccessDenied*
+- uid: System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.WrongKind)
+  commentId: M:System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.WrongKind)
+  id: '#ctor(System.Storage.StorageLookupError.WrongKind)'
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: StorageLookupError(WrongKind)
+  nameWithType: StorageLookupError.StorageLookupError(StorageLookupError.WrongKind)
+  fullName: System.Storage.StorageLookupError.StorageLookupError(System.Storage.StorageLookupError.WrongKind)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding WrongKind.
+  example: []
+  syntax:
+    content: public StorageLookupError(StorageLookupError.WrongKind value)
+    parameters:
+    - id: value
+      type: System.Storage.StorageLookupError.WrongKind
+      description: The WrongKind case to hold.
+    content.vb: Public Sub New(value As StorageLookupError.WrongKind)
+  overload: System.Storage.StorageLookupError.#ctor*
+  nameWithType.vb: StorageLookupError.New(StorageLookupError.WrongKind)
+  fullName.vb: System.Storage.StorageLookupError.New(System.Storage.StorageLookupError.WrongKind)
+  name.vb: New(WrongKind)
+- uid: System.Storage.StorageLookupError.GetWrongKind
+  commentId: M:System.Storage.StorageLookupError.GetWrongKind
+  id: GetWrongKind
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: GetWrongKind()
+  nameWithType: StorageLookupError.GetWrongKind()
+  fullName: System.Storage.StorageLookupError.GetWrongKind()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the WrongKind case.
+  remarks: Requires the matching case; a mismatch is a runtime fault.
+  example: []
+  syntax:
+    content: public StorageLookupError.WrongKind GetWrongKind()
+    return:
+      type: System.Storage.StorageLookupError.WrongKind
+      description: The held case value.
+    content.vb: Public Function GetWrongKind() As StorageLookupError.WrongKind
+  overload: System.Storage.StorageLookupError.GetWrongKind*
+- uid: System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.IoFailure)
+  commentId: M:System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.IoFailure)
+  id: '#ctor(System.Storage.StorageLookupError.IoFailure)'
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: StorageLookupError(IoFailure)
+  nameWithType: StorageLookupError.StorageLookupError(StorageLookupError.IoFailure)
+  fullName: System.Storage.StorageLookupError.StorageLookupError(System.Storage.StorageLookupError.IoFailure)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding IoFailure.
+  example: []
+  syntax:
+    content: public StorageLookupError(StorageLookupError.IoFailure value)
+    parameters:
+    - id: value
+      type: System.Storage.StorageLookupError.IoFailure
+      description: The IoFailure case to hold.
+    content.vb: Public Sub New(value As StorageLookupError.IoFailure)
+  overload: System.Storage.StorageLookupError.#ctor*
+  nameWithType.vb: StorageLookupError.New(StorageLookupError.IoFailure)
+  fullName.vb: System.Storage.StorageLookupError.New(System.Storage.StorageLookupError.IoFailure)
+  name.vb: New(IoFailure)
+- uid: System.Storage.StorageLookupError.GetIoFailure
+  commentId: M:System.Storage.StorageLookupError.GetIoFailure
+  id: GetIoFailure
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: GetIoFailure()
+  nameWithType: StorageLookupError.GetIoFailure()
+  fullName: System.Storage.StorageLookupError.GetIoFailure()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the IoFailure case.
+  remarks: Requires the matching case; a mismatch is a runtime fault.
+  example: []
+  syntax:
+    content: public StorageLookupError.IoFailure GetIoFailure()
+    return:
+      type: System.Storage.StorageLookupError.IoFailure
+      description: The held case value.
+    content.vb: Public Function GetIoFailure() As StorageLookupError.IoFailure
+  overload: System.Storage.StorageLookupError.GetIoFailure*
+- uid: System.Storage.StorageLookupError.IsInvalidPath
+  commentId: P:System.Storage.StorageLookupError.IsInvalidPath
+  id: IsInvalidPath
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: IsInvalidPath
+  nameWithType: StorageLookupError.IsInvalidPath
+  fullName: System.Storage.StorageLookupError.IsInvalidPath
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether this value holds InvalidPath.
+  example: []
+  syntax:
+    content: public bool IsInvalidPath { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for this case.
+    content.vb: Public ReadOnly Property IsInvalidPath As Boolean
+  overload: System.Storage.StorageLookupError.IsInvalidPath*
+- uid: System.Storage.StorageLookupError.IsNotFound
+  commentId: P:System.Storage.StorageLookupError.IsNotFound
+  id: IsNotFound
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: IsNotFound
+  nameWithType: StorageLookupError.IsNotFound
+  fullName: System.Storage.StorageLookupError.IsNotFound
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether this value holds NotFound.
+  example: []
+  syntax:
+    content: public bool IsNotFound { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for this case.
+    content.vb: Public ReadOnly Property IsNotFound As Boolean
+  overload: System.Storage.StorageLookupError.IsNotFound*
+- uid: System.Storage.StorageLookupError.IsAccessDenied
+  commentId: P:System.Storage.StorageLookupError.IsAccessDenied
+  id: IsAccessDenied
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: IsAccessDenied
+  nameWithType: StorageLookupError.IsAccessDenied
+  fullName: System.Storage.StorageLookupError.IsAccessDenied
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether this value holds AccessDenied.
+  example: []
+  syntax:
+    content: public bool IsAccessDenied { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for this case.
+    content.vb: Public ReadOnly Property IsAccessDenied As Boolean
+  overload: System.Storage.StorageLookupError.IsAccessDenied*
+- uid: System.Storage.StorageLookupError.IsWrongKind
+  commentId: P:System.Storage.StorageLookupError.IsWrongKind
+  id: IsWrongKind
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: IsWrongKind
+  nameWithType: StorageLookupError.IsWrongKind
+  fullName: System.Storage.StorageLookupError.IsWrongKind
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether this value holds WrongKind.
+  example: []
+  syntax:
+    content: public bool IsWrongKind { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for this case.
+    content.vb: Public ReadOnly Property IsWrongKind As Boolean
+  overload: System.Storage.StorageLookupError.IsWrongKind*
+- uid: System.Storage.StorageLookupError.IsIoFailure
+  commentId: P:System.Storage.StorageLookupError.IsIoFailure
+  id: IsIoFailure
+  parent: System.Storage.StorageLookupError
+  langs:
+  - csharp
+  - vb
+  name: IsIoFailure
+  nameWithType: StorageLookupError.IsIoFailure
+  fullName: System.Storage.StorageLookupError.IsIoFailure
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether this value holds IoFailure.
+  example: []
+  syntax:
+    content: public bool IsIoFailure { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for this case.
+    content.vb: Public ReadOnly Property IsIoFailure As Boolean
+  overload: System.Storage.StorageLookupError.IsIoFailure*
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.StorageLookupError.ToString*
+  commentId: Overload:System.Storage.StorageLookupError.ToString
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError_ToString
+  name: ToString
+  nameWithType: StorageLookupError.ToString
+  fullName: System.Storage.StorageLookupError.ToString
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Storage.StorageLookupError.#ctor*
+  commentId: Overload:System.Storage.StorageLookupError.#ctor
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError__ctor_System_Storage_StorageLookupError_InvalidPath_
+  name: StorageLookupError
+  nameWithType: StorageLookupError.StorageLookupError
+  fullName: System.Storage.StorageLookupError.StorageLookupError
+  nameWithType.vb: StorageLookupError.New
+  fullName.vb: System.Storage.StorageLookupError.New
+  name.vb: New
+- uid: System.Storage.StorageLookupError.InvalidPath
+  commentId: T:System.Storage.StorageLookupError.InvalidPath
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageLookupError.html
+  name: StorageLookupError.InvalidPath
+  nameWithType: StorageLookupError.InvalidPath
+  fullName: System.Storage.StorageLookupError.InvalidPath
+  spec.csharp:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.Storage.StorageLookupError.InvalidPath.html
+  spec.vb:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.Storage.StorageLookupError.InvalidPath.html
+- uid: System.Storage.StorageLookupError.GetInvalidPath*
+  commentId: Overload:System.Storage.StorageLookupError.GetInvalidPath
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError_GetInvalidPath
+  name: GetInvalidPath
+  nameWithType: StorageLookupError.GetInvalidPath
+  fullName: System.Storage.StorageLookupError.GetInvalidPath
+- uid: System.Storage.StorageLookupError.NotFound
+  commentId: T:System.Storage.StorageLookupError.NotFound
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageLookupError.html
+  name: StorageLookupError.NotFound
+  nameWithType: StorageLookupError.NotFound
+  fullName: System.Storage.StorageLookupError.NotFound
+  spec.csharp:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.Storage.StorageLookupError.NotFound.html
+  spec.vb:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.Storage.StorageLookupError.NotFound.html
+- uid: System.Storage.StorageLookupError.GetNotFound*
+  commentId: Overload:System.Storage.StorageLookupError.GetNotFound
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError_GetNotFound
+  name: GetNotFound
+  nameWithType: StorageLookupError.GetNotFound
+  fullName: System.Storage.StorageLookupError.GetNotFound
+- uid: System.Storage.StorageLookupError.AccessDenied
+  commentId: T:System.Storage.StorageLookupError.AccessDenied
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageLookupError.html
+  name: StorageLookupError.AccessDenied
+  nameWithType: StorageLookupError.AccessDenied
+  fullName: System.Storage.StorageLookupError.AccessDenied
+  spec.csharp:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.Storage.StorageLookupError.AccessDenied.html
+  spec.vb:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.Storage.StorageLookupError.AccessDenied.html
+- uid: System.Storage.StorageLookupError.GetAccessDenied*
+  commentId: Overload:System.Storage.StorageLookupError.GetAccessDenied
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError_GetAccessDenied
+  name: GetAccessDenied
+  nameWithType: StorageLookupError.GetAccessDenied
+  fullName: System.Storage.StorageLookupError.GetAccessDenied
+- uid: System.Storage.StorageLookupError.WrongKind
+  commentId: T:System.Storage.StorageLookupError.WrongKind
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageLookupError.html
+  name: StorageLookupError.WrongKind
+  nameWithType: StorageLookupError.WrongKind
+  fullName: System.Storage.StorageLookupError.WrongKind
+  spec.csharp:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.WrongKind
+    name: WrongKind
+    isExternal: true
+    href: System.Storage.StorageLookupError.WrongKind.html
+  spec.vb:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.WrongKind
+    name: WrongKind
+    isExternal: true
+    href: System.Storage.StorageLookupError.WrongKind.html
+- uid: System.Storage.StorageLookupError.GetWrongKind*
+  commentId: Overload:System.Storage.StorageLookupError.GetWrongKind
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError_GetWrongKind
+  name: GetWrongKind
+  nameWithType: StorageLookupError.GetWrongKind
+  fullName: System.Storage.StorageLookupError.GetWrongKind
+- uid: System.Storage.StorageLookupError.IoFailure
+  commentId: T:System.Storage.StorageLookupError.IoFailure
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageLookupError.html
+  name: StorageLookupError.IoFailure
+  nameWithType: StorageLookupError.IoFailure
+  fullName: System.Storage.StorageLookupError.IoFailure
+  spec.csharp:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.IoFailure
+    name: IoFailure
+    isExternal: true
+    href: System.Storage.StorageLookupError.IoFailure.html
+  spec.vb:
+  - uid: System.Storage.StorageLookupError
+    name: StorageLookupError
+    isExternal: true
+    href: System.Storage.StorageLookupError.html
+  - name: .
+  - uid: System.Storage.StorageLookupError.IoFailure
+    name: IoFailure
+    isExternal: true
+    href: System.Storage.StorageLookupError.IoFailure.html
+- uid: System.Storage.StorageLookupError.GetIoFailure*
+  commentId: Overload:System.Storage.StorageLookupError.GetIoFailure
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError_GetIoFailure
+  name: GetIoFailure
+  nameWithType: StorageLookupError.GetIoFailure
+  fullName: System.Storage.StorageLookupError.GetIoFailure
+- uid: System.Storage.StorageLookupError.IsInvalidPath*
+  commentId: Overload:System.Storage.StorageLookupError.IsInvalidPath
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError_IsInvalidPath
+  name: IsInvalidPath
+  nameWithType: StorageLookupError.IsInvalidPath
+  fullName: System.Storage.StorageLookupError.IsInvalidPath
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System.Storage.StorageLookupError.IsNotFound*
+  commentId: Overload:System.Storage.StorageLookupError.IsNotFound
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError_IsNotFound
+  name: IsNotFound
+  nameWithType: StorageLookupError.IsNotFound
+  fullName: System.Storage.StorageLookupError.IsNotFound
+- uid: System.Storage.StorageLookupError.IsAccessDenied*
+  commentId: Overload:System.Storage.StorageLookupError.IsAccessDenied
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError_IsAccessDenied
+  name: IsAccessDenied
+  nameWithType: StorageLookupError.IsAccessDenied
+  fullName: System.Storage.StorageLookupError.IsAccessDenied
+- uid: System.Storage.StorageLookupError.IsWrongKind*
+  commentId: Overload:System.Storage.StorageLookupError.IsWrongKind
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError_IsWrongKind
+  name: IsWrongKind
+  nameWithType: StorageLookupError.IsWrongKind
+  fullName: System.Storage.StorageLookupError.IsWrongKind
+- uid: System.Storage.StorageLookupError.IsIoFailure*
+  commentId: Overload:System.Storage.StorageLookupError.IsIoFailure
+  isExternal: true
+  href: System.Storage.StorageLookupError.html#System_Storage_StorageLookupError_IsIoFailure
+  name: IsIoFailure
+  nameWithType: StorageLookupError.IsIoFailure
+  fullName: System.Storage.StorageLookupError.IsIoFailure

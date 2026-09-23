@@ -1,0 +1,85 @@
+; Generated from runtime/raven/src/System/Storage/StorageLookupError.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Storage.StorageLookupError.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.type System.Storage.StorageLookupError.InvalidPath
+.method instance .ctor() -> Void
+M00000011_IL_0000:
+M00000011_IL_0001:
+ldarg 0
+M00000011_IL_0002:
+pop
+M00000011_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Storage.StorageLookupError.NotFound
+.method instance .ctor() -> Void
+M00000012_IL_0000:
+M00000012_IL_0001:
+ldarg 0
+M00000012_IL_0002:
+pop
+M00000012_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Storage.StorageLookupError.AccessDenied
+.method instance .ctor() -> Void
+M00000013_IL_0000:
+M00000013_IL_0001:
+ldarg 0
+M00000013_IL_0002:
+pop
+M00000013_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Storage.StorageLookupError.WrongKind
+.method instance .ctor() -> Void
+M00000014_IL_0000:
+M00000014_IL_0001:
+ldarg 0
+M00000014_IL_0002:
+pop
+M00000014_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Storage.StorageLookupError.IoFailure
+.method instance .ctor() -> Void
+M00000015_IL_0000:
+M00000015_IL_0001:
+ldarg 0
+M00000015_IL_0002:
+pop
+M00000015_IL_0007:
+ldvoid
+ret
+.end
+.end

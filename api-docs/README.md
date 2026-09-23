@@ -107,3 +107,10 @@ The host-facing Rust Fault/FaultCode API and debugger `fault_code` field are cov
 in [faults.md](faults.md), linked from the API guide and navigation. These are host
 contracts, not synthetic CLI types for DocFX metadata. Keep that complete member/code
 reference synchronized with `src/fault_code.rs` and the debugger snapshot.
+
+System.Storage.Metadata, EntryKind and StorageLookupError are now included in DocFX
+selection. Their complete metadata reference and [lookup guide](storage-lookup.md)
+describe development host-path lookup. The provider GetFile members remain
+application-owned and are covered by the [sample reference](storage-experiment.md).
+No renderer exclusion is needed for these new signatures. Existing whole-file and
+Path string helpers remain tracked coverage gaps; they were not changed by this slice.
