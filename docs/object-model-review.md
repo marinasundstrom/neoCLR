@@ -154,3 +154,69 @@ Object()` idioms with a domain type. No lock API is introduced or promised.
 Migration: application classes now retain Object as their metadata base. A class
 that supplies ToString should declare an override; same-name hiding is rejected by
 the current importer/runtime profile. Use matching reference/library artifacts.
+
+
+## Identity prerequisites — 2026-09-23
+
+This bounded follow-up characterizes the next API slice before adding public
+ReferenceEquals/Equals/GetHashCode methods. A caller needs to distinguish a shared
+object from a different object with equal contents, including after casts and GC.
+The six raw-runtime tests in [object_identity_contract.rs](../tests/object_identity_contract.rs)
+roundtrip metadata through an artifact and check class/interface/Object aliases
+through mutation and collection, distinct boxes, array aliases, typed nulls, and
+execution-local diagnostic identities. They also record a concrete string gap:
+
+- Converting a String payload to Object allocates a wrapper on each conversion.
+  Reusing a stored Object wrapper preserves its identity; repeating the conversion
+  from the same String does not. Casting back to String loses the wrapper identity.
+- The .NET comparison preserves String identity across these conversions while
+  independently allocated equal strings remain distinct. String content equality
+  and equal hashes do not imply reference identity.
+- neoCLR's existing `ref.eq` is usable for class/array/box handles and nulls, but its
+  support for managed byref locations is a different contract. Object.ReferenceEquals
+  must not expose stack/interior-location equality as object identity.
+- Heap allocation IDs are stable and never reused within an execution. They restart
+  in another execution, so comparing diagnostic IDs alone is not a host-level
+  identity test. Current handle equality also checks the owning allocation.
+
+### .NET layers and implementation choices
+
+Sources checked 2026-09-23: [.NET 10 Object source](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Object.cs)
+implements ordinary class Equals using identity, static Equals with identity/null
+shortcuts followed by virtual dispatch, and GetHashCode through RuntimeHelpers.
+The [CoreCLR helper](https://github.com/dotnet/runtime/blob/v10.0.0/src/coreclr/System.Private.CoreLib/src/System/Runtime/CompilerServices/RuntimeHelpers.CoreCLR.cs)
+checks an existing hash before entering its runtime slow path. These are library
+and runtime layers; the signatures alone do not provide their behavior. The
+[ReferenceEquals contract](https://learn.microsoft.com/en-us/dotnet/api/system.object.referenceequals?view=net-10.0)
+and the expanded 14-assertion .NET baseline distinguish identity from overridable
+equality. The baseline requests compacting GC but does not prove relocation.
+
+Rust's [Rc::ptr_eq](https://doc.rust-lang.org/std/rc/struct.Rc.html#method.ptr_eq)
+likewise separates shared-allocation identity from payload equality. Its allocation
+model does not establish a safe address-based hash for a future moving managed heap.
+The earlier alternative-library review remains applicable: a library alone cannot
+repair identity lost by a runtime String conversion. No new .NET ecosystem library
+or API-review issue is claimed as evidence for changing Object's contract.
+
+Prefer .NET semantic outcomes over promoting wrapper identity into a public promise.
+The next implementation should keep ReferenceEquals nonvirtual and implement default
+class Equals/GetHashCode together, with override tests. An execution-local allocation
+ID can seed a stable 32-bit identity hash without exposing an address; the hash is
+not a unique ID, a serialized value or a cross-execution contract. Mixing/folding
+and service placement still require implementation and tests. Hashing mutable fields
+for default class equality is rejected because mutation would change an identity
+hash; automatically structural class equality would violate the selected baseline.
+
+For strings, compare a stable managed identity retained by payload copies and Object
+views against making String fully heap-backed. The former touches intrinsic/host
+representations; the latter also changes allocation budgets, roots and native
+boundaries. Interning by text would incorrectly merge distinct strings. Retaining
+today's wrapper behavior is cheapest but fails the desired cast/alias semantics.
+No representation change is selected by these characterization tests. Resolve this
+explicitly before describing Object identity as general; a first class/array/box-only
+API must state its String exclusion. Boxed value Equals/hash also needs payload
+receiver dispatch and a deliberate value policy; identity alone does not supply it.
+
+Typed collection equality remains a separate review item: an Object override must
+not silently replace existing Equatable<T> contracts. The follow-up adds no public
+methods, hash algorithm, collection change or Value migration.

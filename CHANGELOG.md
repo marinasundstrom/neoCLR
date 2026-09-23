@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Characterize Object identity prerequisites before adding equality/hash APIs.
+  Add artifact-roundtrip checks for aliases, mutation/GC, boxes, arrays, typed nulls
+  and execution-local allocation IDs; expose the existing String wrapper identity
+  gap in the review and website. Expand the pinned .NET baseline to 14 assertions,
+  including custom equality/hash and String conversion behavior. No public equality
+  method, hash algorithm or String representation change is implemented here.
+  Validation: six new identity cases and four existing reference-identity tests,
+  all 14 .NET baseline assertions and the combined website build passed.
+
 - Make Object abstract with validated base construction, following author direction;
   direct Object allocation is rejected. This differs from .NET's concrete Object.
   Implement the first Object.ToString slice with a concrete-type-name fallback and

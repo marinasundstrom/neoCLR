@@ -5718,3 +5718,24 @@ and recorded the convention for runtime code as well as examples.
 - **Validation:** 21 dispatch/construction tests, the source sample and negative
   abstract-construction check, three existing reflection/inheritance samples,
   generated library/API checks and the combined website build passed.
+
+### 2026-09-23 — Identity prerequisites after Object display
+
+- **Author:** asked to continue with the next slice after the abstract Object work.
+- **Assistant action:** committed the bounded display slice, then compared identity
+  prerequisites with the pinned .NET 10 baseline. Added raw-artifact scenarios for
+  casts/aliases, mutation and GC, arrays, boxes, typed nulls and heap identity scope.
+- **Finding:** String-to-Object conversion creates a wrapper; repeating the conversion
+  or roundtripping through String loses its identity. This differs from the .NET
+  baseline. Diagnostic allocation IDs also restart per execution and must not be
+  treated as globally unique object identities.
+- **Proposed next implementation:** keep ReferenceEquals separate from overridable
+  equality, implement class Equals/GetHashCode together, and explicitly resolve the
+  String representation/scope before claiming general Object identity. This is an
+  assistant recommendation; no further author decision is recorded here.
+- **Outcome:** characterization and documentation only; no equality API, hashing
+  algorithm, String storage replacement or System.Value migration in this follow-up.
+  See [the review](object-model-review.md#identity-prerequisites--2026-09-23).
+
+- **Validation:** all six new runtime identity cases, four existing reference-identity
+  tests, 14 .NET assertions and the combined website build passed.

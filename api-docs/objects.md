@@ -61,7 +61,10 @@ extraction and lifetime tests, rather than a type rename.
 The intended baseline is .NET-compatible reference/value semantics. The first Object display slice implements overridable class ToString with a
 runtime-type-name fallback. Equality and hashing should next be designed together: default reference identity
 for ordinary classes, value behavior for value types and consistent custom overrides.
-Equality and hashing are not yet implemented on Object. See Microsoft's
+Equality and hashing are not yet implemented on Object. String-to-Object
+conversions currently allocate wrappers: repeated conversions from one String do
+not preserve identity, unlike .NET. This is an unresolved representation gap, not
+a promised reference-equality contract. See Microsoft's
 [Object contract](https://learn.microsoft.com/en-us/dotnet/api/system.object?view=net-10.0)
 for the comparison baseline; neoCLR does not yet provide that entire surface.
 

@@ -22,7 +22,35 @@ Check(!ReferenceEquals(boxed, secondBox) && boxed.Equals(secondBox), "Separate b
 Check(boxed.GetHashCode() == secondBox.GetHashCode(), "Equal values have equal hashes; unequal hashes are not required");
 Check(ReferenceEquals(null, null) && !ReferenceEquals(first, null), "Reference equality handles null");
 Check(new Cell().ToString() == typeof(Cell).FullName, "Object formatting defaults to the runtime type name");
+var identityHash = first!.GetHashCode();
+first.Number++;
+GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, blocking: true, compacting: true);
+Check(ReferenceEquals(first, alias) && alias.GetHashCode() == identityHash,
+    "Default class identity and hash survive mutation and a requested compacting collection");
+var array = new[] { 1, 2 };
+Check(ReferenceEquals(array, (object)array) && !array.Equals(new[] { 1, 2 }),
+    "Array Object views preserve identity; equal elements do not imply Object equality");
+var text = new string(new[] { 's', 'a', 'm', 'e' });
+object textView = text;
+Check(ReferenceEquals(textView, (object)text) && ReferenceEquals(textView, (object)(string)textView),
+    "String Object conversions preserve identity");
+var sameText = new string(new[] { 's', 'a', 'm', 'e' });
+Check(!ReferenceEquals(text, sameText) && text.Equals(sameText) && text.GetHashCode() == sameText.GetHashCode(),
+    "Separate strings can be value-equal with equal hashes and distinct identity");
+var key = new Key(42);
+var equalKey = new Key(42);
+Check(key.Equals(equalKey) && !ReferenceEquals(key, equalKey) && key.GetHashCode() == equalKey.GetHashCode(),
+    "Custom equality and hash agree without changing reference identity");
+Check(object.Equals(key, equalKey) && object.Equals(null, null) && !object.Equals(key, null),
+    "Static Object equality handles null and dispatches the instance override");
 Console.WriteLine($"Runtime: {System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}");
 
 sealed class Cell { public int Number; }
 struct Pair { public int Number; public Cell Reference; }
+
+sealed class Key(int number)
+{
+    public int Number { get; } = number;
+    public override bool Equals(object? other) => other is Key key && key.Number == Number;
+    public override int GetHashCode() => Number;
+}

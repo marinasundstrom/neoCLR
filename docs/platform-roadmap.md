@@ -36,7 +36,10 @@ member stubs, a tested .NET baseline and Value's live dependencies. The bounded
 [Object.ToString/override sample](experiments/object-display/README.md) is implemented;
 Object is abstract by author direction; derived construction remains supported.
 Boxed-value and intrinsic-string virtual formatting still need receiver work. Identity,
-equality and hashing follow as a pair of related contracts. Value removal
+equality and hashing follow as a pair of related contracts. The completed
+[identity prerequisite review](object-model-review.md#identity-prerequisites--2026-09-23)
+records tested handle behavior and the String-to-Object wrapper identity gap; resolve
+that scope explicitly before exposing a general identity API. Value removal
 requires its own storage migration, not a rename to Object.
 
 When choosing work autonomously, follow the current author-directed focus and the
