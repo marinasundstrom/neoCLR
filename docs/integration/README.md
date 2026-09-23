@@ -93,3 +93,21 @@ exposed a generated-field collision in the imported artifact; the consumer uses
 `destination`. A reduced general CLI-metadata case and responsibility analysis are
 still required before changing Raven or the importer. This remains a deferred
 integration candidate, not a user-facing parameter-name restriction.
+
+
+### Queue-ownership fixture findings (2026-09-23)
+
+The worker adapter's Affinity.rvn fixture uses a synchronous owner method for
+bookkeeping after await and a separate synchronous Register helper for result
+observation. Initial versions exposed two unreduced integration failures:
+
+- A callback created inside the async Observe function and capturing its parameters
+  failed strict import with a receiver/state-machine stack-type mismatch.
+- A callback nested inside the Main queue callback captured the local result Task,
+  but its later GetResult call faulted with a null object reference.
+
+These observations do not yet establish compiler versus importer responsibility.
+Reduce them into independent CLI-metadata/emission cases before changing Raven;
+retain them as deferred general integration candidates. Runtime Contract settings,
+compiler code and target policy are unchanged. See the
+[fixture notes](../experiments/worker-task-cancellation/README.md#queue-ownership-characterization).

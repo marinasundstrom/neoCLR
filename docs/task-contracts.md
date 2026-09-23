@@ -439,3 +439,67 @@ The general fix is independently tested on ordinary Raven CLI metadata contracts
 (21 focused tests) and integrated into Raven main as c51c69bad; neoclr carries the
 same lowering fix as e56fc1ddf (40 focused tests). The target-specific branch remains
 separate. No parser or Task failure-state change was integrated into main.
+
+## Scheduling and suspension exploration — 2026-09-23
+
+The author clarified that TaskQueue was temporary scaffolding for building Task
+interfaces/contracts. Keep using it while useful and update the model when concrete
+needs arise, including runtime suspension. This is neither a commitment to preserve
+TaskQueue nor a decision to replace it now. No public Scheduler API is selected.
+
+Distinguish three responsibilities during that work: Task represents eventual
+completion; scheduling determines where/when runnable work executes; continuation
+dispatch determines where suspended work resumes. These are conceptual boundaries,
+not three required public types. Task.Run should express concurrent work through
+platform capabilities, whereas Thread remains an explicit native-thread API.
+Supporting workers on another platform also needs capture/transport contracts;
+choosing a scheduler alone does not make arbitrary closures transferable.
+
+### Current behavior to reconsider
+
+Promise captures a queue at construction. Its callbacks are posted to that queue.
+AsyncTaskMethodBuilder creates its result Promise on the calling queue, but
+AwaitOnCompleted registers MoveNext directly with the awaited task. Consequently,
+an incomplete await resumes through the **awaited producer's queue**, even when
+the async method's result belongs to a different calling queue. An already-completed
+await may continue inline; this experiment specifically covers a pending worker.
+
+[The affinity fixture](experiments/worker-task-cancellation/Affinity.rvn) starts a
+worker on the default queue, then awaits it from an explicit queue. After entry
+returns, the async body resumes without draining that explicit queue. Observation
+of the async method's result requires an explicit drain of the calling queue. The
+fixture records existing behavior so a future change can intentionally update the
+expectation; it does not endorse this split as permanent affinity semantics.
+Native notifications in this adapter are still driven only by the default queue.
+Explicit-queue worker submission remains unsupported by the experiment's contract;
+there is no newly implemented rejection or general custom-queue progress guarantee.
+
+### Comparison and options
+
+Reviewed 2026-09-23: Microsoft's
+[ConfigureAwait FAQ](https://devblogs.microsoft.com/dotnet/configureawait-faq/)
+explains that .NET Task awaits normally consider SynchronizationContext and then
+a non-default TaskScheduler when arranging a pending continuation. neoCLR currently
+has no equivalent await-site capture. Its simpler producer-queue behavior helped
+bootstrap the APIs, but does not provide caller-affinity guarantees. This is a
+missing design decision, not an improvement over .NET.
+
+Possible next implementations include capturing a continuation destination at await,
+using one runtime-owned execution context initially, or moving resumption ownership
+into the runtime suspension model. Retaining the present behavior costs least now;
+adding capture makes affinity explicit but needs lifetime/progress rules; runtime
+ownership can centralize suspension/rooting but requires more machinery. No option
+is selected merely by this comparison. A full public scheduler design needs broader
+platform research before adoption.
+
+Before a consumer requires these guarantees, use executable cases to settle:
+
+- What owns a suspended operation, its retained roots and its continuation destination?
+- How does native completion make it runnable without executing guest code on the
+  producer thread or resuming it twice?
+- What happens when completion races with cancellation or invocation shutdown?
+- What keeps pending operations alive when no guest callbacks are ready, and how
+  do limits, fairness and unsupported platform capabilities affect progress?
+
+These questions guide the next need-driven slice. They do not require exposing
+TaskQueue, Scheduler or a thread to every Storage caller.

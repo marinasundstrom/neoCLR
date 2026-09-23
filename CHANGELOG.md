@@ -8,6 +8,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Characterize queue ownership in the isolated worker adapter with a pending await
+  entered from an explicit caller queue: the body resumes through the producer's
+  queue, while result observation waits for the caller queue to drain. Keep this as
+  evidence of current behavior, not a future affinity guarantee. Record the author's
+  direction to evolve TaskQueue and the scheduling model when concrete needs arise,
+  including runtime suspension, without committing to retention or replacement.
+  Update the roadmap, Task contracts, on-site explanation and source download;
+  runtime and public APIs are unchanged. Record two unreduced callback-capture
+  integration failures for independent investigation.
+  Validation: exact cross-queue output, four worker cancellation/sibling outcomes
+  with GC and zero final live objects, UserFault and bootstrap boundary checks,
+  API snapshot, website tests/build and matching ten-file source archive.
+
 - Connect acknowledged per-job cancellation to Promise.Cancel in an isolated Raven
   worker adapter. Admit the two existing services in bootstrap RuntimeServices only;
   normal Thread/Task APIs and installed worker implementation stay unchanged. Add

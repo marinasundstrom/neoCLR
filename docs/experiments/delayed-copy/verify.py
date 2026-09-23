@@ -85,6 +85,14 @@ def main():
                 assert failed.returncode != 0 and 'code=UserFault' in failed.stderr, failed.stdout + failed.stderr
                 assert 'Unexpected continuation' not in failed.stdout, failed.stdout
                 print('Producer UserFault remains a Fault, not Task cancellation')
+            if (consumer / 'Affinity.rvn').exists():
+                shutil.copyfile(consumer / 'Affinity.rvn', root / 'Main.rvn')
+                run(['dotnet', 'msbuild', root / 'DelayedCopy.rvnproj', '-nologo', '-v:minimal'], env=env)
+                affinity = run([bundle / 'bin/neoclr', 'run', root / 'bin/neoclr/Debug/App.neoil',
+                                '--system', root / 'System.neoil'])
+                assert affinity.stdout == (consumer / 'affinity.expected.txt').read_text(), affinity.stdout + affinity.stderr
+                print(affinity.stdout, end='')
+                print('Current producer-bound await and caller-bound result observation: characterized')
             if (consumer / 'Forbidden.rvn').exists():
                 shutil.copyfile(consumer / 'Forbidden.rvn', root / 'Main.rvn')
                 rejected = subprocess.run(['dotnet', 'msbuild', str(root / 'DelayedCopy.rvnproj'), '-nologo', '-v:minimal'],

@@ -132,5 +132,16 @@ python3 docs/experiments/delayed-copy/verify.py --toolchain-root /path/to/develo
 ```
 
 The harness substitutes the adapter only in a temporary library. Installed APIs are
-unchanged. Queue affinity, public cancellation handles and real async file I/O remain
-future work.
+unchanged. A further `Affinity.rvn` fixture characterizes a pending cross-queue
+await: the async body resumes through the producer's default queue, while observation
+of the async method's result waits for its caller queue to be drained. This is current
+experimental behavior, not a permanent caller-affinity guarantee. In .NET, pending
+Task awaits normally consider the await site's context/scheduler; see Microsoft's
+[ConfigureAwait explanation](https://devblogs.microsoft.com/dotnet/configureawait-faq/).
+
+TaskQueue was scaffolding for the initial Task contracts. The model can change as
+concrete requirements arise, including runtime suspension. No public Scheduler type
+or replacement for TaskQueue has been selected. Continuation ownership and progress,
+public cancellation handles and real async file I/O remain open. Explicit-queue
+worker submission is not a supported case in this adapter; it has no new early
+rejection check.

@@ -261,9 +261,18 @@ cases preserve cancelled destinations and successful siblings with actual GC; ne
 fixtures retain UserFault identity and reject bootstrap service access. Cancellation
 submission uses fixture-only wiring, not a new public Thread member.
 
-**Next direction:** establish queue affinity for construction/submission/completion
-in the isolated adapter, then address byte payload accounting before introducing a
-filesystem producer. Public cancellation handles remain a separate contract decision.
+**Scheduling clarification, 2026-09-23:** TaskQueue is provisional scaffolding.
+The author directs adapting the model when requirements arise, including runtime
+suspension; neither retaining nor replacing TaskQueue is a commitment. No public
+Scheduler API is selected. The [scheduling exploration](task-contracts.md#scheduling-and-suspension-exploration--2026-09-23)
+and cross-queue worker fixture document current producer-bound await resumption
+versus caller-bound result observation. They characterize a limitation, not a future
+affinity guarantee.
+
+**Next direction:** use a concrete pending-operation case to settle continuation
+ownership/progress as needed, then address byte payload accounting before introducing
+a filesystem producer. Default-only worker notification remains experimental;
+explicit-queue worker submission and public cancellation handles remain open.
 Keep M1 suspension and cancellation work ahead of networking. Evaluate task-returning provider operations
 against that suspension model; do not expand Storage metadata or mutations without
 a concrete case. Preserve the working disk/memory consumer.

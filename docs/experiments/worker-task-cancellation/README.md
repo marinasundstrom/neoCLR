@@ -62,10 +62,30 @@ in this tested consumer. This is a deferred compiler/importer integration issue,
 not a reserved public naming rule. It needs a reduced general metadata test before
 choosing a compiler or importer fix. No Raven repository changes were made here.
 
+## Queue ownership characterization
+
+Affinity.rvn starts a worker from the default queue and awaits its pending Task
+inside an explicit caller queue. The async body resumes through the producer's
+default queue; observing the async method's result then requires draining the
+caller queue. The harness verifies the exact output in affinity.expected.txt.
+The async body keeps its bookkeeping in a synchronous owner method. An initial
+version with a nested callback capturing async parameters failed strict import
+with a state-machine/receiver stack-type mismatch. This remains an unreduced
+compiler/importer investigation. A nested Main callback also observed a null captured
+result Task; registration now uses a separate synchronous helper. Neither issue is
+claimed fixed or treated as a language restriction. See the
+[integration findings](../../integration/README.md#queue-ownership-fixture-findings-2026-09-23).
+This demonstrates current behavior, not a recommended affinity contract. No API or
+installed implementation changes are made. Explicit-queue worker submission is
+still outside the experiment's supported cases; no early rejection was added.
+
+TaskQueue remains scaffolding that can evolve when requirements justify it. See
+[scheduling and suspension exploration](../../task-contracts.md#scheduling-and-suspension-exploration--2026-09-23)
+for the .NET comparison, alternatives and unresolved ownership/progress rules.
+
 ## Next slice
 
-Choose and test queue affinity for the notification adapter before generalizing it:
-construction, submission and completion must agree on the consumer queue, or reject
-an unsupported explicit queue early. Keep producer cancellation wiring experimental
-until a public request/ownership contract is selected. Byte payload accounting and
-an actual filesystem producer follow those boundaries.
+Use a concrete pending-operation case to decide continuation ownership/progress
+when needed. Keep producer cancellation wiring experimental until a public
+request/ownership contract is selected. Byte payload accounting and an actual
+filesystem producer follow those boundaries.

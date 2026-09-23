@@ -1,0 +1,61 @@
+import System.*
+import System.Concurrency.*
+import System.Tasks.*
+import System.Console.*
+
+class AffinityProbe {
+    private field resumed: bool = false
+    private field observed: bool = false
+    val Resumed: bool => resumed
+    val Observed: bool => observed
+    func MarkObserved() {
+        observed = true
+    }
+
+    func Resume(caller: TaskQueue) {
+        resumed = true
+        WriteLine("Await resumed before caller queue was drained")
+        TaskQueue.Default.Post(() => self.DrainCaller(caller))
+    }
+
+    func DrainCaller(caller: TaskQueue) {
+        if observed {
+            System.Fault("Caller observation ran before its queue was drained")
+        }
+        caller.Drain()
+        if !observed {
+            System.Fault("Caller observation was not queued")
+        }
+        WriteLine("Caller queue drained explicitly")
+    }
+}
+
+async func Observe(work: Task<string>, caller: TaskQueue, probe: AffinityProbe) -> Task<string> {
+    let result = await work
+    probe.Resume(caller)
+    return result
+}
+
+func Register(result: Task<string>, probe: AffinityProbe) {
+    result.OnCompleted(() => {
+        if !probe.Resumed || result.GetResult() != "Hi" {
+            System.Fault("Unexpected continuation outcome")
+        }
+        probe.MarkObserved()
+        WriteLine("Result observation ran on caller queue")
+    })
+}
+
+func Main() {
+    let probe = AffinityProbe()
+    let work = Thread.Run(Produce, "Hi")
+    let caller = TaskQueue()
+    caller.Run(() => {
+        let result = Observe(work, caller, probe)
+        Register(result, probe)
+    })
+    if probe.Resumed || probe.Observed {
+        System.Fault("Worker completion ran synchronously")
+    }
+    WriteLine("Entry returned before worker completion")
+}

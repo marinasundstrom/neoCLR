@@ -5591,3 +5591,28 @@ and recorded the convention for runtime code as well as examples.
 - **Evidence:** [product](experiments/storage-poc/README.md),
   [contracts](experiments/storage-provider/ReaderContracts.rvn),
   [API guide](../api-docs/streams.md), [roadmap](platform-roadmap.md).
+
+
+### 2026-09-23 — Scheduling and provisional TaskQueue
+
+- **Author:** asked whether a scheduler concept is needed; explained that TaskQueue
+  was a temporary way to build the Task interfaces/contracts and that the model
+  must adapt to future needs, including runtime suspension.
+- **Assistant proposal:** distinguish completion, work scheduling and continuation
+  dispatch, initially as internal contracts rather than a public Scheduler API.
+  Proposed checking the worker adapter's queue limitations.
+- **Author clarification:** “I don't say that we should keep it, we will update the
+  model when there is a need.” This leaves both retention and replacement open.
+- **Action:** documented current Promise/builder ownership and added an executable
+  cross-queue characterization fixture. Updated the roadmap and on-site explanation;
+  no runtime or public API model is changed by this slice.
+- **Remaining:** select ownership/progress rules when a concrete consumer needs them;
+  runtime suspension, explicit-queue worker submission and public scheduler shape
+  remain open. The assistant's initial early-rejection approach was not implemented:
+  Raven queue-reference comparison encountered an unsupported importer comparison,
+  and this slice instead characterizes behavior without expanding the provisional API.
+- **Observed outcome:** the cross-queue fixture passes with the expected four lines;
+  existing cancellation/sibling, GC, UserFault and bootstrap-boundary checks pass.
+  API snapshot and combined website checks pass; no publication is claimed.
+- **Evidence:** [contracts](task-contracts.md#scheduling-and-suspension-exploration--2026-09-23),
+  [fixture](experiments/worker-task-cancellation/Affinity.rvn).
