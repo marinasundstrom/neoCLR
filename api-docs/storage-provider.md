@@ -32,8 +32,8 @@ Their concrete implementations and text conveniences remain sample-owned.
 are integrated into the platform; provider-specific descriptor state belongs to
 the sample implementation classes.
 
-A platform provider is not required to implement GetFile, ReadText or WriteText.
-StorageLookup extends it with GetFile; the sample extends that capability with
+A byte-only provider is not required to implement lookup, ReadText or WriteText.
+StorageLookup extends it with GetFile and GetDirectory; the sample extends that capability with
 temporary text conveniences. UTF-8
 conversion belongs above byte access; existing static file text helpers remain
 available with their current string paths and error types.
@@ -47,3 +47,19 @@ without requiring every backend to encode text or reproduce a metadata hierarchy
 The cost is another dispatch boundary and provider-specific identity and lifetime
 rules. Async I/O, richer metadata and portable replacement semantics remain open;
 this is an incremental POC contract, not the complete Storage proposal.
+
+## Directory lookup
+
+`StorageLookup.GetDirectory(path: Path) -> Result<Directory, StorageLookupError>`
+queries the current entry without creating anything or opening content. The result
+is the public Directory interface; its concrete implementation belongs to the
+provider. Missing entries return NotFound and files return WrongKind. Access and
+I/O failures are preserved. Success does not guarantee later child access.
+
+The disk sample checks the mapped native entry. The bounded memory sample exposes
+only `/` (also addressed by `.`); slash-containing file keys do not imply a tree.
+The product obtains its root through this method and uses the returned Directory
+for the same disk/memory workflow. Calls remain synchronous. Adding this required
+method is a development migration for StorageLookup implementers; byte-only
+StorageProvider implementations are unaffected. The separate lookup interface is
+transitional pending consolidation into the proposal's provider contract.

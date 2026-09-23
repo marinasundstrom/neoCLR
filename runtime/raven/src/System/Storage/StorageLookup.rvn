@@ -3,5 +3,6 @@ namespace System.Storage
 import System.*
 
 public interface StorageLookup : StorageProvider {
+    func GetDirectory(path: Path) -> Result<Directory, StorageLookupError>
     func GetFile(path: Path) -> Result<File, StorageLookupError>
 }

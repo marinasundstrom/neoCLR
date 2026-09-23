@@ -5503,3 +5503,44 @@ and recorded the convention for runtime code as well as examples.
   working read/write/lookup consumer, not additional formats, helpers or Uri APIs.
 - **Remaining:** integrate the existing provider surface in bounded slices; no
   overload signature or normalization behavior was selected by this exchange.
+
+
+### 2026-09-23 — Storage POC remains the product checkpoint
+
+- **Author:** reaffirmed: “The goal is to have a POC Storage API in place that can
+  demonstrate the API and file access.”
+- **Assistant:** scoped the checkpoint around a runnable app obtaining a directory
+  from a provider, resolving or creating a file, and reading/writing through streams.
+  Richer metadata and broader storage features remain later work.
+- **Action:** made that completion evidence explicit in the roadmap. Provider
+  GetDirectory now returns the Directory interface and the sample obtains its root
+  through lookup. The disk/memory product and directory contract checks pass.
+- **Remaining:** finish the minimal integrated provider surface; concrete disk/memory
+  providers are still sample-owned. This is not a claim that the full proposal is done.
+
+
+### 2026-09-23 — StreamReader for a comprehensible Storage sample
+
+- **Author:** suggested that the platform may also need a StreamReader class.
+- **Author clarification:** there will also be a TextReader interface.
+- **Assistant response:** consumers use TextReader; StreamReader implements it over
+  InputStream, allowing future text sources without a byte-stream dependency.
+- **Assistant proposal:** a minimal UTF-8 reader over InputStream with bounded
+  reads, explicit ownership and typed errors, shared by disk and memory consumers.
+- **Action:** recorded the .NET comparison and concrete contract questions in the
+  Streams proposal and linked it from the POC roadmap. No StreamReader API has been
+  implemented in the directory-lookup slice; namespace, signatures, BOM handling
+  and exact lifetime/error policies remain to be selected and tested.
+
+
+### 2026-09-23 — Seekability as a separate stream capability
+
+- **Author:** asked whether to implement a provisional ReadOnlyAccessStream
+  interface to allow seeking.
+- **Assistant recommendation:** use the proposal's SeekableStream capability
+  alongside InputStream; consider a combined SeekableInputStream only if needed.
+  Keep text readers usable with sequential streams and define buffer/decoder reset
+  behavior before adding text-reader repositioning.
+- **Action:** recorded the alternatives, .NET comparison and seek-and-reread
+  validation scenario in the Streams proposal. No seek API was implemented and no
+  author decision on the recommended name or signature is assumed.

@@ -3,7 +3,7 @@
   "owner": "System.Single",
   "inputs": {
     "runtime/raven/src/System/Storage/StorageItems.rvn": "6b4641f4d3d9c92ef840efdc48f25429ecb2cc505256478cf1da05a99fe6ee8c",
-    "runtime/raven/src/System/Storage/StorageLookup.rvn": "1275b326e9d701b9381c0aa186117365e30e390423ed8a29e58041062b77f5dc",
+    "runtime/raven/src/System/Storage/StorageLookup.rvn": "f188beb9efd54c02ed033823a58d8db170f0097fb49a995819bf46e04fd7b31a",
     "runtime/raven/src/System/Storage/StorageProvider.rvn": "5f05b218e821da5b4a74c358fe7773b57ae6b03dc0834dd62498bbe33ca65d37",
     "runtime/raven/src/System/Streams/InputStream.rvn": "73fbe20bcfc532ff6a51cdcf8a7f87158f964515ad58972cc55dd5a7220c8253",
     "runtime/raven/src/System/Streams/OutputStream.rvn": "5bceeed5c80ec358754e0f32e2c95f16a5ef8b84c4ff4f59d919d01174af3784",
@@ -105,7 +105,7 @@
     "Single.helpers.neoil": "3a68db74505b3614dcd99db43f35869674c75bf0517df3e34687ee96fba64b4f"
   },
   "compilerSha256": "571ac41551f849a5dd7b6ed3fa57080c6284e919baefe6550b6d48df6ea44919",
-  "coreSha256": "1250fe697389ef1abf21602ddf3edf3046976c8d38c85e2fda8b9721ee528ccf",
+  "coreSha256": "a00382e99ce809b44edee00dcaeec3a5959b3a92962a5bb366aad46097cdc841",
   "exports": [
     "readonly byref CompareTo(Single other) -> Int32"
   ]

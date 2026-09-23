@@ -3,7 +3,7 @@
   "owner": "System.Storage.StorageLookup",
   "inputs": {
     "runtime/raven/src/System/Storage/StorageItems.rvn": "6b4641f4d3d9c92ef840efdc48f25429ecb2cc505256478cf1da05a99fe6ee8c",
-    "runtime/raven/src/System/Storage/StorageLookup.rvn": "1275b326e9d701b9381c0aa186117365e30e390423ed8a29e58041062b77f5dc",
+    "runtime/raven/src/System/Storage/StorageLookup.rvn": "f188beb9efd54c02ed033823a58d8db170f0097fb49a995819bf46e04fd7b31a",
     "runtime/raven/src/System/Storage/StorageProvider.rvn": "5f05b218e821da5b4a74c358fe7773b57ae6b03dc0834dd62498bbe33ca65d37",
     "runtime/raven/src/System/Streams/InputStream.rvn": "73fbe20bcfc532ff6a51cdcf8a7f87158f964515ad58972cc55dd5a7220c8253",
     "runtime/raven/src/System/Streams/OutputStream.rvn": "5bceeed5c80ec358754e0f32e2c95f16a5ef8b84c4ff4f59d919d01174af3784",
@@ -101,12 +101,13 @@
     "build/NeoCLR.Raven.props": "b7d01e1d6b23228bb784dafcda4cf7c777b554b11f093cc3daf2509bb7402ee0"
   },
   "outputs": {
-    "StorageLookup.methods.neoil": "1726d764331b11cd13396b5da2999255d3b67ce73ca28c58d25045c7fdc828fb",
+    "StorageLookup.methods.neoil": "1496cc2e0881f9e2bd565c8d0ba0164ab400c607575e05ac4355df01b7849e2b",
     "StorageLookup.helpers.neoil": "da1416d2bdbcd56ba282027dd0b63e33f7b8f0d65122b1da0f3927c88be5a7f8"
   },
   "compilerSha256": "571ac41551f849a5dd7b6ed3fa57080c6284e919baefe6550b6d48df6ea44919",
-  "coreSha256": "1250fe697389ef1abf21602ddf3edf3046976c8d38c85e2fda8b9721ee528ccf",
+  "coreSha256": "a00382e99ce809b44edee00dcaeec3a5959b3a92962a5bb366aad46097cdc841",
   "exports": [
+    "GetDirectory(System.Storage.Path path) -> System.Result<System.Storage.Directory,System.Storage.StorageLookupError>",
     "GetFile(System.Storage.Path path) -> System.Result<System.Storage.File,System.Storage.StorageLookupError>"
   ]
 }

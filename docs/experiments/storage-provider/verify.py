@@ -76,6 +76,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-storage-provider-') as folder:
     resolved = subprocess.run([str(bundle / 'bin/neoclr'), 'run', str(root / 'bin/neoclr/Debug/App.neoil'), '--system', str(bundle / 'lib/System.neoil')], cwd=work / 'sandbox', capture_output=True, text=True, timeout=60)
     assert resolved.returncode == 0, resolved.stdout + resolved.stderr
     assert resolved.stdout == 'Relative directory lookup contracts: passed\n', resolved.stdout
+    assert not (work / 'sandbox/absent-directory').exists(), 'Directory lookup created an entry'
+    assert (work / 'sandbox/context/nested/note.txt').read_text() == 'lookup contents'
     print(resolved.stdout, end='')
 
     shutil.copyfile(HERE / 'ProviderContracts.rvn', root / 'Main.rvn')

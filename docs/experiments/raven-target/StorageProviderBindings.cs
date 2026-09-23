@@ -11,6 +11,7 @@ static class StorageProviderBindings
     public const string Declarations = """
         namespace Storage {
             public interface StorageLookup : StorageProvider {
+                Result<Directory, StorageLookupError> GetDirectory(Path path);
                 Result<File, StorageLookupError> GetFile(Path path);
             }
             public interface StorageProvider {
@@ -25,6 +26,7 @@ static class StorageProviderBindings
         if (owner is null || !IsName(owner)) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var expected = (owner, reference.Name) switch {
+            (Lookup, "GetDirectory") => ("System.Storage.Path", "System.Result<System.Storage.Directory,System.Storage.StorageLookupError>"),
             (Lookup, "GetFile") => ("System.Storage.Path", "System.Result<System.Storage.File,System.Storage.StorageLookupError>"),
             (Name, "OpenRead") => ("System.Storage.Path", "System.Result<System.Streams.InputStream,System.Streams.StreamError>"),
             (Name, "CreateNew") => ("System.Storage.Path", "System.Result<System.Streams.OutputStream,System.Streams.StreamError>"),
@@ -42,7 +44,7 @@ static class StorageProviderBindings
     {
         foreach (var (name, members) in new[] {
             (Name, new[] { "OpenRead", "CreateNew" }),
-            (Lookup, new[] { "GetFile" }) })
+            (Lookup, new[] { "GetFile", "GetDirectory" }) })
         {
             var type = module.GetType(name);
             if (type is null || !type.IsPublic || !type.IsInterface || type.HasGenericParameters

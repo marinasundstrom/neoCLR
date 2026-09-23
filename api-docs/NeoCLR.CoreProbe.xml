@@ -679,14 +679,20 @@
       <remarks>The exact method is documented in the [manual reference](/docs/storage-items.html#writealltext) because DocFX cannot render its unit-valued Result. Invalid limits and oversized text are rejected before modification. Later I/O failures can leave partial output; this is not atomic replacement.</remarks>
     </member>
     <member name="T:System.Storage.StorageLookup">
-      <summary>A byte provider that can query a file address without retaining a stream.</summary>
-      <remarks>Extends StorageProvider. GetFile returns a descriptor bound to the queried provider and logical address, or StorageLookupError. Implementations inspect current kind/existence rather than opening content. Success is an observation, not a guarantee of later access. Byte-only providers need not implement this interface.</remarks>
+      <summary>A byte provider that can query file and directory addresses without retaining streams.</summary>
+      <remarks>Extends StorageProvider. GetFile and GetDirectory return interface descriptors bound to the queried provider and logical address, or StorageLookupError. Implementations inspect current kind/existence rather than opening content. Success is an observation, not a guarantee of later access. Byte-only providers need not implement this interface.</remarks>
     </member>
     <member name="M:System.Storage.StorageLookup.GetFile(System.Storage.Path)">
       <summary>Looks up an existing file and returns its provider-bound descriptor.</summary>
       <param name="path">Validated logical file address.</param>
       <returns>A File retaining this provider and address, or StorageLookupError such as NotFound, WrongKind, AccessDenied, InvalidPath or IoFailure.</returns>
       <remarks>Must not create the file or retain an open stream. Provider-specific aliases and concurrent changes do not establish stable item identity.</remarks>
+    </member>
+    <member name="M:System.Storage.StorageLookup.GetDirectory(System.Storage.Path)">
+      <summary>Looks up an existing directory and returns its provider-owned interface.</summary>
+      <param name="path">Validated logical directory address interpreted by this provider.</param>
+      <returns>A Directory retaining its provider context and logical address, or StorageLookupError such as NotFound, WrongKind, AccessDenied, InvalidPath or IoFailure.</returns>
+      <remarks>Synchronous; may block. Does not create directories or retain an open stream. Success observes current kind, not stable identity or guaranteed later access. Providers define their directory model: the sample memory provider exposes only its root.</remarks>
     </member>
     <member name="T:System.Storage.Directory">
       <summary>The directory branch of StorageItem, implemented by storage providers.</summary>

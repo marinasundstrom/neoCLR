@@ -110,7 +110,7 @@ reference synchronized with `src/fault_code.rs` and the debugger snapshot.
 
 System.Storage.Metadata, EntryKind and StorageLookupError are now included in DocFX
 selection. Their complete metadata reference and [lookup guide](storage-lookup.md)
-describe development host-path lookup. StorageLookup.GetFile is the integrated optional lookup capability; concrete
+describe development host-path lookup. StorageLookup.GetFile/GetDirectory are the integrated optional lookup capability; concrete
 providers remain [sample implementations](storage-experiment.md).
 No renderer exclusion is needed for these new signatures. FileText and its legacy text error types are now selected too; only WriteAllText is
 excluded because DocFX 2.80.1 cannot render Result<System.Void, FileWriteError>. Its

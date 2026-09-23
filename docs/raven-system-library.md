@@ -1239,3 +1239,10 @@ interface static methods are not admitted. The legacy System profile retains Fil
 original bodies/call-site identities and forwards FileText calls to them; the Raven
 profile selects FileText bodies and the File interface. Use matching regenerated
 artifacts. No Raven compiler or Runtime Contract policy change was required.
+
+
+StorageLookup now also declares GetDirectory(Path), returning the Directory
+interface in Result with StorageLookupError. The matching strict bridge validates
+this member and the regenerated reference/runtime must be used together. This
+extends the transitional lookup capability toward the selected provider model;
+no new native method, compiler policy or Runtime Contract setting is introduced.

@@ -1663,3 +1663,79 @@ The distinction between concrete types and contracts is therefore central:
 > **Concrete stream types expose the capabilities they support. API contracts request only the capabilities they require.**
 
 This gives NeoCLR a stream model that remains recognizable to .NET developers while making capability requirements explicit in the type system and leaving room for future abstractions where actual platform requirements justify them.
+
+## Minimal text reader for the Storage POC — 2026-09-23
+
+**Exploration, not an implemented API.** The author suggested a StreamReader class
+and then specified that there will also be a TextReader interface. StreamReader
+will implement that consumer-facing contract over InputStream,
+so the Storage POC can demonstrate text file access without making every consumer
+assemble byte chunks and decode them. The assistant proposes a small UTF-8 reader
+above InputStream, usable with disk and memory alike. Consumers should request
+TextReader when they need text, without requiring a byte-stream-backed implementation.
+This permits future string-backed readers without making them part of this POC.
+Neither the interface nor StreamReader should resolve paths
+or depend on a Storage provider.
+
+### Comparison and provisional scope
+
+Primary references checked 2026-09-23: [.NET 10 StreamReader constructors](https://learn.microsoft.com/en-us/dotnet/api/system.io.streamreader.-ctor?view=net-10.0)
+accept streams, offer encoding/BOM and leaveOpen options, and normally dispose the
+wrapped stream. [ReadToEnd](https://learn.microsoft.com/en-us/dotnet/api/system.io.streamreader.readtoend?view=net-10.0)
+returns the remaining text as one string. Those library policies are separate from
+CLR stream or scheduler mechanisms.
+
+Start by evaluating bounded whole-text reading over the existing InputStream and
+strict Utf8 decoder. This can replace the sample's ReadMessage + Utf8.Decode glue
+without introducing native entry points. A helper function would be the smallest alternative, but the author selected a
+TextReader interface as part of the model. That separates the text contract from
+byte decoding. StreamReader provides lifetime state and a place for later buffered
+line reading, at the cost of another object, interface dispatch and ownership rules. Broad .NET encoding,
+path-constructor and async overload parity is not needed for this POC.
+
+Compared with the [.NET TextReader abstract base class](https://learn.microsoft.com/en-us/dotnet/api/system.io.textreader?view=net-10.0),
+neoCLR's selected TextReader is an interface: implementations provide behavior
+without inheriting a common class. Shared implementation, default operations and
+the exact method set are not selected yet. Do not copy the full .NET member set.
+
+Before implementing, settle the minimal TextReader members, constructor/namespace and these observable contracts:
+
+- Maximum input-byte bound, including how to distinguish exact-bound EOF from
+  overflow and whether an overflow probe consumes a byte.
+- Ownership of the wrapped stream, close behavior and use after close; do not
+  silently change ownership on a failed read.
+- Typed distinction between underlying I/O failure, malformed UTF-8 and size limits.
+- BOM policy, empty text and multi-byte characters split across partial reads.
+- Remaining-stream semantics on repeated reads and after an error.
+
+Tests should run the same reader against disk and a short-read memory stream,
+including split multi-byte text, EOF, exact/over bounds, invalid UTF-8, propagated
+I/O failure and close ownership. Bounded whole-text reading retains bytes and a
+result string, so it is not constant-memory streaming. ReadLine/incremental decoding,
+other encodings and async operation remain follow-ups unless the POC requires them.
+
+
+## POC seekability question — 2026-09-23
+
+**Author question:** should a provisional ReadOnlyAccessStream interface allow
+seeking? **Assistant recommendation, not an author-selected new API:** retain
+InputStream for reading and add the already-proposed SeekableStream capability
+when a concrete seek-and-reread sample needs it. ReadOnlyAccessStream does not
+communicate the extra positioning guarantee. A nominal SeekableInputStream may
+combine the two if the target compiler cannot express the required capability
+composition; that support must be validated before selecting consumer signatures.
+
+[.NET 10 Stream.CanSeek](https://learn.microsoft.com/en-us/dotnet/api/system.io.stream.canseek?view=net-10.0)
+and [Stream.Seek](https://learn.microsoft.com/en-us/dotnet/api/system.io.stream.seek?view=net-10.0)
+(primary references checked 2026-09-23) expose seek support as a runtime property;
+unsupported streams can reject positioning operations. The neoCLR alternative
+expresses the requirement as an interface, at the cost of additional types and
+capability discovery/composition. No new seek interface is implemented in this slice.
+
+Keep this optional for the sequential Storage/text-reading POC. A follow-up should
+prove byte-position semantics on disk and memory, seek-and-reread, EOF, invalid
+positions, closed streams and unchanged cursor on rejected positions. Select
+absolute versus origin-relative positioning and numeric bounds explicitly; length
+and resizing are not implied. A buffered StreamReader must not assume that seeking
+its underlying stream also resets unread bytes or decoding state. TextReader does
+not require byte seekability; reader-aware repositioning remains a separate design.

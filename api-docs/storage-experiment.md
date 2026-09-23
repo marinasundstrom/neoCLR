@@ -18,15 +18,14 @@ Download the tested [project file](/samples/storage-provider/StorageExplorer.rvn
 memory. An oversized replacement is rejected without changing the saved contents.
 
 ```raven
-match Path.Parse("/") {
-    Ok(let path) => {
-        let host: StorageProvider = HostStorage("sandbox")
-        let disk: Directory = ProviderDirectory(host, path)
-        ByteRoundTrip(disk, host)
-    }
-    Error(_) => System.Fault("Invalid logical path")
-}
+let host: StorageProvider = HostStorage("sandbox")
+let root = RequirePath("/")
+let disk = RequireDirectory(host, root)
+ByteRoundTrip(disk, host)
 ```
+
+RequireDirectory is the sample helper that unwraps provider GetDirectory and
+returns the Directory interface, faulting if sample setup cannot resolve its root.
 
 The text workflow uses existing synchronous UTF-8 helpers. The additional
 `ByteRoundTrip(directory)` workflow uses directional [file streams](streams.md) on
@@ -62,6 +61,7 @@ above them.
 
 | Member | Contract |
 | --- | --- |
+| `GetDirectory(path: Path) -> Result<Directory, StorageLookupError>` | Query an existing directory through its public interface. Disk checks native kind; memory exposes only its root. Missing returns NotFound, file returns WrongKind. |
 | `GetFile(path: Path) -> Result<File, StorageLookupError>` | Query a current file and return a provider-bound descriptor; does not retain a stream or guarantee later availability. Root/directory returns WrongKind and missing entries return NotFound. |
 | `OpenRead(path: Path) -> Result<InputStream, StreamError>` | Open an existing byte file with a new read cursor at zero, or report an expected error. |
 | `CreateNew(path: Path) -> Result<OutputStream, StreamError>` | Exclusively create a byte file. Existing entries are not overwritten. |

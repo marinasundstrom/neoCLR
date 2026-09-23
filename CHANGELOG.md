@@ -8,6 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Add synchronous StorageLookup.GetDirectory(Path), returning the public Directory
+  interface with typed missing/wrong-kind errors. The disk/memory product obtains
+  its root through provider lookup. Disk validates native kind; the bounded memory
+  provider exposes only its root and does not infer directories from file keys.
+  Development migration: StorageLookup implementers must add GetDirectory; byte-only
+  providers are unchanged. Document the contract and refresh API/runtime snapshots.
+  Provider consolidation, generic item lookup and enumeration remain follow-ups.
+  Validation: SDK disk/memory product and contract/negative suite, strict interface
+  import, runtime/API snapshots and combined website pass. Reaffirm the bounded POC
+  checkpoint and record TextReader/StreamReader as planned follow-up work and
+  seekability as an open design question, not implemented APIs.
+
 - Implement StorageItem as a closed root over provider-implemented File and Directory
   interfaces. Provider result contracts expose interfaces; concrete classes remain
   implementation details. Move descriptor classes into the sample providers; test common

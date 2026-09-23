@@ -15,3 +15,15 @@ func RequirePath(text: string) -> Path {
         }
     }
 }
+
+// Application bootstrap unwraps lookup while retaining only the public interface.
+func RequireDirectory(provider: System.Storage.StorageLookup, path: System.Storage.Path) -> System.Storage.Directory {
+    return match provider.GetDirectory(path) {
+        Ok(let directory) => directory
+        Error(let error) => {
+            System.Fault(error.ToString())
+            // Fault does not yet have compiler-visible non-returning semantics.
+            RequireDirectory(provider, path)
+        }
+    }
+}

@@ -88,8 +88,8 @@ func Main() {
     let memory: StorageProvider = MemoryStorage()
     // Parsing does not open storage. The same logical root works for both providers.
     let root = RequirePath("/")
-    let disk = ProviderDirectory(host, root)
-    let temporary = ProviderDirectory(memory, root)
+    let disk = RequireDirectory(host, root)
+    let temporary = RequireDirectory(memory, root)
     WriteLine("Disk")
     RoundTrip(disk, host)
     ByteRoundTrip(disk, host)

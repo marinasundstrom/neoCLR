@@ -799,3 +799,10 @@ Raw neoIL does not enforce the closed marker. Provider resolution remains a foll
 The development native text calls are FileText.ReadAllText/WriteAllText; File is now
 an interface with no constructors or static helpers. Legacy raw File helper names
 remain supported. The source/reference/runtime snapshot must be updated together.
+
+
+StorageLookup additionally admits GetDirectory(Path) -> Result<Directory,
+StorageLookupError>. Reference declarations, strict signature validation and the
+Raven bootstrap contract include it. Provider implementations return the core
+interface; the importer requires no provider-specific concrete class. This is a
+development contract change with no Raven compiler or Runtime Contract setting change.

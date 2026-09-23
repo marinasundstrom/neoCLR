@@ -115,3 +115,13 @@ Storage alignment has begun with a [validated Path experiment](storage-experimen
 using this working stream sample. Provider lookup, identity and error contracts are next. The sample's InputStream/OutputStream interfaces
 are still application-owned experiments. General capability interfaces, automatic
 disposal, asynchronous I/O and suspension-aware buffer ownership remain open.
+
+
+## Text reader direction
+
+The planned TextReader interface will describe text reading; StreamReader will
+implement it over InputStream for the Storage POC so
+applications can read UTF-8 text without assembling byte buffers themselves. It is
+not implemented yet. The first iteration should define bounded reads, partial-byte
+handling, decoding errors and ownership of the wrapped stream. Additional encodings,
+line reading and async behavior are separate extensions.

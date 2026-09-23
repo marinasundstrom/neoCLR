@@ -129,6 +129,19 @@ class HostStorage : StorageProvider {
         return System.Storage.Path.Combine(root, text)
     }
 
+    func GetDirectory(path: Path) -> Result<Directory, StorageLookupError> {
+        return match System.Storage.Metadata.GetKind(Resolve(path)) {
+            Ok(let kind) => {
+                if kind.IsDirectory {
+                    let directory: Directory = ProviderDirectory(self, path)
+                    return Ok(directory)
+                }
+                Error(StorageLookupError(StorageLookupError.WrongKind()))
+            }
+            Error(let error) => Error(error)
+        }
+    }
+
     func GetFile(path: Path) -> Result<File, StorageLookupError> {
         return match System.Storage.Metadata.GetKind(Resolve(path)) {
             Ok(let kind) => {
@@ -196,6 +209,19 @@ class MemoryStorage : StorageProvider {
             index += 1
         }
         return -1
+    }
+
+    // This bounded provider has one directory: its root. Slash-containing keys
+    // do not implicitly create a directory tree.
+    func GetDirectory(path: Path) -> Result<Directory, StorageLookupError> {
+        if Key(path) == "/" {
+            let directory: Directory = ProviderDirectory(self, path)
+            return Ok(directory)
+        }
+        if Find(path) >= 0 {
+            return Error(StorageLookupError(StorageLookupError.WrongKind()))
+        }
+        return Error(StorageLookupError(StorageLookupError.NotFound()))
     }
 
     func GetFile(path: Path) -> Result<File, StorageLookupError> {

@@ -486,3 +486,38 @@ foundation and static file import probes pass. All 10 native file/Path regressio
 cases pass, retaining legacy call-site identity and native status behavior. Runtime
 and API snapshots pass; 244 generated items have summaries. Four website tooling
 tests and the combined 13-page site build pass without DocFX warnings.
+
+
+### Provider directory lookup — 2026-09-23
+
+StorageLookup.GetDirectory(Path) returns Result<Directory, StorageLookupError>.
+The product now obtains its root through the provider, leaving ProviderDirectory
+construction inside provider code. Existing address-only contract fixtures still
+construct it intentionally. Disk lookup checks Metadata.GetKind and preserves errors;
+the flat memory fixture exposes only its root (`/` or `.`). Slash-containing keys
+do not imply directories. No creation, stream ownership or metadata cache is added.
+
+This extends the .NET/WinRT comparison above (primary references checked 2026-09-23):
+unlike constructing a [.NET 10 DirectoryInfo](https://learn.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.-ctor?view=net-10.0)
+address without checking existence, this operation queries current kind before
+returning an interface, similar to [WinRT folder retrieval](https://learn.microsoft.com/en-us/uwp/api/windows.storage.storagefolder.getfolderasync?view=winrt-26100). It is synchronous and
+returns typed errors; it does not promise WinRT async behavior. Keeping construction
+as the public entry point was simpler but did not meet the selected provider
+boundary. The cost of lookup is a provider call and a stale observation can still
+precede failure on later access. Native implementation and GC ownership are unchanged.
+
+This required member is a development compatibility change for StorageLookup
+implementers. It is an incremental step toward consolidating resolution on
+StorageProvider, not a commitment to the temporary byte/lookup split. Generic item
+lookup, directory-to-directory traversal and enumeration remain next. Tests cover
+root aliases, disk nested lookup, missing/wrong-kind errors, the memory policy and
+reading through the returned Directory without a concrete cast.
+
+
+Directory-lookup validation: the normal SDK product and complete contract/negative
+suite pass, including missing/wrong-kind directories, root aliases, nested disk
+lookup and subsequent file reads through interfaces. Directory lookup creates no
+entry. The expanded contract fixture was reduced to one run of each existing case
+after duplicated runs hit the VM instruction budget; the runtime limit is unchanged.
+Strict interface import, bootstrap snapshot hashes, 245 documented API items and
+the combined website pass. No native runtime or Raven compiler changes were required.

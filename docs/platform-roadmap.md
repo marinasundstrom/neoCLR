@@ -195,7 +195,27 @@ Directory in Raven metadata and the strict importer, while provider implementati
 of either branch are accepted. The disk/memory sample owns ProviderFile and
 ProviderDirectory. Raw neoIL does not enforce that metadata. Native static text
 helpers move to FileText in the development Raven API; legacy raw aliases remain.
-**Next:** align provider GetItem/GetFile/GetDirectory and directory traversal, then
+Provider GetDirectory now returns the Directory interface through the transitional
+StorageLookup capability. The disk/memory product resolves its root through that
+contract; disk checks current kind and memory exposes only its root. Missing/wrong-kind
+results and retained provider context are covered by the directory contract sample.
+**POC scope reaffirmed by the author, 2026-09-23:** deliver a small Storage API that
+can demonstrate the abstraction and real file access. The completion evidence is a
+runnable, documented app obtaining a directory through the provider contract and
+resolving/creating a file, writing bytes and reading them back through streams, with
+expected failures visible. Keep the selected StorageItem/File/Directory interface
+model; finish the minimal provider integration needed by this product before
+expanding metadata, mutation operations or provider breadth. The current disk/memory
+sample demonstrates the workflow, but its concrete providers remain sample-owned.
+
+The author also suggests StreamReader for this POC and specifies a TextReader
+interface. Consumers depend on TextReader; StreamReader implements it as a minimal
+provider-independent UTF-8 reader over InputStream to remove byte-buffer/decoding plumbing from the text
+consumer; [scope and contract questions](proposals/streams-api.md#minimal-text-reader-for-the-storage-poc--2026-09-23)
+cover bounds, partial reads, errors and ownership. This is planned work, not an
+implemented API or a requirement for full .NET StreamReader parity.
+
+**Next:** consolidate provider resolution (including GetItem) and directory traversal, then
 integrate the minimal host provider and mixed GetItems enumeration with explicit
 bounds and failure semantics. StorageLookup and the byte-provider-first shape are
 still transitional, as are FileAt/CreateNew address operations. Keep the disk/memory

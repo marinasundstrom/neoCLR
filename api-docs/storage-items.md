@@ -10,10 +10,10 @@ storage query. A Path describes an address in a provider namespace; it does not
 establish access or stable identity. Callers depend on the interfaces rather than
 constructing File or Directory themselves.
 Provider methods return the interfaces, even when they instantiate concrete classes
-internally. Current StorageLookup.GetFile returns Result<File, StorageLookupError>;
-future directory/item lookup and enumeration must preserve the same boundary.
-The sample bootstraps ProviderDirectory explicitly while provider GetDirectory is
-pending; its consumer functions accept Directory, not the concrete class.
+internally. StorageLookup.GetFile returns Result<File, StorageLookupError> and
+GetDirectory returns Result<Directory, StorageLookupError>. The product sample now
+obtains its root through GetDirectory; consumer functions accept Directory.
+Generic item lookup and enumeration must preserve the same boundary.
 
 The Raven compiler and strict CIL importer enforce the closed root. Providers may
 implement File/Directory, but an unrelated third StorageItem branch is rejected.
@@ -43,7 +43,8 @@ The memory fixture uses flat keys and does not model a full directory hierarchy.
 StorageProvider's byte methods and the separate StorageLookup capability remain
 transitional. The selected model moves path resolution onto StorageProvider, with
 GetItem/GetFile/GetDirectory, and adds Directory traversal and GetItems enumeration
-of StorageItem values. GetItem/GetDirectory/GetItems are **not implemented yet**.
+of StorageItem values. Provider GetDirectory now works through StorageLookup;
+Directory.GetDirectory, GetItem and GetItems are **not implemented yet**.
 Creation/address factories will be aligned with resolved storage objects in that
 work; FileAt/CreateNew should not be treated as the final creation model. Async
 interaction needs scheduling and cancellation contracts before claiming nonblocking I/O.

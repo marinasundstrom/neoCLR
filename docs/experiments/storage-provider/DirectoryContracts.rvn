@@ -35,11 +35,11 @@ func DirectoryCases(provider: StorageProvider, content: string) {
     }
     let context = ProviderDirectory(provider, RequirePath("/context"))
     CheckResolved(context.GetFile(RequirePath("nested/note.txt")), target.Text, content)
-    let root = ProviderDirectory(provider, RequirePath("/"))
+    let root = RequireDirectory(provider, RequirePath("/"))
     CheckResolved(root.GetFile(RequirePath("context/nested/note.txt")), target.Text, content)
     let relative = ProviderDirectory(provider, RequirePath("context"))
     CheckResolved(relative.GetFile(RequirePath("nested/note.txt")), "context/nested/note.txt", content)
-    let current = ProviderDirectory(provider, RequirePath("."))
+    let current = RequireDirectory(provider, RequirePath("."))
     CheckResolved(current.GetFile(RequirePath("context/nested/note.txt")), "context/nested/note.txt", content)
     // Absolute syntax is valid for a provider, but rejected by a directory context.
     CheckResolved(provider.GetFile(target), target.Text, content)
@@ -78,8 +78,51 @@ func DirectoryCases(provider: StorageProvider, content: string) {
     }
 }
 
+func DirectoryLookupCases(provider: StorageProvider) {
+    let root = RequireDirectory(provider, RequirePath("/"))
+    let current = RequireDirectory(provider, RequirePath("."))
+    if root.Path.Text != "/" || current.Path.Text != "." {
+        System.Fault("Directory lookup changed logical spelling")
+    }
+    let item: System.Storage.StorageItem = root
+    if item.Path.Text != "/" {
+        System.Fault("Directory lost StorageItem contract")
+    }
+    match provider.GetDirectory(RequirePath("context/nested/note.txt")) {
+        Error(let error) => {
+            if !error.IsWrongKind {
+                System.Fault("File lookup as directory changed error")
+            }
+        }
+        Ok(_) => System.Fault("File returned as directory")
+    }
+    match provider.GetDirectory(RequirePath("absent-directory")) {
+        Error(let error) => {
+            if !error.IsNotFound {
+                System.Fault("Missing directory changed error")
+            }
+        }
+        Ok(_) => System.Fault("Missing directory returned")
+    }
+}
+
 func Main() {
-    DirectoryCases(HostStorage("."), "disk contents")
-    DirectoryCases(MemoryStorage(), "memory contents")
+    let disk: StorageProvider = HostStorage(".")
+    let memory: StorageProvider = MemoryStorage()
+    DirectoryCases(disk, "lookup contents")
+    DirectoryCases(memory, "lookup contents")
+    DirectoryLookupCases(disk)
+    DirectoryLookupCases(memory)
+    let nested = RequireDirectory(disk, RequirePath("context/nested"))
+    CheckResolved(nested.GetFile("note.txt"), "context/nested/note.txt", "lookup contents")
+    // Memory keys do not imply directories; that is a provider policy.
+    match memory.GetDirectory(RequirePath("context/nested")) {
+        Error(let error) => {
+            if !error.IsNotFound {
+                System.Fault("Flat memory provider changed directory policy")
+            }
+        }
+        Ok(_) => System.Fault("Memory lookup invented a directory")
+    }
     WriteLine("Relative directory lookup contracts: passed")
 }
