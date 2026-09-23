@@ -743,3 +743,32 @@ introduced. Ordinary overload resolution and metadata access checks now see the
 platform type rather than the sample-local one. Use matching regenerated core and
 runtime artifacts. The companion integration note is on Raven's isolated feature
 branch in docs/compiler/runtime-contracts.md; no experiment is merged into Raven main.
+
+### Directional stream interface integration (2026-09-23)
+
+System.Streams.InputStream and OutputStream are ordinary CLI interfaces, authored
+in Raven and emitted into the development runtime library. FileInputStream and
+FileOutputStream implement them directly; custom application providers use the
+same imported contracts. The importer validates the exact core interface members
+and admits only the corresponding concrete-to-interface conversion. It does not
+add a catch-all conversion or identify application types by their spelling.
+
+The matching reference/runtime snapshots are required. Existing concrete methods
+and native services keep their behavior. Runtime Contract options are unchanged;
+new interface implementations use ordinary CLI method matching and interface
+calls, without new VM instructions. The Storage sample exercises Read/Write/Flush/
+Close through these interfaces for both disk and memory, including short transfers.
+Input cannot call Write and output cannot call Read; source negatives cover this.
+
+Integration exposed a general Raven array-symbol identity defect: imported byte[]
+parameters carried a different construction container from source arrays and failed
+implicit interface matching. The independent ordinary .NET regression and fix are on
+Raven main (`f0c06f7f8`), integrated as `5fa6516fe`; the target-specific stream catalog remains here. Use a development
+compiler containing that fix and the configured-unit identity fix when regenerating the snapshots or building custom
+stream implementations. Published Preview 9 compilers do not contain these fixes.
+
+Flush also exposed a configured-unit identity mismatch inside imported generic
+returns. Raven main `44ae9f242` (integration `849347a97`) fixes equality/hash matching
+against the explicitly selected value type. Its ordinary .NET regression uses
+System.ValueTuple, with opt-in success and default rejection; 39 focused unit, symbol
+and interface checks pass. No neoCLR-specific policies were merged into Raven main.

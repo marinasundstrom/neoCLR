@@ -1,0 +1,2 @@
+.include "generated/OutputStream.methods.neoil"
+.include "generated/OutputStream.helpers.neoil"

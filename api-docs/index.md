@@ -105,3 +105,9 @@ parallel execution or nonblocking I/O.
 See the [platform overview](/about/index.html) for background and direction and
 [proposals](/proposals/index.html) for open ideas. General API usage belongs here
 and in the feature guides; repository implementation notes are supplementary.
+
+The development [InputStream](xref:System.Streams.InputStream) and
+[OutputStream](xref:System.Streams.OutputStream) interfaces let the same consumer
+use a file stream or an application-defined memory stream. See the
+[capability contracts](streams.md#capability-contracts) and the manually documented
+[Flush methods](streams.md#flush).

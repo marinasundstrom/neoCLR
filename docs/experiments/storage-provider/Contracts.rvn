@@ -76,8 +76,11 @@ func Main() {
             if alias[0] != (byte)99 || alias[1] != (byte)72 || alias[2] != (byte)99 {
                 System.Fault("Read lost alias or advanced on rejected operation")
             }
+            let capability: InputStream = input
+            capability.Close()
             input.Close()
             ExpectError(input.Read(buffer, 0, 1), "Closed")
+            ExpectError(capability.Read(buffer, 0, 1), "Closed")
         }
         Error(let error) => System.Fault(error.ToString())
     }
@@ -86,8 +89,18 @@ func Main() {
             ExpectError(output.Write(buffer, -1, 1), "InvalidRange")
             ExpectError(output.Write(buffer, 2, 2), "InvalidRange")
             ExpectCount(output.Write(buffer, 3, 0), 0)
+            let capability: OutputStream = output
+            capability.Close()
             output.Close()
             ExpectError(output.Write(buffer, 0, 1), "Closed")
+            match capability.Flush() {
+                Error(let error) => {
+                    if !error.IsClosed {
+                        System.Fault("Unexpected closed flush error")
+                    }
+                }
+                Ok(_) => System.Fault("Flush ignored interface close")
+            }
         }
         Error(let error) => System.Fault(error.ToString())
     }

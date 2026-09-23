@@ -1,0 +1,8 @@
+namespace System.Streams
+
+import System.*
+
+public interface InputStream {
+    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError>
+    func Close()
+}

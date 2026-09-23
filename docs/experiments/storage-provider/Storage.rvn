@@ -150,8 +150,8 @@ class HostStorage : StorageProvider {
     func OpenRead(path: Path) -> Result<InputStream, StreamError> {
         return match FileInputStream.Open(Resolve(path)) {
             Ok(let stream) => {
-                let adapter: InputStream = DiskInput(stream)
-                Ok(adapter)
+                let input: InputStream = stream
+                Ok(input)
             }
             Error(let error) => Error(error)
         }
@@ -160,8 +160,8 @@ class HostStorage : StorageProvider {
     func CreateNew(path: Path) -> Result<OutputStream, StreamError> {
         return match FileOutputStream.CreateNew(Resolve(path)) {
             Ok(let stream) => {
-                let adapter: OutputStream = DiskOutput(stream)
-                Ok(adapter)
+                let output: OutputStream = stream
+                Ok(output)
             }
             Error(let error) => Error(error)
         }

@@ -1,0 +1,9 @@
+; Generated from runtime/raven/src/System/Streams/OutputStream.rvn. Regenerate with build_runtime_library.py.
+.interface System.Streams.OutputStream
+.method instance Write(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Result<Int32,System.Streams.StreamError>
+.end
+.method instance Flush() -> System.Result<Void,System.Streams.StreamError>
+.end
+.method instance Close() -> noresult
+.end
+.end

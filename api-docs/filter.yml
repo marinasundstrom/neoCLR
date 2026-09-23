@@ -1,6 +1,6 @@
 apiRules:
 - exclude:
-    uidRegex: '^System\.Streams\.FileOutputStream\.Flush($|\()'
+    uidRegex: '^System\.Streams\.(FileOutputStream|OutputStream)\.Flush($|\()'
     type: Method
 - exclude:
     uidRegex: '^System\.Concurrency\.ThreadPool\.#ctor'
@@ -21,7 +21,7 @@ apiRules:
     uidRegex: '^System\.Streams$'
     type: Namespace
 - include:
-    uidRegex: '^System\.Streams\.(FileInputStream|FileOutputStream|StreamError)($|\.)'
+    uidRegex: '^System\.Streams\.(InputStream|OutputStream|FileInputStream|FileOutputStream|StreamError)($|\.)'
 - include:
     uidRegex: '^System\.Storage$'
     type: Namespace

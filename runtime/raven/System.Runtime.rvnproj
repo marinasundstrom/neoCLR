@@ -271,4 +271,10 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InvalidPathError'">
     <Compile Include="src/System/Storage/InvalidPathError.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InputStream'">
+    <Compile Include="src/System/Streams/InputStream.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'OutputStream'">
+    <Compile Include="src/System/Streams/OutputStream.rvn" />
+  </ItemGroup>
 </Project>

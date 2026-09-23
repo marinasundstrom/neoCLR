@@ -8,6 +8,20 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Integrate development System.Streams.InputStream and OutputStream interfaces.
+  File streams implement them directly; the disk/memory sample imports the platform
+  contracts and drops forwarding disk adapters. Preserve blocking partial transfers,
+  typed errors and explicit close. Add generated API coverage, a manual OutputStream.Flush
+  entry for DocFX's unit-result limitation, and opposite-direction negative checks.
+  Custom implementations require the matching core/runtime and a development Raven
+  compiler with the imported-array and configured-unit identity corrections;
+  Preview 9 is unchanged.
+  Record the author's minimal WinRT-informed Storage direction: useful address/name
+  properties and explicit operations first, richer metadata only when needed.
+  File/Directory/provider integration remains the next bounded slice. Validation:
+  disk/memory SDK contracts and negative callers, interface import checks, runtime
+  snapshot, 148 API summaries and the combined website pass.
+
 - Add development System.Storage.Metadata.GetKind(string), EntryKind and
   StorageLookupError over the existing native metadata service, with generated API
   reference coverage. Add typed GetFile lookup to the disk/memory provider sample;

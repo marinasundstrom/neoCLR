@@ -22,14 +22,16 @@ items:
   remarks: Native resources belong to the invocation. Close promptly; invocation teardown closes remaining files. A retained stream cannot be reused in another invocation. There is no finalizer, automatic disposal, seeking or asynchronous scheduling in this slice.
   example: []
   syntax:
-    content: public sealed class FileOutputStream
-    content.vb: Public NotInheritable Class FileOutputStream
+    content: 'public sealed class FileOutputStream : OutputStream'
+    content.vb: Public NotInheritable Class FileOutputStream Implements OutputStream
   seealso:
   - linkType: HRef
     linkId: ../streams.html#flush
     altText: Flush contract and file stream guide
   inheritance:
   - System.Object
+  implements:
+  - System.Streams.OutputStream
 - uid: System.Streams.FileOutputStream.CreateNew(System.String)
   commentId: M:System.Streams.FileOutputStream.CreateNew(System.String)
   id: CreateNew(System.String)
@@ -95,6 +97,8 @@ items:
       description: Ok with the transferred count, or a typed StreamError. Invalid ranges fail before I/O.
     content.vb: Public Function Write(buffer As Byte(), offset As Integer, count As Integer) As Result(Of Integer, StreamError)
   overload: System.Streams.FileOutputStream.Write*
+  implements:
+  - System.Streams.OutputStream.Write(System.Byte[],System.Int32,System.Int32)
   nameWithType.vb: FileOutputStream.Write(Byte(), Integer, Integer)
   fullName.vb: System.Streams.FileOutputStream.Write(Byte(), Integer, Integer)
   name.vb: Write(Byte(), Integer, Integer)
@@ -119,6 +123,8 @@ items:
     content: public void Close()
     content.vb: Public Sub Close()
   overload: System.Streams.FileOutputStream.Close*
+  implements:
+  - System.Streams.OutputStream.Close
 references:
 - uid: System.Streams
   commentId: N:System.Streams
@@ -157,6 +163,14 @@ references:
   nameWithType.vb: Object
   fullName.vb: Object
   name.vb: Object
+- uid: System.Streams.OutputStream
+  commentId: T:System.Streams.OutputStream
+  parent: System.Streams
+  isExternal: true
+  href: System.Streams.OutputStream.html
+  name: OutputStream
+  nameWithType: OutputStream
+  fullName: System.Streams.OutputStream
 - uid: System
   commentId: N:System
   isExternal: true
@@ -264,6 +278,61 @@ references:
   name: Write
   nameWithType: FileOutputStream.Write
   fullName: System.Streams.FileOutputStream.Write
+- uid: System.Streams.OutputStream.Write(System.Byte[],System.Int32,System.Int32)
+  commentId: M:System.Streams.OutputStream.Write(System.Byte[],System.Int32,System.Int32)
+  parent: System.Streams.OutputStream
+  isExternal: true
+  href: System.Streams.OutputStream.html#System_Streams_OutputStream_Write_System_Byte___System_Int32_System_Int32_
+  name: Write(byte[], int, int)
+  nameWithType: OutputStream.Write(byte[], int, int)
+  fullName: System.Streams.OutputStream.Write(byte[], int, int)
+  nameWithType.vb: OutputStream.Write(Byte(), Integer, Integer)
+  fullName.vb: System.Streams.OutputStream.Write(Byte(), Integer, Integer)
+  name.vb: Write(Byte(), Integer, Integer)
+  spec.csharp:
+  - uid: System.Streams.OutputStream.Write(System.Byte[],System.Int32,System.Int32)
+    name: Write
+    isExternal: true
+    href: System.Streams.OutputStream.html#System_Streams_OutputStream_Write_System_Byte___System_Int32_System_Int32_
+  - name: (
+  - uid: System.Byte
+    name: byte
+    isExternal: true
+  - name: '['
+  - name: ']'
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: int
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: int
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: System.Streams.OutputStream.Write(System.Byte[],System.Int32,System.Int32)
+    name: Write
+    isExternal: true
+    href: System.Streams.OutputStream.html#System_Streams_OutputStream_Write_System_Byte___System_Int32_System_Int32_
+  - name: (
+  - uid: System.Byte
+    name: Byte
+    isExternal: true
+  - name: (
+  - name: )
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+  - name: )
 - uid: System.Byte[]
   isExternal: true
   name: byte[]
@@ -344,3 +413,25 @@ references:
   name: Close
   nameWithType: FileOutputStream.Close
   fullName: System.Streams.FileOutputStream.Close
+- uid: System.Streams.OutputStream.Close
+  commentId: M:System.Streams.OutputStream.Close
+  parent: System.Streams.OutputStream
+  isExternal: true
+  href: System.Streams.OutputStream.html#System_Streams_OutputStream_Close
+  name: Close()
+  nameWithType: OutputStream.Close()
+  fullName: System.Streams.OutputStream.Close()
+  spec.csharp:
+  - uid: System.Streams.OutputStream.Close
+    name: Close
+    isExternal: true
+    href: System.Streams.OutputStream.html#System_Streams_OutputStream_Close
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Streams.OutputStream.Close
+    name: Close
+    isExternal: true
+    href: System.Streams.OutputStream.html#System_Streams_OutputStream_Close
+  - name: (
+  - name: )

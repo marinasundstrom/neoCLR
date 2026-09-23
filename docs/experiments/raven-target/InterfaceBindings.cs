@@ -9,11 +9,11 @@ static class InterfaceBindings
         public interface Closable<E> { Result<PropagationUnit,E> Close(); }
         """;
     static readonly HashSet<string> Contracts = new() { "System.Equatable", "System.Comparable", "System.Clonable", "System.Closable" };
-    public static bool IsInterface(string type) => type == "System.Clock" || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
+    public static bool IsInterface(string type) => (type == "System.Clock" || StreamBindings.IsCapability(type)) || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
     public static string? Type(TypeReference type, Func<TypeReference, string>? parameterMap = null)
     {
         if (!RuntimeSignatures.IsCore(type.Scope)) return null;
-        if (type.FullName == "System.Clock" && !type.IsValueType) return "System.Clock";
+        if ((type.FullName == "System.Clock" || StreamBindings.IsCapability(type.FullName)) && !type.IsValueType) return type.FullName;
         if (type.FullName == "System.Object") return "System.Object";
         if (type is not GenericInstanceType g || g.IsValueType || g.GenericArguments.Count != 1) return null;
         var name = g.ElementType.FullName.Split('`')[0];
@@ -21,12 +21,13 @@ static class InterfaceBindings
         var element = parameterMap?.Invoke(g.GenericArguments[0]) ?? ReflectionBindings.Type(g.GenericArguments[0]) ?? GenericUnionBindings.Type(g.GenericArguments[0]);
         return element is null ? null : name + "<" + element + ">";
     }
-    public static bool Converts(string source, string target) => source == "String" && target == "System.Collections.Iterable<Char>" || IsInterface(target)
+    public static bool Converts(string source, string target) => StreamBindings.Assignable(source, target) || source == "String" && target == "System.Collections.Iterable<Char>" || IsInterface(target)
         && (source == "System.Object" || source == "String" || ReflectionBindings.IsReference(source) || CalendarBindings.IsReference(source));
     public static string Convert(string source, string target) => Converts(source,target) ? "castclass " + target + "\n" : "";
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
         if (reference.DeclaringType.FullName == "System.Clock") return CalendarBindings.Bind(reference, definition);
+        if (StreamBindings.IsCapability(reference.DeclaringType.FullName)) return StreamBindings.BindCapability(reference, definition);
         var owner = Type(reference.DeclaringType);
         if (owner is null || !IsInterface(owner)) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? ReflectionBindings.Type(t) ?? GenericUnionBindings.Type(t));
@@ -47,6 +48,7 @@ static class InterfaceBindings
     }
     public static void Validate(ModuleDefinition module)
     {
+        StreamBindings.ValidateCapabilities(module);
         foreach (var name in Contracts) {
             var type = module.GetType(name + "`1");
             if (type is null || !type.IsInterface || type.GenericParameters.Count != 1

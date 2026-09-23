@@ -7,15 +7,39 @@ not a finalized provider model or asynchronous I/O contract.
 ## Browse the API
 
 - [System.Streams](xref:System.Streams) — namespace and types.
+- [InputStream](xref:System.Streams.InputStream) — Read and Close contracts.
+- [OutputStream](xref:System.Streams.OutputStream) — Write, Flush and Close contracts.
 - [FileInputStream](xref:System.Streams.FileInputStream) — Open, Read and Close.
 - [FileOutputStream](xref:System.Streams.FileOutputStream) — CreateNew, Write and Close.
 - [StreamError](xref:System.Streams.StreamError) — expected open and transfer failures.
-- [Flush](#flush) — complete manual entry for the one renderer exclusion.
+- [Flush](#flush) — complete manual entries for both renderer exclusions.
 
 An input stream reads an existing regular file. An output stream exclusively
 creates a new file; it never overwrites an existing entry. The classes expose
 only their supported direction. Both own an open file until Close or invocation
 teardown. No public constructor accepts a native handle.
+
+## Capability contracts
+
+`InputStream` and `OutputStream` are development platform interfaces. FileInputStream
+and FileOutputStream implement them directly. The Storage sample's memory streams
+implement the same interfaces; consumers need no disk adapter or native handle.
+InputStream exposes Read and Close. OutputStream exposes Write, Flush and Close.
+Neither direction exposes the opposite operation, seeking or metadata properties.
+
+Implementers must preserve range validation, partial counts, the 64 KiB request
+limit, caller buffer ownership and idempotent Close. Check Closed before validating
+ranges. InvalidRange and LimitExceeded fail before transfer. Read changes only the
+returned number of elements; Write does not mutate its input. A positive-count
+successful write must make progress. No thread safety or concurrent mutation is
+promised. File invocation lifetime and native handle limits belong to the file
+implementation, not every provider.
+
+Unlike .NET's [Stream](https://learn.microsoft.com/en-us/dotnet/api/system.io.stream?view=net-10.0),
+which exposes read/write/seek operations with capability properties, these narrow
+interfaces express direction in the type. This helps consumers request only what
+they use, at the cost of additional types and no ready-made duplex/seek abstraction.
+This is a provisional library choice, not new VM machinery or a performance claim.
 
 ## Buffer and lifetime rules
 
@@ -45,6 +69,13 @@ An I/O failure may leave partial output; this is not transactional file replacem
 
 ## Flush
 
+`OutputStream.Flush() -> Result<unit, StreamError>`
+
+An output implementation reports `Ok(())` or a typed StreamError, including Closed
+after Close. Flush does not close the stream, make writes transactional or promise
+durable storage. The memory sample has no pending buffer, so it returns Ok while
+open. Callers should check the result before Close. Parameters: none.
+
 `FileOutputStream.Flush() -> Result<unit, StreamError>`
 
 Flush calls the host file's flush operation. It returns `Ok(())`, or a typed error;
@@ -53,8 +84,8 @@ and success does not imply fsync or durability. Call it before Close when the
 operation needs to observe a flush error.
 
 DocFX 2.80.1 cannot render this metadata signature because neoCLR's unit is
-`System.Void` inside a generic Result. Flush is therefore omitted from the generated
-class page and documented here, using its actual Raven signature. It remains part
+`System.Void` inside a generic Result. Both Flush methods are therefore omitted from their generated
+type pages and documented here, using its actual Raven signature. It remains part
 of the public API.
 
 ## A runnable example

@@ -2,13 +2,15 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.IntPtr",
   "inputs": {
+    "runtime/raven/src/System/Streams/InputStream.rvn": "73fbe20bcfc532ff6a51cdcf8a7f87158f964515ad58972cc55dd5a7220c8253",
+    "runtime/raven/src/System/Streams/OutputStream.rvn": "5bceeed5c80ec358754e0f32e2c95f16a5ef8b84c4ff4f59d919d01174af3784",
     "runtime/raven/src/System/Storage/InvalidPathError.rvn": "9545d4b15c35a592037178548ce68694ce5e82fccc14b8d3c1f5a50a34ec5c6b",
     "runtime/raven/src/System/Storage/EntryKind.rvn": "d281c32a35b2898eacdbb48af928a9b633f46719740eaf42c5de1907a79ee764",
     "runtime/raven/src/System/Storage/StorageLookupError.rvn": "33297642519fcbbd78b866972ad8985af41029be33028fdd40ae62821b8ca5b4",
     "runtime/raven/src/System/Storage/Metadata.rvn": "872ffc36e117d21fadb8b4f42752c673ab0f212d352d4accc010b4d3b95508db",
     "runtime/raven/src/System/Streams/StreamError.rvn": "b32980c3816c7843eb4bc2a95c4c38f87e7ad8b9a4f709a1353647fc05cc93b1",
-    "runtime/raven/src/System/Streams/FileInputStream.rvn": "d12261144ba2888725a13db58c0cdba0917b138e8dc204cc5ce2dff737bd6723",
-    "runtime/raven/src/System/Streams/FileOutputStream.rvn": "20ccefc75a3b3d9690f9adc741c4a124f5a3219c6dae660b9219b0b8a4810301",
+    "runtime/raven/src/System/Streams/FileInputStream.rvn": "8d2b43c8ae766d2ce43f4e3384650164ac83b7b1d578ea0f2f63bf171e60cea8",
+    "runtime/raven/src/System/Streams/FileOutputStream.rvn": "bf3e1c9b42b4e923ad850fdcad097256f7e522c64824c0cf9ac6eee98f2aaa7d",
     "runtime/raven/src/System/Tasks/TaskOutcome.rvn": "746ea27b2d33c5840214ce6ca154e969205b45880aef4e1959a5c65b35e5b5e6",
     "runtime/raven/src/System/Tasks/TaskState.rvn": "297cecd35247b5d8b83e6b9c2d7288a556bd6ec81071f4c0d269d251b64acc87",
     "runtime/raven/src/System/Tasks/Tasks.rvn": "5c88a6a8c203f5276956456421b5b15400b10b18e239d37b97603e457255f237",
@@ -92,15 +94,15 @@
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
-    "runtime/raven/System.Runtime.rvnproj": "b5d2ef0a6ee6faefcf71ecf36f23526df8fa481a1b0a3c6cfaa97f59affdeec6",
+    "runtime/raven/System.Runtime.rvnproj": "d8136effadd0fd7cee7c41b529a717266ccfd142cfd076c3ad232cd90c39963a",
     "build/NeoCLR.Raven.props": "b7d01e1d6b23228bb784dafcda4cf7c777b554b11f093cc3daf2509bb7402ee0"
   },
   "outputs": {
     "IntPtr.methods.neoil": "7598ec6ba1014b89dbf4e6af86ba712527aff1e6a8ea8138d5d33d0d7b5c6db8",
     "IntPtr.helpers.neoil": "9af7283bdadd4dc6ae9970e86b9f9482fd15658ec2155b6d8f2d44f29c32868a"
   },
-  "compilerSha256": "a21ff0939cef995e7ae6cd714369622658098222036d95a1309151213f597467",
-  "coreSha256": "b1e3a7d44e9377b8b6ea14e20d6b94d829c972e73c311b97d52ee54238cd9803",
+  "compilerSha256": "571ac41551f849a5dd7b6ed3fa57080c6284e919baefe6550b6d48df6ea44919",
+  "coreSha256": "7031fd074a340953dfcb9fd26a4eaaaabac303c428922aa27a1b963e50a78b38",
   "exports": [
     "readonly byref CompareTo(IntPtr other) -> Int32"
   ]

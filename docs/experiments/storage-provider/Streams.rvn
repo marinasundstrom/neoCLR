@@ -5,54 +5,6 @@ import System.Collections.*
 import System.Result.*
 import System.Streams.*
 
-// Application-owned capability experiment. Calls complete synchronously.
-interface InputStream {
-    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError>
-    func Close()
-}
-
-interface OutputStream {
-    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError>
-    func Flush() -> Result<unit, StreamError>
-    func Close()
-}
-
-class DiskInput : InputStream {
-    private field stream: FileInputStream
-
-    init(stream: FileInputStream) {
-        self.stream = stream
-    }
-
-    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
-        return stream.Read(buffer, offset, count)
-    }
-
-    func Close() {
-        stream.Close()
-    }
-}
-
-class DiskOutput : OutputStream {
-    private field stream: FileOutputStream
-
-    init(stream: FileOutputStream) {
-        self.stream = stream
-    }
-
-    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
-        return stream.Write(buffer, offset, count)
-    }
-
-    func Flush() -> Result<unit, StreamError> {
-        return stream.Flush()
-    }
-
-    func Close() {
-        stream.Close()
-    }
-}
-
 // Two-byte transfers deliberately exercise short-read and short-write loops.
 class MemoryInput : InputStream {
     private field bytes: List<byte>

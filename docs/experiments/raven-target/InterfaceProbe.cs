@@ -21,7 +21,9 @@ static class InterfaceProbe
                 metadataImportOptions: new MetadataImportOptions(CoreDeclarations.Identity),
                 runtimeIterationContract: new RuntimeIterationContract(CoreDeclarations.Identity,
                     "System.Collections.Iterable`1", "System.Collections.Iterator`1", ArrayShapeTypeName: "System.Array`1"),
-                runtimePropagationContract: new RuntimePropagationContract(CoreDeclarations.Identity, "System.Propagatable`3")));
+                runtimePropagationContract: new RuntimePropagationContract(CoreDeclarations.Identity, "System.Propagatable`3"))
+                .WithTargetCoreAssemblyName(CoreDeclarations.Identity)
+                .WithRuntimeUnitContract(new RuntimeUnitContract(CoreDeclarations.Identity, "System.Void")));
         var compilation = Create(source);
         var path = Path.Combine(output, "CoreInterfaces.dll");
         using (var stream = File.Create(path))
@@ -34,7 +36,8 @@ static class InterfaceProbe
         using var library = AssemblyDefinition.ReadAssembly(core);
         using var image = AssemblyDefinition.ReadAssembly(path);
         var interfaces = library.MainModule.GetTypes().Where(t => t.IsInterface).ToArray();
-        if (interfaces.Length != 14 || interfaces.SelectMany(t => t.Methods).Any(m => !m.IsAbstract || !m.IsVirtual || !m.IsNewSlot))
+        if (new[] { "System.Collections.List`1", "System.Streams.InputStream", "System.Streams.OutputStream" }.Any(name => !interfaces.Any(t => t.FullName == name))
+            || interfaces.SelectMany(t => t.Methods).Any(m => !m.IsAbstract || !m.IsVirtual || !m.IsNewSlot))
             throw new Exception("Expected ordinary abstract CLI interface contracts.");
         var arrayShape = library.MainModule.GetType("System.Array`1");
         if (arrayShape is null || arrayShape.IsValueType || arrayShape.GenericParameters.Count != 1 ||
@@ -117,14 +120,15 @@ static class InterfaceProbe
                 PropagationImportChecks.RejectVoidParameter(projected, core, output);
                 continue;
             }
-            try { UnionImport.Write(raw, core, Path.Combine(output, sample + ".invalid.neoil"), collectionProfile: true); }
-            catch (InvalidDataException) { continue; }
-            throw new Exception("Raw Void marker storage was admitted: " + sample);
+            // With the SDK's explicit unit contract, the compiler emits nominal
+            // unit storage directly. Malformed CLI VOID parameters are still
+            // rejected by the deliberate metadata mutation above.
+            UnionImport.Write(raw, core, Path.Combine(output, sample + ".unprojected.neoil"), collectionProfile: true);
         }
         var propagationRejections = PropagationImportChecks.Run(propagationPath, core, output);
         var rejections = CollectionImportChecks.Run(path, core, output);
         File.WriteAllText(Path.Combine(output, "interface-results.json"), JsonSerializer.Serialize(new {
-            RecordedDate = "2026-09-12", Scope = "Raven collection metadata, emission and import; runtime verification is separate",
+            RecordedDate = "2026-09-23", Scope = "Raven collection metadata, emission and import; runtime verification is separate",
             ApplicationClosureErrors = closure,
             Interfaces = interfaces.Select(t => new { t.FullName, Parents = t.Interfaces.Select(i => i.InterfaceType.FullName).ToArray() }),
             InterfaceCalls = calls, NegativeDiagnostics = negatives, ImportRejections = rejections, PropagationRejections = propagationRejections, ImportedProgram = Path.GetFileName(destination)

@@ -22,10 +22,12 @@ items:
   remarks: Native resources belong to the invocation. Close promptly; invocation teardown closes remaining files. A retained stream cannot be reused in another invocation. There is no finalizer, automatic disposal, seeking or asynchronous scheduling in this slice.
   example: []
   syntax:
-    content: public sealed class FileInputStream
-    content.vb: Public NotInheritable Class FileInputStream
+    content: 'public sealed class FileInputStream : InputStream'
+    content.vb: Public NotInheritable Class FileInputStream Implements InputStream
   inheritance:
   - System.Object
+  implements:
+  - System.Streams.InputStream
 - uid: System.Streams.FileInputStream.Open(System.String)
   commentId: M:System.Streams.FileInputStream.Open(System.String)
   id: Open(System.String)
@@ -90,6 +92,8 @@ items:
       description: Ok with the transferred count, or a typed StreamError. Invalid ranges fail before I/O.
     content.vb: Public Function Read(buffer As Byte(), offset As Integer, count As Integer) As Result(Of Integer, StreamError)
   overload: System.Streams.FileInputStream.Read*
+  implements:
+  - System.Streams.InputStream.Read(System.Byte[],System.Int32,System.Int32)
   nameWithType.vb: FileInputStream.Read(Byte(), Integer, Integer)
   fullName.vb: System.Streams.FileInputStream.Read(Byte(), Integer, Integer)
   name.vb: Read(Byte(), Integer, Integer)
@@ -114,6 +118,8 @@ items:
     content: public void Close()
     content.vb: Public Sub Close()
   overload: System.Streams.FileInputStream.Close*
+  implements:
+  - System.Streams.InputStream.Close
 references:
 - uid: System.Streams
   commentId: N:System.Streams
@@ -152,6 +158,14 @@ references:
   nameWithType.vb: Object
   fullName.vb: Object
   name.vb: Object
+- uid: System.Streams.InputStream
+  commentId: T:System.Streams.InputStream
+  parent: System.Streams
+  isExternal: true
+  href: System.Streams.InputStream.html
+  name: InputStream
+  nameWithType: InputStream
+  fullName: System.Streams.InputStream
 - uid: System
   commentId: N:System
   isExternal: true
@@ -259,6 +273,61 @@ references:
   name: Read
   nameWithType: FileInputStream.Read
   fullName: System.Streams.FileInputStream.Read
+- uid: System.Streams.InputStream.Read(System.Byte[],System.Int32,System.Int32)
+  commentId: M:System.Streams.InputStream.Read(System.Byte[],System.Int32,System.Int32)
+  parent: System.Streams.InputStream
+  isExternal: true
+  href: System.Streams.InputStream.html#System_Streams_InputStream_Read_System_Byte___System_Int32_System_Int32_
+  name: Read(byte[], int, int)
+  nameWithType: InputStream.Read(byte[], int, int)
+  fullName: System.Streams.InputStream.Read(byte[], int, int)
+  nameWithType.vb: InputStream.Read(Byte(), Integer, Integer)
+  fullName.vb: System.Streams.InputStream.Read(Byte(), Integer, Integer)
+  name.vb: Read(Byte(), Integer, Integer)
+  spec.csharp:
+  - uid: System.Streams.InputStream.Read(System.Byte[],System.Int32,System.Int32)
+    name: Read
+    isExternal: true
+    href: System.Streams.InputStream.html#System_Streams_InputStream_Read_System_Byte___System_Int32_System_Int32_
+  - name: (
+  - uid: System.Byte
+    name: byte
+    isExternal: true
+  - name: '['
+  - name: ']'
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: int
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: int
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: System.Streams.InputStream.Read(System.Byte[],System.Int32,System.Int32)
+    name: Read
+    isExternal: true
+    href: System.Streams.InputStream.html#System_Streams_InputStream_Read_System_Byte___System_Int32_System_Int32_
+  - name: (
+  - uid: System.Byte
+    name: Byte
+    isExternal: true
+  - name: (
+  - name: )
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+  - name: )
 - uid: System.Byte[]
   isExternal: true
   name: byte[]
@@ -339,3 +408,25 @@ references:
   name: Close
   nameWithType: FileInputStream.Close
   fullName: System.Streams.FileInputStream.Close
+- uid: System.Streams.InputStream.Close
+  commentId: M:System.Streams.InputStream.Close
+  parent: System.Streams.InputStream
+  isExternal: true
+  href: System.Streams.InputStream.html#System_Streams_InputStream_Close
+  name: Close()
+  nameWithType: InputStream.Close()
+  fullName: System.Streams.InputStream.Close()
+  spec.csharp:
+  - uid: System.Streams.InputStream.Close
+    name: Close
+    isExternal: true
+    href: System.Streams.InputStream.html#System_Streams_InputStream_Close
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Streams.InputStream.Close
+    name: Close
+    isExternal: true
+    href: System.Streams.InputStream.html#System_Streams_InputStream_Close
+  - name: (
+  - name: )

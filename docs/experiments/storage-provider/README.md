@@ -1,6 +1,6 @@
 # Provider-bound File and Directory exploration
 
-**Development experiment, 2026-09-23. Application-owned providers/capabilities using integrated System.Storage.Path and System.Streams APIs.**
+**Development experiment, 2026-09-23. Application-owned providers using integrated System.Storage.Path and System.Streams APIs.**
 The same Raven `RoundTrip(Directory)` workflow writes and reads a real UTF-8 file
 and then runs against a bounded memory provider. The application sees File and
 Directory objects; each retains the provider that interprets its address.
@@ -108,10 +108,11 @@ FileInputStream and FileOutputStream separate the .NET FileStream directions,
 while retaining the familiar array/offset/count partial-transfer baseline. The
 extra types and shared provisional error family are tradeoffs, not a superiority
 claim. This first wrapper is synchronous, has no finalizer/automatic disposal and
-makes no durability guarantee. Memory views, asynchronous ownership and general
-System.Streams capability interfaces are still open.
+makes no durability guarantee. InputStream and OutputStream are now platform
+interfaces implemented directly by the file classes and the sample memory classes.
+Memory views and asynchronous ownership remain open.
 
-Storage alignment has begun with the application-owned Path experiment. Keep
+Storage alignment began with an application-owned Path experiment; Path is now integrated. Keep
 syntax validation separate from provider lookup and identity; do not promote the
 temporary text-helper provider contract unchanged. The core System.Storage.Path
 string helpers remain unchanged. See the [complete Path contract](../../../api-docs/storage-experiment.md#path-value-object)
@@ -328,3 +329,57 @@ is rejected as read-only; targeted negative builds passed after updating the pri
 application-local diagnostic expectation. API summaries cover 142 generated items;
 the combined website and four tooling tests passed. Provider integration remains
 next; Unix/Windows normalization and a future Uri value are recorded directions.
+
+## Minimal Storage design: WinRT lessons (2026-09-23)
+
+The author asks us to learn from Windows Runtime while implementing only immediate
+needs. File/directory properties must earn their place in the sample; a broad
+metadata model is not a prerequisite for the POC.
+
+The next integrated descriptors should retain their provider and logical Path.
+File.Name is useful for display; it should be derived from the path, not supplied
+as a second potentially inconsistent constructor argument. Directory.Path supplies
+the current context; a Directory.Name property can wait until a consumer needs it.
+GetFile is an explicit typed lookup, while an address for exclusive creation need
+not exist. Neither property access nor descriptor construction should perform I/O.
+Opened streams own resources; descriptors do not retain an open handle.
+
+The existing provider FileAt(path, name) factory is sample scaffolding. Review it
+for removal when integrating File: a descriptor can retain a provider directly,
+without requiring every provider to implement an identical factory. Keep existing
+whole-text static helpers compatible, but do not require all future providers to
+implement text encoding helpers merely to offer byte access. The next bounded
+integration should settle this small byte-oriented contract using the working
+read/write sample. These are preferred next-slice choices, not APIs already shipped.
+
+Primary sources reviewed 2026-09-23:
+
+- [WinRT StorageFile](https://learn.microsoft.com/en-us/uwp/api/windows.storage.storagefile?view=winrt-26100)
+  separates properties such as Name/Path from opening streams; it also offers many
+  content, display and mutation operations. Borrow the descriptor/open distinction,
+  not the whole surface or its asynchronous signature model.
+- [WinRT StorageFolder](https://learn.microsoft.com/en-us/uwp/api/windows.storage.storagefolder?view=winrt-26100)
+  provides contextual lookup and creation. Keep the useful directory context;
+  defer query objects, bulk enumeration and collision-option families.
+- [.NET FileInfo](https://learn.microsoft.com/en-us/dotnet/api/system.io.fileinfo?view=net-10.0)
+  caches retrieved metadata; [Refresh](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.refresh?view=net-10.0)
+  obtains another snapshot. Our initial descriptors expose address information
+  only; defer size/timestamps/attributes and an explicit snapshot API. This avoids
+  an immediate cache/freshness policy but offers less information than FileInfo.
+- [.NET Stream](https://learn.microsoft.com/en-us/dotnet/api/system.io.stream?view=net-10.0)
+  combines directions and seeking with capability checks. The integrated directional
+  interfaces let consumers require only input or output; the cost is more types
+  and no current seek/duplex abstraction. Ordinary interface dispatch suffices.
+
+These are library choices. They add no VM identity, security or scheduling mechanism.
+Root mapping remains a convenience rather than a sandbox; successful lookup remains
+an observation. Future Windows/Unix Path formats, richer metadata and Uri remain
+outside this POC. Existing disk/memory tests are the integration acceptance cases;
+new descriptor invariants need targeted checks when implemented.
+
+Stream integration validation: the normal SDK disk/memory sample and all six
+consumer/contract programs pass, including close through an interface and subsequent
+use of the concrete alias. Opposite-direction source calls are rejected. The core
+interface import probe, bootstrap snapshot, API reference (148 documented generated
+items) and combined website also pass. Two ordinary Raven compiler corrections were
+integrated from main; see [the integration evidence](../raven-target/README.md#directional-stream-interface-integration-2026-09-23).

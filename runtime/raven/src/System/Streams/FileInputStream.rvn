@@ -4,7 +4,7 @@ import System.*
 import System.Result.*
 import System.Runtime.CompilerServices.*
 
-public class FileInputStream {
+public class FileInputStream : InputStream {
     private field handle: int
     private field closed: bool = false
 

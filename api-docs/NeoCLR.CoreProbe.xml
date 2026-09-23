@@ -144,6 +144,45 @@
     <member name="N:System.Streams">
       <summary>Development byte-stream APIs. File operations are blocking and scoped to one runtime invocation.</summary>
     </member>
+    <member name="T:System.Streams.InputStream">
+      <summary>A synchronous input capability implemented by platform file streams and application providers. Development API after Preview 9.</summary>
+      <remarks>Caller-owned arrays, partial transfers, explicit idempotent Close and typed errors. No seeking, scheduling or automatic disposal is implied. The interface does not impose native file lifetime on memory implementations.</remarks>
+      <seealso href="../streams.html#capability-contracts">Capability contracts and Flush reference</seealso>
+    </member>
+    <member name="M:System.Streams.InputStream.Read(System.Byte[],System.Int32,System.Int32)">
+      <summary>Attempts one synchronous partial read.</summary>
+      <param name="buffer">Caller-owned byte array; retained only for the duration of this call.</param>
+      <param name="offset">Zero-based start within the array.</param>
+      <param name="count">Maximum bytes to transfer, from zero through 65536 and within the array range.</param>
+      <returns>Ok with the transferred count, or StreamError. Closed is checked before range validation; invalid ranges and oversized requests fail before transfer.</returns>
+      <remarks>Only the transferred elements change. A positive-count read returning zero indicates EOF; zero-count does not establish EOF. Calls do not suspend. No concurrency safety is promised.</remarks>
+    </member>
+    <member name="M:System.Streams.InputStream.Close">
+      <summary>Closes this stream; repeated calls are harmless.</summary>
+      <remarks>Subsequent transfers return Closed. This no-result operation does not report close failures or promise flush/durability. Other streams opened separately retain their own lifetime.</remarks>
+    </member>
+    <member name="T:System.Streams.OutputStream">
+      <summary>A synchronous output capability implemented by platform file streams and application providers. Development API after Preview 9.</summary>
+      <remarks>Caller-owned arrays, partial transfers, explicit idempotent Close and typed errors. No seeking, scheduling or automatic disposal is implied. The interface does not impose native file lifetime on memory implementations.</remarks>
+      <seealso href="../streams.html#capability-contracts">Capability contracts and Flush reference</seealso>
+    </member>
+    <member name="M:System.Streams.OutputStream.Write(System.Byte[],System.Int32,System.Int32)">
+      <summary>Attempts one synchronous partial write.</summary>
+      <param name="buffer">Caller-owned byte array; retained only for the duration of this call.</param>
+      <param name="offset">Zero-based start within the array.</param>
+      <param name="count">Maximum bytes to transfer, from zero through 65536 and within the array range.</param>
+      <returns>Ok with the transferred count, or StreamError. Closed is checked before range validation; invalid ranges and oversized requests fail before transfer.</returns>
+      <remarks>The buffer is not modified. A positive-count successful write must make progress; callers loop over partial writes. Calls do not suspend. No concurrency safety is promised.</remarks>
+    </member>
+    <member name="M:System.Streams.OutputStream.Close">
+      <summary>Closes this stream; repeated calls are harmless.</summary>
+      <remarks>Subsequent transfers return Closed. This no-result operation does not report close failures or promise flush/durability. Other streams opened separately retain their own lifetime.</remarks>
+    </member>
+    <member name="M:System.Streams.OutputStream.Flush">
+      <summary>Asks the provider to flush output and report an expected failure.</summary>
+      <returns>Ok with unit or StreamError; a closed stream returns Closed.</returns>
+      <remarks>No durability guarantee. Exact signature and provider-specific behavior are documented in the stream guide because DocFX cannot render Result&lt;System.Void, StreamError&gt;.</remarks>
+    </member>
     <member name="T:System.Streams.FileInputStream">
       <summary>A blocking, explicitly closed file read stream. Development API, not included in Preview 9.</summary>
       <remarks>Native resources belong to the invocation. Close promptly; invocation teardown closes remaining files. A retained stream cannot be reused in another invocation. There is no finalizer, automatic disposal, seeking or asynchronous scheduling in this slice.</remarks>

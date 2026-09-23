@@ -171,14 +171,24 @@ with networking; no Uri API is implemented or added to the immediate scope.
 possible, rather than expanding isolated experiments first. The first integration
 moves the validated value into System.Storage.Path while preserving its native
 Combine/GetFileName string helpers; the sample now imports the platform type.
-Next, integrate the tested provider/File/Directory and stream capability contracts
+The stream capability contracts now live in System.Streams; concrete file streams
+and application memory streams implement them directly. Next, integrate the minimal
+provider/File/Directory contract
 in bounded library slices, preserving existing static file helpers and keeping
 known limitations explicit. The author emphasizes a minimal Storage POC: Path-taking
 Combine/helper overloads are future direction, not required in this integration. Parent hierarchy, shared errors and replacement identity
 remain follow-ups; they are not blanket prerequisites for initial integration. Preserve the tested stream operations. The
-current application-owned File/Directory and capability interfaces remain
+current application-owned File/Directory contracts remain
 exploratory; do not promote their string-address/text-helper shape unchanged merely
 because this sample works. Public stream wrappers have on-site reference coverage.
+**API design clarification, 2026-09-23:** learn from WinRT StorageFile/StorageFolder
+without importing their breadth. Start with address properties (Path and File.Name),
+explicit lookup and byte-stream access. Add metadata properties only for a concrete
+consumer need; timestamps, size snapshots, query APIs and enumeration are follow-ups.
+[The comparison and next-slice choices](experiments/storage-provider/README.md#minimal-storage-design-winrt-lessons-2026-09-23)
+keep provider factories and temporary whole-text requirements open for simplification.
+The author permits continuing directly into the next slice after validation.
+
 The author additionally directs stable runtime Fault codes, including StackOverflow,
 with a distinct UserFault for explicit guest faults and no guest-selectable code.
 This bounded diagnostics improvement does not reorder the Storage/Path follow-up.

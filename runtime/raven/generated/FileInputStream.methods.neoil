@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Streams/FileInputStream.rvn. Regenerate with build_runtime_library.py.
 .type class System.Streams.FileInputStream
+.implements System.Streams.InputStream
 .field private handle Int32
 .field private closed Boolean
 .method private instance .ctor(Int32 handle) -> noresult

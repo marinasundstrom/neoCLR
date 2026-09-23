@@ -100,7 +100,7 @@ The combined site builder converts root-relative reference links, including DocF
 client-side navigation JSON, to page-relative links for GitHub Pages project paths.
 
 The development stream slice includes System.Streams in generated reference.
-FileOutputStream.Flush returns Result<System.Void, StreamError>, which DocFX 2.80.1
+FileOutputStream.Flush and OutputStream.Flush return Result<System.Void, StreamError>, which DocFX 2.80.1
 cannot render; its exact signature and full contract live in [streams.md](streams.md).
 
 The host-facing Rust Fault/FaultCode API and debugger `fault_code` field are covered
@@ -119,3 +119,9 @@ lexical equality, alongside the existing static native string helpers. Path and
 InvalidPathError are selected for generated reference, including both legacy methods.
 The Storage sample imports this platform type rather than defining its own. Its
 provider classes remain application-owned until the next integration slices.
+
+InputStream and OutputStream are selected with their concrete file implementations.
+OutputStream.Flush shares the exact unit-valued Result renderer exclusion; its
+signature and provider contract are linked from the generated type page to
+[the Flush reference](streams.md#flush). Directional interface dispatch is exercised
+by the disk/memory SDK sample; memory stream classes remain sample implementations.

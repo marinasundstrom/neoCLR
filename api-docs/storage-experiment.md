@@ -1,8 +1,9 @@
 # Storage provider experiment
 
 **Development exploration, not a published System.Storage API.** These
-`StorageExperiment` provider and stream-adapter types belong to a tested Raven sample.
-They now consume the development System.Storage.Path type from the platform library. Their purpose is to
+`StorageExperiment` providers, descriptors and memory stream classes belong to a tested Raven sample.
+They consume the development System.Storage.Path value and System.Streams.InputStream/OutputStream
+interfaces from the platform library. Their purpose is to
 compare provider ownership, file descriptors and path interpretation before
 settling the platform API. They are documented here so the experimental contract
 is visible; they are not types in the core reference assembly.
@@ -169,7 +170,7 @@ Streams still transfer at most two bytes per call to exercise partial-transfer l
 
 ## Directional capability interfaces
 
-These are application-owned interfaces, separate from the core file classes.
+These are now platform interfaces in System.Streams: [InputStream](xref:System.Streams.InputStream) and [OutputStream](xref:System.Streams.OutputStream). File and Directory remain application-owned experiments.
 
 | Member | Contract |
 | --- | --- |
@@ -184,13 +185,12 @@ most 64 KiB per request. Close is checked before the range. Buffer ownership rem
 with the caller; no operation suspends. The [stream guide](streams.md) details the
 host lifetime and error behavior.
 
-## Supplied stream adapters
+## Supplied stream implementations
 
-`DiskInput(stream: FileInputStream)` implements InputStream by forwarding Read and
-Close. `DiskOutput(stream: FileOutputStream)` implements OutputStream by forwarding
-Write, Flush and Close. The adapter retains the supplied stream and closing either
-reference closes the same resource. Providers create these adapters after a successful
-open; callers ordinarily obtain the capability through File.
+The core file stream classes now implement these interfaces directly. The sample's
+former DiskInput and DiskOutput forwarding adapters have been removed. Providers
+return the opened stream through its directional interface; Close through either
+reference closes the same stream.
 
 `MemoryInput(bytes: List<byte>)` implements InputStream over the supplied shared list,
 starting at position zero. Read copies at most two bytes and advances its own cursor;

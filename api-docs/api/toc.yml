@@ -60,6 +60,12 @@ items:
   - uid: System.Streams.FileOutputStream
     name: FileOutputStream
     type: Class
+  - uid: System.Streams.InputStream
+    name: InputStream
+    type: Interface
+  - uid: System.Streams.OutputStream
+    name: OutputStream
+    type: Interface
   - uid: System.Streams.StreamError
     name: StreamError
     type: Struct

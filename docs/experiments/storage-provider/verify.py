@@ -88,3 +88,17 @@ with tempfile.TemporaryDirectory(prefix='neoclr-storage-provider-') as folder:
         assert rejected.returncode != 0, 'Path invariant bypass compiled'
         assert diagnostic in (rejected.stdout + rejected.stderr).lower(), rejected.stdout + rejected.stderr
     print('Path constructor and immutable text: rejected invalid callers')
+
+    # Direction is a source contract: neither interface exposes the opposite operation.
+    for capability, operation in [('InputStream', 'Write'), ('OutputStream', 'Read')]:
+        (root / 'Main.rvn').write_text(
+            'namespace StorageExperiment\nimport System.*\nimport System.Streams.*\n'
+            f'func Wrong(stream: {capability}) {{\n'
+            '    let buffer: byte[] = [(byte)0]\n'
+            f'    _ = stream.{operation}(buffer, 0, 1)\n'
+            '}\nfunc Main() {}\n')
+        rejected = subprocess.run(['dotnet', 'msbuild', str(root / 'StorageExplorer.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=120)
+        assert rejected.returncode != 0, f'{capability} admitted {operation}'
+        diagnostics = rejected.stdout + rejected.stderr
+        assert operation in diagnostics and 'error RAV' in diagnostics, diagnostics
+    print('Stream capability directions: rejected opposite operations')
