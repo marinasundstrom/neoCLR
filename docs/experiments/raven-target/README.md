@@ -832,10 +832,10 @@ bundle; Preview 9 artifacts do not supply this contract. Default .NET record syn
 is unchanged.
 
 The current slice admits non-generic record classes with integer, non-null string
-and same-compilation record-class components, preserving
+and same-compilation record-class components (including nullable references), preserving
 reference assignment while generating value equality, matching hashes, display and
 Deconstruct. The [record sample](../records/README.md) is the executable gate. RAVT004
-rejects nullable components, external record components, record structs and
+rejects nullable string/value components, external record components, record structs and
 generic/inherited shapes rather than suggesting full record parity. The target hash
 contract requires Add(int), Add(string) and ToHashCode. Nested records use typed
 Equals/GetHashCode; strings use their content equality operator. HashCode is a mutable
@@ -857,3 +857,11 @@ Shared candidate deferred for independent main validation: a source-defined gene
 runtime-interface fixture exposed a reentrant negative metadata-name lookup cache
 issue. The compiler regression uses a separately emitted provider assembly, matching
 the real target boundary. No shared source-cache fix or Raven main release is claimed.
+
+Nullable record-reference follow-up: generated members resolve the underlying record
+type while retaining nullable source properties. Null components compare/hash/display
+without dereferencing; Deconstruct retains null. The importer materializes literal
+nulls only for application-reference call/constructor arguments through typed adapters,
+preserving mixed/multiple argument positions. Intrinsic null strings remain rejected.
+The sample verifies both paths; no new RuntimeRecordContract settings or public
+library members are added.

@@ -14,12 +14,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   .NET comparisons and validation questions; no APIs or milestone priorities change.
 
 - Extend experimental Raven record components to non-null strings and nested
-  same-compilation record classes. Preserve Equatable<Record>, use content/typed
+  same-compilation record classes, including nullable record references.
+  Preserve Equatable<Record>, use content/typed
   equality and matching hashes, and support string/reference deconstruction outputs.
-  Nullable components, external record components and record structs remain
+  Typed importer call adapters preserve null argument positions; absent record
+  components retain null through equality, hashes, display and deconstruction.
+  Nullable strings/values, external record components and record structs remain
   unsupported. The configured hash provider now requires Add(string) as well as
   Add(int). Expand the checked sample, design comparison, API guide and website. Validation:
-  45 compiler tests, 32 reference-slot tests, Unicode/nested-record sample, editor
+  46 compiler tests, 32 reference-slot tests, Unicode/nested/nullable-record sample, editor
   completion and the combined site/API build. Prepare a separate matching local
   SDK snapshot, preserving the previous workspace.
 

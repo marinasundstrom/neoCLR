@@ -330,3 +330,8 @@ for nested same-compilation record classes. Output deconstruction now handles st
 and application references. Nullable components, metadata-only record components,
 boxed equality and record structs remain open. See the
 [component comparison and tradeoffs](hash-code-design.md#string-and-nested-record-components--2026-09-24).
+
+Nullable record references now pass source construction, null/present equality,
+hashing, display and deconstruction. This reuses existing reference storage and does
+not settle intrinsic nullable String or nullable value representation. Boxed-value
+equality remains the next bounded review before admitting record structs.

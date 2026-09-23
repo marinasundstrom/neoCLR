@@ -17,10 +17,17 @@ their direct base. Components can be Int32, non-null String, or another supporte
 record class declared in the same compilation. Strings compare by contents without
 normalization; nested records use typed Equals and GetHashCode. This is recursive
 component comparison, not general graph/collection equality or implicit boxing.
-Nullable components, externally compiled record components, record structs and
+Nullable string/value components, externally compiled record components, record structs and
 generic/inherited records remain outside this slice (RAVT004).
 
 The importer recognizes init-only property metadata, checks readonly-field writes,
 and supports the integer, string and application-reference output parameters used by generated Deconstruct. Property
 initialization restrictions are checked by Raven; runtime reflection over application
 properties and a persistent runtime init-only field flag are not provided here.
+
+OptionalEntry models a nullable reference at a boundary: its Owner: Person? can be
+null, and OptionalPair exercises mixed/multiple null arguments. Equality, hashes,
+display and deconstruction preserve the absent reference. This does not add nullable
+strings or nullable integer components. Prefer Option<T> for domain absence; Option
+record components remain a separate capability. The verifier also rejects passing
+null through the unsupported intrinsic-string argument path.

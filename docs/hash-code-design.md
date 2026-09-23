@@ -68,3 +68,27 @@ Defensive null handling for nested class values is tested through metadata invoc
 this does not add nullable Raven component support or null-string runtime support.
 The normal Raven/.NET synthesis path is unchanged. The experimental hash contract now
 requires Add(string) as well as Add(int) and ToHashCode; incomplete providers receive RAVT003.
+
+## Nullable record references — 2026-09-24
+
+A boundary record can now declare Owner: Person? for a supported source record class.
+Raven's [nullable model](https://github.com/marinasundstrom/raven/blob/main/docs/lang/nullability.md)
+distinguishes nullable reference state from Option<T> domain absence. This sample is
+about reference-state interoperability; it does not replace Option with null.
+As in [.NET nullable references](https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references)
+(reviewed 24 September 2026), the emitted class-reference representation is unchanged.
+Raven retains the nullable static property type and resolves generated calls against
+the underlying record type only after null guards.
+
+Two null components compare equal; one null and one present value differ. Null adds
+zero as its component hash and prints an empty component value, matching the existing
+record formatting convention. A zero hash contribution can collide with a present
+value's hash: equality remains authoritative. Deconstruction preserves null.
+
+The importer previously admitted stored null references but not literal null arguments.
+Typed call adapters now materialize application-reference nulls in argument order;
+this handles both constructors and ordinary calls, including multiple null arguments.
+It does not introduce boxes, a general null value for intrinsic String, or Nullable<T>
+value storage. Retaining explicit diagnostics for nullable strings/integers is preferable
+to silently turning null into empty text or zero. Those representations, Option record
+components and boxed-value equality remain follow-up work.

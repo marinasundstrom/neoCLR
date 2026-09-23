@@ -4,8 +4,12 @@ record class Key(Number: int)
 record class Pair(Left: int, Right: int)
 record class Person(Name: string, Age: int)
 record class Entry(Owner: Person, Number: int)
+record class OptionalEntry(Owner: Person?, Number: int)
+record class OptionalPair(Left: Person?, Right: Person?)
 
 func BuildName(prefix: string) -> string => prefix + "ven"
+
+func Wrap(owner: Person?, number: int) -> OptionalEntry => OptionalEntry(owner, number)
 
 func Main() {
     let first = Key(42)
@@ -68,6 +72,24 @@ func Main() {
     if entry.ToString() != "Entry { Owner = Person { Name = Raven, Age = 42 }, Number = 7 }" {
         System.Fault("Unexpected nested record display")
     }
+    let missing = OptionalEntry(null, 7)
+    let sameMissing = Wrap(null, 7)
+    let present = OptionalEntry(person, 7)
+    let nullableView: Equatable<OptionalEntry> = missing
+    if !nullableView.Equals(sameMissing) || missing != sameMissing || missing.GetHashCode() != sameMissing.GetHashCode() {
+        System.Fault("Absent record components must compare and hash equally")
+    }
+    if missing == present || present == missing || missing == OptionalEntry(null, 8) {
+        System.Fault("Presence and other components must affect equality")
+    }
+    let (missingOwner, missingNumber) = missing
+    if missingOwner is not null || missingNumber != 7 || missing.ToString() != "OptionalEntry { Owner = , Number = 7 }" {
+        System.Fault("Absent components must survive deconstruction and display")
+    }
+    if OptionalPair(null, null) != OptionalPair(null, null) || OptionalPair(person, null) == OptionalPair(null, person) {
+        System.Fault("Null arguments must preserve their positions")
+    }
+    Console.WriteLine("Nullable record components preserve absence")
     Console.WriteLine(entry.ToString())
     Console.WriteLine(first.ToString())
     Console.WriteLine("Records retain reference identity and compare their components")

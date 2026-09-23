@@ -106,13 +106,26 @@ static class UnionImport
             if (!coercions.TryGetValue(key, out var helper))
             {
                 var name = "RuntimeCliCall" + coercions.Count;
-                var parameters = actual.Select((t, i) => (i == call.OutArgument ? (call.ConditionalOutput ? "out(true) " : "out ") : call.Outputs?.Contains(i) == true ? "out " : ApplicationTypes.IsLibraryUnion(call.Arguments[i]) && t == call.Arguments[i] + "&" ? "readonly " : "") + t + " arg" + i);
+                // CLI null slots have no emitted stack value. Materialize them in the
+                // adapter so later evaluated arguments retain their original positions.
+                var parameters = actual.Select((t, i) => (Type: t, Index: i)).Where(p => p.Type != "FaultNull").Select(p =>
+                {
+                    var (t, i) = p;
+                    return (i == call.OutArgument ? (call.ConditionalOutput ? "out(true) " : "out ") : call.Outputs?.Contains(i) == true ? "out " : ApplicationTypes.IsLibraryUnion(call.Arguments[i]) && t == call.Arguments[i] + "&" ? "readonly " : "") + t + " arg" + i;
+                });
                 var body = new StringBuilder($".function {name}({string.Join(',', parameters)}) -> {call.Result}\n");
-                for (var i = 0; i < actual.Length; i++) body.AppendLine("ldarg arg" + i).Append(ConvertStack(actual[i], call.Arguments[i]));
+                for (var i = 0; i < actual.Length; i++)
+                    if (actual[i] == "FaultNull") body.AppendLine($".local {call.Arguments[i]} null{i}");
+                for (var i = 0; i < actual.Length; i++)
+                {
+                    if (actual[i] == "FaultNull")
+                        body.AppendLine($"ldloca null{i}\ninitobj {call.Arguments[i]}\nldloc null{i}");
+                    else body.AppendLine("ldarg arg" + i).Append(ConvertStack(actual[i], call.Arguments[i]));
+                }
                 body.AppendLine(call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})").AppendLine("ret\n.end");
                 helper = (name, body.ToString()); coercions.Add(key, helper);
             }
-            return call with { Name = helper.Name, Arguments = actual, Instruction = null };
+            return call with { Name = helper.Name, Arguments = actual.Where(t => t != "FaultNull").ToArray(), Instruction = null };
         }
         var delegateAdapters = new Dictionary<string, string>();
         var mappings = new List<(MethodDefinition Method, int MethodId, int Offset)>();
@@ -975,7 +988,7 @@ static class UnionImport
         "System.Result/Error`1<System.OverflowError>" when type.IsValueType => Error,
         _ => throw new InvalidDataException("Unsupported Result profile type: " + type.FullName)
     };
-    static bool Converts(string source, string target) => source != target && target == "System.Object" && ManagedArrayBindings.IsReference(source) || ApplicationTypes.IsLibraryUnion(target) && source == target + "&" || InterfaceBindings.Converts(source, target) || BooleanBindings.Converts(source, target) || EnumBindings.Converts(source, target);
+    static bool Converts(string source, string target) => source == "FaultNull" && ApplicationTypes.IsReference(target) || source != target && target == "System.Object" && ManagedArrayBindings.IsReference(source) || ApplicationTypes.IsLibraryUnion(target) && source == target + "&" || InterfaceBindings.Converts(source, target) || BooleanBindings.Converts(source, target) || EnumBindings.Converts(source, target);
     static string ConvertStack(string source, string target) => (source != target && target == "System.Object" && ManagedArrayBindings.IsReference(source) ? "castclass System.Object\n" : "") + (ApplicationTypes.IsLibraryUnion(target) && source == target + "&" ? "ldobj " + target + "\n" : "") + InterfaceBindings.Convert(source, target) + BooleanBindings.Convert(source, target) + EnumBindings.Convert(source, target);
     static bool NeedsInitialization(string type) => ReaderBindings.IsName(type) || ApplicationTypes.LibraryUnionRequiresInitialization(type) || CalendarBindings.IsReference(type) || type is "System.Object" or ParameterSnapshotBindings.Vector || InterfaceBindings.IsInterface(type) || NativeMemoryBindings.IsPointer(type) || type is "System.RuntimeTypeHandle" or "Value" || DelegateBindings.IsType(type) || (GenericUnionBindings.IsType(type)
         ? GenericUnionBindings.RequiresInitialization(type) : ResultBindings.RequiresInitialization(type));

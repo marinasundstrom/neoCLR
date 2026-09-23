@@ -56,8 +56,10 @@ with nullable/boxed semantics and record structs to follow as separate work.
 **Action.** Extended the target-specific synthesis on Raven's experimental branch:
 string content equality/hash, typed nested equality/hash/display and declared
 reference outputs for deconstruction. Added forward-reference and metadata-injected
-null regression cases. Retained explicit diagnostics for nullable and unsupported
-component types. Validation passed: 45 compiler tests, 32 reference-slot tests, the expanded neoCLR
+null regression cases. Retained explicit diagnostics for nullable string/value and unsupported
+component types. A follow-up admits nullable record references using existing
+reference storage, and typed importer adapters preserve literal null argument
+positions in constructors and calls. Validation passed: 46 compiler tests, 32 reference-slot tests, the expanded neoCLR
 sample, nested-record editor completions and the combined site/API build. A separate
 local SDK workspace preserves the prior snapshot. No general comparer API or Raven
 main integration is claimed.

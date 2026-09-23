@@ -91,7 +91,7 @@ reference identity and class equality/hash now have bounded implementations. Str
 identity and boxed-value dispatch remain representation gaps. Raven record syntax
 now passes an end-to-end record-class sample with integer, string and nested components with generated equality,
 hashing, display and deconstruction. Record structs, generic/inherited records and
-nullable/arbitrary component types are not supported by this target contract. See Microsoft's
+nullable string/value and arbitrary component types are not supported by this target contract. See Microsoft's
 [Object contract](https://learn.microsoft.com/en-us/dotnet/api/system.object?view=net-10.0)
 for the comparison baseline; neoCLR does not yet provide that entire surface.
 
@@ -120,8 +120,10 @@ deconstruction retrieves the components. Person(Name: string, Age: int) adds str
 content equality, and Entry(Owner: Person, Number: int) compares a nested record via
 typed Equals and hashes its value. Nested display calls ToString; deconstruction
 preserves the nested reference. Components may be Int32, non-null String or supported
-record classes declared in the same compilation. Nullable components and externally
-compiled record components remain unsupported; this is not general graph equality.
+record classes declared in the same compilation, including nullable record references.
+Two null components compare equal; null and present values differ. Null contributes
+zero to hashing, prints an empty component value and survives deconstruction. Nullable
+string/value components and externally compiled record components remain unsupported; this is not general graph equality.
 
 Raven's target configuration selects System.Equatable and System.HashCode. Unsupported
 record shapes report RAVT004. Init-only property assignment remains a compiler rule;
