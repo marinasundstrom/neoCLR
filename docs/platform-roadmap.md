@@ -310,8 +310,10 @@ are proposed. A language-only check is not evidence of runtime enforcement.
 
 M1 remains active. Its first [host-side S0 experiment](experiments/external-io-progress/README.md)
 passes seven ownership/progress/cancellation checks. This is a reduced Rust model,
-not a guest networking API or completed S0. The next S0 case will be invocation-owned
-host completion delivery with actual guest GC retention and a Raven consumer.
+not a guest networking API or completed S0. A [real-heap ownership follow-up](experiments/external-io-progress/GC-OWNERSHIP.md)
+now verifies pending and ready roots, receiver graphs, reclamation and terminal
+cleanup in eight test-only cases. The next S0 case must integrate those roots into
+the actual interpreter invocation and deliver completion to a Raven consumer.
 S1 now has a [runnable Byte Copy checkpoint](experiments/byte-copy/README.md):
 checked ranges, overlapping copies and short reads/writes over ordinary managed
 arrays, with synchronous GC-retention checks. It is an application-local experiment,
@@ -339,10 +341,11 @@ its feature plan, and update changelog, relevant feature pages and integration d
 Samples begin as small programs, not miniature frameworks. Existing release/debugging
 requirements and Raven branch/integration rules continue to apply.
 
-**Next:** validate guest lifetimes with controlled delayed completion, using the
-existing Byte Copy/text/document consumers as context. Connect invocation-owned
-host completion to actual guest GC retention before reusing the pipeline for files
-and then sockets. Keep the application-enum and protected-constructor importer
+**Next:** integrate the checked pending/ready ownership protocol into the real VM
+collection and TaskQueue dispatch paths, using a controlled delayed-copy Raven
+consumer. The real-heap fixture is supporting evidence, not completion of that
+checkpoint. Verify invocation failure and cancellation teardown before reusing the
+pipeline for files and then sockets. Keep the application-enum and protected-constructor importer
 limitations exposed by the JSON experiment as explicit follow-up probes; they do
 not require a metadata redesign or block this next lifetime checkpoint. Reassess
 priorities at each checkpoint and M2 onward after the first major HTTP application

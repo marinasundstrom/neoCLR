@@ -86,9 +86,17 @@ These cases use channels rather than sleeps to control ordering. The five-second
 receive timeout is a test watchdog, not an I/O deadline contract. The race cases
 exercise both controlled orderings, not exhaustive concurrency model checking.
 
+## Real-heap follow-up
+
+The [Delayed Byte Copy ownership probe](GC-OWNERSHIP.md) now checks eight cases
+against neoCLR's real tracing heap: pending destination and callback roots, transfer
+to a ready owner, reclamation, cancellation, invalid inputs and teardown. It is a
+test-only registry, not interpreter dispatch or a guest Task/Promise consumer.
+
 ## Remaining S0 work
 
-Rc retention is **not guest GC evidence**. Next connect a reduced host completion
+Rc retention in this original probe is **not guest GC evidence**. The new probe
+adds actual heap evidence but still needs VM integration. Next connect a reduced host completion
 source to the interpreter's invocation-owned registry, trace the Task/Promise and
 managed destination through actual GC, and deliver completion through the existing
 Task queue. Demonstrate one runnable Raven caller and direct-IL negative cases for

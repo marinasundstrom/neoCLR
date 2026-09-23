@@ -35,12 +35,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   homepage and Collections. Validate 12 website pages, website tests, the new sample
   and 32 existing runtime array tests. No website publication is implied.
 
-- Start M1/S0 with an isolated host-side external-completion experiment. Seven passing
-  cases cover pending destination retention, callback progress, cancellation
-  acknowledgement, both completion/cancellation orderings, late-event rejection and
-  teardown. Record owned-byte delivery as a candidate, not a selected API/backend;
-  guest GC/Task integration and real I/O remain unimplemented. Update roadmap status
-  with partial evidence and reproduction instructions.
+- Start M1/S0 with an isolated host-side external-completion experiment. Seven cases
+  cover callback progress, cancellation acknowledgement, completion ordering and
+  teardown. Add eight test-only delayed Byte Copy checks against the real managed
+  heap, array slots and delegate receiver tracing: pending-to-ready root handoff,
+  collection/reclamation, invalid-input rejection and terminal cleanup. Record
+  owned-byte delivery as a candidate; VM/TaskQueue integration, a Raven delayed-copy
+  consumer and real I/O remain open. Normal runtime builds are unchanged.
 
 - Prioritize an HTTP client/server application POC in the roadmap, with smaller
   stream, encoding, JSON and TCP cases, explicit acceptance criteria and complete

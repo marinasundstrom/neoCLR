@@ -144,3 +144,8 @@ pub mod metadata_origin;
 mod assembly_info;
 
 mod metadata_tokens;
+
+// Research harness: real tracing-heap ownership without a public I/O service.
+#[cfg(test)]
+#[path = "../docs/experiments/external-io-progress/gc_probe.rs"]
+mod external_io_gc_probe;
