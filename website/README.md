@@ -130,3 +130,11 @@ current scope and participation guidance. General explanations belong on-site;
 GitHub design records are optional detail. Follow the technical, approachable
 editorial direction in `docs/design/feature-pages.md`, keeping community participation
 open without implying unestablished governance or promised APIs.
+
+## API reference
+
+Run `dotnet tool restore` before the website build (.NET 10 required). The builder
+also runs DocFX and places the development API reference at `/docs/`, with the
+feature guides providing the broader API overview. See
+[API documentation maintenance](../api-docs/README.md) for metadata/XML regeneration,
+the initial Task scope and the callback-signature limitation.

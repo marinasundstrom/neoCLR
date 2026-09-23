@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the dependency-free project site using excerpts from executable samples."""
+"""Build the project site and DocFX reference, using executable sample excerpts."""
 from html import escape, unescape
 from html.parser import HTMLParser
 from pathlib import Path
@@ -7,6 +7,7 @@ import shutil
 import json
 import re
 import subprocess
+import sys
 from textwrap import dedent
 from urllib.parse import urlsplit, unquote
 
@@ -80,6 +81,31 @@ def render(page, samples):
     return page
 
 
+def check_reference_links():
+    # DocFX validates its own content graph. Also check links from generated HTML
+    # into the surrounding website, including root-relative overview links.
+    class ReferenceLinks(HTMLParser):
+        def handle_starttag(self, tag, attrs):
+            for name, value in attrs:
+                if name not in ('href', 'src') or not value:
+                    continue
+                url = urlsplit(value)
+                if url.scheme or url.netloc or not url.path:
+                    continue
+                path = unquote(url.path)
+                target = ((OUTPUT / path.lstrip('/')) if path.startswith('/')
+                          else self.page.parent / path).resolve()
+                if target.is_dir():
+                    target /= 'index.html'
+                if not target.is_relative_to(OUTPUT.resolve()) or not target.is_file():
+                    raise ValueError(f'Missing API reference link in {self.page.name}: {value}')
+
+    for page in (OUTPUT / 'docs').rglob('*.html'):
+        parser = ReferenceLinks()
+        parser.page = page
+        parser.feed(page.read_text(encoding='utf-8'))
+
+
 def main():
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)
@@ -146,8 +172,10 @@ def main():
         check = PageCheck()
         check.feed(page)
         pages[target.resolve()] = check
+    subprocess.run([sys.executable, str(ROOT / 'scripts/build-api-docs.py')], check=True)
     for path, check in pages.items():
         check.check(path, pages)
+    check_reference_links()
     (OUTPUT / '.nojekyll').touch()
     print(f'Built and checked {len(pages)} pages:', OUTPUT)
 

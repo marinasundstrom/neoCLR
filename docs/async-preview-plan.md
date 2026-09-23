@@ -67,7 +67,9 @@ editor probes exist, but they do not certify a future archive or another platfor
   evidence for each claimed binary target; source CI does not establish binary support.
 - [ ] Review the complete candidate diff, migration notes, notices, checksums and
   release notes. Align README, Tasks/overview/setup pages and downloadable samples
-  with the actual package contents. Verify supported APIs against .NET comparisons
+  with the actual package contents. Include the DocFX `/docs/` overview and useful
+  main async API descriptions; exhaustive documentation is not required for this release.
+  Verify supported APIs against .NET comparisons
   already recorded in [Task contracts](task-contracts.md) and [workers](isolated-workers.md).
 
 Minimum migration review: System.Tasks namespace and producer API changes; terminal
@@ -78,10 +80,10 @@ Preview 8 instead of assuming this list is exhaustive.
 
 ## Next action and exit
 
-The next bounded task is a candidate-readiness inventory: map each gate to the exact
-script/sample/artifact, run cheap regeneration and documentation consistency checks,
-then build one clean local evaluator bundle. Record blockers with evidence and only
-claim platforms actually tested. Remote candidate CI and publication remain distinct
+Local progress is recorded in [the readiness inventory](async-preview-readiness.md).
+Next, repackage the corrected Workbench verifier and check it after extraction,
+then complete full library regeneration and the remaining editor/candidate gates.
+Record blockers with evidence and only claim platforms actually tested. Remote candidate CI and publication remain distinct
 steps; this plan does not tag, push, upload artifacts or publish the website.
 
 When the gates pass, select the actual version/date and publication scope through

@@ -2,3 +2,5 @@
 .DS_Store
 
 /website/node_modules/
+
+/api-docs/api/.manifest

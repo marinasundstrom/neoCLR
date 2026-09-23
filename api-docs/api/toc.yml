@@ -1,0 +1,19 @@
+### YamlMime:TableOfContent
+items:
+- uid: System.Tasks
+  name: System.Tasks
+  type: Namespace
+  items:
+  - uid: System.Tasks.Promise`1
+    name: Promise<T>
+    type: Class
+  - uid: System.Tasks.TaskQueue
+    name: TaskQueue
+    type: Class
+  - uid: System.Tasks.TaskState
+    name: TaskState
+    type: Enum
+  - uid: System.Tasks.Task`1
+    name: Task<T>
+    type: Class
+memberLayout: SamePage

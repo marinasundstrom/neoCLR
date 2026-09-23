@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='utf-8'?>
+<doc>
+  <assembly>
+    <name>NeoCLR.CoreProbe</name>
+  </assembly>
+  <members>
+    <member name="T:System.Tasks.Task`1">
+      <summary>A consumer handle for one eventual value or cancellation.</summary>
+      <remarks>Obtain a task from Promise&lt;T&gt;.Task or an async method. Consumers cannot complete it. Expected failures belong in the result type; there is no faulted Task state. This provisional API is confined to one guest invocation. Callback methods using Func&lt;System.Void&gt; are described in the [callback guide](/docs/callbacks.html).</remarks>
+      <typeparam name="T">The value type carried by successful completion, including Result values for expected failures.</typeparam>
+    </member>
+    <member name="P:System.Tasks.Task`1.State">
+      <summary>Gets Pending, Completed or Cancelled.</summary>
+      <remarks>Completed means a value is available. Cancelled is a separate terminal state.</remarks>
+    </member>
+    <member name="P:System.Tasks.Task`1.Outcome">
+      <summary>Gets None while pending, or Some containing Completed(value) or Cancelled.</summary>
+      <remarks>Inspect the union with Raven patterns to handle cancellation explicitly. Reading this property does not wait or pump a queue.</remarks>
+    </member>
+    <member name="P:System.Tasks.Task`1.IsCompleted">
+      <summary>Gets whether the task has reached either terminal state.</summary>
+      <remarks>True for both successful completion and cancellation. Inspect State or Outcome to distinguish them.</remarks>
+    </member>
+    <member name="P:System.Tasks.Task`1.IsCancelled">
+      <summary>Gets whether the producer cancelled the task.</summary>
+      <remarks>Also used by the provisional async compiler protocol.</remarks>
+    </member>
+    <member name="M:System.Tasks.Task`1.GetAwaiter">
+      <summary>Returns this task for the await protocol.</summary>
+      <returns>The same task instance.</returns>
+    </member>
+    <member name="M:System.Tasks.Task`1.GetResult">
+      <summary>Reads the completed value without waiting.</summary>
+      <remarks>A pending or cancelled task produces a runtime fault. Application code should normally use await or inspect Outcome.</remarks>
+      <returns>The value supplied by the producer.</returns>
+    </member>
+    <member name="M:System.Tasks.Task`1.OnCompleted(System.Func{System.Void})">
+      <summary>Schedules a callback when this task reaches a terminal state.</summary>
+      <remarks>The callback is posted to the promise’s queue, never invoked inline by registration. Registering after completion or cancellation also posts it.</remarks>
+      <param name="callback">The callback to run on the associated queue.</param>
+    </member>
+    <member name="T:System.Tasks.Promise`1">
+      <summary>Producer authority to complete or cancel one task.</summary>
+      <remarks>The first successful terminal operation wins. Subsequent Complete or Cancel calls return false. Continuations are queued. This is not a thread-safe shared-memory primitive or a cancellation-token source.</remarks>
+      <typeparam name="T">The value type carried by successful completion, including Result values for expected failures.</typeparam>
+    </member>
+    <member name="M:System.Tasks.Promise`1.#ctor">
+      <summary>Creates a promise on the current queue, falling back to the invocation’s default queue.</summary>
+    </member>
+    <member name="M:System.Tasks.Promise`1.#ctor(System.Tasks.TaskQueue)">
+      <summary>Creates a promise on an explicit queue.</summary>
+      <param name="queue">The dispatcher that will receive completion and cancellation callbacks.</param>
+    </member>
+    <member name="P:System.Tasks.Promise`1.Task">
+      <summary>Gets the stable consumer handle for this promise.</summary>
+      <remarks>Repeated reads return the same task. The handle does not expose Complete or Cancel.</remarks>
+    </member>
+    <member name="M:System.Tasks.Promise`1.Complete(`0)">
+      <summary>Completes a pending task with a value and posts its registered callbacks.</summary>
+      <returns>True if this call completed the task; false if it was already completed or cancelled.</returns>
+      <param name="value">The task’s successful result, which may itself be a Result value.</param>
+    </member>
+    <member name="M:System.Tasks.Promise`1.Cancel">
+      <summary>Cancels a pending task and posts its registered callbacks.</summary>
+      <remarks>This changes the promise state. It does not stop a worker or cancel the host invocation. Awaiting a cancelled input propagates cancellation to the enclosing async task.</remarks>
+      <returns>True if this call cancelled the task; false if it was already completed or cancelled.</returns>
+    </member>
+    <member name="T:System.Tasks.TaskQueue">
+      <summary>A FIFO callback dispatcher within one guest invocation.</summary>
+      <remarks>Post schedules work. Drain runs callbacks in batches until empty, including callbacks posted during dispatch. Recursive pumping produces a runtime fault. This is not a thread pool or general-purpose event loop. Callback methods using Func&lt;System.Void&gt; are described in the [callback guide](/docs/callbacks.html).</remarks>
+    </member>
+    <member name="M:System.Tasks.TaskQueue.#ctor">
+      <summary>Creates an empty explicit queue.</summary>
+    </member>
+    <member name="P:System.Tasks.TaskQueue.Default">
+      <summary>Gets the lazily created queue for the current invocation.</summary>
+      <remarks>Repeated reads within an invocation return the same queue. Normal runtime invocation pumps default-queue work after the entry point returns; isolated workers have their own invocation state.</remarks>
+    </member>
+    <member name="M:System.Tasks.TaskQueue.Post(System.Func{System.Void})">
+      <summary>Appends a callback without executing it.</summary>
+      <param name="callback">Work to execute when the queue is pumped.</param>
+    </member>
+    <member name="M:System.Tasks.TaskQueue.Run(System.Func{System.Void})">
+      <summary>Runs the callback, then drains this queue.</summary>
+      <remarks>Recursive pumping produces a runtime fault. While Run or Drain is active, newly constructed promises and async methods select the nearest active queue. An explicit Promise&lt;T&gt;(queue) selects its supplied queue instead.</remarks>
+      <param name="callback">Initial work to execute before queued callbacks.</param>
+    </member>
+    <member name="M:System.Tasks.TaskQueue.Drain">
+      <summary>Runs queued callbacks until the queue is empty.</summary>
+      <remarks>Callbacks posted by a running callback join the next batch. Recursive pumping produces a runtime fault. Runtime faults stop execution; this is not an exception recovery boundary.</remarks>
+    </member>
+    <member name="T:System.Tasks.TaskState">
+      <summary>The observable state of a task.</summary>
+    </member>
+    <member name="F:System.Tasks.TaskState.Pending">
+      <summary>No value or cancellation has been published.</summary>
+    </member>
+    <member name="F:System.Tasks.TaskState.Completed">
+      <summary>A value is available. This state is terminal.</summary>
+    </member>
+    <member name="F:System.Tasks.TaskState.Cancelled">
+      <summary>The producer cancelled the task. This state is terminal.</summary>
+    </member>
+  </members>
+</doc>

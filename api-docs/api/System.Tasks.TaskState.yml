@@ -1,0 +1,121 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Tasks.TaskState
+  commentId: T:System.Tasks.TaskState
+  id: TaskState
+  parent: System.Tasks
+  children:
+  - System.Tasks.TaskState.Cancelled
+  - System.Tasks.TaskState.Completed
+  - System.Tasks.TaskState.Pending
+  langs:
+  - csharp
+  - vb
+  name: TaskState
+  nameWithType: TaskState
+  fullName: System.Tasks.TaskState
+  type: Enum
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Tasks
+  summary: The observable state of a task.
+  example: []
+  syntax:
+    content: public enum TaskState
+    content.vb: Public Enum TaskState
+- uid: System.Tasks.TaskState.Pending
+  commentId: F:System.Tasks.TaskState.Pending
+  id: Pending
+  parent: System.Tasks.TaskState
+  langs:
+  - csharp
+  - vb
+  name: Pending
+  nameWithType: TaskState.Pending
+  fullName: System.Tasks.TaskState.Pending
+  type: Field
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Tasks
+  summary: No value or cancellation has been published.
+  example: []
+  syntax:
+    content: Pending = 0
+    return:
+      type: System.Tasks.TaskState
+- uid: System.Tasks.TaskState.Completed
+  commentId: F:System.Tasks.TaskState.Completed
+  id: Completed
+  parent: System.Tasks.TaskState
+  langs:
+  - csharp
+  - vb
+  name: Completed
+  nameWithType: TaskState.Completed
+  fullName: System.Tasks.TaskState.Completed
+  type: Field
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Tasks
+  summary: A value is available. This state is terminal.
+  example: []
+  syntax:
+    content: Completed = 1
+    return:
+      type: System.Tasks.TaskState
+- uid: System.Tasks.TaskState.Cancelled
+  commentId: F:System.Tasks.TaskState.Cancelled
+  id: Cancelled
+  parent: System.Tasks.TaskState
+  langs:
+  - csharp
+  - vb
+  name: Cancelled
+  nameWithType: TaskState.Cancelled
+  fullName: System.Tasks.TaskState.Cancelled
+  type: Field
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Tasks
+  summary: The producer cancelled the task. This state is terminal.
+  example: []
+  syntax:
+    content: Cancelled = 2
+    return:
+      type: System.Tasks.TaskState
+references:
+- uid: System.Tasks
+  commentId: N:System.Tasks
+  isExternal: true
+  href: System.html
+  name: System.Tasks
+  nameWithType: System.Tasks
+  fullName: System.Tasks
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Tasks
+    name: Tasks
+    isExternal: true
+    href: System.Tasks.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Tasks
+    name: Tasks
+    isExternal: true
+    href: System.Tasks.html
+- uid: System.Tasks.TaskState
+  commentId: T:System.Tasks.TaskState
+  parent: System.Tasks
+  isExternal: true
+  href: System.Tasks.TaskState.html
+  name: TaskState
+  nameWithType: TaskState
+  fullName: System.Tasks.TaskState

@@ -1,0 +1,11 @@
+apiRules:
+- exclude:
+    uidRegex: '^System\.Tasks\.(TaskQueue\.(Post|Run)|Task`1\.OnCompleted)(\(|$)'
+    type: Method
+- include:
+    uidRegex: '^System\.Tasks$'
+    type: Namespace
+- include:
+    uidRegex: '^System\.Tasks\.(Task`1|Promise`1|TaskQueue|TaskState)($|\.)'
+- exclude:
+    uidRegex: '.*'

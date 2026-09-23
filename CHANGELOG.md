@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Add a DocFX development API reference at `/docs/`, with an API overview, authored
+  XML descriptions for the initial Task surface, and metadata-generated signatures.
+  Document three unsupported callback signatures separately in Raven notation.
+  Integrate the reference into website navigation, validation and the Pages artifact;
+  publication remains manual. Keep this release’s documentation scope to a useful
+  overview and main APIs, with exhaustive coverage deferred.
+
 - Prepare async preview packaging: include the current Task probes in the evaluator
   bundle, make their helper/sample paths work after extraction, replace the obsolete
   explicit-worker-queue expectation and add an eight-sample saved-project Async

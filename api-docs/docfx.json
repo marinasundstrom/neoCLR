@@ -1,0 +1,59 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../target/api-docs/input",
+          "files": [
+            "NeoCLR.CoreProbe.dll"
+          ]
+        }
+      ],
+      "dest": "api",
+      "filter": "filter.yml",
+      "disableGitFeatures": true
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "*.md",
+          "toc.yml",
+          "api/*.yml"
+        ],
+        "exclude": [
+          "README.md"
+        ]
+      },
+      {
+        "src": "namespaces",
+        "files": [
+          "*.md"
+        ],
+        "dest": "api"
+      }
+    ],
+    "output": "../target/website/docs",
+    "template": [
+      "default",
+      "modern"
+    ],
+    "globalMetadata": {
+      "_appTitle": "neoCLR API reference \u00b7 Experimental",
+      "_appName": "neoCLR \u00b7 Experimental",
+      "_appFooter": "Experimental application platform \u00b7 Development API \u00b7 C#/VB signatures are metadata notation",
+      "_enableSearch": true,
+      "_disableContribution": true,
+      "_lang": "en",
+      "_appLogoPath": "images/mark.svg"
+    },
+    "resource": [
+      {
+        "files": [
+          "images/**"
+        ]
+      }
+    ]
+  }
+}

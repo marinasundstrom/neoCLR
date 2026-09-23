@@ -73,6 +73,9 @@ adapter and guest operation cancellation tokens are not part of the supported sc
 
 This is a release checkpoint within the foundations work, not a replacement for M1
 or a declaration that S0 is complete. Version/date remain unset.
+The author also requests a DocFX API reference at `/docs/`. For this release,
+provide a useful overview, main async API descriptions and links to tested examples;
+complete member coverage is not a release gate. See [documentation maintenance](../api-docs/README.md).
 After the release, focus on Streams, Storage and Encoding before networking, as
 requested by the author. Reuse memory-backed and file-backed transformation samples;
 start Storage with bounded local file operations rather than a full provider model.

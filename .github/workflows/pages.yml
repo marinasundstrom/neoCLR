@@ -5,6 +5,11 @@ on:
     branches: [main]
     paths:
       - 'website/**'
+      - 'api-docs/**'
+      - '.config/dotnet-tools.json'
+      - 'scripts/build-api-docs.py'
+      - 'docs/experiments/raven-target/*.cs'
+      - 'runtime/raven/src/System/Tasks/**'
       - 'scripts/build-website.py'
       - 'scripts/test_build_website.py'
       - 'examples/preview/result-void.neoil'
@@ -15,6 +20,11 @@ on:
   pull_request:
     paths:
       - 'website/**'
+      - 'api-docs/**'
+      - '.config/dotnet-tools.json'
+      - 'scripts/build-api-docs.py'
+      - 'docs/experiments/raven-target/*.cs'
+      - 'runtime/raven/src/System/Tasks/**'
       - 'scripts/build-website.py'
       - 'scripts/test_build_website.py'
       - 'examples/preview/result-void.neoil'
@@ -44,6 +54,11 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: website/package-lock.json
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore DocFX
+        run: dotnet tool restore
       - name: Install website tokenizer
         run: npm ci --prefix website --ignore-scripts
       - name: Check Raven highlighting

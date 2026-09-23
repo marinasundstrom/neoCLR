@@ -1,0 +1,120 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Tasks
+  commentId: N:System.Tasks
+  id: System.Tasks
+  children:
+  - System.Tasks.Promise`1
+  - System.Tasks.TaskQueue
+  - System.Tasks.TaskState
+  - System.Tasks.Task`1
+  langs:
+  - csharp
+  - vb
+  name: System.Tasks
+  nameWithType: System.Tasks
+  fullName: System.Tasks
+  type: Namespace
+  assemblies:
+  - NeoCLR.CoreProbe
+references:
+- uid: System.Tasks.TaskState
+  commentId: T:System.Tasks.TaskState
+  parent: System.Tasks
+  isExternal: true
+  href: System.Tasks.TaskState.html
+  name: TaskState
+  nameWithType: TaskState
+  fullName: System.Tasks.TaskState
+- uid: System.Tasks.TaskQueue
+  commentId: T:System.Tasks.TaskQueue
+  parent: System.Tasks
+  isExternal: true
+  href: System.Tasks.TaskQueue.html
+  name: TaskQueue
+  nameWithType: TaskQueue
+  fullName: System.Tasks.TaskQueue
+- uid: System.Tasks.Task`1
+  commentId: T:System.Tasks.Task`1
+  parent: System.Tasks
+  isExternal: true
+  href: System.Tasks.Task-1.html
+  name: Task<T>
+  nameWithType: Task<T>
+  fullName: System.Tasks.Task<T>
+  nameWithType.vb: Task(Of T)
+  fullName.vb: System.Tasks.Task(Of T)
+  name.vb: Task(Of T)
+  spec.csharp:
+  - uid: System.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: System.Tasks.Task-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: System.Tasks.Task-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Tasks.Promise`1
+  commentId: T:System.Tasks.Promise`1
+  isExternal: true
+  href: System.Tasks.Promise-1.html
+  name: Promise<T>
+  nameWithType: Promise<T>
+  fullName: System.Tasks.Promise<T>
+  nameWithType.vb: Promise(Of T)
+  fullName.vb: System.Tasks.Promise(Of T)
+  name.vb: Promise(Of T)
+  spec.csharp:
+  - uid: System.Tasks.Promise`1
+    name: Promise
+    isExternal: true
+    href: System.Tasks.Promise-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Tasks.Promise`1
+    name: Promise
+    isExternal: true
+    href: System.Tasks.Promise-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Tasks
+  commentId: N:System.Tasks
+  isExternal: true
+  href: System.html
+  name: System.Tasks
+  nameWithType: System.Tasks
+  fullName: System.Tasks
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Tasks
+    name: Tasks
+    isExternal: true
+    href: System.Tasks.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Tasks
+    name: Tasks
+    isExternal: true
+    href: System.Tasks.html

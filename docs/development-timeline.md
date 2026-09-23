@@ -5050,3 +5050,26 @@ and recorded the convention for runtime code as well as examples.
 - **Validation:** all 13 pages build with internal links checked; tokenizer and
   website tests pass. Inspected the homepage and new overview at desktop and narrow
   sizes. No site publication was performed.
+
+
+### 2026-09-23 — API documentation alongside the website
+
+- **Author:** requested API documentation generated from metadata and XML docs using
+  DocFX, published alongside the website at `/docs/`, with real descriptions to make
+  it useful. Subsequently clarified that this release needs “good enough
+  documentation” for an API overview, not exhaustive coverage.
+- **Assistant response and action:** added a broad on-site API index and an initial
+  generated Task, Promise, TaskQueue and TaskState reference. Descriptions currently
+  live in an authored XML sidecar; the signatures come from the compiler reference
+  assembly. Added DocFX to the combined website build and Pages artifact, with
+  navigation from all site pages. Documentation completeness does not delay the async
+  preview beyond this overview and main-API scope.
+- **Finding and tradeoff:** DocFX 2.80.1 cannot render the neoCLR-specific
+  `Func<System.Void>` callback signatures. Three methods are documented on a linked
+  Raven-notation guide instead. The generated declarations are clearly labelled
+  metadata notation; no runtime types were changed to accommodate DocFX. A checked-in
+  metadata snapshot lets website CI build without a Raven source checkout.
+- **Outcome:** local DocFX build and existing website checks pass. Publication uses
+  the existing manual main-branch workflow and has not occurred in this work.
+  Broader member coverage and automatic XML emission from Raven source comments
+  remain future work.
