@@ -1,0 +1,6 @@
+Copied bytes:
+4
+Decoded message:
+Hi!
+
+Transfer complete

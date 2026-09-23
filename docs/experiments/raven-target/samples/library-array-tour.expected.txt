@@ -1,0 +1,15 @@
+Number of readings:
+3
+Read-only view sees the correction:
+22
+Snapshot then current reading:
+18
+19
+Current readings:
+19
+22
+21
+Empty array length:
+0
+Array element type:
+System.Int32

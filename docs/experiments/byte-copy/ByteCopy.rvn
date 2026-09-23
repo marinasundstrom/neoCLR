@@ -1,0 +1,110 @@
+import System.*
+import System.Result.*
+
+// A checked byte range, expressed using today's managed arrays rather than
+// committing to a new Memory/Span representation.
+public func ValidRange(length: int, offset: int, count: int) -> bool {
+    return offset >= 0 && count >= 0 && offset <= length && count <= length - offset
+}
+
+// Validate both ranges before changing the destination. Copy direction preserves
+// unread bytes even when source and destination are aliases of the same array.
+public func CopyBytes(source: byte[], sourceOffset: int, destination: byte[], destinationOffset: int, count: int) -> Result<int, string> {
+    if !ValidRange(source.Length, sourceOffset, count) {
+        return Error("Invalid source range")
+    }
+    if !ValidRange(destination.Length, destinationOffset, count) {
+        return Error("Invalid destination range")
+    }
+    if destinationOffset > sourceOffset {
+        var remaining = count
+        while remaining > 0 {
+            remaining = remaining - 1
+            destination[destinationOffset + remaining] = source[sourceOffset + remaining]
+        }
+    } else {
+        var index = 0
+        while index < count {
+            destination[destinationOffset + index] = source[sourceOffset + index]
+            index = index + 1
+        }
+    }
+    return Ok(count)
+}
+
+// Controlled in-memory endpoints. The small transfer limits deliberately show
+// that a successful read or write need not consume the entire requested range.
+public class MemoryInput {
+    private field data: byte[]
+    private field position: int
+
+    init(bytes: byte[]) {
+        data = bytes
+        position = 0
+    }
+
+    func Read(destination: byte[], offset: int, count: int) -> Result<int, string> {
+        if !ValidRange(destination.Length, offset, count) {
+            return Error("Invalid destination range")
+        }
+        let available = data.Length - position
+        let transferred = Math.Min(Math.Min(count, available), 2)
+        let copied = CopyBytes(data, position, destination, offset, transferred)?
+        position = position + copied
+        return Ok(copied)
+    }
+}
+
+public class MemoryOutput {
+    private field data: byte[]
+    private field position: int
+
+    init(bytes: byte[]) {
+        data = bytes
+        position = 0
+    }
+
+    val Count: int => position
+
+    func Write(source: byte[], offset: int, count: int) -> Result<int, string> {
+        if !ValidRange(source.Length, offset, count) {
+            return Error("Invalid source range")
+        }
+        if count == 0 {
+            return Ok(0)
+        }
+        if position == data.Length {
+            return Error("Output is full")
+        }
+        let transferred = Math.Min(count, 1)
+        let copied = CopyBytes(source, offset, data, position, transferred)?
+        position = position + copied
+        return Ok(copied)
+    }
+}
+
+// The caller supplies separate source, scratch and destination storage in this
+// experiment. Per-call overlap is supported; whole-pipeline aliasing is not.
+public func CopyAll(input: MemoryInput, output: MemoryOutput, scratch: byte[]) -> Result<int, string> {
+    if scratch.Length == 0 {
+        return Error("Copy requires a nonempty buffer")
+    }
+    var total = 0
+    var finished = false
+    while !finished {
+        let read = input.Read(scratch, 0, scratch.Length)?
+        if read == 0 {
+            finished = true
+        }
+        var written = 0
+        while written < read {
+            let count = output.Write(scratch, written, read - written)?
+            if count == 0 {
+                return Error("Output made no progress")
+            }
+            written = written + count
+            total = total + count
+        }
+    }
+    return Ok(total)
+}

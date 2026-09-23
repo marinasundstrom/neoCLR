@@ -1,0 +1,30 @@
+import System.*
+import System.Console.*
+import System.Collections.*
+import System.Linq.*
+
+func Main() {
+    // Correct a reading through another name for the same fixed-size array.
+    let readings: int[] = [18, 20, 21]
+    let same: Array<int> = readings
+    let view: Sequence<int> = readings
+    same[1] = 22
+    WriteLine("Number of readings:")
+    WriteLine(readings.Length)
+    WriteLine("Read-only view sees the correction:")
+    WriteLine(view[1])
+
+    // Materializing the integer values creates independent collection storage.
+    let snapshot = readings.ToList()
+    readings[0] = 19
+    WriteLine("Snapshot then current reading:")
+    WriteLine(snapshot[0])
+    WriteLine(view[0])
+
+    WriteLine("Current readings:")
+    readings.ForEach(value => WriteLine(value))
+    WriteLine("Empty array length:")
+    WriteLine(Array<int>.Empty.Length)
+    WriteLine("Array element type:")
+    WriteLine(typeof(Array<int>).GetGenericArguments()[0].Name)
+}

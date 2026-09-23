@@ -116,3 +116,10 @@ Its examples reuse the checked propagation, pattern and closure samples.
 the complete Preview 7 install/build/run path and explains development availability.
 The project excerpt is read from the actual bundled project template. Maintain this
 page with each release rather than sending evaluators to repository instructions.
+
+
+The Arrays feature page compares reference identity, bounds, invariance, generic shape
+and collection capabilities with .NET arrays. Its `ARRAY_TOUR` excerpt and expected
+output come from `library-array-tour.rvn` and its `.expected.txt`; the saved-project
+verifier includes the `ArrayTour` case. Both files are public downloads. The page
+describes current Raven-target behavior and keeps the Byte Copy/stream work experimental.

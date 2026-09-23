@@ -24,7 +24,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
-    cases = [('Utf8', 'library-utf8.rvn', (bridge / 'samples/library-utf8.expected.txt').read_text()),
+    cases = [('ArrayTour', 'library-array-tour.rvn', (bridge / 'samples/library-array-tour.expected.txt').read_text()),
+             ('Utf8', 'library-utf8.rvn', (bridge / 'samples/library-utf8.expected.txt').read_text()),
              ('NestedTypeInfo', 'library-nested-type-info.rvn', 'Outer/Inner\nOuter\nActual declaring type\nTop-level type\nType member\n'),
              ('IntrospectionTour', 'library-introspection-tour.rvn', (bridge / 'samples/library-introspection-tour.expected.txt').read_text()),
              ('AssemblyInfo', 'library-assembly-info.rvn', 'Demo\nSystem.Runtime\nRuntime types available\nDemo\n1\nWidget\nType token available\nDemo\nSame definition token\n'),

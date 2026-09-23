@@ -8,6 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Add a Raven Byte Copy experiment over existing managed arrays: validate ranges
+  before mutation, preserve overlapping copies and demonstrate partial reads/writes
+  with a greeting transfer. Validate 1,024 range/alias cases, extreme/empty ranges,
+  output failure and synchronous array retention through guest GC. Keep public
+  stream/buffer contracts and pending native I/O unselected; record the deferred
+  compiler fallthrough-emission observation and partial S1 roadmap evidence.
+- Add a dedicated Arrays feature page comparing neoCLR with .NET arrays, including
+  generic shape, invariance, aliasing, bounds and collection capabilities. Include
+  a tested downloadable readings/snapshot sample and exact output; link from the
+  homepage and Collections. Validate 12 website pages, website tests, the new sample
+  and 32 existing runtime array tests. No website publication is implied.
+
 - Start M1/S0 with an isolated host-side external-completion experiment. Seven passing
   cases cover pending destination retention, callback progress, cancellation
   acknowledgement, both completion/cancellation orderings, late-event rejection and

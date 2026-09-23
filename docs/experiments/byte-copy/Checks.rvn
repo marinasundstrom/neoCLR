@@ -1,0 +1,140 @@
+import System.*
+import System.Result.*
+import System.Console.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("Byte Copy contract check failed")
+    }
+}
+
+func ExpectCount(result: Result<int, string>, expected: int) {
+    match result {
+        Ok(let count) => Check(count == expected)
+        Error(_) => System.Fault("Unexpected Byte Copy error")
+    }
+}
+
+func ExpectError(result: Result<int, string>) {
+    match result {
+        Ok(_) => System.Fault("Expected Byte Copy error")
+        Error(_) => { }
+    }
+}
+
+func CheckRanges(mode: int, sourceOffset: int) {
+    // Compare every small range with an immutable snapshot oracle, including
+    // overlapping aliases in both directions and separate allocations.
+    var cases = 0
+    for destinationOffset in -1..<7 {
+        for count in -1..<7 {
+            let source: byte[] = [(byte)1, (byte)2, (byte)3, (byte)4, (byte)5]
+            var destination: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9, (byte)9]
+            if mode == 1 {
+                destination = source
+            }
+            let result = CopyBytes(source, sourceOffset, destination, destinationOffset, count)
+            let valid = sourceOffset >= 0 && destinationOffset >= 0 && count >= 0 && sourceOffset + count <= 5 && destinationOffset + count <= 5
+            if valid {
+                ExpectCount(result, count)
+            } else {
+                ExpectError(result)
+            }
+            for index in 0..<5 {
+                var expected = 9
+                if mode == 1 {
+                    expected = index + 1
+                }
+                if valid && index >= destinationOffset && index < destinationOffset + count {
+                    expected = sourceOffset + index - destinationOffset + 1
+                }
+                Check(destination[index] == expected)
+                if mode == 0 {
+                    Check(source[index] == index + 1)
+                }
+            }
+            cases = cases + 1
+        }
+    }
+    WriteLine("Checked range/alias cases:")
+    WriteLine(cases)
+}
+
+func CheckExtremeRanges() {
+    let bytes: byte[] = [(byte)7]
+    ExpectError(CopyBytes(bytes, 2147483647, bytes, 0, 1))
+    ExpectError(CopyBytes(bytes, 0, bytes, 2147483647, 1))
+    ExpectError(CopyBytes(bytes, 1, bytes, 0, 2147483647))
+    ExpectError(CopyBytes(bytes, 0, bytes, 1, 2147483647))
+    ExpectCount(CopyBytes(bytes, 1, bytes, 1, 0), 0)
+    let empty: byte[] = []
+    ExpectCount(CopyBytes(empty, 0, empty, 0, 0), 0)
+    Check(bytes[0] == 7)
+    WriteLine("Extreme and empty ranges: passed")
+}
+
+func CheckEndpoints() {
+    let source: byte[] = [(byte)1, (byte)2, (byte)3, (byte)4, (byte)5]
+    let destination: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9, (byte)9]
+    let scratch: byte[] = [(byte)0, (byte)0, (byte)0]
+    let output = MemoryOutput(destination)
+    ExpectCount(CopyAll(MemoryInput(source), output, scratch), 5)
+    Check(output.Count == 5)
+    for index in 0..<5 {
+        Check(destination[index] == source[index])
+    }
+    let empty: byte[] = []
+    ExpectError(CopyAll(MemoryInput(source), output, empty))
+    ExpectCount(CopyAll(MemoryInput(empty), MemoryOutput(empty), scratch), 0)
+    let input = MemoryInput(source)
+    ExpectError(input.Read(scratch, -1, 1))
+    ExpectCount(input.Read(scratch, 3, 0), 0)
+    ExpectCount(input.Read(scratch, 0, 3), 2)
+    Check(scratch[0] == 1 && scratch[1] == 2)
+    ExpectCount(input.Read(scratch, 0, 3), 2)
+    ExpectCount(input.Read(scratch, 0, 3), 1)
+    ExpectCount(input.Read(scratch, 0, 3), 0)
+    let small: byte[] = [(byte)9, (byte)9]
+    let sink = MemoryOutput(small)
+    ExpectError(sink.Write(source, 4, 2))
+    Check(sink.Count == 0 && small[0] == 9)
+    ExpectError(CopyAll(MemoryInput(source), sink, scratch))
+    Check(sink.Count == 2 && small[0] == 1 && small[1] == 2)
+    ExpectCount(sink.Write(source, source.Length, 0), 0)
+    WriteLine("Partial I/O, EOF and output failure: passed")
+}
+
+func MakeInput() -> MemoryInput {
+    let bytes: byte[] = [(byte)42]
+    return MemoryInput(bytes)
+}
+
+func CheckRetention() {
+    let input = MakeInput()
+    for index in 0..<1200 {
+        _ = MemoryInput([(byte)0])
+    }
+    let destination: byte[] = [(byte)0]
+    ExpectCount(input.Read(destination, 0, 1), 1)
+    Check(destination[0] == 42)
+    WriteLine("Managed owner retained through GC: passed")
+}
+
+func Main() {
+    let arguments = Environment.GetCommandLineArgs()
+    if arguments.Length == 3 {
+        match Int32.Parse(arguments[1]) {
+            Ok(let mode) => {
+                match Int32.Parse(arguments[2]) {
+                    Ok(let offset) => CheckRanges(mode, offset)
+                    Error(_) => System.Fault("Invalid test offset")
+                }
+            }
+            Error(_) => System.Fault("Invalid test mode")
+        }
+        return
+    }
+    CheckExtremeRanges()
+    CheckEndpoints()
+    CheckRetention()
+}

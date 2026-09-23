@@ -1,0 +1,31 @@
+import System.*
+import System.Result.*
+import System.Console.*
+import System.Text.*
+
+func TransferGreeting() -> Result<int, string> {
+    // Four ASCII bytes spell "Hi!\n". Byte I/O has no character interpretation.
+    let message: byte[] = [(byte)72, (byte)105, (byte)33, (byte)10]
+    let destination: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0]
+    let scratch: byte[] = [(byte)0, (byte)0, (byte)0]
+    let input = MemoryInput(message)
+    let output = MemoryOutput(destination)
+
+    // Reads return at most two bytes; writes accept one. CopyAll must handle both.
+    let copied = CopyAll(input, output, scratch)?
+    WriteLine("Copied bytes:")
+    WriteLine(copied)
+    WriteLine("Decoded message:")
+    match Utf8.Decode(destination) {
+        Ok(let text) => WriteLine(text)
+        Error(_) => WriteLine("Invalid UTF-8")
+    }
+    return Ok(output.Count)
+}
+
+func Main() {
+    match TransferGreeting() {
+        Ok(_) => WriteLine("Transfer complete")
+        Error(let message) => WriteLine(message)
+    }
+}

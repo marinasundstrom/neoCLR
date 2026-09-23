@@ -4970,3 +4970,27 @@ and recorded the convention for runtime code as well as examples.
   author's question, not approval of each eventual contract. The isolated host probe
   has seven passing checks and is committed at `629cbf4`; guest GC/Task integration
   and the new sample checkpoints remain open. The roadmap was committed at `6634b79`.
+
+
+### 2026-09-23 — Foundational primitives with explanatory samples
+
+- **Author:** directed continued work on primitives and foundational runtime behavior
+  first, while producing comprehensible samples that convey context and use. Later
+  requested a dedicated Arrays website page comparing neoCLR arrays with .NET.
+- **Assistant action:** built an application-local Byte Copy sample using ordinary
+  managed arrays, checked ranges and concrete short-read/short-write endpoints. A
+  greeting transfer explains why byte pipelines need partial-transfer handling.
+  Added range/alias, failure and real synchronous GC-retention checks; retained
+  runtime responsibility for bounds, element compatibility and tracing rather than
+  inventing new instructions without evidence of a gap.
+- **API limits:** this is a provisional library experiment, not public stream
+  contracts or asynchronous/native buffer lifetime support. Whole-pipeline aliasing
+  remains a stated precondition; the individual copy supports overlap. Existing
+  array tests also cover direct IL checks below the frontend.
+- **Website action:** added an Arrays page with a tested readings/snapshot example,
+  expected output, .NET comparisons and current limits; linked it from the homepage
+  and Collections. The site remains unpublished by this work.
+- **Deferred finding:** an infinite-loop copy function without a fallback return
+  compiled to an unsupported InvalidOperationException reference on the local
+  target. An explicit EOF loop avoids it. A general Raven fix needs an isolated
+  CLI/.NET reproduction; no Raven repository change was made.

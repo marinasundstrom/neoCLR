@@ -1,5 +1,10 @@
 # Generic managed arrays
 
+The [Arrays feature page](../website/features/arrays/index.html) explains the current
+Raven behavior with a checked readings/snapshot sample and a .NET comparison. The
+[Byte Copy experiment](experiments/byte-copy/README.md) exercises this foundation
+for bounded I/O without selecting a new buffer representation.
+
 Implemented for the Raven runtime profile on 2026-09-13. The profile replaces the
 old native System.Array<T> descriptor with a managed array definition. Existing
 Raven `T[]` syntax and CLI SZARRAY/newarr/ldlen/ldelem/stelem operations remain the

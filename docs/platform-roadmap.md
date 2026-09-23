@@ -312,8 +312,12 @@ M1 remains active. Its first [host-side S0 experiment](experiments/external-io-p
 passes seven ownership/progress/cancellation checks. This is a reduced Rust model,
 not a guest networking API or completed S0. The next S0 case will be invocation-owned
 host completion delivery with actual guest GC retention and a Raven consumer.
-The immediate priority is now S1's in-memory byte-copy case, followed by the
-progressive checkpoints above; the host probe does not make networking urgent.
+S1 now has a [runnable Byte Copy checkpoint](experiments/byte-copy/README.md):
+checked ranges, overlapping copies and short reads/writes over ordinary managed
+arrays, with synchronous GC-retention checks. It is an application-local experiment,
+not a completed general stream API. The next small consumer should test these
+primitives with text processing before new storage representations are selected;
+the host probe does not make networking urgent.
 No later major milestone has started.
 
 ## Working rules and immediate next step
@@ -330,8 +334,9 @@ its feature plan, and update changelog, relevant feature pages and integration d
 Samples begin as small programs, not miniature frameworks. Existing release/debugging
 requirements and Raven branch/integration rules continue to apply.
 
-**Next:** build S1's bounded in-memory byte-copy sample using existing runtime
-facilities where adequate. Let the text/JSON consumer revise that contract, then
+**Next:** build on S1's checked in-memory Byte Copy sample. Use a small text
+consumer to test the range and partial-transfer contracts before selecting general
+stream interfaces or Memory/Span types, then
 validate guest lifetimes with controlled delayed completion and reuse the pipeline
 for files before tackling sockets. Reassess priorities at each checkpoint and M2
 onward after the first major HTTP application milestone.

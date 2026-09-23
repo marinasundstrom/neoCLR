@@ -88,6 +88,7 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'ARRAY_TOUR': (raven + 'library-array-tour.rvn', 'import System.*', '\n}', True),
         'TASK_WORKER_SAMPLE': (raven + 'library-async-default-queue.rvn', 'import System.*', '\nfunc Main() {\n    _ = Show()\n}', True),
         'TASK_PROMISE_SAMPLE': (raven + 'library-task-producer.rvn', 'import System.*', '\n    promise.Complete(41)\n}', True),
         'TASK_PROPAGATION_SAMPLE': (raven + 'library-task-propagation.rvn', 'async func Read', '\n}\n', True),
@@ -126,16 +127,19 @@ def main():
     })
     # The full expected output is shared with the saved-project execution check.
     output_text = escape((ROOT / (raven + 'library-introspection-tour.expected.txt')).read_text().rstrip())
+    array_output = escape((ROOT / (raven + 'library-array-tour.expected.txt')).read_text().rstrip())
     downloads = OUTPUT / 'samples'
     downloads.mkdir()
-    for name in ('library-task-propagation.rvn', 'library-task-result.rvn', 'library-async-default-queue.rvn', 'library-task-producer.rvn', 'library-async-cancellation.rvn', 'library-outcome-operators.rvn', 'library-outcome-operators.expected.txt', 'library-query-basics.rvn', 'library-query-basics.expected.txt', 'library-query-names.rvn', 'library-query-names.expected.txt', 'library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
+    for name in ('library-array-tour.rvn', 'library-array-tour.expected.txt', 'library-task-propagation.rvn', 'library-task-result.rvn', 'library-async-default-queue.rvn', 'library-task-producer.rvn', 'library-async-cancellation.rvn', 'library-outcome-operators.rvn', 'library-outcome-operators.expected.txt', 'library-query-basics.rvn', 'library-query-basics.expected.txt', 'library-query-names.rvn', 'library-query-names.expected.txt', 'library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
         shutil.copyfile(ROOT / raven / name, downloads / name)
     pages = {}
     for source in sorted(SOURCE.rglob('*.html')):
         relative = source.relative_to(SOURCE)
         target = OUTPUT / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        template = source.read_text(encoding='utf-8').replace('{{TOUR_OUTPUT}}', output_text)
+        template = (source.read_text(encoding='utf-8')
+                    .replace('{{TOUR_OUTPUT}}', output_text)
+                    .replace('{{ARRAY_OUTPUT}}', array_output))
         page = render(template, samples)
         target.write_text(page, encoding='utf-8')
         check = PageCheck()
