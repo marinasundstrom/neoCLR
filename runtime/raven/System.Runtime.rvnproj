@@ -22,7 +22,15 @@
     <Compile Include="src/System/Linq/Operators.rvn" />
     <Compile Include="src/System/OptionOperators.rvn" />
     <Compile Include="src/System/ResultOperators.rvn" />
-    <Compile Include="src/System/Storage/File/Functions.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'File'">
+    <Compile Include="src/System/Storage/File.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Directory'">
+    <Compile Include="src/System/Storage/Directory.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StorageLookup'">
+    <Compile Include="src/System/Storage/StorageLookup.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Clock'">
     <Compile Include="src/System/Clock.rvn" />

@@ -1,5 +1,8 @@
 namespace StorageExperiment
 
+import System.Storage.File
+import System.Storage.Directory
+
 import System.*
 import System.Storage.Path
 import System.Collections.*
@@ -10,104 +13,10 @@ import System.Storage.FileReadError
 import System.Storage.FileWriteError
 import System.Storage.StorageLookupError
 
-// Sample-only lookup and text conveniences extend the platform byte contract.
-interface StorageProvider : System.Storage.StorageProvider {
-    func GetFile(path: Path) -> Result<File, StorageLookupError>
+// Fixture-only text conveniences; platform descriptors use byte/lookup capabilities.
+interface StorageProvider : System.Storage.StorageLookup {
     func ReadText(path: Path, maxBytes: int) -> Result<string, FileReadError>
     func WriteText(path: Path, text: string, maxBytes: int) -> Result<unit, FileWriteError>
-}
-
-class File {
-    private field provider: StorageProvider
-    private field path: Path
-    private field name: string
-
-    init(provider: StorageProvider, path: Path) {
-        self.provider = provider
-        self.path = path
-        self.name = System.Storage.Path.GetFileName(path.Text)
-    }
-
-    val Path: Path => path
-    val Name: string => name
-
-    func OpenRead() -> Result<InputStream, StreamError> {
-        let bytes: System.Storage.StorageProvider = provider
-        return bytes.OpenRead(path)
-    }
-
-    func CreateNew() -> Result<OutputStream, StreamError> {
-        let bytes: System.Storage.StorageProvider = provider
-        return bytes.CreateNew(path)
-    }
-
-    func ReadText(maxBytes: int) -> Result<string, FileReadError> {
-        return provider.ReadText(path, maxBytes)
-    }
-
-    func WriteText(text: string, maxBytes: int) -> Result<unit, FileWriteError> {
-        return provider.WriteText(path, text, maxBytes)
-    }
-}
-
-class Directory {
-    private field provider: StorageProvider
-    private field path: Path
-
-    init(provider: StorageProvider, path: Path) {
-        self.provider = provider
-        self.path = path
-    }
-
-    val Path: Path => path
-
-    // This resolves a direct child address; it does not query existence.
-    func FileAt(name: string) -> Result<File, FileReadError> {
-        if name.IsEmpty || name == "." || name == ".." || name.ContainsOrdinal("/") {
-            return Error(FileReadError(FileReadError.InvalidPath()))
-        }
-        var childText = path.Text + "/" + name
-        if path.Text == "." {
-            childText = name
-        }
-        if path.Text == "/" {
-            childText = "/" + name
-        }
-        return match System.Storage.Path.Parse(childText) {
-            Ok(let child) => Ok(File(provider, child))
-            Error(_) => Error(FileReadError(FileReadError.InvalidPath()))
-        }
-    }
-
-    // Validate a direct child, then query its provider. The result owns no stream.
-    func GetFile(name: string) -> Result<File, StorageLookupError> {
-        return match FileAt(name) {
-            Ok(let descriptor) => provider.GetFile(descriptor.Path)
-            Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
-        }
-    }
-
-    // A parsed absolute path is valid syntax, but cannot replace this context.
-    func GetFile(relativePath: Path) -> Result<File, StorageLookupError> {
-        if relativePath.IsAbsolute {
-            return Error(StorageLookupError(StorageLookupError.InvalidPath()))
-        }
-        if relativePath.Text == "." {
-            return provider.GetFile(path)
-        }
-        var resolved = path.Text + "/" + relativePath.Text
-        if path.Text == "/" {
-            resolved = "/" + relativePath.Text
-        }
-        if path.Text == "." {
-            resolved = relativePath.Text
-        }
-        return match System.Storage.Path.Parse(resolved) {
-            Ok(let child) => provider.GetFile(child)
-            Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
-        }
-    }
-
 }
 
 class HostStorage : StorageProvider {

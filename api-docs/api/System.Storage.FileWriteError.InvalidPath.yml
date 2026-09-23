@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.FileWriteError.InvalidPath
+  commentId: T:System.Storage.FileWriteError.InvalidPath
+  id: FileWriteError.InvalidPath
+  parent: System.Storage
+  children:
+  - System.Storage.FileWriteError.InvalidPath.#ctor
+  langs:
+  - csharp
+  - vb
+  name: FileWriteError.InvalidPath
+  nameWithType: FileWriteError.InvalidPath
+  fullName: System.Storage.FileWriteError.InvalidPath
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: The native path is empty or contains NUL.
+  example: []
+  syntax:
+    content: public struct FileWriteError.InvalidPath
+    content.vb: Public Structure FileWriteError.InvalidPath
+- uid: System.Storage.FileWriteError.InvalidPath.#ctor
+  commentId: M:System.Storage.FileWriteError.InvalidPath.#ctor
+  id: '#ctor'
+  parent: System.Storage.FileWriteError.InvalidPath
+  langs:
+  - csharp
+  - vb
+  name: InvalidPath()
+  nameWithType: FileWriteError.InvalidPath.InvalidPath()
+  fullName: System.Storage.FileWriteError.InvalidPath.InvalidPath()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the InvalidPath case.
+  example: []
+  syntax:
+    content: public InvalidPath()
+    content.vb: Public Sub New()
+  overload: System.Storage.FileWriteError.InvalidPath.#ctor*
+  nameWithType.vb: FileWriteError.InvalidPath.New()
+  fullName.vb: System.Storage.FileWriteError.InvalidPath.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.FileWriteError.InvalidPath.#ctor*
+  commentId: Overload:System.Storage.FileWriteError.InvalidPath.#ctor
+  isExternal: true
+  href: System.Storage.FileWriteError.InvalidPath.html#System_Storage_FileWriteError_InvalidPath__ctor
+  name: InvalidPath
+  nameWithType: FileWriteError.InvalidPath.InvalidPath
+  fullName: System.Storage.FileWriteError.InvalidPath.InvalidPath
+  nameWithType.vb: FileWriteError.InvalidPath.New
+  fullName.vb: System.Storage.FileWriteError.InvalidPath.New
+  name.vb: New

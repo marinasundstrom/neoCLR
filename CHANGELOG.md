@@ -8,6 +8,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Integrate development System.Storage.File and Directory descriptors and the optional
+  StorageLookup provider capability. File retains provider/Path, derives Name and
+  opens directional streams; Directory constructs child addresses and explicitly
+  looks up files. Construction/properties perform no storage queries. Preserve the
+  existing static string-based File.ReadAllText/WriteAllText helpers. The sample now
+  imports platform descriptors; text conveniences stay on fixture providers.
+  Directory.FileAt changes from the sample FileReadError to StorageLookupError.
+  Add complete descriptor/lookup and legacy text-error API reference coverage, with
+  an exact manual WriteAllText entry for DocFX's unit-result limitation. Regenerate
+  runtime/reference snapshots and update the website and roadmap.
+  Validation: disk/memory product and contract checks (including construction without
+  provider calls), strict interface/foundation checks, ten native file/Path artifact
+  regressions, runtime/API snapshots, 245 documented API items and the combined
+  website pass. Concrete host-provider integration is next.
+
 - Integrate development System.Streams.InputStream and OutputStream interfaces.
   File streams implement them directly; the disk/memory sample imports the platform
   contracts and drops forwarding disk adapters. Preserve blocking partial transfers,
@@ -25,7 +40,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and CreateNew. Sample lookup/text conveniences extend it; file byte operations
   dispatch through the platform interface for both disk and memory. Text encoding,
   descriptor lookup and richer metadata are not mandatory provider methods.
-  File/Directory integration remains the next bounded slice. Validation:
+  File/Directory integration follows in the entry above. Validation:
   disk/memory SDK contracts and negative callers, interface import checks, runtime
   snapshot, 151 API summaries and the combined website pass.
 

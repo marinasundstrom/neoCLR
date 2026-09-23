@@ -139,7 +139,7 @@ try:
         results['ArrayList'] = labels
     if files:
         for version, owner, expected, forbidden in (
-            (8, 'Storage', ('Path', 'File', 'FileReadError', 'FileWriteError'), ('Directory', 'Stream', 'ConsoleReadError')),
+            (8, 'Storage', ('Path', 'File', 'Directory', 'StorageProvider', 'StorageLookup', 'FileReadError', 'FileWriteError'), ('Stream', 'ConsoleReadError')),
             (9, 'Storage.File', ('ReadAllText', 'WriteAllText'), ('Delete', 'ReadAllBytes', 'Open')),
             (10, 'Storage.Path', ('Combine', 'GetFileName'), ('GetFullPath', 'GetExtension'))):
             access = 'System.' + owner + '.'

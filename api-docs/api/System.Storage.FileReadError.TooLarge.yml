@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.FileReadError.TooLarge
+  commentId: T:System.Storage.FileReadError.TooLarge
+  id: FileReadError.TooLarge
+  parent: System.Storage
+  children:
+  - System.Storage.FileReadError.TooLarge.#ctor
+  langs:
+  - csharp
+  - vb
+  name: FileReadError.TooLarge
+  nameWithType: FileReadError.TooLarge
+  fullName: System.Storage.FileReadError.TooLarge
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: The file or encoded text exceeds the byte limit.
+  example: []
+  syntax:
+    content: public struct FileReadError.TooLarge
+    content.vb: Public Structure FileReadError.TooLarge
+- uid: System.Storage.FileReadError.TooLarge.#ctor
+  commentId: M:System.Storage.FileReadError.TooLarge.#ctor
+  id: '#ctor'
+  parent: System.Storage.FileReadError.TooLarge
+  langs:
+  - csharp
+  - vb
+  name: TooLarge()
+  nameWithType: FileReadError.TooLarge.TooLarge()
+  fullName: System.Storage.FileReadError.TooLarge.TooLarge()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the TooLarge case.
+  example: []
+  syntax:
+    content: public TooLarge()
+    content.vb: Public Sub New()
+  overload: System.Storage.FileReadError.TooLarge.#ctor*
+  nameWithType.vb: FileReadError.TooLarge.New()
+  fullName.vb: System.Storage.FileReadError.TooLarge.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.FileReadError.TooLarge.#ctor*
+  commentId: Overload:System.Storage.FileReadError.TooLarge.#ctor
+  isExternal: true
+  href: System.Storage.FileReadError.TooLarge.html#System_Storage_FileReadError_TooLarge__ctor
+  name: TooLarge
+  nameWithType: FileReadError.TooLarge.TooLarge
+  fullName: System.Storage.FileReadError.TooLarge.TooLarge
+  nameWithType.vb: FileReadError.TooLarge.New
+  fullName.vb: System.Storage.FileReadError.TooLarge.New
+  name.vb: New

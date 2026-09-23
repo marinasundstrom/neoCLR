@@ -1,5 +1,8 @@
 namespace StorageExperiment
 
+import System.Storage.File
+import System.Storage.Directory
+
 import System.*
 import System.Console.*
 import System.Result.*
@@ -11,7 +14,7 @@ func CheckResolved(result: Result<File, StorageLookupError>, expected: string, c
             if file.Path.Text != expected || file.Name != "note.txt" {
                 System.Fault("Directory lookup changed the address")
             }
-            match file.ReadText(32) {
+            match ReadFileText(file) {
                 Ok(let text) => {
                     if text != content {
                         System.Fault("Directory lookup used the wrong context")

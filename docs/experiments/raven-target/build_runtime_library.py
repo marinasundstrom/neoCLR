@@ -10,6 +10,8 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'Directory': 'System.Storage.Directory',
+    'StorageLookup': 'System.Storage.StorageLookup',
     'StorageProvider': 'System.Storage.StorageProvider',
     'InputStream': 'System.Streams.InputStream',
     'OutputStream': 'System.Streams.OutputStream',
@@ -111,6 +113,8 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'Directory': 'runtime/raven/src/System/Storage/Directory.rvn',
+    'StorageLookup': 'runtime/raven/src/System/Storage/StorageLookup.rvn',
     'StorageProvider': 'runtime/raven/src/System/Storage/StorageProvider.rvn',
     'InputStream': 'runtime/raven/src/System/Streams/InputStream.rvn',
     'OutputStream': 'runtime/raven/src/System/Streams/OutputStream.rvn',
@@ -199,7 +203,7 @@ SOURCES = {
     'Time': 'runtime/raven/src/System/Time.rvn',
     'Date': 'runtime/raven/src/System/Date.rvn',
     'Path': 'runtime/raven/src/System/Storage/Path.rvn',
-    'File': 'runtime/raven/src/System/Storage/File/Functions.rvn',
+    'File': 'runtime/raven/src/System/Storage/File.rvn',
     'Int64': 'runtime/raven/src/System/Int64.rvn',
     'SByte': 'runtime/raven/src/System/SByte.rvn',
     'Byte': 'runtime/raven/src/System/Byte.rvn',
@@ -330,7 +334,7 @@ def main():
         generated = {}
         for name, owner in SLICES.items():
             compiled = root / 'compiled'
-            if name not in ('Math', 'Linq', 'OptionOperators', 'OptionNestedOperators', 'ResultOperators', 'File'):
+            if name not in ('Math', 'Linq', 'OptionOperators', 'OptionNestedOperators', 'ResultOperators'):
                 compiled = root / ('compiled-' + name)
                 subprocess.run(['dotnet', str(args.compiler.resolve()), str(PROJECT), '--no-project-restore',
                                 '-o', str(compiled)], env={**os.environ, 'NeoCLRBootstrapRoot': str(root),

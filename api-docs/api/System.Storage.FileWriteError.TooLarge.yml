@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.FileWriteError.TooLarge
+  commentId: T:System.Storage.FileWriteError.TooLarge
+  id: FileWriteError.TooLarge
+  parent: System.Storage
+  children:
+  - System.Storage.FileWriteError.TooLarge.#ctor
+  langs:
+  - csharp
+  - vb
+  name: FileWriteError.TooLarge
+  nameWithType: FileWriteError.TooLarge
+  fullName: System.Storage.FileWriteError.TooLarge
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: The file or encoded text exceeds the byte limit.
+  example: []
+  syntax:
+    content: public struct FileWriteError.TooLarge
+    content.vb: Public Structure FileWriteError.TooLarge
+- uid: System.Storage.FileWriteError.TooLarge.#ctor
+  commentId: M:System.Storage.FileWriteError.TooLarge.#ctor
+  id: '#ctor'
+  parent: System.Storage.FileWriteError.TooLarge
+  langs:
+  - csharp
+  - vb
+  name: TooLarge()
+  nameWithType: FileWriteError.TooLarge.TooLarge()
+  fullName: System.Storage.FileWriteError.TooLarge.TooLarge()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the TooLarge case.
+  example: []
+  syntax:
+    content: public TooLarge()
+    content.vb: Public Sub New()
+  overload: System.Storage.FileWriteError.TooLarge.#ctor*
+  nameWithType.vb: FileWriteError.TooLarge.New()
+  fullName.vb: System.Storage.FileWriteError.TooLarge.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.FileWriteError.TooLarge.#ctor*
+  commentId: Overload:System.Storage.FileWriteError.TooLarge.#ctor
+  isExternal: true
+  href: System.Storage.FileWriteError.TooLarge.html#System_Storage_FileWriteError_TooLarge__ctor
+  name: TooLarge
+  nameWithType: FileWriteError.TooLarge.TooLarge
+  fullName: System.Storage.FileWriteError.TooLarge.TooLarge
+  nameWithType.vb: FileWriteError.TooLarge.New
+  fullName.vb: System.Storage.FileWriteError.TooLarge.New
+  name.vb: New

@@ -1,0 +1,1079 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.FileReadError
+  commentId: T:System.Storage.FileReadError
+  id: FileReadError
+  parent: System.Storage
+  children:
+  - System.Storage.FileReadError.#ctor(System.Storage.FileReadError.AccessDenied)
+  - System.Storage.FileReadError.#ctor(System.Storage.FileReadError.InvalidLimit)
+  - System.Storage.FileReadError.#ctor(System.Storage.FileReadError.InvalidPath)
+  - System.Storage.FileReadError.#ctor(System.Storage.FileReadError.InvalidUtf8)
+  - System.Storage.FileReadError.#ctor(System.Storage.FileReadError.NotFound)
+  - System.Storage.FileReadError.#ctor(System.Storage.FileReadError.NotRegularFile)
+  - System.Storage.FileReadError.#ctor(System.Storage.FileReadError.ReadFailed)
+  - System.Storage.FileReadError.#ctor(System.Storage.FileReadError.TooLarge)
+  - System.Storage.FileReadError.GetAccessDenied
+  - System.Storage.FileReadError.GetInvalidLimit
+  - System.Storage.FileReadError.GetInvalidPath
+  - System.Storage.FileReadError.GetInvalidUtf8
+  - System.Storage.FileReadError.GetNotFound
+  - System.Storage.FileReadError.GetNotRegularFile
+  - System.Storage.FileReadError.GetReadFailed
+  - System.Storage.FileReadError.GetTooLarge
+  - System.Storage.FileReadError.IsAccessDenied
+  - System.Storage.FileReadError.IsInvalidLimit
+  - System.Storage.FileReadError.IsInvalidPath
+  - System.Storage.FileReadError.IsInvalidUtf8
+  - System.Storage.FileReadError.IsNotFound
+  - System.Storage.FileReadError.IsNotRegularFile
+  - System.Storage.FileReadError.IsReadFailed
+  - System.Storage.FileReadError.IsTooLarge
+  - System.Storage.FileReadError.ToString
+  langs:
+  - csharp
+  - vb
+  name: FileReadError
+  nameWithType: FileReadError
+  fullName: System.Storage.FileReadError
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Expected failures from the static native whole-text file helper.
+  remarks: Construct a named case; an uninitialized carrier is not a valid error. These legacy error families are distinct from StreamError and StorageLookupError.
+  example: []
+  syntax:
+    content: public struct FileReadError
+    content.vb: Public Structure FileReadError
+- uid: System.Storage.FileReadError.ToString
+  commentId: M:System.Storage.FileReadError.ToString
+  id: ToString
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: ToString()
+  nameWithType: FileReadError.ToString()
+  fullName: System.Storage.FileReadError.ToString()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Returns the selected case name.
+  example: []
+  syntax:
+    content: public string ToString()
+    return:
+      type: System.String
+      description: A display label, not a host diagnostic.
+    content.vb: Public Function ToString() As String
+  overload: System.Storage.FileReadError.ToString*
+- uid: System.Storage.FileReadError.#ctor(System.Storage.FileReadError.InvalidLimit)
+  commentId: M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.InvalidLimit)
+  id: '#ctor(System.Storage.FileReadError.InvalidLimit)'
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: FileReadError(InvalidLimit)
+  nameWithType: FileReadError.FileReadError(FileReadError.InvalidLimit)
+  fullName: System.Storage.FileReadError.FileReadError(System.Storage.FileReadError.InvalidLimit)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding InvalidLimit.
+  example: []
+  syntax:
+    content: public FileReadError(FileReadError.InvalidLimit value)
+    parameters:
+    - id: value
+      type: System.Storage.FileReadError.InvalidLimit
+      description: The case value to retain.
+    content.vb: Public Sub New(value As FileReadError.InvalidLimit)
+  overload: System.Storage.FileReadError.#ctor*
+  nameWithType.vb: FileReadError.New(FileReadError.InvalidLimit)
+  fullName.vb: System.Storage.FileReadError.New(System.Storage.FileReadError.InvalidLimit)
+  name.vb: New(InvalidLimit)
+- uid: System.Storage.FileReadError.GetInvalidLimit
+  commentId: M:System.Storage.FileReadError.GetInvalidLimit
+  id: GetInvalidLimit
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: GetInvalidLimit()
+  nameWithType: FileReadError.GetInvalidLimit()
+  fullName: System.Storage.FileReadError.GetInvalidLimit()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the InvalidLimit case.
+  remarks: Requires the matching case; a mismatch produces a runtime fault.
+  example: []
+  syntax:
+    content: public FileReadError.InvalidLimit GetInvalidLimit()
+    return:
+      type: System.Storage.FileReadError.InvalidLimit
+      description: The held case value.
+    content.vb: Public Function GetInvalidLimit() As FileReadError.InvalidLimit
+  overload: System.Storage.FileReadError.GetInvalidLimit*
+- uid: System.Storage.FileReadError.#ctor(System.Storage.FileReadError.InvalidPath)
+  commentId: M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.InvalidPath)
+  id: '#ctor(System.Storage.FileReadError.InvalidPath)'
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: FileReadError(InvalidPath)
+  nameWithType: FileReadError.FileReadError(FileReadError.InvalidPath)
+  fullName: System.Storage.FileReadError.FileReadError(System.Storage.FileReadError.InvalidPath)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding InvalidPath.
+  example: []
+  syntax:
+    content: public FileReadError(FileReadError.InvalidPath value)
+    parameters:
+    - id: value
+      type: System.Storage.FileReadError.InvalidPath
+      description: The case value to retain.
+    content.vb: Public Sub New(value As FileReadError.InvalidPath)
+  overload: System.Storage.FileReadError.#ctor*
+  nameWithType.vb: FileReadError.New(FileReadError.InvalidPath)
+  fullName.vb: System.Storage.FileReadError.New(System.Storage.FileReadError.InvalidPath)
+  name.vb: New(InvalidPath)
+- uid: System.Storage.FileReadError.GetInvalidPath
+  commentId: M:System.Storage.FileReadError.GetInvalidPath
+  id: GetInvalidPath
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: GetInvalidPath()
+  nameWithType: FileReadError.GetInvalidPath()
+  fullName: System.Storage.FileReadError.GetInvalidPath()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the InvalidPath case.
+  remarks: Requires the matching case; a mismatch produces a runtime fault.
+  example: []
+  syntax:
+    content: public FileReadError.InvalidPath GetInvalidPath()
+    return:
+      type: System.Storage.FileReadError.InvalidPath
+      description: The held case value.
+    content.vb: Public Function GetInvalidPath() As FileReadError.InvalidPath
+  overload: System.Storage.FileReadError.GetInvalidPath*
+- uid: System.Storage.FileReadError.#ctor(System.Storage.FileReadError.NotFound)
+  commentId: M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.NotFound)
+  id: '#ctor(System.Storage.FileReadError.NotFound)'
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: FileReadError(NotFound)
+  nameWithType: FileReadError.FileReadError(FileReadError.NotFound)
+  fullName: System.Storage.FileReadError.FileReadError(System.Storage.FileReadError.NotFound)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding NotFound.
+  example: []
+  syntax:
+    content: public FileReadError(FileReadError.NotFound value)
+    parameters:
+    - id: value
+      type: System.Storage.FileReadError.NotFound
+      description: The case value to retain.
+    content.vb: Public Sub New(value As FileReadError.NotFound)
+  overload: System.Storage.FileReadError.#ctor*
+  nameWithType.vb: FileReadError.New(FileReadError.NotFound)
+  fullName.vb: System.Storage.FileReadError.New(System.Storage.FileReadError.NotFound)
+  name.vb: New(NotFound)
+- uid: System.Storage.FileReadError.GetNotFound
+  commentId: M:System.Storage.FileReadError.GetNotFound
+  id: GetNotFound
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: GetNotFound()
+  nameWithType: FileReadError.GetNotFound()
+  fullName: System.Storage.FileReadError.GetNotFound()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the NotFound case.
+  remarks: Requires the matching case; a mismatch produces a runtime fault.
+  example: []
+  syntax:
+    content: public FileReadError.NotFound GetNotFound()
+    return:
+      type: System.Storage.FileReadError.NotFound
+      description: The held case value.
+    content.vb: Public Function GetNotFound() As FileReadError.NotFound
+  overload: System.Storage.FileReadError.GetNotFound*
+- uid: System.Storage.FileReadError.#ctor(System.Storage.FileReadError.AccessDenied)
+  commentId: M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.AccessDenied)
+  id: '#ctor(System.Storage.FileReadError.AccessDenied)'
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: FileReadError(AccessDenied)
+  nameWithType: FileReadError.FileReadError(FileReadError.AccessDenied)
+  fullName: System.Storage.FileReadError.FileReadError(System.Storage.FileReadError.AccessDenied)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding AccessDenied.
+  example: []
+  syntax:
+    content: public FileReadError(FileReadError.AccessDenied value)
+    parameters:
+    - id: value
+      type: System.Storage.FileReadError.AccessDenied
+      description: The case value to retain.
+    content.vb: Public Sub New(value As FileReadError.AccessDenied)
+  overload: System.Storage.FileReadError.#ctor*
+  nameWithType.vb: FileReadError.New(FileReadError.AccessDenied)
+  fullName.vb: System.Storage.FileReadError.New(System.Storage.FileReadError.AccessDenied)
+  name.vb: New(AccessDenied)
+- uid: System.Storage.FileReadError.GetAccessDenied
+  commentId: M:System.Storage.FileReadError.GetAccessDenied
+  id: GetAccessDenied
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: GetAccessDenied()
+  nameWithType: FileReadError.GetAccessDenied()
+  fullName: System.Storage.FileReadError.GetAccessDenied()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the AccessDenied case.
+  remarks: Requires the matching case; a mismatch produces a runtime fault.
+  example: []
+  syntax:
+    content: public FileReadError.AccessDenied GetAccessDenied()
+    return:
+      type: System.Storage.FileReadError.AccessDenied
+      description: The held case value.
+    content.vb: Public Function GetAccessDenied() As FileReadError.AccessDenied
+  overload: System.Storage.FileReadError.GetAccessDenied*
+- uid: System.Storage.FileReadError.#ctor(System.Storage.FileReadError.NotRegularFile)
+  commentId: M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.NotRegularFile)
+  id: '#ctor(System.Storage.FileReadError.NotRegularFile)'
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: FileReadError(NotRegularFile)
+  nameWithType: FileReadError.FileReadError(FileReadError.NotRegularFile)
+  fullName: System.Storage.FileReadError.FileReadError(System.Storage.FileReadError.NotRegularFile)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding NotRegularFile.
+  example: []
+  syntax:
+    content: public FileReadError(FileReadError.NotRegularFile value)
+    parameters:
+    - id: value
+      type: System.Storage.FileReadError.NotRegularFile
+      description: The case value to retain.
+    content.vb: Public Sub New(value As FileReadError.NotRegularFile)
+  overload: System.Storage.FileReadError.#ctor*
+  nameWithType.vb: FileReadError.New(FileReadError.NotRegularFile)
+  fullName.vb: System.Storage.FileReadError.New(System.Storage.FileReadError.NotRegularFile)
+  name.vb: New(NotRegularFile)
+- uid: System.Storage.FileReadError.GetNotRegularFile
+  commentId: M:System.Storage.FileReadError.GetNotRegularFile
+  id: GetNotRegularFile
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: GetNotRegularFile()
+  nameWithType: FileReadError.GetNotRegularFile()
+  fullName: System.Storage.FileReadError.GetNotRegularFile()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the NotRegularFile case.
+  remarks: Requires the matching case; a mismatch produces a runtime fault.
+  example: []
+  syntax:
+    content: public FileReadError.NotRegularFile GetNotRegularFile()
+    return:
+      type: System.Storage.FileReadError.NotRegularFile
+      description: The held case value.
+    content.vb: Public Function GetNotRegularFile() As FileReadError.NotRegularFile
+  overload: System.Storage.FileReadError.GetNotRegularFile*
+- uid: System.Storage.FileReadError.#ctor(System.Storage.FileReadError.TooLarge)
+  commentId: M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.TooLarge)
+  id: '#ctor(System.Storage.FileReadError.TooLarge)'
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: FileReadError(TooLarge)
+  nameWithType: FileReadError.FileReadError(FileReadError.TooLarge)
+  fullName: System.Storage.FileReadError.FileReadError(System.Storage.FileReadError.TooLarge)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding TooLarge.
+  example: []
+  syntax:
+    content: public FileReadError(FileReadError.TooLarge value)
+    parameters:
+    - id: value
+      type: System.Storage.FileReadError.TooLarge
+      description: The case value to retain.
+    content.vb: Public Sub New(value As FileReadError.TooLarge)
+  overload: System.Storage.FileReadError.#ctor*
+  nameWithType.vb: FileReadError.New(FileReadError.TooLarge)
+  fullName.vb: System.Storage.FileReadError.New(System.Storage.FileReadError.TooLarge)
+  name.vb: New(TooLarge)
+- uid: System.Storage.FileReadError.GetTooLarge
+  commentId: M:System.Storage.FileReadError.GetTooLarge
+  id: GetTooLarge
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: GetTooLarge()
+  nameWithType: FileReadError.GetTooLarge()
+  fullName: System.Storage.FileReadError.GetTooLarge()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the TooLarge case.
+  remarks: Requires the matching case; a mismatch produces a runtime fault.
+  example: []
+  syntax:
+    content: public FileReadError.TooLarge GetTooLarge()
+    return:
+      type: System.Storage.FileReadError.TooLarge
+      description: The held case value.
+    content.vb: Public Function GetTooLarge() As FileReadError.TooLarge
+  overload: System.Storage.FileReadError.GetTooLarge*
+- uid: System.Storage.FileReadError.#ctor(System.Storage.FileReadError.ReadFailed)
+  commentId: M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.ReadFailed)
+  id: '#ctor(System.Storage.FileReadError.ReadFailed)'
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: FileReadError(ReadFailed)
+  nameWithType: FileReadError.FileReadError(FileReadError.ReadFailed)
+  fullName: System.Storage.FileReadError.FileReadError(System.Storage.FileReadError.ReadFailed)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding ReadFailed.
+  example: []
+  syntax:
+    content: public FileReadError(FileReadError.ReadFailed value)
+    parameters:
+    - id: value
+      type: System.Storage.FileReadError.ReadFailed
+      description: The case value to retain.
+    content.vb: Public Sub New(value As FileReadError.ReadFailed)
+  overload: System.Storage.FileReadError.#ctor*
+  nameWithType.vb: FileReadError.New(FileReadError.ReadFailed)
+  fullName.vb: System.Storage.FileReadError.New(System.Storage.FileReadError.ReadFailed)
+  name.vb: New(ReadFailed)
+- uid: System.Storage.FileReadError.GetReadFailed
+  commentId: M:System.Storage.FileReadError.GetReadFailed
+  id: GetReadFailed
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: GetReadFailed()
+  nameWithType: FileReadError.GetReadFailed()
+  fullName: System.Storage.FileReadError.GetReadFailed()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the ReadFailed case.
+  remarks: Requires the matching case; a mismatch produces a runtime fault.
+  example: []
+  syntax:
+    content: public FileReadError.ReadFailed GetReadFailed()
+    return:
+      type: System.Storage.FileReadError.ReadFailed
+      description: The held case value.
+    content.vb: Public Function GetReadFailed() As FileReadError.ReadFailed
+  overload: System.Storage.FileReadError.GetReadFailed*
+- uid: System.Storage.FileReadError.#ctor(System.Storage.FileReadError.InvalidUtf8)
+  commentId: M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.InvalidUtf8)
+  id: '#ctor(System.Storage.FileReadError.InvalidUtf8)'
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: FileReadError(InvalidUtf8)
+  nameWithType: FileReadError.FileReadError(FileReadError.InvalidUtf8)
+  fullName: System.Storage.FileReadError.FileReadError(System.Storage.FileReadError.InvalidUtf8)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding InvalidUtf8.
+  example: []
+  syntax:
+    content: public FileReadError(FileReadError.InvalidUtf8 value)
+    parameters:
+    - id: value
+      type: System.Storage.FileReadError.InvalidUtf8
+      description: The case value to retain.
+    content.vb: Public Sub New(value As FileReadError.InvalidUtf8)
+  overload: System.Storage.FileReadError.#ctor*
+  nameWithType.vb: FileReadError.New(FileReadError.InvalidUtf8)
+  fullName.vb: System.Storage.FileReadError.New(System.Storage.FileReadError.InvalidUtf8)
+  name.vb: New(InvalidUtf8)
+- uid: System.Storage.FileReadError.GetInvalidUtf8
+  commentId: M:System.Storage.FileReadError.GetInvalidUtf8
+  id: GetInvalidUtf8
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: GetInvalidUtf8()
+  nameWithType: FileReadError.GetInvalidUtf8()
+  fullName: System.Storage.FileReadError.GetInvalidUtf8()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the InvalidUtf8 case.
+  remarks: Requires the matching case; a mismatch produces a runtime fault.
+  example: []
+  syntax:
+    content: public FileReadError.InvalidUtf8 GetInvalidUtf8()
+    return:
+      type: System.Storage.FileReadError.InvalidUtf8
+      description: The held case value.
+    content.vb: Public Function GetInvalidUtf8() As FileReadError.InvalidUtf8
+  overload: System.Storage.FileReadError.GetInvalidUtf8*
+- uid: System.Storage.FileReadError.IsInvalidLimit
+  commentId: P:System.Storage.FileReadError.IsInvalidLimit
+  id: IsInvalidLimit
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: IsInvalidLimit
+  nameWithType: FileReadError.IsInvalidLimit
+  fullName: System.Storage.FileReadError.IsInvalidLimit
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether the error holds InvalidLimit.
+  example: []
+  syntax:
+    content: public bool IsInvalidLimit { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for that case.
+    content.vb: Public ReadOnly Property IsInvalidLimit As Boolean
+  overload: System.Storage.FileReadError.IsInvalidLimit*
+- uid: System.Storage.FileReadError.IsInvalidPath
+  commentId: P:System.Storage.FileReadError.IsInvalidPath
+  id: IsInvalidPath
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: IsInvalidPath
+  nameWithType: FileReadError.IsInvalidPath
+  fullName: System.Storage.FileReadError.IsInvalidPath
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether the error holds InvalidPath.
+  example: []
+  syntax:
+    content: public bool IsInvalidPath { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for that case.
+    content.vb: Public ReadOnly Property IsInvalidPath As Boolean
+  overload: System.Storage.FileReadError.IsInvalidPath*
+- uid: System.Storage.FileReadError.IsNotFound
+  commentId: P:System.Storage.FileReadError.IsNotFound
+  id: IsNotFound
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: IsNotFound
+  nameWithType: FileReadError.IsNotFound
+  fullName: System.Storage.FileReadError.IsNotFound
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether the error holds NotFound.
+  example: []
+  syntax:
+    content: public bool IsNotFound { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for that case.
+    content.vb: Public ReadOnly Property IsNotFound As Boolean
+  overload: System.Storage.FileReadError.IsNotFound*
+- uid: System.Storage.FileReadError.IsAccessDenied
+  commentId: P:System.Storage.FileReadError.IsAccessDenied
+  id: IsAccessDenied
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: IsAccessDenied
+  nameWithType: FileReadError.IsAccessDenied
+  fullName: System.Storage.FileReadError.IsAccessDenied
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether the error holds AccessDenied.
+  example: []
+  syntax:
+    content: public bool IsAccessDenied { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for that case.
+    content.vb: Public ReadOnly Property IsAccessDenied As Boolean
+  overload: System.Storage.FileReadError.IsAccessDenied*
+- uid: System.Storage.FileReadError.IsNotRegularFile
+  commentId: P:System.Storage.FileReadError.IsNotRegularFile
+  id: IsNotRegularFile
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: IsNotRegularFile
+  nameWithType: FileReadError.IsNotRegularFile
+  fullName: System.Storage.FileReadError.IsNotRegularFile
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether the error holds NotRegularFile.
+  example: []
+  syntax:
+    content: public bool IsNotRegularFile { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for that case.
+    content.vb: Public ReadOnly Property IsNotRegularFile As Boolean
+  overload: System.Storage.FileReadError.IsNotRegularFile*
+- uid: System.Storage.FileReadError.IsTooLarge
+  commentId: P:System.Storage.FileReadError.IsTooLarge
+  id: IsTooLarge
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: IsTooLarge
+  nameWithType: FileReadError.IsTooLarge
+  fullName: System.Storage.FileReadError.IsTooLarge
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether the error holds TooLarge.
+  example: []
+  syntax:
+    content: public bool IsTooLarge { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for that case.
+    content.vb: Public ReadOnly Property IsTooLarge As Boolean
+  overload: System.Storage.FileReadError.IsTooLarge*
+- uid: System.Storage.FileReadError.IsReadFailed
+  commentId: P:System.Storage.FileReadError.IsReadFailed
+  id: IsReadFailed
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: IsReadFailed
+  nameWithType: FileReadError.IsReadFailed
+  fullName: System.Storage.FileReadError.IsReadFailed
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether the error holds ReadFailed.
+  example: []
+  syntax:
+    content: public bool IsReadFailed { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for that case.
+    content.vb: Public ReadOnly Property IsReadFailed As Boolean
+  overload: System.Storage.FileReadError.IsReadFailed*
+- uid: System.Storage.FileReadError.IsInvalidUtf8
+  commentId: P:System.Storage.FileReadError.IsInvalidUtf8
+  id: IsInvalidUtf8
+  parent: System.Storage.FileReadError
+  langs:
+  - csharp
+  - vb
+  name: IsInvalidUtf8
+  nameWithType: FileReadError.IsInvalidUtf8
+  fullName: System.Storage.FileReadError.IsInvalidUtf8
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether the error holds InvalidUtf8.
+  example: []
+  syntax:
+    content: public bool IsInvalidUtf8 { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for that case.
+    content.vb: Public ReadOnly Property IsInvalidUtf8 As Boolean
+  overload: System.Storage.FileReadError.IsInvalidUtf8*
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.FileReadError.ToString*
+  commentId: Overload:System.Storage.FileReadError.ToString
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_ToString
+  name: ToString
+  nameWithType: FileReadError.ToString
+  fullName: System.Storage.FileReadError.ToString
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Storage.FileReadError.#ctor*
+  commentId: Overload:System.Storage.FileReadError.#ctor
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError__ctor_System_Storage_FileReadError_InvalidLimit_
+  name: FileReadError
+  nameWithType: FileReadError.FileReadError
+  fullName: System.Storage.FileReadError.FileReadError
+  nameWithType.vb: FileReadError.New
+  fullName.vb: System.Storage.FileReadError.New
+  name.vb: New
+- uid: System.Storage.FileReadError.InvalidLimit
+  commentId: T:System.Storage.FileReadError.InvalidLimit
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.InvalidLimit
+  nameWithType: FileReadError.InvalidLimit
+  fullName: System.Storage.FileReadError.InvalidLimit
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.InvalidLimit
+    name: InvalidLimit
+    isExternal: true
+    href: System.Storage.FileReadError.InvalidLimit.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.InvalidLimit
+    name: InvalidLimit
+    isExternal: true
+    href: System.Storage.FileReadError.InvalidLimit.html
+- uid: System.Storage.FileReadError.GetInvalidLimit*
+  commentId: Overload:System.Storage.FileReadError.GetInvalidLimit
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_GetInvalidLimit
+  name: GetInvalidLimit
+  nameWithType: FileReadError.GetInvalidLimit
+  fullName: System.Storage.FileReadError.GetInvalidLimit
+- uid: System.Storage.FileReadError.InvalidPath
+  commentId: T:System.Storage.FileReadError.InvalidPath
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.InvalidPath
+  nameWithType: FileReadError.InvalidPath
+  fullName: System.Storage.FileReadError.InvalidPath
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.Storage.FileReadError.InvalidPath.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.Storage.FileReadError.InvalidPath.html
+- uid: System.Storage.FileReadError.GetInvalidPath*
+  commentId: Overload:System.Storage.FileReadError.GetInvalidPath
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_GetInvalidPath
+  name: GetInvalidPath
+  nameWithType: FileReadError.GetInvalidPath
+  fullName: System.Storage.FileReadError.GetInvalidPath
+- uid: System.Storage.FileReadError.NotFound
+  commentId: T:System.Storage.FileReadError.NotFound
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.NotFound
+  nameWithType: FileReadError.NotFound
+  fullName: System.Storage.FileReadError.NotFound
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.Storage.FileReadError.NotFound.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.Storage.FileReadError.NotFound.html
+- uid: System.Storage.FileReadError.GetNotFound*
+  commentId: Overload:System.Storage.FileReadError.GetNotFound
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_GetNotFound
+  name: GetNotFound
+  nameWithType: FileReadError.GetNotFound
+  fullName: System.Storage.FileReadError.GetNotFound
+- uid: System.Storage.FileReadError.AccessDenied
+  commentId: T:System.Storage.FileReadError.AccessDenied
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.AccessDenied
+  nameWithType: FileReadError.AccessDenied
+  fullName: System.Storage.FileReadError.AccessDenied
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.Storage.FileReadError.AccessDenied.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.Storage.FileReadError.AccessDenied.html
+- uid: System.Storage.FileReadError.GetAccessDenied*
+  commentId: Overload:System.Storage.FileReadError.GetAccessDenied
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_GetAccessDenied
+  name: GetAccessDenied
+  nameWithType: FileReadError.GetAccessDenied
+  fullName: System.Storage.FileReadError.GetAccessDenied
+- uid: System.Storage.FileReadError.NotRegularFile
+  commentId: T:System.Storage.FileReadError.NotRegularFile
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.NotRegularFile
+  nameWithType: FileReadError.NotRegularFile
+  fullName: System.Storage.FileReadError.NotRegularFile
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.NotRegularFile
+    name: NotRegularFile
+    isExternal: true
+    href: System.Storage.FileReadError.NotRegularFile.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.NotRegularFile
+    name: NotRegularFile
+    isExternal: true
+    href: System.Storage.FileReadError.NotRegularFile.html
+- uid: System.Storage.FileReadError.GetNotRegularFile*
+  commentId: Overload:System.Storage.FileReadError.GetNotRegularFile
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_GetNotRegularFile
+  name: GetNotRegularFile
+  nameWithType: FileReadError.GetNotRegularFile
+  fullName: System.Storage.FileReadError.GetNotRegularFile
+- uid: System.Storage.FileReadError.TooLarge
+  commentId: T:System.Storage.FileReadError.TooLarge
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.TooLarge
+  nameWithType: FileReadError.TooLarge
+  fullName: System.Storage.FileReadError.TooLarge
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.TooLarge
+    name: TooLarge
+    isExternal: true
+    href: System.Storage.FileReadError.TooLarge.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.TooLarge
+    name: TooLarge
+    isExternal: true
+    href: System.Storage.FileReadError.TooLarge.html
+- uid: System.Storage.FileReadError.GetTooLarge*
+  commentId: Overload:System.Storage.FileReadError.GetTooLarge
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_GetTooLarge
+  name: GetTooLarge
+  nameWithType: FileReadError.GetTooLarge
+  fullName: System.Storage.FileReadError.GetTooLarge
+- uid: System.Storage.FileReadError.ReadFailed
+  commentId: T:System.Storage.FileReadError.ReadFailed
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.ReadFailed
+  nameWithType: FileReadError.ReadFailed
+  fullName: System.Storage.FileReadError.ReadFailed
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.ReadFailed
+    name: ReadFailed
+    isExternal: true
+    href: System.Storage.FileReadError.ReadFailed.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.ReadFailed
+    name: ReadFailed
+    isExternal: true
+    href: System.Storage.FileReadError.ReadFailed.html
+- uid: System.Storage.FileReadError.GetReadFailed*
+  commentId: Overload:System.Storage.FileReadError.GetReadFailed
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_GetReadFailed
+  name: GetReadFailed
+  nameWithType: FileReadError.GetReadFailed
+  fullName: System.Storage.FileReadError.GetReadFailed
+- uid: System.Storage.FileReadError.InvalidUtf8
+  commentId: T:System.Storage.FileReadError.InvalidUtf8
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.InvalidUtf8
+  nameWithType: FileReadError.InvalidUtf8
+  fullName: System.Storage.FileReadError.InvalidUtf8
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.InvalidUtf8
+    name: InvalidUtf8
+    isExternal: true
+    href: System.Storage.FileReadError.InvalidUtf8.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.InvalidUtf8
+    name: InvalidUtf8
+    isExternal: true
+    href: System.Storage.FileReadError.InvalidUtf8.html
+- uid: System.Storage.FileReadError.GetInvalidUtf8*
+  commentId: Overload:System.Storage.FileReadError.GetInvalidUtf8
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_GetInvalidUtf8
+  name: GetInvalidUtf8
+  nameWithType: FileReadError.GetInvalidUtf8
+  fullName: System.Storage.FileReadError.GetInvalidUtf8
+- uid: System.Storage.FileReadError.IsInvalidLimit*
+  commentId: Overload:System.Storage.FileReadError.IsInvalidLimit
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_IsInvalidLimit
+  name: IsInvalidLimit
+  nameWithType: FileReadError.IsInvalidLimit
+  fullName: System.Storage.FileReadError.IsInvalidLimit
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System.Storage.FileReadError.IsInvalidPath*
+  commentId: Overload:System.Storage.FileReadError.IsInvalidPath
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_IsInvalidPath
+  name: IsInvalidPath
+  nameWithType: FileReadError.IsInvalidPath
+  fullName: System.Storage.FileReadError.IsInvalidPath
+- uid: System.Storage.FileReadError.IsNotFound*
+  commentId: Overload:System.Storage.FileReadError.IsNotFound
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_IsNotFound
+  name: IsNotFound
+  nameWithType: FileReadError.IsNotFound
+  fullName: System.Storage.FileReadError.IsNotFound
+- uid: System.Storage.FileReadError.IsAccessDenied*
+  commentId: Overload:System.Storage.FileReadError.IsAccessDenied
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_IsAccessDenied
+  name: IsAccessDenied
+  nameWithType: FileReadError.IsAccessDenied
+  fullName: System.Storage.FileReadError.IsAccessDenied
+- uid: System.Storage.FileReadError.IsNotRegularFile*
+  commentId: Overload:System.Storage.FileReadError.IsNotRegularFile
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_IsNotRegularFile
+  name: IsNotRegularFile
+  nameWithType: FileReadError.IsNotRegularFile
+  fullName: System.Storage.FileReadError.IsNotRegularFile
+- uid: System.Storage.FileReadError.IsTooLarge*
+  commentId: Overload:System.Storage.FileReadError.IsTooLarge
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_IsTooLarge
+  name: IsTooLarge
+  nameWithType: FileReadError.IsTooLarge
+  fullName: System.Storage.FileReadError.IsTooLarge
+- uid: System.Storage.FileReadError.IsReadFailed*
+  commentId: Overload:System.Storage.FileReadError.IsReadFailed
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_IsReadFailed
+  name: IsReadFailed
+  nameWithType: FileReadError.IsReadFailed
+  fullName: System.Storage.FileReadError.IsReadFailed
+- uid: System.Storage.FileReadError.IsInvalidUtf8*
+  commentId: Overload:System.Storage.FileReadError.IsInvalidUtf8
+  isExternal: true
+  href: System.Storage.FileReadError.html#System_Storage_FileReadError_IsInvalidUtf8
+  name: IsInvalidUtf8
+  nameWithType: FileReadError.IsInvalidUtf8
+  fullName: System.Storage.FileReadError.IsInvalidUtf8

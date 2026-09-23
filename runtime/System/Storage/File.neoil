@@ -1,5 +1,2 @@
-.type System.Storage.File
-    .include "../../raven/generated/File.methods.neoil"
-.end
-
+.include "../../raven/generated/File.methods.neoil"
 .include "../../raven/generated/File.helpers.neoil"

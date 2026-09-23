@@ -279,7 +279,7 @@ static class LibraryImplementation
 
     public static bool SameType(TypeReference left, TypeReference right)
     {
-        if (StorageProviderBindings.SameType(left, right) || PathBindings.SameType(left, right) || StreamBindings.SameType(left, right) || WorkerBindings.SameType(left, right) || AsyncBindings.SameType(left, right) || TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right)) return true;
+        if (StorageItemBindings.SameType(left, right) || StorageProviderBindings.SameType(left, right) || PathBindings.SameType(left, right) || StreamBindings.SameType(left, right) || WorkerBindings.SameType(left, right) || AsyncBindings.SameType(left, right) || TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right)) return true;
         if (left is ByReferenceType lb)
             return right is ByReferenceType rb && SameType(lb.ElementType, rb.ElementType);
         if (left is ArrayType la)

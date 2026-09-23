@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.FileWriteError.NotRegularFile
+  commentId: T:System.Storage.FileWriteError.NotRegularFile
+  id: FileWriteError.NotRegularFile
+  parent: System.Storage
+  children:
+  - System.Storage.FileWriteError.NotRegularFile.#ctor
+  langs:
+  - csharp
+  - vb
+  name: FileWriteError.NotRegularFile
+  nameWithType: FileWriteError.NotRegularFile
+  fullName: System.Storage.FileWriteError.NotRegularFile
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: The target is not a regular file.
+  example: []
+  syntax:
+    content: public struct FileWriteError.NotRegularFile
+    content.vb: Public Structure FileWriteError.NotRegularFile
+- uid: System.Storage.FileWriteError.NotRegularFile.#ctor
+  commentId: M:System.Storage.FileWriteError.NotRegularFile.#ctor
+  id: '#ctor'
+  parent: System.Storage.FileWriteError.NotRegularFile
+  langs:
+  - csharp
+  - vb
+  name: NotRegularFile()
+  nameWithType: FileWriteError.NotRegularFile.NotRegularFile()
+  fullName: System.Storage.FileWriteError.NotRegularFile.NotRegularFile()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the NotRegularFile case.
+  example: []
+  syntax:
+    content: public NotRegularFile()
+    content.vb: Public Sub New()
+  overload: System.Storage.FileWriteError.NotRegularFile.#ctor*
+  nameWithType.vb: FileWriteError.NotRegularFile.New()
+  fullName.vb: System.Storage.FileWriteError.NotRegularFile.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.FileWriteError.NotRegularFile.#ctor*
+  commentId: Overload:System.Storage.FileWriteError.NotRegularFile.#ctor
+  isExternal: true
+  href: System.Storage.FileWriteError.NotRegularFile.html#System_Storage_FileWriteError_NotRegularFile__ctor
+  name: NotRegularFile
+  nameWithType: FileWriteError.NotRegularFile.NotRegularFile
+  fullName: System.Storage.FileWriteError.NotRegularFile.NotRegularFile
+  nameWithType.vb: FileWriteError.NotRegularFile.New
+  fullName.vb: System.Storage.FileWriteError.NotRegularFile.New
+  name.vb: New

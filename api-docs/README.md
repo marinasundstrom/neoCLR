@@ -68,7 +68,7 @@ Existing reference coverage gaps (not exemptions from the policy):
 
 - Arrays and collection interfaces/implementations, delegates, queries and operators.
 - Option/Result carriers, TaskOutcome and composition/propagation helpers.
-- Primitives, text/encoding, process/console and whole-file helpers.
+- Primitives, text/encoding and process/console APIs.
 - Time/calendar, introspection and public resource/interop contracts.
 
 Backfill these as each area is developed. The next Storage/Streams slice must include
@@ -110,9 +110,12 @@ reference synchronized with `src/fault_code.rs` and the debugger snapshot.
 
 System.Storage.Metadata, EntryKind and StorageLookupError are now included in DocFX
 selection. Their complete metadata reference and [lookup guide](storage-lookup.md)
-describe development host-path lookup. The provider GetFile members remain
-application-owned and are covered by the [sample reference](storage-experiment.md).
-No renderer exclusion is needed for these new signatures. Existing whole-file helpers remain a tracked coverage gap. Path coverage is described below.
+describe development host-path lookup. StorageLookup.GetFile is the integrated optional lookup capability; concrete
+providers remain [sample implementations](storage-experiment.md).
+No renderer exclusion is needed for these new signatures. File and its legacy text error types are now selected too; only WriteAllText is
+excluded because DocFX 2.80.1 cannot render Result<System.Void, FileWriteError>. Its
+complete manual reference is [WriteAllText](storage-items.md#writealltext).
+File, Directory and StorageLookup have generated type/member coverage. Path coverage follows.
 
 System.Storage.Path is now a platform class with Parse, immutable properties and
 lexical equality, alongside the existing static native string helpers. Path and

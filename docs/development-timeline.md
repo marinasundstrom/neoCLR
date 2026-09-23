@@ -61,6 +61,15 @@ This implements the proposed separation at the platform boundary. File/Directory
 integration and lookup capabilities remain next; this is an assistant implementation
 choice within the requested POC, not an author-approved final Storage design.
 
+**Descriptor integration.** The assistant subsequently integrated File and Directory,
+preserving File's static native string helpers. Chose StorageLookup as an optional
+interface extending byte access with GetFile, so byte-only providers remain valid.
+Moved sample text conveniences out of descriptors and retained them on fixture
+providers. Directory.FileAt now uses StorageLookupError. Added generated API member
+coverage and a manual WriteAllText entry for DocFX's unit-result limitation. Concrete
+host-provider integration remains next; richer metadata is still deferred. This
+separation remains exploratory rather than a final author-selected API shape.
+
 ## 2026-09-23 — Storage and Streams as architectural exploration
 
 **Author clarification.** “Look at this as exploration also, to investigate what

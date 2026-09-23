@@ -1,0 +1,7 @@
+namespace System.Storage
+
+import System.*
+
+public interface StorageLookup : StorageProvider {
+    func GetFile(path: Path) -> Result<File, StorageLookupError>
+}

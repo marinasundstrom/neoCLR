@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.FileReadError.InvalidLimit
+  commentId: T:System.Storage.FileReadError.InvalidLimit
+  id: FileReadError.InvalidLimit
+  parent: System.Storage
+  children:
+  - System.Storage.FileReadError.InvalidLimit.#ctor
+  langs:
+  - csharp
+  - vb
+  name: FileReadError.InvalidLimit
+  nameWithType: FileReadError.InvalidLimit
+  fullName: System.Storage.FileReadError.InvalidLimit
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: The byte limit is negative.
+  example: []
+  syntax:
+    content: public struct FileReadError.InvalidLimit
+    content.vb: Public Structure FileReadError.InvalidLimit
+- uid: System.Storage.FileReadError.InvalidLimit.#ctor
+  commentId: M:System.Storage.FileReadError.InvalidLimit.#ctor
+  id: '#ctor'
+  parent: System.Storage.FileReadError.InvalidLimit
+  langs:
+  - csharp
+  - vb
+  name: InvalidLimit()
+  nameWithType: FileReadError.InvalidLimit.InvalidLimit()
+  fullName: System.Storage.FileReadError.InvalidLimit.InvalidLimit()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the InvalidLimit case.
+  example: []
+  syntax:
+    content: public InvalidLimit()
+    content.vb: Public Sub New()
+  overload: System.Storage.FileReadError.InvalidLimit.#ctor*
+  nameWithType.vb: FileReadError.InvalidLimit.New()
+  fullName.vb: System.Storage.FileReadError.InvalidLimit.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.FileReadError.InvalidLimit.#ctor*
+  commentId: Overload:System.Storage.FileReadError.InvalidLimit.#ctor
+  isExternal: true
+  href: System.Storage.FileReadError.InvalidLimit.html#System_Storage_FileReadError_InvalidLimit__ctor
+  name: InvalidLimit
+  nameWithType: FileReadError.InvalidLimit.InvalidLimit
+  fullName: System.Storage.FileReadError.InvalidLimit.InvalidLimit
+  nameWithType.vb: FileReadError.InvalidLimit.New
+  fullName.vb: System.Storage.FileReadError.InvalidLimit.New
+  name.vb: New

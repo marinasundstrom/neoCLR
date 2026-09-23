@@ -1,0 +1,122 @@
+; Generated from runtime/raven/src/System/Storage/Directory.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Storage.Directory.RuntimeStringEquals(String source,String value0) -> Boolean
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::Equals(String)
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeStringContainsOrdinal(String source,String value0) -> Boolean
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::ContainsOrdinal(String)
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeStringget_IsEmpty(String source) -> Boolean
+ldarg source
+call instance System.String::get_IsEmpty()
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorInvalidPath(System.Storage.StorageLookupError.InvalidPath value) -> System.Storage.StorageLookupError
+ldarg value
+newobj instance System.Storage.StorageLookupError::.ctor(System.Storage.StorageLookupError.InvalidPath)
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeErrorSystemStorageStorageLookupErrorInvalidPathNew() -> System.Storage.StorageLookupError.InvalidPath
+newobj instance System.Storage.StorageLookupError.InvalidPath::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeUnion0(System.Storage.StorageLookupError arg0) -> System.Result.Error<System.Storage.StorageLookupError>
+ldarg arg0
+newobj instance System.Result.Error<System.Storage.StorageLookupError>::.ctor(System.Storage.StorageLookupError)
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeUnion1(System.Result.Error<System.Storage.StorageLookupError> arg0) -> System.Result<System.Storage.File,System.Storage.StorageLookupError>
+ldarg arg0
+newobj instance System.Result<System.Storage.File,System.Storage.StorageLookupError>::.ctor(System.Result.Error<System.Storage.StorageLookupError>)
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeUnion2(System.Result<System.Storage.Path,System.Storage.InvalidPathError>& arg0,out(true) System.Result.Ok<System.Storage.Path>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Result<System.Storage.Path,System.Storage.InvalidPathError>
+ldarg arg1
+call instance System.Result<System.Storage.Path,System.Storage.InvalidPathError>::TryGet(System.Result.Ok<System.Storage.Path>&)
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeUnion3(System.Result.Ok<System.Storage.Path>& receiver,out System.Storage.Path& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Result.Ok<System.Storage.Path>
+call instance System.Result.Ok<System.Storage.Path>::get_Value()
+stobj System.Storage.Path
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeUnion4(System.Result<System.Storage.Path,System.Storage.InvalidPathError>& arg0,out(true) System.Result.Error<System.Storage.InvalidPathError>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Result<System.Storage.Path,System.Storage.InvalidPathError>
+ldarg arg1
+call instance System.Result<System.Storage.Path,System.Storage.InvalidPathError>::TryGet(System.Result.Error<System.Storage.InvalidPathError>&)
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeUnion5(System.Result.Error<System.Storage.InvalidPathError>& receiver,out System.Storage.InvalidPathError& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Result.Error<System.Storage.InvalidPathError>
+call instance System.Result.Error<System.Storage.InvalidPathError>::get_Value()
+stobj System.Storage.InvalidPathError
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeUnion6(System.Storage.File arg0) -> System.Result.Ok<System.Storage.File>
+ldarg arg0
+newobj instance System.Result.Ok<System.Storage.File>::.ctor(System.Storage.File)
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeUnion7(System.Result.Ok<System.Storage.File> arg0) -> System.Result<System.Storage.File,System.Storage.StorageLookupError>
+ldarg arg0
+newobj instance System.Result<System.Storage.File,System.Storage.StorageLookupError>::.ctor(System.Result.Ok<System.Storage.File>)
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeUnion8(System.Result<System.Storage.File,System.Storage.StorageLookupError>& arg0,out(true) System.Result.Ok<System.Storage.File>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Result<System.Storage.File,System.Storage.StorageLookupError>
+ldarg arg1
+call instance System.Result<System.Storage.File,System.Storage.StorageLookupError>::TryGet(System.Result.Ok<System.Storage.File>&)
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeUnion9(System.Result.Ok<System.Storage.File>& receiver,out System.Storage.File& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Result.Ok<System.Storage.File>
+call instance System.Result.Ok<System.Storage.File>::get_Value()
+stobj System.Storage.File
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeUnion10(System.Result<System.Storage.File,System.Storage.StorageLookupError>& arg0,out(true) System.Result.Error<System.Storage.StorageLookupError>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Result<System.Storage.File,System.Storage.StorageLookupError>
+ldarg arg1
+call instance System.Result<System.Storage.File,System.Storage.StorageLookupError>::TryGet(System.Result.Error<System.Storage.StorageLookupError>&)
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeUnion11(System.Result.Error<System.Storage.StorageLookupError>& receiver,out System.Storage.StorageLookupError& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Result.Error<System.Storage.StorageLookupError>
+call instance System.Result.Error<System.Storage.StorageLookupError>::get_Value()
+stobj System.Storage.StorageLookupError
+ret
+.end
+.function neoCLR.Library.System.Storage.Directory.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

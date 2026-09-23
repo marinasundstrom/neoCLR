@@ -29,6 +29,36 @@ items:
   assemblies:
   - NeoCLR.CoreProbe
 references:
+- uid: System.Streams.InputStream
+  commentId: T:System.Streams.InputStream
+  parent: System.Streams
+  isExternal: true
+  href: System.Streams.InputStream.html
+  name: InputStream
+  nameWithType: InputStream
+  fullName: System.Streams.InputStream
+- uid: System.Streams.OutputStream
+  commentId: T:System.Streams.OutputStream
+  parent: System.Streams
+  isExternal: true
+  href: System.Streams.OutputStream.html
+  name: OutputStream
+  nameWithType: OutputStream
+  fullName: System.Streams.OutputStream
+- uid: System.Streams.FileInputStream
+  commentId: T:System.Streams.FileInputStream
+  isExternal: true
+  href: System.Streams.FileInputStream.html
+  name: FileInputStream
+  nameWithType: FileInputStream
+  fullName: System.Streams.FileInputStream
+- uid: System.Streams.FileOutputStream
+  commentId: T:System.Streams.FileOutputStream
+  isExternal: true
+  href: System.Streams.FileOutputStream.html
+  name: FileOutputStream
+  nameWithType: FileOutputStream
+  fullName: System.Streams.FileOutputStream
 - uid: System.Streams.StreamError
   commentId: T:System.Streams.StreamError
   isExternal: true
@@ -316,36 +346,6 @@ references:
     name: IoFailure
     isExternal: true
     href: System.Streams.StreamError.IoFailure.html
-- uid: System.Streams.InputStream
-  commentId: T:System.Streams.InputStream
-  parent: System.Streams
-  isExternal: true
-  href: System.Streams.InputStream.html
-  name: InputStream
-  nameWithType: InputStream
-  fullName: System.Streams.InputStream
-- uid: System.Streams.OutputStream
-  commentId: T:System.Streams.OutputStream
-  parent: System.Streams
-  isExternal: true
-  href: System.Streams.OutputStream.html
-  name: OutputStream
-  nameWithType: OutputStream
-  fullName: System.Streams.OutputStream
-- uid: System.Streams.FileInputStream
-  commentId: T:System.Streams.FileInputStream
-  isExternal: true
-  href: System.Streams.FileInputStream.html
-  name: FileInputStream
-  nameWithType: FileInputStream
-  fullName: System.Streams.FileInputStream
-- uid: System.Streams.FileOutputStream
-  commentId: T:System.Streams.FileOutputStream
-  isExternal: true
-  href: System.Streams.FileOutputStream.html
-  name: FileOutputStream
-  nameWithType: FileOutputStream
-  fullName: System.Streams.FileOutputStream
 - uid: System.Streams
   commentId: N:System.Streams
   isExternal: true

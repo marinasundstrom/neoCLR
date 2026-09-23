@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.FileReadError.InvalidPath
+  commentId: T:System.Storage.FileReadError.InvalidPath
+  id: FileReadError.InvalidPath
+  parent: System.Storage
+  children:
+  - System.Storage.FileReadError.InvalidPath.#ctor
+  langs:
+  - csharp
+  - vb
+  name: FileReadError.InvalidPath
+  nameWithType: FileReadError.InvalidPath
+  fullName: System.Storage.FileReadError.InvalidPath
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: The native path is empty or contains NUL.
+  example: []
+  syntax:
+    content: public struct FileReadError.InvalidPath
+    content.vb: Public Structure FileReadError.InvalidPath
+- uid: System.Storage.FileReadError.InvalidPath.#ctor
+  commentId: M:System.Storage.FileReadError.InvalidPath.#ctor
+  id: '#ctor'
+  parent: System.Storage.FileReadError.InvalidPath
+  langs:
+  - csharp
+  - vb
+  name: InvalidPath()
+  nameWithType: FileReadError.InvalidPath.InvalidPath()
+  fullName: System.Storage.FileReadError.InvalidPath.InvalidPath()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the InvalidPath case.
+  example: []
+  syntax:
+    content: public InvalidPath()
+    content.vb: Public Sub New()
+  overload: System.Storage.FileReadError.InvalidPath.#ctor*
+  nameWithType.vb: FileReadError.InvalidPath.New()
+  fullName.vb: System.Storage.FileReadError.InvalidPath.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.FileReadError.InvalidPath.#ctor*
+  commentId: Overload:System.Storage.FileReadError.InvalidPath.#ctor
+  isExternal: true
+  href: System.Storage.FileReadError.InvalidPath.html#System_Storage_FileReadError_InvalidPath__ctor
+  name: InvalidPath
+  nameWithType: FileReadError.InvalidPath.InvalidPath
+  fullName: System.Storage.FileReadError.InvalidPath.InvalidPath
+  nameWithType.vb: FileReadError.InvalidPath.New
+  fullName.vb: System.Storage.FileReadError.InvalidPath.New
+  name.vb: New

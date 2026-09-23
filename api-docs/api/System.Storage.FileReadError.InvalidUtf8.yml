@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.FileReadError.InvalidUtf8
+  commentId: T:System.Storage.FileReadError.InvalidUtf8
+  id: FileReadError.InvalidUtf8
+  parent: System.Storage
+  children:
+  - System.Storage.FileReadError.InvalidUtf8.#ctor
+  langs:
+  - csharp
+  - vb
+  name: FileReadError.InvalidUtf8
+  nameWithType: FileReadError.InvalidUtf8
+  fullName: System.Storage.FileReadError.InvalidUtf8
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: File bytes are not valid UTF-8.
+  example: []
+  syntax:
+    content: public struct FileReadError.InvalidUtf8
+    content.vb: Public Structure FileReadError.InvalidUtf8
+- uid: System.Storage.FileReadError.InvalidUtf8.#ctor
+  commentId: M:System.Storage.FileReadError.InvalidUtf8.#ctor
+  id: '#ctor'
+  parent: System.Storage.FileReadError.InvalidUtf8
+  langs:
+  - csharp
+  - vb
+  name: InvalidUtf8()
+  nameWithType: FileReadError.InvalidUtf8.InvalidUtf8()
+  fullName: System.Storage.FileReadError.InvalidUtf8.InvalidUtf8()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the InvalidUtf8 case.
+  example: []
+  syntax:
+    content: public InvalidUtf8()
+    content.vb: Public Sub New()
+  overload: System.Storage.FileReadError.InvalidUtf8.#ctor*
+  nameWithType.vb: FileReadError.InvalidUtf8.New()
+  fullName.vb: System.Storage.FileReadError.InvalidUtf8.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.FileReadError.InvalidUtf8.#ctor*
+  commentId: Overload:System.Storage.FileReadError.InvalidUtf8.#ctor
+  isExternal: true
+  href: System.Storage.FileReadError.InvalidUtf8.html#System_Storage_FileReadError_InvalidUtf8__ctor
+  name: InvalidUtf8
+  nameWithType: FileReadError.InvalidUtf8.InvalidUtf8
+  fullName: System.Storage.FileReadError.InvalidUtf8.InvalidUtf8
+  nameWithType.vb: FileReadError.InvalidUtf8.New
+  fullName.vb: System.Storage.FileReadError.InvalidUtf8.New
+  name.vb: New

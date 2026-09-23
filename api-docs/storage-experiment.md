@@ -1,12 +1,10 @@
 # Storage provider experiment
 
-**Development exploration, not a published System.Storage API.** These
-`StorageExperiment` providers, descriptors and memory stream classes belong to a tested Raven sample.
-They consume the development System.Storage.Path value and System.Streams.InputStream/OutputStream
-interfaces from the platform library. Their purpose is to
-compare provider ownership, file descriptors and path interpretation before
-settling the platform API. They are documented here so the experimental contract
-is visible; they are not types in the core reference assembly.
+**Development exploration after Preview 9.** The sample imports platform
+[File, Directory and StorageLookup](storage-items.md), Path and directional stream
+interfaces. Its concrete HostStorage, MemoryStorage and memory streams remain
+application-owned fixtures for comparing provider ownership and path interpretation.
+The platform API is provisional; these additions are not in Preview 9 downloads.
 
 Download the tested [project file](/samples/storage-provider/StorageExplorer.rvnproj),
 [Storage.rvn](/samples/storage-provider/Storage.rvn),
@@ -15,7 +13,7 @@ Download the tested [project file](/samples/storage-provider/StorageExplorer.rvn
 [ByteRoundTrip.rvn](/samples/storage-provider/ByteRoundTrip.rvn),
 [Main.rvn](/samples/storage-provider/Main.rvn) and
 [expected output](/samples/storage-provider/expected.txt). The same
-`RoundTrip(directory)` function writes and reads `Hello, värld!` using disk and
+`RoundTrip(directory, provider)` function writes and reads `Hello, värld!` using disk and
 memory. An oversized replacement is rejected without changing the saved contents.
 
 ```raven
@@ -23,7 +21,7 @@ match Path.Parse("/") {
     Ok(let path) => {
         let host: StorageProvider = HostStorage("sandbox")
         let disk = Directory(host, path)
-        ByteRoundTrip(disk)
+        ByteRoundTrip(disk, host)
     }
     Error(_) => System.Fault("Invalid logical path")
 }
@@ -53,8 +51,8 @@ actual bytes, error handling and independent provider state.
 ## StorageProvider
 
 The sample interface extends the integrated
-[System.Storage.StorageProvider](storage-provider.md) byte contract. Only OpenRead
-and CreateNew belong to that platform interface; lookup and text helpers below
+[System.Storage.StorageLookup](xref:System.Storage.StorageLookup) capability, which
+inherits the [byte contract](storage-provider.md). Only ReadText and WriteText below
 remain sample conveniences.
 
 Implementations resolve validated logical Path values in their own namespace. Text methods remain temporary
@@ -77,15 +75,15 @@ Directory.FileAt instead appends a direct child to that directory's Path.
 
 ## Directory
 
-A provider-bound directory address. Construction does not create or verify a directory.
+An integrated provider-bound directory address. Construction does not create or verify a directory.
 
 | Member | Contract |
 | --- | --- |
-| `Directory(provider: StorageProvider, path: Path)` | Retain the provider and its directory address. |
+| `Directory(provider: StorageLookup, path: Path)` | Retain the provider and its directory address. |
 | `Path: Path` | Return the validated logical path without querying storage. |
 | `GetFile(relativePath: Path) -> Result<File, StorageLookupError>` | Resolve a relative logical path against this directory and query through its retained provider. Nested segments are accepted. Absolute values return InvalidPath without querying; `.` queries this directory address as a file and normally returns WrongKind. |
 | `GetFile(name: string) -> Result<File, StorageLookupError>` | Validate a direct child name, then query the provider. Invalid names return InvalidPath; provider lookup errors are preserved. |
-| `FileAt(name: string) -> Result<File, FileReadError>` | Validate a direct child name, parse the combined logical path, then construct a File descriptor retaining the same provider. Empty names, `.`, `..` and names containing separators, colon or NUL are rejected with InvalidPath. |
+| `FileAt(name: string) -> Result<File, StorageLookupError>` | Validate a direct child name, parse the combined logical path, then construct a File descriptor retaining the same provider. Empty names, `.`, `..` and names containing separators, colon or NUL are rejected with InvalidPath. |
 
 FileAt constructs an address without I/O and can describe a file to create later.
 GetFile queries its current kind/existence. Validation is not a security
@@ -118,7 +116,7 @@ error design remain open. Comparison reviewed 2026-09-23.
 
 ## File
 
-A descriptor retaining its provider, address and display name. It owns no open file
+A descriptor retaining its provider, address. It owns no open file
 handle and has no disposal requirement in this experiment. Constructing a descriptor
 is valid before the entry exists; use GetFile for an explicit lookup. Providers no
 longer need a FileAt factory just to construct descriptors. File.Name uses the existing
@@ -129,11 +127,9 @@ spelling. Revisit extraction when additional Path formats are introduced.
 | --- | --- |
 | `File(provider: StorageProvider, path: Path)` | Retain the provider and validated address, deriving Name from the address. Does not query existence or open a stream. |
 | `Path: Path` | Return the validated logical path. |
-| `Name: string` | Return the final path component, derived once at construction. No independent display-name argument or metadata query. |
+| `Name: string` | Return the final path component, derived from Path without lookup. No independent display-name argument or metadata query. |
 | `OpenRead() -> Result<InputStream, StreamError>` | Ask the retained provider for an input stream. The caller must close it. |
 | `CreateNew() -> Result<OutputStream, StreamError>` | Ask the retained provider for a new file output stream. The caller must close it. |
-| `ReadText(maxBytes: int) -> Result<string, FileReadError>` | Read through the retained provider. A missing file is reported when read, not when its descriptor is constructed. |
-| `WriteText(text: string, maxBytes: int) -> Result<unit, FileWriteError>` | Write through that same provider; never select a provider from ambient state. |
 
 ## Supplied providers
 

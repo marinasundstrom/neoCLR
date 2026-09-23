@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.FileReadError.NotFound
+  commentId: T:System.Storage.FileReadError.NotFound
+  id: FileReadError.NotFound
+  parent: System.Storage
+  children:
+  - System.Storage.FileReadError.NotFound.#ctor
+  langs:
+  - csharp
+  - vb
+  name: FileReadError.NotFound
+  nameWithType: FileReadError.NotFound
+  fullName: System.Storage.FileReadError.NotFound
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: The file or a required parent cannot be found.
+  example: []
+  syntax:
+    content: public struct FileReadError.NotFound
+    content.vb: Public Structure FileReadError.NotFound
+- uid: System.Storage.FileReadError.NotFound.#ctor
+  commentId: M:System.Storage.FileReadError.NotFound.#ctor
+  id: '#ctor'
+  parent: System.Storage.FileReadError.NotFound
+  langs:
+  - csharp
+  - vb
+  name: NotFound()
+  nameWithType: FileReadError.NotFound.NotFound()
+  fullName: System.Storage.FileReadError.NotFound.NotFound()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the NotFound case.
+  example: []
+  syntax:
+    content: public NotFound()
+    content.vb: Public Sub New()
+  overload: System.Storage.FileReadError.NotFound.#ctor*
+  nameWithType.vb: FileReadError.NotFound.New()
+  fullName.vb: System.Storage.FileReadError.NotFound.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.FileReadError.NotFound.#ctor*
+  commentId: Overload:System.Storage.FileReadError.NotFound.#ctor
+  isExternal: true
+  href: System.Storage.FileReadError.NotFound.html#System_Storage_FileReadError_NotFound__ctor
+  name: NotFound
+  nameWithType: FileReadError.NotFound.NotFound
+  fullName: System.Storage.FileReadError.NotFound.NotFound
+  nameWithType.vb: FileReadError.NotFound.New
+  fullName.vb: System.Storage.FileReadError.NotFound.New
+  name.vb: New

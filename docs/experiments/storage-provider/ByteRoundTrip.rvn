@@ -1,5 +1,8 @@
 namespace StorageExperiment
 
+import System.Storage.File
+import System.Storage.Directory
+
 import System.*
 import System.Console.*
 import System.Collections.*
@@ -59,7 +62,7 @@ func ReadMessage(input: InputStream) -> Result<List<byte>, StreamError> {
     return Ok(bytes)
 }
 
-func ByteRoundTrip(directory: Directory) {
+func ByteRoundTrip(directory: Directory, provider: StorageProvider) {
     match directory.FileAt("stream.txt") {
         Ok(let file) => {
             match file.CreateNew() {
@@ -125,7 +128,7 @@ func ByteRoundTrip(directory: Directory) {
                 }
                 Error(let error) => System.Fault(error.ToString())
             }
-            match file.ReadText(14) {
+            match provider.ReadText(file.Path, 14) {
                 Ok(let text) => {
                     if text != "Hello, värld!" {
                         System.Fault("Byte writes not visible through text helper")
@@ -138,4 +141,25 @@ func ByteRoundTrip(directory: Directory) {
         }
         Error(let error) => System.Fault(error.ToString())
     }
+}
+
+// Fixture assertion helper: decode the small, known UTF-8 contract-test contents.
+func ReadFileText(file: File) -> Result<string, StreamError> {
+    match file.OpenRead() {
+        Ok(let input) => {
+            let read = ReadMessage(input)
+            input.Close()
+            match read {
+                Ok(let bytes) => {
+                    match Utf8.Decode(bytes) {
+                        Ok(let text) => return Ok(text)
+                        Error(_) => System.Fault("Expected UTF-8 fixture contents")
+                    }
+                }
+                Error(let error) => return Error(error)
+            }
+        }
+        Error(let error) => return Error(error)
+    }
+    return Error(StreamError(StreamError.IoFailure()))
 }

@@ -112,7 +112,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-storage-provider-') as folder:
     print('Stream capability directions: rejected opposite operations')
 
     (root / 'Main.rvn').write_text(
-        'namespace StorageExperiment\nfunc Main() {\n'
+        'namespace StorageExperiment\nimport System.Storage.File\nfunc Main() {\n'
         '    let file = File(MemoryStorage(), RequirePath("correct.txt"), "misleading.txt")\n'
         '}\n')
     rejected = subprocess.run(['dotnet', 'msbuild', str(root / 'StorageExplorer.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=120)

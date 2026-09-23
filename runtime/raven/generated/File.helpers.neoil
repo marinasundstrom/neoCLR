@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/System/Storage/File/Functions.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Storage/File.rvn. Regenerate with build_runtime_library.py.
 .function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorInvalidLimit(System.Storage.FileReadError.InvalidLimit value) -> System.Storage.FileReadError
 ldarg value
 newobj instance System.Storage.FileReadError::.ctor(System.Storage.FileReadError.InvalidLimit)

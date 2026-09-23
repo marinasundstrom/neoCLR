@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.FileReadError.NotRegularFile
+  commentId: T:System.Storage.FileReadError.NotRegularFile
+  id: FileReadError.NotRegularFile
+  parent: System.Storage
+  children:
+  - System.Storage.FileReadError.NotRegularFile.#ctor
+  langs:
+  - csharp
+  - vb
+  name: FileReadError.NotRegularFile
+  nameWithType: FileReadError.NotRegularFile
+  fullName: System.Storage.FileReadError.NotRegularFile
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: The target is not a regular file.
+  example: []
+  syntax:
+    content: public struct FileReadError.NotRegularFile
+    content.vb: Public Structure FileReadError.NotRegularFile
+- uid: System.Storage.FileReadError.NotRegularFile.#ctor
+  commentId: M:System.Storage.FileReadError.NotRegularFile.#ctor
+  id: '#ctor'
+  parent: System.Storage.FileReadError.NotRegularFile
+  langs:
+  - csharp
+  - vb
+  name: NotRegularFile()
+  nameWithType: FileReadError.NotRegularFile.NotRegularFile()
+  fullName: System.Storage.FileReadError.NotRegularFile.NotRegularFile()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the NotRegularFile case.
+  example: []
+  syntax:
+    content: public NotRegularFile()
+    content.vb: Public Sub New()
+  overload: System.Storage.FileReadError.NotRegularFile.#ctor*
+  nameWithType.vb: FileReadError.NotRegularFile.New()
+  fullName.vb: System.Storage.FileReadError.NotRegularFile.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.FileReadError.NotRegularFile.#ctor*
+  commentId: Overload:System.Storage.FileReadError.NotRegularFile.#ctor
+  isExternal: true
+  href: System.Storage.FileReadError.NotRegularFile.html#System_Storage_FileReadError_NotRegularFile__ctor
+  name: NotRegularFile
+  nameWithType: FileReadError.NotRegularFile.NotRegularFile
+  fullName: System.Storage.FileReadError.NotRegularFile.NotRegularFile
+  nameWithType.vb: FileReadError.NotRegularFile.New
+  fullName.vb: System.Storage.FileReadError.NotRegularFile.New
+  name.vb: New

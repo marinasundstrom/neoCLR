@@ -27,11 +27,13 @@ MemoryStorage implementations. Its File.OpenRead and File.CreateNew dispatch thr
 the platform interface; the same byte workflow runs against both. The host provider
 maps logical paths beneath a native root and uses the platform file streams. The
 memory provider deliberately uses two-byte transfers to exercise partial I/O.
-Their concrete implementations, File/Directory descriptors, lookup and text
-conveniences remain sample-owned while integration continues.
+Their concrete implementations and text conveniences remain sample-owned.
+[File/Directory descriptors](storage-items.md) and the StorageLookup capability
+are integrated into the platform.
 
 A platform provider is not required to implement GetFile, ReadText or WriteText.
-The sample extends the byte contract with those temporary conveniences. UTF-8
+StorageLookup extends it with GetFile; the sample extends that capability with
+temporary text conveniences. UTF-8
 conversion belongs above byte access; existing static file text helpers remain
 available with their current string paths and error types.
 

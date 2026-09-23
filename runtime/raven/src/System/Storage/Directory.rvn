@@ -1,0 +1,64 @@
+namespace System.Storage
+
+import System.*
+import System.Result.*
+
+public class Directory {
+    private field provider: StorageLookup
+    private field path: Path
+
+    init(provider: StorageLookup, path: Path) {
+        self.provider = provider
+        self.path = path
+    }
+
+    val Path: Path => path
+
+    // This resolves a direct child address; it does not query existence.
+    func FileAt(name: string) -> Result<File, StorageLookupError> {
+        if name.IsEmpty || name == "." || name == ".." || name.ContainsOrdinal("/") {
+            return Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+        var childText = path.Text + "/" + name
+        if path.Text == "." {
+            childText = name
+        }
+        if path.Text == "/" {
+            childText = "/" + name
+        }
+        return match System.Storage.Path.Parse(childText) {
+            Ok(let child) => Ok(File(provider, child))
+            Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+    }
+
+    // Validate a direct child, then query its provider. The result owns no stream.
+    func GetFile(name: string) -> Result<File, StorageLookupError> {
+        return match FileAt(name) {
+            Ok(let descriptor) => provider.GetFile(descriptor.Path)
+            Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+    }
+
+    // A parsed absolute path is valid syntax, but cannot replace this context.
+    func GetFile(relativePath: Path) -> Result<File, StorageLookupError> {
+        if relativePath.IsAbsolute {
+            return Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+        if relativePath.Text == "." {
+            return provider.GetFile(path)
+        }
+        var resolved = path.Text + "/" + relativePath.Text
+        if path.Text == "/" {
+            resolved = "/" + relativePath.Text
+        }
+        if path.Text == "." {
+            resolved = relativePath.Text
+        }
+        return match System.Storage.Path.Parse(resolved) {
+            Ok(let child) => provider.GetFile(child)
+            Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+    }
+
+}

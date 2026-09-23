@@ -2,6 +2,8 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Storage.Metadata",
   "inputs": {
+    "runtime/raven/src/System/Storage/Directory.rvn": "b559db8b59ec4495c4d07703ce158840c4801e465588bbe8907466fece256010",
+    "runtime/raven/src/System/Storage/StorageLookup.rvn": "1275b326e9d701b9381c0aa186117365e30e390423ed8a29e58041062b77f5dc",
     "runtime/raven/src/System/Storage/StorageProvider.rvn": "5f05b218e821da5b4a74c358fe7773b57ae6b03dc0834dd62498bbe33ca65d37",
     "runtime/raven/src/System/Streams/InputStream.rvn": "73fbe20bcfc532ff6a51cdcf8a7f87158f964515ad58972cc55dd5a7220c8253",
     "runtime/raven/src/System/Streams/OutputStream.rvn": "5bceeed5c80ec358754e0f32e2c95f16a5ef8b84c4ff4f59d919d01174af3784",
@@ -83,7 +85,7 @@
     "runtime/raven/src/System/Time.rvn": "32057665602a216c60d011e9a6f1c9dbb3161ac0ad2b7cf041df6552baf1352c",
     "runtime/raven/src/System/Date.rvn": "e6fa47d6b202e2b2e7e4bc61f6ded4105baf4d3e256b38b3b33c0712a06da4fe",
     "runtime/raven/src/System/Storage/Path.rvn": "4163b625f589c019bad3f3801b957b547bd38ba1fe176125c8e970ce5a794550",
-    "runtime/raven/src/System/Storage/File/Functions.rvn": "8dc2c2564e52923845a5400b5cc0078c09e50af6e3cf9cd693c301d3bbef7443",
+    "runtime/raven/src/System/Storage/File.rvn": "f27fe3cf3488e4c597c4eab650643916eeb087fa475da0d95f903710271a88ae",
     "runtime/raven/src/System/Int64.rvn": "0a6bf2bb36f1a76e6674534681a8405f3d0969f63a6de7744aa8234f018765bc",
     "runtime/raven/src/System/SByte.rvn": "3c90d534988afed3fb18bcb34e695a54b6d7a05df147626e4d80ccb3c6fdbc76",
     "runtime/raven/src/System/Byte.rvn": "91c302230af71cfdb9c4570e3305ea845bd7618e11824a950d4f359049f30a2b",
@@ -95,7 +97,7 @@
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
-    "runtime/raven/System.Runtime.rvnproj": "62819b44ea6190878a6297be219f8a1b9c7f5e26ab7185f1905a87a65f92719c",
+    "runtime/raven/System.Runtime.rvnproj": "6f558dbf9a67b933a61cdb358e6c5575e5413441b6d86fb629e6a52cde8f4edf",
     "build/NeoCLR.Raven.props": "b7d01e1d6b23228bb784dafcda4cf7c777b554b11f093cc3daf2509bb7402ee0"
   },
   "outputs": {
@@ -103,7 +105,7 @@
     "StorageMetadata.helpers.neoil": "b413c2424a452d8d2a302049bfd29e63ac7e25b6432bf60d42fafba18324c341"
   },
   "compilerSha256": "571ac41551f849a5dd7b6ed3fa57080c6284e919baefe6550b6d48df6ea44919",
-  "coreSha256": "46c2f97227f740101983a1cf2fe68c858f68ecfc788b18fa0333ab061a2d1548",
+  "coreSha256": "913bc6b4833573e01f1f54e47824f7b7a977912fcc91f424dfcee3e234f7d03f",
   "exports": [
     "GetKind(String path) -> System.Result<System.Storage.EntryKind,System.Storage.StorageLookupError>"
   ]

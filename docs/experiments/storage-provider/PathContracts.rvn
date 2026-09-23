@@ -1,5 +1,8 @@
 namespace StorageExperiment
 
+import System.Storage.File
+import System.Storage.Directory
+
 import System.*
 import System.Storage.Path
 import System.Console.*
@@ -72,7 +75,7 @@ func Main() {
     let current = Directory(memory, RequirePath("."))
     match root.FileAt("note") {
         Ok(let file) => {
-            match file.WriteText("rooted", 16) {
+            match memory.WriteText(file.Path, "rooted", 16) {
                 Ok(_) => { }
                 Error(let error) => System.Fault(error.ToString())
             }
@@ -82,7 +85,7 @@ func Main() {
     // Providers may resolve distinct lexical values to the same address.
     match current.FileAt("note") {
         Ok(let file) => {
-            match file.ReadText(16) {
+            match memory.ReadText(file.Path, 16) {
                 Ok(let text) => {
                     if text != "rooted" {
                         System.Fault("Relative resolution changed provider context")

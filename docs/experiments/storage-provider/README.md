@@ -1,6 +1,6 @@
 # Provider-bound File and Directory exploration
 
-**Development experiment, 2026-09-23. Application-owned providers using integrated System.Storage.Path and System.Streams APIs.**
+**Development experiment, 2026-09-23. Application-owned providers using integrated System.Storage descriptors, Path and System.Streams APIs.**
 The same Raven `RoundTrip(Directory)` workflow writes and reads a real UTF-8 file
 and then runs against a bounded memory provider. The application sees File and
 Directory objects; each retains the provider that interprets its address.
@@ -30,11 +30,12 @@ native root; MemoryStorage uses rooted logical keys. File retains its display
 name derived from Path. The original experiments used ordinary Raven interface
 dispatch; the subsequent platform integrations are recorded below.
 
-The types use the **StorageExperiment** namespace. Their documented surface is in
+The fixture providers use the **StorageExperiment** namespace; File/Directory and
+the byte/lookup interfaces now use **System.Storage**. Their documented surface is in
 [the on-site API guide source](../../../api-docs/storage-experiment.md); it is linked
 from `/docs/` and the Files feature page, with the exact tested source downloadable.
-It is a manual reference to application-owned experiment types, not a DocFX metadata
-claim that these types are part of the platform's core reference assembly.
+The guide distinguishes fixture types from integrated platform types, which also
+have generated DocFX member coverage.
 
 ## Provisional choices, costs and alternatives
 
@@ -420,3 +421,35 @@ pass. The interface import probe and regenerated bootstrap snapshot pass. DocFX
 covers 151 items with summaries; four website tooling tests and the combined
 13-page website build pass without documentation warnings. No native runtime or
 Raven compiler change was needed for this slice.
+
+
+### Platform File/Directory integration — 2026-09-23
+
+File now retains a StorageProvider and Path, derives Name and delegates byte opening.
+Its static native string-based ReadAllText/WriteAllText methods are preserved in the
+same Raven-authored class. StorageLookup extends StorageProvider with GetFile(Path);
+Directory requires this capability and provides FileAt plus both GetFile overloads.
+Byte-only providers do not need lookup or text methods. Descriptor construction
+performs no lookup and retains no stream. Directory.FileAt uses StorageLookupError
+instead of the old sample FileReadError. All public members have on-site reference
+coverage; WriteAllText has a manual entry for DocFX's unit-result limitation.
+
+The sample imports these platform types. Its text workflow explicitly receives the
+fixture text provider; File has no ReadText/WriteText instance members. Descriptor
+lookup assertions read through byte streams, checking actual retained provider
+context. Arrays of descriptors and inherited lookup-to-byte capability conversion
+are admitted by the strict bridge. Existing .NET/WinRT research above supports
+separate addresses, observations and handles; optional lookup adds an interface
+but avoids imposing metadata operations on every byte backend. Rich metadata,
+parent hierarchy and stable replacement identity remain provisional.
+
+Next is a minimal integrated host provider; the memory implementation remains a
+bounded comparison fixture, not a general filesystem.
+
+
+Descriptor integration validation: normal SDK product and all contract/negative
+checks pass, including a byte-only provider counter confirming File construction
+and property access make no provider calls. Native static file input/output and
+Path tests pass (10 cases, including artifacts/CLI). Strict interface/foundation
+checks and bootstrap/API snapshots pass. All 245 generated API items have summaries;
+four website tooling tests and the combined site pass with zero DocFX warnings.

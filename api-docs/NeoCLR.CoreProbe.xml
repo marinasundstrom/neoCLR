@@ -493,7 +493,7 @@
       <returns>The held case value.</returns>
     </member>
     <member name="T:System.Storage.StorageLookupError">
-      <summary>Expected failures from metadata queries and experimental provider lookup.</summary>
+      <summary>Expected failures from metadata queries, child address validation and provider lookup.</summary>
       <remarks>Development after Preview 9. Use a named case; an uninitialized carrier is not a valid value. Prefer union patterns when supported by the consuming frontend.</remarks>
     </member>
     <member name="M:System.Storage.StorageLookupError.ToString">
@@ -501,7 +501,7 @@
       <returns>The stable case label for display, not a filesystem diagnostic.</returns>
     </member>
     <member name="T:System.Storage.StorageLookupError.InvalidPath">
-      <summary>The native path is empty or contains NUL.</summary>
+      <summary>The supplied path is invalid for this operation.</summary>
     </member>
     <member name="M:System.Storage.StorageLookupError.InvalidPath.#ctor">
       <summary>Constructs the InvalidPath case.</summary>
@@ -648,6 +648,392 @@
     <member name="M:System.Storage.InvalidPathError.ToString">
       <summary>Returns InvalidPath for display.</summary>
       <returns>The string InvalidPath.</returns>
+    </member>
+    <member name="T:System.Storage.File">
+      <summary>A provider-bound file address with byte-stream access and compatible static native text helpers.</summary>
+      <remarks>Development instance API after Preview 9. Construction performs no lookup or I/O. A descriptor owns no stream and does not guarantee existence or stable file identity. Name is derived from Path. Static text helpers use native string paths independently of the descriptor provider. See the [descriptor guide](/docs/storage-items.html).</remarks>
+    </member>
+    <member name="M:System.Storage.File.#ctor(System.Storage.StorageProvider,System.Storage.Path)">
+      <summary>Retains a byte provider and validated logical address.</summary>
+      <param name="provider">Provider used for subsequent byte opening operations.</param>
+      <param name="path">Address interpreted in that provider namespace.</param>
+      <remarks>The file need not exist. Construction does not create it or open a handle.</remarks>
+    </member>
+    <member name="P:System.Storage.File.Path">
+      <summary>Gets the retained validated logical address.</summary>
+      <returns>The same Path supplied at construction.</returns>
+    </member>
+    <member name="P:System.Storage.File.Name">
+      <summary>Gets the final component of the current logical path.</summary>
+      <returns>The native GetFileName result for the accepted slash-based spelling; an empty string for root.</returns>
+      <remarks>No metadata query occurs. The current grammar excludes native drive/UNC paths; revisit extraction with future Path formats.</remarks>
+    </member>
+    <member name="M:System.Storage.File.OpenRead">
+      <summary>Opens existing bytes for reading.</summary>
+      <returns>InputStream on success, or the retained provider's StreamError unchanged.</returns>
+      <remarks>Delegates to the provider with Path. The caller closes a successful stream. Opening can fail even after successful lookup. Creation never overwrites an existing entry; later write failure does not roll back creation.</remarks>
+    </member>
+    <member name="M:System.Storage.File.CreateNew">
+      <summary>Exclusively creates an empty file for writing.</summary>
+      <returns>OutputStream on success, or the retained provider's StreamError unchanged.</returns>
+      <remarks>Delegates to the provider with Path. The caller closes a successful stream. Opening can fail even after successful lookup. Creation never overwrites an existing entry; later write failure does not roll back creation.</remarks>
+    </member>
+    <member name="M:System.Storage.File.ReadAllText(System.String,System.Int32)">
+      <summary>Reads a bounded native file as strict UTF-8.</summary>
+      <param name="path">Native path string; provider Path parsing is not applied.</param>
+      <param name="maxBytes">Nonnegative maximum number of bytes to read.</param>
+      <returns>The decoded text, or FileReadError.</returns>
+      <remarks>Synchronous. Opens and closes per call. Rejects non-regular files, malformed UTF-8 and contents exceeding the limit; a UTF-8 BOM is preserved as text. Zero accepts an empty file. This static helper does not use a descriptor provider.</remarks>
+    </member>
+    <member name="M:System.Storage.File.WriteAllText(System.String,System.String,System.Int32)">
+      <summary>Creates or replaces a native file with bounded UTF-8 text.</summary>
+      <param name="path">Native destination path string.</param>
+      <param name="text">Text encoded as UTF-8 without adding a BOM.</param>
+      <param name="maxBytes">Nonnegative UTF-8 byte limit.</param>
+      <returns>Success unit or FileWriteError.</returns>
+      <remarks>The exact method is documented in the [manual reference](/docs/storage-items.html#writealltext) because DocFX cannot render its unit-valued Result. Invalid limits and oversized text are rejected before modification. Later I/O failures can leave partial output; this is not atomic replacement.</remarks>
+    </member>
+    <member name="T:System.Storage.StorageLookup">
+      <summary>A byte provider that can query a file address without retaining a stream.</summary>
+      <remarks>Extends StorageProvider. GetFile returns a descriptor bound to the queried provider and logical address, or StorageLookupError. Implementations inspect current kind/existence rather than opening content. Success is an observation, not a guarantee of later access. Byte-only providers need not implement this interface.</remarks>
+    </member>
+    <member name="M:System.Storage.StorageLookup.GetFile(System.Storage.Path)">
+      <summary>Looks up an existing file and returns its provider-bound descriptor.</summary>
+      <param name="path">Validated logical file address.</param>
+      <returns>A File retaining this provider and address, or StorageLookupError such as NotFound, WrongKind, AccessDenied, InvalidPath or IoFailure.</returns>
+      <remarks>Must not create the file or retain an open stream. Provider-specific aliases and concurrent changes do not establish stable item identity.</remarks>
+    </member>
+    <member name="T:System.Storage.Directory">
+      <summary>A provider-bound directory address for child resolution and explicit file lookup.</summary>
+      <remarks>Development API. Construction does not create or verify a directory. No metadata is cached. Parent existence, enumeration, timestamps and stable identity are outside this initial contract. See the [descriptor guide](/docs/storage-items.html).</remarks>
+    </member>
+    <member name="M:System.Storage.Directory.#ctor(System.Storage.StorageLookup,System.Storage.Path)">
+      <summary>Retains a lookup-capable provider and directory address.</summary>
+      <param name="provider">Byte provider with explicit file lookup capability.</param>
+      <param name="path">Validated logical directory address; existence is not checked.</param>
+    </member>
+    <member name="P:System.Storage.Directory.Path">
+      <summary>Gets the retained directory address without querying storage.</summary>
+      <returns>The Path supplied at construction.</returns>
+    </member>
+    <member name="M:System.Storage.Directory.FileAt(System.String)">
+      <summary>Constructs a direct-child file address without performing I/O.</summary>
+      <param name="name">One nonempty child name, excluding separators, dot/parent segments and other invalid Path characters.</param>
+      <returns>A File using this provider, or StorageLookupError.InvalidPath.</returns>
+      <remarks>Use this for a future destination. It does not check existence, open a stream or create a file. The error family is StorageLookupError rather than the earlier sample FileReadError.</remarks>
+    </member>
+    <member name="M:System.Storage.Directory.GetFile(System.String)">
+      <summary>Validates one child name and explicitly looks up its file.</summary>
+      <param name="name">One direct child name, not a relative path containing separators.</param>
+      <returns>A provider-bound File, InvalidPath for an invalid name, or the provider lookup error unchanged.</returns>
+      <remarks>Equivalent to resolving FileAt and querying StorageLookup.GetFile; it owns no stream.</remarks>
+    </member>
+    <member name="M:System.Storage.Directory.GetFile(System.Storage.Path)">
+      <summary>Resolves a relative logical path in this directory and looks up its file.</summary>
+      <param name="relativePath">Relative Path; nested segments are supported, absolute inputs are rejected.</param>
+      <returns>A provider-bound File, InvalidPath for an absolute input, or the provider lookup error unchanged.</returns>
+      <remarks>Dot queries this directory address as a file, normally WrongKind. Resolution preserves the provider and prefix; it does not normalize, enforce parent existence or create a security sandbox.</remarks>
+    </member>
+    <member name="T:System.Storage.FileReadError">
+      <summary>Expected failures from the static native whole-text file helper.</summary>
+      <remarks>Construct a named case; an uninitialized carrier is not a valid error. These legacy error families are distinct from StreamError and StorageLookupError.</remarks>
+    </member>
+    <member name="M:System.Storage.FileReadError.ToString">
+      <summary>Returns the selected case name.</summary>
+      <returns>A display label, not a host diagnostic.</returns>
+    </member>
+    <member name="T:System.Storage.FileReadError.InvalidLimit">
+      <summary>The byte limit is negative.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.InvalidLimit.#ctor">
+      <summary>Constructs the InvalidLimit case.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.InvalidLimit)">
+      <summary>Constructs a carrier holding InvalidLimit.</summary>
+      <param name="value">The case value to retain.</param>
+    </member>
+    <member name="P:System.Storage.FileReadError.IsInvalidLimit">
+      <summary>Tests whether the error holds InvalidLimit.</summary>
+      <returns>True only for that case.</returns>
+    </member>
+    <member name="M:System.Storage.FileReadError.GetInvalidLimit">
+      <summary>Extracts the InvalidLimit case.</summary>
+      <returns>The held case value.</returns>
+      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
+    </member>
+    <member name="T:System.Storage.FileReadError.InvalidPath">
+      <summary>The native path is empty or contains NUL.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.InvalidPath.#ctor">
+      <summary>Constructs the InvalidPath case.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.InvalidPath)">
+      <summary>Constructs a carrier holding InvalidPath.</summary>
+      <param name="value">The case value to retain.</param>
+    </member>
+    <member name="P:System.Storage.FileReadError.IsInvalidPath">
+      <summary>Tests whether the error holds InvalidPath.</summary>
+      <returns>True only for that case.</returns>
+    </member>
+    <member name="M:System.Storage.FileReadError.GetInvalidPath">
+      <summary>Extracts the InvalidPath case.</summary>
+      <returns>The held case value.</returns>
+      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
+    </member>
+    <member name="T:System.Storage.FileReadError.NotFound">
+      <summary>The file or a required parent cannot be found.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.NotFound.#ctor">
+      <summary>Constructs the NotFound case.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.NotFound)">
+      <summary>Constructs a carrier holding NotFound.</summary>
+      <param name="value">The case value to retain.</param>
+    </member>
+    <member name="P:System.Storage.FileReadError.IsNotFound">
+      <summary>Tests whether the error holds NotFound.</summary>
+      <returns>True only for that case.</returns>
+    </member>
+    <member name="M:System.Storage.FileReadError.GetNotFound">
+      <summary>Extracts the NotFound case.</summary>
+      <returns>The held case value.</returns>
+      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
+    </member>
+    <member name="T:System.Storage.FileReadError.AccessDenied">
+      <summary>The host denied access.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.AccessDenied.#ctor">
+      <summary>Constructs the AccessDenied case.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.AccessDenied)">
+      <summary>Constructs a carrier holding AccessDenied.</summary>
+      <param name="value">The case value to retain.</param>
+    </member>
+    <member name="P:System.Storage.FileReadError.IsAccessDenied">
+      <summary>Tests whether the error holds AccessDenied.</summary>
+      <returns>True only for that case.</returns>
+    </member>
+    <member name="M:System.Storage.FileReadError.GetAccessDenied">
+      <summary>Extracts the AccessDenied case.</summary>
+      <returns>The held case value.</returns>
+      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
+    </member>
+    <member name="T:System.Storage.FileReadError.NotRegularFile">
+      <summary>The target is not a regular file.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.NotRegularFile.#ctor">
+      <summary>Constructs the NotRegularFile case.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.NotRegularFile)">
+      <summary>Constructs a carrier holding NotRegularFile.</summary>
+      <param name="value">The case value to retain.</param>
+    </member>
+    <member name="P:System.Storage.FileReadError.IsNotRegularFile">
+      <summary>Tests whether the error holds NotRegularFile.</summary>
+      <returns>True only for that case.</returns>
+    </member>
+    <member name="M:System.Storage.FileReadError.GetNotRegularFile">
+      <summary>Extracts the NotRegularFile case.</summary>
+      <returns>The held case value.</returns>
+      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
+    </member>
+    <member name="T:System.Storage.FileReadError.TooLarge">
+      <summary>The file or encoded text exceeds the byte limit.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.TooLarge.#ctor">
+      <summary>Constructs the TooLarge case.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.TooLarge)">
+      <summary>Constructs a carrier holding TooLarge.</summary>
+      <param name="value">The case value to retain.</param>
+    </member>
+    <member name="P:System.Storage.FileReadError.IsTooLarge">
+      <summary>Tests whether the error holds TooLarge.</summary>
+      <returns>True only for that case.</returns>
+    </member>
+    <member name="M:System.Storage.FileReadError.GetTooLarge">
+      <summary>Extracts the TooLarge case.</summary>
+      <returns>The held case value.</returns>
+      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
+    </member>
+    <member name="T:System.Storage.FileReadError.ReadFailed">
+      <summary>A remaining native read failure occurred.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.ReadFailed.#ctor">
+      <summary>Constructs the ReadFailed case.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.ReadFailed)">
+      <summary>Constructs a carrier holding ReadFailed.</summary>
+      <param name="value">The case value to retain.</param>
+    </member>
+    <member name="P:System.Storage.FileReadError.IsReadFailed">
+      <summary>Tests whether the error holds ReadFailed.</summary>
+      <returns>True only for that case.</returns>
+    </member>
+    <member name="M:System.Storage.FileReadError.GetReadFailed">
+      <summary>Extracts the ReadFailed case.</summary>
+      <returns>The held case value.</returns>
+      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
+    </member>
+    <member name="T:System.Storage.FileReadError.InvalidUtf8">
+      <summary>File bytes are not valid UTF-8.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.InvalidUtf8.#ctor">
+      <summary>Constructs the InvalidUtf8 case.</summary>
+    </member>
+    <member name="M:System.Storage.FileReadError.#ctor(System.Storage.FileReadError.InvalidUtf8)">
+      <summary>Constructs a carrier holding InvalidUtf8.</summary>
+      <param name="value">The case value to retain.</param>
+    </member>
+    <member name="P:System.Storage.FileReadError.IsInvalidUtf8">
+      <summary>Tests whether the error holds InvalidUtf8.</summary>
+      <returns>True only for that case.</returns>
+    </member>
+    <member name="M:System.Storage.FileReadError.GetInvalidUtf8">
+      <summary>Extracts the InvalidUtf8 case.</summary>
+      <returns>The held case value.</returns>
+      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
+    </member>
+    <member name="T:System.Storage.FileWriteError">
+      <summary>Expected failures from the static native whole-text file helper.</summary>
+      <remarks>Construct a named case; an uninitialized carrier is not a valid error. These legacy error families are distinct from StreamError and StorageLookupError.</remarks>
+    </member>
+    <member name="M:System.Storage.FileWriteError.ToString">
+      <summary>Returns the selected case name.</summary>
+      <returns>A display label, not a host diagnostic.</returns>
+    </member>
+    <member name="T:System.Storage.FileWriteError.InvalidLimit">
+      <summary>The byte limit is negative.</summary>
+    </member>
+    <member name="M:System.Storage.FileWriteError.InvalidLimit.#ctor">
+      <summary>Constructs the InvalidLimit case.</summary>
+    </member>
+    <member name="M:System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.InvalidLimit)">
+      <summary>Constructs a carrier holding InvalidLimit.</summary>
+      <param name="value">The case value to retain.</param>
+    </member>
+    <member name="P:System.Storage.FileWriteError.IsInvalidLimit">
+      <summary>Tests whether the error holds InvalidLimit.</summary>
+      <returns>True only for that case.</returns>
+    </member>
+    <member name="M:System.Storage.FileWriteError.GetInvalidLimit">
+      <summary>Extracts the InvalidLimit case.</summary>
+      <returns>The held case value.</returns>
+      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
+    </member>
+    <member name="T:System.Storage.FileWriteError.InvalidPath">
+      <summary>The native path is empty or contains NUL.</summary>
+    </member>
+    <member name="M:System.Storage.FileWriteError.InvalidPath.#ctor">
+      <summary>Constructs the InvalidPath case.</summary>
+    </member>
+    <member name="M:System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.InvalidPath)">
+      <summary>Constructs a carrier holding InvalidPath.</summary>
+      <param name="value">The case value to retain.</param>
+    </member>
+    <member name="P:System.Storage.FileWriteError.IsInvalidPath">
+      <summary>Tests whether the error holds InvalidPath.</summary>
+      <returns>True only for that case.</returns>
+    </member>
+    <member name="M:System.Storage.FileWriteError.GetInvalidPath">
+      <summary>Extracts the InvalidPath case.</summary>
+      <returns>The held case value.</returns>
+      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
+    </member>
+    <member name="T:System.Storage.FileWriteError.NotFound">
+      <summary>The file or a required parent cannot be found.</summary>
+    </member>
+    <member name="M:System.Storage.FileWriteError.NotFound.#ctor">
+      <summary>Constructs the NotFound case.</summary>
+    </member>
+    <member name="M:System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.NotFound)">
+      <summary>Constructs a carrier holding NotFound.</summary>
+      <param name="value">The case value to retain.</param>
+    </member>
+    <member name="P:System.Storage.FileWriteError.IsNotFound">
+      <summary>Tests whether the error holds NotFound.</summary>
+      <returns>True only for that case.</returns>
+    </member>
+    <member name="M:System.Storage.FileWriteError.GetNotFound">
+      <summary>Extracts the NotFound case.</summary>
+      <returns>The held case value.</returns>
+      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
+    </member>
+    <member name="T:System.Storage.FileWriteError.AccessDenied">
+      <summary>The host denied access.</summary>
+    </member>
+    <member name="M:System.Storage.FileWriteError.AccessDenied.#ctor">
+      <summary>Constructs the AccessDenied case.</summary>
+    </member>
+    <member name="M:System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.AccessDenied)">
+      <summary>Constructs a carrier holding AccessDenied.</summary>
+      <param name="value">The case value to retain.</param>
+    </member>
+    <member name="P:System.Storage.FileWriteError.IsAccessDenied">
+      <summary>Tests whether the error holds AccessDenied.</summary>
+      <returns>True only for that case.</returns>
+    </member>
+    <member name="M:System.Storage.FileWriteError.GetAccessDenied">
+      <summary>Extracts the AccessDenied case.</summary>
+      <returns>The held case value.</returns>
+      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
+    </member>
+    <member name="T:System.Storage.FileWriteError.NotRegularFile">
+      <summary>The target is not a regular file.</summary>
+    </member>
+    <member name="M:System.Storage.FileWriteError.NotRegularFile.#ctor">
+      <summary>Constructs the NotRegularFile case.</summary>
+    </member>
+    <member name="M:System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.NotRegularFile)">
+      <summary>Constructs a carrier holding NotRegularFile.</summary>
+      <param name="value">The case value to retain.</param>
+    </member>
+    <member name="P:System.Storage.FileWriteError.IsNotRegularFile">
+      <summary>Tests whether the error holds NotRegularFile.</summary>
+      <returns>True only for that case.</returns>
+    </member>
+    <member name="M:System.Storage.FileWriteError.GetNotRegularFile">
+      <summary>Extracts the NotRegularFile case.</summary>
+      <returns>The held case value.</returns>
+      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
+    </member>
+    <member name="T:System.Storage.FileWriteError.TooLarge">
+      <summary>The file or encoded text exceeds the byte limit.</summary>
+    </member>
+    <member name="M:System.Storage.FileWriteError.TooLarge.#ctor">
+      <summary>Constructs the TooLarge case.</summary>
+    </member>
+    <member name="M:System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.TooLarge)">
+      <summary>Constructs a carrier holding TooLarge.</summary>
+      <param name="value">The case value to retain.</param>
+    </member>
+    <member name="P:System.Storage.FileWriteError.IsTooLarge">
+      <summary>Tests whether the error holds TooLarge.</summary>
+      <returns>True only for that case.</returns>
+    </member>
+    <member name="M:System.Storage.FileWriteError.GetTooLarge">
+      <summary>Extracts the TooLarge case.</summary>
+      <returns>The held case value.</returns>
+      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
+    </member>
+    <member name="T:System.Storage.FileWriteError.WriteFailed">
+      <summary>A remaining native write failure occurred.</summary>
+    </member>
+    <member name="M:System.Storage.FileWriteError.WriteFailed.#ctor">
+      <summary>Constructs the WriteFailed case.</summary>
+    </member>
+    <member name="M:System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.WriteFailed)">
+      <summary>Constructs a carrier holding WriteFailed.</summary>
+      <param name="value">The case value to retain.</param>
+    </member>
+    <member name="P:System.Storage.FileWriteError.IsWriteFailed">
+      <summary>Tests whether the error holds WriteFailed.</summary>
+      <returns>True only for that case.</returns>
+    </member>
+    <member name="M:System.Storage.FileWriteError.GetWriteFailed">
+      <summary>Extracts the WriteFailed case.</summary>
+      <returns>The held case value.</returns>
+      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
     </member>
   </members>
 </doc>

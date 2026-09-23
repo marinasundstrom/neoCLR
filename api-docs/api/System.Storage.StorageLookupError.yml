@@ -31,7 +31,7 @@ items:
   assemblies:
   - NeoCLR.CoreProbe
   namespace: System.Storage
-  summary: Expected failures from metadata queries and experimental provider lookup.
+  summary: Expected failures from metadata queries, child address validation and provider lookup.
   remarks: Development after Preview 9. Use a named case; an uninitialized carrier is not a valid value. Prefer union patterns when supported by the consuming frontend.
   example: []
   syntax:

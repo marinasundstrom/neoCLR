@@ -174,15 +174,18 @@ Combine/GetFileName string helpers; the sample now imports the platform type.
 The stream capability contracts now live in System.Streams; concrete file streams
 and application memory streams implement them directly. System.Storage.StorageProvider
 now integrates OpenRead(Path) and CreateNew(Path); the sample extends this byte
-contract with temporary lookup/text conveniences. Next, integrate the minimal
-File/Directory contract
-in bounded library slices, preserving existing static file helpers and keeping
-known limitations explicit. The author emphasizes a minimal Storage POC: Path-taking
-Combine/helper overloads are future direction, not required in this integration. Parent hierarchy, shared errors and replacement identity
-remain follow-ups; they are not blanket prerequisites for initial integration. Preserve the tested stream operations. The
-current application-owned File/Directory contracts remain
-exploratory; do not promote their string-address/text-helper shape unchanged merely
-because this sample works. Public stream wrappers have on-site reference coverage.
+contract with optional lookup and temporary text conveniences. File and Directory
+are now integrated as provider-bound descriptors, with File.Path/Name and byte
+opening, Directory child-address construction and typed lookup. StorageLookup
+extends the byte contract with GetFile; byte-only providers remain supported.
+Directory.FileAt now returns StorageLookupError, replacing the sample's FileReadError.
+Existing static native string-based File helpers remain compatible. All public
+members have on-site reference coverage, including a manual WriteAllText entry.
+The concrete host/memory providers remain sample implementations. **Next:** promote
+the minimal host provider so an application can use this integrated surface without
+copying its disk adapter, then reassess the Storage POC before adding metadata.
+Path-taking Combine/helper overloads, parent hierarchy and replacement identity
+remain follow-ups. Keep async scheduling and richer metadata outside this blocking POC.
 **API design clarification, 2026-09-23:** learn from WinRT StorageFile/StorageFolder
 without importing their breadth. Start with address properties (Path and File.Name),
 explicit lookup and byte-stream access. Add metadata properties only for a concrete

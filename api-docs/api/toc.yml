@@ -14,6 +14,9 @@ items:
   name: System.Storage
   type: Namespace
   items:
+  - uid: System.Storage.Directory
+    name: Directory
+    type: Class
   - uid: System.Storage.EntryKind
     name: EntryKind
     type: Struct
@@ -22,6 +25,60 @@ items:
     type: Struct
   - uid: System.Storage.EntryKind.File
     name: EntryKind.File
+    type: Struct
+  - uid: System.Storage.File
+    name: File
+    type: Class
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    type: Struct
+  - uid: System.Storage.FileReadError.AccessDenied
+    name: FileReadError.AccessDenied
+    type: Struct
+  - uid: System.Storage.FileReadError.InvalidLimit
+    name: FileReadError.InvalidLimit
+    type: Struct
+  - uid: System.Storage.FileReadError.InvalidPath
+    name: FileReadError.InvalidPath
+    type: Struct
+  - uid: System.Storage.FileReadError.InvalidUtf8
+    name: FileReadError.InvalidUtf8
+    type: Struct
+  - uid: System.Storage.FileReadError.NotFound
+    name: FileReadError.NotFound
+    type: Struct
+  - uid: System.Storage.FileReadError.NotRegularFile
+    name: FileReadError.NotRegularFile
+    type: Struct
+  - uid: System.Storage.FileReadError.ReadFailed
+    name: FileReadError.ReadFailed
+    type: Struct
+  - uid: System.Storage.FileReadError.TooLarge
+    name: FileReadError.TooLarge
+    type: Struct
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    type: Struct
+  - uid: System.Storage.FileWriteError.AccessDenied
+    name: FileWriteError.AccessDenied
+    type: Struct
+  - uid: System.Storage.FileWriteError.InvalidLimit
+    name: FileWriteError.InvalidLimit
+    type: Struct
+  - uid: System.Storage.FileWriteError.InvalidPath
+    name: FileWriteError.InvalidPath
+    type: Struct
+  - uid: System.Storage.FileWriteError.NotFound
+    name: FileWriteError.NotFound
+    type: Struct
+  - uid: System.Storage.FileWriteError.NotRegularFile
+    name: FileWriteError.NotRegularFile
+    type: Struct
+  - uid: System.Storage.FileWriteError.TooLarge
+    name: FileWriteError.TooLarge
+    type: Struct
+  - uid: System.Storage.FileWriteError.WriteFailed
+    name: FileWriteError.WriteFailed
     type: Struct
   - uid: System.Storage.InvalidPathError
     name: InvalidPathError
@@ -32,6 +89,9 @@ items:
   - uid: System.Storage.Path
     name: Path
     type: Class
+  - uid: System.Storage.StorageLookup
+    name: StorageLookup
+    type: Interface
   - uid: System.Storage.StorageLookupError
     name: StorageLookupError
     type: Struct

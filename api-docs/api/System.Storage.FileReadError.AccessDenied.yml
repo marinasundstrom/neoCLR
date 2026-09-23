@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.FileReadError.AccessDenied
+  commentId: T:System.Storage.FileReadError.AccessDenied
+  id: FileReadError.AccessDenied
+  parent: System.Storage
+  children:
+  - System.Storage.FileReadError.AccessDenied.#ctor
+  langs:
+  - csharp
+  - vb
+  name: FileReadError.AccessDenied
+  nameWithType: FileReadError.AccessDenied
+  fullName: System.Storage.FileReadError.AccessDenied
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: The host denied access.
+  example: []
+  syntax:
+    content: public struct FileReadError.AccessDenied
+    content.vb: Public Structure FileReadError.AccessDenied
+- uid: System.Storage.FileReadError.AccessDenied.#ctor
+  commentId: M:System.Storage.FileReadError.AccessDenied.#ctor
+  id: '#ctor'
+  parent: System.Storage.FileReadError.AccessDenied
+  langs:
+  - csharp
+  - vb
+  name: AccessDenied()
+  nameWithType: FileReadError.AccessDenied.AccessDenied()
+  fullName: System.Storage.FileReadError.AccessDenied.AccessDenied()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the AccessDenied case.
+  example: []
+  syntax:
+    content: public AccessDenied()
+    content.vb: Public Sub New()
+  overload: System.Storage.FileReadError.AccessDenied.#ctor*
+  nameWithType.vb: FileReadError.AccessDenied.New()
+  fullName.vb: System.Storage.FileReadError.AccessDenied.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.FileReadError.AccessDenied.#ctor*
+  commentId: Overload:System.Storage.FileReadError.AccessDenied.#ctor
+  isExternal: true
+  href: System.Storage.FileReadError.AccessDenied.html#System_Storage_FileReadError_AccessDenied__ctor
+  name: AccessDenied
+  nameWithType: FileReadError.AccessDenied.AccessDenied
+  fullName: System.Storage.FileReadError.AccessDenied.AccessDenied
+  nameWithType.vb: FileReadError.AccessDenied.New
+  fullName.vb: System.Storage.FileReadError.AccessDenied.New
+  name.vb: New

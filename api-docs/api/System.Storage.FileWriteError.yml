@@ -1,0 +1,959 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.FileWriteError
+  commentId: T:System.Storage.FileWriteError
+  id: FileWriteError
+  parent: System.Storage
+  children:
+  - System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.AccessDenied)
+  - System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.InvalidLimit)
+  - System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.InvalidPath)
+  - System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.NotFound)
+  - System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.NotRegularFile)
+  - System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.TooLarge)
+  - System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.WriteFailed)
+  - System.Storage.FileWriteError.GetAccessDenied
+  - System.Storage.FileWriteError.GetInvalidLimit
+  - System.Storage.FileWriteError.GetInvalidPath
+  - System.Storage.FileWriteError.GetNotFound
+  - System.Storage.FileWriteError.GetNotRegularFile
+  - System.Storage.FileWriteError.GetTooLarge
+  - System.Storage.FileWriteError.GetWriteFailed
+  - System.Storage.FileWriteError.IsAccessDenied
+  - System.Storage.FileWriteError.IsInvalidLimit
+  - System.Storage.FileWriteError.IsInvalidPath
+  - System.Storage.FileWriteError.IsNotFound
+  - System.Storage.FileWriteError.IsNotRegularFile
+  - System.Storage.FileWriteError.IsTooLarge
+  - System.Storage.FileWriteError.IsWriteFailed
+  - System.Storage.FileWriteError.ToString
+  langs:
+  - csharp
+  - vb
+  name: FileWriteError
+  nameWithType: FileWriteError
+  fullName: System.Storage.FileWriteError
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Expected failures from the static native whole-text file helper.
+  remarks: Construct a named case; an uninitialized carrier is not a valid error. These legacy error families are distinct from StreamError and StorageLookupError.
+  example: []
+  syntax:
+    content: public struct FileWriteError
+    content.vb: Public Structure FileWriteError
+- uid: System.Storage.FileWriteError.ToString
+  commentId: M:System.Storage.FileWriteError.ToString
+  id: ToString
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: ToString()
+  nameWithType: FileWriteError.ToString()
+  fullName: System.Storage.FileWriteError.ToString()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Returns the selected case name.
+  example: []
+  syntax:
+    content: public string ToString()
+    return:
+      type: System.String
+      description: A display label, not a host diagnostic.
+    content.vb: Public Function ToString() As String
+  overload: System.Storage.FileWriteError.ToString*
+- uid: System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.InvalidLimit)
+  commentId: M:System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.InvalidLimit)
+  id: '#ctor(System.Storage.FileWriteError.InvalidLimit)'
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: FileWriteError(InvalidLimit)
+  nameWithType: FileWriteError.FileWriteError(FileWriteError.InvalidLimit)
+  fullName: System.Storage.FileWriteError.FileWriteError(System.Storage.FileWriteError.InvalidLimit)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding InvalidLimit.
+  example: []
+  syntax:
+    content: public FileWriteError(FileWriteError.InvalidLimit value)
+    parameters:
+    - id: value
+      type: System.Storage.FileWriteError.InvalidLimit
+      description: The case value to retain.
+    content.vb: Public Sub New(value As FileWriteError.InvalidLimit)
+  overload: System.Storage.FileWriteError.#ctor*
+  nameWithType.vb: FileWriteError.New(FileWriteError.InvalidLimit)
+  fullName.vb: System.Storage.FileWriteError.New(System.Storage.FileWriteError.InvalidLimit)
+  name.vb: New(InvalidLimit)
+- uid: System.Storage.FileWriteError.GetInvalidLimit
+  commentId: M:System.Storage.FileWriteError.GetInvalidLimit
+  id: GetInvalidLimit
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: GetInvalidLimit()
+  nameWithType: FileWriteError.GetInvalidLimit()
+  fullName: System.Storage.FileWriteError.GetInvalidLimit()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the InvalidLimit case.
+  remarks: Requires the matching case; a mismatch produces a runtime fault.
+  example: []
+  syntax:
+    content: public FileWriteError.InvalidLimit GetInvalidLimit()
+    return:
+      type: System.Storage.FileWriteError.InvalidLimit
+      description: The held case value.
+    content.vb: Public Function GetInvalidLimit() As FileWriteError.InvalidLimit
+  overload: System.Storage.FileWriteError.GetInvalidLimit*
+- uid: System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.InvalidPath)
+  commentId: M:System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.InvalidPath)
+  id: '#ctor(System.Storage.FileWriteError.InvalidPath)'
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: FileWriteError(InvalidPath)
+  nameWithType: FileWriteError.FileWriteError(FileWriteError.InvalidPath)
+  fullName: System.Storage.FileWriteError.FileWriteError(System.Storage.FileWriteError.InvalidPath)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding InvalidPath.
+  example: []
+  syntax:
+    content: public FileWriteError(FileWriteError.InvalidPath value)
+    parameters:
+    - id: value
+      type: System.Storage.FileWriteError.InvalidPath
+      description: The case value to retain.
+    content.vb: Public Sub New(value As FileWriteError.InvalidPath)
+  overload: System.Storage.FileWriteError.#ctor*
+  nameWithType.vb: FileWriteError.New(FileWriteError.InvalidPath)
+  fullName.vb: System.Storage.FileWriteError.New(System.Storage.FileWriteError.InvalidPath)
+  name.vb: New(InvalidPath)
+- uid: System.Storage.FileWriteError.GetInvalidPath
+  commentId: M:System.Storage.FileWriteError.GetInvalidPath
+  id: GetInvalidPath
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: GetInvalidPath()
+  nameWithType: FileWriteError.GetInvalidPath()
+  fullName: System.Storage.FileWriteError.GetInvalidPath()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the InvalidPath case.
+  remarks: Requires the matching case; a mismatch produces a runtime fault.
+  example: []
+  syntax:
+    content: public FileWriteError.InvalidPath GetInvalidPath()
+    return:
+      type: System.Storage.FileWriteError.InvalidPath
+      description: The held case value.
+    content.vb: Public Function GetInvalidPath() As FileWriteError.InvalidPath
+  overload: System.Storage.FileWriteError.GetInvalidPath*
+- uid: System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.NotFound)
+  commentId: M:System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.NotFound)
+  id: '#ctor(System.Storage.FileWriteError.NotFound)'
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: FileWriteError(NotFound)
+  nameWithType: FileWriteError.FileWriteError(FileWriteError.NotFound)
+  fullName: System.Storage.FileWriteError.FileWriteError(System.Storage.FileWriteError.NotFound)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding NotFound.
+  example: []
+  syntax:
+    content: public FileWriteError(FileWriteError.NotFound value)
+    parameters:
+    - id: value
+      type: System.Storage.FileWriteError.NotFound
+      description: The case value to retain.
+    content.vb: Public Sub New(value As FileWriteError.NotFound)
+  overload: System.Storage.FileWriteError.#ctor*
+  nameWithType.vb: FileWriteError.New(FileWriteError.NotFound)
+  fullName.vb: System.Storage.FileWriteError.New(System.Storage.FileWriteError.NotFound)
+  name.vb: New(NotFound)
+- uid: System.Storage.FileWriteError.GetNotFound
+  commentId: M:System.Storage.FileWriteError.GetNotFound
+  id: GetNotFound
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: GetNotFound()
+  nameWithType: FileWriteError.GetNotFound()
+  fullName: System.Storage.FileWriteError.GetNotFound()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the NotFound case.
+  remarks: Requires the matching case; a mismatch produces a runtime fault.
+  example: []
+  syntax:
+    content: public FileWriteError.NotFound GetNotFound()
+    return:
+      type: System.Storage.FileWriteError.NotFound
+      description: The held case value.
+    content.vb: Public Function GetNotFound() As FileWriteError.NotFound
+  overload: System.Storage.FileWriteError.GetNotFound*
+- uid: System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.AccessDenied)
+  commentId: M:System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.AccessDenied)
+  id: '#ctor(System.Storage.FileWriteError.AccessDenied)'
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: FileWriteError(AccessDenied)
+  nameWithType: FileWriteError.FileWriteError(FileWriteError.AccessDenied)
+  fullName: System.Storage.FileWriteError.FileWriteError(System.Storage.FileWriteError.AccessDenied)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding AccessDenied.
+  example: []
+  syntax:
+    content: public FileWriteError(FileWriteError.AccessDenied value)
+    parameters:
+    - id: value
+      type: System.Storage.FileWriteError.AccessDenied
+      description: The case value to retain.
+    content.vb: Public Sub New(value As FileWriteError.AccessDenied)
+  overload: System.Storage.FileWriteError.#ctor*
+  nameWithType.vb: FileWriteError.New(FileWriteError.AccessDenied)
+  fullName.vb: System.Storage.FileWriteError.New(System.Storage.FileWriteError.AccessDenied)
+  name.vb: New(AccessDenied)
+- uid: System.Storage.FileWriteError.GetAccessDenied
+  commentId: M:System.Storage.FileWriteError.GetAccessDenied
+  id: GetAccessDenied
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: GetAccessDenied()
+  nameWithType: FileWriteError.GetAccessDenied()
+  fullName: System.Storage.FileWriteError.GetAccessDenied()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the AccessDenied case.
+  remarks: Requires the matching case; a mismatch produces a runtime fault.
+  example: []
+  syntax:
+    content: public FileWriteError.AccessDenied GetAccessDenied()
+    return:
+      type: System.Storage.FileWriteError.AccessDenied
+      description: The held case value.
+    content.vb: Public Function GetAccessDenied() As FileWriteError.AccessDenied
+  overload: System.Storage.FileWriteError.GetAccessDenied*
+- uid: System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.NotRegularFile)
+  commentId: M:System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.NotRegularFile)
+  id: '#ctor(System.Storage.FileWriteError.NotRegularFile)'
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: FileWriteError(NotRegularFile)
+  nameWithType: FileWriteError.FileWriteError(FileWriteError.NotRegularFile)
+  fullName: System.Storage.FileWriteError.FileWriteError(System.Storage.FileWriteError.NotRegularFile)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding NotRegularFile.
+  example: []
+  syntax:
+    content: public FileWriteError(FileWriteError.NotRegularFile value)
+    parameters:
+    - id: value
+      type: System.Storage.FileWriteError.NotRegularFile
+      description: The case value to retain.
+    content.vb: Public Sub New(value As FileWriteError.NotRegularFile)
+  overload: System.Storage.FileWriteError.#ctor*
+  nameWithType.vb: FileWriteError.New(FileWriteError.NotRegularFile)
+  fullName.vb: System.Storage.FileWriteError.New(System.Storage.FileWriteError.NotRegularFile)
+  name.vb: New(NotRegularFile)
+- uid: System.Storage.FileWriteError.GetNotRegularFile
+  commentId: M:System.Storage.FileWriteError.GetNotRegularFile
+  id: GetNotRegularFile
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: GetNotRegularFile()
+  nameWithType: FileWriteError.GetNotRegularFile()
+  fullName: System.Storage.FileWriteError.GetNotRegularFile()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the NotRegularFile case.
+  remarks: Requires the matching case; a mismatch produces a runtime fault.
+  example: []
+  syntax:
+    content: public FileWriteError.NotRegularFile GetNotRegularFile()
+    return:
+      type: System.Storage.FileWriteError.NotRegularFile
+      description: The held case value.
+    content.vb: Public Function GetNotRegularFile() As FileWriteError.NotRegularFile
+  overload: System.Storage.FileWriteError.GetNotRegularFile*
+- uid: System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.TooLarge)
+  commentId: M:System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.TooLarge)
+  id: '#ctor(System.Storage.FileWriteError.TooLarge)'
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: FileWriteError(TooLarge)
+  nameWithType: FileWriteError.FileWriteError(FileWriteError.TooLarge)
+  fullName: System.Storage.FileWriteError.FileWriteError(System.Storage.FileWriteError.TooLarge)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding TooLarge.
+  example: []
+  syntax:
+    content: public FileWriteError(FileWriteError.TooLarge value)
+    parameters:
+    - id: value
+      type: System.Storage.FileWriteError.TooLarge
+      description: The case value to retain.
+    content.vb: Public Sub New(value As FileWriteError.TooLarge)
+  overload: System.Storage.FileWriteError.#ctor*
+  nameWithType.vb: FileWriteError.New(FileWriteError.TooLarge)
+  fullName.vb: System.Storage.FileWriteError.New(System.Storage.FileWriteError.TooLarge)
+  name.vb: New(TooLarge)
+- uid: System.Storage.FileWriteError.GetTooLarge
+  commentId: M:System.Storage.FileWriteError.GetTooLarge
+  id: GetTooLarge
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: GetTooLarge()
+  nameWithType: FileWriteError.GetTooLarge()
+  fullName: System.Storage.FileWriteError.GetTooLarge()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the TooLarge case.
+  remarks: Requires the matching case; a mismatch produces a runtime fault.
+  example: []
+  syntax:
+    content: public FileWriteError.TooLarge GetTooLarge()
+    return:
+      type: System.Storage.FileWriteError.TooLarge
+      description: The held case value.
+    content.vb: Public Function GetTooLarge() As FileWriteError.TooLarge
+  overload: System.Storage.FileWriteError.GetTooLarge*
+- uid: System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.WriteFailed)
+  commentId: M:System.Storage.FileWriteError.#ctor(System.Storage.FileWriteError.WriteFailed)
+  id: '#ctor(System.Storage.FileWriteError.WriteFailed)'
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: FileWriteError(WriteFailed)
+  nameWithType: FileWriteError.FileWriteError(FileWriteError.WriteFailed)
+  fullName: System.Storage.FileWriteError.FileWriteError(System.Storage.FileWriteError.WriteFailed)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs a carrier holding WriteFailed.
+  example: []
+  syntax:
+    content: public FileWriteError(FileWriteError.WriteFailed value)
+    parameters:
+    - id: value
+      type: System.Storage.FileWriteError.WriteFailed
+      description: The case value to retain.
+    content.vb: Public Sub New(value As FileWriteError.WriteFailed)
+  overload: System.Storage.FileWriteError.#ctor*
+  nameWithType.vb: FileWriteError.New(FileWriteError.WriteFailed)
+  fullName.vb: System.Storage.FileWriteError.New(System.Storage.FileWriteError.WriteFailed)
+  name.vb: New(WriteFailed)
+- uid: System.Storage.FileWriteError.GetWriteFailed
+  commentId: M:System.Storage.FileWriteError.GetWriteFailed
+  id: GetWriteFailed
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: GetWriteFailed()
+  nameWithType: FileWriteError.GetWriteFailed()
+  fullName: System.Storage.FileWriteError.GetWriteFailed()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the WriteFailed case.
+  remarks: Requires the matching case; a mismatch produces a runtime fault.
+  example: []
+  syntax:
+    content: public FileWriteError.WriteFailed GetWriteFailed()
+    return:
+      type: System.Storage.FileWriteError.WriteFailed
+      description: The held case value.
+    content.vb: Public Function GetWriteFailed() As FileWriteError.WriteFailed
+  overload: System.Storage.FileWriteError.GetWriteFailed*
+- uid: System.Storage.FileWriteError.IsInvalidLimit
+  commentId: P:System.Storage.FileWriteError.IsInvalidLimit
+  id: IsInvalidLimit
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: IsInvalidLimit
+  nameWithType: FileWriteError.IsInvalidLimit
+  fullName: System.Storage.FileWriteError.IsInvalidLimit
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether the error holds InvalidLimit.
+  example: []
+  syntax:
+    content: public bool IsInvalidLimit { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for that case.
+    content.vb: Public ReadOnly Property IsInvalidLimit As Boolean
+  overload: System.Storage.FileWriteError.IsInvalidLimit*
+- uid: System.Storage.FileWriteError.IsInvalidPath
+  commentId: P:System.Storage.FileWriteError.IsInvalidPath
+  id: IsInvalidPath
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: IsInvalidPath
+  nameWithType: FileWriteError.IsInvalidPath
+  fullName: System.Storage.FileWriteError.IsInvalidPath
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether the error holds InvalidPath.
+  example: []
+  syntax:
+    content: public bool IsInvalidPath { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for that case.
+    content.vb: Public ReadOnly Property IsInvalidPath As Boolean
+  overload: System.Storage.FileWriteError.IsInvalidPath*
+- uid: System.Storage.FileWriteError.IsNotFound
+  commentId: P:System.Storage.FileWriteError.IsNotFound
+  id: IsNotFound
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: IsNotFound
+  nameWithType: FileWriteError.IsNotFound
+  fullName: System.Storage.FileWriteError.IsNotFound
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether the error holds NotFound.
+  example: []
+  syntax:
+    content: public bool IsNotFound { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for that case.
+    content.vb: Public ReadOnly Property IsNotFound As Boolean
+  overload: System.Storage.FileWriteError.IsNotFound*
+- uid: System.Storage.FileWriteError.IsAccessDenied
+  commentId: P:System.Storage.FileWriteError.IsAccessDenied
+  id: IsAccessDenied
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: IsAccessDenied
+  nameWithType: FileWriteError.IsAccessDenied
+  fullName: System.Storage.FileWriteError.IsAccessDenied
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether the error holds AccessDenied.
+  example: []
+  syntax:
+    content: public bool IsAccessDenied { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for that case.
+    content.vb: Public ReadOnly Property IsAccessDenied As Boolean
+  overload: System.Storage.FileWriteError.IsAccessDenied*
+- uid: System.Storage.FileWriteError.IsNotRegularFile
+  commentId: P:System.Storage.FileWriteError.IsNotRegularFile
+  id: IsNotRegularFile
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: IsNotRegularFile
+  nameWithType: FileWriteError.IsNotRegularFile
+  fullName: System.Storage.FileWriteError.IsNotRegularFile
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether the error holds NotRegularFile.
+  example: []
+  syntax:
+    content: public bool IsNotRegularFile { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for that case.
+    content.vb: Public ReadOnly Property IsNotRegularFile As Boolean
+  overload: System.Storage.FileWriteError.IsNotRegularFile*
+- uid: System.Storage.FileWriteError.IsTooLarge
+  commentId: P:System.Storage.FileWriteError.IsTooLarge
+  id: IsTooLarge
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: IsTooLarge
+  nameWithType: FileWriteError.IsTooLarge
+  fullName: System.Storage.FileWriteError.IsTooLarge
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether the error holds TooLarge.
+  example: []
+  syntax:
+    content: public bool IsTooLarge { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for that case.
+    content.vb: Public ReadOnly Property IsTooLarge As Boolean
+  overload: System.Storage.FileWriteError.IsTooLarge*
+- uid: System.Storage.FileWriteError.IsWriteFailed
+  commentId: P:System.Storage.FileWriteError.IsWriteFailed
+  id: IsWriteFailed
+  parent: System.Storage.FileWriteError
+  langs:
+  - csharp
+  - vb
+  name: IsWriteFailed
+  nameWithType: FileWriteError.IsWriteFailed
+  fullName: System.Storage.FileWriteError.IsWriteFailed
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Tests whether the error holds WriteFailed.
+  example: []
+  syntax:
+    content: public bool IsWriteFailed { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: True only for that case.
+    content.vb: Public ReadOnly Property IsWriteFailed As Boolean
+  overload: System.Storage.FileWriteError.IsWriteFailed*
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.FileWriteError.ToString*
+  commentId: Overload:System.Storage.FileWriteError.ToString
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError_ToString
+  name: ToString
+  nameWithType: FileWriteError.ToString
+  fullName: System.Storage.FileWriteError.ToString
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Storage.FileWriteError.#ctor*
+  commentId: Overload:System.Storage.FileWriteError.#ctor
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError__ctor_System_Storage_FileWriteError_InvalidLimit_
+  name: FileWriteError
+  nameWithType: FileWriteError.FileWriteError
+  fullName: System.Storage.FileWriteError.FileWriteError
+  nameWithType.vb: FileWriteError.New
+  fullName.vb: System.Storage.FileWriteError.New
+  name.vb: New
+- uid: System.Storage.FileWriteError.InvalidLimit
+  commentId: T:System.Storage.FileWriteError.InvalidLimit
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileWriteError.html
+  name: FileWriteError.InvalidLimit
+  nameWithType: FileWriteError.InvalidLimit
+  fullName: System.Storage.FileWriteError.InvalidLimit
+  spec.csharp:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.InvalidLimit
+    name: InvalidLimit
+    isExternal: true
+    href: System.Storage.FileWriteError.InvalidLimit.html
+  spec.vb:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.InvalidLimit
+    name: InvalidLimit
+    isExternal: true
+    href: System.Storage.FileWriteError.InvalidLimit.html
+- uid: System.Storage.FileWriteError.GetInvalidLimit*
+  commentId: Overload:System.Storage.FileWriteError.GetInvalidLimit
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError_GetInvalidLimit
+  name: GetInvalidLimit
+  nameWithType: FileWriteError.GetInvalidLimit
+  fullName: System.Storage.FileWriteError.GetInvalidLimit
+- uid: System.Storage.FileWriteError.InvalidPath
+  commentId: T:System.Storage.FileWriteError.InvalidPath
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileWriteError.html
+  name: FileWriteError.InvalidPath
+  nameWithType: FileWriteError.InvalidPath
+  fullName: System.Storage.FileWriteError.InvalidPath
+  spec.csharp:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.Storage.FileWriteError.InvalidPath.html
+  spec.vb:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.Storage.FileWriteError.InvalidPath.html
+- uid: System.Storage.FileWriteError.GetInvalidPath*
+  commentId: Overload:System.Storage.FileWriteError.GetInvalidPath
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError_GetInvalidPath
+  name: GetInvalidPath
+  nameWithType: FileWriteError.GetInvalidPath
+  fullName: System.Storage.FileWriteError.GetInvalidPath
+- uid: System.Storage.FileWriteError.NotFound
+  commentId: T:System.Storage.FileWriteError.NotFound
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileWriteError.html
+  name: FileWriteError.NotFound
+  nameWithType: FileWriteError.NotFound
+  fullName: System.Storage.FileWriteError.NotFound
+  spec.csharp:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.Storage.FileWriteError.NotFound.html
+  spec.vb:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.Storage.FileWriteError.NotFound.html
+- uid: System.Storage.FileWriteError.GetNotFound*
+  commentId: Overload:System.Storage.FileWriteError.GetNotFound
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError_GetNotFound
+  name: GetNotFound
+  nameWithType: FileWriteError.GetNotFound
+  fullName: System.Storage.FileWriteError.GetNotFound
+- uid: System.Storage.FileWriteError.AccessDenied
+  commentId: T:System.Storage.FileWriteError.AccessDenied
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileWriteError.html
+  name: FileWriteError.AccessDenied
+  nameWithType: FileWriteError.AccessDenied
+  fullName: System.Storage.FileWriteError.AccessDenied
+  spec.csharp:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.Storage.FileWriteError.AccessDenied.html
+  spec.vb:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.Storage.FileWriteError.AccessDenied.html
+- uid: System.Storage.FileWriteError.GetAccessDenied*
+  commentId: Overload:System.Storage.FileWriteError.GetAccessDenied
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError_GetAccessDenied
+  name: GetAccessDenied
+  nameWithType: FileWriteError.GetAccessDenied
+  fullName: System.Storage.FileWriteError.GetAccessDenied
+- uid: System.Storage.FileWriteError.NotRegularFile
+  commentId: T:System.Storage.FileWriteError.NotRegularFile
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileWriteError.html
+  name: FileWriteError.NotRegularFile
+  nameWithType: FileWriteError.NotRegularFile
+  fullName: System.Storage.FileWriteError.NotRegularFile
+  spec.csharp:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.NotRegularFile
+    name: NotRegularFile
+    isExternal: true
+    href: System.Storage.FileWriteError.NotRegularFile.html
+  spec.vb:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.NotRegularFile
+    name: NotRegularFile
+    isExternal: true
+    href: System.Storage.FileWriteError.NotRegularFile.html
+- uid: System.Storage.FileWriteError.GetNotRegularFile*
+  commentId: Overload:System.Storage.FileWriteError.GetNotRegularFile
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError_GetNotRegularFile
+  name: GetNotRegularFile
+  nameWithType: FileWriteError.GetNotRegularFile
+  fullName: System.Storage.FileWriteError.GetNotRegularFile
+- uid: System.Storage.FileWriteError.TooLarge
+  commentId: T:System.Storage.FileWriteError.TooLarge
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileWriteError.html
+  name: FileWriteError.TooLarge
+  nameWithType: FileWriteError.TooLarge
+  fullName: System.Storage.FileWriteError.TooLarge
+  spec.csharp:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.TooLarge
+    name: TooLarge
+    isExternal: true
+    href: System.Storage.FileWriteError.TooLarge.html
+  spec.vb:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.TooLarge
+    name: TooLarge
+    isExternal: true
+    href: System.Storage.FileWriteError.TooLarge.html
+- uid: System.Storage.FileWriteError.GetTooLarge*
+  commentId: Overload:System.Storage.FileWriteError.GetTooLarge
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError_GetTooLarge
+  name: GetTooLarge
+  nameWithType: FileWriteError.GetTooLarge
+  fullName: System.Storage.FileWriteError.GetTooLarge
+- uid: System.Storage.FileWriteError.WriteFailed
+  commentId: T:System.Storage.FileWriteError.WriteFailed
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileWriteError.html
+  name: FileWriteError.WriteFailed
+  nameWithType: FileWriteError.WriteFailed
+  fullName: System.Storage.FileWriteError.WriteFailed
+  spec.csharp:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.WriteFailed
+    name: WriteFailed
+    isExternal: true
+    href: System.Storage.FileWriteError.WriteFailed.html
+  spec.vb:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.WriteFailed
+    name: WriteFailed
+    isExternal: true
+    href: System.Storage.FileWriteError.WriteFailed.html
+- uid: System.Storage.FileWriteError.GetWriteFailed*
+  commentId: Overload:System.Storage.FileWriteError.GetWriteFailed
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError_GetWriteFailed
+  name: GetWriteFailed
+  nameWithType: FileWriteError.GetWriteFailed
+  fullName: System.Storage.FileWriteError.GetWriteFailed
+- uid: System.Storage.FileWriteError.IsInvalidLimit*
+  commentId: Overload:System.Storage.FileWriteError.IsInvalidLimit
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError_IsInvalidLimit
+  name: IsInvalidLimit
+  nameWithType: FileWriteError.IsInvalidLimit
+  fullName: System.Storage.FileWriteError.IsInvalidLimit
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System.Storage.FileWriteError.IsInvalidPath*
+  commentId: Overload:System.Storage.FileWriteError.IsInvalidPath
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError_IsInvalidPath
+  name: IsInvalidPath
+  nameWithType: FileWriteError.IsInvalidPath
+  fullName: System.Storage.FileWriteError.IsInvalidPath
+- uid: System.Storage.FileWriteError.IsNotFound*
+  commentId: Overload:System.Storage.FileWriteError.IsNotFound
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError_IsNotFound
+  name: IsNotFound
+  nameWithType: FileWriteError.IsNotFound
+  fullName: System.Storage.FileWriteError.IsNotFound
+- uid: System.Storage.FileWriteError.IsAccessDenied*
+  commentId: Overload:System.Storage.FileWriteError.IsAccessDenied
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError_IsAccessDenied
+  name: IsAccessDenied
+  nameWithType: FileWriteError.IsAccessDenied
+  fullName: System.Storage.FileWriteError.IsAccessDenied
+- uid: System.Storage.FileWriteError.IsNotRegularFile*
+  commentId: Overload:System.Storage.FileWriteError.IsNotRegularFile
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError_IsNotRegularFile
+  name: IsNotRegularFile
+  nameWithType: FileWriteError.IsNotRegularFile
+  fullName: System.Storage.FileWriteError.IsNotRegularFile
+- uid: System.Storage.FileWriteError.IsTooLarge*
+  commentId: Overload:System.Storage.FileWriteError.IsTooLarge
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError_IsTooLarge
+  name: IsTooLarge
+  nameWithType: FileWriteError.IsTooLarge
+  fullName: System.Storage.FileWriteError.IsTooLarge
+- uid: System.Storage.FileWriteError.IsWriteFailed*
+  commentId: Overload:System.Storage.FileWriteError.IsWriteFailed
+  isExternal: true
+  href: System.Storage.FileWriteError.html#System_Storage_FileWriteError_IsWriteFailed
+  name: IsWriteFailed
+  nameWithType: FileWriteError.IsWriteFailed
+  fullName: System.Storage.FileWriteError.IsWriteFailed

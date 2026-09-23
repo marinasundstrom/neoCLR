@@ -1,24 +1,27 @@
 namespace StorageExperiment
 
+import System.Storage.File
+import System.Storage.Directory
+
 import System.*
 import System.Console.*
 import System.Result.*
 import System.Text.*
 
 // This workflow receives a directory; it does not select the storage provider.
-func RoundTrip(directory: Directory) {
+func RoundTrip(directory: Directory, provider: StorageProvider) {
     match directory.FileAt("notes.txt") {
         Ok(let file) => {
             WriteLine(file.Name)
-            match file.WriteText("Hello, värld!", 14) {
+            match provider.WriteText(file.Path, "Hello, värld!", 14) {
                 Ok(_) => WriteLine("Written")
                 Error(let error) => System.Fault(error.ToString())
             }
-            match file.ReadText(14) {
+            match provider.ReadText(file.Path, 14) {
                 Ok(let text) => WriteLine(text)
                 Error(let error) => System.Fault(error.ToString())
             }
-            match file.WriteText("too large", 2) {
+            match provider.WriteText(file.Path, "too large", 2) {
                 Error(let error) => {
                     if !error.IsTooLarge {
                         System.Fault("Wrong bounded-write error")
@@ -26,7 +29,7 @@ func RoundTrip(directory: Directory) {
                 }
                 Ok(_) => System.Fault("Oversized write succeeded")
             }
-            match file.ReadText(14) {
+            match provider.ReadText(file.Path, 14) {
                 Ok(let text) => {
                     if text != "Hello, värld!" {
                         System.Fault("Rejected write changed contents")
@@ -34,7 +37,7 @@ func RoundTrip(directory: Directory) {
                 }
                 Error(let error) => System.Fault(error.ToString())
             }
-            match file.ReadText(13) {
+            match provider.ReadText(file.Path, 13) {
                 Error(let error) => {
                     if !error.IsTooLarge {
                         System.Fault("Wrong UTF-8 byte-limit error")
@@ -88,18 +91,18 @@ func Main() {
     let disk = Directory(host, root)
     let temporary = Directory(memory, root)
     WriteLine("Disk")
-    RoundTrip(disk)
-    ByteRoundTrip(disk)
+    RoundTrip(disk, host)
+    ByteRoundTrip(disk, host)
     WriteLine("Memory")
-    RoundTrip(temporary)
-    ByteRoundTrip(temporary)
+    RoundTrip(temporary, memory)
+    ByteRoundTrip(temporary, memory)
     for directory in [disk, temporary] {
         match directory.GetFile("notes.txt") {
             Ok(let file) => {
                 if file.Name != "notes.txt" {
                     System.Fault("Lookup lost the child name")
                 }
-                match file.ReadText(14) {
+                match ReadFileText(file) {
                     Ok(let text) => {
                         if text != "Hello, värld!" {
                             System.Fault("Lookup changed provider ownership")
@@ -117,7 +120,7 @@ func Main() {
             if !file.Path.Equals(RequirePath("/notes.txt")) {
                 System.Fault("Directory replaced the provider address")
             }
-            match file.ReadText(14) {
+            match ReadFileText(file) {
                 Ok(let text) => {
                     if text != "Hello, värld!" {
                         System.Fault("A new descriptor lost provider state")
@@ -138,7 +141,7 @@ func Main() {
     WriteLine("Direct child required")
     let otherMemory: StorageProvider = MemoryStorage()
     let other = File(otherMemory, RequirePath("/notes.txt"))
-    match other.ReadText(64) {
+    match otherMemory.ReadText(other.Path, 64) {
         Error(let error) => {
             if !error.IsNotFound {
                 System.Fault("Wrong missing-file error")

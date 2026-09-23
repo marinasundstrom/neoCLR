@@ -16,7 +16,7 @@ items:
   assemblies:
   - NeoCLR.CoreProbe
   namespace: System.Storage
-  summary: The native path is empty or contains NUL.
+  summary: The supplied path is invalid for this operation.
   example: []
   syntax:
     content: public struct StorageLookupError.InvalidPath

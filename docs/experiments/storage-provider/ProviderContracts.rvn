@@ -3,23 +3,34 @@ namespace StorageExperiment
 import System.*
 import System.Result.*
 import System.Storage.Path
+import System.Storage.File
 import System.Streams.*
 
 // A provider needs only byte access: no File descriptor or text helper members.
 class UnavailableStorage : System.Storage.StorageProvider {
+    private field calls: int
+    val Calls: int => calls
+
     func OpenRead(path: Path) -> Result<InputStream, StreamError> {
+        calls += 1
         return Error(StreamError(StreamError.NotFound()))
     }
 
     func CreateNew(path: Path) -> Result<OutputStream, StreamError> {
+        calls += 1
         return Error(StreamError(StreamError.AccessDenied()))
     }
 }
 
 func Main() {
-    let provider: System.Storage.StorageProvider = UnavailableStorage()
+    let concrete = UnavailableStorage()
+    let provider: System.Storage.StorageProvider = concrete
     let path = RequirePath("item.txt")
-    match provider.OpenRead(path) {
+    let file = File(provider, path)
+    if file.Name != "item.txt" || !file.Path.Equals(path) || concrete.Calls != 0 {
+        System.Fault("Descriptor construction or properties performed I/O")
+    }
+    match file.OpenRead() {
         Error(let error) => {
             if !error.IsNotFound {
                 System.Fault("Provider read error changed")
@@ -30,7 +41,7 @@ func Main() {
             System.Fault("Unavailable provider opened a stream")
         }
     }
-    match provider.CreateNew(path) {
+    match file.CreateNew() {
         Error(let error) => {
             if !error.IsAccessDenied {
                 System.Fault("Provider creation error changed")
@@ -40,6 +51,9 @@ func Main() {
             stream.Close()
             System.Fault("Unavailable provider created a stream")
         }
+    }
+    if concrete.Calls != 2 {
+        System.Fault("Descriptor did not delegate byte operations")
     }
     System.Console.WriteLine("Minimal platform provider contract: passed")
 }

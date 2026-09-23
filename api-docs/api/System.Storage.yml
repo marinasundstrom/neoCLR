@@ -4,12 +4,32 @@ items:
   commentId: N:System.Storage
   id: System.Storage
   children:
+  - System.Storage.Directory
   - System.Storage.EntryKind
   - System.Storage.EntryKind.Directory
   - System.Storage.EntryKind.File
+  - System.Storage.File
+  - System.Storage.FileReadError
+  - System.Storage.FileReadError.AccessDenied
+  - System.Storage.FileReadError.InvalidLimit
+  - System.Storage.FileReadError.InvalidPath
+  - System.Storage.FileReadError.InvalidUtf8
+  - System.Storage.FileReadError.NotFound
+  - System.Storage.FileReadError.NotRegularFile
+  - System.Storage.FileReadError.ReadFailed
+  - System.Storage.FileReadError.TooLarge
+  - System.Storage.FileWriteError
+  - System.Storage.FileWriteError.AccessDenied
+  - System.Storage.FileWriteError.InvalidLimit
+  - System.Storage.FileWriteError.InvalidPath
+  - System.Storage.FileWriteError.NotFound
+  - System.Storage.FileWriteError.NotRegularFile
+  - System.Storage.FileWriteError.TooLarge
+  - System.Storage.FileWriteError.WriteFailed
   - System.Storage.InvalidPathError
   - System.Storage.Metadata
   - System.Storage.Path
+  - System.Storage.StorageLookup
   - System.Storage.StorageLookupError
   - System.Storage.StorageLookupError.AccessDenied
   - System.Storage.StorageLookupError.InvalidPath
@@ -42,6 +62,29 @@ references:
   name: Metadata
   nameWithType: Metadata
   fullName: System.Storage.Metadata
+- uid: System.Storage.File
+  commentId: T:System.Storage.File
+  isExternal: true
+  href: System.Storage.File.html
+  name: File
+  nameWithType: File
+  fullName: System.Storage.File
+- uid: System.Storage.StorageLookup
+  commentId: T:System.Storage.StorageLookup
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageLookup.html
+  name: StorageLookup
+  nameWithType: StorageLookup
+  fullName: System.Storage.StorageLookup
+- uid: System.Storage.StorageProvider
+  commentId: T:System.Storage.StorageProvider
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageProvider.html
+  name: StorageProvider
+  nameWithType: StorageProvider
+  fullName: System.Storage.StorageProvider
 - uid: System.Storage.InvalidPathError
   commentId: T:System.Storage.InvalidPathError
   isExternal: true
@@ -259,13 +302,447 @@ references:
     name: IoFailure
     isExternal: true
     href: System.Storage.StorageLookupError.IoFailure.html
-- uid: System.Storage.StorageProvider
-  commentId: T:System.Storage.StorageProvider
+- uid: System.Storage.FileReadError
+  commentId: T:System.Storage.FileReadError
   isExternal: true
-  href: System.Storage.StorageProvider.html
-  name: StorageProvider
-  nameWithType: StorageProvider
-  fullName: System.Storage.StorageProvider
+  href: System.Storage.FileReadError.html
+  name: FileReadError
+  nameWithType: FileReadError
+  fullName: System.Storage.FileReadError
+- uid: System.Storage.FileReadError.InvalidLimit
+  commentId: T:System.Storage.FileReadError.InvalidLimit
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.InvalidLimit
+  nameWithType: FileReadError.InvalidLimit
+  fullName: System.Storage.FileReadError.InvalidLimit
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.InvalidLimit
+    name: InvalidLimit
+    isExternal: true
+    href: System.Storage.FileReadError.InvalidLimit.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.InvalidLimit
+    name: InvalidLimit
+    isExternal: true
+    href: System.Storage.FileReadError.InvalidLimit.html
+- uid: System.Storage.FileReadError.InvalidPath
+  commentId: T:System.Storage.FileReadError.InvalidPath
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.InvalidPath
+  nameWithType: FileReadError.InvalidPath
+  fullName: System.Storage.FileReadError.InvalidPath
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.Storage.FileReadError.InvalidPath.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.Storage.FileReadError.InvalidPath.html
+- uid: System.Storage.FileReadError.NotFound
+  commentId: T:System.Storage.FileReadError.NotFound
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.NotFound
+  nameWithType: FileReadError.NotFound
+  fullName: System.Storage.FileReadError.NotFound
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.Storage.FileReadError.NotFound.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.Storage.FileReadError.NotFound.html
+- uid: System.Storage.FileReadError.AccessDenied
+  commentId: T:System.Storage.FileReadError.AccessDenied
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.AccessDenied
+  nameWithType: FileReadError.AccessDenied
+  fullName: System.Storage.FileReadError.AccessDenied
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.Storage.FileReadError.AccessDenied.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.Storage.FileReadError.AccessDenied.html
+- uid: System.Storage.FileReadError.NotRegularFile
+  commentId: T:System.Storage.FileReadError.NotRegularFile
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.NotRegularFile
+  nameWithType: FileReadError.NotRegularFile
+  fullName: System.Storage.FileReadError.NotRegularFile
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.NotRegularFile
+    name: NotRegularFile
+    isExternal: true
+    href: System.Storage.FileReadError.NotRegularFile.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.NotRegularFile
+    name: NotRegularFile
+    isExternal: true
+    href: System.Storage.FileReadError.NotRegularFile.html
+- uid: System.Storage.FileReadError.TooLarge
+  commentId: T:System.Storage.FileReadError.TooLarge
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.TooLarge
+  nameWithType: FileReadError.TooLarge
+  fullName: System.Storage.FileReadError.TooLarge
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.TooLarge
+    name: TooLarge
+    isExternal: true
+    href: System.Storage.FileReadError.TooLarge.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.TooLarge
+    name: TooLarge
+    isExternal: true
+    href: System.Storage.FileReadError.TooLarge.html
+- uid: System.Storage.FileReadError.ReadFailed
+  commentId: T:System.Storage.FileReadError.ReadFailed
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.ReadFailed
+  nameWithType: FileReadError.ReadFailed
+  fullName: System.Storage.FileReadError.ReadFailed
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.ReadFailed
+    name: ReadFailed
+    isExternal: true
+    href: System.Storage.FileReadError.ReadFailed.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.ReadFailed
+    name: ReadFailed
+    isExternal: true
+    href: System.Storage.FileReadError.ReadFailed.html
+- uid: System.Storage.FileReadError.InvalidUtf8
+  commentId: T:System.Storage.FileReadError.InvalidUtf8
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileReadError.html
+  name: FileReadError.InvalidUtf8
+  nameWithType: FileReadError.InvalidUtf8
+  fullName: System.Storage.FileReadError.InvalidUtf8
+  spec.csharp:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.InvalidUtf8
+    name: InvalidUtf8
+    isExternal: true
+    href: System.Storage.FileReadError.InvalidUtf8.html
+  spec.vb:
+  - uid: System.Storage.FileReadError
+    name: FileReadError
+    isExternal: true
+    href: System.Storage.FileReadError.html
+  - name: .
+  - uid: System.Storage.FileReadError.InvalidUtf8
+    name: InvalidUtf8
+    isExternal: true
+    href: System.Storage.FileReadError.InvalidUtf8.html
+- uid: System.Storage.FileWriteError
+  commentId: T:System.Storage.FileWriteError
+  isExternal: true
+  href: System.Storage.FileWriteError.html
+  name: FileWriteError
+  nameWithType: FileWriteError
+  fullName: System.Storage.FileWriteError
+- uid: System.Storage.FileWriteError.InvalidLimit
+  commentId: T:System.Storage.FileWriteError.InvalidLimit
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileWriteError.html
+  name: FileWriteError.InvalidLimit
+  nameWithType: FileWriteError.InvalidLimit
+  fullName: System.Storage.FileWriteError.InvalidLimit
+  spec.csharp:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.InvalidLimit
+    name: InvalidLimit
+    isExternal: true
+    href: System.Storage.FileWriteError.InvalidLimit.html
+  spec.vb:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.InvalidLimit
+    name: InvalidLimit
+    isExternal: true
+    href: System.Storage.FileWriteError.InvalidLimit.html
+- uid: System.Storage.FileWriteError.InvalidPath
+  commentId: T:System.Storage.FileWriteError.InvalidPath
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileWriteError.html
+  name: FileWriteError.InvalidPath
+  nameWithType: FileWriteError.InvalidPath
+  fullName: System.Storage.FileWriteError.InvalidPath
+  spec.csharp:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.Storage.FileWriteError.InvalidPath.html
+  spec.vb:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.Storage.FileWriteError.InvalidPath.html
+- uid: System.Storage.FileWriteError.NotFound
+  commentId: T:System.Storage.FileWriteError.NotFound
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileWriteError.html
+  name: FileWriteError.NotFound
+  nameWithType: FileWriteError.NotFound
+  fullName: System.Storage.FileWriteError.NotFound
+  spec.csharp:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.Storage.FileWriteError.NotFound.html
+  spec.vb:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.Storage.FileWriteError.NotFound.html
+- uid: System.Storage.FileWriteError.AccessDenied
+  commentId: T:System.Storage.FileWriteError.AccessDenied
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileWriteError.html
+  name: FileWriteError.AccessDenied
+  nameWithType: FileWriteError.AccessDenied
+  fullName: System.Storage.FileWriteError.AccessDenied
+  spec.csharp:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.Storage.FileWriteError.AccessDenied.html
+  spec.vb:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.Storage.FileWriteError.AccessDenied.html
+- uid: System.Storage.FileWriteError.NotRegularFile
+  commentId: T:System.Storage.FileWriteError.NotRegularFile
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileWriteError.html
+  name: FileWriteError.NotRegularFile
+  nameWithType: FileWriteError.NotRegularFile
+  fullName: System.Storage.FileWriteError.NotRegularFile
+  spec.csharp:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.NotRegularFile
+    name: NotRegularFile
+    isExternal: true
+    href: System.Storage.FileWriteError.NotRegularFile.html
+  spec.vb:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.NotRegularFile
+    name: NotRegularFile
+    isExternal: true
+    href: System.Storage.FileWriteError.NotRegularFile.html
+- uid: System.Storage.FileWriteError.TooLarge
+  commentId: T:System.Storage.FileWriteError.TooLarge
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileWriteError.html
+  name: FileWriteError.TooLarge
+  nameWithType: FileWriteError.TooLarge
+  fullName: System.Storage.FileWriteError.TooLarge
+  spec.csharp:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.TooLarge
+    name: TooLarge
+    isExternal: true
+    href: System.Storage.FileWriteError.TooLarge.html
+  spec.vb:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.TooLarge
+    name: TooLarge
+    isExternal: true
+    href: System.Storage.FileWriteError.TooLarge.html
+- uid: System.Storage.FileWriteError.WriteFailed
+  commentId: T:System.Storage.FileWriteError.WriteFailed
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.FileWriteError.html
+  name: FileWriteError.WriteFailed
+  nameWithType: FileWriteError.WriteFailed
+  fullName: System.Storage.FileWriteError.WriteFailed
+  spec.csharp:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.WriteFailed
+    name: WriteFailed
+    isExternal: true
+    href: System.Storage.FileWriteError.WriteFailed.html
+  spec.vb:
+  - uid: System.Storage.FileWriteError
+    name: FileWriteError
+    isExternal: true
+    href: System.Storage.FileWriteError.html
+  - name: .
+  - uid: System.Storage.FileWriteError.WriteFailed
+    name: WriteFailed
+    isExternal: true
+    href: System.Storage.FileWriteError.WriteFailed.html
+- uid: System.Storage.Directory
+  commentId: T:System.Storage.Directory
+  isExternal: true
+  href: System.Storage.Directory.html
+  name: Directory
+  nameWithType: Directory
+  fullName: System.Storage.Directory
 - uid: System.Storage
   commentId: N:System.Storage
   isExternal: true

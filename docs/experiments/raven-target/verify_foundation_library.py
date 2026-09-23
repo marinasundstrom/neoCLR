@@ -28,7 +28,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
     source = (ROOT / 'runtime/raven/src/System/Equatable.rvn').read_text()
     local = (ROOT / 'runtime/raven/src/System/LocalDateTime.rvn').read_text()
-    file_source = (ROOT / 'runtime/raven/src/System/Storage/File/Functions.rvn').read_text()
+    file_source = (ROOT / 'runtime/raven/src/System/Storage/File.rvn').read_text()
     mapping = (ROOT / 'runtime/raven/src/System/Collections/Map.rvn').read_text()
     mutable = (ROOT / 'runtime/raven/src/System/Collections/MutableMap.rvn').read_text()
     mismatch = 'Library interface does not match reference contract'
@@ -44,8 +44,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
         ('MutableMap', 'Collections.MutableMap', mutable, None),
         ('MissingParent', 'Collections.MutableMap', mutable.replace(' : Map<K, V>', ''), mismatch),
         ('WrongParent', 'Collections.MutableMap', mutable.replace(' : Map<K, V>', ' : Map<V, K>'), mismatch),
-        ('DefaultNativePayload', 'IO.File', file_source.replace('RuntimeServices.ReadAllText(path, maxBytes)', 'default(System.Value)'), 'Read of uninitialized'),
-        ('UnsupportedPayload', 'IO.File', file_source.replace('UnpackValue<byte>', 'UnpackValue<long>'), 'Unsupported erased native payload type'),
+        ('DefaultNativePayload', 'Storage.File', file_source.replace('RuntimeServices.ReadAllText(path, maxBytes)', 'default(System.Value)'), 'Read of uninitialized'),
+        ('UnsupportedPayload', 'Storage.File', file_source.replace('UnpackValue<byte>', 'UnpackValue<long>'), 'Unsupported erased native payload type'),
         ('Local', 'LocalDateTime', local, None),
         ('Reordered', 'LocalDateTime', local.replace('private field StoredDate: Date\n    private field StoredTime: Time', 'private field StoredTime: Time\n    private field StoredDate: Date'), 'value library layout'),
         ('ExtraStorage', 'LocalDateTime', local.replace('private field StoredDate:', 'private field Extra: int = 0\n    private field StoredDate:'), 'value library layout'),

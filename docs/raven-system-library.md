@@ -964,7 +964,7 @@ The final saved-project batch also covers Raven Path consumers.
 
 ### File-write outcomes and generic Void matching — 2026-09-15
 
-`src/System/Storage/File/Functions.rvn` now constructs the existing WriteAllText outcomes:
+`src/System/Storage/File.rvn` now constructs the existing WriteAllText outcomes:
 Ok(Void), seven typed FileWriteError cases, and a terminal fault for an unknown host
 status. Actual UTF-8 encoding, limit checks, filesystem writes and truncation remain
 in the native service. ReadAllText retains its existing IL implementation because its
@@ -1210,3 +1210,16 @@ the archived Neo profile; the Raven profile uses the complete authoring source.
 The ownership audit reports 862 declarations and 74 explicit native services.
 See [the text contract](design/text-abstraction.md) and
 [the runnable example](experiments/raven-target/samples/library-grapheme-strings.rvn).
+
+
+### Provider-bound Storage descriptors (2026-09-23)
+
+System.Storage.File is now a Raven-authored class with retained provider/Path,
+Name and directional stream opening; its static ReadAllText/WriteAllText signatures
+remain compatible with native string callers. The baseline library includes its
+byte-provider/stream contract dependencies; the full Raven profile adds Directory
+and StorageLookup. StorageLookup inherits the byte provider interface and adds
+GetFile(Path), leaving byte-only providers valid. The strict importer admits the
+exact constructors/members, inherited provider conversion and descriptor arrays.
+The SDK disk/memory sample imports these types. No Raven compiler or Runtime Contract
+configuration changes are required; use matching regenerated development artifacts.

@@ -772,3 +772,16 @@ returns. Raven main `44ae9f242` (integration `849347a97`) fixes equality/hash ma
 against the explicitly selected value type. Its ordinary .NET regression uses
 System.ValueTuple, with opt-in success and default rejection; 39 focused unit, symbol
 and interface checks pass. No neoCLR-specific policies were merged into Raven main.
+
+
+### Integrated Storage descriptors — 2026-09-23
+
+The development reference now declares System.Storage.File as a sealed descriptor
+class, preserving its static native text helpers. Directory resolves child addresses;
+StorageLookup inherits StorageProvider and adds typed file lookup. The strict bridge
+admits only these constructors/members and the exact inherited lookup-to-byte
+conversion, including arrays of descriptors. Matching runtime and reference snapshots
+are required; no compiler or Runtime Contract configuration change is needed.
+See the [Storage evidence](../storage-provider/README.md#platform-filedirectory-integration--2026-09-23)
+and [member reference](../../../api-docs/storage-items.md). Native static file/Path
+artifact regressions remain the compatibility check.
