@@ -130,3 +130,68 @@ checks valid and invalid spellings, lexical equality, provider resolution and va
 but missing files. Separate compiler checks reject direct construction and Text
 assignment. The verifier confirms no sample files escape to the parent working
 directory; this fixture check does not establish a filesystem sandbox.
+
+## Lookup and identity evidence (2026-09-23)
+
+The next question is what a lookup can guarantee before opening a stream. Run the
+host-only comparison independently of the Raven sample:
+
+```sh
+python3 docs/experiments/storage-provider/verify_lookup.py
+```
+
+This compiles `LookupProbe.rs` and `LookupProbe.cs` in a disposable directory. It
+prints installed toolchain versions and targets the installed .NET SDK's major
+version. It does not implement or advertise a new neoCLR API. On macOS, select a
+working SDKROOT if the default SDK cannot link Rust executables.
+
+Observed on macOS arm64 with Rust 1.95.0 and .NET SDK
+11.0.100-rc.1.26425.128: five Rust cases and the .NET comparison passed. The probes
+show missing/file/directory distinctions, stale metadata after removal, independent
+provider roots, and address replacement while an existing stream retains the old
+file. The Unix-only case distinguishes following a symlink from inspecting it,
+including a dangling link. No Windows/Linux runs or permission-denial probes were
+performed; those remain targeted platform validation, not inferred coverage.
+
+### Comparison and provisional direction
+
+Primary contracts reviewed 2026-09-23:
+
+- [.NET FileInfo.Exists](https://learn.microsoft.com/en-us/dotnet/api/system.io.fileinfo.exists?view=net-10.0)
+  caches observations until Refresh and reports false for a directory or lookup
+  error. The local .NET probe confirms caching across creation/removal and shows
+  that FileInfo retains an address rather than an open item. The documented .NET 10
+  contract is the comparison baseline; the executable used the installed .NET 11 RC.
+- [Rust fs::metadata](https://doc.rust-lang.org/std/fs/fn.metadata.html)
+  returns metadata or an I/O error and follows links. Our probe checks the host
+  behavior with Rust 1.95.0; the online standard-library documentation can be newer.
+  A metadata query is a possible host adapter, not a new runtime mechanism.
+
+Alternatives are a boolean Exists, opening/closing a stream as a probe, or a typed
+metadata lookup. A boolean collapses useful failures. Opening content introduces
+read-access requirements and consumes the stream budget, so it is not an equivalent
+lookup. Prefer investigating metadata lookup with typed errors while keeping the
+actual open operation authoritative. This adds an I/O operation and does not remove
+races; consumers only needing bytes should be able to open directly.
+
+Proposed contract for the next implementation slice, **not shipped API**:
+
+- Keep FileAt as descriptor construction without I/O. Add GetFile only when a
+  provider can actually query kind/existence without opening content.
+- A successful lookup returns a provider-bound address observed as a file. It does
+  not retain an open handle or guarantee later availability, identity or permissions.
+  Opens must perform their own checks and can return NotFound or other errors.
+- Keep lexical Path equality distinct from provider address equality and stable item
+  identity. Do not infer same-file identity from matching strings, or across roots.
+- Consider NotFound, WrongKind, AccessDenied and IoFailure lookup errors separately
+  from stream states such as Closed or invalid buffer ranges. Native mapping and
+  provider-specific details still need implementation and tests.
+- Select and test link-following behavior explicitly. Provider root mapping still
+  does not confer sandbox authority. Async completion remains open with scheduling;
+  do not advertise synchronous experiments as the final provider contract.
+
+Before a shared lookup interface, make the memory provider's text and byte views
+coherent: its current separate slots cannot honestly answer a single file lookup.
+Then add a native metadata adapter and matched disk/memory checks, including a
+failed open after successful lookup. Independent .NET filesystem abstractions and
+permission-error portability remain research gaps before promoting this API family.

@@ -140,8 +140,13 @@ values and maps host storage beneath a configured native root. This is explorati
 not a new System.Storage.Path contract. The author defers broader Path operations
 and leaves string overloads on path-taking APIs open; the assistant recommends
 convenience overloads that parse and forward, not a separate unchecked path.
-Next, evaluate provider lookup/identity and error contracts against the working
-sample before promoting the Storage surface. Preserve the tested stream operations. The
+The [lookup/identity probes](experiments/storage-provider/README.md#lookup-and-identity-evidence-2026-09-23)
+now distinguish metadata observations, provider-bound addresses and open handles,
+with a .NET FileInfo comparison. They support typed metadata lookup rather than
+opening content to probe existence; no GetFile API has been implemented yet.
+Next, unify the memory provider's text/byte contents so one address denotes one file,
+then test a native metadata lookup adapter and typed errors across disk/memory
+before promoting the Storage surface. Preserve the tested stream operations. The
 current application-owned File/Directory and capability interfaces remain
 exploratory; do not promote their string-address/text-helper shape unchanged merely
 because this sample works. Public stream wrappers have on-site reference coverage.

@@ -168,7 +168,14 @@ remain exploratory. A proposed string overload would parse and forward to the Pa
 version, preserving the same validation and typed errors; no overload family is
 added by this slice.
 Eager lookup, item identity, provider-specific File implementations and common
-StorageItem contracts remain exploratory. The separate text and byte slots are a
+StorageItem contracts remain exploratory. Host comparison probes show why a future
+lookup must not promise that a file remains available: metadata is an observation,
+while an open stream can retain an old file after its address is replaced. A
+proposed GetFile would query kind/existence and return a provider-bound descriptor;
+it is not implemented. Each later open must still report its own failures. Opening
+content merely to check existence would add read-access requirements and consume
+the stream budget. A native metadata query is the next candidate to evaluate after
+the memory provider has coherent text/byte contents. The separate text and byte slots are a
 visible limitation of the test provider, not a final storage model. General stream
 capabilities, automatic disposal, cleanup across await and async scheduling also
 remain design work.

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Add isolated host Storage lookup probes comparing .NET FileInfo caching with
+  metadata observations, path replacement, open-handle identity and provider roots.
+  Record typed metadata lookup as a provisional direction, not an implemented
+  GetFile API. Make coherent memory-provider text/byte contents the next prerequisite.
+
 - Explore an immutable Path value in the Storage sample. Path.Parse returns
   Result<Path, InvalidPathError>; construction is private and text cannot be changed.
   Move experimental provider/File/Directory parameters to validated logical paths
