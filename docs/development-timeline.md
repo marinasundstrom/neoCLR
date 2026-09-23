@@ -25,6 +25,24 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-24 — Grow a website namespace overview with the APIs
+
+**Author.** Requested a website namespace overview explaining what namespaces
+contain, starting with the existing APIs and adding namespaces as APIs are added.
+
+**Assistant/action.** Added an [on-site overview](../api-docs/namespaces.md), linked
+from the homepage, API landing page and navigation. It describes current application
+namespaces and runtime/compiler support, identifies incomplete member coverage,
+and keeps proposed namespaces outside the implemented inventory. Corrected the
+old namespace table's treatment of Console: it is a class in System. Recorded
+maintenance guidance so the list grows with implemented APIs. This documentation
+request does not change platform milestone priorities; publication remains separate.
+
+**Validation.** The API snapshot check and combined website/link build passed in a
+temporary copy using the committed compiler/runtime baseline plus these documentation
+changes. The working copy snapshot is stale alongside concurrent compiler/runtime
+edits; those edits were left untouched. Website tokenizer tests passed.
+
 ## 2026-09-23 — Queryable information without a filesystem-shaped core
 
 **Author.** Suggested ways to fetch additional information/attributes from storage

@@ -13,6 +13,14 @@ record migration information. Renderer exclusions need a linked manual reference
 entry with the exact signature and behavior. Run the combined website build; passing
 snapshot hashes alone does not establish browsability or adequate descriptions.
 
+## Namespace overview
+
+Keep [the namespace overview](namespaces.md) aligned with implemented public APIs.
+Add a namespace when its APIs land, explain its contents and link its generated
+reference or on-site guide. Distinguish namespaces from types and compiler-only
+support, mark missing member coverage, and keep proposed namespaces out of the
+current inventory.
+
 ## Build the complete website
 
 From the repository root:

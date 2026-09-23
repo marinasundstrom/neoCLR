@@ -37,6 +37,7 @@ the homepage provides current status and feature entry points.
 | `website/features/<name>/index.html` | What currently works, a useful example where appropriate, limits and feedback | Implemented behavior versus “Where we’re heading” |
 | `website/try/index.html` | Reader-facing installation, .rvnproj workflow, expected output and troubleshooting | Published bundle instructions versus development-only API availability |
 | `website/raven/index.html` | Introduce the Raven language, examples and the .NET/neoCLR target distinction | Language capabilities versus target-specific library support |
+| `api-docs/namespaces.md` → `/docs/namespaces.html` | Current namespace contents and links to reference pages and guides; extend as APIs land | Implemented namespaces versus proposals; overview versus member coverage |
 | `website/proposals/index.html` | Brief summaries of ideas across the platform, linked to original proposals and maintained design records | Proposals are not promises or a release checklist |
 | `docs/` and release notes | Detailed contracts, research, verification and historical release behavior | Preserve published release notes; record corrections under Unreleased |
 

@@ -33,20 +33,14 @@ being expanded beyond the initial Preview 9 async overview.
 
 ## Browse namespaces
 
-| Namespace | Types and purpose |
-| --- | --- |
-| [System](xref:System) | [Object and Value](objects.md): runtime type inspection and the distinction between objects and temporary erased storage |
-| [System.Storage](xref:System.Storage) | [StorageItem, File and Directory](storage-items.md), [FileText](xref:System.Storage.FileText), [FileSystem](xref:System.Storage.FileSystem), [StorageProvider](xref:System.Storage.StorageProvider) for [item lookup](storage-provider.md), [Path](xref:System.Storage.Path), InvalidPathError, [Metadata.GetKind](xref:System.Storage.Metadata), EntryKind and StorageLookupError; see the [lookup guide](storage-lookup.md) |
-| [System.Tasks](xref:System.Tasks) | Task, Promise, TaskQueue and completion state |
-| [System.Console](xref:System.Console) | Static standard input/output/error, line reading and byte streams; see the [Console guide](console.md) |
-| [System.IO](xref:System.IO) | Directional file streams, TextReader/StreamReader, TextWriter/StreamWriter, SeekableStream and typed errors; see the [stream guide](streams.md), including Flush |
-| [System.Concurrency](xref:System.Concurrency) | Explicit Thread lifecycle and the isolated ThreadPool; development after Preview 9 |
+The [namespace overview](namespaces.md) explains what each current namespace
+contains and links to its available reference pages and feature guides. Start there
+for collections, text, Tasks, storage, streams, introspection and runtime support.
 
-Use the API reference navigation to expand each namespace and select a type.
-Type pages list constructors, properties and methods with their descriptions.
-The reference is incomplete for older areas listed above; a feature guide is not
-full API coverage. Public APIs must gain reference coverage as they are added or
-changed, with existing gaps tracked in the maintenance plan.
+Use the API reference navigation to expand namespaces with generated coverage and
+select a type. Type pages list constructors, properties and methods. Reference
+coverage for older areas is still being expanded; a feature guide does not replace
+member documentation.
 
 ## Start with Tasks
 

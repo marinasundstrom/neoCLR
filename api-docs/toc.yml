@@ -2,6 +2,8 @@
   href: /index.html
 - name: API guide
   href: index.md
+- name: Namespace overview
+  href: namespaces.md
 - name: API reference
   href: api/
 - name: Callback methods

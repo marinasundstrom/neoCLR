@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add a website namespace overview describing the current library and runtime
+  support areas, with reference/guide links and explicit coverage gaps. Link it
+  from the homepage and API navigation; keep Console under System and extend
+  the inventory as implemented APIs introduce namespaces.
+
 - Plan a pre-release Raven example portability pass after shared compiler fixes
   are independently verified on Raven main, released and integrated into the
   neoCLR branch. Track pinned baselines, minimal ports, failure classification and
