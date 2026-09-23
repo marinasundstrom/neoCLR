@@ -5,8 +5,10 @@
 Follow the [Object/value consistency review](object-model-review.md). The author
 directs harmonization with .NET reference/value semantics: classes share reference
 identity, values copy their fields, and boxing is separate. Object.GetType is
-implemented in the Raven library; other common Object methods remain incomplete.
-The old proposal below predates nominal classes and must not guide new Object APIs.
+implemented in the Raven library, along with the bounded class ToString slice;
+equality and hashing remain incomplete.
+Object is now abstract, with derived construction supported and direct allocation
+rejected. The old proposal below predates nominal classes and must not guide new Object APIs.
 Its universal value-equality policy and value-like Object inheritance are superseded.
 
 ## Historical proposal (superseded where noted)

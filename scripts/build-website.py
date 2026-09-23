@@ -154,6 +154,7 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'OBJECT_DISPLAY_SAMPLE': ('docs/experiments/object-display/Main.rvn', 'open class Plain', '\nfunc Main()', False),
         'CONSOLE_PROPAGATION_SAMPLE': ('docs/experiments/console-streams/Propagation.rvn', 'func ReadInput()', '\n}', True),
         'CONSOLE_IF_LET_SAMPLE': ('docs/experiments/console-streams/IfLet.rvn', 'func ReadInput()', '\n}', True),
         'STORAGE_POC_SAMPLE': ('docs/experiments/storage-poc/Main.rvn', 'func Main()', '\n}', True),
@@ -244,6 +245,12 @@ def main():
         shutil.copyfile(ROOT / 'docs/experiments/console-streams' / name, console_sources / name)
     shutil.make_archive(str(downloads / 'console-streams'), 'zip', console_sources.parent)
     shutil.rmtree(console_sources.parent)
+    object_sources = OUTPUT / '_object-source' / 'object-display'
+    object_sources.mkdir(parents=True)
+    for name in ('Main.rvn', 'Abstract.rvn', 'ObjectDisplay.rvnproj', 'expected.txt', 'verify.py', 'README.md'):
+        shutil.copyfile(ROOT / 'docs/experiments/object-display' / name, object_sources / name)
+    shutil.make_archive(str(downloads / 'object-display'), 'zip', object_sources.parent)
+    shutil.rmtree(object_sources.parent)
     cancel_sources = OUTPUT / '_worker-cancel-source' / 'worker-task-cancellation'
     cancel_sources.mkdir(parents=True)
     for name in ('Workers.rvn', 'Copy.rvn', 'Main.rvn', 'DelayedCopy.rvnproj', 'Fault.rvn', 'Forbidden.rvn', 'Affinity.rvn', 'affinity.expected.txt', 'expected.txt', 'README.md'):

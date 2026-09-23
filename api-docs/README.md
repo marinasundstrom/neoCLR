@@ -165,9 +165,9 @@ ConsoleOutputStream are provider implementation classes, not public APIs.
 
 ## Object and Value coverage — 2026-09-23
 
-Object, Object.GetType and Value now have generated summaries and an
-[on-site guide](objects.md). Object's reference-only `.ctor`, `Equals(Object)`,
-`GetHashCode()` and `ToString()` are deliberately outside selection: their presence
+Object, Object.GetType, Object.ToString and Value now have generated summaries and an
+[on-site guide](objects.md). Object's reference-only `Equals(Object)`
+and `GetHashCode()` are deliberately outside selection: their presence
 supports compiler metadata but does not establish executable API implementations.
 This is a tracked implementation gap, not a DocFX rendering failure. Do not expose
 stub bodies as working methods. Value has no public member API; low-level operations
@@ -176,6 +176,11 @@ remains an existing separate gap. Object/Value source files now participate in t
 reference snapshot fingerprint.
 
 The metadata refresh normalizes two DocFX core-type assumptions: Object's declaration
-is rendered as `public class Object`, and Value does not advertise inherited GetType
+is rendered as `public abstract class Object`, and Value does not advertise inherited Object methods
 from the reference-only ValueType scaffold. The latter is not an executable Value
 member. This normalization changes documentation only, not reference metadata.
+
+Object's protected parameterless constructor is described in the Object guide. It
+is only a derived-construction contract; direct construction is rejected because
+Object is abstract. The runtime's public constructor entry supports validated base
+chaining; reference accessibility and constructor-state checks restrict its use.

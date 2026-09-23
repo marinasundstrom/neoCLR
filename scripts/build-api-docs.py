@@ -42,10 +42,10 @@ def normalize_intrinsic_metadata():
     # Neither rendering describes the executable neoCLR intrinsic contract.
     path = DOCS / 'api/System.Object.yml'
     if path.exists():
-        path.write_text(path.read_text().replace('content: public object\n', 'content: public class Object\n').replace('content.vb: Public Object\n', 'content.vb: Public Class Object\n'))
+        path.write_text(path.read_text().replace('content: public abstract object\n', 'content: public abstract class Object\n').replace('content.vb: Public MustInherit Object\n', 'content.vb: Public MustInherit Class Object\n'))
     path = DOCS / 'api/System.Value.yml'
     if path.exists():
-        path.write_text(path.read_text().replace('  inheritedMembers:\n  - System.Object.GetType\n', ''))
+        path.write_text(re.sub(r'  inheritedMembers:\n(?:  - System\.Object\.[^\n]+\n)+', '', path.read_text()))
 
 
 def check_descriptions():

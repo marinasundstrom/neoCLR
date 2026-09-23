@@ -1,0 +1,6 @@
+import System.*
+
+func Main() {
+    let value = Object()
+    Console.WriteLine(value.GetType().FullName)
+}

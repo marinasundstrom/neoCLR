@@ -6,6 +6,7 @@ items:
   parent: System
   children:
   - System.Object.GetType
+  - System.Object.ToString
   langs:
   - csharp
   - vb
@@ -16,12 +17,12 @@ items:
   assemblies:
   - NeoCLR.CoreProbe
   namespace: System
-  summary: Provides the common object-reference view and runtime type inspection.
-  remarks: 'Development support is bounded: GetType is implemented. Equals, GetHashCode, ToString and the constructor declarations in the compiler reference do not establish executable public API support. See the Object and Value guide. Ordinary class assignment shares a reference; value assignment copies fields.'
+  summary: Provides an abstract common object-reference base with runtime type inspection and display behavior.
+  remarks: 'Development support is bounded: GetType and virtual ToString are implemented with the limits in the Object and Value guide. Equals and GetHashCode in the compiler reference do not establish executable public API support. Object is abstract; its protected constructor initializes the base portion of a derived instance. See the Object and Value guide. Ordinary class assignment shares a reference; value assignment copies fields.'
   example: []
   syntax:
-    content: public class Object
-    content.vb: Public Class Object
+    content: public abstract class Object
+    content.vb: Public MustInherit Class Object
   inheritance: []
   nameWithType.vb: Object
   fullName.vb: Object
@@ -52,6 +53,32 @@ items:
   overload: System.Object.GetType*
   nameWithType.vb: Object.GetType()
   fullName.vb: Object.GetType()
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  id: ToString
+  parent: System.Object
+  langs:
+  - csharp
+  - vb
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Returns the concrete runtime type name unless an admitted class override supplies display text.
+  remarks: Development class-reference slice. Virtual calls select class overrides; explicit base calls use this fallback. Rootless nominal classes and arrays use the fallback. Null raises NullReference. Virtual dispatch for boxed values and intrinsic strings is not yet supported; use their typed formatting APIs. This is display text, not serialization or a stable identity.
+  example: []
+  syntax:
+    content: public virtual string ToString()
+    return:
+      type: System.String
+      description: The type descriptor FullName, or the string produced by the selected override.
+    content.vb: Public Overridable Function ToString() As String
+  overload: System.Object.ToString*
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
 references:
 - uid: System
   commentId: N:System
@@ -103,3 +130,22 @@ references:
     name: Introspection
     isExternal: true
     href: System.Introspection.html
+- uid: System.Object.ToString*
+  commentId: Overload:System.Object.ToString
+  isExternal: true
+  href: System.Object.html#System_Object_ToString
+  name: ToString
+  nameWithType: object.ToString
+  fullName: object.ToString
+  nameWithType.vb: Object.ToString
+  fullName.vb: Object.ToString
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String

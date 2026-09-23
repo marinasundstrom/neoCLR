@@ -23,6 +23,7 @@ items:
     content.vb: Public Structure FileReadError.AccessDenied
   inheritedMembers:
   - System.Object.GetType
+  - System.Object.ToString
 - uid: System.Storage.FileReadError.AccessDenied.#ctor
   commentId: M:System.Storage.FileReadError.AccessDenied.#ctor
   id: '#ctor'
@@ -96,6 +97,30 @@ references:
     name: GetType
     isExternal: true
     href: System.Object.html#System_Object_GetType
+  - name: (
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: System.Object.html#System_Object_ToString
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: System.Object.html#System_Object_ToString
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: System.Object.html#System_Object_ToString
   - name: (
   - name: )
 - uid: System.Object

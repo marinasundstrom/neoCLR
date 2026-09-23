@@ -5697,3 +5697,24 @@ and recorded the convention for runtime code as well as examples.
 - **Evidence:** [review](object-model-review.md),
   [.NET baseline](experiments/object-baseline/README.md),
   [on-site reference guide](../api-docs/objects.md).
+
+### 2026-09-23 — Object display and an abstract root
+
+- **Author:** asked to continue the reviewed slices, then proposed making Object
+  abstract: “If we ever want to declare a lock object we will find another way.”
+- **Assistant action:** implemented the class ToString fallback/override slice and
+  adopted an abstract Object root. The source/reference constructor is protected;
+  derived construction chains to an empty runtime entry. Direct construction is
+  rejected. This deliberately differs from .NET's instantiable Object.
+- **Implementation finding:** preserving Object ancestry also requires preserving
+  its base-constructor call, previously omitted for the rootless projection. Virtual
+  calls and explicit base calls must select different adapters. Abstract Object must
+  not cause its concrete default methods to disappear from reachability analysis.
+- **Limits:** boxed-value/string virtual formatting, equality/hash and Value migration
+  remain separate follow-ups; no lock primitive or generic synchronization object
+  was added. [The display sample](experiments/object-display/README.md) and raw tests
+  record the executable scope, including negative construction/dispatch cases.
+
+- **Validation:** 21 dispatch/construction tests, the source sample and negative
+  abstract-construction check, three existing reflection/inheritance samples,
+  generated library/API checks and the combined website build passed.

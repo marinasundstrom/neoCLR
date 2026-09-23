@@ -729,7 +729,12 @@ static class UnionImport
                         else if (targetMethod.Module == library.MainModule)
                         {
                             if (targetMethod.IsConstructor && targetMethod.DeclaringType.FullName is "System.Object" or "System.ValueType" && targetMethod.Parameters.Count == 0 && method.IsConstructor && method.DeclaringType.BaseType?.FullName == targetMethod.DeclaringType.FullName && instruction.OpCode.Code == Code.Call)
-                            { Expect(ApplicationTypes.Receiver(method)); code.AppendLine("pop"); break; }
+                            {
+                                Expect(ApplicationTypes.Receiver(method));
+                                code.AppendLine(libraryOwner is null && !method.DeclaringType.IsValueType && targetMethod.DeclaringType.FullName == "System.Object"
+                                    ? "call instance System.Object::.ctor()" : "pop");
+                                break;
+                            }
                             if (libraryOwner is not null && reference.DeclaringType.FullName == "System.Runtime.CompilerServices.ValueStorage"
                                 && reference.Name == "LeaveUnassigned")
                             {
@@ -751,7 +756,7 @@ static class UnionImport
                             var pathCall = PathBindings.Bind(reference, targetMethod);
                             var interfaceCall = collectionProfile ? InterfaceBindings.Bind(reference, targetMethod) : null;
                             var nativeCall = collectionProfile ? NativeMemoryBindings.Bind(reference, targetMethod) : null;
-                            var reflectionCall = collectionProfile ? ReflectionBindings.Bind(reference, targetMethod) : null;
+                            var reflectionCall = collectionProfile ? ReflectionBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
                             var queryCall = collectionProfile ? QueryBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt)
                                 ?? OutcomeOperatorBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
                             var arrayCallback = collectionProfile ? ArrayCallbackBindings.Bind(reference, targetMethod, libraryOwner is null ? null : t => ProfileType(t)) : null;

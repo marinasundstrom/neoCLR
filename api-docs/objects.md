@@ -7,18 +7,36 @@ object. Neither assignment performs a deep clone.
 
 ## Object's current API
 
-[System.Object](xref:System.Object) supplies
+[System.Object](xref:System.Object) is abstract and supplies
 [GetType()](xref:System.Object.GetType), returning System.Introspection.TypeInfo for
 the concrete runtime type. Supported object, base and interface views retain that
 type. Arrays, strings and boxed values have tested runtime paths too. Calling it on
 null produces a terminal NullReference fault.
 
+## Object display text
+
+`ToString() -> string` is now a virtual class method. Its default is the concrete
+runtime type's FullName. A derived override is selected through an Object or base
+reference; an explicit base call uses the type-name fallback. Rootless nominal
+classes and arrays use the default Object slot. A null receiver faults.
+
+The [display sample](/samples/object-display.zip) prints Plain, Named instance,
+Named instance and Named. The last line comes from an explicit base call, showing
+that bypassing the override still describes the concrete object.
+
+This first slice does not implement Object virtual dispatch for boxed values or
+intrinsic strings. Those calls fail; use typed formatting where available. It does
+not add Console.WriteLine(Object), serialization, culture/format overloads or string
+identity. GetType's existing string/boxed paths remain supported.
+
 This reference intentionally does not advertise all .NET Object methods as implemented.
-The compiler reference contains Equals, GetHashCode and ToString declarations, but
-the executable Object library does not yet supply those methods. A normal implicit
-base-constructor call is recognized by the importer; direct Object construction is
-not a demonstrated application API. These are implementation gaps, not usable stub
-implementations. Public reference coverage will expand with the implementations.
+The compiler reference contains Equals and GetHashCode declarations, but
+the executable Object library does not yet supply those methods. Object has a protected parameterless constructor used when a derived instance is
+initialized. It cannot be instantiated directly; both Raven and raw runtime
+construction reject it. This deliberately differs from .NET's concrete Object.
+A future synchronization API should provide a purpose-specific type rather than
+requiring an otherwise empty Object as a lock token. Equality/hash remain gaps,
+not usable stub implementations. Public reference coverage will expand with the implementations.
 
 ## System.Value is a different facility
 
@@ -40,14 +58,17 @@ extraction and lifetime tests, rather than a type rename.
 
 ## Direction under review
 
-The intended baseline is .NET-compatible reference/value semantics. The proposed
-first Object extension is an overridable ToString with a runtime-type-name fallback.
-Equality and hashing should then be designed together: default reference identity
+The intended baseline is .NET-compatible reference/value semantics. The first Object display slice implements overridable class ToString with a
+runtime-type-name fallback. Equality and hashing should next be designed together: default reference identity
 for ordinary classes, value behavior for value types and consistent custom overrides.
-These additions are not implemented by this review. See Microsoft's
+Equality and hashing are not yet implemented on Object. See Microsoft's
 [Object contract](https://learn.microsoft.com/en-us/dotnet/api/system.object?view=net-10.0)
 for the comparison baseline; neoCLR does not yet provide that entire surface.
 
 System.Value remains until its dependent carriers and runtime boundaries have a
 verified replacement. Shallow cloning, finalization and broad implicit boxing are
 not part of the next small Object slice.
+
+Migration: application classes now retain Object as their metadata base. A class
+that supplies ToString should declare an override; same-name hiding is rejected by
+the current importer/runtime profile. Use matching reference/library artifacts.

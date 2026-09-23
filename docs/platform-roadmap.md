@@ -32,8 +32,11 @@ TaskQueue/suspension exploration remains open and networking stays later.
 then address Object's missing behavior. Harmonize with .NET where useful, especially
 reference/value semantics. Finish existing slices before switching. The
 [consistency review](object-model-review.md) records implemented GetType, compiler-only
-member stubs, a tested .NET baseline and Value's live dependencies. Next is a bounded
-Object.ToString/override sample; equality and hashing follow as a pair. Value removal
+member stubs, a tested .NET baseline and Value's live dependencies. The bounded
+[Object.ToString/override sample](experiments/object-display/README.md) is implemented;
+Object is abstract by author direction; derived construction remains supported.
+Boxed-value and intrinsic-string virtual formatting still need receiver work. Identity,
+equality and hashing follow as a pair of related contracts. Value removal
 requires its own storage migration, not a rename to Object.
 
 When choosing work autonomously, follow the current author-directed focus and the
@@ -622,7 +625,7 @@ review. StorageProvider belongs to the composed Raven library alongside StorageI
 File and Directory; the legacy bootstrap library keeps its static File helpers.
 The repair restores the existing Console regression suite without changing public APIs.
 The [Object/Value review](object-model-review.md) now records those dependencies and
-missing members. Next implement the bounded Object display/override case, preserving
+missing members. The bounded class display/override case now preserves
 .NET-style class reference sharing and value copying. Equality/hash policy and Value
 retirement remain separate, explicitly scoped follow-ups.
 This is a bounded foundation review; networking remains later. Console ownership,

@@ -22,6 +22,7 @@ static class ReflectionBindings
         ("System.Introspection.ModuleInfo", "get_MetadataToken", [], "Int32", false),
         ("System.Introspection.ModuleInfo", "GetTypes", [], "System.Collections.Sequence<System.Introspection.TypeInfo>", false),
         ("System.Object", "GetType", [], "System.Introspection.TypeInfo", false),
+        ("System.Object", "ToString", [], "String", false),
         ("System.Runtime.RuntimeContext", "get_Current", [], "System.Runtime.RuntimeContext", true),
         ("System.Runtime.RuntimeContext", "GetTypeInfoFromHandle", ["System.RuntimeTypeHandle"], "System.Introspection.TypeInfo", false),
         ("System.Introspection.TypeInfo", "get_GenericArgumentCount", [], "Int32", false),
@@ -141,9 +142,9 @@ static class ReflectionBindings
                 throw new InvalidDataException("Unsupported reflection contract: " + name);
         }
     }
-    public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
+    public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition, bool virtualCall = false)
     {
-        var owner = reference.DeclaringType.FullName == "System.Object" && reference.Name == "GetType" && RuntimeSignatures.IsCore(reference.DeclaringType.Scope) ? "System.Object" : Type(reference.DeclaringType);
+        var owner = reference.DeclaringType.FullName == "System.Object" && reference.Name is "GetType" or "ToString" && RuntimeSignatures.IsCore(reference.DeclaringType.Scope) ? "System.Object" : Type(reference.DeclaringType);
         if (owner is null || IsArray(owner) || owner == "System.RuntimeTypeHandle") return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? CollectionBindings.Type(t) ?? ProcessBindings.ArrayType(t) ?? GenericUnionBindings.Type(t));
         string Project(string t) => t.EndsWith("[]") ? "arrayref<" + t[..^2] + ">" : t;
@@ -151,7 +152,7 @@ static class ReflectionBindings
             && m.Args.Select(Project).SequenceEqual(args) && Project(m.Result) == result))
             throw new InvalidDataException("Unsupported reflection signature: " + reference.FullName);
         var inputs = reference.HasThis ? new[] { owner }.Concat(args).ToArray() : args;
-        var key = reference.FullName;
+        var key = reference.FullName + (owner == "System.Object" && reference.Name == "ToString" && virtualCall ? "#virtual" : "");
         var name = "RuntimeReflection" + Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(key)))[..16];
         if (!Helpers.ContainsKey(key))
         {
@@ -160,7 +161,7 @@ static class ReflectionBindings
             {
                 body.AppendLine("ldarg arg" + i);
             }
-            body.AppendLine($"{(definition.DeclaringType.IsInterface ? "callvirt" : "call")} {(reference.HasThis ? "instance " : "")}{owner}::{reference.Name}({string.Join(',', args)})");
+            body.AppendLine($"{(definition.DeclaringType.IsInterface || definition.IsVirtual && virtualCall ? "callvirt" : "call")} {(reference.HasThis ? "instance " : "")}{owner}::{reference.Name}({string.Join(',', args)})");
             body.AppendLine("ret\n.end"); Helpers.Add(key, body.ToString());
         }
         return new(name, inputs, result);

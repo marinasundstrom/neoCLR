@@ -1,0 +1,25 @@
+import System.*
+
+open class Plain { }
+
+class Named : Plain {
+    override func ToString() -> string {
+        return "Named instance"
+    }
+    func DefaultText() -> string {
+        return base.ToString()
+    }
+}
+
+func Describe(value: Object) {
+    Console.WriteLine(value.ToString())
+}
+
+func Main() {
+    Describe(Plain())
+    let named = Named()
+    Describe(named)
+    let parent: Plain = named
+    Console.WriteLine(parent.ToString())
+    Console.WriteLine(named.DefaultText())
+}

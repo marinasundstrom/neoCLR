@@ -8,6 +8,20 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Make Object abstract with validated base construction, following author direction;
+  direct Object allocation is rejected. This differs from .NET's concrete Object.
+  Implement the first Object.ToString slice with a concrete-type-name fallback and
+  ordinary class overrides. Preserve Object ancestry in imported application classes
+  and distinguish virtual calls from explicit base calls. Rootless nominal classes
+  and arrays use Object's default slot. Boxed-value and intrinsic-string virtual
+  formatting remain unsupported; GetType support is unchanged. Add a checked Raven
+  sample, raw dispatch regressions, refreshed API docs and an on-site source download.
+  Application ToString declarations must use override; same-name hiding is rejected.
+  No equality/hash implementation or erased Value migration is included.
+  Validation: 21 dispatch/construction tests, the positive/negative Raven sample,
+  three existing reflection/inheritance samples, matching library/API snapshots
+  (375 API items) and the combined website build.
+
 - Review Object and temporary Value storage against .NET reference/value semantics.
   Supersede older value-like Object inheritance and universal structural-equality
   proposals; record current implementation gaps and the next Object display/override

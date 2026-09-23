@@ -145,3 +145,26 @@ are not intended language restrictions. Existing neoCLR-specific configuration
 and experiments remain isolated on the integration feature branch.
 
 See [Console contracts](../../api-docs/console.md) and [tested samples](../experiments/console-streams/README.md).
+
+## Object display integration — 2026-09-23
+
+The neoCLR importer now admits the implemented virtual Object.ToString body and
+preserves core Object ancestry for ordinary application classes. Virtual reference
+calls and explicit base calls use separate adapters, retaining CIL callvirt versus
+call semantics. Object's GetType remains nonvirtual. Runtime Contract settings,
+Raven's value/reference classification and compiler emission are unchanged.
+Rootless nominal classes/arrays use the runtime's default Object slot; overrides
+require declared ancestry. Boxed-value and intrinsic-string Object virtual dispatch
+remain unsupported; typed formatting and existing GetType paths are separate.
+No Raven compiler code change or general fix is included. The neoCLR object-display
+sample and raw dispatch tests cover the bounded contract; these changes require
+matching development references, bridge and generated System library.
+
+Object is now abstract by author direction. Its reference constructor is protected;
+the importer preserves base chaining into an empty runtime constructor entry.
+Ordinary derived classes remain constructible; direct Object construction is rejected
+by source compilation and raw runtime allocation. No synchronization API is implied.
+
+Migration: application classes now retain Object as their metadata base. A class
+that supplies ToString should declare an override; same-name hiding is rejected by
+the current importer/runtime profile. Use matching reference/library artifacts.

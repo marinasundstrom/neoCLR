@@ -295,6 +295,20 @@ pub(crate) fn dispatch(
         .owner
         .as_ref()
         .ok_or_else(|| Fault::new("virtual method requires owner"))?;
+    // Object is an admitted common reference view even for a nominal class or
+    // managed array without explicit Object ancestry. Such a view uses Object's
+    // default slot; only declared ancestry can contribute an override.
+    if owner == &Type::from_name("System.Object")
+        && module.is_reference_type(concrete)
+        && require_base(module, concrete, owner).is_err()
+    {
+        if contract.is_abstract {
+            return Err(Fault::new(
+                "concrete type has an unimplemented abstract method",
+            ));
+        }
+        return Ok(contract.clone());
+    }
     require_base(module, concrete, owner)?;
     for ty in lineage(module, concrete)? {
         if let Some(candidate) = declared_method(module, &ty, contract)? {
@@ -316,7 +330,15 @@ pub(crate) fn dispatch_targets(
     module: &Module,
     contract: &crate::metadata::Function,
 ) -> Result<Vec<crate::metadata::Function>, Fault> {
-    let mut targets = Vec::new();
+    // Rootless classes and arrays can reach a concrete Object default even when
+    // Object itself is abstract and no declared subclass is in this module.
+    let mut targets = if contract.owner.as_ref() == Some(&Type::from_name("System.Object"))
+        && !contract.is_abstract
+    {
+        vec![contract.clone()]
+    } else {
+        Vec::new()
+    };
     for definition in &module.types {
         if definition.representation != Representation::Record || definition.is_abstract {
             continue;

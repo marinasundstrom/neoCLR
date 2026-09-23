@@ -4,7 +4,12 @@ import System.Introspection.*
 import System.Runtime.*
 import System.Runtime.CompilerServices.*
 
-public open class Object {
+public abstract class Object {
+    protected init() { }
+    virtual func ToString() -> string {
+        return GetType().FullName
+    }
+
     func GetType() -> TypeInfo {
         return RuntimeContext.Current.GetTypeInfoFromHandle(RuntimeServices.ObjectTypeHandle(self))
     }

@@ -12,7 +12,7 @@ It does not claim new Object methods have been implemented.
 | --- | --- | --- |
 | Class instance | Nominal reference type; assignment copies the reference | Aliases share mutation; a base/interface view retains the allocation |
 | Value instance | Assignment copies fields; reference fields still share their targets | Value copying is shallow, not deep cloning |
-| `System.Object` | Raven library class with `GetType()` | Common reference view, not an arbitrary unboxed payload slot |
+| `System.Object` | Raven library class with `GetType()` and bounded virtual `ToString()` | Common reference view, not an arbitrary unboxed payload slot |
 | `box T` | Copies a supported value into GC-owned storage exposed through Object/interfaces | Allocation, shared boxed identity and copy independence are observable |
 | `System.Value` | Intrinsic, explicitly erased complete payload; pack/is/unpack operations | Carries exact type and value-copy behavior; not .NET ValueType or Object |
 | `System.ValueType` | Compiler/reference metadata role | Not a replacement name for System.Value and not a complete executable .NET ValueType implementation |
@@ -28,11 +28,11 @@ contract; preserve that distinction in tests and documentation.
 ### A reference declaration is not implementation evidence
 
 CoreDeclarations supplies Object Equals, GetHashCode and ToString stubs to the
-reference/compiler environment. The generated Object library only supplies GetType.
+reference/compiler environment. At review time the generated Object library only supplied GetType. The subsequent
+class-display slice implements ToString; Equals/GetHashCode remain scaffolding.
 These stub bodies must never be executed or advertised as working implementations.
-Normal Object base-constructor calls are recognized by the importer, but direct
-Object construction needs its own admitted source/import/runtime case before it is
-promoted as a supported application API. Keep this gap explicit in the on-site docs.
+The subsequent author-directed abstract Object choice permits base-constructor
+chaining but deliberately rejects direct construction. Keep this gap explicit in the on-site docs.
 Do not remove compiler scaffolding without checking compiler synthesis dependencies.
 
 ## .NET baseline and preferred adaptation
@@ -102,9 +102,9 @@ runtime/issue review is required when implementing hashing or changing storage.
 
 ## Bounded implementation order
 
-1. **This slice:** record actual behavior and gaps; cover Object.GetType and Value
+1. **Review completed:** record actual behavior and gaps; cover Object.GetType and Value
    in the API reference; correct obsolete direction notes. No runtime API expansion.
-2. **Next:** a small Raven object-display sample with a base reference and derived
+2. **Class-display slice completed (bounded scope below):** a small Raven object-display sample with a base reference and derived
    override. Implement/test Object.ToString with a type-name fallback, ordinary
    virtual dispatch and honest importer diagnostics. Check class, boxed value,
    String and null paths before declaring the surface general. Keep Console object
@@ -119,3 +119,38 @@ runtime/issue review is required when implementing hashing or changing storage.
 This order is an assistant recommendation under the author's consistency direction,
 not approval of an entire .NET Object clone. Storage cleanup, suspension and scheduling
 remain open follow-ups; this review does not pull networking forward.
+
+## Class display implementation — 2026-09-23
+
+Object.ToString now has a Raven body returning GetType().FullName and a virtual slot.
+The importer preserves ordinary core Object ancestry for application classes, so a
+ToString override has an actual inherited contract. Reference calls retain the CIL
+call/callvirt distinction: explicit base calls must not re-enter the override.
+Rootless nominal classes and managed arrays already have an admitted Object view;
+they use the default Object slot when they have no declared Object ancestry.
+Only declared ancestry contributes overrides; no arbitrary same-named method is
+promoted into an override. No new opcode, native formatting service or universal
+base requirement is added to the raw runtime profile.
+
+Boxed-value and intrinsic-string virtual dispatch remain unsupported and are tested
+as failures rather than silently returning a type name. GetType still handles those
+views. This is a deliberate bounded gap from .NET, not a preferred semantic divergence.
+The [sample](experiments/object-display/README.md) covers class fallback, override,
+base-reference calls and explicit base calls. Broader formatting remains contingent
+on proper payload receiver dispatch. Equality/hash and Value migration are next
+independent slices, not implemented by the display change.
+
+### Author-directed abstract Object
+
+The author proposes abstract Object, with a dedicated synchronization concept if
+locking is later needed. The implementation adopts that direction: abstract in
+Raven/reference metadata and the runtime declaration, with a protected reference
+constructor and an empty runtime base-constructor entry. Derived construction chains
+through it; direct allocation must fail in both source and raw IL. This differs
+from .NET's concrete Object and removes its use as a generic instantiable token.
+The benefit is a narrower base-class role; the migration cost is replacing `new
+Object()` idioms with a domain type. No lock API is introduced or promised.
+
+Migration: application classes now retain Object as their metadata base. A class
+that supplies ToString should declare an override; same-name hiding is rejected by
+the current importer/runtime profile. Use matching reference/library artifacts.

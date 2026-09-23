@@ -9,3 +9,38 @@ ldarg arg1
 call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
 ret
 .end
+.function neoCLR.Library.System.Object.RuntimeReflectionF572EF30E2C7291B(System.Introspection.TypeInfo arg0) -> String
+ldarg arg0
+callvirt instance System.Introspection.TypeInfo::get_FullName()
+ret
+.end
+.type class abstract System.Object
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance GetType() -> System.Introspection.TypeInfo
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+call neoCLR.Library.System.Object.RuntimeReflectionC67D76CC5C960860()
+M00000001_IL_0007:
+ldarg 0
+M00000001_IL_0008:
+call neoCLR.Runtime.ObjectTypeHandle(System.Object)
+M00000001_IL_000d:
+call neoCLR.Library.System.Object.RuntimeReflection3A6D81CD5FF86035(System.Runtime.RuntimeContext,System.RuntimeTypeHandle)
+M00000001_IL_0012:
+ret
+.end
+.method instance virtual ToString() -> String
+M00000002_IL_0000:
+M00000002_IL_0001:
+ldarg 0
+M00000002_IL_0002:
+callvirt instance System.Object::GetType()
+M00000002_IL_0007:
+call neoCLR.Library.System.Object.RuntimeReflectionF572EF30E2C7291B(System.Introspection.TypeInfo)
+M00000002_IL_000c:
+ret
+.end
+.end

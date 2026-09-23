@@ -1,7 +1,7 @@
 apiRules:
 # Object's remaining reference members are compiler scaffolding, not executable APIs.
 - include:
-    uidRegex: '^System\.Object($|\.GetType($|\())'
+    uidRegex: '^System\.Object($|\.(GetType|ToString)($|\())'
 - include:
     uidRegex: '^System\.Value$'
 - exclude:
