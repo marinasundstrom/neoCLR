@@ -89,7 +89,8 @@ Complete remaining editor/candidate and migration gates before expanding feature
 ## Post-release concurrency direction — 2026-09-23
 
 The author directs renaming `System.Threading` to `System.Concurrency` after this
-release. Thread support may be platform-dependent and could later ship in an optional
+release. System.Concurrency covers concurrency including threading; Thread remains
+an explicit thread API. Thread support may be platform-dependent and could later ship in an optional
 `System.Concurrency.Threads` package; that name does not determine its namespace.
 Distinguish general result-oriented submission, now proposed as `Task.Run(...)`,
 from constructing a tracked Thread,
@@ -100,9 +101,10 @@ The author further directs an abstraction-first platform: concurrency must not
 require threads. Explore portable worker/Task-oriented execution while exposing
 Thread as a lower-level target capability only where appropriate. WebAssembly is
 a candidate for a workers/tasks surface without Thread, not a settled target policy.
-The author's latest suggestion is Task.Run-style submission with platform-selected
-concurrent execution. Explore that as the portable entry point; define progress,
-isolation and capability guarantees without promising parallel execution everywhere.
+The author confirms Task as a general abstraction and API that will provide concurrent
+work submission independent of threads, illustrated by Task.Run. Execution depends
+on the target; WebAssembly might use Web Workers behind this API. Define progress,
+isolation and capability guarantees while preserving that platform-independent role.
 Keep release stabilization immediate and Streams, Storage and Encoding before
 networking; the full thread lifecycle design is not a new release prerequisite.
 

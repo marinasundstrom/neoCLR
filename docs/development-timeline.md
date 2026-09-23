@@ -68,6 +68,17 @@ Thread.Run suggestion here. Scheduling, progress and isolation need a portable
 contract; concurrent execution does not necessarily promise parallel execution.
 This is a post-release proposal, not an implemented API.
 
+**Author confirmation.** System.Concurrency is the namespace for concurrency,
+including threading. Thread remains an explicit thread API that may not exist on
+all platforms. Task is a general abstraction and API, not inherently tied to threads,
+and will provide concurrent execution using the platform's mechanism; a WebAssembly
+target might use Web Workers.
+
+**Assistant action.** Made these roles explicit in the roadmap, design note and
+website. Task's concurrent-submission role is selected direction; exact method
+signatures and a Web Workers implementation remain undecided and unimplemented.
+A separate public Worker API is not a prerequisite for that Task backend.
+
 **Open.** Scheduling policy for Run, result types, lifecycle control, ownership,
 platform capability and migration contracts. Package naming is tentative. This does
 not add a release gate or replace the Streams/Storage/Encoding sequence.

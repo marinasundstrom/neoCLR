@@ -2,8 +2,13 @@
 
 **Recorded 2026-09-23. Planned, not implemented.** The author directs renaming
 `System.Threading` to `System.Concurrency` after the async/Tasks release to express
-a broader area. The release keeps its current API. This does not select a move of
-`System.Tasks` or change the Streams, Storage and Encoding priority before networking.
+a broader area. `System.Concurrency` is the namespace for concurrency, including
+threading. Thread remains an explicit thread API and may be unavailable on some
+platforms. Task is a general abstraction and API, independent of threads, and will
+provide concurrent work submission using the target platform's execution mechanism.
+These are author-selected design directions; exact signatures and implementation
+remain open. The current release keeps its API, and Streams, Storage and Encoding
+remain ahead of networking.
 
 Thread support may be unavailable on some platforms. A future optional package
 could be named `System.Concurrency.Threads`; that is a packaging possibility, not a
@@ -20,24 +25,27 @@ for every neoCLR application platform.
 
 Keep these roles distinct while designing the public surface:
 
-- **Task:** represents an operation's completion and possible result. A Task alone
-  does not promise parallel execution or create an execution resource.
+- **Task:** a general abstraction for work, completion and results, with an API for
+  submitting work concurrently. The platform supplies the execution mechanism;
+  neither the abstraction nor submission requires a public Thread API.
 - **Worker:** a possible abstraction for independently executing work, with an
   explicit input/output and isolation contract. Its backend and scheduling policy
   may vary by platform; no common Worker API has been selected yet.
 - **Thread:** an explicit lower-level execution resource with identity and lifecycle,
   available only where the platform chooses to expose that capability.
 
-The author suggested WebAssembly as a possible target exposing workers or
-Task-oriented concurrency instead of Thread. This is a platform-policy example,
+For a WebAssembly target, Task's concurrent execution might use Web Workers behind
+its general API. This does not require applications to use a separate Worker API or
+make Thread available on that target. This is a platform-policy example,
 not a claim that every WebAssembly environment lacks thread support. Determine
 contracts for each actual target, including unsupported capabilities, rather than
 silently emulating a Thread with different identity or parallelism guarantees.
 
 The author's subsequent suggestion places general work submission on Task through
 an operation similar to `Task.Run`, with the platform determining how execution is
-scheduled concurrently. This is the preferred direction to explore, superseding the
-earlier open placement question for portable submission. A Task remains useful for
+scheduled concurrently. The author subsequently confirmed that Task will provide a way to run work
+concurrently, with the mechanism depending on the platform. This selects the role
+of the API; Task.Run remains the illustrative method shape. A Task remains useful for
 any work, including operations initiated elsewhere; not every Task requires Run.
 Explicit worker or Thread APIs remain useful when their particular guarantees matter.
 

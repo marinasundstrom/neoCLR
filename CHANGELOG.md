@@ -14,8 +14,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   update website future direction. Clarify abstraction-first concurrency, separating
   Task completion, possible portable worker execution and target-specific Thread
   capabilities. Record the subsequent Task.Run-style proposal for general work with
-  platform-selected concurrent execution; scheduling contracts and WebAssembly policy
-  remain open. Current release APIs remain unchanged.
+  platform-selected concurrent execution. Capture the author's confirmation of Task's
+  general submission role and Thread's explicit, optional platform capability under
+  System.Concurrency; Web Workers are a possible Task backend for WebAssembly.
+  Exact contracts remain open. Current release APIs remain unchanged.
 
 - Correct two stale release samples after the Error-wrapper removal and Storage
   namespace migration; preserve the case-payload and error-carrier regression intent.
