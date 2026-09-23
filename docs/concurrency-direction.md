@@ -1,6 +1,6 @@
 # Concurrency and tracked threads — post-release direction
 
-**Recorded 2026-09-23. Planned, not implemented.** The author directs renaming
+**Updated 2026-09-23. Explicit Thread implementation in development; Task.Run planned.** The author directs renaming
 `System.Threading` to `System.Concurrency` after the async/Tasks release to express
 a broader area. `System.Concurrency` is the namespace for concurrency, including
 threading. Thread remains an explicit thread API and may be unavailable on some
@@ -14,6 +14,28 @@ Thread support may be unavailable on some platforms. A future optional package
 could be named `System.Concurrency.Threads`; that is a packaging possibility, not a
 selected namespace. Package boundaries, capability detection and unsupported-target
 behavior remain open.
+
+## Clarification: Task.Run overloads — 2026-09-23
+
+The author clarified that Task.Run should have overloads and return values, as in
+.NET. The intended shape includes completion-only callbacks and value-producing
+callbacks (`Task.Run(() => 42)` yielding `Task<int>`). This is not a selection of
+the existing isolated string-to-string worker API as the general Task.Run contract.
+Task and Promise remain in **System.Tasks**; explicit Thread moves to
+**System.Concurrency**.
+
+The author expects to revisit Task.Run once suspension and scheduling have a clear
+model. Before implementing its public surface, settle callback/capture ownership,
+result transport and supported result types, progress and scheduling, and overloads
+for async callbacks (including whether their returned tasks are flattened, as in
+.NET). The completion-only return shape must also fit neoCLR's existing
+`Task<unit>` convention; a non-generic Task is not implemented merely by this plan.
+
+The assistant removed an uncommitted Task.Run facade forwarding only
+`Func<string, string>` plus an input string to ThreadPool.Queue. That adapter would
+have prematurely presented the worker restriction as the general API. Explicit
+Thread and the existing ThreadPool.Queue remain useful bounded implementation
+steps; the general Task.Run overload family is pending this design work.
 
 ## Platform abstractions before execution primitives
 
@@ -99,18 +121,35 @@ thread has finished, not merely that its callback published a value.
 
 ## Current implementation and migration
 
-[Current isolated workers](isolated-workers.md) expose static `Thread.Start` and
-`ThreadPool.Queue`, returning `Task<string>`. They accept static, uncaptured
-string-to-string callbacks, isolate guest heaps and deliver results through queued
-blocking joins. There is no public retained Thread instance or lifecycle Task.
-The proposed integer and lambda examples therefore express a future API goal,
-not existing generic worker or closure support.
+The development library moves explicit workers from `System.Threading` to
+`System.Concurrency`. `Thread(callback, input)` creates an unstarted thread object;
+`Task` is stable and pending before start, `IsStarted` becomes true after successful
+submission, and instance `Start()` rejects repeated calls. `Thread.Run(callback,
+input)` constructs and starts a thread and returns its Task. A never-started
+object owns no native thread and its Task stays pending.
 
-After release, inventory namespace/type references in the library, runtime bindings,
-compiler integration, metadata, samples, API docs and website. Decide source and
-artifact compatibility, aliases if any, and rebuild requirements together. Renaming
-the result-oriented entry point to Task.Run and adding instance Thread.Start are
-separate API changes to evaluate; the namespace rename alone does not implement them.
+The completion queue is selected at construction, using the current queue or its
+default. Starting in another queue does not change the Task's dispatcher. A
+successful Task completion includes joining the dedicated native thread, including
+host teardown. Invocation exit retains responsibility for cancelling and joining
+outstanding workers even if the guest Thread object becomes unreachable.
+
+This still uses static, uncaptured `Func<string, string>` callbacks and isolated
+guest heaps. It does **not** implement arbitrary result types, shared objects,
+per-thread cancellation, naming, priorities or a general Task.Run. Queued joins
+can block the dispatcher. Callback faults remain invocation faults.
+`ThreadPool.Queue` remains the existing bounded worker API.
+
+Preview 9 retains `System.Threading.Thread.Start(callback, input)`. Development
+callers must change the namespace and use `Thread.Run`, or construct a Thread and
+call its instance Start. Rebuild applications with matching core metadata, library
+and bridge; no old namespace aliases or mixed-artifact compatibility are provided.
+Task/Promise remain in System.Tasks.
+
+See the [worker sample](experiments/raven-target/samples/library-workers.rvn) and
+[contract checks](experiments/task-contract/verify_workers.py). The general
+Task.Run model means **spawn work concurrently**: submission starts the operation;
+await observes its eventual completion, rather than starting it.
 
 ## Comparison and design questions
 

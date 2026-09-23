@@ -1,8 +1,17 @@
 # API documentation maintenance
 
 The `/docs/` section is built with pinned DocFX 2.80.1 (.NET 10). It describes the
-**Preview 9** API. The release goal is a navigable overview and useful descriptions
-of the main async APIs, not complete documentation of every library member.
+development API following **Preview 9**. Public APIs must have reference coverage;
+update descriptions, signatures, navigation and generated metadata in the same
+change as the API. The limited async overview was the Preview 9 release baseline,
+not a permanent exemption for other APIs.
+
+For each public API change, include the namespace/type in `filter.yml`, author useful
+XML documentation, refresh metadata from the current bridge, and check navigation
+from the API landing page to its type and members. Renames remove stale entries and
+record migration information. Renderer exclusions need a linked manual reference
+entry with the exact signature and behavior. Run the combined website build; passing
+snapshot hashes alone does not establish browsability or adequate descriptions.
 
 ## Build the complete website
 
@@ -50,9 +59,22 @@ that each included type/member has an XML summary and treats DocFX warnings as e
 
 ## Current scope and limitation
 
-`filter.yml` selects Task, Promise, TaskQueue and TaskState. Other feature areas have
+`filter.yml` selects Task, Promise, TaskQueue, TaskState and the public Thread/ThreadPool
+APIs in System.Concurrency. Other feature areas have
 an overview linking their on-site guides. TaskOutcome and supporting types are shown
 in signatures without implying complete reference coverage.
+
+Existing reference coverage gaps (not exemptions from the policy):
+
+- Arrays and collection interfaces/implementations, delegates, queries and operators.
+- Option/Result carriers, TaskOutcome and composition/propagation helpers.
+- Primitives, text/encoding, process/console, paths and whole-file helpers.
+- Time/calendar, introspection and public resource/interop contracts.
+
+Backfill these as each area is developed. The next Storage/Streams slice must include
+its public reference pages from the start. Feature guides remain useful context but
+do not count as member reference coverage. Internal bootstrap/runtime services are
+not public application APIs and do not belong in the application reference.
 
 DocFX 2.80.1 fails in `YamlModelGenerator.AddSpecReference` when Roslyn sees the
 neoCLR-specific `Func<System.Void>` argument. The filter excludes exactly Post, Run

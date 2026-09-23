@@ -246,6 +246,6 @@
     <Compile Include="src/System/Tasks/TaskOperators.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Workers'">
-    <Compile Include="src/System/Threading/Workers.rvn" />
+    <Compile Include="src/System/Concurrency/Workers.rvn" />
   </ItemGroup>
 </Project>

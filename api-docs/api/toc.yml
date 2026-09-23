@@ -1,5 +1,15 @@
 ### YamlMime:TableOfContent
 items:
+- uid: System.Concurrency
+  name: System.Concurrency
+  type: Namespace
+  items:
+  - uid: System.Concurrency.Thread
+    name: Thread
+    type: Class
+  - uid: System.Concurrency.ThreadPool
+    name: ThreadPool
+    type: Class
 - uid: System.Tasks
   name: System.Tasks
   type: Namespace

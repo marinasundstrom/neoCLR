@@ -25,6 +25,49 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-23 — Public API documentation policy
+
+**Author direction.** Add System.Concurrency to the API docs, keep documentation
+updated as policy, and make it easily browsable. The author clarified: “So APIs
+should be covered by the API docs”.
+
+**Assistant action.** Added the namespace and Thread/ThreadPool member pages,
+namespace links on the reference landing page, and an API-wide navigation label.
+Recorded the requirement in AGENTS.md and the maintenance guide: public API changes
+include reference coverage; renderer exceptions need linked manual entries. Listed
+older coverage gaps explicitly rather than claiming the existing Tasks-focused
+reference covers the whole library. Backfilling those gaps remains work.
+
+## 2026-09-23 — Post-release concurrency, Storage and file streams
+
+**Author direction.** Implement the concurrency rename, Task.Run and explicit
+Thread APIs, Storage File/Directory abstractions, and a first Stream API for file
+access. The requested end product is an application reading and writing disk files.
+
+**Clarification.** Asked whether Task/Promise should remain in System.Tasks, the
+author answered: “Keep System.Tasks; move Thread to System.Concurrency”.
+
+**Assistant action.** Updated the authoritative roadmap with that sequence and
+started the concurrency implementation. The retained Thread owns its completion
+Task before Start; native completion must include thread teardown. Storage and
+Streams implementation and the end-to-end file application remain pending.
+**Subsequent author correction.** Task.Run should have overloads and return values,
+“just like in .NET”; the author expects to revisit it with a clear suspension and
+scheduling model. The assistant removed the uncommitted string-only Task.Run
+facade and recorded the broader contract as pending design, including captured
+state and async-delegate behavior. The author further described Task.Run as “spawn work concurrently”. The assistant
+recorded that submission starts work and await observes completion. This does not
+defer explicit Thread, Storage or Streams work.
+
+**Implementation outcome.** Explicit Thread now retains its pending Task before
+Start, rejects a second start and completes on the construction queue after native
+thread termination. Eight source contract cases and eleven default-queue cases
+pass. Runtime/API snapshots and development documentation were refreshed. The
+website retains its Preview 9 worker sample separately from the development API.
+Storage, Streams and the final file application remain pending.
+
+See [the checkpoint](platform-roadmap.md#post-release-concurrency-direction--2026-09-23).
+
 ## 2026-09-23 — Continue async release preparation
 
 **Author request.** “Continue with the release”.

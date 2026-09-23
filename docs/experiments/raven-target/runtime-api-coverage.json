@@ -1944,7 +1944,7 @@
   ],
   "targetProfileAdditions": [
     {
-      "file": "runtime/raven/src/System/Threading/Workers.rvn",
+      "file": "runtime/raven/src/System/Concurrency/Workers.rvn",
       "disposition": "provisional-isolated-workers",
       "samples": [
         "library-workers.rvn"

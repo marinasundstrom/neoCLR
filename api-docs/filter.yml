@@ -1,5 +1,7 @@
 apiRules:
 - exclude:
+    uidRegex: '^System\.Concurrency\.ThreadPool\.#ctor'
+- exclude:
     uidRegex: '^System\.Tasks\.(TaskQueue\.(Post|Run)|Task`1\.OnCompleted)(\(|$)'
     type: Method
 - include:
@@ -7,5 +9,10 @@ apiRules:
     type: Namespace
 - include:
     uidRegex: '^System\.Tasks\.(Task`1|Promise`1|TaskQueue|TaskState)($|\.)'
+- include:
+    uidRegex: '^System\.Concurrency$'
+    type: Namespace
+- include:
+    uidRegex: '^System\.Concurrency\.(Thread|ThreadPool)($|\.)'
 - exclude:
     uidRegex: '.*'

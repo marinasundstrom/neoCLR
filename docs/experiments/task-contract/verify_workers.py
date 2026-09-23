@@ -16,18 +16,62 @@ samples = parent / 'samples' if (parent / 'samples').is_dir() else parent / 'rav
 sample = samples / 'library-workers.rvn'
 prelude = '''import System.*
 import System.Tasks.*
-import System.Threading.*
+import System.Concurrency.*
 import System.Console.*
 public func Echo(value: string) -> string => value
 '''
 cases = [
+    ('Retained Thread lifecycle', prelude + '''public async func Work() -> Task<unit> {
+        let thread = Thread(Echo, "tracked thread")
+        let completion = thread.Task
+        if thread.IsStarted || completion.IsCompleted {
+            System.Fault("started too soon")
+        }
+        thread.Start()
+        if !thread.IsStarted {
+            System.Fault("missing start state")
+        }
+        WriteLine(await completion)
+        WriteLine(await thread.Task)
+        return ()
+    }
+    func Main() {
+        let queue = TaskQueue()
+        queue.Run(() => {
+            _ = Work()
+        })
+    }''', 'tracked thread\ntracked thread\n', None),
+    ('Construction queue retained across start scope', prelude + '''func Main() {
+        let thread = Thread(Echo, "construction queue")
+        let other = TaskQueue()
+        other.Run(() => {
+            thread.Start()
+        })
+        if thread.Task.IsCompleted {
+            System.Fault("completion moved to start queue")
+        }
+        TaskQueue.Default.Drain()
+        WriteLine(thread.Task.GetResult())
+    }''', 'construction queue\n', None),
+    ('Never-started thread stays pending', prelude + '''func Main() {
+        let thread = Thread(Echo, "not started")
+        TaskQueue.Default.Drain()
+        if thread.IsStarted || thread.Task.IsCompleted {
+            System.Fault("unstarted thread made progress")
+        }
+    }''', '', None),
+    ('Starting twice rejected', prelude + '''func Main() {
+        let thread = Thread(Echo, "input")
+        thread.Start()
+        thread.Start()
+    }''', '', 'Thread has already been started'),
     ('Await dedicated and pooled tasks', sample.read_text(), 'Hello, thread\nHello, pool\n', None),
     ('Captured state rejected', prelude + '''func Main() {
         let queue = TaskQueue()
         let suffix = "!"
-        queue.Run(() => { _ = Thread.Start(value => value + suffix, "input") })
+        queue.Run(() => { _ = Thread.Run(value => value + suffix, "input") })
     }''', '', 'cannot capture guest state'),
-    ('Default queue without explicit scope', prelude + 'func Main() { _ = Thread.Start(Echo, "input") }', '', None),
+    ('Default queue without explicit scope', prelude + 'func Main() { _ = Thread.Run(Echo, "input") }', '', None),
     ('Multiple pool jobs', prelude + '''
 public async func Work() -> Task<unit> {
     let first = ThreadPool.Queue(Echo, "one")

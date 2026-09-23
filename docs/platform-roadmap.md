@@ -22,8 +22,8 @@ An explicit author instruction takes precedence, including a bounded task outsid
 the current milestone. Such a task does not silently reorder the entire roadmap;
 record a lasting change in direction when the author makes one.
 
-When choosing work autonomously, follow the immediate checkpoint below: stabilize
-the async/Tasks preview, then resume the next useful bounded case within M1.
+When choosing work autonomously, follow the immediate checkpoint below: complete the post-release concurrency, Storage and file Stream checkpoint below
+within M1. The async/Tasks preview has shipped.
 The early memory-copy checkpoint has evidence; sockets and HTTP remain later.
 Use the progression below and its detailed plan for validation.
 Later milestone candidates remain provisional: listing them here does not authorize
@@ -100,25 +100,35 @@ This is a release-engineering follow-up, not a change to the feature sequence.
 
 ## Post-release concurrency direction — 2026-09-23
 
-The author directs renaming `System.Threading` to `System.Concurrency` after this
-release. System.Concurrency covers concurrency including threading; Thread remains
-an explicit thread API. Thread support may be platform-dependent and could later ship in an optional
-`System.Concurrency.Threads` package; that name does not determine its namespace.
-Distinguish general result-oriented submission, now proposed as `Task.Run(...)`,
-from constructing a tracked Thread,
-calling `Start()` and awaiting its `Task`. These API shapes are proposed, while the
-post-release namespace rename is selected. See [concurrency direction](concurrency-direction.md)
-for current limitations, .NET comparisons, migration questions and two sample cases.
-The author further directs an abstraction-first platform: concurrency must not
-require threads. Explore portable worker/Task-oriented execution while exposing
-Thread as a lower-level target capability only where appropriate. WebAssembly is
-a candidate for a workers/tasks surface without Thread, not a settled target policy.
-The author confirms Task as a general abstraction and API that will provide concurrent
-work submission independent of threads, illustrated by Task.Run. Execution depends
-on the target; WebAssembly might use Web Workers behind this API. Define progress,
-isolation and capability guarantees while preserving that platform-independent role.
-Keep release stabilization immediate and Streams, Storage and Encoding before
-networking; the full thread lifecycle design is not a new release prerequisite.
+The author selects the next implementation checkpoint in this order:
+
+1. Rename `System.Threading` to `System.Concurrency`, keeping `Task` and `Promise`
+   in **`System.Tasks`** (explicit author clarification).
+2. Add explicit `Thread.Run` and a retained `Thread` with instance `Start()` and an
+   awaitable `Task`. Design the general `Task.Run` overload family (completion-only
+   and value-producing callbacks, as in .NET) alongside suspension and scheduling;
+   do not substitute the existing string-only worker adapter for that contract.
+3. Implement the first `System.Storage` File/Directory abstractions from the proposals.
+4. Implement the first `System.Streams` capabilities for file access.
+
+**Acceptance product: an application that writes and reads a real disk file.**
+Implement and validate smaller cases along the way; proposals remain design inputs.
+The explicit Thread slice is implemented and checked: retained Task before Start,
+one-shot Start, construction-queue affinity and native termination before completion.
+Evidence: [worker sample](experiments/raven-target/samples/library-workers.rvn),
+[eight contract cases](experiments/task-contract/verify_workers.py), default-queue
+regressions and Rust worker tests. Task/Promise remain in System.Tasks. The next
+bounded task is Storage and file Stream resource ownership; those APIs and the
+acceptance application remain pending. Preserve typed errors and explicit resource ownership in the file slice.
+Networking remains later.
+
+Task represents work independently of an OS thread. The current host can submit to
+isolated worker threads; a future WebAssembly host might use Web Workers. Explicit
+Thread is a target capability and may be unavailable. An optional package named
+`System.Concurrency.Threads` remains a packaging possibility, not a namespace choice.
+See [concurrency direction](concurrency-direction.md) for .NET comparisons and
+current callback/isolation limits. General .NET-style shared-memory callbacks and
+arbitrary result types are not implied by the first bounded worker implementation.
 
 ## Progressive delivery before networking — revised 2026-09-23
 

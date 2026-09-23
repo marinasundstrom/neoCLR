@@ -1,17 +1,41 @@
-namespace System.Threading
+namespace System.Concurrency
 
 import System.*
 import System.Tasks.*
 import System.Runtime.CompilerServices.*
 
 public class Thread {
-    static func Start(callback: Func<string, string>, input: string) -> Task<string> {
-        let source = Promise<string>()
-        let queue = RuntimeServices.CurrentTaskQueue
+    private field callback: Func<string, string>
+    private field input: string
+    private field source: Promise<string>
+    private field started: bool
+    private field queue: TaskQueue
+
+    init(callback: Func<string, string>, input: string) {
+        self.callback = callback
+        self.input = input
+        source = Promise<string>()
+        queue = RuntimeServices.CurrentTaskQueue
+        started = false
+    }
+
+    val Task: Task<string> => source.Task
+    val IsStarted: bool => started
+
+    func Start() {
+        if started {
+            System.Fault("Thread has already been started")
+        }
         let handle = RuntimeServices.StartWorker(callback, input)
+        started = true
         let completion = WorkerCompletion(handle, source)
         queue.Post(completion.Complete)
-        return source.Task
+    }
+
+    static func Run(callback: Func<string, string>, input: string) -> Task<string> {
+        let thread = Thread(callback, input)
+        thread.Start()
+        return thread.Task
     }
 }
 

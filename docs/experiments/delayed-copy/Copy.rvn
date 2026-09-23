@@ -2,14 +2,14 @@ import System.*
 import System.Console.*
 import System.Tasks.*
 import System.Text.*
-import System.Threading.*
+import System.Concurrency.*
 
 // The isolated producer exchanges owned text. It never receives guest storage.
 func Produce(input: string) -> string => input
 
 async func BeginCopy() -> Task<int> {
     let destination: byte[] = [(byte)0, (byte)0, (byte)0]
-    let text = await Thread.Start(Produce, "Hi!")
+    let text = await Thread.Run(Produce, "Hi!")
     let bytes = Utf8.Encode(text)
     if bytes.Count > destination.Length {
         return 0

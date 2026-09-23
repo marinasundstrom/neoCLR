@@ -1,12 +1,14 @@
 import System.*
-import System.Threading.*
+import System.Concurrency.*
 import System.Tasks.*
 import System.Console.*
 
 public func Greet(name: string) -> string => "Hello, " + name
 
 public async func RunWorkers() -> Task<unit> {
-    let first = Thread.Start(Greet, "thread")
+    let thread = Thread(Greet, "thread")
+    let first = thread.Task
+    thread.Start()
     let second = ThreadPool.Queue(Greet, "pool")
     WriteLine(await first)
     WriteLine(await second)

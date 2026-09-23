@@ -101,5 +101,45 @@
     <member name="F:System.Tasks.TaskState.Cancelled">
       <summary>The producer cancelled the task. This state is terminal.</summary>
     </member>
+    <member name="T:System.Concurrency.Thread">
+      <summary>An explicit, isolated host thread with a retained completion task.</summary>
+      <remarks>Development after Preview 9. Accepts an uncaptured string-to-string callback. Construction selects the completion queue but does not start work. Guest objects do not cross thread boundaries.</remarks>
+    </member>
+    <member name="M:System.Concurrency.Thread.#ctor(System.Func{System.String,System.String},System.String)">
+      <summary>Creates an unstarted thread and its pending completion task.</summary>
+      <remarks>The active TaskQueue, or the invocation default, is selected at construction. A never-started thread allocates no native thread.</remarks>
+      <param name="callback">A static function with no captured receiver, taking copied input text and returning result text.</param>
+      <param name="input">Text copied into the isolated worker invocation.</param>
+    </member>
+    <member name="P:System.Concurrency.Thread.Task">
+      <summary>Gets the stable task containing the callback result after thread termination.</summary>
+      <remarks>Pending before Start. Successful completion includes native thread cleanup. Callback faults terminate the invocation rather than producing a faulted task.</remarks>
+    </member>
+    <member name="P:System.Concurrency.Thread.IsStarted">
+      <summary>Gets whether native thread submission has succeeded.</summary>
+      <remarks>Remains true after termination. This is not a running-state property.</remarks>
+    </member>
+    <member name="M:System.Concurrency.Thread.Start">
+      <summary>Starts this thread once.</summary>
+      <remarks>A second call faults. The callback must be static and cannot capture guest state. Completion is dispatched on the queue selected at construction; its queued join may block.</remarks>
+    </member>
+    <member name="M:System.Concurrency.Thread.Run(System.Func{System.String,System.String},System.String)">
+      <summary>Creates and starts a dedicated thread and returns its completion task.</summary>
+      <remarks>Equivalent to construction, Start, and reading Task. This is explicit thread creation, not the planned platform-selected Task.Run API.</remarks>
+      <param name="callback">A static function with no captured receiver, taking copied input text and returning result text.</param>
+      <param name="input">Text copied into the isolated worker invocation.</param>
+      <returns>A task for the copied result text, completed on the selected dispatcher.</returns>
+    </member>
+    <member name="T:System.Concurrency.ThreadPool">
+      <summary>Provides the bounded isolated worker-pool API.</summary>
+      <remarks>Development namespace after Preview 9. The current invocation owns two reusable native workers and admits at most 64 jobs across dedicated and pooled submissions.</remarks>
+    </member>
+    <member name="M:System.Concurrency.ThreadPool.Queue(System.Func{System.String,System.String},System.String)">
+      <summary>Submits an uncaptured string-to-string callback to the invocation worker pool.</summary>
+      <remarks>Input and result are copied strings. Completion uses the active or default TaskQueue. This restricted worker API does not define the future general Task.Run contract.</remarks>
+      <param name="callback">A static function with no captured receiver, taking copied input text and returning result text.</param>
+      <param name="input">Text copied into the isolated worker invocation.</param>
+      <returns>A task for the copied result text, completed on the selected dispatcher.</returns>
+    </member>
   </members>
 </doc>

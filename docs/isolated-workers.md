@@ -1,12 +1,18 @@
 # Isolated workers: development PoC
 
-This is development work after Preview 8. It starts [System.Tasks](task-contracts.md) work on isolated OS threads; it is not
+This describes development after Preview 9. It starts [System.Tasks](task-contracts.md) work on isolated OS threads; it is not
 a shared-object threading model.
 
-| API in System.Threading | Current behavior |
+| API in System.Concurrency | Current behavior |
 | --- | --- |
-| Thread.Start(callback, input) | Start a dedicated OS thread; return Task<string>. |
+| Thread.Run(callback, input) | Start a dedicated OS thread; return Task<string>. |
 | ThreadPool.Queue(callback, input) | Submit to an invocation-owned pool of two reusable OS threads; return Task<string>. |
+
+Constructing `Thread(callback, input)` provides a retained object. Its `Task` is
+pending before `Start()`; starting twice faults. The completion queue is selected
+at construction. Successful completion includes native thread termination. A
+never-started thread owns no native resource. Preview 9 used the old namespace
+and static `Thread.Start`; rebuild callers for the development API.
 
 The callback is a static `Func<string, string>` with no captured receiver. Named
 functions are the clearest current spelling. Input and result text are owned copies;

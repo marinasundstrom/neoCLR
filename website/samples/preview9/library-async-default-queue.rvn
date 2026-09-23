@@ -1,12 +1,12 @@
 import System.*
 import System.Tasks.*
-import System.Concurrency.*
+import System.Threading.*
 import System.Console.*
 
 func Describe(input: string) -> string => input + " on a worker"
 
 async func Show() -> Task<unit> {
-    let text = await Thread.Run(Describe, "Hello")
+    let text = await Thread.Start(Describe, "Hello")
     WriteLine(text)
     return ()
 }

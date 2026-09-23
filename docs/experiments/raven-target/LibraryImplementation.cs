@@ -20,9 +20,9 @@ static class LibraryImplementation
         ReadonlyReceivers.Clear();
         if (owner != "System" && !Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
             throw new InvalidDataException("Invalid library owner.");
-        if (owner == "System.Threading.Thread")
+        if (owner == "System.Concurrency.Thread")
         {
-            var names = new[] { "System.Threading.Thread", "System.Threading.ThreadPool", "System.Threading.WorkerCompletion" };
+            var names = new[] { "System.Concurrency.Thread", "System.Concurrency.ThreadPool", "System.Concurrency.WorkerCompletion" };
             foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name);
             return names.SelectMany(name => InstanceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
         }

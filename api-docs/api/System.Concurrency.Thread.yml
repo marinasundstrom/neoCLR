@@ -1,0 +1,427 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Concurrency.Thread
+  commentId: T:System.Concurrency.Thread
+  id: Thread
+  parent: System.Concurrency
+  children:
+  - System.Concurrency.Thread.#ctor(System.Func{System.String,System.String},System.String)
+  - System.Concurrency.Thread.IsStarted
+  - System.Concurrency.Thread.Run(System.Func{System.String,System.String},System.String)
+  - System.Concurrency.Thread.Start
+  - System.Concurrency.Thread.Task
+  langs:
+  - csharp
+  - vb
+  name: Thread
+  nameWithType: Thread
+  fullName: System.Concurrency.Thread
+  type: Class
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Concurrency
+  summary: An explicit, isolated host thread with a retained completion task.
+  remarks: Development after Preview 9. Accepts an uncaptured string-to-string callback. Construction selects the completion queue but does not start work. Guest objects do not cross thread boundaries.
+  example: []
+  syntax:
+    content: public sealed class Thread
+    content.vb: Public NotInheritable Class Thread
+  inheritance:
+  - System.Object
+- uid: System.Concurrency.Thread.#ctor(System.Func{System.String,System.String},System.String)
+  commentId: M:System.Concurrency.Thread.#ctor(System.Func{System.String,System.String},System.String)
+  id: '#ctor(System.Func{System.String,System.String},System.String)'
+  parent: System.Concurrency.Thread
+  langs:
+  - csharp
+  - vb
+  name: Thread(Func<string, string>, string)
+  nameWithType: Thread.Thread(Func<string, string>, string)
+  fullName: System.Concurrency.Thread.Thread(System.Func<string, string>, string)
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Concurrency
+  summary: Creates an unstarted thread and its pending completion task.
+  remarks: The active TaskQueue, or the invocation default, is selected at construction. A never-started thread allocates no native thread.
+  example: []
+  syntax:
+    content: public Thread(Func<string, string> callback, string input)
+    parameters:
+    - id: callback
+      type: System.Func{System.String,System.String}
+      description: A static function with no captured receiver, taking copied input text and returning result text.
+    - id: input
+      type: System.String
+      description: Text copied into the isolated worker invocation.
+    content.vb: Public Sub New(callback As Func(Of String, String), input As String)
+  overload: System.Concurrency.Thread.#ctor*
+  nameWithType.vb: Thread.New(Func(Of String, String), String)
+  fullName.vb: System.Concurrency.Thread.New(System.Func(Of String, String), String)
+  name.vb: New(Func(Of String, String), String)
+- uid: System.Concurrency.Thread.Start
+  commentId: M:System.Concurrency.Thread.Start
+  id: Start
+  parent: System.Concurrency.Thread
+  langs:
+  - csharp
+  - vb
+  name: Start()
+  nameWithType: Thread.Start()
+  fullName: System.Concurrency.Thread.Start()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Concurrency
+  summary: Starts this thread once.
+  remarks: A second call faults. The callback must be static and cannot capture guest state. Completion is dispatched on the queue selected at construction; its queued join may block.
+  example: []
+  syntax:
+    content: public void Start()
+    content.vb: Public Sub Start()
+  overload: System.Concurrency.Thread.Start*
+- uid: System.Concurrency.Thread.Run(System.Func{System.String,System.String},System.String)
+  commentId: M:System.Concurrency.Thread.Run(System.Func{System.String,System.String},System.String)
+  id: Run(System.Func{System.String,System.String},System.String)
+  parent: System.Concurrency.Thread
+  langs:
+  - csharp
+  - vb
+  name: Run(Func<string, string>, string)
+  nameWithType: Thread.Run(Func<string, string>, string)
+  fullName: System.Concurrency.Thread.Run(System.Func<string, string>, string)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Concurrency
+  summary: Creates and starts a dedicated thread and returns its completion task.
+  remarks: Equivalent to construction, Start, and reading Task. This is explicit thread creation, not the planned platform-selected Task.Run API.
+  example: []
+  syntax:
+    content: public static Task<string> Run(Func<string, string> callback, string input)
+    parameters:
+    - id: callback
+      type: System.Func{System.String,System.String}
+      description: A static function with no captured receiver, taking copied input text and returning result text.
+    - id: input
+      type: System.String
+      description: Text copied into the isolated worker invocation.
+    return:
+      type: System.Tasks.Task{System.String}
+      description: A task for the copied result text, completed on the selected dispatcher.
+    content.vb: Public Shared Function Run(callback As Func(Of String, String), input As String) As Task(Of String)
+  overload: System.Concurrency.Thread.Run*
+  nameWithType.vb: Thread.Run(Func(Of String, String), String)
+  fullName.vb: System.Concurrency.Thread.Run(System.Func(Of String, String), String)
+  name.vb: Run(Func(Of String, String), String)
+- uid: System.Concurrency.Thread.Task
+  commentId: P:System.Concurrency.Thread.Task
+  id: Task
+  parent: System.Concurrency.Thread
+  langs:
+  - csharp
+  - vb
+  name: Task
+  nameWithType: Thread.Task
+  fullName: System.Concurrency.Thread.Task
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Concurrency
+  summary: Gets the stable task containing the callback result after thread termination.
+  remarks: Pending before Start. Successful completion includes native thread cleanup. Callback faults terminate the invocation rather than producing a faulted task.
+  example: []
+  syntax:
+    content: public Task<string> Task { get; }
+    parameters: []
+    return:
+      type: System.Tasks.Task{System.String}
+    content.vb: Public ReadOnly Property Task As Task(Of String)
+  overload: System.Concurrency.Thread.Task*
+- uid: System.Concurrency.Thread.IsStarted
+  commentId: P:System.Concurrency.Thread.IsStarted
+  id: IsStarted
+  parent: System.Concurrency.Thread
+  langs:
+  - csharp
+  - vb
+  name: IsStarted
+  nameWithType: Thread.IsStarted
+  fullName: System.Concurrency.Thread.IsStarted
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Concurrency
+  summary: Gets whether native thread submission has succeeded.
+  remarks: Remains true after termination. This is not a running-state property.
+  example: []
+  syntax:
+    content: public bool IsStarted { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public ReadOnly Property IsStarted As Boolean
+  overload: System.Concurrency.Thread.IsStarted*
+references:
+- uid: System.Concurrency
+  commentId: N:System.Concurrency
+  isExternal: true
+  href: System.html
+  name: System.Concurrency
+  nameWithType: System.Concurrency
+  fullName: System.Concurrency
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Concurrency
+    name: Concurrency
+    isExternal: true
+    href: System.Concurrency.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Concurrency
+    name: Concurrency
+    isExternal: true
+    href: System.Concurrency.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Concurrency.Thread.#ctor*
+  commentId: Overload:System.Concurrency.Thread.#ctor
+  isExternal: true
+  href: System.Concurrency.Thread.html#System_Concurrency_Thread__ctor_System_Func_System_String_System_String__System_String_
+  name: Thread
+  nameWithType: Thread.Thread
+  fullName: System.Concurrency.Thread.Thread
+  nameWithType.vb: Thread.New
+  fullName.vb: System.Concurrency.Thread.New
+  name.vb: New
+- uid: System.Func{System.String,System.String}
+  commentId: T:System.Func{System.String,System.String}
+  parent: System
+  definition: System.Func`2
+  name: Func<string, string>
+  nameWithType: Func<string, string>
+  fullName: System.Func<string, string>
+  nameWithType.vb: Func(Of String, String)
+  fullName.vb: System.Func(Of String, String)
+  name.vb: Func(Of String, String)
+  spec.csharp:
+  - uid: System.Func`2
+    name: Func
+    isExternal: true
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: string
+    isExternal: true
+  - name: '>'
+  spec.vb:
+  - uid: System.Func`2
+    name: Func
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+  - name: )
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System.Func`2
+  commentId: T:System.Func`2
+  isExternal: true
+  name: Func<T0, TResult>
+  nameWithType: Func<T0, TResult>
+  fullName: System.Func<T0, TResult>
+  nameWithType.vb: Func(Of T0, TResult)
+  fullName.vb: System.Func(Of T0, TResult)
+  name.vb: Func(Of T0, TResult)
+  spec.csharp:
+  - uid: System.Func`2
+    name: Func
+    isExternal: true
+  - name: <
+  - name: T0
+  - name: ','
+  - name: " "
+  - name: TResult
+  - name: '>'
+  spec.vb:
+  - uid: System.Func`2
+    name: Func
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T0
+  - name: ','
+  - name: " "
+  - name: TResult
+  - name: )
+- uid: System.Concurrency.Thread.Start*
+  commentId: Overload:System.Concurrency.Thread.Start
+  isExternal: true
+  href: System.Concurrency.Thread.html#System_Concurrency_Thread_Start
+  name: Start
+  nameWithType: Thread.Start
+  fullName: System.Concurrency.Thread.Start
+- uid: System.Concurrency.Thread.Run*
+  commentId: Overload:System.Concurrency.Thread.Run
+  isExternal: true
+  href: System.Concurrency.Thread.html#System_Concurrency_Thread_Run_System_Func_System_String_System_String__System_String_
+  name: Run
+  nameWithType: Thread.Run
+  fullName: System.Concurrency.Thread.Run
+- uid: System.Tasks.Task{System.String}
+  commentId: T:System.Tasks.Task{System.String}
+  parent: System.Tasks
+  definition: System.Tasks.Task`1
+  href: System.Tasks.Task-1.html
+  name: Task<string>
+  nameWithType: Task<string>
+  fullName: System.Tasks.Task<string>
+  nameWithType.vb: Task(Of String)
+  fullName.vb: System.Tasks.Task(Of String)
+  name.vb: Task(Of String)
+  spec.csharp:
+  - uid: System.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: System.Tasks.Task-1.html
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+  - name: '>'
+  spec.vb:
+  - uid: System.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: System.Tasks.Task-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+  - name: )
+- uid: System.Tasks.Task`1
+  commentId: T:System.Tasks.Task`1
+  parent: System.Tasks
+  isExternal: true
+  href: System.Tasks.Task-1.html
+  name: Task<T>
+  nameWithType: Task<T>
+  fullName: System.Tasks.Task<T>
+  nameWithType.vb: Task(Of T)
+  fullName.vb: System.Tasks.Task(Of T)
+  name.vb: Task(Of T)
+  spec.csharp:
+  - uid: System.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: System.Tasks.Task-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: System.Tasks.Task-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Tasks
+  commentId: N:System.Tasks
+  isExternal: true
+  href: System.html
+  name: System.Tasks
+  nameWithType: System.Tasks
+  fullName: System.Tasks
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Tasks
+    name: Tasks
+    isExternal: true
+    href: System.Tasks.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Tasks
+    name: Tasks
+    isExternal: true
+    href: System.Tasks.html
+- uid: System.Concurrency.Thread.Task*
+  commentId: Overload:System.Concurrency.Thread.Task
+  isExternal: true
+  href: System.Concurrency.Thread.html#System_Concurrency_Thread_Task
+  name: Task
+  nameWithType: Thread.Task
+  fullName: System.Concurrency.Thread.Task
+- uid: System.Concurrency.Thread.IsStarted*
+  commentId: Overload:System.Concurrency.Thread.IsStarted
+  isExternal: true
+  href: System.Concurrency.Thread.html#System_Concurrency_Thread_IsStarted
+  name: IsStarted
+  nameWithType: Thread.IsStarted
+  fullName: System.Concurrency.Thread.IsStarted
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean

@@ -8,6 +8,23 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Require on-site reference coverage for public API changes, including namespace
+  navigation and documented renderer exclusions. Add System.Concurrency Thread and
+  ThreadPool reference pages, a namespace browsing index, and an explicit backlog
+  for older APIs that still lack member reference coverage.
+
+- Select the post-release concurrency, Storage and file-stream checkpoint. Keep
+  Task/Promise in System.Tasks; move explicit thread APIs to System.Concurrency.
+  Add retained Thread instances with one-shot Start, IsStarted and a stable Task,
+  plus static Thread.Run; successful completion waits for native thread teardown.
+  Update bindings, samples, generated library, API docs and the development website
+  section. Preserve the website's tested Preview 9 worker example. This breaks the
+  old namespace and static Thread.Start spelling; rebuild with matching artifacts.
+  The Storage/Stream APIs and disk read/write acceptance app remain pending.
+  Task.Run will need completion-only and generic
+  value-returning overloads; keep it pending suspension/scheduling design rather
+  than publishing a string-only worker facade.
+
 - Skip the runtime matrix for documentation, website and API-reference-only pushes
   and pull requests; keep executable experiments covered and provide manual runs.
   Release tags no longer automatically repeat the validated candidate matrix.

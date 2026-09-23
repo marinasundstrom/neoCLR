@@ -13,7 +13,7 @@ SLICES = {
     'TaskOutcome': 'System.Tasks.TaskOutcome',
     'TaskState': 'System.Tasks.TaskState',
     'Tasks': 'System.Tasks.Task',
-    'Workers': 'System.Threading.Thread',
+    'Workers': 'System.Concurrency.Thread',
 
     'Array': 'System.Array',
     'Object': 'System.Object',
@@ -103,7 +103,7 @@ SOURCES = {
     'TaskOutcome': 'runtime/raven/src/System/Tasks/TaskOutcome.rvn',
     'TaskState': 'runtime/raven/src/System/Tasks/TaskState.rvn',
     'Tasks': 'runtime/raven/src/System/Tasks/Tasks.rvn',
-    'Workers': 'runtime/raven/src/System/Threading/Workers.rvn',
+    'Workers': 'runtime/raven/src/System/Concurrency/Workers.rvn',
 
     'Array': 'runtime/raven/src/System/Array.rvn',
     'Object': 'runtime/raven/src/System/Object.rvn',

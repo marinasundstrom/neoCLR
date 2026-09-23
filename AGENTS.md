@@ -106,3 +106,22 @@ See [the changelog workflow](docs/changelog.md) for consolidation and release ha
   development work and proposals distinctly from published product capabilities.
 - Website validation runs on relevant pushes/PRs. Publication is a separate manual
   workflow on main; do not treat a code push or successful local build as deployment.
+
+## API reference documentation
+
+- Public APIs must be covered by the on-site API reference at `/docs/`. Update
+  documentation in the same change that adds, changes, renames or removes an API;
+  a feature overview alone does not replace type and member documentation.
+- Keep signatures, useful XML summaries, parameters/results, errors, limitations
+  and examples aligned with the implemented contract. Distinguish development APIs
+  from published releases and proposals. Never document a planned API as shipped.
+- Keep namespace/type navigation and the API landing page browsable. New public
+  APIs must be included in the DocFX selection, with generated metadata and the
+  snapshot refreshed from the matching reference assembly.
+- If DocFX cannot render a signature, provide a linked manual reference entry and
+  record the exact exclusion and reason. Do not silently omit public APIs. Track
+  existing coverage gaps explicitly in [API documentation maintenance](api-docs/README.md)
+  and close them as those areas are developed.
+- Validate the API snapshot and build the combined website before committing API
+  changes. Follow [the maintenance procedure](api-docs/README.md); publication remains
+  a separate manual operation.

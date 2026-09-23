@@ -1,7 +1,9 @@
 # neoCLR API reference
 
 neoCLR is an **experimental application platform**. This reference describes the
-Preview 9 API, starting with Tasks. Names and contracts remain experimental;
+development API following Preview 9, starting with Tasks and explicit threads.
+The new System.Concurrency APIs require matching development artifacts; Preview 9
+downloads retain System.Threading. Names and contracts remain experimental;
 this reference does not promise compatibility with future releases.
 
 ## API overview
@@ -20,9 +22,21 @@ The feature guides explain current behavior and provide small Raven examples:
 | [Introspection](/features/introspection/index.html) | Inspecting assemblies, types and members |
 
 Streams, broader Storage and Encoding APIs are upcoming work; networking follows
-those foundations. They are not implied by this API index. For this release, the
-goal is a useful overview and descriptions of the main async APIs, not exhaustive
-member coverage.
+those foundations. They are not implied by this API index. Reference coverage is
+being expanded beyond the initial Preview 9 async overview.
+
+## Browse namespaces
+
+| Namespace | Types and purpose |
+| --- | --- |
+| [System.Tasks](xref:System.Tasks) | Task, Promise, TaskQueue and completion state |
+| [System.Concurrency](xref:System.Concurrency) | Explicit Thread lifecycle and the isolated ThreadPool; development after Preview 9 |
+
+Use the API reference navigation to expand each namespace and select a type.
+Type pages list constructors, properties and methods with their descriptions.
+The reference is incomplete for older areas listed above; a feature guide is not
+full API coverage. Public APIs must gain reference coverage as they are added or
+changed, with existing gaps tracked in the maintenance plan.
 
 ## Start with Tasks
 
@@ -34,11 +48,20 @@ member coverage.
 Read the [Tasks feature guide](/features/tasks/index.html) for tested Raven
 examples, async/await, composition, workers and host cancellation. Those examples
 are the intended application syntax. This initial reference does not yet cover the
-rest of the library, worker APIs or composition extensions.
+rest of the library or composition extensions.
 
 Three methods accepting `Func<System.Void>` are documented in the
 [callback guide](callbacks.md). DocFX’s .NET metadata reader cannot currently
 render this neoCLR signature, so these methods are omitted from generated type pages.
+
+## Explicit threads in development
+
+[Thread](xref:System.Concurrency.Thread) represents an explicit isolated host thread:
+construct it, retain its pending Task, then call Start once. Thread.Run is a shortcut
+for immediate submission. Completion includes thread termination. The current
+callback still takes and returns strings and cannot capture guest objects.
+[ThreadPool](xref:System.Concurrency.ThreadPool) retains the bounded worker-pool API.
+Neither API implements the planned general Task.Run overload family.
 
 ## Reading generated declarations
 

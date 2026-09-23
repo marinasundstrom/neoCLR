@@ -14,7 +14,7 @@ parser.add_argument('--runtime', type=Path, required=True)
 args = parser.parse_args()
 prelude = '''import System.*
 import System.Tasks.*
-import System.Threading.*
+import System.Concurrency.*
 import System.Console.*
 public func Check(value: bool) { if !value { System.Fault("Default queue assertion failed") } }
 '''
@@ -87,7 +87,7 @@ public func Enqueue() {
     ('Dedicated and pooled workers need no queue setup', '''
 public func Echo(value: string) -> string => value + " worker"
 ''', '''
-    let first = Thread.Start(Echo, "dedicated")
+    let first = Thread.Run(Echo, "dedicated")
     let second = ThreadPool.Queue(Echo, "pooled")
     first.OnCompleted(() => WriteLine(first.GetResult()))
     second.OnCompleted(() => WriteLine(second.GetResult()))
@@ -98,7 +98,7 @@ public func Echo(value: string) -> string {
     return value
 }
 ''', '''
-    let answer = Thread.Start(Echo, "caller callback")
+    let answer = Thread.Run(Echo, "caller callback")
     answer.OnCompleted(() => WriteLine(answer.GetResult()))
 ''', 'worker callback\ncaller callback\n'),
 ]

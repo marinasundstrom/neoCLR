@@ -1,0 +1,32 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Concurrency
+  commentId: N:System.Concurrency
+  id: System.Concurrency
+  children:
+  - System.Concurrency.Thread
+  - System.Concurrency.ThreadPool
+  langs:
+  - csharp
+  - vb
+  name: System.Concurrency
+  nameWithType: System.Concurrency
+  fullName: System.Concurrency
+  type: Namespace
+  assemblies:
+  - NeoCLR.CoreProbe
+references:
+- uid: System.Concurrency.Thread
+  commentId: T:System.Concurrency.Thread
+  isExternal: true
+  href: System.Concurrency.Thread.html
+  name: Thread
+  nameWithType: Thread
+  fullName: System.Concurrency.Thread
+- uid: System.Concurrency.ThreadPool
+  commentId: T:System.Concurrency.ThreadPool
+  isExternal: true
+  href: System.Concurrency.ThreadPool.html
+  name: ThreadPool
+  nameWithType: ThreadPool
+  fullName: System.Concurrency.ThreadPool

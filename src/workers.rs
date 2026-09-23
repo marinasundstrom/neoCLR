@@ -84,6 +84,7 @@ fn execute(mut job: Job) {
     let _ = job.reply.send(result);
 }
 struct WorkerResult {
+    thread: Option<JoinHandle<()>>,
     receive: Option<mpsc::Receiver<Outcome>>,
     ready: Option<Outcome>,
     notification: Option<Value>,
@@ -145,6 +146,7 @@ impl Workers {
             },
             reply,
         };
+        let mut dedicated = None;
         if pooled {
             if self.pool.is_none() {
                 let (send, receive) = mpsc::sync_channel::<Job>(64);
@@ -174,7 +176,7 @@ impl Workers {
                 .send(job)
                 .map_err(|_| Fault::new("Worker pool unavailable"))?;
         } else {
-            self.threads.push(
+            dedicated = Some(
                 std::thread::Builder::new()
                     .name("neoclr-thread".into())
                     .spawn(move || execute(job))
@@ -182,6 +184,7 @@ impl Workers {
             );
         }
         self.results.push(WorkerResult {
+            thread: dedicated,
             receive: Some(receive),
             ready: None,
             notification: None,
@@ -320,6 +323,13 @@ impl Workers {
             options.check_cancellation("Worker.Join", 0)?;
             match next {
                 Ok(outcome) => {
+                    // A dedicated thread is finished, including host cleanup, before
+                    // its Task can be completed on the invoking VM.
+                    if let Some(thread) = result.thread.take() {
+                        thread
+                            .join()
+                            .map_err(|_| Fault::new("Worker thread panicked"))?;
+                    }
                     let (value, lines) = outcome?;
                     // Keep worker output isolated until explicitly joined.
                     if let Some(console) = &options.console {
@@ -346,6 +356,11 @@ impl Drop for Workers {
     fn drop(&mut self) {
         self.cancellation.cancel();
         self.pool.take();
+        for result in &mut self.results {
+            if let Some(thread) = result.thread.take() {
+                let _ = thread.join();
+            }
+        }
         for thread in self.threads.drain(..) {
             let _ = thread.join();
         }
@@ -358,11 +373,39 @@ mod tests {
 
     fn pending(receive: mpsc::Receiver<Outcome>, marker: i32) -> WorkerResult {
         WorkerResult {
+            thread: None,
             receive: Some(receive),
             ready: None,
             notification: Some(Value::Int32(marker)),
             registered: true,
         }
+    }
+
+    #[test]
+    fn dedicated_join_waits_for_thread_cleanup() {
+        let (send, receive) = mpsc::channel();
+        let cleaned = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let finished = cleaned.clone();
+        let thread = std::thread::spawn(move || {
+            send.send(Ok(("done".into(), vec![]))).unwrap();
+            finished.store(true, std::sync::atomic::Ordering::Release);
+        });
+        let mut workers = Workers::default();
+        workers.results.push(WorkerResult {
+            thread: Some(thread),
+            receive: Some(receive),
+            ready: None,
+            notification: None,
+            registered: false,
+        });
+        let result = workers.join(
+            vec![Value::Int32(0)],
+            &mut vec![],
+            &ExecutionOptions::default(),
+        );
+        assert_eq!(result.unwrap(), Value::String("done".into()));
+        assert!(cleaned.load(std::sync::atomic::Ordering::Acquire));
+        assert!(workers.results[0].thread.is_none());
     }
 
     #[test]

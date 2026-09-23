@@ -2,19 +2,23 @@ using Mono.Cecil;
 
 static class WorkerBindings
 {
-    const string Prefix = "System.Threading.";
+    const string Prefix = "System.Concurrency.";
     public static bool IsName(string name) => name is Prefix + "Thread" or Prefix + "ThreadPool" or Prefix + "WorkerCompletion";
     public static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
     public const string Declarations = """
-        namespace Threading {
+        namespace Concurrency {
             public sealed class WorkerCompletion {
                 public WorkerCompletion(int handle, Tasks.Promise<string> source) { }
                 public void Complete() { }
             }
             public sealed class Thread {
-                public static Tasks.Task<string> Start(Func<string, string> callback, string input) => default;
+                public Thread(Func<string, string> callback, string input) { }
+                public Tasks.Task<string> Task => default;
+                public bool IsStarted => default;
+                public void Start() { }
+                public static Tasks.Task<string> Run(Func<string, string> callback, string input) => default;
             }
             public sealed class ThreadPool {
                 public static Tasks.Task<string> Queue(Func<string, string> callback, string input) => default;
@@ -37,7 +41,11 @@ static class WorkerBindings
         var expected = (owner, definition.Name) switch {
             (Prefix + "WorkerCompletion", ".ctor") when library => ("Int32,System.Tasks.Promise<String>", "noresult", false),
             (Prefix + "WorkerCompletion", "Complete") when library => ("", "noresult", false),
-            (Prefix + "Thread", "Start") or (Prefix + "ThreadPool", "Queue") => ("System.Func<String,String>,String", "System.Tasks.Task<String>", true),
+            (Prefix + "Thread", "Run") or (Prefix + "ThreadPool", "Queue") => ("System.Func<String,String>,String", "System.Tasks.Task<String>", true),
+            (Prefix + "Thread", ".ctor") => ("System.Func<String,String>,String", "noresult", false),
+            (Prefix + "Thread", "Start") => ("", "noresult", false),
+            (Prefix + "Thread", "get_Task") => ("", "System.Tasks.Task<String>", false),
+            (Prefix + "Thread", "get_IsStarted") => ("", "Boolean", false),
             _ => throw new InvalidDataException("Unsupported worker member.")
         };
         if (definition.IsConstructor != construct || definition.IsStatic != expected.Item3

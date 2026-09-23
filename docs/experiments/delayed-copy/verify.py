@@ -42,8 +42,8 @@ def main():
 </Project>''')
         run(['dotnet', compiler, project, '--no-project-restore', '-o', root / 'compiled'])
         run(['dotnet', bridge, '--library-implementation', root / 'compiled/Workers.dll', core,
-             'System.Threading.Thread', root / 'imported'])
-        generated = fragments((root / 'imported/Implementation.neoil').read_text(), 'Workers', 'System.Threading.Thread')
+             'System.Concurrency.Thread', root / 'imported'])
+        generated = fragments((root / 'imported/Implementation.neoil').read_text(), 'Workers', 'System.Concurrency.Thread')
         system = (bundle / 'lib/System.neoil').read_text()
         for name, replacement in generated.items():
             original = (ROOT / 'runtime/raven/generated' / name).read_text()

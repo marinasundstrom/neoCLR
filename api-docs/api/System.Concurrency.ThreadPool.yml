@@ -1,0 +1,282 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Concurrency.ThreadPool
+  commentId: T:System.Concurrency.ThreadPool
+  id: ThreadPool
+  parent: System.Concurrency
+  children:
+  - System.Concurrency.ThreadPool.Queue(System.Func{System.String,System.String},System.String)
+  langs:
+  - csharp
+  - vb
+  name: ThreadPool
+  nameWithType: ThreadPool
+  fullName: System.Concurrency.ThreadPool
+  type: Class
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Concurrency
+  summary: Provides the bounded isolated worker-pool API.
+  remarks: Development namespace after Preview 9. The current invocation owns two reusable native workers and admits at most 64 jobs across dedicated and pooled submissions.
+  example: []
+  syntax:
+    content: public sealed class ThreadPool
+    content.vb: Public NotInheritable Class ThreadPool
+  inheritance:
+  - System.Object
+- uid: System.Concurrency.ThreadPool.Queue(System.Func{System.String,System.String},System.String)
+  commentId: M:System.Concurrency.ThreadPool.Queue(System.Func{System.String,System.String},System.String)
+  id: Queue(System.Func{System.String,System.String},System.String)
+  parent: System.Concurrency.ThreadPool
+  langs:
+  - csharp
+  - vb
+  name: Queue(Func<string, string>, string)
+  nameWithType: ThreadPool.Queue(Func<string, string>, string)
+  fullName: System.Concurrency.ThreadPool.Queue(System.Func<string, string>, string)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Concurrency
+  summary: Submits an uncaptured string-to-string callback to the invocation worker pool.
+  remarks: Input and result are copied strings. Completion uses the active or default TaskQueue. This restricted worker API does not define the future general Task.Run contract.
+  example: []
+  syntax:
+    content: public static Task<string> Queue(Func<string, string> callback, string input)
+    parameters:
+    - id: callback
+      type: System.Func{System.String,System.String}
+      description: A static function with no captured receiver, taking copied input text and returning result text.
+    - id: input
+      type: System.String
+      description: Text copied into the isolated worker invocation.
+    return:
+      type: System.Tasks.Task{System.String}
+      description: A task for the copied result text, completed on the selected dispatcher.
+    content.vb: Public Shared Function Queue(callback As Func(Of String, String), input As String) As Task(Of String)
+  overload: System.Concurrency.ThreadPool.Queue*
+  nameWithType.vb: ThreadPool.Queue(Func(Of String, String), String)
+  fullName.vb: System.Concurrency.ThreadPool.Queue(System.Func(Of String, String), String)
+  name.vb: Queue(Func(Of String, String), String)
+references:
+- uid: System.Concurrency
+  commentId: N:System.Concurrency
+  isExternal: true
+  href: System.html
+  name: System.Concurrency
+  nameWithType: System.Concurrency
+  fullName: System.Concurrency
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Concurrency
+    name: Concurrency
+    isExternal: true
+    href: System.Concurrency.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Concurrency
+    name: Concurrency
+    isExternal: true
+    href: System.Concurrency.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Concurrency.ThreadPool.Queue*
+  commentId: Overload:System.Concurrency.ThreadPool.Queue
+  isExternal: true
+  href: System.Concurrency.ThreadPool.html#System_Concurrency_ThreadPool_Queue_System_Func_System_String_System_String__System_String_
+  name: Queue
+  nameWithType: ThreadPool.Queue
+  fullName: System.Concurrency.ThreadPool.Queue
+- uid: System.Func{System.String,System.String}
+  commentId: T:System.Func{System.String,System.String}
+  parent: System
+  definition: System.Func`2
+  name: Func<string, string>
+  nameWithType: Func<string, string>
+  fullName: System.Func<string, string>
+  nameWithType.vb: Func(Of String, String)
+  fullName.vb: System.Func(Of String, String)
+  name.vb: Func(Of String, String)
+  spec.csharp:
+  - uid: System.Func`2
+    name: Func
+    isExternal: true
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: string
+    isExternal: true
+  - name: '>'
+  spec.vb:
+  - uid: System.Func`2
+    name: Func
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+  - name: )
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System.Tasks.Task{System.String}
+  commentId: T:System.Tasks.Task{System.String}
+  parent: System.Tasks
+  definition: System.Tasks.Task`1
+  href: System.Tasks.Task-1.html
+  name: Task<string>
+  nameWithType: Task<string>
+  fullName: System.Tasks.Task<string>
+  nameWithType.vb: Task(Of String)
+  fullName.vb: System.Tasks.Task(Of String)
+  name.vb: Task(Of String)
+  spec.csharp:
+  - uid: System.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: System.Tasks.Task-1.html
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+  - name: '>'
+  spec.vb:
+  - uid: System.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: System.Tasks.Task-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+  - name: )
+- uid: System.Func`2
+  commentId: T:System.Func`2
+  isExternal: true
+  name: Func<T0, TResult>
+  nameWithType: Func<T0, TResult>
+  fullName: System.Func<T0, TResult>
+  nameWithType.vb: Func(Of T0, TResult)
+  fullName.vb: System.Func(Of T0, TResult)
+  name.vb: Func(Of T0, TResult)
+  spec.csharp:
+  - uid: System.Func`2
+    name: Func
+    isExternal: true
+  - name: <
+  - name: T0
+  - name: ','
+  - name: " "
+  - name: TResult
+  - name: '>'
+  spec.vb:
+  - uid: System.Func`2
+    name: Func
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T0
+  - name: ','
+  - name: " "
+  - name: TResult
+  - name: )
+- uid: System.Tasks.Task`1
+  commentId: T:System.Tasks.Task`1
+  parent: System.Tasks
+  isExternal: true
+  href: System.Tasks.Task-1.html
+  name: Task<T>
+  nameWithType: Task<T>
+  fullName: System.Tasks.Task<T>
+  nameWithType.vb: Task(Of T)
+  fullName.vb: System.Tasks.Task(Of T)
+  name.vb: Task(Of T)
+  spec.csharp:
+  - uid: System.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: System.Tasks.Task-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: System.Tasks.Task-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Tasks
+  commentId: N:System.Tasks
+  isExternal: true
+  href: System.html
+  name: System.Tasks
+  nameWithType: System.Tasks
+  fullName: System.Tasks
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Tasks
+    name: Tasks
+    isExternal: true
+    href: System.Tasks.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Tasks
+    name: Tasks
+    isExternal: true
+    href: System.Tasks.html

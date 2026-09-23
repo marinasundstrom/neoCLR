@@ -1,71 +1,181 @@
-; Generated from runtime/raven/src/System/Threading/Workers.rvn. Regenerate with build_runtime_library.py.
-.type class System.Threading.Thread
-.method static Start(System.Func<String,String> callback,String input) -> System.Tasks.Task<String>
-.local System.Tasks.Promise<String> local0
-.local System.Tasks.TaskQueue local1
-.local Int32 local2
-.local System.Threading.WorkerCompletion local3
-ldloca local0
-initobj System.Tasks.Promise<String>
-ldloca local1
-initobj System.Tasks.TaskQueue
-ldc.i4 0
-stloc local2
-ldloca local3
-initobj System.Threading.WorkerCompletion
+; Generated from runtime/raven/src/System/Concurrency/Workers.rvn. Regenerate with build_runtime_library.py.
+.type class System.Concurrency.Thread
+.field private callback System.Func<String,String>
+.field private input String
+.field private source System.Tasks.Promise<String>
+.field private started Boolean
+.field private queue System.Tasks.TaskQueue
+.property instance Task() -> System.Tasks.Task<String>
+.get instance System.Concurrency.Thread::get_Task()
+.end
+.property instance IsStarted() -> Boolean
+.get instance System.Concurrency.Thread::get_IsStarted()
+.end
+.method instance .ctor(System.Func<String,String> callback,String input) -> noresult
 M00000001_IL_0000:
 M00000001_IL_0001:
-newobj instance System.Tasks.Promise<String>::.ctor()
-M00000001_IL_0006:
-stloc local0
+ldarg 0
+M00000001_IL_0002:
+pop
 M00000001_IL_0007:
 M00000001_IL_0008:
-call neoCLR.Runtime.CurrentTaskQueue()
-M00000001_IL_000d:
-stloc local1
-M00000001_IL_000e:
-M00000001_IL_000f:
 ldarg 0
-M00000001_IL_0010:
+M00000001_IL_0009:
 ldarg 1
+M00000001_IL_000a:
+stfld System.Concurrency.Thread::callback
+M00000001_IL_000f:
+M00000001_IL_0010:
+ldarg 0
 M00000001_IL_0011:
-call neoCLR.Runtime.StartWorker(System.Func<String,String>,String)
-M00000001_IL_0016:
-stloc local2
+ldarg 2
+M00000001_IL_0012:
+stfld System.Concurrency.Thread::input
 M00000001_IL_0017:
+ldarg 0
 M00000001_IL_0018:
-ldloc local2
-M00000001_IL_0019:
-ldloc local0
-M00000001_IL_001a:
-newobj instance System.Threading.WorkerCompletion::.ctor(Int32,System.Tasks.Promise<String>)
-M00000001_IL_001f:
-stloc local3
-M00000001_IL_0020:
-M00000001_IL_0021:
-ldloc local1
+newobj instance System.Tasks.Promise<String>::.ctor()
+M00000001_IL_001d:
+stfld System.Concurrency.Thread::source
 M00000001_IL_0022:
-ldloc local3
 M00000001_IL_0023:
+ldarg 0
+M00000001_IL_0024:
+call neoCLR.Runtime.CurrentTaskQueue()
 M00000001_IL_0029:
-delegate.bind System.Func<Void> = instance System.Threading.WorkerCompletion::DelegateTarget_Application_V1_M_363A6D6574686F643131363A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31363A53797374656D2E546872656164696E6731363A576F726B6572436F6D706C6574696F6E383A436F6D706C657465343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
+stfld System.Concurrency.Thread::queue
 M00000001_IL_002e:
-call instance System.Tasks.TaskQueue::Post(System.Func<Void>)
-M00000001_IL_0033:
-M00000001_IL_0034:
-ldloc local0
-M00000001_IL_0035:
-call instance System.Tasks.Promise<String>::get_Task()
-M00000001_IL_003a:
+M00000001_IL_002f:
+ldarg 0
+M00000001_IL_0030:
+ldc.i4 0
+M00000001_IL_0031:
+call neoCLR.Library.System.Concurrency.Thread.RuntimeBooleanFromInt32(Int32)
+stfld System.Concurrency.Thread::started
+M00000001_IL_0036:
 ret
 .end
-.method instance .ctor() -> noresult
+.method instance get_Task() -> System.Tasks.Task<String>
 M00000002_IL_0000:
 M00000002_IL_0001:
-ldarg 0
 M00000002_IL_0002:
-pop
-M00000002_IL_0007:
+ldarg 0
+M00000002_IL_0003:
+ldfld System.Concurrency.Thread::source
+M00000002_IL_0008:
+call instance System.Tasks.Promise<String>::get_Task()
+M00000002_IL_000d:
+ret
+.end
+.method instance get_IsStarted() -> Boolean
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.Concurrency.Thread::started
+call neoCLR.Library.System.Concurrency.Thread.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0008:
+call neoCLR.Library.System.Concurrency.Thread.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance Start() -> noresult
+.local Int32 local0
+.local System.Concurrency.WorkerCompletion local1
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Concurrency.WorkerCompletion
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.Concurrency.Thread::started
+call neoCLR.Library.System.Concurrency.Thread.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_0008:
+brtrue M00000004_IL_0012
+M00000004_IL_000d:
+br M00000004_IL_001d
+M00000004_IL_0012:
+M00000004_IL_0013:
+ldstr "Thread has already been started"
+M00000004_IL_0018:
+call System.Fault(String)
+M00000004_IL_001d:
+M00000004_IL_001e:
+M00000004_IL_001f:
+ldarg 0
+M00000004_IL_0020:
+ldfld System.Concurrency.Thread::callback
+M00000004_IL_0025:
+ldarg 0
+M00000004_IL_0026:
+ldfld System.Concurrency.Thread::input
+M00000004_IL_002b:
+call neoCLR.Runtime.StartWorker(System.Func<String,String>,String)
+M00000004_IL_0030:
+stloc local0
+M00000004_IL_0031:
+M00000004_IL_0032:
+ldarg 0
+M00000004_IL_0033:
+ldc.i4 1
+M00000004_IL_0034:
+call neoCLR.Library.System.Concurrency.Thread.RuntimeBooleanFromInt32(Int32)
+stfld System.Concurrency.Thread::started
+M00000004_IL_0039:
+M00000004_IL_003a:
+ldloc local0
+M00000004_IL_003b:
+ldarg 0
+M00000004_IL_003c:
+ldfld System.Concurrency.Thread::source
+M00000004_IL_0041:
+newobj instance System.Concurrency.WorkerCompletion::.ctor(Int32,System.Tasks.Promise<String>)
+M00000004_IL_0046:
+stloc local1
+M00000004_IL_0047:
+M00000004_IL_0048:
+ldarg 0
+M00000004_IL_0049:
+ldfld System.Concurrency.Thread::queue
+M00000004_IL_004e:
+ldloc local1
+M00000004_IL_004f:
+M00000004_IL_0055:
+delegate.bind System.Func<Void> = instance System.Concurrency.WorkerCompletion::DelegateTarget_Application_V1_M_363A6D6574686F643131383A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31383A53797374656D2E436F6E63757272656E637931363A576F726B6572436F6D706C6574696F6E383A436F6D706C657465343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
+M00000004_IL_005a:
+call instance System.Tasks.TaskQueue::Post(System.Func<Void>)
+M00000004_IL_005f:
+M00000004_IL_0060:
+ret
+.end
+.method static Run(System.Func<String,String> callback,String input) -> System.Tasks.Task<String>
+.local System.Concurrency.Thread local0
+ldloca local0
+initobj System.Concurrency.Thread
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldarg 1
+M00000005_IL_0004:
+newobj instance System.Concurrency.Thread::.ctor(System.Func<String,String>,String)
+M00000005_IL_0009:
+stloc local0
+M00000005_IL_000a:
+M00000005_IL_000b:
+ldloc local0
+M00000005_IL_000c:
+callvirt instance System.Concurrency.Thread::Start()
+M00000005_IL_0011:
+M00000005_IL_0012:
+ldloc local0
+M00000005_IL_0013:
+callvirt instance System.Concurrency.Thread::get_Task()
+M00000005_IL_0018:
 ret
 .end
 .end

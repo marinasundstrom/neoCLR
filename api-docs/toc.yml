@@ -2,7 +2,7 @@
   href: /index.html
 - name: API guide
   href: index.md
-- name: Task reference
+- name: API reference
   href: api/
 - name: Callback methods
   href: callbacks.md
