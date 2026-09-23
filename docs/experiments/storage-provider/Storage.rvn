@@ -88,6 +88,27 @@ class Directory {
         }
     }
 
+    // A parsed absolute path is valid syntax, but cannot replace this context.
+    func GetFile(relativePath: Path) -> Result<File, StorageLookupError> {
+        if relativePath.IsAbsolute {
+            return Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+        if relativePath.Text == "." {
+            return provider.GetFile(path)
+        }
+        var resolved = path.Text + "/" + relativePath.Text
+        if path.Text == "/" {
+            resolved = "/" + relativePath.Text
+        }
+        if path.Text == "." {
+            resolved = relativePath.Text
+        }
+        return match StorageExperiment.Path.Parse(resolved) {
+            Ok(let child) => provider.GetFile(child)
+            Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+    }
+
 }
 
 class HostStorage : StorageProvider {

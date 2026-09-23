@@ -12,6 +12,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   StorageLookupError over the existing native metadata service, with generated API
   reference coverage. Add typed GetFile lookup to the disk/memory provider sample;
   distinguish missing and wrong-kind outcomes without opening file contents.
+  Extend experimental Directory.GetFile with relative Path lookup, including nested
+  paths. Absolute paths remain valid for providers but are rejected by a directory;
+  its string overload still accepts one direct child. Document this provisional
+  distinction, flat-memory-directory limits and tested .NET comparison.
   Lookup is an observation, not stable identity or a guarantee of later access.
   Record Path as Storage-specific rather than mandatory throughout the platform;
   host metadata and file-stream APIs retain string parameters. Matching regenerated

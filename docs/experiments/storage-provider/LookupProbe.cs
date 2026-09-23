@@ -7,6 +7,9 @@ Directory.CreateDirectory(root);
 try
 {
     var path = Path.Combine(root, "item");
+    var absoluteRoot = Path.GetPathRoot(root)!;
+    Check(Path.Combine(root, absoluteRoot) == absoluteRoot,
+        "A rooted later Combine argument should replace the earlier prefix");
     var descriptor = new FileInfo(path); // Construction succeeds before creation.
     Check(!descriptor.Exists, "Missing file should not exist");
     File.WriteAllText(path, "first");

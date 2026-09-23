@@ -68,6 +68,16 @@ with tempfile.TemporaryDirectory(prefix='neoclr-storage-provider-') as folder:
     assert found.stdout == 'Typed disk and memory lookup contracts: passed\n', found.stdout
     print(found.stdout, end='')
 
+    (work / 'sandbox/context').mkdir()
+    (work / 'sandbox/context/nested').mkdir()
+    shutil.copyfile(HERE / 'DirectoryContracts.rvn', root / 'Main.rvn')
+    directory = subprocess.run(['dotnet', 'msbuild', str(root / 'StorageExplorer.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=120)
+    assert directory.returncode == 0, directory.stdout + directory.stderr
+    resolved = subprocess.run([str(bundle / 'bin/neoclr'), 'run', str(root / 'bin/neoclr/Debug/App.neoil'), '--system', str(bundle / 'lib/System.neoil')], cwd=work / 'sandbox', capture_output=True, text=True, timeout=60)
+    assert resolved.returncode == 0, resolved.stdout + resolved.stderr
+    assert resolved.stdout == 'Relative directory lookup contracts: passed\n', resolved.stdout
+    print(resolved.stdout, end='')
+
     # Ordinary callers cannot construct an unvalidated Path or mutate its spelling.
     for source, diagnostic in [
         ('namespace StorageExperiment\nfunc Main() { let path = Path("../bypass") }', 'inaccessible'),

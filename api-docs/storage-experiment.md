@@ -77,12 +77,38 @@ A provider-bound directory address. Construction does not create or verify a dir
 | --- | --- |
 | `Directory(provider: StorageProvider, path: Path)` | Retain the provider and its directory address. |
 | `Path: Path` | Return the validated logical path without querying storage. |
+| `GetFile(relativePath: Path) -> Result<File, StorageLookupError>` | Resolve a relative logical path against this directory and query through its retained provider. Nested segments are accepted. Absolute values return InvalidPath without querying; `.` queries this directory address as a file and normally returns WrongKind. |
 | `GetFile(name: string) -> Result<File, StorageLookupError>` | Validate a direct child name, then query the provider. Invalid names return InvalidPath; provider lookup errors are preserved. |
 | `FileAt(name: string) -> Result<File, FileReadError>` | Validate a direct child name, parse the combined logical path, then construct the File descriptor through the retained provider. Empty names, `.`, `..` and names containing separators, colon or NUL are rejected with InvalidPath. |
 
 FileAt constructs an address without I/O and can describe a file to create later.
 GetFile queries its current kind/existence. Validation is not a security
 boundary or a restriction on the provider's other operations.
+
+### Relative paths and direct child names
+
+The Path overload permits nested relative paths such as `nested/note.txt`. The
+string overload remains a direct-child-name operation: that same slash-containing
+string returns InvalidPath. This is a provisional distinction from the Storage
+proposal, not a general policy that string-taking APIs must accept only names.
+An absolute Path is valid syntax but invalid for this operation; use a provider
+lookup to resolve an absolute logical address.
+
+Resolution preserves the directory's provider and logical prefix. Root `/`, current
+relative `.` and relative directory addresses are handled explicitly. It does not
+canonicalize, check parent directories, follow links itself or establish a sandbox.
+The Path parser already rejects parent traversal segments. Directory construction
+still does not establish that its address exists or is a directory; a lookup delegates
+the final address to its provider. MemoryStorage still has flat keys rather than a
+directory tree, so parent existence and non-root directory kinds are not yet shared
+contracts. Returned File.Path is the combined spelling; Name is the final component.
+
+Compared with [.NET Path.Combine](https://learn.microsoft.com/en-us/dotnet/api/system.io.path.combine?view=net-10.0),
+which discards earlier components when a later component is rooted, this operation
+rejects absolute input to preserve its selected directory context. This extra
+restriction is useful for explicit resolution but is not a containment guarantee.
+It also makes the two overloads less interchangeable; convenience parsing and shared
+error design remain open. Comparison reviewed 2026-09-23.
 
 ## File
 

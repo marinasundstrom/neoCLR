@@ -271,3 +271,34 @@ file-resource unit cases and twelve VM file-resource cases passed (eleven existi
 cases plus the targeted Unix link case). DocFX checked summaries for 130 generated
 items; the combined site and four website tooling tests passed. No Raven compiler
 change or cross-platform run was required for this bounded library adapter.
+
+
+## Relative directory lookup (2026-09-23)
+
+The application-owned Directory.GetFile(Path) overload resolves relative, potentially
+nested paths while retaining the directory's provider. It accepts `nested/note.txt`
+under `/context`, `context`, `/` or `.` as appropriate. Absolute paths are rejected
+with StorageLookupError.InvalidPath before provider lookup, although they remain
+valid Path values accepted by provider GetFile. The existing string overload still
+means one direct child name. This follows one exploratory proposal distinction,
+not an author decision to forbid path strings throughout Storage or other APIs.
+
+DirectoryContracts uses different disk and memory contents at the same logical
+address to check provider retention. It checks returned spelling/name, relative and
+rooted bases, nested lookup, absolute rejection, the direct-child string restriction,
+missing items and `.` at the root. The verifier creates only the disk fixture's
+parent directories; the memory provider's flat-key limitation remains explicit.
+No new runtime or core reference API is added by this slice.
+
+The [.NET Path.Combine contract](https://learn.microsoft.com/en-us/dotnet/api/system.io.path.combine?view=net-10.0)
+(reviewed 2026-09-23) permits a rooted later argument to replace the earlier prefix.
+The .NET lookup probe now checks that behavior on its current host. Here the
+operation-specific restriction instead preserves directory context, at the cost of
+an extra validation failure and overload asymmetry. Neither design alone establishes
+filesystem confinement. The existing host metadata/error and lexical Path research
+still apply; general provider hierarchy and capability authority remain open.
+
+Validation on 2026-09-23: the SDK product sample and stream, Path, coherent-memory,
+lookup and relative-directory contracts passed on macOS arm64. The independent
+.NET/Rust comparison, API snapshot, combined website and four website tooling tests
+also passed. Core API metadata and runtime implementations did not change.

@@ -1,0 +1,82 @@
+namespace StorageExperiment
+
+import System.*
+import System.Console.*
+import System.Result.*
+import System.Storage.StorageLookupError
+
+func CheckResolved(result: Result<File, StorageLookupError>, expected: string, content: string) {
+    match result {
+        Ok(let file) => {
+            if file.Path.Text != expected || file.Name != "note.txt" {
+                System.Fault("Directory lookup changed the address")
+            }
+            match file.ReadText(32) {
+                Ok(let text) => {
+                    if text != content {
+                        System.Fault("Directory lookup used the wrong context")
+                    }
+                }
+                Error(let error) => System.Fault(error.ToString())
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+}
+
+func DirectoryCases(provider: StorageProvider, content: string) {
+    let target = RequirePath("/context/nested/note.txt")
+    match provider.WriteText(target, content, 32) {
+        Ok(_) => { }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    let context = Directory(provider, RequirePath("/context"))
+    CheckResolved(context.GetFile(RequirePath("nested/note.txt")), target.Text, content)
+    let root = Directory(provider, RequirePath("/"))
+    CheckResolved(root.GetFile(RequirePath("context/nested/note.txt")), target.Text, content)
+    let relative = Directory(provider, RequirePath("context"))
+    CheckResolved(relative.GetFile(RequirePath("nested/note.txt")), "context/nested/note.txt", content)
+    let current = Directory(provider, RequirePath("."))
+    CheckResolved(current.GetFile(RequirePath("context/nested/note.txt")), "context/nested/note.txt", content)
+    // Absolute syntax is valid for a provider, but rejected by a directory context.
+    CheckResolved(provider.GetFile(target), target.Text, content)
+    match context.GetFile(target) {
+        Error(let error) => {
+            if !error.IsInvalidPath {
+                System.Fault("Absolute path has wrong context error")
+            }
+        }
+        Ok(_) => System.Fault("Absolute path replaced directory context")
+    }
+    // The string overload still accepts one child name, not a relative path.
+    match context.GetFile("nested/note.txt") {
+        Error(let error) => {
+            if !error.IsInvalidPath {
+                System.Fault("Nested string has wrong error")
+            }
+        }
+        Ok(_) => System.Fault("Direct-child overload accepted a nested string")
+    }
+    match context.GetFile(RequirePath("absent.txt")) {
+        Error(let error) => {
+            if !error.IsNotFound {
+                System.Fault("Missing relative lookup changed error")
+            }
+        }
+        Ok(_) => System.Fault("Missing relative lookup succeeded")
+    }
+    match root.GetFile(RequirePath(".")) {
+        Error(let error) => {
+            if !error.IsWrongKind {
+                System.Fault("Current directory treated as file")
+            }
+        }
+        Ok(_) => System.Fault("Current directory returned as file")
+    }
+}
+
+func Main() {
+    DirectoryCases(HostStorage("."), "disk contents")
+    DirectoryCases(MemoryStorage(), "memory contents")
+    WriteLine("Relative directory lookup contracts: passed")
+}

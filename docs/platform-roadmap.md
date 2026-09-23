@@ -155,8 +155,13 @@ System.Storage.Metadata.GetKind(string) returns Result<EntryKind, StorageLookupE
 The sample providers expose GetFile(Path) and Directory.GetFile(name), preserving
 missing versus wrong-kind errors without retaining a stream. These remain blocking
 observations, not stable item identity or a finalized provider surface.
-Next, compare directory context/resolution and shared provider errors, including
-replacement behavior, before promoting the Storage surface. Preserve the tested stream operations. The
+Directory now has an application-owned GetFile(Path) overload for nested relative
+resolution, rejecting absolute inputs while retaining its provider context. The
+string overload still accepts one child name; this exploratory distinction is not
+a system-wide restriction on string APIs. Disk/memory contract checks cover both.
+Next, evaluate parent-directory existence/kind and a shared provider hierarchy/error
+contract; the flat-key memory store still cannot model those guarantees. Keep
+replacement behavior provisional before promoting the Storage surface. Preserve the tested stream operations. The
 current application-owned File/Directory and capability interfaces remain
 exploratory; do not promote their string-address/text-helper shape unchanged merely
 because this sample works. Public stream wrappers have on-site reference coverage.
