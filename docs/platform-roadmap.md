@@ -23,7 +23,8 @@ the current milestone. Such a task does not silently reorder the entire roadmap;
 record a lasting change in direction when the author makes one.
 
 When choosing work autonomously, select the next useful bounded case within the
-active milestone, currently M1. Use its detailed plan for dependencies and validation.
+active milestone, currently M1. Start with its in-memory byte-copy checkpoint, not
+sockets or HTTP. Use the progression below and its detailed plan for validation.
 Later milestone candidates remain provisional: listing them here does not authorize
 wholesale implementation of their proposals or freeze their order. Update completion
 status with evidence and record significant direction changes in the development timeline.
@@ -53,10 +54,46 @@ notes. No new sample or runtime capability is implemented by this roadmap.
 | M5 | Explain programs | **Assembly Explorer** | Inspect a sample application's types/members, compare metadata views and report unsupported information clearly | Candidate; a loaded-program version can start independently |
 | M6 | Carry the platform across hosts | **Portable Sample Pack** | Run selected earlier products on a second host and report available/missing capabilities consistently | Candidate; target and exact sample set remain open |
 
-M1's memory-copy, encoding, JSON and TCP echo programs are small delivery checkpoints
-inside M1, not additional major milestones that delay the HTTP proof. M2–M6 identify
+M1's memory-copy, encoding, JSON, delayed-read, file-copy and TCP echo programs
+are independently useful delivery checkpoints inside M1. Deliver and reassess each
+before taking on the next kind of complexity. HTTP is the first major application
+destination, not the first API to implement. M2–M6 identify
 useful destinations, not a promise to complete all proposals. Progress through them
 by the dependency of the next runnable case, not by completing entire API families.
+
+## Progressive delivery before networking — revised 2026-09-23
+
+The author asks whether sockets/HTTP should move down in priority so that features
+and existing APIs can evolve gradually, while retaining difficult cases when they
+teach us something about GC or other runtime needs. The following is the revised
+working sequence, not an author endorsement of every API choice. Preserve the HTTP
+application destination, but prioritize cheap, informative cases before transport.
+
+| Order | Runnable product / checkpoint | New question to answer | Advance when |
+| --- | --- | --- | --- |
+| 1 | **Byte Copy** — copy between two bounded memory-backed endpoints | Which buffer ranges, ownership and partial-transfer contracts are actually useful? | Empty/short transfers, bounds, aliasing and error outcomes are explicit; ordinary arrays/interfaces suffice or their concrete gap is recorded |
+| 2 | **Text/JSON Transformer** — decode small UTF-8 chunks, inspect/change an explicit JSON field, encode output | Can text and structured data layer on the byte contracts without changing their meaning? | Split UTF-8, malformed input, byte/grapheme distinctions and bounded JSON cases work; no reflection or dynamic machinery required |
+| 3 | **Delayed Copy** — the same operation with controlled external completion | What must stay alive while work is pending, and when is it safe to cancel/release it? | Actual guest GC retains the destination and continuation; cancellation and teardown have tested ownership rules; ordinary callbacks progress. Use the existing host probe as partial evidence |
+| 4 | **File Transformer** — reuse the pipeline for a bounded file input/output | Does a second backend reveal a weak abstraction or hidden resource assumption? | File opening, stream cleanup and failed output behavior are documented and tested; no provider hierarchy or directory catalog is required |
+| 5 | **TCP Echo** — reuse the byte contracts over a connection | Which additional demands come from OS readiness, peer failure and backpressure? | Pending read/accept, short transfers and shutdown work without blocking unrelated progress |
+| 6 | **Hello Service + Hello Client** | Do the pieces compose into the intended HTTP application? | M1's independent-peer, protocol, resource and reproduction checks pass |
+
+These are a default learning order, not a demand to finish every earlier API family.
+A missing primitive may be explored earlier when a small case demonstrates why it
+is needed. The delayed-copy case deliberately introduces suspension/GC before real
+networking: complexity is justified by the question it answers, not by proximity to
+HTTP. File transformation borrows a narrow slice of M2; its directory/catalog work
+remains later. File I/O can begin with an honest synchronous backend; it must not be
+labelled nonblocking merely because a Task wrapper is added.
+
+After each checkpoint, review the previous APIs against the new consumer. Change
+provisional contracts, update earlier samples and record migration effects together.
+Keep both backends in validation so a convenient change for one does not break the
+other. Do not freeze an API early just because the first sample passed. In particular,
+compare .NET MemoryStream/Stream and existing neoCLR arrays before choosing a new
+buffer family; compare Encoding/Decoder and explicit JSON readers before adding
+serialization infrastructure. Reuse [stream research](stream-design.md) and
+[the M1 comparisons](http-poc-roadmap.md#evidence-comparisons-and-costs).
 
 ## M1 — Communicate: Hello Service and Hello Client
 
@@ -65,9 +102,9 @@ that calls both and displays the decoded results. Both run on neoCLR. This is th
 first proof that the runtime can host an application rather than only isolated API
 examples.
 
-**Build up through:** delayed I/O completion; byte copy in memory; UTF-8 chunks;
-JSON round trip; TCP echo; standalone HTTP server; standalone HTTP client; combined
-application pair. The [detailed sequence](http-poc-roadmap.md#small-executable-slices)
+**Build up through:** byte copy in memory; UTF-8/JSON transformation; controlled
+delayed copy with guest GC; a bounded file transformer; TCP echo; standalone HTTP
+server; standalone HTTP client; combined application pair. The [detailed sequence](http-poc-roadmap.md#small-executable-slices)
 contains dependencies and negative cases.
 
 **Proposal inputs:** networking, streams, Task, strings/encoding, with only the
@@ -273,9 +310,11 @@ are proposed. A language-only check is not evidence of runtime enforcement.
 
 M1 remains active. Its first [host-side S0 experiment](experiments/external-io-progress/README.md)
 passes seven ownership/progress/cancellation checks. This is a reduced Rust model,
-not a guest networking API or completed S0. The next S0 case is invocation-owned
+not a guest networking API or completed S0. The next S0 case will be invocation-owned
 host completion delivery with actual guest GC retention and a Raven consumer.
-S1's memory-stream case remains open; no later milestone has started.
+The immediate priority is now S1's in-memory byte-copy case, followed by the
+progressive checkpoints above; the host probe does not make networking urgent.
+No later major milestone has started.
 
 ## Working rules and immediate next step
 
@@ -291,7 +330,8 @@ its feature plan, and update changelog, relevant feature pages and integration d
 Samples begin as small programs, not miniature frameworks. Existing release/debugging
 requirements and Raven branch/integration rules continue to apply.
 
-**Next:** take the first M1 cases—delayed external completion and byte copy in memory—
-far enough to compare ownership, cancellation and stream contracts. Then grow the
-UTF-8/JSON and TCP cases toward Hello Service + Hello Client. Reassess M2 onward after
-that first major milestone demonstrates what the platform still needs.
+**Next:** build S1's bounded in-memory byte-copy sample using existing runtime
+facilities where adequate. Let the text/JSON consumer revise that contract, then
+validate guest lifetimes with controlled delayed completion and reuse the pipeline
+for files before tackling sockets. Reassess priorities at each checkpoint and M2
+onward after the first major HTTP application milestone.

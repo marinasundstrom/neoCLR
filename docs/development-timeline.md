@@ -4952,3 +4952,21 @@ and recorded the convention for runtime code as well as examples.
   sequencing and scope in both the roadmap and AGENTS.md. Explicit author directions
   override it. Detailed plans remain subordinate; a one-off task outside M1 does not
   automatically reorder the roadmap or turn candidate milestones into commitments.
+
+
+### 2026-09-23 — Prefer progressive API cases before networking
+
+- **Author:** asked whether sockets and HTTP client should be down-prioritized,
+  allowing features and existing APIs to evolve progressively. Asked that the roadmap
+  avoid starting with the most complex work unless it reveals useful runtime issues,
+  such as garbage collection. Expressed openness to rearranging the list.
+- **Assistant recommendation and action:** retain HTTP as the first major application
+  destination but revise default delivery to Byte Copy, Text/JSON Transformer, Delayed
+  Copy with actual guest GC, File Transformer, TCP Echo and then the HTTP pair. Move
+  S1 memory copy ahead of further S0 integration; record the existing host probe as
+  partial evidence rather than a reason to rush into sockets. Keep checkpoint APIs
+  revisable as each new consumer tests their assumptions.
+- **Status:** this is the assistant's revised working sequence in response to the
+  author's question, not approval of each eventual contract. The isolated host probe
+  has seven passing checks and is committed at `629cbf4`; guest GC/Task integration
+  and the new sample checkpoints remain open. The roadmap was committed at `6634b79`.

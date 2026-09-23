@@ -69,7 +69,18 @@ These links describe different dated slices. Later development additions take
 precedence over historical limitations within them. No new runtime validation was
 performed for this planning update.
 
-## Urgent decisions, in dependency order
+## Delivery ordering update — 2026-09-23
+
+Follow the [platform roadmap's progressive checkpoints](platform-roadmap.md#progressive-delivery-before-networking--revised-2026-09-23):
+memory byte copy, text/JSON transformation, controlled delayed copy with guest GC,
+a bounded file transformer, TCP echo, then HTTP. The author asks for gradual API
+evolution rather than starting with the most complex application. The first S0 host
+probe is useful evidence, not a reason to prioritize networking next. Start S1 now.
+S0/S1 identifiers below are stable references, not an instruction to implement in
+numeric order. The decisions below become necessary when a case crosses that boundary;
+not all must be settled before an in-memory synchronous copy can run.
+
+## Urgent decisions before external I/O
 
 1. **External progress and ownership.** Register a pending operation, yield, wake the
    correct invocation, retain the Task/buffer/handle, and finish exactly once. Test
@@ -106,8 +117,8 @@ does not promise guest recovery; the host must reclaim resources on invocation e
 
 ## Small executable slices
 
-Every row should produce a runnable Raven case, focused negative tests and a short
-contract/comparison note. Mark completion only with linked execution evidence.
+Every completed slice should produce a runnable Raven case, focused negative tests
+and a short contract/comparison note. The isolated S0 host probe is only partial evidence. Mark completion only with linked execution evidence.
 
 | Slice / status | Small case and dependency | Exit evidence |
 | --- | --- | --- |
@@ -115,15 +126,17 @@ contract/comparison note. Mark completion only with linked execution evidence.
 | S1 — planned | In-memory input/output and copy case; can start alongside S0 | Directional contracts, partial transfers, empty-buffer rules, EOF only for nonempty reads, truncated ReadExactly, no-progress WriteAll, bounds errors, repeated cleanup and injected failures; copy helpers require no sockets |
 | S2 — planned | Encode/decode a multilingual message split at every UTF-8 byte boundary; depends on S1 | Strict invalid/truncated input outcomes, carried decoder state, final-flush behavior and byte counts; reuse current whole-buffer conversions rather than change Char again |
 | S3 — planned | Small JSON round trip in memory; depends on S2 | Read/write object, array, string, number, boolean and null; escaped strings and Unicode, malformed syntax, duplicate-key policy, numeric limits/precision and nesting/size bounds are explicit. Prefer explicit field access and construction; benchmark only if making performance claims |
+| S1F — planned learning checkpoint | Reuse the memory/text/JSON pipeline with bounded file input/output; after S1–S3 and the delayed-lifetime checkpoint | Shared stream behavior, open/read/write errors, cleanup and a declared failed-save policy; no directory/provider redesign or claim of nonblocking I/O |
 | S4 — exploration then implementation | TCP listener and echo client; depends on S0/S1 and resolved ownership | Bind/listen/accept/connect/read/write/close, endpoint reporting, short transfers, peer EOF/reset, refused connection, pending accept/read cancellation and repeated shutdown. A stalled connection must not freeze unrelated work; bound admitted connections |
 | S5 — planned | HTTP server returns text to an independent client; depends on S2/S4 | Split start lines/headers/body boundaries, methods/targets/status/headers, byte Content-Length, case-insensitive header names, bounded input and explicit rejection of unsupported/ambiguous framing. Choose accept/respond versus handler API using this case |
 | S6 — planned | HttpClient calls an independent local server; depends on S2/S4 and shared HTTP framing work | Parse supported endpoint URLs, send GET/POST, inspect non-2xx responses as responses, consume bounded bodies, report transport/protocol errors distinctly and close resources after cancellation/error |
 | M1 — planned | Two neoCLR apps exchange text and JSON; depends on S3/S5/S6 | All milestone cases above, independent-peer checks, shutdown/resource stress, recorded platform limits and packaged reproduction |
 
-S2/S3 and S4 are independent after their prerequisites; neither a JSON implementation
-nor file-provider redesign needs to block TCP. S5 and S6 should reuse framing tests
-but have independent peers to avoid hiding matching client/server bugs. Seeking and
-file-backed streams are useful later cases, not prerequisites for non-seekable TCP.
+S2/S3 and S4 are technically independent after their prerequisites, but the default
+learning sequence validates in-memory text/JSON, delayed guest lifetime and a bounded
+file backend before TCP. A file-provider redesign is not required. S5 and S6 should reuse framing tests
+but have independent peers to avoid hiding matching client/server bugs. Seeking remains later. A simple file-backed transformer is now a preferred
+pre-TCP learning checkpoint, not a technical requirement of non-seekable networking.
 
 For S3, compare a forward-only reader/writer with a tiny bounded document tree. A tree
 is simpler for field access but allocates more; a token API exposes parsing state and

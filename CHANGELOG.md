@@ -25,7 +25,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   download queue, a time-aware report, an assembly explorer and a portable sample
   pack. Make that roadmap the default authority for work in AGENTS.md, subordinate
   to explicit author directions. Keep post-POC milestones and separate research
-  products provisional.
+  products provisional. Refine M1 delivery to memory copy, text/JSON transformation,
+  delayed guest-lifetime checks and a bounded file transformer before TCP/HTTP;
+  retain HTTP as the first major application destination and allow earlier APIs
+  to evolve as subsequent samples expose gaps.
 
 - Add a development Tasks feature page with tested, downloadable worker, Promise,
   cancellation, MapResult and awaited-propagation examples. Link it from the
