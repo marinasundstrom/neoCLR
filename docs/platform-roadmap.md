@@ -269,6 +269,14 @@ Nullability and other existing backlog contracts should likewise be promoted whe
 a concrete sample reveals a problem, with direct-IL validation where runtime guarantees
 are proposed. A language-only check is not evidence of runtime enforcement.
 
+## Active progress — 2026-09-23
+
+M1 remains active. Its first [host-side S0 experiment](experiments/external-io-progress/README.md)
+passes seven ownership/progress/cancellation checks. This is a reduced Rust model,
+not a guest networking API or completed S0. The next S0 case is invocation-owned
+host completion delivery with actual guest GC retention and a Raven consumer.
+S1's memory-stream case remains open; no later milestone has started.
+
 ## Working rules and immediate next step
 
 Each selected slice should leave a checked sample, expected output, a matching build/run

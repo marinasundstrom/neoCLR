@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Start M1/S0 with an isolated host-side external-completion experiment. Seven passing
+  cases cover pending destination retention, callback progress, cancellation
+  acknowledgement, both completion/cancellation orderings, late-event rejection and
+  teardown. Record owned-byte delivery as a candidate, not a selected API/backend;
+  guest GC/Task integration and real I/O remain unimplemented. Update roadmap status
+  with partial evidence and reproduction instructions.
+
 - Prioritize an HTTP client/server application POC in the roadmap, with smaller
   stream, encoding, JSON and TCP cases, explicit acceptance criteria and complete
   proposal triage. Record external I/O progress, cancellation, buffer ownership and
