@@ -30,6 +30,13 @@ func Invalid(text: string) {
 }
 
 func Main() {
+    // A descriptor needs no existing file, and its display name cannot disagree
+    // with the parsed address. Unicode spelling is preserved.
+    let descriptor = File(HostStorage("missing-provider-root"), RequirePath("nested/naïve.txt"))
+    if descriptor.Name != "naïve.txt" || descriptor.Path.Text != "nested/naïve.txt" {
+        System.Fault("Descriptor name disagrees with its path")
+    }
+
     Valid("/", true)
     Valid(".", false)
     Valid("notes.txt", false)

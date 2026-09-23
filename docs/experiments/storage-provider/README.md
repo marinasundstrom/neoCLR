@@ -344,8 +344,8 @@ GetFile is an explicit typed lookup, while an address for exclusive creation nee
 not exist. Neither property access nor descriptor construction should perform I/O.
 Opened streams own resources; descriptors do not retain an open handle.
 
-The existing provider FileAt(path, name) factory is sample scaffolding. Review it
-for removal when integrating File: a descriptor can retain a provider directly,
+The reviewed provider FileAt(path, name) factory was sample scaffolding. The first
+simplification below removes it: a descriptor can retain a provider directly,
 without requiring every provider to implement an identical factory. Keep existing
 whole-text static helpers compatible, but do not require all future providers to
 implement text encoding helpers merely to offer byte access. The next bounded
@@ -383,3 +383,17 @@ use of the concrete alias. Opposite-direction source calls are rejected. The cor
 interface import probe, bootstrap snapshot, API reference (148 documented generated
 items) and combined website also pass. Two ordinary Raven compiler corrections were
 integrated from main; see [the integration evidence](../raven-target/README.md#directional-stream-interface-integration-2026-09-23).
+
+### Descriptor simplification after stream integration
+
+The sample now constructs File(provider, path), deriving Name from the validated
+path instead of accepting a separate name. StorageProvider.FileAt and its duplicate
+provider implementations are removed; Directory.FileAt still constructs a child
+address, while GetFile performs lookup. No new metadata properties or filesystem
+queries were added. The current GetFileName helper is sufficient for the validated
+slash grammar; future Path formats will need their own component rules.
+
+This implements the first simplification from the WinRT-informed review, without
+promoting the whole provisional provider contract. Whole-text methods and provider
+lookup remain the next integration choices. The verifier covers a nested Unicode
+name without an existing provider root and rejects the old independent name argument.

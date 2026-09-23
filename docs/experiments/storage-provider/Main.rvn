@@ -137,7 +137,7 @@ func Main() {
     RejectChild(disk, "child\u0000name")
     WriteLine("Direct child required")
     let otherMemory: StorageProvider = MemoryStorage()
-    let other = otherMemory.FileAt(RequirePath("/notes.txt"), "notes.txt")
+    let other = File(otherMemory, RequirePath("/notes.txt"))
     match other.ReadText(64) {
         Error(let error) => {
             if !error.IsNotFound {

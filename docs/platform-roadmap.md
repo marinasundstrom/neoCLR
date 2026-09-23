@@ -186,7 +186,10 @@ without importing their breadth. Start with address properties (Path and File.Na
 explicit lookup and byte-stream access. Add metadata properties only for a concrete
 consumer need; timestamps, size snapshots, query APIs and enumeration are follow-ups.
 [The comparison and next-slice choices](experiments/storage-provider/README.md#minimal-storage-design-winrt-lessons-2026-09-23)
-keep provider factories and temporary whole-text requirements open for simplification.
+keep temporary whole-text requirements open for simplification. The sample now
+derives File.Name from Path and constructs descriptors directly: the redundant
+StorageProvider.FileAt factory has been removed. Directory.FileAt remains an address
+operation, distinct from GetFile lookup; no metadata properties were added.
 The author permits continuing directly into the next slice after validation.
 
 The author additionally directs stable runtime Fault codes, including StackOverflow,

@@ -36,7 +36,10 @@ once the current one is done.
 start with Path and useful File.Name, explicit lookup and byte access. Defer cached
 metadata, timestamps, sizes, enumeration and query objects. Review the sample's
 redundant provider descriptor factory and mandatory text helpers before integrating
-the provider contract. These proposed simplifications are not yet implemented APIs.
+the provider contract. The sample subsequently implements derived names and removes
+the provider factory;
+these remain sample contracts pending platform integration. Removing mandatory
+whole-text provider helpers remains proposed.
 
 **Action.** Added a [WinRT/.NET comparison and scope decision](experiments/storage-provider/README.md#minimal-storage-design-winrt-lessons-2026-09-23)
 and began integrating InputStream/OutputStream as shared platform interfaces,

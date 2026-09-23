@@ -102,3 +102,12 @@ with tempfile.TemporaryDirectory(prefix='neoclr-storage-provider-') as folder:
         diagnostics = rejected.stdout + rejected.stderr
         assert operation in diagnostics and 'error RAV' in diagnostics, diagnostics
     print('Stream capability directions: rejected opposite operations')
+
+    (root / 'Main.rvn').write_text(
+        'namespace StorageExperiment\nfunc Main() {\n'
+        '    let file = File(MemoryStorage(), RequirePath("correct.txt"), "misleading.txt")\n'
+        '}\n')
+    rejected = subprocess.run(['dotnet', 'msbuild', str(root / 'StorageExplorer.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=120)
+    assert rejected.returncode != 0, 'Independent descriptor name was admitted'
+    assert 'rav1501' in (rejected.stdout + rejected.stderr).lower(), rejected.stdout + rejected.stderr
+    print('Descriptor names: rejected independent constructor argument')

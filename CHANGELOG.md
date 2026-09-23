@@ -18,6 +18,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Preview 9 is unchanged.
   Record the author's minimal WinRT-informed Storage direction: useful address/name
   properties and explicit operations first, richer metadata only when needed.
+  Simplify the sample File constructor to (provider, path), deriving Name from Path;
+  remove the redundant StorageProvider.FileAt factory. Directory.FileAt remains an
+  address operation. Reject independent names; preserve existing lookup and I/O.
   File/Directory/provider integration remains the next bounded slice. Validation:
   disk/memory SDK contracts and negative callers, interface import checks, runtime
   snapshot, 148 API summaries and the combined website pass.

@@ -59,7 +59,6 @@ above them.
 | Member | Contract |
 | --- | --- |
 | `GetFile(path: Path) -> Result<File, StorageLookupError>` | Query a current file and return a provider-bound descriptor; does not retain a stream or guarantee later availability. Root/directory returns WrongKind and missing entries return NotFound. |
-| `FileAt(path: Path, name: string) -> File` | Construct a descriptor retaining a parsed path and display name; does not check existence. Directory.FileAt constructs and validates child paths for ordinary callers. |
 | `OpenRead(path: Path) -> Result<InputStream, StreamError>` | Open an existing byte file with a new read cursor at zero, or report an expected error. |
 | `CreateNew(path: Path) -> Result<OutputStream, StreamError>` | Exclusively create a byte file. Existing entries are not overwritten. |
 | `ReadText(path: Path, maxBytes: int) -> Result<string, FileReadError>` | Read UTF-8 text within a byte limit. Reports expected read errors as values. |
@@ -81,7 +80,7 @@ A provider-bound directory address. Construction does not create or verify a dir
 | `Path: Path` | Return the validated logical path without querying storage. |
 | `GetFile(relativePath: Path) -> Result<File, StorageLookupError>` | Resolve a relative logical path against this directory and query through its retained provider. Nested segments are accepted. Absolute values return InvalidPath without querying; `.` queries this directory address as a file and normally returns WrongKind. |
 | `GetFile(name: string) -> Result<File, StorageLookupError>` | Validate a direct child name, then query the provider. Invalid names return InvalidPath; provider lookup errors are preserved. |
-| `FileAt(name: string) -> Result<File, FileReadError>` | Validate a direct child name, parse the combined logical path, then construct the File descriptor through the retained provider. Empty names, `.`, `..` and names containing separators, colon or NUL are rejected with InvalidPath. |
+| `FileAt(name: string) -> Result<File, FileReadError>` | Validate a direct child name, parse the combined logical path, then construct a File descriptor retaining the same provider. Empty names, `.`, `..` and names containing separators, colon or NUL are rejected with InvalidPath. |
 
 FileAt constructs an address without I/O and can describe a file to create later.
 GetFile queries its current kind/existence. Validation is not a security
@@ -115,13 +114,17 @@ error design remain open. Comparison reviewed 2026-09-23.
 ## File
 
 A descriptor retaining its provider, address and display name. It owns no open file
-handle and has no disposal requirement in this experiment.
+handle and has no disposal requirement in this experiment. Constructing a descriptor
+is valid before the entry exists; use GetFile for an explicit lookup. Providers no
+longer need a FileAt factory just to construct descriptors. File.Name uses the existing
+GetFileName string helper on the current validated slash grammar, preserving Unicode
+spelling. Revisit extraction when additional Path formats are introduced.
 
 | Member | Contract |
 | --- | --- |
-| `File(provider: StorageProvider, path: Path, name: string)` | Retain the supplied values; normally called by a provider. Does not verify the address or that the name matches it. |
+| `File(provider: StorageProvider, path: Path)` | Retain the provider and validated address, deriving Name from the address. Does not query existence or open a stream. |
 | `Path: Path` | Return the validated logical path. |
-| `Name: string` | Return the supplied child name. Does not parse Path with host rules. |
+| `Name: string` | Return the final path component, derived once at construction. No independent display-name argument or metadata query. |
 | `OpenRead() -> Result<InputStream, StreamError>` | Ask the retained provider for an input stream. The caller must close it. |
 | `CreateNew() -> Result<OutputStream, StreamError>` | Ask the retained provider for a new file output stream. The caller must close it. |
 | `ReadText(maxBytes: int) -> Result<string, FileReadError>` | Read through the retained provider. A missing file is reported when read, not when its descriptor is constructed. |
@@ -129,7 +132,7 @@ handle and has no disposal requirement in this experiment.
 
 ## Supplied providers
 
-`HostStorage(root: string)` configures a native disk root and implements all six
+`HostStorage(root: string)` configures a native disk root and implements all five
 StorageProvider methods using native path combination, [Metadata.GetKind](xref:System.Storage.Metadata), the existing whole-file helpers, and FileInputStream/FileOutputStream.
 Calls block. Whole-text helpers close per operation; byte streams remain open until
 the caller closes them or the invocation ends. Its permissions, symlinks and native path validity follow the host. Logical `/`
@@ -138,7 +141,7 @@ configuration remains relative to the process working directory; no canonicaliza
 or sandbox claim is made. There is no sandbox or read-only capability here.
 
 `MemoryStorage()` replaces the earlier experimental MemorySlotStorage. It implements
-all six StorageProvider methods using one byte payload per logical address; text
+all five StorageProvider methods using one byte payload per logical address; text
 reads decode that payload and text writes encode UTF-8 without a BOM. Files written
 through either API are visible through the other. Instances do not share state.
 Relative and absolute spellings with the same names resolve to the same entry.

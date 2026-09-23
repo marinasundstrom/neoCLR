@@ -13,7 +13,6 @@ import System.Storage.StorageLookupError
 // Experimental application-owned contract. Text methods are a temporary adapter
 // over existing helpers; byte streams are a separate incremental experiment.
 interface StorageProvider {
-    func FileAt(path: Path, name: string) -> File
     func GetFile(path: Path) -> Result<File, StorageLookupError>
     func OpenRead(path: Path) -> Result<InputStream, StreamError>
     func CreateNew(path: Path) -> Result<OutputStream, StreamError>
@@ -26,10 +25,10 @@ class File {
     private field path: Path
     private field name: string
 
-    init(provider: StorageProvider, path: Path, name: string) {
+    init(provider: StorageProvider, path: Path) {
         self.provider = provider
         self.path = path
-        self.name = name
+        self.name = System.Storage.Path.GetFileName(path.Text)
     }
 
     val Path: Path => path
@@ -76,7 +75,7 @@ class Directory {
             childText = "/" + name
         }
         return match System.Storage.Path.Parse(childText) {
-            Ok(let child) => Ok(provider.FileAt(child, name))
+            Ok(let child) => Ok(File(provider, child))
             Error(_) => Error(FileReadError(FileReadError.InvalidPath()))
         }
     }
@@ -139,7 +138,7 @@ class HostStorage : StorageProvider {
         return match System.Storage.Metadata.GetKind(Resolve(path)) {
             Ok(let kind) => {
                 if kind.IsFile {
-                    return Ok(File(self, path, System.Storage.Path.GetFileName(path.Text)))
+                    return Ok(File(self, path))
                 }
                 Error(StorageLookupError(StorageLookupError.WrongKind()))
             }
@@ -165,10 +164,6 @@ class HostStorage : StorageProvider {
             }
             Error(let error) => Error(error)
         }
-    }
-
-    func FileAt(path: Path, name: string) -> File {
-        return File(self, path, name)
     }
 
     func ReadText(path: Path, maxBytes: int) -> Result<string, FileReadError> {
@@ -214,7 +209,7 @@ class MemoryStorage : StorageProvider {
         if Find(path) < 0 {
             return Error(StorageLookupError(StorageLookupError.NotFound()))
         }
-        return Ok(File(self, path, System.Storage.Path.GetFileName(path.Text)))
+        return Ok(File(self, path))
     }
 
     func OpenRead(path: Path) -> Result<InputStream, StreamError> {
@@ -244,10 +239,6 @@ class MemoryStorage : StorageProvider {
         contents.Add(bytes)
         let stream: OutputStream = MemoryOutput(bytes)
         return Ok(stream)
-    }
-
-    func FileAt(path: Path, name: string) -> File {
-        return File(self, path, name)
     }
 
     func ReadText(path: Path, maxBytes: int) -> Result<string, FileReadError> {
