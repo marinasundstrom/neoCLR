@@ -96,6 +96,35 @@ build. The latter checks source-project resolution without a prebuilt DLL. Inclu
 changed-library rebuilds, incompatible reference packs, dependency compiler failures
 and stale-output rejection. Do not claim multi-level dependency or restore support.
 
+## Archive without macOS metadata files
+
+The known upstream macOS SDK packaging issue can add AppleDouble `._*` entries.
+Before release, archive the clean staged payload using Python's `tarfile` rather
+than macOS metadata-preserving tar defaults. Do this for both the runtime bundle
+and the Raven SDK; do not modify already published archives. For example:
+
+```python
+from pathlib import Path
+import tarfile
+
+staged = Path("/absolute/path/to/staged-package")
+archive = Path("/absolute/path/to/new-package.tar.gz")
+if archive.exists():
+    raise FileExistsError(archive)
+
+def without_appledouble(member):
+    return None if any(part.startswith("._") for part in Path(member.name).parts) else member
+
+with tarfile.open(archive, "w:gz") as output:
+    output.add(staged, arcname=staged.name, filter=without_appledouble)
+```
+
+Check archive paths and entry kinds before extraction, verify there are no `._*`
+entries, and compare every archived regular file's SHA-256 with the staged payload.
+Then extract into a fresh directory and validate there. Removing sidecars alone
+is not execution evidence. The general Raven packaging-script fix remains deferred;
+this local distribution workaround must not be described as an upstream fix.
+
 ## Validate the actual packaged build
 
 Extract/install into an isolated directory or VS Code profile; preserve the user's

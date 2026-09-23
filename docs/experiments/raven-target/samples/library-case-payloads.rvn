@@ -1,18 +1,21 @@
 import System.*
 import System.Console.*
+import System.Option.*
+import System.Result.*
+
 func Main() {
-    var ok = Result.Ok<int>(42)
-    let carrier = Result<int, Error>(ok)
+    var ok = Ok(42)
+    let carrier: Result<int, string> = ok
     ok.Value = 7
     WriteLine(ok.Value)
     match carrier {
-        .Ok(let value) => WriteLine(value)
-        .Error(_) => Fault("Expected success")
+        Ok(let value) => WriteLine(value)
+        Error(_) => Fault("Expected success")
     }
-    var some = Option.Some<string>("Before")
+    var some = Some("Before")
     some.Value = "After"
     WriteLine(some.Value)
-    var error = Result.Error<string>("Original error")
+    var error = Error("Original error")
     error.Value = "Updated error"
     WriteLine(error.Value)
 }

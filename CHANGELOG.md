@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Correct two stale release samples after the Error-wrapper removal and Storage
+  namespace migration; preserve the case-payload and error-carrier regression intent.
+  Validate all 84 saved-project outcomes against the rebuilt runtime and clean SDK payload.
+  Document sidecar-free archive creation for the known macOS packaging issue,
+  including staged-payload hash comparison and fresh extraction requirements.
+
 - Preserve Rust 1.85 compatibility in worker notification dispatch by replacing
   unsupported let-chain syntax with equivalent nested conditions. The source-archive
   minimum-version check exposed the failure; the supported minimum remains unchanged.

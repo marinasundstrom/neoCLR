@@ -1,105 +1,106 @@
 import System.*
 import System.Console.*
+// ABI regression: exercise case accessors and carrier reconstruction explicitly.
 func Main() {
-    let error0 = IO.FileReadError(IO.FileReadError.InvalidLimit())
+    let error0 = Storage.FileReadError(Storage.FileReadError.InvalidLimit())
     WriteLine(error0.ToString())
-    let restored1 = IO.FileReadError(error0.GetInvalidLimit())
+    let restored1 = Storage.FileReadError(error0.GetInvalidLimit())
     if restored1.IsInvalidLimit {
         WriteLine("Confirmed")
     }
-    let error1 = IO.FileReadError(IO.FileReadError.InvalidPath())
+    let error1 = Storage.FileReadError(Storage.FileReadError.InvalidPath())
     WriteLine(error1.ToString())
-    let restored2 = IO.FileReadError(error1.GetInvalidPath())
+    let restored2 = Storage.FileReadError(error1.GetInvalidPath())
     if restored2.IsInvalidPath {
         WriteLine("Confirmed")
     }
-    let error2 = IO.FileReadError(IO.FileReadError.NotFound())
+    let error2 = Storage.FileReadError(Storage.FileReadError.NotFound())
     WriteLine(error2.ToString())
-    let restored3 = IO.FileReadError(error2.GetNotFound())
+    let restored3 = Storage.FileReadError(error2.GetNotFound())
     if restored3.IsNotFound {
         WriteLine("Confirmed")
     }
-    let error3 = IO.FileReadError(IO.FileReadError.AccessDenied())
+    let error3 = Storage.FileReadError(Storage.FileReadError.AccessDenied())
     WriteLine(error3.ToString())
-    let restored4 = IO.FileReadError(error3.GetAccessDenied())
+    let restored4 = Storage.FileReadError(error3.GetAccessDenied())
     if restored4.IsAccessDenied {
         WriteLine("Confirmed")
     }
-    let error4 = IO.FileReadError(IO.FileReadError.NotRegularFile())
+    let error4 = Storage.FileReadError(Storage.FileReadError.NotRegularFile())
     WriteLine(error4.ToString())
-    let restored5 = IO.FileReadError(error4.GetNotRegularFile())
+    let restored5 = Storage.FileReadError(error4.GetNotRegularFile())
     if restored5.IsNotRegularFile {
         WriteLine("Confirmed")
     }
-    let error5 = IO.FileReadError(IO.FileReadError.TooLarge())
+    let error5 = Storage.FileReadError(Storage.FileReadError.TooLarge())
     WriteLine(error5.ToString())
-    let restored6 = IO.FileReadError(error5.GetTooLarge())
+    let restored6 = Storage.FileReadError(error5.GetTooLarge())
     if restored6.IsTooLarge {
         WriteLine("Confirmed")
     }
-    let error6 = IO.FileReadError(IO.FileReadError.ReadFailed())
+    let error6 = Storage.FileReadError(Storage.FileReadError.ReadFailed())
     WriteLine(error6.ToString())
-    let restored7 = IO.FileReadError(error6.GetReadFailed())
+    let restored7 = Storage.FileReadError(error6.GetReadFailed())
     if restored7.IsReadFailed {
         WriteLine("Confirmed")
     }
-    let error7 = IO.FileReadError(IO.FileReadError.InvalidUtf8())
+    let error7 = Storage.FileReadError(Storage.FileReadError.InvalidUtf8())
     WriteLine(error7.ToString())
-    let restored8 = IO.FileReadError(error7.GetInvalidUtf8())
+    let restored8 = Storage.FileReadError(error7.GetInvalidUtf8())
     if restored8.IsInvalidUtf8 {
         WriteLine("Confirmed")
     }
-    let error8 = IO.FileWriteError(IO.FileWriteError.InvalidLimit())
+    let error8 = Storage.FileWriteError(Storage.FileWriteError.InvalidLimit())
     WriteLine(error8.ToString())
-    let restored9 = IO.FileWriteError(error8.GetInvalidLimit())
+    let restored9 = Storage.FileWriteError(error8.GetInvalidLimit())
     if restored9.IsInvalidLimit {
         WriteLine("Confirmed")
     }
-    let error9 = IO.FileWriteError(IO.FileWriteError.InvalidPath())
+    let error9 = Storage.FileWriteError(Storage.FileWriteError.InvalidPath())
     WriteLine(error9.ToString())
-    let restored10 = IO.FileWriteError(error9.GetInvalidPath())
+    let restored10 = Storage.FileWriteError(error9.GetInvalidPath())
     if restored10.IsInvalidPath {
         WriteLine("Confirmed")
     }
-    let error10 = IO.FileWriteError(IO.FileWriteError.NotFound())
+    let error10 = Storage.FileWriteError(Storage.FileWriteError.NotFound())
     WriteLine(error10.ToString())
-    let restored11 = IO.FileWriteError(error10.GetNotFound())
+    let restored11 = Storage.FileWriteError(error10.GetNotFound())
     if restored11.IsNotFound {
         WriteLine("Confirmed")
     }
-    let error11 = IO.FileWriteError(IO.FileWriteError.AccessDenied())
+    let error11 = Storage.FileWriteError(Storage.FileWriteError.AccessDenied())
     WriteLine(error11.ToString())
-    let restored12 = IO.FileWriteError(error11.GetAccessDenied())
+    let restored12 = Storage.FileWriteError(error11.GetAccessDenied())
     if restored12.IsAccessDenied {
         WriteLine("Confirmed")
     }
-    let error12 = IO.FileWriteError(IO.FileWriteError.NotRegularFile())
+    let error12 = Storage.FileWriteError(Storage.FileWriteError.NotRegularFile())
     WriteLine(error12.ToString())
-    let restored13 = IO.FileWriteError(error12.GetNotRegularFile())
+    let restored13 = Storage.FileWriteError(error12.GetNotRegularFile())
     if restored13.IsNotRegularFile {
         WriteLine("Confirmed")
     }
-    let error13 = IO.FileWriteError(IO.FileWriteError.TooLarge())
+    let error13 = Storage.FileWriteError(Storage.FileWriteError.TooLarge())
     WriteLine(error13.ToString())
-    let restored14 = IO.FileWriteError(error13.GetTooLarge())
+    let restored14 = Storage.FileWriteError(error13.GetTooLarge())
     if restored14.IsTooLarge {
         WriteLine("Confirmed")
     }
-    let error14 = IO.FileWriteError(IO.FileWriteError.WriteFailed())
+    let error14 = Storage.FileWriteError(Storage.FileWriteError.WriteFailed())
     WriteLine(error14.ToString())
-    let restored15 = IO.FileWriteError(error14.GetWriteFailed())
+    let restored15 = Storage.FileWriteError(error14.GetWriteFailed())
     if restored15.IsWriteFailed {
         WriteLine("Confirmed")
     }
-    let error15 = IO.ConsoleReadError(IO.ConsoleReadError.Unavailable())
+    let error15 = ConsoleReadError(ConsoleReadError.Unavailable())
     WriteLine(error15.ToString())
-    let restored16 = IO.ConsoleReadError(error15.GetUnavailable())
+    let restored16 = ConsoleReadError(error15.GetUnavailable())
     if restored16.IsUnavailable {
         WriteLine("Confirmed")
     }
-    let error16 = IO.ConsoleReadError(IO.ConsoleReadError.ReadFailed())
+    let error16 = ConsoleReadError(ConsoleReadError.ReadFailed())
     WriteLine(error16.ToString())
-    let restored17 = IO.ConsoleReadError(error16.GetReadFailed())
+    let restored17 = ConsoleReadError(error16.GetReadFailed())
     if restored17.IsReadFailed {
         WriteLine("Confirmed")
     }
