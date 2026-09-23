@@ -25,6 +25,22 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-23 — Continue async release preparation
+
+**Author request.** “Continue with the release”.
+
+**Assistant actions.** Pushed the corrected implementation candidate e9bb28a to a
+separate release-validation branch for six-job source CI. Rebuilt and checked its
+package, including an interactive VS Code build/run and Task type hover in a named
+profile. Recorded results and a release-note draft. Asked for a version preference,
+suggesting 0.1.0-preview.9; no answer was available at preparation time. The assistant
+used that next preview number as a candidate-preparation choice, not an attributed
+author decision or publication approval. Updated Cargo metadata and kept publication
+pending the versioned candidate's own validation.
+
+**Open.** Final candidate source/platform checks, artifact hashes and publication.
+See [the release plan](async-preview-plan.md) and [candidate evidence](async-preview-candidate-validation.json).
+
 ## 2026-09-23 — Broader concurrency and tracked threads after release
 
 **Author direction.** “After the release, we will rename System.Threading as

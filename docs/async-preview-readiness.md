@@ -1,7 +1,8 @@
 # Async preview readiness — 2026-09-23
 
 This is local preparation for the [author-selected async/Tasks release](async-preview-plan.md),
-not a release certification. The release version/date and final candidate remain unset.
+not a release certification. Preview 9 is now the prepared version; publication
+and certification of the final versioned candidate remain pending.
 The first evaluator build uses clean isolated neoCLR and Raven worktrees; Raven stays
 on `codex/async-preview-readiness`, based on the existing neoCLR feature revision.
 The default developer SDK selection and default VS Code profile are unchanged.
@@ -181,7 +182,8 @@ the separate profile remains available. Earlier failed UI binding attempts are
 preserved above, but no longer block this particular check.
 
 The [release-note draft](async-preview-release-notes.md) covers current behavior,
-migration and limits. Its version/date and final asset set remain unset. README now
+migration and limits. Preview 9 is now the prepared version; publication date and final asset hashes
+remain unset. README now
 mentions development async/worker support while retaining Preview 8 as the published
 release. Source/platform and remaining distribution gates still need completion.
 

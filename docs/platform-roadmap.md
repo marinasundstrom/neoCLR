@@ -72,7 +72,8 @@ HTTP and completion of M1 are not prerequisites. The experimental nonblocking wo
 adapter and guest operation cancellation tokens are not part of the supported scope.
 
 This is a release checkpoint within the foundations work, not a replacement for M1
-or a declaration that S0 is complete. Version/date remain unset.
+or a declaration that S0 is complete. Preview 9 is the prepared candidate version;
+publication remains pending validation.
 The author also requests a DocFX API reference at `/docs/`. For this release,
 provide a useful overview, main async API descriptions and links to tested examples;
 complete member coverage is not a release gate. See [documentation maintenance](../api-docs/README.md).

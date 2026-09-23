@@ -1,7 +1,10 @@
-# neoCLR — Async and Tasks preview
+# neoCLR Preview 9 — Async and Tasks
 
-Release draft for candidate e9bb28a. Version and publication date are not selected.
-Validation is in progress; this document is not a release announcement.
+Version: **0.1.0-preview.9** · Intended tag: **v0.1.0-preview.9**.
+Release scope selected 2026-09-23. Candidate validation is in progress; publication
+has not occurred. The final manifest must record the exact revision and validation
+results. Earlier e9bb28a evidence is preparation evidence, not certification of this
+versioned candidate.
 
 neoCLR is an experimental application platform. This preview adds Task/Promise,
 Raven async/await and isolated workers, with small runnable examples showing
@@ -99,5 +102,4 @@ Pending: exact-candidate six-job Linux/macOS/Windows source matrix, full local s
 archives, final artifact manifest/hashes. All six extracted Task contract probes pass.
 The candidate passes the interactive VSIX build/run and Task type-hover check in a
 separate profile, and all eight Async Workbench cases.
-Binary validation targets macOS arm64 only. No final release files or checksums are
-selected here. The changelog continues after release with a fresh Unreleased section.
+Binary validation targets macOS arm64 only. Final release files and checksums must be recorded in the manifest. The changelog continues after release with a fresh Unreleased section.

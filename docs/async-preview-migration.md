@@ -1,7 +1,7 @@
 # Async preview migration review
 
-Draft for the upcoming async/Tasks preview, reviewed 2026-09-23. No release number,
-date or final candidate is selected. The baseline is published `v0.1.0-preview.8`;
+Migration draft for the prepared 0.1.0-preview.9 async/Tasks candidate, reviewed
+2026-09-23. Publication and final validation remain pending. The baseline is published `v0.1.0-preview.8`;
 the initial review covers changes through `556fd7a`, with follow-up review through
 `0fec5e8`. The follow-up restores Rust 1.85 compatibility, corrects two stale sample
 fixtures and records future concurrency direction; it introduces no additional runtime

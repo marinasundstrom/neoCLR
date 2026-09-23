@@ -4,7 +4,9 @@ Author-selected immediate priority, recorded 2026-09-23. After asking when to re
 the async/Task work, the author accepted this scope and directed that it take priority
 before further platform expansion. This is a release scope and readiness plan,
 not a release announcement or publication approval.
-Version, publication date and candidate revisions remain unset.
+The prepared candidate version is **0.1.0-preview.9**. Publication date and final
+artifact hashes remain unset; record the exact versioned commit in the manifest.
+The earlier e9bb28a checks do not certify the subsequent versioned candidate.
 
 ## When to release
 

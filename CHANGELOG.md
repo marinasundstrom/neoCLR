@@ -6,7 +6,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+Changes after the prepared Preview 9 candidate will be recorded here.
+
+## 0.1.0-preview.9
+
+Prepared candidate; publication date and final evidence belong to the release manifest.
+The dated entries below record development, including explicitly labelled future plans.
+
 ### 2026-09-23
+
+- Prepare version 0.1.0-preview.9 for the async/Tasks release, with matching Cargo
+  metadata and release/migration guidance. Source and package validation of this
+  versioned candidate must pass before publication; earlier candidate results remain
+  separately attributed. Retain a fresh Unreleased section for subsequent work.
 
 - Continue async release preparation with a fresh e9bb28a evaluator bundle, eight
   passing Workbench cases, all six packaged Task probes, dependency/hash checks, a runtime-only execution check

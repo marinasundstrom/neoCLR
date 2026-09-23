@@ -47,7 +47,7 @@ propagation, text and numeric helpers, files, date/time, reflection introspectio
 delegates, interfaces and native buffers. Development builds also support
 [Tasks, Promise and Raven async/await](docs/task-contracts.md), including isolated
 string workers and default callback dispatch. The [async release checkpoint](docs/async-preview-plan.md)
-is being validated; these additions are not in published Preview 8. The APIs are
+is being validated as the Preview 9 candidate; these additions are not in published Preview 8. The APIs are
 experimental and open to feedback.
 
 Start with the [runtime and Raven walkthrough](docs/runtime-raven-preview.md), covering
