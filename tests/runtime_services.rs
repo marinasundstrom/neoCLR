@@ -171,4 +171,14 @@ fn worker_notification_requires_worker_and_dispatch_services() {
         graph.required_services(),
         [Service::TaskDispatch, Service::IsolatedWorkers]
     );
+    for name in ["RequestWorkerCancellation", "JoinWorkerResult"] {
+        let graph = LoadedProgram::new(&module).unwrap().analyze_reachability(
+            &[parse_function_ref(&format!("neoCLR.Runtime.{name}(Int32)")).unwrap()], 1,
+        ).unwrap();
+        assert_eq!(graph.required_services(), if name == "JoinWorkerResult" {
+            vec![Service::ValueStorage, Service::IsolatedWorkers]
+        } else {
+            vec![Service::IsolatedWorkers]
+        });
+    }
 }

@@ -87,3 +87,9 @@ channel and bounded acknowledgement, distinguishing it from invocation cancellat
 Also decide queue affinity and byte payload accounting before adding a filesystem
 producer. Do not generalize a no-op String worker into a guarantee for noncooperative
 OS calls, async Storage, safe buffer borrowing or bounded shutdown.
+
+
+The [per-job runtime follow-up](../../isolated-workers.md#per-job-cancellation-experiment-2026-09-23)
+now adds independent stop requests and a cancellation-aware raw join, with registry
+and direct-IL validation. This sample still uses deferred discard; its adapter does
+not yet consume the new services. The next slice must connect those layers explicitly.

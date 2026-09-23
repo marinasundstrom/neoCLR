@@ -8,6 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Give isolated jobs independent cooperative cancellation tokens. Add experimental
+  raw RequestWorkerCancellation and JoinWorkerResult runtime services: requests retain
+  pending roots, and acknowledged job cancellation returns an erased Void outcome for
+  adapters. Cached success and unrelated Faults are preserved; host cancellation and
+  legacy JoinWorker behavior remain terminal. Release pooled per-job state before
+  result publication and retain all-job cancellation/join on invocation teardown.
+  Ordinary Raven Thread/Task/Storage APIs are unchanged; document the raw services
+  on-site and keep guest Task-adapter integration as the next slice.
+  Validation: 10 worker-registry tests, 16 worker integration tests including both
+  execution backends and cancellation/GC, service reachability, normal build and
+  website tests/build.
+
 - Connect the pending-read experiment to real isolated host workers and the existing
   notification adapter. Defer requested cancellation until joined producer completion,
   then discard the owned payload; preserve completed results against late requests.

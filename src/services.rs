@@ -59,6 +59,8 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
         let service = match crate::native::bind(function)? {
             crate::native::Binding::StartWorker(_)
             | crate::native::Binding::JoinWorker
+            | crate::native::Binding::JoinWorkerResult
+            | crate::native::Binding::RequestWorkerCancellation
             | crate::native::Binding::NotifyWorker => RuntimeService::IsolatedWorkers,
             crate::native::Binding::CurrentTaskQueue
             | crate::native::Binding::DefaultTaskQueue

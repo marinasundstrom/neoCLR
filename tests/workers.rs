@@ -550,3 +550,86 @@ fn explicit_queue_does_not_dispatch_default_queue_notifications() {
     );
     assert!(result.unwrap_err().message.contains("instruction limit"));
 }
+
+#[test]
+fn individual_worker_cancellation_is_acknowledged_without_cancelling_siblings() {
+    let producer = ".function UntilCancelled(String text) -> String\nAgain:\nbr Again\n.end";
+    for start in ["StartWorker", "QueueWorker"] {
+        let body = format!(
+            r#"
+.local Int32 cancelled
+.local Int32 sibling
+delegate.bind System.Func<String,String> = UntilCancelled(String)
+ldstr ""
+call neoCLR.Runtime.{start}(System.Func<String,String>,String)
+stloc cancelled
+delegate.bind System.Func<String,String> = Echo(String)
+ldstr "sibling survived"
+call neoCLR.Runtime.{start}(System.Func<String,String>,String)
+stloc sibling
+ldloc cancelled
+call neoCLR.Runtime.RequestWorkerCancellation(Int32)
+brtrue Requested
+fault "first request was not accepted"
+Requested:
+ldloc cancelled
+call neoCLR.Runtime.RequestWorkerCancellation(Int32)
+brfalse Repeated
+fault "duplicate request was accepted"
+Repeated:
+ldloc cancelled
+call neoCLR.Runtime.JoinWorkerResult(Int32)
+value.unpack Void
+pop
+ldloc sibling
+call neoCLR.Runtime.JoinWorkerResult(Int32)
+value.unpack String
+"#
+        );
+        let execution = execute_options(
+            &body,
+            producer,
+            Limits {
+                instructions: 100_000_000,
+                ..Limits::default()
+            }
+            .into(),
+        )
+        .unwrap();
+        assert_eq!(execution.value, Value::String("sibling survived".into()));
+    }
+    assert!(
+        execute(
+            "ldc.i4 -1\ncall neoCLR.Runtime.RequestWorkerCancellation(Int32)\npop\nldstr \"bad\"",
+            ""
+        )
+        .unwrap_err()
+        .message
+        .contains("Unknown")
+    );
+}
+
+#[test]
+fn cancelled_notification_keeps_receiver_alive_until_acknowledged_join() {
+    let types = NOTIFY_TYPES.replace(
+        "call neoCLR.Runtime.JoinWorker(Int32)\npop",
+        "call neoCLR.Runtime.JoinWorkerResult(Int32)\nvalue.unpack Void\npop",
+    ).replace("= Echo(String)", "= UntilCancelled(String)")
+     .replace("stloc handle\nldc.i4 1", "stloc handle\nldloc handle\ncall neoCLR.Runtime.RequestWorkerCancellation(Int32)\npop\nldc.i4 1");
+    let producer = ".function UntilCancelled(String text) -> String\nAgain:\nbr Again\n.end";
+    let body = ".local Int32 index\ncall Launch()\npop\nldc.i4 0\nstloc index\nAgain:\nldc.i4 16\nnewarr Byte\npop\nldloc index\nldc.i4 1\nadd\nstloc index\nldloc index\nldc.i4 100\nblt Again\nldstr \"entry\"";
+    let result = execute_options(
+        body,
+        &format!("{types}\n{producer}"),
+        Limits {
+            instructions: 100_000_000,
+            heap_objects: 32,
+            ..Limits::default()
+        }
+        .into(),
+    )
+    .unwrap();
+    assert_eq!(result.output, ["copied"]);
+    assert!(result.heap.statistics().reclaimed_objects >= 100);
+    assert_eq!(result.heap.statistics().live_objects, 0);
+}

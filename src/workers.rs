@@ -81,9 +81,13 @@ fn execute(mut job: Job) {
         }
         fault
     });
+    // Publish only after per-job producer state is released, including on pooled workers.
+    drop(output);
+    drop(job.module);
     let _ = job.reply.send(result);
 }
 struct WorkerResult {
+    cancellation: CancellationToken,
     thread: Option<JoinHandle<()>>,
     receive: Option<mpsc::Receiver<Outcome>>,
     ready: Option<Outcome>,
@@ -95,7 +99,6 @@ pub(crate) struct Workers {
     results: Vec<WorkerResult>,
     threads: Vec<JoinHandle<()>>,
     pool: Option<mpsc::SyncSender<Job>>,
-    cancellation: CancellationToken,
 }
 impl Workers {
     pub(crate) fn start(
@@ -134,6 +137,7 @@ impl Workers {
             ));
         }
         let (reply, receive) = mpsc::channel();
+        let cancellation = CancellationToken::new();
         let job = Job {
             module: Arc::new(module.clone()),
             function,
@@ -141,7 +145,7 @@ impl Workers {
             options: ExecutionOptions {
                 limits: options.limits,
                 arguments: options.arguments.clone(),
-                cancellation: Some(self.cancellation.clone()),
+                cancellation: Some(cancellation.clone()),
                 ..Default::default()
             },
             reply,
@@ -184,6 +188,7 @@ impl Workers {
             );
         }
         self.results.push(WorkerResult {
+            cancellation,
             thread: dedicated,
             receive: Some(receive),
             ready: None,
@@ -192,6 +197,23 @@ impl Workers {
         });
         Ok(Value::Int32((self.results.len() - 1) as i32))
     }
+    // A request changes no outcome and releases no roots or producer resources.
+    pub(crate) fn request_cancellation(&mut self, args: Vec<Value>) -> Result<Value, Fault> {
+        let [Value::Int32(id)] = args.as_slice() else {
+            return Err(Fault::new("Invalid worker handle"));
+        };
+        let result = usize::try_from(*id)
+            .ok()
+            .and_then(|i| self.results.get_mut(i))
+            .ok_or_else(|| Fault::new("Unknown worker"))?;
+        if result.receive.is_none() && result.ready.is_none() || result.cancellation.is_cancelled()
+        {
+            return Ok(Value::Boolean(false));
+        }
+        result.cancellation.cancel();
+        Ok(Value::Boolean(true))
+    }
+
     // Experimental notification path. It retains the callback until the VM
     // transfers it into a TaskQueue.Post frame; no guest Value enters a worker.
     pub(crate) fn notify(&mut self, args: Vec<Value>) -> Result<Value, Fault> {
@@ -294,6 +316,16 @@ impl Workers {
         output: &mut Vec<String>,
         options: &ExecutionOptions,
     ) -> Result<Value, Fault> {
+        self.join_result(args, output, options, false)
+    }
+
+    pub(crate) fn join_result(
+        &mut self,
+        args: Vec<Value>,
+        output: &mut Vec<String>,
+        options: &ExecutionOptions,
+        cancellation_as_value: bool,
+    ) -> Result<Value, Fault> {
         let [Value::Int32(id)] = args.as_slice() else {
             return Err(Fault::new("Invalid worker handle"));
         };
@@ -330,7 +362,17 @@ impl Workers {
                             .join()
                             .map_err(|_| Fault::new("Worker thread panicked"))?;
                     }
-                    let (value, lines) = outcome?;
+                    let (value, lines) = match outcome {
+                        Err(fault)
+                            if cancellation_as_value
+                                && result.cancellation.is_cancelled()
+                                && fault.code == crate::FaultCode::ExecutionCancelled =>
+                        {
+                            options.check_cancellation("Worker.Join", 0)?;
+                            return Ok(Value::Void);
+                        }
+                        other => other?,
+                    };
                     // Keep worker output isolated until explicitly joined.
                     if let Some(console) = &options.console {
                         for line in lines {
@@ -354,7 +396,9 @@ impl Workers {
 }
 impl Drop for Workers {
     fn drop(&mut self) {
-        self.cancellation.cancel();
+        for result in &self.results {
+            result.cancellation.cancel();
+        }
         self.pool.take();
         for result in &mut self.results {
             if let Some(thread) = result.thread.take() {
@@ -373,11 +417,135 @@ mod tests {
 
     fn pending(receive: mpsc::Receiver<Outcome>, marker: i32) -> WorkerResult {
         WorkerResult {
+            cancellation: CancellationToken::new(),
             thread: None,
             receive: Some(receive),
             ready: None,
             notification: Some(Value::Int32(marker)),
             registered: true,
+        }
+    }
+
+    #[test]
+    fn operation_cancel_waits_for_acknowledgement_and_leaves_sibling_live() {
+        let (send, receive) = mpsc::channel();
+        let (_sibling_send, sibling_receive) = mpsc::channel();
+        let mut workers = Workers::default();
+        workers.results = vec![pending(receive, 1), pending(sibling_receive, 2)];
+        let token = workers.results[0].cancellation.clone();
+        let cleaned = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let finished = cleaned.clone();
+        workers.results[0].thread = Some(std::thread::spawn(move || {
+            let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+            while !token.is_cancelled() {
+                assert!(std::time::Instant::now() < deadline);
+                std::thread::yield_now();
+            }
+            send.send(Err(Fault::coded(
+                crate::FaultCode::ExecutionCancelled,
+                "execution cancelled",
+            )))
+            .unwrap();
+            finished.store(true, std::sync::atomic::Ordering::Release);
+        }));
+        assert_eq!(
+            workers.request_cancellation(vec![Value::Int32(0)]).unwrap(),
+            Value::Boolean(true)
+        );
+        assert_eq!(
+            workers.request_cancellation(vec![Value::Int32(0)]).unwrap(),
+            Value::Boolean(false)
+        );
+        assert!(!workers.results[1].cancellation.is_cancelled());
+        assert_eq!(workers.results[0].notification, Some(Value::Int32(1)));
+        let options = ExecutionOptions::default();
+        assert_eq!(
+            workers.wait_notification(&options).unwrap(),
+            Some(Value::Int32(1))
+        );
+        assert_eq!(
+            workers
+                .join_result(vec![Value::Int32(0)], &mut vec![], &options, true)
+                .unwrap(),
+            Value::Void
+        );
+        assert!(cleaned.load(std::sync::atomic::Ordering::Acquire));
+        assert_eq!(
+            workers.request_cancellation(vec![Value::Int32(0)]).unwrap(),
+            Value::Boolean(false)
+        );
+        assert!(
+            workers
+                .join_result(vec![Value::Int32(0)], &mut vec![], &options, true)
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn request_does_not_override_ready_success_or_forge_cancellation() {
+        for outcome in [
+            Ok(("done".into(), vec![])),
+            Err(Fault::coded(
+                crate::FaultCode::UserFault,
+                "execution cancelled",
+            )),
+        ] {
+            let success = outcome.is_ok();
+            let (send, receive) = mpsc::channel();
+            send.send(outcome).unwrap();
+            let mut workers = Workers::default();
+            workers.results.push(pending(receive, 1));
+            assert_eq!(workers.poll_notification(), Some(Value::Int32(1)));
+            assert_eq!(
+                workers.request_cancellation(vec![Value::Int32(0)]).unwrap(),
+                Value::Boolean(true)
+            );
+            let result = workers.join_result(
+                vec![Value::Int32(0)],
+                &mut vec![],
+                &ExecutionOptions::default(),
+                true,
+            );
+            if success {
+                assert_eq!(result.unwrap(), Value::String("done".into()));
+            } else {
+                assert_eq!(result.unwrap_err().code, crate::FaultCode::UserFault);
+            }
+        }
+    }
+
+    #[test]
+    fn legacy_join_and_invocation_cancellation_still_fault() {
+        for invocation_cancelled in [false, true] {
+            let (send, receive) = mpsc::channel();
+            send.send(Err(Fault::coded(
+                crate::FaultCode::ExecutionCancelled,
+                "execution cancelled",
+            )))
+            .unwrap();
+            let mut workers = Workers::default();
+            workers.results.push(pending(receive, 1));
+            workers.request_cancellation(vec![Value::Int32(0)]).unwrap();
+            assert_eq!(workers.poll_notification(), Some(Value::Int32(1)));
+            let token = CancellationToken::new();
+            if invocation_cancelled {
+                token.cancel();
+            }
+            let options = ExecutionOptions {
+                cancellation: Some(token),
+                ..Default::default()
+            };
+            // Legacy join always faults; the new join must not swallow host cancellation.
+            let result = workers.join_result(
+                vec![Value::Int32(0)],
+                &mut vec![],
+                &options,
+                invocation_cancelled,
+            );
+            assert_eq!(
+                result.unwrap_err().code,
+                crate::FaultCode::ExecutionCancelled
+            );
         }
     }
 
@@ -392,6 +560,7 @@ mod tests {
         });
         let mut workers = Workers::default();
         workers.results.push(WorkerResult {
+            cancellation: CancellationToken::new(),
             thread: Some(thread),
             receive: Some(receive),
             ready: None,
@@ -535,9 +704,9 @@ mod tests {
     #[test]
     fn teardown_waits_for_producer_cancellation_acknowledgement() {
         let mut workers = Workers::default();
-        let cancellation = workers.cancellation.clone();
         let (send, receive) = mpsc::channel();
         workers.results.push(pending(receive, 1));
+        let cancellation = workers.results[0].cancellation.clone();
         let acknowledged = Arc::new(std::sync::atomic::AtomicBool::new(false));
         let finished = acknowledged.clone();
         workers.threads.push(std::thread::spawn(move || {

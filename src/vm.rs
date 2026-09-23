@@ -2681,6 +2681,13 @@ fn interpret_instructions(
                                 ));
                             }
                             workers.notify(args)?
+                        } else if matches!(
+                            binding,
+                            crate::native::Binding::RequestWorkerCancellation
+                        ) {
+                            workers.request_cancellation(args)?
+                        } else if matches!(binding, crate::native::Binding::JoinWorkerResult) {
+                            Value::Erased(Box::new(workers.join_result(args, output, options, true)?))
                         } else if matches!(binding, crate::native::Binding::JoinWorker) {
                             workers.join(args, output, options)?
                         } else {

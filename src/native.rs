@@ -22,6 +22,8 @@ pub(crate) enum Binding {
     RegisterDefaultTaskQueue,
     StartWorker(bool),
     JoinWorker,
+    JoinWorkerResult,
+    RequestWorkerCancellation,
     NotifyWorker,
     AssemblyInfo(crate::assembly_info::Query),
     TypeName,
@@ -265,6 +267,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ) if definition == "System.Func" && arguments == &[Type::String, Type::String] => {
             (Binding::StartWorker(true), Type::Int32)
         }
+        ("neoCLR.Runtime.RequestWorkerCancellation", [Type::Int32]) => {
+            (Binding::RequestWorkerCancellation, Type::Boolean)
+        }
+        ("neoCLR.Runtime.JoinWorkerResult", [Type::Int32]) => (Binding::JoinWorkerResult, Type::Value),
         ("neoCLR.Runtime.JoinWorker", [Type::Int32]) => (Binding::JoinWorker, Type::String),
         ("neoCLR.Runtime.NotifyWorker", [Type::Int32, callback])
             if *callback == crate::assembler::parse_type("System.Func<Void>")? =>

@@ -131,3 +131,45 @@ The [concurrency direction](concurrency-direction.md) distinguishes result-orien
 `Task.Run` with platform-selected execution from a retained Thread object with `Start()` and a `Task` property for
 termination. These shapes are not implemented. Optional thread packaging and platform
 availability remain open; the current isolated string-worker contract above still applies.
+
+## Per-job cancellation experiment — 2026-09-23
+
+Each WorkerResult now owns an independent CancellationToken, also passed to that
+job's interpreter. Teardown requests all retained tokens before joining dedicated
+and pooled producers. This preserves invocation-wide teardown while allowing one
+job to be stopped independently through the experimental raw runtime service
+RequestWorkerCancellation(Int32) -> Boolean. Requests do not remove callbacks,
+receivers or managed roots, and do not synthesize a terminal result.
+
+JoinWorkerResult(Int32) -> Value is a cancellation-aware alternative to JoinWorker.
+It returns erased String on success, erased Void only for ExecutionCancelled from
+a job whose own token was requested, and preserves other Faults. Host invocation
+cancellation remains terminal and is not converted into Void. Successful results
+already produced win over later requests; a true request return is not a cancellation
+outcome. Unknown handles fault, repeat requests/requests after join return false,
+and terminal results are consumed once. Registered joins remain forbidden until
+notification dispatch. Existing JoinWorker behavior and ordinary Raven APIs remain.
+
+Producer acknowledgement follows execution and per-job cleanup. Dedicated joins
+also join the host thread; pooled producers release their output-capture/module
+state before publishing a terminal result. No native call interruption or bounded
+shutdown follows from polling a token at interpreter boundaries. Per-job tokens add
+one shared flag allocation per submitted job, retaining the existing 64-job limit.
+No scheduler, GC algorithm or public token abstraction changes.
+
+This adapts the [.NET cooperative cancellation baseline](https://learn.microsoft.com/en-us/dotnet/standard/threading/cancellation-in-managed-threads),
+reviewed in the [pending-read comparison](experiments/pending-read/README.md#net-comparison-and-alternatives).
+The benefit over one shared worker token is isolation of sibling jobs, at the cost
+of individual token state and a separate terminal result contract. Keeping a shared
+token is simpler but cannot express one operation's cancellation. Immediate guest
+Promise cancellation would skip producer acknowledgement. Neither alternative is
+silently selected for Storage: these services are provisional adapter machinery.
+
+Registry tests use controlled channels to check request retention, actual producer
+acknowledgement, late success, fault-code identity, legacy join behavior, invocation
+cancellation precedence and teardown. Direct-IL tests exercise real dedicated and
+pooled interpreters, one cancelled looping job alongside a successful sibling, and
+cancelled notifications with collected/retained managed receivers. The loop's large
+instruction budget is a watchdog allowance, not a cancellation deadline. A Task
+adapter mapping Void to Promise.Cancel is still required for a guest-facing product.
+See the [on-site service contract](../api-docs/pending-read.md#experimental-per-worker-cancellation-services).

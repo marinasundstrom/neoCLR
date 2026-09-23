@@ -352,3 +352,15 @@ delayed-copy and busy-queue consumers also pass the shared harness.
 This is deferred cancellation, not producer interruption. A no-op managed String
 worker does not establish async file I/O or bounded native shutdown. Per-operation
 cancel channels, queue affinity, byte payloads and producer Fault mapping remain open.
+
+
+## Per-job producer cancellation — 2026-09-23
+
+Experimental raw RequestWorkerCancellation and JoinWorkerResult services now
+separate job stop requests from invocation teardown and terminal acknowledgement.
+Each job has its own token; sibling jobs continue. Acknowledged job cancellation
+can be returned as an erased Void value for an adapter, while host cancellation
+and unrelated producer Faults remain terminal. Direct-IL and registry tests cover
+these boundaries; the ordinary Raven core still exposes no new cancellation API.
+Connect this result to Promise.Cancel in the isolated adapter before claiming an
+end-to-end cancellable Task product. Native interruption and bounded shutdown remain open.

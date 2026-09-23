@@ -250,8 +250,14 @@ await. Five cases cover deferred cancellation, completion and bounded payload ou
 with GC and unrelated ready work. Cancellation before delivery discards a completed
 result; it does not interrupt the worker. The existing runtime and public API are unchanged.
 
-**Next direction:** investigate per-operation producer cancellation and acknowledgement,
-queue affinity and byte payload accounting before introducing a filesystem producer.
+Experimental raw worker services now give each job an independent cancellation
+token and a cancellation-aware terminal join. Registry/direct-IL evidence covers
+acknowledgement, sibling isolation and retained notification state; ordinary Raven
+Thread/Task/Storage APIs are unchanged. See [worker contracts](isolated-workers.md#per-job-cancellation-experiment-2026-09-23).
+
+**Next direction:** map the acknowledged worker outcome into Promise cancellation
+in the isolated Raven adapter, then address queue affinity and byte payload accounting
+before introducing a filesystem producer.
 Keep M1 suspension and cancellation work ahead of networking. Evaluate task-returning provider operations
 against that suspension model; do not expand Storage metadata or mutations without
 a concrete case. Preserve the working disk/memory consumer.

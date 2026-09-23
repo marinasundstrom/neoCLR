@@ -144,3 +144,9 @@ Development streams moved from System.Streams to System.IO. TextReader, StreamRe
 TextReadError and SeekableStream are selected for generated member documentation.
 TextReader/StreamReader use strict bounded UTF-8 reading; FileInputStream adds optional
 positioning. Public names and exact unit-return exclusions were migrated together.
+
+
+The provisional raw worker cancellation services are not managed reference-core
+members. Their exact low-level signatures, outcomes and limitations are documented
+in [Pending reads](pending-read.md#experimental-per-worker-cancellation-services).
+No public Thread/Task member was added by that runtime experiment.

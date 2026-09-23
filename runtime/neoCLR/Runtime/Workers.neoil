@@ -11,3 +11,10 @@
 .function neoCLR.Runtime.NotifyWorker(Int32 handle,System.Func<Void> callback) -> Void
 .methodimpl InternalCall
 .end
+
+.function neoCLR.Runtime.RequestWorkerCancellation(Int32 handle) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.JoinWorkerResult(Int32 handle) -> Value
+.methodimpl InternalCall
+.end
