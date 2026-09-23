@@ -372,7 +372,11 @@ requirements and Raven branch/integration rules continue to apply.
 
 **Next:** finish the [remaining async preview gates](async-preview-plan.md#next-action-and-exit):
 interactive editor validation, source/archive and platform checks, and migration review.
-The [fresh local package checks](async-preview-readiness.md#follow-up-package-validation) pass. After the release checkpoint, prioritize
+The [fresh local package checks](async-preview-readiness.md#follow-up-package-validation) pass.
+The subsequent minimum-Rust archive check exposed unsupported dispatch syntax;
+the local fix passes all-target compilation and worker regressions. Rebuild and
+revalidate the corrected candidate; use the [migration draft](async-preview-migration.md)
+for the remaining distribution review. After the release checkpoint, prioritize
 Streams, Storage and Encoding through the bounded file-transformer progression.
 Select the needed small guest operation cancellation contract and extend the real
 delayed-copy evidence to its completion races and queue affinity before pending I/O.

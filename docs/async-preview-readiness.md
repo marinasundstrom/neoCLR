@@ -82,6 +82,28 @@ sources are unchanged between these bundles. Dependency notice audits cover all
 23 bundle and 26 SDK NuGet dependencies, verifying all 34 preserved notice sets.
 This is local evidence; it does not select a final release candidate.
 
+## Source-archive follow-up
+
+The first minimum-Rust archive check at `556fd7a` failed at compile time: worker
+notification dispatch used two let-chain conditions unavailable in Rust 1.85.
+The implementation now uses equivalent nested conditions, preserving the advertised
+minimum. A fresh `cargo +1.85.0 check --locked --all-targets` passes locally.
+Formatting, strict stable Clippy on all targets and all 14 worker regression tests
+also pass with the fix, including self-reposting default-queue progress and explicit
+queue isolation. Logs are `msrv-fix-check.log`, `msrv-fix-clippy.log` and
+`msrv-fix-workers.log` in the local validation directory.
+The original stable full-suite run was stopped after this finding because its
+pre-fix archive is superseded; it is not a passed source-archive gate. Both
+`source-minimum/report.json` and `source-stable/report.json` remain in the local
+validation directory with their unsuccessful status. The fixed commit requires
+fresh archive/platform evidence and a rebuilt binary package before publication.
+
+The [migration draft](async-preview-migration.md) covers published Preview 8 breaks
+as well as intermediate development Task renames, separating those two audiences.
+The VSIX installed successfully into an isolated profile under the validation
+directory. Interactive build/run inspection remains unverified: the available UI
+binding selected the existing user editor instance, which was not reconfigured.
+
 ## Remaining release work
 
 Finish exact-candidate source/archive validation, interactive editor checks

@@ -4,6 +4,10 @@ Every commit must include an update to [CHANGELOG.md](../CHANGELOG.md). This app
 to implementation, fixes, tests, documentation, build tooling and maintenance work.
 The changelog is a maintained release summary, not a verbatim copy of Git messages.
 
+The author reaffirmed on 2026-09-23 that this changelog continues after the async
+release. It is a permanent project record, not a temporary release checklist.
+Keep published history and a fresh Unreleased section for each subsequent cycle.
+
 ## During development
 
 1. Update **Unreleased** using the current development date in `YYYY-MM-DD` form.

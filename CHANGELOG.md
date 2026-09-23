@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Preserve Rust 1.85 compatibility in worker notification dispatch by replacing
+  unsupported let-chain syntax with equivalent nested conditions. The source-archive
+  minimum-version check exposed the failure; the supported minimum remains unchanged.
+  Validate all targets on Rust 1.85, strict stable Clippy and 14 worker regressions.
+- Draft migration guidance from Preview 8 and intermediate Task builds. Reaffirm
+  that this changelog continues permanently after the async release, with frozen
+  published entries and a fresh Unreleased section for later development.
+
 - Add a DocFX development API reference at `/docs/`, with an API overview, authored
   XML descriptions for the initial Task surface, and metadata-generated signatures.
   Document three unsupported callback signatures separately in Raven notation.

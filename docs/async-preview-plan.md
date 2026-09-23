@@ -83,7 +83,10 @@ Preview 8 instead of assuming this list is exhaustive.
 Local progress is recorded in [the readiness inventory](async-preview-readiness.md).
 The corrected package, full library regeneration and protocol/MSBuild checks now
 pass locally. Next, complete interactive editor validation, exact-candidate source
-archive/platform checks and the full migration/distribution review.
+archive/platform checks and the final migration/distribution review.
+The [migration draft](async-preview-migration.md) inventories known breaks; the
+minimum-Rust archive check found a dispatch syntax issue, now corrected locally.
+Rebuild the runtime bundle and validate the corrected committed tree before release.
 Record blockers with evidence and only claim platforms actually tested. Remote candidate CI and publication remain distinct
 steps; this plan does not tag, push, upload artifacts or publish the website.
 

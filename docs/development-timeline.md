@@ -5073,3 +5073,12 @@ and recorded the convention for runtime code as well as examples.
   the existing manual main-branch workflow and has not occurred in this work.
   Broader member coverage and automatic XML emission from Raven source comments
   remain future work.
+
+
+### 2026-09-23 — Keep the changelog after release
+
+- **Author:** stated, “We are going to keep a Changelog after this release”.
+- **Assistant:** confirmed that `CHANGELOG.md` remains a permanent record: published
+  entries stay frozen and later work continues under Unreleased. Recorded this
+  explicit continuation in the changelog workflow; existing per-commit requirements
+  remain in effect. No release publication or changelog reset was performed.
