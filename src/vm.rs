@@ -1493,6 +1493,33 @@ fn interpret_frames(
     })
 }
 
+fn worker_notification_frame(
+    module: &Module,
+    queue: Value,
+    callback: Value,
+) -> Result<Frame, Fault> {
+    let post = resolve(
+        module,
+        &FunctionRef {
+            definition: None,
+            name: "System.Tasks.TaskQueue.Post".into(),
+            owner: Some(Type::from_name("System.Tasks.TaskQueue")),
+            instance: true,
+            generic_arguments: vec![],
+            parameters: vec![crate::assembler::parse_type("System.Func<Void>")?],
+        },
+    )?;
+    if !post.no_result
+        || post
+            .definition
+            .as_ref()
+            .is_none_or(|id| id.module != "System")
+    {
+        return Err(Fault::new("Invalid default TaskQueue post contract"));
+    }
+    Frame::new(post, vec![queue, callback])
+}
+
 #[allow(clippy::too_many_arguments)]
 fn interpret_instructions(
     module: &Module,
@@ -3235,26 +3262,7 @@ fn interpret_instructions(
                     let queue = default_task_queue
                         .as_ref()
                         .ok_or_else(|| Fault::new("Missing default TaskQueue"))?;
-                    let post = resolve(
-                        module,
-                        &FunctionRef {
-                            definition: None,
-                            name: "System.Tasks.TaskQueue.Post".into(),
-                            owner: Some(Type::from_name("System.Tasks.TaskQueue")),
-                            instance: true,
-                            generic_arguments: vec![],
-                            parameters: vec![crate::assembler::parse_type("System.Func<Void>")?],
-                        },
-                    )?;
-                    if !post.no_result
-                        || post
-                            .definition
-                            .as_ref()
-                            .is_none_or(|id| id.module != "System")
-                    {
-                        return Err(Fault::new("Invalid default TaskQueue post contract"));
-                    }
-                    frames.push(Frame::new(post, vec![queue.clone(), callback])?);
+                    frames.push(worker_notification_frame(module, queue.clone(), callback)?);
                     drain_required = true;
                     continue;
                 }
@@ -3269,7 +3277,39 @@ fn interpret_instructions(
                 fault.instruction = Some(pc);
                 return Err(fault);
             }
-            Ok(None) => (),
+            Ok(None) => {
+                // Returning from a default-queue callback is a safe point to append
+                // ready notifications: Post has no suspended mutation here. Never
+                // inject into an arbitrary callback, collection operation or queue.
+                if matches!(op, Op::Return)
+                    && !(function.name == "System.Tasks.TaskQueue.Post"
+                        && function
+                            .definition
+                            .as_ref()
+                            .is_some_and(|id| id.module == "System"))
+                    && let (Some(caller), Some(queue)) = (frames.last(), &default_task_queue)
+                    && caller.function.name == "System.Tasks.TaskQueue.Drain"
+                    && caller
+                        .function
+                        .definition
+                        .as_ref()
+                        .is_some_and(|id| id.module == "System")
+                    && caller.function.instance
+                    && caller.function.owner.as_ref()
+                        == Some(&Type::from_name("System.Tasks.TaskQueue"))
+                    && caller
+                        .args
+                        .first()
+                        .is_some_and(|slot| slot.borrow().get().is_ok_and(|value| value == *queue))
+                    && matches!(caller.function.body.get(caller.trace_pc), Some(Op::Call(target) | Op::CallVirtual(target))
+                        if target.name == "System.Func.Invoke" && target.instance
+                            && target.owner.as_ref() == Some(&crate::assembler::parse_type("System.Func<Void>")?)
+                            && target.parameters.is_empty())
+                    && let Some(callback) = workers.poll_notification()
+                {
+                    frames.push(worker_notification_frame(module, queue.clone(), callback)?);
+                }
+            }
         }
         if frames.iter().any(|f| f.stack.len() > limits.stack) {
             return Err(Fault::new("evaluation stack limit exceeded"));

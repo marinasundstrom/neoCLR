@@ -54,7 +54,7 @@
       <section id="direction">
         <h2>Roadmap</h2>
         <p>The first major application milestone is a Raven HTTP client/server pair exchanging UTF-8 text and JSON. The sequence starts with byte copy, text and JSON transformation, and controlled delayed operations that test GC lifetimes. A bounded file transformer and TCP echo precede HTTP.</p>
-        <p>Byte-copy, UTF-8, JSON and reduced VM completion checkpoints now run. Fair dispatch, operation cancellation and buffer ownership still need work before general I/O. The <a href="../proposals/#http-poc">on-site roadmap overview</a> describes the current evidence and remaining scope.</p>
+        <p>Byte-copy, UTF-8, JSON and reduced VM completion checkpoints now run. Completion progresses between returning default-queue callbacks, including self-reposting work. Operation cancellation, queue affinity and buffer ownership still need work before general I/O. The <a href="../proposals/#http-poc">on-site roadmap overview</a> describes the current evidence and remaining scope.</p>
         <p>Later candidates include a file catalog, download queue, time-aware report, assembly explorer and portable sample pack. Their order can change. Memory views, nullability, runtime suspension and alternative execution backends remain research topics rather than prerequisites for every sample.</p>
       </section>
       <section id="participate" class="feature-feedback">

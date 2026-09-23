@@ -154,7 +154,9 @@ ready owner, actual reclamation, checked ranges, atomic failed delivery and term
 cleanup. This is test-only code; it does not connect the VM loop, TaskQueue or a
 Raven consumer. The [VM Delayed Copy follow-up](experiments/delayed-copy/README.md)
 now exercises real invocation roots, default TaskQueue notification and a Raven await
-through an isolated worker-library adapter. Queue affinity/fairness, operation-level
+through an isolated worker-library adapter. Polling at default-queue callback returns
+now permits completion during continuously reposted work, verified in direct IL and
+Raven. This is cooperative progress, not preemption. Queue affinity, operation-level
 cancellation races and bounded native payloads remain open. No public I/O contract
 or backend is selected by these results.
 

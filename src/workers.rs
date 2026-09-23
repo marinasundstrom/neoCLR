@@ -164,37 +164,46 @@ impl Workers {
         }
     }
 
+    // Nonblocking poll for a safe guest dispatch boundary. A receiver remains
+    // rooted here until its callback moves into the VM's Post frame.
+    pub(crate) fn poll_notification(&mut self) -> Option<Value> {
+        for result in &mut self.results {
+            if result.notification.is_none() {
+                continue;
+            }
+            if result.ready.is_none() {
+                match result.receive.as_ref().unwrap().try_recv() {
+                    Ok(outcome) => {
+                        result.ready = Some(outcome);
+                        result.receive = None;
+                    }
+                    Err(mpsc::TryRecvError::Disconnected) => {
+                        result.ready = Some(Err(Fault::new("Worker terminated without a result")));
+                        result.receive = None;
+                    }
+                    Err(mpsc::TryRecvError::Empty) => {}
+                }
+            }
+            if result.ready.is_some() {
+                return result.notification.take();
+            }
+        }
+        None
+    }
+
     pub(crate) fn wait_notification(
         &mut self,
         options: &ExecutionOptions,
     ) -> Result<Option<Value>, Fault> {
         loop {
             options.check_cancellation("Worker.Completion", 0)?;
-            let mut waiting = None;
-            for (index, result) in self.results.iter_mut().enumerate() {
-                if result.notification.is_none() {
-                    continue;
-                }
-                if result.ready.is_none() {
-                    match result.receive.as_ref().unwrap().try_recv() {
-                        Ok(outcome) => {
-                            result.ready = Some(outcome);
-                            result.receive = None;
-                        }
-                        Err(mpsc::TryRecvError::Disconnected) => {
-                            result.ready =
-                                Some(Err(Fault::new("Worker terminated without a result")));
-                            result.receive = None;
-                        }
-                        Err(mpsc::TryRecvError::Empty) => {
-                            waiting.get_or_insert(index);
-                        }
-                    }
-                }
-                if result.ready.is_some() {
-                    return Ok(result.notification.take());
-                }
+            if let Some(callback) = self.poll_notification() {
+                return Ok(Some(callback));
             }
+            let waiting = self
+                .results
+                .iter()
+                .position(|result| result.notification.is_some());
             let Some(index) = waiting else {
                 return Ok(None);
             };
@@ -326,6 +335,7 @@ mod tests {
                 .join(vec![Value::Int32(0)], &mut output, &options)
                 .is_err()
         );
+        assert_eq!(workers.poll_notification(), None);
         let cancellation = CancellationToken::default();
         cancellation.cancel();
         assert!(

@@ -315,8 +315,9 @@ now verifies pending and ready roots, receiver graphs, reclamation and terminal
 cleanup in eight test-only cases. A [VM Delayed Copy checkpoint](experiments/delayed-copy/README.md)
 now retains real invocation roots, posts ready worker notifications to TaskQueue and
 resumes a Raven consumer through GC pressure. Its worker-library adapter is isolated;
-normal worker APIs still use queued joins. S0 remains partial: queue fairness,
-operation cancellation races and bounded native I/O ownership remain open.
+normal worker APIs still use queued joins. A self-reposting callback sample now
+verifies cooperative completion progress without queue quiescence. S0 remains partial:
+queue affinity, operation cancellation races and bounded native I/O ownership remain open.
 S1 now has a [runnable Byte Copy checkpoint](experiments/byte-copy/README.md):
 checked ranges, overlapping copies and short reads/writes over ordinary managed
 arrays, with synchronous GC-retention checks. It is an application-local experiment,
@@ -345,7 +346,8 @@ Samples begin as small programs, not miniature frameworks. Existing release/debu
 requirements and Raven branch/integration rules continue to apply.
 
 **Next:** extend the real delayed-copy invocation evidence to cancellation/completion
-races, queue affinity, progress under sustained ready work and bounded result storage.
+races, queue affinity and bounded result storage. Cooperative progress under
+self-reposting ready work is now checked; broader scheduling policies remain open.
 Select a small operation cancellation contract before generalizing the experimental
 worker adapter or reusing the pipeline for files and then sockets. Keep the
 application-enum and protected-constructor importer limitations exposed by the JSON experiment as explicit follow-up probes; they do

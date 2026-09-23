@@ -278,3 +278,120 @@ fn cancellation_after_registration_stops_invocation_and_worker() {
     );
     assert!(result.unwrap_err().message.contains("cancel"));
 }
+
+const BUSY_QUEUE: &str = r#"
+.type class BusyQueue
+.field Handle Int32
+.field Done Int32
+.field Queue System.Tasks.TaskQueue
+.method instance Complete() -> Void
+ldarg this
+ldfld BusyQueue::Handle
+call neoCLR.Runtime.JoinWorker(Int32)
+pop
+ldarg this
+ldc.i4 1
+stfld BusyQueue::Done
+ldstr "completed"
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldvoid
+ret
+.end
+.method instance Tick() -> Void
+ldarg this
+ldfld BusyQueue::Done
+brtrue Finished
+ldc.i4 16
+newarr Byte
+pop
+ldarg this
+ldfld BusyQueue::Queue
+ldarg this
+delegate.bind System.Func<Void> = instance BusyQueue::Tick()
+call instance System.Tasks.TaskQueue::Post(System.Func<Void>)
+ldvoid
+ret
+Finished:
+ldstr "pump stopped"
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldvoid
+ret
+.end
+.end
+"#;
+
+fn busy_queue_body(explicit: bool) -> String {
+    let queue = if explicit {
+        "newobj instance System.Tasks.TaskQueue::.ctor()"
+    } else {
+        "call System.Tasks.TaskQueue::get_Default()"
+    };
+    let drain = if explicit {
+        "ldloc queue\ncall instance System.Tasks.TaskQueue::Drain()"
+    } else {
+        ""
+    };
+    format!(
+        r#"
+.local System.Tasks.TaskQueue queue
+.local BusyQueue state
+call System.Tasks.TaskQueue::get_Default()
+pop
+{queue}
+stloc queue
+delegate.bind System.Func<String,String> = Echo(String)
+ldstr "ready"
+call neoCLR.Runtime.StartWorker(System.Func<String,String>,String)
+ldc.i4 0
+ldloc queue
+newobj BusyQueue
+stloc state
+ldloc state
+ldfld BusyQueue::Handle
+ldloc state
+delegate.bind System.Func<Void> = instance BusyQueue::Complete()
+call neoCLR.Runtime.NotifyWorker(Int32,System.Func<Void>)
+pop
+ldloc queue
+ldloc state
+delegate.bind System.Func<Void> = instance BusyQueue::Tick()
+call instance System.Tasks.TaskQueue::Post(System.Func<Void>)
+{drain}
+ldstr "entry"
+"#
+    )
+}
+
+#[test]
+fn completion_progresses_while_default_queue_reposts_work() {
+    let result = execute_options(
+        &busy_queue_body(false),
+        BUSY_QUEUE,
+        Limits {
+            instructions: 1_000_000,
+            heap_objects: 64,
+            ..Limits::default()
+        }
+        .into(),
+    )
+    .unwrap();
+    assert_eq!(result.output, ["completed", "pump stopped"]);
+    assert_eq!(result.value, Value::String("entry".into()));
+    assert_eq!(result.heap.statistics().live_objects, 0);
+}
+
+#[test]
+fn explicit_queue_does_not_dispatch_default_queue_notifications() {
+    let result = execute_options(
+        &busy_queue_body(true),
+        BUSY_QUEUE,
+        Limits {
+            instructions: 10_000,
+            ..Limits::default()
+        }
+        .into(),
+    );
+    assert!(result.unwrap_err().message.contains("instruction limit"));
+}

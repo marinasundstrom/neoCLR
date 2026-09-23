@@ -53,7 +53,7 @@ def main():
         (root / 'System.neoil').write_text(system)
         # Normal application references exclude bootstrap host services.
         run(['dotnet', bridge, '--reference-core', core])
-        for name in ['Main.rvn', 'DelayedCopy.rvnproj']:
+        for name in ['Copy.rvn', 'Main.rvn', 'DelayedCopy.rvnproj']:
             shutil.copyfile(HERE / name, root / name)
         env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(bundle / 'raven-sdk'))
         run(['dotnet', 'msbuild', root / 'DelayedCopy.rvnproj', '-nologo', '-v:minimal'], env=env)
@@ -65,6 +65,12 @@ def main():
         print(result.stdout, end='')
         print(result.stderr, end='')
         print('Isolated library adapter, actual VM completion, await and GC: passed')
+        shutil.copyfile(HERE / 'Busy.rvn', root / 'Main.rvn')
+        run(['dotnet', 'msbuild', root / 'DelayedCopy.rvnproj', '-nologo', '-v:minimal'], env=env)
+        busy = run([bundle / 'bin/neoclr', 'run', root / 'bin/neoclr/Debug/App.neoil',
+                    '--system', root / 'System.neoil'])
+        assert busy.stdout == (HERE / 'busy.expected.txt').read_text(), busy.stdout + busy.stderr
+        print('Completion during continuously reposted guest work: passed')
 
 
 if __name__ == '__main__':

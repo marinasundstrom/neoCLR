@@ -1,0 +1,6 @@
+Entry finished
+First copied byte (H):
+72
+Copied byte count:
+3
+Background callbacks stopped

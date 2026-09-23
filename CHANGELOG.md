@@ -50,9 +50,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   owned-byte delivery as a candidate. Add experimental worker completion notification
   to the real VM, rooting callbacks at both GC paths and posting ready outcomes to
   the default TaskQueue. Validate a Raven await/copy consumer using an isolated
-  worker-library adapter, failure/cancellation teardown and one-shot delivery. Normal
-  Thread/ThreadPool implementations retain queued joins; fairness, per-operation
-  cancellation, bounded native I/O ownership and real I/O remain open.
+  worker-library adapter, failure/cancellation teardown and one-shot delivery. Poll
+  ready notifications at default-queue callback returns so self-reposting guest work
+  no longer requires queue quiescence; verify Raven and direct-IL consumers and
+  explicit-queue isolation. Normal Thread/ThreadPool implementations retain queued
+  joins; preemption, per-operation cancellation, bounded native I/O ownership and
+  real I/O remain open.
 
 - Prioritize an HTTP client/server application POC in the roadmap, with smaller
   stream, encoding, JSON and TCP cases, explicit acceptance criteria and complete

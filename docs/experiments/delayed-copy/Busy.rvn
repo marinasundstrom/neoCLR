@@ -1,0 +1,30 @@
+import System.*
+import System.Console.*
+import System.Tasks.*
+
+// Keep the queue nonempty until the consumer finishes. Completion must make
+// progress between callbacks; waiting for an empty queue would never finish.
+class BackgroundWork {
+    private field consumer: Task<unit>
+
+    init(consumer: Task<unit>) {
+        self.consumer = consumer
+    }
+
+    func Tick() {
+        if consumer.IsCompleted {
+            WriteLine("Background callbacks stopped")
+            return
+        }
+        let scratch: byte[] = [(byte)0]
+        _ = scratch
+        TaskQueue.Default.Post(self.Tick)
+    }
+}
+
+func Main() {
+    let consumer = Show()
+    let background = BackgroundWork(consumer)
+    TaskQueue.Default.Post(background.Tick)
+    WriteLine("Entry finished")
+}

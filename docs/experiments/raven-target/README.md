@@ -686,3 +686,13 @@ are added. Existing heap async state machines and cancellation propagation setti
 remain in use. The sample verifier compiles both the library adapter and ordinary
 application, checks exact output and requires actual guest collections. Runtime
 worker/Task tests cover admission, roots, dispatch and teardown.
+
+
+The notification experiment now polls after a callback returns to the System
+library's default TaskQueue.Drain, then appends ready notification work using Post.
+The hook validates the library module, owner, default receiver identity and
+Func<Void> invocation boundary. Updating the queue implementation must preserve or
+reassess that boundary. No Raven lowering, reference-core signature or Runtime
+Contract setting changes in this follow-up. The shared Copy.rvn consumer is tested
+with both allocation pressure and a self-reposting BackgroundWork callback; an
+explicit-queue runtime test verifies default notifications do not run there.

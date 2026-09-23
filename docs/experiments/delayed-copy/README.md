@@ -9,8 +9,8 @@ It is not a stream API or an OS I/O backend.
 
 ## The small product
 
-[Main.rvn](Main.rvn) allocates the three-byte destination before awaiting. Its async
-state machine retains the array while Main creates 1,200 disposable arrays. The
+[Copy.rvn](Copy.rvn), called by [Main.rvn](Main.rvn), allocates the three-byte
+destination before awaiting. Its async state machine retains the array while Main creates 1,200 disposable arrays. The
 pending worker notification retains the Promise and its continuation graph after
 the initiating call returns. Main also posts unrelated ready work.
 
@@ -20,10 +20,25 @@ copied first byte (`72`, H), and the awaited byte count (`3`). The checked run r
 Those counts are observations of this toolchain, not a stable API or benchmark;
 the verifier requires exact output and at least one real collection.
 
-The producer may finish immediately. **Delivery** is delayed until the default
-queue is quiescent; this sample does not use timing sleeps or claim to simulate a
-slow socket. Direct-IL tests independently force each VM collection path and check
+The producer may finish immediately. **Delivery** is deferred to the default queue,
+including between callbacks. This sample does not use timing sleeps or claim to
+simulate a slow socket. Direct-IL tests independently force each VM collection path and check
 that pending receiver graphs survive before notification dispatch.
+
+## Completion while the queue stays busy
+
+[Busy.rvn](Busy.rvn) uses the same copy consumer and posts a small background
+callback repeatedly until the consumer finishes. It prints the copied byte and
+count, then `Background callbacks stopped`. Without polling between callbacks the
+queue never empties, so completion cannot be delivered and the instruction budget
+is exhausted. The verifier checks [the complete expected output](busy.expected.txt)
+with no timing sleeps. The existing allocation-pressure sample remains separate.
+
+This is cooperative progress, not preemptive scheduling or a latency guarantee.
+At most one notification is appended per completed callback. A finite current batch
+runs before newly posted work; the normal queue ordering and recursion checks remain.
+The hook recognizes the System library's default Drain receiver and Func<Void>
+invocation boundary, not merely an application method with a matching name.
 
 ## Selected layers and ownership
 
@@ -35,7 +50,11 @@ that pending receiver graphs survive before notification dispatch.
 - The invocation traces registered callbacks at both heap-pressure and array-budget
   collection points. Workers receive owned strings only, never a guest reference or
   native pointer into an array. A ready outcome remains cached until JoinWorker.
-- At queue quiescence, the interpreter scans all registrations and waits in bounded
+- After a callback returns to the real default TaskQueue.Drain, the interpreter
+  polls registrations without blocking and appends one ready notification through
+  TaskQueue.Post. Current-batch callbacks keep their order; notification joins the
+  pending batch. Polling does not occur inside a callback or collection mutation.
+  At queue quiescence, the interpreter scans all registrations and waits in bounded
   10 ms intervals when none are ready. A later ready worker can bypass an earlier
   pending worker. It transfers the callback directly into a traced TaskQueue.Post
   frame before the next collection point, then drains the default queue again.
@@ -73,10 +92,11 @@ A new array representation or runtime suspension mechanism is not needed by this
 
 The low-level notification service is provisional. Normal application APIs are
 unchanged. Generalizing this adapter requires queue affinity and fairness decisions:
-notifications currently dispatch only on the default queue after ready work drains.
-A continuously replenished queue can starve them, and an explicit TaskQueue is not
-supported by the adapter. An unresolved Promise alone still does not keep an
-invocation alive. Result payloads have no new host-memory budget.
+notifications dispatch only on the default queue. Reposting callbacks no longer
+requires the queue to become empty for notification to progress. A callback that
+never returns, a blocking host call or an exhausted instruction/allocation budget
+can still prevent progress. Explicit TaskQueues are not supported by the adapter.
+An unresolved Promise alone still does not keep an invocation alive. Result payloads have no new host-memory budget.
 
 ## Reproduce
 
@@ -98,16 +118,20 @@ The `.rvnproj` can build independently, but reproducing this notification experi
 requires the verifier's temporary library replacement; the normal worker library
 still runs queued joins.
 
-Eight worker integration tests (five new) cover both GC paths, ready callback order,
+Ten worker integration tests cover both GC paths, ready callback order,
 invalid/duplicate registration, invocation failure/budget exhaustion, producer failure
-and cancellation after registration, alongside existing worker behavior. Two new
+and cancellation after registration, alongside existing worker behavior. The busy
+queue test runs a self-reposting callback until worker delivery stops it; an explicit
+queue negative case exhausts its budget without running default notifications. Two
 registry tests cover out-of-order readiness, one-shot join, pending-join rejection,
 cancelled waiting and producer disconnection. All seven existing Task tests pass.
 
 ## Next bounded work
 
 Keep S0 partial. Extend the real invocation evidence to cancellation/completion races,
-explicit queue affinity, sustained ready-work fairness and bounded result storage.
+explicit queue affinity and bounded result storage. Cooperative progress under
+self-reposting ready work now has direct-IL and Raven evidence; broader scheduling
+policy and preemption remain unselected.
 Compare the application cancellation contract before generalizing the adapter or
 introducing a file producer. The older controlled ownership fixture already tests
 some terminal races, but those are not yet end-to-end VM/Task guarantees. Native
