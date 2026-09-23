@@ -346,7 +346,7 @@ static class SignatureProbe
             Reject("Unmarked static implementation cannot satisfy an extension contract", () =>
                 LibraryImplementation.CheckExtensionContract(implementation, original));
         }
-        foreach (var ownerName in new[] { "OptionOperators", "OptionNestedOperators", "ResultOperators", "Tasks.TaskOperators" }) {
+        foreach (var ownerName in new[] { "OptionOperators", "OptionNestedOperators", "ResultOperators", "Tasks.TaskOperators", "Tasks.TaskResultOperators" }) {
             var operatorType = module.GetType("System." + ownerName);
             var index = 0;
             foreach (var operation in operatorType.Methods) {
@@ -356,6 +356,7 @@ static class SignatureProbe
                 var operatorTypeArguments = new[] { module.TypeSystem.Int32, module.TypeSystem.String, module.TypeSystem.Boolean };
                 for (var i = 0; i < operation.GenericParameters.Count; i++) call.GenericArguments.Add(operatorTypeArguments[i]);
                 var expected = (ownerName, operation.Name) switch {
+                    ("Tasks.TaskResultOperators", "MapResult") => "System.Tasks.Task<System.Result<Boolean,String>>",
                     ("Tasks.TaskOperators", "Map" or "Then") => "System.Tasks.Task<String>",
                     ("OptionOperators", "Map" or "Then") => "System.Option<String>",
                     ("OptionOperators", "Match") => "String",

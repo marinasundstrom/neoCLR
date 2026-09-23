@@ -1,0 +1,19 @@
+import System.*
+import System.Tasks.*
+import System.Result.*
+import System.Console.*
+
+async func Print(input: Task<Result<int, string>>) -> Task<unit> {
+    let result = await input
+    match result {
+        Ok(let value) => WriteLine(value)
+        Error(let message) => WriteLine(message)
+    }
+    return ()
+}
+
+func Main() {
+    let promise = Promise<Result<int, string>>()
+    _ = Print(promise.Task.MapResult(value => value + 1))
+    promise.Complete(Ok(41))
+}

@@ -5,6 +5,9 @@ static class OutcomeOperatorBindings
 {
     public const string Declarations = """
         namespace Tasks {
+            public static class TaskResultOperators {
+                public static Task<Result<U,E>> MapResult<T,E,U>(this Task<Result<T,E>> self, Func<T,U> transform) => default;
+            }
             public static class TaskOperators {
                 public static Task<U> Map<T,U>(this Task<T> self, Func<T,U> transform) => default;
                 public static Task<U> Then<T,U>(this Task<T> self, Func<T,Task<U>> continuation) => default;
@@ -45,6 +48,7 @@ static class OutcomeOperatorBindings
 
     sealed record Contract(string Owner, string Name, int Arity, string[] Arguments, string Result);
     static readonly Contract[] Contracts = [
+        new("System.Tasks.TaskResultOperators", "MapResult", 3, ["System.Tasks.Task<System.Result<@0,@1>>", "System.Func<@0,@2>"], "System.Tasks.Task<System.Result<@2,@1>>"),
         new("System.Tasks.TaskOperators", "Map", 2, ["System.Tasks.Task<@0>", "System.Func<@0,@1>"], "System.Tasks.Task<@1>"),
         new("System.Tasks.TaskOperators", "Then", 2, ["System.Tasks.Task<@0>", "System.Func<@0,System.Tasks.Task<@1>>"], "System.Tasks.Task<@1>"),
         new("System.OptionOperators", "Map", 2, ["System.Option<@0>", "System.Func<@0,@1>"], "System.Option<@1>"),
@@ -76,7 +80,7 @@ static class OutcomeOperatorBindings
 
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition, bool callvirt)
     {
-        if (reference.DeclaringType.FullName is not ("System.OptionOperators" or "System.ResultOperators" or "System.OptionNestedOperators" or "System.Tasks.TaskOperators")) return null;
+        if (reference.DeclaringType.FullName is not ("System.OptionOperators" or "System.ResultOperators" or "System.OptionNestedOperators" or "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators")) return null;
         if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope) || reference.HasThis || callvirt
             || reference is not GenericInstanceMethod method
             || definition.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant))

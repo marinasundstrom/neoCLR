@@ -30,7 +30,7 @@ static class LibraryImplementation
         {
             var names = new[] { "System.Tasks.TaskQueue", "System.Tasks.Task`1", "System.Tasks.Promise`1", "System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1", "System.Runtime.CompilerServices.IAsyncStateMachine", "System.Runtime.CompilerServices.ITaskAwaiter" };
             foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name.Split('`')[0]);
-            return names.SelectMany(name => source.GetType(name).IsInterface ? InterfaceRoots(source.GetType(name), core.GetType(name), name) : InstanceRoots(source.GetType(name), core.GetType(name), name.Split('`')[0])).Concat(Roots(source, core, "System.Tasks.TaskOperators")).ToArray();
+            return names.SelectMany(name => source.GetType(name).IsInterface ? InterfaceRoots(source.GetType(name), core.GetType(name), name) : InstanceRoots(source.GetType(name), core.GetType(name), name.Split('`')[0])).Concat(Roots(source, core, "System.Tasks.TaskOperators")).Concat(Roots(source, core, "System.Tasks.TaskResultOperators")).ToArray();
         }
         if (owner == "System.Array") return InstanceRoots(source.GetType("System.Array`1") ?? throw new InvalidDataException("Missing Array implementation."), core.GetType("System.Array`1"), owner);
         if (MarkerLibrary.IsOwner(owner)) return MarkerLibrary.Roots(source, core, owner);
@@ -75,7 +75,7 @@ static class LibraryImplementation
                 && m.Parameters.Zip(method.Parameters).All(p => p.First.Name == p.Second.Name && SameType(p.First.ParameterType, p.Second.ParameterType))).ToArray();
             if (matches.Length == 1) CheckMethod(matches[0]);
             if (matches.Length != 1) throw new InvalidDataException("Library export does not match reference contract: " + method.FullName);
-            if (owner is "System.Linq.Operators" or "System.OptionOperators" or "System.OptionNestedOperators" or "System.ResultOperators" or "System.Tasks.TaskOperators")
+            if (owner is "System.Linq.Operators" or "System.OptionOperators" or "System.OptionNestedOperators" or "System.ResultOperators" or "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators")
                 CheckExtensionContract(method, matches[0]);
         }
         return methods;
@@ -331,7 +331,7 @@ static class LibraryImplementation
     {
         var helpers = Regex.Matches(text, @"(?m)^\.function (?:internal )?([^\(]+)\(").Select(m => m.Groups[1].Value)
             .Where(h => !h.StartsWith(owner + ".", StringComparison.Ordinal)
-                && !(owner == "System.Tasks.Task" && h.StartsWith("System.Tasks.TaskOperators.", StringComparison.Ordinal))).ToArray();
+                && !(owner == "System.Tasks.Task" && (h.StartsWith("System.Tasks.TaskOperators.", StringComparison.Ordinal) || h.StartsWith("System.Tasks.TaskResultOperators.", StringComparison.Ordinal)))).ToArray();
         // Adapters generated from open signatures must themselves declare the free
         // method parameters. Propagate through helper calls before qualifying names.
         var bodies = Regex.Matches(text, @"(?ms)^\.function (?:internal )?([^\(]+)\(.*?^\.end\r?$")
@@ -350,7 +350,7 @@ static class LibraryImplementation
                             changed |= parameters[helper].Add(parameter);
         } while (changed);
         foreach (var helper in helpers.Where(h => !h.StartsWith(owner + ".", StringComparison.Ordinal)
-                && !(owner == "System.Tasks.Task" && h.StartsWith("System.Tasks.TaskOperators.", StringComparison.Ordinal))))
+                && !(owner == "System.Tasks.Task" && (h.StartsWith("System.Tasks.TaskOperators.", StringComparison.Ordinal) || h.StartsWith("System.Tasks.TaskResultOperators.", StringComparison.Ordinal)))))
         {
             var generic = parameters[helper].Count == 0 ? "" : "<" + string.Join(',',
                 parameters[helper].OrderBy(p => int.Parse(p[1..]))) + ">";

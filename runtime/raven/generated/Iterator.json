@@ -84,7 +84,7 @@
     "runtime/raven/src/System/Single.rvn": "488efaf36e56f147c7158a5b0637f3bc4e56e84bb3f514af6c64a023dcd8598e",
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
-    "runtime/raven/src/System/Tasks/TaskOperators.rvn": "fb288d2176dd601e2e3d10dd5efdb9a12fe4f37c4eb1a154b7a1a8930ea4b7e4",
+    "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/System.Runtime.rvnproj": "72d540a568e1a5cec14347e405be867af2c6e7d75dac99dd8d6ff90a65123de1",
     "build/NeoCLR.Raven.props": "b7d01e1d6b23228bb784dafcda4cf7c777b554b11f093cc3daf2509bb7402ee0"
   },
@@ -93,7 +93,7 @@
     "Iterator.helpers.neoil": "405b2a880d629bf4b85b50f04bc7442fbd92b3d40d9d9d98dde9e0f77da780ac"
   },
   "compilerSha256": "fd81ea896146b15d8fa66d2ba7c74b806a1dad1919012a77f7fe53242bbed105",
-  "coreSha256": "82ab62e0a61018cfe1ac77b4a759224ea59a68b59198fda20c4def3fde9090f7",
+  "coreSha256": "a26af170b34496680ce99f402ea6a8096238dfe63eecc576b351ef3c61fbd26e",
   "exports": [
     "MoveNext() -> Boolean",
     "get_Current() -> T0"

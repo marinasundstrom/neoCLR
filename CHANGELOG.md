@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Add the explicit Task<Result<T,E>>.MapResult extension: queue Ok transformations,
+  preserve Error payloads and propagate cancellation without invoking the mapper.
+  Ordinary Task.Map still handles the complete value. Include a runnable sample
+  and six passing outcome, dispatcher, GC and fault checks; validate 272 metadata
+  signatures and the generated runtime snapshot.
+
 - Add invocation-local TaskQueue.Default and Promise<T>() using the active queue
   or the default. Async functions and isolated workers no longer require queue setup.
   The runtime dispatches default-queue callbacks automatically before invocation

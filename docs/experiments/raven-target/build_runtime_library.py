@@ -198,7 +198,7 @@ def digest(path):
 def fragments(text, name="Math", owner="System.Math", bootstrap=False):
     lines = text.splitlines(keepends=True)
     methods, helpers, types = [], {}, []
-    task_operators = []
+    task_operators = {}
     while lines:
         if not lines[0].strip():
             lines.pop(0)
@@ -226,8 +226,9 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
         assert match, lines[0]
         end = lines.index('.end\n')
         body = ''.join(lines[:end + 1])
-        if name == 'Tasks' and match[1].startswith('System.Tasks.TaskOperators.'):
-            task_operators.append(body.replace('.function System.Tasks.TaskOperators.', '.method static ', 1))
+        if name == 'Tasks' and match[1].startswith(('System.Tasks.TaskOperators.', 'System.Tasks.TaskResultOperators.')):
+            operator_owner = match[1].rsplit('.', 1)[0]
+            task_operators.setdefault(operator_owner, []).append(body.replace('.function ' + operator_owner + '.', '.method static ', 1))
         elif match[1].startswith(owner + '.'):
             # Retain the bootstrap owner used by direct IL and the archived Neo frontend.
             # Namespace functions use marked containers; static APIs retain their owner.
@@ -241,8 +242,8 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
             assert match[1] not in helpers
             helpers[match[1]] = body
         lines = lines[end + 1:]
-    if task_operators:
-        types.append('.type System.Tasks.TaskOperators\n' + ''.join(task_operators) + '.end\n')
+    for operator_owner, bodies in task_operators.items():
+        types.append('.type ' + operator_owner + '\n' + ''.join(bodies) + '.end\n')
     # Nongeneric classes can also own static factories. Merge their function roots
     # into the emitted class rather than leaving top-level method fragments.
     for body in types[:]:

@@ -388,3 +388,28 @@ implementation choices. They remove queue setup and pumping from normal callers,
 at the cost of invocation-scoped lifetime and no independent host-event progress.
 A scheduler abstraction may later fit runtime suspension, affinity or concurrency
 policies; neither Task payloads nor Promise construction should freeze those choices.
+
+
+## Explicit Result mapping — 2026-09-23
+
+`Task<Result<T, E>>.MapResult(transform)` maps only the Ok payload, producing
+`Task<Result<U, E>>`. Error retains the same error value and never invokes the
+mapper. A cancelled input cancels the output without invoking it. Like Map, this
+operator uses the input's dispatcher, queues observation even for an already
+terminal input, and treats callback faults as terminal runtime faults.
+
+This Raven extension in System.Tasks is an explicit convenience layer; ordinary
+Task.Map continues to receive the entire Result. Compared with .NET Task and
+exception-based completion, the benefit is visible separation of expected errors
+from asynchronous completion. The cost is a distinct combinator and a Result
+contract understood by API authors. It does not add a Task failure state.
+See the [complete sample](experiments/raven-target/samples/library-task-result.rvn).
+The provisional surface is intended to support API construction while scheduling,
+cancellation tokens and runtime suspension continue to evolve.
+
+A compiler limitation discovered here remains a general-fix candidate: invoking
+generic Task.Map from an open extension over Task<Result<T,E>> encountered a cyclic
+type-substitution emission error. The implementation uses an explicit continuation,
+which also makes all outcome paths visible. Reproduce and validate the generic
+projection issue independently on Raven's ordinary CLI target before integration
+into Raven main; no neoCLR policy change is required by this helper.

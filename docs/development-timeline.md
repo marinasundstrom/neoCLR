@@ -4844,3 +4844,18 @@ The author corrected TaskQueue.Current() and RuntimeServices.CurrentTaskQueue():
 context lookup should be expressed as a property. The assistant changed both
 Raven-facing contracts, kept the native transport function behind the getter,
 and recorded the convention for runtime code as well as examples.
+
+
+### 2026-09-23 — Provisional API boundary, Result composition and editor use
+
+- **Author:** clarified that the goal is a provisional contract good enough to
+  build APIs on, "At least for the Task API surface". Requested that the finished
+  work be testable in VS Code and suggested including MapResult extensions.
+- **Assistant:** kept Task/Promise, completion and cancellation outcomes,
+  composition and working async/await as the boundary; queue and state-machine
+  implementation remain provisional. Added explicit Task<Result<T,E>>.MapResult
+  with queued Ok mapping, unchanged Error and cancellation bypass. Planned a
+  matching local development toolchain and runnable .rvnproj examples, with a
+  Tasks feature page clearly distinguishing development from published Preview 8.
+- **Open:** cancellation requests/tokens, host event progress, protected cleanup
+  and broader suspension support; this exchange does not settle scheduler design.

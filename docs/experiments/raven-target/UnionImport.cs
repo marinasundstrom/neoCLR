@@ -54,7 +54,7 @@ static class UnionImport
         if (libraryOwner is not null) ApplicationTypes.SetLibraryScope(app.MainModule, libraryOwner);
         var entry = libraryOwner is null ? app.EntryPoint ?? throw new InvalidDataException("Missing entry point.") : null;
         string Name(MethodDefinition method) => libraryOwner is null ? MetadataIdentity.FunctionName(method)
-            : exports.Contains(method) ? (method.DeclaringType.FullName == "System.Tasks.TaskOperators" ? method.DeclaringType.FullName : libraryOwner) + "." + LibraryImplementation.GenericName(method)
+            : exports.Contains(method) ? (method.DeclaringType.FullName is "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators" ? method.DeclaringType.FullName : libraryOwner) + "." + LibraryImplementation.GenericName(method)
             : throw new InvalidDataException("Unexported implementation dependency: " + method.FullName);
         if (entry is not null && (entry.Parameters.Count != 0 || entry.ReturnType.MetadataType != MetadataType.Void))
             throw new InvalidDataException("Result profile requires a parameterless no-result entry.");

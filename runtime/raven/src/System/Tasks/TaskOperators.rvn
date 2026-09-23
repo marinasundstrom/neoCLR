@@ -2,6 +2,7 @@ namespace System.Tasks
 
 import System.*
 import System.Option.*
+import System.Result.*
 import System.Tasks.TaskOutcome.*
 
 public extension TaskOperators<T> for Task<T> {
@@ -78,6 +79,42 @@ internal class OutcomeTransfer<T> {
     func Run() {
         if input.Outcome is Some(Completed(let value)) {
             _ = output.Complete(value)
+        } else if input.Outcome is Some(Cancelled) {
+            _ = output.Cancel()
+        } else {
+            System.Fault("Task continuation ran while pending")
+        }
+    }
+}
+
+// Result-aware composition is explicit; Task itself treats Result as a value.
+public extension TaskResultOperators<T, E> for Task<Result<T, E>> {
+    func MapResult<U>(transform: Func<T, U>) -> Task<Result<U, E>> {
+        let promise = Promise<Result<U, E>>(self.Dispatcher())
+        let continuation = TaskResultMapContinuation<T, E, U>(self, promise, transform)
+        self.OnCompleted(continuation.Run)
+        return promise.Task
+    }
+}
+
+internal class TaskResultMapContinuation<T, E, U> {
+    private field input: Task<Result<T, E>>
+    private field output: Promise<Result<U, E>>
+    private field transform: Func<T, U>
+
+    init(input: Task<Result<T, E>>, output: Promise<Result<U, E>>, transform: Func<T, U>) {
+        self.input = input
+        self.output = output
+        self.transform = transform
+    }
+
+    func Run() {
+        if input.Outcome is Some(Completed(let result)) {
+            if result is Ok(let value) {
+                _ = output.Complete(Ok(transform(value)))
+            } else if result is Error(let error) {
+                _ = output.Complete(Error(error))
+            }
         } else if input.Outcome is Some(Cancelled) {
             _ = output.Cancel()
         } else {
