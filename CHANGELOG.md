@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Record the author-selected post-release System.Concurrency namespace direction
+  and proposed Thread.Run versus retained Thread/Start/Task API shapes. Document
+  optional thread packaging, platform limits, .NET comparisons and validation needs;
+  update website future direction. Current release APIs remain unchanged.
+
 - Correct two stale release samples after the Error-wrapper removal and Storage
   namespace migration; preserve the case-payload and error-carrier regression intent.
   Validate all 84 saved-project outcomes against the rebuilt runtime and clean SDK payload.

@@ -86,6 +86,18 @@ The [local readiness record](async-preview-readiness.md) now covers a fresh extr
 bundle, full library regeneration, Task editor completion and MSBuild checks.
 Complete remaining editor/candidate and migration gates before expanding features. Published release notes stay unchanged and publication remains separate.
 
+## Post-release concurrency direction — 2026-09-23
+
+The author directs renaming `System.Threading` to `System.Concurrency` after this
+release. Thread support may be platform-dependent and could later ship in an optional
+`System.Concurrency.Threads` package; that name does not determine its namespace.
+Distinguish result-oriented `Thread.Run(...)` from constructing a tracked Thread,
+calling `Start()` and awaiting its `Task`. These API shapes are proposed, while the
+post-release namespace rename is selected. See [concurrency direction](concurrency-direction.md)
+for current limitations, .NET comparisons, migration questions and two sample cases.
+Keep release stabilization immediate and Streams, Storage and Encoding before
+networking; the full thread lifecycle design is not a new release prerequisite.
+
 ## Progressive delivery before networking — revised 2026-09-23
 
 The author asks whether sockets/HTTP should move down in priority so that features

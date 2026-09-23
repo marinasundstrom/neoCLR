@@ -117,3 +117,11 @@ callback rejection and the required TaskQueue scope.
 The author intends to shape this API further with Task integrated from the outset.
 Potential public synchronous counterparts remain a future design question; the
 internal blocking completion wait is not a settled synchronous API design.
+
+## Post-release API direction
+
+The author selects `System.Concurrency` as the namespace after this release.
+The [concurrency direction](concurrency-direction.md) distinguishes result-oriented
+`Thread.Run` from a retained Thread object with `Start()` and a `Task` property for
+termination. These shapes are not implemented. Optional thread packaging and platform
+availability remain open; the current isolated string-worker contract above still applies.

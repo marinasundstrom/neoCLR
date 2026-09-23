@@ -25,6 +25,30 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-23 — Broader concurrency and tracked threads after release
+
+**Author direction.** “After the release, we will rename System.Threading as
+System.Concurrency. This signals a broader area”. The author noted that Thread may
+not be available on every platform and suggested `System.Concurrency.Threads` as a
+possible package, explicitly not necessarily its namespace. Two scenarios are
+needed: executing work for a result, and retaining a Thread object to control and
+await its termination.
+
+**Author clarification.** Proposed `Thread.Run(() => 42, ...)` for the first case,
+and construction followed by `thread.Start()` and `thread.Task` for the second.
+The first example annotated an awaited result as `Task<int>`.
+
+**Assistant response and actions.** Distinguished the returned `Task<int>` from the
+`int` produced by awaiting it. Recorded the selected post-release namespace rename
+and the proposed API shapes in the [roadmap](platform-roadmap.md) and
+[concurrency direction](concurrency-direction.md), with current isolated-worker
+limits, .NET comparison and sample/validation questions. Updated website future
+direction. No runtime APIs were renamed or implemented.
+
+**Open.** Scheduling policy for Run, result types, lifecycle control, ownership,
+platform capability and migration contracts. Package naming is tentative. This does
+not add a release gate or replace the Streams/Storage/Encoding sequence.
+
 ## 2026-09-23 — Plan an async and Tasks release checkpoint
 
 **Author request.** “We should also decide when to make a new release focused around
