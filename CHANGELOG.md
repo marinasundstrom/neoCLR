@@ -22,6 +22,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Validate all 84 saved-project outcomes against the rebuilt runtime and clean SDK payload.
   Document sidecar-free archive creation for the known macOS packaging issue,
   including staged-payload hash comparison and fresh extraction requirements.
+  Preserve follow-up archive hashes, eight Workbench results, 84 saved-project
+  outcomes and focused extracted-fixture checks in a separate readiness record.
+  Extend migration review through the subsequent documentation changes, explicitly
+  keeping proposed concurrency APIs outside this release's migration instructions.
 
 - Preserve Rust 1.85 compatibility in worker notification dispatch by replacing
   unsupported let-chain syntax with equivalent nested conditions. The source-archive

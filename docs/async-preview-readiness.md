@@ -104,6 +104,34 @@ The VSIX installed successfully into an isolated profile under the validation
 directory. Interactive build/run inspection remains unverified: the available UI
 binding selected the existing user editor instance, which was not reconfigured.
 
+## Corrected runtime and sample package follow-up
+
+The [follow-up package record](async-preview-package-followup.json) preserves the
+new evidence separately from the earlier `97b8d91` results. The runtime was rebuilt
+at `a9c1131` with the Rust compatibility fix. All eight Workbench samples pass using
+freshly extracted runtime and SDK archives. Four packaged direct neoIL samples pass.
+A fresh source archive also builds all 13 authored website pages and the eight-page
+DocFX output with no warnings or errors.
+
+The broad saved-project verifier exposed two stale fixtures still using the removed
+Error wrapper and former IO namespace. Commit `6512c31` corrects them. All 84
+saved-project outcomes pass with the corrected source fixtures and extracted tools;
+a fresh package containing those fixes also passes its focused CasePayloads and
+ErrorValues checks plus the verifier's mandatory edit/rejection cases. The runtime
+binary is identical between these two packages; only samples and release instructions
+changed after the runtime build.
+
+System tar produced macOS AppleDouble sidecars in the first archives. Python tarfile
+archives omit those entries; every regular payload file was hash-compared with staging
+before fresh extraction. The runtime bundle has 935 regular files and the SDK 439.
+The record contains archive checksums and outcomes. This is a packaging workaround,
+not a claim that Raven's upstream packaging script was fixed.
+
+Fresh stable and Rust 1.85 source validation runs at `a9c1131` are still in progress
+when this package evidence is recorded. Neither is claimed as a passed full source
+gate. Their eventual reports and exact revision must be recorded separately; these
+local macOS runs cannot satisfy the Linux/Windows matrix or certify later revisions.
+
 ## Remaining release work
 
 Finish exact-candidate source/archive validation, interactive editor checks

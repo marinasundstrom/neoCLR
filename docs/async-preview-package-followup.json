@@ -1,0 +1,224 @@
+{
+  "date": "2026-09-23",
+  "scope": "Local macOS arm64 package follow-up; not final-candidate or cross-platform certification",
+  "runtimeSourceRevision": "a9c113131a350fd0852994ce936620e09f3f8fb3",
+  "samplePackageRevision": "6512c3143cbc233297081d3ba5214dd4bdc220f9",
+  "ravenRevision": "e56fc1ddf25d570d6aaa2bddfdf34138198f9941",
+  "sdkVersion": "0.1.12-neoclr.async.20260923",
+  "archives": {
+    "neoclr-fixed": {
+      "files": 935,
+      "sha256": "a85c8968988013a6de0bb20de427fb7153aafd7ec7e135a754b55de44b34cf53",
+      "payloadHashesUnchanged": true,
+      "appleDoubleEntries": 0
+    },
+    "raven-sdk-0.1.12-neoclr.async.20260923-osx-arm64": {
+      "files": 439,
+      "sha256": "99b68bab33ff720fba3391885a502e9c13a6e0c1320d1751dd09db70af2788e0",
+      "payloadHashesUnchanged": true,
+      "appleDoubleEntries": 0
+    }
+  },
+  "sampleArchive": {
+    "revision": "6512c3143cbc233297081d3ba5214dd4bdc220f9",
+    "archiveSha256": "ef7315e79a05f266ae629b73221565c1130a038d4e9b0dd95c1dd2bd8482878c",
+    "regularFileCount": 935,
+    "appleDoubleEntries": 0,
+    "payloadHashesUnchanged": true
+  },
+  "runtimeSha256": "0582e684b59ede3ed34a44c7a2fb51be46b6a6de500341bc7aaee3a4afe1efe2",
+  "runtimeIdenticalAcrossPackages": true,
+  "asyncWorkbench": [
+    {
+      "sample": "library-async-default-queue",
+      "output": "Hello on a worker\n",
+      "passed": true
+    },
+    {
+      "sample": "library-workers",
+      "output": "Hello, thread\nHello, pool\n",
+      "passed": true
+    },
+    {
+      "sample": "library-task-producer",
+      "output": "42\n",
+      "passed": true
+    },
+    {
+      "sample": "library-task-composition",
+      "output": "42\n",
+      "passed": true
+    },
+    {
+      "sample": "library-task-result",
+      "output": "42\n",
+      "passed": true
+    },
+    {
+      "sample": "library-task-propagation",
+      "output": "Unavailable\n",
+      "passed": true
+    },
+    {
+      "sample": "library-async-cancellation",
+      "output": "Cancelled\n",
+      "passed": true
+    },
+    {
+      "sample": "library-async",
+      "output": "Suspended\n42\n",
+      "passed": true
+    }
+  ],
+  "savedProject": {
+    "sampleSourceRevision": "6512c31",
+    "execution": "Corrected repository fixtures with extracted a9c1131 runtime, bridge, library and clean SDK",
+    "outcomeCount": 84,
+    "outcomes": {
+      "ArrayTour": "Number of readings:\n3\nRead-only view sees the correction:\n22\nSnapshot then current reading:\n18\n19\nCurrent readings:\n19\n22\n21\nEmpty array length:\n0\nArray element type:\nSystem.Int32\n",
+      "Utf8": "Round trip\nRound trip\nRound trip\nRound trip\nRound trip\nRound trip\n7\nNo preamble\nAB\nInvalidUtf8\nInvalidUtf8\nInvalidUtf8\nInvalidUtf8\nInvalidUtf8\nInvalidUtf8\n",
+      "NestedTypeInfo": "Outer/Inner\nOuter\nActual declaring type\nTop-level type\nType member\n",
+      "IntrospectionTour": "Instance and declared type agree\nDemo\nSystem.Runtime\nDemo\nWidget\nSame definition token\nDemo\n5\nMethod\nvalue\nField\nProperty\n0\n",
+      "AssemblyInfo": "Demo\nSystem.Runtime\nRuntime types available\nDemo\n1\nWidget\nType token available\nDemo\nSame definition token\n",
+      "TypeAcquisition": "Concrete class\nSystem.String\nSame type\nArray type\nSystem.Int32\nSystem.Int32\n",
+      "Instants": "0\n-1\n0\n-1\nSame duration\nSystem clock\n",
+      "Basics": "42\n1\n0\nLibrary calls from Raven\n",
+      "CasePayloads": "7\n42\nAfter\nUpdated error\n",
+      "GenericUnions": "Ok\n0\nError\nFailure\n0\nFailure\nFound\nNone\n0\n",
+      "ErrorValues": "ArgumentOutOfRange\nConfirmed\nInvalidPath\nConfirmed\nFileNotFound\nConfirmed\nAccessDenied\nConfirmed\nNotRegularFile\nConfirmed\nFileTooLarge\nConfirmed\nFileReadFailed\nConfirmed\nInvalidUtf8\nConfirmed\nInvalidLimit\nConfirmed\nInvalidPath\nConfirmed\nNotFound\nConfirmed\nAccessDenied\nConfirmed\nNotRegularFile\nConfirmed\nTooLarge\nConfirmed\nWriteFailed\nConfirmed\nConsoleUnavailable\nConfirmed\nConsoleReadFailed\nConfirmed\nOutOfRange\nConfirmed\nInvalidBoundary\nConfirmed\nInvalidFormat\nConfirmed\nOverflow\nConfirmed\nDivisionByZero\nConfirmed\nOverflow\nConfirmed\nInvalidRange\nInvalidDate\nInvalidTime\nOverflow\nEnvironmentUnavailable\nA domain error\nA domain error\n",
+      "Calendar": "2024\n2\n29\n60\n738944\n0\nSame date\nDate accepted\n1\n1\n1\n1\n0\n0\nSame date\nDate accepted\nInvalid date\nInvalid date\n12\n34\n56\n789\n7890123\n0\n0\nSame time\nTime accepted\n12\n34\n56\n789\n7890123\n0\n0\nSame time\nTime accepted\n0\n0\n0\n0\n0\n-1\n0\nSame time\nTime accepted\nInvalid time\nInvalid time\n",
+      "GraphemeStrings": "4\n12\n37\nA\ne\u0301\n\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc66\n\ud83c\uddf8\ud83c\uddea\nCombining character\n\ud83d\udc4d\ud83c\udffd\ne\u0301\n\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc66\nFamily\n101\nLetter scalar\n769\n0\nDefault NUL\n\ud83d\udc4d\ud83c\udffd\ne\u0301\n",
+      "Primitives": "-1\n1\n-1\n1\n1\n1\n0\n0\n0\n-1\n-1\nDigit\nNumber\nLetter\nUpper\nLower\nSeparator\nControl\nPunctuation\nSymbol\nASCII\nASCII digit\nLetter or digit\nWhitespace\n",
+      "NumericOperators": "0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n",
+      "NumericWidening": "0\n0\n0\n0\n",
+      "FloatingMath": "0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n-1\n",
+      "Clamp": "Clamped\n5\nClamped\n0\nClamped\n10\nClamped\n7\nClamped\n-2147483648\nClamped\n2147483647\nInvalid range\n",
+      "Integers": "42\n1\nEqual\n-2147483648\n-1\nDifferent\n2147483647\n1\nDifferent\n0\n0\nEqual\n",
+      "Division": "Divided\n3\nDivided\n-3\nDivided\n-3\nDivided\n0\nDivided\n-2147483648\nDivision by zero\nOverflow\n",
+      "Parsing": "Parsed\n42\nParsed\n-2147483648\nParsed\n2147483647\nParsed\n7\nOverflow\nOverflow\nInvalid format\nInvalid format\nInvalid format\nInvalid format\n",
+      "Paths": "summary.txt\nreport.txt\nreport.txt\n\n\nfinal.txt\n\u4e16\u754c.txt\nleaf.txt\n",
+      "StringSlices": "Sliced\n\u00e9\nSliced\n\ud83d\ude00\nSliced\n\nInvalid boundary\nInvalid boundary\nOut of range\nOut of range\nOut of range\nOut of range\nOut of range\nSliced\n\n",
+      "Strings": "Hello, v\u00e4rld!\n14\nyes\nno\nyes\nno\nyes\nyes\nyes\nno\n-1\n0\n1\n",
+      "StringBoundaries": "yes\nyes\nyes\nyes\nno\n1\n4\n",
+      "Patterns": "42\n-1\n7\n-1\n",
+      "MatchForms": "42\n-1\nPresent\nAbsent\n42\nOverflow\n",
+      "MatchVoid": "42\nSaved\nCompleted\nOverflow\n",
+      "Math": "-2147483648\n2147483647\n7\n-7\n-1\n0\n1\n",
+      "Result": "42\nOverflow\n",
+      "Propagation": "Continued\n42\nOverflow propagated\n",
+      "OptionPropagation": "Value found\n42\nAbsent\n",
+      "VoidResultPropagation": "42\nSaved\nCompleted\nOverflow\n",
+      "Option": "42\nProduct not found\n",
+      "Void": "Completed without a payload\nNot completed\n",
+      "Interfaces": "1\n42\n",
+      "ListFilters": "7\n7\n1\n3\nAbsent\nExists\nNot all positive\n3\n7\n42\n7\n7\nAbsent\nAbsent\nAbsent\n0\nAll empty elements satisfy the predicate\n5\n7\n99\n1\n2\n",
+      "QueryTerminals": "Absent\nAbsent\n0\n42\nAbsent\nEmpty\n0\nMultiple\n42\nMultiple\n42\nAbsent\nSystem.String\nNo result\n42\nAbsent\nAbsent\n0\n0\nEmpty\nMultiple\n42\n",
+      "Maps": "Added\nDuplicate rejected\nPending\nUnknown order\nShipped\n1\n2\nFound\n42\n99\nStored\nStored\nShipped\n23\n2\n1\n",
+      "CollectionCapabilities": "2\n42\n2\n2\n7\n2\n9\n2\n3\n11\n",
+      "UnifiedArray": "42\n2\n42\n8\n50\n42\n1\n42\n1\nSystem.Int32\n4\n9\n",
+      "ArrayShapes": "0\n0\nBoolean elements\nSystem.Int32\nSystem.String\n0\n255\n65535\ne\u0301\n42\n",
+      "ReferencePayloads": "Copied TypeInfo reference\nSystem.Int32\nSystem.String\n3\n2\n0\n3\n3\n42\nStored error\n7\n42\nSystem.Int32\n",
+      "ValueInterfaces": "0\n1\nEqual integer\nEqual string\nEqual type\n0\nEqual date\n0\n0\n",
+      "NativeBuffer": "Native allocation released\n",
+      "Flags": "28\n8\n20\n-29\n0\nSame flags\nPublic included\n5\nStoredDayNumber\n",
+      "ArrayQueries": "Parse\nDivide\nEquals\nToString\nCompareTo\n0\n17\n13\n3\n17\n52\n6\n0\n0\n43\n",
+      "ArrayForEach": "Parse\nDivide\nEquals\nToString\nCompareTo\n42\n1\n2\n3\n",
+      "ManagedArrayMetadata": "42\n2\n1\nSystem.Int32\n0\nEmpty\nLength\nCount\nItem\n4\n42\n8\n50\n2\n",
+      "IntrospectionInterfaces": "Interface\nInterface\nInterface\nInterface\nInterface\nInterface\nSystem.Date\nField\nMethod\nProperty\nType\n",
+      "Reflection": "System.Int32\nSystem.Int32\nSystem\ntrue\ntrue\nfalse\nfalse\nfalse\ntrue\nfalse\nfalse\nfalse\nfalse\nfalse\nfalse\nParse\nSystem.Int32\nSystem.Result\ntrue\ntrue\nfalse\nfalse\nfalse\nfalse\nfalse\nfalse\nfalse\ntrue\nvalue\n0\nSystem.String\nfalse\nfalse\nfalse\nDayNumber\nSystem.Int32\nfalse\ntrue\nfalse\n0\n0\nget_DayNumber\ntrue\ntrue\ntrue\n28\ntrue\ntrue\n8\n20\n-29\n0\n2\nStoredDayNumber\nSystem.Int32\n0\nfalse\ntrue\nfalse\nfalse\n0\n5\n5\n1\nSystem.Int32\nSystem.Int32\n1\ntrue\ntrue\ntrue\nSystem.Int32\ntrue\nDefault\nSystem.Int32\n",
+      "ArrayCallbacks": "7\n42\nFirst\nSecond\n",
+      "Delegates": "42\n42\n42\n42\n42\nDone\n1\nExists\n42\nNo index\nNone\n",
+      "Booleans": "1\n-1\n0\n1\n42\nNot false\nEqual\nDifferent\n0\n1\n0\n",
+      "GenericCollections": "Changed\nSecond\n0\n0\n1\n2\n1\n",
+      "PropagationWorkflow": "42\nSaved\nCompleted\nOverflow\nValue found\n42\nAbsent\n",
+      "ValueCopy": "42\n7\n",
+      "Arrays": "42\n2\n",
+      "Workflow": "42\nCompleted\nPrice overflow\nSkipped\nProduct not found\nSkipped\n",
+      "ForEach": "41\n42\n41\n41\n",
+      "Aliases": "7\n42\n2\n",
+      "SavedEdit": "7\n42\n7\n7\n",
+      "MissingFieldInfoMatch": "Rejected; no executable produced or stale output run",
+      "MissingMethodInfoMatch": "Rejected; no executable produced or stale output run",
+      "MissingPropertyInfoMatch": "Rejected; no executable produced or stale output run",
+      "MissingTypeInfoMatch": "Rejected; no executable produced or stale output run",
+      "CompileFailure": "Rejected; no executable produced or stale output run",
+      "IntrospectionArrayAssignment": "Rejected; no executable produced or stale output run",
+      "IntrospectionMutation": "Rejected; no executable produced or stale output run",
+      "ExternalIntrospectionProvider": "Rejected; no executable produced or stale output run",
+      "HiddenIntrospectionProvider": "Rejected; no executable produced or stale output run",
+      "RemovedTypeClass": "Rejected; no executable produced or stale output run",
+      "RemovedInfoProperty": "Rejected; no executable produced or stale output run",
+      "RemovedTypeOfHelper": "Rejected; no executable produced or stale output run",
+      "InheritedIntegerMember": "Rejected; no executable produced or stale output run",
+      "PathArgumentMismatch": "Rejected; no executable produced or stale output run",
+      "PathUnsupportedApi": "Rejected; no executable produced or stale output run",
+      "StringArgumentMismatch": "Rejected; no executable produced or stale output run",
+      "StringUnsupportedApi": "Rejected; no executable produced or stale output run",
+      "ArrayImplicitCovariance": "Rejected; no executable produced or stale output run",
+      "ArrayExplicitCovariance": "Rejected; no executable produced or stale output run",
+      "ImportFailure": "Rejected; no executable produced or stale output run",
+      "DivisionByZero": "Verified, then faulted during execution",
+      "DivisionOverflow": "Verified, then faulted during execution"
+    }
+  },
+  "sampleArchiveRecheck": {
+    "execution": "Packaged verifier and fixtures from fresh 6512c31 archive; --only CasePayloads ErrorValues plus mandatory edit/rejection cases",
+    "outcomeCount": 25,
+    "outcomes": {
+      "CasePayloads": "7\n42\nAfter\nUpdated error\n",
+      "ErrorValues": "ArgumentOutOfRange\nConfirmed\nInvalidPath\nConfirmed\nFileNotFound\nConfirmed\nAccessDenied\nConfirmed\nNotRegularFile\nConfirmed\nFileTooLarge\nConfirmed\nFileReadFailed\nConfirmed\nInvalidUtf8\nConfirmed\nInvalidLimit\nConfirmed\nInvalidPath\nConfirmed\nNotFound\nConfirmed\nAccessDenied\nConfirmed\nNotRegularFile\nConfirmed\nTooLarge\nConfirmed\nWriteFailed\nConfirmed\nConsoleUnavailable\nConfirmed\nConsoleReadFailed\nConfirmed\nOutOfRange\nConfirmed\nInvalidBoundary\nConfirmed\nInvalidFormat\nConfirmed\nOverflow\nConfirmed\nDivisionByZero\nConfirmed\nOverflow\nConfirmed\nInvalidRange\nInvalidDate\nInvalidTime\nOverflow\nEnvironmentUnavailable\nA domain error\nA domain error\n",
+      "SavedEdit": "7\n42\n7\n7\n",
+      "MissingFieldInfoMatch": "Rejected; no executable produced or stale output run",
+      "MissingMethodInfoMatch": "Rejected; no executable produced or stale output run",
+      "MissingPropertyInfoMatch": "Rejected; no executable produced or stale output run",
+      "MissingTypeInfoMatch": "Rejected; no executable produced or stale output run",
+      "CompileFailure": "Rejected; no executable produced or stale output run",
+      "IntrospectionArrayAssignment": "Rejected; no executable produced or stale output run",
+      "IntrospectionMutation": "Rejected; no executable produced or stale output run",
+      "ExternalIntrospectionProvider": "Rejected; no executable produced or stale output run",
+      "HiddenIntrospectionProvider": "Rejected; no executable produced or stale output run",
+      "RemovedTypeClass": "Rejected; no executable produced or stale output run",
+      "RemovedInfoProperty": "Rejected; no executable produced or stale output run",
+      "RemovedTypeOfHelper": "Rejected; no executable produced or stale output run",
+      "InheritedIntegerMember": "Rejected; no executable produced or stale output run",
+      "PathArgumentMismatch": "Rejected; no executable produced or stale output run",
+      "PathUnsupportedApi": "Rejected; no executable produced or stale output run",
+      "StringArgumentMismatch": "Rejected; no executable produced or stale output run",
+      "StringUnsupportedApi": "Rejected; no executable produced or stale output run",
+      "ArrayImplicitCovariance": "Rejected; no executable produced or stale output run",
+      "ArrayExplicitCovariance": "Rejected; no executable produced or stale output run",
+      "ImportFailure": "Rejected; no executable produced or stale output run",
+      "DivisionByZero": "Verified, then faulted during execution",
+      "DivisionOverflow": "Verified, then faulted during execution"
+    }
+  },
+  "directNeoIL": {
+    "runtimeSourceRevision": "a9c1131",
+    "passed": [
+      "type-categories.neoil",
+      "generic_managed_array.neoil",
+      "native_memory.neoil",
+      "result-void.neoil"
+    ]
+  },
+  "website": {
+    "sourceRevision": "a9c1131",
+    "authoredPages": 13,
+    "docfxPages": 8,
+    "warnings": 0,
+    "errors": 0
+  },
+  "sourceValidation": {
+    "revision": "a9c1131",
+    "status": "Still running when this package record was written; no full-suite success claimed",
+    "toolchains": [
+      "stable",
+      "1.85.0"
+    ]
+  },
+  "remaining": [
+    "Exact final candidate and six platform/toolchain source jobs",
+    "Interactive VSIX build/run and hover validation",
+    "Final migration/distribution review and release version/date selection"
+  ]
+}

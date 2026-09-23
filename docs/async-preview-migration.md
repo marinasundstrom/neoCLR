@@ -2,8 +2,10 @@
 
 Draft for the upcoming async/Tasks preview, reviewed 2026-09-23. No release number,
 date or final candidate is selected. The baseline is published `v0.1.0-preview.8`;
-the initial review covers changes through `556fd7a`. Later candidate changes must
-be reviewed too. Published Preview 8 notes and artifacts remain unchanged.
+the initial review covers changes through `556fd7a`, with follow-up review through
+`0fec5e8`. The follow-up restores Rust 1.85 compatibility, corrects two stale sample
+fixtures and records future concurrency direction; it introduces no additional runtime
+API migration. Later candidate changes must be reviewed too. Published Preview 8 notes and artifacts remain unchanged.
 
 ## Upgrade the toolchain as a set
 
@@ -83,6 +85,14 @@ The notification adapter remains experimental and is not the ordinary worker pat
 See [Task contracts](task-contracts.md), [isolated workers](isolated-workers.md),
 [host cancellation](cancellation.md) and [error migration](errors.md) for the existing
 .NET comparisons, tradeoffs and tested behavior. This review adds no API contract.
+
+## Post-release direction is not part of this migration
+
+The planned `System.Threading` to `System.Concurrency` rename, proposed Task.Run-style
+submission and retained Thread lifecycle are [post-release direction](concurrency-direction.md).
+Keep current Thread.Start/ThreadPool.Queue calls and System.Threading imports for
+this release. Do not migrate to the proposed API sketches or infer that Task.Run is
+implemented. Optional thread packaging and target policies are still undecided.
 
 ## Distribution review still required
 
