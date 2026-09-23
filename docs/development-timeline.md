@@ -25,6 +25,19 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-23 — Storage and Streams as architectural exploration
+
+**Author clarification.** “Look at this as exploration also, to investigate what
+is best, and consistent with the architectural direction.”
+
+**Assistant response and action.** Treat the disk application as evidence for
+provider boundaries, directional stream capabilities, ownership/disposal, typed
+errors and compatibility with future suspension/scheduling. Mark backend transport,
+buffer shape and blocking dispatch as provisional, not public API commitments.
+Recorded these evaluation questions in the roadmap and
+[file-resource experiment](experiments/file-streams/README.md). The first host and
+VM tests pass; public Raven wrappers and the acceptance application remain pending.
+
 ## 2026-09-23 — Public API documentation policy
 
 **Author direction.** Add System.Concurrency to the API docs, keep documentation

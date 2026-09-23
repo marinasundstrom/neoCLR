@@ -112,14 +112,21 @@ The author selects the next implementation checkpoint in this order:
 4. Implement the first `System.Streams` capabilities for file access.
 
 **Acceptance product: an application that writes and reads a real disk file.**
+The author confirms this is also exploration: investigate the best design consistent
+with platform architecture, not mechanical implementation of proposal shapes.
+Use the sample to evaluate provider boundaries, stream capabilities, ownership,
+typed failures and compatibility with future suspension/scheduling. Record and
+revise provisional decisions rather than treating this sequence as an API freeze.
 Implement and validate smaller cases along the way; proposals remain design inputs.
 The explicit Thread slice is implemented and checked: retained Task before Start,
 one-shot Start, construction-queue affinity and native termination before completion.
 Evidence: [worker sample](experiments/raven-target/samples/library-workers.rvn),
 [eight contract cases](experiments/task-contract/verify_workers.py), default-queue
 regressions and Rust worker tests. Task/Promise remain in System.Tasks. The next
-bounded task is Storage and file Stream resource ownership; those APIs and the
-acceptance application remain pending. Preserve typed errors and explicit resource ownership in the file slice.
+bounded task is Storage and file Stream resource ownership. The
+[file-resource experiment](experiments/file-streams/README.md) begins with an
+invocation-owned host table, bounded transfers and explicit close. Public Storage
+and Stream wrappers, API reference pages and the acceptance application remain pending. Preserve typed errors and explicit resource ownership in the file slice.
 Networking remains later.
 
 Task represents work independently of an OS thread. The current host can submit to

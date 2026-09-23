@@ -1538,6 +1538,7 @@ fn interpret_instructions(
     let mut collection_threshold = limits.heap_objects.min(64);
     let mut arrays_used = false;
     let mut workers = crate::workers::Workers::default();
+    let mut files = crate::file_streams::Files::default();
     // An invocation-local guest root; isolated workers have their own registry.
     let mut default_task_queue: Option<Value> = None;
     let mut invocation_result: Option<Value> = None;
@@ -2626,6 +2627,8 @@ fn interpret_instructions(
                             }
                             default_task_queue = Some(args[0].clone());
                             Value::Void
+                        } else if let crate::native::Binding::FileResource(operation) = binding {
+                            files.invoke(operation, &args, &limits)?
                         } else if let crate::native::Binding::StartWorker(pooled) = binding {
                             workers.start(module, args, options, pooled)?
                         } else if matches!(binding, crate::native::Binding::NotifyWorker) {

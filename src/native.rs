@@ -47,6 +47,7 @@ pub(crate) enum Binding {
     StringStartsWithOrdinal,
     StringEndsWithOrdinal,
     StringSliceUtf8,
+    FileResource(crate::file_streams::Operation),
     ReadAllText,
     WriteAllText,
     ConsoleReadByte,
@@ -165,6 +166,50 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.StringSliceUtf8", [Type::String, Type::Int32, Type::Int32]) => {
             (Binding::StringSliceUtf8, Type::Value)
         }
+        ("neoCLR.Runtime.FileOpenRead", [Type::String]) => (
+            Binding::FileResource(crate::file_streams::Operation::OpenRead),
+            Type::Value,
+        ),
+        ("neoCLR.Runtime.FileOpenWrite", [Type::String]) => (
+            Binding::FileResource(crate::file_streams::Operation::OpenWrite),
+            Type::Value,
+        ),
+        ("neoCLR.Runtime.FileCreateNew", [Type::String]) => (
+            Binding::FileResource(crate::file_streams::Operation::CreateNew),
+            Type::Value,
+        ),
+        ("neoCLR.Runtime.FileReadChunk", [Type::Int32, Type::Int32]) => (
+            Binding::FileResource(crate::file_streams::Operation::Read),
+            Type::Value,
+        ),
+        (
+            "neoCLR.Runtime.FileWriteChunk",
+            [
+                Type::Int32,
+                Type::ArrayRef(element),
+                Type::Int32,
+                Type::Int32,
+            ],
+        ) if **element == Type::Byte => (
+            Binding::FileResource(crate::file_streams::Operation::Write),
+            Type::Value,
+        ),
+        ("neoCLR.Runtime.FileFlush", [Type::Int32]) => (
+            Binding::FileResource(crate::file_streams::Operation::Flush),
+            Type::Value,
+        ),
+        ("neoCLR.Runtime.FileClose", [Type::Int32]) => (
+            Binding::FileResource(crate::file_streams::Operation::Close),
+            Type::Value,
+        ),
+        ("neoCLR.Runtime.StorageKind", [Type::String]) => (
+            Binding::FileResource(crate::file_streams::Operation::Kind),
+            Type::Value,
+        ),
+        ("neoCLR.Runtime.StorageCreateDirectory", [Type::String]) => (
+            Binding::FileResource(crate::file_streams::Operation::CreateDirectory),
+            Type::Value,
+        ),
         ("neoCLR.Runtime.WriteAllText", [Type::String, Type::String, Type::Int32]) => {
             (Binding::WriteAllText, Type::Int32)
         }

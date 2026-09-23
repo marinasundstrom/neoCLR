@@ -1,0 +1,28 @@
+; Experimental bootstrap services, not application APIs.
+.function neoCLR.Runtime.FileOpenRead(String path) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.FileOpenWrite(String path) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.FileCreateNew(String path) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.FileReadChunk(Int32 handle,Int32 count) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.FileWriteChunk(Int32 handle,arrayref<Byte> buffer,Int32 offset,Int32 count) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.FileFlush(Int32 handle) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.FileClose(Int32 handle) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StorageKind(String path) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StorageCreateDirectory(String path) -> Value
+.methodimpl InternalCall
+.end

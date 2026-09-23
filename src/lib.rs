@@ -26,6 +26,7 @@ pub use gc::{CollectionEvent, CollectionReason, GcStatistics, ManagedHeap};
 pub use slots::SlotReference;
 mod char_categories;
 mod file_io;
+mod file_streams;
 pub mod library;
 mod math;
 pub mod memory;

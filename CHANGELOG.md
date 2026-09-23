@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Start the file-stream resource foundation: invocation-owned regular-file handles,
+  bounded chunk transfers, explicit close, exclusive creation and item/directory
+  host operations. This is an experimental internal service boundary; public
+  Storage/Stream wrappers, reference pages and the Raven disk application remain
+  pending. Calls block; flush does not promise durable storage. Record the author's
+  clarification that this is architectural exploration, with API choices open to
+  revision based on the file application's evidence.
+
 - Require on-site reference coverage for public API changes, including namespace
   navigation and documented renderer exclusions. Add System.Concurrency Thread and
   ThreadPool reference pages, a namespace browsing index, and an explicit backlog

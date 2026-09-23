@@ -82,6 +82,26 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             | crate::native::Binding::TypeArgumentCount
             | crate::native::Binding::TypeArgument => RuntimeService::TypeInspection,
             crate::native::Binding::ConsoleReadByte => RuntimeService::ConsoleInput,
+            // Closing an opaque handle may release an input or output resource.
+            // Report both logical uses; this is analysis, not an access-control policy.
+            crate::native::Binding::FileResource(crate::file_streams::Operation::Close) => {
+                return Ok(vec![
+                    ServiceUse {
+                        service: RuntimeService::FileInput,
+                        instruction: None,
+                    },
+                    ServiceUse {
+                        service: RuntimeService::FileOutput,
+                        instruction: None,
+                    },
+                ]);
+            }
+            crate::native::Binding::FileResource(operation) => match operation {
+                crate::file_streams::Operation::OpenRead
+                | crate::file_streams::Operation::Read
+                | crate::file_streams::Operation::Kind => RuntimeService::FileInput,
+                _ => RuntimeService::FileOutput,
+            },
             crate::native::Binding::WriteAllText => RuntimeService::FileOutput,
             crate::native::Binding::ReadAllText => RuntimeService::FileInput,
             crate::native::Binding::ParseInt32 => RuntimeService::ParseInt32,
