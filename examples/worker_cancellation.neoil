@@ -20,3 +20,12 @@
     call neoCLR.Runtime.JoinWorker(Int32)
     ret
 .end
+
+; Provisional worker services used by this low-level host example.
+; Ordinary Raven applications use Thread/ThreadPool through the library.
+.function neoCLR.Runtime.StartWorker(System.Func<String,String> callback, String input) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.JoinWorker(Int32 handle) -> String
+.methodimpl InternalCall
+.end

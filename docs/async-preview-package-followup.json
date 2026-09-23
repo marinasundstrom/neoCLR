@@ -210,7 +210,7 @@
   },
   "sourceValidation": {
     "revision": "a9c1131",
-    "status": "Still running when this package record was written; no full-suite success claimed",
+    "status": "Both full source runs failed on the standalone worker sample; see async-preview-source-validation.json. Package results above remain separate.",
     "toolchains": [
       "stable",
       "1.85.0"

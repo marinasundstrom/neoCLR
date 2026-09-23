@@ -94,7 +94,8 @@ Run the small [host sample](../examples/worker_cancellation.rs):
 cargo run --locked --example worker_cancellation
 ```
 
-It supplies provisional worker imports for its [guest IL](../examples/worker_cancellation.neoil).
+Its [guest IL](../examples/worker_cancellation.neoil) declares its provisional worker
+imports directly, so the same source can be assembled and verified independently.
 This is a runtime embedding example; ordinary Raven applications use library APIs.
 Expected output (also asserted by the executable):
 

@@ -26,14 +26,7 @@ impl Console for CancelAfterFirstLine {
 }
 
 fn main() -> Result<(), neoclr::Fault> {
-    // This low-level host example supplies provisional worker service imports.
-    // Ordinary Raven applications use Thread/ThreadPool through the library.
-    let source = format!(
-        "{}\n{}",
-        include_str!("worker_cancellation.neoil"),
-        include_str!("../runtime/neoCLR/Runtime/Workers.neoil")
-    );
-    let module = assemble(&source)?;
+    let module = assemble(include_str!("worker_cancellation.neoil"))?;
     let program = LoadedProgram::new(&module)?;
     program.verify()?;
     let console = Arc::new(CancelAfterFirstLine::default());

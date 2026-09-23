@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Make the low-level worker-cancellation sample self-contained by declaring its
+  worker service imports in the neoIL source. The host example now uses that same
+  source directly. This fixes the full-suite standalone sample assembly failure;
+  verifier assembly diagnostics now identify the failing sample path. All nine
+  verifier checks pass on stable Rust and Rust 1.85, and the host cancellation
+  example passes. Preserve both earlier full-source failures separately; neither
+  constitutes a passed release gate.
+
 - Record the author-selected post-release System.Concurrency namespace direction
   and proposed Thread.Run versus retained Thread/Start/Task API shapes. Document
   optional thread packaging, platform limits, .NET comparisons and validation needs;

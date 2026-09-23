@@ -127,10 +127,29 @@ before fresh extraction. The runtime bundle has 935 regular files and the SDK 43
 The record contains archive checksums and outcomes. This is a packaging workaround,
 not a claim that Raven's upstream packaging script was fixed.
 
-Fresh stable and Rust 1.85 source validation runs at `a9c1131` are still in progress
-when this package evidence is recorded. Neither is claimed as a passed full source
-gate. Their eventual reports and exact revision must be recorded separately; these
-local macOS runs cannot satisfy the Linux/Windows matrix or certify later revisions.
+## Standalone worker sample failure and correction
+
+The full stable source run at `a9c1131` failed in
+`verifier_accepts_all_samples_without_executing_them`: assembling
+`examples/worker_cancellation.neoil` could not resolve StartWorker. Rust 1.85 completed with
+the same sole failure. Both [source reports](async-preview-source-validation.json)
+record 1,314 passing tests and one failure; archive smoke programs were not reached. The host sample had appended the service declarations itself,
+so its successful execution did not establish standalone sample validity.
+
+The guest source now declares the two worker services it uses, and the Rust host
+assembles that same self-contained file. The verifier test also identifies the
+sample path when assembly fails. This restores the existing sample contract; no
+runtime or public library API changes. Reuse the existing
+[cancellation comparison and host scenario](cancellation.md).
+
+The failed archive runs remain failed evidence, not passed full-source gates.
+Correction checks pass locally: all nine verifier tests on stable Rust and Rust
+1.85, the executable host cancellation example, and rustfmt. The host verifies
+cancellation after the first delivered line and reuse of the loaded program in a
+fresh invocation. Logs are `verifier-sample-fix.log`,
+`verifier-sample-fix-minimum.log` and `host-sample-fix.log` under the local validation
+directory. These focused checks do not replace a corrected final-candidate full
+archive run; that and the cross-platform checks remain open. Local macOS results cannot satisfy Linux/Windows gates.
 
 ## Remaining release work
 

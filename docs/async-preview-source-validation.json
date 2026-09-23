@@ -1,0 +1,50 @@
+{
+  "date": "2026-09-23",
+  "scope": "Failed local macOS source runs at a9c1131; preserved independently of correction checks",
+  "runs": [
+    {
+      "status": "failed",
+      "platform": "macOS-27.0-arm64-arm-64bit",
+      "toolchain": "stable",
+      "full_tests": false,
+      "smoke_programs": [],
+      "validator_sha256": "bdcf834c28e9d6ddf0e26a2ad4ae850a6180098f6aa0b2bce3fa501460b44312",
+      "commit": "a9c113131a350fd0852994ce936620e09f3f8fb3",
+      "archive_sha256": "071a7a4b27632b03993962b8a5d0e97ace836db3c28af87437b9a8f7a21adf73",
+      "tracked_files": 1863,
+      "registry_packages": 48,
+      "notice_files": 97,
+      "raven_library_snapshot": true,
+      "rustc": "rustc 1.95.0 (59807616e 2026-04-14)\nbinary: rustc\ncommit-hash: 59807616e1fa2540724bfbac14d7976d7e4a3860\ncommit-date: 2026-04-14\nhost: aarch64-apple-darwin\nrelease: 1.95.0\nLLVM version: 22.1.2",
+      "error": "Command '['cargo', '+stable', 'test', '--locked', '--all-targets', '--no-fail-fast']' returned non-zero exit status 101.",
+      "test_summary": {
+        "passed": 1314,
+        "failed": 1,
+        "failing_test": "verifier_accepts_all_samples_without_executing_them",
+        "cause": "worker_cancellation.neoil omitted worker service imports appended only by its Rust host"
+      }
+    },
+    {
+      "status": "failed",
+      "platform": "macOS-27.0-arm64-arm-64bit",
+      "toolchain": "1.85.0",
+      "full_tests": false,
+      "smoke_programs": [],
+      "validator_sha256": "bdcf834c28e9d6ddf0e26a2ad4ae850a6180098f6aa0b2bce3fa501460b44312",
+      "commit": "a9c113131a350fd0852994ce936620e09f3f8fb3",
+      "archive_sha256": "071a7a4b27632b03993962b8a5d0e97ace836db3c28af87437b9a8f7a21adf73",
+      "tracked_files": 1863,
+      "registry_packages": 48,
+      "notice_files": 97,
+      "raven_library_snapshot": true,
+      "rustc": "rustc 1.85.0 (4d91de4e4 2025-02-17)\nbinary: rustc\ncommit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688\ncommit-date: 2025-02-17\nhost: aarch64-apple-darwin\nrelease: 1.85.0\nLLVM version: 19.1.7",
+      "error": "Command '['cargo', '+1.85.0', 'test', '--locked', '--all-targets', '--no-fail-fast']' returned non-zero exit status 101.",
+      "test_summary": {
+        "passed": 1314,
+        "failed": 1,
+        "failing_test": "verifier_accepts_all_samples_without_executing_them",
+        "cause": "worker_cancellation.neoil omitted worker service imports appended only by its Rust host"
+      }
+    }
+  ]
+}

@@ -15,7 +15,8 @@ fn verifier_accepts_all_samples_without_executing_them() {
             .extension()
             .is_some_and(|extension| extension == "neoil")
         {
-            let module = assemble(&std::fs::read_to_string(&path).unwrap()).unwrap();
+            let module = assemble(&std::fs::read_to_string(&path).unwrap())
+                .unwrap_or_else(|error| panic!("{}: {error}", path.display()));
             verify(&module).unwrap_or_else(|error| panic!("{}: {error}", path.display()));
         }
     }

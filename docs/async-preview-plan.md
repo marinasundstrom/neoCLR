@@ -88,8 +88,10 @@ The [migration draft](async-preview-migration.md) inventories known breaks; the
 minimum-Rust archive check found a dispatch syntax issue, now corrected locally.
 The rebuilt runtime and corrected sample archive now have
 [separate package evidence](async-preview-package-followup.json), including eight
-Workbench samples and 84 saved-project outcomes. Full local source suites are in
-progress; finish and record them without treating them as cross-platform evidence.
+Workbench samples and 84 saved-project outcomes. Full local source suites exposed a standalone worker sample with missing service
+imports. The sample now supplies them directly; preserve failed archive reports
+and record correction checks separately. Final-candidate full-source/platform gates
+remain open.
 Record blockers with evidence and only claim platforms actually tested. Remote candidate CI and publication remain distinct
 steps; this plan does not tag, push, upload artifacts or publish the website.
 
