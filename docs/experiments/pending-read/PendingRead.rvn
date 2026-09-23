@@ -1,0 +1,84 @@
+import System.*
+import System.Tasks.*
+import System.Result.*
+import System.Text.*
+
+// Experiment only: terminal producer events are supplied by queued guest callbacks.
+// The caller never receives the mutable destination while the operation is pending.
+class PendingRead {
+    private field completion: Promise<Result<int, string>> = Promise<Result<int, string>>()
+    private field buffer: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9]
+    private field requested: bool = false
+    private field terminal: bool = false
+    private field releases: int = 0
+
+    val Task: Task<Result<int, string>> => completion.Task
+    val ReleaseCount: int => releases
+    val CancellationRequested: bool => requested
+
+    func RequestCancel() -> bool {
+        if terminal || requested {
+            return false
+        }
+        requested = true
+        return true
+    }
+
+    // Models closing an owner with one outstanding read: request, then await quiescence.
+    func RequestClose() {
+        _ = RequestCancel()
+    }
+
+    private func Release() {
+        terminal = true
+        releases += 1
+    }
+
+    func Complete(text: string) -> bool {
+        if terminal {
+            return false
+        }
+        let bytes = Utf8.Encode(text)
+        if bytes.Count > 2 {
+            Release()
+            let error: Result<int, string> = Error("Payload exceeds requested range")
+            completion.Complete(error)
+            return true
+        }
+        var index = 0
+        while index < bytes.Count {
+            buffer[index + 1] = bytes[index]
+            index += 1
+        }
+        Release()
+        let result: Result<int, string> = Ok(bytes.Count)
+        completion.Complete(result)
+        return true
+    }
+
+    func AcknowledgeCancel() -> bool {
+        if terminal || !requested {
+            return false
+        }
+        Release()
+        completion.Cancel()
+        return true
+    }
+
+    func Fail() -> bool {
+        if terminal {
+            return false
+        }
+        Release()
+        let result: Result<int, string> = Error("Producer failure")
+        completion.Complete(result)
+        return true
+    }
+
+    func ByteAt(index: int) -> byte {
+        if !terminal {
+            System.Fault("Pending destination is private")
+        }
+        return buffer[index]
+    }
+}

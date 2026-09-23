@@ -1,0 +1,7 @@
+Requests returned; terminal events still queued
+Cancellation acknowledged: consumer cancelled, bytes unchanged
+Completion wins after request: Hi copied once
+Oversized payload: error, bytes unchanged
+Producer failure: error, bytes unchanged
+Empty completion: zero bytes
+Short completion: one byte, unused range unchanged

@@ -237,8 +237,16 @@ It validates and serializes before exclusive output creation, preserves input an
 existing destinations, and documents the possibility of partial output after an I/O
 failure. JSON remains application experiment code, not a new platform API.
 
-**Next direction:** use these products as the baseline for remaining M1 suspension
-and cancellation work before networking. Evaluate task-returning provider operations
+**Pending-operation evidence:** the [pending-read contract experiment](experiments/pending-read/README.md)
+uses real Task/Promise, await and GC with queued guest producer events. Six cases
+separate cancellation requests from terminal acknowledgement, permit completion to
+win, and reject late writes/releases/notifications. The buffer is private while
+pending. Resource release is a counter, not native I/O; no public async signature
+or token API is selected.
+
+**Next direction:** connect this operation contract to a controlled host producer
+on the real invocation/default-queue path, checking acknowledged release and root
+handoff. Keep M1 suspension and cancellation work ahead of networking. Evaluate task-returning provider operations
 against that suspension model; do not expand Storage metadata or mutations without
 a concrete case. Preserve the working disk/memory consumer.
 Task-based interaction is the intended extension direction; its scheduling and

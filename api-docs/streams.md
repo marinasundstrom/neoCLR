@@ -154,3 +154,9 @@ Streams and text readers now use System.IO. Update System.Streams imports and ty
 names to System.IO and regenerate applications with matching artifacts. System.Storage
 continues to own providers, files, directories and Path. These APIs are development
 work after Preview 9; published downloads are unchanged.
+
+## Future asynchronous reads
+
+The [pending-read experiment](pending-read.md) explores cancellation requests versus
+terminal completion using Task/Promise, private buffers and queued producer events.
+It exercises real await and GC, but does not introduce asynchronous stream methods.

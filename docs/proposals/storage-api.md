@@ -1636,3 +1636,16 @@ Close before claiming asynchronous I/O. Do not assume a thread pool exists on ev
 platform or implement general storage concurrency by indiscriminately spawning
 threads. The synchronous POC should explicitly document blocking behavior. Whether
 to replace signatures or retain a separately named sync/async pair remains open.
+
+
+### Pending-operation contract evidence
+
+The [queued pending-read experiment](../experiments/pending-read/README.md) tests
+Task/Promise cancellation through actual awaits and GC without changing Storage.
+Its provisional rule is to keep the Task pending after a cancellation/close request
+until a terminal producer event establishes modeled resource release. Completion
+may win after the request; expected producer failure remains a Result error. This
+separates cancellation of an operation from merely abandoning a wait. Native release
+and concurrent backend races are not established by queued guest events. Private
+owned buffers simplify this fixture, but owned-result versus caller-buffer APIs and
+multiple-operation close behavior remain open. No public type or signature is selected.

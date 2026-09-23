@@ -1,0 +1,104 @@
+import System.*
+import System.Tasks.*
+import System.Result.*
+import System.Console.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("Pending-read contract failed")
+    }
+}
+
+async func Consume(read: PendingRead, expected: int) -> Task<unit> {
+    let result = await read.Task
+    Check(read.ReleaseCount == 1)
+    match result {
+        Ok(let count) => {
+            Check(count == expected)
+            Check(read.ByteAt(0) == 9 && read.ByteAt(3) == 9)
+            if count > 0 {
+                Check(read.ByteAt(1) == 72)
+            }
+            if count == 2 {
+                Check(read.ByteAt(2) == 105)
+            } else {
+                Check(read.ByteAt(2) == 9)
+            }
+        }
+        Error(_) => {
+            Check(expected == -1)
+            Check(read.ByteAt(1) == 9 && read.ByteAt(2) == 9)
+        }
+    }
+    return ()
+}
+
+func Scenario(name: string, mode: int) {
+    let read = PendingRead()
+    let expected = if mode == 3 || mode == 4 { -1 } else if mode == 5 { 0 } else if mode == 6 { 1 } else { 2 }
+    let consumer = Consume(read, expected)
+    var notified = 0
+    consumer.OnCompleted(() => {
+        notified += 1
+        Check(notified == 1)
+        Check(read.ReleaseCount == 1)
+        if mode == 1 {
+            Check(consumer.IsCancelled)
+            Check(read.ByteAt(1) == 9 && read.ByteAt(2) == 9)
+        } else {
+            Check(!consumer.IsCancelled)
+        }
+        WriteLine(name)
+    })
+    Check(!read.Task.IsCompleted && !consumer.IsCompleted)
+    Check(!read.AcknowledgeCancel())
+    if mode <= 2 {
+        Check(read.RequestCancel())
+        Check(!read.RequestCancel())
+        read.RequestClose()
+        Check(read.CancellationRequested)
+        Check(read.ReleaseCount == 0 && !read.Task.IsCompleted)
+    }
+    TaskQueue.Default.Post(() => {
+        // The producer's terminal event, not the request, releases the resource.
+        if mode == 1 {
+            Check(read.AcknowledgeCancel())
+        } else if mode == 3 {
+            Check(read.Complete("oversized"))
+        } else if mode == 4 {
+            Check(read.Fail())
+        } else if mode == 5 {
+            Check(read.Complete(""))
+        } else if mode == 6 {
+            Check(read.Complete("H"))
+        } else {
+            Check(read.Complete("Hi"))
+        }
+        Check(read.ReleaseCount == 1 && read.Task.IsCompleted)
+        Check(notified == 0)
+        // Duplicate or late events cannot write, release or notify twice.
+        Check(!read.Complete("XX"))
+        Check(!read.AcknowledgeCancel())
+        Check(!read.Fail())
+        Check(!read.RequestCancel())
+        read.RequestClose()
+        Check(read.ReleaseCount == 1)
+    })
+}
+
+func Main() {
+    Scenario("Cancellation acknowledged: consumer cancelled, bytes unchanged", 1)
+    Scenario("Completion wins after request: Hi copied once", 2)
+    Scenario("Oversized payload: error, bytes unchanged", 3)
+    Scenario("Producer failure: error, bytes unchanged", 4)
+    Scenario("Empty completion: zero bytes", 5)
+    Scenario("Short completion: one byte, unused range unchanged", 6)
+    // Scenario locals are gone; pending callbacks and await continuations own the graph.
+    var index = 0
+    while index < 1200 {
+        let garbage: byte[] = [(byte)0]
+        _ = garbage
+        index += 1
+    }
+    WriteLine("Requests returned; terminal events still queued")
+}

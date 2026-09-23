@@ -326,3 +326,15 @@ opened streams, but device/flush failure can leave a partial new destination.
 Injected write-failure testing and async ownership/cancellation remain follow-ups;
 no atomic-save or durability claim is made. Parser/decoder limits remain those of
 the existing experiments, not proposed general library defaults.
+
+
+## Guest pending-read contract — 2026-09-23
+
+The [pending-read sample](experiments/pending-read/README.md) supplies six deterministic
+Task/Promise/await scenarios with actual collection: acknowledged cancellation,
+completion winning after a request, oversize rejection, producer failure, empty and
+short delivery. Duplicate and late events cannot publish twice. The private buffer
+is retained through pending callbacks and consumers; final guest live count is zero.
+The producer events and resource release are modeled in guest code, so native
+acknowledgement, arbitrary queue affinity, host payload limits and teardown still
+require integration with the S0 host path. Existing synchronous Storage is unchanged.

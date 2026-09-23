@@ -147,3 +147,10 @@ Compare the application cancellation contract before generalizing the adapter or
 introducing a file producer. The older controlled ownership fixture already tests
 some terminal races, but those are not yet end-to-end VM/Task guarantees. Native
 byte-buffer delivery, aliasing rules and noncooperative OS cancellation remain open.
+
+
+The [pending-read guest contract](../pending-read/README.md) now explores the
+request/terminal distinction with ordinary Tasks and generated awaits. It verifies
+both ordered outcomes and late-event suppression with a private destination and GC.
+Its queued producer and release counter are modeled; connecting that contract to
+this host-notification path remains the next bounded integration step.

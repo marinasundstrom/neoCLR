@@ -86,6 +86,7 @@
         <p>Preview 9 includes the current Task/Promise model, named async functions, await, composition, Result propagation, producer cancellation and automatic default-queue dispatch. Isolated workers are included with their current limits: ordinary worker joins can block the queue.</p>
         <p>The release was checked with fresh extracted runtime, SDK and editor packages, eight Async Workbench samples, six Task contract probes and the Linux/macOS/Windows source matrix. Prebuilt package validation covers macOS arm64. HTTP, guest cancellation tokens and the experimental nonblocking worker adapter are not supported features of this preview.</p>
       </section>
+      <section id="pending-read"><h2>Pending-read contract experiment</h2><p>A <a href="../../docs/pending-read.html">development sample</a> separates a cancellation request from terminal producer acknowledgement. Real Task/Promise, await and managed GC exercise both ordered outcomes and reject late events. Producer callbacks and resource release are modeled; this is not an async Storage implementation.</p></section>
       <section id="direction">
         <p class="eyebrow">PROPOSED DIRECTION</p><h2>Comparison with .NET and planned work</h2>
         <p>Both platforms expose awaitable completion. neoCLR uses Promise for producer completion and Result values for expected errors; Task has no faulted outcome. This differs from .NET Task’s exception-based fault state and requires different library and compiler contracts.</p>

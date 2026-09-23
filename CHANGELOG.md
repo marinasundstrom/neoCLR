@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Add a pending-read contract experiment using real Task/Promise, Raven await,
+  TaskQueue and managed GC. Six ordered scenarios distinguish cancellation requests
+  from terminal acknowledgement, preserve bytes on failure/cancellation and reject
+  duplicate terminal writes, releases and notifications. The buffer stays private
+  while pending; producer callbacks and resource release are modeled, with no new
+  public async Storage API. Add on-site documentation and a source download.
+  Validation: all six guest scenarios, actual collections and zero final live objects;
+  website tests/build and source archive verification.
+
 - Add a bounded File Transformer sample connecting platform Storage and System.IO
   to the existing experimental JSON document consumer. Validate and serialize before
   exclusive output creation; preserve input and existing destinations, close streams

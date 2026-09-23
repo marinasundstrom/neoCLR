@@ -224,6 +224,12 @@ def main():
             shutil.copyfile(ROOT / 'docs/experiments' / folder / name, destination / name)
     shutil.make_archive(str(downloads / 'file-transformer'), 'zip', transformer_sources)
     shutil.rmtree(transformer_sources)
+    pending_sources = OUTPUT / '_pending-read-source' / 'pending-read'
+    pending_sources.mkdir(parents=True)
+    for name in ('PendingRead.rvn', 'Main.rvn', 'PendingRead.rvnproj', 'expected.txt', 'verify.py', 'README.md'):
+        shutil.copyfile(ROOT / 'docs/experiments/pending-read' / name, pending_sources / name)
+    shutil.make_archive(str(downloads / 'pending-read'), 'zip', pending_sources.parent)
+    shutil.rmtree(pending_sources.parent)
     pages = {}
     for source in sorted(SOURCE.rglob('*.html')):
         relative = source.relative_to(SOURCE)
