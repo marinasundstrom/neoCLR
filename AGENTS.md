@@ -1,5 +1,17 @@
 # Repository workflow
 
+## Work priorities
+
+- Treat [the platform roadmap](docs/platform-roadmap.md) as the authoritative default
+  for work priorities, milestone sequencing and scope unless the author explicitly
+  directs work otherwise. Explicit author directions take precedence.
+- Detailed milestone plans, API plans, backlogs and older direction notes support
+  that roadmap; they do not independently override its priorities. Proposals remain
+  exploratory inputs, not specifications or implementation commitments.
+- Select the next bounded task from the active milestone. Keep roadmap status and
+  linked evidence current as work completes. Record significant author-directed
+  changes in direction without inferring a permanent reprioritization from a one-off task.
+
 ## Raven integration work
 
 - Keep work in the Raven repository isolated on a feature branch. Verify its branch

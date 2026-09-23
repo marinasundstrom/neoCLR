@@ -1,0 +1,289 @@
+# neoCLR platform roadmap
+
+**Updated 2026-09-23 · Product-led planning, not a release schedule.**
+
+Build a platform that can justify itself through useful programs. Each milestone
+has a theme, a concrete sample product and smaller cases that make the underlying
+APIs testable before they are combined. The first major milestone is the
+author-selected HTTP application POC. Later milestones and sample names below are
+proposed directions; they may be reordered, reduced or replaced after experience.
+
+The [original proposals](proposals/README.md) are inputs about needs and possible
+solutions. They may conflict and do not prescribe what the platform must eventually
+look like. A milestone selects an outcome to investigate, not every abstraction in
+its source proposals. Keep, adapt or discard ideas based on working samples and
+[comparison with .NET/CLR](design-research.md).
+
+## Authority and use
+
+**This roadmap is authoritative for our work unless the author explicitly directs
+work otherwise.** It governs default priorities, milestone sequencing and scope.
+An explicit author instruction takes precedence, including a bounded task outside
+the current milestone. Such a task does not silently reorder the entire roadmap;
+record a lasting change in direction when the author makes one.
+
+When choosing work autonomously, select the next useful bounded case within the
+active milestone, currently M1. Use its detailed plan for dependencies and validation.
+Later milestone candidates remain provisional: listing them here does not authorize
+wholesale implementation of their proposals or freeze their order. Update completion
+status with evidence and record significant direction changes in the development timeline.
+
+## How the plans fit together
+
+This is the unified view of platform milestones and their priorities.
+The [HTTP POC roadmap](http-poc-roadmap.md) is the detailed M1 work plan, including
+urgent experiments, proposal triage and socket/stream acceptance cases. Keep its
+implementation details there. [Direction and migration](roadmap.md) preserves dated
+directions; the [API plan](runtime-api-plan.md) and [platform backlog](platform-backlog.md)
+provide supporting inventories rather than competing execution orders.
+
+Current applications, collections, text, Tasks, file helpers and introspection are
+starting assets, not completed milestones below. Their evidence is linked from the
+[HTTP baseline](http-poc-roadmap.md#starting-evidence-and-gaps) and feature design
+notes. No new sample or runtime capability is implemented by this roadmap.
+
+## Milestones at a glance
+
+| Milestone | Theme | Concrete product / sample | What it should demonstrate | Planning status |
+| --- | --- | --- | --- | --- |
+| M1 | Communicate | **Hello Service + Hello Client** | Two Raven apps exchange text and JSON on neoCLR using HTTP, sockets, streams and encoding | First major milestone selected by author; detailed scope provisional |
+| M2 | Work with data | **File Catalog** | Scan a bounded directory, query entries, write/read a JSON catalog and reuse the same logic with an in-memory source | Candidate after M1 |
+| M3 | Handle real waiting and failure | **Download Queue** | Fetch named resources with bounded concurrency, cancellation, deadlines and controlled output to files | Candidate; builds on M1 and the needed part of M2 |
+| M4 | Work with human time and presentation | **Activity Report** | Summarize timestamped records with deterministic clocks, explicit time-zone handling and selected cultural formatting | Candidate; can branch from M2 independently of M3 |
+| M5 | Explain programs | **Assembly Explorer** | Inspect a sample application's types/members, compare metadata views and report unsupported information clearly | Candidate; a loaded-program version can start independently |
+| M6 | Carry the platform across hosts | **Portable Sample Pack** | Run selected earlier products on a second host and report available/missing capabilities consistently | Candidate; target and exact sample set remain open |
+
+M1's memory-copy, encoding, JSON and TCP echo programs are small delivery checkpoints
+inside M1, not additional major milestones that delay the HTTP proof. M2–M6 identify
+useful destinations, not a promise to complete all proposals. Progress through them
+by the dependency of the next runnable case, not by completing entire API families.
+
+## M1 — Communicate: Hello Service and Hello Client
+
+**Product:** a small server with a text route and a JSON echo route, plus a client
+that calls both and displays the decoded results. Both run on neoCLR. This is the
+first proof that the runtime can host an application rather than only isolated API
+examples.
+
+**Build up through:** delayed I/O completion; byte copy in memory; UTF-8 chunks;
+JSON round trip; TCP echo; standalone HTTP server; standalone HTTP client; combined
+application pair. The [detailed sequence](http-poc-roadmap.md#small-executable-slices)
+contains dependencies and negative cases.
+
+**Proposal inputs:** networking, streams, Task, strings/encoding, with only the
+necessary collection and runtime-host support. The small JSON API is an explicit
+author requirement rather than a supplied standalone proposal.
+
+**Finish when:** the pair works on the bounded documented protocol subset, each
+side also interoperates with an independent peer, cancellation and shutdown release
+resources, and a matching packaged toolchain reproduces the checked output.
+
+**Compare with .NET:** Socket/TcpListener, Stream, Encoding/Decoder, HttpClient,
+HttpListener and System.Text.Json provide the functional baselines. Test directional
+streams and Task/Result against those roles; they may improve explicitness but cost
+adapters and different error handling. Reuse the [primary-source comparison](http-poc-roadmap.md#evidence-comparisons-and-costs).
+Do not require new suspension machinery, intersection types or reflective JSON to
+prove the application. Proposed loopback scope and API names are still open to evidence.
+
+## M2 — Work with data: File Catalog
+
+**Product:** a command-line tool accepts a root directory, lists supported file
+metadata, filters/orders entries and writes a bounded JSON catalog. A second command
+reads the catalog and produces a short report. Begin with names and sizes; add
+content inspection only when it gives the sample a useful additional operation.
+
+**Build up through:** file-to-memory copy using M1 streams; shallow directory listing;
+filter a fixed set of entries; JSON catalog round trip; inject an in-memory source
+into the same catalog logic. Recursive traversal is a later bounded increment with
+explicit limits and a deliberate symbolic-link policy.
+
+**Proposal inputs:** [storage](proposals/storage-api.md), [async storage](proposals/storage-api-extensions.md),
+[collections](proposals/collections-api.md), [environment](proposals/environment-api.md),
+streams and text. This is the second concrete backend for stream contracts and the
+first useful test of contextual storage access.
+
+**Explore:** path values versus resolved handles; explicit provider injection versus
+contextual convenience; iterator cleanup; missing versus inaccessible entries; save
+failure and overwrite policy. A local host source plus a small in-memory implementation
+is enough to test substitutability. It does not select a provider hierarchy or require
+archive storage, every collection family, or a general ShellEnvironment first.
+
+**Finish when:** fixture catalogs are deterministic, malformed input and access errors
+produce documented outcomes, interrupted writes follow the declared save policy,
+handles are released and the same catalog operation works with both sources. State
+whether saves are atomic; do not imply durability from a successful stream write.
+
+**Compare with .NET:** File/Directory/Path/FileStream and collection/query APIs are
+the baseline. Injected capabilities can make tests and host restrictions clearer,
+but introduce resolution and ownership contracts absent from simple static calls.
+Reuse [filesystem comparisons](filesystem-design.md) and [collection review](collection-contracts.md).
+Keep path and provider policy in libraries/host adapters unless runtime enforcement
+is actually needed; a provider interface alone is not a sandbox.
+
+## M3 — Handle real waiting and failure: Download Queue
+
+**Product:** a terminal program reads a small manifest, downloads resources to a
+chosen directory, reports progress and permits cancellation. Start against a
+controlled local server with delayed, failed and truncated responses, then add a
+selected HTTPS scenario before describing the sample as an internet downloader.
+
+**Build up through:** one response streamed to a file; two queued downloads with a
+concurrency limit; a cancelled pending read; a deadline; deterministic failure/retry
+cases; DNS and TLS integration. Reuse the M1 client and M2 file stream rather than
+create a separate networking or storage stack.
+
+**Proposal inputs:** networking, Task, streams, storage extensions, date/time and
+runtime architecture. This is the motivating product for backpressure, deadlines,
+resource budgets and controlled concurrent work.
+
+**Explore:** explicit tokens versus context-based cancellation, group lifetime,
+monotonic deadlines, retry policy and connection reuse. Cancellation requested is
+not cancellation completed. Keep retries bounded and select eligible operations;
+do not turn an arbitrary failure into an automatic repeated side effect. Compare
+host event progress with a bounded worker implementation under the same workload.
+
+**Finish when:** slow connections do not halt unrelated work; buffer, task and handle
+counts stay within declared limits; cancellation stops pending work and leaves output
+in a documented state; certificate/hostname failures are rejected in the HTTPS case;
+shutdown is bounded. Record throughput and allocation measurements before claiming
+an improvement. HTTP/2/3, an application hosting framework and universal structured
+concurrency remain optional follow-ups.
+
+**Compare with .NET:** HttpClient's streaming/lifetime choices, Task cancellation,
+Stream and TimeProvider are reference roles. neoCLR's explicit outcomes may clarify
+failure flow but require different cancellation/cleanup contracts. Use [M1 evidence](http-poc-roadmap.md#evidence-comparisons-and-costs),
+[Task contracts](task-contracts.md) and [time design](date-time-design.md); pin backend
+versions and complete TLS/cancellation research when selecting implementation details.
+
+## M4 — Human time and presentation: Activity Report
+
+**Product:** a console report reads a small timestamped activity log, filters a time
+window and groups entries for display. Keep the stored JSON invariant; make display
+culture and time zone explicit inputs. This can later consume File Catalog or server
+activity, but a fixed input file is enough for the first case.
+
+**Build up through:** invariant timestamp round trip; a fixed clock; elapsed-duration
+summary; grouping by local calendar date in a selected zone; formatting the same
+values for two selected cultures. Add a scheduling example only if date-to-instant
+conversion needs a clearer consumer.
+
+**Proposal inputs:** [date/time](proposals/datetime-api.md), [globalization](proposals/globalization-api.md),
+strings, collections and contextual environment. These proposals should converge
+through the sample rather than impose their entire type catalogs.
+
+**Explore:** instant versus local date/time, elapsed versus calendar arithmetic,
+ambiguous/missing local times, explicit versus contextual culture and the source and
+version of cultural/time-zone data. Normalization, collation and alternate calendars
+need their own use cases; displaying two cultures does not imply complete support.
+
+**Finish when:** fixed inputs, clock and data versions give reproducible results;
+daylight-transition cases have explicit outcomes; unknown culture/zone data is
+reported; changing display culture does not change stored values or wire parsing.
+
+**Compare with .NET:** DateOnly/TimeOnly, DateTimeOffset, TimeSpan, TimeZoneInfo,
+TimeProvider and CultureInfo distinguish the relevant roles. More explicit types
+or immutable context could reduce accidental mixing but add conversions, data
+shipping and portability costs. Start from [time comparisons](date-time-design.md)
+and [globalization design](globalization-design.md); complete the existing broader
+[Noda Time research direction](design-research.md#broader-api-review-scope-2026-09-13)
+before settling new contracts. No calendar redesign is required merely to format a report.
+
+## M5 — Explain programs: Assembly Explorer
+
+**Product:** a developer tool prints a structured inventory of a sample application's
+types, members and signatures and can write it as JSON. Start by inspecting the loaded
+program using current introspection. Add an offline input mode as a separate extension,
+then compare the two views on a shared supported subset.
+
+**Build up through:** list loaded declarations; filter/query them; stable report;
+read a small artifact without executing it; compare supported signatures; diagnose
+unknown metadata. This gives introspection and metadata proposals a consumer before
+redesigning the complete descriptor model.
+
+**Proposal inputs:** both [introspection](proposals/introspection-and-reflection-api.md)
+and [capability-model](proposals/introspection-model.md) texts, [metadata](proposals/metadata-format.md),
+collections and runtime architecture.
+
+**Explore:** descriptor identity and lifetime, nominal versus compound type views,
+missing metadata versus unsupported operations, and compatibility of the container
+with conventional readers. Keep description separate from invocation. Dynamic loading,
+reflection execution and Emit are separate experiments, not implicit explorer features.
+
+**Finish when:** loaded and offline reports agree for the selected subset, offline
+inspection does not run the inspected program, malformed/unsupported metadata is
+handled explicitly and golden artifacts document compatibility limits. The initial
+loaded-only product may ship as a checkpoint without claiming offline capability.
+
+**Compare with .NET/CLR:** Type/TypeInfo and System.Reflection.Metadata/ECMA-335 are
+the reference layers. A shared descriptive model could reduce duplicated tooling,
+but context identity and unavailable capabilities become explicit obligations.
+Reuse [introspection evidence](introspection-design.md) and the [model review](reflection-model-review.md).
+A new metadata representation must earn its cost against the existing CLI boundary.
+
+## M6 — Across hosts: Portable Sample Pack
+
+**Product:** a reproducible bundle of selected earlier samples, plus a runner that
+records outputs, declared capabilities and unsupported cases on two selected hosts.
+Begin with another supported desktop environment; selecting a constrained target is
+a separate decision, not a requirement to build a microcontroller port.
+
+**Build up through:** inventory sample dependencies; package a matching toolchain;
+run memory/text/JSON cases; run file and HTTP cases on a second host; exercise an
+explicitly unavailable host service. Earlier milestones still need ordinary packaging
+and honest platform limits; this milestone deepens portability rather than postponing it.
+
+**Proposal inputs:** [runtime architecture](proposals/runtime-architecture.md),
+environment, storage, networking and metadata. Reuse the same public sample code
+where its capabilities exist; expose host-specific limitations rather than silently
+substituting a different contract.
+
+**Finish when:** the supported cases produce equivalent documented outcomes, missing
+capabilities have deliberate diagnostics, resource limits are recorded and a clean
+checkout or package can reproduce both runs. OS-dependent path, clock and socket
+behavior must be accounted for. This is not a claim of universal binary portability.
+
+**Compare with .NET/CLR:** common API contracts, platform-specific services and
+runtime deployment are separate concerns. Smaller explicit capability sets may aid
+embedding but create a conformance matrix and packaging burden. Use [capability planning](runtime-api-plan.md#common-platform-contract-and-target-capabilities-2026-09-14),
+[target profiles](raven-target-profiles.md) and [execution architecture](execution-architecture.md).
+JIT, AOT and compiler self-hosting are not prerequisites; evaluate them only against
+a recorded deployment or performance problem in this sample pack.
+
+## Research products alongside the milestones
+
+These are bounded experiments, not additional mandatory milestones. Their deliverable
+is a runnable comparison and a decision record; “the existing mechanism is adequate”
+is a successful result. Run them when a product exposes the question, keeping them
+off M1's critical path unless it cannot proceed safely without the result.
+
+| Research product | Proposal inputs and motivating case | Comparison and decision evidence |
+| --- | --- | --- |
+| **Capability Composition Lab** | Runtime unions/intersections and generic relationships; pass a duplex connection to code that requires read plus write | Compare CLI nominal interfaces/constraints and existing Result/Option with proposed type expressions. Show a concrete ergonomic or enforcement gain, account for signatures, dispatch, GC and tooling, or retain nominal composition |
+| **Dynamic Record Adapter** | Dynamic dispatch; access fields from a small external record in a typed consumer | Compare explicit JSON lookup, typed adapters and .NET-style dynamic binding. Test missing members, type mismatch, access control and cache invalidation; prefer a library solution if runtime hooks add no needed guarantee |
+| **Metadata Compatibility Probe** | Metadata format and introspection; read ordinary and proposed extended signatures | Compare existing CLI artifacts with a reduced extension. Record what conventional readers can enumerate versus understand; do not generalize a successful container read to semantic compatibility |
+| **Execution Cost Probe** | Runtime architecture and Task; rerun an earlier bounded workload | Compare current state machines/interpreter with one reduced suspension or execution alternative only when justified. Measure correctness, GC/lifetimes, diagnostics, allocation and execution cost on recorded versions; no new backend is selected in advance |
+
+These experiments cover the wider proposals without making type-system redesign,
+dynamic dispatch or new execution backends a price of admission for useful apps.
+Nullability and other existing backlog contracts should likewise be promoted when
+a concrete sample reveals a problem, with direct-IL validation where runtime guarantees
+are proposed. A language-only check is not evidence of runtime enforcement.
+
+## Working rules and immediate next step
+
+Each selected slice should leave a checked sample, expected output, a matching build/run
+path, failure cases and a short decision record. Record the .NET baseline, alternatives,
+selected layer (language, library, metadata, runtime or host), benefits, costs and open
+questions. Existing research can support planning; deepen primary-source and independent
+comparisons before adopting a substantive new contract. Proposals are not proof that
+a feature compiles, runs or improves on .NET.
+
+Update this roadmap's status only with linked evidence. Keep detailed API progress in
+its feature plan, and update changelog, relevant feature pages and integration docs.
+Samples begin as small programs, not miniature frameworks. Existing release/debugging
+requirements and Raven branch/integration rules continue to apply.
+
+**Next:** take the first M1 cases—delayed external completion and byte copy in memory—
+far enough to compare ownership, cancellation and stream contracts. Then grow the
+UTF-8/JSON and TCP cases toward Hello Service + Hello Client. Reassess M2 onward after
+that first major milestone demonstrates what the platform still needs.

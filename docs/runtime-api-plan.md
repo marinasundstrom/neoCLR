@@ -1,5 +1,11 @@
 # Runtime-library API plan
 
+**Current priority (2026-09-23):** follow the [platform milestone roadmap](platform-roadmap.md).
+Its first major milestone, the [HTTP application POC](http-poc-roadmap.md)
+orders work by the socket, stream, encoding and small JSON dependencies of real
+client/server apps. Its smaller executable slices supersede the historical immediate
+sequence below. The wider API catalog remains exploration, not a prerequisite.
+
 Planning baseline: 2026-09-13. Define the expected families now; implement coherent
 subsets when a real program or compiler feature needs them. The aim is familiar C#
 and other .NET-language ergonomics over neoCLR's documented differences, not a complete

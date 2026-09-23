@@ -5,6 +5,8 @@
 These are maintained design discussions and decisions; individual pages state implementation status.
 See the [original proposals](../proposals/README.md) for the supplied source material.
 
+- [Platform roadmap: themed milestones and sample products](../platform-roadmap.md)
+- [HTTP application POC: first milestone details](../http-poc-roadmap.md)
 - [Runtime library API design](../api-design.md)
 - [Familiar concepts, deliberate platform contracts](../api-policy.md)
 - [Assembler expressiveness](../assembler-design.md)

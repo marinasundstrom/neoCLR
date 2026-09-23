@@ -1,5 +1,10 @@
 # Documentation
 
+The [platform roadmap](platform-roadmap.md) is authoritative for work priorities
+unless the author directs otherwise. It organizes themed milestones and concrete
+sample products. The [HTTP POC plan](http-poc-roadmap.md)
+details the first major milestone.
+
 Start with the [runtime and Raven walkthrough](runtime-raven-preview.md).
 The [changelog](../CHANGELOG.md) records implemented changes; proposals and plans
 are not evidence that an API is available.

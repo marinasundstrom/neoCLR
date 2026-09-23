@@ -8,6 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Prioritize an HTTP client/server application POC in the roadmap, with smaller
+  stream, encoding, JSON and TCP cases, explicit acceptance criteria and complete
+  proposal triage. Record external I/O progress, cancellation, buffer ownership and
+  cleanup as urgent experiments; distinguish planned APIs from current behavior.
+  Align planning entry points and the website proposal overview; no runtime APIs
+  or release commitments are added by this documentation change. Add a unified
+  platform roadmap with themed sample products: HTTP apps, a file catalog, a
+  download queue, a time-aware report, an assembly explorer and a portable sample
+  pack. Make that roadmap the default authority for work in AGENTS.md, subordinate
+  to explicit author directions. Keep post-POC milestones and separate research
+  products provisional.
+
 - Add a development Tasks feature page with tested, downloadable worker, Promise,
   cancellation, MapResult and awaited-propagation examples. Link it from the
   homepage and proposals, distinguishing current behavior from future scheduling

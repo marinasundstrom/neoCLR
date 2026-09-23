@@ -4896,3 +4896,59 @@ and recorded the convention for runtime code as well as examples.
   the highlighting test pass. Desktop layout was visually inspected. GUI interaction
   was interrupted by the user's activity; build/run and editor protocol verification
   are completed, but an interactive VS Code Run Task session is not claimed.
+
+
+### 2026-09-23 — HTTP applications as the first major milestone
+
+- **Author:** asked to process the proposals, identify urgent needs (including
+  exploration without commitment), and create/update the roadmap. Directed a minimal
+  POC with HttpClient and HttpServe/HttpListener APIs, needed socket abstractions,
+  streams, encoding and a small JSON API: “This will be what we use to justify the
+  runtime.” Allowed supporting changes and requested gradual, smaller API cases.
+- **Assistant proposal:** make two Raven apps on neoCLR exchange UTF-8 text and JSON;
+  start with controlled loopback HTTP, and develop delayed I/O completion, memory
+  streams, chunked text decoding, JSON, TCP echo and independent HTTP peers first.
+  Prioritize external progress, buffer/handle ownership, cancellation and cleanup.
+  Record conflicts between older stream notes, the revised Streams proposal and
+  explicit-token Task cancellation. Keep server naming and backend choices open.
+- **Action:** added the [HTTP POC roadmap](http-poc-roadmap.md), triaged all current
+  proposal families, linked existing implementation evidence and primary comparisons,
+  and aligned roadmap/API-plan entry points and the website proposals overview.
+  Original proposal text, including the existing Streams working edit, is preserved.
+- **Outcome and open work:** this is a planning change; no socket, stream, encoding
+  or JSON implementation is claimed. The author selected the milestone; the detailed
+  slice order, loopback envelope and API alternatives are assistant proposals pending
+  executable evidence, not individually approved platform contracts. No release date
+  or production networking commitment was selected.
+
+- **Author clarification:** the proposals are not necessarily consistent and are
+  “Not showing what it necessarily should look like in the end”.
+- **Assistant adjustment:** explicitly treat proposals as inputs about needs and
+  alternatives, not final specifications. Do not prefer a newer proposal merely for
+  its recency or combine all proposed abstractions. Select eventual API shapes from
+  small application experiments; retain, reshape or discard ideas based on evidence.
+
+
+### 2026-09-23 — Unified platform roadmap through sample products
+
+- **Author:** requested a unified `platform-roadmap.md` next to the HTTP plan,
+  with milestone themes and concrete products/samples based on the proposals.
+- **Assistant proposal:** retain the HTTP pair as M1, then consider a File Catalog,
+  Download Queue, Activity Report, Assembly Explorer and Portable Sample Pack. Each
+  has smaller runnable checkpoints, completion evidence and a .NET/CLR comparison.
+  Put broader type-system, dynamic, metadata and execution ideas in bounded research
+  products whose outcome may be to keep existing mechanisms.
+- **Action:** created the [platform roadmap](platform-roadmap.md), retained the
+  [HTTP roadmap](http-poc-roadmap.md) as its detailed first-milestone plan, and updated
+  planning indexes and the website proposal overview to distinguish their roles.
+- **Status:** documentation/planning only. The later themes, products and dependency
+  order are assistant proposals, not individual author commitments or implemented
+  samples. The earlier clarification that proposals do not prescribe final API
+  shapes remains in force.
+
+- **Author follow-up:** “Make the platform-roadmap authoritative for our work, unless
+  we direct work in another way.”
+- **Assistant action:** made the platform roadmap the default authority for priorities,
+  sequencing and scope in both the roadmap and AGENTS.md. Explicit author directions
+  override it. Detailed plans remain subordinate; a one-off task outside M1 does not
+  automatically reorder the roadmap or turn candidate milestones into commitments.

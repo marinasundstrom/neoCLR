@@ -1,5 +1,13 @@
 # Stream API proposal
 
+**Planning update, 2026-09-23:** this note preserves the earlier sync/async design.
+The [supplied Streams revision](proposals/streams-api.md) instead proposes
+System.Streams InputStream/OutputStream with Task-based I/O. The
+[HTTP POC roadmap](http-poc-roadmap.md) compares these as prototype candidates and
+records the cancellation, buffer and cleanup decisions needed next. Neither surface
+is implemented by this note; the earlier Cancelled error below is not an adopted
+replacement for Task cancellation.
+
 Proposal recorded 2026-09-16. Streams are a future byte-I/O layer for the proposed
 [FileSystem capability](filesystem-design.md). The current whole-file File helpers and
 console byte API remain synchronous bounded implementations and are not Stream APIs.

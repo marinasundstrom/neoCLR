@@ -1,5 +1,19 @@
 # Direction and migration
 
+## Active priority — HTTP application POC (2026-09-23)
+
+The [unified platform roadmap](platform-roadmap.md) is authoritative unless the
+author directs otherwise. It organizes the current direction
+into themed milestones and sample products. Its first major milestone is detailed
+in the [HTTP POC roadmap](http-poc-roadmap.md): develop the
+small socket, stream, encoding and JSON cases needed for Raven HttpClient and
+HttpServer/HttpListener-style applications running on neoCLR. It includes proposal
+triage, urgent contract experiments, dependencies and milestone acceptance criteria.
+This author-selected milestone supersedes older immediate sequences below; those
+remain dated history. API shapes and backend choices remain provisional, and existing
+release/debugging requirements still apply. No new API implementation or release
+is claimed by this planning update.
+
 The [2026-09-13 platform direction](platform-direction.md) retains the value/reference
 type split and focuses investigation on modern UTF-8 APIs, bounded memory views and
 nullability metadata. It takes precedence over historical default-semantics proposals
