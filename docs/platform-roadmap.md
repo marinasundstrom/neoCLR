@@ -90,6 +90,14 @@ The final candidate passed editor, migration and six-job source/platform gates.
 This checkpoint is complete; resume the foundational Streams/Storage/Encoding cases.
 Published release notes stay unchanged; website deployment remains a separate workflow.
 
+## Next-release validation efficiency
+
+The author requests a leaner CI process **for the next release, not during this
+release**: isolate platform-specific behavior and stop repeating the full sample
+and validation suite on every platform. Follow the [CI efficiency plan](ci-efficiency-plan.md)
+before the next release cycle; preserve evidence and targeted platform coverage.
+This is a release-engineering follow-up, not a change to the feature sequence.
+
 ## Post-release concurrency direction — 2026-09-23
 
 The author directs renaming `System.Threading` to `System.Concurrency` after this

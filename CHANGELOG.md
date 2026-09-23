@@ -14,7 +14,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Align website, setup and API reference with Preview 9. Reduce the main menu to
   five consistent destinations, remove Experimental from the API header/title and
   add logo spacing. Make DocFX HTML and client-side navigation links work under a
-  GitHub Pages project path, with regression coverage.
+  GitHub Pages project path, with regression coverage. Publish the combined site and
+  `/docs/` from `5bffbca` through the manual Pages workflow; verify the public pages.
+- Plan next-release CI efficiency: run shared validation once and isolate host-specific
+  checks instead of repeating all samples per platform. Workflows are unchanged.
 
 
 ## 0.1.0-preview.9

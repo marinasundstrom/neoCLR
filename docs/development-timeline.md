@@ -5175,6 +5175,21 @@ and recorded the convention for runtime code as well as examples.
 - **Validation:** package scope remains macOS arm64; source validation covers Linux,
   macOS and Windows on stable and Rust 1.85. Website/DocFX builds and link/highlighting
   checks pass locally. Desktop and narrow navigation and API header were inspected.
-  Website deployment is a separate follow-up to this commit.
+  The separate [manual Pages deployment](https://github.com/marinasundstrom/neoCLR/actions/runs/35876887523)
+  published website revision `5bffbca`. Public homepage and `/docs/` checks confirmed
+  the Preview 9 status, five-item menu, plain API brand and logo spacing.
 - **Next:** the release checkpoint is complete. Streams, Storage and Encoding precede
   networking; the selected post-release concurrency direction remains future work.
+
+
+### 2026-09-23 — Make the next release's CI efficient
+
+- **Author:** directed improving CI for the next release, explicitly “not now”. Said
+  repeating every part and entire samples for every platform takes too long; isolate
+  platform-specific behavior instead.
+- **Assistant response:** proposed one comprehensive shared validation run, focused
+  host-boundary tests, separate minimum-Rust compatibility and a small cross-platform
+  smoke set. Recorded [a plan](ci-efficiency-plan.md) with measurement and coverage
+  criteria rather than changing the active release or workflow.
+- **Status:** planning only. Preview 9 passed the existing six-job matrix. Job
+  classification, duplicate removal and the revised matrix remain future work.
