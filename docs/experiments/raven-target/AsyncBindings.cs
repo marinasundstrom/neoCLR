@@ -30,7 +30,7 @@ static class AsyncBindings
         var allowed = owner switch {
             Prefix + "IAsyncStateMachine" => definition.Name is "MoveNext" or "SetStateMachine",
             Prefix + "ITaskAwaiter" => definition.Name == "OnCompleted",
-            _ => definition.Name is ".ctor" or "Create" or "get_Task" or "SetResult" or "Start" or "SetStateMachine" or "AwaitOnCompleted"
+            _ => definition.Name is ".ctor" or "Create" or "get_Task" or "SetResult" or "SetCancelled" or "Start" or "SetStateMachine" or "AwaitOnCompleted"
         };
         if (!allowed || contract.IsInterface != interfaceOwner || contract.HasInterfaces
             || (!interfaceOwner && !contract.IsSealed)
@@ -44,6 +44,7 @@ static class AsyncBindings
             ".ctor" => ("System.Tasks.TaskQueue", "noresult"),
             "Create" => ("", owner),
             "get_Task" => ("", "System.Tasks.Task<" + payload + ">"),
+            "SetCancelled" => ("", "noresult"),
             "SetResult" => (payload!, "noresult"),
             "Start" or "SetStateMachine" => (state, "noresult"),
             "AwaitOnCompleted" => (Prefix + "ITaskAwaiter," + state, "noresult"),

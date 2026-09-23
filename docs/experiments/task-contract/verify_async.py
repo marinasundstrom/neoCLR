@@ -172,6 +172,40 @@ public async func Ready() -> Task<int> { return 42 }
     Check(observed)
 ''')
 
+# Both immediate and resumed awaits must terminate without consuming a value.
+for timing in ('immediate', 'resumed'):
+    for payload in ('int', 'Result<int, string>', 'unit'):
+        cases[f'{timing} cancellation of {payload}'] = ("""
+public class Effects {
+    public var Count: int = 0
+}
+public async func Inner(input: Task<PAYLOAD>, effects: Effects) -> Task<PAYLOAD> {
+    let value = await input
+    effects.Count = effects.Count + 1
+    return value
+}
+public async func Outer(input: Task<PAYLOAD>, effects: Effects) -> Task<PAYLOAD> {
+    let value = await Inner(input, effects)
+    effects.Count = effects.Count + 1
+    return value
+}
+""".replace('PAYLOAD', payload), ("""
+    let queue = TaskQueue()
+    let source = Promise<PAYLOAD>(queue)
+    let effects = Effects()
+    var answer = source.Task
+    BEFORE
+    queue.Run(() => { answer = Outer(source.Task, effects) })
+    AFTER
+    Check(answer.State == TaskState.Cancelled)
+    Check(effects.Count == 0)
+    Check(!source.Complete(DEFAULT))
+    Check(answer.State == TaskState.Cancelled)
+""".replace('PAYLOAD', payload)
+    .replace('BEFORE', 'source.Cancel()' if timing == 'immediate' else '')
+    .replace('AFTER', '' if timing == 'immediate' else 'Check(!answer.IsCompleted)\n    source.Cancel()\n    queue.Drain()')
+    .replace('DEFAULT', {'int': '42', 'Result<int, string>': 'Error("ordinary")', 'unit': '()'}[payload])))
+
 with tempfile.TemporaryDirectory(prefix='neoclr-generated-async-') as directory:
     root = Path(directory)
     for name in ('Demo.rvnproj', 'NeoCLR.CoreProbe.dll'):
@@ -201,3 +235,27 @@ with tempfile.TemporaryDirectory(prefix='neoclr-generated-async-') as directory:
         run = subprocess.run([str(args.runtime.resolve()), 'run', str(output / 'App.neoil'), '--system', str(args.system.resolve())], capture_output=True, text=True, timeout=30)
         assert run.returncode != 0 and expected in run.stderr, label + ': ' + run.stdout + run.stderr
         print(label + ': Passed', flush=True)
+
+    # Unsupported cleanup must fail explicitly rather than omit disposal.
+    for index, (label, helpers, expected) in enumerate([
+        ('Await in iterator loop', """
+public async func Read(input: Task<int>, values: ArrayList<int>) -> Task<int> {
+    for value in values { return value + await input }
+    return 0
+}
+""", 'RAV2712'),
+        ('use requires an unimplemented target disposal contract', """
+public class Lease : Disposable { func Dispose() { } }
+public async func Read(input: Task<int>) -> Task<int> {
+    use resource = Lease()
+    return await input
+}
+""", 'RAV1503'),
+    ]):
+        if args.case:
+            continue
+        (root / 'Main.rvn').write_text(prelude + helpers + '\nfunc Main() { }\n')
+        output = root / ('rejected-' + str(index))
+        built = subprocess.run(['dotnet', str(args.bridge.resolve()), '--project', str(root / 'Demo.rvnproj'), str(output)], capture_output=True, text=True, timeout=120)
+        assert built.returncode != 0 and expected in built.stdout + built.stderr, label + ': ' + built.stdout + built.stderr
+        print(label + ': Rejected as expected', flush=True)

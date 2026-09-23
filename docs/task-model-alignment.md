@@ -37,8 +37,8 @@ Result.
 
 The following gap analysis records the state before implementation. The first core
 slice now adds TaskState, TaskOutcome<T>, State/Outcome and Complete/Cancel; see
-[current contracts](task-contracts.md). Map/Then composition is also implemented in the following slice; tokens and
-cancelled-await propagation remain outstanding.
+[current contracts](task-contracts.md). Map/Then composition is also implemented in the following slice; cancelled-await propagation is now implemented for the bounded named-function
+subset described in the contracts. Tokens and worker acknowledgement remain outstanding.
 
 ## Gaps identified at assessment
 
@@ -140,3 +140,14 @@ other values. Inspect emitted artifacts for exception dependencies and test ordi
 .NET awaits separately. Library composition tests should establish the model before
 compiler tests establish Raven's syntax over it. Fault cleanup guarantees and
 cross-thread races remain outside the single-queue PoC's evidence.
+
+
+### Progress on 2026-09-23
+
+The author prioritized the remaining slices needed for async APIs. The compiler
+slice establishes immediate/resumed cancellation propagation without waiting for
+token support: explicit Promise.Cancel already supplies the terminal outcome.
+This deliberately changes the original order, not the request/outcome distinction.
+Await in for loops is diagnosed pending suspension-aware iteration cleanup.
+The author also requested a default TaskQueue and parameterless Promise construction;
+that is the next ergonomics slice, with queue scheduling still provisional.

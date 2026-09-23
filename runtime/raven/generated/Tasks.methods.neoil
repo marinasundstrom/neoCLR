@@ -5,6 +5,9 @@
 .property instance IsCompleted() -> Boolean
 .get instance System.Tasks.Task<T0>::get_IsCompleted()
 .end
+.property instance IsCancelled() -> Boolean
+.get instance System.Tasks.Task<T0>::get_IsCancelled()
+.end
 .property instance State() -> System.Tasks.TaskState
 .get instance System.Tasks.Task<T0>::get_State()
 .end
@@ -41,7 +44,7 @@ M00000006_IL_000d:
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance get_State() -> System.Tasks.TaskState
+.method instance get_IsCancelled() -> Boolean
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
@@ -52,45 +55,10 @@ M00000007_IL_0008:
 callvirt instance System.Tasks.Promise<T0>::Cancelled()
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_000d:
-brtrue M00000007_IL_0017
-M00000007_IL_0012:
-br M00000007_IL_001a
-M00000007_IL_0017:
-M00000007_IL_0018:
-ldc.i4 2
-M00000007_IL_0019:
-call System.Tasks.TaskState::FromValue(Int32)
-ret
-M00000007_IL_001a:
-M00000007_IL_001b:
-M00000007_IL_001c:
-ldarg 0
-M00000007_IL_001d:
-ldfld System.Tasks.Task<T0>::source
-M00000007_IL_0022:
-callvirt instance System.Tasks.Promise<T0>::Completed()
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000007_IL_0027:
-brtrue M00000007_IL_0031
-M00000007_IL_002c:
-br M00000007_IL_0034
-M00000007_IL_0031:
-M00000007_IL_0032:
-ldc.i4 1
-M00000007_IL_0033:
-call System.Tasks.TaskState::FromValue(Int32)
-ret
-M00000007_IL_0034:
-M00000007_IL_0035:
-M00000007_IL_0036:
-ldc.i4 0
-M00000007_IL_0037:
-call System.Tasks.TaskState::FromValue(Int32)
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance get_Outcome() -> System.Option<System.Tasks.TaskOutcome<T0>>
-.local System.Tasks.TaskOutcome<T0> local0
-.local System.Tasks.TaskOutcome<T0> local1
+.method instance get_State() -> System.Tasks.TaskState
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:
@@ -103,66 +71,43 @@ call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
 M00000008_IL_000d:
 brtrue M00000008_IL_0017
 M00000008_IL_0012:
-br M00000008_IL_002f
+br M00000008_IL_001a
 M00000008_IL_0017:
 M00000008_IL_0018:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion0()
-M00000008_IL_001d:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion1<T0>(System.Tasks.TaskOutcome.Cancelled)
-M00000008_IL_0022:
-stloc local0
-M00000008_IL_0023:
-ldloc local0
-M00000008_IL_0024:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion2<T0>(System.Tasks.TaskOutcome<T0>)
-M00000008_IL_0029:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion3<T0>(System.Option.Some<System.Tasks.TaskOutcome<T0>>)
-M00000008_IL_002e:
+ldc.i4 2
+M00000008_IL_0019:
+call System.Tasks.TaskState::FromValue(Int32)
 ret
-M00000008_IL_002f:
-M00000008_IL_0030:
-M00000008_IL_0031:
+M00000008_IL_001a:
+M00000008_IL_001b:
+M00000008_IL_001c:
 ldarg 0
-M00000008_IL_0032:
+M00000008_IL_001d:
 ldfld System.Tasks.Task<T0>::source
-M00000008_IL_0037:
+M00000008_IL_0022:
 callvirt instance System.Tasks.Promise<T0>::Completed()
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000008_IL_003c:
-brtrue M00000008_IL_0046
-M00000008_IL_0041:
-br M00000008_IL_006a
-M00000008_IL_0046:
-M00000008_IL_0047:
-ldarg 0
-M00000008_IL_0048:
-ldfld System.Tasks.Task<T0>::source
-M00000008_IL_004d:
-callvirt instance System.Tasks.Promise<T0>::Read()
-M00000008_IL_0052:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion6<T0>(T0)
-M00000008_IL_0057:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion7<T0>(System.Tasks.TaskOutcome.Completed<T0>)
-M00000008_IL_005c:
-stloc local1
-M00000008_IL_005d:
-M00000008_IL_005e:
-ldloc local1
-M00000008_IL_005f:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion2<T0>(System.Tasks.TaskOutcome<T0>)
-M00000008_IL_0064:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion3<T0>(System.Option.Some<System.Tasks.TaskOutcome<T0>>)
-M00000008_IL_0069:
+M00000008_IL_0027:
+brtrue M00000008_IL_0031
+M00000008_IL_002c:
+br M00000008_IL_0034
+M00000008_IL_0031:
+M00000008_IL_0032:
+ldc.i4 1
+M00000008_IL_0033:
+call System.Tasks.TaskState::FromValue(Int32)
 ret
-M00000008_IL_006a:
-M00000008_IL_006b:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion4()
-M00000008_IL_0070:
-call neoCLR.Library.System.Tasks.Task.RuntimeUnion5<T0>(System.Option.None)
-M00000008_IL_0075:
+M00000008_IL_0034:
+M00000008_IL_0035:
+M00000008_IL_0036:
+ldc.i4 0
+M00000008_IL_0037:
+call System.Tasks.TaskState::FromValue(Int32)
 ret
 .end
-.method internal instance Dispatcher() -> System.Tasks.TaskQueue
+.method instance get_Outcome() -> System.Option<System.Tasks.TaskOutcome<T0>>
+.local System.Tasks.TaskOutcome<T0> local0
+.local System.Tasks.TaskOutcome<T0> local1
 M00000009_IL_0000:
 M00000009_IL_0001:
 M00000009_IL_0002:
@@ -170,31 +115,91 @@ ldarg 0
 M00000009_IL_0003:
 ldfld System.Tasks.Task<T0>::source
 M00000009_IL_0008:
-callvirt instance System.Tasks.Promise<T0>::Dispatcher()
+callvirt instance System.Tasks.Promise<T0>::Cancelled()
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
 M00000009_IL_000d:
+brtrue M00000009_IL_0017
+M00000009_IL_0012:
+br M00000009_IL_002f
+M00000009_IL_0017:
+M00000009_IL_0018:
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion0()
+M00000009_IL_001d:
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion1<T0>(System.Tasks.TaskOutcome.Cancelled)
+M00000009_IL_0022:
+stloc local0
+M00000009_IL_0023:
+ldloc local0
+M00000009_IL_0024:
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion2<T0>(System.Tasks.TaskOutcome<T0>)
+M00000009_IL_0029:
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion3<T0>(System.Option.Some<System.Tasks.TaskOutcome<T0>>)
+M00000009_IL_002e:
+ret
+M00000009_IL_002f:
+M00000009_IL_0030:
+M00000009_IL_0031:
+ldarg 0
+M00000009_IL_0032:
+ldfld System.Tasks.Task<T0>::source
+M00000009_IL_0037:
+callvirt instance System.Tasks.Promise<T0>::Completed()
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_003c:
+brtrue M00000009_IL_0046
+M00000009_IL_0041:
+br M00000009_IL_006a
+M00000009_IL_0046:
+M00000009_IL_0047:
+ldarg 0
+M00000009_IL_0048:
+ldfld System.Tasks.Task<T0>::source
+M00000009_IL_004d:
+callvirt instance System.Tasks.Promise<T0>::Read()
+M00000009_IL_0052:
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion6<T0>(T0)
+M00000009_IL_0057:
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion7<T0>(System.Tasks.TaskOutcome.Completed<T0>)
+M00000009_IL_005c:
+stloc local1
+M00000009_IL_005d:
+M00000009_IL_005e:
+ldloc local1
+M00000009_IL_005f:
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion2<T0>(System.Tasks.TaskOutcome<T0>)
+M00000009_IL_0064:
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion3<T0>(System.Option.Some<System.Tasks.TaskOutcome<T0>>)
+M00000009_IL_0069:
+ret
+M00000009_IL_006a:
+M00000009_IL_006b:
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion4()
+M00000009_IL_0070:
+call neoCLR.Library.System.Tasks.Task.RuntimeUnion5<T0>(System.Option.None)
+M00000009_IL_0075:
 ret
 .end
-.method instance GetAwaiter() -> System.Tasks.Task<T0>
+.method internal instance Dispatcher() -> System.Tasks.TaskQueue
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 M0000000a_IL_0002:
 ldarg 0
 M0000000a_IL_0003:
+ldfld System.Tasks.Task<T0>::source
+M0000000a_IL_0008:
+callvirt instance System.Tasks.Promise<T0>::Dispatcher()
+M0000000a_IL_000d:
 ret
 .end
-.method instance GetResult() -> T0
+.method instance GetAwaiter() -> System.Tasks.Task<T0>
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 M0000000b_IL_0002:
 ldarg 0
 M0000000b_IL_0003:
-ldfld System.Tasks.Task<T0>::source
-M0000000b_IL_0008:
-callvirt instance System.Tasks.Promise<T0>::Read()
-M0000000b_IL_000d:
 ret
 .end
-.method instance OnCompleted(System.Func<Void> callback) -> noresult
+.method instance GetResult() -> T0
 M0000000c_IL_0000:
 M0000000c_IL_0001:
 M0000000c_IL_0002:
@@ -202,11 +207,23 @@ ldarg 0
 M0000000c_IL_0003:
 ldfld System.Tasks.Task<T0>::source
 M0000000c_IL_0008:
+callvirt instance System.Tasks.Promise<T0>::Read()
+M0000000c_IL_000d:
+ret
+.end
+.method instance OnCompleted(System.Func<Void> callback) -> noresult
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
+ldarg 0
+M0000000d_IL_0003:
+ldfld System.Tasks.Task<T0>::source
+M0000000d_IL_0008:
 ldarg 1
-M0000000c_IL_0009:
+M0000000d_IL_0009:
 callvirt instance System.Tasks.Promise<T0>::Register(System.Func<Void>)
-M0000000c_IL_000e:
-M0000000c_IL_000f:
+M0000000d_IL_000e:
+M0000000d_IL_000f:
 ret
 .end
 .end

@@ -1,0 +1,23 @@
+import System.*
+import System.Tasks.*
+import System.Option.*
+import System.Tasks.TaskOutcome.*
+import System.Console.*
+
+async func Read(input: Task<int>) -> Task<int> {
+    let value = await input
+    WriteLine("Read completed")
+    return value + 1
+}
+
+func Main() {
+    let queue = TaskQueue()
+    let promise = Promise<int>(queue)
+    var result = promise.Task
+    queue.Run(() => { result = Read(promise.Task) })
+    promise.Cancel()
+    queue.Drain()
+    if result.Outcome is Some(Cancelled) {
+        WriteLine("Cancelled")
+    }
+}

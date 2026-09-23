@@ -9,8 +9,8 @@ references and replace earlier System.Threading.Tasks imports.
 
 The [Task model alignment assessment](task-model-alignment.md) records the next
 contract. The core State/Outcome and producer cancellation slice is now implemented;
-Cancellation tokens and automatic await cancellation propagation remain
-follow-up work. Rebuild reference/library artifacts and callers together.
+Cancelled awaits now propagate through named async functions; cancellation tokens
+remain follow-up work. See the September 23 lowering slice below. Rebuild reference/library artifacts and callers together.
 
 ## Consumer and producer
 
@@ -18,7 +18,7 @@ The Raven-authored types live provisionally in System.Tasks:
 
 | Type | Current surface | Responsibility |
 | --- | --- | --- |
-| Task<T> | State, Outcome, IsCompleted, GetAwaiter(), GetResult(), OnCompleted(callback) | Observe completion or cancellation; register consumers. |
+| Task<T> | State, Outcome, IsCompleted, IsCancelled, GetAwaiter(), GetResult(), OnCompleted(callback) | Observe completion or cancellation; register consumers. |
 | Promise<T> | constructor(queue), Task, Complete(value), Cancel() | Own completion authority; first completion wins. |
 | TaskState | Pending, Completed, Cancelled | Normal enum for the public lifecycle. |
 | TaskOutcome<T> | Completed(T), Cancelled | Union containing the terminal value or cancellation. |
@@ -168,8 +168,8 @@ where its callbacks are drained; this is not UI affinity or automatic context fl
 Nested Run scopes on different queues select the nearest active queue, then restore
 the outer scope naturally. Reentering Run or Drain on the same active queue faults
 before running another callback. Cross-queue programs must drive every relevant
-queue explicitly. Tasks have cancellation state but no exception state. The current
-awaiter adapter cannot yet propagate cancellation to an enclosing async method.
+queue explicitly. Tasks have cancellation state but no exception state. The opt-in
+awaiter protocol propagates cancellation to an enclosing async method.
 
 The provisional System.Runtime.CompilerServices protocol consists of
 IAsyncStateMachine, ITaskAwaiter and AsyncTaskMethodBuilder<T>. The builder receives
@@ -280,7 +280,8 @@ A Result.Error payload is passed to callbacks unchanged like any other T. Callba
 Faults remain terminal execution failures; they do not create a Task fault/error
 outcome. Cancellation travels downstream only: cancelling an input does not cancel
 unrelated operations or introduce parent/sibling ownership. Tokens, structured
-concurrency and automatic cancellation propagation through await remain separate.
+concurrency remain separate from these operators. Await propagation is implemented
+in the following slice.
 
 Implementation uses private generic continuation classes and ordinary managed
 callbacks. Their references are retained by queued registrations and traced by GC.
@@ -311,3 +312,37 @@ This follows the selected Task model and reuses the
 It simplifies value pipelines but provides no scheduler-selection, fault-recovery or
 multi-task orchestration API. Continuation objects and queueing add allocations and
 dispatch work; no performance advantage is claimed.
+
+
+## Cancelled awaits — 2026-09-23
+
+Named async functions now propagate Task cancellation before consuming a value, on
+both immediate and resumed awaits. The generated state machine clears its saved
+awaiter, leaves the user body and calls the builder's SetCancelled. No default T,
+Result.Error or exception is manufactured. Nested calls propagate the same outcome;
+ordinary Result propagation still completes with a Result value.
+
+This is selected explicitly with RavenPropagateAsyncCancellation=true, alongside
+heap state machines and disabled exception capture in NeoCLR.Raven.props. The
+provisional protocol adds bool IsCancelled to Task's awaiter surface and
+SetCancelled() to AsyncTaskMethodBuilder<T>. The public State/Outcome model remains
+the authoritative observation API. These hooks may change with runtime suspension.
+The bridge admits stackless CLI leave instructions only in bodies without exception
+handlers; source exception regions remain unsupported.
+
+The compiler reports missing protocol members. Await inside for loops is rejected
+with RAV2712: the probe exposed that their emitter-owned iterator state and disposal
+are not yet suspension-aware. Raven use declarations also remain unsupported by
+this target's Disposable contract (RAV1503); no cleanup support is claimed for them.
+Cancellation exits participate in source-scope exit generation, but the supported
+neoCLR subset does not yet include protected cleanup regions or async disposal.
+
+Validation adds immediate/resumed cancellation for int, unit and Result<int,string>,
+with nested async propagation and checks that later side effects never execute.
+The existing successful awaits, Result propagation, GC retention and queue checks
+remain regressions. Compiler tests cover explicit selection, project evaluation,
+missing protocol diagnostics and the rejected for-loop shape. Ordinary .NET async
+continues to use its existing exception-based protocol by default. This implements
+the model's exception-free semantics at the cost of a target compiler contract;
+it is not a performance claim. Reuse the primary-source comparison in
+[the alignment assessment](task-model-alignment.md#comparison-and-acceptance-evidence).

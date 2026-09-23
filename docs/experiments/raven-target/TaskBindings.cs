@@ -44,6 +44,7 @@ static class TaskBindings
                 public TaskState State => default;
                 public Option<TaskOutcome<T>> Outcome => default;
                 public bool IsCompleted => default;
+                public bool IsCancelled => default;
                 public T GetResult() => default;
                 public TaskQueue Dispatcher() => default;
                 public Task<T> GetAwaiter() => default;
@@ -74,6 +75,7 @@ static class TaskBindings
                 public void Start(IAsyncStateMachine stateMachine) { }
                 public void SetStateMachine(IAsyncStateMachine stateMachine) { }
                 public void SetResult(T value) { }
+                public void SetCancelled() { }
                 public void AwaitOnCompleted(ITaskAwaiter awaiter, IAsyncStateMachine stateMachine) { }
             }
         }
@@ -138,7 +140,7 @@ static class TaskBindings
             ("Task", ".ctor") => (Prefix + "Promise<" + payload + ">", "noresult"),
             ("Task", "get_State") => ("", EnumBindings.TaskState),
             ("Task", "get_Outcome") => ("", "System.Option<System.Tasks.TaskOutcome<" + payload + ">>"),
-            ("Task", "get_IsCompleted") => ("", "Boolean"),
+            ("Task", "get_IsCompleted" or "get_IsCancelled") => ("", "Boolean"),
             ("Task" or "Promise", "Dispatcher") when library => ("", Queue),
             ("Task", "GetAwaiter") => ("", owner),
             ("Task", "GetResult") => ("", payload),

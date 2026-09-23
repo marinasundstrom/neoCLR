@@ -58,6 +58,13 @@ public class Task<T> : System.Runtime.CompilerServices.ITaskAwaiter {
         }
     }
 
+    // Provisional compiler protocol; application code normally uses await or Outcome.
+    val IsCancelled: bool {
+        get {
+            return source.Cancelled()
+        }
+    }
+
     val State: TaskState {
         get {
             if source.Cancelled() { return TaskState.Cancelled }
@@ -195,6 +202,10 @@ namespace System.Runtime.CompilerServices {
 
         func SetResult(value: T) {
             _ = source.Complete(value)
+        }
+
+        func SetCancelled() {
+            _ = source.Cancel()
         }
 
         func AwaitOnCompleted(awaiter: ITaskAwaiter, stateMachine: IAsyncStateMachine) {

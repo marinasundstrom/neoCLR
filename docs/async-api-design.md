@@ -17,8 +17,8 @@ shared Task state across threads remain outstanding. The queue is provisional.
 
 The updated [Task model proposal](proposals/task-model.md) is the target for the
 ongoing slices. State/Outcome and explicit producer cancellation are implemented;
-Map/Then now compose their outcomes. Token requests and cancelled-await lowering
-remain outstanding. Follow
+Map/Then now compose their outcomes. Cancelled-await lowering now propagates cancellation in the bounded
+named-function subset; token requests remain outstanding. Follow
 the [runtime-first alignment sequence](task-model-alignment.md); older open questions
 below record how the design evolved, not alternatives to this latest direction.
 

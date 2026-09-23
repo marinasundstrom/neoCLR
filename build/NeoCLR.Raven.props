@@ -15,6 +15,7 @@
     <RavenUnitType>System.Void</RavenUnitType>
     <RavenGraphemeChar>true</RavenGraphemeChar>
     <RavenHeapAsyncStateMachines>true</RavenHeapAsyncStateMachines>
+    <RavenPropagateAsyncCancellation>true</RavenPropagateAsyncCancellation>
     <RavenCaptureAsyncExceptions>false</RavenCaptureAsyncExceptions>
     <RavenUseHostFrameworkReferences>false</RavenUseHostFrameworkReferences>
     <RavenAllowArrayCovariance>false</RavenAllowArrayCovariance>

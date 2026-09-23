@@ -641,6 +641,11 @@ static class UnionImport
                         code.AppendLine($"call {equality.Name}({string.Join(',', equality.Arguments)})"); break;
                     case Code.Pop: if (Pop().Type != "FaultNull") code.AppendLine("pop"); break;
                     case Code.Dup: var top = Pop(); Push(top); Push(top); if (top.Type != "FaultNull") code.AppendLine("dup"); break;
+                    case Code.Leave: case Code.Leave_S:
+                        // Bodies with exception handlers are rejected above. A stackless
+                        // leave outside protected regions is an ordinary control transfer.
+                        if (stack.Count != 0) throw new InvalidDataException("leave requires an empty stack in this profile.");
+                        goto case Code.Br;
                     case Code.Br: case Code.Br_S:
                         var branch = Target(); successors.Add(branch); code.AppendLine($"br M{methodId:x8}_IL_{instructions[branch].Offset:x4}"); terminates = true; break;
                     case Code.Beq: case Code.Beq_S: case Code.Bne_Un: case Code.Bne_Un_S:

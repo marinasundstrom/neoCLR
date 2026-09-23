@@ -6,6 +6,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-23
+
+- Add opt-in Raven cancelled-await propagation for named async functions, both
+  immediate and resumed, through provisional IsCancelled/SetCancelled hooks.
+  Nested calls cancel without fabricating a value; Result remains an ordinary
+  payload. Await inside for loops is diagnosed pending suspension-aware iterator
+  cleanup. Rebuild the compiler, reference library and callers together. Validate
+  18 neoCLR scenarios, 31 focused Raven tests, metadata signatures, runtime
+  regressions, bootstrap snapshots and website checks.
+- Correct the development status after 606a597: Map and Then composition is
+  implemented and tested; cancellation tokens remain outstanding.
+
 ### 2026-09-21
 
 - Add the core development Task model: normal TaskState enum, TaskOutcome<T> union,

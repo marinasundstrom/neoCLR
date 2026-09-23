@@ -4792,3 +4792,23 @@ explicit outcome sample prints Cancelled, and library snapshot/API audits and
 website checks pass. No cancelled-await lowering or new installed SDK is included.
 The compiler/bootstrap pattern limitations found during validation are recorded
 in the current Task contracts as deferred Raven candidates.
+
+
+## 2026-09-23 — Task cancellation lowering and a default queue
+
+The author asked to finish the remaining Task/async-await slices so APIs can be
+built on them. The assistant found that Map/Then had been committed in 606a597 and
+started the target-specific cancelled-await protocol. Result remains an ordinary
+payload. The implementation uses an explicit compiler policy, never the name of
+a Task type or the payload's union identity, to select cancellation propagation.
+
+The author then requested a Default TaskQueue so constructing a Promise does not
+require creating and passing a queue. The assistant proposed invocation-local
+default dispatch, with the active explicit queue taking precedence. Default queue
+construction is a subsequent slice; no automatic scheduler is implied.
+
+Testing exposed two issues: routing cancellation through successful completion
+required an invalid default Result, so the assistant separated the terminal exits;
+and await in for loops skipped iterator disposal. The latter is explicitly diagnosed
+pending suspension-aware loop lowering. Current behavior and validation are recorded
+in [Task contracts](task-contracts.md#cancelled-awaits--2026-09-23).
