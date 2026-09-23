@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import xml.etree.ElementTree as ET
 
 CASES = {
     'library-async-default-queue': 'Hello on a worker\n',
@@ -30,7 +31,13 @@ def main():
         with tempfile.TemporaryDirectory(prefix='neoclr-async-workbench-') as directory:
             root = Path(directory)
             project = root / 'Demo.rvnproj'
-            shutil.copyfile(bundle / 'msbuild-demo/Demo.rvnproj', project)
+            tree = ET.parse(bundle / 'msbuild-demo/Demo.rvnproj')
+            properties = tree.getroot().find('PropertyGroup')
+            # The compiler reloads the saved project in a separate process; MSBuild
+            # command-line properties alone do not configure that second load.
+            properties.find('NeoCLRRoot').text = str(bundle)
+            ET.SubElement(properties, 'RavenSdkRoot').text = str(sdk)
+            tree.write(project, encoding='unicode')
             for name, expected in CASES.items():
                 shutil.copyfile(bundle / 'tools/samples' / (name + '.rvn'), root / 'Main.rvn')
                 built = subprocess.run([

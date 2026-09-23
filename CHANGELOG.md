@@ -14,7 +14,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Workbench check with a JSON report. Document the packaged commands; release
   certification remains separate from these focused checks. Fix three pre-existing
   rustfmt discrepancies and strict Clippy findings (redundant match guards and
-  test idioms) found by the release-readiness pass; no behavior changes.
+  test idioms) found by the release-readiness pass; no runtime behavior changes.
+  Persist toolchain roots in the Workbench project so Raven’s separate project load
+  resolves the extracted bundle; record passing local package probes and remaining gates.
 
 - Make the author-approved async/Tasks preview checkpoint the immediate
   priority: stabilize the existing completion/await/composition and isolated-worker surface, require a
