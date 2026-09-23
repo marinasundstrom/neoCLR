@@ -80,7 +80,7 @@ with Result. That makes the direction visible, but adds types and currently shar
 one provisional error family between opening and transfers. No general advantage
 or .NET source compatibility is claimed.
 
-The next step is aligning Storage, including investigating a Path value object,
-using this working stream sample. The sample's InputStream/OutputStream interfaces
+Storage alignment has begun with a [validated Path experiment](storage-experiment.md#path-value-object)
+using this working stream sample. Provider lookup, identity and error contracts are next. The sample's InputStream/OutputStream interfaces
 are still application-owned experiments. General capability interfaces, automatic
 disposal, asynchronous I/O and suspension-aware buffer ownership remain open.

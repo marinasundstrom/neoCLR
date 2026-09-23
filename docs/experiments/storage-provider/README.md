@@ -11,7 +11,7 @@ Run against matching development artifacts:
 python3 docs/experiments/storage-provider/verify.py --toolchain-root /path/to/bundle
 ```
 
-The verifier builds the saved MSBuild project with all four Raven files, runs in a
+The verifier builds the saved MSBuild project with all five Raven files, runs in a
 disposable working directory, checks
 exact output and actual disk bytes, and removes its fixture. No sample file is
 written into the checkout. It also checks that rejected oversized writes preserve
@@ -22,11 +22,13 @@ provider instances do not share state.
 
 An initial draft let Directory combine paths with the host Path helper. Reviewing
 that draft showed a provider leak: generic storage objects would impose filesystem
-syntax on memory, archive or remote providers. The tested revision delegates child
-address resolution to the provider. HostStorage combines native paths; MemorySlotStorage
-uses `directory::name` logical keys. File retains its name separately instead of
-recovering it with host path parsing. This separation works without runtime or
-compiler changes and uses ordinary Raven interface dispatch.
+syntax on memory, archive or remote providers. The earlier tested revision delegated child
+address resolution to the provider and used `directory::name` memory keys. The next
+exploration now introduces shared validated logical Path syntax: Directory parses
+child paths, while providers resolve them. HostStorage maps them under a configured
+native root; MemorySlotStorage uses rooted logical keys. File retains its display
+name separately. Both experiments use ordinary Raven interface dispatch without
+runtime or compiler changes.
 
 The types use the **StorageExperiment** namespace. Their documented surface is in
 [the on-site API guide source](../../../api-docs/storage-experiment.md); it is linked
@@ -45,11 +47,17 @@ claim that these types are part of the platform's core reference assembly.
 - **Provider ownership:** a Directory passes its provider to a File, and the File
   retains it. No global provider replacement or native handles enter the application.
   A future provider could instead return its own File implementation, avoiding the
-  current requirement to dispatch every operation through a provider and string key.
-- **Path identity:** strings are temporary provider-owned addresses, not a selected
-  public Path contract. The direct-child helper rejects empty, dot, dot-dot, slash,
-  backslash and NUL names. This is name validation, not a sandbox: native symlinks and
-  direct provider calls still use host permissions.
+  current requirement to dispatch every operation through a provider and Path value.
+- **Path identity:** `Path.Parse(text)` returns `Result<Path, InvalidPathError>`.
+  Private construction and read-only text keep accepted syntax valid. The immutable
+  reference class provides explicit lexical Equals, not filesystem identity or value
+  operators. Logical syntax uses slash-separated names, rejecting parent/dot segments,
+  empty names, NUL, colon and backslash; standalone `/` and `.` are accepted. This
+  provisional grammar excludes native Windows drive/UNC spellings. HostStorage takes
+  a separate native root string; root mapping is not a symlink-safe sandbox.
+- **Call-site ergonomics:** provider and descriptor APIs currently require Path.
+  String overloads where a path is expected remain open; the assistant recommends
+  parsing and delegating to the typed implementation. More Path operations are deferred.
 - **Text:** ReadText/WriteText temporarily reuse the existing bounded whole-file
   helpers and their error families. A final provider should expose byte streams;
   text/encoding convenience belongs above that boundary. The byte workflow now
@@ -99,9 +107,11 @@ claim. This first wrapper is synchronous, has no finalizer/automatic disposal an
 makes no durability guarantee. Memory views, asynchronous ownership and general
 System.Streams capability interfaces are still open.
 
-The author now directs Storage alignment, including exploring a Path value object,
-after this working read/write slice. Keep addresses and provider identity separate;
-do not promote the temporary text-helper provider contract unchanged.
+Storage alignment has begun with the application-owned Path experiment. Keep
+syntax validation separate from provider lookup and identity; do not promote the
+temporary text-helper provider contract unchanged. The core System.Storage.Path
+string helpers remain unchanged. See the [complete Path contract](../../../api-docs/storage-experiment.md#path-value-object)
+for grammar, costs and comparison with .NET System.IO.Path.
 
 The verifier also compiles `Contracts.rvn` separately through the normal SDK. It
 checks missing/empty/directory paths, rejected ranges before input consumption or
@@ -113,3 +123,10 @@ through normal MSBuild compilation. Five native file-resource unit cases, eleven
 VM integration cases and eight existing Thread/worker cases passed. All Raven
 library slices regenerated, snapshot checks matched, and the website/API-reference
 build and four website tooling tests passed. No cross-platform matrix was rerun.
+
+Path validation on 2026-09-23: the normal SDK sample and stream contracts passed
+again with the disk provider rooted in a scratch `sandbox` directory. PathContracts
+checks valid and invalid spellings, lexical equality, provider resolution and valid
+but missing files. Separate compiler checks reject direct construction and Text
+assignment. The verifier confirms no sample files escape to the parent working
+directory; this fixture check does not establish a filesystem sandbox.

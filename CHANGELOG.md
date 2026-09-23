@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Explore an immutable Path value in the Storage sample. Path.Parse returns
+  Result<Path, InvalidPathError>; construction is private and text cannot be changed.
+  Move experimental provider/File/Directory parameters to validated logical paths
+  and configure a separate native disk root. Document the conservative logical
+  grammar, lexical equality and limitations; legacy System.Storage.Path helpers
+  remain unchanged. Broader operations and string overloads remain open design work.
+
 - Add host-visible FaultCode classifications, including StackOverflow for the
   interpreter frame limit, arithmetic/memory limits and host cancellation. Explicit
   guest faults always use UserFault; System.Fault still accepts only a message.

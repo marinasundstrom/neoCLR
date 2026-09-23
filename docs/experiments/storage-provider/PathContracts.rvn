@@ -1,0 +1,122 @@
+namespace StorageExperiment
+
+import System.*
+import System.Console.*
+import System.Result.*
+
+func Valid(text: string, absolute: bool) {
+    match Path.Parse(text) {
+        Ok(let path) => {
+            if path.Text != text || path.ToString() != text {
+                System.Fault("Path spelling changed")
+            }
+            if path.IsAbsolute != absolute || path.IsRelative == absolute {
+                System.Fault("Wrong path kind")
+            }
+            if !path.Equals(RequirePath(text)) {
+                System.Fault("Path equality used object identity")
+            }
+        }
+        Error(_) => System.Fault("Valid logical path rejected")
+    }
+}
+
+func Invalid(text: string) {
+    match Path.Parse(text) {
+        Error(_) => { }
+        Ok(_) => System.Fault("Invalid logical path accepted")
+    }
+}
+
+func Main() {
+    Valid("/", true)
+    Valid(".", false)
+    Valid("notes.txt", false)
+    Valid("config/settings.json", false)
+    Valid("/config/settings.json", true)
+    Valid("/värld/☃.txt", true)
+    Valid("two words/file.txt", false)
+    Invalid("")
+    Invalid("\u0000")
+    Invalid("a\u0000b")
+    Invalid("a\\b")
+    Invalid("C:/file")
+    Invalid("../file")
+    Invalid("./file")
+    Invalid("a/../file")
+    Invalid("a/./file")
+    Invalid("..")
+    Invalid("/..")
+    Invalid("/.")
+    Invalid("a/..")
+    Invalid("a/.")
+    Invalid("a//b")
+    Invalid("//server/share")
+    Invalid("a/")
+    if RequirePath("/A").Equals(RequirePath("/a")) {
+        System.Fault("Path equality depends on host case rules")
+    }
+    if RequirePath("/notes.txt").Equals(RequirePath("notes.txt")) {
+        System.Fault("Path equality silently resolved relative addresses")
+    }
+    let memory: StorageProvider = MemorySlotStorage()
+    let root = Directory(memory, RequirePath("/"))
+    let current = Directory(memory, RequirePath("."))
+    match root.FileAt("note") {
+        Ok(let file) => {
+            match file.WriteText("rooted", 16) {
+                Ok(_) => { }
+                Error(let error) => System.Fault(error.ToString())
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    // Providers may resolve distinct lexical values to the same address.
+    match current.FileAt("note") {
+        Ok(let file) => {
+            match file.ReadText(16) {
+                Ok(let text) => {
+                    if text != "rooted" {
+                        System.Fault("Relative resolution changed provider context")
+                    }
+                }
+                Error(let error) => System.Fault(error.ToString())
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    match root.FileAt("a\\b") {
+        Error(_) => { }
+        Ok(_) => System.Fault("Directory bypassed path validation")
+    }
+    let host: StorageProvider = HostStorage(".")
+    match host.ReadText(RequirePath("/notes.txt"), 64) {
+        Ok(let text) => {
+            if text != "Hello, värld!" {
+                System.Fault("Provider-rooted path reached wrong disk file")
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    match host.ReadText(RequirePath("notes.txt"), 64) {
+        Ok(let text) => {
+            if text != "Hello, värld!" {
+                System.Fault("Relative path reached wrong disk file")
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    // Parse checks syntax without querying storage.
+    match host.OpenRead(RequirePath("/missing")) {
+        Error(let error) => {
+            if !error.IsNotFound {
+                System.Fault("Parsing performed storage lookup")
+            }
+        }
+        Ok(let stream) => {
+            stream.Close()
+            System.Fault("Missing item opened")
+        }
+    }
+    WriteLine("Validated Path and provider resolution: passed")
+}

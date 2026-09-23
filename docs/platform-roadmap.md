@@ -133,9 +133,15 @@ first disk read/write stream application, not a completed Storage model or async
 
 **Author clarification, 2026-09-23:** establish working stream reads and writes
 before aligning the Storage APIs, including investigating/implementing the Path
-value object. That Storage alignment is the next bounded slice. Compare the
-proposal's path value, provider-specific addresses, lazy File descriptors and eager
-lookup against .NET Path/FileInfo, preserving the tested stream operations. The
+value object. That Storage alignment has begun with an application-owned immutable Path value
+object: static Parse returns Result<Path, InvalidPathError>, with a private
+constructor and explicit logical grammar. The disk/memory sample now passes Path
+values and maps host storage beneath a configured native root. This is exploration,
+not a new System.Storage.Path contract. The author defers broader Path operations
+and leaves string overloads on path-taking APIs open; the assistant recommends
+convenience overloads that parse and forward, not a separate unchecked path.
+Next, evaluate provider lookup/identity and error contracts against the working
+sample before promoting the Storage surface. Preserve the tested stream operations. The
 current application-owned File/Directory and capability interfaces remain
 exploratory; do not promote their string-address/text-helper shape unchanged merely
 because this sample works. Public stream wrappers have on-site reference coverage.

@@ -10,25 +10,25 @@ import System.Storage.FileWriteError
 // Experimental application-owned contract. Text methods are a temporary adapter
 // over existing helpers; byte streams are a separate incremental experiment.
 interface StorageProvider {
-    func FileAt(directory: string, name: string) -> File
-    func OpenRead(path: string) -> Result<InputStream, StreamError>
-    func CreateNew(path: string) -> Result<OutputStream, StreamError>
-    func ReadText(path: string, maxBytes: int) -> Result<string, FileReadError>
-    func WriteText(path: string, text: string, maxBytes: int) -> Result<unit, FileWriteError>
+    func FileAt(path: Path, name: string) -> File
+    func OpenRead(path: Path) -> Result<InputStream, StreamError>
+    func CreateNew(path: Path) -> Result<OutputStream, StreamError>
+    func ReadText(path: Path, maxBytes: int) -> Result<string, FileReadError>
+    func WriteText(path: Path, text: string, maxBytes: int) -> Result<unit, FileWriteError>
 }
 
 class File {
     private field provider: StorageProvider
-    private field path: string
+    private field path: Path
     private field name: string
 
-    init(provider: StorageProvider, path: string, name: string) {
+    init(provider: StorageProvider, path: Path, name: string) {
         self.provider = provider
         self.path = path
         self.name = name
     }
 
-    val Path: string => path
+    val Path: Path => path
     val Name: string => name
 
     func OpenRead() -> Result<InputStream, StreamError> {
@@ -50,29 +50,59 @@ class File {
 
 class Directory {
     private field provider: StorageProvider
-    private field path: string
+    private field path: Path
 
-    init(provider: StorageProvider, path: string) {
+    init(provider: StorageProvider, path: Path) {
         self.provider = provider
         self.path = path
     }
 
-    val Path: string => path
+    val Path: Path => path
 
     // This resolves a direct child address; it does not query existence.
     func FileAt(name: string) -> Result<File, FileReadError> {
-        let reserved = name.IsEmpty || name == "." || name == ".."
-        let separator = name.ContainsOrdinal("/") || name.ContainsOrdinal("\\")
-        if reserved || separator || name.ContainsOrdinal("\u0000") {
+        if name.IsEmpty || name == "." || name == ".." || name.ContainsOrdinal("/") {
             return Error(FileReadError(FileReadError.InvalidPath()))
         }
-        return Ok(provider.FileAt(path, name))
+        var childText = path.Text + "/" + name
+        if path.Text == "." {
+            childText = name
+        }
+        if path.Text == "/" {
+            childText = "/" + name
+        }
+        return match StorageExperiment.Path.Parse(childText) {
+            Ok(let child) => Ok(provider.FileAt(child, name))
+            Error(_) => Error(FileReadError(FileReadError.InvalidPath()))
+        }
     }
 }
 
 class HostStorage : StorageProvider {
-    func OpenRead(path: string) -> Result<InputStream, StreamError> {
-        return match FileInputStream.Open(path) {
+    private field root: string
+
+    init(root: string) {
+        self.root = root
+    }
+
+    // Both absolute logical paths and relative paths resolve beneath this root.
+    // This is address mapping, not a symlink-safe sandbox.
+    private func Resolve(path: Path) -> string {
+        let text = path.Text
+        if text == "/" || text == "." {
+            return root
+        }
+        if path.IsAbsolute {
+            match text.SliceUtf8(1, text.GetUtf8ByteCount() - 1) {
+                Ok(let relative) => return System.Storage.Path.Combine(root, relative)
+                Error(_) => System.Fault("Invalid parsed path boundary")
+            }
+        }
+        return System.Storage.Path.Combine(root, text)
+    }
+
+    func OpenRead(path: Path) -> Result<InputStream, StreamError> {
+        return match FileInputStream.Open(Resolve(path)) {
             Ok(let stream) => {
                 let adapter: InputStream = DiskInput(stream)
                 Ok(adapter)
@@ -81,8 +111,8 @@ class HostStorage : StorageProvider {
         }
     }
 
-    func CreateNew(path: string) -> Result<OutputStream, StreamError> {
-        return match FileOutputStream.CreateNew(path) {
+    func CreateNew(path: Path) -> Result<OutputStream, StreamError> {
+        return match FileOutputStream.CreateNew(Resolve(path)) {
             Ok(let stream) => {
                 let adapter: OutputStream = DiskOutput(stream)
                 Ok(adapter)
@@ -91,62 +121,71 @@ class HostStorage : StorageProvider {
         }
     }
 
-    func FileAt(directory: string, name: string) -> File {
-        return File(self, System.Storage.Path.Combine(directory, name), name)
+    func FileAt(path: Path, name: string) -> File {
+        return File(self, path, name)
     }
 
-    func ReadText(path: string, maxBytes: int) -> Result<string, FileReadError> {
-        return System.Storage.File.ReadAllText(path, maxBytes)
+    func ReadText(path: Path, maxBytes: int) -> Result<string, FileReadError> {
+        return System.Storage.File.ReadAllText(Resolve(path), maxBytes)
     }
 
-    func WriteText(path: string, text: string, maxBytes: int) -> Result<unit, FileWriteError> {
-        return System.Storage.File.WriteAllText(path, text, maxBytes)
+    func WriteText(path: Path, text: string, maxBytes: int) -> Result<unit, FileWriteError> {
+        return System.Storage.File.WriteAllText(Resolve(path), text, maxBytes)
     }
 }
 
 // Deliberately one slot: enough to check provider retention and the sample's
 // behavior without pretending to implement a general in-memory filesystem.
 class MemorySlotStorage : StorageProvider {
+    private func Key(path: Path) -> string {
+        if path.Text == "." {
+            return "/"
+        }
+        if path.IsAbsolute {
+            return path.Text
+        }
+        return "/" + path.Text
+    }
+
     // Separate byte slot while the old whole-text adapter remains in the sample.
     private field bytePresent: bool = false
     private field bytePath: string = ""
     private field bytes: List<byte> = ArrayList<byte>()
 
-    func OpenRead(path: string) -> Result<InputStream, StreamError> {
-        if !bytePresent || bytePath != path {
+    func OpenRead(path: Path) -> Result<InputStream, StreamError> {
+        if !bytePresent || bytePath != Key(path) {
             return Error(StreamError(StreamError.NotFound()))
         }
         let stream: InputStream = MemoryInput(bytes)
         return Ok(stream)
     }
 
-    func CreateNew(path: string) -> Result<OutputStream, StreamError> {
+    func CreateNew(path: Path) -> Result<OutputStream, StreamError> {
         if bytePresent {
-            if bytePath == path {
+            if bytePath == Key(path) {
                 return Error(StreamError(StreamError.AlreadyExists()))
             }
             return Error(StreamError(StreamError.LimitExceeded()))
         }
         bytePresent = true
-        bytePath = path
+        bytePath = Key(path)
         let stream: OutputStream = MemoryOutput(bytes)
         return Ok(stream)
     }
 
-    func FileAt(directory: string, name: string) -> File {
-        // A logical key deliberately different from a host filesystem path.
-        return File(self, directory + "::" + name, name)
+    func FileAt(path: Path, name: string) -> File {
+        return File(self, path, name)
     }
 
     private field present: bool = false
-    private field path: string = ""
+    private field storedPath: string = ""
     private field text: string = ""
 
-    func ReadText(path: string, maxBytes: int) -> Result<string, FileReadError> {
+    func ReadText(path: Path, maxBytes: int) -> Result<string, FileReadError> {
         if maxBytes < 0 {
             return Error(FileReadError(FileReadError.InvalidLimit()))
         }
-        if !present || self.path != path {
+        if !present || storedPath != Key(path) {
             return Error(FileReadError(FileReadError.NotFound()))
         }
         if text.GetUtf8ByteCount() > maxBytes {
@@ -155,14 +194,14 @@ class MemorySlotStorage : StorageProvider {
         return Ok(text)
     }
 
-    func WriteText(path: string, text: string, maxBytes: int) -> Result<unit, FileWriteError> {
+    func WriteText(path: Path, text: string, maxBytes: int) -> Result<unit, FileWriteError> {
         if maxBytes < 0 {
             return Error(FileWriteError(FileWriteError.InvalidLimit()))
         }
         if text.GetUtf8ByteCount() > maxBytes {
             return Error(FileWriteError(FileWriteError.TooLarge()))
         }
-        self.path = path
+        storedPath = Key(path)
         self.text = text
         present = true
         return Ok(())

@@ -59,10 +59,12 @@ func RejectChild(directory: Directory, name: string) {
 }
 
 func Main() {
-    let host: StorageProvider = HostStorage()
+    let host: StorageProvider = HostStorage("sandbox")
     let memory: StorageProvider = MemorySlotStorage()
-    let disk = Directory(host, ".")
-    let temporary = Directory(memory, ".")
+    // Parsing does not open storage. The same logical root works for both providers.
+    let root = RequirePath("/")
+    let disk = Directory(host, root)
+    let temporary = Directory(memory, root)
     WriteLine("Disk")
     RoundTrip(disk)
     ByteRoundTrip(disk)
@@ -71,7 +73,7 @@ func Main() {
     ByteRoundTrip(temporary)
     match temporary.FileAt("notes.txt") {
         Ok(let file) => {
-            if file.Path != ".::notes.txt" {
+            if !file.Path.Equals(RequirePath("/notes.txt")) {
                 System.Fault("Directory replaced the provider address")
             }
             match file.ReadText(14) {
@@ -94,7 +96,7 @@ func Main() {
     RejectChild(disk, "child\u0000name")
     WriteLine("Direct child required")
     let otherMemory: StorageProvider = MemorySlotStorage()
-    let other = otherMemory.FileAt(".", "notes.txt")
+    let other = otherMemory.FileAt(RequirePath("/notes.txt"), "notes.txt")
     match other.ReadText(64) {
         Error(let error) => {
             if !error.IsNotFound {

@@ -5305,3 +5305,31 @@ and recorded the convention for runtime code as well as examples.
 - **Scope:** no guest exception hierarchy, catch/recovery semantics or HRESULT
   compatibility. More precise classification of remaining RuntimeError diagnostics
   can follow; Storage alignment and Path remain the next platform slice.
+
+
+### 2026-09-23 — Validated Path values and string overloads
+
+- **Author:** directed continuing directly into the next slice after fault codes.
+  Clarified that static Path.Parse should return Result<Path, ...> and ensure valid
+  syntax. Said further Path operations can come later and expressed uncertainty
+  about requiring Path versus offering string overloads “where a path is expected”.
+- **Assistant response:** selected Parse returning Result<Path, InvalidPathError>
+  and private construction. Initially proposed a Path core contract with convenience
+  overloads considered at application boundaries; after the author's clarification,
+  recommended Path and string overloads on path-taking APIs, with strings parsed
+  and forwarded to the typed implementation. This remains an assistant recommendation,
+  not an author decision to implement an overload family now.
+- **Action:** implemented a small application-owned immutable Path class, with
+  validated spelling, absolute/relative indicators and explicit lexical Equals.
+  Directory parses child paths; provider operations consume Path values and the host
+  provider maps them under an explicitly configured native root. More Path operations
+  and platform-wide API promotion are deferred.
+- **Provisional tradeoff:** use a conservative slash-separated logical grammar rather
+  than claim a universal native path parser. This revises the earlier experiment's
+  provider-specific string spelling: syntax is now shared while resolution stays
+  provider-owned. Constructor privacy protects ordinary Raven use, not arbitrary
+  forged IL; provider root mapping is not a symlink-safe sandbox.
+- **Evidence:** [sample and verifier](experiments/storage-provider/README.md),
+  [complete sample API reference](../api-docs/storage-experiment.md#path-value-object).
+  Explicit parsing remains visible in the sample so overload ergonomics can be judged
+  before finalizing the Storage contract.
