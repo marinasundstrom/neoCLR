@@ -1,5 +1,31 @@
 name: neoCLR
-on: [push, pull_request]
+on:
+  push:
+    # Release candidates are validated before tagging; do not repeat for tag pushes.
+    branches: ["**"]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/*.json'
+      - 'website/**'
+      - 'api-docs/**'
+      - '.config/dotnet-tools.json'
+      - 'scripts/build-api-docs.py'
+      - 'scripts/build-website.py'
+      - 'scripts/test_build_website.py'
+      - '.github/workflows/pages.yml'
+  pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/*.json'
+      - 'website/**'
+      - 'api-docs/**'
+      - '.config/dotnet-tools.json'
+      - 'scripts/build-api-docs.py'
+      - 'scripts/build-website.py'
+      - 'scripts/test_build_website.py'
+      - '.github/workflows/pages.yml'
+  # Explicit exact-candidate validation remains available regardless of paths.
+  workflow_dispatch:
 jobs:
   test:
     strategy:

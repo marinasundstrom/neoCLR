@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Skip the runtime matrix for documentation, website and API-reference-only pushes
+  and pull requests; keep executable experiments covered and provide manual runs.
+  Release tags no longer automatically repeat the validated candidate matrix.
+
 - Record publication of Preview 9 at `834028c` with six passing platform/toolchain
   jobs and extracted macOS arm64 package/editor evidence; mark the async checkpoint
   complete and resume foundational Streams, Storage and Encoding priorities.
