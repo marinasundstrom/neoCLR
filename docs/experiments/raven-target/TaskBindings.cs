@@ -35,6 +35,8 @@ static class TaskBindings
             }
             public sealed class TaskQueue {
                 public TaskQueue() { }
+                public static TaskQueue Default => default;
+                public static TaskQueue Current => default;
                 public void Post(Func<PropagationUnit> callback) { }
                 public void Drain() { }
                 public void Run(Func<PropagationUnit> callback) { }
@@ -51,6 +53,7 @@ static class TaskBindings
                 public void OnCompleted(Func<PropagationUnit> callback) { }
             }
             public sealed class Promise<T> {
+                public Promise() { }
                 public Promise(TaskQueue queue) { }
                 public Task<T> Task => default;
                 public bool Complete(T value) => default;
@@ -83,6 +86,8 @@ static class TaskBindings
 
     public static void Project(ModuleDefinition module)
     {
+        var current = module.GetType(Queue).Methods.Single(m => m.Name == "get_Current");
+        current.Attributes = (current.Attributes & ~MethodAttributes.MemberAccessMask) | MethodAttributes.Assembly;
         foreach (var method in module.GetType(Prefix + "Task`1").Methods.Where(m => m.IsConstructor || m.Name == "Dispatcher")
             .Concat(module.GetType(Prefix + "Promise`1").Methods.Where(m => m.Name is "Completed" or "Cancelled" or "Read" or "Register" or "Dispatcher")))
             method.Attributes = (method.Attributes & ~MethodAttributes.MemberAccessMask) | MethodAttributes.Assembly;
@@ -117,7 +122,8 @@ static class TaskBindings
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
         var (kind, payload) = Shapes[owner];
-        var internalMember = kind == "Task" && (definition.IsConstructor || definition.Name == "Dispatcher")
+        var internalMember = kind == "TaskQueue" && definition.Name == "get_Current"
+            || kind == "Task" && (definition.IsConstructor || definition.Name == "Dispatcher")
             || kind == "Promise" && definition.Name is "Completed" or "Cancelled" or "Read" or "Register" or "Dispatcher";
         if (internalMember ? !library || !definition.IsAssembly : !definition.IsPublic)
             throw new InvalidDataException("Invalid Task member visibility.");
@@ -125,15 +131,18 @@ static class TaskBindings
             || definition.DeclaringType.Interfaces[0].InterfaceType.FullName != "System.Runtime.CompilerServices.ITaskAwaiter"
             || !RuntimeSignatures.IsCore(definition.DeclaringType.Interfaces[0].InterfaceType.Scope)))
             throw new InvalidDataException("Invalid Task awaiter interface.");
+        var staticMember = kind == "TaskQueue" && definition.Name is "get_Current" or "get_Default";
         if (!definition.DeclaringType.IsSealed || definition.DeclaringType.IsInterface
             || (kind != "Task" && definition.DeclaringType.HasInterfaces)
             || definition.DeclaringType.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant)
-            || !reference.HasThis || definition.IsStatic || definition.HasGenericParameters
+            || reference.HasThis == staticMember || definition.IsStatic != staticMember || definition.HasGenericParameters
             || !definition.IsPublic && !(library && definition.IsAssembly)
             || definition.IsConstructor != construct)
             throw new InvalidDataException("Unsupported provisional Task contract.");
         var expected = (kind, definition.Name) switch
         {
+            ("TaskQueue", "get_Default") => ("", Queue),
+            ("TaskQueue", "get_Current") when library => ("", Queue),
             ("TaskQueue", ".ctor") => ("", "noresult"),
             ("TaskQueue", "Post" or "Run") => ("System.Func<Void>", "noresult"),
             ("TaskQueue", "Drain") => ("", "noresult"),
@@ -145,6 +154,7 @@ static class TaskBindings
             ("Task", "GetAwaiter") => ("", owner),
             ("Task", "GetResult") => ("", payload),
             ("Task", "OnCompleted") => ("System.Func<Void>", "noresult"),
+            ("Promise", ".ctor") when definition.Parameters.Count == 0 => ("", "noresult"),
             ("Promise", ".ctor") => (Queue, "noresult"),
             ("Promise", "get_Task") => ("", Prefix + "Task<" + payload + ">"),
             ("Promise", "Cancel") => ("", "Boolean"),
@@ -160,6 +170,6 @@ static class TaskBindings
             throw new InvalidDataException("Unsupported Task signature.");
         return construct
             ? new(args, owner, $"newobj instance {owner}::.ctor({string.Join(',', args)})")
-            : new(new[] { owner }.Concat(args).ToArray(), result, $"call instance {owner}::{definition.Name}({string.Join(',', args)})");
+            : new(staticMember ? args : new[] { owner }.Concat(args).ToArray(), result, $"call {(staticMember ? "" : "instance ")}{owner}::{definition.Name}({string.Join(',', args)})");
     }
 }

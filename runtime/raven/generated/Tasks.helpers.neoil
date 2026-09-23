@@ -113,6 +113,12 @@ ret
 .type class System.Tasks.TaskQueue
 .field private pending System.Collections.ArrayList<System.Func<Void>>
 .field private running Boolean
+.property static Default() -> System.Tasks.TaskQueue
+.get System.Tasks.TaskQueue::get_Default()
+.end
+.property static Current() -> System.Tasks.TaskQueue
+.get System.Tasks.TaskQueue::get_Current()
+.end
 .method instance .ctor() -> noresult
 M00000001_IL_0000:
 M00000001_IL_0001:
@@ -136,67 +142,146 @@ stfld System.Tasks.TaskQueue::running
 M00000001_IL_001a:
 ret
 .end
-.method instance Post(System.Func<Void> callback) -> noresult
+.method static get_Default() -> System.Tasks.TaskQueue
+.local System.Tasks.TaskQueue local0
+.local System.Tasks.TaskQueue local1
+ldloca local0
+initobj System.Tasks.TaskQueue
+ldloca local1
+initobj System.Tasks.TaskQueue
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
-ldarg 0
-M00000002_IL_0003:
-ldfld System.Tasks.TaskQueue::pending
+call neoCLR.Runtime.DefaultTaskQueue()
+M00000002_IL_0007:
+stloc local0
 M00000002_IL_0008:
-ldarg 1
 M00000002_IL_0009:
-callvirt instance System.Collections.ArrayList<System.Func<Void>>::Add(System.Func<Void>)
-M00000002_IL_000e:
-M00000002_IL_000f:
+ldloc local0
+M00000002_IL_000a:
+M00000002_IL_000b:
+ref.isnull
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_000d:
+brtrue M00000002_IL_0017
+M00000002_IL_0012:
+br M00000002_IL_0027
+M00000002_IL_0017:
+M00000002_IL_0018:
+newobj instance System.Tasks.TaskQueue::.ctor()
+M00000002_IL_001d:
+stloc local1
+M00000002_IL_001e:
+ldloc local1
+M00000002_IL_001f:
+call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue)
+pop
+M00000002_IL_0024:
+M00000002_IL_0025:
+ldloc local1
+M00000002_IL_0026:
+ret
+M00000002_IL_0027:
+M00000002_IL_0028:
+M00000002_IL_0029:
+ldloc local0
+M00000002_IL_002a:
 ret
 .end
-.method instance Run(System.Func<Void> callback) -> noresult
+.method internal static get_Current() -> System.Tasks.TaskQueue
+.local System.Tasks.TaskQueue local0
+ldloca local0
+initobj System.Tasks.TaskQueue
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
-ldarg 0
-M00000003_IL_0003:
-ldfld System.Tasks.TaskQueue::running
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Runtime.CurrentTaskQueue()
+M00000003_IL_0007:
+stloc local0
 M00000003_IL_0008:
-brtrue M00000003_IL_0012
+M00000003_IL_0009:
+ldloc local0
+M00000003_IL_000a:
+M00000003_IL_000b:
+ref.isnull
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
 M00000003_IL_000d:
-br M00000003_IL_001d
+brtrue M00000003_IL_0017
 M00000003_IL_0012:
-M00000003_IL_0013:
-ldstr "Task queue cannot be pumped recursively"
+br M00000003_IL_001e
+M00000003_IL_0017:
 M00000003_IL_0018:
-call System.Fault(String)
+call System.Tasks.TaskQueue::get_Default()
 M00000003_IL_001d:
+ret
 M00000003_IL_001e:
 M00000003_IL_001f:
-ldarg 0
 M00000003_IL_0020:
-ldc.i4 1
+ldloc local0
 M00000003_IL_0021:
+ret
+.end
+.method instance Post(System.Func<Void> callback) -> noresult
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.Tasks.TaskQueue::pending
+M00000004_IL_0008:
+ldarg 1
+M00000004_IL_0009:
+callvirt instance System.Collections.ArrayList<System.Func<Void>>::Add(System.Func<Void>)
+M00000004_IL_000e:
+M00000004_IL_000f:
+ret
+.end
+.method instance Run(System.Func<Void> callback) -> noresult
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.Tasks.TaskQueue::running
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0008:
+brtrue M00000005_IL_0012
+M00000005_IL_000d:
+br M00000005_IL_001d
+M00000005_IL_0012:
+M00000005_IL_0013:
+ldstr "Task queue cannot be pumped recursively"
+M00000005_IL_0018:
+call System.Fault(String)
+M00000005_IL_001d:
+M00000005_IL_001e:
+M00000005_IL_001f:
+ldarg 0
+M00000005_IL_0020:
+ldc.i4 1
+M00000005_IL_0021:
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
 stfld System.Tasks.TaskQueue::running
-M00000003_IL_0026:
+M00000005_IL_0026:
 ldarg 1
-M00000003_IL_0027:
+M00000005_IL_0027:
 callvirt instance System.Func<Void>::Invoke()
 pop
-M00000003_IL_002c:
-M00000003_IL_002d:
+M00000005_IL_002c:
+M00000005_IL_002d:
 ldarg 0
-M00000003_IL_002e:
+M00000005_IL_002e:
 ldc.i4 0
-M00000003_IL_002f:
+M00000005_IL_002f:
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
 stfld System.Tasks.TaskQueue::running
-M00000003_IL_0034:
-M00000003_IL_0035:
+M00000005_IL_0034:
+M00000005_IL_0035:
 ldarg 0
-M00000003_IL_0036:
+M00000005_IL_0036:
 callvirt instance System.Tasks.TaskQueue::Drain()
-M00000003_IL_003b:
-M00000003_IL_003c:
+M00000005_IL_003b:
+M00000005_IL_003c:
 ret
 .end
 .method instance Drain() -> noresult
@@ -208,106 +293,106 @@ ldloca local0
 initobj System.Collections.ArrayList<System.Func<Void>>
 ldloca local2
 initobj System.Collections.Iterator<System.Func<Void>>
-M00000004_IL_0000:
-M00000004_IL_0001:
-M00000004_IL_0002:
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
 ldarg 0
-M00000004_IL_0003:
+M00000006_IL_0003:
 ldfld System.Tasks.TaskQueue::running
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_0008:
-brtrue M00000004_IL_0012
-M00000004_IL_000d:
-br M00000004_IL_001d
-M00000004_IL_0012:
-M00000004_IL_0013:
+M00000006_IL_0008:
+brtrue M00000006_IL_0012
+M00000006_IL_000d:
+br M00000006_IL_001d
+M00000006_IL_0012:
+M00000006_IL_0013:
 ldstr "Task queue cannot be pumped recursively"
-M00000004_IL_0018:
+M00000006_IL_0018:
 call System.Fault(String)
-M00000004_IL_001d:
-M00000004_IL_001e:
-M00000004_IL_001f:
+M00000006_IL_001d:
+M00000006_IL_001e:
+M00000006_IL_001f:
 ldarg 0
-M00000004_IL_0020:
+M00000006_IL_0020:
 ldc.i4 1
-M00000004_IL_0021:
+M00000006_IL_0021:
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
 stfld System.Tasks.TaskQueue::running
-M00000004_IL_0026:
-M00000004_IL_0027:
-M00000004_IL_0028:
+M00000006_IL_0026:
+M00000006_IL_0027:
+M00000006_IL_0028:
 ldarg 0
-M00000004_IL_0029:
+M00000006_IL_0029:
 ldfld System.Tasks.TaskQueue::pending
-M00000004_IL_002e:
+M00000006_IL_002e:
 callvirt instance System.Collections.ArrayList<System.Func<Void>>::get_Count()
-M00000004_IL_0033:
+M00000006_IL_0033:
 ldc.i4 0
-M00000004_IL_0034:
+M00000006_IL_0034:
 ceq
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_0036:
+M00000006_IL_0036:
 ldc.i4 0
-M00000004_IL_0037:
+M00000006_IL_0037:
 ceq
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_0039:
-brtrue M00000004_IL_0043
-M00000004_IL_003e:
-br M00000004_IL_0080
-M00000004_IL_0043:
-M00000004_IL_0044:
+M00000006_IL_0039:
+brtrue M00000006_IL_0043
+M00000006_IL_003e:
+br M00000006_IL_0080
+M00000006_IL_0043:
+M00000006_IL_0044:
 ldarg 0
-M00000004_IL_0045:
+M00000006_IL_0045:
 ldfld System.Tasks.TaskQueue::pending
-M00000004_IL_004a:
+M00000006_IL_004a:
 stloc local0
-M00000004_IL_004b:
+M00000006_IL_004b:
 ldarg 0
-M00000004_IL_004c:
+M00000006_IL_004c:
 newobj instance System.Collections.ArrayList<System.Func<Void>>::.ctor()
-M00000004_IL_0051:
+M00000006_IL_0051:
 stfld System.Tasks.TaskQueue::pending
-M00000004_IL_0056:
-M00000004_IL_0057:
+M00000006_IL_0056:
+M00000006_IL_0057:
 ldloc local0
-M00000004_IL_0058:
+M00000006_IL_0058:
 callvirt instance System.Collections.Iterable<System.Func<Void>>::GetIterator()
-M00000004_IL_005d:
+M00000006_IL_005d:
 stloc local2
-M00000004_IL_005e:
+M00000006_IL_005e:
 ldloc local2
-M00000004_IL_005f:
+M00000006_IL_005f:
 callvirt instance System.Collections.Iterator<System.Func<Void>>::MoveNext()
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_0064:
-brfalse M00000004_IL_007b
-M00000004_IL_0069:
+M00000006_IL_0064:
+brfalse M00000006_IL_007b
+M00000006_IL_0069:
 ldloc local2
-M00000004_IL_006a:
+M00000006_IL_006a:
 callvirt instance System.Collections.Iterator<System.Func<Void>>::get_Current()
-M00000004_IL_006f:
+M00000006_IL_006f:
 stloc local3
-M00000004_IL_0070:
+M00000006_IL_0070:
 ldloc local3
-M00000004_IL_0071:
+M00000006_IL_0071:
 callvirt instance System.Func<Void>::Invoke()
 pop
-M00000004_IL_0076:
-br M00000004_IL_005e
-M00000004_IL_007b:
-br M00000004_IL_0027
-M00000004_IL_0080:
-M00000004_IL_0081:
-M00000004_IL_0082:
+M00000006_IL_0076:
+br M00000006_IL_005e
+M00000006_IL_007b:
+br M00000006_IL_0027
+M00000006_IL_0080:
+M00000006_IL_0081:
+M00000006_IL_0082:
 ldarg 0
-M00000004_IL_0083:
+M00000006_IL_0083:
 ldc.i4 0
-M00000004_IL_0084:
+M00000006_IL_0084:
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
 stfld System.Tasks.TaskQueue::running
-M00000004_IL_0089:
-M00000004_IL_008a:
+M00000006_IL_0089:
+M00000006_IL_008a:
 ret
 .end
 .end
@@ -320,62 +405,110 @@ ret
 .property instance Task() -> System.Tasks.Task<T0>
 .get instance System.Tasks.Promise<T0>::get_Task()
 .end
-.method instance .ctor(System.Tasks.TaskQueue queue) -> noresult
-M0000000e_IL_0000:
-M0000000e_IL_0001:
+.method instance .ctor() -> noresult
+M00000010_IL_0000:
+M00000010_IL_0001:
 ldarg 0
-M0000000e_IL_0002:
+M00000010_IL_0002:
 pop
-M0000000e_IL_0007:
-M0000000e_IL_0008:
+M00000010_IL_0007:
+M00000010_IL_0008:
 ldarg 0
-M0000000e_IL_0009:
-ldarg 1
-M0000000e_IL_000a:
+M00000010_IL_0009:
+call System.Tasks.TaskQueue::get_Current()
+M00000010_IL_000e:
 stfld System.Tasks.Promise<T0>::queue
-M0000000e_IL_000f:
-M0000000e_IL_0010:
+M00000010_IL_0013:
+M00000010_IL_0014:
 ldarg 0
-M0000000e_IL_0011:
+M00000010_IL_0015:
 ldc.i4 0
-M0000000e_IL_0012:
+M00000010_IL_0016:
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
 stfld System.Tasks.Promise<T0>::cancelled
-M0000000e_IL_0017:
-M0000000e_IL_0018:
+M00000010_IL_001b:
+M00000010_IL_001c:
 ldarg 0
-M0000000e_IL_0019:
+M00000010_IL_001d:
 ldc.i4 1
-M0000000e_IL_001a:
+M00000010_IL_001e:
 newobj instance System.Collections.ArrayList<T0>::.ctor(Int32)
-M0000000e_IL_001f:
+M00000010_IL_0023:
 stfld System.Tasks.Promise<T0>::slot
-M0000000e_IL_0024:
+M00000010_IL_0028:
 ldarg 0
-M0000000e_IL_0025:
+M00000010_IL_0029:
 newobj instance System.Collections.ArrayList<System.Func<Void>>::.ctor()
-M0000000e_IL_002a:
+M00000010_IL_002e:
 stfld System.Tasks.Promise<T0>::callbacks
-M0000000e_IL_002f:
-M0000000e_IL_0030:
+M00000010_IL_0033:
+M00000010_IL_0034:
 ldarg 0
-M0000000e_IL_0031:
+M00000010_IL_0035:
 ldarg 0
-M0000000e_IL_0032:
+M00000010_IL_0036:
 newobj instance System.Tasks.Task<T0>::.ctor(System.Tasks.Promise<T0>)
-M0000000e_IL_0037:
+M00000010_IL_003b:
 stfld System.Tasks.Promise<T0>::task
-M0000000e_IL_003c:
+M00000010_IL_0040:
+ret
+.end
+.method instance .ctor(System.Tasks.TaskQueue queue) -> noresult
+M00000011_IL_0000:
+M00000011_IL_0001:
+ldarg 0
+M00000011_IL_0002:
+pop
+M00000011_IL_0007:
+M00000011_IL_0008:
+ldarg 0
+M00000011_IL_0009:
+ldarg 1
+M00000011_IL_000a:
+stfld System.Tasks.Promise<T0>::queue
+M00000011_IL_000f:
+M00000011_IL_0010:
+ldarg 0
+M00000011_IL_0011:
+ldc.i4 0
+M00000011_IL_0012:
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
+stfld System.Tasks.Promise<T0>::cancelled
+M00000011_IL_0017:
+M00000011_IL_0018:
+ldarg 0
+M00000011_IL_0019:
+ldc.i4 1
+M00000011_IL_001a:
+newobj instance System.Collections.ArrayList<T0>::.ctor(Int32)
+M00000011_IL_001f:
+stfld System.Tasks.Promise<T0>::slot
+M00000011_IL_0024:
+ldarg 0
+M00000011_IL_0025:
+newobj instance System.Collections.ArrayList<System.Func<Void>>::.ctor()
+M00000011_IL_002a:
+stfld System.Tasks.Promise<T0>::callbacks
+M00000011_IL_002f:
+M00000011_IL_0030:
+ldarg 0
+M00000011_IL_0031:
+ldarg 0
+M00000011_IL_0032:
+newobj instance System.Tasks.Task<T0>::.ctor(System.Tasks.Promise<T0>)
+M00000011_IL_0037:
+stfld System.Tasks.Promise<T0>::task
+M00000011_IL_003c:
 ret
 .end
 .method instance get_Task() -> System.Tasks.Task<T0>
-M0000000f_IL_0000:
-M0000000f_IL_0001:
-M0000000f_IL_0002:
+M00000012_IL_0000:
+M00000012_IL_0001:
+M00000012_IL_0002:
 ldarg 0
-M0000000f_IL_0003:
+M00000012_IL_0003:
 ldfld System.Tasks.Promise<T0>::task
-M0000000f_IL_0008:
+M00000012_IL_0008:
 ret
 .end
 .method instance Complete(T0 value) -> Boolean
@@ -387,80 +520,80 @@ ldloca local0
 initobj System.Collections.ArrayList<System.Func<Void>>
 ldloca local2
 initobj System.Collections.Iterator<System.Func<Void>>
-M00000010_IL_0000:
-M00000010_IL_0001:
-M00000010_IL_0002:
+M00000013_IL_0000:
+M00000013_IL_0001:
+M00000013_IL_0002:
 ldarg 0
-M00000010_IL_0003:
+M00000013_IL_0003:
 callvirt instance System.Tasks.Promise<T0>::Completed()
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000010_IL_0008:
-brtrue M00000010_IL_0012
-M00000010_IL_000d:
-br M00000010_IL_0015
-M00000010_IL_0012:
-M00000010_IL_0013:
+M00000013_IL_0008:
+brtrue M00000013_IL_0012
+M00000013_IL_000d:
+br M00000013_IL_0015
+M00000013_IL_0012:
+M00000013_IL_0013:
 ldc.i4 0
-M00000010_IL_0014:
+M00000013_IL_0014:
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
 ret
-M00000010_IL_0015:
-M00000010_IL_0016:
-M00000010_IL_0017:
+M00000013_IL_0015:
+M00000013_IL_0016:
+M00000013_IL_0017:
 ldarg 0
-M00000010_IL_0018:
+M00000013_IL_0018:
 ldfld System.Tasks.Promise<T0>::slot
-M00000010_IL_001d:
+M00000013_IL_001d:
 ldarg 1
-M00000010_IL_001e:
+M00000013_IL_001e:
 callvirt instance System.Collections.ArrayList<T0>::Add(T0)
-M00000010_IL_0023:
-M00000010_IL_0024:
+M00000013_IL_0023:
+M00000013_IL_0024:
 ldarg 0
-M00000010_IL_0025:
+M00000013_IL_0025:
 ldfld System.Tasks.Promise<T0>::callbacks
-M00000010_IL_002a:
+M00000013_IL_002a:
 stloc local0
-M00000010_IL_002b:
+M00000013_IL_002b:
 ldarg 0
-M00000010_IL_002c:
+M00000013_IL_002c:
 newobj instance System.Collections.ArrayList<System.Func<Void>>::.ctor()
-M00000010_IL_0031:
+M00000013_IL_0031:
 stfld System.Tasks.Promise<T0>::callbacks
-M00000010_IL_0036:
-M00000010_IL_0037:
+M00000013_IL_0036:
+M00000013_IL_0037:
 ldloc local0
-M00000010_IL_0038:
+M00000013_IL_0038:
 callvirt instance System.Collections.Iterable<System.Func<Void>>::GetIterator()
-M00000010_IL_003d:
+M00000013_IL_003d:
 stloc local2
-M00000010_IL_003e:
+M00000013_IL_003e:
 ldloc local2
-M00000010_IL_003f:
+M00000013_IL_003f:
 callvirt instance System.Collections.Iterator<System.Func<Void>>::MoveNext()
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000010_IL_0044:
-brfalse M00000010_IL_0061
-M00000010_IL_0049:
+M00000013_IL_0044:
+brfalse M00000013_IL_0061
+M00000013_IL_0049:
 ldloc local2
-M00000010_IL_004a:
+M00000013_IL_004a:
 callvirt instance System.Collections.Iterator<System.Func<Void>>::get_Current()
-M00000010_IL_004f:
+M00000013_IL_004f:
 stloc local3
-M00000010_IL_0050:
+M00000013_IL_0050:
 ldarg 0
-M00000010_IL_0051:
+M00000013_IL_0051:
 ldfld System.Tasks.Promise<T0>::queue
-M00000010_IL_0056:
+M00000013_IL_0056:
 ldloc local3
-M00000010_IL_0057:
+M00000013_IL_0057:
 callvirt instance System.Tasks.TaskQueue::Post(System.Func<Void>)
-M00000010_IL_005c:
-br M00000010_IL_003e
-M00000010_IL_0061:
-M00000010_IL_0062:
+M00000013_IL_005c:
+br M00000013_IL_003e
+M00000013_IL_0061:
+M00000013_IL_0062:
 ldc.i4 1
-M00000010_IL_0063:
+M00000013_IL_0063:
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
 ret
 .end
@@ -473,224 +606,224 @@ ldloca local0
 initobj System.Collections.ArrayList<System.Func<Void>>
 ldloca local2
 initobj System.Collections.Iterator<System.Func<Void>>
-M00000011_IL_0000:
-M00000011_IL_0001:
-M00000011_IL_0002:
-ldarg 0
-M00000011_IL_0003:
-callvirt instance System.Tasks.Promise<T0>::Completed()
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000011_IL_0008:
-brtrue M00000011_IL_0012
-M00000011_IL_000d:
-br M00000011_IL_0015
-M00000011_IL_0012:
-M00000011_IL_0013:
-ldc.i4 0
-M00000011_IL_0014:
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
-ret
-M00000011_IL_0015:
-M00000011_IL_0016:
-M00000011_IL_0017:
-ldarg 0
-M00000011_IL_0018:
-ldc.i4 1
-M00000011_IL_0019:
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
-stfld System.Tasks.Promise<T0>::cancelled
-M00000011_IL_001e:
-M00000011_IL_001f:
-ldarg 0
-M00000011_IL_0020:
-ldfld System.Tasks.Promise<T0>::callbacks
-M00000011_IL_0025:
-stloc local0
-M00000011_IL_0026:
-ldarg 0
-M00000011_IL_0027:
-newobj instance System.Collections.ArrayList<System.Func<Void>>::.ctor()
-M00000011_IL_002c:
-stfld System.Tasks.Promise<T0>::callbacks
-M00000011_IL_0031:
-M00000011_IL_0032:
-ldloc local0
-M00000011_IL_0033:
-callvirt instance System.Collections.Iterable<System.Func<Void>>::GetIterator()
-M00000011_IL_0038:
-stloc local2
-M00000011_IL_0039:
-ldloc local2
-M00000011_IL_003a:
-callvirt instance System.Collections.Iterator<System.Func<Void>>::MoveNext()
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000011_IL_003f:
-brfalse M00000011_IL_005c
-M00000011_IL_0044:
-ldloc local2
-M00000011_IL_0045:
-callvirt instance System.Collections.Iterator<System.Func<Void>>::get_Current()
-M00000011_IL_004a:
-stloc local3
-M00000011_IL_004b:
-ldarg 0
-M00000011_IL_004c:
-ldfld System.Tasks.Promise<T0>::queue
-M00000011_IL_0051:
-ldloc local3
-M00000011_IL_0052:
-callvirt instance System.Tasks.TaskQueue::Post(System.Func<Void>)
-M00000011_IL_0057:
-br M00000011_IL_0039
-M00000011_IL_005c:
-M00000011_IL_005d:
-ldc.i4 1
-M00000011_IL_005e:
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method internal instance Dispatcher() -> System.Tasks.TaskQueue
-M00000012_IL_0000:
-M00000012_IL_0001:
-M00000012_IL_0002:
-ldarg 0
-M00000012_IL_0003:
-ldfld System.Tasks.Promise<T0>::queue
-M00000012_IL_0008:
-ret
-.end
-.method internal instance Cancelled() -> Boolean
-M00000013_IL_0000:
-M00000013_IL_0001:
-M00000013_IL_0002:
-ldarg 0
-M00000013_IL_0003:
-ldfld System.Tasks.Promise<T0>::cancelled
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000013_IL_0008:
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method internal instance Completed() -> Boolean
 M00000014_IL_0000:
 M00000014_IL_0001:
 M00000014_IL_0002:
 ldarg 0
 M00000014_IL_0003:
-ldfld System.Tasks.Promise<T0>::cancelled
+callvirt instance System.Tasks.Promise<T0>::Completed()
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
 M00000014_IL_0008:
-brtrue M00000014_IL_0023
+brtrue M00000014_IL_0012
 M00000014_IL_000d:
-ldarg 0
-M00000014_IL_000e:
-ldfld System.Tasks.Promise<T0>::slot
+br M00000014_IL_0015
+M00000014_IL_0012:
 M00000014_IL_0013:
-callvirt instance System.Collections.ArrayList<T0>::get_Count()
+ldc.i4 0
+M00000014_IL_0014:
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
+ret
+M00000014_IL_0015:
+M00000014_IL_0016:
+M00000014_IL_0017:
+ldarg 0
 M00000014_IL_0018:
-ldc.i4 0
-M00000014_IL_0019:
-ceq
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000014_IL_001b:
-ldc.i4 0
-M00000014_IL_001c:
-ceq
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000014_IL_001e:
-br M00000014_IL_0024
-M00000014_IL_0023:
 ldc.i4 1
-M00000014_IL_0024:
+M00000014_IL_0019:
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
+stfld System.Tasks.Promise<T0>::cancelled
+M00000014_IL_001e:
+M00000014_IL_001f:
+ldarg 0
+M00000014_IL_0020:
+ldfld System.Tasks.Promise<T0>::callbacks
+M00000014_IL_0025:
+stloc local0
+M00000014_IL_0026:
+ldarg 0
+M00000014_IL_0027:
+newobj instance System.Collections.ArrayList<System.Func<Void>>::.ctor()
+M00000014_IL_002c:
+stfld System.Tasks.Promise<T0>::callbacks
+M00000014_IL_0031:
+M00000014_IL_0032:
+ldloc local0
+M00000014_IL_0033:
+callvirt instance System.Collections.Iterable<System.Func<Void>>::GetIterator()
+M00000014_IL_0038:
+stloc local2
+M00000014_IL_0039:
+ldloc local2
+M00000014_IL_003a:
+callvirt instance System.Collections.Iterator<System.Func<Void>>::MoveNext()
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
+M00000014_IL_003f:
+brfalse M00000014_IL_005c
+M00000014_IL_0044:
+ldloc local2
+M00000014_IL_0045:
+callvirt instance System.Collections.Iterator<System.Func<Void>>::get_Current()
+M00000014_IL_004a:
+stloc local3
+M00000014_IL_004b:
+ldarg 0
+M00000014_IL_004c:
+ldfld System.Tasks.Promise<T0>::queue
+M00000014_IL_0051:
+ldloc local3
+M00000014_IL_0052:
+callvirt instance System.Tasks.TaskQueue::Post(System.Func<Void>)
+M00000014_IL_0057:
+br M00000014_IL_0039
+M00000014_IL_005c:
+M00000014_IL_005d:
+ldc.i4 1
+M00000014_IL_005e:
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method internal instance Read() -> T0
+.method internal instance Dispatcher() -> System.Tasks.TaskQueue
 M00000015_IL_0000:
 M00000015_IL_0001:
 M00000015_IL_0002:
 ldarg 0
 M00000015_IL_0003:
-ldfld System.Tasks.Promise<T0>::cancelled
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
+ldfld System.Tasks.Promise<T0>::queue
 M00000015_IL_0008:
-brtrue M00000015_IL_0012
-M00000015_IL_000d:
-br M00000015_IL_001d
-M00000015_IL_0012:
-M00000015_IL_0013:
-ldstr "Task is cancelled; consume its Outcome"
-M00000015_IL_0018:
-call System.Fault(String)
-M00000015_IL_001d:
-M00000015_IL_001e:
-M00000015_IL_001f:
-ldarg 0
-M00000015_IL_0020:
-callvirt instance System.Tasks.Promise<T0>::Completed()
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000015_IL_0025:
-ldc.i4 0
-M00000015_IL_0026:
-ceq
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000015_IL_0028:
-brtrue M00000015_IL_0032
-M00000015_IL_002d:
-br M00000015_IL_003d
-M00000015_IL_0032:
-M00000015_IL_0033:
-ldstr "Task is still pending"
-M00000015_IL_0038:
-call System.Fault(String)
-M00000015_IL_003d:
-M00000015_IL_003e:
-M00000015_IL_003f:
-ldarg 0
-M00000015_IL_0040:
-ldfld System.Tasks.Promise<T0>::slot
-M00000015_IL_0045:
-ldc.i4 0
-M00000015_IL_0046:
-callvirt instance System.Collections.ArrayList<T0>::get_Item(Int32)
-M00000015_IL_004b:
 ret
 .end
-.method internal instance Register(System.Func<Void> callback) -> noresult
+.method internal instance Cancelled() -> Boolean
 M00000016_IL_0000:
 M00000016_IL_0001:
 M00000016_IL_0002:
 ldarg 0
 M00000016_IL_0003:
-callvirt instance System.Tasks.Promise<T0>::Completed()
+ldfld System.Tasks.Promise<T0>::cancelled
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
 M00000016_IL_0008:
-brtrue M00000016_IL_0012
-M00000016_IL_000d:
-br M00000016_IL_0025
-M00000016_IL_0012:
-M00000016_IL_0013:
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method internal instance Completed() -> Boolean
+M00000017_IL_0000:
+M00000017_IL_0001:
+M00000017_IL_0002:
 ldarg 0
-M00000016_IL_0014:
+M00000017_IL_0003:
+ldfld System.Tasks.Promise<T0>::cancelled
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_0008:
+brtrue M00000017_IL_0023
+M00000017_IL_000d:
+ldarg 0
+M00000017_IL_000e:
+ldfld System.Tasks.Promise<T0>::slot
+M00000017_IL_0013:
+callvirt instance System.Collections.ArrayList<T0>::get_Count()
+M00000017_IL_0018:
+ldc.i4 0
+M00000017_IL_0019:
+ceq
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_001b:
+ldc.i4 0
+M00000017_IL_001c:
+ceq
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_001e:
+br M00000017_IL_0024
+M00000017_IL_0023:
+ldc.i4 1
+M00000017_IL_0024:
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method internal instance Read() -> T0
+M00000018_IL_0000:
+M00000018_IL_0001:
+M00000018_IL_0002:
+ldarg 0
+M00000018_IL_0003:
+ldfld System.Tasks.Promise<T0>::cancelled
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_0008:
+brtrue M00000018_IL_0012
+M00000018_IL_000d:
+br M00000018_IL_001d
+M00000018_IL_0012:
+M00000018_IL_0013:
+ldstr "Task is cancelled; consume its Outcome"
+M00000018_IL_0018:
+call System.Fault(String)
+M00000018_IL_001d:
+M00000018_IL_001e:
+M00000018_IL_001f:
+ldarg 0
+M00000018_IL_0020:
+callvirt instance System.Tasks.Promise<T0>::Completed()
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_0025:
+ldc.i4 0
+M00000018_IL_0026:
+ceq
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_0028:
+brtrue M00000018_IL_0032
+M00000018_IL_002d:
+br M00000018_IL_003d
+M00000018_IL_0032:
+M00000018_IL_0033:
+ldstr "Task is still pending"
+M00000018_IL_0038:
+call System.Fault(String)
+M00000018_IL_003d:
+M00000018_IL_003e:
+M00000018_IL_003f:
+ldarg 0
+M00000018_IL_0040:
+ldfld System.Tasks.Promise<T0>::slot
+M00000018_IL_0045:
+ldc.i4 0
+M00000018_IL_0046:
+callvirt instance System.Collections.ArrayList<T0>::get_Item(Int32)
+M00000018_IL_004b:
+ret
+.end
+.method internal instance Register(System.Func<Void> callback) -> noresult
+M00000019_IL_0000:
+M00000019_IL_0001:
+M00000019_IL_0002:
+ldarg 0
+M00000019_IL_0003:
+callvirt instance System.Tasks.Promise<T0>::Completed()
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
+M00000019_IL_0008:
+brtrue M00000019_IL_0012
+M00000019_IL_000d:
+br M00000019_IL_0025
+M00000019_IL_0012:
+M00000019_IL_0013:
+ldarg 0
+M00000019_IL_0014:
 ldfld System.Tasks.Promise<T0>::queue
-M00000016_IL_0019:
+M00000019_IL_0019:
 ldarg 1
-M00000016_IL_001a:
+M00000019_IL_001a:
 callvirt instance System.Tasks.TaskQueue::Post(System.Func<Void>)
-M00000016_IL_001f:
-br M00000016_IL_0032
-M00000016_IL_0025:
-M00000016_IL_0026:
+M00000019_IL_001f:
+br M00000019_IL_0032
+M00000019_IL_0025:
+M00000019_IL_0026:
 ldarg 0
-M00000016_IL_0027:
+M00000019_IL_0027:
 ldfld System.Tasks.Promise<T0>::callbacks
-M00000016_IL_002c:
+M00000019_IL_002c:
 ldarg 1
-M00000016_IL_002d:
+M00000019_IL_002d:
 callvirt instance System.Collections.ArrayList<System.Func<Void>>::Add(System.Func<Void>)
-M00000016_IL_0032:
-M00000016_IL_0033:
-M00000016_IL_0034:
+M00000019_IL_0032:
+M00000019_IL_0033:
+M00000019_IL_0034:
 ret
 .end
 .end
@@ -700,63 +833,34 @@ ret
 .get instance System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::get_Task()
 .end
 .method instance .ctor(System.Tasks.TaskQueue queue) -> noresult
-M00000017_IL_0000:
-M00000017_IL_0001:
+M0000001a_IL_0000:
+M0000001a_IL_0001:
 ldarg 0
-M00000017_IL_0002:
+M0000001a_IL_0002:
 pop
-M00000017_IL_0007:
-M00000017_IL_0008:
+M0000001a_IL_0007:
+M0000001a_IL_0008:
 ldarg 0
-M00000017_IL_0009:
+M0000001a_IL_0009:
 ldarg 1
-M00000017_IL_000a:
+M0000001a_IL_000a:
 newobj instance System.Tasks.Promise<T0>::.ctor(System.Tasks.TaskQueue)
-M00000017_IL_000f:
+M0000001a_IL_000f:
 stfld System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::source
-M00000017_IL_0014:
+M0000001a_IL_0014:
 ret
 .end
 .method static Create() -> System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>
-M00000018_IL_0000:
-M00000018_IL_0001:
-M00000018_IL_0002:
-call neoCLR.Runtime.CurrentTaskQueue()
-M00000018_IL_0007:
-newobj instance System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::.ctor(System.Tasks.TaskQueue)
-M00000018_IL_000c:
-ret
-.end
-.method instance get_Task() -> System.Tasks.Task<T0>
-M00000019_IL_0000:
-M00000019_IL_0001:
-M00000019_IL_0002:
-ldarg 0
-M00000019_IL_0003:
-ldfld System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::source
-M00000019_IL_0008:
-callvirt instance System.Tasks.Promise<T0>::get_Task()
-M00000019_IL_000d:
-ret
-.end
-.method instance Start(System.Runtime.CompilerServices.IAsyncStateMachine stateMachine) -> noresult
-M0000001a_IL_0000:
-M0000001a_IL_0001:
-M0000001a_IL_0002:
-ldarg 1
-M0000001a_IL_0003:
-callvirt instance System.Runtime.CompilerServices.IAsyncStateMachine::MoveNext()
-M0000001a_IL_0008:
-M0000001a_IL_0009:
-ret
-.end
-.method instance SetStateMachine(System.Runtime.CompilerServices.IAsyncStateMachine stateMachine) -> noresult
 M0000001b_IL_0000:
 M0000001b_IL_0001:
 M0000001b_IL_0002:
+call System.Tasks.TaskQueue::get_Current()
+M0000001b_IL_0007:
+newobj instance System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::.ctor(System.Tasks.TaskQueue)
+M0000001b_IL_000c:
 ret
 .end
-.method instance SetResult(T0 value) -> noresult
+.method instance get_Task() -> System.Tasks.Task<T0>
 M0000001c_IL_0000:
 M0000001c_IL_0001:
 M0000001c_IL_0002:
@@ -764,50 +868,79 @@ ldarg 0
 M0000001c_IL_0003:
 ldfld System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::source
 M0000001c_IL_0008:
-ldarg 1
-M0000001c_IL_0009:
-callvirt instance System.Tasks.Promise<T0>::Complete(T0)
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M0000001c_IL_000e:
-pop
-M0000001c_IL_000f:
-M0000001c_IL_0010:
+callvirt instance System.Tasks.Promise<T0>::get_Task()
+M0000001c_IL_000d:
 ret
 .end
-.method instance SetCancelled() -> noresult
+.method instance Start(System.Runtime.CompilerServices.IAsyncStateMachine stateMachine) -> noresult
 M0000001d_IL_0000:
 M0000001d_IL_0001:
 M0000001d_IL_0002:
-ldarg 0
+ldarg 1
 M0000001d_IL_0003:
-ldfld System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::source
+callvirt instance System.Runtime.CompilerServices.IAsyncStateMachine::MoveNext()
 M0000001d_IL_0008:
-callvirt instance System.Tasks.Promise<T0>::Cancel()
-call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M0000001d_IL_000d:
-pop
-M0000001d_IL_000e:
-M0000001d_IL_000f:
+M0000001d_IL_0009:
 ret
 .end
-.method instance AwaitOnCompleted(System.Runtime.CompilerServices.ITaskAwaiter awaiter,System.Runtime.CompilerServices.IAsyncStateMachine stateMachine) -> noresult
+.method instance SetStateMachine(System.Runtime.CompilerServices.IAsyncStateMachine stateMachine) -> noresult
 M0000001e_IL_0000:
 M0000001e_IL_0001:
 M0000001e_IL_0002:
+ret
+.end
+.method instance SetResult(T0 value) -> noresult
+M0000001f_IL_0000:
+M0000001f_IL_0001:
+M0000001f_IL_0002:
+ldarg 0
+M0000001f_IL_0003:
+ldfld System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::source
+M0000001f_IL_0008:
 ldarg 1
-M0000001e_IL_0003:
+M0000001f_IL_0009:
+callvirt instance System.Tasks.Promise<T0>::Complete(T0)
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
+M0000001f_IL_000e:
+pop
+M0000001f_IL_000f:
+M0000001f_IL_0010:
+ret
+.end
+.method instance SetCancelled() -> noresult
+M00000020_IL_0000:
+M00000020_IL_0001:
+M00000020_IL_0002:
+ldarg 0
+M00000020_IL_0003:
+ldfld System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::source
+M00000020_IL_0008:
+callvirt instance System.Tasks.Promise<T0>::Cancel()
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
+M00000020_IL_000d:
+pop
+M00000020_IL_000e:
+M00000020_IL_000f:
+ret
+.end
+.method instance AwaitOnCompleted(System.Runtime.CompilerServices.ITaskAwaiter awaiter,System.Runtime.CompilerServices.IAsyncStateMachine stateMachine) -> noresult
+M00000021_IL_0000:
+M00000021_IL_0001:
+M00000021_IL_0002:
+ldarg 1
+M00000021_IL_0003:
 ldarg 2
-M0000001e_IL_0004:
+M00000021_IL_0004:
 dup
-M0000001e_IL_0005:
+M00000021_IL_0005:
 call neoCLR.Library.System.Tasks.Task.CheckDelegateReceiver_Application_V1_T_343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331383A494173796E6353746174654D616368696E65(System.Runtime.CompilerServices.IAsyncStateMachine)
-M0000001e_IL_000b:
+M00000021_IL_000b:
 newobj Application.DelegateTarget_Application_V1_M_363A6D6574686F643133333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331383A494173796E6353746174654D616368696E65383A4D6F76654E657874343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303AVirtual
 delegate.bind System.Func<Void> = instance Application.DelegateTarget_Application_V1_M_363A6D6574686F643133333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331383A494173796E6353746174654D616368696E65383A4D6F76654E657874343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303AVirtual::DelegateTarget_Application_V1_M_363A6D6574686F643133333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C33313A53797374656D2E52756E74696D652E436F6D70696C6572536572766963657331383A494173796E6353746174654D616368696E65383A4D6F76654E657874343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303AVirtual()
-M0000001e_IL_0010:
+M00000021_IL_0010:
 callvirt instance System.Runtime.CompilerServices.ITaskAwaiter::OnCompleted(System.Func<Void>)
-M0000001e_IL_0015:
-M0000001e_IL_0016:
+M00000021_IL_0015:
+M00000021_IL_0016:
 ret
 .end
 .end
@@ -826,33 +959,33 @@ ret
 .field private output System.Tasks.Promise<T1>
 .field private transform System.Func<T0,T1>
 .method instance .ctor(System.Tasks.Task<T0> input,System.Tasks.Promise<T1> output,System.Func<T0,T1> transform) -> noresult
-M00000021_IL_0000:
-M00000021_IL_0001:
+M00000024_IL_0000:
+M00000024_IL_0001:
 ldarg 0
-M00000021_IL_0002:
+M00000024_IL_0002:
 pop
-M00000021_IL_0007:
-M00000021_IL_0008:
+M00000024_IL_0007:
+M00000024_IL_0008:
 ldarg 0
-M00000021_IL_0009:
+M00000024_IL_0009:
 ldarg 1
-M00000021_IL_000a:
+M00000024_IL_000a:
 stfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4D6170436F6E74696E756174696F6E6032<T0,T1>::input
-M00000021_IL_000f:
-M00000021_IL_0010:
+M00000024_IL_000f:
+M00000024_IL_0010:
 ldarg 0
-M00000021_IL_0011:
+M00000024_IL_0011:
 ldarg 2
-M00000021_IL_0012:
+M00000024_IL_0012:
 stfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4D6170436F6E74696E756174696F6E6032<T0,T1>::output
-M00000021_IL_0017:
-M00000021_IL_0018:
+M00000024_IL_0017:
+M00000024_IL_0018:
 ldarg 0
-M00000021_IL_0019:
+M00000024_IL_0019:
 ldarg 3
-M00000021_IL_001a:
+M00000024_IL_001a:
 stfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4D6170436F6E74696E756174696F6E6032<T0,T1>::transform
-M00000021_IL_001f:
+M00000024_IL_001f:
 ret
 .end
 .method instance Run() -> noresult
@@ -873,169 +1006,169 @@ ret
 .local System.Tasks.TaskOutcome.Cancelled local14
 ldloca local14
 initobj System.Tasks.TaskOutcome.Cancelled
-M00000022_IL_0000:
-M00000022_IL_0001:
-M00000022_IL_0002:
+M00000025_IL_0000:
+M00000025_IL_0001:
+M00000025_IL_0002:
 ldarg 0
-M00000022_IL_0003:
+M00000025_IL_0003:
 ldfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4D6170436F6E74696E756174696F6E6032<T0,T1>::input
-M00000022_IL_0008:
+M00000025_IL_0008:
 callvirt instance System.Tasks.Task<T0>::get_Outcome()
-M00000022_IL_000d:
+M00000025_IL_000d:
 stloc local1
-M00000022_IL_000e:
+M00000025_IL_000e:
 ldloca local1
-M00000022_IL_0010:
+M00000025_IL_0010:
 ldloca local2
-M00000022_IL_0012:
+M00000025_IL_0012:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion8<T0>(System.Option<System.Tasks.TaskOutcome<T0>>&,System.Option.Some<System.Tasks.TaskOutcome<T0>>&)
-M00000022_IL_0017:
-brfalse M00000022_IL_0079
-M00000022_IL_001c:
+M00000025_IL_0017:
+brfalse M00000025_IL_0079
+M00000025_IL_001c:
 ldloc local2
-M00000022_IL_001d:
+M00000025_IL_001d:
 stloc local3
-M00000022_IL_001e:
+M00000025_IL_001e:
 ldloca local3
-M00000022_IL_0020:
+M00000025_IL_0020:
 ldloca local4
-M00000022_IL_0022:
+M00000025_IL_0022:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion9<T0>(System.Option.Some<System.Tasks.TaskOutcome<T0>>&,System.Tasks.TaskOutcome<T0>&)
-M00000022_IL_0027:
+M00000025_IL_0027:
 ldloc local4
-M00000022_IL_0029:
+M00000025_IL_0029:
 stloc local5
-M00000022_IL_002b:
+M00000025_IL_002b:
 ldloca local5
-M00000022_IL_002d:
+M00000025_IL_002d:
 ldloca local6
-M00000022_IL_002f:
+M00000025_IL_002f:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion10<T0>(System.Tasks.TaskOutcome<T0>&,System.Tasks.TaskOutcome.Completed<T0>&)
-M00000022_IL_0034:
-brfalse M00000022_IL_0079
-M00000022_IL_0039:
+M00000025_IL_0034:
+brfalse M00000025_IL_0079
+M00000025_IL_0039:
 ldloc local6
-M00000022_IL_003b:
+M00000025_IL_003b:
 stloc local7
-M00000022_IL_003d:
+M00000025_IL_003d:
 ldloca local7
-M00000022_IL_003f:
+M00000025_IL_003f:
 ldloca local8
-M00000022_IL_0041:
+M00000025_IL_0041:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion11<T0>(System.Tasks.TaskOutcome.Completed<T0>&,T0&)
-M00000022_IL_0046:
+M00000025_IL_0046:
 ldloc local8
-M00000022_IL_0048:
+M00000025_IL_0048:
 stloc local0
-M00000022_IL_0049:
+M00000025_IL_0049:
 ldc.i4 1
-M00000022_IL_004a:
-br M00000022_IL_0050
-M00000022_IL_0050:
-brfalse M00000022_IL_0079
-M00000022_IL_0055:
-M00000022_IL_0056:
-br M00000022_IL_0061
-M00000022_IL_0061:
-M00000022_IL_0062:
-br M00000022_IL_006d
-M00000022_IL_006d:
-M00000022_IL_006e:
-br M00000022_IL_007e
-M00000022_IL_0079:
-br M00000022_IL_009d
-M00000022_IL_007e:
-M00000022_IL_007f:
+M00000025_IL_004a:
+br M00000025_IL_0050
+M00000025_IL_0050:
+brfalse M00000025_IL_0079
+M00000025_IL_0055:
+M00000025_IL_0056:
+br M00000025_IL_0061
+M00000025_IL_0061:
+M00000025_IL_0062:
+br M00000025_IL_006d
+M00000025_IL_006d:
+M00000025_IL_006e:
+br M00000025_IL_007e
+M00000025_IL_0079:
+br M00000025_IL_009d
+M00000025_IL_007e:
+M00000025_IL_007f:
 ldarg 0
-M00000022_IL_0080:
+M00000025_IL_0080:
 ldfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4D6170436F6E74696E756174696F6E6032<T0,T1>::output
-M00000022_IL_0085:
+M00000025_IL_0085:
 ldarg 0
-M00000022_IL_0086:
+M00000025_IL_0086:
 ldfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4D6170436F6E74696E756174696F6E6032<T0,T1>::transform
-M00000022_IL_008b:
+M00000025_IL_008b:
 ldloc local0
-M00000022_IL_008c:
+M00000025_IL_008c:
 callvirt instance System.Func<T0,T1>::Invoke(T0)
-M00000022_IL_0091:
+M00000025_IL_0091:
 callvirt instance System.Tasks.Promise<T1>::Complete(T1)
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_0096:
+M00000025_IL_0096:
 pop
-M00000022_IL_0097:
-br M00000022_IL_0120
-M00000022_IL_009d:
-M00000022_IL_009e:
-M00000022_IL_009f:
+M00000025_IL_0097:
+br M00000025_IL_0120
+M00000025_IL_009d:
+M00000025_IL_009e:
+M00000025_IL_009f:
 ldarg 0
-M00000022_IL_00a0:
+M00000025_IL_00a0:
 ldfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4D6170436F6E74696E756174696F6E6032<T0,T1>::input
-M00000022_IL_00a5:
+M00000025_IL_00a5:
 callvirt instance System.Tasks.Task<T0>::get_Outcome()
-M00000022_IL_00aa:
+M00000025_IL_00aa:
 stloc local9
-M00000022_IL_00ac:
+M00000025_IL_00ac:
 ldloca local9
-M00000022_IL_00ae:
+M00000025_IL_00ae:
 ldloca local10
-M00000022_IL_00b0:
+M00000025_IL_00b0:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion8<T0>(System.Option<System.Tasks.TaskOutcome<T0>>&,System.Option.Some<System.Tasks.TaskOutcome<T0>>&)
-M00000022_IL_00b5:
-brfalse M00000022_IL_00fd
-M00000022_IL_00ba:
+M00000025_IL_00b5:
+brfalse M00000025_IL_00fd
+M00000025_IL_00ba:
 ldloc local10
-M00000022_IL_00bc:
+M00000025_IL_00bc:
 stloc local11
-M00000022_IL_00be:
+M00000025_IL_00be:
 ldloca local11
-M00000022_IL_00c0:
+M00000025_IL_00c0:
 ldloca local12
-M00000022_IL_00c2:
+M00000025_IL_00c2:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion9<T0>(System.Option.Some<System.Tasks.TaskOutcome<T0>>&,System.Tasks.TaskOutcome<T0>&)
-M00000022_IL_00c7:
+M00000025_IL_00c7:
 ldloc local12
-M00000022_IL_00c9:
+M00000025_IL_00c9:
 stloc local13
-M00000022_IL_00cb:
+M00000025_IL_00cb:
 ldloca local13
-M00000022_IL_00cd:
+M00000025_IL_00cd:
 ldloca local14
-M00000022_IL_00cf:
+M00000025_IL_00cf:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion12<T0>(System.Tasks.TaskOutcome<T0>&,System.Tasks.TaskOutcome.Cancelled&)
-M00000022_IL_00d4:
-brfalse M00000022_IL_00fd
-M00000022_IL_00d9:
-M00000022_IL_00da:
-br M00000022_IL_00e5
-M00000022_IL_00e5:
-M00000022_IL_00e6:
-br M00000022_IL_00f1
-M00000022_IL_00f1:
-M00000022_IL_00f2:
-br M00000022_IL_0102
-M00000022_IL_00fd:
-br M00000022_IL_0114
-M00000022_IL_0102:
-M00000022_IL_0103:
+M00000025_IL_00d4:
+brfalse M00000025_IL_00fd
+M00000025_IL_00d9:
+M00000025_IL_00da:
+br M00000025_IL_00e5
+M00000025_IL_00e5:
+M00000025_IL_00e6:
+br M00000025_IL_00f1
+M00000025_IL_00f1:
+M00000025_IL_00f2:
+br M00000025_IL_0102
+M00000025_IL_00fd:
+br M00000025_IL_0114
+M00000025_IL_0102:
+M00000025_IL_0103:
 ldarg 0
-M00000022_IL_0104:
+M00000025_IL_0104:
 ldfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4D6170436F6E74696E756174696F6E6032<T0,T1>::output
-M00000022_IL_0109:
+M00000025_IL_0109:
 callvirt instance System.Tasks.Promise<T1>::Cancel()
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_010e:
+M00000025_IL_010e:
 pop
-M00000022_IL_010f:
-br M00000022_IL_011f
-M00000022_IL_0114:
-M00000022_IL_0115:
+M00000025_IL_010f:
+br M00000025_IL_011f
+M00000025_IL_0114:
+M00000025_IL_0115:
 ldstr "Task continuation ran while pending"
-M00000022_IL_011a:
+M00000025_IL_011a:
 call System.Fault(String)
-M00000022_IL_011f:
-M00000022_IL_0120:
-M00000022_IL_0121:
-M00000022_IL_0122:
+M00000025_IL_011f:
+M00000025_IL_0120:
+M00000025_IL_0121:
+M00000025_IL_0122:
 ret
 .end
 .method instance DelegateTarget_Application_V1_M_363A6D6574686F643131333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31323A53797374656D2E5461736B7331373A4D6170436F6E74696E756174696F6E6032333A52756E343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect() -> Void
@@ -1050,33 +1183,33 @@ ret
 .field private output System.Tasks.Promise<T1>
 .field private continuation System.Func<T0,System.Tasks.Task<T1>>
 .method instance .ctor(System.Tasks.Task<T0> input,System.Tasks.Promise<T1> output,System.Func<T0,System.Tasks.Task<T1>> continuation) -> noresult
-M00000023_IL_0000:
-M00000023_IL_0001:
+M00000026_IL_0000:
+M00000026_IL_0001:
 ldarg 0
-M00000023_IL_0002:
+M00000026_IL_0002:
 pop
-M00000023_IL_0007:
-M00000023_IL_0008:
+M00000026_IL_0007:
+M00000026_IL_0008:
 ldarg 0
-M00000023_IL_0009:
+M00000026_IL_0009:
 ldarg 1
-M00000023_IL_000a:
+M00000026_IL_000a:
 stfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E5468656E436F6E74696E756174696F6E6032<T0,T1>::input
-M00000023_IL_000f:
-M00000023_IL_0010:
+M00000026_IL_000f:
+M00000026_IL_0010:
 ldarg 0
-M00000023_IL_0011:
+M00000026_IL_0011:
 ldarg 2
-M00000023_IL_0012:
+M00000026_IL_0012:
 stfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E5468656E436F6E74696E756174696F6E6032<T0,T1>::output
-M00000023_IL_0017:
-M00000023_IL_0018:
+M00000026_IL_0017:
+M00000026_IL_0018:
 ldarg 0
-M00000023_IL_0019:
+M00000026_IL_0019:
 ldarg 3
-M00000023_IL_001a:
+M00000026_IL_001a:
 stfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E5468656E436F6E74696E756174696F6E6032<T0,T1>::continuation
-M00000023_IL_001f:
+M00000026_IL_001f:
 ret
 .end
 .method instance Run() -> noresult
@@ -1103,183 +1236,183 @@ ldloca local2
 initobj neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4F7574636F6D655472616E736665726031<T1>
 ldloca local16
 initobj System.Tasks.TaskOutcome.Cancelled
-M00000024_IL_0000:
-M00000024_IL_0001:
-M00000024_IL_0002:
+M00000027_IL_0000:
+M00000027_IL_0001:
+M00000027_IL_0002:
 ldarg 0
-M00000024_IL_0003:
+M00000027_IL_0003:
 ldfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E5468656E436F6E74696E756174696F6E6032<T0,T1>::input
-M00000024_IL_0008:
+M00000027_IL_0008:
 callvirt instance System.Tasks.Task<T0>::get_Outcome()
-M00000024_IL_000d:
+M00000027_IL_000d:
 stloc local3
-M00000024_IL_000e:
+M00000027_IL_000e:
 ldloca local3
-M00000024_IL_0010:
+M00000027_IL_0010:
 ldloca local4
-M00000024_IL_0012:
+M00000027_IL_0012:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion8<T0>(System.Option<System.Tasks.TaskOutcome<T0>>&,System.Option.Some<System.Tasks.TaskOutcome<T0>>&)
-M00000024_IL_0017:
-brfalse M00000024_IL_007b
-M00000024_IL_001c:
+M00000027_IL_0017:
+brfalse M00000027_IL_007b
+M00000027_IL_001c:
 ldloc local4
-M00000024_IL_001e:
+M00000027_IL_001e:
 stloc local5
-M00000024_IL_0020:
+M00000027_IL_0020:
 ldloca local5
-M00000024_IL_0022:
+M00000027_IL_0022:
 ldloca local6
-M00000024_IL_0024:
+M00000027_IL_0024:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion9<T0>(System.Option.Some<System.Tasks.TaskOutcome<T0>>&,System.Tasks.TaskOutcome<T0>&)
-M00000024_IL_0029:
+M00000027_IL_0029:
 ldloc local6
-M00000024_IL_002b:
+M00000027_IL_002b:
 stloc local7
-M00000024_IL_002d:
+M00000027_IL_002d:
 ldloca local7
-M00000024_IL_002f:
+M00000027_IL_002f:
 ldloca local8
-M00000024_IL_0031:
+M00000027_IL_0031:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion10<T0>(System.Tasks.TaskOutcome<T0>&,System.Tasks.TaskOutcome.Completed<T0>&)
-M00000024_IL_0036:
-brfalse M00000024_IL_007b
-M00000024_IL_003b:
+M00000027_IL_0036:
+brfalse M00000027_IL_007b
+M00000027_IL_003b:
 ldloc local8
-M00000024_IL_003d:
+M00000027_IL_003d:
 stloc local9
-M00000024_IL_003f:
+M00000027_IL_003f:
 ldloca local9
-M00000024_IL_0041:
+M00000027_IL_0041:
 ldloca local10
-M00000024_IL_0043:
+M00000027_IL_0043:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion11<T0>(System.Tasks.TaskOutcome.Completed<T0>&,T0&)
-M00000024_IL_0048:
+M00000027_IL_0048:
 ldloc local10
-M00000024_IL_004a:
+M00000027_IL_004a:
 stloc local0
-M00000024_IL_004b:
+M00000027_IL_004b:
 ldc.i4 1
-M00000024_IL_004c:
-br M00000024_IL_0052
-M00000024_IL_0052:
-brfalse M00000024_IL_007b
-M00000024_IL_0057:
-M00000024_IL_0058:
-br M00000024_IL_0063
-M00000024_IL_0063:
-M00000024_IL_0064:
-br M00000024_IL_006f
-M00000024_IL_006f:
-M00000024_IL_0070:
-br M00000024_IL_0080
-M00000024_IL_007b:
-br M00000024_IL_00b5
-M00000024_IL_0080:
-M00000024_IL_0081:
+M00000027_IL_004c:
+br M00000027_IL_0052
+M00000027_IL_0052:
+brfalse M00000027_IL_007b
+M00000027_IL_0057:
+M00000027_IL_0058:
+br M00000027_IL_0063
+M00000027_IL_0063:
+M00000027_IL_0064:
+br M00000027_IL_006f
+M00000027_IL_006f:
+M00000027_IL_0070:
+br M00000027_IL_0080
+M00000027_IL_007b:
+br M00000027_IL_00b5
+M00000027_IL_0080:
+M00000027_IL_0081:
 ldarg 0
-M00000024_IL_0082:
+M00000027_IL_0082:
 ldfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E5468656E436F6E74696E756174696F6E6032<T0,T1>::continuation
-M00000024_IL_0087:
+M00000027_IL_0087:
 ldloc local0
-M00000024_IL_0088:
+M00000027_IL_0088:
 callvirt instance System.Func<T0,System.Tasks.Task<T1>>::Invoke(T0)
-M00000024_IL_008d:
+M00000027_IL_008d:
 stloc local1
-M00000024_IL_008e:
-M00000024_IL_008f:
+M00000027_IL_008e:
+M00000027_IL_008f:
 ldloc local1
-M00000024_IL_0090:
+M00000027_IL_0090:
 ldarg 0
-M00000024_IL_0091:
+M00000027_IL_0091:
 ldfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E5468656E436F6E74696E756174696F6E6032<T0,T1>::output
-M00000024_IL_0096:
+M00000027_IL_0096:
 newobj instance neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4F7574636F6D655472616E736665726031<T1>::.ctor(System.Tasks.Task<T1>,System.Tasks.Promise<T1>)
-M00000024_IL_009b:
+M00000027_IL_009b:
 stloc local2
-M00000024_IL_009c:
-M00000024_IL_009d:
+M00000027_IL_009c:
+M00000027_IL_009d:
 ldloc local1
-M00000024_IL_009e:
+M00000027_IL_009e:
 ldloc local2
-M00000024_IL_009f:
-M00000024_IL_00a5:
+M00000027_IL_009f:
+M00000027_IL_00a5:
 delegate.bind System.Func<Void> = instance neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4F7574636F6D655472616E736665726031<T1>::DelegateTarget_Application_V1_M_363A6D6574686F643131333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31323A53797374656D2E5461736B7331373A4F7574636F6D655472616E736665726031333A52756E343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
-M00000024_IL_00aa:
+M00000027_IL_00aa:
 callvirt instance System.Tasks.Task<T1>::OnCompleted(System.Func<Void>)
-M00000024_IL_00af:
-br M00000024_IL_0138
-M00000024_IL_00b5:
-M00000024_IL_00b6:
-M00000024_IL_00b7:
+M00000027_IL_00af:
+br M00000027_IL_0138
+M00000027_IL_00b5:
+M00000027_IL_00b6:
+M00000027_IL_00b7:
 ldarg 0
-M00000024_IL_00b8:
+M00000027_IL_00b8:
 ldfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E5468656E436F6E74696E756174696F6E6032<T0,T1>::input
-M00000024_IL_00bd:
+M00000027_IL_00bd:
 callvirt instance System.Tasks.Task<T0>::get_Outcome()
-M00000024_IL_00c2:
+M00000027_IL_00c2:
 stloc local11
-M00000024_IL_00c4:
+M00000027_IL_00c4:
 ldloca local11
-M00000024_IL_00c6:
+M00000027_IL_00c6:
 ldloca local12
-M00000024_IL_00c8:
+M00000027_IL_00c8:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion8<T0>(System.Option<System.Tasks.TaskOutcome<T0>>&,System.Option.Some<System.Tasks.TaskOutcome<T0>>&)
-M00000024_IL_00cd:
-brfalse M00000024_IL_0115
-M00000024_IL_00d2:
+M00000027_IL_00cd:
+brfalse M00000027_IL_0115
+M00000027_IL_00d2:
 ldloc local12
-M00000024_IL_00d4:
+M00000027_IL_00d4:
 stloc local13
-M00000024_IL_00d6:
+M00000027_IL_00d6:
 ldloca local13
-M00000024_IL_00d8:
+M00000027_IL_00d8:
 ldloca local14
-M00000024_IL_00da:
+M00000027_IL_00da:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion9<T0>(System.Option.Some<System.Tasks.TaskOutcome<T0>>&,System.Tasks.TaskOutcome<T0>&)
-M00000024_IL_00df:
+M00000027_IL_00df:
 ldloc local14
-M00000024_IL_00e1:
+M00000027_IL_00e1:
 stloc local15
-M00000024_IL_00e3:
+M00000027_IL_00e3:
 ldloca local15
-M00000024_IL_00e5:
+M00000027_IL_00e5:
 ldloca local16
-M00000024_IL_00e7:
+M00000027_IL_00e7:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion12<T0>(System.Tasks.TaskOutcome<T0>&,System.Tasks.TaskOutcome.Cancelled&)
-M00000024_IL_00ec:
-brfalse M00000024_IL_0115
-M00000024_IL_00f1:
-M00000024_IL_00f2:
-br M00000024_IL_00fd
-M00000024_IL_00fd:
-M00000024_IL_00fe:
-br M00000024_IL_0109
-M00000024_IL_0109:
-M00000024_IL_010a:
-br M00000024_IL_011a
-M00000024_IL_0115:
-br M00000024_IL_012c
-M00000024_IL_011a:
-M00000024_IL_011b:
+M00000027_IL_00ec:
+brfalse M00000027_IL_0115
+M00000027_IL_00f1:
+M00000027_IL_00f2:
+br M00000027_IL_00fd
+M00000027_IL_00fd:
+M00000027_IL_00fe:
+br M00000027_IL_0109
+M00000027_IL_0109:
+M00000027_IL_010a:
+br M00000027_IL_011a
+M00000027_IL_0115:
+br M00000027_IL_012c
+M00000027_IL_011a:
+M00000027_IL_011b:
 ldarg 0
-M00000024_IL_011c:
+M00000027_IL_011c:
 ldfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E5468656E436F6E74696E756174696F6E6032<T0,T1>::output
-M00000024_IL_0121:
+M00000027_IL_0121:
 callvirt instance System.Tasks.Promise<T1>::Cancel()
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000024_IL_0126:
+M00000027_IL_0126:
 pop
-M00000024_IL_0127:
-br M00000024_IL_0137
-M00000024_IL_012c:
-M00000024_IL_012d:
+M00000027_IL_0127:
+br M00000027_IL_0137
+M00000027_IL_012c:
+M00000027_IL_012d:
 ldstr "Task continuation ran while pending"
-M00000024_IL_0132:
+M00000027_IL_0132:
 call System.Fault(String)
-M00000024_IL_0137:
-M00000024_IL_0138:
-M00000024_IL_0139:
-M00000024_IL_013a:
+M00000027_IL_0137:
+M00000027_IL_0138:
+M00000027_IL_0139:
+M00000027_IL_013a:
 ret
 .end
 .method instance DelegateTarget_Application_V1_M_363A6D6574686F643131343A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31323A53797374656D2E5461736B7331383A5468656E436F6E74696E756174696F6E6032333A52756E343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect() -> Void
@@ -1293,26 +1426,26 @@ ret
 .field private input System.Tasks.Task<T0>
 .field private output System.Tasks.Promise<T0>
 .method instance .ctor(System.Tasks.Task<T0> input,System.Tasks.Promise<T0> output) -> noresult
-M00000025_IL_0000:
-M00000025_IL_0001:
+M00000028_IL_0000:
+M00000028_IL_0001:
 ldarg 0
-M00000025_IL_0002:
+M00000028_IL_0002:
 pop
-M00000025_IL_0007:
-M00000025_IL_0008:
+M00000028_IL_0007:
+M00000028_IL_0008:
 ldarg 0
-M00000025_IL_0009:
+M00000028_IL_0009:
 ldarg 1
-M00000025_IL_000a:
+M00000028_IL_000a:
 stfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4F7574636F6D655472616E736665726031<T0>::input
-M00000025_IL_000f:
-M00000025_IL_0010:
+M00000028_IL_000f:
+M00000028_IL_0010:
 ldarg 0
-M00000025_IL_0011:
+M00000028_IL_0011:
 ldarg 2
-M00000025_IL_0012:
+M00000028_IL_0012:
 stfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4F7574636F6D655472616E736665726031<T0>::output
-M00000025_IL_0017:
+M00000028_IL_0017:
 ret
 .end
 .method instance Run() -> noresult
@@ -1333,163 +1466,163 @@ ret
 .local System.Tasks.TaskOutcome.Cancelled local14
 ldloca local14
 initobj System.Tasks.TaskOutcome.Cancelled
-M00000026_IL_0000:
-M00000026_IL_0001:
-M00000026_IL_0002:
+M00000029_IL_0000:
+M00000029_IL_0001:
+M00000029_IL_0002:
 ldarg 0
-M00000026_IL_0003:
+M00000029_IL_0003:
 ldfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4F7574636F6D655472616E736665726031<T0>::input
-M00000026_IL_0008:
+M00000029_IL_0008:
 callvirt instance System.Tasks.Task<T0>::get_Outcome()
-M00000026_IL_000d:
+M00000029_IL_000d:
 stloc local1
-M00000026_IL_000e:
+M00000029_IL_000e:
 ldloca local1
-M00000026_IL_0010:
+M00000029_IL_0010:
 ldloca local2
-M00000026_IL_0012:
+M00000029_IL_0012:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion8<T0>(System.Option<System.Tasks.TaskOutcome<T0>>&,System.Option.Some<System.Tasks.TaskOutcome<T0>>&)
-M00000026_IL_0017:
-brfalse M00000026_IL_0079
-M00000026_IL_001c:
+M00000029_IL_0017:
+brfalse M00000029_IL_0079
+M00000029_IL_001c:
 ldloc local2
-M00000026_IL_001d:
+M00000029_IL_001d:
 stloc local3
-M00000026_IL_001e:
+M00000029_IL_001e:
 ldloca local3
-M00000026_IL_0020:
+M00000029_IL_0020:
 ldloca local4
-M00000026_IL_0022:
+M00000029_IL_0022:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion9<T0>(System.Option.Some<System.Tasks.TaskOutcome<T0>>&,System.Tasks.TaskOutcome<T0>&)
-M00000026_IL_0027:
+M00000029_IL_0027:
 ldloc local4
-M00000026_IL_0029:
+M00000029_IL_0029:
 stloc local5
-M00000026_IL_002b:
+M00000029_IL_002b:
 ldloca local5
-M00000026_IL_002d:
+M00000029_IL_002d:
 ldloca local6
-M00000026_IL_002f:
+M00000029_IL_002f:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion10<T0>(System.Tasks.TaskOutcome<T0>&,System.Tasks.TaskOutcome.Completed<T0>&)
-M00000026_IL_0034:
-brfalse M00000026_IL_0079
-M00000026_IL_0039:
+M00000029_IL_0034:
+brfalse M00000029_IL_0079
+M00000029_IL_0039:
 ldloc local6
-M00000026_IL_003b:
+M00000029_IL_003b:
 stloc local7
-M00000026_IL_003d:
+M00000029_IL_003d:
 ldloca local7
-M00000026_IL_003f:
+M00000029_IL_003f:
 ldloca local8
-M00000026_IL_0041:
+M00000029_IL_0041:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion11<T0>(System.Tasks.TaskOutcome.Completed<T0>&,T0&)
-M00000026_IL_0046:
+M00000029_IL_0046:
 ldloc local8
-M00000026_IL_0048:
+M00000029_IL_0048:
 stloc local0
-M00000026_IL_0049:
+M00000029_IL_0049:
 ldc.i4 1
-M00000026_IL_004a:
-br M00000026_IL_0050
-M00000026_IL_0050:
-brfalse M00000026_IL_0079
-M00000026_IL_0055:
-M00000026_IL_0056:
-br M00000026_IL_0061
-M00000026_IL_0061:
-M00000026_IL_0062:
-br M00000026_IL_006d
-M00000026_IL_006d:
-M00000026_IL_006e:
-br M00000026_IL_007e
-M00000026_IL_0079:
-br M00000026_IL_0092
-M00000026_IL_007e:
-M00000026_IL_007f:
+M00000029_IL_004a:
+br M00000029_IL_0050
+M00000029_IL_0050:
+brfalse M00000029_IL_0079
+M00000029_IL_0055:
+M00000029_IL_0056:
+br M00000029_IL_0061
+M00000029_IL_0061:
+M00000029_IL_0062:
+br M00000029_IL_006d
+M00000029_IL_006d:
+M00000029_IL_006e:
+br M00000029_IL_007e
+M00000029_IL_0079:
+br M00000029_IL_0092
+M00000029_IL_007e:
+M00000029_IL_007f:
 ldarg 0
-M00000026_IL_0080:
+M00000029_IL_0080:
 ldfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4F7574636F6D655472616E736665726031<T0>::output
-M00000026_IL_0085:
+M00000029_IL_0085:
 ldloc local0
-M00000026_IL_0086:
+M00000029_IL_0086:
 callvirt instance System.Tasks.Promise<T0>::Complete(T0)
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000026_IL_008b:
+M00000029_IL_008b:
 pop
-M00000026_IL_008c:
-br M00000026_IL_0115
-M00000026_IL_0092:
-M00000026_IL_0093:
-M00000026_IL_0094:
+M00000029_IL_008c:
+br M00000029_IL_0115
+M00000029_IL_0092:
+M00000029_IL_0093:
+M00000029_IL_0094:
 ldarg 0
-M00000026_IL_0095:
+M00000029_IL_0095:
 ldfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4F7574636F6D655472616E736665726031<T0>::input
-M00000026_IL_009a:
+M00000029_IL_009a:
 callvirt instance System.Tasks.Task<T0>::get_Outcome()
-M00000026_IL_009f:
+M00000029_IL_009f:
 stloc local9
-M00000026_IL_00a1:
+M00000029_IL_00a1:
 ldloca local9
-M00000026_IL_00a3:
+M00000029_IL_00a3:
 ldloca local10
-M00000026_IL_00a5:
+M00000029_IL_00a5:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion8<T0>(System.Option<System.Tasks.TaskOutcome<T0>>&,System.Option.Some<System.Tasks.TaskOutcome<T0>>&)
-M00000026_IL_00aa:
-brfalse M00000026_IL_00f2
-M00000026_IL_00af:
+M00000029_IL_00aa:
+brfalse M00000029_IL_00f2
+M00000029_IL_00af:
 ldloc local10
-M00000026_IL_00b1:
+M00000029_IL_00b1:
 stloc local11
-M00000026_IL_00b3:
+M00000029_IL_00b3:
 ldloca local11
-M00000026_IL_00b5:
+M00000029_IL_00b5:
 ldloca local12
-M00000026_IL_00b7:
+M00000029_IL_00b7:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion9<T0>(System.Option.Some<System.Tasks.TaskOutcome<T0>>&,System.Tasks.TaskOutcome<T0>&)
-M00000026_IL_00bc:
+M00000029_IL_00bc:
 ldloc local12
-M00000026_IL_00be:
+M00000029_IL_00be:
 stloc local13
-M00000026_IL_00c0:
+M00000029_IL_00c0:
 ldloca local13
-M00000026_IL_00c2:
+M00000029_IL_00c2:
 ldloca local14
-M00000026_IL_00c4:
+M00000029_IL_00c4:
 call neoCLR.Library.System.Tasks.Task.RuntimeUnion12<T0>(System.Tasks.TaskOutcome<T0>&,System.Tasks.TaskOutcome.Cancelled&)
-M00000026_IL_00c9:
-brfalse M00000026_IL_00f2
-M00000026_IL_00ce:
-M00000026_IL_00cf:
-br M00000026_IL_00da
-M00000026_IL_00da:
-M00000026_IL_00db:
-br M00000026_IL_00e6
-M00000026_IL_00e6:
-M00000026_IL_00e7:
-br M00000026_IL_00f7
-M00000026_IL_00f2:
-br M00000026_IL_0109
-M00000026_IL_00f7:
-M00000026_IL_00f8:
+M00000029_IL_00c9:
+brfalse M00000029_IL_00f2
+M00000029_IL_00ce:
+M00000029_IL_00cf:
+br M00000029_IL_00da
+M00000029_IL_00da:
+M00000029_IL_00db:
+br M00000029_IL_00e6
+M00000029_IL_00e6:
+M00000029_IL_00e7:
+br M00000029_IL_00f7
+M00000029_IL_00f2:
+br M00000029_IL_0109
+M00000029_IL_00f7:
+M00000029_IL_00f8:
 ldarg 0
-M00000026_IL_00f9:
+M00000029_IL_00f9:
 ldfld neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4F7574636F6D655472616E736665726031<T0>::output
-M00000026_IL_00fe:
+M00000029_IL_00fe:
 callvirt instance System.Tasks.Promise<T0>::Cancel()
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000026_IL_0103:
+M00000029_IL_0103:
 pop
-M00000026_IL_0104:
-br M00000026_IL_0114
-M00000026_IL_0109:
-M00000026_IL_010a:
+M00000029_IL_0104:
+br M00000029_IL_0114
+M00000029_IL_0109:
+M00000029_IL_010a:
 ldstr "Task continuation ran while pending"
-M00000026_IL_010f:
+M00000029_IL_010f:
 call System.Fault(String)
-M00000026_IL_0114:
-M00000026_IL_0115:
-M00000026_IL_0116:
-M00000026_IL_0117:
+M00000029_IL_0114:
+M00000029_IL_0115:
+M00000029_IL_0116:
+M00000029_IL_0117:
 ret
 .end
 .method instance DelegateTarget_Application_V1_M_363A6D6574686F643131333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31323A53797374656D2E5461736B7331373A4F7574636F6D655472616E736665726031333A52756E343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect() -> Void
@@ -1517,43 +1650,43 @@ ldloca local0
 initobj System.Tasks.Promise<T1>
 ldloca local1
 initobj neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4D6170436F6E74696E756174696F6E6032<T0,T1>
-M0000001f_IL_0000:
-M0000001f_IL_0001:
-M0000001f_IL_0002:
+M00000022_IL_0000:
+M00000022_IL_0001:
+M00000022_IL_0002:
 ldarg 0
-M0000001f_IL_0003:
+M00000022_IL_0003:
 callvirt instance System.Tasks.Task<T0>::Dispatcher()
-M0000001f_IL_0008:
+M00000022_IL_0008:
 newobj instance System.Tasks.Promise<T1>::.ctor(System.Tasks.TaskQueue)
-M0000001f_IL_000d:
+M00000022_IL_000d:
 stloc local0
-M0000001f_IL_000e:
-M0000001f_IL_000f:
+M00000022_IL_000e:
+M00000022_IL_000f:
 ldarg 0
-M0000001f_IL_0010:
+M00000022_IL_0010:
 ldloc local0
-M0000001f_IL_0011:
+M00000022_IL_0011:
 ldarg 1
-M0000001f_IL_0012:
+M00000022_IL_0012:
 newobj instance neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4D6170436F6E74696E756174696F6E6032<T0,T1>::.ctor(System.Tasks.Task<T0>,System.Tasks.Promise<T1>,System.Func<T0,T1>)
-M0000001f_IL_0017:
+M00000022_IL_0017:
 stloc local1
-M0000001f_IL_0018:
-M0000001f_IL_0019:
+M00000022_IL_0018:
+M00000022_IL_0019:
 ldarg 0
-M0000001f_IL_001a:
+M00000022_IL_001a:
 ldloc local1
-M0000001f_IL_001b:
-M0000001f_IL_0021:
+M00000022_IL_001b:
+M00000022_IL_0021:
 delegate.bind System.Func<Void> = instance neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4D6170436F6E74696E756174696F6E6032<T0,T1>::DelegateTarget_Application_V1_M_363A6D6574686F643131333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31323A53797374656D2E5461736B7331373A4D6170436F6E74696E756174696F6E6032333A52756E343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
-M0000001f_IL_0026:
+M00000022_IL_0026:
 callvirt instance System.Tasks.Task<T0>::OnCompleted(System.Func<Void>)
-M0000001f_IL_002b:
-M0000001f_IL_002c:
+M00000022_IL_002b:
+M00000022_IL_002c:
 ldloc local0
-M0000001f_IL_002d:
+M00000022_IL_002d:
 callvirt instance System.Tasks.Promise<T1>::get_Task()
-M0000001f_IL_0032:
+M00000022_IL_0032:
 ret
 .end
 .method static Then<T0,T1>(System.Tasks.Task<T0> self,System.Func<T0,System.Tasks.Task<T1>> continuation) -> System.Tasks.Task<T1>
@@ -1563,43 +1696,43 @@ ldloca local0
 initobj System.Tasks.Promise<T1>
 ldloca local1
 initobj neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E5468656E436F6E74696E756174696F6E6032<T0,T1>
-M00000020_IL_0000:
-M00000020_IL_0001:
-M00000020_IL_0002:
+M00000023_IL_0000:
+M00000023_IL_0001:
+M00000023_IL_0002:
 ldarg 0
-M00000020_IL_0003:
+M00000023_IL_0003:
 callvirt instance System.Tasks.Task<T0>::Dispatcher()
-M00000020_IL_0008:
+M00000023_IL_0008:
 newobj instance System.Tasks.Promise<T1>::.ctor(System.Tasks.TaskQueue)
-M00000020_IL_000d:
+M00000023_IL_000d:
 stloc local0
-M00000020_IL_000e:
-M00000020_IL_000f:
+M00000023_IL_000e:
+M00000023_IL_000f:
 ldarg 0
-M00000020_IL_0010:
+M00000023_IL_0010:
 ldloc local0
-M00000020_IL_0011:
+M00000023_IL_0011:
 ldarg 1
-M00000020_IL_0012:
+M00000023_IL_0012:
 newobj instance neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E5468656E436F6E74696E756174696F6E6032<T0,T1>::.ctor(System.Tasks.Task<T0>,System.Tasks.Promise<T1>,System.Func<T0,System.Tasks.Task<T1>>)
-M00000020_IL_0017:
+M00000023_IL_0017:
 stloc local1
-M00000020_IL_0018:
-M00000020_IL_0019:
+M00000023_IL_0018:
+M00000023_IL_0019:
 ldarg 0
-M00000020_IL_001a:
+M00000023_IL_001a:
 ldloc local1
-M00000020_IL_001b:
-M00000020_IL_0021:
+M00000023_IL_001b:
+M00000023_IL_0021:
 delegate.bind System.Func<Void> = instance neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E5468656E436F6E74696E756174696F6E6032<T0,T1>::DelegateTarget_Application_V1_M_363A6D6574686F643131343A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31323A53797374656D2E5461736B7331383A5468656E436F6E74696E756174696F6E6032333A52756E343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
-M00000020_IL_0026:
+M00000023_IL_0026:
 callvirt instance System.Tasks.Task<T0>::OnCompleted(System.Func<Void>)
-M00000020_IL_002b:
-M00000020_IL_002c:
+M00000023_IL_002b:
+M00000023_IL_002c:
 ldloc local0
-M00000020_IL_002d:
+M00000023_IL_002d:
 callvirt instance System.Tasks.Promise<T1>::get_Task()
-M00000020_IL_0032:
+M00000023_IL_0032:
 ret
 .end
 .end

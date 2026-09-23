@@ -41,6 +41,10 @@ Prefer an expression-bodied property for a single getter expression:
 val DeclaringType: Option<TypeInfo> => Some(StoredDeclaringType)
 ```
 
+Use properties for contextual state or identity, such as TaskQueue.Current and
+TaskQueue.Default, including internal Raven-facing runtime-service accessors. Native
+transport calls behind those getters remain implementation details.
+
 Use a getter block when it actually needs statements, and retain explicit accessor
 contracts when setter visibility or initialization matters. Interface declarations
 still describe the contract rather than an implementation.

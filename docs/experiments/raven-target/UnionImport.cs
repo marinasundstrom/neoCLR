@@ -158,7 +158,7 @@ static class UnionImport
             var args = (method.HasThis ? new[] { ApplicationTypes.Receiver(method) } : Array.Empty<string>()).Concat(method.Parameters.Select(p => ProfileType(p.ParameterType))).ToArray();
             var valueConstructor = libraryOwner is null && method.IsConstructor && method.DeclaringType.IsValueType;
             var emitInstance = method.HasThis && !valueConstructor;
-            var emitOwnedStatic = libraryOwner is not null && method.IsStatic && (WorkerBindings.IsName(method.DeclaringType.FullName) || AsyncBindings.IsName(method.DeclaringType.FullName) || method.DeclaringType.IsValueType || OpaqueLibrary.IsString(method.DeclaringType) || ArrayLibrary.IsMatched(method.DeclaringType) || DescriptorLibrary.IsProvider(method.DeclaringType));
+            var emitOwnedStatic = libraryOwner is not null && method.IsStatic && (WorkerBindings.IsName(method.DeclaringType.FullName) || AsyncBindings.IsName(method.DeclaringType.FullName) || method.DeclaringType.FullName == "System.Tasks.TaskQueue" || method.DeclaringType.IsValueType || OpaqueLibrary.IsString(method.DeclaringType) || ArrayLibrary.IsMatched(method.DeclaringType) || DescriptorLibrary.IsProvider(method.DeclaringType));
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
             if (locals.Any(t => !(libraryOwner is not null && t is "Value" or ParameterSnapshotBindings.Vector) && !(libraryOwner is not null && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !WorkerBindings.IsName(t) && !EnumBindings.IsType(t) && !AsyncBindings.IsType(t) && !TaskBindings.IsType(t) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.IsReference(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
@@ -630,6 +630,14 @@ static class UnionImport
                         code.AppendLine(instruction.OpCode.Name).Append(BooleanBindings.Convert("Boolean", "Int32"));
                         break;
                     case Code.Ceq:
+                        if (stack.Count >= 2 &&
+                            (stack[^1].Type == "FaultNull" && ManagedArrayBindings.IsReference(stack[^2].Type)
+                            || stack[^2].Type == "FaultNull" && ManagedArrayBindings.IsReference(stack[^1].Type)))
+                        {
+                            Pop(); Pop(); Push(new("Int32"));
+                            code.AppendLine("ref.isnull").Append(BooleanBindings.Convert("Boolean", "Int32"));
+                            break;
+                        }
                         if (NumericOperands() || stack.Count >= 2 && stack[^1].Type == "Char" && stack[^2].Type == "Char")
                         {
                             Pop(); Pop(); Push(new("Int32"));
@@ -707,7 +715,7 @@ static class UnionImport
                                 var parameters = reference.Parameters.Select(p => ProfileType(ApplicationTypes.Close(p.ParameterType, reference.DeclaringType))).ToArray();
                                 call = targetMethod.HasThis && (libraryOwner is not null || !(targetMethod.IsConstructor && targetMethod.DeclaringType.IsValueType))
                                     ? new("", new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray(), ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true), Instruction: $"{(instruction.OpCode.Code == Code.Callvirt ? "callvirt" : "call")} instance {ProfileType(reference.DeclaringType)}::{ApplicationTypes.MethodName(targetMethod)}({string.Join(',', parameters)})" + (targetMethod.DeclaringType.IsValueType && targetMethod.ReturnType.MetadataType == MetadataType.Void ? "\npop" : ""))
-                                    : new(libraryOwner is not null && targetMethod.IsStatic && (WorkerBindings.IsName(targetMethod.DeclaringType.FullName) || AsyncBindings.IsName(targetMethod.DeclaringType.FullName) || targetMethod.DeclaringType.IsValueType || DescriptorLibrary.IsProvider(targetMethod.DeclaringType)) ? ProfileType(reference.DeclaringType) + "::" + targetMethod.Name : Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray() : parameters, ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true));
+                                    : new(libraryOwner is not null && targetMethod.IsStatic && (WorkerBindings.IsName(targetMethod.DeclaringType.FullName) || AsyncBindings.IsName(targetMethod.DeclaringType.FullName) || targetMethod.DeclaringType.FullName == "System.Tasks.TaskQueue" || targetMethod.DeclaringType.IsValueType || DescriptorLibrary.IsProvider(targetMethod.DeclaringType)) ? ProfileType(reference.DeclaringType) + "::" + targetMethod.Name : Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray() : parameters, ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true));
                             }
                         }
                         else if (targetMethod.Module == library.MainModule)

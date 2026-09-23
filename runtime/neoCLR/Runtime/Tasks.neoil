@@ -1,3 +1,11 @@
 .function neoCLR.Runtime.CurrentTaskQueue() -> System.Tasks.TaskQueue
 .methodimpl InternalCall
 .end
+
+.function neoCLR.Runtime.DefaultTaskQueue() -> System.Tasks.TaskQueue
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue queue) -> Void
+.methodimpl InternalCall
+.end

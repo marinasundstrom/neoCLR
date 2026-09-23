@@ -19,10 +19,10 @@ The Raven-authored types live provisionally in System.Tasks:
 | Type | Current surface | Responsibility |
 | --- | --- | --- |
 | Task<T> | State, Outcome, IsCompleted, IsCancelled, GetAwaiter(), GetResult(), OnCompleted(callback) | Observe completion or cancellation; register consumers. |
-| Promise<T> | constructor(queue), Task, Complete(value), Cancel() | Own completion authority; first completion wins. |
+| Promise<T> | constructor(), constructor(queue), Task, Complete(value), Cancel() | Own completion authority; first completion wins. |
 | TaskState | Pending, Completed, Cancelled | Normal enum for the public lifecycle. |
 | TaskOutcome<T> | Completed(T), Cancelled | Union containing the terminal value or cancellation. |
-| TaskQueue | Run(callback), Post(callback), Drain() | Explicit single-invocation continuation dispatch for the PoC. |
+| TaskQueue | Default, Run(callback), Post(callback), Drain() | Explicit single-invocation continuation dispatch for the PoC. |
 
 Task is a stable reference: repeated reads of a source's Task property return the
 same object. Completion publishes its value before enqueueing callbacks. Consumers
@@ -153,22 +153,23 @@ The saved project must use the rebuilt reference library. Regenerate bootstrap
 snapshots through build_runtime_library.py when editing implementation sources;
 never hand-edit generated neoIL.
 
-## Generated async and explicit progress
+## Generated async and queue selection
 
 See [library-async.rvn](experiments/raven-target/samples/library-async.rvn) for the
 complete runnable source. It starts PrintAnswer inside queue.Run, awaits a pending
 Task<int>, prints “Suspended”, completes the producer and then resumes to print 42.
 Ordinary async functions return Task<T>; use Task<unit> for no payload. Even an
-awaitless async function uses the builder and requires an active queue scope.
-Starting async work outside Run or a drained callback faults. A method can remain
-pending after Run returns and resume when later completion is followed by Drain.
+awaitless async function uses the builder. It selects the nearest active queue or
+the invocation default. The runtime dispatches default-queue work automatically
+after the entry function returns; see the default-dispatch slice below. Explicit
+queues still allow controlled Run/Drain for tests and custom orchestration.
 
 Task completion queues registered continuations. The producer's queue controls
 where its callbacks are drained; this is not UI affinity or automatic context flow.
 Nested Run scopes on different queues select the nearest active queue, then restore
 the outer scope naturally. Reentering Run or Drain on the same active queue faults
-before running another callback. Cross-queue programs must drive every relevant
-queue explicitly. Tasks have cancellation state but no exception state. The opt-in
+before running another callback. Cross-queue programs must drive their explicit
+queues; the runtime drives the default queue. Tasks have cancellation state but no exception state. The opt-in
 awaiter protocol propagates cancellation to an enclosing async method.
 
 The provisional System.Runtime.CompilerServices protocol consists of
@@ -346,3 +347,44 @@ continues to use its existing exception-based protocol by default. This implemen
 the model's exception-free semantics at the cost of a target compiler contract;
 it is not a performance claim. Reuse the primary-source comparison in
 [the alignment assessment](task-model-alignment.md#comparison-and-acceptance-evidence).
+
+
+## Default dispatch — 2026-09-23
+
+Ordinary API implementations can construct Promise<T>() without a queue parameter.
+It selects the nearest active TaskQueue.Run/Drain scope, falling back to the stable
+TaskQueue.Default for this invocation. Async builders and Thread.Start/ThreadPool.Queue
+use the same selection. Explicit Promise<T>(queue) remains available.
+
+The runtime runs default-queue work automatically when the entry function returns.
+Callbacks posted by callbacks are processed until the queue is empty, before the
+invocation result is returned to the host. The original result is retained across
+this dispatch. The default queue and any saved invocation result are GC roots while
+work runs. Each isolated worker owns a separate default queue. Registration is
+one-time, invocation-local state, not a mutable process-wide singleton.
+
+[The runnable example](experiments/raven-target/samples/library-async-default-queue.rvn)
+starts a worker from an async function and prints its result without constructing a
+queue, passing one into a producer, or calling Drain. Tests cover parameterless
+Promise construction, nested callbacks, cancellation and GC retention as well.
+
+This is a minimal runtime dispatch loop, not a public TaskScheduler contract.
+It is serialized; joining isolated workers can block the caller's dispatcher.
+Automatic dispatch shares the invocation instruction budget and terminal Fault
+behavior. An endlessly reposting callback exhausts that budget. An unresolved
+Promise with no queued work does not keep an invocation alive: there is no external
+I/O completion reactor yet. Explicit custom queues are still caller-driven, and
+async entry-point signatures are not added by this slice. Source exceptions,
+protected cleanup and shared guest mutation remain unsupported.
+
+The author wants familiar .NET concepts adapted to neoCLR's framework style and
+future runtime suspension. Reviewed 2026-09-23: .NET
+[TaskScheduler.Current](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.taskscheduler.current?view=net-10.0)
+falls back to its default scheduler outside a task, and
+[TaskScheduler.Default](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.taskscheduler.default?view=net-10.0)
+exposes the platform default. We reuse the ergonomic default-selection principle;
+neoCLR's invocation-owned queue and serialized interpreter dispatch are provisional
+implementation choices. They remove queue setup and pumping from normal callers,
+at the cost of invocation-scoped lifetime and no independent host-event progress.
+A scheduler abstraction may later fit runtime suspension, affinity or concurrency
+policies; neither Task payloads nor Promise construction should freeze those choices.

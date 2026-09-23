@@ -18,6 +18,8 @@ pub(crate) enum Binding {
     ObjectTypeHandle,
     ExecutingAssembly,
     CurrentTaskQueue,
+    DefaultTaskQueue,
+    RegisterDefaultTaskQueue,
     StartWorker(bool),
     JoinWorker,
     AssemblyInfo(crate::assembly_info::Query),
@@ -176,6 +178,15 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::StartWorker(true), Type::Int32)
         }
         ("neoCLR.Runtime.JoinWorker", [Type::Int32]) => (Binding::JoinWorker, Type::String),
+        ("neoCLR.Runtime.DefaultTaskQueue", []) => (
+            Binding::DefaultTaskQueue,
+            Type::from_name("System.Tasks.TaskQueue"),
+        ),
+        ("neoCLR.Runtime.RegisterDefaultTaskQueue", [queue])
+            if queue == &Type::from_name("System.Tasks.TaskQueue") =>
+        {
+            (Binding::RegisterDefaultTaskQueue, Type::Void)
+        }
         ("neoCLR.Runtime.CurrentTaskQueue", []) => (
             Binding::CurrentTaskQueue,
             Type::from_name("System.Tasks.TaskQueue"),

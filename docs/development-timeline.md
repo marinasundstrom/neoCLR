@@ -4812,3 +4812,35 @@ required an invalid default Result, so the assistant separated the terminal exit
 and await in for loops skipped iterator disposal. The latter is explicitly diagnosed
 pending suspension-aware loop lowering. Current behavior and validation are recorded
 in [Task contracts](task-contracts.md#cancelled-awaits--2026-09-23).
+
+
+### Automatic progress and familiar concepts
+
+The author then suggested that a scheduler may already be needed for the PoC:
+“We don't want to have to drain the queue manually.” The assistant adopted a minimal
+runtime dispatch loop over the invocation default, keeping explicit queues for
+controlled dispatch and deferring the public scheduler shape. The author restated
+the purpose: take familiar .NET concepts, improve them to fit the framework's style,
+and align them with the strategy for runtime suspension. This is a design criterion,
+not a requirement to copy .NET names or freeze state-machine APIs.
+
+The default-dispatch slice adds parameterless Promise construction and automatic
+progress before invocation return. It retains queue identity and pending callbacks
+through GC, and workers have separate dispatch state. External completion waiting,
+async entry-point signatures and public scheduling policies remain open. See
+[the current contract and comparison](task-contracts.md#default-dispatch--2026-09-23).
+
+
+The author emphasized explicit awaitable operations: creating and awaiting a thread
+makes the operation clear, while Tasks are not inherently built on threads. The
+assistant clarified that the current Thread.Start returns Task<string> for worker
+completion, and recorded I/O and stream operations as future awaitable producers.
+A first-class awaitable thread handle is not implemented by this exchange; the
+current source spelling is await Thread.Start(...). Task completion and worker
+execution remain distinct responsibilities.
+
+
+The author corrected TaskQueue.Current() and RuntimeServices.CurrentTaskQueue():
+context lookup should be expressed as a property. The assistant changed both
+Raven-facing contracts, kept the native transport function behind the getter,
+and recorded the convention for runtime code as well as examples.

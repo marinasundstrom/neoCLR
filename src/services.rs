@@ -60,7 +60,9 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::StartWorker(_) | crate::native::Binding::JoinWorker => {
                 RuntimeService::IsolatedWorkers
             }
-            crate::native::Binding::CurrentTaskQueue => RuntimeService::TaskDispatch,
+            crate::native::Binding::CurrentTaskQueue
+            | crate::native::Binding::DefaultTaskQueue
+            | crate::native::Binding::RegisterDefaultTaskQueue => RuntimeService::TaskDispatch,
             crate::native::Binding::Fault => return Ok(vec![]),
             crate::native::Binding::EnvironmentArguments
             | crate::native::Binding::EnvironmentCurrentDirectory

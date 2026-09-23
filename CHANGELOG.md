@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Add invocation-local TaskQueue.Default and Promise<T>() using the active queue
+  or the default. Async functions and isolated workers no longer require queue setup.
+  The runtime dispatches default-queue callbacks automatically before invocation
+  return, preserving the entry result and retaining work through GC. Explicit queues
+  remain caller-driven; external I/O completion and a public scheduler are future work.
+  Validate 11 automatic-dispatch source scenarios, async regressions, ten runtime
+  access/worker checks, metadata, snapshots and website checks.
+
 - Add opt-in Raven cancelled-await propagation for named async functions, both
   immediate and resumed, through provisional IsCancelled/SetCancelled hooks.
   Nested calls cancel without fabricating a value; Result remains an ordinary

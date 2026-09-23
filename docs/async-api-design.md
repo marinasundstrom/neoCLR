@@ -9,11 +9,11 @@ contracts.
 ## Current development proof of concept
 
 The [Task completion slice](task-contracts.md) now implements Raven-authored
-Task<T>, Promise<T> and an explicit TaskQueue in the development Raven
+Task<T>, Promise<T> and a provisional TaskQueue in the development Raven
 profile. Generic payloads, queued continuations and producer/consumer access checks
 run on neoCLR. This is not in Preview 8. Named compiler-generated async functions
-and isolated workers now run in the development PoC; automatic host progress and
-shared Task state across threads remain outstanding. The queue is provisional.
+and isolated workers now run in the development PoC; the invocation now dispatches default-queue work automatically. External I/O
+completion and shared Task state across threads remain outstanding. The queue is provisional.
 
 The updated [Task model proposal](proposals/task-model.md) is the target for the
 ongoing slices. State/Outcome and explicit producer cancellation are implemented;
@@ -256,3 +256,20 @@ Tokens request cancellation; operations decide whether to terminate as Cancelled
 The [alignment assessment](task-model-alignment.md) distinguishes the validated PoC,
 unvalidated cancellation work and required public contracts. Raven may need a
 separate lowering, but its implementation must follow the Task model.
+
+
+## Awaitable operations and scheduling direction — 2026-09-23
+
+The author's criterion is familiar .NET concepts adapted to neoCLR's framework
+style and runtime-suspension strategy. A Task represents an operation's completion;
+it does not imply that the operation consumes a worker thread. The explicit
+`await Thread.Start(callback, input)` spelling starts an isolated worker and awaits
+its Task<string> completion. A distinct awaitable thread handle remains an API
+option, not the current implemented return type. Future I/O and stream operations
+may supply other awaitables over their own completion mechanisms.
+
+Automatic default dispatch is now a minimal invocation event loop. A public
+scheduler concept can be introduced when suspension, host events or scheduling
+policies give it concrete responsibilities. The current queue, generated state
+machine and serialized dispatch must not become permanent requirements on all
+future awaitables. See [current behavior and its limits](task-contracts.md#default-dispatch--2026-09-23).

@@ -223,7 +223,6 @@ with tempfile.TemporaryDirectory(prefix='neoclr-generated-async-') as directory:
             assert int(re.search(r'collections=(\d+)', run.stderr).group(1)) > 0, run.stderr
         print(label + ': Passed', flush=True)
     for index, (label, body, expected) in enumerate([
-        ('Missing queue scope', 'Ready()', 'requires an active TaskQueue'),
         ('Recursive queue entry', 'let queue = TaskQueue()\nqueue.Run(() => { queue.Run(() => { }) })', 'cannot be pumped recursively'),
     ]):
         if args.case:

@@ -15,6 +15,28 @@ public class TaskQueue {
         running = false
     }
 
+    static val Default: TaskQueue {
+        get {
+            let queue = System.Runtime.CompilerServices.RuntimeServices.DefaultTaskQueue
+            if queue is null {
+                let created = TaskQueue()
+                System.Runtime.CompilerServices.RuntimeServices.RegisterDefaultTaskQueue(created)
+                return created
+            }
+            return queue
+        }
+    }
+
+    internal static val Current: TaskQueue {
+        get {
+            let queue = System.Runtime.CompilerServices.RuntimeServices.CurrentTaskQueue
+            if queue is null {
+                return TaskQueue.Default
+            }
+            return queue
+        }
+    }
+
     func Post(callback: Func<System.Void>) {
         pending.Add(callback)
     }
@@ -105,6 +127,14 @@ public class Promise<T> {
     private field task: Task<T>
     private field cancelled: bool
 
+    init() {
+        queue = TaskQueue.Current
+        cancelled = false
+        slot = ArrayList<T>(1)
+        callbacks = ArrayList<Func<System.Void>>()
+        task = Task<T>(self)
+    }
+
     init(queue: TaskQueue) {
         self.queue = queue
         cancelled = false
@@ -189,7 +219,7 @@ namespace System.Runtime.CompilerServices {
         }
 
         static func Create() -> AsyncTaskMethodBuilder<T> {
-            return AsyncTaskMethodBuilder<T>(RuntimeServices.CurrentTaskQueue())
+            return AsyncTaskMethodBuilder<T>(TaskQueue.Current)
         }
 
         val Task: Task<T> => source.Task

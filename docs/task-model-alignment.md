@@ -150,4 +150,5 @@ token support: explicit Promise.Cancel already supplies the terminal outcome.
 This deliberately changes the original order, not the request/outcome distinction.
 Await in for loops is diagnosed pending suspension-aware iteration cleanup.
 The author also requested a default TaskQueue and parameterless Promise construction;
-that is the next ergonomics slice, with queue scheduling still provisional.
+that ergonomics slice now uses automatic invocation dispatch, with the public
+scheduler contract still open.

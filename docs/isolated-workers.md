@@ -16,7 +16,8 @@ thread is reused. Heap isolation is not a sandbox: files and other host resource
 remain external shared resources.
 
 The tested sample is [library-workers.rvn](experiments/raven-target/samples/library-workers.rvn).
-Both APIs require an active TaskQueue.Run/Drain scope. Start submits work before
+Both APIs select the active TaskQueue.Run/Drain scope or the invocation default.
+Default-queue work progresses automatically before the invocation returns. Start submits work before
 returning a pending Task; the caller can use ordinary `await`. Completion is posted
 to the caller's queue, which waits for the worker result and completes its local
 Promise. Task objects remain entirely in the caller's heap. Pumping

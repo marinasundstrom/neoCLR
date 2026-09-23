@@ -52,6 +52,8 @@ static class RuntimeServiceBindings
             ("TypeArgument", ["System.RuntimeTypeHandle", "Int32"], "System.RuntimeTypeHandle"),
             ("TypeShape", ["System.RuntimeTypeHandle", "Int32"], "Boolean"),
             ("TypeDisplayName", ["System.RuntimeTypeHandle", "Int32"], "String"),
+            ("DefaultTaskQueue", [], "System.Tasks.TaskQueue"),
+            ("RegisterDefaultTaskQueue", ["System.Tasks.TaskQueue"], "noresult"),
             ("CurrentTaskQueue", [], "System.Tasks.TaskQueue"),
             ("ExecutingAssembly", [], "System.Introspection.AssemblyInfo"),
             ("AssemblyName", ["String"], "String"),
@@ -85,8 +87,9 @@ static class RuntimeServiceBindings
         _ when type.StartsWith("arrayref<") => CSharp(type[9..^1]) + "[]",
         _ => throw new InvalidDataException("Unsupported runtime service declaration.")
     };
+    static bool IsProperty(string name) => name is "CurrentTaskQueue" or "DefaultTaskQueue";
     public static string Declarations => "namespace Runtime.CompilerServices { public static class RuntimeServices { "
-        + string.Join(" ", Members.Select(m => $"public static {CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => CSharp(t) + " arg" + i))}) {(m.Result == "noresult" ? "{ }" : "=> default;")}")) + " public static bool IsValue<T>(System.Value value) => default; public static T UnpackValue<T>(System.Value value) => default; } }";
+        + string.Join(" ", Members.Select(m => IsProperty(m.Name) ? $"public static {CSharp(m.Result)} {m.Name} => default;" : $"public static {CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => CSharp(t) + " arg" + i))}) {(m.Result == "noresult" ? "{ }" : "=> default;")}")) + " public static bool IsValue<T>(System.Value value) => default; public static T UnpackValue<T>(System.Value value) => default; } }";
 
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
@@ -100,10 +103,12 @@ static class RuntimeServiceBindings
         var (args, result) = RuntimeSignatures.Match(reference, definition,
             t => t.FullName == "System.Object" && (t.MetadataType == MetadataType.Object || RuntimeSignatures.IsCore(t.Scope) || ApplicationTypes.IsLibrary(t)) ? "System.Object" : t is ArrayType { IsVector: true, ElementType.MetadataType: MetadataType.Int32 } ? "arrayref<Int32>"
                 : ManagedArrayBindings.Type(t) ?? ReflectionBindings.Type(t) ?? ProcessBindings.ArrayType(t) ?? GenericUnionBindings.Type(t));
-        if (!Members.Any(m => m.Name == reference.Name && m.Args.SequenceEqual(args) && m.Result == result))
+        if (!Members.Any(m => (IsProperty(m.Name) ? "get_" + m.Name : m.Name) == reference.Name && m.Args.SequenceEqual(args) && m.Result == result))
             throw new InvalidDataException("Unsupported runtime service signature: " + reference.FullName);
         if (reference.Name == "StringEquals")
             return new("", args, result, Instruction: "ceq");
+        if (reference.Name == "RegisterDefaultTaskQueue")
+            return new("", args, result, Instruction: "call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue)\npop");
         if (reference.Name == "WriteLine")
             return new("", args, result, Instruction: "call neoCLR.Runtime.WriteLine(String)\npop");
         if (reference.Name is "IntPtrToInt64" or "UIntPtrToUInt64")
@@ -122,7 +127,10 @@ static class RuntimeServiceBindings
             Helpers[name] = $".function {name}({parameters}) -> {result}\n.local {element}[] source\n.local {result} destination\n.local Int32 index\n{loads}\ncall neoCLR.Runtime.{reference.Name}({signature})\nstloc source\nldloc source\nldlen\nconv.i4\nnewarr {element}\nstloc destination\nldc.i4 0\nstloc index\nbr Test\nCopy:\nldloc destination\nldloc index\nldloc source\nldloc index\nldelem {element}\nstelem {element}\nldloc index\nldc.i4 1\nadd\nstloc index\nTest:\nldloc index\nldloc source\nldlen\nconv.i4\nblt Copy\nldloc destination\nret\n.end\n";
             return new(name, args, result);
         }
-        return new("neoCLR.Runtime." + reference.Name, args, result);
+        var serviceName = reference.Name.StartsWith("get_", StringComparison.Ordinal) ? reference.Name[4..] : reference.Name;
+        if (IsProperty(serviceName) && !definition.IsGetter)
+            throw new InvalidDataException("Runtime context lookup must be a property getter.");
+        return new("neoCLR.Runtime." + serviceName, args, result);
     }
     static ResultBindings.Binding BindValue(MethodReference reference, MethodDefinition definition)
     {

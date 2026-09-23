@@ -58,6 +58,7 @@ ldc.i4 42
 #[test]
 fn guest_il_cannot_bypass_completion_capabilities() {
     for body in [
+        "call Tasks.TaskQueue::get_Current()\npop\nldc.i4 0",
         "ldloc source\nnewobj instance Tasks.Task<Int32>::.ctor(Tasks.Promise<Int32>)\npop\nldc.i4 0",
         "ldloc source\ncall instance Tasks.Promise<Int32>::Read()",
         "ldloc source\ncall instance Tasks.Promise<Int32>::Dispatcher()\npop\nldc.i4 0",
@@ -122,10 +123,39 @@ ldc.i4 0
 }
 
 #[test]
-fn active_task_queue_is_not_a_process_global_default() {
-    let program = load("call neoCLR.Runtime.CurrentTaskQueue()\npop\nldc.i4 0").unwrap();
-    let error = program.run(Limits::default()).unwrap_err().to_string();
-    assert!(error.contains("requires an active TaskQueue"), "{error}");
+fn default_queue_is_lazy_stable_and_invocation_local() {
+    let body = r#"
+call neoCLR.Runtime.DefaultTaskQueue()
+ref.isnull
+brtrue Empty
+fault "Queue leaked from an earlier invocation"
+Empty:
+call Tasks.TaskQueue::get_Default()
+call Tasks.TaskQueue::get_Default()
+ref.eq
+brtrue Same
+fault "Default identity changed"
+Same:
+ldc.i4 42
+"#;
+    let program = load(body).unwrap();
+    for _ in 0..2 {
+        assert_eq!(
+            program.run(Limits::default()).unwrap().value,
+            Value::Int32(42)
+        );
+    }
+}
+
+#[test]
+fn default_queue_registration_cannot_replace_the_dispatcher() {
+    let body = "call Tasks.TaskQueue::get_Default()\npop\nnewobj instance Tasks.TaskQueue::.ctor()\ncall neoCLR.Runtime.RegisterDefaultTaskQueue(Tasks.TaskQueue)\npop\nldc.i4 0";
+    let error = load(body)
+        .unwrap()
+        .run(Limits::default())
+        .unwrap_err()
+        .to_string();
+    assert!(error.contains("registered once"), "{error}");
 }
 
 #[test]

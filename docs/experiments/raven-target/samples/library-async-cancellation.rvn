@@ -11,13 +11,12 @@ async func Read(input: Task<int>) -> Task<int> {
 }
 
 func Main() {
-    let queue = TaskQueue()
-    let promise = Promise<int>(queue)
-    var result = promise.Task
-    queue.Run(() => { result = Read(promise.Task) })
+    let promise = Promise<int>()
+    let result = Read(promise.Task)
+    result.OnCompleted(() => {
+        if result.Outcome is Some(Cancelled) {
+            WriteLine("Cancelled")
+        }
+    })
     promise.Cancel()
-    queue.Drain()
-    if result.Outcome is Some(Cancelled) {
-        WriteLine("Cancelled")
-    }
 }

@@ -1507,6 +1507,9 @@ fn interpret_instructions(
     let mut collection_threshold = limits.heap_objects.min(64);
     let mut arrays_used = false;
     let mut workers = crate::workers::Workers::default();
+    // An invocation-local guest root; isolated workers have their own registry.
+    let mut default_task_queue: Option<Value> = None;
+    let mut invocation_result: Option<Value> = None;
     for _ in 0..limits.instructions {
         if let (Some(debugger), Some(frame)) = (&options.debugger, frames.last()) {
             let before_host_call = matches!(frame.function.body.get(frame.pc), Some(Op::Call(target))
@@ -1523,6 +1526,9 @@ fn interpret_instructions(
         if arrays_used {
             let check = |frames: &[Frame], heap: &crate::ManagedHeap| -> Result<(), Fault> {
                 let mut usage = crate::arrays::Usage::default();
+                if let Some(value) = &invocation_result {
+                    crate::arrays::measure(value, &mut usage, &limits)?;
+                }
                 for frame in frames {
                     for cell in frame
                         .args
@@ -1540,6 +1546,12 @@ fn interpret_instructions(
             };
             if check(frames, heap).is_err() {
                 let mut roots = vec![];
+                if let Some(queue) = &default_task_queue {
+                    crate::gc::trace(queue, &mut roots);
+                }
+                if let Some(value) = &invocation_result {
+                    crate::gc::trace(value, &mut roots);
+                }
                 for frame in frames.iter() {
                     for cell in frame
                         .args
@@ -1596,6 +1608,12 @@ fn interpret_instructions(
             && heap.len() >= collection_threshold
         {
             let mut roots = vec![];
+            if let Some(queue) = &default_task_queue {
+                crate::gc::trace(queue, &mut roots);
+            }
+            if let Some(value) = &invocation_result {
+                crate::gc::trace(value, &mut roots);
+            }
             for frame in frames.iter() {
                 if let Some(object) = &frame.construction_object {
                     roots.push(object.allocation_id());
@@ -2547,11 +2565,33 @@ fn interpret_instructions(
                             arrays_used = true;
                         }
                         let value = if matches!(binding, crate::native::Binding::CurrentTaskQueue) {
-                            current_task_queue.clone().ok_or_else(|| {
-                                Fault::new(
-                                    "Async work requires an active TaskQueue.Run or Drain scope",
-                                )
-                            })?
+                            current_task_queue
+                                .clone()
+                                .or_else(|| default_task_queue.clone())
+                                .unwrap_or_else(|| {
+                                    Value::NullObjectReference(Type::from_name(
+                                        "System.Tasks.TaskQueue",
+                                    ))
+                                })
+                        } else if matches!(binding, crate::native::Binding::DefaultTaskQueue) {
+                            default_task_queue.clone().unwrap_or_else(|| {
+                                Value::NullObjectReference(Type::from_name(
+                                    "System.Tasks.TaskQueue",
+                                ))
+                            })
+                        } else if matches!(
+                            binding,
+                            crate::native::Binding::RegisterDefaultTaskQueue
+                        ) {
+                            if default_task_queue.is_some()
+                                || !matches!(args.as_slice(), [Value::ObjectReference(_)])
+                            {
+                                return Err(Fault::new(
+                                    "Default TaskQueue must be registered once with a live queue",
+                                ));
+                            }
+                            default_task_queue = Some(args[0].clone());
+                            Value::Void
                         } else if let crate::native::Binding::StartWorker(pooled) = binding {
                             workers.start(module, args, options, pooled)?
                         } else if matches!(binding, crate::native::Binding::JoinWorker) {
@@ -3149,6 +3189,36 @@ fn interpret_instructions(
         })();
         match step {
             Ok(Some(value)) => {
+                // A minimal invocation event loop: after entry returns, run the
+                // default queue to quiescence on this same interpreter and budget.
+                // Explicit queues remain caller-owned; no guest objects cross workers.
+                if invocation_result.is_none() {
+                    if let Some(queue) = &default_task_queue {
+                        let drain = resolve(
+                            module,
+                            &FunctionRef {
+                                definition: None,
+                                name: "System.Tasks.TaskQueue.Drain".into(),
+                                owner: Some(Type::from_name("System.Tasks.TaskQueue")),
+                                instance: true,
+                                generic_arguments: vec![],
+                                parameters: vec![],
+                            },
+                        )?;
+                        if !drain.no_result
+                            || drain
+                                .definition
+                                .as_ref()
+                                .is_none_or(|id| id.module != "System")
+                        {
+                            return Err(Fault::new("Invalid default TaskQueue dispatch contract"));
+                        }
+                        invocation_result = Some(value);
+                        frames.push(Frame::new(drain, vec![queue.clone()])?);
+                        continue;
+                    }
+                }
+                let value = invocation_result.take().unwrap_or(value);
                 let mut roots = vec![];
                 crate::gc::trace(&value, &mut roots);
                 heap.collect(roots, crate::CollectionReason::ExecutionCompleted)?;

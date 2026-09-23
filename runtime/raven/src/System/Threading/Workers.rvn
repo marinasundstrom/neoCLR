@@ -6,8 +6,8 @@ import System.Runtime.CompilerServices.*
 
 public class Thread {
     static func Start(callback: Func<string, string>, input: string) -> Task<string> {
-        let queue = RuntimeServices.CurrentTaskQueue()
-        let source = Promise<string>(queue)
+        let source = Promise<string>()
+        let queue = RuntimeServices.CurrentTaskQueue
         let handle = RuntimeServices.StartWorker(callback, input)
         let completion = WorkerCompletion(handle, source)
         queue.Post(completion.Complete)
@@ -17,8 +17,8 @@ public class Thread {
 
 public class ThreadPool {
     static func Queue(callback: Func<string, string>, input: string) -> Task<string> {
-        let queue = RuntimeServices.CurrentTaskQueue()
-        let source = Promise<string>(queue)
+        let source = Promise<string>()
+        let queue = RuntimeServices.CurrentTaskQueue
         let handle = RuntimeServices.QueueWorker(callback, input)
         let completion = WorkerCompletion(handle, source)
         queue.Post(completion.Complete)
