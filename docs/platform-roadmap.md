@@ -95,6 +95,11 @@ Distinguish result-oriented `Thread.Run(...)` from constructing a tracked Thread
 calling `Start()` and awaiting its `Task`. These API shapes are proposed, while the
 post-release namespace rename is selected. See [concurrency direction](concurrency-direction.md)
 for current limitations, .NET comparisons, migration questions and two sample cases.
+The author further directs an abstraction-first platform: concurrency must not
+require threads. Explore portable worker/Task-oriented execution while exposing
+Thread as a lower-level target capability only where appropriate. WebAssembly is
+a candidate for a workers/tasks surface without Thread, not a settled target policy.
+Revisit where result-oriented submission belongs before fixing the Thread.Run shape.
 Keep release stabilization immediate and Streams, Storage and Encoding before
 networking; the full thread lifecycle design is not a new release prerequisite.
 

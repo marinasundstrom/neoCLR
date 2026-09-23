@@ -10,6 +10,45 @@ could be named `System.Concurrency.Threads`; that is a packaging possibility, no
 selected namespace. Package boundaries, capability detection and unsupported-target
 behavior remain open.
 
+## Platform abstractions before execution primitives
+
+The author clarified that the broader namespace should accommodate forms of
+concurrency beyond threads. Applications should primarily use abstractions; expose
+lower-level execution primitives only where appropriate for the target. Thread is
+one such platform capability, not the definition of concurrency or a requirement
+for every neoCLR application platform.
+
+Keep these roles distinct while designing the public surface:
+
+- **Task:** represents an operation's completion and possible result. A Task alone
+  does not promise parallel execution or create an execution resource.
+- **Worker:** a possible abstraction for independently executing work, with an
+  explicit input/output and isolation contract. Its backend and scheduling policy
+  may vary by platform; no common Worker API has been selected yet.
+- **Thread:** an explicit lower-level execution resource with identity and lifecycle,
+  available only where the platform chooses to expose that capability.
+
+The author suggested WebAssembly as a possible target exposing workers or
+Task-oriented concurrency instead of Thread. This is a platform-policy example,
+not a claim that every WebAssembly environment lacks thread support. Determine
+contracts for each actual target, including unsupported capabilities, rather than
+silently emulating a Thread with different identity or parallelism guarantees.
+
+This clarifies the earlier Thread.Run sketch: preserve the two use cases, but
+investigate whether portable result-oriented submission belongs on a worker or
+other concurrency abstraction, with Thread.Run reserved for explicitly requested
+thread execution. The author has not selected that API name or placement. Likewise,
+Task composition can describe an application's concurrency structure while worker,
+thread or event-driven host facilities supply execution and completion. Structured
+lifetimes, cancellation propagation and scheduling remain design questions.
+
+.NET's Task.Run/Thread separation below is a starting comparison, not a reason to
+make thread-pool execution the universal backend. Portable abstractions can reduce
+application dependence on host primitives; they also require honest capability,
+isolation and progress contracts. Keeping explicit Thread access is useful when
+thread identity is the actual requirement. Backend selection must not imply shared
+objects, preemption or parallelism where the target cannot provide those guarantees.
+
 ## Two author-selected API scenarios
 
 The author clarified the intended distinction with `Thread.Run`, construction,

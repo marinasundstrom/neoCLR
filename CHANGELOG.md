@@ -11,7 +11,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Record the author-selected post-release System.Concurrency namespace direction
   and proposed Thread.Run versus retained Thread/Start/Task API shapes. Document
   optional thread packaging, platform limits, .NET comparisons and validation needs;
-  update website future direction. Current release APIs remain unchanged.
+  update website future direction. Clarify abstraction-first concurrency, separating
+  Task completion, possible portable worker execution and target-specific Thread
+  capabilities; API placement and WebAssembly policy remain open. Current release
+  APIs remain unchanged.
 
 - Correct two stale release samples after the Error-wrapper removal and Storage
   namespace migration; preserve the case-payload and error-carrier regression intent.

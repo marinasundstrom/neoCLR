@@ -45,6 +45,18 @@ and the proposed API shapes in the [roadmap](platform-roadmap.md) and
 limits, .NET comparison and sample/validation questions. Updated website future
 direction. No runtime APIs were renamed or implemented.
 
+**Author further clarification.** Concurrency should encompass alternatives to
+threads. The platform should primarily expose abstractions and expose lower-level
+primitives only when appropriate. Suggested workers or tasks for a possible
+WebAssembly target without a public Thread API; this was exploratory, not a
+blanket claim about WebAssembly support.
+
+**Assistant interpretation and action.** Recorded separate roles for Task completion,
+worker execution and explicit Thread lifecycle. Proposed reconsidering the placement
+of portable result-oriented submission rather than fixing Thread.Run as universal.
+Clarified that Tasks do not inherently create parallel execution. Updated the
+roadmap, design note and website; backend and public API choices remain open.
+
 **Open.** Scheduling policy for Run, result types, lifecycle control, ownership,
 platform capability and migration contracts. Package naming is tentative. This does
 not add a release gate or replace the Streams/Storage/Encoding sequence.
