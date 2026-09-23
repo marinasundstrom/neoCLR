@@ -122,6 +122,6 @@ internal blocking completion wait is not a settled synchronous API design.
 
 The author selects `System.Concurrency` as the namespace after this release.
 The [concurrency direction](concurrency-direction.md) distinguishes result-oriented
-`Thread.Run` from a retained Thread object with `Start()` and a `Task` property for
+`Task.Run` with platform-selected execution from a retained Thread object with `Start()` and a `Task` property for
 termination. These shapes are not implemented. Optional thread packaging and platform
 availability remain open; the current isolated string-worker contract above still applies.

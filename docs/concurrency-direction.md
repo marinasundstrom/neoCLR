@@ -34,13 +34,21 @@ not a claim that every WebAssembly environment lacks thread support. Determine
 contracts for each actual target, including unsupported capabilities, rather than
 silently emulating a Thread with different identity or parallelism guarantees.
 
-This clarifies the earlier Thread.Run sketch: preserve the two use cases, but
-investigate whether portable result-oriented submission belongs on a worker or
-other concurrency abstraction, with Thread.Run reserved for explicitly requested
-thread execution. The author has not selected that API name or placement. Likewise,
-Task composition can describe an application's concurrency structure while worker,
-thread or event-driven host facilities supply execution and completion. Structured
-lifetimes, cancellation propagation and scheduling remain design questions.
+The author's subsequent suggestion places general work submission on Task through
+an operation similar to `Task.Run`, with the platform determining how execution is
+scheduled concurrently. This is the preferred direction to explore, superseding the
+earlier open placement question for portable submission. A Task remains useful for
+any work, including operations initiated elsewhere; not every Task requires Run.
+Explicit worker or Thread APIs remain useful when their particular guarantees matter.
+
+A portable Run contract must separate stable application guarantees from backend
+policy. Define admission, progress, callback/data transfer, completion, cancellation
+and resource ownership consistently; document whether a target uses workers, threads
+or cooperative scheduling. Concurrency need not guarantee simultaneous parallel
+execution. Merely posting arbitrary blocking work to an event loop does not establish
+useful concurrent progress. Determine unsupported-work behavior rather than silently
+changing isolation or shared-state semantics across targets. Structured lifetimes and
+the exact scheduling contract remain open.
 
 .NET's Task.Run/Thread separation below is a starting comparison, not a reason to
 make thread-pool execution the universal backend. Portable abstractions can reduce
@@ -51,14 +59,15 @@ objects, preemption or parallelism where the target cannot provide those guarant
 
 ## Two author-selected API scenarios
 
-The author clarified the intended distinction with `Thread.Run`, construction,
-`Start()` and a `Task` property. These are proposed shapes, not executable samples:
+The author first illustrated result submission with `Thread.Run`, then suggested
+Task.Run-style submission with platform-selected execution. The retained Thread
+scenario remains separate. These are proposed shapes, not executable samples:
 
 ```raven
 // Result-oriented execution: retain the operation, without managing a thread object.
-let pending: Task<int> = Thread.Run(() => 42, ...)
+let pending: Task<int> = Task.Run(() => 42, ...)
 let result: int = await pending
-// Equivalently: let result = await Thread.Run(() => 42, ...)
+// Equivalently: let result = await Task.Run(() => 42, ...)
 
 // Explicit thread lifecycle: retain and control the actual thread.
 let thread = Thread(() => {}, ...)
@@ -72,9 +81,9 @@ The original example annotated the awaited result as `Task<int>`. If `Run` retur
 its result. Ellipses stand for undecided options, not a selected signature. The
 empty callback illustrates completion without a value; its exact Task type is open.
 
-`Run` describes executing work on a thread and observing its result. Whether it
-always creates a dedicated thread or uses a pool must be explicit before adoption;
-it must not silently imply both. The constructed object represents a particular
+`Task.Run` would submit general work and return its completion/result, without
+requiring the caller to select a thread. An explicit `Thread.Run`, if retained,
+would need a separate thread-specific contract. The constructed object represents a particular
 thread, with identity and lifecycle control, and exposes awaitable termination
 through `Task`. Exact control operations, repeated Start behavior, and access to
 Task before Start still need contracts. Awaiting termination should mean that the
@@ -92,8 +101,8 @@ not existing generic worker or closure support.
 After release, inventory namespace/type references in the library, runtime bindings,
 compiler integration, metadata, samples, API docs and website. Decide source and
 artifact compatibility, aliases if any, and rebuild requirements together. Renaming
-static result-oriented Start to Run and adding instance Start are separate API
-changes to validate; the namespace rename alone does not implement them.
+the result-oriented entry point to Task.Run and adding instance Thread.Start are
+separate API changes to evaluate; the namespace rename alone does not implement them.
 
 ## Comparison and design questions
 
@@ -101,7 +110,7 @@ Primary .NET 10 library contracts reviewed 2026-09-23:
 
 | Baseline | Relevance to neoCLR |
 | --- | --- |
-| [Task.Run](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task.run?view=net-10.0) queues work to the thread pool and returns a task | Demonstrates result-oriented submission without owning a particular thread. The proposed Thread.Run name must specify its scheduling policy. |
+| [Task.Run](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task.run?view=net-10.0) queues work to the thread pool and returns a task | Demonstrates result-oriented submission without owning a particular thread. neoCLR could retain the familiar submission/result shape while allowing target-specific execution. That divergence requires a clear progress and portability contract. |
 | [Thread.Join](https://learn.microsoft.com/en-us/dotnet/api/system.threading.thread.join?view=net-10.0) blocks the calling thread until the represented thread terminates | Supplies the lifecycle baseline. A Task property could compose termination with ordinary await, but needs completion delivery that does not block unrelated work. |
 
 These are library/host-runtime contracts, not requirements to add a language keyword
@@ -128,7 +137,7 @@ faults and start failures are represented without inventing a faulted Task state
 ## Bounded samples and validation to develop after release
 
 - **Result Worker:** compute a value through Run; retain its Task or await directly.
-  Compare dedicated and pooled execution and document the selected policy.
+  Compare target execution policies and document progress, isolation and unsupported-work behavior.
 - **Tracked Worker:** construct, start, observe identity/state and await `thread.Task`.
   Add one useful lifecycle control only after defining its completion semantics.
 - Exercise completion before/after awaiting, multiple observers, access before Start,

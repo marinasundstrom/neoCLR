@@ -13,8 +13,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   optional thread packaging, platform limits, .NET comparisons and validation needs;
   update website future direction. Clarify abstraction-first concurrency, separating
   Task completion, possible portable worker execution and target-specific Thread
-  capabilities; API placement and WebAssembly policy remain open. Current release
-  APIs remain unchanged.
+  capabilities. Record the subsequent Task.Run-style proposal for general work with
+  platform-selected concurrent execution; scheduling contracts and WebAssembly policy
+  remain open. Current release APIs remain unchanged.
 
 - Correct two stale release samples after the Error-wrapper removal and Storage
   namespace migration; preserve the case-payload and error-carrier regression intent.

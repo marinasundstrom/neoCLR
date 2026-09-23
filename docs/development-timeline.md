@@ -57,6 +57,17 @@ of portable result-oriented submission rather than fixing Thread.Run as universa
 Clarified that Tasks do not inherently create parallel execution. Updated the
 roadmap, design note and website; backend and public API choices remain open.
 
+**Author submission follow-up.** Suggested that Task remains useful for any work
+and could offer a method similar to Task.Run, with the platform determining how it
+executes concurrently.
+
+**Assistant response and action.** Recorded Task.Run-style submission as the preferred
+portable direction to explore, preserving explicit thread lifecycle as a separate
+scenario. Updated current design and website wording while retaining the earlier
+Thread.Run suggestion here. Scheduling, progress and isolation need a portable
+contract; concurrent execution does not necessarily promise parallel execution.
+This is a post-release proposal, not an implemented API.
+
 **Open.** Scheduling policy for Run, result types, lifecycle control, ownership,
 platform capability and migration contracts. Package naming is tentative. This does
 not add a release gate or replace the Streams/Storage/Encoding sequence.
