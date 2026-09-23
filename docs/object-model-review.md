@@ -300,3 +300,24 @@ merely documenting the absent .NET comparer. Preserve ordinary .NET record behav
 when the target contract is unconfigured; keep neoCLR policy and target fixtures on
 the isolated branch. Start with the small record-syntax acceptance source and expand
 only with explicit component equality/hash rules and executable evidence.
+
+
+### Integer records and HashCode — 2026-09-24
+
+The author-directed follow-up now has a passing [record sample](experiments/records/README.md).
+Raven uses the opt-in target contract for System.Equatable<Record> and System.HashCode;
+integer components use value comparisons without boxed comparers. Class allocation
+identity, typed/Object equality, operators, hashes, display and Deconstruct agree.
+Normal .NET synthesis retains its existing path. The first target contract rejects
+record structs, generic/inherited records and other components with RAVT004.
+
+[HashCode](hash-code-design.md) supplies Add(int/string), ToHashCode and Combine(int,int)
+as a mutable Raven value type. Generic/comparer overloads and a hardened hashing
+algorithm are not implied. The importer recognizes private readonly backing fields
+and init-only property signatures, checks write contexts, and imports integer output
+parameters. Init-only assignment remains a compiler rule; runtime field flags and
+application-property reflection remain gaps. See the [integration contract](experiments/raven-target/README.md#record-and-hashcode-integration--2026-09-24).
+
+A same-compilation generic provider fixture exposed a separate reentrant lookup-cache
+issue in Raven. The accepted tests use a referenced provider assembly, matching neoCLR's
+boundary. That general compiler candidate must be reduced/tested independently on main.

@@ -822,3 +822,33 @@ constructor and lookup signatures. Directory traversal and bounded GetItems retu
 core interfaces; StorageList and StorageNames are bootstrap transport helpers. No
 Raven compiler or Runtime Contract configuration changes are introduced. Generated
 core/runtime artifacts must match this development contract.
+
+## Record and HashCode integration — 2026-09-24
+
+The experimental Raven compiler now has an opt-in RuntimeRecordContract. The SDK
+sets RavenRecordAssemblyName=NeoCLR.CoreProbe, RavenRecordEquatableType=System.Equatable`1
+and RavenRecordHashCodeType=System.HashCode. Use a matching compiler/reference/library
+bundle; Preview 9 artifacts do not supply this contract. Default .NET record synthesis
+is unchanged.
+
+The first slice admits non-generic record classes with integer components, preserving
+reference assignment while generating value equality, matching hashes, display and
+Deconstruct. The [record sample](../records/README.md) is the executable gate. RAVT004
+rejects other shapes rather than suggesting full record parity. HashCode is a mutable
+Raven value type with Add(int/string), ToHashCode and Combine(int,int), without generic
+component or comparer support. See [the design comparison](../../hash-code-design.md).
+
+The importer admits private CLI initonly fields with stores restricted to declaring
+constructors or recognized init accessors. IsExternalInit is accepted only as an exact
+core return modifier on a property setter. Integer output parameters support generated
+Deconstruct. A standalone metadata marker has no runtime instance. Initialization-only
+assignment is enforced by Raven; the runtime does not yet preserve an initonly field
+flag or expose application property metadata. This follows the compiler/runtime split
+of [.NET init accessors](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/init),
+without claiming general CLI modifier support. `--record-metadata-checks` verifies
+ordinary, static, foreign-marker and unassociated-setter rejection.
+
+Shared candidate deferred for independent main validation: a source-defined generic
+runtime-interface fixture exposed a reentrant negative metadata-name lookup cache
+issue. The compiler regression uses a separately emitted provider assembly, matching
+the real target boundary. No shared source-cache fix or Raven main release is claimed.

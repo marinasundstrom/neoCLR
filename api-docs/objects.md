@@ -89,8 +89,9 @@ and returns false. Static two-argument Object.Equals is not yet available.
 The intended baseline is .NET-compatible reference/value semantics. Class display,
 reference identity and class equality/hash now have bounded implementations. String
 identity and boxed-value dispatch remain representation gaps. Raven record syntax
-is the intended end-to-end acceptance case for generated equality/hash behavior;
-records are not yet supported by this slice. See Microsoft's
+now passes an end-to-end integer record-class sample with generated equality,
+hashing, display and deconstruction. Record structs, generic/inherited records and
+other component types are not supported by this initial target contract. See Microsoft's
 [Object contract](https://learn.microsoft.com/en-us/dotnet/api/system.object?view=net-10.0)
 for the comparison baseline; neoCLR does not yet provide that entire surface.
 
@@ -101,3 +102,25 @@ not part of the next small Object slice.
 Migration: application classes now retain Object as their metadata base. A class
 that supplies ToString should declare an override; same-name hiding is rejected by
 the current importer/runtime profile. Use matching reference/library artifacts.
+
+## HashCode and records (development)
+
+[System.HashCode](xref:System.HashCode) is a mutable value accumulator. Add(int),
+Add(string), ToHashCode() and Combine(int, int) are available. Copies retain independent
+state. String hashing uses non-null UTF-8 contents without Unicode normalization and
+allocates a temporary byte snapshot. Generic values and custom comparers are not
+supported. Hashes can collide and must not be persisted; this implementation has no
+randomized seed and does not reproduce .NET's hash values.
+
+The <a href="/samples/records.zip">checked record sample</a> uses `record class
+Key(Number: int)` and a two-component Pair. Separate instances compare equal by
+components while ReferenceEquals distinguishes their allocations. Equals through
+Object, generated operators and hashes agree. Display prints `Key { Number = 42 }`;
+deconstruction retrieves the components. Current record components are Int32 only,
+even though the standalone hash accumulator also accepts strings.
+
+Raven's target configuration selects System.Equatable and System.HashCode. Unsupported
+record shapes report RAVT004. Init-only property assignment remains a compiler rule;
+the importer recognizes the IsExternalInit metadata marker and permits readonly
+backing-field stores only in declaring constructors or recognized init accessors.
+Application-property reflection and a runtime init-only field flag remain gaps.

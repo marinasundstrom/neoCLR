@@ -91,7 +91,7 @@ static class ApplicationTypes
         if (type.HasGenericParameters && !LibraryNames.ContainsKey(type) || type.IsEnum && !FlagsLibrary.IsMatched(type)
             || type.IsExplicitLayout || (type.DeclaringType?.HasGenericParameters ?? false) || type.IsValueType && type.HasInterfaces && !LibraryNames.ContainsKey(type)
             || (!type.IsInterface && !DelegateLibrary.IsMatched(type) && !FlagsLibrary.IsMatched(type) && !MarkerLibrary.IsMatched(type) && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && !IsModule(type.BaseType?.Resolve()?.Module))
-            || !FlagsLibrary.IsMatched(type) && type.Fields.Any(f => f.IsStatic || f.HasMarshalInfo || f.IsInitOnly)
+            || !FlagsLibrary.IsMatched(type) && type.Fields.Any(f => f.IsStatic || f.HasMarshalInfo || f.IsInitOnly && !f.IsPrivate)
             || type.Methods.Any(m => m.IsConstructor && m.IsStatic))
             throw new InvalidDataException("Unsupported application type: " + type.FullName);
         var name = LibraryNames.TryGetValue(type, out var libraryOwner)
@@ -162,8 +162,25 @@ static class ApplicationTypes
         if (method.IsConstructor) return ".ctor";
         return MetadataIdentity.MemberName(method.Name);
     }
+    public static bool IsInitReturn(TypeReference type) => type is RequiredModifierType modifier
+        && modifier.ModifierType.FullName == "System.Runtime.CompilerServices.IsExternalInit"
+        && RuntimeSignatures.IsCore(modifier.ModifierType.Scope)
+        && modifier.ElementType.MetadataType == MetadataType.Void;
+    public static bool IsInitSetter(MethodDefinition method) => IsInitReturn(method.ReturnType)
+        && method.HasThis && !method.IsStatic && method.IsSetter && method.Parameters.Count == 1
+        && method.DeclaringType.Properties.Any(p => p.SetMethod == method && p.Parameters.Count == 0
+            && p.PropertyType.FullName == method.Parameters[0].ParameterType.FullName);
+    public static void CheckFieldWrite(FieldDefinition field, MethodDefinition caller)
+    {
+        if (field.IsInitOnly && (field.DeclaringType != caller.DeclaringType ||
+            !(caller.IsConstructor && !caller.IsStatic || IsInitSetter(caller))))
+            throw new InvalidDataException("Readonly field writes require the declaring constructor or init accessor.");
+    }
     public static void CheckMethod(MethodReference method)
     {
+        if (method.ReturnType is RequiredModifierType &&
+            (!IsInitReturn(method.ReturnType) || method.Resolve() is not { } definition || !IsInitSetter(definition)))
+            throw new InvalidDataException("Unsupported application return modifier.");
         if (method.ExplicitThis || method.HasGenericParameters || method is GenericInstanceMethod
             || (method.DeclaringType.HasGenericParameters || method.DeclaringType is GenericInstanceType) && !IsLibrary(method.DeclaringType)
             || method.CallingConvention != MethodCallingConvention.Default)

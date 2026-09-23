@@ -16,6 +16,9 @@ items:
   - uid: System.ConsoleReadError.Unavailable
     name: ConsoleReadError.Unavailable
     type: Struct
+  - uid: System.HashCode
+    name: HashCode
+    type: Struct
   - uid: System.Object
     name: object
     type: Class
@@ -132,6 +135,13 @@ items:
   - uid: System.IO.TextWriter
     name: TextWriter
     type: Interface
+- uid: System.Runtime.CompilerServices
+  name: System.Runtime.CompilerServices
+  type: Namespace
+  items:
+  - uid: System.Runtime.CompilerServices.IsExternalInit
+    name: IsExternalInit
+    type: Class
 - uid: System.Storage
   name: System.Storage
   type: Namespace

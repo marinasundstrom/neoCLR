@@ -1,0 +1,389 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.HashCode
+  commentId: T:System.HashCode
+  id: HashCode
+  parent: System
+  children:
+  - System.HashCode.#ctor
+  - System.HashCode.Add(System.Int32)
+  - System.HashCode.Add(System.String)
+  - System.HashCode.Combine(System.Int32,System.Int32)
+  - System.HashCode.ToHashCode
+  langs:
+  - csharp
+  - vb
+  name: HashCode
+  nameWithType: HashCode
+  fullName: System.HashCode
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: A mutable value accumulator for combining integer and string components into an execution-local hash.
+  remarks: Development API. Copies have independent state. This bounded implementation has no generic Add or comparer overloads, no randomized seed, and no persistent or cryptographic guarantee. It does not reproduce .NET hash values. Equal component sequences produce equal hashes; collisions are possible.
+  example: []
+  syntax:
+    content: public struct HashCode
+    content.vb: Public Structure HashCode
+  inheritedMembers:
+  - System.Object.GetType
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.Equals(System.Object)
+  - System.Object.GetHashCode
+  - System.Object.ToString
+- uid: System.HashCode.#ctor
+  commentId: M:System.HashCode.#ctor
+  id: '#ctor'
+  parent: System.HashCode
+  langs:
+  - csharp
+  - vb
+  name: HashCode()
+  nameWithType: HashCode.HashCode()
+  fullName: System.HashCode.HashCode()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Creates an empty accumulator.
+  example: []
+  syntax:
+    content: public HashCode()
+    content.vb: Public Sub New()
+  overload: System.HashCode.#ctor*
+  nameWithType.vb: HashCode.New()
+  fullName.vb: System.HashCode.New()
+  name.vb: New()
+- uid: System.HashCode.Add(System.Int32)
+  commentId: M:System.HashCode.Add(System.Int32)
+  id: Add(System.Int32)
+  parent: System.HashCode
+  langs:
+  - csharp
+  - vb
+  name: Add(int)
+  nameWithType: HashCode.Add(int)
+  fullName: System.HashCode.Add(int)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Mixes an integer component into this accumulator.
+  remarks: Arithmetic wraps at 32 bits; overflow does not fault.
+  example: []
+  syntax:
+    content: public void Add(int value)
+    parameters:
+    - id: value
+      type: System.Int32
+      description: The next component in order.
+    content.vb: Public Sub Add(value As Integer)
+  overload: System.HashCode.Add*
+  nameWithType.vb: HashCode.Add(Integer)
+  fullName.vb: System.HashCode.Add(Integer)
+  name.vb: Add(Integer)
+- uid: System.HashCode.Add(System.String)
+  commentId: M:System.HashCode.Add(System.String)
+  id: Add(System.String)
+  parent: System.HashCode
+  langs:
+  - csharp
+  - vb
+  name: Add(string)
+  nameWithType: HashCode.Add(string)
+  fullName: System.HashCode.Add(string)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Mixes the UTF-8 contents of a string into this accumulator.
+  remarks: Allocates a temporary UTF-8 byte snapshot. No Unicode normalization is performed. Null is not supported.
+  example: []
+  syntax:
+    content: public void Add(string value)
+    parameters:
+    - id: value
+      type: System.String
+      description: The non-null string component.
+    content.vb: Public Sub Add(value As String)
+  overload: System.HashCode.Add*
+  nameWithType.vb: HashCode.Add(String)
+  fullName.vb: System.HashCode.Add(String)
+  name.vb: Add(String)
+- uid: System.HashCode.ToHashCode
+  commentId: M:System.HashCode.ToHashCode
+  id: ToHashCode
+  parent: System.HashCode
+  langs:
+  - csharp
+  - vb
+  name: ToHashCode()
+  nameWithType: HashCode.ToHashCode()
+  fullName: System.HashCode.ToHashCode()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Returns the current combined hash without changing the accumulator.
+  example: []
+  syntax:
+    content: public int ToHashCode()
+    return:
+      type: System.Int32
+      description: A 32-bit hash. Do not persist it or assume different values cannot collide.
+    content.vb: Public Function ToHashCode() As Integer
+  overload: System.HashCode.ToHashCode*
+- uid: System.HashCode.Combine(System.Int32,System.Int32)
+  commentId: M:System.HashCode.Combine(System.Int32,System.Int32)
+  id: Combine(System.Int32,System.Int32)
+  parent: System.HashCode
+  langs:
+  - csharp
+  - vb
+  name: Combine(int, int)
+  nameWithType: HashCode.Combine(int, int)
+  fullName: System.HashCode.Combine(int, int)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Combines two integer components in order.
+  example: []
+  syntax:
+    content: public static int Combine(int first, int second)
+    parameters:
+    - id: first
+      type: System.Int32
+      description: The first component.
+    - id: second
+      type: System.Int32
+      description: The second component.
+    return:
+      type: System.Int32
+      description: The same hash as adding both components to an empty accumulator.
+    content.vb: Public Shared Function Combine(first As Integer, second As Integer) As Integer
+  overload: System.HashCode.Combine*
+  nameWithType.vb: HashCode.Combine(Integer, Integer)
+  fullName.vb: System.HashCode.Combine(Integer, Integer)
+  name.vb: Combine(Integer, Integer)
+references:
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: System.Object.html#System_Object_GetType
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: System.Object.html#System_Object_GetType
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: System.Object.html#System_Object_GetType
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: System.Object.html#System_Object_ReferenceEquals_System_Object_System_Object_
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: System.Object.html#System_Object_ReferenceEquals_System_Object_System_Object_
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: System.Object.html
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: System.Object.html
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: System.Object.html#System_Object_ReferenceEquals_System_Object_System_Object_
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: System.Object.html
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: System.Object.html
+  - name: )
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: System.Object.html#System_Object_Equals_System_Object_
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: System.Object.html#System_Object_Equals_System_Object_
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: System.Object.html
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: System.Object.html#System_Object_Equals_System_Object_
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: System.Object.html
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: System.Object.html#System_Object_GetHashCode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: System.Object.html#System_Object_GetHashCode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: System.Object.html#System_Object_GetHashCode
+  - name: (
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: System.Object.html#System_Object_ToString
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: System.Object.html#System_Object_ToString
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: System.Object.html#System_Object_ToString
+  - name: (
+  - name: )
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: System.Object.html
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.HashCode.#ctor*
+  commentId: Overload:System.HashCode.#ctor
+  isExternal: true
+  href: System.HashCode.html#System_HashCode__ctor
+  name: HashCode
+  nameWithType: HashCode.HashCode
+  fullName: System.HashCode.HashCode
+  nameWithType.vb: HashCode.New
+  fullName.vb: System.HashCode.New
+  name.vb: New
+- uid: System.HashCode.Add*
+  commentId: Overload:System.HashCode.Add
+  isExternal: true
+  href: System.HashCode.html#System_HashCode_Add_System_Int32_
+  name: Add
+  nameWithType: HashCode.Add
+  fullName: System.HashCode.Add
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System.HashCode.ToHashCode*
+  commentId: Overload:System.HashCode.ToHashCode
+  isExternal: true
+  href: System.HashCode.html#System_HashCode_ToHashCode
+  name: ToHashCode
+  nameWithType: HashCode.ToHashCode
+  fullName: System.HashCode.ToHashCode
+- uid: System.HashCode.Combine*
+  commentId: Overload:System.HashCode.Combine
+  isExternal: true
+  href: System.HashCode.html#System_HashCode_Combine_System_Int32_System_Int32_
+  name: Combine
+  nameWithType: HashCode.Combine
+  fullName: System.HashCode.Combine

@@ -1,0 +1,40 @@
+namespace System
+
+import System.Runtime.CompilerServices.*
+
+public struct HashCode {
+    private field State: int
+
+    init() {
+        State = 0
+    }
+
+    func Add(value: int) {
+        State = (State ^ value) * 16777619 + -1640531527
+    }
+
+    func Add(value: string) {
+        let bytes = RuntimeServices.Utf8Encode(value)
+        var hash = -2128831035
+        var index = 0
+        while index < bytes.Length {
+            hash = (hash ^ bytes[index]) * 16777619
+            index += 1
+        }
+        Add(hash)
+    }
+
+    func ToHashCode() -> int {
+        var bits = State
+        bits = (bits ^ (int)((uint)bits >> 16)) * -2048144789
+        bits = (bits ^ (int)((uint)bits >> 13)) * -1028477387
+        return bits ^ (int)((uint)bits >> 16)
+    }
+
+    static func Combine(first: int, second: int) -> int {
+        var hash = HashCode()
+        hash.Add(first)
+        hash.Add(second)
+        return hash.ToHashCode()
+    }
+}

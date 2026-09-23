@@ -26,8 +26,14 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'SeekableStream'">
     <Compile Include="src/System/IO/SeekableStream.rvn" />
   </ItemGroup>
-  <!-- Declaration slices shadow core types and contain no typeof expressions. -->
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HashCode'">
+    <Compile Include="src/System/HashCode.rvn" />
+  </ItemGroup>
+  <!-- Declaration slices shadow core types and contain no typeof expressions or records. -->
   <PropertyGroup>
+    <RavenRecordAssemblyName></RavenRecordAssemblyName>
+    <RavenRecordEquatableType></RavenRecordEquatableType>
+    <RavenRecordHashCodeType></RavenRecordHashCodeType>
     <RavenTypeOfAssemblyName></RavenTypeOfAssemblyName>
     <RavenTypeOfInfoType></RavenTypeOfInfoType>
     <RavenTypeOfContextType></RavenTypeOfContextType>

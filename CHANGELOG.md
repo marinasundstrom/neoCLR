@@ -8,6 +8,25 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Prepare a matching local neoCLR/Raven development SDK workspace for VS Code,
+  with records, Storage and Console projects and pinned compiler/server paths.
+  Verify all three build/run paths and HashCode/Concurrency editor completions.
+  Remove the Storage sample’s Console wildcard import to avoid the collision
+  between Console.Error and the Result.Error case constructor. This is a local
+  development snapshot, not a published SDK release.
+
+- Add a bounded System.HashCode value accumulator (Add for integer/non-null string,
+  ToHashCode and two-integer Combine) and opt-in Raven record-class integration.
+  Integer records preserve reference identity while generating component equality,
+  hashes, display and deconstruction. Other record shapes report RAVT004; generic
+  hashing/comparers, boxed-value equality and runtime init-only field flags remain
+  unsupported. Import recognized init-only setters and private readonly field writes
+  with explicit context checks. Add a checked record sample and API/website coverage.
+  Requires matching experimental Raven compiler, reference and runtime artifacts;
+  default Raven/.NET record synthesis is unchanged. Validation: 40 compiler tests,
+  three hash runtime tests, record/Equatable sample and shape rejection, readonly
+  metadata checks, full library regeneration, 385 API items and the website build.
+
 - Add a website namespace overview describing the current library and runtime
   support areas, with reference/guide links and explicit coverage gaps. Link it
   from the homepage and API navigation; keep Console under System and extend
@@ -26,10 +45,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Keep native identity imports exact and report ManagedHeap service requirements.
   Update importer static/virtual Object handling, generated library and API docs,
   and add a downloadable class sample. Record syntax is the author-selected next
-  end-to-end gate: the acceptance probe currently fails on a missing comparer
-  contract; generated hashing also requires HashCode. The author directs implementing
-  HashCode and adapting Raven record generation next; no record support is claimed
-  in this slice. Validation: nine equality/service tests, six identity cases, six
+  end-to-end gate: the initial acceptance probe exposed a missing comparer
+  contract and HashCode dependency. The author then directed HashCode and adapted record synthesis,
+  implemented in the follow-up entry above. Validation: nine equality/service tests, six identity cases, six
   display regressions, both Raven samples, 15 .NET assertions, full library
   regeneration, 378 API items and the combined website build.
 

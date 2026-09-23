@@ -1,0 +1,24 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Runtime.CompilerServices
+  commentId: N:System.Runtime.CompilerServices
+  id: System.Runtime.CompilerServices
+  children:
+  - System.Runtime.CompilerServices.IsExternalInit
+  langs:
+  - csharp
+  - vb
+  name: System.Runtime.CompilerServices
+  nameWithType: System.Runtime.CompilerServices
+  fullName: System.Runtime.CompilerServices
+  type: Namespace
+  assemblies:
+  - NeoCLR.CoreProbe
+references:
+- uid: System.Runtime.CompilerServices.IsExternalInit
+  commentId: T:System.Runtime.CompilerServices.IsExternalInit
+  isExternal: true
+  href: System.Runtime.CompilerServices.IsExternalInit.html
+  name: IsExternalInit
+  nameWithType: IsExternalInit
+  fullName: System.Runtime.CompilerServices.IsExternalInit

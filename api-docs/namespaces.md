@@ -14,7 +14,7 @@ is supported.
 
 | Namespace | What it contains | Explore |
 | --- | --- | --- |
-| `System` | Core types such as Object, Value, primitives, String and Array; Func delegates; Option and Result; common capability and error types; Console; dates, times, durations and clocks. Console is a class in this namespace. | [Core reference](xref:System), [Object and Value](objects.md), [Console](console.md), [arrays](/features/arrays/index.html), [outcomes](/features/outcomes/index.html), [dates and clocks](/features/time/index.html) |
+| `System` | Core types such as Object, Value, HashCode, primitives, String and Array; Func delegates; Option and Result; common capability and error types; Console; dates, times, durations and clocks. Console is a class in this namespace. | [Core reference](xref:System), [Object and Value](objects.md), [Console](console.md), [arrays](/features/arrays/index.html), [outcomes](/features/outcomes/index.html), [dates and clocks](/features/time/index.html) |
 | `System.Collections` | Iteration and collection capabilities: Iterable, Iterator, Collection, Sequence, List and map interfaces, with ArrayList and HashMap implementations. | [Collections and queries](/features/collections/index.html) |
 | `System.Concurrency` | Explicit Thread lifecycle and ThreadPool execution using isolated workers. This development namespace replaces the Preview 9 System.Threading namespace. | [Reference](xref:System.Concurrency), [thread guide](index.md#explicit-threads-in-development) |
 | `System.Environment` | Functions for command-line arguments, the current directory and environment-variable lookup. Lookup distinguishes a missing variable from a host access error through Result and Option. | Member reference coverage pending. |
@@ -34,7 +34,7 @@ text or I/O workflows. Their member reference coverage is still pending.
 
 | Namespace | What it contains |
 | --- | --- |
-| `System.Runtime.CompilerServices` | Compiler-facing metadata such as UnionAttribute and runtime integration support. Internal bootstrap services are not application APIs. |
+| `System.Runtime.CompilerServices` | Compiler-facing metadata such as UnionAttribute and [IsExternalInit](xref:System.Runtime.CompilerServices.IsExternalInit), plus runtime integration support. Internal bootstrap services are not application APIs. |
 | `System.Runtime.InteropServices` | NativeMemory allocation and freeing for the supported unsafe pointer surface. This is separate from managed object and array storage. |
 
 ## Finding a type

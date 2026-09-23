@@ -13,7 +13,7 @@ static class CoreDeclarations
         if (unionProbe)
             declarations = declarations.Replace("public static class Console {", "public static class Console { " + ProcessBindings.ConsoleDeclaration).Replace("public static class Math {",
                 "public static class Math { " + DoubleBindings.MathDeclarations + " public static Result<int, OverflowError> Abs(int value) => default; public static Result<int, InvalidRangeError> Clamp(int value, int min, int max) => default;")
-                + "public static class FaultFunctions { public static void Fault(string message) { } }" + UnionDeclarations.Source + DelegateBindings.Declarations + ProcessBindings.Declarations + CalendarBindings.Declarations + PathBindings.Declarations + FileBindings.Declarations + StorageItemBindings.Declarations + StreamBindings.Declarations + ReaderBindings.Declarations + StorageProviderBindings.Declarations + FileSystemBindings.Declarations + ResultBindings.Declarations;
+                + "public static class FaultFunctions { public static void Fault(string message) { } }" + UnionDeclarations.Source + DelegateBindings.Declarations + ProcessBindings.Declarations + CalendarBindings.Declarations + HashCodeBindings.Declarations + PathBindings.Declarations + FileBindings.Declarations + StorageItemBindings.Declarations + StreamBindings.Declarations + ReaderBindings.Declarations + StorageProviderBindings.Declarations + FileSystemBindings.Declarations + ResultBindings.Declarations;
         if (collectionProbe) declarations += WorkerBindings.Declarations + TaskBindings.Declarations + Utf8Bindings.Declarations + UnicodeScalarBindings.Declarations + QueryBindings.Declarations + OutcomeOperatorBindings.Declarations + CollectionDeclarations.Source + ReflectionBindings.Declarations + ReflectionBindings.ProviderDeclarations + NativeMemoryBindings.Declaration + InterfaceBindings.Declarations;
         if (libraryBootstrap) declarations += RuntimeFailureBindings.Declarations + NativeAllocationBindings.Declarations + ParameterSnapshotBindings.Declarations + CheckedStorageBindings.Declarations + RuntimeServiceBindings.Declarations + ValueStorageBindings.Declarations;
         var source = Source.Replace("public struct Double { }", unionProbe ? DoubleBindings.Declarations : "public struct Double { }").Replace("public struct Int32 { }", unionProbe ? Int32Bindings.Declarations : "public struct Int32 { }").Replace("public sealed class String { }", StringBindings.Declarations(unionProbe, collectionProbe))
@@ -34,6 +34,7 @@ static class CoreDeclarations
             using var image = Mono.Cecil.AssemblyDefinition.ReadAssembly(stream);
             var module = image.MainModule;
             CalendarBindings.ProjectLayout(module);
+            HashCodeBindings.ProjectLayout(module);
             if (libraryBootstrap) { PrimitiveLibrary.Project(module); OpaqueLibrary.Project(module); EmptyLibrary.Project(module); ErrorCarrierLibrary.Project(module); GenericUnionLibrary.Project(module); }
             if (libraryBootstrap && collectionProbe)
             {
@@ -146,6 +147,7 @@ static class CoreDeclarations
             public static class Console { public static void WriteLine(string value) { } }
         }
         namespace System.Runtime.CompilerServices {
+            public static class IsExternalInit { }
             // Union probe attribute
             public sealed class ReferenceAssemblyAttribute : System.Attribute { }
             // Raven namespace-member metadata marker; not an executable runtime API.

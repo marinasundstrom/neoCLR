@@ -25,6 +25,22 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-24 — Refresh the SDKs for VS Code testing
+
+**Author direction.** Said it was soon time to update the neoCLR and Raven SDKs
+so they could test the latest work in VS Code.
+
+**Assistant action and outcome.** Prepared an isolated local development bundle
+with matching runtime, library, reference assembly, bridge, compiler and language
+server. Added saved records, Storage and Console projects with build/run tasks.
+All three projects built and ran; stdio language-server checks returned HashCode
+and Concurrency completions. The Storage check exposed a Console.Error/Result.Error
+name collision, fixed by qualifying Console calls in the maintained sample.
+The compiler's supported record slice remains limited to integer record classes.
+This is a local SDK snapshot, not a published release or a manual VS Code UI test.
+See [the local workspace instructions](local-sdk-snapshot.md). Other SDK installations
+were left in place.
+
 ## 2026-09-24 — Grow a website namespace overview with the APIs
 
 **Author.** Requested a website namespace overview explaining what namespaces
@@ -5821,3 +5837,29 @@ Object-slice validation completed: nine equality/service checks, six identity ca
 six display regressions, both Raven samples, 15 .NET assertions, full library
 regeneration and combined API/website validation passed. The record probe's emission
 failure remains the next acceptance target.
+
+
+### 2026-09-24 — First target-aware record implementation
+
+- **Author direction carried forward:** make Raven support neoCLR record semantics
+  and implement System.HashCode. Keep .NET reference/value behavior central and use
+  actual record syntax as the acceptance case.
+- **Assistant action:** implemented a bounded mutable HashCode value accumulator,
+  an opt-in compiler RuntimeRecordContract and a record-class sample with integer
+  components. Existing .NET synthesis is retained; other target record shapes report
+  an explicit diagnostic. The compiler work stays on the experimental feature branch.
+- **Integration finding:** record emission exposed readonly backing fields,
+  IsExternalInit return modifiers and Deconstruct integer outputs. Added checked
+  importer handling rather than changing records into ordinary mutable classes.
+  Initialization-only assignment is a compiler rule; runtime field flags and property
+  reflection remain outside this slice.
+- **Observed outcome:** the neoCLR record source passes identity, equality through
+  typed/Object views, operators, hashes, display and deconstruction. HashCode tests
+  cover signed boundaries, independent copies and UTF-8 string content. Compiler
+  baseline and configured tests pass (40 checks); full artifact regeneration and
+  combined website/API validation pass (385 documented items).
+- **Open:** additional component/null contracts, record structs/generics/inheritance,
+  generic hashing and randomized/adversarial-input policy. A source-defined generic
+  provider fixture exposed a shared lookup-cache candidate, deferred for independent
+  main validation; the accepted contract is tested across a referenced metadata boundary.
+  See [the sample](experiments/records/README.md) and [design comparison](hash-code-design.md).

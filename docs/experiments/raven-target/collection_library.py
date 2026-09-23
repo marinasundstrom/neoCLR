@@ -84,6 +84,7 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/ModuleInfo.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/AssemblyInfo.neoil')
         result += build(ROOT / 'runtime/raven/Object.neoil')
+        result += build(ROOT / 'runtime/raven/HashCode.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectTypeHandle.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectIdentity.neoil')
         result += build(ROOT / 'runtime/raven/SingleError.neoil')

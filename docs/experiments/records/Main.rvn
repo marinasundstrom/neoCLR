@@ -1,0 +1,46 @@
+import System.*
+
+record class Key(Number: int)
+record class Pair(Left: int, Right: int)
+
+func Main() {
+    let first = Key(42)
+    let second = Key(42)
+    let alias = first
+    let value: Object = first
+    let equatable: Equatable<Key> = first
+    if !Object.ReferenceEquals(first, alias) {
+        System.Fault("Record assignment must preserve class identity")
+    }
+    if Object.ReferenceEquals(first, second) {
+        System.Fault("Separate records must retain distinct identities")
+    }
+    if !first.Equals(second) || !value.Equals(second) || !equatable.Equals(second) || first != second {
+        System.Fault("Record equality must agree through typed and Object views")
+    }
+    if first.GetHashCode() != second.GetHashCode() {
+        System.Fault("Equal records must have equal hashes")
+    }
+    if first == Key(7) {
+        System.Fault("Different record components must compare unequal")
+    }
+    if first.ToString() != "Key { Number = 42 }" {
+        System.Fault("Unexpected record display")
+    }
+    let pair = Pair(42, 7)
+    let (left, right) = pair
+    if left != 42 || right != 7 || pair.GetHashCode() != HashCode.Combine(42, 7) {
+        System.Fault("Deconstruction or ordered component hash differs")
+    }
+    var hash = HashCode()
+    hash.Add(42)
+    hash.Add(7)
+    var independent = hash
+    independent.Add(99)
+    if hash.ToHashCode() != pair.GetHashCode() || independent.ToHashCode() == hash.ToHashCode() {
+        System.Fault("Hash accumulator copies must retain independent state")
+    }
+    Console.WriteLine(first.ToString())
+    Console.WriteLine("Records retain reference identity and compare their components")
+    Console.WriteLine("Deconstruction and ordered hashes agree")
+}

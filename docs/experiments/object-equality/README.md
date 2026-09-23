@@ -17,7 +17,7 @@ not a record implementation. String identity, boxed virtual equality/hash and th
 static Object.Equals overload remain unsupported. Raw tests additionally cover
 nulls, GC, arrays, explicit base calls and separate box identity.
 
-## Pending record acceptance probe
+## Record acceptance history
 
 `RecordProbe.rvn` expresses the same distinction using `record class Key(Number:
 int)`, typed/Object Equals, generated operators and hashes. It is deliberately not
@@ -30,3 +30,6 @@ Observed 2026-09-23: compilation reaches emission, then fails with `Failed to re
 EqualityComparer<T>.` Raven record hashing also references System.HashCode.Add<T>
 and ToHashCode. These dependencies are not implemented by this Object slice. This
 probe is an acceptance target, not a passing test or a promise of record support.
+
+2026-09-24: the integer record-class probe passes with the opt-in target contract.
+See [the maintained record sample](../records/README.md) for current scope and checks.

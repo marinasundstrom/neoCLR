@@ -191,3 +191,9 @@ Object's protected parameterless constructor is described in the Object guide. I
 is only a derived-construction contract; direct construction is rejected because
 Object is abstract. The runtime's public constructor entry supports validated base
 chaining; reference accessibility and constructor-state checks restrict its use.
+
+
+2026-09-24: System.HashCode and the compiler-only IsExternalInit marker are included
+in metadata selection with summaries for every newly exposed member. The Object guide
+and namespace overview describe the bounded record/hash contract. HashCode has no generic
+or comparer overloads. IsExternalInit is metadata support, not an executable service.

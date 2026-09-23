@@ -1,5 +1,4 @@
 import System.*
-import System.Console.*
 import System.Result.*
 import System.Storage.*
 import System.Storage.File
@@ -46,7 +45,7 @@ func WriteMessage(output: OutputStream) -> Result<unit, StreamError> {
 
 func ShowText(prefix: string, result: Result<string, TextReadError>) {
     match result {
-        Ok(let text) => WriteLine(prefix + text)
+        Ok(let text) => Console.WriteLine(prefix + text)
         Error(let error) => System.Fault(error.ToString())
     }
 }
@@ -57,7 +56,7 @@ func FileAccess(file: File) {
             let written = WriteMessage(output)
             output.Close()
             match written {
-                Ok(_) => WriteLine("Created " + file.Name)
+                Ok(_) => Console.WriteLine("Created " + file.Name)
                 Error(let error) => System.Fault(error.ToString())
             }
         }
@@ -88,7 +87,7 @@ func FileAccess(file: File) {
         Error(let error) => System.Fault(error.ToString())
     }
     match file.CreateNew() {
-        Error(let error) => WriteLine("Existing file: " + error.ToString())
+        Error(let error) => Console.WriteLine("Existing file: " + error.ToString())
         Ok(let unexpected) => {
             unexpected.Close()
             System.Fault("Exclusive creation replaced a file")
@@ -104,27 +103,27 @@ func Explore(directory: Directory) {
     }
     match directory.GetItems(8) {
         Ok(let items) => {
-            WriteLine("Items:")
+            Console.WriteLine("Items:")
             for item in items {
                 if item is Directory {
-                    WriteLine("directory: " + item.Name)
+                    Console.WriteLine("directory: " + item.Name)
                 } else {
-                    WriteLine("file: " + item.Name)
+                    Console.WriteLine("file: " + item.Name)
                 }
             }
         }
         Error(let error) => System.Fault(error.ToString())
     }
     match directory.GetDirectory("examples") {
-        Ok(let child) => WriteLine("Directory: " + child.Path.Text)
+        Ok(let child) => Console.WriteLine("Directory: " + child.Path.Text)
         Error(let error) => System.Fault(error.ToString())
     }
     match directory.GetItem(Parse("message.txt")) {
-        Ok(let item) => WriteLine("Item: " + item.Name)
+        Ok(let item) => Console.WriteLine("Item: " + item.Name)
         Error(let error) => System.Fault(error.ToString())
     }
     match directory.GetFile("missing.txt") {
-        Error(let error) => WriteLine("Missing file: " + error.ToString())
+        Error(let error) => Console.WriteLine("Missing file: " + error.ToString())
         Ok(_) => System.Fault("Unexpected fixture file")
     }
 }

@@ -1,6 +1,6 @@
 # neoCLR platform roadmap
 
-**Updated 2026-09-23 · Product-led planning, not a release schedule.**
+**Updated 2026-09-24 · Product-led planning, not a release schedule.**
 
 Build a platform that can justify itself through useful programs. Each milestone
 has a theme, a concrete sample product and smaller cases that make the underlying
@@ -41,13 +41,14 @@ adds ReferenceEquals and default/overridable class Equals/GetHashCode. String id
 is explicitly unsupported; boxed virtual value equality/hash remain open.
 **Author-selected end-to-end acceptance case:** Raven record syntax must exercise
 record semantics, including generated equality/hash while preserving class/value
-assignment behavior. The checked-in record-class probe currently fails emission on
-missing EqualityComparer<T>; generated hashing also needs a HashCode contract.
-The author now directs implementing System.HashCode and making Raven record
-generation support neoCLR semantics. Resolve those integration dependencies in
-bounded follow-ups on the isolated compiler branch. Handwritten class
-overrides are prerequisites, not completion of record support. Value removal still
-requires its own storage migration, not a rename to Object.
+assignment behavior. The first [record-class sample](experiments/records/README.md)
+now passes with Int32 components: reference identity, typed/Object equality, operators,
+hashes, display and deconstruction. [System.HashCode](hash-code-design.md) provides a
+mutable value accumulator with integer/string Add and two-integer Combine. Raven uses
+an opt-in target metadata contract on its isolated feature branch; default .NET record
+synthesis remains unchanged. Unsupported record shapes report RAVT004. Record structs,
+generic/inherited records, other components and null-component policy remain follow-ups.
+Value removal still requires its own storage migration, not a rename to Object.
 
 When choosing work autonomously, follow the current author-directed focus and the
 [immediate next step](#working-rules-and-immediate-next-step). The post-release
@@ -670,8 +671,9 @@ File and Directory; the legacy bootstrap library keeps its static File helpers.
 The repair restores the existing Console regression suite without changing public APIs.
 The [Object/Value review](object-model-review.md) now records those dependencies and
 missing members. The bounded class display/override case now preserves
-.NET-style class reference sharing and value copying. Equality/hash policy and Value
-retirement remain separate, explicitly scoped follow-ups.
+.NET-style class reference sharing and value copying. Class equality/hash and the first integer record-class gate now have checked evidence.
+The next bounded Object review should address the component/null and boxed-value gaps
+before broadening record support. Value retirement remains a separate storage migration.
 This is a bounded foundation review; networking remains later. Console ownership,
 cleanup on propagated errors and buffering remain follow-up questions, not selected
 redesigns. The scheduling/operation-cancellation work below remains open.

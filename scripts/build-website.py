@@ -257,6 +257,12 @@ def main():
     shutil.make_archive(str(downloads / 'object-equality'), 'zip', equality_sources.parent)
     shutil.rmtree(equality_sources.parent)
     shutil.rmtree(object_sources.parent)
+    record_sources = OUTPUT / '_records-source' / 'records'
+    record_sources.mkdir(parents=True)
+    for name in ('Main.rvn', 'Records.rvnproj', 'expected.txt', 'verify.py', 'README.md'):
+        shutil.copyfile(ROOT / 'docs/experiments/records' / name, record_sources / name)
+    shutil.make_archive(str(downloads / 'records'), 'zip', record_sources.parent)
+    shutil.rmtree(record_sources.parent)
     cancel_sources = OUTPUT / '_worker-cancel-source' / 'worker-task-cancellation'
     cancel_sources.mkdir(parents=True)
     for name in ('Workers.rvn', 'Copy.rvn', 'Main.rvn', 'DelayedCopy.rvnproj', 'Fault.rvn', 'Forbidden.rvn', 'Affinity.rvn', 'affinity.expected.txt', 'expected.txt', 'README.md'):

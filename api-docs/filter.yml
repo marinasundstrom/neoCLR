@@ -1,4 +1,8 @@
 apiRules:
+- include:
+    uidRegex: '^System\.Runtime\.CompilerServices($|\.IsExternalInit$)'
+- include:
+    uidRegex: '^System\.HashCode($|\.)'
 # Object members are selected explicitly; protected construction is documented manually.
 - include:
     uidRegex: '^System\.Object($|\.(GetType|ToString|ReferenceEquals|Equals|GetHashCode)($|\())'

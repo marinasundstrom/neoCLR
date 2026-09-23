@@ -1,0 +1,3 @@
+; Raven-authored hash accumulator.
+.include "generated/HashCode.methods.neoil"
+.include "generated/HashCode.helpers.neoil"

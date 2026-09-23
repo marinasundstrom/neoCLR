@@ -6,6 +6,12 @@ using Raven.CodeAnalysis;
 using Raven.CodeAnalysis.Syntax;
 using AssemblyDefinition = Mono.Cecil.AssemblyDefinition;
 
+if (args.Length == 1 && args[0] == "--record-metadata-checks")
+{
+    RecordMetadataChecks.Verify();
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--storage-hierarchy")
 {
     StorageHierarchyProbe.Write(args[1]);

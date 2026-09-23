@@ -37,6 +37,7 @@ SLICES = {
 
     'Array': 'System.Array',
     'Object': 'System.Object',
+    'HashCode': 'System.HashCode',
     'UnionAttribute': 'System.Runtime.CompilerServices.UnionAttribute',
     'BindingFlags': 'System.Introspection.BindingFlags',
     'Func': 'System.Func',
@@ -146,6 +147,7 @@ SOURCES = {
 
     'Array': 'runtime/raven/src/System/Array.rvn',
     'Object': 'runtime/raven/src/System/Object.rvn',
+    'HashCode': 'runtime/raven/src/System/HashCode.rvn',
     'UnionAttribute': 'runtime/raven/src/System/Runtime/CompilerServices/UnionAttribute.rvn',
     'BindingFlags': 'runtime/raven/src/System/Introspection/BindingFlags.rvn',
     'Func': 'runtime/raven/src/System/Func.rvn',

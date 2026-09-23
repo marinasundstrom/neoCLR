@@ -26,6 +26,7 @@
     "runtime/raven/src/System/Concurrency/Workers.rvn": "aa21357c65b4b9d081e3bcb01dde1e152012684120e30cc7747072758dabc941",
     "runtime/raven/src/System/Array.rvn": "8015702d1767e692f05502b65d5cd06939936c73f0dbb16b12ab9768d7ae0ae9",
     "runtime/raven/src/System/Object.rvn": "3a39972fcf6c96b9d700f54a7295603f8c30dd5e3f35fea8fdf32b576367c1d9",
+    "runtime/raven/src/System/HashCode.rvn": "e6937956209544dcf3b1326132ff18204c894f8c1bbd7c3c69889e488ced9103",
     "runtime/raven/src/System/Runtime/CompilerServices/UnionAttribute.rvn": "2b5dc7aca6883217188df40ce57c31025703caa869bcdcf775309eda34c804d9",
     "runtime/raven/src/System/Introspection/BindingFlags.rvn": "d653a79edea57d664431ee9b6a1bd5e7980f873b6543308610a33286703f7d4e",
     "runtime/raven/src/System/Func.rvn": "4720a0463a88be11a4ff213363cad1c6680cd41afd457c813e247e5c4e3cbd2e",
@@ -104,14 +105,14 @@
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "572baaae21e63bb6f1d53cd99de6099e42962caadc4f4148518a233b2d3cd12d",
-    "runtime/raven/System.Runtime.rvnproj": "4aa05096f940f019e236844919fdb1dfe9847ed6b25449183a8f7dca19cb965c",
-    "build/NeoCLR.Raven.props": "b7d01e1d6b23228bb784dafcda4cf7c777b554b11f093cc3daf2509bb7402ee0"
+    "runtime/raven/System.Runtime.rvnproj": "86fdce720912de17cf0f5044a78cf15646383c27efe075456bd39b4140bd8d86",
+    "build/NeoCLR.Raven.props": "981cd3de8b8a36a3a1583186d797212a5f0c1cda4856969310042255e28dded3"
   },
   "outputs": {
     "Void.methods.neoil": "ddfe1201591742398602c27c117e50bbed7501a0e6980e1d25695f2c620e6dce",
     "Void.helpers.neoil": "f4a187735feadd65ee37ef9c2392a284d2b230e2496153c30c62faf5a055e7fe"
   },
-  "compilerSha256": "571ac41551f849a5dd7b6ed3fa57080c6284e919baefe6550b6d48df6ea44919",
-  "coreSha256": "2ccba1938fc5889559ecbca72684977b19d19df47017fbf21388a6adc5252bd1",
+  "compilerSha256": "dfa2755f79572ade366961c87067911e23d49942eee31a07ad44ca99fa7ce057",
+  "coreSha256": "50d437237a04921949d5c03644e0a0e817f0959c0543f070dd563fba0052cb55",
   "exports": []
 }

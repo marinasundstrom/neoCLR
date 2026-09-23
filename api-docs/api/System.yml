@@ -8,6 +8,7 @@ items:
   - System.ConsoleReadError
   - System.ConsoleReadError.ReadFailed
   - System.ConsoleReadError.Unavailable
+  - System.HashCode
   - System.Object
   - System.Value
   langs:
@@ -45,6 +46,13 @@ references:
   name: Console
   nameWithType: Console
   fullName: System.Console
+- uid: System.HashCode
+  commentId: T:System.HashCode
+  isExternal: true
+  href: System.HashCode.html
+  name: HashCode
+  nameWithType: HashCode
+  fullName: System.HashCode
 - uid: System.ConsoleReadError
   commentId: T:System.ConsoleReadError
   isExternal: true
