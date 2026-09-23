@@ -10,7 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
-    'Directory': 'System.Storage.Directory',
+    'StorageItems': 'System.Storage.StorageItem',
     'StorageLookup': 'System.Storage.StorageLookup',
     'StorageProvider': 'System.Storage.StorageProvider',
     'InputStream': 'System.Streams.InputStream',
@@ -100,7 +100,7 @@ SLICES = {
     'Time': 'System.Time',
     'Date': 'System.Date',
     'Path': 'System.Storage.Path',
-    'File': 'System.Storage.File',
+    'FileText': 'System.Storage.FileText',
     'Int64': 'System.Int64',
     'SByte': 'System.SByte',
     'Byte': 'System.Byte',
@@ -113,7 +113,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
-    'Directory': 'runtime/raven/src/System/Storage/Directory.rvn',
+    'StorageItems': 'runtime/raven/src/System/Storage/StorageItems.rvn',
     'StorageLookup': 'runtime/raven/src/System/Storage/StorageLookup.rvn',
     'StorageProvider': 'runtime/raven/src/System/Storage/StorageProvider.rvn',
     'InputStream': 'runtime/raven/src/System/Streams/InputStream.rvn',
@@ -203,7 +203,7 @@ SOURCES = {
     'Time': 'runtime/raven/src/System/Time.rvn',
     'Date': 'runtime/raven/src/System/Date.rvn',
     'Path': 'runtime/raven/src/System/Storage/Path.rvn',
-    'File': 'runtime/raven/src/System/Storage/File.rvn',
+    'FileText': 'runtime/raven/src/System/Storage/FileText.rvn',
     'Int64': 'runtime/raven/src/System/Int64.rvn',
     'SByte': 'runtime/raven/src/System/SByte.rvn',
     'Byte': 'runtime/raven/src/System/Byte.rvn',

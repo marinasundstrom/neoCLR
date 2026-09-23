@@ -23,11 +23,11 @@
     <Compile Include="src/System/OptionOperators.rvn" />
     <Compile Include="src/System/ResultOperators.rvn" />
   </ItemGroup>
-  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'File'">
-    <Compile Include="src/System/Storage/File.rvn" />
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileText'">
+    <Compile Include="src/System/Storage/FileText.rvn" />
   </ItemGroup>
-  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Directory'">
-    <Compile Include="src/System/Storage/Directory.rvn" />
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StorageItems'">
+    <Compile Include="src/System/Storage/StorageItems.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StorageLookup'">
     <Compile Include="src/System/Storage/StorageLookup.rvn" />

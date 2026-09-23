@@ -1,0 +1,20 @@
+namespace System.Storage
+
+import System.*
+import System.Streams.*
+
+public sealed interface StorageItem {
+    val Path: Path { get }
+    val Name: string { get }
+}
+
+public interface File : StorageItem {
+    func OpenRead() -> Result<InputStream, StreamError>
+    func CreateNew() -> Result<OutputStream, StreamError>
+}
+
+public interface Directory : StorageItem {
+    func FileAt(name: string) -> Result<File, StorageLookupError>
+    func GetFile(name: string) -> Result<File, StorageLookupError>
+    func GetFile(relativePath: Path) -> Result<File, StorageLookupError>
+}

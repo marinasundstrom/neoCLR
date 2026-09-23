@@ -32,6 +32,8 @@ def adapt(text: str, name: str) -> str:
 def build(path: Path) -> str:
     if path.parent == ROOT / 'runtime/System' and path.stem in {'Environment', 'Console', 'Clonable', 'LocalDateTime', 'Disposable', 'Equatable', 'Comparable', 'SystemClock', 'Closable'}:
         return build(ROOT / 'runtime/raven' / path.name)
+    if path == ROOT / 'runtime/System/Storage/File.neoil':
+        return build(ROOT / 'runtime/raven/FileText.neoil')
     if path == ROOT / 'runtime/System/String.neoil':
         return build(ROOT / 'runtime/raven/String.neoil')
     if path == ROOT / 'runtime/System/Clock.neoil':
@@ -94,7 +96,7 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/StorageLookupError.neoil')
         result += build(ROOT / 'runtime/raven/StorageMetadata.neoil')
         result += build(ROOT / 'runtime/raven/StorageLookup.neoil')
-        result += build(ROOT / 'runtime/raven/Directory.neoil')
+        result += build(ROOT / 'runtime/raven/StorageItems.neoil')
         result += build(ROOT / 'runtime/raven/FileInputStream.neoil')
         result += build(ROOT / 'runtime/raven/FileOutputStream.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/FileStreams.neoil')

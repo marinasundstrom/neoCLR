@@ -16,7 +16,7 @@ items:
   items:
   - uid: System.Storage.Directory
     name: Directory
-    type: Class
+    type: Interface
   - uid: System.Storage.EntryKind
     name: EntryKind
     type: Struct
@@ -28,7 +28,7 @@ items:
     type: Struct
   - uid: System.Storage.File
     name: File
-    type: Class
+    type: Interface
   - uid: System.Storage.FileReadError
     name: FileReadError
     type: Struct
@@ -56,6 +56,9 @@ items:
   - uid: System.Storage.FileReadError.TooLarge
     name: FileReadError.TooLarge
     type: Struct
+  - uid: System.Storage.FileText
+    name: FileText
+    type: Class
   - uid: System.Storage.FileWriteError
     name: FileWriteError
     type: Struct
@@ -89,6 +92,9 @@ items:
   - uid: System.Storage.Path
     name: Path
     type: Class
+  - uid: System.Storage.StorageItem
+    name: StorageItem
+    type: Interface
   - uid: System.Storage.StorageLookup
     name: StorageLookup
     type: Interface

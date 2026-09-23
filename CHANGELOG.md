@@ -8,6 +8,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Implement StorageItem as a closed root over provider-implemented File and Directory
+  interfaces. Provider result contracts expose interfaces; concrete classes remain
+  implementation details. Move descriptor classes into the sample providers; test common
+  Name/Path access over mixed items and reject unrelated branches in Raven and the
+  strict importer. Raw neoIL does not enforce the closed-hierarchy metadata.
+  Development migration: construct provider implementations rather than File/Directory;
+  native static text helpers move to FileText because interface static methods are
+  not supported. Legacy raw File aliases remain. Update API docs, generated runtime
+  and reference snapshots, website and roadmap. Provider resolution and enumeration
+  remain next; StorageLookup/FileAt/CreateNew are still transitional POC contracts.
+  Validation: disk/memory product and contract/negative callers, mixed StorageItem
+  arrays, Raven and raw-CIL closure rejection, strict interface/foundation and static
+  file import checks, ten native file/Path regressions, runtime/API snapshots,
+  244 documented API items and the combined website pass.
+
 - Record the author's selected Storage model: StorageItem is a closed interface
   hierarchy over provider-implemented File and Directory interfaces; providers
   resolve paths and GetItems enumerates StorageItem values. Correct proposal class

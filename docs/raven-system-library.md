@@ -964,7 +964,7 @@ The final saved-project batch also covers Raven Path consumers.
 
 ### File-write outcomes and generic Void matching — 2026-09-15
 
-`src/System/Storage/File.rvn` now constructs the existing WriteAllText outcomes:
+`src/System/Storage/FileText.rvn` now constructs the existing WriteAllText outcomes:
 Ok(Void), seven typed FileWriteError cases, and a terminal fault for an unknown host
 status. Actual UTF-8 encoding, limit checks, filesystem writes and truncation remain
 in the native service. ReadAllText retains its existing IL implementation because its
@@ -1223,3 +1223,19 @@ GetFile(Path), leaving byte-only providers valid. The strict importer admits the
 exact constructors/members, inherited provider conversion and descriptor arrays.
 The SDK disk/memory sample imports these types. No Raven compiler or Runtime Contract
 configuration changes are required; use matching regenerated development artifacts.
+
+
+### Storage item interface migration (2026-09-23)
+
+StorageItems.rvn declares sealed StorageItem with open File/Directory branches in
+one source file. The importer validates the closed-root metadata and permits
+provider implementations of the branches, including Raven's redundant inherited
+InterfaceImpl rows. Sample ProviderFile/ProviderDirectory retain implementation
+state; no public core descriptor constructors remain. Mixed StorageItem arrays
+use the same interface-dispatch mechanism. Raw neoIL closure is not enforced.
+
+Static native helpers move to the Raven namespace-function slice FileText because
+interface static methods are not admitted. The legacy System profile retains File's
+original bodies/call-site identities and forwards FileText calls to them; the Raven
+profile selects FileText bodies and the File interface. Use matching regenerated
+artifacts. No Raven compiler or Runtime Contract policy change was required.

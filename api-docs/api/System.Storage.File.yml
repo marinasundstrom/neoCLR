@@ -5,61 +5,27 @@ items:
   id: File
   parent: System.Storage
   children:
-  - System.Storage.File.#ctor(System.Storage.StorageProvider,System.Storage.Path)
   - System.Storage.File.CreateNew
-  - System.Storage.File.Name
   - System.Storage.File.OpenRead
-  - System.Storage.File.Path
-  - System.Storage.File.ReadAllText(System.String,System.Int32)
   langs:
   - csharp
   - vb
   name: File
   nameWithType: File
   fullName: System.Storage.File
-  type: Class
+  type: Interface
   assemblies:
   - NeoCLR.CoreProbe
   namespace: System.Storage
-  summary: A provider-bound file address with byte-stream access and compatible static native text helpers.
-  remarks: Development instance API after Preview 9. Construction performs no lookup or I/O. A descriptor owns no stream and does not guarantee existence or stable file identity. Name is derived from Path. Static text helpers use native string paths independently of the descriptor provider. See the [descriptor guide](/docs/storage-items.html).
+  summary: The file branch of StorageItem, implemented by storage providers.
+  remarks: Development interface after Preview 9. Implementations supply Name, Path and byte operations. File has no public constructor and owns no mandatory native handle. Current operations block and return directional streams; callers close successful streams. CreateNew remains a POC address-opening operation pending alignment of creation with resolved items. Static native text helpers moved to FileText. See the [Storage guide](/docs/storage-items.html).
   example: []
   syntax:
-    content: public sealed class File
-    content.vb: Public NotInheritable Class File
-  inheritance:
-  - System.Object
-- uid: System.Storage.File.#ctor(System.Storage.StorageProvider,System.Storage.Path)
-  commentId: M:System.Storage.File.#ctor(System.Storage.StorageProvider,System.Storage.Path)
-  id: '#ctor(System.Storage.StorageProvider,System.Storage.Path)'
-  parent: System.Storage.File
-  langs:
-  - csharp
-  - vb
-  name: File(StorageProvider, Path)
-  nameWithType: File.File(StorageProvider, Path)
-  fullName: System.Storage.File.File(System.Storage.StorageProvider, System.Storage.Path)
-  type: Constructor
-  assemblies:
-  - NeoCLR.CoreProbe
-  namespace: System.Storage
-  summary: Retains a byte provider and validated logical address.
-  remarks: The file need not exist. Construction does not create it or open a handle.
-  example: []
-  syntax:
-    content: public File(StorageProvider provider, Path path)
-    parameters:
-    - id: provider
-      type: System.Storage.StorageProvider
-      description: Provider used for subsequent byte opening operations.
-    - id: path
-      type: System.Storage.Path
-      description: Address interpreted in that provider namespace.
-    content.vb: Public Sub New(provider As StorageProvider, path As Path)
-  overload: System.Storage.File.#ctor*
-  nameWithType.vb: File.New(StorageProvider, Path)
-  fullName.vb: System.Storage.File.New(System.Storage.StorageProvider, System.Storage.Path)
-  name.vb: New(StorageProvider, Path)
+    content: 'public interface File : StorageItem'
+    content.vb: Public Interface File Inherits StorageItem
+  inheritedMembers:
+  - System.Storage.StorageItem.Path
+  - System.Storage.StorageItem.Name
 - uid: System.Storage.File.OpenRead
   commentId: M:System.Storage.File.OpenRead
   id: OpenRead
@@ -78,11 +44,11 @@ items:
   remarks: Delegates to the provider with Path. The caller closes a successful stream. Opening can fail even after successful lookup. Creation never overwrites an existing entry; later write failure does not roll back creation.
   example: []
   syntax:
-    content: public Result<InputStream, StreamError> OpenRead()
+    content: Result<InputStream, StreamError> OpenRead()
     return:
       type: System.Result{System.Streams.InputStream,System.Streams.StreamError}
       description: InputStream on success, or the retained provider's StreamError unchanged.
-    content.vb: Public Function OpenRead() As Result(Of InputStream, StreamError)
+    content.vb: Function OpenRead() As Result(Of InputStream, StreamError)
   overload: System.Storage.File.OpenRead*
 - uid: System.Storage.File.CreateNew
   commentId: M:System.Storage.File.CreateNew
@@ -102,95 +68,12 @@ items:
   remarks: Delegates to the provider with Path. The caller closes a successful stream. Opening can fail even after successful lookup. Creation never overwrites an existing entry; later write failure does not roll back creation.
   example: []
   syntax:
-    content: public Result<OutputStream, StreamError> CreateNew()
+    content: Result<OutputStream, StreamError> CreateNew()
     return:
       type: System.Result{System.Streams.OutputStream,System.Streams.StreamError}
       description: OutputStream on success, or the retained provider's StreamError unchanged.
-    content.vb: Public Function CreateNew() As Result(Of OutputStream, StreamError)
+    content.vb: Function CreateNew() As Result(Of OutputStream, StreamError)
   overload: System.Storage.File.CreateNew*
-- uid: System.Storage.File.ReadAllText(System.String,System.Int32)
-  commentId: M:System.Storage.File.ReadAllText(System.String,System.Int32)
-  id: ReadAllText(System.String,System.Int32)
-  parent: System.Storage.File
-  langs:
-  - csharp
-  - vb
-  name: ReadAllText(string, int)
-  nameWithType: File.ReadAllText(string, int)
-  fullName: System.Storage.File.ReadAllText(string, int)
-  type: Method
-  assemblies:
-  - NeoCLR.CoreProbe
-  namespace: System.Storage
-  summary: Reads a bounded native file as strict UTF-8.
-  remarks: Synchronous. Opens and closes per call. Rejects non-regular files, malformed UTF-8 and contents exceeding the limit; a UTF-8 BOM is preserved as text. Zero accepts an empty file. This static helper does not use a descriptor provider.
-  example: []
-  syntax:
-    content: public static Result<string, FileReadError> ReadAllText(string path, int maxBytes)
-    parameters:
-    - id: path
-      type: System.String
-      description: Native path string; provider Path parsing is not applied.
-    - id: maxBytes
-      type: System.Int32
-      description: Nonnegative maximum number of bytes to read.
-    return:
-      type: System.Result{System.String,System.Storage.FileReadError}
-      description: The decoded text, or FileReadError.
-    content.vb: Public Shared Function ReadAllText(path As String, maxBytes As Integer) As Result(Of String, FileReadError)
-  overload: System.Storage.File.ReadAllText*
-  nameWithType.vb: File.ReadAllText(String, Integer)
-  fullName.vb: System.Storage.File.ReadAllText(String, Integer)
-  name.vb: ReadAllText(String, Integer)
-- uid: System.Storage.File.Path
-  commentId: P:System.Storage.File.Path
-  id: Path
-  parent: System.Storage.File
-  langs:
-  - csharp
-  - vb
-  name: Path
-  nameWithType: File.Path
-  fullName: System.Storage.File.Path
-  type: Property
-  assemblies:
-  - NeoCLR.CoreProbe
-  namespace: System.Storage
-  summary: Gets the retained validated logical address.
-  example: []
-  syntax:
-    content: public Path Path { get; }
-    parameters: []
-    return:
-      type: System.Storage.Path
-      description: The same Path supplied at construction.
-    content.vb: Public ReadOnly Property Path As Path
-  overload: System.Storage.File.Path*
-- uid: System.Storage.File.Name
-  commentId: P:System.Storage.File.Name
-  id: Name
-  parent: System.Storage.File
-  langs:
-  - csharp
-  - vb
-  name: Name
-  nameWithType: File.Name
-  fullName: System.Storage.File.Name
-  type: Property
-  assemblies:
-  - NeoCLR.CoreProbe
-  namespace: System.Storage
-  summary: Gets the final component of the current logical path.
-  remarks: No metadata query occurs. The current grammar excludes native drive/UNC paths; revisit extraction with future Path formats.
-  example: []
-  syntax:
-    content: public string Name { get; }
-    parameters: []
-    return:
-      type: System.String
-      description: The native GetFileName result for the accepted slash-based spelling; an empty string for root.
-    content.vb: Public ReadOnly Property Name As String
-  overload: System.Storage.File.Name*
 references:
 - uid: System.Storage
   commentId: N:System.Storage
@@ -219,49 +102,30 @@ references:
     name: Storage
     isExternal: true
     href: System.Storage.html
-- uid: System.Object
-  commentId: T:System.Object
-  parent: System
+- uid: System.Storage.StorageItem.Path
+  commentId: P:System.Storage.StorageItem.Path
+  parent: System.Storage.StorageItem
   isExternal: true
-  name: object
-  nameWithType: object
-  fullName: object
-  nameWithType.vb: Object
-  fullName.vb: Object
-  name.vb: Object
-- uid: System
-  commentId: N:System
-  isExternal: true
-  href: System.html
-  name: System
-  nameWithType: System
-  fullName: System
-- uid: System.Storage.File.#ctor*
-  commentId: Overload:System.Storage.File.#ctor
-  isExternal: true
-  href: System.Storage.File.html#System_Storage_File__ctor_System_Storage_StorageProvider_System_Storage_Path_
-  name: File
-  nameWithType: File.File
-  fullName: System.Storage.File.File
-  nameWithType.vb: File.New
-  fullName.vb: System.Storage.File.New
-  name.vb: New
-- uid: System.Storage.StorageProvider
-  commentId: T:System.Storage.StorageProvider
-  parent: System.Storage
-  isExternal: true
-  href: System.Storage.StorageProvider.html
-  name: StorageProvider
-  nameWithType: StorageProvider
-  fullName: System.Storage.StorageProvider
-- uid: System.Storage.Path
-  commentId: T:System.Storage.Path
-  parent: System.Storage
-  isExternal: true
-  href: System.Storage.Path.html
+  href: System.Storage.StorageItem.html#System_Storage_StorageItem_Path
   name: Path
-  nameWithType: Path
-  fullName: System.Storage.Path
+  nameWithType: StorageItem.Path
+  fullName: System.Storage.StorageItem.Path
+- uid: System.Storage.StorageItem.Name
+  commentId: P:System.Storage.StorageItem.Name
+  parent: System.Storage.StorageItem
+  isExternal: true
+  href: System.Storage.StorageItem.html#System_Storage_StorageItem_Name
+  name: Name
+  nameWithType: StorageItem.Name
+  fullName: System.Storage.StorageItem.Name
+- uid: System.Storage.StorageItem
+  commentId: T:System.Storage.StorageItem
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageItem.html
+  name: StorageItem
+  nameWithType: StorageItem
+  fullName: System.Storage.StorageItem
 - uid: System.Storage.File.OpenRead*
   commentId: Overload:System.Storage.File.OpenRead
   isExternal: true
@@ -345,6 +209,13 @@ references:
   - name: " "
   - name: E
   - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
 - uid: System.Storage.File.CreateNew*
   commentId: Overload:System.Storage.File.CreateNew
   isExternal: true
@@ -397,87 +268,3 @@ references:
     isExternal: true
     href: System.Streams.StreamError.html
   - name: )
-- uid: System.Storage.File.ReadAllText*
-  commentId: Overload:System.Storage.File.ReadAllText
-  isExternal: true
-  href: System.Storage.File.html#System_Storage_File_ReadAllText_System_String_System_Int32_
-  name: ReadAllText
-  nameWithType: File.ReadAllText
-  fullName: System.Storage.File.ReadAllText
-- uid: System.String
-  commentId: T:System.String
-  parent: System
-  isExternal: true
-  name: string
-  nameWithType: string
-  fullName: string
-  nameWithType.vb: String
-  fullName.vb: String
-  name.vb: String
-- uid: System.Int32
-  commentId: T:System.Int32
-  parent: System
-  isExternal: true
-  name: int
-  nameWithType: int
-  fullName: int
-  nameWithType.vb: Integer
-  fullName.vb: Integer
-  name.vb: Integer
-- uid: System.Result{System.String,System.Storage.FileReadError}
-  commentId: T:System.Result{System.String,System.Storage.FileReadError}
-  parent: System
-  definition: System.Result`2
-  href: System.Storage.FileReadError.html
-  name: Result<string, FileReadError>
-  nameWithType: Result<string, FileReadError>
-  fullName: System.Result<string, System.Storage.FileReadError>
-  nameWithType.vb: Result(Of String, FileReadError)
-  fullName.vb: System.Result(Of String, System.Storage.FileReadError)
-  name.vb: Result(Of String, FileReadError)
-  spec.csharp:
-  - uid: System.Result`2
-    name: Result
-    isExternal: true
-  - name: <
-  - uid: System.String
-    name: string
-    isExternal: true
-  - name: ','
-  - name: " "
-  - uid: System.Storage.FileReadError
-    name: FileReadError
-    isExternal: true
-    href: System.Storage.FileReadError.html
-  - name: '>'
-  spec.vb:
-  - uid: System.Result`2
-    name: Result
-    isExternal: true
-  - name: (
-  - name: Of
-  - name: " "
-  - uid: System.String
-    name: String
-    isExternal: true
-  - name: ','
-  - name: " "
-  - uid: System.Storage.FileReadError
-    name: FileReadError
-    isExternal: true
-    href: System.Storage.FileReadError.html
-  - name: )
-- uid: System.Storage.File.Path*
-  commentId: Overload:System.Storage.File.Path
-  isExternal: true
-  href: System.Storage.File.html#System_Storage_File_Path
-  name: Path
-  nameWithType: File.Path
-  fullName: System.Storage.File.Path
-- uid: System.Storage.File.Name*
-  commentId: Overload:System.Storage.File.Name
-  isExternal: true
-  href: System.Storage.File.html#System_Storage_File_Name
-  name: Name
-  nameWithType: File.Name
-  fullName: System.Storage.File.Name

@@ -88,8 +88,8 @@ func Main() {
     let memory: StorageProvider = MemoryStorage()
     // Parsing does not open storage. The same logical root works for both providers.
     let root = RequirePath("/")
-    let disk = Directory(host, root)
-    let temporary = Directory(memory, root)
+    let disk = ProviderDirectory(host, root)
+    let temporary = ProviderDirectory(memory, root)
     WriteLine("Disk")
     RoundTrip(disk, host)
     ByteRoundTrip(disk, host)
@@ -140,7 +140,7 @@ func Main() {
     RejectChild(disk, "child\u0000name")
     WriteLine("Direct child required")
     let otherMemory: StorageProvider = MemoryStorage()
-    let other = File(otherMemory, RequirePath("/notes.txt"))
+    let other = ProviderFile(otherMemory, RequirePath("/notes.txt"))
     match otherMemory.ReadText(other.Path, 64) {
         Error(let error) => {
             if !error.IsNotFound {

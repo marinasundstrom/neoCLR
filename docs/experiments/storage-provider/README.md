@@ -453,3 +453,36 @@ and property access make no provider calls. Native static file input/output and
 Path tests pass (10 cases, including artifacts/CLI). Strict interface/foundation
 checks and bootstrap/API snapshots pass. All 245 generated API items have summaries;
 four website tooling tests and the combined site pass with zero DocFX warnings.
+
+
+### Provider-implemented Storage interfaces — 2026-09-23
+
+The author's selected hierarchy is integrated: sealed StorageItem has two open
+interface branches, File and Directory. Name/Path are common represented state.
+The sample now owns ProviderFile/ProviderDirectory, using the previous descriptor
+logic with its chosen backend. Both provider branches can be converted to
+StorageItem and placed in one typed array. They are no longer public core classes.
+
+The Raven metadata closes the root, not the implementation set of File/Directory.
+The strict importer validates that metadata and rejects a raw CIL third branch;
+it accepts transitive InterfaceImpl rows on real branch implementations. The
+compiler rejects unrelated direct branches. Raw neoIL does not enforce closure.
+No compiler changes were needed. The native runtime does not support interface
+static methods, so development text calls migrate to FileText.ReadAllText/WriteAllText.
+The legacy baseline keeps File aliases, while the Raven collection profile uses
+FileText and the File interface. This is a development API migration, not a change
+to published Preview 9 artifacts.
+
+This follows the selected proposal model without claiming it is finished: provider
+GetItem/GetFile/GetDirectory alignment, GetItems enumeration and creation semantics
+remain next. Current StorageLookup and address-level FileAt/CreateNew are temporary.
+Metadata queries remain an extension direction, not a new implemented API.
+
+
+Hierarchy validation: the SDK product and all contract/negative cases pass, including
+mixed StorageItem arrays and Raven RAV0306 for a third branch. The dedicated importer
+probe rejects a C#-emitted third branch and missing closure metadata. Interface,
+foundation and static file import probes pass. All 10 native file/Path regression
+cases pass, retaining legacy call-site identity and native status behavior. Runtime
+and API snapshots pass; 244 generated items have summaries. Four website tooling
+tests and the combined 13-page site build pass without DocFX warnings.

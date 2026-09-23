@@ -14,10 +14,11 @@ Directory.GetItems enumerates StorageItem values, allowing files and directories
 the same result. The sequence/async-sequence and task signatures remain to be settled
 with the operations; the common element model is selected.
 
-This is a direction decision, not a claim that these interfaces are shipped.
-The development library currently has concrete File/Directory descriptors and a
-separate StorageLookup interface. That intermediate shape must be aligned before
-promoting a host adapter. The [roadmap](../platform-roadmap.md) governs the bounded
+The interface hierarchy is now integrated in the development library, with
+provider-owned sample implementations and compiler/importer closure checks. It is
+not in Preview 9. The separate StorageLookup and byte-first provider shape still
+require alignment before promoting a host adapter; GetItem/GetItems are not yet
+implemented. The [roadmap](../platform-roadmap.md) governs the bounded
 implementation sequence. Optional topology, rich metadata and unneeded mutations
 in this proposal are not prerequisites for the initial POC.
 
@@ -364,6 +365,12 @@ boundary. File and Directory remain implementable by providers. For example,
 filesystem-backed and memory-backed File implementations can expose different
 internal state while consumers depend only on File. Do not seal the File branch
 to a fixed set of built-in concrete classes.
+
+The author further clarifies that providers may construct and use concrete classes
+internally, but the contract exposes interfaces. GetFile returns File, GetDirectory
+returns Directory, GetItem returns StorageItem, and GetItems enumerates StorageItem
+values (inside the chosen Result/Task/sequence layers). Consumers do not need casts
+to provider-specific classes. Implementation classes are not a required public API.
 
 Provider-specific implementations own resolution and opening behavior. Public
 constructors on the File/Directory interfaces are not part of the target model.

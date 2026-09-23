@@ -1,0 +1,17 @@
+; Generated from runtime/raven/src/System/Storage/StorageItems.rvn. Regenerate with build_runtime_library.py.
+.interface System.Storage.File
+.implements System.Storage.StorageItem
+.method instance OpenRead() -> System.Result<System.Streams.InputStream,System.Streams.StreamError>
+.end
+.method instance CreateNew() -> System.Result<System.Streams.OutputStream,System.Streams.StreamError>
+.end
+.end
+.interface System.Storage.Directory
+.implements System.Storage.StorageItem
+.method instance FileAt(String name) -> System.Result<System.Storage.File,System.Storage.StorageLookupError>
+.end
+.method instance GetFile(String name) -> System.Result<System.Storage.File,System.Storage.StorageLookupError>
+.end
+.method instance GetFile(System.Storage.Path relativePath) -> System.Result<System.Storage.File,System.Storage.StorageLookupError>
+.end
+.end

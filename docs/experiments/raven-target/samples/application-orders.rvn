@@ -44,7 +44,7 @@ class FileOrderStore : OrderStore {
         return None()
     }
     func Save(order: Order, limit: int) -> Result<System.Void, FileWriteError> {
-        File.WriteAllText("neoclr-orders.txt", String.Concat("Order: ", order.Name), limit)?
+        FileText.WriteAllText("neoclr-orders.txt", String.Concat("Order: ", order.Name), limit)?
         order.Status = "Saved"
         return Ok(())
     }
@@ -80,7 +80,7 @@ func Main() {
     Process(store, 99, 64)
     WriteLine(first.Status)
     WriteLine(second.Status)
-    match File.ReadAllText("neoclr-orders.txt", 64) {
+    match FileText.ReadAllText("neoclr-orders.txt", 64) {
         Ok(let text) => WriteLine(text)
         Error(let error) => WriteLine("Order report could not be read")
     }

@@ -785,3 +785,17 @@ are required; no compiler or Runtime Contract configuration change is needed.
 See the [Storage evidence](../storage-provider/README.md#platform-filedirectory-integration--2026-09-23)
 and [member reference](../../../api-docs/storage-items.md). Native static file/Path
 artifact regressions remain the compatibility check.
+
+
+### Storage interface hierarchy migration — 2026-09-23
+
+StorageItem now closes the kind hierarchy to the File and Directory interfaces;
+providers can implement either branch. `--storage-hierarchy <new-folder>` verifies
+that ordinary C# CIL cannot add a third branch through the importer, and that missing
+closure metadata is rejected. The SDK Storage contract also checks Raven rejection
+and common Name/Path access across provider-owned File and Directory objects.
+Raw neoIL does not enforce the closed marker. Provider resolution remains a follow-up.
+
+The development native text calls are FileText.ReadAllText/WriteAllText; File is now
+an interface with no constructors or static helpers. Legacy raw File helper names
+remain supported. The source/reference/runtime snapshot must be updated together.

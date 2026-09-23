@@ -13,8 +13,8 @@ static class CoreDeclarations
         if (unionProbe)
             declarations = declarations.Replace("public static class Console {", "public static class Console { " + ProcessBindings.ConsoleDeclaration).Replace("public static class Math {",
                 "public static class Math { " + DoubleBindings.MathDeclarations + " public static Result<int, OverflowError> Abs(int value) => default; public static Result<int, InvalidRangeError> Clamp(int value, int min, int max) => default;")
-                + "public static class FaultFunctions { public static void Fault(string message) { } }" + UnionDeclarations.Source + DelegateBindings.Declarations + ProcessBindings.Declarations + CalendarBindings.Declarations + PathBindings.Declarations + FileBindings.Declarations.Replace("public static class File {", "public sealed class File { " + StorageItemBindings.FileMembers) + StreamBindings.Declarations + StorageProviderBindings.Declarations + ResultBindings.Declarations;
-        if (collectionProbe) declarations += StorageItemBindings.Declarations + WorkerBindings.Declarations + TaskBindings.Declarations + Utf8Bindings.Declarations + UnicodeScalarBindings.Declarations + QueryBindings.Declarations + OutcomeOperatorBindings.Declarations + CollectionDeclarations.Source + ReflectionBindings.Declarations + ReflectionBindings.ProviderDeclarations + NativeMemoryBindings.Declaration + InterfaceBindings.Declarations;
+                + "public static class FaultFunctions { public static void Fault(string message) { } }" + UnionDeclarations.Source + DelegateBindings.Declarations + ProcessBindings.Declarations + CalendarBindings.Declarations + PathBindings.Declarations + FileBindings.Declarations + StorageItemBindings.Declarations + StreamBindings.Declarations + StorageProviderBindings.Declarations + ResultBindings.Declarations;
+        if (collectionProbe) declarations += WorkerBindings.Declarations + TaskBindings.Declarations + Utf8Bindings.Declarations + UnicodeScalarBindings.Declarations + QueryBindings.Declarations + OutcomeOperatorBindings.Declarations + CollectionDeclarations.Source + ReflectionBindings.Declarations + ReflectionBindings.ProviderDeclarations + NativeMemoryBindings.Declaration + InterfaceBindings.Declarations;
         if (libraryBootstrap) declarations += RuntimeFailureBindings.Declarations + NativeAllocationBindings.Declarations + ParameterSnapshotBindings.Declarations + CheckedStorageBindings.Declarations + RuntimeServiceBindings.Declarations + ValueStorageBindings.Declarations;
         var source = Source.Replace("public struct Double { }", unionProbe ? DoubleBindings.Declarations : "public struct Double { }").Replace("public struct Int32 { }", unionProbe ? Int32Bindings.Declarations : "public struct Int32 { }").Replace("public sealed class String { }", StringBindings.Declarations(unionProbe, collectionProbe))
             .Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
@@ -55,6 +55,7 @@ static class CoreDeclarations
                 }
             }
             if (collectionProbe) { IntrospectionHierarchy.Project(module); TaskBindings.Project(module); WorkerBindings.Project(module); }
+            StorageHierarchy.Project(module);
             NamespaceFunctions.ProjectMath(module);
             NamespaceFunctions.ProjectFault(module);
             var unit = module.GetType("System.PropagationUnit");

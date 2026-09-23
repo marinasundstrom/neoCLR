@@ -33,13 +33,13 @@ func DirectoryCases(provider: StorageProvider, content: string) {
         Ok(_) => { }
         Error(let error) => System.Fault(error.ToString())
     }
-    let context = Directory(provider, RequirePath("/context"))
+    let context = ProviderDirectory(provider, RequirePath("/context"))
     CheckResolved(context.GetFile(RequirePath("nested/note.txt")), target.Text, content)
-    let root = Directory(provider, RequirePath("/"))
+    let root = ProviderDirectory(provider, RequirePath("/"))
     CheckResolved(root.GetFile(RequirePath("context/nested/note.txt")), target.Text, content)
-    let relative = Directory(provider, RequirePath("context"))
+    let relative = ProviderDirectory(provider, RequirePath("context"))
     CheckResolved(relative.GetFile(RequirePath("nested/note.txt")), "context/nested/note.txt", content)
-    let current = Directory(provider, RequirePath("."))
+    let current = ProviderDirectory(provider, RequirePath("."))
     CheckResolved(current.GetFile(RequirePath("context/nested/note.txt")), "context/nested/note.txt", content)
     // Absolute syntax is valid for a provider, but rejected by a directory context.
     CheckResolved(provider.GetFile(target), target.Text, content)

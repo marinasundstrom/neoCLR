@@ -6,7 +6,7 @@
   href: api/
 - name: Callback methods
   href: callbacks.md
-- name: File and Directory
+- name: Storage item interfaces
   href: storage-items.md
 - name: Storage providers
   href: storage-provider.md

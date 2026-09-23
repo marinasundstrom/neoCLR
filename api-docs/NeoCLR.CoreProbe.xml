@@ -650,23 +650,8 @@
       <returns>The string InvalidPath.</returns>
     </member>
     <member name="T:System.Storage.File">
-      <summary>A provider-bound file address with byte-stream access and compatible static native text helpers.</summary>
-      <remarks>Development instance API after Preview 9. Construction performs no lookup or I/O. A descriptor owns no stream and does not guarantee existence or stable file identity. Name is derived from Path. Static text helpers use native string paths independently of the descriptor provider. See the [descriptor guide](/docs/storage-items.html).</remarks>
-    </member>
-    <member name="M:System.Storage.File.#ctor(System.Storage.StorageProvider,System.Storage.Path)">
-      <summary>Retains a byte provider and validated logical address.</summary>
-      <param name="provider">Provider used for subsequent byte opening operations.</param>
-      <param name="path">Address interpreted in that provider namespace.</param>
-      <remarks>The file need not exist. Construction does not create it or open a handle.</remarks>
-    </member>
-    <member name="P:System.Storage.File.Path">
-      <summary>Gets the retained validated logical address.</summary>
-      <returns>The same Path supplied at construction.</returns>
-    </member>
-    <member name="P:System.Storage.File.Name">
-      <summary>Gets the final component of the current logical path.</summary>
-      <returns>The native GetFileName result for the accepted slash-based spelling; an empty string for root.</returns>
-      <remarks>No metadata query occurs. The current grammar excludes native drive/UNC paths; revisit extraction with future Path formats.</remarks>
+      <summary>The file branch of StorageItem, implemented by storage providers.</summary>
+      <remarks>Development interface after Preview 9. Implementations supply Name, Path and byte operations. File has no public constructor and owns no mandatory native handle. Current operations block and return directional streams; callers close successful streams. CreateNew remains a POC address-opening operation pending alignment of creation with resolved items. Static native text helpers moved to FileText. See the [Storage guide](/docs/storage-items.html).</remarks>
     </member>
     <member name="M:System.Storage.File.OpenRead">
       <summary>Opens existing bytes for reading.</summary>
@@ -678,14 +663,14 @@
       <returns>OutputStream on success, or the retained provider's StreamError unchanged.</returns>
       <remarks>Delegates to the provider with Path. The caller closes a successful stream. Opening can fail even after successful lookup. Creation never overwrites an existing entry; later write failure does not roll back creation.</remarks>
     </member>
-    <member name="M:System.Storage.File.ReadAllText(System.String,System.Int32)">
+    <member name="M:System.Storage.FileText.ReadAllText(System.String,System.Int32)">
       <summary>Reads a bounded native file as strict UTF-8.</summary>
       <param name="path">Native path string; provider Path parsing is not applied.</param>
       <param name="maxBytes">Nonnegative maximum number of bytes to read.</param>
       <returns>The decoded text, or FileReadError.</returns>
       <remarks>Synchronous. Opens and closes per call. Rejects non-regular files, malformed UTF-8 and contents exceeding the limit; a UTF-8 BOM is preserved as text. Zero accepts an empty file. This static helper does not use a descriptor provider.</remarks>
     </member>
-    <member name="M:System.Storage.File.WriteAllText(System.String,System.String,System.Int32)">
+    <member name="M:System.Storage.FileText.WriteAllText(System.String,System.String,System.Int32)">
       <summary>Creates or replaces a native file with bounded UTF-8 text.</summary>
       <param name="path">Native destination path string.</param>
       <param name="text">Text encoded as UTF-8 without adding a BOM.</param>
@@ -704,17 +689,8 @@
       <remarks>Must not create the file or retain an open stream. Provider-specific aliases and concurrent changes do not establish stable item identity.</remarks>
     </member>
     <member name="T:System.Storage.Directory">
-      <summary>A provider-bound directory address for child resolution and explicit file lookup.</summary>
-      <remarks>Development API. Construction does not create or verify a directory. No metadata is cached. Parent existence, enumeration, timestamps and stable identity are outside this initial contract. See the [descriptor guide](/docs/storage-items.html).</remarks>
-    </member>
-    <member name="M:System.Storage.Directory.#ctor(System.Storage.StorageLookup,System.Storage.Path)">
-      <summary>Retains a lookup-capable provider and directory address.</summary>
-      <param name="provider">Byte provider with explicit file lookup capability.</param>
-      <param name="path">Validated logical directory address; existence is not checked.</param>
-    </member>
-    <member name="P:System.Storage.Directory.Path">
-      <summary>Gets the retained directory address without querying storage.</summary>
-      <returns>The Path supplied at construction.</returns>
+      <summary>The directory branch of StorageItem, implemented by storage providers.</summary>
+      <remarks>Development interface after Preview 9. Providers supply Name, Path, child-address construction and explicit relative file lookup. There is no public constructor. Current sample implementations retain provider context; no metadata cache or native filesystem identity is required. FileAt remains a transitional POC address operation. GetItem, GetDirectory and GetItems are follow-up work, not implemented members.</remarks>
     </member>
     <member name="M:System.Storage.Directory.FileAt(System.String)">
       <summary>Constructs a direct-child file address without performing I/O.</summary>
@@ -1034,6 +1010,23 @@
       <summary>Extracts the WriteFailed case.</summary>
       <returns>The held case value.</returns>
       <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
+    </member>
+    <member name="T:System.Storage.StorageItem">
+      <summary>A stored item whose two permitted interface branches are File and Directory.</summary>
+      <remarks>The Raven reference metadata closes the root to File and Directory. Providers may implement those interfaces, but cannot introduce unrelated direct StorageItem branches. The compiler and strict CIL importer enforce this boundary; raw neoIL does not enforce the closed-hierarchy metadata. The implementation owns interpretation and access. Metadata queries and enumeration are planned, not implemented here.</remarks>
+    </member>
+    <member name="P:System.Storage.StorageItem.Path">
+      <summary>Gets this item's logical address in its provider namespace.</summary>
+      <remarks>Represented state, without performing a new storage query. A path alone is not authority, stable identity or a guarantee of subsequent access.</remarks>
+      <returns>The provider-interpreted Path.</returns>
+    </member>
+    <member name="P:System.Storage.StorageItem.Name">
+      <summary>Gets this item's represented name without performing a storage query.</summary>
+      <returns>The item name supplied by its provider implementation.</returns>
+    </member>
+    <member name="T:System.Storage.FileText">
+      <summary>Compatibility helpers for bounded native UTF-8 file reads and writes.</summary>
+      <remarks>Development callers migrate File.ReadAllText/WriteAllText to FileText.ReadAllText/WriteAllText as File becomes an interface. Native string resolution and error behavior are unchanged; these helpers do not use StorageProvider. WriteAllText is documented in the [manual reference](/docs/storage-items.html#writealltext) because DocFX cannot render its unit-valued result.</remarks>
     </member>
   </members>
 </doc>

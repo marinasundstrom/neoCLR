@@ -64,6 +64,20 @@ validation. Updated the website/API guide to distinguish the selected direction
 from the current concrete implementation. No interface migration or GetItems
 implementation is claimed by this direction update.
 
+**Author clarification.** Providers may use concrete implementation classes
+internally, but their contracts must expose the interfaces. The assistant confirms
+that current GetFile returns Result<File, StorageLookupError>; future directory,
+generic-item and enumeration contracts must similarly expose Directory/StorageItem,
+without requiring consumers to name or cast to implementation classes.
+
+**Subsequent implementation.** After the author's instruction to continue after the
+metadata slice, migrated StorageItem/File/Directory to the selected interface
+hierarchy. Moved descriptor behavior into sample provider implementations. Added
+compiler/importer closure checks and mixed-item tests, without claiming raw neoIL
+enforcement. Native static text helpers move to FileText in the development Raven
+surface because the runtime cannot put static methods on an interface; legacy raw
+aliases remain. Provider resolution and enumeration are still follow-up work.
+
 **Open.** Concrete enumeration/task signatures, enforcement across compiler/importer/
 runtime layers, and static helper compatibility during migration require implementation
 validation. Optional filesystem topology and rich metadata remain deferred.

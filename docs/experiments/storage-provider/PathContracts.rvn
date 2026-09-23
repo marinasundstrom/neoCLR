@@ -35,7 +35,7 @@ func Invalid(text: string) {
 func Main() {
     // A descriptor needs no existing file, and its display name cannot disagree
     // with the parsed address. Unicode spelling is preserved.
-    let descriptor = File(HostStorage("missing-provider-root"), RequirePath("nested/naïve.txt"))
+    let descriptor = ProviderFile(HostStorage("missing-provider-root"), RequirePath("nested/naïve.txt"))
     if descriptor.Name != "naïve.txt" || descriptor.Path.Text != "nested/naïve.txt" {
         System.Fault("Descriptor name disagrees with its path")
     }
@@ -71,8 +71,8 @@ func Main() {
         System.Fault("Path equality silently resolved relative addresses")
     }
     let memory: StorageProvider = MemoryStorage()
-    let root = Directory(memory, RequirePath("/"))
-    let current = Directory(memory, RequirePath("."))
+    let root = ProviderDirectory(memory, RequirePath("/"))
+    let current = ProviderDirectory(memory, RequirePath("."))
     match root.FileAt("note") {
         Ok(let file) => {
             match memory.WriteText(file.Path, "rooted", 16) {

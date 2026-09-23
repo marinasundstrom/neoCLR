@@ -1,52 +1,68 @@
 using Mono.Cecil;
 
-// Provider-bound addresses: construction and properties perform no storage lookup.
+// Public item kinds are interfaces; implementation state belongs to providers.
 static class StorageItemBindings
 {
-    public static bool IsName(string name) => name is "System.Storage.File" or "System.Storage.Directory";
+    public const string Root = "System.Storage.StorageItem";
+    public static bool IsName(string name) => name is Root or "System.Storage.File" or "System.Storage.Directory";
+    public static bool Assignable(string source, string target) => target == Root && source is "System.Storage.File" or "System.Storage.Directory";
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope)
         && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
     public static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
-    public const string FileMembers = """
-        public File(StorageProvider provider, Path path) { }
-        public Path Path => default;
-        public string Name => default;
-        public Result<Streams.InputStream, Streams.StreamError> OpenRead() => default;
-        public Result<Streams.OutputStream, Streams.StreamError> CreateNew() => default;
-        """;
     public const string Declarations = """
-        namespace Storage { public sealed class Directory {
-            public Directory(StorageLookup provider, Path path) { }
-            public Path Path => default;
-            public Result<File, StorageLookupError> FileAt(string name) => default;
-            public Result<File, StorageLookupError> GetFile(string name) => default;
-            public Result<File, StorageLookupError> GetFile(Path relativePath) => default;
-        } }
+        namespace Storage {
+            public interface StorageItem { Path Path { get; } string Name { get; } }
+            public interface File : StorageItem {
+                Result<Streams.InputStream, Streams.StreamError> OpenRead();
+                Result<Streams.OutputStream, Streams.StreamError> CreateNew();
+            }
+            public interface Directory : StorageItem {
+                Result<File, StorageLookupError> FileAt(string name);
+                Result<File, StorageLookupError> GetFile(string name);
+                Result<File, StorageLookupError> GetFile(Path relativePath);
+            }
+        }
         """;
-    public static CollectionBindings.Binding? Bind(MethodReference reference, MethodDefinition definition, bool construct)
+    public static ResultBindings.Binding? BindContract(MethodReference reference, MethodDefinition definition)
     {
         var owner = Type(reference.DeclaringType);
-        if (owner is null || definition.IsStatic) return null;
+        if (owner is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var expected = (owner, reference.Name) switch {
-            ("System.Storage.File", ".ctor") => ("System.Storage.StorageProvider,System.Storage.Path", "noresult"),
-            ("System.Storage.Directory", ".ctor") => ("System.Storage.StorageLookup,System.Storage.Path", "noresult"),
-            (_, "get_Path") => ("", "System.Storage.Path"),
-            ("System.Storage.File", "get_Name") => ("", "String"),
+            (Root, "get_Path") => ("", "System.Storage.Path"),
+            (Root, "get_Name") => ("", "String"),
             ("System.Storage.File", "OpenRead") => ("", "System.Result<System.Streams.InputStream,System.Streams.StreamError>"),
             ("System.Storage.File", "CreateNew") => ("", "System.Result<System.Streams.OutputStream,System.Streams.StreamError>"),
             ("System.Storage.Directory", "FileAt") => ("String", "System.Result<System.Storage.File,System.Storage.StorageLookupError>"),
             ("System.Storage.Directory", "GetFile") => (args.Length == 1 && args[0] == "System.Storage.Path" ? "System.Storage.Path" : "String", "System.Result<System.Storage.File,System.Storage.StorageLookupError>"),
-            _ => throw new InvalidDataException("Unsupported storage descriptor member.")
+            _ => throw new InvalidDataException("Unsupported storage item member.")
         };
-        if (!definition.IsPublic || definition.IsVirtual || definition.HasGenericParameters
-            || !definition.DeclaringType.IsSealed || definition.DeclaringType.HasGenericParameters
-            || !reference.HasThis || definition.IsConstructor != construct
-            || string.Join(',', args) != expected.Item1 || result != expected.Item2)
-            throw new InvalidDataException("Unsupported storage descriptor signature.");
-        return construct
-            ? new(args, owner, $"newobj instance {owner}::.ctor({string.Join(',', args)})")
-            : new(new[] { owner }.Concat(args).ToArray(), result, $"call instance {owner}::{reference.Name}({string.Join(',', args)})");
+        if (!definition.DeclaringType.IsInterface || definition.DeclaringType.HasGenericParameters
+            || !definition.IsPublic || !definition.IsAbstract || !definition.IsVirtual || !definition.IsNewSlot
+            || definition.IsFinal || definition.IsStatic || definition.HasBody || definition.HasGenericParameters
+            || !reference.HasThis || string.Join(',', args) != expected.Item1 || result != expected.Item2)
+            throw new InvalidDataException("Unsupported storage item signature.");
+        return new(owner + "::" + reference.Name, new[] { owner }.Concat(args).ToArray(), result,
+            Instruction: $"callvirt instance {owner}::{reference.Name}({string.Join(',', args)})");
+    }
+    public static CollectionBindings.Binding? Bind(MethodReference reference, MethodDefinition definition, bool construct)
+    {
+        if (Type(reference.DeclaringType) is null) return null;
+        if (construct) throw new InvalidDataException("Storage interfaces cannot be constructed.");
+        var call = BindContract(reference, definition)!;
+        return new(call.Arguments, call.Result, call.Instruction!);
+    }
+    public static void Validate(ModuleDefinition module)
+    {
+        foreach (var (name, count) in new[] { (Root, 2), ("System.Storage.File", 2), ("System.Storage.Directory", 3) })
+        {
+            var type = module.GetType(name);
+            if (type is null || !type.IsPublic || !type.IsInterface || type.HasFields || type.HasGenericParameters
+                || type.Methods.Count != count || (name == Root ? type.HasInterfaces : type.Interfaces.Count != 1 || type.Interfaces[0].InterfaceType.FullName != Root))
+                throw new InvalidDataException("Unsupported storage item metadata: " + name);
+            StorageHierarchy.Validate(type);
+            foreach (var method in type.Methods) _ = BindContract(method, method);
+        }
     }
 }

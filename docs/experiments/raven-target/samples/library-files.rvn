@@ -5,13 +5,13 @@ import System.Storage.*
 
 // Creates or replaces this file in the working directory.
 func Save(path: string, text: string, limit: int) -> Result<System.Void, FileWriteError> {
-    File.WriteAllText(path, text, limit)?
+    FileText.WriteAllText(path, text, limit)?
     WriteLine("Written")
     return Ok(())
 }
 
 func Load(path: string, limit: int) -> Result<string, FileReadError> {
-    let text = File.ReadAllText(path, limit)?
+    let text = FileText.ReadAllText(path, limit)?
     return Ok(text)
 }
 

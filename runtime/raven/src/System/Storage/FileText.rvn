@@ -1,0 +1,70 @@
+namespace System.Storage.FileText
+
+import System.Storage.FileReadError
+import System.Storage.FileWriteError
+import System.Result.*
+import System.Runtime.CompilerServices.RuntimeServices
+
+public func WriteAllText(path: string, text: string, maxBytes: int) -> System.Result<System.Void, FileWriteError> {
+    let status = RuntimeServices.WriteAllText(path, text, maxBytes)
+    if status == 0 {
+        return Ok(())
+    }
+    if status == 1 {
+        return Error(FileWriteError(FileWriteError.InvalidLimit()))
+    }
+    if status == 2 {
+        return Error(FileWriteError(FileWriteError.InvalidPath()))
+    }
+    if status == 3 {
+        return Error(FileWriteError(FileWriteError.NotFound()))
+    }
+    if status == 4 {
+        return Error(FileWriteError(FileWriteError.AccessDenied()))
+    }
+    if status == 5 {
+        return Error(FileWriteError(FileWriteError.NotRegularFile()))
+    }
+    if status == 6 {
+        return Error(FileWriteError(FileWriteError.WriteFailed()))
+    }
+    if status == 7 {
+        return Error(FileWriteError(FileWriteError.TooLarge()))
+    }
+    System.Fault("invalid native file write status")
+    return Error(FileWriteError(FileWriteError.WriteFailed()))
+}
+
+public func ReadAllText(path: string, maxBytes: int) -> System.Result<string, FileReadError> {
+    let payload = RuntimeServices.ReadAllText(path, maxBytes)
+    if !RuntimeServices.IsValue<byte>(payload) {
+        return Ok(RuntimeServices.UnpackValue<string>(payload))
+    }
+    let status = RuntimeServices.UnpackValue<byte>(payload)
+    if status == 1 {
+        return Error(FileReadError(FileReadError.InvalidLimit()))
+    }
+    if status == 2 {
+        return Error(FileReadError(FileReadError.InvalidPath()))
+    }
+    if status == 3 {
+        return Error(FileReadError(FileReadError.NotFound()))
+    }
+    if status == 4 {
+        return Error(FileReadError(FileReadError.AccessDenied()))
+    }
+    if status == 5 {
+        return Error(FileReadError(FileReadError.NotRegularFile()))
+    }
+    if status == 6 {
+        return Error(FileReadError(FileReadError.ReadFailed()))
+    }
+    if status == 7 {
+        return Error(FileReadError(FileReadError.TooLarge()))
+    }
+    if status == 8 {
+        return Error(FileReadError(FileReadError.InvalidUtf8()))
+    }
+    System.Fault("invalid native I/O status")
+    return Error(FileReadError(FileReadError.ReadFailed()))
+}

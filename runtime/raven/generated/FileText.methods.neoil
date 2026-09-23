@@ -1,0 +1,489 @@
+; Generated from runtime/raven/src/System/Storage/FileText.rvn. Regenerate with build_runtime_library.py.
+.method static WriteAllText(String path,String text,Int32 maxBytes) -> System.Result<Void,System.Storage.FileWriteError>
+.local Int32 local0
+.local Void local1
+ldc.i4 0
+stloc local0
+ldvoid
+stloc local1
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldarg 0
+M00000001_IL_0003:
+ldarg 1
+M00000001_IL_0004:
+ldarg 2
+M00000001_IL_0005:
+call neoCLR.Runtime.WriteAllText(String,String,Int32)
+M00000001_IL_000a:
+stloc local0
+M00000001_IL_000b:
+M00000001_IL_000c:
+ldloc local0
+M00000001_IL_000d:
+ldc.i4 0
+M00000001_IL_000e:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0010:
+brtrue M00000001_IL_001a
+M00000001_IL_0015:
+br M00000001_IL_0034
+M00000001_IL_001a:
+M00000001_IL_001b:
+ldloca local1
+M00000001_IL_001f:
+ldvoid
+stobj Void
+M00000001_IL_0025:
+ldloc local1
+M00000001_IL_0029:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion0(Void)
+M00000001_IL_002e:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion1(System.Result.Ok<Void>)
+M00000001_IL_0033:
+ret
+M00000001_IL_0034:
+M00000001_IL_0035:
+M00000001_IL_0036:
+ldloc local0
+M00000001_IL_0037:
+ldc.i4 1
+M00000001_IL_0038:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_003a:
+brtrue M00000001_IL_0044
+M00000001_IL_003f:
+br M00000001_IL_0059
+M00000001_IL_0044:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorInvalidLimitNew()
+M00000001_IL_0049:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorInvalidLimit(System.Storage.FileWriteError.InvalidLimit)
+M00000001_IL_004e:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
+M00000001_IL_0053:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
+M00000001_IL_0058:
+ret
+M00000001_IL_0059:
+M00000001_IL_005a:
+M00000001_IL_005b:
+ldloc local0
+M00000001_IL_005c:
+ldc.i4 2
+M00000001_IL_005d:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_005f:
+brtrue M00000001_IL_0069
+M00000001_IL_0064:
+br M00000001_IL_007e
+M00000001_IL_0069:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorInvalidPathNew()
+M00000001_IL_006e:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorInvalidPath(System.Storage.FileWriteError.InvalidPath)
+M00000001_IL_0073:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
+M00000001_IL_0078:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
+M00000001_IL_007d:
+ret
+M00000001_IL_007e:
+M00000001_IL_007f:
+M00000001_IL_0080:
+ldloc local0
+M00000001_IL_0081:
+ldc.i4 3
+M00000001_IL_0082:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0084:
+brtrue M00000001_IL_008e
+M00000001_IL_0089:
+br M00000001_IL_00a3
+M00000001_IL_008e:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorNotFoundNew()
+M00000001_IL_0093:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorNotFound(System.Storage.FileWriteError.NotFound)
+M00000001_IL_0098:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
+M00000001_IL_009d:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
+M00000001_IL_00a2:
+ret
+M00000001_IL_00a3:
+M00000001_IL_00a4:
+M00000001_IL_00a5:
+ldloc local0
+M00000001_IL_00a6:
+ldc.i4 4
+M00000001_IL_00a7:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_00a9:
+brtrue M00000001_IL_00b3
+M00000001_IL_00ae:
+br M00000001_IL_00c8
+M00000001_IL_00b3:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorAccessDeniedNew()
+M00000001_IL_00b8:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorAccessDenied(System.Storage.FileWriteError.AccessDenied)
+M00000001_IL_00bd:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
+M00000001_IL_00c2:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
+M00000001_IL_00c7:
+ret
+M00000001_IL_00c8:
+M00000001_IL_00c9:
+M00000001_IL_00ca:
+ldloc local0
+M00000001_IL_00cb:
+ldc.i4 5
+M00000001_IL_00cc:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_00ce:
+brtrue M00000001_IL_00d8
+M00000001_IL_00d3:
+br M00000001_IL_00ed
+M00000001_IL_00d8:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorNotRegularFileNew()
+M00000001_IL_00dd:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorNotRegularFile(System.Storage.FileWriteError.NotRegularFile)
+M00000001_IL_00e2:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
+M00000001_IL_00e7:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
+M00000001_IL_00ec:
+ret
+M00000001_IL_00ed:
+M00000001_IL_00ee:
+M00000001_IL_00ef:
+ldloc local0
+M00000001_IL_00f0:
+ldc.i4 6
+M00000001_IL_00f1:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_00f3:
+brtrue M00000001_IL_00fd
+M00000001_IL_00f8:
+br M00000001_IL_0112
+M00000001_IL_00fd:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorWriteFailedNew()
+M00000001_IL_0102:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorWriteFailed(System.Storage.FileWriteError.WriteFailed)
+M00000001_IL_0107:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
+M00000001_IL_010c:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
+M00000001_IL_0111:
+ret
+M00000001_IL_0112:
+M00000001_IL_0113:
+M00000001_IL_0114:
+ldloc local0
+M00000001_IL_0115:
+ldc.i4 7
+M00000001_IL_0116:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0118:
+brtrue M00000001_IL_0122
+M00000001_IL_011d:
+br M00000001_IL_0137
+M00000001_IL_0122:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorTooLargeNew()
+M00000001_IL_0127:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorTooLarge(System.Storage.FileWriteError.TooLarge)
+M00000001_IL_012c:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
+M00000001_IL_0131:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
+M00000001_IL_0136:
+ret
+M00000001_IL_0137:
+M00000001_IL_0138:
+M00000001_IL_0139:
+ldstr "invalid native file write status"
+M00000001_IL_013e:
+call System.Fault(String)
+M00000001_IL_0143:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorWriteFailedNew()
+M00000001_IL_0148:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorWriteFailed(System.Storage.FileWriteError.WriteFailed)
+M00000001_IL_014d:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
+M00000001_IL_0152:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
+M00000001_IL_0157:
+ret
+.end
+.method static ReadAllText(String path,Int32 maxBytes) -> System.Result<String,System.Storage.FileReadError>
+.local Value local0
+.local Byte local1
+ldc.i4 0
+stloc local1
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldarg 1
+M00000002_IL_0004:
+call neoCLR.Runtime.ReadAllText(String,Int32)
+M00000002_IL_0009:
+stloc local0
+M00000002_IL_000a:
+M00000002_IL_000b:
+ldloc local0
+M00000002_IL_000c:
+value.is Byte
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0011:
+ldc.i4 0
+M00000002_IL_0012:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0014:
+brtrue M00000002_IL_001e
+M00000002_IL_0019:
+br M00000002_IL_0030
+M00000002_IL_001e:
+M00000002_IL_001f:
+ldloc local0
+M00000002_IL_0020:
+value.unpack String
+M00000002_IL_0025:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion4(String)
+M00000002_IL_002a:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion5(System.Result.Ok<String>)
+M00000002_IL_002f:
+ret
+M00000002_IL_0030:
+M00000002_IL_0031:
+M00000002_IL_0032:
+ldloc local0
+M00000002_IL_0033:
+value.unpack Byte
+M00000002_IL_0038:
+stloc local1
+M00000002_IL_0039:
+M00000002_IL_003a:
+ldloc local1
+M00000002_IL_003b:
+conv.i4
+M00000002_IL_003c:
+ldc.i4 1
+M00000002_IL_003d:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_003f:
+brtrue M00000002_IL_0049
+M00000002_IL_0044:
+br M00000002_IL_005e
+M00000002_IL_0049:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorInvalidLimitNew()
+M00000002_IL_004e:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorInvalidLimit(System.Storage.FileReadError.InvalidLimit)
+M00000002_IL_0053:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
+M00000002_IL_0058:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+M00000002_IL_005d:
+ret
+M00000002_IL_005e:
+M00000002_IL_005f:
+M00000002_IL_0060:
+ldloc local1
+M00000002_IL_0061:
+conv.i4
+M00000002_IL_0062:
+ldc.i4 2
+M00000002_IL_0063:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0065:
+brtrue M00000002_IL_006f
+M00000002_IL_006a:
+br M00000002_IL_0084
+M00000002_IL_006f:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorInvalidPathNew()
+M00000002_IL_0074:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorInvalidPath(System.Storage.FileReadError.InvalidPath)
+M00000002_IL_0079:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
+M00000002_IL_007e:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+M00000002_IL_0083:
+ret
+M00000002_IL_0084:
+M00000002_IL_0085:
+M00000002_IL_0086:
+ldloc local1
+M00000002_IL_0087:
+conv.i4
+M00000002_IL_0088:
+ldc.i4 3
+M00000002_IL_0089:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_008b:
+brtrue M00000002_IL_0095
+M00000002_IL_0090:
+br M00000002_IL_00aa
+M00000002_IL_0095:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorNotFoundNew()
+M00000002_IL_009a:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorNotFound(System.Storage.FileReadError.NotFound)
+M00000002_IL_009f:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
+M00000002_IL_00a4:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+M00000002_IL_00a9:
+ret
+M00000002_IL_00aa:
+M00000002_IL_00ab:
+M00000002_IL_00ac:
+ldloc local1
+M00000002_IL_00ad:
+conv.i4
+M00000002_IL_00ae:
+ldc.i4 4
+M00000002_IL_00af:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_00b1:
+brtrue M00000002_IL_00bb
+M00000002_IL_00b6:
+br M00000002_IL_00d0
+M00000002_IL_00bb:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorAccessDeniedNew()
+M00000002_IL_00c0:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorAccessDenied(System.Storage.FileReadError.AccessDenied)
+M00000002_IL_00c5:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
+M00000002_IL_00ca:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+M00000002_IL_00cf:
+ret
+M00000002_IL_00d0:
+M00000002_IL_00d1:
+M00000002_IL_00d2:
+ldloc local1
+M00000002_IL_00d3:
+conv.i4
+M00000002_IL_00d4:
+ldc.i4 5
+M00000002_IL_00d5:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_00d7:
+brtrue M00000002_IL_00e1
+M00000002_IL_00dc:
+br M00000002_IL_00f6
+M00000002_IL_00e1:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorNotRegularFileNew()
+M00000002_IL_00e6:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorNotRegularFile(System.Storage.FileReadError.NotRegularFile)
+M00000002_IL_00eb:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
+M00000002_IL_00f0:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+M00000002_IL_00f5:
+ret
+M00000002_IL_00f6:
+M00000002_IL_00f7:
+M00000002_IL_00f8:
+ldloc local1
+M00000002_IL_00f9:
+conv.i4
+M00000002_IL_00fa:
+ldc.i4 6
+M00000002_IL_00fb:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_00fd:
+brtrue M00000002_IL_0107
+M00000002_IL_0102:
+br M00000002_IL_011c
+M00000002_IL_0107:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorReadFailedNew()
+M00000002_IL_010c:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorReadFailed(System.Storage.FileReadError.ReadFailed)
+M00000002_IL_0111:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
+M00000002_IL_0116:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+M00000002_IL_011b:
+ret
+M00000002_IL_011c:
+M00000002_IL_011d:
+M00000002_IL_011e:
+ldloc local1
+M00000002_IL_011f:
+conv.i4
+M00000002_IL_0120:
+ldc.i4 7
+M00000002_IL_0121:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0123:
+brtrue M00000002_IL_012d
+M00000002_IL_0128:
+br M00000002_IL_0142
+M00000002_IL_012d:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorTooLargeNew()
+M00000002_IL_0132:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorTooLarge(System.Storage.FileReadError.TooLarge)
+M00000002_IL_0137:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
+M00000002_IL_013c:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+M00000002_IL_0141:
+ret
+M00000002_IL_0142:
+M00000002_IL_0143:
+M00000002_IL_0144:
+ldloc local1
+M00000002_IL_0145:
+conv.i4
+M00000002_IL_0146:
+ldc.i4 8
+M00000002_IL_0147:
+ceq
+call neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0149:
+brtrue M00000002_IL_0153
+M00000002_IL_014e:
+br M00000002_IL_0168
+M00000002_IL_0153:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorInvalidUtf8New()
+M00000002_IL_0158:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorInvalidUtf8(System.Storage.FileReadError.InvalidUtf8)
+M00000002_IL_015d:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
+M00000002_IL_0162:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+M00000002_IL_0167:
+ret
+M00000002_IL_0168:
+M00000002_IL_0169:
+M00000002_IL_016a:
+ldstr "invalid native I/O status"
+M00000002_IL_016f:
+call System.Fault(String)
+M00000002_IL_0174:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorReadFailedNew()
+M00000002_IL_0179:
+call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorReadFailed(System.Storage.FileReadError.ReadFailed)
+M00000002_IL_017e:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
+M00000002_IL_0183:
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+M00000002_IL_0188:
+ret
+.end

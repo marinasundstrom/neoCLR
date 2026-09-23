@@ -5,59 +5,28 @@ items:
   id: Directory
   parent: System.Storage
   children:
-  - System.Storage.Directory.#ctor(System.Storage.StorageLookup,System.Storage.Path)
   - System.Storage.Directory.FileAt(System.String)
   - System.Storage.Directory.GetFile(System.Storage.Path)
   - System.Storage.Directory.GetFile(System.String)
-  - System.Storage.Directory.Path
   langs:
   - csharp
   - vb
   name: Directory
   nameWithType: Directory
   fullName: System.Storage.Directory
-  type: Class
+  type: Interface
   assemblies:
   - NeoCLR.CoreProbe
   namespace: System.Storage
-  summary: A provider-bound directory address for child resolution and explicit file lookup.
-  remarks: Development API. Construction does not create or verify a directory. No metadata is cached. Parent existence, enumeration, timestamps and stable identity are outside this initial contract. See the [descriptor guide](/docs/storage-items.html).
+  summary: The directory branch of StorageItem, implemented by storage providers.
+  remarks: Development interface after Preview 9. Providers supply Name, Path, child-address construction and explicit relative file lookup. There is no public constructor. Current sample implementations retain provider context; no metadata cache or native filesystem identity is required. FileAt remains a transitional POC address operation. GetItem, GetDirectory and GetItems are follow-up work, not implemented members.
   example: []
   syntax:
-    content: public sealed class Directory
-    content.vb: Public NotInheritable Class Directory
-  inheritance:
-  - System.Object
-- uid: System.Storage.Directory.#ctor(System.Storage.StorageLookup,System.Storage.Path)
-  commentId: M:System.Storage.Directory.#ctor(System.Storage.StorageLookup,System.Storage.Path)
-  id: '#ctor(System.Storage.StorageLookup,System.Storage.Path)'
-  parent: System.Storage.Directory
-  langs:
-  - csharp
-  - vb
-  name: Directory(StorageLookup, Path)
-  nameWithType: Directory.Directory(StorageLookup, Path)
-  fullName: System.Storage.Directory.Directory(System.Storage.StorageLookup, System.Storage.Path)
-  type: Constructor
-  assemblies:
-  - NeoCLR.CoreProbe
-  namespace: System.Storage
-  summary: Retains a lookup-capable provider and directory address.
-  example: []
-  syntax:
-    content: public Directory(StorageLookup provider, Path path)
-    parameters:
-    - id: provider
-      type: System.Storage.StorageLookup
-      description: Byte provider with explicit file lookup capability.
-    - id: path
-      type: System.Storage.Path
-      description: Validated logical directory address; existence is not checked.
-    content.vb: Public Sub New(provider As StorageLookup, path As Path)
-  overload: System.Storage.Directory.#ctor*
-  nameWithType.vb: Directory.New(StorageLookup, Path)
-  fullName.vb: System.Storage.Directory.New(System.Storage.StorageLookup, System.Storage.Path)
-  name.vb: New(StorageLookup, Path)
+    content: 'public interface Directory : StorageItem'
+    content.vb: Public Interface Directory Inherits StorageItem
+  inheritedMembers:
+  - System.Storage.StorageItem.Path
+  - System.Storage.StorageItem.Name
 - uid: System.Storage.Directory.FileAt(System.String)
   commentId: M:System.Storage.Directory.FileAt(System.String)
   id: FileAt(System.String)
@@ -76,7 +45,7 @@ items:
   remarks: Use this for a future destination. It does not check existence, open a stream or create a file. The error family is StorageLookupError rather than the earlier sample FileReadError.
   example: []
   syntax:
-    content: public Result<File, StorageLookupError> FileAt(string name)
+    content: Result<File, StorageLookupError> FileAt(string name)
     parameters:
     - id: name
       type: System.String
@@ -84,7 +53,7 @@ items:
     return:
       type: System.Result{System.Storage.File,System.Storage.StorageLookupError}
       description: A File using this provider, or StorageLookupError.InvalidPath.
-    content.vb: Public Function FileAt(name As String) As Result(Of File, StorageLookupError)
+    content.vb: Function FileAt(name As String) As Result(Of File, StorageLookupError)
   overload: System.Storage.Directory.FileAt*
   nameWithType.vb: Directory.FileAt(String)
   fullName.vb: System.Storage.Directory.FileAt(String)
@@ -107,7 +76,7 @@ items:
   remarks: Equivalent to resolving FileAt and querying StorageLookup.GetFile; it owns no stream.
   example: []
   syntax:
-    content: public Result<File, StorageLookupError> GetFile(string name)
+    content: Result<File, StorageLookupError> GetFile(string name)
     parameters:
     - id: name
       type: System.String
@@ -115,7 +84,7 @@ items:
     return:
       type: System.Result{System.Storage.File,System.Storage.StorageLookupError}
       description: A provider-bound File, InvalidPath for an invalid name, or the provider lookup error unchanged.
-    content.vb: Public Function GetFile(name As String) As Result(Of File, StorageLookupError)
+    content.vb: Function GetFile(name As String) As Result(Of File, StorageLookupError)
   overload: System.Storage.Directory.GetFile*
   nameWithType.vb: Directory.GetFile(String)
   fullName.vb: System.Storage.Directory.GetFile(String)
@@ -138,7 +107,7 @@ items:
   remarks: Dot queries this directory address as a file, normally WrongKind. Resolution preserves the provider and prefix; it does not normalize, enforce parent existence or create a security sandbox.
   example: []
   syntax:
-    content: public Result<File, StorageLookupError> GetFile(Path relativePath)
+    content: Result<File, StorageLookupError> GetFile(Path relativePath)
     parameters:
     - id: relativePath
       type: System.Storage.Path
@@ -146,32 +115,8 @@ items:
     return:
       type: System.Result{System.Storage.File,System.Storage.StorageLookupError}
       description: A provider-bound File, InvalidPath for an absolute input, or the provider lookup error unchanged.
-    content.vb: Public Function GetFile(relativePath As Path) As Result(Of File, StorageLookupError)
+    content.vb: Function GetFile(relativePath As Path) As Result(Of File, StorageLookupError)
   overload: System.Storage.Directory.GetFile*
-- uid: System.Storage.Directory.Path
-  commentId: P:System.Storage.Directory.Path
-  id: Path
-  parent: System.Storage.Directory
-  langs:
-  - csharp
-  - vb
-  name: Path
-  nameWithType: Directory.Path
-  fullName: System.Storage.Directory.Path
-  type: Property
-  assemblies:
-  - NeoCLR.CoreProbe
-  namespace: System.Storage
-  summary: Gets the retained directory address without querying storage.
-  example: []
-  syntax:
-    content: public Path Path { get; }
-    parameters: []
-    return:
-      type: System.Storage.Path
-      description: The Path supplied at construction.
-    content.vb: Public ReadOnly Property Path As Path
-  overload: System.Storage.Directory.Path*
 references:
 - uid: System.Storage
   commentId: N:System.Storage
@@ -200,49 +145,30 @@ references:
     name: Storage
     isExternal: true
     href: System.Storage.html
-- uid: System.Object
-  commentId: T:System.Object
-  parent: System
+- uid: System.Storage.StorageItem.Path
+  commentId: P:System.Storage.StorageItem.Path
+  parent: System.Storage.StorageItem
   isExternal: true
-  name: object
-  nameWithType: object
-  fullName: object
-  nameWithType.vb: Object
-  fullName.vb: Object
-  name.vb: Object
-- uid: System
-  commentId: N:System
-  isExternal: true
-  href: System.html
-  name: System
-  nameWithType: System
-  fullName: System
-- uid: System.Storage.Directory.#ctor*
-  commentId: Overload:System.Storage.Directory.#ctor
-  isExternal: true
-  href: System.Storage.Directory.html#System_Storage_Directory__ctor_System_Storage_StorageLookup_System_Storage_Path_
-  name: Directory
-  nameWithType: Directory.Directory
-  fullName: System.Storage.Directory.Directory
-  nameWithType.vb: Directory.New
-  fullName.vb: System.Storage.Directory.New
-  name.vb: New
-- uid: System.Storage.StorageLookup
-  commentId: T:System.Storage.StorageLookup
-  parent: System.Storage
-  isExternal: true
-  href: System.Storage.StorageLookup.html
-  name: StorageLookup
-  nameWithType: StorageLookup
-  fullName: System.Storage.StorageLookup
-- uid: System.Storage.Path
-  commentId: T:System.Storage.Path
-  parent: System.Storage
-  isExternal: true
-  href: System.Storage.Path.html
+  href: System.Storage.StorageItem.html#System_Storage_StorageItem_Path
   name: Path
-  nameWithType: Path
-  fullName: System.Storage.Path
+  nameWithType: StorageItem.Path
+  fullName: System.Storage.StorageItem.Path
+- uid: System.Storage.StorageItem.Name
+  commentId: P:System.Storage.StorageItem.Name
+  parent: System.Storage.StorageItem
+  isExternal: true
+  href: System.Storage.StorageItem.html#System_Storage_StorageItem_Name
+  name: Name
+  nameWithType: StorageItem.Name
+  fullName: System.Storage.StorageItem.Name
+- uid: System.Storage.StorageItem
+  commentId: T:System.Storage.StorageItem
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.StorageItem.html
+  name: StorageItem
+  nameWithType: StorageItem
+  fullName: System.Storage.StorageItem
 - uid: System.Storage.Directory.FileAt*
   commentId: Overload:System.Storage.Directory.FileAt
   isExternal: true
@@ -305,6 +231,13 @@ references:
     isExternal: true
     href: System.Storage.StorageLookupError.html
   - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
 - uid: System.Result`2
   commentId: T:System.Result`2
   isExternal: true
@@ -343,10 +276,11 @@ references:
   name: GetFile
   nameWithType: Directory.GetFile
   fullName: System.Storage.Directory.GetFile
-- uid: System.Storage.Directory.Path*
-  commentId: Overload:System.Storage.Directory.Path
+- uid: System.Storage.Path
+  commentId: T:System.Storage.Path
+  parent: System.Storage
   isExternal: true
-  href: System.Storage.Directory.html#System_Storage_Directory_Path
+  href: System.Storage.Path.html
   name: Path
-  nameWithType: Directory.Path
-  fullName: System.Storage.Directory.Path
+  nameWithType: Path
+  fullName: System.Storage.Path

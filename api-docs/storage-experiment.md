@@ -1,9 +1,10 @@
 # Storage provider experiment
 
 **Development exploration after Preview 9.** The sample imports platform
-[File, Directory and StorageLookup](storage-items.md), Path and directional stream
+[StorageItem, File, Directory and StorageLookup](storage-items.md), Path and directional stream
 interfaces. Its concrete HostStorage, MemoryStorage and memory streams remain
 application-owned fixtures for comparing provider ownership and path interpretation.
+ProviderFile and ProviderDirectory are concrete sample implementations, not public platform classes.
 The platform API is provisional; these additions are not in Preview 9 downloads.
 
 Download the tested [project file](/samples/storage-provider/StorageExplorer.rvnproj),
@@ -20,7 +21,7 @@ memory. An oversized replacement is rejected without changing the saved contents
 match Path.Parse("/") {
     Ok(let path) => {
         let host: StorageProvider = HostStorage("sandbox")
-        let disk = Directory(host, path)
+        let disk: Directory = ProviderDirectory(host, path)
         ByteRoundTrip(disk, host)
     }
     Error(_) => System.Fault("Invalid logical path")
@@ -73,13 +74,13 @@ rooted logical string keys. Providers choose resolution rules, not Path parsing.
 In this experiment, relative provider operations start at the provider root.
 Directory.FileAt instead appends a direct child to that directory's Path.
 
-## Directory
+## Directory and its sample implementation
 
-An integrated provider-bound directory address. Construction does not create or verify a directory.
+The sample ProviderDirectory implements the platform Directory interface. Construction does not create or verify a directory.
 
 | Member | Contract |
 | --- | --- |
-| `Directory(provider: StorageLookup, path: Path)` | Retain the provider and its directory address. |
+| `ProviderDirectory(provider: StorageLookup, path: Path)` | Retain the provider and its directory address. |
 | `Path: Path` | Return the validated logical path without querying storage. |
 | `GetFile(relativePath: Path) -> Result<File, StorageLookupError>` | Resolve a relative logical path against this directory and query through its retained provider. Nested segments are accepted. Absolute values return InvalidPath without querying; `.` queries this directory address as a file and normally returns WrongKind. |
 | `GetFile(name: string) -> Result<File, StorageLookupError>` | Validate a direct child name, then query the provider. Invalid names return InvalidPath; provider lookup errors are preserved. |
@@ -114,9 +115,9 @@ restriction is useful for explicit resolution but is not a containment guarantee
 It also makes the two overloads less interchangeable; convenience parsing and shared
 error design remain open. Comparison reviewed 2026-09-23.
 
-## File
+## File and its sample implementation
 
-A descriptor retaining its provider, address. It owns no open file
+The sample ProviderFile implements the platform File interface, retaining its provider and address. It owns no open file
 handle and has no disposal requirement in this experiment. Constructing a descriptor
 is valid before the entry exists; use GetFile for an explicit lookup. Providers no
 longer need a FileAt factory just to construct descriptors. File.Name uses the existing
@@ -125,7 +126,7 @@ spelling. Revisit extraction when additional Path formats are introduced.
 
 | Member | Contract |
 | --- | --- |
-| `File(provider: StorageProvider, path: Path)` | Retain the provider and validated address, deriving Name from the address. Does not query existence or open a stream. |
+| `ProviderFile(provider: System.Storage.StorageProvider, path: Path)` | Retain the provider and validated address, deriving Name from the address. Does not query existence or open a stream. |
 | `Path: Path` | Return the validated logical path. |
 | `Name: string` | Return the final path component, derived from Path without lookup. No independent display-name argument or metadata query. |
 | `OpenRead() -> Result<InputStream, StreamError>` | Ask the retained provider for an input stream. The caller must close it. |
@@ -174,7 +175,7 @@ Streams still transfer at most two bytes per call to exercise partial-transfer l
 
 ## Directional capability interfaces
 
-These are now platform interfaces in System.Streams: [InputStream](xref:System.Streams.InputStream) and [OutputStream](xref:System.Streams.OutputStream). File and Directory remain application-owned experiments.
+These are now platform interfaces in System.Streams: [InputStream](xref:System.Streams.InputStream) and [OutputStream](xref:System.Streams.OutputStream). File and Directory are also platform interfaces; their ProviderFile/ProviderDirectory implementations remain application-owned.
 
 | Member | Contract |
 | --- | --- |

@@ -175,11 +175,12 @@ The stream capability contracts now live in System.Streams; concrete file stream
 and application memory streams implement them directly. System.Storage.StorageProvider
 now integrates OpenRead(Path) and CreateNew(Path); the sample extends this byte
 contract with optional lookup and temporary text conveniences. File and Directory
-are now integrated as provider-bound descriptors, with File.Path/Name and byte
+were first integrated as provider-bound descriptors, with File.Path/Name and byte
 opening, Directory child-address construction and typed lookup. StorageLookup
 extends the byte contract with GetFile; byte-only providers remain supported.
 Directory.FileAt now returns StorageLookupError, replacing the sample's FileReadError.
-Existing static native string-based File helpers remain compatible. All public
+Native static text behavior is retained, with the development naming migration
+described below. All public
 members have on-site reference coverage, including a manual WriteAllText entry.
 **Author-selected target, 2026-09-23:** align with the
 [Storage proposal's object model](proposals/storage-api.md#selected-object-model--2026-09-23).
@@ -189,14 +190,17 @@ StorageProvider resolves paths. GetItem returns one StorageItem; Directory.GetIt
 enumerates StorageItem values. The existing descriptor classes and separate
 StorageLookup/byte-provider split are intermediate implementation choices, not the goal.
 
-**Next:** replace the public descriptor-class shape with that interface hierarchy
-and move implementation state/behavior into provider implementations. Verify that
-external providers can implement File/Directory while unrelated direct StorageItem
-branches are rejected. Then align provider GetItem/GetFile/GetDirectory and directory
-traversal, integrate the minimal host provider, and add mixed GetItems enumeration
-with explicit bounds and failure semantics. Keep the disk/memory read/write consumer
-working throughout; document any development API migration and update `/docs/` in
-the same change. Do not expand the previous StorageLookup split as an alternative model.
+The interface migration is now implemented: StorageItem is closed to File and
+Directory in Raven metadata and the strict importer, while provider implementations
+of either branch are accepted. The disk/memory sample owns ProviderFile and
+ProviderDirectory. Raw neoIL does not enforce that metadata. Native static text
+helpers move to FileText in the development Raven API; legacy raw aliases remain.
+**Next:** align provider GetItem/GetFile/GetDirectory and directory traversal, then
+integrate the minimal host provider and mixed GetItems enumeration with explicit
+bounds and failure semantics. StorageLookup and the byte-provider-first shape are
+still transitional, as are FileAt/CreateNew address operations. Keep the disk/memory
+consumer working; update `/docs/` and document migrations in each slice. Do not
+expand the previous split as an alternative model.
 Task-based interaction is the intended extension direction; its scheduling and
 cancellation contract must be established before claiming nonblocking I/O. GetItems'
 eager/incremental representation remains open. Rich metadata, topology, Path format

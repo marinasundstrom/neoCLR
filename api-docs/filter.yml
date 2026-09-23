@@ -1,6 +1,6 @@
 apiRules:
 - exclude:
-    uidRegex: '^System\.Storage\.File\.WriteAllText($|\()'
+    uidRegex: '^System\.Storage\.FileText\.WriteAllText($|\()'
     type: Method
 - exclude:
     uidRegex: '^System\.Streams\.(FileOutputStream|OutputStream)\.Flush($|\()'
@@ -29,6 +29,6 @@ apiRules:
     uidRegex: '^System\.Storage$'
     type: Namespace
 - include:
-    uidRegex: '^System\.Storage\.(File|Directory|StorageLookup|FileReadError|FileWriteError|StorageProvider|Metadata|EntryKind|StorageLookupError|Path|InvalidPathError)($|\.)'
+    uidRegex: '^System\.Storage\.(StorageItem|File|Directory|FileText|StorageLookup|FileReadError|FileWriteError|StorageProvider|Metadata|EntryKind|StorageLookupError|Path|InvalidPathError)($|\.)'
 - exclude:
     uidRegex: '.*'

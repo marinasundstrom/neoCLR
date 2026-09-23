@@ -86,6 +86,19 @@ with tempfile.TemporaryDirectory(prefix='neoclr-storage-provider-') as folder:
     assert minimal.stdout == 'Minimal platform provider contract: passed\n', minimal.stdout
     print(minimal.stdout, end='')
 
+    # The root is closed; providers implement File or Directory instead.
+    (root / 'Main.rvn').write_text(
+        'namespace StorageExperiment\nimport System.Storage.*\n'
+        'class ThirdKind : StorageItem {\n'
+        '    val Name: string => "third"\n'
+        '    val Path: Path => RequirePath("third")\n'
+        '}\nfunc Main() {}\n')
+    rejected = subprocess.run(['dotnet', 'msbuild', str(root / 'StorageExplorer.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=120)
+    assert rejected.returncode != 0, 'An unrelated StorageItem branch compiled'
+    diagnostics = (rejected.stdout + rejected.stderr).lower()
+    assert 'rav0306' in diagnostics, diagnostics
+    print('Closed StorageItem root: rejected unrelated provider branch')
+
     # Ordinary callers cannot construct an unvalidated Path or mutate its spelling.
     for source, diagnostic in [
         ('namespace StorageExperiment\nimport System.Storage.Path\nfunc Main() { let path = Path("../bypass") }', 'rav1501'),
@@ -113,7 +126,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-storage-provider-') as folder:
 
     (root / 'Main.rvn').write_text(
         'namespace StorageExperiment\nimport System.Storage.File\nfunc Main() {\n'
-        '    let file = File(MemoryStorage(), RequirePath("correct.txt"), "misleading.txt")\n'
+        '    let file = ProviderFile(MemoryStorage(), RequirePath("correct.txt"), "misleading.txt")\n'
         '}\n')
     rejected = subprocess.run(['dotnet', 'msbuild', str(root / 'StorageExplorer.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=120)
     assert rejected.returncode != 0, 'Independent descriptor name was admitted'

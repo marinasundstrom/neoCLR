@@ -112,10 +112,12 @@ System.Storage.Metadata, EntryKind and StorageLookupError are now included in Do
 selection. Their complete metadata reference and [lookup guide](storage-lookup.md)
 describe development host-path lookup. StorageLookup.GetFile is the integrated optional lookup capability; concrete
 providers remain [sample implementations](storage-experiment.md).
-No renderer exclusion is needed for these new signatures. File and its legacy text error types are now selected too; only WriteAllText is
+No renderer exclusion is needed for these new signatures. FileText and its legacy text error types are now selected too; only WriteAllText is
 excluded because DocFX 2.80.1 cannot render Result<System.Void, FileWriteError>. Its
 complete manual reference is [WriteAllText](storage-items.md#writealltext).
-File, Directory and StorageLookup have generated type/member coverage. Path coverage follows.
+StorageItem, File, Directory and StorageLookup have generated type/member coverage.
+File/Directory are provider-implemented interfaces; inherited Name/Path are documented
+on StorageItem. FileText contains the renamed native static helpers. Path coverage follows.
 
 System.Storage.Path is now a platform class with Parse, immutable properties and
 lexical equality, alongside the existing static native string helpers. Path and

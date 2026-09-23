@@ -2,6 +2,7 @@ namespace StorageExperiment
 
 import System.Storage.File
 import System.Storage.Directory
+import System.Storage.StorageLookup
 
 import System.*
 import System.Storage.Path
@@ -17,6 +18,92 @@ import System.Storage.StorageLookupError
 interface StorageProvider : System.Storage.StorageLookup {
     func ReadText(path: Path, maxBytes: int) -> Result<string, FileReadError>
     func WriteText(path: Path, text: string, maxBytes: int) -> Result<unit, FileWriteError>
+}
+
+class ProviderFile : File {
+    private field provider: System.Storage.StorageProvider
+    private field path: Path
+
+    init(provider: System.Storage.StorageProvider, path: Path) {
+        self.provider = provider
+        self.path = path
+    }
+
+    val Path: Path => path
+    val Name: string => System.Storage.Path.GetFileName(path.Text)
+
+    func OpenRead() -> Result<InputStream, StreamError> {
+        return provider.OpenRead(path)
+    }
+
+    func CreateNew() -> Result<OutputStream, StreamError> {
+        return provider.CreateNew(path)
+    }
+
+}
+
+class ProviderDirectory : Directory {
+    private field provider: StorageLookup
+    private field path: Path
+
+    init(provider: StorageLookup, path: Path) {
+        self.provider = provider
+        self.path = path
+    }
+
+    val Path: Path => path
+    val Name: string => System.Storage.Path.GetFileName(path.Text)
+
+    // This resolves a direct child address; it does not query existence.
+    func FileAt(name: string) -> Result<File, StorageLookupError> {
+        if name.IsEmpty || name == "." || name == ".." || name.ContainsOrdinal("/") {
+            return Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+        var childText = path.Text + "/" + name
+        if path.Text == "." {
+            childText = name
+        }
+        if path.Text == "/" {
+            childText = "/" + name
+        }
+        return match System.Storage.Path.Parse(childText) {
+            Ok(let child) => {
+                let file: File = ProviderFile(provider, child)
+                Ok(file)
+            }
+            Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+    }
+
+    // Validate a direct child, then query its provider. The result owns no stream.
+    func GetFile(name: string) -> Result<File, StorageLookupError> {
+        return match FileAt(name) {
+            Ok(let descriptor) => provider.GetFile(descriptor.Path)
+            Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+    }
+
+    // A parsed absolute path is valid syntax, but cannot replace this context.
+    func GetFile(relativePath: Path) -> Result<File, StorageLookupError> {
+        if relativePath.IsAbsolute {
+            return Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+        if relativePath.Text == "." {
+            return provider.GetFile(path)
+        }
+        var resolved = path.Text + "/" + relativePath.Text
+        if path.Text == "/" {
+            resolved = "/" + relativePath.Text
+        }
+        if path.Text == "." {
+            resolved = relativePath.Text
+        }
+        return match System.Storage.Path.Parse(resolved) {
+            Ok(let child) => provider.GetFile(child)
+            Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
+        }
+    }
+
 }
 
 class HostStorage : StorageProvider {
@@ -46,7 +133,8 @@ class HostStorage : StorageProvider {
         return match System.Storage.Metadata.GetKind(Resolve(path)) {
             Ok(let kind) => {
                 if kind.IsFile {
-                    return Ok(File(self, path))
+                    let file: File = ProviderFile(self, path)
+                    return Ok(file)
                 }
                 Error(StorageLookupError(StorageLookupError.WrongKind()))
             }
@@ -75,11 +163,11 @@ class HostStorage : StorageProvider {
     }
 
     func ReadText(path: Path, maxBytes: int) -> Result<string, FileReadError> {
-        return System.Storage.File.ReadAllText(Resolve(path), maxBytes)
+        return System.Storage.FileText.ReadAllText(Resolve(path), maxBytes)
     }
 
     func WriteText(path: Path, text: string, maxBytes: int) -> Result<unit, FileWriteError> {
-        return System.Storage.File.WriteAllText(Resolve(path), text, maxBytes)
+        return System.Storage.FileText.WriteAllText(Resolve(path), text, maxBytes)
     }
 }
 
@@ -117,7 +205,8 @@ class MemoryStorage : StorageProvider {
         if Find(path) < 0 {
             return Error(StorageLookupError(StorageLookupError.NotFound()))
         }
-        return Ok(File(self, path))
+        let file: File = ProviderFile(self, path)
+        return Ok(file)
     }
 
     func OpenRead(path: Path) -> Result<InputStream, StreamError> {

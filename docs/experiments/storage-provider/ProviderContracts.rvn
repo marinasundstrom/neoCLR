@@ -4,6 +4,8 @@ import System.*
 import System.Result.*
 import System.Storage.Path
 import System.Storage.File
+import System.Storage.Directory
+import System.Storage.StorageItem
 import System.Streams.*
 
 // A provider needs only byte access: no File descriptor or text helper members.
@@ -26,7 +28,7 @@ func Main() {
     let concrete = UnavailableStorage()
     let provider: System.Storage.StorageProvider = concrete
     let path = RequirePath("item.txt")
-    let file = File(provider, path)
+    let file = ProviderFile(provider, path)
     if file.Name != "item.txt" || !file.Path.Equals(path) || concrete.Calls != 0 {
         System.Fault("Descriptor construction or properties performed I/O")
     }
@@ -54,6 +56,15 @@ func Main() {
     }
     if concrete.Calls != 2 {
         System.Fault("Descriptor did not delegate byte operations")
+    }
+    let item: StorageItem = file
+    if item.Name != "item.txt" || !item.Path.Equals(path) {
+        System.Fault("StorageItem lost provider properties")
+    }
+    let folder: Directory = ProviderDirectory(MemoryStorage(), RequirePath("/folder"))
+    let items: StorageItem[] = [file, folder]
+    if items[0].Name != "item.txt" || items[1].Name != "folder" {
+        System.Fault("Mixed storage items lost their properties")
     }
     System.Console.WriteLine("Minimal platform provider contract: passed")
 }

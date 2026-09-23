@@ -20,6 +20,12 @@ static class LibraryImplementation
         ReadonlyReceivers.Clear();
         if (owner != "System" && !Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
             throw new InvalidDataException("Invalid library owner.");
+        if (owner == "System.Storage.StorageItem")
+        {
+            var names = new[] { "System.Storage.StorageItem", "System.Storage.File", "System.Storage.Directory" };
+            foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name);
+            return names.SelectMany(name => InterfaceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
+        }
         if (owner == "System.Concurrency.Thread")
         {
             var names = new[] { "System.Concurrency.Thread", "System.Concurrency.ThreadPool", "System.Concurrency.WorkerCompletion" };
@@ -94,7 +100,9 @@ static class LibraryImplementation
     static MethodDefinition[] InterfaceRoots(TypeDefinition type, TypeDefinition contract, string owner)
     {
         IntrospectionHierarchy.Validate(type);
+        StorageHierarchy.Validate(type);
         IntrospectionHierarchy.Validate(contract);
+        StorageHierarchy.Validate(contract);
         // Bounded invariant declaration authoring, not permission to replace a class with an
         // interface or supply executable default/static interface members.
         foreach (var candidate in new[] { type, contract })
@@ -136,7 +144,9 @@ static class LibraryImplementation
     static MethodDefinition[] InstanceRoots(TypeDefinition type, TypeDefinition contract, string owner)
     {
         IntrospectionHierarchy.Validate(type);
+        StorageHierarchy.Validate(type);
         IntrospectionHierarchy.Validate(contract);
+        StorageHierarchy.Validate(contract);
         if (DescriptorLibrary.IsProvider(type) && (!type.IsNotPublic || !contract.IsNotPublic))
             throw new InvalidDataException("Runtime descriptor providers must remain internal.");
         if (GenericUnionLibrary.IsFamily(type)) GenericUnionLibrary.Validate(type, contract);

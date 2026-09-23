@@ -163,10 +163,10 @@ for file in source['sourceFiles']:
                      'tests': ['tests/character_classification.rs', 'docs/experiments/raven-target/verify_scalar_library.py'],
                      'note': 'Raven owns Parse, Divide, Equals, CompareTo and ToString. Bootstrap intrinsics decode native parse payloads; the scalar formatting receiver is preserved.'})
         continue
-    if file.startswith('runtime/raven/generated/File.'):
+    if file.startswith('runtime/raven/generated/FileText.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-file-write-bootstrap',
                      'tests': ['tests/file_output.rs', 'tests/io_errors.rs'],
-                     'note': 'Raven constructs existing read and write Results from native payload/status values. Unknown statuses still fault; public signatures are preserved.'})
+                     'note': 'Raven constructs existing read and write Results from native payload/status values. Unknown statuses still fault. Development native helpers use FileText; legacy raw File aliases remain.'})
         continue
     if file.startswith('runtime/raven/generated/Path.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-path-bootstrap',

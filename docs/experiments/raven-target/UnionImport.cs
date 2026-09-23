@@ -48,7 +48,10 @@ static class UnionImport
         var guestLibraries = resolver.Images.Where(a => a != app && a != library).Select(a => a.MainModule).ToHashSet();
         if (guestLibraries.Append(app.MainModule).Any(module => module.Types.Any(t => t.Name == "<Module>" && t.Methods.Any(m => m.IsConstructor && m.IsStatic))))
             throw new InvalidDataException("Module initializers unsupported.");
-        if (libraryOwner is null) IntrospectionHierarchy.RejectExternalProviders(guestLibraries.Append(app.MainModule));
+        if (libraryOwner is null) {
+            IntrospectionHierarchy.RejectExternalProviders(guestLibraries.Append(app.MainModule));
+            StorageHierarchy.RejectExternalBranches(guestLibraries.Append(app.MainModule));
+        }
         ApplicationTypes.Reset(guestLibraries.Append(app.MainModule).ToArray());
         var exports = libraryOwner is null ? [] : LibraryImplementation.Roots(app.MainModule, library.MainModule, libraryOwner);
         if (libraryOwner is not null) ApplicationTypes.SetLibraryScope(app.MainModule, libraryOwner);

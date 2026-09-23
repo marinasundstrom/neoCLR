@@ -28,8 +28,9 @@ the platform interface; the same byte workflow runs against both. The host provi
 maps logical paths beneath a native root and uses the platform file streams. The
 memory provider deliberately uses two-byte transfers to exercise partial I/O.
 Their concrete implementations and text conveniences remain sample-owned.
-[File/Directory descriptors](storage-items.md) and the StorageLookup capability
-are integrated into the platform.
+[StorageItem/File/Directory interfaces](storage-items.md) and the StorageLookup capability
+are integrated into the platform; provider-specific descriptor state belongs to
+the sample implementation classes.
 
 A platform provider is not required to implement GetFile, ReadText or WriteText.
 StorageLookup extends it with GetFile; the sample extends that capability with

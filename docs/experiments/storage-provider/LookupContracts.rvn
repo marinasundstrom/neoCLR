@@ -25,7 +25,7 @@ func LookupCases(provider: StorageProvider) {
         }
         Ok(_) => System.Fault("Directory returned as file")
     }
-    let directory = Directory(provider, RequirePath("/"))
+    let directory = ProviderDirectory(provider, RequirePath("/"))
     match directory.GetFile("../escape") {
         Error(let error) => {
             if !error.IsInvalidPath {
