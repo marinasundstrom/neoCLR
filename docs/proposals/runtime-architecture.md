@@ -485,25 +485,26 @@ System
 ├── DependencyInjection
 ├── Globalization
 ├── Introspection
+├── IO
 ├── Localization
 ├── Logging
 ├── Networking
 │   ├── Dns
-│   ├── Http
-│   │   ├── Client
-│   │   └── Server
-│   ├── Sockets
-│   └── WebSockets
+│   └── Sockets
 ├── Runtime
 │   ├── Reflection
 │   └── Emit
 ├── Security
 │   └── Cryptography
-├── Streams
 ├── Storage
 ├── Tasks
 ├── Text
-└── Time
+├── Time
+└── Web
+    ├── Http
+    │   ├── Client
+    │   └── Server
+    └── WebSockets
 ```
 
 This hierarchy is a design target rather than a commitment that every namespace must exist in the initial release.

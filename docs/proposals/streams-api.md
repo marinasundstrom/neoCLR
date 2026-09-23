@@ -1,6 +1,6 @@
 > **Development status, 2026-09-23:** the Storage POC implements byte streams,
 > TextReader/StreamReader and optional SeekableStream in **System.IO**. The original
-> proposal below remains exploratory, including its older System.Streams namespace.
+> proposal below remains exploratory, including its older System.IO namespace.
 > See the [current API guide](../../api-docs/streams.md) for the implemented surface.
 
 Here is the revised proposal, keeping the directional model but replacing the overly generic `Seekable` with the stream-specific `SeekableStream`. I’ve also made the `&` composition model explicit and kept `RandomAccessStream` as a possible nominal alternative rather than another mandatory abstraction. This revises the earlier proposal’s `Seekable` sections while retaining its core principle that API contracts request only the capabilities they need. :chatgpt-content-reference{index="0"} :chatgpt-content-reference{index="1"}
@@ -16,7 +16,7 @@ They are not inherently files, network connections, memory buffers, or devices. 
 NeoCLR therefore treats streams as a small independent platform abstraction:
 
 ```text
-System.Streams
+System.IO
 ```
 
 The API follows familiar .NET stream concepts while adapting them to NeoCLR's type system, Task model, explicit error model, and capability-oriented API design.
@@ -34,7 +34,7 @@ Read / ReadAsync                Read
 Write / WriteAsync              Write
 exceptions                      Result<T, E>
 CancellationToken parameters    Task cancellation
-System.IO ownership             System.Streams
+System.IO ownership             System.IO
 ```
 
 The central principle is:
@@ -48,7 +48,7 @@ The central principle is:
 The core abstractions live in:
 
 ```raven
-namespace System.Streams;
+namespace System.IO;
 ```
 
 This is intentionally independent of:
@@ -870,14 +870,14 @@ metadata
 opening resources
 ```
 
-while `System.Streams` takes over once byte transfer begins.
+while `System.IO` takes over once byte transfer begins.
 
 ```text
 System.Storage
       │
       │ OpenRead()
       ▼
-System.Streams.InputStream
+System.IO.InputStream
 ```
 
 A storage error opening a nonexistent file is not necessarily the same thing as an error encountered while consuming an already-open stream.
@@ -963,7 +963,7 @@ let reader = TextReader(input);
 
 without making `InputStream` itself text-aware.
 
-Whether `TextReader` and `TextWriter` ultimately belong in `System.Text`, `System.Streams`, or a more specialized namespace can be decided with the Text API.
+Whether `TextReader` and `TextWriter` ultimately belong in `System.Text`, `System.IO`, or a more specialized namespace can be decided with the Text API.
 
 ---
 
@@ -1486,7 +1486,7 @@ It remains a legitimate design alternative if concrete requirements justify it.
 The first version can remain deliberately small:
 
 ```raven
-namespace System.Streams;
+namespace System.IO;
 
 interface InputStream
 {
@@ -1564,13 +1564,14 @@ System
 ├── Collections
 ├── Concurrency
 ├── Data
+├── IO (Streams, Readers, Writers)
 ├── Networking ─────────────┐
-├── Security               │
+├── Security                │
 ├── Storage ────────────┐   │
-├── Streams             │   │
 ├── Tasks               │   │
 ├── Text                │   │
-└── Time                │   │
+├── Time                │   │
+└── Web                 │   │
                          ▼   ▼
                     InputStream
                     OutputStream
@@ -1580,17 +1581,17 @@ System
            buffering  transforms  text/binary
 ```
 
-`SeekableStream` is another contract within `System.Streams`, used only where positioning semantics exist.
+`SeekableStream` is another contract within `System.IO`, used only where positioning semantics exist.
 
 The dependency relationship is deliberately not represented through namespace nesting.
 
-`System.Storage` can use `System.Streams`.
+`System.Storage` can use `System.IO`.
 
-`System.Networking` can use `System.Streams`.
+`System.Networking` can use `System.IO`.
 
-`System.Data.Compression` can use `System.Streams`.
+`System.Data.Compression` can use `System.IO`.
 
-`System.Security.Cryptography` can use `System.Streams`.
+`System.Security.Cryptography` can use `System.IO`.
 
 And all of them can use `System.Tasks`.
 
