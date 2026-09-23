@@ -16,6 +16,7 @@ items:
   - System.Storage.StorageLookupError.IoFailure
   - System.Storage.StorageLookupError.NotFound
   - System.Storage.StorageLookupError.WrongKind
+  - System.Storage.StorageProvider
   langs:
   - csharp
   - vb
@@ -258,6 +259,13 @@ references:
     name: IoFailure
     isExternal: true
     href: System.Storage.StorageLookupError.IoFailure.html
+- uid: System.Storage.StorageProvider
+  commentId: T:System.Storage.StorageProvider
+  isExternal: true
+  href: System.Storage.StorageProvider.html
+  name: StorageProvider
+  nameWithType: StorageProvider
+  fullName: System.Storage.StorageProvider
 - uid: System.Storage
   commentId: N:System.Storage
   isExternal: true

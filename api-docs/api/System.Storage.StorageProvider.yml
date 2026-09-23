@@ -1,0 +1,259 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.StorageProvider
+  commentId: T:System.Storage.StorageProvider
+  id: StorageProvider
+  parent: System.Storage
+  children:
+  - System.Storage.StorageProvider.CreateNew(System.Storage.Path)
+  - System.Storage.StorageProvider.OpenRead(System.Storage.Path)
+  langs:
+  - csharp
+  - vb
+  name: StorageProvider
+  nameWithType: StorageProvider
+  fullName: System.Storage.StorageProvider
+  type: Interface
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Opens directional byte streams at validated logical storage paths.
+  remarks: Development API after Preview 9. Implementations resolve Path in their own address space. Parsing validates syntax only; it does not grant access or establish existence. Operations are synchronous and may block. The caller closes each successful stream. This contract requires neither text helpers nor descriptor lookup. See the [provider guide](/docs/storage-provider.html).
+  example: []
+  syntax:
+    content: public interface StorageProvider
+    content.vb: Public Interface StorageProvider
+- uid: System.Storage.StorageProvider.OpenRead(System.Storage.Path)
+  commentId: M:System.Storage.StorageProvider.OpenRead(System.Storage.Path)
+  id: OpenRead(System.Storage.Path)
+  parent: System.Storage.StorageProvider
+  langs:
+  - csharp
+  - vb
+  name: OpenRead(Path)
+  nameWithType: StorageProvider.OpenRead(Path)
+  fullName: System.Storage.StorageProvider.OpenRead(System.Storage.Path)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Opens an existing file for byte reads starting at offset zero.
+  remarks: A successful open owns a separate cursor and requires Close. An accepted Path can still be unsupported by a provider. Subsequent reads may fail; concurrent modification and replacement visibility depend on the provider.
+  example: []
+  syntax:
+    content: Result<InputStream, StreamError> OpenRead(Path path)
+    parameters:
+    - id: path
+      type: System.Storage.Path
+      description: Validated logical address interpreted by this provider.
+    return:
+      type: System.Result{System.Streams.InputStream,System.Streams.StreamError}
+      description: A new InputStream, or a StreamError such as NotFound, AccessDenied, WrongKind, InvalidPath, LimitExceeded or IoFailure.
+    content.vb: Function OpenRead(path As Path) As Result(Of InputStream, StreamError)
+  overload: System.Storage.StorageProvider.OpenRead*
+- uid: System.Storage.StorageProvider.CreateNew(System.Storage.Path)
+  commentId: M:System.Storage.StorageProvider.CreateNew(System.Storage.Path)
+  id: CreateNew(System.Storage.Path)
+  parent: System.Storage.StorageProvider
+  langs:
+  - csharp
+  - vb
+  name: CreateNew(Path)
+  nameWithType: StorageProvider.CreateNew(Path)
+  fullName: System.Storage.StorageProvider.CreateNew(System.Storage.Path)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Exclusively creates an empty file and opens it for byte writes.
+  remarks: Existing entries must not be overwritten. Successful creation is visible even before writing. Close the stream after use. A later write failure does not roll back creation or earlier writes. Parent creation, replacement and durable flushing are not promised.
+  example: []
+  syntax:
+    content: Result<OutputStream, StreamError> CreateNew(Path path)
+    parameters:
+    - id: path
+      type: System.Storage.Path
+      description: Validated destination address interpreted by this provider.
+    return:
+      type: System.Result{System.Streams.OutputStream,System.Streams.StreamError}
+      description: A new OutputStream, or a StreamError such as AlreadyExists, NotFound, AccessDenied, WrongKind, InvalidPath, LimitExceeded or IoFailure.
+    content.vb: Function CreateNew(path As Path) As Result(Of OutputStream, StreamError)
+  overload: System.Storage.StorageProvider.CreateNew*
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.StorageProvider.OpenRead*
+  commentId: Overload:System.Storage.StorageProvider.OpenRead
+  isExternal: true
+  href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_OpenRead_System_Storage_Path_
+  name: OpenRead
+  nameWithType: StorageProvider.OpenRead
+  fullName: System.Storage.StorageProvider.OpenRead
+- uid: System.Storage.Path
+  commentId: T:System.Storage.Path
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.Path.html
+  name: Path
+  nameWithType: Path
+  fullName: System.Storage.Path
+- uid: System.Result{System.Streams.InputStream,System.Streams.StreamError}
+  commentId: T:System.Result{System.Streams.InputStream,System.Streams.StreamError}
+  parent: System
+  definition: System.Result`2
+  href: System.Streams.InputStream.html
+  name: Result<InputStream, StreamError>
+  nameWithType: Result<InputStream, StreamError>
+  fullName: System.Result<System.Streams.InputStream, System.Streams.StreamError>
+  nameWithType.vb: Result(Of InputStream, StreamError)
+  fullName.vb: System.Result(Of System.Streams.InputStream, System.Streams.StreamError)
+  name.vb: Result(Of InputStream, StreamError)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - uid: System.Streams.InputStream
+    name: InputStream
+    isExternal: true
+    href: System.Streams.InputStream.html
+  - name: ','
+  - name: " "
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Streams.InputStream
+    name: InputStream
+    isExternal: true
+    href: System.Streams.InputStream.html
+  - name: ','
+  - name: " "
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: )
+- uid: System.Result`2
+  commentId: T:System.Result`2
+  isExternal: true
+  name: Result<T, E>
+  nameWithType: Result<T, E>
+  fullName: System.Result<T, E>
+  nameWithType.vb: Result(Of T, E)
+  fullName.vb: System.Result(Of T, E)
+  name.vb: Result(Of T, E)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Storage.StorageProvider.CreateNew*
+  commentId: Overload:System.Storage.StorageProvider.CreateNew
+  isExternal: true
+  href: System.Storage.StorageProvider.html#System_Storage_StorageProvider_CreateNew_System_Storage_Path_
+  name: CreateNew
+  nameWithType: StorageProvider.CreateNew
+  fullName: System.Storage.StorageProvider.CreateNew
+- uid: System.Result{System.Streams.OutputStream,System.Streams.StreamError}
+  commentId: T:System.Result{System.Streams.OutputStream,System.Streams.StreamError}
+  parent: System
+  definition: System.Result`2
+  href: System.Streams.OutputStream.html
+  name: Result<OutputStream, StreamError>
+  nameWithType: Result<OutputStream, StreamError>
+  fullName: System.Result<System.Streams.OutputStream, System.Streams.StreamError>
+  nameWithType.vb: Result(Of OutputStream, StreamError)
+  fullName.vb: System.Result(Of System.Streams.OutputStream, System.Streams.StreamError)
+  name.vb: Result(Of OutputStream, StreamError)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - uid: System.Streams.OutputStream
+    name: OutputStream
+    isExternal: true
+    href: System.Streams.OutputStream.html
+  - name: ','
+  - name: " "
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Streams.OutputStream
+    name: OutputStream
+    isExternal: true
+    href: System.Streams.OutputStream.html
+  - name: ','
+  - name: " "
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: )

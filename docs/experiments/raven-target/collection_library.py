@@ -94,6 +94,7 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/StorageLookupError.neoil')
         result += build(ROOT / 'runtime/raven/StorageMetadata.neoil')
         result += build(ROOT / 'runtime/raven/StreamError.neoil')
+        result += build(ROOT / 'runtime/raven/StorageProvider.neoil')
         result += build(ROOT / 'runtime/raven/InputStream.neoil')
         result += build(ROOT / 'runtime/raven/OutputStream.neoil')
         result += build(ROOT / 'runtime/raven/FileInputStream.neoil')

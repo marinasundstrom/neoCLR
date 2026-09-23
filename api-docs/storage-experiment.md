@@ -52,6 +52,11 @@ actual bytes, error handling and independent provider state.
 
 ## StorageProvider
 
+The sample interface extends the integrated
+[System.Storage.StorageProvider](storage-provider.md) byte contract. Only OpenRead
+and CreateNew belong to that platform interface; lookup and text helpers below
+remain sample conveniences.
+
 Implementations resolve validated logical Path values in their own namespace. Text methods remain temporary
 adapters; the byte workflow opens directional streams and layers UTF-8 conversion
 above them.

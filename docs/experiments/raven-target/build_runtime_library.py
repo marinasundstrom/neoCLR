@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'StorageProvider': 'System.Storage.StorageProvider',
     'InputStream': 'System.Streams.InputStream',
     'OutputStream': 'System.Streams.OutputStream',
     "InvalidPathError": "System.Storage.InvalidPathError",
@@ -110,6 +111,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'StorageProvider': 'runtime/raven/src/System/Storage/StorageProvider.rvn',
     'InputStream': 'runtime/raven/src/System/Streams/InputStream.rvn',
     'OutputStream': 'runtime/raven/src/System/Streams/OutputStream.rvn',
     "InvalidPathError": "runtime/raven/src/System/Storage/InvalidPathError.rvn",

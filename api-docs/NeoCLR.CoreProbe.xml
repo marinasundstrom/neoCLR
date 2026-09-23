@@ -4,6 +4,22 @@
     <name>NeoCLR.CoreProbe</name>
   </assembly>
   <members>
+    <member name="T:System.Storage.StorageProvider">
+      <summary>Opens directional byte streams at validated logical storage paths.</summary>
+      <remarks>Development API after Preview 9. Implementations resolve Path in their own address space. Parsing validates syntax only; it does not grant access or establish existence. Operations are synchronous and may block. The caller closes each successful stream. This contract requires neither text helpers nor descriptor lookup. See the [provider guide](/docs/storage-provider.html).</remarks>
+    </member>
+    <member name="M:System.Storage.StorageProvider.OpenRead(System.Storage.Path)">
+      <summary>Opens an existing file for byte reads starting at offset zero.</summary>
+      <param name="path">Validated logical address interpreted by this provider.</param>
+      <returns>A new InputStream, or a StreamError such as NotFound, AccessDenied, WrongKind, InvalidPath, LimitExceeded or IoFailure.</returns>
+      <remarks>A successful open owns a separate cursor and requires Close. An accepted Path can still be unsupported by a provider. Subsequent reads may fail; concurrent modification and replacement visibility depend on the provider.</remarks>
+    </member>
+    <member name="M:System.Storage.StorageProvider.CreateNew(System.Storage.Path)">
+      <summary>Exclusively creates an empty file and opens it for byte writes.</summary>
+      <param name="path">Validated destination address interpreted by this provider.</param>
+      <returns>A new OutputStream, or a StreamError such as AlreadyExists, NotFound, AccessDenied, WrongKind, InvalidPath, LimitExceeded or IoFailure.</returns>
+      <remarks>Existing entries must not be overwritten. Successful creation is visible even before writing. Close the stream after use. A later write failure does not roll back creation or earlier writes. Parent creation, replacement and durable flushing are not promised.</remarks>
+    </member>
     <member name="T:System.Tasks.Task`1">
       <summary>A consumer handle for one eventual value or cancellation.</summary>
       <remarks>Obtain a task from Promise&lt;T&gt;.Task or an async method. Consumers cannot complete it. Expected failures belong in the result type; there is no faulted Task state. This provisional API is confined to one guest invocation. Callback methods using Func&lt;System.Void&gt; are described in the [callback guide](/docs/callbacks.html).</remarks>

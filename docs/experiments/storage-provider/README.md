@@ -27,8 +27,8 @@ address resolution to the provider and used `directory::name` memory keys. The n
 exploration now introduces shared validated logical Path syntax: Directory parses
 child paths, while providers resolve them. HostStorage maps them under a configured
 native root; MemoryStorage uses rooted logical keys. File retains its display
-name separately. Both experiments use ordinary Raven interface dispatch without
-runtime or compiler changes.
+name derived from Path. The original experiments used ordinary Raven interface
+dispatch; the subsequent platform integrations are recorded below.
 
 The types use the **StorageExperiment** namespace. Their documented surface is in
 [the on-site API guide source](../../../api-docs/storage-experiment.md); it is linked
@@ -397,3 +397,26 @@ This implements the first simplification from the WinRT-informed review, without
 promoting the whole provisional provider contract. Whole-text methods and provider
 lookup remain the next integration choices. The verifier covers a nested Unicode
 name without an existing provider root and rejects the old independent name argument.
+
+
+### Platform byte-provider integration — 2026-09-23
+
+System.Storage.StorageProvider now requires only OpenRead(Path) and CreateNew(Path),
+returning the integrated directional streams. The sample interface inherits this
+contract and adds its provisional lookup/text methods. File byte operations dispatch
+through the core interface, exercising inherited interface conversion with both
+providers. Existing static string-based File text helpers are unchanged.
+
+This follows the .NET/WinRT comparison above: keep opening separate from descriptors
+and text conversion. It avoids forcing every byte provider to implement text policy;
+the cost is an additional interface layer while sample conveniences remain. Lookup
+capabilities and File/Directory integration are next; no parent hierarchy or metadata
+snapshot is introduced. Public signatures and limitations are covered by the
+[provider API guide](../../../api-docs/storage-provider.md) and generated reference.
+
+Validation: the normal SDK disk/memory product, stream/Path/memory/lookup/directory
+checks, a provider implementing only the two core methods, and negative callers
+pass. The interface import probe and regenerated bootstrap snapshot pass. DocFX
+covers 151 items with summaries; four website tooling tests and the combined
+13-page website build pass without documentation warnings. No native runtime or
+Raven compiler change was needed for this slice.

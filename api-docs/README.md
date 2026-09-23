@@ -119,6 +119,8 @@ lexical equality, alongside the existing static native string helpers. Path and
 InvalidPathError are selected for generated reference, including both legacy methods.
 The Storage sample imports this platform type rather than defining its own. Its
 provider classes remain application-owned until the next integration slices.
+The two-member System.Storage.StorageProvider byte contract is integrated and
+selected for generated documentation; lookup/text methods are not required by it.
 
 InputStream and OutputStream are selected with their concrete file implementations.
 OutputStream.Flush shares the exact unit-valued Result renderer exclusion; its

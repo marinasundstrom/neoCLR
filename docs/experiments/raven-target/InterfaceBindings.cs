@@ -9,11 +9,11 @@ static class InterfaceBindings
         public interface Closable<E> { Result<PropagationUnit,E> Close(); }
         """;
     static readonly HashSet<string> Contracts = new() { "System.Equatable", "System.Comparable", "System.Clonable", "System.Closable" };
-    public static bool IsInterface(string type) => (type == "System.Clock" || StreamBindings.IsCapability(type)) || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
+    public static bool IsInterface(string type) => (type == "System.Clock" || StreamBindings.IsCapability(type) || type == StorageProviderBindings.Name) || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
     public static string? Type(TypeReference type, Func<TypeReference, string>? parameterMap = null)
     {
         if (!RuntimeSignatures.IsCore(type.Scope)) return null;
-        if ((type.FullName == "System.Clock" || StreamBindings.IsCapability(type.FullName)) && !type.IsValueType) return type.FullName;
+        if ((type.FullName == "System.Clock" || StreamBindings.IsCapability(type.FullName) || type.FullName == StorageProviderBindings.Name) && !type.IsValueType) return type.FullName;
         if (type.FullName == "System.Object") return "System.Object";
         if (type is not GenericInstanceType g || g.IsValueType || g.GenericArguments.Count != 1) return null;
         var name = g.ElementType.FullName.Split('`')[0];
@@ -27,6 +27,7 @@ static class InterfaceBindings
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
         if (reference.DeclaringType.FullName == "System.Clock") return CalendarBindings.Bind(reference, definition);
+        if (reference.DeclaringType.FullName == StorageProviderBindings.Name) return StorageProviderBindings.Bind(reference, definition);
         if (StreamBindings.IsCapability(reference.DeclaringType.FullName)) return StreamBindings.BindCapability(reference, definition);
         var owner = Type(reference.DeclaringType);
         if (owner is null || !IsInterface(owner)) return null;
@@ -49,6 +50,7 @@ static class InterfaceBindings
     public static void Validate(ModuleDefinition module)
     {
         StreamBindings.ValidateCapabilities(module);
+        StorageProviderBindings.Validate(module);
         foreach (var name in Contracts) {
             var type = module.GetType(name + "`1");
             if (type is null || !type.IsInterface || type.GenericParameters.Count != 1

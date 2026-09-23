@@ -21,9 +21,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Simplify the sample File constructor to (provider, path), deriving Name from Path;
   remove the redundant StorageProvider.FileAt factory. Directory.FileAt remains an
   address operation. Reject independent names; preserve existing lookup and I/O.
-  File/Directory/provider integration remains the next bounded slice. Validation:
+  Integrate the minimal System.Storage.StorageProvider byte contract with OpenRead
+  and CreateNew. Sample lookup/text conveniences extend it; file byte operations
+  dispatch through the platform interface for both disk and memory. Text encoding,
+  descriptor lookup and richer metadata are not mandatory provider methods.
+  File/Directory integration remains the next bounded slice. Validation:
   disk/memory SDK contracts and negative callers, interface import checks, runtime
-  snapshot, 148 API summaries and the combined website pass.
+  snapshot, 151 API summaries and the combined website pass.
 
 - Add development System.Storage.Metadata.GetKind(string), EntryKind and
   StorageLookupError over the existing native metadata service, with generated API

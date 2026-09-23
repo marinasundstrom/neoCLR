@@ -53,6 +53,14 @@ identity inside imported generic returns; the independent opt-in ValueTuple
 regression and fix passed 39 focused checks, landed as `44ae9f242` on main and
 `849347a97` on the integration branch. Platform validation is recorded in the changelog.
 
+**Subsequent integration.** Added System.Storage.StorageProvider with only OpenRead
+and CreateNew. The disk/memory sample extends it with provisional lookup/text
+methods; its byte operations now dispatch through the core interface. Added generated
+API documentation and a contract check whose provider has no text or lookup methods.
+This implements the proposed separation at the platform boundary. File/Directory
+integration and lookup capabilities remain next; this is an assistant implementation
+choice within the requested POC, not an author-approved final Storage design.
+
 ## 2026-09-23 — Storage and Streams as architectural exploration
 
 **Author clarification.** “Look at this as exploration also, to investigate what

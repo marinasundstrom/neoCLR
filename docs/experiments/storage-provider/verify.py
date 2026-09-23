@@ -78,6 +78,14 @@ with tempfile.TemporaryDirectory(prefix='neoclr-storage-provider-') as folder:
     assert resolved.stdout == 'Relative directory lookup contracts: passed\n', resolved.stdout
     print(resolved.stdout, end='')
 
+    shutil.copyfile(HERE / 'ProviderContracts.rvn', root / 'Main.rvn')
+    provider = subprocess.run(['dotnet', 'msbuild', str(root / 'StorageExplorer.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=120)
+    assert provider.returncode == 0, provider.stdout + provider.stderr
+    minimal = subprocess.run([str(bundle / 'bin/neoclr'), 'run', str(root / 'bin/neoclr/Debug/App.neoil'), '--system', str(bundle / 'lib/System.neoil')], cwd=work, capture_output=True, text=True, timeout=60)
+    assert minimal.returncode == 0, minimal.stdout + minimal.stderr
+    assert minimal.stdout == 'Minimal platform provider contract: passed\n', minimal.stdout
+    print(minimal.stdout, end='')
+
     # Ordinary callers cannot construct an unvalidated Path or mutate its spelling.
     for source, diagnostic in [
         ('namespace StorageExperiment\nimport System.Storage.Path\nfunc Main() { let path = Path("../bypass") }', 'rav1501'),

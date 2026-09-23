@@ -50,6 +50,9 @@ items:
   - uid: System.Storage.StorageLookupError.WrongKind
     name: StorageLookupError.WrongKind
     type: Struct
+  - uid: System.Storage.StorageProvider
+    name: StorageProvider
+    type: Interface
 - uid: System.Streams
   name: System.Streams
   type: Namespace

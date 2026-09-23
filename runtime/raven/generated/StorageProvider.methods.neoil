@@ -1,0 +1,7 @@
+; Generated from runtime/raven/src/System/Storage/StorageProvider.rvn. Regenerate with build_runtime_library.py.
+.interface System.Storage.StorageProvider
+.method instance OpenRead(System.Storage.Path path) -> System.Result<System.Streams.InputStream,System.Streams.StreamError>
+.end
+.method instance CreateNew(System.Storage.Path path) -> System.Result<System.Streams.OutputStream,System.Streams.StreamError>
+.end
+.end

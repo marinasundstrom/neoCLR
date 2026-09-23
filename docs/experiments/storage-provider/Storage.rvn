@@ -10,12 +10,9 @@ import System.Storage.FileReadError
 import System.Storage.FileWriteError
 import System.Storage.StorageLookupError
 
-// Experimental application-owned contract. Text methods are a temporary adapter
-// over existing helpers; byte streams are a separate incremental experiment.
-interface StorageProvider {
+// Sample-only lookup and text conveniences extend the platform byte contract.
+interface StorageProvider : System.Storage.StorageProvider {
     func GetFile(path: Path) -> Result<File, StorageLookupError>
-    func OpenRead(path: Path) -> Result<InputStream, StreamError>
-    func CreateNew(path: Path) -> Result<OutputStream, StreamError>
     func ReadText(path: Path, maxBytes: int) -> Result<string, FileReadError>
     func WriteText(path: Path, text: string, maxBytes: int) -> Result<unit, FileWriteError>
 }
@@ -35,11 +32,13 @@ class File {
     val Name: string => name
 
     func OpenRead() -> Result<InputStream, StreamError> {
-        return provider.OpenRead(path)
+        let bytes: System.Storage.StorageProvider = provider
+        return bytes.OpenRead(path)
     }
 
     func CreateNew() -> Result<OutputStream, StreamError> {
-        return provider.CreateNew(path)
+        let bytes: System.Storage.StorageProvider = provider
+        return bytes.CreateNew(path)
     }
 
     func ReadText(maxBytes: int) -> Result<string, FileReadError> {

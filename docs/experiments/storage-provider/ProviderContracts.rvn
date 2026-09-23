@@ -1,0 +1,45 @@
+namespace StorageExperiment
+
+import System.*
+import System.Result.*
+import System.Storage.Path
+import System.Streams.*
+
+// A provider needs only byte access: no File descriptor or text helper members.
+class UnavailableStorage : System.Storage.StorageProvider {
+    func OpenRead(path: Path) -> Result<InputStream, StreamError> {
+        return Error(StreamError(StreamError.NotFound()))
+    }
+
+    func CreateNew(path: Path) -> Result<OutputStream, StreamError> {
+        return Error(StreamError(StreamError.AccessDenied()))
+    }
+}
+
+func Main() {
+    let provider: System.Storage.StorageProvider = UnavailableStorage()
+    let path = RequirePath("item.txt")
+    match provider.OpenRead(path) {
+        Error(let error) => {
+            if !error.IsNotFound {
+                System.Fault("Provider read error changed")
+            }
+        }
+        Ok(let stream) => {
+            stream.Close()
+            System.Fault("Unavailable provider opened a stream")
+        }
+    }
+    match provider.CreateNew(path) {
+        Error(let error) => {
+            if !error.IsAccessDenied {
+                System.Fault("Provider creation error changed")
+            }
+        }
+        Ok(let stream) => {
+            stream.Close()
+            System.Fault("Unavailable provider created a stream")
+        }
+    }
+    System.Console.WriteLine("Minimal platform provider contract: passed")
+}

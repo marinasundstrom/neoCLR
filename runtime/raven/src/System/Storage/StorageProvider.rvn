@@ -1,0 +1,9 @@
+namespace System.Storage
+
+import System.*
+import System.Streams.*
+
+public interface StorageProvider {
+    func OpenRead(path: Path) -> Result<InputStream, StreamError>
+    func CreateNew(path: Path) -> Result<OutputStream, StreamError>
+}

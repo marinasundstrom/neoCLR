@@ -172,8 +172,10 @@ possible, rather than expanding isolated experiments first. The first integratio
 moves the validated value into System.Storage.Path while preserving its native
 Combine/GetFileName string helpers; the sample now imports the platform type.
 The stream capability contracts now live in System.Streams; concrete file streams
-and application memory streams implement them directly. Next, integrate the minimal
-provider/File/Directory contract
+and application memory streams implement them directly. System.Storage.StorageProvider
+now integrates OpenRead(Path) and CreateNew(Path); the sample extends this byte
+contract with temporary lookup/text conveniences. Next, integrate the minimal
+File/Directory contract
 in bounded library slices, preserving existing static file helpers and keeping
 known limitations explicit. The author emphasizes a minimal Storage POC: Path-taking
 Combine/helper overloads are future direction, not required in this integration. Parent hierarchy, shared errors and replacement identity
