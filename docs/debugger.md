@@ -205,3 +205,13 @@ See [debugger tests](../tests/debugger.rs), [source grammar](neo-grammar.md),
 Guest arguments may follow `--`: `cargo run --locked -- debug examples/source/environment.neo -- demo`.
 They are exposed through [Environment.GetCommandLineArgs](environment.md), including
 the guest input path at index zero.
+
+
+## Terminal fault classification
+
+Development snapshots expose `fault_code` alongside the existing diagnostic `fault`.
+It is a stable symbolic identifier such as `StackOverflow` or `UserFault`, and is
+null before a terminal failure or after successful execution. It also covers
+pre-execution launch failures and cancellation while paused. The terminal view
+prints the code separately. See [the fault reference](../api-docs/faults.md); clients
+should not classify failures by message text.

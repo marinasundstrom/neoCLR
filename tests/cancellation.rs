@@ -13,6 +13,7 @@ fn cancelled() -> ExecutionOptions {
 }
 fn assert_cancelled(fault: neoclr::Fault) {
     assert_eq!(fault.message, "execution cancelled");
+    assert_eq!(fault.code, neoclr::FaultCode::ExecutionCancelled);
     assert!(fault.function.is_some());
     assert!(fault.instruction.is_some());
 }

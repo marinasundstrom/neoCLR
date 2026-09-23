@@ -65,6 +65,7 @@ impl ExecutionOptions {
             .is_some_and(CancellationToken::is_cancelled)
         {
             return Err(Fault {
+                code: crate::FaultCode::ExecutionCancelled,
                 message: "execution cancelled".into(),
                 function: Some(function.into()),
                 instruction: Some(instruction),

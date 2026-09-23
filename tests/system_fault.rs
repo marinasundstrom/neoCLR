@@ -11,6 +11,8 @@ fn dynamic_fault_stops_guest_but_does_not_abort_host() {
     .unwrap();
     for message in [
         "",
+        "StackOverflow",
+        "[code=DivideByZero]",
         "Query iterator has no current element",
         "failure: åäö ☃",
     ] {
@@ -30,6 +32,7 @@ ret
         program.verify().unwrap();
         let fault = program.run(Limits::default()).unwrap_err();
         assert_eq!(fault.message, message);
+        assert_eq!(fault.code, neoclr::FaultCode::UserFault);
     }
     let app =
         assemble(".module Healthy\n.entry Main\n.function Main() -> Int32\nldc.i4 42\nret\n.end")
@@ -48,6 +51,7 @@ ret
 fn fault_binding_requires_void_return_and_string_argument() {
     for (signature, expected) in [
         ("(Int32 message) -> Void", "no runtime binding"),
+        ("(String message,Int32 code) -> Void", "no runtime binding"),
         ("(String message) -> Int32", "return type mismatch"),
         ("(String message) -> void", "no-result methods"),
     ] {

@@ -158,6 +158,11 @@ fn source_breakpoint_and_fault_snapshot_survive_execution_teardown() {
     assert_eq!(fault.status, "faulted");
     assert_eq!(fault.frames[0].source.as_ref().unwrap().line, 3);
     assert!(fault.fault.is_some());
+    assert_eq!(fault.fault_code, Some(neoclr::FaultCode::DivideByZero));
+    assert_eq!(
+        serde_json::to_value(&fault).unwrap()["fault_code"],
+        "DivideByZero"
+    );
     worker.join().unwrap();
 }
 #[test]
@@ -265,6 +270,10 @@ fn cancellation_works_while_paused() {
     until(&debugger, |s| s.status == "paused");
     cancellation.cancel();
     until(&debugger, |s| s.status == "faulted");
+    assert_eq!(
+        debugger.snapshot().fault_code,
+        Some(neoclr::FaultCode::ExecutionCancelled)
+    );
     worker.join().unwrap();
 }
 

@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Add host-visible FaultCode classifications, including StackOverflow for the
+  interpreter frame limit, arithmetic/memory limits and host cancellation. Explicit
+  guest faults always use UserFault; System.Fault still accepts only a message.
+  Keep a RuntimeError fallback for diagnostics not yet classified. Preserve codes
+  with stack traces and expose debugger fault_code; CLI messages include the code.
+  Document all codes and the Rust host API on-site. Hosts constructing Fault with
+  struct literals must provide code; formatted CLI diagnostics also change.
+
 - Add development System.Streams FileInputStream/FileOutputStream APIs with typed
   StreamError results, bounded caller-buffer transfers, exclusive file creation,
   flush and explicit close. These calls block; they do not implement async I/O or

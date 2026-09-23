@@ -57,6 +57,9 @@ fn overview(out: &mut impl Write, snapshot: &DebugSnapshot) -> io::Result<()> {
     }
     if let Some(fault) = &snapshot.fault {
         writeln!(out, "Fault: {}", fault.escape_debug())?;
+        if let Some(code) = snapshot.fault_code {
+            writeln!(out, "Fault code: {code}")?;
+        }
     }
     if let Some(result) = &snapshot.result {
         value(out, "result", result, 0)?;

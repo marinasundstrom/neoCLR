@@ -5288,3 +5288,20 @@ and recorded the convention for runtime code as well as examples.
   with real disk-byte assertions. Storage alignment and the Path value object are
   next; asynchronous I/O, buffer ownership across suspension and Task.Run scheduling
   remain separate open work. This is development work after Preview 9.
+
+
+### 2026-09-23 — Runtime-owned terminal fault codes
+
+- **Author:** asked whether known runtime faults have codes, and directed adding
+  them if absent, giving StackOverflow as an example. Subsequently specified that
+  faults triggered from user code need a distinct code and users must not set it.
+- **Assistant finding/proposal:** Fault had only diagnostic text, location and stack
+  trace. Proposed a machine-readable classification assigned at detection sites,
+  independent of message text, with UserFault for explicit guest requests.
+- **Action:** added host FaultCode/Fault.code, specific codes for selected known
+  runtime failures and a RuntimeError fallback, plus debugger `fault_code` and CLI
+  display. System.Fault(message) and the fault instruction always use UserFault;
+  their guest signatures do not accept a code. Added on-site reference and tests.
+- **Scope:** no guest exception hierarchy, catch/recovery semantics or HRESULT
+  compatibility. More precise classification of remaining RuntimeError diagnostics
+  can follow; Storage alignment and Path remain the next platform slice.

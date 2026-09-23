@@ -355,7 +355,10 @@ impl SlotReference {
             return Err(Fault::new("array element type mismatch"));
         }
         if index >= self.array_length()? {
-            return Err(Fault::new("array index out of range"));
+            return Err(Fault::coded(
+                crate::FaultCode::IndexOutOfRange,
+                "array index out of range",
+            ));
         }
         let mut result = self.clone();
         result.path.push(index);

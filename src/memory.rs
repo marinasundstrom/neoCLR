@@ -304,10 +304,16 @@ impl PointerHeap {
             .checked_add(size)
             .ok_or_else(|| Fault::new("allocation size overflow"))?;
         if total > byte_limit {
-            return Err(Fault::new("pointer heap byte limit exceeded"));
+            return Err(Fault::coded(
+                crate::FaultCode::NativeMemoryLimitExceeded,
+                "pointer heap byte limit exceeded",
+            ));
         }
         if self.allocations.len() >= allocation_limit {
-            return Err(Fault::new("pointer allocation limit exceeded"));
+            return Err(Fault::coded(
+                crate::FaultCode::NativeMemoryLimitExceeded,
+                "pointer allocation limit exceeded",
+            ));
         }
         let mut initialized = Vec::new();
         initialized
@@ -395,7 +401,10 @@ impl PointerHeap {
 
     fn allocation(&self, pointer: &Pointer) -> Result<&Allocation, Fault> {
         if pointer.address == 0 {
-            return Err(Fault::new("null pointer access"));
+            return Err(Fault::coded(
+                crate::FaultCode::NullPointer,
+                "null pointer access",
+            ));
         }
         let id = pointer
             .allocation
@@ -588,7 +597,7 @@ impl PointerHeap {
             .get_mut(
                 pointer
                     .allocation
-                    .ok_or_else(|| Fault::new("null pointer"))?,
+                    .ok_or_else(|| Fault::coded(crate::FaultCode::NullPointer, "null pointer"))?,
             )
             .and_then(Option::as_mut)
             .ok_or_else(|| Fault::new("invalid allocation"))?;

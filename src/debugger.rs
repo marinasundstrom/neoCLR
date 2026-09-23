@@ -37,6 +37,8 @@ pub struct DebugSnapshot {
     pub output: Vec<String>,
     pub result: Option<DebugValue>,
     pub fault: Option<String>,
+    /// Stable terminal code, absent while running or after successful completion.
+    pub fault_code: Option<crate::FaultCode>,
     pub truncated: bool,
 }
 #[derive(Debug, Clone, Serialize)]
@@ -191,6 +193,7 @@ impl Debugger {
             s.snapshot.revision = 1;
             s.snapshot.status = "faulted".into();
             s.snapshot.fault = Some(fault.to_string());
+            s.snapshot.fault_code = Some(fault.code);
             s.mode = Mode::Finished;
             self.shared.changed.notify_all();
         }
@@ -263,7 +266,10 @@ impl Debugger {
         }
         while s.mode == Mode::Paused {
             if cancellation.is_some_and(CancellationToken::is_cancelled) {
-                return Err(Fault::new("execution cancelled"));
+                return Err(Fault::coded(
+                    crate::FaultCode::ExecutionCancelled,
+                    "execution cancelled",
+                ));
             }
             s = self
                 .shared
@@ -273,14 +279,17 @@ impl Debugger {
                 .0;
         }
         if s.mode == Mode::Stopped {
-            return Err(Fault::new("debug execution stopped"));
+            return Err(Fault::coded(
+                crate::FaultCode::ExecutionCancelled,
+                "debug execution stopped",
+            ));
         }
         if s.mode == Mode::Step {
             s.mode = Mode::Stepping;
         }
         Ok(())
     }
-    pub(crate) fn finish(&self, mut snapshot: DebugSnapshot, fault: Option<String>) {
+    pub(crate) fn finish(&self, mut snapshot: DebugSnapshot, fault: Option<&Fault>) {
         let mut s = self.shared.state.lock().unwrap();
         snapshot.revision = s.snapshot.revision + 1;
         snapshot.status = if s.mode == Mode::Stopped {
@@ -291,7 +300,8 @@ impl Debugger {
             "completed"
         }
         .into();
-        snapshot.fault = fault;
+        snapshot.fault = fault.map(|fault| fault.message.clone());
+        snapshot.fault_code = fault.map(|fault| fault.code);
         s.snapshot = snapshot;
         s.mode = Mode::Finished;
         self.shared.changed.notify_all();

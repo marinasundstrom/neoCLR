@@ -10,3 +10,5 @@
   href: storage-experiment.md
 - name: File streams
   href: streams.md
+- name: Terminal faults
+  href: faults.md

@@ -101,6 +101,7 @@ fn analyze_constructor(module: &Module, function: &Function) -> Result<(), Fault
         .generic_parameters
         .len();
     let fault = |pc, message: &str| Fault {
+        code: crate::FaultCode::InvalidProgram,
         message: format!("verification: {message}"),
         function: Some(function.name.clone()),
         instruction: Some(pc),
@@ -283,6 +284,7 @@ fn analyze_function(
     constructing: bool,
 ) -> Result<FunctionVerification, Fault> {
     let fault = |pc, message: &str| Fault {
+        code: crate::FaultCode::InvalidProgram,
         message: format!("verification: {message}"),
         function: Some(function.name.clone()),
         instruction: Some(pc),
@@ -786,7 +788,8 @@ fn loaded(ty: &Type) -> StackType {
 
 fn stored(module: &Module, value: &StackType, target: &Type) -> Result<(), Fault> {
     if matches!(value, StackType::Readonly(_)) && matches!(target, Type::ByRef(_)) {
-        return Err(Fault::new(
+        return Err(Fault::coded(
+            crate::FaultCode::InvalidProgram,
             "readonly reference cannot satisfy writable storage contract",
         ));
     }
@@ -800,9 +803,10 @@ fn stored(module: &Module, value: &StackType, target: &Type) -> Result<(), Fault
     {
         Ok(())
     } else {
-        Err(Fault::new(format!(
-            "expected storage {target:?}, got {value:?}"
-        )))
+        Err(Fault::coded(
+            crate::FaultCode::InvalidProgram,
+            format!("expected storage {target:?}, got {value:?}"),
+        ))
     }
 }
 
@@ -810,7 +814,8 @@ fn exact(value: &StackType) -> Result<&Type, Fault> {
     match value {
         StackType::Exact(ty) | StackType::Readonly(ty) | StackType::Slot { ty, .. } => Ok(ty),
         StackType::ConditionalOutput(_) => Ok(&Type::Boolean),
-        _ => Err(Fault::new(
+        _ => Err(Fault::coded(
+            crate::FaultCode::InvalidProgram,
             "operation requires a concrete stack type; open parameter normalization is unresolved",
         )),
     }
@@ -819,14 +824,20 @@ fn exact(value: &StackType) -> Result<&Type, Fault> {
 fn address(value: &StackType) -> Result<&Type, Fault> {
     match exact(value)? {
         Type::Ptr(t) | Type::ByRef(t) => Ok(t),
-        _ => Err(Fault::new("expected pointer or managed slot reference")),
+        _ => Err(Fault::coded(
+            crate::FaultCode::InvalidProgram,
+            "expected pointer or managed slot reference",
+        )),
     }
 }
 
 fn pointer(value: &StackType) -> Result<&Type, Fault> {
     match exact(value)? {
         Type::Ptr(ty) => Ok(ty),
-        _ => Err(Fault::new("expected native pointer")),
+        _ => Err(Fault::coded(
+            crate::FaultCode::InvalidProgram,
+            "expected native pointer",
+        )),
     }
 }
 
@@ -843,7 +854,7 @@ fn require(condition: bool, message: &str) -> Result<(), Fault> {
     if condition {
         Ok(())
     } else {
-        Err(Fault::new(message))
+        Err(Fault::coded(crate::FaultCode::InvalidProgram, message))
     }
 }
 
@@ -864,7 +875,9 @@ fn typed_effect(
         crate::vm::record_fields(module, owner, arity)?
             .get(index)
             .map(|f| f.ty.clone())
-            .ok_or_else(|| crate::Fault::new("field index out of range"))
+            .ok_or_else(|| {
+                crate::Fault::coded(crate::FaultCode::InvalidProgram, "field index out of range")
+            })
     };
     match op {
         ReserveArray(ty) | AllocateArray(ty) | NewValueArray(ty) | NewArray(ty)
@@ -897,7 +910,10 @@ fn typed_effect(
                 "array reference slot must be loaded before array access",
             )?;
             let (T::Array(element) | T::ArrayRef(element)) = target else {
-                return Err(crate::Fault::new("array operation requires array"));
+                return Err(crate::Fault::coded(
+                    crate::FaultCode::InvalidProgram,
+                    "array operation requires array",
+                ));
             };
             if matches!(op, ArrayLength) {
                 return one(T::UIntPtr);
@@ -1020,7 +1036,8 @@ fn typed_effect(
                 return one(target.clone());
             }
             let T::ByRef(source) = exact(&values[0])? else {
-                return Err(crate::Fault::new(
+                return Err(crate::Fault::coded(
+                    crate::FaultCode::InvalidProgram,
                     "castclass requires a managed record reference",
                 ));
             };
@@ -1054,7 +1071,8 @@ fn typed_effect(
                 }
                 one(T::InterfaceRef(Box::new(interface.clone())))
             }
-            _ => Err(crate::Fault::new(
+            _ => Err(crate::Fault::coded(
+                crate::FaultCode::InvalidProgram,
                 "interface.borrow requires a typed pointer or managed slot reference",
             )),
         },
@@ -1084,10 +1102,12 @@ fn typed_effect(
                 }
                 return Ok(vec![loaded(&callee.returns)]);
             }
-            let interface = callee
-                .owner
-                .clone()
-                .ok_or_else(|| crate::Fault::new("interface call requires owner"))?;
+            let interface = callee.owner.clone().ok_or_else(|| {
+                crate::Fault::coded(
+                    crate::FaultCode::InvalidProgram,
+                    "interface call requires owner",
+                )
+            })?;
             match exact(&values[0])? {
                 actual
                     if callee.instance
@@ -1106,7 +1126,8 @@ fn typed_effect(
                     if **actual == interface && !module.is_reference_type(&interface) => {}
                 T::InterfaceRef(actual) if **actual == interface && !callee.receiver_byref => (),
                 _ => {
-                    return Err(crate::Fault::new(
+                    return Err(crate::Fault::coded(
+                        crate::FaultCode::InvalidProgram,
                         "interface view or receiver mode mismatch",
                     ));
                 }
@@ -1129,7 +1150,10 @@ fn typed_effect(
                         "constructor chaining requires a managed constructor",
                     )?;
                     let T::ByRef(actual) = exact(value)? else {
-                        return Err(crate::Fault::new("constructor requires managed receiver"));
+                        return Err(crate::Fault::coded(
+                            crate::FaultCode::InvalidProgram,
+                            "constructor requires managed receiver",
+                        ));
                     };
                     require(
                         function.owner.as_ref() == Some(actual.as_ref()),
@@ -1188,9 +1212,12 @@ fn typed_effect(
             for (value, ty) in values.iter().zip(&callee.parameters) {
                 stored(module, value, ty)?;
             }
-            one(callee
-                .owner
-                .ok_or_else(|| crate::Fault::new("missing constructor owner"))?)
+            one(callee.owner.ok_or_else(|| {
+                crate::Fault::coded(
+                    crate::FaultCode::InvalidProgram,
+                    "missing constructor owner",
+                )
+            })?)
         }
         New(ty) => {
             for (value, field) in values

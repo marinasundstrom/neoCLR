@@ -43,7 +43,12 @@ pub(crate) fn convert(op: &Op, value: Value) -> Result<Value, Fault> {
     };
     let lower = if signed { -(1i128 << (bits - 1)) } else { 0 };
     let upper_exclusive = 1i128 << (bits - u32::from(signed));
-    let overflow = || Fault::new(format!("checked conversion overflow to {target:?}"));
+    let overflow = || {
+        Fault::coded(
+            crate::FaultCode::ArithmeticOverflow,
+            format!("checked conversion overflow to {target:?}"),
+        )
+    };
     let number = match value {
         Value::Int32(n) if source_unsigned => n as u32 as i128,
         Value::Int32(n) => n as i128,

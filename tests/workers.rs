@@ -286,14 +286,24 @@ fn notification_fault_and_instruction_exhaustion_teardown_workers() {
 
 #[test]
 fn notified_worker_failure_reaches_invocation() {
-    let extra = NOTIFY_TYPES.replace("= Echo(String)", "= Fails(String)")
-        + "\n.function Fails(String input) -> String\nfault \"producer failed\"\n.end\n";
-    assert!(
-        execute("call Launch()\npop\nldstr \"entry\"", &extra)
-            .unwrap_err()
-            .message
-            .contains("producer failed")
-    );
+    for (body, message, code) in [
+        (
+            "fault \"producer failed\"",
+            "producer failed",
+            neoclr::FaultCode::UserFault,
+        ),
+        (
+            "ldc.i4 1\nldc.i4 0\ndiv\npop\nldarg input\nret",
+            "division by zero",
+            neoclr::FaultCode::DivideByZero,
+        ),
+    ] {
+        let extra = NOTIFY_TYPES.replace("= Echo(String)", "= Fails(String)")
+            + &format!("\n.function Fails(String input) -> String\n{body}\n.end\n");
+        let fault = execute("call Launch()\npop\nldstr \"entry\"", &extra).unwrap_err();
+        assert!(fault.message.contains(message));
+        assert_eq!(fault.code, code);
+    }
 }
 
 #[test]

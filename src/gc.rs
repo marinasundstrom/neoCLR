@@ -108,9 +108,12 @@ impl ManagedHeap {
     pub(crate) fn allocate(&mut self, value: Value) -> Result<usize, Fault> {
         value.ensure_heap_references()?;
         let identity = self.next_identity;
-        self.next_identity = identity
-            .checked_add(1)
-            .ok_or_else(|| Fault::new("managed heap identity budget exhausted"))?;
+        self.next_identity = identity.checked_add(1).ok_or_else(|| {
+            Fault::coded(
+                crate::FaultCode::HeapLimitExceeded,
+                "managed heap identity budget exhausted",
+            )
+        })?;
         self.objects
             .insert(identity, crate::slots::Slot::new(value.ty(), Some(value)));
         self.peak_objects = self.peak_objects.max(self.len());

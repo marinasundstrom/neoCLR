@@ -102,3 +102,8 @@ client-side navigation JSON, to page-relative links for GitHub Pages project pat
 The development stream slice includes System.Streams in generated reference.
 FileOutputStream.Flush returns Result<System.Void, StreamError>, which DocFX 2.80.1
 cannot render; its exact signature and full contract live in [streams.md](streams.md).
+
+The host-facing Rust Fault/FaultCode API and debugger `fault_code` field are covered
+in [faults.md](faults.md), linked from the API guide and navigation. These are host
+contracts, not synthetic CLI types for DocFX metadata. Keep that complete member/code
+reference synchronized with `src/fault_code.rs` and the debugger snapshot.

@@ -727,7 +727,10 @@ pub(crate) fn materialize(
                 };
                 if module.is_reference_type(&ty) {
                     if heap.len() >= limits.heap_objects {
-                        return Err(Fault::new("heap object limit exceeded"));
+                        return Err(Fault::coded(
+                            crate::FaultCode::HeapLimitExceeded,
+                            "heap object limit exceeded",
+                        ));
                     }
                     let index = heap.allocate(value)?;
                     Ok(Value::ObjectReference(crate::value::ObjectReference {

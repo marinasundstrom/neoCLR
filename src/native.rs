@@ -342,7 +342,10 @@ impl Binding {
                     }
                     Value::String(_) => Type::String,
                     Value::NullObjectReference(_) => {
-                        return Err(Fault::new("GetType requires a non-null instance"));
+                        return Err(Fault::coded(
+                            crate::FaultCode::NullReference,
+                            "GetType requires a non-null instance",
+                        ));
                     }
                     _ => return Err(Fault::new("GetType requires an object reference")),
                 };
@@ -453,7 +456,9 @@ impl Binding {
                 Ok(Value::Erased(Box::new(payload)))
             }
             (Self::Int32ToString, [Value::Int32(number)]) => Ok(Value::String(number.to_string())),
-            (Self::Fault, [Value::String(message)]) => Err(Fault::new(message)),
+            (Self::Fault, [Value::String(message)]) => {
+                Err(Fault::coded(crate::FaultCode::UserFault, message))
+            }
             (Self::WriteLine, [Value::String(text)]) => {
                 if let Some(console) = console {
                     console

@@ -139,6 +139,10 @@ lookup against .NET Path/FileInfo, preserving the tested stream operations. The
 current application-owned File/Directory and capability interfaces remain
 exploratory; do not promote their string-address/text-helper shape unchanged merely
 because this sample works. Public stream wrappers have on-site reference coverage.
+The author additionally directs stable runtime Fault codes, including StackOverflow,
+with a distinct UserFault for explicit guest faults and no guest-selectable code.
+This bounded diagnostics improvement does not reorder the Storage/Path follow-up.
+See [the fault reference](../api-docs/faults.md).
 Networking remains later.
 
 Task represents work independently of an OS thread. The current host can submit to

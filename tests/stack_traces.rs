@@ -17,6 +17,7 @@ fn nested_faults_preserve_call_sites_and_owned_definition_identities() {
             .unwrap_err()
     };
     assert_eq!(fault.message, "broken");
+    assert_eq!(fault.code, neoclr::FaultCode::UserFault);
     let trace = fault.stack_trace.as_ref().unwrap();
     assert!(!trace.truncated);
     assert_eq!(
@@ -84,6 +85,7 @@ fn recursive_frame_limits_bound_capture_and_mark_truncation() {
     )
     .unwrap_err();
     assert!(fault.message.contains("frame limit"));
+    assert_eq!(fault.code, neoclr::FaultCode::StackOverflow);
     let trace = fault.stack_trace.as_ref().unwrap();
     assert_eq!(trace.frames.len(), StackTrace::MAX_FRAMES);
     assert!(trace.truncated);
@@ -105,6 +107,7 @@ fn instruction_and_stack_limits_and_fallthrough_have_active_stack_context() {
             ..Limits::default()
         })
         .unwrap_err();
+    assert_eq!(fault.code, neoclr::FaultCode::InstructionLimitExceeded);
     let trace = fault.stack_trace.unwrap();
     assert_eq!(trace.frames[0].function.name, "Middle");
     assert_eq!(trace.frames[0].location, CodeLocation::IlInstruction(1));
@@ -116,6 +119,7 @@ fn instruction_and_stack_limits_and_fallthrough_have_active_stack_context() {
         })
         .unwrap_err();
     assert!(fault.message.contains("evaluation stack limit"));
+    assert_eq!(fault.code, neoclr::FaultCode::EvaluationStackOverflow);
     assert_eq!(
         fault.stack_trace.unwrap().frames[0].location,
         CodeLocation::IlInstruction(0)
@@ -124,6 +128,7 @@ fn instruction_and_stack_limits_and_fallthrough_have_active_stack_context() {
         assemble(".module App\n.entry Main\n.function Main() -> Void\nldvoid\npop\n.end").unwrap();
     let fault = neoclr::run(&module, Limits::default()).unwrap_err();
     assert!(fault.message.contains("fell through"));
+    assert_eq!(fault.code, neoclr::FaultCode::InvalidProgram);
     assert_eq!(
         fault.stack_trace.unwrap().frames[0].location,
         CodeLocation::IlInstruction(2)

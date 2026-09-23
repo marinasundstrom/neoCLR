@@ -42,18 +42,19 @@ pub(crate) fn binary(op: &Op, left: Value, right: Value) -> Result<Value, Fault>
                 _ => return Err(Fault::new("invalid integer operation")),
             };
             result.map(|n| Value::$variant(n as _)).ok_or_else(|| {
-                Fault::new(
-                    if right == 0
-                        && matches!(
-                            op,
-                            Op::Divide | Op::DivideUnsigned | Op::Remainder | Op::RemainderUnsigned
-                        )
-                    {
-                        "division by zero"
-                    } else {
-                        concat!(stringify!($variant), " overflow")
-                    },
-                )
+                if right == 0
+                    && matches!(
+                        op,
+                        Op::Divide | Op::DivideUnsigned | Op::Remainder | Op::RemainderUnsigned
+                    )
+                {
+                    Fault::coded(crate::FaultCode::DivideByZero, "division by zero")
+                } else {
+                    Fault::coded(
+                        crate::FaultCode::ArithmeticOverflow,
+                        concat!(stringify!($variant), " overflow"),
+                    )
+                }
             })
         }};
     }

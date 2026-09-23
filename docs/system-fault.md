@@ -19,6 +19,14 @@ No guest Dispose/finally/destructor execution is promised on this path. The API
 requests a terminal failure; it is not an orderly shutdown or cleanup facility.
 Empty messages are permitted, though descriptive messages are more useful.
 
+**Development 2026-09-23:** this API and the explicit fault instruction always
+produce `FaultCode::UserFault`. Guest code cannot supply a code; a message such as
+`StackOverflow` does not change that classification. Runtime detection sites assign
+specific codes for frame limits, arithmetic, memory and cancellation failures.
+See the complete [on-site fault reference](../api-docs/faults.md) for code identifiers,
+host API fields and debugger transport. Message text remains diagnostic, not a
+machine-readable discriminator.
+
 ## Implementation and compiler boundary
 
 The public neoIL function calls a signature-checked InternalCall accepting String.

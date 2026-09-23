@@ -26,7 +26,10 @@ pub(crate) fn measure(value: &Value, usage: &mut Usage, limits: &Limits) -> Resu
             _ => (),
         }
         if usage.elements > limits.array_elements || usage.bytes > limits.array_bytes {
-            return Err(Fault::new("array payload budget exceeded"));
+            return Err(Fault::coded(
+                crate::FaultCode::ArrayLimitExceeded,
+                "array payload budget exceeded",
+            ));
         }
     }
     Ok(())
@@ -39,7 +42,10 @@ pub(crate) fn create(
     limits: &Limits,
 ) -> Result<Value, Fault> {
     if length > i32::MAX as usize {
-        return Err(Fault::new("array length exceeds preview Int32 limit"));
+        return Err(Fault::coded(
+            crate::FaultCode::ArrayLimitExceeded,
+            "array length exceeds preview Int32 limit",
+        ));
     }
     initial.ensure_heap_references()?;
     if length == 0 {
@@ -62,7 +68,10 @@ pub(crate) fn create(
             .checked_mul(unit.bytes)
             .is_none_or(|n| n > limits.array_bytes)
     {
-        return Err(Fault::new("array payload budget exceeded"));
+        return Err(Fault::coded(
+            crate::FaultCode::ArrayLimitExceeded,
+            "array payload budget exceeded",
+        ));
     }
     let Value::Array { elements, .. } = one else {
         unreachable!()
@@ -100,8 +109,18 @@ pub(crate) fn check_replacement(old: &Value, new: &Value) -> Result<(), Fault> {
 
 pub(crate) fn index(value: Value) -> Result<usize, Fault> {
     match value {
-        Value::Int32(n) => usize::try_from(n).map_err(|_| Fault::new("array index out of range")),
-        Value::IntPtr(n) => usize::try_from(n).map_err(|_| Fault::new("array index out of range")),
+        Value::Int32(n) => usize::try_from(n).map_err(|_| {
+            Fault::coded(
+                crate::FaultCode::IndexOutOfRange,
+                "array index out of range",
+            )
+        }),
+        Value::IntPtr(n) => usize::try_from(n).map_err(|_| {
+            Fault::coded(
+                crate::FaultCode::IndexOutOfRange,
+                "array index out of range",
+            )
+        }),
         Value::UIntPtr(n) => Ok(n),
         _ => Err(Fault::new("array index requires Int32 or native integer")),
     }

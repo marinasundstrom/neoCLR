@@ -56,9 +56,14 @@ pub use program::{LoadedFunction, LoadedProgram};
 pub use value::Value;
 pub use vm::{Execution, Limits, run, run_with_library, run_with_native};
 
+mod fault_code;
+pub use fault_code::FaultCode;
+
 /// A terminal runtime/loader failure. Guest code cannot catch a Fault.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Fault {
+    /// Runtime-assigned classification; independent of the diagnostic message.
+    pub code: FaultCode,
     pub message: String,
     pub function: Option<String>,
     pub instruction: Option<usize>,
@@ -78,7 +83,12 @@ impl Fault {
     }
 
     pub(crate) fn new(message: impl Into<String>) -> Self {
+        Self::coded(FaultCode::RuntimeError, message)
+    }
+
+    pub(crate) fn coded(code: FaultCode, message: impl Into<String>) -> Self {
         Self {
+            code,
             message: message.into(),
             function: None,
             instruction: None,
@@ -89,7 +99,7 @@ impl Fault {
 
 impl std::fmt::Display for Fault {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Fault: {}", self.message)?;
+        write!(f, "Fault: {} [code={}]", self.message, self.code)?;
         if let (Some(function), Some(instruction)) = (&self.function, self.instruction) {
             write!(f, " at {function}:{instruction}")?;
         }

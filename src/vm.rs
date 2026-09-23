@@ -1442,7 +1442,10 @@ pub(crate) fn interpret_function(
             .map_err(initial_fault)?;
         let limits = options.limits;
         if limits.frames == 0 {
-            return Err(initial_fault(Fault::new("frame limit exceeded")));
+            return Err(initial_fault(Fault::coded(
+                crate::FaultCode::StackOverflow,
+                "frame limit exceeded",
+            )));
         }
         let mut frames = vec![Frame::new(function, arguments)?];
         let result = interpret_frames(module, &mut frames, options, native_libraries);
@@ -1457,7 +1460,7 @@ pub(crate) fn interpret_function(
     })();
     if let (Some(debugger), Err(fault)) = (&debugger, &result) {
         if debugger.snapshot().revision == 0 {
-            debugger.finish(Default::default(), Some(fault.to_string()));
+            debugger.finish(Default::default(), Some(fault));
         }
     }
     result
@@ -1486,7 +1489,7 @@ fn interpret_frames(
         if let Ok(value) = &result {
             snapshot.result = Some(debug_value(module, frames, value, 0, &mut 2048));
         }
-        debugger.finish(snapshot, result.as_ref().err().map(|e| e.message.clone()));
+        debugger.finish(snapshot, result.as_ref().err());
     }
     result.map(|value| Execution {
         value,
@@ -1617,6 +1620,7 @@ fn interpret_instructions(
         frame.trace_pc = pc;
         options.check_cancellation(&function.name, pc)?;
         let op = function.body.get(pc).ok_or_else(|| Fault {
+            code: crate::FaultCode::InvalidProgram,
             message: "function fell through without ret".into(),
             function: Some(function.name.clone()),
             instruction: Some(pc),
@@ -2031,7 +2035,10 @@ fn interpret_instructions(
                         args.insert(0, *receiver);
                     }
                     if frames.len() >= limits.frames {
-                        return Err(Fault::new("frame limit exceeded"));
+                        return Err(Fault::coded(
+                            crate::FaultCode::StackOverflow,
+                            "frame limit exceeded",
+                        ));
                     }
                     frames.push(Frame::new(callee, args)?);
                 }
@@ -2051,7 +2058,10 @@ fn interpret_instructions(
                                 .pop()?
                                 .for_storage_in(module, contract.owner.as_ref().unwrap())?;
                             let Value::ObjectReference(mut object) = receiver else {
-                                return Err(Fault::new("null class receiver"));
+                                return Err(Fault::coded(
+                                    crate::FaultCode::NullReference,
+                                    "null class receiver",
+                                ));
                             };
                             object.reference.assigned()?;
                             let contract = if contract.is_virtual {
@@ -2066,7 +2076,10 @@ fn interpret_instructions(
                             object.view = contract.owner.clone();
                             args.insert(0, Value::ObjectReference(object));
                             if frames.len() >= limits.frames {
-                                return Err(Fault::new("frame limit exceeded"));
+                                return Err(Fault::coded(
+                                    crate::FaultCode::StackOverflow,
+                                    "frame limit exceeded",
+                                ));
                             }
                             frames.push(Frame::new(contract, args)?);
                             return Ok(None);
@@ -2086,14 +2099,20 @@ fn interpret_instructions(
                             reference.dispatch_view(module, callee.owner.as_ref().unwrap())?;
                         args.insert(0, Value::SlotReference(receiver));
                         if frames.len() >= limits.frames {
-                            return Err(Fault::new("frame limit exceeded"));
+                            return Err(Fault::coded(
+                                crate::FaultCode::StackOverflow,
+                                "frame limit exceeded",
+                            ));
                         }
                         frames.push(Frame::new(callee, args)?);
                         return Ok(None);
                     }
 
                     if matches!(frame.stack.last(), Some(Value::NullObjectReference(_))) {
-                        return Err(Fault::new("null interface receiver"));
+                        return Err(Fault::coded(
+                            crate::FaultCode::NullReference,
+                            "null interface receiver",
+                        ));
                     }
                     if let Some(Value::ObjectReference(_)) = frame.stack.last() {
                         let Value::ObjectReference(mut object) = frame.pop()? else {
@@ -2138,7 +2157,10 @@ fn interpret_instructions(
                             args.insert(0, Value::ObjectReference(object));
                         }
                         if frames.len() >= limits.frames {
-                            return Err(Fault::new("frame limit exceeded"));
+                            return Err(Fault::coded(
+                                crate::FaultCode::StackOverflow,
+                                "frame limit exceeded",
+                            ));
                         }
                         frames.push(Frame::new(callee, args)?);
                         return Ok(None);
@@ -2195,7 +2217,10 @@ fn interpret_instructions(
                     };
                     args.insert(0, receiver);
                     if frames.len() >= limits.frames {
-                        return Err(Fault::new("frame limit exceeded"));
+                        return Err(Fault::coded(
+                            crate::FaultCode::StackOverflow,
+                            "frame limit exceeded",
+                        ));
                     }
                     frames.push(Frame::new(callee, args)?);
                 }
@@ -2262,7 +2287,10 @@ fn interpret_instructions(
                             value if *target == Type::String => value,
                             value => {
                                 if heap.len() >= limits.heap_objects {
-                                    return Err(Fault::new("heap object limit exceeded"));
+                                    return Err(Fault::coded(
+                                        crate::FaultCode::HeapLimitExceeded,
+                                        "heap object limit exceeded",
+                                    ));
                                 }
                                 let index = heap.allocate(value)?;
                                 Value::ObjectReference(crate::value::ObjectReference {
@@ -2326,7 +2354,10 @@ fn interpret_instructions(
                                 )?;
                             }
                             if heap.len() >= limits.heap_objects {
-                                return Err(Fault::new("heap object limit exceeded"));
+                                return Err(Fault::coded(
+                                    crate::FaultCode::HeapLimitExceeded,
+                                    "heap object limit exceeded",
+                                ));
                             }
                             let index = heap.allocate(value)?;
                             Value::ObjectReference(crate::value::ObjectReference {
@@ -2394,14 +2425,20 @@ fn interpret_instructions(
                     check_type(&owner, module)?;
                     let args = frame.args(module, &callee.parameters)?;
                     if frames.len() >= limits.frames {
-                        return Err(Fault::new("frame limit exceeded"));
+                        return Err(Fault::coded(
+                            crate::FaultCode::StackOverflow,
+                            "frame limit exceeded",
+                        ));
                     }
                     let byref = callee.receiver_byref;
                     let definitions = module.instantiated_fields(&owner)?;
                     let mut child = Frame::new(callee, args)?;
                     if module.is_reference_type(&owner) {
                         if heap.len() >= limits.heap_objects {
-                            return Err(Fault::new("heap object limit exceeded"));
+                            return Err(Fault::coded(
+                                crate::FaultCode::HeapLimitExceeded,
+                                "heap object limit exceeded",
+                            ));
                         }
                         let fields = definitions
                             .iter()
@@ -2514,7 +2551,10 @@ fn interpret_instructions(
                         let receiver = current.constructor_view(module, &owner)?;
                         frame.constructor_chained = true;
                         if frames.len() >= limits.frames {
-                            return Err(Fault::new("frame limit exceeded"));
+                            return Err(Fault::coded(
+                                crate::FaultCode::StackOverflow,
+                                "frame limit exceeded",
+                            ));
                         }
                         if frames.iter().any(|f| {
                             f.construction_receiver
@@ -2572,7 +2612,10 @@ fn interpret_instructions(
                             return Err(Fault::new("cyclic constructor delegation"));
                         }
                         if frames.len() >= limits.frames {
-                            return Err(Fault::new("frame limit exceeded"));
+                            return Err(Fault::coded(
+                                crate::FaultCode::StackOverflow,
+                                "frame limit exceeded",
+                            ));
                         }
                         frames.push(Frame::new(callee, args)?);
                         return Ok(None);
@@ -2664,7 +2707,10 @@ fn interpret_instructions(
                         frame.stack.push(value);
                     } else {
                         if frames.len() >= limits.frames {
-                            return Err(Fault::new("frame limit exceeded"));
+                            return Err(Fault::coded(
+                                crate::FaultCode::StackOverflow,
+                                "frame limit exceeded",
+                            ));
                         }
                         frames.push(Frame::new(callee, args)?);
                     }
@@ -2773,7 +2819,10 @@ fn interpret_instructions(
                             | Op::ReserveArray(_)
                     ) {
                         if heap.len() >= limits.heap_objects {
-                            return Err(Fault::new("heap object limit exceeded"));
+                            return Err(Fault::coded(
+                                crate::FaultCode::HeapLimitExceeded,
+                                "heap object limit exceeded",
+                            ));
                         }
                         let index = heap.allocate(value)?;
                         let reference = heap.address(index)?;
@@ -2800,7 +2849,10 @@ fn interpret_instructions(
                             object.reference.array_length()?
                         }
                         Value::NullObjectReference(_) => {
-                            return Err(Fault::new("null array reference"));
+                            return Err(Fault::coded(
+                                crate::FaultCode::NullReference,
+                                "null array reference",
+                            ));
                         }
                         Value::Array { elements, .. } => elements.len(),
                         _ => return Err(Fault::new("ldlen requires array")),
@@ -2821,7 +2873,10 @@ fn interpret_instructions(
                             Value::SlotReference(object.reference)
                         }
                         Value::NullObjectReference(_) => {
-                            return Err(Fault::new("null array reference"));
+                            return Err(Fault::coded(
+                                crate::FaultCode::NullReference,
+                                "null array reference",
+                            ));
                         }
                         value => value,
                     };
@@ -2850,7 +2905,12 @@ fn interpret_instructions(
                             frame.stack.push(
                                 elements
                                     .get(index)
-                                    .ok_or_else(|| Fault::new("array index out of range"))?
+                                    .ok_or_else(|| {
+                                        Fault::coded(
+                                            crate::FaultCode::IndexOutOfRange,
+                                            "array index out of range",
+                                        )
+                                    })?
                                     .initialized()?
                                     .clone()
                                     .on_stack(),
@@ -2877,7 +2937,10 @@ fn interpret_instructions(
                     };
                     frame.stack.push(if module.is_reference_type(ty) {
                         if heap.len() >= limits.heap_objects {
-                            return Err(Fault::new("heap object limit exceeded"));
+                            return Err(Fault::coded(
+                                crate::FaultCode::HeapLimitExceeded,
+                                "heap object limit exceeded",
+                            ));
                         }
                         let identity = heap.allocate(value)?;
                         Value::ObjectReference(crate::value::ObjectReference {
@@ -2890,7 +2953,10 @@ fn interpret_instructions(
                 }
                 Op::Field(i) => {
                     if matches!(frame.stack.last(), Some(Value::NullObjectReference(_))) {
-                        return Err(Fault::new("null object reference in field load"));
+                        return Err(Fault::coded(
+                            crate::FaultCode::NullReference,
+                            "null object reference in field load",
+                        ));
                     }
                     if let Some(Value::ObjectReference(object)) = frame.stack.last() {
                         crate::access::check_field(module, &function, object.target(), *i)?;
@@ -2925,7 +2991,10 @@ fn interpret_instructions(
                     let value = frame.pop()?;
                     let receiver = frame.pop()?;
                     if matches!(receiver, Value::NullObjectReference(_)) {
-                        return Err(Fault::new("null object reference in field store"));
+                        return Err(Fault::coded(
+                            crate::FaultCode::NullReference,
+                            "null object reference in field store",
+                        ));
                     }
                     if let Value::ObjectReference(object) = receiver {
                         crate::access::check_field(module, &function, object.target(), *i)?;
@@ -3202,7 +3271,10 @@ fn interpret_instructions(
                 }
                 Op::BoxValue(ty) => {
                     if heap.len() >= limits.heap_objects {
-                        return Err(Fault::new("heap object limit exceeded"));
+                        return Err(Fault::coded(
+                            crate::FaultCode::HeapLimitExceeded,
+                            "heap object limit exceeded",
+                        ));
                     }
                     let value = frame.pop()?.for_storage_in(module, ty)?;
                     let index = heap.allocate(value)?;
@@ -3215,7 +3287,10 @@ fn interpret_instructions(
                 }
                 Op::HeapNew => {
                     if heap.len() >= limits.heap_objects {
-                        return Err(Fault::new("heap object limit exceeded"));
+                        return Err(Fault::coded(
+                            crate::FaultCode::HeapLimitExceeded,
+                            "heap object limit exceeded",
+                        ));
                     }
                     let value = frame.pop()?;
                     let target = value.ty();
@@ -3227,7 +3302,9 @@ fn interpret_instructions(
                     let index = heap.allocate(value)?;
                     frame.stack.push(Value::SlotReference(heap.address(index)?));
                 }
-                Op::Fault(message) => return Err(Fault::new(message)),
+                Op::Fault(message) => {
+                    return Err(Fault::coded(crate::FaultCode::UserFault, message));
+                }
             }
             Ok(None)
         })();
@@ -3326,13 +3403,19 @@ fn interpret_instructions(
             }
         }
         if frames.iter().any(|f| f.stack.len() > limits.stack) {
-            return Err(Fault::new("evaluation stack limit exceeded"));
+            return Err(Fault::coded(
+                crate::FaultCode::EvaluationStackOverflow,
+                "evaluation stack limit exceeded",
+            ));
         }
     }
     if let Some(frame) = frames.last_mut() {
         frame.trace_pc = frame.pc;
     }
-    Err(Fault::new("instruction limit exceeded"))
+    Err(Fault::coded(
+        crate::FaultCode::InstructionLimitExceeded,
+        "instruction limit exceeded",
+    ))
 }
 
 fn source_point(

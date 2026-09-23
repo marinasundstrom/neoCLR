@@ -6,6 +6,12 @@ The new System.Concurrency APIs require matching development artifacts; Preview 
 downloads retain System.Threading. Names and contracts remain experimental;
 this reference does not promise compatibility with future releases.
 
+## Terminal failures
+
+The [fault reference](faults.md) covers runtime-assigned FaultCode values, the Rust
+host outcome, CLI/debugger diagnostics and System.Fault. Explicit guest faults use
+UserFault; guest code cannot set a code.
+
 ## API overview
 
 The feature guides explain current behavior and provide small Raven examples:

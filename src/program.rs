@@ -284,6 +284,7 @@ impl LoadedFunction<'_> {
         arguments: Vec<crate::Value>,
     ) -> Result<Vec<crate::Value>, Fault> {
         let fault = |message| Fault {
+            code: crate::FaultCode::RuntimeError,
             message,
             function: Some(self.function.name.clone()),
             instruction: None,

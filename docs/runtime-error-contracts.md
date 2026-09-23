@@ -70,3 +70,29 @@ case in its tests. No new host intrinsic is required solely to recognize an erro
 Verify samples from source and assembled artifacts, case identity/extraction, error
 formatting, and the separation from Fault traces. Rebuild application and System artifacts
 together when signatures change. The source-preview API remains intentionally unstable.
+
+
+## Terminal fault codes — 2026-09-23
+
+At the author's request, Fault now has a runtime-assigned symbolic FaultCode.
+Expected Result errors above remain distinct from terminal failures. Explicit guest
+faults always use UserFault and accept only a message. Checked frame/operand-stack
+limits, instruction exhaustion, cancellation, arithmetic and selected memory
+failures have specific codes; remaining diagnostics use RuntimeError pending
+classification. Codes are chosen at detection sites, not by parsing strings.
+
+The .NET comparison reviewed 2026-09-23 is Exception.HResult and
+StackOverflowException (primary links and the complete API contract are in
+[the on-site reference](../api-docs/faults.md)). Symbolic codes avoid introducing
+HRESULT numbering or a guest exception hierarchy, at the cost of coarser categories
+and a separate mapping for .NET tooling. The StackOverflow code refers to neoCLR's
+checked frame budget, not recovery from a native host stack overflow.
+
+Validation includes explicit guest messages resembling runtime codes, rejection of
+a code-taking native Fault signature, arithmetic and memory failures, initial and
+recursive frame limits, stack-trace preservation, debugger launch/paused-cancellation
+snapshots, stable serialization and fault propagation from isolated workers.
+
+Validation on 2026-09-23: 35 focused fault, stack-trace, System.Fault, cancellation
+and debugger tests passed, plus the isolated-worker fault propagation case (testing
+both UserFault and DivideByZero). The website/API build and four tooling tests passed.
