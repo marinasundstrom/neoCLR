@@ -76,7 +76,7 @@ are unchanged.
 String identity is deliberately unsupported: the current String/Object conversion
 creates wrappers instead of preserving an underlying String allocation. Identity
 calls on String payloads or their wrappers raise a terminal RuntimeError. Virtual
-boxed-value Equals/GetHashCode remain unsupported except for Int32, described below.
+boxed-value Equals/GetHashCode support Int32 and explicit named-struct overrides, described below.
 ReferenceEquals can compare box identities, but does not supply boxed value equality.
 Null instance receivers raise NullReference; default Equals accepts a null argument
 and returns false. Static two-argument Object.Equals is not yet available.
@@ -87,7 +87,7 @@ The intended baseline is .NET-compatible reference/value semantics. Class displa
 reference identity and class equality/hash now have bounded implementations. String
 identity and general boxed-value dispatch remain representation gaps. Raven record syntax
 now passes an end-to-end record-class sample with integer, string and nested components with generated equality,
-hashing, display and deconstruction. Record structs, generic/inherited records and
+hashing, display and deconstruction. Generic/inherited records and
 nullable string/value and arbitrary component types are not supported by this target contract. See Microsoft's
 [Object contract](https://learn.microsoft.com/en-us/dotnet/api/system.object?view=net-10.0)
 for the comparison baseline; neoCLR does not yet provide that entire surface.
@@ -139,6 +139,47 @@ calls retain allocation equality/hash rather than dispatching to the integer beh
 
 This is a bounded interpreter intrinsic for the System library's exact Object slots.
 It does not add a typed Int32.GetHashCode member, general struct equality, nullable
-boxing, or boxed ToString. Other primitive types and named value types still require
-explicit implementation. System.Value is not involved in this dispatch.
+boxing, or primitive boxed ToString. Other primitive types still require
+explicit implementation. Named structs now dispatch their explicit overrides. System.Value is not involved in this dispatch.
 The [Object equality sample](/samples/object-equality.zip) demonstrates the behavior.
+
+
+## Structs and record structs (development)
+
+Ordinary non-generic application structs support fields, construction, instance
+methods and value copying. Copying reference fields retains their references;
+there is no deep clone. Assigning a struct to Object or a supported interface boxes
+a copy. Two aliases of that box share its payload, while the original local remains
+independent. Explicit Equals, GetHashCode and ToString overrides dispatch against
+that payload. A struct without an override has no automatic field-based Object
+implementation in this profile; this differs from .NET's ValueType fallback.
+
+The checked sample includes:
+
+```raven
+record struct Coordinate(X: int, Y: int)
+
+let first = Coordinate(42, 7)
+let same = Coordinate(42, 7)
+let value: Object = first
+let comparable: Equatable<Coordinate> = first
+```
+
+Generated typed/Object/interface equality compares components, GetHashCode combines
+their hashes, ToString produces `Coordinate { X = 42, Y = 7 }`, and deconstruction
+returns X and Y. Object equality rejects null and other concrete types. Separate
+boxes remain distinct for ReferenceEquals. `default(Coordinate)` initializes both
+integers to zero. The sample also checks constructed non-null strings and nullable
+record-class fields, including default absent references.
+
+The configured contract admits the same component types for record structs as for
+record classes: Int32, non-null String and supported same-compilation record-class
+references. Nested struct components, nullable values/strings, generic records and
+external record components remain outside this first implementation. Default values
+with non-null reference fields need separate representation review; the sample does
+not claim .NET null-string default semantics.
+
+At the instruction layer, value `isinst` preserves a matching box or returns null;
+`unbox.any` copies an exact value payload. Null unboxing faults with NullReference,
+and a different concrete type faults with InvalidCast. Reference-type unbox.any,
+nullable boxing and address-returning unbox remain unsupported.

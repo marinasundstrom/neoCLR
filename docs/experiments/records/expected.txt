@@ -1,3 +1,4 @@
+Coordinate { X = 42, Y = 7 }
 Nullable record components preserve absence
 Entry { Owner = Person { Name = Raven, Age = 42 }, Number = 7 }
 Key { Number = 42 }

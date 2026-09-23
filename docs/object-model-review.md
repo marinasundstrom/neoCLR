@@ -4,7 +4,9 @@ Reviewed 2026-09-23. The author directs harmonizing with .NET where useful,
 particularly reference-type and value-type semantics. This review supersedes the
 older proposal that Object inheritance should leave every type value-like, and
 that all Object equality should describe fields independently of type category.
-It does not claim new Object methods have been implemented.
+The opening review records the initial state. Subsequent implementation sections below
+cover class identity/display, record classes, boxed Int32 and the first
+[struct/record-struct slice](#struct-object-slots-and-record-structs--2026-09-24).
 
 ## Current layers
 
@@ -12,7 +14,7 @@ It does not claim new Object methods have been implemented.
 | --- | --- | --- |
 | Class instance | Nominal reference type; assignment copies the reference | Aliases share mutation; a base/interface view retains the allocation |
 | Value instance | Assignment copies fields; reference fields still share their targets | Value copying is shallow, not deep cloning |
-| `System.Object` | Raven library class with `GetType()` and bounded virtual `ToString()` | Common reference view, not an arbitrary unboxed payload slot |
+| `System.Object` | Abstract Raven class with GetType, ReferenceEquals and virtual equality/hash/display | Common reference view, not an arbitrary unboxed payload slot |
 | `box T` | Copies a supported value into GC-owned storage exposed through Object/interfaces | Allocation, shared boxed identity and copy independence are observable |
 | `System.Value` | Intrinsic, explicitly erased complete payload; pack/is/unpack operations | Carries exact type and value-copy behavior; not .NET ValueType or Object |
 | `System.ValueType` | Compiler/reference metadata role | Not a replacement name for System.Value and not a complete executable .NET ValueType implementation |
@@ -29,7 +31,8 @@ contract; preserve that distinction in tests and documentation.
 
 CoreDeclarations supplies Object Equals, GetHashCode and ToString stubs to the
 reference/compiler environment. At review time the generated Object library only supplied GetType. The subsequent
-class-display slice implements ToString; Equals/GetHashCode remain scaffolding.
+class-display slice implemented ToString; later equality/hash and struct slices below
+replace those particular stubs with bounded implementations.
 These stub bodies must never be executed or advertised as working implementations.
 The subsequent author-directed abstract Object choice permits base-constructor
 chaining but deliberately rejects direct construction. Keep this gap explicit in the on-site docs.
@@ -366,3 +369,64 @@ introduced. Boxed ToString remains unsupported. Record structs remain gated.
 Validation covers exact type/value checks, signed boundaries, source-copy independence,
 GC, retained explicit base equality, existing class/array behavior and lookalike slots.
 The Raven Object sample adds four boxed-integer checks without compiler changes.
+
+
+## Struct Object slots and record structs — 2026-09-24
+
+**Author direction:** continue the slices until structs and record structs are
+implemented; skip further VS Code builds. Ordinary non-generic struct construction,
+fields and value copying already existed. The missing pieces were boxed Object
+slots, exact boxed type tests/unboxing, and configured record-struct synthesis.
+
+**Baseline and choice.** ECMA-335 sixth edition (June 2012), I.8.2.4 and III.4.6,
+4.32–4.33 distinguish copied boxing, boxed type tests and copied versus address
+unboxing ([specification](https://www.ecma-international.org/wp-content/uploads/ECMA-335_6th_edition_june_2012.pdf),
+consulted 2026-09-24). C# record structs generate component equality and hashing
+while retaining value copying ([Microsoft record documentation](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/types/records),
+consulted 2026-09-24). The pinned SDK 10.0.100/.NET 10.0.0 baseline now has 26
+assertions, including record-struct copied boxes, exact-type Object equality,
+interface equality, matching hashes and default integer fields.
+
+The interpreter now adapts explicit Object overrides on rootless named value
+records to a managed reference into the boxed payload. It does not add reference
+storage ancestry or a universal structural comparison of internal Values. Return,
+parameter and output contracts remain exact; readonly receivers are restricted.
+Non-generic targets enter the dispatch reachability graph. `isinst T` keeps the
+matching box; `unbox.any T` returns a copy. Null faults with NullReference; a different
+boxed type faults with InvalidCast. No widening integer conversion occurs.
+
+A new universal ValueType-style fallback could make ordinary struct equality more
+.NET-compatible, but would require decisions about every field type, recursive
+comparison and hash policy. Explicit overrides plus compiler-generated record
+members reuse the existing method contracts and keep these questions visible.
+Special-casing each record in the VM would duplicate language policy, while treating
+value types as reference subclasses would undermine copying. The chosen adaptation
+costs a box allocation at Object/interface conversion and dispatch work, preserves
+GC rooting through the existing managed reference, and makes no speed claim. Future
+AOT/JIT implementations need the same receiver adaptation. Application reflection
+and generic target discovery remain bounded; no new reflection members are claimed.
+The prior broader Object review remains the comparison context; no independent
+library or other-platform mechanism is needed for this CLI interoperability repair.
+
+Raven's opt-in RuntimeRecordContract now synthesizes struct typed equality without
+reference guards, and Object equality with a type test, unboxed copy and component
+comparison. Hashing, display, operators and deconstruction reuse the existing typed
+component contract. The importer admits struct interfaces and emits virtual modifiers
+before byref/readonly modifiers. The experimental branch keeps this target policy
+separate from ordinary Raven/.NET synthesis; no neoCLR policy is merged to main.
+
+Evidence: `tests/object_equality.rs` covers copied boxes/unboxing, exact types,
+readonly protection, shared box mutation, GC and invalid signatures;
+`docs/experiments/records` compiles and runs ordinary Counter plus Coordinate,
+NamedCoordinate and OwnedCoordinate record structs. The compiler fixture checks
+boxed null/type rejection on .NET. Source Object.Equals currently has a non-null
+Object parameter, so a literal-null call is rejected by Raven; this does not remove
+the runtime guard. Class and boxed-interface regressions remain required.
+
+Bounds: no general ValueType fallback, generic structs in the application importer,
+nested struct record components, nullable-value boxing, address-returning unbox,
+reference-type unbox.any, or .NET null-string default semantics. The same record
+component gate remains Int32, non-null String and supported same-compilation record
+classes (optionally nullable). Those are follow-up capabilities, not required to
+claim the checked first struct/record-struct implementation. System.Value retirement
+remains a separate migration.

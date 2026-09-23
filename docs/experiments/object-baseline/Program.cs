@@ -61,6 +61,16 @@ foreach (var value in new[] { int.MinValue, -1, 0, 1, int.MaxValue })
     object boxedInteger = value;
     Check(boxedInteger.GetHashCode() == value, $"Boxed Int32 hash matches its value: {value}");
 }
+var point = new Coordinate(42, 7);
+var copiedPoint = point;
+object boxedPoint = point;
+point.X = 99;
+Check(copiedPoint.X == 42 && ((Coordinate)boxedPoint).X == 42, "Record struct assignment and boxing copy fields");
+Check(boxedPoint.Equals(copiedPoint) && !boxedPoint.Equals(new Coordinate(7, 42))
+    && !boxedPoint.Equals(null) && !boxedPoint.Equals(new KeyRecord(42)), "Record struct Object equality requires exact type and equal fields");
+Check(boxedPoint.GetHashCode() == copiedPoint.GetHashCode()
+    && ((IEquatable<Coordinate>)boxedPoint).Equals(copiedPoint), "Boxed record struct hash and interface equality agree");
+Check(default(Coordinate) == new Coordinate(0, 0), "Record struct default initializes value fields");
 Console.WriteLine($"Runtime: {System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}");
 
 sealed class Cell { public int Number; }
@@ -74,3 +84,5 @@ sealed class Key(int number)
 }
 
 sealed record KeyRecord(int Number);
+
+record struct Coordinate(int X, int Y);

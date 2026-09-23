@@ -592,7 +592,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         "sizeof" | "alignof" | "heap.alloc" | "ptr.null" | "ptr.cast"
                         | "ptr.fromint" | "ldobj" | "stobj" | "cpobj" | "initobj" | "box"
                         | "value.pack" | "value.is" | "value.unpack" | "ldtoken" | "castclass"
-                        | "isinst" | "interface.borrow" | "newarr" | "array.new"
+                        | "isinst" | "unbox.any" | "interface.borrow" | "newarr" | "array.new"
                         | "array.alloc" | "array.reserve" | "array.create" | "ldelem"
                         | "stelem" | "ldelema" => Some(
                             serde_json::to_value(parse_type(rest)?)

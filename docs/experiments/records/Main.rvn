@@ -11,7 +11,69 @@ func BuildName(prefix: string) -> string => prefix + "ven"
 
 func Wrap(owner: Person?, number: int) -> OptionalEntry => OptionalEntry(owner, number)
 
+struct Counter {
+    var Number: int
+    init(number: int) {
+        Number = number
+    }
+    func Set(number: int) {
+        Number = number
+    }
+    override func GetHashCode() -> int => Number
+}
+
+record struct Coordinate(X: int, Y: int)
+record struct NamedCoordinate(Name: string, Number: int)
+record struct OwnedCoordinate(Owner: Person?, Number: int)
+
+func CheckStructs() {
+    var original = Counter(42)
+    var copy = original
+    let boxed: Object = original
+    copy.Set(7)
+    original.Set(99)
+    if copy.Number != 7 || original.Number != 99 || boxed.GetHashCode() != 42 {
+        System.Fault("Struct copies and boxes must own independent values")
+    }
+    let zero = default(Coordinate)
+    if zero != Coordinate(0, 0) {
+        System.Fault("Default record struct must initialize value fields")
+    }
+    let absent = default(OwnedCoordinate)
+    if absent != OwnedCoordinate(null, 0) || absent.GetHashCode() != OwnedCoordinate(null, 0).GetHashCode() {
+        System.Fault("Default record struct must preserve absent reference fields")
+    }
+    let named = NamedCoordinate(BuildName("Ra"), 42)
+    if named != NamedCoordinate("Raven", 42) || named.GetHashCode() != NamedCoordinate("Raven", 42).GetHashCode() {
+        System.Fault("Record struct string fields must compare and hash by contents")
+    }
+    let owner = OwnedCoordinate(Person("Raven", 42), 7)
+    if owner != OwnedCoordinate(Person("Raven", 42), 7) || owner == OwnedCoordinate(null, 7) {
+        System.Fault("Record struct reference fields must use typed equality")
+    }
+    let first = Coordinate(42, 7)
+    let same = Coordinate(42, 7)
+    let value: Object = first
+    let secondBox: Object = same
+    let comparable: Equatable<Coordinate> = first
+    if first != same || !first.Equals(same) || !value.Equals(secondBox) || !comparable.Equals(same) {
+        System.Fault("Record struct equality must agree through value, Object and interface views")
+    }
+    if Object.ReferenceEquals(value, secondBox) || value.Equals(Coordinate(7, 42)) || value.Equals(Key(42)) {
+        System.Fault("Boxed record structs require exact type and component equality")
+    }
+    let (x, y) = first
+    if x != 42 || y != 7 || value.GetHashCode() != first.GetHashCode() || first.GetHashCode() != same.GetHashCode() {
+        System.Fault("Record struct deconstruction and hashing differ")
+    }
+    if value.ToString() != "Coordinate { X = 42, Y = 7 }" {
+        System.Fault("Unexpected boxed record struct display")
+    }
+    Console.WriteLine(value.ToString())
+}
+
 func Main() {
+    CheckStructs()
     let first = Key(42)
     let second = Key(42)
     let alias = first

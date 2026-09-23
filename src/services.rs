@@ -1,7 +1,7 @@
 //! Logical runtime-service uses; no target ABI or ownership policy is implied.
 use crate::{
-    Fault,
     metadata::{Function, Instruction as Op},
+    Fault,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -236,7 +236,7 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         Op::PackValue(..) | Op::IsValue(..) | Op::UnpackValue(..) => &[ValueStorage],
         Op::LoadTypeToken(..) => &[TypeInspection],
         Op::ReferenceType => &[TypeInspection, SlotReferences],
-        Op::BoxValue(_) => &[ManagedHeap, ValueStorage, SlotReferences],
+        Op::BoxValue(_) | Op::UnboxAny(_) => &[ManagedHeap, ValueStorage, SlotReferences],
         Op::IsInstance(_) | Op::ReferenceIsNull | Op::CastClass(_) => {
             &[TypeInspection, SlotReferences]
         }

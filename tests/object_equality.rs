@@ -189,7 +189,7 @@ fn other_boxed_virtual_value_equality_remains_explicitly_unsupported() {
 
 #[test]
 fn identity_imports_require_exact_signatures_and_report_managed_heap_service() {
-    use neoclr::{RuntimeService, assemble, assembler::parse_function_ref};
+    use neoclr::{assemble, assembler::parse_function_ref, RuntimeService};
     for (name, parameters, returns) in [
         (
             "ObjectReferenceEquals",
@@ -290,4 +290,126 @@ fn boxed_intrinsic_dispatch_does_not_claim_other_object_definitions() {
     let module = neoclr::assemble(".module Application\n.entry Main\n.type class System.Object\n.method instance virtual GetHashCode() -> Int32\nldc.i4 99\nret\n.end\n.end\n.function Main() -> Int32\nldc.i4 42\nbox Int32\ncallvirt instance System.Object::GetHashCode()\nret\n.end").unwrap();
     neoclr::verify(&module).unwrap();
     assert!(neoclr::run(&module, Limits::default()).is_err());
+}
+
+const STRUCT_KEY: &str = ".type Key\n.field Number Int32\n.method instance override readonly byref GetHashCode() -> Int32\nldarg this\nldfld 0\nret\n.end\n.end";
+
+#[test]
+fn named_struct_box_dispatch_reads_copied_payload() {
+    let body = format!(".local Key source\n.local System.Object boxed\nldc.i4 42\nnewobj Key\nstloc source\nldloc source\nbox Key\nstloc boxed\nldloca source\nldflda 0\nldc.i4 99\nstobj Int32\nldloc boxed\n{HASH}");
+    assert_eq!(
+        run(&body, STRUCT_KEY, "Int32", 8).unwrap().value,
+        Value::Int32(42)
+    );
+}
+
+#[test]
+fn named_struct_same_name_is_not_an_object_override() {
+    let declarations = STRUCT_KEY.replace("override ", "");
+    assert!(run(
+        &format!("ldc.i4 42\nnewobj Key\nbox Key\n{HASH}"),
+        &declarations,
+        "Int32",
+        8
+    )
+    .is_err());
+}
+
+#[test]
+fn named_struct_override_preserves_return_contract() {
+    let declarations = STRUCT_KEY
+        .replace("GetHashCode() -> Int32", "GetHashCode() -> Boolean")
+        .replace("ldarg this\nldfld 0", "ldc.bool true");
+    assert!(run("ldc.i4 0", &declarations, "Int32", 8).is_err());
+}
+
+#[test]
+fn unboxing_is_an_exact_type_copy_and_type_test_preserves_the_box() {
+    let body = format!(".local Key copy\n.local System.Object boxed\nldc.i4 42\nnewobj Key\nbox Key\nstloc boxed\nldloc boxed\nisinst Key\nldloc boxed\n{IDENTITY}\nbrfalse failed\nldloc boxed\nunbox.any Key\nstloc copy\nldloca copy\nldflda 0\nldc.i4 99\nstobj Int32\nldloc boxed\n{HASH}\nret\nfailed:\nldc.i4 -1");
+    assert_eq!(
+        run(&body, STRUCT_KEY, "Int32", 8).unwrap().value,
+        Value::Int32(42)
+    );
+    for (value, code) in [
+        ("ldc.i4 42\nbox Int32", FaultCode::InvalidCast),
+        (
+            ".local System.Object empty\nldloca empty\ninitobj System.Object\nldloc empty",
+            FaultCode::NullReference,
+        ),
+    ] {
+        assert_eq!(
+            run(
+                &format!("{value}\nunbox.any Key\npop\nldc.i4 0"),
+                STRUCT_KEY,
+                "Int32",
+                8
+            )
+            .unwrap_err()
+            .code,
+            code
+        );
+        assert_eq!(
+            run(
+                &format!("{value}\nisinst Key\nref.isnull"),
+                STRUCT_KEY,
+                "Boolean",
+                8
+            )
+            .unwrap()
+            .value,
+            Value::Boolean(true)
+        );
+    }
+}
+
+#[test]
+fn boxed_struct_override_mutates_shared_box_and_survives_collection() {
+    let declarations = STRUCT_KEY.replace("override readonly", "override").replace("ldarg this\nldfld 0", "ldarg this\nldflda 0\nldarg this\nldfld 0\nldc.i4 1\nadd\nstobj Int32\nldarg this\nldfld 0");
+    let mut body = format!(".local System.Object boxed\n.local System.Object alias\nldc.i4 40\nnewobj Key\nbox Key\nstloc boxed\nldloc boxed\nstloc alias\nldloc boxed\n{HASH}\npop\n");
+    for _ in 0..8 {
+        body.push_str("ldc.i4 0\nbox Int32\npop\n");
+    }
+    body.push_str(&format!("ldloc alias\n{HASH}"));
+    let result = run(&body, &declarations, "Int32", 2).unwrap();
+    assert_eq!(result.value, Value::Int32(42));
+    assert!(result.heap.collections() > 1);
+}
+
+#[test]
+fn boxed_struct_readonly_override_cannot_write_payload() {
+    let declarations = STRUCT_KEY.replace(
+        "ldarg this\nldfld 0",
+        "ldarg this\nldflda 0\nldc.i4 9\nstobj Int32\nldc.i4 9",
+    );
+    let error = run(
+        &format!("ldc.i4 42\nnewobj Key\nbox Key\n{HASH}"),
+        &declarations,
+        "Int32",
+        8,
+    )
+    .unwrap_err();
+    assert!(error.message.contains("readonly"), "{error}");
+}
+
+#[test]
+fn unbox_does_not_convert_integer_widths_or_admit_reference_targets() {
+    assert_eq!(
+        run("ldc.i4 42\nbox Int32\nunbox.any Int64", "", "Int64", 8)
+            .unwrap_err()
+            .code,
+        FaultCode::InvalidCast
+    );
+    assert!(run(
+        "ldc.i4 42\nbox Int32\nunbox.any System.Object",
+        "",
+        "System.Object",
+        8
+    )
+    .is_err());
+}
+
+#[test]
+fn named_struct_generic_object_overrides_are_rejected_until_reachability_is_closed() {
+    let declarations = STRUCT_KEY.replace(".type Key", ".type Key<T>");
+    assert!(run("ldc.i4 0", &declarations, "Int32", 8).is_err());
 }

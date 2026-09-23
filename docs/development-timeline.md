@@ -5912,3 +5912,23 @@ failure remains the next acceptance target.
   provider fixture exposed a shared lookup-cache candidate, deferred for independent
   main validation; the accepted contract is tested across a referenced metadata boundary.
   See [the sample](experiments/records/README.md) and [design comparison](hash-code-design.md).
+
+
+### 2026-09-24 — Complete the first struct and record-struct slices
+
+- **Author:** “Continue with the slices until struct support snd record structs have
+  been implemented”, following “Skip VS Code build, continue”. This explicitly
+  selects the next Object work and excludes further editor-build work in this slice.
+- **Assistant proposal:** implement named-value Object overrides first, then configured
+  Raven record-struct generation and end-to-end samples, retaining reference sharing,
+  value copying and boxing semantics.
+- **Actions:** added boxed-payload override dispatch, value type testing and copied
+  unboxing; extended the experimental Raven contract and importer. The checked sample
+  now includes ordinary Counter and Coordinate/NamedCoordinate/OwnedCoordinate record
+  structs. Updated API reference, feature page and integration/design records.
+- **Outcome and bounds:** the first non-generic implementation has source execution
+  evidence; see the [Object review](object-model-review.md#struct-object-slots-and-record-structs--2026-09-24).
+  Generic/nested-struct components, nullable-value boxing and automatic ValueType
+  equality remain explicit follow-ups. No VS Code build, release or publication was
+  performed. No subsequent author approval of individual implementation details is
+  inferred from the continuation request.

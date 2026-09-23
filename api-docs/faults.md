@@ -59,7 +59,8 @@ Fault values itself is trusted host code; this is not a guest capability.
 | `ExecutionCancelled` | Host cancellation or debugger stop, not guest Task cancellation |
 | `DivideByZero` | Integer divide or remainder with a zero divisor |
 | `ArithmeticOverflow` | Checked integer arithmetic or conversion overflow; also signed minimum divided by minus one |
-| `NullReference` | Null managed object, array or interface dereference |
+| `NullReference` | Null managed object, array or interface dereference, including value unboxing |
+| `InvalidCast` | Unboxing a value whose concrete boxed type differs from the requested type |
 | `NullPointer` | Null native pointer dereference |
 | `IndexOutOfRange` | Managed array index outside its range |
 | `HeapLimitExceeded` | Managed heap object or identity budget exhausted |

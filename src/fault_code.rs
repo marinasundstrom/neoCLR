@@ -25,6 +25,8 @@ pub enum FaultCode {
     ExecutionCancelled,
     /// An operation dereferenced a null managed object, array or interface.
     NullReference,
+    /// A boxed value did not have the exact requested unboxing type.
+    InvalidCast,
     /// An operation dereferenced a null native pointer.
     NullPointer,
     /// A managed array index was outside its valid range.
@@ -52,6 +54,7 @@ impl FaultCode {
             Self::InstructionLimitExceeded => "InstructionLimitExceeded",
             Self::ExecutionCancelled => "ExecutionCancelled",
             Self::NullReference => "NullReference",
+            Self::InvalidCast => "InvalidCast",
             Self::NullPointer => "NullPointer",
             Self::IndexOutOfRange => "IndexOutOfRange",
             Self::ArithmeticOverflow => "ArithmeticOverflow",

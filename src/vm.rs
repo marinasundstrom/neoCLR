@@ -1,6 +1,6 @@
 use crate::{
-    ExecutionOptions, Fault, Module, Value,
     metadata::{FunctionRef, Instruction as Op, Representation, Type},
+    ExecutionOptions, Fault, Module, Value,
 };
 use std::collections::HashSet;
 
@@ -947,7 +947,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         return Err(Fault::new("managed references cannot be indirectly stored"));
                     }
                 }
-                Op::BoxValue(ty) => {
+                Op::BoxValue(ty) | Op::UnboxAny(ty) => {
                     check(ty)?;
                     if matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_) | Type::Ptr(_))
                         || module.is_object_reference_type(ty)
@@ -956,6 +956,14 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     }
                     if !module.is_reference_type(&Type::Named("System.Object".into())) {
                         return Err(Fault::new("box requires a System.Object class declaration"));
+                    }
+                }
+                Op::IsInstance(ty) if !module.is_object_reference_type(ty) => {
+                    check(ty)?;
+                    if matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_) | Type::Ptr(_)) {
+                        return Err(Fault::new(
+                            "isinst requires a boxable value or reference type",
+                        ));
                     }
                 }
                 Op::IsInstance(ty) | Op::CastClass(ty) => {
@@ -2087,8 +2095,16 @@ fn interpret_instructions(
                             } else {
                                 contract
                             };
-                            object.view = contract.owner.clone();
-                            args.insert(0, Value::ObjectReference(object));
+                            if contract.receiver_byref {
+                                let mut receiver = object.reference;
+                                if contract.receiver_readonly {
+                                    receiver.restrict_readonly();
+                                }
+                                args.insert(0, Value::SlotReference(receiver));
+                            } else {
+                                object.view = contract.owner.clone();
+                                args.insert(0, Value::ObjectReference(object));
+                            }
                             if frames.len() >= limits.frames {
                                 return Err(Fault::coded(
                                     crate::FaultCode::StackOverflow,
@@ -2268,8 +2284,47 @@ fn interpret_instructions(
                         Value::NullObjectReference(_)
                     )));
                 }
+                Op::UnboxAny(target) => {
+                    let value = frame.pop()?;
+                    match value {
+                        Value::NullObjectReference(_) => {
+                            return Err(Fault::coded(
+                                crate::FaultCode::NullReference,
+                                "cannot unbox null",
+                            ))
+                        }
+                        Value::ObjectReference(object) if object.concrete_type() == *target => {
+                            frame.stack.push(object.reference.read()?);
+                        }
+                        _ => {
+                            return Err(Fault::coded(
+                                crate::FaultCode::InvalidCast,
+                                "unbox.any requires the exact boxed value type",
+                            ))
+                        }
+                    }
+                }
                 Op::IsInstance(target) => {
                     let value = frame.pop()?;
+                    if !module.is_object_reference_type(target) {
+                        let result = match value {
+                            Value::ObjectReference(mut object) => {
+                                object.reference.assigned()?;
+                                if object.concrete_type() == *target {
+                                    object.view = Some(Type::from_name("System.Object"));
+                                    Value::ObjectReference(object)
+                                } else {
+                                    Value::NullObjectReference(Type::from_name("System.Object"))
+                                }
+                            }
+                            Value::NullObjectReference(_) | Value::String(_) => {
+                                Value::NullObjectReference(Type::from_name("System.Object"))
+                            }
+                            _ => return Err(Fault::new("isinst requires an object reference")),
+                        };
+                        frame.stack.push(result);
+                        return Ok(None);
+                    }
                     let concrete = match &value {
                         Value::ObjectReference(object) => {
                             object.reference.assigned()?;

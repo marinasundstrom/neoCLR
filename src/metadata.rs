@@ -732,7 +732,7 @@ pub enum Instruction {
     ReferenceType,
     #[serde(rename = "castclass")]
     CastClass(Type),
-    /// CLI reference type test: return a compatible view, or a typed null.
+    /// CLI type test: return a compatible reference (a box for value targets), or null.
     #[serde(rename = "isinst")]
     IsInstance(Type),
     #[serde(rename = "ref.isnull")]
@@ -740,6 +740,9 @@ pub enum Instruction {
     /// Copy a value into a managed object allocation (CLI box).
     #[serde(rename = "box")]
     BoxValue(Type),
+    /// Copy an exact boxed value payload; never expose an interior reference.
+    #[serde(rename = "unbox.any")]
+    UnboxAny(Type),
     #[serde(rename = "ref.eq")]
     ReferenceEqual,
     #[serde(rename = "interface.borrow")]
@@ -1077,6 +1080,7 @@ impl Function {
                 | Instruction::StoreArrayElement(ty)
                 | Instruction::ArrayAddress(ty)
                 | Instruction::BoxValue(ty)
+                | Instruction::UnboxAny(ty)
                 | Instruction::CastClass(ty)
                 | Instruction::IsInstance(ty)
                 | Instruction::BorrowInterface(ty)

@@ -8,10 +8,23 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Implement the first non-generic struct/record-struct Object integration: explicit
+  named-value overrides dispatch into boxed payloads with readonly protection;
+  value isinst preserves exact boxes and unbox.any copies their payloads. Null
+  unboxing uses NullReference and type mismatch uses the new InvalidCast Fault code.
+  Extend Raven's configured record contract and importer for typed/Object/interface
+  equality, hashing, display and deconstruction. Add a checked sample covering
+  ordinary struct copies, box independence, default fields and string/reference
+  components. Update the API reference, website, research and roadmap. General
+  ValueType fallback equality, generic/nested-struct record components, nullable
+  boxing and address-returning unbox remain unsupported. Validation: 55 compiler tests,
+  47 focused runtime tests, 26 .NET baseline assertions, the compiled Raven sample,
+  385 API items and the combined website. No VS Code build or release.
+
 - Implement bounded virtual Object equality/hash for boxed Int32: compare exact
   type and integer value, and return the stored integer hash. Preserve separate-box
-  identity and explicit Object base behavior. Other boxed values and boxed ToString
-  remain unsupported; named struct override dispatch is still open. Extend the
+  identity and explicit Object base behavior. Other boxed primitives and primitive boxed ToString
+  remain unsupported; named struct overrides are covered separately. Extend the
   Raven Object sample, .NET comparison and API/website documentation. Validation:
   12 Object runtime tests, 22 pinned .NET assertions, the compiled Raven sample and
   combined website/API build. Include the sample in the local SDK workspace.
@@ -27,8 +40,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   equality and matching hashes, and support string/reference deconstruction outputs.
   Typed importer call adapters preserve null argument positions; absent record
   components retain null through equality, hashes, display and deconstruction.
-  Nullable strings/values, external record components and record structs remain
-  unsupported. The configured hash provider now requires Add(string) as well as
+  Nullable strings/values and external record components remain unsupported;
+  record structs are covered separately. The configured hash provider now requires Add(string) as well as
   Add(int). Expand the checked sample, design comparison, API guide and website. Validation:
   46 compiler tests, 32 reference-slot tests, Unicode/nested/nullable-record sample, editor
   completion and the combined site/API build. Prepare a separate matching local

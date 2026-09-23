@@ -39,3 +39,9 @@ by a missing comparer contract; it is not a passing neoCLR sample.
 The boxed-Int32 follow-up adds seven assertions (22 total), testing exact type/value
 comparison and hashes at signed boundaries. These run on the pinned .NET 10.0.0
 runtime; they do not establish support for other boxed types in neoCLR.
+
+
+The struct follow-up adds four assertions (26 total), covering record-struct copy
+and box independence, exact-type Object equality, interface equality, hashes and
+zero default fields. All pass on SDK 10.0.100/.NET 10.0.0. neoCLR's checked records
+sample now provides corresponding target execution evidence for the bounded contract.

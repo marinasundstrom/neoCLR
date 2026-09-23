@@ -1,8 +1,8 @@
 //! Opt-in typed-stack, control-flow, and definite-local-initialization analysis.
 //! This is not a memory-safety verifier.
 use crate::{
-    Fault, Module,
     metadata::{Function, Instruction as Op, Type},
+    Fault, Module,
 };
 use std::collections::VecDeque;
 
@@ -672,8 +672,8 @@ fn effect(
             usize::from(!crate::vm::resolve(module, target)?.no_result),
         ),
         Construct(target) => (target.parameters.len(), 1),
-        IsInstance(_) | ReferenceIsNull | BoxValue(_) | CastClass(_) | BorrowInterface(_)
-        | PackValue(_) | IsValue(_) | UnpackValue(_) => (1, 1),
+        IsInstance(_) | ReferenceIsNull | BoxValue(_) | UnboxAny(_) | CastClass(_)
+        | BorrowInterface(_) | PackValue(_) | IsValue(_) | UnpackValue(_) => (1, 1),
         ReferenceEqual | SetField(_) | PointerAdd | BitAnd | BitOr | BitXor | ShiftLeft
         | ShiftRight | ShiftRightUnsigned | Remainder | RemainderUnsigned | Add | Sub | Mul
         | AddChecked | SubChecked | MulChecked | Divide | AddCheckedUnsigned
@@ -1010,7 +1010,21 @@ fn typed_effect(
             stored(module, &values[0], target)?;
             one(Type::Named("System.Object".into()))
         }
+        UnboxAny(target) => {
+            require(
+                module.is_object_reference_type(exact(&values[0])?),
+                "unbox.any requires an object reference",
+            )?;
+            one(target.clone())
+        }
         IsInstance(target) => {
+            if !module.is_object_reference_type(target) {
+                require(
+                    module.is_object_reference_type(exact(&values[0])?),
+                    "isinst requires an object reference",
+                )?;
+                return one(Type::from_name("System.Object"));
+            }
             require(
                 module.is_object_reference_type(exact(&values[0])?)
                     && module.is_object_reference_type(target),

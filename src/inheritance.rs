@@ -1,7 +1,7 @@
 //! Record ancestry, field layout and managed-receiver dispatch contracts.
 use crate::{
-    Fault, Module,
     metadata::{Field, Representation, Type},
+    Fault, Module,
 };
 
 pub(crate) fn base(module: &Module, ty: &Type) -> Result<Option<Type>, Fault> {
@@ -194,6 +194,35 @@ fn declared_method(
     }
     Ok(None)
 }
+// Value payloads have no Object storage ancestry. Only explicit overrides may
+// adapt a System.Object slot to a managed reference into the box.
+fn value_object_contract(
+    module: &Module,
+    owner: &Type,
+    method: &crate::metadata::Function,
+) -> Result<Option<crate::metadata::Function>, Fault> {
+    if module.type_definition(owner).is_none_or(|d| {
+        d.is_reference_type
+            || d.representation != Representation::Record
+            || d.base.is_some()
+            || !d.generic_parameters.is_empty()
+    }) {
+        return Ok(None);
+    }
+    let object = Type::from_name("System.Object");
+    if module.type_definition(&object).is_none() {
+        return Ok(None);
+    }
+    Ok(declared_method(module, &object, method)?.filter(|f| {
+        f.definition
+            .as_ref()
+            .is_some_and(|id| id.module == "System")
+            && f.is_virtual
+            && !f.receiver_byref
+            && f.generic_parameters.is_empty()
+    }))
+}
+
 fn validate_methods(module: &Module) -> Result<(), Fault> {
     fn flags(values: &[usize]) -> std::collections::BTreeSet<usize> {
         values.iter().copied().collect()
@@ -258,14 +287,22 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
                 break;
             }
         }
+        let boxed_parent = if method.is_override && inherited.is_none() {
+            value_object_contract(module, owner, method)?
+        } else {
+            None
+        };
+        let adapted_receiver = boxed_parent.is_some() && method.receiver_byref;
         if method.is_override {
             let parent = inherited
+                .or(boxed_parent)
                 .ok_or_else(|| Fault::new("override requires an inherited virtual method"))?;
             if !parent.is_virtual
+                || (adapted_receiver && !method.generic_parameters.is_empty())
                 || parent.returns != method.returns
                 || parent.no_result != method.no_result
-                || parent.receiver_readonly != method.receiver_readonly
-                || parent.receiver_byref != method.receiver_byref
+                || (!adapted_receiver && parent.receiver_readonly != method.receiver_readonly)
+                || (!adapted_receiver && parent.receiver_byref != method.receiver_byref)
                 || flags(&parent.out_parameters) != flags(&method.out_parameters)
                 || flags(&parent.out_when_true) != flags(&method.out_when_true)
                 || flags(&parent.readonly_parameters) != flags(&method.readonly_parameters)
@@ -295,6 +332,16 @@ pub(crate) fn dispatch(
         .owner
         .as_ref()
         .ok_or_else(|| Fault::new("virtual method requires owner"))?;
+    if owner == &Type::from_name("System.Object")
+        && value_object_contract(module, concrete, contract)?.is_some()
+    {
+        if let Some(candidate) = declared_method(module, concrete, contract)? {
+            if candidate.is_override && !candidate.is_abstract {
+                return Ok(candidate);
+            }
+        }
+        return Err(Fault::new("boxed value has no explicit Object override"));
+    }
     // Object is an admitted common reference view even for a nominal class or
     // managed array without explicit Object ancestry. Such a view uses Object's
     // default slot; only declared ancestry can contribute an override.
@@ -355,7 +402,11 @@ pub(crate) fn dispatch_targets(
             }
             continue;
         }
-        if require_base(module, &owner, contract.owner.as_ref().unwrap()).is_ok() {
+        let boxed_override = contract.owner.as_ref() == Some(&Type::from_name("System.Object"))
+            && value_object_contract(module, &owner, contract)?.is_some()
+            && declared_method(module, &owner, contract)?.is_some_and(|m| m.is_override);
+        if boxed_override || require_base(module, &owner, contract.owner.as_ref().unwrap()).is_ok()
+        {
             let target = dispatch(module, &owner, contract)?;
             if !targets.iter().any(|f: &crate::metadata::Function| {
                 f.definition == target.definition && f.owner == target.owner

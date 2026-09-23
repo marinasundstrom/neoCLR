@@ -17,8 +17,8 @@ values/byrefs; no universal boxing of generic payloads is introduced.
 
 The current instruction requires an ordinary System.Object class declaration.
 It does not impose Object ancestry on every type. This is a bounded interpreter
-implementation: generic reference-type box no-ops, nullable boxing, unbox/unbox.any,
-general Object virtual methods and constrained-call allocation optimizations remain
+implementation: generic reference-type box no-ops, nullable boxing, address-returning unbox,
+general primitive Object virtual methods and constrained-call allocation optimizations remain
 future work. Boxed Int32 has a bounded Object.Equals/GetHashCode intrinsic, described
 in the [Object review](object-model-review.md#boxed-int32-equality-and-hash--2026-09-24). The typed verifier currently requires an explicit interface cast after box;
 the Raven importer can normalize an implicit CLI assignment with that checked cast.
@@ -35,3 +35,15 @@ Legacy explicitly borrowed interface contracts keep their receiver requirements.
 Tests in `tests/boxed_interfaces.rs` cover copy independence, alias mutation,
 escape, collection, limits and invalid operations. Raven API projection is a
 subsequent slice, not evidence supplied by these runtime tests alone.
+
+
+## Named structs and copied unboxing (2026-09-24, development)
+
+Named value payloads may implement Object virtual slots explicitly without acquiring
+Object storage ancestry. The selected method receives a managed reference into the
+box, restricted when its receiver is readonly. Reachability includes these targets.
+`isinst T` for a value T tests the exact boxed type and keeps the Object reference;
+`unbox.any T` reads a value copy. Null yields NullReference and a different type yields
+InvalidCast. No numeric conversion or interior reference escapes. Reference-type and
+nullable unboxing remain outside this profile. See the [Object review](object-model-review.md)
+and `tests/object_equality.rs` for comparison, tradeoffs and regression evidence.

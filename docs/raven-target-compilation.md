@@ -155,3 +155,20 @@ ordinal text. The importer admits these operations only against the matching cor
 metadata. Ordinary .NET compilation is unchanged; the intermediate scalar option
 is not selected by neoCLR. See [the text design](design/text-abstraction.md) for
 Unicode-version limits, migration, .NET/Swift/Rust comparisons and validation.
+
+
+### Struct and record-struct integration (development, 2026-09-24)
+
+The opt-in RuntimeRecordContract also admits non-generic record structs with the
+existing Int32/non-null String/source-record-class component gate. Struct typed
+Equals compares components directly; Object.Equals first tests the exact boxed
+type and unboxes a copy. The same target Equatable and HashCode metadata providers
+remain required; default Raven/.NET synthesis is unchanged. The importer admits
+struct interfaces and translates value isinst/unbox.any; named Object overrides
+use the boxed payload receiver. Generated hash, display and deconstruction share
+the existing contract. See [the design and bounds](object-model-review.md#struct-object-slots-and-record-structs--2026-09-24)
+and the checked [record sample](experiments/records/README.md). No VS Code build or
+SDK publication is part of this slice. Compiler changes remain on the Raven feature
+branch and are documented in its compiler runtime-contract guide and changelog.
+
+Matching Raven implementation: `9bb7cc8be` on `codex/async-preview-readiness`.

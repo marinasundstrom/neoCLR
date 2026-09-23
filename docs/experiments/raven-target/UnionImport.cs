@@ -284,15 +284,21 @@ static class UnionImport
                     case Code.Box:
                         var boxedType = ProfileType((TypeReference)instruction.Operand);
                         ConvertTop(boxedType); Push(new("System.Object")); code.AppendLine("box " + boxedType); break;
+                    case Code.Unbox_Any:
+                        var unboxedType = ProfileType((TypeReference)instruction.Operand);
+                        var unboxedSource = Pop().Type;
+                        if (!ManagedArrayBindings.IsReference(unboxedSource) || ManagedArrayBindings.IsReference(unboxedType))
+                            throw new InvalidDataException("Only exact value unboxing is supported.");
+                        Push(new(unboxedType)); code.AppendLine("unbox.any " + unboxedType); break;
                     case Code.Isinst:
                         var testedTarget = ProfileType((TypeReference)instruction.Operand);
                         var testedSource = Pop().Type;
-                        if (!ManagedArrayBindings.IsReference(testedSource) || !ManagedArrayBindings.IsReference(testedTarget))
-                            throw new InvalidDataException("Only reference type tests are supported.");
+                        if (!ManagedArrayBindings.IsReference(testedSource))
+                            throw new InvalidDataException("Type tests require an object reference.");
                         if (ManagedArrayBindings.IsType(testedSource) && ManagedArrayBindings.IsType(testedTarget)
                             && testedSource != testedTarget)
                             throw new InvalidDataException("Mutable array tests require identical element types.");
-                        Push(new(testedTarget)); code.AppendLine("isinst " + testedTarget); break;
+                        Push(new(ManagedArrayBindings.IsReference(testedTarget) ? testedTarget : "System.Object")); code.AppendLine("isinst " + testedTarget); break;
                     case Code.Castclass:
                         var castTarget = ProfileType((TypeReference)instruction.Operand);
                         var castSource = Pop().Type;
@@ -870,7 +876,7 @@ static class UnionImport
             // Library metadata keeps author-supplied parameter names for introspection.
             var declaredParameters = args.Skip(method.HasThis ? 1 : 0).Select((t, i) =>
                 libraryOwner is not null ? (GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[i]) ? "out(true) " : "") + t + " " + OpaqueLibrary.ParameterName(method, i) : (method.Parameters[i].IsOut ? "out " : "") + t);
-            output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "noresult" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {method.Name}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : (DescriptorLibrary.IsBaseConstructor(method) || libraryOwner is not null && method.IsAssembly) ? "internal " : "")}instance {(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "byref " : "")}{ApplicationTypes.Modifiers(method)}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
+            output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "noresult" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {method.Name}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : (DescriptorLibrary.IsBaseConstructor(method) || libraryOwner is not null && method.IsAssembly) ? "internal " : "")}instance {ApplicationTypes.Modifiers(method)}{(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "byref " : "")}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
             if (libraryOwner is null) output.AppendLine(SourceMetadata.Method(method, explicitReceiver: method.HasThis && !emitInstance));
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             if (method.Body.InitLocals)
