@@ -26,13 +26,21 @@ fn program(body: &str, returns: &str) -> neoclr::Module {
     assemble(&format!(".module FileResources\n{SERVICES}\n.function Run(String path) -> {returns}\n{body}\nret\n.end")).unwrap()
 }
 fn invoke(body: &str, returns: &str, path: &str) -> Result<neoclr::Execution, neoclr::Fault> {
+    invoke_with_limits(body, returns, path, Limits::default())
+}
+fn invoke_with_limits(
+    body: &str,
+    returns: &str,
+    path: &str,
+    limits: Limits,
+) -> Result<neoclr::Execution, neoclr::Fault> {
     let module = program(body, returns);
     let loaded = LoadedProgram::new(&module).unwrap();
     loaded.verify().unwrap();
     loaded
         .resolve_function(&parse_function_ref("Run(String)").unwrap())
         .unwrap()
-        .invoke(vec![Value::String(path.into())], Limits::default())
+        .invoke(vec![Value::String(path.into())], limits)
 }
 #[test]
 fn disk_round_trip_through_vm_resource_services() {
@@ -243,4 +251,140 @@ fn a_managed_function_named_like_a_service_does_not_open_a_file() {
         .unwrap();
     assert_eq!(result.value, Value::Erased(Box::new(Value::Int32(42))));
     assert!(!std::path::Path::new(&fixture.path()).exists());
+}
+
+const READ_BUFFER: &str = r#"
+.local Int32 handle
+.local arrayref<Byte> bytes
+.local arrayref<Byte> alias
+ldarg path
+call neoCLR.Runtime.FileOpenRead(String)
+value.unpack Int32
+stloc handle
+ldc.i4 5
+newarr Byte
+stloc bytes
+ldloc bytes
+stloc alias
+ldloc bytes
+ldc.i4 4
+ldc.i4 99
+conv.u1
+stelem Byte
+"#;
+
+fn read_into(offset: i32, count: i32, outcome: &str, expected: i32) -> String {
+    format!(
+        r#"
+ldloc handle
+ldloc bytes
+ldc.i4 {offset}
+ldc.i4 {count}
+call neoCLR.Runtime.FileReadInto(Int32,arrayref<Byte>,Int32,Int32)
+value.unpack {outcome}
+{conversion}
+ldc.i4 {expected}
+beq Matched{label}
+fault "Unexpected read outcome"
+Matched{label}:
+"#,
+        conversion = if outcome == "Byte" { "conv.i4" } else { "" },
+        label = format!("{offset}_{count}_{outcome}").replace('-', "N")
+    )
+}
+
+#[test]
+fn read_into_preserves_aliases_prefix_tail_and_eof_buffer() {
+    let fixture = Fixture::new();
+    std::fs::write(fixture.path(), b"ABC").unwrap();
+    let mut body = READ_BUFFER.to_owned();
+    // Zero-size at the end is valid and does not consume input.
+    body += &read_into(5, 0, "Int32", 0);
+    body += &read_into(1, 2, "Int32", 2);
+    // Only C is left: a short read must leave the rest of the buffer alone.
+    body += &read_into(3, 2, "Int32", 1);
+    body += &read_into(0, 5, "Int32", 0);
+    for (index, expected) in [0, 65, 66, 67, 99].iter().enumerate() {
+        body += &format!(
+            r#"
+ldloc alias
+ldc.i4 {index}
+ldelem Byte
+conv.i4
+ldc.i4 {expected}
+beq Element{index}
+fault "Read changed wrong buffer element"
+Element{index}:
+"#
+        );
+    }
+    body += "ldloc handle\ncall neoCLR.Runtime.FileClose(Int32)\npop\n";
+    body += &read_into(0, 1, "Byte", 6);
+    body += "ldc.i4 1";
+    assert_eq!(
+        invoke(&body, "Int32", &fixture.path()).unwrap().value,
+        Value::Int32(1)
+    );
+}
+
+#[test]
+fn invalid_read_ranges_do_not_mutate_buffer_or_advance_file() {
+    for (offset, count) in [(-1, 1), (0, -1), (4, 2), (6, 0), (i32::MAX, i32::MAX)] {
+        let fixture = Fixture::new();
+        std::fs::write(fixture.path(), b"AB").unwrap();
+        let mut body = format!("{READ_BUFFER}{}", read_into(offset, count, "Byte", 7));
+        for (index, expected) in [0, 0, 0, 0, 99].iter().enumerate() {
+            body += &format!(
+                "ldloc bytes\nldc.i4 {index}\nldelem Byte\nconv.i4\nldc.i4 {expected}\nbeq Preserved{index}\nfault \"Invalid read changed buffer\"\nPreserved{index}:\n"
+            );
+        }
+        body += &read_into(0, 1, "Int32", 1);
+        body += "ldloc bytes\nldc.i4 0\nldelem Byte";
+        assert_eq!(
+            invoke(&body, "Byte", &fixture.path()).unwrap().value,
+            Value::Byte(b'A')
+        );
+    }
+}
+
+#[test]
+fn oversized_read_into_is_rejected_before_advancing() {
+    let fixture = Fixture::new();
+    std::fs::write(fixture.path(), b"A").unwrap();
+    let body = format!(
+        "{}{}{}ldloc bytes\nldc.i4 0\nldelem Byte",
+        READ_BUFFER.replace("ldc.i4 5\nnewarr", "ldc.i4 65537\nnewarr"),
+        read_into(0, 65537, "Byte", 8),
+        read_into(0, 1, "Int32", 1)
+    );
+    assert_eq!(
+        invoke_with_limits(
+            &body,
+            "Byte",
+            &fixture.path(),
+            Limits {
+                array_elements: 131_072,
+                array_bytes: 131_072 * std::mem::size_of::<Value>(),
+                ..Limits::default()
+            }
+        )
+        .unwrap()
+        .value,
+        Value::Byte(b'A')
+    );
+}
+
+#[test]
+fn read_into_requires_read_access_and_exact_byte_array_signature() {
+    let fixture = Fixture::new();
+    std::fs::write(fixture.path(), b"unchanged").unwrap();
+    let body = format!(
+        "{}{}ldc.i4 1",
+        READ_BUFFER.replace("FileOpenRead", "FileOpenWrite"),
+        read_into(0, 1, "Byte", 9)
+    );
+    invoke(&body, "Int32", &fixture.path()).unwrap();
+    assert_eq!(std::fs::read(fixture.path()).unwrap(), b"unchanged");
+    let invalid = ".module Bad\n.function neoCLR.Runtime.FileReadInto(Int32 handle,arrayref<Int32> bytes,Int32 offset,Int32 count) -> Value\n.methodimpl InternalCall\n.end";
+    assert!(assemble(invalid).is_err());
 }

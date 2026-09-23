@@ -92,6 +92,36 @@ public wrappers. Chunk reads currently allocate and copy; no performance advanta
 over .NET is claimed. Borrowed memory views and true asynchronous host completion
 remain design/validation work.
 
+## Caller-owned read buffer — 2026-09-23
+
+`FileReadInto(handle, buffer, offset, count)` adds a bootstrap-only managed-array
+read. It returns an erased Int32 count or the existing Byte error tag. The destination
+is an existing `arrayref<Byte>`: only the transferred range changes, aliases observe
+those writes, and a short read leaves the remaining elements untouched. Negative or
+out-of-bounds ranges and requests above 64 KiB fail before consuming file data.
+Zero-count reads return zero without consuming data; only a positive-count read
+returning zero establishes EOF. Closed and write-only handles retain their distinct
+errors. This is not a public numeric-handle API.
+
+The comparison baseline is [.NET Stream.Read(byte[], offset, count)](https://learn.microsoft.com/en-us/dotnet/api/system.io.stream.read?view=net-10.0)
+(reviewed 2026-09-23): caller-owned storage, a count result, partial reads and the
+zero-count/EOF distinction. neoCLR's provisional transport reports expected failures
+as tags for future typed library results, whereas .NET uses exceptions. This does
+not select the public error taxonomy or promise an advantage over .NET.
+
+The earlier chunk operation returns a detached value array, which cannot be used
+as a Raven managed array without an adapter and copying. Reading into an existing
+managed array avoids allocating a new guest array per read and lets a later copy
+loop reuse one buffer. The host still allocates a temporary bounded byte vector
+and copies each returned byte; this is not zero-copy I/O. No guest callback,
+suspension or GC occurs during this blocking host call. An asynchronous version
+would need separate buffer rooting, exclusive-use and cancellation rules; the
+current mechanism does not establish those contracts.
+
+This is a prerequisite slice for connecting the provider sample to byte streams.
+The Raven sample still uses whole-text helpers. Public wrappers and their API
+reference remain pending; no application reference surface was added here.
+
 ## Validation and next slice
 
 Run `cargo test --lib file_streams::` and `cargo test --test file_streams` with the
@@ -110,3 +140,11 @@ transfer shape relates to the proposals' Memory/ReadOnlyMemory before publishing
 Validation on 2026-09-23: four host-resource unit cases and seven VM integration
 cases passed, including a real disk round trip. Public Raven API validation remains
 pending and must not be inferred from these lower-level checks.
+
+The managed-buffer integration cases additionally check aliases, untouched prefix
+and tail, partial reads, EOF, zero-count reads, invalid/overflowing ranges,
+transfer limits, wrong access direction and the strict service signature.
+
+Validation after the managed-buffer slice: all 11 file-resource VM cases, four
+resource unit cases, six existing file-input and three file-output cases passed.
+The website/API-reference build and four website tooling tests also passed.

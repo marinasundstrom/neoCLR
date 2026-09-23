@@ -26,3 +26,6 @@
 .function neoCLR.Runtime.StorageCreateDirectory(String path) -> Value
 .methodimpl InternalCall
 .end
+.function neoCLR.Runtime.FileReadInto(Int32 handle,arrayref<Byte> buffer,Int32 offset,Int32 count) -> Value
+.methodimpl InternalCall
+.end

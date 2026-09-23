@@ -17,7 +17,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Start the file-stream resource foundation: invocation-owned regular-file handles,
   bounded chunk transfers, explicit close, exclusive creation and item/directory
-  host operations. This is an experimental internal service boundary; public
+  host operations. Add a caller-owned managed byte-buffer read with partial counts,
+  preserved aliases and untouched tails, and range checks before file consumption.
+  This is an experimental internal service boundary; public
   Storage/Stream wrappers, reference pages and the Raven disk application remain
   pending. Calls block; flush does not promise durable storage. Record the author's
   clarification that this is architectural exploration, with API choices open to

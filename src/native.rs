@@ -183,6 +183,18 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Type::Value,
         ),
         (
+            "neoCLR.Runtime.FileReadInto",
+            [
+                Type::Int32,
+                Type::ArrayRef(element),
+                Type::Int32,
+                Type::Int32,
+            ],
+        ) if **element == Type::Byte => (
+            Binding::FileResource(crate::file_streams::Operation::ReadInto),
+            Type::Value,
+        ),
+        (
             "neoCLR.Runtime.FileWriteChunk",
             [
                 Type::Int32,

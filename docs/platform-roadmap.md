@@ -131,7 +131,9 @@ and Stream wrappers and the full acceptance application remain pending. A subseq
 same text workflow against disk and memory and documents its provisional contract
 on the website. It delegates address construction to the provider, preserving the
 architectural boundary. It still uses the existing whole-text helpers; connecting
-those objects to directional byte streams is next. Preserve typed errors and
+those objects to directional byte streams is next. A managed-buffer read service
+now supplies the missing caller-owned array boundary, with partial-read, alias and
+range validation; it remains internal and blocking. Preserve typed errors and
 explicit resource ownership in the file slice.
 Networking remains later.
 

@@ -16,6 +16,7 @@ pub(crate) enum Operation {
     OpenWrite,
     CreateNew,
     Read,
+    ReadInto,
     Write,
     Flush,
     Close,
@@ -169,6 +170,40 @@ impl Files {
                         )?),
                         Err(error) => Err(error),
                     }
+                }
+            }
+            (
+                Operation::ReadInto,
+                [
+                    Value::Int32(id),
+                    Value::ObjectReference(array),
+                    Value::Int32(offset),
+                    Value::Int32(count),
+                ],
+            ) => {
+                if array.reference.target() != &Type::Array(Box::new(Type::Byte)) {
+                    return Err(Fault::new("File read requires a byte array"));
+                }
+                array.reference.require_writable()?;
+                let length = array.reference.array_length()?;
+                match (usize::try_from(*offset), usize::try_from(*count)) {
+                    (Ok(offset), Ok(count)) if offset <= length && count <= length - offset => {
+                        match self.read(*id, count as i32) {
+                            Ok(bytes) => {
+                                // The blocking call cannot suspend or run guest code. Mutate only
+                                // transferred elements, preserving aliases and the untouched tail.
+                                for (index, byte) in bytes.iter().enumerate() {
+                                    array
+                                        .reference
+                                        .element(offset + index, &Type::Byte)?
+                                        .write(Value::Byte(*byte))?;
+                                }
+                                Ok(Value::Int32(bytes.len() as i32))
+                            }
+                            Err(error) => Err(error),
+                        }
+                    }
+                    _ => Err(Error::InvalidRange),
                 }
             }
             (

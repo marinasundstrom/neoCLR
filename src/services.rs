@@ -99,6 +99,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::FileResource(operation) => match operation {
                 crate::file_streams::Operation::OpenRead
                 | crate::file_streams::Operation::Read
+                | crate::file_streams::Operation::ReadInto
                 | crate::file_streams::Operation::Kind => RuntimeService::FileInput,
                 _ => RuntimeService::FileOutput,
             },

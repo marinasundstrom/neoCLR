@@ -106,3 +106,12 @@ For comparison, .NET's [FileInfo constructor](https://learn.microsoft.com/en-us/
 creates a path wrapper. This experiment explores retaining a storage provider as
 well, allowing the same consumer to use host files or logical memory storage.
 The additional indirection and identity rules need evaluation alongside that benefit.
+
+## Byte-stream integration status
+
+The internal file backend now supports reading into a caller-owned managed byte
+array with an offset and count. It reports partial reads, preserves untouched
+buffer elements and rejects invalid ranges before consuming file data. Calls are
+blocking. This is groundwork for directional streams; the experimental provider
+members documented above still use whole-text helpers. No new public member is
+implied by the backend change.
