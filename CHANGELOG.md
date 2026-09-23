@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Record System.Networking.Sockets and System.Web.Http as candidate future namespace
+  boundaries, with a .NET comparison and open naming/package questions. This is a
+  roadmap consideration, not an implemented API or a priority change.
+
 - Characterize Object identity prerequisites before adding equality/hash APIs.
   Add artifact-roundtrip checks for aliases, mutation/GC, boxes, arrays, typed nulls
   and execution-local allocation IDs; expose the existing String wrapper identity

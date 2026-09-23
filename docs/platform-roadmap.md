@@ -334,6 +334,31 @@ See [concurrency direction](concurrency-direction.md) for .NET comparisons and
 current callback/isolation limits. General .NET-style shared-memory callbacks and
 arbitrary result types are not implied by the first bounded worker implementation.
 
+## Future networking and web namespaces — consideration, 2026-09-23
+
+The author suggests considering `System.Networking.Sockets` for socket-level APIs
+and `System.Web.Http` for HTTP APIs. Record this as a candidate separation for the
+later networking slices, not a finalized naming decision or an immediate rename.
+Current foundational Object work retains priority.
+
+The proposed boundary separates transport primitives from HTTP requests, responses,
+clients and serving contracts. HTTP consumers should not need to manipulate sockets;
+a provider could use sockets or a host HTTP facility. This is a design objective to
+validate with TCP echo and the HTTP client/server samples, not implemented behavior.
+Namespace organization does not itself settle packages, provider availability or
+whether client and server APIs share all dependencies. URI placement remains open.
+
+.NET comparison (primary documentation checked 2026-09-23): .NET uses
+[System.Net.Sockets](https://learn.microsoft.com/en-us/dotnet/api/system.net.sockets?view=net-10.0)
+and [System.Net.Http](https://learn.microsoft.com/en-us/dotnet/api/system.net.http?view=net-10.0).
+The proposed names make the transport/web distinction explicit, at the cost of
+familiar .NET imports. The name System.Web also has an existing
+[ASP.NET association in .NET Framework](https://learn.microsoft.com/en-us/dotnet/api/system.web?view=netframework-4.8.1);
+using it here would not imply compatibility with that framework. Compare the
+proposed split with retaining .NET names or placing HTTP under System.Networking
+when the samples establish the API boundaries. Do not infer a web framework scope
+from this naming suggestion.
+
 ## Progressive delivery before networking — revised 2026-09-23
 
 The author asks whether sockets/HTTP should move down in priority so that features

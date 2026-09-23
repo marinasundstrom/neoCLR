@@ -261,6 +261,12 @@ covers the proposal files present on 2026-09-23, including the working Streams r
 
 ## Reconcile proposals before stabilizing APIs
 
+- Consider the author's later namespace split: `System.Networking.Sockets` for
+  transport primitives and `System.Web.Http` for HTTP. See the authoritative
+  [roadmap consideration](platform-roadmap.md#future-networking-and-web-namespaces--consideration-2026-09-23)
+  for the .NET comparison and open choices. These are candidate names, not current
+  APIs, a package decision or a change in priority.
+
 - The earlier [stream design](stream-design.md) uses System.IO, separate sync/async
   interfaces and a possible Cancelled I/O error. The supplied revision uses
   System.Streams, InputStream/OutputStream, Task-based I/O and Task cancellation.

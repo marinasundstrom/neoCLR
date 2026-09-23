@@ -5739,3 +5739,16 @@ and recorded the convention for runtime code as well as examples.
 
 - **Validation:** all six new runtime identity cases, four existing reference-identity
   tests, 14 .NET assertions and the combined website build passed.
+
+
+### 2026-09-23 — Possible networking/web namespace separation
+
+- **Author:** suggested considering `System.Networking.Sockets` and
+  `System.Web.Http` later as a separation between networking and web concerns.
+- **Assistant response/action:** recorded the suggestion as provisional in the
+  platform roadmap and linked it from the HTTP POC plan. Compared .NET namespace
+  organization and noted the historical System.Web association. Proposed keeping
+  HTTP consumers independent of explicit socket manipulation.
+- **Open:** final names, package/provider boundaries, URI placement and the exact
+  client/server surface. No API rename or implementation occurred; current Object
+  work and the existing networking milestone sequence remain in place.
