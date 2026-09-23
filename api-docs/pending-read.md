@@ -103,6 +103,34 @@ erased result. The cancellation-aware join can block unless called
 through the notification path after producer completion.
 
 Direct-IL checks exercise dedicated and pooled jobs, sibling isolation, cancelled
-notification delivery and retained managed state through GC. A Raven Task adapter
-that maps the Void outcome into Promise.Cancel remains the next integration step.
+notification delivery and retained managed state through GC. The isolated Raven adapter described below now maps the Void outcome into
+Promise.Cancel.
 There is still no public per-operation cancellation-token or async Storage API.
+
+## Raven Task cancellation follow-up
+
+A further isolated adapter now maps an acknowledged worker cancellation into
+Promise.Cancel. Four awaiting consumers cover cancelled and successful sibling jobs
+on both dedicated threads and the pool. Cancelled awaits propagate before writing
+the destination; successful siblings copy `Hi`. The sample checks unrelated queue
+progress, actual GC, one notification per consumer and zero final live guest objects.
+
+For controlled testing, this adapter requests cancellation when a fixture job has
+input `"cancel"`. That special input is test wiring, **not installed Thread behavior
+or a public cancellation API**. The producer cooperates at interpreter instruction
+boundaries. Native calls remain non-interruptible.
+
+A producer fault whose message happens to be `execution cancelled` remains a
+UserFault and does not turn into Task cancellation. A separate compilation check
+rejects direct bootstrap-service calls through the normal reference core.
+
+Download the [adapter and consumer sources](/samples/worker-task-cancellation.zip).
+Run the shared harness from a matching development checkout:
+
+```sh
+python3 docs/experiments/delayed-copy/verify.py --toolchain-root /path/to/development/bundle --consumer-root docs/experiments/worker-task-cancellation --adapter-source docs/experiments/worker-task-cancellation/Workers.rvn
+```
+
+The harness substitutes the adapter only in a temporary library. Installed APIs are
+unchanged. Queue affinity, public cancellation handles and real async file I/O remain
+future work.

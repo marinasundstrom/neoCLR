@@ -74,3 +74,22 @@ conversion is rejected by the current compiler. All I/O remains synchronous; Tas
 return types and cancellation are future contract work. Validation lives in the
 [standalone POC](../experiments/storage-poc/README.md), the provider ReaderContracts,
 strict interface probes, native file-resource tests and generated runtime/API checks.
+
+
+### Bootstrap worker cancellation adapter (2026-09-23)
+
+RuntimeServiceBindings admits RequestWorkerCancellation(Int32)->Boolean and
+JoinWorkerResult(Int32)->Value only in the bootstrap RuntimeServices contract.
+Normal core generation still omits those services. The isolated worker adapter
+checks erased String/Void and completes/cancels its Promise after notification and
+acknowledged join. Public Thread/Task signatures, Raven Runtime Contract configuration,
+compiler emission and the checked-in worker library are unchanged. The API snapshot
+was refreshed from the matching normal reference assembly.
+
+The [sample](../experiments/worker-task-cancellation/README.md) tests dedicated/pooled
+cancelled awaits, successful siblings, actual GC, genuine producer Fault propagation
+and rejection of ordinary bootstrap-service calls. An async parameter named `state`
+exposed a generated-field collision in the imported artifact; the consumer uses
+`destination`. A reduced general CLI-metadata case and responsibility analysis are
+still required before changing Raven or the importer. This remains a deferred
+integration candidate, not a user-facing parameter-name restriction.

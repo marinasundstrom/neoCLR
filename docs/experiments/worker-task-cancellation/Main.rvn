@@ -1,0 +1,45 @@
+import System.*
+import System.Tasks.*
+import System.Console.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("Worker Task cancellation contract failed")
+    }
+}
+
+func Scenario(name: string, cancelled: bool, pooled: bool) {
+    let state = ReadState()
+    let input = if cancelled { "cancel" } else { "Hi" }
+    let result = Read(state, input, pooled)
+    Check(!result.IsCompleted && !state.Delivered)
+    var notifications = 0
+    result.OnCompleted(() => {
+        notifications += 1
+        Check(notifications == 1)
+        Check(result.IsCancelled == cancelled)
+        Check(state.Delivered != cancelled)
+        Check(state.ByteAt(0) == 9 && state.ByteAt(3) == 9)
+        if cancelled {
+            Check(state.ByteAt(1) == 9 && state.ByteAt(2) == 9)
+        } else {
+            Check(state.ByteAt(1) == 72 && state.ByteAt(2) == 105)
+        }
+        WriteLine(name)
+    })
+}
+
+func Main() {
+    Scenario("Dedicated cancellation reached await; bytes unchanged", true, false)
+    Scenario("Dedicated sibling copied Hi", false, false)
+    Scenario("Pooled cancellation reached await; bytes unchanged", true, true)
+    Scenario("Pooled sibling copied Hi", false, true)
+    TaskQueue.Default.Post(() => WriteLine("Unrelated ready work"))
+    var index = 0
+    while index < 1200 {
+        let garbage: byte[] = [(byte)0]
+        _ = garbage
+        index += 1
+    }
+    WriteLine("Entry returned with consumers pending")
+}

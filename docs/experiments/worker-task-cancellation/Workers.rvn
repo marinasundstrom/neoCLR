@@ -1,0 +1,79 @@
+// Test-only cancellation adapter; the sentinel is fixture wiring, not a public API.
+namespace System.Concurrency
+
+import System.*
+import System.Tasks.*
+import System.Runtime.CompilerServices.*
+
+public class Thread {
+    private field callback: Func<string, string>
+    private field input: string
+    private field source: Promise<string>
+    private field started: bool
+    private field queue: TaskQueue
+
+    init(callback: Func<string, string>, input: string) {
+        self.callback = callback
+        self.input = input
+        source = Promise<string>()
+        queue = RuntimeServices.CurrentTaskQueue
+        started = false
+    }
+
+    val Task: Task<string> => source.Task
+    val IsStarted: bool => started
+
+    func Start() {
+        if started {
+            System.Fault("Thread has already been started")
+        }
+        let handle = RuntimeServices.StartWorker(callback, input)
+        started = true
+        let completion = WorkerCompletion(handle, source)
+        RuntimeServices.NotifyWorker(handle, completion.Complete)
+        if input == "cancel" {
+            _ = RuntimeServices.RequestWorkerCancellation(handle)
+        }
+    }
+
+    static func Run(callback: Func<string, string>, input: string) -> Task<string> {
+        let thread = Thread(callback, input)
+        thread.Start()
+        return thread.Task
+    }
+}
+
+public class ThreadPool {
+    static func Queue(callback: Func<string, string>, input: string) -> Task<string> {
+        let source = Promise<string>()
+        let queue = RuntimeServices.CurrentTaskQueue
+        let handle = RuntimeServices.QueueWorker(callback, input)
+        let completion = WorkerCompletion(handle, source)
+        RuntimeServices.NotifyWorker(handle, completion.Complete)
+        if input == "cancel" {
+            _ = RuntimeServices.RequestWorkerCancellation(handle)
+        }
+        return source.Task
+    }
+}
+
+internal class WorkerCompletion {
+    private field handle: int
+    private field source: Promise<string>
+
+    internal init(handle: int, source: Promise<string>) {
+        self.handle = handle
+        self.source = source
+    }
+
+    internal func Complete() {
+        let outcome = RuntimeServices.JoinWorkerResult(handle)
+        if RuntimeServices.IsValue<string>(outcome) {
+            _ = source.Complete(RuntimeServices.UnpackValue<string>(outcome))
+        } else if RuntimeServices.IsValue<System.Void>(outcome) {
+            _ = source.Cancel()
+        } else {
+            System.Fault("Invalid worker terminal outcome")
+        }
+    }
+}

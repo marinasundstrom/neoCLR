@@ -364,3 +364,11 @@ and unrelated producer Faults remain terminal. Direct-IL and registry tests cove
 these boundaries; the ordinary Raven core still exposes no new cancellation API.
 Connect this result to Promise.Cancel in the isolated adapter before claiming an
 end-to-end cancellable Task product. Native interruption and bounded shutdown remain open.
+
+
+The [isolated Raven worker cancellation consumer](experiments/worker-task-cancellation/README.md)
+now maps acknowledged native Void outcomes to Promise.Cancel through ordinary awaits.
+Both worker backends retain successful siblings and cancelled destination state under
+GC; UserFault and normal-reference access checks remain distinct. Submission is
+fixture-controlled. Queue affinity is the next adapter boundary; no public token API
+or async filesystem producer is selected.

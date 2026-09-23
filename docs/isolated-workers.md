@@ -170,6 +170,15 @@ acknowledgement, late success, fault-code identity, legacy join behavior, invoca
 cancellation precedence and teardown. Direct-IL tests exercise real dedicated and
 pooled interpreters, one cancelled looping job alongside a successful sibling, and
 cancelled notifications with collected/retained managed receivers. The loop's large
-instruction budget is a watchdog allowance, not a cancellation deadline. A Task
-adapter mapping Void to Promise.Cancel is still required for a guest-facing product.
+instruction budget is a watchdog allowance, not a cancellation deadline. The isolated Task
+adapter described below now maps Void to Promise.Cancel for a controlled guest consumer;
+a public cancellation-request API remains unselected.
 See the [on-site service contract](../api-docs/pending-read.md#experimental-per-worker-cancellation-services).
+
+
+The [Raven adapter follow-up](experiments/worker-task-cancellation/README.md) now
+maps JoinWorkerResult String/Void to Promise.Complete/Cancel and checks real awaits,
+sibling progress and GC on both producer paths. Only the isolated adapter requests
+cancellation through a test sentinel. The normal reference core and installed worker
+library remain unchanged; RuntimeServiceBindings admits the two methods only for
+bootstrap compilation. Queue affinity is still unresolved.

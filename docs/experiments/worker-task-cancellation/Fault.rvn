@@ -1,0 +1,19 @@
+import System.*
+import System.Tasks.*
+import System.Concurrency.*
+
+func FailProducer(input: string) -> string {
+    // Matching diagnostic text must not forge the runtime cancellation code.
+    System.Fault("execution cancelled")
+    return input
+}
+
+async func ObserveFailure() -> Task<unit> {
+    _ = await Thread.Run(FailProducer, "fault")
+    System.Console.WriteLine("Unexpected continuation")
+    return ()
+}
+
+func Main() {
+    _ = ObserveFailure()
+}

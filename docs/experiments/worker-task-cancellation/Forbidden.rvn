@@ -1,0 +1,4 @@
+func Main() {
+    _ = System.Runtime.CompilerServices.RuntimeServices.RequestWorkerCancellation(0)
+    _ = System.Runtime.CompilerServices.RuntimeServices.JoinWorkerResult(0)
+}

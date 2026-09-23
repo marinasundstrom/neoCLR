@@ -8,6 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Connect acknowledged per-job cancellation to Promise.Cancel in an isolated Raven
+  worker adapter. Admit the two existing services in bootstrap RuntimeServices only;
+  normal Thread/Task APIs and installed worker implementation stay unchanged. Add
+  dedicated/pooled awaiting consumers, sibling and GC checks, genuine UserFault and
+  forbidden-service fixtures, and on-site adapter documentation/source download.
+  Record the generated-field collision with an async parameter named state as a
+  deferred integration issue; the tested sample uses destination. Refresh the matching
+  normal-core API snapshot without adding managed public APIs.
+  Validation: four cancellation/sibling outcomes with GC and zero final live objects,
+  UserFault and normal-core boundary checks, original delayed-copy/busy-queue consumers,
+  runtime/API snapshots, matching source archive and combined website checks.
+
 - Give isolated jobs independent cooperative cancellation tokens. Add experimental
   raw RequestWorkerCancellation and JoinWorkerResult runtime services: requests retain
   pending roots, and acknowledged job cancellation returns an erased Void outcome for

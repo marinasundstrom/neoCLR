@@ -236,6 +236,12 @@ def main():
         shutil.copyfile(ROOT / 'docs/experiments/host-pending-read' / name, host_pending_sources / name)
     shutil.make_archive(str(downloads / 'host-pending-read'), 'zip', host_pending_sources.parent)
     shutil.rmtree(host_pending_sources.parent)
+    cancel_sources = OUTPUT / '_worker-cancel-source' / 'worker-task-cancellation'
+    cancel_sources.mkdir(parents=True)
+    for name in ('Workers.rvn', 'Copy.rvn', 'Main.rvn', 'DelayedCopy.rvnproj', 'Fault.rvn', 'Forbidden.rvn', 'expected.txt', 'README.md'):
+        shutil.copyfile(ROOT / 'docs/experiments/worker-task-cancellation' / name, cancel_sources / name)
+    shutil.make_archive(str(downloads / 'worker-task-cancellation'), 'zip', cancel_sources.parent)
+    shutil.rmtree(cancel_sources.parent)
     pages = {}
     for source in sorted(SOURCE.rglob('*.html')):
         relative = source.relative_to(SOURCE)

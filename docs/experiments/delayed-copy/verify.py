@@ -25,6 +25,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--toolchain-root', type=Path, required=True)
     parser.add_argument('--consumer-root', type=Path, default=HERE, help='Alternate controlled consumer using the same experimental notification adapter')
+    parser.add_argument('--adapter-source', type=Path, default=HERE / 'Workers.rvn', help='Isolated bootstrap adapter to substitute for this check')
     args = parser.parse_args()
     consumer = args.consumer_root.resolve()
     bundle = args.toolchain_root.resolve()
@@ -40,7 +41,7 @@ def main():
         project.write_text(f'''<Project>
   <PropertyGroup><OutputType>Library</OutputType><AssemblyName>Workers</AssemblyName><NeoCLRRoot>{escape(str(root))}</NeoCLRRoot></PropertyGroup>
   <Import Project="{escape(str(ROOT / 'build/NeoCLR.Raven.props'))}" />
-  <ItemGroup><Compile Include="{escape(str(HERE / 'Workers.rvn'))}" /></ItemGroup>
+  <ItemGroup><Compile Include="{escape(str(args.adapter_source.resolve()))}" /></ItemGroup>
 </Project>''')
         run(['dotnet', compiler, project, '--no-project-restore', '-o', root / 'compiled'])
         run(['dotnet', bridge, '--library-implementation', root / 'compiled/Workers.dll', core,
@@ -76,6 +77,21 @@ def main():
         print(result.stderr, end='')
         print('Isolated library adapter, actual VM completion, await and GC: passed')
         if consumer != HERE:
+            if (consumer / 'Fault.rvn').exists():
+                shutil.copyfile(consumer / 'Fault.rvn', root / 'Main.rvn')
+                run(['dotnet', 'msbuild', root / 'DelayedCopy.rvnproj', '-nologo', '-v:minimal'], env=env)
+                failed = subprocess.run([str(bundle / 'bin/neoclr'), 'run', str(root / 'bin/neoclr/Debug/App.neoil'),
+                                         '--system', str(root / 'System.neoil')], capture_output=True, text=True, timeout=120)
+                assert failed.returncode != 0 and 'code=UserFault' in failed.stderr, failed.stdout + failed.stderr
+                assert 'Unexpected continuation' not in failed.stdout, failed.stdout
+                print('Producer UserFault remains a Fault, not Task cancellation')
+            if (consumer / 'Forbidden.rvn').exists():
+                shutil.copyfile(consumer / 'Forbidden.rvn', root / 'Main.rvn')
+                rejected = subprocess.run(['dotnet', 'msbuild', str(root / 'DelayedCopy.rvnproj'), '-nologo', '-v:minimal'],
+                                          env=env, capture_output=True, text=True, timeout=120)
+                diagnostics = rejected.stdout + rejected.stderr
+                assert rejected.returncode != 0 and "error RAV0234" in diagnostics and "'Runtime' was not found" in diagnostics, diagnostics
+                print('Normal reference core rejects bootstrap runtime-service calls')
             return
         shutil.copyfile(HERE / 'Busy.rvn', root / 'Main.rvn')
         run(['dotnet', 'msbuild', root / 'DelayedCopy.rvnproj', '-nologo', '-v:minimal'], env=env)

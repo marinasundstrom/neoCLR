@@ -1,0 +1,37 @@
+import System.*
+import System.Tasks.*
+import System.Concurrency.*
+import System.Text.*
+
+func Produce(input: string) -> string {
+    if input == "cancel" {
+        // A cooperative managed producer, stopped by its own runtime token.
+        while true { }
+    }
+    return input
+}
+
+class ReadState {
+    private field buffer: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9]
+    private field delivered: bool = false
+    val Delivered: bool => delivered
+    func ByteAt(index: int) -> byte => buffer[index]
+
+    func Apply(text: string) {
+        let bytes = Utf8.Encode(text)
+        if bytes.Count != 2 || delivered {
+            System.Fault("Invalid delivery")
+        }
+        buffer[1] = bytes[0]
+        buffer[2] = bytes[1]
+        delivered = true
+    }
+}
+
+async func Read(destination: ReadState, input: string, pooled: bool) -> Task<int> {
+    let work = if pooled { ThreadPool.Queue(Produce, input) } else { Thread.Run(Produce, input) }
+    let text = await work
+    // Cancelled await must propagate before any destination mutation.
+    destination.Apply(text)
+    return 2
+}

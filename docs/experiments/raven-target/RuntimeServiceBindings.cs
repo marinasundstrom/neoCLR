@@ -24,6 +24,8 @@ static class RuntimeServiceBindings
             ("StartWorker", ["System.Func<String,String>", "String"], "Int32"),
             ("QueueWorker", ["System.Func<String,String>", "String"], "Int32"),
             ("JoinWorker", ["Int32"], "String"),
+            ("RequestWorkerCancellation", ["Int32"], "Boolean"),
+            ("JoinWorkerResult", ["Int32"], "Value"),
             ("NotifyWorker", ["Int32", "System.Func<Void>"], "noresult"),
             ("LocalDateTime", ["Int64"], "System.LocalDateTime"),
             ("UnixTimeTicks", [], "Int64"),
