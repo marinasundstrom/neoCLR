@@ -346,7 +346,9 @@ Samples begin as small programs, not miniature frameworks. Existing release/debu
 requirements and Raven branch/integration rules continue to apply.
 
 **Next:** extend the real delayed-copy invocation evidence to cancellation/completion
-races, queue affinity and bounded result storage. Cooperative progress under
+races, queue affinity and broader host-memory accounting. A [worker payload quota](isolated-workers.md#completion-payload-quota)
+now bounds successful retained text/output (1 MiB per worker by default), excluding
+temporaries, diagnostics and allocation overhead. Cooperative progress under
 self-reposting ready work is now checked; broader scheduling policies remain open.
 Select a small operation cancellation contract before generalizing the experimental
 worker adapter or reusing the pipeline for files and then sockets. Keep the

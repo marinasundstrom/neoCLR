@@ -52,6 +52,55 @@ fn dedicated_and_pooled_workers_exchange_owned_text() {
 }
 
 #[test]
+fn worker_results_share_a_byte_budget_with_captured_output() {
+    let extra = ".function Print(String input) -> String\nldstr \"\"\ncall neoCLR.Runtime.WriteLine(String)\npop\nldarg input\ncall neoCLR.Runtime.WriteLine(String)\npop\nldarg input\nret\n.end";
+    for name in ["StartWorker", "QueueWorker"] {
+        for (callback, input, budget, succeeds) in [
+            ("Echo", "", 0, true),
+            ("Echo", "é", 2, true),
+            ("Echo", "é", 1, false),
+            ("Print", "é", 6, true), // empty line + UTF-8 line + returned text
+            ("Print", "é", 5, false), // return exceeds remaining quota
+            ("Print", "é", 3, false), // line exceeds remaining quota
+            ("Print", "", 0, false), // empty lines still cost one byte
+        ] {
+            let body = format!(
+                "delegate.bind System.Func<String,String> = {callback}(String)\nldstr \"{input}\"\ncall neoCLR.Runtime.{name}(System.Func<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)"
+            );
+            let result = execute_options(
+                &body,
+                extra,
+                Limits {
+                    worker_result_bytes: budget,
+                    ..Default::default()
+                }
+                .into(),
+            );
+            if succeeds {
+                let execution =
+                    result.unwrap_or_else(|e| panic!("{name} {callback} {input:?} {budget}: {e}"));
+                assert_eq!(execution.value, Value::String(input.into()));
+                assert_eq!(
+                    execution.output,
+                    if callback == "Print" {
+                        vec!["", input]
+                    } else {
+                        vec![]
+                    }
+                );
+            } else {
+                assert!(
+                    result
+                        .unwrap_err()
+                        .message
+                        .contains("Worker result byte limit exceeded")
+                );
+            }
+        }
+    }
+}
+
+#[test]
 fn invalid_and_reused_handles_fault() {
     assert!(
         execute("ldc.i4 -1\ncall neoCLR.Runtime.JoinWorker(Int32)", "")
@@ -245,6 +294,39 @@ fn notified_worker_failure_reaches_invocation() {
             .message
             .contains("producer failed")
     );
+}
+
+#[test]
+fn oversized_notified_result_reaches_invocation_as_fault() {
+    let result = execute_options(
+        "call Launch()\npop\nldstr \"entry\"",
+        NOTIFY_TYPES,
+        Limits {
+            worker_result_bytes: 3,
+            ..Default::default()
+        }
+        .into(),
+    );
+    assert!(
+        result
+            .unwrap_err()
+            .message
+            .contains("Worker result byte limit exceeded")
+    );
+}
+
+#[test]
+fn worker_output_capture_keeps_console_input_unavailable() {
+    let extra = ".function Read(String input) -> String\ncall neoCLR.Runtime.ConsoleReadByte()\nvalue.unpack Int32\nldc.i4 1\nbeq Unavailable\nfault \"Worker input must be unavailable\"\nUnavailable:\nldarg input\nret\n.end";
+    for name in ["StartWorker", "QueueWorker"] {
+        let body = format!(
+            "delegate.bind System.Func<String,String> = Read(String)\nldstr \"ok\"\ncall neoCLR.Runtime.{name}(System.Func<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)"
+        );
+        assert_eq!(
+            execute(&body, extra).unwrap().value,
+            Value::String("ok".into())
+        );
+    }
 }
 
 #[test]

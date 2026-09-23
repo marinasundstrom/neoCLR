@@ -53,7 +53,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   worker-library adapter, failure/cancellation teardown and one-shot delivery. Poll
   ready notifications at default-queue callback returns so self-reposting guest work
   no longer requires queue quiescence; verify Raven and direct-IL consumers and
-  explicit-queue isolation. Normal Thread/ThreadPool implementations retain queued
+  explicit-queue isolation. Bound successful worker result text and captured output
+  with a shared per-worker logical-byte quota (default 1 MiB); reject overflow before
+  capturing a line or publishing success, preserving unavailable console input.
+  Cover UTF-8, empty lines and notification failure delivery. Larger worker outputs
+  now fault unless an embedder raises `Limits.worker_result_bytes`; exhaustive Rust
+  Limits literals need the new field. This is not a total host-memory bound.
+  Normal Thread/ThreadPool implementations retain queued
   joins; preemption, per-operation cancellation, bounded native I/O ownership and
   real I/O remain open.
 

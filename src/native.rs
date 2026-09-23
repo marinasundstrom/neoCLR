@@ -334,6 +334,12 @@ impl Binding {
             }
             (Self::ConsoleReadByte, []) => {
                 // Byte = data, Void = EOF; Int32 1 = Unavailable, 2 = ReadFailed.
+                // A worker's bounded output sink does not provide console input.
+                let console = if crate::workers::is_worker() {
+                    None
+                } else {
+                    console
+                };
                 let payload = match console {
                     None => Value::Int32(1),
                     Some(console) => match console.read_byte() {

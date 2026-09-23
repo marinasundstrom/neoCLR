@@ -96,7 +96,10 @@ notifications dispatch only on the default queue. Reposting callbacks no longer
 requires the queue to become empty for notification to progress. A callback that
 never returns, a blocking host call or an exhausted instruction/allocation budget
 can still prevent progress. Explicit TaskQueues are not supported by the adapter.
-An unresolved Promise alone still does not keep an invocation alive. Result payloads have no new host-memory budget.
+An unresolved Promise alone still does not keep an invocation alive. Worker result
+text and captured output now share a default 1 MiB quota per worker;
+see [the exact accounting and exclusions](../../isolated-workers.md#completion-payload-quota).
+This bounds successful payloads, not all host memory.
 
 ## Reproduce
 
@@ -118,7 +121,7 @@ The `.rvnproj` can build independently, but reproducing this notification experi
 requires the verifier's temporary library replacement; the normal worker library
 still runs queued joins.
 
-Ten worker integration tests cover both GC paths, ready callback order,
+Thirteen worker integration tests cover both GC paths, ready callback order,
 invalid/duplicate registration, invocation failure/budget exhaustion, producer failure
 and cancellation after registration, alongside existing worker behavior. The busy
 queue test runs a self-reposting callback until worker delivery stops it; an explicit
@@ -129,7 +132,9 @@ cancelled waiting and producer disconnection. All seven existing Task tests pass
 ## Next bounded work
 
 Keep S0 partial. Extend the real invocation evidence to cancellation/completion races,
-explicit queue affinity and bounded result storage. Cooperative progress under
+explicit queue affinity and broader host-memory accounting. Successful text/output
+payload quotas are checked on both worker paths and notification failure delivery.
+Cooperative progress under
 self-reposting ready work now has direct-IL and Raven evidence; broader scheduling
 policy and preemption remain unselected.
 Compare the application cancellation contract before generalizing the adapter or

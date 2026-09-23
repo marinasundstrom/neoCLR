@@ -3,6 +3,39 @@ use crate::{CancellationToken, ExecutionOptions, Fault, Module, Value};
 use std::sync::{Arc, Mutex, mpsc};
 use std::thread::JoinHandle;
 
+// Capturing through Console checks the quota before copying each line, rather
+// than letting an interpreter build an unlimited output Vec before returning.
+#[derive(Debug)]
+struct WorkerOutput {
+    capture: Mutex<CapturedOutput>,
+}
+#[derive(Debug)]
+struct CapturedOutput {
+    remaining: usize,
+    lines: Vec<String>,
+    exceeded: bool,
+}
+impl crate::Console for WorkerOutput {
+    fn read_byte(&self) -> std::io::Result<Option<u8>> {
+        Err(std::io::Error::other("Worker console input is unavailable"))
+    }
+
+    fn write_line(&self, text: &str) -> std::io::Result<()> {
+        let mut capture = self.capture.lock().unwrap();
+        let Some(remaining) = text
+            .len()
+            .checked_add(1)
+            .and_then(|cost| capture.remaining.checked_sub(cost))
+        else {
+            capture.exceeded = true;
+            return Err(std::io::Error::other("Worker result byte limit exceeded"));
+        };
+        capture.lines.push(text.to_owned());
+        capture.remaining = remaining;
+        Ok(())
+    }
+}
+
 type Outcome = Result<(String, Vec<String>), Fault>;
 struct Job {
     module: Arc<Module>,
@@ -12,8 +45,19 @@ struct Job {
     reply: mpsc::Sender<Outcome>,
 }
 thread_local! { static IN_WORKER: std::cell::Cell<bool> = const { std::cell::Cell::new(false) }; }
-fn execute(job: Job) {
+pub(crate) fn is_worker() -> bool {
+    IN_WORKER.with(|flag| flag.get())
+}
+fn execute(mut job: Job) {
     IN_WORKER.with(|flag| flag.set(true));
+    let output = Arc::new(WorkerOutput {
+        capture: Mutex::new(CapturedOutput {
+            remaining: job.options.limits.worker_result_bytes,
+            lines: Vec::new(),
+            exceeded: false,
+        }),
+    });
+    job.options.console = Some(output.clone());
     let result = crate::vm::interpret_function(
         &job.module,
         job.function,
@@ -22,8 +66,20 @@ fn execute(job: Job) {
         None,
     )
     .and_then(|execution| match execution.value {
-        Value::String(value) => Ok((value, execution.output)),
+        Value::String(value) => {
+            let mut capture = output.capture.lock().unwrap();
+            if value.len() > capture.remaining {
+                return Err(Fault::new("Worker result byte limit exceeded"));
+            }
+            Ok((value, std::mem::take(&mut capture.lines)))
+        }
         _ => Err(Fault::new("Worker must return String")),
+    });
+    let result = result.map_err(|mut fault| {
+        if output.capture.lock().unwrap().exceeded {
+            fault.message = "Worker result byte limit exceeded".into();
+        }
+        fault
     });
     let _ = job.reply.send(result);
 }
@@ -48,7 +104,7 @@ impl Workers {
         options: &ExecutionOptions,
         pooled: bool,
     ) -> Result<Value, Fault> {
-        if IN_WORKER.with(|flag| flag.get()) {
+        if is_worker() {
             return Err(Fault::new("Nested worker creation is not supported"));
         }
         if self.results.len() >= 64 {

@@ -16,6 +16,9 @@ pub struct Limits {
     pub array_bytes: usize,
     pub pointer_bytes: usize,
     pub pointer_allocations: usize,
+    /// Per-worker successful result and captured output UTF-8 bytes; each line costs one extra byte.
+    /// Excludes inputs, interpreter temporaries, diagnostics and allocator overhead.
+    pub worker_result_bytes: usize,
 }
 
 impl Default for Limits {
@@ -29,6 +32,7 @@ impl Default for Limits {
             array_bytes: 16 * 1024 * 1024,
             pointer_bytes: 16 * 1024 * 1024,
             pointer_allocations: 4096,
+            worker_result_bytes: 1024 * 1024,
         }
     }
 }
