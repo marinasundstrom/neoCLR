@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Streams.StreamError.InvalidRange
+  commentId: T:System.Streams.StreamError.InvalidRange
+  id: StreamError.InvalidRange
+  parent: System.Streams
+  children:
+  - System.Streams.StreamError.InvalidRange.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StreamError.InvalidRange
+  nameWithType: StreamError.InvalidRange
+  fullName: System.Streams.StreamError.InvalidRange
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Streams
+  summary: The buffer offset or count is negative or outside the array.
+  example: []
+  syntax:
+    content: public struct StreamError.InvalidRange
+    content.vb: Public Structure StreamError.InvalidRange
+- uid: System.Streams.StreamError.InvalidRange.#ctor
+  commentId: M:System.Streams.StreamError.InvalidRange.#ctor
+  id: '#ctor'
+  parent: System.Streams.StreamError.InvalidRange
+  langs:
+  - csharp
+  - vb
+  name: InvalidRange()
+  nameWithType: StreamError.InvalidRange.InvalidRange()
+  fullName: System.Streams.StreamError.InvalidRange.InvalidRange()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Streams
+  summary: Creates the InvalidRange case value.
+  example: []
+  syntax:
+    content: public InvalidRange()
+    content.vb: Public Sub New()
+  overload: System.Streams.StreamError.InvalidRange.#ctor*
+  nameWithType.vb: StreamError.InvalidRange.New()
+  fullName.vb: System.Streams.StreamError.InvalidRange.New()
+  name.vb: New()
+references:
+- uid: System.Streams
+  commentId: N:System.Streams
+  isExternal: true
+  href: System.html
+  name: System.Streams
+  nameWithType: System.Streams
+  fullName: System.Streams
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Streams
+    name: Streams
+    isExternal: true
+    href: System.Streams.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Streams
+    name: Streams
+    isExternal: true
+    href: System.Streams.html
+- uid: System.Streams.StreamError.InvalidRange.#ctor*
+  commentId: Overload:System.Streams.StreamError.InvalidRange.#ctor
+  isExternal: true
+  href: System.Streams.StreamError.InvalidRange.html#System_Streams_StreamError_InvalidRange__ctor
+  name: InvalidRange
+  nameWithType: StreamError.InvalidRange.InvalidRange
+  fullName: System.Streams.StreamError.InvalidRange.InvalidRange
+  nameWithType.vb: StreamError.InvalidRange.New
+  fullName.vb: System.Streams.StreamError.InvalidRange.New
+  name.vb: New

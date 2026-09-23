@@ -1,7 +1,7 @@
 # neoCLR API reference
 
 neoCLR is an **experimental application platform**. This reference describes the
-development API following Preview 9, starting with Tasks and explicit threads.
+development API following Preview 9, covering Tasks, explicit threads and the first file streams.
 The new System.Concurrency APIs require matching development artifacts; Preview 9
 downloads retain System.Threading. Names and contracts remain experimental;
 this reference does not promise compatibility with future releases.
@@ -21,8 +21,8 @@ The feature guides explain current behavior and provide small Raven examples:
 | [Dates and clocks](/features/time/index.html) | Calendar values, instants and clock access |
 | [Introspection](/features/introspection/index.html) | Inspecting assemblies, types and members |
 
-Streams, broader Storage and Encoding APIs are upcoming work; networking follows
-those foundations. They are not implied by this API index. Reference coverage is
+The [file stream guide](streams.md) describes the first blocking byte APIs. Broader
+Storage and Encoding APIs remain upcoming work; networking follows those foundations. Reference coverage is
 being expanded beyond the initial Preview 9 async overview.
 
 ## Browse namespaces
@@ -30,6 +30,7 @@ being expanded beyond the initial Preview 9 async overview.
 | Namespace | Types and purpose |
 | --- | --- |
 | [System.Tasks](xref:System.Tasks) | Task, Promise, TaskQueue and completion state |
+| [System.Streams](xref:System.Streams) | Directional file streams and typed errors; see the [stream guide](streams.md), including Flush |
 | [System.Concurrency](xref:System.Concurrency) | Explicit Thread lifecycle and the isolated ThreadPool; development after Preview 9 |
 
 Use the API reference navigation to expand each namespace and select a type.

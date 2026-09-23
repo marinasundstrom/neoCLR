@@ -1,0 +1,2 @@
+.include "generated/StreamError.methods.neoil"
+.include "generated/StreamError.helpers.neoil"

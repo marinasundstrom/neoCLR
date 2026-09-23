@@ -3,8 +3,9 @@
 **Development experiment, 2026-09-23. Not a public Storage or Stream API.**
 This is the first host-resource slice of the
 [post-release checkpoint](../../platform-roadmap.md#post-release-concurrency-direction--2026-09-23).
-The acceptance application will use Raven File/Directory and Stream abstractions;
-those wrappers, their reference pages and that application remain to be implemented.
+The [Raven provider sample](../storage-provider/README.md) now connects application-owned
+File/Directory objects to directional System.Streams file wrappers. Their complete
+on-site reference is linked from [the stream guide](../../../api-docs/streams.md).
 
 ## Exploration, not an API commitment
 
@@ -31,13 +32,15 @@ Compare the simpler alternatives and .NET baseline below when making those choic
 
 The VM owns a file table for each invocation, alongside its worker resources.
 Successful opens return an opaque positive integer, not an OS descriptor. Closing
-an issued handle is idempotent. IDs never recycle during an invocation, so a stale
-handle cannot accidentally address a later open. Another invocation has a separate
-table; handles are not transferable capabilities. All remaining files are dropped
+an issued handle is idempotent. IDs never recycle during the process, so a stale
+handle cannot accidentally address a later open, even if a guest wrapper survives
+into another invocation. Each invocation has a separate table and records which
+IDs it issued; handles are not transferable capabilities. The bounded Int32 ID
+space reports LimitExceeded on exhaustion rather than wrapping. All remaining files are dropped
 on success, fault, cancellation or instruction-budget exhaustion. GC does not own
-the native table; the public wrapper will need explicit resource release.
+the native table; the public wrappers provide explicit Close.
 
-The experimental services in `Services.neoil` support regular-file reads, opening
+The internal services in [FileStreams.neoil](../../../runtime/neoCLR/Runtime/FileStreams.neoil) support regular-file reads, opening
 an existing file for writes without truncation, exclusive creation, chunk reads and
 writes, flush, close, item-kind lookup and creating one directory. Creation does
 not replace an existing entry or recursively create missing parent directories.
@@ -63,10 +66,10 @@ Bootstrap transport uses an erased Value: Byte means an error and other payloads
 mean success (Int32 handle/count/status, or a Byte array for reads). Error codes are
 internal: invalid path, missing entry, access denied, wrong item kind, existing
 entry, closed/unknown handle, invalid range, resource limit, wrong access direction,
-and other I/O failure. These must become typed public outcomes in the library, not
-raw numeric errors in the application API. Invalid metadata or byte-array shape
-remains a runtime fault. The declarations are deliberately excluded from the
-application reference assembly and public DocFX API selection.
+and other I/O failure. The Raven library translates these to StreamError cases; raw numeric errors and
+handles are not part of the application API. Invalid metadata or byte-array shape
+remains a runtime fault. The bootstrap service declarations remain excluded from the application reference
+assembly. The public stream wrappers and typed errors have DocFX reference pages.
 
 ## Comparison and provisional decision
 
@@ -118,9 +121,8 @@ suspension or GC occurs during this blocking host call. An asynchronous version
 would need separate buffer rooting, exclusive-use and cancellation rules; the
 current mechanism does not establish those contracts.
 
-This is a prerequisite slice for connecting the provider sample to byte streams.
-The Raven sample still uses whole-text helpers. Public wrappers and their API
-reference remain pending; no application reference surface was added here.
+The subsequent Raven wrapper slice connects this boundary to the provider sample.
+The earlier whole-text workflow remains as a separate migration comparison.
 
 ## Validation and next slice
 
@@ -131,15 +133,13 @@ zero-size reads, direction errors, creation without overwrite, nontruncating wri
 invalid paths/ranges, handle limits and stale handles. This is lower-level evidence,
 not the requested public Raven application.
 
-Next: select and implement the minimal Storage provider/File/Directory wrappers,
-directional byte streams with explicit disposal and typed errors, then document all
-public members and compile the disk read/write application. Keep the existing
-whole-text helpers usable during migration. Decide how the initial array-based
-transfer shape relates to the proposals' Memory/ReadOnlyMemory before publishing it.
+The first public wrapper slice is described in the [stream guide](../../../api-docs/streams.md).
+Next, align Storage and explore the Path value object as directed by the author;
+keep cancellation, asynchronous buffer ownership and automatic disposal provisional.
 
 Validation on 2026-09-23: four host-resource unit cases and seven VM integration
-cases passed, including a real disk round trip. Public Raven API validation remains
-pending and must not be inferred from these lower-level checks.
+cases passed, including a real disk round trip. At that initial checkpoint, public Raven API validation was pending; the
+subsequent wrapper/sample evidence is recorded below.
 
 The managed-buffer integration cases additionally check aliases, untouched prefix
 and tail, partial reads, EOF, zero-count reads, invalid/overflowing ranges,
@@ -148,3 +148,8 @@ transfer limits, wrong access direction and the strict service signature.
 Validation after the managed-buffer slice: all 11 file-resource VM cases, four
 resource unit cases, six existing file-input and three file-output cases passed.
 The website/API-reference build and four website tooling tests also passed.
+
+After adding the Raven wrappers, five resource unit cases pass, including a retained
+handle rejected by a later invocation after that invocation opens its own file.
+The provider verifier now supplies end-to-end Raven evidence for disk/memory byte
+streams, explicit close, closed errors and exclusive creation.

@@ -3,10 +3,14 @@ notes.txt
 Written
 Hello, värld!
 Rejected write preserved contents
+Byte stream round trip: Hello, värld!
+Exclusive creation and closed streams checked
 Memory
 notes.txt
 Written
 Hello, värld!
 Rejected write preserved contents
+Byte stream round trip: Hello, värld!
+Exclusive creation and closed streams checked
 Direct child required
 Providers remain independent

@@ -1,0 +1,132 @@
+namespace StorageExperiment
+
+import System.*
+import System.Console.*
+import System.Collections.*
+import System.Result.*
+import System.Streams.*
+import System.Text.*
+
+func WriteMessage(output: OutputStream) -> Result<unit, StreamError> {
+    let message = Utf8.Encode("Hello, värld!")
+    let buffer: byte[] = [(byte)0, (byte)0, (byte)0]
+    var position = 0
+    while position < message.Count {
+        var count = 0
+        while count < buffer.Length && position < message.Count {
+            buffer[count] = message[position]
+            count += 1
+            position += 1
+        }
+        var offset = 0
+        while offset < count {
+            match output.Write(buffer, offset, count - offset) {
+                Ok(let written) => {
+                    if written <= 0 || written > count - offset {
+                        System.Fault("Invalid write progress")
+                    }
+                    offset += written
+                }
+                Error(let error) => return Error(error)
+            }
+        }
+    }
+    return output.Flush()
+}
+
+func ReadMessage(input: InputStream) -> Result<List<byte>, StreamError> {
+    let bytes: List<byte> = ArrayList<byte>()
+    let buffer: byte[] = [(byte)0, (byte)0, (byte)0]
+    var finished = false
+    while !finished {
+        match input.Read(buffer, 0, buffer.Length) {
+            Ok(let count) => {
+                if count == 0 {
+                    finished = true
+                }
+                if count > 64 - bytes.Count {
+                    return Error(StreamError(StreamError.LimitExceeded()))
+                }
+                var index = 0
+                while index < count {
+                    bytes.Add(buffer[index])
+                    index += 1
+                }
+            }
+            Error(let error) => return Error(error)
+        }
+    }
+    return Ok(bytes)
+}
+
+func ByteRoundTrip(directory: Directory) {
+    match directory.FileAt("stream.txt") {
+        Ok(let file) => {
+            match file.CreateNew() {
+                Ok(let output) => {
+                    let written = WriteMessage(output)
+                    // Close before inspecting either success or expected failure.
+                    output.Close()
+                    output.Close()
+                    match written {
+                        Ok(_) => { }
+                        Error(let error) => System.Fault(error.ToString())
+                    }
+                    match output.Flush() {
+                        Error(let error) => {
+                            if !error.IsClosed {
+                                System.Fault("Expected closed output")
+                            }
+                        }
+                        Ok(_) => System.Fault("Closed output flushed")
+                    }
+                }
+                Error(let error) => System.Fault(error.ToString())
+            }
+            match file.CreateNew() {
+                Error(let error) => {
+                    if !error.IsAlreadyExists {
+                        System.Fault("Expected exclusive creation")
+                    }
+                }
+                Ok(let unexpected) => {
+                    unexpected.Close()
+                    System.Fault("Creation replaced an existing file")
+                }
+            }
+            match file.OpenRead() {
+                Ok(let input) => {
+                    let read = ReadMessage(input)
+                    input.Close()
+                    input.Close()
+                    match read {
+                        Ok(let bytes) => {
+                            match Utf8.Decode(bytes) {
+                                Ok(let text) => {
+                                    if text != "Hello, värld!" {
+                                        System.Fault("Byte stream changed the message")
+                                    }
+                                    WriteLine("Byte stream round trip: " + text)
+                                }
+                                Error(let error) => System.Fault(error.ToString())
+                            }
+                        }
+                        Error(let error) => System.Fault(error.ToString())
+                    }
+                    let buffer: byte[] = [(byte)99]
+                    match input.Read(buffer, 0, 1) {
+                        Error(let error) => {
+                            if !error.IsClosed || buffer[0] != (byte)99 {
+                                System.Fault("Expected closed input with untouched buffer")
+                            }
+                        }
+                        Ok(_) => System.Fault("Closed input read")
+                    }
+                }
+                Error(let error) => System.Fault(error.ToString())
+            }
+            WriteLine("Exclusive creation and closed streams checked")
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+}

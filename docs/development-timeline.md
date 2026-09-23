@@ -5269,3 +5269,22 @@ and recorded the convention for runtime code as well as examples.
 - **Validation:** actionlint passed for both workflows. The documentation closeout
   uses a normal commit, without a skip marker, to check the new path filtering.
   Published release validation and website deployment were not cancelled.
+
+
+### 2026-09-23 — Working streams before Storage alignment
+
+- **Author:** “Once we have working read write operations with streams then we can
+  start aligning the Storage APIs. Even implement the Path value object”.
+- **Assistant response:** agreed to finish and validate stream reads/writes first,
+  then align Storage using that evidence and consider host paths separately from
+  provider-specific addresses. No final Path contract was proposed or accepted.
+- **Action:** implemented directional, blocking FileInputStream/FileOutputStream
+  wrappers with typed errors, hidden native handles and explicit Close. Connected
+  them to the experimental provider sample; the same byte workflow runs against
+  disk and deliberately short-transfer memory streams. Added process-unique native
+  IDs so retained streams cannot alias another invocation's resources.
+- **Evidence:** [sample and verifier](experiments/storage-provider/README.md) and
+  [on-site stream API guide](../api-docs/streams.md). The Raven MSBuild sample passed
+  with real disk-byte assertions. Storage alignment and the Path value object are
+  next; asynchronous I/O, buffer ownership across suspension and Task.Run scheduling
+  remain separate open work. This is development work after Preview 9.

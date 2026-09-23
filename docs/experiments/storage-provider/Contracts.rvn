@@ -1,0 +1,104 @@
+namespace StorageExperiment
+
+import System.*
+import System.Console.*
+import System.Result.*
+import System.Streams.*
+
+func ExpectError(result: Result<int, StreamError>, name: string) {
+    match result {
+        Error(let error) => {
+            if error.ToString() != name {
+                System.Fault("Wrong stream error")
+            }
+        }
+        Ok(_) => System.Fault("Expected stream error")
+    }
+}
+
+func ExpectCount(result: Result<int, StreamError>, expected: int) {
+    match result {
+        Ok(let count) => {
+            if count != expected {
+                System.Fault("Wrong transfer count")
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+}
+
+func Main() {
+    match FileInputStream.Open("missing-file") {
+        Error(let error) => {
+            if !error.IsNotFound {
+                System.Fault("Expected missing file")
+            }
+        }
+        Ok(let stream) => {
+            stream.Close()
+            System.Fault("Missing file opened")
+        }
+    }
+    match FileInputStream.Open("") {
+        Error(let error) => {
+            if !error.IsInvalidPath {
+                System.Fault("Expected invalid path")
+            }
+        }
+        Ok(let stream) => {
+            stream.Close()
+            System.Fault("Empty path opened")
+        }
+    }
+    match FileInputStream.Open(".") {
+        Error(let error) => {
+            if !error.IsWrongKind {
+                System.Fault("Expected wrong kind")
+            }
+        }
+        Ok(let stream) => {
+            stream.Close()
+            System.Fault("Directory opened as file")
+        }
+    }
+    let buffer: byte[] = [(byte)99, (byte)99, (byte)99]
+    let alias = buffer
+    match FileInputStream.Open("stream.txt") {
+        Ok(let input) => {
+            ExpectError(input.Read(buffer, -1, 1), "InvalidRange")
+            ExpectError(input.Read(buffer, 2, 2), "InvalidRange")
+            ExpectError(input.Read(buffer, 0, -1), "InvalidRange")
+            if alias[0] != (byte)99 || alias[1] != (byte)99 || alias[2] != (byte)99 {
+                System.Fault("Invalid reads changed buffer")
+            }
+            ExpectCount(input.Read(buffer, 3, 0), 0)
+            ExpectCount(input.Read(buffer, 1, 1), 1)
+            if alias[0] != (byte)99 || alias[1] != (byte)72 || alias[2] != (byte)99 {
+                System.Fault("Read lost alias or advanced on rejected operation")
+            }
+            input.Close()
+            ExpectError(input.Read(buffer, 0, 1), "Closed")
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    match FileOutputStream.CreateNew("failed-write.bin") {
+        Ok(let output) => {
+            ExpectError(output.Write(buffer, -1, 1), "InvalidRange")
+            ExpectError(output.Write(buffer, 2, 2), "InvalidRange")
+            ExpectCount(output.Write(buffer, 3, 0), 0)
+            output.Close()
+            ExpectError(output.Write(buffer, 0, 1), "Closed")
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    // Exceed the simultaneous-open budget cumulatively: Close must release slots.
+    var iteration = 0
+    while iteration < 70 {
+        match FileInputStream.Open("stream.txt") {
+            Ok(let input) => input.Close()
+            Error(let error) => System.Fault(error.ToString())
+        }
+        iteration += 1
+    }
+    WriteLine("Stream wrapper contracts: passed")
+}

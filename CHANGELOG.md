@@ -8,22 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
-- Explore provider-bound File and Directory descriptors in a compiled Raven sample.
-  Run the same bounded UTF-8 write/read workflow against disk and a one-slot memory
-  provider; keep child-address syntax in each provider. Document the complete
-  provisional sample contract in `/docs/`, with tested source downloads. These
-  application-owned types reuse whole-text helpers; platform byte-stream wrappers
-  and integration with the new file resources remain pending.
-
-- Start the file-stream resource foundation: invocation-owned regular-file handles,
-  bounded chunk transfers, explicit close, exclusive creation and item/directory
-  host operations. Add a caller-owned managed byte-buffer read with partial counts,
-  preserved aliases and untouched tails, and range checks before file consumption.
-  This is an experimental internal service boundary; public
-  Storage/Stream wrappers, reference pages and the Raven disk application remain
-  pending. Calls block; flush does not promise durable storage. Record the author's
-  clarification that this is architectural exploration, with API choices open to
-  revision based on the file application's evidence.
+- Add development System.Streams FileInputStream/FileOutputStream APIs with typed
+  StreamError results, bounded caller-buffer transfers, exclusive file creation,
+  flush and explicit close. These calls block; they do not implement async I/O or
+  durable flush. Connect the Raven provider sample to byte streams on disk and in
+  memory, including deliberate short transfers and actual UTF-8 disk verification.
+  Keep native IDs unique across invocations so retained wrappers cannot access a
+  later invocation's files. Add browsable API reference and source downloads.
+  Keep provider-owned child-address construction and the earlier bounded whole-text
+  workflow as exploratory comparison cases. Following the author's clarification,
+  align Storage and explore a Path value object next; application-owned provider contracts remain provisional.
 
 - Require on-site reference coverage for public API changes, including namespace
   navigation and documented renderer exclusions. Add System.Concurrency Thread and
@@ -37,7 +31,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Update bindings, samples, generated library, API docs and the development website
   section. Preserve the website's tested Preview 9 worker example. This breaks the
   old namespace and static Thread.Start spelling; rebuild with matching artifacts.
-  The Storage/Stream APIs and disk read/write acceptance app remain pending.
+  The first file Stream APIs and disk read/write acceptance app are now implemented
+  as described above; Storage alignment remains pending.
   Task.Run will need completion-only and generic
   value-returning overloads; keep it pending suspension/scheduling design rather
   than publishing a string-only worker facade.

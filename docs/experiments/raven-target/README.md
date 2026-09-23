@@ -696,3 +696,22 @@ reassess that boundary. No Raven lowering, reference-core signature or Runtime
 Contract setting changes in this follow-up. The shared Copy.rvn consumer is tested
 with both allocation pressure and a self-reposting BackgroundWork callback; an
 explicit-queue runtime test verifies default notifications do not run there.
+
+
+### Development file streams
+
+The reference/import profile admits System.Streams.FileInputStream and
+FileOutputStream with exact signatures and private resource constructors. Their
+Raven implementations call bootstrap-only RuntimeServices bindings for open,
+create, read-into, write, flush and close; application code cannot call those raw
+services. StreamError uses the existing typed error-carrier machinery. The compiler
+and Runtime Contract configuration are unchanged: ordinary reference classes,
+arrays and Result metadata use the existing CIL path. No Raven repository changes
+or new suspension semantics are part of this slice.
+
+Regenerate the library fragments and reference assembly together. The
+[provider sample](../storage-provider/README.md) uses normal SDK/MSBuild compilation;
+its verifier separately checks wrapper error paths, managed-array aliasing and
+resource-slot reuse. Stream wrappers are synchronous and invocation-bound; see the
+[stream guide](../../../api-docs/streams.md) for API details and the DocFX Flush
+renderer exclusion. This is development work after Preview 9.

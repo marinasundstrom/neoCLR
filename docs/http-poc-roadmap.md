@@ -70,7 +70,7 @@ one. Keep backend details out of the public contract.
 | Task and Result | [Task contracts](task-contracts.md), including the September 23 default dispatch, cancellation propagation and MapResult additions | External I/O registration/wakeup, cancellation requests/tokens, safe cleanup and pending-operation lifetime are still needed; queued continuations alone do not establish socket progress |
 | Text | [Current text contract](design/text-abstraction.md): grapheme Char, scalar access and strict UTF-8 conversions | Incremental decoding across byte chunks and an agreed minimal Encoding surface; no general Encoding hierarchy is established |
 | Collections and types | [Generic arrays](generic-managed-arrays.md), [collection contracts](collection-contracts.md), ordinary nominal interfaces and Result/Option | Safe buffer ranges and any small header/JSON lookup needs; neither full variance nor new type-expression metadata is a prerequisite |
-| I/O | [Bounded file API](raven-file-api.md), [stream design](stream-design.md) | Shared streams, guest networking APIs and guest JSON API are proposed work. Host JSON/module tooling is not evidence of a guest JSON library |
+| I/O | [Bounded file API](raven-file-api.md), [development file streams](experiments/storage-provider/README.md), [stream design](stream-design.md) | Blocking directional file streams now support the disk/memory Raven sample. General stream capabilities, asynchronous file I/O, guest networking APIs and guest JSON API remain proposed work. Host JSON/module tooling is not evidence of a guest JSON library |
 
 These links describe different dated slices. Later development additions take
 precedence over historical limitations within them. No new runtime validation was

@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Streams.StreamError.InvalidPath
+  commentId: T:System.Streams.StreamError.InvalidPath
+  id: StreamError.InvalidPath
+  parent: System.Streams
+  children:
+  - System.Streams.StreamError.InvalidPath.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StreamError.InvalidPath
+  nameWithType: StreamError.InvalidPath
+  fullName: System.Streams.StreamError.InvalidPath
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Streams
+  summary: The path is empty, contains a NUL, or is rejected as invalid by the host.
+  example: []
+  syntax:
+    content: public struct StreamError.InvalidPath
+    content.vb: Public Structure StreamError.InvalidPath
+- uid: System.Streams.StreamError.InvalidPath.#ctor
+  commentId: M:System.Streams.StreamError.InvalidPath.#ctor
+  id: '#ctor'
+  parent: System.Streams.StreamError.InvalidPath
+  langs:
+  - csharp
+  - vb
+  name: InvalidPath()
+  nameWithType: StreamError.InvalidPath.InvalidPath()
+  fullName: System.Streams.StreamError.InvalidPath.InvalidPath()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Streams
+  summary: Creates the InvalidPath case value.
+  example: []
+  syntax:
+    content: public InvalidPath()
+    content.vb: Public Sub New()
+  overload: System.Streams.StreamError.InvalidPath.#ctor*
+  nameWithType.vb: StreamError.InvalidPath.New()
+  fullName.vb: System.Streams.StreamError.InvalidPath.New()
+  name.vb: New()
+references:
+- uid: System.Streams
+  commentId: N:System.Streams
+  isExternal: true
+  href: System.html
+  name: System.Streams
+  nameWithType: System.Streams
+  fullName: System.Streams
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Streams
+    name: Streams
+    isExternal: true
+    href: System.Streams.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Streams
+    name: Streams
+    isExternal: true
+    href: System.Streams.html
+- uid: System.Streams.StreamError.InvalidPath.#ctor*
+  commentId: Overload:System.Streams.StreamError.InvalidPath.#ctor
+  isExternal: true
+  href: System.Streams.StreamError.InvalidPath.html#System_Streams_StreamError_InvalidPath__ctor
+  name: InvalidPath
+  nameWithType: StreamError.InvalidPath.InvalidPath
+  fullName: System.Streams.StreamError.InvalidPath.InvalidPath
+  nameWithType.vb: StreamError.InvalidPath.New
+  fullName.vb: System.Streams.StreamError.InvalidPath.New
+  name.vb: New

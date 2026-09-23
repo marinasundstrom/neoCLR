@@ -2,6 +2,9 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Collections.Sequence",
   "inputs": {
+    "runtime/raven/src/System/Streams/StreamError.rvn": "b32980c3816c7843eb4bc2a95c4c38f87e7ad8b9a4f709a1353647fc05cc93b1",
+    "runtime/raven/src/System/Streams/FileInputStream.rvn": "d12261144ba2888725a13db58c0cdba0917b138e8dc204cc5ce2dff737bd6723",
+    "runtime/raven/src/System/Streams/FileOutputStream.rvn": "20ccefc75a3b3d9690f9adc741c4a124f5a3219c6dae660b9219b0b8a4810301",
     "runtime/raven/src/System/Tasks/TaskOutcome.rvn": "746ea27b2d33c5840214ce6ca154e969205b45880aef4e1959a5c65b35e5b5e6",
     "runtime/raven/src/System/Tasks/TaskState.rvn": "297cecd35247b5d8b83e6b9c2d7288a556bd6ec81071f4c0d269d251b64acc87",
     "runtime/raven/src/System/Tasks/Tasks.rvn": "5c88a6a8c203f5276956456421b5b15400b10b18e239d37b97603e457255f237",
@@ -85,7 +88,7 @@
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
-    "runtime/raven/System.Runtime.rvnproj": "1520ee1b596677e7e6b41dcd271c2e5e79556a5c1db1e657728c785b5db20812",
+    "runtime/raven/System.Runtime.rvnproj": "ed5e0ffe4c0fe7b320091a59f3c77a2769d72375603117f02a3b777930552605",
     "build/NeoCLR.Raven.props": "b7d01e1d6b23228bb784dafcda4cf7c777b554b11f093cc3daf2509bb7402ee0"
   },
   "outputs": {
@@ -93,7 +96,7 @@
     "Sequence.helpers.neoil": "cd539bcdf789da3a2d2c0fee65b9472d05f64cd5f3b0e80f5c1a6afbac97ec02"
   },
   "compilerSha256": "a21ff0939cef995e7ae6cd714369622658098222036d95a1309151213f597467",
-  "coreSha256": "271eeae5d1815c89a341a24de056069e6912bd2618a20866fa5828c4c54f158c",
+  "coreSha256": "ad5230d16dde5e2bf6d3cd2cad789b1be9b35450cd4a9f022f4b9ccab7dfae65",
   "exports": [
     "get_Item(Int32 index) -> T0"
   ]

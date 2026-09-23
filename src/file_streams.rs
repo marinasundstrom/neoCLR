@@ -2,10 +2,15 @@
 //! Integer handles are private runtime transport, not OS descriptors or capabilities.
 use crate::{Fault, Limits, Value, metadata::Type};
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     fs::{File, OpenOptions},
     io::{Read, Write},
+    sync::atomic::{AtomicI32, Ordering},
 };
+
+// IDs are process-unique so a guest stream retained across invocations cannot
+// accidentally address a newly opened file in another invocation. Never wrap.
+static NEXT_HANDLE: AtomicI32 = AtomicI32::new(1);
 
 const MAX_OPEN_FILES: usize = 64;
 const MAX_TRANSFER: usize = 64 * 1024;
@@ -58,7 +63,7 @@ struct OpenFile {
 #[derive(Default)]
 pub(crate) struct Files {
     open: HashMap<i32, OpenFile>,
-    next: i32,
+    issued: HashSet<i32>,
 }
 fn path(path: &str) -> Result<&std::path::Path, Error> {
     if path.is_empty() || path.contains('\0') {
@@ -77,9 +82,12 @@ fn regular(path: &std::path::Path) -> Result<(), Error> {
 impl Files {
     fn open(&mut self, name: &str, mode: Operation) -> Result<i32, Error> {
         let path = path(name)?;
-        if self.open.len() >= MAX_OPEN_FILES || self.next == i32::MAX {
+        if self.open.len() >= MAX_OPEN_FILES {
             return Err(Error::LimitExceeded);
         }
+        let id = NEXT_HANDLE
+            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+            .map_err(|_| Error::LimitExceeded)?;
         let writable = !matches!(mode, Operation::OpenRead);
         let file = if matches!(mode, Operation::CreateNew) {
             // Exclusive creation never replaces an existing file or follows an existing link.
@@ -96,9 +104,9 @@ impl Files {
         if !file.metadata()?.is_file() {
             return Err(Error::WrongKind);
         }
-        self.next += 1;
-        self.open.insert(self.next, OpenFile { file, writable });
-        Ok(self.next)
+        self.issued.insert(id);
+        self.open.insert(id, OpenFile { file, writable });
+        Ok(id)
     }
     fn get(&mut self, id: i32, writable: bool) -> Result<&mut File, Error> {
         let entry = self.open.get_mut(&id).ok_or(Error::Closed)?;
@@ -136,7 +144,7 @@ impl Files {
         }
     }
     fn close(&mut self, id: i32) -> Result<i32, Error> {
-        if id <= 0 || id > self.next {
+        if !self.issued.contains(&id) {
             return Err(Error::Closed);
         }
         // Idempotent release; IDs never recycle within an invocation.
@@ -360,23 +368,34 @@ mod tests {
         assert_eq!(files.close(id + 1), Err(Error::Closed));
     }
     #[test]
+    fn retained_handle_cannot_alias_another_invocations_file() {
+        let fixture = Fixture::new();
+        let path = fixture.path("data");
+        std::fs::write(&path, b"abc").unwrap();
+        let old = Files::default().open(&path, Operation::OpenRead).unwrap();
+        let mut next = Files::default();
+        let current = next.open(&path, Operation::OpenRead).unwrap();
+        assert_ne!(old, current);
+        assert_eq!(next.read(old, 1), Err(Error::Closed));
+        assert_eq!(next.close(old), Err(Error::Closed));
+        assert_eq!(next.read(current, 1).unwrap(), b"a");
+    }
+    #[test]
     fn live_handle_limit_recovers_without_reusing_ids() {
         let fixture = Fixture::new();
         let path = fixture.path("data");
         std::fs::write(&path, b"abc").unwrap();
         let mut files = Files::default();
-        for _ in 0..MAX_OPEN_FILES {
-            files.open(&path, Operation::OpenRead).unwrap();
-        }
+        let handles: Vec<_> = (0..MAX_OPEN_FILES)
+            .map(|_| files.open(&path, Operation::OpenRead).unwrap())
+            .collect();
         assert_eq!(
             files.open(&path, Operation::OpenRead),
             Err(Error::LimitExceeded)
         );
-        files.close(1).unwrap();
-        assert_eq!(
-            files.open(&path, Operation::OpenRead).unwrap(),
-            MAX_OPEN_FILES as i32 + 1
-        );
-        assert_eq!(files.read(1, 1), Err(Error::Closed));
+        files.close(handles[0]).unwrap();
+        let next = files.open(&path, Operation::OpenRead).unwrap();
+        assert!(!handles.contains(&next));
+        assert_eq!(files.read(handles[0], 1), Err(Error::Closed));
     }
 }

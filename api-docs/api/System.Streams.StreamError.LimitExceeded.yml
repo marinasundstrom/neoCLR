@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Streams.StreamError.LimitExceeded
+  commentId: T:System.Streams.StreamError.LimitExceeded
+  id: StreamError.LimitExceeded
+  parent: System.Streams
+  children:
+  - System.Streams.StreamError.LimitExceeded.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StreamError.LimitExceeded
+  nameWithType: StreamError.LimitExceeded
+  fullName: System.Streams.StreamError.LimitExceeded
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Streams
+  summary: The request exceeds a transfer or resource limit.
+  example: []
+  syntax:
+    content: public struct StreamError.LimitExceeded
+    content.vb: Public Structure StreamError.LimitExceeded
+- uid: System.Streams.StreamError.LimitExceeded.#ctor
+  commentId: M:System.Streams.StreamError.LimitExceeded.#ctor
+  id: '#ctor'
+  parent: System.Streams.StreamError.LimitExceeded
+  langs:
+  - csharp
+  - vb
+  name: LimitExceeded()
+  nameWithType: StreamError.LimitExceeded.LimitExceeded()
+  fullName: System.Streams.StreamError.LimitExceeded.LimitExceeded()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Streams
+  summary: Creates the LimitExceeded case value.
+  example: []
+  syntax:
+    content: public LimitExceeded()
+    content.vb: Public Sub New()
+  overload: System.Streams.StreamError.LimitExceeded.#ctor*
+  nameWithType.vb: StreamError.LimitExceeded.New()
+  fullName.vb: System.Streams.StreamError.LimitExceeded.New()
+  name.vb: New()
+references:
+- uid: System.Streams
+  commentId: N:System.Streams
+  isExternal: true
+  href: System.html
+  name: System.Streams
+  nameWithType: System.Streams
+  fullName: System.Streams
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Streams
+    name: Streams
+    isExternal: true
+    href: System.Streams.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Streams
+    name: Streams
+    isExternal: true
+    href: System.Streams.html
+- uid: System.Streams.StreamError.LimitExceeded.#ctor*
+  commentId: Overload:System.Streams.StreamError.LimitExceeded.#ctor
+  isExternal: true
+  href: System.Streams.StreamError.LimitExceeded.html#System_Streams_StreamError_LimitExceeded__ctor
+  name: LimitExceeded
+  nameWithType: StreamError.LimitExceeded.LimitExceeded
+  fullName: System.Streams.StreamError.LimitExceeded.LimitExceeded
+  nameWithType.vb: StreamError.LimitExceeded.New
+  fullName.vb: System.Streams.StreamError.LimitExceeded.New
+  name.vb: New

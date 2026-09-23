@@ -1,0 +1,150 @@
+; Generated from runtime/raven/src/System/Streams/FileInputStream.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorInvalidPath(System.Streams.StreamError.InvalidPath value) -> System.Streams.StreamError
+ldarg value
+newobj instance System.Streams.StreamError::.ctor(System.Streams.StreamError.InvalidPath)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorNotFound(System.Streams.StreamError.NotFound value) -> System.Streams.StreamError
+ldarg value
+newobj instance System.Streams.StreamError::.ctor(System.Streams.StreamError.NotFound)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorAccessDenied(System.Streams.StreamError.AccessDenied value) -> System.Streams.StreamError
+ldarg value
+newobj instance System.Streams.StreamError::.ctor(System.Streams.StreamError.AccessDenied)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorWrongKind(System.Streams.StreamError.WrongKind value) -> System.Streams.StreamError
+ldarg value
+newobj instance System.Streams.StreamError::.ctor(System.Streams.StreamError.WrongKind)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorAlreadyExists(System.Streams.StreamError.AlreadyExists value) -> System.Streams.StreamError
+ldarg value
+newobj instance System.Streams.StreamError::.ctor(System.Streams.StreamError.AlreadyExists)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorClosed(System.Streams.StreamError.Closed value) -> System.Streams.StreamError
+ldarg value
+newobj instance System.Streams.StreamError::.ctor(System.Streams.StreamError.Closed)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorInvalidRange(System.Streams.StreamError.InvalidRange value) -> System.Streams.StreamError
+ldarg value
+newobj instance System.Streams.StreamError::.ctor(System.Streams.StreamError.InvalidRange)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorLimitExceeded(System.Streams.StreamError.LimitExceeded value) -> System.Streams.StreamError
+ldarg value
+newobj instance System.Streams.StreamError::.ctor(System.Streams.StreamError.LimitExceeded)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorWrongAccess(System.Streams.StreamError.WrongAccess value) -> System.Streams.StreamError
+ldarg value
+newobj instance System.Streams.StreamError::.ctor(System.Streams.StreamError.WrongAccess)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorIoFailure(System.Streams.StreamError.IoFailure value) -> System.Streams.StreamError
+ldarg value
+newobj instance System.Streams.StreamError::.ctor(System.Streams.StreamError.IoFailure)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorInvalidPathNew() -> System.Streams.StreamError.InvalidPath
+newobj instance System.Streams.StreamError.InvalidPath::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNotFoundNew() -> System.Streams.StreamError.NotFound
+newobj instance System.Streams.StreamError.NotFound::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorAccessDeniedNew() -> System.Streams.StreamError.AccessDenied
+newobj instance System.Streams.StreamError.AccessDenied::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorWrongKindNew() -> System.Streams.StreamError.WrongKind
+newobj instance System.Streams.StreamError.WrongKind::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorAlreadyExistsNew() -> System.Streams.StreamError.AlreadyExists
+newobj instance System.Streams.StreamError.AlreadyExists::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorClosedNew() -> System.Streams.StreamError.Closed
+newobj instance System.Streams.StreamError.Closed::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorInvalidRangeNew() -> System.Streams.StreamError.InvalidRange
+newobj instance System.Streams.StreamError.InvalidRange::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorLimitExceededNew() -> System.Streams.StreamError.LimitExceeded
+newobj instance System.Streams.StreamError.LimitExceeded::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorWrongAccessNew() -> System.Streams.StreamError.WrongAccess
+newobj instance System.Streams.StreamError.WrongAccess::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorIoFailureNew() -> System.Streams.StreamError.IoFailure
+newobj instance System.Streams.StreamError.IoFailure::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion0(System.Streams.StreamError arg0) -> System.Result.Error<System.Streams.StreamError>
+ldarg arg0
+newobj instance System.Result.Error<System.Streams.StreamError>::.ctor(System.Streams.StreamError)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion1(System.Result.Error<System.Streams.StreamError> arg0) -> System.Result<System.Streams.FileInputStream,System.Streams.StreamError>
+ldarg arg0
+newobj instance System.Result<System.Streams.FileInputStream,System.Streams.StreamError>::.ctor(System.Result.Error<System.Streams.StreamError>)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion2(System.Streams.FileInputStream arg0) -> System.Result.Ok<System.Streams.FileInputStream>
+ldarg arg0
+newobj instance System.Result.Ok<System.Streams.FileInputStream>::.ctor(System.Streams.FileInputStream)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion3(System.Result.Ok<System.Streams.FileInputStream> arg0) -> System.Result<System.Streams.FileInputStream,System.Streams.StreamError>
+ldarg arg0
+newobj instance System.Result<System.Streams.FileInputStream,System.Streams.StreamError>::.ctor(System.Result.Ok<System.Streams.FileInputStream>)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion4(System.Result.Error<System.Streams.StreamError> arg0) -> System.Result<Int32,System.Streams.StreamError>
+ldarg arg0
+newobj instance System.Result<Int32,System.Streams.StreamError>::.ctor(System.Result.Error<System.Streams.StreamError>)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion5(Int32 arg0) -> System.Result.Ok<Int32>
+ldarg arg0
+newobj instance System.Result.Ok<Int32>::.ctor(Int32)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion6(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.Streams.StreamError>
+ldarg arg0
+newobj instance System.Result<Int32,System.Streams.StreamError>::.ctor(System.Result.Ok<Int32>)
+ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

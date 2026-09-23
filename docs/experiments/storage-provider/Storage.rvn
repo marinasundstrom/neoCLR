@@ -1,14 +1,18 @@
 namespace StorageExperiment
 
 import System.*
+import System.Collections.*
+import System.Streams.*
 import System.Result.*
 import System.Storage.FileReadError
 import System.Storage.FileWriteError
 
 // Experimental application-owned contract. Text methods are a temporary adapter
-// over existing helpers, not a proposed final storage-provider interface.
+// over existing helpers; byte streams are a separate incremental experiment.
 interface StorageProvider {
     func FileAt(directory: string, name: string) -> File
+    func OpenRead(path: string) -> Result<InputStream, StreamError>
+    func CreateNew(path: string) -> Result<OutputStream, StreamError>
     func ReadText(path: string, maxBytes: int) -> Result<string, FileReadError>
     func WriteText(path: string, text: string, maxBytes: int) -> Result<unit, FileWriteError>
 }
@@ -26,6 +30,14 @@ class File {
 
     val Path: string => path
     val Name: string => name
+
+    func OpenRead() -> Result<InputStream, StreamError> {
+        return provider.OpenRead(path)
+    }
+
+    func CreateNew() -> Result<OutputStream, StreamError> {
+        return provider.CreateNew(path)
+    }
 
     func ReadText(maxBytes: int) -> Result<string, FileReadError> {
         return provider.ReadText(path, maxBytes)
@@ -59,6 +71,26 @@ class Directory {
 }
 
 class HostStorage : StorageProvider {
+    func OpenRead(path: string) -> Result<InputStream, StreamError> {
+        return match FileInputStream.Open(path) {
+            Ok(let stream) => {
+                let adapter: InputStream = DiskInput(stream)
+                Ok(adapter)
+            }
+            Error(let error) => Error(error)
+        }
+    }
+
+    func CreateNew(path: string) -> Result<OutputStream, StreamError> {
+        return match FileOutputStream.CreateNew(path) {
+            Ok(let stream) => {
+                let adapter: OutputStream = DiskOutput(stream)
+                Ok(adapter)
+            }
+            Error(let error) => Error(error)
+        }
+    }
+
     func FileAt(directory: string, name: string) -> File {
         return File(self, System.Storage.Path.Combine(directory, name), name)
     }
@@ -75,6 +107,32 @@ class HostStorage : StorageProvider {
 // Deliberately one slot: enough to check provider retention and the sample's
 // behavior without pretending to implement a general in-memory filesystem.
 class MemorySlotStorage : StorageProvider {
+    // Separate byte slot while the old whole-text adapter remains in the sample.
+    private field bytePresent: bool = false
+    private field bytePath: string = ""
+    private field bytes: List<byte> = ArrayList<byte>()
+
+    func OpenRead(path: string) -> Result<InputStream, StreamError> {
+        if !bytePresent || bytePath != path {
+            return Error(StreamError(StreamError.NotFound()))
+        }
+        let stream: InputStream = MemoryInput(bytes)
+        return Ok(stream)
+    }
+
+    func CreateNew(path: string) -> Result<OutputStream, StreamError> {
+        if bytePresent {
+            if bytePath == path {
+                return Error(StreamError(StreamError.AlreadyExists()))
+            }
+            return Error(StreamError(StreamError.LimitExceeded()))
+        }
+        bytePresent = true
+        bytePath = path
+        let stream: OutputStream = MemoryOutput(bytes)
+        return Ok(stream)
+    }
+
     func FileAt(directory: string, name: string) -> File {
         // A logical key deliberately different from a host filesystem path.
         return File(self, directory + "::" + name, name)

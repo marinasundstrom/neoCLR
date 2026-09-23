@@ -23,6 +23,7 @@ def inputs():
     paths = list((ROOT / 'docs/experiments/raven-target').glob('*.cs'))
     paths += list((ROOT / 'runtime/raven/src/System/Tasks').glob('*.rvn'))
     paths += list((ROOT / 'runtime/raven/src/System/Concurrency').glob('*.rvn'))
+    paths += list((ROOT / 'runtime/raven/src/System/Streams').glob('*.rvn'))
     paths += [DOCS / name for name in ('NeoCLR.CoreProbe.xml', 'filter.yml', 'docfx.json')]
     paths += [ROOT / '.config/dotnet-tools.json']
     return {str(p.relative_to(ROOT)): digest(p) for p in sorted(paths)}

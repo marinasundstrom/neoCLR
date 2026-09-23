@@ -2,6 +2,8 @@
   <Import Project="$(NeoCLRRoot)/build/NeoCLR.Raven.props" />
   <ItemGroup>
     <Compile Include="Storage.rvn" />
+    <Compile Include="Streams.rvn" />
+    <Compile Include="ByteRoundTrip.rvn" />
     <Compile Include="Main.rvn" />
   </ItemGroup>
   <Import Project="$(NeoCLRRoot)/build/NeoCLR.Raven.targets" />

@@ -65,8 +65,10 @@ func Main() {
     let temporary = Directory(memory, ".")
     WriteLine("Disk")
     RoundTrip(disk)
+    ByteRoundTrip(disk)
     WriteLine("Memory")
     RoundTrip(temporary)
+    ByteRoundTrip(temporary)
     match temporary.FileAt("notes.txt") {
         Ok(let file) => {
             if file.Path != ".::notes.txt" {

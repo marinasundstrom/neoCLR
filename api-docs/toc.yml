@@ -8,3 +8,5 @@
   href: callbacks.md
 - name: Storage experiment
   href: storage-experiment.md
+- name: File streams
+  href: streams.md

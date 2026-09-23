@@ -1,0 +1,357 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Streams
+  commentId: N:System.Streams
+  id: System.Streams
+  children:
+  - System.Streams.FileInputStream
+  - System.Streams.FileOutputStream
+  - System.Streams.StreamError
+  - System.Streams.StreamError.AccessDenied
+  - System.Streams.StreamError.AlreadyExists
+  - System.Streams.StreamError.Closed
+  - System.Streams.StreamError.InvalidPath
+  - System.Streams.StreamError.InvalidRange
+  - System.Streams.StreamError.IoFailure
+  - System.Streams.StreamError.LimitExceeded
+  - System.Streams.StreamError.NotFound
+  - System.Streams.StreamError.WrongAccess
+  - System.Streams.StreamError.WrongKind
+  langs:
+  - csharp
+  - vb
+  name: System.Streams
+  nameWithType: System.Streams
+  fullName: System.Streams
+  type: Namespace
+  assemblies:
+  - NeoCLR.CoreProbe
+references:
+- uid: System.Streams.StreamError
+  commentId: T:System.Streams.StreamError
+  isExternal: true
+  href: System.Streams.StreamError.html
+  name: StreamError
+  nameWithType: StreamError
+  fullName: System.Streams.StreamError
+- uid: System.Streams.StreamError.InvalidPath
+  commentId: T:System.Streams.StreamError.InvalidPath
+  parent: System.Streams
+  isExternal: true
+  href: System.Streams.StreamError.html
+  name: StreamError.InvalidPath
+  nameWithType: StreamError.InvalidPath
+  fullName: System.Streams.StreamError.InvalidPath
+  spec.csharp:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.Streams.StreamError.InvalidPath.html
+  spec.vb:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.Streams.StreamError.InvalidPath.html
+- uid: System.Streams.StreamError.NotFound
+  commentId: T:System.Streams.StreamError.NotFound
+  parent: System.Streams
+  isExternal: true
+  href: System.Streams.StreamError.html
+  name: StreamError.NotFound
+  nameWithType: StreamError.NotFound
+  fullName: System.Streams.StreamError.NotFound
+  spec.csharp:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.Streams.StreamError.NotFound.html
+  spec.vb:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.Streams.StreamError.NotFound.html
+- uid: System.Streams.StreamError.AccessDenied
+  commentId: T:System.Streams.StreamError.AccessDenied
+  parent: System.Streams
+  isExternal: true
+  href: System.Streams.StreamError.html
+  name: StreamError.AccessDenied
+  nameWithType: StreamError.AccessDenied
+  fullName: System.Streams.StreamError.AccessDenied
+  spec.csharp:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.Streams.StreamError.AccessDenied.html
+  spec.vb:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.Streams.StreamError.AccessDenied.html
+- uid: System.Streams.StreamError.WrongKind
+  commentId: T:System.Streams.StreamError.WrongKind
+  parent: System.Streams
+  isExternal: true
+  href: System.Streams.StreamError.html
+  name: StreamError.WrongKind
+  nameWithType: StreamError.WrongKind
+  fullName: System.Streams.StreamError.WrongKind
+  spec.csharp:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.WrongKind
+    name: WrongKind
+    isExternal: true
+    href: System.Streams.StreamError.WrongKind.html
+  spec.vb:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.WrongKind
+    name: WrongKind
+    isExternal: true
+    href: System.Streams.StreamError.WrongKind.html
+- uid: System.Streams.StreamError.AlreadyExists
+  commentId: T:System.Streams.StreamError.AlreadyExists
+  parent: System.Streams
+  isExternal: true
+  href: System.Streams.StreamError.html
+  name: StreamError.AlreadyExists
+  nameWithType: StreamError.AlreadyExists
+  fullName: System.Streams.StreamError.AlreadyExists
+  spec.csharp:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.AlreadyExists
+    name: AlreadyExists
+    isExternal: true
+    href: System.Streams.StreamError.AlreadyExists.html
+  spec.vb:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.AlreadyExists
+    name: AlreadyExists
+    isExternal: true
+    href: System.Streams.StreamError.AlreadyExists.html
+- uid: System.Streams.StreamError.Closed
+  commentId: T:System.Streams.StreamError.Closed
+  parent: System.Streams
+  isExternal: true
+  href: System.Streams.StreamError.html
+  name: StreamError.Closed
+  nameWithType: StreamError.Closed
+  fullName: System.Streams.StreamError.Closed
+  spec.csharp:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.Closed
+    name: Closed
+    isExternal: true
+    href: System.Streams.StreamError.Closed.html
+  spec.vb:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.Closed
+    name: Closed
+    isExternal: true
+    href: System.Streams.StreamError.Closed.html
+- uid: System.Streams.StreamError.InvalidRange
+  commentId: T:System.Streams.StreamError.InvalidRange
+  parent: System.Streams
+  isExternal: true
+  href: System.Streams.StreamError.html
+  name: StreamError.InvalidRange
+  nameWithType: StreamError.InvalidRange
+  fullName: System.Streams.StreamError.InvalidRange
+  spec.csharp:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.InvalidRange
+    name: InvalidRange
+    isExternal: true
+    href: System.Streams.StreamError.InvalidRange.html
+  spec.vb:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.InvalidRange
+    name: InvalidRange
+    isExternal: true
+    href: System.Streams.StreamError.InvalidRange.html
+- uid: System.Streams.StreamError.LimitExceeded
+  commentId: T:System.Streams.StreamError.LimitExceeded
+  parent: System.Streams
+  isExternal: true
+  href: System.Streams.StreamError.html
+  name: StreamError.LimitExceeded
+  nameWithType: StreamError.LimitExceeded
+  fullName: System.Streams.StreamError.LimitExceeded
+  spec.csharp:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.LimitExceeded
+    name: LimitExceeded
+    isExternal: true
+    href: System.Streams.StreamError.LimitExceeded.html
+  spec.vb:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.LimitExceeded
+    name: LimitExceeded
+    isExternal: true
+    href: System.Streams.StreamError.LimitExceeded.html
+- uid: System.Streams.StreamError.WrongAccess
+  commentId: T:System.Streams.StreamError.WrongAccess
+  parent: System.Streams
+  isExternal: true
+  href: System.Streams.StreamError.html
+  name: StreamError.WrongAccess
+  nameWithType: StreamError.WrongAccess
+  fullName: System.Streams.StreamError.WrongAccess
+  spec.csharp:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.WrongAccess
+    name: WrongAccess
+    isExternal: true
+    href: System.Streams.StreamError.WrongAccess.html
+  spec.vb:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.WrongAccess
+    name: WrongAccess
+    isExternal: true
+    href: System.Streams.StreamError.WrongAccess.html
+- uid: System.Streams.StreamError.IoFailure
+  commentId: T:System.Streams.StreamError.IoFailure
+  parent: System.Streams
+  isExternal: true
+  href: System.Streams.StreamError.html
+  name: StreamError.IoFailure
+  nameWithType: StreamError.IoFailure
+  fullName: System.Streams.StreamError.IoFailure
+  spec.csharp:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.IoFailure
+    name: IoFailure
+    isExternal: true
+    href: System.Streams.StreamError.IoFailure.html
+  spec.vb:
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: .
+  - uid: System.Streams.StreamError.IoFailure
+    name: IoFailure
+    isExternal: true
+    href: System.Streams.StreamError.IoFailure.html
+- uid: System.Streams.FileInputStream
+  commentId: T:System.Streams.FileInputStream
+  isExternal: true
+  href: System.Streams.FileInputStream.html
+  name: FileInputStream
+  nameWithType: FileInputStream
+  fullName: System.Streams.FileInputStream
+- uid: System.Streams.FileOutputStream
+  commentId: T:System.Streams.FileOutputStream
+  isExternal: true
+  href: System.Streams.FileOutputStream.html
+  name: FileOutputStream
+  nameWithType: FileOutputStream
+  fullName: System.Streams.FileOutputStream
+- uid: System.Streams
+  commentId: N:System.Streams
+  isExternal: true
+  href: System.html
+  name: System.Streams
+  nameWithType: System.Streams
+  fullName: System.Streams
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Streams
+    name: Streams
+    isExternal: true
+    href: System.Streams.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Streams
+    name: Streams
+    isExternal: true
+    href: System.Streams.html

@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Streams.StreamError.Closed
+  commentId: T:System.Streams.StreamError.Closed
+  id: StreamError.Closed
+  parent: System.Streams
+  children:
+  - System.Streams.StreamError.Closed.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StreamError.Closed
+  nameWithType: StreamError.Closed
+  fullName: System.Streams.StreamError.Closed
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Streams
+  summary: The stream is closed or its owning invocation has ended.
+  example: []
+  syntax:
+    content: public struct StreamError.Closed
+    content.vb: Public Structure StreamError.Closed
+- uid: System.Streams.StreamError.Closed.#ctor
+  commentId: M:System.Streams.StreamError.Closed.#ctor
+  id: '#ctor'
+  parent: System.Streams.StreamError.Closed
+  langs:
+  - csharp
+  - vb
+  name: Closed()
+  nameWithType: StreamError.Closed.Closed()
+  fullName: System.Streams.StreamError.Closed.Closed()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Streams
+  summary: Creates the Closed case value.
+  example: []
+  syntax:
+    content: public Closed()
+    content.vb: Public Sub New()
+  overload: System.Streams.StreamError.Closed.#ctor*
+  nameWithType.vb: StreamError.Closed.New()
+  fullName.vb: System.Streams.StreamError.Closed.New()
+  name.vb: New()
+references:
+- uid: System.Streams
+  commentId: N:System.Streams
+  isExternal: true
+  href: System.html
+  name: System.Streams
+  nameWithType: System.Streams
+  fullName: System.Streams
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Streams
+    name: Streams
+    isExternal: true
+    href: System.Streams.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Streams
+    name: Streams
+    isExternal: true
+    href: System.Streams.html
+- uid: System.Streams.StreamError.Closed.#ctor*
+  commentId: Overload:System.Streams.StreamError.Closed.#ctor
+  isExternal: true
+  href: System.Streams.StreamError.Closed.html#System_Streams_StreamError_Closed__ctor
+  name: Closed
+  nameWithType: StreamError.Closed.Closed
+  fullName: System.Streams.StreamError.Closed.Closed
+  nameWithType.vb: StreamError.Closed.New
+  fullName.vb: System.Streams.StreamError.Closed.New
+  name.vb: New

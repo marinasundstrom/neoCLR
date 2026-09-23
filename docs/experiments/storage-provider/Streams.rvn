@@ -1,0 +1,144 @@
+namespace StorageExperiment
+
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Streams.*
+
+// Application-owned capability experiment. Calls complete synchronously.
+interface InputStream {
+    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError>
+    func Close()
+}
+
+interface OutputStream {
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError>
+    func Flush() -> Result<unit, StreamError>
+    func Close()
+}
+
+class DiskInput : InputStream {
+    private field stream: FileInputStream
+
+    init(stream: FileInputStream) {
+        self.stream = stream
+    }
+
+    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        return stream.Read(buffer, offset, count)
+    }
+
+    func Close() {
+        stream.Close()
+    }
+}
+
+class DiskOutput : OutputStream {
+    private field stream: FileOutputStream
+
+    init(stream: FileOutputStream) {
+        self.stream = stream
+    }
+
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        return stream.Write(buffer, offset, count)
+    }
+
+    func Flush() -> Result<unit, StreamError> {
+        return stream.Flush()
+    }
+
+    func Close() {
+        stream.Close()
+    }
+}
+
+// Two-byte transfers deliberately exercise short-read and short-write loops.
+class MemoryInput : InputStream {
+    private field bytes: List<byte>
+    private field position: int = 0
+    private field closed: bool = false
+
+    init(bytes: List<byte>) {
+        self.bytes = bytes
+    }
+
+    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError(StreamError.Closed()))
+        }
+        if offset < 0 {
+            return Error(StreamError(StreamError.InvalidRange()))
+        }
+        if count < 0 {
+            return Error(StreamError(StreamError.InvalidRange()))
+        }
+        if offset > buffer.Length {
+            return Error(StreamError(StreamError.InvalidRange()))
+        }
+        if count > buffer.Length - offset {
+            return Error(StreamError(StreamError.InvalidRange()))
+        }
+        if count > 65536 {
+            return Error(StreamError(StreamError.LimitExceeded()))
+        }
+        var read = 0
+        while read < count && read < 2 && position < bytes.Count {
+            buffer[offset + read] = bytes[position]
+            position += 1
+            read += 1
+        }
+        return Ok(read)
+    }
+
+    func Close() {
+        closed = true
+    }
+}
+
+class MemoryOutput : OutputStream {
+    private field bytes: List<byte>
+    private field closed: bool = false
+
+    init(bytes: List<byte>) {
+        self.bytes = bytes
+    }
+
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError(StreamError.Closed()))
+        }
+        if offset < 0 {
+            return Error(StreamError(StreamError.InvalidRange()))
+        }
+        if count < 0 {
+            return Error(StreamError(StreamError.InvalidRange()))
+        }
+        if offset > buffer.Length {
+            return Error(StreamError(StreamError.InvalidRange()))
+        }
+        if count > buffer.Length - offset {
+            return Error(StreamError(StreamError.InvalidRange()))
+        }
+        if count > 65536 || count > 65536 - bytes.Count {
+            return Error(StreamError(StreamError.LimitExceeded()))
+        }
+        var written = 0
+        while written < count && written < 2 {
+            bytes.Add(buffer[offset + written])
+            written += 1
+        }
+        return Ok(written)
+    }
+
+    func Flush() -> Result<unit, StreamError> {
+        if closed {
+            return Error(StreamError(StreamError.Closed()))
+        }
+        return Ok(())
+    }
+
+    func Close() {
+        closed = true
+    }
+}

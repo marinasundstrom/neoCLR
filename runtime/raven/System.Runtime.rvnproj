@@ -248,4 +248,13 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Workers'">
     <Compile Include="src/System/Concurrency/Workers.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StreamError'">
+    <Compile Include="src/System/Streams/StreamError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileInputStream'">
+    <Compile Include="src/System/Streams/FileInputStream.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileOutputStream'">
+    <Compile Include="src/System/Streams/FileOutputStream.rvn" />
+  </ItemGroup>
 </Project>

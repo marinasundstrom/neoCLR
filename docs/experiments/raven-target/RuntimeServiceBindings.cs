@@ -10,6 +10,12 @@ static class RuntimeServiceBindings
     static readonly (string Name, string[] Args, string Result)[] Members =
         UnaryMath.Select(n => ("Math" + n, new[] { "Double" }, "Double"))
         .Concat(BinaryMath.Select(n => ("Math" + n, new[] { "Double", "Double" }, "Double"))).Concat(new (string Name, string[] Args, string Result)[] {
+            ("FileOpenRead", ["String"], "Value"),
+            ("FileCreateNew", ["String"], "Value"),
+            ("FileReadInto", ["Int32", "arrayref<Byte>", "Int32", "Int32"], "Value"),
+            ("FileWriteChunk", ["Int32", "arrayref<Byte>", "Int32", "Int32"], "Value"),
+            ("FileFlush", ["Int32"], "Value"),
+            ("FileClose", ["Int32"], "Value"),
             ("StartWorker", ["System.Func<String,String>", "String"], "Int32"),
             ("QueueWorker", ["System.Func<String,String>", "String"], "Int32"),
             ("JoinWorker", ["Int32"], "String"),

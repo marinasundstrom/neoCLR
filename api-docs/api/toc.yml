@@ -10,6 +10,49 @@ items:
   - uid: System.Concurrency.ThreadPool
     name: ThreadPool
     type: Class
+- uid: System.Streams
+  name: System.Streams
+  type: Namespace
+  items:
+  - uid: System.Streams.FileInputStream
+    name: FileInputStream
+    type: Class
+  - uid: System.Streams.FileOutputStream
+    name: FileOutputStream
+    type: Class
+  - uid: System.Streams.StreamError
+    name: StreamError
+    type: Struct
+  - uid: System.Streams.StreamError.AccessDenied
+    name: StreamError.AccessDenied
+    type: Struct
+  - uid: System.Streams.StreamError.AlreadyExists
+    name: StreamError.AlreadyExists
+    type: Struct
+  - uid: System.Streams.StreamError.Closed
+    name: StreamError.Closed
+    type: Struct
+  - uid: System.Streams.StreamError.InvalidPath
+    name: StreamError.InvalidPath
+    type: Struct
+  - uid: System.Streams.StreamError.InvalidRange
+    name: StreamError.InvalidRange
+    type: Struct
+  - uid: System.Streams.StreamError.IoFailure
+    name: StreamError.IoFailure
+    type: Struct
+  - uid: System.Streams.StreamError.LimitExceeded
+    name: StreamError.LimitExceeded
+    type: Struct
+  - uid: System.Streams.StreamError.NotFound
+    name: StreamError.NotFound
+    type: Struct
+  - uid: System.Streams.StreamError.WrongAccess
+    name: StreamError.WrongAccess
+    type: Struct
+  - uid: System.Streams.StreamError.WrongKind
+    name: StreamError.WrongKind
+    type: Struct
 - uid: System.Tasks
   name: System.Tasks
   type: Namespace

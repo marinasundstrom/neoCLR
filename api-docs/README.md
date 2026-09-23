@@ -98,3 +98,7 @@ The API header uses plain neoCLR branding. Its small logo margin is supplied by
 [DocFX custom template hook](https://dotnet.github.io/docfx/docs/template.html).
 The combined site builder converts root-relative reference links, including DocFX's
 client-side navigation JSON, to page-relative links for GitHub Pages project paths.
+
+The development stream slice includes System.Streams in generated reference.
+FileOutputStream.Flush returns Result<System.Void, StreamError>, which DocFX 2.80.1
+cannot render; its exact signature and full contract live in [streams.md](streams.md).

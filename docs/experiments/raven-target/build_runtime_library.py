@@ -10,6 +10,10 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'StreamError': 'System.Streams.StreamError',
+    'FileInputStream': 'System.Streams.FileInputStream',
+    'FileOutputStream': 'System.Streams.FileOutputStream',
+
     'TaskOutcome': 'System.Tasks.TaskOutcome',
     'TaskState': 'System.Tasks.TaskState',
     'Tasks': 'System.Tasks.Task',
@@ -100,6 +104,10 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'StreamError': 'runtime/raven/src/System/Streams/StreamError.rvn',
+    'FileInputStream': 'runtime/raven/src/System/Streams/FileInputStream.rvn',
+    'FileOutputStream': 'runtime/raven/src/System/Streams/FileOutputStream.rvn',
+
     'TaskOutcome': 'runtime/raven/src/System/Tasks/TaskOutcome.rvn',
     'TaskState': 'runtime/raven/src/System/Tasks/TaskState.rvn',
     'Tasks': 'runtime/raven/src/System/Tasks/Tasks.rvn',

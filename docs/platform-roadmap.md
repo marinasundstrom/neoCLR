@@ -122,19 +122,23 @@ The explicit Thread slice is implemented and checked: retained Task before Start
 one-shot Start, construction-queue affinity and native termination before completion.
 Evidence: [worker sample](experiments/raven-target/samples/library-workers.rvn),
 [eight contract cases](experiments/task-contract/verify_workers.py), default-queue
-regressions and Rust worker tests. Task/Promise remain in System.Tasks. The next
-bounded task is Storage and file Stream resource ownership. The
-[file-resource experiment](experiments/file-streams/README.md) begins with an
-invocation-owned host table, bounded transfers and explicit close. Public Storage
-and Stream wrappers and the full acceptance application remain pending. A subsequent
-[provider-bound Raven experiment](experiments/storage-provider/README.md) runs the
-same text workflow against disk and memory and documents its provisional contract
-on the website. It delegates address construction to the provider, preserving the
-architectural boundary. It still uses the existing whole-text helpers; connecting
-those objects to directional byte streams is next. A managed-buffer read service
-now supplies the missing caller-owned array boundary, with partial-read, alias and
-range validation; it remains internal and blocking. Preserve typed errors and
-explicit resource ownership in the file slice.
+regressions and Rust worker tests. Task/Promise remain in System.Tasks. The file-resource backend and first directional Raven stream wrappers are now
+implemented. [FileInputStream and FileOutputStream](../api-docs/streams.md) provide
+blocking, bounded reads/writes, exclusive creation, typed failures and explicit close.
+The [provider-bound disk/memory sample](experiments/storage-provider/README.md)
+uses both whole-text helpers and the new byte streams. Three-byte caller buffers
+and a memory backend restricted to two-byte transfers exercise partial-transfer
+loops; the verifier checks actual UTF-8 disk bytes. This supplies the checkpoint's
+first disk read/write stream application, not a completed Storage model or async I/O.
+
+**Author clarification, 2026-09-23:** establish working stream reads and writes
+before aligning the Storage APIs, including investigating/implementing the Path
+value object. That Storage alignment is the next bounded slice. Compare the
+proposal's path value, provider-specific addresses, lazy File descriptors and eager
+lookup against .NET Path/FileInfo, preserving the tested stream operations. The
+current application-owned File/Directory and capability interfaces remain
+exploratory; do not promote their string-address/text-helper shape unchanged merely
+because this sample works. Public stream wrappers have on-site reference coverage.
 Networking remains later.
 
 Task represents work independently of an OS thread. The current host can submit to

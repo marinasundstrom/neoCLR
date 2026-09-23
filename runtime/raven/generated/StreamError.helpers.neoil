@@ -1,0 +1,145 @@
+; Generated from runtime/raven/src/System/Streams/StreamError.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Streams.StreamError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.type System.Streams.StreamError.InvalidPath
+.method instance .ctor() -> Void
+M00000020_IL_0000:
+M00000020_IL_0001:
+ldarg 0
+M00000020_IL_0002:
+pop
+M00000020_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Streams.StreamError.NotFound
+.method instance .ctor() -> Void
+M00000021_IL_0000:
+M00000021_IL_0001:
+ldarg 0
+M00000021_IL_0002:
+pop
+M00000021_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Streams.StreamError.AccessDenied
+.method instance .ctor() -> Void
+M00000022_IL_0000:
+M00000022_IL_0001:
+ldarg 0
+M00000022_IL_0002:
+pop
+M00000022_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Streams.StreamError.WrongKind
+.method instance .ctor() -> Void
+M00000023_IL_0000:
+M00000023_IL_0001:
+ldarg 0
+M00000023_IL_0002:
+pop
+M00000023_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Streams.StreamError.AlreadyExists
+.method instance .ctor() -> Void
+M00000024_IL_0000:
+M00000024_IL_0001:
+ldarg 0
+M00000024_IL_0002:
+pop
+M00000024_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Streams.StreamError.Closed
+.method instance .ctor() -> Void
+M00000025_IL_0000:
+M00000025_IL_0001:
+ldarg 0
+M00000025_IL_0002:
+pop
+M00000025_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Streams.StreamError.InvalidRange
+.method instance .ctor() -> Void
+M00000026_IL_0000:
+M00000026_IL_0001:
+ldarg 0
+M00000026_IL_0002:
+pop
+M00000026_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Streams.StreamError.LimitExceeded
+.method instance .ctor() -> Void
+M00000027_IL_0000:
+M00000027_IL_0001:
+ldarg 0
+M00000027_IL_0002:
+pop
+M00000027_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Streams.StreamError.WrongAccess
+.method instance .ctor() -> Void
+M00000028_IL_0000:
+M00000028_IL_0001:
+ldarg 0
+M00000028_IL_0002:
+pop
+M00000028_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Streams.StreamError.IoFailure
+.method instance .ctor() -> Void
+M00000029_IL_0000:
+M00000029_IL_0001:
+ldarg 0
+M00000029_IL_0002:
+pop
+M00000029_IL_0007:
+ldvoid
+ret
+.end
+.end

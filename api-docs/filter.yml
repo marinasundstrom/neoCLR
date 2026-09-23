@@ -1,5 +1,8 @@
 apiRules:
 - exclude:
+    uidRegex: '^System\.Streams\.FileOutputStream\.Flush($|\()'
+    type: Method
+- exclude:
     uidRegex: '^System\.Concurrency\.ThreadPool\.#ctor'
 - exclude:
     uidRegex: '^System\.Tasks\.(TaskQueue\.(Post|Run)|Task`1\.OnCompleted)(\(|$)'
@@ -14,5 +17,10 @@ apiRules:
     type: Namespace
 - include:
     uidRegex: '^System\.Concurrency\.(Thread|ThreadPool)($|\.)'
+- include:
+    uidRegex: '^System\.Streams$'
+    type: Namespace
+- include:
+    uidRegex: '^System\.Streams\.(FileInputStream|FileOutputStream|StreamError)($|\.)'
 - exclude:
     uidRegex: '.*'

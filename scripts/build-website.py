@@ -205,7 +205,7 @@ def main():
         shutil.copyfile(source_sample, downloads / name)
     storage_downloads = downloads / 'storage-provider'
     storage_downloads.mkdir()
-    for name in ('Storage.rvn', 'Main.rvn', 'StorageExplorer.rvnproj', 'expected.txt'):
+    for name in ('Storage.rvn', 'Streams.rvn', 'ByteRoundTrip.rvn', 'Main.rvn', 'StorageExplorer.rvnproj', 'expected.txt'):
         shutil.copyfile(ROOT / 'docs/experiments/storage-provider' / name, storage_downloads / name)
     pages = {}
     for source in sorted(SOURCE.rglob('*.html')):

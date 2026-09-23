@@ -5,6 +5,7 @@ using System.Text;
 static class ErrorBindings
 {
     public static readonly Dictionary<string, string[]> Cases = new() {
+        ["System.Streams.StreamError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "AlreadyExists", "Closed", "InvalidRange", "LimitExceeded", "WrongAccess", "IoFailure"],
         ["System.Storage.FileReadError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "ReadFailed", "InvalidUtf8"],
         ["System.Storage.FileWriteError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "WriteFailed"],
         ["System.ConsoleReadError"] = ["Unavailable", "ReadFailed"],

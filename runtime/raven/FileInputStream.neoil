@@ -1,0 +1,2 @@
+.include "generated/FileInputStream.methods.neoil"
+.include "generated/FileInputStream.helpers.neoil"

@@ -1,6 +1,6 @@
 # Provider-bound File and Directory exploration
 
-**Development experiment, 2026-09-23. Application-owned types, not new System APIs.**
+**Development experiment, 2026-09-23. Application-owned Storage/capability types using development System.Streams APIs.**
 The same Raven `RoundTrip(Directory)` workflow writes and reads a real UTF-8 file
 and then runs against a one-slot memory provider. The application sees File and
 Directory objects; each retains the provider that interprets its address.
@@ -11,7 +11,7 @@ Run against matching development artifacts:
 python3 docs/experiments/storage-provider/verify.py --toolchain-root /path/to/bundle
 ```
 
-The verifier builds the saved MSBuild project with both Raven files, runs in a
+The verifier builds the saved MSBuild project with all four Raven files, runs in a
 disposable working directory, checks
 exact output and actual disk bytes, and removes its fixture. No sample file is
 written into the checkout. It also checks that rejected oversized writes preserve
@@ -52,14 +52,15 @@ claim that these types are part of the platform's core reference assembly.
   direct provider calls still use host permissions.
 - **Text:** ReadText/WriteText temporarily reuse the existing bounded whole-file
   helpers and their error families. A final provider should expose byte streams;
-  text/encoding convenience belongs above that boundary. The native resource
-  experiment is not yet connected to these Raven objects.
+  text/encoding convenience belongs above that boundary. The byte workflow now
+  uses native-resource-backed System.Streams wrappers independently of those helpers.
 - **Lifetime:** these descriptors hold no open file; the existing helper opens and
-  closes per operation. This says nothing yet about disposing an open stream across
-  suspension. That is the next integration question.
-- **Memory provider:** deliberately stores one file. It proves interchangeable
-  application behavior for this case, not filesystem conformance, arbitrary paths,
-  concurrent access, directories or shared-storage semantics.
+  closes per text operation. Byte streams require explicit Close and otherwise live
+  until invocation teardown. Disposal across suspension is still unproven.
+- **Memory provider:** retains one text slot and one separate byte slot during this
+  migration experiment. They are not coherent views of the same file. Byte streams
+  share a list, have separate input cursors and transfer at most two bytes per call.
+  This tests application progress loops, not filesystem conformance or concurrency.
 
 The existing compiler reference's error cases require explicit carrier construction
 inside inferred Result.Error values; direct nested case construction did not compile.
@@ -76,7 +77,39 @@ The benefit is test substitution and provider-owned addressing; the cost is anot
 contract, retained references and unresolved provider identity/validation rules.
 This is not a claim of performance or general superiority over .NET.
 
-The [file-resource experiment](../file-streams/README.md) separately compares native
-file lifetime and chunked I/O with FileStream and Rust's host APIs. Next, connect
-provider-owned File objects to directional byte streams, compare read-into-buffer
-against returned chunks, and test explicit cleanup before committing public shapes.
+The [file-resource experiment](../file-streams/README.md) compares native file lifetime
+and chunked I/O with FileStream and Rust's host APIs. The sample now connects File
+objects to directional byte streams with explicit close. System.Streams wrappers
+hide native handles, return StreamError cases and are documented through generated
+DocFX metadata plus the Flush renderer exception in the on-site guide.
+
+## Byte workflow evidence and next slice
+
+`ByteRoundTrip(Directory)` writes `Hello, värld!` using three-byte buffers and loops
+until every write completes. It flushes and closes, opens an input, reads until EOF,
+closes, and decodes the accumulated bytes (limited to 64). It also checks exclusive
+creation and repeated close/Closed failures. Memory transfers are capped at two
+bytes to expose incorrect all-or-nothing assumptions; the disk fixture verifies
+exact UTF-8 bytes. No Raven compiler changes were needed.
+
+FileInputStream and FileOutputStream separate the .NET FileStream directions,
+while retaining the familiar array/offset/count partial-transfer baseline. The
+extra types and shared provisional error family are tradeoffs, not a superiority
+claim. This first wrapper is synchronous, has no finalizer/automatic disposal and
+makes no durability guarantee. Memory views, asynchronous ownership and general
+System.Streams capability interfaces are still open.
+
+The author now directs Storage alignment, including exploring a Path value object,
+after this working read/write slice. Keep addresses and provider identity separate;
+do not promote the temporary text-helper provider contract unchanged.
+
+The verifier also compiles `Contracts.rvn` separately through the normal SDK. It
+checks missing/empty/directory paths, rejected ranges before input consumption or
+output mutation, managed-buffer aliases and untouched elements, zero-count calls,
+Closed errors, and 70 open/close cycles against the 64-live-file budget.
+
+Validation on 2026-09-23: the product sample and separate wrapper contracts passed
+through normal MSBuild compilation. Five native file-resource unit cases, eleven
+VM integration cases and eight existing Thread/worker cases passed. All Raven
+library slices regenerated, snapshot checks matched, and the website/API-reference
+build and four website tooling tests passed. No cross-platform matrix was rerun.

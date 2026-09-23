@@ -1,0 +1,341 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Streams.FileInputStream
+  commentId: T:System.Streams.FileInputStream
+  id: FileInputStream
+  parent: System.Streams
+  children:
+  - System.Streams.FileInputStream.Close
+  - System.Streams.FileInputStream.Open(System.String)
+  - System.Streams.FileInputStream.Read(System.Byte[],System.Int32,System.Int32)
+  langs:
+  - csharp
+  - vb
+  name: FileInputStream
+  nameWithType: FileInputStream
+  fullName: System.Streams.FileInputStream
+  type: Class
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Streams
+  summary: A blocking, explicitly closed file read stream. Development API, not included in Preview 9.
+  remarks: Native resources belong to the invocation. Close promptly; invocation teardown closes remaining files. A retained stream cannot be reused in another invocation. There is no finalizer, automatic disposal, seeking or asynchronous scheduling in this slice.
+  example: []
+  syntax:
+    content: public sealed class FileInputStream
+    content.vb: Public NotInheritable Class FileInputStream
+  inheritance:
+  - System.Object
+- uid: System.Streams.FileInputStream.Open(System.String)
+  commentId: M:System.Streams.FileInputStream.Open(System.String)
+  id: Open(System.String)
+  parent: System.Streams.FileInputStream
+  langs:
+  - csharp
+  - vb
+  name: Open(string)
+  nameWithType: FileInputStream.Open(string)
+  fullName: System.Streams.FileInputStream.Open(string)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Streams
+  summary: Opens an existing regular file for reading, positioned at its beginning.
+  example: []
+  syntax:
+    content: public static Result<FileInputStream, StreamError> Open(string path)
+    parameters:
+    - id: path
+      type: System.String
+      description: Host filesystem path; normal host permissions and symlink resolution apply.
+    return:
+      type: System.Result{System.Streams.FileInputStream,System.Streams.StreamError}
+      description: Ok with a new input stream, or an error such as InvalidPath, NotFound, AccessDenied, WrongKind or LimitExceeded.
+    content.vb: Public Shared Function Open(path As String) As Result(Of FileInputStream, StreamError)
+  overload: System.Streams.FileInputStream.Open*
+  nameWithType.vb: FileInputStream.Open(String)
+  fullName.vb: System.Streams.FileInputStream.Open(String)
+  name.vb: Open(String)
+- uid: System.Streams.FileInputStream.Read(System.Byte[],System.Int32,System.Int32)
+  commentId: M:System.Streams.FileInputStream.Read(System.Byte[],System.Int32,System.Int32)
+  id: Read(System.Byte[],System.Int32,System.Int32)
+  parent: System.Streams.FileInputStream
+  langs:
+  - csharp
+  - vb
+  name: Read(byte[], int, int)
+  nameWithType: FileInputStream.Read(byte[], int, int)
+  fullName: System.Streams.FileInputStream.Read(byte[], int, int)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Streams
+  summary: Attempts one partial read using a caller-owned byte array.
+  remarks: Calls block. A read changes only the transferred range. A zero count returns zero without establishing EOF; a positive-count read returning zero means EOF. Writes may be partial; loop until all bytes have been accepted.
+  example: []
+  syntax:
+    content: public Result<int, StreamError> Read(byte[] buffer, int offset, int count)
+    parameters:
+    - id: buffer
+      type: System.Byte[]
+      description: Managed byte array. Do not mutate it during the call.
+    - id: offset
+      type: System.Int32
+      description: Zero-based start index.
+    - id: count
+      type: System.Int32
+      description: Maximum bytes to transfer; zero through 65536, within the array range.
+    return:
+      type: System.Result{System.Int32,System.Streams.StreamError}
+      description: Ok with the transferred count, or a typed StreamError. Invalid ranges fail before I/O.
+    content.vb: Public Function Read(buffer As Byte(), offset As Integer, count As Integer) As Result(Of Integer, StreamError)
+  overload: System.Streams.FileInputStream.Read*
+  nameWithType.vb: FileInputStream.Read(Byte(), Integer, Integer)
+  fullName.vb: System.Streams.FileInputStream.Read(Byte(), Integer, Integer)
+  name.vb: Read(Byte(), Integer, Integer)
+- uid: System.Streams.FileInputStream.Close
+  commentId: M:System.Streams.FileInputStream.Close
+  id: Close
+  parent: System.Streams.FileInputStream
+  langs:
+  - csharp
+  - vb
+  name: Close()
+  nameWithType: FileInputStream.Close()
+  fullName: System.Streams.FileInputStream.Close()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Streams
+  summary: Releases the open file. Repeated calls are harmless.
+  remarks: Subsequent operations return Closed. Close is not a flush or durability guarantee and does not report OS close errors. Invocation teardown releases resources after an unhandled runtime fault.
+  example: []
+  syntax:
+    content: public void Close()
+    content.vb: Public Sub Close()
+  overload: System.Streams.FileInputStream.Close*
+references:
+- uid: System.Streams
+  commentId: N:System.Streams
+  isExternal: true
+  href: System.html
+  name: System.Streams
+  nameWithType: System.Streams
+  fullName: System.Streams
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Streams
+    name: Streams
+    isExternal: true
+    href: System.Streams.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Streams
+    name: Streams
+    isExternal: true
+    href: System.Streams.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Streams.FileInputStream.Open*
+  commentId: Overload:System.Streams.FileInputStream.Open
+  isExternal: true
+  href: System.Streams.FileInputStream.html#System_Streams_FileInputStream_Open_System_String_
+  name: Open
+  nameWithType: FileInputStream.Open
+  fullName: System.Streams.FileInputStream.Open
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System.Result{System.Streams.FileInputStream,System.Streams.StreamError}
+  commentId: T:System.Result{System.Streams.FileInputStream,System.Streams.StreamError}
+  parent: System
+  definition: System.Result`2
+  href: System.Streams.FileInputStream.html
+  name: Result<FileInputStream, StreamError>
+  nameWithType: Result<FileInputStream, StreamError>
+  fullName: System.Result<System.Streams.FileInputStream, System.Streams.StreamError>
+  nameWithType.vb: Result(Of FileInputStream, StreamError)
+  fullName.vb: System.Result(Of System.Streams.FileInputStream, System.Streams.StreamError)
+  name.vb: Result(Of FileInputStream, StreamError)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - uid: System.Streams.FileInputStream
+    name: FileInputStream
+    isExternal: true
+    href: System.Streams.FileInputStream.html
+  - name: ','
+  - name: " "
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Streams.FileInputStream
+    name: FileInputStream
+    isExternal: true
+    href: System.Streams.FileInputStream.html
+  - name: ','
+  - name: " "
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: )
+- uid: System.Result`2
+  commentId: T:System.Result`2
+  isExternal: true
+  name: Result<T, E>
+  nameWithType: Result<T, E>
+  fullName: System.Result<T, E>
+  nameWithType.vb: Result(Of T, E)
+  fullName.vb: System.Result(Of T, E)
+  name.vb: Result(Of T, E)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: )
+- uid: System.Streams.FileInputStream.Read*
+  commentId: Overload:System.Streams.FileInputStream.Read
+  isExternal: true
+  href: System.Streams.FileInputStream.html#System_Streams_FileInputStream_Read_System_Byte___System_Int32_System_Int32_
+  name: Read
+  nameWithType: FileInputStream.Read
+  fullName: System.Streams.FileInputStream.Read
+- uid: System.Byte[]
+  isExternal: true
+  name: byte[]
+  nameWithType: byte[]
+  fullName: byte[]
+  nameWithType.vb: Byte()
+  fullName.vb: Byte()
+  name.vb: Byte()
+  spec.csharp:
+  - uid: System.Byte
+    name: byte
+    isExternal: true
+  - name: '['
+  - name: ']'
+  spec.vb:
+  - uid: System.Byte
+    name: Byte
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System.Result{System.Int32,System.Streams.StreamError}
+  commentId: T:System.Result{System.Int32,System.Streams.StreamError}
+  parent: System
+  definition: System.Result`2
+  href: System.Streams.StreamError.html
+  name: Result<int, StreamError>
+  nameWithType: Result<int, StreamError>
+  fullName: System.Result<int, System.Streams.StreamError>
+  nameWithType.vb: Result(Of Integer, StreamError)
+  fullName.vb: System.Result(Of Integer, System.Streams.StreamError)
+  name.vb: Result(Of Integer, StreamError)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - uid: System.Int32
+    name: int
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Streams.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.Streams.StreamError.html
+  - name: )
+- uid: System.Streams.FileInputStream.Close*
+  commentId: Overload:System.Streams.FileInputStream.Close
+  isExternal: true
+  href: System.Streams.FileInputStream.html#System_Streams_FileInputStream_Close
+  name: Close
+  nameWithType: FileInputStream.Close
+  fullName: System.Streams.FileInputStream.Close
