@@ -9,7 +9,7 @@ import sys
 import tempfile
 
 HERE = Path(__file__).resolve().parent
-BRIDGE = HERE.parent / 'raven-target'
+BRIDGE = HERE.parent if (HERE.parent / 'run_project.py').is_file() else HERE.parent / 'raven-target'
 sys.path.insert(0, str(BRIDGE))
 from runner_options import add_toolchain_arguments, runner_arguments
 

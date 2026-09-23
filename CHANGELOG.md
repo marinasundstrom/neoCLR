@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Prepare async preview packaging: include the current Task probes in the evaluator
+  bundle, make their helper/sample paths work after extraction, replace the obsolete
+  explicit-worker-queue expectation and add an eight-sample saved-project Async
+  Workbench check with a JSON report. Document the packaged commands; release
+  certification remains separate from these focused checks.
+
 - Make the author-approved async/Tasks preview checkpoint the immediate
   priority: stabilize the existing completion/await/composition and isolated-worker surface, require a
   fresh evaluator bundle and exact-candidate release gates, and leave HTTP and the

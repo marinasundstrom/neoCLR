@@ -69,6 +69,35 @@ Verify both runtime-level neoIL samples:
 python3 tools/verify_neoil.py --samples samples/neoil --system lib/System.neoil --runtime bin/neoclr
 ```
 
+## Async Workbench
+
+The development async/Tasks surface includes Task/Promise, named async functions,
+await, Map/Then/MapResult, Result propagation and producer cancellation. Workers are
+isolated and exchange text; ordinary queued joins can block the default dispatcher.
+The separate nonblocking notification adapter and guest cancellation tokens are not
+part of this sample set.
+
+Run eight saved-source examples through the packaged MSBuild workflow:
+
+```sh
+python3 tools/verify_async_workbench.py --bundle . --sdk /absolute/path/to/raven-sdk --report async-workbench.json
+```
+
+The check uses fresh temporary projects and asserts exact output for default-queue
+workers, dedicated/pool workers, Promise, composition, Result mapping/propagation,
+cancelled await and pending await. Copy any matching `tools/samples/library-task-*.rvn`
+or `library-async-*.rvn` over `msbuild-demo/Main.rvn` to explore it in the editor.
+
+The deeper probes are included under `tools/task-contract`. For example:
+
+```sh
+python3 tools/task-contract/verify_workers.py demo/Demo.rvnproj --bridge tools/bridge/Probe.dll --system lib/System.neoil --runtime bin/neoclr
+python3 tools/task-contract/verify_async.py demo/Demo.rvnproj --bridge tools/bridge/Probe.dll --system lib/System.neoil --runtime bin/neoclr
+python3 tools/task-contract/verify_editor.py msbuild-demo
+```
+
+These are focused checks, not a complete release or platform certification.
+
 Run the repeatable Raven sample suite:
 
 ```sh

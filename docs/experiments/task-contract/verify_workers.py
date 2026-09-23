@@ -11,7 +11,9 @@ parser.add_argument('--bridge', type=Path, required=True)
 parser.add_argument('--system', type=Path, required=True)
 parser.add_argument('--runtime', type=Path, required=True)
 args = parser.parse_args()
-sample = Path(__file__).resolve().parents[1] / 'raven-target/samples/library-workers.rvn'
+parent = Path(__file__).resolve().parents[1]
+samples = parent / 'samples' if (parent / 'samples').is_dir() else parent / 'raven-target/samples'
+sample = samples / 'library-workers.rvn'
 prelude = '''import System.*
 import System.Tasks.*
 import System.Threading.*
@@ -25,7 +27,7 @@ cases = [
         let suffix = "!"
         queue.Run(() => { _ = Thread.Start(value => value + suffix, "input") })
     }''', '', 'cannot capture guest state'),
-    ('Scope required', prelude + 'func Main() { _ = Thread.Start(Echo, "input") }', '', 'requires an active TaskQueue'),
+    ('Default queue without explicit scope', prelude + 'func Main() { _ = Thread.Start(Echo, "input") }', '', None),
     ('Multiple pool jobs', prelude + '''
 public async func Work() -> Task<unit> {
     let first = ThreadPool.Queue(Echo, "one")

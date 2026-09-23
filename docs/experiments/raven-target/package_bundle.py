@@ -49,8 +49,13 @@ shutil.copytree(sdk / 'tools/language-server', output / 'tools/server')
 for name in ('run_project.py', 'runner_options.py', 'configure_tasks.py', 'verify_project.py',
              'verify_editor.py', 'verify_msbuild.py', 'verify_array_api.py', 'verify_neoil.py', 'verify_file_project.py', 'verify_process.py', 'verify_clock.py', 'verify_error_values.py',
              'verify_unions.py', 'verify_matches.py', 'verify_delegates.py', 'verify_native_buffer.py',
-             'verify_application.py', 'verify_orders.py', 'verify_queries.py', 'query_basic_cases.py', 'verify_outcome_operators.py', 'verify_collection_capabilities.py', 'verify_compiler_target.py', 'verify_library_import.py'):
+             'verify_async_workbench.py', 'verify_application.py', 'verify_orders.py', 'verify_queries.py', 'query_basic_cases.py', 'verify_outcome_operators.py', 'verify_collection_capabilities.py', 'verify_compiler_target.py', 'verify_library_import.py'):
     shutil.copyfile(HERE / name, output / 'tools' / name)
+# Keep current Task probes runnable using only the extracted package.
+(output / 'tools/task-contract').mkdir()
+for name in ('verify_tasks.py', 'verify_composition.py', 'verify_async.py',
+             'verify_default_queue.py', 'verify_workers.py', 'verify_map_result.py', 'verify_editor.py'):
+    shutil.copyfile(HERE.parent / 'task-contract' / name, output / 'tools/task-contract' / name)
 shutil.copytree(ROOT / 'examples/preview', output / 'samples/neoil')
 shutil.copytree(HERE / 'samples', output / 'tools/samples')
 shutil.copytree(HERE / 'samples', output / 'docs/experiments/raven-target/samples')
