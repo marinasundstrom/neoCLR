@@ -24,19 +24,16 @@ The [display sample](/samples/object-display.zip) prints Plain, Named instance,
 Named instance and Named. The last line comes from an explicit base call, showing
 that bypassing the override still describes the concrete object.
 
-This first slice does not implement Object virtual dispatch for boxed values or
-intrinsic strings. Those calls fail; use typed formatting where available. It does
+Virtual ToString dispatch for boxed values or intrinsic strings remains unsupported. Those calls fail; use typed formatting where available. It does
 not add Console.WriteLine(Object), serialization, culture/format overloads or string
 identity. GetType's existing string/boxed paths remain supported.
 
 This reference intentionally does not advertise all .NET Object methods as implemented.
-The compiler reference contains Equals and GetHashCode declarations, but
-the executable Object library does not yet supply those methods. Object has a protected parameterless constructor used when a derived instance is
-initialized. It cannot be instantiated directly; both Raven and raw runtime
-construction reject it. This deliberately differs from .NET's concrete Object.
-A future synchronization API should provide a purpose-specific type rather than
-requiring an otherwise empty Object as a lock token. Equality/hash remain gaps,
-not usable stub implementations. Public reference coverage will expand with the implementations.
+Equals and GetHashCode have the bounded implementation described below. Object has a
+protected parameterless constructor used when a derived instance is initialized.
+It cannot be instantiated directly; both Raven and raw runtime construction reject
+it. This differs from .NET's concrete Object. A future synchronization API should
+provide a purpose-specific type rather than an empty Object as a lock token.
 
 ## System.Value is a different facility
 
@@ -79,7 +76,7 @@ are unchanged.
 String identity is deliberately unsupported: the current String/Object conversion
 creates wrappers instead of preserving an underlying String allocation. Identity
 calls on String payloads or their wrappers raise a terminal RuntimeError. Virtual
-boxed-value Equals/GetHashCode also remain unsupported; use typed equality APIs.
+boxed-value Equals/GetHashCode remain unsupported except for Int32, described below.
 ReferenceEquals can compare box identities, but does not supply boxed value equality.
 Null instance receivers raise NullReference; default Equals accepts a null argument
 and returns false. Static two-argument Object.Equals is not yet available.
@@ -88,7 +85,7 @@ and returns false. Static two-argument Object.Equals is not yet available.
 
 The intended baseline is .NET-compatible reference/value semantics. Class display,
 reference identity and class equality/hash now have bounded implementations. String
-identity and boxed-value dispatch remain representation gaps. Raven record syntax
+identity and general boxed-value dispatch remain representation gaps. Raven record syntax
 now passes an end-to-end record-class sample with integer, string and nested components with generated equality,
 hashing, display and deconstruction. Record structs, generic/inherited records and
 nullable string/value and arbitrary component types are not supported by this target contract. See Microsoft's
@@ -130,3 +127,18 @@ record shapes report RAVT004. Init-only property assignment remains a compiler r
 the importer recognizes the IsExternalInit metadata marker and permits readonly
 backing-field stores only in declaring constructors or recognized init accessors.
 Application-property reflection and a runtime init-only field flag remain gaps.
+
+## Boxed Int32 equality (development)
+
+Through an Object view, a boxed Int32 compares equal to another boxed Int32 with the
+same value. Null, another integer type, strings and application classes compare false.
+Its virtual GetHashCode returns the stored integer, including negative values and
+Int32 limits. Boxing copies the value, so changing the original variable has no effect.
+ReferenceEquals still distinguishes separately allocated boxes. Explicit Object base
+calls retain allocation equality/hash rather than dispatching to the integer behavior.
+
+This is a bounded interpreter intrinsic for the System library's exact Object slots.
+It does not add a typed Int32.GetHashCode member, general struct equality, nullable
+boxing, or boxed ToString. Other primitive types and named value types still require
+explicit implementation. System.Value is not involved in this dispatch.
+The [Object equality sample](/samples/object-equality.zip) demonstrates the behavior.

@@ -55,4 +55,13 @@ func Main() {
     Check(SameValue(first, second), "An override supplies key equality")
     Check(Hash(first) == Hash(second), "Equal keys supply equal hashes")
     Check(!SameValue(first, cell), "Key equality rejects another type")
+
+    var number = 42
+    let boxed: Object = number
+    let equalBox: Object = 42
+    number = 7
+    Check(!Object.ReferenceEquals(boxed, equalBox), "Equal boxed integers have distinct identities")
+    Check(SameValue(boxed, equalBox), "Boxed integers compare their values")
+    Check(!SameValue(boxed, first), "Boxed integer equality checks the concrete type")
+    Check(Hash(boxed) == 42 && Hash(boxed) == Hash(equalBox), "Boxed integer hashes preserve the copied value")
 }

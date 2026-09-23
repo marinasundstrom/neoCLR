@@ -24,6 +24,7 @@ mod slots;
 pub use execution::{CancellationToken, ExecutionOptions};
 pub use gc::{CollectionEvent, CollectionReason, GcStatistics, ManagedHeap};
 pub use slots::SlotReference;
+mod boxed_values;
 mod char_categories;
 mod file_io;
 mod file_streams;

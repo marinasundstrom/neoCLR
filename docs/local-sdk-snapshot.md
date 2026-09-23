@@ -17,11 +17,15 @@ and enumeration, and Console input/output/error streams. Records are currently
 limited to non-generic classes with integer, non-null string or same-compilation
 record-class components and a direct Object base. Record references may be nullable;
 nullable string/value components and record structs remain unsupported.
+The Object equality project also checks boxed Int32 value equality and hashes while
+separate boxes retain distinct identities. Other boxed values remain unsupported.
 HashCode supports Add(int), Add(string), ToHashCode and Combine(int, int).
 
-Validation: all three saved projects build and run; language-server protocol checks
-return HashCode.Combine, System.Concurrency and nested-record member completions. The compiler record suite
-passes 46 tests; the runtime reference-slot suite passes 32. The prior hash suite
+Validation: all four samples build and run; language-server protocol checks
+return HashCode.Combine, System.Concurrency and nested-record member completions,
+and hover retains Person? for nullable properties. The compiler record suite
+passes 46 tests; boxed/class Object equality passes 12 runtime cases and the
+.NET comparison passes 22 assertions; the runtime reference-slot suite passes 32. The prior hash suite
 passed three tests; the HashCode implementation is unchanged in this slice. This does not claim a manual
 VS Code UI test or broad record parity with .NET. The existing SDK base version is
 retained; snapshot provenance distinguishes these rebuilt local tools.

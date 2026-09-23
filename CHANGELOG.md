@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Implement bounded virtual Object equality/hash for boxed Int32: compare exact
+  type and integer value, and return the stored integer hash. Preserve separate-box
+  identity and explicit Object base behavior. Other boxed values and boxed ToString
+  remain unsupported; named struct override dispatch is still open. Extend the
+  Raven Object sample, .NET comparison and API/website documentation. Validation:
+  12 Object runtime tests, 22 pinned .NET assertions, the compiled Raven sample and
+  combined website/API build. Include the sample in the local SDK workspace.
+
 - Record the future minimal HTTP application namespace map, optional HTTPS
   dependencies, conceptual System.Web.WebApplication and longer-term time/String/
   StringBuilder needs. Extend the roadmap and HTTP plan with provisional layering,

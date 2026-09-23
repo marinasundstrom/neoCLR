@@ -66,6 +66,14 @@ main integration is claimed.
 See [the decision and tradeoffs](hash-code-design.md#string-and-nested-record-components--2026-09-24)
 and [the executable sample](experiments/records/README.md).
 
+**Next issue.** The author directed continuing with the next issue. The assistant
+selected boxed-value equality/hash and implemented a bounded Int32 compatibility case.
+It retains box identity, copies and class defaults, while virtual Object calls compare
+Int32 payloads and return the integer hash. Twelve runtime cases, 22 pinned .NET
+assertions, the Raven sample and site/API build passed. This is a narrow interpreter
+intrinsic, not a completed named-value-type override model or record-struct support;
+see the [tradeoffs](object-model-review.md#boxed-int32-equality-and-hash--2026-09-24).
+
 ## 2026-09-24 — Refresh the SDKs for VS Code testing
 
 **Author direction.** Said it was soon time to update the neoCLR and Raven SDKs

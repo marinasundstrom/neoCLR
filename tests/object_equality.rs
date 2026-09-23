@@ -178,12 +178,12 @@ fn string_wrappers_cannot_accidentally_acquire_a_public_identity_contract() {
 }
 
 #[test]
-fn boxed_virtual_value_equality_remains_explicitly_unsupported() {
+fn other_boxed_virtual_value_equality_remains_explicitly_unsupported() {
     for (tail, returns) in [
         (format!("ldc.i4 42\nbox Int32\n{EQUALS}"), "Boolean"),
         (HASH.into(), "Int32"),
     ] {
-        assert!(run(&format!("ldc.i4 42\nbox Int32\n{tail}"), "", returns, 8).is_err());
+        assert!(run(&format!("ldc.i8 42\nbox Int64\n{tail}"), "", returns, 8).is_err());
     }
 }
 
@@ -226,4 +226,68 @@ fn identity_imports_require_exact_signatures_and_report_managed_heap_service() {
             "{fault}"
         );
     }
+}
+
+#[test]
+fn boxed_int32_virtual_equality_uses_exact_type_and_value() {
+    for (right, expected) in [
+        ("ldc.i4 42\nbox Int32", true),
+        ("ldc.i4 7\nbox Int32", false),
+        ("ldc.i8 42\nbox Int64", false),
+        ("ldstr \"42\"\ncastclass System.Object", false),
+        ("ldc.i4 42\nnewobj Cell", false),
+        ("ldloc empty", false),
+    ] {
+        let body = format!(
+            ".local System.Object empty\nldloca empty\ninitobj System.Object\nldc.i4 42\nbox Int32\n{right}\n{EQUALS}"
+        );
+        assert_eq!(
+            run(&body, CELL, "Boolean", 8).unwrap().value,
+            Value::Boolean(expected)
+        );
+    }
+    let direct = "call instance System.Object::Equals(System.Object)";
+    assert_eq!(
+        run(
+            &format!("ldc.i4 42\nbox Int32\nldc.i4 42\nbox Int32\n{direct}"),
+            "",
+            "Boolean",
+            8
+        )
+        .unwrap()
+        .value,
+        Value::Boolean(false)
+    );
+}
+
+#[test]
+fn boxed_int32_hash_matches_value_across_boundaries_and_collection() {
+    for value in [i32::MIN, -1, 0, 1, i32::MAX] {
+        assert_eq!(
+            run(
+                &format!("ldc.i4 {value}\nbox Int32\n{HASH}"),
+                "",
+                "Int32",
+                8
+            )
+            .unwrap()
+            .value,
+            Value::Int32(value)
+        );
+    }
+    let mut body = ".local Int32 original\n.local System.Object boxed\nldc.i4 42\nstloc original\nldloc original\nbox Int32\nstloc boxed\nldc.i4 7\nstloc original\n".to_string();
+    for _ in 0..8 {
+        body.push_str("ldc.i4 9\nbox Int32\npop\n");
+    }
+    body.push_str(&format!("ldloc boxed\n{HASH}"));
+    let result = run(&body, "", "Int32", 2).unwrap();
+    assert_eq!(result.value, Value::Int32(42));
+    assert!(result.heap.collections() > 1);
+}
+
+#[test]
+fn boxed_intrinsic_dispatch_does_not_claim_other_object_definitions() {
+    let module = neoclr::assemble(".module Application\n.entry Main\n.type class System.Object\n.method instance virtual GetHashCode() -> Int32\nldc.i4 99\nret\n.end\n.end\n.function Main() -> Int32\nldc.i4 42\nbox Int32\ncallvirt instance System.Object::GetHashCode()\nret\n.end").unwrap();
+    neoclr::verify(&module).unwrap();
+    assert!(neoclr::run(&module, Limits::default()).is_err());
 }

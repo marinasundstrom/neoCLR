@@ -2072,6 +2072,12 @@ fn interpret_instructions(
                                 ));
                             };
                             object.reference.assigned()?;
+                            if let Some(value) =
+                                crate::boxed_values::dispatch(&object, &contract, &args)?
+                            {
+                                frame.stack.push(value);
+                                return Ok(None);
+                            }
                             let contract = if contract.is_virtual {
                                 crate::inheritance::dispatch(
                                     module,

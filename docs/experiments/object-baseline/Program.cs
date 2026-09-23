@@ -50,6 +50,17 @@ Check(ReferenceEquals(record, record) && !ReferenceEquals(record, sameRecord)
     && record == sameRecord && record != new KeyRecord(7)
     && record.GetHashCode() == sameRecord.GetHashCode(),
     "Record syntax generates value equality and matching hashes while preserving class identity");
+object integer = 42;
+object equalInteger = 42;
+Check(integer.Equals(equalInteger) && !ReferenceEquals(integer, equalInteger),
+    "Boxed Int32 uses value equality without sharing identity");
+Check(!integer.Equals(7) && !integer.Equals(42L) && !integer.Equals(null)
+    && !integer.Equals("42"), "Boxed Int32 equality requires the same concrete type and value");
+foreach (var value in new[] { int.MinValue, -1, 0, 1, int.MaxValue })
+{
+    object boxedInteger = value;
+    Check(boxedInteger.GetHashCode() == value, $"Boxed Int32 hash matches its value: {value}");
+}
 Console.WriteLine($"Runtime: {System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}");
 
 sealed class Cell { public int Number; }

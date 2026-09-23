@@ -335,3 +335,34 @@ Nullable record references now pass source construction, null/present equality,
 hashing, display and deconstruction. This reuses existing reference storage and does
 not settle intrinsic nullable String or nullable value representation. Boxed-value
 equality remains the next bounded review before admitting record structs.
+
+### Boxed Int32 equality and hash — 2026-09-24
+
+Scenario: two Object references containing separately boxed 42 values must compare
+equal without sharing identity; changing the source integer must not change its box.
+The [.NET 10 Int32 implementation](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Int32.cs)
+compares the exact runtime type and stored integer, and returns that integer as its
+hash (reviewed 24 September 2026). The pinned .NET baseline now has 22 assertions.
+General ValueType equality and user struct overrides are broader contracts than this
+primitive case and must not be approximated by comparing arbitrary interpreter data.
+
+The bounded implementation recognizes the exact virtual Object.Equals(Object) and
+Object.GetHashCode slots originating in the System library for an Int32 box. It reads
+the validated heap payload directly. Equality with null or another concrete type is
+false; hash is the stored integer. This intrinsic adds no heap allocation, native
+pointer exposure, unboxing API or System.Value dependency. ReferenceEquals and explicit
+Object base calls still use allocation identity. Ordinary class dispatch is unchanged.
+Non-System lookalike Object slots do not opt into the intrinsic.
+
+Alternatives: waiting for a complete ValueType hierarchy would postpone a simple
+compatibility case; generic structural fallback could ignore custom reference-field
+Equals and give incorrect hashes. An interpreter intrinsic is intentionally narrow:
+it lacks a public value override mapping and adds a runtime-special slot. Named struct
+and other primitive behavior, reflection-visible overrides, constrained calls and
+non-interpreter backends require separate design. Reachability remains conservative
+through Object's default target and already reports ManagedHeap; no new service is
+introduced. Boxed ToString remains unsupported. Record structs remain gated.
+
+Validation covers exact type/value checks, signed boundaries, source-copy independence,
+GC, retained explicit base equality, existing class/array behavior and lookalike slots.
+The Raven Object sample adds four boxed-integer checks without compiler changes.

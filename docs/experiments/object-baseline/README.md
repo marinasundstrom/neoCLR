@@ -9,8 +9,8 @@ formatting. Hash values themselves are deliberately not golden outputs.
 This is comparison evidence, not a neoCLR feature sample. The corresponding current
 neoCLR evidence is `tests/class_semantics.rs`, `tests/boxed_interfaces.rs`,
 `tests/value_storage.rs` and the `object_get_type` cases in `tests/raven_reflection.rs`.
-Object equality/hash remain missing executable APIs despite reference stubs; bounded
-class formatting is now implemented.
+Class equality/hash and formatting now have bounded implementations; boxed Int32
+equality/hash is the next checked primitive case.
 See [the review](../../object-model-review.md) for the implementation order and gaps.
 
 Initial observation 2026-09-23: SDK 10.0.100, runtime .NET 10.0.0, all eight assertions passed.
@@ -35,3 +35,7 @@ class identity remains distinct while generated typed/Object equality, operators
 and hashes agree. The corresponding Raven acceptance source is
 [RecordProbe.rvn](../object-equality/RecordProbe.rvn), currently blocked at emission
 by a missing comparer contract; it is not a passing neoCLR sample.
+
+The boxed-Int32 follow-up adds seven assertions (22 total), testing exact type/value
+comparison and hashes at signed boundaries. These run on the pinned .NET 10.0.0
+runtime; they do not establish support for other boxed types in neoCLR.

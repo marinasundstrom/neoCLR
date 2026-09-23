@@ -6,3 +6,7 @@ Equal keys remain distinct objects
 An override supplies key equality
 Equal keys supply equal hashes
 Key equality rejects another type
+Equal boxed integers have distinct identities
+Boxed integers compare their values
+Boxed integer equality checks the concrete type
+Boxed integer hashes preserve the copied value

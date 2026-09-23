@@ -18,8 +18,9 @@ values/byrefs; no universal boxing of generic payloads is introduced.
 The current instruction requires an ordinary System.Object class declaration.
 It does not impose Object ancestry on every type. This is a bounded interpreter
 implementation: generic reference-type box no-ops, nullable boxing, unbox/unbox.any,
-Object virtual methods and constrained-call allocation optimizations remain future
-work. The typed verifier currently requires an explicit interface cast after box;
+general Object virtual methods and constrained-call allocation optimizations remain
+future work. Boxed Int32 has a bounded Object.Equals/GetHashCode intrinsic, described
+in the [Object review](object-model-review.md#boxed-int32-equality-and-hash--2026-09-24). The typed verifier currently requires an explicit interface cast after box;
 the Raven importer can normalize an implicit CLI assignment with that checked cast.
 
 String retains its existing intrinsic representation. Casting it to an implemented

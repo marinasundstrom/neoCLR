@@ -105,7 +105,7 @@ items:
   - NeoCLR.CoreProbe
   namespace: System
   summary: Tests reference identity by default; an ordinary class may override equality.
-  remarks: 'Null other returns false for a supported non-null default receiver. A null receiver raises NullReference. Class overrides must be consistent with GetHashCode: equal objects must have equal hashes. Virtual boxed-value and String equality are unsupported; use typed equality APIs. This does not add structural class equality or change Equatable contracts.'
+  remarks: 'Null other returns false for a supported non-null default receiver. A null receiver raises NullReference. Class overrides must be consistent with GetHashCode: equal objects must have equal hashes. Virtual calls on boxed Int32 compare values only with another boxed Int32; null or another concrete type compares false. Other boxed-value and String equality remain unsupported. Explicit Object base calls retain reference equality. This does not add structural class equality or change Equatable contracts.'
   example: []
   syntax:
     content: public virtual bool Equals(object other)
@@ -136,7 +136,7 @@ items:
   - NeoCLR.CoreProbe
   namespace: System
   summary: Returns a stable identity hash by default; an ordinary class may override it consistently with equality.
-  remarks: The default class/array hash survives mutation and garbage collection and is shared by aliases. Collisions are allowed. It is not a unique object identifier, persisted value, native address or cross-execution contract. A null receiver raises NullReference. String identity hashes and virtual boxed-value hashes are unsupported. An equality override must provide a compatible hash.
+  remarks: The default class/array hash survives mutation and garbage collection and is shared by aliases. Collisions are allowed. It is not a unique object identifier, persisted value, native address or cross-execution contract. A null receiver raises NullReference. Virtual calls on boxed Int32 return its integer value as the hash. Other virtual boxed-value hashes and String identity hashes remain unsupported. Explicit Object base calls retain the identity hash. An equality override must provide a compatible hash.
   example: []
   syntax:
     content: public virtual int GetHashCode()

@@ -9,12 +9,13 @@ python3 verify.py --toolchain-root /path/to/bundle
 Cell uses Object's default reference equality and identity hash. Mutation through an
 alias changes its field without changing its hash. Key overrides equality and hash
 using one property: two equal keys remain distinct objects. Calls through Object
-exercise virtual dispatch. The verifier checks all eight labeled output lines.
+exercise virtual dispatch. The verifier checks all twelve labeled output lines.
 Hash numbers are deliberately not printed or used as unique IDs.
 
 This is a handwritten class prerequisite for the later Raven record-syntax case,
-not a record implementation. String identity, boxed virtual equality/hash and the
-static Object.Equals overload remain unsupported. Raw tests additionally cover
+not a record implementation. Boxed Int32 now compares and hashes its stored value through Object; separate boxes
+still have distinct identities and source mutation does not change the copy. String
+identity, other boxed virtual equality/hash and static Object.Equals remain unsupported. Raw tests additionally cover
 nulls, GC, arrays, explicit base calls and separate box identity.
 
 ## Record acceptance history
