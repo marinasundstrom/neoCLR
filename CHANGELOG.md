@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Revise the website toward technical project documentation: current capabilities,
+  limits, .NET tradeoffs and the active foundations-to-HTTP roadmap. Add a project
+  overview with background, goals and contribution paths; keep general information
+  on-site and repository design records optional. Preserve tested sample sources
+  and distinguish published behavior, development experiments and proposals. Validate
+  all 13 pages, site tests and responsive overview rendering.
+
 - Add bounded JSON string-message and sensor-report document experiments using
   existing text primitives. Validate Unicode escapes, read/write all six value
   kinds, preserve number spellings, check Int32 conversion and reject duplicate

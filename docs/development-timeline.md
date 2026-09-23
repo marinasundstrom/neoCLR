@@ -4994,3 +4994,24 @@ and recorded the convention for runtime code as well as examples.
   compiled to an unsupported InvalidOperationException reference on the local
   target. An explicit EOF loop avoids it. A general Raven fix needs an isolated
   CLI/.NET reproduction; no Raven repository change was made.
+
+
+### 2026-09-23 — Technical website and an open project overview
+
+- **Author:** said the website sounded too much like sales copy. Directed it to
+  explain the current project, features, relevant .NET differences and direction.
+  Added that general information should live on the webpage, with GitHub docs used
+  only when detail warrants them; the site should feel capable of becoming a
+  community project. Requested an overview of the project's background and aims.
+- **Assistant response and action:** revised homepage and feature-page framing,
+  replaced the stale broad next-release pitch with the active foundations-to-HTTP
+  roadmap, and added an on-site overview covering background, .NET/Raven relationships,
+  current limits, goals and participation. Kept general navigation on the website
+  and retained optional technical records. Described concrete ways to contribute
+  without claiming an established community or settled API design.
+- **Scope:** editorial and navigation changes; executable sample sources and runtime
+  behavior are unchanged. The website maintenance guidance now records these author
+  preferences. Local validation does not constitute publication.
+- **Validation:** all 13 pages build with internal links checked; tokenizer and
+  website tests pass. Inspected the homepage and new overview at desktop and narrow
+  sizes. No site publication was performed.

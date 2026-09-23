@@ -12,35 +12,35 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="header wrap">
   <a class="brand" href="../../">neo<span>CLR</span></a>
-  <nav aria-label="Main navigation"><a href="../../#feature-pages">Features</a><a href="../../raven/">Raven</a><a href="#try">Try it</a><a href="#direction">Direction</a></nav>
+  <nav aria-label="Main navigation"><a href="../../about/">About</a><a href="../../#feature-pages">Features</a><a href="../../raven/">Raven</a><a href="#try">Try it</a><a href="#direction">Direction</a></nav>
 </header>
 <main id="main" class="wrap">
   <div class="feature-hero">
     <p class="eyebrow"><span class="dot"></span>DEVELOPMENT POC · OPEN DESIGN</p>
-    <h1>Start an operation.<br>Await its completion.</h1>
+    <h1>Tasks and async execution</h1>
     <p class="intro">Task describes whether an operation produced a value. It does not imply a thread. Write async code around the operation you need, with expected errors as values and cancellation as a distinct outcome.</p>
-    <p class="feature-status"><strong>Development after Preview 8 · September 23, 2026.</strong> This working proof of concept is not in the published Preview 8 downloads. The API and implementation are provisional, shaped around neoCLR’s future runtime suspension.</p>
+    <p class="feature-status"><strong>Development after Preview 8 · September 23, 2026.</strong> This working proof of concept is not in the published Preview 8 downloads. The API and implementation are provisional. Current execution uses compiler-generated state machines; runtime suspension remains a research direction.</p>
     <div class="actions"><a class="button" href="#await">See a working example <span aria-hidden="true">↓</span></a><a class="text-link" href="../../samples/library-async-default-queue.rvn" download>Download the complete example</a></div>
   </div>
   <div class="feature-layout">
     <aside class="feature-toc" aria-label="On this page"><p class="eyebrow">CURRENT STATE</p><nav aria-label="Feature sections"><a href="#await">Await an operation</a><a href="#promise">Produce a value</a><a href="#outcomes">Cancellation and errors</a><a href="#dispatch">Automatic progress</a><a href="#try">Try it</a><a href="#direction">Where we’re heading</a></nav></aside>
     <article class="feature-body">
       <section id="await">
-        <h2>Make the operation explicit.</h2>
+        <h2>Starting and awaiting a worker</h2>
         <pre tabindex="0" aria-label="Start and await an isolated worker"><code>{{TASK_WORKER_SAMPLE}}</code></pre>
         <p>This prints <code>Hello on a worker</code>. <code>Thread.Start</code> explicitly creates an isolated OS worker and returns a <code>Task&lt;string&gt;</code> for its completion. <code>await</code> obtains that string. Use <code>Task&lt;unit&gt;</code> when completion carries no additional value.</p>
         <p>The worker callback is a named function with owned text input and output. Guest objects are not shared. <code>ThreadPool.Queue</code> offers the same completion shape through a small reusable pool.</p>
         <p>A Task is a completion handle, not a thread wrapper. Other operations can produce Tasks without creating threads; future I/O and stream operations will build on awaitable completion too.</p>
       </section>
       <section id="promise">
-        <h2>A producer and its consumers.</h2>
+        <h2>Promise and Task composition</h2>
         <pre tabindex="0" aria-label="Complete a Promise and map its Task"><code>{{TASK_PROMISE_SAMPLE}}</code></pre>
         <p>This prints <code>42</code>. <code>Promise&lt;T&gt;</code> owns completion; its <code>Task</code> lets consumers await or compose the result. <code>Complete(value)</code> and <code>Cancel()</code> return whether they won the first terminal transition. Later attempts leave the outcome unchanged.</p>
         <p><code>Map</code> transforms a completed value. <code>Then</code> accepts a continuation returning another Task and follows its completion. Both propagate cancellation without invoking skipped callbacks. They treat <code>Result</code> as an ordinary payload.</p>
         <p><a href="../../samples/library-task-producer.rvn" download>Download the producer example →</a></p>
       </section>
       <section id="outcomes">
-        <h2>Values, cancellation and faults stay distinct.</h2>
+        <h2>Completion, cancellation and Fault</h2>
         <div class="table-scroll"><table><thead><tr><th scope="col">Situation</th><th scope="col">Meaning</th></tr></thead><tbody>
           <tr><td><code>Pending</code></td><td>The operation has no terminal outcome yet.</td></tr>
           <tr><td><code>Completed(value)</code></td><td>Await yields the value. That value can itself be a Result containing Ok or Error.</td></tr>
@@ -60,7 +60,7 @@
         <p><a href="../../samples/library-async-cancellation.rvn" download>Download the cancellation example →</a> · <a href="../outcomes/">Explore Option and Result →</a></p>
       </section>
       <section id="dispatch">
-        <h2>No queue setup or manual drain.</h2>
+        <h2>Default TaskQueue dispatch</h2>
         <p><code>Promise&lt;T&gt;()</code>, async functions and worker APIs select the active queue or the invocation’s <code>TaskQueue.Default</code>. The runtime runs default-queue callbacks automatically before the invocation returns, including callbacks posted by other callbacks. Explicit queues remain available for controlled dispatch.</p>
         <p>This dispatcher is small and serialized. Worker joins can block it. An unresolved Promise with no queued work does not keep the invocation alive; OS I/O completion is not implemented yet. Await inside for loops is diagnosed until iterator state and cleanup are suspension-aware. Protected cleanup and async disposal are outside the current subset.</p>
       </section>
@@ -71,14 +71,14 @@
         <p><a href="../../try/#development">Development setup and release status →</a></p>
       </section>
       <section id="direction">
-        <p class="eyebrow">PROPOSED DIRECTION</p><h2>Familiar concepts, room to evolve.</h2>
-        <p>The producer/consumer split and await syntax will feel familiar to .NET developers. neoCLR separates expected failure from Task completion and uses Promise-style composition. That requires its own runtime and compiler contracts rather than copying .NET’s exception-based completion protocol.</p>
-        <p>Raven currently emits state machines. They are provisional machinery: the strategy is to move toward runtime suspension while keeping application code focused on operations and completion. A scheduler concept may support that strategy when its responsibilities become clear.</p>
+        <p class="eyebrow">PROPOSED DIRECTION</p><h2>Comparison with .NET and planned work</h2>
+        <p>Both platforms expose awaitable completion. neoCLR uses Promise for producer completion and Result values for expected errors; Task has no faulted outcome. This differs from .NET Task’s exception-based fault state and requires different library and compiler contracts.</p>
+        <p>Raven currently emits state machines. Runtime suspension is a longer-term direction, but it is not required for the next sample. The immediate work is completion progress, cancellation, queue affinity and cleanup with the current VM and TaskQueue.</p>
         <p>Cancellation tokens, host I/O completion, stream operations, scheduling policies and broader cleanup support remain development work. This page demonstrates the current direction, not a final design.</p>
         <p>A development <a href="https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/delayed-copy/README.md">Delayed Copy experiment</a> now connects worker completion to the interpreter and default TaskQueue. A Raven consumer retains its byte array through collection and resumes to copy the result. This uses an isolated worker-library adapter; the normal Thread APIs above still use queued joins. Queue fairness, per-operation cancellation and real I/O remain open.</p>
         <p><a href="../../proposals/#async">Related proposals and open questions →</a></p>
       </section>
-      <section id="feedback" class="feature-feedback"><h2>What would you build on this?</h2><p>Bring a small API or application scenario. Where does completion feel clear, and where would cancellation or scheduling need a different shape?</p><a class="button" href="https://github.com/marinasundstrom/neoCLR/issues">Share feedback on GitHub ↗</a></section>
+      <section id="feedback" class="feature-feedback"><h2>Questions and contributions</h2><p>Report completion, cancellation or scheduling issues with a reproducible example and the expected operation lifetime.</p><a class="button" href="https://github.com/marinasundstrom/neoCLR/issues">Discuss on GitHub ↗</a><p>Questions, sample programs and documentation corrections are welcome. See <a href="../../#feedback">how to contribute</a> for ways to participate.</p></section>
     </article>
   </div>
 </main>

@@ -10,11 +10,11 @@
 </head>
 <body class="feature-page">
 <a class="skip" href="#main">Skip to content</a>
-<header class="header wrap"><a class="brand" href="../../">neo<span>CLR</span></a><nav aria-label="Main navigation"><a href="../../#feature-pages">Feature pages</a><a href="../collections/">Collections</a><a href="../../proposals/">Proposals</a></nav></header>
+<header class="header wrap"><a class="brand" href="../../">neo<span>CLR</span></a><nav aria-label="Main navigation"><a href="../../about/">About</a><a href="../../#feature-pages">Feature pages</a><a href="../collections/">Collections</a><a href="../../proposals/">Proposals</a></nav></header>
 <main id="main" class="wrap">
   <div class="feature-hero">
     <p class="eyebrow"><span class="dot"></span>FOUNDATION · MANAGED ARRAYS</p>
-    <h1>One array. Familiar access.</h1>
+    <h1>Managed arrays</h1>
     <p class="intro">An array is fixed-size managed storage. Assigning it shares the same array; changing an element is visible through its aliases. neoCLR keeps these familiar .NET behaviors while giving arrays a generic API shape and invariant element types.</p>
     <p class="feature-status"><strong>Current Raven-target implementation · September 23, 2026.</strong> This page is checked against the local development toolchain. Arrays already underpin the preview library; this example is not a new release. The broader API remains open to revision.</p>
   </div>
@@ -22,7 +22,7 @@
     <aside class="feature-toc" aria-label="On this page"><p class="eyebrow">CURRENT STATE</p><nav aria-label="Feature sections"><a href="#example">Correcting a reading</a><a href="#dotnet">Compared with .NET</a><a href="#ownership">Storage and lifetime</a><a href="#limits">Current limits</a><a href="#direction">What comes next</a><a href="#feedback">Feedback</a></nav></aside>
     <article class="feature-body">
       <section id="example">
-        <h2>Correct a reading, preserve a snapshot.</h2>
+        <h2>Array aliasing and copying</h2>
         <p>The array holds three readings. A second name changes the same storage, and a Sequence view sees that correction. ToList then copies the integer elements into a separate collection, preserving those readings while the original array changes.</p>
         <pre tabindex="0" aria-label="Runnable Raven array sample"><code>{{ARRAY_TOUR}}</code></pre>
         <p><code>let</code> prevents rebinding the local name; it does not freeze the array. A Sequence exposes reading, but other aliases can still replace elements. The snapshot here contains integers: copying references into a new collection would still share the referenced objects.</p>
@@ -51,17 +51,17 @@
         <p>A byte array is a useful I/O buffer, but being managed does not make it safe for a native operation to retain an untracked address. Pending I/O still needs explicit rooting, mutation and cancellation rules. A read-only view does not prove exclusive ownership.</p>
       </section>
       <section id="limits">
-        <h2>Keep the supported subset visible.</h2>
+        <h2>Supported operations and limits</h2>
         <p>The API includes Length, Count, indexed access, iteration, Empty and ForEach, with the runtime’s supported element types. The generic shape is not a promise that every possible element signature or .NET Array helper is admitted. Direct array loops use indexed access; Iterable consumers use the declared interface contract.</p>
         <p>Bounds failures are terminal, so validate user-supplied ranges before accessing elements when invalid input should produce a recoverable Result. Array size and allocation are also constrained by runtime budgets.</p>
         <p>Span/Memory APIs, general interface variance and immutable or frozen array families are not introduced by this implementation. Historical Neo owned-array experiments are separate from the ordinary Raven T[] behavior described here.</p>
       </section>
       <section id="direction">
-        <p class="eyebrow">EXPERIMENTS · CONTRACTS MAY EVOLVE</p><h2>Use small programs to test the foundation.</h2>
+        <p class="eyebrow">EXPERIMENTS · CONTRACTS MAY EVOLVE</p><h2>Buffer experiments and planned work</h2>
         <p>The platform roadmap starts with byte copy, then text/JSON transformation and controlled delayed operations before sockets. These cases test range arithmetic, overlap, partial transfers and retention through garbage collection. They can reshape provisional APIs before the HTTP application milestone.</p>
-        <p><a href="https://github.com/marinasundstrom/neoCLR/blob/main/docs/platform-roadmap.md">Platform roadmap →</a> · <a href="../collections/">Collection capabilities →</a></p>
+        <p><a href="../../proposals/#http-poc">Platform roadmap →</a> · <a href="../collections/">Collection capabilities →</a></p>
       </section>
-      <section id="feedback" class="feature-feedback"><h2>Which array operation does your program need?</h2><p>Bring a small buffer, data-processing or collection example. Show the required access and lifetime so we can distinguish a missing helper from a missing runtime guarantee.</p><a class="button" href="https://github.com/marinasundstrom/neoCLR/issues">Share an example on GitHub ↗</a></section>
+      <section id="feedback" class="feature-feedback"><h2>Questions and contributions</h2><p>Include the required access and lifetime when reporting an array issue. This distinguishes a missing library operation from a missing runtime guarantee.</p><a class="button" href="https://github.com/marinasundstrom/neoCLR/issues">Share an example on GitHub ↗</a><p>Questions, sample programs and documentation corrections are welcome. See <a href="../../#feedback">how to contribute</a> for ways to participate.</p></section>
     </article>
   </div>
 </main>

@@ -123,3 +123,10 @@ and collection capabilities with .NET arrays. Its `ARRAY_TOUR` excerpt and expec
 output come from `library-array-tour.rvn` and its `.expected.txt`; the saved-project
 verifier includes the `ArrayTour` case. Both files are public downloads. The page
 describes current Raven-target behavior and keeps the Byte Copy/stream work experimental.
+
+
+The About page provides project background, goals, the .NET/Raven relationship,
+current scope and participation guidance. General explanations belong on-site;
+GitHub design records are optional detail. Follow the technical, approachable
+editorial direction in `docs/design/feature-pages.md`, keeping community participation
+open without implying unestablished governance or promised APIs.

@@ -5,10 +5,31 @@ and provides a place to discuss its direction. A feature page may be a short
 implementation note; it need not be an exhaustive guide. Keep working behavior,
 development-only behavior and proposals visibly separate.
 
+## Editorial direction — 2026-09-23
+
+Use a technical, approachable tone. Explain the current implementation, useful
+features, limits, relevant differences from .NET and the intended direction. Prefer
+subject headings and concrete behavior over slogans, sales copy or unqualified
+claims of improvement. Separate published releases, development experiments and
+unimplemented proposals. Derive sequencing from the authoritative platform roadmap.
+
+General information must be available on the website. Link between site pages for
+background, feature explanations, roadmap summaries and setup. Reserve GitHub docs
+for optional depth: exact contracts, research, implementation evidence and historical
+records. Readers should not need those links to understand the project or a feature.
+GitHub source, issues and pull requests remain appropriate participation destinations.
+
+Make participation accessible to a potential community: questions, sample reports,
+documentation, tests, design comparisons and code all count. Keep the design open to
+criticism without inventing an established contributor community, governance process
+or commitment to proposed APIs. The overview page explains background and goals;
+the homepage provides current status and feature entry points.
+
 ## Information structure
 
 | Location | Purpose | Required distinction |
 | --- | --- | --- |
+| `website/about/index.html` | Project background, goals, relationship to .NET, current scope and participation | Intent versus implemented capability |
 | `website/index.html` | Product overview, release/download status and entry points | Published capabilities versus development-only examples |
 | `website/features/<name>/index.html` | What currently works, a useful example where appropriate, limits and feedback | Implemented behavior versus “Where we’re heading” |
 | `website/try/index.html` | Reader-facing installation, .rvnproj workflow, expected output and troubleshooting | Published bundle instructions versus development-only API availability |
@@ -19,6 +40,7 @@ development-only behavior and proposals visibly separate.
 Feature pages currently cover [Introspection](../../website/features/introspection/index.html)
 and [Strings](../../website/features/strings/index.html), with additional notes for
 [Option/Result](../../website/features/outcomes/index.html),
+[arrays](../../website/features/arrays/index.html),
 [collections/queries](../../website/features/collections/index.html),
 [dates/clocks](../../website/features/time/index.html) and
 [UTF-8 files](../../website/features/files/index.html) and the development
