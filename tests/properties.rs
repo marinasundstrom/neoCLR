@@ -190,7 +190,8 @@ fn property_metadata_is_optional_and_system_accessors_are_explicit() {
     assert!(!json.contains("properties"));
     assert!(neoclr::load(&json).is_ok());
     let system = neoclr::library::system().unwrap();
-    for (name, property) in [("System.Array", "Length")] {
+    {
+        let (name, property) = ("System.Array", "Length");
         let def = system.types.iter().find(|ty| ty.name == name).unwrap();
         assert_eq!(def.properties[0].name, property);
         assert!(def.properties[0].setter.is_none());

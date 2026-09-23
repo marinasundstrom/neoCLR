@@ -68,9 +68,7 @@ fn guest_il_cannot_bypass_completion_capabilities() {
         "ldloc source\nldfld Tasks.Promise<Int32>::cancelled\npop\nldc.i4 0",
         "ldloc source\nldfld Tasks.Promise<Int32>::slot\npop\nldc.i4 0",
     ] {
-        let error = load(&format!("{SOURCE}{body}"))
-            .err()
-            .expect("access must fail");
+        let error = load(&format!("{SOURCE}{body}")).expect_err("access must fail");
         assert!(
             error.contains("access") || error.contains("private") || error.contains("internal"),
             "{error}"

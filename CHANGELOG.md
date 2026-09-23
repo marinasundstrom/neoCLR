@@ -13,7 +13,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   explicit-worker-queue expectation and add an eight-sample saved-project Async
   Workbench check with a JSON report. Document the packaged commands; release
   certification remains separate from these focused checks. Fix three pre-existing
-  rustfmt discrepancies found by the release-readiness pass; no behavior changes.
+  rustfmt discrepancies and strict Clippy findings (redundant match guards and
+  test idioms) found by the release-readiness pass; no behavior changes.
 
 - Make the author-approved async/Tasks preview checkpoint the immediate
   priority: stabilize the existing completion/await/composition and isolated-worker surface, require a

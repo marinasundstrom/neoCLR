@@ -172,10 +172,28 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::ReadAllText, Type::Value)
         }
         ("neoCLR.Runtime.ConsoleReadByte", []) => (Binding::ConsoleReadByte, Type::Value),
-        ("neoCLR.Runtime.StartWorker", [callback, Type::String]) if matches!(callback, Type::Constructed { definition, arguments } if definition == "System.Func" && arguments == &[Type::String, Type::String]) => {
+        (
+            "neoCLR.Runtime.StartWorker",
+            [
+                Type::Constructed {
+                    definition,
+                    arguments,
+                },
+                Type::String,
+            ],
+        ) if definition == "System.Func" && arguments == &[Type::String, Type::String] => {
             (Binding::StartWorker(false), Type::Int32)
         }
-        ("neoCLR.Runtime.QueueWorker", [callback, Type::String]) if matches!(callback, Type::Constructed { definition, arguments } if definition == "System.Func" && arguments == &[Type::String, Type::String]) => {
+        (
+            "neoCLR.Runtime.QueueWorker",
+            [
+                Type::Constructed {
+                    definition,
+                    arguments,
+                },
+                Type::String,
+            ],
+        ) if definition == "System.Func" && arguments == &[Type::String, Type::String] => {
             (Binding::StartWorker(true), Type::Int32)
         }
         ("neoCLR.Runtime.JoinWorker", [Type::Int32]) => (Binding::JoinWorker, Type::String),
