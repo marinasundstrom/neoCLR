@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Explore provider-bound File and Directory descriptors in a compiled Raven sample.
+  Run the same bounded UTF-8 write/read workflow against disk and a one-slot memory
+  provider; keep child-address syntax in each provider. Document the complete
+  provisional sample contract in `/docs/`, with tested source downloads. These
+  application-owned types reuse whole-text helpers; platform byte-stream wrappers
+  and integration with the new file resources remain pending.
+
 - Start the file-stream resource foundation: invocation-owned regular-file handles,
   bounded chunk transfers, explicit close, exclusive creation and item/directory
   host operations. This is an experimental internal service boundary; public

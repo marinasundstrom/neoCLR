@@ -203,6 +203,10 @@ def main():
             # Published examples retain the release contract during development.
             source_sample = SOURCE / 'samples/preview9' / name
         shutil.copyfile(source_sample, downloads / name)
+    storage_downloads = downloads / 'storage-provider'
+    storage_downloads.mkdir()
+    for name in ('Storage.rvn', 'Main.rvn', 'StorageExplorer.rvnproj', 'expected.txt'):
+        shutil.copyfile(ROOT / 'docs/experiments/storage-provider' / name, storage_downloads / name)
     pages = {}
     for source in sorted(SOURCE.rglob('*.html')):
         relative = source.relative_to(SOURCE)

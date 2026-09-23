@@ -1,0 +1,12 @@
+Disk
+notes.txt
+Written
+Hello, värld!
+Rejected write preserved contents
+Memory
+notes.txt
+Written
+Hello, värld!
+Rejected write preserved contents
+Direct child required
+Providers remain independent

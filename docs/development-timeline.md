@@ -36,7 +36,13 @@ errors and compatibility with future suspension/scheduling. Mark backend transpo
 buffer shape and blocking dispatch as provisional, not public API commitments.
 Recorded these evaluation questions in the roadmap and
 [file-resource experiment](experiments/file-streams/README.md). The first host and
-VM tests pass; public Raven wrappers and the acceptance application remain pending.
+VM tests pass; public platform wrappers and the full acceptance application remain
+pending. At the author's request to continue into the next slice, the assistant
+built an application-owned Raven provider experiment. The same workflow runs against
+disk and memory. Review exposed host path rules leaking into a generic Directory;
+child-address resolution was moved into the provider and the tested revision keeps
+memory addresses distinct. The provisional contract and tested source are browsable
+in `/docs/`; byte-stream integration remains pending.
 
 ## 2026-09-23 — Public API documentation policy
 

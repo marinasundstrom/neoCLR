@@ -63,6 +63,12 @@ callback still takes and returns strings and cannot capture guest objects.
 [ThreadPool](xref:System.Concurrency.ThreadPool) retains the bounded worker-pool API.
 Neither API implements the planned general Task.Run overload family.
 
+## Storage exploration
+
+The [Storage provider experiment](storage-experiment.md) documents application-owned
+File and Directory descriptors used by the same tested Raven workflow with disk
+and memory. It is a provisional contract, separate from the published System APIs.
+
 ## Reading generated declarations
 
 Signatures come from the compiler reference assembly, with authored XML descriptions.

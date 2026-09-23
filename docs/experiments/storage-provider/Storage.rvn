@@ -1,0 +1,112 @@
+namespace StorageExperiment
+
+import System.*
+import System.Result.*
+import System.Storage.FileReadError
+import System.Storage.FileWriteError
+
+// Experimental application-owned contract. Text methods are a temporary adapter
+// over existing helpers, not a proposed final storage-provider interface.
+interface StorageProvider {
+    func FileAt(directory: string, name: string) -> File
+    func ReadText(path: string, maxBytes: int) -> Result<string, FileReadError>
+    func WriteText(path: string, text: string, maxBytes: int) -> Result<unit, FileWriteError>
+}
+
+class File {
+    private field provider: StorageProvider
+    private field path: string
+    private field name: string
+
+    init(provider: StorageProvider, path: string, name: string) {
+        self.provider = provider
+        self.path = path
+        self.name = name
+    }
+
+    val Path: string => path
+    val Name: string => name
+
+    func ReadText(maxBytes: int) -> Result<string, FileReadError> {
+        return provider.ReadText(path, maxBytes)
+    }
+
+    func WriteText(text: string, maxBytes: int) -> Result<unit, FileWriteError> {
+        return provider.WriteText(path, text, maxBytes)
+    }
+}
+
+class Directory {
+    private field provider: StorageProvider
+    private field path: string
+
+    init(provider: StorageProvider, path: string) {
+        self.provider = provider
+        self.path = path
+    }
+
+    val Path: string => path
+
+    // This resolves a direct child address; it does not query existence.
+    func FileAt(name: string) -> Result<File, FileReadError> {
+        let reserved = name.IsEmpty || name == "." || name == ".."
+        let separator = name.ContainsOrdinal("/") || name.ContainsOrdinal("\\")
+        if reserved || separator || name.ContainsOrdinal("\u0000") {
+            return Error(FileReadError(FileReadError.InvalidPath()))
+        }
+        return Ok(provider.FileAt(path, name))
+    }
+}
+
+class HostStorage : StorageProvider {
+    func FileAt(directory: string, name: string) -> File {
+        return File(self, System.Storage.Path.Combine(directory, name), name)
+    }
+
+    func ReadText(path: string, maxBytes: int) -> Result<string, FileReadError> {
+        return System.Storage.File.ReadAllText(path, maxBytes)
+    }
+
+    func WriteText(path: string, text: string, maxBytes: int) -> Result<unit, FileWriteError> {
+        return System.Storage.File.WriteAllText(path, text, maxBytes)
+    }
+}
+
+// Deliberately one slot: enough to check provider retention and the sample's
+// behavior without pretending to implement a general in-memory filesystem.
+class MemorySlotStorage : StorageProvider {
+    func FileAt(directory: string, name: string) -> File {
+        // A logical key deliberately different from a host filesystem path.
+        return File(self, directory + "::" + name, name)
+    }
+
+    private field present: bool = false
+    private field path: string = ""
+    private field text: string = ""
+
+    func ReadText(path: string, maxBytes: int) -> Result<string, FileReadError> {
+        if maxBytes < 0 {
+            return Error(FileReadError(FileReadError.InvalidLimit()))
+        }
+        if !present || self.path != path {
+            return Error(FileReadError(FileReadError.NotFound()))
+        }
+        if text.GetUtf8ByteCount() > maxBytes {
+            return Error(FileReadError(FileReadError.TooLarge()))
+        }
+        return Ok(text)
+    }
+
+    func WriteText(path: string, text: string, maxBytes: int) -> Result<unit, FileWriteError> {
+        if maxBytes < 0 {
+            return Error(FileWriteError(FileWriteError.InvalidLimit()))
+        }
+        if text.GetUtf8ByteCount() > maxBytes {
+            return Error(FileWriteError(FileWriteError.TooLarge()))
+        }
+        self.path = path
+        self.text = text
+        present = true
+        return Ok(())
+    }
+}

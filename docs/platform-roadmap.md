@@ -126,7 +126,13 @@ regressions and Rust worker tests. Task/Promise remain in System.Tasks. The next
 bounded task is Storage and file Stream resource ownership. The
 [file-resource experiment](experiments/file-streams/README.md) begins with an
 invocation-owned host table, bounded transfers and explicit close. Public Storage
-and Stream wrappers, API reference pages and the acceptance application remain pending. Preserve typed errors and explicit resource ownership in the file slice.
+and Stream wrappers and the full acceptance application remain pending. A subsequent
+[provider-bound Raven experiment](experiments/storage-provider/README.md) runs the
+same text workflow against disk and memory and documents its provisional contract
+on the website. It delegates address construction to the provider, preserving the
+architectural boundary. It still uses the existing whole-text helpers; connecting
+those objects to directional byte streams is next. Preserve typed errors and
+explicit resource ownership in the file slice.
 Networking remains later.
 
 Task represents work independently of an OS thread. The current host can submit to

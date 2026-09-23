@@ -1,0 +1,105 @@
+namespace StorageExperiment
+
+import System.*
+import System.Console.*
+import System.Result.*
+
+// This workflow receives a directory; it does not select the storage provider.
+func RoundTrip(directory: Directory) {
+    match directory.FileAt("notes.txt") {
+        Ok(let file) => {
+            WriteLine(file.Name)
+            match file.WriteText("Hello, värld!", 14) {
+                Ok(_) => WriteLine("Written")
+                Error(let error) => System.Fault(error.ToString())
+            }
+            match file.ReadText(14) {
+                Ok(let text) => WriteLine(text)
+                Error(let error) => System.Fault(error.ToString())
+            }
+            match file.WriteText("too large", 2) {
+                Error(let error) => {
+                    if !error.IsTooLarge {
+                        System.Fault("Wrong bounded-write error")
+                    }
+                }
+                Ok(_) => System.Fault("Oversized write succeeded")
+            }
+            match file.ReadText(14) {
+                Ok(let text) => {
+                    if text != "Hello, värld!" {
+                        System.Fault("Rejected write changed contents")
+                    }
+                }
+                Error(let error) => System.Fault(error.ToString())
+            }
+            match file.ReadText(13) {
+                Error(let error) => {
+                    if !error.IsTooLarge {
+                        System.Fault("Wrong UTF-8 byte-limit error")
+                    }
+                }
+                Ok(_) => System.Fault("Byte limit counted characters")
+            }
+            WriteLine("Rejected write preserved contents")
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+}
+
+func RejectChild(directory: Directory, name: string) {
+    match directory.FileAt(name) {
+        Error(let error) => {
+            if !error.IsInvalidPath {
+                System.Fault("Wrong child-name error")
+            }
+        }
+        Ok(_) => System.Fault("Invalid child name accepted")
+    }
+}
+
+func Main() {
+    let host: StorageProvider = HostStorage()
+    let memory: StorageProvider = MemorySlotStorage()
+    let disk = Directory(host, ".")
+    let temporary = Directory(memory, ".")
+    WriteLine("Disk")
+    RoundTrip(disk)
+    WriteLine("Memory")
+    RoundTrip(temporary)
+    match temporary.FileAt("notes.txt") {
+        Ok(let file) => {
+            if file.Path != ".::notes.txt" {
+                System.Fault("Directory replaced the provider address")
+            }
+            match file.ReadText(14) {
+                Ok(let text) => {
+                    if text != "Hello, värld!" {
+                        System.Fault("A new descriptor lost provider state")
+                    }
+                }
+                Error(let error) => System.Fault(error.ToString())
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    RejectChild(disk, "../outside.txt")
+    RejectChild(disk, "")
+    RejectChild(disk, ".")
+    RejectChild(disk, "..")
+    RejectChild(disk, "child/name")
+    RejectChild(disk, "child\\name")
+    RejectChild(disk, "child\u0000name")
+    WriteLine("Direct child required")
+    let otherMemory: StorageProvider = MemorySlotStorage()
+    let other = otherMemory.FileAt(".", "notes.txt")
+    match other.ReadText(64) {
+        Error(let error) => {
+            if !error.IsNotFound {
+                System.Fault("Wrong missing-file error")
+            }
+            WriteLine("Providers remain independent")
+        }
+        Ok(_) => System.Fault("Provider state leaked")
+    }
+}
