@@ -24,6 +24,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   test idioms) found by the release-readiness pass; no runtime behavior changes.
   Persist toolchain roots in the Workbench project so Raven’s separate project load
   resolves the extracted bundle; record passing local package probes and remaining gates.
+  Verify the repackaged eight-sample Workbench, all 22 MSBuild cases, Task editor
+  completion, full library regeneration and bundle/SDK notices; preserve revisions,
+  hashes and case results in a local-readiness record. Final release gates remain open.
 
 - Make the author-approved async/Tasks preview checkpoint the immediate
   priority: stabilize the existing completion/await/composition and isolated-worker surface, require a

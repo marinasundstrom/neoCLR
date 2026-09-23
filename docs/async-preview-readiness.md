@@ -10,7 +10,7 @@ No developer SDK selection or VS Code installation is changed.
 
 | Gate | Concrete check / deliverable | Evidence boundary |
 | --- | --- | --- |
-| Library sources and generated artifacts | `build_runtime_library.py --check-snapshot`; full `--check --compiler … --bridge …` regeneration | Hash check passes locally; full regeneration must be recorded separately |
+| Library sources and generated artifacts | `build_runtime_library.py --check-snapshot`; full `--check --compiler … --bridge …` regeneration | All slices regenerate identically on the local recorded compiler/bridge; final-candidate repetition remains required |
 | Fresh compiler/editor distribution | Raven `scripts/codex-build.sh`, `package-sdk.sh`, `package-vscode.sh` | Local macOS arm64 build; VSIX packaging is separate from an installed editor test |
 | Runtime bundle | `package_bundle.py` with clean recorded repositories, freshly built runtime and SDK | Manifest records revisions, tools and file hashes; archive/extract before testing |
 | Saved-source Async Workbench | Packaged `tools/verify_async_workbench.py --bundle … --sdk … --report …` | Eight exact-output cases through standalone MSBuild, in fresh temporary projects |
@@ -52,8 +52,8 @@ Run from the extracted bundle; the editor probe takes the configured project fol
 - The new Workbench verifier initially failed: MSBuild command-line roots did not
   survive Raven's separate reload of the saved project. The verifier now persists
   both roots in the temporary `.rvnproj`. All eight samples pass using this corrected
-  source verifier and the extracted packages. A newly packaged verifier still needs
-  its final extracted-package check; this distinction is intentional.
+  source verifier and the extracted packages. The subsequent clean package at
+  `97b8d91` also passes all eight cases using its own packaged verifier after extraction.
 - Strict Clippy passes; Task (7), property (6), worker (14) and runtime-service (7)
   regression tests pass locally. Formatting passes.
 
@@ -63,9 +63,27 @@ Local raw reports and logs are under `/tmp/neoclr-async-readiness.0ceuuk/`:
 `worker-regressions.log` and `lint-regressions.log`. These temporary machine-local
 files are supporting evidence, not published or durable release artifacts.
 
+## Follow-up package validation
+
+The [durable local result record](async-preview-local-validation.json) identifies
+neoCLR `97b8d91`, the matching Raven revision, archive/tool hashes and case results.
+The new archive was extracted to a fresh directory and configured with the extracted
+SDK. Its packaged verifier passes all eight Workbench samples. All 22 standalone
+MSBuild checks pass, including failed-build cleanup, paths with spaces, changed
+library rebuilding, project-reference ordering and invalid dependency graphs.
+
+The packaged language server passes Task/Promise/TaskQueue completion checks;
+`Default` is a property and internal `Current` is hidden. This probe does not test
+hover descriptions or interactive VS Code installation/build/run behavior.
+
+Full Raven library regeneration matches every checked-in slice. It used the fresh
+SDK and earlier clean bridge; the record includes their hashes, and their relevant
+sources are unchanged between these bundles. Dependency notice audits cover all
+23 bundle and 26 SDK NuGet dependencies, verifying all 34 preserved notice sets.
+This is local evidence; it does not select a final release candidate.
+
 ## Remaining release work
 
-Finish full
-library regeneration, exact-candidate source/archive validation, package/editor checks
-and the complete migration/notice review. Rerun affected evidence after candidate
+Finish exact-candidate source/archive validation, interactive editor checks
+and the complete migration/distribution review. Rerun affected evidence after candidate
 changes. Keep publication, website deployment and version/date selection separate.

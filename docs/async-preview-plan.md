@@ -81,8 +81,9 @@ Preview 8 instead of assuming this list is exhaustive.
 ## Next action and exit
 
 Local progress is recorded in [the readiness inventory](async-preview-readiness.md).
-Next, repackage the corrected Workbench verifier and check it after extraction,
-then complete full library regeneration and the remaining editor/candidate gates.
+The corrected package, full library regeneration and protocol/MSBuild checks now
+pass locally. Next, complete interactive editor validation, exact-candidate source
+archive/platform checks and the full migration/distribution review.
 Record blockers with evidence and only claim platforms actually tested. Remote candidate CI and publication remain distinct
 steps; this plan does not tag, push, upload artifacts or publish the website.
 

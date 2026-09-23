@@ -82,8 +82,9 @@ start Storage with bounded local file operations rather than a full provider mod
 Resolve cancellation/lifetime gaps as those cases require. Networking still follows
 these foundations, and proposals remain exploratory rather than API specifications.
 
-Start with a readiness inventory and one fresh local bundle; fix release blockers
-before expanding features. Published release notes stay unchanged and publication remains separate.
+The [local readiness record](async-preview-readiness.md) now covers a fresh extracted
+bundle, full library regeneration, Task editor completion and MSBuild checks.
+Complete remaining editor/candidate and migration gates before expanding features. Published release notes stay unchanged and publication remains separate.
 
 ## Progressive delivery before networking — revised 2026-09-23
 
@@ -369,8 +370,9 @@ its feature plan, and update changelog, relevant feature pages and integration d
 Samples begin as small programs, not miniature frameworks. Existing release/debugging
 requirements and Raven branch/integration rules continue to apply.
 
-**Next:** run the [async preview readiness inventory](async-preview-plan.md#next-action-and-exit)
-and prepare a fresh local evaluator bundle. After the release checkpoint, prioritize
+**Next:** finish the [remaining async preview gates](async-preview-plan.md#next-action-and-exit):
+interactive editor validation, source/archive and platform checks, and migration review.
+The [fresh local package checks](async-preview-readiness.md#follow-up-package-validation) pass. After the release checkpoint, prioritize
 Streams, Storage and Encoding through the bounded file-transformer progression.
 Select the needed small guest operation cancellation contract and extend the real
 delayed-copy evidence to its completion races and queue affinity before pending I/O.
