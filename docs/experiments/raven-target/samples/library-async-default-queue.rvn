@@ -12,5 +12,5 @@ async func Show() -> Task<unit> {
 }
 
 func Main() {
-    Show()
+    _ = Show()
 }

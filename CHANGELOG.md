@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Add a development Tasks feature page with tested, downloadable worker, Promise,
+  cancellation, MapResult and awaited-propagation examples. Link it from the
+  homepage and proposals, distinguishing current behavior from future scheduling
+  and cancellation-token work. Validate 11 pages, website tests, five locally
+  installed .rvnproj build/run examples and Task editor completions. Prepare a
+  matching local VS Code development workspace without changing release selection.
+
 - Integrate Raven's propagation-temporary lifetime fix for `(await input)?`, with
   immediate and resumed Ok, Error and cancellation regressions. Preserve current
   postfix-first precedence; record ergonomic shorthand as future design work.

@@ -4878,3 +4878,21 @@ and recorded the convention for runtime code as well as examples.
   cases pass on neoCLR. Raven main received only the independently tested general
   fix (c51c69bad, 21 tests); neoclr retains its separate policies (e56fc1ddf,
   40 tests). The temporary main-fix branch was removed after fast-forward integration.
+
+
+### 2026-09-23 — Task feature page and matching local development tools
+
+- **Assistant action:** added the Tasks feature page with tested worker, Promise,
+  cancellation, MapResult and awaited-propagation examples, complete website-hosted
+  downloads, current limits and future direction. Marked it development after
+  Preview 8; no publication or new public release is implied.
+- **Local outcome:** prepared `~/.neoclr/experiments/tasks-20260923/Tasks.code-workspace`
+  with five .rvnproj folders, matching compiler, reference library, importer,
+  runtime and Raven Language Server. Each saved project builds and runs with the
+  documented output. Stdio LSP checks expose Task/Promise/MapResult and the Default
+  property. The server build allows existing nullable warnings; those unrelated
+  warnings were not changed. The user's installed release selection is unchanged.
+- **Validation:** website build/link checks cover 11 pages; three Python checks and
+  the highlighting test pass. Desktop layout was visually inspected. GUI interaction
+  was interrupted by the user's activity; build/run and editor protocol verification
+  are completed, but an interactive VS Code Run Task session is not claimed.

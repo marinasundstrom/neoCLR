@@ -144,3 +144,22 @@ library. It covers queued callbacks on pending and terminal inputs, value-changi
 flattening, both stages of cancellation, Result.Error payloads, generic unit,
 cross-queue progress, GC retention, terminal callback Faults and private dispatcher
 access. See the [current Task contracts](../../task-contracts.md#task-composition--2026-09-21).
+
+
+## Current generated async and editor probes — 2026-09-23
+
+- `verify_async.py`: generated async, Result propagation, immediate/resumed
+  cancellation, combined `(await input)?`, GC and unsupported cleanup diagnostics.
+- `verify_default_queue.py`: default Promise construction and automatic invocation
+  dispatch, worker progress, retained callbacks and execution-budget faults.
+- `verify_map_result.py`: explicit Ok mapping, Error/cancellation bypass, async
+  composition, source dispatcher retention and terminal callback faults.
+- `verify_editor.py <prepared-project-folder>`: launch the server configured by
+  that folder's `.vscode/settings.json`; check Task/Promise/MapResult completions
+  and the Default property. It does not edit Main.rvn on disk.
+
+The first three take a prepared Demo.rvnproj plus `--bridge`, `--system` and
+`--runtime` paths. The [Tasks feature page](../../../website/features/tasks/index.html)
+uses complete source samples, also tested through installed `.rvnproj` build/run
+commands. Local development toolchains must pair the compiler and language server
+with the current reference metadata, System library, importer and runtime.

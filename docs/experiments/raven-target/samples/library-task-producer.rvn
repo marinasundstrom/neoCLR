@@ -1,0 +1,16 @@
+import System.*
+import System.Tasks.*
+import System.Console.*
+
+async func Print(task: Task<int>) -> Task<unit> {
+    let value = await task
+    WriteLine(value)
+    return ()
+}
+
+func Main() {
+    let promise = Promise<int>()
+    let answer = promise.Task.Map(value => value + 1)
+    _ = Print(answer)
+    promise.Complete(41)
+}

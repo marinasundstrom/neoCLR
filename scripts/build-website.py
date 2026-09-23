@@ -88,6 +88,11 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'TASK_WORKER_SAMPLE': (raven + 'library-async-default-queue.rvn', 'import System.*', '\nfunc Main() {\n    _ = Show()\n}', True),
+        'TASK_PROMISE_SAMPLE': (raven + 'library-task-producer.rvn', 'import System.*', '\n    promise.Complete(41)\n}', True),
+        'TASK_PROPAGATION_SAMPLE': (raven + 'library-task-propagation.rvn', 'async func Read', '\n}\n', True),
+        'TASK_RESULT_SAMPLE': (raven + 'library-task-result.rvn', 'import System.*', '\n    promise.Complete(Ok(41))\n}', True),
+        'TASK_CANCELLATION_SAMPLE': (raven + 'library-async-cancellation.rvn', 'import System.*', '\n    promise.Cancel()\n}', True),
         'PROJECT_SAMPLE': ('docs/experiments/raven-target/msbuild/Demo.rvnproj', '<Project', '</Project>', True),
         'CLOCK_SAMPLE': (raven + 'library-instants.rvn', 'func ShowCurrentTime', '\n}', True),
         'INTROSPECTION_SAMPLE': (raven + 'library-introspection-tour.rvn', '    let assembly', '    for module', False),
@@ -123,7 +128,7 @@ def main():
     output_text = escape((ROOT / (raven + 'library-introspection-tour.expected.txt')).read_text().rstrip())
     downloads = OUTPUT / 'samples'
     downloads.mkdir()
-    for name in ('library-outcome-operators.rvn', 'library-outcome-operators.expected.txt', 'library-query-basics.rvn', 'library-query-basics.expected.txt', 'library-query-names.rvn', 'library-query-names.expected.txt', 'library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
+    for name in ('library-task-propagation.rvn', 'library-task-result.rvn', 'library-async-default-queue.rvn', 'library-task-producer.rvn', 'library-async-cancellation.rvn', 'library-outcome-operators.rvn', 'library-outcome-operators.expected.txt', 'library-query-basics.rvn', 'library-query-basics.expected.txt', 'library-query-names.rvn', 'library-query-names.expected.txt', 'library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
         shutil.copyfile(ROOT / raven / name, downloads / name)
     pages = {}
     for source in sorted(SOURCE.rglob('*.html')):

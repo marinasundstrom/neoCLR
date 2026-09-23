@@ -21,7 +21,8 @@ and [Strings](../../website/features/strings/index.html), with additional notes 
 [Option/Result](../../website/features/outcomes/index.html),
 [collections/queries](../../website/features/collections/index.html),
 [dates/clocks](../../website/features/time/index.html) and
-[UTF-8 files](../../website/features/files/index.html). Introspection is an in-depth
+[UTF-8 files](../../website/features/files/index.html) and the development
+[Tasks and async PoC](../../website/features/tasks/index.html). Introspection is an in-depth
 walkthrough; the second deliberately shows one working conversion example. Scale
 detail to what helps an evaluator. Do not add an API just to fill a page outline.
 
