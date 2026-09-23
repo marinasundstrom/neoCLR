@@ -1,10 +1,10 @@
 # Roadmap: prove neoCLR with HTTP applications
 
-**Current priority (2026-09-23):** the author has selected the
-[async/Tasks release checkpoint](async-preview-plan.md) first. After stabilization,
-focus on Streams, Storage and Encoding before networking, using the bounded memory
-and file-transformer cases below. This does not select the full proposal APIs. The
-[platform roadmap](platform-roadmap.md) remains authoritative.
+**Current priority (2026-09-23):** the async/Tasks preview has shipped and the
+synchronous Storage POC is implemented. The File Transformer below connects the
+existing JSON experiment to those APIs. Pending I/O ownership, scheduling and
+cancellation remain pre-networking questions. The [platform roadmap](platform-roadmap.md)
+remains authoritative.
 
 
 Detailed M1 plan subordinate to the [authoritative platform roadmap](platform-roadmap.md).
@@ -133,7 +133,7 @@ and a short contract/comparison note. The isolated S0 host probe is only partial
 | S1 — partial; checked memory-copy fixture runs | In-memory input/output and copy case; can start alongside S0 | Directional contracts, partial transfers, empty-buffer rules, EOF only for nonempty reads, truncated ReadExactly, no-progress WriteAll, bounds errors, repeated cleanup and injected failures; copy helpers require no sockets |
 | S2 — partial; strict chunk decoder experiment | Encode/decode a multilingual message split at every UTF-8 byte boundary; depends on S1 | Strict invalid/truncated input outcomes, carried decoder state, final-flush behavior and byte counts; reuse current whole-buffer conversions rather than change Char again |
 | S3 — partial; document consumer runs | Small JSON round trip in memory; depends on S2 | Read/write object, array, string, number, boolean and null; escaped strings and Unicode, malformed syntax, duplicate-key policy, numeric limits/precision and nesting/size bounds are explicit. Prefer explicit field access and construction; benchmark only if making performance claims |
-| S1F — planned learning checkpoint | Reuse the memory/text/JSON pipeline with bounded file input/output; after S1–S3 and the delayed-lifetime checkpoint | Shared stream behavior, open/read/write errors, cleanup and a declared failed-save policy; no directory/provider redesign or claim of nonblocking I/O |
+| S1F — partial; synchronous file consumer runs | Reuse the memory/text/JSON pipeline with bounded file input/output; after S1–S3 and the delayed-lifetime checkpoint | Shared stream behavior, open/read/write errors, cleanup and a declared failed-save policy; no directory/provider redesign or claim of nonblocking I/O |
 | S4 — exploration then implementation | TCP listener and echo client; depends on S0/S1 and resolved ownership | Bind/listen/accept/connect/read/write/close, endpoint reporting, short transfers, peer EOF/reset, refused connection, pending accept/read cancellation and repeated shutdown. A stalled connection must not freeze unrelated work; bound admitted connections |
 | S5 — planned | HTTP server returns text to an independent client; depends on S2/S4 | Split start lines/headers/body boundaries, methods/targets/status/headers, byte Content-Length, case-insensitive header names, bounded input and explicit rejection of unsupported/ambiguous framing. Choose accept/respond versus handler API using this case |
 | S6 — planned | HttpClient calls an independent local server; depends on S2/S4 and shared HTTP framing work | Parse supported endpoint URLs, send GET/POST, inspect non-2xx responses as responses, consume bounded bodies, report transport/protocol errors distinctly and close resources after cancellation/error |
@@ -142,7 +142,8 @@ and a short contract/comparison note. The isolated S0 host probe is only partial
 S2/S3 and S4 are technically independent after their prerequisites, but the default
 learning sequence validates in-memory text/JSON, delayed guest lifetime and a bounded
 file backend before TCP. A file-provider redesign is not required. S5 and S6 should reuse framing tests
-but have independent peers to avoid hiding matching client/server bugs. Seeking remains later. A simple file-backed transformer is now a preferred
+but have independent peers to avoid hiding matching client/server bugs. Optional file
+seekability is implemented in the Storage POC; it is not required by network streams. A simple file-backed transformer is now a preferred
 pre-TCP learning checkpoint, not a technical requirement of non-seekable networking.
 
 For S3, compare a forward-only reader/writer with a tiny bounded document tree. A tree
@@ -185,8 +186,8 @@ policies, not production defaults or a selected public serializer API.
 The target admitted this application without runtime changes. Application-defined
 enums and protected cross-type constructor calls remain bridge limitations; the
 experiment records its sealed-family representation and required source spellings.
-Keep those follow-ups bounded. The next delivery checkpoint is actual guest lifetime
-retention across controlled delayed completion before the file consumer.
+Keep those follow-ups bounded. Actual guest lifetime evidence is recorded under S0 above. The synchronous file
+consumer now supplies S1F evidence below; operation-level async races remain open.
 
 ## S3 first evidence — 2026-09-23
 
@@ -311,3 +312,17 @@ Raven fixes must be isolated, independently tested and integrated separately fro
 neoCLR target policy; compiler-affecting integrations need both repositories' docs
 and changelogs. Existing Raven debugging and release gates remain required for a
 release even though they are not dependencies of every local POC case.
+
+
+## S1F synchronous file consumer — 2026-09-23
+
+The [File Transformer](experiments/file-transformer/README.md) reuses the JSON
+sensor acknowledgement with platform Storage and System.IO readers/streams.
+Nine isolated fixtures check real file contents, independent JSON decoding,
+input preservation and no output for read/validation errors. Existing output is
+preserved by exclusive creation. This requires no new public API or runtime feature.
+All operations block; this is not evidence of asynchronous file I/O. The app closes
+opened streams, but device/flush failure can leave a partial new destination.
+Injected write-failure testing and async ownership/cancellation remain follow-ups;
+no atomic-save or durability claim is made. Parser/decoder limits remain those of
+the existing experiments, not proposed general library defaults.

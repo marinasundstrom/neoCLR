@@ -40,3 +40,6 @@ See [Storage providers](storage-provider.md), [item interfaces](storage-items.md
 and [System.IO streams/readers](streams.md) for member contracts and limits.
 All operations are synchronous; task-returning Storage operations remain future
 work. Listing is bounded and non-atomic, and root mapping is not a security sandbox.
+
+The [File Transformer](file-transformer.md) builds on this example to validate a
+JSON sensor report and save an acknowledgement with an explicit failed-save policy.

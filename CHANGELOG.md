@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Add a bounded File Transformer sample connecting platform Storage and System.IO
+  to the existing experimental JSON document consumer. Validate and serialize before
+  exclusive output creation; preserve input and existing destinations, close streams
+  and document partial-output risk after write/flush failure. Add an on-site walkthrough
+  and downloadable source bundle. JSON remains sample code and I/O is synchronous.
+  Validation: nine isolated file cases, unchanged source/existing-output checks,
+  independent JSON output parsing, matching source archive, website tests and build.
+
 - Complete the synchronous Storage POC with a platform-only file-access sample,
   downloadable on-site walkthrough and API reference. Move development byte streams
   from System.Streams to System.IO (recompile consumers and update imports). Add

@@ -231,8 +231,14 @@ partial-transfer, error, ownership and seek contracts. On-site API documentation
 includes a downloadable walkthrough. This meets the requested synchronous Storage
 POC product scope; production provider breadth is not implied.
 
-**Next direction:** use this POC as the baseline for the remaining M1 encoding/JSON
-and suspension work before networking. Evaluate task-returning provider operations
+**File consumer follow-up:** the [File Transformer](experiments/file-transformer/README.md)
+connects the existing bounded JSON document experiment to Storage and System.IO.
+It validates and serializes before exclusive output creation, preserves input and
+existing destinations, and documents the possibility of partial output after an I/O
+failure. JSON remains application experiment code, not a new platform API.
+
+**Next direction:** use these products as the baseline for remaining M1 suspension
+and cancellation work before networking. Evaluate task-returning provider operations
 against that suspension model; do not expand Storage metadata or mutations without
 a concrete case. Preserve the working disk/memory consumer.
 Task-based interaction is the intended extension direction; its scheduling and

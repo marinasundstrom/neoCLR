@@ -212,6 +212,18 @@ def main():
     poc_downloads.mkdir()
     for name in ('Main.rvn', 'StoragePoc.rvnproj', 'expected.txt'):
         shutil.copyfile(ROOT / 'docs/experiments/storage-poc' / name, poc_downloads / name)
+    transformer_sources = OUTPUT / '_transformer-source'
+    for folder, names in {
+        'file-transformer': ('Main.rvn', 'FileTransformer.rvnproj', 'README.md', 'verify.py'),
+        'json-document': ('JsonDocument.rvn', 'JsonValue.rvn'),
+        'json-message': ('JsonMessage.rvn',),
+    }.items():
+        destination = transformer_sources / folder
+        destination.mkdir(parents=True)
+        for name in names:
+            shutil.copyfile(ROOT / 'docs/experiments' / folder / name, destination / name)
+    shutil.make_archive(str(downloads / 'file-transformer'), 'zip', transformer_sources)
+    shutil.rmtree(transformer_sources)
     pages = {}
     for source in sorted(SOURCE.rglob('*.html')):
         relative = source.relative_to(SOURCE)

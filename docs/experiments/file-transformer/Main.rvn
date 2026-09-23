@@ -1,0 +1,112 @@
+import System.*
+import System.Result.*
+import System.Console.*
+
+// A small sensor report: inspect fields and construct an explicit acknowledgement.
+func Acknowledge(payload: string) -> Result<string, string> {
+    let report = ReadDocument(payload)?
+    let stationValue = report.Field("station")?
+    let station = stationValue.AsString()?
+    let readings = report.Field("readings")?
+    if !(readings is JsonArray) {
+        return Error("Expected readings array")
+    }
+    let first = readings.Item(0)?
+    _ = first.AsInt32()?
+    // Validate the first reading without coercing fractional or overflowing numbers.
+    let reply = JsonValue.ObjectValue()
+    _ = reply.Put("station", JsonValue.StringValue(station))?
+    _ = reply.Put("accepted", JsonValue.BooleanValue(true))?
+    let count = JsonValue.NumberValue(readings.Count.ToString())?
+    _ = reply.Put("count", count)?
+    _ = reply.Put("note", JsonValue.NullValue())?
+    return WriteDocument(reply)
+}
+
+func StoragePath(text: string) -> Result<System.Storage.Path, string> {
+    return match System.Storage.Path.Parse(text) {
+        Ok(let path) => Ok(path)
+        Error(_) => Error("Invalid sample path")
+    }
+}
+
+func ReadReport(file: System.Storage.File) -> Result<string, string> {
+    return match file.OpenRead() {
+        Ok(let input) => {
+            let reader: System.IO.TextReader = System.IO.StreamReader(input)
+            let result = reader.ReadToEnd(128)
+            reader.Close()
+            return match result {
+                Ok(let text) => Ok(text)
+                Error(let error) => Error(error.ToString())
+            }
+        }
+        Error(let error) => Error(error.ToString())
+    }
+}
+
+func WriteReply(output: System.IO.OutputStream, text: string) -> Result<unit, string> {
+    let bytes = System.Text.Utf8.Encode(text)
+    let buffer: byte[] = [(byte)0, (byte)0, (byte)0]
+    var position = 0
+    while position < bytes.Count {
+        var count = 0
+        while count < buffer.Length && position < bytes.Count {
+            buffer[count] = bytes[position]
+            count += 1
+            position += 1
+        }
+        var offset = 0
+        while offset < count {
+            match output.Write(buffer, offset, count - offset) {
+                Ok(let written) => {
+                    if written <= 0 || written > count - offset {
+                        System.Fault("Invalid write progress")
+                    }
+                    offset += written
+                }
+                Error(let error) => return Error(error.ToString())
+            }
+        }
+    }
+    return match output.Flush() {
+        Ok(_) => Ok(())
+        Error(let error) => Error(error.ToString())
+    }
+}
+
+func Transform(provider: System.Storage.StorageProvider) -> Result<unit, string> {
+    let sourcePath = StoragePath("report.json")?
+    let source = match provider.GetFile(sourcePath) {
+        Ok(let file) => file
+        Error(let error) => return Error(error.ToString())
+    }
+    let payload = ReadReport(source)?
+    // Validate and serialize completely before creating an output file.
+    let reply = Acknowledge(payload)?
+    let rootPath = StoragePath("/")?
+    let root = match provider.GetDirectory(rootPath) {
+        Ok(let directory) => directory
+        Error(let error) => return Error(error.ToString())
+    }
+    let destination = match root.FileAt("reply.json") {
+        Ok(let file) => file
+        Error(let error) => return Error(error.ToString())
+    }
+    return match destination.CreateNew() {
+        Ok(let output) => {
+            let result = WriteReply(output, reply)
+            output.Close()
+            result
+        }
+        Error(let error) => Error(error.ToString())
+    }
+}
+
+func Main() {
+    let provider: System.Storage.StorageProvider = System.Storage.FileSystem("reports")
+    match Transform(provider) {
+        Ok(_) => WriteLine("Saved reply.json")
+        Error(let error) => WriteLine("Failed: " + error)
+    }
+}
