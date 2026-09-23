@@ -244,9 +244,15 @@ win, and reject late writes/releases/notifications. The buffer is private while
 pending. Resource release is a counter, not native I/O; no public async signature
 or token API is selected.
 
-**Next direction:** connect this operation contract to a controlled host producer
-on the real invocation/default-queue path, checking acknowledged release and root
-handoff. Keep M1 suspension and cancellation work ahead of networking. Evaluate task-returning provider operations
+The [host-backed follow-up](experiments/host-pending-read/README.md) now uses real
+isolated workers, notification dispatch, joined producer acknowledgement and Raven
+await. Five cases cover deferred cancellation, completion and bounded payload outcomes
+with GC and unrelated ready work. Cancellation before delivery discards a completed
+result; it does not interrupt the worker. The existing runtime and public API are unchanged.
+
+**Next direction:** investigate per-operation producer cancellation and acknowledgement,
+queue affinity and byte payload accounting before introducing a filesystem producer.
+Keep M1 suspension and cancellation work ahead of networking. Evaluate task-returning provider operations
 against that suspension model; do not expand Storage metadata or mutations without
 a concrete case. Preserve the working disk/memory consumer.
 Task-based interaction is the intended extension direction; its scheduling and

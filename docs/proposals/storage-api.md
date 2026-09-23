@@ -1649,3 +1649,11 @@ separates cancellation of an operation from merely abandoning a wait. Native rel
 and concurrent backend races are not established by queued guest events. Private
 owned buffers simplify this fixture, but owned-result versus caller-buffer APIs and
 multiple-operation close behavior remain open. No public type or signature is selected.
+
+
+The [host-backed experiment](../experiments/host-pending-read/README.md) now connects
+that lifetime question to existing worker notifications. It chooses deferred discard
+for its consumer: cancellation requested before invocation-side delivery waits for
+host acknowledgement, then cancels without copying the result. Completion already
+delivered is retained. This provides real Task/GC evidence but no producer interruption,
+OS cancellation or public Storage signature decision.

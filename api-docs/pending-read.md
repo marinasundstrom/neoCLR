@@ -41,3 +41,32 @@ can still access it. The current type system does not prevent such aliases.
 [Storage](storage-provider.md) and [streams](streams.md) remain synchronous.
 Task-returning provider operations are future direction. This experiment does not
 select public cancellation tokens, owned-buffer results or an async close method.
+
+## Host-backed follow-up
+
+A second development sample connects the private-buffer consumer to a real isolated
+worker using the experimental notification adapter. The worker owns its text input
+and result. The runtime transfers a retained callback into the default TaskQueue;
+the adapter joins the finished producer before resuming the Raven consumer.
+
+Its cancellation policy is deliberately narrow: a request before invocation-side
+delivery leaves the Task pending, then discards the producer's result and cancels
+the Task after acknowledgement. A request after delivery cannot replace completion.
+It does not interrupt the worker; the producer may already have finished when the
+request arrives. This tests a safe terminal boundary, not cancellation latency.
+
+Five cases cover cancellation, completion, oversized, empty and short payloads.
+An unrelated callback runs before consumer outcomes; GC runs while the pending
+graph is retained, and the verifier checks zero final live guest objects. Producers
+may complete in any order. Native producer Faults still terminate the invocation.
+
+Download the [consumer sources](/samples/host-pending-read.zip). Reproducing the
+notification path requires the shared experimental adapter harness in a matching
+checkout, rather than an ordinary published SDK build:
+
+```sh
+python3 docs/experiments/delayed-copy/verify.py --toolchain-root /path/to/development/bundle --consumer-root docs/experiments/host-pending-read
+```
+
+No public API changes. Per-operation producer cancellation, explicit queues, native
+byte payloads and async filesystem operations remain future work.

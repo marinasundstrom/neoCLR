@@ -1,0 +1,72 @@
+import System.*
+import System.Tasks.*
+import System.Result.*
+import System.Text.*
+import System.Concurrency.*
+
+// Host worker inputs/results are owned text; it cannot access the pending buffer.
+func Produce(input: string) -> string => input
+
+class PendingRead {
+    private field completion: Promise<Result<int, string>> = Promise<Result<int, string>>()
+    private field buffer: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9]
+    private field requested: bool = false
+    private field terminal: bool = false
+    private field deliveries: int = 0
+
+    init(text: string) {
+        _ = AwaitDelivery(self, text)
+    }
+
+    val Task: Task<Result<int, string>> => completion.Task
+    val DeliveryCount: int => deliveries
+
+    func RequestCancel() -> bool {
+        if terminal || requested {
+            return false
+        }
+        requested = true
+        return true
+    }
+
+    func Finish(payload: string) {
+        if terminal {
+            System.Fault("Duplicate host delivery")
+        }
+        terminal = true
+        deliveries += 1
+        if requested {
+            // Deferred cancellation: discard only after producer completion.
+            completion.Cancel()
+            return
+        }
+        let bytes = Utf8.Encode(payload)
+        if bytes.Count > 2 {
+            let failure: Result<int, string> = Error("Payload exceeds requested range")
+            completion.Complete(failure)
+            return
+        }
+        var index = 0
+        while index < bytes.Count {
+            buffer[index + 1] = bytes[index]
+            index += 1
+        }
+        let result: Result<int, string> = Ok(bytes.Count)
+        completion.Complete(result)
+    }
+
+    func ByteAt(index: int) -> byte {
+        if !terminal {
+            System.Fault("Pending destination is private")
+        }
+        return buffer[index]
+    }
+}
+
+// Keep async orchestration outside the owner: the current bridge does not admit
+// generated state-machine access to another application's private fields.
+async func AwaitDelivery(read: PendingRead, text: string) -> Task<unit> {
+    let payload = await Thread.Run(Produce, text)
+    read.Finish(payload)
+    return ()
+}

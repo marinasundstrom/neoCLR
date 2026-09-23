@@ -85,3 +85,8 @@ queued consumer ownership, including host cancellation/Fault teardown. Check lat
 completion, explicit queue affinity, bounded host payloads and disconnection. Use
 owned host payloads first to avoid native pointers into guest arrays. Keep this
 separate from choosing a production OS backend or public cancellation-token API.
+
+
+The [host-backed follow-up](../host-pending-read/README.md) now exercises real worker
+notification and Task delivery using a narrower deferred-discard policy. It does not
+replace the ordered model above or claim producer-side cancellation.

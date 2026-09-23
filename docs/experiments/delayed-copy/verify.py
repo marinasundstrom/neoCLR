@@ -24,7 +24,9 @@ def run(command, **kwargs):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--toolchain-root', type=Path, required=True)
+    parser.add_argument('--consumer-root', type=Path, default=HERE, help='Alternate controlled consumer using the same experimental notification adapter')
     args = parser.parse_args()
+    consumer = args.consumer_root.resolve()
     bundle = args.toolchain_root.resolve()
     compiler = bundle / 'raven-sdk/tools/rvnc/rvnc.dll'
     bridge = bundle / 'tools/bridge/Probe.dll'
@@ -54,17 +56,27 @@ def main():
         # Normal application references exclude bootstrap host services.
         run(['dotnet', bridge, '--reference-core', core])
         for name in ['Copy.rvn', 'Main.rvn', 'DelayedCopy.rvnproj']:
-            shutil.copyfile(HERE / name, root / name)
+            shutil.copyfile(consumer / name, root / name)
         env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(bundle / 'raven-sdk'))
         run(['dotnet', 'msbuild', root / 'DelayedCopy.rvnproj', '-nologo', '-v:minimal'], env=env)
         result = run([bundle / 'bin/neoclr', 'run', root / 'bin/neoclr/Debug/App.neoil',
                       '--system', root / 'System.neoil', '--gc-stats'])
-        assert result.stdout == (HERE / 'expected.txt').read_text(), result.stdout + result.stderr
+        expected = (consumer / 'expected.txt').read_text()
+        if consumer == HERE:
+            assert result.stdout == expected, result.stdout + result.stderr
+        else:
+            # Independent host jobs may finish in any order; each outcome appears once.
+            assert sorted(result.stdout.splitlines()) == sorted(expected.splitlines()), result.stdout
+            assert result.stdout.splitlines()[:2] == expected.splitlines()[:2], result.stdout
+            live = re.search(r'live=(\d+)', result.stderr)
+            assert live and int(live[1]) == 0, result.stderr
         collections = re.search(r'collections=(\d+)', result.stderr)
         assert collections and int(collections[1]) > 0, result.stderr
         print(result.stdout, end='')
         print(result.stderr, end='')
         print('Isolated library adapter, actual VM completion, await and GC: passed')
+        if consumer != HERE:
+            return
         shutil.copyfile(HERE / 'Busy.rvn', root / 'Main.rvn')
         run(['dotnet', 'msbuild', root / 'DelayedCopy.rvnproj', '-nologo', '-v:minimal'], env=env)
         busy = run([bundle / 'bin/neoclr', 'run', root / 'bin/neoclr/Debug/App.neoil',

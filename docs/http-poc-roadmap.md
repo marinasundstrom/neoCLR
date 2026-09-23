@@ -338,3 +338,17 @@ is retained through pending callbacks and consumers; final guest live count is z
 The producer events and resource release are modeled in guest code, so native
 acknowledgement, arbitrary queue affinity, host payload limits and teardown still
 require integration with the S0 host path. Existing synchronous Storage is unchanged.
+
+
+## Host pending-read delivery — 2026-09-23
+
+The [host-backed consumer](experiments/host-pending-read/README.md) connects the guest
+contract to the existing notification adapter without adding runtime services. It
+retains private destination state across real worker completion and queued awaits.
+Requests before delivery cancel only after joined producer acknowledgement, discarding
+the payload; requests after delivery cannot change the result. Five outcomes pass
+with actual GC, zero final live objects and unrelated callback progress. The original
+delayed-copy and busy-queue consumers also pass the shared harness.
+This is deferred cancellation, not producer interruption. A no-op managed String
+worker does not establish async file I/O or bounded native shutdown. Per-operation
+cancel channels, queue affinity, byte payloads and producer Fault mapping remain open.

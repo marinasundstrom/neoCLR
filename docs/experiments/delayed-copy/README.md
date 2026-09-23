@@ -154,3 +154,10 @@ request/terminal distinction with ordinary Tasks and generated awaits. It verifi
 both ordered outcomes and late-event suppression with a private destination and GC.
 Its queued producer and release counter are modeled; connecting that contract to
 this host-notification path remains the next bounded integration step.
+
+
+The [host-backed pending-read follow-up](../host-pending-read/README.md) now uses
+this adapter through `verify.py --consumer-root`. It demonstrates deferred cancellation
+at acknowledged host completion, preserves private bytes on cancellation/error and
+checks real GC. The default verifier still checks both original consumers. This
+adds no runtime services and does not implement per-worker interruption.

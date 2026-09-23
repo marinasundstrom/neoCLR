@@ -230,6 +230,12 @@ def main():
         shutil.copyfile(ROOT / 'docs/experiments/pending-read' / name, pending_sources / name)
     shutil.make_archive(str(downloads / 'pending-read'), 'zip', pending_sources.parent)
     shutil.rmtree(pending_sources.parent)
+    host_pending_sources = OUTPUT / '_host-pending-source' / 'host-pending-read'
+    host_pending_sources.mkdir(parents=True)
+    for name in ('Copy.rvn', 'Main.rvn', 'DelayedCopy.rvnproj', 'expected.txt', 'README.md'):
+        shutil.copyfile(ROOT / 'docs/experiments/host-pending-read' / name, host_pending_sources / name)
+    shutil.make_archive(str(downloads / 'host-pending-read'), 'zip', host_pending_sources.parent)
+    shutil.rmtree(host_pending_sources.parent)
     pages = {}
     for source in sorted(SOURCE.rglob('*.html')):
         relative = source.relative_to(SOURCE)

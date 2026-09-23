@@ -1,0 +1,67 @@
+import System.*
+import System.Tasks.*
+import System.Result.*
+import System.Console.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("Host pending-read contract failed")
+    }
+}
+
+async func Consume(read: PendingRead, expected: int) -> Task<unit> {
+    let result = await read.Task
+    Check(read.DeliveryCount == 1)
+    Check(read.ByteAt(0) == 9 && read.ByteAt(3) == 9)
+    match result {
+        Ok(let count) => {
+            Check(count == expected)
+            Check(read.ByteAt(1) == if count > 0 { 72 } else { 9 })
+            Check(read.ByteAt(2) == if count == 2 { 105 } else { 9 })
+        }
+        Error(_) => {
+            Check(expected == -1)
+            Check(read.ByteAt(1) == 9 && read.ByteAt(2) == 9)
+        }
+    }
+    return ()
+}
+
+func Scenario(name: string, text: string, expected: int, cancel: bool) {
+    let read = PendingRead(text)
+    let consumer = Consume(read, expected)
+    Check(!read.Task.IsCompleted && !consumer.IsCompleted)
+    if cancel {
+        Check(read.RequestCancel())
+        Check(!read.RequestCancel())
+        Check(read.DeliveryCount == 0 && !read.Task.IsCompleted)
+    }
+    var notified = 0
+    consumer.OnCompleted(() => {
+        notified += 1
+        Check(notified == 1 && read.DeliveryCount == 1)
+        Check(consumer.IsCancelled == cancel)
+        if cancel {
+            Check(read.ByteAt(1) == 9 && read.ByteAt(2) == 9)
+        }
+        // A request arriving after terminal delivery cannot replace its outcome.
+        Check(!read.RequestCancel())
+        WriteLine(name)
+    })
+}
+
+func Main() {
+    Scenario("Cancellation after host acknowledgement: bytes unchanged", "Hi", 2, true)
+    Scenario("Completion before late request: Hi copied", "Hi", 2, false)
+    Scenario("Oversized host payload: error, bytes unchanged", "large", -1, false)
+    Scenario("Empty host payload: zero bytes", "", 0, false)
+    Scenario("Short host payload: unused byte unchanged", "H", 1, false)
+    TaskQueue.Default.Post(() => WriteLine("Unrelated ready callback"))
+    var index = 0
+    while index < 1200 {
+        let garbage: byte[] = [(byte)0]
+        _ = garbage
+        index += 1
+    }
+    WriteLine("Requests returned before host delivery")
+}

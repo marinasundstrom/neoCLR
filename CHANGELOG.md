@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Connect the pending-read experiment to real isolated host workers and the existing
+  notification adapter. Defer requested cancellation until joined producer completion,
+  then discard the owned payload; preserve completed results against late requests.
+  No public Storage/runtime API or worker interruption is added. Reuse the delayed-copy
+  harness for the new consumer; record the private-field async bridge limitation and
+  add on-site explanation and consumer-source download.
+  Validation: five host-backed outcomes with actual GC and zero final live objects,
+  original delayed-copy/busy-queue consumers, website tests/build and source archive.
+
 - Add a pending-read contract experiment using real Task/Promise, Raven await,
   TaskQueue and managed GC. Six ordered scenarios distinguish cancellation requests
   from terminal acknowledgement, preserve bytes on failure/cancellation and reject

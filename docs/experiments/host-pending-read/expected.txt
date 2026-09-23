@@ -1,0 +1,7 @@
+Requests returned before host delivery
+Unrelated ready callback
+Cancellation after host acknowledgement: bytes unchanged
+Completion before late request: Hi copied
+Oversized host payload: error, bytes unchanged
+Empty host payload: zero bytes
+Short host payload: unused byte unchanged
