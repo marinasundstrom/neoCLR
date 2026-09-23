@@ -1,0 +1,161 @@
+namespace StorageExperiment
+
+import System.*
+import System.Collections.*
+import System.IO.*
+import System.Result.*
+import System.Text.*
+
+func TextInput(text: string) -> MemoryInput {
+    let bytes: List<byte> = ArrayList<byte>()
+    for value in Utf8.Encode(text) {
+        bytes.Add(value)
+    }
+    return MemoryInput(bytes)
+}
+
+func ExpectText(reader: TextReader, limit: int, expected: string) {
+    match reader.ReadToEnd(limit) {
+        Ok(let text) => {
+            if text != expected {
+                System.Fault("Decoded text changed")
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+}
+
+func ExpectPosition(stream: SeekableStream, expected: long) {
+    match stream.GetPosition() {
+        Ok(let position) => {
+            if position != expected {
+                System.Fault("Stream position changed")
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+}
+
+func ReaderAndSeek(input: InputStream, seek: SeekableStream) {
+    ExpectPosition(seek, 0)
+    match seek.Seek(-1) {
+        Error(let error) => {
+            if !error.IsInvalidRange {
+                System.Fault("Invalid seek changed error")
+            }
+        }
+        Ok(_) => System.Fault("Negative seek accepted")
+    }
+    ExpectPosition(seek, 0)
+    match seek.Seek(99) {
+        Ok(_) => { }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    let probe: byte[] = [(byte)0]
+    match input.Read(probe, 0, 1) {
+        Ok(let count) => {
+            if count != 0 {
+                System.Fault("Read beyond EOF returned data")
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    match seek.Seek(0) {
+        Ok(_) => { }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    let reader: TextReader = StreamReader(input, true)
+    ExpectText(reader, 14, "Hello, värld!")
+    ExpectText(reader, 0, "")
+    ExpectPosition(seek, 14)
+    reader.Close()
+    match seek.Seek(0) {
+        Ok(_) => { }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    let owner: TextReader = StreamReader(input)
+    match owner.ReadToEnd(13) {
+        Error(let error) => {
+            if !error.IsLimitExceeded {
+                System.Fault("Text bound changed error")
+            }
+        }
+        Ok(_) => System.Fault("Oversized text accepted")
+    }
+    ExpectPosition(seek, 14)
+    owner.Close()
+    owner.Close()
+    match seek.GetPosition() {
+        Error(let error) => {
+            if !error.IsClosed {
+                System.Fault("Reader failed to close owned input")
+            }
+        }
+        Ok(_) => System.Fault("Owned stream remained open")
+    }
+    match owner.ReadToEnd(-1) {
+        Error(let error) => {
+            if !error.IsClosed {
+                System.Fault("Closed reader changed precedence")
+            }
+        }
+        Ok(_) => System.Fault("Closed reader read text")
+    }
+}
+
+class FailingInput : InputStream {
+    private field calls: int = 0
+    val Calls: int => calls
+    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        calls += 1
+        return Error(StreamError(StreamError.AccessDenied()))
+    }
+    func Close() { }
+}
+
+func Main() {
+    let memory = TextInput("Hello, värld!")
+    ReaderAndSeek(memory, memory)
+    match FileInputStream.Open("reader.txt") {
+        Ok(let disk) => ReaderAndSeek(disk, disk)
+        Error(let error) => System.Fault(error.ToString())
+    }
+    let invalid: List<byte> = ArrayList<byte>()
+    invalid.Add((byte)195)
+    let bad = StreamReader(MemoryInput(invalid))
+    match bad.ReadToEnd(1) {
+        Error(let error) => {
+            if !error.IsInvalidUtf8 {
+                System.Fault("Malformed UTF-8 changed error")
+            }
+        }
+        Ok(_) => System.Fault("Malformed UTF-8 accepted")
+    }
+    bad.Close()
+    let bom = StreamReader(TextInput("\uFEFFx"))
+    ExpectText(bom, 4, "\uFEFFx")
+    bom.Close()
+    let empty = StreamReader(TextInput(""))
+    ExpectText(empty, 0, "")
+    empty.Close()
+    let failing = FailingInput()
+    let errors = StreamReader(failing)
+    match errors.ReadToEnd(-1) {
+        Error(let error) => {
+            if !error.IsInvalidRange || failing.Calls != 0 {
+                System.Fault("Invalid limit consumed input")
+            }
+        }
+        Ok(_) => System.Fault("Negative text limit accepted")
+    }
+    match errors.ReadToEnd(8) {
+        Error(let error) => {
+            if !error.IsAccessDenied {
+                System.Fault("Stream failure distinction lost")
+            }
+        }
+        Ok(_) => System.Fault("Failed input succeeded")
+    }
+    errors.Close()
+    System.Console.WriteLine("Text readers and seekability: passed")
+}

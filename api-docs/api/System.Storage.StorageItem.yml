@@ -18,7 +18,7 @@ items:
   - NeoCLR.CoreProbe
   namespace: System.Storage
   summary: A stored item whose two permitted interface branches are File and Directory.
-  remarks: The Raven reference metadata closes the root to File and Directory. Providers may implement those interfaces, but cannot introduce unrelated direct StorageItem branches. The compiler and strict CIL importer enforce this boundary; raw neoIL does not enforce the closed-hierarchy metadata. The implementation owns interpretation and access. Metadata queries and enumeration are planned, not implemented here.
+  remarks: The Raven reference metadata closes the root to File and Directory. Providers may implement those interfaces, but cannot introduce unrelated direct StorageItem branches. The compiler and strict CIL importer enforce this boundary; raw neoIL does not enforce the closed-hierarchy metadata. The implementation owns interpretation and access. Directory.GetItems provides bounded mixed-item enumeration. Metadata queries remain planned.
   example: []
   syntax:
     content: public interface StorageItem

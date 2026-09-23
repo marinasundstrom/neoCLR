@@ -1,0 +1,728 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO
+  commentId: N:System.IO
+  id: System.IO
+  children:
+  - System.IO.FileInputStream
+  - System.IO.FileOutputStream
+  - System.IO.InputStream
+  - System.IO.OutputStream
+  - System.IO.SeekableStream
+  - System.IO.StreamError
+  - System.IO.StreamError.AccessDenied
+  - System.IO.StreamError.AlreadyExists
+  - System.IO.StreamError.Closed
+  - System.IO.StreamError.InvalidPath
+  - System.IO.StreamError.InvalidRange
+  - System.IO.StreamError.IoFailure
+  - System.IO.StreamError.LimitExceeded
+  - System.IO.StreamError.NotFound
+  - System.IO.StreamError.WrongAccess
+  - System.IO.StreamError.WrongKind
+  - System.IO.StreamReader
+  - System.IO.TextReadError
+  - System.IO.TextReadError.AccessDenied
+  - System.IO.TextReadError.AlreadyExists
+  - System.IO.TextReadError.Closed
+  - System.IO.TextReadError.InvalidPath
+  - System.IO.TextReadError.InvalidRange
+  - System.IO.TextReadError.InvalidUtf8
+  - System.IO.TextReadError.IoFailure
+  - System.IO.TextReadError.LimitExceeded
+  - System.IO.TextReadError.NotFound
+  - System.IO.TextReadError.WrongAccess
+  - System.IO.TextReadError.WrongKind
+  - System.IO.TextReader
+  langs:
+  - csharp
+  - vb
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  type: Namespace
+  assemblies:
+  - NeoCLR.CoreProbe
+references:
+- uid: System.IO.SeekableStream
+  commentId: T:System.IO.SeekableStream
+  parent: System.IO
+  isExternal: true
+  href: System.IO.SeekableStream.html
+  name: SeekableStream
+  nameWithType: SeekableStream
+  fullName: System.IO.SeekableStream
+- uid: System.IO.InputStream
+  commentId: T:System.IO.InputStream
+  parent: System.IO
+  isExternal: true
+  href: System.IO.InputStream.html
+  name: InputStream
+  nameWithType: InputStream
+  fullName: System.IO.InputStream
+- uid: System.IO.OutputStream
+  commentId: T:System.IO.OutputStream
+  parent: System.IO
+  isExternal: true
+  href: System.IO.OutputStream.html
+  name: OutputStream
+  nameWithType: OutputStream
+  fullName: System.IO.OutputStream
+- uid: System.IO.FileInputStream
+  commentId: T:System.IO.FileInputStream
+  isExternal: true
+  href: System.IO.FileInputStream.html
+  name: FileInputStream
+  nameWithType: FileInputStream
+  fullName: System.IO.FileInputStream
+- uid: System.IO.FileOutputStream
+  commentId: T:System.IO.FileOutputStream
+  isExternal: true
+  href: System.IO.FileOutputStream.html
+  name: FileOutputStream
+  nameWithType: FileOutputStream
+  fullName: System.IO.FileOutputStream
+- uid: System.IO.TextReader
+  commentId: T:System.IO.TextReader
+  parent: System.IO
+  isExternal: true
+  href: System.IO.TextReader.html
+  name: TextReader
+  nameWithType: TextReader
+  fullName: System.IO.TextReader
+- uid: System.IO.StreamReader
+  commentId: T:System.IO.StreamReader
+  isExternal: true
+  href: System.IO.StreamReader.html
+  name: StreamReader
+  nameWithType: StreamReader
+  fullName: System.IO.StreamReader
+- uid: System.IO.TextReadError
+  commentId: T:System.IO.TextReadError
+  isExternal: true
+  href: System.IO.TextReadError.html
+  name: TextReadError
+  nameWithType: TextReadError
+  fullName: System.IO.TextReadError
+- uid: System.IO.TextReadError.InvalidPath
+  commentId: T:System.IO.TextReadError.InvalidPath
+  parent: System.IO
+  isExternal: true
+  href: System.IO.TextReadError.html
+  name: TextReadError.InvalidPath
+  nameWithType: TextReadError.InvalidPath
+  fullName: System.IO.TextReadError.InvalidPath
+  spec.csharp:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.IO.TextReadError.InvalidPath.html
+  spec.vb:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.IO.TextReadError.InvalidPath.html
+- uid: System.IO.TextReadError.NotFound
+  commentId: T:System.IO.TextReadError.NotFound
+  parent: System.IO
+  isExternal: true
+  href: System.IO.TextReadError.html
+  name: TextReadError.NotFound
+  nameWithType: TextReadError.NotFound
+  fullName: System.IO.TextReadError.NotFound
+  spec.csharp:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.IO.TextReadError.NotFound.html
+  spec.vb:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.IO.TextReadError.NotFound.html
+- uid: System.IO.TextReadError.AccessDenied
+  commentId: T:System.IO.TextReadError.AccessDenied
+  parent: System.IO
+  isExternal: true
+  href: System.IO.TextReadError.html
+  name: TextReadError.AccessDenied
+  nameWithType: TextReadError.AccessDenied
+  fullName: System.IO.TextReadError.AccessDenied
+  spec.csharp:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.IO.TextReadError.AccessDenied.html
+  spec.vb:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.IO.TextReadError.AccessDenied.html
+- uid: System.IO.TextReadError.WrongKind
+  commentId: T:System.IO.TextReadError.WrongKind
+  parent: System.IO
+  isExternal: true
+  href: System.IO.TextReadError.html
+  name: TextReadError.WrongKind
+  nameWithType: TextReadError.WrongKind
+  fullName: System.IO.TextReadError.WrongKind
+  spec.csharp:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.WrongKind
+    name: WrongKind
+    isExternal: true
+    href: System.IO.TextReadError.WrongKind.html
+  spec.vb:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.WrongKind
+    name: WrongKind
+    isExternal: true
+    href: System.IO.TextReadError.WrongKind.html
+- uid: System.IO.TextReadError.AlreadyExists
+  commentId: T:System.IO.TextReadError.AlreadyExists
+  parent: System.IO
+  isExternal: true
+  href: System.IO.TextReadError.html
+  name: TextReadError.AlreadyExists
+  nameWithType: TextReadError.AlreadyExists
+  fullName: System.IO.TextReadError.AlreadyExists
+  spec.csharp:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.AlreadyExists
+    name: AlreadyExists
+    isExternal: true
+    href: System.IO.TextReadError.AlreadyExists.html
+  spec.vb:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.AlreadyExists
+    name: AlreadyExists
+    isExternal: true
+    href: System.IO.TextReadError.AlreadyExists.html
+- uid: System.IO.TextReadError.Closed
+  commentId: T:System.IO.TextReadError.Closed
+  parent: System.IO
+  isExternal: true
+  href: System.IO.TextReadError.html
+  name: TextReadError.Closed
+  nameWithType: TextReadError.Closed
+  fullName: System.IO.TextReadError.Closed
+  spec.csharp:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.Closed
+    name: Closed
+    isExternal: true
+    href: System.IO.TextReadError.Closed.html
+  spec.vb:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.Closed
+    name: Closed
+    isExternal: true
+    href: System.IO.TextReadError.Closed.html
+- uid: System.IO.TextReadError.InvalidRange
+  commentId: T:System.IO.TextReadError.InvalidRange
+  parent: System.IO
+  isExternal: true
+  href: System.IO.TextReadError.html
+  name: TextReadError.InvalidRange
+  nameWithType: TextReadError.InvalidRange
+  fullName: System.IO.TextReadError.InvalidRange
+  spec.csharp:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.InvalidRange
+    name: InvalidRange
+    isExternal: true
+    href: System.IO.TextReadError.InvalidRange.html
+  spec.vb:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.InvalidRange
+    name: InvalidRange
+    isExternal: true
+    href: System.IO.TextReadError.InvalidRange.html
+- uid: System.IO.TextReadError.LimitExceeded
+  commentId: T:System.IO.TextReadError.LimitExceeded
+  parent: System.IO
+  isExternal: true
+  href: System.IO.TextReadError.html
+  name: TextReadError.LimitExceeded
+  nameWithType: TextReadError.LimitExceeded
+  fullName: System.IO.TextReadError.LimitExceeded
+  spec.csharp:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.LimitExceeded
+    name: LimitExceeded
+    isExternal: true
+    href: System.IO.TextReadError.LimitExceeded.html
+  spec.vb:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.LimitExceeded
+    name: LimitExceeded
+    isExternal: true
+    href: System.IO.TextReadError.LimitExceeded.html
+- uid: System.IO.TextReadError.WrongAccess
+  commentId: T:System.IO.TextReadError.WrongAccess
+  parent: System.IO
+  isExternal: true
+  href: System.IO.TextReadError.html
+  name: TextReadError.WrongAccess
+  nameWithType: TextReadError.WrongAccess
+  fullName: System.IO.TextReadError.WrongAccess
+  spec.csharp:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.WrongAccess
+    name: WrongAccess
+    isExternal: true
+    href: System.IO.TextReadError.WrongAccess.html
+  spec.vb:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.WrongAccess
+    name: WrongAccess
+    isExternal: true
+    href: System.IO.TextReadError.WrongAccess.html
+- uid: System.IO.TextReadError.IoFailure
+  commentId: T:System.IO.TextReadError.IoFailure
+  parent: System.IO
+  isExternal: true
+  href: System.IO.TextReadError.html
+  name: TextReadError.IoFailure
+  nameWithType: TextReadError.IoFailure
+  fullName: System.IO.TextReadError.IoFailure
+  spec.csharp:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.IoFailure
+    name: IoFailure
+    isExternal: true
+    href: System.IO.TextReadError.IoFailure.html
+  spec.vb:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.IoFailure
+    name: IoFailure
+    isExternal: true
+    href: System.IO.TextReadError.IoFailure.html
+- uid: System.IO.TextReadError.InvalidUtf8
+  commentId: T:System.IO.TextReadError.InvalidUtf8
+  parent: System.IO
+  isExternal: true
+  href: System.IO.TextReadError.html
+  name: TextReadError.InvalidUtf8
+  nameWithType: TextReadError.InvalidUtf8
+  fullName: System.IO.TextReadError.InvalidUtf8
+  spec.csharp:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.InvalidUtf8
+    name: InvalidUtf8
+    isExternal: true
+    href: System.IO.TextReadError.InvalidUtf8.html
+  spec.vb:
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: .
+  - uid: System.IO.TextReadError.InvalidUtf8
+    name: InvalidUtf8
+    isExternal: true
+    href: System.IO.TextReadError.InvalidUtf8.html
+- uid: System.IO.StreamError
+  commentId: T:System.IO.StreamError
+  isExternal: true
+  href: System.IO.StreamError.html
+  name: StreamError
+  nameWithType: StreamError
+  fullName: System.IO.StreamError
+- uid: System.IO.StreamError.InvalidPath
+  commentId: T:System.IO.StreamError.InvalidPath
+  parent: System.IO
+  isExternal: true
+  href: System.IO.StreamError.html
+  name: StreamError.InvalidPath
+  nameWithType: StreamError.InvalidPath
+  fullName: System.IO.StreamError.InvalidPath
+  spec.csharp:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.IO.StreamError.InvalidPath.html
+  spec.vb:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.InvalidPath
+    name: InvalidPath
+    isExternal: true
+    href: System.IO.StreamError.InvalidPath.html
+- uid: System.IO.StreamError.NotFound
+  commentId: T:System.IO.StreamError.NotFound
+  parent: System.IO
+  isExternal: true
+  href: System.IO.StreamError.html
+  name: StreamError.NotFound
+  nameWithType: StreamError.NotFound
+  fullName: System.IO.StreamError.NotFound
+  spec.csharp:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.IO.StreamError.NotFound.html
+  spec.vb:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.NotFound
+    name: NotFound
+    isExternal: true
+    href: System.IO.StreamError.NotFound.html
+- uid: System.IO.StreamError.AccessDenied
+  commentId: T:System.IO.StreamError.AccessDenied
+  parent: System.IO
+  isExternal: true
+  href: System.IO.StreamError.html
+  name: StreamError.AccessDenied
+  nameWithType: StreamError.AccessDenied
+  fullName: System.IO.StreamError.AccessDenied
+  spec.csharp:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.IO.StreamError.AccessDenied.html
+  spec.vb:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.AccessDenied
+    name: AccessDenied
+    isExternal: true
+    href: System.IO.StreamError.AccessDenied.html
+- uid: System.IO.StreamError.WrongKind
+  commentId: T:System.IO.StreamError.WrongKind
+  parent: System.IO
+  isExternal: true
+  href: System.IO.StreamError.html
+  name: StreamError.WrongKind
+  nameWithType: StreamError.WrongKind
+  fullName: System.IO.StreamError.WrongKind
+  spec.csharp:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.WrongKind
+    name: WrongKind
+    isExternal: true
+    href: System.IO.StreamError.WrongKind.html
+  spec.vb:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.WrongKind
+    name: WrongKind
+    isExternal: true
+    href: System.IO.StreamError.WrongKind.html
+- uid: System.IO.StreamError.AlreadyExists
+  commentId: T:System.IO.StreamError.AlreadyExists
+  parent: System.IO
+  isExternal: true
+  href: System.IO.StreamError.html
+  name: StreamError.AlreadyExists
+  nameWithType: StreamError.AlreadyExists
+  fullName: System.IO.StreamError.AlreadyExists
+  spec.csharp:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.AlreadyExists
+    name: AlreadyExists
+    isExternal: true
+    href: System.IO.StreamError.AlreadyExists.html
+  spec.vb:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.AlreadyExists
+    name: AlreadyExists
+    isExternal: true
+    href: System.IO.StreamError.AlreadyExists.html
+- uid: System.IO.StreamError.Closed
+  commentId: T:System.IO.StreamError.Closed
+  parent: System.IO
+  isExternal: true
+  href: System.IO.StreamError.html
+  name: StreamError.Closed
+  nameWithType: StreamError.Closed
+  fullName: System.IO.StreamError.Closed
+  spec.csharp:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.Closed
+    name: Closed
+    isExternal: true
+    href: System.IO.StreamError.Closed.html
+  spec.vb:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.Closed
+    name: Closed
+    isExternal: true
+    href: System.IO.StreamError.Closed.html
+- uid: System.IO.StreamError.InvalidRange
+  commentId: T:System.IO.StreamError.InvalidRange
+  parent: System.IO
+  isExternal: true
+  href: System.IO.StreamError.html
+  name: StreamError.InvalidRange
+  nameWithType: StreamError.InvalidRange
+  fullName: System.IO.StreamError.InvalidRange
+  spec.csharp:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.InvalidRange
+    name: InvalidRange
+    isExternal: true
+    href: System.IO.StreamError.InvalidRange.html
+  spec.vb:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.InvalidRange
+    name: InvalidRange
+    isExternal: true
+    href: System.IO.StreamError.InvalidRange.html
+- uid: System.IO.StreamError.LimitExceeded
+  commentId: T:System.IO.StreamError.LimitExceeded
+  parent: System.IO
+  isExternal: true
+  href: System.IO.StreamError.html
+  name: StreamError.LimitExceeded
+  nameWithType: StreamError.LimitExceeded
+  fullName: System.IO.StreamError.LimitExceeded
+  spec.csharp:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.LimitExceeded
+    name: LimitExceeded
+    isExternal: true
+    href: System.IO.StreamError.LimitExceeded.html
+  spec.vb:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.LimitExceeded
+    name: LimitExceeded
+    isExternal: true
+    href: System.IO.StreamError.LimitExceeded.html
+- uid: System.IO.StreamError.WrongAccess
+  commentId: T:System.IO.StreamError.WrongAccess
+  parent: System.IO
+  isExternal: true
+  href: System.IO.StreamError.html
+  name: StreamError.WrongAccess
+  nameWithType: StreamError.WrongAccess
+  fullName: System.IO.StreamError.WrongAccess
+  spec.csharp:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.WrongAccess
+    name: WrongAccess
+    isExternal: true
+    href: System.IO.StreamError.WrongAccess.html
+  spec.vb:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.WrongAccess
+    name: WrongAccess
+    isExternal: true
+    href: System.IO.StreamError.WrongAccess.html
+- uid: System.IO.StreamError.IoFailure
+  commentId: T:System.IO.StreamError.IoFailure
+  parent: System.IO
+  isExternal: true
+  href: System.IO.StreamError.html
+  name: StreamError.IoFailure
+  nameWithType: StreamError.IoFailure
+  fullName: System.IO.StreamError.IoFailure
+  spec.csharp:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.IoFailure
+    name: IoFailure
+    isExternal: true
+    href: System.IO.StreamError.IoFailure.html
+  spec.vb:
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: .
+  - uid: System.IO.StreamError.IoFailure
+    name: IoFailure
+    isExternal: true
+    href: System.IO.StreamError.IoFailure.html
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html

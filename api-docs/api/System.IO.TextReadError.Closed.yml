@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.TextReadError.Closed
+  commentId: T:System.IO.TextReadError.Closed
+  id: TextReadError.Closed
+  parent: System.IO
+  children:
+  - System.IO.TextReadError.Closed.#ctor
+  langs:
+  - csharp
+  - vb
+  name: TextReadError.Closed
+  nameWithType: TextReadError.Closed
+  fullName: System.IO.TextReadError.Closed
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: The Closed text-reading error case.
+  example: []
+  syntax:
+    content: public struct TextReadError.Closed
+    content.vb: Public Structure TextReadError.Closed
+- uid: System.IO.TextReadError.Closed.#ctor
+  commentId: M:System.IO.TextReadError.Closed.#ctor
+  id: '#ctor'
+  parent: System.IO.TextReadError.Closed
+  langs:
+  - csharp
+  - vb
+  name: Closed()
+  nameWithType: TextReadError.Closed.Closed()
+  fullName: System.IO.TextReadError.Closed.Closed()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Creates Closed.
+  example: []
+  syntax:
+    content: public Closed()
+    content.vb: Public Sub New()
+  overload: System.IO.TextReadError.Closed.#ctor*
+  nameWithType.vb: TextReadError.Closed.New()
+  fullName.vb: System.IO.TextReadError.Closed.New()
+  name.vb: New()
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.TextReadError.Closed.#ctor*
+  commentId: Overload:System.IO.TextReadError.Closed.#ctor
+  isExternal: true
+  href: System.IO.TextReadError.Closed.html#System_IO_TextReadError_Closed__ctor
+  name: Closed
+  nameWithType: TextReadError.Closed.Closed
+  fullName: System.IO.TextReadError.Closed.Closed
+  nameWithType.vb: TextReadError.Closed.New
+  fullName.vb: System.IO.TextReadError.Closed.New
+  name.vb: New

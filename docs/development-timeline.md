@@ -5571,3 +5571,23 @@ and recorded the convention for runtime code as well as examples.
   Scheduling, cancellation, ownership and closing races must be defined first.
 - **Action:** recorded this as future direction. The active POC remains synchronous;
   no completed-task wrapper or automatic thread spawning is being presented as async I/O.
+
+
+### 2026-09-23 — Storage POC implementation outcome
+
+- **Assistant action:** integrated System.IO byte streams and the TextReader interface,
+  a bounded UTF-8 StreamReader with explicit input ownership, and a separate
+  SeekableStream capability on file input. Kept System.Storage for providers/items/paths.
+- **Observed outcome:** the standalone platform-only Storage POC compiles, verifies
+  and runs, producing checked file bytes and output for write/read, seek/reread,
+  mixed enumeration, traversal and expected errors. Source, walkthrough and API
+  reference are on-site build inputs; no website publication is claimed.
+- **Implementation findings:** the bridge needed reader local admission and Boolean
+  constructor coercion. The current compiler requires an object view for checked
+  discovery of an unrelated stream interface. No Raven repository changes were made.
+- **Still open:** async Storage signatures, scheduling/cancellation, metadata query
+  shape, incremental readers/enumeration and broader providers. The author's async
+  question is recorded as exploration, not a decision to change POC signatures.
+- **Evidence:** [product](experiments/storage-poc/README.md),
+  [contracts](experiments/storage-provider/ReaderContracts.rvn),
+  [API guide](../api-docs/streams.md), [roadmap](platform-roadmap.md).

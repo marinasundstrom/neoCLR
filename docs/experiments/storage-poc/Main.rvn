@@ -1,0 +1,138 @@
+import System.*
+import System.Console.*
+import System.Result.*
+import System.Storage.*
+import System.Storage.File
+import System.Storage.Directory
+import System.IO.*
+import System.Text.*
+
+func Parse(text: string) -> Path {
+    return match Path.Parse(text) {
+        Ok(let path) => path
+        Error(_) => {
+            System.Fault("Invalid sample path")
+            Parse("/")
+        }
+    }
+}
+
+func WriteMessage(output: OutputStream) -> Result<unit, StreamError> {
+    let message = Utf8.Encode("Hello, värld!")
+    let buffer: byte[] = [(byte)0, (byte)0, (byte)0]
+    var position = 0
+    while position < message.Count {
+        var count = 0
+        while count < buffer.Length && position < message.Count {
+            buffer[count] = message[position]
+            count += 1
+            position += 1
+        }
+        var offset = 0
+        while offset < count {
+            match output.Write(buffer, offset, count - offset) {
+                Ok(let written) => {
+                    if written <= 0 || written > count - offset {
+                        System.Fault("Invalid write progress")
+                    }
+                    offset += written
+                }
+                Error(let error) => return Error(error)
+            }
+        }
+    }
+    return output.Flush()
+}
+
+func ShowText(prefix: string, result: Result<string, TextReadError>) {
+    match result {
+        Ok(let text) => WriteLine(prefix + text)
+        Error(let error) => System.Fault(error.ToString())
+    }
+}
+
+func FileAccess(file: File) {
+    match file.CreateNew() {
+        Ok(let output) => {
+            let written = WriteMessage(output)
+            output.Close()
+            match written {
+                Ok(_) => WriteLine("Created " + file.Name)
+                Error(let error) => System.Fault(error.ToString())
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    match file.OpenRead() {
+        Ok(let input) => {
+            // This reader borrows the input; close it before repositioning.
+            let reader: TextReader = StreamReader(input, true)
+            let text = reader.ReadToEnd(64)
+            reader.Close()
+            ShowText("Read: ", text)
+            // Seekability is optional on a generic InputStream.
+            let capability: object = input
+            if capability is let seek: SeekableStream {
+                match seek.Seek(0) {
+                    Ok(_) => {
+                        let again: TextReader = StreamReader(input, true)
+                        let reread = again.ReadToEnd(64)
+                        again.Close()
+                        ShowText("Re-read after seek: ", reread)
+                    }
+                    Error(let error) => System.Fault(error.ToString())
+                }
+            }
+            input.Close()
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    match file.CreateNew() {
+        Error(let error) => WriteLine("Existing file: " + error.ToString())
+        Ok(let unexpected) => {
+            unexpected.Close()
+            System.Fault("Exclusive creation replaced a file")
+        }
+    }
+}
+
+func Explore(directory: Directory) {
+    // FileAt describes a destination; CreateNew performs exclusive creation.
+    match directory.FileAt("message.txt") {
+        Ok(let file) => FileAccess(file)
+        Error(let error) => System.Fault(error.ToString())
+    }
+    match directory.GetItems(8) {
+        Ok(let items) => {
+            WriteLine("Items:")
+            for item in items {
+                if item is Directory {
+                    WriteLine("directory: " + item.Name)
+                } else {
+                    WriteLine("file: " + item.Name)
+                }
+            }
+        }
+        Error(let error) => System.Fault(error.ToString())
+    }
+    match directory.GetDirectory("examples") {
+        Ok(let child) => WriteLine("Directory: " + child.Path.Text)
+        Error(let error) => System.Fault(error.ToString())
+    }
+    match directory.GetItem(Parse("message.txt")) {
+        Ok(let item) => WriteLine("Item: " + item.Name)
+        Error(let error) => System.Fault(error.ToString())
+    }
+    match directory.GetFile("missing.txt") {
+        Error(let error) => WriteLine("Missing file: " + error.ToString())
+        Ok(_) => System.Fault("Unexpected fixture file")
+    }
+}
+
+func Main() {
+    let provider: StorageProvider = FileSystem("storage-demo")
+    match provider.GetDirectory(Parse("/")) {
+        Ok(let directory) => Explore(directory)
+        Error(let error) => System.Fault(error.ToString())
+    }
+}

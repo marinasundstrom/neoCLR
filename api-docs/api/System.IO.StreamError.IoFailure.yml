@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.StreamError.IoFailure
+  commentId: T:System.IO.StreamError.IoFailure
+  id: StreamError.IoFailure
+  parent: System.IO
+  children:
+  - System.IO.StreamError.IoFailure.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StreamError.IoFailure
+  nameWithType: StreamError.IoFailure
+  fullName: System.IO.StreamError.IoFailure
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Another host I/O error occurred.
+  example: []
+  syntax:
+    content: public struct StreamError.IoFailure
+    content.vb: Public Structure StreamError.IoFailure
+- uid: System.IO.StreamError.IoFailure.#ctor
+  commentId: M:System.IO.StreamError.IoFailure.#ctor
+  id: '#ctor'
+  parent: System.IO.StreamError.IoFailure
+  langs:
+  - csharp
+  - vb
+  name: IoFailure()
+  nameWithType: StreamError.IoFailure.IoFailure()
+  fullName: System.IO.StreamError.IoFailure.IoFailure()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Creates the IoFailure case value.
+  example: []
+  syntax:
+    content: public IoFailure()
+    content.vb: Public Sub New()
+  overload: System.IO.StreamError.IoFailure.#ctor*
+  nameWithType.vb: StreamError.IoFailure.New()
+  fullName.vb: System.IO.StreamError.IoFailure.New()
+  name.vb: New()
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.StreamError.IoFailure.#ctor*
+  commentId: Overload:System.IO.StreamError.IoFailure.#ctor
+  isExternal: true
+  href: System.IO.StreamError.IoFailure.html#System_IO_StreamError_IoFailure__ctor
+  name: IoFailure
+  nameWithType: StreamError.IoFailure.IoFailure
+  fullName: System.IO.StreamError.IoFailure.IoFailure
+  nameWithType.vb: StreamError.IoFailure.New
+  fullName.vb: System.IO.StreamError.IoFailure.New
+  name.vb: New

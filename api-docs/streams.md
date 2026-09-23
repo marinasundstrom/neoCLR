@@ -1,17 +1,17 @@
 # File byte streams
 
-**Development after Preview 9.** System.Streams now has blocking file input and
+**Development after Preview 9.** System.IO now has blocking file input and
 output APIs. Use matching development artifacts. These are a first working slice,
 not a finalized provider model or asynchronous I/O contract.
 
 ## Browse the API
 
-- [System.Streams](xref:System.Streams) — namespace and types.
-- [InputStream](xref:System.Streams.InputStream) — Read and Close contracts.
-- [OutputStream](xref:System.Streams.OutputStream) — Write, Flush and Close contracts.
-- [FileInputStream](xref:System.Streams.FileInputStream) — Open, Read and Close.
-- [FileOutputStream](xref:System.Streams.FileOutputStream) — CreateNew, Write and Close.
-- [StreamError](xref:System.Streams.StreamError) — expected open and transfer failures.
+- [System.IO](xref:System.IO) — namespace and types.
+- [InputStream](xref:System.IO.InputStream) — Read and Close contracts.
+- [OutputStream](xref:System.IO.OutputStream) — Write, Flush and Close contracts.
+- [FileInputStream](xref:System.IO.FileInputStream) — Open, Read and Close.
+- [FileOutputStream](xref:System.IO.FileOutputStream) — CreateNew, Write and Close.
+- [StreamError](xref:System.IO.StreamError) — expected open and transfer failures.
 - [Flush](#flush) — complete manual entries for both renderer exclusions.
 
 An input stream reads an existing regular file. An output stream exclusively
@@ -25,7 +25,8 @@ teardown. No public constructor accepts a native handle.
 and FileOutputStream implement them directly. The Storage sample's memory streams
 implement the same interfaces; consumers need no disk adapter or native handle.
 InputStream exposes Read and Close. OutputStream exposes Write, Flush and Close.
-Neither direction exposes the opposite operation, seeking or metadata properties.
+Neither directional interface exposes the opposite operation, seeking or metadata
+properties. SeekableStream adds positioning separately; FileInputStream implements it.
 
 Implementers must preserve range validation, partial counts, the 64 KiB request
 limit, caller buffer ownership and idempotent Close. Check Closed before validating
@@ -38,7 +39,7 @@ implementation, not every provider.
 Unlike .NET's [Stream](https://learn.microsoft.com/en-us/dotnet/api/system.io.stream?view=net-10.0),
 which exposes read/write/seek operations with capability properties, these narrow
 interfaces express direction in the type. This helps consumers request only what
-they use, at the cost of additional types and no ready-made duplex/seek abstraction.
+they use, at the cost of additional types and explicit capability composition.
 This is a provisional library choice, not new VM machinery or a performance claim.
 
 ## Buffer and lifetime rules
@@ -117,11 +118,39 @@ are still application-owned experiments. General capability interfaces, automati
 disposal, asynchronous I/O and suspension-aware buffer ownership remain open.
 
 
-## Text reader direction
+## Text readers
 
-The planned TextReader interface will describe text reading; StreamReader will
-implement it over InputStream for the Storage POC so
-applications can read UTF-8 text without assembling byte buffers themselves. It is
-not implemented yet. The first iteration should define bounded reads, partial-byte
-handling, decoding errors and ownership of the wrapped stream. Additional encodings,
-line reading and async behavior are separate extensions.
+[TextReader](xref:System.IO.TextReader) is the consumer interface.
+[StreamReader](xref:System.IO.StreamReader) reads strict UTF-8 from an InputStream.
+It works with host files and the sample's partial-read memory input. The POC exposes
+ReadToEnd(maxUtf8Bytes) and Close; line reading, other encodings and async work remain
+future extensions. A BOM is preserved as text, rather than detecting other encodings.
+
+Bounds are 0–65536 UTF-8 bytes. Negative bounds fail before reading; zero accepts
+only EOF. One excess byte may be consumed to detect overflow. Invalid UTF-8 has a
+distinct TextReadError; input error distinctions are preserved as named cases.
+Errors do not roll back the cursor. Repeated reads at EOF produce an empty string.
+This implementation buffers remaining bytes and the decoded string, so memory is
+bounded by the operation but is not constant. Host resource budgets also apply.
+
+StreamReader(input) owns the input; StreamReader(input, true) leaves it open when
+closed. Close is idempotent, and reads after closing return Closed. Construction
+performs no read. Consumers receive TextReader; they need not know the input source.
+
+## Seekability
+
+[SeekableStream](xref:System.IO.SeekableStream) adds GetPosition and absolute
+Seek(position), returning Int64 positions or StreamError. It is separate from
+InputStream. FileInputStream implements both; a generic input need not support seeks.
+Negative offsets return InvalidRange without moving, closed inputs return Closed,
+and FileInputStream permits seeking past EOF. The sample memory input supports the
+same operations within its Int32-backed cursor range. Byte positions are not text
+character positions. Close a leave-open reader before independently repositioning
+its input and creating another reader; TextReader has no repositioning API.
+
+## Development namespace migration
+
+Streams and text readers now use System.IO. Update System.Streams imports and type
+names to System.IO and regenerate applications with matching artifacts. System.Storage
+continues to own providers, files, directories and Path. These APIs are development
+work after Preview 9; published downloads are unchanged.

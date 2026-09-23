@@ -2,7 +2,7 @@ namespace System.Storage
 
 import System.*
 import System.Collections.*
-import System.Streams.*
+import System.IO.*
 
 public sealed interface StorageItem {
     val Path: Path { get }

@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.TextReadError.WrongAccess
+  commentId: T:System.IO.TextReadError.WrongAccess
+  id: TextReadError.WrongAccess
+  parent: System.IO
+  children:
+  - System.IO.TextReadError.WrongAccess.#ctor
+  langs:
+  - csharp
+  - vb
+  name: TextReadError.WrongAccess
+  nameWithType: TextReadError.WrongAccess
+  fullName: System.IO.TextReadError.WrongAccess
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: The WrongAccess text-reading error case.
+  example: []
+  syntax:
+    content: public struct TextReadError.WrongAccess
+    content.vb: Public Structure TextReadError.WrongAccess
+- uid: System.IO.TextReadError.WrongAccess.#ctor
+  commentId: M:System.IO.TextReadError.WrongAccess.#ctor
+  id: '#ctor'
+  parent: System.IO.TextReadError.WrongAccess
+  langs:
+  - csharp
+  - vb
+  name: WrongAccess()
+  nameWithType: TextReadError.WrongAccess.WrongAccess()
+  fullName: System.IO.TextReadError.WrongAccess.WrongAccess()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Creates WrongAccess.
+  example: []
+  syntax:
+    content: public WrongAccess()
+    content.vb: Public Sub New()
+  overload: System.IO.TextReadError.WrongAccess.#ctor*
+  nameWithType.vb: TextReadError.WrongAccess.New()
+  fullName.vb: System.IO.TextReadError.WrongAccess.New()
+  name.vb: New()
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.TextReadError.WrongAccess.#ctor*
+  commentId: Overload:System.IO.TextReadError.WrongAccess.#ctor
+  isExternal: true
+  href: System.IO.TextReadError.WrongAccess.html#System_IO_TextReadError_WrongAccess__ctor
+  name: WrongAccess
+  nameWithType: TextReadError.WrongAccess.WrongAccess
+  fullName: System.IO.TextReadError.WrongAccess.WrongAccess
+  nameWithType.vb: TextReadError.WrongAccess.New
+  fullName.vb: System.IO.TextReadError.WrongAccess.New
+  name.vb: New

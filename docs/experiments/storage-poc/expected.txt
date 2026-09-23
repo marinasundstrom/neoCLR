@@ -1,0 +1,10 @@
+Created message.txt
+Read: Hello, värld!
+Re-read after seek: Hello, värld!
+Existing file: AlreadyExists
+Items:
+directory: examples
+file: message.txt
+Directory: /examples
+Item: message.txt
+Missing file: NotFound

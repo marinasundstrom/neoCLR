@@ -1,0 +1,7 @@
+; Generated from runtime/raven/src/System/IO/TextReader.rvn. Regenerate with build_runtime_library.py.
+.interface System.IO.TextReader
+.method instance ReadToEnd(Int32 maxUtf8Bytes) -> System.Result<String,System.IO.TextReadError>
+.end
+.method instance Close() -> noresult
+.end
+.end

@@ -3,17 +3,21 @@ using Mono.Cecil;
 // Directional, blocking file streams. Raw resource IDs never enter the public contract.
 static class StreamBindings
 {
-    const string Prefix = "System.Streams.";
-    public static bool IsCapability(string name) => name is Prefix + "InputStream" or Prefix + "OutputStream";
+    const string Prefix = "System.IO.";
+    public static bool IsCapability(string name) => name is Prefix + "InputStream" or Prefix + "OutputStream" or Prefix + "SeekableStream";
     public static bool Assignable(string source, string target) =>
-        source == Prefix + "FileInputStream" && target == Prefix + "InputStream"
+        source == Prefix + "FileInputStream" && target is Prefix + "InputStream" or Prefix + "SeekableStream"
         || source == Prefix + "FileOutputStream" && target == Prefix + "OutputStream";
     public static bool IsName(string name) => name is Prefix + "FileInputStream" or Prefix + "FileOutputStream";
     public static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName
         && (IsName(left.FullName) || IsCapability(left.FullName)) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
     public const string Declarations = """
-        namespace Streams {
+        namespace IO {
+            public interface SeekableStream {
+                Result<long, StreamError> GetPosition();
+                Result<long, StreamError> Seek(long position);
+            }
             public interface InputStream {
                 Result<int, StreamError> Read(byte[] buffer, int offset, int count);
                 void Close();
@@ -23,7 +27,9 @@ static class StreamBindings
                 Result<PropagationUnit, StreamError> Flush();
                 void Close();
             }
-            public sealed class FileInputStream : InputStream {
+            public sealed class FileInputStream : InputStream, SeekableStream {
+                public Result<long, StreamError> GetPosition() => default;
+                public Result<long, StreamError> Seek(long position) => default;
                 private FileInputStream(int handle) { }
                 public static Result<FileInputStream, StreamError> Open(string path) => default;
                 public Result<int, StreamError> Read(byte[] buffer, int offset, int count) => default;
@@ -44,8 +50,10 @@ static class StreamBindings
         if (owner is null || !IsCapability(owner)) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var expected = (owner, reference.Name) switch {
-            (Prefix + "InputStream", "Read") or (Prefix + "OutputStream", "Write") => ("arrayref<Byte>,Int32,Int32", "System.Result<Int32,System.Streams.StreamError>"),
-            (Prefix + "OutputStream", "Flush") => ("", "System.Result<Void,System.Streams.StreamError>"),
+            (Prefix + "InputStream", "Read") or (Prefix + "OutputStream", "Write") => ("arrayref<Byte>,Int32,Int32", "System.Result<Int32,System.IO.StreamError>"),
+            (Prefix + "SeekableStream", "GetPosition") => ("", "System.Result<Int64,System.IO.StreamError>"),
+            (Prefix + "SeekableStream", "Seek") => ("Int64", "System.Result<Int64,System.IO.StreamError>"),
+            (Prefix + "OutputStream", "Flush") => ("", "System.Result<Void,System.IO.StreamError>"),
             (_, "Close") => ("", "noresult"),
             _ => throw new InvalidDataException("Unsupported stream capability member.")
         };
@@ -60,6 +68,7 @@ static class StreamBindings
     public static void ValidateCapabilities(ModuleDefinition module)
     {
         foreach (var (name, members) in new[] {
+            (Prefix + "SeekableStream", new[] { "GetPosition", "Seek" }),
             (Prefix + "InputStream", new[] { "Read", "Close" }),
             (Prefix + "OutputStream", new[] { "Write", "Flush", "Close" }) })
         {
@@ -77,9 +86,11 @@ static class StreamBindings
         if (owner is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var expected = (owner, definition.Name) switch {
-            (Prefix + "FileInputStream", "Open") or (Prefix + "FileOutputStream", "CreateNew") => ("String", $"System.Result<{owner},System.Streams.StreamError>", true),
-            (Prefix + "FileInputStream", "Read") or (Prefix + "FileOutputStream", "Write") => ("arrayref<Byte>,Int32,Int32", "System.Result<Int32,System.Streams.StreamError>", false),
-            (Prefix + "FileOutputStream", "Flush") => ("", "System.Result<Void,System.Streams.StreamError>", false),
+            (Prefix + "FileInputStream", "Open") or (Prefix + "FileOutputStream", "CreateNew") => ("String", $"System.Result<{owner},System.IO.StreamError>", true),
+            (Prefix + "FileInputStream", "Read") or (Prefix + "FileOutputStream", "Write") => ("arrayref<Byte>,Int32,Int32", "System.Result<Int32,System.IO.StreamError>", false),
+            (Prefix + "FileInputStream", "GetPosition") => ("", "System.Result<Int64,System.IO.StreamError>", false),
+            (Prefix + "FileInputStream", "Seek") => ("Int64", "System.Result<Int64,System.IO.StreamError>", false),
+            (Prefix + "FileOutputStream", "Flush") => ("", "System.Result<Void,System.IO.StreamError>", false),
             (_, "Close") => ("", "noresult", false),
             _ => throw new InvalidDataException("Unsupported file stream member.")
         };

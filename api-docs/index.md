@@ -37,7 +37,7 @@ being expanded beyond the initial Preview 9 async overview.
 | --- | --- |
 | [System.Storage](xref:System.Storage) | [StorageItem, File and Directory](storage-items.md), [FileText](xref:System.Storage.FileText), [FileSystem](xref:System.Storage.FileSystem), [StorageProvider](xref:System.Storage.StorageProvider) for [item lookup](storage-provider.md), [Path](xref:System.Storage.Path), InvalidPathError, [Metadata.GetKind](xref:System.Storage.Metadata), EntryKind and StorageLookupError; see the [lookup guide](storage-lookup.md) |
 | [System.Tasks](xref:System.Tasks) | Task, Promise, TaskQueue and completion state |
-| [System.Streams](xref:System.Streams) | Directional file streams and typed errors; see the [stream guide](streams.md), including Flush |
+| [System.IO](xref:System.IO) | Directional file streams, TextReader/StreamReader, SeekableStream and typed errors; see the [stream guide](streams.md), including Flush |
 | [System.Concurrency](xref:System.Concurrency) | Explicit Thread lifecycle and the isolated ThreadPool; development after Preview 9 |
 
 Use the API reference navigation to expand each namespace and select a type.
@@ -106,8 +106,11 @@ See the [platform overview](/about/index.html) for background and direction and
 [proposals](/proposals/index.html) for open ideas. General API usage belongs here
 and in the feature guides; repository implementation notes are supplementary.
 
-The development [InputStream](xref:System.Streams.InputStream) and
-[OutputStream](xref:System.Streams.OutputStream) interfaces let the same consumer
+The development [InputStream](xref:System.IO.InputStream) and
+[OutputStream](xref:System.IO.OutputStream) interfaces let the same consumer
 use a file stream or an application-defined memory stream. See the
 [capability contracts](streams.md#capability-contracts) and the manually documented
 [Flush methods](streams.md#flush).
+
+The [Storage POC](storage-poc.md) demonstrates provider lookup, writing, text reading,
+seekability and mixed-item enumeration using the integrated development APIs.

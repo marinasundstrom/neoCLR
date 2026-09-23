@@ -3,10 +3,10 @@ namespace StorageExperiment
 import System.*
 import System.Collections.*
 import System.Result.*
-import System.Streams.*
+import System.IO.*
 
 // Two-byte transfers deliberately exercise short-read and short-write loops.
-class MemoryInput : InputStream {
+class MemoryInput : InputStream, SeekableStream {
     private field bytes: List<byte>
     private field position: int = 0
     private field closed: bool = false
@@ -41,6 +41,27 @@ class MemoryInput : InputStream {
             read += 1
         }
         return Ok(read)
+    }
+
+    func GetPosition() -> Result<long, StreamError> {
+        if closed {
+            return Error(StreamError(StreamError.Closed()))
+        }
+        return Ok((long)position)
+    }
+
+    func Seek(position: long) -> Result<long, StreamError> {
+        if closed {
+            return Error(StreamError(StreamError.Closed()))
+        }
+        if position < 0 {
+            return Error(StreamError(StreamError.InvalidRange()))
+        }
+        if position > 2147483647 {
+            return Error(StreamError(StreamError.LimitExceeded()))
+        }
+        self.position = (int)position
+        return Ok(position)
     }
 
     func Close() {

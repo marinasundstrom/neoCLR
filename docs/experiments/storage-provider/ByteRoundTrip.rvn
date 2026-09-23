@@ -7,7 +7,7 @@ import System.*
 import System.Console.*
 import System.Collections.*
 import System.Result.*
-import System.Streams.*
+import System.IO.*
 import System.Text.*
 
 func WriteMessage(output: OutputStream) -> Result<unit, StreamError> {

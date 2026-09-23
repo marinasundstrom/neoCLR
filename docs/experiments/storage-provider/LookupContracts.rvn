@@ -6,7 +6,7 @@ import System.Storage.Directory
 import System.*
 import System.Console.*
 import System.Result.*
-import System.Streams.*
+import System.IO.*
 
 func LookupCases(provider: StorageProvider) {
     match provider.GetFile(RequirePath("/missing")) {

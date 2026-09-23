@@ -4,7 +4,7 @@ use crate::{metadata::Type, Fault, Limits, Value};
 use std::{
     collections::{HashMap, HashSet},
     fs::{File, OpenOptions},
-    io::{Read, Write},
+    io::{Read, Seek, SeekFrom, Write},
     sync::atomic::{AtomicI32, Ordering},
 };
 
@@ -28,6 +28,8 @@ pub(crate) enum Operation {
     Kind,
     CreateDirectory,
     List,
+    Position,
+    Seek,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -151,6 +153,14 @@ impl Files {
         // Idempotent release; IDs never recycle within an invocation.
         self.open.remove(&id);
         Ok(0)
+    }
+    fn position(&mut self, id: i32) -> Result<i64, Error> {
+        i64::try_from(self.get(id, false)?.stream_position()?).map_err(|_| Error::LimitExceeded)
+    }
+    fn seek(&mut self, id: i32, position: i64) -> Result<i64, Error> {
+        let file = self.get(id, false)?;
+        let position = u64::try_from(position).map_err(|_| Error::InvalidRange)?;
+        i64::try_from(file.seek(SeekFrom::Start(position))?).map_err(|_| Error::LimitExceeded)
     }
     fn list(name: &str, max_items: i32, limits: &Limits) -> Result<Vec<String>, Error> {
         let bound = usize::try_from(max_items).map_err(|_| Error::InvalidRange)?;
@@ -279,6 +289,10 @@ impl Files {
                     Err(Error::WrongKind)
                 }
             }),
+            (Operation::Position, [Value::Int32(id)]) => self.position(*id).map(Value::Int64),
+            (Operation::Seek, [Value::Int32(id), Value::Int64(position)]) => {
+                self.seek(*id, *position).map(Value::Int64)
+            }
             (Operation::List, [Value::String(name), Value::Int32(max_items)]) => {
                 match Self::list(name, *max_items, limits) {
                     Ok(names) => Ok(crate::reflection::array(
@@ -324,6 +338,28 @@ mod tests {
             std::fs::remove_dir_all(&self.0).unwrap();
         }
     }
+    #[test]
+    fn seek_read_only_file_and_preserve_cursor_on_invalid_position() {
+        let fixture = Fixture::new();
+        let path = fixture.path("seek");
+        std::fs::write(&path, b"abc").unwrap();
+        let mut files = Files::default();
+        let id = files.open(&path, Operation::OpenRead).unwrap();
+        assert_eq!(files.position(id), Ok(0));
+        assert_eq!(files.read(id, 2).unwrap(), b"ab");
+        assert_eq!(files.position(id), Ok(2));
+        assert_eq!(files.seek(id, -1), Err(Error::InvalidRange));
+        assert_eq!(files.position(id), Ok(2));
+        assert_eq!(files.seek(id, 0), Ok(0));
+        assert_eq!(files.read(id, 3).unwrap(), b"abc");
+        assert_eq!(files.seek(id, 10), Ok(10));
+        assert_eq!(files.read(id, 1).unwrap(), b"");
+        files.close(id).unwrap();
+        assert_eq!(files.seek(id, -1), Err(Error::Closed));
+        assert_eq!(files.position(id), Err(Error::Closed));
+        assert_eq!(std::fs::read(path).unwrap(), b"abc");
+    }
+
     #[test]
     fn bounded_directory_snapshot_preserves_names_and_errors() {
         let fixture = Fixture::new();

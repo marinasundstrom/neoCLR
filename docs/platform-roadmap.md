@@ -171,13 +171,10 @@ with networking; no Uri API is implemented or added to the immediate scope.
 possible, rather than expanding isolated experiments first. The first integration
 moves the validated value into System.Storage.Path while preserving its native
 Combine/GetFileName string helpers; the sample now imports the platform type.
-The stream capability contracts now live in System.Streams; concrete file streams
-and application memory streams implement them directly. System.Storage.StorageProvider
-now integrates OpenRead(Path) and CreateNew(Path); the sample extends this byte
-contract with optional lookup and temporary text conveniences. File and Directory
-were first integrated as provider-bound descriptors, with File.Path/Name and byte
-opening, Directory child-address construction and typed lookup. StorageLookup
-extends the byte contract with GetFile; byte-only providers remain supported.
+The initial integration placed stream capability contracts in System.Streams and
+put byte opening on StorageProvider, with optional StorageLookup and concrete item
+descriptors. The current model below supersedes that intermediate split: System.IO
+owns stream contracts, StorageProvider resolves items, and File opens content.
 Directory.FileAt now returns StorageLookupError, replacing the sample's FileReadError.
 Native static text behavior is retained, with the development naming migration
 described below. All public
@@ -220,13 +217,24 @@ cover bounds, partial reads, errors and ownership. The author includes these rea
 a small seekability case and the System.IO grouping in the POC objective, alongside
 provider integration and enumeration. Move byte streams and text readers together
 to System.IO; keep storage item/provider/path abstractions in System.Storage. These
-remaining capabilities are planned, not implemented or full .NET parity requirements.
+capabilities are now implemented in the development library; they do not aim at full .NET parity.
 
-**Next:** move streams/readers to System.IO; implement minimal
-TextReader/StreamReader and a seek-and-reread case. Finish with one documented POC
-covering this surface. FileAt/CreateNew address operations remain transitional. Keep the disk/memory
-consumer working; update `/docs/` and document migrations in each slice. Do not
-expand the previous split as an alternative model.
+**POC evidence, 2026-09-23:** the [standalone Storage app](experiments/storage-poc/README.md)
+uses platform FileSystem through StorageProvider, writes UTF-8 bytes to a new File,
+reads via TextReader/StreamReader, discovers SeekableStream, rewinds and rereads,
+enumerates mixed items and demonstrates AlreadyExists/NotFound. Its verifier checks
+exact output and native file bytes. Streams and readers now live in System.IO.
+Readers are bounded, strict UTF-8 and explicitly own or leave open their inputs.
+FileAt/CreateNew remain the minimal transitional creation model. The
+[disk/memory suite](experiments/storage-provider/README.md) supplies complementary
+partial-transfer, error, ownership and seek contracts. On-site API documentation
+includes a downloadable walkthrough. This meets the requested synchronous Storage
+POC product scope; production provider breadth is not implied.
+
+**Next direction:** use this POC as the baseline for the remaining M1 encoding/JSON
+and suspension work before networking. Evaluate task-returning provider operations
+against that suspension model; do not expand Storage metadata or mutations without
+a concrete case. Preserve the working disk/memory consumer.
 Task-based interaction is the intended extension direction; its scheduling and
 cancellation contract must be established before claiming nonblocking I/O. GetItems'
 eager/incremental representation remains open. Rich metadata, topology, Path format

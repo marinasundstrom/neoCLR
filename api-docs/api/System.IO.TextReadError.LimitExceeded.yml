@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.TextReadError.LimitExceeded
+  commentId: T:System.IO.TextReadError.LimitExceeded
+  id: TextReadError.LimitExceeded
+  parent: System.IO
+  children:
+  - System.IO.TextReadError.LimitExceeded.#ctor
+  langs:
+  - csharp
+  - vb
+  name: TextReadError.LimitExceeded
+  nameWithType: TextReadError.LimitExceeded
+  fullName: System.IO.TextReadError.LimitExceeded
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: The LimitExceeded text-reading error case.
+  example: []
+  syntax:
+    content: public struct TextReadError.LimitExceeded
+    content.vb: Public Structure TextReadError.LimitExceeded
+- uid: System.IO.TextReadError.LimitExceeded.#ctor
+  commentId: M:System.IO.TextReadError.LimitExceeded.#ctor
+  id: '#ctor'
+  parent: System.IO.TextReadError.LimitExceeded
+  langs:
+  - csharp
+  - vb
+  name: LimitExceeded()
+  nameWithType: TextReadError.LimitExceeded.LimitExceeded()
+  fullName: System.IO.TextReadError.LimitExceeded.LimitExceeded()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Creates LimitExceeded.
+  example: []
+  syntax:
+    content: public LimitExceeded()
+    content.vb: Public Sub New()
+  overload: System.IO.TextReadError.LimitExceeded.#ctor*
+  nameWithType.vb: TextReadError.LimitExceeded.New()
+  fullName.vb: System.IO.TextReadError.LimitExceeded.New()
+  name.vb: New()
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.TextReadError.LimitExceeded.#ctor*
+  commentId: Overload:System.IO.TextReadError.LimitExceeded.#ctor
+  isExternal: true
+  href: System.IO.TextReadError.LimitExceeded.html#System_IO_TextReadError_LimitExceeded__ctor
+  name: LimitExceeded
+  nameWithType: TextReadError.LimitExceeded.LimitExceeded
+  fullName: System.IO.TextReadError.LimitExceeded.LimitExceeded
+  nameWithType.vb: TextReadError.LimitExceeded.New
+  fullName.vb: System.IO.TextReadError.LimitExceeded.New
+  name.vb: New

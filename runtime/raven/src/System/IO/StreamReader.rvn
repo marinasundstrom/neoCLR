@@ -1,0 +1,113 @@
+namespace System.IO
+
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+import System.Runtime.CompilerServices.*
+
+public class StreamReader : TextReader {
+    private field input: InputStream
+    private field leaveOpen: bool
+    private field closed: bool = false
+
+    init(input: InputStream) {
+        self.input = input
+        leaveOpen = false
+    }
+
+    init(input: InputStream, leaveOpen: bool) {
+        self.input = input
+        self.leaveOpen = leaveOpen
+    }
+
+    func ReadToEnd(maxUtf8Bytes: int) -> Result<string, TextReadError> {
+        if closed {
+            return Error(TextReadError(TextReadError.Closed()))
+        }
+        if maxUtf8Bytes < 0 {
+            return Error(TextReadError(TextReadError.InvalidRange()))
+        }
+        if maxUtf8Bytes > 65536 {
+            return Error(TextReadError(TextReadError.LimitExceeded()))
+        }
+        let bytes: List<byte> = ArrayList<byte>()
+        let buffer = CheckedStorage.Reserve<byte>(256)
+        while true {
+            var request = maxUtf8Bytes - bytes.Count + 1
+            if request > buffer.Length {
+                request = buffer.Length
+            }
+            match input.Read(buffer, 0, request) {
+                Ok(let count) => {
+                    if count < 0 {
+                        System.Fault("Invalid input read count")
+                    }
+                    if count > request {
+                        System.Fault("Invalid input read count")
+                    }
+                    if count > maxUtf8Bytes - bytes.Count {
+                        return Error(TextReadError(TextReadError.LimitExceeded()))
+                    }
+                    if count == 0 {
+                        return match Utf8.Decode(bytes) {
+                            Ok(let text) => Ok(text)
+                            Error(_) => Error(TextReadError(TextReadError.InvalidUtf8()))
+                        }
+                    }
+                    var index = 0
+                    while index < count {
+                        bytes.Add(buffer[index])
+                        index += 1
+                    }
+                }
+                Error(let error) => return Error(FromStream(error))
+            }
+        }
+        return Error(TextReadError(TextReadError.IoFailure()))
+    }
+
+    func Close() {
+        if !closed {
+            closed = true
+            if !leaveOpen {
+                input.Close()
+            }
+        }
+    }
+
+    private static func FromStream(error: StreamError) -> TextReadError {
+        if error.IsInvalidPath {
+            return TextReadError(TextReadError.InvalidPath())
+        }
+        if error.IsNotFound {
+            return TextReadError(TextReadError.NotFound())
+        }
+        if error.IsAccessDenied {
+            return TextReadError(TextReadError.AccessDenied())
+        }
+        if error.IsWrongKind {
+            return TextReadError(TextReadError.WrongKind())
+        }
+        if error.IsAlreadyExists {
+            return TextReadError(TextReadError.AlreadyExists())
+        }
+        if error.IsClosed {
+            return TextReadError(TextReadError.Closed())
+        }
+        if error.IsInvalidRange {
+            return TextReadError(TextReadError.InvalidRange())
+        }
+        if error.IsLimitExceeded {
+            return TextReadError(TextReadError.LimitExceeded())
+        }
+        if error.IsWrongAccess {
+            return TextReadError(TextReadError.WrongAccess())
+        }
+        if error.IsIoFailure {
+            return TextReadError(TextReadError.IoFailure())
+        }
+        System.Fault("Invalid stream error")
+        return TextReadError(TextReadError.IoFailure())
+    }
+}

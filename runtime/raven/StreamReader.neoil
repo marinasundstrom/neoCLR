@@ -1,0 +1,2 @@
+.include "generated/StreamReader.methods.neoil"
+.include "generated/StreamReader.helpers.neoil"

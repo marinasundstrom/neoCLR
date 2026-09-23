@@ -1,0 +1,7 @@
+; Generated from runtime/raven/src/System/IO/SeekableStream.rvn. Regenerate with build_runtime_library.py.
+.interface System.IO.SeekableStream
+.method instance GetPosition() -> System.Result<Int64,System.IO.StreamError>
+.end
+.method instance Seek(Int64 position) -> System.Result<Int64,System.IO.StreamError>
+.end
+.end

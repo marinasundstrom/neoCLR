@@ -46,7 +46,7 @@ items:
   syntax:
     content: Result<InputStream, StreamError> OpenRead()
     return:
-      type: System.Result{System.Streams.InputStream,System.Streams.StreamError}
+      type: System.Result{System.IO.InputStream,System.IO.StreamError}
       description: InputStream on success, or the retained provider's StreamError unchanged.
     content.vb: Function OpenRead() As Result(Of InputStream, StreamError)
   overload: System.Storage.File.OpenRead*
@@ -70,7 +70,7 @@ items:
   syntax:
     content: Result<OutputStream, StreamError> CreateNew()
     return:
-      type: System.Result{System.Streams.OutputStream,System.Streams.StreamError}
+      type: System.Result{System.IO.OutputStream,System.IO.StreamError}
       description: OutputStream on success, or the retained provider's StreamError unchanged.
     content.vb: Function CreateNew() As Result(Of OutputStream, StreamError)
   overload: System.Storage.File.CreateNew*
@@ -133,32 +133,32 @@ references:
   name: OpenRead
   nameWithType: File.OpenRead
   fullName: System.Storage.File.OpenRead
-- uid: System.Result{System.Streams.InputStream,System.Streams.StreamError}
-  commentId: T:System.Result{System.Streams.InputStream,System.Streams.StreamError}
+- uid: System.Result{System.IO.InputStream,System.IO.StreamError}
+  commentId: T:System.Result{System.IO.InputStream,System.IO.StreamError}
   parent: System
   definition: System.Result`2
-  href: System.Streams.InputStream.html
+  href: System.IO.InputStream.html
   name: Result<InputStream, StreamError>
   nameWithType: Result<InputStream, StreamError>
-  fullName: System.Result<System.Streams.InputStream, System.Streams.StreamError>
+  fullName: System.Result<System.IO.InputStream, System.IO.StreamError>
   nameWithType.vb: Result(Of InputStream, StreamError)
-  fullName.vb: System.Result(Of System.Streams.InputStream, System.Streams.StreamError)
+  fullName.vb: System.Result(Of System.IO.InputStream, System.IO.StreamError)
   name.vb: Result(Of InputStream, StreamError)
   spec.csharp:
   - uid: System.Result`2
     name: Result
     isExternal: true
   - name: <
-  - uid: System.Streams.InputStream
+  - uid: System.IO.InputStream
     name: InputStream
     isExternal: true
-    href: System.Streams.InputStream.html
+    href: System.IO.InputStream.html
   - name: ','
   - name: " "
-  - uid: System.Streams.StreamError
+  - uid: System.IO.StreamError
     name: StreamError
     isExternal: true
-    href: System.Streams.StreamError.html
+    href: System.IO.StreamError.html
   - name: '>'
   spec.vb:
   - uid: System.Result`2
@@ -167,16 +167,16 @@ references:
   - name: (
   - name: Of
   - name: " "
-  - uid: System.Streams.InputStream
+  - uid: System.IO.InputStream
     name: InputStream
     isExternal: true
-    href: System.Streams.InputStream.html
+    href: System.IO.InputStream.html
   - name: ','
   - name: " "
-  - uid: System.Streams.StreamError
+  - uid: System.IO.StreamError
     name: StreamError
     isExternal: true
-    href: System.Streams.StreamError.html
+    href: System.IO.StreamError.html
   - name: )
 - uid: System.Result`2
   commentId: T:System.Result`2
@@ -223,32 +223,32 @@ references:
   name: CreateNew
   nameWithType: File.CreateNew
   fullName: System.Storage.File.CreateNew
-- uid: System.Result{System.Streams.OutputStream,System.Streams.StreamError}
-  commentId: T:System.Result{System.Streams.OutputStream,System.Streams.StreamError}
+- uid: System.Result{System.IO.OutputStream,System.IO.StreamError}
+  commentId: T:System.Result{System.IO.OutputStream,System.IO.StreamError}
   parent: System
   definition: System.Result`2
-  href: System.Streams.OutputStream.html
+  href: System.IO.OutputStream.html
   name: Result<OutputStream, StreamError>
   nameWithType: Result<OutputStream, StreamError>
-  fullName: System.Result<System.Streams.OutputStream, System.Streams.StreamError>
+  fullName: System.Result<System.IO.OutputStream, System.IO.StreamError>
   nameWithType.vb: Result(Of OutputStream, StreamError)
-  fullName.vb: System.Result(Of System.Streams.OutputStream, System.Streams.StreamError)
+  fullName.vb: System.Result(Of System.IO.OutputStream, System.IO.StreamError)
   name.vb: Result(Of OutputStream, StreamError)
   spec.csharp:
   - uid: System.Result`2
     name: Result
     isExternal: true
   - name: <
-  - uid: System.Streams.OutputStream
+  - uid: System.IO.OutputStream
     name: OutputStream
     isExternal: true
-    href: System.Streams.OutputStream.html
+    href: System.IO.OutputStream.html
   - name: ','
   - name: " "
-  - uid: System.Streams.StreamError
+  - uid: System.IO.StreamError
     name: StreamError
     isExternal: true
-    href: System.Streams.StreamError.html
+    href: System.IO.StreamError.html
   - name: '>'
   spec.vb:
   - uid: System.Result`2
@@ -257,14 +257,14 @@ references:
   - name: (
   - name: Of
   - name: " "
-  - uid: System.Streams.OutputStream
+  - uid: System.IO.OutputStream
     name: OutputStream
     isExternal: true
-    href: System.Streams.OutputStream.html
+    href: System.IO.OutputStream.html
   - name: ','
   - name: " "
-  - uid: System.Streams.StreamError
+  - uid: System.IO.StreamError
     name: StreamError
     isExternal: true
-    href: System.Streams.StreamError.html
+    href: System.IO.StreamError.html
   - name: )

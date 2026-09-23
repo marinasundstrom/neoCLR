@@ -1,0 +1,242 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.OutputStream
+  commentId: T:System.IO.OutputStream
+  id: OutputStream
+  parent: System.IO
+  children:
+  - System.IO.OutputStream.Close
+  - System.IO.OutputStream.Write(System.Byte[],System.Int32,System.Int32)
+  langs:
+  - csharp
+  - vb
+  name: OutputStream
+  nameWithType: OutputStream
+  fullName: System.IO.OutputStream
+  type: Interface
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: A synchronous output capability implemented by platform file streams and application providers. Development API after Preview 9.
+  remarks: Caller-owned arrays, partial transfers, explicit idempotent Close and typed errors. No seeking, scheduling or automatic disposal is implied. The interface does not impose native file lifetime on memory implementations.
+  example: []
+  syntax:
+    content: public interface OutputStream
+    content.vb: Public Interface OutputStream
+  seealso:
+  - linkType: HRef
+    linkId: ../streams.html#capability-contracts
+    altText: Capability contracts and Flush reference
+  derivedClasses:
+  - System.IO.FileOutputStream
+- uid: System.IO.OutputStream.Write(System.Byte[],System.Int32,System.Int32)
+  commentId: M:System.IO.OutputStream.Write(System.Byte[],System.Int32,System.Int32)
+  id: Write(System.Byte[],System.Int32,System.Int32)
+  parent: System.IO.OutputStream
+  langs:
+  - csharp
+  - vb
+  name: Write(byte[], int, int)
+  nameWithType: OutputStream.Write(byte[], int, int)
+  fullName: System.IO.OutputStream.Write(byte[], int, int)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Attempts one synchronous partial write.
+  remarks: The buffer is not modified. A positive-count successful write must make progress; callers loop over partial writes. Calls do not suspend. No concurrency safety is promised.
+  example: []
+  syntax:
+    content: Result<int, StreamError> Write(byte[] buffer, int offset, int count)
+    parameters:
+    - id: buffer
+      type: System.Byte[]
+      description: Caller-owned byte array; retained only for the duration of this call.
+    - id: offset
+      type: System.Int32
+      description: Zero-based start within the array.
+    - id: count
+      type: System.Int32
+      description: Maximum bytes to transfer, from zero through 65536 and within the array range.
+    return:
+      type: System.Result{System.Int32,System.IO.StreamError}
+      description: Ok with the transferred count, or StreamError. Closed is checked before range validation; invalid ranges and oversized requests fail before transfer.
+    content.vb: Function Write(buffer As Byte(), offset As Integer, count As Integer) As Result(Of Integer, StreamError)
+  overload: System.IO.OutputStream.Write*
+  nameWithType.vb: OutputStream.Write(Byte(), Integer, Integer)
+  fullName.vb: System.IO.OutputStream.Write(Byte(), Integer, Integer)
+  name.vb: Write(Byte(), Integer, Integer)
+- uid: System.IO.OutputStream.Close
+  commentId: M:System.IO.OutputStream.Close
+  id: Close
+  parent: System.IO.OutputStream
+  langs:
+  - csharp
+  - vb
+  name: Close()
+  nameWithType: OutputStream.Close()
+  fullName: System.IO.OutputStream.Close()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Closes this stream; repeated calls are harmless.
+  remarks: Subsequent transfers return Closed. This no-result operation does not report close failures or promise flush/durability. Other streams opened separately retain their own lifetime.
+  example: []
+  syntax:
+    content: void Close()
+    content.vb: Sub Close()
+  overload: System.IO.OutputStream.Close*
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.OutputStream.Write*
+  commentId: Overload:System.IO.OutputStream.Write
+  isExternal: true
+  href: System.IO.OutputStream.html#System_IO_OutputStream_Write_System_Byte___System_Int32_System_Int32_
+  name: Write
+  nameWithType: OutputStream.Write
+  fullName: System.IO.OutputStream.Write
+- uid: System.Byte[]
+  isExternal: true
+  name: byte[]
+  nameWithType: byte[]
+  fullName: byte[]
+  nameWithType.vb: Byte()
+  fullName.vb: Byte()
+  name.vb: Byte()
+  spec.csharp:
+  - uid: System.Byte
+    name: byte
+    isExternal: true
+  - name: '['
+  - name: ']'
+  spec.vb:
+  - uid: System.Byte
+    name: Byte
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System.Result{System.Int32,System.IO.StreamError}
+  commentId: T:System.Result{System.Int32,System.IO.StreamError}
+  parent: System
+  definition: System.Result`2
+  href: System.IO.StreamError.html
+  name: Result<int, StreamError>
+  nameWithType: Result<int, StreamError>
+  fullName: System.Result<int, System.IO.StreamError>
+  nameWithType.vb: Result(Of Integer, StreamError)
+  fullName.vb: System.Result(Of Integer, System.IO.StreamError)
+  name.vb: Result(Of Integer, StreamError)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - uid: System.Int32
+    name: int
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.IO.StreamError
+    name: StreamError
+    isExternal: true
+    href: System.IO.StreamError.html
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Result`2
+  commentId: T:System.Result`2
+  isExternal: true
+  name: Result<T, E>
+  nameWithType: Result<T, E>
+  fullName: System.Result<T, E>
+  nameWithType.vb: Result(Of T, E)
+  fullName.vb: System.Result(Of T, E)
+  name.vb: Result(Of T, E)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: )
+- uid: System.IO.OutputStream.Close*
+  commentId: Overload:System.IO.OutputStream.Close
+  isExternal: true
+  href: System.IO.OutputStream.html#System_IO_OutputStream_Close
+  name: Close
+  nameWithType: OutputStream.Close
+  fullName: System.IO.OutputStream.Close

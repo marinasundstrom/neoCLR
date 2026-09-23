@@ -14,8 +14,8 @@ static class StorageItemBindings
         namespace Storage {
             public interface StorageItem { Path Path { get; } string Name { get; } }
             public interface File : StorageItem {
-                Result<Streams.InputStream, Streams.StreamError> OpenRead();
-                Result<Streams.OutputStream, Streams.StreamError> CreateNew();
+                Result<IO.InputStream, IO.StreamError> OpenRead();
+                Result<IO.OutputStream, IO.StreamError> CreateNew();
             }
             public interface Directory : StorageItem {
                 Result<Collections.Sequence<StorageItem>, StorageLookupError> GetItems(int maxItems);
@@ -36,8 +36,8 @@ static class StorageItemBindings
         var expected = (owner, reference.Name) switch {
             (Root, "get_Path") => ("", "System.Storage.Path"),
             (Root, "get_Name") => ("", "String"),
-            ("System.Storage.File", "OpenRead") => ("", "System.Result<System.Streams.InputStream,System.Streams.StreamError>"),
-            ("System.Storage.File", "CreateNew") => ("", "System.Result<System.Streams.OutputStream,System.Streams.StreamError>"),
+            ("System.Storage.File", "OpenRead") => ("", "System.Result<System.IO.InputStream,System.IO.StreamError>"),
+            ("System.Storage.File", "CreateNew") => ("", "System.Result<System.IO.OutputStream,System.IO.StreamError>"),
             ("System.Storage.Directory", "GetItems") => ("Int32", "System.Result<System.Collections.Sequence<System.Storage.StorageItem>,System.Storage.StorageLookupError>"),
             ("System.Storage.Directory", "GetItem") => ("System.Storage.Path", "System.Result<System.Storage.StorageItem,System.Storage.StorageLookupError>"),
             ("System.Storage.Directory", "GetDirectory") => (args.Length == 1 && args[0] == "System.Storage.Path" ? "System.Storage.Path" : "String", "System.Result<System.Storage.Directory,System.Storage.StorageLookupError>"),

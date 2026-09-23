@@ -14,6 +14,18 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileSystem'">
     <Compile Include="src/System/Storage/FileSystem.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TextReadError'">
+    <Compile Include="src/System/IO/TextReadError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TextReader'">
+    <Compile Include="src/System/IO/TextReader.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StreamReader'">
+    <Compile Include="src/System/IO/StreamReader.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'SeekableStream'">
+    <Compile Include="src/System/IO/SeekableStream.rvn" />
+  </ItemGroup>
   <!-- Declaration slices shadow core types and contain no typeof expressions. -->
   <PropertyGroup>
     <RavenTypeOfAssemblyName></RavenTypeOfAssemblyName>
@@ -256,13 +268,13 @@
     <Compile Include="src/System/Concurrency/Workers.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StreamError'">
-    <Compile Include="src/System/Streams/StreamError.rvn" />
+    <Compile Include="src/System/IO/StreamError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileInputStream'">
-    <Compile Include="src/System/Streams/FileInputStream.rvn" />
+    <Compile Include="src/System/IO/FileInputStream.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileOutputStream'">
-    <Compile Include="src/System/Streams/FileOutputStream.rvn" />
+    <Compile Include="src/System/IO/FileOutputStream.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EntryKind'">
     <Compile Include="src/System/Storage/EntryKind.rvn" />
@@ -283,9 +295,9 @@
     <Compile Include="src/System/Storage/StorageProvider.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InputStream'">
-    <Compile Include="src/System/Streams/InputStream.rvn" />
+    <Compile Include="src/System/IO/InputStream.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'OutputStream'">
-    <Compile Include="src/System/Streams/OutputStream.rvn" />
+    <Compile Include="src/System/IO/OutputStream.rvn" />
   </ItemGroup>
 </Project>

@@ -1,3 +1,8 @@
+> **Development status, 2026-09-23:** the Storage POC implements byte streams,
+> TextReader/StreamReader and optional SeekableStream in **System.IO**. The original
+> proposal below remains exploratory, including its older System.Streams namespace.
+> See the [current API guide](../../api-docs/streams.md) for the implemented surface.
+
 Here is the revised proposal, keeping the directional model but replacing the overly generic `Seekable` with the stream-specific `SeekableStream`. I’ve also made the `&` composition model explicit and kept `RandomAccessStream` as a possible nominal alternative rather than another mandatory abstraction. This revises the earlier proposal’s `Seekable` sections while retaining its core principle that API contracts request only the capabilities they need. :chatgpt-content-reference{index="0"} :chatgpt-content-reference{index="1"}
 
 # NeoCLR Streams API
@@ -1739,3 +1744,29 @@ absolute versus origin-relative positioning and numeric bounds explicitly; lengt
 and resizing are not implied. A buffered StreamReader must not assume that seeking
 its underlying stream also resets unread bytes or decoding state. TextReader does
 not require byte seekability; reader-aware repositioning remains a separate design.
+
+
+## Implemented POC contract — 2026-09-23
+
+The development implementation groups streams and readers under System.IO, leaving
+providers/items/paths under System.Storage. StreamReader implements TextReader with
+ReadToEnd(maxUtf8Bytes) and Close. It performs strict UTF-8 decoding, preserves a BOM,
+and bounds whole-text accumulation to at most 64 KiB. The exact-bound EOF probe may
+consume one excess byte before LimitExceeded; failures do not rewind. It owns its
+input by default, with a leaveOpen constructor overload. Repeated EOF produces empty
+text and repeated Close is harmless. TextReadError preserves named stream errors and
+adds InvalidUtf8. This is bounded accumulation, not incremental text decoding.
+
+SeekableStream provides GetPosition and absolute Seek in signed 64-bit byte positions.
+FileInputStream implements it alongside InputStream; sequential inputs need not.
+Negative positions fail without moving the cursor; positions beyond EOF are valid.
+The reader has no retained decoder/buffer state between successful ReadToEnd calls;
+the POC closes its leave-open reader, seeks and creates a new reader. Length, relative
+origins, output seeking, ReadLine and async readers remain outside this slice.
+
+Compared with the .NET contracts cited above, this supplies fewer operations and
+encoding choices, explicit bounded failure and separate optional capabilities. The
+cost is more interface/error types and explicit capability discovery. The current
+Raven target requires an object view to test an unrelated interface capability; no
+new language-level intersection types are assumed. See the [standalone sample](../experiments/storage-poc/README.md)
+and [disk/memory contract checks](../experiments/storage-provider/ReaderContracts.rvn).

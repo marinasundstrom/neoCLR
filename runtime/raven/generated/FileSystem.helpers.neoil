@@ -219,91 +219,91 @@ ldarg arg0
 newobj instance System.Result<System.Storage.File,System.Storage.StorageLookupError>::.ctor(System.Result.Ok<System.Storage.File>)
 ret
 .end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion18(System.Result<System.Streams.FileInputStream,System.Streams.StreamError>& arg0,out(true) System.Result.Ok<System.Streams.FileInputStream>& arg1) -> Boolean
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion18(System.Result<System.IO.FileInputStream,System.IO.StreamError>& arg0,out(true) System.Result.Ok<System.IO.FileInputStream>& arg1) -> Boolean
 ldarg arg0
-ldobj System.Result<System.Streams.FileInputStream,System.Streams.StreamError>
+ldobj System.Result<System.IO.FileInputStream,System.IO.StreamError>
 ldarg arg1
-call instance System.Result<System.Streams.FileInputStream,System.Streams.StreamError>::TryGet(System.Result.Ok<System.Streams.FileInputStream>&)
+call instance System.Result<System.IO.FileInputStream,System.IO.StreamError>::TryGet(System.Result.Ok<System.IO.FileInputStream>&)
 ret
 .end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion19(System.Result.Ok<System.Streams.FileInputStream>& receiver,out System.Streams.FileInputStream& value) -> void
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion19(System.Result.Ok<System.IO.FileInputStream>& receiver,out System.IO.FileInputStream& value) -> void
 ldarg value
 ldarg receiver
-ldobj System.Result.Ok<System.Streams.FileInputStream>
-call instance System.Result.Ok<System.Streams.FileInputStream>::get_Value()
-stobj System.Streams.FileInputStream
+ldobj System.Result.Ok<System.IO.FileInputStream>
+call instance System.Result.Ok<System.IO.FileInputStream>::get_Value()
+stobj System.IO.FileInputStream
 ret
 .end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion20(System.Result<System.Streams.FileInputStream,System.Streams.StreamError>& arg0,out(true) System.Result.Error<System.Streams.StreamError>& arg1) -> Boolean
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion20(System.Result<System.IO.FileInputStream,System.IO.StreamError>& arg0,out(true) System.Result.Error<System.IO.StreamError>& arg1) -> Boolean
 ldarg arg0
-ldobj System.Result<System.Streams.FileInputStream,System.Streams.StreamError>
+ldobj System.Result<System.IO.FileInputStream,System.IO.StreamError>
 ldarg arg1
-call instance System.Result<System.Streams.FileInputStream,System.Streams.StreamError>::TryGet(System.Result.Error<System.Streams.StreamError>&)
+call instance System.Result<System.IO.FileInputStream,System.IO.StreamError>::TryGet(System.Result.Error<System.IO.StreamError>&)
 ret
 .end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion21(System.Result.Error<System.Streams.StreamError>& receiver,out System.Streams.StreamError& value) -> void
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion21(System.Result.Error<System.IO.StreamError>& receiver,out System.IO.StreamError& value) -> void
 ldarg value
 ldarg receiver
-ldobj System.Result.Error<System.Streams.StreamError>
-call instance System.Result.Error<System.Streams.StreamError>::get_Value()
-stobj System.Streams.StreamError
+ldobj System.Result.Error<System.IO.StreamError>
+call instance System.Result.Error<System.IO.StreamError>::get_Value()
+stobj System.IO.StreamError
 ret
 .end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion22(System.Streams.InputStream arg0) -> System.Result.Ok<System.Streams.InputStream>
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion22(System.IO.InputStream arg0) -> System.Result.Ok<System.IO.InputStream>
 ldarg arg0
-newobj instance System.Result.Ok<System.Streams.InputStream>::.ctor(System.Streams.InputStream)
+newobj instance System.Result.Ok<System.IO.InputStream>::.ctor(System.IO.InputStream)
 ret
 .end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion23(System.Result.Ok<System.Streams.InputStream> arg0) -> System.Result<System.Streams.InputStream,System.Streams.StreamError>
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion23(System.Result.Ok<System.IO.InputStream> arg0) -> System.Result<System.IO.InputStream,System.IO.StreamError>
 ldarg arg0
-newobj instance System.Result<System.Streams.InputStream,System.Streams.StreamError>::.ctor(System.Result.Ok<System.Streams.InputStream>)
+newobj instance System.Result<System.IO.InputStream,System.IO.StreamError>::.ctor(System.Result.Ok<System.IO.InputStream>)
 ret
 .end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion24(System.Streams.StreamError arg0) -> System.Result.Error<System.Streams.StreamError>
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion24(System.IO.StreamError arg0) -> System.Result.Error<System.IO.StreamError>
 ldarg arg0
-newobj instance System.Result.Error<System.Streams.StreamError>::.ctor(System.Streams.StreamError)
+newobj instance System.Result.Error<System.IO.StreamError>::.ctor(System.IO.StreamError)
 ret
 .end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion25(System.Result.Error<System.Streams.StreamError> arg0) -> System.Result<System.Streams.InputStream,System.Streams.StreamError>
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion25(System.Result.Error<System.IO.StreamError> arg0) -> System.Result<System.IO.InputStream,System.IO.StreamError>
 ldarg arg0
-newobj instance System.Result<System.Streams.InputStream,System.Streams.StreamError>::.ctor(System.Result.Error<System.Streams.StreamError>)
+newobj instance System.Result<System.IO.InputStream,System.IO.StreamError>::.ctor(System.Result.Error<System.IO.StreamError>)
 ret
 .end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion26(System.Result<System.Streams.FileOutputStream,System.Streams.StreamError>& arg0,out(true) System.Result.Ok<System.Streams.FileOutputStream>& arg1) -> Boolean
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion26(System.Result<System.IO.FileOutputStream,System.IO.StreamError>& arg0,out(true) System.Result.Ok<System.IO.FileOutputStream>& arg1) -> Boolean
 ldarg arg0
-ldobj System.Result<System.Streams.FileOutputStream,System.Streams.StreamError>
+ldobj System.Result<System.IO.FileOutputStream,System.IO.StreamError>
 ldarg arg1
-call instance System.Result<System.Streams.FileOutputStream,System.Streams.StreamError>::TryGet(System.Result.Ok<System.Streams.FileOutputStream>&)
+call instance System.Result<System.IO.FileOutputStream,System.IO.StreamError>::TryGet(System.Result.Ok<System.IO.FileOutputStream>&)
 ret
 .end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion27(System.Result.Ok<System.Streams.FileOutputStream>& receiver,out System.Streams.FileOutputStream& value) -> void
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion27(System.Result.Ok<System.IO.FileOutputStream>& receiver,out System.IO.FileOutputStream& value) -> void
 ldarg value
 ldarg receiver
-ldobj System.Result.Ok<System.Streams.FileOutputStream>
-call instance System.Result.Ok<System.Streams.FileOutputStream>::get_Value()
-stobj System.Streams.FileOutputStream
+ldobj System.Result.Ok<System.IO.FileOutputStream>
+call instance System.Result.Ok<System.IO.FileOutputStream>::get_Value()
+stobj System.IO.FileOutputStream
 ret
 .end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion28(System.Result<System.Streams.FileOutputStream,System.Streams.StreamError>& arg0,out(true) System.Result.Error<System.Streams.StreamError>& arg1) -> Boolean
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion28(System.Result<System.IO.FileOutputStream,System.IO.StreamError>& arg0,out(true) System.Result.Error<System.IO.StreamError>& arg1) -> Boolean
 ldarg arg0
-ldobj System.Result<System.Streams.FileOutputStream,System.Streams.StreamError>
+ldobj System.Result<System.IO.FileOutputStream,System.IO.StreamError>
 ldarg arg1
-call instance System.Result<System.Streams.FileOutputStream,System.Streams.StreamError>::TryGet(System.Result.Error<System.Streams.StreamError>&)
+call instance System.Result<System.IO.FileOutputStream,System.IO.StreamError>::TryGet(System.Result.Error<System.IO.StreamError>&)
 ret
 .end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion29(System.Streams.OutputStream arg0) -> System.Result.Ok<System.Streams.OutputStream>
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion29(System.IO.OutputStream arg0) -> System.Result.Ok<System.IO.OutputStream>
 ldarg arg0
-newobj instance System.Result.Ok<System.Streams.OutputStream>::.ctor(System.Streams.OutputStream)
+newobj instance System.Result.Ok<System.IO.OutputStream>::.ctor(System.IO.OutputStream)
 ret
 .end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion30(System.Result.Ok<System.Streams.OutputStream> arg0) -> System.Result<System.Streams.OutputStream,System.Streams.StreamError>
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion30(System.Result.Ok<System.IO.OutputStream> arg0) -> System.Result<System.IO.OutputStream,System.IO.StreamError>
 ldarg arg0
-newobj instance System.Result<System.Streams.OutputStream,System.Streams.StreamError>::.ctor(System.Result.Ok<System.Streams.OutputStream>)
+newobj instance System.Result<System.IO.OutputStream,System.IO.StreamError>::.ctor(System.Result.Ok<System.IO.OutputStream>)
 ret
 .end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion31(System.Result.Error<System.Streams.StreamError> arg0) -> System.Result<System.Streams.OutputStream,System.Streams.StreamError>
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion31(System.Result.Error<System.IO.StreamError> arg0) -> System.Result<System.IO.OutputStream,System.IO.StreamError>
 ldarg arg0
-newobj instance System.Result<System.Streams.OutputStream,System.Streams.StreamError>::.ctor(System.Result.Error<System.Streams.StreamError>)
+newobj instance System.Result<System.IO.OutputStream,System.IO.StreamError>::.ctor(System.Result.Error<System.IO.StreamError>)
 ret
 .end
 .function neoCLR.Library.System.Storage.FileSystem.RuntimeUnion32(System.Result.Error<System.Storage.StorageLookupError> arg0) -> System.Result<System.Storage.Path,System.Storage.StorageLookupError>
@@ -532,25 +532,25 @@ call System.Storage.Path::GetFileName(String)
 M00000009_IL_0012:
 ret
 .end
-.method instance OpenRead() -> System.Result<System.Streams.InputStream,System.Streams.StreamError>
-.local System.Result<System.Streams.FileInputStream,System.Streams.StreamError> local0
-.local System.Result<System.Streams.InputStream,System.Streams.StreamError> local1
-.local System.Streams.FileInputStream local2
-.local System.Streams.StreamError local3
-.local System.Result<System.Streams.FileInputStream,System.Streams.StreamError> local4
-.local System.Result.Ok<System.Streams.FileInputStream> local5
-.local System.Result.Ok<System.Streams.FileInputStream> local6
-.local System.Streams.FileInputStream local7
-.local System.Streams.InputStream local8
-.local System.Result.Ok<System.Streams.InputStream> local9
-.local System.Result<System.Streams.FileInputStream,System.Streams.StreamError> local10
-.local System.Result.Error<System.Streams.StreamError> local11
-.local System.Result.Error<System.Streams.StreamError> local12
-.local System.Streams.StreamError local13
+.method instance OpenRead() -> System.Result<System.IO.InputStream,System.IO.StreamError>
+.local System.Result<System.IO.FileInputStream,System.IO.StreamError> local0
+.local System.Result<System.IO.InputStream,System.IO.StreamError> local1
+.local System.IO.FileInputStream local2
+.local System.IO.StreamError local3
+.local System.Result<System.IO.FileInputStream,System.IO.StreamError> local4
+.local System.Result.Ok<System.IO.FileInputStream> local5
+.local System.Result.Ok<System.IO.FileInputStream> local6
+.local System.IO.FileInputStream local7
+.local System.IO.InputStream local8
+.local System.Result.Ok<System.IO.InputStream> local9
+.local System.Result<System.IO.FileInputStream,System.IO.StreamError> local10
+.local System.Result.Error<System.IO.StreamError> local11
+.local System.Result.Error<System.IO.StreamError> local12
+.local System.IO.StreamError local13
 ldloca local2
-initobj System.Streams.FileInputStream
+initobj System.IO.FileInputStream
 ldloca local7
-initobj System.Streams.FileInputStream
+initobj System.IO.FileInputStream
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 M0000000a_IL_0002:
@@ -559,7 +559,7 @@ ldarg 0
 M0000000a_IL_0004:
 ldfld neoCLR.Library.System.Storage.FileSystem.Type_53797374656D2E53746F726167652E4C6F63616C46696C65::nativePath
 M0000000a_IL_0009:
-call System.Streams.FileInputStream::Open(String)
+call System.IO.FileInputStream::Open(String)
 M0000000a_IL_000e:
 stloc local0
 M0000000a_IL_000f:
@@ -576,7 +576,7 @@ ldloca local4
 M0000000a_IL_001d:
 ldloca local5
 M0000000a_IL_001f:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion18(System.Result<System.Streams.FileInputStream,System.Streams.StreamError>&,System.Result.Ok<System.Streams.FileInputStream>&)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion18(System.Result<System.IO.FileInputStream,System.IO.StreamError>&,System.Result.Ok<System.IO.FileInputStream>&)
 M0000000a_IL_0024:
 brfalse M0000000a_IL_006a
 M0000000a_IL_0029:
@@ -588,7 +588,7 @@ ldloca local6
 M0000000a_IL_002f:
 ldloca local7
 M0000000a_IL_0031:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion19(System.Result.Ok<System.Streams.FileInputStream>&,System.Streams.FileInputStream&)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion19(System.Result.Ok<System.IO.FileInputStream>&,System.IO.FileInputStream&)
 M0000000a_IL_0036:
 ldloc local7
 M0000000a_IL_0038:
@@ -605,18 +605,18 @@ br M0000000a_IL_0051
 M0000000a_IL_0051:
 ldloc local2
 M0000000a_IL_0052:
-castclass System.Streams.InputStream
+castclass System.IO.InputStream
 stloc local8
 M0000000a_IL_0054:
 ldloc local8
 M0000000a_IL_0056:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion22(System.Streams.InputStream)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion22(System.IO.InputStream)
 M0000000a_IL_005b:
 stloc local9
 M0000000a_IL_005d:
 ldloc local9
 M0000000a_IL_005f:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion23(System.Result.Ok<System.Streams.InputStream>)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion23(System.Result.Ok<System.IO.InputStream>)
 M0000000a_IL_0064:
 stloc local1
 M0000000a_IL_0065:
@@ -631,7 +631,7 @@ ldloca local10
 M0000000a_IL_0070:
 ldloca local11
 M0000000a_IL_0072:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion20(System.Result<System.Streams.FileInputStream,System.Streams.StreamError>&,System.Result.Error<System.Streams.StreamError>&)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion20(System.Result<System.IO.FileInputStream,System.IO.StreamError>&,System.Result.Error<System.IO.StreamError>&)
 M0000000a_IL_0077:
 brfalse M0000000a_IL_00b6
 M0000000a_IL_007c:
@@ -643,7 +643,7 @@ ldloca local12
 M0000000a_IL_0082:
 ldloca local13
 M0000000a_IL_0084:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion21(System.Result.Error<System.Streams.StreamError>&,System.Streams.StreamError&)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion21(System.Result.Error<System.IO.StreamError>&,System.IO.StreamError&)
 M0000000a_IL_0089:
 ldloc local13
 M0000000a_IL_008b:
@@ -661,9 +661,9 @@ M0000000a_IL_00a4:
 M0000000a_IL_00a5:
 ldloc local3
 M0000000a_IL_00a6:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion24(System.Streams.StreamError)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion24(System.IO.StreamError)
 M0000000a_IL_00ab:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion25(System.Result.Error<System.Streams.StreamError>)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion25(System.Result.Error<System.IO.StreamError>)
 M0000000a_IL_00b0:
 stloc local1
 M0000000a_IL_00b1:
@@ -680,25 +680,25 @@ ldloc local1
 M0000000a_IL_00bd:
 ret
 .end
-.method instance CreateNew() -> System.Result<System.Streams.OutputStream,System.Streams.StreamError>
-.local System.Result<System.Streams.FileOutputStream,System.Streams.StreamError> local0
-.local System.Result<System.Streams.OutputStream,System.Streams.StreamError> local1
-.local System.Streams.FileOutputStream local2
-.local System.Streams.StreamError local3
-.local System.Result<System.Streams.FileOutputStream,System.Streams.StreamError> local4
-.local System.Result.Ok<System.Streams.FileOutputStream> local5
-.local System.Result.Ok<System.Streams.FileOutputStream> local6
-.local System.Streams.FileOutputStream local7
-.local System.Streams.OutputStream local8
-.local System.Result.Ok<System.Streams.OutputStream> local9
-.local System.Result<System.Streams.FileOutputStream,System.Streams.StreamError> local10
-.local System.Result.Error<System.Streams.StreamError> local11
-.local System.Result.Error<System.Streams.StreamError> local12
-.local System.Streams.StreamError local13
+.method instance CreateNew() -> System.Result<System.IO.OutputStream,System.IO.StreamError>
+.local System.Result<System.IO.FileOutputStream,System.IO.StreamError> local0
+.local System.Result<System.IO.OutputStream,System.IO.StreamError> local1
+.local System.IO.FileOutputStream local2
+.local System.IO.StreamError local3
+.local System.Result<System.IO.FileOutputStream,System.IO.StreamError> local4
+.local System.Result.Ok<System.IO.FileOutputStream> local5
+.local System.Result.Ok<System.IO.FileOutputStream> local6
+.local System.IO.FileOutputStream local7
+.local System.IO.OutputStream local8
+.local System.Result.Ok<System.IO.OutputStream> local9
+.local System.Result<System.IO.FileOutputStream,System.IO.StreamError> local10
+.local System.Result.Error<System.IO.StreamError> local11
+.local System.Result.Error<System.IO.StreamError> local12
+.local System.IO.StreamError local13
 ldloca local2
-initobj System.Streams.FileOutputStream
+initobj System.IO.FileOutputStream
 ldloca local7
-initobj System.Streams.FileOutputStream
+initobj System.IO.FileOutputStream
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 M0000000b_IL_0002:
@@ -707,7 +707,7 @@ ldarg 0
 M0000000b_IL_0004:
 ldfld neoCLR.Library.System.Storage.FileSystem.Type_53797374656D2E53746F726167652E4C6F63616C46696C65::nativePath
 M0000000b_IL_0009:
-call System.Streams.FileOutputStream::CreateNew(String)
+call System.IO.FileOutputStream::CreateNew(String)
 M0000000b_IL_000e:
 stloc local0
 M0000000b_IL_000f:
@@ -724,7 +724,7 @@ ldloca local4
 M0000000b_IL_001d:
 ldloca local5
 M0000000b_IL_001f:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion26(System.Result<System.Streams.FileOutputStream,System.Streams.StreamError>&,System.Result.Ok<System.Streams.FileOutputStream>&)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion26(System.Result<System.IO.FileOutputStream,System.IO.StreamError>&,System.Result.Ok<System.IO.FileOutputStream>&)
 M0000000b_IL_0024:
 brfalse M0000000b_IL_006a
 M0000000b_IL_0029:
@@ -736,7 +736,7 @@ ldloca local6
 M0000000b_IL_002f:
 ldloca local7
 M0000000b_IL_0031:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion27(System.Result.Ok<System.Streams.FileOutputStream>&,System.Streams.FileOutputStream&)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion27(System.Result.Ok<System.IO.FileOutputStream>&,System.IO.FileOutputStream&)
 M0000000b_IL_0036:
 ldloc local7
 M0000000b_IL_0038:
@@ -753,18 +753,18 @@ br M0000000b_IL_0051
 M0000000b_IL_0051:
 ldloc local2
 M0000000b_IL_0052:
-castclass System.Streams.OutputStream
+castclass System.IO.OutputStream
 stloc local8
 M0000000b_IL_0054:
 ldloc local8
 M0000000b_IL_0056:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion29(System.Streams.OutputStream)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion29(System.IO.OutputStream)
 M0000000b_IL_005b:
 stloc local9
 M0000000b_IL_005d:
 ldloc local9
 M0000000b_IL_005f:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion30(System.Result.Ok<System.Streams.OutputStream>)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion30(System.Result.Ok<System.IO.OutputStream>)
 M0000000b_IL_0064:
 stloc local1
 M0000000b_IL_0065:
@@ -779,7 +779,7 @@ ldloca local10
 M0000000b_IL_0070:
 ldloca local11
 M0000000b_IL_0072:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion28(System.Result<System.Streams.FileOutputStream,System.Streams.StreamError>&,System.Result.Error<System.Streams.StreamError>&)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion28(System.Result<System.IO.FileOutputStream,System.IO.StreamError>&,System.Result.Error<System.IO.StreamError>&)
 M0000000b_IL_0077:
 brfalse M0000000b_IL_00b6
 M0000000b_IL_007c:
@@ -791,7 +791,7 @@ ldloca local12
 M0000000b_IL_0082:
 ldloca local13
 M0000000b_IL_0084:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion21(System.Result.Error<System.Streams.StreamError>&,System.Streams.StreamError&)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion21(System.Result.Error<System.IO.StreamError>&,System.IO.StreamError&)
 M0000000b_IL_0089:
 ldloc local13
 M0000000b_IL_008b:
@@ -809,9 +809,9 @@ M0000000b_IL_00a4:
 M0000000b_IL_00a5:
 ldloc local3
 M0000000b_IL_00a6:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion24(System.Streams.StreamError)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion24(System.IO.StreamError)
 M0000000b_IL_00ab:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion31(System.Result.Error<System.Streams.StreamError>)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion31(System.Result.Error<System.IO.StreamError>)
 M0000000b_IL_00b0:
 stloc local1
 M0000000b_IL_00b1:

@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.TextReadError.InvalidUtf8
+  commentId: T:System.IO.TextReadError.InvalidUtf8
+  id: TextReadError.InvalidUtf8
+  parent: System.IO
+  children:
+  - System.IO.TextReadError.InvalidUtf8.#ctor
+  langs:
+  - csharp
+  - vb
+  name: TextReadError.InvalidUtf8
+  nameWithType: TextReadError.InvalidUtf8
+  fullName: System.IO.TextReadError.InvalidUtf8
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: The InvalidUtf8 text-reading error case.
+  example: []
+  syntax:
+    content: public struct TextReadError.InvalidUtf8
+    content.vb: Public Structure TextReadError.InvalidUtf8
+- uid: System.IO.TextReadError.InvalidUtf8.#ctor
+  commentId: M:System.IO.TextReadError.InvalidUtf8.#ctor
+  id: '#ctor'
+  parent: System.IO.TextReadError.InvalidUtf8
+  langs:
+  - csharp
+  - vb
+  name: InvalidUtf8()
+  nameWithType: TextReadError.InvalidUtf8.InvalidUtf8()
+  fullName: System.IO.TextReadError.InvalidUtf8.InvalidUtf8()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Creates InvalidUtf8.
+  example: []
+  syntax:
+    content: public InvalidUtf8()
+    content.vb: Public Sub New()
+  overload: System.IO.TextReadError.InvalidUtf8.#ctor*
+  nameWithType.vb: TextReadError.InvalidUtf8.New()
+  fullName.vb: System.IO.TextReadError.InvalidUtf8.New()
+  name.vb: New()
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.TextReadError.InvalidUtf8.#ctor*
+  commentId: Overload:System.IO.TextReadError.InvalidUtf8.#ctor
+  isExternal: true
+  href: System.IO.TextReadError.InvalidUtf8.html#System_IO_TextReadError_InvalidUtf8__ctor
+  name: InvalidUtf8
+  nameWithType: TextReadError.InvalidUtf8.InvalidUtf8
+  fullName: System.IO.TextReadError.InvalidUtf8.InvalidUtf8
+  nameWithType.vb: TextReadError.InvalidUtf8.New
+  fullName.vb: System.IO.TextReadError.InvalidUtf8.New
+  name.vb: New

@@ -10,6 +10,100 @@ items:
   - uid: System.Concurrency.ThreadPool
     name: ThreadPool
     type: Class
+- uid: System.IO
+  name: System.IO
+  type: Namespace
+  items:
+  - uid: System.IO.FileInputStream
+    name: FileInputStream
+    type: Class
+  - uid: System.IO.FileOutputStream
+    name: FileOutputStream
+    type: Class
+  - uid: System.IO.InputStream
+    name: InputStream
+    type: Interface
+  - uid: System.IO.OutputStream
+    name: OutputStream
+    type: Interface
+  - uid: System.IO.SeekableStream
+    name: SeekableStream
+    type: Interface
+  - uid: System.IO.StreamError
+    name: StreamError
+    type: Struct
+  - uid: System.IO.StreamError.AccessDenied
+    name: StreamError.AccessDenied
+    type: Struct
+  - uid: System.IO.StreamError.AlreadyExists
+    name: StreamError.AlreadyExists
+    type: Struct
+  - uid: System.IO.StreamError.Closed
+    name: StreamError.Closed
+    type: Struct
+  - uid: System.IO.StreamError.InvalidPath
+    name: StreamError.InvalidPath
+    type: Struct
+  - uid: System.IO.StreamError.InvalidRange
+    name: StreamError.InvalidRange
+    type: Struct
+  - uid: System.IO.StreamError.IoFailure
+    name: StreamError.IoFailure
+    type: Struct
+  - uid: System.IO.StreamError.LimitExceeded
+    name: StreamError.LimitExceeded
+    type: Struct
+  - uid: System.IO.StreamError.NotFound
+    name: StreamError.NotFound
+    type: Struct
+  - uid: System.IO.StreamError.WrongAccess
+    name: StreamError.WrongAccess
+    type: Struct
+  - uid: System.IO.StreamError.WrongKind
+    name: StreamError.WrongKind
+    type: Struct
+  - uid: System.IO.StreamReader
+    name: StreamReader
+    type: Class
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    type: Struct
+  - uid: System.IO.TextReadError.AccessDenied
+    name: TextReadError.AccessDenied
+    type: Struct
+  - uid: System.IO.TextReadError.AlreadyExists
+    name: TextReadError.AlreadyExists
+    type: Struct
+  - uid: System.IO.TextReadError.Closed
+    name: TextReadError.Closed
+    type: Struct
+  - uid: System.IO.TextReadError.InvalidPath
+    name: TextReadError.InvalidPath
+    type: Struct
+  - uid: System.IO.TextReadError.InvalidRange
+    name: TextReadError.InvalidRange
+    type: Struct
+  - uid: System.IO.TextReadError.InvalidUtf8
+    name: TextReadError.InvalidUtf8
+    type: Struct
+  - uid: System.IO.TextReadError.IoFailure
+    name: TextReadError.IoFailure
+    type: Struct
+  - uid: System.IO.TextReadError.LimitExceeded
+    name: TextReadError.LimitExceeded
+    type: Struct
+  - uid: System.IO.TextReadError.NotFound
+    name: TextReadError.NotFound
+    type: Struct
+  - uid: System.IO.TextReadError.WrongAccess
+    name: TextReadError.WrongAccess
+    type: Struct
+  - uid: System.IO.TextReadError.WrongKind
+    name: TextReadError.WrongKind
+    type: Struct
+  - uid: System.IO.TextReader
+    name: TextReader
+    type: Interface
 - uid: System.Storage
   name: System.Storage
   type: Namespace
@@ -125,55 +219,6 @@ items:
   - uid: System.Storage.StorageProvider
     name: StorageProvider
     type: Interface
-- uid: System.Streams
-  name: System.Streams
-  type: Namespace
-  items:
-  - uid: System.Streams.FileInputStream
-    name: FileInputStream
-    type: Class
-  - uid: System.Streams.FileOutputStream
-    name: FileOutputStream
-    type: Class
-  - uid: System.Streams.InputStream
-    name: InputStream
-    type: Interface
-  - uid: System.Streams.OutputStream
-    name: OutputStream
-    type: Interface
-  - uid: System.Streams.StreamError
-    name: StreamError
-    type: Struct
-  - uid: System.Streams.StreamError.AccessDenied
-    name: StreamError.AccessDenied
-    type: Struct
-  - uid: System.Streams.StreamError.AlreadyExists
-    name: StreamError.AlreadyExists
-    type: Struct
-  - uid: System.Streams.StreamError.Closed
-    name: StreamError.Closed
-    type: Struct
-  - uid: System.Streams.StreamError.InvalidPath
-    name: StreamError.InvalidPath
-    type: Struct
-  - uid: System.Streams.StreamError.InvalidRange
-    name: StreamError.InvalidRange
-    type: Struct
-  - uid: System.Streams.StreamError.IoFailure
-    name: StreamError.IoFailure
-    type: Struct
-  - uid: System.Streams.StreamError.LimitExceeded
-    name: StreamError.LimitExceeded
-    type: Struct
-  - uid: System.Streams.StreamError.NotFound
-    name: StreamError.NotFound
-    type: Struct
-  - uid: System.Streams.StreamError.WrongAccess
-    name: StreamError.WrongAccess
-    type: Struct
-  - uid: System.Streams.StreamError.WrongKind
-    name: StreamError.WrongKind
-    type: Struct
 - uid: System.Tasks
   name: System.Tasks
   type: Namespace

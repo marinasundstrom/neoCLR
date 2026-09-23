@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.StreamError.Closed
+  commentId: T:System.IO.StreamError.Closed
+  id: StreamError.Closed
+  parent: System.IO
+  children:
+  - System.IO.StreamError.Closed.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StreamError.Closed
+  nameWithType: StreamError.Closed
+  fullName: System.IO.StreamError.Closed
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: The stream is closed or its owning invocation has ended.
+  example: []
+  syntax:
+    content: public struct StreamError.Closed
+    content.vb: Public Structure StreamError.Closed
+- uid: System.IO.StreamError.Closed.#ctor
+  commentId: M:System.IO.StreamError.Closed.#ctor
+  id: '#ctor'
+  parent: System.IO.StreamError.Closed
+  langs:
+  - csharp
+  - vb
+  name: Closed()
+  nameWithType: StreamError.Closed.Closed()
+  fullName: System.IO.StreamError.Closed.Closed()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Creates the Closed case value.
+  example: []
+  syntax:
+    content: public Closed()
+    content.vb: Public Sub New()
+  overload: System.IO.StreamError.Closed.#ctor*
+  nameWithType.vb: StreamError.Closed.New()
+  fullName.vb: System.IO.StreamError.Closed.New()
+  name.vb: New()
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.StreamError.Closed.#ctor*
+  commentId: Overload:System.IO.StreamError.Closed.#ctor
+  isExternal: true
+  href: System.IO.StreamError.Closed.html#System_IO_StreamError_Closed__ctor
+  name: Closed
+  nameWithType: StreamError.Closed.Closed
+  fullName: System.IO.StreamError.Closed.Closed
+  nameWithType.vb: StreamError.Closed.New
+  fullName.vb: System.IO.StreamError.Closed.New
+  name.vb: New

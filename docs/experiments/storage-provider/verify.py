@@ -108,6 +108,15 @@ with tempfile.TemporaryDirectory(prefix='neoclr-storage-provider-') as folder:
     assert minimal.stdout == 'Minimal platform provider contract: passed\n', minimal.stdout
     print(minimal.stdout, end='')
 
+    (work / 'sandbox/reader.txt').write_text('Hello, värld!', encoding='utf-8')
+    shutil.copyfile(HERE / 'ReaderContracts.rvn', root / 'Main.rvn')
+    readers = subprocess.run(['dotnet', 'msbuild', str(root / 'StorageExplorer.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=120)
+    assert readers.returncode == 0, readers.stdout + readers.stderr
+    decoded = subprocess.run([str(bundle / 'bin/neoclr'), 'run', str(root / 'bin/neoclr/Debug/App.neoil'), '--system', str(bundle / 'lib/System.neoil')], cwd=work / 'sandbox', capture_output=True, text=True, timeout=60)
+    assert decoded.returncode == 0, decoded.stdout + decoded.stderr
+    assert decoded.stdout == 'Text readers and seekability: passed\n', decoded.stdout
+    print(decoded.stdout, end='')
+
     # The root is closed; providers implement File or Directory instead.
     (root / 'Main.rvn').write_text(
         'namespace StorageExperiment\nimport System.Storage.*\n'
@@ -135,7 +144,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-storage-provider-') as folder:
     # Direction is a source contract: neither interface exposes the opposite operation.
     for capability, operation in [('InputStream', 'Write'), ('OutputStream', 'Read')]:
         (root / 'Main.rvn').write_text(
-            'namespace StorageExperiment\nimport System.*\nimport System.Streams.*\n'
+            'namespace StorageExperiment\nimport System.*\nimport System.IO.*\n'
             f'func Wrong(stream: {capability}) {{\n'
             '    let buffer: byte[] = [(byte)0]\n'
             f'    _ = stream.{operation}(buffer, 0, 1)\n'

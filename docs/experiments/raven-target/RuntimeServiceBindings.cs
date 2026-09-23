@@ -15,6 +15,8 @@ static class RuntimeServiceBindings
             ("StorageKind", ["String"], "Value"),
             ("FileOpenRead", ["String"], "Value"),
             ("FileCreateNew", ["String"], "Value"),
+            ("FilePosition", ["Int32"], "Value"),
+            ("FileSeek", ["Int32", "Int64"], "Value"),
             ("FileReadInto", ["Int32", "arrayref<Byte>", "Int32", "Int32"], "Value"),
             ("FileWriteChunk", ["Int32", "arrayref<Byte>", "Int32", "Int32"], "Value"),
             ("FileFlush", ["Int32"], "Value"),
@@ -158,7 +160,7 @@ static class RuntimeServiceBindings
                 : definition.ReturnType is not GenericParameter parameter || parameter.Owner != definition || parameter.Position != 0))
             throw new InvalidDataException("Unsupported erased native value intrinsic.");
         var element = RuntimeSignatures.Map(method.GenericArguments[0], GenericUnionBindings.Type);
-        if (element is not ("String" or "Char" or "UInt32" or "Byte" or "Int32" or "Void"))
+        if (element is not ("String" or "Char" or "UInt32" or "Byte" or "Int32" or "Int64" or "Void"))
             throw new InvalidDataException("Unsupported erased native payload type.");
         var shape = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         if (!shape.Args.SequenceEqual(new[] { "Value" })

@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.TextReadError.IoFailure
+  commentId: T:System.IO.TextReadError.IoFailure
+  id: TextReadError.IoFailure
+  parent: System.IO
+  children:
+  - System.IO.TextReadError.IoFailure.#ctor
+  langs:
+  - csharp
+  - vb
+  name: TextReadError.IoFailure
+  nameWithType: TextReadError.IoFailure
+  fullName: System.IO.TextReadError.IoFailure
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: The IoFailure text-reading error case.
+  example: []
+  syntax:
+    content: public struct TextReadError.IoFailure
+    content.vb: Public Structure TextReadError.IoFailure
+- uid: System.IO.TextReadError.IoFailure.#ctor
+  commentId: M:System.IO.TextReadError.IoFailure.#ctor
+  id: '#ctor'
+  parent: System.IO.TextReadError.IoFailure
+  langs:
+  - csharp
+  - vb
+  name: IoFailure()
+  nameWithType: TextReadError.IoFailure.IoFailure()
+  fullName: System.IO.TextReadError.IoFailure.IoFailure()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Creates IoFailure.
+  example: []
+  syntax:
+    content: public IoFailure()
+    content.vb: Public Sub New()
+  overload: System.IO.TextReadError.IoFailure.#ctor*
+  nameWithType.vb: TextReadError.IoFailure.New()
+  fullName.vb: System.IO.TextReadError.IoFailure.New()
+  name.vb: New()
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.TextReadError.IoFailure.#ctor*
+  commentId: Overload:System.IO.TextReadError.IoFailure.#ctor
+  isExternal: true
+  href: System.IO.TextReadError.IoFailure.html#System_IO_TextReadError_IoFailure__ctor
+  name: IoFailure
+  nameWithType: TextReadError.IoFailure.IoFailure
+  fullName: System.IO.TextReadError.IoFailure.IoFailure
+  nameWithType.vb: TextReadError.IoFailure.New
+  fullName.vb: System.IO.TextReadError.IoFailure.New
+  name.vb: New

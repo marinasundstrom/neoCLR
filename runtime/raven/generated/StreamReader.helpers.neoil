@@ -1,0 +1,264 @@
+; Generated from runtime/raven/src/System/IO/StreamReader.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorInvalidPath(System.IO.TextReadError.InvalidPath value) -> System.IO.TextReadError
+ldarg value
+newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.InvalidPath)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorNotFound(System.IO.TextReadError.NotFound value) -> System.IO.TextReadError
+ldarg value
+newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.NotFound)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorAccessDenied(System.IO.TextReadError.AccessDenied value) -> System.IO.TextReadError
+ldarg value
+newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.AccessDenied)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorWrongKind(System.IO.TextReadError.WrongKind value) -> System.IO.TextReadError
+ldarg value
+newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.WrongKind)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorAlreadyExists(System.IO.TextReadError.AlreadyExists value) -> System.IO.TextReadError
+ldarg value
+newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.AlreadyExists)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorClosed(System.IO.TextReadError.Closed value) -> System.IO.TextReadError
+ldarg value
+newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.Closed)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorInvalidRange(System.IO.TextReadError.InvalidRange value) -> System.IO.TextReadError
+ldarg value
+newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.InvalidRange)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorLimitExceeded(System.IO.TextReadError.LimitExceeded value) -> System.IO.TextReadError
+ldarg value
+newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.LimitExceeded)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorWrongAccess(System.IO.TextReadError.WrongAccess value) -> System.IO.TextReadError
+ldarg value
+newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.WrongAccess)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorIoFailure(System.IO.TextReadError.IoFailure value) -> System.IO.TextReadError
+ldarg value
+newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.IoFailure)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorInvalidUtf8(System.IO.TextReadError.InvalidUtf8 value) -> System.IO.TextReadError
+ldarg value
+newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.InvalidUtf8)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsInvalidPath(System.IO.StreamError& source) -> Boolean
+ldarg source
+ldobj System.IO.StreamError
+call instance System.IO.StreamError::get_IsInvalidPath()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsNotFound(System.IO.StreamError& source) -> Boolean
+ldarg source
+ldobj System.IO.StreamError
+call instance System.IO.StreamError::get_IsNotFound()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsAccessDenied(System.IO.StreamError& source) -> Boolean
+ldarg source
+ldobj System.IO.StreamError
+call instance System.IO.StreamError::get_IsAccessDenied()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsWrongKind(System.IO.StreamError& source) -> Boolean
+ldarg source
+ldobj System.IO.StreamError
+call instance System.IO.StreamError::get_IsWrongKind()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsAlreadyExists(System.IO.StreamError& source) -> Boolean
+ldarg source
+ldobj System.IO.StreamError
+call instance System.IO.StreamError::get_IsAlreadyExists()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsClosed(System.IO.StreamError& source) -> Boolean
+ldarg source
+ldobj System.IO.StreamError
+call instance System.IO.StreamError::get_IsClosed()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsInvalidRange(System.IO.StreamError& source) -> Boolean
+ldarg source
+ldobj System.IO.StreamError
+call instance System.IO.StreamError::get_IsInvalidRange()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsLimitExceeded(System.IO.StreamError& source) -> Boolean
+ldarg source
+ldobj System.IO.StreamError
+call instance System.IO.StreamError::get_IsLimitExceeded()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsWrongAccess(System.IO.StreamError& source) -> Boolean
+ldarg source
+ldobj System.IO.StreamError
+call instance System.IO.StreamError::get_IsWrongAccess()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsIoFailure(System.IO.StreamError& source) -> Boolean
+ldarg source
+ldobj System.IO.StreamError
+call instance System.IO.StreamError::get_IsIoFailure()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorInvalidPathNew() -> System.IO.TextReadError.InvalidPath
+newobj instance System.IO.TextReadError.InvalidPath::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNotFoundNew() -> System.IO.TextReadError.NotFound
+newobj instance System.IO.TextReadError.NotFound::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorAccessDeniedNew() -> System.IO.TextReadError.AccessDenied
+newobj instance System.IO.TextReadError.AccessDenied::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorWrongKindNew() -> System.IO.TextReadError.WrongKind
+newobj instance System.IO.TextReadError.WrongKind::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorAlreadyExistsNew() -> System.IO.TextReadError.AlreadyExists
+newobj instance System.IO.TextReadError.AlreadyExists::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorClosedNew() -> System.IO.TextReadError.Closed
+newobj instance System.IO.TextReadError.Closed::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorInvalidRangeNew() -> System.IO.TextReadError.InvalidRange
+newobj instance System.IO.TextReadError.InvalidRange::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorLimitExceededNew() -> System.IO.TextReadError.LimitExceeded
+newobj instance System.IO.TextReadError.LimitExceeded::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorWrongAccessNew() -> System.IO.TextReadError.WrongAccess
+newobj instance System.IO.TextReadError.WrongAccess::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorIoFailureNew() -> System.IO.TextReadError.IoFailure
+newobj instance System.IO.TextReadError.IoFailure::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorInvalidUtf8New() -> System.IO.TextReadError.InvalidUtf8
+newobj instance System.IO.TextReadError.InvalidUtf8::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError arg0) -> System.Result.Error<System.IO.TextReadError>
+ldarg arg0
+newobj instance System.Result.Error<System.IO.TextReadError>::.ctor(System.IO.TextReadError)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Error<System.IO.TextReadError> arg0) -> System.Result<String,System.IO.TextReadError>
+ldarg arg0
+newobj instance System.Result<String,System.IO.TextReadError>::.ctor(System.Result.Error<System.IO.TextReadError>)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion2(System.Result<Int32,System.IO.StreamError>& arg0,out(true) System.Result.Ok<Int32>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Result<Int32,System.IO.StreamError>
+ldarg arg1
+call instance System.Result<Int32,System.IO.StreamError>::TryGet(System.Result.Ok<Int32>&)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion3(System.Result.Ok<Int32>& receiver,out Int32& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Result.Ok<Int32>
+call instance System.Result.Ok<Int32>::get_Value()
+stobj Int32
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion4(System.Result<Int32,System.IO.StreamError>& arg0,out(true) System.Result.Error<System.IO.StreamError>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Result<Int32,System.IO.StreamError>
+ldarg arg1
+call instance System.Result<Int32,System.IO.StreamError>::TryGet(System.Result.Error<System.IO.StreamError>&)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion5(System.Result.Error<System.IO.StreamError>& receiver,out System.IO.StreamError& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Result.Error<System.IO.StreamError>
+call instance System.Result.Error<System.IO.StreamError>::get_Value()
+stobj System.IO.StreamError
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion6(System.Result<String,System.Text.InvalidUtf8Error>& arg0,out(true) System.Result.Ok<String>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Result<String,System.Text.InvalidUtf8Error>
+ldarg arg1
+call instance System.Result<String,System.Text.InvalidUtf8Error>::TryGet(System.Result.Ok<String>&)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion7(System.Result.Ok<String>& receiver,out String& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Result.Ok<String>
+call instance System.Result.Ok<String>::get_Value()
+stobj String
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion8(System.Result<String,System.Text.InvalidUtf8Error>& arg0,out(true) System.Result.Error<System.Text.InvalidUtf8Error>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Result<String,System.Text.InvalidUtf8Error>
+ldarg arg1
+call instance System.Result<String,System.Text.InvalidUtf8Error>::TryGet(System.Result.Error<System.Text.InvalidUtf8Error>&)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion9(System.Result.Error<System.Text.InvalidUtf8Error>& receiver,out System.Text.InvalidUtf8Error& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Result.Error<System.Text.InvalidUtf8Error>
+call instance System.Result.Error<System.Text.InvalidUtf8Error>::get_Value()
+stobj System.Text.InvalidUtf8Error
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion10(String arg0) -> System.Result.Ok<String>
+ldarg arg0
+newobj instance System.Result.Ok<String>::.ctor(String)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion11(System.Result.Ok<String> arg0) -> System.Result<String,System.IO.TextReadError>
+ldarg arg0
+newobj instance System.Result<String,System.IO.TextReadError>::.ctor(System.Result.Ok<String>)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

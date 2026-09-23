@@ -4,7 +4,7 @@ using Mono.Cecil.Cil;
 static class ManagedArrayBindings
 {
     public static bool IsType(string type) => type.StartsWith("arrayref<", StringComparison.Ordinal) && type.EndsWith('>');
-    public static bool IsReference(string type) => type == FileSystemBindings.Name || StorageItemBindings.IsName(type) || ApplicationTypes.IsReference(type) || type == "String" || type == "System.Object" || IsType(type)
+    public static bool IsReference(string type) => ReaderBindings.IsName(type) || type == FileSystemBindings.Name || StorageItemBindings.IsName(type) || ApplicationTypes.IsReference(type) || type == "String" || type == "System.Object" || IsType(type)
         || ReflectionBindings.IsReference(type) || CollectionBindings.IsReference(type) || InterfaceBindings.IsInterface(type);
     public static bool Defaultable(string type) => IsReference(type) || type is "Int32" or "Double" or "Boolean" or "Void"
         || PrimitiveBindings.Types.Contains(type) || CalendarBindings.Types.Contains(type) || ErrorBindings.IsEmpty(type);

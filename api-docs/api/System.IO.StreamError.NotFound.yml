@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.StreamError.NotFound
+  commentId: T:System.IO.StreamError.NotFound
+  id: StreamError.NotFound
+  parent: System.IO
+  children:
+  - System.IO.StreamError.NotFound.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StreamError.NotFound
+  nameWithType: StreamError.NotFound
+  fullName: System.IO.StreamError.NotFound
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: The requested file or a required parent does not exist.
+  example: []
+  syntax:
+    content: public struct StreamError.NotFound
+    content.vb: Public Structure StreamError.NotFound
+- uid: System.IO.StreamError.NotFound.#ctor
+  commentId: M:System.IO.StreamError.NotFound.#ctor
+  id: '#ctor'
+  parent: System.IO.StreamError.NotFound
+  langs:
+  - csharp
+  - vb
+  name: NotFound()
+  nameWithType: StreamError.NotFound.NotFound()
+  fullName: System.IO.StreamError.NotFound.NotFound()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Creates the NotFound case value.
+  example: []
+  syntax:
+    content: public NotFound()
+    content.vb: Public Sub New()
+  overload: System.IO.StreamError.NotFound.#ctor*
+  nameWithType.vb: StreamError.NotFound.New()
+  fullName.vb: System.IO.StreamError.NotFound.New()
+  name.vb: New()
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.StreamError.NotFound.#ctor*
+  commentId: Overload:System.IO.StreamError.NotFound.#ctor
+  isExternal: true
+  href: System.IO.StreamError.NotFound.html#System_IO_StreamError_NotFound__ctor
+  name: NotFound
+  nameWithType: StreamError.NotFound.NotFound
+  fullName: System.IO.StreamError.NotFound.NotFound
+  nameWithType.vb: StreamError.NotFound.New
+  fullName.vb: System.IO.StreamError.NotFound.New
+  name.vb: New

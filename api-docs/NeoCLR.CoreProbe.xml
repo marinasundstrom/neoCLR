@@ -4,6 +4,77 @@
     <name>NeoCLR.CoreProbe</name>
   </assembly>
   <members>
+    <member name="T:System.IO.TextReadError"><summary>An expected text-reading failure.</summary><remarks>Preserves the named input StreamError distinction or reports InvalidUtf8. InvalidRange rejects negative bounds; LimitExceeded reports bounds or size overflow. Cases are values; extracting the wrong case faults.</remarks></member>
+    <member name="M:System.IO.TextReadError.ToString"><summary>Returns the active text-reading error case name.</summary><returns>A stable case name for diagnostics.</returns></member>
+    <member name="T:System.IO.TextReadError.InvalidPath"><summary>The InvalidPath text-reading error case.</summary></member>
+    <member name="M:System.IO.TextReadError.InvalidPath.#ctor"><summary>Creates InvalidPath.</summary></member>
+    <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.InvalidPath)"><summary>Creates an error containing InvalidPath.</summary><param name="value">The error case.</param></member>
+    <member name="P:System.IO.TextReadError.IsInvalidPath"><summary>Whether this error is InvalidPath.</summary><returns>True for the named case.</returns></member>
+    <member name="M:System.IO.TextReadError.GetInvalidPath"><summary>Extracts InvalidPath.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
+    <member name="T:System.IO.TextReadError.NotFound"><summary>The NotFound text-reading error case.</summary></member>
+    <member name="M:System.IO.TextReadError.NotFound.#ctor"><summary>Creates NotFound.</summary></member>
+    <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.NotFound)"><summary>Creates an error containing NotFound.</summary><param name="value">The error case.</param></member>
+    <member name="P:System.IO.TextReadError.IsNotFound"><summary>Whether this error is NotFound.</summary><returns>True for the named case.</returns></member>
+    <member name="M:System.IO.TextReadError.GetNotFound"><summary>Extracts NotFound.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
+    <member name="T:System.IO.TextReadError.AccessDenied"><summary>The AccessDenied text-reading error case.</summary></member>
+    <member name="M:System.IO.TextReadError.AccessDenied.#ctor"><summary>Creates AccessDenied.</summary></member>
+    <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.AccessDenied)"><summary>Creates an error containing AccessDenied.</summary><param name="value">The error case.</param></member>
+    <member name="P:System.IO.TextReadError.IsAccessDenied"><summary>Whether this error is AccessDenied.</summary><returns>True for the named case.</returns></member>
+    <member name="M:System.IO.TextReadError.GetAccessDenied"><summary>Extracts AccessDenied.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
+    <member name="T:System.IO.TextReadError.WrongKind"><summary>The WrongKind text-reading error case.</summary></member>
+    <member name="M:System.IO.TextReadError.WrongKind.#ctor"><summary>Creates WrongKind.</summary></member>
+    <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.WrongKind)"><summary>Creates an error containing WrongKind.</summary><param name="value">The error case.</param></member>
+    <member name="P:System.IO.TextReadError.IsWrongKind"><summary>Whether this error is WrongKind.</summary><returns>True for the named case.</returns></member>
+    <member name="M:System.IO.TextReadError.GetWrongKind"><summary>Extracts WrongKind.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
+    <member name="T:System.IO.TextReadError.AlreadyExists"><summary>The AlreadyExists text-reading error case.</summary></member>
+    <member name="M:System.IO.TextReadError.AlreadyExists.#ctor"><summary>Creates AlreadyExists.</summary></member>
+    <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.AlreadyExists)"><summary>Creates an error containing AlreadyExists.</summary><param name="value">The error case.</param></member>
+    <member name="P:System.IO.TextReadError.IsAlreadyExists"><summary>Whether this error is AlreadyExists.</summary><returns>True for the named case.</returns></member>
+    <member name="M:System.IO.TextReadError.GetAlreadyExists"><summary>Extracts AlreadyExists.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
+    <member name="T:System.IO.TextReadError.Closed"><summary>The Closed text-reading error case.</summary></member>
+    <member name="M:System.IO.TextReadError.Closed.#ctor"><summary>Creates Closed.</summary></member>
+    <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.Closed)"><summary>Creates an error containing Closed.</summary><param name="value">The error case.</param></member>
+    <member name="P:System.IO.TextReadError.IsClosed"><summary>Whether this error is Closed.</summary><returns>True for the named case.</returns></member>
+    <member name="M:System.IO.TextReadError.GetClosed"><summary>Extracts Closed.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
+    <member name="T:System.IO.TextReadError.InvalidRange"><summary>The InvalidRange text-reading error case.</summary></member>
+    <member name="M:System.IO.TextReadError.InvalidRange.#ctor"><summary>Creates InvalidRange.</summary></member>
+    <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.InvalidRange)"><summary>Creates an error containing InvalidRange.</summary><param name="value">The error case.</param></member>
+    <member name="P:System.IO.TextReadError.IsInvalidRange"><summary>Whether this error is InvalidRange.</summary><returns>True for the named case.</returns></member>
+    <member name="M:System.IO.TextReadError.GetInvalidRange"><summary>Extracts InvalidRange.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
+    <member name="T:System.IO.TextReadError.LimitExceeded"><summary>The LimitExceeded text-reading error case.</summary></member>
+    <member name="M:System.IO.TextReadError.LimitExceeded.#ctor"><summary>Creates LimitExceeded.</summary></member>
+    <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.LimitExceeded)"><summary>Creates an error containing LimitExceeded.</summary><param name="value">The error case.</param></member>
+    <member name="P:System.IO.TextReadError.IsLimitExceeded"><summary>Whether this error is LimitExceeded.</summary><returns>True for the named case.</returns></member>
+    <member name="M:System.IO.TextReadError.GetLimitExceeded"><summary>Extracts LimitExceeded.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
+    <member name="T:System.IO.TextReadError.WrongAccess"><summary>The WrongAccess text-reading error case.</summary></member>
+    <member name="M:System.IO.TextReadError.WrongAccess.#ctor"><summary>Creates WrongAccess.</summary></member>
+    <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.WrongAccess)"><summary>Creates an error containing WrongAccess.</summary><param name="value">The error case.</param></member>
+    <member name="P:System.IO.TextReadError.IsWrongAccess"><summary>Whether this error is WrongAccess.</summary><returns>True for the named case.</returns></member>
+    <member name="M:System.IO.TextReadError.GetWrongAccess"><summary>Extracts WrongAccess.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
+    <member name="T:System.IO.TextReadError.IoFailure"><summary>The IoFailure text-reading error case.</summary></member>
+    <member name="M:System.IO.TextReadError.IoFailure.#ctor"><summary>Creates IoFailure.</summary></member>
+    <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.IoFailure)"><summary>Creates an error containing IoFailure.</summary><param name="value">The error case.</param></member>
+    <member name="P:System.IO.TextReadError.IsIoFailure"><summary>Whether this error is IoFailure.</summary><returns>True for the named case.</returns></member>
+    <member name="M:System.IO.TextReadError.GetIoFailure"><summary>Extracts IoFailure.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
+    <member name="T:System.IO.TextReadError.InvalidUtf8"><summary>The InvalidUtf8 text-reading error case.</summary></member>
+    <member name="M:System.IO.TextReadError.InvalidUtf8.#ctor"><summary>Creates InvalidUtf8.</summary></member>
+    <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.InvalidUtf8)"><summary>Creates an error containing InvalidUtf8.</summary><param name="value">The error case.</param></member>
+    <member name="P:System.IO.TextReadError.IsInvalidUtf8"><summary>Whether this error is InvalidUtf8.</summary><returns>True for the named case.</returns></member>
+    <member name="M:System.IO.TextReadError.GetInvalidUtf8"><summary>Extracts InvalidUtf8.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
+    <member name="T:System.IO.TextReader"><summary>A sequential text-reading contract independent of its backing source.</summary><remarks>Development POC: bounded whole-text reading and explicit Close. Does not require byte streams or seekability. No async or line-reading members are implemented.</remarks></member>
+    <member name="T:System.IO.StreamReader"><summary>A synchronous strict UTF-8 TextReader over InputStream.</summary><remarks>Preserves a UTF-8 BOM as text. Reads from the current byte position and buffers remaining input until EOF; not constant-memory decoding. Supports partial reads and split UTF-8 characters. See the [reader guide](/docs/streams.html#text-readers). Close owns the input unless leaveOpen was selected. The reader has no seek API.</remarks></member>
+    <member name="M:System.IO.StreamReader.#ctor(System.IO.InputStream)"><summary>Creates a reader that closes its input when closed.</summary><param name="input">Input at its current position; construction performs no read.</param></member>
+    <member name="M:System.IO.StreamReader.#ctor(System.IO.InputStream,System.Boolean)"><summary>Creates a reader with explicit ownership of its input.</summary><param name="input">Input at its current position; construction performs no read.</param><param name="leaveOpen">True leaves the input open when the reader closes.</param></member>
+    <member name="M:System.IO.TextReader.ReadToEnd(System.Int32)"><summary>Reads remaining text subject to a UTF-8 output-byte bound.</summary><param name="maxUtf8Bytes">Nonnegative maximum UTF-8 bytes in the returned text. StreamReader accepts up to 65536; zero succeeds only at EOF.</param><returns>The remaining text, or TextReadError.</returns><remarks>StreamReader checks Closed before bounds and reads no input for invalid bounds. It consumes at most one byte beyond the bound to distinguish exact-bound EOF. Errors can leave input advanced; there is no rollback. Decoding is strict and preserves a BOM. Repeated reading at EOF returns empty text. Host execution and allocation budgets still apply.</remarks></member>
+    <member name="M:System.IO.TextReader.Close"><summary>Closes the reader idempotently.</summary><remarks>Later reads return Closed. StreamReader closes owned input, or leaves it open if requested. Does not rewind or report underlying close errors.</remarks></member>
+    <member name="M:System.IO.StreamReader.ReadToEnd(System.Int32)"><summary>Reads remaining text subject to a UTF-8 output-byte bound.</summary><param name="maxUtf8Bytes">Nonnegative maximum UTF-8 bytes in the returned text. StreamReader accepts up to 65536; zero succeeds only at EOF.</param><returns>The remaining text, or TextReadError.</returns><remarks>StreamReader checks Closed before bounds and reads no input for invalid bounds. It consumes at most one byte beyond the bound to distinguish exact-bound EOF. Errors can leave input advanced; there is no rollback. Decoding is strict and preserves a BOM. Repeated reading at EOF returns empty text. Host execution and allocation budgets still apply.</remarks></member>
+    <member name="M:System.IO.StreamReader.Close"><summary>Closes the reader idempotently.</summary><remarks>Later reads return Closed. StreamReader closes owned input, or leaves it open if requested. Does not rewind or report underlying close errors.</remarks></member>
+    <member name="T:System.IO.SeekableStream"><summary>An optional capability for repositioning a stream by byte offset.</summary><remarks>Independent of reading and writing. FileInputStream implements this capability; TextReader does not. Calls are synchronous and return typed errors. No concurrent position operations are promised.</remarks></member>
+    <member name="M:System.IO.SeekableStream.GetPosition"><summary>Reports the current absolute byte position.</summary><returns>The nonnegative position as Int64, or StreamError.</returns><remarks>Closed streams return Closed. Positions outside the representable range return LimitExceeded. This is not a decoded-character position.</remarks></member>
+    <member name="M:System.IO.SeekableStream.Seek(System.Int64)"><summary>Sets the absolute byte position without changing file contents.</summary><param name="position">Nonnegative absolute byte offset. FileInputStream permits positions beyond EOF.</param><returns>The resulting position or StreamError.</returns><remarks>Closed is checked first. Negative positions return InvalidRange without moving the cursor. Reading beyond EOF returns zero. Seeking does not reset a separate text reader's state; close a leave-open reader before independently repositioning and constructing a new reader.</remarks></member>
+    <member name="M:System.IO.FileInputStream.GetPosition"><summary>Reports the current absolute byte position.</summary><returns>The nonnegative position as Int64, or StreamError.</returns><remarks>Closed streams return Closed. Positions outside the representable range return LimitExceeded. This is not a decoded-character position.</remarks></member>
+    <member name="M:System.IO.FileInputStream.Seek(System.Int64)"><summary>Sets the absolute byte position without changing file contents.</summary><param name="position">Nonnegative absolute byte offset. FileInputStream permits positions beyond EOF.</param><returns>The resulting position or StreamError.</returns><remarks>Closed is checked first. Negative positions return InvalidRange without moving the cursor. Reading beyond EOF returns zero. Seeking does not reset a separate text reader's state; close a leave-open reader before independently repositioning and constructing a new reader.</remarks></member>
+
     <member name="T:System.Storage.FileSystem">
       <summary>A synchronous host-filesystem implementation of StorageProvider.</summary>
       <remarks>Development after Preview 9. Maps logical paths beneath a configured native root; this is not a symlink-safe sandbox. Returns File and Directory interfaces backed by internal implementation classes. Construction performs no I/O. Relative native roots use the host working directory. Lookup observes current state and does not retain content handles. See the [provider guide](/docs/storage-provider.html).</remarks>
@@ -208,15 +279,15 @@
       <param name="input">Text copied into the isolated worker invocation.</param>
       <returns>A task for the copied result text, completed on the selected dispatcher.</returns>
     </member>
-    <member name="N:System.Streams">
+    <member name="N:System.IO">
       <summary>Development byte-stream APIs. File operations are blocking and scoped to one runtime invocation.</summary>
     </member>
-    <member name="T:System.Streams.InputStream">
+    <member name="T:System.IO.InputStream">
       <summary>A synchronous input capability implemented by platform file streams and application providers. Development API after Preview 9.</summary>
       <remarks>Caller-owned arrays, partial transfers, explicit idempotent Close and typed errors. No seeking, scheduling or automatic disposal is implied. The interface does not impose native file lifetime on memory implementations.</remarks>
       <seealso href="../streams.html#capability-contracts">Capability contracts and Flush reference</seealso>
     </member>
-    <member name="M:System.Streams.InputStream.Read(System.Byte[],System.Int32,System.Int32)">
+    <member name="M:System.IO.InputStream.Read(System.Byte[],System.Int32,System.Int32)">
       <summary>Attempts one synchronous partial read.</summary>
       <param name="buffer">Caller-owned byte array; retained only for the duration of this call.</param>
       <param name="offset">Zero-based start within the array.</param>
@@ -224,16 +295,16 @@
       <returns>Ok with the transferred count, or StreamError. Closed is checked before range validation; invalid ranges and oversized requests fail before transfer.</returns>
       <remarks>Only the transferred elements change. A positive-count read returning zero indicates EOF; zero-count does not establish EOF. Calls do not suspend. No concurrency safety is promised.</remarks>
     </member>
-    <member name="M:System.Streams.InputStream.Close">
+    <member name="M:System.IO.InputStream.Close">
       <summary>Closes this stream; repeated calls are harmless.</summary>
       <remarks>Subsequent transfers return Closed. This no-result operation does not report close failures or promise flush/durability. Other streams opened separately retain their own lifetime.</remarks>
     </member>
-    <member name="T:System.Streams.OutputStream">
+    <member name="T:System.IO.OutputStream">
       <summary>A synchronous output capability implemented by platform file streams and application providers. Development API after Preview 9.</summary>
       <remarks>Caller-owned arrays, partial transfers, explicit idempotent Close and typed errors. No seeking, scheduling or automatic disposal is implied. The interface does not impose native file lifetime on memory implementations.</remarks>
       <seealso href="../streams.html#capability-contracts">Capability contracts and Flush reference</seealso>
     </member>
-    <member name="M:System.Streams.OutputStream.Write(System.Byte[],System.Int32,System.Int32)">
+    <member name="M:System.IO.OutputStream.Write(System.Byte[],System.Int32,System.Int32)">
       <summary>Attempts one synchronous partial write.</summary>
       <param name="buffer">Caller-owned byte array; retained only for the duration of this call.</param>
       <param name="offset">Zero-based start within the array.</param>
@@ -241,20 +312,20 @@
       <returns>Ok with the transferred count, or StreamError. Closed is checked before range validation; invalid ranges and oversized requests fail before transfer.</returns>
       <remarks>The buffer is not modified. A positive-count successful write must make progress; callers loop over partial writes. Calls do not suspend. No concurrency safety is promised.</remarks>
     </member>
-    <member name="M:System.Streams.OutputStream.Close">
+    <member name="M:System.IO.OutputStream.Close">
       <summary>Closes this stream; repeated calls are harmless.</summary>
       <remarks>Subsequent transfers return Closed. This no-result operation does not report close failures or promise flush/durability. Other streams opened separately retain their own lifetime.</remarks>
     </member>
-    <member name="M:System.Streams.OutputStream.Flush">
+    <member name="M:System.IO.OutputStream.Flush">
       <summary>Asks the provider to flush output and report an expected failure.</summary>
       <returns>Ok with unit or StreamError; a closed stream returns Closed.</returns>
       <remarks>No durability guarantee. Exact signature and provider-specific behavior are documented in the stream guide because DocFX cannot render Result&lt;System.Void, StreamError&gt;.</remarks>
     </member>
-    <member name="T:System.Streams.FileInputStream">
+    <member name="T:System.IO.FileInputStream">
       <summary>A blocking, explicitly closed file read stream. Development API, not included in Preview 9.</summary>
-      <remarks>Native resources belong to the invocation. Close promptly; invocation teardown closes remaining files. A retained stream cannot be reused in another invocation. There is no finalizer, automatic disposal, seeking or asynchronous scheduling in this slice.</remarks>
+      <remarks>Native resources belong to the invocation. Close promptly; invocation teardown closes remaining files. A retained stream cannot be reused in another invocation. There is no finalizer, automatic disposal or asynchronous scheduling in this slice. FileInputStream additionally implements SeekableStream; FileOutputStream remains sequential.</remarks>
     </member>
-    <member name="M:System.Streams.FileInputStream.Read(System.Byte[],System.Int32,System.Int32)">
+    <member name="M:System.IO.FileInputStream.Read(System.Byte[],System.Int32,System.Int32)">
       <summary>Attempts one partial read using a caller-owned byte array.</summary>
       <param name="buffer">Managed byte array. Do not mutate it during the call.</param>
       <param name="offset">Zero-based start index.</param>
@@ -262,21 +333,21 @@
       <returns>Ok with the transferred count, or a typed StreamError. Invalid ranges fail before I/O.</returns>
       <remarks>Calls block. A read changes only the transferred range. A zero count returns zero without establishing EOF; a positive-count read returning zero means EOF. Writes may be partial; loop until all bytes have been accepted.</remarks>
     </member>
-    <member name="M:System.Streams.FileInputStream.Close">
+    <member name="M:System.IO.FileInputStream.Close">
       <summary>Releases the open file. Repeated calls are harmless.</summary>
       <remarks>Subsequent operations return Closed. Close is not a flush or durability guarantee and does not report OS close errors. Invocation teardown releases resources after an unhandled runtime fault.</remarks>
     </member>
-    <member name="M:System.Streams.FileInputStream.Open(System.String)">
+    <member name="M:System.IO.FileInputStream.Open(System.String)">
       <summary>Opens an existing regular file for reading, positioned at its beginning.</summary>
       <param name="path">Host filesystem path; normal host permissions and symlink resolution apply.</param>
       <returns>Ok with a new input stream, or an error such as InvalidPath, NotFound, AccessDenied, WrongKind or LimitExceeded.</returns>
     </member>
-    <member name="T:System.Streams.FileOutputStream">
+    <member name="T:System.IO.FileOutputStream">
       <summary>A blocking, explicitly closed file write stream. Development API, not included in Preview 9. The Flush method is documented in the File streams guide because DocFX cannot render its unit-valued Result.</summary>
-      <remarks>Native resources belong to the invocation. Close promptly; invocation teardown closes remaining files. A retained stream cannot be reused in another invocation. There is no finalizer, automatic disposal, seeking or asynchronous scheduling in this slice.</remarks>
+      <remarks>Native resources belong to the invocation. Close promptly; invocation teardown closes remaining files. A retained stream cannot be reused in another invocation. There is no finalizer, automatic disposal or asynchronous scheduling in this slice. FileInputStream additionally implements SeekableStream; FileOutputStream remains sequential.</remarks>
       <seealso href="../streams.html#flush">Flush contract and file stream guide</seealso>
     </member>
-    <member name="M:System.Streams.FileOutputStream.Write(System.Byte[],System.Int32,System.Int32)">
+    <member name="M:System.IO.FileOutputStream.Write(System.Byte[],System.Int32,System.Int32)">
       <summary>Attempts one partial write using a caller-owned byte array.</summary>
       <param name="buffer">Managed byte array. Do not mutate it during the call.</param>
       <param name="offset">Zero-based start index.</param>
@@ -284,205 +355,205 @@
       <returns>Ok with the transferred count, or a typed StreamError. Invalid ranges fail before I/O.</returns>
       <remarks>Calls block and may write fewer bytes than requested. Loop over the remaining range. Closing does not make a failed write transactional.</remarks>
     </member>
-    <member name="M:System.Streams.FileOutputStream.Close">
+    <member name="M:System.IO.FileOutputStream.Close">
       <summary>Releases the open file. Repeated calls are harmless.</summary>
       <remarks>Subsequent operations return Closed. Close is not a flush or durability guarantee and does not report OS close errors. Invocation teardown releases resources after an unhandled runtime fault.</remarks>
     </member>
-    <member name="M:System.Streams.FileOutputStream.CreateNew(System.String)">
+    <member name="M:System.IO.FileOutputStream.CreateNew(System.String)">
       <summary>Exclusively creates a regular file and opens it for writing.</summary>
       <param name="path">New host filesystem path; parent directories must already exist.</param>
       <returns>Ok with a new output stream, or an error. An existing entry returns AlreadyExists and is not overwritten.</returns>
       <remarks>No truncate, overwrite, append or recursive directory creation is implied.</remarks>
     </member>
-    <member name="M:System.Streams.FileOutputStream.Flush">
+    <member name="M:System.IO.FileOutputStream.Flush">
       <summary>Flushes the writable file through the host file API.</summary>
       <returns>Ok with unit, or a typed error. Closed streams return Closed.</returns>
       <remarks>This is not an fsync or durable-storage guarantee. The wrapper adds no managed buffering.</remarks>
     </member>
-    <member name="T:System.Streams.StreamError">
+    <member name="T:System.IO.StreamError">
       <summary>Expected file-stream failures represented as typed cases. The error taxonomy is provisional.</summary>
       <remarks>Opening and transferring currently share this error type. It is distinct from Task cancellation and runtime faults. Do not use an uninitialized/default carrier.</remarks>
     </member>
-    <member name="M:System.Streams.StreamError.ToString">
+    <member name="M:System.IO.StreamError.ToString">
       <summary>Returns the diagnostic case name.</summary>
       <returns>The current case name; this is not a localization or stable serialization format.</returns>
     </member>
-    <member name="T:System.Streams.StreamError.InvalidPath">
+    <member name="T:System.IO.StreamError.InvalidPath">
       <summary>The path is empty, contains a NUL, or is rejected as invalid by the host.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.InvalidPath.#ctor">
+    <member name="M:System.IO.StreamError.InvalidPath.#ctor">
       <summary>Creates the InvalidPath case value.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.#ctor(System.Streams.StreamError.InvalidPath)">
+    <member name="M:System.IO.StreamError.#ctor(System.IO.StreamError.InvalidPath)">
       <summary>Wraps the InvalidPath case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.Streams.StreamError.IsInvalidPath">
+    <member name="P:System.IO.StreamError.IsInvalidPath">
       <summary>Tests whether this is the InvalidPath case.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.GetInvalidPath">
+    <member name="M:System.IO.StreamError.GetInvalidPath">
       <summary>Extracts the InvalidPath case.</summary>
       <returns>The case value.</returns>
       <remarks>Only call when IsInvalidPath is true; extracting a different case faults.</remarks>
     </member>
-    <member name="T:System.Streams.StreamError.NotFound">
+    <member name="T:System.IO.StreamError.NotFound">
       <summary>The requested file or a required parent does not exist.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.NotFound.#ctor">
+    <member name="M:System.IO.StreamError.NotFound.#ctor">
       <summary>Creates the NotFound case value.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.#ctor(System.Streams.StreamError.NotFound)">
+    <member name="M:System.IO.StreamError.#ctor(System.IO.StreamError.NotFound)">
       <summary>Wraps the NotFound case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.Streams.StreamError.IsNotFound">
+    <member name="P:System.IO.StreamError.IsNotFound">
       <summary>Tests whether this is the NotFound case.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.GetNotFound">
+    <member name="M:System.IO.StreamError.GetNotFound">
       <summary>Extracts the NotFound case.</summary>
       <returns>The case value.</returns>
       <remarks>Only call when IsNotFound is true; extracting a different case faults.</remarks>
     </member>
-    <member name="T:System.Streams.StreamError.AccessDenied">
+    <member name="T:System.IO.StreamError.AccessDenied">
       <summary>The host denies access.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.AccessDenied.#ctor">
+    <member name="M:System.IO.StreamError.AccessDenied.#ctor">
       <summary>Creates the AccessDenied case value.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.#ctor(System.Streams.StreamError.AccessDenied)">
+    <member name="M:System.IO.StreamError.#ctor(System.IO.StreamError.AccessDenied)">
       <summary>Wraps the AccessDenied case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.Streams.StreamError.IsAccessDenied">
+    <member name="P:System.IO.StreamError.IsAccessDenied">
       <summary>Tests whether this is the AccessDenied case.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.GetAccessDenied">
+    <member name="M:System.IO.StreamError.GetAccessDenied">
       <summary>Extracts the AccessDenied case.</summary>
       <returns>The case value.</returns>
       <remarks>Only call when IsAccessDenied is true; extracting a different case faults.</remarks>
     </member>
-    <member name="T:System.Streams.StreamError.WrongKind">
+    <member name="T:System.IO.StreamError.WrongKind">
       <summary>The path does not resolve to an allowed regular file or required directory.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.WrongKind.#ctor">
+    <member name="M:System.IO.StreamError.WrongKind.#ctor">
       <summary>Creates the WrongKind case value.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.#ctor(System.Streams.StreamError.WrongKind)">
+    <member name="M:System.IO.StreamError.#ctor(System.IO.StreamError.WrongKind)">
       <summary>Wraps the WrongKind case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.Streams.StreamError.IsWrongKind">
+    <member name="P:System.IO.StreamError.IsWrongKind">
       <summary>Tests whether this is the WrongKind case.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.GetWrongKind">
+    <member name="M:System.IO.StreamError.GetWrongKind">
       <summary>Extracts the WrongKind case.</summary>
       <returns>The case value.</returns>
       <remarks>Only call when IsWrongKind is true; extracting a different case faults.</remarks>
     </member>
-    <member name="T:System.Streams.StreamError.AlreadyExists">
+    <member name="T:System.IO.StreamError.AlreadyExists">
       <summary>Exclusive creation found an existing entry.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.AlreadyExists.#ctor">
+    <member name="M:System.IO.StreamError.AlreadyExists.#ctor">
       <summary>Creates the AlreadyExists case value.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.#ctor(System.Streams.StreamError.AlreadyExists)">
+    <member name="M:System.IO.StreamError.#ctor(System.IO.StreamError.AlreadyExists)">
       <summary>Wraps the AlreadyExists case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.Streams.StreamError.IsAlreadyExists">
+    <member name="P:System.IO.StreamError.IsAlreadyExists">
       <summary>Tests whether this is the AlreadyExists case.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.GetAlreadyExists">
+    <member name="M:System.IO.StreamError.GetAlreadyExists">
       <summary>Extracts the AlreadyExists case.</summary>
       <returns>The case value.</returns>
       <remarks>Only call when IsAlreadyExists is true; extracting a different case faults.</remarks>
     </member>
-    <member name="T:System.Streams.StreamError.Closed">
+    <member name="T:System.IO.StreamError.Closed">
       <summary>The stream is closed or its owning invocation has ended.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.Closed.#ctor">
+    <member name="M:System.IO.StreamError.Closed.#ctor">
       <summary>Creates the Closed case value.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.#ctor(System.Streams.StreamError.Closed)">
+    <member name="M:System.IO.StreamError.#ctor(System.IO.StreamError.Closed)">
       <summary>Wraps the Closed case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.Streams.StreamError.IsClosed">
+    <member name="P:System.IO.StreamError.IsClosed">
       <summary>Tests whether this is the Closed case.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.GetClosed">
+    <member name="M:System.IO.StreamError.GetClosed">
       <summary>Extracts the Closed case.</summary>
       <returns>The case value.</returns>
       <remarks>Only call when IsClosed is true; extracting a different case faults.</remarks>
     </member>
-    <member name="T:System.Streams.StreamError.InvalidRange">
+    <member name="T:System.IO.StreamError.InvalidRange">
       <summary>The buffer offset or count is negative or outside the array.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.InvalidRange.#ctor">
+    <member name="M:System.IO.StreamError.InvalidRange.#ctor">
       <summary>Creates the InvalidRange case value.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.#ctor(System.Streams.StreamError.InvalidRange)">
+    <member name="M:System.IO.StreamError.#ctor(System.IO.StreamError.InvalidRange)">
       <summary>Wraps the InvalidRange case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.Streams.StreamError.IsInvalidRange">
+    <member name="P:System.IO.StreamError.IsInvalidRange">
       <summary>Tests whether this is the InvalidRange case.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.GetInvalidRange">
+    <member name="M:System.IO.StreamError.GetInvalidRange">
       <summary>Extracts the InvalidRange case.</summary>
       <returns>The case value.</returns>
       <remarks>Only call when IsInvalidRange is true; extracting a different case faults.</remarks>
     </member>
-    <member name="T:System.Streams.StreamError.LimitExceeded">
+    <member name="T:System.IO.StreamError.LimitExceeded">
       <summary>The request exceeds a transfer or resource limit.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.LimitExceeded.#ctor">
+    <member name="M:System.IO.StreamError.LimitExceeded.#ctor">
       <summary>Creates the LimitExceeded case value.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.#ctor(System.Streams.StreamError.LimitExceeded)">
+    <member name="M:System.IO.StreamError.#ctor(System.IO.StreamError.LimitExceeded)">
       <summary>Wraps the LimitExceeded case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.Streams.StreamError.IsLimitExceeded">
+    <member name="P:System.IO.StreamError.IsLimitExceeded">
       <summary>Tests whether this is the LimitExceeded case.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.GetLimitExceeded">
+    <member name="M:System.IO.StreamError.GetLimitExceeded">
       <summary>Extracts the LimitExceeded case.</summary>
       <returns>The case value.</returns>
       <remarks>Only call when IsLimitExceeded is true; extracting a different case faults.</remarks>
     </member>
-    <member name="T:System.Streams.StreamError.WrongAccess">
+    <member name="T:System.IO.StreamError.WrongAccess">
       <summary>The internal resource has the wrong access direction; directional wrappers do not normally expose this case.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.WrongAccess.#ctor">
+    <member name="M:System.IO.StreamError.WrongAccess.#ctor">
       <summary>Creates the WrongAccess case value.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.#ctor(System.Streams.StreamError.WrongAccess)">
+    <member name="M:System.IO.StreamError.#ctor(System.IO.StreamError.WrongAccess)">
       <summary>Wraps the WrongAccess case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.Streams.StreamError.IsWrongAccess">
+    <member name="P:System.IO.StreamError.IsWrongAccess">
       <summary>Tests whether this is the WrongAccess case.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.GetWrongAccess">
+    <member name="M:System.IO.StreamError.GetWrongAccess">
       <summary>Extracts the WrongAccess case.</summary>
       <returns>The case value.</returns>
       <remarks>Only call when IsWrongAccess is true; extracting a different case faults.</remarks>
     </member>
-    <member name="T:System.Streams.StreamError.IoFailure">
+    <member name="T:System.IO.StreamError.IoFailure">
       <summary>Another host I/O error occurred.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.IoFailure.#ctor">
+    <member name="M:System.IO.StreamError.IoFailure.#ctor">
       <summary>Creates the IoFailure case value.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.#ctor(System.Streams.StreamError.IoFailure)">
+    <member name="M:System.IO.StreamError.#ctor(System.IO.StreamError.IoFailure)">
       <summary>Wraps the IoFailure case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.Streams.StreamError.IsIoFailure">
+    <member name="P:System.IO.StreamError.IsIoFailure">
       <summary>Tests whether this is the IoFailure case.</summary>
     </member>
-    <member name="M:System.Streams.StreamError.GetIoFailure">
+    <member name="M:System.IO.StreamError.GetIoFailure">
       <summary>Extracts the IoFailure case.</summary>
       <returns>The case value.</returns>
       <remarks>Only call when IsIoFailure is true; extracting a different case faults.</remarks>
@@ -1066,7 +1137,7 @@
     </member>
     <member name="T:System.Storage.StorageItem">
       <summary>A stored item whose two permitted interface branches are File and Directory.</summary>
-      <remarks>The Raven reference metadata closes the root to File and Directory. Providers may implement those interfaces, but cannot introduce unrelated direct StorageItem branches. The compiler and strict CIL importer enforce this boundary; raw neoIL does not enforce the closed-hierarchy metadata. The implementation owns interpretation and access. Metadata queries and enumeration are planned, not implemented here.</remarks>
+      <remarks>The Raven reference metadata closes the root to File and Directory. Providers may implement those interfaces, but cannot introduce unrelated direct StorageItem branches. The compiler and strict CIL importer enforce this boundary; raw neoIL does not enforce the closed-hierarchy metadata. The implementation owns interpretation and access. Directory.GetItems provides bounded mixed-item enumeration. Metadata queries remain planned.</remarks>
     </member>
     <member name="P:System.Storage.StorageItem.Path">
       <summary>Gets this item's logical address in its provider namespace.</summary>

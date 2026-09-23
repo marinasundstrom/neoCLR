@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.TextReadError.NotFound
+  commentId: T:System.IO.TextReadError.NotFound
+  id: TextReadError.NotFound
+  parent: System.IO
+  children:
+  - System.IO.TextReadError.NotFound.#ctor
+  langs:
+  - csharp
+  - vb
+  name: TextReadError.NotFound
+  nameWithType: TextReadError.NotFound
+  fullName: System.IO.TextReadError.NotFound
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: The NotFound text-reading error case.
+  example: []
+  syntax:
+    content: public struct TextReadError.NotFound
+    content.vb: Public Structure TextReadError.NotFound
+- uid: System.IO.TextReadError.NotFound.#ctor
+  commentId: M:System.IO.TextReadError.NotFound.#ctor
+  id: '#ctor'
+  parent: System.IO.TextReadError.NotFound
+  langs:
+  - csharp
+  - vb
+  name: NotFound()
+  nameWithType: TextReadError.NotFound.NotFound()
+  fullName: System.IO.TextReadError.NotFound.NotFound()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Creates NotFound.
+  example: []
+  syntax:
+    content: public NotFound()
+    content.vb: Public Sub New()
+  overload: System.IO.TextReadError.NotFound.#ctor*
+  nameWithType.vb: TextReadError.NotFound.New()
+  fullName.vb: System.IO.TextReadError.NotFound.New()
+  name.vb: New()
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.TextReadError.NotFound.#ctor*
+  commentId: Overload:System.IO.TextReadError.NotFound.#ctor
+  isExternal: true
+  href: System.IO.TextReadError.NotFound.html#System_IO_TextReadError_NotFound__ctor
+  name: NotFound
+  nameWithType: TextReadError.NotFound.NotFound
+  fullName: System.IO.TextReadError.NotFound.NotFound
+  nameWithType.vb: TextReadError.NotFound.New
+  fullName.vb: System.IO.TextReadError.NotFound.New
+  name.vb: New

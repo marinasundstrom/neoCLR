@@ -1625,7 +1625,8 @@ recommends evaluating Task<Result<T, StorageLookupError>> for provider GetItem,
 GetFile and GetDirectory and directory GetItems, and Task<Result<T, StreamError>>
 for opening/creating content streams. These operations may involve remote or other
 latency-bearing providers. This is future direction, not a POC signature change.
-WinRT's retrieval methods illustrate this separation; the current .NET directory
+[WinRT GetItemsAsync](https://learn.microsoft.com/en-us/uwp/api/windows.storage.storagefolder.getitemsasync?view=winrt-26100)
+(primary documentation reviewed 2026-09-23) illustrates this separation; the current .NET directory
 retrieval comparison above remains synchronous. A completed Task around blocking
 work does not make it nonblocking.
 

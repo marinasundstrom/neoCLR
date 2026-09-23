@@ -3,7 +3,7 @@ apiRules:
     uidRegex: '^System\.Storage\.FileText\.WriteAllText($|\()'
     type: Method
 - exclude:
-    uidRegex: '^System\.Streams\.(FileOutputStream|OutputStream)\.Flush($|\()'
+    uidRegex: '^System\.IO\.(FileOutputStream|OutputStream)\.Flush($|\()'
     type: Method
 - exclude:
     uidRegex: '^System\.Concurrency\.ThreadPool\.#ctor'
@@ -21,10 +21,10 @@ apiRules:
 - include:
     uidRegex: '^System\.Concurrency\.(Thread|ThreadPool)($|\.)'
 - include:
-    uidRegex: '^System\.Streams$'
+    uidRegex: '^System\.IO$'
     type: Namespace
 - include:
-    uidRegex: '^System\.Streams\.(InputStream|OutputStream|FileInputStream|FileOutputStream|StreamError)($|\.)'
+    uidRegex: '^System\.IO\.(InputStream|OutputStream|FileInputStream|FileOutputStream|StreamError|TextReader|StreamReader|TextReadError|SeekableStream)($|\.)'
 - include:
     uidRegex: '^System\.Storage$'
     type: Namespace

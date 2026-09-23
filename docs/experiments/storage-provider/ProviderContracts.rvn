@@ -6,7 +6,7 @@ import System.Storage.Path
 import System.Storage.File
 import System.Storage.Directory
 import System.Storage.StorageItem
-import System.Streams.*
+import System.IO.*
 
 // Byte routing is a sample implementation detail, not a platform provider contract.
 class UnavailableStorage : ByteStorage {

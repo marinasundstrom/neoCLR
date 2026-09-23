@@ -3,7 +3,7 @@ namespace StorageExperiment
 import System.*
 import System.Console.*
 import System.Result.*
-import System.Streams.*
+import System.IO.*
 
 func ExpectError(result: Result<int, StreamError>, name: string) {
     match result {

@@ -1,5 +1,5 @@
-; Generated from runtime/raven/src/System/Streams/StreamError.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.Streams.StreamError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+; Generated from runtime/raven/src/System/IO/StreamError.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
     ldarg value
     ldc.i4 0
     beq False
@@ -14,7 +14,7 @@ True:
     ldc.bool true
     ret
 .end
-.function neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean value) -> Int32
+.function neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False
     ldc.i4 1
@@ -23,7 +23,7 @@ False:
     ldc.i4 0
     ret
 .end
-.type System.Streams.StreamError.InvalidPath
+.type System.IO.StreamError.InvalidPath
 .method instance .ctor() -> Void
 M00000020_IL_0000:
 M00000020_IL_0001:
@@ -35,7 +35,7 @@ ldvoid
 ret
 .end
 .end
-.type System.Streams.StreamError.NotFound
+.type System.IO.StreamError.NotFound
 .method instance .ctor() -> Void
 M00000021_IL_0000:
 M00000021_IL_0001:
@@ -47,7 +47,7 @@ ldvoid
 ret
 .end
 .end
-.type System.Streams.StreamError.AccessDenied
+.type System.IO.StreamError.AccessDenied
 .method instance .ctor() -> Void
 M00000022_IL_0000:
 M00000022_IL_0001:
@@ -59,7 +59,7 @@ ldvoid
 ret
 .end
 .end
-.type System.Streams.StreamError.WrongKind
+.type System.IO.StreamError.WrongKind
 .method instance .ctor() -> Void
 M00000023_IL_0000:
 M00000023_IL_0001:
@@ -71,7 +71,7 @@ ldvoid
 ret
 .end
 .end
-.type System.Streams.StreamError.AlreadyExists
+.type System.IO.StreamError.AlreadyExists
 .method instance .ctor() -> Void
 M00000024_IL_0000:
 M00000024_IL_0001:
@@ -83,7 +83,7 @@ ldvoid
 ret
 .end
 .end
-.type System.Streams.StreamError.Closed
+.type System.IO.StreamError.Closed
 .method instance .ctor() -> Void
 M00000025_IL_0000:
 M00000025_IL_0001:
@@ -95,7 +95,7 @@ ldvoid
 ret
 .end
 .end
-.type System.Streams.StreamError.InvalidRange
+.type System.IO.StreamError.InvalidRange
 .method instance .ctor() -> Void
 M00000026_IL_0000:
 M00000026_IL_0001:
@@ -107,7 +107,7 @@ ldvoid
 ret
 .end
 .end
-.type System.Streams.StreamError.LimitExceeded
+.type System.IO.StreamError.LimitExceeded
 .method instance .ctor() -> Void
 M00000027_IL_0000:
 M00000027_IL_0001:
@@ -119,7 +119,7 @@ ldvoid
 ret
 .end
 .end
-.type System.Streams.StreamError.WrongAccess
+.type System.IO.StreamError.WrongAccess
 .method instance .ctor() -> Void
 M00000028_IL_0000:
 M00000028_IL_0001:
@@ -131,7 +131,7 @@ ldvoid
 ret
 .end
 .end
-.type System.Streams.StreamError.IoFailure
+.type System.IO.StreamError.IoFailure
 .method instance .ctor() -> Void
 M00000029_IL_0000:
 M00000029_IL_0001:

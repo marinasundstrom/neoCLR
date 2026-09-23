@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.TextReadError.InvalidRange
+  commentId: T:System.IO.TextReadError.InvalidRange
+  id: TextReadError.InvalidRange
+  parent: System.IO
+  children:
+  - System.IO.TextReadError.InvalidRange.#ctor
+  langs:
+  - csharp
+  - vb
+  name: TextReadError.InvalidRange
+  nameWithType: TextReadError.InvalidRange
+  fullName: System.IO.TextReadError.InvalidRange
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: The InvalidRange text-reading error case.
+  example: []
+  syntax:
+    content: public struct TextReadError.InvalidRange
+    content.vb: Public Structure TextReadError.InvalidRange
+- uid: System.IO.TextReadError.InvalidRange.#ctor
+  commentId: M:System.IO.TextReadError.InvalidRange.#ctor
+  id: '#ctor'
+  parent: System.IO.TextReadError.InvalidRange
+  langs:
+  - csharp
+  - vb
+  name: InvalidRange()
+  nameWithType: TextReadError.InvalidRange.InvalidRange()
+  fullName: System.IO.TextReadError.InvalidRange.InvalidRange()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Creates InvalidRange.
+  example: []
+  syntax:
+    content: public InvalidRange()
+    content.vb: Public Sub New()
+  overload: System.IO.TextReadError.InvalidRange.#ctor*
+  nameWithType.vb: TextReadError.InvalidRange.New()
+  fullName.vb: System.IO.TextReadError.InvalidRange.New()
+  name.vb: New()
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.TextReadError.InvalidRange.#ctor*
+  commentId: Overload:System.IO.TextReadError.InvalidRange.#ctor
+  isExternal: true
+  href: System.IO.TextReadError.InvalidRange.html#System_IO_TextReadError_InvalidRange__ctor
+  name: InvalidRange
+  nameWithType: TextReadError.InvalidRange.InvalidRange
+  fullName: System.IO.TextReadError.InvalidRange.InvalidRange
+  nameWithType.vb: TextReadError.InvalidRange.New
+  fullName.vb: System.IO.TextReadError.InvalidRange.New
+  name.vb: New

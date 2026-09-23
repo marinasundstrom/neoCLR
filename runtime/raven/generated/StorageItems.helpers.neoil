@@ -1,9 +1,9 @@
 ; Generated from runtime/raven/src/System/Storage/StorageItems.rvn. Regenerate with build_runtime_library.py.
 .interface System.Storage.File
 .implements System.Storage.StorageItem
-.method instance OpenRead() -> System.Result<System.Streams.InputStream,System.Streams.StreamError>
+.method instance OpenRead() -> System.Result<System.IO.InputStream,System.IO.StreamError>
 .end
-.method instance CreateNew() -> System.Result<System.Streams.OutputStream,System.Streams.StreamError>
+.method instance CreateNew() -> System.Result<System.IO.OutputStream,System.IO.StreamError>
 .end
 .end
 .interface System.Storage.Directory

@@ -7,7 +7,7 @@ import System.Storage.StorageItem
 import System.*
 import System.Storage.Path
 import System.Collections.*
-import System.Streams.*
+import System.IO.*
 import System.Text.*
 import System.Result.*
 import System.Storage.FileReadError

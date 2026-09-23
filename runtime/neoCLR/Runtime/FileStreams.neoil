@@ -38,3 +38,10 @@
     value.unpack String[]
     ret
 .end
+
+.function neoCLR.Runtime.FilePosition(Int32 handle) -> Value
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.FileSeek(Int32 handle,Int64 position) -> Value
+    .methodimpl InternalCall
+.end

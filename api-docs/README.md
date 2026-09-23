@@ -99,7 +99,7 @@ The API header uses plain neoCLR branding. Its small logo margin is supplied by
 The combined site builder converts root-relative reference links, including DocFX's
 client-side navigation JSON, to page-relative links for GitHub Pages project paths.
 
-The development stream slice includes System.Streams in generated reference.
+The development stream slice includes System.IO in generated reference.
 FileOutputStream.Flush and OutputStream.Flush return Result<System.Void, StreamError>, which DocFX 2.80.1
 cannot render; its exact signature and full contract live in [streams.md](streams.md).
 
@@ -138,3 +138,9 @@ by the disk/memory SDK sample; memory stream classes remain sample implementatio
 FileSystem and the Directory traversal/GetItems members have generated API entries.
 StorageLookupError.InvalidRange and LimitExceeded cover the bounded snapshot contract.
 LocalFile/LocalDirectory are internal implementation classes and are not public APIs.
+
+
+Development streams moved from System.Streams to System.IO. TextReader, StreamReader,
+TextReadError and SeekableStream are selected for generated member documentation.
+TextReader/StreamReader use strict bounded UTF-8 reading; FileInputStream adds optional
+positioning. Public names and exact unit-return exclusions were migrated together.

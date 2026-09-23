@@ -1262,3 +1262,14 @@ constructor and lookup signatures. Directory traversal and bounded GetItems retu
 core interfaces; StorageList and StorageNames are bootstrap transport helpers. No
 Raven compiler or Runtime Contract configuration changes are introduced. Generated
 core/runtime artifacts must match this development contract.
+
+
+### System.IO readers and seekability — 2026-09-23
+
+Development streams moved from System.Streams to System.IO. TextReader is an interface;
+StreamReader is a Raven implementation using InputStream, ArrayList and Utf8. No native
+text-reader service is introduced. SeekableStream is optional; FileInputStream delegates
+GetPosition/Seek to native read-handle services. Reader reference locals and constructor
+coercion are part of the bridge contract. The [integration note](integration/README.md#storage-poc-io-surface-2026-09-23)
+describes scope and limitations; [API documentation](../api-docs/streams.md) defines the
+bounded decoding and ownership behavior. Task-based Storage remains future exploration.

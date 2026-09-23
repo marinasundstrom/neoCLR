@@ -1,6 +1,7 @@
-; Generated from runtime/raven/src/System/Streams/FileInputStream.rvn. Regenerate with build_runtime_library.py.
-.type class System.Streams.FileInputStream
-.implements System.Streams.InputStream
+; Generated from runtime/raven/src/System/IO/FileInputStream.rvn. Regenerate with build_runtime_library.py.
+.type class System.IO.FileInputStream
+.implements System.IO.InputStream
+.implements System.IO.SeekableStream
 .field private handle Int32
 .field private closed Boolean
 .method private instance .ctor(Int32 handle) -> noresult
@@ -15,19 +16,19 @@ ldarg 0
 M00000001_IL_0009:
 ldc.i4 0
 M00000001_IL_000a:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanFromInt32(Int32)
-stfld System.Streams.FileInputStream::closed
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanFromInt32(Int32)
+stfld System.IO.FileInputStream::closed
 M00000001_IL_000f:
 M00000001_IL_0010:
 ldarg 0
 M00000001_IL_0011:
 ldarg 1
 M00000001_IL_0012:
-stfld System.Streams.FileInputStream::handle
+stfld System.IO.FileInputStream::handle
 M00000001_IL_0017:
 ret
 .end
-.method static Open(String path) -> System.Result<System.Streams.FileInputStream,System.Streams.StreamError>
+.method static Open(String path) -> System.Result<System.IO.FileInputStream,System.IO.StreamError>
 .local Value local0
 M00000002_IL_0000:
 M00000002_IL_0001:
@@ -42,7 +43,7 @@ M00000002_IL_000a:
 ldloc local0
 M00000002_IL_000b:
 value.is Byte
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
 M00000002_IL_0010:
 brtrue M00000002_IL_001a
 M00000002_IL_0015:
@@ -53,11 +54,11 @@ ldloc local0
 M00000002_IL_001c:
 value.unpack Byte
 M00000002_IL_0021:
-call System.Streams.FileInputStream::DecodeError(Byte)
+call System.IO.FileInputStream::DecodeError(Byte)
 M00000002_IL_0026:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion0(System.Streams.StreamError)
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion0(System.IO.StreamError)
 M00000002_IL_002b:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion1(System.Result.Error<System.Streams.StreamError>)
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
 M00000002_IL_0030:
 ret
 M00000002_IL_0031:
@@ -67,35 +68,35 @@ ldloc local0
 M00000002_IL_0034:
 value.unpack Int32
 M00000002_IL_0039:
-newobj instance System.Streams.FileInputStream::.ctor(Int32)
+newobj instance System.IO.FileInputStream::.ctor(Int32)
 M00000002_IL_003e:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion2(System.Streams.FileInputStream)
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion2(System.IO.FileInputStream)
 M00000002_IL_0043:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion3(System.Result.Ok<System.Streams.FileInputStream>)
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion3(System.Result.Ok<System.IO.FileInputStream>)
 M00000002_IL_0048:
 ret
 .end
-.method instance Read(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Result<Int32,System.Streams.StreamError>
+.method instance Read(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Result<Int32,System.IO.StreamError>
 .local Value local0
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
 ldarg 0
 M00000003_IL_0003:
-ldfld System.Streams.FileInputStream::closed
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean)
+ldfld System.IO.FileInputStream::closed
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
 M00000003_IL_0008:
 brtrue M00000003_IL_0012
 M00000003_IL_000d:
 br M00000003_IL_0027
 M00000003_IL_0012:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorClosedNew()
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorClosedNew()
 M00000003_IL_0017:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorClosed(System.Streams.StreamError.Closed)
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorClosed(System.IO.StreamError.Closed)
 M00000003_IL_001c:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion0(System.Streams.StreamError)
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion0(System.IO.StreamError)
 M00000003_IL_0021:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion4(System.Result.Error<System.Streams.StreamError>)
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError>)
 M00000003_IL_0026:
 ret
 M00000003_IL_0027:
@@ -103,7 +104,7 @@ M00000003_IL_0028:
 M00000003_IL_0029:
 ldarg 0
 M00000003_IL_002a:
-ldfld System.Streams.FileInputStream::handle
+ldfld System.IO.FileInputStream::handle
 M00000003_IL_002f:
 ldarg 1
 M00000003_IL_0030:
@@ -119,7 +120,7 @@ M00000003_IL_0039:
 ldloc local0
 M00000003_IL_003a:
 value.is Byte
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
 M00000003_IL_003f:
 brtrue M00000003_IL_0049
 M00000003_IL_0044:
@@ -130,11 +131,11 @@ ldloc local0
 M00000003_IL_004b:
 value.unpack Byte
 M00000003_IL_0050:
-call System.Streams.FileInputStream::DecodeError(Byte)
+call System.IO.FileInputStream::DecodeError(Byte)
 M00000003_IL_0055:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion0(System.Streams.StreamError)
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion0(System.IO.StreamError)
 M00000003_IL_005a:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion4(System.Result.Error<System.Streams.StreamError>)
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError>)
 M00000003_IL_005f:
 ret
 M00000003_IL_0060:
@@ -144,273 +145,413 @@ ldloc local0
 M00000003_IL_0063:
 value.unpack Int32
 M00000003_IL_0068:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion5(Int32)
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion5(Int32)
 M00000003_IL_006d:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeUnion6(System.Result.Ok<Int32>)
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion6(System.Result.Ok<Int32>)
 M00000003_IL_0072:
 ret
 .end
-.method instance Close() -> noresult
+.method instance GetPosition() -> System.Result<Int64,System.IO.StreamError>
+.local Value local0
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
 ldarg 0
 M00000004_IL_0003:
-ldfld System.Streams.FileInputStream::closed
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean)
+ldfld System.IO.FileInputStream::closed
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
 M00000004_IL_0008:
-ldc.i4 0
-M00000004_IL_0009:
-ceq
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_000b:
-brtrue M00000004_IL_0015
-M00000004_IL_0010:
-br M00000004_IL_002a
-M00000004_IL_0015:
-M00000004_IL_0016:
-ldarg 0
+brtrue M00000004_IL_0012
+M00000004_IL_000d:
+br M00000004_IL_0027
+M00000004_IL_0012:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorClosedNew()
 M00000004_IL_0017:
-ldfld System.Streams.FileInputStream::handle
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorClosed(System.IO.StreamError.Closed)
 M00000004_IL_001c:
-call neoCLR.Runtime.FileClose(Int32)
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion0(System.IO.StreamError)
 M00000004_IL_0021:
-pop
-M00000004_IL_0022:
-M00000004_IL_0023:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion7(System.Result.Error<System.IO.StreamError>)
+M00000004_IL_0026:
+ret
+M00000004_IL_0027:
+M00000004_IL_0028:
+M00000004_IL_0029:
 ldarg 0
-M00000004_IL_0024:
-ldc.i4 1
-M00000004_IL_0025:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanFromInt32(Int32)
-stfld System.Streams.FileInputStream::closed
 M00000004_IL_002a:
-M00000004_IL_002b:
-M00000004_IL_002c:
+ldfld System.IO.FileInputStream::handle
+M00000004_IL_002f:
+call neoCLR.Runtime.FilePosition(Int32)
+M00000004_IL_0034:
+stloc local0
+M00000004_IL_0035:
+M00000004_IL_0036:
+ldloc local0
+M00000004_IL_0037:
+value.is Byte
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_003c:
+brtrue M00000004_IL_0046
+M00000004_IL_0041:
+br M00000004_IL_005d
+M00000004_IL_0046:
+M00000004_IL_0047:
+ldloc local0
+M00000004_IL_0048:
+value.unpack Byte
+M00000004_IL_004d:
+call System.IO.FileInputStream::DecodeError(Byte)
+M00000004_IL_0052:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion0(System.IO.StreamError)
+M00000004_IL_0057:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion7(System.Result.Error<System.IO.StreamError>)
+M00000004_IL_005c:
+ret
+M00000004_IL_005d:
+M00000004_IL_005e:
+M00000004_IL_005f:
+ldloc local0
+M00000004_IL_0060:
+value.unpack Int64
+M00000004_IL_0065:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion8(Int64)
+M00000004_IL_006a:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion9(System.Result.Ok<Int64>)
+M00000004_IL_006f:
 ret
 .end
-.method private static DecodeError(Byte status) -> System.Streams.StreamError
+.method instance Seek(Int64 position) -> System.Result<Int64,System.IO.StreamError>
+.local Value local0
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
 ldarg 0
 M00000005_IL_0003:
-conv.i4
-M00000005_IL_0004:
-ldc.i4 1
-M00000005_IL_0005:
-ceq
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_0007:
-brtrue M00000005_IL_0011
-M00000005_IL_000c:
-br M00000005_IL_001c
-M00000005_IL_0011:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorInvalidPathNew()
-M00000005_IL_0016:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorInvalidPath(System.Streams.StreamError.InvalidPath)
-M00000005_IL_001b:
-ret
+ldfld System.IO.FileInputStream::closed
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0008:
+brtrue M00000005_IL_0012
+M00000005_IL_000d:
+br M00000005_IL_0027
+M00000005_IL_0012:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorClosedNew()
+M00000005_IL_0017:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorClosed(System.IO.StreamError.Closed)
 M00000005_IL_001c:
-M00000005_IL_001d:
-M00000005_IL_001e:
-ldarg 0
-M00000005_IL_001f:
-conv.i4
-M00000005_IL_0020:
-ldc.i4 2
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion0(System.IO.StreamError)
 M00000005_IL_0021:
-ceq
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_0023:
-brtrue M00000005_IL_002d
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion7(System.Result.Error<System.IO.StreamError>)
+M00000005_IL_0026:
+ret
+M00000005_IL_0027:
 M00000005_IL_0028:
-br M00000005_IL_0038
-M00000005_IL_002d:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNotFoundNew()
-M00000005_IL_0032:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorNotFound(System.Streams.StreamError.NotFound)
+M00000005_IL_0029:
+ldarg 0
+M00000005_IL_002a:
+ldfld System.IO.FileInputStream::handle
+M00000005_IL_002f:
+ldarg 1
+M00000005_IL_0030:
+call neoCLR.Runtime.FileSeek(Int32,Int64)
+M00000005_IL_0035:
+stloc local0
+M00000005_IL_0036:
 M00000005_IL_0037:
-ret
+ldloc local0
 M00000005_IL_0038:
-M00000005_IL_0039:
-M00000005_IL_003a:
-ldarg 0
-M00000005_IL_003b:
-conv.i4
-M00000005_IL_003c:
-ldc.i4 3
+value.is Byte
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
 M00000005_IL_003d:
-ceq
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_003f:
-brtrue M00000005_IL_0049
-M00000005_IL_0044:
-br M00000005_IL_0054
+brtrue M00000005_IL_0047
+M00000005_IL_0042:
+br M00000005_IL_005e
+M00000005_IL_0047:
+M00000005_IL_0048:
+ldloc local0
 M00000005_IL_0049:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorAccessDeniedNew()
+value.unpack Byte
 M00000005_IL_004e:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorAccessDenied(System.Streams.StreamError.AccessDenied)
+call System.IO.FileInputStream::DecodeError(Byte)
 M00000005_IL_0053:
-ret
-M00000005_IL_0054:
-M00000005_IL_0055:
-M00000005_IL_0056:
-ldarg 0
-M00000005_IL_0057:
-conv.i4
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion0(System.IO.StreamError)
 M00000005_IL_0058:
-ldc.i4 4
-M00000005_IL_0059:
-ceq
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_005b:
-brtrue M00000005_IL_0065
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion7(System.Result.Error<System.IO.StreamError>)
+M00000005_IL_005d:
+ret
+M00000005_IL_005e:
+M00000005_IL_005f:
 M00000005_IL_0060:
-br M00000005_IL_0070
-M00000005_IL_0065:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorWrongKindNew()
-M00000005_IL_006a:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorWrongKind(System.Streams.StreamError.WrongKind)
-M00000005_IL_006f:
-ret
+ldloc local0
+M00000005_IL_0061:
+value.unpack Int64
+M00000005_IL_0066:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion8(Int64)
+M00000005_IL_006b:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion9(System.Result.Ok<Int64>)
 M00000005_IL_0070:
-M00000005_IL_0071:
-M00000005_IL_0072:
+ret
+.end
+.method instance Close() -> noresult
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
 ldarg 0
-M00000005_IL_0073:
+M00000006_IL_0003:
+ldfld System.IO.FileInputStream::closed
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0008:
+ldc.i4 0
+M00000006_IL_0009:
+ceq
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_000b:
+brtrue M00000006_IL_0015
+M00000006_IL_0010:
+br M00000006_IL_002a
+M00000006_IL_0015:
+M00000006_IL_0016:
+ldarg 0
+M00000006_IL_0017:
+ldfld System.IO.FileInputStream::handle
+M00000006_IL_001c:
+call neoCLR.Runtime.FileClose(Int32)
+M00000006_IL_0021:
+pop
+M00000006_IL_0022:
+M00000006_IL_0023:
+ldarg 0
+M00000006_IL_0024:
+ldc.i4 1
+M00000006_IL_0025:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanFromInt32(Int32)
+stfld System.IO.FileInputStream::closed
+M00000006_IL_002a:
+M00000006_IL_002b:
+M00000006_IL_002c:
+ret
+.end
+.method private static DecodeError(Byte status) -> System.IO.StreamError
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
 conv.i4
-M00000005_IL_0074:
+M00000007_IL_0004:
+ldc.i4 1
+M00000007_IL_0005:
+ceq
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0007:
+brtrue M00000007_IL_0011
+M00000007_IL_000c:
+br M00000007_IL_001c
+M00000007_IL_0011:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorInvalidPathNew()
+M00000007_IL_0016:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorInvalidPath(System.IO.StreamError.InvalidPath)
+M00000007_IL_001b:
+ret
+M00000007_IL_001c:
+M00000007_IL_001d:
+M00000007_IL_001e:
+ldarg 0
+M00000007_IL_001f:
+conv.i4
+M00000007_IL_0020:
+ldc.i4 2
+M00000007_IL_0021:
+ceq
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0023:
+brtrue M00000007_IL_002d
+M00000007_IL_0028:
+br M00000007_IL_0038
+M00000007_IL_002d:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorNotFoundNew()
+M00000007_IL_0032:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorNotFound(System.IO.StreamError.NotFound)
+M00000007_IL_0037:
+ret
+M00000007_IL_0038:
+M00000007_IL_0039:
+M00000007_IL_003a:
+ldarg 0
+M00000007_IL_003b:
+conv.i4
+M00000007_IL_003c:
+ldc.i4 3
+M00000007_IL_003d:
+ceq
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_003f:
+brtrue M00000007_IL_0049
+M00000007_IL_0044:
+br M00000007_IL_0054
+M00000007_IL_0049:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorAccessDeniedNew()
+M00000007_IL_004e:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorAccessDenied(System.IO.StreamError.AccessDenied)
+M00000007_IL_0053:
+ret
+M00000007_IL_0054:
+M00000007_IL_0055:
+M00000007_IL_0056:
+ldarg 0
+M00000007_IL_0057:
+conv.i4
+M00000007_IL_0058:
+ldc.i4 4
+M00000007_IL_0059:
+ceq
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_005b:
+brtrue M00000007_IL_0065
+M00000007_IL_0060:
+br M00000007_IL_0070
+M00000007_IL_0065:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorWrongKindNew()
+M00000007_IL_006a:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorWrongKind(System.IO.StreamError.WrongKind)
+M00000007_IL_006f:
+ret
+M00000007_IL_0070:
+M00000007_IL_0071:
+M00000007_IL_0072:
+ldarg 0
+M00000007_IL_0073:
+conv.i4
+M00000007_IL_0074:
 ldc.i4 5
-M00000005_IL_0075:
+M00000007_IL_0075:
 ceq
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_0077:
-brtrue M00000005_IL_0081
-M00000005_IL_007c:
-br M00000005_IL_008c
-M00000005_IL_0081:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorAlreadyExistsNew()
-M00000005_IL_0086:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorAlreadyExists(System.Streams.StreamError.AlreadyExists)
-M00000005_IL_008b:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0077:
+brtrue M00000007_IL_0081
+M00000007_IL_007c:
+br M00000007_IL_008c
+M00000007_IL_0081:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorAlreadyExistsNew()
+M00000007_IL_0086:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorAlreadyExists(System.IO.StreamError.AlreadyExists)
+M00000007_IL_008b:
 ret
-M00000005_IL_008c:
-M00000005_IL_008d:
-M00000005_IL_008e:
+M00000007_IL_008c:
+M00000007_IL_008d:
+M00000007_IL_008e:
 ldarg 0
-M00000005_IL_008f:
+M00000007_IL_008f:
 conv.i4
-M00000005_IL_0090:
+M00000007_IL_0090:
 ldc.i4 6
-M00000005_IL_0091:
+M00000007_IL_0091:
 ceq
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_0093:
-brtrue M00000005_IL_009d
-M00000005_IL_0098:
-br M00000005_IL_00a8
-M00000005_IL_009d:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorClosedNew()
-M00000005_IL_00a2:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorClosed(System.Streams.StreamError.Closed)
-M00000005_IL_00a7:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0093:
+brtrue M00000007_IL_009d
+M00000007_IL_0098:
+br M00000007_IL_00a8
+M00000007_IL_009d:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorClosedNew()
+M00000007_IL_00a2:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorClosed(System.IO.StreamError.Closed)
+M00000007_IL_00a7:
 ret
-M00000005_IL_00a8:
-M00000005_IL_00a9:
-M00000005_IL_00aa:
+M00000007_IL_00a8:
+M00000007_IL_00a9:
+M00000007_IL_00aa:
 ldarg 0
-M00000005_IL_00ab:
+M00000007_IL_00ab:
 conv.i4
-M00000005_IL_00ac:
+M00000007_IL_00ac:
 ldc.i4 7
-M00000005_IL_00ad:
+M00000007_IL_00ad:
 ceq
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_00af:
-brtrue M00000005_IL_00b9
-M00000005_IL_00b4:
-br M00000005_IL_00c4
-M00000005_IL_00b9:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorInvalidRangeNew()
-M00000005_IL_00be:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorInvalidRange(System.Streams.StreamError.InvalidRange)
-M00000005_IL_00c3:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_00af:
+brtrue M00000007_IL_00b9
+M00000007_IL_00b4:
+br M00000007_IL_00c4
+M00000007_IL_00b9:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorInvalidRangeNew()
+M00000007_IL_00be:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorInvalidRange(System.IO.StreamError.InvalidRange)
+M00000007_IL_00c3:
 ret
-M00000005_IL_00c4:
-M00000005_IL_00c5:
-M00000005_IL_00c6:
+M00000007_IL_00c4:
+M00000007_IL_00c5:
+M00000007_IL_00c6:
 ldarg 0
-M00000005_IL_00c7:
+M00000007_IL_00c7:
 conv.i4
-M00000005_IL_00c8:
+M00000007_IL_00c8:
 ldc.i4 8
-M00000005_IL_00c9:
+M00000007_IL_00c9:
 ceq
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_00cb:
-brtrue M00000005_IL_00d5
-M00000005_IL_00d0:
-br M00000005_IL_00e0
-M00000005_IL_00d5:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorLimitExceededNew()
-M00000005_IL_00da:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorLimitExceeded(System.Streams.StreamError.LimitExceeded)
-M00000005_IL_00df:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_00cb:
+brtrue M00000007_IL_00d5
+M00000007_IL_00d0:
+br M00000007_IL_00e0
+M00000007_IL_00d5:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorLimitExceededNew()
+M00000007_IL_00da:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorLimitExceeded(System.IO.StreamError.LimitExceeded)
+M00000007_IL_00df:
 ret
-M00000005_IL_00e0:
-M00000005_IL_00e1:
-M00000005_IL_00e2:
+M00000007_IL_00e0:
+M00000007_IL_00e1:
+M00000007_IL_00e2:
 ldarg 0
-M00000005_IL_00e3:
+M00000007_IL_00e3:
 conv.i4
-M00000005_IL_00e4:
+M00000007_IL_00e4:
 ldc.i4 9
-M00000005_IL_00e6:
+M00000007_IL_00e6:
 ceq
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_00e8:
-brtrue M00000005_IL_00f2
-M00000005_IL_00ed:
-br M00000005_IL_00fd
-M00000005_IL_00f2:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorWrongAccessNew()
-M00000005_IL_00f7:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorWrongAccess(System.Streams.StreamError.WrongAccess)
-M00000005_IL_00fc:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_00e8:
+brtrue M00000007_IL_00f2
+M00000007_IL_00ed:
+br M00000007_IL_00fd
+M00000007_IL_00f2:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorWrongAccessNew()
+M00000007_IL_00f7:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorWrongAccess(System.IO.StreamError.WrongAccess)
+M00000007_IL_00fc:
 ret
-M00000005_IL_00fd:
-M00000005_IL_00fe:
-M00000005_IL_00ff:
+M00000007_IL_00fd:
+M00000007_IL_00fe:
+M00000007_IL_00ff:
 ldarg 0
-M00000005_IL_0100:
+M00000007_IL_0100:
 conv.i4
-M00000005_IL_0101:
+M00000007_IL_0101:
 ldc.i4 10
-M00000005_IL_0103:
+M00000007_IL_0103:
 ceq
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_0105:
-brtrue M00000005_IL_010f
-M00000005_IL_010a:
-br M00000005_IL_011a
-M00000005_IL_010f:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorIoFailureNew()
-M00000005_IL_0114:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorIoFailure(System.Streams.StreamError.IoFailure)
-M00000005_IL_0119:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0105:
+brtrue M00000007_IL_010f
+M00000007_IL_010a:
+br M00000007_IL_011a
+M00000007_IL_010f:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorIoFailureNew()
+M00000007_IL_0114:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorIoFailure(System.IO.StreamError.IoFailure)
+M00000007_IL_0119:
 ret
-M00000005_IL_011a:
-M00000005_IL_011b:
-M00000005_IL_011c:
+M00000007_IL_011a:
+M00000007_IL_011b:
+M00000007_IL_011c:
 ldstr "invalid native stream error"
-M00000005_IL_0121:
+M00000007_IL_0121:
 call System.Fault(String)
-M00000005_IL_0126:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorIoFailureNew()
-M00000005_IL_012b:
-call neoCLR.Library.System.Streams.FileInputStream.RuntimeErrorSystemStreamsStreamErrorNewSystemStreamsStreamErrorIoFailure(System.Streams.StreamError.IoFailure)
-M00000005_IL_0130:
+M00000007_IL_0126:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorIoFailureNew()
+M00000007_IL_012b:
+call neoCLR.Library.System.IO.FileInputStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorIoFailure(System.IO.StreamError.IoFailure)
+M00000007_IL_0130:
 ret
 .end
 .end

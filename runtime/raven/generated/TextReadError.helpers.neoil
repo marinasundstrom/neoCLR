@@ -1,0 +1,157 @@
+; Generated from runtime/raven/src/System/IO/TextReadError.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.IO.TextReadError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.IO.TextReadError.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.type System.IO.TextReadError.InvalidPath
+.method instance .ctor() -> Void
+M00000023_IL_0000:
+M00000023_IL_0001:
+ldarg 0
+M00000023_IL_0002:
+pop
+M00000023_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.TextReadError.NotFound
+.method instance .ctor() -> Void
+M00000024_IL_0000:
+M00000024_IL_0001:
+ldarg 0
+M00000024_IL_0002:
+pop
+M00000024_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.TextReadError.AccessDenied
+.method instance .ctor() -> Void
+M00000025_IL_0000:
+M00000025_IL_0001:
+ldarg 0
+M00000025_IL_0002:
+pop
+M00000025_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.TextReadError.WrongKind
+.method instance .ctor() -> Void
+M00000026_IL_0000:
+M00000026_IL_0001:
+ldarg 0
+M00000026_IL_0002:
+pop
+M00000026_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.TextReadError.AlreadyExists
+.method instance .ctor() -> Void
+M00000027_IL_0000:
+M00000027_IL_0001:
+ldarg 0
+M00000027_IL_0002:
+pop
+M00000027_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.TextReadError.Closed
+.method instance .ctor() -> Void
+M00000028_IL_0000:
+M00000028_IL_0001:
+ldarg 0
+M00000028_IL_0002:
+pop
+M00000028_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.TextReadError.InvalidRange
+.method instance .ctor() -> Void
+M00000029_IL_0000:
+M00000029_IL_0001:
+ldarg 0
+M00000029_IL_0002:
+pop
+M00000029_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.TextReadError.LimitExceeded
+.method instance .ctor() -> Void
+M0000002a_IL_0000:
+M0000002a_IL_0001:
+ldarg 0
+M0000002a_IL_0002:
+pop
+M0000002a_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.TextReadError.WrongAccess
+.method instance .ctor() -> Void
+M0000002b_IL_0000:
+M0000002b_IL_0001:
+ldarg 0
+M0000002b_IL_0002:
+pop
+M0000002b_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.TextReadError.IoFailure
+.method instance .ctor() -> Void
+M0000002c_IL_0000:
+M0000002c_IL_0001:
+ldarg 0
+M0000002c_IL_0002:
+pop
+M0000002c_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.TextReadError.InvalidUtf8
+.method instance .ctor() -> Void
+M0000002d_IL_0000:
+M0000002d_IL_0001:
+ldarg 0
+M0000002d_IL_0002:
+pop
+M0000002d_IL_0007:
+ldvoid
+ret
+.end
+.end

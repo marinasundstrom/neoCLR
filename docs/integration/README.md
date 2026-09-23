@@ -55,3 +55,22 @@ See also the [Raven experiment](../experiments/raven-target/README.md).
 - [Option and Result APIs from Raven](../raven-union-api.md)
 
 - [Try the completed Raven source port locally](../raven-port-local-build.md) — isolated VS Code workspace and saved-project task.
+
+
+### Storage POC I/O surface (2026-09-23)
+
+The development Runtime Contract now exposes byte streams and text readers under
+System.IO. Recompile development consumers using System.Streams imports. ReaderBindings
+admits the exact TextReader/StreamReader declarations, including owning and leave-open
+constructors; strict import includes reader reference locals and constructor argument
+coercions (CLI Int32 Boolean values become neoIL Boolean storage). SeekableStream is
+an independent interface, implemented by FileInputStream. Native FilePosition/FileSeek
+carry signed 64-bit positions through the erased runtime-service boundary. Existing
+runtime permission routing classifies both as file input operations.
+
+This does not change Raven emission or its target configuration. The standalone POC
+uses an object view before a SeekableStream pattern because direct unrelated-interface
+conversion is rejected by the current compiler. All I/O remains synchronous; Task
+return types and cancellation are future contract work. Validation lives in the
+[standalone POC](../experiments/storage-poc/README.md), the provider ReaderContracts,
+strict interface probes, native file-resource tests and generated runtime/API checks.

@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.StreamError.AccessDenied
+  commentId: T:System.IO.StreamError.AccessDenied
+  id: StreamError.AccessDenied
+  parent: System.IO
+  children:
+  - System.IO.StreamError.AccessDenied.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StreamError.AccessDenied
+  nameWithType: StreamError.AccessDenied
+  fullName: System.IO.StreamError.AccessDenied
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: The host denies access.
+  example: []
+  syntax:
+    content: public struct StreamError.AccessDenied
+    content.vb: Public Structure StreamError.AccessDenied
+- uid: System.IO.StreamError.AccessDenied.#ctor
+  commentId: M:System.IO.StreamError.AccessDenied.#ctor
+  id: '#ctor'
+  parent: System.IO.StreamError.AccessDenied
+  langs:
+  - csharp
+  - vb
+  name: AccessDenied()
+  nameWithType: StreamError.AccessDenied.AccessDenied()
+  fullName: System.IO.StreamError.AccessDenied.AccessDenied()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Creates the AccessDenied case value.
+  example: []
+  syntax:
+    content: public AccessDenied()
+    content.vb: Public Sub New()
+  overload: System.IO.StreamError.AccessDenied.#ctor*
+  nameWithType.vb: StreamError.AccessDenied.New()
+  fullName.vb: System.IO.StreamError.AccessDenied.New()
+  name.vb: New()
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.StreamError.AccessDenied.#ctor*
+  commentId: Overload:System.IO.StreamError.AccessDenied.#ctor
+  isExternal: true
+  href: System.IO.StreamError.AccessDenied.html#System_IO_StreamError_AccessDenied__ctor
+  name: AccessDenied
+  nameWithType: StreamError.AccessDenied.AccessDenied
+  fullName: System.IO.StreamError.AccessDenied.AccessDenied
+  nameWithType.vb: StreamError.AccessDenied.New
+  fullName.vb: System.IO.StreamError.AccessDenied.New
+  name.vb: New

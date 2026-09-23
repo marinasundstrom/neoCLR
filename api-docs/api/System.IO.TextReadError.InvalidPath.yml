@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.TextReadError.InvalidPath
+  commentId: T:System.IO.TextReadError.InvalidPath
+  id: TextReadError.InvalidPath
+  parent: System.IO
+  children:
+  - System.IO.TextReadError.InvalidPath.#ctor
+  langs:
+  - csharp
+  - vb
+  name: TextReadError.InvalidPath
+  nameWithType: TextReadError.InvalidPath
+  fullName: System.IO.TextReadError.InvalidPath
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: The InvalidPath text-reading error case.
+  example: []
+  syntax:
+    content: public struct TextReadError.InvalidPath
+    content.vb: Public Structure TextReadError.InvalidPath
+- uid: System.IO.TextReadError.InvalidPath.#ctor
+  commentId: M:System.IO.TextReadError.InvalidPath.#ctor
+  id: '#ctor'
+  parent: System.IO.TextReadError.InvalidPath
+  langs:
+  - csharp
+  - vb
+  name: InvalidPath()
+  nameWithType: TextReadError.InvalidPath.InvalidPath()
+  fullName: System.IO.TextReadError.InvalidPath.InvalidPath()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Creates InvalidPath.
+  example: []
+  syntax:
+    content: public InvalidPath()
+    content.vb: Public Sub New()
+  overload: System.IO.TextReadError.InvalidPath.#ctor*
+  nameWithType.vb: TextReadError.InvalidPath.New()
+  fullName.vb: System.IO.TextReadError.InvalidPath.New()
+  name.vb: New()
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.TextReadError.InvalidPath.#ctor*
+  commentId: Overload:System.IO.TextReadError.InvalidPath.#ctor
+  isExternal: true
+  href: System.IO.TextReadError.InvalidPath.html#System_IO_TextReadError_InvalidPath__ctor
+  name: InvalidPath
+  nameWithType: TextReadError.InvalidPath.InvalidPath
+  fullName: System.IO.TextReadError.InvalidPath.InvalidPath
+  nameWithType.vb: TextReadError.InvalidPath.New
+  fullName.vb: System.IO.TextReadError.InvalidPath.New
+  name.vb: New

@@ -1,0 +1,86 @@
+namespace System.IO
+
+import System.*
+import System.Result.*
+import System.Runtime.CompilerServices.*
+
+public class FileOutputStream : OutputStream {
+    private field handle: int
+    private field closed: bool = false
+
+    private init(handle: int) {
+        self.handle = handle
+    }
+
+    static func CreateNew(path: string) -> Result<FileOutputStream, StreamError> {
+        let payload = RuntimeServices.FileCreateNew(path)
+        if RuntimeServices.IsValue<byte>(payload) {
+            return Error(DecodeError(RuntimeServices.UnpackValue<byte>(payload)))
+        }
+        return Ok(FileOutputStream(RuntimeServices.UnpackValue<int>(payload)))
+    }
+
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError(StreamError.Closed()))
+        }
+        let payload = RuntimeServices.FileWriteChunk(handle, buffer, offset, count)
+        if RuntimeServices.IsValue<byte>(payload) {
+            return Error(DecodeError(RuntimeServices.UnpackValue<byte>(payload)))
+        }
+        return Ok(RuntimeServices.UnpackValue<int>(payload))
+    }
+
+    func Flush() -> Result<unit, StreamError> {
+        if closed {
+            return Error(StreamError(StreamError.Closed()))
+        }
+        let payload = RuntimeServices.FileFlush(handle)
+        if RuntimeServices.IsValue<byte>(payload) {
+            return Error(DecodeError(RuntimeServices.UnpackValue<byte>(payload)))
+        }
+        return Ok(())
+    }
+
+    func Close() {
+        if !closed {
+            _ = RuntimeServices.FileClose(handle)
+            closed = true
+        }
+    }
+
+    private static func DecodeError(status: byte) -> StreamError {
+        if status == 1 {
+            return StreamError(StreamError.InvalidPath())
+        }
+        if status == 2 {
+            return StreamError(StreamError.NotFound())
+        }
+        if status == 3 {
+            return StreamError(StreamError.AccessDenied())
+        }
+        if status == 4 {
+            return StreamError(StreamError.WrongKind())
+        }
+        if status == 5 {
+            return StreamError(StreamError.AlreadyExists())
+        }
+        if status == 6 {
+            return StreamError(StreamError.Closed())
+        }
+        if status == 7 {
+            return StreamError(StreamError.InvalidRange())
+        }
+        if status == 8 {
+            return StreamError(StreamError.LimitExceeded())
+        }
+        if status == 9 {
+            return StreamError(StreamError.WrongAccess())
+        }
+        if status == 10 {
+            return StreamError(StreamError.IoFailure())
+        }
+        System.Fault("invalid native stream error")
+        return StreamError(StreamError.IoFailure())
+    }
+}

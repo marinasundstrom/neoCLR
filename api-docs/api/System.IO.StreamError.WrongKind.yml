@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.StreamError.WrongKind
+  commentId: T:System.IO.StreamError.WrongKind
+  id: StreamError.WrongKind
+  parent: System.IO
+  children:
+  - System.IO.StreamError.WrongKind.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StreamError.WrongKind
+  nameWithType: StreamError.WrongKind
+  fullName: System.IO.StreamError.WrongKind
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: The path does not resolve to an allowed regular file or required directory.
+  example: []
+  syntax:
+    content: public struct StreamError.WrongKind
+    content.vb: Public Structure StreamError.WrongKind
+- uid: System.IO.StreamError.WrongKind.#ctor
+  commentId: M:System.IO.StreamError.WrongKind.#ctor
+  id: '#ctor'
+  parent: System.IO.StreamError.WrongKind
+  langs:
+  - csharp
+  - vb
+  name: WrongKind()
+  nameWithType: StreamError.WrongKind.WrongKind()
+  fullName: System.IO.StreamError.WrongKind.WrongKind()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Creates the WrongKind case value.
+  example: []
+  syntax:
+    content: public WrongKind()
+    content.vb: Public Sub New()
+  overload: System.IO.StreamError.WrongKind.#ctor*
+  nameWithType.vb: StreamError.WrongKind.New()
+  fullName.vb: System.IO.StreamError.WrongKind.New()
+  name.vb: New()
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.StreamError.WrongKind.#ctor*
+  commentId: Overload:System.IO.StreamError.WrongKind.#ctor
+  isExternal: true
+  href: System.IO.StreamError.WrongKind.html#System_IO_StreamError_WrongKind__ctor
+  name: WrongKind
+  nameWithType: StreamError.WrongKind.WrongKind
+  fullName: System.IO.StreamError.WrongKind.WrongKind
+  nameWithType.vb: StreamError.WrongKind.New
+  fullName.vb: System.IO.StreamError.WrongKind.New
+  name.vb: New

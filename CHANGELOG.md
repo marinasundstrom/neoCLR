@@ -8,6 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Complete the synchronous Storage POC with a platform-only file-access sample,
+  downloadable on-site walkthrough and API reference. Move development byte streams
+  from System.Streams to System.IO (recompile consumers and update imports). Add
+  TextReader/StreamReader with bounded strict UTF-8, named errors and explicit input
+  ownership; add optional SeekableStream with absolute byte positions on file input.
+  Fix strict bridge admission of reader locals and constructor Boolean conversions.
+  Keep Task-returning Storage as future exploration pending suspension, scheduling
+  and cancellation contracts; no asynchronous I/O is claimed.
+  Validation: standalone POC, disk/memory reader and provider contracts, nine native
+  file-resource tests, strict interface probe, runtime/API snapshots, 332 documented
+  API items and combined website build.
+
 - Integrate FileSystem as the host StorageProvider with internal File/Directory
   implementations. Add relative Directory.GetItem/GetDirectory and bounded
   GetItems snapshots of mixed StorageItem interfaces. Bounds fail explicitly

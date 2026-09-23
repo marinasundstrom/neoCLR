@@ -154,6 +154,7 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'STORAGE_POC_SAMPLE': ('docs/experiments/storage-poc/Main.rvn', 'func Main()', '\n}', True),
         'ARRAY_TOUR': (raven + 'library-array-tour.rvn', 'import System.*', '\n}', True),
         'TASK_AWAIT_SAMPLE': ('website/samples/preview9/library-async-default-queue.rvn', 'func Describe', '\n    return ()\n}', True),
         'TASK_WORKER_SAMPLE': ('website/samples/preview9/library-async-default-queue.rvn', 'import System.*', '\nfunc Main() {\n    _ = Show()\n}', True),
@@ -207,6 +208,10 @@ def main():
     storage_downloads.mkdir()
     for name in ('Storage.rvn', 'Path.rvn', 'Streams.rvn', 'ByteRoundTrip.rvn', 'Main.rvn', 'StorageExplorer.rvnproj', 'expected.txt'):
         shutil.copyfile(ROOT / 'docs/experiments/storage-provider' / name, storage_downloads / name)
+    poc_downloads = downloads / 'storage-poc'
+    poc_downloads.mkdir()
+    for name in ('Main.rvn', 'StoragePoc.rvnproj', 'expected.txt'):
+        shutil.copyfile(ROOT / 'docs/experiments/storage-poc' / name, poc_downloads / name)
     pages = {}
     for source in sorted(SOURCE.rglob('*.html')):
         relative = source.relative_to(SOURCE)

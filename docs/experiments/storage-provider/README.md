@@ -572,3 +572,9 @@ StorageList is a FileInput runtime service. Its tagged transport is bootstrap-on
 StorageNames unpacks a checked names array for copying into managed storage. The
 strict bridge admits FileSystem's constructor and three lookup methods and the
 new Directory signatures. No Raven compiler configuration change is required.
+
+
+The System.IO reader contracts also run against disk and deliberately short-read
+memory input: strict UTF-8, BOM preservation, bounds, EOF, underlying errors, close
+ownership and byte seeking. The [standalone Storage POC](../storage-poc/README.md)
+combines those capabilities using the platform FileSystem provider alone.

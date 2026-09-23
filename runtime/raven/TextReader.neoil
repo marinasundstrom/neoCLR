@@ -1,0 +1,2 @@
+.include "generated/TextReader.methods.neoil"
+.include "generated/TextReader.helpers.neoil"

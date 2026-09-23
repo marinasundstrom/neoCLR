@@ -1,0 +1,9 @@
+namespace System.IO
+
+import System.*
+
+public interface OutputStream {
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError>
+    func Flush() -> Result<unit, StreamError>
+    func Close()
+}

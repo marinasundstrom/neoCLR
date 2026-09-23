@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.StreamError.AlreadyExists
+  commentId: T:System.IO.StreamError.AlreadyExists
+  id: StreamError.AlreadyExists
+  parent: System.IO
+  children:
+  - System.IO.StreamError.AlreadyExists.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StreamError.AlreadyExists
+  nameWithType: StreamError.AlreadyExists
+  fullName: System.IO.StreamError.AlreadyExists
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Exclusive creation found an existing entry.
+  example: []
+  syntax:
+    content: public struct StreamError.AlreadyExists
+    content.vb: Public Structure StreamError.AlreadyExists
+- uid: System.IO.StreamError.AlreadyExists.#ctor
+  commentId: M:System.IO.StreamError.AlreadyExists.#ctor
+  id: '#ctor'
+  parent: System.IO.StreamError.AlreadyExists
+  langs:
+  - csharp
+  - vb
+  name: AlreadyExists()
+  nameWithType: StreamError.AlreadyExists.AlreadyExists()
+  fullName: System.IO.StreamError.AlreadyExists.AlreadyExists()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Creates the AlreadyExists case value.
+  example: []
+  syntax:
+    content: public AlreadyExists()
+    content.vb: Public Sub New()
+  overload: System.IO.StreamError.AlreadyExists.#ctor*
+  nameWithType.vb: StreamError.AlreadyExists.New()
+  fullName.vb: System.IO.StreamError.AlreadyExists.New()
+  name.vb: New()
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.StreamError.AlreadyExists.#ctor*
+  commentId: Overload:System.IO.StreamError.AlreadyExists.#ctor
+  isExternal: true
+  href: System.IO.StreamError.AlreadyExists.html#System_IO_StreamError_AlreadyExists__ctor
+  name: AlreadyExists
+  nameWithType: StreamError.AlreadyExists.AlreadyExists
+  fullName: System.IO.StreamError.AlreadyExists.AlreadyExists
+  nameWithType.vb: StreamError.AlreadyExists.New
+  fullName.vb: System.IO.StreamError.AlreadyExists.New
+  name.vb: New

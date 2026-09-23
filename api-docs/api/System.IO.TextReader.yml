@@ -1,0 +1,212 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.TextReader
+  commentId: T:System.IO.TextReader
+  id: TextReader
+  parent: System.IO
+  children:
+  - System.IO.TextReader.Close
+  - System.IO.TextReader.ReadToEnd(System.Int32)
+  langs:
+  - csharp
+  - vb
+  name: TextReader
+  nameWithType: TextReader
+  fullName: System.IO.TextReader
+  type: Interface
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: A sequential text-reading contract independent of its backing source.
+  remarks: 'Development POC: bounded whole-text reading and explicit Close. Does not require byte streams or seekability. No async or line-reading members are implemented.'
+  example: []
+  syntax:
+    content: public interface TextReader
+    content.vb: Public Interface TextReader
+  derivedClasses:
+  - System.IO.StreamReader
+- uid: System.IO.TextReader.ReadToEnd(System.Int32)
+  commentId: M:System.IO.TextReader.ReadToEnd(System.Int32)
+  id: ReadToEnd(System.Int32)
+  parent: System.IO.TextReader
+  langs:
+  - csharp
+  - vb
+  name: ReadToEnd(int)
+  nameWithType: TextReader.ReadToEnd(int)
+  fullName: System.IO.TextReader.ReadToEnd(int)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Reads remaining text subject to a UTF-8 output-byte bound.
+  remarks: StreamReader checks Closed before bounds and reads no input for invalid bounds. It consumes at most one byte beyond the bound to distinguish exact-bound EOF. Errors can leave input advanced; there is no rollback. Decoding is strict and preserves a BOM. Repeated reading at EOF returns empty text. Host execution and allocation budgets still apply.
+  example: []
+  syntax:
+    content: Result<string, TextReadError> ReadToEnd(int maxUtf8Bytes)
+    parameters:
+    - id: maxUtf8Bytes
+      type: System.Int32
+      description: Nonnegative maximum UTF-8 bytes in the returned text. StreamReader accepts up to 65536; zero succeeds only at EOF.
+    return:
+      type: System.Result{System.String,System.IO.TextReadError}
+      description: The remaining text, or TextReadError.
+    content.vb: Function ReadToEnd(maxUtf8Bytes As Integer) As Result(Of String, TextReadError)
+  overload: System.IO.TextReader.ReadToEnd*
+  nameWithType.vb: TextReader.ReadToEnd(Integer)
+  fullName.vb: System.IO.TextReader.ReadToEnd(Integer)
+  name.vb: ReadToEnd(Integer)
+- uid: System.IO.TextReader.Close
+  commentId: M:System.IO.TextReader.Close
+  id: Close
+  parent: System.IO.TextReader
+  langs:
+  - csharp
+  - vb
+  name: Close()
+  nameWithType: TextReader.Close()
+  fullName: System.IO.TextReader.Close()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Closes the reader idempotently.
+  remarks: Later reads return Closed. StreamReader closes owned input, or leaves it open if requested. Does not rewind or report underlying close errors.
+  example: []
+  syntax:
+    content: void Close()
+    content.vb: Sub Close()
+  overload: System.IO.TextReader.Close*
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.TextReader.ReadToEnd*
+  commentId: Overload:System.IO.TextReader.ReadToEnd
+  isExternal: true
+  href: System.IO.TextReader.html#System_IO_TextReader_ReadToEnd_System_Int32_
+  name: ReadToEnd
+  nameWithType: TextReader.ReadToEnd
+  fullName: System.IO.TextReader.ReadToEnd
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System.Result{System.String,System.IO.TextReadError}
+  commentId: T:System.Result{System.String,System.IO.TextReadError}
+  parent: System
+  definition: System.Result`2
+  href: System.IO.TextReadError.html
+  name: Result<string, TextReadError>
+  nameWithType: Result<string, TextReadError>
+  fullName: System.Result<string, System.IO.TextReadError>
+  nameWithType.vb: Result(Of String, TextReadError)
+  fullName.vb: System.Result(Of String, System.IO.TextReadError)
+  name.vb: Result(Of String, TextReadError)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.IO.TextReadError
+    name: TextReadError
+    isExternal: true
+    href: System.IO.TextReadError.html
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Result`2
+  commentId: T:System.Result`2
+  isExternal: true
+  name: Result<T, E>
+  nameWithType: Result<T, E>
+  fullName: System.Result<T, E>
+  nameWithType.vb: Result(Of T, E)
+  fullName.vb: System.Result(Of T, E)
+  name.vb: Result(Of T, E)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: )
+- uid: System.IO.TextReader.Close*
+  commentId: Overload:System.IO.TextReader.Close
+  isExternal: true
+  href: System.IO.TextReader.html#System_IO_TextReader_Close
+  name: Close
+  nameWithType: TextReader.Close
+  fullName: System.IO.TextReader.Close

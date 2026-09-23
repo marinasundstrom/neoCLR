@@ -1,8 +1,8 @@
-; Generated from runtime/raven/src/System/Streams/OutputStream.rvn. Regenerate with build_runtime_library.py.
-.interface System.Streams.OutputStream
-.method instance Write(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Result<Int32,System.Streams.StreamError>
+; Generated from runtime/raven/src/System/IO/OutputStream.rvn. Regenerate with build_runtime_library.py.
+.interface System.IO.OutputStream
+.method instance Write(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Result<Int32,System.IO.StreamError>
 .end
-.method instance Flush() -> System.Result<Void,System.Streams.StreamError>
+.method instance Flush() -> System.Result<Void,System.IO.StreamError>
 .end
 .method instance Close() -> noresult
 .end

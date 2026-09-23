@@ -1,41 +1,41 @@
-; Generated from runtime/raven/src/System/Streams/StreamError.rvn. Regenerate with build_runtime_library.py.
-.type System.Streams.StreamError
+; Generated from runtime/raven/src/System/IO/StreamError.rvn. Regenerate with build_runtime_library.py.
+.type System.IO.StreamError
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .field private Stored Value
 .property instance IsInvalidPath() -> Boolean
-.get instance System.Streams.StreamError::get_IsInvalidPath()
+.get instance System.IO.StreamError::get_IsInvalidPath()
 .end
 .property instance IsNotFound() -> Boolean
-.get instance System.Streams.StreamError::get_IsNotFound()
+.get instance System.IO.StreamError::get_IsNotFound()
 .end
 .property instance IsAccessDenied() -> Boolean
-.get instance System.Streams.StreamError::get_IsAccessDenied()
+.get instance System.IO.StreamError::get_IsAccessDenied()
 .end
 .property instance IsWrongKind() -> Boolean
-.get instance System.Streams.StreamError::get_IsWrongKind()
+.get instance System.IO.StreamError::get_IsWrongKind()
 .end
 .property instance IsAlreadyExists() -> Boolean
-.get instance System.Streams.StreamError::get_IsAlreadyExists()
+.get instance System.IO.StreamError::get_IsAlreadyExists()
 .end
 .property instance IsClosed() -> Boolean
-.get instance System.Streams.StreamError::get_IsClosed()
+.get instance System.IO.StreamError::get_IsClosed()
 .end
 .property instance IsInvalidRange() -> Boolean
-.get instance System.Streams.StreamError::get_IsInvalidRange()
+.get instance System.IO.StreamError::get_IsInvalidRange()
 .end
 .property instance IsLimitExceeded() -> Boolean
-.get instance System.Streams.StreamError::get_IsLimitExceeded()
+.get instance System.IO.StreamError::get_IsLimitExceeded()
 .end
 .property instance IsWrongAccess() -> Boolean
-.get instance System.Streams.StreamError::get_IsWrongAccess()
+.get instance System.IO.StreamError::get_IsWrongAccess()
 .end
 .property instance IsIoFailure() -> Boolean
-.get instance System.Streams.StreamError::get_IsIoFailure()
+.get instance System.IO.StreamError::get_IsIoFailure()
 .end
-.method instance .ctor(System.Streams.StreamError.InvalidPath value) -> Void
+.method instance .ctor(System.IO.StreamError.InvalidPath value) -> Void
 ldarg value
-value.pack System.Streams.StreamError.InvalidPath
-newobj System.Streams.StreamError
+value.pack System.IO.StreamError.InvalidPath
+newobj System.IO.StreamError
 starg this
 ldvoid
 ret
@@ -46,30 +46,30 @@ M00000002_IL_0001:
 M00000002_IL_0002:
 ldarg 0
 M00000002_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M00000002_IL_0008:
-value.is System.Streams.StreamError.InvalidPath
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+value.is System.IO.StreamError.InvalidPath
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M00000002_IL_000d:
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetInvalidPath() -> System.Streams.StreamError.InvalidPath
+.method instance GetInvalidPath() -> System.IO.StreamError.InvalidPath
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
 ldarg 0
 M00000003_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M00000003_IL_0008:
-value.unpack System.Streams.StreamError.InvalidPath
+value.unpack System.IO.StreamError.InvalidPath
 M00000003_IL_000d:
 ret
 .end
-.method instance .ctor(System.Streams.StreamError.NotFound value) -> Void
+.method instance .ctor(System.IO.StreamError.NotFound value) -> Void
 ldarg value
-value.pack System.Streams.StreamError.NotFound
-newobj System.Streams.StreamError
+value.pack System.IO.StreamError.NotFound
+newobj System.IO.StreamError
 starg this
 ldvoid
 ret
@@ -80,30 +80,30 @@ M00000005_IL_0001:
 M00000005_IL_0002:
 ldarg 0
 M00000005_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M00000005_IL_0008:
-value.is System.Streams.StreamError.NotFound
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+value.is System.IO.StreamError.NotFound
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M00000005_IL_000d:
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetNotFound() -> System.Streams.StreamError.NotFound
+.method instance GetNotFound() -> System.IO.StreamError.NotFound
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
 ldarg 0
 M00000006_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M00000006_IL_0008:
-value.unpack System.Streams.StreamError.NotFound
+value.unpack System.IO.StreamError.NotFound
 M00000006_IL_000d:
 ret
 .end
-.method instance .ctor(System.Streams.StreamError.AccessDenied value) -> Void
+.method instance .ctor(System.IO.StreamError.AccessDenied value) -> Void
 ldarg value
-value.pack System.Streams.StreamError.AccessDenied
-newobj System.Streams.StreamError
+value.pack System.IO.StreamError.AccessDenied
+newobj System.IO.StreamError
 starg this
 ldvoid
 ret
@@ -114,30 +114,30 @@ M00000008_IL_0001:
 M00000008_IL_0002:
 ldarg 0
 M00000008_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M00000008_IL_0008:
-value.is System.Streams.StreamError.AccessDenied
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+value.is System.IO.StreamError.AccessDenied
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M00000008_IL_000d:
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetAccessDenied() -> System.Streams.StreamError.AccessDenied
+.method instance GetAccessDenied() -> System.IO.StreamError.AccessDenied
 M00000009_IL_0000:
 M00000009_IL_0001:
 M00000009_IL_0002:
 ldarg 0
 M00000009_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M00000009_IL_0008:
-value.unpack System.Streams.StreamError.AccessDenied
+value.unpack System.IO.StreamError.AccessDenied
 M00000009_IL_000d:
 ret
 .end
-.method instance .ctor(System.Streams.StreamError.WrongKind value) -> Void
+.method instance .ctor(System.IO.StreamError.WrongKind value) -> Void
 ldarg value
-value.pack System.Streams.StreamError.WrongKind
-newobj System.Streams.StreamError
+value.pack System.IO.StreamError.WrongKind
+newobj System.IO.StreamError
 starg this
 ldvoid
 ret
@@ -148,30 +148,30 @@ M0000000b_IL_0001:
 M0000000b_IL_0002:
 ldarg 0
 M0000000b_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M0000000b_IL_0008:
-value.is System.Streams.StreamError.WrongKind
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+value.is System.IO.StreamError.WrongKind
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M0000000b_IL_000d:
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetWrongKind() -> System.Streams.StreamError.WrongKind
+.method instance GetWrongKind() -> System.IO.StreamError.WrongKind
 M0000000c_IL_0000:
 M0000000c_IL_0001:
 M0000000c_IL_0002:
 ldarg 0
 M0000000c_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M0000000c_IL_0008:
-value.unpack System.Streams.StreamError.WrongKind
+value.unpack System.IO.StreamError.WrongKind
 M0000000c_IL_000d:
 ret
 .end
-.method instance .ctor(System.Streams.StreamError.AlreadyExists value) -> Void
+.method instance .ctor(System.IO.StreamError.AlreadyExists value) -> Void
 ldarg value
-value.pack System.Streams.StreamError.AlreadyExists
-newobj System.Streams.StreamError
+value.pack System.IO.StreamError.AlreadyExists
+newobj System.IO.StreamError
 starg this
 ldvoid
 ret
@@ -182,30 +182,30 @@ M0000000e_IL_0001:
 M0000000e_IL_0002:
 ldarg 0
 M0000000e_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M0000000e_IL_0008:
-value.is System.Streams.StreamError.AlreadyExists
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+value.is System.IO.StreamError.AlreadyExists
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M0000000e_IL_000d:
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetAlreadyExists() -> System.Streams.StreamError.AlreadyExists
+.method instance GetAlreadyExists() -> System.IO.StreamError.AlreadyExists
 M0000000f_IL_0000:
 M0000000f_IL_0001:
 M0000000f_IL_0002:
 ldarg 0
 M0000000f_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M0000000f_IL_0008:
-value.unpack System.Streams.StreamError.AlreadyExists
+value.unpack System.IO.StreamError.AlreadyExists
 M0000000f_IL_000d:
 ret
 .end
-.method instance .ctor(System.Streams.StreamError.Closed value) -> Void
+.method instance .ctor(System.IO.StreamError.Closed value) -> Void
 ldarg value
-value.pack System.Streams.StreamError.Closed
-newobj System.Streams.StreamError
+value.pack System.IO.StreamError.Closed
+newobj System.IO.StreamError
 starg this
 ldvoid
 ret
@@ -216,30 +216,30 @@ M00000011_IL_0001:
 M00000011_IL_0002:
 ldarg 0
 M00000011_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M00000011_IL_0008:
-value.is System.Streams.StreamError.Closed
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+value.is System.IO.StreamError.Closed
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M00000011_IL_000d:
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetClosed() -> System.Streams.StreamError.Closed
+.method instance GetClosed() -> System.IO.StreamError.Closed
 M00000012_IL_0000:
 M00000012_IL_0001:
 M00000012_IL_0002:
 ldarg 0
 M00000012_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M00000012_IL_0008:
-value.unpack System.Streams.StreamError.Closed
+value.unpack System.IO.StreamError.Closed
 M00000012_IL_000d:
 ret
 .end
-.method instance .ctor(System.Streams.StreamError.InvalidRange value) -> Void
+.method instance .ctor(System.IO.StreamError.InvalidRange value) -> Void
 ldarg value
-value.pack System.Streams.StreamError.InvalidRange
-newobj System.Streams.StreamError
+value.pack System.IO.StreamError.InvalidRange
+newobj System.IO.StreamError
 starg this
 ldvoid
 ret
@@ -250,30 +250,30 @@ M00000014_IL_0001:
 M00000014_IL_0002:
 ldarg 0
 M00000014_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M00000014_IL_0008:
-value.is System.Streams.StreamError.InvalidRange
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+value.is System.IO.StreamError.InvalidRange
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M00000014_IL_000d:
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetInvalidRange() -> System.Streams.StreamError.InvalidRange
+.method instance GetInvalidRange() -> System.IO.StreamError.InvalidRange
 M00000015_IL_0000:
 M00000015_IL_0001:
 M00000015_IL_0002:
 ldarg 0
 M00000015_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M00000015_IL_0008:
-value.unpack System.Streams.StreamError.InvalidRange
+value.unpack System.IO.StreamError.InvalidRange
 M00000015_IL_000d:
 ret
 .end
-.method instance .ctor(System.Streams.StreamError.LimitExceeded value) -> Void
+.method instance .ctor(System.IO.StreamError.LimitExceeded value) -> Void
 ldarg value
-value.pack System.Streams.StreamError.LimitExceeded
-newobj System.Streams.StreamError
+value.pack System.IO.StreamError.LimitExceeded
+newobj System.IO.StreamError
 starg this
 ldvoid
 ret
@@ -284,30 +284,30 @@ M00000017_IL_0001:
 M00000017_IL_0002:
 ldarg 0
 M00000017_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M00000017_IL_0008:
-value.is System.Streams.StreamError.LimitExceeded
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+value.is System.IO.StreamError.LimitExceeded
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M00000017_IL_000d:
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetLimitExceeded() -> System.Streams.StreamError.LimitExceeded
+.method instance GetLimitExceeded() -> System.IO.StreamError.LimitExceeded
 M00000018_IL_0000:
 M00000018_IL_0001:
 M00000018_IL_0002:
 ldarg 0
 M00000018_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M00000018_IL_0008:
-value.unpack System.Streams.StreamError.LimitExceeded
+value.unpack System.IO.StreamError.LimitExceeded
 M00000018_IL_000d:
 ret
 .end
-.method instance .ctor(System.Streams.StreamError.WrongAccess value) -> Void
+.method instance .ctor(System.IO.StreamError.WrongAccess value) -> Void
 ldarg value
-value.pack System.Streams.StreamError.WrongAccess
-newobj System.Streams.StreamError
+value.pack System.IO.StreamError.WrongAccess
+newobj System.IO.StreamError
 starg this
 ldvoid
 ret
@@ -318,30 +318,30 @@ M0000001a_IL_0001:
 M0000001a_IL_0002:
 ldarg 0
 M0000001a_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M0000001a_IL_0008:
-value.is System.Streams.StreamError.WrongAccess
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+value.is System.IO.StreamError.WrongAccess
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M0000001a_IL_000d:
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetWrongAccess() -> System.Streams.StreamError.WrongAccess
+.method instance GetWrongAccess() -> System.IO.StreamError.WrongAccess
 M0000001b_IL_0000:
 M0000001b_IL_0001:
 M0000001b_IL_0002:
 ldarg 0
 M0000001b_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M0000001b_IL_0008:
-value.unpack System.Streams.StreamError.WrongAccess
+value.unpack System.IO.StreamError.WrongAccess
 M0000001b_IL_000d:
 ret
 .end
-.method instance .ctor(System.Streams.StreamError.IoFailure value) -> Void
+.method instance .ctor(System.IO.StreamError.IoFailure value) -> Void
 ldarg value
-value.pack System.Streams.StreamError.IoFailure
-newobj System.Streams.StreamError
+value.pack System.IO.StreamError.IoFailure
+newobj System.IO.StreamError
 starg this
 ldvoid
 ret
@@ -352,23 +352,23 @@ M0000001d_IL_0001:
 M0000001d_IL_0002:
 ldarg 0
 M0000001d_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M0000001d_IL_0008:
-value.is System.Streams.StreamError.IoFailure
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+value.is System.IO.StreamError.IoFailure
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M0000001d_IL_000d:
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetIoFailure() -> System.Streams.StreamError.IoFailure
+.method instance GetIoFailure() -> System.IO.StreamError.IoFailure
 M0000001e_IL_0000:
 M0000001e_IL_0001:
 M0000001e_IL_0002:
 ldarg 0
 M0000001e_IL_0003:
-ldfld System.Streams.StreamError::Stored
+ldfld System.IO.StreamError::Stored
 M0000001e_IL_0008:
-value.unpack System.Streams.StreamError.IoFailure
+value.unpack System.IO.StreamError.IoFailure
 M0000001e_IL_000d:
 ret
 .end
@@ -378,8 +378,8 @@ M0000001f_IL_0001:
 M0000001f_IL_0002:
 ldarg 0
 M0000001f_IL_0003:
-call instance System.Streams.StreamError::get_IsInvalidPath()
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+call instance System.IO.StreamError::get_IsInvalidPath()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M0000001f_IL_0008:
 brtrue M0000001f_IL_0012
 M0000001f_IL_000d:
@@ -394,8 +394,8 @@ M0000001f_IL_001a:
 M0000001f_IL_001b:
 ldarg 0
 M0000001f_IL_001c:
-call instance System.Streams.StreamError::get_IsNotFound()
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+call instance System.IO.StreamError::get_IsNotFound()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M0000001f_IL_0021:
 brtrue M0000001f_IL_002b
 M0000001f_IL_0026:
@@ -410,8 +410,8 @@ M0000001f_IL_0033:
 M0000001f_IL_0034:
 ldarg 0
 M0000001f_IL_0035:
-call instance System.Streams.StreamError::get_IsAccessDenied()
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+call instance System.IO.StreamError::get_IsAccessDenied()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M0000001f_IL_003a:
 brtrue M0000001f_IL_0044
 M0000001f_IL_003f:
@@ -426,8 +426,8 @@ M0000001f_IL_004c:
 M0000001f_IL_004d:
 ldarg 0
 M0000001f_IL_004e:
-call instance System.Streams.StreamError::get_IsWrongKind()
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+call instance System.IO.StreamError::get_IsWrongKind()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M0000001f_IL_0053:
 brtrue M0000001f_IL_005d
 M0000001f_IL_0058:
@@ -442,8 +442,8 @@ M0000001f_IL_0065:
 M0000001f_IL_0066:
 ldarg 0
 M0000001f_IL_0067:
-call instance System.Streams.StreamError::get_IsAlreadyExists()
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+call instance System.IO.StreamError::get_IsAlreadyExists()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M0000001f_IL_006c:
 brtrue M0000001f_IL_0076
 M0000001f_IL_0071:
@@ -458,8 +458,8 @@ M0000001f_IL_007e:
 M0000001f_IL_007f:
 ldarg 0
 M0000001f_IL_0080:
-call instance System.Streams.StreamError::get_IsClosed()
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+call instance System.IO.StreamError::get_IsClosed()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M0000001f_IL_0085:
 brtrue M0000001f_IL_008f
 M0000001f_IL_008a:
@@ -474,8 +474,8 @@ M0000001f_IL_0097:
 M0000001f_IL_0098:
 ldarg 0
 M0000001f_IL_0099:
-call instance System.Streams.StreamError::get_IsInvalidRange()
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+call instance System.IO.StreamError::get_IsInvalidRange()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M0000001f_IL_009e:
 brtrue M0000001f_IL_00a8
 M0000001f_IL_00a3:
@@ -490,8 +490,8 @@ M0000001f_IL_00b0:
 M0000001f_IL_00b1:
 ldarg 0
 M0000001f_IL_00b2:
-call instance System.Streams.StreamError::get_IsLimitExceeded()
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+call instance System.IO.StreamError::get_IsLimitExceeded()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M0000001f_IL_00b7:
 brtrue M0000001f_IL_00c1
 M0000001f_IL_00bc:
@@ -506,8 +506,8 @@ M0000001f_IL_00c9:
 M0000001f_IL_00ca:
 ldarg 0
 M0000001f_IL_00cb:
-call instance System.Streams.StreamError::get_IsWrongAccess()
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+call instance System.IO.StreamError::get_IsWrongAccess()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M0000001f_IL_00d0:
 brtrue M0000001f_IL_00da
 M0000001f_IL_00d5:
@@ -522,8 +522,8 @@ M0000001f_IL_00e2:
 M0000001f_IL_00e3:
 ldarg 0
 M0000001f_IL_00e4:
-call instance System.Streams.StreamError::get_IsIoFailure()
-call neoCLR.Library.System.Streams.StreamError.RuntimeBooleanToInt32(Boolean)
+call instance System.IO.StreamError::get_IsIoFailure()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
 M0000001f_IL_00e9:
 brtrue M0000001f_IL_00f3
 M0000001f_IL_00ee:

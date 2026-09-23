@@ -1,0 +1,84 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.IO.StreamError.WrongAccess
+  commentId: T:System.IO.StreamError.WrongAccess
+  id: StreamError.WrongAccess
+  parent: System.IO
+  children:
+  - System.IO.StreamError.WrongAccess.#ctor
+  langs:
+  - csharp
+  - vb
+  name: StreamError.WrongAccess
+  nameWithType: StreamError.WrongAccess
+  fullName: System.IO.StreamError.WrongAccess
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: The internal resource has the wrong access direction; directional wrappers do not normally expose this case.
+  example: []
+  syntax:
+    content: public struct StreamError.WrongAccess
+    content.vb: Public Structure StreamError.WrongAccess
+- uid: System.IO.StreamError.WrongAccess.#ctor
+  commentId: M:System.IO.StreamError.WrongAccess.#ctor
+  id: '#ctor'
+  parent: System.IO.StreamError.WrongAccess
+  langs:
+  - csharp
+  - vb
+  name: WrongAccess()
+  nameWithType: StreamError.WrongAccess.WrongAccess()
+  fullName: System.IO.StreamError.WrongAccess.WrongAccess()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.IO
+  summary: Creates the WrongAccess case value.
+  example: []
+  syntax:
+    content: public WrongAccess()
+    content.vb: Public Sub New()
+  overload: System.IO.StreamError.WrongAccess.#ctor*
+  nameWithType.vb: StreamError.WrongAccess.New()
+  fullName.vb: System.IO.StreamError.WrongAccess.New()
+  name.vb: New()
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: System.html
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: System.IO.html
+- uid: System.IO.StreamError.WrongAccess.#ctor*
+  commentId: Overload:System.IO.StreamError.WrongAccess.#ctor
+  isExternal: true
+  href: System.IO.StreamError.WrongAccess.html#System_IO_StreamError_WrongAccess__ctor
+  name: WrongAccess
+  nameWithType: StreamError.WrongAccess.WrongAccess
+  fullName: System.IO.StreamError.WrongAccess.WrongAccess
+  nameWithType.vb: StreamError.WrongAccess.New
+  fullName.vb: System.IO.StreamError.WrongAccess.New
+  name.vb: New

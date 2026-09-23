@@ -1,0 +1,8 @@
+namespace System.IO
+
+import System.*
+
+public interface TextReader {
+    func ReadToEnd(maxUtf8Bytes: int) -> Result<string, TextReadError>
+    func Close()
+}

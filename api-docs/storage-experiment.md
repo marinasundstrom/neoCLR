@@ -176,7 +176,7 @@ Streams still transfer at most two bytes per call to exercise partial-transfer l
 
 ## Directional capability interfaces
 
-These are now platform interfaces in System.Streams: [InputStream](xref:System.Streams.InputStream) and [OutputStream](xref:System.Streams.OutputStream). File and Directory are also platform interfaces; their ProviderFile/ProviderDirectory implementations remain application-owned.
+These are now platform interfaces in System.IO: [InputStream](xref:System.IO.InputStream) and [OutputStream](xref:System.IO.OutputStream). File and Directory are also platform interfaces; their ProviderFile/ProviderDirectory implementations remain application-owned.
 
 | Member | Contract |
 | --- | --- |
