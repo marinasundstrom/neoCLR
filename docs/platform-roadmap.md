@@ -28,8 +28,10 @@ streams. Console stays a class, with static In/Out/Error access. The bounded
 text/byte output channels and reader/writer ownership. This is synchronous I/O;
 TaskQueue/suspension exploration remains open and networking stays later.
 
-When choosing work autonomously, follow the immediate checkpoint below: complete the post-release concurrency, Storage and file Stream checkpoint below
-within M1. The async/Tasks preview has shipped.
+When choosing work autonomously, follow the current author-directed focus and the
+[immediate next step](#working-rules-and-immediate-next-step). The post-release
+concurrency, Storage and file Stream POC has working evidence below; broader
+suspension and cancellation remain within M1. The async/Tasks preview has shipped.
 The early memory-copy checkpoint has evidence; sockets and HTTP remain later.
 Use the progression below and its detailed plan for validation.
 Later milestone candidates remain provisional: listing them here does not authorize
@@ -602,16 +604,21 @@ its feature plan, and update changelog, relevant feature pages and integration d
 Samples begin as small programs, not miniature frameworks. Existing release/debugging
 requirements and Raven branch/integration rules continue to apply.
 
-**Next:** finish the [remaining async preview gates](async-preview-plan.md#next-action-and-exit):
-interactive editor validation, source/archive and platform checks, and migration review.
-The [fresh local package checks](async-preview-readiness.md#follow-up-package-validation) pass.
-The subsequent minimum-Rust archive check exposed unsupported dispatch syntax;
-the local fix passes all-target compilation and worker regressions. Rebuild and
-revalidate the corrected candidate; use the [migration draft](async-preview-migration.md)
-for the remaining distribution review. After the release checkpoint, prioritize
-Streams, Storage and Encoding through the bounded file-transformer progression.
-Select the needed small guest operation cancellation contract and extend the real
-delayed-copy evidence to its completion races and queue affinity before pending I/O.
+**Current checkpoint, 2026-09-23:** Preview 9 is released. The synchronous disk/memory
+Storage POC and Console stream slice have executable evidence. The author requests a
+consistency review before expanding the platform: keep, adapt, redesign or remove
+provisional choices based on concrete use and comparison with .NET.
+
+The library composition repair is complete before the author-selected Object/Value
+review. StorageProvider belongs to the composed Raven library alongside StorageItem,
+File and Directory; the legacy bootstrap library keeps its static File helpers.
+The repair restores the existing Console regression suite without changing public APIs.
+Next, assess System.Object's implemented and missing members and System.Value's
+remaining dependencies before proposing additions or a payload migration.
+This is a bounded foundation review; networking remains later. Console ownership,
+cleanup on propagated errors and buffering remain follow-up questions, not selected
+redesigns. The scheduling/operation-cancellation work below remains open.
+
 [Host invocation cancellation orderings](cancellation.md#worker-completion-boundaries--development)
 now cover ready results before/after notification dispatch, interrupted output delivery
 and producer acknowledgement during teardown. This does not implement guest operation

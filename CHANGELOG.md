@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Repair library composition: include StorageProvider only with the Raven
+  StorageItem/File/Directory hierarchy, rather than in the legacy bootstrap library
+  with static File helpers. Restore the legacy Console suite (11 tests); preserve
+  the composed library's provider contract. Remove stale completed-release gates
+  from the roadmap and record the upcoming Object/Value consistency review.
+  Validation: 11 legacy Console tests, three composed-library Console stream tests,
+  and matching generated-library/API snapshots.
+
 - Keep Console a static class and add In/Out/Error, standard byte-stream factories,
   bounded UTF-8 ReadLine, Write and blank WriteLine. Add TextWriter and StreamWriter;
   extend TextReader with ReadLine (implementers must supply the new member).

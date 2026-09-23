@@ -5662,3 +5662,18 @@ and recorded the convention for runtime code as well as examples.
   371 items. The older raw-System Console tests are blocked by that library's
   unresolved StorageItem dependency, independently of the composed Raven library
   used by the new checks.
+
+### 2026-09-23 — Consistency review and Object/Value follow-up
+
+- **Author:** requested continued useful work with reassessment of what should be
+  adapted from .NET, redesigned or removed. Then suggested focusing on Object's
+  missing behavior and the role of System.Value now that Object exists. Confirmed
+  unfinished work should be completed before tackling that review.
+- **Assistant finding:** the roadmap still ended with already-completed release
+  gates. A Raven-only StorageProvider contract in the legacy manifest also caused
+  unresolved StorageItem failures in otherwise unrelated Console tests.
+- **Action/outcome:** moved that include to Raven library composition, restored all
+  11 legacy Console tests and corrected the roadmap's immediate checkpoint.
+- **Next:** review Object and Value independently of this repair. Initial source
+  inspection shows Value is an erased payload facility, not the Object base class;
+  no removal or universal Object equality policy has been selected.

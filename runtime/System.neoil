@@ -94,6 +94,5 @@
 .include "neoCLR/Runtime/WriteAllText.neoil"
 
 .include "raven/StreamError.neoil"
-.include "raven/StorageProvider.neoil"
 .include "raven/InputStream.neoil"
 .include "raven/OutputStream.neoil"

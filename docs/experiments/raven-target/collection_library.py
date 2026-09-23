@@ -95,7 +95,10 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/EntryKind.neoil')
         result += build(ROOT / 'runtime/raven/StorageLookupError.neoil')
         result += build(ROOT / 'runtime/raven/StorageMetadata.neoil')
+        # Provider contracts require the Raven StorageItem/File/Directory hierarchy.
+        # Keep them out of the legacy bootstrap manifest, which has static File helpers.
         result += build(ROOT / 'runtime/raven/StorageItems.neoil')
+        result += build(ROOT / 'runtime/raven/StorageProvider.neoil')
         result += build(ROOT / 'runtime/raven/FileSystem.neoil')
         result += build(ROOT / 'runtime/raven/TextReadError.neoil')
         result += build(ROOT / 'runtime/raven/TextReader.neoil')
