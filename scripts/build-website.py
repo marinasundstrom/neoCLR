@@ -3,13 +3,14 @@
 from html import escape, unescape
 from html.parser import HTMLParser
 from pathlib import Path
+import posixpath
 import shutil
 import json
 import re
 import subprocess
 import sys
 from textwrap import dedent
-from urllib.parse import urlsplit, unquote
+from urllib.parse import urlsplit, urlunsplit, unquote
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / 'website'
@@ -79,6 +80,45 @@ def render(page, samples):
     if '{{' in page:
         raise ValueError('Unexpanded website placeholder')
     return page
+
+
+def make_reference_links_relative():
+    # DocFX treats links into the surrounding site as external root-relative URLs.
+    # Relativize HTML and the client-side navigation data for Pages project paths.
+    def relative(value, page):
+        url = urlsplit(value)
+        if url.scheme or url.netloc or not url.path.startswith('/'):
+            return value
+        parent = page.relative_to(OUTPUT).parent.as_posix()
+        path = posixpath.relpath(url.path.lstrip('/') or '.', parent)
+        if url.path.endswith('/'):
+            path += '/'
+        return urlunsplit(('', '', path, url.query, url.fragment))
+
+    attribute = re.compile(r'\b(href|src)=("|\')(/[^"\']*)\2')
+    for page in (OUTPUT / 'docs').rglob('*.html'):
+        def replace_attribute(match):
+            value = relative(unescape(match.group(3)), page)
+            return f'{match.group(1)}={match.group(2)}{escape(value, quote=True)}{match.group(2)}'
+
+        html = re.sub(r'<[^>]+>', lambda tag: attribute.sub(replace_attribute, tag.group(0)),
+                      page.read_text(encoding='utf-8'))
+        page.write_text(html, encoding='utf-8')
+
+    for page in (OUTPUT / 'docs').rglob('toc.json'):
+        def visit(value):
+            if isinstance(value, dict):
+                for key, child in value.items():
+                    if key in {'href', 'topicHref', 'tocHref'} and isinstance(child, str):
+                        value[key] = relative(child, page)
+                    else:
+                        visit(child)
+            elif isinstance(value, list):
+                for child in value:
+                    visit(child)
+        toc = json.loads(page.read_text(encoding='utf-8'))
+        visit(toc)
+        page.write_text(json.dumps(toc), encoding='utf-8')
 
 
 def check_reference_links():
@@ -175,6 +215,7 @@ def main():
     subprocess.run([sys.executable, str(ROOT / 'scripts/build-api-docs.py')], check=True)
     for path, check in pages.items():
         check.check(path, pages)
+    make_reference_links_relative()
     check_reference_links()
     (OUTPUT / '.nojekyll').touch()
     print(f'Built and checked {len(pages)} pages:', OUTPUT)

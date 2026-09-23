@@ -3,10 +3,12 @@
 Author-selected immediate priority, recorded 2026-09-23. After asking when to release
 the async/Task work, the author accepted this scope and directed that it take priority
 before further platform expansion. This is a release scope and readiness plan,
-not a release announcement or publication approval.
-The prepared candidate version is **0.1.0-preview.9**. Publication date and final
-artifact hashes remain unset; record the exact versioned commit in the manifest.
-The earlier e9bb28a checks do not certify the subsequent versioned candidate.
+not a release announcement or publication approval by itself.
+**Completed:** [Preview 9](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.9)
+was published on 2026-09-23 at `834028c`. The exact candidate passed all six source
+jobs; the extracted macOS arm64 runtime/SDK/VSIX passed the package and editor gates.
+See [final evidence](preview-9-validation.json) and [release notes](preview-9-release-notes.md).
+Earlier failed and superseded candidate reports remain historical preparation evidence.
 
 ## When to release
 
@@ -48,26 +50,26 @@ omit compatibility changes merely because the release theme is Tasks.
 
 ## Release gates and evidence
 
-All gates below are **open for the final candidate**. Focused local tests, samples and
-editor probes exist, but they do not certify a future archive or another platform.
+All gates below are **complete for Preview 9**. The linked final evidence records
+the selected commit, toolchain and macOS arm64 binary scope; it does not certify future builds.
 
-- [ ] Pin matching neoCLR and Raven revisions, SDK/reference/runtime-library inputs
+- [x] Pin matching neoCLR and Raven revisions, SDK/reference/runtime-library inputs
   and VSIX build. Record the candidate manifest; preserve Raven branch isolation.
   Regenerate library artifacts and verify their snapshot and runtime-service contracts.
-- [ ] Run the Task, composition, async, default-queue, worker, MapResult and editor
+- [x] Run the Task, composition, async, default-queue, worker, MapResult and editor
   probes from [the Task experiment](experiments/task-contract/README.md), plus runtime
   GC, cancellation, quota and invalid-IL regressions. Check both immediate and resumed
   paths, success/error/cancellation, one-shot completion and unsupported diagnostics.
-- [ ] Build fresh packages with [the bundle tooling](experiments/raven-target/package_bundle.py).
+- [x] Build fresh packages with [the bundle tooling](experiments/raven-target/package_bundle.py).
   Extract them into new directories and build/run the Async Workbench samples via
   saved `.rvnproj` files. Verify expected output, editor completion/hover and normal
   build/run tasks using only those packages. Temporary adapter replacements, local
   development symlinks and stale compiler/reference fallbacks cannot satisfy this gate.
-- [ ] Pass the [source/archive validation matrix](next-preview-validation.md) on the
+- [x] Pass the [source/archive validation matrix](next-preview-validation.md) on the
   exact selected commit, including minimum/stable Rust, formatting and strict Clippy
   on the configured Linux/macOS/Windows jobs. Record separate package execution
   evidence for each claimed binary target; source CI does not establish binary support.
-- [ ] Review the complete candidate diff, migration notes, notices, checksums and
+- [x] Review the complete candidate diff, migration notes, notices, checksums and
   release notes. Align README, Tasks/overview/setup pages and downloadable samples
   with the actual package contents. Include the DocFX `/docs/` overview and useful
   main async API descriptions; exhaustive documentation is not required for this release.
@@ -82,26 +84,20 @@ Preview 8 instead of assuming this list is exhaustive.
 
 ## Next action and exit
 
-Local progress is recorded in [the readiness inventory](async-preview-readiness.md).
-The corrected package, full library regeneration and protocol/MSBuild checks now
-pass locally. Interactive build/run and Task type hover now pass in a separate VS Code
-profile against the extracted `e9bb28a` bundle. Exact-candidate local source validation
-and the six-job CI matrix are running. All six deeper packaged Task probes pass. Complete the source checks
-and the final migration/distribution review; see the [release-note draft](async-preview-release-notes.md).
-The [migration draft](async-preview-migration.md) inventories known breaks; the
-minimum-Rust archive check found a dispatch syntax issue, now corrected locally.
-The rebuilt runtime and corrected sample archive now have
-[separate package evidence](async-preview-package-followup.json), including eight
-Workbench samples and 84 saved-project outcomes. Full local source suites exposed a standalone worker sample with missing service
-imports. The sample now supplies them directly; preserve failed archive reports
-and record correction checks separately. Final-candidate full-source/platform gates
-remain open.
-Record blockers with evidence and only claim platforms actually tested. Remote candidate CI and publication remain distinct
-steps; this plan does not tag, push, upload artifacts or publish the website.
+The release checkpoint is complete. The [final evidence](preview-9-validation.json)
+records eight Async Workbench cases, six deeper Task probes, 84 saved-project outcomes,
+22 MSBuild checks, four direct neoIL samples, full library regeneration, Task editor
+completion and interactive VSIX build/run/type hover. All six Linux/macOS/Windows
+source jobs passed stable/minimum Rust checks against the same source archive.
+Binary package execution was checked on macOS arm64 only.
 
-When the gates pass, select the actual version/date and publication scope through
-the [release process](source-release.md). After this checkpoint, resume M1 with Streams, Storage and Encoding before networking,
-as directed by the author. Use bounded file-transformer cases to expose the needed
-operation cancellation and queue-affinity contracts; the [authoritative roadmap](platform-roadmap.md)
-keeps the sequence and ownership prerequisites explicit. The first major application destination
-remains the HTTP client/server pair.
+The [readiness inventory](async-preview-readiness.md) preserves earlier preparation
+and failures; the [migration review](async-preview-migration.md) records compatibility
+changes. Published notes and release history remain frozen; development continues in
+Unreleased.
+
+Resume M1 with Streams, Storage and Encoding before networking. The author's
+post-release System.Concurrency direction remains recorded separately; explicit Thread
+lifecycle and platform-specific Task submission are not silently included in Preview 9.
+Use bounded file-transformer cases to resolve cancellation, queue affinity and lifetime
+contracts before the HTTP client/server application pair.

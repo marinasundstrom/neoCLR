@@ -1,8 +1,8 @@
 # neoCLR API reference
 
 neoCLR is an **experimental application platform**. This reference describes the
-current development API, starting with Tasks for the upcoming async preview. It is
-not a promise of compatibility or documentation of an already published release.
+Preview 9 API, starting with Tasks. Names and contracts remain experimental;
+this reference does not promise compatibility with future releases.
 
 ## API overview
 

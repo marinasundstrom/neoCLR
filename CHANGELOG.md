@@ -6,7 +6,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
-Changes after the prepared Preview 9 candidate will be recorded here.
+### 2026-09-23
+
+- Record publication of Preview 9 at `834028c` with six passing platform/toolchain
+  jobs and extracted macOS arm64 package/editor evidence; mark the async checkpoint
+  complete and resume foundational Streams, Storage and Encoding priorities.
+- Align website, setup and API reference with Preview 9. Reduce the main menu to
+  five consistent destinations, remove Experimental from the API header/title and
+  add logo spacing. Make DocFX HTML and client-side navigation links work under a
+  GitHub Pages project path, with regression coverage.
+
 
 ## 0.1.0-preview.9
 

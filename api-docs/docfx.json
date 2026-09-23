@@ -37,12 +37,13 @@
     "output": "../target/website/docs",
     "template": [
       "default",
-      "modern"
+      "modern",
+      "template"
     ],
     "globalMetadata": {
-      "_appTitle": "neoCLR API reference \u00b7 Experimental",
-      "_appName": "neoCLR \u00b7 Experimental",
-      "_appFooter": "Experimental application platform \u00b7 Development API \u00b7 C#/VB signatures are metadata notation",
+      "_appTitle": "neoCLR API reference",
+      "_appName": "neoCLR",
+      "_appFooter": "Experimental application platform \u00b7 Preview 9 API \u00b7 C#/VB signatures are metadata notation",
       "_enableSearch": true,
       "_disableContribution": true,
       "_lang": "en",

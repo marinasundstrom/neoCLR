@@ -1,0 +1,677 @@
+{
+  "version": "0.1.0-preview.9",
+  "status": "validated release candidate",
+  "neoCLRRevision": "834028c9ac879c417c89fe298c35f75fe1bc2aa8",
+  "ravenRevision": "e56fc1ddf25d570d6aaa2bddfdf34138198f9941",
+  "ravenBranch": "codex/async-preview-readiness",
+  "sdkVersion": "0.1.12-neoclr.async.20260923",
+  "binaryTargets": [
+    "osx-arm64"
+  ],
+  "dotnetSdk": "11.0.100-rc.1.26425.128",
+  "sourceCI": "https://github.com/marinasundstrom/neoCLR/actions/runs/35868351666",
+  "archiveValidation": {
+    "revision": "834028c9ac879c417c89fe298c35f75fe1bc2aa8",
+    "sha256": "fdbf664ccbbd66246ded01c287922a15e51895f08720ef93e1477b47566312b4",
+    "files": 937,
+    "manifestFilesVerified": 936,
+    "payloadHashesUnchanged": true,
+    "appleDoubleEntries": 0
+  },
+  "interactiveEditor": {
+    "candidate": "834028c9ac879c417c89fe298c35f75fe1bc2aa8",
+    "profile": "neoCLR Release Validation e9bb28a",
+    "vsixSha256": "3dd2c0e512801b4f13ca2cb3a2665cdd8c8a8cc00f8bb38aa3f200040367dc4b",
+    "sample": "library-async-default-queue.rvn",
+    "installedExtension": "raven.raven-vscode@0.1.12-neoclr.async.20260923",
+    "method": "Interactive VS Code UI using extracted bundle and SDK; named empty profile",
+    "build": "Build succeeded in 5,5s",
+    "runTask": "neoCLR: Run (MSBuild)",
+    "output": "Hello on a worker",
+    "problems": "No Problems",
+    "hover": "class Task<()>: ITaskAwaiter; Type in Tasks",
+    "windowClosed": true,
+    "limits": "Hover verified type information, not XML descriptions. No Raven source debugging claim.",
+    "bundle": "preview9-extracted/neoclr-0.1.0-preview.9-osx-arm64",
+    "sdk": "preview9-extracted/raven-sdk-0.1.12-neoclr.async.20260923-osx-arm64"
+  },
+  "editorCompletion": {
+    "Task": [
+      "Equals",
+      "GetAwaiter",
+      "GetHashCode",
+      "GetResult",
+      "GetType",
+      "IsCancelled",
+      "IsCompleted",
+      "Map",
+      "MapResult",
+      "OnCompleted",
+      "Outcome",
+      "State",
+      "Then",
+      "ToString"
+    ],
+    "Promise": [
+      "Cancel",
+      "Complete",
+      "Equals",
+      "GetHashCode",
+      "GetType",
+      "Task",
+      "ToString"
+    ],
+    "Queue": [
+      "Default"
+    ]
+  },
+  "assets": {
+    "neoclr-0.1.0-preview.9-osx-arm64.tar.gz": {
+      "sha256": "fdbf664ccbbd66246ded01c287922a15e51895f08720ef93e1477b47566312b4",
+      "bytes": 23873534
+    },
+    "neoclr-source-0.1.0-preview.9.tar.gz": {
+      "sha256": "e6ea484b235ee03c3aeabe4824b9cb6ff377d5979ee098865411e313739fc37d",
+      "bytes": 2408952
+    },
+    "raven-sdk-0.1.12-neoclr.async.20260923-osx-arm64.tar.gz": {
+      "sha256": "99b68bab33ff720fba3391885a502e9c13a6e0c1320d1751dd09db70af2788e0",
+      "bytes": 30846409
+    },
+    "raven-toolchain-notices.tar.gz": {
+      "sha256": "43930f7aa30805990afa83d577024b665df89947bc940ac12561ce472461ffff",
+      "bytes": 137077
+    },
+    "raven-vscode-0.1.12-neoclr.async.20260923.vsix": {
+      "sha256": "3dd2c0e512801b4f13ca2cb3a2665cdd8c8a8cc00f8bb38aa3f200040367dc4b",
+      "bytes": 10266049
+    },
+    "validation-evidence.tar.gz": {
+      "sha256": "d56cd017af1512567d0ced1e51b9f8c2373cff40201c81fcfe5727081b82921e",
+      "bytes": 11635
+    }
+  },
+  "packageChecks": {
+    "workbench": {
+      "exitCode": 0,
+      "passed": true
+    },
+    "msbuild": {
+      "exitCode": 0,
+      "passed": true
+    },
+    "neoil": {
+      "exitCode": 0,
+      "passed": true
+    }
+  },
+  "asyncWorkbench": [
+    {
+      "sample": "library-async-default-queue",
+      "output": "Hello on a worker\n",
+      "passed": true
+    },
+    {
+      "sample": "library-workers",
+      "output": "Hello, thread\nHello, pool\n",
+      "passed": true
+    },
+    {
+      "sample": "library-task-producer",
+      "output": "42\n",
+      "passed": true
+    },
+    {
+      "sample": "library-task-composition",
+      "output": "42\n",
+      "passed": true
+    },
+    {
+      "sample": "library-task-result",
+      "output": "42\n",
+      "passed": true
+    },
+    {
+      "sample": "library-task-propagation",
+      "output": "Unavailable\n",
+      "passed": true
+    },
+    {
+      "sample": "library-async-cancellation",
+      "output": "Cancelled\n",
+      "passed": true
+    },
+    {
+      "sample": "library-async",
+      "output": "Suspended\n42\n",
+      "passed": true
+    }
+  ],
+  "taskProbes": {
+    "tasks": {
+      "exitCode": 0,
+      "passed": true
+    },
+    "composition": {
+      "exitCode": 0,
+      "passed": true
+    },
+    "async": {
+      "exitCode": 0,
+      "passed": true
+    },
+    "default_queue": {
+      "exitCode": 0,
+      "passed": true
+    },
+    "workers": {
+      "exitCode": 0,
+      "passed": true
+    },
+    "map_result": {
+      "exitCode": 0,
+      "passed": true
+    }
+  },
+  "savedProject": {
+    "outcomeCount": 84,
+    "outcomes": {
+      "ArrayTour": "Number of readings:\n3\nRead-only view sees the correction:\n22\nSnapshot then current reading:\n18\n19\nCurrent readings:\n19\n22\n21\nEmpty array length:\n0\nArray element type:\nSystem.Int32\n",
+      "Utf8": "Round trip\nRound trip\nRound trip\nRound trip\nRound trip\nRound trip\n7\nNo preamble\nAB\nInvalidUtf8\nInvalidUtf8\nInvalidUtf8\nInvalidUtf8\nInvalidUtf8\nInvalidUtf8\n",
+      "NestedTypeInfo": "Outer/Inner\nOuter\nActual declaring type\nTop-level type\nType member\n",
+      "IntrospectionTour": "Instance and declared type agree\nDemo\nSystem.Runtime\nDemo\nWidget\nSame definition token\nDemo\n5\nMethod\nvalue\nField\nProperty\n0\n",
+      "AssemblyInfo": "Demo\nSystem.Runtime\nRuntime types available\nDemo\n1\nWidget\nType token available\nDemo\nSame definition token\n",
+      "TypeAcquisition": "Concrete class\nSystem.String\nSame type\nArray type\nSystem.Int32\nSystem.Int32\n",
+      "Instants": "0\n-1\n0\n-1\nSame duration\nSystem clock\n",
+      "Basics": "42\n1\n0\nLibrary calls from Raven\n",
+      "CasePayloads": "7\n42\nAfter\nUpdated error\n",
+      "GenericUnions": "Ok\n0\nError\nFailure\n0\nFailure\nFound\nNone\n0\n",
+      "ErrorValues": "ArgumentOutOfRange\nConfirmed\nInvalidPath\nConfirmed\nFileNotFound\nConfirmed\nAccessDenied\nConfirmed\nNotRegularFile\nConfirmed\nFileTooLarge\nConfirmed\nFileReadFailed\nConfirmed\nInvalidUtf8\nConfirmed\nInvalidLimit\nConfirmed\nInvalidPath\nConfirmed\nNotFound\nConfirmed\nAccessDenied\nConfirmed\nNotRegularFile\nConfirmed\nTooLarge\nConfirmed\nWriteFailed\nConfirmed\nConsoleUnavailable\nConfirmed\nConsoleReadFailed\nConfirmed\nOutOfRange\nConfirmed\nInvalidBoundary\nConfirmed\nInvalidFormat\nConfirmed\nOverflow\nConfirmed\nDivisionByZero\nConfirmed\nOverflow\nConfirmed\nInvalidRange\nInvalidDate\nInvalidTime\nOverflow\nEnvironmentUnavailable\nA domain error\nA domain error\n",
+      "Calendar": "2024\n2\n29\n60\n738944\n0\nSame date\nDate accepted\n1\n1\n1\n1\n0\n0\nSame date\nDate accepted\nInvalid date\nInvalid date\n12\n34\n56\n789\n7890123\n0\n0\nSame time\nTime accepted\n12\n34\n56\n789\n7890123\n0\n0\nSame time\nTime accepted\n0\n0\n0\n0\n0\n-1\n0\nSame time\nTime accepted\nInvalid time\nInvalid time\n",
+      "GraphemeStrings": "4\n12\n37\nA\ne\u0301\n\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc66\n\ud83c\uddf8\ud83c\uddea\nCombining character\n\ud83d\udc4d\ud83c\udffd\ne\u0301\n\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc66\nFamily\n101\nLetter scalar\n769\n0\nDefault NUL\n\ud83d\udc4d\ud83c\udffd\ne\u0301\n",
+      "Primitives": "-1\n1\n-1\n1\n1\n1\n0\n0\n0\n-1\n-1\nDigit\nNumber\nLetter\nUpper\nLower\nSeparator\nControl\nPunctuation\nSymbol\nASCII\nASCII digit\nLetter or digit\nWhitespace\n",
+      "NumericOperators": "0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n",
+      "NumericWidening": "0\n0\n0\n0\n",
+      "FloatingMath": "0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n-1\n",
+      "Clamp": "Clamped\n5\nClamped\n0\nClamped\n10\nClamped\n7\nClamped\n-2147483648\nClamped\n2147483647\nInvalid range\n",
+      "Integers": "42\n1\nEqual\n-2147483648\n-1\nDifferent\n2147483647\n1\nDifferent\n0\n0\nEqual\n",
+      "Division": "Divided\n3\nDivided\n-3\nDivided\n-3\nDivided\n0\nDivided\n-2147483648\nDivision by zero\nOverflow\n",
+      "Parsing": "Parsed\n42\nParsed\n-2147483648\nParsed\n2147483647\nParsed\n7\nOverflow\nOverflow\nInvalid format\nInvalid format\nInvalid format\nInvalid format\n",
+      "Paths": "summary.txt\nreport.txt\nreport.txt\n\n\nfinal.txt\n\u4e16\u754c.txt\nleaf.txt\n",
+      "StringSlices": "Sliced\n\u00e9\nSliced\n\ud83d\ude00\nSliced\n\nInvalid boundary\nInvalid boundary\nOut of range\nOut of range\nOut of range\nOut of range\nOut of range\nSliced\n\n",
+      "Strings": "Hello, v\u00e4rld!\n14\nyes\nno\nyes\nno\nyes\nyes\nyes\nno\n-1\n0\n1\n",
+      "StringBoundaries": "yes\nyes\nyes\nyes\nno\n1\n4\n",
+      "Patterns": "42\n-1\n7\n-1\n",
+      "MatchForms": "42\n-1\nPresent\nAbsent\n42\nOverflow\n",
+      "MatchVoid": "42\nSaved\nCompleted\nOverflow\n",
+      "Math": "-2147483648\n2147483647\n7\n-7\n-1\n0\n1\n",
+      "Result": "42\nOverflow\n",
+      "Propagation": "Continued\n42\nOverflow propagated\n",
+      "OptionPropagation": "Value found\n42\nAbsent\n",
+      "VoidResultPropagation": "42\nSaved\nCompleted\nOverflow\n",
+      "Option": "42\nProduct not found\n",
+      "Void": "Completed without a payload\nNot completed\n",
+      "Interfaces": "1\n42\n",
+      "ListFilters": "7\n7\n1\n3\nAbsent\nExists\nNot all positive\n3\n7\n42\n7\n7\nAbsent\nAbsent\nAbsent\n0\nAll empty elements satisfy the predicate\n5\n7\n99\n1\n2\n",
+      "QueryTerminals": "Absent\nAbsent\n0\n42\nAbsent\nEmpty\n0\nMultiple\n42\nMultiple\n42\nAbsent\nSystem.String\nNo result\n42\nAbsent\nAbsent\n0\n0\nEmpty\nMultiple\n42\n",
+      "Maps": "Added\nDuplicate rejected\nPending\nUnknown order\nShipped\n1\n2\nFound\n42\n99\nStored\nStored\nShipped\n23\n2\n1\n",
+      "CollectionCapabilities": "2\n42\n2\n2\n7\n2\n9\n2\n3\n11\n",
+      "UnifiedArray": "42\n2\n42\n8\n50\n42\n1\n42\n1\nSystem.Int32\n4\n9\n",
+      "ArrayShapes": "0\n0\nBoolean elements\nSystem.Int32\nSystem.String\n0\n255\n65535\ne\u0301\n42\n",
+      "ReferencePayloads": "Copied TypeInfo reference\nSystem.Int32\nSystem.String\n3\n2\n0\n3\n3\n42\nStored error\n7\n42\nSystem.Int32\n",
+      "ValueInterfaces": "0\n1\nEqual integer\nEqual string\nEqual type\n0\nEqual date\n0\n0\n",
+      "NativeBuffer": "Native allocation released\n",
+      "Flags": "28\n8\n20\n-29\n0\nSame flags\nPublic included\n5\nStoredDayNumber\n",
+      "ArrayQueries": "Parse\nDivide\nEquals\nToString\nCompareTo\n0\n17\n13\n3\n17\n52\n6\n0\n0\n43\n",
+      "ArrayForEach": "Parse\nDivide\nEquals\nToString\nCompareTo\n42\n1\n2\n3\n",
+      "ManagedArrayMetadata": "42\n2\n1\nSystem.Int32\n0\nEmpty\nLength\nCount\nItem\n4\n42\n8\n50\n2\n",
+      "IntrospectionInterfaces": "Interface\nInterface\nInterface\nInterface\nInterface\nInterface\nSystem.Date\nField\nMethod\nProperty\nType\n",
+      "Reflection": "System.Int32\nSystem.Int32\nSystem\ntrue\ntrue\nfalse\nfalse\nfalse\ntrue\nfalse\nfalse\nfalse\nfalse\nfalse\nfalse\nParse\nSystem.Int32\nSystem.Result\ntrue\ntrue\nfalse\nfalse\nfalse\nfalse\nfalse\nfalse\nfalse\ntrue\nvalue\n0\nSystem.String\nfalse\nfalse\nfalse\nDayNumber\nSystem.Int32\nfalse\ntrue\nfalse\n0\n0\nget_DayNumber\ntrue\ntrue\ntrue\n28\ntrue\ntrue\n8\n20\n-29\n0\n2\nStoredDayNumber\nSystem.Int32\n0\nfalse\ntrue\nfalse\nfalse\n0\n5\n5\n1\nSystem.Int32\nSystem.Int32\n1\ntrue\ntrue\ntrue\nSystem.Int32\ntrue\nDefault\nSystem.Int32\n",
+      "ArrayCallbacks": "7\n42\nFirst\nSecond\n",
+      "Delegates": "42\n42\n42\n42\n42\nDone\n1\nExists\n42\nNo index\nNone\n",
+      "Booleans": "1\n-1\n0\n1\n42\nNot false\nEqual\nDifferent\n0\n1\n0\n",
+      "GenericCollections": "Changed\nSecond\n0\n0\n1\n2\n1\n",
+      "PropagationWorkflow": "42\nSaved\nCompleted\nOverflow\nValue found\n42\nAbsent\n",
+      "ValueCopy": "42\n7\n",
+      "Arrays": "42\n2\n",
+      "Workflow": "42\nCompleted\nPrice overflow\nSkipped\nProduct not found\nSkipped\n",
+      "ForEach": "41\n42\n41\n41\n",
+      "Aliases": "7\n42\n2\n",
+      "SavedEdit": "7\n42\n7\n7\n",
+      "MissingFieldInfoMatch": "Rejected; no executable produced or stale output run",
+      "MissingMethodInfoMatch": "Rejected; no executable produced or stale output run",
+      "MissingPropertyInfoMatch": "Rejected; no executable produced or stale output run",
+      "MissingTypeInfoMatch": "Rejected; no executable produced or stale output run",
+      "CompileFailure": "Rejected; no executable produced or stale output run",
+      "IntrospectionArrayAssignment": "Rejected; no executable produced or stale output run",
+      "IntrospectionMutation": "Rejected; no executable produced or stale output run",
+      "ExternalIntrospectionProvider": "Rejected; no executable produced or stale output run",
+      "HiddenIntrospectionProvider": "Rejected; no executable produced or stale output run",
+      "RemovedTypeClass": "Rejected; no executable produced or stale output run",
+      "RemovedInfoProperty": "Rejected; no executable produced or stale output run",
+      "RemovedTypeOfHelper": "Rejected; no executable produced or stale output run",
+      "InheritedIntegerMember": "Rejected; no executable produced or stale output run",
+      "PathArgumentMismatch": "Rejected; no executable produced or stale output run",
+      "PathUnsupportedApi": "Rejected; no executable produced or stale output run",
+      "StringArgumentMismatch": "Rejected; no executable produced or stale output run",
+      "StringUnsupportedApi": "Rejected; no executable produced or stale output run",
+      "ArrayImplicitCovariance": "Rejected; no executable produced or stale output run",
+      "ArrayExplicitCovariance": "Rejected; no executable produced or stale output run",
+      "ImportFailure": "Rejected; no executable produced or stale output run",
+      "DivisionByZero": "Verified, then faulted during execution",
+      "DivisionOverflow": "Verified, then faulted during execution"
+    }
+  },
+  "libraryRegeneration": {
+    "passed": true,
+    "log": "preview9-regeneration.log",
+    "bridgeSha256": "e66608bd431735c11b7e67cf34cb4b122ebe724f9525658a26837830cf11abc3"
+  },
+  "websiteValidation": {
+    "run": "https://github.com/marinasundstrom/neoCLR/actions/runs/35869398917",
+    "passed": true,
+    "deployed": false
+  },
+  "sourceArchive": {
+    "revision": "834028c9ac879c417c89fe298c35f75fe1bc2aa8",
+    "trackedFiles": 1868,
+    "tarSha256": "bdd53aa2a66ebf4703919cfa0f9384a5ef853d4af4d183532384d5265a0683d4",
+    "gzipSha256": "e6ea484b235ee03c3aeabe4824b9cb6ff377d5979ee098865411e313739fc37d",
+    "membershipMatches": true
+  },
+  "runtimeWithoutDotnetOnPath": {
+    "passed": true,
+    "path": "/usr/bin:/bin"
+  },
+  "noticeAudit": {
+    "bundleNuGetDependencies": 23,
+    "sdkNuGetDependencies": 26,
+    "preservedNoticeSets": 34,
+    "productionNpmDependencies": 8,
+    "covered": true
+  },
+  "preliminarySourceValidation": {
+    "candidate": "e9bb28a18fc90d3efa4523dbea3f218616727cdf",
+    "stable": {
+      "status": "passed",
+      "platform": "macOS-27.0-arm64-arm-64bit",
+      "toolchain": "stable",
+      "full_tests": true,
+      "smoke_programs": [
+        "counter",
+        "collections",
+        "outputs",
+        "reflection",
+        "reference-identity",
+        "interfaces",
+        "arrays",
+        "control-flow",
+        "typeof",
+        "ordinal-text",
+        "character-classification",
+        "math",
+        "date-time",
+        "common-interfaces",
+        "predicate-search",
+        "reflection-hierarchy",
+        "constructor-chaining",
+        "default-interfaces",
+        "explicit-interfaces",
+        "generic-functions",
+        "delegates",
+        "closures",
+        "readonly",
+        "environment",
+        "file-report"
+      ],
+      "validator_sha256": "bdcf834c28e9d6ddf0e26a2ad4ae850a6180098f6aa0b2bce3fa501460b44312",
+      "commit": "e9bb28a18fc90d3efa4523dbea3f218616727cdf",
+      "archive_sha256": "ed29bb8fb7f9b9bbe8804aa8934758f9012af93ace1dc58fcf885c01c9258182",
+      "tracked_files": 1866,
+      "registry_packages": 48,
+      "notice_files": 97,
+      "raven_library_snapshot": true,
+      "rustc": "rustc 1.95.0 (59807616e 2026-04-14)\nbinary: rustc\ncommit-hash: 59807616e1fa2540724bfbac14d7976d7e4a3860\ncommit-date: 2026-04-14\nhost: aarch64-apple-darwin\nrelease: 1.95.0\nLLVM version: 22.1.2"
+    },
+    "minimum": {
+      "status": "passed",
+      "platform": "macOS-27.0-arm64-arm-64bit",
+      "toolchain": "1.85.0",
+      "full_tests": true,
+      "smoke_programs": [
+        "counter",
+        "collections",
+        "outputs",
+        "reflection",
+        "reference-identity",
+        "interfaces",
+        "arrays",
+        "control-flow",
+        "typeof",
+        "ordinal-text",
+        "character-classification",
+        "math",
+        "date-time",
+        "common-interfaces",
+        "predicate-search",
+        "reflection-hierarchy",
+        "constructor-chaining",
+        "default-interfaces",
+        "explicit-interfaces",
+        "generic-functions",
+        "delegates",
+        "closures",
+        "readonly",
+        "environment",
+        "file-report"
+      ],
+      "validator_sha256": "bdcf834c28e9d6ddf0e26a2ad4ae850a6180098f6aa0b2bce3fa501460b44312",
+      "commit": "e9bb28a18fc90d3efa4523dbea3f218616727cdf",
+      "archive_sha256": "ed29bb8fb7f9b9bbe8804aa8934758f9012af93ace1dc58fcf885c01c9258182",
+      "tracked_files": 1866,
+      "registry_packages": 48,
+      "notice_files": 97,
+      "raven_library_snapshot": true,
+      "rustc": "rustc 1.85.0 (4d91de4e4 2025-02-17)\nbinary: rustc\ncommit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688\ncommit-date: 2025-02-17\nhost: aarch64-apple-darwin\nrelease: 1.85.0\nLLVM version: 19.1.7"
+    }
+  },
+  "sourceValidationReports": {
+    "ubuntu-stable": {
+      "status": "passed",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "toolchain": "stable",
+      "full_tests": true,
+      "smoke_programs": [
+        "counter",
+        "collections",
+        "outputs",
+        "reflection",
+        "reference-identity",
+        "interfaces",
+        "arrays",
+        "control-flow",
+        "typeof",
+        "ordinal-text",
+        "character-classification",
+        "math",
+        "date-time",
+        "common-interfaces",
+        "predicate-search",
+        "reflection-hierarchy",
+        "constructor-chaining",
+        "default-interfaces",
+        "explicit-interfaces",
+        "generic-functions",
+        "delegates",
+        "closures",
+        "readonly",
+        "environment",
+        "file-report"
+      ],
+      "validator_sha256": "bdcf834c28e9d6ddf0e26a2ad4ae850a6180098f6aa0b2bce3fa501460b44312",
+      "commit": "834028c9ac879c417c89fe298c35f75fe1bc2aa8",
+      "archive_sha256": "bdd53aa2a66ebf4703919cfa0f9384a5ef853d4af4d183532384d5265a0683d4",
+      "tracked_files": 1868,
+      "registry_packages": 48,
+      "notice_files": 97,
+      "raven_library_snapshot": true,
+      "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8"
+    },
+    "ubuntu-minimum": {
+      "status": "passed",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "toolchain": "1.85.0",
+      "full_tests": true,
+      "smoke_programs": [
+        "counter",
+        "collections",
+        "outputs",
+        "reflection",
+        "reference-identity",
+        "interfaces",
+        "arrays",
+        "control-flow",
+        "typeof",
+        "ordinal-text",
+        "character-classification",
+        "math",
+        "date-time",
+        "common-interfaces",
+        "predicate-search",
+        "reflection-hierarchy",
+        "constructor-chaining",
+        "default-interfaces",
+        "explicit-interfaces",
+        "generic-functions",
+        "delegates",
+        "closures",
+        "readonly",
+        "environment",
+        "file-report"
+      ],
+      "validator_sha256": "bdcf834c28e9d6ddf0e26a2ad4ae850a6180098f6aa0b2bce3fa501460b44312",
+      "commit": "834028c9ac879c417c89fe298c35f75fe1bc2aa8",
+      "archive_sha256": "bdd53aa2a66ebf4703919cfa0f9384a5ef853d4af4d183532384d5265a0683d4",
+      "tracked_files": 1868,
+      "registry_packages": 48,
+      "notice_files": 97,
+      "raven_library_snapshot": true,
+      "rustc": "rustc 1.85.0 (4d91de4e4 2025-02-17)\nbinary: rustc\ncommit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688\ncommit-date: 2025-02-17\nhost: x86_64-unknown-linux-gnu\nrelease: 1.85.0\nLLVM version: 19.1.7"
+    },
+    "macos-stable": {
+      "status": "passed",
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "toolchain": "stable",
+      "full_tests": true,
+      "smoke_programs": [
+        "counter",
+        "collections",
+        "outputs",
+        "reflection",
+        "reference-identity",
+        "interfaces",
+        "arrays",
+        "control-flow",
+        "typeof",
+        "ordinal-text",
+        "character-classification",
+        "math",
+        "date-time",
+        "common-interfaces",
+        "predicate-search",
+        "reflection-hierarchy",
+        "constructor-chaining",
+        "default-interfaces",
+        "explicit-interfaces",
+        "generic-functions",
+        "delegates",
+        "closures",
+        "readonly",
+        "environment",
+        "file-report"
+      ],
+      "validator_sha256": "bdcf834c28e9d6ddf0e26a2ad4ae850a6180098f6aa0b2bce3fa501460b44312",
+      "commit": "834028c9ac879c417c89fe298c35f75fe1bc2aa8",
+      "archive_sha256": "bdd53aa2a66ebf4703919cfa0f9384a5ef853d4af4d183532384d5265a0683d4",
+      "tracked_files": 1868,
+      "registry_packages": 48,
+      "notice_files": 97,
+      "raven_library_snapshot": true,
+      "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: aarch64-apple-darwin\nrelease: 1.98.1\nLLVM version: 22.1.8"
+    },
+    "macos-minimum": {
+      "status": "passed",
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "toolchain": "1.85.0",
+      "full_tests": true,
+      "smoke_programs": [
+        "counter",
+        "collections",
+        "outputs",
+        "reflection",
+        "reference-identity",
+        "interfaces",
+        "arrays",
+        "control-flow",
+        "typeof",
+        "ordinal-text",
+        "character-classification",
+        "math",
+        "date-time",
+        "common-interfaces",
+        "predicate-search",
+        "reflection-hierarchy",
+        "constructor-chaining",
+        "default-interfaces",
+        "explicit-interfaces",
+        "generic-functions",
+        "delegates",
+        "closures",
+        "readonly",
+        "environment",
+        "file-report"
+      ],
+      "validator_sha256": "bdcf834c28e9d6ddf0e26a2ad4ae850a6180098f6aa0b2bce3fa501460b44312",
+      "commit": "834028c9ac879c417c89fe298c35f75fe1bc2aa8",
+      "archive_sha256": "bdd53aa2a66ebf4703919cfa0f9384a5ef853d4af4d183532384d5265a0683d4",
+      "tracked_files": 1868,
+      "registry_packages": 48,
+      "notice_files": 97,
+      "raven_library_snapshot": true,
+      "rustc": "rustc 1.85.0 (4d91de4e4 2025-02-17)\nbinary: rustc\ncommit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688\ncommit-date: 2025-02-17\nhost: aarch64-apple-darwin\nrelease: 1.85.0\nLLVM version: 19.1.7"
+    },
+    "windows-stable": {
+      "status": "passed",
+      "platform": "Windows-2025Server-10.0.26100-SP0",
+      "toolchain": "stable",
+      "full_tests": true,
+      "smoke_programs": [
+        "counter",
+        "collections",
+        "outputs",
+        "reflection",
+        "reference-identity",
+        "interfaces",
+        "arrays",
+        "control-flow",
+        "typeof",
+        "ordinal-text",
+        "character-classification",
+        "math",
+        "date-time",
+        "common-interfaces",
+        "predicate-search",
+        "reflection-hierarchy",
+        "constructor-chaining",
+        "default-interfaces",
+        "explicit-interfaces",
+        "generic-functions",
+        "delegates",
+        "closures",
+        "readonly",
+        "environment",
+        "file-report"
+      ],
+      "validator_sha256": "bb5fb26f0bd6744f603b41a73c1b53c4caaed3215b843d5f04f0cf6e55a2ad1a",
+      "commit": "834028c9ac879c417c89fe298c35f75fe1bc2aa8",
+      "archive_sha256": "bdd53aa2a66ebf4703919cfa0f9384a5ef853d4af4d183532384d5265a0683d4",
+      "tracked_files": 1868,
+      "registry_packages": 48,
+      "notice_files": 97,
+      "raven_library_snapshot": true,
+      "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-pc-windows-msvc\nrelease: 1.98.1\nLLVM version: 22.1.8"
+    },
+    "windows-minimum": {
+      "status": "passed",
+      "platform": "Windows-2025Server-10.0.26100-SP0",
+      "toolchain": "1.85.0",
+      "full_tests": true,
+      "smoke_programs": [
+        "counter",
+        "collections",
+        "outputs",
+        "reflection",
+        "reference-identity",
+        "interfaces",
+        "arrays",
+        "control-flow",
+        "typeof",
+        "ordinal-text",
+        "character-classification",
+        "math",
+        "date-time",
+        "common-interfaces",
+        "predicate-search",
+        "reflection-hierarchy",
+        "constructor-chaining",
+        "default-interfaces",
+        "explicit-interfaces",
+        "generic-functions",
+        "delegates",
+        "closures",
+        "readonly",
+        "environment",
+        "file-report"
+      ],
+      "validator_sha256": "bb5fb26f0bd6744f603b41a73c1b53c4caaed3215b843d5f04f0cf6e55a2ad1a",
+      "commit": "834028c9ac879c417c89fe298c35f75fe1bc2aa8",
+      "archive_sha256": "bdd53aa2a66ebf4703919cfa0f9384a5ef853d4af4d183532384d5265a0683d4",
+      "tracked_files": 1868,
+      "registry_packages": 48,
+      "notice_files": 97,
+      "raven_library_snapshot": true,
+      "rustc": "rustc 1.85.0 (4d91de4e4 2025-02-17)\nbinary: rustc\ncommit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688\ncommit-date: 2025-02-17\nhost: x86_64-pc-windows-msvc\nrelease: 1.85.0\nLLVM version: 19.1.7"
+    }
+  },
+  "validationCompletedAt": "2026-09-23T14:46:45.800985+00:00",
+  "sourceCIRun": {
+    "headSha": "834028c9ac879c417c89fe298c35f75fe1bc2aa8",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/35868351666"
+  },
+  "sourceCIJobs": [
+    {
+      "name": "minimum-rust (windows-latest)",
+      "conclusion": "success",
+      "startedAt": "2026-09-23T13:37:26Z",
+      "completedAt": "2026-09-23T14:45:28Z"
+    },
+    {
+      "name": "test (macos-latest)",
+      "conclusion": "success",
+      "startedAt": "2026-09-23T13:37:31Z",
+      "completedAt": "2026-09-23T14:07:14Z"
+    },
+    {
+      "name": "test (windows-latest)",
+      "conclusion": "success",
+      "startedAt": "2026-09-23T13:37:25Z",
+      "completedAt": "2026-09-23T14:28:33Z"
+    },
+    {
+      "name": "test (ubuntu-latest)",
+      "conclusion": "success",
+      "startedAt": "2026-09-23T13:37:25Z",
+      "completedAt": "2026-09-23T13:53:21Z"
+    },
+    {
+      "name": "minimum-rust (ubuntu-latest)",
+      "conclusion": "success",
+      "startedAt": "2026-09-23T13:37:25Z",
+      "completedAt": "2026-09-23T13:58:53Z"
+    },
+    {
+      "name": "minimum-rust (macos-latest)",
+      "conclusion": "success",
+      "startedAt": "2026-09-23T13:37:32Z",
+      "completedAt": "2026-09-23T14:16:36Z"
+    }
+  ],
+  "publication": {
+    "isDraft": false,
+    "publishedAt": "2026-09-23T14:47:26Z",
+    "targetCommitish": "834028c9ac879c417c89fe298c35f75fe1bc2aa8",
+    "url": "https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.9"
+  }
+}

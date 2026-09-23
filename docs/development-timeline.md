@@ -5156,3 +5156,25 @@ and recorded the convention for runtime code as well as examples.
   entries stay frozen and later work continues under Unreleased. Recorded this
   explicit continuation in the changelog workflow; existing per-commit requirements
   remain in effect. No release publication or changelog reset was performed.
+
+
+### 2026-09-23 — Release completion and website navigation
+
+- **Author:** directed continued release work. While validation ran, requested fewer
+  website menu items after release, removal of “Experimental” from the API site's
+  neoCLR branding, and showed a screenshot where the icon touched the name.
+- **Assistant response and action:** kept Preview 9 fixed at `834028c` while preparing
+  the website changes separately. Published the prerelease after all six exact-commit
+  source jobs and the extracted package/editor gates passed. Preserved the source
+  archive, checksums, manifest and supporting logs as release assets.
+- **Website work:** prepared five common menu destinations (About, Features, Raven,
+  API docs and Try it), plain neoCLR API branding and an eight-pixel logo gap at the
+  default font size. The main site retains its experimental platform description.
+  Rendering under the actual `/neoCLR/` base path exposed root-relative DocFX links;
+  the builder now adjusts both HTML and navigation JSON, with a regression test.
+- **Validation:** package scope remains macOS arm64; source validation covers Linux,
+  macOS and Windows on stable and Rust 1.85. Website/DocFX builds and link/highlighting
+  checks pass locally. Desktop and narrow navigation and API header were inspected.
+  Website deployment is a separate follow-up to this commit.
+- **Next:** the release checkpoint is complete. Streams, Storage and Encoding precede
+  networking; the selected post-release concurrency direction remains future work.

@@ -72,8 +72,9 @@ HTTP and completion of M1 are not prerequisites. The experimental nonblocking wo
 adapter and guest operation cancellation tokens are not part of the supported scope.
 
 This is a release checkpoint within the foundations work, not a replacement for M1
-or a declaration that S0 is complete. Preview 9 is the prepared candidate version;
-publication remains pending validation.
+or a declaration that S0 is complete. **Preview 9 was published on 2026-09-23**
+at `834028c`; see [release notes](preview-9-release-notes.md) and
+[exact-candidate evidence](preview-9-validation.json).
 The author also requests a DocFX API reference at `/docs/`. For this release,
 provide a useful overview, main async API descriptions and links to tested examples;
 complete member coverage is not a release gate. See [documentation maintenance](../api-docs/README.md).
@@ -85,7 +86,9 @@ these foundations, and proposals remain exploratory rather than API specificatio
 
 The [local readiness record](async-preview-readiness.md) now covers a fresh extracted
 bundle, full library regeneration, Task editor completion and MSBuild checks.
-Complete remaining editor/candidate and migration gates before expanding features. Published release notes stay unchanged and publication remains separate.
+The final candidate passed editor, migration and six-job source/platform gates.
+This checkpoint is complete; resume the foundational Streams/Storage/Encoding cases.
+Published release notes stay unchanged; website deployment remains a separate workflow.
 
 ## Post-release concurrency direction — 2026-09-23
 

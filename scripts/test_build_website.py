@@ -51,5 +51,26 @@ class PageLinks(unittest.TestCase):
             page.check(path, self.pages)
 
 
+    def test_reference_links_work_under_a_project_base_path(self):
+        from urllib.parse import urljoin
+        self.page('index.html', '<main>Platform</main>')
+        self.page('features/tasks/index.html', '<main id="await">Tasks</main>')
+        path, _ = self.page('docs/api/Task.html',
+            '<a href="/features/tasks/index.html?one=1&amp;two=2#await">Guide</a>'
+            '<a href="/index.html">Home</a><a href="//example.com/help">External</a>')
+        import json
+        toc = build.OUTPUT / 'docs/toc.json'
+        toc.write_text(json.dumps({'items': [{'href': '/index.html', 'topicHref': '/index.html'}]}))
+        build.make_reference_links_relative()
+        self.assertEqual(json.loads(toc.read_text())['items'][0],
+                         {'href': '../index.html', 'topicHref': '../index.html'})
+        check = build.PageCheck()
+        check.feed(path.read_text())
+        self.assertEqual(urljoin('https://example.org/neoCLR/docs/api/Task.html', check.links[0]),
+                         'https://example.org/neoCLR/features/tasks/index.html?one=1&two=2#await')
+        self.assertEqual(check.links[1:], ['../../index.html', '//example.com/help'])
+        build.check_reference_links()
+
+
 if __name__ == '__main__':
     unittest.main()

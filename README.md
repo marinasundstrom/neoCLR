@@ -1,7 +1,7 @@
 # neoCLR
 
 [![CI](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml)
-[![Preview 8](https://img.shields.io/badge/release-v0.1.0--preview.8-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.8)
+[![Preview 9](https://img.shields.io/badge/release-v0.1.0--preview.9-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.9)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Rust 1.85+](https://img.shields.io/badge/Rust-1.85%2B-orange)](Cargo.toml)
 
@@ -44,10 +44,10 @@ output is a temporary internal format, not that final binary representation. See
 
 The current proof of concept demonstrates collections and iteration, Result/Option
 propagation, text and numeric helpers, files, date/time, reflection introspection,
-delegates, interfaces and native buffers. Development builds also support
+delegates, interfaces and native buffers. Preview 9 also supports
 [Tasks, Promise and Raven async/await](docs/task-contracts.md), including isolated
 string workers and default callback dispatch. The [async release checkpoint](docs/async-preview-plan.md)
-is being validated as the Preview 9 candidate; these additions are not in published Preview 8. The APIs are
+is published as Preview 9. The APIs are
 experimental and open to feedback.
 
 Start with the [runtime and Raven walkthrough](docs/runtime-raven-preview.md), covering
@@ -56,12 +56,12 @@ direct neoIL execution and Raven against the same library.
 The current [MSBuild workflow](docs/raven-msbuild.md) uses familiar Raven project
 files with standalone neoCLR build assets. It provides completion and explicit
 **neoCLR: Build with MSBuild** / **neoCLR: Run (MSBuild)** tasks, including a bounded
-application-plus-library example. This is the Preview 8 workflow.
+application-plus-library example. This workflow is included in Preview 9.
 The normal Raven toolbar build/run/debug commands do not implement this target.
 See [runtime API coverage](docs/raven-runtime-api-coverage.md) for supported contracts
 and importer limits, and [the packaging procedure](docs/experiments/raven-target/RELEASING.md)
-for producing a matching experimental toolchain. Preview 8 packages these entry points together; see the
-[release notes](docs/preview-8-release-notes.md) for assets, prerequisites and limits.
+for producing a matching experimental toolchain. Preview 9 packages these entry points together; see the
+[release notes](docs/preview-9-release-notes.md) for assets, prerequisites and limits.
 
 ## Earlier Neo language experiment
 
@@ -87,14 +87,13 @@ separates unreleased work from published capabilities. Every commit updates it u
 The [next-preview validation guide](docs/next-preview-validation.md) documents the
 reproducible source-archive check and exact-commit release gates.
 
-## Preview 8
+## Preview 9
 
-**Preview 8 (v0.1.0-preview.8)** presents Raven-authored
-System.Runtime, unified Introspection and grapheme text through
-neoIL and Raven. It includes a macOS arm64 runtime bundle, experimental Raven SDK/VSIX,
+**Preview 9 (v0.1.0-preview.9)** adds Task/Promise, Raven async/await,
+composition, cancellation and isolated workers to the experimental application platform. It includes a macOS arm64 runtime bundle, experimental Raven SDK/VSIX,
 examples, source, attribution and validation evidence. Start with the
-[release notes](docs/preview-8-release-notes.md). Publication is gated on the exact
-source revision passing CI; the GitHub prerelease is the asset source of truth.
+[release notes](docs/preview-9-release-notes.md). The exact source revision passed the six Linux/macOS/Windows CI jobs.
+The GitHub prerelease contains the asset checksums and validation evidence.
 
 ## Earlier previews
 

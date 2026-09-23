@@ -1,11 +1,13 @@
 # Async preview migration review
 
-Migration draft for the prepared 0.1.0-preview.9 async/Tasks candidate, reviewed
-2026-09-23. Publication and final validation remain pending. The baseline is published `v0.1.0-preview.8`;
+Migration review for 0.1.0-preview.9, published 2026-09-23 at `834028c`.
+See [final validation](preview-9-validation.json). The baseline is published `v0.1.0-preview.8`;
 the initial review covers changes through `556fd7a`, with follow-up review through
 `0fec5e8`. The follow-up restores Rust 1.85 compatibility, corrects two stale sample
 fixtures and records future concurrency direction; it introduces no additional runtime
-API migration. Later candidate changes must be reviewed too. Published Preview 8 notes and artifacts remain unchanged.
+API migration. Final review through `834028c` adds self-contained worker sample service imports,
+package/editor evidence, documentation and the version selection, with no additional
+runtime API migration. Published Preview 8 notes and artifacts remain unchanged.
 
 ## Upgrade the toolchain as a set
 

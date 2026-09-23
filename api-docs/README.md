@@ -1,7 +1,7 @@
 # API documentation maintenance
 
 The `/docs/` section is built with pinned DocFX 2.80.1 (.NET 10). It describes the
-**development** API. The release goal is a navigable overview and useful descriptions
+**Preview 9** API. The release goal is a navigable overview and useful descriptions
 of the main async APIs, not complete documentation of every library member.
 
 ## Build the complete website
@@ -69,3 +69,10 @@ renderer would avoid the notation mismatch but add maintenance; defer it for thi
 release. Primary source: [DocFX assembly input and XML documentation](https://dotnet.github.io/docfx/docs/dotnet-api-docs.html),
 reviewed 2026-09-23. Task/.NET contract comparisons remain in the existing Task
 feature guide and design records; no runtime contract changes are made here.
+
+
+The API header uses plain neoCLR branding. Its small logo margin is supplied by
+`template/public/main.css`, using the documented
+[DocFX custom template hook](https://dotnet.github.io/docfx/docs/template.html).
+The combined site builder converts root-relative reference links, including DocFX's
+client-side navigation JSON, to page-relative links for GitHub Pages project paths.

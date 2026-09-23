@@ -113,7 +113,7 @@ language and distinguishes ordinary .NET use from the experimental neoCLR target
 Its examples reuse the checked propagation, pattern and closure samples.
 
 `try/index.html` is the reader-facing setup guide, centered on .rvnproj. It contains
-the complete Preview 7 install/build/run path and explains development availability.
+the Preview 9 install/build/run path and explains development availability.
 The project excerpt is read from the actual bundled project template. Maintain this
 page with each release rather than sending evaluators to repository instructions.
 
@@ -134,7 +134,7 @@ open without implying unestablished governance or promised APIs.
 ## API reference
 
 Run `dotnet tool restore` before the website build (.NET 10 required). The builder
-also runs DocFX and places the development API reference at `/docs/`, with the
+also runs DocFX and places the Preview 9 API reference at `/docs/`, with the
 feature guides providing the broader API overview. See
 [API documentation maintenance](../api-docs/README.md) for metadata/XML regeneration,
 the initial Task scope and the callback-signature limitation.
