@@ -68,7 +68,7 @@ Existing reference coverage gaps (not exemptions from the policy):
 
 - Arrays and collection interfaces/implementations, delegates, queries and operators.
 - Option/Result carriers, TaskOutcome and composition/propagation helpers.
-- Primitives, text/encoding, process/console, paths and whole-file helpers.
+- Primitives, text/encoding, process/console and whole-file helpers.
 - Time/calendar, introspection and public resource/interop contracts.
 
 Backfill these as each area is developed. The next Storage/Streams slice must include
@@ -112,5 +112,10 @@ System.Storage.Metadata, EntryKind and StorageLookupError are now included in Do
 selection. Their complete metadata reference and [lookup guide](storage-lookup.md)
 describe development host-path lookup. The provider GetFile members remain
 application-owned and are covered by the [sample reference](storage-experiment.md).
-No renderer exclusion is needed for these new signatures. Existing whole-file and
-Path string helpers remain tracked coverage gaps; they were not changed by this slice.
+No renderer exclusion is needed for these new signatures. Existing whole-file helpers remain a tracked coverage gap. Path coverage is described below.
+
+System.Storage.Path is now a platform class with Parse, immutable properties and
+lexical equality, alongside the existing static native string helpers. Path and
+InvalidPathError are selected for generated reference, including both legacy methods.
+The Storage sample imports this platform type rather than defining its own. Its
+provider classes remain application-owned until the next integration slices.

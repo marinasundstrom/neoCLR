@@ -1,5 +1,2 @@
-.type System.Storage.Path
-    .include "../../raven/generated/Path.methods.neoil"
-.end
-
+.include "../../raven/generated/Path.methods.neoil"
 .include "../../raven/generated/Path.helpers.neoil"

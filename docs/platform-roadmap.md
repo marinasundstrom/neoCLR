@@ -133,11 +133,15 @@ first disk read/write stream application, not a completed Storage model or async
 
 **Author clarification, 2026-09-23:** establish working stream reads and writes
 before aligning the Storage APIs, including investigating/implementing the Path
-value object. That Storage alignment has begun with an application-owned immutable Path value
+value object. That Storage alignment began with an application-owned immutable Path value
 object: static Parse returns Result<Path, InvalidPathError>, with a private
 constructor and explicit logical grammar. The disk/memory sample now passes Path
-values and maps host storage beneath a configured native root. This is exploration,
-not a new System.Storage.Path contract. The author defers broader Path operations
+values and maps host storage beneath a configured native root. That initial
+experiment is now integrated as System.Storage.Path, as described below; its grammar
+remains provisional. The author intends future parsing of Unix and Windows formats,
+normalized through the Path object; the current logical grammar is not the final
+format model. Format selection, drive/UNC roots and normalization/equality rules
+remain to be defined. The author defers broader Path operations
 and leaves string overloads on Storage APIs open. The author further clarifies
 that Path belongs to Storage rather than being imposed system-wide: other APIs may
 accept strings, with callers optionally parsing and passing Text. The native metadata
@@ -159,9 +163,19 @@ Directory now has an application-owned GetFile(Path) overload for nested relativ
 resolution, rejecting absolute inputs while retaining its provider context. The
 string overload still accepts one child name; this exploratory distinction is not
 a system-wide restriction on string APIs. Disk/memory contract checks cover both.
-Next, evaluate parent-directory existence/kind and a shared provider hierarchy/error
-contract; the flat-key memory store still cannot model those guarantees. Keep
-replacement behavior provisional before promoting the Storage surface. Preserve the tested stream operations. The
+**Future direction:** the author expects a similar structured-value versus string
+boundary for a Uri class. Evaluate its parsing and relative-reference contracts
+with networking; no Uri API is implemented or added to the immediate scope.
+
+**Author priority, 2026-09-23:** integrate the working Storage slice as soon as
+possible, rather than expanding isolated experiments first. The first integration
+moves the validated value into System.Storage.Path while preserving its native
+Combine/GetFileName string helpers; the sample now imports the platform type.
+Next, integrate the tested provider/File/Directory and stream capability contracts
+in bounded library slices, preserving existing static file helpers and keeping
+known limitations explicit. The author emphasizes a minimal Storage POC: Path-taking
+Combine/helper overloads are future direction, not required in this integration. Parent hierarchy, shared errors and replacement identity
+remain follow-ups; they are not blanket prerequisites for initial integration. Preserve the tested stream operations. The
 current application-owned File/Directory and capability interfaces remain
 exploratory; do not promote their string-address/text-helper shape unchanged merely
 because this sample works. Public stream wrappers have on-site reference coverage.

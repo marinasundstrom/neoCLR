@@ -1,7 +1,8 @@
 # Storage provider experiment
 
 **Development exploration, not a published System.Storage API.** These
-`StorageExperiment` types belong to a tested Raven sample. Their purpose is to
+`StorageExperiment` provider and stream-adapter types belong to a tested Raven sample.
+They now consume the development System.Storage.Path type from the platform library. Their purpose is to
 compare provider ownership, file descriptors and path interpretation before
 settling the platform API. They are documented here so the experimental contract
 is visible; they are not types in the core reference assembly.
@@ -211,7 +212,7 @@ with retained streams and text workflow failures.
 
 ## What remains open
 
-Storage consumes the validated Path value object described below. The author's
+Storage consumes the platform System.Storage.Path value object described below. The author's
 intended boundary is Storage-specific: other APIs can continue accepting strings.
 Callers may optionally parse a Path, then pass Text to a string-taking API. The native
 metadata and file-stream APIs accept strings. String overloads on provider APIs
@@ -240,8 +241,9 @@ and its identity rules need evaluation alongside the benefit.
 
 ## Path value object
 
-**Application-owned exploration, not a replacement for System.Storage.Path.**
+**Integrated development API: [System.Storage.Path](xref:System.Storage.Path).**
 `Path.Parse(text: string) -> Result<Path, InvalidPathError>` is the construction API.
+The former StorageExperiment.Path implementation has moved into the platform library.
 The constructor is private and the object exposes no mutation. Ok guarantees the
 logical syntax below, not existence, permissions or support by every provider.
 
@@ -253,7 +255,7 @@ logical syntax below, not existence, permissions or support by every provider.
 | `IsRelative: bool` | The inverse of IsAbsolute; resolution requires provider/directory context. |
 | `Equals(other: Path) -> bool` | Ordinal lexical equality. Different objects with identical spelling compare equal; it does not resolve paths or compare filesystem identity. Use this method, not reference equality. |
 | `ToString() -> string` | Return the validated spelling. |
-| `InvalidPathError()` | Empty error value identifying invalid logical syntax; no filesystem error is implied. |
+| `System.Storage.InvalidPathError()` | Empty error value identifying invalid logical syntax; no filesystem error is implied. |
 
 This first grammar accepts `/` as root, `.` as the current relative location, and
 slash-separated nonempty names with an optional leading slash. It rejects empty
@@ -273,8 +275,11 @@ remaining unequal Path values.
 Path is currently an immutable reference class with value comparison, avoiding a
 struct's invalid default value. That costs an allocation and does not yet supply
 value operators or a hashing/Equatable contract. Additional operations are deferred;
-Directory owns direct-child construction and calls Parse to validate its result.
-`RequirePath(text)` in the sample is a small helper for known fixture paths: it calls
+Directory owns child resolution and calls Parse to validate its result. The existing
+static Combine(string, string) and GetFileName(string) compatibility methods retain
+their native string behavior; they do not return or validate Path values.
+The downloaded Path.rvn now contains only `RequirePath(text)`, a sample fixture helper
+for known paths: it calls
 Parse and terminates with UserFault on invalid syntax. It is not a second parser.
 
 .NET's [System.IO.Path](https://learn.microsoft.com/en-us/dotnet/api/system.io.path?view=net-10.0)
@@ -283,3 +288,19 @@ is a static string API with platform-dependent rules.
 resolves native full-path spellings. This experiment separates validated logical
 syntax from provider resolution. The benefit is reuse of a checked value; costs
 include the new type, narrower grammar and explicit parsing at call sites.
+
+
+### Future path formats
+
+The author intends Path.Parse to support Unix and Windows formats and normalize
+accepted paths through the value object. This is future work: the current parser
+still accepts only the documented logical slash grammar and preserves its spelling.
+Format selection, Windows drive/UNC roots, separator and dot-segment handling, and
+normalization/equality rules need an explicit contract. No overload spelling or
+automatic host-format detection has been selected. Normalization will remain distinct
+from filesystem existence, permissions, symlink resolution and item identity.
+
+
+Path-taking overloads of Combine and related helpers are also a future direction.
+For now these helpers keep their string contracts; no new overload signature is
+selected. The immediate goal is a minimal integrated Storage read/write/lookup POC.

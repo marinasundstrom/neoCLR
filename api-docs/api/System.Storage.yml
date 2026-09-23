@@ -7,7 +7,9 @@ items:
   - System.Storage.EntryKind
   - System.Storage.EntryKind.Directory
   - System.Storage.EntryKind.File
+  - System.Storage.InvalidPathError
   - System.Storage.Metadata
+  - System.Storage.Path
   - System.Storage.StorageLookupError
   - System.Storage.StorageLookupError.AccessDenied
   - System.Storage.StorageLookupError.InvalidPath
@@ -24,6 +26,14 @@ items:
   assemblies:
   - NeoCLR.CoreProbe
 references:
+- uid: System.Storage.Path
+  commentId: T:System.Storage.Path
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.Path.html
+  name: Path
+  nameWithType: Path
+  fullName: System.Storage.Path
 - uid: System.Storage.Metadata
   commentId: T:System.Storage.Metadata
   isExternal: true
@@ -31,6 +41,13 @@ references:
   name: Metadata
   nameWithType: Metadata
   fullName: System.Storage.Metadata
+- uid: System.Storage.InvalidPathError
+  commentId: T:System.Storage.InvalidPathError
+  isExternal: true
+  href: System.Storage.InvalidPathError.html
+  name: InvalidPathError
+  nameWithType: InvalidPathError
+  fullName: System.Storage.InvalidPathError
 - uid: System.Storage.EntryKind
   commentId: T:System.Storage.EntryKind
   isExternal: true

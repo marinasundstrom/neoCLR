@@ -727,3 +727,19 @@ Raven compiler, Runtime Contract configuration or emission-policy change. The no
 Storage provider SDK sample and LookupContracts exercise reference import and execution.
 Metadata takes a native string; application-owned provider GetFile consumes its
 validated logical Path. These are development additions after Preview 9.
+
+
+### Integrated Path reference contract
+
+System.Storage.Path is now a sealed reference type with private construction,
+Parse returning Result<Path, InvalidPathError>, read-only properties and nonvirtual
+Equals/ToString methods. Existing static Combine/GetFileName string signatures
+remain. The catalog recognizes Path instance calls, including Raven-emitted
+callvirt for nonvirtual reference members, and emits the existing runtime instance
+call mechanism. The bootstrap owner preserves both static and instance methods.
+RavenMetadataCoreAssemblyName/RavenTargetCoreAssemblyName remain NeoCLR.CoreProbe;
+no Runtime Contract setting, compiler semantic rule or Raven emission change is
+introduced. Ordinary overload resolution and metadata access checks now see the
+platform type rather than the sample-local one. Use matching regenerated core and
+runtime artifacts. The companion integration note is on Raven's isolated feature
+branch in docs/compiler/runtime-contracts.md; no experiment is merged into Raven main.

@@ -1,6 +1,7 @@
 namespace StorageExperiment
 
 import System.*
+import System.Storage.Path
 import System.Console.*
 import System.Result.*
 

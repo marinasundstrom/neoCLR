@@ -1,6 +1,6 @@
 # Provider-bound File and Directory exploration
 
-**Development experiment, 2026-09-23. Application-owned Storage/capability types using development System.Streams APIs.**
+**Development experiment, 2026-09-23. Application-owned providers/capabilities using integrated System.Storage.Path and System.Streams APIs.**
 The same Raven `RoundTrip(Directory)` workflow writes and reads a real UTF-8 file
 and then runs against a bounded memory provider. The application sees File and
 Directory objects; each retains the provider that interprets its address.
@@ -302,3 +302,29 @@ Validation on 2026-09-23: the SDK product sample and stream, Path, coherent-memo
 lookup and relative-directory contracts passed on macOS arm64. The independent
 .NET/Rust comparison, API snapshot, combined website and four website tooling tests
 also passed. Core API metadata and runtime implementations did not change.
+
+
+## Integration begins with System.Storage.Path (2026-09-23)
+
+Following the author's request to integrate as soon as possible, Path and
+InvalidPathError now live in the platform library. The sample imports
+System.Storage.Path; its Path.rvn is only a fixture helper. The previously tested
+parser, immutable text and explicit lexical comparison are retained. Existing native
+Combine/GetFileName helpers keep their string signatures on the same type. This
+backfills generated reference coverage for those helpers as well as the new members.
+The ordinary SDK sample, negative constructor/mutation checks and archived lexical
+path artifact test exercise the integration, not a copied application-local parser.
+
+The next priority is integrating the working provider/File/Directory and stream
+capability contracts. An expanded memory hierarchy was proposed but not implemented
+in this turn; it is not a prerequisite for these initial integration slices. Existing
+experimental limitations remain documented. No core/static File API is removed.
+
+Integration validation on 2026-09-23: library regeneration and snapshot checks,
+normal SDK product/stream/Path/memory/lookup/relative-directory cases, and the
+existing lexical path artifact/service test passed. Imported private construction
+is rejected with RAV1501 (no accessible matching constructor), while Text assignment
+is rejected as read-only; targeted negative builds passed after updating the prior
+application-local diagnostic expectation. API summaries cover 142 generated items;
+the combined website and four tooling tests passed. Provider integration remains
+next; Unix/Windows normalization and a future Uri value are recorded directions.

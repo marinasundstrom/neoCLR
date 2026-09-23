@@ -22,7 +22,6 @@
     <Compile Include="src/System/Linq/Operators.rvn" />
     <Compile Include="src/System/OptionOperators.rvn" />
     <Compile Include="src/System/ResultOperators.rvn" />
-    <Compile Include="src/System/Storage/Path/Functions.rvn" />
     <Compile Include="src/System/Storage/File/Functions.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Clock'">
@@ -265,5 +264,11 @@
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StorageMetadata'">
     <Compile Include="src/System/Storage/Metadata.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Path'">
+    <Compile Include="src/System/Storage/Path.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InvalidPathError'">
+    <Compile Include="src/System/Storage/InvalidPathError.rvn" />
   </ItemGroup>
 </Project>

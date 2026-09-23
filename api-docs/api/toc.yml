@@ -23,8 +23,14 @@ items:
   - uid: System.Storage.EntryKind.File
     name: EntryKind.File
     type: Struct
+  - uid: System.Storage.InvalidPathError
+    name: InvalidPathError
+    type: Struct
   - uid: System.Storage.Metadata
     name: Metadata
+    type: Class
+  - uid: System.Storage.Path
+    name: Path
     type: Class
   - uid: System.Storage.StorageLookupError
     name: StorageLookupError

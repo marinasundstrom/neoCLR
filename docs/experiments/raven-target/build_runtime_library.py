@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    "InvalidPathError": "System.Storage.InvalidPathError",
     "EntryKind": "System.Storage.EntryKind",
     "StorageLookupError": "System.Storage.StorageLookupError",
     "StorageMetadata": "System.Storage.Metadata",
@@ -107,6 +108,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    "InvalidPathError": "runtime/raven/src/System/Storage/InvalidPathError.rvn",
     "EntryKind": "runtime/raven/src/System/Storage/EntryKind.rvn",
     "StorageLookupError": "runtime/raven/src/System/Storage/StorageLookupError.rvn",
     "StorageMetadata": "runtime/raven/src/System/Storage/Metadata.rvn",
@@ -190,7 +192,7 @@ SOURCES = {
     'HashMap': 'runtime/raven/src/System/Collections/HashMap.rvn',
     'Time': 'runtime/raven/src/System/Time.rvn',
     'Date': 'runtime/raven/src/System/Date.rvn',
-    'Path': 'runtime/raven/src/System/Storage/Path/Functions.rvn',
+    'Path': 'runtime/raven/src/System/Storage/Path.rvn',
     'File': 'runtime/raven/src/System/Storage/File/Functions.rvn',
     'Int64': 'runtime/raven/src/System/Int64.rvn',
     'SByte': 'runtime/raven/src/System/SByte.rvn',
@@ -322,7 +324,7 @@ def main():
         generated = {}
         for name, owner in SLICES.items():
             compiled = root / 'compiled'
-            if name not in ('Math', 'Linq', 'OptionOperators', 'OptionNestedOperators', 'ResultOperators', 'Path', 'File'):
+            if name not in ('Math', 'Linq', 'OptionOperators', 'OptionNestedOperators', 'ResultOperators', 'File'):
                 compiled = root / ('compiled-' + name)
                 subprocess.run(['dotnet', str(args.compiler.resolve()), str(PROJECT), '--no-project-restore',
                                 '-o', str(compiled)], env={**os.environ, 'NeoCLRBootstrapRoot': str(root),

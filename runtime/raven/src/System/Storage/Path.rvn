@@ -1,0 +1,59 @@
+namespace System.Storage
+
+import System.*
+import System.Result.*
+import System.Runtime.CompilerServices.RuntimeServices
+
+public class Path {
+    static func Combine(value0: string, value1: string) -> string {
+        return RuntimeServices.PathCombine(value0, value1)
+    }
+
+    static func GetFileName(value0: string) -> string {
+        return RuntimeServices.PathGetFileName(value0)
+    }
+
+    private field text: string
+
+    private init(text: string) {
+        self.text = text
+    }
+
+    val Text: string => text
+    val IsAbsolute: bool => text.StartsWithOrdinal("/")
+    val IsRelative: bool => !IsAbsolute
+
+    static func Parse(text: string) -> Result<Path, InvalidPathError> {
+        if text.IsEmpty || text.ContainsOrdinal("\u0000") {
+            return Error(InvalidPathError())
+        }
+        // This first logical grammar deliberately excludes native drive/UNC syntax.
+        if text.ContainsOrdinal("\\") || text.ContainsOrdinal(":") {
+            return Error(InvalidPathError())
+        }
+        if text == "." || text == "/" {
+            return Ok(Path(text))
+        }
+        if text.ContainsOrdinal("//") || text.EndsWithOrdinal("/") {
+            return Error(InvalidPathError())
+        }
+        if text == ".." || text.StartsWithOrdinal("./") || text.StartsWithOrdinal("../") {
+            return Error(InvalidPathError())
+        }
+        if text.ContainsOrdinal("/./") || text.ContainsOrdinal("/../") {
+            return Error(InvalidPathError())
+        }
+        if text.EndsWithOrdinal("/.") || text.EndsWithOrdinal("/..") {
+            return Error(InvalidPathError())
+        }
+        return Ok(Path(text))
+    }
+
+    func Equals(other: Path) -> bool {
+        return text.Equals(other.Text)
+    }
+
+    func ToString() -> string {
+        return text
+    }
+}

@@ -1,1 +1,90 @@
-; Generated from runtime/raven/src/System/Storage/Path/Functions.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Storage/Path.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Storage.Path.RuntimeStringEquals(String source,String value0) -> Boolean
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::Equals(String)
+ret
+.end
+.function neoCLR.Library.System.Storage.Path.RuntimeStringContainsOrdinal(String source,String value0) -> Boolean
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::ContainsOrdinal(String)
+ret
+.end
+.function neoCLR.Library.System.Storage.Path.RuntimeStringStartsWithOrdinal(String source,String value0) -> Boolean
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::StartsWithOrdinal(String)
+ret
+.end
+.function neoCLR.Library.System.Storage.Path.RuntimeStringEndsWithOrdinal(String source,String value0) -> Boolean
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::EndsWithOrdinal(String)
+ret
+.end
+.function neoCLR.Library.System.Storage.Path.RuntimeStringget_IsEmpty(String source) -> Boolean
+ldarg source
+call instance System.String::get_IsEmpty()
+ret
+.end
+.function neoCLR.Library.System.Storage.Path.RuntimeErrorSystemStorageInvalidPathErrorNew() -> System.Storage.InvalidPathError
+newobj instance System.Storage.InvalidPathError::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Storage.Path.RuntimeUnion0(System.Storage.InvalidPathError arg0) -> System.Result.Error<System.Storage.InvalidPathError>
+ldarg arg0
+newobj instance System.Result.Error<System.Storage.InvalidPathError>::.ctor(System.Storage.InvalidPathError)
+ret
+.end
+.function neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Error<System.Storage.InvalidPathError> arg0) -> System.Result<System.Storage.Path,System.Storage.InvalidPathError>
+ldarg arg0
+newobj instance System.Result<System.Storage.Path,System.Storage.InvalidPathError>::.ctor(System.Result.Error<System.Storage.InvalidPathError>)
+ret
+.end
+.function neoCLR.Library.System.Storage.Path.RuntimeUnion2(System.Storage.Path arg0) -> System.Result.Ok<System.Storage.Path>
+ldarg arg0
+newobj instance System.Result.Ok<System.Storage.Path>::.ctor(System.Storage.Path)
+ret
+.end
+.function neoCLR.Library.System.Storage.Path.RuntimeUnion3(System.Result.Ok<System.Storage.Path> arg0) -> System.Result<System.Storage.Path,System.Storage.InvalidPathError>
+ldarg arg0
+newobj instance System.Result<System.Storage.Path,System.Storage.InvalidPathError>::.ctor(System.Result.Ok<System.Storage.Path>)
+ret
+.end
+.function neoCLR.Library.System.Storage.Path.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

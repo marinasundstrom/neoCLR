@@ -45,7 +45,7 @@ static class GenericUnionBindings
         if (type.FullName == "System.Tasks.TaskOutcome/Cancelled" && type.IsValueType && RuntimeSignatures.IsCore(type.Scope)) return Register("Tasks.TaskOutcome.Cancelled");
         if (type.FullName == "System.Value" && type.IsValueType && RuntimeSignatures.IsCore(type.Scope)) return "Value";
         if (type.FullName == "System.Void" && type.IsValueType && RuntimeSignatures.IsCore(type.Scope)) return "Void";
-        return EnumBindings.Type(type) ?? ApplicationTypes.Type(type) ?? StreamBindings.Type(type) ?? WorkerBindings.Type(type) ?? TaskBindings.Type(type) ?? AsyncBindings.Type(type) ?? ReflectionBindings.Type(type) ?? CollectionBindings.Type(type) ?? InterfaceBindings.Type(type) ?? DelegateBindings.Type(type) ?? NativeMemoryBindings.Type(type) ?? ManagedArrayBindings.Type(type) ?? CalendarBindings.Type(type) ?? ErrorBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? type.MetadataType switch {
+        return EnumBindings.Type(type) ?? ApplicationTypes.Type(type) ?? PathBindings.Type(type) ?? StreamBindings.Type(type) ?? WorkerBindings.Type(type) ?? TaskBindings.Type(type) ?? AsyncBindings.Type(type) ?? ReflectionBindings.Type(type) ?? CollectionBindings.Type(type) ?? InterfaceBindings.Type(type) ?? DelegateBindings.Type(type) ?? NativeMemoryBindings.Type(type) ?? ManagedArrayBindings.Type(type) ?? CalendarBindings.Type(type) ?? ErrorBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? type.MetadataType switch {
             MetadataType.Int32 => "Int32", MetadataType.Double => "Double", MetadataType.Boolean => "Boolean", MetadataType.String => "String", _ => null
         };
     }

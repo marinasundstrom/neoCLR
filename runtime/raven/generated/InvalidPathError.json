@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.Collections.List",
+  "owner": "System.Storage.InvalidPathError",
   "inputs": {
     "runtime/raven/src/System/Storage/InvalidPathError.rvn": "9545d4b15c35a592037178548ce68694ce5e82fccc14b8d3c1f5a50a34ec5c6b",
     "runtime/raven/src/System/Storage/EntryKind.rvn": "d281c32a35b2898eacdbb48af928a9b633f46719740eaf42c5de1907a79ee764",
@@ -96,12 +96,13 @@
     "build/NeoCLR.Raven.props": "b7d01e1d6b23228bb784dafcda4cf7c777b554b11f093cc3daf2509bb7402ee0"
   },
   "outputs": {
-    "List.methods.neoil": "eeed0cfa971fff5c352bd965d416d17abe83e076779c3d4953251dd89cb9840c",
-    "List.helpers.neoil": "40f935ef9b61d2a1f9c154687c83785e0a5c8ce41ab29f32a9eec4d2e3c3c2a7"
+    "InvalidPathError.methods.neoil": "c383e8c4e5fbed4c518515e64ef4ff399189001d823f0a592fba5fde17f55214",
+    "InvalidPathError.helpers.neoil": "132529db7cca00027cd40fcdb4fe702eb047e77ba4505c6efca6b953f67eb490"
   },
   "compilerSha256": "a21ff0939cef995e7ae6cd714369622658098222036d95a1309151213f597467",
   "coreSha256": "b1e3a7d44e9377b8b6ea14e20d6b94d829c972e73c311b97d52ee54238cd9803",
   "exports": [
-    "Add(T0 value) -> noresult"
+    "ToString() -> String",
+    ".ctor() -> Void"
   ]
 }

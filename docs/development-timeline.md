@@ -5348,3 +5348,56 @@ and recorded the convention for runtime code as well as examples.
   experiment. Updated the roadmap and on-site reference with this boundary.
 - **Open:** exact grammar, convenience overloads within Storage, provider identity,
   directory resolution and asynchronous lookup remain under exploration.
+
+
+### 2026-09-23 — Prioritize integrating the working Storage slice
+
+- **Author:** directed, “We want to integrate this as soon as possible”.
+- **Assistant:** interpreted this as integrating the working Storage APIs into the
+  platform library, with the disk/memory program becoming a consumer rather than
+  continuing to expand an isolated experiment. Deferred the newly proposed memory
+  hierarchy slice in favor of integration.
+- **Action:** moved the tested Path implementation into System.Storage.Path,
+  preserving static Combine/GetFileName string helpers. Changed the sample to import
+  the platform value and added generated member reference coverage. No Raven
+  compiler or Runtime Contract policy changes are needed; the existing reference
+  catalog and library authoring mechanism are extended.
+- **Remaining:** provider/File/Directory and stream capability integration follow in
+  bounded slices. Current hierarchy and replacement limitations stay explicit;
+  this does not select a final API or require every remaining question to be settled.
+
+
+### 2026-09-23 — A future Uri value can follow the same boundary
+
+- **Author:** said a similar situation will arise with a future Uri class.
+- **Assistant:** agreed that a structured validated value can be useful without
+  forcing every URI-taking API to require it. Parsing, relative references and
+  URI-specific operations should be evaluated near networking work.
+- **Action:** recorded this as a future design comparison, not an implemented Uri
+  API or a reprioritization away from current Storage integration.
+
+
+### 2026-09-23 — Future Unix and Windows Path parsing
+
+- **Author:** directed that the future parser accept Unix and Windows formats and
+  normalize them through the Path object.
+- **Assistant:** recorded this as the target direction rather than treating today's
+  narrow slash grammar as final. Identified format selection, drive/UNC roots,
+  separator handling and equality under normalization as contracts to define.
+- **Action:** updated the roadmap and on-site Path direction. No new parsing format
+  or normalization behavior was implemented in this integration slice. Existing
+  Parse preserves accepted spelling; native string helpers retain host rules.
+- **Open:** no format-selector signature or automatic host-format detection was
+  selected. Normalization is not filesystem lookup, authority or stable identity.
+
+
+### 2026-09-23 — Keep Path helper expansion outside the minimal Storage POC
+
+- **Author:** suggested future Combine and other Path helper overloads that accept
+  Path objects, while explicitly asking to keep the current work minimal. Identified
+  the Storage API POC as the goal.
+- **Assistant:** retained the current string helpers and recorded Path overloads as
+  direction only. Kept this integration focused on the existing validated value and
+  working read/write/lookup consumer, not additional formats, helpers or Uri APIs.
+- **Remaining:** integrate the existing provider surface in bounded slices; no
+  overload signature or normalization behavior was selected by this exchange.

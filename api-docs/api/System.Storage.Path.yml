@@ -1,0 +1,455 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.Path
+  commentId: T:System.Storage.Path
+  id: Path
+  parent: System.Storage
+  children:
+  - System.Storage.Path.Combine(System.String,System.String)
+  - System.Storage.Path.Equals(System.Storage.Path)
+  - System.Storage.Path.GetFileName(System.String)
+  - System.Storage.Path.IsAbsolute
+  - System.Storage.Path.IsRelative
+  - System.Storage.Path.Parse(System.String)
+  - System.Storage.Path.Text
+  - System.Storage.Path.ToString
+  langs:
+  - csharp
+  - vb
+  name: Path
+  nameWithType: Path
+  fullName: System.Storage.Path
+  type: Class
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: An immutable validated logical Storage path, with existing native string helpers.
+  remarks: Development after Preview 9. Parse checks logical syntax, not existence, authority or native filename validity. Other APIs can still accept strings. See the Path guide for grammar and the distinction between provider paths and native paths.
+  example: []
+  syntax:
+    content: public sealed class Path
+    content.vb: Public NotInheritable Class Path
+  inheritance:
+  - System.Object
+- uid: System.Storage.Path.Combine(System.String,System.String)
+  commentId: M:System.Storage.Path.Combine(System.String,System.String)
+  id: Combine(System.String,System.String)
+  parent: System.Storage.Path
+  langs:
+  - csharp
+  - vb
+  name: Combine(string, string)
+  nameWithType: Path.Combine(string, string)
+  fullName: System.Storage.Path.Combine(string, string)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Combines native host path strings using the existing lexical helper.
+  remarks: This compatibility helper does not construct or validate a Path value. Host path rules apply; it is not a provider resolver.
+  example: []
+  syntax:
+    content: public static string Combine(string value0, string value1)
+    parameters:
+    - id: value0
+      type: System.String
+      description: The first native path component.
+    - id: value1
+      type: System.String
+      description: The second native path component.
+    return:
+      type: System.String
+      description: A combined native path string.
+    content.vb: Public Shared Function Combine(value0 As String, value1 As String) As String
+  overload: System.Storage.Path.Combine*
+  nameWithType.vb: Path.Combine(String, String)
+  fullName.vb: System.Storage.Path.Combine(String, String)
+  name.vb: Combine(String, String)
+- uid: System.Storage.Path.GetFileName(System.String)
+  commentId: M:System.Storage.Path.GetFileName(System.String)
+  id: GetFileName(System.String)
+  parent: System.Storage.Path
+  langs:
+  - csharp
+  - vb
+  name: GetFileName(string)
+  nameWithType: Path.GetFileName(string)
+  fullName: System.Storage.Path.GetFileName(string)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Extracts the final component using the existing native path helper.
+  remarks: This compatibility helper neither validates a Path value nor queries storage.
+  example: []
+  syntax:
+    content: public static string GetFileName(string value0)
+    parameters:
+    - id: value0
+      type: System.String
+      description: A native path string.
+    return:
+      type: System.String
+      description: The native final component, or an empty string when none is available.
+    content.vb: Public Shared Function GetFileName(value0 As String) As String
+  overload: System.Storage.Path.GetFileName*
+  nameWithType.vb: Path.GetFileName(String)
+  fullName.vb: System.Storage.Path.GetFileName(String)
+  name.vb: GetFileName(String)
+- uid: System.Storage.Path.Parse(System.String)
+  commentId: M:System.Storage.Path.Parse(System.String)
+  id: Parse(System.String)
+  parent: System.Storage.Path
+  langs:
+  - csharp
+  - vb
+  name: Parse(string)
+  nameWithType: Path.Parse(string)
+  fullName: System.Storage.Path.Parse(string)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Validates a logical path without performing I/O.
+  remarks: Accepts slash-separated names, optional leading slash, standalone / and .; rejects empty input, NUL, backslash, colon, doubled/trailing separators and dot/parent segments. Preserves accepted spelling.
+  example: []
+  syntax:
+    content: public static Result<Path, InvalidPathError> Parse(string text)
+    parameters:
+    - id: text
+      type: System.String
+      description: The logical path spelling to validate.
+    return:
+      type: System.Result{System.Storage.Path,System.Storage.InvalidPathError}
+      description: Ok with an immutable Path, or Error with InvalidPathError.
+    content.vb: Public Shared Function Parse(text As String) As Result(Of Path, InvalidPathError)
+  overload: System.Storage.Path.Parse*
+  nameWithType.vb: Path.Parse(String)
+  fullName.vb: System.Storage.Path.Parse(String)
+  name.vb: Parse(String)
+- uid: System.Storage.Path.Equals(System.Storage.Path)
+  commentId: M:System.Storage.Path.Equals(System.Storage.Path)
+  id: Equals(System.Storage.Path)
+  parent: System.Storage.Path
+  langs:
+  - csharp
+  - vb
+  name: Equals(Path)
+  nameWithType: Path.Equals(Path)
+  fullName: System.Storage.Path.Equals(System.Storage.Path)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Compares accepted spellings using ordinal equality.
+  remarks: Does not resolve a provider or compare filesystem identity. Use this method explicitly; reference equality and hashing are not value contracts.
+  example: []
+  syntax:
+    content: public bool Equals(Path other)
+    parameters:
+    - id: other
+      type: System.Storage.Path
+      description: The other validated logical path.
+    return:
+      type: System.Boolean
+      description: True when the spellings are identical.
+    content.vb: Public Function Equals(other As Path) As Boolean
+  overload: System.Storage.Path.Equals*
+- uid: System.Storage.Path.ToString
+  commentId: M:System.Storage.Path.ToString
+  id: ToString
+  parent: System.Storage.Path
+  langs:
+  - csharp
+  - vb
+  name: ToString()
+  nameWithType: Path.ToString()
+  fullName: System.Storage.Path.ToString()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Returns the accepted logical spelling.
+  example: []
+  syntax:
+    content: public string ToString()
+    return:
+      type: System.String
+      description: The same string as Text.
+    content.vb: Public Function ToString() As String
+  overload: System.Storage.Path.ToString*
+- uid: System.Storage.Path.Text
+  commentId: P:System.Storage.Path.Text
+  id: Text
+  parent: System.Storage.Path
+  langs:
+  - csharp
+  - vb
+  name: Text
+  nameWithType: Path.Text
+  fullName: System.Storage.Path.Text
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Gets the accepted spelling unchanged.
+  example: []
+  syntax:
+    content: public string Text { get; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public ReadOnly Property Text As String
+  overload: System.Storage.Path.Text*
+- uid: System.Storage.Path.IsAbsolute
+  commentId: P:System.Storage.Path.IsAbsolute
+  id: IsAbsolute
+  parent: System.Storage.Path
+  langs:
+  - csharp
+  - vb
+  name: IsAbsolute
+  nameWithType: Path.IsAbsolute
+  fullName: System.Storage.Path.IsAbsolute
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Gets whether the logical path starts with /.
+  remarks: Absolute means rooted within a provider namespace, not necessarily the host filesystem.
+  example: []
+  syntax:
+    content: public bool IsAbsolute { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public ReadOnly Property IsAbsolute As Boolean
+  overload: System.Storage.Path.IsAbsolute*
+- uid: System.Storage.Path.IsRelative
+  commentId: P:System.Storage.Path.IsRelative
+  id: IsRelative
+  parent: System.Storage.Path
+  langs:
+  - csharp
+  - vb
+  name: IsRelative
+  nameWithType: Path.IsRelative
+  fullName: System.Storage.Path.IsRelative
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Gets whether this is a relative logical path.
+  example: []
+  syntax:
+    content: public bool IsRelative { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public ReadOnly Property IsRelative As Boolean
+  overload: System.Storage.Path.IsRelative*
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Storage.Path.Combine*
+  commentId: Overload:System.Storage.Path.Combine
+  isExternal: true
+  href: System.Storage.Path.html#System_Storage_Path_Combine_System_String_System_String_
+  name: Combine
+  nameWithType: Path.Combine
+  fullName: System.Storage.Path.Combine
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System.Storage.Path.GetFileName*
+  commentId: Overload:System.Storage.Path.GetFileName
+  isExternal: true
+  href: System.Storage.Path.html#System_Storage_Path_GetFileName_System_String_
+  name: GetFileName
+  nameWithType: Path.GetFileName
+  fullName: System.Storage.Path.GetFileName
+- uid: System.Storage.Path.Parse*
+  commentId: Overload:System.Storage.Path.Parse
+  isExternal: true
+  href: System.Storage.Path.html#System_Storage_Path_Parse_System_String_
+  name: Parse
+  nameWithType: Path.Parse
+  fullName: System.Storage.Path.Parse
+- uid: System.Result{System.Storage.Path,System.Storage.InvalidPathError}
+  commentId: T:System.Result{System.Storage.Path,System.Storage.InvalidPathError}
+  parent: System
+  definition: System.Result`2
+  href: System.Storage.Path.html
+  name: Result<Path, InvalidPathError>
+  nameWithType: Result<Path, InvalidPathError>
+  fullName: System.Result<System.Storage.Path, System.Storage.InvalidPathError>
+  nameWithType.vb: Result(Of Path, InvalidPathError)
+  fullName.vb: System.Result(Of System.Storage.Path, System.Storage.InvalidPathError)
+  name.vb: Result(Of Path, InvalidPathError)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - uid: System.Storage.Path
+    name: Path
+    isExternal: true
+    href: System.Storage.Path.html
+  - name: ','
+  - name: " "
+  - uid: System.Storage.InvalidPathError
+    name: InvalidPathError
+    isExternal: true
+    href: System.Storage.InvalidPathError.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Storage.Path
+    name: Path
+    isExternal: true
+    href: System.Storage.Path.html
+  - name: ','
+  - name: " "
+  - uid: System.Storage.InvalidPathError
+    name: InvalidPathError
+    isExternal: true
+    href: System.Storage.InvalidPathError.html
+  - name: )
+- uid: System.Result`2
+  commentId: T:System.Result`2
+  isExternal: true
+  name: Result<T, E>
+  nameWithType: Result<T, E>
+  fullName: System.Result<T, E>
+  nameWithType.vb: Result(Of T, E)
+  fullName.vb: System.Result(Of T, E)
+  name.vb: Result(Of T, E)
+  spec.csharp:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: <
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: '>'
+  spec.vb:
+  - uid: System.Result`2
+    name: Result
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - name: E
+  - name: )
+- uid: System.Storage.Path.Equals*
+  commentId: Overload:System.Storage.Path.Equals
+  isExternal: true
+  href: System.Storage.Path.html#System_Storage_Path_Equals_System_Storage_Path_
+  name: Equals
+  nameWithType: Path.Equals
+  fullName: System.Storage.Path.Equals
+- uid: System.Storage.Path
+  commentId: T:System.Storage.Path
+  parent: System.Storage
+  isExternal: true
+  href: System.Storage.Path.html
+  name: Path
+  nameWithType: Path
+  fullName: System.Storage.Path
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System.Storage.Path.ToString*
+  commentId: Overload:System.Storage.Path.ToString
+  isExternal: true
+  href: System.Storage.Path.html#System_Storage_Path_ToString
+  name: ToString
+  nameWithType: Path.ToString
+  fullName: System.Storage.Path.ToString
+- uid: System.Storage.Path.Text*
+  commentId: Overload:System.Storage.Path.Text
+  isExternal: true
+  href: System.Storage.Path.html#System_Storage_Path_Text
+  name: Text
+  nameWithType: Path.Text
+  fullName: System.Storage.Path.Text
+- uid: System.Storage.Path.IsAbsolute*
+  commentId: Overload:System.Storage.Path.IsAbsolute
+  isExternal: true
+  href: System.Storage.Path.html#System_Storage_Path_IsAbsolute
+  name: IsAbsolute
+  nameWithType: Path.IsAbsolute
+  fullName: System.Storage.Path.IsAbsolute
+- uid: System.Storage.Path.IsRelative*
+  commentId: Overload:System.Storage.Path.IsRelative
+  isExternal: true
+  href: System.Storage.Path.html#System_Storage_Path_IsRelative
+  name: IsRelative
+  nameWithType: Path.IsRelative
+  fullName: System.Storage.Path.IsRelative

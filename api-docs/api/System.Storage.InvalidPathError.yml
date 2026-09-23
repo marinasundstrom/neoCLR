@@ -1,0 +1,133 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Storage.InvalidPathError
+  commentId: T:System.Storage.InvalidPathError
+  id: InvalidPathError
+  parent: System.Storage
+  children:
+  - System.Storage.InvalidPathError.#ctor
+  - System.Storage.InvalidPathError.ToString
+  langs:
+  - csharp
+  - vb
+  name: InvalidPathError
+  nameWithType: InvalidPathError
+  fullName: System.Storage.InvalidPathError
+  type: Struct
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: A logical path spelling failed Parse validation.
+  remarks: No filesystem operation or lookup failure is implied.
+  example: []
+  syntax:
+    content: public struct InvalidPathError
+    content.vb: Public Structure InvalidPathError
+- uid: System.Storage.InvalidPathError.ToString
+  commentId: M:System.Storage.InvalidPathError.ToString
+  id: ToString
+  parent: System.Storage.InvalidPathError
+  langs:
+  - csharp
+  - vb
+  name: ToString()
+  nameWithType: InvalidPathError.ToString()
+  fullName: System.Storage.InvalidPathError.ToString()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Returns InvalidPath for display.
+  example: []
+  syntax:
+    content: public string ToString()
+    return:
+      type: System.String
+      description: The string InvalidPath.
+    content.vb: Public Function ToString() As String
+  overload: System.Storage.InvalidPathError.ToString*
+- uid: System.Storage.InvalidPathError.#ctor
+  commentId: M:System.Storage.InvalidPathError.#ctor
+  id: '#ctor'
+  parent: System.Storage.InvalidPathError
+  langs:
+  - csharp
+  - vb
+  name: InvalidPathError()
+  nameWithType: InvalidPathError.InvalidPathError()
+  fullName: System.Storage.InvalidPathError.InvalidPathError()
+  type: Constructor
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Constructs the invalid-path error value.
+  example: []
+  syntax:
+    content: public InvalidPathError()
+    content.vb: Public Sub New()
+  overload: System.Storage.InvalidPathError.#ctor*
+  nameWithType.vb: InvalidPathError.New()
+  fullName.vb: System.Storage.InvalidPathError.New()
+  name.vb: New()
+references:
+- uid: System.Storage
+  commentId: N:System.Storage
+  isExternal: true
+  href: System.html
+  name: System.Storage
+  nameWithType: System.Storage
+  fullName: System.Storage
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Storage
+    name: Storage
+    isExternal: true
+    href: System.Storage.html
+- uid: System.Storage.InvalidPathError.ToString*
+  commentId: Overload:System.Storage.InvalidPathError.ToString
+  isExternal: true
+  href: System.Storage.InvalidPathError.html#System_Storage_InvalidPathError_ToString
+  name: ToString
+  nameWithType: InvalidPathError.ToString
+  fullName: System.Storage.InvalidPathError.ToString
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Storage.InvalidPathError.#ctor*
+  commentId: Overload:System.Storage.InvalidPathError.#ctor
+  isExternal: true
+  href: System.Storage.InvalidPathError.html#System_Storage_InvalidPathError__ctor
+  name: InvalidPathError
+  nameWithType: InvalidPathError.InvalidPathError
+  fullName: System.Storage.InvalidPathError.InvalidPathError
+  nameWithType.vb: InvalidPathError.New
+  fullName.vb: System.Storage.InvalidPathError.New
+  name.vb: New

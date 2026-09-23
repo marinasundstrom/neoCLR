@@ -540,5 +540,59 @@
       <remarks>Requires the matching case; a mismatch is a runtime fault.</remarks>
       <returns>The held case value.</returns>
     </member>
+    <member name="T:System.Storage.Path">
+      <summary>An immutable validated logical Storage path, with existing native string helpers.</summary>
+      <remarks>Development after Preview 9. Parse checks logical syntax, not existence, authority or native filename validity. Other APIs can still accept strings. See the Path guide for grammar and the distinction between provider paths and native paths.</remarks>
+    </member>
+    <member name="M:System.Storage.Path.Parse(System.String)">
+      <summary>Validates a logical path without performing I/O.</summary>
+      <remarks>Accepts slash-separated names, optional leading slash, standalone / and .; rejects empty input, NUL, backslash, colon, doubled/trailing separators and dot/parent segments. Preserves accepted spelling.</remarks>
+      <param name="text">The logical path spelling to validate.</param>
+      <returns>Ok with an immutable Path, or Error with InvalidPathError.</returns>
+    </member>
+    <member name="P:System.Storage.Path.Text">
+      <summary>Gets the accepted spelling unchanged.</summary>
+    </member>
+    <member name="P:System.Storage.Path.IsAbsolute">
+      <summary>Gets whether the logical path starts with /.</summary>
+      <remarks>Absolute means rooted within a provider namespace, not necessarily the host filesystem.</remarks>
+    </member>
+    <member name="P:System.Storage.Path.IsRelative">
+      <summary>Gets whether this is a relative logical path.</summary>
+    </member>
+    <member name="M:System.Storage.Path.Equals(System.Storage.Path)">
+      <summary>Compares accepted spellings using ordinal equality.</summary>
+      <remarks>Does not resolve a provider or compare filesystem identity. Use this method explicitly; reference equality and hashing are not value contracts.</remarks>
+      <param name="other">The other validated logical path.</param>
+      <returns>True when the spellings are identical.</returns>
+    </member>
+    <member name="M:System.Storage.Path.ToString">
+      <summary>Returns the accepted logical spelling.</summary>
+      <returns>The same string as Text.</returns>
+    </member>
+    <member name="M:System.Storage.Path.Combine(System.String,System.String)">
+      <summary>Combines native host path strings using the existing lexical helper.</summary>
+      <remarks>This compatibility helper does not construct or validate a Path value. Host path rules apply; it is not a provider resolver.</remarks>
+      <param name="value0">The first native path component.</param>
+      <param name="value1">The second native path component.</param>
+      <returns>A combined native path string.</returns>
+    </member>
+    <member name="M:System.Storage.Path.GetFileName(System.String)">
+      <summary>Extracts the final component using the existing native path helper.</summary>
+      <remarks>This compatibility helper neither validates a Path value nor queries storage.</remarks>
+      <param name="value0">A native path string.</param>
+      <returns>The native final component, or an empty string when none is available.</returns>
+    </member>
+    <member name="T:System.Storage.InvalidPathError">
+      <summary>A logical path spelling failed Parse validation.</summary>
+      <remarks>No filesystem operation or lookup failure is implied.</remarks>
+    </member>
+    <member name="M:System.Storage.InvalidPathError.#ctor">
+      <summary>Constructs the invalid-path error value.</summary>
+    </member>
+    <member name="M:System.Storage.InvalidPathError.ToString">
+      <summary>Returns InvalidPath for display.</summary>
+      <returns>The string InvalidPath.</returns>
+    </member>
   </members>
 </doc>

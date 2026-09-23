@@ -1,6 +1,7 @@
 namespace StorageExperiment
 
 import System.*
+import System.Storage.Path
 import System.Collections.*
 import System.Streams.*
 import System.Text.*
@@ -74,7 +75,7 @@ class Directory {
         if path.Text == "/" {
             childText = "/" + name
         }
-        return match StorageExperiment.Path.Parse(childText) {
+        return match System.Storage.Path.Parse(childText) {
             Ok(let child) => Ok(provider.FileAt(child, name))
             Error(_) => Error(FileReadError(FileReadError.InvalidPath()))
         }
@@ -103,7 +104,7 @@ class Directory {
         if path.Text == "." {
             resolved = relativePath.Text
         }
-        return match StorageExperiment.Path.Parse(resolved) {
+        return match System.Storage.Path.Parse(resolved) {
             Ok(let child) => provider.GetFile(child)
             Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
         }

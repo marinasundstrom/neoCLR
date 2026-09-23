@@ -33,12 +33,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Record typed metadata lookup as a provisional direction, not an implemented
   GetFile API. Make coherent memory-provider text/byte contents the next prerequisite.
 
-- Explore an immutable Path value in the Storage sample. Path.Parse returns
-  Result<Path, InvalidPathError>; construction is private and text cannot be changed.
-  Move experimental provider/File/Directory parameters to validated logical paths
-  and configure a separate native disk root. Document the conservative logical
-  grammar, lexical equality and limitations; legacy System.Storage.Path helpers
-  remain unchanged. Broader operations and string overloads remain open design work.
+- Integrate the tested immutable Path value into the development System.Storage
+  library, with Parse returning Result<Path, InvalidPathError>, private construction,
+  read-only text and lexical equality. Preserve existing Combine/GetFileName string
+  helpers and add generated reference for all Path members. The Storage sample now
+  imports the platform type; its Path.rvn retains only a fixture helper. Regenerate
+  matching runtime/reference artifacts. Logical grammar and provider APIs remain
+  provisional; Path is not required by unrelated string-taking APIs. Prioritize
+  integrating the remaining working Storage slice over expanding isolated experiments.
+  Record future Unix/Windows parsing and normalization, and an analogous Uri value
+  direction and Path-taking helper overloads, as plans rather than implemented
+  behavior; keep immediate integration scoped to a minimal Storage POC.
 
 - Add host-visible FaultCode classifications, including StackOverflow for the
   interpreter frame limit, arithmetic/memory limits and host cancellation. Explicit

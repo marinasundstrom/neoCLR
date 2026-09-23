@@ -80,7 +80,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-storage-provider-') as folder:
 
     # Ordinary callers cannot construct an unvalidated Path or mutate its spelling.
     for source, diagnostic in [
-        ('namespace StorageExperiment\nfunc Main() { let path = Path("../bypass") }', 'inaccessible'),
+        ('namespace StorageExperiment\nimport System.Storage.Path\nfunc Main() { let path = Path("../bypass") }', 'rav1501'),
         ('namespace StorageExperiment\nfunc Main() { let path = RequirePath("ok")\npath.Text = "../bypass" }', 'read-only'),
     ]:
         (root / 'Main.rvn').write_text(source)
