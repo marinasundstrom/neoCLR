@@ -7,7 +7,7 @@
 
 [Documentation](docs/README.md) · [Project website](https://marinasundstrom.github.io/neoCLR/) · [Runtime and Raven walkthrough](docs/runtime-raven-preview.md)
 
-**An experimental, .NET-inspired runtime with its own library and a Raven language integration.**
+**An experimental application platform with a managed runtime, library and Raven development tools.**
 
 neoCLR is a managed, type-safe virtual machine with garbage-collected heap storage.
 The current Raven target follows familiar CLR value/reference type categories:
@@ -44,7 +44,11 @@ output is a temporary internal format, not that final binary representation. See
 
 The current proof of concept demonstrates collections and iteration, Result/Option
 propagation, text and numeric helpers, files, date/time, reflection introspection,
-delegates, interfaces and native buffers. Its provisional APIs are open to feedback.
+delegates, interfaces and native buffers. Development builds also support
+[Tasks, Promise and Raven async/await](docs/task-contracts.md), including isolated
+string workers and default callback dispatch. The [async release checkpoint](docs/async-preview-plan.md)
+is being validated; these additions are not in published Preview 8. The APIs are
+experimental and open to feedback.
 
 Start with the [runtime and Raven walkthrough](docs/runtime-raven-preview.md), covering
 direct neoIL execution and Raven against the same library.
@@ -381,7 +385,10 @@ managed references and the Void* sample alone do not complete that migration.
 
 The library is a bootstrap surface, not a complete BCL. General user-defined
 generic instance methods, static lifetime verification, full native marshalling,
-threading, runtime async, JIT compilation, and full verification are unimplemented.
+shared-object threading, runtime-level async suspension, JIT compilation and full
+verification are unimplemented. Isolated workers and compiler-generated async/await
+are available in development builds; ordinary worker completion still uses queued
+blocking joins. See [worker limits](docs/isolated-workers.md).
 Resource limits are guardrails, not a memory quota or a hostile-code sandbox.
 The CLI writes console output immediately and flushes each line, so prompts are visible
 before input. Default Rust embedding still captures output until successful completion;

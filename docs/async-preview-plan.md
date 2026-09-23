@@ -82,8 +82,10 @@ Preview 8 instead of assuming this list is exhaustive.
 
 Local progress is recorded in [the readiness inventory](async-preview-readiness.md).
 The corrected package, full library regeneration and protocol/MSBuild checks now
-pass locally. Next, complete interactive editor validation, exact-candidate source
-archive/platform checks and the final migration/distribution review.
+pass locally. Interactive build/run and Task type hover now pass in a separate VS Code
+profile against the extracted `e9bb28a` bundle. Exact-candidate local source validation
+and the six-job CI matrix are running. All six deeper packaged Task probes pass. Complete the source checks
+and the final migration/distribution review; see the [release-note draft](async-preview-release-notes.md).
 The [migration draft](async-preview-migration.md) inventories known breaks; the
 minimum-Rust archive check found a dispatch syntax issue, now corrected locally.
 The rebuilt runtime and corrected sample archive now have

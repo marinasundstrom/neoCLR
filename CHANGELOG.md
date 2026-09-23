@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Continue async release preparation with a fresh e9bb28a evaluator bundle, eight
+  passing Workbench cases, all six packaged Task probes, dependency/hash checks, a runtime-only execution check
+  and interactive VSIX build/run/type-hover evidence in a separate profile. Start exact-commit local source checks and six-job platform/toolchain
+  CI, without claiming results before completion. Draft release notes and correct
+  README's stale threading/async limitation while retaining published Preview 8 links.
+
 - Make the low-level worker-cancellation sample self-contained by declaring its
   worker service imports in the neoIL source. The host example now uses that same
   source directly. This fixes the full-suite standalone sample assembly failure;

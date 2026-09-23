@@ -4,7 +4,8 @@ This is local preparation for the [author-selected async/Tasks release](async-pr
 not a release certification. The release version/date and final candidate remain unset.
 The first evaluator build uses clean isolated neoCLR and Raven worktrees; Raven stays
 on `codex/async-preview-readiness`, based on the existing neoCLR feature revision.
-No developer SDK selection or VS Code installation is changed.
+The default developer SDK selection and default VS Code profile are unchanged.
+Editor validation uses a separate named profile.
 
 ## Gate inventory
 
@@ -151,8 +152,41 @@ fresh invocation. Logs are `verifier-sample-fix.log`,
 directory. These focused checks do not replace a corrected final-candidate full
 archive run; that and the cross-platform checks remain open. Local macOS results cannot satisfy Linux/Windows gates.
 
+## Corrected candidate validation — e9bb28a
+
+Fresh source validation is running on stable and Rust 1.85 at `e9bb28a`, which includes
+the standalone sample correction. The same commit was pushed to
+`codex/async-preview-candidate` for the required
+[six-job source matrix](https://github.com/marinasundstrom/neoCLR/actions/runs/35865860294).
+No tag, release or website publication was created. These jobs are not yet certified.
+
+A fresh runtime build and extracted bundle at that commit pass all eight Async
+Workbench cases. All 935 staged manifest hashes match; archive payload hashes match
+staging and the archive excludes AppleDouble entries. Runtime/SDK audits cover 23/26
+NuGet dependencies and all 34 preserved package notice sets. The VSIX's eight production npm dependencies are covered by notices and its
+JavaScript matches the built extension. The compiled async sample also runs with
+`dotnet` absent from PATH; native dependencies are macOS system libraries only.
+All six deeper packaged probes pass: Tasks, composition, async, default queue,
+workers and MapResult. See the
+[candidate record](async-preview-candidate-validation.json) and local `candidate-*.log`.
+
+The interactive editor gate now has evidence. An empty named VS Code profile,
+`neoCLR Release Validation e9bb28a`, installed the packaged experimental VSIX.
+The extracted saved project, using `library-async-default-queue.rvn` as Main.rvn,
+built successfully through the default build task, then printed `Hello on a worker`
+through **neoCLR: Run (MSBuild)**. VS Code reported no problems and the hover showed
+`class Task<()>: ITaskAwaiter` in Tasks. This verifies type information, not XML hover
+descriptions or Raven source debugging. The validation window was closed afterward;
+the separate profile remains available. Earlier failed UI binding attempts are
+preserved above, but no longer block this particular check.
+
+The [release-note draft](async-preview-release-notes.md) covers current behavior,
+migration and limits. Its version/date and final asset set remain unset. README now
+mentions development async/worker support while retaining Preview 8 as the published
+release. Source/platform and remaining distribution gates still need completion.
+
 ## Remaining release work
 
-Finish exact-candidate source/archive validation, interactive editor checks
-and the complete migration/distribution review. Rerun affected evidence after candidate
+Finish exact-candidate source/archive validation and the complete
+migration/distribution review. Rerun affected evidence after candidate
 changes. Keep publication, website deployment and version/date selection separate.

@@ -1,0 +1,130 @@
+{
+  "candidate": "e9bb28a18fc90d3efa4523dbea3f218616727cdf",
+  "status": "validation in progress; not released",
+  "sourceCI": "https://github.com/marinasundstrom/neoCLR/actions/runs/35865860294",
+  "archive": {
+    "revision": "e9bb28a18fc90d3efa4523dbea3f218616727cdf",
+    "sha256": "2d5e0099834144066793f5fbbad0f69c46635a5dd154ecfec9c68f8852fa8113",
+    "files": 936,
+    "appleDoubleEntries": 0,
+    "payloadHashesUnchanged": true
+  },
+  "editor": {
+    "candidate": "e9bb28a18fc90d3efa4523dbea3f218616727cdf",
+    "profile": "neoCLR Release Validation e9bb28a",
+    "vsixSha256": "3dd2c0e512801b4f13ca2cb3a2665cdd8c8a8cc00f8bb38aa3f200040367dc4b",
+    "sample": "library-async-default-queue.rvn",
+    "installedExtension": "raven.raven-vscode@0.1.12-neoclr.async.20260923",
+    "method": "Interactive VS Code UI using extracted bundle and SDK; named empty profile",
+    "build": "Build succeeded in 4,1s",
+    "runTask": "neoCLR: Run (MSBuild)",
+    "output": "Hello on a worker",
+    "problems": "No Problems",
+    "hover": "class Task<()>: ITaskAwaiter; Type in Tasks",
+    "windowClosed": true,
+    "limits": "Hover verified type information, not XML descriptions. No Raven source debugging claim."
+  },
+  "workbench": {
+    "bundle": "/private/tmp/neoclr-async-readiness.0ceuuk/candidate-extracted/neoclr-candidate",
+    "sdk": "/private/tmp/neoclr-async-readiness.0ceuuk/clean-extracted/raven-sdk-0.1.12-neoclr.async.20260923-osx-arm64",
+    "cases": [
+      {
+        "sample": "library-async-default-queue",
+        "output": "Hello on a worker\n",
+        "passed": true
+      },
+      {
+        "sample": "library-workers",
+        "output": "Hello, thread\nHello, pool\n",
+        "passed": true
+      },
+      {
+        "sample": "library-task-producer",
+        "output": "42\n",
+        "passed": true
+      },
+      {
+        "sample": "library-task-composition",
+        "output": "42\n",
+        "passed": true
+      },
+      {
+        "sample": "library-task-result",
+        "output": "42\n",
+        "passed": true
+      },
+      {
+        "sample": "library-task-propagation",
+        "output": "Unavailable\n",
+        "passed": true
+      },
+      {
+        "sample": "library-async-cancellation",
+        "output": "Cancelled\n",
+        "passed": true
+      },
+      {
+        "sample": "library-async",
+        "output": "Suspended\n42\n",
+        "passed": true
+      }
+    ],
+    "passed": true
+  },
+  "noticeAudit": {
+    "bundleNuGetDependencies": 23,
+    "sdkNuGetDependencies": 26,
+    "verifiedNoticeSets": 34
+  },
+  "stagedManifestFilesVerified": 935,
+  "packagedProbes": {
+    "tasks": {
+      "exitCode": 0,
+      "passed": true
+    },
+    "composition": {
+      "exitCode": 0,
+      "passed": true
+    },
+    "async": {
+      "exitCode": 0,
+      "passed": true
+    },
+    "default_queue": {
+      "exitCode": 0,
+      "passed": true
+    },
+    "workers": {
+      "exitCode": 0,
+      "passed": true
+    },
+    "map_result": {
+      "exitCode": 0,
+      "passed": true
+    }
+  },
+  "vsixAudit": {
+    "productionNpmPackages": [
+      "balanced-match/1.0.2",
+      "brace-expansion/2.1.4",
+      "minimatch/5.1.9",
+      "semver/7.7.3",
+      "vscode-jsonrpc/8.2.0",
+      "vscode-languageclient/9.0.1",
+      "vscode-languageserver-protocol/3.17.5",
+      "vscode-languageserver-types/3.17.5"
+    ],
+    "allCoveredByNotices": true,
+    "vsixJavaScriptMatchesBuiltExtension": true
+  },
+  "runtimeWithoutDotnetOnPath": {
+    "path": "/usr/bin:/bin",
+    "output": "Hello on a worker\n",
+    "passed": true
+  },
+  "nativeDependencies": [
+    "/usr/lib/libiconv.2.dylib",
+    "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+    "/usr/lib/libSystem.B.dylib"
+  ]
+}
