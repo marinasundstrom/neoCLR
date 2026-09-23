@@ -201,6 +201,13 @@ Task-based interaction is the intended extension direction; its scheduling and
 cancellation contract must be established before claiming nonblocking I/O. GetItems'
 eager/incremental representation remains open. Rich metadata, topology, Path format
 expansion and unneeded mutations remain outside the initial POC.
+**Additional information direction, 2026-09-23:** the author expects queryable
+attributes/information through the Storage structure while keeping the object model
+independent of filesystem or other provider-specific models. Compare System.IO and
+WinRT approaches; [metadata query design](proposals/storage-api.md#querying-additional-information)
+keeps typed versus extensible representations open. Do not impose a universal native
+attribute set. Define availability, failure and freshness when implementing the first
+useful query. This does not move metadata ahead of the interface/provider migration.
 **API design clarification, 2026-09-23:** learn from WinRT StorageFile/StorageFolder
 without importing their breadth. Start with address properties (Path and File.Name),
 explicit lookup and byte-stream access. Add metadata properties only for a concrete

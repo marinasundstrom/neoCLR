@@ -14,6 +14,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   examples, update roadmap priority and distinguish the target from current concrete
   descriptors on the website/API guide. Interface migration and enumeration remain
   planned; no new runtime API is implemented by this direction update.
+  Record queryable metadata as a future extension independent of native filesystem
+  attributes, with System.IO/WinRT comparisons and query shape, availability and
+  freshness left open. The interface/provider migration remains the next priority.
 
 - Integrate development System.Storage.File and Directory descriptors and the optional
   StorageLookup provider capability. File retains provider/Path, derives Name and

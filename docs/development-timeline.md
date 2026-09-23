@@ -25,6 +25,22 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-23 — Queryable information without a filesystem-shaped core
+
+**Author.** Suggested ways to fetch additional information/attributes from storage
+objects, drawing on System.IO and Windows Runtime, while keeping the Storage model
+abstract and independent of a particular backing model.
+
+**Assistant.** Proposed treating metadata access as an extension to storage
+capabilities, separating represented state from provider queries. Recorded typed
+common information, optional interfaces and extensible queries as alternatives;
+no signature or property-bag design was selected by the author.
+
+**Action.** Added the direction and primary-source comparisons to the proposal,
+roadmap and on-site future direction. Recorded availability, failure and freshness
+as contracts to resolve. The interface/provider migration remains next; no metadata
+query API is implemented by this update.
+
 ## 2026-09-23 — Select the proposal's interface-based Storage model
 
 **Author.** Directed continued work toward the model in the Storage proposal, then

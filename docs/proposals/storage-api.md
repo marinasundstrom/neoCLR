@@ -1388,6 +1388,47 @@ Topology is therefore discoverable where useful rather than imposed on ordinary 
 
 ---
 
+# Querying additional information
+
+**Author direction, 2026-09-23:** storage objects may expose ways to query additional
+information or attributes, informed by System.IO and Windows Runtime. The common
+Storage model must remain independent of any one backing system. This selects an
+extension direction, not a query signature or a mandatory metadata inventory.
+
+Queries should be reachable through the storage objects/capabilities a component
+already has. Retrieving attributes must not require recovering a native filesystem
+path or broadening access back to an unrestricted provider. An archive entry or
+remote object may have useful information without having native filesystem flags.
+
+Distinguish locally represented state (such as Name and Path) from information that
+requires provider interaction. A metadata query may involve I/O, fail or be denied;
+its availability and freshness must be part of the contract. Unsupported or absent
+information must not silently become a fabricated zero, empty string or false value.
+Attribute information is not, by itself, permission to perform an operation.
+
+Typed common information, optional metadata interfaces and extensible property
+queries are alternatives to evaluate against concrete consumers. Typed results
+improve discoverability and checking but require shared semantics; extensible keys
+accommodate provider-specific data but need naming, value-type and availability
+rules. Neither a universal attribute enum nor a string/object property bag is
+selected. Additional metadata should not add new StorageItem branches or expose
+provider internals as part of the core object model.
+
+**Comparison, checked 2026-09-23:** .NET FileSystemInfo exposes filesystem metadata;
+[Refresh](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.refresh?view=net-10.0)
+updates its snapshot, illustrating why freshness needs a contract. Windows Runtime
+separates [top-level, basic and extended properties](https://learn.microsoft.com/en-us/windows/apps/develop/files/file-properties).
+Its [RetrievePropertiesAsync](https://learn.microsoft.com/en-us/uwp/api/windows.storage.fileproperties.storageitemcontentproperties.retrievepropertiesasync?view=winrt-28000)
+accepts property names and returns a map of values, which can be null. Those are
+useful reference approaches, not requirements to adopt filesystem-specific flags,
+Windows property keys or the same caching scheme.
+
+Implement the first useful query after the core interface/provider migration, with
+explicit absence, failure and freshness behavior. Metadata enumeration, mutation
+and a general query framework are not implied by this direction.
+
+---
+
 # Provider extensibility
 
 Providers may extend the common storage model with capabilities specific to their domain.

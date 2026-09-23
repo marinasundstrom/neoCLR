@@ -6,7 +6,11 @@ those interfaces; StorageProvider will resolve paths into items. GetItems will
 enumerate StorageItem values. The concrete descriptor API documented below is the
 current development implementation, not the final public object model. The next
 slice migrates it while preserving the disk/memory sample. Enumeration and task
-signatures remain open.
+signatures remain open. Additional information will be queryable through storage
+objects without tying the common model to native filesystem attributes. Typed
+metadata and extensible property queries remain design alternatives; supported
+information, absent values, failures and freshness need explicit contracts. No
+additional attribute-query API is implemented yet.
 
 **Development after Preview 9.** [File](xref:System.Storage.File) and
 [Directory](xref:System.Storage.Directory) are platform-owned addresses. Construction
