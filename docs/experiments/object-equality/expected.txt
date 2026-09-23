@@ -1,0 +1,8 @@
+Aliases share identity
+Default equality follows identity
+Equal fields do not make two cells equal
+Mutation preserves the default hash
+Equal keys remain distinct objects
+An override supplies key equality
+Equal keys supply equal hashes
+Key equality rejects another type

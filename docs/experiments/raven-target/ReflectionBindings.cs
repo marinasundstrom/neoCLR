@@ -23,6 +23,9 @@ static class ReflectionBindings
         ("System.Introspection.ModuleInfo", "GetTypes", [], "System.Collections.Sequence<System.Introspection.TypeInfo>", false),
         ("System.Object", "GetType", [], "System.Introspection.TypeInfo", false),
         ("System.Object", "ToString", [], "String", false),
+        ("System.Object", "Equals", ["System.Object"], "Boolean", false),
+        ("System.Object", "GetHashCode", [], "Int32", false),
+        ("System.Object", "ReferenceEquals", ["System.Object", "System.Object"], "Boolean", true),
         ("System.Runtime.RuntimeContext", "get_Current", [], "System.Runtime.RuntimeContext", true),
         ("System.Runtime.RuntimeContext", "GetTypeInfoFromHandle", ["System.RuntimeTypeHandle"], "System.Introspection.TypeInfo", false),
         ("System.Introspection.TypeInfo", "get_GenericArgumentCount", [], "Int32", false),
@@ -144,15 +147,15 @@ static class ReflectionBindings
     }
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition, bool virtualCall = false)
     {
-        var owner = reference.DeclaringType.FullName == "System.Object" && reference.Name is "GetType" or "ToString" && RuntimeSignatures.IsCore(reference.DeclaringType.Scope) ? "System.Object" : Type(reference.DeclaringType);
+        var owner = reference.DeclaringType.FullName == "System.Object" && reference.Name is "GetType" or "ToString" or "Equals" or "GetHashCode" or "ReferenceEquals" && RuntimeSignatures.IsCore(reference.DeclaringType.Scope) ? "System.Object" : Type(reference.DeclaringType);
         if (owner is null || IsArray(owner) || owner == "System.RuntimeTypeHandle") return null;
-        var (args, result) = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? CollectionBindings.Type(t) ?? ProcessBindings.ArrayType(t) ?? GenericUnionBindings.Type(t));
+        var (args, result) = RuntimeSignatures.Match(reference, definition, t => t.FullName == "System.Object" && (t.MetadataType == MetadataType.Object || RuntimeSignatures.IsCore(t.Scope)) ? "System.Object" : Type(t) ?? CollectionBindings.Type(t) ?? ProcessBindings.ArrayType(t) ?? GenericUnionBindings.Type(t));
         string Project(string t) => t.EndsWith("[]") ? "arrayref<" + t[..^2] + ">" : t;
         if (!Members.Any(m => m.Owner == owner && m.Name == reference.Name && m.Static == !reference.HasThis
             && m.Args.Select(Project).SequenceEqual(args) && Project(m.Result) == result))
             throw new InvalidDataException("Unsupported reflection signature: " + reference.FullName);
         var inputs = reference.HasThis ? new[] { owner }.Concat(args).ToArray() : args;
-        var key = reference.FullName + (owner == "System.Object" && reference.Name == "ToString" && virtualCall ? "#virtual" : "");
+        var key = reference.FullName + (owner == "System.Object" && definition.IsVirtual && virtualCall ? "#virtual" : "");
         var name = "RuntimeReflection" + Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(key)))[..16];
         if (!Helpers.ContainsKey(key))
         {

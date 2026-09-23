@@ -6,6 +6,28 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-24
+
+- Plan a pre-release Raven example portability pass after shared compiler fixes
+  are independently verified on Raven main, released and integrated into the
+  neoCLR branch. Track pinned baselines, minimal ports, failure classification and
+  fixes/retests while retaining the efficient platform-specific CI split.
+
+- Implement bounded Object.ReferenceEquals and virtual class Equals/GetHashCode,
+  including default array identity, custom overrides, explicit base calls and a
+  stable execution-local identity hash. Instance null receivers fault; static
+  identity handles two nulls. Separate boxes retain distinct identity. String
+  identity calls explicitly fault; boxed virtual equality/hash remain unsupported.
+  Keep native identity imports exact and report ManagedHeap service requirements.
+  Update importer static/virtual Object handling, generated library and API docs,
+  and add a downloadable class sample. Record syntax is the author-selected next
+  end-to-end gate: the acceptance probe currently fails on a missing comparer
+  contract; generated hashing also requires HashCode. The author directs implementing
+  HashCode and adapting Raven record generation next; no record support is claimed
+  in this slice. Validation: nine equality/service tests, six identity cases, six
+  display regressions, both Raven samples, 15 .NET assertions, full library
+  regeneration, 378 API items and the combined website build.
+
 ### 2026-09-23
 
 - Record System.Networking.Sockets and System.Web.Http as candidate future namespace

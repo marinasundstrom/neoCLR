@@ -165,12 +165,11 @@ ConsoleOutputStream are provider implementation classes, not public APIs.
 
 ## Object and Value coverage — 2026-09-23
 
-Object, Object.GetType, Object.ToString and Value now have generated summaries and an
-[on-site guide](objects.md). Object's reference-only `Equals(Object)`
-and `GetHashCode()` are deliberately outside selection: their presence
-supports compiler metadata but does not establish executable API implementations.
-This is a tracked implementation gap, not a DocFX rendering failure. Do not expose
-stub bodies as working methods. Value has no public member API; low-level operations
+Object, GetType, ToString, ReferenceEquals, Equals, GetHashCode and Value have generated
+summaries and an [on-site guide](objects.md). The equality/identity surface is a
+bounded development implementation: String identity and boxed virtual equality/hash
+remain unsupported. Static Object.Equals is not yet declared or implemented.
+Value has no public member API; low-level operations
 and its temporary role are explained in the guide. Introspection type/member coverage
 remains an existing separate gap. Object/Value source files now participate in the
 reference snapshot fingerprint.

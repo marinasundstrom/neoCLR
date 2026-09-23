@@ -10,6 +10,18 @@ public abstract class Object {
         return GetType().FullName
     }
 
+    static func ReferenceEquals(left: Object, right: Object) -> bool {
+        return RuntimeServices.ObjectReferenceEquals(left, right)
+    }
+
+    virtual func Equals(other: Object) -> bool {
+        return RuntimeServices.ObjectEquals(self, other)
+    }
+
+    virtual func GetHashCode() -> int {
+        return RuntimeServices.ObjectIdentityHash(self)
+    }
+
     func GetType() -> TypeInfo {
         return RuntimeContext.Current.GetTypeInfoFromHandle(RuntimeServices.ObjectTypeHandle(self))
     }

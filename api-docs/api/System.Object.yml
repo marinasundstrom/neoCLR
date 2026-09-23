@@ -5,7 +5,10 @@ items:
   id: Object
   parent: System
   children:
+  - System.Object.Equals(System.Object)
+  - System.Object.GetHashCode
   - System.Object.GetType
+  - System.Object.ReferenceEquals(System.Object,System.Object)
   - System.Object.ToString
   langs:
   - csharp
@@ -17,8 +20,8 @@ items:
   assemblies:
   - NeoCLR.CoreProbe
   namespace: System
-  summary: Provides an abstract common object-reference base with runtime type inspection and display behavior.
-  remarks: 'Development support is bounded: GetType and virtual ToString are implemented with the limits in the Object and Value guide. Equals and GetHashCode in the compiler reference do not establish executable public API support. Object is abstract; its protected constructor initializes the base portion of a derived instance. See the Object and Value guide. Ordinary class assignment shares a reference; value assignment copies fields.'
+  summary: Provides an abstract common object-reference base with runtime type inspection, display and bounded identity/equality behavior.
+  remarks: 'Development support is bounded: GetType, ToString, ReferenceEquals, Equals and GetHashCode are implemented with the type restrictions in the Object and Value guide. String identity and boxed virtual equality/hash remain unsupported. Object is abstract; its protected constructor initializes the base portion of a derived instance. See the Object and Value guide. Ordinary class assignment shares a reference; value assignment copies fields.'
   example: []
   syntax:
     content: public abstract class Object
@@ -53,6 +56,97 @@ items:
   overload: System.Object.GetType*
   nameWithType.vb: Object.GetType()
   fullName.vb: Object.GetType()
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  id: ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  langs:
+  - csharp
+  - vb
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Tests whether two supported references denote the same allocation or are both null.
+  remarks: Nonvirtual and independent of Equals overrides. Separate boxes remain distinct even with equal contents. Intrinsic strings and String Object wrappers raise a terminal RuntimeError until String identity is defined. Managed byref locations are not Object identity operands.
+  example: []
+  syntax:
+    content: public static bool ReferenceEquals(object left, object right)
+    parameters:
+    - id: left
+      type: System.Object
+      description: A class, array or boxed-value reference, or null.
+    - id: right
+      type: System.Object
+      description: A class, array or boxed-value reference, or null.
+    return:
+      type: System.Boolean
+      description: True for aliases or two nulls; false for distinct allocations or exactly one null.
+    content.vb: Public Shared Function ReferenceEquals(left As Object, right As Object) As Boolean
+  overload: System.Object.ReferenceEquals*
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  id: Equals(System.Object)
+  parent: System.Object
+  langs:
+  - csharp
+  - vb
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Tests reference identity by default; an ordinary class may override equality.
+  remarks: 'Null other returns false for a supported non-null default receiver. A null receiver raises NullReference. Class overrides must be consistent with GetHashCode: equal objects must have equal hashes. Virtual boxed-value and String equality are unsupported; use typed equality APIs. This does not add structural class equality or change Equatable contracts.'
+  example: []
+  syntax:
+    content: public virtual bool Equals(object other)
+    parameters:
+    - id: other
+      type: System.Object
+      description: The object to compare with this instance, or null.
+    return:
+      type: System.Boolean
+      description: For the default class/array implementation, true only when other aliases this instance. An override supplies its own equality policy.
+    content.vb: Public Overridable Function Equals(other As Object) As Boolean
+  overload: System.Object.Equals*
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  id: GetHashCode
+  parent: System.Object
+  langs:
+  - csharp
+  - vb
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System
+  summary: Returns a stable identity hash by default; an ordinary class may override it consistently with equality.
+  remarks: The default class/array hash survives mutation and garbage collection and is shared by aliases. Collisions are allowed. It is not a unique object identifier, persisted value, native address or cross-execution contract. A null receiver raises NullReference. String identity hashes and virtual boxed-value hashes are unsupported. An equality override must provide a compatible hash.
+  example: []
+  syntax:
+    content: public virtual int GetHashCode()
+    return:
+      type: System.Int32
+      description: A signed 32-bit hash for the live object, or the hash supplied by a class override.
+    content.vb: Public Overridable Function GetHashCode() As Integer
+  overload: System.Object.GetHashCode*
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
 - uid: System.Object.ToString
   commentId: M:System.Object.ToString
   id: ToString
@@ -130,6 +224,64 @@ references:
     name: Introspection
     isExternal: true
     href: System.Introspection.html
+- uid: System.Object.ReferenceEquals*
+  commentId: Overload:System.Object.ReferenceEquals
+  isExternal: true
+  href: System.Object.html#System_Object_ReferenceEquals_System_Object_System_Object_
+  name: ReferenceEquals
+  nameWithType: object.ReferenceEquals
+  fullName: object.ReferenceEquals
+  nameWithType.vb: Object.ReferenceEquals
+  fullName.vb: Object.ReferenceEquals
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: System.Object.html
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System.Object.Equals*
+  commentId: Overload:System.Object.Equals
+  isExternal: true
+  href: System.Object.html#System_Object_Equals_System_Object_
+  name: Equals
+  nameWithType: object.Equals
+  fullName: object.Equals
+  nameWithType.vb: Object.Equals
+  fullName.vb: Object.Equals
+- uid: System.Object.GetHashCode*
+  commentId: Overload:System.Object.GetHashCode
+  isExternal: true
+  href: System.Object.html#System_Object_GetHashCode
+  name: GetHashCode
+  nameWithType: object.GetHashCode
+  fullName: object.GetHashCode
+  nameWithType.vb: Object.GetHashCode
+  fullName.vb: Object.GetHashCode
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
 - uid: System.Object.ToString*
   commentId: Overload:System.Object.ToString
   isExternal: true

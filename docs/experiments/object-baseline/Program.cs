@@ -43,6 +43,13 @@ Check(key.Equals(equalKey) && !ReferenceEquals(key, equalKey) && key.GetHashCode
     "Custom equality and hash agree without changing reference identity");
 Check(object.Equals(key, equalKey) && object.Equals(null, null) && !object.Equals(key, null),
     "Static Object equality handles null and dispatches the instance override");
+var record = new KeyRecord(42);
+var sameRecord = new KeyRecord(42);
+Check(ReferenceEquals(record, record) && !ReferenceEquals(record, sameRecord)
+    && record.Equals(sameRecord) && ((object)record).Equals(sameRecord)
+    && record == sameRecord && record != new KeyRecord(7)
+    && record.GetHashCode() == sameRecord.GetHashCode(),
+    "Record syntax generates value equality and matching hashes while preserving class identity");
 Console.WriteLine($"Runtime: {System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}");
 
 sealed class Cell { public int Number; }
@@ -54,3 +61,5 @@ sealed class Key(int number)
     public override bool Equals(object? other) => other is Key key && key.Number == Number;
     public override int GetHashCode() => Number;
 }
+
+sealed record KeyRecord(int Number);

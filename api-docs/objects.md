@@ -56,15 +56,41 @@ an Object/interface reference to it. Aliases can share that box. Replacing Value
 with Object would therefore require a storage migration with copy, identity,
 extraction and lifetime tests, rather than a type rename.
 
+## Identity, equality and hashing (development)
+
+`Object.ReferenceEquals(left, right)` is nonvirtual. It compares the allocation
+behind class, array and boxed-value references: aliases compare equal, distinct
+allocations do not, two nulls compare equal and exactly one null compares unequal.
+It does not compare fields, invoke overrides or compare managed byref locations.
+
+For ordinary classes and arrays, virtual `Equals(Object)` defaults to this identity
+comparison, and `GetHashCode()` returns an identity hash. Aliases share a hash that
+survives mutation and collection. Hash collisions are allowed; never persist a
+hash, treat it as a unique ID or expect a stable value between executions.
+
+A class can override Equals and GetHashCode together. Equal objects must have equal
+hashes, even when their allocations differ. The
+<a href="/samples/object-equality.zip">checked sample</a> contrasts a mutable Cell using
+identity with a Key using its Number for both equality and hashing. Calls through
+Object select the overrides. ReferenceEquals remains an identity comparison, and
+explicit base calls retain the base implementation. Existing Equatable contracts
+are unchanged.
+
+String identity is deliberately unsupported: the current String/Object conversion
+creates wrappers instead of preserving an underlying String allocation. Identity
+calls on String payloads or their wrappers raise a terminal RuntimeError. Virtual
+boxed-value Equals/GetHashCode also remain unsupported; use typed equality APIs.
+ReferenceEquals can compare box identities, but does not supply boxed value equality.
+Null instance receivers raise NullReference; default Equals accepts a null argument
+and returns false. Static two-argument Object.Equals is not yet available.
+
 ## Direction under review
 
-The intended baseline is .NET-compatible reference/value semantics. The first Object display slice implements overridable class ToString with a
-runtime-type-name fallback. Equality and hashing should next be designed together: default reference identity
-for ordinary classes, value behavior for value types and consistent custom overrides.
-Equality and hashing are not yet implemented on Object. String-to-Object
-conversions currently allocate wrappers: repeated conversions from one String do
-not preserve identity, unlike .NET. This is an unresolved representation gap, not
-a promised reference-equality contract. See Microsoft's
+The intended baseline is .NET-compatible reference/value semantics. Class display,
+reference identity and class equality/hash now have bounded implementations. String
+identity and boxed-value dispatch remain representation gaps. Raven record syntax
+is the intended end-to-end acceptance case for generated equality/hash behavior;
+records are not yet supported by this slice. See Microsoft's
 [Object contract](https://learn.microsoft.com/en-us/dotnet/api/system.object?view=net-10.0)
 for the comparison baseline; neoCLR does not yet provide that entire surface.
 

@@ -65,6 +65,9 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::CurrentTaskQueue
             | crate::native::Binding::DefaultTaskQueue
             | crate::native::Binding::RegisterDefaultTaskQueue => RuntimeService::TaskDispatch,
+            crate::native::Binding::ObjectEquals
+            | crate::native::Binding::ObjectReferenceEquals
+            | crate::native::Binding::ObjectIdentityHash => RuntimeService::ManagedHeap,
             crate::native::Binding::Fault => return Ok(vec![]),
             crate::native::Binding::EnvironmentArguments
             | crate::native::Binding::EnvironmentCurrentDirectory

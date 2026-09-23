@@ -1,0 +1,9 @@
+.function neoCLR.Runtime.ObjectReferenceEquals(System.Object left,System.Object right) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ObjectIdentityHash(System.Object value) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ObjectEquals(System.Object value,System.Object other) -> Boolean
+.methodimpl InternalCall
+.end

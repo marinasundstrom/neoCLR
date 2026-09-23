@@ -75,3 +75,40 @@ These filters use [GitHub's documented path and branch rules](https://docs.githu
 If runtime jobs later become required PR checks, account for path-skipped workflows
 remaining pending; do not enable that branch policy without an appropriate lightweight
 required check. Main had no branch protection when this correction was made.
+
+## Pre-release Raven example portability pass — author direction, 2026-09-23
+
+Near the next neoCLR release, select representative existing Raven examples that run
+on .NET, port a bounded set to neoCLR and investigate crashes, missing APIs and
+semantic differences. Prefer real small programs over isolated syntax checks. This
+is a pre-release task, not a reprioritization of the current Object slices.
+
+Establish compiler provenance before interpreting differences:
+
+1. Extract shared compiler fixes from the neoCLR integration branch, validate them
+   independently on Raven main (including relevant .NET Framework/NanoFramework
+   targets), and make a Raven release containing those fixes. Do not merge the
+   neoCLR branch wholesale or release target-specific policy as a shared fix.
+2. Integrate the same shared fixes into the neoCLR branch. Record Raven release/tag,
+   main commit, integration commit, compiler hashes, target configuration and the
+   patch difference between the two builds. Branch ancestry alone is insufficient
+   evidence that the binaries contain the same fixes.
+3. Run the original examples on the released Raven/.NET baseline, then their minimal
+   ports on the matching neoCLR bundle. Record exact source revisions, edits,
+   expected behavior, compiler diagnostics and runtime outcomes. Examples relying
+   on intentionally unsupported platform capabilities need an explicit scope note.
+4. Classify failures as shared compiler, target metadata/importer, missing library
+   contract, runtime crash/semantic mismatch or expected platform limitation. Reduce
+   unexpected failures, fix them in the appropriate repository/branch, and rerun the
+   affected originals and ports. Shared defects discovered here require another
+   validated main/release integration before claiming a clean compiler baseline.
+5. Keep passing ports as reproducible compatibility cases. Give remaining failures
+   an explicit release disposition; do not silently skip crashes or label every
+   unsupported API a required release feature. The pass aims to exclude known shared
+   compiler causes, not to prove that no shared compiler bug remains.
+
+Choose cases by coverage: record equality/hash once available, ordinary class/value
+behavior, Result/Option, collection operations, and a small Console or file program.
+The selected list and expected differences should be recorded with release evidence.
+Run platform-neutral cases once on the primary host; repeat only platform-specific
+boundaries on other hosts, in line with this plan's efficient CI split.

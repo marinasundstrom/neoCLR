@@ -1,0 +1,26 @@
+import System.*
+
+record class Key(Number: int)
+
+func Main() {
+    let first = Key(42)
+    let second = Key(42)
+    let alias = first
+    let value: Object = first
+    if !Object.ReferenceEquals(first, alias) {
+        System.Fault("Record assignment must preserve class identity")
+    }
+    if Object.ReferenceEquals(first, second) {
+        System.Fault("Separate records must retain distinct identities")
+    }
+    if !first.Equals(second) || !value.Equals(second) || first != second {
+        System.Fault("Record equality must agree through typed and Object views")
+    }
+    if first.GetHashCode() != second.GetHashCode() {
+        System.Fault("Equal records must have equal hashes")
+    }
+    if first == Key(7) {
+        System.Fault("Different record components must compare unequal")
+    }
+    Console.WriteLine("Record identity, equality and hashes agree")
+}

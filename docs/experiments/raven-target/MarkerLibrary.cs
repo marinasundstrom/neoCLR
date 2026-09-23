@@ -2,7 +2,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 // Explicitly admitted Object members and the empty union marker declaration.
-// Equality and hashing remain compiler-facing reference metadata.
+// Concrete method bodies remain Raven-authored.
 static class MarkerLibrary
 {
     public static bool IsOwner(string owner) => owner is "System.Object" or "System.Runtime.CompilerServices.UnionAttribute";
@@ -18,7 +18,7 @@ static class MarkerLibrary
             || type.HasFields || type.HasInterfaces || type.HasProperties || type.HasEvents || type.HasNestedTypes
             || type.IsExplicitLayout || type.BaseType?.FullName != baseName || !RuntimeSignatures.IsCore(type.BaseType.Scope)
             || !contract.IsPublic || !contract.IsClass || contract.HasFields || contract.HasGenericParameters
-            || contract.IsAbstract != type.IsAbstract || contract.IsSealed != type.IsSealed || type.Methods.Count != (isObject ? 3 : 1) || !EmptyConstructor(type.Methods.Single(m => m.IsConstructor), baseName))
+            || contract.IsAbstract != type.IsAbstract || contract.IsSealed != type.IsSealed || type.Methods.Count != (isObject ? 6 : 1) || !EmptyConstructor(type.Methods.Single(m => m.IsConstructor), baseName))
             throw new InvalidDataException("Unsupported empty marker declaration: " + owner);
         ApplicationTypes.BindLibrary(type, owner);
         _ = ApplicationTypes.Type(type);
@@ -35,7 +35,21 @@ static class MarkerLibrary
             || display.IsFinal || display.HasParameters || display.HasGenericParameters || !display.HasBody
             || !LibraryImplementation.SameType(expectedDisplay.ReturnType, display.ReturnType))
             throw new InvalidDataException("Unsupported Object.ToString contract.");
-        return [method, display];
+        var equality = type.Methods.Single(m => m.Name == "Equals");
+        var hash = type.Methods.Single(m => m.Name == "GetHashCode");
+        var identity = type.Methods.Single(m => m.Name == "ReferenceEquals");
+        foreach (var member in new[] { equality, hash, identity })
+        {
+            var expectedMember = contract.Methods.Single(m => m.Name == member.Name);
+            var isStatic = member.Name == "ReferenceEquals";
+            if (!member.IsPublic || member.IsStatic != isStatic || member.IsVirtual == isStatic
+                || !isStatic && !member.IsNewSlot || member.IsFinal || member.HasGenericParameters
+                || !member.HasBody || !LibraryImplementation.SameType(expectedMember.ReturnType, member.ReturnType)
+                || member.Parameters.Count != expectedMember.Parameters.Count
+                || !member.Parameters.Zip(expectedMember.Parameters).All(p => LibraryImplementation.SameType(p.First.ParameterType, p.Second.ParameterType)))
+                throw new InvalidDataException("Unsupported Object identity/equality contract: " + member.Name);
+        }
+        return [method, display, equality, hash, identity];
     }
     static bool EmptyConstructor(MethodDefinition method, string baseName)
     {

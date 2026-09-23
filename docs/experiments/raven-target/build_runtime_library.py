@@ -286,7 +286,7 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
     # Nongeneric classes can also own static factories. Merge their function roots
     # into the emitted class rather than leaving top-level method fragments.
     for body in types[:]:
-        if body.startswith('.type class ' + owner + '\n'):
+        if body.startswith(('.type class ' + owner + '\n', '.type class abstract ' + owner + '\n')):
             types.remove(body)
             methods = [body[:-len('.end\n')] + ''.join(methods) + '.end\n']
     if name == 'String' and bootstrap:

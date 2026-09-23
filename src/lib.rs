@@ -32,6 +32,7 @@ mod math;
 pub mod memory;
 pub mod metadata;
 mod native;
+mod object_identity;
 mod program;
 mod reachability;
 mod references;

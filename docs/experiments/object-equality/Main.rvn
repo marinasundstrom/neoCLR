@@ -1,0 +1,58 @@
+import System.*
+
+class Cell {
+    var Number: int
+    init(number: int) {
+        Number = number
+    }
+}
+
+class Key {
+    private field storedNumber: int
+    val Number: int => storedNumber
+    init(number: int) {
+        storedNumber = number
+    }
+    override func Equals(other: Object) -> bool {
+        if other is Key key {
+            return Number == key.Number
+        }
+        return false
+    }
+    override func GetHashCode() -> int {
+        return Number
+    }
+}
+
+func Check(condition: bool, description: string) {
+    if !condition {
+        System.Fault(description)
+    }
+    Console.WriteLine(description)
+}
+
+func SameValue(left: Object, right: Object) -> bool {
+    return left.Equals(right)
+}
+
+func Hash(value: Object) -> int {
+    return value.GetHashCode()
+}
+
+func Main() {
+    let cell = Cell(1)
+    let alias = cell
+    let hash = Hash(cell)
+    alias.Number = 2
+    Check(Object.ReferenceEquals(cell, alias), "Aliases share identity")
+    Check(SameValue(cell, alias), "Default equality follows identity")
+    Check(!SameValue(cell, Cell(2)), "Equal fields do not make two cells equal")
+    Check(hash == Hash(alias), "Mutation preserves the default hash")
+
+    let first = Key(42)
+    let second = Key(42)
+    Check(!Object.ReferenceEquals(first, second), "Equal keys remain distinct objects")
+    Check(SameValue(first, second), "An override supplies key equality")
+    Check(Hash(first) == Hash(second), "Equal keys supply equal hashes")
+    Check(!SameValue(first, cell), "Key equality rejects another type")
+}

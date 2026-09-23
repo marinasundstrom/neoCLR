@@ -29,3 +29,9 @@ new Object API or bless that gap as the eventual contract.
 
 Follow-up observation 2026-09-23: all 14 .NET assertions and the six new neoCLR
 identity cases passed, together with four existing reference-identity tests.
+
+The record follow-up adds a fifteenth assertion using `record KeyRecord(int Number)`:
+class identity remains distinct while generated typed/Object equality, operators
+and hashes agree. The corresponding Raven acceptance source is
+[RecordProbe.rvn](../object-equality/RecordProbe.rvn), currently blocked at emission
+by a missing comparer contract; it is not a passing neoCLR sample.

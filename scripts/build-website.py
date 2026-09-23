@@ -250,6 +250,12 @@ def main():
     for name in ('Main.rvn', 'Abstract.rvn', 'ObjectDisplay.rvnproj', 'expected.txt', 'verify.py', 'README.md'):
         shutil.copyfile(ROOT / 'docs/experiments/object-display' / name, object_sources / name)
     shutil.make_archive(str(downloads / 'object-display'), 'zip', object_sources.parent)
+    equality_sources = OUTPUT / '_object-equality-source' / 'object-equality'
+    equality_sources.mkdir(parents=True, exist_ok=True)
+    for name in ('Main.rvn', 'ObjectEquality.rvnproj', 'expected.txt', 'verify.py', 'README.md'):
+        shutil.copyfile(ROOT / 'docs/experiments/object-equality' / name, equality_sources / name)
+    shutil.make_archive(str(downloads / 'object-equality'), 'zip', equality_sources.parent)
+    shutil.rmtree(equality_sources.parent)
     shutil.rmtree(object_sources.parent)
     cancel_sources = OUTPUT / '_worker-cancel-source' / 'worker-task-cancellation'
     cancel_sources.mkdir(parents=True)

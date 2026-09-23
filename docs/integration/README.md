@@ -168,3 +168,33 @@ by source compilation and raw runtime allocation. No synchronization API is impl
 Migration: application classes now retain Object as their metadata base. A class
 that supplies ToString should declare an override; same-name hiding is rejected by
 the current importer/runtime profile. Use matching reference/library artifacts.
+
+
+### Object identity/equality and the record gate — 2026-09-23
+
+The target now admits Object.ReferenceEquals(Object,Object), virtual
+Equals(Object) and GetHashCode, preserving call/callvirt for overrides and base
+calls. Core Object parameter signatures must recognize the CLI Object element type
+as well as a core-scoped named type. Abstract Object's static and instance members
+are emitted in the same runtime declaration; generated fragments are refreshed.
+Runtime Contract configuration and Raven semantic/emission rules are unchanged.
+The runtime binds exact identity services, rejecting String payload/wrapper identity
+until its representation is resolved. Boxed virtual equality/hash remain unsupported.
+Match the reference assembly, importer, generated library and runtime binary.
+
+The class sample uses a private backing field with a getter for its key property;
+readonly/init-only field support is not silently broadened. It exercises identity,
+mutation-stable default hashes and custom equality/hash through Object references.
+Raw tests cover null receivers (including direct calls), static null identity,
+arrays, distinct boxes, GC, override/base dispatch and native signature/service use.
+
+The author's end-to-end goal is record semantics through record syntax. The
+`record class Key(Number: int)` target probe currently fails during emission with
+`Failed to resolve EqualityComparer<T>.` Inspection of
+SynthesizedMethodBodyFactory.Records.cs also identifies System.HashCode.Add<T> and
+ToHashCode for generated hashing. No target comparer/hash contract or compiler
+adaptation is implemented here. Compare a bounded library implementation with Runtime
+Contract mapping to neoCLR's typed equality contracts before changing synthesis.
+Reporting absent record dependencies as diagnostics instead of emission exceptions
+is a potential general Raven fix; extract and validate independently before main
+integration. Do not merge neoCLR policy with that diagnostic improvement.

@@ -106,6 +106,7 @@ static class CoreDeclarations
         [assembly: System.Runtime.CompilerServices.ReferenceAssembly]
         namespace System {
             public abstract class Object {
+                public static bool ReferenceEquals(object left, object right) => false;
                 public virtual bool Equals(object other) => false;
                 public virtual int GetHashCode() => 0;
                 public virtual string ToString() => "";

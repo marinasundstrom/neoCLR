@@ -109,7 +109,8 @@ runtime/issue review is required when implementing hashing or changing storage.
    virtual dispatch and honest importer diagnostics. Check class, boxed value,
    String and null paths before declaring the surface general. Keep Console object
    overloads and automatic interpolation integration out until this dispatch works.
-3. **Then:** Object.ReferenceEquals and the Equals/GetHashCode pair, with equal
+3. **Class identity/equality slice implemented (limits below):** Object.ReferenceEquals
+   and the Equals/GetHashCode pair, with equal
    payload/distinct identity, null, boxed values, custom overrides, mutable fields
    and GC tests. Assess typed collection equality alongside this contract.
 4. **Separately:** inventory and migrate one Value-backed carrier with nested managed
@@ -220,3 +221,82 @@ receiver dispatch and a deliberate value policy; identity alone does not supply 
 Typed collection equality remains a separate review item: an Object override must
 not silently replace existing Equatable<T> contracts. The follow-up adds no public
 methods, hash algorithm, collection change or Value migration.
+
+
+## Class equality/hash implementation — 2026-09-23
+
+The next bounded implementation adds nonvirtual Object.ReferenceEquals and virtual
+Object.Equals(Object)/GetHashCode with ordinary class overrides. The Raven bodies
+call narrowly bound runtime identity services; no new opcode or collection policy
+is introduced. Both aliases and null handling are separate from field equality.
+Arrays use the same default identity contract. ReferenceEquals compares box identity
+without promising boxed value equality. String payloads and String wrappers are
+explicitly rejected by the identity services, including self-comparison, so the
+current conversion defect cannot become an accidental API promise.
+
+The default hash mixes the execution-local allocation ID into 32 bits using wrapping
+integer arithmetic. The ID is stable across mutation and collection; the hash does
+not expose a native address. Collisions and repeated hash values in separate runs
+are permitted. No cryptographic, persistence or performance claim is made. Custom
+Equals/GetHashCode implementations remain responsible for equal values having equal
+hashes; automatic verification of that invariant is not supplied.
+
+The native identity comparison validates live references and is nonvirtual. Instance
+Equals separately requires a non-null receiver, including raw direct calls; it does
+not inherit static ReferenceEquals(null, null)'s true result. All three imports
+report the existing ManagedHeap service. The abstract Object declaration now owns
+its static and instance methods together in generated library fragments. Importer
+adapters retain direct/virtual call distinctions for Equals and GetHashCode as for
+ToString. Explicit base calls use defaults; virtual calls reach class overrides.
+
+The [class sample](experiments/object-equality/README.md) compares mutable Cell
+identity with Key equality through Object parameters. Its Key uses a private field
+and getter: general readonly field/init-only admission is not added by this slice.
+The raw tests cover GC, array views, separate boxes, nulls, override/base dispatch,
+unsupported String/boxed paths and exact native signatures/service reporting.
+Static Object.Equals, boxed virtual equality/hash, String identity and Value storage
+migration remain unimplemented. Existing typed Equatable contracts are unchanged.
+
+### Record syntax as the end-to-end acceptance case
+
+The author identifies record semantics with record syntax as the ultimate test.
+This becomes a concrete follow-up gate, rather than calling handwritten equality
+sufficient record support. The first probe is
+[RecordProbe.rvn](experiments/object-equality/RecordProbe.rvn): `record class
+Key(Number: int)` must retain class aliasing and distinct allocation identity while
+its generated typed/Object equality, operators and hashes agree on components.
+The pinned .NET baseline now includes the corresponding fifteenth assertion.
+
+The [.NET record baseline](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/types/records)
+(checked 2026-09-23) distinguishes compiler-generated value equality from the type's
+underlying class/value assignment semantics. Record class assignment still aliases;
+record structs copy their fields. Neither promises recursive deep equality or copying.
+Extend the initial integer case with String and nested reference fields, generated
+display/deconstruction, and the Raven-supported value-record/copy forms after the
+basic gate runs. Check actual Raven syntax and semantics rather than assuming every
+C# record feature exists.
+
+Current probe outcome: source reaches emission, then fails with `Failed to resolve
+EqualityComparer<T>.` on the matching target bundle. Inspection of Raven's
+`SynthesizedMethodBodyFactory.Records.cs` also identifies System.HashCode.Add<T>
+and ToHashCode dependencies for generated hashing. These are actual target contract
+integration gaps; the ordinary Object methods alone do not supply them. The emission
+failure is reported as an exception rather than a friendly missing-contract diagnostic.
+A general diagnostic improvement is a separately validated Raven candidate; it must
+not move neoCLR policy into Raven main.
+
+Next compare a bounded typed comparer/hash library contract with Runtime Contract
+configuration that maps record synthesis to neoCLR's existing Equatable conventions.
+Do not introduce universal structural Object equality to make records work: generated
+record members should express their component policy through normal contracts.
+No compiler change, comparer/hash API or record support is claimed in this slice.
+
+
+### Author clarification after the probe
+
+The author directs making Raven support neoCLR record semantics and implementing
+System.HashCode. This selects compiler/library integration as the next work, beyond
+merely documenting the absent .NET comparer. Preserve ordinary .NET record behavior
+when the target contract is unconfigured; keep neoCLR policy and target fixtures on
+the isolated branch. Start with the small record-syntax acceptance source and expand
+only with explicit component equality/hash rules and executable evidence.

@@ -1,1 +1,69 @@
 ; Generated from runtime/raven/src/System/Object.rvn. Regenerate with build_runtime_library.py.
+.type class abstract System.Object
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance GetType() -> System.Introspection.TypeInfo
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+call neoCLR.Library.System.Object.RuntimeReflectionC67D76CC5C960860()
+M00000001_IL_0007:
+ldarg 0
+M00000001_IL_0008:
+call neoCLR.Runtime.ObjectTypeHandle(System.Object)
+M00000001_IL_000d:
+call neoCLR.Library.System.Object.RuntimeReflection3A6D81CD5FF86035(System.Runtime.RuntimeContext,System.RuntimeTypeHandle)
+M00000001_IL_0012:
+ret
+.end
+.method instance virtual ToString() -> String
+M00000002_IL_0000:
+M00000002_IL_0001:
+ldarg 0
+M00000002_IL_0002:
+callvirt instance System.Object::GetType()
+M00000002_IL_0007:
+call neoCLR.Library.System.Object.RuntimeReflectionF572EF30E2C7291B(System.Introspection.TypeInfo)
+M00000002_IL_000c:
+ret
+.end
+.method instance virtual Equals(System.Object other) -> Boolean
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldarg 1
+M00000003_IL_0004:
+call neoCLR.Runtime.ObjectEquals(System.Object,System.Object)
+call neoCLR.Library.System.Object.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0009:
+call neoCLR.Library.System.Object.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance virtual GetHashCode() -> Int32
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+call neoCLR.Runtime.ObjectIdentityHash(System.Object)
+M00000004_IL_0008:
+ret
+.end
+.method static ReferenceEquals(System.Object left,System.Object right) -> Boolean
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldarg 1
+M00000005_IL_0004:
+call neoCLR.Runtime.ObjectReferenceEquals(System.Object,System.Object)
+call neoCLR.Library.System.Object.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0009:
+call neoCLR.Library.System.Object.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.end

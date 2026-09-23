@@ -16,6 +16,9 @@ pub(crate) enum Binding {
     Math(crate::math::Operation),
     Reflection(crate::reflection::Query),
     ObjectTypeHandle,
+    ObjectReferenceEquals,
+    ObjectEquals,
+    ObjectIdentityHash,
     ExecutingAssembly,
     CurrentTaskQueue,
     DefaultTaskQueue,
@@ -308,6 +311,19 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Binding::ExecutingAssembly,
             Type::from_name("System.Introspection.AssemblyInfo"),
         ),
+        ("neoCLR.Runtime.ObjectEquals", [Type::Named(left), Type::Named(right)])
+            if left == "System.Object" && right == "System.Object" =>
+        {
+            (Binding::ObjectEquals, Type::Boolean)
+        }
+        ("neoCLR.Runtime.ObjectReferenceEquals", [Type::Named(left), Type::Named(right)])
+            if left == "System.Object" && right == "System.Object" =>
+        {
+            (Binding::ObjectReferenceEquals, Type::Boolean)
+        }
+        ("neoCLR.Runtime.ObjectIdentityHash", [Type::Named(name)]) if name == "System.Object" => {
+            (Binding::ObjectIdentityHash, Type::Int32)
+        }
         ("neoCLR.Runtime.ObjectTypeHandle", [Type::Named(name)]) if name == "System.Object" => {
             (Binding::ObjectTypeHandle, Type::RuntimeTypeHandle)
         }
@@ -367,6 +383,15 @@ impl Binding {
             return query.invoke(module, &args, limits);
         }
         match (self, args.as_slice()) {
+            (Self::ObjectEquals, [left, right]) => {
+                crate::object_identity::equals(left, right).map(Value::Boolean)
+            }
+            (Self::ObjectReferenceEquals, [left, right]) => {
+                crate::object_identity::reference_equals(left, right).map(Value::Boolean)
+            }
+            (Self::ObjectIdentityHash, [value]) => {
+                crate::object_identity::hash(value).map(Value::Int32)
+            }
             (Self::ObjectTypeHandle, [value]) => {
                 let concrete = match value {
                     Value::ObjectReference(object) => {

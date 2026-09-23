@@ -35,11 +35,18 @@ reference/value semantics. Finish existing slices before switching. The
 member stubs, a tested .NET baseline and Value's live dependencies. The bounded
 [Object.ToString/override sample](experiments/object-display/README.md) is implemented;
 Object is abstract by author direction; derived construction remains supported.
-Boxed-value and intrinsic-string virtual formatting still need receiver work. Identity,
-equality and hashing follow as a pair of related contracts. The completed
-[identity prerequisite review](object-model-review.md#identity-prerequisites--2026-09-23)
-records tested handle behavior and the String-to-Object wrapper identity gap; resolve
-that scope explicitly before exposing a general identity API. Value removal
+Boxed-value and intrinsic-string virtual formatting still need receiver work.
+The [bounded class equality/hash slice](object-model-review.md#class-equalityhash-implementation--2026-09-23)
+adds ReferenceEquals and default/overridable class Equals/GetHashCode. String identity
+is explicitly unsupported; boxed virtual value equality/hash remain open.
+**Author-selected end-to-end acceptance case:** Raven record syntax must exercise
+record semantics, including generated equality/hash while preserving class/value
+assignment behavior. The checked-in record-class probe currently fails emission on
+missing EqualityComparer<T>; generated hashing also needs a HashCode contract.
+The author now directs implementing System.HashCode and making Raven record
+generation support neoCLR semantics. Resolve those integration dependencies in
+bounded follow-ups on the isolated compiler branch. Handwritten class
+overrides are prerequisites, not completion of record support. Value removal still
 requires its own storage migration, not a rename to Object.
 
 When choosing work autonomously, follow the current author-directed focus and the
@@ -119,6 +126,15 @@ release**: isolate platform-specific behavior and stop repeating the full sample
 and validation suite on every platform. Follow the [CI efficiency plan](ci-efficiency-plan.md)
 before the next release cycle; preserve evidence and targeted platform coverage.
 This is a release-engineering follow-up, not a change to the feature sequence.
+
+Before the next release, also perform the author-requested
+[Raven example portability pass](ci-efficiency-plan.md#pre-release-raven-example-portability-pass--author-direction-2026-09-23).
+First verify shared compiler fixes independently on Raven main, release Raven with
+those fixes, and integrate the same fixes into the neoCLR branch. Then compare
+original .NET examples and minimal neoCLR ports on pinned builds; investigate crashes,
+missing contracts and semantic differences without conflating known shared compiler
+issues with neoCLR failures. Record fixes, retests and remaining release dispositions.
+This is a later release gate; current Object and record-semantics work continues.
 
 ## Post-release concurrency direction — 2026-09-23
 

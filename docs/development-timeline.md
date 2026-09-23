@@ -5752,3 +5752,54 @@ and recorded the convention for runtime code as well as examples.
 - **Open:** final names, package/provider boundaries, URI placement and the exact
   client/server surface. No API rename or implementation occurred; current Object
   work and the existing networking milestone sequence remain in place.
+
+
+### 2026-09-23 — Object equality and record-syntax acceptance
+
+- **Author:** asked to resume Object work after recording the possible networking
+  namespaces, then said: “The ultimate test would be record semantics support -
+  with the record syntax.”
+- **Assistant action:** implemented a bounded class identity/equality/hash slice
+  with a handwritten Cell/Key sample, native identity services and API documentation.
+  String identity calls explicitly reject the current wrapper representation.
+- **Validation finding:** a raw direct instance Equals call with null could initially
+  behave like static ReferenceEquals(null, null). Added a separate receiver check
+  for instance equality; static null identity remains valid.
+- **Record action/outcome:** added a concrete Raven record-class acceptance source
+  and a matching .NET assertion. The Raven probe reaches emission then fails on
+  missing EqualityComparer<T>. Compiler source also requires System.HashCode for
+  generated hashes. This is not completed record support.
+- **Next:** compare typed comparer/hash contracts and Runtime Contract adaptation;
+  use record syntax to validate generated members, ordinary dispatch and reference/
+  value semantics together. Broader record forms and String/boxed behavior remain
+  explicit follow-ups. See [the Object review](object-model-review.md#record-syntax-as-the-end-to-end-acceptance-case).
+
+
+### 2026-09-23 — Raven examples as a pre-release compatibility pass
+
+- **Author:** proposed porting selected Raven/.NET examples near release to discover
+  crashes and missing functionality, then solving the findings. Specified that shared
+  changes must first be verified on Raven main and released, even when they also
+  exist on the neoCLR branch, so shared issues can be excluded from the comparison.
+- **Assistant action:** added a later roadmap/release-validation gate with pinned
+  compiler/release provenance, minimal port diffs, failure classification, fixes and
+  retests. Shared fixes remain independently integrated; neoCLR policy stays on its
+  feature branch. Platform-neutral cases should not be repeated across every host.
+- **Open:** example selection, Raven release/version, concrete fixes and execution of
+  the pass. No Raven release or compatibility-pass completion is claimed now.
+
+
+### 2026-09-23 — Implement HashCode and adapt record generation
+
+- **Author:** clarified: “we should make Raven support the neoCLR semantics for
+  records. And implement System.HashCode”.
+- **Assistant response:** accepted this as the next implementation direction after
+  completing the current Object checks. Plan coordinated library/compiler work,
+  isolated neoCLR integration, and regression checks for normal .NET record behavior.
+- **Status:** direction recorded; HashCode and record generation changes follow the
+  bounded Object commit. No completion is implied by this entry.
+
+Object-slice validation completed: nine equality/service checks, six identity cases,
+six display regressions, both Raven samples, 15 .NET assertions, full library
+regeneration and combined API/website validation passed. The record probe's emission
+failure remains the next acceptance target.

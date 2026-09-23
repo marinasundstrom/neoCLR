@@ -85,6 +85,7 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/neoCLR/Runtime/AssemblyInfo.neoil')
         result += build(ROOT / 'runtime/raven/Object.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectTypeHandle.neoil')
+        result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectIdentity.neoil')
         result += build(ROOT / 'runtime/raven/SingleError.neoil')
         result += build(ROOT / 'runtime/raven/Linq.neoil')
         result += build(ROOT / 'runtime/raven/OptionOperators.neoil')
