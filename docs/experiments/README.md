@@ -6,6 +6,7 @@ Executable probes and local validation support design decisions; their presence
 does not imply a shipped runtime capability. Read each experiment's status and
 reproduction instructions before using its output.
 
+- [JSON message: a bounded string round trip](json-message/README.md)
 - [UTF-8 chunks: stateful text over partial byte reads](utf8-chunks/README.md)
 - [Byte Copy: managed storage and partial transfers](byte-copy/README.md)
 - [External I/O progress: host-side M1/S0 probe](external-io-progress/README.md)

@@ -1,0 +1,27 @@
+import System.*
+import System.Console.*
+import System.Result.*
+
+func Reply(payload: string) -> Result<string, string> {
+    let message = ReadMessage(payload)?
+    WriteLine("Received message:")
+    WriteLine(message)
+    return WriteMessage(String.Concat("Received: ", message))
+}
+
+func Main() {
+    // A JSON string is a complete JSON value. The surrounding quotes and
+    // Unicode escapes belong to the payload, not to the decoded message.
+    let payload = "\"Hello, caf\\u00e9 \\ud83d\\ude00!\""
+    match Reply(payload) {
+        Ok(let reply) => {
+            WriteLine("JSON reply:")
+            WriteLine(reply)
+            match ReadMessage(reply) {
+                Ok(let text) => WriteLine(text)
+                Error(let error) => WriteLine(error)
+            }
+        }
+        Error(let error) => WriteLine(error)
+    }
+}

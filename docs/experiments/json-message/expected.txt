@@ -1,0 +1,5 @@
+Received message:
+Hello, café 😀!
+JSON reply:
+"Received: Hello, café 😀!"
+Received: Hello, café 😀!

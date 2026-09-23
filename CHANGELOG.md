@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Add a bounded JSON string-message experiment using existing text primitives,
+  with Unicode escape/surrogate validation, reply writing and explicit byte limits.
+  Compare string materialization with .NET 10 and check target round trips and
+  writer expansion. Record partial S3 evidence; object/array JSON and public APIs
+  remain future work.
+
 - Add an application-local UTF-8 chunk decoder experiment reusing Byte Copy's
   managed arrays and short reads. Demonstrate scalar boundaries versus graphemes,
   strict finalization, caller-buffer reuse and synchronous GC retention. Compare

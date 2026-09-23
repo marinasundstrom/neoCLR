@@ -1,0 +1,178 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+
+// Application-local JSON string codec, not a general JSON parser.
+public func HexDigit(value: int) -> int {
+    if value >= 48 && value <= 57 {
+        return value - 48
+    }
+    if value >= 65 && value <= 70 {
+        return value - 55
+    }
+    if value >= 97 && value <= 102 {
+        return value - 87
+    }
+    return -1
+}
+
+public func Whitespace(value: byte) -> bool {
+    return value == 32 || value == 9 || value == 10 || value == 13
+}
+
+public class MessageReader {
+    private field bytes: Sequence<byte>
+    private field position: int
+
+    init(text: string) {
+        bytes = Utf8.Encode(text)
+        position = 0
+    }
+
+    private func HexQuad() -> Result<int, string> {
+        if bytes.Count - position < 4 {
+            return Error("Truncated Unicode escape")
+        }
+        var value = 0
+        for index in 0..<4 {
+            let digit = HexDigit(bytes[position])
+            if digit == -1 {
+                return Error("Invalid Unicode escape")
+            }
+            value = value * 16 + digit
+            position += 1
+        }
+        return Ok(value)
+    }
+
+    func Read() -> Result<string, string> {
+        if bytes.Count > 128 {
+            return Error("Payload exceeds 128 UTF-8 bytes")
+        }
+        while position < bytes.Count && Whitespace(bytes[position]) {
+            position += 1
+        }
+        if position == bytes.Count || bytes[position] != 34 {
+            return Error("Expected a JSON string")
+        }
+        position += 1
+        let output = ArrayList<byte>(bytes.Count)
+        var closed = false
+        while position < bytes.Count && !closed {
+            let value = bytes[position]
+            position += 1
+            if value == 34 {
+                closed = true
+            } else if value == 92 {
+                if position == bytes.Count {
+                    return Error("Truncated escape")
+                }
+                let escape = bytes[position]
+                position += 1
+                if escape == 34 || escape == 92 || escape == 47 {
+                    output.Add(escape)
+                } else if escape == 98 {
+                    output.Add((byte)8)
+                } else if escape == 102 {
+                    output.Add((byte)12)
+                } else if escape == 110 {
+                    output.Add((byte)10)
+                } else if escape == 114 {
+                    output.Add((byte)13)
+                } else if escape == 116 {
+                    output.Add((byte)9)
+                } else if escape == 117 {
+                    var scalar = HexQuad()?
+                    if scalar >= 55296 && scalar <= 56319 {
+                        if bytes.Count - position < 6 {
+                            return Error("Missing low surrogate")
+                        }
+                        if bytes[position] != 92 || bytes[position + 1] != 117 {
+                            return Error("Missing low surrogate")
+                        }
+                        position += 2
+                        let low = HexQuad()?
+                        if !(low >= 56320 && low <= 57343) {
+                            return Error("Invalid low surrogate")
+                        }
+                        scalar = 65536 + (scalar - 55296) * 1024 + low - 56320
+                    } else if scalar >= 56320 && scalar <= 57343 {
+                        return Error("Unpaired low surrogate")
+                    }
+                    if scalar <= 127 {
+                        output.Add((byte)scalar)
+                    } else if scalar <= 2047 {
+                        output.Add((byte)(192 + scalar / 64))
+                        output.Add((byte)(128 + scalar % 64))
+                    } else if scalar <= 65535 {
+                        output.Add((byte)(224 + scalar / 4096))
+                        output.Add((byte)(128 + scalar / 64 % 64))
+                        output.Add((byte)(128 + scalar % 64))
+                    } else {
+                        output.Add((byte)(240 + scalar / 262144))
+                        output.Add((byte)(128 + scalar / 4096 % 64))
+                        output.Add((byte)(128 + scalar / 64 % 64))
+                        output.Add((byte)(128 + scalar % 64))
+                    }
+                } else {
+                    return Error("Unknown escape")
+                }
+            } else if value <= 31 {
+                return Error("Unescaped control byte")
+            } else {
+                output.Add(value)
+            }
+        }
+        if !closed {
+            return Error("Unclosed string")
+        }
+        while position < bytes.Count && Whitespace(bytes[position]) {
+            position += 1
+        }
+        if position != bytes.Count {
+            return Error("Trailing content")
+        }
+        match Utf8.Decode(output) {
+            Ok(let text) => return Ok(text)
+            Error(_) => return Error("Invalid UTF-8")
+        }
+    }
+}
+
+public func ReadMessage(payload: string) -> Result<string, string> {
+    return MessageReader(payload).Read()
+}
+
+public func WriteMessage(text: string) -> Result<string, string> {
+    let input = Utf8.Encode(text)
+    if input.Count > 126 {
+        return Error("Message exceeds payload limit")
+    }
+    let output = ArrayList<byte>(input.Count + 2)
+    let hex = Utf8.Encode("0123456789abcdef")
+    output.Add((byte)34)
+    for value in input {
+        if value == 34 || value == 92 {
+            output.Add((byte)92)
+            output.Add(value)
+        } else if value <= 31 {
+            output.Add((byte)92)
+            output.Add((byte)117)
+            output.Add((byte)48)
+            output.Add((byte)48)
+            output.Add(hex[value / 16])
+            output.Add(hex[value % 16])
+        } else {
+            output.Add(value)
+        }
+        if output.Count > 127 {
+            return Error("Escaped message exceeds payload limit")
+        }
+    }
+    output.Add((byte)34)
+    match Utf8.Decode(output) {
+        Ok(let payload) => return Ok(payload)
+        Error(_) => return Error("Invalid UTF-8")
+    }
+}

@@ -317,7 +317,9 @@ checked ranges, overlapping copies and short reads/writes over ordinary managed
 arrays, with synchronous GC-retention checks. It is an application-local experiment,
 not a completed general stream API. S2 now has a [UTF-8 chunk consumer](experiments/utf8-chunks/README.md)
 that reuses those primitives, preserves incomplete scalars across reads and compares
-strict decoding with .NET. Neither experiment selects a new storage representation;
+strict decoding with .NET. S3 has a first [JSON string-message checkpoint](experiments/json-message/README.md)
+for explicit escaping, Unicode materialization and bounded replies; objects, arrays
+and numbers remain open. These experiments do not select a new storage representation;
 the host probe does not make networking urgent.
 No later major milestone has started.
 
@@ -335,9 +337,11 @@ its feature plan, and update changelog, relevant feature pages and integration d
 Samples begin as small programs, not miniature frameworks. Existing release/debugging
 requirements and Raven branch/integration rules continue to apply.
 
-**Next:** use the byte-copy and UTF-8 evidence to scope the smallest explicit JSON
-round trip. Compare whole-buffer processing with the incremental text adapter;
-do not require a general serializer, stream hierarchy or Memory/Span family first.
+**Next:** extend the JSON string-message checkpoint into a small object-document
+round trip with explicit fields, then arrays, booleans, null and preserved number
+text. Keep whole-buffer processing for bounded payloads unless a concrete consumer
+needs incremental JSON; select duplicate-key, nesting and size policies explicitly.
+Do not require a general serializer, stream hierarchy or Memory/Span family first.
 Then validate guest lifetimes with controlled delayed completion and reuse the
 pipeline for files before tackling sockets. Reassess priorities at each checkpoint and M2
 onward after the first major HTTP application milestone.
