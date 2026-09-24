@@ -1,0 +1,1008 @@
+{
+  "System.Tasks.TaskState.html": {
+    "uid": "T:System.Tasks.TaskState",
+    "anchors": {
+      "System_Tasks_TaskState": "T:System.Tasks.TaskState",
+      "System_Tasks_TaskState_Pending": "F:System.Tasks.TaskState.Pending",
+      "System_Tasks_TaskState_Completed": "F:System.Tasks.TaskState.Completed",
+      "System_Tasks_TaskState_Cancelled": "F:System.Tasks.TaskState.Cancelled"
+    }
+  },
+  "System.Storage.FileWriteError.NotRegularFile.html": {
+    "uid": "T:System.Storage.FileWriteError.NotRegularFile",
+    "anchors": {
+      "System_Storage_FileWriteError_NotRegularFile": "T:System.Storage.FileWriteError.NotRegularFile",
+      "System_Storage_FileWriteError_NotRegularFile__ctor": "M:System.Storage.FileWriteError.NotRegularFile.#ctor"
+    }
+  },
+  "System.Introspection.html": {
+    "uid": "N:System.Introspection",
+    "anchors": {}
+  },
+  "System.Storage.Metadata.html": {
+    "uid": "T:System.Storage.Metadata",
+    "anchors": {
+      "System_Storage_Metadata": "T:System.Storage.Metadata",
+      "System_Storage_Metadata_GetKind_System_String_": "M:System.Storage.Metadata.GetKind"
+    }
+  },
+  "System.Storage.EntryKind.html": {
+    "uid": "T:System.Storage.EntryKind",
+    "anchors": {
+      "System_Storage_EntryKind": "T:System.Storage.EntryKind",
+      "System_Storage_EntryKind_ToString": "M:System.Storage.EntryKind.ToString",
+      "System_Storage_EntryKind__ctor_System_Storage_EntryKind_File_": "M:System.Storage.EntryKind.#ctor",
+      "System_Storage_EntryKind_GetFile": "M:System.Storage.EntryKind.GetFile",
+      "System_Storage_EntryKind__ctor_System_Storage_EntryKind_Directory_": "M:System.Storage.EntryKind.#ctor",
+      "System_Storage_EntryKind_GetDirectory": "M:System.Storage.EntryKind.GetDirectory",
+      "System_Storage_EntryKind_IsFile": "P:System.Storage.EntryKind.IsFile",
+      "System_Storage_EntryKind_IsDirectory": "P:System.Storage.EntryKind.IsDirectory"
+    }
+  },
+  "System.Storage.StorageLookupError.WrongKind.html": {
+    "uid": "T:System.Storage.StorageLookupError.WrongKind",
+    "anchors": {
+      "System_Storage_StorageLookupError_WrongKind": "T:System.Storage.StorageLookupError.WrongKind",
+      "System_Storage_StorageLookupError_WrongKind__ctor": "M:System.Storage.StorageLookupError.WrongKind.#ctor"
+    }
+  },
+  "System.IO.html": {
+    "uid": "N:System.IO",
+    "anchors": {}
+  },
+  "System.ConsoleReadError.ReadFailed.html": {
+    "uid": "T:System.ConsoleReadError.ReadFailed",
+    "anchors": {
+      "System_ConsoleReadError_ReadFailed": "T:System.ConsoleReadError.ReadFailed",
+      "System_ConsoleReadError_ReadFailed__ctor": "M:System.ConsoleReadError.ReadFailed.#ctor"
+    }
+  },
+  "System.IO.StreamReader.html": {
+    "uid": "T:System.IO.StreamReader",
+    "anchors": {
+      "System_IO_StreamReader": "T:System.IO.StreamReader",
+      "System_IO_StreamReader__ctor_System_IO_InputStream_": "M:System.IO.StreamReader.#ctor",
+      "System_IO_StreamReader__ctor_System_IO_InputStream_System_Boolean_": "M:System.IO.StreamReader.#ctor",
+      "System_IO_StreamReader_ReadLine_System_Int32_": "M:System.IO.StreamReader.ReadLine",
+      "System_IO_StreamReader_ReadToEnd_System_Int32_": "M:System.IO.StreamReader.ReadToEnd",
+      "System_IO_StreamReader_Close": "M:System.IO.StreamReader.Close"
+    }
+  },
+  "System.Introspection.MemberInfo.html": {
+    "uid": "T:System.Introspection.MemberInfo",
+    "anchors": {
+      "System_Introspection_MemberInfo": "T:System.Introspection.MemberInfo",
+      "System_Introspection_MemberInfo_MetadataToken": "P:System.Introspection.MemberInfo.MetadataToken",
+      "System_Introspection_MemberInfo_Module": "P:System.Introspection.MemberInfo.Module",
+      "System_Introspection_MemberInfo_Name": "P:System.Introspection.MemberInfo.Name",
+      "System_Introspection_MemberInfo_DeclaringType": "P:System.Introspection.MemberInfo.DeclaringType"
+    }
+  },
+  "System.Storage.html": {
+    "uid": "N:System.Storage",
+    "anchors": {}
+  },
+  "System.HashCode.html": {
+    "uid": "T:System.HashCode",
+    "anchors": {
+      "System_HashCode": "T:System.HashCode",
+      "System_HashCode__ctor": "M:System.HashCode.#ctor",
+      "System_HashCode_Add_System_Int32_": "M:System.HashCode.Add",
+      "System_HashCode_Add_System_String_": "M:System.HashCode.Add",
+      "System_HashCode_ToHashCode": "M:System.HashCode.ToHashCode",
+      "System_HashCode_Combine_System_Int32_System_Int32_": "M:System.HashCode.Combine"
+    }
+  },
+  "System.Introspection.FieldInfo.html": {
+    "uid": "T:System.Introspection.FieldInfo",
+    "anchors": {
+      "System_Introspection_FieldInfo": "T:System.Introspection.FieldInfo",
+      "System_Introspection_FieldInfo_FieldType": "P:System.Introspection.FieldInfo.FieldType",
+      "System_Introspection_FieldInfo_IsPublic": "P:System.Introspection.FieldInfo.IsPublic",
+      "System_Introspection_FieldInfo_IsPrivate": "P:System.Introspection.FieldInfo.IsPrivate",
+      "System_Introspection_FieldInfo_IsAssembly": "P:System.Introspection.FieldInfo.IsAssembly",
+      "System_Introspection_FieldInfo_IsStatic": "P:System.Introspection.FieldInfo.IsStatic",
+      "System_Introspection_FieldInfo_DefinitionIndex": "P:System.Introspection.FieldInfo.DefinitionIndex"
+    }
+  },
+  "System.Introspection.TypeInfo.html": {
+    "uid": "T:System.Introspection.TypeInfo",
+    "anchors": {
+      "System_Introspection_TypeInfo": "T:System.Introspection.TypeInfo",
+      "System_Introspection_TypeInfo_GetGenericArgument_System_Int32_": "M:System.Introspection.TypeInfo.GetGenericArgument",
+      "System_Introspection_TypeInfo_Equals_System_Introspection_TypeInfo_": "M:System.Introspection.TypeInfo.Equals",
+      "System_Introspection_TypeInfo_GetGenericArguments": "M:System.Introspection.TypeInfo.GetGenericArguments",
+      "System_Introspection_TypeInfo_GetElementType": "M:System.Introspection.TypeInfo.GetElementType",
+      "System_Introspection_TypeInfo_GetInterfaces": "M:System.Introspection.TypeInfo.GetInterfaces",
+      "System_Introspection_TypeInfo_GetEnumNames": "M:System.Introspection.TypeInfo.GetEnumNames",
+      "System_Introspection_TypeInfo_GetEnumUnderlyingType": "M:System.Introspection.TypeInfo.GetEnumUnderlyingType",
+      "System_Introspection_TypeInfo_GetFields": "M:System.Introspection.TypeInfo.GetFields",
+      "System_Introspection_TypeInfo_GetFields_System_Introspection_BindingFlags_": "M:System.Introspection.TypeInfo.GetFields",
+      "System_Introspection_TypeInfo_GetMethods": "M:System.Introspection.TypeInfo.GetMethods",
+      "System_Introspection_TypeInfo_GetMethods_System_Introspection_BindingFlags_": "M:System.Introspection.TypeInfo.GetMethods",
+      "System_Introspection_TypeInfo_GetProperties": "M:System.Introspection.TypeInfo.GetProperties",
+      "System_Introspection_TypeInfo_GetProperties_System_Introspection_BindingFlags_": "M:System.Introspection.TypeInfo.GetProperties",
+      "System_Introspection_TypeInfo_FullName": "P:System.Introspection.TypeInfo.FullName",
+      "System_Introspection_TypeInfo_Namespace": "P:System.Introspection.TypeInfo.Namespace",
+      "System_Introspection_TypeInfo_GenericArgumentCount": "P:System.Introspection.TypeInfo.GenericArgumentCount",
+      "System_Introspection_TypeInfo_IsArray": "P:System.Introspection.TypeInfo.IsArray",
+      "System_Introspection_TypeInfo_IsByRef": "P:System.Introspection.TypeInfo.IsByRef",
+      "System_Introspection_TypeInfo_IsPointer": "P:System.Introspection.TypeInfo.IsPointer",
+      "System_Introspection_TypeInfo_IsInterface": "P:System.Introspection.TypeInfo.IsInterface",
+      "System_Introspection_TypeInfo_IsReadOnly": "P:System.Introspection.TypeInfo.IsReadOnly",
+      "System_Introspection_TypeInfo_IsAbstract": "P:System.Introspection.TypeInfo.IsAbstract",
+      "System_Introspection_TypeInfo_IsEnum": "P:System.Introspection.TypeInfo.IsEnum",
+      "System_Introspection_TypeInfo_IsValueType": "P:System.Introspection.TypeInfo.IsValueType",
+      "System_Introspection_TypeInfo_BaseType": "P:System.Introspection.TypeInfo.BaseType"
+    }
+  },
+  "System.Storage.FileWriteError.WriteFailed.html": {
+    "uid": "T:System.Storage.FileWriteError.WriteFailed",
+    "anchors": {
+      "System_Storage_FileWriteError_WriteFailed": "T:System.Storage.FileWriteError.WriteFailed",
+      "System_Storage_FileWriteError_WriteFailed__ctor": "M:System.Storage.FileWriteError.WriteFailed.#ctor"
+    }
+  },
+  "System.IO.TextWriter.html": {
+    "uid": "T:System.IO.TextWriter",
+    "anchors": {
+      "System_IO_TextWriter": "T:System.IO.TextWriter",
+      "System_IO_TextWriter_Write_System_String_": "M:System.IO.TextWriter.Write",
+      "System_IO_TextWriter_WriteLine_System_String_": "M:System.IO.TextWriter.WriteLine",
+      "System_IO_TextWriter_Close": "M:System.IO.TextWriter.Close"
+    }
+  },
+  "System.IO.TextReadError.html": {
+    "uid": "T:System.IO.TextReadError",
+    "anchors": {
+      "System_IO_TextReadError": "T:System.IO.TextReadError",
+      "System_IO_TextReadError_ToString": "M:System.IO.TextReadError.ToString",
+      "System_IO_TextReadError__ctor_System_IO_TextReadError_InvalidPath_": "M:System.IO.TextReadError.#ctor",
+      "System_IO_TextReadError_GetInvalidPath": "M:System.IO.TextReadError.GetInvalidPath",
+      "System_IO_TextReadError__ctor_System_IO_TextReadError_NotFound_": "M:System.IO.TextReadError.#ctor",
+      "System_IO_TextReadError_GetNotFound": "M:System.IO.TextReadError.GetNotFound",
+      "System_IO_TextReadError__ctor_System_IO_TextReadError_AccessDenied_": "M:System.IO.TextReadError.#ctor",
+      "System_IO_TextReadError_GetAccessDenied": "M:System.IO.TextReadError.GetAccessDenied",
+      "System_IO_TextReadError__ctor_System_IO_TextReadError_WrongKind_": "M:System.IO.TextReadError.#ctor",
+      "System_IO_TextReadError_GetWrongKind": "M:System.IO.TextReadError.GetWrongKind",
+      "System_IO_TextReadError__ctor_System_IO_TextReadError_AlreadyExists_": "M:System.IO.TextReadError.#ctor",
+      "System_IO_TextReadError_GetAlreadyExists": "M:System.IO.TextReadError.GetAlreadyExists",
+      "System_IO_TextReadError__ctor_System_IO_TextReadError_Closed_": "M:System.IO.TextReadError.#ctor",
+      "System_IO_TextReadError_GetClosed": "M:System.IO.TextReadError.GetClosed",
+      "System_IO_TextReadError__ctor_System_IO_TextReadError_InvalidRange_": "M:System.IO.TextReadError.#ctor",
+      "System_IO_TextReadError_GetInvalidRange": "M:System.IO.TextReadError.GetInvalidRange",
+      "System_IO_TextReadError__ctor_System_IO_TextReadError_LimitExceeded_": "M:System.IO.TextReadError.#ctor",
+      "System_IO_TextReadError_GetLimitExceeded": "M:System.IO.TextReadError.GetLimitExceeded",
+      "System_IO_TextReadError__ctor_System_IO_TextReadError_WrongAccess_": "M:System.IO.TextReadError.#ctor",
+      "System_IO_TextReadError_GetWrongAccess": "M:System.IO.TextReadError.GetWrongAccess",
+      "System_IO_TextReadError__ctor_System_IO_TextReadError_IoFailure_": "M:System.IO.TextReadError.#ctor",
+      "System_IO_TextReadError_GetIoFailure": "M:System.IO.TextReadError.GetIoFailure",
+      "System_IO_TextReadError__ctor_System_IO_TextReadError_InvalidUtf8_": "M:System.IO.TextReadError.#ctor",
+      "System_IO_TextReadError_GetInvalidUtf8": "M:System.IO.TextReadError.GetInvalidUtf8",
+      "System_IO_TextReadError_IsInvalidPath": "P:System.IO.TextReadError.IsInvalidPath",
+      "System_IO_TextReadError_IsNotFound": "P:System.IO.TextReadError.IsNotFound",
+      "System_IO_TextReadError_IsAccessDenied": "P:System.IO.TextReadError.IsAccessDenied",
+      "System_IO_TextReadError_IsWrongKind": "P:System.IO.TextReadError.IsWrongKind",
+      "System_IO_TextReadError_IsAlreadyExists": "P:System.IO.TextReadError.IsAlreadyExists",
+      "System_IO_TextReadError_IsClosed": "P:System.IO.TextReadError.IsClosed",
+      "System_IO_TextReadError_IsInvalidRange": "P:System.IO.TextReadError.IsInvalidRange",
+      "System_IO_TextReadError_IsLimitExceeded": "P:System.IO.TextReadError.IsLimitExceeded",
+      "System_IO_TextReadError_IsWrongAccess": "P:System.IO.TextReadError.IsWrongAccess",
+      "System_IO_TextReadError_IsIoFailure": "P:System.IO.TextReadError.IsIoFailure",
+      "System_IO_TextReadError_IsInvalidUtf8": "P:System.IO.TextReadError.IsInvalidUtf8"
+    }
+  },
+  "System.Runtime.CompilerServices.IsExternalInit.html": {
+    "uid": "T:System.Runtime.CompilerServices.IsExternalInit",
+    "anchors": {
+      "System_Runtime_CompilerServices_IsExternalInit": "T:System.Runtime.CompilerServices.IsExternalInit"
+    }
+  },
+  "System.Console.html": {
+    "uid": "T:System.Console",
+    "anchors": {
+      "System_Console": "T:System.Console",
+      "System_Console_ReadByte": "M:System.Console.ReadByte",
+      "System_Console_OpenStandardInput": "M:System.Console.OpenStandardInput",
+      "System_Console_OpenStandardOutput": "M:System.Console.OpenStandardOutput",
+      "System_Console_OpenStandardError": "M:System.Console.OpenStandardError",
+      "System_Console_ReadLine": "M:System.Console.ReadLine",
+      "System_Console_ReadLine_System_Int32_": "M:System.Console.ReadLine",
+      "System_Console_Write_System_String_": "M:System.Console.Write",
+      "System_Console_Write_System_Int32_": "M:System.Console.Write",
+      "System_Console_WriteLine": "M:System.Console.WriteLine",
+      "System_Console_WriteLine_System_String_": "M:System.Console.WriteLine",
+      "System_Console_WriteLine_System_Int32_": "M:System.Console.WriteLine",
+      "System_Console_In": "P:System.Console.In",
+      "System_Console_Out": "P:System.Console.Out",
+      "System_Console_Error": "P:System.Console.Error"
+    }
+  },
+  "System.IO.StreamError.AccessDenied.html": {
+    "uid": "T:System.IO.StreamError.AccessDenied",
+    "anchors": {
+      "System_IO_StreamError_AccessDenied": "T:System.IO.StreamError.AccessDenied",
+      "System_IO_StreamError_AccessDenied__ctor": "M:System.IO.StreamError.AccessDenied.#ctor"
+    }
+  },
+  "System.Introspection.BindingFlags.html": {
+    "uid": "T:System.Introspection.BindingFlags",
+    "anchors": {
+      "System_Introspection_BindingFlags": "T:System.Introspection.BindingFlags",
+      "System_Introspection_BindingFlags_Default": "F:System.Introspection.BindingFlags.Default",
+      "System_Introspection_BindingFlags_DeclaredOnly": "F:System.Introspection.BindingFlags.DeclaredOnly",
+      "System_Introspection_BindingFlags_Instance": "F:System.Introspection.BindingFlags.Instance",
+      "System_Introspection_BindingFlags_Static": "F:System.Introspection.BindingFlags.Static",
+      "System_Introspection_BindingFlags_Public": "F:System.Introspection.BindingFlags.Public",
+      "System_Introspection_BindingFlags_NonPublic": "F:System.Introspection.BindingFlags.NonPublic"
+    }
+  },
+  "System.ConsoleReadError.html": {
+    "uid": "T:System.ConsoleReadError",
+    "anchors": {
+      "System_ConsoleReadError": "T:System.ConsoleReadError",
+      "System_ConsoleReadError_ToString": "M:System.ConsoleReadError.ToString",
+      "System_ConsoleReadError__ctor_System_ConsoleReadError_Unavailable_": "M:System.ConsoleReadError.#ctor",
+      "System_ConsoleReadError_GetUnavailable": "M:System.ConsoleReadError.GetUnavailable",
+      "System_ConsoleReadError__ctor_System_ConsoleReadError_ReadFailed_": "M:System.ConsoleReadError.#ctor",
+      "System_ConsoleReadError_GetReadFailed": "M:System.ConsoleReadError.GetReadFailed",
+      "System_ConsoleReadError_IsUnavailable": "P:System.ConsoleReadError.IsUnavailable",
+      "System_ConsoleReadError_IsReadFailed": "P:System.ConsoleReadError.IsReadFailed"
+    }
+  },
+  "System.IO.StreamError.html": {
+    "uid": "T:System.IO.StreamError",
+    "anchors": {
+      "System_IO_StreamError": "T:System.IO.StreamError",
+      "System_IO_StreamError_ToString": "M:System.IO.StreamError.ToString",
+      "System_IO_StreamError__ctor_System_IO_StreamError_InvalidPath_": "M:System.IO.StreamError.#ctor",
+      "System_IO_StreamError_GetInvalidPath": "M:System.IO.StreamError.GetInvalidPath",
+      "System_IO_StreamError__ctor_System_IO_StreamError_NotFound_": "M:System.IO.StreamError.#ctor",
+      "System_IO_StreamError_GetNotFound": "M:System.IO.StreamError.GetNotFound",
+      "System_IO_StreamError__ctor_System_IO_StreamError_AccessDenied_": "M:System.IO.StreamError.#ctor",
+      "System_IO_StreamError_GetAccessDenied": "M:System.IO.StreamError.GetAccessDenied",
+      "System_IO_StreamError__ctor_System_IO_StreamError_WrongKind_": "M:System.IO.StreamError.#ctor",
+      "System_IO_StreamError_GetWrongKind": "M:System.IO.StreamError.GetWrongKind",
+      "System_IO_StreamError__ctor_System_IO_StreamError_AlreadyExists_": "M:System.IO.StreamError.#ctor",
+      "System_IO_StreamError_GetAlreadyExists": "M:System.IO.StreamError.GetAlreadyExists",
+      "System_IO_StreamError__ctor_System_IO_StreamError_Closed_": "M:System.IO.StreamError.#ctor",
+      "System_IO_StreamError_GetClosed": "M:System.IO.StreamError.GetClosed",
+      "System_IO_StreamError__ctor_System_IO_StreamError_InvalidRange_": "M:System.IO.StreamError.#ctor",
+      "System_IO_StreamError_GetInvalidRange": "M:System.IO.StreamError.GetInvalidRange",
+      "System_IO_StreamError__ctor_System_IO_StreamError_LimitExceeded_": "M:System.IO.StreamError.#ctor",
+      "System_IO_StreamError_GetLimitExceeded": "M:System.IO.StreamError.GetLimitExceeded",
+      "System_IO_StreamError__ctor_System_IO_StreamError_WrongAccess_": "M:System.IO.StreamError.#ctor",
+      "System_IO_StreamError_GetWrongAccess": "M:System.IO.StreamError.GetWrongAccess",
+      "System_IO_StreamError__ctor_System_IO_StreamError_IoFailure_": "M:System.IO.StreamError.#ctor",
+      "System_IO_StreamError_GetIoFailure": "M:System.IO.StreamError.GetIoFailure",
+      "System_IO_StreamError_IsInvalidPath": "P:System.IO.StreamError.IsInvalidPath",
+      "System_IO_StreamError_IsNotFound": "P:System.IO.StreamError.IsNotFound",
+      "System_IO_StreamError_IsAccessDenied": "P:System.IO.StreamError.IsAccessDenied",
+      "System_IO_StreamError_IsWrongKind": "P:System.IO.StreamError.IsWrongKind",
+      "System_IO_StreamError_IsAlreadyExists": "P:System.IO.StreamError.IsAlreadyExists",
+      "System_IO_StreamError_IsClosed": "P:System.IO.StreamError.IsClosed",
+      "System_IO_StreamError_IsInvalidRange": "P:System.IO.StreamError.IsInvalidRange",
+      "System_IO_StreamError_IsLimitExceeded": "P:System.IO.StreamError.IsLimitExceeded",
+      "System_IO_StreamError_IsWrongAccess": "P:System.IO.StreamError.IsWrongAccess",
+      "System_IO_StreamError_IsIoFailure": "P:System.IO.StreamError.IsIoFailure"
+    }
+  },
+  "System.IO.StreamError.WrongKind.html": {
+    "uid": "T:System.IO.StreamError.WrongKind",
+    "anchors": {
+      "System_IO_StreamError_WrongKind": "T:System.IO.StreamError.WrongKind",
+      "System_IO_StreamError_WrongKind__ctor": "M:System.IO.StreamError.WrongKind.#ctor"
+    }
+  },
+  "System.Storage.StorageProvider.html": {
+    "uid": "T:System.Storage.StorageProvider",
+    "anchors": {
+      "System_Storage_StorageProvider": "T:System.Storage.StorageProvider",
+      "System_Storage_StorageProvider_GetItem_System_Storage_Path_": "M:System.Storage.StorageProvider.GetItem",
+      "System_Storage_StorageProvider_GetFile_System_Storage_Path_": "M:System.Storage.StorageProvider.GetFile",
+      "System_Storage_StorageProvider_GetDirectory_System_Storage_Path_": "M:System.Storage.StorageProvider.GetDirectory"
+    }
+  },
+  "System.Storage.Directory.html": {
+    "uid": "T:System.Storage.Directory",
+    "anchors": {
+      "System_Storage_Directory": "T:System.Storage.Directory",
+      "System_Storage_Directory_GetItems_System_Int32_": "M:System.Storage.Directory.GetItems",
+      "System_Storage_Directory_GetItem_System_Storage_Path_": "M:System.Storage.Directory.GetItem",
+      "System_Storage_Directory_GetDirectory_System_String_": "M:System.Storage.Directory.GetDirectory",
+      "System_Storage_Directory_GetDirectory_System_Storage_Path_": "M:System.Storage.Directory.GetDirectory",
+      "System_Storage_Directory_FileAt_System_String_": "M:System.Storage.Directory.FileAt",
+      "System_Storage_Directory_GetFile_System_String_": "M:System.Storage.Directory.GetFile",
+      "System_Storage_Directory_GetFile_System_Storage_Path_": "M:System.Storage.Directory.GetFile"
+    }
+  },
+  "System.IO.TextReader.html": {
+    "uid": "T:System.IO.TextReader",
+    "anchors": {
+      "System_IO_TextReader": "T:System.IO.TextReader",
+      "System_IO_TextReader_ReadLine_System_Int32_": "M:System.IO.TextReader.ReadLine",
+      "System_IO_TextReader_ReadToEnd_System_Int32_": "M:System.IO.TextReader.ReadToEnd",
+      "System_IO_TextReader_Close": "M:System.IO.TextReader.Close"
+    }
+  },
+  "System.IO.TextReadError.AccessDenied.html": {
+    "uid": "T:System.IO.TextReadError.AccessDenied",
+    "anchors": {
+      "System_IO_TextReadError_AccessDenied": "T:System.IO.TextReadError.AccessDenied",
+      "System_IO_TextReadError_AccessDenied__ctor": "M:System.IO.TextReadError.AccessDenied.#ctor"
+    }
+  },
+  "System.IO.StreamWriter.html": {
+    "uid": "T:System.IO.StreamWriter",
+    "anchors": {
+      "System_IO_StreamWriter": "T:System.IO.StreamWriter",
+      "System_IO_StreamWriter__ctor_System_IO_OutputStream_": "M:System.IO.StreamWriter.#ctor",
+      "System_IO_StreamWriter__ctor_System_IO_OutputStream_System_Boolean_": "M:System.IO.StreamWriter.#ctor",
+      "System_IO_StreamWriter_Write_System_String_": "M:System.IO.StreamWriter.Write",
+      "System_IO_StreamWriter_WriteLine_System_String_": "M:System.IO.StreamWriter.WriteLine",
+      "System_IO_StreamWriter_Close": "M:System.IO.StreamWriter.Close"
+    }
+  },
+  "System.Introspection.MethodInfo.html": {
+    "uid": "T:System.Introspection.MethodInfo",
+    "anchors": {
+      "System_Introspection_MethodInfo": "T:System.Introspection.MethodInfo",
+      "System_Introspection_MethodInfo_GetParameters": "M:System.Introspection.MethodInfo.GetParameters",
+      "System_Introspection_MethodInfo_ReturnType": "P:System.Introspection.MethodInfo.ReturnType",
+      "System_Introspection_MethodInfo_IsStatic": "P:System.Introspection.MethodInfo.IsStatic",
+      "System_Introspection_MethodInfo_IsPublic": "P:System.Introspection.MethodInfo.IsPublic",
+      "System_Introspection_MethodInfo_IsPrivate": "P:System.Introspection.MethodInfo.IsPrivate",
+      "System_Introspection_MethodInfo_IsAssembly": "P:System.Introspection.MethodInfo.IsAssembly",
+      "System_Introspection_MethodInfo_IsReceiverByRef": "P:System.Introspection.MethodInfo.IsReceiverByRef",
+      "System_Introspection_MethodInfo_DefinitionIndex": "P:System.Introspection.MethodInfo.DefinitionIndex",
+      "System_Introspection_MethodInfo_IsReadOnly": "P:System.Introspection.MethodInfo.IsReadOnly",
+      "System_Introspection_MethodInfo_IsVirtual": "P:System.Introspection.MethodInfo.IsVirtual",
+      "System_Introspection_MethodInfo_IsOverride": "P:System.Introspection.MethodInfo.IsOverride",
+      "System_Introspection_MethodInfo_IsAbstract": "P:System.Introspection.MethodInfo.IsAbstract"
+    }
+  },
+  "System.Storage.FileWriteError.InvalidPath.html": {
+    "uid": "T:System.Storage.FileWriteError.InvalidPath",
+    "anchors": {
+      "System_Storage_FileWriteError_InvalidPath": "T:System.Storage.FileWriteError.InvalidPath",
+      "System_Storage_FileWriteError_InvalidPath__ctor": "M:System.Storage.FileWriteError.InvalidPath.#ctor"
+    }
+  },
+  "System.Storage.FileText.html": {
+    "uid": "T:System.Storage.FileText",
+    "anchors": {
+      "System_Storage_FileText": "T:System.Storage.FileText",
+      "System_Storage_FileText_ReadAllText_System_String_System_Int32_": "M:System.Storage.FileText.ReadAllText"
+    }
+  },
+  "System.Storage.FileReadError.ReadFailed.html": {
+    "uid": "T:System.Storage.FileReadError.ReadFailed",
+    "anchors": {
+      "System_Storage_FileReadError_ReadFailed": "T:System.Storage.FileReadError.ReadFailed",
+      "System_Storage_FileReadError_ReadFailed__ctor": "M:System.Storage.FileReadError.ReadFailed.#ctor"
+    }
+  },
+  "System.Storage.File.html": {
+    "uid": "T:System.Storage.File",
+    "anchors": {
+      "System_Storage_File": "T:System.Storage.File",
+      "System_Storage_File_OpenRead": "M:System.Storage.File.OpenRead",
+      "System_Storage_File_CreateNew": "M:System.Storage.File.CreateNew"
+    }
+  },
+  "System.IO.StreamError.AlreadyExists.html": {
+    "uid": "T:System.IO.StreamError.AlreadyExists",
+    "anchors": {
+      "System_IO_StreamError_AlreadyExists": "T:System.IO.StreamError.AlreadyExists",
+      "System_IO_StreamError_AlreadyExists__ctor": "M:System.IO.StreamError.AlreadyExists.#ctor"
+    }
+  },
+  "System.Storage.FileReadError.NotRegularFile.html": {
+    "uid": "T:System.Storage.FileReadError.NotRegularFile",
+    "anchors": {
+      "System_Storage_FileReadError_NotRegularFile": "T:System.Storage.FileReadError.NotRegularFile",
+      "System_Storage_FileReadError_NotRegularFile__ctor": "M:System.Storage.FileReadError.NotRegularFile.#ctor"
+    }
+  },
+  "System.IO.TextReadError.Closed.html": {
+    "uid": "T:System.IO.TextReadError.Closed",
+    "anchors": {
+      "System_IO_TextReadError_Closed": "T:System.IO.TextReadError.Closed",
+      "System_IO_TextReadError_Closed__ctor": "M:System.IO.TextReadError.Closed.#ctor"
+    }
+  },
+  "System.IO.TextReadError.IoFailure.html": {
+    "uid": "T:System.IO.TextReadError.IoFailure",
+    "anchors": {
+      "System_IO_TextReadError_IoFailure": "T:System.IO.TextReadError.IoFailure",
+      "System_IO_TextReadError_IoFailure__ctor": "M:System.IO.TextReadError.IoFailure.#ctor"
+    }
+  },
+  "System.Storage.EntryKind.File.html": {
+    "uid": "T:System.Storage.EntryKind.File",
+    "anchors": {
+      "System_Storage_EntryKind_File": "T:System.Storage.EntryKind.File",
+      "System_Storage_EntryKind_File__ctor": "M:System.Storage.EntryKind.File.#ctor"
+    }
+  },
+  "System.IO.StreamError.InvalidPath.html": {
+    "uid": "T:System.IO.StreamError.InvalidPath",
+    "anchors": {
+      "System_IO_StreamError_InvalidPath": "T:System.IO.StreamError.InvalidPath",
+      "System_IO_StreamError_InvalidPath__ctor": "M:System.IO.StreamError.InvalidPath.#ctor"
+    }
+  },
+  "System.IO.InputStream.html": {
+    "uid": "T:System.IO.InputStream",
+    "anchors": {
+      "System_IO_InputStream": "T:System.IO.InputStream",
+      "System_IO_InputStream_Read_System_Byte___System_Int32_System_Int32_": "M:System.IO.InputStream.Read",
+      "System_IO_InputStream_Close": "M:System.IO.InputStream.Close"
+    }
+  },
+  "System.Runtime.CompilerServices.AsyncTaskMethodBuilder-1.html": {
+    "uid": "T:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1",
+    "anchors": {
+      "System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1": "T:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1",
+      "System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1__ctor_System_Tasks_TaskQueue_": "M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.#ctor",
+      "System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_Create": "M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.Create",
+      "System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_Start__1___0__": "M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.Start``1",
+      "System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_SetStateMachine_System_Runtime_CompilerServices_IAsyncStateMachine_": "M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetStateMachine",
+      "System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_HasStateMachine": "M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.HasStateMachine",
+      "System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_GetStateMachine": "M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.GetStateMachine",
+      "System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_SetResult__0_": "M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetResult",
+      "System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_SetCancelled": "M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetCancelled",
+      "System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_AwaitOnCompleted__2___0____1__": "M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AwaitOnCompleted``2",
+      "System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_Task": "P:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.Task"
+    }
+  },
+  "System.Storage.FileWriteError.TooLarge.html": {
+    "uid": "T:System.Storage.FileWriteError.TooLarge",
+    "anchors": {
+      "System_Storage_FileWriteError_TooLarge": "T:System.Storage.FileWriteError.TooLarge",
+      "System_Storage_FileWriteError_TooLarge__ctor": "M:System.Storage.FileWriteError.TooLarge.#ctor"
+    }
+  },
+  "System.IO.TextReadError.NotFound.html": {
+    "uid": "T:System.IO.TextReadError.NotFound",
+    "anchors": {
+      "System_IO_TextReadError_NotFound": "T:System.IO.TextReadError.NotFound",
+      "System_IO_TextReadError_NotFound__ctor": "M:System.IO.TextReadError.NotFound.#ctor"
+    }
+  },
+  "System.Storage.StorageLookupError.InvalidRange.html": {
+    "uid": "T:System.Storage.StorageLookupError.InvalidRange",
+    "anchors": {
+      "System_Storage_StorageLookupError_InvalidRange": "T:System.Storage.StorageLookupError.InvalidRange",
+      "System_Storage_StorageLookupError_InvalidRange__ctor": "M:System.Storage.StorageLookupError.InvalidRange.#ctor"
+    }
+  },
+  "System.Storage.FileReadError.NotFound.html": {
+    "uid": "T:System.Storage.FileReadError.NotFound",
+    "anchors": {
+      "System_Storage_FileReadError_NotFound": "T:System.Storage.FileReadError.NotFound",
+      "System_Storage_FileReadError_NotFound__ctor": "M:System.Storage.FileReadError.NotFound.#ctor"
+    }
+  },
+  "System.Storage.Path.html": {
+    "uid": "T:System.Storage.Path",
+    "anchors": {
+      "System_Storage_Path": "T:System.Storage.Path",
+      "System_Storage_Path_Combine_System_String_System_String_": "M:System.Storage.Path.Combine",
+      "System_Storage_Path_GetFileName_System_String_": "M:System.Storage.Path.GetFileName",
+      "System_Storage_Path_Parse_System_String_": "M:System.Storage.Path.Parse",
+      "System_Storage_Path_Equals_System_Storage_Path_": "M:System.Storage.Path.Equals",
+      "System_Storage_Path_Equals_System_Object_": "M:System.Storage.Path.Equals",
+      "System_Storage_Path_GetHashCode": "M:System.Storage.Path.GetHashCode",
+      "System_Storage_Path_ToString": "M:System.Storage.Path.ToString",
+      "System_Storage_Path_Text": "P:System.Storage.Path.Text",
+      "System_Storage_Path_IsAbsolute": "P:System.Storage.Path.IsAbsolute",
+      "System_Storage_Path_IsRelative": "P:System.Storage.Path.IsRelative"
+    }
+  },
+  "System.IO.StreamError.WrongAccess.html": {
+    "uid": "T:System.IO.StreamError.WrongAccess",
+    "anchors": {
+      "System_IO_StreamError_WrongAccess": "T:System.IO.StreamError.WrongAccess",
+      "System_IO_StreamError_WrongAccess__ctor": "M:System.IO.StreamError.WrongAccess.#ctor"
+    }
+  },
+  "System.IO.StreamError.LimitExceeded.html": {
+    "uid": "T:System.IO.StreamError.LimitExceeded",
+    "anchors": {
+      "System_IO_StreamError_LimitExceeded": "T:System.IO.StreamError.LimitExceeded",
+      "System_IO_StreamError_LimitExceeded__ctor": "M:System.IO.StreamError.LimitExceeded.#ctor"
+    }
+  },
+  "System.IO.OutputStream.html": {
+    "uid": "T:System.IO.OutputStream",
+    "anchors": {
+      "System_IO_OutputStream": "T:System.IO.OutputStream",
+      "System_IO_OutputStream_Write_System_Byte___System_Int32_System_Int32_": "M:System.IO.OutputStream.Write",
+      "System_IO_OutputStream_Close": "M:System.IO.OutputStream.Close"
+    }
+  },
+  "System.Storage.FileReadError.html": {
+    "uid": "T:System.Storage.FileReadError",
+    "anchors": {
+      "System_Storage_FileReadError": "T:System.Storage.FileReadError",
+      "System_Storage_FileReadError_ToString": "M:System.Storage.FileReadError.ToString",
+      "System_Storage_FileReadError__ctor_System_Storage_FileReadError_InvalidLimit_": "M:System.Storage.FileReadError.#ctor",
+      "System_Storage_FileReadError_GetInvalidLimit": "M:System.Storage.FileReadError.GetInvalidLimit",
+      "System_Storage_FileReadError__ctor_System_Storage_FileReadError_InvalidPath_": "M:System.Storage.FileReadError.#ctor",
+      "System_Storage_FileReadError_GetInvalidPath": "M:System.Storage.FileReadError.GetInvalidPath",
+      "System_Storage_FileReadError__ctor_System_Storage_FileReadError_NotFound_": "M:System.Storage.FileReadError.#ctor",
+      "System_Storage_FileReadError_GetNotFound": "M:System.Storage.FileReadError.GetNotFound",
+      "System_Storage_FileReadError__ctor_System_Storage_FileReadError_AccessDenied_": "M:System.Storage.FileReadError.#ctor",
+      "System_Storage_FileReadError_GetAccessDenied": "M:System.Storage.FileReadError.GetAccessDenied",
+      "System_Storage_FileReadError__ctor_System_Storage_FileReadError_NotRegularFile_": "M:System.Storage.FileReadError.#ctor",
+      "System_Storage_FileReadError_GetNotRegularFile": "M:System.Storage.FileReadError.GetNotRegularFile",
+      "System_Storage_FileReadError__ctor_System_Storage_FileReadError_TooLarge_": "M:System.Storage.FileReadError.#ctor",
+      "System_Storage_FileReadError_GetTooLarge": "M:System.Storage.FileReadError.GetTooLarge",
+      "System_Storage_FileReadError__ctor_System_Storage_FileReadError_ReadFailed_": "M:System.Storage.FileReadError.#ctor",
+      "System_Storage_FileReadError_GetReadFailed": "M:System.Storage.FileReadError.GetReadFailed",
+      "System_Storage_FileReadError__ctor_System_Storage_FileReadError_InvalidUtf8_": "M:System.Storage.FileReadError.#ctor",
+      "System_Storage_FileReadError_GetInvalidUtf8": "M:System.Storage.FileReadError.GetInvalidUtf8",
+      "System_Storage_FileReadError_IsInvalidLimit": "P:System.Storage.FileReadError.IsInvalidLimit",
+      "System_Storage_FileReadError_IsInvalidPath": "P:System.Storage.FileReadError.IsInvalidPath",
+      "System_Storage_FileReadError_IsNotFound": "P:System.Storage.FileReadError.IsNotFound",
+      "System_Storage_FileReadError_IsAccessDenied": "P:System.Storage.FileReadError.IsAccessDenied",
+      "System_Storage_FileReadError_IsNotRegularFile": "P:System.Storage.FileReadError.IsNotRegularFile",
+      "System_Storage_FileReadError_IsTooLarge": "P:System.Storage.FileReadError.IsTooLarge",
+      "System_Storage_FileReadError_IsReadFailed": "P:System.Storage.FileReadError.IsReadFailed",
+      "System_Storage_FileReadError_IsInvalidUtf8": "P:System.Storage.FileReadError.IsInvalidUtf8"
+    }
+  },
+  "System.IO.FileInputStream.html": {
+    "uid": "T:System.IO.FileInputStream",
+    "anchors": {
+      "System_IO_FileInputStream": "T:System.IO.FileInputStream",
+      "System_IO_FileInputStream_GetPosition": "M:System.IO.FileInputStream.GetPosition",
+      "System_IO_FileInputStream_Seek_System_Int64_": "M:System.IO.FileInputStream.Seek",
+      "System_IO_FileInputStream_Open_System_String_": "M:System.IO.FileInputStream.Open",
+      "System_IO_FileInputStream_Read_System_Byte___System_Int32_System_Int32_": "M:System.IO.FileInputStream.Read",
+      "System_IO_FileInputStream_Close": "M:System.IO.FileInputStream.Close"
+    }
+  },
+  "System.Storage.StorageLookupError.AccessDenied.html": {
+    "uid": "T:System.Storage.StorageLookupError.AccessDenied",
+    "anchors": {
+      "System_Storage_StorageLookupError_AccessDenied": "T:System.Storage.StorageLookupError.AccessDenied",
+      "System_Storage_StorageLookupError_AccessDenied__ctor": "M:System.Storage.StorageLookupError.AccessDenied.#ctor"
+    }
+  },
+  "System.IO.TextReadError.InvalidPath.html": {
+    "uid": "T:System.IO.TextReadError.InvalidPath",
+    "anchors": {
+      "System_IO_TextReadError_InvalidPath": "T:System.IO.TextReadError.InvalidPath",
+      "System_IO_TextReadError_InvalidPath__ctor": "M:System.IO.TextReadError.InvalidPath.#ctor"
+    }
+  },
+  "System.Storage.FileReadError.InvalidPath.html": {
+    "uid": "T:System.Storage.FileReadError.InvalidPath",
+    "anchors": {
+      "System_Storage_FileReadError_InvalidPath": "T:System.Storage.FileReadError.InvalidPath",
+      "System_Storage_FileReadError_InvalidPath__ctor": "M:System.Storage.FileReadError.InvalidPath.#ctor"
+    }
+  },
+  "System.IO.StreamError.Closed.html": {
+    "uid": "T:System.IO.StreamError.Closed",
+    "anchors": {
+      "System_IO_StreamError_Closed": "T:System.IO.StreamError.Closed",
+      "System_IO_StreamError_Closed__ctor": "M:System.IO.StreamError.Closed.#ctor"
+    }
+  },
+  "System.ConsoleReadError.Unavailable.html": {
+    "uid": "T:System.ConsoleReadError.Unavailable",
+    "anchors": {
+      "System_ConsoleReadError_Unavailable": "T:System.ConsoleReadError.Unavailable",
+      "System_ConsoleReadError_Unavailable__ctor": "M:System.ConsoleReadError.Unavailable.#ctor"
+    }
+  },
+  "System.Equatable-1.html": {
+    "uid": "T:System.Equatable`1",
+    "anchors": {
+      "System_Equatable_1": "T:System.Equatable`1",
+      "System_Equatable_1_Equals__0_": "M:System.Equatable`1.Equals"
+    }
+  },
+  "System.Tasks.html": {
+    "uid": "N:System.Tasks",
+    "anchors": {}
+  },
+  "System.IO.FileOutputStream.html": {
+    "uid": "T:System.IO.FileOutputStream",
+    "anchors": {
+      "System_IO_FileOutputStream": "T:System.IO.FileOutputStream",
+      "System_IO_FileOutputStream_CreateNew_System_String_": "M:System.IO.FileOutputStream.CreateNew",
+      "System_IO_FileOutputStream_Write_System_Byte___System_Int32_System_Int32_": "M:System.IO.FileOutputStream.Write",
+      "System_IO_FileOutputStream_Close": "M:System.IO.FileOutputStream.Close"
+    }
+  },
+  "System.IO.TextReadError.AlreadyExists.html": {
+    "uid": "T:System.IO.TextReadError.AlreadyExists",
+    "anchors": {
+      "System_IO_TextReadError_AlreadyExists": "T:System.IO.TextReadError.AlreadyExists",
+      "System_IO_TextReadError_AlreadyExists__ctor": "M:System.IO.TextReadError.AlreadyExists.#ctor"
+    }
+  },
+  "System.Storage.FileWriteError.InvalidLimit.html": {
+    "uid": "T:System.Storage.FileWriteError.InvalidLimit",
+    "anchors": {
+      "System_Storage_FileWriteError_InvalidLimit": "T:System.Storage.FileWriteError.InvalidLimit",
+      "System_Storage_FileWriteError_InvalidLimit__ctor": "M:System.Storage.FileWriteError.InvalidLimit.#ctor"
+    }
+  },
+  "System.IO.StreamError.IoFailure.html": {
+    "uid": "T:System.IO.StreamError.IoFailure",
+    "anchors": {
+      "System_IO_StreamError_IoFailure": "T:System.IO.StreamError.IoFailure",
+      "System_IO_StreamError_IoFailure__ctor": "M:System.IO.StreamError.IoFailure.#ctor"
+    }
+  },
+  "System.Introspection.AssemblyInfo.html": {
+    "uid": "T:System.Introspection.AssemblyInfo",
+    "anchors": {
+      "System_Introspection_AssemblyInfo": "T:System.Introspection.AssemblyInfo",
+      "System_Introspection_AssemblyInfo_GetModules": "M:System.Introspection.AssemblyInfo.GetModules",
+      "System_Introspection_AssemblyInfo_GetTypes": "M:System.Introspection.AssemblyInfo.GetTypes",
+      "System_Introspection_AssemblyInfo_Name": "P:System.Introspection.AssemblyInfo.Name",
+      "System_Introspection_AssemblyInfo_FullName": "P:System.Introspection.AssemblyInfo.FullName",
+      "System_Introspection_AssemblyInfo_MetadataToken": "P:System.Introspection.AssemblyInfo.MetadataToken",
+      "System_Introspection_AssemblyInfo_ReferencedAssemblies": "P:System.Introspection.AssemblyInfo.ReferencedAssemblies"
+    }
+  },
+  "System.IO.TextReadError.InvalidRange.html": {
+    "uid": "T:System.IO.TextReadError.InvalidRange",
+    "anchors": {
+      "System_IO_TextReadError_InvalidRange": "T:System.IO.TextReadError.InvalidRange",
+      "System_IO_TextReadError_InvalidRange__ctor": "M:System.IO.TextReadError.InvalidRange.#ctor"
+    }
+  },
+  "System.Storage.StorageItem.html": {
+    "uid": "T:System.Storage.StorageItem",
+    "anchors": {
+      "System_Storage_StorageItem": "T:System.Storage.StorageItem",
+      "System_Storage_StorageItem_Path": "P:System.Storage.StorageItem.Path",
+      "System_Storage_StorageItem_Name": "P:System.Storage.StorageItem.Name"
+    }
+  },
+  "System.Storage.StorageLookupError.IoFailure.html": {
+    "uid": "T:System.Storage.StorageLookupError.IoFailure",
+    "anchors": {
+      "System_Storage_StorageLookupError_IoFailure": "T:System.Storage.StorageLookupError.IoFailure",
+      "System_Storage_StorageLookupError_IoFailure__ctor": "M:System.Storage.StorageLookupError.IoFailure.#ctor"
+    }
+  },
+  "System.Runtime.CompilerServices.IAsyncStateMachine.html": {
+    "uid": "T:System.Runtime.CompilerServices.IAsyncStateMachine",
+    "anchors": {
+      "System_Runtime_CompilerServices_IAsyncStateMachine": "T:System.Runtime.CompilerServices.IAsyncStateMachine",
+      "System_Runtime_CompilerServices_IAsyncStateMachine_MoveNext": "M:System.Runtime.CompilerServices.IAsyncStateMachine.MoveNext",
+      "System_Runtime_CompilerServices_IAsyncStateMachine_SetStateMachine_System_Runtime_CompilerServices_IAsyncStateMachine_": "M:System.Runtime.CompilerServices.IAsyncStateMachine.SetStateMachine"
+    }
+  },
+  "System.Storage.FileWriteError.NotFound.html": {
+    "uid": "T:System.Storage.FileWriteError.NotFound",
+    "anchors": {
+      "System_Storage_FileWriteError_NotFound": "T:System.Storage.FileWriteError.NotFound",
+      "System_Storage_FileWriteError_NotFound__ctor": "M:System.Storage.FileWriteError.NotFound.#ctor"
+    }
+  },
+  "System.IO.TextReadError.WrongAccess.html": {
+    "uid": "T:System.IO.TextReadError.WrongAccess",
+    "anchors": {
+      "System_IO_TextReadError_WrongAccess": "T:System.IO.TextReadError.WrongAccess",
+      "System_IO_TextReadError_WrongAccess__ctor": "M:System.IO.TextReadError.WrongAccess.#ctor"
+    }
+  },
+  "System.Storage.FileReadError.TooLarge.html": {
+    "uid": "T:System.Storage.FileReadError.TooLarge",
+    "anchors": {
+      "System_Storage_FileReadError_TooLarge": "T:System.Storage.FileReadError.TooLarge",
+      "System_Storage_FileReadError_TooLarge__ctor": "M:System.Storage.FileReadError.TooLarge.#ctor"
+    }
+  },
+  "System.Object.html": {
+    "uid": "T:System.Object",
+    "anchors": {
+      "System_Object": "T:System.Object",
+      "System_Object_GetType": "M:System.Object.GetType",
+      "System_Object_ReferenceEquals_System_Object_System_Object_": "M:System.Object.ReferenceEquals",
+      "System_Object_Equals_System_Object_": "M:System.Object.Equals",
+      "System_Object_GetHashCode": "M:System.Object.GetHashCode",
+      "System_Object_ToString": "M:System.Object.ToString"
+    }
+  },
+  "System.Tasks.Task-1.html": {
+    "uid": "T:System.Tasks.Task`1",
+    "anchors": {
+      "System_Tasks_Task_1": "T:System.Tasks.Task`1",
+      "System_Tasks_Task_1_GetResult": "M:System.Tasks.Task`1.GetResult",
+      "System_Tasks_Task_1_GetAwaiter": "M:System.Tasks.Task`1.GetAwaiter",
+      "System_Tasks_Task_1_State": "P:System.Tasks.Task`1.State",
+      "System_Tasks_Task_1_Outcome": "P:System.Tasks.Task`1.Outcome",
+      "System_Tasks_Task_1_IsCompleted": "P:System.Tasks.Task`1.IsCompleted",
+      "System_Tasks_Task_1_IsCancelled": "P:System.Tasks.Task`1.IsCancelled"
+    }
+  },
+  "System.Runtime.CompilerServices.html": {
+    "uid": "N:System.Runtime.CompilerServices",
+    "anchors": {}
+  },
+  "System.Value.html": {
+    "uid": "T:System.Value",
+    "anchors": {
+      "System_Value": "T:System.Value"
+    }
+  },
+  "System.Concurrency.ThreadPool.html": {
+    "uid": "T:System.Concurrency.ThreadPool",
+    "anchors": {
+      "System_Concurrency_ThreadPool": "T:System.Concurrency.ThreadPool",
+      "System_Concurrency_ThreadPool_Queue_System_Func_System_String_System_String__System_String_": "M:System.Concurrency.ThreadPool.Queue"
+    }
+  },
+  "System.Runtime.CompilerServices.ITaskAwaiter.html": {
+    "uid": "T:System.Runtime.CompilerServices.ITaskAwaiter",
+    "anchors": {
+      "System_Runtime_CompilerServices_ITaskAwaiter": "T:System.Runtime.CompilerServices.ITaskAwaiter"
+    }
+  },
+  "System.Introspection.ModuleInfo.html": {
+    "uid": "T:System.Introspection.ModuleInfo",
+    "anchors": {
+      "System_Introspection_ModuleInfo": "T:System.Introspection.ModuleInfo",
+      "System_Introspection_ModuleInfo_GetTypes": "M:System.Introspection.ModuleInfo.GetTypes",
+      "System_Introspection_ModuleInfo_Name": "P:System.Introspection.ModuleInfo.Name",
+      "System_Introspection_ModuleInfo_Assembly": "P:System.Introspection.ModuleInfo.Assembly",
+      "System_Introspection_ModuleInfo_MetadataToken": "P:System.Introspection.ModuleInfo.MetadataToken"
+    }
+  },
+  "System.Storage.EntryKind.Directory.html": {
+    "uid": "T:System.Storage.EntryKind.Directory",
+    "anchors": {
+      "System_Storage_EntryKind_Directory": "T:System.Storage.EntryKind.Directory",
+      "System_Storage_EntryKind_Directory__ctor": "M:System.Storage.EntryKind.Directory.#ctor"
+    }
+  },
+  "System.Storage.FileReadError.InvalidLimit.html": {
+    "uid": "T:System.Storage.FileReadError.InvalidLimit",
+    "anchors": {
+      "System_Storage_FileReadError_InvalidLimit": "T:System.Storage.FileReadError.InvalidLimit",
+      "System_Storage_FileReadError_InvalidLimit__ctor": "M:System.Storage.FileReadError.InvalidLimit.#ctor"
+    }
+  },
+  "System.IO.TextReadError.LimitExceeded.html": {
+    "uid": "T:System.IO.TextReadError.LimitExceeded",
+    "anchors": {
+      "System_IO_TextReadError_LimitExceeded": "T:System.IO.TextReadError.LimitExceeded",
+      "System_IO_TextReadError_LimitExceeded__ctor": "M:System.IO.TextReadError.LimitExceeded.#ctor"
+    }
+  },
+  "System.html": {
+    "uid": "N:System",
+    "anchors": {}
+  },
+  "System.IO.SeekableStream.html": {
+    "uid": "T:System.IO.SeekableStream",
+    "anchors": {
+      "System_IO_SeekableStream": "T:System.IO.SeekableStream",
+      "System_IO_SeekableStream_GetPosition": "M:System.IO.SeekableStream.GetPosition",
+      "System_IO_SeekableStream_Seek_System_Int64_": "M:System.IO.SeekableStream.Seek"
+    }
+  },
+  "System.IO.StreamError.InvalidRange.html": {
+    "uid": "T:System.IO.StreamError.InvalidRange",
+    "anchors": {
+      "System_IO_StreamError_InvalidRange": "T:System.IO.StreamError.InvalidRange",
+      "System_IO_StreamError_InvalidRange__ctor": "M:System.IO.StreamError.InvalidRange.#ctor"
+    }
+  },
+  "System.Storage.FileWriteError.html": {
+    "uid": "T:System.Storage.FileWriteError",
+    "anchors": {
+      "System_Storage_FileWriteError": "T:System.Storage.FileWriteError",
+      "System_Storage_FileWriteError_ToString": "M:System.Storage.FileWriteError.ToString",
+      "System_Storage_FileWriteError__ctor_System_Storage_FileWriteError_InvalidLimit_": "M:System.Storage.FileWriteError.#ctor",
+      "System_Storage_FileWriteError_GetInvalidLimit": "M:System.Storage.FileWriteError.GetInvalidLimit",
+      "System_Storage_FileWriteError__ctor_System_Storage_FileWriteError_InvalidPath_": "M:System.Storage.FileWriteError.#ctor",
+      "System_Storage_FileWriteError_GetInvalidPath": "M:System.Storage.FileWriteError.GetInvalidPath",
+      "System_Storage_FileWriteError__ctor_System_Storage_FileWriteError_NotFound_": "M:System.Storage.FileWriteError.#ctor",
+      "System_Storage_FileWriteError_GetNotFound": "M:System.Storage.FileWriteError.GetNotFound",
+      "System_Storage_FileWriteError__ctor_System_Storage_FileWriteError_AccessDenied_": "M:System.Storage.FileWriteError.#ctor",
+      "System_Storage_FileWriteError_GetAccessDenied": "M:System.Storage.FileWriteError.GetAccessDenied",
+      "System_Storage_FileWriteError__ctor_System_Storage_FileWriteError_NotRegularFile_": "M:System.Storage.FileWriteError.#ctor",
+      "System_Storage_FileWriteError_GetNotRegularFile": "M:System.Storage.FileWriteError.GetNotRegularFile",
+      "System_Storage_FileWriteError__ctor_System_Storage_FileWriteError_TooLarge_": "M:System.Storage.FileWriteError.#ctor",
+      "System_Storage_FileWriteError_GetTooLarge": "M:System.Storage.FileWriteError.GetTooLarge",
+      "System_Storage_FileWriteError__ctor_System_Storage_FileWriteError_WriteFailed_": "M:System.Storage.FileWriteError.#ctor",
+      "System_Storage_FileWriteError_GetWriteFailed": "M:System.Storage.FileWriteError.GetWriteFailed",
+      "System_Storage_FileWriteError_IsInvalidLimit": "P:System.Storage.FileWriteError.IsInvalidLimit",
+      "System_Storage_FileWriteError_IsInvalidPath": "P:System.Storage.FileWriteError.IsInvalidPath",
+      "System_Storage_FileWriteError_IsNotFound": "P:System.Storage.FileWriteError.IsNotFound",
+      "System_Storage_FileWriteError_IsAccessDenied": "P:System.Storage.FileWriteError.IsAccessDenied",
+      "System_Storage_FileWriteError_IsNotRegularFile": "P:System.Storage.FileWriteError.IsNotRegularFile",
+      "System_Storage_FileWriteError_IsTooLarge": "P:System.Storage.FileWriteError.IsTooLarge",
+      "System_Storage_FileWriteError_IsWriteFailed": "P:System.Storage.FileWriteError.IsWriteFailed"
+    }
+  },
+  "System.Introspection.PropertyInfo.html": {
+    "uid": "T:System.Introspection.PropertyInfo",
+    "anchors": {
+      "System_Introspection_PropertyInfo": "T:System.Introspection.PropertyInfo",
+      "System_Introspection_PropertyInfo_GetIndexParameters": "M:System.Introspection.PropertyInfo.GetIndexParameters",
+      "System_Introspection_PropertyInfo_GetGetMethod": "M:System.Introspection.PropertyInfo.GetGetMethod",
+      "System_Introspection_PropertyInfo_GetGetMethod_System_Boolean_": "M:System.Introspection.PropertyInfo.GetGetMethod",
+      "System_Introspection_PropertyInfo_GetSetMethod": "M:System.Introspection.PropertyInfo.GetSetMethod",
+      "System_Introspection_PropertyInfo_GetSetMethod_System_Boolean_": "M:System.Introspection.PropertyInfo.GetSetMethod",
+      "System_Introspection_PropertyInfo_PropertyType": "P:System.Introspection.PropertyInfo.PropertyType",
+      "System_Introspection_PropertyInfo_IsStatic": "P:System.Introspection.PropertyInfo.IsStatic",
+      "System_Introspection_PropertyInfo_CanRead": "P:System.Introspection.PropertyInfo.CanRead",
+      "System_Introspection_PropertyInfo_CanWrite": "P:System.Introspection.PropertyInfo.CanWrite",
+      "System_Introspection_PropertyInfo_DefinitionIndex": "P:System.Introspection.PropertyInfo.DefinitionIndex"
+    }
+  },
+  "System.IO.StreamError.NotFound.html": {
+    "uid": "T:System.IO.StreamError.NotFound",
+    "anchors": {
+      "System_IO_StreamError_NotFound": "T:System.IO.StreamError.NotFound",
+      "System_IO_StreamError_NotFound__ctor": "M:System.IO.StreamError.NotFound.#ctor"
+    }
+  },
+  "System.IO.TextReadError.InvalidUtf8.html": {
+    "uid": "T:System.IO.TextReadError.InvalidUtf8",
+    "anchors": {
+      "System_IO_TextReadError_InvalidUtf8": "T:System.IO.TextReadError.InvalidUtf8",
+      "System_IO_TextReadError_InvalidUtf8__ctor": "M:System.IO.TextReadError.InvalidUtf8.#ctor"
+    }
+  },
+  "System.Concurrency.Thread.html": {
+    "uid": "T:System.Concurrency.Thread",
+    "anchors": {
+      "System_Concurrency_Thread": "T:System.Concurrency.Thread",
+      "System_Concurrency_Thread__ctor_System_Func_System_String_System_String__System_String_": "M:System.Concurrency.Thread.#ctor",
+      "System_Concurrency_Thread_Start": "M:System.Concurrency.Thread.Start",
+      "System_Concurrency_Thread_Run_System_Func_System_String_System_String__System_String_": "M:System.Concurrency.Thread.Run",
+      "System_Concurrency_Thread_Task": "P:System.Concurrency.Thread.Task",
+      "System_Concurrency_Thread_IsStarted": "P:System.Concurrency.Thread.IsStarted"
+    }
+  },
+  "System.Storage.InvalidPathError.html": {
+    "uid": "T:System.Storage.InvalidPathError",
+    "anchors": {
+      "System_Storage_InvalidPathError": "T:System.Storage.InvalidPathError",
+      "System_Storage_InvalidPathError_ToString": "M:System.Storage.InvalidPathError.ToString",
+      "System_Storage_InvalidPathError__ctor": "M:System.Storage.InvalidPathError.#ctor"
+    }
+  },
+  "System.Storage.StorageLookupError.NotFound.html": {
+    "uid": "T:System.Storage.StorageLookupError.NotFound",
+    "anchors": {
+      "System_Storage_StorageLookupError_NotFound": "T:System.Storage.StorageLookupError.NotFound",
+      "System_Storage_StorageLookupError_NotFound__ctor": "M:System.Storage.StorageLookupError.NotFound.#ctor"
+    }
+  },
+  "System.Tasks.Promise-1.html": {
+    "uid": "T:System.Tasks.Promise`1",
+    "anchors": {
+      "System_Tasks_Promise_1": "T:System.Tasks.Promise`1",
+      "System_Tasks_Promise_1__ctor": "M:System.Tasks.Promise`1.#ctor",
+      "System_Tasks_Promise_1__ctor_System_Tasks_TaskQueue_": "M:System.Tasks.Promise`1.#ctor",
+      "System_Tasks_Promise_1_Complete__0_": "M:System.Tasks.Promise`1.Complete",
+      "System_Tasks_Promise_1_Cancel": "M:System.Tasks.Promise`1.Cancel",
+      "System_Tasks_Promise_1_Task": "P:System.Tasks.Promise`1.Task"
+    }
+  },
+  "System.Storage.FileWriteError.AccessDenied.html": {
+    "uid": "T:System.Storage.FileWriteError.AccessDenied",
+    "anchors": {
+      "System_Storage_FileWriteError_AccessDenied": "T:System.Storage.FileWriteError.AccessDenied",
+      "System_Storage_FileWriteError_AccessDenied__ctor": "M:System.Storage.FileWriteError.AccessDenied.#ctor"
+    }
+  },
+  "System.Storage.FileReadError.InvalidUtf8.html": {
+    "uid": "T:System.Storage.FileReadError.InvalidUtf8",
+    "anchors": {
+      "System_Storage_FileReadError_InvalidUtf8": "T:System.Storage.FileReadError.InvalidUtf8",
+      "System_Storage_FileReadError_InvalidUtf8__ctor": "M:System.Storage.FileReadError.InvalidUtf8.#ctor"
+    }
+  },
+  "System.Storage.FileSystem.html": {
+    "uid": "T:System.Storage.FileSystem",
+    "anchors": {
+      "System_Storage_FileSystem": "T:System.Storage.FileSystem",
+      "System_Storage_FileSystem__ctor_System_String_": "M:System.Storage.FileSystem.#ctor",
+      "System_Storage_FileSystem_GetItem_System_Storage_Path_": "M:System.Storage.FileSystem.GetItem",
+      "System_Storage_FileSystem_GetFile_System_Storage_Path_": "M:System.Storage.FileSystem.GetFile",
+      "System_Storage_FileSystem_GetDirectory_System_Storage_Path_": "M:System.Storage.FileSystem.GetDirectory"
+    }
+  },
+  "System.IO.TextReadError.WrongKind.html": {
+    "uid": "T:System.IO.TextReadError.WrongKind",
+    "anchors": {
+      "System_IO_TextReadError_WrongKind": "T:System.IO.TextReadError.WrongKind",
+      "System_IO_TextReadError_WrongKind__ctor": "M:System.IO.TextReadError.WrongKind.#ctor"
+    }
+  },
+  "System.Concurrency.html": {
+    "uid": "N:System.Concurrency",
+    "anchors": {}
+  },
+  "System.Storage.StorageLookupError.LimitExceeded.html": {
+    "uid": "T:System.Storage.StorageLookupError.LimitExceeded",
+    "anchors": {
+      "System_Storage_StorageLookupError_LimitExceeded": "T:System.Storage.StorageLookupError.LimitExceeded",
+      "System_Storage_StorageLookupError_LimitExceeded__ctor": "M:System.Storage.StorageLookupError.LimitExceeded.#ctor"
+    }
+  },
+  "System.Storage.StorageLookupError.InvalidPath.html": {
+    "uid": "T:System.Storage.StorageLookupError.InvalidPath",
+    "anchors": {
+      "System_Storage_StorageLookupError_InvalidPath": "T:System.Storage.StorageLookupError.InvalidPath",
+      "System_Storage_StorageLookupError_InvalidPath__ctor": "M:System.Storage.StorageLookupError.InvalidPath.#ctor"
+    }
+  },
+  "System.Storage.StorageLookupError.html": {
+    "uid": "T:System.Storage.StorageLookupError",
+    "anchors": {
+      "System_Storage_StorageLookupError": "T:System.Storage.StorageLookupError",
+      "System_Storage_StorageLookupError_ToString": "M:System.Storage.StorageLookupError.ToString",
+      "System_Storage_StorageLookupError__ctor_System_Storage_StorageLookupError_InvalidPath_": "M:System.Storage.StorageLookupError.#ctor",
+      "System_Storage_StorageLookupError_GetInvalidPath": "M:System.Storage.StorageLookupError.GetInvalidPath",
+      "System_Storage_StorageLookupError__ctor_System_Storage_StorageLookupError_NotFound_": "M:System.Storage.StorageLookupError.#ctor",
+      "System_Storage_StorageLookupError_GetNotFound": "M:System.Storage.StorageLookupError.GetNotFound",
+      "System_Storage_StorageLookupError__ctor_System_Storage_StorageLookupError_AccessDenied_": "M:System.Storage.StorageLookupError.#ctor",
+      "System_Storage_StorageLookupError_GetAccessDenied": "M:System.Storage.StorageLookupError.GetAccessDenied",
+      "System_Storage_StorageLookupError__ctor_System_Storage_StorageLookupError_WrongKind_": "M:System.Storage.StorageLookupError.#ctor",
+      "System_Storage_StorageLookupError_GetWrongKind": "M:System.Storage.StorageLookupError.GetWrongKind",
+      "System_Storage_StorageLookupError__ctor_System_Storage_StorageLookupError_IoFailure_": "M:System.Storage.StorageLookupError.#ctor",
+      "System_Storage_StorageLookupError_GetIoFailure": "M:System.Storage.StorageLookupError.GetIoFailure",
+      "System_Storage_StorageLookupError__ctor_System_Storage_StorageLookupError_InvalidRange_": "M:System.Storage.StorageLookupError.#ctor",
+      "System_Storage_StorageLookupError_GetInvalidRange": "M:System.Storage.StorageLookupError.GetInvalidRange",
+      "System_Storage_StorageLookupError__ctor_System_Storage_StorageLookupError_LimitExceeded_": "M:System.Storage.StorageLookupError.#ctor",
+      "System_Storage_StorageLookupError_GetLimitExceeded": "M:System.Storage.StorageLookupError.GetLimitExceeded",
+      "System_Storage_StorageLookupError_IsInvalidPath": "P:System.Storage.StorageLookupError.IsInvalidPath",
+      "System_Storage_StorageLookupError_IsNotFound": "P:System.Storage.StorageLookupError.IsNotFound",
+      "System_Storage_StorageLookupError_IsAccessDenied": "P:System.Storage.StorageLookupError.IsAccessDenied",
+      "System_Storage_StorageLookupError_IsWrongKind": "P:System.Storage.StorageLookupError.IsWrongKind",
+      "System_Storage_StorageLookupError_IsIoFailure": "P:System.Storage.StorageLookupError.IsIoFailure",
+      "System_Storage_StorageLookupError_IsInvalidRange": "P:System.Storage.StorageLookupError.IsInvalidRange",
+      "System_Storage_StorageLookupError_IsLimitExceeded": "P:System.Storage.StorageLookupError.IsLimitExceeded"
+    }
+  },
+  "System.Introspection.ParameterInfo.html": {
+    "uid": "T:System.Introspection.ParameterInfo",
+    "anchors": {
+      "System_Introspection_ParameterInfo": "T:System.Introspection.ParameterInfo",
+      "System_Introspection_ParameterInfo_MetadataToken": "P:System.Introspection.ParameterInfo.MetadataToken",
+      "System_Introspection_ParameterInfo_Module": "P:System.Introspection.ParameterInfo.Module",
+      "System_Introspection_ParameterInfo_Name": "P:System.Introspection.ParameterInfo.Name",
+      "System_Introspection_ParameterInfo_Position": "P:System.Introspection.ParameterInfo.Position",
+      "System_Introspection_ParameterInfo_ParameterType": "P:System.Introspection.ParameterInfo.ParameterType",
+      "System_Introspection_ParameterInfo_IsOut": "P:System.Introspection.ParameterInfo.IsOut",
+      "System_Introspection_ParameterInfo_IsOutWhenTrue": "P:System.Introspection.ParameterInfo.IsOutWhenTrue",
+      "System_Introspection_ParameterInfo_IsReadOnly": "P:System.Introspection.ParameterInfo.IsReadOnly"
+    }
+  },
+  "System.Tasks.TaskQueue.html": {
+    "uid": "T:System.Tasks.TaskQueue",
+    "anchors": {
+      "System_Tasks_TaskQueue": "T:System.Tasks.TaskQueue",
+      "System_Tasks_TaskQueue__ctor": "M:System.Tasks.TaskQueue.#ctor",
+      "System_Tasks_TaskQueue_Drain": "M:System.Tasks.TaskQueue.Drain",
+      "System_Tasks_TaskQueue_Default": "P:System.Tasks.TaskQueue.Default"
+    }
+  },
+  "System.Storage.FileReadError.AccessDenied.html": {
+    "uid": "T:System.Storage.FileReadError.AccessDenied",
+    "anchors": {
+      "System_Storage_FileReadError_AccessDenied": "T:System.Storage.FileReadError.AccessDenied",
+      "System_Storage_FileReadError_AccessDenied__ctor": "M:System.Storage.FileReadError.AccessDenied.#ctor"
+    }
+  },
+  "System.Runtime.html": {
+    "uid": "N:System.Runtime",
+    "anchors": {}
+  }
+}

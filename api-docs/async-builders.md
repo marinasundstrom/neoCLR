@@ -6,7 +6,7 @@ deprecated or removed when runtime-owned suspension replaces generated machinery
 Use Task and await in application code; no public scheduler design is implied.
 
 The reference includes IAsyncStateMachine, ITaskAwaiter and
-AsyncTaskMethodBuilder<T> under System.Runtime.CompilerServices.
+AsyncTaskMethodBuilder&lt;T&gt; under System.Runtime.CompilerServices.
 
 ## State ownership
 
@@ -33,9 +33,8 @@ A value state does not eliminate Promise, Task, dispatcher or continuation alloc
 
 `ITaskAwaiter.OnCompleted(callback: Func<System.Void>)` registers a continuation on
 the awaited operation's dispatcher. It returns no result. Task implements this
-contract. The member is excluded from generated signatures because DocFX cannot
-render the intrinsic Func<Void> shape; its type and the other builder members have
-generated reference coverage. This omission follows the [callback reference](callbacks.md).
+contract. RavenDoc includes this Func&lt;Void&gt; signature alongside the other builder
+members. See the [callback reference](callbacks.md) for continuation behavior.
 
 ## Errors and limits
 

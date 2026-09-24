@@ -6,11 +6,14 @@ on:
     paths:
       - 'website/**'
       - 'api-docs/**'
-      - '.config/dotnet-tools.json'
       - 'scripts/build-api-docs.py'
       - 'docs/experiments/raven-target/*.cs'
-      - 'runtime/raven/src/System/Tasks/**'
+      - 'runtime/raven/src/System/**'
+      - 'docs/experiments/**'
       - 'scripts/build-website.py'
+      - 'scripts/ravendoc.py'
+      - 'scripts/update-ravendoc.py'
+      - 'tools/ravendoc/**'
       - 'scripts/test_build_website.py'
       - 'examples/preview/result-void.neoil'
       - 'docs/experiments/raven-target/samples/*.rvn'
@@ -21,11 +24,14 @@ on:
     paths:
       - 'website/**'
       - 'api-docs/**'
-      - '.config/dotnet-tools.json'
       - 'scripts/build-api-docs.py'
       - 'docs/experiments/raven-target/*.cs'
-      - 'runtime/raven/src/System/Tasks/**'
+      - 'runtime/raven/src/System/**'
+      - 'docs/experiments/**'
       - 'scripts/build-website.py'
+      - 'scripts/ravendoc.py'
+      - 'scripts/update-ravendoc.py'
+      - 'tools/ravendoc/**'
       - 'scripts/test_build_website.py'
       - 'examples/preview/result-void.neoil'
       - 'docs/experiments/raven-target/samples/*.rvn'
@@ -49,21 +55,10 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: website/package-lock.json
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
-      - name: Restore DocFX
-        run: dotnet tool restore
-      - name: Install website tokenizer
-        run: npm ci --prefix website --ignore-scripts
-      - name: Check Raven highlighting
-        run: npm test --prefix website
-      - name: Check cross-page links
+      - name: Check website contracts
         run: python -m unittest discover -s scripts -p test_build_website.py
       - name: Build and check project site
         run: python scripts/build-website.py

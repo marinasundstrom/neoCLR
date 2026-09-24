@@ -27,7 +27,7 @@ Use the matched compiler rather than substituting .NET Task or builder assemblie
 
 | Area | Migration / behavior |
 | --- | --- |
-| Queries | Replace `Where` with `Filter` and `Select` with `Map`. No legacy aliases. Deferred traversal remains; see the [operator comparison](../website/features/collections/index.html). |
+| Queries | Replace `Where` with `Filter` and `Select` with `Map`. No legacy aliases. Deferred traversal remains; see the [operator comparison](../website/content/features/collections/index.md). |
 | File and path APIs | Replace `System.IO` imports/qualified names with `System.Storage`, including file error types. `ConsoleReadError` moves to `System`. This rename does not introduce storage providers or change local synchronous file behavior. |
 | Message-wrapper errors | Replace `System.Error` payloads with `string` or domain-specific error types. Remove `Error.FromMessage` and `.Message`. `Result.Error(...)` remains a union case and is not the removed wrapper type. |
 | Old low-level error artifacts | Rebuild metadata/JSON artifacts using the retired Error intrinsic. Replace neoIL `error "text"` with `ldstr "text"` when the desired payload is text. Update Rust uses of `Value::Error`, `Type::Error`, `Instruction::Error` and `RuntimeService::ErrorValues`; those variants are removed. |

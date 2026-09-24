@@ -32,24 +32,24 @@ the homepage provides current status and feature entry points.
 
 | Location | Purpose | Required distinction |
 | --- | --- | --- |
-| `website/about/index.html` | Project background, goals, relationship to .NET, current scope and participation | Intent versus implemented capability |
-| `website/index.html` | Product overview, release/download status and entry points | Published capabilities versus development-only examples |
-| `website/features/<name>/index.html` | What currently works, a useful example where appropriate, limits and feedback | Implemented behavior versus “Where we’re heading” |
-| `website/try/index.html` | Reader-facing installation, .rvnproj workflow, expected output and troubleshooting | Published bundle instructions versus development-only API availability |
-| `website/raven/index.html` | Introduce the Raven language, examples and the .NET/neoCLR target distinction | Language capabilities versus target-specific library support |
+| `website/content/about/index.md` | Project background, goals, relationship to .NET, current scope and participation | Intent versus implemented capability |
+| `website/content/index.html` | Product overview, release/download status and entry points | Published capabilities versus development-only examples |
+| `website/content/features/<name>/index.md` | What currently works, a useful example where appropriate, limits and feedback | Implemented behavior versus “Where we’re heading” |
+| `website/content/try/index.md` | Reader-facing installation, .rvnproj workflow, expected output and troubleshooting | Published bundle instructions versus development-only API availability |
+| `website/content/raven/index.md` | Introduce the Raven language, examples and the .NET/neoCLR target distinction | Language capabilities versus target-specific library support |
 | `api-docs/namespaces.md` → `/docs/namespaces.html` | Current namespace contents and links to reference pages and guides; extend as APIs land | Implemented namespaces versus proposals; overview versus member coverage |
-| `website/proposals/index.html` | Brief summaries of ideas across the platform, linked to original proposals and maintained design records | Proposals are not promises or a release checklist |
+| `website/content/proposals/index.md` | Brief summaries of ideas across the platform, linked to original proposals and maintained design records | Proposals are not promises or a release checklist |
 | `docs/` and release notes | Detailed contracts, research, verification and historical release behavior | Preserve published release notes; record corrections under Unreleased |
 
-Feature pages currently cover [Introspection](../../website/features/introspection/index.html)
-and [Strings](../../website/features/strings/index.html), with additional notes for
-[Option/Result](../../website/features/outcomes/index.html),
-[Console](../../website/features/console/index.html),
-[arrays](../../website/features/arrays/index.html),
-[collections/queries](../../website/features/collections/index.html),
-[dates/clocks](../../website/features/time/index.html) and
-[UTF-8 files](../../website/features/files/index.html) and the development
-[Tasks and async PoC](../../website/features/tasks/index.html). Introspection is an in-depth
+Feature pages currently cover [Introspection](../../website/content/features/introspection/index.md)
+and [Strings](../../website/content/features/strings/index.md), with additional notes for
+[Option/Result](../../website/content/features/outcomes/index.md),
+[Console](../../website/content/features/console/index.md),
+[arrays](../../website/content/features/arrays/index.md),
+[collections/queries](../../website/content/features/collections/index.md),
+[dates/clocks](../../website/content/features/time/index.md) and
+[UTF-8 files](../../website/content/features/files/index.md) and the development
+[Tasks and async PoC](../../website/content/features/tasks/index.md). Introspection is an in-depth
 walkthrough; the second deliberately shows one working conversion example. Scale
 detail to what helps an evaluator. Do not add an API just to fill a page outline.
 
@@ -70,9 +70,9 @@ commitment to the next release. Names, signatures and behavior may change.
    supplied proposal texts and explain subsequent decisions in maintained notes.
 3. Source displayed code from executable samples through `scripts/build-website.py`.
    Verify changed samples with their matching toolchain and expected-output checks.
-   Do not duplicate an untested version in HTML. Small implementation notes need not
+   Do not duplicate an untested version in Markdown or HTML content. Small implementation notes need not
    reproduce every test case or every API member.
-4. Run the website tokenizer tests, page build and link tests documented in
+4. Run the RavenDoc publisher tests, full page build and link checks documented in
    [the website README](../../website/README.md). Inspect rendered changed pages;
    check desktop and narrow layouts when changing layout or CSS.
 5. Include the website status in release review. Confirm downloads, instructions,
@@ -126,3 +126,30 @@ type annotations and explanatory syntax when the operation and surrounding code
 already make the meaning clear. Keep annotations that current compilation requires
 or that clarify an otherwise unclear contract, and compile the exact displayed
 example. Do not add annotations merely to teach or over-explain the language.
+
+
+## RavenDoc site and landing page — 2026-09-24
+
+The author selected one RavenDoc site, replacing the bespoke website renderer and
+separate DocFX reference. Adapt content to the documentation structure rather than
+mechanically carrying over the old landing page. Feature/API guides remain separate
+pages alongside generated namespace, type and member reference. The documentation
+entry point links both, and guides link their corresponding reference.
+
+The homepage is an HTML body fragment with a hero on its own background and feature
+boxes beneath. It has no enclosing article panel or “On this page” outline. Raven
+and CloudShell's landing pages supplied layout inspiration; neoCLR uses a restrained
+slate/blue palette. The author accepted the feature boxes and requested a less
+intrusive development notice. Keep that notice compact but visible: documentation
+may precede a runtime release. Publication never implies release availability.
+
+RavenDoc accepts Markdown and HTML body fragments with optional scalar front matter:
+`title`, `layout: docs|landing`, and `toc: true|false`. Use the shared header,
+release notice and footer; the landing page is not a second website. Long guides
+and generated reference retain the outline when useful. Site settings live in
+`website/site.json`; presentation lives in `website/custom.css`.
+
+The portable RavenDoc archive, immutable source revision, checksum and upstream
+source revision are maintained in `tools/ravendoc`. Follow its README to
+update the build, then verify the whole site before publication. CI validates the
+same repository-contained build without a sibling Raven checkout or DocFX restore.

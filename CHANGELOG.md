@@ -24,6 +24,27 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   after GC, and update API/website documentation. Other primitive formatting,
   format strings and culture providers remain unsupported.
 
+- Migrate the website and API reference to one RavenDoc build. Adapt guides to
+  Markdown and use an HTML landing page with a separate hero and feature cards.
+  Add front-matter title/layout/outline controls, shared branding and a compact
+  unreleased-documentation notice. Vendor the portable .NET 10 publisher with an
+  immutable upstream revision, checksum and update script; remove DocFX and Node
+  build dependencies. Generate Raven type/member pages from the checked reference
+  assembly and authored documentation, including previously excluded callback and
+  unit-result signatures. Preserve legacy reference routes, sample downloads and
+  manual publication; retain explicit reference-coverage gaps. Simplify API lists
+  to name-first signatures with parameter/property/field and return types plus a
+  static icon marker, with full Raven list signatures available by opt-in.
+  Distinguish classes (C), interfaces (I), enums (E), unions (U), delegates (D)
+  and structs (S) on lists and detail pages. Add a shared
+  RavenDoc API Browser with expandable namespace/type navigation, current-type
+  highlighting and an off-canvas drawer on small screens. Compile authored
+  nested `toc.yml` menus into section navigation, separate from main menus and
+  page outlines. Add an N-logo favicon and a persistent Light/Dark/Auto theme
+  menu. Share Raven website syntax highlighting for snippets and API
+  signatures, with the engine bundled locally. General publishing changes are
+  maintained upstream in Raven.
+
 - Add boxed Int64 Object equality over the complete copied payload and a .NET-compatible
   lower/upper-half hash. Preserve exact-type comparisons and distinct box identity.
   Cover limits, deliberate hash collisions, Object-keyed maps and collection; boxed

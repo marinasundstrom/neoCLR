@@ -25,6 +25,103 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-24 — Upstream navigation and custom union classification
+
+**Author direction.** Distinguished nested main navigation, authored per-section
+`toc.yml` side navigation, and within-page outlines. Requested a simple RavenDoc
+navigation model rather than copying every DocFX concept. Directed that general
+improvements land on Raven main and then its neoCLR branch. Clarified that
+StreamError and similar carriers should carry UnionAttribute and load as
+IUnionSymbol, with cases presented as unions. Requested I/E/U/D/S type icons,
+then C for classes; static membership remains an icon badge.
+
+**Assistant implementation.** Added the shared navigation and compact browsing
+features in Raven commit `c5838d3c7`, integrated locally on main, and brought them
+and the preceding site publisher to the neoclr branch (`3db61296b`, `d8f31e475`).
+Replaced the neoCLR publisher overlay with the upstream configuration. Added
+independent class/struct metadata fixtures for the typed-case contract; corrected
+a same-name case filter that could hide System.Storage.File. Updated runtime and
+reference markers without changing carrier storage. Recognition and documentation
+projection are separate from extraction lowering; no new pattern ABI is claimed.
+The general union/icon fix was then committed on Raven main as `c629dc729` and
+cherry-picked to neoclr as `927c99df2`; 23 focused compiler/publisher tests passed.
+Validation and the final immutable generator pin are recorded with the code.
+The author subsequently requested the Raven website's exact snippet rendering
+method and then a view of the resulting site. The assistant extracted the shared
+Highlight.js grammar and colors into assets consumed by both website and RavenDoc,
+with a local pinned engine. The author directed that neoCLR union changes be
+committed separately from the website migration. Bootstrap validation required
+direct case construction and the existing upstream configured-unit identity fix
+for imported Flush contracts, plus structural array identity for stream
+interface implementation. The resulting bootstrap instruction fragments remain
+unchanged. The author additionally requested an N favicon, shared dark-mode
+support, a compact Light/Dark/Auto icon menu, an updated RavenDoc sample site and
+updated RavenDoc documentation. These are implemented in the generic publisher;
+neoCLR retains its branding. The union/runtime changes were committed separately in neoCLR as `417a3f9a`.
+Raven main now contains the shared UI/sample/docs work at `69717b4df`, brought to
+the neoclr branch as `1fb1f9904`. The combined neoCLR site passed 491 page/link
+checks and 10 publisher tests. These local integrations are not publication or a
+push to the remote repository.
+
+## 2026-09-24 — One RavenDoc website, with page metadata and release status
+
+**Author direction.** Requested migration to RavenDocs with appropriate customization
+and an up-to-date build in the repository for CI/CD. Clarified that content should
+be Markdown and the reference part of the same site, with no separate DocFX site.
+Required clarity when documentation is published before its corresponding release.
+
+**Assistant proposal and first implementation.** Located Raven's RavenDoc publisher,
+probed its assembly/XML input and began converting the existing content. Proposed
+an immutable portable publisher build, a reviewed site extension, shared branding
+and a visible development notice. The first content pass carried over too much of
+the old website's structure.
+
+**Author corrections.** Said, “You can't just port the website content as is. We
+need to adapt it”. Then requested HTML-page support and front matter, including
+control over the page outline, as a CMS-like authoring capability. Clarified that
+a custom landing page could use Markdown or HTML through that mechanism. Required
+a hero and feature boxes, no purposeless outline or enclosing landing-page panel,
+and a distinct hero background with feature boxes beneath.
+
+**Documentation organization.** Asked to see the real generated API site with XML
+or Markdown documentation, keeping feature/API guides alongside type and member
+pages. The assistant built and opened the integrated API entry point, with guide
+and generated-reference links together. Existing reference gaps remain explicit;
+this migration does not claim complete coverage of every runtime API.
+
+**Visual feedback.** The author pointed to the Raven and CloudShell landing pages
+for inspiration, accepted the improved structure, criticized the colors and an
+intrusive development notice, then said, “The boxes below are OK.” The assistant
+retained the feature cards and adjusted the hero to slate/blue and the notice to
+a compact development-status line.
+
+**API navigation feedback.** The author found declaration modifiers distracting in
+API lists and directed names by default, with icons indicating symbol kinds and
+full signatures opt-in at generation. They then requested property and field types in the
+form `MyProp: <type>`. The publisher follows this distinction and keeps full
+declarations on detail pages. The author subsequently refined this to simple
+name-first signatures such as `MyFunc(x: int) -> ()`, retaining type annotations
+and parameter lists while omitting declaration keywords and distracting modifiers.
+They noted that static does matter; the assistant added a trailing `[static]`
+annotation to preserve name-first browsing. The author then suggested marking the
+icon instead; the assistant agreed and implemented an `S` badge with a tooltip and
+an accessible static-member label. Overloads now retain separate entries. The
+author also requested a distinct interface icon; interfaces use an I glyph on
+lists and detail pages. The author then requested a left-side API Browser with
+expandable namespaces, explicitly inside RavenDocs, with an off-canvas default on
+small screens and a modern documentation-site presentation. The assistant added
+shared publisher navigation with active-type highlighting and a modal mobile drawer.
+
+**Work and evidence.** Added Markdown/HTML content and scalar front-matter controls
+in the repository-owned RavenDoc customization, a checksum-verified portable build
+and updater, shared page chrome, generated reference and legacy redirects. The
+[website build](../website/README.md), [API maintenance](../api-docs/README.md) and
+[publisher source/pin](../tools/ravendoc/README.md) document the workflow. Local
+publisher tests and complete-site link validation are the acceptance checks; this
+entry does not claim CI execution, upstream integration or public deployment.
+Publishing remains a separate manual operation on main. The author-directed task
+does not change application-milestone ordering.
+
 ## 2026-09-24 — Nullable value declaration policy
 
 **Author request.** Following the direction to prefer Option for absence and defer

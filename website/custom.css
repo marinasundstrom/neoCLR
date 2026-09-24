@@ -1,0 +1,73 @@
+/* neoCLR branding over RavenDoc's shared responsive, light/dark theme. */
+.site-logo { flex: 0 0 auto; }
+.page-context { display: none; }
+.api-content { max-width: 78ch; }
+.api-content h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 1.2; }
+.api-content pre { overflow-x: auto; }
+.api-content table { display: block; overflow-x: auto; }
+.api-content a { overflow-wrap: anywhere; }
+.skip-link { position: absolute; left: 1rem; top: -5rem; z-index: 10; padding: .8rem; background: var(--raven-surface, white); }
+.skip-link:focus { top: 1rem; }
+a[id] { scroll-margin-top: 2rem; }
+@media (max-width: 760px) {
+  .site-header { flex-wrap: wrap; gap: 1rem; }
+  .site-navigation { flex-wrap: wrap; }
+  .content-shell { min-width: 0; }
+}
+.release-notice { margin: 1rem auto 0; max-width: 1280px; padding: .8rem 1.5rem; border-left: 4px solid #79924b; background: color-mix(in srgb, #79924b 12%, transparent); font-size: .9rem; }
+.release-notice strong { font-weight: 500; }
+.release-notice a { white-space: nowrap; }
+.without-outline .documentation-shell { grid-template-columns: minmax(0, 1fr); max-width: 1120px; }
+.without-outline .api-content { max-width: 86ch; margin-inline: auto; }
+.layout-landing .api-content h1 { font-size: clamp(3rem, 8vw, 5rem); letter-spacing: -.05em; margin-bottom: 1rem; }
+.layout-landing .api-content > h1 + p { font-size: 1.4rem; line-height: 1.5; max-width: 42ch; }
+.layout-landing .api-content h2 { margin-top: 2.5rem; }
+/* The homepage is an HTML content page; the header, notice and footer remain RavenDoc. */
+.layout-landing .documentation-shell { max-width: 1280px; }
+.layout-landing .content-shell { padding: 0; background: transparent; border: 0; box-shadow: none; }
+.layout-landing .api-content { max-width: none; }
+.landing-hero { display: grid; grid-template-columns: 1.1fr 1fr; gap: 3rem; align-items: center; padding: 3rem 1rem 4rem; }
+.layout-landing .landing-hero h1 { font-size: clamp(2.5rem, 4.4vw, 4rem); line-height: 1.08; margin-top: 1rem; }
+.landing-lead { font-size: 1.2rem; color: var(--raven-muted); max-width: 42ch; }
+.landing-eyebrow, .feature-category { font-size: .72rem; font-weight: 650; letter-spacing: .08em; color: var(--raven-muted); }
+.landing-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1.25rem; margin: 1.75rem 0; }
+.api-content .primary-action { display: inline-block; padding: .8rem 1.1rem; border-radius: .5rem; background: #243c36; color: #fff; text-decoration: none; font-weight: 600; }
+.landing-note { font-size: .8rem; color: var(--raven-muted); }
+.landing-example { min-width: 0; border: 1px solid var(--raven-line); border-radius: 1rem; background: var(--raven-surface); padding: 1.5rem; box-shadow: var(--raven-shadow); }
+.layout-landing .landing-example h2 { margin: .75rem 0; font-size: 1.2rem; border: 0; }
+.landing-example pre { font-size: .8rem; }
+.landing-section { padding: 2.5rem 1rem; }
+.landing-section-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.layout-landing .landing-section h2 { margin: 0 0 1rem; border: 0; }
+.feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-top: 1.75rem; }
+.api-content .feature-box { display: flex; flex-direction: column; padding: 1.5rem; border: 1px solid var(--raven-line); border-radius: .8rem; background: var(--raven-surface); color: var(--raven-ink); text-decoration: none; transition: border-color .15s; }
+.feature-box:hover { border-color: var(--raven-accent); }
+.api-content .feature-box h3 { font-size: 1.12rem; margin: .6rem 0; }
+.feature-box p { color: var(--raven-muted); font-size: .93rem; margin: 0 0 1.25rem; }
+.feature-more { margin-top: auto; color: var(--raven-accent); font-size: .85rem; }
+.landing-split { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; border-top: 1px solid var(--raven-line); margin-top: 1rem; }
+.landing-reference { background: var(--raven-surface-raised); border: 1px solid var(--raven-line); border-radius: 1rem; padding: 2rem; }
+@media (max-width: 980px) { .landing-hero { gap: 1.5rem; } .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 720px) { .landing-hero, .landing-split, .feature-grid { grid-template-columns: minmax(0, 1fr); } .landing-hero { padding-top: 1.5rem; } .landing-section { padding-inline: .25rem; } .landing-reference { padding: 1.25rem; } }
+.layout-landing .api-content { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.layout-landing .api-content > * { max-width: none; }
+.landing-hero { background: #173a32; color: #f5f8f0; box-shadow: 0 0 0 100vmax #173a32; clip-path: inset(0 -100vmax); margin-bottom: 2rem; }
+.landing-hero .landing-lead, .landing-hero .landing-note, .landing-hero > div > .landing-eyebrow { color: #ceded4; }
+.landing-hero > div:first-child a:not(.primary-action) { color: #c5efa6; }
+.landing-hero .primary-action { background: #c5efa6; color: #18392d; }
+.landing-hero .landing-example { color: var(--raven-ink); }
+/* Restrained project palette, separate from Raven's purple documentation theme. */
+:root { --raven-bg: #f7f8fa; --raven-surface: #fff; --raven-surface-raised: #eef1f5; --raven-ink: #202a37; --raven-muted: #657080; --raven-line: #dfe4eb; --raven-accent: #3664a0; --raven-accent-strong: #244d83; --raven-header-bg: rgba(255,255,255,.95); }
+.release-notice { margin: 0 auto; padding: .45rem 1.5rem; max-width: 1280px; border: 0; background: transparent; color: var(--raven-muted); font-size: .78rem; }
+.release-notice a { margin-left: .5rem; }
+.layout-landing .documentation-shell { padding-top: 0; }
+.landing-hero { background: #182332; box-shadow: 0 0 0 100vmax #182332; color: #f7f9fc; }
+.landing-hero .landing-lead, .landing-hero .landing-note, .landing-hero > div:first-child > .landing-eyebrow { color: #bdcad9; }
+.landing-hero > div:first-child a:not(.primary-action) { color: #b6d3f5; }
+.landing-hero .primary-action, .api-content .primary-action { background: #3d6db0; color: #fff; }
+.landing-hero .landing-example > .landing-eyebrow { color: var(--raven-muted); }
+.landing-example { box-shadow: 0 14px 45px #0002; }
+:root[data-theme="dark"] { --raven-bg: #141a23; --raven-surface: #1c2531; --raven-surface-raised: #222e3b; --raven-ink: #e8edf4; --raven-muted: #a5b2c2; --raven-line: #344151; --raven-accent: #9fc3f2; --raven-header-bg: rgba(20,26,35,.95); }
+@media (prefers-color-scheme: dark) {
+:root:not([data-theme]) { --raven-bg: #141a23; --raven-surface: #1c2531; --raven-surface-raised: #222e3b; --raven-ink: #e8edf4; --raven-muted: #a5b2c2; --raven-line: #344151; --raven-accent: #9fc3f2; --raven-header-bg: rgba(20,26,35,.95); }
+}

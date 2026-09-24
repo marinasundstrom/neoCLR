@@ -72,5 +72,123 @@ class PageLinks(unittest.TestCase):
         build.check_reference_links()
 
 
+class RavenDocPages(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('ravendoc', Path(__file__).with_name('ravendoc.py'))
+        runner = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(runner)
+        cls.runtime = runner.runtime()
+
+    def publish(self, content, extension='.md', extra=None):
+        import json
+        import subprocess
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        source = root / ('page' + extension)
+        source.write_text(content)
+        config = dict(name='Example', subtitle='Experimental', footer='Development',
+                      output=str(root / 'site'), pages=[dict(source=str(source), output='index.html', title='Fallback')],
+                      links=[dict(label='Guides', url='guides/')], apiNavigationRoot='docs', notice='May document unreleased APIs.',
+                      releaseUrl='https://example.com/releases', releaseLabel='Published release')
+        config.update(extra or {})
+        manifest = root / 'site.json'
+        manifest.write_text(json.dumps(config))
+        result = subprocess.run(['dotnet', str(self.runtime), '--site', str(manifest)], capture_output=True, text=True)
+        return result, root / 'site'
+
+    def test_api_list_labels_and_signature_opt_in(self):
+        import shutil
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        assembly = Path(temporary.name) / 'NeoCLR.CoreProbe.dll'
+        repo = Path(__file__).resolve().parent.parent
+        shutil.copyfile(repo / 'api-docs/reference/NeoCLR.CoreProbe.dll', assembly)
+        shutil.copyfile(repo / 'api-docs/NeoCLR.CoreProbe.xml', assembly.with_suffix('.xml'))
+        config = dict(api=str(assembly), types=['System.Storage.Path', 'System.Introspection.BindingFlags', 'System.Console', 'System.Introspection.TypeInfo', 'System.IO.StreamError', 'System.Storage.EntryKind', 'System.Storage.File'])
+        result, output = self.publish('# Reference', extra=config)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        namespace = (output / 'api/System/Storage/index.html').read_text()
+        self.assertIn('class="member-name">Path</span>', namespace)
+        path = (output / 'api/System/Storage/Path/index.html').read_text()
+        self.assertIn('class="member-name">Text: string</span>', path)
+        self.assertIn('API Browser</h2>', path)
+        self.assertIn('aria-label="API namespaces and types"', path)
+        self.assertIn('<summary title="System.Storage"><span>System.Storage</span></summary>', path)
+        self.assertIn('aria-current="location"', path)
+        self.assertIn('aria-controls="api-browser"', path)
+        self.assertNotIn('id="api-browser"', (output / 'index.html').read_text())
+        self.assertEqual(path.count('class="member-name">Equals('), 2)
+        self.assertIn(' -&gt; bool</span>', path)
+        self.assertNotIn('class="member-name">func ', path)
+        self.assertIn('title="Static member"', path)
+        self.assertIn('class="symbol-static-marker">S</span>', path)
+        self.assertIn('class="visually-hidden">Static member: </span>', path)
+        self.assertNotIn('[static]', path)
+        console = (output / 'api/System/Console/index.html').read_text()
+        self.assertIn('class="member-name">Write(value0: int) -&gt; ()</span>', console)
+        self.assertIn('class="member-name">Write(value0: string) -&gt; ()</span>', console)
+        introspection = (output / 'api/System/Introspection/index.html').read_text()
+        self.assertIn('symbol-icon--interface" title="Interface"', introspection)
+        interface = (output / 'api/System/Introspection/TypeInfo/index.html').read_text()
+        self.assertIn('symbol-icon--interface" title="Interface"', interface)
+        flags = (output / 'api/System/Introspection/BindingFlags/index.html').read_text()
+        self.assertIn('class="member-name">Public: BindingFlags</span>', flags)
+        self.assertIn('symbol-icon--enum', flags)
+        self.assertIn('symbol-icon--class', console)
+        union = (output / 'api/System/IO/StreamError/index.html').read_text()
+        self.assertIn('union struct StreamError', union)
+        self.assertIn('symbol-icon--union', union)
+        self.assertIn('case Closed', union)
+        self.assertNotIn('<summary title="StreamError">', union)
+        self.assertTrue((output / 'api/System/Storage/File/index.html').exists())
+        detail = (output / 'api/System/Storage/Path/property_Text.html').read_text()
+        self.assertIn('val Text:', detail)
+        result, output = self.publish('# Reference', extra={**config, 'memberListStyle': 'signatures', 'apiNavigationRoot': None})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        path = (output / 'api/System/Storage/Path/index.html').read_text()
+        self.assertIn('class="member-signature">val Text:', path)
+        self.assertIn('id="api-browser"', (output / 'index.html').read_text())
+
+    def test_markdown_landing_metadata_omits_outline_and_keeps_notice(self):
+        result, output = self.publish('---\ntitle: "A landing page"\nlayout: landing\ntoc: false\n---\n# Welcome\n\n## Features\n\nText.')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        html = (output / 'index.html').read_text()
+        self.assertIn('<title>A landing page · Example</title>', html)
+        self.assertIn('layout-landing without-outline', html)
+        self.assertNotIn('aria-label="On this page"', html)
+        self.assertIn('May document unreleased APIs.', html)
+        self.assertIn('<h2 id="features">Features</h2>', html)
+
+    def test_html_body_uses_shared_shell_without_markdown_parsing(self):
+        result, output = self.publish('---\ntitle: HTML landing\ntoc: false\n---\n<section><h1>Hero</h1><p>**literal HTML**</p></section>', '.html')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        html = (output / 'index.html').read_text()
+        self.assertIn('<section><h1>Hero</h1>', html)
+        self.assertIn('**literal HTML**', html)
+        self.assertIn('Main navigation', html)
+        self.assertIn('May document unreleased APIs.', html)
+        self.assertEqual(html.count('<html'), 1)
+
+    def test_guide_retains_outline_by_default(self):
+        result, output = self.publish('# Guide\n\n## Details\n\nText.')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('aria-label="On this page"', (output / 'index.html').read_text())
+
+    def test_invalid_front_matter_fails_instead_of_ignoring_controls(self):
+        for content in ('---\ntoc: maybe\n---\n# Bad', '---\ntoc: false\ntoc: true\n---\n# Bad',
+                        '---\nlayout: unknown\n---\n# Bad', '---\ntoc: false\n# Bad'):
+            with self.subTest(content=content):
+                result, _ = self.publish(content)
+                self.assertNotEqual(result.returncode, 0)
+
+    def test_full_html_document_is_rejected_as_content(self):
+        result, _ = self.publish('<!doctype html><html><body>Nested document</body></html>', '.html')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('body fragment', result.stderr)
+
+
 if __name__ == '__main__':
     unittest.main()

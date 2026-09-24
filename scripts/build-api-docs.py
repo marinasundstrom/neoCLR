@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build DocFX reference pages, or refresh their metadata snapshot from a core DLL."""
+"""Verify or refresh the RavenDoc compiler-reference snapshot."""
 import argparse
 import hashlib
 import json
@@ -27,67 +27,29 @@ def inputs():
     paths += list((ROOT / 'runtime/raven/src/System/Console').glob('*.rvn'))
     paths += [ROOT / 'runtime/raven/src/System' / name for name in ('ConsoleReadError.rvn', 'Object.rvn', 'Value.rvn', 'HashCode.rvn')]
     paths += list((ROOT / 'runtime/raven/src/System/Storage').rglob('*.rvn'))
-    paths += [DOCS / name for name in ('NeoCLR.CoreProbe.xml', 'filter.yml', 'docfx.json')]
-    paths += [ROOT / '.config/dotnet-tools.json']
+    paths += list((ROOT / 'runtime/raven/src/System/Introspection').glob('*.rvn'))
+    paths += [DOCS / name for name in ('NeoCLR.CoreProbe.xml', 'types.json', 'exclusions.json')]
     return {str(p.relative_to(ROOT)): digest(p) for p in sorted(paths)}
-
-
-def generated():
-    return {str(p.relative_to(DOCS)): digest(p) for p in sorted((DOCS / 'api').glob('*.yml'))}
-
-
-def normalize_intrinsic_metadata():
-    # DocFX treats the core Object declaration as C#'s object keyword even in a
-    # declaration, and infers GetType on Value through reference-only ValueType.
-    # Neither rendering describes the executable neoCLR intrinsic contract.
-    path = DOCS / 'api/System.Object.yml'
-    if path.exists():
-        path.write_text(path.read_text().replace('content: public abstract object\n', 'content: public abstract class Object\n').replace('content.vb: Public MustInherit Object\n', 'content.vb: Public MustInherit Class Object\n'))
-    path = DOCS / 'api/System.Value.yml'
-    if path.exists():
-        path.write_text(re.sub(r'  inheritedMembers:\n(?:  - System\.Object\.[^\n]+\n)+', '', path.read_text()))
-
-
-def check_descriptions():
-    members = {m.attrib['name']: m for m in ET.parse(DOCS / 'NeoCLR.CoreProbe.xml').findall('./members/member')}
-    count = 0
-    for path in (DOCS / 'api').glob('*.yml'):
-        # DocFX emits the items before its supporting reference table. Check only
-        # published items, not types mentioned by signatures or overload groups.
-        items = path.read_text().split('\nreferences:', 1)[0]
-        for uid in re.findall(r'^  commentId: ([TMPF]:.+)$', items, re.M):
-            member = members.get(uid)
-            if member is None or member.find('summary') is None or not ''.join(member.find('summary').itertext()).strip():
-                raise ValueError('Missing API summary: ' + uid)
-            count += 1
-    if count == 0:
-        raise ValueError('No documented API items generated')
-    print(f'Checked summaries for {count} generated API items', flush=True)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--refresh', type=Path, metavar='CORE_DLL', help='Regenerate the checked-in YAML from a freshly generated reference assembly')
-    parser.add_argument('--check', action='store_true', help='Check snapshot inputs and descriptions without building HTML')
+    parser.add_argument('--refresh', type=Path, metavar='CORE_DLL', help='Snapshot a freshly generated compiler reference assembly')
+    parser.add_argument('--check', action='store_true', help='Check reference inputs and checksum')
     args = parser.parse_args()
+    assembly = DOCS / 'reference/NeoCLR.CoreProbe.dll'
     if args.refresh:
-        staging = ROOT / 'target/api-docs/input'
-        staging.mkdir(parents=True, exist_ok=True)
-        assembly = staging / 'NeoCLR.CoreProbe.dll'
+        assembly.parent.mkdir(parents=True, exist_ok=True)
         if args.refresh.resolve() != assembly.resolve():
             shutil.copyfile(args.refresh, assembly)
-        shutil.copyfile(DOCS / 'NeoCLR.CoreProbe.xml', assembly.with_suffix('.xml'))
-        shutil.rmtree(DOCS / 'api', ignore_errors=True)
-        subprocess.run(['dotnet', 'tool', 'run', 'docfx', 'metadata', str(DOCS / 'docfx.json'), '--warningsAsErrors'], cwd=ROOT, check=True)
-        normalize_intrinsic_metadata()
-        check_descriptions()
-        MANIFEST.write_text(json.dumps({'assemblySha256': digest(assembly), 'inputs': inputs(), 'generated': generated()}, indent=2) + '\n')
+        MANIFEST.write_text(json.dumps({'assemblySha256': digest(assembly), 'inputs': inputs()}, indent=2) + '\n')
     recorded = json.loads(MANIFEST.read_text())
-    if recorded['inputs'] != inputs() or recorded['generated'] != generated():
-        raise ValueError('API snapshot is stale. See api-docs/README.md to refresh from current metadata and XML.')
-    check_descriptions()
+    if recorded['inputs'] != inputs() or recorded['assemblySha256'] != digest(assembly):
+        raise ValueError('API reference snapshot is stale. See api-docs/README.md to refresh from current metadata and XML.')
+    shutil.copyfile(DOCS / 'NeoCLR.CoreProbe.xml', assembly.with_suffix('.xml'))
+    print('Checked RavenDoc reference assembly and source fingerprints', flush=True)
     if not args.check:
-        subprocess.run(['dotnet', 'tool', 'run', 'docfx', 'build', str(DOCS / 'docfx.json'), '--warningsAsErrors'], cwd=ROOT, check=True)
+        subprocess.run(['python3', str(ROOT / 'scripts/build-website.py')], check=True)
 
 
 if __name__ == '__main__':

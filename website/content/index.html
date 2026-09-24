@@ -1,0 +1,71 @@
+---
+title: neoCLR — Experimental application platform
+layout: landing
+toc: false
+---
+<section class="landing-hero" aria-labelledby="hero-title">
+  <div>
+    <p class="landing-eyebrow">RUNTIME · LIBRARY · RAVEN · TOOLS</p>
+    <h1 id="hero-title">An experimental<br>application platform.</h1>
+    <p class="landing-lead">A managed runtime and application APIs, explored through working Raven programs. Familiar .NET foundations, with room to question the contracts.</p>
+    <div class="landing-actions"><a class="primary-action" href="try/">Build your first project →</a><a href="docs/">Browse the API reference</a></div>
+    <p class="landing-note">Open source · Interpreted execution · Automatic memory management</p>
+  </div>
+  <div class="landing-example">
+    <p class="landing-eyebrow">RAVEN / EXPLICIT OUTCOMES</p>
+    <h2>A value, or an explicit absence</h2>
+    <pre><code class="language-raven">{{OPTION_SAMPLE}}</code></pre>
+    <p>Return <code>Some(value)</code> for a match, or <code>None</code> when no element matches.</p>
+    <a href="features/outcomes/">Explore Option and Result →</a>
+  </div>
+</section>
+<a id="start"></a>
+<a id="examples"></a>
+<a id="example-option"></a>
+<a id="example-result"></a>
+<a id="example-date"></a>
+<a id="example-query"></a>
+<a id="feature-pages"></a>
+<a id="example-func"></a>
+<a id="example-void"></a>
+<a id="api-preview"></a>
+<a id="example-clock"></a>
+<a id="example-introspection"></a>
+<a id="features"></a>
+<a id="example-tasks"></a>
+<a id="example-text"></a>
+<a id="example-collections"></a>
+<a id="familiar"></a>
+<a id="runtime"></a>
+<a id="type-system"></a>
+<a id="migration"></a>
+<a id="tooling"></a>
+<a id="next"></a>
+<a id="api-proposals"></a>
+<a id="exploring"></a>
+<section class="landing-section" aria-labelledby="features-title">
+  <div class="landing-section-heading"><h2 id="features-title">Explore the platform</h2><a href="guides/">All guides →</a></div>
+  <p>Small APIs, executable examples and explicit limits. Each guide identifies what is released, what is in development and what remains open.</p>
+  <div class="feature-grid">
+    <a class="feature-box" href="features/outcomes/"><span class="feature-category">ERRORS &amp; ABSENCE</span><h3>Option and Result</h3><p>Match and propagate expected outcomes, including operations with no useful result.</p><span class="feature-more">Read the guide →</span></a>
+    <a class="feature-box" href="features/arrays/"><span class="feature-category">DATA</span><h3>Arrays and collections</h3><p>Shared array storage, invariant element types, and separate read, replace and grow capabilities.</p><span class="feature-more">Read the guide →</span></a>
+    <a class="feature-box" href="features/collections/"><span class="feature-category">QUERIES</span><h3>Filter, map and combine</h3><p>Work with iterable queries and typed cardinality outcomes. Materialize only when needed.</p><span class="feature-more">Read the guide →</span></a>
+    <a class="feature-box" href="features/strings/"><span class="feature-category">TEXT</span><h3>Unicode and UTF-8</h3><p>Distinguish grapheme clusters, Unicode scalars and bytes, with strict conversion at boundaries.</p><span class="feature-more">Read the guide →</span></a>
+    <a class="feature-box" href="features/tasks/"><span class="feature-category">ASYNC</span><h3>Tasks and promises</h3><p>Await results, supply producer completion and understand the limits of isolated workers.</p><span class="feature-more">Read the guide →</span></a>
+    <a class="feature-box" href="features/introspection/"><span class="feature-category">DISCOVERY</span><h3>Types and members</h3><p>Explore assemblies, types and members through one model, with explicit identity contracts.</p><span class="feature-more">Read the guide →</span></a>
+    <a class="feature-box" href="features/files/"><span class="feature-category">I/O · DEVELOPMENT</span><h3>Files, Storage and streams</h3><p>Follow the evolution from bounded file helpers to provider-based storage and byte streams.</p><span class="feature-more">Read the guide →</span></a>
+    <a class="feature-box" href="features/console/"><span class="feature-category">TERMINAL · DEVELOPMENT</span><h3>Console and standard streams</h3><p>Handle input, output, end-of-input and typed errors through a common stream contract.</p><span class="feature-more">Read the guide →</span></a>
+    <a class="feature-box" href="features/time/"><span class="feature-category">TIME</span><h3>Dates and clocks</h3><p>Validate calendar values and obtain clock instants. Time zones and broader scheduling remain open.</p><span class="feature-more">Read the guide →</span></a>
+  </div>
+</section>
+<section class="landing-section landing-split" aria-labelledby="status-title">
+  <div><h2 id="status-title">Docs can lead the release</h2><p>This site tracks development. <strong>Preview 9</strong> is the published baseline described by the installation guide; some documented APIs require a newer development toolchain.</p><p>A website publication does not announce a runtime release. Check each page’s availability notes and use the matching sample and toolchain.</p><a href="try/">Published toolchain and development setup →</a></div>
+  <div><h2 id="direction-title">Build toward useful applications</h2><p>The active milestone is a small HTTP client/server pair. Work proceeds through byte, text, JSON, storage and delayed-operation samples before networking.</p><p>General sockets, HTTP and a JIT are not released capabilities. The importer supports a bounded CLI subset, not arbitrary unchanged .NET assemblies.</p><a href="proposals/">Roadmap and open questions →</a></div>
+</section>
+<section class="landing-section landing-reference" aria-labelledby="reference-title">
+  <div><p class="landing-eyebrow">ONE SITE, FROM EXAMPLE TO CONTRACT</p><h2 id="reference-title">Find the guide. Look up the API.</h2><p>Use tested walkthroughs to understand behavior, then follow the Raven API reference for types, members, errors and limitations.</p></div>
+  <div class="landing-actions"><a class="primary-action" href="guides/">Explore guides →</a><a href="docs/">Open the API reference →</a></div>
+</section>
+<section class="landing-section" aria-labelledby="feedback">
+  <h2 id="feedback">Help shape the project</h2><p>Run a sample, improve a guide, report a problem or bring a concrete API use case. Questions and critical comparisons matter alongside code.</p><p><a href="https://github.com/marinasundstrom/neoCLR/issues">Questions and issues</a> · <a href="https://github.com/marinasundstrom/neoCLR">Source and pull requests</a> · <a href="about/">About neoCLR</a></p>
+</section>

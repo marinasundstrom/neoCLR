@@ -159,7 +159,7 @@ access. See the [current Task contracts](../../task-contracts.md#task-compositio
   and the Default property. It does not edit Main.rvn on disk.
 
 The first three take a prepared Demo.rvnproj plus `--bridge`, `--system` and
-`--runtime` paths. The [Tasks feature page](../../../website/features/tasks/index.html)
+`--runtime` paths. The [Tasks feature page](../../../website/content/features/tasks/index.md)
 uses complete source samples, also tested through installed `.rvnproj` build/run
 commands. Local development toolchains must pair the compiler and language server
 with the current reference metadata, System library, importer and runtime.

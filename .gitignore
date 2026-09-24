@@ -4,3 +4,7 @@
 /website/node_modules/
 
 /api-docs/api/.manifest
+
+# RavenDoc copies the authored sidecar beside the pinned reference at build time.
+/api-docs/reference/*.xml
+/scripts/__pycache__/

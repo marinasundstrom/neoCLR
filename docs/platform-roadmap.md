@@ -14,6 +14,12 @@ look like. A milestone selects an outcome to investigate, not every abstraction 
 its source proposals. Keep, adapt or discard ideas based on working samples and
 [comparison with .NET/CLR](design-research.md).
 
+**Author-directed website work, 2026-09-24:** migrate the product and API documentation
+to one RavenDoc site, with Markdown guides, an HTML landing page, front-matter layout
+controls and a pinned portable CI build. Documentation may precede a runtime release;
+show that status explicitly. This bounded publishing change does not reorder the
+application milestones. See [website maintenance](design/feature-pages.md#ravendoc-site-and-landing-page--2026-09-24).
+
 ## Authority and use
 
 **This roadmap is authoritative for our work unless the author explicitly directs

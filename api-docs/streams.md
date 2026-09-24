@@ -12,7 +12,7 @@ not a finalized provider model or asynchronous I/O contract.
 - [FileInputStream](xref:System.IO.FileInputStream) — Open, Read and Close.
 - [FileOutputStream](xref:System.IO.FileOutputStream) — CreateNew, Write and Close.
 - [StreamError](xref:System.IO.StreamError) — expected open and transfer failures.
-- [Flush](#flush) — complete manual entries for both renderer exclusions.
+- [Flush](#flush) — the output and file stream flush contracts.
 
 An input stream reads an existing regular file. An output stream exclusively
 creates a new file; it never overwrites an existing entry. The classes expose
@@ -84,10 +84,8 @@ a closed stream returns Closed. There is no managed output buffer in this wrappe
 and success does not imply fsync or durability. Call it before Close when the
 operation needs to observe a flush error.
 
-DocFX 2.80.1 cannot render this metadata signature because neoCLR's unit is
-`System.Void` inside a generic Result. Both Flush methods are therefore omitted from their generated
-type pages and documented here, using its actual Raven signature. It remains part
-of the public API.
+RavenDoc renders both Flush methods in their generated type pages, including
+`System.Void` inside the generic Result. This guide explains their behavior and limits.
 
 ## A runnable example
 

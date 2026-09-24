@@ -272,7 +272,7 @@ for intentional absence in both value and reference API models.
 Generated record Object.Equals preserves Object's nullable comparison parameter;
 generated typed record-class Equals also accepts a nullable reference to its record
 type and compares null as false. Record-struct typed parameters remain non-nullable
-values. The Equatable<T> interface contract is unchanged. This does not add Nullable<T>,
+values. The Equatable&lt;T&gt; interface contract is unchanged. This does not add Nullable&lt;T&gt;,
 nullable-value boxing or Option components to the supported record component set.
 
 Generated record-class `==` and `!=` also accept nullable operands in development.

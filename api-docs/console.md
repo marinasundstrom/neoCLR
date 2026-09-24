@@ -63,9 +63,8 @@ func Flush() -> Result<unit, StreamError>
 func Close()
 ```
 
-DocFX cannot render `Result<System.Void, StreamError>`. **Exactly
-TextWriter.Flush and StreamWriter.Flush are excluded from generated metadata** and
-covered here, alongside the existing OutputStream/FileOutputStream Flush entries
+RavenDoc includes TextWriter.Flush and StreamWriter.Flush in generated reference.
+This guide complements the OutputStream/FileOutputStream Flush entries
 in the [stream guide](streams.md). Flush returns unit or a typed error, including
 Closed after Close. It does not close the destination. StreamWriter is unbuffered;
 Close releases owned output without implicitly flushing. Call Flush explicitly to

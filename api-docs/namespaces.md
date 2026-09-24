@@ -42,7 +42,7 @@ text or I/O workflows. Their member reference coverage is still pending.
 Expand namespaces in the [generated reference](xref:System) to browse documented
 types and members. Some areas currently have only a feature guide; this overview
 does not replace their eventual member documentation. Generated declarations use
-C# metadata notation; the [API guide](index.md#reading-generated-declarations)
+Raven notation; the [API guide](index.md#reading-generated-declarations)
 explains how to read them for Raven.
 
 Future namespace ideas belong in [proposals](/proposals/index.html) until they have
@@ -50,7 +50,7 @@ implemented APIs. This list will expand alongside the library.
 
 The [transitional async builder guide](async-builders.md) covers generated state ownership and links the compiler-facing System.Runtime.CompilerServices contracts to their temporary role.
 
-[Equatable<T>](xref:System.Equatable`1) defines typed equality as Equals(T), without
+[Equatable&lt;T&gt;](xref:System.Equatable`1) defines typed equality as Equals(T), without
 imposing nullable value types. Path now supplies that contract and Object overrides.
 
 ## System.Introspection

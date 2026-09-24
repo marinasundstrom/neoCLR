@@ -1,7 +1,0 @@
-{
-  "name": "neoclr-website-build",
-  "private": true,
-  "type": "module",
-  "scripts": {"test": "node --test highlight.test.mjs"},
-  "dependencies": {"vscode-oniguruma": "2.0.1", "vscode-textmate": "9.3.2"}
-}

@@ -1,0 +1,42 @@
+{
+  "subtitle": "Experimental application platform",
+  "footer": "Experimental \u00b7 Development APIs after Preview 9",
+  "notice": "Development docs \u00b7 Some APIs are not released yet.",
+  "releaseUrl": "https://github.com/marinasundstrom/neoCLR/releases/latest",
+  "releaseLabel": "Published release \u2192",
+  "apiPath": "docs/api",
+  "logo": "mark.svg",
+  "stylesheet": "custom.css",
+  "memberListStyle": "compact",
+  "apiNavigationRoot": "docs",
+  "name": "neoCLR",
+  "links": [
+    {
+      "label": "Overview",
+      "url": "index.html"
+    },
+    {
+      "label": "Get started",
+      "url": "try/"
+    },
+    {
+      "label": "Guides",
+      "url": "guides/"
+    },
+    {
+      "label": "API reference",
+      "url": "docs/"
+    },
+    {
+      "label": "Direction",
+      "url": "proposals/"
+    },
+    {
+      "label": "About",
+      "url": "about/"
+    }
+  ],
+  "showToc": true,
+  "toc": "toc.yml",
+  "favicon": "favicon.svg"
+}

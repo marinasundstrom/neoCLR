@@ -1,9 +1,8 @@
 # Task callback methods
 
 These three public methods use `Func<System.Void>`, a callback returning neoCLR's
-unit value. DocFX's .NET signature reader rejects that generic argument. They are
-therefore described here in Raven notation, rather than silently changing the API
-or publishing a different CLR-compatible signature.
+unit value. RavenDoc renders these methods in the generated reference; this guide
+explains their queue and continuation contracts.
 
 This is the same queue used by [Task&lt;T&gt;](xref:System.Tasks.Task`1) and
 [Promise&lt;T&gt;](xref:System.Tasks.Promise`1). See the
@@ -26,7 +25,7 @@ pumping is a runtime fault. A fault stops execution; this API is not an exceptio
 recovery boundary. While `Run` or `Drain` is active, new promises and async methods use the nearest
 active queue. `Promise<T>(queue)` instead uses the queue supplied explicitly.
 
-## Task<T>.OnCompleted
+## Task&lt;T&gt;.OnCompleted
 
 `func OnCompleted(callback: Func<System.Void>)`
 

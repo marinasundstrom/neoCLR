@@ -1,116 +1,64 @@
-# neoCLR API reference
+---
+title: API documentation
+toc: false
+---
+# API documentation
 
-neoCLR is an **experimental application platform**. This reference describes the
-development API following Preview 9, covering Tasks, explicit threads and the first file streams and host metadata lookup.
-The new System.Concurrency APIs require matching development artifacts; Preview 9
-downloads retain System.Threading. Names and contracts remain experimental;
-this reference does not promise compatibility with future releases.
+**Development after Preview 9.** These pages describe the current development
+contracts. They may precede a downloadable release. In particular, the development
+`System.Concurrency` APIs replace the `System.Threading` names in Preview 9 bundles.
 
-## Terminal failures
+Start with a feature guide for behavior and working examples, or open a namespace
+for generated type and member documentation. Both are parts of this site.
 
-The [fault reference](faults.md) covers runtime-assigned FaultCode values, the Rust
-host outcome, CLI/debugger diagnostics and System.Fault. Explicit guest faults use
-UserFault; guest code cannot set a code.
+<a id="explicit-threads-in-development"></a>
+<a id="api-overview"></a>
+<a id="browse-namespaces"></a>
+<a id="start-with-tasks"></a>
+<a id="storage-exploration"></a>
+<a id="terminal-failures"></a>
 
-## API overview
+## Features and reference
 
-The feature guides explain current behavior and provide small Raven examples:
+| Area | Read the guide | Browse types and members |
+| --- | --- | --- |
+| Tasks and completion | [Tasks and async](/features/tasks/) · [Callbacks](callbacks.md) | [System.Tasks](xref:System.Tasks) |
+| Isolated workers | [Thread and worker behavior](/features/tasks/) | [System.Concurrency](xref:System.Concurrency) |
+| Storage and files | [Files and Storage](/features/files/) · [Providers](storage-provider.md) | [System.Storage](xref:System.Storage) |
+| Byte and text streams | [Stream contracts](streams.md) · [Pending reads](pending-read.md) | [System.IO](xref:System.IO) |
+| Console | [Console guide](/features/console/) · [Standard stream ownership](console.md) | [Console](xref:System.Console) |
+| Metadata discovery | [Introspection walkthrough](/features/introspection/) · [Descriptor identity](introspection.md) | [System.Introspection](xref:System.Introspection) |
+| Identity, values and records | [Object and value contracts](objects.md) | [Object](xref:System.Object) · [Value](xref:System.Value) · [HashCode](xref:System.HashCode) · [Equatable&lt;T&gt;](xref:System.Equatable`1) |
+| Compiler support | [Transitional async builders](async-builders.md) | [System.Runtime.CompilerServices](xref:System.Runtime.CompilerServices) |
+| Runtime failures | [Terminal faults and host diagnostics](faults.md) | Manual host reference in that guide |
 
-| Area | What to explore |
-| --- | --- |
-| [Arrays](/features/arrays/index.html) | Managed array storage, identity, bounds and collection capabilities |
-| [Collections and queries](/features/collections/index.html) | Lists, maps, iteration and query operations |
-| [Strings](/features/strings/index.html) | Text slices, Unicode scalars, graphemes and strict UTF-8 conversion |
-| [Outcomes](/features/outcomes/index.html) | Option, Result, expected errors and propagation |
-| [Tasks](/features/tasks/index.html) | Promise, completion, await, cancellation and isolated workers |
-| [Files](/features/files/index.html) | The current bounded UTF-8 file-reading API |
-| [Dates and clocks](/features/time/index.html) | Calendar values, instants and clock access |
-| [Introspection](/features/introspection/index.html) | Inspecting assemblies, types and members |
+[Browse all generated namespaces](api/) · [Namespace overview](namespaces.md) ·
+[All feature guides](/guides/)
 
-The [file stream guide](streams.md) describes the first blocking byte APIs. Broader
-Storage and Encoding APIs remain upcoming work; networking follows those foundations. Reference coverage is
-being expanded beyond the initial Preview 9 async overview.
+<a id="reading-generated-declarations"></a>
+<a id="how-this-differs-from-net"></a>
 
-## Browse namespaces
+## Reading an API page
 
-The [namespace overview](namespaces.md) explains what each current namespace
-contains and links to its available reference pages and feature guides. Start there
-for collections, text, Tasks, storage, streams, introspection and runtime support.
+RavenDoc generates declarations from the compiler reference assembly and renders
+the authored documentation sidecar. Type pages list members; member pages include
+summaries, parameters, results and available remarks. Signatures use Raven notation.
+A reference signature does not imply support for arbitrary .NET assemblies.
 
-Use the API reference navigation to expand namespaces with generated coverage and
-select a type. Type pages list constructors, properties and methods. Reference
-coverage for older areas is still being expanded; a feature guide does not replace
-member documentation.
+Generic unit-valued results and callbacks are included: `Func<System.Void>` and
+`Result<System.Void, E>` no longer require omissions from generated reference.
+The callback and stream guides explain the behavior behind those signatures.
+Reference-only carrier/scaffold details may differ from idiomatic source; use the
+tested examples in feature guides when writing an application.
 
-## Start with Tasks
+## Coverage and availability
 
-- [Task&lt;T&gt;](xref:System.Tasks.Task`1) lets a consumer observe completion.
-- [Promise&lt;T&gt;](xref:System.Tasks.Promise`1) lets a producer complete or cancel it.
-- [TaskQueue](xref:System.Tasks.TaskQueue) dispatches callbacks within one invocation.
-- [TaskState](xref:System.Tasks.TaskState) names the three observable states.
+Reference coverage is still being expanded. Arrays, collections, queries,
+Option/Result helpers, text/encoding, time/calendar and other older areas have
+feature guides but do not yet have complete generated member reference.
+The [namespace overview](namespaces.md) makes those gaps visible; a guide is not a
+claim of full member coverage.
 
-Read the [Tasks feature guide](/features/tasks/index.html) for tested Raven
-examples, async/await, composition, workers and host cancellation. Those examples
-are the intended application syntax. This initial reference does not yet cover the
-rest of the library or composition extensions.
-
-Three methods accepting `Func<System.Void>` are documented in the
-[callback guide](callbacks.md). DocFX’s .NET metadata reader cannot currently
-render this neoCLR signature, so these methods are omitted from generated type pages.
-
-## Explicit threads in development
-
-[Thread](xref:System.Concurrency.Thread) represents an explicit isolated host thread:
-construct it, retain its pending Task, then call Start once. Thread.Run is a shortcut
-for immediate submission. Completion includes thread termination. The current
-callback still takes and returns strings and cannot capture guest objects.
-[ThreadPool](xref:System.Concurrency.ThreadPool) retains the bounded worker-pool API.
-Neither API implements the planned general Task.Run overload family.
-
-## Storage exploration
-
-The [Storage provider experiment](storage-experiment.md) documents application-owned
-File and Directory descriptors used by the same tested Raven workflow with disk
-and memory. It is a provisional contract, separate from the published System APIs.
-
-## Reading generated declarations
-
-Signatures come from the compiler reference assembly, with authored XML descriptions.
-DocFX renders them in **C# metadata notation**; this does not imply a supported C#
-frontend or execution on the .NET CLR. Raven uses spellings such as `Task<int>` and
-`Func<System.Void>`. Some supporting union types and compiler interfaces appear in
-signatures but do not yet have reference pages. Prefer union patterns in Raven over
-metadata carrier accessors.
-
-## How this differs from .NET
-
-.NET places Task in `System.Threading.Tasks` and exposes producer completion through
-`TaskCompletionSource<T>`. neoCLR uses `System.Tasks.Task<T>` and `Promise<T>`.
-Completion and cancellation are terminal states; expected failures are values such
-as `Result<T, E>`, rather than a faulted Task carrying an exception. This makes
-expected outcomes visible in the type, but is not source or behavioral compatibility
-with .NET Tasks.
-
-The current queue is a single-invocation dispatcher, not a .NET thread pool or
-SynchronizationContext. Registering a callback schedules it on the associated
-queue, including after completion. These guest objects are not shared-memory,
-thread-safe synchronization primitives. Worker execution uses isolated invocations;
-its current join can block the parent queue. An async method alone does not provide
-parallel execution or nonblocking I/O.
-
-See the [platform overview](/about/index.html) for background and direction and
-[proposals](/proposals/index.html) for open ideas. General API usage belongs here
-and in the feature guides; repository implementation notes are supplementary.
-
-The development [InputStream](xref:System.IO.InputStream) and
-[OutputStream](xref:System.IO.OutputStream) interfaces let the same consumer
-use a file stream or an application-defined memory stream. See the
-[capability contracts](streams.md#capability-contracts) and the manually documented
-[Flush methods](streams.md#flush).
-
-The [Storage POC](storage-poc.md) demonstrates provider lookup, writing, text reading,
-seekability and mixed-item enumeration using the integrated development APIs.
-
-[Transitional async builders](async-builders.md) documents the compiler-facing state-machine protocol and its current limits. It may be replaced by runtime suspension.
-
-[Type introspection](introspection.md) explains represented-type equality, hashing and display, with a browsable type/member reference.
+Names and contracts are experimental. Pages label published behavior, development
+changes and proposals separately. Use [the matching toolchain](/try/#development)
+for development examples.

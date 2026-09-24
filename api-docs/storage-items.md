@@ -101,8 +101,8 @@ An invalid limit or oversized text is rejected before modification. A later I/O
 failure can leave empty or partial output; writes are not atomic replacement and
 do not promise durability. Parent directories are not created.
 
-DocFX cannot render Result<System.Void, FileWriteError>. Only this exact method is
-excluded; this entry supplies its signature and contract.
+RavenDoc includes this unit-valued Result signature in the generated reference;
+this entry explains its write and error contract.
 
 ## Design comparison
 

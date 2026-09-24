@@ -1,0 +1,164 @@
+# Tasks and async execution
+
+Task describes whether an operation produced a value. It does not imply a thread. Write async code around the operation you need, with expected errors as values and cancellation as a distinct outcome.
+
+**Preview 9 implementation.** These APIs are included in the matching Preview 9 downloads. The API and implementation are provisional. Current execution uses compiler-generated state machines; runtime suspension remains a research direction.
+
+[See a working example ↓](#await) · [Download the complete example](../../samples/library-async-default-queue.rvn)
+
+<a id="await"></a>
+
+## Starting and awaiting a worker
+
+```raven
+{{TASK_WORKER_SAMPLE}}
+```
+
+This prints `Hello on a worker`. `Thread.Start` explicitly creates an isolated OS worker and returns a `Task<string>` for its completion. `await` obtains that string. Use `Task<unit>` when completion carries no additional value.
+
+The worker callback is a named function with owned text input and output. Guest objects are not shared. `ThreadPool.Queue` offers the same completion shape through a small reusable pool.
+
+A Task is a completion handle, not a thread wrapper. Other operations can produce Tasks without creating threads; future I/O and stream operations will build on awaitable completion too.
+
+<a id="promise"></a>
+
+## Promise and Task composition
+
+```raven
+{{TASK_PROMISE_SAMPLE}}
+```
+
+This prints `42`. `Promise<T>` owns completion; its `Task` lets consumers await or compose the result. `Complete(value)` and `Cancel()` return whether they won the first terminal transition. Later attempts leave the outcome unchanged.
+
+`Map` transforms a completed value. `Then` accepts a continuation returning another Task and follows its completion. Both propagate cancellation without invoking skipped callbacks. They treat `Result` as an ordinary payload.
+
+[Download the producer example →](../../samples/library-task-producer.rvn)
+
+<a id="outcomes"></a>
+
+## Completion, cancellation and Fault
+
+| Situation | Meaning |
+| --- | --- |
+| `Pending` | The operation has no terminal outcome yet. |
+| `Completed(value)` | Await yields the value. That value can itself be a Result containing Ok or Error. |
+| `Cancelled` | Await cancels the enclosing Task and skips the rest of that async body. |
+| Fault | Unrecoverable execution failure. There is no Task fault state or catch/rejection operator. |
+
+```raven
+{{TASK_CANCELLATION_SAMPLE}}
+```
+
+This prints only `Cancelled`. The message after the await never runs. `Outcome` is None while pending and Some of the terminal outcome afterward. Ordinary application code can await; orchestration code can inspect outcomes explicitly.
+
+`MapResult` explicitly maps the Ok payload of a Task containing a Result. It preserves Error and propagates cancellation without invoking the mapper. Ordinary `Map` still receives the whole Result.
+
+```raven
+{{TASK_RESULT_SAMPLE}}
+```
+
+This prints `42`. [Download the Result mapping example →](../../samples/library-task-result.rvn)
+
+For an operation returning `Task<Result<T, E>>`, await yields the Result and `?` propagates an expected error independently. Cancellation never becomes `Result.Error`. Cancellation tokens remain a follow-up slice; the example uses explicit producer cancellation.
+
+```raven
+{{TASK_PROPAGATION_SAMPLE}}
+```
+
+Parentheses make the order explicit: `(await input)?` awaits first, then propagates from the Result. Today, `await input?` applies `?` first; ergonomic shorthand is a future language-design question.
+
+Here, Error skips the rest of Read and completes its Task with that same Error. The complete example supplies `Error("Unavailable")` and prints `Unavailable`. Propagation also works before an await, returning without waiting for later inputs.
+
+[Download the propagation example →](../../samples/library-task-propagation.rvn)
+
+[Download the cancellation example →](../../samples/library-async-cancellation.rvn) · [Explore Option and Result →](../outcomes/)
+
+<a id="worker-limits"></a>
+
+## Worker payload limits
+
+Each worker has a default 1 MiB quota shared by its returned text and captured console output. Accounting uses UTF-8 bytes plus one byte per output line, including empty lines. Output is checked before copying a line; returned text is checked before publishing success. Exceeding the quota faults when the caller joins the result, without forwarding partial output.
+
+The embedding host can change this quota. With the existing 64-submission limit, default successful payloads total at most 64 MiB. This is not a process-memory limit: inputs, temporary strings, diagnostics and allocation overhead are excluded. A worker printing an empty line and `é`, then returning `é`, uses six logical bytes.
+
+The limit applies to dedicated and pooled workers, including the experimental completion adapter. Its per-worker accounting is predictable, but a future shared budget could distribute capacity more flexibly.
+
+<a id="host-cancellation"></a>
+
+## Host cancellation during completion
+
+The embedding host can request cancellation of an entire invocation. Worker joins check that request around waits, between forwarded output lines and before returning the value. For example, if the host requests cancellation while writing the first of two buffered worker lines, that line remains visible, the second is skipped and the invocation ends with an `execution cancelled` Fault. A fresh invocation can still run the same program.
+
+This is separate from a producer calling `Promise.Cancel()`: host cancellation does not complete an individual Task as Cancelled. Requests are cooperative and cannot interrupt an active host call or undo output. Teardown requests worker cancellation and waits for its threads to stop. Guest operation tokens, native I/O acknowledgement and bounded shutdown remain open.
+
+<a id="dispatch"></a>
+
+## Default TaskQueue dispatch
+
+`Promise<T>()`, async functions and worker APIs select the active queue or the invocation’s `TaskQueue.Default`. The runtime runs default-queue callbacks automatically before the invocation returns, including callbacks posted by other callbacks. Explicit queues remain available for controlled dispatch.
+
+This dispatcher is small and serialized. Worker joins can block it. An unresolved Promise with no queued work does not keep the invocation alive; OS I/O completion is not implemented yet. Await inside for loops is diagnosed until iterator state and cleanup are suspension-aware. Protected cleanup and async disposal are outside the current subset.
+
+<a id="try"></a>
+
+## Use the matching Preview 9 toolchain
+With the Preview 9 SDK, open a prepared `.rvnproj` in VS Code, replace `Main.rvn` with one of the complete downloads above, and run the neoCLR build/run task. Refresh the compiler, reference core and runtime library together. Use the runtime, SDK and VSIX from the same release.
+
+neoCLR and the programs it runs do not require .NET. The Raven compiler, build tools and Raven Language Server run on .NET.
+
+[Setup and version compatibility →](../../try/#development)
+
+<a id="release-checkpoint"></a>
+
+## Preview 9: async and Tasks
+
+Preview 9 includes the current Task/Promise model, named async functions, await, composition, Result propagation, producer cancellation and automatic default-queue dispatch. Isolated workers are included with their current limits: ordinary worker joins can block the queue.
+
+The release was checked with fresh extracted runtime, SDK and editor packages, eight Async Workbench samples, six Task contract probes and the Linux/macOS/Windows source matrix. Prebuilt package validation covers macOS arm64. HTTP, guest cancellation tokens and the experimental nonblocking worker adapter are not supported features of this preview.
+
+<a id="pending-read"></a>
+
+## Pending-read contract experiment
+
+A [development sample](../../docs/pending-read.html) separates a cancellation request from terminal producer acknowledgement. Real Task/Promise, await and managed GC exercise both ordered outcomes and reject late events. The first case models producer callbacks; a follow-up uses real host-worker notification and defers cancellation until producer acknowledgement. Neither is an async Storage implementation. Experimental raw runtime services now support individual worker cancellation with acknowledged outcomes; an isolated Raven adapter now maps those outcomes to Promise cancellation and tests both dedicated and pooled jobs. A cross-queue fixture also records a current limitation: a pending await resumes through the producer’s queue, while observation of the async method’s result uses its caller’s queue. Public cancellation APIs and the future affinity contract remain open.
+
+<a id="direction"></a>
+
+## Comparison with .NET and planned work
+
+Both platforms expose awaitable completion. neoCLR uses Promise for producer completion and Result values for expected errors; Task has no faulted outcome. This differs from .NET Task’s exception-based fault state and requires different library and compiler contracts.
+
+Raven currently emits state machines. Runtime suspension is a longer-term direction, but it is not required for the next sample. TaskQueue is provisional scaffolding: we will adapt the model when concrete requirements arise, including runtime suspension. No public Scheduler API or TaskQueue replacement has been selected. The immediate questions are completion progress, continuation ownership, cancellation and cleanup.
+
+Development: the importer now supports opt-in value-type state machines for non-generic methods using Task awaiters. Startup runs in place; pending awaits reuse one retained state. Ready, pending and cancelled cases are checked under garbage collection pressure, including unit and Result payloads. Ready completion saves one managed state object in the focused comparison; pending cases have allocation parity. Heap states remain the default while broader cases and costs are evaluated.
+
+Generated state machines help us build the platform now. Runtime-owned async suspension is a future direction, and these compiler-facing builder APIs may later be deprecated or removed. See the [development builder contracts](../../docs/async-builders.html) for the supported scope.
+
+Cancellation tokens, host I/O completion, stream operations, scheduling policies and broader cleanup support remain development work. This page demonstrates the current direction, not a final design.
+
+A development [Delayed Copy experiment](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/delayed-copy/README.md) now connects worker completion to the interpreter and default TaskQueue. A Raven consumer retains its byte array through collection and resumes to copy the result. This uses an isolated worker-library adapter; the normal Thread APIs above still use queued joins. The experiment now checks ready completions between default-queue callbacks, so a callback that reposts itself no longer prevents delivery. Callbacks must still return; preemption, explicit queue affinity, per-operation cancellation and real I/O remain open.
+
+**Development after Preview 9:** explicit thread APIs move to `System.Concurrency`; Task and Promise stay in `System.Tasks`. A retained `Thread(callback, input)` exposes a pending `Task` before instance `Start()`. Starting twice faults. `Thread.Run(callback, input)` is the immediate-start shortcut. Both retain the current isolated string callback restriction; successful completion includes native thread termination. These changes require matching development artifacts and are not in the Preview 9 downloads.
+
+`Task.Run` is planned to spawn work concurrently, with overloads for completion-only and value-producing callbacks. Calling Run submits the work; awaiting its Task observes completion. Scheduling, captured state and async callback behavior need to be defined with the suspension model. The string-only worker API is not the intended general Task.Run contract.
+
+System.Concurrency will cover concurrency, including threading. Thread remains an explicit API for threads and may be unavailable on some platforms. Task will be a general abstraction and API for work, with a way to submit work concurrently, such as Task.Run. Its execution mechanism depends on the platform rather than requiring a thread. On WebAssembly it might use Web Workers behind the Task API. This is post-release direction; exact scheduling, isolation and progress contracts still need design and implementation.
+
+[Related proposals and open questions →](../../proposals/#async)
+
+<a id="feedback"></a>
+
+## Questions and contributions
+
+Report completion, cancellation or scheduling issues with a reproducible example and the expected operation lifetime.
+
+[Discuss on GitHub ↗](https://github.com/marinasundstrom/neoCLR/issues)
+
+Questions, sample programs and documentation corrections are welcome. See [how to contribute](../../#feedback) for ways to participate.
+
+## API reference
+
+[System.Tasks](xref:System.Tasks) · [System.Concurrency](xref:System.Concurrency)
+
+The generated reference describes development after Preview 9. Use the availability
+notes above to distinguish it from the published toolchain.

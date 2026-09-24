@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the project site and DocFX reference, using executable sample excerpts."""
+"""Build one RavenDoc site from Markdown, reference metadata and tested samples."""
 from html import escape, unescape
 from html.parser import HTMLParser
 from pathlib import Path
@@ -21,7 +21,7 @@ def excerpt(path, start, end, include_end=True):
     text = (ROOT / path).read_text(encoding='utf-8')
     first = text.index(start)
     last = text.index(end, first) + (len(end) if include_end else 0)
-    return escape(dedent(text[first:last]).rstrip())
+    return dedent(text[first:last]).rstrip()
 
 
 class PageCheck(HTMLParser):
@@ -43,6 +43,11 @@ class PageCheck(HTMLParser):
             if attr in attrs:
                 self.links.append(attrs[attr])
 
+    def handle_startendtag(self, tag, attrs):
+        self.handle_starttag(tag, attrs)
+        if self.stack and self.stack[-1] == tag:
+            self.stack.pop()
+
     def handle_endtag(self, tag):
         if not self.stack or self.stack.pop() != tag:
             raise ValueError('Mismatched closing HTML tag: ' + tag)
@@ -63,20 +68,10 @@ class PageCheck(HTMLParser):
                 raise ValueError(f'Missing anchor in {path.name}: {link}')
 
 
-def render(page, samples):
+def render(page, samples, html=False):
     for token, source in samples.items():
-        page = page.replace('{{' + token + '}}', excerpt(*source))
-    blocks = list(re.finditer(r'(<pre[^>]*><code>)(.*?)(</code></pre>)', page, re.S))
-    raven_blocks = [block for block in blocks
-                    if 'neoIL' not in block.group(1) and 'data-language="text"' not in block.group(1)]
-    result = subprocess.run(
-        ['node', str(SOURCE / 'highlight.mjs')],
-        input=json.dumps([unescape(block.group(2)) for block in raven_blocks]),
-        capture_output=True, text=True, check=True)
-    highlighted = dict(zip((block.start() for block in raven_blocks), json.loads(result.stdout)))
-    for block in reversed(blocks):
-        if block.start() in highlighted:
-            page = page[:block.start(2)] + highlighted[block.start()] + page[block.end(2):]
+        value = excerpt(*source)
+        page = page.replace('{{' + token + '}}', escape(value) if html else value)
     if '{{' in page:
         raise ValueError('Unexpanded website placeholder')
     return page
@@ -96,7 +91,7 @@ def make_reference_links_relative():
         return urlunsplit(('', '', path, url.query, url.fragment))
 
     attribute = re.compile(r'\b(href|src)=("|\')(/[^"\']*)\2')
-    for page in (OUTPUT / 'docs').rglob('*.html'):
+    for page in OUTPUT.rglob('*.html'):
         def replace_attribute(match):
             value = relative(unescape(match.group(3)), page)
             return f'{match.group(1)}={match.group(2)}{escape(value, quote=True)}{match.group(2)}'
@@ -140,17 +135,71 @@ def check_reference_links():
                 if not target.is_relative_to(OUTPUT.resolve()) or not target.is_file():
                     raise ValueError(f'Missing API reference link in {self.page.name}: {value}')
 
-    for page in (OUTPUT / 'docs').rglob('*.html'):
+    for page in OUTPUT.rglob('*.html'):
         parser = ReferenceLinks()
         parser.page = page
         parser.feed(page.read_text(encoding='utf-8'))
 
 
+def check_api_coverage():
+    import xml.etree.ElementTree as ET
+    xrefs = {uid.replace('+', '.').replace('..ctor', '.#ctor'): path
+             for uid, path in json.loads((OUTPUT / 'xref-map.json').read_text()).items()}
+    types = json.loads((ROOT / 'api-docs/types.json').read_text())
+    exclusions = json.loads((ROOT / 'api-docs/exclusions.json').read_text())
+    comments = {node.attrib['name']: node for node in
+                ET.parse(ROOT / 'api-docs/NeoCLR.CoreProbe.xml').findall('./members/member')}
+    for name in types:
+        uid = 'T:' + name
+        if uid not in xrefs or uid not in comments:
+            raise ValueError('Missing generated type or XML description: ' + uid)
+        page = OUTPUT / xrefs[uid]
+        if 'member-summary--empty' in page.read_text():
+            raise ValueError('Missing public member summary in ' + str(page))
+    for uid, node in comments.items():
+        normalized = re.sub(r'``[0-9]+', '', uid.split('(', 1)[0])
+        selected = uid.startswith('T:') and uid[2:] in types or (
+            uid[:2] in ('M:', 'P:', 'F:') and any(normalized[2:].startswith(name + '.') for name in types))
+        if not selected or normalized in exclusions:
+            continue
+        if normalized not in xrefs:
+            raise ValueError('Documented API missing from generated reference: ' + uid)
+        summary = node.find('summary')
+        if summary is None or not ''.join(summary.itertext()).strip():
+            raise ValueError('Missing API summary: ' + uid)
+
+
+def write_legacy_routes():
+    xrefs = {uid.replace('+', '.').replace('..ctor', '.#ctor'): path
+             for uid, path in json.loads((OUTPUT / 'xref-map.json').read_text()).items()}
+    routes = json.loads((ROOT / 'api-docs/legacy-routes.json').read_text())
+    for name, route in routes.items():
+        if route['uid'] not in xrefs:
+            raise ValueError('Missing legacy API target: ' + route['uid'])
+        target = posixpath.relpath(xrefs[route['uid']], 'docs/api')
+        anchors = {anchor: posixpath.relpath(xrefs[uid], 'docs/api')
+                   for anchor, uid in route['anchors'].items() if uid in xrefs}
+        body = ''.join(f'<p id="{escape(anchor)}"><a href="{escape(href)}">Member reference</a></p>'
+                       for anchor, href in anchors.items())
+        (OUTPUT / 'docs/api' / name).write_text(
+            '<!doctype html><html lang="en"><head><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width, initial-scale=1">'
+            '<title>API reference moved · neoCLR</title></head><body>'
+            f'<h1>API reference moved</h1><p><a href="{escape(target)}">Open the RavenDoc reference</a></p>'
+            + body + '<script>const routes=' + json.dumps(anchors) + ';'
+            + 'location.replace(routes[decodeURIComponent(location.hash.slice(1))] || '
+            + json.dumps(target) + ');</script></body></html>')
+
+
 def main():
+    global OUTPUT
+    publish_destination = OUTPUT
+    subprocess.run([sys.executable, str(ROOT / 'scripts/build-api-docs.py'), '--check'], check=True)
+    OUTPUT = publish_destination.with_name(publish_destination.name + '-next')
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)
     OUTPUT.mkdir(parents=True)
-    for name in ('style.css', 'mark.svg'):
+    for name in ('custom.css', 'mark.svg', 'favicon.svg'):
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
@@ -197,8 +246,8 @@ def main():
         'TOUR_MEMBERS': (tour, '    let flags', '\n}', False),
     })
     # The full expected output is shared with the saved-project execution check.
-    output_text = escape((ROOT / (raven + 'library-introspection-tour.expected.txt')).read_text().rstrip())
-    array_output = escape((ROOT / (raven + 'library-array-tour.expected.txt')).read_text().rstrip())
+    output_text = (ROOT / (raven + 'library-introspection-tour.expected.txt')).read_text().rstrip()
+    array_output = (ROOT / (raven + 'library-array-tour.expected.txt')).read_text().rstrip()
     downloads = OUTPUT / 'samples'
     downloads.mkdir()
     for name in ('library-array-tour.rvn', 'library-array-tour.expected.txt', 'library-task-propagation.rvn', 'library-task-result.rvn', 'library-async-default-queue.rvn', 'library-task-producer.rvn', 'library-async-cancellation.rvn', 'library-outcome-operators.rvn', 'library-outcome-operators.expected.txt', 'library-query-basics.rvn', 'library-query-basics.expected.txt', 'library-query-names.rvn', 'library-query-names.expected.txt', 'library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
@@ -269,26 +318,56 @@ def main():
         shutil.copyfile(ROOT / 'docs/experiments/worker-task-cancellation' / name, cancel_sources / name)
     shutil.make_archive(str(downloads / 'worker-task-cancellation'), 'zip', cancel_sources.parent)
     shutil.rmtree(cancel_sources.parent)
+    staging = ROOT / 'target/website-content'
+    shutil.rmtree(staging, ignore_errors=True)
+    staging.mkdir(parents=True)
+    config = json.loads((SOURCE / 'site.json').read_text())
+    if not config.get('notice') or not config.get('releaseUrl'):
+        raise ValueError('The site must explain development/release availability and link the published release')
+    publisher_output = ROOT / 'target/website-rendered'
+    config.update(output=str(publisher_output), api=str(ROOT / 'api-docs/reference/NeoCLR.CoreProbe.dll'),
+                  types=json.loads((ROOT / 'api-docs/types.json').read_text()),
+                  excludedMembers=list(json.loads((ROOT / 'api-docs/exclusions.json').read_text())), pages=[])
+    sources = [(source, source.relative_to(SOURCE / 'content').with_suffix('.html'))
+               for source in sorted((SOURCE / 'content').rglob('*')) if source.suffix in ('.md', '.html')]
+    sources += [(source, Path('docs') / source.with_suffix('.html').name)
+                for source in sorted((ROOT / 'api-docs').glob('*.md')) if source.name != 'README.md']
+    for source, relative in sources:
+        template = source.read_text().replace('{{TOUR_OUTPUT}}', output_text).replace('{{ARRAY_OUTPUT}}', array_output)
+        markdown = render(template, samples, html=source.suffix == '.html')
+        # Conceptual Markdown links keep their existing published .html routes.
+        markdown = re.sub(r'(?<=\])\(([^):]+)\.md([#?][^)]*)?\)',
+                          lambda m: '(' + m[1] + '.html' + (m[2] or '') + ')', markdown)
+        title = re.search(r'^# (.+)$', markdown, re.M)
+        staged = staging / relative.with_suffix(source.suffix)
+        staged.parent.mkdir(parents=True, exist_ok=True)
+        staged.write_text(markdown)
+        config['pages'].append(dict(source=str(staged), output=str(relative), title=title[1].replace('*', '') if title else None))
+    shutil.copyfile(SOURCE / 'toc.yml', staging / 'toc.yml')
+    manifest = staging / 'site.json'
+    manifest.write_text(json.dumps(config))
+    subprocess.run([sys.executable, str(ROOT / 'scripts/ravendoc.py'), '--site', str(manifest)], check=True)
+    shutil.copytree(publisher_output, OUTPUT, dirs_exist_ok=True)
+    check_api_coverage()
+    write_legacy_routes()
+    # All site links must work at the domain root and under a Pages project prefix.
+    make_reference_links_relative()
     pages = {}
-    for source in sorted(SOURCE.rglob('*.html')):
-        relative = source.relative_to(SOURCE)
-        target = OUTPUT / relative
-        target.parent.mkdir(parents=True, exist_ok=True)
-        template = (source.read_text(encoding='utf-8')
-                    .replace('{{TOUR_OUTPUT}}', output_text)
-                    .replace('{{ARRAY_OUTPUT}}', array_output))
-        page = render(template, samples)
-        target.write_text(page, encoding='utf-8')
+    for path in OUTPUT.rglob('*.html'):
+        page = path.read_text()
         check = PageCheck()
-        check.feed(page)
-        pages[target.resolve()] = check
-    subprocess.run([sys.executable, str(ROOT / 'scripts/build-api-docs.py')], check=True)
+        try:
+            check.feed(page)
+        except ValueError as error:
+            raise ValueError(f"{path}: {error}") from error
+        pages[path.resolve()] = check
     for path, check in pages.items():
         check.check(path, pages)
-    make_reference_links_relative()
-    check_reference_links()
     (OUTPUT / '.nojekyll').touch()
-    print(f'Built and checked {len(pages)} pages:', OUTPUT)
+    shutil.rmtree(publish_destination, ignore_errors=True)
+    OUTPUT.rename(publish_destination)
+    OUTPUT = publish_destination
+    print(f'Built and checked {len(pages)} RavenDoc pages:', OUTPUT)
 
 
 if __name__ == '__main__':

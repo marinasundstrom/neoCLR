@@ -116,9 +116,9 @@ See [the changelog workflow](docs/changelog.md) for consolidation and release ha
   and examples aligned with the implemented contract. Distinguish development APIs
   from published releases and proposals. Never document a planned API as shipped.
 - Keep namespace/type navigation and the API landing page browsable. New public
-  APIs must be included in the DocFX selection, with generated metadata and the
-  snapshot refreshed from the matching reference assembly.
-- If DocFX cannot render a signature, provide a linked manual reference entry and
+  APIs must be included in the RavenDoc type selection, with the reference assembly and
+  documentation snapshot refreshed from the matching compiler bridge.
+- If RavenDoc cannot render a signature, provide a linked manual reference entry and
   record the exact exclusion and reason. Do not silently omit public APIs. Track
   existing coverage gaps explicitly in [API documentation maintenance](api-docs/README.md)
   and close them as those areas are developed.

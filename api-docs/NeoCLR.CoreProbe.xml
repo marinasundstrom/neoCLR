@@ -151,7 +151,7 @@
     </member>
     <member name="T:System.Tasks.Task`1">
       <summary>A consumer handle for one eventual value or cancellation.</summary>
-      <remarks>Obtain a task from Promise&lt;T&gt;.Task or an async method. Consumers cannot complete it. Expected failures belong in the result type; there is no faulted Task state. This provisional API is confined to one guest invocation. Callback methods using Func&lt;System.Void&gt; are described in the [callback guide](/docs/callbacks.html).</remarks>
+      <remarks>Obtain a task from `Promise&lt;T&gt;`.Task or an async method. Consumers cannot complete it. Expected failures belong in the result type; there is no faulted Task state. This provisional API is confined to one guest invocation. Callback methods using Func&lt;System.Void&gt; are described in the [callback guide](/docs/callbacks.html).</remarks>
       <typeparam name="T">The value type carried by successful completion, including Result values for expected failures.</typeparam>
     </member>
     <member name="P:System.Tasks.Task`1.State">
@@ -227,7 +227,7 @@
     </member>
     <member name="M:System.Tasks.TaskQueue.Run(System.Func{System.Void})">
       <summary>Runs the callback, then drains this queue.</summary>
-      <remarks>Recursive pumping produces a runtime fault. While Run or Drain is active, newly constructed promises and async methods select the nearest active queue. An explicit Promise&lt;T&gt;(queue) selects its supplied queue instead.</remarks>
+      <remarks>Recursive pumping produces a runtime fault. While Run or Drain is active, newly constructed promises and async methods select the nearest active queue. An explicit `Promise&lt;T&gt;`(queue) selects its supplied queue instead.</remarks>
       <param name="callback">Initial work to execute before queued callbacks.</param>
     </member>
     <member name="M:System.Tasks.TaskQueue.Drain">
@@ -326,7 +326,7 @@
     <member name="M:System.IO.OutputStream.Flush">
       <summary>Asks the provider to flush output and report an expected failure.</summary>
       <returns>Ok with unit or StreamError; a closed stream returns Closed.</returns>
-      <remarks>No durability guarantee. Exact signature and provider-specific behavior are documented in the stream guide because DocFX cannot render Result&lt;System.Void, StreamError&gt;.</remarks>
+      <remarks>No durability guarantee. Exact signature and provider-specific behavior are documented in the stream guide.</remarks>
     </member>
     <member name="T:System.IO.FileInputStream">
       <summary>A blocking, explicitly closed file read stream. Development API, not included in Preview 9.</summary>
@@ -350,7 +350,7 @@
       <returns>Ok with a new input stream, or an error such as InvalidPath, NotFound, AccessDenied, WrongKind or LimitExceeded.</returns>
     </member>
     <member name="T:System.IO.FileOutputStream">
-      <summary>A blocking, explicitly closed file write stream. Development API, not included in Preview 9. The Flush method is documented in the File streams guide because DocFX cannot render its unit-valued Result.</summary>
+      <summary>A blocking, explicitly closed file write stream. Development API, not included in Preview 9. The Flush method is documented in the File streams guide.</summary>
       <remarks>Native resources belong to the invocation. Close promptly; invocation teardown closes remaining files. A retained stream cannot be reused in another invocation. There is no finalizer, automatic disposal or asynchronous scheduling in this slice. FileInputStream additionally implements SeekableStream; FileOutputStream remains sequential.</remarks>
       <seealso href="../streams.html#flush">Flush contract and file stream guide</seealso>
     </member>
@@ -746,7 +746,7 @@
     </member>
     <member name="M:System.Storage.Path.Equals(System.Storage.Path)">
       <summary>Compares accepted spellings using ordinal equality.</summary>
-      <remarks>Implements Equatable&lt;Path&gt;. Requires a non-null Path, matching Equatable&lt;T&gt;.Equals(T); this contract does not require nullable value types. Object.Equals(Object?) is the separate null-aware overload. No provider resolution or filesystem identity comparison is performed.</remarks>
+      <remarks>Implements `Equatable&lt;Path&gt;`. Requires a non-null Path, matching `Equatable&lt;T&gt;`.Equals(T); this contract does not require nullable value types. Object.Equals(Object?) is the separate null-aware overload. No provider resolution or filesystem identity comparison is performed.</remarks>
       <param name="other">The non-null validated logical path to compare.</param>
       <returns>True when the spellings are identical.</returns>
     </member>
@@ -825,7 +825,7 @@
       <param name="text">Text encoded as UTF-8 without adding a BOM.</param>
       <param name="maxBytes">Nonnegative UTF-8 byte limit.</param>
       <returns>Success unit or FileWriteError.</returns>
-      <remarks>The exact method is documented in the [manual reference](/docs/storage-items.html#writealltext) because DocFX cannot render its unit-valued Result. Invalid limits and oversized text are rejected before modification. Later I/O failures can leave partial output; this is not atomic replacement.</remarks>
+      <remarks>The exact method is documented in the [manual reference](/docs/storage-items.html#writealltext). Invalid limits and oversized text are rejected before modification. Later I/O failures can leave partial output; this is not atomic replacement.</remarks>
     </member>
     <member name="M:System.Storage.StorageProvider.GetFile(System.Storage.Path)">
       <summary>Looks up an existing file and returns its provider-bound descriptor.</summary>
@@ -1177,7 +1177,7 @@
     </member>
     <member name="T:System.Storage.FileText">
       <summary>Compatibility helpers for bounded native UTF-8 file reads and writes.</summary>
-      <remarks>Development callers migrate File.ReadAllText/WriteAllText to FileText.ReadAllText/WriteAllText as File becomes an interface. Native string resolution and error behavior are unchanged; these helpers do not use StorageProvider. WriteAllText is documented in the [manual reference](/docs/storage-items.html#writealltext) because DocFX cannot render its unit-valued result.</remarks>
+      <remarks>Development callers migrate File.ReadAllText/WriteAllText to FileText.ReadAllText/WriteAllText as File becomes an interface. Native string resolution and error behavior are unchanged; these helpers do not use StorageProvider. WriteAllText is documented in the [manual reference](/docs/storage-items.html#writealltext).</remarks>
     </member>
     <member name="T:System.Console"><summary>Static access to standard input, output and error.</summary><remarks>Development API. UTF-8 and synchronous host calls. In/Out/Error create fresh wrappers; Close affects only that wrapper. See the Console guide for ownership, limits and embedding behavior.</remarks></member>
     <member name="P:System.Console.In"><summary>Gets a fresh TextReader wrapper for standard input.</summary><remarks>Wrappers share the underlying host channel. Closing a wrapper never closes the process stream. Cache it locally when making repeated calls. No redirection setter is provided.</remarks></member>
@@ -1212,11 +1212,11 @@
     <member name="M:System.IO.StreamWriter.#ctor(System.IO.OutputStream,System.Boolean)"><summary>Creates an unbuffered UTF-8 writer.</summary><param name="output">Destination stream.</param><param name="leaveOpen">True leaves the destination open when this writer closes.</param><remarks>The one-argument constructor owns its output. Construction performs no I/O.</remarks></member>
     <member name="M:System.IO.TextWriter.Write(System.String)"><summary>Writes text.</summary><param name="text">Text to encode as UTF-8.</param><returns>Number of bytes written, including LF for WriteLine, or StreamError.</returns><remarks>StreamWriter accepts at most 65536 encoded bytes per call, including the line terminator. Closed and oversized writes produce errors before output. Failed writes may have partially written data.</remarks></member>
     <member name="M:System.IO.TextWriter.WriteLine(System.String)"><summary>Writes text followed by LF.</summary><param name="text">Text to encode as UTF-8.</param><returns>Number of bytes written, including LF for WriteLine, or StreamError.</returns><remarks>StreamWriter accepts at most 65536 encoded bytes per call, including the line terminator. Closed and oversized writes produce errors before output. Failed writes may have partially written data.</remarks></member>
-    <member name="M:System.IO.TextWriter.Flush"><summary>Flushes the output.</summary><returns>Unit on success or StreamError.</returns><remarks>See the manual Console reference for this Result&lt;unit, StreamError&gt; signature, which DocFX cannot render.</remarks></member>
+    <member name="M:System.IO.TextWriter.Flush"><summary>Flushes the output.</summary><returns>Unit on success or StreamError.</returns><remarks>See the manual Console reference for this Result&lt;unit, StreamError&gt; signature.</remarks></member>
     <member name="M:System.IO.TextWriter.Close"><summary>Closes the writer idempotently.</summary><remarks>StreamWriter closes owned output unless leaveOpen is true. Later writes and Flush return Closed. Call Flush before Close to observe flush errors.</remarks></member>
     <member name="M:System.IO.StreamWriter.Write(System.String)"><summary>Writes text.</summary><param name="text">Text to encode as UTF-8.</param><returns>Number of bytes written, including LF for WriteLine, or StreamError.</returns><remarks>StreamWriter accepts at most 65536 encoded bytes per call, including the line terminator. Closed and oversized writes produce errors before output. Failed writes may have partially written data.</remarks></member>
     <member name="M:System.IO.StreamWriter.WriteLine(System.String)"><summary>Writes text followed by LF.</summary><param name="text">Text to encode as UTF-8.</param><returns>Number of bytes written, including LF for WriteLine, or StreamError.</returns><remarks>StreamWriter accepts at most 65536 encoded bytes per call, including the line terminator. Closed and oversized writes produce errors before output. Failed writes may have partially written data.</remarks></member>
-    <member name="M:System.IO.StreamWriter.Flush"><summary>Flushes the output.</summary><returns>Unit on success or StreamError.</returns><remarks>See the manual Console reference for this Result&lt;unit, StreamError&gt; signature, which DocFX cannot render.</remarks></member>
+    <member name="M:System.IO.StreamWriter.Flush"><summary>Flushes the output.</summary><returns>Unit on success or StreamError.</returns><remarks>See the manual Console reference for this Result&lt;unit, StreamError&gt; signature.</remarks></member>
     <member name="M:System.IO.StreamWriter.Close"><summary>Closes the writer idempotently.</summary><remarks>StreamWriter closes owned output unless leaveOpen is true. Later writes and Flush return Closed. Call Flush before Close to observe flush errors.</remarks></member>
     <member name="M:System.ConsoleReadError.ReadFailed.#ctor"><summary>Creates a ReadFailed case marker.</summary></member>
     <member name="M:System.ConsoleReadError.Unavailable.#ctor"><summary>Creates an Unavailable case marker.</summary></member>
@@ -1231,7 +1231,7 @@
     <member name="T:System.Runtime.CompilerServices.IAsyncStateMachine"><summary>Temporary compiler-generated async state contract.</summary><remarks>May be replaced or removed when runtime-owned suspension is implemented. Application code should use Task and await.</remarks></member>
     <member name="M:System.Runtime.CompilerServices.IAsyncStateMachine.MoveNext"><summary>Resumes the retained state until completion or its next pending await.</summary></member>
     <member name="M:System.Runtime.CompilerServices.IAsyncStateMachine.SetStateMachine(System.Runtime.CompilerServices.IAsyncStateMachine)"><summary>Associates a heap-owned state with its shared builder.</summary><param name="stateMachine">The retained state owner.</param></member>
-    <member name="T:System.Runtime.CompilerServices.ITaskAwaiter"><summary>Temporary continuation-registration contract used by the async compiler protocol.</summary><remarks>OnCompleted is documented in the async builder guide because its Func&lt;Void&gt; signature cannot be rendered by DocFX.</remarks></member>
+    <member name="T:System.Runtime.CompilerServices.ITaskAwaiter"><summary>Temporary continuation-registration contract used by the async compiler protocol.</summary><remarks>OnCompleted is documented in the async builder guide.</remarks></member>
     <member name="M:System.Runtime.CompilerServices.ITaskAwaiter.OnCompleted(System.Func{System.Void})"><summary>Registers a continuation to run when the awaited operation completes.</summary><param name="callback">The continuation queued on the operation's dispatcher.</param></member>
     <member name="T:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1"><summary>Temporary reference-type builder sharing completion and suspended-state ownership.</summary><typeparam name="T">Task result payload.</typeparam><remarks>Compiler support, not a permanent application abstraction. The importer specializes ref startup and await registration for admitted non-generic state machines. The existing heap policy remains the default. See the async builder guide for limits and ownership.</remarks></member>
     <member name="M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.#ctor(System.Tasks.TaskQueue)"><summary>Creates completion storage using the selected dispatcher.</summary><param name="queue">Dispatcher for completion callbacks.</param></member>
