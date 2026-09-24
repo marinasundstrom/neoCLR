@@ -978,3 +978,14 @@ resolution is not added; metadata remains descriptive. Runtime Contract configur
 compiler semantics and emission are unchanged. The parameter fixture covers owner-aware
 map lookup under GC; raw metadata regressions cover zero tokens, generic owners and
 property/accessor distinctions. No Raven compiler changes are required.
+
+### Object in generic payload signatures — 2026-09-24
+
+The generic API mapper now recognizes CLI ELEMENT_TYPE_OBJECT independently of Cecil's
+host-core scope, using the same rule as ordinary import signatures. Target-core Object
+references remain accepted. This closes the HashMap<Object, ...> admission gap without
+admitting arbitrary unresolved named types. Runtime Contract configuration, public
+reference metadata, compiler semantics, library algorithms and native layout are unchanged;
+no Raven compiler patch is needed. The mixed Object map fixture checks key dispatch,
+boxed values, Option<Object> payloads, collisions, replacement, rehashing and GC. A
+freshly built bridge is required; existing runtime/library fragments remain valid.

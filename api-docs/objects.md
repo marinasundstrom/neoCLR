@@ -270,3 +270,18 @@ Generated record-class `==` and `!=` also accept nullable operands in developmen
 Two absent references compare equal; an absent and present reference compare unequal;
 present records compare by components. Record-struct operator parameters remain
 values. Explicitly authored operators retain their own contracts.
+
+
+## Mixed Object map keys (development)
+
+Supported generic API signatures now admit Object, including `HashMap<Object, Object>`.
+Supply explicit callbacks: `(left, right) => left.Equals(right)` and
+`key => key.GetHashCode()`. Paths and type descriptors use their represented-value
+contracts; supported boxed Int32/Boolean values use exact-type value equality, while
+ordinary classes retain allocation identity. Equal keys must have equal hashes.
+
+The compiled sample checks duplicate keys, replacement, deliberate collisions,
+growth and reference-preserving Object values returned through `Option<Object>` under
+GC. This adds no default comparer, string-to-Object conversion, nullable-key policy
+or support for other boxed primitives. It is an importer coverage fix, not a new map
+algorithm or runtime layout.

@@ -759,7 +759,9 @@ now aligns represented-type equality/hash/display, with GC-tested map reuse.
 AssemblyInfo/ModuleInfo now use scoped catalog equality/hash/display. Field, method
 and property equality includes descriptor kind, closed declaring owner and definition
 index. Parameter snapshots now retain that owner key plus position, with equality/hash
-and Name display. Public owner resolution remains future work. Keep
+and Name display. Public owner resolution remains future work. The Object-keyed
+HashMap importer gap is now closed, with mixed keys, Object payloads and GC-tested
+map growth using explicit callbacks. Keep
 Equatable<T>.Equals(T) explicit;
 nullable value operands are not introduced by equality contracts. Reflected context,
 inherited queries and a public parameter Member property remain design work. Broader primitive,

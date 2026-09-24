@@ -27,6 +27,10 @@ static class GenericUnionBindings
     static string? Map(TypeReference type, int depth)
     {
         if (type is GenericParameter parameter) return ParameterMap?.Invoke(parameter);
+        // CLI ELEMENT_TYPE_OBJECT can carry Cecil's host-core scope even when
+        // nested in a target generic signature. Match the ordinary import path.
+        if (type.FullName == "System.Object" && (type.MetadataType == MetadataType.Object
+            || RuntimeSignatures.IsCore(type.Scope))) return "System.Object";
         if (depth > 24) throw new InvalidDataException("Union payload nesting limit exceeded.");
         if (type is GenericInstanceType g && RuntimeSignatures.IsCore(type.Scope) && type.IsValueType)
         {

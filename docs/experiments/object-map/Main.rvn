@@ -1,0 +1,70 @@
+import System.*
+import System.Storage.Path
+import System.Collections.*
+import System.Result.*
+import System.Option.*
+
+class IdentityKey { }
+
+func Parsed(text: string) -> Path {
+    if let Ok(path) = Path.Parse(text) {
+        return path
+    }
+    System.Fault("Invalid fixture path")
+    return Parsed(text)
+}
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+func Found(map: HashMap<Object, Object>, key: Object) -> Object {
+    if let Some(value) = map.Find(key) {
+        return value
+    }
+    System.Fault("Missing object key")
+    return key
+}
+
+func Main() {
+    let first = Parsed("notes/data.txt")
+    let repeated = Parsed("notes/data.txt")
+    let identity = IdentityKey()
+    let values = HashMap<Object, Object>((left, right) => left.Equals(right), key => key.GetHashCode())
+    Check(values.TryAdd(first, 11), "Path insertion through Object")
+    Check(!values.TryAdd(repeated, 99), "Path equality through Object key")
+    Check(values.TryAdd(typeof(IdentityKey), 12), "Type descriptor key")
+    Check(!values.TryAdd(typeof(IdentityKey), 99), "Repeated type descriptor key")
+    Check(values.TryAdd(999, first) && !values.TryAdd(999, repeated), "Separate boxes compare by integer value")
+    Check(values.TryAdd(true, 14) && values.TryAdd(identity, 15), "Boolean and class keys")
+    Check(!values.ContainsKey(IdentityKey()), "Ordinary classes keep allocation identity")
+    Check(Object.ReferenceEquals(Found(values, 999), first), "Object payload retains its reference")
+    values.Set(repeated, 21)
+    Check(Found(values, first).Equals(21), "Replace equal key through Object")
+
+    // Deliberate collisions exercise equality independently of hash distribution.
+    let collisions = HashMap<Object, int>((left, right) => left.Equals(right), key => 0)
+    Check(collisions.TryAdd(1, 1) && collisions.TryAdd(true, 2), "Boxed numeric and Boolean kinds differ")
+    Check(collisions.TryAdd(first, 3) && !collisions.TryAdd(repeated, 4), "Equal colliding paths")
+    Check(collisions.Count == 3, "Only equal keys merge")
+
+    var n = 0
+    while n < 32 {
+        values.Set(n, n + 100)
+        n += 1
+    }
+    Check(values.Count == 37, "Growth preserves mixed keys")
+    n = 0
+    while n < 400 {
+        _ = typeof(IdentityKey)
+        n += 1
+    }
+    Check(Found(values, Parsed("notes/data.txt")).Equals(21), "Path lookup after collection")
+    Check(Found(values, typeof(IdentityKey)).Equals(12), "Descriptor lookup after collection")
+    Check(Found(values, identity).Equals(15), "Identity lookup after collection")
+    Check(Found(values, 31).Equals(131), "Boxed values survive growth and collection")
+    Check(Object.ReferenceEquals(Found(values, 999), first), "Payload alias survives collection")
+    Console.WriteLine("Mixed Object map keys, payloads, collisions and GC: passed")
+}

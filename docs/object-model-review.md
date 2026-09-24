@@ -869,3 +869,30 @@ closed generic owners, separate declaring types, property/accessor distinctions 
 two properties sharing an accessor. The compiled Raven fixture checks Object dispatch,
 null/wrong-type rejection, repeat-query map keys and retained owner data through GC:
 894 allocated/reclaimed objects, peak 72, 25 collections, zero retained objects.
+
+### Object-keyed collection integration — 2026-09-24
+
+The earlier Path audit's Object-keyed map admission gap is now closed. Reproduction
+failed on HashMap<Object, int> before import: generic type mapping lacked the ordinary
+signature mapper's CLI intrinsic Object case. Applying that same rule admits Object
+inside already-supported generic shapes. This changes importer coverage only; it adds
+no Object operation, default comparer, runtime storage policy or native layout.
+
+The compiled mixed-map fixture consumes the completed library semantics: separately
+parsed Paths and fresh type descriptors compare equal, Int32 boxes compare by value,
+Boolean remains distinct from Int32, and ordinary classes retain allocation identity.
+Values travel through Object and Option<Object> without losing reference identity.
+Forced collisions, key replacement, growth and collection are checked. All 955 managed
+objects are reclaimed across eleven collections (peak 202 under a 256-object limit).
+
+.NET 10's [Dictionary implementation](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Collections/Generic/Dictionary.cs),
+reviewed 2026-09-24, combines hashes with comparer equality and supports custom comparers.
+neoCLR's existing HashMap requires explicit callbacks; this fixture supplies Object
+virtual dispatch. It does not introduce .NET's default comparer selection or universal
+boxing/string support. Retaining typed-only admission would hide otherwise working
+Object contracts; changing the map runtime is unnecessary. The bounded importer fix
+reuses the established intrinsic mapping rule instead of adding a new API mechanism.
+
+Remaining limitations: string-to-Object conversion, other primitive Object operations,
+nullable-key policy and a default comparer require separate work. Mutable/resource
+objects retain identity; this slice does not prescribe universal structural equality.

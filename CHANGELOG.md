@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Admit intrinsic Object in supported generic API signatures, matching ordinary
+  import mapping. This enables HashMap<Object, Object> with explicit equality/hash
+  callbacks and Option<Object> results. Check mixed Path/type/class/boxed keys,
+  payload aliases, collisions, replacement, table growth and GC; all 955 objects
+  are reclaimed across eleven collections. No default comparer, new primitive
+  boxing behavior or runtime/library layout change is introduced.
+
 - Give parameter snapshots owner-aware Object equality/hash and Name display,
   using closed declaring type, member kind/index and position even with absent
   parameter tokens or shared property accessors. Retain compact owner keys without
