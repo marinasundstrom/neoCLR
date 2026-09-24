@@ -22,6 +22,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   path that matches an empty-case union family against a separate core reference,
   imports generated bodies and conditional outputs, and preserves constructor checks
   through per-field default initialization. Encode generated static helper names.
+  Preserve and validate Raven case metadata in the bootstrap reference fixture;
+  check generic companion associations and separate consumer compilation. Keep
+  Raven metadata in the development bridge, without a runtime dependency or a new
+  platform case-map convention.
   Legacy erased SocketError
   nesting remains rejected by runtime verification. HttpError/BaseUri remain unimplemented.
 

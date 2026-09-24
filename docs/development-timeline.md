@@ -6786,3 +6786,21 @@ configuration/content, not target-specific code added to Raven main.
   private `var` storage and passes; no wholesale storage rewrite is claimed.
 - **Scope:** this clarification accompanies the ongoing standard-union bootstrap
   work and does not replace the HttpError/BaseUri objective.
+
+
+### 2026-09-24 — Raven union metadata boundary
+
+- **Author observation:** points out `RavenUnionCompanionAttribute` during the union
+  work. Reiterates that the objective is normal union syntax in the class library,
+  followed by returning to the main work.
+- **Assistant findings/actions:** identifies Raven's case-name/ordinal metadata and
+  generic companion-to-carrier association. Preserves selected case metadata in the
+  bootstrap reference fixture and validates it before importing native bodies. Adds
+  a generic producer/consumer metadata probe, without claiming generic runtime support.
+- **Author direction:** avoid a runtime dependency on Raven metadata. The companion
+  object belongs to Raven's convention; support it during development, but defer
+  standardizing a platform case map and reconsider the mapping later.
+- **Boundary:** the adapter lives in the Raven bridge; imported runtime types and
+  methods do not depend on Raven attributes. This is not a new union ABI. Production
+  reference integration and mixed legacy carrier defaults still block HttpError;
+  generic companion execution is not a new prerequisite for that HTTP objective.

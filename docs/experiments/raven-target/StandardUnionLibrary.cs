@@ -13,6 +13,8 @@ static class StandardUnionLibrary
         if (!ApplicationTypes.IsEmptyCaseUnion(source) || !ApplicationTypes.IsEmptyCaseUnion(reference)
             || source.FullName != reference.FullName)
             throw new InvalidDataException("Unsupported standard union library shape.");
+        if (!RavenUnionMetadata.ValidateEmptyCases(source).SequenceEqual(RavenUnionMetadata.ValidateEmptyCases(reference)))
+            throw new InvalidDataException("Raven union case metadata does not match reference contract.");
         const string protocolName = "System.Runtime.CompilerServices.IUnion";
         var protocol = source.Module.GetType(protocolName)
             ?? throw new InvalidDataException("Standard union bootstrap requires its source protocol declaration.");

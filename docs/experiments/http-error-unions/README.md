@@ -127,9 +127,9 @@ to neoCLR's construction model without hand-authoring union constructors in Rave
 
 Validation covers both cases, unsuccessful extraction, a computed property, empty
 defaults, boxed-copy display after reassignment, and Value extraction. It reports
-three allocations and zero live objects after final collection. Five independently
+three allocations and zero live objects after final collection. Eight independently
 altered reference contracts—case identity, return type, output mode, nonempty case,
-and missing marker—are rejected before producing an implementation artifact. The
+missing marker, missing case metadata, wrong case ordinal and unresolved case name—are rejected before producing an implementation artifact. The
 existing instance-library regression, including its private `var` storage and five
 contract rejections, also passes.
 
@@ -139,7 +139,34 @@ reference declaration. Making the production core own the protocol once, and adm
 that core-owned reference during compilation, are explicit follow-up work.
 
 No public core-library type has migrated yet. Production reference/catalog integration,
-consumer binding and API documentation must accompany the first real migration.
+application import/execution through production catalogs and API documentation must
+accompany the first real migration. The fixture now compiles a separate Raven consumer
+that constructs and matches the projected core union; that compilation does not yet
+validate execution through the production consumer pipeline.
 Private storage `var`/`val` should be used normally; checking the emitted field layout
 is not a requirement to write explicit `field` syntax. The fixture uses qualified
 empty-case patterns so a bare identifier is not interpreted as a new binding.
+
+
+## Raven metadata at the bridge boundary
+
+The bootstrap fixture preserves Raven's case metadata names, logical names and
+ordinals and checks them against the source family before import. This is a bounded
+Raven adapter: no `Raven.Runtime.CompilerServices` dependency appears in the native
+implementation fragment. The fixture copies the selected case attribute definition
+and usages, not every custom attribute in the source assembly.
+
+`RavenUnionCompanionAttribute` associates a generic union's separate case container
+with its carrier. Nongeneric unions in this fixture own their cases directly and do
+not need a companion. A separate metadata-only probe compiles a generic producer and
+consumer, checks the association and rejects missing/wrong companion targets:
+
+```sh
+python3 docs/experiments/http-error-unions/verify_metadata.py \
+  --bundle /path/to/matching/neoclr-bundle \
+  --bridge docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll
+```
+
+This validates compiler metadata consumption, not generic-union execution in neoCLR.
+The Raven convention remains compiler-owned. No platform case-map standard is being
+introduced; reconsider it later without blocking the class-library/HTTP objective.

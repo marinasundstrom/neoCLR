@@ -13,7 +13,9 @@ static class StandardUnionLibraryChecks
         var originals = module.AssemblyReferences.ToHashSet();
         var root = source.MainModule.GetType(owner) ?? throw new InvalidDataException("Missing probe union.");
         var protocol = source.MainModule.GetType("System.Runtime.CompilerServices.IUnion");
-        var selected = new[] { root, protocol }.Concat(root.NestedTypes).ToArray();
+        var caseAttribute = source.MainModule.GetType(RavenUnionMetadata.CaseAttribute)
+            ?? throw new InvalidDataException("Missing source Raven union case attribute definition.");
+        var selected = new[] { root, protocol, caseAttribute }.Concat(root.NestedTypes).ToArray();
         var types = new Dictionary<string, TypeDefinition>();
         foreach (var type in selected)
         {
@@ -78,6 +80,13 @@ static class StandardUnionLibraryChecks
                 }
         types[root.FullName].CustomAttributes.Add(new CustomAttribute(module.GetType(
             "System.Runtime.CompilerServices.UnionAttribute").Methods.Single(m => m.IsConstructor)));
+        foreach (var attribute in root.CustomAttributes.Where(a => a.AttributeType.FullName == RavenUnionMetadata.CaseAttribute))
+        {
+            var copy = new CustomAttribute(types[RavenUnionMetadata.CaseAttribute].Methods.Single(m => m.IsConstructor));
+            foreach (var argument in attribute.ConstructorArguments)
+                copy.ConstructorArguments.Add(new CustomAttributeArgument(Map(argument.Type), argument.Value));
+            types[root.FullName].CustomAttributes.Add(copy);
+        }
         var carrier = types[root.FullName];
         switch (mutation)
         {
@@ -88,6 +97,14 @@ static class StandardUnionLibraryChecks
             case "wrong-output": carrier.Methods.First(m => m.Name == "TryGetValue").Parameters[0].IsOut = false; break;
             case "nonempty-case": carrier.NestedTypes[0].Fields.Add(new FieldDefinition("Extra", FieldAttributes.Private,
                 carrier.Fields.Single(f => f.Name == "<Tag>").FieldType)); break;
+            case "missing-case-metadata":
+                carrier.CustomAttributes.Remove(carrier.CustomAttributes.First(a => a.AttributeType.FullName == RavenUnionMetadata.CaseAttribute)); break;
+            case "wrong-case-ordinal":
+                carrier.CustomAttributes.First(a => a.AttributeType.FullName == RavenUnionMetadata.CaseAttribute)
+                    .ConstructorArguments[2] = new CustomAttributeArgument(Map(root.CustomAttributes.First(a => a.AttributeType.FullName == RavenUnionMetadata.CaseAttribute).ConstructorArguments[2].Type), 99); break;
+            case "wrong-case-name":
+                carrier.CustomAttributes.First(a => a.AttributeType.FullName == RavenUnionMetadata.CaseAttribute)
+                    .ConstructorArguments[0] = new CustomAttributeArgument(Map(root.CustomAttributes.First(a => a.AttributeType.FullName == RavenUnionMetadata.CaseAttribute).ConstructorArguments[0].Type), "Probe.Missing+Headers"); break;
             case "unmarked": carrier.CustomAttributes.Clear(); break;
             default: throw new InvalidDataException("Unknown union reference mutation.");
         }

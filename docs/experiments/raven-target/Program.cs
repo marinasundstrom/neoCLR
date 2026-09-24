@@ -6,6 +6,18 @@ using Raven.CodeAnalysis;
 using Raven.CodeAnalysis.Syntax;
 using AssemblyDefinition = Mono.Cecil.AssemblyDefinition;
 
+if (args.Length == 4 && args[0] == "--union-companion-mutation")
+{
+    RavenUnionMetadataChecks.MutateCompanion(args[1], args[2], args[3]);
+    return;
+}
+
+if (args.Length == 2 && args[0] == "--union-metadata-report")
+{
+    RavenUnionMetadataChecks.Run(args[1]);
+    return;
+}
+
 if (args.Length is 5 or 6 && args[0] == "--standard-union-library-core")
 {
     StandardUnionLibraryChecks.WriteReference(args[1], args[2], args[3], args[4], args.Length == 6 ? args[5] : null);

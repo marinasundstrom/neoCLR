@@ -846,7 +846,10 @@ the default path. The [source-union probe](experiments/http-error-unions/README.
 now executes nested standard declarations with members, defaults, copying and boxing,
 including empty-case-only unions and separately compiled dependencies.
 The empty-case bootstrap probe now matches a separate core reference and imports
-native library bodies with constructor checks preserved. Mixed erased-carrier defaults,
+native library bodies with constructor checks preserved. Raven case/companion metadata
+is supported at the development bridge boundary only; it is not a runtime dependency
+or a standardized platform case map. Limit this work to enabling class-library source
+unions, then resume HttpError/BaseUri. Mixed erased-carrier defaults,
 production reference/consumer integration and public API migration remain open.
 Handler/server cancellation ownership and public JSON contracts remain later work. The [JSON report](experiments/http-json/README.md) now passes between two
 neoCLR applications and independent peers; it does not promote a public JSON API. The

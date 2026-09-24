@@ -63,9 +63,35 @@ public union Limit {
     reference = root / 'NeoCLR.CoreProbe.dll'
     run(['dotnet', bridge, '--standard-union-library-core', source,
          bundle / 'demo/NeoCLR.CoreProbe.dll', 'Probe.Limit', reference])
+    source_metadata = run(['dotnet', bridge, '--union-metadata-report', source]).stdout
+    reference_metadata = run(['dotnet', bridge, '--union-metadata-report', reference]).stdout
+    assert source_metadata == reference_metadata, (source_metadata, reference_metadata)
+    (root / 'Consumer.rvn').write_text("""import Probe.*
+func Create() -> Limit {
+    Limit.Headers
+}
+func Inspect(value: Limit) -> bool {
+    if let Limit.Headers = value {
+        return true
+    }
+    return false
+}
+""")
+    (root / 'Consumer.rvnproj').write_text(f'''<Project>
+<Import Project="$(NeoCLRRoot)/build/NeoCLR.Raven.props" />
+<PropertyGroup><OutputType>Library</OutputType></PropertyGroup>
+<ItemGroup>
+<Reference Update="NeoCLR.CoreProbe"><HintPath>{reference}</HintPath></Reference>
+<Compile Include="Consumer.rvn" />
+</ItemGroup>
+</Project>''')
+    run(['dotnet', bundle / 'raven-sdk/tools/rvnc/rvnc.dll', root / 'Consumer.rvnproj',
+         '--no-project-restore', '-o', root / 'consumer'])
+    print('Separate Raven consumer compiled against projected core union metadata.')
     imported = root / 'imported'
     run(['dotnet', bridge, '--library-implementation', source, reference, 'Probe.Limit', imported])
     body = (imported / 'Implementation.neoil').read_text()
+    assert 'Raven.Runtime.CompilerServices' not in body, body
     assert 'out(true)' in body, body
     assert '.type Probe.Limit' in body and 'Application.V1_' not in body, body
     program = root / 'App.neoil'
@@ -151,7 +177,8 @@ fault "WrongDefault"
     assert result.stdout.splitlines() == ['Headers', 'Headers', 'Body', 'Empty'], result.stdout
     assert 'live=0' in result.stderr, result.stderr
     print(result.stdout + result.stderr)
-    for mutation in ('wrong-case', 'wrong-return', 'wrong-output', 'nonempty-case', 'unmarked'):
+    for mutation in ('wrong-case', 'wrong-return', 'wrong-output', 'nonempty-case', 'unmarked',
+                     'missing-case-metadata', 'wrong-case-ordinal', 'wrong-case-name'):
         altered = root / (mutation + '.dll')
         run(['dotnet', bridge, '--standard-union-library-core', source,
              bundle / 'demo/NeoCLR.CoreProbe.dll', 'Probe.Limit', altered, mutation])
@@ -160,6 +187,7 @@ fault "WrongDefault"
                         'Probe.Limit', destination], success=False)
         assert rejected.returncode != 0, 'Unexpected contract admission: ' + mutation
         assert ('standard union' in rejected.stdout + rejected.stderr
-                or 'Standard union' in rejected.stdout + rejected.stderr), rejected.stdout + rejected.stderr
+                or 'Standard union' in rejected.stdout + rejected.stderr
+                or 'Raven union' in rejected.stdout + rejected.stderr), rejected.stdout + rejected.stderr
         assert not (destination / 'Implementation.neoil').exists()
         print('Rejected mismatched bootstrap contract: ' + mutation)

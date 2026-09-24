@@ -5,6 +5,25 @@ compiler. System.Option and System.Result now implement it in platform IL. The
 runtime executes ordinary types and methods; no convention recognizer or high-level
 compiler is implemented yet. The marker does not certify an implementation's behavior.
 
+## Raven development adapter — 2026-09-24
+
+Raven's `RavenUnionCaseAttribute` and `RavenUnionCompanionAttribute` are
+compiler-owned conventions. The development bridge may consume and preserve them
+in CLI reference fixtures so normal Raven union syntax and separate consumers work.
+They are not neoCLR runtime dependencies or additions to the platform union contract.
+The runtime executes imported ordinary types and methods without recognizing these
+attributes. In particular, Raven's generic companion container is not a required
+neoCLR representation.
+
+Compared with CLI custom-attribute metadata, this keeps source-tool association at
+the import boundary and execution in ordinary fields, calls and conditional outputs.
+The benefit is usable source unions without adopting a compiler-specific runtime ABI;
+the cost is a provisional bridge adapter that must track Raven's emitted convention.
+Do not standardize a richer platform case map yet. Reconsider that mapping later;
+finish the class-library support needed for HttpError and return to the HTTP work.
+See the [focused probe](experiments/http-error-unions/README.md) for the supported
+shapes and remaining production integration work.
+
 ## Recognizing the contract
 
 A carrier has the ordinary System.Runtime.CompilerServices.UnionAttribute marker.
