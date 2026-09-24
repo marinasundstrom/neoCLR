@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add symbol-derived member documentation structure with linked parameter and
+  property/return/field/event types, even without authored prose. XML and Markdown
+  enhance the generated contract; label the owner as Declaring type. Update the
+  pinned RavenDoc build from the shared implementation on both Raven branches.
+
 - Add Socket.Connect(Sequence<string>, port) with synchronous input snapshotting,
   full validation, duplicate removal and ordered IPv4 fallback. All attempts share
   five seconds; pending attempts get at most one second while alternatives remain.

@@ -64,3 +64,8 @@ no CDN access.
 The shared header also supplies a keyboard-accessible Light/Dark/Auto icon menu
 and a configurable favicon. neoCLR's CSS supplies matching light/dark project
 colors; it does not implement a separate theme switcher or snippet lexer.
+
+Member pages derive Parameters and Property value/Return value/Field value/Event
+type sections from symbols, with navigable types even without authored comments.
+XML and Markdown descriptions enhance that contract; remarks and examples can be
+added over time. The owner is labeled Declaring type, distinct from the value type.

@@ -6512,3 +6512,23 @@ remain a validation failure. Publication is separate from the local site build.
 `9775eca0f` and neoclr as `9e196cc4b`; RavenDoc sources and docs match across those
 branches. This task's public inventory and documentation additions are neoCLR site
 configuration/content, not target-specific code added to Raven main.
+
+### 2026-09-24 — Symbol-derived member pages enhanced by authored content
+
+- **Author:** points out missing navigable property/return/parameter types on
+  RuntimeContext.Current, suggests comparing language documentation conventions,
+  and establishes that XML/Markdown enhance a structure generated even without
+  comments. The longer-term goal is richer usage content on every type/member page.
+- **Assistant:** compares Microsoft Learn, Rust and Kotlin references; chooses
+  Parameters, Property value and Return value with linked types and a distinct
+  Declaring type label. Implements shared RavenDoc sections from symbols, merges
+  authored descriptions, and retains remarks/examples and overload grouping.
+- **Evidence:** 26 focused RavenDoc tests pass, including source and metadata
+  cases with undocumented properties, nullable/array/generic types and overloads;
+  sample site rebuilt. Shared change is on Raven main (0017c5165) and its neoCLR
+  branch (ce8d1068c); the generator documentation records the comparison sources.
+- **Future direction:** deepen type/member usage examples progressively. No blanket
+  claim is made that all APIs already have complete examples.
+- **neoCLR validation:** the pinned publisher builds and checks 955 pages; all 15
+  website tests pass. RuntimeContext.Current has a linked Property value, and
+  InputStream.Read displays linked parameter/return types with existing XML prose.
