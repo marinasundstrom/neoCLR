@@ -189,6 +189,12 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.StringSliceUtf8", [Type::String, Type::Int32, Type::Int32]) => {
             (Binding::StringSliceUtf8, Type::Value)
         }
+        ("neoCLR.Runtime.SocketDeadlineAfter", [Type::Int32]) => (Binding::Socket(crate::socket_io::Operation::DeadlineAfter), Type::Int64),
+        ("neoCLR.Runtime.SocketDeadlineExpired", [Type::Int64]) => (Binding::Socket(crate::socket_io::Operation::DeadlineExpired), Type::Boolean),
+        ("neoCLR.Runtime.DnsLookupUntil", [Type::String, Type::Int64, callback]) if *callback == crate::assembler::parse_type("System.Func<Void>")? => (Binding::Resolve(crate::name_resolution::Operation::LookupUntil), Type::Value),
+        ("neoCLR.Runtime.SocketConnectAddressesUntil", [addresses, Type::Int32, Type::Int64, callback]) if *addresses == Type::ArrayRef(Box::new(Type::String)) && *callback == crate::assembler::parse_type("System.Func<Void>")? => (Binding::Socket(crate::socket_io::Operation::ConnectAddressesUntil), Type::Value),
+        ("neoCLR.Runtime.SocketReceiveUntil", [Type::Int64, buffer, Type::Int32, Type::Int32, Type::Int64, callback]) if *buffer == crate::assembler::parse_type("arrayref<Byte>")? && *callback == crate::assembler::parse_type("System.Func<Void>")? => (Binding::Socket(crate::socket_io::Operation::ReceiveUntil), Type::Value),
+        ("neoCLR.Runtime.SocketSendUntil", [Type::Int64, buffer, Type::Int32, Type::Int32, Type::Int64, callback]) if *buffer == crate::assembler::parse_type("arrayref<Byte>")? && *callback == crate::assembler::parse_type("System.Func<Void>")? => (Binding::Socket(crate::socket_io::Operation::SendUntil), Type::Value),
         ("neoCLR.Runtime.DnsLookup", [Type::String, callback]) if *callback == crate::assembler::parse_type("System.Func<Void>")? => (Binding::Resolve(crate::name_resolution::Operation::Lookup), Type::Value),
         ("neoCLR.Runtime.DnsResult", [Type::Int64]) => (Binding::Resolve(crate::name_resolution::Operation::Result), Type::Value),
         ("neoCLR.Runtime.SocketListen", [Type::String, Type::Int32, Type::Int32]) => (Binding::Socket(crate::socket_io::Operation::Listen), Type::Value),

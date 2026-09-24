@@ -6,6 +6,12 @@ using Raven.CodeAnalysis;
 using Raven.CodeAnalysis.Syntax;
 using AssemblyDefinition = Mono.Cecil.AssemblyDefinition;
 
+if (args.Length == 1 && args[0] == "--network-budget-checks")
+{
+    NetworkBudgetChecks.Run();
+    return;
+}
+
 if (args.Length == 1 && args[0] == "--field-access-checks")
 {
     FieldAccessChecks.Verify();

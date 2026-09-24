@@ -18,6 +18,9 @@ static class LibraryImplementation
     public static MethodDefinition[] Roots(ModuleDefinition source, ModuleDefinition core, string owner)
     {
         ReadonlyReceivers.Clear();
+        // Bootstrap compilation can call cross-slice deadline helpers. Restore the
+        // ordinary internal contract before validating or importing any bodies.
+        SocketBindings.Project(core);
         if (owner != "System" && !Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
             throw new InvalidDataException("Invalid library owner.");
         if (owner == "System.Storage.StorageItem")

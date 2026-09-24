@@ -149,7 +149,7 @@ System.Web.Http has generated coverage for HttpClient, HttpHandler, HttpSocketHa
 HttpRequest, HttpResponse, HttpContent and HttpHeader, including constructors and all
 public members. The bounded response parser and per-request continuation object are
 internal and excluded from the public inventory by visibility. The Web guide documents
-provisional string errors, body/ownership limits and the remaining whole-request deadline gap.
+provisional string errors, body/ownership limits and the fixed socket-handler exchange budget and remaining handler/server lifetime gaps.
 Socket Send/Receive and TimedOut documentation cover the new five-second per-transfer
 bound, one-shot completion and connection preservation. Signatures are unchanged.
 
@@ -157,3 +157,9 @@ HttpServer and HttpRequest.Headers have generated member coverage. The server gu
 covers one-request ownership, malformed-request closure, computed framing and the
 unsupported cancellation/deadline cases. Internal request parsing, encoding and
 operation adapters remain outside the public inventory.
+
+The HTTP socket handler now carries a private monotonic stamp through DNS, connection
+and transfer submissions. Public signatures remain unchanged. Deadline helpers and
+Until methods stay out of the normal application/reference surface; bootstrap-only
+cross-slice visibility is restored to internal before importer contract validation.
+Refresh reference, bridge, library and native runtime together for this private ABI.

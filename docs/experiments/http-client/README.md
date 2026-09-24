@@ -106,3 +106,18 @@ and `fragmented UTF-8`; the .NET baseline still runs. A peer keeps its write sid
 so timeout must reach the managed error/Close path without EOF. The verifier checks
 zero final live objects. This is not a whole-request deadline; short progress can
 restart the per-transfer budget. Full runs now include these two extra cases.
+
+### Shared exchange budget — 2026-09-24
+
+With matching updated runtime/reference/bridge/library artifacts, HttpSocketHandler
+now uses one 15-second deadline from DNS submission through response completion.
+Select `--case 'trickling body' --case 'trickling headers' --case 'fragmented UTF-8'
+--case 'stalled headers'` to compare aggregate expiry, success and phase expiry.
+The trickle peers make progress more often than every five seconds, so individual
+transfer bounds alone would not end them. The verifier observes connection closure
+and zero final live objects. Custom handlers and server callback lifetime remain open.
+
+The focused shared-budget run passes both trickles, silent headers and fragmented
+success, with zero live objects after every run. Body/header trickles collect nine
+and eleven times respectively with a 256-object heap. The .NET comparison still
+passes. No general handler/server cancellation or production timeout tuning is claimed.

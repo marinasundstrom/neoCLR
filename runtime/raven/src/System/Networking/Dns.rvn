@@ -10,9 +10,13 @@ public class Dns {
     private init() { }
 
     static func GetHostAddresses(hostName: string) -> Task<Result<Sequence<string>, DnsError>> {
+        return GetHostAddressesUntil(hostName, 0)
+    }
+
+    internal static func GetHostAddressesUntil(hostName: string, deadline: long) -> Task<Result<Sequence<string>, DnsError>> {
         let source = Promise<Result<Sequence<string>, DnsError>>()
         let completion = DnsCompletion(source)
-        completion.Start(hostName)
+        completion.StartUntil(hostName, deadline)
         return source.Task
     }
 
@@ -50,8 +54,16 @@ internal class DnsCompletion {
     }
 
     internal func Start(hostName: string) {
+        StartUntil(hostName, 0)
+    }
+
+    internal func StartUntil(hostName: string, deadline: long) {
         _ = TaskQueue.Default
-        let payload = RuntimeServices.DnsLookup(hostName, self.Complete)
+        let payload = if deadline == 0 {
+            RuntimeServices.DnsLookup(hostName, self.Complete)
+        } else {
+            RuntimeServices.DnsLookupUntil(hostName, deadline, self.Complete)
+        }
         if RuntimeServices.IsValue<byte>(payload) {
             _ = source.Complete(Error(Dns.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {

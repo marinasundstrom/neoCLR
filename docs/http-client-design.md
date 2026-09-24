@@ -37,8 +37,8 @@ distinguishes headers-only and buffered completion. The sample buffers the entir
 small response before Send completes. ReadText keeps the proposed Task contract even
 though decoding currently completes immediately. The .NET comparison uses
 ResponseHeadersRead and passes one five-second cancellation token through both send
-and body reading. The Raven sample has separate DNS/connect bounds and now five seconds per pending
-nonempty transfer, but no total request deadline. A verifier watchdog does not close that gap.
+and body reading. The Raven socket handler now also has a shared 15-second exchange budget, retaining
+shorter DNS/connect/transfer bounds. This does not yet cover arbitrary custom handlers. A verifier watchdog does not close that gap.
 
 Primary sources above reviewed 2026-09-24. No performance equivalence is claimed.
 
@@ -186,8 +186,9 @@ Each operation uses the earlier of its existing phase bound and that shared dead
 Already expired valid submissions reject before native work; retries and short I/O do
 not reset it. The [native loopback probe](experiments/request-budget/README.md) carries
 one deadline across lookup, connect and successive body reads, with deterministic
-expiry and existing cleanup. This is implemented native infrastructure, **not yet wired
-through the Raven HTTP bridge**. The public POC still has separate phase bounds.
+expiry and existing cleanup. This is implemented native infrastructure, **now wired
+through the private Raven HTTP bridge** as described below. Public Socket calls keep
+their independent phase bounds.
 
 This reuses the existing .NET HttpClient cancellation comparison. Additional primary
 contracts checked 2026-09-24:
@@ -216,3 +217,48 @@ completed response must not become success after the request budget has expired.
 Expiry cannot preempt arbitrary guest code or force a blocking host resolver to stop.
 Custom handler pipelines, accepted server connections and accept waiting need explicit
 cancellation ownership before claiming a general HttpClient/HttpServer timeout API.
+
+## Socket-backed HTTP exchange budget — 2026-09-24
+
+HttpExchange now creates one private monotonic deadline immediately before lookup.
+The default budget is 15 seconds. DNS, fallback connect and each send/receive receive
+that same deadline and retain the earlier five-second phase limit. The adapter consumes
+each native outcome before checking expiry, closes a late successful connection, and
+checks again before reporting a buffered response. Expiry returns the provisional
+string `Request deadline exceeded` and closes the exchange's connection. Short body
+or header progress cannot renew the budget. Completed native outcomes retain their
+original result; the enclosing HTTP exchange can still expire before delivery.
+
+The private stamp is a checked process-monotonic millisecond offset, rounded upward
+when created. It is not a wall-clock time, public value type, persistent identifier or
+resource lease. It allocates no registry entry or managed root. Deadline services
+remain native SocketIo helpers; DNS Until submission still requires NameResolution
+and TaskDispatch, while socket Until submissions require SocketIo and TaskDispatch.
+The new private ABI needs matching native runtime, reference, importer and library.
+
+Bootstrap references temporarily make only the four cross-slice Until methods public
+for Raven compilation. Normal application references keep them internal. Import
+validation restores the internal contract, and the socket catalog permits internal
+signatures only in library-import mode. The dedicated visibility check rejects
+application imports and checks that generic signature matching stays public-only by
+default. No Raven compiler semantics, public scheduler or cancellation-token API changes.
+
+This is a socket-handler budget, not all of .NET HttpClient.Timeout: URL/request
+construction and custom handlers before/after transport are outside it. Server accept
+and application response tasks are also outside it. Non-yielding guest code and an
+unpumped callback queue are not preempted. The 15-second fixed choice is provisional
+and may reject slow legitimate exchanges. A complete configurable client/server
+lifetime contract still needs cancellation ownership and structured errors.
+
+Validation uses peers that send body bytes every three seconds or header bytes every
+second. Each would keep the five-second transfer timeout alive; the shared exchange
+must instead fail and close around its original deadline. A fragmented success case,
+a silent-header case, handler checks and independent .NET baseline guard existing
+behavior. These are lifecycle tests, not throughput measurements.
+
+Local validation passes: trickling response body and headers both end with the request
+expiry error and zero live objects (nine and eleven collections). Silent headers still
+use the shorter phase error, and ordinary fragmented UTF-8 succeeds. The independent
+.NET client still consumes the neoCLR server. All 32 socket, nine resolver, one clock
+stamp and nine service-analysis tests pass, as do the bootstrap/application visibility
+checks. The API snapshot and 967-page website validate; all 17 website tests pass.

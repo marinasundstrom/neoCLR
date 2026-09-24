@@ -5,6 +5,7 @@ import http.server
 import os
 from pathlib import Path
 import re
+import select
 import shutil
 import socket
 import subprocess
@@ -58,8 +59,19 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-client-') as folder, socket
                     assert f'Host: localhost:{port}'.encode() in lines, request
                     assert b'Connection: close' in lines, request
                     for fragment in fragments:
-                        peer.sendall(fragment)
-                        time.sleep(0.002)
+                        if isinstance(fragment, tuple):
+                            data, delay = fragment
+                            try:
+                                peer.sendall(data)
+                                if select.select([peer], [], [], delay)[0]:
+                                    assert peer.recv(1) == b'', 'Unexpected request bytes'
+                                    return
+                            except (BrokenPipeError, ConnectionResetError):
+                                assert allow_reset, 'Unexpected close while sending a valid response'
+                                return
+                        else:
+                            peer.sendall(fragment)
+                            time.sleep(0.002)
                     if truncate:
                         peer.shutdown(socket.SHUT_WR)
                     # In the valid case keep the write direction open: completion
@@ -85,6 +97,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-client-') as folder, socket
     command = [str(args.runner.resolve()), str(root / 'bin/neoclr/Debug/App.neoil'), str(bundle / 'lib/System.neoil'), '256', '10000000']
     prefix = 'Handler checks passed\nOther work runs while HTTP is pending\n'
     cases = [
+        ('trickling body', [head] + [(bytes([value]), 3) for value in body], False, 'HTTP error: Request deadline exceeded\n'),
+        ('trickling headers', [(bytes([value]), 1) for value in head], False, 'HTTP error: Request deadline exceeded\n'),
         ('stalled headers', [], False, 'HTTP error: Response receive failed\n'),
         ('stalled body', [head, body[:1]], False, 'HTTP error: Response receive failed\n'),
         ('fragmented UTF-8', fragments, False, 'HTTP 200\nCafé 🌍\n'),

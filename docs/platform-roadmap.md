@@ -830,12 +830,13 @@ No later major milestone has started.
 The [pending transfer checkpoint](socket-api-design.md#pending-transfer-deadline--2026-09-24)
 now returns TimedOut after five seconds per nonempty Send/Receive, releasing buffers
 without closing the caller's socket. HTTP closes its owned connection on that error.
-This does not bound repeated short transfers, accept or application handler work.
+The [HTTP socket-handler budget](http-client-design.md#socket-backed-http-exchange-budget--2026-09-24)
+now carries a 15-second absolute deadline across lookup, connect and repeated transfers.
+Public Socket operations keep their phase bounds. Request construction, custom pipeline
+work outside transport, server accept and server application handlers remain outside
+that budget. A configurable general timeout/token API is not yet selected.
 
-**Active next step, 2026-09-24:** carry one owner-scoped deadline through the private
-Raven HTTP bridge. The [native shared-budget probe](experiments/request-budget/README.md)
-now verifies lookup, connect and repeated reads under one absolute deadline; public
-HTTP still has separate operation bounds. Complete this request-lifetime integration,
+**Active next step, 2026-09-24:** establish handler/server cancellation ownership,
 then evaluate public JSON contracts from the existing
 consumer. The [JSON report](experiments/http-json/README.md) now passes between two
 neoCLR applications and independent peers; it does not promote a public JSON API. The

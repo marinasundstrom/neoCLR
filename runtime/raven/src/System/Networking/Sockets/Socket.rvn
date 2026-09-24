@@ -21,9 +21,13 @@ public class Socket {
     }
 
     static func Connect(addresses: Sequence<string>, port: int) -> Task<Result<Socket, SocketError>> {
+        return ConnectUntil(addresses, port, 0)
+    }
+
+    internal static func ConnectUntil(addresses: Sequence<string>, port: int, deadline: long) -> Task<Result<Socket, SocketError>> {
         let source = Promise<Result<Socket, SocketError>>()
         let completion = SocketConnectCompletion(source)
-        completion.StartAddresses(addresses, port)
+        completion.StartAddressesUntil(addresses, port, deadline)
         return source.Task
     }
 
@@ -51,16 +55,24 @@ public class Socket {
     }
 
     func Receive(buffer: byte[], offset: int, count: int) -> Task<Result<int, SocketError>> {
+        return ReceiveUntil(buffer, offset, count, 0)
+    }
+
+    internal func ReceiveUntil(buffer: byte[], offset: int, count: int, deadline: long) -> Task<Result<int, SocketError>> {
         let source = Promise<Result<int, SocketError>>()
         let completion = SocketTransferCompletion(source)
-        completion.StartReceive(handle, buffer, offset, count)
+        completion.StartReceiveUntil(handle, buffer, offset, count, deadline)
         return source.Task
     }
 
     func Send(buffer: byte[], offset: int, count: int) -> Task<Result<int, SocketError>> {
+        return SendUntil(buffer, offset, count, 0)
+    }
+
+    internal func SendUntil(buffer: byte[], offset: int, count: int, deadline: long) -> Task<Result<int, SocketError>> {
         let source = Promise<Result<int, SocketError>>()
         let completion = SocketTransferCompletion(source)
-        completion.StartSend(handle, buffer, offset, count)
+        completion.StartSendUntil(handle, buffer, offset, count, deadline)
         return source.Task
     }
 
@@ -133,6 +145,10 @@ internal class SocketConnectCompletion {
     }
 
     internal func StartAddresses(addresses: Sequence<string>, port: int) {
+        StartAddressesUntil(addresses, port, 0)
+    }
+
+    internal func StartAddressesUntil(addresses: Sequence<string>, port: int, deadline: long) {
         let count = addresses.Count
         if count <= 0 {
             _ = source.Complete(Error(SocketError.InvalidRange()))
@@ -149,7 +165,11 @@ internal class SocketConnectCompletion {
             index += 1
         }
         _ = TaskQueue.Default
-        let payload = RuntimeServices.SocketConnectAddresses(snapshot, port, self.Complete)
+        let payload = if deadline == 0 {
+            RuntimeServices.SocketConnectAddresses(snapshot, port, self.Complete)
+        } else {
+            RuntimeServices.SocketConnectAddressesUntil(snapshot, port, deadline, self.Complete)
+        }
         if RuntimeServices.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {
@@ -187,8 +207,16 @@ internal class SocketTransferCompletion {
     }
 
     internal func StartReceive(handle: long, buffer: byte[], offset: int, count: int) {
+        StartReceiveUntil(handle, buffer, offset, count, 0)
+    }
+
+    internal func StartReceiveUntil(handle: long, buffer: byte[], offset: int, count: int, deadline: long) {
         _ = TaskQueue.Default
-        let payload = RuntimeServices.SocketReceive(handle, buffer, offset, count, self.Complete)
+        let payload = if deadline == 0 {
+            RuntimeServices.SocketReceive(handle, buffer, offset, count, self.Complete)
+        } else {
+            RuntimeServices.SocketReceiveUntil(handle, buffer, offset, count, deadline, self.Complete)
+        }
         if RuntimeServices.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {
@@ -197,8 +225,16 @@ internal class SocketTransferCompletion {
     }
 
     internal func StartSend(handle: long, buffer: byte[], offset: int, count: int) {
+        StartSendUntil(handle, buffer, offset, count, 0)
+    }
+
+    internal func StartSendUntil(handle: long, buffer: byte[], offset: int, count: int, deadline: long) {
         _ = TaskQueue.Default
-        let payload = RuntimeServices.SocketSend(handle, buffer, offset, count, self.Complete)
+        let payload = if deadline == 0 {
+            RuntimeServices.SocketSend(handle, buffer, offset, count, self.Complete)
+        } else {
+            RuntimeServices.SocketSendUntil(handle, buffer, offset, count, deadline, self.Complete)
+        }
         if RuntimeServices.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {

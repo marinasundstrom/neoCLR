@@ -6682,3 +6682,24 @@ configuration/content, not target-specific code added to Raven main.
   handler/server ownership. No public timeout/token type is selected in this slice.
 - **Evidence:** [probe](experiments/request-budget/README.md) and
   [contract comparisons](http-client-design.md#shared-native-deadline-checkpoint--2026-09-24).
+
+### 2026-09-24 — Shared budget reaches the managed HTTP client
+
+- **Assistant continuation:** follows the native checkpoint immediately with the
+  private Raven bridge. Selects a provisional 15-second socket-handler exchange budget,
+  retaining shorter phase bounds. The author has not selected that duration as a
+  permanent or configurable public timeout policy.
+- **Action:** passes a checked monotonic stamp through lookup/connect/transfers,
+  consumes pending outcomes before finalization, closes late successful connections
+  and checks expiry before returning buffered success. Public signatures stay unchanged.
+- **Integration finding:** separate library slices could not call internal core helpers.
+  The bootstrap reference temporarily exposes four Until methods for compilation;
+  normal references and importer validation retain their internal contract. Explicit
+  library-mode signature admission and negative application checks preserve the boundary.
+  No Raven compiler change or general compiler fix is claimed.
+- **Validation:** the focused HTTP verifier exercises regular header/body trickles,
+  ordinary fragmentation and a stalled response. Native ownership and service-analysis
+  tests cover the underlying paths; matching artifacts and API documentation are refreshed.
+- **Remaining scope:** custom pipeline work outside transport, server accept/application
+  callbacks, cancellation tokens and configurable timeouts. The HTTP design records the
+  distinction from a general HttpClient.Timeout contract.

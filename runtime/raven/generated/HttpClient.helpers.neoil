@@ -4409,6 +4409,7 @@ ret
 .end
 .type internal class System.Web.Http.HttpExchange
 .sealed
+.field private deadline Int64
 .field private request System.Web.Http.HttpRequest
 .field private source System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,String>>
 .field private socket System.Option<System.Networking.Sockets.Socket>
@@ -4440,146 +4441,155 @@ M00000022_IL_0007:
 M00000022_IL_0008:
 ldarg 0
 M00000022_IL_0009:
-ldarg 1
+ldc.i4 0
 M00000022_IL_000a:
-stfld System.Web.Http.HttpExchange::request
-M00000022_IL_000f:
-ldarg 0
+conv.i8
+M00000022_IL_000b:
+stfld System.Web.Http.HttpExchange::deadline
 M00000022_IL_0010:
+M00000022_IL_0011:
+ldarg 0
+M00000022_IL_0012:
+ldarg 1
+M00000022_IL_0013:
+stfld System.Web.Http.HttpExchange::request
+M00000022_IL_0018:
+ldarg 0
+M00000022_IL_0019:
 newobj instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,String>>::.ctor()
-M00000022_IL_0015:
+M00000022_IL_001e:
 stfld System.Web.Http.HttpExchange::source
-M00000022_IL_001a:
+M00000022_IL_0023:
 ldarg 0
-M00000022_IL_001b:
+M00000022_IL_0024:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion32()
-M00000022_IL_0020:
+M00000022_IL_0029:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion33(System.Option.None)
-M00000022_IL_0025:
+M00000022_IL_002e:
 stfld System.Web.Http.HttpExchange::socket
-M00000022_IL_002a:
+M00000022_IL_0033:
 ldarg 0
-M00000022_IL_002b:
+M00000022_IL_0034:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion32()
-M00000022_IL_0030:
+M00000022_IL_0039:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion34(System.Option.None)
-M00000022_IL_0035:
+M00000022_IL_003e:
 stfld System.Web.Http.HttpExchange::lookup
-M00000022_IL_003a:
+M00000022_IL_0043:
 ldarg 0
-M00000022_IL_003b:
+M00000022_IL_0044:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion32()
-M00000022_IL_0040:
+M00000022_IL_0049:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion35(System.Option.None)
-M00000022_IL_0045:
+M00000022_IL_004e:
 stfld System.Web.Http.HttpExchange::connecting
-M00000022_IL_004a:
+M00000022_IL_0053:
 ldarg 0
-M00000022_IL_004b:
+M00000022_IL_0054:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion32()
-M00000022_IL_0050:
+M00000022_IL_0059:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion36(System.Option.None)
-M00000022_IL_0055:
+M00000022_IL_005e:
 stfld System.Web.Http.HttpExchange::transfer
-M00000022_IL_005a:
-M00000022_IL_005b:
-ldarg 1
-M00000022_IL_005c:
-callvirt instance System.Web.Http.HttpRequest::get_Target()
-M00000022_IL_0061:
-stloc local0
-M00000022_IL_0062:
 M00000022_IL_0063:
-ldarg 1
 M00000022_IL_0064:
-callvirt instance System.Web.Http.HttpRequest::get_Host()
-M00000022_IL_0069:
-stloc local1
-M00000022_IL_006a:
-M00000022_IL_006b:
 ldarg 1
+M00000022_IL_0065:
+callvirt instance System.Web.Http.HttpRequest::get_Target()
+M00000022_IL_006a:
+stloc local0
+M00000022_IL_006b:
 M00000022_IL_006c:
-callvirt instance System.Web.Http.HttpRequest::get_Port()
-M00000022_IL_0071:
-stloc local2
+ldarg 1
+M00000022_IL_006d:
+callvirt instance System.Web.Http.HttpRequest::get_Host()
 M00000022_IL_0072:
+stloc local1
 M00000022_IL_0073:
+M00000022_IL_0074:
+ldarg 1
+M00000022_IL_0075:
+callvirt instance System.Web.Http.HttpRequest::get_Port()
+M00000022_IL_007a:
+stloc local2
+M00000022_IL_007b:
+M00000022_IL_007c:
 ldstr "GET "
-M00000022_IL_0078:
+M00000022_IL_0081:
 ldloc local0
-M00000022_IL_0079:
+M00000022_IL_0082:
 call System.String::Concat(String,String)
-M00000022_IL_007e:
+M00000022_IL_0087:
 ldstr " HTTP/1.1\r\nHost: "
-M00000022_IL_0083:
+M00000022_IL_008c:
 call System.String::Concat(String,String)
-M00000022_IL_0088:
+M00000022_IL_0091:
 stloc local3
-M00000022_IL_0089:
-M00000022_IL_008a:
+M00000022_IL_0092:
+M00000022_IL_0093:
 ldloc local1
-M00000022_IL_008b:
+M00000022_IL_0094:
 ldstr ":"
-M00000022_IL_0090:
+M00000022_IL_0099:
 call System.String::Concat(String,String)
-M00000022_IL_0095:
+M00000022_IL_009e:
 ldloca local2
-M00000022_IL_0097:
+M00000022_IL_00a0:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeInt32ToString(Int32&)
-M00000022_IL_009c:
-call System.String::Concat(String,String)
-M00000022_IL_00a1:
-stloc local4
-M00000022_IL_00a3:
-M00000022_IL_00a4:
-ldloc local3
 M00000022_IL_00a5:
-ldloc local4
-M00000022_IL_00a7:
 call System.String::Concat(String,String)
+M00000022_IL_00aa:
+stloc local4
 M00000022_IL_00ac:
-ldstr "\r\nConnection: close\r\n\r\n"
-M00000022_IL_00b1:
+M00000022_IL_00ad:
+ldloc local3
+M00000022_IL_00ae:
+ldloc local4
+M00000022_IL_00b0:
 call System.String::Concat(String,String)
-M00000022_IL_00b6:
+M00000022_IL_00b5:
+ldstr "\r\nConnection: close\r\n\r\n"
+M00000022_IL_00ba:
+call System.String::Concat(String,String)
+M00000022_IL_00bf:
 stloc local5
-M00000022_IL_00b8:
-M00000022_IL_00b9:
-ldloc local5
-M00000022_IL_00bb:
-call System.Text.Utf8::Encode(String)
-M00000022_IL_00c0:
-stloc local6
+M00000022_IL_00c1:
 M00000022_IL_00c2:
-M00000022_IL_00c3:
-ldarg 0
+ldloc local5
 M00000022_IL_00c4:
-ldloc local6
-M00000022_IL_00c6:
-stfld System.Web.Http.HttpExchange::outgoing
+call System.Text.Utf8::Encode(String)
+M00000022_IL_00c9:
+stloc local6
 M00000022_IL_00cb:
 M00000022_IL_00cc:
 ldarg 0
 M00000022_IL_00cd:
-ldc.i4 0
-M00000022_IL_00ce:
-stfld System.Web.Http.HttpExchange::sent
-M00000022_IL_00d3:
+ldloc local6
+M00000022_IL_00cf:
+stfld System.Web.Http.HttpExchange::outgoing
 M00000022_IL_00d4:
-ldarg 0
 M00000022_IL_00d5:
-ldc.i4 256
-M00000022_IL_00da:
-array.reserve Byte
-M00000022_IL_00df:
-stfld System.Web.Http.HttpExchange::buffer
-M00000022_IL_00e4:
 ldarg 0
-M00000022_IL_00e5:
+M00000022_IL_00d6:
+ldc.i4 0
+M00000022_IL_00d7:
+stfld System.Web.Http.HttpExchange::sent
+M00000022_IL_00dc:
+M00000022_IL_00dd:
+ldarg 0
+M00000022_IL_00de:
+ldc.i4 256
+M00000022_IL_00e3:
+array.reserve Byte
+M00000022_IL_00e8:
+stfld System.Web.Http.HttpExchange::buffer
+M00000022_IL_00ed:
+ldarg 0
+M00000022_IL_00ee:
 newobj instance System.Web.Http.HttpResponseDecoder::.ctor()
-M00000022_IL_00ea:
+M00000022_IL_00f3:
 stfld System.Web.Http.HttpExchange::decoder
-M00000022_IL_00ef:
+M00000022_IL_00f8:
 ret
 .end
 .method internal instance Execute() -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,String>>
@@ -4591,42 +4601,55 @@ M00000023_IL_0001:
 M00000023_IL_0002:
 ldarg 0
 M00000023_IL_0003:
-ldfld System.Web.Http.HttpExchange::request
+ldc.i4 15000
 M00000023_IL_0008:
-callvirt instance System.Web.Http.HttpRequest::get_Host()
+call neoCLR.Runtime.SocketDeadlineAfter(Int32)
 M00000023_IL_000d:
-call System.Networking.Dns::GetHostAddresses(String)
+stfld System.Web.Http.HttpExchange::deadline
 M00000023_IL_0012:
-stloc local0
 M00000023_IL_0013:
+ldarg 0
 M00000023_IL_0014:
+ldfld System.Web.Http.HttpExchange::request
+M00000023_IL_0019:
+callvirt instance System.Web.Http.HttpRequest::get_Host()
+M00000023_IL_001e:
 ldarg 0
-M00000023_IL_0015:
+M00000023_IL_001f:
+ldfld System.Web.Http.HttpExchange::deadline
+M00000023_IL_0024:
+call System.Networking.Dns::GetHostAddressesUntil(String,Int64)
+M00000023_IL_0029:
+stloc local0
+M00000023_IL_002a:
+M00000023_IL_002b:
+ldarg 0
+M00000023_IL_002c:
 ldloc local0
-M00000023_IL_0016:
+M00000023_IL_002d:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion37(System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>)
-M00000023_IL_001b:
+M00000023_IL_0032:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion38(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>)
-M00000023_IL_0020:
+M00000023_IL_0037:
 stfld System.Web.Http.HttpExchange::lookup
-M00000023_IL_0025:
-M00000023_IL_0026:
+M00000023_IL_003c:
+M00000023_IL_003d:
 ldloc local0
-M00000023_IL_0027:
+M00000023_IL_003e:
 ldarg 0
-M00000023_IL_0028:
-M00000023_IL_002e:
-delegate.bind System.Func<Void> = instance System.Web.Http.HttpExchange::DelegateTarget_Application_V1_M_363A6D6574686F643131313A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A4874747045786368616E6765383A4F6E4C6F6F6B7570343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
-M00000023_IL_0033:
-call instance System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>::OnCompleted(System.Func<Void>)
-M00000023_IL_0038:
-M00000023_IL_0039:
-ldarg 0
-M00000023_IL_003a:
-ldfld System.Web.Http.HttpExchange::source
 M00000023_IL_003f:
+M00000023_IL_0045:
+delegate.bind System.Func<Void> = instance System.Web.Http.HttpExchange::DelegateTarget_Application_V1_M_363A6D6574686F643131313A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A4874747045786368616E6765383A4F6E4C6F6F6B7570343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
+M00000023_IL_004a:
+call instance System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>::OnCompleted(System.Func<Void>)
+M00000023_IL_004f:
+M00000023_IL_0050:
+ldarg 0
+M00000023_IL_0051:
+ldfld System.Web.Http.HttpExchange::source
+M00000023_IL_0056:
 call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,String>>::get_Task()
-M00000023_IL_0044:
+M00000023_IL_005b:
 ret
 .end
 .method private instance Finish(System.Result<System.Web.Http.HttpResponse,String> result) -> noresult
@@ -4722,16 +4745,47 @@ M00000024_IL_008a:
 M00000024_IL_008b:
 ldarg 0
 M00000024_IL_008c:
-ldfld System.Web.Http.HttpExchange::source
+ldfld System.Web.Http.HttpExchange::deadline
 M00000024_IL_0091:
-ldarg 1
-M00000024_IL_0092:
+call neoCLR.Runtime.SocketDeadlineExpired(Int64)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_0096:
+brtrue M00000024_IL_00a0
+M00000024_IL_009b:
+br M00000024_IL_00c2
+M00000024_IL_00a0:
+M00000024_IL_00a1:
+ldarg 0
+M00000024_IL_00a2:
+ldfld System.Web.Http.HttpExchange::source
+M00000024_IL_00a7:
+ldstr "Request deadline exceeded"
+M00000024_IL_00ac:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
+M00000024_IL_00b1:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
+M00000024_IL_00b6:
 call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,String>>::Complete(System.Result<System.Web.Http.HttpResponse,String>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M00000024_IL_0097:
+M00000024_IL_00bb:
 pop
-M00000024_IL_0098:
-M00000024_IL_0099:
+M00000024_IL_00bc:
+br M00000024_IL_00d0
+M00000024_IL_00c2:
+M00000024_IL_00c3:
+ldarg 0
+M00000024_IL_00c4:
+ldfld System.Web.Http.HttpExchange::source
+M00000024_IL_00c9:
+ldarg 1
+M00000024_IL_00ca:
+call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,String>>::Complete(System.Result<System.Web.Http.HttpResponse,String>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_00cf:
+pop
+M00000024_IL_00d0:
+M00000024_IL_00d1:
+M00000024_IL_00d2:
 ret
 .end
 .method private instance OnLookup() -> noresult
@@ -4797,7 +4851,7 @@ M00000025_IL_0034:
 M00000025_IL_0035:
 br M00000025_IL_0045
 M00000025_IL_0040:
-br M00000025_IL_00f1
+br M00000025_IL_0126
 M00000025_IL_0045:
 M00000025_IL_0046:
 ldloc local0
@@ -4815,93 +4869,124 @@ M00000025_IL_0058:
 stfld System.Web.Http.HttpExchange::lookup
 M00000025_IL_005d:
 M00000025_IL_005e:
-ldloc local1
+ldarg 0
 M00000025_IL_005f:
-stloc local8
-M00000025_IL_0061:
-ldloca local8
-M00000025_IL_0063:
-ldloca local9
-M00000025_IL_0065:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion43(System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>&,System.Result.Ok<System.Collections.Sequence<String>>&)
-M00000025_IL_006a:
-brfalse M00000025_IL_0097
-M00000025_IL_006f:
-ldloc local9
-M00000025_IL_0071:
-stloc local10
+ldfld System.Web.Http.HttpExchange::deadline
+M00000025_IL_0064:
+call neoCLR.Runtime.SocketDeadlineExpired(Int64)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
+M00000025_IL_0069:
+brtrue M00000025_IL_0073
+M00000025_IL_006e:
+br M00000025_IL_008b
 M00000025_IL_0073:
-ldloca local10
+M00000025_IL_0074:
+ldarg 0
 M00000025_IL_0075:
-ldloca local11
-M00000025_IL_0077:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion44(System.Result.Ok<System.Collections.Sequence<String>>&,System.Collections.Sequence<String>&)
-M00000025_IL_007c:
-ldloc local11
-M00000025_IL_007e:
-stloc local2
+ldstr "Request deadline exceeded"
+M00000025_IL_007a:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
 M00000025_IL_007f:
-ldc.i4 1
-M00000025_IL_0080:
-br M00000025_IL_0086
-M00000025_IL_0086:
-brfalse M00000025_IL_0097
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
+M00000025_IL_0084:
+callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
+M00000025_IL_0089:
+M00000025_IL_008a:
+ret
 M00000025_IL_008b:
 M00000025_IL_008c:
-br M00000025_IL_009c
-M00000025_IL_0097:
-br M00000025_IL_00da
-M00000025_IL_009c:
-M00000025_IL_009d:
-ldloc local2
+M00000025_IL_008d:
+ldloc local1
+M00000025_IL_008e:
+stloc local8
+M00000025_IL_0090:
+ldloca local8
+M00000025_IL_0092:
+ldloca local9
+M00000025_IL_0094:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion43(System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>&,System.Result.Ok<System.Collections.Sequence<String>>&)
+M00000025_IL_0099:
+brfalse M00000025_IL_00c6
 M00000025_IL_009e:
-ldarg 0
-M00000025_IL_009f:
-ldfld System.Web.Http.HttpExchange::request
+ldloc local9
+M00000025_IL_00a0:
+stloc local10
+M00000025_IL_00a2:
+ldloca local10
 M00000025_IL_00a4:
-callvirt instance System.Web.Http.HttpRequest::get_Port()
-M00000025_IL_00a9:
-call System.Networking.Sockets.Socket::Connect(System.Collections.Sequence<String>,Int32)
+ldloca local11
+M00000025_IL_00a6:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion44(System.Result.Ok<System.Collections.Sequence<String>>&,System.Collections.Sequence<String>&)
+M00000025_IL_00ab:
+ldloc local11
+M00000025_IL_00ad:
+stloc local2
 M00000025_IL_00ae:
-stloc local3
+ldc.i4 1
 M00000025_IL_00af:
-M00000025_IL_00b0:
+br M00000025_IL_00b5
+M00000025_IL_00b5:
+brfalse M00000025_IL_00c6
+M00000025_IL_00ba:
+M00000025_IL_00bb:
+br M00000025_IL_00cb
+M00000025_IL_00c6:
+br M00000025_IL_010f
+M00000025_IL_00cb:
+M00000025_IL_00cc:
+ldloc local2
+M00000025_IL_00cd:
 ldarg 0
-M00000025_IL_00b1:
-ldloc local3
-M00000025_IL_00b2:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion45(System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>)
-M00000025_IL_00b7:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion46(System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>)
-M00000025_IL_00bc:
-stfld System.Web.Http.HttpExchange::connecting
-M00000025_IL_00c1:
-M00000025_IL_00c2:
-ldloc local3
-M00000025_IL_00c3:
+M00000025_IL_00ce:
+ldfld System.Web.Http.HttpExchange::request
+M00000025_IL_00d3:
+callvirt instance System.Web.Http.HttpRequest::get_Port()
+M00000025_IL_00d8:
 ldarg 0
-M00000025_IL_00c4:
-M00000025_IL_00ca:
-delegate.bind System.Func<Void> = instance System.Web.Http.HttpExchange::DelegateTarget_Application_V1_M_363A6D6574686F643131313A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A4874747045786368616E676531313A4F6E436F6E6E6563746564343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
-M00000025_IL_00cf:
-call instance System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::OnCompleted(System.Func<Void>)
-M00000025_IL_00d4:
-br M00000025_IL_00f0
-M00000025_IL_00da:
-M00000025_IL_00db:
+M00000025_IL_00d9:
+ldfld System.Web.Http.HttpExchange::deadline
+M00000025_IL_00de:
+call System.Networking.Sockets.Socket::ConnectUntil(System.Collections.Sequence<String>,Int32,Int64)
+M00000025_IL_00e3:
+stloc local3
+M00000025_IL_00e4:
+M00000025_IL_00e5:
 ldarg 0
-M00000025_IL_00dc:
-ldstr "Lookup failed"
-M00000025_IL_00e1:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
 M00000025_IL_00e6:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
-M00000025_IL_00eb:
-callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
-M00000025_IL_00f0:
+ldloc local3
+M00000025_IL_00e7:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion45(System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>)
+M00000025_IL_00ec:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion46(System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>)
 M00000025_IL_00f1:
-M00000025_IL_00f2:
-M00000025_IL_00f3:
+stfld System.Web.Http.HttpExchange::connecting
+M00000025_IL_00f6:
+M00000025_IL_00f7:
+ldloc local3
+M00000025_IL_00f8:
+ldarg 0
+M00000025_IL_00f9:
+M00000025_IL_00ff:
+delegate.bind System.Func<Void> = instance System.Web.Http.HttpExchange::DelegateTarget_Application_V1_M_363A6D6574686F643131313A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A4874747045786368616E676531313A4F6E436F6E6E6563746564343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
+M00000025_IL_0104:
+call instance System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::OnCompleted(System.Func<Void>)
+M00000025_IL_0109:
+br M00000025_IL_0125
+M00000025_IL_010f:
+M00000025_IL_0110:
+ldarg 0
+M00000025_IL_0111:
+ldstr "Lookup failed"
+M00000025_IL_0116:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
+M00000025_IL_011b:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
+M00000025_IL_0120:
+callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
+M00000025_IL_0125:
+M00000025_IL_0126:
+M00000025_IL_0127:
+M00000025_IL_0128:
 ret
 .end
 .method private instance OnConnected() -> noresult
@@ -5073,183 +5158,214 @@ M00000027_IL_0001:
 M00000027_IL_0002:
 ldarg 0
 M00000027_IL_0003:
-ldfld System.Web.Http.HttpExchange::socket
+ldfld System.Web.Http.HttpExchange::deadline
 M00000027_IL_0008:
-stloc local3
-M00000027_IL_0009:
-ldloca local3
-M00000027_IL_000b:
-ldloca local4
-M00000027_IL_000d:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion39(System.Option<System.Networking.Sockets.Socket>&,System.Option.Some<System.Networking.Sockets.Socket>&)
-M00000027_IL_0012:
-brfalse M00000027_IL_003f
-M00000027_IL_0017:
-ldloc local4
-M00000027_IL_0019:
-stloc local5
-M00000027_IL_001b:
-ldloca local5
-M00000027_IL_001d:
-ldloca local6
-M00000027_IL_001f:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion40(System.Option.Some<System.Networking.Sockets.Socket>&,System.Networking.Sockets.Socket&)
-M00000027_IL_0024:
-ldloc local6
-M00000027_IL_0026:
-stloc local0
-M00000027_IL_0027:
-ldc.i4 1
-M00000027_IL_0028:
-br M00000027_IL_002e
-M00000027_IL_002e:
-brfalse M00000027_IL_003f
-M00000027_IL_0033:
-M00000027_IL_0034:
-br M00000027_IL_0044
-M00000027_IL_003f:
-br M00000027_IL_00fe
-M00000027_IL_0044:
-M00000027_IL_0045:
-ldarg 0
-M00000027_IL_0046:
-ldfld System.Web.Http.HttpExchange::sent
-M00000027_IL_004b:
-ldarg 0
-M00000027_IL_004c:
-ldfld System.Web.Http.HttpExchange::outgoing
-M00000027_IL_0051:
-callvirt instance System.Collections.Collection<Byte>::get_Count()
-M00000027_IL_0056:
-ceq
+call neoCLR.Runtime.SocketDeadlineExpired(Int64)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M00000027_IL_0058:
-brtrue M00000027_IL_0062
+M00000027_IL_000d:
+brtrue M00000027_IL_0017
+M00000027_IL_0012:
+br M00000027_IL_002f
+M00000027_IL_0017:
+M00000027_IL_0018:
+ldarg 0
+M00000027_IL_0019:
+ldstr "Request deadline exceeded"
+M00000027_IL_001e:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
+M00000027_IL_0023:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
+M00000027_IL_0028:
+callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
+M00000027_IL_002d:
+M00000027_IL_002e:
+ret
+M00000027_IL_002f:
+M00000027_IL_0030:
+M00000027_IL_0031:
+ldarg 0
+M00000027_IL_0032:
+ldfld System.Web.Http.HttpExchange::socket
+M00000027_IL_0037:
+stloc local3
+M00000027_IL_0038:
+ldloca local3
+M00000027_IL_003a:
+ldloca local4
+M00000027_IL_003c:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion39(System.Option<System.Networking.Sockets.Socket>&,System.Option.Some<System.Networking.Sockets.Socket>&)
+M00000027_IL_0041:
+brfalse M00000027_IL_006e
+M00000027_IL_0046:
+ldloc local4
+M00000027_IL_0048:
+stloc local5
+M00000027_IL_004a:
+ldloca local5
+M00000027_IL_004c:
+ldloca local6
+M00000027_IL_004e:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion40(System.Option.Some<System.Networking.Sockets.Socket>&,System.Networking.Sockets.Socket&)
+M00000027_IL_0053:
+ldloc local6
+M00000027_IL_0055:
+stloc local0
+M00000027_IL_0056:
+ldc.i4 1
+M00000027_IL_0057:
+br M00000027_IL_005d
 M00000027_IL_005d:
-br M00000027_IL_006a
+brfalse M00000027_IL_006e
 M00000027_IL_0062:
 M00000027_IL_0063:
-ldarg 0
-M00000027_IL_0064:
-callvirt instance System.Web.Http.HttpExchange::ReceiveNext()
-M00000027_IL_0069:
-ret
-M00000027_IL_006a:
-M00000027_IL_006b:
-M00000027_IL_006c:
-ldc.i4 0
-M00000027_IL_006d:
-stloc local1
+br M00000027_IL_0073
 M00000027_IL_006e:
-M00000027_IL_006f:
-M00000027_IL_0070:
-ldloc local1
-M00000027_IL_0071:
-ldc.i4 256
-M00000027_IL_0076:
-clt
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M00000027_IL_0078:
-brfalse M00000027_IL_0097
-M00000027_IL_007d:
+br M00000027_IL_0133
+M00000027_IL_0073:
+M00000027_IL_0074:
 ldarg 0
-M00000027_IL_007e:
+M00000027_IL_0075:
 ldfld System.Web.Http.HttpExchange::sent
-M00000027_IL_0083:
-ldloc local1
-M00000027_IL_0084:
-add
-M00000027_IL_0085:
+M00000027_IL_007a:
 ldarg 0
-M00000027_IL_0086:
+M00000027_IL_007b:
 ldfld System.Web.Http.HttpExchange::outgoing
-M00000027_IL_008b:
+M00000027_IL_0080:
 callvirt instance System.Collections.Collection<Byte>::get_Count()
-M00000027_IL_0090:
+M00000027_IL_0085:
+ceq
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
+M00000027_IL_0087:
+brtrue M00000027_IL_0091
+M00000027_IL_008c:
+br M00000027_IL_0099
+M00000027_IL_0091:
+M00000027_IL_0092:
+ldarg 0
+M00000027_IL_0093:
+callvirt instance System.Web.Http.HttpExchange::ReceiveNext()
+M00000027_IL_0098:
+ret
+M00000027_IL_0099:
+M00000027_IL_009a:
+M00000027_IL_009b:
+ldc.i4 0
+M00000027_IL_009c:
+stloc local1
+M00000027_IL_009d:
+M00000027_IL_009e:
+M00000027_IL_009f:
+ldloc local1
+M00000027_IL_00a0:
+ldc.i4 256
+M00000027_IL_00a5:
 clt
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M00000027_IL_0092:
-br M00000027_IL_0098
-M00000027_IL_0097:
-ldc.i4 0
-M00000027_IL_0098:
-brtrue M00000027_IL_00a2
-M00000027_IL_009d:
-br M00000027_IL_00c8
-M00000027_IL_00a2:
-M00000027_IL_00a3:
+M00000027_IL_00a7:
+brfalse M00000027_IL_00c6
+M00000027_IL_00ac:
 ldarg 0
-M00000027_IL_00a4:
-ldfld System.Web.Http.HttpExchange::buffer
-M00000027_IL_00a9:
-ldloc local1
-M00000027_IL_00aa:
-ldarg 0
-M00000027_IL_00ab:
-ldfld System.Web.Http.HttpExchange::outgoing
-M00000027_IL_00b0:
-ldarg 0
-M00000027_IL_00b1:
+M00000027_IL_00ad:
 ldfld System.Web.Http.HttpExchange::sent
-M00000027_IL_00b6:
+M00000027_IL_00b2:
 ldloc local1
-M00000027_IL_00b7:
+M00000027_IL_00b3:
 add
-M00000027_IL_00b8:
-callvirt instance System.Collections.Sequence<Byte>::get_Item(Int32)
-M00000027_IL_00bd:
-stelem Byte
-M00000027_IL_00be:
+M00000027_IL_00b4:
+ldarg 0
+M00000027_IL_00b5:
+ldfld System.Web.Http.HttpExchange::outgoing
+M00000027_IL_00ba:
+callvirt instance System.Collections.Collection<Byte>::get_Count()
 M00000027_IL_00bf:
-ldloc local1
-M00000027_IL_00c0:
-ldc.i4 1
+clt
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000027_IL_00c1:
-add
-M00000027_IL_00c2:
-stloc local1
-M00000027_IL_00c3:
-br M00000027_IL_006f
-M00000027_IL_00c8:
-M00000027_IL_00c9:
-M00000027_IL_00ca:
-ldloc local0
-M00000027_IL_00cb:
-ldarg 0
-M00000027_IL_00cc:
-ldfld System.Web.Http.HttpExchange::buffer
-M00000027_IL_00d1:
+br M00000027_IL_00c7
+M00000027_IL_00c6:
 ldc.i4 0
+M00000027_IL_00c7:
+brtrue M00000027_IL_00d1
+M00000027_IL_00cc:
+br M00000027_IL_00f7
+M00000027_IL_00d1:
 M00000027_IL_00d2:
-ldloc local1
+ldarg 0
 M00000027_IL_00d3:
-call instance System.Networking.Sockets.Socket::Send(arrayref<Byte>,Int32,Int32)
+ldfld System.Web.Http.HttpExchange::buffer
 M00000027_IL_00d8:
-stloc local2
+ldloc local1
 M00000027_IL_00d9:
+ldarg 0
 M00000027_IL_00da:
+ldfld System.Web.Http.HttpExchange::outgoing
+M00000027_IL_00df:
 ldarg 0
-M00000027_IL_00db:
-ldloc local2
-M00000027_IL_00dc:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion53(System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>)
-M00000027_IL_00e1:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion54(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>)
+M00000027_IL_00e0:
+ldfld System.Web.Http.HttpExchange::sent
+M00000027_IL_00e5:
+ldloc local1
 M00000027_IL_00e6:
-stfld System.Web.Http.HttpExchange::transfer
-M00000027_IL_00eb:
+add
+M00000027_IL_00e7:
+callvirt instance System.Collections.Sequence<Byte>::get_Item(Int32)
 M00000027_IL_00ec:
-ldloc local2
+stelem Byte
 M00000027_IL_00ed:
-ldarg 0
 M00000027_IL_00ee:
-M00000027_IL_00f4:
-delegate.bind System.Func<Void> = instance System.Web.Http.HttpExchange::DelegateTarget_Application_V1_M_363A6D6574686F643131313A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A4874747045786368616E6765363A4F6E53656E74343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
+ldloc local1
+M00000027_IL_00ef:
+ldc.i4 1
+M00000027_IL_00f0:
+add
+M00000027_IL_00f1:
+stloc local1
+M00000027_IL_00f2:
+br M00000027_IL_009e
+M00000027_IL_00f7:
+M00000027_IL_00f8:
 M00000027_IL_00f9:
-call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::OnCompleted(System.Func<Void>)
-M00000027_IL_00fe:
-M00000027_IL_00ff:
+ldloc local0
+M00000027_IL_00fa:
+ldarg 0
+M00000027_IL_00fb:
+ldfld System.Web.Http.HttpExchange::buffer
 M00000027_IL_0100:
+ldc.i4 0
+M00000027_IL_0101:
+ldloc local1
+M00000027_IL_0102:
+ldarg 0
+M00000027_IL_0103:
+ldfld System.Web.Http.HttpExchange::deadline
+M00000027_IL_0108:
+call instance System.Networking.Sockets.Socket::SendUntil(arrayref<Byte>,Int32,Int32,Int64)
+M00000027_IL_010d:
+stloc local2
+M00000027_IL_010e:
+M00000027_IL_010f:
+ldarg 0
+M00000027_IL_0110:
+ldloc local2
+M00000027_IL_0111:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion53(System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>)
+M00000027_IL_0116:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion54(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>)
+M00000027_IL_011b:
+stfld System.Web.Http.HttpExchange::transfer
+M00000027_IL_0120:
+M00000027_IL_0121:
+ldloc local2
+M00000027_IL_0122:
+ldarg 0
+M00000027_IL_0123:
+M00000027_IL_0129:
+delegate.bind System.Func<Void> = instance System.Web.Http.HttpExchange::DelegateTarget_Application_V1_M_363A6D6574686F643131313A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A4874747045786368616E6765363A4F6E53656E74343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
+M00000027_IL_012e:
+call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::OnCompleted(System.Func<Void>)
+M00000027_IL_0133:
+M00000027_IL_0134:
+M00000027_IL_0135:
 ret
 .end
 .method private instance OnSent() -> noresult
@@ -5316,7 +5432,7 @@ M00000028_IL_0033:
 M00000028_IL_0034:
 br M00000028_IL_0044
 M00000028_IL_003f:
-br M00000028_IL_00f9
+br M00000028_IL_0128
 M00000028_IL_0044:
 M00000028_IL_0045:
 ldloc local0
@@ -5334,102 +5450,129 @@ M00000028_IL_0057:
 stfld System.Web.Http.HttpExchange::transfer
 M00000028_IL_005c:
 M00000028_IL_005d:
-ldloc local1
+ldarg 0
 M00000028_IL_005e:
-stloc local7
-M00000028_IL_0060:
-ldloca local7
-M00000028_IL_0062:
-ldloca local8
-M00000028_IL_0064:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion57(System.Result<Int32,System.Networking.Sockets.SocketError>&,System.Result.Ok<Int32>&)
-M00000028_IL_0069:
-brfalse M00000028_IL_0096
-M00000028_IL_006e:
-ldloc local8
-M00000028_IL_0070:
-stloc local9
+ldfld System.Web.Http.HttpExchange::deadline
+M00000028_IL_0063:
+call neoCLR.Runtime.SocketDeadlineExpired(Int64)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
+M00000028_IL_0068:
+brtrue M00000028_IL_0072
+M00000028_IL_006d:
+br M00000028_IL_008a
 M00000028_IL_0072:
-ldloca local9
+M00000028_IL_0073:
+ldarg 0
 M00000028_IL_0074:
-ldloca local10
-M00000028_IL_0076:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion58(System.Result.Ok<Int32>&,Int32&)
-M00000028_IL_007b:
-ldloc local10
-M00000028_IL_007d:
-stloc local2
+ldstr "Request deadline exceeded"
+M00000028_IL_0079:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
 M00000028_IL_007e:
-ldc.i4 1
-M00000028_IL_007f:
-br M00000028_IL_0085
-M00000028_IL_0085:
-brfalse M00000028_IL_0096
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
+M00000028_IL_0083:
+callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
+M00000028_IL_0088:
+M00000028_IL_0089:
+ret
 M00000028_IL_008a:
 M00000028_IL_008b:
-br M00000028_IL_009b
-M00000028_IL_0096:
-br M00000028_IL_00e2
-M00000028_IL_009b:
-M00000028_IL_009c:
-ldloc local2
+M00000028_IL_008c:
+ldloc local1
+M00000028_IL_008d:
+stloc local7
+M00000028_IL_008f:
+ldloca local7
+M00000028_IL_0091:
+ldloca local8
+M00000028_IL_0093:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion57(System.Result<Int32,System.Networking.Sockets.SocketError>&,System.Result.Ok<Int32>&)
+M00000028_IL_0098:
+brfalse M00000028_IL_00c5
 M00000028_IL_009d:
+ldloc local8
+M00000028_IL_009f:
+stloc local9
+M00000028_IL_00a1:
+ldloca local9
+M00000028_IL_00a3:
+ldloca local10
+M00000028_IL_00a5:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion58(System.Result.Ok<Int32>&,Int32&)
+M00000028_IL_00aa:
+ldloc local10
+M00000028_IL_00ac:
+stloc local2
+M00000028_IL_00ad:
+ldc.i4 1
+M00000028_IL_00ae:
+br M00000028_IL_00b4
+M00000028_IL_00b4:
+brfalse M00000028_IL_00c5
+M00000028_IL_00b9:
+M00000028_IL_00ba:
+br M00000028_IL_00ca
+M00000028_IL_00c5:
+br M00000028_IL_0111
+M00000028_IL_00ca:
+M00000028_IL_00cb:
+ldloc local2
+M00000028_IL_00cc:
 ldc.i4 0
-M00000028_IL_009e:
+M00000028_IL_00cd:
 cgt
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M00000028_IL_00a0:
-brtrue M00000028_IL_00aa
-M00000028_IL_00a5:
-br M00000028_IL_00c5
-M00000028_IL_00aa:
-M00000028_IL_00ab:
+M00000028_IL_00cf:
+brtrue M00000028_IL_00d9
+M00000028_IL_00d4:
+br M00000028_IL_00f4
+M00000028_IL_00d9:
+M00000028_IL_00da:
 ldarg 0
-M00000028_IL_00ac:
-ldarg 0
-M00000028_IL_00ad:
-ldfld System.Web.Http.HttpExchange::sent
-M00000028_IL_00b2:
-ldloc local2
-M00000028_IL_00b3:
-add
-M00000028_IL_00b4:
-stfld System.Web.Http.HttpExchange::sent
-M00000028_IL_00b9:
-ldarg 0
-M00000028_IL_00ba:
-callvirt instance System.Web.Http.HttpExchange::SendNext()
-M00000028_IL_00bf:
-br M00000028_IL_00db
-M00000028_IL_00c5:
-M00000028_IL_00c6:
-ldarg 0
-M00000028_IL_00c7:
-ldstr "Send made no progress"
-M00000028_IL_00cc:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
-M00000028_IL_00d1:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
-M00000028_IL_00d6:
-callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
 M00000028_IL_00db:
-M00000028_IL_00dc:
-br M00000028_IL_00f8
-M00000028_IL_00e2:
-M00000028_IL_00e3:
 ldarg 0
-M00000028_IL_00e4:
-ldstr "Request send failed"
+M00000028_IL_00dc:
+ldfld System.Web.Http.HttpExchange::sent
+M00000028_IL_00e1:
+ldloc local2
+M00000028_IL_00e2:
+add
+M00000028_IL_00e3:
+stfld System.Web.Http.HttpExchange::sent
+M00000028_IL_00e8:
+ldarg 0
 M00000028_IL_00e9:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
+callvirt instance System.Web.Http.HttpExchange::SendNext()
 M00000028_IL_00ee:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
-M00000028_IL_00f3:
-callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
-M00000028_IL_00f8:
-M00000028_IL_00f9:
-M00000028_IL_00fa:
+br M00000028_IL_010a
+M00000028_IL_00f4:
+M00000028_IL_00f5:
+ldarg 0
+M00000028_IL_00f6:
+ldstr "Send made no progress"
 M00000028_IL_00fb:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
+M00000028_IL_0100:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
+M00000028_IL_0105:
+callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
+M00000028_IL_010a:
+M00000028_IL_010b:
+br M00000028_IL_0127
+M00000028_IL_0111:
+M00000028_IL_0112:
+ldarg 0
+M00000028_IL_0113:
+ldstr "Request send failed"
+M00000028_IL_0118:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
+M00000028_IL_011d:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
+M00000028_IL_0122:
+callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
+M00000028_IL_0127:
+M00000028_IL_0128:
+M00000028_IL_0129:
+M00000028_IL_012a:
 ret
 .end
 .method private instance ReceiveNext() -> noresult
@@ -5450,81 +5593,112 @@ M00000029_IL_0001:
 M00000029_IL_0002:
 ldarg 0
 M00000029_IL_0003:
-ldfld System.Web.Http.HttpExchange::socket
+ldfld System.Web.Http.HttpExchange::deadline
 M00000029_IL_0008:
-stloc local2
-M00000029_IL_0009:
-ldloca local2
-M00000029_IL_000b:
-ldloca local3
+call neoCLR.Runtime.SocketDeadlineExpired(Int64)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000029_IL_000d:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion39(System.Option<System.Networking.Sockets.Socket>&,System.Option.Some<System.Networking.Sockets.Socket>&)
+brtrue M00000029_IL_0017
 M00000029_IL_0012:
-brfalse M00000029_IL_003e
+br M00000029_IL_002f
 M00000029_IL_0017:
-ldloc local3
 M00000029_IL_0018:
-stloc local4
-M00000029_IL_001a:
-ldloca local4
-M00000029_IL_001c:
-ldloca local5
+ldarg 0
+M00000029_IL_0019:
+ldstr "Request deadline exceeded"
 M00000029_IL_001e:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion40(System.Option.Some<System.Networking.Sockets.Socket>&,System.Networking.Sockets.Socket&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
 M00000029_IL_0023:
-ldloc local5
-M00000029_IL_0025:
-stloc local0
-M00000029_IL_0026:
-ldc.i4 1
-M00000029_IL_0027:
-br M00000029_IL_002d
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
+M00000029_IL_0028:
+callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
 M00000029_IL_002d:
-brfalse M00000029_IL_003e
+M00000029_IL_002e:
+ret
+M00000029_IL_002f:
+M00000029_IL_0030:
+M00000029_IL_0031:
+ldarg 0
 M00000029_IL_0032:
-M00000029_IL_0033:
-br M00000029_IL_0043
-M00000029_IL_003e:
-br M00000029_IL_007c
-M00000029_IL_0043:
-M00000029_IL_0044:
-ldloc local0
-M00000029_IL_0045:
-ldarg 0
+ldfld System.Web.Http.HttpExchange::socket
+M00000029_IL_0037:
+stloc local2
+M00000029_IL_0038:
+ldloca local2
+M00000029_IL_003a:
+ldloca local3
+M00000029_IL_003c:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion39(System.Option<System.Networking.Sockets.Socket>&,System.Option.Some<System.Networking.Sockets.Socket>&)
+M00000029_IL_0041:
+brfalse M00000029_IL_006d
 M00000029_IL_0046:
-ldfld System.Web.Http.HttpExchange::buffer
+ldloc local3
+M00000029_IL_0047:
+stloc local4
+M00000029_IL_0049:
+ldloca local4
 M00000029_IL_004b:
-ldc.i4 0
-M00000029_IL_004c:
-ldc.i4 256
-M00000029_IL_0051:
-call instance System.Networking.Sockets.Socket::Receive(arrayref<Byte>,Int32,Int32)
+ldloca local5
+M00000029_IL_004d:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion40(System.Option.Some<System.Networking.Sockets.Socket>&,System.Networking.Sockets.Socket&)
+M00000029_IL_0052:
+ldloc local5
+M00000029_IL_0054:
+stloc local0
+M00000029_IL_0055:
+ldc.i4 1
 M00000029_IL_0056:
-stloc local1
-M00000029_IL_0057:
-M00000029_IL_0058:
-ldarg 0
-M00000029_IL_0059:
-ldloc local1
-M00000029_IL_005a:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion53(System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>)
-M00000029_IL_005f:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion54(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>)
-M00000029_IL_0064:
-stfld System.Web.Http.HttpExchange::transfer
-M00000029_IL_0069:
-M00000029_IL_006a:
-ldloc local1
-M00000029_IL_006b:
-ldarg 0
-M00000029_IL_006c:
+br M00000029_IL_005c
+M00000029_IL_005c:
+brfalse M00000029_IL_006d
+M00000029_IL_0061:
+M00000029_IL_0062:
+br M00000029_IL_0072
+M00000029_IL_006d:
+br M00000029_IL_00b1
 M00000029_IL_0072:
+M00000029_IL_0073:
+ldloc local0
+M00000029_IL_0074:
+ldarg 0
+M00000029_IL_0075:
+ldfld System.Web.Http.HttpExchange::buffer
+M00000029_IL_007a:
+ldc.i4 0
+M00000029_IL_007b:
+ldc.i4 256
+M00000029_IL_0080:
+ldarg 0
+M00000029_IL_0081:
+ldfld System.Web.Http.HttpExchange::deadline
+M00000029_IL_0086:
+call instance System.Networking.Sockets.Socket::ReceiveUntil(arrayref<Byte>,Int32,Int32,Int64)
+M00000029_IL_008b:
+stloc local1
+M00000029_IL_008c:
+M00000029_IL_008d:
+ldarg 0
+M00000029_IL_008e:
+ldloc local1
+M00000029_IL_008f:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion53(System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>)
+M00000029_IL_0094:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion54(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>)
+M00000029_IL_0099:
+stfld System.Web.Http.HttpExchange::transfer
+M00000029_IL_009e:
+M00000029_IL_009f:
+ldloc local1
+M00000029_IL_00a0:
+ldarg 0
+M00000029_IL_00a1:
+M00000029_IL_00a7:
 delegate.bind System.Func<Void> = instance System.Web.Http.HttpExchange::DelegateTarget_Application_V1_M_363A6D6574686F643131313A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A4874747045786368616E676531303A4F6E5265636569766564343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
-M00000029_IL_0077:
+M00000029_IL_00ac:
 call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::OnCompleted(System.Func<Void>)
-M00000029_IL_007c:
-M00000029_IL_007d:
-M00000029_IL_007e:
+M00000029_IL_00b1:
+M00000029_IL_00b2:
+M00000029_IL_00b3:
 ret
 .end
 .method private instance OnReceived() -> noresult
@@ -5600,7 +5774,7 @@ M0000002a_IL_0034:
 M0000002a_IL_0035:
 br M0000002a_IL_0045
 M0000002a_IL_0040:
-br M0000002a_IL_01ba
+br M0000002a_IL_01e9
 M0000002a_IL_0045:
 M0000002a_IL_0046:
 ldloc local0
@@ -5618,235 +5792,262 @@ M0000002a_IL_0058:
 stfld System.Web.Http.HttpExchange::transfer
 M0000002a_IL_005d:
 M0000002a_IL_005e:
-ldloc local1
+ldarg 0
 M0000002a_IL_005f:
-stloc local10
-M0000002a_IL_0061:
-ldloca local10
-M0000002a_IL_0063:
-ldloca local11
-M0000002a_IL_0065:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion57(System.Result<Int32,System.Networking.Sockets.SocketError>&,System.Result.Ok<Int32>&)
-M0000002a_IL_006a:
-brfalse M0000002a_IL_0097
-M0000002a_IL_006f:
-ldloc local11
-M0000002a_IL_0071:
-stloc local12
+ldfld System.Web.Http.HttpExchange::deadline
+M0000002a_IL_0064:
+call neoCLR.Runtime.SocketDeadlineExpired(Int64)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
+M0000002a_IL_0069:
+brtrue M0000002a_IL_0073
+M0000002a_IL_006e:
+br M0000002a_IL_008b
 M0000002a_IL_0073:
-ldloca local12
+M0000002a_IL_0074:
+ldarg 0
 M0000002a_IL_0075:
-ldloca local13
-M0000002a_IL_0077:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion58(System.Result.Ok<Int32>&,Int32&)
-M0000002a_IL_007c:
-ldloc local13
-M0000002a_IL_007e:
-stloc local2
+ldstr "Request deadline exceeded"
+M0000002a_IL_007a:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
 M0000002a_IL_007f:
-ldc.i4 1
-M0000002a_IL_0080:
-br M0000002a_IL_0086
-M0000002a_IL_0086:
-brfalse M0000002a_IL_0097
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
+M0000002a_IL_0084:
+callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
+M0000002a_IL_0089:
+M0000002a_IL_008a:
+ret
 M0000002a_IL_008b:
 M0000002a_IL_008c:
-br M0000002a_IL_009c
-M0000002a_IL_0097:
-br M0000002a_IL_01a3
-M0000002a_IL_009c:
-M0000002a_IL_009d:
-ldloc local2
+M0000002a_IL_008d:
+ldloc local1
+M0000002a_IL_008e:
+stloc local10
+M0000002a_IL_0090:
+ldloca local10
+M0000002a_IL_0092:
+ldloca local11
+M0000002a_IL_0094:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion57(System.Result<Int32,System.Networking.Sockets.SocketError>&,System.Result.Ok<Int32>&)
+M0000002a_IL_0099:
+brfalse M0000002a_IL_00c6
 M0000002a_IL_009e:
-ldc.i4 0
-M0000002a_IL_009f:
-ceq
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M0000002a_IL_00a1:
-brtrue M0000002a_IL_00ab
+ldloc local11
+M0000002a_IL_00a0:
+stloc local12
+M0000002a_IL_00a2:
+ldloca local12
+M0000002a_IL_00a4:
+ldloca local13
 M0000002a_IL_00a6:
-br M0000002a_IL_00c3
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion58(System.Result.Ok<Int32>&,Int32&)
 M0000002a_IL_00ab:
-M0000002a_IL_00ac:
-ldarg 0
+ldloc local13
 M0000002a_IL_00ad:
-ldstr "EOF before complete response"
-M0000002a_IL_00b2:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
-M0000002a_IL_00b7:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
-M0000002a_IL_00bc:
-callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
-M0000002a_IL_00c1:
-M0000002a_IL_00c2:
-ret
-M0000002a_IL_00c3:
-M0000002a_IL_00c4:
-M0000002a_IL_00c5:
-ldc.i4 0
+stloc local2
+M0000002a_IL_00ae:
+ldc.i4 1
+M0000002a_IL_00af:
+br M0000002a_IL_00b5
+M0000002a_IL_00b5:
+brfalse M0000002a_IL_00c6
+M0000002a_IL_00ba:
+M0000002a_IL_00bb:
+br M0000002a_IL_00cb
 M0000002a_IL_00c6:
-stloc local3
-M0000002a_IL_00c7:
-M0000002a_IL_00c8:
-M0000002a_IL_00c9:
-ldloc local3
-M0000002a_IL_00ca:
-ldloc local2
+br M0000002a_IL_01d2
 M0000002a_IL_00cb:
-clt
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
+M0000002a_IL_00cc:
+ldloc local2
 M0000002a_IL_00cd:
-brfalse M0000002a_IL_00e5
-M0000002a_IL_00d2:
-ldarg 0
-M0000002a_IL_00d3:
-ldfld System.Web.Http.HttpExchange::decoder
-M0000002a_IL_00d8:
-callvirt instance System.Web.Http.HttpResponseDecoder::get_Complete()
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M0000002a_IL_00dd:
 ldc.i4 0
-M0000002a_IL_00de:
+M0000002a_IL_00ce:
 ceq
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M0000002a_IL_00e0:
-br M0000002a_IL_00e6
-M0000002a_IL_00e5:
-ldc.i4 0
+M0000002a_IL_00d0:
+brtrue M0000002a_IL_00da
+M0000002a_IL_00d5:
+br M0000002a_IL_00f2
+M0000002a_IL_00da:
+M0000002a_IL_00db:
+ldarg 0
+M0000002a_IL_00dc:
+ldstr "EOF before complete response"
+M0000002a_IL_00e1:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
 M0000002a_IL_00e6:
-brtrue M0000002a_IL_00f0
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
 M0000002a_IL_00eb:
-br M0000002a_IL_0167
+callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
 M0000002a_IL_00f0:
 M0000002a_IL_00f1:
-ldarg 0
-M0000002a_IL_00f2:
-ldfld System.Web.Http.HttpExchange::decoder
-M0000002a_IL_00f7:
-ldarg 0
-M0000002a_IL_00f8:
-ldfld System.Web.Http.HttpExchange::buffer
-M0000002a_IL_00fd:
-ldloc local3
-M0000002a_IL_00fe:
-ldelem Byte
-M0000002a_IL_00ff:
-callvirt instance System.Web.Http.HttpResponseDecoder::Push(Byte)
-M0000002a_IL_0104:
-stloc local4
-M0000002a_IL_0106:
-M0000002a_IL_0107:
-ldloc local4
-M0000002a_IL_0109:
-stloc local14
-M0000002a_IL_010b:
-ldloca local14
-M0000002a_IL_010d:
-ldloca local15
-M0000002a_IL_010f:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion20(System.Result<Boolean,String>&,System.Result.Error<String>&)
-M0000002a_IL_0114:
-brfalse M0000002a_IL_0142
-M0000002a_IL_0119:
-ldloc local15
-M0000002a_IL_011b:
-stloc local16
-M0000002a_IL_011d:
-ldloca local16
-M0000002a_IL_011f:
-ldloca local17
-M0000002a_IL_0121:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion3(System.Result.Error<String>&,String&)
-M0000002a_IL_0126:
-ldloc local17
-M0000002a_IL_0128:
-stloc local5
-M0000002a_IL_012a:
-ldc.i4 1
-M0000002a_IL_012b:
-br M0000002a_IL_0131
-M0000002a_IL_0131:
-brfalse M0000002a_IL_0142
-M0000002a_IL_0136:
-M0000002a_IL_0137:
-br M0000002a_IL_0147
-M0000002a_IL_0142:
-br M0000002a_IL_015c
-M0000002a_IL_0147:
-M0000002a_IL_0148:
-ldarg 0
-M0000002a_IL_0149:
-ldloc local5
-M0000002a_IL_014b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
-M0000002a_IL_0150:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
-M0000002a_IL_0155:
-callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
-M0000002a_IL_015a:
-M0000002a_IL_015b:
 ret
-M0000002a_IL_015c:
-M0000002a_IL_015d:
-M0000002a_IL_015e:
-ldloc local3
-M0000002a_IL_015f:
-ldc.i4 1
-M0000002a_IL_0160:
-add
-M0000002a_IL_0161:
+M0000002a_IL_00f2:
+M0000002a_IL_00f3:
+M0000002a_IL_00f4:
+ldc.i4 0
+M0000002a_IL_00f5:
 stloc local3
-M0000002a_IL_0162:
-br M0000002a_IL_00c8
-M0000002a_IL_0167:
-M0000002a_IL_0168:
-M0000002a_IL_0169:
+M0000002a_IL_00f6:
+M0000002a_IL_00f7:
+M0000002a_IL_00f8:
+ldloc local3
+M0000002a_IL_00f9:
+ldloc local2
+M0000002a_IL_00fa:
+clt
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
+M0000002a_IL_00fc:
+brfalse M0000002a_IL_0114
+M0000002a_IL_0101:
 ldarg 0
-M0000002a_IL_016a:
+M0000002a_IL_0102:
 ldfld System.Web.Http.HttpExchange::decoder
-M0000002a_IL_016f:
+M0000002a_IL_0107:
 callvirt instance System.Web.Http.HttpResponseDecoder::get_Complete()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M0000002a_IL_0174:
-brtrue M0000002a_IL_017e
-M0000002a_IL_0179:
-br M0000002a_IL_0195
-M0000002a_IL_017e:
-M0000002a_IL_017f:
+M0000002a_IL_010c:
+ldc.i4 0
+M0000002a_IL_010d:
+ceq
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
+M0000002a_IL_010f:
+br M0000002a_IL_0115
+M0000002a_IL_0114:
+ldc.i4 0
+M0000002a_IL_0115:
+brtrue M0000002a_IL_011f
+M0000002a_IL_011a:
+br M0000002a_IL_0196
+M0000002a_IL_011f:
+M0000002a_IL_0120:
 ldarg 0
-M0000002a_IL_0180:
-ldarg 0
-M0000002a_IL_0181:
+M0000002a_IL_0121:
 ldfld System.Web.Http.HttpExchange::decoder
-M0000002a_IL_0186:
-callvirt instance System.Web.Http.HttpResponseDecoder::Finish()
-M0000002a_IL_018b:
-callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
-M0000002a_IL_0190:
-br M0000002a_IL_019c
-M0000002a_IL_0195:
-M0000002a_IL_0196:
+M0000002a_IL_0126:
 ldarg 0
-M0000002a_IL_0197:
-callvirt instance System.Web.Http.HttpExchange::ReceiveNext()
-M0000002a_IL_019c:
-M0000002a_IL_019d:
-br M0000002a_IL_01b9
-M0000002a_IL_01a3:
-M0000002a_IL_01a4:
+M0000002a_IL_0127:
+ldfld System.Web.Http.HttpExchange::buffer
+M0000002a_IL_012c:
+ldloc local3
+M0000002a_IL_012d:
+ldelem Byte
+M0000002a_IL_012e:
+callvirt instance System.Web.Http.HttpResponseDecoder::Push(Byte)
+M0000002a_IL_0133:
+stloc local4
+M0000002a_IL_0135:
+M0000002a_IL_0136:
+ldloc local4
+M0000002a_IL_0138:
+stloc local14
+M0000002a_IL_013a:
+ldloca local14
+M0000002a_IL_013c:
+ldloca local15
+M0000002a_IL_013e:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion20(System.Result<Boolean,String>&,System.Result.Error<String>&)
+M0000002a_IL_0143:
+brfalse M0000002a_IL_0171
+M0000002a_IL_0148:
+ldloc local15
+M0000002a_IL_014a:
+stloc local16
+M0000002a_IL_014c:
+ldloca local16
+M0000002a_IL_014e:
+ldloca local17
+M0000002a_IL_0150:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion3(System.Result.Error<String>&,String&)
+M0000002a_IL_0155:
+ldloc local17
+M0000002a_IL_0157:
+stloc local5
+M0000002a_IL_0159:
+ldc.i4 1
+M0000002a_IL_015a:
+br M0000002a_IL_0160
+M0000002a_IL_0160:
+brfalse M0000002a_IL_0171
+M0000002a_IL_0165:
+M0000002a_IL_0166:
+br M0000002a_IL_0176
+M0000002a_IL_0171:
+br M0000002a_IL_018b
+M0000002a_IL_0176:
+M0000002a_IL_0177:
 ldarg 0
-M0000002a_IL_01a5:
-ldstr "Response receive failed"
-M0000002a_IL_01aa:
+M0000002a_IL_0178:
+ldloc local5
+M0000002a_IL_017a:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
-M0000002a_IL_01af:
+M0000002a_IL_017f:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
-M0000002a_IL_01b4:
+M0000002a_IL_0184:
 callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
-M0000002a_IL_01b9:
+M0000002a_IL_0189:
+M0000002a_IL_018a:
+ret
+M0000002a_IL_018b:
+M0000002a_IL_018c:
+M0000002a_IL_018d:
+ldloc local3
+M0000002a_IL_018e:
+ldc.i4 1
+M0000002a_IL_018f:
+add
+M0000002a_IL_0190:
+stloc local3
+M0000002a_IL_0191:
+br M0000002a_IL_00f7
+M0000002a_IL_0196:
+M0000002a_IL_0197:
+M0000002a_IL_0198:
+ldarg 0
+M0000002a_IL_0199:
+ldfld System.Web.Http.HttpExchange::decoder
+M0000002a_IL_019e:
+callvirt instance System.Web.Http.HttpResponseDecoder::get_Complete()
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
+M0000002a_IL_01a3:
+brtrue M0000002a_IL_01ad
+M0000002a_IL_01a8:
+br M0000002a_IL_01c4
+M0000002a_IL_01ad:
+M0000002a_IL_01ae:
+ldarg 0
+M0000002a_IL_01af:
+ldarg 0
+M0000002a_IL_01b0:
+ldfld System.Web.Http.HttpExchange::decoder
+M0000002a_IL_01b5:
+callvirt instance System.Web.Http.HttpResponseDecoder::Finish()
 M0000002a_IL_01ba:
-M0000002a_IL_01bb:
-M0000002a_IL_01bc:
+callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
+M0000002a_IL_01bf:
+br M0000002a_IL_01cb
+M0000002a_IL_01c4:
+M0000002a_IL_01c5:
+ldarg 0
+M0000002a_IL_01c6:
+callvirt instance System.Web.Http.HttpExchange::ReceiveNext()
+M0000002a_IL_01cb:
+M0000002a_IL_01cc:
+br M0000002a_IL_01e8
+M0000002a_IL_01d2:
+M0000002a_IL_01d3:
+ldarg 0
+M0000002a_IL_01d4:
+ldstr "Response receive failed"
+M0000002a_IL_01d9:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
+M0000002a_IL_01de:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
+M0000002a_IL_01e3:
+callvirt instance System.Web.Http.HttpExchange::Finish(System.Result<System.Web.Http.HttpResponse,String>)
+M0000002a_IL_01e8:
+M0000002a_IL_01e9:
+M0000002a_IL_01ea:
+M0000002a_IL_01eb:
 ret
 .end
 .method instance DelegateTarget_Application_V1_M_363A6D6574686F643131313A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A4874747045786368616E6765383A4F6E4C6F6F6B7570343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect() -> Void

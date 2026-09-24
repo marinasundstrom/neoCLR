@@ -144,3 +144,8 @@ settles its waiting accept as Closed; an already committed accepted connection s
 open independently. Send/Receive on a listener and Accept on a connected socket
 return InvalidOperation. Listener teardown closes remaining native resources.
 No public accept deadline or individual cancellation API is provided yet.
+
+The default HTTP socket handler now supplies a shared 15-second exchange deadline
+through private lookup/connect/transfer paths. Each native operation uses the earlier
+of that deadline and its phase bound. Public Socket calls still use the independent
+bounds above; this adds no Socket timeout overload or cancellation token.

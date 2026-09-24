@@ -1,7 +1,8 @@
 # One budget across native I/O phases
 
 Development checkpoint, 2026-09-24. This is a native ownership probe, not a new Raven
-HTTP capability. The public HTTP samples still have separate five-second operations.
+HTTP capability. The subsequent HTTP bridge now uses this path with a 15-second exchange budget,
+retaining shorter phase bounds.
 
 The combined loopback case creates one absolute monotonic deadline, resolves a
 numeric loopback address, connects to a listener and receives the first byte of a
@@ -33,7 +34,6 @@ The combined success path uses only numeric loopback lookup and a local listener
 
 Local validation passes 32 socket tests and nine resolver tests. No platform adapter,
 managed signature, compiler reference or runtime service ABI changed. This is the
-native part of the next integration slice. The private Raven bridge must still carry
-the same deadline across its pending Tasks, preserve it through cleanup and enforce
-it before reporting HTTP success. Accept waiting and application handler cancellation
+native foundation used by the subsequent Raven HTTP integration, which carries the
+same deadline across its pending Tasks and checks expiry before reporting success. Accept waiting and application handler cancellation
 need separate ownership decisions. No public Timeout/Deadline type is selected.

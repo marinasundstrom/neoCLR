@@ -2773,14 +2773,21 @@ fn interpret_instructions(
                             };
                             Value::String(interned.intern(text.clone()).map_err(|e| e.fault())?)
                         } else if let crate::native::Binding::Resolve(operation) = binding {
-                            if matches!(operation, crate::name_resolution::Operation::Lookup) && default_task_queue.is_none() {
+                            if matches!(operation, crate::name_resolution::Operation::Lookup | crate::name_resolution::Operation::LookupUntil) && default_task_queue.is_none() {
                                 return Err(Fault::new("Resolver completion requires the default TaskQueue"));
                             }
                             scheduler.resolver.invoke(operation, &args)?
                         } else if let crate::native::Binding::Socket(operation) = binding {
                             if matches!(
                                 operation,
-                                crate::socket_io::Operation::Accept | crate::socket_io::Operation::Connect | crate::socket_io::Operation::ConnectAddresses | crate::socket_io::Operation::Receive | crate::socket_io::Operation::Send
+                                crate::socket_io::Operation::ConnectAddressesUntil
+                                | crate::socket_io::Operation::ReceiveUntil
+                                | crate::socket_io::Operation::SendUntil
+                                | crate::socket_io::Operation::Accept
+                                | crate::socket_io::Operation::Connect
+                                | crate::socket_io::Operation::ConnectAddresses
+                                | crate::socket_io::Operation::Receive
+                                | crate::socket_io::Operation::Send
                             ) && default_task_queue.is_none() {
                                 return Err(Fault::new("Socket completion requires the default TaskQueue"));
                             }

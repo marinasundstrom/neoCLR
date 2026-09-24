@@ -28,3 +28,18 @@
 .function neoCLR.Runtime.SocketConnectAddresses(arrayref<String> addresses,Int32 port,System.Func<Void> callback) -> Value
 .methodimpl InternalCall
 .end
+.function neoCLR.Runtime.SocketDeadlineAfter(Int32 milliseconds) -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketDeadlineExpired(Int64 deadline) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketConnectAddressesUntil(arrayref<String> addresses,Int32 port,Int64 deadline,System.Func<Void> callback) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketReceiveUntil(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline,System.Func<Void> callback) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketSendUntil(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline,System.Func<Void> callback) -> Value
+.methodimpl InternalCall
+.end

@@ -23,6 +23,7 @@ pub(crate) struct OperationId(u64);
 #[derive(Clone, Copy)]
 pub(crate) enum Operation {
     Lookup,
+    LookupUntil,
     Result,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -101,6 +102,11 @@ impl Resolver {
         args: &[Value],
     ) -> Result<Value, crate::Fault> {
         let result = match (operation, args) {
+            (Operation::LookupUntil, [Value::String(name), Value::Int64(stamp), callback]) => {
+                let until = crate::clock::network_deadline(*stamp)?;
+                self.submit_until(name, callback.clone(), Duration::from_secs(5), Some(until))
+                    .map(|id| Value::Int64(id.0 as i64))
+            }
             (Operation::Lookup, [Value::String(name), callback]) => self
                 .submit(name, callback.clone(), Duration::from_secs(5))
                 .map(|id| Value::Int64(id.0 as i64)),

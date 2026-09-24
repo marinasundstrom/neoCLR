@@ -84,6 +84,11 @@ struct Connect {
 }
 #[derive(Clone, Copy)]
 pub(crate) enum Operation {
+    DeadlineAfter,
+    DeadlineExpired,
+    ConnectAddressesUntil,
+    ReceiveUntil,
+    SendUntil,
     Listen,
     Accept,
     LocalPort,
@@ -380,6 +385,7 @@ impl Sockets {
         port: i32,
         callback: Value,
         heap: &ManagedHeap,
+        until: Option<Instant>,
     ) -> Result<OperationId, Error> {
         let Value::ObjectReference(object) = addresses else {
             return Err(Error::InvalidBuffer);
@@ -403,7 +409,7 @@ impl Sockets {
                 _ => Err(Error::InvalidAddress),
             })
             .collect::<Result<Vec<_>, _>>()?;
-        self.connect_addresses(&addresses, port, callback)
+        self.connect_addresses_until(&addresses, port, callback, until)
     }
 
     pub(crate) fn invoke(
@@ -412,7 +418,49 @@ impl Sockets {
         args: &[Value],
         heap: &ManagedHeap,
     ) -> Result<Value, Fault> {
+        match (operation, args) {
+            (Operation::DeadlineAfter, [Value::Int32(milliseconds)]) => {
+                return crate::clock::network_deadline_after(*milliseconds).map(Value::Int64);
+            }
+            (Operation::DeadlineExpired, [Value::Int64(stamp)]) => {
+                let deadline = crate::clock::network_deadline(*stamp)?;
+                return Ok(Value::Boolean(Instant::now() >= deadline));
+            }
+            _ => {}
+        }
         let result = match (operation, args) {
+            (
+                Operation::ConnectAddressesUntil,
+                [addresses, Value::Int32(port), Value::Int64(stamp), callback],
+            ) => {
+                let until = crate::clock::network_deadline(*stamp)?;
+                self.connect_array(addresses, *port, callback.clone(), heap, Some(until))
+                    .map(|id| Value::Int64(id.0 as i64))
+            }
+            (
+                Operation::ReceiveUntil | Operation::SendUntil,
+                [
+                    Value::Int64(socket),
+                    destination,
+                    Value::Int32(offset),
+                    Value::Int32(count),
+                    Value::Int64(stamp),
+                    callback,
+                ],
+            ) => {
+                let until = crate::clock::network_deadline(*stamp)?;
+                self.transfer_until(
+                    matches!(operation, Operation::SendUntil),
+                    SocketId(*socket as u64),
+                    heap,
+                    destination.clone(),
+                    *offset,
+                    *count,
+                    callback.clone(),
+                    Some(until),
+                )
+                .map(|id| Value::Int64(id.0 as i64))
+            }
             (
                 Operation::Listen,
                 [
@@ -430,7 +478,7 @@ impl Sockets {
                 self.local_port(SocketId(*socket as u64)).map(Value::Int32)
             }
             (Operation::ConnectAddresses, [addresses, Value::Int32(port), callback]) => self
-                .connect_array(addresses, *port, callback.clone(), heap)
+                .connect_array(addresses, *port, callback.clone(), heap, None)
                 .map(|id| Value::Int64(id.0 as i64)),
             (Operation::Connect, [Value::String(address), Value::Int32(port), callback]) => self
                 .connect(address, *port, callback.clone())

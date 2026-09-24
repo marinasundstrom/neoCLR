@@ -372,6 +372,7 @@ public class HttpSocketHandler : HttpHandler {
 // Private continuation adapter, replaceable when runtime suspension is available.
 // Each Send owns independent buffers, pending tasks and one socket.
 internal class HttpExchange {
+    private field deadline: long = 0
     private field request: HttpRequest
     private field source: Promise<Result<HttpResponse, string>>
     private field socket: Option<Socket>
@@ -404,7 +405,8 @@ internal class HttpExchange {
     }
 
     internal func Execute() -> Task<Result<HttpResponse, string>> {
-        let pending = Dns.GetHostAddresses(request.Host)
+        deadline = RuntimeServices.SocketDeadlineAfter(15000)
+        let pending = Dns.GetHostAddressesUntil(request.Host, deadline)
         lookup = Some(pending)
         pending.OnCompleted(self.OnLookup)
         return source.Task
@@ -418,15 +420,23 @@ internal class HttpExchange {
         lookup = None()
         connecting = None()
         transfer = None()
-        _ = source.Complete(result)
+        if RuntimeServices.SocketDeadlineExpired(deadline) {
+            _ = source.Complete(Error("Request deadline exceeded"))
+        } else {
+            _ = source.Complete(result)
+        }
     }
 
     private func OnLookup() {
         if let Some(pending) = lookup {
             let result = pending.GetResult()
             lookup = None()
+            if RuntimeServices.SocketDeadlineExpired(deadline) {
+                Finish(Error("Request deadline exceeded"))
+                return
+            }
             if let Ok(addresses) = result {
-                let next = Socket.Connect(addresses, request.Port)
+                let next = Socket.ConnectUntil(addresses, request.Port, deadline)
                 connecting = Some(next)
                 next.OnCompleted(self.OnConnected)
             } else {
@@ -449,6 +459,10 @@ internal class HttpExchange {
     }
 
     private func SendNext() {
+        if RuntimeServices.SocketDeadlineExpired(deadline) {
+            Finish(Error("Request deadline exceeded"))
+            return
+        }
         if let Some(connection) = socket {
             if sent == outgoing.Count {
                 ReceiveNext()
@@ -459,7 +473,7 @@ internal class HttpExchange {
                 buffer[count] = outgoing[sent + count]
                 count += 1
             }
-            let pending = connection.Send(buffer, 0, count)
+            let pending = connection.SendUntil(buffer, 0, count, deadline)
             transfer = Some(pending)
             pending.OnCompleted(self.OnSent)
         }
@@ -469,6 +483,10 @@ internal class HttpExchange {
         if let Some(pending) = transfer {
             let result = pending.GetResult()
             transfer = None()
+            if RuntimeServices.SocketDeadlineExpired(deadline) {
+                Finish(Error("Request deadline exceeded"))
+                return
+            }
             if let Ok(count) = result {
                 if count > 0 {
                     sent += count
@@ -483,8 +501,12 @@ internal class HttpExchange {
     }
 
     private func ReceiveNext() {
+        if RuntimeServices.SocketDeadlineExpired(deadline) {
+            Finish(Error("Request deadline exceeded"))
+            return
+        }
         if let Some(connection) = socket {
-            let pending = connection.Receive(buffer, 0, 256)
+            let pending = connection.ReceiveUntil(buffer, 0, 256, deadline)
             transfer = Some(pending)
             pending.OnCompleted(self.OnReceived)
         }
@@ -494,6 +516,10 @@ internal class HttpExchange {
         if let Some(pending) = transfer {
             let result = pending.GetResult()
             transfer = None()
+            if RuntimeServices.SocketDeadlineExpired(deadline) {
+                Finish(Error("Request deadline exceeded"))
+                return
+            }
             if let Ok(count) = result {
                 if count == 0 {
                     Finish(Error("EOF before complete response"))

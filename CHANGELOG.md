@@ -11,8 +11,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Add private absolute-deadline submission paths for resolver, address fallback and
   socket transfers. Preserve the shorter phase bound, reject expired work before
   native admission and prevent short progress from renewing a shared budget. Add a
-  native loopback lookup/connect/body probe and deterministic ownership tests. Raven
-  HTTP integration remains pending; no public API or service ABI changed.
+  native loopback lookup/connect/body probe and deterministic ownership tests. Wire
+  HttpSocketHandler to a provisional 15-second exchange budget, with late-success
+  cleanup and trickling-peer checks. Public signatures remain unchanged; new private
+  deadline services require matching runtime/reference/bridge/library artifacts.
+  Keep Until helpers internal in application references, with bootstrap-only access
+  and explicit library-import checks. Custom pipeline/server handler work is not bounded.
 
 - Bound each pending nonempty socket Send/Receive to a provisional five seconds from
   native admission. Timeout releases transfer storage and returns TimedOut without

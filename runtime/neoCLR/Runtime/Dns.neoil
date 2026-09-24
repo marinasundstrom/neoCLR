@@ -9,3 +9,6 @@ ldarg payload
 value.unpack String[]
 ret
 .end
+.function neoCLR.Runtime.DnsLookupUntil(String hostName,Int64 deadline,System.Func<Void> callback) -> Value
+.methodimpl InternalCall
+.end

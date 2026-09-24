@@ -3,11 +3,11 @@
   "owner": "System.IO.TextWriter",
   "inputs": {
     "runtime/raven/src/System/Web/Http/HttpServer.rvn": "e64d5b8a6d4a3dc5f5dd8df7d6a551deededd6f5da8d9bad32ff6d4b5b02b563",
-    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "211ed92b2a38242973843b7e15da62bcc692ae5f7e0f7d50f95fc2d574a345bc",
+    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "859dc96f2458c3359922d5a8cd596809edc1669946cfcc886788fcc39e22c9c6",
     "runtime/raven/src/System/Networking/DnsError.rvn": "652823f199e6d95b14518917d27306ac83c97d7bac1ee2f62578bb224b3b1d3c",
-    "runtime/raven/src/System/Networking/Dns.rvn": "d64bfe87d3ed679bf3fbb26efe9b86fcc6e832358319c4ff23d46c7d3a55ba21",
+    "runtime/raven/src/System/Networking/Dns.rvn": "59a6602715d4965feb78ed97327df0b8ebbaf1e4a04eecc074c2e57f14bdebb7",
     "runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "908aedf618e5cc664268b2769910543c60bc5fe00642b687e6f6e4af9333adc9",
-    "runtime/raven/src/System/Networking/Sockets/Socket.rvn": "4085552ccb184d82c0218102a515df7971e0052a43c062e2dbae36a0df208cce",
+    "runtime/raven/src/System/Networking/Sockets/Socket.rvn": "24108b0b3e6003fda27588211303df99618d58ce6c9c1ee5d70be446bc75866a",
     "runtime/raven/src/System/IO/TextReadError.rvn": "bd5cc31983f8aaa1b7e4a68fe63d06e45166e8a3c0c9537673a1ebab09d3659c",
     "runtime/raven/src/System/IO/TextReader.rvn": "6f9f6159741cec9acaded9e5b2705d3c1beaac4fa3fbb1be8a2146f18f575ce0",
     "runtime/raven/src/System/IO/TextWriter.rvn": "ee053d0893f533207e580eba37509aca9284dd0c37d13dff1941a2485b506fec",
@@ -119,7 +119,7 @@
     "TextWriter.helpers.neoil": "755a1bde34aced625ffa856f2dc7b1821e32fa34ec5546b3ffd3bfbc1c518738"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "8574b548ff16a542a2c7b26e3b0b720ecf73d890c629f2936f6560466978ebff",
+  "coreSha256": "c8dde6955c0e0a90cbe7b140ccab0914b418f4c91a37978d68e6085a3d3ef320",
   "exports": [
     "Write(String text) -> System.Result<Int32,System.IO.StreamError>",
     "WriteLine(String text) -> System.Result<Int32,System.IO.StreamError>",

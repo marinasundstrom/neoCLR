@@ -60,7 +60,7 @@ static class CoreDeclarations
                     info.Methods.Add(factory);
                 }
             }
-            if (collectionProbe) { IntrospectionHierarchy.Project(module); TaskBindings.Project(module); WorkerBindings.Project(module); SocketBindings.Project(module); HttpBindings.Project(module); ReaderBindings.Project(module); }
+            if (collectionProbe) { IntrospectionHierarchy.Project(module); TaskBindings.Project(module); WorkerBindings.Project(module); SocketBindings.Project(module, libraryBootstrap); HttpBindings.Project(module); ReaderBindings.Project(module); }
             StorageHierarchy.Project(module);
             NamespaceFunctions.ProjectMath(module);
             NamespaceFunctions.ProjectFault(module);

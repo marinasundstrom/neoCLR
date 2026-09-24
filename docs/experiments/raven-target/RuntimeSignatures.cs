@@ -62,11 +62,11 @@ static class RuntimeSignatures
     }
 
     public static (string[] Args, string Result) Match(MethodReference reference, MethodDefinition definition,
-        Func<TypeReference, string?> catalog, bool pointers = false, bool allowOpenMethodParameters = false)
+        Func<TypeReference, string?> catalog, bool pointers = false, bool allowOpenMethodParameters = false, bool allowInternal = false)
     {
         var method = reference as GenericInstanceMethod;
         var convention = method is null ? MethodCallingConvention.Default : MethodCallingConvention.Generic;
-        if (!definition.IsPublic || reference.Name != definition.Name || reference.ExplicitThis || definition.ExplicitThis
+        if ((!definition.IsPublic && !(allowInternal && definition.IsAssembly)) || reference.Name != definition.Name || reference.ExplicitThis || definition.ExplicitThis
             || reference.HasGenericParameters || definition.GenericParameters.Count != (method?.GenericArguments.Count ?? 0)
             || reference.CallingConvention != convention || definition.CallingConvention != convention
             || reference.HasThis != definition.HasThis

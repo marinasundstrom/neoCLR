@@ -93,3 +93,43 @@ mod tests {
         assert!(components(Utc.with_ymd_and_hms(10000, 1, 1, 0, 0, 0).unwrap()).is_err());
     }
 }
+
+// Private network-budget stamps. Process-monotonic milliseconds, never wall time
+// or persisted metadata. No registry, timer thread or guest root is allocated.
+fn network_origin() -> std::time::Instant {
+    static ORIGIN: std::sync::OnceLock<std::time::Instant> = std::sync::OnceLock::new();
+    *ORIGIN.get_or_init(std::time::Instant::now)
+}
+pub(crate) fn network_deadline_after(milliseconds: i32) -> Result<i64, Fault> {
+    if !(1..=60_000).contains(&milliseconds) {
+        return Err(Fault::new("Invalid private network budget"));
+    }
+    let elapsed = network_origin().elapsed().as_nanos().div_ceil(1_000_000);
+    i64::try_from(elapsed + milliseconds as u128)
+        .map_err(|_| Fault::new("Network deadline overflow"))
+}
+pub(crate) fn network_deadline(stamp: i64) -> Result<std::time::Instant, Fault> {
+    let millis = u64::try_from(stamp).map_err(|_| Fault::new("Invalid network deadline"))?;
+    network_origin()
+        .checked_add(std::time::Duration::from_millis(millis))
+        .ok_or_else(|| Fault::new("Network deadline overflow"))
+}
+
+#[cfg(test)]
+mod network_budget_tests {
+    use super::*;
+    use std::time::{Duration, Instant};
+    #[test]
+    fn stamps_round_trip_monotonically_and_reject_invalid_budgets() {
+        let before = Instant::now();
+        let stamp = network_deadline_after(15000).unwrap();
+        let end = network_deadline(stamp).unwrap();
+        assert!(end >= before + Duration::from_secs(15));
+        assert!(end <= Instant::now() + Duration::from_millis(15001));
+        assert!(network_deadline(0).unwrap() <= Instant::now());
+        assert!(network_deadline(-1).is_err());
+        for invalid in [-1, 0, 60001] {
+            assert!(network_deadline_after(invalid).is_err());
+        }
+    }
+}

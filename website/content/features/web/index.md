@@ -93,20 +93,24 @@ fields, and bodies to 1,024 bytes. It rejects duplicate lengths, transfer encodi
 and content encodings. It does not implement chunking, TLS, redirects, pooling,
 streaming content or general HTTP status handling. Text always means strict UTF-8.
 
-DNS and connection attempts have separate bounds. Each nonempty socket transfer
-now has a five-second deadline; HTTP closes its connection when a transfer fails.
-A silent peer therefore ends with an error, but a trickling peer can keep completing
-short transfers. There is no whole-request deadline, accept deadline or bound on an
-application handler task yet. The verifier's watchdog is only a test guard.
+The socket handler now has a provisional 15-second exchange budget, starting before
+DNS lookup and ending with the buffered response. DNS, connection and transfers keep
+their shorter five-second bounds. Short progress does not renew the shared budget;
+expiry closes the connection and returns an error. This requires scheduler progress
+and does not preempt guest code. The limit is not configurable yet.
+
+Request construction, custom pipeline work outside the socket handler, server accept
+and server application-handler waiting are not covered by this exchange budget.
+The verifier's watchdog is only a test guard.
 The transport uses a 256-byte reusable buffer and handles short transfers. This
 is a correctness POC, not a performance benchmark. Generated async states still perform suspension.
 
 ## Direction
 
-The client/server greeting and JSON report are in place. Request lifetime/deadlines,
-a public JSON contract and broader request/response behavior remain open gates.
-The native I/O owners now have a tested shared-deadline path; connecting it through
-the private HTTP bridge is the next step. It is not yet an HTTP timeout feature. The System.Web.Http boundary
+The client/server greeting, JSON report and socket-backed client exchange budget are
+in place. Handler/server cancellation ownership, a public JSON contract and broader
+request/response behavior remain open gates. The fixed transport budget is a POC
+policy, not a complete HttpClient timeout configuration model. The System.Web.Http boundary
 separates HTTP policy from [networking](/features/networking/); a future transport
 could use sockets or a host facility. Handler ownership, concurrency, cancellation
 and a structured error model need concrete cases as these provisional APIs evolve. No complete HTTP stack or runtime suspension is claimed.

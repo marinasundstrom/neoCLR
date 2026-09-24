@@ -12,10 +12,12 @@ static class SocketBindings
     public const string Declarations = """
         namespace Networking {
             public sealed class Dns {
+                public static Tasks.Task<Result<Collections.Sequence<string>, DnsError>> GetHostAddressesUntil(string hostName, long deadline) => default;
                 public static Tasks.Task<Result<Collections.Sequence<string>, DnsError>> GetHostAddresses(string hostName) => default;
                 public static DnsError DecodeError(byte code) => default;
             }
             public sealed class DnsCompletion {
+                public void StartUntil(string hostName, long deadline) { }
                 public DnsCompletion(Tasks.Promise<Result<Collections.Sequence<string>, DnsError>> source) { }
                 public void Start(string hostName) { }
                 public void Complete() { }
@@ -23,6 +25,9 @@ static class SocketBindings
         }
         namespace Networking.Sockets {
             public sealed class Socket {
+                public static Tasks.Task<Result<Socket, SocketError>> ConnectUntil(Collections.Sequence<string> addresses, int port, long deadline) => default;
+                public Tasks.Task<Result<int, SocketError>> ReceiveUntil(byte[] buffer, int offset, int count, long deadline) => default;
+                public Tasks.Task<Result<int, SocketError>> SendUntil(byte[] buffer, int offset, int count, long deadline) => default;
                 public Socket(long handle) { }
                 public static Tasks.Task<Result<Socket, SocketError>> Connect(string address, int port) => default;
                 public static Tasks.Task<Result<Socket, SocketError>> Connect(Collections.Sequence<string> addresses, int port) => default;
@@ -35,6 +40,7 @@ static class SocketBindings
                 public static SocketError DecodeError(byte code) => default;
             }
             public sealed class SocketConnectCompletion {
+                public void StartAddressesUntil(Collections.Sequence<string> addresses, int port, long deadline) { }
                 public SocketConnectCompletion(Tasks.Promise<Result<Socket, SocketError>> source) { }
                 public void Start(string address, int port) { }
                 public void StartAddresses(Collections.Sequence<string> addresses, int port) { }
@@ -42,6 +48,8 @@ static class SocketBindings
                 public void Complete() { }
             }
             public sealed class SocketTransferCompletion {
+                public void StartReceiveUntil(long handle, byte[] buffer, int offset, int count, long deadline) { }
+                public void StartSendUntil(long handle, byte[] buffer, int offset, int count, long deadline) { }
                 public SocketTransferCompletion(Tasks.Promise<Result<int, SocketError>> source) { }
                 public void StartReceive(long handle, byte[] buffer, int offset, int count) { }
                 public void StartSend(long handle, byte[] buffer, int offset, int count) { }
@@ -49,21 +57,29 @@ static class SocketBindings
             }
         }
         """;
-    public static void Project(ModuleDefinition module) {
+    public static void Project(ModuleDefinition module, bool libraryBootstrap = false) {
         foreach (var type in module.Types.Where(t => IsName(t.FullName))) {
             if (IsProvider(type)) type.Attributes = (type.Attributes & ~TypeAttributes.VisibilityMask) | TypeAttributes.NotPublic;
-            foreach (var method in type.Methods.Where(m => IsProvider(type) || m.IsConstructor || m.Name == "DecodeError"))
-                method.Attributes = (method.Attributes & ~MethodAttributes.MemberAccessMask) | MethodAttributes.Assembly;
+            foreach (var method in type.Methods.Where(m => IsProvider(type) || m.IsConstructor || m.Name == "DecodeError" || m.Name.EndsWith("Until", StringComparison.Ordinal)))
+                method.Attributes = (method.Attributes & ~MethodAttributes.MemberAccessMask)
+                    | (libraryBootstrap && !IsProvider(type) && method.Name.EndsWith("Until", StringComparison.Ordinal)
+                        ? MethodAttributes.Public : MethodAttributes.Assembly);
         }
     }
     public static CollectionBindings.Binding? Bind(MethodReference reference, MethodDefinition definition, bool construct, bool library)
     {
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
-        var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
+        var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type, allowInternal: library);
         const string Error = Prefix + "SocketError";
         const string Socket = Prefix + "Socket";
         var expected = (owner, definition.Name) switch {
+            ("System.Networking.Dns", "GetHostAddressesUntil") when library => ("String,Int64", "System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>", true),
+            ("System.Networking.DnsCompletion", "StartUntil") when library => ("String,Int64", "noresult", false),
+            (Socket, "ConnectUntil") when library => ("System.Collections.Sequence<String>,Int32,Int64", $"System.Tasks.Task<System.Result<{Socket},{Error}>>", true),
+            (Socket, "ReceiveUntil" or "SendUntil") when library => ("arrayref<Byte>,Int32,Int32,Int64", $"System.Tasks.Task<System.Result<Int32,{Error}>>", false),
+            (Prefix + "SocketConnectCompletion", "StartAddressesUntil") when library => ("System.Collections.Sequence<String>,Int32,Int64", "noresult", false),
+            (Prefix + "SocketTransferCompletion", "StartReceiveUntil" or "StartSendUntil") when library => ("Int64,arrayref<Byte>,Int32,Int32,Int64", "noresult", false),
             ("System.Networking.Dns", "GetHostAddresses") => ("String", "System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>", true),
             ("System.Networking.Dns", "DecodeError") when library => ("Byte", "System.Networking.DnsError", true),
             ("System.Networking.DnsCompletion", ".ctor") when library => ("System.Tasks.Promise<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>", "noresult", false),
