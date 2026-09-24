@@ -14,10 +14,10 @@ args = parser.parse_args()
 bundle = args.toolchain_root.resolve()
 with tempfile.TemporaryDirectory(prefix='neoclr-records-') as folder:
     root = Path(folder)
-    for name in ('Main.rvn', 'Records.rvnproj', 'Nested.rvn', 'Nested.rvnproj'):
+    for name in ('Main.rvn', 'Records.rvnproj', 'Nested.rvn', 'Nested.rvnproj', 'Defaults.rvn', 'Defaults.rvnproj'):
         shutil.copyfile(HERE / name, root / name)
     env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(bundle / 'raven-sdk'))
-    for project, expected in [('Records.rvnproj', 'expected.txt'), ('Nested.rvnproj', 'nested-expected.txt')]:
+    for project, expected in [('Records.rvnproj', 'expected.txt'), ('Nested.rvnproj', 'nested-expected.txt'), ('Defaults.rvnproj', 'defaults-expected.txt')]:
         build = subprocess.run(['dotnet', 'msbuild', str(root / project), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=120)
         assert build.returncode == 0, build.stdout + build.stderr
         run = subprocess.run([str(bundle / 'bin/neoclr'), 'run', str(root / 'bin/neoclr/Debug/App.neoil'), '--system', str(bundle / 'lib/System.neoil')], capture_output=True, text=True, timeout=120)

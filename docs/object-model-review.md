@@ -456,3 +456,31 @@ and independent deconstruction copies. It is separate from the larger Records
 sample to remain within the unchanged importer method limit. Nullable struct
 components still report RAVT004. Syntax, semantic symbol shapes and editor grammar
 are unchanged; component properties remain ordinary typed properties.
+
+
+### Default reference components — 2026-09-24
+
+The next probe found that `default(Payload)` correctly contained null reference
+fields, but generated hashing passed its string to HashCode.Add(string), reaching
+Utf8Encode with null and raising RuntimeError. The runtime already had String null
+defaults (`tests/string_defaults.rs`); the gap belonged to configured record synthesis.
+
+Reuse the .NET comparison above and Raven's nullable type specification: annotations
+do not replace zero initialization with constructor calls. The pinned .NET baseline
+now has 30 assertions, including a non-nullable string field that is null in a default
+record struct and still supports equality/hash/display. neoCLR now guards generated
+string component equality, uses Add(int 0) for null hashes, and substitutes empty
+text only for display. Stored/deconstructed values remain null. Class-reference
+components already use corresponding guards. Returning empty strings from initialization
+would lose the distinction between null and empty; making all String APIs null-tolerant
+would expand unrelated contracts. This compiler adaptation needs no runtime opcode,
+layout change, new allocation contract or API signature change. HashCode.Add(string)
+continues to require non-null input. Ordinary Raven/.NET synthesis is unchanged.
+
+Evidence: configured compiler execution checks null/empty equality, hashing, display
+and reflected deconstruction. Defaults.rvnproj checks the target through typed, boxed
+Object and Equatable calls, including default class-reference fields. It reproduces
+the old failure and is included alongside the other checked website samples. Explicit
+nullable-string declarations, nullable-value boxing and Object.Equals parameter
+annotation alignment remain separate follow-ups; non-null declarations are not a
+runtime proof that default reference fields contain an instance.

@@ -182,3 +182,14 @@ components remain rejected. No new configuration or syntax is required. See
 `docs/experiments/records/Nested.rvnproj` and the Object review for validation.
 
 Matching nested-component compiler commit: `8b703083b` on the Raven feature branch.
+
+
+Configured record methods now guard null string components arising from default
+struct initialization, even for non-nullable source declarations. Null contributes
+zero to hashing and empty display text; deconstruction preserves it. This repairs
+the default-string hash fault without changing nullable syntax, provider signatures,
+HashCode.Add(string), reference artifacts or ordinary Raven/.NET synthesis. The
+Defaults.rvnproj sample checks the matching target behavior. Explicit nullable-string
+components and nullable-value boxing remain unsupported.
+
+Matching default-component compiler commit: `b896089e0` on the Raven feature branch.

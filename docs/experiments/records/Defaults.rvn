@@ -1,0 +1,32 @@
+import System.*
+
+record struct TextValue(Text: string)
+record class Owner(Name: string)
+record struct Payload(Text: string, Owner: Owner)
+
+func Main() {
+    let absentText = default(TextValue)
+    let emptyText = TextValue("")
+    if absentText == emptyText || emptyText == absentText {
+        System.Fault("Null and empty strings must remain different values")
+    }
+    let absent = default(Payload)
+    let same = default(Payload)
+    let present = Payload("", Owner("Raven"))
+    let boxed: Object = absent
+    let comparable: Equatable<Payload> = absent
+    if absent != same || !boxed.Equals(same) || !comparable.Equals(same) || absent == present {
+        System.Fault("Default reference components must compare safely")
+    }
+    if absent.GetHashCode() != HashCode.Combine(0, 0) || boxed.GetHashCode() != same.GetHashCode() {
+        System.Fault("Null reference components must contribute zero to the hash")
+    }
+    if absent.ToString() != "Payload { Text = , Owner =  }" {
+        System.Fault("Null reference components must display as empty fields")
+    }
+    let (text, owner) = absent
+    if text is not null || owner is not null {
+        System.Fault("Deconstruction must preserve null defaults")
+    }
+    Console.WriteLine(absent.ToString())
+}

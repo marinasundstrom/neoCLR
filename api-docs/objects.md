@@ -175,9 +175,9 @@ record-class fields, including default absent references.
 The configured contract admits the same component types for record structs as for
 record classes: Int32, non-null String, supported same-compilation record structs and record-class
 references. Nullable values/strings, generic records and
-external record components remain outside this first implementation. Default values
-with non-null reference fields need separate representation review; the sample does
-not claim .NET null-string default semantics.
+external record components remain outside this first implementation. Default values retain null in reference fields, even when the property is declared
+non-nullable. Generated record equality, hashing and display guard these values;
+this does not make ordinary calls on a null reference safe.
 
 At the instruction layer, value `isinst` preserves a matching box or returns null;
 `unbox.any` copies an exact value payload. Null unboxing faults with NullReference,
@@ -201,3 +201,20 @@ Point values: changing the original point or a deconstructed copy does not modif
 the rectangle. Drawing demonstrates a record class containing a record struct.
 Default Rectangle initializes its nested integer fields to zero. Nullable struct
 components and externally compiled component records remain unsupported.
+
+
+### Default reference fields
+
+`Defaults.rvnproj` demonstrates `default(Payload)` where Payload contains a string
+and a record-class reference, both declared non-nullable. Default initialization
+bypasses construction and leaves those fields null. Equality treats two absent
+components as equal and distinguishes an absent string from an empty string.
+A null component contributes zero to HashCode; display prints an empty component
+value. Deconstruction preserves null rather than substituting an empty string or
+creating a record instance.
+
+This follows the .NET distinction between nullable annotations and runtime default
+initialization. HashCode.Add(string) still requires a non-null argument; generated
+record code checks first and uses Add(int) for the null contribution. Explicit
+nullable-string record components and nullable-value boxing remain unsupported.
+Object.Equals' non-null parameter annotation is a separate follow-up.

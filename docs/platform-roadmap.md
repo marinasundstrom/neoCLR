@@ -734,8 +734,11 @@ slice now have [checked evidence](object-model-review.md#struct-object-slots-and
 The author-directed struct/record-struct gate is complete for non-generic types with
 the documented component contract. Nested same-compilation record structs now compose in both record classes and structs,
 with a checked Point/Rectangle sample and value-output deconstruction. Other primitive
-Object implementations, generic struct components and nullable-value/default-reference
-semantics remain follow-ups. Value retirement remains a separate storage migration.
+Object implementations, generic struct components and nullable-value boxing remain
+follow-ups. Default reference fields now have a checked record case:
+null is preserved even for non-nullable declarations, and generated equality/hash/display
+handle it. Explicit nullable-string components and Object method annotations remain
+separate work. Value retirement remains a separate storage migration.
 This is a bounded foundation review; networking remains later. Console ownership,
 cleanup on propagated errors and buffering remain follow-up questions, not selected
 redesigns. The scheduling/operation-cancellation work below remains open.

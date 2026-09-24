@@ -50,3 +50,8 @@ sample now provides corresponding target execution evidence for the bounded cont
 The nested-struct follow-up adds two assertions (28 total): Rectangle construction
 and deconstruction copy Coordinate components; boxed/interface equality, hashes and
 nested display agree. SDK/runtime pins are unchanged.
+
+
+The default-reference follow-up adds two assertions (30 total): zero initialization
+preserves a null non-nullable string field, and record equality/hash/display handle
+it. Null remains distinct from empty. SDK/runtime pins are unchanged.

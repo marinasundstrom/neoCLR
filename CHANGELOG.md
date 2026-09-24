@@ -31,6 +31,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   58 focused compiler tests, both target samples, 28 pinned .NET assertions and
   combined website/API documentation checks.
 
+  Repair default record structs with non-nullable string fields: generated methods
+  guard null components, contribute zero to hashes and display empty component text,
+  while preserving null in storage/deconstruction. Add a Defaults sample reproducing
+  the former Utf8Encode fault, alongside null-versus-empty checks. No runtime layout,
+  HashCode.Add(string) or nullable API contract changes. Validation: 59 compiler
+  tests, all three target samples, 30 .NET assertions and website/API checks.
+
 - Implement bounded virtual Object equality/hash for boxed Int32: compare exact
   type and integer value, and return the stored integer hash. Preserve separate-box
   identity and explicit Object base behavior. Other boxed primitives and primitive boxed ToString

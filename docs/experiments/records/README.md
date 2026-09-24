@@ -39,13 +39,21 @@ checks typed, boxed Object and Equatable<Coordinate> equality, distinct box iden
 other-type rejection, matching hashes, virtual display and deconstruction.
 Default Coordinate has zero integers; default OwnedCoordinate has a null record
 reference. NamedCoordinate checks constructed string components. Struct reference
-fields copy references, not the referenced objects. Non-null reference defaults,
-nullable value boxing and generic struct components are not established here.
+fields copy references, not the referenced objects. Nullable value boxing and generic struct components are not established here.
 
 
 `Nested.rvnproj` is a separate small program with Point, Rectangle and Drawing.
 It checks nested struct defaults, typed/Object/interface equality, hashing, display,
 and independent construction/deconstruction copies. Point deliberately has mutable
-properties so the copying behavior is observable. Both projects are included in the
+properties so the copying behavior is observable. These projects are included in the
 website download and run by verify.py. Keeping them separate also stays within the
 importer's existing per-application method limit. No limit has been raised.
+
+
+`Defaults.rvnproj` covers zero-initialized string and class-reference fields, including
+non-nullable declarations. Generated equality/hash/display must handle their null
+values without dereferencing them. Null contributes zero to HashCode and empty
+component text; deconstruction preserves it. The verifier runs all three projects.
+Before this repair, the default string hash reached Utf8Encode with null and raised
+RuntimeError. This does not widen the direct HashCode.Add(string) contract or admit
+explicit nullable-string record declarations.

@@ -83,6 +83,13 @@ Check(((object)bounds).Equals(equalBounds) && ((IEquatable<Rectangle>)bounds).Eq
     && bounds.GetHashCode() == equalBounds.GetHashCode()
     && bounds.ToString() == "Rectangle { Start = Coordinate { X = 1, Y = 2 }, End = Coordinate { X = 3, Y = 4 } }",
     "Nested record struct equality, hash and display use component semantics");
+var defaultText = default(TextRecord);
+var otherDefaultText = default(TextRecord);
+Check(defaultText.Text is null && defaultText == otherDefaultText && defaultText != new TextRecord(""),
+    "Non-nullable string annotations do not change struct zero initialization");
+Check(defaultText.GetHashCode() == otherDefaultText.GetHashCode()
+    && defaultText.ToString() == "TextRecord { Text =  }",
+    "Default string components hash and display without dereferencing null");
 Console.WriteLine($"Runtime: {System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}");
 
 sealed class Cell { public int Number; }
@@ -100,3 +107,5 @@ sealed record KeyRecord(int Number);
 record struct Coordinate(int X, int Y);
 
 record struct Rectangle(Coordinate Start, Coordinate End);
+
+record struct TextRecord(string Text);
