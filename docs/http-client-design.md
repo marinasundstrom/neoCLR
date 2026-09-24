@@ -262,3 +262,15 @@ use the shorter phase error, and ordinary fragmented UTF-8 succeeds. The indepen
 .NET client still consumes the neoCLR server. All 32 socket, nine resolver, one clock
 stamp and nine service-analysis tests pass, as do the bootstrap/application visibility
 checks. The API snapshot and 967-page website validate; all 17 website tests pass.
+
+## Uri, HttpError and BaseUri priority — 2026-09-24
+
+The author now explicitly prioritizes these three contracts, using BaseUri as the
+current spelling and retaining both string and Uri address overloads. This supersedes
+the earlier BaseAddress name and defers the next cancellation exploration. The first
+[Uri slice](uri-design.md) supplies managed parsing, typed UriError and string/Uri
+relative-resolution overloads. It does not yet change HttpClient's string results or
+absolute-URL-only request factory. HttpError and BaseUri are the following integration
+slices. URI/URL encoding utilities are author-directed later work, not implicit
+escaping in Parse. Preserve the error-union comparisons above when selecting typed
+HTTP failures; do not turn every diagnostic message into an unrelated case.

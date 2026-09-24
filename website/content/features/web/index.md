@@ -122,3 +122,25 @@ One error-model candidate groups request, transport and response failures, nesti
 resolver/socket causes where useful. HTTP statuses should remain response values as
 status support expands; decoding errors belong to ReadText. This is a proposal:
 the current POC returns explicitly provisional string errors.
+
+## URI references in development
+
+`System.Uri` now parses escaped ASCII references and resolves relative references
+against an absolute base. `Parse` returns `Result<Uri, UriError>`; `Resolve` accepts
+either a string or another Uri. A trailing slash matters: resolving `child` against
+`http://example.test/api/` gives `/api/child`, while a base ending in `/api` gives
+`/child`. Query-only references preserve the base path, and literal dot segments are
+removed during resolution.
+
+This first iteration preserves exact text for equality and hashing. It does not
+perform network access, implicit escaping, IDNA conversion or IPv6-literal parsing.
+Input is limited to 4096 bytes. A parsed Uri does not imply transport support.
+The [API reference](/docs/api/System/Uri/) describes both overloads and the limits.
+
+The next HTTP work is typed `HttpError` results and `HttpClient.BaseUri`, with string
+and Uri request overloads. These HTTP additions are planned; the existing client
+still accepts absolute plain-HTTP strings and returns provisional string errors.
+
+URI/URL encoding utilities are also planned separately. Their design will distinguish
+path segments, query values and form data; the current Uri parser expects text that
+has already been escaped.

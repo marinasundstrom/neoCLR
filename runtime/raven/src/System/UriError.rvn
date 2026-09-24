@@ -1,0 +1,73 @@
+namespace System
+
+import System.Runtime.CompilerServices.ValueStorage
+
+[System.Runtime.CompilerServices.Union]
+public struct UriError {
+    private field Stored: System.Value
+
+    public struct InvalidFormat { }
+
+    init(value: UriError.InvalidFormat) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsInvalidFormat: bool => ValueStorage.Is<UriError.InvalidFormat>(Stored)
+
+    func GetInvalidFormat() -> UriError.InvalidFormat {
+        return ValueStorage.Unpack<UriError.InvalidFormat>(Stored)
+    }
+
+    public struct UnsupportedAuthority { }
+
+    init(value: UriError.UnsupportedAuthority) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsUnsupportedAuthority: bool => ValueStorage.Is<UriError.UnsupportedAuthority>(Stored)
+
+    func GetUnsupportedAuthority() -> UriError.UnsupportedAuthority {
+        return ValueStorage.Unpack<UriError.UnsupportedAuthority>(Stored)
+    }
+
+    public struct TooLong { }
+
+    init(value: UriError.TooLong) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsTooLong: bool => ValueStorage.Is<UriError.TooLong>(Stored)
+
+    func GetTooLong() -> UriError.TooLong {
+        return ValueStorage.Unpack<UriError.TooLong>(Stored)
+    }
+
+    public struct BaseNotAbsolute { }
+
+    init(value: UriError.BaseNotAbsolute) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsBaseNotAbsolute: bool => ValueStorage.Is<UriError.BaseNotAbsolute>(Stored)
+
+    func GetBaseNotAbsolute() -> UriError.BaseNotAbsolute {
+        return ValueStorage.Unpack<UriError.BaseNotAbsolute>(Stored)
+    }
+
+    func ToString() -> string {
+        if IsInvalidFormat {
+            return "InvalidFormat"
+        }
+        if IsUnsupportedAuthority {
+            return "UnsupportedAuthority"
+        }
+        if IsTooLong {
+            return "TooLong"
+        }
+        if IsBaseNotAbsolute {
+            return "BaseNotAbsolute"
+        }
+        System.Fault("Invalid URI error case")
+        return ""
+    }
+}

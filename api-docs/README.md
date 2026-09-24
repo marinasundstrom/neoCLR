@@ -77,7 +77,7 @@ Sequence, Collection, Iterable and Iterator now have generated reference coverag
 including String construction and its read-only grapheme indexer. String Count is
 an explicit Collection implementation, visible through Sequence/Collection only.
 
-The current audit covers all 225 public reference types: 212 generated type pages,
+The current audit covers every public reference type through generated type pages,
 three explicit manual entries and ten explicitly excluded metadata scaffolds. Collections, arrays, delegates, query operators,
 Option/Result, TaskOutcome, numeric types, text/encoding, environment, time/calendar,
 resource capabilities and interop now have type/member descriptions. Compiler-reference
@@ -163,3 +163,8 @@ and transfer submissions. Public signatures remain unchanged. Deadline helpers a
 Until methods stay out of the normal application/reference surface; bootstrap-only
 cross-slice visibility is restored to internal before importer contract validation.
 Refresh reference, bridge, library and native runtime together for this private ABI.
+
+System.Uri and UriError now have generated type/member coverage. Parse and both
+Resolve overloads document strict ASCII grammar, the 4096-byte bound, unsupported
+IP literals, lexical equality and RFC relative resolution. HttpError and
+HttpClient.BaseUri remain planned; Uri parsing alone does not broaden HTTP support.

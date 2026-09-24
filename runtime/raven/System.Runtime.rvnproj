@@ -5,6 +5,12 @@
     <NeoCLRRoot>$(NeoCLRBootstrapRoot)</NeoCLRRoot>
   </PropertyGroup>
   <Import Project="../../build/NeoCLR.Raven.props" />
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Uri'">
+    <Compile Include="src/System/Uri.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UriError'">
+    <Compile Include="src/System/UriError.rvn" />
+  </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HttpClient'">
     <Compile Include="src/System/Web/Http/HttpClient.rvn" />
     <Compile Include="src/System/Web/Http/HttpServer.rvn" />

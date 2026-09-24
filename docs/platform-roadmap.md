@@ -323,7 +323,7 @@ string overload still accepts one child name; this exploratory distinction is no
 a system-wide restriction on string APIs. Disk/memory contract checks cover both.
 **Future direction:** the author expects a similar structured-value versus string
 boundary for a Uri class. Evaluate its parsing and relative-reference contracts
-with networking; no Uri API is implemented or added to the immediate scope.
+with networking. The author subsequently prioritized the [Uri/HTTP addressing slices](uri-design.md), which now supply an initial managed Uri contract.
 
 **Author priority, 2026-09-23:** integrate the working Storage slice as soon as
 possible, rather than expanding isolated experiments first. The first integration
@@ -836,9 +836,10 @@ Public Socket operations keep their phase bounds. Request construction, custom p
 work outside transport, server accept and server application handlers remain outside
 that budget. A configurable general timeout/token API is not yet selected.
 
-**Active next step, 2026-09-24:** establish handler/server cancellation ownership,
-then evaluate public JSON contracts from the existing
-consumer. The [JSON report](experiments/http-json/README.md) now passes between two
+**Active next step, 2026-09-24 (author-directed):** finish Uri, HttpError and
+HttpClient.BaseUri with string/Uri request overloads. The initial managed Uri
+slice is implemented; typed HTTP errors and base-address request resolution follow.
+Handler/server cancellation ownership and public JSON contracts remain later work. The [JSON report](experiments/http-json/README.md) now passes between two
 neoCLR applications and independent peers; it does not promote a public JSON API. The
 [HTTP sample](experiments/http-client/README.md) imports development System.Web.Http
 client, request/response/content and handler APIs; the bounded GET/200 client is the
@@ -849,18 +850,19 @@ the completed web application milestone.
 now accepts a Sequence of IPv4 addresses with a shared five-second connection budget,
 per-address progress limits and one owned native connection. DNS still has a separate
 five-second deadline. The HTTP case must establish header/body bounds and phase
-limits; a combined lookup/TCP/HTTP request deadline is not implemented. The [two-process echo](experiments/socket-echo/README.md)
+limits; the socket handler now carries a shared 15-second exchange budget while preserving shorter phase limits. The [two-process echo](experiments/socket-echo/README.md)
 now uses Listen/Accept on the server and the hostname client on the other side. The [hostname client](experiments/socket-client/README.md) now uses public
 Dns.GetHostAddresses with Task/Result and a read-only IPv4 address sequence over the
 [bounded resolver](socket-api-design.md#public-hostname-lookup-and-networking-poc--2026-09-24).
-Future author direction: introduce an IPAddress value object when the networking
-model is ready; consider HostEntry if richer lookup results become useful. Also add
-a Uri value object later and evaluate the author's IPv4Address/IPv6Address union
-candidate, with explicit parsing, equality and normalization contracts. HttpClient()
-already selects the socket handler; add BaseAddress and relative request resolution
-after Uri, as directed by the author. See the
-[address model notes](socket-api-design.md#address-value-objects--future-direction-2026-09-24).
-These are not requirements to replace the current POC strings immediately.
+Immediate author direction (2026-09-24): complete Uri, HttpError and
+HttpClient.BaseUri, retaining string and Uri request overloads. This takes priority
+over further cancellation exploration. The [managed Uri slice](uri-design.md) adds
+bounded ASCII parsing, RFC reference resolution and lexical value semantics; typed
+HTTP errors and BaseUri request integration follow. Parameterless HttpClient already
+selects the socket handler. IPv4Address/IPv6Address and HostEntry remain later
+networking evaluations, not requirements to replace all strings now. Author-directed
+later work also includes URI/URL encoding utilities, with component-specific
+contracts evaluated separately from the current parser.
 Bounded address fallback and its shared connection deadline now have an executable
 echo case; preserve these bounds when building the first HTTP client. Networking has its own feature page and homepage box;
 the integrated client now also has its own Web page and homepage box.

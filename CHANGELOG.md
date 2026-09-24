@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add managed System.Uri and UriError with strict escaped-ASCII parsing, string/Uri
+  Resolve overloads and RFC 3986 relative resolution. Preserve lexical Text equality
+  through Object and hashing; bracketed IP literals, IRI/IDNA and canonical resource
+  equality remain unsupported. Add executable RFC/.NET comparison and GC checks.
+  HttpError and HttpClient.BaseUri remain the next integration slices; URI/URL
+  encoding utilities are recorded as later work.
+
 - Add private absolute-deadline submission paths for resolver, address fallback and
   socket transfers. Preserve the shorter phase bound, reject expired work before
   native admission and prevent short progress from renewing a shared budget. Add a

@@ -2,6 +2,8 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.IO.FileOutputStream",
   "inputs": {
+    "runtime/raven/src/System/Uri.rvn": "b366425867c4b84f126de1689d4a03bf9855a6a881a4abe4dba1836a381537b7",
+    "runtime/raven/src/System/UriError.rvn": "7ba12d894914067d32accd5bcb6dbd9fdc1aabd5273da6b7e7c3dd034b6ee5a2",
     "runtime/raven/src/System/Web/Http/HttpServer.rvn": "e64d5b8a6d4a3dc5f5dd8df7d6a551deededd6f5da8d9bad32ff6d4b5b02b563",
     "runtime/raven/src/System/Web/Http/HttpClient.rvn": "859dc96f2458c3359922d5a8cd596809edc1669946cfcc886788fcc39e22c9c6",
     "runtime/raven/src/System/Networking/DnsError.rvn": "652823f199e6d95b14518917d27306ac83c97d7bac1ee2f62578bb224b3b1d3c",
@@ -111,7 +113,7 @@
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
-    "runtime/raven/System.Runtime.rvnproj": "b02b24b6ec7e103885f8c33d9c693e7391197655e2ff54acb2238497a9e9e894",
+    "runtime/raven/System.Runtime.rvnproj": "8a8c86fd58d478c360440649474725db43b76540244fde5f381a9caa873535c4",
     "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
@@ -119,7 +121,7 @@
     "FileOutputStream.helpers.neoil": "3f629c3d45a6340d0237ce09a29db6da8714ad64e2723252523db8cfa3f14203"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "c8dde6955c0e0a90cbe7b140ccab0914b418f4c91a37978d68e6085a3d3ef320",
+  "coreSha256": "23d895573829807a3b4558845599740ca96e725f3dc7ca9eacefaec3f4e858e1",
   "exports": [
     "CreateNew(String path) -> System.Result<System.IO.FileOutputStream,System.IO.StreamError>",
     "Write(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Result<Int32,System.IO.StreamError>",

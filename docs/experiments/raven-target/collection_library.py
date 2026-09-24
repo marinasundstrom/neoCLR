@@ -119,6 +119,8 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/neoCLR/Runtime/Dns.neoil')
         result += build(ROOT / 'runtime/raven/SocketError.neoil')
         result += build(ROOT / 'runtime/raven/Socket.neoil')
+        result += build(ROOT / 'runtime/raven/UriError.neoil')
+        result += build(ROOT / 'runtime/raven/Uri.neoil')
         result += build(ROOT / 'runtime/raven/HttpClient.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/Sockets.neoil')
         result += build(ROOT / 'runtime/raven/Workers.neoil')

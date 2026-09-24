@@ -6703,3 +6703,36 @@ configuration/content, not target-specific code added to Raven main.
 - **Remaining scope:** custom pipeline work outside transport, server accept/application
   callbacks, cancellation tokens and configurable timeouts. The HTTP design records the
   distinction from a general HttpClient.Timeout contract.
+
+### 2026-09-24 — Uri, typed HTTP errors and BaseUri
+
+- **Author:** “Our goal is to have Uri, HttpError, and BaseUri ready.” Requests both
+  Uri and string overloads, rather than requiring callers to construct Uri values.
+- **Assistant:** prioritizes this over the next cancellation exploration. Separates
+  general reference parsing/resolution from the HTTP provider's transport restrictions.
+  Uses BaseUri as the current spelling, superseding earlier BaseAddress discussion.
+- **Action:** implements an initial managed Uri and UriError, with two Resolve
+  overloads, exact text equality/hash behavior and reference-resolution validation.
+  Adds RFC cases, negative grammar cases, Object/GC checks and a .NET 10 comparison.
+- **Provisional choices:** strict escaped ASCII, 4096-byte bound and lexical identity;
+  IP literals and broader normalization remain open. These are assistant choices for
+  the POC, not permanent author requirements. See [URI design](uri-design.md).
+- **Integration finding:** the first boxed-Object probe exposed a missing bridge
+  reference-category entry, now added alongside interface/collection conversions.
+  A boundary run exceeded its initial timeout; a local process sample showed array
+  resource scans dominating while the parser held encoded input. Replaced that
+  temporary byte array with bounded string slices; no GC policy change is claimed.
+- **Outcome:** the final managed probe passes both resolution overloads, grammar,
+  length limits, Object/interface/collection behavior and zero-live-object cleanup.
+  Bootstrap/API validation, the 986-page site and 17 website tests pass.
+- **Remaining:** HttpError and BaseUri integration with string/Uri HTTP overloads.
+  No new scheduler or runtime-suspension requirement is introduced.
+
+### 2026-09-24 — Later URI/URL encoding utilities
+
+- **Author:** “We will have to add utilities for URI/URL encode later.”
+- **Assistant response:** records this as future work, with path-segment, query-value
+  and form-encoding distinctions to investigate. No method names or final encoding
+  contract are selected, and the current escaped-input parser contract is unchanged.
+- **Evidence:** [URI design](uri-design.md#later-encoding-utilities--author-direction-2026-09-24)
+  and the platform roadmap. No encoding utility is implemented by this slice.

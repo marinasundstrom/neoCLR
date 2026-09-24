@@ -1,0 +1,152 @@
+; Generated from runtime/raven/src/System/Uri.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Uri.RuntimeStringEquals(String source,String value0) -> Boolean
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::Equals(String)
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeStringStartsWithOrdinal(String source,String value0) -> Boolean
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::StartsWithOrdinal(String)
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeStringGetUtf8ByteCount(String source) -> Int32
+ldarg source
+call instance System.String::GetUtf8ByteCount()
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeStringget_IsEmpty(String source) -> Boolean
+ldarg source
+call instance System.String::get_IsEmpty()
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeStringSliceUtf8(String source,Int32 value0,Int32 value1) -> System.Result<String,System.Text.Utf8SliceError>
+ldarg source
+ldarg value0
+ldarg value1
+call instance System.String::SliceUtf8(Int32,Int32)
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvalidFormat(System.UriError.InvalidFormat value) -> System.UriError
+ldarg value
+newobj instance System.UriError::.ctor(System.UriError.InvalidFormat)
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorUnsupportedAuthority(System.UriError.UnsupportedAuthority value) -> System.UriError
+ldarg value
+newobj instance System.UriError::.ctor(System.UriError.UnsupportedAuthority)
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorTooLong(System.UriError.TooLong value) -> System.UriError
+ldarg value
+newobj instance System.UriError::.ctor(System.UriError.TooLong)
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorBaseNotAbsolute(System.UriError.BaseNotAbsolute value) -> System.UriError
+ldarg value
+newobj instance System.UriError::.ctor(System.UriError.BaseNotAbsolute)
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorInvalidFormatNew() -> System.UriError.InvalidFormat
+newobj instance System.UriError.InvalidFormat::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorUnsupportedAuthorityNew() -> System.UriError.UnsupportedAuthority
+newobj instance System.UriError.UnsupportedAuthority::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorTooLongNew() -> System.UriError.TooLong
+newobj instance System.UriError.TooLong::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorBaseNotAbsoluteNew() -> System.UriError.BaseNotAbsolute
+newobj instance System.UriError.BaseNotAbsolute::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeUnion0(System.Result<String,System.Text.Utf8SliceError>& arg0,out(true) System.Result.Ok<String>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Result<String,System.Text.Utf8SliceError>
+ldarg arg1
+call instance System.Result<String,System.Text.Utf8SliceError>::TryGet(System.Result.Ok<String>&)
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeUnion1(System.Result.Ok<String>& receiver,out String& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Result.Ok<String>
+call instance System.Result.Ok<String>::get_Value()
+stobj String
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError arg0) -> System.Result.Error<System.UriError>
+ldarg arg0
+newobj instance System.Result.Error<System.UriError>::.ctor(System.UriError)
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError> arg0) -> System.Result<System.Uri,System.UriError>
+ldarg arg0
+newobj instance System.Result<System.Uri,System.UriError>::.ctor(System.Result.Error<System.UriError>)
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeUnion4(System.Uri arg0) -> System.Result.Ok<System.Uri>
+ldarg arg0
+newobj instance System.Result.Ok<System.Uri>::.ctor(System.Uri)
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeUnion5(System.Result.Ok<System.Uri> arg0) -> System.Result<System.Uri,System.UriError>
+ldarg arg0
+newobj instance System.Result<System.Uri,System.UriError>::.ctor(System.Result.Ok<System.Uri>)
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeUnion6(System.Result<System.Uri,System.UriError>& arg0,out(true) System.Uri& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<System.Uri,System.UriError>::TryGetOutput(System.Uri&)
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeUnion7(System.Result<System.Uri,System.UriError>& arg0,out(true) System.UriError& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<System.Uri,System.UriError>::TryGetResidual(System.UriError&)
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeUnion8(System.UriError arg0) -> System.Result<System.Uri,System.UriError>
+ldarg arg0
+call System.Result<System.Uri,System.UriError>::FromResidual(System.UriError)
+ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.function neoCLR.Library.System.Uri.RuntimeNewHashCode() -> System.HashCode
+newobj instance System.HashCode::.ctor()
+ret
+.end

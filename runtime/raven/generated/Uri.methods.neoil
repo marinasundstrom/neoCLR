@@ -1,0 +1,2986 @@
+; Generated from runtime/raven/src/System/Uri.rvn. Regenerate with build_runtime_library.py.
+.type class System.Uri
+.sealed
+.extends System.Object
+.implements System.Equatable<System.Uri>
+.field private text String
+.field private scheme String
+.field private authority String
+.field private path String
+.field private query String
+.field private fragment String
+.property instance Text() -> String
+.get instance System.Uri::get_Text()
+.end
+.property instance IsAbsolute() -> Boolean
+.get instance System.Uri::get_IsAbsolute()
+.end
+.property instance IsRelative() -> Boolean
+.get instance System.Uri::get_IsRelative()
+.end
+.method private instance .ctor(String text,String scheme,String authority,String path,String query,String fragment) -> noresult
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+call instance System.Object::.ctor()
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 0
+M00000001_IL_0009:
+ldarg 1
+M00000001_IL_000a:
+stfld System.Uri::text
+M00000001_IL_000f:
+M00000001_IL_0010:
+ldarg 0
+M00000001_IL_0011:
+ldarg 2
+M00000001_IL_0012:
+stfld System.Uri::scheme
+M00000001_IL_0017:
+M00000001_IL_0018:
+ldarg 0
+M00000001_IL_0019:
+ldarg 3
+M00000001_IL_001a:
+stfld System.Uri::authority
+M00000001_IL_001f:
+M00000001_IL_0020:
+ldarg 0
+M00000001_IL_0021:
+ldarg 4
+M00000001_IL_0023:
+stfld System.Uri::path
+M00000001_IL_0028:
+M00000001_IL_0029:
+ldarg 0
+M00000001_IL_002a:
+ldarg 5
+M00000001_IL_002c:
+stfld System.Uri::query
+M00000001_IL_0031:
+M00000001_IL_0032:
+ldarg 0
+M00000001_IL_0033:
+ldarg 6
+M00000001_IL_0035:
+stfld System.Uri::fragment
+M00000001_IL_003a:
+ret
+.end
+.method instance get_Text() -> String
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldfld System.Uri::text
+M00000002_IL_0008:
+ret
+.end
+.method instance get_IsAbsolute() -> Boolean
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.Uri::scheme
+M00000003_IL_0008:
+call neoCLR.Library.System.Uri.RuntimeStringget_IsEmpty(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_000d:
+ldc.i4 0
+M00000003_IL_000e:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0010:
+call neoCLR.Library.System.Uri.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_IsRelative() -> Boolean
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.Uri::scheme
+M00000004_IL_0008:
+call neoCLR.Library.System.Uri.RuntimeStringget_IsEmpty(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_000d:
+call neoCLR.Library.System.Uri.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method private static Part(String text,Int32 start,Int32 end) -> String
+.local String local0
+.local System.Result<String,System.Text.Utf8SliceError> local1
+.local System.Result.Ok<String> local2
+.local System.Result.Ok<String> local3
+.local String local4
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldarg 1
+M00000005_IL_0004:
+ldarg 2
+M00000005_IL_0005:
+ldarg 1
+M00000005_IL_0006:
+sub
+M00000005_IL_0007:
+call neoCLR.Library.System.Uri.RuntimeStringSliceUtf8(String,Int32,Int32)
+M00000005_IL_000c:
+stloc local1
+M00000005_IL_000d:
+ldloca local1
+M00000005_IL_000f:
+ldloca local2
+M00000005_IL_0011:
+call neoCLR.Library.System.Uri.RuntimeUnion0(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Ok<String>&)
+M00000005_IL_0016:
+brfalse M00000005_IL_0041
+M00000005_IL_001b:
+ldloc local2
+M00000005_IL_001c:
+stloc local3
+M00000005_IL_001d:
+ldloca local3
+M00000005_IL_001f:
+ldloca local4
+M00000005_IL_0021:
+call neoCLR.Library.System.Uri.RuntimeUnion1(System.Result.Ok<String>&,String&)
+M00000005_IL_0026:
+ldloc local4
+M00000005_IL_0028:
+stloc local0
+M00000005_IL_0029:
+ldc.i4 1
+M00000005_IL_002a:
+br M00000005_IL_0030
+M00000005_IL_0030:
+brfalse M00000005_IL_0041
+M00000005_IL_0035:
+M00000005_IL_0036:
+br M00000005_IL_0046
+M00000005_IL_0041:
+br M00000005_IL_0049
+M00000005_IL_0046:
+M00000005_IL_0047:
+ldloc local0
+M00000005_IL_0048:
+ret
+M00000005_IL_0049:
+M00000005_IL_004a:
+M00000005_IL_004b:
+ldstr "Invalid internal URI boundary"
+M00000005_IL_0050:
+call System.Fault(String)
+M00000005_IL_0055:
+M00000005_IL_0056:
+ldstr ""
+M00000005_IL_005b:
+ret
+.end
+.method private static At(String text,Int32 index) -> String
+.local String local0
+.local System.Result<String,System.Text.Utf8SliceError> local1
+.local System.Result.Ok<String> local2
+.local System.Result.Ok<String> local3
+.local String local4
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldarg 1
+M00000006_IL_0004:
+ldc.i4 1
+M00000006_IL_0005:
+call neoCLR.Library.System.Uri.RuntimeStringSliceUtf8(String,Int32,Int32)
+M00000006_IL_000a:
+stloc local1
+M00000006_IL_000b:
+ldloca local1
+M00000006_IL_000d:
+ldloca local2
+M00000006_IL_000f:
+call neoCLR.Library.System.Uri.RuntimeUnion0(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Ok<String>&)
+M00000006_IL_0014:
+brfalse M00000006_IL_003f
+M00000006_IL_0019:
+ldloc local2
+M00000006_IL_001a:
+stloc local3
+M00000006_IL_001b:
+ldloca local3
+M00000006_IL_001d:
+ldloca local4
+M00000006_IL_001f:
+call neoCLR.Library.System.Uri.RuntimeUnion1(System.Result.Ok<String>&,String&)
+M00000006_IL_0024:
+ldloc local4
+M00000006_IL_0026:
+stloc local0
+M00000006_IL_0027:
+ldc.i4 1
+M00000006_IL_0028:
+br M00000006_IL_002e
+M00000006_IL_002e:
+brfalse M00000006_IL_003f
+M00000006_IL_0033:
+M00000006_IL_0034:
+br M00000006_IL_0044
+M00000006_IL_003f:
+br M00000006_IL_0047
+M00000006_IL_0044:
+M00000006_IL_0045:
+ldloc local0
+M00000006_IL_0046:
+ret
+M00000006_IL_0047:
+M00000006_IL_0048:
+M00000006_IL_0049:
+ldstr ""
+M00000006_IL_004e:
+ret
+.end
+.method private static Alpha(String value) -> Boolean
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+ldstr "A"
+M00000007_IL_0008:
+call System.String::CompareOrdinal(String,String)
+M00000007_IL_000d:
+ldc.i4 0
+M00000007_IL_000e:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0010:
+ldc.i4 0
+M00000007_IL_0011:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0013:
+brfalse M00000007_IL_002e
+M00000007_IL_0018:
+ldarg 0
+M00000007_IL_0019:
+ldstr "Z"
+M00000007_IL_001e:
+call System.String::CompareOrdinal(String,String)
+M00000007_IL_0023:
+ldc.i4 0
+M00000007_IL_0024:
+cgt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0026:
+ldc.i4 0
+M00000007_IL_0027:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0029:
+br M00000007_IL_002f
+M00000007_IL_002e:
+ldc.i4 0
+M00000007_IL_002f:
+brtrue M00000007_IL_0066
+M00000007_IL_0034:
+ldarg 0
+M00000007_IL_0035:
+ldstr "a"
+M00000007_IL_003a:
+call System.String::CompareOrdinal(String,String)
+M00000007_IL_003f:
+ldc.i4 0
+M00000007_IL_0040:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0042:
+ldc.i4 0
+M00000007_IL_0043:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0045:
+brfalse M00000007_IL_0060
+M00000007_IL_004a:
+ldarg 0
+M00000007_IL_004b:
+ldstr "z"
+M00000007_IL_0050:
+call System.String::CompareOrdinal(String,String)
+M00000007_IL_0055:
+ldc.i4 0
+M00000007_IL_0056:
+cgt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0058:
+ldc.i4 0
+M00000007_IL_0059:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_005b:
+br M00000007_IL_0061
+M00000007_IL_0060:
+ldc.i4 0
+M00000007_IL_0061:
+br M00000007_IL_0067
+M00000007_IL_0066:
+ldc.i4 1
+M00000007_IL_0067:
+call neoCLR.Library.System.Uri.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method private static Digit(String value) -> Boolean
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldstr "0"
+M00000008_IL_0008:
+call System.String::CompareOrdinal(String,String)
+M00000008_IL_000d:
+ldc.i4 0
+M00000008_IL_000e:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0010:
+ldc.i4 0
+M00000008_IL_0011:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0013:
+brfalse M00000008_IL_002e
+M00000008_IL_0018:
+ldarg 0
+M00000008_IL_0019:
+ldstr "9"
+M00000008_IL_001e:
+call System.String::CompareOrdinal(String,String)
+M00000008_IL_0023:
+ldc.i4 0
+M00000008_IL_0024:
+cgt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0026:
+ldc.i4 0
+M00000008_IL_0027:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0029:
+br M00000008_IL_002f
+M00000008_IL_002e:
+ldc.i4 0
+M00000008_IL_002f:
+call neoCLR.Library.System.Uri.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method private static Hex(String value) -> Boolean
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+call System.Uri::Digit(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0008:
+brtrue M00000009_IL_003f
+M00000009_IL_000d:
+ldarg 0
+M00000009_IL_000e:
+ldstr "A"
+M00000009_IL_0013:
+call System.String::CompareOrdinal(String,String)
+M00000009_IL_0018:
+ldc.i4 0
+M00000009_IL_0019:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_001b:
+ldc.i4 0
+M00000009_IL_001c:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_001e:
+brfalse M00000009_IL_0039
+M00000009_IL_0023:
+ldarg 0
+M00000009_IL_0024:
+ldstr "F"
+M00000009_IL_0029:
+call System.String::CompareOrdinal(String,String)
+M00000009_IL_002e:
+ldc.i4 0
+M00000009_IL_002f:
+cgt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0031:
+ldc.i4 0
+M00000009_IL_0032:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0034:
+br M00000009_IL_003a
+M00000009_IL_0039:
+ldc.i4 0
+M00000009_IL_003a:
+br M00000009_IL_0040
+M00000009_IL_003f:
+ldc.i4 1
+M00000009_IL_0040:
+brtrue M00000009_IL_0077
+M00000009_IL_0045:
+ldarg 0
+M00000009_IL_0046:
+ldstr "a"
+M00000009_IL_004b:
+call System.String::CompareOrdinal(String,String)
+M00000009_IL_0050:
+ldc.i4 0
+M00000009_IL_0051:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0053:
+ldc.i4 0
+M00000009_IL_0054:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0056:
+brfalse M00000009_IL_0071
+M00000009_IL_005b:
+ldarg 0
+M00000009_IL_005c:
+ldstr "f"
+M00000009_IL_0061:
+call System.String::CompareOrdinal(String,String)
+M00000009_IL_0066:
+ldc.i4 0
+M00000009_IL_0067:
+cgt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0069:
+ldc.i4 0
+M00000009_IL_006a:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_006c:
+br M00000009_IL_0072
+M00000009_IL_0071:
+ldc.i4 0
+M00000009_IL_0072:
+br M00000009_IL_0078
+M00000009_IL_0077:
+ldc.i4 1
+M00000009_IL_0078:
+call neoCLR.Library.System.Uri.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static Parse(String text) -> System.Result<System.Uri,System.UriError>
+.local Int32 local0
+.local Int32 local1
+.local String local2
+.local String local3
+.local String local4
+.local String local5
+.local String local6
+.local Int32 local7
+.local Int32 local8
+.local String local9
+.local Int32 local10
+.local Int32 local11
+.local Int32 local12
+.local String local13
+ldc.i4 0
+stloc local0
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local7
+ldc.i4 0
+stloc local8
+ldc.i4 0
+stloc local10
+ldc.i4 0
+stloc local11
+ldc.i4 0
+stloc local12
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+call neoCLR.Library.System.Uri.RuntimeStringGetUtf8ByteCount(String)
+M0000000a_IL_0008:
+ldc.i4 4096
+M0000000a_IL_000d:
+cgt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_000f:
+brtrue M0000000a_IL_0019
+M0000000a_IL_0014:
+br M0000000a_IL_002e
+M0000000a_IL_0019:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorTooLongNew()
+M0000000a_IL_001e:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorTooLong(System.UriError.TooLong)
+M0000000a_IL_0023:
+call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
+M0000000a_IL_0028:
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+M0000000a_IL_002d:
+ret
+M0000000a_IL_002e:
+M0000000a_IL_002f:
+M0000000a_IL_0030:
+ldarg 0
+M0000000a_IL_0031:
+call neoCLR.Library.System.Uri.RuntimeStringGetUtf8ByteCount(String)
+M0000000a_IL_0036:
+stloc local0
+M0000000a_IL_0037:
+M0000000a_IL_0038:
+ldc.i4 0
+M0000000a_IL_0039:
+stloc local1
+M0000000a_IL_003a:
+M0000000a_IL_003b:
+M0000000a_IL_003c:
+ldloc local1
+M0000000a_IL_003d:
+ldloc local0
+M0000000a_IL_003e:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0040:
+brtrue M0000000a_IL_004a
+M0000000a_IL_0045:
+br M0000000a_IL_0315
+M0000000a_IL_004a:
+M0000000a_IL_004b:
+ldarg 0
+M0000000a_IL_004c:
+ldloc local1
+M0000000a_IL_004d:
+call System.Uri::At(String,Int32)
+M0000000a_IL_0052:
+stloc local2
+M0000000a_IL_0053:
+M0000000a_IL_0054:
+ldloc local2
+M0000000a_IL_0055:
+ldstr "%"
+M0000000a_IL_005a:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_005f:
+brtrue M0000000a_IL_0069
+M0000000a_IL_0064:
+br M0000000a_IL_00d5
+M0000000a_IL_0069:
+M0000000a_IL_006a:
+ldloc local1
+M0000000a_IL_006b:
+ldc.i4 2
+M0000000a_IL_006c:
+add
+M0000000a_IL_006d:
+ldloc local0
+M0000000a_IL_006e:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0070:
+ldc.i4 0
+M0000000a_IL_0071:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0073:
+brtrue M0000000a_IL_008e
+M0000000a_IL_0078:
+ldarg 0
+M0000000a_IL_0079:
+ldloc local1
+M0000000a_IL_007a:
+ldc.i4 1
+M0000000a_IL_007b:
+add
+M0000000a_IL_007c:
+call System.Uri::At(String,Int32)
+M0000000a_IL_0081:
+call System.Uri::Hex(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0086:
+ldc.i4 0
+M0000000a_IL_0087:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0089:
+br M0000000a_IL_008f
+M0000000a_IL_008e:
+ldc.i4 1
+M0000000a_IL_008f:
+brtrue M0000000a_IL_00aa
+M0000000a_IL_0094:
+ldarg 0
+M0000000a_IL_0095:
+ldloc local1
+M0000000a_IL_0096:
+ldc.i4 2
+M0000000a_IL_0097:
+add
+M0000000a_IL_0098:
+call System.Uri::At(String,Int32)
+M0000000a_IL_009d:
+call System.Uri::Hex(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_00a2:
+ldc.i4 0
+M0000000a_IL_00a3:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_00a5:
+br M0000000a_IL_00ab
+M0000000a_IL_00aa:
+ldc.i4 1
+M0000000a_IL_00ab:
+brtrue M0000000a_IL_00b5
+M0000000a_IL_00b0:
+br M0000000a_IL_00ca
+M0000000a_IL_00b5:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorInvalidFormatNew()
+M0000000a_IL_00ba:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvalidFormat(System.UriError.InvalidFormat)
+M0000000a_IL_00bf:
+call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
+M0000000a_IL_00c4:
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+M0000000a_IL_00c9:
+ret
+M0000000a_IL_00ca:
+M0000000a_IL_00cb:
+M0000000a_IL_00cc:
+ldloc local1
+M0000000a_IL_00cd:
+ldc.i4 3
+M0000000a_IL_00ce:
+add
+M0000000a_IL_00cf:
+stloc local1
+M0000000a_IL_00d0:
+br M0000000a_IL_003b
+M0000000a_IL_00d5:
+M0000000a_IL_00d6:
+M0000000a_IL_00d7:
+ldloc local2
+M0000000a_IL_00d8:
+call System.Uri::Alpha(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_00dd:
+brtrue M0000000a_IL_00ed
+M0000000a_IL_00e2:
+ldloc local2
+M0000000a_IL_00e3:
+call System.Uri::Digit(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_00e8:
+br M0000000a_IL_00ee
+M0000000a_IL_00ed:
+ldc.i4 1
+M0000000a_IL_00ee:
+brtrue M0000000a_IL_0103
+M0000000a_IL_00f3:
+ldloc local2
+M0000000a_IL_00f4:
+ldstr "-"
+M0000000a_IL_00f9:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_00fe:
+br M0000000a_IL_0104
+M0000000a_IL_0103:
+ldc.i4 1
+M0000000a_IL_0104:
+brtrue M0000000a_IL_0119
+M0000000a_IL_0109:
+ldloc local2
+M0000000a_IL_010a:
+ldstr "."
+M0000000a_IL_010f:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0114:
+br M0000000a_IL_011a
+M0000000a_IL_0119:
+ldc.i4 1
+M0000000a_IL_011a:
+brtrue M0000000a_IL_012f
+M0000000a_IL_011f:
+ldloc local2
+M0000000a_IL_0120:
+ldstr "_"
+M0000000a_IL_0125:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_012a:
+br M0000000a_IL_0130
+M0000000a_IL_012f:
+ldc.i4 1
+M0000000a_IL_0130:
+brtrue M0000000a_IL_0145
+M0000000a_IL_0135:
+ldloc local2
+M0000000a_IL_0136:
+ldstr "~"
+M0000000a_IL_013b:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0140:
+br M0000000a_IL_0146
+M0000000a_IL_0145:
+ldc.i4 1
+M0000000a_IL_0146:
+brtrue M0000000a_IL_015b
+M0000000a_IL_014b:
+ldloc local2
+M0000000a_IL_014c:
+ldstr ":"
+M0000000a_IL_0151:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0156:
+br M0000000a_IL_015c
+M0000000a_IL_015b:
+ldc.i4 1
+M0000000a_IL_015c:
+brtrue M0000000a_IL_0171
+M0000000a_IL_0161:
+ldloc local2
+M0000000a_IL_0162:
+ldstr "/"
+M0000000a_IL_0167:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_016c:
+br M0000000a_IL_0172
+M0000000a_IL_0171:
+ldc.i4 1
+M0000000a_IL_0172:
+brtrue M0000000a_IL_0187
+M0000000a_IL_0177:
+ldloc local2
+M0000000a_IL_0178:
+ldstr "?"
+M0000000a_IL_017d:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0182:
+br M0000000a_IL_0188
+M0000000a_IL_0187:
+ldc.i4 1
+M0000000a_IL_0188:
+brtrue M0000000a_IL_019d
+M0000000a_IL_018d:
+ldloc local2
+M0000000a_IL_018e:
+ldstr "#"
+M0000000a_IL_0193:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0198:
+br M0000000a_IL_019e
+M0000000a_IL_019d:
+ldc.i4 1
+M0000000a_IL_019e:
+brtrue M0000000a_IL_01b3
+M0000000a_IL_01a3:
+ldloc local2
+M0000000a_IL_01a4:
+ldstr "@"
+M0000000a_IL_01a9:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_01ae:
+br M0000000a_IL_01b4
+M0000000a_IL_01b3:
+ldc.i4 1
+M0000000a_IL_01b4:
+brtrue M0000000a_IL_01c9
+M0000000a_IL_01b9:
+ldloc local2
+M0000000a_IL_01ba:
+ldstr "!"
+M0000000a_IL_01bf:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_01c4:
+br M0000000a_IL_01ca
+M0000000a_IL_01c9:
+ldc.i4 1
+M0000000a_IL_01ca:
+brtrue M0000000a_IL_01df
+M0000000a_IL_01cf:
+ldloc local2
+M0000000a_IL_01d0:
+ldstr "$"
+M0000000a_IL_01d5:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_01da:
+br M0000000a_IL_01e0
+M0000000a_IL_01df:
+ldc.i4 1
+M0000000a_IL_01e0:
+brtrue M0000000a_IL_01f5
+M0000000a_IL_01e5:
+ldloc local2
+M0000000a_IL_01e6:
+ldstr "\u0026"
+M0000000a_IL_01eb:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_01f0:
+br M0000000a_IL_01f6
+M0000000a_IL_01f5:
+ldc.i4 1
+M0000000a_IL_01f6:
+brtrue M0000000a_IL_020b
+M0000000a_IL_01fb:
+ldloc local2
+M0000000a_IL_01fc:
+ldstr "\u0027"
+M0000000a_IL_0201:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0206:
+br M0000000a_IL_020c
+M0000000a_IL_020b:
+ldc.i4 1
+M0000000a_IL_020c:
+brtrue M0000000a_IL_0221
+M0000000a_IL_0211:
+ldloc local2
+M0000000a_IL_0212:
+ldstr "("
+M0000000a_IL_0217:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_021c:
+br M0000000a_IL_0222
+M0000000a_IL_0221:
+ldc.i4 1
+M0000000a_IL_0222:
+brtrue M0000000a_IL_0237
+M0000000a_IL_0227:
+ldloc local2
+M0000000a_IL_0228:
+ldstr ")"
+M0000000a_IL_022d:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0232:
+br M0000000a_IL_0238
+M0000000a_IL_0237:
+ldc.i4 1
+M0000000a_IL_0238:
+brtrue M0000000a_IL_024d
+M0000000a_IL_023d:
+ldloc local2
+M0000000a_IL_023e:
+ldstr "*"
+M0000000a_IL_0243:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0248:
+br M0000000a_IL_024e
+M0000000a_IL_024d:
+ldc.i4 1
+M0000000a_IL_024e:
+brtrue M0000000a_IL_0263
+M0000000a_IL_0253:
+ldloc local2
+M0000000a_IL_0254:
+ldstr "\u002B"
+M0000000a_IL_0259:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_025e:
+br M0000000a_IL_0264
+M0000000a_IL_0263:
+ldc.i4 1
+M0000000a_IL_0264:
+brtrue M0000000a_IL_0279
+M0000000a_IL_0269:
+ldloc local2
+M0000000a_IL_026a:
+ldstr ","
+M0000000a_IL_026f:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0274:
+br M0000000a_IL_027a
+M0000000a_IL_0279:
+ldc.i4 1
+M0000000a_IL_027a:
+brtrue M0000000a_IL_028f
+M0000000a_IL_027f:
+ldloc local2
+M0000000a_IL_0280:
+ldstr ";"
+M0000000a_IL_0285:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_028a:
+br M0000000a_IL_0290
+M0000000a_IL_028f:
+ldc.i4 1
+M0000000a_IL_0290:
+brtrue M0000000a_IL_02a5
+M0000000a_IL_0295:
+ldloc local2
+M0000000a_IL_0296:
+ldstr "="
+M0000000a_IL_029b:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_02a0:
+br M0000000a_IL_02a6
+M0000000a_IL_02a5:
+ldc.i4 1
+M0000000a_IL_02a6:
+ldc.i4 0
+M0000000a_IL_02a7:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_02a9:
+brtrue M0000000a_IL_02b3
+M0000000a_IL_02ae:
+br M0000000a_IL_030a
+M0000000a_IL_02b3:
+M0000000a_IL_02b4:
+ldloc local2
+M0000000a_IL_02b5:
+ldstr "["
+M0000000a_IL_02ba:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_02bf:
+brtrue M0000000a_IL_02d4
+M0000000a_IL_02c4:
+ldloc local2
+M0000000a_IL_02c5:
+ldstr "]"
+M0000000a_IL_02ca:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_02cf:
+br M0000000a_IL_02d5
+M0000000a_IL_02d4:
+ldc.i4 1
+M0000000a_IL_02d5:
+brtrue M0000000a_IL_02df
+M0000000a_IL_02da:
+br M0000000a_IL_02f4
+M0000000a_IL_02df:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorUnsupportedAuthorityNew()
+M0000000a_IL_02e4:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorUnsupportedAuthority(System.UriError.UnsupportedAuthority)
+M0000000a_IL_02e9:
+call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
+M0000000a_IL_02ee:
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+M0000000a_IL_02f3:
+ret
+M0000000a_IL_02f4:
+M0000000a_IL_02f5:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorInvalidFormatNew()
+M0000000a_IL_02fa:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvalidFormat(System.UriError.InvalidFormat)
+M0000000a_IL_02ff:
+call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
+M0000000a_IL_0304:
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+M0000000a_IL_0309:
+ret
+M0000000a_IL_030a:
+M0000000a_IL_030b:
+M0000000a_IL_030c:
+ldloc local1
+M0000000a_IL_030d:
+ldc.i4 1
+M0000000a_IL_030e:
+add
+M0000000a_IL_030f:
+stloc local1
+M0000000a_IL_0310:
+br M0000000a_IL_003b
+M0000000a_IL_0315:
+M0000000a_IL_0316:
+M0000000a_IL_0317:
+ldstr ""
+M0000000a_IL_031c:
+stloc local3
+M0000000a_IL_031d:
+M0000000a_IL_031e:
+ldstr ""
+M0000000a_IL_0323:
+stloc local4
+M0000000a_IL_0325:
+M0000000a_IL_0326:
+ldstr ""
+M0000000a_IL_032b:
+stloc local5
+M0000000a_IL_032d:
+M0000000a_IL_032e:
+ldstr ""
+M0000000a_IL_0333:
+stloc local6
+M0000000a_IL_0335:
+M0000000a_IL_0336:
+ldc.i4 0
+M0000000a_IL_0337:
+stloc local7
+M0000000a_IL_0339:
+M0000000a_IL_033a:
+ldc.i4 0
+M0000000a_IL_033b:
+stloc local1
+M0000000a_IL_033c:
+M0000000a_IL_033d:
+M0000000a_IL_033e:
+ldloc local1
+M0000000a_IL_033f:
+ldloc local0
+M0000000a_IL_0340:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0342:
+brfalse M0000000a_IL_0395
+M0000000a_IL_0347:
+ldarg 0
+M0000000a_IL_0348:
+ldloc local1
+M0000000a_IL_0349:
+call System.Uri::At(String,Int32)
+M0000000a_IL_034e:
+ldstr "/"
+M0000000a_IL_0353:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+ldc.bool false
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0358:
+brfalse M0000000a_IL_038f
+M0000000a_IL_035d:
+ldarg 0
+M0000000a_IL_035e:
+ldloc local1
+M0000000a_IL_035f:
+call System.Uri::At(String,Int32)
+M0000000a_IL_0364:
+ldstr "?"
+M0000000a_IL_0369:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+ldc.bool false
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_036e:
+brfalse M0000000a_IL_0389
+M0000000a_IL_0373:
+ldarg 0
+M0000000a_IL_0374:
+ldloc local1
+M0000000a_IL_0375:
+call System.Uri::At(String,Int32)
+M0000000a_IL_037a:
+ldstr "#"
+M0000000a_IL_037f:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+ldc.bool false
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0384:
+br M0000000a_IL_038a
+M0000000a_IL_0389:
+ldc.i4 0
+M0000000a_IL_038a:
+br M0000000a_IL_0390
+M0000000a_IL_038f:
+ldc.i4 0
+M0000000a_IL_0390:
+br M0000000a_IL_0396
+M0000000a_IL_0395:
+ldc.i4 0
+M0000000a_IL_0396:
+brtrue M0000000a_IL_03a0
+M0000000a_IL_039b:
+br M0000000a_IL_04cc
+M0000000a_IL_03a0:
+M0000000a_IL_03a1:
+ldarg 0
+M0000000a_IL_03a2:
+ldloc local1
+M0000000a_IL_03a3:
+call System.Uri::At(String,Int32)
+M0000000a_IL_03a8:
+ldstr ":"
+M0000000a_IL_03ad:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_03b2:
+brtrue M0000000a_IL_03bc
+M0000000a_IL_03b7:
+br M0000000a_IL_04c1
+M0000000a_IL_03bc:
+M0000000a_IL_03bd:
+ldloc local1
+M0000000a_IL_03be:
+ldc.i4 0
+M0000000a_IL_03bf:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_03c1:
+brtrue M0000000a_IL_03da
+M0000000a_IL_03c6:
+ldarg 0
+M0000000a_IL_03c7:
+ldc.i4 0
+M0000000a_IL_03c8:
+call System.Uri::At(String,Int32)
+M0000000a_IL_03cd:
+call System.Uri::Alpha(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_03d2:
+ldc.i4 0
+M0000000a_IL_03d3:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_03d5:
+br M0000000a_IL_03db
+M0000000a_IL_03da:
+ldc.i4 1
+M0000000a_IL_03db:
+brtrue M0000000a_IL_03e5
+M0000000a_IL_03e0:
+br M0000000a_IL_03fa
+M0000000a_IL_03e5:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorInvalidFormatNew()
+M0000000a_IL_03ea:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvalidFormat(System.UriError.InvalidFormat)
+M0000000a_IL_03ef:
+call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
+M0000000a_IL_03f4:
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+M0000000a_IL_03f9:
+ret
+M0000000a_IL_03fa:
+M0000000a_IL_03fb:
+M0000000a_IL_03fc:
+ldc.i4 1
+M0000000a_IL_03fd:
+stloc local8
+M0000000a_IL_03ff:
+M0000000a_IL_0400:
+M0000000a_IL_0401:
+ldloc local8
+M0000000a_IL_0403:
+ldloc local1
+M0000000a_IL_0404:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0406:
+brtrue M0000000a_IL_0410
+M0000000a_IL_040b:
+br M0000000a_IL_04a9
+M0000000a_IL_0410:
+M0000000a_IL_0411:
+ldarg 0
+M0000000a_IL_0412:
+ldloc local8
+M0000000a_IL_0414:
+call System.Uri::At(String,Int32)
+M0000000a_IL_0419:
+stloc local9
+M0000000a_IL_041b:
+M0000000a_IL_041c:
+ldloc local9
+M0000000a_IL_041e:
+call System.Uri::Alpha(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0423:
+brtrue M0000000a_IL_0434
+M0000000a_IL_0428:
+ldloc local9
+M0000000a_IL_042a:
+call System.Uri::Digit(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_042f:
+br M0000000a_IL_0435
+M0000000a_IL_0434:
+ldc.i4 1
+M0000000a_IL_0435:
+brtrue M0000000a_IL_044b
+M0000000a_IL_043a:
+ldloc local9
+M0000000a_IL_043c:
+ldstr "\u002B"
+M0000000a_IL_0441:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0446:
+br M0000000a_IL_044c
+M0000000a_IL_044b:
+ldc.i4 1
+M0000000a_IL_044c:
+brtrue M0000000a_IL_0462
+M0000000a_IL_0451:
+ldloc local9
+M0000000a_IL_0453:
+ldstr "-"
+M0000000a_IL_0458:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_045d:
+br M0000000a_IL_0463
+M0000000a_IL_0462:
+ldc.i4 1
+M0000000a_IL_0463:
+brtrue M0000000a_IL_0479
+M0000000a_IL_0468:
+ldloc local9
+M0000000a_IL_046a:
+ldstr "."
+M0000000a_IL_046f:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0474:
+br M0000000a_IL_047a
+M0000000a_IL_0479:
+ldc.i4 1
+M0000000a_IL_047a:
+ldc.i4 0
+M0000000a_IL_047b:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_047d:
+brtrue M0000000a_IL_0487
+M0000000a_IL_0482:
+br M0000000a_IL_049c
+M0000000a_IL_0487:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorInvalidFormatNew()
+M0000000a_IL_048c:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvalidFormat(System.UriError.InvalidFormat)
+M0000000a_IL_0491:
+call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
+M0000000a_IL_0496:
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+M0000000a_IL_049b:
+ret
+M0000000a_IL_049c:
+M0000000a_IL_049d:
+M0000000a_IL_049e:
+ldloc local8
+M0000000a_IL_04a0:
+ldc.i4 1
+M0000000a_IL_04a1:
+add
+M0000000a_IL_04a2:
+stloc local8
+M0000000a_IL_04a4:
+br M0000000a_IL_0400
+M0000000a_IL_04a9:
+M0000000a_IL_04aa:
+M0000000a_IL_04ab:
+ldarg 0
+M0000000a_IL_04ac:
+ldc.i4 0
+M0000000a_IL_04ad:
+ldloc local1
+M0000000a_IL_04ae:
+ldc.i4 1
+M0000000a_IL_04af:
+add
+M0000000a_IL_04b0:
+call System.Uri::Part(String,Int32,Int32)
+M0000000a_IL_04b5:
+stloc local3
+M0000000a_IL_04b6:
+M0000000a_IL_04b7:
+ldloc local1
+M0000000a_IL_04b8:
+ldc.i4 1
+M0000000a_IL_04b9:
+add
+M0000000a_IL_04ba:
+stloc local7
+M0000000a_IL_04bc:
+br M0000000a_IL_04cc
+M0000000a_IL_04c1:
+M0000000a_IL_04c2:
+M0000000a_IL_04c3:
+ldloc local1
+M0000000a_IL_04c4:
+ldc.i4 1
+M0000000a_IL_04c5:
+add
+M0000000a_IL_04c6:
+stloc local1
+M0000000a_IL_04c7:
+br M0000000a_IL_033d
+M0000000a_IL_04cc:
+M0000000a_IL_04cd:
+M0000000a_IL_04ce:
+ldloc local7
+M0000000a_IL_04d0:
+ldc.i4 1
+M0000000a_IL_04d1:
+add
+M0000000a_IL_04d2:
+ldloc local0
+M0000000a_IL_04d3:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_04d5:
+brfalse M0000000a_IL_0510
+M0000000a_IL_04da:
+ldarg 0
+M0000000a_IL_04db:
+ldloc local7
+M0000000a_IL_04dd:
+call System.Uri::At(String,Int32)
+M0000000a_IL_04e2:
+ldstr "/"
+M0000000a_IL_04e7:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_04ec:
+brfalse M0000000a_IL_050a
+M0000000a_IL_04f1:
+ldarg 0
+M0000000a_IL_04f2:
+ldloc local7
+M0000000a_IL_04f4:
+ldc.i4 1
+M0000000a_IL_04f5:
+add
+M0000000a_IL_04f6:
+call System.Uri::At(String,Int32)
+M0000000a_IL_04fb:
+ldstr "/"
+M0000000a_IL_0500:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0505:
+br M0000000a_IL_050b
+M0000000a_IL_050a:
+ldc.i4 0
+M0000000a_IL_050b:
+br M0000000a_IL_0511
+M0000000a_IL_0510:
+ldc.i4 0
+M0000000a_IL_0511:
+brtrue M0000000a_IL_051b
+M0000000a_IL_0516:
+br M0000000a_IL_06f9
+M0000000a_IL_051b:
+M0000000a_IL_051c:
+ldloc local7
+M0000000a_IL_051e:
+ldc.i4 2
+M0000000a_IL_051f:
+add
+M0000000a_IL_0520:
+stloc local1
+M0000000a_IL_0521:
+M0000000a_IL_0522:
+ldc.i4 -1
+M0000000a_IL_0523:
+stloc local10
+M0000000a_IL_0525:
+M0000000a_IL_0526:
+ldc.i4 -1
+M0000000a_IL_0527:
+stloc local11
+M0000000a_IL_0529:
+M0000000a_IL_052a:
+M0000000a_IL_052b:
+ldloc local1
+M0000000a_IL_052c:
+ldloc local0
+M0000000a_IL_052d:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_052f:
+brfalse M0000000a_IL_0582
+M0000000a_IL_0534:
+ldarg 0
+M0000000a_IL_0535:
+ldloc local1
+M0000000a_IL_0536:
+call System.Uri::At(String,Int32)
+M0000000a_IL_053b:
+ldstr "/"
+M0000000a_IL_0540:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+ldc.bool false
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0545:
+brfalse M0000000a_IL_057c
+M0000000a_IL_054a:
+ldarg 0
+M0000000a_IL_054b:
+ldloc local1
+M0000000a_IL_054c:
+call System.Uri::At(String,Int32)
+M0000000a_IL_0551:
+ldstr "?"
+M0000000a_IL_0556:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+ldc.bool false
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_055b:
+brfalse M0000000a_IL_0576
+M0000000a_IL_0560:
+ldarg 0
+M0000000a_IL_0561:
+ldloc local1
+M0000000a_IL_0562:
+call System.Uri::At(String,Int32)
+M0000000a_IL_0567:
+ldstr "#"
+M0000000a_IL_056c:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+ldc.bool false
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0571:
+br M0000000a_IL_0577
+M0000000a_IL_0576:
+ldc.i4 0
+M0000000a_IL_0577:
+br M0000000a_IL_057d
+M0000000a_IL_057c:
+ldc.i4 0
+M0000000a_IL_057d:
+br M0000000a_IL_0583
+M0000000a_IL_0582:
+ldc.i4 0
+M0000000a_IL_0583:
+brtrue M0000000a_IL_058d
+M0000000a_IL_0588:
+br M0000000a_IL_060c
+M0000000a_IL_058d:
+M0000000a_IL_058e:
+ldarg 0
+M0000000a_IL_058f:
+ldloc local1
+M0000000a_IL_0590:
+call System.Uri::At(String,Int32)
+M0000000a_IL_0595:
+ldstr "@"
+M0000000a_IL_059a:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_059f:
+brtrue M0000000a_IL_05a9
+M0000000a_IL_05a4:
+br M0000000a_IL_05e0
+M0000000a_IL_05a9:
+M0000000a_IL_05aa:
+ldloc local10
+M0000000a_IL_05ac:
+ldc.i4 0
+M0000000a_IL_05ad:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_05af:
+ldc.i4 0
+M0000000a_IL_05b0:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_05b2:
+brtrue M0000000a_IL_05bc
+M0000000a_IL_05b7:
+br M0000000a_IL_05d1
+M0000000a_IL_05bc:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorInvalidFormatNew()
+M0000000a_IL_05c1:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvalidFormat(System.UriError.InvalidFormat)
+M0000000a_IL_05c6:
+call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
+M0000000a_IL_05cb:
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+M0000000a_IL_05d0:
+ret
+M0000000a_IL_05d1:
+M0000000a_IL_05d2:
+M0000000a_IL_05d3:
+ldloc local1
+M0000000a_IL_05d4:
+stloc local10
+M0000000a_IL_05d6:
+M0000000a_IL_05d7:
+ldc.i4 -1
+M0000000a_IL_05d8:
+stloc local11
+M0000000a_IL_05da:
+br M0000000a_IL_0601
+M0000000a_IL_05e0:
+M0000000a_IL_05e1:
+M0000000a_IL_05e2:
+ldarg 0
+M0000000a_IL_05e3:
+ldloc local1
+M0000000a_IL_05e4:
+call System.Uri::At(String,Int32)
+M0000000a_IL_05e9:
+ldstr ":"
+M0000000a_IL_05ee:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_05f3:
+brtrue M0000000a_IL_05fd
+M0000000a_IL_05f8:
+br M0000000a_IL_0600
+M0000000a_IL_05fd:
+ldloc local1
+M0000000a_IL_05fe:
+stloc local11
+M0000000a_IL_0600:
+M0000000a_IL_0601:
+M0000000a_IL_0602:
+M0000000a_IL_0603:
+ldloc local1
+M0000000a_IL_0604:
+ldc.i4 1
+M0000000a_IL_0605:
+add
+M0000000a_IL_0606:
+stloc local1
+M0000000a_IL_0607:
+br M0000000a_IL_052a
+M0000000a_IL_060c:
+M0000000a_IL_060d:
+M0000000a_IL_060e:
+ldloc local7
+M0000000a_IL_0610:
+ldc.i4 2
+M0000000a_IL_0611:
+add
+M0000000a_IL_0612:
+stloc local12
+M0000000a_IL_0614:
+M0000000a_IL_0615:
+ldloc local10
+M0000000a_IL_0617:
+ldc.i4 0
+M0000000a_IL_0618:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_061a:
+ldc.i4 0
+M0000000a_IL_061b:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_061d:
+brtrue M0000000a_IL_0627
+M0000000a_IL_0622:
+br M0000000a_IL_062e
+M0000000a_IL_0627:
+M0000000a_IL_0628:
+ldloc local10
+M0000000a_IL_062a:
+ldc.i4 1
+M0000000a_IL_062b:
+add
+M0000000a_IL_062c:
+stloc local12
+M0000000a_IL_062e:
+M0000000a_IL_062f:
+M0000000a_IL_0630:
+M0000000a_IL_0631:
+ldloc local12
+M0000000a_IL_0633:
+ldloc local1
+M0000000a_IL_0634:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0636:
+brtrue M0000000a_IL_0640
+M0000000a_IL_063b:
+br M0000000a_IL_06e8
+M0000000a_IL_0640:
+M0000000a_IL_0641:
+ldarg 0
+M0000000a_IL_0642:
+ldloc local12
+M0000000a_IL_0644:
+call System.Uri::At(String,Int32)
+M0000000a_IL_0649:
+ldstr ":"
+M0000000a_IL_064e:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0653:
+brfalse M0000000a_IL_0666
+M0000000a_IL_0658:
+ldloc local12
+M0000000a_IL_065a:
+ldloc local11
+M0000000a_IL_065c:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_065e:
+ldc.i4 0
+M0000000a_IL_065f:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0661:
+br M0000000a_IL_0667
+M0000000a_IL_0666:
+ldc.i4 0
+M0000000a_IL_0667:
+brtrue M0000000a_IL_0671
+M0000000a_IL_066c:
+br M0000000a_IL_0686
+M0000000a_IL_0671:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorInvalidFormatNew()
+M0000000a_IL_0676:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvalidFormat(System.UriError.InvalidFormat)
+M0000000a_IL_067b:
+call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
+M0000000a_IL_0680:
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+M0000000a_IL_0685:
+ret
+M0000000a_IL_0686:
+M0000000a_IL_0687:
+M0000000a_IL_0688:
+ldloc local11
+M0000000a_IL_068a:
+ldc.i4 0
+M0000000a_IL_068b:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_068d:
+ldc.i4 0
+M0000000a_IL_068e:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0690:
+brfalse M0000000a_IL_06bb
+M0000000a_IL_0695:
+ldloc local12
+M0000000a_IL_0697:
+ldloc local11
+M0000000a_IL_0699:
+cgt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_069b:
+brfalse M0000000a_IL_06b5
+M0000000a_IL_06a0:
+ldarg 0
+M0000000a_IL_06a1:
+ldloc local12
+M0000000a_IL_06a3:
+call System.Uri::At(String,Int32)
+M0000000a_IL_06a8:
+call System.Uri::Digit(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_06ad:
+ldc.i4 0
+M0000000a_IL_06ae:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_06b0:
+br M0000000a_IL_06b6
+M0000000a_IL_06b5:
+ldc.i4 0
+M0000000a_IL_06b6:
+br M0000000a_IL_06bc
+M0000000a_IL_06bb:
+ldc.i4 0
+M0000000a_IL_06bc:
+brtrue M0000000a_IL_06c6
+M0000000a_IL_06c1:
+br M0000000a_IL_06db
+M0000000a_IL_06c6:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorInvalidFormatNew()
+M0000000a_IL_06cb:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvalidFormat(System.UriError.InvalidFormat)
+M0000000a_IL_06d0:
+call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
+M0000000a_IL_06d5:
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+M0000000a_IL_06da:
+ret
+M0000000a_IL_06db:
+M0000000a_IL_06dc:
+M0000000a_IL_06dd:
+ldloc local12
+M0000000a_IL_06df:
+ldc.i4 1
+M0000000a_IL_06e0:
+add
+M0000000a_IL_06e1:
+stloc local12
+M0000000a_IL_06e3:
+br M0000000a_IL_0630
+M0000000a_IL_06e8:
+M0000000a_IL_06e9:
+M0000000a_IL_06ea:
+ldarg 0
+M0000000a_IL_06eb:
+ldloc local7
+M0000000a_IL_06ed:
+ldloc local1
+M0000000a_IL_06ee:
+call System.Uri::Part(String,Int32,Int32)
+M0000000a_IL_06f3:
+stloc local4
+M0000000a_IL_06f5:
+M0000000a_IL_06f6:
+ldloc local1
+M0000000a_IL_06f7:
+stloc local7
+M0000000a_IL_06f9:
+M0000000a_IL_06fa:
+M0000000a_IL_06fb:
+ldloc local7
+M0000000a_IL_06fd:
+stloc local1
+M0000000a_IL_06fe:
+M0000000a_IL_06ff:
+M0000000a_IL_0700:
+ldloc local1
+M0000000a_IL_0701:
+ldloc local0
+M0000000a_IL_0702:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0704:
+brfalse M0000000a_IL_073b
+M0000000a_IL_0709:
+ldarg 0
+M0000000a_IL_070a:
+ldloc local1
+M0000000a_IL_070b:
+call System.Uri::At(String,Int32)
+M0000000a_IL_0710:
+ldstr "?"
+M0000000a_IL_0715:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+ldc.bool false
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_071a:
+brfalse M0000000a_IL_0735
+M0000000a_IL_071f:
+ldarg 0
+M0000000a_IL_0720:
+ldloc local1
+M0000000a_IL_0721:
+call System.Uri::At(String,Int32)
+M0000000a_IL_0726:
+ldstr "#"
+M0000000a_IL_072b:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+ldc.bool false
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0730:
+br M0000000a_IL_0736
+M0000000a_IL_0735:
+ldc.i4 0
+M0000000a_IL_0736:
+br M0000000a_IL_073c
+M0000000a_IL_073b:
+ldc.i4 0
+M0000000a_IL_073c:
+brtrue M0000000a_IL_0746
+M0000000a_IL_0741:
+br M0000000a_IL_0750
+M0000000a_IL_0746:
+M0000000a_IL_0747:
+ldloc local1
+M0000000a_IL_0748:
+ldc.i4 1
+M0000000a_IL_0749:
+add
+M0000000a_IL_074a:
+stloc local1
+M0000000a_IL_074b:
+br M0000000a_IL_06ff
+M0000000a_IL_0750:
+M0000000a_IL_0751:
+M0000000a_IL_0752:
+ldarg 0
+M0000000a_IL_0753:
+ldloc local7
+M0000000a_IL_0755:
+ldloc local1
+M0000000a_IL_0756:
+call System.Uri::Part(String,Int32,Int32)
+M0000000a_IL_075b:
+stloc local13
+M0000000a_IL_075d:
+M0000000a_IL_075e:
+ldloc local1
+M0000000a_IL_075f:
+ldloc local0
+M0000000a_IL_0760:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0762:
+brfalse M0000000a_IL_077d
+M0000000a_IL_0767:
+ldarg 0
+M0000000a_IL_0768:
+ldloc local1
+M0000000a_IL_0769:
+call System.Uri::At(String,Int32)
+M0000000a_IL_076e:
+ldstr "?"
+M0000000a_IL_0773:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0778:
+br M0000000a_IL_077e
+M0000000a_IL_077d:
+ldc.i4 0
+M0000000a_IL_077e:
+brtrue M0000000a_IL_0788
+M0000000a_IL_0783:
+br M0000000a_IL_07d4
+M0000000a_IL_0788:
+M0000000a_IL_0789:
+ldloc local1
+M0000000a_IL_078a:
+stloc local7
+M0000000a_IL_078c:
+M0000000a_IL_078d:
+ldloc local1
+M0000000a_IL_078e:
+ldc.i4 1
+M0000000a_IL_078f:
+add
+M0000000a_IL_0790:
+stloc local1
+M0000000a_IL_0791:
+M0000000a_IL_0792:
+M0000000a_IL_0793:
+ldloc local1
+M0000000a_IL_0794:
+ldloc local0
+M0000000a_IL_0795:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0797:
+brfalse M0000000a_IL_07b2
+M0000000a_IL_079c:
+ldarg 0
+M0000000a_IL_079d:
+ldloc local1
+M0000000a_IL_079e:
+call System.Uri::At(String,Int32)
+M0000000a_IL_07a3:
+ldstr "#"
+M0000000a_IL_07a8:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+ldc.bool false
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_07ad:
+br M0000000a_IL_07b3
+M0000000a_IL_07b2:
+ldc.i4 0
+M0000000a_IL_07b3:
+brtrue M0000000a_IL_07bd
+M0000000a_IL_07b8:
+br M0000000a_IL_07c7
+M0000000a_IL_07bd:
+M0000000a_IL_07be:
+ldloc local1
+M0000000a_IL_07bf:
+ldc.i4 1
+M0000000a_IL_07c0:
+add
+M0000000a_IL_07c1:
+stloc local1
+M0000000a_IL_07c2:
+br M0000000a_IL_0792
+M0000000a_IL_07c7:
+M0000000a_IL_07c8:
+M0000000a_IL_07c9:
+ldarg 0
+M0000000a_IL_07ca:
+ldloc local7
+M0000000a_IL_07cc:
+ldloc local1
+M0000000a_IL_07cd:
+call System.Uri::Part(String,Int32,Int32)
+M0000000a_IL_07d2:
+stloc local5
+M0000000a_IL_07d4:
+M0000000a_IL_07d5:
+M0000000a_IL_07d6:
+ldloc local1
+M0000000a_IL_07d7:
+ldloc local0
+M0000000a_IL_07d8:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_07da:
+brtrue M0000000a_IL_07e4
+M0000000a_IL_07df:
+br M0000000a_IL_0846
+M0000000a_IL_07e4:
+M0000000a_IL_07e5:
+ldloc local1
+M0000000a_IL_07e6:
+stloc local7
+M0000000a_IL_07e8:
+M0000000a_IL_07e9:
+ldloc local1
+M0000000a_IL_07ea:
+ldc.i4 1
+M0000000a_IL_07eb:
+add
+M0000000a_IL_07ec:
+stloc local1
+M0000000a_IL_07ed:
+M0000000a_IL_07ee:
+M0000000a_IL_07ef:
+ldloc local1
+M0000000a_IL_07f0:
+ldloc local0
+M0000000a_IL_07f1:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_07f3:
+brtrue M0000000a_IL_07fd
+M0000000a_IL_07f8:
+br M0000000a_IL_0839
+M0000000a_IL_07fd:
+M0000000a_IL_07fe:
+ldarg 0
+M0000000a_IL_07ff:
+ldloc local1
+M0000000a_IL_0800:
+call System.Uri::At(String,Int32)
+M0000000a_IL_0805:
+ldstr "#"
+M0000000a_IL_080a:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_080f:
+brtrue M0000000a_IL_0819
+M0000000a_IL_0814:
+br M0000000a_IL_082e
+M0000000a_IL_0819:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorInvalidFormatNew()
+M0000000a_IL_081e:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvalidFormat(System.UriError.InvalidFormat)
+M0000000a_IL_0823:
+call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
+M0000000a_IL_0828:
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+M0000000a_IL_082d:
+ret
+M0000000a_IL_082e:
+M0000000a_IL_082f:
+M0000000a_IL_0830:
+ldloc local1
+M0000000a_IL_0831:
+ldc.i4 1
+M0000000a_IL_0832:
+add
+M0000000a_IL_0833:
+stloc local1
+M0000000a_IL_0834:
+br M0000000a_IL_07ee
+M0000000a_IL_0839:
+M0000000a_IL_083a:
+M0000000a_IL_083b:
+ldarg 0
+M0000000a_IL_083c:
+ldloc local7
+M0000000a_IL_083e:
+ldloc local0
+M0000000a_IL_083f:
+call System.Uri::Part(String,Int32,Int32)
+M0000000a_IL_0844:
+stloc local6
+M0000000a_IL_0846:
+M0000000a_IL_0847:
+M0000000a_IL_0848:
+ldarg 0
+M0000000a_IL_0849:
+ldloc local3
+M0000000a_IL_084a:
+ldloc local4
+M0000000a_IL_084c:
+ldloc local13
+M0000000a_IL_084e:
+ldloc local5
+M0000000a_IL_0850:
+ldloc local6
+M0000000a_IL_0852:
+newobj instance System.Uri::.ctor(String,String,String,String,String,String)
+M0000000a_IL_0857:
+call neoCLR.Library.System.Uri.RuntimeUnion4(System.Uri)
+M0000000a_IL_085c:
+call neoCLR.Library.System.Uri.RuntimeUnion5(System.Result.Ok<System.Uri>)
+M0000000a_IL_0861:
+ret
+.end
+.method private static Parent(String path) -> String
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+call neoCLR.Library.System.Uri.RuntimeStringGetUtf8ByteCount(String)
+M0000000b_IL_0008:
+ldc.i4 1
+M0000000b_IL_0009:
+sub
+M0000000b_IL_000a:
+stloc local0
+M0000000b_IL_000b:
+M0000000b_IL_000c:
+M0000000b_IL_000d:
+ldloc local0
+M0000000b_IL_000e:
+ldc.i4 0
+M0000000b_IL_000f:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_0011:
+ldc.i4 0
+M0000000b_IL_0012:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_0014:
+brtrue M0000000b_IL_001e
+M0000000b_IL_0019:
+br M0000000b_IL_004f
+M0000000b_IL_001e:
+M0000000b_IL_001f:
+ldarg 0
+M0000000b_IL_0020:
+ldloc local0
+M0000000b_IL_0021:
+call System.Uri::At(String,Int32)
+M0000000b_IL_0026:
+ldstr "/"
+M0000000b_IL_002b:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_0030:
+brtrue M0000000b_IL_003a
+M0000000b_IL_0035:
+br M0000000b_IL_0044
+M0000000b_IL_003a:
+M0000000b_IL_003b:
+ldarg 0
+M0000000b_IL_003c:
+ldc.i4 0
+M0000000b_IL_003d:
+ldloc local0
+M0000000b_IL_003e:
+call System.Uri::Part(String,Int32,Int32)
+M0000000b_IL_0043:
+ret
+M0000000b_IL_0044:
+M0000000b_IL_0045:
+M0000000b_IL_0046:
+ldloc local0
+M0000000b_IL_0047:
+ldc.i4 1
+M0000000b_IL_0048:
+sub
+M0000000b_IL_0049:
+stloc local0
+M0000000b_IL_004a:
+br M0000000b_IL_000c
+M0000000b_IL_004f:
+M0000000b_IL_0050:
+M0000000b_IL_0051:
+ldstr ""
+M0000000b_IL_0056:
+ret
+.end
+.method private static RemoveDots(String path) -> String
+.local String local0
+.local String local1
+.local Int32 local2
+.local Int32 local3
+ldc.i4 0
+stloc local2
+ldc.i4 0
+stloc local3
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+stloc local0
+M0000000c_IL_0004:
+M0000000c_IL_0005:
+ldstr ""
+M0000000c_IL_000a:
+stloc local1
+M0000000c_IL_000b:
+M0000000c_IL_000c:
+M0000000c_IL_000d:
+ldloc local0
+M0000000c_IL_000e:
+call neoCLR.Library.System.Uri.RuntimeStringget_IsEmpty(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0013:
+ldc.i4 0
+M0000000c_IL_0014:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0016:
+brtrue M0000000c_IL_0020
+M0000000c_IL_001b:
+br M0000000c_IL_01af
+M0000000c_IL_0020:
+M0000000c_IL_0021:
+ldloc local0
+M0000000c_IL_0022:
+call neoCLR.Library.System.Uri.RuntimeStringGetUtf8ByteCount(String)
+M0000000c_IL_0027:
+stloc local2
+M0000000c_IL_0028:
+M0000000c_IL_0029:
+ldloc local0
+M0000000c_IL_002a:
+ldstr "../"
+M0000000c_IL_002f:
+call neoCLR.Library.System.Uri.RuntimeStringStartsWithOrdinal(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0034:
+brtrue M0000000c_IL_003e
+M0000000c_IL_0039:
+br M0000000c_IL_004e
+M0000000c_IL_003e:
+M0000000c_IL_003f:
+ldloc local0
+M0000000c_IL_0040:
+ldc.i4 3
+M0000000c_IL_0041:
+ldloc local2
+M0000000c_IL_0042:
+call System.Uri::Part(String,Int32,Int32)
+M0000000c_IL_0047:
+stloc local0
+M0000000c_IL_0048:
+br M0000000c_IL_01a9
+M0000000c_IL_004e:
+M0000000c_IL_004f:
+M0000000c_IL_0050:
+ldloc local0
+M0000000c_IL_0051:
+ldstr "./"
+M0000000c_IL_0056:
+call neoCLR.Library.System.Uri.RuntimeStringStartsWithOrdinal(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_005b:
+brtrue M0000000c_IL_0065
+M0000000c_IL_0060:
+br M0000000c_IL_0074
+M0000000c_IL_0065:
+M0000000c_IL_0066:
+ldloc local0
+M0000000c_IL_0067:
+ldc.i4 2
+M0000000c_IL_0068:
+ldloc local2
+M0000000c_IL_0069:
+call System.Uri::Part(String,Int32,Int32)
+M0000000c_IL_006e:
+stloc local0
+M0000000c_IL_006f:
+br M0000000c_IL_01a8
+M0000000c_IL_0074:
+M0000000c_IL_0075:
+M0000000c_IL_0076:
+ldloc local0
+M0000000c_IL_0077:
+ldstr "/./"
+M0000000c_IL_007c:
+call neoCLR.Library.System.Uri.RuntimeStringStartsWithOrdinal(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0081:
+brtrue M0000000c_IL_008b
+M0000000c_IL_0086:
+br M0000000c_IL_009a
+M0000000c_IL_008b:
+M0000000c_IL_008c:
+ldloc local0
+M0000000c_IL_008d:
+ldc.i4 2
+M0000000c_IL_008e:
+ldloc local2
+M0000000c_IL_008f:
+call System.Uri::Part(String,Int32,Int32)
+M0000000c_IL_0094:
+stloc local0
+M0000000c_IL_0095:
+br M0000000c_IL_01a7
+M0000000c_IL_009a:
+M0000000c_IL_009b:
+M0000000c_IL_009c:
+ldloc local0
+M0000000c_IL_009d:
+ldstr "/."
+M0000000c_IL_00a2:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_00a7:
+brtrue M0000000c_IL_00b1
+M0000000c_IL_00ac:
+br M0000000c_IL_00bd
+M0000000c_IL_00b1:
+M0000000c_IL_00b2:
+ldstr "/"
+M0000000c_IL_00b7:
+stloc local0
+M0000000c_IL_00b8:
+br M0000000c_IL_01a6
+M0000000c_IL_00bd:
+M0000000c_IL_00be:
+M0000000c_IL_00bf:
+ldloc local0
+M0000000c_IL_00c0:
+ldstr "/../"
+M0000000c_IL_00c5:
+call neoCLR.Library.System.Uri.RuntimeStringStartsWithOrdinal(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_00ca:
+brtrue M0000000c_IL_00d4
+M0000000c_IL_00cf:
+br M0000000c_IL_00eb
+M0000000c_IL_00d4:
+M0000000c_IL_00d5:
+ldloc local0
+M0000000c_IL_00d6:
+ldc.i4 3
+M0000000c_IL_00d7:
+ldloc local2
+M0000000c_IL_00d8:
+call System.Uri::Part(String,Int32,Int32)
+M0000000c_IL_00dd:
+stloc local0
+M0000000c_IL_00de:
+M0000000c_IL_00df:
+ldloc local1
+M0000000c_IL_00e0:
+call System.Uri::Parent(String)
+M0000000c_IL_00e5:
+stloc local1
+M0000000c_IL_00e6:
+br M0000000c_IL_01a5
+M0000000c_IL_00eb:
+M0000000c_IL_00ec:
+M0000000c_IL_00ed:
+ldloc local0
+M0000000c_IL_00ee:
+ldstr "/.."
+M0000000c_IL_00f3:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_00f8:
+brtrue M0000000c_IL_0102
+M0000000c_IL_00fd:
+br M0000000c_IL_0116
+M0000000c_IL_0102:
+M0000000c_IL_0103:
+ldstr "/"
+M0000000c_IL_0108:
+stloc local0
+M0000000c_IL_0109:
+M0000000c_IL_010a:
+ldloc local1
+M0000000c_IL_010b:
+call System.Uri::Parent(String)
+M0000000c_IL_0110:
+stloc local1
+M0000000c_IL_0111:
+br M0000000c_IL_01a4
+M0000000c_IL_0116:
+M0000000c_IL_0117:
+ldloc local0
+M0000000c_IL_0118:
+ldstr "."
+M0000000c_IL_011d:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0122:
+brtrue M0000000c_IL_0137
+M0000000c_IL_0127:
+ldloc local0
+M0000000c_IL_0128:
+ldstr ".."
+M0000000c_IL_012d:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0132:
+br M0000000c_IL_0138
+M0000000c_IL_0137:
+ldc.i4 1
+M0000000c_IL_0138:
+brtrue M0000000c_IL_0142
+M0000000c_IL_013d:
+br M0000000c_IL_014f
+M0000000c_IL_0142:
+M0000000c_IL_0143:
+ldstr ""
+M0000000c_IL_0148:
+stloc local0
+M0000000c_IL_0149:
+br M0000000c_IL_01a3
+M0000000c_IL_014f:
+M0000000c_IL_0150:
+M0000000c_IL_0151:
+ldc.i4 1
+M0000000c_IL_0152:
+stloc local3
+M0000000c_IL_0153:
+M0000000c_IL_0154:
+ldloc local3
+M0000000c_IL_0155:
+ldloc local2
+M0000000c_IL_0156:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0158:
+brfalse M0000000c_IL_0173
+M0000000c_IL_015d:
+ldloc local0
+M0000000c_IL_015e:
+ldloc local3
+M0000000c_IL_015f:
+call System.Uri::At(String,Int32)
+M0000000c_IL_0164:
+ldstr "/"
+M0000000c_IL_0169:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+ldc.bool false
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_016e:
+br M0000000c_IL_0174
+M0000000c_IL_0173:
+ldc.i4 0
+M0000000c_IL_0174:
+brtrue M0000000c_IL_017e
+M0000000c_IL_0179:
+br M0000000c_IL_0188
+M0000000c_IL_017e:
+M0000000c_IL_017f:
+ldloc local3
+M0000000c_IL_0180:
+ldc.i4 1
+M0000000c_IL_0181:
+add
+M0000000c_IL_0182:
+stloc local3
+M0000000c_IL_0183:
+br M0000000c_IL_0153
+M0000000c_IL_0188:
+M0000000c_IL_0189:
+M0000000c_IL_018a:
+ldloc local1
+M0000000c_IL_018b:
+ldloc local0
+M0000000c_IL_018c:
+ldc.i4 0
+M0000000c_IL_018d:
+ldloc local3
+M0000000c_IL_018e:
+call System.Uri::Part(String,Int32,Int32)
+M0000000c_IL_0193:
+call System.String::Concat(String,String)
+M0000000c_IL_0198:
+stloc local1
+M0000000c_IL_0199:
+M0000000c_IL_019a:
+ldloc local0
+M0000000c_IL_019b:
+ldloc local3
+M0000000c_IL_019c:
+ldloc local2
+M0000000c_IL_019d:
+call System.Uri::Part(String,Int32,Int32)
+M0000000c_IL_01a2:
+stloc local0
+M0000000c_IL_01a3:
+M0000000c_IL_01a4:
+M0000000c_IL_01a5:
+M0000000c_IL_01a6:
+M0000000c_IL_01a7:
+M0000000c_IL_01a8:
+M0000000c_IL_01a9:
+M0000000c_IL_01aa:
+br M0000000c_IL_000c
+M0000000c_IL_01af:
+M0000000c_IL_01b0:
+M0000000c_IL_01b1:
+ldloc local1
+M0000000c_IL_01b2:
+ret
+.end
+.method instance Resolve(String reference) -> System.Result<System.Uri,System.UriError>
+.local System.Result<System.Uri,System.UriError> local0
+.local System.Uri local1
+.local System.UriError local2
+.local System.Uri local3
+ldloca local1
+initobj System.Uri
+ldloca local3
+initobj System.Uri
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
+ldarg 1
+M0000000d_IL_0003:
+call System.Uri::Parse(String)
+M0000000d_IL_0008:
+stloc local0
+M0000000d_IL_0009:
+ldloca local0
+M0000000d_IL_000b:
+ldloca local1
+M0000000d_IL_000d:
+call neoCLR.Library.System.Uri.RuntimeUnion6(System.Result<System.Uri,System.UriError>&,System.Uri&)
+M0000000d_IL_0012:
+brfalse M0000000d_IL_001c
+M0000000d_IL_0017:
+br M0000000d_IL_003d
+M0000000d_IL_001c:
+ldloca local2
+M0000000d_IL_001e:
+pop
+M0000000d_IL_0024:
+ldloca local0
+M0000000d_IL_0026:
+ldloca local2
+M0000000d_IL_0028:
+call neoCLR.Library.System.Uri.RuntimeUnion7(System.Result<System.Uri,System.UriError>&,System.UriError&)
+M0000000d_IL_002d:
+brfalse M0000000d_IL_0039
+M0000000d_IL_0032:
+ldloc local2
+M0000000d_IL_0033:
+call neoCLR.Library.System.Uri.RuntimeUnion8(System.UriError)
+M0000000d_IL_0038:
+ret
+M0000000d_IL_0039:
+M0000000d_IL_003a:
+M0000000d_IL_003b:
+M0000000d_IL_003c:
+fault "Guest program reached a terminal failure"
+M0000000d_IL_003d:
+M0000000d_IL_003e:
+ldloc local1
+M0000000d_IL_003f:
+stloc local3
+M0000000d_IL_0040:
+M0000000d_IL_0041:
+ldarg 0
+M0000000d_IL_0042:
+ldloc local3
+M0000000d_IL_0043:
+callvirt instance System.Uri::Resolve(System.Uri)
+M0000000d_IL_0048:
+ret
+.end
+.method instance Resolve(System.Uri reference) -> System.Result<System.Uri,System.UriError>
+.local String local0
+.local String local1
+.local String local2
+.local String local3
+.local String local4
+.local Int32 local5
+.local String local6
+.local String local7
+ldc.i4 0
+stloc local5
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+M0000000e_IL_0002:
+ldarg 0
+M0000000e_IL_0003:
+callvirt instance System.Uri::get_IsAbsolute()
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0008:
+ldc.i4 0
+M0000000e_IL_0009:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_000b:
+brtrue M0000000e_IL_0015
+M0000000e_IL_0010:
+br M0000000e_IL_002a
+M0000000e_IL_0015:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorBaseNotAbsoluteNew()
+M0000000e_IL_001a:
+call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorBaseNotAbsolute(System.UriError.BaseNotAbsolute)
+M0000000e_IL_001f:
+call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
+M0000000e_IL_0024:
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+M0000000e_IL_0029:
+ret
+M0000000e_IL_002a:
+M0000000e_IL_002b:
+M0000000e_IL_002c:
+ldarg 0
+M0000000e_IL_002d:
+ldfld System.Uri::scheme
+M0000000e_IL_0032:
+stloc local0
+M0000000e_IL_0033:
+M0000000e_IL_0034:
+ldarg 0
+M0000000e_IL_0035:
+ldfld System.Uri::authority
+M0000000e_IL_003a:
+stloc local1
+M0000000e_IL_003b:
+M0000000e_IL_003c:
+ldarg 1
+M0000000e_IL_003d:
+ldfld System.Uri::path
+M0000000e_IL_0042:
+stloc local2
+M0000000e_IL_0043:
+M0000000e_IL_0044:
+ldarg 1
+M0000000e_IL_0045:
+ldfld System.Uri::query
+M0000000e_IL_004a:
+stloc local3
+M0000000e_IL_004b:
+M0000000e_IL_004c:
+ldarg 1
+M0000000e_IL_004d:
+callvirt instance System.Uri::get_IsAbsolute()
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0052:
+brtrue M0000000e_IL_005c
+M0000000e_IL_0057:
+br M0000000e_IL_007f
+M0000000e_IL_005c:
+M0000000e_IL_005d:
+ldarg 1
+M0000000e_IL_005e:
+ldfld System.Uri::scheme
+M0000000e_IL_0063:
+stloc local0
+M0000000e_IL_0064:
+M0000000e_IL_0065:
+ldarg 1
+M0000000e_IL_0066:
+ldfld System.Uri::authority
+M0000000e_IL_006b:
+stloc local1
+M0000000e_IL_006c:
+M0000000e_IL_006d:
+ldarg 1
+M0000000e_IL_006e:
+ldfld System.Uri::path
+M0000000e_IL_0073:
+call System.Uri::RemoveDots(String)
+M0000000e_IL_0078:
+stloc local2
+M0000000e_IL_0079:
+br M0000000e_IL_01da
+M0000000e_IL_007f:
+M0000000e_IL_0080:
+M0000000e_IL_0081:
+ldarg 1
+M0000000e_IL_0082:
+ldfld System.Uri::authority
+M0000000e_IL_0087:
+call neoCLR.Library.System.Uri.RuntimeStringget_IsEmpty(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_008c:
+ldc.i4 0
+M0000000e_IL_008d:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_008f:
+brtrue M0000000e_IL_0099
+M0000000e_IL_0094:
+br M0000000e_IL_00b3
+M0000000e_IL_0099:
+ldarg 1
+M0000000e_IL_009a:
+ldfld System.Uri::authority
+M0000000e_IL_009f:
+stloc local1
+M0000000e_IL_00a0:
+M0000000e_IL_00a1:
+ldarg 1
+M0000000e_IL_00a2:
+ldfld System.Uri::path
+M0000000e_IL_00a7:
+call System.Uri::RemoveDots(String)
+M0000000e_IL_00ac:
+stloc local2
+M0000000e_IL_00ad:
+br M0000000e_IL_01d9
+M0000000e_IL_00b3:
+M0000000e_IL_00b4:
+M0000000e_IL_00b5:
+ldarg 1
+M0000000e_IL_00b6:
+ldfld System.Uri::path
+M0000000e_IL_00bb:
+call neoCLR.Library.System.Uri.RuntimeStringget_IsEmpty(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_00c0:
+brtrue M0000000e_IL_00ca
+M0000000e_IL_00c5:
+br M0000000e_IL_00f6
+M0000000e_IL_00ca:
+M0000000e_IL_00cb:
+ldarg 0
+M0000000e_IL_00cc:
+ldfld System.Uri::path
+M0000000e_IL_00d1:
+stloc local2
+M0000000e_IL_00d2:
+M0000000e_IL_00d3:
+ldarg 1
+M0000000e_IL_00d4:
+ldfld System.Uri::query
+M0000000e_IL_00d9:
+call neoCLR.Library.System.Uri.RuntimeStringget_IsEmpty(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_00de:
+brtrue M0000000e_IL_00e8
+M0000000e_IL_00e3:
+br M0000000e_IL_00f0
+M0000000e_IL_00e8:
+M0000000e_IL_00e9:
+ldarg 0
+M0000000e_IL_00ea:
+ldfld System.Uri::query
+M0000000e_IL_00ef:
+stloc local3
+M0000000e_IL_00f0:
+M0000000e_IL_00f1:
+br M0000000e_IL_01d8
+M0000000e_IL_00f6:
+M0000000e_IL_00f7:
+M0000000e_IL_00f8:
+ldarg 1
+M0000000e_IL_00f9:
+ldfld System.Uri::path
+M0000000e_IL_00fe:
+ldstr "/"
+M0000000e_IL_0103:
+call neoCLR.Library.System.Uri.RuntimeStringStartsWithOrdinal(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0108:
+ldc.i4 0
+M0000000e_IL_0109:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_010b:
+brtrue M0000000e_IL_0115
+M0000000e_IL_0110:
+br M0000000e_IL_01cf
+M0000000e_IL_0115:
+M0000000e_IL_0116:
+ldstr ""
+M0000000e_IL_011b:
+stloc local4
+M0000000e_IL_011d:
+M0000000e_IL_011e:
+ldarg 0
+M0000000e_IL_011f:
+ldfld System.Uri::path
+M0000000e_IL_0124:
+call neoCLR.Library.System.Uri.RuntimeStringGetUtf8ByteCount(String)
+M0000000e_IL_0129:
+ldc.i4 1
+M0000000e_IL_012a:
+sub
+M0000000e_IL_012b:
+stloc local5
+M0000000e_IL_012d:
+M0000000e_IL_012e:
+M0000000e_IL_012f:
+ldloc local5
+M0000000e_IL_0131:
+ldc.i4 0
+M0000000e_IL_0132:
+clt
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0134:
+ldc.i4 0
+M0000000e_IL_0135:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0137:
+brtrue M0000000e_IL_0141
+M0000000e_IL_013c:
+br M0000000e_IL_0188
+M0000000e_IL_0141:
+M0000000e_IL_0142:
+ldarg 0
+M0000000e_IL_0143:
+ldfld System.Uri::path
+M0000000e_IL_0148:
+ldloc local5
+M0000000e_IL_014a:
+call System.Uri::At(String,Int32)
+M0000000e_IL_014f:
+ldstr "/"
+M0000000e_IL_0154:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0159:
+brtrue M0000000e_IL_0163
+M0000000e_IL_015e:
+br M0000000e_IL_017b
+M0000000e_IL_0163:
+M0000000e_IL_0164:
+ldarg 0
+M0000000e_IL_0165:
+ldfld System.Uri::path
+M0000000e_IL_016a:
+ldc.i4 0
+M0000000e_IL_016b:
+ldloc local5
+M0000000e_IL_016d:
+ldc.i4 1
+M0000000e_IL_016e:
+add
+M0000000e_IL_016f:
+call System.Uri::Part(String,Int32,Int32)
+M0000000e_IL_0174:
+stloc local4
+M0000000e_IL_0176:
+br M0000000e_IL_0188
+M0000000e_IL_017b:
+M0000000e_IL_017c:
+M0000000e_IL_017d:
+ldloc local5
+M0000000e_IL_017f:
+ldc.i4 1
+M0000000e_IL_0180:
+sub
+M0000000e_IL_0181:
+stloc local5
+M0000000e_IL_0183:
+br M0000000e_IL_012e
+M0000000e_IL_0188:
+M0000000e_IL_0189:
+ldarg 0
+M0000000e_IL_018a:
+ldfld System.Uri::path
+M0000000e_IL_018f:
+call neoCLR.Library.System.Uri.RuntimeStringget_IsEmpty(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0194:
+brfalse M0000000e_IL_01ac
+M0000000e_IL_0199:
+ldarg 0
+M0000000e_IL_019a:
+ldfld System.Uri::authority
+M0000000e_IL_019f:
+call neoCLR.Library.System.Uri.RuntimeStringget_IsEmpty(String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_01a4:
+ldc.i4 0
+M0000000e_IL_01a5:
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_01a7:
+br M0000000e_IL_01ad
+M0000000e_IL_01ac:
+ldc.i4 0
+M0000000e_IL_01ad:
+brtrue M0000000e_IL_01b7
+M0000000e_IL_01b2:
+br M0000000e_IL_01bf
+M0000000e_IL_01b7:
+M0000000e_IL_01b8:
+ldstr "/"
+M0000000e_IL_01bd:
+stloc local4
+M0000000e_IL_01bf:
+M0000000e_IL_01c0:
+M0000000e_IL_01c1:
+ldloc local4
+M0000000e_IL_01c3:
+ldarg 1
+M0000000e_IL_01c4:
+ldfld System.Uri::path
+M0000000e_IL_01c9:
+call System.String::Concat(String,String)
+M0000000e_IL_01ce:
+stloc local2
+M0000000e_IL_01cf:
+M0000000e_IL_01d0:
+M0000000e_IL_01d1:
+ldloc local2
+M0000000e_IL_01d2:
+call System.Uri::RemoveDots(String)
+M0000000e_IL_01d7:
+stloc local2
+M0000000e_IL_01d8:
+M0000000e_IL_01d9:
+M0000000e_IL_01da:
+M0000000e_IL_01db:
+M0000000e_IL_01dc:
+ldloc local0
+M0000000e_IL_01dd:
+ldloc local1
+M0000000e_IL_01de:
+call System.String::Concat(String,String)
+M0000000e_IL_01e3:
+stloc local6
+M0000000e_IL_01e5:
+M0000000e_IL_01e6:
+ldloc local3
+M0000000e_IL_01e7:
+ldarg 1
+M0000000e_IL_01e8:
+ldfld System.Uri::fragment
+M0000000e_IL_01ed:
+call System.String::Concat(String,String)
+M0000000e_IL_01f2:
+stloc local7
+M0000000e_IL_01f4:
+M0000000e_IL_01f5:
+ldloc local6
+M0000000e_IL_01f7:
+ldloc local2
+M0000000e_IL_01f8:
+call System.String::Concat(String,String)
+M0000000e_IL_01fd:
+ldloc local7
+M0000000e_IL_01ff:
+call System.String::Concat(String,String)
+M0000000e_IL_0204:
+call System.Uri::Parse(String)
+M0000000e_IL_0209:
+ret
+.end
+.method instance Equals(System.Uri other) -> Boolean
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+ldarg 0
+M0000000f_IL_0003:
+ldfld System.Uri::text
+M0000000f_IL_0008:
+ldarg 1
+M0000000f_IL_0009:
+callvirt instance System.Uri::get_Text()
+M0000000f_IL_000e:
+call neoCLR.Library.System.Uri.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_0013:
+call neoCLR.Library.System.Uri.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance override Equals(System.Object other) -> Boolean
+.local System.Uri local0
+ldloca local0
+initobj System.Uri
+M00000010_IL_0000:
+M00000010_IL_0001:
+M00000010_IL_0002:
+ldarg 1
+M00000010_IL_0003:
+isinst System.Uri
+M00000010_IL_0008:
+dup
+M00000010_IL_0009:
+stloc local0
+M00000010_IL_000a:
+M00000010_IL_000b:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_000d:
+brtrue M00000010_IL_0017
+M00000010_IL_0012:
+br M00000010_IL_0020
+M00000010_IL_0017:
+M00000010_IL_0018:
+ldarg 0
+M00000010_IL_0019:
+ldloc local0
+M00000010_IL_001a:
+callvirt instance System.Uri::Equals(System.Uri)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_001f:
+call neoCLR.Library.System.Uri.RuntimeBooleanFromInt32(Int32)
+ret
+M00000010_IL_0020:
+M00000010_IL_0021:
+M00000010_IL_0022:
+ldc.i4 0
+M00000010_IL_0023:
+call neoCLR.Library.System.Uri.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance override GetHashCode() -> Int32
+.local System.HashCode local0
+ldloca local0
+initobj System.HashCode
+M00000011_IL_0000:
+M00000011_IL_0001:
+call neoCLR.Library.System.Uri.RuntimeNewHashCode()
+M00000011_IL_0006:
+stloc local0
+M00000011_IL_0007:
+M00000011_IL_0008:
+ldloca local0
+M00000011_IL_000a:
+ldarg 0
+M00000011_IL_000b:
+ldfld System.Uri::text
+M00000011_IL_0010:
+call instance System.HashCode::Add(String)
+pop
+M00000011_IL_0015:
+M00000011_IL_0016:
+ldloca local0
+M00000011_IL_0018:
+call instance System.HashCode::ToHashCode()
+M00000011_IL_001d:
+ret
+.end
+.method instance override ToString() -> String
+M00000012_IL_0000:
+M00000012_IL_0001:
+M00000012_IL_0002:
+ldarg 0
+M00000012_IL_0003:
+ldfld System.Uri::text
+M00000012_IL_0008:
+ret
+.end
+.end

@@ -1,0 +1,231 @@
+; Generated from runtime/raven/src/System/UriError.rvn. Regenerate with build_runtime_library.py.
+.type System.UriError
+.sealed
+.custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+.field private Stored Value
+.property instance IsInvalidFormat() -> Boolean
+.get instance System.UriError::get_IsInvalidFormat()
+.end
+.property instance IsUnsupportedAuthority() -> Boolean
+.get instance System.UriError::get_IsUnsupportedAuthority()
+.end
+.property instance IsTooLong() -> Boolean
+.get instance System.UriError::get_IsTooLong()
+.end
+.property instance IsBaseNotAbsolute() -> Boolean
+.get instance System.UriError::get_IsBaseNotAbsolute()
+.end
+.method instance .ctor(System.UriError.InvalidFormat value) -> Void
+ldarg value
+value.pack System.UriError.InvalidFormat
+newobj System.UriError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsInvalidFormat() -> Boolean
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldfld System.UriError::Stored
+M00000002_IL_0008:
+value.is System.UriError.InvalidFormat
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_000d:
+call neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetInvalidFormat() -> System.UriError.InvalidFormat
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.UriError::Stored
+M00000003_IL_0008:
+value.unpack System.UriError.InvalidFormat
+M00000003_IL_000d:
+ret
+.end
+.method instance .ctor(System.UriError.UnsupportedAuthority value) -> Void
+ldarg value
+value.pack System.UriError.UnsupportedAuthority
+newobj System.UriError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsUnsupportedAuthority() -> Boolean
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.UriError::Stored
+M00000005_IL_0008:
+value.is System.UriError.UnsupportedAuthority
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_000d:
+call neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetUnsupportedAuthority() -> System.UriError.UnsupportedAuthority
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.UriError::Stored
+M00000006_IL_0008:
+value.unpack System.UriError.UnsupportedAuthority
+M00000006_IL_000d:
+ret
+.end
+.method instance .ctor(System.UriError.TooLong value) -> Void
+ldarg value
+value.pack System.UriError.TooLong
+newobj System.UriError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsTooLong() -> Boolean
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldfld System.UriError::Stored
+M00000008_IL_0008:
+value.is System.UriError.TooLong
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_000d:
+call neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetTooLong() -> System.UriError.TooLong
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldfld System.UriError::Stored
+M00000009_IL_0008:
+value.unpack System.UriError.TooLong
+M00000009_IL_000d:
+ret
+.end
+.method instance .ctor(System.UriError.BaseNotAbsolute value) -> Void
+ldarg value
+value.pack System.UriError.BaseNotAbsolute
+newobj System.UriError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsBaseNotAbsolute() -> Boolean
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+ldfld System.UriError::Stored
+M0000000b_IL_0008:
+value.is System.UriError.BaseNotAbsolute
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_000d:
+call neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetBaseNotAbsolute() -> System.UriError.BaseNotAbsolute
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+ldfld System.UriError::Stored
+M0000000c_IL_0008:
+value.unpack System.UriError.BaseNotAbsolute
+M0000000c_IL_000d:
+ret
+.end
+.method instance ToString() -> String
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
+ldarg 0
+M0000000d_IL_0003:
+call instance System.UriError::get_IsInvalidFormat()
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0008:
+brtrue M0000000d_IL_0012
+M0000000d_IL_000d:
+br M0000000d_IL_0019
+M0000000d_IL_0012:
+M0000000d_IL_0013:
+ldstr "InvalidFormat"
+M0000000d_IL_0018:
+ret
+M0000000d_IL_0019:
+M0000000d_IL_001a:
+M0000000d_IL_001b:
+ldarg 0
+M0000000d_IL_001c:
+call instance System.UriError::get_IsUnsupportedAuthority()
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0021:
+brtrue M0000000d_IL_002b
+M0000000d_IL_0026:
+br M0000000d_IL_0032
+M0000000d_IL_002b:
+M0000000d_IL_002c:
+ldstr "UnsupportedAuthority"
+M0000000d_IL_0031:
+ret
+M0000000d_IL_0032:
+M0000000d_IL_0033:
+M0000000d_IL_0034:
+ldarg 0
+M0000000d_IL_0035:
+call instance System.UriError::get_IsTooLong()
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_003a:
+brtrue M0000000d_IL_0044
+M0000000d_IL_003f:
+br M0000000d_IL_004b
+M0000000d_IL_0044:
+M0000000d_IL_0045:
+ldstr "TooLong"
+M0000000d_IL_004a:
+ret
+M0000000d_IL_004b:
+M0000000d_IL_004c:
+M0000000d_IL_004d:
+ldarg 0
+M0000000d_IL_004e:
+call instance System.UriError::get_IsBaseNotAbsolute()
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0053:
+brtrue M0000000d_IL_005d
+M0000000d_IL_0058:
+br M0000000d_IL_0064
+M0000000d_IL_005d:
+M0000000d_IL_005e:
+ldstr "BaseNotAbsolute"
+M0000000d_IL_0063:
+ret
+M0000000d_IL_0064:
+M0000000d_IL_0065:
+M0000000d_IL_0066:
+ldstr "Invalid URI error case"
+M0000000d_IL_006b:
+call System.Fault(String)
+M0000000d_IL_0070:
+M0000000d_IL_0071:
+ldstr ""
+M0000000d_IL_0076:
+ret
+.end
+.end

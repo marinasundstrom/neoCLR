@@ -1,0 +1,77 @@
+; Generated from runtime/raven/src/System/UriError.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.type System.UriError.InvalidFormat
+.sealed
+.method instance .ctor() -> Void
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+ldarg 0
+M0000000e_IL_0002:
+pop
+M0000000e_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.UriError.UnsupportedAuthority
+.sealed
+.method instance .ctor() -> Void
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+ldarg 0
+M0000000f_IL_0002:
+pop
+M0000000f_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.UriError.TooLong
+.sealed
+.method instance .ctor() -> Void
+M00000010_IL_0000:
+M00000010_IL_0001:
+ldarg 0
+M00000010_IL_0002:
+pop
+M00000010_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.UriError.BaseNotAbsolute
+.sealed
+.method instance .ctor() -> Void
+M00000011_IL_0000:
+M00000011_IL_0001:
+ldarg 0
+M00000011_IL_0002:
+pop
+M00000011_IL_0007:
+ldvoid
+ret
+.end
+.end

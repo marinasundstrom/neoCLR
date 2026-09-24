@@ -1,0 +1,277 @@
+namespace System
+
+import System.Result.*
+
+// Bounded ASCII URI-reference grammar; parsing performs no I/O.
+public class Uri : Equatable<Uri> {
+    private field text: string
+    private field scheme: string
+    private field authority: string
+    private field path: string
+    private field query: string
+    private field fragment: string
+
+    private init(text: string, scheme: string, authority: string, path: string, query: string, fragment: string) {
+        self.text = text
+        self.scheme = scheme
+        self.authority = authority
+        self.path = path
+        self.query = query
+        self.fragment = fragment
+    }
+
+    val Text: string => text
+    val IsAbsolute: bool => !scheme.IsEmpty
+    val IsRelative: bool => scheme.IsEmpty
+
+    private static func Part(text: string, start: int, end: int) -> string {
+        if let Ok(part) = text.SliceUtf8(start, end - start) {
+            return part
+        }
+        System.Fault("Invalid internal URI boundary")
+        return ""
+    }
+
+    // A one-byte slice fails for non-ASCII input instead of allocating a byte array.
+    private static func At(text: string, index: int) -> string {
+        if let Ok(value) = text.SliceUtf8(index, 1) {
+            return value
+        }
+        return ""
+    }
+
+    private static func Alpha(value: string) -> bool {
+        return (String.CompareOrdinal(value, "A") >= 0 && String.CompareOrdinal(value, "Z") <= 0) ||
+            (String.CompareOrdinal(value, "a") >= 0 && String.CompareOrdinal(value, "z") <= 0)
+    }
+
+    private static func Digit(value: string) -> bool {
+        return String.CompareOrdinal(value, "0") >= 0 && String.CompareOrdinal(value, "9") <= 0
+    }
+
+    private static func Hex(value: string) -> bool {
+        return Digit(value) || (String.CompareOrdinal(value, "A") >= 0 && String.CompareOrdinal(value, "F") <= 0) ||
+            (String.CompareOrdinal(value, "a") >= 0 && String.CompareOrdinal(value, "f") <= 0)
+    }
+
+    static func Parse(text: string) -> Result<Uri, UriError> {
+        if text.GetUtf8ByteCount() > 4096 {
+            return Error(UriError.TooLong())
+        }
+        let count = text.GetUtf8ByteCount()
+        var index = 0
+        while index < count {
+            let value = At(text, index)
+            if value == "%" {
+                if index + 2 >= count || !Hex(At(text, index + 1)) || !Hex(At(text, index + 2)) {
+                    return Error(UriError.InvalidFormat())
+                }
+                index += 3
+                continue
+            }
+            if !(Alpha(value) || Digit(value) || value == "-" || value == "." || value == "_" || value == "~" ||
+                value == ":" || value == "/" || value == "?" || value == "#" || value == "@" ||
+                value == "!" || value == "$" || value == "&" || value == "'" || value == "(" || value == ")" ||
+                value == "*" || value == "+" || value == "," || value == ";" || value == "=") {
+                if value == "[" || value == "]" {
+                    return Error(UriError.UnsupportedAuthority())
+                }
+                return Error(UriError.InvalidFormat())
+            }
+            index += 1
+        }
+        var parsedScheme = ""
+        var parsedAuthority = ""
+        var parsedQuery = ""
+        var parsedFragment = ""
+        var start = 0
+        index = 0
+        while index < count && At(text, index) != "/" && At(text, index) != "?" && At(text, index) != "#" {
+            if At(text, index) == ":" {
+                if index == 0 || !Alpha(At(text, 0)) {
+                    return Error(UriError.InvalidFormat())
+                }
+                var position = 1
+                while position < index {
+                    let value = At(text, position)
+                    if !(Alpha(value) || Digit(value) || value == "+" || value == "-" || value == ".") {
+                        return Error(UriError.InvalidFormat())
+                    }
+                    position += 1
+                }
+                parsedScheme = Part(text, 0, index + 1)
+                start = index + 1
+                break
+            }
+            index += 1
+        }
+        if start + 1 < count && At(text, start) == "/" && At(text, start + 1) == "/" {
+            index = start + 2
+            var at = -1
+            var colon = -1
+            while index < count && At(text, index) != "/" && At(text, index) != "?" && At(text, index) != "#" {
+                if At(text, index) == "@" {
+                    if at >= 0 {
+                        return Error(UriError.InvalidFormat())
+                    }
+                    at = index
+                    colon = -1
+                } else if At(text, index) == ":" {
+                    colon = index
+                }
+                index += 1
+            }
+            // A reg-name host has no colons. User info may have them.
+            var position = start + 2
+            if at >= 0 {
+                position = at + 1
+            }
+            while position < index {
+                if At(text, position) == ":" && position != colon {
+                    return Error(UriError.InvalidFormat())
+                }
+                if colon >= 0 && position > colon && !Digit(At(text, position)) {
+                    return Error(UriError.InvalidFormat())
+                }
+                position += 1
+            }
+            parsedAuthority = Part(text, start, index)
+            start = index
+        }
+        index = start
+        while index < count && At(text, index) != "?" && At(text, index) != "#" {
+            index += 1
+        }
+        let parsedPath = Part(text, start, index)
+        if index < count && At(text, index) == "?" {
+            start = index
+            index += 1
+            while index < count && At(text, index) != "#" {
+                index += 1
+            }
+            parsedQuery = Part(text, start, index)
+        }
+        if index < count {
+            start = index
+            index += 1
+            while index < count {
+                if At(text, index) == "#" {
+                    return Error(UriError.InvalidFormat())
+                }
+                index += 1
+            }
+            parsedFragment = Part(text, start, count)
+        }
+        return Ok(Uri(text, parsedScheme, parsedAuthority, parsedPath, parsedQuery, parsedFragment))
+    }
+
+    private static func Parent(path: string) -> string {
+        var index = path.GetUtf8ByteCount() - 1
+        while index >= 0 {
+            if At(path, index) == "/" {
+                return Part(path, 0, index)
+            }
+            index -= 1
+        }
+        return ""
+    }
+
+    // RFC 3986 section 5.2.4. Percent-encoded dots are not decoded here.
+    private static func RemoveDots(path: string) -> string {
+        var input = path
+        var output = ""
+        while !input.IsEmpty {
+            let count = input.GetUtf8ByteCount()
+            if input.StartsWithOrdinal("../") {
+                input = Part(input, 3, count)
+            } else if input.StartsWithOrdinal("./") {
+                input = Part(input, 2, count)
+            } else if input.StartsWithOrdinal("/./") {
+                input = Part(input, 2, count)
+            } else if input == "/." {
+                input = "/"
+            } else if input.StartsWithOrdinal("/../") {
+                input = Part(input, 3, count)
+                output = Parent(output)
+            } else if input == "/.." {
+                input = "/"
+                output = Parent(output)
+            } else if input == "." || input == ".." {
+                input = ""
+            } else {
+                var end = 1
+                while end < count && At(input, end) != "/" {
+                    end += 1
+                }
+                output = String.Concat(output, Part(input, 0, end))
+                input = Part(input, end, count)
+            }
+        }
+        return output
+    }
+
+    func Resolve(reference: string) -> Result<Uri, UriError> {
+        let parsed = Parse(reference)?
+        return Resolve(parsed)
+    }
+
+    func Resolve(reference: Uri) -> Result<Uri, UriError> {
+        if !IsAbsolute {
+            return Error(UriError.BaseNotAbsolute())
+        }
+        var resolvedScheme = scheme
+        var resolvedAuthority = authority
+        var resolvedPath = reference.path
+        var resolvedQuery = reference.query
+        if reference.IsAbsolute {
+            resolvedScheme = reference.scheme
+            resolvedAuthority = reference.authority
+            resolvedPath = RemoveDots(reference.path)
+        } else if !reference.authority.IsEmpty {
+            resolvedAuthority = reference.authority
+            resolvedPath = RemoveDots(reference.path)
+        } else if reference.path.IsEmpty {
+            resolvedPath = path
+            if reference.query.IsEmpty {
+                resolvedQuery = query
+            }
+        } else {
+            if !reference.path.StartsWithOrdinal("/") {
+                var prefix = ""
+                var end = path.GetUtf8ByteCount() - 1
+                while end >= 0 {
+                    if At(path, end) == "/" {
+                        prefix = Part(path, 0, end + 1)
+                        break
+                    }
+                    end -= 1
+                }
+                if path.IsEmpty && !authority.IsEmpty {
+                    prefix = "/"
+                }
+                resolvedPath = String.Concat(prefix, reference.path)
+            }
+            resolvedPath = RemoveDots(resolvedPath)
+        }
+        let resolvedPrefix = String.Concat(resolvedScheme, resolvedAuthority)
+        let suffix = String.Concat(resolvedQuery, reference.fragment)
+        return Parse(String.Concat(String.Concat(resolvedPrefix, resolvedPath), suffix))
+    }
+
+    func Equals(other: Uri) -> bool => text.Equals(other.Text)
+
+    override func Equals(other: Object?) -> bool {
+        if other is Uri uri {
+            return Equals(uri)
+        }
+        return false
+    }
+
+    override func GetHashCode() -> int {
+        var hash = HashCode()
+        hash.Add(text)
+        return hash.ToHashCode()
+    }
+
+    override func ToString() -> string => text
+}

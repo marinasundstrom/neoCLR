@@ -1150,3 +1150,13 @@ application callbacks remain unbounded. The adapter consumes outcomes and closes
 late successful socket before completing an expired request. Matching core metadata
 also keeps all public HTTP APIs available in the on-site reference. See neoCLR's
 HTTP design and verifier for exact behavior and focused validation.
+
+### Managed URI references
+
+System.Uri and UriError are explicit reference/import catalogs. The Uri slice uses
+ordinary managed String/UTF-8/Result code and the established Equatable/Object
+contract. Core reference assignability includes Uri to Object and Equatable<Uri>,
+with Uri admitted as a collection/array reference element. No new native service,
+Runtime Contract setting or compiler emission change is required. Regenerate the
+reference and bootstrap together; the [URI probe](../uri/README.md) covers parsing,
+resolution, both overloads, Object dispatch, collections and live-object cleanup.
