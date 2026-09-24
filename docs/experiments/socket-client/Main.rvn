@@ -123,7 +123,7 @@ func Main() {
         System.Fault("Malformed address sequence admitted")
     }
     if let Error(error) = Dns.GetHostAddresses("bad name").GetResult() {
-        Check(error.IsInvalidName)
+        Check(error is DnsError.InvalidName)
     } else {
         System.Fault("Invalid hostname admitted")
     }

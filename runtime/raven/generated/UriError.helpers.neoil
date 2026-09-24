@@ -23,55 +23,491 @@ False:
     ldc.i4 0
     ret
 .end
+.function neoCLR.Library.System.UriError.RuntimeReflection936F30A1978F475D(System.Object arg0) -> String
+ldarg arg0
+callvirt instance System.Object::ToString()
+ret
+.end
+.function neoCLR.Library.System.UriError.DefaultReference53797374656D2E4F626A656374() -> System.Object
+.local System.Object value
+ldloca value
+initobj System.Object
+ldloc value
+ret
+.end
 .type System.UriError.InvalidFormat
 .sealed
-.method instance .ctor() -> Void
-M0000000e_IL_0000:
-M0000000e_IL_0001:
+.method instance byref .ctor() -> Void
+M0000000d_IL_0000:
 ldarg 0
-M0000000e_IL_0002:
+M0000000d_IL_0001:
 pop
-M0000000e_IL_0007:
+M0000000d_IL_0007:
+M0000000d_IL_0008:
 ldvoid
+ret
+.end
+.method instance override byref ToString() -> String
+M0000000e_IL_0000:
+ldstr "UriError"
+M0000000e_IL_0005:
+ldstr "."
+M0000000e_IL_000a:
+call System.String::Concat(String,String)
+M0000000e_IL_000f:
+ldstr "InvalidFormat"
+M0000000e_IL_0014:
+call System.String::Concat(String,String)
+M0000000e_IL_0019:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M0000000f_IL_0000:
+ldarg 0
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+ref.isnull
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_0004:
+brtrue M0000000f_IL_000e
+M0000000f_IL_0009:
+br M0000000f_IL_0014
+M0000000f_IL_000e:
+ldstr "null"
+M0000000f_IL_0013:
+ret
+M0000000f_IL_0014:
+M0000000f_IL_0015:
+ldarg 0
+M0000000f_IL_0016:
+isinst String
+M0000000f_IL_001b:
+M0000000f_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_001e:
+brtrue M0000000f_IL_0028
+M0000000f_IL_0023:
+br M0000000f_IL_0043
+M0000000f_IL_0028:
+ldstr "\u0022"
+M0000000f_IL_002d:
+ldarg 0
+M0000000f_IL_002e:
+castclass String
+M0000000f_IL_0033:
+call System.String::Concat(String,String)
+M0000000f_IL_0038:
+ldstr "\u0022"
+M0000000f_IL_003d:
+call System.String::Concat(String,String)
+M0000000f_IL_0042:
+ret
+M0000000f_IL_0043:
+M0000000f_IL_0044:
+ldarg 0
+M0000000f_IL_0045:
+isinst Char
+M0000000f_IL_004a:
+dup
+M0000000f_IL_004b:
+ref.isnull
+brfalse M0000000f_IL_0057
+M0000000f_IL_0050:
+pop
+M0000000f_IL_0051:
+ldc.i4 0
+M0000000f_IL_0052:
+br M0000000f_IL_005e
+M0000000f_IL_0057:
+unbox.any Char
+M0000000f_IL_005c:
+pop
+M0000000f_IL_005d:
+ldc.i4 1
+M0000000f_IL_005e:
+brtrue M0000000f_IL_0068
+M0000000f_IL_0063:
+br M0000000f_IL_0083
+M0000000f_IL_0068:
+ldstr "\u0027"
+M0000000f_IL_006d:
+ldarg 0
+M0000000f_IL_006e:
+call neoCLR.Library.System.UriError.RuntimeReflection936F30A1978F475D(System.Object)
+M0000000f_IL_0073:
+call System.String::Concat(String,String)
+M0000000f_IL_0078:
+ldstr "\u0027"
+M0000000f_IL_007d:
+call System.String::Concat(String,String)
+M0000000f_IL_0082:
+ret
+M0000000f_IL_0083:
+M0000000f_IL_0084:
+ldarg 0
+M0000000f_IL_0085:
+call neoCLR.Library.System.UriError.RuntimeReflection936F30A1978F475D(System.Object)
+M0000000f_IL_008a:
 ret
 .end
 .end
 .type System.UriError.UnsupportedAuthority
 .sealed
-.method instance .ctor() -> Void
-M0000000f_IL_0000:
-M0000000f_IL_0001:
+.method instance byref .ctor() -> Void
+M00000010_IL_0000:
 ldarg 0
-M0000000f_IL_0002:
+M00000010_IL_0001:
 pop
-M0000000f_IL_0007:
+M00000010_IL_0007:
+M00000010_IL_0008:
 ldvoid
+ret
+.end
+.method instance override byref ToString() -> String
+M00000011_IL_0000:
+ldstr "UriError"
+M00000011_IL_0005:
+ldstr "."
+M00000011_IL_000a:
+call System.String::Concat(String,String)
+M00000011_IL_000f:
+ldstr "UnsupportedAuthority"
+M00000011_IL_0014:
+call System.String::Concat(String,String)
+M00000011_IL_0019:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000012_IL_0000:
+ldarg 0
+M00000012_IL_0001:
+M00000012_IL_0002:
+ref.isnull
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M00000012_IL_0004:
+brtrue M00000012_IL_000e
+M00000012_IL_0009:
+br M00000012_IL_0014
+M00000012_IL_000e:
+ldstr "null"
+M00000012_IL_0013:
+ret
+M00000012_IL_0014:
+M00000012_IL_0015:
+ldarg 0
+M00000012_IL_0016:
+isinst String
+M00000012_IL_001b:
+M00000012_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M00000012_IL_001e:
+brtrue M00000012_IL_0028
+M00000012_IL_0023:
+br M00000012_IL_0043
+M00000012_IL_0028:
+ldstr "\u0022"
+M00000012_IL_002d:
+ldarg 0
+M00000012_IL_002e:
+castclass String
+M00000012_IL_0033:
+call System.String::Concat(String,String)
+M00000012_IL_0038:
+ldstr "\u0022"
+M00000012_IL_003d:
+call System.String::Concat(String,String)
+M00000012_IL_0042:
+ret
+M00000012_IL_0043:
+M00000012_IL_0044:
+ldarg 0
+M00000012_IL_0045:
+isinst Char
+M00000012_IL_004a:
+dup
+M00000012_IL_004b:
+ref.isnull
+brfalse M00000012_IL_0057
+M00000012_IL_0050:
+pop
+M00000012_IL_0051:
+ldc.i4 0
+M00000012_IL_0052:
+br M00000012_IL_005e
+M00000012_IL_0057:
+unbox.any Char
+M00000012_IL_005c:
+pop
+M00000012_IL_005d:
+ldc.i4 1
+M00000012_IL_005e:
+brtrue M00000012_IL_0068
+M00000012_IL_0063:
+br M00000012_IL_0083
+M00000012_IL_0068:
+ldstr "\u0027"
+M00000012_IL_006d:
+ldarg 0
+M00000012_IL_006e:
+call neoCLR.Library.System.UriError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000012_IL_0073:
+call System.String::Concat(String,String)
+M00000012_IL_0078:
+ldstr "\u0027"
+M00000012_IL_007d:
+call System.String::Concat(String,String)
+M00000012_IL_0082:
+ret
+M00000012_IL_0083:
+M00000012_IL_0084:
+ldarg 0
+M00000012_IL_0085:
+call neoCLR.Library.System.UriError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000012_IL_008a:
 ret
 .end
 .end
 .type System.UriError.TooLong
 .sealed
-.method instance .ctor() -> Void
-M00000010_IL_0000:
-M00000010_IL_0001:
+.method instance byref .ctor() -> Void
+M00000013_IL_0000:
 ldarg 0
-M00000010_IL_0002:
+M00000013_IL_0001:
 pop
-M00000010_IL_0007:
+M00000013_IL_0007:
+M00000013_IL_0008:
 ldvoid
+ret
+.end
+.method instance override byref ToString() -> String
+M00000014_IL_0000:
+ldstr "UriError"
+M00000014_IL_0005:
+ldstr "."
+M00000014_IL_000a:
+call System.String::Concat(String,String)
+M00000014_IL_000f:
+ldstr "TooLong"
+M00000014_IL_0014:
+call System.String::Concat(String,String)
+M00000014_IL_0019:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000015_IL_0000:
+ldarg 0
+M00000015_IL_0001:
+M00000015_IL_0002:
+ref.isnull
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M00000015_IL_0004:
+brtrue M00000015_IL_000e
+M00000015_IL_0009:
+br M00000015_IL_0014
+M00000015_IL_000e:
+ldstr "null"
+M00000015_IL_0013:
+ret
+M00000015_IL_0014:
+M00000015_IL_0015:
+ldarg 0
+M00000015_IL_0016:
+isinst String
+M00000015_IL_001b:
+M00000015_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M00000015_IL_001e:
+brtrue M00000015_IL_0028
+M00000015_IL_0023:
+br M00000015_IL_0043
+M00000015_IL_0028:
+ldstr "\u0022"
+M00000015_IL_002d:
+ldarg 0
+M00000015_IL_002e:
+castclass String
+M00000015_IL_0033:
+call System.String::Concat(String,String)
+M00000015_IL_0038:
+ldstr "\u0022"
+M00000015_IL_003d:
+call System.String::Concat(String,String)
+M00000015_IL_0042:
+ret
+M00000015_IL_0043:
+M00000015_IL_0044:
+ldarg 0
+M00000015_IL_0045:
+isinst Char
+M00000015_IL_004a:
+dup
+M00000015_IL_004b:
+ref.isnull
+brfalse M00000015_IL_0057
+M00000015_IL_0050:
+pop
+M00000015_IL_0051:
+ldc.i4 0
+M00000015_IL_0052:
+br M00000015_IL_005e
+M00000015_IL_0057:
+unbox.any Char
+M00000015_IL_005c:
+pop
+M00000015_IL_005d:
+ldc.i4 1
+M00000015_IL_005e:
+brtrue M00000015_IL_0068
+M00000015_IL_0063:
+br M00000015_IL_0083
+M00000015_IL_0068:
+ldstr "\u0027"
+M00000015_IL_006d:
+ldarg 0
+M00000015_IL_006e:
+call neoCLR.Library.System.UriError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000015_IL_0073:
+call System.String::Concat(String,String)
+M00000015_IL_0078:
+ldstr "\u0027"
+M00000015_IL_007d:
+call System.String::Concat(String,String)
+M00000015_IL_0082:
+ret
+M00000015_IL_0083:
+M00000015_IL_0084:
+ldarg 0
+M00000015_IL_0085:
+call neoCLR.Library.System.UriError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000015_IL_008a:
 ret
 .end
 .end
 .type System.UriError.BaseNotAbsolute
 .sealed
-.method instance .ctor() -> Void
-M00000011_IL_0000:
-M00000011_IL_0001:
+.method instance byref .ctor() -> Void
+M00000016_IL_0000:
 ldarg 0
-M00000011_IL_0002:
+M00000016_IL_0001:
 pop
-M00000011_IL_0007:
+M00000016_IL_0007:
+M00000016_IL_0008:
 ldvoid
+ret
+.end
+.method instance override byref ToString() -> String
+M00000017_IL_0000:
+ldstr "UriError"
+M00000017_IL_0005:
+ldstr "."
+M00000017_IL_000a:
+call System.String::Concat(String,String)
+M00000017_IL_000f:
+ldstr "BaseNotAbsolute"
+M00000017_IL_0014:
+call System.String::Concat(String,String)
+M00000017_IL_0019:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000018_IL_0000:
+ldarg 0
+M00000018_IL_0001:
+M00000018_IL_0002:
+ref.isnull
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_0004:
+brtrue M00000018_IL_000e
+M00000018_IL_0009:
+br M00000018_IL_0014
+M00000018_IL_000e:
+ldstr "null"
+M00000018_IL_0013:
+ret
+M00000018_IL_0014:
+M00000018_IL_0015:
+ldarg 0
+M00000018_IL_0016:
+isinst String
+M00000018_IL_001b:
+M00000018_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_001e:
+brtrue M00000018_IL_0028
+M00000018_IL_0023:
+br M00000018_IL_0043
+M00000018_IL_0028:
+ldstr "\u0022"
+M00000018_IL_002d:
+ldarg 0
+M00000018_IL_002e:
+castclass String
+M00000018_IL_0033:
+call System.String::Concat(String,String)
+M00000018_IL_0038:
+ldstr "\u0022"
+M00000018_IL_003d:
+call System.String::Concat(String,String)
+M00000018_IL_0042:
+ret
+M00000018_IL_0043:
+M00000018_IL_0044:
+ldarg 0
+M00000018_IL_0045:
+isinst Char
+M00000018_IL_004a:
+dup
+M00000018_IL_004b:
+ref.isnull
+brfalse M00000018_IL_0057
+M00000018_IL_0050:
+pop
+M00000018_IL_0051:
+ldc.i4 0
+M00000018_IL_0052:
+br M00000018_IL_005e
+M00000018_IL_0057:
+unbox.any Char
+M00000018_IL_005c:
+pop
+M00000018_IL_005d:
+ldc.i4 1
+M00000018_IL_005e:
+brtrue M00000018_IL_0068
+M00000018_IL_0063:
+br M00000018_IL_0083
+M00000018_IL_0068:
+ldstr "\u0027"
+M00000018_IL_006d:
+ldarg 0
+M00000018_IL_006e:
+call neoCLR.Library.System.UriError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000018_IL_0073:
+call System.String::Concat(String,String)
+M00000018_IL_0078:
+ldstr "\u0027"
+M00000018_IL_007d:
+call System.String::Concat(String,String)
+M00000018_IL_0082:
+ret
+M00000018_IL_0083:
+M00000018_IL_0084:
+ldarg 0
+M00000018_IL_0085:
+call neoCLR.Library.System.UriError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000018_IL_008a:
 ret
 .end
 .end

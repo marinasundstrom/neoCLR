@@ -3,10 +3,10 @@
   "owner": "System.Int32",
   "inputs": {
     "runtime/raven/src/System/Uri.rvn": "b366425867c4b84f126de1689d4a03bf9855a6a881a4abe4dba1836a381537b7",
-    "runtime/raven/src/System/UriError.rvn": "7ba12d894914067d32accd5bcb6dbd9fdc1aabd5273da6b7e7c3dd034b6ee5a2",
+    "runtime/raven/src/System/UriError.rvn": "4cb6c1aa4d9c8bb51e3eb1964a5e5c57330e0b9091bd44bf5125a8a99c027dce",
     "runtime/raven/src/System/Web/Http/HttpServer.rvn": "e64d5b8a6d4a3dc5f5dd8df7d6a551deededd6f5da8d9bad32ff6d4b5b02b563",
     "runtime/raven/src/System/Web/Http/HttpClient.rvn": "859dc96f2458c3359922d5a8cd596809edc1669946cfcc886788fcc39e22c9c6",
-    "runtime/raven/src/System/Networking/DnsError.rvn": "652823f199e6d95b14518917d27306ac83c97d7bac1ee2f62578bb224b3b1d3c",
+    "runtime/raven/src/System/Networking/DnsError.rvn": "3d29e8b2008d54270cb35a581f4ba38e6d0672f4576b334100fc72d8f729a7bd",
     "runtime/raven/src/System/Networking/Dns.rvn": "59a6602715d4965feb78ed97327df0b8ebbaf1e4a04eecc074c2e57f14bdebb7",
     "runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "8bef0a016957620d757b082c7875e2ed87162a7b6fa936585c8d21264eb10014",
     "runtime/raven/src/System/Networking/Sockets/Socket.rvn": "24108b0b3e6003fda27588211303df99618d58ce6c9c1ee5d70be446bc75866a",
@@ -121,7 +121,7 @@
     "Int32.helpers.neoil": "c570e3a7f4c93397af251cc3d0e0481d59784216d31d37258154ce6da46d4a3c"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "6b7eb4a6c8283345438f953cec85fe8d48011124213560c104c93c9f04dce303",
+  "coreSha256": "633f93495cf44e5b5dcfebbb93886600013c32070a5b4857cb8d6ac11d303e43",
   "exports": [
     "Parse(String value) -> System.Result<Int32,System.Int32ParseError>",
     "Divide(Int32 dividend,Int32 divisor) -> System.Result<Int32,System.IntegerDivisionError>",

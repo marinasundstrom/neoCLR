@@ -61,7 +61,7 @@ func Resolved(baseUri: Uri, reference: string, expected: string) {
 
 func Invalid(text: string) {
     if let Error(error) = Uri.Parse(text) {
-        Check(error.IsInvalidFormat)
+        Check(error is UriError.InvalidFormat)
     } else {
         Check(false)
     }
@@ -84,12 +84,12 @@ source += '''    Resolved(Parsed("http://a"), "child", "http://a/child")
     let value: Object = Parsed("a")
     Check(!value.Equals("a"))
     if let Error(error) = Parsed("relative").Resolve("http://a/") {
-        Check(error.IsBaseNotAbsolute)
+        Check(error is UriError.BaseNotAbsolute)
     } else {
         Check(false)
     }
     if let Error(error) = Uri.Parse("http://[::1]/") {
-        Check(error.IsUnsupportedAuthority)
+        Check(error is UriError.UnsupportedAuthority)
     } else {
         Check(false)
     }
@@ -103,12 +103,12 @@ source += '''    Resolved(Parsed("http://a"), "child", "http://a/child")
     let maximum = Parsed(longText)
     Check(maximum.Text == longText)
     if let Error(error) = Uri.Parse(String.Concat(longText, "x")) {
-        Check(error.IsTooLong)
+        Check(error is UriError.TooLong)
     } else {
         Check(false)
     }
     if let Error(error) = baseUri.Resolve(maximum) {
-        Check(error.IsTooLong)
+        Check(error is UriError.TooLong)
     } else {
         Check(false)
     }

@@ -176,3 +176,8 @@ HasValue, Value and conditional TryGetValue members are documented. IUnion is a
 provisional ordinary compiler-support interface. RavenUnionCaseAttribute is excluded
 as compiler-reference metadata, with the exact reason in exclusions.json; it is not
 an executable runtime API. Rebuild the bridge after changing the embedded source.
+
+DnsError and UriError also use embedded-source projection. Their generated HasValue,
+Value and conditional TryGetValue members replace handwritten per-case Is*/Get*
+helpers. Their default values are inactive. The core projection runs sequentially
+so every family uses the same supplied IUnion identity.

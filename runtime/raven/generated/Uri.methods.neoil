@@ -2450,6 +2450,8 @@ ret
 .local System.Uri local3
 ldloca local1
 initobj System.Uri
+ldloca local2
+initobj System.UriError
 ldloca local3
 initobj System.Uri
 M0000000d_IL_0000:
@@ -2473,7 +2475,7 @@ br M0000000d_IL_003d
 M0000000d_IL_001c:
 ldloca local2
 M0000000d_IL_001e:
-pop
+initobj System.UriError
 M0000000d_IL_0024:
 ldloca local0
 M0000000d_IL_0026:

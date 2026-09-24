@@ -2,230 +2,856 @@
 .type System.UriError
 .sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
-.field private Stored Value
-.property instance IsInvalidFormat() -> Boolean
-.get instance System.UriError::get_IsInvalidFormat()
+.implements System.Runtime.CompilerServices.IUnion
+.field private Metadata_V1_3C5461673E Byte
+.field private Metadata_V1_3C496E76616C6964466F726D61745061796C6F61643E System.UriError.InvalidFormat
+.field private Metadata_V1_3C556E737570706F72746564417574686F726974795061796C6F61643E System.UriError.UnsupportedAuthority
+.field private Metadata_V1_3C546F6F4C6F6E675061796C6F61643E System.UriError.TooLong
+.field private Metadata_V1_3C426173654E6F744162736F6C7574655061796C6F61643E System.UriError.BaseNotAbsolute
+.property instance Value() -> System.Object
+.get instance System.UriError::get_Value()
 .end
-.property instance IsUnsupportedAuthority() -> Boolean
-.get instance System.UriError::get_IsUnsupportedAuthority()
+.property instance HasValue() -> Boolean
+.get instance System.UriError::get_HasValue()
 .end
-.property instance IsTooLong() -> Boolean
-.get instance System.UriError::get_IsTooLong()
-.end
-.property instance IsBaseNotAbsolute() -> Boolean
-.get instance System.UriError::get_IsBaseNotAbsolute()
-.end
-.method instance .ctor(System.UriError.InvalidFormat value) -> Void
-ldarg value
-value.pack System.UriError.InvalidFormat
-newobj System.UriError
-starg this
-ldvoid
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000001_IL_0000:
+ldarg 0
+M00000001_IL_0001:
+M00000001_IL_0002:
+ref.isnull
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0004:
+brtrue M00000001_IL_000e
+M00000001_IL_0009:
+br M00000001_IL_0014
+M00000001_IL_000e:
+ldstr "null"
+M00000001_IL_0013:
+ret
+M00000001_IL_0014:
+M00000001_IL_0015:
+ldarg 0
+M00000001_IL_0016:
+isinst String
+M00000001_IL_001b:
+M00000001_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_001e:
+brtrue M00000001_IL_0028
+M00000001_IL_0023:
+br M00000001_IL_0043
+M00000001_IL_0028:
+ldstr "\u0022"
+M00000001_IL_002d:
+ldarg 0
+M00000001_IL_002e:
+castclass String
+M00000001_IL_0033:
+call System.String::Concat(String,String)
+M00000001_IL_0038:
+ldstr "\u0022"
+M00000001_IL_003d:
+call System.String::Concat(String,String)
+M00000001_IL_0042:
+ret
+M00000001_IL_0043:
+M00000001_IL_0044:
+ldarg 0
+M00000001_IL_0045:
+isinst Char
+M00000001_IL_004a:
+dup
+M00000001_IL_004b:
+ref.isnull
+brfalse M00000001_IL_0057
+M00000001_IL_0050:
+pop
+M00000001_IL_0051:
+ldc.i4 0
+M00000001_IL_0052:
+br M00000001_IL_005e
+M00000001_IL_0057:
+unbox.any Char
+M00000001_IL_005c:
+pop
+M00000001_IL_005d:
+ldc.i4 1
+M00000001_IL_005e:
+brtrue M00000001_IL_0068
+M00000001_IL_0063:
+br M00000001_IL_0083
+M00000001_IL_0068:
+ldstr "\u0027"
+M00000001_IL_006d:
+ldarg 0
+M00000001_IL_006e:
+call neoCLR.Library.System.UriError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000001_IL_0073:
+call System.String::Concat(String,String)
+M00000001_IL_0078:
+ldstr "\u0027"
+M00000001_IL_007d:
+call System.String::Concat(String,String)
+M00000001_IL_0082:
+ret
+M00000001_IL_0083:
+M00000001_IL_0084:
+ldarg 0
+M00000001_IL_0085:
+call neoCLR.Library.System.UriError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000001_IL_008a:
 ret
 .end
-.method instance get_IsInvalidFormat() -> Boolean
+.method instance byref .ctor(System.UriError.InvalidFormat value) -> Void
+.local Byte local0
+.local System.UriError.InvalidFormat local1
+.local Byte unionDefault1_0
+.local System.UriError.InvalidFormat unionDefault1_1
+.local System.UriError.UnsupportedAuthority unionDefault1_2
+.local System.UriError.TooLong unionDefault1_3
+.local System.UriError.BaseNotAbsolute unionDefault1_4
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.UriError.InvalidFormat
 M00000002_IL_0000:
+ldarg 0
 M00000002_IL_0001:
-M00000002_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000002_IL_0003:
-ldfld System.UriError::Stored
+ldloc unionDefault1_0
+stfld System.UriError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.UriError.InvalidFormat
+ldarg 0
+ldloc unionDefault1_1
+stfld System.UriError::Metadata_V1_3C496E76616C6964466F726D61745061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.UriError.UnsupportedAuthority
+ldarg 0
+ldloc unionDefault1_2
+stfld System.UriError::Metadata_V1_3C556E737570706F72746564417574686F726974795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.UriError.TooLong
+ldarg 0
+ldloc unionDefault1_3
+stfld System.UriError::Metadata_V1_3C546F6F4C6F6E675061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.UriError.BaseNotAbsolute
+ldarg 0
+ldloc unionDefault1_4
+stfld System.UriError::Metadata_V1_3C426173654E6F744162736F6C7574655061796C6F61643E
+pop
+M00000002_IL_0007:
+ldc.i4 1
 M00000002_IL_0008:
-value.is System.UriError.InvalidFormat
-call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
-M00000002_IL_000d:
-call neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32)
+stloc local0
+M00000002_IL_0009:
+ldarg 0
+M00000002_IL_000a:
+ldloc local0
+M00000002_IL_000b:
+conv.u1
+M00000002_IL_000c:
+stfld System.UriError::Metadata_V1_3C5461673E
+pop
+M00000002_IL_0011:
+ldarg 1
+M00000002_IL_0012:
+stloc local1
+M00000002_IL_0013:
+ldarg 0
+M00000002_IL_0014:
+ldloc local1
+M00000002_IL_0015:
+stfld System.UriError::Metadata_V1_3C496E76616C6964466F726D61745061796C6F61643E
+pop
+M00000002_IL_001a:
+ldvoid
 ret
 .end
-.method instance GetInvalidFormat() -> System.UriError.InvalidFormat
+.method instance byref TryGetValue(out(true) System.UriError.InvalidFormat& value) -> Boolean
 M00000003_IL_0000:
+ldarg 0
 M00000003_IL_0001:
-M00000003_IL_0002:
-ldarg 0
-M00000003_IL_0003:
-ldfld System.UriError::Stored
+ldfld System.UriError::Metadata_V1_3C5461673E
+M00000003_IL_0006:
+conv.i4
+M00000003_IL_0007:
+ldc.i4 1
 M00000003_IL_0008:
-value.unpack System.UriError.InvalidFormat
-M00000003_IL_000d:
+conv.i4
+M00000003_IL_0009:
+ceq
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_000b:
+brtrue M00000003_IL_0015
+M00000003_IL_0010:
+br M00000003_IL_0023
+M00000003_IL_0015:
+ldarg 1
+M00000003_IL_0016:
+ldarg 0
+M00000003_IL_0017:
+ldfld System.UriError::Metadata_V1_3C496E76616C6964466F726D61745061796C6F61643E
+M00000003_IL_001c:
+stobj System.UriError.InvalidFormat
+M00000003_IL_0021:
+ldc.i4 1
+M00000003_IL_0022:
+call neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000003_IL_0023:
+M00000003_IL_0024:
+ldc.i4 0
+M00000003_IL_0025:
+call neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance .ctor(System.UriError.UnsupportedAuthority value) -> Void
-ldarg value
-value.pack System.UriError.UnsupportedAuthority
-newobj System.UriError
-starg this
+.method instance byref .ctor(System.UriError.UnsupportedAuthority value) -> Void
+.local Byte local0
+.local System.UriError.UnsupportedAuthority local1
+.local Byte unionDefault1_0
+.local System.UriError.InvalidFormat unionDefault1_1
+.local System.UriError.UnsupportedAuthority unionDefault1_2
+.local System.UriError.TooLong unionDefault1_3
+.local System.UriError.BaseNotAbsolute unionDefault1_4
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.UriError.UnsupportedAuthority
+M00000004_IL_0000:
+ldarg 0
+M00000004_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.UriError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.UriError.InvalidFormat
+ldarg 0
+ldloc unionDefault1_1
+stfld System.UriError::Metadata_V1_3C496E76616C6964466F726D61745061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.UriError.UnsupportedAuthority
+ldarg 0
+ldloc unionDefault1_2
+stfld System.UriError::Metadata_V1_3C556E737570706F72746564417574686F726974795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.UriError.TooLong
+ldarg 0
+ldloc unionDefault1_3
+stfld System.UriError::Metadata_V1_3C546F6F4C6F6E675061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.UriError.BaseNotAbsolute
+ldarg 0
+ldloc unionDefault1_4
+stfld System.UriError::Metadata_V1_3C426173654E6F744162736F6C7574655061796C6F61643E
+pop
+M00000004_IL_0007:
+ldc.i4 2
+M00000004_IL_0008:
+stloc local0
+M00000004_IL_0009:
+ldarg 0
+M00000004_IL_000a:
+ldloc local0
+M00000004_IL_000b:
+conv.u1
+M00000004_IL_000c:
+stfld System.UriError::Metadata_V1_3C5461673E
+pop
+M00000004_IL_0011:
+ldarg 1
+M00000004_IL_0012:
+stloc local1
+M00000004_IL_0013:
+ldarg 0
+M00000004_IL_0014:
+ldloc local1
+M00000004_IL_0015:
+stfld System.UriError::Metadata_V1_3C556E737570706F72746564417574686F726974795061796C6F61643E
+pop
+M00000004_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsUnsupportedAuthority() -> Boolean
+.method instance byref TryGetValue(out(true) System.UriError.UnsupportedAuthority& value) -> Boolean
 M00000005_IL_0000:
+ldarg 0
 M00000005_IL_0001:
-M00000005_IL_0002:
-ldarg 0
-M00000005_IL_0003:
-ldfld System.UriError::Stored
+ldfld System.UriError::Metadata_V1_3C5461673E
+M00000005_IL_0006:
+conv.i4
+M00000005_IL_0007:
+ldc.i4 2
 M00000005_IL_0008:
-value.is System.UriError.UnsupportedAuthority
+conv.i4
+M00000005_IL_0009:
+ceq
 call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_000d:
+M00000005_IL_000b:
+brtrue M00000005_IL_0015
+M00000005_IL_0010:
+br M00000005_IL_0023
+M00000005_IL_0015:
+ldarg 1
+M00000005_IL_0016:
+ldarg 0
+M00000005_IL_0017:
+ldfld System.UriError::Metadata_V1_3C556E737570706F72746564417574686F726974795061796C6F61643E
+M00000005_IL_001c:
+stobj System.UriError.UnsupportedAuthority
+M00000005_IL_0021:
+ldc.i4 1
+M00000005_IL_0022:
+call neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000005_IL_0023:
+M00000005_IL_0024:
+ldc.i4 0
+M00000005_IL_0025:
 call neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetUnsupportedAuthority() -> System.UriError.UnsupportedAuthority
+.method instance byref .ctor(System.UriError.TooLong value) -> Void
+.local Byte local0
+.local System.UriError.TooLong local1
+.local Byte unionDefault1_0
+.local System.UriError.InvalidFormat unionDefault1_1
+.local System.UriError.UnsupportedAuthority unionDefault1_2
+.local System.UriError.TooLong unionDefault1_3
+.local System.UriError.BaseNotAbsolute unionDefault1_4
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.UriError.TooLong
 M00000006_IL_0000:
+ldarg 0
 M00000006_IL_0001:
-M00000006_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000006_IL_0003:
-ldfld System.UriError::Stored
+ldloc unionDefault1_0
+stfld System.UriError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.UriError.InvalidFormat
+ldarg 0
+ldloc unionDefault1_1
+stfld System.UriError::Metadata_V1_3C496E76616C6964466F726D61745061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.UriError.UnsupportedAuthority
+ldarg 0
+ldloc unionDefault1_2
+stfld System.UriError::Metadata_V1_3C556E737570706F72746564417574686F726974795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.UriError.TooLong
+ldarg 0
+ldloc unionDefault1_3
+stfld System.UriError::Metadata_V1_3C546F6F4C6F6E675061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.UriError.BaseNotAbsolute
+ldarg 0
+ldloc unionDefault1_4
+stfld System.UriError::Metadata_V1_3C426173654E6F744162736F6C7574655061796C6F61643E
+pop
+M00000006_IL_0007:
+ldc.i4 3
 M00000006_IL_0008:
-value.unpack System.UriError.UnsupportedAuthority
-M00000006_IL_000d:
-ret
-.end
-.method instance .ctor(System.UriError.TooLong value) -> Void
-ldarg value
-value.pack System.UriError.TooLong
-newobj System.UriError
-starg this
+stloc local0
+M00000006_IL_0009:
+ldarg 0
+M00000006_IL_000a:
+ldloc local0
+M00000006_IL_000b:
+conv.u1
+M00000006_IL_000c:
+stfld System.UriError::Metadata_V1_3C5461673E
+pop
+M00000006_IL_0011:
+ldarg 1
+M00000006_IL_0012:
+stloc local1
+M00000006_IL_0013:
+ldarg 0
+M00000006_IL_0014:
+ldloc local1
+M00000006_IL_0015:
+stfld System.UriError::Metadata_V1_3C546F6F4C6F6E675061796C6F61643E
+pop
+M00000006_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsTooLong() -> Boolean
+.method instance byref TryGetValue(out(true) System.UriError.TooLong& value) -> Boolean
+M00000007_IL_0000:
+ldarg 0
+M00000007_IL_0001:
+ldfld System.UriError::Metadata_V1_3C5461673E
+M00000007_IL_0006:
+conv.i4
+M00000007_IL_0007:
+ldc.i4 3
+M00000007_IL_0008:
+conv.i4
+M00000007_IL_0009:
+ceq
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_000b:
+brtrue M00000007_IL_0015
+M00000007_IL_0010:
+br M00000007_IL_0023
+M00000007_IL_0015:
+ldarg 1
+M00000007_IL_0016:
+ldarg 0
+M00000007_IL_0017:
+ldfld System.UriError::Metadata_V1_3C546F6F4C6F6E675061796C6F61643E
+M00000007_IL_001c:
+stobj System.UriError.TooLong
+M00000007_IL_0021:
+ldc.i4 1
+M00000007_IL_0022:
+call neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000007_IL_0023:
+M00000007_IL_0024:
+ldc.i4 0
+M00000007_IL_0025:
+call neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.UriError.BaseNotAbsolute value) -> Void
+.local Byte local0
+.local System.UriError.BaseNotAbsolute local1
+.local Byte unionDefault1_0
+.local System.UriError.InvalidFormat unionDefault1_1
+.local System.UriError.UnsupportedAuthority unionDefault1_2
+.local System.UriError.TooLong unionDefault1_3
+.local System.UriError.BaseNotAbsolute unionDefault1_4
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.UriError.BaseNotAbsolute
 M00000008_IL_0000:
+ldarg 0
 M00000008_IL_0001:
-M00000008_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000008_IL_0003:
-ldfld System.UriError::Stored
+ldloc unionDefault1_0
+stfld System.UriError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.UriError.InvalidFormat
+ldarg 0
+ldloc unionDefault1_1
+stfld System.UriError::Metadata_V1_3C496E76616C6964466F726D61745061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.UriError.UnsupportedAuthority
+ldarg 0
+ldloc unionDefault1_2
+stfld System.UriError::Metadata_V1_3C556E737570706F72746564417574686F726974795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.UriError.TooLong
+ldarg 0
+ldloc unionDefault1_3
+stfld System.UriError::Metadata_V1_3C546F6F4C6F6E675061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.UriError.BaseNotAbsolute
+ldarg 0
+ldloc unionDefault1_4
+stfld System.UriError::Metadata_V1_3C426173654E6F744162736F6C7574655061796C6F61643E
+pop
+M00000008_IL_0007:
+ldc.i4 4
 M00000008_IL_0008:
-value.is System.UriError.TooLong
-call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
-M00000008_IL_000d:
-call neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method instance GetTooLong() -> System.UriError.TooLong
-M00000009_IL_0000:
-M00000009_IL_0001:
-M00000009_IL_0002:
+stloc local0
+M00000008_IL_0009:
 ldarg 0
-M00000009_IL_0003:
-ldfld System.UriError::Stored
-M00000009_IL_0008:
-value.unpack System.UriError.TooLong
-M00000009_IL_000d:
-ret
-.end
-.method instance .ctor(System.UriError.BaseNotAbsolute value) -> Void
-ldarg value
-value.pack System.UriError.BaseNotAbsolute
-newobj System.UriError
-starg this
+M00000008_IL_000a:
+ldloc local0
+M00000008_IL_000b:
+conv.u1
+M00000008_IL_000c:
+stfld System.UriError::Metadata_V1_3C5461673E
+pop
+M00000008_IL_0011:
+ldarg 1
+M00000008_IL_0012:
+stloc local1
+M00000008_IL_0013:
+ldarg 0
+M00000008_IL_0014:
+ldloc local1
+M00000008_IL_0015:
+stfld System.UriError::Metadata_V1_3C426173654E6F744162736F6C7574655061796C6F61643E
+pop
+M00000008_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsBaseNotAbsolute() -> Boolean
-M0000000b_IL_0000:
-M0000000b_IL_0001:
-M0000000b_IL_0002:
+.method instance byref TryGetValue(out(true) System.UriError.BaseNotAbsolute& value) -> Boolean
+M00000009_IL_0000:
 ldarg 0
-M0000000b_IL_0003:
-ldfld System.UriError::Stored
-M0000000b_IL_0008:
-value.is System.UriError.BaseNotAbsolute
+M00000009_IL_0001:
+ldfld System.UriError::Metadata_V1_3C5461673E
+M00000009_IL_0006:
+conv.i4
+M00000009_IL_0007:
+ldc.i4 4
+M00000009_IL_0008:
+conv.i4
+M00000009_IL_0009:
+ceq
 call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
-M0000000b_IL_000d:
+M00000009_IL_000b:
+brtrue M00000009_IL_0015
+M00000009_IL_0010:
+br M00000009_IL_0023
+M00000009_IL_0015:
+ldarg 1
+M00000009_IL_0016:
+ldarg 0
+M00000009_IL_0017:
+ldfld System.UriError::Metadata_V1_3C426173654E6F744162736F6C7574655061796C6F61643E
+M00000009_IL_001c:
+stobj System.UriError.BaseNotAbsolute
+M00000009_IL_0021:
+ldc.i4 1
+M00000009_IL_0022:
+call neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000009_IL_0023:
+M00000009_IL_0024:
+ldc.i4 0
+M00000009_IL_0025:
 call neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetBaseNotAbsolute() -> System.UriError.BaseNotAbsolute
-M0000000c_IL_0000:
-M0000000c_IL_0001:
-M0000000c_IL_0002:
+.method instance override byref ToString() -> String
+.local System.UriError local0
+.local String local1
+.local System.UriError local2
+.local System.UriError.InvalidFormat local3
+.local System.UriError local4
+.local System.UriError.UnsupportedAuthority local5
+.local System.UriError local6
+.local System.UriError.TooLong local7
+.local System.UriError local8
+.local System.UriError.BaseNotAbsolute local9
+ldloca local0
+initobj System.UriError
+ldloca local2
+initobj System.UriError
+ldloca local3
+initobj System.UriError.InvalidFormat
+ldloca local4
+initobj System.UriError
+ldloca local5
+initobj System.UriError.UnsupportedAuthority
+ldloca local6
+initobj System.UriError
+ldloca local7
+initobj System.UriError.TooLong
+ldloca local8
+initobj System.UriError
+ldloca local9
+initobj System.UriError.BaseNotAbsolute
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+M0000000a_IL_0003:
 ldarg 0
-M0000000c_IL_0003:
-ldfld System.UriError::Stored
-M0000000c_IL_0008:
-value.unpack System.UriError.BaseNotAbsolute
-M0000000c_IL_000d:
+M0000000a_IL_0004:
+ldobj System.UriError
+M0000000a_IL_0009:
+stloc local0
+M0000000a_IL_000a:
+M0000000a_IL_000b:
+ldloc local0
+M0000000a_IL_000c:
+stloc local2
+M0000000a_IL_000d:
+ldloca local2
+M0000000a_IL_000f:
+ldloca local3
+M0000000a_IL_0011:
+call instance System.UriError::TryGetValue(System.UriError.InvalidFormat&)
+M0000000a_IL_0016:
+brfalse M0000000a_IL_0034
+M0000000a_IL_001b:
+ldloc local3
+M0000000a_IL_001c:
+pop
+M0000000a_IL_001d:
+M0000000a_IL_001e:
+br M0000000a_IL_0029
+M0000000a_IL_0029:
+ldstr "InvalidFormat"
+M0000000a_IL_002e:
+stloc local1
+M0000000a_IL_002f:
+br M0000000a_IL_00d4
+M0000000a_IL_0034:
+M0000000a_IL_0035:
+ldloc local0
+M0000000a_IL_0036:
+stloc local4
+M0000000a_IL_0038:
+ldloca local4
+M0000000a_IL_003a:
+ldloca local5
+M0000000a_IL_003c:
+call instance System.UriError::TryGetValue(System.UriError.UnsupportedAuthority&)
+M0000000a_IL_0041:
+brfalse M0000000a_IL_0060
+M0000000a_IL_0046:
+ldloc local5
+M0000000a_IL_0048:
+pop
+M0000000a_IL_0049:
+M0000000a_IL_004a:
+br M0000000a_IL_0055
+M0000000a_IL_0055:
+ldstr "UnsupportedAuthority"
+M0000000a_IL_005a:
+stloc local1
+M0000000a_IL_005b:
+br M0000000a_IL_00d4
+M0000000a_IL_0060:
+M0000000a_IL_0061:
+M0000000a_IL_0062:
+ldloc local0
+M0000000a_IL_0063:
+stloc local6
+M0000000a_IL_0065:
+ldloca local6
+M0000000a_IL_0067:
+ldloca local7
+M0000000a_IL_0069:
+call instance System.UriError::TryGetValue(System.UriError.TooLong&)
+M0000000a_IL_006e:
+brfalse M0000000a_IL_008d
+M0000000a_IL_0073:
+ldloc local7
+M0000000a_IL_0075:
+pop
+M0000000a_IL_0076:
+M0000000a_IL_0077:
+br M0000000a_IL_0082
+M0000000a_IL_0082:
+ldstr "TooLong"
+M0000000a_IL_0087:
+stloc local1
+M0000000a_IL_0088:
+br M0000000a_IL_00d4
+M0000000a_IL_008d:
+M0000000a_IL_008e:
+M0000000a_IL_008f:
+ldloc local0
+M0000000a_IL_0090:
+stloc local8
+M0000000a_IL_0092:
+ldloca local8
+M0000000a_IL_0094:
+ldloca local9
+M0000000a_IL_0096:
+call instance System.UriError::TryGetValue(System.UriError.BaseNotAbsolute&)
+M0000000a_IL_009b:
+brfalse M0000000a_IL_00ba
+M0000000a_IL_00a0:
+ldloc local9
+M0000000a_IL_00a2:
+pop
+M0000000a_IL_00a3:
+M0000000a_IL_00a4:
+br M0000000a_IL_00af
+M0000000a_IL_00af:
+ldstr "BaseNotAbsolute"
+M0000000a_IL_00b4:
+stloc local1
+M0000000a_IL_00b5:
+br M0000000a_IL_00d4
+M0000000a_IL_00ba:
+M0000000a_IL_00bb:
+ldloc local0
+M0000000a_IL_00bc:
+pop
+M0000000a_IL_00bd:
+ldc.i4 1
+M0000000a_IL_00be:
+brfalse M0000000a_IL_00cf
+M0000000a_IL_00c3:
+M0000000a_IL_00c4:
+ldstr "Empty"
+M0000000a_IL_00c9:
+stloc local1
+M0000000a_IL_00ca:
+br M0000000a_IL_00d4
+M0000000a_IL_00cf:
+M0000000a_IL_00d0:
+M0000000a_IL_00d1:
+M0000000a_IL_00d2:
+M0000000a_IL_00d3:
+fault "Guest program reached a terminal failure"
+M0000000a_IL_00d4:
+M0000000a_IL_00d5:
+ldloc local1
+M0000000a_IL_00d6:
 ret
 .end
-.method instance ToString() -> String
-M0000000d_IL_0000:
-M0000000d_IL_0001:
-M0000000d_IL_0002:
+.method instance byref get_Value() -> System.Object
+M0000000b_IL_0000:
 ldarg 0
-M0000000d_IL_0003:
-call instance System.UriError::get_IsInvalidFormat()
+M0000000b_IL_0001:
+ldfld System.UriError::Metadata_V1_3C5461673E
+M0000000b_IL_0006:
+conv.i4
+M0000000b_IL_0007:
+ldc.i4 1
+M0000000b_IL_0008:
+conv.i4
+M0000000b_IL_0009:
+ceq
 call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
-M0000000d_IL_0008:
-brtrue M0000000d_IL_0012
-M0000000d_IL_000d:
-br M0000000d_IL_0019
-M0000000d_IL_0012:
-M0000000d_IL_0013:
-ldstr "InvalidFormat"
-M0000000d_IL_0018:
-ret
-M0000000d_IL_0019:
-M0000000d_IL_001a:
-M0000000d_IL_001b:
+M0000000b_IL_000b:
+brtrue M0000000b_IL_0015
+M0000000b_IL_0010:
+br M0000000b_IL_0021
+M0000000b_IL_0015:
 ldarg 0
-M0000000d_IL_001c:
-call instance System.UriError::get_IsUnsupportedAuthority()
-call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
-M0000000d_IL_0021:
-brtrue M0000000d_IL_002b
-M0000000d_IL_0026:
-br M0000000d_IL_0032
-M0000000d_IL_002b:
-M0000000d_IL_002c:
-ldstr "UnsupportedAuthority"
-M0000000d_IL_0031:
+M0000000b_IL_0016:
+ldfld System.UriError::Metadata_V1_3C496E76616C6964466F726D61745061796C6F61643E
+M0000000b_IL_001b:
+box System.UriError.InvalidFormat
+M0000000b_IL_0020:
 ret
-M0000000d_IL_0032:
-M0000000d_IL_0033:
-M0000000d_IL_0034:
+M0000000b_IL_0021:
+M0000000b_IL_0022:
 ldarg 0
-M0000000d_IL_0035:
-call instance System.UriError::get_IsTooLong()
+M0000000b_IL_0023:
+ldfld System.UriError::Metadata_V1_3C5461673E
+M0000000b_IL_0028:
+conv.i4
+M0000000b_IL_0029:
+ldc.i4 2
+M0000000b_IL_002a:
+conv.i4
+M0000000b_IL_002b:
+ceq
 call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
-M0000000d_IL_003a:
-brtrue M0000000d_IL_0044
-M0000000d_IL_003f:
-br M0000000d_IL_004b
-M0000000d_IL_0044:
-M0000000d_IL_0045:
-ldstr "TooLong"
-M0000000d_IL_004a:
-ret
-M0000000d_IL_004b:
-M0000000d_IL_004c:
-M0000000d_IL_004d:
+M0000000b_IL_002d:
+brtrue M0000000b_IL_0037
+M0000000b_IL_0032:
+br M0000000b_IL_0043
+M0000000b_IL_0037:
 ldarg 0
-M0000000d_IL_004e:
-call instance System.UriError::get_IsBaseNotAbsolute()
-call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
-M0000000d_IL_0053:
-brtrue M0000000d_IL_005d
-M0000000d_IL_0058:
-br M0000000d_IL_0064
-M0000000d_IL_005d:
-M0000000d_IL_005e:
-ldstr "BaseNotAbsolute"
-M0000000d_IL_0063:
+M0000000b_IL_0038:
+ldfld System.UriError::Metadata_V1_3C556E737570706F72746564417574686F726974795061796C6F61643E
+M0000000b_IL_003d:
+box System.UriError.UnsupportedAuthority
+M0000000b_IL_0042:
 ret
-M0000000d_IL_0064:
-M0000000d_IL_0065:
-M0000000d_IL_0066:
-ldstr "Invalid URI error case"
-M0000000d_IL_006b:
-call System.Fault(String)
-M0000000d_IL_0070:
-M0000000d_IL_0071:
-ldstr ""
-M0000000d_IL_0076:
+M0000000b_IL_0043:
+M0000000b_IL_0044:
+ldarg 0
+M0000000b_IL_0045:
+ldfld System.UriError::Metadata_V1_3C5461673E
+M0000000b_IL_004a:
+conv.i4
+M0000000b_IL_004b:
+ldc.i4 3
+M0000000b_IL_004c:
+conv.i4
+M0000000b_IL_004d:
+ceq
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_004f:
+brtrue M0000000b_IL_0059
+M0000000b_IL_0054:
+br M0000000b_IL_0065
+M0000000b_IL_0059:
+ldarg 0
+M0000000b_IL_005a:
+ldfld System.UriError::Metadata_V1_3C546F6F4C6F6E675061796C6F61643E
+M0000000b_IL_005f:
+box System.UriError.TooLong
+M0000000b_IL_0064:
+ret
+M0000000b_IL_0065:
+M0000000b_IL_0066:
+ldarg 0
+M0000000b_IL_0067:
+ldfld System.UriError::Metadata_V1_3C5461673E
+M0000000b_IL_006c:
+conv.i4
+M0000000b_IL_006d:
+ldc.i4 4
+M0000000b_IL_006e:
+conv.i4
+M0000000b_IL_006f:
+ceq
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_0071:
+brtrue M0000000b_IL_007b
+M0000000b_IL_0076:
+br M0000000b_IL_0087
+M0000000b_IL_007b:
+ldarg 0
+M0000000b_IL_007c:
+ldfld System.UriError::Metadata_V1_3C426173654E6F744162736F6C7574655061796C6F61643E
+M0000000b_IL_0081:
+box System.UriError.BaseNotAbsolute
+M0000000b_IL_0086:
+ret
+M0000000b_IL_0087:
+M0000000b_IL_0088:
+M0000000b_IL_0089:
+call neoCLR.Library.System.UriError.DefaultReference53797374656D2E4F626A656374()
+ret
+.end
+.method instance byref get_HasValue() -> Boolean
+M0000000c_IL_0000:
+ldarg 0
+M0000000c_IL_0001:
+call instance System.UriError::get_Value()
+M0000000c_IL_0006:
+M0000000c_IL_0007:
+ref.isnull
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0009:
+ldc.i4 0
+M0000000c_IL_000a:
+ceq
+call neoCLR.Library.System.UriError.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_000c:
+call neoCLR.Library.System.UriError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .end

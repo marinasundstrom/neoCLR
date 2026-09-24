@@ -1,98 +1,22 @@
 namespace System.Networking
 
-import System.Runtime.CompilerServices.ValueStorage
+public union DnsError {
+    case InvalidName
+    case LimitExceeded
+    case NoAddress
+    case TimedOut
+    case Cancelled
+    case LookupFailed
 
-[System.Runtime.CompilerServices.Union]
-public struct DnsError {
-    private field Stored: System.Value
-
-    public struct InvalidName { }
-    public struct LimitExceeded { }
-    public struct NoAddress { }
-    public struct TimedOut { }
-    public struct Cancelled { }
-    public struct LookupFailed { }
-
-    init(value: DnsError.InvalidName) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsInvalidName: bool => ValueStorage.Is<DnsError.InvalidName>(Stored)
-
-    func GetInvalidName() -> DnsError.InvalidName {
-        return ValueStorage.Unpack<DnsError.InvalidName>(Stored)
-    }
-
-    init(value: DnsError.LimitExceeded) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsLimitExceeded: bool => ValueStorage.Is<DnsError.LimitExceeded>(Stored)
-
-    func GetLimitExceeded() -> DnsError.LimitExceeded {
-        return ValueStorage.Unpack<DnsError.LimitExceeded>(Stored)
-    }
-
-    init(value: DnsError.NoAddress) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsNoAddress: bool => ValueStorage.Is<DnsError.NoAddress>(Stored)
-
-    func GetNoAddress() -> DnsError.NoAddress {
-        return ValueStorage.Unpack<DnsError.NoAddress>(Stored)
-    }
-
-    init(value: DnsError.TimedOut) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsTimedOut: bool => ValueStorage.Is<DnsError.TimedOut>(Stored)
-
-    func GetTimedOut() -> DnsError.TimedOut {
-        return ValueStorage.Unpack<DnsError.TimedOut>(Stored)
-    }
-
-    init(value: DnsError.Cancelled) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsCancelled: bool => ValueStorage.Is<DnsError.Cancelled>(Stored)
-
-    func GetCancelled() -> DnsError.Cancelled {
-        return ValueStorage.Unpack<DnsError.Cancelled>(Stored)
-    }
-
-    init(value: DnsError.LookupFailed) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsLookupFailed: bool => ValueStorage.Is<DnsError.LookupFailed>(Stored)
-
-    func GetLookupFailed() -> DnsError.LookupFailed {
-        return ValueStorage.Unpack<DnsError.LookupFailed>(Stored)
-    }
-
-    func ToString() -> string {
-        if IsInvalidName {
-            return "InvalidName"
+    override func ToString() -> string {
+        return match self {
+            InvalidName => "InvalidName"
+            LimitExceeded => "LimitExceeded"
+            NoAddress => "NoAddress"
+            TimedOut => "TimedOut"
+            Cancelled => "Cancelled"
+            LookupFailed => "LookupFailed"
+            _ => "Empty"
         }
-        if IsLimitExceeded {
-            return "LimitExceeded"
-        }
-        if IsNoAddress {
-            return "NoAddress"
-        }
-        if IsTimedOut {
-            return "TimedOut"
-        }
-        if IsCancelled {
-            return "Cancelled"
-        }
-        if IsLookupFailed {
-            return "LookupFailed"
-        }
-        System.Fault("invalid DNS error case")
-        return ""
     }
 }

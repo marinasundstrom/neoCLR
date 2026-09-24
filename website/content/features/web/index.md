@@ -135,6 +135,9 @@ removed during resolution.
 This first iteration preserves exact text for equality and hashing. It does not
 perform network access, implicit escaping, IDNA conversion or IPv6-literal parsing.
 Input is limited to 4096 bytes. A parsed Uri does not imply transport support.
+UriError is a development union with named cases and generated pattern support.
+Its former per-case `Is*`/`Get*` helpers have been removed; match the cases directly.
+
 The [API reference](/docs/api/System/Uri/) describes both overloads and the limits.
 
 The next HTTP work is typed `HttpError` results and `HttpClient.BaseUri`, with string

@@ -842,7 +842,11 @@ SocketError is now the first public error migrated to normal Raven union syntax:
 consumer/bootstrap references compile embedded source, native callers use generated
 case matching, and nested HttpError probes pass copying/boxing/GC checks. Real TCP,
 managed listener/client and selected HTTP cases pass. Rebuild matching SDK/library/apps;
-SocketError's Is*/Get* helpers are removed and its default is inactive.
+SocketError's Is*/Get* helpers are removed and its default is inactive. The next
+empty-case group migrates DnsError and UriError through the same source projection,
+with generated case patterns and inactive defaults. All 23 case names, nested
+managed payloads, copies/boxing/defaults, URI grammar/resolution and DNS/TCP pass; payload-bearing explicit
+layout is separately tested as an unsupported boundary.
 
 Per-case Is* properties are not a required convention, including for Option/Result.
 Migrate applicable existing unions next, recording concrete blockers for remaining

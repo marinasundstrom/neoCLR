@@ -247,3 +247,31 @@ zero live objects. Socket client, separate neoCLR listener/client and selected H
 success/failure checks pass with the matching artifacts. The next author-directed
 work is batch migration of applicable existing unions before resuming public HttpError
 and BaseUri. Generic families remain a separate validation boundary.
+
+## DNS and URI error migration batch
+
+DnsError and UriError now use normal union declarations alongside SocketError.
+Core generation compiles each embedded source against the preceding projected
+reference, reusing the existing IUnion and case metadata definitions. The public
+case names and producer outcomes are unchanged; handwritten Is*/Get* helpers are
+removed. Use patterns and rebuild matching SDK/library/application artifacts.
+Defaults are inactive and format as Empty.
+
+The focused verifier now covers every case in these three families, direct and
+boxed display, defaults, copies and nesting in data-bearing source unions. A
+separate all-value payload union remains rejected: Raven emits overlapping payload
+storage, while the bridge only admits explicit layout for empty-case unions. The
+mixed managed payload probe is supported. This is a concrete remaining layout
+boundary, not evidence that arbitrary payload unions work in the class library.
+
+Existing .NET API comparisons still apply: neoCLR models expected DNS/URI failures
+as result values rather than copying exception inheritance. This slice changes
+implementation and case access, not the error categories or a claim of .NET ABI
+compatibility. Enums remain an option for named constants; this is a migration of
+existing union contracts, not a new universal representation rule.
+
+Batch checks: 147 allocations, three collections and zero live objects. DNS/TCP
+passes with 1856 allocations and zero live objects; its expected invalid-name case
+is checked through a pattern. The all-value payload layout is explicitly rejected.
+
+URI grammar/resolution, Object checks and the recorded .NET comparison also pass.

@@ -44,6 +44,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Update generated library and API/website documentation. Per-case predicates are not
   a required convention for any union, including Option and Result. Batch remaining
   applicable union migrations before resuming HttpError/BaseUri (still unimplemented).
+  Migrate DnsError and UriError next, projecting each source against the preceding
+  core so compiler-support identities are shared. Remove their per-case Is*/Get*
+  helpers in favor of patterns; inactive defaults expose HasValue false, Value null
+  and ToString Empty. Matching SDK, library and applications must be rebuilt.
 
 - Add managed System.Uri and UriError with strict escaped-ASCII parsing, string/Uri
   Resolve overloads and RFC 3986 relative resolution. Preserve lexical Text equality

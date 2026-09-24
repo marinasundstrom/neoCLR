@@ -12,7 +12,9 @@ artifacts; the published Preview 9 SDK does not include these APIs.
 [Dns.GetHostAddresses](xref:System.Networking.Dns) returns a
 `Task<Result<Sequence<string>, DnsError>>`. Resolution uses the host configuration,
 including local host entries. The numeric IPv4 strings can be passed to Socket.Connect.
-Lookup errors and connection errors are separate outcomes. `SocketError` is authored
+Lookup errors and connection errors are separate outcomes. `DnsError` also uses
+normal union syntax; match cases such as `DnsError.InvalidName` directly. Its former
+per-case `Is*`/`Get*` helpers have been removed in the development API. `SocketError` is authored
 with normal union syntax in the development library. Match its named cases directly;
 per-case `Is*` properties and `Get*` methods are no longer part of that API. Rebuild
 applications with the matching development SDK and runtime library.
