@@ -1,6 +1,6 @@
 # neoCLR platform roadmap
 
-**Updated 2026-09-24 · Product-led planning, not a release schedule.**
+**Updated 2026-09-25 · Product-led planning, not a release schedule.**
 
 Build a platform that can justify itself through useful programs. Each milestone
 has a theme, a concrete sample product and smaller cases that make the underlying
@@ -59,6 +59,69 @@ keeps the hosting loop provisional. The [JSON report application](experiments/ht
 now composes the existing JSON consumer with this exchange, including independent
 Python client/server checks. JSON remains application-local pending public API design. Keep transfer/request lifetime explicit. M1 remains incomplete; broad HTTP, TLS,
 retry policy and runtime suspension are not prerequisites for this controlled POC.
+
+## Networking and web release target — discussion, 2026-09-25
+
+**Author direction:** work toward a release containing networking and web that feels
+coherent and reasonably complete, without requiring a finished platform. HttpClient
+and cancellation tokens are explicitly included. The additional scope below is the
+assistant's recommendation for review, not approval of every proposed API or a
+release date. Continue the current typed HTTP/error/base-address integration first.
+
+The current GET/200, small-buffer and ServeOne POC proves the path, but it is too
+narrow to be the whole release experience. Prefer these connected release gates:
+
+| Slice | Proposed release outcome and evidence |
+| --- | --- |
+| Client contract | Token-aware Send, Get/GetString and common verb helpers; optional string BaseUri with the recorded relative/absolute rules; fake and forwarding handlers use the same pipeline |
+| Requests and content | Method, resolved URI, usable case-insensitive headers, byte and UTF-8 text bodies with content type; POST round-trip, empty content and non-ASCII content tested |
+| Responses and errors | General status values, headers and content; 201/204/400/404/500 examples; typed HttpError with inspectable causes; distinguish HTTP status, transport failure, cancellation, timeout and decoding failure |
+| Cancellation and lifetime | A source/token pair usable beyond HTTP; cancel before dispatch and during pending work; configurable request deadline; deterministic connection/buffer cleanup and explicit handler ownership/reuse rules |
+| HTTP interoperability | Bounded Content-Length and chunked-body reception, legal no-body responses, close-delimited response handling, malformed/ambiguous framing rejection; client and server each checked with independent peers |
+| Server lifecycle | Repeated requests, GET and POST bodies, application-selected statuses, cancellation while waiting/serving and bounded shutdown; define in-flight request ownership; demonstrate a small bounded concurrent workload without adding a routing framework |
+| Release product | A storage-backed notes app: list/read notes, POST UTF-8 content to save one, report missing/invalid input and stop cleanly; packaged client/server samples, API docs and matching SDK/compiler/runtime artifacts |
+
+Keep bodies buffered initially with documented/configurable bounds. A stream-backed
+body API is a follow-up unless the chosen sample demonstrates a concrete need;
+do not require full duplex streaming just to release ordinary request/response I/O.
+The notes app should reuse storage APIs and the bounded JSON work, extracting only
+the small public JSON contract the app needs. A serializer/reflection framework is
+not a prerequisite. Check the application API with familiar .NET patterns while
+retaining Result/Option and explicit ownership.
+
+**HTTPS scope decision:** investigate a maintained native/platform TLS backend early,
+including certificate trust, hostname validation, cancellation and target packaging.
+Recommend HTTPS client support if this release is meant to call ordinary external
+services. If deferred, describe the release explicitly as experimental plain-HTTP
+client/server support for controlled environments. Server TLS may remain separate.
+Do not implement cryptography or accept invalid certificates as a shortcut.
+
+**Defer by default:** HTTP/2/3, automatic retries/redirects, cookies, proxies,
+compression, WebSockets, connection pooling, a general hosting/routing framework,
+TcpClient/UdpClient convenience wrappers and runtime suspension. IPAddress/HostEntry
+and IPv6 remain useful follow-ups; do not require them merely to replace currently
+working string boundaries. The additional .NET client machinery has real lifetime
+and performance benefits, but also broadens this release's contracts and tests.
+Document the costs of connection-per-request behavior and retained IPv4-only limits.
+
+**Efficient validation:** run common parser, URI, handler and error behavior once per
+relevant change. On each supported target, exercise the actual socket/DNS/TLS and
+cancellation/cleanup boundary plus one packaged smoke exchange. Perform focused
+GC/race/fault checks and independent-peer interoperability before release. Use a
+fresh matching Raven release/verified main baseline when porting .NET Raven examples
+to distinguish shared compiler defects from neoCLR-specific problems. Refresh API
+reference and on-site limitations with each integrated slice. No version is selected.
+
+Comparison sources reviewed 2026-09-25:
+[.NET SendAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.sendasync?view=net-10.0)
+for the request/token boundary,
+[.NET HttpClient lifetime guidance](https://learn.microsoft.com/en-us/dotnet/fundamentals/networking/http/httpclient-guidelines)
+for handler ownership and connection reuse costs, and
+[RFC 9112](https://www.rfc-editor.org/rfc/rfc9112.html)
+for framing and completion. These are reference points, not a claim that the bounded
+neoCLR stack already implements their full behavior. Reuse the detailed
+[client](http-client-design.md), [server](http-server-design.md) and
+[socket](socket-api-design.md) research for each implementation slice.
 
 ## Scheduling checkpoint before the public socket bridge — 2026-09-24
 

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Record the networking/web release objective and a proposed scope: request/body
+  and status support, cancellation/lifetimes, interoperable framing, server shutdown,
+  a storage-backed sample and focused release validation. HTTPS remains an explicit
+  scope decision; these are planning recommendations, not implemented capabilities.
+
 - Extend the development union projector/importer to matched nongeneric sequential
   payload families. Verify an HttpError library prototype with URI/DNS/socket causes
   and text payloads, separate consumer compilation, copies/boxing/GC, and rejection

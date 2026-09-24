@@ -6953,3 +6953,22 @@ configuration/content, not target-specific code added to Raven main.
   replaces the earlier planned absolute-override test with the stated two-mode
   contract. Uri remains useful internally for parsing/resolution and as an address
   overload. Implementation and exact error cases remain pending.
+
+### 2026-09-25 — Networking and web release scope
+
+- **Author direction/question:** work toward a release with networking and web that
+  feels reasonably complete, without being 100% done; HttpClient and cancellation
+  tokens are on the list, and asks what else belongs.
+- **Assistant assessment:** the current GET/200, bounded buffered bodies and
+  ServeOne prove integration but need request-body/status breadth and lifecycle
+  behavior for a coherent release. Proposes headers/text/byte content, typed errors,
+  deadlines and cleanup, basic interoperable framing, a repeatable stoppable server,
+  and a packaged storage-backed notes sample with API documentation.
+- **Assistant scope recommendation:** investigate HTTPS through a maintained backend
+  early; require it for an external-service client claim or explicitly retain a
+  plain-HTTP experimental scope. Defer pooling, HTTP/2/3, retries, broad hosting,
+  convenience socket wrappers and runtime suspension. Keep validation shared except
+  where host behavior differs. Records candidate gates in the
+  [roadmap](platform-roadmap.md#networking-and-web-release-target--discussion-2026-09-25).
+- **Status:** this is scope planning; no new networking APIs, release version/date
+  or author approval of the additional recommended gates is claimed.
