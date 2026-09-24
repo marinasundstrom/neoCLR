@@ -12,7 +12,9 @@ neoCLR owns its site configuration, content, styling, API selection and release
 notice. The generator keeps main menus, section navigation (`toc.yml`) and
 in-page outlines separate. Generated API navigation uses the same internal
 section-navigation model as authored menus. On small screens the sidebar opens
-as an off-canvas drawer.
+as an off-canvas drawer. neoCLR selects `namespaceNavigation: flat`, listing full
+namespace names as peers while each expands to its types. RavenDoc also supports
+`hierarchical` (the default); this option does not change reference URLs.
 
 ## Updating
 

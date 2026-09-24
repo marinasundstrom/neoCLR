@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Enable RavenDoc flat namespace navigation for the neoCLR API Browser, with
+  full namespace names as peers and expandable type groups. Update the pinned
+  upstream generator; hierarchical mode remains available and URLs are unchanged.
+
 - Add Socket.Listen, asynchronous Accept and GetLocalPort for a two-process neoCLR
   echo POC. Reserve connection capacity for pending accepts; preserve accepted sockets
   after listener close, with that ownership rule documented on Close. Add

@@ -9,6 +9,7 @@
   "stylesheet": "custom.css",
   "memberListStyle": "compact",
   "apiNavigationRoot": "docs",
+  "namespaceNavigation": "flat",
   "name": "neoCLR",
   "links": [
     {
