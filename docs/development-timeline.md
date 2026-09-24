@@ -6213,3 +6213,18 @@ failure remains the next acceptance target.
   [Object review](object-model-review.md) track the behavior and validation.
 - **Open:** stable String identity, interning and a shared heap-text representation
   are not implied by the content-contract change.
+
+
+### 2026-09-24 — Next focus: String storage and identity
+
+- **Author:** asks what to focus on next, then directs continuing.
+- **Assistant recommendation:** investigate shared immutable String storage and
+  reference identity, ahead of remaining value contracts and default comparers;
+  consolidate stale roadmap status. Generic math stays later exploration.
+- **Action:** maps copy/ownership boundaries, adds a measured Rust prototype and
+  .NET identity baseline, and records alternatives and migration gates in the
+  [String storage investigation](string-storage-design.md). Updates the roadmap's
+  current summary to reflect completed Object/record/content-contract slices.
+- **Open:** the production representation, text-byte accounting and host/worker
+  lifetime rules remain to be implemented and validated. The prototype does not
+  enable String ReferenceEquals or change guest APIs.

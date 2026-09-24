@@ -110,3 +110,9 @@ a persisted identifier or a defense against deliberate collisions.
 
 See the [String API reference](xref:System.String) and
 [Object contract](../../docs/objects.html#string-through-object-development).
+
+
+The next storage investigation compares current text copies and Object wrappers with
+shared immutable text. Its goal is to preserve String identity through assignments
+and conversions while validating ownership and memory accounting. This is exploration;
+the current runtime still rejects String identity operations.

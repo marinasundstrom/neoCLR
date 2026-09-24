@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Investigate String storage and identity with an allocation-counting Release probe,
+  a private shared-text prototype and a .NET alias/record/array baseline. Record
+  migration, GC, host-lifetime and accounting gates, and consolidate stale roadmap
+  status. This is exploration; production String storage and identity are unchanged.
+
 - Support String Object content equality, matching UTF-8 hashes and unchanged text
   display through existing wrappers. Cover Object map keys, casts and GC; retain
   explicit rejection of String identity operations. Add generated reference for

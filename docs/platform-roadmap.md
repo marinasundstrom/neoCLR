@@ -34,27 +34,25 @@ streams. Console stays a class, with static In/Out/Error access. The bounded
 text/byte output channels and reader/writer ownership. This is synchronous I/O;
 TaskQueue/suspension exploration remains open and networking stays later.
 
-**Current author-directed focus, 2026-09-23:** review System.Object and System.Value,
-then address Object's missing behavior. Harmonize with .NET where useful, especially
-reference/value semantics. Finish existing slices before switching. The
-[consistency review](object-model-review.md) records implemented GetType, compiler-only
-member stubs, a tested .NET baseline and Value's live dependencies. The bounded
-[Object.ToString/override sample](experiments/object-display/README.md) is implemented;
-Object is abstract by author direction; derived construction remains supported.
-Boxed-value and intrinsic-string virtual formatting still need receiver work.
-The [bounded class equality/hash slice](object-model-review.md#class-equalityhash-implementation--2026-09-23)
-adds ReferenceEquals and default/overridable class Equals/GetHashCode. String identity
-is explicitly unsupported; boxed virtual value equality/hash remain open.
-**Author-selected end-to-end acceptance case:** Raven record syntax must exercise
-record semantics, including generated equality/hash while preserving class/value
-assignment behavior. The first [record-class sample](experiments/records/README.md)
-now passes with Int32 components: reference identity, typed/Object equality, operators,
-hashes, display and deconstruction. [System.HashCode](hash-code-design.md) provides a
-mutable value accumulator with integer/string Add and two-integer Combine. Raven uses
-an opt-in target metadata contract on its isolated feature branch; default .NET record
-synthesis remains unchanged. Unsupported record shapes report RAVT004. Record structs,
-generic/inherited records, other components and null-component policy remain follow-ups.
-Value removal still requires its own storage migration, not a rename to Object.
+**Current author-directed focus, updated 2026-09-24:** consolidate Object/value
+semantics and investigate String storage and reference identity. Object is abstract;
+class identity and overrides, bounded primitive equality/hash/display, String content
+contracts, Path and introspection semantics have checked samples. The
+[consistency review](object-model-review.md) records their exact limits. String
+ReferenceEquals remains unsupported; content equality does not establish identity.
+The [storage investigation](string-storage-design.md) measures current copy/wrapper
+costs and a shared-text prototype. The next gate is an internal immutable text handle,
+with identity following its owner through copies/conversions, then GC and host-lifetime
+validation before enabling String identity. The representation choice is provisional.
+
+**Author-selected end-to-end acceptance case:** Raven record syntax now exercises
+class and struct equality/hash/display, assignment, nested components and null default
+fields within the documented non-generic component contract. See the
+[record sample](experiments/records/README.md) and [HashCode design](hash-code-design.md).
+Generic/inherited records, additional component shapes, remaining primitive/calendar
+Object contracts and default comparers remain follow-ups. Generic math is later
+exploration. Value removal still requires its own storage migration, not a rename to
+Object; String work does not implicitly select that migration.
 
 When choosing work autonomously, follow the current author-directed focus and the
 [immediate next step](#working-rules-and-immediate-next-step). The post-release

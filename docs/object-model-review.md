@@ -1050,3 +1050,14 @@ Final validation: three String runtime regressions pass, including small-heap lo
 and operand-stack roots; all eight display regressions pass. The Raven map fixture
 reclaims all 421 allocations across nine collections (peak 64, zero live). The .NET
 content baseline and API snapshot/510-page combined website build pass.
+
+
+### String representation investigation — 2026-09-24
+
+The [storage investigation](string-storage-design.md) now maps owned text copies,
+conversion wrappers, GC leaf treatment and host/worker boundaries. An executable
+Release probe compares current Value clones with private shared immutable text; a
+.NET baseline checks identity across locals, Object, records, arrays and collection.
+The preferred next gate is an internal immutable text handle, with ownership and
+accounting validated before guest String identity is enabled. No production String
+representation or public behavior changes in this exploration slice.
