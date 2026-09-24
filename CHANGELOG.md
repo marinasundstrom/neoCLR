@@ -11,6 +11,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Check pending socket-receive ownership with real loopback TCP in an isolated
   six-case probe: exact range delivery, retained destinations, terminal ordering,
   admission quotas and teardown. Guest Socket/Task integration remains pending.
+  Extend the fixture to actual managed arrays and collector roots with five TCP
+  cases; cancellation preserves the connection, and admission counts ready callbacks
+  as well as pending reads. All 13 managed-heap ownership cases pass.
 
 - Integrate explicit `String.Intern` with one bounded strong pool per execution;
   isolated workers and separate host invocations have independent pools. Retain

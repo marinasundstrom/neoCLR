@@ -60,8 +60,11 @@ without a concrete need.
 **Socket completion checkpoint, 2026-09-24:** the
 [receive ownership probe](experiments/socket-completion/README.md) checks real TCP
 with retained destinations, bounded admission, exact range delivery and serialized
-completion/cancellation. Six host-side cases pass; managed GC roots, socket handle
-ownership and Task delivery remain open. This does not expose a guest Socket API.
+completion/cancellation. The six host-side cases now have a
+[real-heap TCP follow-up](experiments/socket-completion/GC-OWNERSHIP.md): five added
+cases verify collector roots, separate socket/read ownership and bounded ready
+callbacks (13 managed-heap cases pass overall). Actual VM safepoints and Task delivery
+remain open. This does not expose a guest Socket API.
 
 **Author-directed interning exploration, 2026-09-24:** investigate explicit String
 interning with a repeated-identifier case before choosing the public contract.

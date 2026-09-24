@@ -69,3 +69,10 @@ future Task adapter must distinguish those states using its operation registry.
 Next integrate socket handles and delivery with the existing real-heap / delayed-copy
 fixtures before exposing a usable Raven Socket API. The web-app and TCP echo milestones
 remain open.
+
+## Managed-heap follow-up
+
+The [real-heap TCP fixture](GC-OWNERSHIP.md) now checks actual collector roots and
+separates socket ownership from pending reads. Cancellation preserves the connection
+in that fixture. The original reduced probe above remains evidence of the earlier
+model; neither fixture exposes a public Socket API.

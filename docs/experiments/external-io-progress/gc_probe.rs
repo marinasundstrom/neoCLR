@@ -469,3 +469,6 @@ fn teardown_quiesces_all_producers_before_releasing_real_roots() {
     invocation.collect();
     assert!(invocation.heap.is_empty());
 }
+
+#[path = "../socket-completion/gc_probe.rs"]
+mod socket_completion;
