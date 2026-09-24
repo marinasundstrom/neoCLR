@@ -169,3 +169,5 @@ mod external_io_gc_probe;
 #[cfg(test)]
 #[path = "../docs/experiments/socket-completion/vm_probe.rs"]
 mod socket_vm_probe;
+
+mod scheduler;

@@ -45,6 +45,12 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   plans; this conversation does not approve every proposed scheduler rule or establish
   that runtime suspension or a public scheduler has been implemented.
 
+- **Follow-up implementation:** extracted a private invocation scheduler with a shared
+  rotating completion policy, source GC roots and a durable worker wake latch.
+  Retained the existing queue adapter and affinity behavior; runtime-frame suspension,
+  public scheduler selection and nonblocking host yielding remain open. All 36 targeted
+  scheduler/worker/TCP checks pass, as does the combined website build.
+
 ## 2026-09-24 — Socket APIs towards a web application
 
 - **Author:** “Our first goal is the socket api - as per proposal. Keep the proposal

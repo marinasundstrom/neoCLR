@@ -11,7 +11,8 @@ we should not make that future change depend on a particular callback representa
 
 This document refines the socket integration sequence in the
 [platform roadmap](platform-roadmap.md). It does not require implementing full runtime
-suspension before TCP echo, nor claim that a scheduler or suspension is implemented.
+suspension before TCP echo. The initial private native-host completion driver is now
+implemented; runtime suspension and a public scheduler are not.
 
 ## Separate responsibilities
 
@@ -44,8 +45,8 @@ Current limitations are architectural, not just missing method names:
 
 - The VM recognizes TaskQueue.Drain and Func<Void> return boundaries by System metadata.
   This compatibility behavior must not become the only place a future frame can resume.
-- Empty-queue waiting and between-callback polling use different source selection orders.
-  The probes establish individual progress cases, not a general fairness policy.
+- The initial source-order mismatch is resolved by the shared driver below. Its
+  cooperative source rotation does not establish preemption or latency guarantees.
 - Normal worker library adapters still have queued joins; the delayed-copy notification
   adapter is experimental. Merely adding a scheduler does not make those joins nonblocking.
 - Promise captures its queue. A pending await registers MoveNext with the awaited Task,
@@ -149,10 +150,11 @@ GC and socket experiments are reusable evidence, not sufficient proof of the ful
 
 ## Next implementation slices
 
-1. Extract one internal dispatch/parking boundary from the VM's worker-specific paths.
-   Preserve current TaskQueue semantics through an adapter. Demonstrate alternating
-   worker/I/O readiness, an indefinitely reposting callback, and completion arriving
-   between empty-check and wait. Keep all work within one invocation; no public API yet.
+1. **Initial native-host extraction complete:** one private source-arbitration and
+   waiting boundary now serves idle and callback dispatch. TaskQueue remains the
+   adapter. Focused rotation/wakeup checks and real guest TCP/worker progress cases
+   pass. OS socket readiness and nonblocking host yielding remain backend follow-ups;
+   there is no public scheduler API.
 2. Make continuation destination and operation ownership explicit at that boundary.
    Cover both GC paths, pending-to-ready-to-active root transfer, bounded completed
    outcomes, cancellation/close orderings and explicit-queue migration behavior. Use
@@ -161,3 +163,55 @@ GC and socket experiments are reusable evidence, not sufficient proof of the ful
    refresh public reference metadata/docs, and run Raven TCP echo. Record how a future
    runtime-suspension adapter will replace the callback side without changing the
    transport producer. Full frame suspension is a later independently validated slice.
+
+## Initial native-host driver — implemented 2026-09-24
+
+[src/scheduler.rs](../src/scheduler.rs) now owns the worker registry, completion-source
+arbitration and idle waiting for each invocation. The VM delegates root collection at
+both GC paths and polls the same driver at queue quiescence and the existing safe
+callback-return boundary. One completion is admitted per boundary. Source order rotates
+after each successful delivery; an idle source cannot hold up a ready peer. Source lists
+use stack storage rather than allocating a list on every poll.
+
+Worker result publication or sender disconnection signals a shared wake latch after
+the channel sender is dropped. Outcomes remain in their channels; the latch is only
+a coalesced hint. A signal arriving between an empty poll and parking remains set,
+and parking checks that state under the same mutex used by signal publication. The
+condition variable may wake spuriously, so progress is always polled again. This is
+a native-host implementation choice, not a browser parking contract.
+
+The driver retains a 10 ms timeout because host cancellation has no wake subscription
+and the test-only TCP adapter has no OS readiness notification. Thus neither native
+socket readiness registration nor fully event-driven cancellation is claimed. The
+worker registry's old wait loop remains only as a unit-test helper; production waiting
+now belongs to the scheduler. Private worker submission/join access still uses its
+existing registry; no generic public work-submission API has been added.
+
+Root transfer into actual TaskQueue.Post frames and existing callback semantics remain
+unchanged. Runnable work is still represented by a callback Value. No synthetic saved
+frame variant is introduced before runtime suspension can implement it. The new shared
+wake state adds a per-invocation allocation and synchronization cost; no speedup claim
+is made. Pending/ready quotas, await-site affinity, nonblocking host yielding and real
+suspended-frame ownership remain follow-up work.
+
+Validation commands:
+
+```sh
+cargo test --lib scheduler::tests
+cargo test --lib socket_vm_probe
+cargo test --lib workers::tests
+cargo test --test workers
+```
+
+Four focused scheduler cases check rotation, completion between poll and park, coalesced
+signals retaining multiple outcomes, and a cross-thread wake. The real-TCP VM fixture
+checks both collection paths, busy queues, progress alongside a pending worker and
+terminal teardown. Existing worker tests cover output budgets, cancellation, default
+versus explicit queues and callback/root ownership. A separate worker reply test
+checks that publication/disconnection is observable before the durable wake. The next implementation slice is
+explicit operation/resumption ownership and its affinity migration gates; the current
+producer-queue affinity has not changed.
+
+Checked locally on Darwin arm64: 4 scheduler cases, 5 real-TCP VM cases,
+11 worker-registry cases (including the reply-order check), and 16 worker integration
+cases pass. The combined website build validates 523 pages.

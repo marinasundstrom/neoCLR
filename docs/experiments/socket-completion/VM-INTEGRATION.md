@@ -21,11 +21,11 @@ contain no socket polling branch. Injection is thread-local so independent tests
 not share streams. No Raven reference metadata, application Socket API, production
 socket dependency or SDK artifact is added.
 
-The production refactor separates the worker registry's bounded wait step from its
-outer wait loop. The invocation now owns that loop, checking cancellation and polling
-registered work between 10 ms worker waits. Existing worker notification behavior is
-preserved. This supplies a place to arbitrate further completion sources without
-waiting indefinitely inside one source. It is not a public scheduler abstraction.
+The [private scheduler](../../runtime-scheduling-design.md#initial-native-host-driver--implemented-2026-09-24)
+now owns source arbitration and waiting. Idle and callback-return polling use the same
+rotating source policy. Workers signal a durable wake latch after publishing their
+outcome; cancellation and the socket probe retain a 10 ms polling fallback. Existing
+worker notification behavior is preserved. This is not a public scheduler abstraction.
 
 The test adapter traces destination and callback at both array-budget recovery and
 heap-allocation-pressure collection. It polls at queue quiescence and at the existing
@@ -63,8 +63,8 @@ until a real socket callback signals completion, then cancels the invocation.
 A console signal releases the peer after guest work has run; no sleep chooses that
 ordering. Socket read/write timeouts are test watchdogs. The peer starts its I/O watchdog after the guest
 signal, so compiler/library loading time is not mistaken for stalled I/O. The test-only
-quiescent socket driver retries every 1 ms; it is not OS readiness registration or a
-selected production backend. The fixture does not prove that every receive is still
+socket source uses the scheduler’s 10 ms polling fallback; it has no OS readiness
+registration or selected production transport backend. The fixture does not prove that every receive is still
 pending at the first empty-queue poll, nor a bounded scheduling latency.
 
 ## Comparison and remaining work

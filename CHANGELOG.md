@@ -13,6 +13,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Record completion/continuation ownership, wakeup and affinity requirements with
   .NET comparisons; update roadmap and Tasks documentation. No scheduler or runtime
   suspension API is added in this design checkpoint.
+  Implement the initial private invocation scheduler: common rotating completion
+  arbitration at idle and callback boundaries, consolidated GC roots, and durable
+  worker wake hints. Preserve TaskQueue/affinity behavior and bounded polling for
+  cancellation and the test-only socket source; runtime suspension remains pending.
+  All 36 targeted scheduling/worker/TCP checks and the website build pass.
 
 - Check pending socket-receive ownership with real loopback TCP in an isolated
   six-case probe: exact range delivery, retained destinations, terminal ordering,

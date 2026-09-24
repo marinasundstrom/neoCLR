@@ -55,9 +55,11 @@ and GC ownership must not depend on generated state-machine callbacks. TaskQueue
 transitional compatibility machinery; no public Scheduler class or full suspension
 implementation is selected. This refines the socket path rather than replacing it.
 
-First extract that boundary while preserving current queue behavior, then settle
-continuation affinity explicitly, then attach reusable sockets and Task/Result
-completion for Raven echo. Current TCP/GC/VM probes remain evidence; they do not
+The initial private native-host driver now centralizes root collection, rotating
+source arbitration and worker wake notifications. Existing TaskQueue behavior is
+preserved; cancellation/socket readiness still has a bounded polling fallback.
+Next make operation/resumption ownership explicit and settle continuation affinity,
+then attach reusable sockets and Task/Result completion for Raven echo. Current TCP/GC/VM probes remain evidence; they do not
 establish a portable scheduler or runtime-owned suspension.
 
 ## Authority and use
@@ -796,12 +798,12 @@ No later major milestone has started.
 
 ## Working rules and immediate next step
 
-**Active next step, 2026-09-24:** extract the internal scheduling boundary described
-in [runtime scheduling](runtime-scheduling-design.md#next-implementation-slices),
-then continue the Raven/neoCLR socket bridge. Preserve generated-async compatibility
-while separating operation completion from the runnable representation. Require one
-source-arbitration policy, no lost wakeups and explicit continuation ownership before
-public socket integration; full runtime suspension is not a prerequisite for TCP echo.
+**Active next step, 2026-09-24:** implement explicit operation and resumption ownership
+at the [internal scheduler boundary](runtime-scheduling-design.md#next-implementation-slices),
+then continue the Raven/neoCLR socket bridge. The initial driver now uses one source
+arbitration policy and durable worker wakeups. Preserve generated-async compatibility;
+settle await-site affinity and bounded pending/ready ownership before public sockets.
+Full runtime suspension is not a prerequisite for TCP echo.
 Earlier foundation checkpoints below are dated evidence, not competing priorities.
 
 Each selected slice should leave a checked sample, expected output, a matching build/run

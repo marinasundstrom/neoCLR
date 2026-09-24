@@ -515,3 +515,10 @@ producer-queue affinity is selected. Operation completion must make work runnabl
 independently of whether it is represented by today's generated callback or a future
 runtime-owned frame. The affinity behavior recorded above remains implemented until
 an explicit migration slice changes and validates it.
+
+The first private native-host driver is now implemented: source polling uses one
+rotating policy at idle and callback boundaries, worker completion publishes durable
+wake hints, and pending roots are traced through the driver. TaskQueue affinity and
+public Task behavior remain unchanged. See the
+[implementation scope](runtime-scheduling-design.md#initial-native-host-driver--implemented-2026-09-24)
+for polling fallbacks and the remaining ownership/migration gates.

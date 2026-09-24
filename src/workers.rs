@@ -42,7 +42,19 @@ struct Job {
     function: crate::metadata::Function,
     input: String,
     options: ExecutionOptions,
-    reply: mpsc::Sender<Outcome>,
+    reply: Reply,
+}
+// Drop the result sender before waking the owner, including unwind/disconnection.
+// The durable outcome remains in the channel; wake hints may be coalesced.
+struct Reply {
+    sender: Option<mpsc::Sender<Outcome>>,
+    wake: Arc<crate::scheduler::Wake>,
+}
+impl Drop for Reply {
+    fn drop(&mut self) {
+        self.sender.take();
+        self.wake.signal();
+    }
 }
 thread_local! { static IN_WORKER: std::cell::Cell<bool> = const { std::cell::Cell::new(false) }; }
 pub(crate) fn is_worker() -> bool {
@@ -84,7 +96,7 @@ fn execute(mut job: Job) {
     // Publish only after per-job producer state is released, including on pooled workers.
     drop(output);
     drop(job.module);
-    let _ = job.reply.send(result);
+    let _ = job.reply.sender.as_ref().unwrap().send(result);
 }
 struct WorkerResult {
     cancellation: CancellationToken,
@@ -96,11 +108,21 @@ struct WorkerResult {
 }
 #[derive(Default)]
 pub(crate) struct Workers {
+    wake: Arc<crate::scheduler::Wake>,
     results: Vec<WorkerResult>,
     threads: Vec<JoinHandle<()>>,
     pool: Option<mpsc::SyncSender<Job>>,
 }
 impl Workers {
+    pub(crate) fn with_wake(wake: Arc<crate::scheduler::Wake>) -> Self {
+        Self {
+            wake,
+            results: Vec::new(),
+            threads: Vec::new(),
+            pool: None,
+        }
+    }
+
     pub(crate) fn start(
         &mut self,
         module: &Module,
@@ -148,7 +170,10 @@ impl Workers {
                 cancellation: Some(cancellation.clone()),
                 ..Default::default()
             },
-            reply,
+            reply: Reply {
+                sender: Some(reply),
+                wake: self.wake.clone(),
+            },
         };
         let mut dedicated = None;
         if pooled {
@@ -278,6 +303,7 @@ impl Workers {
 
     // One bounded wait only. The invocation must poll other completion sources
     // between waits rather than letting a pending worker monopolize quiescence.
+    #[cfg(test)]
     pub(crate) fn wait_notification_tick(&mut self) {
         let Some(result) = self.results.iter_mut().find(|r| r.notification.is_some()) else {
             return;
@@ -419,6 +445,28 @@ impl Drop for Workers {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn reply_publishes_outcome_or_disconnection_before_wake() {
+        for publish in [false, true] {
+            let wake = Arc::new(crate::scheduler::Wake::default());
+            let (sender, receiver) = mpsc::channel();
+            let reply = Reply {
+                sender: Some(sender),
+                wake: wake.clone(),
+            };
+            if publish {
+                reply.sender.as_ref().unwrap().send(Ok(("done".into(), vec![]))).unwrap();
+            }
+            drop(reply);
+            assert!(wake.park(std::time::Duration::ZERO));
+            if publish {
+                assert_eq!(receiver.try_recv().unwrap().unwrap().0, "done");
+            }
+            assert!(matches!(receiver.try_recv(), Err(mpsc::TryRecvError::Disconnected)));
+            assert!(!wake.park(std::time::Duration::ZERO));
+        }
+    }
 
     fn pending(receive: mpsc::Receiver<Outcome>, marker: i32) -> WorkerResult {
         WorkerResult {

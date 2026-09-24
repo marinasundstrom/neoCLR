@@ -133,11 +133,16 @@ longer-term direction. Task describes eventual completion; scheduling determines
 when and where runnable work executes. TaskQueue currently stores and dispatches
 callbacks, but it is transitional scaffolding rather than the full scheduling model.
 
-The next internal design separates ready work, pending I/O, wakeups and continuation
-ownership. It should support current generated continuations and later runtime-owned
-suspended executions. This is planned work, not an implemented scheduler or suspension
-feature, and no public Scheduler API has been selected. Full runtime suspension is
-not required before the first socket application.
+Development now includes a private invocation scheduler for completion-source
+selection, worker wakeups and retained roots. It uses the same rotating source order
+while the queue is busy and while waiting for work. TaskQueue remains the adapter
+that executes current generated callbacks. Cancellation and the test socket source
+still require bounded polling; portable host integration is unfinished.
+
+The design separates operation completion from how an execution resumes, allowing
+runtime-owned suspended executions later. Those suspended frames are not implemented,
+and no public Scheduler API has been selected. Full runtime suspension is not required
+before the first socket application.
 
 Continuation affinity also needs refinement: a pending await currently resumes through
 the awaited Task’s producer queue. That behavior is not a permanent affinity guarantee.
