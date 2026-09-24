@@ -1,166 +1,32 @@
 namespace System.IO
 
-import System.Runtime.CompilerServices.ValueStorage
+public union TextReadError {
+    case InvalidPath
+    case NotFound
+    case AccessDenied
+    case WrongKind
+    case AlreadyExists
+    case Closed
+    case InvalidRange
+    case LimitExceeded
+    case WrongAccess
+    case IoFailure
+    case InvalidUtf8
 
-[System.Runtime.CompilerServices.Union]
-public struct TextReadError {
-    private field Stored: System.Value
-
-    public struct InvalidPath { }
-    public struct NotFound { }
-    public struct AccessDenied { }
-    public struct WrongKind { }
-    public struct AlreadyExists { }
-    public struct Closed { }
-    public struct InvalidRange { }
-    public struct LimitExceeded { }
-    public struct WrongAccess { }
-    public struct IoFailure { }
-
-    init(value: TextReadError.InvalidPath) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsInvalidPath: bool => ValueStorage.Is<TextReadError.InvalidPath>(Stored)
-
-    func GetInvalidPath() -> TextReadError.InvalidPath {
-        return ValueStorage.Unpack<TextReadError.InvalidPath>(Stored)
-    }
-
-    init(value: TextReadError.NotFound) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsNotFound: bool => ValueStorage.Is<TextReadError.NotFound>(Stored)
-
-    func GetNotFound() -> TextReadError.NotFound {
-        return ValueStorage.Unpack<TextReadError.NotFound>(Stored)
-    }
-
-    init(value: TextReadError.AccessDenied) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsAccessDenied: bool => ValueStorage.Is<TextReadError.AccessDenied>(Stored)
-
-    func GetAccessDenied() -> TextReadError.AccessDenied {
-        return ValueStorage.Unpack<TextReadError.AccessDenied>(Stored)
-    }
-
-    init(value: TextReadError.WrongKind) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsWrongKind: bool => ValueStorage.Is<TextReadError.WrongKind>(Stored)
-
-    func GetWrongKind() -> TextReadError.WrongKind {
-        return ValueStorage.Unpack<TextReadError.WrongKind>(Stored)
-    }
-
-    init(value: TextReadError.AlreadyExists) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsAlreadyExists: bool => ValueStorage.Is<TextReadError.AlreadyExists>(Stored)
-
-    func GetAlreadyExists() -> TextReadError.AlreadyExists {
-        return ValueStorage.Unpack<TextReadError.AlreadyExists>(Stored)
-    }
-
-    init(value: TextReadError.Closed) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsClosed: bool => ValueStorage.Is<TextReadError.Closed>(Stored)
-
-    func GetClosed() -> TextReadError.Closed {
-        return ValueStorage.Unpack<TextReadError.Closed>(Stored)
-    }
-
-    init(value: TextReadError.InvalidRange) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsInvalidRange: bool => ValueStorage.Is<TextReadError.InvalidRange>(Stored)
-
-    func GetInvalidRange() -> TextReadError.InvalidRange {
-        return ValueStorage.Unpack<TextReadError.InvalidRange>(Stored)
-    }
-
-    init(value: TextReadError.LimitExceeded) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsLimitExceeded: bool => ValueStorage.Is<TextReadError.LimitExceeded>(Stored)
-
-    func GetLimitExceeded() -> TextReadError.LimitExceeded {
-        return ValueStorage.Unpack<TextReadError.LimitExceeded>(Stored)
-    }
-
-    init(value: TextReadError.WrongAccess) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsWrongAccess: bool => ValueStorage.Is<TextReadError.WrongAccess>(Stored)
-
-    func GetWrongAccess() -> TextReadError.WrongAccess {
-        return ValueStorage.Unpack<TextReadError.WrongAccess>(Stored)
-    }
-
-    init(value: TextReadError.IoFailure) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsIoFailure: bool => ValueStorage.Is<TextReadError.IoFailure>(Stored)
-
-    func GetIoFailure() -> TextReadError.IoFailure {
-        return ValueStorage.Unpack<TextReadError.IoFailure>(Stored)
-    }
-
-    public struct InvalidUtf8 { }
-    init(value: TextReadError.InvalidUtf8) {
-        Stored = ValueStorage.Pack(value)
-    }
-    val IsInvalidUtf8: bool => ValueStorage.Is<TextReadError.InvalidUtf8>(Stored)
-    func GetInvalidUtf8() -> TextReadError.InvalidUtf8 {
-        return ValueStorage.Unpack<TextReadError.InvalidUtf8>(Stored)
-    }
-
-    func ToString() -> string {
-        if IsInvalidUtf8 {
-            return "InvalidUtf8"
+    override func ToString() -> string {
+        return match self {
+            InvalidPath => "InvalidPath"
+            NotFound => "NotFound"
+            AccessDenied => "AccessDenied"
+            WrongKind => "WrongKind"
+            AlreadyExists => "AlreadyExists"
+            Closed => "Closed"
+            InvalidRange => "InvalidRange"
+            LimitExceeded => "LimitExceeded"
+            WrongAccess => "WrongAccess"
+            IoFailure => "IoFailure"
+            InvalidUtf8 => "InvalidUtf8"
+            _ => "Empty"
         }
-        if IsInvalidPath {
-            return "InvalidPath"
-        }
-        if IsNotFound {
-            return "NotFound"
-        }
-        if IsAccessDenied {
-            return "AccessDenied"
-        }
-        if IsWrongKind {
-            return "WrongKind"
-        }
-        if IsAlreadyExists {
-            return "AlreadyExists"
-        }
-        if IsClosed {
-            return "Closed"
-        }
-        if IsInvalidRange {
-            return "InvalidRange"
-        }
-        if IsLimitExceeded {
-            return "LimitExceeded"
-        }
-        if IsWrongAccess {
-            return "WrongAccess"
-        }
-        if IsIoFailure {
-            return "IoFailure"
-        }
-        System.Fault("invalid text read error case")
-        return ""
     }
 }

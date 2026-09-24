@@ -56,7 +56,7 @@ func Process(store: OrderStore, id: int, limit: int) {
         match store.Save(order, limit) {
             .Ok => WriteLine(order.Status)
             .Error(let failure) => {
-                if failure.IsTooLarge {
+                if (failure is System.Storage.FileReadError.TooLarge) {
                     WriteLine("Order report exceeds limit")
                 } else {
                     WriteLine("Order report could not be written")

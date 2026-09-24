@@ -73,4 +73,10 @@ func Inspect(value: Reply<int>) -> int {
         rejected = run(['dotnet', bridge, '--union-metadata-report', altered], success=False)
         assert rejected.returncode != 0 and 'companion' in rejected.stderr.lower(), rejected.stdout + rejected.stderr
         print('Rejected companion metadata: ' + mode)
+    projected = root / 'Generic.Core.dll'
+    rejected = run(['dotnet', bridge, '--project-union-reference', assembly,
+        bundle / 'demo/NeoCLR.CoreProbe.dll', 'UnionMetadataProbe.Reply`1', projected], success=False)
+    assert rejected.returncode != 0 and 'Only standard empty-case unions can be projected' in rejected.stderr, rejected.stdout + rejected.stderr
+    assert not projected.exists()
+    print('Generic library projection remains rejected before producing a reference')
     print('Generic union metadata and separate consumer compilation passed; no neoCLR generic-union execution claimed.')

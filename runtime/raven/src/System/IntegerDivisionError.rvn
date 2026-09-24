@@ -1,39 +1,14 @@
 namespace System
 
-import System.Runtime.CompilerServices.ValueStorage
+public union IntegerDivisionError {
+    case DivisionByZero
+    case Overflow
 
-[System.Runtime.CompilerServices.Union]
-public struct IntegerDivisionError {
-    private field Stored: System.Value
-
-    public struct DivisionByZero { }
-    public struct Overflow { }
-
-    init(value: IntegerDivisionError.DivisionByZero) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsDivisionByZero: bool => ValueStorage.Is<IntegerDivisionError.DivisionByZero>(Stored)
-
-    func GetDivisionByZero() -> IntegerDivisionError.DivisionByZero {
-        return ValueStorage.Unpack<IntegerDivisionError.DivisionByZero>(Stored)
-    }
-
-    init(value: IntegerDivisionError.Overflow) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsOverflow: bool => ValueStorage.Is<IntegerDivisionError.Overflow>(Stored)
-
-    func GetOverflow() -> IntegerDivisionError.Overflow {
-        return ValueStorage.Unpack<IntegerDivisionError.Overflow>(Stored)
-    }
-
-    func ToString() -> string {
-        if IsDivisionByZero {
-            return "DivisionByZero"
+    override func ToString() -> string {
+        return match self {
+            DivisionByZero => "DivisionByZero"
+            Overflow => "Overflow"
+            _ => "Empty"
         }
-        GetOverflow()
-        return "Overflow"
     }
 }

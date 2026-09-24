@@ -1,4 +1,4 @@
-"""Check error case APIs, wrong-case faults and invalid carrier defaults."""
+"""Check removed error helpers and valid inactive union defaults."""
 import argparse
 from runner_options import add_toolchain_arguments, runner_arguments
 from pathlib import Path
@@ -26,9 +26,8 @@ func Main() {
 }
 ''')
     result = subprocess.run(command, capture_output=True, text=True, timeout=240)
-    if result.returncode == 0 or 'Fault:' not in result.stderr:
+    if result.returncode == 0 or 'GetInvalidFormat' not in result.stdout + result.stderr:
         raise AssertionError(result.stdout + result.stderr)
-    previous = set(root.rglob('App.neoil'))
     (root / 'Main.rvn').write_text('''import System.*
 func Main() {
     let error = default(Int32ParseError)
@@ -36,6 +35,6 @@ func Main() {
 }
 ''')
     result = subprocess.run(command, capture_output=True, text=True, timeout=240)
-    if result.returncode == 0 or 'uninitialized' not in result.stderr or set(root.rglob('App.neoil')) != previous:
+    if result.returncode != 0 or 'Empty' not in result.stdout:
         raise AssertionError(result.stdout + result.stderr)
-    print('Wrong-case access faults; invalid carrier default is rejected before execution')
+    print('Removed case helper rejected; inactive default executes as Empty')

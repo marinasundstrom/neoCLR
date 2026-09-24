@@ -1,143 +1,143 @@
 import System.*
 import System.Console.*
-// ABI regression: exercise case accessors and carrier reconstruction explicitly.
+// Exercise case construction, carrier copying and generated case patterns.
 func Main() {
     let error0 = Storage.FileReadError.InvalidLimit()
     WriteLine(error0.ToString())
-    let restored1 = Storage.FileReadError(error0.GetInvalidLimit())
-    if restored1.IsInvalidLimit {
+    let restored1 = error0
+    if restored1 is Storage.FileReadError.InvalidLimit {
         WriteLine("Confirmed")
     }
     let error1 = Storage.FileReadError.InvalidPath()
     WriteLine(error1.ToString())
-    let restored2 = Storage.FileReadError(error1.GetInvalidPath())
-    if restored2.IsInvalidPath {
+    let restored2 = error1
+    if restored2 is Storage.FileReadError.InvalidPath {
         WriteLine("Confirmed")
     }
     let error2 = Storage.FileReadError.NotFound()
     WriteLine(error2.ToString())
-    let restored3 = Storage.FileReadError(error2.GetNotFound())
-    if restored3.IsNotFound {
+    let restored3 = error2
+    if restored3 is Storage.FileReadError.NotFound {
         WriteLine("Confirmed")
     }
     let error3 = Storage.FileReadError.AccessDenied()
     WriteLine(error3.ToString())
-    let restored4 = Storage.FileReadError(error3.GetAccessDenied())
-    if restored4.IsAccessDenied {
+    let restored4 = error3
+    if restored4 is Storage.FileReadError.AccessDenied {
         WriteLine("Confirmed")
     }
     let error4 = Storage.FileReadError.NotRegularFile()
     WriteLine(error4.ToString())
-    let restored5 = Storage.FileReadError(error4.GetNotRegularFile())
-    if restored5.IsNotRegularFile {
+    let restored5 = error4
+    if restored5 is Storage.FileReadError.NotRegularFile {
         WriteLine("Confirmed")
     }
     let error5 = Storage.FileReadError.TooLarge()
     WriteLine(error5.ToString())
-    let restored6 = Storage.FileReadError(error5.GetTooLarge())
-    if restored6.IsTooLarge {
+    let restored6 = error5
+    if restored6 is Storage.FileReadError.TooLarge {
         WriteLine("Confirmed")
     }
     let error6 = Storage.FileReadError.ReadFailed()
     WriteLine(error6.ToString())
-    let restored7 = Storage.FileReadError(error6.GetReadFailed())
-    if restored7.IsReadFailed {
+    let restored7 = error6
+    if restored7 is Storage.FileReadError.ReadFailed {
         WriteLine("Confirmed")
     }
     let error7 = Storage.FileReadError.InvalidUtf8()
     WriteLine(error7.ToString())
-    let restored8 = Storage.FileReadError(error7.GetInvalidUtf8())
-    if restored8.IsInvalidUtf8 {
+    let restored8 = error7
+    if restored8 is Storage.FileReadError.InvalidUtf8 {
         WriteLine("Confirmed")
     }
     let error8 = Storage.FileWriteError.InvalidLimit()
     WriteLine(error8.ToString())
-    let restored9 = Storage.FileWriteError(error8.GetInvalidLimit())
-    if restored9.IsInvalidLimit {
+    let restored9 = error8
+    if restored9 is Storage.FileWriteError.InvalidLimit {
         WriteLine("Confirmed")
     }
     let error9 = Storage.FileWriteError.InvalidPath()
     WriteLine(error9.ToString())
-    let restored10 = Storage.FileWriteError(error9.GetInvalidPath())
-    if restored10.IsInvalidPath {
+    let restored10 = error9
+    if restored10 is Storage.FileWriteError.InvalidPath {
         WriteLine("Confirmed")
     }
     let error10 = Storage.FileWriteError.NotFound()
     WriteLine(error10.ToString())
-    let restored11 = Storage.FileWriteError(error10.GetNotFound())
-    if restored11.IsNotFound {
+    let restored11 = error10
+    if restored11 is Storage.FileWriteError.NotFound {
         WriteLine("Confirmed")
     }
     let error11 = Storage.FileWriteError.AccessDenied()
     WriteLine(error11.ToString())
-    let restored12 = Storage.FileWriteError(error11.GetAccessDenied())
-    if restored12.IsAccessDenied {
+    let restored12 = error11
+    if restored12 is Storage.FileWriteError.AccessDenied {
         WriteLine("Confirmed")
     }
     let error12 = Storage.FileWriteError.NotRegularFile()
     WriteLine(error12.ToString())
-    let restored13 = Storage.FileWriteError(error12.GetNotRegularFile())
-    if restored13.IsNotRegularFile {
+    let restored13 = error12
+    if restored13 is Storage.FileWriteError.NotRegularFile {
         WriteLine("Confirmed")
     }
     let error13 = Storage.FileWriteError.TooLarge()
     WriteLine(error13.ToString())
-    let restored14 = Storage.FileWriteError(error13.GetTooLarge())
-    if restored14.IsTooLarge {
+    let restored14 = error13
+    if restored14 is Storage.FileWriteError.TooLarge {
         WriteLine("Confirmed")
     }
     let error14 = Storage.FileWriteError.WriteFailed()
     WriteLine(error14.ToString())
-    let restored15 = Storage.FileWriteError(error14.GetWriteFailed())
-    if restored15.IsWriteFailed {
+    let restored15 = error14
+    if restored15 is Storage.FileWriteError.WriteFailed {
         WriteLine("Confirmed")
     }
     let error15 = ConsoleReadError.Unavailable()
     WriteLine(error15.ToString())
-    let restored16 = ConsoleReadError(error15.GetUnavailable())
-    if restored16.IsUnavailable {
+    let restored16 = error15
+    if restored16 is ConsoleReadError.Unavailable {
         WriteLine("Confirmed")
     }
     let error16 = ConsoleReadError.ReadFailed()
     WriteLine(error16.ToString())
-    let restored17 = ConsoleReadError(error16.GetReadFailed())
-    if restored17.IsReadFailed {
+    let restored17 = error16
+    if restored17 is ConsoleReadError.ReadFailed {
         WriteLine("Confirmed")
     }
     let error17 = Text.Utf8SliceError.OutOfRange()
     WriteLine(error17.ToString())
-    let restored18 = Text.Utf8SliceError(error17.GetOutOfRange())
-    if restored18.IsOutOfRange {
+    let restored18 = error17
+    if restored18 is Text.Utf8SliceError.OutOfRange {
         WriteLine("Confirmed")
     }
     let error18 = Text.Utf8SliceError.InvalidBoundary()
     WriteLine(error18.ToString())
-    let restored19 = Text.Utf8SliceError(error18.GetInvalidBoundary())
-    if restored19.IsInvalidBoundary {
+    let restored19 = error18
+    if restored19 is Text.Utf8SliceError.InvalidBoundary {
         WriteLine("Confirmed")
     }
     let error19 = Int32ParseError.InvalidFormat()
     WriteLine(error19.ToString())
-    let restored20 = Int32ParseError(error19.GetInvalidFormat())
-    if restored20.IsInvalidFormat {
+    let restored20 = error19
+    if restored20 is Int32ParseError.InvalidFormat {
         WriteLine("Confirmed")
     }
     let error20 = Int32ParseError.Overflow()
     WriteLine(error20.ToString())
-    let restored21 = Int32ParseError(error20.GetOverflow())
-    if restored21.IsOverflow {
+    let restored21 = error20
+    if restored21 is Int32ParseError.Overflow {
         WriteLine("Confirmed")
     }
     let error21 = IntegerDivisionError.DivisionByZero()
     WriteLine(error21.ToString())
-    let restored22 = IntegerDivisionError(error21.GetDivisionByZero())
-    if restored22.IsDivisionByZero {
+    let restored22 = error21
+    if restored22 is IntegerDivisionError.DivisionByZero {
         WriteLine("Confirmed")
     }
     let error22 = IntegerDivisionError.Overflow()
     WriteLine(error22.ToString())
-    let restored23 = IntegerDivisionError(error22.GetOverflow())
-    if restored23.IsOverflow {
+    let restored23 = error22
+    if restored23 is IntegerDivisionError.Overflow {
         WriteLine("Confirmed")
     }
     let invalidrangeerror = InvalidRangeError()

@@ -6837,3 +6837,46 @@ configuration/content, not target-specific code added to Raven main.
 - **Assistant action:** records the distinction in the modeling and Raven
   conventions. Retains SocketError and points to the tested nested HttpError probe
   as the data-bearing example; the public HttpError API is still planned.
+
+### 2026-09-24 — EntryKind as an enum
+
+- **Author observation:** identifies EntryKind as an enum candidate while asking
+  the assistant to continue through the migration slices.
+- **Assistant decision/action:** removes EntryKind from the union migration and
+  implements it through the existing enum lowering, with File = 1 and Directory = 2.
+  These preserve the host kind values. Zero is unnamed; unsupported/missing entries
+  continue to use StorageLookupError. Provider callers use enum comparisons.
+- **Tradeoff:** this gives named constants without empty case-carrier machinery,
+  like .NET enums, but allows unnamed underlying values. No new Unknown result is
+  invented and enum values do not themselves prove a successful storage lookup.
+  Matching SDK/library/application rebuilds are required. The rebuilt error probe
+  validates all 76 empty-case error variants and EntryKind box/unbox round trips.
+  Storage provider and reader checks pass with an explicit larger fixture budget.
+
+### 2026-09-24 — Future Error interface and diagnostics
+
+- **Author proposal:** errors expressed as unions could later implement an Error
+  interface providing integration points for stack traces and other diagnostics.
+  Notes the lack of macros for generating supporting implementations.
+- **Assistant response:** records this as future exploration, not a current API or
+  a requirement on every error union. An interface supplies access points but does
+  not itself capture a trace. Compare compiler-generated support, explicit library
+  helpers and runtime/API-boundary capture, including cost and propagation behavior.
+- **Open:** interface members, who owns/captures diagnostic context, when a trace
+  is captured, and whether support is compiler-generated remain undecided. The
+  current migrations neither add Error nor claim stack-trace capture for results.
+
+- **Author follow-up:** adds composability and decorating errors with more
+  information as future benefits of an Error interface. The assistant records
+  wrappers retaining an underlying error as an example, without selecting an API.
+
+### 2026-09-25 — Helpers on System.Enum
+
+- **Author direction:** asks for enum names/values helpers on Enum itself, and
+  clarifies that static methods should have overloads taking an enum type parameter
+  while retaining the overloads accepting TypeInfo.
+- **Assistant proposed contract:** GetNames(TypeInfo) and GetNames<TEnum>(), plus
+  GetValues(TypeInfo) and GetValues<TEnum>(). The generic value form preserves the
+  enum type and requires an enum constraint. All forms share metadata and ordering;
+  enum formatting should use that same metadata. Implementation is the next slice,
+  not a shipped API in the union migration.

@@ -6,6 +6,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-25
+
+- Migrate the remaining empty-case storage, stream, text, console, parsing,
+  division and LINQ error unions to standard Raven declarations. Replace their
+  Is*/Get* helpers with case patterns, preserve producer outcomes, and document
+  inactive defaults. Resolve value-case tokens used by isinst against the supplied
+  core definition. Change EntryKind to a non-flags enum (File = 1, Directory = 2),
+  leaving zero unnamed and lookup failures in StorageLookupError. Rebuild matching
+  SDK, runtime library and applications. Update API references and legacy routes.
+  Record generic/payload projection blockers explicitly. The large storage contract
+  fixture needs a larger explicit test instruction budget; production limits stay
+  unchanged. System.Enum helpers and boxed formatting are the next planned slice.
+- Record the proposed future Error interface for diagnostic integration,
+  composition and decoration; no Error API or stack capture is implemented.
+
 ### 2026-09-24
 
 - Clarify Raven storage conventions: prefer private `var`/`val`, which emit fields;

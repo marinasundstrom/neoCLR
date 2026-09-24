@@ -71,6 +71,13 @@ static class SignatureProbe
         cancelled.Constant = 99;
         Reject("TaskState literal contract mismatch", () => EnumBindings.Validate(module, EnumBindings.TaskState));
         cancelled.Constant = 2;
+        EnumBindings.Validate(module, EnumBindings.EntryKind);
+        var entryKind = module.GetType(EnumBindings.EntryKind);
+        Check("EntryKind is a non-flags enum", entryKind.IsEnum && !entryKind.HasNestedTypes && entryKind.CustomAttributes.Count == 0);
+        var directoryKind = entryKind.Fields.Single(f => f.Name == "Directory");
+        directoryKind.Constant = 99;
+        Reject("EntryKind literal contract mismatch", () => EnumBindings.Validate(module, EnumBindings.EntryKind));
+        directoryKind.Constant = 2;
         var outcome = new GenericInstanceType(module.GetType("System.Tasks.TaskOutcome`1"));
         outcome.GenericArguments.Add(module.TypeSystem.String);
         Check("TaskOutcome is an ordinary union payload", GenericUnionBindings.Type(outcome) == "System.Tasks.TaskOutcome<String>");
@@ -280,8 +287,10 @@ static class SignatureProbe
         var notFound = readError.NestedTypes.Single(t => t.Name == "NotFound");
         var notFoundConstructor = notFound.Methods.Single(m => m.IsConstructor);
         Check("Error case constructor mapping", ErrorBindings.Construct(Reference(notFoundConstructor, notFound), notFoundConstructor)?.Result == "System.Storage.FileReadError.NotFound");
-        Check("Only empty errors have defaults", ErrorBindings.IsEmpty("System.InvalidDateError") && !ErrorBindings.IsEmpty("System.Int32ParseError"));
-        var checkedGetter = readError.Methods.Single(m => m.Name == "GetNotFound");
+        Check("Empty errors differ from union carriers", ErrorBindings.IsEmpty("System.InvalidDateError") && !ErrorBindings.IsEmpty("System.Int32ParseError"));
+        ErrorBindings.Reset(module);
+        var checkedGetter = readError.Methods.Single(m => m.Name == "TryGetValue"
+            && m.Parameters[0].ParameterType.GetElementType().FullName == notFound.FullName);
         var getterReference = Reference(checkedGetter, readError);
         getterReference.ReturnType = module.TypeSystem.Int32;
         Reject("Error getter signature mismatch", () => ErrorBindings.Bind(getterReference, checkedGetter));

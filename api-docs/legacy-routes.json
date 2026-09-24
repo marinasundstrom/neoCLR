@@ -30,13 +30,13 @@
     "uid": "T:System.Storage.EntryKind",
     "anchors": {
       "System_Storage_EntryKind": "T:System.Storage.EntryKind",
-      "System_Storage_EntryKind_ToString": "M:System.Storage.EntryKind.ToString",
-      "System_Storage_EntryKind__ctor_System_Storage_EntryKind_File_": "M:System.Storage.EntryKind.#ctor",
-      "System_Storage_EntryKind_GetFile": "M:System.Storage.EntryKind.GetFile",
-      "System_Storage_EntryKind__ctor_System_Storage_EntryKind_Directory_": "M:System.Storage.EntryKind.#ctor",
-      "System_Storage_EntryKind_GetDirectory": "M:System.Storage.EntryKind.GetDirectory",
-      "System_Storage_EntryKind_IsFile": "P:System.Storage.EntryKind.IsFile",
-      "System_Storage_EntryKind_IsDirectory": "P:System.Storage.EntryKind.IsDirectory"
+      "System_Storage_EntryKind_ToString": "T:System.Storage.EntryKind",
+      "System_Storage_EntryKind__ctor_System_Storage_EntryKind_File_": "T:System.Storage.EntryKind",
+      "System_Storage_EntryKind_GetFile": "T:System.Storage.EntryKind",
+      "System_Storage_EntryKind__ctor_System_Storage_EntryKind_Directory_": "T:System.Storage.EntryKind",
+      "System_Storage_EntryKind_GetDirectory": "T:System.Storage.EntryKind",
+      "System_Storage_EntryKind_IsFile": "T:System.Storage.EntryKind",
+      "System_Storage_EntryKind_IsDirectory": "T:System.Storage.EntryKind"
     }
   },
   "System.Storage.StorageLookupError.WrongKind.html": {
@@ -419,10 +419,10 @@
     }
   },
   "System.Storage.EntryKind.File.html": {
-    "uid": "T:System.Storage.EntryKind.File",
+    "uid": "T:System.Storage.EntryKind",
     "anchors": {
-      "System_Storage_EntryKind_File": "T:System.Storage.EntryKind.File",
-      "System_Storage_EntryKind_File__ctor": "M:System.Storage.EntryKind.File.#ctor"
+      "System_Storage_EntryKind_File": "T:System.Storage.EntryKind",
+      "System_Storage_EntryKind_File__ctor": "T:System.Storage.EntryKind"
     }
   },
   "System.IO.StreamError.InvalidPath.html": {
@@ -760,10 +760,10 @@
     }
   },
   "System.Storage.EntryKind.Directory.html": {
-    "uid": "T:System.Storage.EntryKind.Directory",
+    "uid": "T:System.Storage.EntryKind",
     "anchors": {
-      "System_Storage_EntryKind_Directory": "T:System.Storage.EntryKind.Directory",
-      "System_Storage_EntryKind_Directory__ctor": "M:System.Storage.EntryKind.Directory.#ctor"
+      "System_Storage_EntryKind_Directory": "T:System.Storage.EntryKind",
+      "System_Storage_EntryKind_Directory__ctor": "T:System.Storage.EntryKind"
     }
   },
   "System.Storage.FileReadError.InvalidLimit.html": {

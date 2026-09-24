@@ -1,4 +1,4 @@
-"""Check erased carrier layout, nested cases, source constructors, and definite assignment."""
+"""Check standard error union admission and reject mismatched case contracts."""
 import argparse
 from pathlib import Path
 import subprocess
@@ -31,13 +31,9 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
     sample = sources['Text.Utf8SliceError']
     cases = [(name.replace('.', ''), name, sources[name], None) for name in names]
     cases += [
-        ('ExtraStorage', 'Text.Utf8SliceError', sample.replace('private field Stored:', 'private field Extra: int\n    private field Stored:'), 'carrier storage'),
-        ('CaseStorage', 'Text.Utf8SliceError', sample.replace('public struct OutOfRange { }', 'public struct OutOfRange { private field Extra: int }'), 'case layout'),
-        ('WrongCase', 'Text.Utf8SliceError', sample.replace('OutOfRange', 'Different'), 'case layout'),
-        ('WrongPayload', 'Text.Utf8SliceError', sample.replace('ValueStorage.Is<Utf8SliceError.OutOfRange>', 'ValueStorage.Is<int>'), 'Unsupported case storage payload'),
-        ('WrongConstructor', 'Text.Utf8SliceError', sample.replace('ValueStorage.Pack(value)', 'ValueStorage.Pack(Utf8SliceError.InvalidBoundary())', 1), 'constructor body'),
-        ('ConstructorEffect', 'Text.Utf8SliceError', sample.replace('Stored = ValueStorage.Pack(value)', 'System.Fault("unexpected")\n        Stored = ValueStorage.Pack(value)', 1), 'constructor body'),
-        ('DefaultCarrier', 'Text.Utf8SliceError', sample.replace('if IsOutOfRange {', 'let invalid = default(Utf8SliceError)\n        invalid.ToString()\n        if IsOutOfRange {'), 'Read of uninitialized'),
+        ('ExtraStorage', 'Text.Utf8SliceError', sample.replace('public union Utf8SliceError {', 'public union Utf8SliceError {\n    private var extra: int'), 'standard union library shape'),
+        ('CaseStorage', 'Text.Utf8SliceError', sample.replace('case OutOfRange', 'case OutOfRange(value: int)').replace('OutOfRange =>', 'OutOfRange(_) =>'), 'standard union library shape'),
+        ('WrongCase', 'Text.Utf8SliceError', sample.replace('OutOfRange', 'Different'), 'case metadata does not match'),
     ]
     for name, owner, text, diagnostic in cases:
         folder = root / name
@@ -49,7 +45,11 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
   <Import Project="{escape(str(ROOT / 'build/NeoCLR.Raven.props'))}" />
   <ItemGroup><Compile Include="Main.rvn" /></ItemGroup>
 </Project>''')
-        run(['dotnet', args.compiler.resolve(), project, '--no-project-restore', '-o', folder / 'bin'])
+        run(['dotnet', args.compiler.resolve(), project, '--no-project-restore', '-o', folder / 'bin'],
+            'RAV2115' if name == 'ExtraStorage' else None)
+        if name == 'ExtraStorage':
+            assert not (folder / 'bin' / (name + '.dll')).exists()
+            continue
         output = folder / 'imported'
         run(['dotnet', args.bridge.resolve(), '--library-implementation', folder / 'bin' / (name + '.dll'),
              core, 'System.' + owner, output], diagnostic)
@@ -58,8 +58,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
         else:
             emitted = (output / 'Implementation.neoil').read_text()
             assert '.type System.' + owner + '\n' in emitted
-            assert '.field private Stored Value' in emitted
-            assert 'starg this' in emitted
+            assert '.field private Stored Value' not in emitted
+            assert '.implements System.Runtime.CompilerServices.IUnion' in emitted
             assert '.custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()' in emitted
-            assert '.method instance ToString() -> String' in emitted
+            assert '.method instance override byref ToString() -> String' in emitted
     print(f'{len(cases)} error carrier admission cases passed')

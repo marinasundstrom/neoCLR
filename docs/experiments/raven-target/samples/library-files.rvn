@@ -19,7 +19,7 @@ func ShowWrite(result: Result<System.Void, FileWriteError>) {
     match result {
         Ok(_) => WriteLine("Completed")
         Error(let error) => {
-            if error.IsTooLarge {
+            if (error is FileWriteError.TooLarge) {
                 WriteLine("Write too large")
             } else {
                 WriteLine("Write failed")
@@ -32,13 +32,13 @@ func ShowRead(result: Result<string, FileReadError>) {
     match result {
         Ok(let ok) => WriteLine(ok)
         Error(let error) => {
-            if error.IsNotFound {
+            if (error is FileReadError.NotFound) {
                 WriteLine("Not found")
-            } else if error.IsTooLarge {
+            } else if (error is FileReadError.TooLarge) {
                 WriteLine("Read too large")
-            } else if error.IsInvalidUtf8 {
+            } else if (error is FileReadError.InvalidUtf8) {
                 WriteLine("Invalid UTF-8")
-            } else if error.IsInvalidLimit {
+            } else if (error is FileReadError.InvalidLimit) {
                 WriteLine("Invalid limit")
             } else {
                 WriteLine("Read failed")

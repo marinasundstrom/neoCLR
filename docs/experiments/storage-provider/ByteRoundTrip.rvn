@@ -4,7 +4,6 @@ import System.Storage.File
 import System.Storage.Directory
 
 import System.*
-import System.Console.*
 import System.Collections.*
 import System.Result.*
 import System.IO.*
@@ -48,7 +47,7 @@ func ReadMessage(input: InputStream) -> Result<List<byte>, StreamError> {
                     finished = true
                 }
                 if count > 64 - bytes.Count {
-                    return Error(StreamError(StreamError.LimitExceeded()))
+                    return Error<StreamError>(StreamError.LimitExceeded)
                 }
                 var index = 0
                 while index < count {
@@ -77,7 +76,7 @@ func ByteRoundTrip(directory: Directory, provider: StorageProvider) {
                     }
                     match output.Flush() {
                         Error(let error) => {
-                            if !error.IsClosed {
+                            if !(error is System.IO.StreamError.Closed) {
                                 System.Fault("Expected closed output")
                             }
                         }
@@ -88,7 +87,7 @@ func ByteRoundTrip(directory: Directory, provider: StorageProvider) {
             }
             match file.CreateNew() {
                 Error(let error) => {
-                    if !error.IsAlreadyExists {
+                    if !(error is System.IO.StreamError.AlreadyExists) {
                         System.Fault("Expected exclusive creation")
                     }
                 }
@@ -109,7 +108,7 @@ func ByteRoundTrip(directory: Directory, provider: StorageProvider) {
                                     if text != "Hello, värld!" {
                                         System.Fault("Byte stream changed the message")
                                     }
-                                    WriteLine("Byte stream round trip: " + text)
+                                    Console.WriteLine("Byte stream round trip: " + text)
                                 }
                                 Error(let error) => System.Fault(error.ToString())
                             }
@@ -119,7 +118,7 @@ func ByteRoundTrip(directory: Directory, provider: StorageProvider) {
                     let buffer: byte[] = [(byte)99]
                     match input.Read(buffer, 0, 1) {
                         Error(let error) => {
-                            if !error.IsClosed || buffer[0] != (byte)99 {
+                            if !(error is System.IO.StreamError.Closed) || buffer[0] != (byte)99 {
                                 System.Fault("Expected closed input with untouched buffer")
                             }
                         }
@@ -136,8 +135,8 @@ func ByteRoundTrip(directory: Directory, provider: StorageProvider) {
                 }
                 Error(let error) => System.Fault(error.ToString())
             }
-            WriteLine("Byte stream write visible through text helper")
-            WriteLine("Exclusive creation and closed streams checked")
+            Console.WriteLine("Byte stream write visible through text helper")
+            Console.WriteLine("Exclusive creation and closed streams checked")
         }
         Error(let error) => System.Fault(error.ToString())
     }
@@ -161,5 +160,5 @@ func ReadFileText(file: File) -> Result<string, StreamError> {
         }
         Error(let error) => return Error(error)
     }
-    return Error(StreamError(StreamError.IoFailure()))
+    return Error<StreamError>(StreamError.IoFailure)
 }

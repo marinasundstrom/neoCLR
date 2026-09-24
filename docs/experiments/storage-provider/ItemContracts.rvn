@@ -11,13 +11,13 @@ import System.Storage.Path
 // A platform provider resolves items; byte methods and text helpers are not required.
 class MissingProvider : System.Storage.StorageProvider {
     func GetItem(path: Path) -> Result<StorageItem, StorageLookupError> {
-        return Error(StorageLookupError(StorageLookupError.NotFound()))
+        return Error<StorageLookupError>(StorageLookupError.NotFound)
     }
     func GetFile(path: Path) -> Result<File, StorageLookupError> {
-        return Error(StorageLookupError(StorageLookupError.NotFound()))
+        return Error<StorageLookupError>(StorageLookupError.NotFound)
     }
     func GetDirectory(path: Path) -> Result<Directory, StorageLookupError> {
-        return Error(StorageLookupError(StorageLookupError.NotFound()))
+        return Error<StorageLookupError>(StorageLookupError.NotFound)
     }
 }
 
@@ -43,7 +43,7 @@ func CheckItems(provider: System.Storage.StorageProvider) {
     }
     match provider.GetItem(RequirePath("/missing-item")) {
         Error(let error) => {
-            if !error.IsNotFound {
+            if !(error is System.Storage.StorageLookupError.NotFound) {
                 System.Fault("Missing generic item changed error")
             }
         }
@@ -63,7 +63,7 @@ func Main() {
     let missing: System.Storage.StorageProvider = MissingProvider()
     match missing.GetItem(RequirePath("anything")) {
         Error(let error) => {
-            if !error.IsNotFound {
+            if !(error is System.Storage.StorageLookupError.NotFound) {
                 System.Fault("Resolution-only provider changed error")
             }
         }

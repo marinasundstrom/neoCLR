@@ -181,3 +181,8 @@ DnsError and UriError also use embedded-source projection. Their generated HasVa
 Value and conditional TryGetValue members replace handwritten per-case Is*/Get*
 helpers. Their default values are inactive. The core projection runs sequentially
 so every family uses the same supplied IUnion identity.
+
+The same generated union documentation now covers StreamError, TextReadError,
+StorageLookupError, FileReadError, FileWriteError, ConsoleReadError, Utf8SliceError,
+Int32ParseError, IntegerDivisionError and SingleError. EntryKind is an enum instead:
+its named fields replace nested union cases and Is*/Get* accessors. Zero is unnamed.

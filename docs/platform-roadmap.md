@@ -849,8 +849,18 @@ managed payloads, copies/boxing/defaults, URI grammar/resolution and DNS/TCP pas
 layout is separately tested as an unsupported boundary.
 
 Per-case Is* properties are not a required convention, including for Option/Result.
-Migrate applicable existing unions next, recording concrete blockers for remaining
-manual carriers. Raven case/companion metadata remains a provisional bridge concern,
+The remaining empty-case errors are migrated as one group, with EntryKind changed
+to an enum following author direction (File = 1, Directory = 2). Their integrated
+case/default/boxing checks pass. Generic Option/Result/TaskOutcome still require
+companion/generic reference projection and payload-body import, plus propagation
+and task-contract validation; their projection is explicitly rejected today.
+
+**Next author-directed slice:** System.Enum helpers for names and values, retaining
+TypeInfo arguments and adding enum type-parameter overloads. Use shared metadata for
+ordering and formatting; boxed enum ToString currently lacks an Object override.
+Do not substitute TypeInfo methods for this Enum API. The future Error interface
+for diagnostics, composition and decoration remains a proposal, without current
+stack capture or wrapper contracts. Raven case/companion metadata remains a provisional bridge concern,
 not a runtime dependency or a standardized platform case map. Generic and
 payload-bearing class-library projection still need validation; the application
 [source-union probe](experiments/http-error-unions/README.md) does not establish that

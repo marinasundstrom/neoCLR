@@ -30,7 +30,7 @@ func ExpectCount(result: Result<int, StreamError>, expected: int) {
 func Main() {
     match FileInputStream.Open("missing-file") {
         Error(let error) => {
-            if !error.IsNotFound {
+            if !(error is System.IO.StreamError.NotFound) {
                 System.Fault("Expected missing file")
             }
         }
@@ -41,7 +41,7 @@ func Main() {
     }
     match FileInputStream.Open("") {
         Error(let error) => {
-            if !error.IsInvalidPath {
+            if !(error is System.IO.StreamError.InvalidPath) {
                 System.Fault("Expected invalid path")
             }
         }
@@ -52,7 +52,7 @@ func Main() {
     }
     match FileInputStream.Open(".") {
         Error(let error) => {
-            if !error.IsWrongKind {
+            if !(error is System.IO.StreamError.WrongKind) {
                 System.Fault("Expected wrong kind")
             }
         }
@@ -95,7 +95,7 @@ func Main() {
             ExpectError(output.Write(buffer, 0, 1), "Closed")
             match capability.Flush() {
                 Error(let error) => {
-                    if !error.IsClosed {
+                    if !(error is System.IO.StreamError.Closed) {
                         System.Fault("Unexpected closed flush error")
                     }
                 }

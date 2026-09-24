@@ -12,9 +12,9 @@ func ShowSlice(result: Result<string, Utf8SliceError>) {
     match result {
         .Ok(let ok) => WriteLine(ok)
         .Error(let error) => {
-            if error.IsOutOfRange {
+            if (error is System.Text.Utf8SliceError.OutOfRange) {
                 WriteLine("Out of range")
-            } else if error.IsInvalidBoundary {
+            } else if (error is System.Text.Utf8SliceError.InvalidBoundary) {
                 WriteLine("Invalid boundary")
             }
         }

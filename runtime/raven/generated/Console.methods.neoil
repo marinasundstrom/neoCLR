@@ -271,12 +271,16 @@ ldloca local5
 initobj System.Result.Ok<Int32>
 ldc.i4 0
 stloc local6
+ldloca local10
+initobj System.IO.StreamError
 ldloca local12
 initobj System.Result.Ok<Void>
 ldloca local13
 initobj System.Result.Ok<Void>
 ldvoid
 stloc local14
+ldloca local18
+initobj System.IO.StreamError
 M0000000c_IL_0000:
 M0000000c_IL_0001:
 M0000000c_IL_0002:

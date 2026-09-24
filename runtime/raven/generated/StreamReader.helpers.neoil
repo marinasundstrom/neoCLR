@@ -54,66 +54,6 @@ ldarg value
 newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.InvalidUtf8)
 ret
 .end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsInvalidPath(System.IO.StreamError& source) -> Boolean
-ldarg source
-ldobj System.IO.StreamError
-call instance System.IO.StreamError::get_IsInvalidPath()
-ret
-.end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsNotFound(System.IO.StreamError& source) -> Boolean
-ldarg source
-ldobj System.IO.StreamError
-call instance System.IO.StreamError::get_IsNotFound()
-ret
-.end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsAccessDenied(System.IO.StreamError& source) -> Boolean
-ldarg source
-ldobj System.IO.StreamError
-call instance System.IO.StreamError::get_IsAccessDenied()
-ret
-.end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsWrongKind(System.IO.StreamError& source) -> Boolean
-ldarg source
-ldobj System.IO.StreamError
-call instance System.IO.StreamError::get_IsWrongKind()
-ret
-.end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsAlreadyExists(System.IO.StreamError& source) -> Boolean
-ldarg source
-ldobj System.IO.StreamError
-call instance System.IO.StreamError::get_IsAlreadyExists()
-ret
-.end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsClosed(System.IO.StreamError& source) -> Boolean
-ldarg source
-ldobj System.IO.StreamError
-call instance System.IO.StreamError::get_IsClosed()
-ret
-.end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsInvalidRange(System.IO.StreamError& source) -> Boolean
-ldarg source
-ldobj System.IO.StreamError
-call instance System.IO.StreamError::get_IsInvalidRange()
-ret
-.end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsLimitExceeded(System.IO.StreamError& source) -> Boolean
-ldarg source
-ldobj System.IO.StreamError
-call instance System.IO.StreamError::get_IsLimitExceeded()
-ret
-.end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsWrongAccess(System.IO.StreamError& source) -> Boolean
-ldarg source
-ldobj System.IO.StreamError
-call instance System.IO.StreamError::get_IsWrongAccess()
-ret
-.end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsIoFailure(System.IO.StreamError& source) -> Boolean
-ldarg source
-ldobj System.IO.StreamError
-call instance System.IO.StreamError::get_IsIoFailure()
-ret
-.end
 .function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorInvalidPathNew() -> System.IO.TextReadError.InvalidPath
 newobj instance System.IO.TextReadError.InvalidPath::.ctor()
 ret

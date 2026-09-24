@@ -578,3 +578,11 @@ The System.IO reader contracts also run against disk and deliberately short-read
 memory input: strict UTF-8, BOM preservation, bounds, EOF, underlying errors, close
 ownership and byte seeking. The [standalone Storage POC](../storage-poc/README.md)
 combines those capabilities using the platform FileSystem provider alone.
+
+
+The development error unions use generated case patterns; EntryKind is an enum.
+The full contract fixture can use `--runner /path/to/measure_async` for an explicit
+10,000,000-instruction and 256-object GC budget. The directory fixture exceeds the
+CLI's default instruction cap after standard-union carrier initialization; the
+runtime's default budget is unchanged. Keep this cost visible when optimizing the
+bridge and generated library.

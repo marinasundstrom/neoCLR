@@ -5,7 +5,8 @@ static class FileBindings
 {
     public const string ReadError = ResultBindings.ReadError, WriteError = ResultBindings.WriteError;
     public const string Declarations = """
-        namespace Storage { public static class Metadata {
+        namespace Storage { public enum EntryKind { File = 1, Directory = 2 }
+        public static class Metadata {
             public static Result<EntryKind, StorageLookupError> GetKind(string path) => default;
         } public static class FileText {
             public static Result<string, FileReadError> ReadAllText(string path, int maxBytes) => default;

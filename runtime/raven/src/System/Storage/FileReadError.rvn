@@ -1,126 +1,26 @@
 namespace System.Storage
 
-import System.Runtime.CompilerServices.ValueStorage
+public union FileReadError {
+    case InvalidLimit
+    case InvalidPath
+    case NotFound
+    case AccessDenied
+    case NotRegularFile
+    case TooLarge
+    case ReadFailed
+    case InvalidUtf8
 
-[System.Runtime.CompilerServices.Union]
-public struct FileReadError {
-    private field Stored: System.Value
-
-    public struct InvalidLimit { }
-    public struct InvalidPath { }
-    public struct NotFound { }
-    public struct AccessDenied { }
-    public struct NotRegularFile { }
-    public struct TooLarge { }
-    public struct ReadFailed { }
-    public struct InvalidUtf8 { }
-
-    init(value: FileReadError.InvalidLimit) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsInvalidLimit: bool => ValueStorage.Is<FileReadError.InvalidLimit>(Stored)
-
-    func GetInvalidLimit() -> FileReadError.InvalidLimit {
-        return ValueStorage.Unpack<FileReadError.InvalidLimit>(Stored)
-    }
-
-    init(value: FileReadError.InvalidPath) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsInvalidPath: bool => ValueStorage.Is<FileReadError.InvalidPath>(Stored)
-
-    func GetInvalidPath() -> FileReadError.InvalidPath {
-        return ValueStorage.Unpack<FileReadError.InvalidPath>(Stored)
-    }
-
-    init(value: FileReadError.NotFound) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsNotFound: bool => ValueStorage.Is<FileReadError.NotFound>(Stored)
-
-    func GetNotFound() -> FileReadError.NotFound {
-        return ValueStorage.Unpack<FileReadError.NotFound>(Stored)
-    }
-
-    init(value: FileReadError.AccessDenied) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsAccessDenied: bool => ValueStorage.Is<FileReadError.AccessDenied>(Stored)
-
-    func GetAccessDenied() -> FileReadError.AccessDenied {
-        return ValueStorage.Unpack<FileReadError.AccessDenied>(Stored)
-    }
-
-    init(value: FileReadError.NotRegularFile) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsNotRegularFile: bool => ValueStorage.Is<FileReadError.NotRegularFile>(Stored)
-
-    func GetNotRegularFile() -> FileReadError.NotRegularFile {
-        return ValueStorage.Unpack<FileReadError.NotRegularFile>(Stored)
-    }
-
-    init(value: FileReadError.TooLarge) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsTooLarge: bool => ValueStorage.Is<FileReadError.TooLarge>(Stored)
-
-    func GetTooLarge() -> FileReadError.TooLarge {
-        return ValueStorage.Unpack<FileReadError.TooLarge>(Stored)
-    }
-
-    init(value: FileReadError.ReadFailed) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsReadFailed: bool => ValueStorage.Is<FileReadError.ReadFailed>(Stored)
-
-    func GetReadFailed() -> FileReadError.ReadFailed {
-        return ValueStorage.Unpack<FileReadError.ReadFailed>(Stored)
-    }
-
-    init(value: FileReadError.InvalidUtf8) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsInvalidUtf8: bool => ValueStorage.Is<FileReadError.InvalidUtf8>(Stored)
-
-    func GetInvalidUtf8() -> FileReadError.InvalidUtf8 {
-        return ValueStorage.Unpack<FileReadError.InvalidUtf8>(Stored)
-    }
-
-    func ToString() -> string {
-        if IsInvalidLimit {
-            return "ArgumentOutOfRange"
+    override func ToString() -> string {
+        return match self {
+            InvalidLimit => "InvalidLimit"
+            InvalidPath => "InvalidPath"
+            NotFound => "NotFound"
+            AccessDenied => "AccessDenied"
+            NotRegularFile => "NotRegularFile"
+            TooLarge => "TooLarge"
+            ReadFailed => "ReadFailed"
+            InvalidUtf8 => "InvalidUtf8"
+            _ => "Empty"
         }
-        if IsInvalidPath {
-            return "InvalidPath"
-        }
-        if IsNotFound {
-            return "FileNotFound"
-        }
-        if IsAccessDenied {
-            return "AccessDenied"
-        }
-        if IsNotRegularFile {
-            return "NotRegularFile"
-        }
-        if IsTooLarge {
-            return "FileTooLarge"
-        }
-        if IsReadFailed {
-            return "FileReadFailed"
-        }
-        if IsInvalidUtf8 {
-            return "InvalidUtf8"
-        }
-        System.Fault("invalid I/O error case")
-        return ""
     }
 }

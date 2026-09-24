@@ -144,3 +144,24 @@ and high-level pattern syntax are not prerequisites for this convention.
 inline nested record cases, exact constructor-based conversions and whole-variant
 matching. The [remaining case-construction plan](result-construction.md#case-projection-ravens-model)
 covers imported cases, generic constructor inference and broader metadata discovery.
+
+## Future error diagnostics
+
+Author proposal, 2026-09-24: an Error interface may give union-based errors common
+integration points for stack traces and related context. It is not implemented or
+required by the current union convention. Unlike .NET Exception-based failure,
+returning an error value does not imply a throw site or automatic stack capture.
+An interface alone does not determine capture timing or storage ownership.
+
+Without a macro mechanism, evaluate compiler-generated implementations, explicit
+library helpers and capture at a runtime/API boundary. Compiler support avoids
+repeated boilerplate but couples diagnostics to emission conventions; explicit
+capture is visible and portable but needs caller discipline; automatic boundary
+capture adds cost and can describe propagation rather than the original failure.
+Keep domain variants distinct from diagnostic context. Members, costs, preservation
+through propagation and the relationship to runtime Fault traces remain open.
+
+Composition and decoration are further proposed uses: a wrapper could retain an
+underlying error while adding operation or application context. How callers inspect
+the cause, preserve variant matching and distinguish domain data from diagnostic
+context remains future design work. No wrapper API is introduced by this note.

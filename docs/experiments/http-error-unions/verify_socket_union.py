@@ -2,6 +2,7 @@
 """Exercise migrated core error unions inside normal source unions under GC."""
 import argparse
 import os
+import re
 from pathlib import Path
 import subprocess
 import tempfile
@@ -20,6 +21,32 @@ def run(command):
     assert result.returncode == 0, result.stdout + result.stderr
     return result
 
+
+# Exercise each migrated production declaration through the consumer reference.
+repository = Path(__file__).resolve().parents[3]
+extra_checks = []
+extra_functions = []
+for path in sorted((repository / 'runtime/raven/src').rglob('*.rvn')):
+    source = path.read_text()
+    declaration = re.search(r'public union (\w+) \{', source)
+    if declaration is None or declaration[1] in ('SocketError', 'DnsError', 'UriError'):
+        continue
+    name = declaration[1]
+    owner = re.search(r'namespace (\S+)', source)[1] + '.' + name
+    cases = re.findall(r'^    case (\w+)$', source, re.M)
+    if not cases:
+        continue
+    extra_functions.append(f"""func Check{name}(value: {owner}, name: string) {{
+    Check(value.HasValue)
+    Check(value.ToString() == name)
+    let boxed: Object = value
+    Check(boxed.ToString() == name)
+}}
+""")
+    extra_checks.extend(f'Check{name}({owner}.{case}, "{case}")' for case in cases)
+    extra_checks.extend([f'let inactive{name} = default({owner})',
+        f'Check(!inactive{name}.HasValue)', f'Check(inactive{name}.Value == null)',
+        f'Check(inactive{name}.ToString() == "Empty")'])
 
 with tempfile.TemporaryDirectory(prefix='neoclr-socket-union-') as directory:
     root = Path(directory)
@@ -55,7 +82,15 @@ func CheckUri(value: UriError, name: string) {
     let boxed: Object = value
     Check(boxed.ToString() == name)
 }
+EXTRA_FUNCTIONS
 func Main() {
+    EXTRA_CHECKS
+    Check((int)System.Storage.EntryKind.File == 1)
+    Check((int)System.Storage.EntryKind.Directory == 2)
+    Check((int)default(System.Storage.EntryKind) == 0)
+    Check(System.Storage.EntryKind.File != System.Storage.EntryKind.Directory)
+    let boxedKind: Object = System.Storage.EntryKind.File
+    Check((System.Storage.EntryKind)boxedKind == System.Storage.EntryKind.File)
     BATCH_CHECKS
     let inactiveDns = default(DnsError)
     Check(!inactiveDns.HasValue)
@@ -106,7 +141,7 @@ func Main() {
     }
     Console.WriteLine("Core error cases, nested unions, defaults and boxed copies passed")
 }
-'''.replace('BATCH_CHECKS', '\n    '.join(
+'''.replace('EXTRA_FUNCTIONS', ''.join(extra_functions)).replace('EXTRA_CHECKS', '\n    '.join(extra_checks)).replace('BATCH_CHECKS', '\n    '.join(
         f'Check{family}({owner}.{case}, \"{case}\")'
         for family, owner, cases in [
             ('Dns', 'DnsError', ['InvalidName', 'LimitExceeded', 'NoAddress', 'TimedOut', 'Cancelled', 'LookupFailed']),

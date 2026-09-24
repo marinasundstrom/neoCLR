@@ -2,548 +2,2308 @@
 .type System.IO.StreamError
 .sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
-.field private Stored Value
-.property instance IsInvalidPath() -> Boolean
-.get instance System.IO.StreamError::get_IsInvalidPath()
+.implements System.Runtime.CompilerServices.IUnion
+.field private Metadata_V1_3C5461673E Byte
+.field private Metadata_V1_3C496E76616C6964506174685061796C6F61643E System.IO.StreamError.InvalidPath
+.field private Metadata_V1_3C4E6F74466F756E645061796C6F61643E System.IO.StreamError.NotFound
+.field private Metadata_V1_3C41636365737344656E6965645061796C6F61643E System.IO.StreamError.AccessDenied
+.field private Metadata_V1_3C57726F6E674B696E645061796C6F61643E System.IO.StreamError.WrongKind
+.field private Metadata_V1_3C416C72656164794578697374735061796C6F61643E System.IO.StreamError.AlreadyExists
+.field private Metadata_V1_3C436C6F7365645061796C6F61643E System.IO.StreamError.Closed
+.field private Metadata_V1_3C496E76616C696452616E67655061796C6F61643E System.IO.StreamError.InvalidRange
+.field private Metadata_V1_3C4C696D697445786365656465645061796C6F61643E System.IO.StreamError.LimitExceeded
+.field private Metadata_V1_3C57726F6E674163636573735061796C6F61643E System.IO.StreamError.WrongAccess
+.field private Metadata_V1_3C496F4661696C7572655061796C6F61643E System.IO.StreamError.IoFailure
+.property instance Value() -> System.Object
+.get instance System.IO.StreamError::get_Value()
 .end
-.property instance IsNotFound() -> Boolean
-.get instance System.IO.StreamError::get_IsNotFound()
+.property instance HasValue() -> Boolean
+.get instance System.IO.StreamError::get_HasValue()
 .end
-.property instance IsAccessDenied() -> Boolean
-.get instance System.IO.StreamError::get_IsAccessDenied()
-.end
-.property instance IsWrongKind() -> Boolean
-.get instance System.IO.StreamError::get_IsWrongKind()
-.end
-.property instance IsAlreadyExists() -> Boolean
-.get instance System.IO.StreamError::get_IsAlreadyExists()
-.end
-.property instance IsClosed() -> Boolean
-.get instance System.IO.StreamError::get_IsClosed()
-.end
-.property instance IsInvalidRange() -> Boolean
-.get instance System.IO.StreamError::get_IsInvalidRange()
-.end
-.property instance IsLimitExceeded() -> Boolean
-.get instance System.IO.StreamError::get_IsLimitExceeded()
-.end
-.property instance IsWrongAccess() -> Boolean
-.get instance System.IO.StreamError::get_IsWrongAccess()
-.end
-.property instance IsIoFailure() -> Boolean
-.get instance System.IO.StreamError::get_IsIoFailure()
-.end
-.method instance .ctor(System.IO.StreamError.InvalidPath value) -> Void
-ldarg value
-value.pack System.IO.StreamError.InvalidPath
-newobj System.IO.StreamError
-starg this
-ldvoid
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000001_IL_0000:
+ldarg 0
+M00000001_IL_0001:
+M00000001_IL_0002:
+ref.isnull
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0004:
+brtrue M00000001_IL_000e
+M00000001_IL_0009:
+br M00000001_IL_0014
+M00000001_IL_000e:
+ldstr "null"
+M00000001_IL_0013:
+ret
+M00000001_IL_0014:
+M00000001_IL_0015:
+ldarg 0
+M00000001_IL_0016:
+isinst String
+M00000001_IL_001b:
+M00000001_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_001e:
+brtrue M00000001_IL_0028
+M00000001_IL_0023:
+br M00000001_IL_0043
+M00000001_IL_0028:
+ldstr "\u0022"
+M00000001_IL_002d:
+ldarg 0
+M00000001_IL_002e:
+castclass String
+M00000001_IL_0033:
+call System.String::Concat(String,String)
+M00000001_IL_0038:
+ldstr "\u0022"
+M00000001_IL_003d:
+call System.String::Concat(String,String)
+M00000001_IL_0042:
+ret
+M00000001_IL_0043:
+M00000001_IL_0044:
+ldarg 0
+M00000001_IL_0045:
+isinst Char
+M00000001_IL_004a:
+dup
+M00000001_IL_004b:
+ref.isnull
+brfalse M00000001_IL_0057
+M00000001_IL_0050:
+pop
+M00000001_IL_0051:
+ldc.i4 0
+M00000001_IL_0052:
+br M00000001_IL_005e
+M00000001_IL_0057:
+unbox.any Char
+M00000001_IL_005c:
+pop
+M00000001_IL_005d:
+ldc.i4 1
+M00000001_IL_005e:
+brtrue M00000001_IL_0068
+M00000001_IL_0063:
+br M00000001_IL_0083
+M00000001_IL_0068:
+ldstr "\u0027"
+M00000001_IL_006d:
+ldarg 0
+M00000001_IL_006e:
+call neoCLR.Library.System.IO.StreamError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000001_IL_0073:
+call System.String::Concat(String,String)
+M00000001_IL_0078:
+ldstr "\u0027"
+M00000001_IL_007d:
+call System.String::Concat(String,String)
+M00000001_IL_0082:
+ret
+M00000001_IL_0083:
+M00000001_IL_0084:
+ldarg 0
+M00000001_IL_0085:
+call neoCLR.Library.System.IO.StreamError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000001_IL_008a:
 ret
 .end
-.method instance get_IsInvalidPath() -> Boolean
+.method instance byref .ctor(System.IO.StreamError.InvalidPath value) -> Void
+.local Byte local0
+.local System.IO.StreamError.InvalidPath local1
+.local Byte unionDefault1_0
+.local System.IO.StreamError.InvalidPath unionDefault1_1
+.local System.IO.StreamError.NotFound unionDefault1_2
+.local System.IO.StreamError.AccessDenied unionDefault1_3
+.local System.IO.StreamError.WrongKind unionDefault1_4
+.local System.IO.StreamError.AlreadyExists unionDefault1_5
+.local System.IO.StreamError.Closed unionDefault1_6
+.local System.IO.StreamError.InvalidRange unionDefault1_7
+.local System.IO.StreamError.LimitExceeded unionDefault1_8
+.local System.IO.StreamError.WrongAccess unionDefault1_9
+.local System.IO.StreamError.IoFailure unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.IO.StreamError.InvalidPath
 M00000002_IL_0000:
+ldarg 0
 M00000002_IL_0001:
-M00000002_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000002_IL_0003:
-ldfld System.IO.StreamError::Stored
+ldloc unionDefault1_0
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.IO.StreamError.InvalidPath
+ldarg 0
+ldloc unionDefault1_1
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.IO.StreamError.NotFound
+ldarg 0
+ldloc unionDefault1_2
+stfld System.IO.StreamError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.IO.StreamError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.IO.StreamError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.IO.StreamError.WrongKind
+ldarg 0
+ldloc unionDefault1_4
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.IO.StreamError.AlreadyExists
+ldarg 0
+ldloc unionDefault1_5
+stfld System.IO.StreamError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.IO.StreamError.Closed
+ldarg 0
+ldloc unionDefault1_6
+stfld System.IO.StreamError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.IO.StreamError.InvalidRange
+ldarg 0
+ldloc unionDefault1_7
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.IO.StreamError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_8
+stfld System.IO.StreamError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.IO.StreamError.WrongAccess
+ldarg 0
+ldloc unionDefault1_9
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.IO.StreamError.IoFailure
+ldarg 0
+ldloc unionDefault1_10
+stfld System.IO.StreamError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000002_IL_0007:
+ldc.i4 1
 M00000002_IL_0008:
-value.is System.IO.StreamError.InvalidPath
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M00000002_IL_000d:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+stloc local0
+M00000002_IL_0009:
+ldarg 0
+M00000002_IL_000a:
+ldloc local0
+M00000002_IL_000b:
+conv.u1
+M00000002_IL_000c:
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+M00000002_IL_0011:
+ldarg 1
+M00000002_IL_0012:
+stloc local1
+M00000002_IL_0013:
+ldarg 0
+M00000002_IL_0014:
+ldloc local1
+M00000002_IL_0015:
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000002_IL_001a:
+ldvoid
 ret
 .end
-.method instance GetInvalidPath() -> System.IO.StreamError.InvalidPath
+.method instance byref TryGetValue(out(true) System.IO.StreamError.InvalidPath& value) -> Boolean
 M00000003_IL_0000:
+ldarg 0
 M00000003_IL_0001:
-M00000003_IL_0002:
-ldarg 0
-M00000003_IL_0003:
-ldfld System.IO.StreamError::Stored
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000003_IL_0006:
+conv.i4
+M00000003_IL_0007:
+ldc.i4 1
 M00000003_IL_0008:
-value.unpack System.IO.StreamError.InvalidPath
-M00000003_IL_000d:
+conv.i4
+M00000003_IL_0009:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_000b:
+brtrue M00000003_IL_0015
+M00000003_IL_0010:
+br M00000003_IL_0023
+M00000003_IL_0015:
+ldarg 1
+M00000003_IL_0016:
+ldarg 0
+M00000003_IL_0017:
+ldfld System.IO.StreamError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+M00000003_IL_001c:
+stobj System.IO.StreamError.InvalidPath
+M00000003_IL_0021:
+ldc.i4 1
+M00000003_IL_0022:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000003_IL_0023:
+M00000003_IL_0024:
+ldc.i4 0
+M00000003_IL_0025:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance .ctor(System.IO.StreamError.NotFound value) -> Void
-ldarg value
-value.pack System.IO.StreamError.NotFound
-newobj System.IO.StreamError
-starg this
+.method instance byref .ctor(System.IO.StreamError.NotFound value) -> Void
+.local Byte local0
+.local System.IO.StreamError.NotFound local1
+.local Byte unionDefault1_0
+.local System.IO.StreamError.InvalidPath unionDefault1_1
+.local System.IO.StreamError.NotFound unionDefault1_2
+.local System.IO.StreamError.AccessDenied unionDefault1_3
+.local System.IO.StreamError.WrongKind unionDefault1_4
+.local System.IO.StreamError.AlreadyExists unionDefault1_5
+.local System.IO.StreamError.Closed unionDefault1_6
+.local System.IO.StreamError.InvalidRange unionDefault1_7
+.local System.IO.StreamError.LimitExceeded unionDefault1_8
+.local System.IO.StreamError.WrongAccess unionDefault1_9
+.local System.IO.StreamError.IoFailure unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.IO.StreamError.NotFound
+M00000004_IL_0000:
+ldarg 0
+M00000004_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.IO.StreamError.InvalidPath
+ldarg 0
+ldloc unionDefault1_1
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.IO.StreamError.NotFound
+ldarg 0
+ldloc unionDefault1_2
+stfld System.IO.StreamError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.IO.StreamError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.IO.StreamError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.IO.StreamError.WrongKind
+ldarg 0
+ldloc unionDefault1_4
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.IO.StreamError.AlreadyExists
+ldarg 0
+ldloc unionDefault1_5
+stfld System.IO.StreamError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.IO.StreamError.Closed
+ldarg 0
+ldloc unionDefault1_6
+stfld System.IO.StreamError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.IO.StreamError.InvalidRange
+ldarg 0
+ldloc unionDefault1_7
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.IO.StreamError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_8
+stfld System.IO.StreamError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.IO.StreamError.WrongAccess
+ldarg 0
+ldloc unionDefault1_9
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.IO.StreamError.IoFailure
+ldarg 0
+ldloc unionDefault1_10
+stfld System.IO.StreamError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000004_IL_0007:
+ldc.i4 2
+M00000004_IL_0008:
+stloc local0
+M00000004_IL_0009:
+ldarg 0
+M00000004_IL_000a:
+ldloc local0
+M00000004_IL_000b:
+conv.u1
+M00000004_IL_000c:
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+M00000004_IL_0011:
+ldarg 1
+M00000004_IL_0012:
+stloc local1
+M00000004_IL_0013:
+ldarg 0
+M00000004_IL_0014:
+ldloc local1
+M00000004_IL_0015:
+stfld System.IO.StreamError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000004_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsNotFound() -> Boolean
+.method instance byref TryGetValue(out(true) System.IO.StreamError.NotFound& value) -> Boolean
 M00000005_IL_0000:
+ldarg 0
 M00000005_IL_0001:
-M00000005_IL_0002:
-ldarg 0
-M00000005_IL_0003:
-ldfld System.IO.StreamError::Stored
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000005_IL_0006:
+conv.i4
+M00000005_IL_0007:
+ldc.i4 2
 M00000005_IL_0008:
-value.is System.IO.StreamError.NotFound
+conv.i4
+M00000005_IL_0009:
+ceq
 call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_000d:
+M00000005_IL_000b:
+brtrue M00000005_IL_0015
+M00000005_IL_0010:
+br M00000005_IL_0023
+M00000005_IL_0015:
+ldarg 1
+M00000005_IL_0016:
+ldarg 0
+M00000005_IL_0017:
+ldfld System.IO.StreamError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+M00000005_IL_001c:
+stobj System.IO.StreamError.NotFound
+M00000005_IL_0021:
+ldc.i4 1
+M00000005_IL_0022:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000005_IL_0023:
+M00000005_IL_0024:
+ldc.i4 0
+M00000005_IL_0025:
 call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetNotFound() -> System.IO.StreamError.NotFound
+.method instance byref .ctor(System.IO.StreamError.AccessDenied value) -> Void
+.local Byte local0
+.local System.IO.StreamError.AccessDenied local1
+.local Byte unionDefault1_0
+.local System.IO.StreamError.InvalidPath unionDefault1_1
+.local System.IO.StreamError.NotFound unionDefault1_2
+.local System.IO.StreamError.AccessDenied unionDefault1_3
+.local System.IO.StreamError.WrongKind unionDefault1_4
+.local System.IO.StreamError.AlreadyExists unionDefault1_5
+.local System.IO.StreamError.Closed unionDefault1_6
+.local System.IO.StreamError.InvalidRange unionDefault1_7
+.local System.IO.StreamError.LimitExceeded unionDefault1_8
+.local System.IO.StreamError.WrongAccess unionDefault1_9
+.local System.IO.StreamError.IoFailure unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.IO.StreamError.AccessDenied
 M00000006_IL_0000:
+ldarg 0
 M00000006_IL_0001:
-M00000006_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000006_IL_0003:
-ldfld System.IO.StreamError::Stored
+ldloc unionDefault1_0
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.IO.StreamError.InvalidPath
+ldarg 0
+ldloc unionDefault1_1
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.IO.StreamError.NotFound
+ldarg 0
+ldloc unionDefault1_2
+stfld System.IO.StreamError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.IO.StreamError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.IO.StreamError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.IO.StreamError.WrongKind
+ldarg 0
+ldloc unionDefault1_4
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.IO.StreamError.AlreadyExists
+ldarg 0
+ldloc unionDefault1_5
+stfld System.IO.StreamError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.IO.StreamError.Closed
+ldarg 0
+ldloc unionDefault1_6
+stfld System.IO.StreamError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.IO.StreamError.InvalidRange
+ldarg 0
+ldloc unionDefault1_7
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.IO.StreamError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_8
+stfld System.IO.StreamError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.IO.StreamError.WrongAccess
+ldarg 0
+ldloc unionDefault1_9
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.IO.StreamError.IoFailure
+ldarg 0
+ldloc unionDefault1_10
+stfld System.IO.StreamError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000006_IL_0007:
+ldc.i4 3
 M00000006_IL_0008:
-value.unpack System.IO.StreamError.NotFound
-M00000006_IL_000d:
-ret
-.end
-.method instance .ctor(System.IO.StreamError.AccessDenied value) -> Void
-ldarg value
-value.pack System.IO.StreamError.AccessDenied
-newobj System.IO.StreamError
-starg this
+stloc local0
+M00000006_IL_0009:
+ldarg 0
+M00000006_IL_000a:
+ldloc local0
+M00000006_IL_000b:
+conv.u1
+M00000006_IL_000c:
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+M00000006_IL_0011:
+ldarg 1
+M00000006_IL_0012:
+stloc local1
+M00000006_IL_0013:
+ldarg 0
+M00000006_IL_0014:
+ldloc local1
+M00000006_IL_0015:
+stfld System.IO.StreamError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000006_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsAccessDenied() -> Boolean
+.method instance byref TryGetValue(out(true) System.IO.StreamError.AccessDenied& value) -> Boolean
+M00000007_IL_0000:
+ldarg 0
+M00000007_IL_0001:
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000007_IL_0006:
+conv.i4
+M00000007_IL_0007:
+ldc.i4 3
+M00000007_IL_0008:
+conv.i4
+M00000007_IL_0009:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_000b:
+brtrue M00000007_IL_0015
+M00000007_IL_0010:
+br M00000007_IL_0023
+M00000007_IL_0015:
+ldarg 1
+M00000007_IL_0016:
+ldarg 0
+M00000007_IL_0017:
+ldfld System.IO.StreamError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+M00000007_IL_001c:
+stobj System.IO.StreamError.AccessDenied
+M00000007_IL_0021:
+ldc.i4 1
+M00000007_IL_0022:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000007_IL_0023:
+M00000007_IL_0024:
+ldc.i4 0
+M00000007_IL_0025:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.IO.StreamError.WrongKind value) -> Void
+.local Byte local0
+.local System.IO.StreamError.WrongKind local1
+.local Byte unionDefault1_0
+.local System.IO.StreamError.InvalidPath unionDefault1_1
+.local System.IO.StreamError.NotFound unionDefault1_2
+.local System.IO.StreamError.AccessDenied unionDefault1_3
+.local System.IO.StreamError.WrongKind unionDefault1_4
+.local System.IO.StreamError.AlreadyExists unionDefault1_5
+.local System.IO.StreamError.Closed unionDefault1_6
+.local System.IO.StreamError.InvalidRange unionDefault1_7
+.local System.IO.StreamError.LimitExceeded unionDefault1_8
+.local System.IO.StreamError.WrongAccess unionDefault1_9
+.local System.IO.StreamError.IoFailure unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.IO.StreamError.WrongKind
 M00000008_IL_0000:
+ldarg 0
 M00000008_IL_0001:
-M00000008_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000008_IL_0003:
-ldfld System.IO.StreamError::Stored
+ldloc unionDefault1_0
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.IO.StreamError.InvalidPath
+ldarg 0
+ldloc unionDefault1_1
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.IO.StreamError.NotFound
+ldarg 0
+ldloc unionDefault1_2
+stfld System.IO.StreamError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.IO.StreamError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.IO.StreamError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.IO.StreamError.WrongKind
+ldarg 0
+ldloc unionDefault1_4
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.IO.StreamError.AlreadyExists
+ldarg 0
+ldloc unionDefault1_5
+stfld System.IO.StreamError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.IO.StreamError.Closed
+ldarg 0
+ldloc unionDefault1_6
+stfld System.IO.StreamError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.IO.StreamError.InvalidRange
+ldarg 0
+ldloc unionDefault1_7
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.IO.StreamError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_8
+stfld System.IO.StreamError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.IO.StreamError.WrongAccess
+ldarg 0
+ldloc unionDefault1_9
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.IO.StreamError.IoFailure
+ldarg 0
+ldloc unionDefault1_10
+stfld System.IO.StreamError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000008_IL_0007:
+ldc.i4 4
 M00000008_IL_0008:
-value.is System.IO.StreamError.AccessDenied
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M00000008_IL_000d:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+stloc local0
+M00000008_IL_0009:
+ldarg 0
+M00000008_IL_000a:
+ldloc local0
+M00000008_IL_000b:
+conv.u1
+M00000008_IL_000c:
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+M00000008_IL_0011:
+ldarg 1
+M00000008_IL_0012:
+stloc local1
+M00000008_IL_0013:
+ldarg 0
+M00000008_IL_0014:
+ldloc local1
+M00000008_IL_0015:
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+M00000008_IL_001a:
+ldvoid
 ret
 .end
-.method instance GetAccessDenied() -> System.IO.StreamError.AccessDenied
+.method instance byref TryGetValue(out(true) System.IO.StreamError.WrongKind& value) -> Boolean
 M00000009_IL_0000:
+ldarg 0
 M00000009_IL_0001:
-M00000009_IL_0002:
-ldarg 0
-M00000009_IL_0003:
-ldfld System.IO.StreamError::Stored
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000009_IL_0006:
+conv.i4
+M00000009_IL_0007:
+ldc.i4 4
 M00000009_IL_0008:
-value.unpack System.IO.StreamError.AccessDenied
-M00000009_IL_000d:
+conv.i4
+M00000009_IL_0009:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_000b:
+brtrue M00000009_IL_0015
+M00000009_IL_0010:
+br M00000009_IL_0023
+M00000009_IL_0015:
+ldarg 1
+M00000009_IL_0016:
+ldarg 0
+M00000009_IL_0017:
+ldfld System.IO.StreamError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+M00000009_IL_001c:
+stobj System.IO.StreamError.WrongKind
+M00000009_IL_0021:
+ldc.i4 1
+M00000009_IL_0022:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000009_IL_0023:
+M00000009_IL_0024:
+ldc.i4 0
+M00000009_IL_0025:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance .ctor(System.IO.StreamError.WrongKind value) -> Void
-ldarg value
-value.pack System.IO.StreamError.WrongKind
-newobj System.IO.StreamError
-starg this
+.method instance byref .ctor(System.IO.StreamError.AlreadyExists value) -> Void
+.local Byte local0
+.local System.IO.StreamError.AlreadyExists local1
+.local Byte unionDefault1_0
+.local System.IO.StreamError.InvalidPath unionDefault1_1
+.local System.IO.StreamError.NotFound unionDefault1_2
+.local System.IO.StreamError.AccessDenied unionDefault1_3
+.local System.IO.StreamError.WrongKind unionDefault1_4
+.local System.IO.StreamError.AlreadyExists unionDefault1_5
+.local System.IO.StreamError.Closed unionDefault1_6
+.local System.IO.StreamError.InvalidRange unionDefault1_7
+.local System.IO.StreamError.LimitExceeded unionDefault1_8
+.local System.IO.StreamError.WrongAccess unionDefault1_9
+.local System.IO.StreamError.IoFailure unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.IO.StreamError.AlreadyExists
+M0000000a_IL_0000:
+ldarg 0
+M0000000a_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.IO.StreamError.InvalidPath
+ldarg 0
+ldloc unionDefault1_1
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.IO.StreamError.NotFound
+ldarg 0
+ldloc unionDefault1_2
+stfld System.IO.StreamError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.IO.StreamError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.IO.StreamError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.IO.StreamError.WrongKind
+ldarg 0
+ldloc unionDefault1_4
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.IO.StreamError.AlreadyExists
+ldarg 0
+ldloc unionDefault1_5
+stfld System.IO.StreamError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.IO.StreamError.Closed
+ldarg 0
+ldloc unionDefault1_6
+stfld System.IO.StreamError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.IO.StreamError.InvalidRange
+ldarg 0
+ldloc unionDefault1_7
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.IO.StreamError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_8
+stfld System.IO.StreamError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.IO.StreamError.WrongAccess
+ldarg 0
+ldloc unionDefault1_9
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.IO.StreamError.IoFailure
+ldarg 0
+ldloc unionDefault1_10
+stfld System.IO.StreamError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M0000000a_IL_0007:
+ldc.i4 5
+M0000000a_IL_0008:
+stloc local0
+M0000000a_IL_0009:
+ldarg 0
+M0000000a_IL_000a:
+ldloc local0
+M0000000a_IL_000b:
+conv.u1
+M0000000a_IL_000c:
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+M0000000a_IL_0011:
+ldarg 1
+M0000000a_IL_0012:
+stloc local1
+M0000000a_IL_0013:
+ldarg 0
+M0000000a_IL_0014:
+ldloc local1
+M0000000a_IL_0015:
+stfld System.IO.StreamError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+M0000000a_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsWrongKind() -> Boolean
+.method instance byref TryGetValue(out(true) System.IO.StreamError.AlreadyExists& value) -> Boolean
 M0000000b_IL_0000:
+ldarg 0
 M0000000b_IL_0001:
-M0000000b_IL_0002:
-ldarg 0
-M0000000b_IL_0003:
-ldfld System.IO.StreamError::Stored
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M0000000b_IL_0006:
+conv.i4
+M0000000b_IL_0007:
+ldc.i4 5
 M0000000b_IL_0008:
-value.is System.IO.StreamError.WrongKind
+conv.i4
+M0000000b_IL_0009:
+ceq
 call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M0000000b_IL_000d:
+M0000000b_IL_000b:
+brtrue M0000000b_IL_0015
+M0000000b_IL_0010:
+br M0000000b_IL_0023
+M0000000b_IL_0015:
+ldarg 1
+M0000000b_IL_0016:
+ldarg 0
+M0000000b_IL_0017:
+ldfld System.IO.StreamError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+M0000000b_IL_001c:
+stobj System.IO.StreamError.AlreadyExists
+M0000000b_IL_0021:
+ldc.i4 1
+M0000000b_IL_0022:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000b_IL_0023:
+M0000000b_IL_0024:
+ldc.i4 0
+M0000000b_IL_0025:
 call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetWrongKind() -> System.IO.StreamError.WrongKind
+.method instance byref .ctor(System.IO.StreamError.Closed value) -> Void
+.local Byte local0
+.local System.IO.StreamError.Closed local1
+.local Byte unionDefault1_0
+.local System.IO.StreamError.InvalidPath unionDefault1_1
+.local System.IO.StreamError.NotFound unionDefault1_2
+.local System.IO.StreamError.AccessDenied unionDefault1_3
+.local System.IO.StreamError.WrongKind unionDefault1_4
+.local System.IO.StreamError.AlreadyExists unionDefault1_5
+.local System.IO.StreamError.Closed unionDefault1_6
+.local System.IO.StreamError.InvalidRange unionDefault1_7
+.local System.IO.StreamError.LimitExceeded unionDefault1_8
+.local System.IO.StreamError.WrongAccess unionDefault1_9
+.local System.IO.StreamError.IoFailure unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.IO.StreamError.Closed
 M0000000c_IL_0000:
+ldarg 0
 M0000000c_IL_0001:
-M0000000c_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M0000000c_IL_0003:
-ldfld System.IO.StreamError::Stored
+ldloc unionDefault1_0
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.IO.StreamError.InvalidPath
+ldarg 0
+ldloc unionDefault1_1
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.IO.StreamError.NotFound
+ldarg 0
+ldloc unionDefault1_2
+stfld System.IO.StreamError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.IO.StreamError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.IO.StreamError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.IO.StreamError.WrongKind
+ldarg 0
+ldloc unionDefault1_4
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.IO.StreamError.AlreadyExists
+ldarg 0
+ldloc unionDefault1_5
+stfld System.IO.StreamError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.IO.StreamError.Closed
+ldarg 0
+ldloc unionDefault1_6
+stfld System.IO.StreamError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.IO.StreamError.InvalidRange
+ldarg 0
+ldloc unionDefault1_7
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.IO.StreamError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_8
+stfld System.IO.StreamError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.IO.StreamError.WrongAccess
+ldarg 0
+ldloc unionDefault1_9
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.IO.StreamError.IoFailure
+ldarg 0
+ldloc unionDefault1_10
+stfld System.IO.StreamError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M0000000c_IL_0007:
+ldc.i4 6
 M0000000c_IL_0008:
-value.unpack System.IO.StreamError.WrongKind
-M0000000c_IL_000d:
-ret
-.end
-.method instance .ctor(System.IO.StreamError.AlreadyExists value) -> Void
-ldarg value
-value.pack System.IO.StreamError.AlreadyExists
-newobj System.IO.StreamError
-starg this
+stloc local0
+M0000000c_IL_0009:
+ldarg 0
+M0000000c_IL_000a:
+ldloc local0
+M0000000c_IL_000b:
+conv.u1
+M0000000c_IL_000c:
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+M0000000c_IL_0011:
+ldarg 1
+M0000000c_IL_0012:
+stloc local1
+M0000000c_IL_0013:
+ldarg 0
+M0000000c_IL_0014:
+ldloc local1
+M0000000c_IL_0015:
+stfld System.IO.StreamError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+M0000000c_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsAlreadyExists() -> Boolean
+.method instance byref TryGetValue(out(true) System.IO.StreamError.Closed& value) -> Boolean
+M0000000d_IL_0000:
+ldarg 0
+M0000000d_IL_0001:
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M0000000d_IL_0006:
+conv.i4
+M0000000d_IL_0007:
+ldc.i4 6
+M0000000d_IL_0008:
+conv.i4
+M0000000d_IL_0009:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_000b:
+brtrue M0000000d_IL_0015
+M0000000d_IL_0010:
+br M0000000d_IL_0023
+M0000000d_IL_0015:
+ldarg 1
+M0000000d_IL_0016:
+ldarg 0
+M0000000d_IL_0017:
+ldfld System.IO.StreamError::Metadata_V1_3C436C6F7365645061796C6F61643E
+M0000000d_IL_001c:
+stobj System.IO.StreamError.Closed
+M0000000d_IL_0021:
+ldc.i4 1
+M0000000d_IL_0022:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000d_IL_0023:
+M0000000d_IL_0024:
+ldc.i4 0
+M0000000d_IL_0025:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.IO.StreamError.InvalidRange value) -> Void
+.local Byte local0
+.local System.IO.StreamError.InvalidRange local1
+.local Byte unionDefault1_0
+.local System.IO.StreamError.InvalidPath unionDefault1_1
+.local System.IO.StreamError.NotFound unionDefault1_2
+.local System.IO.StreamError.AccessDenied unionDefault1_3
+.local System.IO.StreamError.WrongKind unionDefault1_4
+.local System.IO.StreamError.AlreadyExists unionDefault1_5
+.local System.IO.StreamError.Closed unionDefault1_6
+.local System.IO.StreamError.InvalidRange unionDefault1_7
+.local System.IO.StreamError.LimitExceeded unionDefault1_8
+.local System.IO.StreamError.WrongAccess unionDefault1_9
+.local System.IO.StreamError.IoFailure unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.IO.StreamError.InvalidRange
 M0000000e_IL_0000:
+ldarg 0
 M0000000e_IL_0001:
-M0000000e_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M0000000e_IL_0003:
-ldfld System.IO.StreamError::Stored
+ldloc unionDefault1_0
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.IO.StreamError.InvalidPath
+ldarg 0
+ldloc unionDefault1_1
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.IO.StreamError.NotFound
+ldarg 0
+ldloc unionDefault1_2
+stfld System.IO.StreamError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.IO.StreamError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.IO.StreamError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.IO.StreamError.WrongKind
+ldarg 0
+ldloc unionDefault1_4
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.IO.StreamError.AlreadyExists
+ldarg 0
+ldloc unionDefault1_5
+stfld System.IO.StreamError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.IO.StreamError.Closed
+ldarg 0
+ldloc unionDefault1_6
+stfld System.IO.StreamError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.IO.StreamError.InvalidRange
+ldarg 0
+ldloc unionDefault1_7
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.IO.StreamError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_8
+stfld System.IO.StreamError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.IO.StreamError.WrongAccess
+ldarg 0
+ldloc unionDefault1_9
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.IO.StreamError.IoFailure
+ldarg 0
+ldloc unionDefault1_10
+stfld System.IO.StreamError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M0000000e_IL_0007:
+ldc.i4 7
 M0000000e_IL_0008:
-value.is System.IO.StreamError.AlreadyExists
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M0000000e_IL_000d:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+stloc local0
+M0000000e_IL_0009:
+ldarg 0
+M0000000e_IL_000a:
+ldloc local0
+M0000000e_IL_000b:
+conv.u1
+M0000000e_IL_000c:
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+M0000000e_IL_0011:
+ldarg 1
+M0000000e_IL_0012:
+stloc local1
+M0000000e_IL_0013:
+ldarg 0
+M0000000e_IL_0014:
+ldloc local1
+M0000000e_IL_0015:
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M0000000e_IL_001a:
+ldvoid
 ret
 .end
-.method instance GetAlreadyExists() -> System.IO.StreamError.AlreadyExists
+.method instance byref TryGetValue(out(true) System.IO.StreamError.InvalidRange& value) -> Boolean
 M0000000f_IL_0000:
+ldarg 0
 M0000000f_IL_0001:
-M0000000f_IL_0002:
-ldarg 0
-M0000000f_IL_0003:
-ldfld System.IO.StreamError::Stored
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M0000000f_IL_0006:
+conv.i4
+M0000000f_IL_0007:
+ldc.i4 7
 M0000000f_IL_0008:
-value.unpack System.IO.StreamError.AlreadyExists
-M0000000f_IL_000d:
+conv.i4
+M0000000f_IL_0009:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_000b:
+brtrue M0000000f_IL_0015
+M0000000f_IL_0010:
+br M0000000f_IL_0023
+M0000000f_IL_0015:
+ldarg 1
+M0000000f_IL_0016:
+ldarg 0
+M0000000f_IL_0017:
+ldfld System.IO.StreamError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+M0000000f_IL_001c:
+stobj System.IO.StreamError.InvalidRange
+M0000000f_IL_0021:
+ldc.i4 1
+M0000000f_IL_0022:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000f_IL_0023:
+M0000000f_IL_0024:
+ldc.i4 0
+M0000000f_IL_0025:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance .ctor(System.IO.StreamError.Closed value) -> Void
-ldarg value
-value.pack System.IO.StreamError.Closed
-newobj System.IO.StreamError
-starg this
+.method instance byref .ctor(System.IO.StreamError.LimitExceeded value) -> Void
+.local Byte local0
+.local System.IO.StreamError.LimitExceeded local1
+.local Byte unionDefault1_0
+.local System.IO.StreamError.InvalidPath unionDefault1_1
+.local System.IO.StreamError.NotFound unionDefault1_2
+.local System.IO.StreamError.AccessDenied unionDefault1_3
+.local System.IO.StreamError.WrongKind unionDefault1_4
+.local System.IO.StreamError.AlreadyExists unionDefault1_5
+.local System.IO.StreamError.Closed unionDefault1_6
+.local System.IO.StreamError.InvalidRange unionDefault1_7
+.local System.IO.StreamError.LimitExceeded unionDefault1_8
+.local System.IO.StreamError.WrongAccess unionDefault1_9
+.local System.IO.StreamError.IoFailure unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.IO.StreamError.LimitExceeded
+M00000010_IL_0000:
+ldarg 0
+M00000010_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.IO.StreamError.InvalidPath
+ldarg 0
+ldloc unionDefault1_1
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.IO.StreamError.NotFound
+ldarg 0
+ldloc unionDefault1_2
+stfld System.IO.StreamError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.IO.StreamError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.IO.StreamError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.IO.StreamError.WrongKind
+ldarg 0
+ldloc unionDefault1_4
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.IO.StreamError.AlreadyExists
+ldarg 0
+ldloc unionDefault1_5
+stfld System.IO.StreamError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.IO.StreamError.Closed
+ldarg 0
+ldloc unionDefault1_6
+stfld System.IO.StreamError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.IO.StreamError.InvalidRange
+ldarg 0
+ldloc unionDefault1_7
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.IO.StreamError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_8
+stfld System.IO.StreamError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.IO.StreamError.WrongAccess
+ldarg 0
+ldloc unionDefault1_9
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.IO.StreamError.IoFailure
+ldarg 0
+ldloc unionDefault1_10
+stfld System.IO.StreamError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000010_IL_0007:
+ldc.i4 8
+M00000010_IL_0008:
+stloc local0
+M00000010_IL_0009:
+ldarg 0
+M00000010_IL_000a:
+ldloc local0
+M00000010_IL_000b:
+conv.u1
+M00000010_IL_000c:
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+M00000010_IL_0011:
+ldarg 1
+M00000010_IL_0012:
+stloc local1
+M00000010_IL_0013:
+ldarg 0
+M00000010_IL_0014:
+ldloc local1
+M00000010_IL_0015:
+stfld System.IO.StreamError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000010_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsClosed() -> Boolean
+.method instance byref TryGetValue(out(true) System.IO.StreamError.LimitExceeded& value) -> Boolean
 M00000011_IL_0000:
+ldarg 0
 M00000011_IL_0001:
-M00000011_IL_0002:
-ldarg 0
-M00000011_IL_0003:
-ldfld System.IO.StreamError::Stored
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000011_IL_0006:
+conv.i4
+M00000011_IL_0007:
+ldc.i4 8
 M00000011_IL_0008:
-value.is System.IO.StreamError.Closed
+conv.i4
+M00000011_IL_0009:
+ceq
 call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M00000011_IL_000d:
+M00000011_IL_000b:
+brtrue M00000011_IL_0015
+M00000011_IL_0010:
+br M00000011_IL_0023
+M00000011_IL_0015:
+ldarg 1
+M00000011_IL_0016:
+ldarg 0
+M00000011_IL_0017:
+ldfld System.IO.StreamError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+M00000011_IL_001c:
+stobj System.IO.StreamError.LimitExceeded
+M00000011_IL_0021:
+ldc.i4 1
+M00000011_IL_0022:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000011_IL_0023:
+M00000011_IL_0024:
+ldc.i4 0
+M00000011_IL_0025:
 call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetClosed() -> System.IO.StreamError.Closed
+.method instance byref .ctor(System.IO.StreamError.WrongAccess value) -> Void
+.local Byte local0
+.local System.IO.StreamError.WrongAccess local1
+.local Byte unionDefault1_0
+.local System.IO.StreamError.InvalidPath unionDefault1_1
+.local System.IO.StreamError.NotFound unionDefault1_2
+.local System.IO.StreamError.AccessDenied unionDefault1_3
+.local System.IO.StreamError.WrongKind unionDefault1_4
+.local System.IO.StreamError.AlreadyExists unionDefault1_5
+.local System.IO.StreamError.Closed unionDefault1_6
+.local System.IO.StreamError.InvalidRange unionDefault1_7
+.local System.IO.StreamError.LimitExceeded unionDefault1_8
+.local System.IO.StreamError.WrongAccess unionDefault1_9
+.local System.IO.StreamError.IoFailure unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.IO.StreamError.WrongAccess
 M00000012_IL_0000:
+ldarg 0
 M00000012_IL_0001:
-M00000012_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000012_IL_0003:
-ldfld System.IO.StreamError::Stored
-M00000012_IL_0008:
-value.unpack System.IO.StreamError.Closed
+ldloc unionDefault1_0
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.IO.StreamError.InvalidPath
+ldarg 0
+ldloc unionDefault1_1
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.IO.StreamError.NotFound
+ldarg 0
+ldloc unionDefault1_2
+stfld System.IO.StreamError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.IO.StreamError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.IO.StreamError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.IO.StreamError.WrongKind
+ldarg 0
+ldloc unionDefault1_4
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.IO.StreamError.AlreadyExists
+ldarg 0
+ldloc unionDefault1_5
+stfld System.IO.StreamError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.IO.StreamError.Closed
+ldarg 0
+ldloc unionDefault1_6
+stfld System.IO.StreamError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.IO.StreamError.InvalidRange
+ldarg 0
+ldloc unionDefault1_7
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.IO.StreamError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_8
+stfld System.IO.StreamError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.IO.StreamError.WrongAccess
+ldarg 0
+ldloc unionDefault1_9
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.IO.StreamError.IoFailure
+ldarg 0
+ldloc unionDefault1_10
+stfld System.IO.StreamError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000012_IL_0007:
+ldc.i4 9
+M00000012_IL_0009:
+stloc local0
+M00000012_IL_000a:
+ldarg 0
+M00000012_IL_000b:
+ldloc local0
+M00000012_IL_000c:
+conv.u1
 M00000012_IL_000d:
-ret
-.end
-.method instance .ctor(System.IO.StreamError.InvalidRange value) -> Void
-ldarg value
-value.pack System.IO.StreamError.InvalidRange
-newobj System.IO.StreamError
-starg this
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+M00000012_IL_0012:
+ldarg 1
+M00000012_IL_0013:
+stloc local1
+M00000012_IL_0014:
+ldarg 0
+M00000012_IL_0015:
+ldloc local1
+M00000012_IL_0016:
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+M00000012_IL_001b:
 ldvoid
 ret
 .end
-.method instance get_IsInvalidRange() -> Boolean
+.method instance byref TryGetValue(out(true) System.IO.StreamError.WrongAccess& value) -> Boolean
+M00000013_IL_0000:
+ldarg 0
+M00000013_IL_0001:
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000013_IL_0006:
+conv.i4
+M00000013_IL_0007:
+ldc.i4 9
+M00000013_IL_0009:
+conv.i4
+M00000013_IL_000a:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_000c:
+brtrue M00000013_IL_0016
+M00000013_IL_0011:
+br M00000013_IL_0024
+M00000013_IL_0016:
+ldarg 1
+M00000013_IL_0017:
+ldarg 0
+M00000013_IL_0018:
+ldfld System.IO.StreamError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+M00000013_IL_001d:
+stobj System.IO.StreamError.WrongAccess
+M00000013_IL_0022:
+ldc.i4 1
+M00000013_IL_0023:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000013_IL_0024:
+M00000013_IL_0025:
+ldc.i4 0
+M00000013_IL_0026:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.IO.StreamError.IoFailure value) -> Void
+.local Byte local0
+.local System.IO.StreamError.IoFailure local1
+.local Byte unionDefault1_0
+.local System.IO.StreamError.InvalidPath unionDefault1_1
+.local System.IO.StreamError.NotFound unionDefault1_2
+.local System.IO.StreamError.AccessDenied unionDefault1_3
+.local System.IO.StreamError.WrongKind unionDefault1_4
+.local System.IO.StreamError.AlreadyExists unionDefault1_5
+.local System.IO.StreamError.Closed unionDefault1_6
+.local System.IO.StreamError.InvalidRange unionDefault1_7
+.local System.IO.StreamError.LimitExceeded unionDefault1_8
+.local System.IO.StreamError.WrongAccess unionDefault1_9
+.local System.IO.StreamError.IoFailure unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.IO.StreamError.IoFailure
 M00000014_IL_0000:
+ldarg 0
 M00000014_IL_0001:
-M00000014_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000014_IL_0003:
-ldfld System.IO.StreamError::Stored
-M00000014_IL_0008:
-value.is System.IO.StreamError.InvalidRange
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+ldloc unionDefault1_0
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.IO.StreamError.InvalidPath
+ldarg 0
+ldloc unionDefault1_1
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.IO.StreamError.NotFound
+ldarg 0
+ldloc unionDefault1_2
+stfld System.IO.StreamError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.IO.StreamError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.IO.StreamError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.IO.StreamError.WrongKind
+ldarg 0
+ldloc unionDefault1_4
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.IO.StreamError.AlreadyExists
+ldarg 0
+ldloc unionDefault1_5
+stfld System.IO.StreamError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.IO.StreamError.Closed
+ldarg 0
+ldloc unionDefault1_6
+stfld System.IO.StreamError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.IO.StreamError.InvalidRange
+ldarg 0
+ldloc unionDefault1_7
+stfld System.IO.StreamError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.IO.StreamError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_8
+stfld System.IO.StreamError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.IO.StreamError.WrongAccess
+ldarg 0
+ldloc unionDefault1_9
+stfld System.IO.StreamError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.IO.StreamError.IoFailure
+ldarg 0
+ldloc unionDefault1_10
+stfld System.IO.StreamError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000014_IL_0007:
+ldc.i4 10
+M00000014_IL_0009:
+stloc local0
+M00000014_IL_000a:
+ldarg 0
+M00000014_IL_000b:
+ldloc local0
+M00000014_IL_000c:
+conv.u1
 M00000014_IL_000d:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+stfld System.IO.StreamError::Metadata_V1_3C5461673E
+pop
+M00000014_IL_0012:
+ldarg 1
+M00000014_IL_0013:
+stloc local1
+M00000014_IL_0014:
+ldarg 0
+M00000014_IL_0015:
+ldloc local1
+M00000014_IL_0016:
+stfld System.IO.StreamError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000014_IL_001b:
+ldvoid
 ret
 .end
-.method instance GetInvalidRange() -> System.IO.StreamError.InvalidRange
+.method instance byref TryGetValue(out(true) System.IO.StreamError.IoFailure& value) -> Boolean
 M00000015_IL_0000:
+ldarg 0
 M00000015_IL_0001:
-M00000015_IL_0002:
-ldarg 0
-M00000015_IL_0003:
-ldfld System.IO.StreamError::Stored
-M00000015_IL_0008:
-value.unpack System.IO.StreamError.InvalidRange
-M00000015_IL_000d:
-ret
-.end
-.method instance .ctor(System.IO.StreamError.LimitExceeded value) -> Void
-ldarg value
-value.pack System.IO.StreamError.LimitExceeded
-newobj System.IO.StreamError
-starg this
-ldvoid
-ret
-.end
-.method instance get_IsLimitExceeded() -> Boolean
-M00000017_IL_0000:
-M00000017_IL_0001:
-M00000017_IL_0002:
-ldarg 0
-M00000017_IL_0003:
-ldfld System.IO.StreamError::Stored
-M00000017_IL_0008:
-value.is System.IO.StreamError.LimitExceeded
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000015_IL_0006:
+conv.i4
+M00000015_IL_0007:
+ldc.i4 10
+M00000015_IL_0009:
+conv.i4
+M00000015_IL_000a:
+ceq
 call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M00000017_IL_000d:
+M00000015_IL_000c:
+brtrue M00000015_IL_0016
+M00000015_IL_0011:
+br M00000015_IL_0024
+M00000015_IL_0016:
+ldarg 1
+M00000015_IL_0017:
+ldarg 0
+M00000015_IL_0018:
+ldfld System.IO.StreamError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+M00000015_IL_001d:
+stobj System.IO.StreamError.IoFailure
+M00000015_IL_0022:
+ldc.i4 1
+M00000015_IL_0023:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000015_IL_0024:
+M00000015_IL_0025:
+ldc.i4 0
+M00000015_IL_0026:
 call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetLimitExceeded() -> System.IO.StreamError.LimitExceeded
-M00000018_IL_0000:
-M00000018_IL_0001:
-M00000018_IL_0002:
+.method instance override byref ToString() -> String
+.local System.IO.StreamError local0
+.local String local1
+.local System.IO.StreamError local2
+.local System.IO.StreamError.InvalidPath local3
+.local System.IO.StreamError local4
+.local System.IO.StreamError.NotFound local5
+.local System.IO.StreamError local6
+.local System.IO.StreamError.AccessDenied local7
+.local System.IO.StreamError local8
+.local System.IO.StreamError.WrongKind local9
+.local System.IO.StreamError local10
+.local System.IO.StreamError.AlreadyExists local11
+.local System.IO.StreamError local12
+.local System.IO.StreamError.Closed local13
+.local System.IO.StreamError local14
+.local System.IO.StreamError.InvalidRange local15
+.local System.IO.StreamError local16
+.local System.IO.StreamError.LimitExceeded local17
+.local System.IO.StreamError local18
+.local System.IO.StreamError.WrongAccess local19
+.local System.IO.StreamError local20
+.local System.IO.StreamError.IoFailure local21
+ldloca local0
+initobj System.IO.StreamError
+ldloca local2
+initobj System.IO.StreamError
+ldloca local3
+initobj System.IO.StreamError.InvalidPath
+ldloca local4
+initobj System.IO.StreamError
+ldloca local5
+initobj System.IO.StreamError.NotFound
+ldloca local6
+initobj System.IO.StreamError
+ldloca local7
+initobj System.IO.StreamError.AccessDenied
+ldloca local8
+initobj System.IO.StreamError
+ldloca local9
+initobj System.IO.StreamError.WrongKind
+ldloca local10
+initobj System.IO.StreamError
+ldloca local11
+initobj System.IO.StreamError.AlreadyExists
+ldloca local12
+initobj System.IO.StreamError
+ldloca local13
+initobj System.IO.StreamError.Closed
+ldloca local14
+initobj System.IO.StreamError
+ldloca local15
+initobj System.IO.StreamError.InvalidRange
+ldloca local16
+initobj System.IO.StreamError
+ldloca local17
+initobj System.IO.StreamError.LimitExceeded
+ldloca local18
+initobj System.IO.StreamError
+ldloca local19
+initobj System.IO.StreamError.WrongAccess
+ldloca local20
+initobj System.IO.StreamError
+ldloca local21
+initobj System.IO.StreamError.IoFailure
+M00000016_IL_0000:
+M00000016_IL_0001:
+M00000016_IL_0002:
+M00000016_IL_0003:
 ldarg 0
-M00000018_IL_0003:
-ldfld System.IO.StreamError::Stored
-M00000018_IL_0008:
-value.unpack System.IO.StreamError.LimitExceeded
-M00000018_IL_000d:
-ret
-.end
-.method instance .ctor(System.IO.StreamError.WrongAccess value) -> Void
-ldarg value
-value.pack System.IO.StreamError.WrongAccess
-newobj System.IO.StreamError
-starg this
-ldvoid
-ret
-.end
-.method instance get_IsWrongAccess() -> Boolean
-M0000001a_IL_0000:
-M0000001a_IL_0001:
-M0000001a_IL_0002:
-ldarg 0
-M0000001a_IL_0003:
-ldfld System.IO.StreamError::Stored
-M0000001a_IL_0008:
-value.is System.IO.StreamError.WrongAccess
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M0000001a_IL_000d:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method instance GetWrongAccess() -> System.IO.StreamError.WrongAccess
-M0000001b_IL_0000:
-M0000001b_IL_0001:
-M0000001b_IL_0002:
-ldarg 0
-M0000001b_IL_0003:
-ldfld System.IO.StreamError::Stored
-M0000001b_IL_0008:
-value.unpack System.IO.StreamError.WrongAccess
-M0000001b_IL_000d:
-ret
-.end
-.method instance .ctor(System.IO.StreamError.IoFailure value) -> Void
-ldarg value
-value.pack System.IO.StreamError.IoFailure
-newobj System.IO.StreamError
-starg this
-ldvoid
-ret
-.end
-.method instance get_IsIoFailure() -> Boolean
-M0000001d_IL_0000:
-M0000001d_IL_0001:
-M0000001d_IL_0002:
-ldarg 0
-M0000001d_IL_0003:
-ldfld System.IO.StreamError::Stored
-M0000001d_IL_0008:
-value.is System.IO.StreamError.IoFailure
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M0000001d_IL_000d:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method instance GetIoFailure() -> System.IO.StreamError.IoFailure
-M0000001e_IL_0000:
-M0000001e_IL_0001:
-M0000001e_IL_0002:
-ldarg 0
-M0000001e_IL_0003:
-ldfld System.IO.StreamError::Stored
-M0000001e_IL_0008:
-value.unpack System.IO.StreamError.IoFailure
-M0000001e_IL_000d:
-ret
-.end
-.method instance ToString() -> String
-M0000001f_IL_0000:
-M0000001f_IL_0001:
-M0000001f_IL_0002:
-ldarg 0
-M0000001f_IL_0003:
-call instance System.IO.StreamError::get_IsInvalidPath()
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M0000001f_IL_0008:
-brtrue M0000001f_IL_0012
-M0000001f_IL_000d:
-br M0000001f_IL_0019
-M0000001f_IL_0012:
-M0000001f_IL_0013:
+M00000016_IL_0004:
+ldobj System.IO.StreamError
+M00000016_IL_0009:
+stloc local0
+M00000016_IL_000a:
+M00000016_IL_000b:
+ldloc local0
+M00000016_IL_000c:
+stloc local2
+M00000016_IL_000d:
+ldloca local2
+M00000016_IL_000f:
+ldloca local3
+M00000016_IL_0011:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.InvalidPath&)
+M00000016_IL_0016:
+brfalse M00000016_IL_0034
+M00000016_IL_001b:
+ldloc local3
+M00000016_IL_001c:
+pop
+M00000016_IL_001d:
+M00000016_IL_001e:
+br M00000016_IL_0029
+M00000016_IL_0029:
 ldstr "InvalidPath"
-M0000001f_IL_0018:
-ret
-M0000001f_IL_0019:
-M0000001f_IL_001a:
-M0000001f_IL_001b:
-ldarg 0
-M0000001f_IL_001c:
-call instance System.IO.StreamError::get_IsNotFound()
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M0000001f_IL_0021:
-brtrue M0000001f_IL_002b
-M0000001f_IL_0026:
-br M0000001f_IL_0032
-M0000001f_IL_002b:
-M0000001f_IL_002c:
+M00000016_IL_002e:
+stloc local1
+M00000016_IL_002f:
+br M00000016_IL_01e2
+M00000016_IL_0034:
+M00000016_IL_0035:
+M00000016_IL_0036:
+ldloc local0
+M00000016_IL_0037:
+stloc local4
+M00000016_IL_0039:
+ldloca local4
+M00000016_IL_003b:
+ldloca local5
+M00000016_IL_003d:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.NotFound&)
+M00000016_IL_0042:
+brfalse M00000016_IL_0061
+M00000016_IL_0047:
+ldloc local5
+M00000016_IL_0049:
+pop
+M00000016_IL_004a:
+M00000016_IL_004b:
+br M00000016_IL_0056
+M00000016_IL_0056:
 ldstr "NotFound"
-M0000001f_IL_0031:
-ret
-M0000001f_IL_0032:
-M0000001f_IL_0033:
-M0000001f_IL_0034:
-ldarg 0
-M0000001f_IL_0035:
-call instance System.IO.StreamError::get_IsAccessDenied()
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M0000001f_IL_003a:
-brtrue M0000001f_IL_0044
-M0000001f_IL_003f:
-br M0000001f_IL_004b
-M0000001f_IL_0044:
-M0000001f_IL_0045:
+M00000016_IL_005b:
+stloc local1
+M00000016_IL_005c:
+br M00000016_IL_01e2
+M00000016_IL_0061:
+M00000016_IL_0062:
+M00000016_IL_0063:
+ldloc local0
+M00000016_IL_0064:
+stloc local6
+M00000016_IL_0066:
+ldloca local6
+M00000016_IL_0068:
+ldloca local7
+M00000016_IL_006a:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.AccessDenied&)
+M00000016_IL_006f:
+brfalse M00000016_IL_008e
+M00000016_IL_0074:
+ldloc local7
+M00000016_IL_0076:
+pop
+M00000016_IL_0077:
+M00000016_IL_0078:
+br M00000016_IL_0083
+M00000016_IL_0083:
 ldstr "AccessDenied"
-M0000001f_IL_004a:
-ret
-M0000001f_IL_004b:
-M0000001f_IL_004c:
-M0000001f_IL_004d:
-ldarg 0
-M0000001f_IL_004e:
-call instance System.IO.StreamError::get_IsWrongKind()
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M0000001f_IL_0053:
-brtrue M0000001f_IL_005d
-M0000001f_IL_0058:
-br M0000001f_IL_0064
-M0000001f_IL_005d:
-M0000001f_IL_005e:
+M00000016_IL_0088:
+stloc local1
+M00000016_IL_0089:
+br M00000016_IL_01e2
+M00000016_IL_008e:
+M00000016_IL_008f:
+M00000016_IL_0090:
+ldloc local0
+M00000016_IL_0091:
+stloc local8
+M00000016_IL_0093:
+ldloca local8
+M00000016_IL_0095:
+ldloca local9
+M00000016_IL_0097:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.WrongKind&)
+M00000016_IL_009c:
+brfalse M00000016_IL_00bb
+M00000016_IL_00a1:
+ldloc local9
+M00000016_IL_00a3:
+pop
+M00000016_IL_00a4:
+M00000016_IL_00a5:
+br M00000016_IL_00b0
+M00000016_IL_00b0:
 ldstr "WrongKind"
-M0000001f_IL_0063:
-ret
-M0000001f_IL_0064:
-M0000001f_IL_0065:
-M0000001f_IL_0066:
-ldarg 0
-M0000001f_IL_0067:
-call instance System.IO.StreamError::get_IsAlreadyExists()
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M0000001f_IL_006c:
-brtrue M0000001f_IL_0076
-M0000001f_IL_0071:
-br M0000001f_IL_007d
-M0000001f_IL_0076:
-M0000001f_IL_0077:
+M00000016_IL_00b5:
+stloc local1
+M00000016_IL_00b6:
+br M00000016_IL_01e2
+M00000016_IL_00bb:
+M00000016_IL_00bc:
+ldloc local0
+M00000016_IL_00bd:
+stloc local10
+M00000016_IL_00bf:
+ldloca local10
+M00000016_IL_00c1:
+ldloca local11
+M00000016_IL_00c3:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.AlreadyExists&)
+M00000016_IL_00c8:
+brfalse M00000016_IL_00e7
+M00000016_IL_00cd:
+ldloc local11
+M00000016_IL_00cf:
+pop
+M00000016_IL_00d0:
+M00000016_IL_00d1:
+br M00000016_IL_00dc
+M00000016_IL_00dc:
 ldstr "AlreadyExists"
-M0000001f_IL_007c:
-ret
-M0000001f_IL_007d:
-M0000001f_IL_007e:
-M0000001f_IL_007f:
-ldarg 0
-M0000001f_IL_0080:
-call instance System.IO.StreamError::get_IsClosed()
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M0000001f_IL_0085:
-brtrue M0000001f_IL_008f
-M0000001f_IL_008a:
-br M0000001f_IL_0096
-M0000001f_IL_008f:
-M0000001f_IL_0090:
+M00000016_IL_00e1:
+stloc local1
+M00000016_IL_00e2:
+br M00000016_IL_01e2
+M00000016_IL_00e7:
+M00000016_IL_00e8:
+M00000016_IL_00e9:
+ldloc local0
+M00000016_IL_00ea:
+stloc local12
+M00000016_IL_00ec:
+ldloca local12
+M00000016_IL_00ee:
+ldloca local13
+M00000016_IL_00f0:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.Closed&)
+M00000016_IL_00f5:
+brfalse M00000016_IL_0114
+M00000016_IL_00fa:
+ldloc local13
+M00000016_IL_00fc:
+pop
+M00000016_IL_00fd:
+M00000016_IL_00fe:
+br M00000016_IL_0109
+M00000016_IL_0109:
 ldstr "Closed"
-M0000001f_IL_0095:
-ret
-M0000001f_IL_0096:
-M0000001f_IL_0097:
-M0000001f_IL_0098:
-ldarg 0
-M0000001f_IL_0099:
-call instance System.IO.StreamError::get_IsInvalidRange()
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M0000001f_IL_009e:
-brtrue M0000001f_IL_00a8
-M0000001f_IL_00a3:
-br M0000001f_IL_00af
-M0000001f_IL_00a8:
-M0000001f_IL_00a9:
+M00000016_IL_010e:
+stloc local1
+M00000016_IL_010f:
+br M00000016_IL_01e2
+M00000016_IL_0114:
+M00000016_IL_0115:
+M00000016_IL_0116:
+ldloc local0
+M00000016_IL_0117:
+stloc local14
+M00000016_IL_0119:
+ldloca local14
+M00000016_IL_011b:
+ldloca local15
+M00000016_IL_011d:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.InvalidRange&)
+M00000016_IL_0122:
+brfalse M00000016_IL_0141
+M00000016_IL_0127:
+ldloc local15
+M00000016_IL_0129:
+pop
+M00000016_IL_012a:
+M00000016_IL_012b:
+br M00000016_IL_0136
+M00000016_IL_0136:
 ldstr "InvalidRange"
-M0000001f_IL_00ae:
-ret
-M0000001f_IL_00af:
-M0000001f_IL_00b0:
-M0000001f_IL_00b1:
-ldarg 0
-M0000001f_IL_00b2:
-call instance System.IO.StreamError::get_IsLimitExceeded()
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M0000001f_IL_00b7:
-brtrue M0000001f_IL_00c1
-M0000001f_IL_00bc:
-br M0000001f_IL_00c8
-M0000001f_IL_00c1:
-M0000001f_IL_00c2:
+M00000016_IL_013b:
+stloc local1
+M00000016_IL_013c:
+br M00000016_IL_01e2
+M00000016_IL_0141:
+M00000016_IL_0142:
+M00000016_IL_0143:
+ldloc local0
+M00000016_IL_0144:
+stloc local16
+M00000016_IL_0146:
+ldloca local16
+M00000016_IL_0148:
+ldloca local17
+M00000016_IL_014a:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.LimitExceeded&)
+M00000016_IL_014f:
+brfalse M00000016_IL_016e
+M00000016_IL_0154:
+ldloc local17
+M00000016_IL_0156:
+pop
+M00000016_IL_0157:
+M00000016_IL_0158:
+br M00000016_IL_0163
+M00000016_IL_0163:
 ldstr "LimitExceeded"
-M0000001f_IL_00c7:
-ret
-M0000001f_IL_00c8:
-M0000001f_IL_00c9:
-M0000001f_IL_00ca:
-ldarg 0
-M0000001f_IL_00cb:
-call instance System.IO.StreamError::get_IsWrongAccess()
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M0000001f_IL_00d0:
-brtrue M0000001f_IL_00da
-M0000001f_IL_00d5:
-br M0000001f_IL_00e1
-M0000001f_IL_00da:
-M0000001f_IL_00db:
+M00000016_IL_0168:
+stloc local1
+M00000016_IL_0169:
+br M00000016_IL_01e2
+M00000016_IL_016e:
+M00000016_IL_016f:
+M00000016_IL_0170:
+ldloc local0
+M00000016_IL_0171:
+stloc local18
+M00000016_IL_0173:
+ldloca local18
+M00000016_IL_0175:
+ldloca local19
+M00000016_IL_0177:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.WrongAccess&)
+M00000016_IL_017c:
+brfalse M00000016_IL_019b
+M00000016_IL_0181:
+ldloc local19
+M00000016_IL_0183:
+pop
+M00000016_IL_0184:
+M00000016_IL_0185:
+br M00000016_IL_0190
+M00000016_IL_0190:
 ldstr "WrongAccess"
-M0000001f_IL_00e0:
-ret
-M0000001f_IL_00e1:
-M0000001f_IL_00e2:
-M0000001f_IL_00e3:
-ldarg 0
-M0000001f_IL_00e4:
-call instance System.IO.StreamError::get_IsIoFailure()
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
-M0000001f_IL_00e9:
-brtrue M0000001f_IL_00f3
-M0000001f_IL_00ee:
-br M0000001f_IL_00fa
-M0000001f_IL_00f3:
-M0000001f_IL_00f4:
+M00000016_IL_0195:
+stloc local1
+M00000016_IL_0196:
+br M00000016_IL_01e2
+M00000016_IL_019b:
+M00000016_IL_019c:
+M00000016_IL_019d:
+ldloc local0
+M00000016_IL_019e:
+stloc local20
+M00000016_IL_01a0:
+ldloca local20
+M00000016_IL_01a2:
+ldloca local21
+M00000016_IL_01a4:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.IoFailure&)
+M00000016_IL_01a9:
+brfalse M00000016_IL_01c8
+M00000016_IL_01ae:
+ldloc local21
+M00000016_IL_01b0:
+pop
+M00000016_IL_01b1:
+M00000016_IL_01b2:
+br M00000016_IL_01bd
+M00000016_IL_01bd:
 ldstr "IoFailure"
-M0000001f_IL_00f9:
+M00000016_IL_01c2:
+stloc local1
+M00000016_IL_01c3:
+br M00000016_IL_01e2
+M00000016_IL_01c8:
+M00000016_IL_01c9:
+ldloc local0
+M00000016_IL_01ca:
+pop
+M00000016_IL_01cb:
+ldc.i4 1
+M00000016_IL_01cc:
+brfalse M00000016_IL_01dd
+M00000016_IL_01d1:
+M00000016_IL_01d2:
+ldstr "Empty"
+M00000016_IL_01d7:
+stloc local1
+M00000016_IL_01d8:
+br M00000016_IL_01e2
+M00000016_IL_01dd:
+M00000016_IL_01de:
+M00000016_IL_01df:
+M00000016_IL_01e0:
+M00000016_IL_01e1:
+fault "Guest program reached a terminal failure"
+M00000016_IL_01e2:
+M00000016_IL_01e3:
+ldloc local1
+M00000016_IL_01e4:
 ret
-M0000001f_IL_00fa:
-M0000001f_IL_00fb:
-M0000001f_IL_00fc:
-ldstr "invalid stream error case"
-M0000001f_IL_0101:
-call System.Fault(String)
-M0000001f_IL_0106:
-M0000001f_IL_0107:
-ldstr ""
-M0000001f_IL_010c:
+.end
+.method instance byref get_Value() -> System.Object
+M00000017_IL_0000:
+ldarg 0
+M00000017_IL_0001:
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000017_IL_0006:
+conv.i4
+M00000017_IL_0007:
+ldc.i4 1
+M00000017_IL_0008:
+conv.i4
+M00000017_IL_0009:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_000b:
+brtrue M00000017_IL_0015
+M00000017_IL_0010:
+br M00000017_IL_0021
+M00000017_IL_0015:
+ldarg 0
+M00000017_IL_0016:
+ldfld System.IO.StreamError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+M00000017_IL_001b:
+box System.IO.StreamError.InvalidPath
+M00000017_IL_0020:
+ret
+M00000017_IL_0021:
+M00000017_IL_0022:
+ldarg 0
+M00000017_IL_0023:
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000017_IL_0028:
+conv.i4
+M00000017_IL_0029:
+ldc.i4 2
+M00000017_IL_002a:
+conv.i4
+M00000017_IL_002b:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_002d:
+brtrue M00000017_IL_0037
+M00000017_IL_0032:
+br M00000017_IL_0043
+M00000017_IL_0037:
+ldarg 0
+M00000017_IL_0038:
+ldfld System.IO.StreamError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+M00000017_IL_003d:
+box System.IO.StreamError.NotFound
+M00000017_IL_0042:
+ret
+M00000017_IL_0043:
+M00000017_IL_0044:
+ldarg 0
+M00000017_IL_0045:
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000017_IL_004a:
+conv.i4
+M00000017_IL_004b:
+ldc.i4 3
+M00000017_IL_004c:
+conv.i4
+M00000017_IL_004d:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_004f:
+brtrue M00000017_IL_0059
+M00000017_IL_0054:
+br M00000017_IL_0065
+M00000017_IL_0059:
+ldarg 0
+M00000017_IL_005a:
+ldfld System.IO.StreamError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+M00000017_IL_005f:
+box System.IO.StreamError.AccessDenied
+M00000017_IL_0064:
+ret
+M00000017_IL_0065:
+M00000017_IL_0066:
+ldarg 0
+M00000017_IL_0067:
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000017_IL_006c:
+conv.i4
+M00000017_IL_006d:
+ldc.i4 4
+M00000017_IL_006e:
+conv.i4
+M00000017_IL_006f:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_0071:
+brtrue M00000017_IL_007b
+M00000017_IL_0076:
+br M00000017_IL_0087
+M00000017_IL_007b:
+ldarg 0
+M00000017_IL_007c:
+ldfld System.IO.StreamError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
+M00000017_IL_0081:
+box System.IO.StreamError.WrongKind
+M00000017_IL_0086:
+ret
+M00000017_IL_0087:
+M00000017_IL_0088:
+ldarg 0
+M00000017_IL_0089:
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000017_IL_008e:
+conv.i4
+M00000017_IL_008f:
+ldc.i4 5
+M00000017_IL_0090:
+conv.i4
+M00000017_IL_0091:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_0093:
+brtrue M00000017_IL_009d
+M00000017_IL_0098:
+br M00000017_IL_00a9
+M00000017_IL_009d:
+ldarg 0
+M00000017_IL_009e:
+ldfld System.IO.StreamError::Metadata_V1_3C416C72656164794578697374735061796C6F61643E
+M00000017_IL_00a3:
+box System.IO.StreamError.AlreadyExists
+M00000017_IL_00a8:
+ret
+M00000017_IL_00a9:
+M00000017_IL_00aa:
+ldarg 0
+M00000017_IL_00ab:
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000017_IL_00b0:
+conv.i4
+M00000017_IL_00b1:
+ldc.i4 6
+M00000017_IL_00b2:
+conv.i4
+M00000017_IL_00b3:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_00b5:
+brtrue M00000017_IL_00bf
+M00000017_IL_00ba:
+br M00000017_IL_00cb
+M00000017_IL_00bf:
+ldarg 0
+M00000017_IL_00c0:
+ldfld System.IO.StreamError::Metadata_V1_3C436C6F7365645061796C6F61643E
+M00000017_IL_00c5:
+box System.IO.StreamError.Closed
+M00000017_IL_00ca:
+ret
+M00000017_IL_00cb:
+M00000017_IL_00cc:
+ldarg 0
+M00000017_IL_00cd:
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000017_IL_00d2:
+conv.i4
+M00000017_IL_00d3:
+ldc.i4 7
+M00000017_IL_00d4:
+conv.i4
+M00000017_IL_00d5:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_00d7:
+brtrue M00000017_IL_00e1
+M00000017_IL_00dc:
+br M00000017_IL_00ed
+M00000017_IL_00e1:
+ldarg 0
+M00000017_IL_00e2:
+ldfld System.IO.StreamError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+M00000017_IL_00e7:
+box System.IO.StreamError.InvalidRange
+M00000017_IL_00ec:
+ret
+M00000017_IL_00ed:
+M00000017_IL_00ee:
+ldarg 0
+M00000017_IL_00ef:
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000017_IL_00f4:
+conv.i4
+M00000017_IL_00f5:
+ldc.i4 8
+M00000017_IL_00f6:
+conv.i4
+M00000017_IL_00f7:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_00f9:
+brtrue M00000017_IL_0103
+M00000017_IL_00fe:
+br M00000017_IL_010f
+M00000017_IL_0103:
+ldarg 0
+M00000017_IL_0104:
+ldfld System.IO.StreamError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+M00000017_IL_0109:
+box System.IO.StreamError.LimitExceeded
+M00000017_IL_010e:
+ret
+M00000017_IL_010f:
+M00000017_IL_0110:
+ldarg 0
+M00000017_IL_0111:
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000017_IL_0116:
+conv.i4
+M00000017_IL_0117:
+ldc.i4 9
+M00000017_IL_0119:
+conv.i4
+M00000017_IL_011a:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_011c:
+brtrue M00000017_IL_0126
+M00000017_IL_0121:
+br M00000017_IL_0132
+M00000017_IL_0126:
+ldarg 0
+M00000017_IL_0127:
+ldfld System.IO.StreamError::Metadata_V1_3C57726F6E674163636573735061796C6F61643E
+M00000017_IL_012c:
+box System.IO.StreamError.WrongAccess
+M00000017_IL_0131:
+ret
+M00000017_IL_0132:
+M00000017_IL_0133:
+ldarg 0
+M00000017_IL_0134:
+ldfld System.IO.StreamError::Metadata_V1_3C5461673E
+M00000017_IL_0139:
+conv.i4
+M00000017_IL_013a:
+ldc.i4 10
+M00000017_IL_013c:
+conv.i4
+M00000017_IL_013d:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_013f:
+brtrue M00000017_IL_0149
+M00000017_IL_0144:
+br M00000017_IL_0155
+M00000017_IL_0149:
+ldarg 0
+M00000017_IL_014a:
+ldfld System.IO.StreamError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+M00000017_IL_014f:
+box System.IO.StreamError.IoFailure
+M00000017_IL_0154:
+ret
+M00000017_IL_0155:
+M00000017_IL_0156:
+M00000017_IL_0157:
+call neoCLR.Library.System.IO.StreamError.DefaultReference53797374656D2E4F626A656374()
+ret
+.end
+.method instance byref get_HasValue() -> Boolean
+M00000018_IL_0000:
+ldarg 0
+M00000018_IL_0001:
+call instance System.IO.StreamError::get_Value()
+M00000018_IL_0006:
+M00000018_IL_0007:
+ref.isnull
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_0009:
+ldc.i4 0
+M00000018_IL_000a:
+ceq
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_000c:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .end

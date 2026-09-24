@@ -227,8 +227,8 @@ try:
     if errors:
         for version, expression, expected in (
             (20, 'System.Storage.FileReadError.', ('NotFound', 'AccessDenied')),
-            (21, 'error.', ('IsNotFound', 'GetNotFound', 'ToString'))):
-            text = 'func Main() {\n    let error = System.Storage.FileReadError(System.Storage.FileReadError.NotFound())\n    ' + expression + '\n}'
+            (21, 'error.', ('HasValue', 'TryGetValue', 'ToString'))):
+            text = 'func Main() {\n    let error: System.Storage.FileReadError = System.Storage.FileReadError.NotFound\n    ' + expression + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
                 'position': {'line': 2, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))

@@ -52,3 +52,10 @@ Reports with input bytes, expected output and the toolchain revision help us eva
 
 The generated reference describes development after Preview 9. Use the availability
 notes above to distinguish it from the published toolchain.
+
+## Development error representation
+
+Expected errors use normal Raven union declarations. Match their named cases;
+handwritten per-case `Is*`/`Get*` helpers have been removed in the development API.
+Rebuild applications with matching SDK and runtime artifacts. The case names and
+operation error meanings are unchanged.

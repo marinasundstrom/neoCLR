@@ -11,7 +11,7 @@ import System.IO.*
 func LookupCases(provider: StorageProvider) {
     match provider.GetFile(RequirePath("/missing")) {
         Error(let error) => {
-            if !error.IsNotFound {
+            if !(error is System.Storage.StorageLookupError.NotFound) {
                 System.Fault("Missing lookup did not return NotFound")
             }
         }
@@ -19,7 +19,7 @@ func LookupCases(provider: StorageProvider) {
     }
     match provider.GetFile(RequirePath("/")) {
         Error(let error) => {
-            if !error.IsWrongKind {
+            if !(error is System.Storage.StorageLookupError.WrongKind) {
                 System.Fault("Directory lookup did not return WrongKind")
             }
         }
@@ -28,7 +28,7 @@ func LookupCases(provider: StorageProvider) {
     let directory = ProviderDirectory(provider, RequirePath("/"))
     match directory.GetFile("../escape") {
         Error(let error) => {
-            if !error.IsInvalidPath {
+            if !(error is System.Storage.StorageLookupError.InvalidPath) {
                 System.Fault("Invalid child has wrong lookup error")
             }
         }
@@ -58,7 +58,7 @@ func Main() {
     LookupCases(MemoryStorage())
     match System.Storage.Metadata.GetKind("") {
         Error(let error) => {
-            if !error.IsInvalidPath {
+            if !(error is System.Storage.StorageLookupError.InvalidPath) {
                 System.Fault("Empty native path has wrong error")
             }
         }
@@ -66,7 +66,7 @@ func Main() {
     }
     match System.Storage.Metadata.GetKind(".") {
         Ok(let kind) => {
-            if !kind.IsDirectory {
+            if !(kind == System.Storage.EntryKind.Directory) {
                 System.Fault("Directory metadata lost its kind")
             }
         }

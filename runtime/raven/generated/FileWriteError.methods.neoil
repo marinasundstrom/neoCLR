@@ -2,389 +2,1519 @@
 .type System.Storage.FileWriteError
 .sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
-.field private Stored Value
-.property instance IsInvalidLimit() -> Boolean
-.get instance System.Storage.FileWriteError::get_IsInvalidLimit()
+.implements System.Runtime.CompilerServices.IUnion
+.field private Metadata_V1_3C5461673E Byte
+.field private Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E System.Storage.FileWriteError.InvalidLimit
+.field private Metadata_V1_3C496E76616C6964506174685061796C6F61643E System.Storage.FileWriteError.InvalidPath
+.field private Metadata_V1_3C4E6F74466F756E645061796C6F61643E System.Storage.FileWriteError.NotFound
+.field private Metadata_V1_3C41636365737344656E6965645061796C6F61643E System.Storage.FileWriteError.AccessDenied
+.field private Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E System.Storage.FileWriteError.NotRegularFile
+.field private Metadata_V1_3C546F6F4C617267655061796C6F61643E System.Storage.FileWriteError.TooLarge
+.field private Metadata_V1_3C57726974654661696C65645061796C6F61643E System.Storage.FileWriteError.WriteFailed
+.property instance Value() -> System.Object
+.get instance System.Storage.FileWriteError::get_Value()
 .end
-.property instance IsInvalidPath() -> Boolean
-.get instance System.Storage.FileWriteError::get_IsInvalidPath()
+.property instance HasValue() -> Boolean
+.get instance System.Storage.FileWriteError::get_HasValue()
 .end
-.property instance IsNotFound() -> Boolean
-.get instance System.Storage.FileWriteError::get_IsNotFound()
-.end
-.property instance IsAccessDenied() -> Boolean
-.get instance System.Storage.FileWriteError::get_IsAccessDenied()
-.end
-.property instance IsNotRegularFile() -> Boolean
-.get instance System.Storage.FileWriteError::get_IsNotRegularFile()
-.end
-.property instance IsTooLarge() -> Boolean
-.get instance System.Storage.FileWriteError::get_IsTooLarge()
-.end
-.property instance IsWriteFailed() -> Boolean
-.get instance System.Storage.FileWriteError::get_IsWriteFailed()
-.end
-.method instance .ctor(System.Storage.FileWriteError.InvalidLimit value) -> Void
-ldarg value
-value.pack System.Storage.FileWriteError.InvalidLimit
-newobj System.Storage.FileWriteError
-starg this
-ldvoid
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000001_IL_0000:
+ldarg 0
+M00000001_IL_0001:
+M00000001_IL_0002:
+ref.isnull
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0004:
+brtrue M00000001_IL_000e
+M00000001_IL_0009:
+br M00000001_IL_0014
+M00000001_IL_000e:
+ldstr "null"
+M00000001_IL_0013:
+ret
+M00000001_IL_0014:
+M00000001_IL_0015:
+ldarg 0
+M00000001_IL_0016:
+isinst String
+M00000001_IL_001b:
+M00000001_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_001e:
+brtrue M00000001_IL_0028
+M00000001_IL_0023:
+br M00000001_IL_0043
+M00000001_IL_0028:
+ldstr "\u0022"
+M00000001_IL_002d:
+ldarg 0
+M00000001_IL_002e:
+castclass String
+M00000001_IL_0033:
+call System.String::Concat(String,String)
+M00000001_IL_0038:
+ldstr "\u0022"
+M00000001_IL_003d:
+call System.String::Concat(String,String)
+M00000001_IL_0042:
+ret
+M00000001_IL_0043:
+M00000001_IL_0044:
+ldarg 0
+M00000001_IL_0045:
+isinst Char
+M00000001_IL_004a:
+dup
+M00000001_IL_004b:
+ref.isnull
+brfalse M00000001_IL_0057
+M00000001_IL_0050:
+pop
+M00000001_IL_0051:
+ldc.i4 0
+M00000001_IL_0052:
+br M00000001_IL_005e
+M00000001_IL_0057:
+unbox.any Char
+M00000001_IL_005c:
+pop
+M00000001_IL_005d:
+ldc.i4 1
+M00000001_IL_005e:
+brtrue M00000001_IL_0068
+M00000001_IL_0063:
+br M00000001_IL_0083
+M00000001_IL_0068:
+ldstr "\u0027"
+M00000001_IL_006d:
+ldarg 0
+M00000001_IL_006e:
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000001_IL_0073:
+call System.String::Concat(String,String)
+M00000001_IL_0078:
+ldstr "\u0027"
+M00000001_IL_007d:
+call System.String::Concat(String,String)
+M00000001_IL_0082:
+ret
+M00000001_IL_0083:
+M00000001_IL_0084:
+ldarg 0
+M00000001_IL_0085:
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000001_IL_008a:
 ret
 .end
-.method instance get_IsInvalidLimit() -> Boolean
+.method instance byref .ctor(System.Storage.FileWriteError.InvalidLimit value) -> Void
+.local Byte local0
+.local System.Storage.FileWriteError.InvalidLimit local1
+.local Byte unionDefault1_0
+.local System.Storage.FileWriteError.InvalidLimit unionDefault1_1
+.local System.Storage.FileWriteError.InvalidPath unionDefault1_2
+.local System.Storage.FileWriteError.NotFound unionDefault1_3
+.local System.Storage.FileWriteError.AccessDenied unionDefault1_4
+.local System.Storage.FileWriteError.NotRegularFile unionDefault1_5
+.local System.Storage.FileWriteError.TooLarge unionDefault1_6
+.local System.Storage.FileWriteError.WriteFailed unionDefault1_7
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Storage.FileWriteError.InvalidLimit
 M00000002_IL_0000:
+ldarg 0
 M00000002_IL_0001:
-M00000002_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000002_IL_0003:
-ldfld System.Storage.FileWriteError::Stored
+ldloc unionDefault1_0
+stfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Storage.FileWriteError.InvalidLimit
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Storage.FileWriteError.InvalidPath
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Storage.FileWriteError.NotFound
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Storage.FileWriteError.AccessDenied
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Storage.FileWriteError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Storage.FileWriteError.NotRegularFile
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Storage.FileWriteError.TooLarge
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Storage.FileWriteError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Storage.FileWriteError.WriteFailed
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Storage.FileWriteError::Metadata_V1_3C57726974654661696C65645061796C6F61643E
+pop
+M00000002_IL_0007:
+ldc.i4 1
 M00000002_IL_0008:
-value.is System.Storage.FileWriteError.InvalidLimit
-call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
-M00000002_IL_000d:
-call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
+stloc local0
+M00000002_IL_0009:
+ldarg 0
+M00000002_IL_000a:
+ldloc local0
+M00000002_IL_000b:
+conv.u1
+M00000002_IL_000c:
+stfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+pop
+M00000002_IL_0011:
+ldarg 1
+M00000002_IL_0012:
+stloc local1
+M00000002_IL_0013:
+ldarg 0
+M00000002_IL_0014:
+ldloc local1
+M00000002_IL_0015:
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+M00000002_IL_001a:
+ldvoid
 ret
 .end
-.method instance GetInvalidLimit() -> System.Storage.FileWriteError.InvalidLimit
+.method instance byref TryGetValue(out(true) System.Storage.FileWriteError.InvalidLimit& value) -> Boolean
 M00000003_IL_0000:
+ldarg 0
 M00000003_IL_0001:
-M00000003_IL_0002:
-ldarg 0
-M00000003_IL_0003:
-ldfld System.Storage.FileWriteError::Stored
+ldfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+M00000003_IL_0006:
+conv.i4
+M00000003_IL_0007:
+ldc.i4 1
 M00000003_IL_0008:
-value.unpack System.Storage.FileWriteError.InvalidLimit
-M00000003_IL_000d:
+conv.i4
+M00000003_IL_0009:
+ceq
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_000b:
+brtrue M00000003_IL_0015
+M00000003_IL_0010:
+br M00000003_IL_0023
+M00000003_IL_0015:
+ldarg 1
+M00000003_IL_0016:
+ldarg 0
+M00000003_IL_0017:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+M00000003_IL_001c:
+stobj System.Storage.FileWriteError.InvalidLimit
+M00000003_IL_0021:
+ldc.i4 1
+M00000003_IL_0022:
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000003_IL_0023:
+M00000003_IL_0024:
+ldc.i4 0
+M00000003_IL_0025:
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance .ctor(System.Storage.FileWriteError.InvalidPath value) -> Void
-ldarg value
-value.pack System.Storage.FileWriteError.InvalidPath
-newobj System.Storage.FileWriteError
-starg this
+.method instance byref .ctor(System.Storage.FileWriteError.InvalidPath value) -> Void
+.local Byte local0
+.local System.Storage.FileWriteError.InvalidPath local1
+.local Byte unionDefault1_0
+.local System.Storage.FileWriteError.InvalidLimit unionDefault1_1
+.local System.Storage.FileWriteError.InvalidPath unionDefault1_2
+.local System.Storage.FileWriteError.NotFound unionDefault1_3
+.local System.Storage.FileWriteError.AccessDenied unionDefault1_4
+.local System.Storage.FileWriteError.NotRegularFile unionDefault1_5
+.local System.Storage.FileWriteError.TooLarge unionDefault1_6
+.local System.Storage.FileWriteError.WriteFailed unionDefault1_7
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Storage.FileWriteError.InvalidPath
+M00000004_IL_0000:
+ldarg 0
+M00000004_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Storage.FileWriteError.InvalidLimit
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Storage.FileWriteError.InvalidPath
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Storage.FileWriteError.NotFound
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Storage.FileWriteError.AccessDenied
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Storage.FileWriteError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Storage.FileWriteError.NotRegularFile
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Storage.FileWriteError.TooLarge
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Storage.FileWriteError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Storage.FileWriteError.WriteFailed
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Storage.FileWriteError::Metadata_V1_3C57726974654661696C65645061796C6F61643E
+pop
+M00000004_IL_0007:
+ldc.i4 2
+M00000004_IL_0008:
+stloc local0
+M00000004_IL_0009:
+ldarg 0
+M00000004_IL_000a:
+ldloc local0
+M00000004_IL_000b:
+conv.u1
+M00000004_IL_000c:
+stfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+pop
+M00000004_IL_0011:
+ldarg 1
+M00000004_IL_0012:
+stloc local1
+M00000004_IL_0013:
+ldarg 0
+M00000004_IL_0014:
+ldloc local1
+M00000004_IL_0015:
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+M00000004_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsInvalidPath() -> Boolean
+.method instance byref TryGetValue(out(true) System.Storage.FileWriteError.InvalidPath& value) -> Boolean
 M00000005_IL_0000:
+ldarg 0
 M00000005_IL_0001:
-M00000005_IL_0002:
-ldarg 0
-M00000005_IL_0003:
-ldfld System.Storage.FileWriteError::Stored
+ldfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+M00000005_IL_0006:
+conv.i4
+M00000005_IL_0007:
+ldc.i4 2
 M00000005_IL_0008:
-value.is System.Storage.FileWriteError.InvalidPath
+conv.i4
+M00000005_IL_0009:
+ceq
 call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_000d:
+M00000005_IL_000b:
+brtrue M00000005_IL_0015
+M00000005_IL_0010:
+br M00000005_IL_0023
+M00000005_IL_0015:
+ldarg 1
+M00000005_IL_0016:
+ldarg 0
+M00000005_IL_0017:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+M00000005_IL_001c:
+stobj System.Storage.FileWriteError.InvalidPath
+M00000005_IL_0021:
+ldc.i4 1
+M00000005_IL_0022:
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000005_IL_0023:
+M00000005_IL_0024:
+ldc.i4 0
+M00000005_IL_0025:
 call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetInvalidPath() -> System.Storage.FileWriteError.InvalidPath
+.method instance byref .ctor(System.Storage.FileWriteError.NotFound value) -> Void
+.local Byte local0
+.local System.Storage.FileWriteError.NotFound local1
+.local Byte unionDefault1_0
+.local System.Storage.FileWriteError.InvalidLimit unionDefault1_1
+.local System.Storage.FileWriteError.InvalidPath unionDefault1_2
+.local System.Storage.FileWriteError.NotFound unionDefault1_3
+.local System.Storage.FileWriteError.AccessDenied unionDefault1_4
+.local System.Storage.FileWriteError.NotRegularFile unionDefault1_5
+.local System.Storage.FileWriteError.TooLarge unionDefault1_6
+.local System.Storage.FileWriteError.WriteFailed unionDefault1_7
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Storage.FileWriteError.NotFound
 M00000006_IL_0000:
+ldarg 0
 M00000006_IL_0001:
-M00000006_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000006_IL_0003:
-ldfld System.Storage.FileWriteError::Stored
+ldloc unionDefault1_0
+stfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Storage.FileWriteError.InvalidLimit
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Storage.FileWriteError.InvalidPath
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Storage.FileWriteError.NotFound
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Storage.FileWriteError.AccessDenied
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Storage.FileWriteError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Storage.FileWriteError.NotRegularFile
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Storage.FileWriteError.TooLarge
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Storage.FileWriteError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Storage.FileWriteError.WriteFailed
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Storage.FileWriteError::Metadata_V1_3C57726974654661696C65645061796C6F61643E
+pop
+M00000006_IL_0007:
+ldc.i4 3
 M00000006_IL_0008:
-value.unpack System.Storage.FileWriteError.InvalidPath
-M00000006_IL_000d:
-ret
-.end
-.method instance .ctor(System.Storage.FileWriteError.NotFound value) -> Void
-ldarg value
-value.pack System.Storage.FileWriteError.NotFound
-newobj System.Storage.FileWriteError
-starg this
+stloc local0
+M00000006_IL_0009:
+ldarg 0
+M00000006_IL_000a:
+ldloc local0
+M00000006_IL_000b:
+conv.u1
+M00000006_IL_000c:
+stfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+pop
+M00000006_IL_0011:
+ldarg 1
+M00000006_IL_0012:
+stloc local1
+M00000006_IL_0013:
+ldarg 0
+M00000006_IL_0014:
+ldloc local1
+M00000006_IL_0015:
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+M00000006_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsNotFound() -> Boolean
+.method instance byref TryGetValue(out(true) System.Storage.FileWriteError.NotFound& value) -> Boolean
+M00000007_IL_0000:
+ldarg 0
+M00000007_IL_0001:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+M00000007_IL_0006:
+conv.i4
+M00000007_IL_0007:
+ldc.i4 3
+M00000007_IL_0008:
+conv.i4
+M00000007_IL_0009:
+ceq
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_000b:
+brtrue M00000007_IL_0015
+M00000007_IL_0010:
+br M00000007_IL_0023
+M00000007_IL_0015:
+ldarg 1
+M00000007_IL_0016:
+ldarg 0
+M00000007_IL_0017:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+M00000007_IL_001c:
+stobj System.Storage.FileWriteError.NotFound
+M00000007_IL_0021:
+ldc.i4 1
+M00000007_IL_0022:
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000007_IL_0023:
+M00000007_IL_0024:
+ldc.i4 0
+M00000007_IL_0025:
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Storage.FileWriteError.AccessDenied value) -> Void
+.local Byte local0
+.local System.Storage.FileWriteError.AccessDenied local1
+.local Byte unionDefault1_0
+.local System.Storage.FileWriteError.InvalidLimit unionDefault1_1
+.local System.Storage.FileWriteError.InvalidPath unionDefault1_2
+.local System.Storage.FileWriteError.NotFound unionDefault1_3
+.local System.Storage.FileWriteError.AccessDenied unionDefault1_4
+.local System.Storage.FileWriteError.NotRegularFile unionDefault1_5
+.local System.Storage.FileWriteError.TooLarge unionDefault1_6
+.local System.Storage.FileWriteError.WriteFailed unionDefault1_7
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Storage.FileWriteError.AccessDenied
 M00000008_IL_0000:
+ldarg 0
 M00000008_IL_0001:
-M00000008_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000008_IL_0003:
-ldfld System.Storage.FileWriteError::Stored
+ldloc unionDefault1_0
+stfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Storage.FileWriteError.InvalidLimit
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Storage.FileWriteError.InvalidPath
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Storage.FileWriteError.NotFound
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Storage.FileWriteError.AccessDenied
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Storage.FileWriteError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Storage.FileWriteError.NotRegularFile
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Storage.FileWriteError.TooLarge
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Storage.FileWriteError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Storage.FileWriteError.WriteFailed
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Storage.FileWriteError::Metadata_V1_3C57726974654661696C65645061796C6F61643E
+pop
+M00000008_IL_0007:
+ldc.i4 4
 M00000008_IL_0008:
-value.is System.Storage.FileWriteError.NotFound
-call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
-M00000008_IL_000d:
-call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
+stloc local0
+M00000008_IL_0009:
+ldarg 0
+M00000008_IL_000a:
+ldloc local0
+M00000008_IL_000b:
+conv.u1
+M00000008_IL_000c:
+stfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+pop
+M00000008_IL_0011:
+ldarg 1
+M00000008_IL_0012:
+stloc local1
+M00000008_IL_0013:
+ldarg 0
+M00000008_IL_0014:
+ldloc local1
+M00000008_IL_0015:
+stfld System.Storage.FileWriteError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000008_IL_001a:
+ldvoid
 ret
 .end
-.method instance GetNotFound() -> System.Storage.FileWriteError.NotFound
+.method instance byref TryGetValue(out(true) System.Storage.FileWriteError.AccessDenied& value) -> Boolean
 M00000009_IL_0000:
+ldarg 0
 M00000009_IL_0001:
-M00000009_IL_0002:
-ldarg 0
-M00000009_IL_0003:
-ldfld System.Storage.FileWriteError::Stored
+ldfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+M00000009_IL_0006:
+conv.i4
+M00000009_IL_0007:
+ldc.i4 4
 M00000009_IL_0008:
-value.unpack System.Storage.FileWriteError.NotFound
-M00000009_IL_000d:
+conv.i4
+M00000009_IL_0009:
+ceq
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_000b:
+brtrue M00000009_IL_0015
+M00000009_IL_0010:
+br M00000009_IL_0023
+M00000009_IL_0015:
+ldarg 1
+M00000009_IL_0016:
+ldarg 0
+M00000009_IL_0017:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+M00000009_IL_001c:
+stobj System.Storage.FileWriteError.AccessDenied
+M00000009_IL_0021:
+ldc.i4 1
+M00000009_IL_0022:
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000009_IL_0023:
+M00000009_IL_0024:
+ldc.i4 0
+M00000009_IL_0025:
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance .ctor(System.Storage.FileWriteError.AccessDenied value) -> Void
-ldarg value
-value.pack System.Storage.FileWriteError.AccessDenied
-newobj System.Storage.FileWriteError
-starg this
+.method instance byref .ctor(System.Storage.FileWriteError.NotRegularFile value) -> Void
+.local Byte local0
+.local System.Storage.FileWriteError.NotRegularFile local1
+.local Byte unionDefault1_0
+.local System.Storage.FileWriteError.InvalidLimit unionDefault1_1
+.local System.Storage.FileWriteError.InvalidPath unionDefault1_2
+.local System.Storage.FileWriteError.NotFound unionDefault1_3
+.local System.Storage.FileWriteError.AccessDenied unionDefault1_4
+.local System.Storage.FileWriteError.NotRegularFile unionDefault1_5
+.local System.Storage.FileWriteError.TooLarge unionDefault1_6
+.local System.Storage.FileWriteError.WriteFailed unionDefault1_7
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Storage.FileWriteError.NotRegularFile
+M0000000a_IL_0000:
+ldarg 0
+M0000000a_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Storage.FileWriteError.InvalidLimit
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Storage.FileWriteError.InvalidPath
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Storage.FileWriteError.NotFound
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Storage.FileWriteError.AccessDenied
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Storage.FileWriteError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Storage.FileWriteError.NotRegularFile
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Storage.FileWriteError.TooLarge
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Storage.FileWriteError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Storage.FileWriteError.WriteFailed
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Storage.FileWriteError::Metadata_V1_3C57726974654661696C65645061796C6F61643E
+pop
+M0000000a_IL_0007:
+ldc.i4 5
+M0000000a_IL_0008:
+stloc local0
+M0000000a_IL_0009:
+ldarg 0
+M0000000a_IL_000a:
+ldloc local0
+M0000000a_IL_000b:
+conv.u1
+M0000000a_IL_000c:
+stfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+pop
+M0000000a_IL_0011:
+ldarg 1
+M0000000a_IL_0012:
+stloc local1
+M0000000a_IL_0013:
+ldarg 0
+M0000000a_IL_0014:
+ldloc local1
+M0000000a_IL_0015:
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+M0000000a_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsAccessDenied() -> Boolean
+.method instance byref TryGetValue(out(true) System.Storage.FileWriteError.NotRegularFile& value) -> Boolean
 M0000000b_IL_0000:
+ldarg 0
 M0000000b_IL_0001:
-M0000000b_IL_0002:
-ldarg 0
-M0000000b_IL_0003:
-ldfld System.Storage.FileWriteError::Stored
+ldfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+M0000000b_IL_0006:
+conv.i4
+M0000000b_IL_0007:
+ldc.i4 5
 M0000000b_IL_0008:
-value.is System.Storage.FileWriteError.AccessDenied
+conv.i4
+M0000000b_IL_0009:
+ceq
 call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
-M0000000b_IL_000d:
+M0000000b_IL_000b:
+brtrue M0000000b_IL_0015
+M0000000b_IL_0010:
+br M0000000b_IL_0023
+M0000000b_IL_0015:
+ldarg 1
+M0000000b_IL_0016:
+ldarg 0
+M0000000b_IL_0017:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+M0000000b_IL_001c:
+stobj System.Storage.FileWriteError.NotRegularFile
+M0000000b_IL_0021:
+ldc.i4 1
+M0000000b_IL_0022:
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000b_IL_0023:
+M0000000b_IL_0024:
+ldc.i4 0
+M0000000b_IL_0025:
 call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetAccessDenied() -> System.Storage.FileWriteError.AccessDenied
+.method instance byref .ctor(System.Storage.FileWriteError.TooLarge value) -> Void
+.local Byte local0
+.local System.Storage.FileWriteError.TooLarge local1
+.local Byte unionDefault1_0
+.local System.Storage.FileWriteError.InvalidLimit unionDefault1_1
+.local System.Storage.FileWriteError.InvalidPath unionDefault1_2
+.local System.Storage.FileWriteError.NotFound unionDefault1_3
+.local System.Storage.FileWriteError.AccessDenied unionDefault1_4
+.local System.Storage.FileWriteError.NotRegularFile unionDefault1_5
+.local System.Storage.FileWriteError.TooLarge unionDefault1_6
+.local System.Storage.FileWriteError.WriteFailed unionDefault1_7
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Storage.FileWriteError.TooLarge
 M0000000c_IL_0000:
+ldarg 0
 M0000000c_IL_0001:
-M0000000c_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M0000000c_IL_0003:
-ldfld System.Storage.FileWriteError::Stored
+ldloc unionDefault1_0
+stfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Storage.FileWriteError.InvalidLimit
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Storage.FileWriteError.InvalidPath
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Storage.FileWriteError.NotFound
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Storage.FileWriteError.AccessDenied
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Storage.FileWriteError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Storage.FileWriteError.NotRegularFile
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Storage.FileWriteError.TooLarge
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Storage.FileWriteError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Storage.FileWriteError.WriteFailed
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Storage.FileWriteError::Metadata_V1_3C57726974654661696C65645061796C6F61643E
+pop
+M0000000c_IL_0007:
+ldc.i4 6
 M0000000c_IL_0008:
-value.unpack System.Storage.FileWriteError.AccessDenied
-M0000000c_IL_000d:
-ret
-.end
-.method instance .ctor(System.Storage.FileWriteError.NotRegularFile value) -> Void
-ldarg value
-value.pack System.Storage.FileWriteError.NotRegularFile
-newobj System.Storage.FileWriteError
-starg this
+stloc local0
+M0000000c_IL_0009:
+ldarg 0
+M0000000c_IL_000a:
+ldloc local0
+M0000000c_IL_000b:
+conv.u1
+M0000000c_IL_000c:
+stfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+pop
+M0000000c_IL_0011:
+ldarg 1
+M0000000c_IL_0012:
+stloc local1
+M0000000c_IL_0013:
+ldarg 0
+M0000000c_IL_0014:
+ldloc local1
+M0000000c_IL_0015:
+stfld System.Storage.FileWriteError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+M0000000c_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsNotRegularFile() -> Boolean
+.method instance byref TryGetValue(out(true) System.Storage.FileWriteError.TooLarge& value) -> Boolean
+M0000000d_IL_0000:
+ldarg 0
+M0000000d_IL_0001:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+M0000000d_IL_0006:
+conv.i4
+M0000000d_IL_0007:
+ldc.i4 6
+M0000000d_IL_0008:
+conv.i4
+M0000000d_IL_0009:
+ceq
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_000b:
+brtrue M0000000d_IL_0015
+M0000000d_IL_0010:
+br M0000000d_IL_0023
+M0000000d_IL_0015:
+ldarg 1
+M0000000d_IL_0016:
+ldarg 0
+M0000000d_IL_0017:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+M0000000d_IL_001c:
+stobj System.Storage.FileWriteError.TooLarge
+M0000000d_IL_0021:
+ldc.i4 1
+M0000000d_IL_0022:
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000d_IL_0023:
+M0000000d_IL_0024:
+ldc.i4 0
+M0000000d_IL_0025:
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Storage.FileWriteError.WriteFailed value) -> Void
+.local Byte local0
+.local System.Storage.FileWriteError.WriteFailed local1
+.local Byte unionDefault1_0
+.local System.Storage.FileWriteError.InvalidLimit unionDefault1_1
+.local System.Storage.FileWriteError.InvalidPath unionDefault1_2
+.local System.Storage.FileWriteError.NotFound unionDefault1_3
+.local System.Storage.FileWriteError.AccessDenied unionDefault1_4
+.local System.Storage.FileWriteError.NotRegularFile unionDefault1_5
+.local System.Storage.FileWriteError.TooLarge unionDefault1_6
+.local System.Storage.FileWriteError.WriteFailed unionDefault1_7
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Storage.FileWriteError.WriteFailed
 M0000000e_IL_0000:
+ldarg 0
 M0000000e_IL_0001:
-M0000000e_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M0000000e_IL_0003:
-ldfld System.Storage.FileWriteError::Stored
+ldloc unionDefault1_0
+stfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Storage.FileWriteError.InvalidLimit
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Storage.FileWriteError.InvalidPath
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Storage.FileWriteError.NotFound
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Storage.FileWriteError.AccessDenied
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Storage.FileWriteError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Storage.FileWriteError.NotRegularFile
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Storage.FileWriteError.TooLarge
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Storage.FileWriteError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Storage.FileWriteError.WriteFailed
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Storage.FileWriteError::Metadata_V1_3C57726974654661696C65645061796C6F61643E
+pop
+M0000000e_IL_0007:
+ldc.i4 7
 M0000000e_IL_0008:
-value.is System.Storage.FileWriteError.NotRegularFile
-call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
-M0000000e_IL_000d:
-call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
+stloc local0
+M0000000e_IL_0009:
+ldarg 0
+M0000000e_IL_000a:
+ldloc local0
+M0000000e_IL_000b:
+conv.u1
+M0000000e_IL_000c:
+stfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+pop
+M0000000e_IL_0011:
+ldarg 1
+M0000000e_IL_0012:
+stloc local1
+M0000000e_IL_0013:
+ldarg 0
+M0000000e_IL_0014:
+ldloc local1
+M0000000e_IL_0015:
+stfld System.Storage.FileWriteError::Metadata_V1_3C57726974654661696C65645061796C6F61643E
+pop
+M0000000e_IL_001a:
+ldvoid
 ret
 .end
-.method instance GetNotRegularFile() -> System.Storage.FileWriteError.NotRegularFile
+.method instance byref TryGetValue(out(true) System.Storage.FileWriteError.WriteFailed& value) -> Boolean
 M0000000f_IL_0000:
+ldarg 0
 M0000000f_IL_0001:
-M0000000f_IL_0002:
-ldarg 0
-M0000000f_IL_0003:
-ldfld System.Storage.FileWriteError::Stored
+ldfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+M0000000f_IL_0006:
+conv.i4
+M0000000f_IL_0007:
+ldc.i4 7
 M0000000f_IL_0008:
-value.unpack System.Storage.FileWriteError.NotRegularFile
-M0000000f_IL_000d:
-ret
-.end
-.method instance .ctor(System.Storage.FileWriteError.TooLarge value) -> Void
-ldarg value
-value.pack System.Storage.FileWriteError.TooLarge
-newobj System.Storage.FileWriteError
-starg this
-ldvoid
-ret
-.end
-.method instance get_IsTooLarge() -> Boolean
-M00000011_IL_0000:
-M00000011_IL_0001:
-M00000011_IL_0002:
-ldarg 0
-M00000011_IL_0003:
-ldfld System.Storage.FileWriteError::Stored
-M00000011_IL_0008:
-value.is System.Storage.FileWriteError.TooLarge
+conv.i4
+M0000000f_IL_0009:
+ceq
 call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
-M00000011_IL_000d:
+M0000000f_IL_000b:
+brtrue M0000000f_IL_0015
+M0000000f_IL_0010:
+br M0000000f_IL_0023
+M0000000f_IL_0015:
+ldarg 1
+M0000000f_IL_0016:
+ldarg 0
+M0000000f_IL_0017:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C57726974654661696C65645061796C6F61643E
+M0000000f_IL_001c:
+stobj System.Storage.FileWriteError.WriteFailed
+M0000000f_IL_0021:
+ldc.i4 1
+M0000000f_IL_0022:
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000f_IL_0023:
+M0000000f_IL_0024:
+ldc.i4 0
+M0000000f_IL_0025:
 call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetTooLarge() -> System.Storage.FileWriteError.TooLarge
-M00000012_IL_0000:
-M00000012_IL_0001:
-M00000012_IL_0002:
+.method instance override byref ToString() -> String
+.local System.Storage.FileWriteError local0
+.local String local1
+.local System.Storage.FileWriteError local2
+.local System.Storage.FileWriteError.InvalidLimit local3
+.local System.Storage.FileWriteError local4
+.local System.Storage.FileWriteError.InvalidPath local5
+.local System.Storage.FileWriteError local6
+.local System.Storage.FileWriteError.NotFound local7
+.local System.Storage.FileWriteError local8
+.local System.Storage.FileWriteError.AccessDenied local9
+.local System.Storage.FileWriteError local10
+.local System.Storage.FileWriteError.NotRegularFile local11
+.local System.Storage.FileWriteError local12
+.local System.Storage.FileWriteError.TooLarge local13
+.local System.Storage.FileWriteError local14
+.local System.Storage.FileWriteError.WriteFailed local15
+ldloca local0
+initobj System.Storage.FileWriteError
+ldloca local2
+initobj System.Storage.FileWriteError
+ldloca local3
+initobj System.Storage.FileWriteError.InvalidLimit
+ldloca local4
+initobj System.Storage.FileWriteError
+ldloca local5
+initobj System.Storage.FileWriteError.InvalidPath
+ldloca local6
+initobj System.Storage.FileWriteError
+ldloca local7
+initobj System.Storage.FileWriteError.NotFound
+ldloca local8
+initobj System.Storage.FileWriteError
+ldloca local9
+initobj System.Storage.FileWriteError.AccessDenied
+ldloca local10
+initobj System.Storage.FileWriteError
+ldloca local11
+initobj System.Storage.FileWriteError.NotRegularFile
+ldloca local12
+initobj System.Storage.FileWriteError
+ldloca local13
+initobj System.Storage.FileWriteError.TooLarge
+ldloca local14
+initobj System.Storage.FileWriteError
+ldloca local15
+initobj System.Storage.FileWriteError.WriteFailed
+M00000010_IL_0000:
+M00000010_IL_0001:
+M00000010_IL_0002:
+M00000010_IL_0003:
 ldarg 0
-M00000012_IL_0003:
-ldfld System.Storage.FileWriteError::Stored
-M00000012_IL_0008:
-value.unpack System.Storage.FileWriteError.TooLarge
-M00000012_IL_000d:
-ret
-.end
-.method instance .ctor(System.Storage.FileWriteError.WriteFailed value) -> Void
-ldarg value
-value.pack System.Storage.FileWriteError.WriteFailed
-newobj System.Storage.FileWriteError
-starg this
-ldvoid
-ret
-.end
-.method instance get_IsWriteFailed() -> Boolean
-M00000014_IL_0000:
-M00000014_IL_0001:
-M00000014_IL_0002:
-ldarg 0
-M00000014_IL_0003:
-ldfld System.Storage.FileWriteError::Stored
-M00000014_IL_0008:
-value.is System.Storage.FileWriteError.WriteFailed
-call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
-M00000014_IL_000d:
-call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method instance GetWriteFailed() -> System.Storage.FileWriteError.WriteFailed
-M00000015_IL_0000:
-M00000015_IL_0001:
-M00000015_IL_0002:
-ldarg 0
-M00000015_IL_0003:
-ldfld System.Storage.FileWriteError::Stored
-M00000015_IL_0008:
-value.unpack System.Storage.FileWriteError.WriteFailed
-M00000015_IL_000d:
-ret
-.end
-.method instance ToString() -> String
-M00000016_IL_0000:
-M00000016_IL_0001:
-M00000016_IL_0002:
-ldarg 0
-M00000016_IL_0003:
-call instance System.Storage.FileWriteError::get_IsInvalidLimit()
-call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
-M00000016_IL_0008:
-brtrue M00000016_IL_0012
-M00000016_IL_000d:
-br M00000016_IL_0019
-M00000016_IL_0012:
-M00000016_IL_0013:
+M00000010_IL_0004:
+ldobj System.Storage.FileWriteError
+M00000010_IL_0009:
+stloc local0
+M00000010_IL_000a:
+M00000010_IL_000b:
+ldloc local0
+M00000010_IL_000c:
+stloc local2
+M00000010_IL_000d:
+ldloca local2
+M00000010_IL_000f:
+ldloca local3
+M00000010_IL_0011:
+call instance System.Storage.FileWriteError::TryGetValue(System.Storage.FileWriteError.InvalidLimit&)
+M00000010_IL_0016:
+brfalse M00000010_IL_0034
+M00000010_IL_001b:
+ldloc local3
+M00000010_IL_001c:
+pop
+M00000010_IL_001d:
+M00000010_IL_001e:
+br M00000010_IL_0029
+M00000010_IL_0029:
 ldstr "InvalidLimit"
-M00000016_IL_0018:
-ret
-M00000016_IL_0019:
-M00000016_IL_001a:
-M00000016_IL_001b:
-ldarg 0
-M00000016_IL_001c:
-call instance System.Storage.FileWriteError::get_IsInvalidPath()
-call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
-M00000016_IL_0021:
-brtrue M00000016_IL_002b
-M00000016_IL_0026:
-br M00000016_IL_0032
-M00000016_IL_002b:
-M00000016_IL_002c:
+M00000010_IL_002e:
+stloc local1
+M00000010_IL_002f:
+br M00000010_IL_015b
+M00000010_IL_0034:
+M00000010_IL_0035:
+M00000010_IL_0036:
+ldloc local0
+M00000010_IL_0037:
+stloc local4
+M00000010_IL_0039:
+ldloca local4
+M00000010_IL_003b:
+ldloca local5
+M00000010_IL_003d:
+call instance System.Storage.FileWriteError::TryGetValue(System.Storage.FileWriteError.InvalidPath&)
+M00000010_IL_0042:
+brfalse M00000010_IL_0061
+M00000010_IL_0047:
+ldloc local5
+M00000010_IL_0049:
+pop
+M00000010_IL_004a:
+M00000010_IL_004b:
+br M00000010_IL_0056
+M00000010_IL_0056:
 ldstr "InvalidPath"
-M00000016_IL_0031:
-ret
-M00000016_IL_0032:
-M00000016_IL_0033:
-M00000016_IL_0034:
-ldarg 0
-M00000016_IL_0035:
-call instance System.Storage.FileWriteError::get_IsNotFound()
-call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
-M00000016_IL_003a:
-brtrue M00000016_IL_0044
-M00000016_IL_003f:
-br M00000016_IL_004b
-M00000016_IL_0044:
-M00000016_IL_0045:
+M00000010_IL_005b:
+stloc local1
+M00000010_IL_005c:
+br M00000010_IL_015b
+M00000010_IL_0061:
+M00000010_IL_0062:
+M00000010_IL_0063:
+ldloc local0
+M00000010_IL_0064:
+stloc local6
+M00000010_IL_0066:
+ldloca local6
+M00000010_IL_0068:
+ldloca local7
+M00000010_IL_006a:
+call instance System.Storage.FileWriteError::TryGetValue(System.Storage.FileWriteError.NotFound&)
+M00000010_IL_006f:
+brfalse M00000010_IL_008e
+M00000010_IL_0074:
+ldloc local7
+M00000010_IL_0076:
+pop
+M00000010_IL_0077:
+M00000010_IL_0078:
+br M00000010_IL_0083
+M00000010_IL_0083:
 ldstr "NotFound"
-M00000016_IL_004a:
-ret
-M00000016_IL_004b:
-M00000016_IL_004c:
-M00000016_IL_004d:
-ldarg 0
-M00000016_IL_004e:
-call instance System.Storage.FileWriteError::get_IsAccessDenied()
-call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
-M00000016_IL_0053:
-brtrue M00000016_IL_005d
-M00000016_IL_0058:
-br M00000016_IL_0064
-M00000016_IL_005d:
-M00000016_IL_005e:
+M00000010_IL_0088:
+stloc local1
+M00000010_IL_0089:
+br M00000010_IL_015b
+M00000010_IL_008e:
+M00000010_IL_008f:
+M00000010_IL_0090:
+ldloc local0
+M00000010_IL_0091:
+stloc local8
+M00000010_IL_0093:
+ldloca local8
+M00000010_IL_0095:
+ldloca local9
+M00000010_IL_0097:
+call instance System.Storage.FileWriteError::TryGetValue(System.Storage.FileWriteError.AccessDenied&)
+M00000010_IL_009c:
+brfalse M00000010_IL_00bb
+M00000010_IL_00a1:
+ldloc local9
+M00000010_IL_00a3:
+pop
+M00000010_IL_00a4:
+M00000010_IL_00a5:
+br M00000010_IL_00b0
+M00000010_IL_00b0:
 ldstr "AccessDenied"
-M00000016_IL_0063:
-ret
-M00000016_IL_0064:
-M00000016_IL_0065:
-M00000016_IL_0066:
-ldarg 0
-M00000016_IL_0067:
-call instance System.Storage.FileWriteError::get_IsNotRegularFile()
-call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
-M00000016_IL_006c:
-brtrue M00000016_IL_0076
-M00000016_IL_0071:
-br M00000016_IL_007d
-M00000016_IL_0076:
-M00000016_IL_0077:
+M00000010_IL_00b5:
+stloc local1
+M00000010_IL_00b6:
+br M00000010_IL_015b
+M00000010_IL_00bb:
+M00000010_IL_00bc:
+ldloc local0
+M00000010_IL_00bd:
+stloc local10
+M00000010_IL_00bf:
+ldloca local10
+M00000010_IL_00c1:
+ldloca local11
+M00000010_IL_00c3:
+call instance System.Storage.FileWriteError::TryGetValue(System.Storage.FileWriteError.NotRegularFile&)
+M00000010_IL_00c8:
+brfalse M00000010_IL_00e7
+M00000010_IL_00cd:
+ldloc local11
+M00000010_IL_00cf:
+pop
+M00000010_IL_00d0:
+M00000010_IL_00d1:
+br M00000010_IL_00dc
+M00000010_IL_00dc:
 ldstr "NotRegularFile"
-M00000016_IL_007c:
-ret
-M00000016_IL_007d:
-M00000016_IL_007e:
-M00000016_IL_007f:
-ldarg 0
-M00000016_IL_0080:
-call instance System.Storage.FileWriteError::get_IsTooLarge()
-call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
-M00000016_IL_0085:
-brtrue M00000016_IL_008f
-M00000016_IL_008a:
-br M00000016_IL_0096
-M00000016_IL_008f:
-M00000016_IL_0090:
+M00000010_IL_00e1:
+stloc local1
+M00000010_IL_00e2:
+br M00000010_IL_015b
+M00000010_IL_00e7:
+M00000010_IL_00e8:
+M00000010_IL_00e9:
+ldloc local0
+M00000010_IL_00ea:
+stloc local12
+M00000010_IL_00ec:
+ldloca local12
+M00000010_IL_00ee:
+ldloca local13
+M00000010_IL_00f0:
+call instance System.Storage.FileWriteError::TryGetValue(System.Storage.FileWriteError.TooLarge&)
+M00000010_IL_00f5:
+brfalse M00000010_IL_0114
+M00000010_IL_00fa:
+ldloc local13
+M00000010_IL_00fc:
+pop
+M00000010_IL_00fd:
+M00000010_IL_00fe:
+br M00000010_IL_0109
+M00000010_IL_0109:
 ldstr "TooLarge"
-M00000016_IL_0095:
-ret
-M00000016_IL_0096:
-M00000016_IL_0097:
-M00000016_IL_0098:
-ldarg 0
-M00000016_IL_0099:
-call instance System.Storage.FileWriteError::get_IsWriteFailed()
-call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
-M00000016_IL_009e:
-brtrue M00000016_IL_00a8
-M00000016_IL_00a3:
-br M00000016_IL_00af
-M00000016_IL_00a8:
-M00000016_IL_00a9:
+M00000010_IL_010e:
+stloc local1
+M00000010_IL_010f:
+br M00000010_IL_015b
+M00000010_IL_0114:
+M00000010_IL_0115:
+M00000010_IL_0116:
+ldloc local0
+M00000010_IL_0117:
+stloc local14
+M00000010_IL_0119:
+ldloca local14
+M00000010_IL_011b:
+ldloca local15
+M00000010_IL_011d:
+call instance System.Storage.FileWriteError::TryGetValue(System.Storage.FileWriteError.WriteFailed&)
+M00000010_IL_0122:
+brfalse M00000010_IL_0141
+M00000010_IL_0127:
+ldloc local15
+M00000010_IL_0129:
+pop
+M00000010_IL_012a:
+M00000010_IL_012b:
+br M00000010_IL_0136
+M00000010_IL_0136:
 ldstr "WriteFailed"
-M00000016_IL_00ae:
+M00000010_IL_013b:
+stloc local1
+M00000010_IL_013c:
+br M00000010_IL_015b
+M00000010_IL_0141:
+M00000010_IL_0142:
+ldloc local0
+M00000010_IL_0143:
+pop
+M00000010_IL_0144:
+ldc.i4 1
+M00000010_IL_0145:
+brfalse M00000010_IL_0156
+M00000010_IL_014a:
+M00000010_IL_014b:
+ldstr "Empty"
+M00000010_IL_0150:
+stloc local1
+M00000010_IL_0151:
+br M00000010_IL_015b
+M00000010_IL_0156:
+M00000010_IL_0157:
+M00000010_IL_0158:
+M00000010_IL_0159:
+M00000010_IL_015a:
+fault "Guest program reached a terminal failure"
+M00000010_IL_015b:
+M00000010_IL_015c:
+ldloc local1
+M00000010_IL_015d:
 ret
-M00000016_IL_00af:
-M00000016_IL_00b0:
-M00000016_IL_00b1:
-ldstr "invalid file write error"
-M00000016_IL_00b6:
-call System.Fault(String)
-M00000016_IL_00bb:
-M00000016_IL_00bc:
-ldstr ""
-M00000016_IL_00c1:
+.end
+.method instance byref get_Value() -> System.Object
+M00000011_IL_0000:
+ldarg 0
+M00000011_IL_0001:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+M00000011_IL_0006:
+conv.i4
+M00000011_IL_0007:
+ldc.i4 1
+M00000011_IL_0008:
+conv.i4
+M00000011_IL_0009:
+ceq
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_000b:
+brtrue M00000011_IL_0015
+M00000011_IL_0010:
+br M00000011_IL_0021
+M00000011_IL_0015:
+ldarg 0
+M00000011_IL_0016:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C69644C696D69745061796C6F61643E
+M00000011_IL_001b:
+box System.Storage.FileWriteError.InvalidLimit
+M00000011_IL_0020:
+ret
+M00000011_IL_0021:
+M00000011_IL_0022:
+ldarg 0
+M00000011_IL_0023:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+M00000011_IL_0028:
+conv.i4
+M00000011_IL_0029:
+ldc.i4 2
+M00000011_IL_002a:
+conv.i4
+M00000011_IL_002b:
+ceq
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_002d:
+brtrue M00000011_IL_0037
+M00000011_IL_0032:
+br M00000011_IL_0043
+M00000011_IL_0037:
+ldarg 0
+M00000011_IL_0038:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C496E76616C6964506174685061796C6F61643E
+M00000011_IL_003d:
+box System.Storage.FileWriteError.InvalidPath
+M00000011_IL_0042:
+ret
+M00000011_IL_0043:
+M00000011_IL_0044:
+ldarg 0
+M00000011_IL_0045:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+M00000011_IL_004a:
+conv.i4
+M00000011_IL_004b:
+ldc.i4 3
+M00000011_IL_004c:
+conv.i4
+M00000011_IL_004d:
+ceq
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_004f:
+brtrue M00000011_IL_0059
+M00000011_IL_0054:
+br M00000011_IL_0065
+M00000011_IL_0059:
+ldarg 0
+M00000011_IL_005a:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
+M00000011_IL_005f:
+box System.Storage.FileWriteError.NotFound
+M00000011_IL_0064:
+ret
+M00000011_IL_0065:
+M00000011_IL_0066:
+ldarg 0
+M00000011_IL_0067:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+M00000011_IL_006c:
+conv.i4
+M00000011_IL_006d:
+ldc.i4 4
+M00000011_IL_006e:
+conv.i4
+M00000011_IL_006f:
+ceq
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_0071:
+brtrue M00000011_IL_007b
+M00000011_IL_0076:
+br M00000011_IL_0087
+M00000011_IL_007b:
+ldarg 0
+M00000011_IL_007c:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+M00000011_IL_0081:
+box System.Storage.FileWriteError.AccessDenied
+M00000011_IL_0086:
+ret
+M00000011_IL_0087:
+M00000011_IL_0088:
+ldarg 0
+M00000011_IL_0089:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+M00000011_IL_008e:
+conv.i4
+M00000011_IL_008f:
+ldc.i4 5
+M00000011_IL_0090:
+conv.i4
+M00000011_IL_0091:
+ceq
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_0093:
+brtrue M00000011_IL_009d
+M00000011_IL_0098:
+br M00000011_IL_00a9
+M00000011_IL_009d:
+ldarg 0
+M00000011_IL_009e:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C4E6F74526567756C617246696C655061796C6F61643E
+M00000011_IL_00a3:
+box System.Storage.FileWriteError.NotRegularFile
+M00000011_IL_00a8:
+ret
+M00000011_IL_00a9:
+M00000011_IL_00aa:
+ldarg 0
+M00000011_IL_00ab:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+M00000011_IL_00b0:
+conv.i4
+M00000011_IL_00b1:
+ldc.i4 6
+M00000011_IL_00b2:
+conv.i4
+M00000011_IL_00b3:
+ceq
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_00b5:
+brtrue M00000011_IL_00bf
+M00000011_IL_00ba:
+br M00000011_IL_00cb
+M00000011_IL_00bf:
+ldarg 0
+M00000011_IL_00c0:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C546F6F4C617267655061796C6F61643E
+M00000011_IL_00c5:
+box System.Storage.FileWriteError.TooLarge
+M00000011_IL_00ca:
+ret
+M00000011_IL_00cb:
+M00000011_IL_00cc:
+ldarg 0
+M00000011_IL_00cd:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C5461673E
+M00000011_IL_00d2:
+conv.i4
+M00000011_IL_00d3:
+ldc.i4 7
+M00000011_IL_00d4:
+conv.i4
+M00000011_IL_00d5:
+ceq
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_00d7:
+brtrue M00000011_IL_00e1
+M00000011_IL_00dc:
+br M00000011_IL_00ed
+M00000011_IL_00e1:
+ldarg 0
+M00000011_IL_00e2:
+ldfld System.Storage.FileWriteError::Metadata_V1_3C57726974654661696C65645061796C6F61643E
+M00000011_IL_00e7:
+box System.Storage.FileWriteError.WriteFailed
+M00000011_IL_00ec:
+ret
+M00000011_IL_00ed:
+M00000011_IL_00ee:
+M00000011_IL_00ef:
+call neoCLR.Library.System.Storage.FileWriteError.DefaultReference53797374656D2E4F626A656374()
+ret
+.end
+.method instance byref get_HasValue() -> Boolean
+M00000012_IL_0000:
+ldarg 0
+M00000012_IL_0001:
+call instance System.Storage.FileWriteError::get_Value()
+M00000012_IL_0006:
+M00000012_IL_0007:
+ref.isnull
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
+M00000012_IL_0009:
+ldc.i4 0
+M00000012_IL_000a:
+ceq
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean)
+M00000012_IL_000c:
+call neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .end

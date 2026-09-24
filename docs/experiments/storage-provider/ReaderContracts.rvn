@@ -40,7 +40,7 @@ func ReaderAndSeek(input: InputStream, seek: SeekableStream) {
     ExpectPosition(seek, 0)
     match seek.Seek(-1) {
         Error(let error) => {
-            if !error.IsInvalidRange {
+            if !(error is System.IO.StreamError.InvalidRange) {
                 System.Fault("Invalid seek changed error")
             }
         }
@@ -76,7 +76,7 @@ func ReaderAndSeek(input: InputStream, seek: SeekableStream) {
     let owner: TextReader = StreamReader(input)
     match owner.ReadToEnd(13) {
         Error(let error) => {
-            if !error.IsLimitExceeded {
+            if !(error is System.IO.TextReadError.LimitExceeded) {
                 System.Fault("Text bound changed error")
             }
         }
@@ -87,7 +87,7 @@ func ReaderAndSeek(input: InputStream, seek: SeekableStream) {
     owner.Close()
     match seek.GetPosition() {
         Error(let error) => {
-            if !error.IsClosed {
+            if !(error is System.IO.StreamError.Closed) {
                 System.Fault("Reader failed to close owned input")
             }
         }
@@ -95,7 +95,7 @@ func ReaderAndSeek(input: InputStream, seek: SeekableStream) {
     }
     match owner.ReadToEnd(-1) {
         Error(let error) => {
-            if !error.IsClosed {
+            if !(error is System.IO.TextReadError.Closed) {
                 System.Fault("Closed reader changed precedence")
             }
         }
@@ -108,7 +108,7 @@ class FailingInput : InputStream {
     val Calls: int => calls
     func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         calls += 1
-        return Error(StreamError(StreamError.AccessDenied()))
+        return Error<StreamError>(StreamError.AccessDenied)
     }
     func Close() { }
 }
@@ -125,7 +125,7 @@ func Main() {
     let bad = StreamReader(MemoryInput(invalid))
     match bad.ReadToEnd(1) {
         Error(let error) => {
-            if !error.IsInvalidUtf8 {
+            if !(error is System.IO.TextReadError.InvalidUtf8) {
                 System.Fault("Malformed UTF-8 changed error")
             }
         }
@@ -142,7 +142,7 @@ func Main() {
     let errors = StreamReader(failing)
     match errors.ReadToEnd(-1) {
         Error(let error) => {
-            if !error.IsInvalidRange || failing.Calls != 0 {
+            if !(error is System.IO.TextReadError.InvalidRange) || failing.Calls != 0 {
                 System.Fault("Invalid limit consumed input")
             }
         }
@@ -150,7 +150,7 @@ func Main() {
     }
     match errors.ReadToEnd(8) {
         Error(let error) => {
-            if !error.IsAccessDenied {
+            if !(error is System.IO.TextReadError.AccessDenied) {
                 System.Fault("Stream failure distinction lost")
             }
         }

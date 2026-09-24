@@ -1,118 +1,24 @@
 namespace System.Storage
 
-import System.Runtime.CompilerServices.ValueStorage
+public union StorageLookupError {
+    case InvalidPath
+    case NotFound
+    case AccessDenied
+    case WrongKind
+    case IoFailure
+    case InvalidRange
+    case LimitExceeded
 
-[System.Runtime.CompilerServices.Union]
-public struct StorageLookupError {
-    private field Stored: System.Value
-
-    public struct InvalidPath { }
-
-    init(value: StorageLookupError.InvalidPath) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsInvalidPath: bool => ValueStorage.Is<StorageLookupError.InvalidPath>(Stored)
-
-    func GetInvalidPath() -> StorageLookupError.InvalidPath {
-        return ValueStorage.Unpack<StorageLookupError.InvalidPath>(Stored)
-    }
-
-    public struct NotFound { }
-
-    init(value: StorageLookupError.NotFound) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsNotFound: bool => ValueStorage.Is<StorageLookupError.NotFound>(Stored)
-
-    func GetNotFound() -> StorageLookupError.NotFound {
-        return ValueStorage.Unpack<StorageLookupError.NotFound>(Stored)
-    }
-
-    public struct AccessDenied { }
-
-    init(value: StorageLookupError.AccessDenied) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsAccessDenied: bool => ValueStorage.Is<StorageLookupError.AccessDenied>(Stored)
-
-    func GetAccessDenied() -> StorageLookupError.AccessDenied {
-        return ValueStorage.Unpack<StorageLookupError.AccessDenied>(Stored)
-    }
-
-    public struct WrongKind { }
-
-    init(value: StorageLookupError.WrongKind) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsWrongKind: bool => ValueStorage.Is<StorageLookupError.WrongKind>(Stored)
-
-    func GetWrongKind() -> StorageLookupError.WrongKind {
-        return ValueStorage.Unpack<StorageLookupError.WrongKind>(Stored)
-    }
-
-    public struct IoFailure { }
-
-    init(value: StorageLookupError.IoFailure) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsIoFailure: bool => ValueStorage.Is<StorageLookupError.IoFailure>(Stored)
-
-    func GetIoFailure() -> StorageLookupError.IoFailure {
-        return ValueStorage.Unpack<StorageLookupError.IoFailure>(Stored)
-    }
-
-    public struct InvalidRange { }
-
-    init(value: StorageLookupError.InvalidRange) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsInvalidRange: bool => ValueStorage.Is<StorageLookupError.InvalidRange>(Stored)
-
-    func GetInvalidRange() -> StorageLookupError.InvalidRange {
-        return ValueStorage.Unpack<StorageLookupError.InvalidRange>(Stored)
-    }
-
-    public struct LimitExceeded { }
-
-    init(value: StorageLookupError.LimitExceeded) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsLimitExceeded: bool => ValueStorage.Is<StorageLookupError.LimitExceeded>(Stored)
-
-    func GetLimitExceeded() -> StorageLookupError.LimitExceeded {
-        return ValueStorage.Unpack<StorageLookupError.LimitExceeded>(Stored)
-    }
-
-    func ToString() -> string {
-        if IsInvalidRange {
-            return "InvalidRange"
+    override func ToString() -> string {
+        return match self {
+            InvalidPath => "InvalidPath"
+            NotFound => "NotFound"
+            AccessDenied => "AccessDenied"
+            WrongKind => "WrongKind"
+            IoFailure => "IoFailure"
+            InvalidRange => "InvalidRange"
+            LimitExceeded => "LimitExceeded"
+            _ => "Empty"
         }
-        if IsLimitExceeded {
-            return "LimitExceeded"
-        }
-        if IsInvalidPath {
-            return "InvalidPath"
-        }
-        if IsNotFound {
-            return "NotFound"
-        }
-        if IsAccessDenied {
-            return "AccessDenied"
-        }
-        if IsWrongKind {
-            return "WrongKind"
-        }
-        if IsIoFailure {
-            return "IoFailure"
-        }
-        System.Fault("Invalid StorageLookupError case")
-        return ""
     }
 }

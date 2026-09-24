@@ -325,6 +325,8 @@ ldloca local13
 initobj System.Result.Ok<Int32>
 ldloca local15
 initobj System.Option.None
+ldloca local19
+initobj System.ConsoleReadError
 M00000010_IL_0000:
 M00000010_IL_0001:
 M00000010_IL_0002:

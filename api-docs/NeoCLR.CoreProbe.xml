@@ -11,63 +11,41 @@
     <member name="M:System.HashCode.Add(System.String)"><summary>Mixes the UTF-8 contents of a string into this accumulator.</summary><param name="value">The non-null string component.</param><remarks>Allocates a temporary UTF-8 byte snapshot. No Unicode normalization is performed. Null is not supported.</remarks></member>
     <member name="M:System.HashCode.ToHashCode"><summary>Returns the current combined hash without changing the accumulator.</summary><returns>A 32-bit hash. Do not persist it or assume different values cannot collide.</returns></member>
     <member name="M:System.HashCode.Combine(System.Int32,System.Int32)"><summary>Combines two integer components in order.</summary><param name="first">The first component.</param><param name="second">The second component.</param><returns>The same hash as adding both components to an empty accumulator.</returns></member>
-    <member name="T:System.IO.TextReadError"><summary>An expected text-reading failure.</summary><remarks>Preserves the named input StreamError distinction or reports InvalidUtf8. InvalidRange rejects negative bounds; LimitExceeded reports bounds or size overflow. Cases are values; extracting the wrong case faults.</remarks></member>
-    <member name="M:System.IO.TextReadError.ToString"><summary>Returns the active text-reading error case name.</summary><returns>A stable case name for diagnostics.</returns></member>
+    <member name="T:System.IO.TextReadError"><summary>An expected text-reading failure.</summary><remarks>Preserves the named input StreamError distinction or reports InvalidUtf8. InvalidRange rejects negative bounds; LimitExceeded reports bounds or size overflow. Cases are values; patterns test and extract the active case. Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks></member>
+    <member name="M:System.IO.TextReadError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
     <member name="T:System.IO.TextReadError.InvalidPath"><summary>The InvalidPath text-reading error case.</summary></member>
     <member name="M:System.IO.TextReadError.InvalidPath.#ctor"><summary>Creates InvalidPath.</summary></member>
     <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.InvalidPath)"><summary>Creates an error containing InvalidPath.</summary><param name="value">The error case.</param></member>
-    <member name="P:System.IO.TextReadError.IsInvalidPath"><summary>Whether this error is InvalidPath.</summary><returns>True for the named case.</returns></member>
-    <member name="M:System.IO.TextReadError.GetInvalidPath"><summary>Extracts InvalidPath.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
     <member name="T:System.IO.TextReadError.NotFound"><summary>The NotFound text-reading error case.</summary></member>
     <member name="M:System.IO.TextReadError.NotFound.#ctor"><summary>Creates NotFound.</summary></member>
     <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.NotFound)"><summary>Creates an error containing NotFound.</summary><param name="value">The error case.</param></member>
-    <member name="P:System.IO.TextReadError.IsNotFound"><summary>Whether this error is NotFound.</summary><returns>True for the named case.</returns></member>
-    <member name="M:System.IO.TextReadError.GetNotFound"><summary>Extracts NotFound.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
     <member name="T:System.IO.TextReadError.AccessDenied"><summary>The AccessDenied text-reading error case.</summary></member>
     <member name="M:System.IO.TextReadError.AccessDenied.#ctor"><summary>Creates AccessDenied.</summary></member>
     <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.AccessDenied)"><summary>Creates an error containing AccessDenied.</summary><param name="value">The error case.</param></member>
-    <member name="P:System.IO.TextReadError.IsAccessDenied"><summary>Whether this error is AccessDenied.</summary><returns>True for the named case.</returns></member>
-    <member name="M:System.IO.TextReadError.GetAccessDenied"><summary>Extracts AccessDenied.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
     <member name="T:System.IO.TextReadError.WrongKind"><summary>The WrongKind text-reading error case.</summary></member>
     <member name="M:System.IO.TextReadError.WrongKind.#ctor"><summary>Creates WrongKind.</summary></member>
     <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.WrongKind)"><summary>Creates an error containing WrongKind.</summary><param name="value">The error case.</param></member>
-    <member name="P:System.IO.TextReadError.IsWrongKind"><summary>Whether this error is WrongKind.</summary><returns>True for the named case.</returns></member>
-    <member name="M:System.IO.TextReadError.GetWrongKind"><summary>Extracts WrongKind.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
     <member name="T:System.IO.TextReadError.AlreadyExists"><summary>The AlreadyExists text-reading error case.</summary></member>
     <member name="M:System.IO.TextReadError.AlreadyExists.#ctor"><summary>Creates AlreadyExists.</summary></member>
     <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.AlreadyExists)"><summary>Creates an error containing AlreadyExists.</summary><param name="value">The error case.</param></member>
-    <member name="P:System.IO.TextReadError.IsAlreadyExists"><summary>Whether this error is AlreadyExists.</summary><returns>True for the named case.</returns></member>
-    <member name="M:System.IO.TextReadError.GetAlreadyExists"><summary>Extracts AlreadyExists.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
     <member name="T:System.IO.TextReadError.Closed"><summary>The Closed text-reading error case.</summary></member>
     <member name="M:System.IO.TextReadError.Closed.#ctor"><summary>Creates Closed.</summary></member>
     <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.Closed)"><summary>Creates an error containing Closed.</summary><param name="value">The error case.</param></member>
-    <member name="P:System.IO.TextReadError.IsClosed"><summary>Whether this error is Closed.</summary><returns>True for the named case.</returns></member>
-    <member name="M:System.IO.TextReadError.GetClosed"><summary>Extracts Closed.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
     <member name="T:System.IO.TextReadError.InvalidRange"><summary>The InvalidRange text-reading error case.</summary></member>
     <member name="M:System.IO.TextReadError.InvalidRange.#ctor"><summary>Creates InvalidRange.</summary></member>
     <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.InvalidRange)"><summary>Creates an error containing InvalidRange.</summary><param name="value">The error case.</param></member>
-    <member name="P:System.IO.TextReadError.IsInvalidRange"><summary>Whether this error is InvalidRange.</summary><returns>True for the named case.</returns></member>
-    <member name="M:System.IO.TextReadError.GetInvalidRange"><summary>Extracts InvalidRange.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
     <member name="T:System.IO.TextReadError.LimitExceeded"><summary>The LimitExceeded text-reading error case.</summary></member>
     <member name="M:System.IO.TextReadError.LimitExceeded.#ctor"><summary>Creates LimitExceeded.</summary></member>
     <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.LimitExceeded)"><summary>Creates an error containing LimitExceeded.</summary><param name="value">The error case.</param></member>
-    <member name="P:System.IO.TextReadError.IsLimitExceeded"><summary>Whether this error is LimitExceeded.</summary><returns>True for the named case.</returns></member>
-    <member name="M:System.IO.TextReadError.GetLimitExceeded"><summary>Extracts LimitExceeded.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
     <member name="T:System.IO.TextReadError.WrongAccess"><summary>The WrongAccess text-reading error case.</summary></member>
     <member name="M:System.IO.TextReadError.WrongAccess.#ctor"><summary>Creates WrongAccess.</summary></member>
     <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.WrongAccess)"><summary>Creates an error containing WrongAccess.</summary><param name="value">The error case.</param></member>
-    <member name="P:System.IO.TextReadError.IsWrongAccess"><summary>Whether this error is WrongAccess.</summary><returns>True for the named case.</returns></member>
-    <member name="M:System.IO.TextReadError.GetWrongAccess"><summary>Extracts WrongAccess.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
     <member name="T:System.IO.TextReadError.IoFailure"><summary>The IoFailure text-reading error case.</summary></member>
     <member name="M:System.IO.TextReadError.IoFailure.#ctor"><summary>Creates IoFailure.</summary></member>
     <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.IoFailure)"><summary>Creates an error containing IoFailure.</summary><param name="value">The error case.</param></member>
-    <member name="P:System.IO.TextReadError.IsIoFailure"><summary>Whether this error is IoFailure.</summary><returns>True for the named case.</returns></member>
-    <member name="M:System.IO.TextReadError.GetIoFailure"><summary>Extracts IoFailure.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
     <member name="T:System.IO.TextReadError.InvalidUtf8"><summary>The InvalidUtf8 text-reading error case.</summary></member>
     <member name="M:System.IO.TextReadError.InvalidUtf8.#ctor"><summary>Creates InvalidUtf8.</summary></member>
     <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.InvalidUtf8)"><summary>Creates an error containing InvalidUtf8.</summary><param name="value">The error case.</param></member>
-    <member name="P:System.IO.TextReadError.IsInvalidUtf8"><summary>Whether this error is InvalidUtf8.</summary><returns>True for the named case.</returns></member>
-    <member name="M:System.IO.TextReadError.GetInvalidUtf8"><summary>Extracts InvalidUtf8.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
     <member name="T:System.IO.TextReader"><summary>A sequential text-reading contract independent of its backing source.</summary><remarks>Development API: bounded line and whole-text reading with explicit Close. Does not require byte streams or seekability. Synchronous; no async members are implemented.</remarks></member>
     <member name="T:System.IO.StreamReader"><summary>A synchronous strict UTF-8 TextReader over InputStream.</summary><remarks>Preserves a UTF-8 BOM as text. Reads from the current byte position and buffers remaining input until EOF; not constant-memory decoding. Supports partial reads and split UTF-8 characters. See the [reader guide](/docs/streams.html#text-readers). Close owns the input unless leaveOpen was selected. The reader has no seek API.</remarks></member>
     <member name="M:System.IO.StreamReader.#ctor(System.IO.InputStream)"><summary>Creates a reader that closes its input when closed.</summary><param name="input">Input at its current position; construction performs no read.</param></member>
@@ -111,13 +89,9 @@
     <member name="T:System.Storage.StorageLookupError.InvalidRange"><summary>The enumeration bound is negative.</summary></member>
     <member name="M:System.Storage.StorageLookupError.InvalidRange.#ctor"><summary>Creates the InvalidRange case.</summary></member>
     <member name="M:System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.InvalidRange)"><summary>Creates a lookup error containing InvalidRange.</summary><param name="value">The error case.</param></member>
-    <member name="P:System.Storage.StorageLookupError.IsInvalidRange"><summary>Whether the error is InvalidRange.</summary><returns>True for this case.</returns></member>
-    <member name="M:System.Storage.StorageLookupError.GetInvalidRange"><summary>Extracts the InvalidRange case.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
     <member name="T:System.Storage.StorageLookupError.LimitExceeded"><summary>The enumeration exceeds the requested or provider resource bound.</summary></member>
     <member name="M:System.Storage.StorageLookupError.LimitExceeded.#ctor"><summary>Creates the LimitExceeded case.</summary></member>
     <member name="M:System.Storage.StorageLookupError.#ctor(System.Storage.StorageLookupError.LimitExceeded)"><summary>Creates a lookup error containing LimitExceeded.</summary><param name="value">The error case.</param></member>
-    <member name="P:System.Storage.StorageLookupError.IsLimitExceeded"><summary>Whether the error is LimitExceeded.</summary><returns>True for this case.</returns></member>
-    <member name="M:System.Storage.StorageLookupError.GetLimitExceeded"><summary>Extracts the LimitExceeded case.</summary><returns>The case value; a mismatched extraction faults.</returns></member>
     <member name="M:System.Storage.Directory.GetItems(System.Int32)">
       <summary>Retrieves a bounded snapshot of direct child item interfaces.</summary>
       <param name="maxItems">Maximum number of items to return. Negative values return InvalidRange; exceeding provider bounds or the requested count returns LimitExceeded.</param>
@@ -379,12 +353,9 @@
     </member>
     <member name="T:System.IO.StreamError">
       <summary>Expected file-stream failures represented as typed cases. The error taxonomy is provisional.</summary>
-      <remarks>Opening and transferring currently share this error type. It is distinct from Task cancellation and runtime faults. Do not use an uninitialized/default carrier.</remarks>
+      <remarks>Opening and transferring currently share this error type. It is distinct from Task cancellation and runtime faults. Do not use an uninitialized/default carrier. Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks>
     </member>
-    <member name="M:System.IO.StreamError.ToString">
-      <summary>Returns the diagnostic case name.</summary>
-      <returns>The current case name; this is not a localization or stable serialization format.</returns>
-    </member>
+    <member name="M:System.IO.StreamError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
     <member name="T:System.IO.StreamError.InvalidPath">
       <summary>The path is empty, contains a NUL, or is rejected as invalid by the host.</summary>
     </member>
@@ -395,14 +366,8 @@
       <summary>Wraps the InvalidPath case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.IO.StreamError.IsInvalidPath">
-      <summary>Tests whether this is the InvalidPath case.</summary>
-    </member>
-    <member name="M:System.IO.StreamError.GetInvalidPath">
-      <summary>Extracts the InvalidPath case.</summary>
-      <returns>The case value.</returns>
-      <remarks>Only call when IsInvalidPath is true; extracting a different case faults.</remarks>
-    </member>
+
+
     <member name="T:System.IO.StreamError.NotFound">
       <summary>The requested file or a required parent does not exist.</summary>
     </member>
@@ -413,14 +378,8 @@
       <summary>Wraps the NotFound case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.IO.StreamError.IsNotFound">
-      <summary>Tests whether this is the NotFound case.</summary>
-    </member>
-    <member name="M:System.IO.StreamError.GetNotFound">
-      <summary>Extracts the NotFound case.</summary>
-      <returns>The case value.</returns>
-      <remarks>Only call when IsNotFound is true; extracting a different case faults.</remarks>
-    </member>
+
+
     <member name="T:System.IO.StreamError.AccessDenied">
       <summary>The host denies access.</summary>
     </member>
@@ -431,14 +390,8 @@
       <summary>Wraps the AccessDenied case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.IO.StreamError.IsAccessDenied">
-      <summary>Tests whether this is the AccessDenied case.</summary>
-    </member>
-    <member name="M:System.IO.StreamError.GetAccessDenied">
-      <summary>Extracts the AccessDenied case.</summary>
-      <returns>The case value.</returns>
-      <remarks>Only call when IsAccessDenied is true; extracting a different case faults.</remarks>
-    </member>
+
+
     <member name="T:System.IO.StreamError.WrongKind">
       <summary>The path does not resolve to an allowed regular file or required directory.</summary>
     </member>
@@ -449,14 +402,8 @@
       <summary>Wraps the WrongKind case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.IO.StreamError.IsWrongKind">
-      <summary>Tests whether this is the WrongKind case.</summary>
-    </member>
-    <member name="M:System.IO.StreamError.GetWrongKind">
-      <summary>Extracts the WrongKind case.</summary>
-      <returns>The case value.</returns>
-      <remarks>Only call when IsWrongKind is true; extracting a different case faults.</remarks>
-    </member>
+
+
     <member name="T:System.IO.StreamError.AlreadyExists">
       <summary>Exclusive creation found an existing entry.</summary>
     </member>
@@ -467,14 +414,8 @@
       <summary>Wraps the AlreadyExists case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.IO.StreamError.IsAlreadyExists">
-      <summary>Tests whether this is the AlreadyExists case.</summary>
-    </member>
-    <member name="M:System.IO.StreamError.GetAlreadyExists">
-      <summary>Extracts the AlreadyExists case.</summary>
-      <returns>The case value.</returns>
-      <remarks>Only call when IsAlreadyExists is true; extracting a different case faults.</remarks>
-    </member>
+
+
     <member name="T:System.IO.StreamError.Closed">
       <summary>The stream is closed or its owning invocation has ended.</summary>
     </member>
@@ -485,14 +426,8 @@
       <summary>Wraps the Closed case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.IO.StreamError.IsClosed">
-      <summary>Tests whether this is the Closed case.</summary>
-    </member>
-    <member name="M:System.IO.StreamError.GetClosed">
-      <summary>Extracts the Closed case.</summary>
-      <returns>The case value.</returns>
-      <remarks>Only call when IsClosed is true; extracting a different case faults.</remarks>
-    </member>
+
+
     <member name="T:System.IO.StreamError.InvalidRange">
       <summary>The buffer offset or count is negative or outside the array.</summary>
     </member>
@@ -503,14 +438,8 @@
       <summary>Wraps the InvalidRange case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.IO.StreamError.IsInvalidRange">
-      <summary>Tests whether this is the InvalidRange case.</summary>
-    </member>
-    <member name="M:System.IO.StreamError.GetInvalidRange">
-      <summary>Extracts the InvalidRange case.</summary>
-      <returns>The case value.</returns>
-      <remarks>Only call when IsInvalidRange is true; extracting a different case faults.</remarks>
-    </member>
+
+
     <member name="T:System.IO.StreamError.LimitExceeded">
       <summary>The request exceeds a transfer or resource limit.</summary>
     </member>
@@ -521,14 +450,8 @@
       <summary>Wraps the LimitExceeded case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.IO.StreamError.IsLimitExceeded">
-      <summary>Tests whether this is the LimitExceeded case.</summary>
-    </member>
-    <member name="M:System.IO.StreamError.GetLimitExceeded">
-      <summary>Extracts the LimitExceeded case.</summary>
-      <returns>The case value.</returns>
-      <remarks>Only call when IsLimitExceeded is true; extracting a different case faults.</remarks>
-    </member>
+
+
     <member name="T:System.IO.StreamError.WrongAccess">
       <summary>The internal resource has the wrong access direction; directional wrappers do not normally expose this case.</summary>
     </member>
@@ -539,14 +462,8 @@
       <summary>Wraps the WrongAccess case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.IO.StreamError.IsWrongAccess">
-      <summary>Tests whether this is the WrongAccess case.</summary>
-    </member>
-    <member name="M:System.IO.StreamError.GetWrongAccess">
-      <summary>Extracts the WrongAccess case.</summary>
-      <returns>The case value.</returns>
-      <remarks>Only call when IsWrongAccess is true; extracting a different case faults.</remarks>
-    </member>
+
+
     <member name="T:System.IO.StreamError.IoFailure">
       <summary>Another host I/O error occurred.</summary>
     </member>
@@ -557,14 +474,8 @@
       <summary>Wraps the IoFailure case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-    <member name="P:System.IO.StreamError.IsIoFailure">
-      <summary>Tests whether this is the IoFailure case.</summary>
-    </member>
-    <member name="M:System.IO.StreamError.GetIoFailure">
-      <summary>Extracts the IoFailure case.</summary>
-      <returns>The case value.</returns>
-      <remarks>Only call when IsIoFailure is true; extracting a different case faults.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.Metadata">
       <summary>Synchronous metadata queries for native host paths.</summary>
       <remarks>Development after Preview 9. This static host adapter is separate from the experimental provider API. It performs no content read and retains no stream handle.</remarks>
@@ -575,60 +486,23 @@
       <param name="path">A native host path. Relative paths use the process working directory, not a provider root.</param>
       <returns>Ok with File or Directory, or a typed StorageLookupError. No resource is retained.</returns>
     </member>
-    <member name="T:System.Storage.EntryKind">
-      <summary>The supported kinds observed by a metadata query.</summary>
-      <remarks>Development after Preview 9. Use a named case; an uninitialized carrier is not a valid value. Prefer union patterns when supported by the consuming frontend.</remarks>
-    </member>
-    <member name="M:System.Storage.EntryKind.ToString">
-      <summary>Returns the selected case name.</summary>
-      <returns>The stable case label for display, not a filesystem diagnostic.</returns>
-    </member>
-    <member name="T:System.Storage.EntryKind.File">
-      <summary>A regular file was observed.</summary>
-    </member>
-    <member name="M:System.Storage.EntryKind.File.#ctor">
-      <summary>Constructs the File case.</summary>
-    </member>
-    <member name="M:System.Storage.EntryKind.#ctor(System.Storage.EntryKind.File)">
-      <summary>Constructs a carrier holding File.</summary>
-      <param name="value">The File case to hold.</param>
-    </member>
-    <member name="P:System.Storage.EntryKind.IsFile">
-      <summary>Tests whether this value holds File.</summary>
-      <returns>True only for this case.</returns>
-    </member>
-    <member name="M:System.Storage.EntryKind.GetFile">
-      <summary>Extracts the File case.</summary>
-      <remarks>Requires the matching case; a mismatch is a runtime fault.</remarks>
-      <returns>The held case value.</returns>
-    </member>
-    <member name="T:System.Storage.EntryKind.Directory">
-      <summary>A directory was observed.</summary>
-    </member>
-    <member name="M:System.Storage.EntryKind.Directory.#ctor">
-      <summary>Constructs the Directory case.</summary>
-    </member>
-    <member name="M:System.Storage.EntryKind.#ctor(System.Storage.EntryKind.Directory)">
-      <summary>Constructs a carrier holding Directory.</summary>
-      <param name="value">The Directory case to hold.</param>
-    </member>
-    <member name="P:System.Storage.EntryKind.IsDirectory">
-      <summary>Tests whether this value holds Directory.</summary>
-      <returns>True only for this case.</returns>
-    </member>
-    <member name="M:System.Storage.EntryKind.GetDirectory">
-      <summary>Extracts the Directory case.</summary>
-      <remarks>Requires the matching case; a mismatch is a runtime fault.</remarks>
-      <returns>The held case value.</returns>
-    </member>
+
+
+
+
+
+
+
+
+
+
+
+
     <member name="T:System.Storage.StorageLookupError">
       <summary>Expected failures from metadata queries, child address validation and provider lookup.</summary>
-      <remarks>Development after Preview 9. Use a named case; an uninitialized carrier is not a valid value. Prefer union patterns when supported by the consuming frontend.</remarks>
+      <remarks>Development after Preview 9. Use a named case; an uninitialized carrier is not a valid value. Prefer union patterns when supported by the consuming frontend. Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks>
     </member>
-    <member name="M:System.Storage.StorageLookupError.ToString">
-      <summary>Returns the selected case name.</summary>
-      <returns>The stable case label for display, not a filesystem diagnostic.</returns>
-    </member>
+    <member name="M:System.Storage.StorageLookupError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
     <member name="T:System.Storage.StorageLookupError.InvalidPath">
       <summary>The supplied path is invalid for this operation.</summary>
     </member>
@@ -639,15 +513,8 @@
       <summary>Constructs a carrier holding InvalidPath.</summary>
       <param name="value">The InvalidPath case to hold.</param>
     </member>
-    <member name="P:System.Storage.StorageLookupError.IsInvalidPath">
-      <summary>Tests whether this value holds InvalidPath.</summary>
-      <returns>True only for this case.</returns>
-    </member>
-    <member name="M:System.Storage.StorageLookupError.GetInvalidPath">
-      <summary>Extracts the InvalidPath case.</summary>
-      <remarks>Requires the matching case; a mismatch is a runtime fault.</remarks>
-      <returns>The held case value.</returns>
-    </member>
+
+
     <member name="T:System.Storage.StorageLookupError.NotFound">
       <summary>The path or followed target does not exist.</summary>
     </member>
@@ -658,15 +525,8 @@
       <summary>Constructs a carrier holding NotFound.</summary>
       <param name="value">The NotFound case to hold.</param>
     </member>
-    <member name="P:System.Storage.StorageLookupError.IsNotFound">
-      <summary>Tests whether this value holds NotFound.</summary>
-      <returns>True only for this case.</returns>
-    </member>
-    <member name="M:System.Storage.StorageLookupError.GetNotFound">
-      <summary>Extracts the NotFound case.</summary>
-      <remarks>Requires the matching case; a mismatch is a runtime fault.</remarks>
-      <returns>The held case value.</returns>
-    </member>
+
+
     <member name="T:System.Storage.StorageLookupError.AccessDenied">
       <summary>The host rejected metadata access.</summary>
     </member>
@@ -677,15 +537,8 @@
       <summary>Constructs a carrier holding AccessDenied.</summary>
       <param name="value">The AccessDenied case to hold.</param>
     </member>
-    <member name="P:System.Storage.StorageLookupError.IsAccessDenied">
-      <summary>Tests whether this value holds AccessDenied.</summary>
-      <returns>True only for this case.</returns>
-    </member>
-    <member name="M:System.Storage.StorageLookupError.GetAccessDenied">
-      <summary>Extracts the AccessDenied case.</summary>
-      <remarks>Requires the matching case; a mismatch is a runtime fault.</remarks>
-      <returns>The held case value.</returns>
-    </member>
+
+
     <member name="T:System.Storage.StorageLookupError.WrongKind">
       <summary>The item does not have the requested or supported kind.</summary>
     </member>
@@ -696,15 +549,8 @@
       <summary>Constructs a carrier holding WrongKind.</summary>
       <param name="value">The WrongKind case to hold.</param>
     </member>
-    <member name="P:System.Storage.StorageLookupError.IsWrongKind">
-      <summary>Tests whether this value holds WrongKind.</summary>
-      <returns>True only for this case.</returns>
-    </member>
-    <member name="M:System.Storage.StorageLookupError.GetWrongKind">
-      <summary>Extracts the WrongKind case.</summary>
-      <remarks>Requires the matching case; a mismatch is a runtime fault.</remarks>
-      <returns>The held case value.</returns>
-    </member>
+
+
     <member name="T:System.Storage.StorageLookupError.IoFailure">
       <summary>Another host I/O failure prevented lookup.</summary>
     </member>
@@ -715,15 +561,8 @@
       <summary>Constructs a carrier holding IoFailure.</summary>
       <param name="value">The IoFailure case to hold.</param>
     </member>
-    <member name="P:System.Storage.StorageLookupError.IsIoFailure">
-      <summary>Tests whether this value holds IoFailure.</summary>
-      <returns>True only for this case.</returns>
-    </member>
-    <member name="M:System.Storage.StorageLookupError.GetIoFailure">
-      <summary>Extracts the IoFailure case.</summary>
-      <remarks>Requires the matching case; a mismatch is a runtime fault.</remarks>
-      <returns>The held case value.</returns>
-    </member>
+
+
     <member name="T:System.Storage.Path">
       <summary>An immutable validated logical Storage path, with existing native string helpers.</summary>
       <remarks>Development after Preview 9. Parse checks logical syntax, not existence, authority or native filename validity. Other APIs can still accept strings. See the Path guide for grammar and the distinction between provider paths and native paths.</remarks>
@@ -863,12 +702,9 @@
     </member>
     <member name="T:System.Storage.FileReadError">
       <summary>Expected failures from the static native whole-text file helper.</summary>
-      <remarks>Construct a named case; an uninitialized carrier is not a valid error. These legacy error families are distinct from StreamError and StorageLookupError.</remarks>
+      <remarks>Construct a named case; an uninitialized carrier is not a valid error. These legacy error families are distinct from StreamError and StorageLookupError. Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks>
     </member>
-    <member name="M:System.Storage.FileReadError.ToString">
-      <summary>Returns the selected case name.</summary>
-      <returns>A display label, not a host diagnostic.</returns>
-    </member>
+    <member name="M:System.Storage.FileReadError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
     <member name="T:System.Storage.FileReadError.InvalidLimit">
       <summary>The byte limit is negative.</summary>
     </member>
@@ -879,15 +715,8 @@
       <summary>Constructs a carrier holding InvalidLimit.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-    <member name="P:System.Storage.FileReadError.IsInvalidLimit">
-      <summary>Tests whether the error holds InvalidLimit.</summary>
-      <returns>True only for that case.</returns>
-    </member>
-    <member name="M:System.Storage.FileReadError.GetInvalidLimit">
-      <summary>Extracts the InvalidLimit case.</summary>
-      <returns>The held case value.</returns>
-      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.FileReadError.InvalidPath">
       <summary>The native path is empty or contains NUL.</summary>
     </member>
@@ -898,15 +727,8 @@
       <summary>Constructs a carrier holding InvalidPath.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-    <member name="P:System.Storage.FileReadError.IsInvalidPath">
-      <summary>Tests whether the error holds InvalidPath.</summary>
-      <returns>True only for that case.</returns>
-    </member>
-    <member name="M:System.Storage.FileReadError.GetInvalidPath">
-      <summary>Extracts the InvalidPath case.</summary>
-      <returns>The held case value.</returns>
-      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.FileReadError.NotFound">
       <summary>The file or a required parent cannot be found.</summary>
     </member>
@@ -917,15 +739,8 @@
       <summary>Constructs a carrier holding NotFound.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-    <member name="P:System.Storage.FileReadError.IsNotFound">
-      <summary>Tests whether the error holds NotFound.</summary>
-      <returns>True only for that case.</returns>
-    </member>
-    <member name="M:System.Storage.FileReadError.GetNotFound">
-      <summary>Extracts the NotFound case.</summary>
-      <returns>The held case value.</returns>
-      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.FileReadError.AccessDenied">
       <summary>The host denied access.</summary>
     </member>
@@ -936,15 +751,8 @@
       <summary>Constructs a carrier holding AccessDenied.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-    <member name="P:System.Storage.FileReadError.IsAccessDenied">
-      <summary>Tests whether the error holds AccessDenied.</summary>
-      <returns>True only for that case.</returns>
-    </member>
-    <member name="M:System.Storage.FileReadError.GetAccessDenied">
-      <summary>Extracts the AccessDenied case.</summary>
-      <returns>The held case value.</returns>
-      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.FileReadError.NotRegularFile">
       <summary>The target is not a regular file.</summary>
     </member>
@@ -955,15 +763,8 @@
       <summary>Constructs a carrier holding NotRegularFile.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-    <member name="P:System.Storage.FileReadError.IsNotRegularFile">
-      <summary>Tests whether the error holds NotRegularFile.</summary>
-      <returns>True only for that case.</returns>
-    </member>
-    <member name="M:System.Storage.FileReadError.GetNotRegularFile">
-      <summary>Extracts the NotRegularFile case.</summary>
-      <returns>The held case value.</returns>
-      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.FileReadError.TooLarge">
       <summary>The file or encoded text exceeds the byte limit.</summary>
     </member>
@@ -974,15 +775,8 @@
       <summary>Constructs a carrier holding TooLarge.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-    <member name="P:System.Storage.FileReadError.IsTooLarge">
-      <summary>Tests whether the error holds TooLarge.</summary>
-      <returns>True only for that case.</returns>
-    </member>
-    <member name="M:System.Storage.FileReadError.GetTooLarge">
-      <summary>Extracts the TooLarge case.</summary>
-      <returns>The held case value.</returns>
-      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.FileReadError.ReadFailed">
       <summary>A remaining native read failure occurred.</summary>
     </member>
@@ -993,15 +787,8 @@
       <summary>Constructs a carrier holding ReadFailed.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-    <member name="P:System.Storage.FileReadError.IsReadFailed">
-      <summary>Tests whether the error holds ReadFailed.</summary>
-      <returns>True only for that case.</returns>
-    </member>
-    <member name="M:System.Storage.FileReadError.GetReadFailed">
-      <summary>Extracts the ReadFailed case.</summary>
-      <returns>The held case value.</returns>
-      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.FileReadError.InvalidUtf8">
       <summary>File bytes are not valid UTF-8.</summary>
     </member>
@@ -1012,23 +799,13 @@
       <summary>Constructs a carrier holding InvalidUtf8.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-    <member name="P:System.Storage.FileReadError.IsInvalidUtf8">
-      <summary>Tests whether the error holds InvalidUtf8.</summary>
-      <returns>True only for that case.</returns>
-    </member>
-    <member name="M:System.Storage.FileReadError.GetInvalidUtf8">
-      <summary>Extracts the InvalidUtf8 case.</summary>
-      <returns>The held case value.</returns>
-      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.FileWriteError">
       <summary>Expected failures from the static native whole-text file helper.</summary>
-      <remarks>Construct a named case; an uninitialized carrier is not a valid error. These legacy error families are distinct from StreamError and StorageLookupError.</remarks>
+      <remarks>Construct a named case; an uninitialized carrier is not a valid error. These legacy error families are distinct from StreamError and StorageLookupError. Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks>
     </member>
-    <member name="M:System.Storage.FileWriteError.ToString">
-      <summary>Returns the selected case name.</summary>
-      <returns>A display label, not a host diagnostic.</returns>
-    </member>
+    <member name="M:System.Storage.FileWriteError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
     <member name="T:System.Storage.FileWriteError.InvalidLimit">
       <summary>The byte limit is negative.</summary>
     </member>
@@ -1039,15 +816,8 @@
       <summary>Constructs a carrier holding InvalidLimit.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-    <member name="P:System.Storage.FileWriteError.IsInvalidLimit">
-      <summary>Tests whether the error holds InvalidLimit.</summary>
-      <returns>True only for that case.</returns>
-    </member>
-    <member name="M:System.Storage.FileWriteError.GetInvalidLimit">
-      <summary>Extracts the InvalidLimit case.</summary>
-      <returns>The held case value.</returns>
-      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.FileWriteError.InvalidPath">
       <summary>The native path is empty or contains NUL.</summary>
     </member>
@@ -1058,15 +828,8 @@
       <summary>Constructs a carrier holding InvalidPath.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-    <member name="P:System.Storage.FileWriteError.IsInvalidPath">
-      <summary>Tests whether the error holds InvalidPath.</summary>
-      <returns>True only for that case.</returns>
-    </member>
-    <member name="M:System.Storage.FileWriteError.GetInvalidPath">
-      <summary>Extracts the InvalidPath case.</summary>
-      <returns>The held case value.</returns>
-      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.FileWriteError.NotFound">
       <summary>The file or a required parent cannot be found.</summary>
     </member>
@@ -1077,15 +840,8 @@
       <summary>Constructs a carrier holding NotFound.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-    <member name="P:System.Storage.FileWriteError.IsNotFound">
-      <summary>Tests whether the error holds NotFound.</summary>
-      <returns>True only for that case.</returns>
-    </member>
-    <member name="M:System.Storage.FileWriteError.GetNotFound">
-      <summary>Extracts the NotFound case.</summary>
-      <returns>The held case value.</returns>
-      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.FileWriteError.AccessDenied">
       <summary>The host denied access.</summary>
     </member>
@@ -1096,15 +852,8 @@
       <summary>Constructs a carrier holding AccessDenied.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-    <member name="P:System.Storage.FileWriteError.IsAccessDenied">
-      <summary>Tests whether the error holds AccessDenied.</summary>
-      <returns>True only for that case.</returns>
-    </member>
-    <member name="M:System.Storage.FileWriteError.GetAccessDenied">
-      <summary>Extracts the AccessDenied case.</summary>
-      <returns>The held case value.</returns>
-      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.FileWriteError.NotRegularFile">
       <summary>The target is not a regular file.</summary>
     </member>
@@ -1115,15 +864,8 @@
       <summary>Constructs a carrier holding NotRegularFile.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-    <member name="P:System.Storage.FileWriteError.IsNotRegularFile">
-      <summary>Tests whether the error holds NotRegularFile.</summary>
-      <returns>True only for that case.</returns>
-    </member>
-    <member name="M:System.Storage.FileWriteError.GetNotRegularFile">
-      <summary>Extracts the NotRegularFile case.</summary>
-      <returns>The held case value.</returns>
-      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.FileWriteError.TooLarge">
       <summary>The file or encoded text exceeds the byte limit.</summary>
     </member>
@@ -1134,15 +876,8 @@
       <summary>Constructs a carrier holding TooLarge.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-    <member name="P:System.Storage.FileWriteError.IsTooLarge">
-      <summary>Tests whether the error holds TooLarge.</summary>
-      <returns>True only for that case.</returns>
-    </member>
-    <member name="M:System.Storage.FileWriteError.GetTooLarge">
-      <summary>Extracts the TooLarge case.</summary>
-      <returns>The held case value.</returns>
-      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.FileWriteError.WriteFailed">
       <summary>A remaining native write failure occurred.</summary>
     </member>
@@ -1153,15 +888,8 @@
       <summary>Constructs a carrier holding WriteFailed.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-    <member name="P:System.Storage.FileWriteError.IsWriteFailed">
-      <summary>Tests whether the error holds WriteFailed.</summary>
-      <returns>True only for that case.</returns>
-    </member>
-    <member name="M:System.Storage.FileWriteError.GetWriteFailed">
-      <summary>Extracts the WriteFailed case.</summary>
-      <returns>The held case value.</returns>
-      <remarks>Requires the matching case; a mismatch produces a runtime fault.</remarks>
-    </member>
+
+
     <member name="T:System.Storage.StorageItem">
       <summary>A stored item whose two permitted interface branches are File and Directory.</summary>
       <remarks>The Raven reference metadata closes the root to File and Directory. Providers may implement those interfaces, but cannot introduce unrelated direct StorageItem branches. The compiler and strict CIL importer enforce this boundary; raw neoIL does not enforce the closed-hierarchy metadata. The implementation owns interpretation and access. Directory.GetItems provides bounded mixed-item enumeration. Metadata queries remain planned.</remarks>
@@ -1194,16 +922,12 @@
     <member name="M:System.Console.WriteLine(System.String)"><summary>Writes text followed by LF to stdout.</summary><param name="value0">Value to write.</param><remarks>Flushes before returning. Output failure is a terminal Fault. For recoverable output errors, use Console.Out. Write(string) is bounded to 65536 UTF-8 bytes; existing WriteLine overloads retain their prior behavior.</remarks></member>
     <member name="M:System.Console.WriteLine(System.Int32)"><summary>Writes a decimal integer followed by LF to stdout.</summary><param name="value0">Value to write.</param><remarks>Flushes before returning. Output failure is a terminal Fault. For recoverable output errors, use Console.Out. Write(string) is bounded to 65536 UTF-8 bytes; existing WriteLine overloads retain their prior behavior.</remarks></member>
     <member name="M:System.Console.WriteLine"><summary>Writes an empty line to stdout and flushes it.</summary></member>
-    <member name="T:System.ConsoleReadError"><summary>Failure to read raw standard input.</summary></member>
+    <member name="T:System.ConsoleReadError"><summary>Failure to read raw standard input.</summary><remarks>Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks></member>
     <member name="T:System.ConsoleReadError.Unavailable"><summary>No host input is available, including isolated workers.</summary></member>
     <member name="M:System.ConsoleReadError.#ctor(System.ConsoleReadError.Unavailable)"><summary>Creates the Unavailable case.</summary><param name="value">Case marker.</param></member>
-    <member name="P:System.ConsoleReadError.IsUnavailable"><summary>Whether this is the Unavailable case.</summary></member>
-    <member name="M:System.ConsoleReadError.GetUnavailable"><summary>Gets the Unavailable case marker.</summary><remarks>Faults when this is a different case. Prefer a union pattern.</remarks></member>
     <member name="T:System.ConsoleReadError.ReadFailed"><summary>The host input operation failed.</summary></member>
     <member name="M:System.ConsoleReadError.#ctor(System.ConsoleReadError.ReadFailed)"><summary>Creates the ReadFailed case.</summary><param name="value">Case marker.</param></member>
-    <member name="P:System.ConsoleReadError.IsReadFailed"><summary>Whether this is the ReadFailed case.</summary></member>
-    <member name="M:System.ConsoleReadError.GetReadFailed"><summary>Gets the ReadFailed case marker.</summary><remarks>Faults when this is a different case. Prefer a union pattern.</remarks></member>
-    <member name="M:System.ConsoleReadError.ToString"><summary>Returns the raw console input error name.</summary></member>
+    <member name="M:System.ConsoleReadError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
     <member name="M:System.IO.TextReader.ReadLine(System.Int32)"><summary>Reads one strict UTF-8 line without its LF or CRLF terminator.</summary><param name="maxUtf8Bytes">Maximum content bytes, 0 through 65536 for StreamReader.</param><returns>Some text for a line; None for EOF before any data; or TextReadError.</returns><remarks>StreamReader performs one-byte reads to avoid read-ahead. A lone CR is data. A BOM is preserved. An unterminated final line is returned once. Invalid bounds consume nothing; decoding, I/O and length errors may advance input. Close is checked first. No rollback or asynchronous behavior is promised.</remarks></member>
     <member name="M:System.IO.StreamReader.ReadLine(System.Int32)"><summary>Reads one strict UTF-8 line without its LF or CRLF terminator.</summary><param name="maxUtf8Bytes">Maximum content bytes, 0 through 65536 for StreamReader.</param><returns>Some text for a line; None for EOF before any data; or TextReadError.</returns><remarks>StreamReader performs one-byte reads to avoid read-ahead. A lone CR is data. A BOM is preserved. An unterminated final line is returned once. Invalid bounds consume nothing; decoding, I/O and length errors may advance input. Close is checked first. No rollback or asynchronous behavior is promised.</remarks></member>
     <member name="T:System.IO.TextWriter"><summary>A synchronous text output contract independent of its destination.</summary></member>
@@ -1376,8 +1100,8 @@
     <member name="M:System.Networking.Sockets.Socket.Receive(System.Byte[],System.Int32,System.Int32)"><summary>Receives up to count bytes into the selected buffer range.</summary><param name="buffer">Live destination byte array. Keep it unmodified and do not use an overlapping pending operation until this Task completes.</param><param name="offset">Nonnegative starting byte index, at most the array length.</param><param name="count">Nonnegative maximum byte count within the remaining array range.</param><returns>A Task containing the actual count or SocketError. A positive-size receive returning zero means EOF; a zero-size receive returns zero without testing EOF. Short reads are normal.</returns><remarks>Only one receive may be pending on a connection; a second returns Busy. Closed and invalid ranges return typed errors. Pending destination and callback are GC roots. Nonempty transfers have a provisional five-second monotonic deadline from native admission. Expiry observed before completion returns TimedOut without modifying receive storage or sending bytes, releases transfer storage and leaves the connection open. Empty transfers still return zero. Committed results survive late delivery; scheduler progress is required. The bound is per operation, not a whole-message deadline, and is not configurable. Only received bytes are modified; the remainder is preserved. Receive storage and send snapshots share a 64 KiB aggregate invocation budget. LimitExceeded rejects admission without closing the connection. Close settles a not-yet-settled receive as Closed; already committed outcomes remain unchanged. Aliasing and mutation restrictions are caller obligations, not enforced exclusivity. Transport errors include ConnectionReset, TimedOut and IoFailure.</remarks></member>
     <member name="M:System.Networking.Sockets.Socket.Send(System.Byte[],System.Int32,System.Int32)"><summary>Sends up to count bytes from a snapshot of the selected source range.</summary><param name="buffer">Live source byte array. The admitted range is copied before this method returns, so the array can then be reused without altering this operation.</param><param name="offset">Nonnegative starting byte index, at most the array length.</param><param name="count">Nonnegative maximum byte count within the remaining array range.</param><returns>A Task containing the number accepted by the local transport or SocketError. Short writes are normal; advance by the returned count to send the remainder. A valid empty send returns zero. Success does not acknowledge receipt or processing by the peer.</returns><remarks>Development API. One send and one receive may be pending on a connection at the same time; another pending send returns Busy. Invalid ranges, Closed and exhausted shared operation/transfer-buffer budgets produce errors without sending. Snapshots and pending receive storage share a 64 KiB invocation budget. Only the reported prefix is sent by this operation. Nonempty transfers have a provisional five-second monotonic deadline from native admission. Expiry observed before completion returns TimedOut without modifying receive storage or sending bytes, releases transfer storage and leaves the connection open. Empty transfers still return zero. Committed results survive late delivery; scheduler progress is required. The bound is per operation, not a whole-message deadline, and is not configurable. Close settles a not-yet-settled send as Closed; already committed outcomes remain unchanged. There is no SendAll, individual cancellation or send-half shutdown API yet. Copying simplifies ownership but allocates and is not a performance claim.</remarks></member>
     <member name="M:System.Networking.Sockets.Socket.Close"><summary>Closes the connection or listener and settles its uncommitted transfers or accept as Closed.</summary><remarks>Repeated calls are harmless. Native outcomes already committed before Close remain unchanged even if their Task callback has not yet run. Completion callbacks are delivered through the scheduler. Closing a listener does not close its accepted connections. Closing a connected socket closes both directions; it is not a send-half shutdown or an awaitable close.</remarks></member>
-    <member name="T:System.Networking.Sockets.SocketError"><summary>A recoverable socket validation, admission or transport failure.</summary><remarks>Construct and match named cases using normal union syntax. The default has no active case and HasValue is false; ToString returns Empty. Per-case Is* and Get* helpers have been removed. Rebuild matching library and applications. Native error numbers and readiness states are private. Only common categories are mapped; other failures use IoFailure. This is distinct from a runtime Fault.</remarks></member>
-    <member name="M:System.Networking.Sockets.SocketError.ToString"><summary>Returns the active socket error case name, or Empty for the inactive default.</summary></member>
+    <member name="T:System.Networking.Sockets.SocketError"><summary>A recoverable socket validation, admission or transport failure.</summary><remarks>Construct and match named cases using normal union syntax. The default has no active case and HasValue is false; ToString returns Empty. Per-case Is* and Get* helpers have been removed. Rebuild matching library and applications. Native error numbers and readiness states are private. Only common categories are mapped; other failures use IoFailure. This is distinct from a runtime Fault. Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks></member>
+    <member name="M:System.Networking.Sockets.SocketError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
     <member name="T:System.Networking.Sockets.SocketError.Closed"><summary>The connection has been closed or does not belong to this invocation.</summary></member>
     <member name="M:System.Networking.Sockets.SocketError.Closed.#ctor"><summary>Creates the Closed case.</summary></member>
     <member name="M:System.Networking.Sockets.SocketError.#ctor(System.Networking.Sockets.SocketError.Closed)"><summary>Wraps the Closed case.</summary><param name="value">The case to wrap.</param></member>
@@ -1413,8 +1137,8 @@
     <member name="M:System.Networking.Sockets.SocketError.#ctor(System.Networking.Sockets.SocketError.IoFailure)"><summary>Wraps the IoFailure case.</summary><param name="value">The case to wrap.</param></member>
     <member name="T:System.Networking.Dns"><summary>Resolves hostnames to a bounded read-only sequence of numeric IPv4 addresses.</summary><remarks>Development after Preview 9. Host-backed resolution runs off the VM owner thread. It is separate from connecting; preserve the original hostname for HTTP and future TLS identity. No IPv6, IDNA conversion, DNS record API or public cancellation overload is provided. See the on-site networking guide.</remarks></member>
     <member name="M:System.Networking.Dns.GetHostAddresses(System.String)"><summary>Resolves a hostname using host configuration without blocking the VM owner.</summary><param name="hostName">Nonempty ASCII host name or numeric IPv4 address, at most 253 bytes; only letters, digits, dots and hyphens are admitted. This guard is not a full DNS-name parser.</param><returns>A Task containing a read-only Sequence of distinct numeric IPv4 strings in host order, or DnsError. Returned strings can be supplied to Socket.Connect. Lookup does not establish a connection.</returns><remarks>The provisional deadline is five seconds from admission; timeout wins if completion was not observed before expiry. Native lookup may continue after timeout, retaining its host-work slot until it exits. Limits are four blocking lookups across the process, eight retained operations per invocation and 16 distinct IPv4 addresses. IPv6-only answers return NoAddress. Results are not silently truncated. The original host name is not canonicalized or preserved in each result. No overall connection deadline, address fallback policy, DNS cache or peer authentication is implied.</remarks></member>
-    <member name="T:System.Networking.DnsError"><summary>A recoverable name-resolution failure, separate from socket connection errors and runtime Faults.</summary><remarks>Use named case patterns. The default value is inactive (HasValue is false, Value is null, and ToString returns Empty). This development union does not expose native resolver error numbers.</remarks></member>
-    <member name="M:System.Networking.DnsError.ToString"><summary>Returns the active error case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
+    <member name="T:System.Networking.DnsError"><summary>A recoverable name-resolution failure, separate from socket connection errors and runtime Faults.</summary><remarks>Use named case patterns. The default value is inactive (HasValue is false, Value is null, and ToString returns Empty). This development union does not expose native resolver error numbers. Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks></member>
+    <member name="M:System.Networking.DnsError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
     <member name="T:System.Networking.DnsError.InvalidName"><summary>The input is empty, exceeds 253 bytes or contains characters outside the provisional ASCII hostname input set.</summary></member>
     <member name="M:System.Networking.DnsError.InvalidName.#ctor"><summary>Creates the InvalidName case.</summary></member>
     <member name="M:System.Networking.DnsError.#ctor(System.Networking.DnsError.InvalidName)"><summary>Wraps the InvalidName case.</summary><param name="value">The case to wrap.</param></member>
@@ -1435,7 +1159,7 @@
     <member name="M:System.Networking.DnsError.#ctor(System.Networking.DnsError.LookupFailed)"><summary>Wraps the LookupFailed case.</summary><param name="value">The case to wrap.</param></member>
     <member name="T:System.ValueType"><summary>CLI base metadata for value-type declarations; the neoCLR application model uses Value.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
     <member name="T:System.Enum"><summary>CLI base metadata for enum declarations; it is not an application-constructible enum.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
-    <member name="T:System.Void"><summary>The inhabited unit value used when an operation has no meaningful result.</summary></member>
+    <member name="T:System.Void"><summary>The inhabited unit value used when an operation has no meaningful result.</summary><remarks>Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks></member>
     <member name="T:System.Boolean"><summary>A Boolean true or false value.</summary></member>
     <member name="M:System.Boolean.CompareTo(System.Boolean)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
 
@@ -1723,38 +1447,30 @@
     <member name="T:System.LocalDateTime"><summary>A date and time expressed in the host local time zone, without retaining a zone identifier.</summary></member>
     <member name="P:System.LocalDateTime.Date"><summary>Gets the local calendar date.</summary></member>
     <member name="P:System.LocalDateTime.Time"><summary>Gets the local time of day.</summary></member>
-    <member name="T:System.Int32ParseError"><summary>An expected integer parsing failure: invalid syntax or a value outside the Int32 range.</summary></member>
-    <member name="M:System.Int32ParseError.ToString"><summary>Returns the value or active error case name for display.</summary></member>
+    <member name="T:System.Int32ParseError"><summary>An expected integer parsing failure: invalid syntax or a value outside the Int32 range.</summary><remarks>Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks></member>
+    <member name="M:System.Int32ParseError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
 
     <member name="M:System.Int32ParseError.#ctor(System.Int32ParseError.InvalidFormat)"><summary>Constructs Int32ParseError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Int32ParseError.GetInvalidFormat"><summary>Extracts the InvalidFormat case; requesting an inactive case faults.</summary></member>
 
     <member name="M:System.Int32ParseError.#ctor(System.Int32ParseError.Overflow)"><summary>Constructs Int32ParseError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Int32ParseError.GetOverflow"><summary>Extracts the Overflow case; requesting an inactive case faults.</summary></member>
 
-    <member name="P:System.Int32ParseError.IsInvalidFormat"><summary>Tests whether the active case is InvalidFormat.</summary></member>
-    <member name="P:System.Int32ParseError.IsOverflow"><summary>Tests whether the active case is Overflow.</summary></member>
     <member name="T:System.Int32ParseError.InvalidFormat"><summary>The InvalidFormat case of System.Int32ParseError.</summary></member>
     <member name="M:System.Int32ParseError.InvalidFormat.#ctor"><summary>Creates InvalidFormat.</summary></member>
 
     <member name="T:System.Int32ParseError.Overflow"><summary>The Overflow case of System.Int32ParseError.</summary></member>
     <member name="M:System.Int32ParseError.Overflow.#ctor"><summary>Creates Overflow.</summary></member>
 
-    <member name="T:System.IntegerDivisionError"><summary>An expected integer division failure: division by zero or signed overflow.</summary></member>
-    <member name="M:System.IntegerDivisionError.ToString"><summary>Returns the value or active error case name for display.</summary></member>
+    <member name="T:System.IntegerDivisionError"><summary>An expected integer division failure: division by zero or signed overflow.</summary><remarks>Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks></member>
+    <member name="M:System.IntegerDivisionError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
 
     <member name="M:System.IntegerDivisionError.#ctor(System.IntegerDivisionError.DivisionByZero)"><summary>Constructs IntegerDivisionError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.IntegerDivisionError.GetDivisionByZero"><summary>Extracts the DivisionByZero case; requesting an inactive case faults.</summary></member>
 
     <member name="M:System.IntegerDivisionError.#ctor(System.IntegerDivisionError.Overflow)"><summary>Constructs IntegerDivisionError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.IntegerDivisionError.GetOverflow"><summary>Extracts the Overflow case; requesting an inactive case faults.</summary></member>
 
-    <member name="P:System.IntegerDivisionError.IsDivisionByZero"><summary>Tests whether the active case is DivisionByZero.</summary></member>
-    <member name="P:System.IntegerDivisionError.IsOverflow"><summary>Tests whether the active case is Overflow.</summary></member>
     <member name="T:System.IntegerDivisionError.DivisionByZero"><summary>The DivisionByZero case of System.IntegerDivisionError.</summary></member>
     <member name="M:System.IntegerDivisionError.DivisionByZero.#ctor"><summary>Creates DivisionByZero.</summary></member>
 
@@ -1984,19 +1700,15 @@
 
     <member name="M:System.Tasks.TaskOperators.Then``2(System.Tasks.Task{``0},System.Func{``0,System.Tasks.Task{``1}})"><summary>Chains a successful value to the next outcome-producing operation, preserving absence, error or cancellation.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
 
-    <member name="T:System.Linq.SingleError"><summary>An expected cardinality failure when a query requires exactly one matching element.</summary></member>
-    <member name="M:System.Linq.SingleError.ToString"><summary>Returns the value or active error case name for display.</summary></member>
+    <member name="T:System.Linq.SingleError"><summary>An expected cardinality failure when a query requires exactly one matching element.</summary><remarks>Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks></member>
+    <member name="M:System.Linq.SingleError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
 
     <member name="M:System.Linq.SingleError.#ctor(System.Linq.SingleError.Empty)"><summary>Constructs SingleError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Linq.SingleError.GetEmpty"><summary>Extracts the Empty case; requesting an inactive case faults.</summary></member>
 
     <member name="M:System.Linq.SingleError.#ctor(System.Linq.SingleError.Multiple)"><summary>Constructs SingleError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Linq.SingleError.GetMultiple"><summary>Extracts the Multiple case; requesting an inactive case faults.</summary></member>
 
-    <member name="P:System.Linq.SingleError.IsEmpty"><summary>Tests whether the active case is Empty.</summary></member>
-    <member name="P:System.Linq.SingleError.IsMultiple"><summary>Tests whether the active case is Multiple.</summary></member>
     <member name="T:System.Linq.SingleError.Empty"><summary>The Empty case of System.Linq.SingleError.</summary></member>
     <member name="M:System.Linq.SingleError.Empty.#ctor"><summary>Creates Empty.</summary></member>
 
@@ -2047,19 +1759,15 @@
 
     <member name="M:System.Text.InvalidUtf8Error.#ctor"><summary>Creates InvalidUtf8Error.</summary></member>
 
-    <member name="T:System.Text.Utf8SliceError"><summary>An error indicating an out-of-range byte slice or an invalid UTF-8 boundary.</summary></member>
-    <member name="M:System.Text.Utf8SliceError.ToString"><summary>Returns the value or active error case name for display.</summary></member>
+    <member name="T:System.Text.Utf8SliceError"><summary>An error indicating an out-of-range byte slice or an invalid UTF-8 boundary.</summary><remarks>Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks></member>
+    <member name="M:System.Text.Utf8SliceError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
 
     <member name="M:System.Text.Utf8SliceError.#ctor(System.Text.Utf8SliceError.OutOfRange)"><summary>Constructs Utf8SliceError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Text.Utf8SliceError.GetOutOfRange"><summary>Extracts the OutOfRange case; requesting an inactive case faults.</summary></member>
 
     <member name="M:System.Text.Utf8SliceError.#ctor(System.Text.Utf8SliceError.InvalidBoundary)"><summary>Constructs Utf8SliceError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Text.Utf8SliceError.GetInvalidBoundary"><summary>Extracts the InvalidBoundary case; requesting an inactive case faults.</summary></member>
 
-    <member name="P:System.Text.Utf8SliceError.IsOutOfRange"><summary>Tests whether the active case is OutOfRange.</summary></member>
-    <member name="P:System.Text.Utf8SliceError.IsInvalidBoundary"><summary>Tests whether the active case is InvalidBoundary.</summary></member>
     <member name="T:System.Text.Utf8SliceError.OutOfRange"><summary>The OutOfRange case of System.Text.Utf8SliceError.</summary></member>
     <member name="M:System.Text.Utf8SliceError.OutOfRange.#ctor"><summary>Creates OutOfRange.</summary></member>
 
@@ -2156,8 +1864,8 @@
     <member name="M:System.Uri.Equals(System.Object)"><summary>Compares exact Text when the object is a Uri; returns false for null or another type.</summary><param name="other">The object to compare.</param><returns>Whether it is an equal Uri.</returns></member>
     <member name="M:System.Uri.GetHashCode"><summary>Returns a hash consistent with exact Text equality.</summary><returns>A hash for in-process collections, not a persistent identifier.</returns></member>
     <member name="M:System.Uri.ToString"><summary>Returns Text without decoding or further normalization.</summary><returns>The validated URI-reference text.</returns></member>
-    <member name="T:System.UriError"><summary>Expected URI parsing or resolution failures.</summary><remarks>Use named case patterns. The default is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks></member>
-    <member name="M:System.UriError.ToString"><summary>Returns the active diagnostic case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
+    <member name="T:System.UriError"><summary>Expected URI parsing or resolution failures.</summary><remarks>Use named case patterns. The default is inactive: HasValue is false, Value is null and ToString returns Empty. Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks></member>
+    <member name="M:System.UriError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
     <member name="T:System.UriError.InvalidFormat"><summary>The reference violates the supported escaped ASCII grammar.</summary></member>
     <member name="M:System.UriError.InvalidFormat.#ctor"><summary>Creates the InvalidFormat case.</summary></member>
     <member name="M:System.UriError.#ctor(System.UriError.InvalidFormat)"><summary>Wraps the InvalidFormat case.</summary><param name="value">The case to wrap.</param></member>
@@ -2201,5 +1909,81 @@
     <member name="M:System.UriError.TryGetValue(System.UriError.UnsupportedAuthority@)"><summary>Tries to extract the UnsupportedAuthority case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when UnsupportedAuthority is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
     <member name="M:System.UriError.TryGetValue(System.UriError.TooLong@)"><summary>Tries to extract the TooLong case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when TooLong is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
     <member name="M:System.UriError.TryGetValue(System.UriError.BaseNotAbsolute@)"><summary>Tries to extract the BaseNotAbsolute case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when BaseNotAbsolute is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="P:System.Storage.StorageLookupError.HasValue"><summary>Reports whether the union contains an active case.</summary><returns>False for the default value; true after constructing a named case.</returns></member>
+    <member name="P:System.Storage.StorageLookupError.Value"><summary>Projects the active case as an Object for compiler support.</summary><returns>A boxed copy of the active case, or null for an inactive default.</returns><remarks>Prefer union patterns for ordinary error handling.</remarks></member>
+    <member name="M:System.Storage.StorageLookupError.TryGetValue(System.Storage.StorageLookupError.InvalidPath@)"><summary>Tries to extract the InvalidPath case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when InvalidPath is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.StorageLookupError.TryGetValue(System.Storage.StorageLookupError.NotFound@)"><summary>Tries to extract the NotFound case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when NotFound is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.StorageLookupError.TryGetValue(System.Storage.StorageLookupError.AccessDenied@)"><summary>Tries to extract the AccessDenied case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when AccessDenied is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.StorageLookupError.TryGetValue(System.Storage.StorageLookupError.WrongKind@)"><summary>Tries to extract the WrongKind case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when WrongKind is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.StorageLookupError.TryGetValue(System.Storage.StorageLookupError.IoFailure@)"><summary>Tries to extract the IoFailure case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when IoFailure is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.StorageLookupError.TryGetValue(System.Storage.StorageLookupError.InvalidRange@)"><summary>Tries to extract the InvalidRange case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when InvalidRange is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.StorageLookupError.TryGetValue(System.Storage.StorageLookupError.LimitExceeded@)"><summary>Tries to extract the LimitExceeded case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when LimitExceeded is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="P:System.IO.TextReadError.HasValue"><summary>Reports whether the union contains an active case.</summary><returns>False for the default value; true after constructing a named case.</returns></member>
+    <member name="P:System.IO.TextReadError.Value"><summary>Projects the active case as an Object for compiler support.</summary><returns>A boxed copy of the active case, or null for an inactive default.</returns><remarks>Prefer union patterns for ordinary error handling.</remarks></member>
+    <member name="M:System.IO.TextReadError.TryGetValue(System.IO.TextReadError.InvalidPath@)"><summary>Tries to extract the InvalidPath case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when InvalidPath is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.TextReadError.TryGetValue(System.IO.TextReadError.NotFound@)"><summary>Tries to extract the NotFound case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when NotFound is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.TextReadError.TryGetValue(System.IO.TextReadError.AccessDenied@)"><summary>Tries to extract the AccessDenied case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when AccessDenied is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.TextReadError.TryGetValue(System.IO.TextReadError.WrongKind@)"><summary>Tries to extract the WrongKind case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when WrongKind is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.TextReadError.TryGetValue(System.IO.TextReadError.AlreadyExists@)"><summary>Tries to extract the AlreadyExists case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when AlreadyExists is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.TextReadError.TryGetValue(System.IO.TextReadError.Closed@)"><summary>Tries to extract the Closed case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when Closed is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.TextReadError.TryGetValue(System.IO.TextReadError.InvalidRange@)"><summary>Tries to extract the InvalidRange case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when InvalidRange is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.TextReadError.TryGetValue(System.IO.TextReadError.LimitExceeded@)"><summary>Tries to extract the LimitExceeded case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when LimitExceeded is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.TextReadError.TryGetValue(System.IO.TextReadError.WrongAccess@)"><summary>Tries to extract the WrongAccess case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when WrongAccess is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.TextReadError.TryGetValue(System.IO.TextReadError.IoFailure@)"><summary>Tries to extract the IoFailure case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when IoFailure is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.TextReadError.TryGetValue(System.IO.TextReadError.InvalidUtf8@)"><summary>Tries to extract the InvalidUtf8 case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when InvalidUtf8 is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="P:System.IO.StreamError.HasValue"><summary>Reports whether the union contains an active case.</summary><returns>False for the default value; true after constructing a named case.</returns></member>
+    <member name="P:System.IO.StreamError.Value"><summary>Projects the active case as an Object for compiler support.</summary><returns>A boxed copy of the active case, or null for an inactive default.</returns><remarks>Prefer union patterns for ordinary error handling.</remarks></member>
+    <member name="M:System.IO.StreamError.TryGetValue(System.IO.StreamError.InvalidPath@)"><summary>Tries to extract the InvalidPath case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when InvalidPath is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.StreamError.TryGetValue(System.IO.StreamError.NotFound@)"><summary>Tries to extract the NotFound case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when NotFound is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.StreamError.TryGetValue(System.IO.StreamError.AccessDenied@)"><summary>Tries to extract the AccessDenied case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when AccessDenied is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.StreamError.TryGetValue(System.IO.StreamError.WrongKind@)"><summary>Tries to extract the WrongKind case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when WrongKind is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.StreamError.TryGetValue(System.IO.StreamError.AlreadyExists@)"><summary>Tries to extract the AlreadyExists case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when AlreadyExists is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.StreamError.TryGetValue(System.IO.StreamError.Closed@)"><summary>Tries to extract the Closed case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when Closed is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.StreamError.TryGetValue(System.IO.StreamError.InvalidRange@)"><summary>Tries to extract the InvalidRange case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when InvalidRange is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.StreamError.TryGetValue(System.IO.StreamError.LimitExceeded@)"><summary>Tries to extract the LimitExceeded case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when LimitExceeded is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.StreamError.TryGetValue(System.IO.StreamError.WrongAccess@)"><summary>Tries to extract the WrongAccess case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when WrongAccess is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IO.StreamError.TryGetValue(System.IO.StreamError.IoFailure@)"><summary>Tries to extract the IoFailure case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when IoFailure is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="P:System.Storage.FileReadError.HasValue"><summary>Reports whether the union contains an active case.</summary><returns>False for the default value; true after constructing a named case.</returns></member>
+    <member name="P:System.Storage.FileReadError.Value"><summary>Projects the active case as an Object for compiler support.</summary><returns>A boxed copy of the active case, or null for an inactive default.</returns><remarks>Prefer union patterns for ordinary error handling.</remarks></member>
+    <member name="M:System.Storage.FileReadError.TryGetValue(System.Storage.FileReadError.InvalidLimit@)"><summary>Tries to extract the InvalidLimit case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when InvalidLimit is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.FileReadError.TryGetValue(System.Storage.FileReadError.InvalidPath@)"><summary>Tries to extract the InvalidPath case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when InvalidPath is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.FileReadError.TryGetValue(System.Storage.FileReadError.NotFound@)"><summary>Tries to extract the NotFound case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when NotFound is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.FileReadError.TryGetValue(System.Storage.FileReadError.AccessDenied@)"><summary>Tries to extract the AccessDenied case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when AccessDenied is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.FileReadError.TryGetValue(System.Storage.FileReadError.NotRegularFile@)"><summary>Tries to extract the NotRegularFile case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when NotRegularFile is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.FileReadError.TryGetValue(System.Storage.FileReadError.TooLarge@)"><summary>Tries to extract the TooLarge case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when TooLarge is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.FileReadError.TryGetValue(System.Storage.FileReadError.ReadFailed@)"><summary>Tries to extract the ReadFailed case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when ReadFailed is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.FileReadError.TryGetValue(System.Storage.FileReadError.InvalidUtf8@)"><summary>Tries to extract the InvalidUtf8 case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when InvalidUtf8 is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="P:System.Storage.FileWriteError.HasValue"><summary>Reports whether the union contains an active case.</summary><returns>False for the default value; true after constructing a named case.</returns></member>
+    <member name="P:System.Storage.FileWriteError.Value"><summary>Projects the active case as an Object for compiler support.</summary><returns>A boxed copy of the active case, or null for an inactive default.</returns><remarks>Prefer union patterns for ordinary error handling.</remarks></member>
+    <member name="M:System.Storage.FileWriteError.TryGetValue(System.Storage.FileWriteError.InvalidLimit@)"><summary>Tries to extract the InvalidLimit case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when InvalidLimit is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.FileWriteError.TryGetValue(System.Storage.FileWriteError.InvalidPath@)"><summary>Tries to extract the InvalidPath case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when InvalidPath is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.FileWriteError.TryGetValue(System.Storage.FileWriteError.NotFound@)"><summary>Tries to extract the NotFound case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when NotFound is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.FileWriteError.TryGetValue(System.Storage.FileWriteError.AccessDenied@)"><summary>Tries to extract the AccessDenied case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when AccessDenied is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.FileWriteError.TryGetValue(System.Storage.FileWriteError.NotRegularFile@)"><summary>Tries to extract the NotRegularFile case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when NotRegularFile is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.FileWriteError.TryGetValue(System.Storage.FileWriteError.TooLarge@)"><summary>Tries to extract the TooLarge case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when TooLarge is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Storage.FileWriteError.TryGetValue(System.Storage.FileWriteError.WriteFailed@)"><summary>Tries to extract the WriteFailed case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when WriteFailed is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="P:System.ConsoleReadError.HasValue"><summary>Reports whether the union contains an active case.</summary><returns>False for the default value; true after constructing a named case.</returns></member>
+    <member name="P:System.ConsoleReadError.Value"><summary>Projects the active case as an Object for compiler support.</summary><returns>A boxed copy of the active case, or null for an inactive default.</returns><remarks>Prefer union patterns for ordinary error handling.</remarks></member>
+    <member name="M:System.ConsoleReadError.TryGetValue(System.ConsoleReadError.Unavailable@)"><summary>Tries to extract the Unavailable case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when Unavailable is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.ConsoleReadError.TryGetValue(System.ConsoleReadError.ReadFailed@)"><summary>Tries to extract the ReadFailed case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when ReadFailed is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="P:System.Text.Utf8SliceError.HasValue"><summary>Reports whether the union contains an active case.</summary><returns>False for the default value; true after constructing a named case.</returns></member>
+    <member name="P:System.Text.Utf8SliceError.Value"><summary>Projects the active case as an Object for compiler support.</summary><returns>A boxed copy of the active case, or null for an inactive default.</returns><remarks>Prefer union patterns for ordinary error handling.</remarks></member>
+    <member name="M:System.Text.Utf8SliceError.TryGetValue(System.Text.Utf8SliceError.OutOfRange@)"><summary>Tries to extract the OutOfRange case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when OutOfRange is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Text.Utf8SliceError.TryGetValue(System.Text.Utf8SliceError.InvalidBoundary@)"><summary>Tries to extract the InvalidBoundary case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when InvalidBoundary is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="P:System.Int32ParseError.HasValue"><summary>Reports whether the union contains an active case.</summary><returns>False for the default value; true after constructing a named case.</returns></member>
+    <member name="P:System.Int32ParseError.Value"><summary>Projects the active case as an Object for compiler support.</summary><returns>A boxed copy of the active case, or null for an inactive default.</returns><remarks>Prefer union patterns for ordinary error handling.</remarks></member>
+    <member name="M:System.Int32ParseError.TryGetValue(System.Int32ParseError.InvalidFormat@)"><summary>Tries to extract the InvalidFormat case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when InvalidFormat is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Int32ParseError.TryGetValue(System.Int32ParseError.Overflow@)"><summary>Tries to extract the Overflow case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when Overflow is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="P:System.Linq.SingleError.HasValue"><summary>Reports whether the union contains an active case.</summary><returns>False for the default value; true after constructing a named case.</returns></member>
+    <member name="P:System.Linq.SingleError.Value"><summary>Projects the active case as an Object for compiler support.</summary><returns>A boxed copy of the active case, or null for an inactive default.</returns><remarks>Prefer union patterns for ordinary error handling.</remarks></member>
+    <member name="M:System.Linq.SingleError.TryGetValue(System.Linq.SingleError.Empty@)"><summary>Tries to extract the Empty case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when Empty is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.Linq.SingleError.TryGetValue(System.Linq.SingleError.Multiple@)"><summary>Tries to extract the Multiple case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when Multiple is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="P:System.IntegerDivisionError.HasValue"><summary>Reports whether the union contains an active case.</summary><returns>False for the default value; true after constructing a named case.</returns></member>
+    <member name="P:System.IntegerDivisionError.Value"><summary>Projects the active case as an Object for compiler support.</summary><returns>A boxed copy of the active case, or null for an inactive default.</returns><remarks>Prefer union patterns for ordinary error handling.</remarks></member>
+    <member name="M:System.IntegerDivisionError.TryGetValue(System.IntegerDivisionError.DivisionByZero@)"><summary>Tries to extract the DivisionByZero case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when DivisionByZero is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="M:System.IntegerDivisionError.TryGetValue(System.IntegerDivisionError.Overflow@)"><summary>Tries to extract the Overflow case.</summary><param name="value">Receives a case copy only when the method returns true.</param><returns>True when Overflow is active; otherwise false without assigning the output.</returns><remarks>Used by Raven case patterns; prefer pattern syntax in application code.</remarks></member>
+    <member name="T:System.Storage.EntryKind"><summary>The kind of a storage entry: File (1) or Directory (2).</summary><remarks>A non-flags enum. Zero is unnamed and is not a successful metadata result. GetKind reports unsupported kinds through StorageLookupError. Enum values replace the former union case types and accessors; rebuild matching applications.</remarks></member>
+    <member name="F:System.Storage.EntryKind.File"><summary>A file entry (1).</summary></member>
+    <member name="F:System.Storage.EntryKind.Directory"><summary>A directory entry (2).</summary></member>
 </members>
 </doc>

@@ -9,7 +9,6 @@ static class ErrorBindings
         ["System.Networking.Sockets.SocketError"] = ["Closed", "Busy", "InvalidRange", "LimitExceeded", "Cancelled", "InvalidAddress", "ConnectionRefused", "ConnectionReset", "AccessDenied", "TimedOut", "IoFailure", "InvalidOperation", "AddressInUse"],
         ["System.UriError"] = ["InvalidFormat", "UnsupportedAuthority", "TooLong", "BaseNotAbsolute"],
         ["System.Storage.InvalidPathError"] = [],
-        ["System.Storage.EntryKind"] = ["File", "Directory"],
         ["System.Storage.StorageLookupError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "IoFailure", "InvalidRange", "LimitExceeded"],
         ["System.IO.TextReadError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "AlreadyExists", "Closed", "InvalidRange", "LimitExceeded", "WrongAccess", "IoFailure", "InvalidUtf8"],
         ["System.IO.StreamError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "AlreadyExists", "Closed", "InvalidRange", "LimitExceeded", "WrongAccess", "IoFailure"],
@@ -42,8 +41,11 @@ static class ErrorBindings
     static IEnumerable<string> CaseTypes => Cases.SelectMany(e => e.Value.Select(c => e.Key + "." + c));
     public static bool IsType(string type) => Errors.Contains(type) || CaseTypes.Contains(type);
     public static bool IsEmpty(string type) => CaseTypes.Contains(type) || Cases.TryGetValue(type, out var cases) && cases.Length == 0;
-    public static string? Type(TypeReference type) => type.IsValueType && RuntimeSignatures.IsCore(type.Scope)
-        && IsType(type.FullName.Replace('/', '.')) ? type.FullName.Replace('/', '.') : null;
+    public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope)
+        && IsType(type.FullName.Replace('/', '.'))
+        // isinst operands can omit the CLI valuetype signature flag. Resolve the
+        // supplied-core definition rather than rejecting a valid case type token.
+        && (type.IsValueType || type.Resolve()?.IsValueType == true) ? type.FullName.Replace('/', '.') : null;
     public static string Declarations => string.Join("\n", Cases.Select(entry => {
         var error = entry.Key; var name = error.Split('.').Last();
         var declaration = (entry.Value.Length > 0 ? "[System.Runtime.CompilerServices.Union] " : "")

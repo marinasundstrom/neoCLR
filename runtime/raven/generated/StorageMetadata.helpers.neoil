@@ -1,14 +1,4 @@
 ; Generated from runtime/raven/src/System/Storage/Metadata.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageEntryKindNewSystemStorageEntryKindFile(System.Storage.EntryKind.File value) -> System.Storage.EntryKind
-ldarg value
-newobj instance System.Storage.EntryKind::.ctor(System.Storage.EntryKind.File)
-ret
-.end
-.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageEntryKindNewSystemStorageEntryKindDirectory(System.Storage.EntryKind.Directory value) -> System.Storage.EntryKind
-ldarg value
-newobj instance System.Storage.EntryKind::.ctor(System.Storage.EntryKind.Directory)
-ret
-.end
 .function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorInvalidPath(System.Storage.StorageLookupError.InvalidPath value) -> System.Storage.StorageLookupError
 ldarg value
 newobj instance System.Storage.StorageLookupError::.ctor(System.Storage.StorageLookupError.InvalidPath)
@@ -32,14 +22,6 @@ ret
 .function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorIoFailure(System.Storage.StorageLookupError.IoFailure value) -> System.Storage.StorageLookupError
 ldarg value
 newobj instance System.Storage.StorageLookupError::.ctor(System.Storage.StorageLookupError.IoFailure)
-ret
-.end
-.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageEntryKindFileNew() -> System.Storage.EntryKind.File
-newobj instance System.Storage.EntryKind.File::.ctor()
-ret
-.end
-.function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageEntryKindDirectoryNew() -> System.Storage.EntryKind.Directory
-newobj instance System.Storage.EntryKind.Directory::.ctor()
 ret
 .end
 .function neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorInvalidPathNew() -> System.Storage.StorageLookupError.InvalidPath
@@ -90,4 +72,10 @@ ret
 False:
     ldc.i4 0
     ret
+.end
+.function neoCLR.Library.System.Storage.Metadata.RuntimeCliCall0(Int32 arg0) -> System.Result.Ok<System.Storage.EntryKind>
+ldarg arg0
+call System.Storage.EntryKind::FromValue(Int32)
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion2(System.Storage.EntryKind)
+ret
 .end

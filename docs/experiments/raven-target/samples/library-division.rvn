@@ -12,9 +12,9 @@ func ShowDivision(result: Result<int, IntegerDivisionError>) {
     match result {
         .Ok(let ok) => WriteLine(ok)
         .Error(let error) => {
-            if error.IsDivisionByZero {
+            if (error is IntegerDivisionError.DivisionByZero) {
                 WriteLine("Division by zero")
-            } else if error.IsOverflow {
+            } else if (error is IntegerDivisionError.Overflow) {
                 WriteLine("Overflow")
             }
         }

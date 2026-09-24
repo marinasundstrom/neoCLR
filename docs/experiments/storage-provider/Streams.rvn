@@ -17,22 +17,22 @@ class MemoryInput : InputStream, SeekableStream {
 
     func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError(StreamError.Closed()))
+            return Error<StreamError>(StreamError.Closed)
         }
         if offset < 0 {
-            return Error(StreamError(StreamError.InvalidRange()))
+            return Error<StreamError>(StreamError.InvalidRange)
         }
         if count < 0 {
-            return Error(StreamError(StreamError.InvalidRange()))
+            return Error<StreamError>(StreamError.InvalidRange)
         }
         if offset > buffer.Length {
-            return Error(StreamError(StreamError.InvalidRange()))
+            return Error<StreamError>(StreamError.InvalidRange)
         }
         if count > buffer.Length - offset {
-            return Error(StreamError(StreamError.InvalidRange()))
+            return Error<StreamError>(StreamError.InvalidRange)
         }
         if count > 65536 {
-            return Error(StreamError(StreamError.LimitExceeded()))
+            return Error<StreamError>(StreamError.LimitExceeded)
         }
         var read = 0
         while read < count && read < 2 && position < bytes.Count {
@@ -45,20 +45,20 @@ class MemoryInput : InputStream, SeekableStream {
 
     func GetPosition() -> Result<long, StreamError> {
         if closed {
-            return Error(StreamError(StreamError.Closed()))
+            return Error<StreamError>(StreamError.Closed)
         }
         return Ok((long)position)
     }
 
     func Seek(position: long) -> Result<long, StreamError> {
         if closed {
-            return Error(StreamError(StreamError.Closed()))
+            return Error<StreamError>(StreamError.Closed)
         }
         if position < 0 {
-            return Error(StreamError(StreamError.InvalidRange()))
+            return Error<StreamError>(StreamError.InvalidRange)
         }
         if position > 2147483647 {
-            return Error(StreamError(StreamError.LimitExceeded()))
+            return Error<StreamError>(StreamError.LimitExceeded)
         }
         self.position = (int)position
         return Ok(position)
@@ -79,22 +79,22 @@ class MemoryOutput : OutputStream {
 
     func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError(StreamError.Closed()))
+            return Error<StreamError>(StreamError.Closed)
         }
         if offset < 0 {
-            return Error(StreamError(StreamError.InvalidRange()))
+            return Error<StreamError>(StreamError.InvalidRange)
         }
         if count < 0 {
-            return Error(StreamError(StreamError.InvalidRange()))
+            return Error<StreamError>(StreamError.InvalidRange)
         }
         if offset > buffer.Length {
-            return Error(StreamError(StreamError.InvalidRange()))
+            return Error<StreamError>(StreamError.InvalidRange)
         }
         if count > buffer.Length - offset {
-            return Error(StreamError(StreamError.InvalidRange()))
+            return Error<StreamError>(StreamError.InvalidRange)
         }
         if count > 65536 || count > 65536 - bytes.Count {
-            return Error(StreamError(StreamError.LimitExceeded()))
+            return Error<StreamError>(StreamError.LimitExceeded)
         }
         var written = 0
         while written < count && written < 2 {
@@ -106,7 +106,7 @@ class MemoryOutput : OutputStream {
 
     func Flush() -> Result<unit, StreamError> {
         if closed {
-            return Error(StreamError(StreamError.Closed()))
+            return Error<StreamError>(StreamError.Closed)
         }
         return Ok(())
     }

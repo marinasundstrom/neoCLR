@@ -23,7 +23,7 @@ func Main() {
     }
     match root.GetItems(1) {
         Error(let error) => {
-            if !error.IsLimitExceeded {
+            if !(error is System.Storage.StorageLookupError.LimitExceeded) {
                 System.Fault("Over-bound listing changed error")
             }
         }
@@ -31,7 +31,7 @@ func Main() {
     }
     match root.GetItems(-1) {
         Error(let error) => {
-            if !error.IsInvalidRange {
+            if !(error is System.Storage.StorageLookupError.InvalidRange) {
                 System.Fault("Invalid listing bound changed error")
             }
         }
@@ -68,7 +68,7 @@ func Main() {
     }
     match root.GetDirectory(RequirePath("/a-dir")) {
         Error(let error) => {
-            if !error.IsInvalidPath {
+            if !(error is System.Storage.StorageLookupError.InvalidPath) {
                 System.Fault("Absolute child lookup changed error")
             }
         }

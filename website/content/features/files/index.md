@@ -72,3 +72,14 @@ Report issues with a small program, the toolchain version, expected behavior and
 
 The generated reference describes development after Preview 9. Use the availability
 notes above to distinguish it from the published toolchain.
+
+
+## Development case representation
+
+Storage and stream errors now use normal Raven union declarations. Match named
+cases directly; handwritten per-case `Is*`/`Get*` helpers have been removed.
+Rebuild applications with the matching development SDK and runtime library.
+
+`EntryKind` is a non-flags enum: `File = 1` and `Directory = 2`. Compare these values
+directly. Zero is unnamed; metadata lookup reports failure through StorageLookupError
+rather than inventing a fallback kind.

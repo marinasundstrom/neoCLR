@@ -275,3 +275,38 @@ passes with 1856 allocations and zero live objects; its expected invalid-name ca
 is checked through a pattern. The all-value payload layout is explicitly rejected.
 
 URI grammar/resolution, Object checks and the recorded .NET comparison also pass.
+
+## Remaining empty-case batch and enum distinction
+
+The remaining StreamError, TextReadError, StorageLookupError, FileReadError,
+FileWriteError, ConsoleReadError, Utf8SliceError, Int32ParseError, IntegerDivisionError
+and SingleError now use standard union declarations. All named cases, boxing and
+inactive defaults pass the integrated verifier (254 allocations, five collections,
+zero live objects). EntryKind is instead an enum with File = 1 and Directory = 2;
+its comparisons, numeric values and boxing/unboxing round-trip are covered.
+
+A library case type in an `isinst` operand can lack Cecil's value-type signature
+flag. The bridge resolves the supplied-core definition before admitting that token;
+it does not infer a foreign type's representation from its name. Wrong-family case
+patterns remain false. Handwritten Is*/Get* accessors are removed. Tests of truly
+uninitialized locals now disable CLI local initialization; default union values
+are valid inactive values.
+
+The larger directory/provider fixture exceeds the CLI's 100,000-instruction cap
+with the generated carrier initialization. Its optional trusted `--runner` uses an
+explicit 10,000,000-instruction budget and a 256-object GC budget. Production limits
+are unchanged; this migration does not claim equal storage or execution cost.
+
+Generic Option, Result and TaskOutcome remain handwritten. The generic metadata
+probe still compiles separate consumers, but the library projector rejects generic
+families before writing a reference. It needs companion ownership, generic parameter
+substitution and generated payload-method import before those carriers can migrate.
+Option/Result also need preservation of Propagatable residual/output contracts;
+TaskOutcome needs its terminal-state/task integration checked. Per-case helpers are
+not a future requirement. Payload-bearing explicit layout is separately rejected.
+These are tracked implementation boundaries, not permanent exemptions.
+
+Boxed enum ToString currently lacks an Object override. The next author-directed
+slice is helpers on System.Enum with both TypeInfo and generic overloads, backed by
+shared metadata for names/values and formatting. Existing TypeInfo.GetEnumNames and
+GetEnumUnderlyingType are foundations, not substitutes for that public surface.

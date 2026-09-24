@@ -2,109 +2,484 @@
 .type System.Text.Utf8SliceError
 .sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
-.field private Stored Value
-.property instance IsOutOfRange() -> Boolean
-.get instance System.Text.Utf8SliceError::get_IsOutOfRange()
+.implements System.Runtime.CompilerServices.IUnion
+.field private Metadata_V1_3C5461673E Byte
+.field private Metadata_V1_3C4F75744F6652616E67655061796C6F61643E System.Text.Utf8SliceError.OutOfRange
+.field private Metadata_V1_3C496E76616C6964426F756E646172795061796C6F61643E System.Text.Utf8SliceError.InvalidBoundary
+.property instance Value() -> System.Object
+.get instance System.Text.Utf8SliceError::get_Value()
 .end
-.property instance IsInvalidBoundary() -> Boolean
-.get instance System.Text.Utf8SliceError::get_IsInvalidBoundary()
+.property instance HasValue() -> Boolean
+.get instance System.Text.Utf8SliceError::get_HasValue()
 .end
-.method instance .ctor(System.Text.Utf8SliceError.OutOfRange value) -> Void
-ldarg value
-value.pack System.Text.Utf8SliceError.OutOfRange
-newobj System.Text.Utf8SliceError
-starg this
-ldvoid
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000001_IL_0000:
+ldarg 0
+M00000001_IL_0001:
+M00000001_IL_0002:
+ref.isnull
+call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0004:
+brtrue M00000001_IL_000e
+M00000001_IL_0009:
+br M00000001_IL_0014
+M00000001_IL_000e:
+ldstr "null"
+M00000001_IL_0013:
+ret
+M00000001_IL_0014:
+M00000001_IL_0015:
+ldarg 0
+M00000001_IL_0016:
+isinst String
+M00000001_IL_001b:
+M00000001_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_001e:
+brtrue M00000001_IL_0028
+M00000001_IL_0023:
+br M00000001_IL_0043
+M00000001_IL_0028:
+ldstr "\u0022"
+M00000001_IL_002d:
+ldarg 0
+M00000001_IL_002e:
+castclass String
+M00000001_IL_0033:
+call System.String::Concat(String,String)
+M00000001_IL_0038:
+ldstr "\u0022"
+M00000001_IL_003d:
+call System.String::Concat(String,String)
+M00000001_IL_0042:
+ret
+M00000001_IL_0043:
+M00000001_IL_0044:
+ldarg 0
+M00000001_IL_0045:
+isinst Char
+M00000001_IL_004a:
+dup
+M00000001_IL_004b:
+ref.isnull
+brfalse M00000001_IL_0057
+M00000001_IL_0050:
+pop
+M00000001_IL_0051:
+ldc.i4 0
+M00000001_IL_0052:
+br M00000001_IL_005e
+M00000001_IL_0057:
+unbox.any Char
+M00000001_IL_005c:
+pop
+M00000001_IL_005d:
+ldc.i4 1
+M00000001_IL_005e:
+brtrue M00000001_IL_0068
+M00000001_IL_0063:
+br M00000001_IL_0083
+M00000001_IL_0068:
+ldstr "\u0027"
+M00000001_IL_006d:
+ldarg 0
+M00000001_IL_006e:
+call neoCLR.Library.System.Text.Utf8SliceError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000001_IL_0073:
+call System.String::Concat(String,String)
+M00000001_IL_0078:
+ldstr "\u0027"
+M00000001_IL_007d:
+call System.String::Concat(String,String)
+M00000001_IL_0082:
+ret
+M00000001_IL_0083:
+M00000001_IL_0084:
+ldarg 0
+M00000001_IL_0085:
+call neoCLR.Library.System.Text.Utf8SliceError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000001_IL_008a:
 ret
 .end
-.method instance get_IsOutOfRange() -> Boolean
+.method instance byref .ctor(System.Text.Utf8SliceError.OutOfRange value) -> Void
+.local Byte local0
+.local System.Text.Utf8SliceError.OutOfRange local1
+.local Byte unionDefault1_0
+.local System.Text.Utf8SliceError.OutOfRange unionDefault1_1
+.local System.Text.Utf8SliceError.InvalidBoundary unionDefault1_2
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Text.Utf8SliceError.OutOfRange
 M00000002_IL_0000:
+ldarg 0
 M00000002_IL_0001:
-M00000002_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000002_IL_0003:
-ldfld System.Text.Utf8SliceError::Stored
+ldloc unionDefault1_0
+stfld System.Text.Utf8SliceError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Text.Utf8SliceError.OutOfRange
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Text.Utf8SliceError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Text.Utf8SliceError.InvalidBoundary
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Text.Utf8SliceError::Metadata_V1_3C496E76616C6964426F756E646172795061796C6F61643E
+pop
+M00000002_IL_0007:
+ldc.i4 1
 M00000002_IL_0008:
-value.is System.Text.Utf8SliceError.OutOfRange
-call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanToInt32(Boolean)
-M00000002_IL_000d:
-call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method instance GetOutOfRange() -> System.Text.Utf8SliceError.OutOfRange
-M00000003_IL_0000:
-M00000003_IL_0001:
-M00000003_IL_0002:
+stloc local0
+M00000002_IL_0009:
 ldarg 0
-M00000003_IL_0003:
-ldfld System.Text.Utf8SliceError::Stored
-M00000003_IL_0008:
-value.unpack System.Text.Utf8SliceError.OutOfRange
-M00000003_IL_000d:
-ret
-.end
-.method instance .ctor(System.Text.Utf8SliceError.InvalidBoundary value) -> Void
-ldarg value
-value.pack System.Text.Utf8SliceError.InvalidBoundary
-newobj System.Text.Utf8SliceError
-starg this
+M00000002_IL_000a:
+ldloc local0
+M00000002_IL_000b:
+conv.u1
+M00000002_IL_000c:
+stfld System.Text.Utf8SliceError::Metadata_V1_3C5461673E
+pop
+M00000002_IL_0011:
+ldarg 1
+M00000002_IL_0012:
+stloc local1
+M00000002_IL_0013:
+ldarg 0
+M00000002_IL_0014:
+ldloc local1
+M00000002_IL_0015:
+stfld System.Text.Utf8SliceError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
+pop
+M00000002_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsInvalidBoundary() -> Boolean
-M00000005_IL_0000:
-M00000005_IL_0001:
-M00000005_IL_0002:
+.method instance byref TryGetValue(out(true) System.Text.Utf8SliceError.OutOfRange& value) -> Boolean
+M00000003_IL_0000:
 ldarg 0
-M00000005_IL_0003:
-ldfld System.Text.Utf8SliceError::Stored
-M00000005_IL_0008:
-value.is System.Text.Utf8SliceError.InvalidBoundary
+M00000003_IL_0001:
+ldfld System.Text.Utf8SliceError::Metadata_V1_3C5461673E
+M00000003_IL_0006:
+conv.i4
+M00000003_IL_0007:
+ldc.i4 1
+M00000003_IL_0008:
+conv.i4
+M00000003_IL_0009:
+ceq
 call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_000d:
+M00000003_IL_000b:
+brtrue M00000003_IL_0015
+M00000003_IL_0010:
+br M00000003_IL_0023
+M00000003_IL_0015:
+ldarg 1
+M00000003_IL_0016:
+ldarg 0
+M00000003_IL_0017:
+ldfld System.Text.Utf8SliceError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
+M00000003_IL_001c:
+stobj System.Text.Utf8SliceError.OutOfRange
+M00000003_IL_0021:
+ldc.i4 1
+M00000003_IL_0022:
+call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000003_IL_0023:
+M00000003_IL_0024:
+ldc.i4 0
+M00000003_IL_0025:
 call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetInvalidBoundary() -> System.Text.Utf8SliceError.InvalidBoundary
+.method instance byref .ctor(System.Text.Utf8SliceError.InvalidBoundary value) -> Void
+.local Byte local0
+.local System.Text.Utf8SliceError.InvalidBoundary local1
+.local Byte unionDefault1_0
+.local System.Text.Utf8SliceError.OutOfRange unionDefault1_1
+.local System.Text.Utf8SliceError.InvalidBoundary unionDefault1_2
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Text.Utf8SliceError.InvalidBoundary
+M00000004_IL_0000:
+ldarg 0
+M00000004_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Text.Utf8SliceError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Text.Utf8SliceError.OutOfRange
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Text.Utf8SliceError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Text.Utf8SliceError.InvalidBoundary
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Text.Utf8SliceError::Metadata_V1_3C496E76616C6964426F756E646172795061796C6F61643E
+pop
+M00000004_IL_0007:
+ldc.i4 2
+M00000004_IL_0008:
+stloc local0
+M00000004_IL_0009:
+ldarg 0
+M00000004_IL_000a:
+ldloc local0
+M00000004_IL_000b:
+conv.u1
+M00000004_IL_000c:
+stfld System.Text.Utf8SliceError::Metadata_V1_3C5461673E
+pop
+M00000004_IL_0011:
+ldarg 1
+M00000004_IL_0012:
+stloc local1
+M00000004_IL_0013:
+ldarg 0
+M00000004_IL_0014:
+ldloc local1
+M00000004_IL_0015:
+stfld System.Text.Utf8SliceError::Metadata_V1_3C496E76616C6964426F756E646172795061796C6F61643E
+pop
+M00000004_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Text.Utf8SliceError.InvalidBoundary& value) -> Boolean
+M00000005_IL_0000:
+ldarg 0
+M00000005_IL_0001:
+ldfld System.Text.Utf8SliceError::Metadata_V1_3C5461673E
+M00000005_IL_0006:
+conv.i4
+M00000005_IL_0007:
+ldc.i4 2
+M00000005_IL_0008:
+conv.i4
+M00000005_IL_0009:
+ceq
+call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_000b:
+brtrue M00000005_IL_0015
+M00000005_IL_0010:
+br M00000005_IL_0023
+M00000005_IL_0015:
+ldarg 1
+M00000005_IL_0016:
+ldarg 0
+M00000005_IL_0017:
+ldfld System.Text.Utf8SliceError::Metadata_V1_3C496E76616C6964426F756E646172795061796C6F61643E
+M00000005_IL_001c:
+stobj System.Text.Utf8SliceError.InvalidBoundary
+M00000005_IL_0021:
+ldc.i4 1
+M00000005_IL_0022:
+call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000005_IL_0023:
+M00000005_IL_0024:
+ldc.i4 0
+M00000005_IL_0025:
+call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance override byref ToString() -> String
+.local System.Text.Utf8SliceError local0
+.local String local1
+.local System.Text.Utf8SliceError local2
+.local System.Text.Utf8SliceError.OutOfRange local3
+.local System.Text.Utf8SliceError local4
+.local System.Text.Utf8SliceError.InvalidBoundary local5
+ldloca local0
+initobj System.Text.Utf8SliceError
+ldloca local2
+initobj System.Text.Utf8SliceError
+ldloca local3
+initobj System.Text.Utf8SliceError.OutOfRange
+ldloca local4
+initobj System.Text.Utf8SliceError
+ldloca local5
+initobj System.Text.Utf8SliceError.InvalidBoundary
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
-ldarg 0
 M00000006_IL_0003:
-ldfld System.Text.Utf8SliceError::Stored
-M00000006_IL_0008:
-value.unpack System.Text.Utf8SliceError.InvalidBoundary
+ldarg 0
+M00000006_IL_0004:
+ldobj System.Text.Utf8SliceError
+M00000006_IL_0009:
+stloc local0
+M00000006_IL_000a:
+M00000006_IL_000b:
+ldloc local0
+M00000006_IL_000c:
+stloc local2
 M00000006_IL_000d:
+ldloca local2
+M00000006_IL_000f:
+ldloca local3
+M00000006_IL_0011:
+call instance System.Text.Utf8SliceError::TryGetValue(System.Text.Utf8SliceError.OutOfRange&)
+M00000006_IL_0016:
+brfalse M00000006_IL_0034
+M00000006_IL_001b:
+ldloc local3
+M00000006_IL_001c:
+pop
+M00000006_IL_001d:
+M00000006_IL_001e:
+br M00000006_IL_0029
+M00000006_IL_0029:
+ldstr "OutOfRange"
+M00000006_IL_002e:
+stloc local1
+M00000006_IL_002f:
+br M00000006_IL_007a
+M00000006_IL_0034:
+M00000006_IL_0035:
+ldloc local0
+M00000006_IL_0036:
+stloc local4
+M00000006_IL_0038:
+ldloca local4
+M00000006_IL_003a:
+ldloca local5
+M00000006_IL_003c:
+call instance System.Text.Utf8SliceError::TryGetValue(System.Text.Utf8SliceError.InvalidBoundary&)
+M00000006_IL_0041:
+brfalse M00000006_IL_0060
+M00000006_IL_0046:
+ldloc local5
+M00000006_IL_0048:
+pop
+M00000006_IL_0049:
+M00000006_IL_004a:
+br M00000006_IL_0055
+M00000006_IL_0055:
+ldstr "InvalidBoundary"
+M00000006_IL_005a:
+stloc local1
+M00000006_IL_005b:
+br M00000006_IL_007a
+M00000006_IL_0060:
+M00000006_IL_0061:
+ldloc local0
+M00000006_IL_0062:
+pop
+M00000006_IL_0063:
+ldc.i4 1
+M00000006_IL_0064:
+brfalse M00000006_IL_0075
+M00000006_IL_0069:
+M00000006_IL_006a:
+ldstr "Empty"
+M00000006_IL_006f:
+stloc local1
+M00000006_IL_0070:
+br M00000006_IL_007a
+M00000006_IL_0075:
+M00000006_IL_0076:
+M00000006_IL_0077:
+M00000006_IL_0078:
+M00000006_IL_0079:
+fault "Guest program reached a terminal failure"
+M00000006_IL_007a:
+M00000006_IL_007b:
+ldloc local1
+M00000006_IL_007c:
 ret
 .end
-.method instance ToString() -> String
+.method instance byref get_Value() -> System.Object
 M00000007_IL_0000:
+ldarg 0
 M00000007_IL_0001:
-M00000007_IL_0002:
-ldarg 0
-M00000007_IL_0003:
-call instance System.Text.Utf8SliceError::get_IsOutOfRange()
-call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanToInt32(Boolean)
+ldfld System.Text.Utf8SliceError::Metadata_V1_3C5461673E
+M00000007_IL_0006:
+conv.i4
+M00000007_IL_0007:
+ldc.i4 1
 M00000007_IL_0008:
-brtrue M00000007_IL_0012
-M00000007_IL_000d:
-br M00000007_IL_0019
-M00000007_IL_0012:
-M00000007_IL_0013:
-ldstr "OutOfRange"
-M00000007_IL_0018:
-ret
-M00000007_IL_0019:
-M00000007_IL_001a:
+conv.i4
+M00000007_IL_0009:
+ceq
+call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_000b:
+brtrue M00000007_IL_0015
+M00000007_IL_0010:
+br M00000007_IL_0021
+M00000007_IL_0015:
 ldarg 0
+M00000007_IL_0016:
+ldfld System.Text.Utf8SliceError::Metadata_V1_3C4F75744F6652616E67655061796C6F61643E
 M00000007_IL_001b:
-call instance System.Text.Utf8SliceError::GetInvalidBoundary()
+box System.Text.Utf8SliceError.OutOfRange
 M00000007_IL_0020:
-pop
+ret
 M00000007_IL_0021:
 M00000007_IL_0022:
-ldstr "InvalidBoundary"
-M00000007_IL_0027:
+ldarg 0
+M00000007_IL_0023:
+ldfld System.Text.Utf8SliceError::Metadata_V1_3C5461673E
+M00000007_IL_0028:
+conv.i4
+M00000007_IL_0029:
+ldc.i4 2
+M00000007_IL_002a:
+conv.i4
+M00000007_IL_002b:
+ceq
+call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_002d:
+brtrue M00000007_IL_0037
+M00000007_IL_0032:
+br M00000007_IL_0043
+M00000007_IL_0037:
+ldarg 0
+M00000007_IL_0038:
+ldfld System.Text.Utf8SliceError::Metadata_V1_3C496E76616C6964426F756E646172795061796C6F61643E
+M00000007_IL_003d:
+box System.Text.Utf8SliceError.InvalidBoundary
+M00000007_IL_0042:
+ret
+M00000007_IL_0043:
+M00000007_IL_0044:
+M00000007_IL_0045:
+call neoCLR.Library.System.Text.Utf8SliceError.DefaultReference53797374656D2E4F626A656374()
+ret
+.end
+.method instance byref get_HasValue() -> Boolean
+M00000008_IL_0000:
+ldarg 0
+M00000008_IL_0001:
+call instance System.Text.Utf8SliceError::get_Value()
+M00000008_IL_0006:
+M00000008_IL_0007:
+ref.isnull
+call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0009:
+ldc.i4 0
+M00000008_IL_000a:
+ceq
+call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_000c:
+call neoCLR.Library.System.Text.Utf8SliceError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .end

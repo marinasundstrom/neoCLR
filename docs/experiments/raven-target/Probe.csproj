@@ -14,6 +14,16 @@
     <EmbeddedResource Include="../../../runtime/raven/src/System/Networking/Sockets/SocketError.rvn" LogicalName="NeoCLR.SocketError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Networking/DnsError.rvn" LogicalName="NeoCLR.DnsError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/UriError.rvn" LogicalName="NeoCLR.UriError.rvn" />
+    <EmbeddedResource Include="../../../runtime/raven/src/System/Storage/StorageLookupError.rvn" LogicalName="NeoCLR.StorageLookupError.rvn" />
+    <EmbeddedResource Include="../../../runtime/raven/src/System/IO/TextReadError.rvn" LogicalName="NeoCLR.TextReadError.rvn" />
+    <EmbeddedResource Include="../../../runtime/raven/src/System/IO/StreamError.rvn" LogicalName="NeoCLR.StreamError.rvn" />
+    <EmbeddedResource Include="../../../runtime/raven/src/System/Storage/FileReadError.rvn" LogicalName="NeoCLR.FileReadError.rvn" />
+    <EmbeddedResource Include="../../../runtime/raven/src/System/Storage/FileWriteError.rvn" LogicalName="NeoCLR.FileWriteError.rvn" />
+    <EmbeddedResource Include="../../../runtime/raven/src/System/ConsoleReadError.rvn" LogicalName="NeoCLR.ConsoleReadError.rvn" />
+    <EmbeddedResource Include="../../../runtime/raven/src/System/Text/Utf8SliceError.rvn" LogicalName="NeoCLR.Utf8SliceError.rvn" />
+    <EmbeddedResource Include="../../../runtime/raven/src/System/Int32ParseError.rvn" LogicalName="NeoCLR.Int32ParseError.rvn" />
+    <EmbeddedResource Include="../../../runtime/raven/src/System/Linq/SingleError.rvn" LogicalName="NeoCLR.SingleError.rvn" />
+    <EmbeddedResource Include="../../../runtime/raven/src/System/IntegerDivisionError.rvn" LogicalName="NeoCLR.IntegerDivisionError.rvn" />
     <None Update="samples/*.rvn" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <Target Name="RequireRaven" BeforeTargets="Restore;PrepareForBuild" Condition="'$(RavenRoot)' == ''">

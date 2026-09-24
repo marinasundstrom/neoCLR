@@ -97,12 +97,16 @@ ldc.i4 0
 stloc local5
 ldc.i4 0
 stloc local6
+ldloca local7
+initobj System.IO.StreamError
 ldloca local9
 initobj System.Result.Ok<Int32>
 ldloca local10
 initobj System.Result.Ok<Int32>
 ldc.i4 0
 stloc local11
+ldloca local15
+initobj System.IO.StreamError
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
@@ -630,6 +634,8 @@ ldc.i4 0
 stloc local4
 ldc.i4 0
 stloc local8
+ldloca local9
+initobj System.IO.StreamError
 ldloca local11
 initobj System.Result.Ok<Int32>
 ldloca local12
@@ -642,6 +648,8 @@ ldloca local20
 initobj System.Result.Error<System.Text.InvalidUtf8Error>
 newobj System.Text.InvalidUtf8Error
 stloc local21
+ldloca local25
+initobj System.IO.StreamError
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -1388,187 +1396,367 @@ M00000004_IL_00ff:
 ret
 .end
 .method static FromStream(System.IO.StreamError error) -> System.IO.TextReadError
+.local System.IO.StreamError local0
+.local System.IO.StreamError.InvalidPath local1
+.local System.IO.StreamError local2
+.local System.IO.StreamError.NotFound local3
+.local System.IO.StreamError local4
+.local System.IO.StreamError.AccessDenied local5
+.local System.IO.StreamError local6
+.local System.IO.StreamError.WrongKind local7
+.local System.IO.StreamError local8
+.local System.IO.StreamError.AlreadyExists local9
+.local System.IO.StreamError local10
+.local System.IO.StreamError.Closed local11
+.local System.IO.StreamError local12
+.local System.IO.StreamError.InvalidRange local13
+.local System.IO.StreamError local14
+.local System.IO.StreamError.LimitExceeded local15
+.local System.IO.StreamError local16
+.local System.IO.StreamError.WrongAccess local17
+.local System.IO.StreamError local18
+.local System.IO.StreamError.IoFailure local19
+ldloca local0
+initobj System.IO.StreamError
+newobj System.IO.StreamError.InvalidPath
+stloc local1
+ldloca local2
+initobj System.IO.StreamError
+newobj System.IO.StreamError.NotFound
+stloc local3
+ldloca local4
+initobj System.IO.StreamError
+newobj System.IO.StreamError.AccessDenied
+stloc local5
+ldloca local6
+initobj System.IO.StreamError
+newobj System.IO.StreamError.WrongKind
+stloc local7
+ldloca local8
+initobj System.IO.StreamError
+newobj System.IO.StreamError.AlreadyExists
+stloc local9
+ldloca local10
+initobj System.IO.StreamError
+newobj System.IO.StreamError.Closed
+stloc local11
+ldloca local12
+initobj System.IO.StreamError
+newobj System.IO.StreamError.InvalidRange
+stloc local13
+ldloca local14
+initobj System.IO.StreamError
+newobj System.IO.StreamError.LimitExceeded
+stloc local15
+ldloca local16
+initobj System.IO.StreamError
+newobj System.IO.StreamError.WrongAccess
+stloc local17
+ldloca local18
+initobj System.IO.StreamError
+newobj System.IO.StreamError.IoFailure
+stloc local19
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
-ldarga 0
+ldarg 0
+M00000007_IL_0003:
+stloc local0
 M00000007_IL_0004:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsInvalidPath(System.IO.StreamError&)
-call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
-M00000007_IL_0009:
-brtrue M00000007_IL_0013
-M00000007_IL_000e:
-br M00000007_IL_001e
+ldloca local0
+M00000007_IL_0006:
+ldloca local1
+M00000007_IL_0008:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.InvalidPath&)
+M00000007_IL_000d:
+brfalse M00000007_IL_0020
+M00000007_IL_0012:
+ldloc local1
 M00000007_IL_0013:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorInvalidPathNew()
-M00000007_IL_0018:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorInvalidPath(System.IO.TextReadError.InvalidPath)
-M00000007_IL_001d:
-ret
-M00000007_IL_001e:
-M00000007_IL_001f:
+pop
+M00000007_IL_0014:
+M00000007_IL_0015:
+br M00000007_IL_0025
 M00000007_IL_0020:
-ldarga 0
-M00000007_IL_0022:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsNotFound(System.IO.StreamError&)
-call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
-M00000007_IL_0027:
-brtrue M00000007_IL_0031
-M00000007_IL_002c:
-br M00000007_IL_003c
+br M00000007_IL_0030
+M00000007_IL_0025:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorInvalidPathNew()
+M00000007_IL_002a:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorInvalidPath(System.IO.TextReadError.InvalidPath)
+M00000007_IL_002f:
+ret
+M00000007_IL_0030:
 M00000007_IL_0031:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNotFoundNew()
+M00000007_IL_0032:
+ldarg 0
+M00000007_IL_0033:
+stloc local2
+M00000007_IL_0034:
+ldloca local2
 M00000007_IL_0036:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorNotFound(System.IO.TextReadError.NotFound)
-M00000007_IL_003b:
-ret
-M00000007_IL_003c:
+ldloca local3
+M00000007_IL_0038:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.NotFound&)
 M00000007_IL_003d:
-M00000007_IL_003e:
-ldarga 0
-M00000007_IL_0040:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsAccessDenied(System.IO.StreamError&)
-call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+brfalse M00000007_IL_0050
+M00000007_IL_0042:
+ldloc local3
+M00000007_IL_0043:
+pop
+M00000007_IL_0044:
 M00000007_IL_0045:
-brtrue M00000007_IL_004f
-M00000007_IL_004a:
-br M00000007_IL_005a
-M00000007_IL_004f:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorAccessDeniedNew()
-M00000007_IL_0054:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorAccessDenied(System.IO.TextReadError.AccessDenied)
-M00000007_IL_0059:
-ret
+br M00000007_IL_0055
+M00000007_IL_0050:
+br M00000007_IL_0060
+M00000007_IL_0055:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNotFoundNew()
 M00000007_IL_005a:
-M00000007_IL_005b:
-M00000007_IL_005c:
-ldarga 0
-M00000007_IL_005e:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsWrongKind(System.IO.StreamError&)
-call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorNotFound(System.IO.TextReadError.NotFound)
+M00000007_IL_005f:
+ret
+M00000007_IL_0060:
+M00000007_IL_0061:
+M00000007_IL_0062:
+ldarg 0
 M00000007_IL_0063:
-brtrue M00000007_IL_006d
-M00000007_IL_0068:
-br M00000007_IL_0078
-M00000007_IL_006d:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorWrongKindNew()
-M00000007_IL_0072:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorWrongKind(System.IO.TextReadError.WrongKind)
+stloc local4
+M00000007_IL_0065:
+ldloca local4
+M00000007_IL_0067:
+ldloca local5
+M00000007_IL_0069:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.AccessDenied&)
+M00000007_IL_006e:
+brfalse M00000007_IL_0082
+M00000007_IL_0073:
+ldloc local5
+M00000007_IL_0075:
+pop
+M00000007_IL_0076:
 M00000007_IL_0077:
+br M00000007_IL_0087
+M00000007_IL_0082:
+br M00000007_IL_0092
+M00000007_IL_0087:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorAccessDeniedNew()
+M00000007_IL_008c:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorAccessDenied(System.IO.TextReadError.AccessDenied)
+M00000007_IL_0091:
 ret
-M00000007_IL_0078:
-M00000007_IL_0079:
-M00000007_IL_007a:
-ldarga 0
-M00000007_IL_007c:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsAlreadyExists(System.IO.StreamError&)
-call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
-M00000007_IL_0081:
-brtrue M00000007_IL_008b
-M00000007_IL_0086:
-br M00000007_IL_0096
-M00000007_IL_008b:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorAlreadyExistsNew()
-M00000007_IL_0090:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorAlreadyExists(System.IO.TextReadError.AlreadyExists)
+M00000007_IL_0092:
+M00000007_IL_0093:
+M00000007_IL_0094:
+ldarg 0
 M00000007_IL_0095:
-ret
-M00000007_IL_0096:
+stloc local6
 M00000007_IL_0097:
-M00000007_IL_0098:
-ldarga 0
-M00000007_IL_009a:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsClosed(System.IO.StreamError&)
-call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
-M00000007_IL_009f:
-brtrue M00000007_IL_00a9
-M00000007_IL_00a4:
-br M00000007_IL_00b4
+ldloca local6
+M00000007_IL_0099:
+ldloca local7
+M00000007_IL_009b:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.WrongKind&)
+M00000007_IL_00a0:
+brfalse M00000007_IL_00b4
+M00000007_IL_00a5:
+ldloc local7
+M00000007_IL_00a7:
+pop
+M00000007_IL_00a8:
 M00000007_IL_00a9:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorClosedNew()
-M00000007_IL_00ae:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorClosed(System.IO.TextReadError.Closed)
-M00000007_IL_00b3:
-ret
+br M00000007_IL_00b9
 M00000007_IL_00b4:
-M00000007_IL_00b5:
-M00000007_IL_00b6:
-ldarga 0
-M00000007_IL_00b8:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsInvalidRange(System.IO.StreamError&)
-call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
-M00000007_IL_00bd:
-brtrue M00000007_IL_00c7
-M00000007_IL_00c2:
-br M00000007_IL_00d2
+br M00000007_IL_00c4
+M00000007_IL_00b9:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorWrongKindNew()
+M00000007_IL_00be:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorWrongKind(System.IO.TextReadError.WrongKind)
+M00000007_IL_00c3:
+ret
+M00000007_IL_00c4:
+M00000007_IL_00c5:
+M00000007_IL_00c6:
+ldarg 0
 M00000007_IL_00c7:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorInvalidRangeNew()
-M00000007_IL_00cc:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorInvalidRange(System.IO.TextReadError.InvalidRange)
-M00000007_IL_00d1:
-ret
+stloc local8
+M00000007_IL_00c9:
+ldloca local8
+M00000007_IL_00cb:
+ldloca local9
+M00000007_IL_00cd:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.AlreadyExists&)
 M00000007_IL_00d2:
-M00000007_IL_00d3:
-M00000007_IL_00d4:
-ldarga 0
-M00000007_IL_00d6:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsLimitExceeded(System.IO.StreamError&)
-call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+brfalse M00000007_IL_00e6
+M00000007_IL_00d7:
+ldloc local9
+M00000007_IL_00d9:
+pop
+M00000007_IL_00da:
 M00000007_IL_00db:
-brtrue M00000007_IL_00e5
-M00000007_IL_00e0:
-br M00000007_IL_00f0
-M00000007_IL_00e5:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorLimitExceededNew()
-M00000007_IL_00ea:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorLimitExceeded(System.IO.TextReadError.LimitExceeded)
-M00000007_IL_00ef:
-ret
+br M00000007_IL_00eb
+M00000007_IL_00e6:
+br M00000007_IL_00f6
+M00000007_IL_00eb:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorAlreadyExistsNew()
 M00000007_IL_00f0:
-M00000007_IL_00f1:
-M00000007_IL_00f2:
-ldarga 0
-M00000007_IL_00f4:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsWrongAccess(System.IO.StreamError&)
-call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorAlreadyExists(System.IO.TextReadError.AlreadyExists)
+M00000007_IL_00f5:
+ret
+M00000007_IL_00f6:
+M00000007_IL_00f7:
+M00000007_IL_00f8:
+ldarg 0
 M00000007_IL_00f9:
-brtrue M00000007_IL_0103
-M00000007_IL_00fe:
-br M00000007_IL_010e
-M00000007_IL_0103:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorWrongAccessNew()
-M00000007_IL_0108:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorWrongAccess(System.IO.TextReadError.WrongAccess)
+stloc local10
+M00000007_IL_00fb:
+ldloca local10
+M00000007_IL_00fd:
+ldloca local11
+M00000007_IL_00ff:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.Closed&)
+M00000007_IL_0104:
+brfalse M00000007_IL_0118
+M00000007_IL_0109:
+ldloc local11
+M00000007_IL_010b:
+pop
+M00000007_IL_010c:
 M00000007_IL_010d:
+br M00000007_IL_011d
+M00000007_IL_0118:
+br M00000007_IL_0128
+M00000007_IL_011d:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorClosedNew()
+M00000007_IL_0122:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorClosed(System.IO.TextReadError.Closed)
+M00000007_IL_0127:
 ret
-M00000007_IL_010e:
-M00000007_IL_010f:
-M00000007_IL_0110:
-ldarga 0
-M00000007_IL_0112:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOStreamErrorgetIsIoFailure(System.IO.StreamError&)
-call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
-M00000007_IL_0117:
-brtrue M00000007_IL_0121
-M00000007_IL_011c:
-br M00000007_IL_012c
-M00000007_IL_0121:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorIoFailureNew()
-M00000007_IL_0126:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorIoFailure(System.IO.TextReadError.IoFailure)
+M00000007_IL_0128:
+M00000007_IL_0129:
+M00000007_IL_012a:
+ldarg 0
 M00000007_IL_012b:
-ret
-M00000007_IL_012c:
+stloc local12
 M00000007_IL_012d:
-M00000007_IL_012e:
-ldstr "Invalid stream error"
-M00000007_IL_0133:
-call System.Fault(String)
-M00000007_IL_0138:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorIoFailureNew()
+ldloca local12
+M00000007_IL_012f:
+ldloca local13
+M00000007_IL_0131:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.InvalidRange&)
+M00000007_IL_0136:
+brfalse M00000007_IL_014a
+M00000007_IL_013b:
+ldloc local13
 M00000007_IL_013d:
+pop
+M00000007_IL_013e:
+M00000007_IL_013f:
+br M00000007_IL_014f
+M00000007_IL_014a:
+br M00000007_IL_015a
+M00000007_IL_014f:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorInvalidRangeNew()
+M00000007_IL_0154:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorInvalidRange(System.IO.TextReadError.InvalidRange)
+M00000007_IL_0159:
+ret
+M00000007_IL_015a:
+M00000007_IL_015b:
+M00000007_IL_015c:
+ldarg 0
+M00000007_IL_015d:
+stloc local14
+M00000007_IL_015f:
+ldloca local14
+M00000007_IL_0161:
+ldloca local15
+M00000007_IL_0163:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.LimitExceeded&)
+M00000007_IL_0168:
+brfalse M00000007_IL_017c
+M00000007_IL_016d:
+ldloc local15
+M00000007_IL_016f:
+pop
+M00000007_IL_0170:
+M00000007_IL_0171:
+br M00000007_IL_0181
+M00000007_IL_017c:
+br M00000007_IL_018c
+M00000007_IL_0181:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorLimitExceededNew()
+M00000007_IL_0186:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorLimitExceeded(System.IO.TextReadError.LimitExceeded)
+M00000007_IL_018b:
+ret
+M00000007_IL_018c:
+M00000007_IL_018d:
+M00000007_IL_018e:
+ldarg 0
+M00000007_IL_018f:
+stloc local16
+M00000007_IL_0191:
+ldloca local16
+M00000007_IL_0193:
+ldloca local17
+M00000007_IL_0195:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.WrongAccess&)
+M00000007_IL_019a:
+brfalse M00000007_IL_01ae
+M00000007_IL_019f:
+ldloc local17
+M00000007_IL_01a1:
+pop
+M00000007_IL_01a2:
+M00000007_IL_01a3:
+br M00000007_IL_01b3
+M00000007_IL_01ae:
+br M00000007_IL_01be
+M00000007_IL_01b3:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorWrongAccessNew()
+M00000007_IL_01b8:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorWrongAccess(System.IO.TextReadError.WrongAccess)
+M00000007_IL_01bd:
+ret
+M00000007_IL_01be:
+M00000007_IL_01bf:
+M00000007_IL_01c0:
+ldarg 0
+M00000007_IL_01c1:
+stloc local18
+M00000007_IL_01c3:
+ldloca local18
+M00000007_IL_01c5:
+ldloca local19
+M00000007_IL_01c7:
+call instance System.IO.StreamError::TryGetValue(System.IO.StreamError.IoFailure&)
+M00000007_IL_01cc:
+brfalse M00000007_IL_01e0
+M00000007_IL_01d1:
+ldloc local19
+M00000007_IL_01d3:
+pop
+M00000007_IL_01d4:
+M00000007_IL_01d5:
+br M00000007_IL_01e5
+M00000007_IL_01e0:
+br M00000007_IL_01f0
+M00000007_IL_01e5:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorIoFailureNew()
+M00000007_IL_01ea:
 call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorIoFailure(System.IO.TextReadError.IoFailure)
-M00000007_IL_0142:
+M00000007_IL_01ef:
+ret
+M00000007_IL_01f0:
+M00000007_IL_01f1:
+M00000007_IL_01f2:
+ldstr "Invalid stream error"
+M00000007_IL_01f7:
+call System.Fault(String)
+M00000007_IL_01fc:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorIoFailureNew()
+M00000007_IL_0201:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorIoFailure(System.IO.TextReadError.IoFailure)
+M00000007_IL_0206:
 ret
 .end
 .end

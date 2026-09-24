@@ -164,8 +164,6 @@
   "System.Single",
   "System.Storage.Directory",
   "System.Storage.EntryKind",
-  "System.Storage.EntryKind.Directory",
-  "System.Storage.EntryKind.File",
   "System.Storage.File",
   "System.Storage.FileReadError",
   "System.Storage.FileReadError.AccessDenied",

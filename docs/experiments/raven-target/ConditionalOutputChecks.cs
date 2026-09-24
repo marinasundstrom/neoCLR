@@ -9,6 +9,9 @@ static class ConditionalOutputChecks
             var method = image.MainModule.GetTypes().SelectMany(t => t.Methods).Single(m => m.Name == methodName);
             if (mode == "UninitializedError")
             {
+                // With standard unions, zero-initialized locals are valid inactive
+                // values. Disable CLI initialization to test a genuinely unread local.
+                method.Body.InitLocals = false;
                 var local = method.Body.Variables.First(v => v.VariableType.FullName == errorType);
                 var il = method.Body.GetILProcessor();
                 var first = method.Body.Instructions[0];

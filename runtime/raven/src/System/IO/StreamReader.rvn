@@ -145,34 +145,34 @@ public class StreamReader : TextReader {
     }
 
     private static func FromStream(error: StreamError) -> TextReadError {
-        if error.IsInvalidPath {
+        if error is StreamError.InvalidPath {
             return TextReadError.InvalidPath()
         }
-        if error.IsNotFound {
+        if error is StreamError.NotFound {
             return TextReadError.NotFound()
         }
-        if error.IsAccessDenied {
+        if error is StreamError.AccessDenied {
             return TextReadError.AccessDenied()
         }
-        if error.IsWrongKind {
+        if error is StreamError.WrongKind {
             return TextReadError.WrongKind()
         }
-        if error.IsAlreadyExists {
+        if error is StreamError.AlreadyExists {
             return TextReadError.AlreadyExists()
         }
-        if error.IsClosed {
+        if error is StreamError.Closed {
             return TextReadError.Closed()
         }
-        if error.IsInvalidRange {
+        if error is StreamError.InvalidRange {
             return TextReadError.InvalidRange()
         }
-        if error.IsLimitExceeded {
+        if error is StreamError.LimitExceeded {
             return TextReadError.LimitExceeded()
         }
-        if error.IsWrongAccess {
+        if error is StreamError.WrongAccess {
             return TextReadError.WrongAccess()
         }
-        if error.IsIoFailure {
+        if error is StreamError.IoFailure {
             return TextReadError.IoFailure()
         }
         System.Fault("Invalid stream error")

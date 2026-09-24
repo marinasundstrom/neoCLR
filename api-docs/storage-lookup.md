@@ -5,14 +5,14 @@ without opening its contents or retaining a stream handle. Use matching developm
 artifacts. It is separate from the application-owned Storage provider experiment.
 
 - [Metadata](xref:System.Storage.Metadata): `GetKind(path: string) -> Result<EntryKind, StorageLookupError>`.
-- [EntryKind](xref:System.Storage.EntryKind): File and Directory cases.
+- [EntryKind](xref:System.Storage.EntryKind): non-flags enum values File (1) and Directory (2). Zero is unnamed.
 - [StorageLookupError](xref:System.Storage.StorageLookupError): InvalidPath, NotFound,
   AccessDenied, WrongKind and IoFailure cases.
 
 ```raven
 match System.Storage.Metadata.GetKind(".") {
     Ok(let kind) => {
-        if !kind.IsDirectory {
+        if kind != EntryKind.Directory {
             System.Fault("Directory metadata lost its kind")
         }
     }

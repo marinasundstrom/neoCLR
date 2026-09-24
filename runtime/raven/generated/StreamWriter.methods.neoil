@@ -96,12 +96,16 @@ ldc.i4 0
 stloc local3
 ldc.i4 0
 stloc local5
+ldloca local6
+initobj System.IO.StreamError
 ldloca local8
 initobj System.Result.Ok<Int32>
 ldloca local9
 initobj System.Result.Ok<Int32>
 ldc.i4 0
 stloc local10
+ldloca local14
+initobj System.IO.StreamError
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:

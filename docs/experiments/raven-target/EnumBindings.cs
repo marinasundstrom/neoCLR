@@ -6,7 +6,9 @@ static class EnumBindings
 {
     public const string Flags = "System.Introspection.BindingFlags";
     public const string TaskState = "System.Tasks.TaskState";
-    public static bool IsType(string name) => name is Flags or TaskState;
+    public const string EntryKind = "System.Storage.EntryKind";
+    public static bool IsType(string name) => name is Flags or TaskState or EntryKind;
+    static readonly (string Name, int Value)[] EntryLiterals = [("File", 1), ("Directory", 2)];
     public static string? Type(TypeReference type) => IsType(type.FullName) && type.IsValueType && RuntimeSignatures.IsCore(type.Scope) ? type.FullName : null;
     static readonly (string Name, int Value)[] TaskLiterals = [("Pending", 0), ("Completed", 1), ("Cancelled", 2)];
     static readonly (string Name, int Value)[] Literals = [("Default", 0), ("DeclaredOnly", 2), ("Instance", 4), ("Static", 8), ("Public", 16), ("NonPublic", 32)];
@@ -18,7 +20,7 @@ static class EnumBindings
             || type.CustomAttributes.Count(a => a.AttributeType.FullName == "System.FlagsAttribute") != (name == Flags ? 1 : 0)
             || type.Fields.Count(f => !f.IsStatic) != 1
             || type.Fields.Single(f => !f.IsStatic) is not { Name: "value__", IsSpecialName: true, IsRuntimeSpecialName: true, FieldType.MetadataType: MetadataType.Int32 }
-            || !type.Fields.Where(f => f.IsStatic).Select(f => (f.Name, f.IsLiteral && f.Constant is int n ? n : int.MinValue)).Order().SequenceEqual((name == Flags ? Literals : TaskLiterals).Order()))
+            || !type.Fields.Where(f => f.IsStatic).Select(f => (f.Name, f.IsLiteral && f.Constant is int n ? n : int.MinValue)).Order().SequenceEqual((name == Flags ? Literals : name == EntryKind ? EntryLiterals : TaskLiterals).Order()))
             throw new InvalidDataException("Unsupported enum metadata: " + name + ".");
     }
     // CLI enums have literals and an underlying value field, not authored method

@@ -6,7 +6,17 @@ using Raven.CodeAnalysis.Syntax;
 // seed is never shipped: both bootstrap and consumer cores receive the same projection.
 static class SourceUnionReferences
 {
-    static readonly string[] Owners = ["System.Networking.Sockets.SocketError", "System.Networking.DnsError", "System.UriError"];
+    static readonly string[] Owners = ["System.Networking.Sockets.SocketError", "System.Networking.DnsError", "System.UriError",
+        "System.Storage.StorageLookupError",
+        "System.IO.TextReadError",
+        "System.IO.StreamError",
+        "System.Storage.FileReadError",
+        "System.Storage.FileWriteError",
+        "System.ConsoleReadError",
+        "System.Text.Utf8SliceError",
+        "System.Int32ParseError",
+        "System.Linq.SingleError",
+        "System.IntegerDivisionError"];
 
     public static void Project(string corePath)
     {

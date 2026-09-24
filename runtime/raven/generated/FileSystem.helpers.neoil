@@ -1,4 +1,15 @@
 ; Generated from runtime/raven/src/System/Storage/FileSystem.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeEqual(Int32 left,Int32 right) -> Int32
+ldarg left
+ldarg right
+ceq
+brfalse False
+ldc.i4 1
+ret
+False:
+ldc.i4 0
+ret
+.end
 .function neoCLR.Library.System.Storage.FileSystem.RuntimeStringEquals(String source,String value0) -> Boolean
 .local String receiver
 ldarg source
@@ -32,18 +43,6 @@ ldarg source
 ldarg value0
 ldarg value1
 call instance System.String::SliceUtf8(Int32,Int32)
-ret
-.end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeErrorSystemStorageEntryKindgetIsFile(System.Storage.EntryKind& source) -> Boolean
-ldarg source
-ldobj System.Storage.EntryKind
-call instance System.Storage.EntryKind::get_IsFile()
-ret
-.end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeErrorSystemStorageEntryKindgetIsDirectory(System.Storage.EntryKind& source) -> Boolean
-ldarg source
-ldobj System.Storage.EntryKind
-call instance System.Storage.EntryKind::get_IsDirectory()
 ret
 .end
 .function neoCLR.Library.System.Storage.FileSystem.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorInvalidPath(System.Storage.StorageLookupError.InvalidPath value) -> System.Storage.StorageLookupError
@@ -433,7 +432,14 @@ False:
     ldc.i4 0
     ret
 .end
-.function neoCLR.Library.System.Storage.FileSystem.RuntimeCliCall0(System.Storage.File arg0) -> System.Storage.Path
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeCliCall0(System.Storage.EntryKind arg0,Int32 arg1) -> Int32
+ldarg arg0
+call instance System.Storage.EntryKind::get_Value()
+ldarg arg1
+call neoCLR.Library.System.Storage.FileSystem.RuntimeEqual(Int32,Int32)
+ret
+.end
+.function neoCLR.Library.System.Storage.FileSystem.RuntimeCliCall1(System.Storage.File arg0) -> System.Storage.Path
 ldarg arg0
 castclass System.Storage.StorageItem
 callvirt instance System.Storage.StorageItem::get_Path()
@@ -550,8 +556,12 @@ ret
 .local System.IO.StreamError local13
 ldloca local2
 initobj System.IO.FileInputStream
+ldloca local3
+initobj System.IO.StreamError
 ldloca local7
 initobj System.IO.FileInputStream
+ldloca local13
+initobj System.IO.StreamError
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 M0000000a_IL_0002:
@@ -698,8 +708,12 @@ ret
 .local System.IO.StreamError local13
 ldloca local2
 initobj System.IO.FileOutputStream
+ldloca local3
+initobj System.IO.StreamError
 ldloca local7
 initobj System.IO.FileOutputStream
+ldloca local13
+initobj System.IO.StreamError
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 M0000000b_IL_0002:
@@ -1172,8 +1186,12 @@ ret
 .local System.Storage.StorageLookupError local11
 ldloca local2
 initobj System.Storage.Path
+ldloca local3
+initobj System.Storage.StorageLookupError
 ldloca local7
 initobj System.Storage.Path
+ldloca local11
+initobj System.Storage.StorageLookupError
 M0000000f_IL_0000:
 M0000000f_IL_0001:
 M0000000f_IL_0002:
@@ -1312,8 +1330,12 @@ ret
 .local System.Storage.StorageLookupError local11
 ldloca local2
 initobj System.Storage.Path
+ldloca local3
+initobj System.Storage.StorageLookupError
 ldloca local7
 initobj System.Storage.Path
+ldloca local11
+initobj System.Storage.StorageLookupError
 M00000010_IL_0000:
 M00000010_IL_0001:
 M00000010_IL_0002:
@@ -1452,8 +1474,12 @@ ret
 .local System.Storage.StorageLookupError local11
 ldloca local2
 initobj System.Storage.File
+ldloca local3
+initobj System.Storage.StorageLookupError
 ldloca local7
 initobj System.Storage.File
+ldloca local11
+initobj System.Storage.StorageLookupError
 M00000011_IL_0000:
 M00000011_IL_0001:
 M00000011_IL_0002:
@@ -1513,7 +1539,7 @@ ldfld neoCLR.Library.System.Storage.FileSystem.Type_53797374656D2E53746F72616765
 M00000011_IL_0054:
 ldloc local2
 M00000011_IL_0055:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeCliCall0(System.Storage.File)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeCliCall1(System.Storage.File)
 M00000011_IL_005a:
 callvirt instance System.Storage.FileSystem::GetDirectory(System.Storage.Path)
 M00000011_IL_005f:
@@ -1621,6 +1647,10 @@ ldloca local6
 initobj System.Storage.File
 ldloca local8
 initobj System.Storage.StorageItem
+ldloca local9
+initobj System.Storage.StorageLookupError
+ldloca local10
+initobj System.Storage.StorageLookupError
 ldloca local11
 initobj System.Collections.Sequence<System.Storage.StorageItem>
 ldloca local12
@@ -1631,6 +1661,10 @@ ldloca local18
 initobj System.Storage.File
 ldloca local22
 initobj System.Storage.StorageItem
+ldloca local26
+initobj System.Storage.StorageLookupError
+ldloca local30
+initobj System.Storage.StorageLookupError
 M00000012_IL_0000:
 M00000012_IL_0001:
 M00000012_IL_0002:
@@ -1913,7 +1947,7 @@ ldfld neoCLR.Library.System.Storage.FileSystem.Type_53797374656D2E53746F72616765
 M00000012_IL_0198:
 ldloc local6
 M00000012_IL_019a:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeCliCall0(System.Storage.File)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeCliCall1(System.Storage.File)
 M00000012_IL_019f:
 callvirt instance System.Storage.FileSystem::GetItem(System.Storage.Path)
 M00000012_IL_01a4:
@@ -2398,6 +2432,8 @@ ldloca local2
 initobj System.Storage.File
 ldloca local6
 initobj System.Storage.File
+ldloca local10
+initobj System.Storage.StorageLookupError
 M00000014_IL_0000:
 M00000014_IL_0001:
 M00000014_IL_0002:
@@ -2457,7 +2493,7 @@ ldfld neoCLR.Library.System.Storage.FileSystem.Type_53797374656D2E53746F72616765
 M00000014_IL_0053:
 ldloc local2
 M00000014_IL_0054:
-call neoCLR.Library.System.Storage.FileSystem.RuntimeCliCall0(System.Storage.File)
+call neoCLR.Library.System.Storage.FileSystem.RuntimeCliCall1(System.Storage.File)
 M00000014_IL_0059:
 callvirt instance System.Storage.FileSystem::GetFile(System.Storage.Path)
 M00000014_IL_005e:

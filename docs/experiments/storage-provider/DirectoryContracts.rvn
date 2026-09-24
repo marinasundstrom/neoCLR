@@ -45,7 +45,7 @@ func DirectoryCases(provider: StorageProvider, content: string) {
     CheckResolved(provider.GetFile(target), target.Text, content)
     match context.GetFile(target) {
         Error(let error) => {
-            if !error.IsInvalidPath {
+            if !(error is System.Storage.StorageLookupError.InvalidPath) {
                 System.Fault("Absolute path has wrong context error")
             }
         }
@@ -54,7 +54,7 @@ func DirectoryCases(provider: StorageProvider, content: string) {
     // The string overload still accepts one child name, not a relative path.
     match context.GetFile("nested/note.txt") {
         Error(let error) => {
-            if !error.IsInvalidPath {
+            if !(error is System.Storage.StorageLookupError.InvalidPath) {
                 System.Fault("Nested string has wrong error")
             }
         }
@@ -62,7 +62,7 @@ func DirectoryCases(provider: StorageProvider, content: string) {
     }
     match context.GetFile(RequirePath("absent.txt")) {
         Error(let error) => {
-            if !error.IsNotFound {
+            if !(error is System.Storage.StorageLookupError.NotFound) {
                 System.Fault("Missing relative lookup changed error")
             }
         }
@@ -70,7 +70,7 @@ func DirectoryCases(provider: StorageProvider, content: string) {
     }
     match root.GetFile(RequirePath(".")) {
         Error(let error) => {
-            if !error.IsWrongKind {
+            if !(error is System.Storage.StorageLookupError.WrongKind) {
                 System.Fault("Current directory treated as file")
             }
         }
@@ -90,7 +90,7 @@ func DirectoryLookupCases(provider: StorageProvider) {
     }
     match provider.GetDirectory(RequirePath("context/nested/note.txt")) {
         Error(let error) => {
-            if !error.IsWrongKind {
+            if !(error is System.Storage.StorageLookupError.WrongKind) {
                 System.Fault("File lookup as directory changed error")
             }
         }
@@ -98,7 +98,7 @@ func DirectoryLookupCases(provider: StorageProvider) {
     }
     match provider.GetDirectory(RequirePath("absent-directory")) {
         Error(let error) => {
-            if !error.IsNotFound {
+            if !(error is System.Storage.StorageLookupError.NotFound) {
                 System.Fault("Missing directory changed error")
             }
         }
@@ -118,7 +118,7 @@ func Main() {
     // Memory keys do not imply directories; that is a provider policy.
     match memory.GetDirectory(RequirePath("context/nested")) {
         Error(let error) => {
-            if !error.IsNotFound {
+            if !(error is System.Storage.StorageLookupError.NotFound) {
                 System.Fault("Flat memory provider changed directory policy")
             }
         }

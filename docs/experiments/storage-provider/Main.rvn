@@ -23,7 +23,7 @@ func RoundTrip(directory: Directory, provider: StorageProvider) {
             }
             match provider.WriteText(file.Path, "too large", 2) {
                 Error(let error) => {
-                    if !error.IsTooLarge {
+                    if !(error is System.Storage.FileWriteError.TooLarge) {
                         System.Fault("Wrong bounded-write error")
                     }
                 }
@@ -39,7 +39,7 @@ func RoundTrip(directory: Directory, provider: StorageProvider) {
             }
             match provider.ReadText(file.Path, 13) {
                 Error(let error) => {
-                    if !error.IsTooLarge {
+                    if !(error is System.Storage.FileReadError.TooLarge) {
                         System.Fault("Wrong UTF-8 byte-limit error")
                     }
                 }
@@ -75,7 +75,7 @@ func RoundTrip(directory: Directory, provider: StorageProvider) {
 func RejectChild(directory: Directory, name: string) {
     match directory.FileAt(name) {
         Error(let error) => {
-            if !error.IsInvalidPath {
+            if !(error is System.Storage.StorageLookupError.InvalidPath) {
                 System.Fault("Wrong child-name error")
             }
         }
@@ -143,7 +143,7 @@ func Main() {
     let other = ProviderFile(otherMemory, RequirePath("/notes.txt"))
     match otherMemory.ReadText(other.Path, 64) {
         Error(let error) => {
-            if !error.IsNotFound {
+            if !(error is System.Storage.FileReadError.NotFound) {
                 System.Fault("Wrong missing-file error")
             }
             WriteLine("Providers remain independent")
