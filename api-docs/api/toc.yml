@@ -138,6 +138,16 @@ items:
   - uid: System.IO.TextWriter
     name: TextWriter
     type: Interface
+- uid: System.Introspection
+  name: System.Introspection
+  type: Namespace
+  items:
+  - uid: System.Introspection.MemberInfo
+    name: MemberInfo
+    type: Interface
+  - uid: System.Introspection.TypeInfo
+    name: TypeInfo
+    type: Interface
 - uid: System.Runtime.CompilerServices
   name: System.Runtime.CompilerServices
   type: Namespace

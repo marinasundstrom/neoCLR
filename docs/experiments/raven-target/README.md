@@ -953,3 +953,10 @@ importer preserves Object ancestry and base construction for library class overr
 Path reference/interface conversions are admitted and tested through HashMap callbacks.
 The archived Neo profile keeps generated Path.bootstrap fragments because it lacks
 the platform Object/HashCode classes; the Raven profile uses the complete source.
+
+RuntimeTypeInfo now overrides Object equality/hash/display without changing the
+opaque-handle layout, TypeIdentity or Raven configuration. Equality uses TypeEquals;
+the bounded library hash uses FullName and can collide across distinct definitions.
+The introspection fixture exercises generic/array shapes and boxed GetType under GC
+pressure. Typed TypeInfo/Equatable operands stay non-nullable. No compiler code changes
+are needed, and other descriptor identity contracts remain open.

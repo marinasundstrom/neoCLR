@@ -175,12 +175,14 @@ ConsoleOutputStream are provider implementation classes, not public APIs.
 
 Object, GetType, ToString, ReferenceEquals, Equals, GetHashCode and Value have generated
 summaries and an [on-site guide](objects.md). The equality/identity surface is a
-bounded development implementation: String identity and boxed virtual equality/hash
-remain unsupported. Static Object.Equals is not yet declared or implemented.
+bounded development implementation: String identity and most boxed primitive
+virtual equality/hash remain unsupported. Static Object.Equals is not yet declared or implemented.
 Value has no public member API; low-level operations
-and its temporary role are explained in the guide. Introspection type/member coverage
-remains an existing separate gap. Object/Value source files now participate in the
-reference snapshot fingerprint.
+and its temporary role are explained in the guide. TypeInfo and MemberInfo now have
+generated type/member coverage and an [introspection guide](introspection.md).
+AssemblyInfo, ModuleInfo, FieldInfo, MethodInfo, PropertyInfo and ParameterInfo remain
+explicit coverage gaps. Object/Value source files participate in the reference
+snapshot fingerprint.
 
 The metadata refresh normalizes two DocFX core-type assumptions: Object's declaration
 is rendered as `public abstract class Object`, and Value does not advertise inherited Object methods

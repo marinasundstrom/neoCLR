@@ -754,9 +754,12 @@ contracts throughout the runtime class library. The [library audit](object-model
 identified Path typed/Object equality, hash and display alignment as the next library
 consumer case. That slice now passes through existing HashMap callbacks. The
 [wider audit](object-model-review.md#path-integration-and-wider-library-audit--2026-09-24)
-selects RuntimeTypeInfo next: same-type wrappers disagree between typed and Object
-equality/hashes. Keep Equatable<T>.Equals(T) explicit; nullable value operands are
-not introduced by equality contracts. Other descriptor identities remain design work. Broader primitive,
+confirmed the RuntimeTypeInfo mismatch. The author-directed introspection slice
+now aligns represented-type equality/hash/display, with GC-tested map reuse.
+AssemblyInfo/ModuleInfo scoped identity is next; member and parameter equality
+requires explicit declaring-owner checks. Keep Equatable<T>.Equals(T) explicit;
+nullable value operands are not introduced by equality contracts. Other descriptor
+identities remain design work. Broader primitive,
 formatting and default-comparer coverage remains incremental; do not imply universal
 Object support from the completed record gate. The author also requires correct GC
 behavior for boxing: verify copied payloads, aliases, reference-field tracing, roots

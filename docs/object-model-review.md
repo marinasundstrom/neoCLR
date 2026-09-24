@@ -721,3 +721,45 @@ Runtime follow-up exposed by Path ancestry: reachability incorrectly tried virtu
 dispatch for nonvirtual class callvirt (Object.GetType). It now records the static
 callee, matching execution's receiver-null-check behavior. A small independent
 base/derived regression and the existing Object-default reachability case cover it.
+
+### Introspection consumer slice — 2026-09-24
+
+The author directs the next slice toward introspection types. RuntimeTypeInfo now
+preserves represented-type equality through Object, with null/wrong-type rejection
+at that boundary. Typed Equals(TypeInfo) and Equatable<TypeInfo> remain non-nullable.
+GetHashCode feeds FullName to HashCode; ToString returns FullName. The internal wrapper
+layout remains one opaque handle, and neither type identity nor native factory layout
+changes. The importer changes from the Path slice preserve its Object base and
+constructor chaining automatically.
+
+This follows .NET's distinction between represented type and wrapper identity, using
+neoCLR's existing TypeIdentity rather than CLR caches. FullName hashing is a bounded
+library-only choice: equal types share a hash, but equal names from distinct definitions
+can collide. Hashing allocates through the current UTF-8 implementation and is not a
+persistent ID. A native identity hash could improve collision distribution/cost later;
+it is not needed to establish correctness. TypeInfo and MemberInfo now have generated
+reference coverage and an on-site guide; remaining introspection interfaces remain
+explicit documentation gaps.
+
+The [fixture](experiments/introspection-object/README.md) checks allocation versus
+represented identity, interface/Object views, boxed GetType versus typeof, constructed
+generics, arrays and a type-keyed map under GC pressure. It requires multiple collections
+and full reclamation after completion. No generic nullable operand is introduced.
+
+Further source investigation distinguishes these follow-ups:
+
+- RuntimeAssemblyInfo carries the loaded full assembly identity; RuntimeModuleInfo
+  carries that identity plus the module name. These are the next bounded equality/hash
+  candidates within one loaded program. Future load contexts would require scope in
+  their identity; neither short names nor tokens alone are sufficient.
+- RuntimeFieldInfo, RuntimeMethodInfo and RuntimePropertyInfo carry a declaring type
+  plus a definition index. Equality must include the descriptor kind and closed owner,
+  and test inherited versus declared queries. Existing snapshots do not cache wrappers.
+- RuntimeParameterInfo currently carries a parameter token, module, position and type,
+  but no declaring member identity. Tokens can be absent; matching position/type is
+  not enough. Establish that owner contract before changing parameter equality.
+
+These findings are investigations, not newly implemented equality for those wrappers.
+The immediate next bounded consumer is AssemblyInfo/ModuleInfo; member/parameter
+identity follows after their ownership checks. Mutable resources and collections retain
+identity semantics; this is not a move to universal structural equality.

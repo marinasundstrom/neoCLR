@@ -1,0 +1,266 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Introspection.MemberInfo
+  commentId: T:System.Introspection.MemberInfo
+  id: MemberInfo
+  parent: System.Introspection
+  children:
+  - System.Introspection.MemberInfo.DeclaringType
+  - System.Introspection.MemberInfo.MetadataToken
+  - System.Introspection.MemberInfo.Module
+  - System.Introspection.MemberInfo.Name
+  langs:
+  - csharp
+  - vb
+  name: MemberInfo
+  nameWithType: MemberInfo
+  fullName: System.Introspection.MemberInfo
+  type: Interface
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Describes a metadata member without exposing mutation or invocation.
+  example: []
+  syntax:
+    content: public interface MemberInfo
+    content.vb: Public Interface MemberInfo
+- uid: System.Introspection.MemberInfo.MetadataToken
+  commentId: P:System.Introspection.MemberInfo.MetadataToken
+  id: MetadataToken
+  parent: System.Introspection.MemberInfo
+  langs:
+  - csharp
+  - vb
+  name: MetadataToken
+  nameWithType: MemberInfo.MetadataToken
+  fullName: System.Introspection.MemberInfo.MetadataToken
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the metadata token within its defining module; not a globally unique identifier.
+  example: []
+  syntax:
+    content: int MetadataToken { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: ReadOnly Property MetadataToken As Integer
+  overload: System.Introspection.MemberInfo.MetadataToken*
+- uid: System.Introspection.MemberInfo.Module
+  commentId: P:System.Introspection.MemberInfo.Module
+  id: Module
+  parent: System.Introspection.MemberInfo
+  langs:
+  - csharp
+  - vb
+  name: Module
+  nameWithType: MemberInfo.Module
+  fullName: System.Introspection.MemberInfo.Module
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the defining module descriptor.
+  example: []
+  syntax:
+    content: ModuleInfo Module { get; }
+    parameters: []
+    return:
+      type: System.Introspection.ModuleInfo
+    content.vb: ReadOnly Property [Module] As ModuleInfo
+  overload: System.Introspection.MemberInfo.Module*
+- uid: System.Introspection.MemberInfo.Name
+  commentId: P:System.Introspection.MemberInfo.Name
+  id: Name
+  parent: System.Introspection.MemberInfo
+  langs:
+  - csharp
+  - vb
+  name: Name
+  nameWithType: MemberInfo.Name
+  fullName: System.Introspection.MemberInfo.Name
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the metadata member name.
+  example: []
+  syntax:
+    content: string Name { get; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: ReadOnly Property Name As String
+  overload: System.Introspection.MemberInfo.Name*
+- uid: System.Introspection.MemberInfo.DeclaringType
+  commentId: P:System.Introspection.MemberInfo.DeclaringType
+  id: DeclaringType
+  parent: System.Introspection.MemberInfo
+  langs:
+  - csharp
+  - vb
+  name: DeclaringType
+  nameWithType: MemberInfo.DeclaringType
+  fullName: System.Introspection.MemberInfo.DeclaringType
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the declaring type, or None for a top-level member.
+  example: []
+  syntax:
+    content: Option<TypeInfo> DeclaringType { get; }
+    parameters: []
+    return:
+      type: System.Option{System.Introspection.TypeInfo}
+    content.vb: ReadOnly Property DeclaringType As [Option](Of TypeInfo)
+  overload: System.Introspection.MemberInfo.DeclaringType*
+references:
+- uid: System.Introspection
+  commentId: N:System.Introspection
+  isExternal: true
+  href: System.html
+  name: System.Introspection
+  nameWithType: System.Introspection
+  fullName: System.Introspection
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Introspection
+    name: Introspection
+    isExternal: true
+    href: System.Introspection.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Introspection
+    name: Introspection
+    isExternal: true
+    href: System.Introspection.html
+- uid: System.Introspection.MemberInfo.MetadataToken*
+  commentId: Overload:System.Introspection.MemberInfo.MetadataToken
+  isExternal: true
+  href: System.Introspection.MemberInfo.html#System_Introspection_MemberInfo_MetadataToken
+  name: MetadataToken
+  nameWithType: MemberInfo.MetadataToken
+  fullName: System.Introspection.MemberInfo.MetadataToken
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Introspection.MemberInfo.Module*
+  commentId: Overload:System.Introspection.MemberInfo.Module
+  isExternal: true
+  href: System.Introspection.MemberInfo.html#System_Introspection_MemberInfo_Module
+  name: Module
+  nameWithType: MemberInfo.Module
+  fullName: System.Introspection.MemberInfo.Module
+- uid: System.Introspection.ModuleInfo
+  commentId: T:System.Introspection.ModuleInfo
+  parent: System.Introspection
+  isExternal: true
+  name: ModuleInfo
+  nameWithType: ModuleInfo
+  fullName: System.Introspection.ModuleInfo
+- uid: System.Introspection.MemberInfo.Name*
+  commentId: Overload:System.Introspection.MemberInfo.Name
+  isExternal: true
+  href: System.Introspection.MemberInfo.html#System_Introspection_MemberInfo_Name
+  name: Name
+  nameWithType: MemberInfo.Name
+  fullName: System.Introspection.MemberInfo.Name
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System.Introspection.MemberInfo.DeclaringType*
+  commentId: Overload:System.Introspection.MemberInfo.DeclaringType
+  isExternal: true
+  href: System.Introspection.MemberInfo.html#System_Introspection_MemberInfo_DeclaringType
+  name: DeclaringType
+  nameWithType: MemberInfo.DeclaringType
+  fullName: System.Introspection.MemberInfo.DeclaringType
+- uid: System.Option{System.Introspection.TypeInfo}
+  commentId: T:System.Option{System.Introspection.TypeInfo}
+  parent: System
+  definition: System.Option`1
+  href: System.Introspection.TypeInfo.html
+  name: Option<TypeInfo>
+  nameWithType: Option<TypeInfo>
+  fullName: System.Option<System.Introspection.TypeInfo>
+  nameWithType.vb: Option(Of TypeInfo)
+  fullName.vb: System.Option(Of System.Introspection.TypeInfo)
+  name.vb: Option(Of TypeInfo)
+  spec.csharp:
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: <
+  - uid: System.Introspection.TypeInfo
+    name: TypeInfo
+    isExternal: true
+    href: System.Introspection.TypeInfo.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Introspection.TypeInfo
+    name: TypeInfo
+    isExternal: true
+    href: System.Introspection.TypeInfo.html
+  - name: )
+- uid: System.Option`1
+  commentId: T:System.Option`1
+  isExternal: true
+  name: Option<T>
+  nameWithType: Option<T>
+  fullName: System.Option<T>
+  nameWithType.vb: Option(Of T)
+  fullName.vb: System.Option(Of T)
+  name.vb: Option(Of T)
+  spec.csharp:
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )

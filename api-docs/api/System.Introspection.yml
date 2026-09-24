@@ -1,0 +1,61 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Introspection
+  commentId: N:System.Introspection
+  id: System.Introspection
+  children:
+  - System.Introspection.MemberInfo
+  - System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: System.Introspection
+  nameWithType: System.Introspection
+  fullName: System.Introspection
+  type: Namespace
+  assemblies:
+  - NeoCLR.CoreProbe
+references:
+- uid: System.Introspection.TypeInfo
+  commentId: T:System.Introspection.TypeInfo
+  parent: System.Introspection
+  isExternal: true
+  href: System.Introspection.TypeInfo.html
+  name: TypeInfo
+  nameWithType: TypeInfo
+  fullName: System.Introspection.TypeInfo
+- uid: System.Introspection.MemberInfo
+  commentId: T:System.Introspection.MemberInfo
+  parent: System.Introspection
+  isExternal: true
+  href: System.Introspection.MemberInfo.html
+  name: MemberInfo
+  nameWithType: MemberInfo
+  fullName: System.Introspection.MemberInfo
+- uid: System.Introspection
+  commentId: N:System.Introspection
+  isExternal: true
+  href: System.html
+  name: System.Introspection
+  nameWithType: System.Introspection
+  fullName: System.Introspection
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Introspection
+    name: Introspection
+    isExternal: true
+    href: System.Introspection.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Introspection
+    name: Introspection
+    isExternal: true
+    href: System.Introspection.html

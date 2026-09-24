@@ -36,3 +36,6 @@
 
 - name: Transitional async builders
   href: async-builders.md
+
+- name: Introspection and type identity
+  href: introspection.md

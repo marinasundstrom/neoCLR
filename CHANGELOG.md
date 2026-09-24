@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Align RuntimeTypeInfo Object equality with represented type identity; hash its
+  FullName consistently and display the represented type rather than the wrapper.
+  Keep Equals(TypeInfo) non-nullable and Object.Equals(Object?) explicitly null-aware.
+  Validate repeated, generic and array descriptors, typeof/GetType agreement and
+  HashMap use under collection pressure. Add browsable TypeInfo/MemberInfo API
+  reference and website guidance. Assembly/module/member/parameter equality remains
+  separate work; hashes are neither unique nor persistent identifiers. Validation:
+  the fixture reclaims all 422 managed objects across ten collections; three
+  descriptor regressions and the Object reachability regression pass.
+
 - Align Storage.Path typed and Object equality, hashing and display; implement
   Equatable<Path> and reuse the contract in HashMap lookup, replacement and rehashing.
   Keep typed equality operands non-nullable (Equatable<T>.Equals(T)); the existing

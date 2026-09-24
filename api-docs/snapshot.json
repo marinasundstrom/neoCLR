@@ -1,10 +1,10 @@
 {
-  "assemblySha256": "f8561e65c39f7b239e00bdea08e7bf19d599f864a5bd1cf95af80ebefd5779a0",
+  "assemblySha256": "e5514229475372648eedd3ecbc4db9225f61ec99669e113339b13426951aa28c",
   "inputs": {
     ".config/dotnet-tools.json": "48ba0318d227fd625ec31f043c11330548a60ea8fff4a6020b62c76f44492f6b",
-    "api-docs/NeoCLR.CoreProbe.xml": "c334a384833e33891b1b1eeb665d7c3e65383a5122191809d8ec7639a3f77e37",
+    "api-docs/NeoCLR.CoreProbe.xml": "1d5f6844d598b0a834602943a89a4af6ac0a12d4db16eb10379098d31849a301",
     "api-docs/docfx.json": "c1aca352fe0b1e7ba92fe789108f7d6d7ba160b9d889003f97b6b339afcc1dd0",
-    "api-docs/filter.yml": "379bf85b90215c1ec3fda0ce0447a77d5b9d27eacef6f17e06bcc62bb2b2c5ba",
+    "api-docs/filter.yml": "32e0dfab503a31d46c9c90f098c1f2b9c9c378c8566f8b42c45d173c7905964c",
     "docs/experiments/raven-target/ApplicationImport.cs": "66855a52e0d43532222cdbae0530de57ce13f25a00cd7e7d0cd791da7bf2607a",
     "docs/experiments/raven-target/ApplicationTypes.cs": "ee4d334e52d96214245cf6c13a01ee1f8093bd01b85bca04e5dafd5d83aa0c3c",
     "docs/experiments/raven-target/ArrayApiProbe.cs": "d222179a4736c127d160eee0282ee6d7eca7b2fbade571c491b0b2bb02d8731c",
@@ -73,7 +73,7 @@
     "docs/experiments/raven-target/QueryBindings.cs": "fbd29ef04e2368a2345379a1037f924bfd5c16598261b0872d0566d2586cbe72",
     "docs/experiments/raven-target/ReaderBindings.cs": "0829df0cd8970866de73e7af224ef9d5f486de07cbc888e12102655c1ca63e10",
     "docs/experiments/raven-target/RecordMetadataChecks.cs": "7935a1effdc1939a0c7d4e4bd3ac4234be602011389ec3c7242f648a0601ba81",
-    "docs/experiments/raven-target/ReflectionBindings.cs": "35729f6f3cd4d310951dde2a64fdb37e0a8aa4e22e7653d6d8cc5a5b5ea84b16",
+    "docs/experiments/raven-target/ReflectionBindings.cs": "af77d2312b35df6f4b14133665da5470083b3b1ef96014ef74ad8271c2d68bb5",
     "docs/experiments/raven-target/ResultBindings.cs": "620629b272a8cc3f8614854cd9085551bcfcae8e6050a3d29edf1a6cf9d5dcd2",
     "docs/experiments/raven-target/ResultImportChecks.cs": "7450bb06c66f7343fc4150e3dfa46632e9a93b30d4e09a802ebb98da5c85d7f3",
     "docs/experiments/raven-target/RuntimeFailureBindings.cs": "119133892f5c2024a8b869d3b0446511207dded1aba1afff66f147a3c65bce7f",
@@ -178,7 +178,10 @@
     "api/System.IO.TextReader.yml": "561922c2a8845b97295e407c6165d5d8fef7dd4ee99f67be84983b9f6c25c101",
     "api/System.IO.TextWriter.yml": "cdede6f2b5e8dc2f7f175fe8e06a2e4789d895553d7ea7f95bdfa6cbebcfe79a",
     "api/System.IO.yml": "2fad92430311d0108ee7a5258c727c552c9f13c7ce12bb50720a240a9b9c4e1b",
-    "api/System.Object.yml": "abe988cf19e59a87c22659ce3a27b8afcd49b428766d497a8ff40261ba68704c",
+    "api/System.Introspection.MemberInfo.yml": "ebf62cb5d09f6be5d6241528bad6285a097c9cfb3ca49a03e859e1e611cec025",
+    "api/System.Introspection.TypeInfo.yml": "6cf5eb2c4ccb16b6b16447455516c31e0ab040206adedbefd5d134177f12bcd3",
+    "api/System.Introspection.yml": "e67220e5f8d89f86793333dbc25052f98058d287ee95884497eec9dfcb112450",
+    "api/System.Object.yml": "9a840c6867f340fc518dbad9893f9157978dbeb1b3db11f96bb9e88f4604dd82",
     "api/System.Runtime.CompilerServices.AsyncTaskMethodBuilder-1.yml": "356d7753edb4092a2b48b9646a81c57f296da34d7c3d912b9ce80470201034f3",
     "api/System.Runtime.CompilerServices.IAsyncStateMachine.yml": "cbe175f18620f36b30f43a3eaa4344a1d908e3cfb6d669b03e08083054c95b95",
     "api/System.Runtime.CompilerServices.ITaskAwaiter.yml": "033a6f68db58fe3ae365793b738fe5a2ee680a878029f9ee6ce5da5050c95619",
@@ -229,6 +232,6 @@
     "api/System.Tasks.yml": "29bb21a52461de10ead15a1ceea6780ebb72194fade98f1fded122421fcddc9b",
     "api/System.Value.yml": "a415a13f5a32f9f26497bdec05c0e350691ac8ec4a9fc4465bfdef7907efb353",
     "api/System.yml": "0f8964861d3d5a4c6efc609abc218f1ac0daf0412a9e5fb4f4133d5f25cda40d",
-    "api/toc.yml": "87b828ce495b214722f0dbbde993f81590df909860d4a94c8aaba8c6abcd4870"
+    "api/toc.yml": "159ac8c6a00304705995c372a1a0cb41f5aebe58c827870fea9553c13167632e"
   }
 }

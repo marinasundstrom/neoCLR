@@ -1,5 +1,7 @@
 apiRules:
 - include:
+    uidRegex: '^System\.Introspection($|\.(TypeInfo|MemberInfo)($|\.))'
+- include:
     uidRegex: '^System\.Equatable`1($|\.)'
 - exclude:
     uidRegex: '^System\.Runtime\.CompilerServices\.ITaskAwaiter\.OnCompleted($|\()'

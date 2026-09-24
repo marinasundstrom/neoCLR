@@ -112,3 +112,5 @@ The [Storage POC](storage-poc.md) demonstrates provider lookup, writing, text re
 seekability and mixed-item enumeration using the integrated development APIs.
 
 [Transitional async builders](async-builders.md) documents the compiler-facing state-machine protocol and its current limits. It may be replaced by runtime suspension.
+
+[Type introspection](introspection.md) explains represented-type equality, hashing and display, with a browsable type/member reference.

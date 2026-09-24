@@ -194,6 +194,7 @@ references:
   commentId: T:System.Introspection.TypeInfo
   parent: System.Introspection
   isExternal: true
+  href: System.Introspection.TypeInfo.html
   name: TypeInfo
   nameWithType: TypeInfo
   fullName: System.Introspection.TypeInfo

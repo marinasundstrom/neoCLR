@@ -319,6 +319,21 @@ internal class RuntimeTypeInfo : TypeInfo {
         return RuntimeServices.TypeEquals(Handle, implementation.Handle)
     }
 
+    override func Equals(other: Object?) -> bool {
+        if other is RuntimeTypeInfo implementation {
+            return RuntimeServices.TypeEquals(Handle, implementation.Handle)
+        }
+        return false
+    }
+
+    override func GetHashCode() -> int {
+        var hash = HashCode()
+        hash.Add(FullName)
+        return hash.ToHashCode()
+    }
+
+    override func ToString() -> string => FullName
+
     val IsArray: bool => RuntimeServices.TypeShape(Handle, 0)
     val IsByRef: bool => RuntimeServices.TypeShape(Handle, 1)
     val IsPointer: bool => RuntimeServices.TypeShape(Handle, 2)

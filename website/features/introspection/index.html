@@ -35,6 +35,12 @@
         <pre tabindex="0" aria-label="Acquire TypeInfo from an instance and a type"><code>{{TOUR_ACQUISITION}}</code></pre>
         <p>Use <code>Equals</code> to compare type identity. Names are useful for display, but do not uniquely identify types across modules. There is no public <code>System.Type</code> class or intermediate <code>.Info</code> property in this Raven profile. Calling <code>GetType()</code> on null faults.</p>
       </section>
+      <section id="object-contracts">
+        <h2>Type identity through Object</h2>
+        <p><strong>Development after Preview 9:</strong> TypeInfo now compares represented types through both typed equality and Object.Equals. Repeated queries may allocate different descriptors; ReferenceEquals still compares those allocations. Generic arguments and array element types participate in type identity.</p>
+        <p>Object.GetHashCode is consistent with that equality, and ToString displays the represented FullName. Different types can have colliding hashes; neither names nor hashes are persistent identity keys. Equatable&lt;TypeInfo&gt; takes a non-null TypeInfo. Object.Equals(Object?) is the explicitly null-aware boundary.</p>
+        <p>Assembly, module and member descriptor equality still needs separate identity work. See the <a href="../../docs/introspection.html">introspection guide</a> and <a href="../../docs/api/System.Introspection.TypeInfo.html">TypeInfo API reference</a> for current contracts.</p>
+      </section>
       <section id="context">
         <p class="eyebrow">02 · ASSEMBLIES AND MODULES</p><h2>Assembly discovery through RuntimeContext</h2>
         <p><code>RuntimeContext.Current</code> describes the current loaded program. <code>ExecutingAssembly</code> identifies the assembly of the source caller through the runtime facade. A call made from a dependency reports that dependency, rather than always reporting the entry assembly.</p>

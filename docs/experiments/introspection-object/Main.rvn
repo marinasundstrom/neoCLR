@@ -1,0 +1,58 @@
+import System.*
+import System.Introspection.*
+import System.Collections.*
+import System.Option.*
+
+class First { }
+class Second { }
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+func Same(left: Object, right: Object?) -> bool => left.Equals(right)
+func Hash(value: Object) -> int => value.GetHashCode()
+func Display(value: Object) -> string => value.ToString()
+
+func Main() {
+    let first = typeof(First)
+    let second = typeof(First)
+    let different = typeof(Second)
+    let contract: Equatable<TypeInfo> = first
+    let member: MemberInfo = first
+    Check(!Object.ReferenceEquals(first, second), "Descriptors have separate allocation identity")
+    Check(first.Equals(second) && contract.Equals(second), "Typed represented-type equality")
+    Check(Same(first, second) && Same(second, member), "Object represented-type equality")
+    Check(!Same(first, different) && !Same(first, null) && !Same(first, 42), "Reject another type, null and non-descriptor")
+    Check(Hash(first) == Hash(second), "Equal type hashes")
+    Check(Display(first) == first.FullName, "Represented-type display")
+
+    let boxed: Object = 42
+    let actual = boxed.GetType()
+    Check(Same(actual, typeof(int)) && Hash(actual) == Hash(typeof(int)), "Object and metadata type acquisition agree")
+
+    let numbers = typeof(ArrayList<int>)
+    let strings = typeof(ArrayList<string>)
+    Check(Same(numbers, typeof(ArrayList<int>)) && !Same(numbers, strings), "Constructed generic identity")
+    let array = typeof(int[])
+    Check(Same(array, typeof(int[])) && !Same(array, typeof(string[])), "Array element identity")
+    Check(Hash(array) == Hash(typeof(int[])), "Repeated array hashes")
+
+    let index = HashMap<TypeInfo, int>((left, right) => Same(left, right), key => Hash(key))
+    Check(index.TryAdd(numbers, 1) && !index.TryAdd(typeof(ArrayList<int>), 2), "Type-keyed lookup")
+    index.Set(typeof(ArrayList<int>), 3)
+    var n = 0
+    while n < 180 {
+        _ = typeof(Second)
+        n += 1
+    }
+    if let Some(value) = index.Find(typeof(ArrayList<int>)) {
+        Check(value == 3 && index.Count == 1, "Type identity survives collection")
+    } else {
+        System.Fault("Repeated descriptor missed map entry")
+    }
+    Check(Same(first, typeof(First)) && Display(first) == first.FullName, "Retained descriptor survives collection")
+    Console.WriteLine("TypeInfo equality, hash, display and map lookup: passed")
+}

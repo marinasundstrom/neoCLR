@@ -1245,5 +1245,36 @@
     <member name="M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetCancelled"><summary>Releases the retained state and cancels the task.</summary></member>
     <member name="M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AwaitOnCompleted``2(``0@,``1@)"><summary>Registers a continuation using one retained owner for the suspended state.</summary><typeparam name="TAwaiter">Currently an admitted target Task awaiter.</typeparam><typeparam name="TState">An admitted non-generic application state machine.</typeparam><param name="awaiter">Awaiter storage; no managed reference escapes.</param><param name="stateMachine">Current state, copied into a box on first suspension when it is a value type.</param><remarks>Subsequent suspensions reuse the same state owner. The importer validates and specializes this temporary compiler-facing protocol.</remarks></member>
 
+    <member name="T:System.Introspection.MemberInfo"><summary>Describes a metadata member without exposing mutation or invocation.</summary></member>
+    <member name="T:System.Introspection.TypeInfo"><summary>Describes a represented type within the current loaded program.</summary><remarks>Development RuntimeTypeInfo implementations compare represented identity through typed and Object equality; reference identity still distinguishes wrapper allocations. See the introspection guide for hash/display behavior and remaining descriptor contracts.</remarks></member>
+    <member name="P:System.Introspection.MemberInfo.Name"><summary>Gets the metadata member name.</summary></member>
+    <member name="P:System.Introspection.MemberInfo.DeclaringType"><summary>Gets the declaring type, or None for a top-level member.</summary></member>
+    <member name="P:System.Introspection.MemberInfo.MetadataToken"><summary>Gets the metadata token within its defining module; not a globally unique identifier.</summary></member>
+    <member name="P:System.Introspection.MemberInfo.Module"><summary>Gets the defining module descriptor.</summary></member>
+    <member name="P:System.Introspection.TypeInfo.FullName"><summary>Gets the represented type display name, including constructed type information.</summary></member>
+    <member name="P:System.Introspection.TypeInfo.Namespace"><summary>Gets the metadata namespace.</summary></member>
+    <member name="P:System.Introspection.TypeInfo.GenericArgumentCount"><summary>Gets the number of generic arguments.</summary></member>
+    <member name="P:System.Introspection.TypeInfo.IsArray"><summary>Tests whether this describes an array.</summary></member>
+    <member name="P:System.Introspection.TypeInfo.IsByRef"><summary>Tests whether this describes a managed reference.</summary></member>
+    <member name="P:System.Introspection.TypeInfo.IsPointer"><summary>Tests whether this describes an unmanaged pointer.</summary></member>
+    <member name="P:System.Introspection.TypeInfo.IsInterface"><summary>Tests whether this describes an interface.</summary></member>
+    <member name="P:System.Introspection.TypeInfo.IsReadOnly"><summary>Tests whether the represented reference is read-only.</summary></member>
+    <member name="P:System.Introspection.TypeInfo.IsAbstract"><summary>Tests whether the represented type is abstract.</summary></member>
+    <member name="P:System.Introspection.TypeInfo.IsEnum"><summary>Tests whether this describes an enum.</summary></member>
+    <member name="P:System.Introspection.TypeInfo.IsValueType"><summary>Tests whether the represented type has value semantics.</summary></member>
+    <member name="P:System.Introspection.TypeInfo.BaseType"><summary>Gets the declared base type, or None when there is no base type.</summary></member>
+    <member name="M:System.Introspection.TypeInfo.Equals(System.Introspection.TypeInfo)"><summary>Compares represented type identity with another TypeInfo.</summary><param name="other">The non-null descriptor to compare; the typed contract takes TypeInfo, not TypeInfo?.</param><returns>True for the same represented type, including the same generic arguments and element shape.</returns><remarks>Object.Equals(Object?) is a separate null-aware overload on the runtime implementation. Names and metadata tokens alone do not establish identity.</remarks></member>
+    <member name="M:System.Introspection.TypeInfo.GetGenericArgument(System.Int32)"><summary>Gets a generic argument by index.</summary><param name="index">Zero-based argument index.</param><returns>The argument descriptor; an out-of-range index is a runtime fault.</returns></member>
+    <member name="M:System.Introspection.TypeInfo.GetGenericArguments"><summary>Gets the represented generic arguments.</summary><returns>A sequence of argument descriptors.</returns></member>
+    <member name="M:System.Introspection.TypeInfo.GetElementType"><summary>Gets the element of an array, pointer or reference shape.</summary><returns>Some element descriptor, or None when the type has no element.</returns></member>
+    <member name="M:System.Introspection.TypeInfo.GetInterfaces"><summary>Gets the implemented interface descriptors.</summary><returns>A sequence of interface types.</returns></member>
+    <member name="M:System.Introspection.TypeInfo.GetEnumNames"><summary>Gets names declared by the represented enum.</summary><returns>A sequence of enum member names; a non-enum receiver is a runtime fault.</returns></member>
+    <member name="M:System.Introspection.TypeInfo.GetEnumUnderlyingType"><summary>Gets the underlying integer type of an enum.</summary><returns>The integer type descriptor; a non-enum receiver is a runtime fault.</returns></member>
+    <member name="M:System.Introspection.TypeInfo.GetFields"><summary>Gets public instance and static fields.</summary><returns>A descriptive sequence; this API does not invoke or mutate members.</returns></member>
+    <member name="M:System.Introspection.TypeInfo.GetFields(System.Introspection.BindingFlags)"><summary>Gets fields selected by binding flags.</summary><param name="flags">Visibility, instance/static and declared/inherited selection flags.</param><returns>The matching member descriptors.</returns></member>
+    <member name="M:System.Introspection.TypeInfo.GetMethods"><summary>Gets public instance and static methods.</summary><returns>A descriptive sequence; this API does not invoke or mutate members.</returns></member>
+    <member name="M:System.Introspection.TypeInfo.GetMethods(System.Introspection.BindingFlags)"><summary>Gets methods selected by binding flags.</summary><param name="flags">Visibility, instance/static and declared/inherited selection flags.</param><returns>The matching member descriptors.</returns></member>
+    <member name="M:System.Introspection.TypeInfo.GetProperties"><summary>Gets public instance and static properties.</summary><returns>A descriptive sequence; this API does not invoke or mutate members.</returns></member>
+    <member name="M:System.Introspection.TypeInfo.GetProperties(System.Introspection.BindingFlags)"><summary>Gets properties selected by binding flags.</summary><param name="flags">Visibility, instance/static and declared/inherited selection flags.</param><returns>The matching member descriptors.</returns></member>
 </members>
 </doc>

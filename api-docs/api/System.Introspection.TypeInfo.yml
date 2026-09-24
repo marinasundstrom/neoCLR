@@ -1,0 +1,1189 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Introspection.TypeInfo
+  commentId: T:System.Introspection.TypeInfo
+  id: TypeInfo
+  parent: System.Introspection
+  children:
+  - System.Introspection.TypeInfo.BaseType
+  - System.Introspection.TypeInfo.Equals(System.Introspection.TypeInfo)
+  - System.Introspection.TypeInfo.FullName
+  - System.Introspection.TypeInfo.GenericArgumentCount
+  - System.Introspection.TypeInfo.GetElementType
+  - System.Introspection.TypeInfo.GetEnumNames
+  - System.Introspection.TypeInfo.GetEnumUnderlyingType
+  - System.Introspection.TypeInfo.GetFields
+  - System.Introspection.TypeInfo.GetFields(System.Introspection.BindingFlags)
+  - System.Introspection.TypeInfo.GetGenericArgument(System.Int32)
+  - System.Introspection.TypeInfo.GetGenericArguments
+  - System.Introspection.TypeInfo.GetInterfaces
+  - System.Introspection.TypeInfo.GetMethods
+  - System.Introspection.TypeInfo.GetMethods(System.Introspection.BindingFlags)
+  - System.Introspection.TypeInfo.GetProperties
+  - System.Introspection.TypeInfo.GetProperties(System.Introspection.BindingFlags)
+  - System.Introspection.TypeInfo.IsAbstract
+  - System.Introspection.TypeInfo.IsArray
+  - System.Introspection.TypeInfo.IsByRef
+  - System.Introspection.TypeInfo.IsEnum
+  - System.Introspection.TypeInfo.IsInterface
+  - System.Introspection.TypeInfo.IsPointer
+  - System.Introspection.TypeInfo.IsReadOnly
+  - System.Introspection.TypeInfo.IsValueType
+  - System.Introspection.TypeInfo.Namespace
+  langs:
+  - csharp
+  - vb
+  name: TypeInfo
+  nameWithType: TypeInfo
+  fullName: System.Introspection.TypeInfo
+  type: Interface
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Describes a represented type within the current loaded program.
+  remarks: Development RuntimeTypeInfo implementations compare represented identity through typed and Object equality; reference identity still distinguishes wrapper allocations. See the introspection guide for hash/display behavior and remaining descriptor contracts.
+  example: []
+  syntax:
+    content: 'public interface TypeInfo : MemberInfo'
+    content.vb: Public Interface TypeInfo Inherits MemberInfo
+  inheritedMembers:
+  - System.Introspection.MemberInfo.MetadataToken
+  - System.Introspection.MemberInfo.Module
+  - System.Introspection.MemberInfo.Name
+  - System.Introspection.MemberInfo.DeclaringType
+- uid: System.Introspection.TypeInfo.GetGenericArgument(System.Int32)
+  commentId: M:System.Introspection.TypeInfo.GetGenericArgument(System.Int32)
+  id: GetGenericArgument(System.Int32)
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: GetGenericArgument(int)
+  nameWithType: TypeInfo.GetGenericArgument(int)
+  fullName: System.Introspection.TypeInfo.GetGenericArgument(int)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets a generic argument by index.
+  example: []
+  syntax:
+    content: TypeInfo GetGenericArgument(int index)
+    parameters:
+    - id: index
+      type: System.Int32
+      description: Zero-based argument index.
+    return:
+      type: System.Introspection.TypeInfo
+      description: The argument descriptor; an out-of-range index is a runtime fault.
+    content.vb: Function GetGenericArgument(index As Integer) As TypeInfo
+  overload: System.Introspection.TypeInfo.GetGenericArgument*
+  nameWithType.vb: TypeInfo.GetGenericArgument(Integer)
+  fullName.vb: System.Introspection.TypeInfo.GetGenericArgument(Integer)
+  name.vb: GetGenericArgument(Integer)
+- uid: System.Introspection.TypeInfo.Equals(System.Introspection.TypeInfo)
+  commentId: M:System.Introspection.TypeInfo.Equals(System.Introspection.TypeInfo)
+  id: Equals(System.Introspection.TypeInfo)
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: Equals(TypeInfo)
+  nameWithType: TypeInfo.Equals(TypeInfo)
+  fullName: System.Introspection.TypeInfo.Equals(System.Introspection.TypeInfo)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Compares represented type identity with another TypeInfo.
+  remarks: Object.Equals(Object?) is a separate null-aware overload on the runtime implementation. Names and metadata tokens alone do not establish identity.
+  example: []
+  syntax:
+    content: bool Equals(TypeInfo other)
+    parameters:
+    - id: other
+      type: System.Introspection.TypeInfo
+      description: The non-null descriptor to compare; the typed contract takes TypeInfo, not TypeInfo?.
+    return:
+      type: System.Boolean
+      description: True for the same represented type, including the same generic arguments and element shape.
+    content.vb: Function Equals(other As TypeInfo) As Boolean
+  overload: System.Introspection.TypeInfo.Equals*
+- uid: System.Introspection.TypeInfo.GetGenericArguments
+  commentId: M:System.Introspection.TypeInfo.GetGenericArguments
+  id: GetGenericArguments
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: GetGenericArguments()
+  nameWithType: TypeInfo.GetGenericArguments()
+  fullName: System.Introspection.TypeInfo.GetGenericArguments()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the represented generic arguments.
+  example: []
+  syntax:
+    content: Sequence<TypeInfo> GetGenericArguments()
+    return:
+      type: System.Collections.Sequence{System.Introspection.TypeInfo}
+      description: A sequence of argument descriptors.
+    content.vb: Function GetGenericArguments() As Sequence(Of TypeInfo)
+  overload: System.Introspection.TypeInfo.GetGenericArguments*
+- uid: System.Introspection.TypeInfo.GetElementType
+  commentId: M:System.Introspection.TypeInfo.GetElementType
+  id: GetElementType
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: GetElementType()
+  nameWithType: TypeInfo.GetElementType()
+  fullName: System.Introspection.TypeInfo.GetElementType()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the element of an array, pointer or reference shape.
+  example: []
+  syntax:
+    content: Option<TypeInfo> GetElementType()
+    return:
+      type: System.Option{System.Introspection.TypeInfo}
+      description: Some element descriptor, or None when the type has no element.
+    content.vb: Function GetElementType() As [Option](Of TypeInfo)
+  overload: System.Introspection.TypeInfo.GetElementType*
+- uid: System.Introspection.TypeInfo.GetInterfaces
+  commentId: M:System.Introspection.TypeInfo.GetInterfaces
+  id: GetInterfaces
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: GetInterfaces()
+  nameWithType: TypeInfo.GetInterfaces()
+  fullName: System.Introspection.TypeInfo.GetInterfaces()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the implemented interface descriptors.
+  example: []
+  syntax:
+    content: Sequence<TypeInfo> GetInterfaces()
+    return:
+      type: System.Collections.Sequence{System.Introspection.TypeInfo}
+      description: A sequence of interface types.
+    content.vb: Function GetInterfaces() As Sequence(Of TypeInfo)
+  overload: System.Introspection.TypeInfo.GetInterfaces*
+- uid: System.Introspection.TypeInfo.GetEnumNames
+  commentId: M:System.Introspection.TypeInfo.GetEnumNames
+  id: GetEnumNames
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: GetEnumNames()
+  nameWithType: TypeInfo.GetEnumNames()
+  fullName: System.Introspection.TypeInfo.GetEnumNames()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets names declared by the represented enum.
+  example: []
+  syntax:
+    content: Sequence<string> GetEnumNames()
+    return:
+      type: System.Collections.Sequence{System.String}
+      description: A sequence of enum member names; a non-enum receiver is a runtime fault.
+    content.vb: Function GetEnumNames() As Sequence(Of String)
+  overload: System.Introspection.TypeInfo.GetEnumNames*
+- uid: System.Introspection.TypeInfo.GetEnumUnderlyingType
+  commentId: M:System.Introspection.TypeInfo.GetEnumUnderlyingType
+  id: GetEnumUnderlyingType
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: GetEnumUnderlyingType()
+  nameWithType: TypeInfo.GetEnumUnderlyingType()
+  fullName: System.Introspection.TypeInfo.GetEnumUnderlyingType()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the underlying integer type of an enum.
+  example: []
+  syntax:
+    content: TypeInfo GetEnumUnderlyingType()
+    return:
+      type: System.Introspection.TypeInfo
+      description: The integer type descriptor; a non-enum receiver is a runtime fault.
+    content.vb: Function GetEnumUnderlyingType() As TypeInfo
+  overload: System.Introspection.TypeInfo.GetEnumUnderlyingType*
+- uid: System.Introspection.TypeInfo.GetFields
+  commentId: M:System.Introspection.TypeInfo.GetFields
+  id: GetFields
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: GetFields()
+  nameWithType: TypeInfo.GetFields()
+  fullName: System.Introspection.TypeInfo.GetFields()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets public instance and static fields.
+  example: []
+  syntax:
+    content: Sequence<FieldInfo> GetFields()
+    return:
+      type: System.Collections.Sequence{System.Introspection.FieldInfo}
+      description: A descriptive sequence; this API does not invoke or mutate members.
+    content.vb: Function GetFields() As Sequence(Of FieldInfo)
+  overload: System.Introspection.TypeInfo.GetFields*
+- uid: System.Introspection.TypeInfo.GetFields(System.Introspection.BindingFlags)
+  commentId: M:System.Introspection.TypeInfo.GetFields(System.Introspection.BindingFlags)
+  id: GetFields(System.Introspection.BindingFlags)
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: GetFields(BindingFlags)
+  nameWithType: TypeInfo.GetFields(BindingFlags)
+  fullName: System.Introspection.TypeInfo.GetFields(System.Introspection.BindingFlags)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets fields selected by binding flags.
+  example: []
+  syntax:
+    content: Sequence<FieldInfo> GetFields(BindingFlags flags)
+    parameters:
+    - id: flags
+      type: System.Introspection.BindingFlags
+      description: Visibility, instance/static and declared/inherited selection flags.
+    return:
+      type: System.Collections.Sequence{System.Introspection.FieldInfo}
+      description: The matching member descriptors.
+    content.vb: Function GetFields(flags As BindingFlags) As Sequence(Of FieldInfo)
+  overload: System.Introspection.TypeInfo.GetFields*
+- uid: System.Introspection.TypeInfo.GetMethods
+  commentId: M:System.Introspection.TypeInfo.GetMethods
+  id: GetMethods
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: GetMethods()
+  nameWithType: TypeInfo.GetMethods()
+  fullName: System.Introspection.TypeInfo.GetMethods()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets public instance and static methods.
+  example: []
+  syntax:
+    content: Sequence<MethodInfo> GetMethods()
+    return:
+      type: System.Collections.Sequence{System.Introspection.MethodInfo}
+      description: A descriptive sequence; this API does not invoke or mutate members.
+    content.vb: Function GetMethods() As Sequence(Of MethodInfo)
+  overload: System.Introspection.TypeInfo.GetMethods*
+- uid: System.Introspection.TypeInfo.GetMethods(System.Introspection.BindingFlags)
+  commentId: M:System.Introspection.TypeInfo.GetMethods(System.Introspection.BindingFlags)
+  id: GetMethods(System.Introspection.BindingFlags)
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: GetMethods(BindingFlags)
+  nameWithType: TypeInfo.GetMethods(BindingFlags)
+  fullName: System.Introspection.TypeInfo.GetMethods(System.Introspection.BindingFlags)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets methods selected by binding flags.
+  example: []
+  syntax:
+    content: Sequence<MethodInfo> GetMethods(BindingFlags flags)
+    parameters:
+    - id: flags
+      type: System.Introspection.BindingFlags
+      description: Visibility, instance/static and declared/inherited selection flags.
+    return:
+      type: System.Collections.Sequence{System.Introspection.MethodInfo}
+      description: The matching member descriptors.
+    content.vb: Function GetMethods(flags As BindingFlags) As Sequence(Of MethodInfo)
+  overload: System.Introspection.TypeInfo.GetMethods*
+- uid: System.Introspection.TypeInfo.GetProperties
+  commentId: M:System.Introspection.TypeInfo.GetProperties
+  id: GetProperties
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: GetProperties()
+  nameWithType: TypeInfo.GetProperties()
+  fullName: System.Introspection.TypeInfo.GetProperties()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets public instance and static properties.
+  example: []
+  syntax:
+    content: Sequence<PropertyInfo> GetProperties()
+    return:
+      type: System.Collections.Sequence{System.Introspection.PropertyInfo}
+      description: A descriptive sequence; this API does not invoke or mutate members.
+    content.vb: Function GetProperties() As Sequence(Of PropertyInfo)
+  overload: System.Introspection.TypeInfo.GetProperties*
+- uid: System.Introspection.TypeInfo.GetProperties(System.Introspection.BindingFlags)
+  commentId: M:System.Introspection.TypeInfo.GetProperties(System.Introspection.BindingFlags)
+  id: GetProperties(System.Introspection.BindingFlags)
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: GetProperties(BindingFlags)
+  nameWithType: TypeInfo.GetProperties(BindingFlags)
+  fullName: System.Introspection.TypeInfo.GetProperties(System.Introspection.BindingFlags)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets properties selected by binding flags.
+  example: []
+  syntax:
+    content: Sequence<PropertyInfo> GetProperties(BindingFlags flags)
+    parameters:
+    - id: flags
+      type: System.Introspection.BindingFlags
+      description: Visibility, instance/static and declared/inherited selection flags.
+    return:
+      type: System.Collections.Sequence{System.Introspection.PropertyInfo}
+      description: The matching member descriptors.
+    content.vb: Function GetProperties(flags As BindingFlags) As Sequence(Of PropertyInfo)
+  overload: System.Introspection.TypeInfo.GetProperties*
+- uid: System.Introspection.TypeInfo.FullName
+  commentId: P:System.Introspection.TypeInfo.FullName
+  id: FullName
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: FullName
+  nameWithType: TypeInfo.FullName
+  fullName: System.Introspection.TypeInfo.FullName
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the represented type display name, including constructed type information.
+  example: []
+  syntax:
+    content: string FullName { get; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: ReadOnly Property FullName As String
+  overload: System.Introspection.TypeInfo.FullName*
+- uid: System.Introspection.TypeInfo.Namespace
+  commentId: P:System.Introspection.TypeInfo.Namespace
+  id: Namespace
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: Namespace
+  nameWithType: TypeInfo.Namespace
+  fullName: System.Introspection.TypeInfo.Namespace
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the metadata namespace.
+  example: []
+  syntax:
+    content: string Namespace { get; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: ReadOnly Property [Namespace] As String
+  overload: System.Introspection.TypeInfo.Namespace*
+- uid: System.Introspection.TypeInfo.GenericArgumentCount
+  commentId: P:System.Introspection.TypeInfo.GenericArgumentCount
+  id: GenericArgumentCount
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: GenericArgumentCount
+  nameWithType: TypeInfo.GenericArgumentCount
+  fullName: System.Introspection.TypeInfo.GenericArgumentCount
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the number of generic arguments.
+  example: []
+  syntax:
+    content: int GenericArgumentCount { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: ReadOnly Property GenericArgumentCount As Integer
+  overload: System.Introspection.TypeInfo.GenericArgumentCount*
+- uid: System.Introspection.TypeInfo.IsArray
+  commentId: P:System.Introspection.TypeInfo.IsArray
+  id: IsArray
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: IsArray
+  nameWithType: TypeInfo.IsArray
+  fullName: System.Introspection.TypeInfo.IsArray
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Tests whether this describes an array.
+  example: []
+  syntax:
+    content: bool IsArray { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property IsArray As Boolean
+  overload: System.Introspection.TypeInfo.IsArray*
+- uid: System.Introspection.TypeInfo.IsByRef
+  commentId: P:System.Introspection.TypeInfo.IsByRef
+  id: IsByRef
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: IsByRef
+  nameWithType: TypeInfo.IsByRef
+  fullName: System.Introspection.TypeInfo.IsByRef
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Tests whether this describes a managed reference.
+  example: []
+  syntax:
+    content: bool IsByRef { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property IsByRef As Boolean
+  overload: System.Introspection.TypeInfo.IsByRef*
+- uid: System.Introspection.TypeInfo.IsPointer
+  commentId: P:System.Introspection.TypeInfo.IsPointer
+  id: IsPointer
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: IsPointer
+  nameWithType: TypeInfo.IsPointer
+  fullName: System.Introspection.TypeInfo.IsPointer
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Tests whether this describes an unmanaged pointer.
+  example: []
+  syntax:
+    content: bool IsPointer { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property IsPointer As Boolean
+  overload: System.Introspection.TypeInfo.IsPointer*
+- uid: System.Introspection.TypeInfo.IsInterface
+  commentId: P:System.Introspection.TypeInfo.IsInterface
+  id: IsInterface
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: IsInterface
+  nameWithType: TypeInfo.IsInterface
+  fullName: System.Introspection.TypeInfo.IsInterface
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Tests whether this describes an interface.
+  example: []
+  syntax:
+    content: bool IsInterface { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property IsInterface As Boolean
+  overload: System.Introspection.TypeInfo.IsInterface*
+- uid: System.Introspection.TypeInfo.IsReadOnly
+  commentId: P:System.Introspection.TypeInfo.IsReadOnly
+  id: IsReadOnly
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: IsReadOnly
+  nameWithType: TypeInfo.IsReadOnly
+  fullName: System.Introspection.TypeInfo.IsReadOnly
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Tests whether the represented reference is read-only.
+  example: []
+  syntax:
+    content: bool IsReadOnly { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property IsReadOnly As Boolean
+  overload: System.Introspection.TypeInfo.IsReadOnly*
+- uid: System.Introspection.TypeInfo.IsAbstract
+  commentId: P:System.Introspection.TypeInfo.IsAbstract
+  id: IsAbstract
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: IsAbstract
+  nameWithType: TypeInfo.IsAbstract
+  fullName: System.Introspection.TypeInfo.IsAbstract
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Tests whether the represented type is abstract.
+  example: []
+  syntax:
+    content: bool IsAbstract { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property IsAbstract As Boolean
+  overload: System.Introspection.TypeInfo.IsAbstract*
+- uid: System.Introspection.TypeInfo.IsEnum
+  commentId: P:System.Introspection.TypeInfo.IsEnum
+  id: IsEnum
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: IsEnum
+  nameWithType: TypeInfo.IsEnum
+  fullName: System.Introspection.TypeInfo.IsEnum
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Tests whether this describes an enum.
+  example: []
+  syntax:
+    content: bool IsEnum { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property IsEnum As Boolean
+  overload: System.Introspection.TypeInfo.IsEnum*
+- uid: System.Introspection.TypeInfo.IsValueType
+  commentId: P:System.Introspection.TypeInfo.IsValueType
+  id: IsValueType
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: IsValueType
+  nameWithType: TypeInfo.IsValueType
+  fullName: System.Introspection.TypeInfo.IsValueType
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Tests whether the represented type has value semantics.
+  example: []
+  syntax:
+    content: bool IsValueType { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property IsValueType As Boolean
+  overload: System.Introspection.TypeInfo.IsValueType*
+- uid: System.Introspection.TypeInfo.BaseType
+  commentId: P:System.Introspection.TypeInfo.BaseType
+  id: BaseType
+  parent: System.Introspection.TypeInfo
+  langs:
+  - csharp
+  - vb
+  name: BaseType
+  nameWithType: TypeInfo.BaseType
+  fullName: System.Introspection.TypeInfo.BaseType
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the declared base type, or None when there is no base type.
+  example: []
+  syntax:
+    content: Option<TypeInfo> BaseType { get; }
+    parameters: []
+    return:
+      type: System.Option{System.Introspection.TypeInfo}
+    content.vb: ReadOnly Property BaseType As [Option](Of TypeInfo)
+  overload: System.Introspection.TypeInfo.BaseType*
+references:
+- uid: System.Introspection
+  commentId: N:System.Introspection
+  isExternal: true
+  href: System.html
+  name: System.Introspection
+  nameWithType: System.Introspection
+  fullName: System.Introspection
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Introspection
+    name: Introspection
+    isExternal: true
+    href: System.Introspection.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Introspection
+    name: Introspection
+    isExternal: true
+    href: System.Introspection.html
+- uid: System.Introspection.MemberInfo.MetadataToken
+  commentId: P:System.Introspection.MemberInfo.MetadataToken
+  parent: System.Introspection.MemberInfo
+  isExternal: true
+  href: System.Introspection.MemberInfo.html#System_Introspection_MemberInfo_MetadataToken
+  name: MetadataToken
+  nameWithType: MemberInfo.MetadataToken
+  fullName: System.Introspection.MemberInfo.MetadataToken
+- uid: System.Introspection.MemberInfo.Module
+  commentId: P:System.Introspection.MemberInfo.Module
+  parent: System.Introspection.MemberInfo
+  isExternal: true
+  href: System.Introspection.MemberInfo.html#System_Introspection_MemberInfo_Module
+  name: Module
+  nameWithType: MemberInfo.Module
+  fullName: System.Introspection.MemberInfo.Module
+- uid: System.Introspection.MemberInfo.Name
+  commentId: P:System.Introspection.MemberInfo.Name
+  parent: System.Introspection.MemberInfo
+  isExternal: true
+  href: System.Introspection.MemberInfo.html#System_Introspection_MemberInfo_Name
+  name: Name
+  nameWithType: MemberInfo.Name
+  fullName: System.Introspection.MemberInfo.Name
+- uid: System.Introspection.MemberInfo.DeclaringType
+  commentId: P:System.Introspection.MemberInfo.DeclaringType
+  parent: System.Introspection.MemberInfo
+  isExternal: true
+  href: System.Introspection.MemberInfo.html#System_Introspection_MemberInfo_DeclaringType
+  name: DeclaringType
+  nameWithType: MemberInfo.DeclaringType
+  fullName: System.Introspection.MemberInfo.DeclaringType
+- uid: System.Introspection.MemberInfo
+  commentId: T:System.Introspection.MemberInfo
+  parent: System.Introspection
+  isExternal: true
+  href: System.Introspection.MemberInfo.html
+  name: MemberInfo
+  nameWithType: MemberInfo
+  fullName: System.Introspection.MemberInfo
+- uid: System.Introspection.TypeInfo.GetGenericArgument*
+  commentId: Overload:System.Introspection.TypeInfo.GetGenericArgument
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_GetGenericArgument_System_Int32_
+  name: GetGenericArgument
+  nameWithType: TypeInfo.GetGenericArgument
+  fullName: System.Introspection.TypeInfo.GetGenericArgument
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System.Introspection.TypeInfo
+  commentId: T:System.Introspection.TypeInfo
+  parent: System.Introspection
+  isExternal: true
+  href: System.Introspection.TypeInfo.html
+  name: TypeInfo
+  nameWithType: TypeInfo
+  fullName: System.Introspection.TypeInfo
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Introspection.TypeInfo.Equals*
+  commentId: Overload:System.Introspection.TypeInfo.Equals
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_Equals_System_Introspection_TypeInfo_
+  name: Equals
+  nameWithType: TypeInfo.Equals
+  fullName: System.Introspection.TypeInfo.Equals
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System.Introspection.TypeInfo.GetGenericArguments*
+  commentId: Overload:System.Introspection.TypeInfo.GetGenericArguments
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_GetGenericArguments
+  name: GetGenericArguments
+  nameWithType: TypeInfo.GetGenericArguments
+  fullName: System.Introspection.TypeInfo.GetGenericArguments
+- uid: System.Collections.Sequence{System.Introspection.TypeInfo}
+  commentId: T:System.Collections.Sequence{System.Introspection.TypeInfo}
+  parent: System.Collections
+  definition: System.Collections.Sequence`1
+  href: System.Introspection.TypeInfo.html
+  name: Sequence<TypeInfo>
+  nameWithType: Sequence<TypeInfo>
+  fullName: System.Collections.Sequence<System.Introspection.TypeInfo>
+  nameWithType.vb: Sequence(Of TypeInfo)
+  fullName.vb: System.Collections.Sequence(Of System.Introspection.TypeInfo)
+  name.vb: Sequence(Of TypeInfo)
+  spec.csharp:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: <
+  - uid: System.Introspection.TypeInfo
+    name: TypeInfo
+    isExternal: true
+    href: System.Introspection.TypeInfo.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Introspection.TypeInfo
+    name: TypeInfo
+    isExternal: true
+    href: System.Introspection.TypeInfo.html
+  - name: )
+- uid: System.Collections.Sequence`1
+  commentId: T:System.Collections.Sequence`1
+  isExternal: true
+  name: Sequence<T>
+  nameWithType: Sequence<T>
+  fullName: System.Collections.Sequence<T>
+  nameWithType.vb: Sequence(Of T)
+  fullName.vb: System.Collections.Sequence(Of T)
+  name.vb: Sequence(Of T)
+  spec.csharp:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections
+  commentId: N:System.Collections
+  isExternal: true
+  href: System.html
+  name: System.Collections
+  nameWithType: System.Collections
+  fullName: System.Collections
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: System.Collections.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: System.Collections.html
+- uid: System.Introspection.TypeInfo.GetElementType*
+  commentId: Overload:System.Introspection.TypeInfo.GetElementType
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_GetElementType
+  name: GetElementType
+  nameWithType: TypeInfo.GetElementType
+  fullName: System.Introspection.TypeInfo.GetElementType
+- uid: System.Option{System.Introspection.TypeInfo}
+  commentId: T:System.Option{System.Introspection.TypeInfo}
+  parent: System
+  definition: System.Option`1
+  href: System.Introspection.TypeInfo.html
+  name: Option<TypeInfo>
+  nameWithType: Option<TypeInfo>
+  fullName: System.Option<System.Introspection.TypeInfo>
+  nameWithType.vb: Option(Of TypeInfo)
+  fullName.vb: System.Option(Of System.Introspection.TypeInfo)
+  name.vb: Option(Of TypeInfo)
+  spec.csharp:
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: <
+  - uid: System.Introspection.TypeInfo
+    name: TypeInfo
+    isExternal: true
+    href: System.Introspection.TypeInfo.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Introspection.TypeInfo
+    name: TypeInfo
+    isExternal: true
+    href: System.Introspection.TypeInfo.html
+  - name: )
+- uid: System.Option`1
+  commentId: T:System.Option`1
+  isExternal: true
+  name: Option<T>
+  nameWithType: Option<T>
+  fullName: System.Option<T>
+  nameWithType.vb: Option(Of T)
+  fullName.vb: System.Option(Of T)
+  name.vb: Option(Of T)
+  spec.csharp:
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Introspection.TypeInfo.GetInterfaces*
+  commentId: Overload:System.Introspection.TypeInfo.GetInterfaces
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_GetInterfaces
+  name: GetInterfaces
+  nameWithType: TypeInfo.GetInterfaces
+  fullName: System.Introspection.TypeInfo.GetInterfaces
+- uid: System.Introspection.TypeInfo.GetEnumNames*
+  commentId: Overload:System.Introspection.TypeInfo.GetEnumNames
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_GetEnumNames
+  name: GetEnumNames
+  nameWithType: TypeInfo.GetEnumNames
+  fullName: System.Introspection.TypeInfo.GetEnumNames
+- uid: System.Collections.Sequence{System.String}
+  commentId: T:System.Collections.Sequence{System.String}
+  parent: System.Collections
+  definition: System.Collections.Sequence`1
+  name: Sequence<string>
+  nameWithType: Sequence<string>
+  fullName: System.Collections.Sequence<string>
+  nameWithType.vb: Sequence(Of String)
+  fullName.vb: System.Collections.Sequence(Of String)
+  name.vb: Sequence(Of String)
+  spec.csharp:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+  - name: )
+- uid: System.Introspection.TypeInfo.GetEnumUnderlyingType*
+  commentId: Overload:System.Introspection.TypeInfo.GetEnumUnderlyingType
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_GetEnumUnderlyingType
+  name: GetEnumUnderlyingType
+  nameWithType: TypeInfo.GetEnumUnderlyingType
+  fullName: System.Introspection.TypeInfo.GetEnumUnderlyingType
+- uid: System.Introspection.TypeInfo.GetFields*
+  commentId: Overload:System.Introspection.TypeInfo.GetFields
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_GetFields
+  name: GetFields
+  nameWithType: TypeInfo.GetFields
+  fullName: System.Introspection.TypeInfo.GetFields
+- uid: System.Collections.Sequence{System.Introspection.FieldInfo}
+  commentId: T:System.Collections.Sequence{System.Introspection.FieldInfo}
+  parent: System.Collections
+  definition: System.Collections.Sequence`1
+  name: Sequence<FieldInfo>
+  nameWithType: Sequence<FieldInfo>
+  fullName: System.Collections.Sequence<System.Introspection.FieldInfo>
+  nameWithType.vb: Sequence(Of FieldInfo)
+  fullName.vb: System.Collections.Sequence(Of System.Introspection.FieldInfo)
+  name.vb: Sequence(Of FieldInfo)
+  spec.csharp:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: <
+  - uid: System.Introspection.FieldInfo
+    name: FieldInfo
+    isExternal: true
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Introspection.FieldInfo
+    name: FieldInfo
+    isExternal: true
+  - name: )
+- uid: System.Introspection.BindingFlags
+  commentId: T:System.Introspection.BindingFlags
+  parent: System.Introspection
+  isExternal: true
+  name: BindingFlags
+  nameWithType: BindingFlags
+  fullName: System.Introspection.BindingFlags
+- uid: System.Introspection.TypeInfo.GetMethods*
+  commentId: Overload:System.Introspection.TypeInfo.GetMethods
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_GetMethods
+  name: GetMethods
+  nameWithType: TypeInfo.GetMethods
+  fullName: System.Introspection.TypeInfo.GetMethods
+- uid: System.Collections.Sequence{System.Introspection.MethodInfo}
+  commentId: T:System.Collections.Sequence{System.Introspection.MethodInfo}
+  parent: System.Collections
+  definition: System.Collections.Sequence`1
+  name: Sequence<MethodInfo>
+  nameWithType: Sequence<MethodInfo>
+  fullName: System.Collections.Sequence<System.Introspection.MethodInfo>
+  nameWithType.vb: Sequence(Of MethodInfo)
+  fullName.vb: System.Collections.Sequence(Of System.Introspection.MethodInfo)
+  name.vb: Sequence(Of MethodInfo)
+  spec.csharp:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: <
+  - uid: System.Introspection.MethodInfo
+    name: MethodInfo
+    isExternal: true
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Introspection.MethodInfo
+    name: MethodInfo
+    isExternal: true
+  - name: )
+- uid: System.Introspection.TypeInfo.GetProperties*
+  commentId: Overload:System.Introspection.TypeInfo.GetProperties
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_GetProperties
+  name: GetProperties
+  nameWithType: TypeInfo.GetProperties
+  fullName: System.Introspection.TypeInfo.GetProperties
+- uid: System.Collections.Sequence{System.Introspection.PropertyInfo}
+  commentId: T:System.Collections.Sequence{System.Introspection.PropertyInfo}
+  parent: System.Collections
+  definition: System.Collections.Sequence`1
+  name: Sequence<PropertyInfo>
+  nameWithType: Sequence<PropertyInfo>
+  fullName: System.Collections.Sequence<System.Introspection.PropertyInfo>
+  nameWithType.vb: Sequence(Of PropertyInfo)
+  fullName.vb: System.Collections.Sequence(Of System.Introspection.PropertyInfo)
+  name.vb: Sequence(Of PropertyInfo)
+  spec.csharp:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: <
+  - uid: System.Introspection.PropertyInfo
+    name: PropertyInfo
+    isExternal: true
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Introspection.PropertyInfo
+    name: PropertyInfo
+    isExternal: true
+  - name: )
+- uid: System.Introspection.TypeInfo.FullName*
+  commentId: Overload:System.Introspection.TypeInfo.FullName
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_FullName
+  name: FullName
+  nameWithType: TypeInfo.FullName
+  fullName: System.Introspection.TypeInfo.FullName
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System.Introspection.TypeInfo.Namespace*
+  commentId: Overload:System.Introspection.TypeInfo.Namespace
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_Namespace
+  name: Namespace
+  nameWithType: TypeInfo.Namespace
+  fullName: System.Introspection.TypeInfo.Namespace
+- uid: System.Introspection.TypeInfo.GenericArgumentCount*
+  commentId: Overload:System.Introspection.TypeInfo.GenericArgumentCount
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_GenericArgumentCount
+  name: GenericArgumentCount
+  nameWithType: TypeInfo.GenericArgumentCount
+  fullName: System.Introspection.TypeInfo.GenericArgumentCount
+- uid: System.Introspection.TypeInfo.IsArray*
+  commentId: Overload:System.Introspection.TypeInfo.IsArray
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_IsArray
+  name: IsArray
+  nameWithType: TypeInfo.IsArray
+  fullName: System.Introspection.TypeInfo.IsArray
+- uid: System.Introspection.TypeInfo.IsByRef*
+  commentId: Overload:System.Introspection.TypeInfo.IsByRef
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_IsByRef
+  name: IsByRef
+  nameWithType: TypeInfo.IsByRef
+  fullName: System.Introspection.TypeInfo.IsByRef
+- uid: System.Introspection.TypeInfo.IsPointer*
+  commentId: Overload:System.Introspection.TypeInfo.IsPointer
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_IsPointer
+  name: IsPointer
+  nameWithType: TypeInfo.IsPointer
+  fullName: System.Introspection.TypeInfo.IsPointer
+- uid: System.Introspection.TypeInfo.IsInterface*
+  commentId: Overload:System.Introspection.TypeInfo.IsInterface
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_IsInterface
+  name: IsInterface
+  nameWithType: TypeInfo.IsInterface
+  fullName: System.Introspection.TypeInfo.IsInterface
+- uid: System.Introspection.TypeInfo.IsReadOnly*
+  commentId: Overload:System.Introspection.TypeInfo.IsReadOnly
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_IsReadOnly
+  name: IsReadOnly
+  nameWithType: TypeInfo.IsReadOnly
+  fullName: System.Introspection.TypeInfo.IsReadOnly
+- uid: System.Introspection.TypeInfo.IsAbstract*
+  commentId: Overload:System.Introspection.TypeInfo.IsAbstract
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_IsAbstract
+  name: IsAbstract
+  nameWithType: TypeInfo.IsAbstract
+  fullName: System.Introspection.TypeInfo.IsAbstract
+- uid: System.Introspection.TypeInfo.IsEnum*
+  commentId: Overload:System.Introspection.TypeInfo.IsEnum
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_IsEnum
+  name: IsEnum
+  nameWithType: TypeInfo.IsEnum
+  fullName: System.Introspection.TypeInfo.IsEnum
+- uid: System.Introspection.TypeInfo.IsValueType*
+  commentId: Overload:System.Introspection.TypeInfo.IsValueType
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_IsValueType
+  name: IsValueType
+  nameWithType: TypeInfo.IsValueType
+  fullName: System.Introspection.TypeInfo.IsValueType
+- uid: System.Introspection.TypeInfo.BaseType*
+  commentId: Overload:System.Introspection.TypeInfo.BaseType
+  isExternal: true
+  href: System.Introspection.TypeInfo.html#System_Introspection_TypeInfo_BaseType
+  name: BaseType
+  nameWithType: TypeInfo.BaseType
+  fullName: System.Introspection.TypeInfo.BaseType

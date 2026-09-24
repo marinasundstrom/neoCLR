@@ -6058,3 +6058,16 @@ failure remains the next acceptance target.
   but different Object equality/hashes for wrappers of the same type. The
   [audit](object-model-review.md#path-integration-and-wider-library-audit--2026-09-24)
   records this next repair and unresolved provider/descriptor identity decisions.
+
+### 2026-09-24 — Introspection after Path
+
+- **Author:** directs continuing with introspection types after the current slice.
+- **Assistant action:** commits Path as 840eceeb, then fixes the demonstrated
+  RuntimeTypeInfo Object mismatch using represented-type equality, consistent hash
+  and represented-type display. Keeps typed operands non-nullable and wrapper
+  allocation identity separate. Adds generated TypeInfo/MemberInfo reference coverage.
+- **Evidence:** the [integration fixture](experiments/introspection-object/README.md)
+  covers repeated/constructed/array type descriptors and a map under GC pressure.
+- **Open:** assembly/module scoped identity is the next candidate; member equality
+  needs kind and closed-owner checks. Parameter snapshots lack declaring-member
+  identity, so their equality is deferred rather than inferred from names or positions.

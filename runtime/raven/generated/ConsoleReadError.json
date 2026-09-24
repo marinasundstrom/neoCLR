@@ -32,7 +32,7 @@
     "runtime/raven/src/System/Func.rvn": "4720a0463a88be11a4ff213363cad1c6680cd41afd457c813e247e5c4e3cbd2e",
     "runtime/raven/src/System/Functions.rvn": "ac8c17cd3cde8cfd78b2d1214454a92120d7f65b93d27d5d8e7258981fb1a70d",
     "runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn": "ef66171b634c2e59249dd875a8d13b275c0c8243c8a8e7f575238683a91ced7d",
-    "runtime/raven/src/System/Introspection/Descriptors.rvn": "fd62cafd8d10a4e171b83f0efc94efb01c30b597e43a6516270c85b5d2a38028",
+    "runtime/raven/src/System/Introspection/Descriptors.rvn": "957a3ca12b3a83535eaef5f77781114ba416455f3abcd8ff3e3858cc4afda141",
     "runtime/raven/src/System/Option.rvn": "0f0b624d9dd94dcf0f3159b651985892f92bd1d26df649d9806689d0277d79ec",
     "runtime/raven/src/System/Result.rvn": "8400722abccdc84277e7a8d7652d9f9d0e10d76c23decdac4f4fd971ddbc367f",
     "runtime/raven/src/System/Propagatable.rvn": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e",
@@ -113,7 +113,7 @@
     "ConsoleReadError.helpers.neoil": "28489006f055aacc733d3098a001ef196f6a3a85ad8eece8370902f0a2d42256"
   },
   "compilerSha256": "3929934792068c2937ba481db944e6fd76587c42b37fc363ed19560c7ab21a5f",
-  "coreSha256": "97076bff3ade0d237428815bfa4eac28e5adcb75f40fbd8d7f6ad69eb9a33c91",
+  "coreSha256": "57674a534ae23e4c6c29b872582733bc62781d4e5a67fa7464005d4db5eb94e6",
   "exports": [
     ".ctor(System.ConsoleReadError.Unavailable value) -> Void",
     "get_IsUnavailable() -> Boolean",

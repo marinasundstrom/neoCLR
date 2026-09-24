@@ -52,3 +52,7 @@ The [transitional async builder guide](async-builders.md) covers generated state
 
 [Equatable<T>](xref:System.Equatable`1) defines typed equality as Equals(T), without
 imposing nullable value types. Path now supplies that contract and Object overrides.
+
+## System.Introspection
+
+[TypeInfo](xref:System.Introspection.TypeInfo) and [MemberInfo](xref:System.Introspection.MemberInfo) describe types and metadata. See [type identity](introspection.md) for Object behavior and remaining descriptor coverage.
