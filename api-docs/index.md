@@ -85,6 +85,6 @@ Names and contracts are experimental. Pages label published behavior, developmen
 changes and proposals separately. Use [the matching toolchain](/try/#development)
 for development examples.
 
-The development [HTTP client and handler APIs](xref:System.Web.Http) support a bounded
+The development [HTTP client, server and handler APIs](xref:System.Web.Http) support a bounded
 GET/200 POC over sockets. Read the [Web guide](/features/web/) for pipeline examples,
 ownership, framing limits and missing transfer deadlines.

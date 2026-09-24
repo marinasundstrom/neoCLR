@@ -77,7 +77,7 @@ Sequence, Collection, Iterable and Iterator now have generated reference coverag
 including String construction and its read-only grapheme indexer. String Count is
 an explicit Collection implementation, visible through Sequence/Collection only.
 
-The current audit covers all 224 public reference types: 211 generated type pages,
+The current audit covers all 225 public reference types: 212 generated type pages,
 three explicit manual entries and ten explicitly excluded metadata scaffolds. Collections, arrays, delegates, query operators,
 Option/Result, TaskOutcome, numeric types, text/encoding, environment, time/calendar,
 resource capabilities and interop now have type/member descriptions. Compiler-reference
@@ -150,3 +150,8 @@ HttpRequest, HttpResponse, HttpContent and HttpHeader, including constructors an
 public members. The bounded response parser and per-request continuation object are
 internal and excluded from the public inventory by visibility. The Web guide documents
 provisional string errors, body/ownership limits and missing transfer deadlines.
+
+HttpServer and HttpRequest.Headers have generated member coverage. The server guide
+covers one-request ownership, malformed-request closure, computed framing and the
+unsupported cancellation/deadline cases. Internal request parsing, encoding and
+operation adapters remain outside the public inventory.

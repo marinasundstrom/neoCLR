@@ -4,10 +4,10 @@ using Mono.Cecil;
 static class HttpBindings
 {
     public const string Prefix = "System.Web.Http.";
-    public static readonly string[] Names = ["HttpClient", "HttpHandler", "HttpRequest", "HttpResponse", "HttpContent", "HttpHeader", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange"];
+    public static readonly string[] Names = ["HttpClient", "HttpHandler", "HttpRequest", "HttpResponse", "HttpContent", "HttpHeader", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange", "HttpServer", "HttpRequestDecoder", "HttpServerExchange"];
     public static bool IsName(string name) => Names.Any(n => name == Prefix + n);
     public static bool IsContract(string name) => name == Prefix + "HttpHandler";
-    public static bool IsProvider(TypeDefinition type) => type.FullName is Prefix + "HttpResponseDecoder" or Prefix + "HttpExchange";
+    public static bool IsProvider(TypeDefinition type) => type.FullName is Prefix + "HttpResponseDecoder" or Prefix + "HttpExchange" or Prefix + "HttpRequestDecoder" or Prefix + "HttpServerExchange";
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
     public static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
@@ -34,6 +34,8 @@ static class HttpBindings
             public sealed class HttpRequest {
                 private HttpRequest(string host, int port, string target) { }
                 public static Result<HttpRequest, string> Get(string url) => default;
+                public Collections.Sequence<HttpHeader> Headers => default;
+                public static Result<HttpRequest, string> FromIncoming(string target, string host, Collections.Sequence<HttpHeader> headers) => default;
                 public string Method => default;
                 public string Host => default;
                 public int Port => default;
@@ -50,6 +52,24 @@ static class HttpBindings
                 public Collections.Sequence<byte> Bytes => default;
                 public Tasks.Task<Result<string, string>> ReadText() => default;
             }
+            public sealed class HttpServer {
+                public HttpServer(Networking.Sockets.Socket listener) { }
+                public static Result<HttpServer, string> Listen(string address, int port, int backlog) => default;
+                public Result<int, string> GetLocalPort() => default;
+                public Tasks.Task<Result<PropagationUnit, string>> ServeOne(Func<HttpRequest, Tasks.Task<Result<HttpResponse, string>>> handler) => default;
+                public void Close() { }
+                public static Result<Collections.Sequence<byte>, string> EncodeResponse(HttpResponse response) => default;
+            }
+            public sealed class HttpRequestDecoder {
+                public HttpRequestDecoder() { }
+                public bool Complete => default;
+                public Result<bool, string> Push(byte value) => default;
+                public Result<HttpRequest, string> Finish() => default;
+            }
+            public sealed class HttpServerExchange {
+                public HttpServerExchange(Networking.Sockets.Socket listener, Func<HttpRequest, Tasks.Task<Result<HttpResponse, string>>> handler) { }
+                public Tasks.Task<Result<PropagationUnit, string>> Start() => default;
+            }
             public sealed class HttpResponseDecoder {
                 public HttpResponseDecoder() { }
                 public bool Complete => default;
@@ -64,6 +84,9 @@ static class HttpBindings
         """;
     public static void Project(ModuleDefinition module)
     {
+        foreach (var type in module.Types.Where(t => IsName(t.FullName)))
+            foreach (var method in type.Methods.Where(m => m.Name == "FromIncoming" || m.Name == "EncodeResponse" || type.Name == "HttpServer" && m.IsConstructor))
+                method.Attributes = (method.Attributes & ~MethodAttributes.MemberAccessMask) | MethodAttributes.Assembly;
         foreach (var type in module.Types.Where(IsProvider))
         {
             type.Attributes = (type.Attributes & ~TypeAttributes.VisibilityMask) | TypeAttributes.NotPublic;
@@ -83,6 +106,20 @@ static class HttpBindings
         var outcome = $"System.Result<{response},String>";
         var task = $"System.Tasks.Task<{outcome}>";
         var expected = (owner[Prefix.Length..], definition.Name) switch {
+            ("HttpServer", ".ctor") when library => ("System.Networking.Sockets.Socket", "noresult", false),
+            ("HttpServer", "Listen") => ("String,Int32,Int32", $"System.Result<{Prefix}HttpServer,String>", true),
+            ("HttpServer", "GetLocalPort") => ("", "System.Result<Int32,String>", false),
+            ("HttpServer", "Close") => ("", "noresult", false),
+            ("HttpServer", "ServeOne") => ($"System.Func<{request},{task}>", "System.Tasks.Task<System.Result<Void,String>>", false),
+            ("HttpServer", "EncodeResponse") when library => (response, "System.Result<System.Collections.Sequence<Byte>,String>", true),
+            ("HttpRequest", "FromIncoming") when library => ($"String,String,System.Collections.Sequence<{Prefix}HttpHeader>", $"System.Result<{request},String>", true),
+            ("HttpRequest", "get_Headers") => ("", $"System.Collections.Sequence<{Prefix}HttpHeader>", false),
+            ("HttpRequestDecoder", ".ctor") when library => ("", "noresult", false),
+            ("HttpRequestDecoder", "get_Complete") when library => ("", "Boolean", false),
+            ("HttpRequestDecoder", "Push") when library => ("Byte", "System.Result<Boolean,String>", false),
+            ("HttpRequestDecoder", "Finish") when library => ("", $"System.Result<{request},String>", false),
+            ("HttpServerExchange", ".ctor") when library => ($"System.Networking.Sockets.Socket,System.Func<{request},{task}>", "noresult", false),
+            ("HttpServerExchange", "Start") when library => ("", "System.Tasks.Task<System.Result<Void,String>>", false),
             ("HttpClient", ".ctor") when args.Length == 0 => ("", "noresult", false),
             ("HttpClient", ".ctor") => (Prefix + "HttpHandler", "noresult", false),
             ("HttpClient", "Get") => ("String", task, false),

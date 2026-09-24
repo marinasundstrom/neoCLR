@@ -230,6 +230,8 @@ public class HttpContent {
 }
 
 public class HttpRequest {
+    private field storedHeaders: Sequence<HttpHeader>
+    val Headers: Sequence<HttpHeader> => storedHeaders
     private field storedMethod: string
     val Method: string => storedMethod
     private field storedHost: string
@@ -240,10 +242,21 @@ public class HttpRequest {
     val Target: string => storedTarget
 
     private init(host: string, port: int, target: string) {
+        storedHeaders = ArrayList<HttpHeader>()
         storedMethod = "GET"
         storedHost = host
         storedPort = port
         storedTarget = target
+    }
+
+    internal static func FromIncoming(target: string, host: string, headers: Sequence<HttpHeader>) -> Result<HttpRequest, string> {
+        let url = String.Concat(String.Concat("http://", host), target)
+        let request = Get(url)?
+        if request.Target != target {
+            return Error("Invalid Host authority")
+        }
+        request.storedHeaders = headers
+        return Ok(request)
     }
 
     private static func Text(bytes: Sequence<byte>, first: int, last: int) -> Result<string, string> {

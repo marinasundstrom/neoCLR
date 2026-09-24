@@ -6612,3 +6612,23 @@ configuration/content, not target-specific code added to Raven main.
   integrated POC. Records BaseAddress and relative-address resolution after a defined
   Uri contract. BaseAddress is not implemented, and string concatenation is not selected
   as a substitute. This does not interrupt the next minimal HttpServer slice.
+
+### 2026-09-24 — Bounded HTTP server and independent peers
+
+- **Author direction:** after the HttpClient POC, add HttpServer and test both together
+  and against independent peers. Continue with subsequent application slices.
+- **Assistant choice:** implements a provisional ServeOne callback with buffered
+  request/response values. This avoids selecting a permanent hosting loop before
+  cancellation, concurrency and runtime suspension are defined. This exact method
+  shape is an assistant implementation choice, not a quoted author specification.
+- **Action:** adds Listen/GetLocalPort/ServeOne/Close and received request headers,
+  internal bounded parsing/encoding, an executable UTF-8 greeting server and matching
+  importer/reference/library contracts. The server computes response framing and
+  closes its accepted connection after sending or a Result error.
+- **Evidence:** [design](http-server-design.md) and [verifier](experiments/http-server/README.md)
+  cover a neoCLR pair, .NET client, fragmented requests and malformed input/application
+  responses with collection and zero final live objects. No runtime/compiler semantics
+  change, release or publication is part of this slice.
+- **Open:** request deadlines/cancellation, general HTTP status/body support, structured
+  errors and a permanent hosting contract. Next use the existing JSON experiment in
+  the network application; Uri/BaseAddress remain later as directed.

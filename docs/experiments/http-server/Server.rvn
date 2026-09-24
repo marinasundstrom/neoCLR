@@ -1,0 +1,46 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Tasks.*
+import System.Text.*
+import System.Web.Http.*
+
+func Respond(request: HttpRequest) -> Task<Result<HttpResponse, string>> {
+    let source = Promise<Result<HttpResponse, string>>()
+    if request.Method != "GET" || request.Target != "/greeting" || request.Headers.Count == 0 {
+        _ = source.Complete(Error("Unexpected request"))
+        return source.Task
+    }
+    let headers = ArrayList<HttpHeader>()
+    headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
+    _ = source.Complete(Ok(HttpResponse(200, headers, Utf8.Encode("Café 🌍"))))
+    return source.Task
+}
+
+func Start(server: HttpServer) {
+    let serving = server.ServeOne(Respond)
+    serving.OnCompleted(() => {
+        let result = serving.GetResult()
+        server.Close()
+        if let Ok(_) = result {
+            Console.WriteLine("Served greeting; server closed")
+        } else if let Error(message) = result {
+            Console.WriteLine("Server error: $message")
+        }
+    })
+    TaskQueue.Default.Post(() => Console.WriteLine("Other work runs while HTTP accept is pending"))
+}
+
+func Main() {
+    if let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) {
+        if let Ok(port) = server.GetLocalPort() {
+            Console.WriteLine(port)
+            Start(server)
+        } else {
+            server.Close()
+            System.Fault("Local port unavailable")
+        }
+    } else {
+        System.Fault("Listen failed")
+    }
+}

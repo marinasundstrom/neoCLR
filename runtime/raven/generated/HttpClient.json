@@ -2,7 +2,8 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Web.Http.HttpClient",
   "inputs": {
-    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "c71f54bb4ee59976d0b04fb1d896b92474e1a6d224cd1c5f86ef97c58bc5c38e",
+    "runtime/raven/src/System/Web/Http/HttpServer.rvn": "e64d5b8a6d4a3dc5f5dd8df7d6a551deededd6f5da8d9bad32ff6d4b5b02b563",
+    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "211ed92b2a38242973843b7e15da62bcc692ae5f7e0f7d50f95fc2d574a345bc",
     "runtime/raven/src/System/Networking/DnsError.rvn": "652823f199e6d95b14518917d27306ac83c97d7bac1ee2f62578bb224b3b1d3c",
     "runtime/raven/src/System/Networking/Dns.rvn": "d64bfe87d3ed679bf3fbb26efe9b86fcc6e832358319c4ff23d46c7d3a55ba21",
     "runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "908aedf618e5cc664268b2769910543c60bc5fe00642b687e6f6e4af9333adc9",
@@ -110,15 +111,15 @@
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
-    "runtime/raven/System.Runtime.rvnproj": "94a3b603f297209a941f3feb653123e592423ade40cf741aab53aa48743f07f6",
+    "runtime/raven/System.Runtime.rvnproj": "b02b24b6ec7e103885f8c33d9c693e7391197655e2ff54acb2238497a9e9e894",
     "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
     "HttpClient.methods.neoil": "b12a2d7b3da8e3a08b6510df30911939a0cca76deaccaf3c601aa2a1346fb4c9",
-    "HttpClient.helpers.neoil": "94cfbf8f476b29153aa8439939c0e60cd38d358e42dd174ff24d400fad0663c5"
+    "HttpClient.helpers.neoil": "00823ff6bf1013d7b6293dd113b727932c19cc25ae063016a362484e14da6a50"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "3f8f8e16948938bcc1905865df10577e4cbfa648ef00ed3fa6fc201b7b41338d",
+  "coreSha256": "8574b548ff16a542a2c7b26e3b0b720ecf73d890c629f2936f6560466978ebff",
   "exports": [
     ".ctor() -> noresult",
     ".ctor(System.Web.Http.HttpHandler handler) -> noresult",

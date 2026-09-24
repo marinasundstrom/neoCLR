@@ -3,8 +3,8 @@ title: Web and HTTP
 ---
 # Web and HTTP
 
-**Development experiment after Preview 9.** A Raven client can fetch a small UTF-8
-response through neoCLR DNS and TCP sockets. HttpClient, request/response types,
+**Development experiment after Preview 9.** Raven client and server applications can exchange a small UTF-8
+response through neoCLR TCP sockets, with DNS on the client. HttpClient, HttpServer, request/response types,
 content and handlers are development APIs in System.Web.Http. They require a matching
 development toolchain and are not part of the published Preview 9 SDK.
 
@@ -43,6 +43,30 @@ also runs a .NET comparison client. The peer stays open until the client finishe
 checking that completion follows Content-Length rather than waiting for EOF.
 Malformed/truncated responses and collection during pending work are exercised too.
 
+## Receive a request and return a response
+
+```raven
+{{HTTP_SERVER_SAMPLE}}
+```
+
+This [server callback](/samples/http-server/Server.rvn) builds a byte response.
+`HttpServer.Listen("127.0.0.1", 0, 4)` binds a loopback listener; `GetLocalPort()`
+reports the selected port. `ServeOne(Respond)` accepts one GET, awaits the callback,
+sends its response and closes that connection. The caller closes the listener.
+`Close()` stops listening; an already accepted exchange remains active.
+
+[Download the server and interoperability verifier](/samples/http-server.zip).
+It pairs separate neoCLR processes, tests an independent .NET client, and sends
+fragmented and invalid raw requests. Small-heap runs collect during pending work
+and finish with no live managed objects. This is a bounded exchange, not an
+application hosting framework.
+
+Received headers have lowercase names and trimmed surrounding whitespace.
+The server requires exactly one Host and no request body; optional Content-Length
+must be `0`. It validates application response headers, computes the byte length
+and adds `Connection: close`. Malformed requests or callback errors close the
+connection without an HTTP error response. Only 200 responses are supported.
+
 ## Current limits
 
 Only plain HTTP/1.1 GET and a 200 response with exactly one Content-Length are
@@ -58,8 +82,8 @@ is a correctness POC, not a performance benchmark. Generated async states still 
 
 ## Direction
 
-The next gates are operation lifetime/deadlines and a minimal neoCLR HTTP responder,
-then an application exchanging text and JSON. The System.Web.Http boundary
+The client/server greeting is in place. The next application case exchanges JSON;
+operation lifetime/deadlines remain a separate open gate. The System.Web.Http boundary
 separates HTTP policy from [networking](/features/networking/); a future transport
 could use sockets or a host facility. Handler ownership, concurrency, cancellation
 and a structured error model need concrete cases as these provisional APIs evolve. No complete HTTP stack or runtime suspension is claimed.

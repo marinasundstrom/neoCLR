@@ -53,8 +53,10 @@ The [HTTP client sample](experiments/http-client/README.md) separates client,
 forwarding/fake handlers and socket transport. Keep those boundaries while testing a
 bounded GET/200 exchange and UTF-8 content; the provisional APIs now live under System.Web.Http with reference coverage.
 The [HTTP design](http-client-design.md) records .NET comparisons and remaining gates.
-Next add the author-selected HttpServer class and a text/JSON exchange between two
-applications, testing independent peers too. Keep transfer/request lifetime explicit. M1 remains incomplete; broad HTTP, TLS,
+The [HttpServer sample](experiments/http-server/README.md) now exchanges UTF-8 text
+with the neoCLR client and an independent .NET client. Its bounded ServeOne callback
+keeps the hosting loop provisional. Next connect the existing small JSON consumer
+to this two-application exchange. Keep transfer/request lifetime explicit. M1 remains incomplete; broad HTTP, TLS,
 retry policy and runtime suspension are not prerequisites for this controlled POC.
 
 ## Scheduling checkpoint before the public socket bridge — 2026-09-24
@@ -824,11 +826,13 @@ No later major milestone has started.
 
 ## Working rules and immediate next step
 
-**Active next step, 2026-09-24:** complete client integration/validation, then add
-HttpServer and test it with the neoCLR client and an independent peer. The
+**Active next step, 2026-09-24:** connect the existing small JSON consumer to the
+validated HttpClient/HttpServer pair, keeping JSON contracts exploratory. The
 [HTTP sample](experiments/http-client/README.md) imports development System.Web.Http
 client, request/response/content and handler APIs; the bounded GET/200 client is the
-current checkpoint, not the completed web application milestone.
+client checkpoint. The [server POC](experiments/http-server/README.md) adds bounded
+request parsing, received headers and an owned response exchange. These are not yet
+the completed web application milestone.
 [Address fallback](socket-api-design.md#address-sequence-connection-poc--2026-09-24)
 now accepts a Sequence of IPv4 addresses with a shared five-second connection budget,
 per-address progress limits and one owned native connection. DNS still has a separate

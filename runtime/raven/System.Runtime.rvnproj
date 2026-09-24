@@ -7,6 +7,7 @@
   <Import Project="../../build/NeoCLR.Raven.props" />
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HttpClient'">
     <Compile Include="src/System/Web/Http/HttpClient.rvn" />
+    <Compile Include="src/System/Web/Http/HttpServer.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Dns'">
     <Compile Include="src/System/Networking/Dns.rvn" />

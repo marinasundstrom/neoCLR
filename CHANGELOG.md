@@ -8,11 +8,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add a provisional HttpServer with Listen/GetLocalPort/ServeOne/Close and received
+  HttpRequest.Headers. Serve one bounded GET/200 exchange, validate response headers
+  and supply framing; expected errors close the connection. Add a greeting app,
+  neoCLR/.NET interoperability and malformed-request/response checks under GC, plus
+  matching reference/library artifacts and on-site API/feature documentation. Add
+  opt-in live console output to the trusted async fixture runner. No transfer deadline,
+  general HTTP hosting loop, TLS or public cancellation is added.
+
 - Add provisional System.Web.Http client/handler APIs and a sample with bounded byte framing,
   UTF-8 content, fake/forwarding handlers, a .NET comparison and 19 passing
   client cases including an independent Python HTTP server. Add generated API
   reference coverage and a Web feature page/homepage entry. Keep
-  contracts provisional; server and transfer deadlines remain
+  contracts provisional; transfer deadlines remain
   open. Admit nested callers accessing containing private fields in the importer,
   with negative access/readonly checks. Allow an explicit instruction budget in the
   trusted async fixture runner without changing runtime defaults. Record future Uri

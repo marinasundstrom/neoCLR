@@ -1121,3 +1121,12 @@ reference, bridge, generated library and runtime artifacts.
 The experiment documents source-defined Task-result admission, propagated field
 assignment and hoisted non-null Sequence issues with source-level workarounds; none
 is claimed fixed. General compiler candidates need independent .NET reproductions.
+
+### HTTP server integration — 2026-09-24
+
+HttpServer adds Listen/GetLocalPort/ServeOne/Close and HttpRequest.Headers. The
+existing HttpClient bootstrap group now compiles both HTTP source files; request
+parsing, response encoding and socket continuations remain internal. Match reference,
+bridge and generated library artifacts. Runtime Contract settings, compiler emission
+and runtime instructions are unchanged. The [server POC](../http-server/README.md)
+checks separate-process interoperability and expected error cleanup under GC.

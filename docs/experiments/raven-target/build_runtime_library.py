@@ -126,6 +126,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    "HttpServer": "runtime/raven/src/System/Web/Http/HttpServer.rvn",
     "HttpClient": "runtime/raven/src/System/Web/Http/HttpClient.rvn",
     "DnsError": "runtime/raven/src/System/Networking/DnsError.rvn",
     "Dns": "runtime/raven/src/System/Networking/Dns.rvn",

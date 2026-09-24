@@ -61,8 +61,8 @@ README records remaining compiler limitations and the source-level workarounds.
 
 ## Next gates
 
-1. Add the author-selected HttpServer class, then a two-application text/JSON exchange.
-   Test against independent peers as well as the neoCLR client.
+1. The [HttpServer POC](http-server-design.md) now supplies the greeting exchange,
+   checked with neoCLR and independent peers. Next connect the existing JSON consumer.
 2. Define request/transfer cancellation and deadlines at the existing operation-owner
    boundary, without exposing generated state-machine mechanics in HTTP contracts.
 3. Decide which additional statuses, methods, request headers and content shapes the

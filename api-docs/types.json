@@ -229,5 +229,6 @@
   "System.Web.Http.HttpHeader",
   "System.Web.Http.HttpRequest",
   "System.Web.Http.HttpResponse",
+  "System.Web.Http.HttpServer",
   "System.Web.Http.HttpSocketHandler"
 ]
