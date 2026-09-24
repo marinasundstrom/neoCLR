@@ -38,6 +38,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   HashCode.Add(string) or nullable API contract changes. Validation: 59 compiler
   tests, all three target samples, 30 .NET assertions and website/API checks.
 
+  Align Object.Equals(Object?) and ReferenceEquals(Object?, Object?) declarations
+  with existing runtime null behavior. Annotate the source library and compiler/
+  bootstrap references, admit literal-null core Object locals/call arguments through
+  typed importer adapters, and regenerate matching library/API snapshots. Check
+  null literals, nullable locals, overrides and boxed equality, while non-nullable
+  Object assignments remain rejected. Runtime signatures/storage are unchanged.
+  Record reference annotations as current Raven compatibility, with future metadata
+  representation undecided; generated record-specific annotations remain separate.
+  Validation: Object plus three record samples, non-nullable assignment rejection,
+  regenerated bootstrap snapshot checks, 385 API items and the combined website.
+
 - Implement bounded virtual Object equality/hash for boxed Int32: compare exact
   type and integer value, and return the stored integer hash. Preserve separate-box
   identity and explicit Object base behavior. Other boxed primitives and primitive boxed ToString

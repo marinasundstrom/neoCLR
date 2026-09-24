@@ -224,7 +224,7 @@ static class UnionImport
                 Slot ConvertTop(string type)
                 {
                     if (stack.Count > 0 && stack[^1].Type == "FaultNull"
-                        && ((((StorageItemBindings.IsName(type) || PathBindings.IsName(type)) || StreamBindings.IsName(type)) || WorkerBindings.IsName(type)) || TaskBindings.IsType(type) || AsyncBindings.IsType(type) || ApplicationTypes.IsReference(type)))
+                        && ((((StorageItemBindings.IsName(type) || PathBindings.IsName(type)) || StreamBindings.IsName(type)) || WorkerBindings.IsName(type)) || TaskBindings.IsType(type) || AsyncBindings.IsType(type) || type == "System.Object" || ApplicationTypes.IsReference(type)))
                     {
                         var nullValue = Pop();
                         var key = "DefaultReference" + Convert.ToHexString(Encoding.UTF8.GetBytes(type));
@@ -998,7 +998,7 @@ static class UnionImport
         "System.Result/Error`1<System.OverflowError>" when type.IsValueType => Error,
         _ => throw new InvalidDataException("Unsupported Result profile type: " + type.FullName)
     };
-    static bool Converts(string source, string target) => source == "FaultNull" && ApplicationTypes.IsReference(target) || source != target && target == "System.Object" && ManagedArrayBindings.IsReference(source) || ApplicationTypes.IsLibraryUnion(target) && source == target + "&" || InterfaceBindings.Converts(source, target) || BooleanBindings.Converts(source, target) || EnumBindings.Converts(source, target);
+    static bool Converts(string source, string target) => source == "FaultNull" && (target == "System.Object" || ApplicationTypes.IsReference(target)) || source != target && target == "System.Object" && ManagedArrayBindings.IsReference(source) || ApplicationTypes.IsLibraryUnion(target) && source == target + "&" || InterfaceBindings.Converts(source, target) || BooleanBindings.Converts(source, target) || EnumBindings.Converts(source, target);
     static string ConvertStack(string source, string target) => (source != target && target == "System.Object" && ManagedArrayBindings.IsReference(source) ? "castclass System.Object\n" : "") + (ApplicationTypes.IsLibraryUnion(target) && source == target + "&" ? "ldobj " + target + "\n" : "") + InterfaceBindings.Convert(source, target) + BooleanBindings.Convert(source, target) + EnumBindings.Convert(source, target);
     static bool NeedsInitialization(string type) => ReaderBindings.IsName(type) || ApplicationTypes.LibraryUnionRequiresInitialization(type) || CalendarBindings.IsReference(type) || type is "System.Object" or ParameterSnapshotBindings.Vector || InterfaceBindings.IsInterface(type) || NativeMemoryBindings.IsPointer(type) || type is "System.RuntimeTypeHandle" or "Value" || DelegateBindings.IsType(type) || (GenericUnionBindings.IsType(type)
         ? GenericUnionBindings.RequiresInitialization(type) : ResultBindings.RequiresInitialization(type));

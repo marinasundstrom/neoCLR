@@ -63,18 +63,18 @@ items:
   langs:
   - csharp
   - vb
-  name: ReferenceEquals(object, object)
-  nameWithType: object.ReferenceEquals(object, object)
-  fullName: object.ReferenceEquals(object, object)
+  name: ReferenceEquals(object?, object?)
+  nameWithType: object.ReferenceEquals(object?, object?)
+  fullName: object.ReferenceEquals(object?, object?)
   type: Method
   assemblies:
   - NeoCLR.CoreProbe
   namespace: System
   summary: Tests whether two supported references denote the same allocation or are both null.
-  remarks: Nonvirtual and independent of Equals overrides. Separate boxes remain distinct even with equal contents. Intrinsic strings and String Object wrappers raise a terminal RuntimeError until String identity is defined. Managed byref locations are not Object identity operands.
+  remarks: 'The reference parameters are nullable for Raven compatibility: ReferenceEquals(Object? left, Object? right). This annotation does not introduce a distinct runtime type. Nonvirtual and independent of Equals overrides. Separate boxes remain distinct even with equal contents. Intrinsic strings and String Object wrappers raise a terminal RuntimeError until String identity is defined. Managed byref locations are not Object identity operands.'
   example: []
   syntax:
-    content: public static bool ReferenceEquals(object left, object right)
+    content: public static bool ReferenceEquals(object? left, object? right)
     parameters:
     - id: left
       type: System.Object
@@ -97,18 +97,18 @@ items:
   langs:
   - csharp
   - vb
-  name: Equals(object)
-  nameWithType: object.Equals(object)
-  fullName: object.Equals(object)
+  name: Equals(object?)
+  nameWithType: object.Equals(object?)
+  fullName: object.Equals(object?)
   type: Method
   assemblies:
   - NeoCLR.CoreProbe
   namespace: System
   summary: Tests reference identity by default; an ordinary class may override equality.
-  remarks: 'Null other returns false for a supported non-null default receiver. A null receiver raises NullReference. Class overrides must be consistent with GetHashCode: equal objects must have equal hashes. Virtual calls on boxed Int32 compare values only with another boxed Int32; null or another concrete type compares false. Boxed named structs dispatch explicit Equals overrides; record structs generate exact-type component equality. Other boxed primitives and String equality remain unsupported. Explicit Object base calls retain reference equality. This does not add structural class equality or change Equatable contracts.'
+  remarks: 'The other parameter is nullable for Raven compatibility: Equals(Object? other). Null other returns false for a supported non-null default receiver. A null receiver raises NullReference. Class overrides must be consistent with GetHashCode: equal objects must have equal hashes. Virtual calls on boxed Int32 compare values only with another boxed Int32; null or another concrete type compares false. Boxed named structs dispatch explicit Equals overrides; record structs generate exact-type component equality. Other boxed primitives and String equality remain unsupported. Explicit Object base calls retain reference equality. This does not add structural class equality or change Equatable contracts.'
   example: []
   syntax:
-    content: public virtual bool Equals(object other)
+    content: public virtual bool Equals(object? other)
     parameters:
     - id: other
       type: System.Object

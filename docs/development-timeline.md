@@ -5932,3 +5932,19 @@ failure remains the next acceptance target.
   equality remain explicit follow-ups. No VS Code build, release or publication was
   performed. No subsequent author approval of individual implementation details is
   inferred from the continuation request.
+
+
+### 2026-09-24 — Provisional reference nullability for Raven compatibility
+
+- **Author:** nullable annotations may not be the final design, but should be kept
+  at least for reference types to obtain compatible Raven behavior; the metadata
+  format may be reconsidered later.
+- **Assistant response:** retain reference annotations now and align Object.Equals
+  and ReferenceEquals with their existing runtime null behavior, separately from
+  any future metadata redesign.
+- **Action:** update Raven source, compiler-reference/bootstrap declarations and
+  core Object typed-null importing; extend the checked Object sample and API/site
+  documentation. No runtime type, virtual slot or null representation change.
+- **Open:** final nullability policy and metadata representation, nullable values,
+  and generated record-specific equality annotations. This does not infer a permanent
+  commitment beyond the author's stated reference-type compatibility direction.

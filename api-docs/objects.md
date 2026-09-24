@@ -217,4 +217,20 @@ This follows the .NET distinction between nullable annotations and runtime defau
 initialization. HashCode.Add(string) still requires a non-null argument; generated
 record code checks first and uses Add(int) for the null contribution. Explicit
 nullable-string record components and nullable-value boxing remain unsupported.
-Object.Equals' non-null parameter annotation is a separate follow-up.
+Object.Equals and ReferenceEquals now advertise their nullable reference arguments.
+
+
+## Nullable Object arguments (development)
+
+`Equals(Object? other)` accepts null as the value to compare. The receiver must still
+be an instance. `ReferenceEquals(Object? left, Object? right)` accepts null on either
+side: two nulls compare true; one null and one instance compare false. The checked
+Object sample exercises literal nulls, nullable locals, class overrides and boxed
+integers. Non-nullable Object declarations still reject null in Raven.
+
+These reference annotations use the existing CLI nullable metadata consumed by
+Raven. They support current type checking and compatible API use; they do not commit
+neoCLR to a final nullability model or metadata representation. Runtime signatures,
+reference storage, virtual slots and Fault behavior are unchanged. Use matching
+reference artifacts to make the corrected annotations visible to the compiler.
+Generated record-specific Equals signatures are a separate compiler follow-up.

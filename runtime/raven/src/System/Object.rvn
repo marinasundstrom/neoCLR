@@ -10,11 +10,11 @@ public abstract class Object {
         return GetType().FullName
     }
 
-    static func ReferenceEquals(left: Object, right: Object) -> bool {
+    static func ReferenceEquals(left: Object?, right: Object?) -> bool {
         return RuntimeServices.ObjectReferenceEquals(left, right)
     }
 
-    virtual func Equals(other: Object) -> bool {
+    virtual func Equals(other: Object?) -> bool {
         return RuntimeServices.ObjectEquals(self, other)
     }
 

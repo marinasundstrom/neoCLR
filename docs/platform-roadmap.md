@@ -737,8 +737,10 @@ with a checked Point/Rectangle sample and value-output deconstruction. Other pri
 Object implementations, generic struct components and nullable-value boxing remain
 follow-ups. Default reference fields now have a checked record case:
 null is preserved even for non-nullable declarations, and generated equality/hash/display
-handle it. Explicit nullable-string components and Object method annotations remain
-separate work. Value retirement remains a separate storage migration.
+handle it. Object.Equals and ReferenceEquals now annotate nullable comparison
+arguments for Raven compatibility. The author keeps reference annotations for now
+while leaving the future nullability model and metadata format open. Explicit
+nullable-string components and generated record-method annotations remain separate work. Value retirement remains a separate storage migration.
 This is a bounded foundation review; networking remains later. Console ownership,
 cleanup on propagated errors and buffering remain follow-up questions, not selected
 redesigns. The scheduling/operation-cancellation work below remains open.

@@ -484,3 +484,29 @@ the old failure and is included alongside the other checked website samples. Exp
 nullable-string declarations, nullable-value boxing and Object.Equals parameter
 annotation alignment remain separate follow-ups; non-null declarations are not a
 runtime proof that default reference fields contain an instance.
+
+
+### Nullable Object arguments — 2026-09-24
+
+The author directs retaining nullable annotations at least for reference types to
+get compatible Raven behavior, without committing to a future metadata format.
+The existing .NET Object baseline above already tests null comparison arguments;
+this slice corrects the source/reference declarations to match that existing runtime
+contract. No new null representation or value-nullability policy is introduced.
+
+Object.Equals now accepts Object?; both ReferenceEquals arguments are Object?.
+The bootstrap runtime-service declarations admit the corresponding null inputs.
+Reference assemblies use existing CLI nullable annotations, scoped to this surface.
+The importer extends its existing typed-null adapters to core Object as well as
+application references. Null locals and call arguments are materialized with typed
+initobj; evaluation order and argument positions remain preserved. No runtime
+instruction or virtual signature changes. Making every Object argument nullable
+would obscure receiver requirements; retaining the misleading non-null signatures
+would prevent valid Raven calls. Explicit annotations express the implemented API
+contract while leaving the final platform representation undecided.
+
+The Object source sample checks null/null, null/instance, instance/null, nullable
+locals, default/class-override/boxed equality, and a negative non-nullable assignment.
+The source library and bootstrap snapshots are regenerated, and the on-site reference
+shows the corrected signatures. Direct generated record Equals annotations remain
+a separate compiler issue; calls through Object use the corrected base contract.

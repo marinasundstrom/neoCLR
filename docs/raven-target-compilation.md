@@ -193,3 +193,16 @@ Defaults.rvnproj sample checks the matching target behavior. Explicit nullable-s
 components and nullable-value boxing remain unsupported.
 
 Matching default-component compiler commit: `b896089e0` on the Raven feature branch.
+
+
+### Nullable Object reference arguments (2026-09-24)
+
+The source/runtime-reference Object surface now declares Equals(Object? other) and
+ReferenceEquals(Object? left, Object? right), using existing CLI nullable metadata.
+Raven consumes these annotations without a new Runtime Contract option. Core Object
+literal-null locals and arguments use the same typed importer adapters as application
+references. Runtime method identity, dispatch and storage are unchanged. The Object
+sample validates permitted null arguments and continued rejection of non-nullable
+Object assignments. Generated record-specific Equals signatures remain a separate
+compiler follow-up. The author treats these reference annotations as current Raven
+compatibility, with future nullability policy/metadata representation still open.

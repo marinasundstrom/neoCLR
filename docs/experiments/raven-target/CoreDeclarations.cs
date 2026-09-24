@@ -104,14 +104,16 @@ static class CoreDeclarations
     }
 
     const string Source = """
+        #nullable enable annotations
         [assembly: System.Runtime.CompilerServices.ReferenceAssembly]
         namespace System {
             public abstract class Object {
-                public static bool ReferenceEquals(object left, object right) => false;
-                public virtual bool Equals(object other) => false;
+                public static bool ReferenceEquals(object? left, object? right) => false;
+                public virtual bool Equals(object? other) => false;
                 public virtual int GetHashCode() => 0;
                 public virtual string ToString() => "";
             }
+        #nullable restore annotations
             public abstract class ValueType { }
             public abstract class Enum : ValueType { }
             public struct Void { }

@@ -23,4 +23,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-object-equality-') as folder:
     assert run.returncode == 0, run.stdout + run.stderr
     assert run.stdout == (HERE / 'expected.txt').read_text(), repr(run.stdout)
     assert not run.stderr, run.stderr
+    (root / 'Main.rvn').write_text('import System.*\nfunc Main() { let invalid: Object = null }\n')
+    rejected = subprocess.run(['dotnet', 'msbuild', str(root / 'ObjectEquality.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=120)
+    assert rejected.returncode != 0 and 'RAV1509' in rejected.stdout + rejected.stderr, rejected.stdout + rejected.stderr
     print('Object identity, class equality and hash sample passed')

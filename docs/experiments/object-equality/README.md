@@ -34,3 +34,11 @@ probe is an acceptance target, not a passing test or a promise of record support
 
 2026-09-24: the integer record-class probe passes with the opt-in target contract.
 See [the maintained record sample](../records/README.md) for current scope and checks.
+
+
+Nullable reference arguments are part of the development Object contract:
+Equals(Object? other) and ReferenceEquals(Object? left, Object? right). The sample
+checks literal nulls and nullable locals through default equality, an explicit class
+override and boxed Int32 equality. Null is still rejected for a non-nullable Object
+local (RAV1509), checked by verify.py. Reference annotations are Raven compatibility
+metadata; runtime types/slots and identity semantics are unchanged.

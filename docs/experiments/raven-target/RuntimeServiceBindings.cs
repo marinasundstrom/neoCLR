@@ -108,8 +108,8 @@ static class RuntimeServiceBindings
         _ => throw new InvalidDataException("Unsupported runtime service declaration.")
     };
     static bool IsProperty(string name) => name is "CurrentTaskQueue" or "DefaultTaskQueue";
-    public static string Declarations => "namespace Runtime.CompilerServices { public static class RuntimeServices { "
-        + string.Join(" ", Members.Select(m => IsProperty(m.Name) ? $"public static {CSharp(m.Result)} {m.Name} => default;" : $"public static {CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => CSharp(t) + " arg" + i))}) {(m.Result == "noresult" ? "{ }" : "=> default;")}")) + " public static bool IsValue<T>(System.Value value) => default; public static T UnpackValue<T>(System.Value value) => default; } }";
+    public static string Declarations => "\n#nullable enable annotations\nnamespace Runtime.CompilerServices { public static class RuntimeServices { "
+        + string.Join(" ", Members.Select(m => IsProperty(m.Name) ? $"public static {CSharp(m.Result)} {m.Name} => default;" : $"public static {CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => CSharp(t) + ((m.Name == "ObjectReferenceEquals" || m.Name == "ObjectEquals" && i == 1) ? "?" : "") + " arg" + i))}) {(m.Result == "noresult" ? "{ }" : "=> default;")}")) + " public static bool IsValue<T>(System.Value value) => default; public static T UnpackValue<T>(System.Value value) => default; } }\n#nullable restore annotations\n";
 
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {

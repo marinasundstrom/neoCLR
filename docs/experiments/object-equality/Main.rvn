@@ -13,7 +13,7 @@ class Key {
     init(number: int) {
         storedNumber = number
     }
-    override func Equals(other: Object) -> bool {
+    override func Equals(other: Object?) -> bool {
         if other is Key key {
             return Number == key.Number
         }
@@ -31,7 +31,7 @@ func Check(condition: bool, description: string) {
     Console.WriteLine(description)
 }
 
-func SameValue(left: Object, right: Object) -> bool {
+func SameValue(left: Object, right: Object?) -> bool {
     return left.Equals(right)
 }
 
@@ -40,6 +40,15 @@ func Hash(value: Object) -> int {
 }
 
 func Main() {
+    let absent: Object? = null
+    let present: Object = Cell(1)
+    let nullableBox: Object = 42
+    if !Object.ReferenceEquals(null, null) || !Object.ReferenceEquals(absent, null)
+        || Object.ReferenceEquals(present, null) || Object.ReferenceEquals(null, present)
+        || present.Equals(null) || present.Equals(absent)
+        || Key(1).Equals(null) || nullableBox.Equals(null) || SameValue(present, null) {
+        System.Fault("Object equality must accept nullable arguments and preserve null semantics")
+    }
     let cell = Cell(1)
     let alias = cell
     let hash = Hash(cell)
