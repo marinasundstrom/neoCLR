@@ -14,6 +14,8 @@
       href: features/tasks/index.md
     - name: Networking
       href: features/networking/index.md
+    - name: Web and HTTP
+      href: features/web/index.md
     - name: Streams
       href: docs/streams.md
     - name: Storage

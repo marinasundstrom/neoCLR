@@ -84,3 +84,7 @@ manual entries; internal implementation types remain outside the public referenc
 Names and contracts are experimental. Pages label published behavior, development
 changes and proposals separately. Use [the matching toolchain](/try/#development)
 for development examples.
+
+The development [HTTP client and handler APIs](xref:System.Web.Http) support a bounded
+GET/200 POC over sockets. Read the [Web guide](/features/web/) for pipeline examples,
+ownership, framing limits and missing transfer deadlines.

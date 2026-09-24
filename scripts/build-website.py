@@ -230,6 +230,7 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'HTTP_CLIENT_SAMPLE': ('docs/experiments/http-client/Main.rvn', 'async func ReadGreeting(', '\n}', True),
         'SOCKET_SERVER_SAMPLE': ('docs/experiments/socket-echo/Server.rvn', 'async func Serve(', '\n}', True),
         'DNS_RESOLVE_SAMPLE': ('docs/experiments/socket-client/Main.rvn', 'async func ResolveHost()', '\n}', True),
         'OBJECT_DISPLAY_SAMPLE': ('docs/experiments/object-display/Main.rvn', 'open class Plain', '\nfunc Main()', False),
@@ -285,6 +286,11 @@ def main():
             # Published examples retain the release contract during development.
             source_sample = SOURCE / 'samples/preview9' / name
         shutil.copyfile(source_sample, downloads / name)
+    http_downloads = downloads / 'http-client'
+    http_downloads.mkdir()
+    for name in ('Main.rvn', 'Handlers.rvn', 'HttpClient.rvnproj', 'Reference.cs', 'README.md', 'verify.py'):
+        shutil.copyfile(ROOT / 'docs/experiments/http-client' / name, http_downloads / name)
+    shutil.make_archive(str(downloads / 'http-client'), 'zip', http_downloads)
     socket_downloads = downloads / 'socket-client'
     socket_downloads.mkdir()
     for name in ('Main.rvn', 'SocketClient.rvnproj', 'README.md', 'verify.py'):

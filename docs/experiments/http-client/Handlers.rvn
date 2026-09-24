@@ -1,0 +1,92 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Tasks.*
+import System.Text.*
+import System.Web.Http.*
+
+// A forwarding handler can observe both sides of the exchange without owning sockets.
+class RecordingHandler : HttpHandler {
+    private field name: string
+    private field inner: HttpHandler
+    private field events: ArrayList<string>
+
+    init(name: string, inner: HttpHandler, events: ArrayList<string>) {
+        self.name = name
+        self.inner = inner
+        self.events = events
+    }
+
+    async func Send(request: HttpRequest) -> Task<Result<HttpResponse, string>> {
+        events.Add(String.Concat(name, " before"))
+        let outcome = await inner.Send(request)
+        events.Add(String.Concat(name, " after"))
+        return outcome
+    }
+}
+
+class FakeHandler : HttpHandler {
+    private field fail: bool
+    var Calls: int = 0
+
+    init(fail: bool) {
+        self.fail = fail
+    }
+
+    func Send(request: HttpRequest) -> Task<Result<HttpResponse, string>> {
+        Calls += 1
+        Check(request.Method == "GET")
+        Check(request.Host == "example.test")
+        Check(request.Port == 80)
+        Check(request.Target == "/greeting")
+        let source = Promise<Result<HttpResponse, string>>()
+        if fail {
+            _ = source.Complete(Error("Fake failure"))
+        } else {
+            _ = source.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), Utf8.Encode("Café 🌍"))))
+        }
+        return source.Task
+    }
+}
+
+func CheckHandlers() {
+    let events = ArrayList<string>()
+    let fake = FakeHandler(false)
+    let client = HttpClient(RecordingHandler("outer", RecordingHandler("inner", fake, events), events))
+    if let Ok(response) = client.Get("http://example.test/greeting").GetResult() {
+        Check(response.Content.Bytes.Count == 10)
+    } else {
+        System.Fault("Fake response lost")
+    }
+    Check(fake.Calls == 1)
+    Check(events.Count == 4)
+    Check(events[0] == "outer before" && events[1] == "inner before")
+    Check(events[2] == "inner after" && events[3] == "outer after")
+    if let Error(message) = client.Get("http://example.test/unsafe\r\nHeader: injected").GetResult() {
+        Check(message == "Unsupported request target")
+    } else {
+        System.Fault("Unsafe target admitted")
+    }
+    if let Error(message) = client.Get("https://example.test/greeting").GetResult() {
+        Check(message == "Only plain http:// URLs are supported")
+    } else {
+        System.Fault("Unsupported scheme admitted")
+    }
+    Check(fake.Calls == 1)
+    Check(events.Count == 4)
+    let failureEvents = ArrayList<string>()
+    let failed = HttpClient(RecordingHandler("failure", FakeHandler(true), failureEvents))
+    if let Error(message) = failed.Get("http://example.test/greeting").GetResult() {
+        Check(message == "Fake failure")
+    } else {
+        System.Fault("Handler failure lost")
+    }
+    Check(failureEvents.Count == 2)
+    Check(failureEvents[1] == "failure after")
+}
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("HTTP contract failed")
+    }
+}

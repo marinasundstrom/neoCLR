@@ -222,5 +222,12 @@
   "System.UIntPtr",
   "System.Value",
   "System.ValueType",
-  "System.Void"
+  "System.Void",
+  "System.Web.Http.HttpClient",
+  "System.Web.Http.HttpContent",
+  "System.Web.Http.HttpHandler",
+  "System.Web.Http.HttpHeader",
+  "System.Web.Http.HttpRequest",
+  "System.Web.Http.HttpResponse",
+  "System.Web.Http.HttpSocketHandler"
 ]

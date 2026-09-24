@@ -1,0 +1,36 @@
+import System.*
+import System.Result.*
+import System.Collections.*
+import System.Tasks.*
+import System.Text.*
+import System.Networking.*
+import System.Networking.Sockets.*
+
+import System.Web.Http.*
+
+async func ReadGreeting(client: HttpClient, url: string) -> Task<Result<string, string>> {
+    let response = await client.Get(url)?
+    Check(response.StatusCode == 200)
+    return await response.Content.ReadText()
+}
+
+func Main() {
+    CheckHandlers()
+    Console.WriteLine("Handler checks passed")
+    // The verifier substitutes an ephemeral port and controls the peer.
+    let events = ArrayList<string>()
+    let client = HttpClient(RecordingHandler("transport", HttpSocketHandler(), events))
+    let fetching = ReadGreeting(client, "http://localhost:19091/greeting")
+    fetching.OnCompleted(() => {
+        let result = fetching.GetResult()
+        Check(events.Count == 2)
+        Check(events[0] == "transport before" && events[1] == "transport after")
+        if let Ok(text) = result {
+            Console.WriteLine("HTTP 200")
+            Console.WriteLine(text)
+        } else if let Error(message) = result {
+            Console.WriteLine("HTTP error: $message")
+        }
+    })
+    TaskQueue.Default.Post(() => Console.WriteLine("Other work runs while HTTP is pending"))
+}

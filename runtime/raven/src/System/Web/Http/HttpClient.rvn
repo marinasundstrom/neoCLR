@@ -1,0 +1,508 @@
+namespace System.Web.Http
+
+import System.Runtime.CompilerServices.*
+import System.Option.*
+import System.Tasks.*
+import System.Networking.*
+import System.Networking.Sockets.*
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+
+// Provisional bounded HTTP response contracts.
+public class HttpHeader {
+    private field storedName: string
+    val Name: string => storedName
+    private field storedValue: string
+    val Value: string => storedValue
+
+    init(name: string, value: string) {
+        storedName = name
+        storedValue = value
+    }
+}
+
+public class HttpResponse {
+    private field storedStatusCode: int
+    val StatusCode: int => storedStatusCode
+    private field storedHeaders: Sequence<HttpHeader>
+    val Headers: Sequence<HttpHeader> => storedHeaders
+    private field storedContent: HttpContent
+    val Content: HttpContent => storedContent
+
+    init(statusCode: int, headers: Sequence<HttpHeader>, body: Sequence<byte>) {
+        storedStatusCode = statusCode
+        storedHeaders = headers
+        storedContent = HttpContent(body)
+    }
+
+
+}
+
+internal class HttpResponseDecoder {
+    internal init() { }
+    private field head: ArrayList<byte> = ArrayList<byte>()
+    private field body: ArrayList<byte> = ArrayList<byte>()
+    private field headers: ArrayList<HttpHeader> = ArrayList<HttpHeader>()
+    private field expected: int = -1
+    private field failed: bool = false
+
+    internal val Complete: bool => expected >= 0 && body.Count == expected && !failed
+
+    internal func Push(value: byte) -> Result<bool, string> {
+        if failed {
+            return Error("Decoder already failed")
+        }
+        let result = PushCore(value)
+        if let Error(message) = result {
+            failed = true
+            return Error(message)
+        }
+        return result
+    }
+
+    private func PushCore(value: byte) -> Result<bool, string> {
+        if Complete {
+            return Error("Bytes after response")
+        }
+        if expected >= 0 {
+            body.Add(value)
+            return Ok(Complete)
+        }
+        if head.Count >= 2048 {
+            return Error("Header limit exceeded")
+        }
+        let count = head.Count
+        if value == 10 && (count == 0 || head[count - 1] != 13) {
+            return Error("Bare LF in headers")
+        }
+        if count > 0 && head[count - 1] == 13 && value != 10 {
+            return Error("Bare CR in headers")
+        }
+        if value != 9 && value != 10 && value != 13 && !(value >= 32 && value <= 126) {
+            return Error("Invalid header byte")
+        }
+        head.Add(value)
+        let size = head.Count
+        if size >= 4 && head[size - 4] == 13 && head[size - 3] == 10 && head[size - 2] == 13 && head[size - 1] == 10 {
+            let length = ParseHead()?
+            expected = length
+        }
+        return Ok(Complete)
+    }
+
+    private func Token(value: byte) -> bool {
+        return (value >= 65 && value <= 90) || (value >= 97 && value <= 122) ||
+            (value >= 48 && value <= 57) || value == 33 || value == 35 ||
+            value == 36 || value == 37 || value == 38 || value == 39 ||
+            value == 42 || value == 43 || value == 45 || value == 46 ||
+            value == 94 || value == 95 || value == 96 || value == 124 || value == 126
+    }
+
+    private func Text(start: int, end: int, lower: int) -> Result<string, string> {
+        let bytes = ArrayList<byte>()
+        var index = start
+        while index < end {
+            var value = head[index]
+            if lower == 1 && value >= 65 && value <= 90 {
+                value = (byte)((int)value + 32)
+            }
+            bytes.Add(value)
+            index += 1
+        }
+        if let Ok(text) = Utf8.Decode(bytes) {
+            return Ok(text)
+        }
+        return Error("Invalid header text")
+    }
+
+    private func ParseHead() -> Result<int, string> {
+        var start = 0
+        var line = 0
+        var length = -1
+        var end = 0
+        while end + 1 < head.Count {
+            if head[end] != 13 || head[end + 1] != 10 {
+                end += 1
+                continue
+            }
+            if line == 0 {
+                // Only successful GET responses are admitted in this first experiment.
+                if end < 13 || Text(0, 13, 0)? != "HTTP/1.1 200 " {
+                    return Error("Unsupported status line")
+                }
+            } else if end == start {
+                if length < 0 {
+                    return Error("Content-Length required")
+                }
+                return Ok(length)
+            } else {
+                if headers.Count >= 16 {
+                    return Error("Header count exceeded")
+                }
+                var colon = start
+                while colon < end && head[colon] != 58 {
+                    if !Token(head[colon]) {
+                        return Error("Invalid header name")
+                    }
+                    colon += 1
+                }
+                if colon == start || colon == end {
+                    return Error("Missing header name or colon")
+                }
+                let name = Text(start, colon, 1)?
+                var first = colon + 1
+                var last = end
+                while first < last && (head[first] == 32 || head[first] == 9) {
+                    first += 1
+                }
+                while last > first && (head[last - 1] == 32 || head[last - 1] == 9) {
+                    last -= 1
+                }
+                let value = Text(first, last, 0)?
+                if name == "transfer-encoding" || name == "content-encoding" {
+                    return Error("Unsupported encoding")
+                }
+                if name == "content-length" {
+                    if length >= 0 {
+                        return Error("Duplicate Content-Length")
+                    }
+                    if first == last {
+                        return Error("Empty Content-Length")
+                    }
+                    var number = 0
+                    var index = first
+                    while index < last {
+                        let digit = (int)head[index] - 48
+                        if !(digit >= 0 && digit <= 9) {
+                            return Error("Invalid Content-Length")
+                        }
+                        // Bound before multiplication, avoiding integer overflow.
+                        if number > (1024 - digit) / 10 {
+                            return Error("Body limit exceeded")
+                        }
+                        number = number * 10 + digit
+                        index += 1
+                    }
+                    length = number
+                }
+                headers.Add(HttpHeader(name, value))
+            }
+            line += 1
+            start = end + 2
+            end = start
+        }
+        return Error("Incomplete headers")
+    }
+
+    internal func Finish() -> Result<HttpResponse, string> {
+        if !Complete {
+            return Error("Incomplete or invalid response")
+        }
+        return Ok(HttpResponse(200, headers, body))
+    }
+}
+
+
+// Request and handler contracts are independent of socket transport.
+public interface HttpHandler {
+    func Send(request: HttpRequest) -> Task<Result<HttpResponse, string>>
+}
+
+public class HttpContent {
+    private field storedBytes: Sequence<byte>
+    val Bytes: Sequence<byte> => storedBytes
+
+    init(bytes: Sequence<byte>) {
+        storedBytes = bytes
+    }
+
+    func ReadText() -> Task<Result<string, string>> {
+        let source = Promise<Result<string, string>>()
+        if let Ok(text) = Utf8.Decode(Bytes) {
+            _ = source.Complete(Ok(text))
+        } else {
+            _ = source.Complete(Error("Invalid UTF-8 body"))
+        }
+        return source.Task
+    }
+}
+
+public class HttpRequest {
+    private field storedMethod: string
+    val Method: string => storedMethod
+    private field storedHost: string
+    val Host: string => storedHost
+    private field storedPort: int
+    val Port: int => storedPort
+    private field storedTarget: string
+    val Target: string => storedTarget
+
+    private init(host: string, port: int, target: string) {
+        storedMethod = "GET"
+        storedHost = host
+        storedPort = port
+        storedTarget = target
+    }
+
+    private static func Text(bytes: Sequence<byte>, first: int, last: int) -> Result<string, string> {
+        let part = ArrayList<byte>()
+        var index = first
+        while index < last {
+            part.Add(bytes[index])
+            index += 1
+        }
+        if let Ok(text) = Utf8.Decode(part) {
+            return Ok(text)
+        }
+        return Error("Invalid URL text")
+    }
+
+    static func Get(url: string) -> Result<HttpRequest, string> {
+        if !url.StartsWithOrdinal("http://") {
+            return Error("Only plain http:// URLs are supported")
+        }
+        let bytes = Utf8.Encode(url)
+        if bytes.Count > 1024 {
+            return Error("URL limit exceeded")
+        }
+        var end = 7
+        while end < bytes.Count && bytes[end] != 47 {
+            end += 1
+        }
+        var colon = 7
+        while colon < end && bytes[colon] != 58 {
+            let value = bytes[colon]
+            if !((value >= 65 && value <= 90) || (value >= 97 && value <= 122) ||
+                (value >= 48 && value <= 57) || value == 45 || value == 46) {
+                return Error("Unsupported hostname")
+            }
+            colon += 1
+        }
+        if colon == 7 || colon - 7 > 253 {
+            return Error("Invalid hostname length")
+        }
+        let host = Text(bytes, 7, colon)?
+        var port = 80
+        if colon < end {
+            port = 0
+            var index = colon + 1
+            if index == end {
+                return Error("Empty port")
+            }
+            while index < end {
+                let digit = (int)bytes[index] - 48
+                if !(digit >= 0 && digit <= 9) || port > (65535 - digit) / 10 {
+                    return Error("Invalid port")
+                }
+                port = port * 10 + digit
+                index += 1
+            }
+            if port == 0 {
+                return Error("Invalid port")
+            }
+        }
+        var target = "/"
+        if end < bytes.Count {
+            var index = end
+            while index < bytes.Count {
+                let value = bytes[index]
+                if !(value >= 33 && value <= 126) || value == 35 {
+                    return Error("Unsupported request target")
+                }
+                index += 1
+            }
+            target = Text(bytes, end, bytes.Count)?
+        }
+        return Ok(HttpRequest(host, port, target))
+    }
+}
+
+public class HttpClient {
+    private field handler: HttpHandler
+
+    init() {
+        handler = HttpSocketHandler()
+    }
+
+    init(handler: HttpHandler) {
+        self.handler = handler
+    }
+
+    func Send(request: HttpRequest) -> Task<Result<HttpResponse, string>> {
+        return handler.Send(request)
+    }
+
+    func Get(url: string) -> Task<Result<HttpResponse, string>> {
+        let parsed = HttpRequest.Get(url)
+        if let Ok(request) = parsed {
+            return Send(request)
+        }
+        let source = Promise<Result<HttpResponse, string>>()
+        if let Error(message) = parsed {
+            _ = source.Complete(Error(message))
+        }
+        return source.Task
+    }
+}
+
+public class HttpSocketHandler : HttpHandler {
+    init() { }
+
+    func Send(request: HttpRequest) -> Task<Result<HttpResponse, string>> {
+        let exchange = HttpExchange(request)
+        return exchange.Execute()
+    }
+}
+
+// Private continuation adapter, replaceable when runtime suspension is available.
+// Each Send owns independent buffers, pending tasks and one socket.
+internal class HttpExchange {
+    private field request: HttpRequest
+    private field source: Promise<Result<HttpResponse, string>>
+    private field socket: Option<Socket>
+    private field lookup: Option<Task<Result<Sequence<string>, DnsError>>>
+    private field connecting: Option<Task<Result<Socket, SocketError>>>
+    private field transfer: Option<Task<Result<int, SocketError>>>
+    private field outgoing: Sequence<byte>
+    private field sent: int
+    private field buffer: byte[]
+    private field decoder: HttpResponseDecoder
+
+    internal init(request: HttpRequest) {
+        self.request = request
+        source = Promise<Result<HttpResponse, string>>()
+        socket = None()
+        lookup = None()
+        connecting = None()
+        transfer = None()
+        let target = request.Target
+        let host = request.Host
+        let port = request.Port
+        let requestLine = String.Concat(String.Concat("GET ", target), " HTTP/1.1\r\nHost: ")
+        let authority = String.Concat(String.Concat(host, ":"), port.ToString())
+        let wire = String.Concat(String.Concat(requestLine, authority), "\r\nConnection: close\r\n\r\n")
+        let encoded = Utf8.Encode(wire)
+        outgoing = encoded
+        sent = 0
+        buffer = CheckedStorage.Reserve<byte>(256)
+        decoder = HttpResponseDecoder()
+    }
+
+    internal func Execute() -> Task<Result<HttpResponse, string>> {
+        let pending = Dns.GetHostAddresses(request.Host)
+        lookup = Some(pending)
+        pending.OnCompleted(self.OnLookup)
+        return source.Task
+    }
+
+    private func Finish(result: Result<HttpResponse, string>) {
+        if let Some(connection) = socket {
+            connection.Close()
+        }
+        socket = None()
+        lookup = None()
+        connecting = None()
+        transfer = None()
+        _ = source.Complete(result)
+    }
+
+    private func OnLookup() {
+        if let Some(pending) = lookup {
+            let result = pending.GetResult()
+            lookup = None()
+            if let Ok(addresses) = result {
+                let next = Socket.Connect(addresses, request.Port)
+                connecting = Some(next)
+                next.OnCompleted(self.OnConnected)
+            } else {
+                Finish(Error("Lookup failed"))
+            }
+        }
+    }
+
+    private func OnConnected() {
+        if let Some(pending) = connecting {
+            let result = pending.GetResult()
+            connecting = None()
+            if let Ok(connection) = result {
+                socket = Some(connection)
+                SendNext()
+            } else {
+                Finish(Error("Connection failed"))
+            }
+        }
+    }
+
+    private func SendNext() {
+        if let Some(connection) = socket {
+            if sent == outgoing.Count {
+                ReceiveNext()
+                return
+            }
+            var count = 0
+            while count < 256 && sent + count < outgoing.Count {
+                buffer[count] = outgoing[sent + count]
+                count += 1
+            }
+            let pending = connection.Send(buffer, 0, count)
+            transfer = Some(pending)
+            pending.OnCompleted(self.OnSent)
+        }
+    }
+
+    private func OnSent() {
+        if let Some(pending) = transfer {
+            let result = pending.GetResult()
+            transfer = None()
+            if let Ok(count) = result {
+                if count > 0 {
+                    sent += count
+                    SendNext()
+                } else {
+                    Finish(Error("Send made no progress"))
+                }
+            } else {
+                Finish(Error("Request send failed"))
+            }
+        }
+    }
+
+    private func ReceiveNext() {
+        if let Some(connection) = socket {
+            let pending = connection.Receive(buffer, 0, 256)
+            transfer = Some(pending)
+            pending.OnCompleted(self.OnReceived)
+        }
+    }
+
+    private func OnReceived() {
+        if let Some(pending) = transfer {
+            let result = pending.GetResult()
+            transfer = None()
+            if let Ok(count) = result {
+                if count == 0 {
+                    Finish(Error("EOF before complete response"))
+                    return
+                }
+                var index = 0
+                while index < count && !decoder.Complete {
+                    let progress = decoder.Push(buffer[index])
+                    if let Error(message) = progress {
+                        Finish(Error(message))
+                        return
+                    }
+                    index += 1
+                }
+                if decoder.Complete {
+                    Finish(decoder.Finish())
+                } else {
+                    ReceiveNext()
+                }
+            } else {
+                Finish(Error("Response receive failed"))
+            }
+        }
+    }
+}

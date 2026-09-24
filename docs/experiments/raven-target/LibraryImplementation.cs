@@ -26,6 +26,14 @@ static class LibraryImplementation
             foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name);
             return names.SelectMany(name => InterfaceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
         }
+        if (owner == "System.Web.Http.HttpClient")
+        {
+            var names = HttpBindings.Names.Select(n => HttpBindings.Prefix + n).ToArray();
+            foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name);
+            return names.SelectMany(name => source.GetType(name).IsInterface
+                ? InterfaceRoots(source.GetType(name), core.GetType(name), name)
+                : InstanceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
+        }
         if (owner == "System.Networking.Dns")
         {
             var names = new[] { owner, "System.Networking.DnsCompletion" };
@@ -172,7 +180,7 @@ static class LibraryImplementation
         // A single explicitly selected reference/implementation pair. Never alias arbitrary
         // guest types by namespace/name, and never execute reference-assembly stub bodies.
         foreach (var candidate in new[] { type, contract })
-            if (!(candidate.IsPublic || candidate.IsNotPublic && (DescriptorLibrary.IsProvider(candidate) || SocketBindings.IsProvider(candidate) || WorkerBindings.IsProvider(candidate) || ReaderBindings.IsProvider(candidate)) || candidate.IsNestedPublic && GenericUnionLibrary.IsCase(candidate)) || candidate.IsInterface || candidate.IsAbstract != (DescriptorLibrary.IsDescriptor(candidate) && candidate.Name == "RuntimeMemberInfo")
+            if (!(candidate.IsPublic || candidate.IsNotPublic && (DescriptorLibrary.IsProvider(candidate) || HttpBindings.IsProvider(candidate) || SocketBindings.IsProvider(candidate) || WorkerBindings.IsProvider(candidate) || ReaderBindings.IsProvider(candidate)) || candidate.IsNestedPublic && GenericUnionLibrary.IsCase(candidate)) || candidate.IsInterface || candidate.IsAbstract != (DescriptorLibrary.IsDescriptor(candidate) && candidate.Name == "RuntimeMemberInfo")
                 || candidate.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant) || candidate.HasNestedTypes && !ErrorCarrierLibrary.IsCarrier(candidate) || candidate.HasEvents
                 || candidate.BaseType?.FullName != (DescriptorLibrary.IsDescriptor(candidate) ? DescriptorLibrary.Base(candidate) : candidate.IsValueType ? "System.ValueType" : "System.Object") || candidate.IsExplicitLayout)
                 throw new InvalidDataException($"Unsupported instance library owner: {candidate.FullName}, base={candidate.BaseType}, public={candidate.IsPublic}, abstract={candidate.IsAbstract}, nested={candidate.HasNestedTypes}, value={candidate.IsValueType}.");
@@ -309,7 +317,7 @@ static class LibraryImplementation
 
     public static bool SameType(TypeReference left, TypeReference right)
     {
-        if (ReaderBindings.SameType(left, right) || FileSystemBindings.SameType(left, right) || StorageItemBindings.SameType(left, right) || StorageProviderBindings.SameType(left, right) || PathBindings.SameType(left, right) || StreamBindings.SameType(left, right) || SocketBindings.SameType(left, right) || WorkerBindings.SameType(left, right) || AsyncBindings.SameType(left, right) || TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right)) return true;
+        if (HttpBindings.SameType(left, right) || ReaderBindings.SameType(left, right) || FileSystemBindings.SameType(left, right) || StorageItemBindings.SameType(left, right) || StorageProviderBindings.SameType(left, right) || PathBindings.SameType(left, right) || StreamBindings.SameType(left, right) || SocketBindings.SameType(left, right) || WorkerBindings.SameType(left, right) || AsyncBindings.SameType(left, right) || TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right)) return true;
         if (left is ByReferenceType lb)
             return right is ByReferenceType rb && SameType(lb.ElementType, rb.ElementType);
         if (left is ArrayType la)

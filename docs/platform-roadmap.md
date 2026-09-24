@@ -45,6 +45,18 @@ checks plus a .NET comparison baseline. It is not a guest Socket API: Task deliv
 GC roots, operation cancellation and the runnable Raven/neoCLR echo remain open.
 Continue with that bridge, then TCP streams and HTTP. S4 has started, not completed.
 
+## HTTP client pipeline checkpoint — 2026-09-24
+
+The author asks for a provisional client following the proposal's request/response
+and content model, with handlers attaching behavior to the request/response pipeline.
+The [HTTP client sample](experiments/http-client/README.md) separates client,
+forwarding/fake handlers and socket transport. Keep those boundaries while testing a
+bounded GET/200 exchange and UTF-8 content; the provisional APIs now live under System.Web.Http with reference coverage.
+The [HTTP design](http-client-design.md) records .NET comparisons and remaining gates.
+Next add the author-selected HttpServer class and a text/JSON exchange between two
+applications, testing independent peers too. Keep transfer/request lifetime explicit. M1 remains incomplete; broad HTTP, TLS,
+retry policy and runtime suspension are not prerequisites for this controlled POC.
+
 ## Scheduling checkpoint before the public socket bridge — 2026-09-24
 
 The author asks that socket work account for runtime-owned async and reevaluate
@@ -812,7 +824,11 @@ No later major milestone has started.
 
 ## Working rules and immediate next step
 
-**Active next step, 2026-09-24:** build the bounded plain-HTTP request/response case.
+**Active next step, 2026-09-24:** complete client integration/validation, then add
+HttpServer and test it with the neoCLR client and an independent peer. The
+[HTTP sample](experiments/http-client/README.md) imports development System.Web.Http
+client, request/response/content and handler APIs; the bounded GET/200 client is the
+current checkpoint, not the completed web application milestone.
 [Address fallback](socket-api-design.md#address-sequence-connection-poc--2026-09-24)
 now accepts a Sequence of IPv4 addresses with a shared five-second connection budget,
 per-address progress limits and one owned native connection. DNS still has a separate
@@ -822,12 +838,16 @@ now uses Listen/Accept on the server and the hostname client on the other side. 
 Dns.GetHostAddresses with Task/Result and a read-only IPv4 address sequence over the
 [bounded resolver](socket-api-design.md#public-hostname-lookup-and-networking-poc--2026-09-24).
 Future author direction: introduce an IPAddress value object when the networking
-model is ready; consider HostEntry if richer lookup results become useful. See the
+model is ready; consider HostEntry if richer lookup results become useful. Also add
+a Uri value object later and evaluate the author's IPv4Address/IPv6Address union
+candidate, with explicit parsing, equality and normalization contracts. HttpClient()
+already selects the socket handler; add BaseAddress and relative request resolution
+after Uri, as directed by the author. See the
 [address model notes](socket-api-design.md#address-value-objects--future-direction-2026-09-24).
 These are not requirements to replace the current POC strings immediately.
 Bounded address fallback and its shared connection deadline now have an executable
 echo case; preserve these bounds when building the first HTTP client. Networking has its own feature page and homepage box;
-add a separate Web page and box when the HTTP POC works, as requested by the author.
+the integrated client now also has its own Web page and homepage box.
 The [public TCP client](experiments/socket-client/README.md) now has
 Connect/Send/Receive/Close and a Task/Result bridge over nonblocking transfers.
 Its compiled sample sends bytes and receives a host echo with collection while pending. Keep exact addressing/lifecycle choices provisional and maintain the API

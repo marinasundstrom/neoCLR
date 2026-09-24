@@ -2,8 +2,8 @@
 use neoclr::{Limits, LoadedProgram, assemble};
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args().collect();
-    if args.len() != 4 {
-        return Err("usage: measure_async APP.neoil System.neoil HEAP_LIMIT".into());
+    if !(4..=5).contains(&args.len()) {
+        return Err("usage: measure_async APP.neoil System.neoil HEAP_LIMIT [INSTRUCTION_LIMIT]".into());
     }
     let text = std::fs::read_to_string(&args[1])?;
     let system = assemble(&std::fs::read_to_string(&args[2])?).map_err(|e| e.to_string())?;
@@ -16,6 +16,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let execution = program
         .run(Limits {
             heap_objects: args[3].parse()?,
+            instructions: args
+                .get(4)
+                .map(|value| value.parse())
+                .transpose()?
+                .unwrap_or(Limits::default().instructions),
             ..Limits::default()
         })
         .map_err(|e| e.to_string())?;

@@ -654,3 +654,23 @@ compiled separate-process echo passes on local macOS: server 104 allocations,
 three collections, zero live objects; client 1,856 allocations, 43 collections,
 zero live objects. These are lifecycle checks, not throughput measurements or
 cross-platform release validation. No compiler semantics changed or SDK was released.
+
+
+## Uri and address-family values — author direction, 2026-09-24
+
+The author requests future Uri and IPAddress value objects, suggesting IPAddress as
+an IPv4Address/IPv6Address union. This is a candidate, not a settled representation
+or an instruction to interrupt HttpClient integration. Compare .NET 10's
+[IPAddress](https://learn.microsoft.com/en-us/dotnet/api/system.net.ipaddress?view=net-10.0)
+single-class model with explicit address-family variants. The union could make family
+matching and family-specific validation clearer, at the cost of another wrapper and
+exhaustive-case evolution. Decide immutable byte storage, equality/hash, mapped IPv4,
+IPv6 scope IDs, parsing and formatting together. Host names and ports remain separate;
+adding IPv6 values does not itself implement IPv6 sockets.
+
+Compare [.NET Uri](https://learn.microsoft.com/en-us/dotnet/api/system.uri?view=net-10.0)
+for parsing, components, comparison and relative/base resolution. A neoCLR value should
+separate syntactic validation from scheme-specific HTTP policy and define normalization,
+escaping and original-text preservation explicitly. Avoid imposing a typed value on
+all string-taking APIs; choose overloads from real cases, as with Path. Primary sources
+reviewed 2026-09-24. The current limited HTTP URL parser is not a general Uri contract.

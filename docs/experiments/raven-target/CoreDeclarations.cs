@@ -14,7 +14,7 @@ static class CoreDeclarations
             declarations = declarations.Replace("public static class Console {", "public static class Console { " + ProcessBindings.ConsoleDeclaration).Replace("public static class Math {",
                 "public static class Math { " + DoubleBindings.MathDeclarations + " public static Result<int, OverflowError> Abs(int value) => default; public static Result<int, InvalidRangeError> Clamp(int value, int min, int max) => default;")
                 + "public static class FaultFunctions { public static void Fault(string message) { } }" + UnionDeclarations.Source + DelegateBindings.Declarations + ProcessBindings.Declarations + CalendarBindings.Declarations + HashCodeBindings.Declarations + PathBindings.Declarations + FileBindings.Declarations + StorageItemBindings.Declarations + StreamBindings.Declarations + ReaderBindings.Declarations + StorageProviderBindings.Declarations + FileSystemBindings.Declarations + ResultBindings.Declarations;
-        if (collectionProbe) declarations += SocketBindings.Declarations + WorkerBindings.Declarations + TaskBindings.ForReference(libraryBootstrap) + Utf8Bindings.Declarations + UnicodeScalarBindings.Declarations + QueryBindings.Declarations + OutcomeOperatorBindings.Declarations + CollectionDeclarations.Source + ReflectionBindings.Declarations + ReflectionBindings.ProviderDeclarations + NativeMemoryBindings.Declaration + InterfaceBindings.Declarations;
+        if (collectionProbe) declarations += HttpBindings.Declarations + SocketBindings.Declarations + WorkerBindings.Declarations + TaskBindings.ForReference(libraryBootstrap) + Utf8Bindings.Declarations + UnicodeScalarBindings.Declarations + QueryBindings.Declarations + OutcomeOperatorBindings.Declarations + CollectionDeclarations.Source + ReflectionBindings.Declarations + ReflectionBindings.ProviderDeclarations + NativeMemoryBindings.Declaration + InterfaceBindings.Declarations;
         if (libraryBootstrap) declarations += RuntimeFailureBindings.Declarations + NativeAllocationBindings.Declarations + ParameterSnapshotBindings.Declarations + CheckedStorageBindings.Declarations + RuntimeServiceBindings.Declarations + ValueStorageBindings.Declarations;
         var source = Source.Replace("public struct Double { }", unionProbe ? DoubleBindings.Declarations : "public struct Double { }").Replace("public struct Int32 { }", unionProbe ? Int32Bindings.Declarations : "public struct Int32 { }").Replace("public sealed class String { }", StringBindings.Declarations(unionProbe, collectionProbe))
             .Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
@@ -60,7 +60,7 @@ static class CoreDeclarations
                     info.Methods.Add(factory);
                 }
             }
-            if (collectionProbe) { IntrospectionHierarchy.Project(module); TaskBindings.Project(module); WorkerBindings.Project(module); SocketBindings.Project(module); ReaderBindings.Project(module); }
+            if (collectionProbe) { IntrospectionHierarchy.Project(module); TaskBindings.Project(module); WorkerBindings.Project(module); SocketBindings.Project(module); HttpBindings.Project(module); ReaderBindings.Project(module); }
             StorageHierarchy.Project(module);
             NamespaceFunctions.ProjectMath(module);
             NamespaceFunctions.ProjectFault(module);

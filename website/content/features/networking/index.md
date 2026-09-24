@@ -94,13 +94,12 @@ up to 16 numeric IPv4 addresses, skip duplicates and try them in order within fi
 seconds. Pending attempts get at most one second while alternatives remain; the last
 gets the remaining time. The echo demo checks fallback and caller-list reuse.
 These provisional limits are not configurable and can reject slow connections.
-A small HTTP client and server will
-exercise requests, headers, responses and bodies, using
-Socket directly where useful. TLS is a separate requirement for HTTPS. TcpClient and
+An [development HTTP client](/features/web/) now exercises requests, headers,
+responses, UTF-8 bodies and handlers over Socket. A neoCLR HTTP responder remains
+next. TLS is a separate requirement for HTTPS. TcpClient and
 UdpClient may follow when a working case needs them.
 
-Web will have a separate feature page and homepage entry when its HTTP POC runs.
-The networking POC does not imply that HTTP or a web server is implemented.
+The HTTP experiment is a bounded client, not a complete HTTP stack or web server.
 
 ## Reference and participation
 

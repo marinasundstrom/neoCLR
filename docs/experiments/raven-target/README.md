@@ -1107,3 +1107,17 @@ Accept reuses the private connection completion/result bridge. AddressInUse and
 InvalidOperation extend SocketError. Rebuild core metadata, importer, library and
 runtime together. The two-process socket-echo sample checks the public surface;
 no compiler semantics or Runtime Contract settings change.
+
+
+### HTTP handler integration — 2026-09-24
+
+The [HTTP experiment](../http-client/README.md) uses async instance handlers. Generated
+states nested inside the handler may now access its private fields through the importer.
+`Probe --field-access-checks` covers own/nested/deep access, unrelated private access
+rejection and readonly-write restrictions. Rebuild the bridge; Runtime Contract
+settings and generated state-machine ABI are unchanged. System.Web.Http adds seven
+public reference types with exact importer bindings and Raven-authored bodies; match
+reference, bridge, generated library and runtime artifacts.
+The experiment documents source-defined Task-result admission, propagated field
+assignment and hoisted non-null Sequence issues with source-level workarounds; none
+is claimed fixed. General compiler candidates need independent .NET reproductions.

@@ -143,3 +143,10 @@ The socket guide documents full preflight validation, snapshot ownership, duplic
 removal and fixed shared/per-address connection deadlines. The native array service
 and completion helpers remain internal; matching reference/bridge/library/runtime
 artifacts are required. This does not supply a combined DNS/HTTP request deadline.
+
+
+System.Web.Http has generated coverage for HttpClient, HttpHandler, HttpSocketHandler,
+HttpRequest, HttpResponse, HttpContent and HttpHeader, including constructors and all
+public members. The bounded response parser and per-request continuation object are
+internal and excluded from the public inventory by visibility. The Web guide documents
+provisional string errors, body/ownership limits and missing transfer deadlines.

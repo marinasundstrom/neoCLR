@@ -193,13 +193,19 @@ static class ApplicationTypes
         && DescriptorLibrary.IsDescriptor(field.DeclaringType) ? field.Name[6..]
         : LibraryNames.ContainsKey(field.DeclaringType) && GenericUnionLibrary.IsCase(field.DeclaringType)
             ? "Value" : MetadataIdentity.MemberName(field.Name);
+    static bool IsWithinType(TypeDefinition caller, TypeDefinition owner)
+    {
+        for (var current = caller; current is not null; current = current.DeclaringType)
+            if (current == owner) return true;
+        return false;
+    }
     public sealed record FieldShape(string Owner, string Type, string Name, bool ValueOwner);
     public static FieldShape? Field(FieldReference reference, MethodDefinition caller, Func<TypeReference, bool, string> map)
     {
         var field = reference.Resolve();
         if (field is null || !Modules.Contains(field.Module)) return null;
         var owner = Type(reference.DeclaringType)!;
-        if (field.IsStatic || (!IsLibrary(field.DeclaringType) && reference.FullName != field.FullName) || (!field.IsPublic && caller.DeclaringType != field.DeclaringType && !(field.IsAssembly && field.Module == caller.Module)))
+        if (field.IsStatic || (!IsLibrary(field.DeclaringType) && reference.FullName != field.FullName) || (!field.IsPublic && !IsWithinType(caller.DeclaringType, field.DeclaringType) && !(field.IsAssembly && field.Module == caller.Module)))
             throw new InvalidDataException("Unsupported application field access.");
         if (IsLibrary(field.DeclaringType) && !LibraryImplementation.SameType(
             Close(reference.FieldType, reference.DeclaringType), Close(field.FieldType, reference.DeclaringType)))

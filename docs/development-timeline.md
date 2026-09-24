@@ -6547,3 +6547,68 @@ configuration/content, not target-specific code added to Raven main.
   makes the working checkout's reference fingerprints stale.
 - **Outcome:** all 930 remaining pages build and pass link/anchor checks. The local
   preview is refreshed; publication remains separate.
+
+### 2026-09-24 — Provisional HTTP client and handler pipeline
+
+- **Author:** asks that the rough HttpClient stay close to the envisioned proposal,
+  adapted from .NET, while remaining open to revision as encoding expands. Suggests
+  handlers for mocking, then clarifies: “Handlers allow us to attach behavior to the
+  client request-response pipeline.”
+- **Assistant:** implements application-local request/response/content contracts and
+  a small handler interface. Forwarding handlers observe before/after outcomes; a
+  fake substitutes transport, while the terminal handler uses DNS and sockets.
+- **Integration:** nested generated states exposed a private containing-field access
+  rejection. The importer now admits that valid access while retaining unrelated
+  private-field and readonly-write rejection checks. Other compiler observations
+  remain explicitly unresolved in the [sample](experiments/http-client/README.md).
+- **Open:** public API promotion, cancellation/deadlines, reusable handler ownership,
+  broader HTTP and the neoCLR responder. No retry/authentication implementation or
+  permanent handler base-class hierarchy is inferred from this direction.
+
+- **Subsequent author direction:** continue until a sample app and APIs are integrated
+  into neoCLR. Finish HttpClient first, then add HttpServer and test both together,
+  also using an independent server. Prefer lower-level/native facilities where useful;
+  the author subsequently confirms that implementing HTTP over the Socket API is OK.
+- **Assistant action:** promotes the bounded contracts into System.Web.Http and adds a
+  private continuation adapter over existing DNS/socket operations. No public scheduler
+  or state-machine API is introduced. HttpServer follows client validation; broader
+  protocol support and native-provider selection remain open.
+
+
+- **Validated outcome:** the integrated app passes 18 controlled-peer cases and an
+  independent Python HTTP server, with zero retained managed objects in every run.
+  The .NET 10 comparison passes. Seven public HTTP types have generated API coverage;
+  the combined website builds 961 pages and 17 website tests pass. HttpServer remains
+  the next author-selected slice; no release or publication is performed.
+
+### 2026-09-24 — Uri and IPAddress family values
+
+- **Author:** says Uri and IPAddress value objects will be needed; proposes that
+  IPAddress might be a union of IPv4Address and IPv6Address.
+- **Assistant:** records the union as a candidate alongside the earlier immutable
+  address direction, comparing .NET and identifying parsing, identity, mapped addresses
+  and scope handling as open questions. Keeps HTTP client/server work active and the
+  existing string inputs unchanged. No new value-object implementation is claimed.
+- **Evidence:** [address model notes](socket-api-design.md#uri-and-address-family-values--author-direction-2026-09-24).
+
+### 2026-09-24 — HTTP errors as nested union values
+
+- **Author:** asks what error union HttpClient.Get should return; suggests nested
+  union payloads and cautions against importing .NET's exact exception hierarchy.
+- **Assistant proposal:** distinguish invalid requests, transport causes, invalid
+  responses, unsupported features and resource limits. Consider a nested transport
+  union preserving resolver/socket causes and failure stage, while keeping HTTP
+  statuses as responses and text decoding at Content.ReadText. Compare provider-neutral
+  alternatives before requiring socket-shaped causes from all transports.
+- **Status:** [candidate recorded](http-client-design.md#error-unions--candidate-2026-09-24),
+  not implemented or author-approved as an exact case list. The integrated POC retains
+  explicitly provisional string errors. Timeout/cancellation alignment remains open.
+
+### 2026-09-24 — HttpClient conveniences after Uri
+
+- **Author:** asks to later match basic .NET HttpClient behavior, including a
+  parameterless constructor and BaseAddress; explicitly identifies Uri as a prerequisite.
+- **Assistant:** notes that HttpClient() already selects HttpSocketHandler in the
+  integrated POC. Records BaseAddress and relative-address resolution after a defined
+  Uri contract. BaseAddress is not implemented, and string concatenation is not selected
+  as a substitute. This does not interrupt the next minimal HttpServer slice.

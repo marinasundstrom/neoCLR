@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add provisional System.Web.Http client/handler APIs and a sample with bounded byte framing,
+  UTF-8 content, fake/forwarding handlers, a .NET comparison and 19 passing
+  client cases including an independent Python HTTP server. Add generated API
+  reference coverage and a Web feature page/homepage entry. Keep
+  contracts provisional; server and transfer deadlines remain
+  open. Admit nested callers accessing containing private fields in the importer,
+  with negative access/readonly checks. Allow an explicit instruction budget in the
+  trusted async fixture runner without changing runtime defaults. Record future Uri
+  and IPAddress value-object direction, BaseAddress after Uri and a candidate nested HTTP error model;
+  those types/unions are not implemented in this slice.
+
 - Exclude non-generic Array, Option, Result and TaskOutcome importer/exporter
   scaffolds and their CLR case carriers from API pages and navigation; retain
   generic APIs and the full metadata inventory with explicit, reasoned coverage exclusions.
