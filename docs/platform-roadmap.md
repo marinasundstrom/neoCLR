@@ -849,7 +849,8 @@ The empty-case bootstrap probe now matches a separate core reference and imports
 native library bodies with constructor checks preserved. Raven case/companion metadata
 is supported at the development bridge boundary only; it is not a runtime dependency
 or a standardized platform case map. Limit this work to enabling class-library source
-unions, then resume HttpError/BaseUri. Mixed erased-carrier defaults,
+unions, then resume HttpError/BaseUri. The bridge now also accepts the supplied core's shared
+IUnion interface without redeclaring it in each imported union. Mixed erased-carrier defaults,
 production reference/consumer integration and public API migration remain open.
 Handler/server cancellation ownership and public JSON contracts remain later work. The [JSON report](experiments/http-json/README.md) now passes between two
 neoCLR applications and independent peers; it does not promote a public JSON API. The

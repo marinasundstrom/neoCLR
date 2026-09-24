@@ -79,7 +79,7 @@ We retain that distinction rather than fabricate a valid legacy error case.
 
 Compiler-owned case machinery reduces handwritten library code; it requires explicit
 bridge support and validation. This slice does not cover generic or payload-bearing explicit-layout
-unions, equality synthesis, all IUnion interface calls or public runtime-library migration.
+unions, equality synthesis, general IUnion conversions or public runtime-library migration.
 Next, resolve the mixed-carrier boundary and production reference integration before shipping
 HttpError/BaseUri. Existing carriers are migration candidates, not an instruction
 to rewrite all working unions in one change.
@@ -127,16 +127,28 @@ to neoCLR's construction model without hand-authoring union constructors in Rave
 
 Validation covers both cases, unsuccessful extraction, a computed property, empty
 defaults, boxed-copy display after reassignment, and Value extraction. It reports
-three allocations and zero live objects after final collection. Eight independently
+three allocations and zero live objects after final collection. Nine independently
 altered reference contracts—case identity, return type, output mode, nonempty case,
-missing marker, missing case metadata, wrong case ordinal and unresolved case name—are rejected before producing an implementation artifact. The
+missing marker, missing case metadata, wrong case ordinal, unresolved case name and malformed protocol—are rejected before producing an implementation artifact. The
 existing instance-library regression, including its private `var` storage and five
 contract rejections, also passes.
 
-The fixture compiles against the existing core, so Raven supplies IUnion in the
-source assembly. The bootstrap currently requires that source protocol and a matching
-reference declaration. Making the production core own the protocol once, and admitting
-that core-owned reference during compilation, are explicit follow-up work.
+The first compilation uses the existing core, so Raven supplies IUnion in the
+source assembly. A second compilation uses the projected reference, which owns the
+interface. The bridge accepts that exact supplied-core identity, validates its public
+abstract Object-returning getter and imports the union without redeclaring the shared
+interface. The same native harness exercises both arrangements. A Raven application
+also boxes its source union as Object, casts that reference to IUnion and dispatches
+through the shared getter. Direct implicit union-to-IUnion assignment is rejected by
+the installed Raven SDK (RAV1504); that compiler conversion gap remains open.
+The application checks the returned case identity and reclaims both tracked allocations.
+
+This follows ordinary CLI interface ownership/dispatch rather than introducing a union
+opcode or requiring each library to synthesize a competing interface identity. The
+benefit is one shared contract for multiple library slices; the cost is another
+provisional compiler bridge mapping. The selected member shape remains Raven-driven,
+not a new platform case-mapping standard. Production core packaging still needs to
+supply that interface once and project each migrated union's reference metadata.
 
 No public core-library type has migrated yet. Production reference/catalog integration,
 application import/execution through production catalogs and API documentation must

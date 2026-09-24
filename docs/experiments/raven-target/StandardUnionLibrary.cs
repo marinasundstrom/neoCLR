@@ -4,6 +4,26 @@ using Mono.Cecil;
 // reference family must match; application namespaces alone never authorize aliasing.
 static class StandardUnionLibrary
 {
+    public const string ProtocolName = "System.Runtime.CompilerServices.IUnion";
+
+    // Provisional Raven bridge protocol; the VM only sees an ordinary interface.
+    public static string? ProtocolType(TypeReference type)
+    {
+        if (type.FullName != ProtocolName || !RuntimeSignatures.IsCore(type.Scope)) return null;
+        ValidateProtocol(type.Resolve() ?? throw new InvalidDataException("Missing standard union protocol."));
+        return ProtocolName;
+    }
+
+    static void ValidateProtocol(TypeDefinition candidate)
+    {
+        if (!candidate.IsPublic || !candidate.IsInterface || candidate.HasFields || candidate.HasInterfaces
+            || candidate.HasGenericParameters || candidate.Methods.Count != 1
+            || candidate.Methods[0] is not { Name: "get_Value", IsPublic: true, IsAbstract: true,
+                IsVirtual: true, HasThis: true, HasParameters: false, HasGenericParameters: false } getter
+            || getter.ReturnType.MetadataType != MetadataType.Object)
+            throw new InvalidDataException("Unsupported standard union protocol.");
+    }
+
     public static bool IsCandidate(TypeDefinition type) => type.IsExplicitLayout
         && type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute"
             && RuntimeSignatures.IsCore(a.AttributeType.Scope));
@@ -15,19 +35,18 @@ static class StandardUnionLibrary
             throw new InvalidDataException("Unsupported standard union library shape.");
         if (!RavenUnionMetadata.ValidateEmptyCases(source).SequenceEqual(RavenUnionMetadata.ValidateEmptyCases(reference)))
             throw new InvalidDataException("Raven union case metadata does not match reference contract.");
-        const string protocolName = "System.Runtime.CompilerServices.IUnion";
-        var protocol = source.Module.GetType(protocolName)
-            ?? throw new InvalidDataException("Standard union bootstrap requires its source protocol declaration.");
+        const string protocolName = ProtocolName;
+        var protocol = source.Interfaces.SingleOrDefault(i => i.InterfaceType.FullName == protocolName)?.InterfaceType.Resolve()
+            ?? throw new InvalidDataException("Missing standard union source protocol.");
         var contractProtocol = reference.Module.GetType(protocolName)
             ?? throw new InvalidDataException("Missing standard union reference protocol.");
-        foreach (var candidate in new[] { protocol, contractProtocol })
-            if (!candidate.IsPublic || !candidate.IsInterface || candidate.HasFields || candidate.HasInterfaces
-                || candidate.HasGenericParameters || candidate.Methods.Count != 1
-                || candidate.Methods[0] is not { Name: "get_Value", IsAbstract: true, HasThis: true, HasParameters: false } getter
-                || getter.ReturnType.MetadataType != MetadataType.Object)
-                throw new InvalidDataException("Unsupported standard union protocol.");
-        var sources = new[] { source, protocol }.Concat(source.NestedTypes).ToArray();
-        var contracts = new[] { reference, contractProtocol }.Concat(reference.NestedTypes).ToArray();
+        ValidateProtocol(protocol);
+        ValidateProtocol(contractProtocol);
+        var ownsProtocol = protocol.Module == source.Module;
+        if (!ownsProtocol && protocol != contractProtocol)
+            throw new InvalidDataException("Standard union protocol must belong to the supplied core reference.");
+        var sources = new[] { source }.Concat(ownsProtocol ? new[] { protocol } : []).Concat(source.NestedTypes).ToArray();
+        var contracts = new[] { reference }.Concat(ownsProtocol ? new[] { contractProtocol } : []).Concat(reference.NestedTypes).ToArray();
         var ownedNames = sources.Select(t => t.FullName).ToHashSet();
         string TypeKey(TypeReference type)
         {

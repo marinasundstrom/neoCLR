@@ -25,7 +25,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Preserve and validate Raven case metadata in the bootstrap reference fixture;
   check generic companion associations and separate consumer compilation. Keep
   Raven metadata in the development bridge, without a runtime dependency or a new
-  platform case-map convention.
+  platform case-map convention. Admit a validated core-owned IUnion protocol during
+  library import, without duplicating its declaration; retain the source-owned
+  bootstrap path and exercise shared-interface compilation and execution.
   Legacy erased SocketError
   nesting remains rejected by runtime verification. HttpError/BaseUri remain unimplemented.
 

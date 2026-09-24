@@ -11,10 +11,11 @@ static class InterfaceBindings
         public interface Closable<E> { Result<PropagationUnit,E> Close(); }
         """;
     static readonly HashSet<string> Contracts = new() { "System.Equatable", "System.Comparable", "System.Clonable", "System.Closable" };
-    public static bool IsInterface(string type) => (HttpBindings.IsContract(type) || ReaderBindings.IsContract(type) || type == "System.Clock" || StorageItemBindings.IsName(type) || StreamBindings.IsCapability(type) || StorageProviderBindings.IsName(type)) || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
+    public static bool IsInterface(string type) => type == StandardUnionLibrary.ProtocolName || (HttpBindings.IsContract(type) || ReaderBindings.IsContract(type) || type == "System.Clock" || StorageItemBindings.IsName(type) || StreamBindings.IsCapability(type) || StorageProviderBindings.IsName(type)) || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
     public static string? Type(TypeReference type, Func<TypeReference, string>? parameterMap = null)
     {
         if (!RuntimeSignatures.IsCore(type.Scope)) return null;
+        if (StandardUnionLibrary.ProtocolType(type) is { } protocol) return protocol;
         if ((HttpBindings.IsContract(type.FullName) || ReaderBindings.IsContract(type.FullName) || type.FullName == "System.Clock" || StorageItemBindings.IsName(type.FullName) || StreamBindings.IsCapability(type.FullName) || StorageProviderBindings.IsName(type.FullName)) && !type.IsValueType) return type.FullName;
         if (type.FullName == "System.Object") return "System.Object";
         if (type is not GenericInstanceType g || g.IsValueType || g.GenericArguments.Count != 1) return null;
@@ -37,6 +38,14 @@ static class InterfaceBindings
         var owner = Type(reference.DeclaringType);
         if (owner is null || !IsInterface(owner)) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? ReflectionBindings.Type(t) ?? GenericUnionBindings.Type(t));
+        if (owner == StandardUnionLibrary.ProtocolName)
+        {
+            if (!reference.HasThis || reference.Name != "get_Value" || args.Length != 0 || result != "System.Object"
+                || !definition.IsAbstract || !definition.IsVirtual || !definition.IsPublic)
+                throw new InvalidDataException("Unsupported standard union protocol member.");
+            return new(owner + "::get_Value", [owner], result,
+                Instruction: $"callvirt instance {owner}::get_Value()");
+        }
         var element = owner[(owner.IndexOf('<')+1)..^1];
         var name = owner[..owner.IndexOf('<')];
         var expected = name switch {

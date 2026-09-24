@@ -91,6 +91,9 @@ static class StandardUnionLibraryChecks
         switch (mutation)
         {
             case null: break;
+            case "wrong-protocol":
+                types["System.Runtime.CompilerServices.IUnion"].Methods.Single().ReturnType =
+                    Map(root.Methods.Single(m => m.Name == "get_IsHeader").ReturnType); break;
             case "wrong-case": carrier.NestedTypes[0].Name += "Changed"; break;
             case "wrong-return": carrier.Methods.Single(m => m.Name == "get_IsHeader").ReturnType = Map(
                 source.MainModule.GetType(owner).Methods.Single(m => m.Name == "ToString").ReturnType); break;
