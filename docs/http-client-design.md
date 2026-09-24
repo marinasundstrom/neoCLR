@@ -274,3 +274,10 @@ absolute-URL-only request factory. HttpError and BaseUri are the following integ
 slices. URI/URL encoding utilities are author-directed later work, not implicit
 escaping in Parse. Preserve the error-union comparisons above when selecting typed
 HTTP failures; do not turn every diagnostic message into an unrelated case.
+
+The author's subsequent direction makes standard Raven union syntax the default,
+including authored members. Establish that path before implementing HttpError; do
+not extend the manual carrier catalog by default. The
+[direct-union investigation](experiments/http-error-unions/README.md) compiles but
+records importer gaps; it is not a shipped HTTP error contract or a fixed physical
+ABI. Existing nested-error comparisons still guide the eventual public cases.

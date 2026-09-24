@@ -45,6 +45,9 @@
   statements across lines when that makes their contents easier to follow; there is
   no requirement to fit a complete block on one line.
 
+- Use standard Raven `union` declarations for class-library unions by default,
+  including unions with members. Manual carrier implementations are rare exceptions;
+  document the concrete constraint and when to revisit it.
 - Prefer union patterns or destructuring to extract case payloads, rather than
   case accessors such as GetSomeCase(). Use idiomatic case construction, such as
   Option<TypeInfo>.Some(owner) or Some(owner) when the target is known; avoid

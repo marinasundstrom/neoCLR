@@ -156,13 +156,35 @@ contract. neoCLR's own API choices may deliberately differ; document their meani
 and migration instead of silently reproducing .NET shapes or treating different
 spelling as an improvement.
 
+## Prefer standard union declarations
+
+Use Raven's standard `union` syntax for class-library unions by default. It supports
+payload-bearing cases, ordinary methods and computed properties; an authored
+`override ToString()` can provide domain-specific diagnostics. Keep case construction
+and pattern matching in source instead of hand-writing erased storage, constructors,
+predicates and checked accessors for each domain error family.
+
+Hand-authored carriers are rare exceptions. Record the concrete bootstrap or runtime
+constraint that requires one and the condition for removing it. Existing custom
+carriers are migration candidates, not templates for new APIs. An importer gap should
+first become a reduced compiler/bridge test; do not silently turn it into a permanent
+manual implementation requirement.
+
+Separate source authoring, the public member contract and physical storage. Using
+standard syntax does not commit neoCLR to the .NET ABI or a particular Raven lowering.
+Validate construction, extraction, inactive/default states, copying, boxing and GC
+for the target representation. Broader .NET comparisons inform that decision without
+requiring binary compatibility.
+
 ## Bootstrap exceptions and validation
 
 The current Option/Result carrier implementation is hand-authored to satisfy the
 compiler/runtime union metadata and storage contract. Its checked case accessors,
-TryGet methods, constructors and residual/output adapters remain necessary ABI
-plumbing. Replacing their implementation with patterns that call those same methods
-could create recursion. Ordinary callers and teaching samples should use patterns;
+TryGet methods, constructors and residual/output adapters are current bootstrap
+plumbing. Their continued need must be assessed as normal union emission becomes
+supported; this is not a permanent exemption from the standard-syntax policy.
+Replacing their implementation with patterns that call those same methods could
+create recursion. Ordinary callers and teaching samples should use patterns;
 removing the ABI is a separate compiler/runtime change, not this style cleanup.
 
 Likewise, case-payload mutability tests intentionally manipulate case values to

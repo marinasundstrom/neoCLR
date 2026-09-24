@@ -838,7 +838,11 @@ that budget. A configurable general timeout/token API is not yet selected.
 
 **Active next step, 2026-09-24 (author-directed):** finish Uri, HttpError and
 HttpClient.BaseUri with string/Uri request overloads. The initial managed Uri
-slice is implemented; typed HTTP errors and base-address request resolution follow.
+slice is implemented. Author direction now requires normal Raven union syntax for
+class-library unions by default, with documented rare manual exceptions. Establish
+target support for a standard-syntax HttpError before integrating typed HTTP errors
+and base-address request resolution; do not expand the manual carrier catalog as
+the default path.
 Handler/server cancellation ownership and public JSON contracts remain later work. The [JSON report](experiments/http-json/README.md) now passes between two
 neoCLR applications and independent peers; it does not promote a public JSON API. The
 [HTTP sample](experiments/http-client/README.md) imports development System.Web.Http

@@ -1,0 +1,20 @@
+import System.*
+import System.Networking.Sockets.*
+import HttpErrorProbe.*
+
+func Main() {
+    let failure: HttpError = HttpError.Transport(SocketError.ConnectionRefused())
+    if let HttpError.Transport(cause) = failure {
+        if !cause.IsConnectionRefused {
+            System.Fault("Wrong nested cause")
+        }
+    } else {
+        System.Fault("Wrong HTTP case")
+    }
+    if !failure.IsTransportFailure {
+        System.Fault("Union property failed")
+    }
+    Console.WriteLine(failure.ToString())
+    let input: HttpError = HttpError.InvalidRequest("Invalid request")
+    Console.WriteLine(input.ToString())
+}

@@ -1,0 +1,29 @@
+namespace HttpErrorProbe
+
+import System.*
+import System.Networking.Sockets.*
+
+public union HttpError {
+    case InvalidRequest(message: string)
+    case Transport(cause: SocketError)
+    case TimedOut
+
+    val IsTransportFailure: bool {
+        get {
+            if let Transport(_) = self {
+                return true
+            }
+            return false
+        }
+    }
+
+    override func ToString() -> string {
+        if let InvalidRequest(message) = self {
+            return message
+        }
+        if let Transport(cause) = self {
+            return cause.ToString()
+        }
+        return "TimedOut"
+    }
+}

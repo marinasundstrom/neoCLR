@@ -6736,3 +6736,27 @@ configuration/content, not target-specific code added to Raven main.
   contract are selected, and the current escaped-input parser contract is unchanged.
 - **Evidence:** [URI design](uri-design.md#later-encoding-utilities--author-direction-2026-09-24)
   and the platform roadmap. No encoding utility is implemented by this slice.
+
+### 2026-09-24 — Standard union syntax as the class-library default
+
+- **Author question:** asks whether custom union implementations have the desired
+  form, explicitly distinguishing that question from .NET binary compatibility.
+- **Author correction:** points out that standard union syntax supports members and
+  directs its use across the neoCLR class library, with manual contracts only rarely
+  when actually needed.
+- **Assistant action:** removes the uncommitted HttpError custom-carrier/payload
+  extension instead of making it the new template. Updates Raven conventions and
+  roadmap sequencing, and creates a direct union probe with payloads, a computed
+  property and an authored ToString. No runtime public API is changed by this probe.
+- **Findings:** current Raven compiles the source. The inspected CLI carrier has a
+  byte tag and typed case fields, plus IUnion/Value/HasValue/TryGetValue members;
+  it is not the same private storage as the existing System.Value-backed carriers.
+  Import first rejects a SocketError byref. A temporary narrow byref admission then
+  reaches a non-local initobj rejection; that diagnostic-only edit was reverted.
+- **Decision boundary:** prefer normal source syntax while evaluating the target
+  representation independently. The observed CLI layout is evidence, not approval
+  of a permanent ABI. Default/inactive state, copying, boxing and GC remain validation
+  requirements before normal union forms are used for the public HTTP contract.
+- **Evidence:** [direct union probe](experiments/http-error-unions/README.md).
+  HttpError/BaseUri integration remains pending. Existing custom carriers are not
+  migrated wholesale during this investigation.

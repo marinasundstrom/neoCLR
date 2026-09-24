@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Shape.cs" />
+    <Reference Include="Mono.Cecil"><HintPath>../raven-target/bin/Debug/net11.0/Mono.Cecil.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>

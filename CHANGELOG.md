@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Make standard Raven union declarations the class-library default, with documented
+  rare manual-contract exceptions. Add a direct HTTP-error union probe with members
+  and a CLI shape report; record current importer gaps instead of extending the
+  hand-authored carrier catalog. HttpError/BaseUri remain unimplemented.
+
 - Add managed System.Uri and UriError with strict escaped-ASCII parsing, string/Uri
   Resolve overloads and RFC 3986 relative resolution. Preserve lexical Text equality
   through Object and hashing; bracketed IP literals, IRI/IDNA and canonical resource
