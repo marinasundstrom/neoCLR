@@ -36,10 +36,16 @@ pub(crate) fn dispatch(
     let hashing = contract.name == "System.Object.GetHashCode"
         && contract.parameters.is_empty()
         && contract.returns == Type::Int32;
-    if !equality && !hashing {
+    let display = contract.name == "System.Object.ToString"
+        && contract.parameters.is_empty()
+        && contract.returns == Type::String;
+    if !equality && !hashing && !display {
         return Ok(None);
     }
     let value = primitive_value(object)?;
+    if display {
+        return Ok(Some(Value::String(value.display())));
+    }
     if hashing {
         return Ok(Some(Value::Int32(value.hash())));
     }
@@ -77,6 +83,14 @@ enum PrimitiveValue {
 }
 
 impl PrimitiveValue {
+    fn display(&self) -> String {
+        match *self {
+            Self::Int32(value) => value.to_string(),
+            Self::Int64(value) => value.to_string(),
+            Self::Boolean(value) => if value { "True" } else { "False" }.to_owned(),
+        }
+    }
+
     fn hash(&self) -> i32 {
         match *self {
             Self::Int32(value) => value,

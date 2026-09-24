@@ -24,7 +24,10 @@ The [display sample](/samples/object-display.zip) prints Plain, Named instance,
 Named instance and Named. The last line comes from an explicit base call, showing
 that bypassing the override still describes the concrete object.
 
-Virtual ToString dispatch for boxed values or intrinsic strings remains unsupported. Those calls fail; use typed formatting where available. It does
+Virtual ToString dispatch supports named structs with explicit overrides and boxed
+Int32, Int64 and Boolean values. Integers produce culture-independent decimal text;
+Boolean produces True or False, matching .NET spelling. Other primitive boxes and
+intrinsic strings remain unsupported; use typed formatting where available. It does
 not add Console.WriteLine(Object), serialization, culture/format overloads or string
 identity. GetType's existing string/boxed paths remain supported.
 
@@ -148,7 +151,8 @@ for true and 0 for false. Separate Boolean boxes retain distinct reference ident
 
 These are bounded interpreter intrinsics for the System library's exact Object slots.
 It does not add typed primitive GetHashCode members, general struct equality, nullable
-boxing, or primitive boxed ToString. Other primitive types still require
+boxing, or general primitive formatting. Int32, Int64 and Boolean boxed ToString
+use the bounded display contract above. Other primitive types still require
 explicit implementation. Named structs now dispatch their explicit overrides. System.Value is not involved in this dispatch.
 The [Object equality sample](/samples/object-equality.zip) demonstrates the behavior.
 

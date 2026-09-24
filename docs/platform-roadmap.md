@@ -737,7 +737,8 @@ with a checked Point/Rectangle sample and value-output deconstruction. Boxed Boo
 now joins Int32 for exact-type Object equality and hashing, with a checked flag sample.
 Boxed Int64 now also has full-width exact-type equality and a .NET-compatible hash;
 the [Int64 sample](experiments/int64-object/README.md) checks colliding Object map keys
-and collection. Other primitive Object implementations and generic struct components
+and collection. Boxed Int32/Int64/Boolean now also provide bounded Object display:
+culture-independent decimal integers and True/False. Other primitive Object implementations and generic struct components
 remain follow-ups.
 Nullable value types and their boxing behavior are not part of the current scope. Default reference fields now have a checked record case:
 null is preserved even for non-nullable declarations, and generated equality/hash/display

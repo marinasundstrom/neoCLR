@@ -162,7 +162,7 @@ items:
   - NeoCLR.CoreProbe
   namespace: System
   summary: Returns the concrete runtime type name for supported references, or display text from a class or boxed-struct override.
-  remarks: Development class-reference slice. Virtual calls select class overrides; explicit base calls use this fallback. Rootless nominal classes and arrays use the fallback. Null raises NullReference. Boxed named structs dispatch an explicit ToString override, including generated record-struct display. Boxed primitives without an implementation and intrinsic strings remain unsupported; use their typed formatting APIs. This is display text, not serialization or a stable identity.
+  remarks: Development class-reference slice. Virtual calls select class overrides; explicit base calls use this fallback. Rootless nominal classes and arrays use the fallback. Null raises NullReference. Boxed named structs dispatch an explicit ToString override, including generated record-struct display. Boxed Int32 and Int64 produce culture-independent decimal text; boxed Boolean produces True or False. Format strings and culture providers are not supported. Other boxed primitives and intrinsic strings remain unsupported; use their typed formatting APIs. This is display text, not serialization or a stable identity.
   example: []
   syntax:
     content: public virtual string ToString()

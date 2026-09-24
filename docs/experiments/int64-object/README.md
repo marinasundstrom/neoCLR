@@ -17,13 +17,16 @@ cargo test --test object_equality boxed_
 dotnet run --project docs/experiments/int64-object/dotnet/Baseline.csproj
 ```
 
-Validation on 2026-09-24: the Raven sample reclaimed all 827 allocations across
-18 collections (peak 64), with zero live objects on exit. The verifier checks exact
+Validation on 2026-09-24: the Raven sample reclaimed all 830 allocations across
+20 collections (peak 64), with zero live objects on exit. The verifier checks exact
 output, multiple collections and full reclamation.
 The .NET 10 baseline checks the same equality/hash rules at the numeric limits and
 for deliberate collisions. Native tests additionally verify copied unboxing after GC.
 
 This is an interpreter Object-slot intrinsic, not a new source-declared Int64 member.
-Boxed ToString, other primitive types and nullable value types are outside this slice.
+Object ToString now also checks copied Int64 text after GC, decimal Int32 output
+and Boolean True/False output. Integer formatting is culture-independent; no format
+strings or providers are supported. Other primitive types and nullable value types
+remain outside this slice.
 Hashes must not be stored as persistent identifiers. See the
 [Object model review](../../object-model-review.md) for the implementation comparison.

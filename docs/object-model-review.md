@@ -920,3 +920,30 @@ map collisions, copied boxing, exact types and collection. Native regressions co
 minimum/maximum values, upper-bit differences, deliberate hash collisions, copied
 unboxing and GC. A separate .NET 10 baseline verifies the compared equality/hash rules. The Raven
 fixture reclaims all 827 allocations across 18 collections (peak 64, zero live).
+
+
+### Boxed primitive display — 2026-09-24
+
+Object.ToString now uses the copied payload for Int32, Int64 and Boolean. Integers
+produce culture-independent decimal text (including numeric limits); Boolean uses
+True/False. The existing exact System.Object slot admission guard is reused. No
+source method, managed layout or compiler contract changes. Named struct overrides,
+class display and null-receiver faults retain their existing paths. String and other
+primitive boxes remain unsupported, rather than returning misleading type names.
+
+Primary comparison, reviewed 2026-09-24: .NET 10
+[Boolean.ToString](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Boolean.cs)
+uses True/False; [Int64.ToString](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Int64.cs)
+supports culture-aware number formatting and overloads. neoCLR deliberately provides
+only culture-independent decimal text here. That makes diagnostics predictable and
+reuses current integer formatting, but does not provide .NET localization or format
+providers. This is display text, not a serialization contract.
+
+An intrinsic is a bounded continuation of primitive Object equality/hash support;
+source-visible overrides and a general formatting API remain future alternatives.
+The native display matrix checks limits and both Boolean values; the Raven sample
+checks copied Int64 display before and after collection, plus Int32 and Boolean.
+The .NET baseline checks equivalent default output under its default culture.
+
+Validation: the Raven sample reclaims all 830 objects across 20 collections, with
+peak 64 and zero live objects. The API snapshot and combined website build pass.

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Support Object.ToString for boxed Int32, Int64 and Boolean: culture-independent
+  decimal integers and True/False text. Check integer limits and copied values
+  after GC, and update API/website documentation. Other primitive formatting,
+  format strings and culture providers remain unsupported.
+
 - Add boxed Int64 Object equality over the complete copied payload and a .NET-compatible
   lower/upper-half hash. Preserve exact-type comparisons and distinct box identity.
   Cover limits, deliberate hash collisions, Object-keyed maps and collection; boxed

@@ -68,7 +68,7 @@ fn null_object_display_reports_null_reference() {
 #[test]
 fn boxed_value_and_string_virtual_display_are_not_silently_type_names() {
     for body in [
-        "ldc.i4 42\nbox Int32",
+        "ldc.r8 42\nbox Double",
         "ldstr \"hello\"\ncastclass System.Object",
     ] {
         let fault = run(
@@ -112,9 +112,38 @@ fn rootless_object_default_remains_reachable_with_an_abstract_root() {
 fn nonvirtual_class_callvirt_has_one_reachable_implementation() {
     let app = neoclr::assemble(".module Calls\n.entry Main\n.type class Base\n.method instance Read() -> Int32\nldc.i4 42\nret\n.end\n.end\n.type class Child\n.extends Base\n.end\n.function Main() -> Int32\nnewobj Child\ncallvirt instance Base::Read()\nret\n.end").unwrap();
     let program = LoadedProgram::new(&app).unwrap();
-    let graph = program.analyze_reachability(
-        &[neoclr::assembler::parse_function_ref("Main()").unwrap()], 10
-    ).unwrap();
+    let graph = program
+        .analyze_reachability(
+            &[neoclr::assembler::parse_function_ref("Main()").unwrap()],
+            10,
+        )
+        .unwrap();
     assert_eq!(graph.functions.len(), 2);
     assert!(graph.functions.iter().any(|f| f.target.name == "Base.Read"));
+}
+
+#[test]
+fn boxed_primitive_display_preserves_full_integer_widths() {
+    let mut body = String::new();
+    for (literal, expected) in [
+        ("ldc.i4 -2147483648\nbox Int32", "-2147483648"),
+        ("ldc.i4 2147483647\nbox Int32", "2147483647"),
+        ("ldc.i4 0\nbox Int32", "0"),
+        (
+            "ldc.i8 -9223372036854775808\nbox Int64",
+            "-9223372036854775808",
+        ),
+        (
+            "ldc.i8 9223372036854775807\nbox Int64",
+            "9223372036854775807",
+        ),
+        ("ldc.i8 4294967297\nbox Int64", "4294967297"),
+        ("ldc.bool true\nbox Boolean", "True"),
+        ("ldc.bool false\nbox Boolean", "False"),
+    ] {
+        body.push_str(&format!("{literal}\ncallvirt instance System.Object::ToString()\nldstr \"{expected}\"\ncall neoCLR.Runtime.StringCompareOrdinal(String,String)\nbrtrue failed\n"));
+    }
+    body.push_str("ldstr \"passed\"\nret\nfailed:\nldstr \"failed\"");
+    let result = run(&body, "").unwrap();
+    assert_eq!(result.value, Value::String("passed".into()));
 }

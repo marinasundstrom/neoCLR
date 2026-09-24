@@ -24,6 +24,13 @@ func Main() {
     let one: Object = 1L
     Check(!one.Equals(1) && !one.Equals(true), "Equal numeric magnitude does not merge types")
 
+    Check(first.ToString() == "4294967297", "Copied Int64 display")
+    let integer: Object = 42
+    let enabled: Object = true
+    let disabled: Object = false
+    Check(integer.ToString() == "42", "Int32 Object display")
+    Check(enabled.ToString() == "True" && disabled.ToString() == "False", "Boolean Object display")
+
     let values = HashMap<Object, int>((left, right) => left.Equals(right), key => Hash(key))
     Check(values.TryAdd(first, 1) && !values.TryAdd(repeated, 2), "Repeated Int64 key")
     Check(values.TryAdd(colliding, 3), "Distinct colliding Int64 key")
@@ -40,5 +47,6 @@ func Main() {
         System.Fault("Int64 lookup failed after collection")
     }
     Check(first.Equals(repeated) && Hash(first) == 0, "Retained box remains unchanged")
+    Check(first.ToString() == "4294967297", "Display after collection")
     Console.WriteLine("Int64 Object equality, hash, collision handling and GC: passed")
 }
