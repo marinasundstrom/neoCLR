@@ -81,7 +81,7 @@ retaining its capacity slot. The VM remains able to dispatch other work.
 
 A pending TCP connect has a five-second deadline and releases its native socket on
 timeout. Delivery still requires scheduler progress. There is no public operation
-cancellation, automatic address fallback or shared DNS/connection deadline. The example
+cancellation or a shared DNS/connection deadline. The example
 controls its host and uses a verifier watchdog.
 Socket completion uses nonblocking polling; host lookup runs on bounded host threads.
 Generated Raven state machines still implement async execution. Runtime suspension
@@ -89,8 +89,12 @@ remains future work.
 
 ## Where we’re heading
 
-Two neoCLR programs can now exchange bytes. Next, address fallback under one shared
-connection deadline will prepare the HTTP case. A small HTTP client and server will
+Two neoCLR programs can now exchange bytes. Connect can also snapshot a sequence of
+up to 16 numeric IPv4 addresses, skip duplicates and try them in order within five
+seconds. Pending attempts get at most one second while alternatives remain; the last
+gets the remaining time. The echo demo checks fallback and caller-list reuse.
+These provisional limits are not configurable and can reject slow connections.
+A small HTTP client and server will
 exercise requests, headers, responses and bodies, using
 Socket directly where useful. TLS is a separate requirement for HTTPS. TcpClient and
 UdpClient may follow when a working case needs them.

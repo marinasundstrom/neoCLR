@@ -131,3 +131,10 @@ IsolatedWorkers. Result consumption requires NameResolution without TaskDispatch
 Socket listener coverage includes Listen, Accept, GetLocalPort, AddressInUse and
 InvalidOperation, with XML descriptions and generated member routes. The guide
 links the separate-process echo sample; private handles/completions remain hidden.
+
+
+Socket.Connect now includes a `Sequence<string>` overload with generated member coverage.
+The socket guide documents full preflight validation, snapshot ownership, duplicate
+removal and fixed shared/per-address connection deadlines. The native array service
+and completion helpers remain internal; matching reference/bridge/library/runtime
+artifacts are required. This does not supply a combined DNS/HTTP request deadline.

@@ -74,3 +74,12 @@ scheduler tests pass (25 total). The compiled hostname/echo sample reclaims all
 visibility checks pass. Ten website tests and the combined 572-page API/site build
 pass. Networking was inspected in the local browser. This is local macOS evidence,
 not cross-platform networking certification or a runtime release.
+
+
+The client now passes a `Sequence<string>` to Socket.Connect. For this controlled
+loopback POC it prepends 127.0.0.2, where the verifier has no listener, before the
+addresses returned for localhost. Connect snapshots the inputs; the sample overwrites
+the first entries afterwards and still reaches 127.0.0.1. All attempts share five
+seconds, with at most one second on an address while alternatives remain. DNS is
+separate. This demonstrates fallback and snapshot ownership, not configurable
+connection policy, IPv6 racing or a combined lookup/connection deadline.

@@ -63,9 +63,11 @@ async func ResolveHost() -> Task<Result<Sequence<string>, DnsError>> {
     return Ok(addresses)
 }
 
-async func ExchangeGreeting(address: string) -> Task<Result<int, SocketError>> {
+async func ExchangeGreeting(addresses: Sequence<string>) -> Task<Result<int, SocketError>> {
     // The verifier substitutes the host's ephemeral loopback port.
-    let socket = await Socket.Connect(address, 19090)?
+    let pending = Socket.Connect(addresses, 19090)
+    Churn()
+    let socket = await pending?
     let result = await Exchange(socket)
     socket.Close()
     socket.Close()
@@ -84,8 +86,19 @@ async func ExchangeGreeting(address: string) -> Task<Result<int, SocketError>> {
     return result
 }
 
-func StartExchange(address: string) {
-    let greeting = ExchangeGreeting(address)
+func StartExchange(addresses: Sequence<string>) {
+    // The controlled loopback demo deliberately tries an address with no listener first.
+    let candidates = ArrayList<string>()
+    candidates.Add("127.0.0.2")
+    var index = 0
+    while index < addresses.Count {
+        candidates.Add(addresses[index])
+        index += 1
+    }
+    let greeting = ExchangeGreeting(candidates)
+    // Connect already owns the address snapshot; caller reuse is safe.
+    candidates[0] = "not an address"
+    candidates[1] = "not an address"
     greeting.OnCompleted(() => {
         if let Ok(count) = greeting.GetResult() {
             Check(count == 2)
@@ -97,6 +110,18 @@ func StartExchange(address: string) {
 }
 
 func Main() {
+    let empty = ArrayList<string>()
+    if let Error(error) = Socket.Connect(empty, 19090).GetResult() {
+        Check(error.IsInvalidRange)
+    } else {
+        System.Fault("Empty address sequence admitted")
+    }
+    let invalid: Sequence<string> = ["127.0.0.1", "bad address"]
+    if let Error(error) = Socket.Connect(invalid, 19090).GetResult() {
+        Check(error.IsInvalidAddress)
+    } else {
+        System.Fault("Malformed address sequence admitted")
+    }
     if let Error(error) = Dns.GetHostAddresses("bad name").GetResult() {
         Check(error.IsInvalidName)
     } else {
@@ -108,7 +133,7 @@ func Main() {
         if let Ok(addresses) = lookup.GetResult() {
             Check(addresses.Count > 0)
             Console.WriteLine("Resolved localhost")
-            StartExchange(addresses[0])
+            StartExchange(addresses)
         } else {
             System.Fault("Hostname lookup failed")
         }

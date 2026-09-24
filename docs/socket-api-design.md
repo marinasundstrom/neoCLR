@@ -592,3 +592,65 @@ runtime-service and five VM socket checks). The API snapshot validates, the comb
 website builds with 955 RavenDoc pages checked, and all 15 website tests pass. No
 compiler/library signature changed, so the existing matching reference assembly is
 retained and its XML snapshot refreshed. No SDK or website publication was performed.
+
+
+## Address-sequence connection POC — 2026-09-24
+
+`Socket.Connect(addresses: Sequence<string>, port: int)` now snapshots 1–16 numeric
+IPv4 entries synchronously, validates the complete input and skips duplicate
+endpoints in input order. Empty input returns InvalidRange; an oversized sequence
+returns LimitExceeded; malformed entries return InvalidAddress. A sequence must be
+stable during its synchronous read; subsequent changes do not affect the operation.
+Only parsed native IPv4 endpoints are retained, not guest strings or the source list.
+
+One operation/socket reservation and one absolute five-second monotonic deadline
+cover all attempts after native admission. While alternatives remain, each pending
+attempt gets at most one second; the last may use the remaining budget. Refusal or
+another native failure advances immediately on observation. The previous stream is
+dropped before opening its replacement. Exhaustion returns the last attempt error;
+overall expiry returns TimedOut without starting another address. Already committed
+success wins and releases untried candidates. Accept and existing byte transfers
+are unchanged. Owner scheduling is still required for progress and deadline delivery.
+
+This refines the previous plan to hide fallback entirely in a client adapter: the
+working case directly consumes the sequence returned by Dns.GetHostAddresses, so a
+small Socket overload is useful before HTTP exists. Timing, retries and operation
+handles remain private. No public scheduler, endpoint object or retry-policy type is
+introduced. The runtime adapter remains compatible with future suspension ownership;
+it does not require the public Task to expose its generated state machine.
+
+Comparison reuses the .NET 10 ConnectAsync address-list/cancellation contract linked
+above. Sequential address attempts and one connection result are familiar behavior;
+neoCLR uses its read-only Sequence contract and typed Result errors. The provisional
+fixed total/per-address bounds favor a controlled demo, can abandon a slow usable
+address, and cannot be tuned or cancelled individually. Parallel address racing may
+reduce latency but costs concurrent connections, cleanup races and more quota policy;
+it remains unselected. The existing Tokio/nonblocking ownership comparison still
+applies. No portability or performance improvement over .NET is claimed.
+
+DNS remains a separate five-second operation. This completes the bounded
+**connection-attempt** fallback case, not a single DNS/TCP/HTTP request deadline.
+HTTP must define request/header/body limits and phase deadlines explicitly. IPv6,
+TLS authentication, richer diagnostic errors and IPAddress/HostEntry stay separate.
+
+The echo client deliberately prepends 127.0.0.2 to the localhost results, then
+reuses its mutable source list after Connect returns. The verifier's listener is on
+127.0.0.1. Success demonstrates fallback and snapshot ownership under forced GC.
+Controlled-clock backend checks cover per-address expiry, no extension of the total
+deadline, total expiry before another native connect, full preflight validation,
+duplicate removal and failed-attempt cleanup.
+
+Target integration adds a checked private SocketConnectAddresses array/callback
+service and a Sequence overload in the compiler reference/importer. Runtime Contract
+configuration, compiler semantics and state-machine emission are unchanged. Refresh
+the reference, bridge, generated library and runtime together; this is not a new
+compiler capability or an SDK release.
+
+
+Validation: all 43 focused Rust checks pass (25 socket backend, nine scheduler,
+nine runtime-service). The regenerated library snapshot matches its sources; the
+combined website checks 955 RavenDoc pages and all 15 website tests pass. The
+compiled separate-process echo passes on local macOS: server 104 allocations,
+three collections, zero live objects; client 1,856 allocations, 43 collections,
+zero live objects. These are lifecycle checks, not throughput measurements or
+cross-platform release validation. No compiler semantics changed or SDK was released.

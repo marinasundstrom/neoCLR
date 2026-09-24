@@ -812,11 +812,12 @@ No later major milestone has started.
 
 ## Working rules and immediate next step
 
-**Active next step, 2026-09-24:** add address fallback under one shared connection
-deadline for the first HTTP client. Pending numeric-address connects now have a
-[provisional five-second bound](socket-api-design.md#pending-connect-deadline--2026-09-24),
-including owner-observed expiry, native socket cleanup and once-only result delivery.
-This per-attempt guard does not complete the overall DNS/fallback deadline gate. The [two-process echo](experiments/socket-echo/README.md)
+**Active next step, 2026-09-24:** build the bounded plain-HTTP request/response case.
+[Address fallback](socket-api-design.md#address-sequence-connection-poc--2026-09-24)
+now accepts a Sequence of IPv4 addresses with a shared five-second connection budget,
+per-address progress limits and one owned native connection. DNS still has a separate
+five-second deadline. The HTTP case must establish header/body bounds and phase
+limits; a combined lookup/TCP/HTTP request deadline is not implemented. The [two-process echo](experiments/socket-echo/README.md)
 now uses Listen/Accept on the server and the hostname client on the other side. The [hostname client](experiments/socket-client/README.md) now uses public
 Dns.GetHostAddresses with Task/Result and a read-only IPv4 address sequence over the
 [bounded resolver](socket-api-design.md#public-hostname-lookup-and-networking-poc--2026-09-24).
@@ -824,8 +825,8 @@ Future author direction: introduce an IPAddress value object when the networking
 model is ready; consider HostEntry if richer lookup results become useful. See the
 [address model notes](socket-api-design.md#address-value-objects--future-direction-2026-09-24).
 These are not requirements to replace the current POC strings immediately.
-Keep bounded address fallback and an overall connection deadline as gates before
-broader HTTP client use. Networking has its own feature page and homepage box;
+Bounded address fallback and its shared connection deadline now have an executable
+echo case; preserve these bounds when building the first HTTP client. Networking has its own feature page and homepage box;
 add a separate Web page and box when the HTTP POC works, as requested by the author.
 The [public TCP client](experiments/socket-client/README.md) now has
 Connect/Send/Receive/Close and a Task/Result bridge over nonblocking transfers.

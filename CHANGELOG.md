@@ -8,16 +8,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add Socket.Connect(Sequence<string>, port) with synchronous input snapshotting,
+  full validation, duplicate removal and ordered IPv4 fallback. All attempts share
+  five seconds; pending attempts get at most one second while alternatives remain.
+  Extend the Raven echo POC to exercise fallback and caller-list reuse under GC.
+  Refresh matching bridge/library/API artifacts. DNS remains separately bounded;
+  fixed connection limits are provisional, with no configurable retry policy. Expiry
+  closes the native socket and returns TimedOut; committed outcomes survive delayed
+  delivery. The single-address overload shares the five-second bound. Accept and
+  transfers retain their existing behavior.
+
 - Restore Google Analytics measurement ID `G-SVXYRRCEEK` across authored and
   generated API pages through RavenDoc configuration, after the website migration
   dropped the previous tag. Update the pinned upstream publisher.
-
-- Bound pending numeric TCP connects to five seconds from native admission. Expiry
-  closes the native socket and returns SocketError.TimedOut; outcomes already committed
-  survive delayed delivery. Accept and transfers keep their existing behavior. Update
-  API/website documentation and deterministic lifecycle tests. This provisional fixed
-  timeout can reject slower connections; a shared deadline and address fallback remain
-  the next slice.
 
 - Enable RavenDoc flat namespace navigation for the neoCLR API Browser, with
   full namespace names as peers and expandable type groups. Update the pinned

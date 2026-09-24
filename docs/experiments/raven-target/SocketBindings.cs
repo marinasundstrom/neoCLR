@@ -25,6 +25,7 @@ static class SocketBindings
             public sealed class Socket {
                 public Socket(long handle) { }
                 public static Tasks.Task<Result<Socket, SocketError>> Connect(string address, int port) => default;
+                public static Tasks.Task<Result<Socket, SocketError>> Connect(Collections.Sequence<string> addresses, int port) => default;
                 public Tasks.Task<Result<int, SocketError>> Receive(byte[] buffer, int offset, int count) => default;
                 public Tasks.Task<Result<int, SocketError>> Send(byte[] buffer, int offset, int count) => default;
                 public static Result<Socket, SocketError> Listen(string address, int port, int backlog) => default;
@@ -36,6 +37,7 @@ static class SocketBindings
             public sealed class SocketConnectCompletion {
                 public SocketConnectCompletion(Tasks.Promise<Result<Socket, SocketError>> source) { }
                 public void Start(string address, int port) { }
+                public void StartAddresses(Collections.Sequence<string> addresses, int port) { }
                 public void StartAccept(long handle) { }
                 public void Complete() { }
             }
@@ -70,6 +72,8 @@ static class SocketBindings
             (Socket, "Accept") => ("", $"System.Tasks.Task<System.Result<{Socket},{Error}>>", false),
             (Socket, "GetLocalPort") => ("", $"System.Result<Int32,{Error}>", false),
             (Prefix + "SocketConnectCompletion", "StartAccept") when library => ("Int64", "noresult", false),
+            (Socket, "Connect") when args[0] == "System.Collections.Sequence<String>" => ("System.Collections.Sequence<String>,Int32", $"System.Tasks.Task<System.Result<{Socket},{Error}>>", true),
+            (Prefix + "SocketConnectCompletion", "StartAddresses") when library => ("System.Collections.Sequence<String>,Int32", "noresult", false),
             (Socket, "Connect") => ("String,Int32", $"System.Tasks.Task<System.Result<{Socket},{Error}>>", true),
             (Socket, "Receive" or "Send") => ("arrayref<Byte>,Int32,Int32", $"System.Tasks.Task<System.Result<Int32,{Error}>>", false),
             (Socket, "Close") => ("", "noresult", false),

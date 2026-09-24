@@ -10,6 +10,7 @@ This remains a provisional subset of a complete Socket API.
 | Operation | Result | Behavior |
 | --- | --- | --- |
 | `Socket.Connect(address, port)` | `Task<Result<Socket, SocketError>>` | Connect to a numeric IPv4 address and port 1–65535. Resolve hostnames separately with Dns.GetHostAddresses. |
+| `Socket.Connect(addresses, port)` | `Task<Result<Socket, SocketError>>` | Snapshot 1–16 numeric IPv4 addresses from `Sequence<string>` and try distinct addresses in order under one five-second deadline. |
 | `socket.Receive(buffer, offset, count)` | `Task<Result<int, SocketError>>` | Receive up to count bytes; short reads are normal. |
 | `socket.Send(buffer, offset, count)` | `Task<Result<int, SocketError>>` | Send from a snapshot of the range; loop on short writes. |
 | `Socket.Listen(address, port, backlog)` | `Result<Socket, SocketError>` | Bind and listen; port zero selects an available local port. |
@@ -20,14 +21,14 @@ This remains a provisional subset of a complete Socket API.
 The [tested echo client](/samples/socket-client/Main.rvn) uses both await and `?`:
 
 ```raven
-let socket = await Socket.Connect(address, 19090)?
+let socket = await Socket.Connect(addresses, 19090)?
 let result = await Exchange(socket)
 socket.Close()
 return result
 ```
 
 The enclosing function returns `Task<Result<int, SocketError>>`. `?` propagates a
-connection error. Here address is a numeric address returned by
+connection error. Here addresses is a sequence of numeric addresses returned by
 [Dns.GetHostAddresses](xref:System.Networking.Dns). Exchange sends the greeting and handles short writes and reads and returns its outcome before
 the caller closes the socket, so a recoverable receive error also reaches Close.
 The [complete sample and verifier](/samples/socket-client.zip) run against a
@@ -73,7 +74,20 @@ later delivery. The timeout releases socket capacity immediately; the outcome re
 its operation slot until consumed. This bounds native waiting, not arbitrary guest
 work or callback delivery: the owner must continue scheduling. Host invocation
 cancellation remains available. Accept, Send and Receive have no operation deadline.
-The timeout is not configurable and does not cover DNS or multiple address attempts.
+The timeout is not configurable and does not cover DNS lookup. The sequence overload
+shares it across all connection attempts. While alternatives remain, a pending attempt
+gets at most one second; the final address gets the remaining time. Failed attempts
+release their native socket before trying another. If all fail, the last error is
+returned. Overall expiry returns TimedOut. A committed success ends the search.
+
+The sequence must remain stable while Connect reads Count and its indexed values.
+It is snapshotted before Connect returns; later mutation is safe. All entries are
+validated before network activity. Empty input returns InvalidRange; more than 16
+entries returns LimitExceeded even if duplicates would reduce the count. Invalid
+numeric addresses return InvalidAddress. Valid duplicates are skipped in input order.
+Custom sequence code is not bounded by the native deadline. These fixed time limits
+are useful for the controlled demo but can reject slow connections; this is not a
+configurable production connection policy.
 
 Connect, Send and Receive use nonblocking sockets polled by the private scheduler. No
 thread is created for each operation. Pending receive buffers and completion objects remain
@@ -101,7 +115,7 @@ result without another suspension; the general hoisted-Result case remains open.
 
 
 Host-backed hostname resolution is available through Dns.GetHostAddresses.
-Planned next: address fallback under one overall connection deadline and an HTTP request/response client using
+Planned next: an HTTP request/response client using
 Socket directly; TcpClient and UdpClient are not required for it. The HTTP
 prototype will include headers, status and byte bodies with explicit message framing.
 The first controlled demo uses plain HTTP; HTTPS needs a separate TLS implementation.

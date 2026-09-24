@@ -17,6 +17,7 @@ static class RuntimeServiceBindings
             ("SocketAccept", ["Int64", "System.Func<Void>"], "Value"),
             ("SocketLocalPort", ["Int64"], "Value"),
             ("SocketConnect", ["String", "Int32", "System.Func<Void>"], "Value"),
+            ("SocketConnectAddresses", ["arrayref<String>", "Int32", "System.Func<Void>"], "Value"),
             ("SocketConnectResult", ["Int64"], "Value"),
             ("SocketReceive", ["Int64", "arrayref<Byte>", "Int32", "Int32", "System.Func<Void>"], "Value"),
             ("SocketSend", ["Int64", "arrayref<Byte>", "Int32", "Int32", "System.Func<Void>"], "Value"),

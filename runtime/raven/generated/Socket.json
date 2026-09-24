@@ -5,7 +5,7 @@
     "runtime/raven/src/System/Networking/DnsError.rvn": "652823f199e6d95b14518917d27306ac83c97d7bac1ee2f62578bb224b3b1d3c",
     "runtime/raven/src/System/Networking/Dns.rvn": "d64bfe87d3ed679bf3fbb26efe9b86fcc6e832358319c4ff23d46c7d3a55ba21",
     "runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "908aedf618e5cc664268b2769910543c60bc5fe00642b687e6f6e4af9333adc9",
-    "runtime/raven/src/System/Networking/Sockets/Socket.rvn": "a8b2f688042966ffb8965be780607b5bcda57c59326ddff0bafccf4d4c58e4df",
+    "runtime/raven/src/System/Networking/Sockets/Socket.rvn": "4085552ccb184d82c0218102a515df7971e0052a43c062e2dbae36a0df208cce",
     "runtime/raven/src/System/IO/TextReadError.rvn": "bd5cc31983f8aaa1b7e4a68fe63d06e45166e8a3c0c9537673a1ebab09d3659c",
     "runtime/raven/src/System/IO/TextReader.rvn": "6f9f6159741cec9acaded9e5b2705d3c1beaac4fa3fbb1be8a2146f18f575ce0",
     "runtime/raven/src/System/IO/TextWriter.rvn": "ee053d0893f533207e580eba37509aca9284dd0c37d13dff1941a2485b506fec",
@@ -113,13 +113,14 @@
     "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
-    "Socket.methods.neoil": "779844b4b543fbc5717aef452fada3dee6e86f4a4886fd74b15c420ac70afc06",
-    "Socket.helpers.neoil": "10b58995fab767554cfeabb10c452259a72ac10e4e029e51ee2185e57ca48cab"
+    "Socket.methods.neoil": "c34fc91be0775c39a0bee88442df30b1aa6dea27a50fd6eacf1eaea901b92e4d",
+    "Socket.helpers.neoil": "eda85e120f25d4968e6b23a3b4c36fa9ebfb048423640d1f71d5b5ed27c7810b"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "2ab3137639cfa8df1b19b60e195f794efc9808db392940bae8c32c3aab734457",
+  "coreSha256": "166c3612e046421dd332dfc28952050aefb637a4c6ae30e3eb59279090edcc3f",
   "exports": [
     "Connect(String address,Int32 port) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>",
+    "Connect(System.Collections.Sequence<String> addresses,Int32 port) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>",
     "Listen(String address,Int32 port,Int32 backlog) -> System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>",
     "Accept() -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>",
     "GetLocalPort() -> System.Result<Int32,System.Networking.Sockets.SocketError>",

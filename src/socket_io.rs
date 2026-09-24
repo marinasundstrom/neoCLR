@@ -1,15 +1,17 @@
 //! Private owned TCP client backend behind the library Task/Result bridge.
 use crate::{Fault, ManagedHeap, Value, metadata::Type};
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, VecDeque},
     io::{self, Read, Write},
     net::{Ipv4Addr, SocketAddrV4, TcpListener, TcpStream},
     sync::atomic::{AtomicU64, Ordering},
     time::{Duration, Instant},
 };
 
-// Provisional per-attempt bound; a multi-address operation needs a shared deadline.
+// Provisional shared connection budget; DNS remains a separate operation.
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(5);
+const ADDRESS_TIMEOUT: Duration = Duration::from_secs(1);
+const MAX_ADDRESSES: usize = 16;
 
 static NEXT_ID: AtomicU64 = AtomicU64::new(1);
 fn next_id() -> Result<u64, Error> {
@@ -71,6 +73,8 @@ fn connecting(error: &io::Error) -> bool {
 }
 struct Connect {
     deadline: Option<Instant>,
+    attempt_deadline: Option<Instant>,
+    remaining: VecDeque<SocketAddrV4>,
     listener: Option<SocketId>,
     stream: Option<TcpStream>,
     callback: Option<Value>,
@@ -82,6 +86,7 @@ pub(crate) enum Operation {
     Accept,
     LocalPort,
     Connect,
+    ConnectAddresses,
     ConnectResult,
     Receive,
     Send,
@@ -232,6 +237,8 @@ impl Sockets {
         self.connects.insert(
             id,
             Connect {
+                attempt_deadline: None,
+                remaining: VecDeque::new(),
                 deadline: None,
                 listener: Some(listener),
                 stream: None,
@@ -242,13 +249,34 @@ impl Sockets {
         Ok(id)
     }
     fn connect(&mut self, address: &str, port: i32, callback: Value) -> Result<OperationId, Error> {
-        let address = address
-            .parse::<Ipv4Addr>()
-            .map_err(|_| Error::InvalidAddress)?;
+        self.connect_addresses(&[address], port, callback)
+    }
+    fn connect_addresses(
+        &mut self,
+        addresses: &[&str],
+        port: i32,
+        callback: Value,
+    ) -> Result<OperationId, Error> {
+        if addresses.is_empty() {
+            return Err(Error::InvalidRange);
+        }
+        if addresses.len() > MAX_ADDRESSES {
+            return Err(Error::Limit);
+        }
         let port = u16::try_from(port)
             .ok()
             .filter(|port| *port != 0)
             .ok_or(Error::InvalidRange)?;
+        let mut remaining = VecDeque::new();
+        for address in addresses {
+            let address = address
+                .parse::<Ipv4Addr>()
+                .map_err(|_| Error::InvalidAddress)?;
+            let endpoint = SocketAddrV4::new(address, port);
+            if !remaining.contains(&endpoint) {
+                remaining.push_back(endpoint);
+            }
+        }
         if !matches!(&callback, Value::Delegate(_))
             || callback.ty() != crate::assembler::parse_type("System.Func<Void>").unwrap()
         {
@@ -259,51 +287,102 @@ impl Sockets {
         {
             return Err(Error::Limit);
         }
-        let deadline = Instant::now() + CONNECT_TIMEOUT;
+        let now = Instant::now();
         let id = OperationId(next_id()?);
-        let socket = socket2::Socket::new(
-            socket2::Domain::IPV4,
-            socket2::Type::STREAM,
-            Some(socket2::Protocol::TCP),
-        )
-        .map_err(Error::from)?;
-        socket.set_nonblocking(true).map_err(Error::from)?;
-        let outcome = match socket.connect(&SocketAddrV4::new(address, port).into()) {
-            Ok(()) => {
-                let socket_id = SocketId(next_id()?);
-                self.sockets.insert(socket_id, socket.into());
-                self.connects.insert(
-                    id,
-                    Connect {
-                        deadline: Some(deadline),
-                        listener: None,
-                        stream: None,
-                        callback: Some(callback),
-                        outcome: Some(Ok(socket_id)),
-                    },
-                );
-                return Ok(id);
-            }
-            Err(error) if connecting(&error) => None,
-            Err(error) => Some(Err(Error::from(error))),
+        let mut op = Connect {
+            deadline: Some(now + CONNECT_TIMEOUT),
+            attempt_deadline: None,
+            remaining,
+            listener: None,
+            stream: None,
+            callback: Some(callback),
+            outcome: None,
         };
-        let stream = if outcome.is_none() {
-            Some(socket.into())
-        } else {
-            None
-        };
-        self.connects.insert(
-            id,
-            Connect {
-                deadline: Some(deadline),
-                listener: None,
-                stream,
-                callback: Some(callback),
-                outcome,
-            },
-        );
+        Self::start_next_address(&mut op, &mut self.sockets, now);
+        self.connects.insert(id, op);
         Ok(id)
     }
+    fn start_next_address(
+        op: &mut Connect,
+        sockets: &mut BTreeMap<SocketId, TcpStream>,
+        now: Instant,
+    ) {
+        // Every retry drops the previous native owner before opening another one.
+        op.stream = None;
+        while let Some(address) = op.remaining.pop_front() {
+            let attempt = (|| {
+                let socket = socket2::Socket::new(
+                    socket2::Domain::IPV4,
+                    socket2::Type::STREAM,
+                    Some(socket2::Protocol::TCP),
+                )?;
+                socket.set_nonblocking(true)?;
+                match socket.connect(&address.into()) {
+                    Ok(()) => Ok((socket.into(), true)),
+                    Err(error) if connecting(&error) => Ok((socket.into(), false)),
+                    Err(error) => Err(error),
+                }
+            })();
+            match attempt {
+                Ok((stream, true)) => {
+                    op.outcome = Some(next_id().map(|id| {
+                        let id = SocketId(id);
+                        sockets.insert(id, stream);
+                        id
+                    }));
+                    op.remaining.clear();
+                    return;
+                }
+                Ok((stream, false)) => {
+                    op.stream = Some(stream);
+                    let deadline = op.deadline.expect("connect has deadline");
+                    op.attempt_deadline = Some(if op.remaining.is_empty() {
+                        deadline
+                    } else {
+                        deadline.min(now + ADDRESS_TIMEOUT)
+                    });
+                    return;
+                }
+                Err(error) if op.remaining.is_empty() => {
+                    op.outcome = Some(Err(Error::from(error)));
+                    return;
+                }
+                Err(_) => {}
+            }
+        }
+    }
+    fn connect_array(
+        &mut self,
+        addresses: &Value,
+        port: i32,
+        callback: Value,
+        heap: &ManagedHeap,
+    ) -> Result<OperationId, Error> {
+        let Value::ObjectReference(object) = addresses else {
+            return Err(Error::InvalidBuffer);
+        };
+        let Value::Array {
+            element: Type::String,
+            elements,
+        } = heap
+            .read_reference(&object.reference)
+            .map_err(|_| Error::InvalidBuffer)?
+        else {
+            return Err(Error::InvalidBuffer);
+        };
+        if elements.len() > MAX_ADDRESSES {
+            return Err(Error::Limit);
+        }
+        let addresses = elements
+            .iter()
+            .map(|value| match value {
+                Value::String(address) => Ok(address.as_str()),
+                _ => Err(Error::InvalidAddress),
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        self.connect_addresses(&addresses, port, callback)
+    }
+
     pub(crate) fn invoke(
         &mut self,
         operation: Operation,
@@ -327,6 +406,9 @@ impl Sockets {
             (Operation::LocalPort, [Value::Int64(socket)]) => {
                 self.local_port(SocketId(*socket as u64)).map(Value::Int32)
             }
+            (Operation::ConnectAddresses, [addresses, Value::Int32(port), callback]) => self
+                .connect_array(addresses, *port, callback.clone(), heap)
+                .map(|id| Value::Int64(id.0 as i64)),
             (Operation::Connect, [Value::String(address), Value::Int32(port), callback]) => self
                 .connect(address, *port, callback.clone())
                 .map(|id| Value::Int64(id.0 as i64)),
@@ -589,6 +671,7 @@ impl Sockets {
                 // an outcome survives later polls and delayed guest delivery.
                 if op.deadline.is_some_and(|deadline| now >= deadline) {
                     op.stream = None;
+                    op.remaining.clear();
                     op.outcome = Some(Err(Error::TimedOut));
                     return Ok(op.callback.take());
                 }
@@ -616,6 +699,13 @@ impl Sockets {
                     }));
                     return Ok(op.callback.take());
                 }
+                if !op.remaining.is_empty() && op.attempt_deadline.is_some_and(|deadline| now >= deadline) {
+                    Self::start_next_address(op, &mut self.sockets, now);
+                    if op.outcome.is_some() {
+                        return Ok(op.callback.take());
+                    }
+                    continue;
+                }
                 let stream = op.stream.as_ref().expect("pending connection owns stream");
                 let status = match stream.take_error() {
                     Ok(Some(error)) | Err(error) => Err(Error::from(error)),
@@ -632,6 +722,14 @@ impl Sockets {
                         Err(error) => Err(Error::from(error)),
                     },
                 };
+                if status.is_err() && !op.remaining.is_empty() {
+                    Self::start_next_address(op, &mut self.sockets, now);
+                    if op.outcome.is_some() {
+                        return Ok(op.callback.take());
+                    }
+                    continue;
+                }
+                op.remaining.clear();
                 op.outcome = Some(status.and_then(|()| {
                     let id = SocketId(next_id()?);
                     self.sockets.insert(id, op.stream.take().unwrap());
@@ -772,6 +870,8 @@ mod tests {
         sockets.connects.insert(
             id,
             Connect {
+                attempt_deadline: None,
+                remaining: VecDeque::new(),
                 deadline: Some(deadline),
                 listener: None,
                 stream: Some(stream),
@@ -780,6 +880,102 @@ mod tests {
             },
         );
         id
+    }
+
+    #[test]
+    fn address_admission_validates_every_candidate_before_opening_a_socket() {
+        let mut sockets = Sockets::default();
+        assert_eq!(
+            sockets.connect_addresses(&[], 80, callback()),
+            Err(Error::InvalidRange)
+        );
+        assert_eq!(
+            sockets.connect_addresses(&["127.0.0.1"; 17], 80, callback()),
+            Err(Error::Limit)
+        );
+        assert_eq!(
+            sockets.connect_addresses(&["127.0.0.1", "not an address"], 80, callback()),
+            Err(Error::InvalidAddress)
+        );
+        assert_eq!(
+            sockets.connect_addresses(&["127.0.0.1"], 0, callback()),
+            Err(Error::InvalidRange)
+        );
+        assert_eq!(sockets.resource_count(), 0);
+        assert!(sockets.connects.is_empty());
+    }
+
+    #[test]
+    fn address_slice_expiry_falls_back_without_extending_overall_deadline() {
+        let (mut first_peer, stream) = pair();
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let address = match listener.local_addr().unwrap() {
+            std::net::SocketAddr::V4(address) => address,
+            _ => unreachable!(),
+        };
+        let mut sockets = Sockets::default();
+        let heap = ManagedHeap::default();
+        let now = Instant::now();
+        let deadline = now + CONNECT_TIMEOUT;
+        let id = staged_connect(&mut sockets, stream, deadline);
+        let op = sockets.connects.get_mut(&id).unwrap();
+        op.attempt_deadline = Some(now);
+        op.remaining.push_back(address);
+        let _ = sockets.poll_connect_at(now).unwrap();
+        assert_eq!(first_peer.read(&mut [0; 1]).unwrap(), 0);
+        assert_eq!(sockets.connects[&id].deadline, Some(deadline));
+        assert!(sockets.resource_count() <= 1);
+        if sockets.connects[&id].callback.is_some() {
+            deliver(&mut sockets, &heap);
+        }
+        let connected = accepted(&mut sockets, &heap, id);
+        assert!(sockets.local_port(connected).is_ok());
+        sockets.close(connected);
+    }
+
+    #[test]
+    fn overall_expiry_does_not_start_remaining_address() {
+        let (_peer, stream) = pair();
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        listener.set_nonblocking(true).unwrap();
+        let address = match listener.local_addr().unwrap() {
+            std::net::SocketAddr::V4(address) => address,
+            _ => unreachable!(),
+        };
+        let mut sockets = Sockets::default();
+        let now = Instant::now();
+        let id = staged_connect(&mut sockets, stream, now);
+        sockets
+            .connects
+            .get_mut(&id)
+            .unwrap()
+            .remaining
+            .push_back(address);
+        assert!(sockets.poll_connect_at(now).unwrap().is_some());
+        assert_eq!(sockets.connects[&id].outcome, Some(Err(Error::TimedOut)));
+        assert!(sockets.connects[&id].remaining.is_empty());
+        assert_eq!(
+            listener.accept().unwrap_err().kind(),
+            io::ErrorKind::WouldBlock
+        );
+        assert_eq!(sockets.resource_count(), 0);
+    }
+
+    #[test]
+    fn duplicate_addresses_are_skipped_without_reserving_more_sockets() {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = i32::from(listener.local_addr().unwrap().port());
+        let mut sockets = Sockets::default();
+        sockets.budget.sockets = 1;
+        let heap = ManagedHeap::default();
+        let id = sockets
+            .connect_addresses(&["127.0.0.1", "127.0.0.1"], port, callback())
+            .unwrap();
+        assert!(sockets.connects[&id].remaining.is_empty());
+        deliver(&mut sockets, &heap);
+        let connected = accepted(&mut sockets, &heap, id);
+        sockets.close(connected);
+        assert_eq!(sockets.resource_count(), 0);
     }
 
     #[test]
@@ -875,6 +1071,8 @@ mod tests {
         sockets.connects.insert(
             id,
             Connect {
+                attempt_deadline: None,
+                remaining: VecDeque::new(),
                 deadline: Some(now),
                 listener: None,
                 stream: None,
@@ -1276,6 +1474,8 @@ mod tests {
             sockets.connects.insert(
                 OperationId(next_id().unwrap()),
                 Connect {
+                    attempt_deadline: None,
+                    remaining: VecDeque::new(),
                     deadline: None,
                     listener: None,
                     stream: None,

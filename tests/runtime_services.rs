@@ -191,7 +191,7 @@ fn socket_submission_requires_socket_and_dispatch_services() {
         include_str!("../runtime/neoCLR/Runtime/Sockets.neoil")
     )).unwrap();
     let program = LoadedProgram::new(&module).unwrap();
-    for signature in ["SocketAccept(Int64,System.Func<Void>)", "SocketConnect(String,Int32,System.Func<Void>)", "SocketReceive(Int64,arrayref<Byte>,Int32,Int32,System.Func<Void>)", "SocketSend(Int64,arrayref<Byte>,Int32,Int32,System.Func<Void>)"] {
+    for signature in ["SocketConnectAddresses(arrayref<String>,Int32,System.Func<Void>)", "SocketAccept(Int64,System.Func<Void>)", "SocketConnect(String,Int32,System.Func<Void>)", "SocketReceive(Int64,arrayref<Byte>,Int32,Int32,System.Func<Void>)", "SocketSend(Int64,arrayref<Byte>,Int32,Int32,System.Func<Void>)"] {
         let graph = program.analyze_reachability(&[parse_function_ref(&format!("neoCLR.Runtime.{signature}")).unwrap()], 1).unwrap();
         assert!(graph.required_services().contains(&Service::SocketIo));
         assert!(graph.required_services().contains(&Service::TaskDispatch));

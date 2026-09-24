@@ -3,6 +3,7 @@ namespace System.Networking.Sockets
 import System.*
 import System.Result.*
 import System.Tasks.*
+import System.Collections.*
 import System.Runtime.CompilerServices.*
 
 public class Socket {
@@ -16,6 +17,13 @@ public class Socket {
         let source = Promise<Result<Socket, SocketError>>()
         let completion = SocketConnectCompletion(source)
         completion.Start(address, port)
+        return source.Task
+    }
+
+    static func Connect(addresses: Sequence<string>, port: int) -> Task<Result<Socket, SocketError>> {
+        let source = Promise<Result<Socket, SocketError>>()
+        let completion = SocketConnectCompletion(source)
+        completion.StartAddresses(addresses, port)
         return source.Task
     }
 
@@ -117,6 +125,31 @@ internal class SocketConnectCompletion {
     internal func Start(address: string, port: int) {
         _ = TaskQueue.Default
         let payload = RuntimeServices.SocketConnect(address, port, self.Complete)
+        if RuntimeServices.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        } else {
+            operation = RuntimeServices.UnpackValue<long>(payload)
+        }
+    }
+
+    internal func StartAddresses(addresses: Sequence<string>, port: int) {
+        let count = addresses.Count
+        if count <= 0 {
+            _ = source.Complete(Error(SocketError.InvalidRange()))
+            return
+        }
+        if count > 16 {
+            _ = source.Complete(Error(SocketError.LimitExceeded()))
+            return
+        }
+        let snapshot = CheckedStorage.Reserve<string>(count)
+        var index = 0
+        while index < count {
+            snapshot[index] = addresses[index]
+            index += 1
+        }
+        _ = TaskQueue.Default
+        let payload = RuntimeServices.SocketConnectAddresses(snapshot, port, self.Complete)
         if RuntimeServices.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {

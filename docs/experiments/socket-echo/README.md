@@ -37,3 +37,16 @@ cover bind conflicts, wrong-role operations, reserved capacity, pending/committe
 close ordering, independent accepted ownership and teardown. A scheduler test
 collects a captured accept callback while pending and staged for delivery. These
 are local macOS results, not a release or evidence for every host platform.
+
+
+The client now passes a `Sequence<string>` to Socket.Connect. For this controlled
+loopback POC it prepends 127.0.0.2, where the verifier has no listener, before the
+addresses returned for localhost. Connect snapshots the inputs; the sample overwrites
+the first entries afterwards and still reaches 127.0.0.1. All attempts share five
+seconds, with at most one second on an address while alternatives remain. DNS is
+separate. This demonstrates fallback and snapshot ownership, not configurable
+connection policy, IPv6 racing or a combined lookup/connection deadline.
+
+Latest fallback validation (2026-09-24): server 104 allocations/three collections;
+client 1,856 allocations/43 collections; both finish with zero live managed objects.
+The verifier checks empty/malformed sequence rejection through the compiled client.

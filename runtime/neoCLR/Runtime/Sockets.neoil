@@ -25,3 +25,6 @@
 .function neoCLR.Runtime.SocketLocalPort(Int64 socket) -> Value
 .methodimpl InternalCall
 .end
+.function neoCLR.Runtime.SocketConnectAddresses(arrayref<String> addresses,Int32 port,System.Func<Void> callback) -> Value
+.methodimpl InternalCall
+.end
