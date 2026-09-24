@@ -2,6 +2,7 @@ namespace System.Storage
 
 import System.Runtime.CompilerServices.ValueStorage
 
+[System.Runtime.CompilerServices.Union]
 public struct EntryKind {
     private field Stored: System.Value
 

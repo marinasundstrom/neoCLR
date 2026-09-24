@@ -58,12 +58,12 @@ public class String : Equatable<string>, Collections.Iterable<char> {
         }
         let status = RuntimeServices.UnpackValue<byte>(payload)
         if status == 1 {
-            return Error(Utf8SliceError(Utf8SliceError.OutOfRange()))
+            return Error(Utf8SliceError.OutOfRange())
         }
         if status == 2 {
-            return Error(Utf8SliceError(Utf8SliceError.InvalidBoundary()))
+            return Error(Utf8SliceError.InvalidBoundary())
         }
         System.Fault("invalid native UTF-8 slice status")
-        return Error(Utf8SliceError(Utf8SliceError.OutOfRange()))
+        return Error(Utf8SliceError.OutOfRange())
     }
 }

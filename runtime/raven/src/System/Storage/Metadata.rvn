@@ -11,29 +11,29 @@ public func GetKind(path: string) -> Result<EntryKind, StorageLookupError> {
     if RuntimeServices.IsValue<byte>(payload) {
         let status = RuntimeServices.UnpackValue<byte>(payload)
         if status == 1 {
-            return Error(StorageLookupError(StorageLookupError.InvalidPath()))
+            return Error(StorageLookupError.InvalidPath())
         }
         if status == 2 {
-            return Error(StorageLookupError(StorageLookupError.NotFound()))
+            return Error(StorageLookupError.NotFound())
         }
         if status == 3 {
-            return Error(StorageLookupError(StorageLookupError.AccessDenied()))
+            return Error(StorageLookupError.AccessDenied())
         }
         if status == 4 {
-            return Error(StorageLookupError(StorageLookupError.WrongKind()))
+            return Error(StorageLookupError.WrongKind())
         }
         if status == 10 {
-            return Error(StorageLookupError(StorageLookupError.IoFailure()))
+            return Error(StorageLookupError.IoFailure())
         }
         System.Fault("Unexpected metadata error status")
     }
     let kind = RuntimeServices.UnpackValue<int>(payload)
     if kind == 1 {
-        return Ok(EntryKind(EntryKind.File()))
+        return Ok(EntryKind.File())
     }
     if kind == 2 {
-        return Ok(EntryKind(EntryKind.Directory()))
+        return Ok(EntryKind.Directory())
     }
     System.Fault("Unexpected metadata kind")
-    return Error(StorageLookupError(StorageLookupError.IoFailure()))
+    return Error(StorageLookupError.IoFailure())
 }

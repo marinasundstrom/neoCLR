@@ -22,10 +22,10 @@ public class StreamWriter : TextWriter {
 
     func Write(text: string) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError(StreamError.Closed()))
+            return Error(StreamError.Closed())
         }
         if text.GetUtf8ByteCount() > 65536 {
-            return Error(StreamError(StreamError.LimitExceeded()))
+            return Error(StreamError.LimitExceeded())
         }
         let bytes = Utf8.Encode(text)
         let buffer = CheckedStorage.Reserve<byte>(bytes.Count)
@@ -45,7 +45,7 @@ public class StreamWriter : TextWriter {
                         System.Fault("Invalid output write count")
                     }
                     if count == 0 {
-                        return Error(StreamError(StreamError.IoFailure()))
+                        return Error(StreamError.IoFailure())
                     }
                     written += count
                 }
@@ -57,17 +57,17 @@ public class StreamWriter : TextWriter {
 
     func WriteLine(text: string) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError(StreamError.Closed()))
+            return Error(StreamError.Closed())
         }
         if text.GetUtf8ByteCount() >= 65536 {
-            return Error(StreamError(StreamError.LimitExceeded()))
+            return Error(StreamError.LimitExceeded())
         }
         return self.Write(text + "\n")
     }
 
     func Flush() -> Result<unit, StreamError> {
         if closed {
-            return Error(StreamError(StreamError.Closed()))
+            return Error(StreamError.Closed())
         }
         return output.Flush()
     }

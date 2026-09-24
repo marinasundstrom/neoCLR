@@ -50,7 +50,7 @@ public class FileSystem : StorageProvider {
                     let directory: Directory = LocalDirectory(self, path, Resolve(path))
                     return Ok(directory)
                 }
-                Error(StorageLookupError(StorageLookupError.WrongKind()))
+                Error(StorageLookupError.WrongKind())
             }
             Error(let error) => Error(error)
         }
@@ -63,7 +63,7 @@ public class FileSystem : StorageProvider {
                     let file: File = LocalFile(path, Resolve(path))
                     return Ok(file)
                 }
-                Error(StorageLookupError(StorageLookupError.WrongKind()))
+                Error(StorageLookupError.WrongKind())
             }
             Error(let error) => Error(error)
         }
@@ -120,7 +120,7 @@ internal class LocalDirectory : Directory {
 
     func Resolve(relativePath: Path) -> Result<Path, StorageLookupError> {
         if relativePath.IsAbsolute {
-            return Error(StorageLookupError(StorageLookupError.InvalidPath()))
+            return Error(StorageLookupError.InvalidPath())
         }
         if relativePath.Text == "." {
             return Ok(path)
@@ -134,7 +134,7 @@ internal class LocalDirectory : Directory {
         }
         return match System.Storage.Path.Parse(resolved) {
             Ok(let child) => Ok(child)
-            Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
+            Error(_) => Error(StorageLookupError.InvalidPath())
         }
     }
 
@@ -164,24 +164,24 @@ internal class LocalDirectory : Directory {
         if RuntimeServices.IsValue<byte>(payload) {
             let status = RuntimeServices.UnpackValue<byte>(payload)
             if status == 1 {
-                return Error(StorageLookupError(StorageLookupError.InvalidPath()))
+                return Error(StorageLookupError.InvalidPath())
             }
             if status == 2 {
-                return Error(StorageLookupError(StorageLookupError.NotFound()))
+                return Error(StorageLookupError.NotFound())
             }
             if status == 3 {
-                return Error(StorageLookupError(StorageLookupError.AccessDenied()))
+                return Error(StorageLookupError.AccessDenied())
             }
             if status == 4 {
-                return Error(StorageLookupError(StorageLookupError.WrongKind()))
+                return Error(StorageLookupError.WrongKind())
             }
             if status == 7 {
-                return Error(StorageLookupError(StorageLookupError.InvalidRange()))
+                return Error(StorageLookupError.InvalidRange())
             }
             if status == 8 {
-                return Error(StorageLookupError(StorageLookupError.LimitExceeded()))
+                return Error(StorageLookupError.LimitExceeded())
             }
-            return Error(StorageLookupError(StorageLookupError.IoFailure()))
+            return Error(StorageLookupError.IoFailure())
         }
         let names = RuntimeServices.StorageNames(payload)
         let items: List<StorageItem> = ArrayList<StorageItem>()
@@ -203,7 +203,7 @@ internal class LocalDirectory : Directory {
     // This resolves a direct child address; it does not query existence.
     func FileAt(name: string) -> Result<File, StorageLookupError> {
         if name.IsEmpty || name == "." || name == ".." || name.ContainsOrdinal("/") {
-            return Error(StorageLookupError(StorageLookupError.InvalidPath()))
+            return Error(StorageLookupError.InvalidPath())
         }
         var childText = path.Text + "/" + name
         if path.Text == "." {
@@ -217,7 +217,7 @@ internal class LocalDirectory : Directory {
                 let file: File = LocalFile(child, System.Storage.Path.Combine(nativePath, name))
                 Ok(file)
             }
-            Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
+            Error(_) => Error(StorageLookupError.InvalidPath())
         }
     }
 
@@ -225,14 +225,14 @@ internal class LocalDirectory : Directory {
     func GetFile(name: string) -> Result<File, StorageLookupError> {
         return match FileAt(name) {
             Ok(let descriptor) => provider.GetFile(descriptor.Path)
-            Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
+            Error(_) => Error(StorageLookupError.InvalidPath())
         }
     }
 
     // A parsed absolute path is valid syntax, but cannot replace this context.
     func GetFile(relativePath: Path) -> Result<File, StorageLookupError> {
         if relativePath.IsAbsolute {
-            return Error(StorageLookupError(StorageLookupError.InvalidPath()))
+            return Error(StorageLookupError.InvalidPath())
         }
         if relativePath.Text == "." {
             return provider.GetFile(path)
@@ -246,7 +246,7 @@ internal class LocalDirectory : Directory {
         }
         return match System.Storage.Path.Parse(resolved) {
             Ok(let child) => provider.GetFile(child)
-            Error(_) => Error(StorageLookupError(StorageLookupError.InvalidPath()))
+            Error(_) => Error(StorageLookupError.InvalidPath())
         }
     }
 

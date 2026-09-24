@@ -25,13 +25,13 @@ public class StreamReader : TextReader {
     // LF and CRLF delimit lines; a lone CR is data. No read-ahead across lines.
     func ReadLine(maxUtf8Bytes: int) -> Result<Option<string>, TextReadError> {
         if closed {
-            return Error(TextReadError(TextReadError.Closed()))
+            return Error(TextReadError.Closed())
         }
         if maxUtf8Bytes < 0 {
-            return Error(TextReadError(TextReadError.InvalidRange()))
+            return Error(TextReadError.InvalidRange())
         }
         if maxUtf8Bytes > 65536 {
-            return Error(TextReadError(TextReadError.LimitExceeded()))
+            return Error(TextReadError.LimitExceeded())
         }
         let bytes: List<byte> = ArrayList<byte>()
         let buffer: byte[] = [(byte)0]
@@ -50,7 +50,7 @@ public class StreamReader : TextReader {
                             return Ok(absent)
                         }
                         if bytes.Count > maxUtf8Bytes {
-                            return Error(TextReadError(TextReadError.LimitExceeded()))
+                            return Error(TextReadError.LimitExceeded())
                         }
                         return DecodeLine(bytes, bytes.Count)
                     }
@@ -63,14 +63,14 @@ public class StreamReader : TextReader {
                         return DecodeLine(bytes, length)
                     }
                     if bytes.Count >= maxUtf8Bytes && (bytes.Count > maxUtf8Bytes || value != 13) {
-                        return Error(TextReadError(TextReadError.LimitExceeded()))
+                        return Error(TextReadError.LimitExceeded())
                     }
                     bytes.Add(value)
                 }
                 Error(let error) => return Error(FromStream(error))
             }
         }
-        return Error(TextReadError(TextReadError.IoFailure()))
+        return Error(TextReadError.IoFailure())
     }
 
     private static func DecodeLine(bytes: Sequence<byte>, length: int) -> Result<Option<string>, TextReadError> {
@@ -85,19 +85,19 @@ public class StreamReader : TextReader {
                 let present: Option<string> = Some(text)
                 Ok(present)
             }
-            Error(_) => Error(TextReadError(TextReadError.InvalidUtf8()))
+            Error(_) => Error(TextReadError.InvalidUtf8())
         }
     }
 
     func ReadToEnd(maxUtf8Bytes: int) -> Result<string, TextReadError> {
         if closed {
-            return Error(TextReadError(TextReadError.Closed()))
+            return Error(TextReadError.Closed())
         }
         if maxUtf8Bytes < 0 {
-            return Error(TextReadError(TextReadError.InvalidRange()))
+            return Error(TextReadError.InvalidRange())
         }
         if maxUtf8Bytes > 65536 {
-            return Error(TextReadError(TextReadError.LimitExceeded()))
+            return Error(TextReadError.LimitExceeded())
         }
         let bytes: List<byte> = ArrayList<byte>()
         let buffer = CheckedStorage.Reserve<byte>(256)
@@ -115,12 +115,12 @@ public class StreamReader : TextReader {
                         System.Fault("Invalid input read count")
                     }
                     if count > maxUtf8Bytes - bytes.Count {
-                        return Error(TextReadError(TextReadError.LimitExceeded()))
+                        return Error(TextReadError.LimitExceeded())
                     }
                     if count == 0 {
                         return match Utf8.Decode(bytes) {
                             Ok(let text) => Ok(text)
-                            Error(_) => Error(TextReadError(TextReadError.InvalidUtf8()))
+                            Error(_) => Error(TextReadError.InvalidUtf8())
                         }
                     }
                     var index = 0
@@ -132,7 +132,7 @@ public class StreamReader : TextReader {
                 Error(let error) => return Error(FromStream(error))
             }
         }
-        return Error(TextReadError(TextReadError.IoFailure()))
+        return Error(TextReadError.IoFailure())
     }
 
     func Close() {
@@ -146,36 +146,36 @@ public class StreamReader : TextReader {
 
     private static func FromStream(error: StreamError) -> TextReadError {
         if error.IsInvalidPath {
-            return TextReadError(TextReadError.InvalidPath())
+            return TextReadError.InvalidPath()
         }
         if error.IsNotFound {
-            return TextReadError(TextReadError.NotFound())
+            return TextReadError.NotFound()
         }
         if error.IsAccessDenied {
-            return TextReadError(TextReadError.AccessDenied())
+            return TextReadError.AccessDenied()
         }
         if error.IsWrongKind {
-            return TextReadError(TextReadError.WrongKind())
+            return TextReadError.WrongKind()
         }
         if error.IsAlreadyExists {
-            return TextReadError(TextReadError.AlreadyExists())
+            return TextReadError.AlreadyExists()
         }
         if error.IsClosed {
-            return TextReadError(TextReadError.Closed())
+            return TextReadError.Closed()
         }
         if error.IsInvalidRange {
-            return TextReadError(TextReadError.InvalidRange())
+            return TextReadError.InvalidRange()
         }
         if error.IsLimitExceeded {
-            return TextReadError(TextReadError.LimitExceeded())
+            return TextReadError.LimitExceeded()
         }
         if error.IsWrongAccess {
-            return TextReadError(TextReadError.WrongAccess())
+            return TextReadError.WrongAccess()
         }
         if error.IsIoFailure {
-            return TextReadError(TextReadError.IoFailure())
+            return TextReadError.IoFailure()
         }
         System.Fault("Invalid stream error")
-        return TextReadError(TextReadError.IoFailure())
+        return TextReadError.IoFailure()
     }
 }

@@ -989,3 +989,36 @@ reference metadata, compiler semantics, library algorithms and native layout are
 no Raven compiler patch is needed. The mixed Object map fixture checks key dispatch,
 boxed values, Option<Object> payloads, collisions, replacement, rehashing and GC. A
 freshly built bridge is required; existing runtime/library fragments remain valid.
+
+## Attributed custom unions (2026-09-24)
+
+`ErrorBindings` emits `System.Runtime.CompilerServices.UnionAttribute` for carriers
+with cases; the corresponding hand-authored runtime structs carry the same marker.
+Empty standalone error values remain structs. Raven's general CLI metadata reader
+recognizes the explicit marker with nested case constructors and matching public
+`IsCase: bool` / `GetCase() -> Case` accessors as `IUnionSymbol`, on .NET or neoCLR.
+RavenDoc consequently shows union signatures, U icons and grouped cases, preserving
+legacy case links. This requires no runtime Union interface or Runtime Contract
+option and does not change the Stored Value representation.
+
+Compared with the boxed `Value` C# union contract, this projection preserves the
+existing typed accessor ABI without introducing boxing. The cost is a separate
+recognized metadata shape. Recognition does not synthesize `TryGetValue` or add
+pattern extraction lowering: typed accessor use remains the validated custom
+carrier contract. The general Raven tests use independent .NET class and struct
+fixtures, reject unmarked/malformed shapes and verify documentation grouping and
+same-named unrelated type visibility.
+
+Runtime implementations now construct cases directly instead of wrapping a case
+that already projects to its carrier. A clean compiler rebuild also required
+Raven main's existing configured-unit identity fix on the neoclr branch
+(`e86e1c773`): with the existing System.Void RuntimeUnitContract, imported generic
+Flush results must compare equal to source `Result<unit, StreamError>` signatures.
+No target option was added.
+
+The same clean validation brought Raven main's structural imported-array identity
+fix to neoclr (`0fee69abd`) so byte-array interface implementations retain their
+virtual/final metadata flags. Focused .NET unit/array interface tests passed.
+All bootstrap slices regenerated successfully with unchanged emitted `.neoil`
+fragments; source/compiler/reference fingerprints changed. The 14 carrier
+admission checks and targeted error runtime tests passed.

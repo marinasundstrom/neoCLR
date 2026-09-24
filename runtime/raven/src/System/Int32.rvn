@@ -15,21 +15,21 @@ public struct Int32 : Comparable<int>, Equatable<int> {
         }
         let status = RuntimeServices.UnpackValue<byte>(payload)
         if status == 1 {
-            return Error(Int32ParseError(Int32ParseError.InvalidFormat()))
+            return Error(Int32ParseError.InvalidFormat())
         }
         if status == 2 {
-            return Error(Int32ParseError(Int32ParseError.Overflow()))
+            return Error(Int32ParseError.Overflow())
         }
         System.Fault("invalid native parse status")
-        return Error(Int32ParseError(Int32ParseError.InvalidFormat()))
+        return Error(Int32ParseError.InvalidFormat())
     }
 
     static func Divide(dividend: int, divisor: int) -> System.Result<int, IntegerDivisionError> {
         if divisor == 0 {
-            return Error(IntegerDivisionError(IntegerDivisionError.DivisionByZero()))
+            return Error(IntegerDivisionError.DivisionByZero())
         }
         if dividend == -2147483648 && divisor == -1 {
-            return Error(IntegerDivisionError(IntegerDivisionError.Overflow()))
+            return Error(IntegerDivisionError.Overflow())
         }
         return Ok(dividend / divisor)
     }

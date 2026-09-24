@@ -11,28 +11,28 @@ public func WriteAllText(path: string, text: string, maxBytes: int) -> System.Re
         return Ok(())
     }
     if status == 1 {
-        return Error(FileWriteError(FileWriteError.InvalidLimit()))
+        return Error(FileWriteError.InvalidLimit())
     }
     if status == 2 {
-        return Error(FileWriteError(FileWriteError.InvalidPath()))
+        return Error(FileWriteError.InvalidPath())
     }
     if status == 3 {
-        return Error(FileWriteError(FileWriteError.NotFound()))
+        return Error(FileWriteError.NotFound())
     }
     if status == 4 {
-        return Error(FileWriteError(FileWriteError.AccessDenied()))
+        return Error(FileWriteError.AccessDenied())
     }
     if status == 5 {
-        return Error(FileWriteError(FileWriteError.NotRegularFile()))
+        return Error(FileWriteError.NotRegularFile())
     }
     if status == 6 {
-        return Error(FileWriteError(FileWriteError.WriteFailed()))
+        return Error(FileWriteError.WriteFailed())
     }
     if status == 7 {
-        return Error(FileWriteError(FileWriteError.TooLarge()))
+        return Error(FileWriteError.TooLarge())
     }
     System.Fault("invalid native file write status")
-    return Error(FileWriteError(FileWriteError.WriteFailed()))
+    return Error(FileWriteError.WriteFailed())
 }
 
 public func ReadAllText(path: string, maxBytes: int) -> System.Result<string, FileReadError> {
@@ -42,29 +42,29 @@ public func ReadAllText(path: string, maxBytes: int) -> System.Result<string, Fi
     }
     let status = RuntimeServices.UnpackValue<byte>(payload)
     if status == 1 {
-        return Error(FileReadError(FileReadError.InvalidLimit()))
+        return Error(FileReadError.InvalidLimit())
     }
     if status == 2 {
-        return Error(FileReadError(FileReadError.InvalidPath()))
+        return Error(FileReadError.InvalidPath())
     }
     if status == 3 {
-        return Error(FileReadError(FileReadError.NotFound()))
+        return Error(FileReadError.NotFound())
     }
     if status == 4 {
-        return Error(FileReadError(FileReadError.AccessDenied()))
+        return Error(FileReadError.AccessDenied())
     }
     if status == 5 {
-        return Error(FileReadError(FileReadError.NotRegularFile()))
+        return Error(FileReadError.NotRegularFile())
     }
     if status == 6 {
-        return Error(FileReadError(FileReadError.ReadFailed()))
+        return Error(FileReadError.ReadFailed())
     }
     if status == 7 {
-        return Error(FileReadError(FileReadError.TooLarge()))
+        return Error(FileReadError.TooLarge())
     }
     if status == 8 {
-        return Error(FileReadError(FileReadError.InvalidUtf8()))
+        return Error(FileReadError.InvalidUtf8())
     }
     System.Fault("invalid native I/O status")
-    return Error(FileReadError(FileReadError.ReadFailed()))
+    return Error(FileReadError.ReadFailed())
 }

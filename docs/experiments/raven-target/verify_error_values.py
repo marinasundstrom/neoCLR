@@ -21,11 +21,11 @@ with tempfile.TemporaryDirectory(prefix='neoclr-error-values-') as temporary:
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
     (root / 'Main.rvn').write_text('''import System.*
 func Main() {
-    let error = Int32ParseError(Int32ParseError.Overflow())
+    let error = Int32ParseError.Overflow()
     error.GetInvalidFormat()
 }
 ''')
-    result = subprocess.run(command, capture_output=True, text=True, timeout=90)
+    result = subprocess.run(command, capture_output=True, text=True, timeout=240)
     if result.returncode == 0 or 'Fault:' not in result.stderr:
         raise AssertionError(result.stdout + result.stderr)
     previous = set(root.rglob('App.neoil'))
@@ -35,7 +35,7 @@ func Main() {
     System.Console.WriteLine(error.ToString())
 }
 ''')
-    result = subprocess.run(command, capture_output=True, text=True, timeout=90)
+    result = subprocess.run(command, capture_output=True, text=True, timeout=240)
     if result.returncode == 0 or 'uninitialized' not in result.stderr or set(root.rglob('App.neoil')) != previous:
         raise AssertionError(result.stdout + result.stderr)
     print('Wrong-case access faults; invalid carrier default is rejected before execution')

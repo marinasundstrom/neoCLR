@@ -13,13 +13,13 @@ public static class Console {
         if RuntimeServices.IsValue<int>(payload) {
             let status = RuntimeServices.UnpackValue<int>(payload)
             if status == 1 {
-                return System.Result<System.Option<byte>, ConsoleReadError>.Error(ConsoleReadError(ConsoleReadError.Unavailable()))
+                return System.Result<System.Option<byte>, ConsoleReadError>.Error(ConsoleReadError.Unavailable())
             }
             if status == 2 {
-                return System.Result<System.Option<byte>, ConsoleReadError>.Error(ConsoleReadError(ConsoleReadError.ReadFailed()))
+                return System.Result<System.Option<byte>, ConsoleReadError>.Error(ConsoleReadError.ReadFailed())
             }
             System.Fault("invalid native I/O status")
-            return System.Result<System.Option<byte>, ConsoleReadError>.Error(ConsoleReadError(ConsoleReadError.ReadFailed()))
+            return System.Result<System.Option<byte>, ConsoleReadError>.Error(ConsoleReadError.ReadFailed())
         }
         if RuntimeServices.IsValue<System.Void>(payload) {
             let absent: System.Option<byte> = None()

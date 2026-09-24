@@ -2,6 +2,7 @@ namespace System.Text
 
 import System.Runtime.CompilerServices.ValueStorage
 
+[System.Runtime.CompilerServices.Union]
 public struct Utf8SliceError {
     private field Stored: System.Value
 

@@ -2,6 +2,7 @@ namespace System
 
 import System.Runtime.CompilerServices.ValueStorage
 
+[System.Runtime.CompilerServices.Union]
 public struct IntegerDivisionError {
     private field Stored: System.Value
 

@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Mark custom case carriers, including StreamError and TextReadError, with
+  UnionAttribute in runtime source and reference metadata. Raven imports the
+  typed constructor/IsCase/GetCase contract as IUnionSymbol and RavenDoc groups
+  cases under their union. Standalone error structs remain ordinary structs.
+  Use direct case construction in runtime implementations now that imported
+  carriers have union semantics. Refresh bootstrap fragments and correct the
+  carrier admission test's moved namespaces. This changes metadata classification,
+  not storage or extraction lowering. Integrate Raven's existing configured-unit
+  and structural-array identity fixes on its neoCLR branch for imported Flush
+  and byte-stream interface signatures.
+
 - Support Object.ToString for boxed Int32, Int64 and Boolean: culture-independent
   decimal integers and True/False text. Check integer limits and copied values
   after GC, and update API/website documentation. Other primitive formatting,

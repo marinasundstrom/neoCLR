@@ -137,13 +137,13 @@ public extension Operators<T> for Iterable<T> {
         let iterator = self.GetIterator()
         if !iterator.MoveNext() {
             iterator.Dispose()
-            return Error(SingleError(SingleError.Empty()))
+            return Error(SingleError.Empty())
         }
         let value = iterator.Current
         let multiple = iterator.MoveNext()
         iterator.Dispose()
         if multiple {
-            return Error(SingleError(SingleError.Multiple()))
+            return Error(SingleError.Multiple())
         }
         return Ok(value)
     }
@@ -188,7 +188,7 @@ public extension Operators<T> for Iterable<T> {
                 while iterator.MoveNext() {
                     if predicate(iterator.Current) {
                         iterator.Dispose()
-                        return Error(SingleError(SingleError.Multiple()))
+                        return Error(SingleError.Multiple())
                     }
                 }
                 iterator.Dispose()
@@ -196,7 +196,7 @@ public extension Operators<T> for Iterable<T> {
             }
         }
         iterator.Dispose()
-        return Error(SingleError(SingleError.Empty()))
+        return Error(SingleError.Empty())
     }
 }
 

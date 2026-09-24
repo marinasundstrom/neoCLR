@@ -2,6 +2,7 @@ namespace System.Linq
 
 import System.Runtime.CompilerServices.ValueStorage
 
+[System.Runtime.CompilerServices.Union]
 public struct SingleError {
     private field Stored: System.Value
 
