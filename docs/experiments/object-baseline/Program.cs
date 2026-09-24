@@ -50,6 +50,17 @@ Check(ReferenceEquals(record, record) && !ReferenceEquals(record, sameRecord)
     && record == sameRecord && record != new KeyRecord(7)
     && record.GetHashCode() == sameRecord.GetHashCode(),
     "Record syntax generates value equality and matching hashes while preserving class identity");
+KeyRecord? absentRecord = null;
+Check(!record.Equals(absentRecord) && !record.Equals(null)
+    && !((IEquatable<KeyRecord>)record).Equals(absentRecord),
+    "Typed record-class equality accepts nullable comparisons");
+var nullability = new System.Reflection.NullabilityInfoContext();
+Check(nullability.Create(typeof(KeyRecord).GetMethod("Equals", [typeof(KeyRecord)])!.GetParameters()[0]).ReadState
+    == System.Reflection.NullabilityState.Nullable
+    && nullability.Create(typeof(Coordinate).GetMethod("Equals", [typeof(Coordinate)])!.GetParameters()[0]).ReadState
+    == System.Reflection.NullabilityState.NotNull,
+    "Typed equality annotates record-class arguments but keeps record-struct values non-nullable");
+
 object integer = 42;
 object equalInteger = 42;
 Check(integer.Equals(equalInteger) && !ReferenceEquals(integer, equalInteger),

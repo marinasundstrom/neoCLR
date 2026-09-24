@@ -60,8 +60,10 @@ explicit nullable-string record declarations.
 
 Generated Object.Equals now inherits Object's nullable comparison parameter. The
 sample passes nullable Object locals (both null and boxed values) directly to record
-class and record struct Equals methods. This is separate from typed Equals, whose
-parameter contract has not been widened.
+class and record struct Equals methods. Typed record-class Equals now also accepts a nullable reference to that record type:
+Main checks an absent Key?, a present Key? and literal null. These select typed
+equality, with null comparing false. Record-struct typed parameters remain values.
+Equatable<T>'s public signature is unchanged; its call-site annotations still apply.
 
 The development target selects RavenAllowNullableValueTypes=false. Nullable value
 declarations now fail in Raven with RAV0407 ("Value types can't be declared as
@@ -73,3 +75,8 @@ Validation for this slice: 117 focused integration compiler tests, all three rec
 programs and their rejection cases, plus the Object equality sample pass. Runtime
 library regeneration changes only 102 provenance/input manifests; emitted runtime
 IL is unchanged. The 385-item API snapshot and combined 14-page website build pass.
+
+Typed-equality follow-up: the general compiler regression also checks nullable
+parameter metadata after reimport, generic record classes on .NET and user-written
+Equals declarations. The 61 target record checks pass with the updated component
+lookup. Generic records remain unsupported by the neoCLR RuntimeRecordContract.

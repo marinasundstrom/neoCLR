@@ -257,5 +257,7 @@ nullable". Reference annotations such as `Object?` remain valid. Prefer `Option<
 for intentional absence in both value and reference API models.
 
 Generated record Object.Equals preserves Object's nullable comparison parameter;
-the separate typed Equals parameter is unchanged. This does not add Nullable<T>,
+generated typed record-class Equals also accepts a nullable reference to its record
+type and compares null as false. Record-struct typed parameters remain non-nullable
+values. The Equatable<T> interface contract is unchanged. This does not add Nullable<T>,
 nullable-value boxing or Option components to the supported record component set.

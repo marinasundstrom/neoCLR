@@ -41,6 +41,20 @@ follow-up imports a bounded static subset and executes it against neoCLR's real 
 library through the separate runtime verification command below. Earlier slice notes
 retain their historical limits. This is not general Raven or direct PE execution.
 
+## Typed record equality integration (2026-09-24)
+
+General Raven commit `df9b7211b` (integrated as `832549785`) annotates synthesized
+record-class Equals with the nullable record parameter and keeps typed record-struct
+parameters non-nullable. It also aligns top-level nullable reference annotations
+when emitting interface dispatch. Target-only follow-up `5d7f3d5c8` selects nested
+record-class component Equals by the underlying parameter type, preserving null guards.
+RuntimeRecordContract configuration and the public Equatable<T> interface are unchanged.
+
+The [record sample](../records/README.md) exercises nullable Key locals and literal
+null, alongside Object/interface calls and the existing value-copy cases. The .NET
+comparison has 32 assertions on pinned SDK 10.0.100/runtime 10.0.0. Generic record-class
+checks in Raven's .NET tests do not expand neoCLR's supported component profile.
+
 ## Current Result propagation follow-up
 
 The current sources require Raven `22cea6fa1` or later on

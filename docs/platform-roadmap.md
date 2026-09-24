@@ -740,8 +740,10 @@ null is preserved even for non-nullable declarations, and generated equality/has
 handle it. Object.Equals and ReferenceEquals now annotate nullable comparison
 arguments for Raven compatibility. The author keeps reference annotations for now
 while leaving the future nullability model and metadata format open. Explicit
-nullable-string components and typed record Equals annotations remain separate work.
-Generated Object.Equals now preserves the inherited nullable parameter contract. Value retirement remains a separate storage migration.
+nullable-string components remain separate work. Generated Object.Equals preserves
+the inherited nullable parameter contract, and typed record-class Equals now accepts
+a nullable record reference. Typed record-struct parameters remain values; the checked
+sample covers absent/present Key? locals and literal null. Value retirement remains a separate storage migration.
 
 **Absence-model direction, 2026-09-24:** prefer Option<T> for intentional absence in
 API/domain models, for both value types and reference types. Retain nullable reference

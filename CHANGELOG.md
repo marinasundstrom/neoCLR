@@ -19,7 +19,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   record-struct generator narrows its comparison argument after an exact-type guard
   before unboxing. Validation: 117 integration compiler checks, record/Object samples,
   385 API entries and the combined website. Regeneration changes 102 input/compiler
-  manifests only; runtime IL is unchanged.
+  manifests only; runtime IL is unchanged. Follow up with typed record-class
+  Equals(Record?) metadata and overload selection, preserving non-nullable record
+  structs and explicit Equals declarations. Repair general Raven interface dispatch
+  for top-level reference annotations and target nested-record component lookup.
+  Extend the checked record sample and pinned .NET comparison; no library API changes.
+  Typed-equality validation includes 61 target record checks, all three record programs,
+  32 pinned .NET assertions, API/snapshot checks and the combined website build.
 
 - Implement the first non-generic struct/record-struct Object integration: explicit
   named-value overrides dispatch into boxed payloads with readonly protection;

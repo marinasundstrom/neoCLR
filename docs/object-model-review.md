@@ -545,3 +545,35 @@ neoCLR selects false through its shared build props. RAV0407 reports "Value type
 can't be declared as nullable". This keeps source diagnostics consistent with the
 current absence model without implementing a nullable value carrier. Reference
 annotations remain available; Option record components remain separate work.
+
+### Typed record-class equality — 2026-09-24
+
+The remaining concrete annotation gap was generated Equals(Record): nullable record
+locals fell back to Equals(Object?) rather than selecting typed equality. The existing
+body already handled null. The selected repair emits Equals(Record?) for classes and
+keeps Equals(Record) for structs; changing record structs to Nullable<Record> would
+conflict with the selected absence policy and is unnecessary.
+
+Microsoft's [record reference](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/record)
+(retrieved 2026-09-24) describes the typed class equality contract. The pinned .NET
+10.0.100/.NET 10.0.0 baseline now checks nullable/literal-null arguments, interface
+dispatch and reflected class-versus-struct parameter annotations (32 assertions).
+This is compiler metadata and overload alignment, not a new runtime null mechanism.
+Keeping only the Object fallback would leave misleading type information and choose
+the less specific overload. The cost is correctly preserving dispatch and component
+lookup after the annotation changes.
+
+A general Raven main-based regression checks typed overload selection, emitted and
+reimported metadata, null/equal/different values, interface calls, generic class
+construction and preservation of explicit Equals declarations. It exposed an emitter
+mismatch: binding ignored reference annotations for interface matching but emission
+did not, causing TypeLoadException. Emission now matches top-level nullable reference
+parameters and returns without erasing nullable value wrappers. The integration branch
+also resolves nested record-class components by their underlying typed parameter while
+retaining null guards. Equatable<T>'s public contract is unchanged.
+
+neoCLR's sample adds absent/present Key? locals and literal-null comparisons. Generic
+record support on .NET is compiler regression coverage, not new neoCLR component
+support. Option components, nullable strings and broader signature matching remain
+separate questions; no public library API, runtime instruction or metadata format is
+added by this slice.

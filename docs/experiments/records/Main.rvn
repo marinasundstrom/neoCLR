@@ -88,6 +88,11 @@ func Main() {
     if first.Equals(absentObject) || !first.Equals(boxedObject) {
         System.Fault("Record class Object equality must accept nullable comparison arguments")
     }
+    let absentKey: Key? = null
+    let maybeKey: Key? = second
+    if first.Equals(absentKey) || first.Equals(null) || !first.Equals(maybeKey) {
+        System.Fault("Typed record equality must accept nullable record references")
+    }
     let equatable: Equatable<Key> = first
     if !Object.ReferenceEquals(first, alias) {
         System.Fault("Record assignment must preserve class identity")

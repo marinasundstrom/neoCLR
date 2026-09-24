@@ -55,3 +55,9 @@ nested display agree. SDK/runtime pins are unchanged.
 The default-reference follow-up adds two assertions (30 total): zero initialization
 preserves a null non-nullable string field, and record equality/hash/display handle
 it. Null remains distinct from empty. SDK/runtime pins are unchanged.
+
+The typed record equality follow-up (2026-09-24) adds two assertions (32 total): a
+record-class Equals accepts a nullable record local and literal null, including
+IEquatable dispatch; reflected typed class parameters are nullable, while typed
+record-struct parameters remain non-nullable values. All pass with the pinned
+SDK 10.0.100 and runtime .NET 10.0.0.
