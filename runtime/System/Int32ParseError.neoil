@@ -1,2 +1,1 @@
-.include "../raven/generated/Int32ParseError.methods.neoil"
-.include "../raven/generated/Int32ParseError.helpers.neoil"
+.include "../legacy/Int32ParseError.neoil"

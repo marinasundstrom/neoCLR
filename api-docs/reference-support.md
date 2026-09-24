@@ -11,10 +11,14 @@ Many sample programs use [ArrayList](xref:System.Collections.ArrayList`1),
 and [query operators](xref:System.Linq.Operators). Their member references supplement
 the [collections](/features/collections/) and [outcomes](/features/outcomes/) walkthroughs.
 
+[Enum](xref:System.Enum) additionally exposes executable development helpers for
+names and values, with TypeInfo and constrained generic overloads. Its class remains
+non-constructible; its presence does not imply every .NET Enum method is supported.
+
 ## Metadata scaffolds
 
 Public visibility in a compiler reference does not mean that every CLR support type
-is an executable neoCLR service. ValueType, Enum, Delegate, MulticastDelegate,
+is an executable neoCLR service. ValueType, Delegate, MulticastDelegate,
 Attribute, attribute metadata and NotImplementedException support compilation or
 reference-body scaffolding. Their pages identify that role. In particular,
 MulticastDelegate does not promise multicast callbacks, and the placeholder exception

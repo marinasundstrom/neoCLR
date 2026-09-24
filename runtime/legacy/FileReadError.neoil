@@ -1,0 +1,574 @@
+; Historical Neo bootstrap carrier, retained from 00c1828a.
+; Raven uses the migrated runtime/raven declaration. See README.md.
+
+.type System.Storage.FileReadError
+.sealed
+.custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+.field private Stored Value
+.property instance IsInvalidLimit() -> Boolean
+.get instance System.Storage.FileReadError::get_IsInvalidLimit()
+.end
+.property instance IsInvalidPath() -> Boolean
+.get instance System.Storage.FileReadError::get_IsInvalidPath()
+.end
+.property instance IsNotFound() -> Boolean
+.get instance System.Storage.FileReadError::get_IsNotFound()
+.end
+.property instance IsAccessDenied() -> Boolean
+.get instance System.Storage.FileReadError::get_IsAccessDenied()
+.end
+.property instance IsNotRegularFile() -> Boolean
+.get instance System.Storage.FileReadError::get_IsNotRegularFile()
+.end
+.property instance IsTooLarge() -> Boolean
+.get instance System.Storage.FileReadError::get_IsTooLarge()
+.end
+.property instance IsReadFailed() -> Boolean
+.get instance System.Storage.FileReadError::get_IsReadFailed()
+.end
+.property instance IsInvalidUtf8() -> Boolean
+.get instance System.Storage.FileReadError::get_IsInvalidUtf8()
+.end
+.method instance .ctor(System.Storage.FileReadError.InvalidLimit value) -> Void
+ldarg value
+value.pack System.Storage.FileReadError.InvalidLimit
+newobj System.Storage.FileReadError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsInvalidLimit() -> Boolean
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M00000002_IL_0008:
+value.is System.Storage.FileReadError.InvalidLimit
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_000d:
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetInvalidLimit() -> System.Storage.FileReadError.InvalidLimit
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M00000003_IL_0008:
+value.unpack System.Storage.FileReadError.InvalidLimit
+M00000003_IL_000d:
+ret
+.end
+.method instance .ctor(System.Storage.FileReadError.InvalidPath value) -> Void
+ldarg value
+value.pack System.Storage.FileReadError.InvalidPath
+newobj System.Storage.FileReadError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsInvalidPath() -> Boolean
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M00000005_IL_0008:
+value.is System.Storage.FileReadError.InvalidPath
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_000d:
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetInvalidPath() -> System.Storage.FileReadError.InvalidPath
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M00000006_IL_0008:
+value.unpack System.Storage.FileReadError.InvalidPath
+M00000006_IL_000d:
+ret
+.end
+.method instance .ctor(System.Storage.FileReadError.NotFound value) -> Void
+ldarg value
+value.pack System.Storage.FileReadError.NotFound
+newobj System.Storage.FileReadError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsNotFound() -> Boolean
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M00000008_IL_0008:
+value.is System.Storage.FileReadError.NotFound
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_000d:
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetNotFound() -> System.Storage.FileReadError.NotFound
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M00000009_IL_0008:
+value.unpack System.Storage.FileReadError.NotFound
+M00000009_IL_000d:
+ret
+.end
+.method instance .ctor(System.Storage.FileReadError.AccessDenied value) -> Void
+ldarg value
+value.pack System.Storage.FileReadError.AccessDenied
+newobj System.Storage.FileReadError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsAccessDenied() -> Boolean
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M0000000b_IL_0008:
+value.is System.Storage.FileReadError.AccessDenied
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_000d:
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetAccessDenied() -> System.Storage.FileReadError.AccessDenied
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M0000000c_IL_0008:
+value.unpack System.Storage.FileReadError.AccessDenied
+M0000000c_IL_000d:
+ret
+.end
+.method instance .ctor(System.Storage.FileReadError.NotRegularFile value) -> Void
+ldarg value
+value.pack System.Storage.FileReadError.NotRegularFile
+newobj System.Storage.FileReadError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsNotRegularFile() -> Boolean
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+M0000000e_IL_0002:
+ldarg 0
+M0000000e_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M0000000e_IL_0008:
+value.is System.Storage.FileReadError.NotRegularFile
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_000d:
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetNotRegularFile() -> System.Storage.FileReadError.NotRegularFile
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+ldarg 0
+M0000000f_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M0000000f_IL_0008:
+value.unpack System.Storage.FileReadError.NotRegularFile
+M0000000f_IL_000d:
+ret
+.end
+.method instance .ctor(System.Storage.FileReadError.TooLarge value) -> Void
+ldarg value
+value.pack System.Storage.FileReadError.TooLarge
+newobj System.Storage.FileReadError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsTooLarge() -> Boolean
+M00000011_IL_0000:
+M00000011_IL_0001:
+M00000011_IL_0002:
+ldarg 0
+M00000011_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M00000011_IL_0008:
+value.is System.Storage.FileReadError.TooLarge
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_000d:
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetTooLarge() -> System.Storage.FileReadError.TooLarge
+M00000012_IL_0000:
+M00000012_IL_0001:
+M00000012_IL_0002:
+ldarg 0
+M00000012_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M00000012_IL_0008:
+value.unpack System.Storage.FileReadError.TooLarge
+M00000012_IL_000d:
+ret
+.end
+.method instance .ctor(System.Storage.FileReadError.ReadFailed value) -> Void
+ldarg value
+value.pack System.Storage.FileReadError.ReadFailed
+newobj System.Storage.FileReadError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsReadFailed() -> Boolean
+M00000014_IL_0000:
+M00000014_IL_0001:
+M00000014_IL_0002:
+ldarg 0
+M00000014_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M00000014_IL_0008:
+value.is System.Storage.FileReadError.ReadFailed
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M00000014_IL_000d:
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetReadFailed() -> System.Storage.FileReadError.ReadFailed
+M00000015_IL_0000:
+M00000015_IL_0001:
+M00000015_IL_0002:
+ldarg 0
+M00000015_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M00000015_IL_0008:
+value.unpack System.Storage.FileReadError.ReadFailed
+M00000015_IL_000d:
+ret
+.end
+.method instance .ctor(System.Storage.FileReadError.InvalidUtf8 value) -> Void
+ldarg value
+value.pack System.Storage.FileReadError.InvalidUtf8
+newobj System.Storage.FileReadError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsInvalidUtf8() -> Boolean
+M00000017_IL_0000:
+M00000017_IL_0001:
+M00000017_IL_0002:
+ldarg 0
+M00000017_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M00000017_IL_0008:
+value.is System.Storage.FileReadError.InvalidUtf8
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_000d:
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetInvalidUtf8() -> System.Storage.FileReadError.InvalidUtf8
+M00000018_IL_0000:
+M00000018_IL_0001:
+M00000018_IL_0002:
+ldarg 0
+M00000018_IL_0003:
+ldfld System.Storage.FileReadError::Stored
+M00000018_IL_0008:
+value.unpack System.Storage.FileReadError.InvalidUtf8
+M00000018_IL_000d:
+ret
+.end
+.method instance ToString() -> String
+M00000019_IL_0000:
+M00000019_IL_0001:
+M00000019_IL_0002:
+ldarg 0
+M00000019_IL_0003:
+call instance System.Storage.FileReadError::get_IsInvalidLimit()
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M00000019_IL_0008:
+brtrue M00000019_IL_0012
+M00000019_IL_000d:
+br M00000019_IL_0019
+M00000019_IL_0012:
+M00000019_IL_0013:
+ldstr "ArgumentOutOfRange"
+M00000019_IL_0018:
+ret
+M00000019_IL_0019:
+M00000019_IL_001a:
+M00000019_IL_001b:
+ldarg 0
+M00000019_IL_001c:
+call instance System.Storage.FileReadError::get_IsInvalidPath()
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M00000019_IL_0021:
+brtrue M00000019_IL_002b
+M00000019_IL_0026:
+br M00000019_IL_0032
+M00000019_IL_002b:
+M00000019_IL_002c:
+ldstr "InvalidPath"
+M00000019_IL_0031:
+ret
+M00000019_IL_0032:
+M00000019_IL_0033:
+M00000019_IL_0034:
+ldarg 0
+M00000019_IL_0035:
+call instance System.Storage.FileReadError::get_IsNotFound()
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M00000019_IL_003a:
+brtrue M00000019_IL_0044
+M00000019_IL_003f:
+br M00000019_IL_004b
+M00000019_IL_0044:
+M00000019_IL_0045:
+ldstr "FileNotFound"
+M00000019_IL_004a:
+ret
+M00000019_IL_004b:
+M00000019_IL_004c:
+M00000019_IL_004d:
+ldarg 0
+M00000019_IL_004e:
+call instance System.Storage.FileReadError::get_IsAccessDenied()
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M00000019_IL_0053:
+brtrue M00000019_IL_005d
+M00000019_IL_0058:
+br M00000019_IL_0064
+M00000019_IL_005d:
+M00000019_IL_005e:
+ldstr "AccessDenied"
+M00000019_IL_0063:
+ret
+M00000019_IL_0064:
+M00000019_IL_0065:
+M00000019_IL_0066:
+ldarg 0
+M00000019_IL_0067:
+call instance System.Storage.FileReadError::get_IsNotRegularFile()
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M00000019_IL_006c:
+brtrue M00000019_IL_0076
+M00000019_IL_0071:
+br M00000019_IL_007d
+M00000019_IL_0076:
+M00000019_IL_0077:
+ldstr "NotRegularFile"
+M00000019_IL_007c:
+ret
+M00000019_IL_007d:
+M00000019_IL_007e:
+M00000019_IL_007f:
+ldarg 0
+M00000019_IL_0080:
+call instance System.Storage.FileReadError::get_IsTooLarge()
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M00000019_IL_0085:
+brtrue M00000019_IL_008f
+M00000019_IL_008a:
+br M00000019_IL_0096
+M00000019_IL_008f:
+M00000019_IL_0090:
+ldstr "FileTooLarge"
+M00000019_IL_0095:
+ret
+M00000019_IL_0096:
+M00000019_IL_0097:
+M00000019_IL_0098:
+ldarg 0
+M00000019_IL_0099:
+call instance System.Storage.FileReadError::get_IsReadFailed()
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M00000019_IL_009e:
+brtrue M00000019_IL_00a8
+M00000019_IL_00a3:
+br M00000019_IL_00af
+M00000019_IL_00a8:
+M00000019_IL_00a9:
+ldstr "FileReadFailed"
+M00000019_IL_00ae:
+ret
+M00000019_IL_00af:
+M00000019_IL_00b0:
+M00000019_IL_00b1:
+ldarg 0
+M00000019_IL_00b2:
+call instance System.Storage.FileReadError::get_IsInvalidUtf8()
+call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean)
+M00000019_IL_00b7:
+brtrue M00000019_IL_00c1
+M00000019_IL_00bc:
+br M00000019_IL_00c8
+M00000019_IL_00c1:
+M00000019_IL_00c2:
+ldstr "InvalidUtf8"
+M00000019_IL_00c7:
+ret
+M00000019_IL_00c8:
+M00000019_IL_00c9:
+M00000019_IL_00ca:
+ldstr "invalid I/O error case"
+M00000019_IL_00cf:
+call System.Fault(String)
+M00000019_IL_00d4:
+M00000019_IL_00d5:
+ldstr ""
+M00000019_IL_00da:
+ret
+.end
+.end
+
+.function neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.type System.Storage.FileReadError.InvalidLimit
+.sealed
+.method instance .ctor() -> Void
+M0000001a_IL_0000:
+M0000001a_IL_0001:
+ldarg 0
+M0000001a_IL_0002:
+pop
+M0000001a_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Storage.FileReadError.InvalidPath
+.sealed
+.method instance .ctor() -> Void
+M0000001b_IL_0000:
+M0000001b_IL_0001:
+ldarg 0
+M0000001b_IL_0002:
+pop
+M0000001b_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Storage.FileReadError.NotFound
+.sealed
+.method instance .ctor() -> Void
+M0000001c_IL_0000:
+M0000001c_IL_0001:
+ldarg 0
+M0000001c_IL_0002:
+pop
+M0000001c_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Storage.FileReadError.AccessDenied
+.sealed
+.method instance .ctor() -> Void
+M0000001d_IL_0000:
+M0000001d_IL_0001:
+ldarg 0
+M0000001d_IL_0002:
+pop
+M0000001d_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Storage.FileReadError.NotRegularFile
+.sealed
+.method instance .ctor() -> Void
+M0000001e_IL_0000:
+M0000001e_IL_0001:
+ldarg 0
+M0000001e_IL_0002:
+pop
+M0000001e_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Storage.FileReadError.TooLarge
+.sealed
+.method instance .ctor() -> Void
+M0000001f_IL_0000:
+M0000001f_IL_0001:
+ldarg 0
+M0000001f_IL_0002:
+pop
+M0000001f_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Storage.FileReadError.ReadFailed
+.sealed
+.method instance .ctor() -> Void
+M00000020_IL_0000:
+M00000020_IL_0001:
+ldarg 0
+M00000020_IL_0002:
+pop
+M00000020_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Storage.FileReadError.InvalidUtf8
+.sealed
+.method instance .ctor() -> Void
+M00000021_IL_0000:
+M00000021_IL_0001:
+ldarg 0
+M00000021_IL_0002:
+pop
+M00000021_IL_0007:
+ldvoid
+ret
+.end
+.end

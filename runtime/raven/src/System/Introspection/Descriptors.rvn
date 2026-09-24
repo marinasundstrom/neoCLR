@@ -315,6 +315,7 @@ public sealed interface TypeInfo : MemberInfo, Equatable<TypeInfo> {
 
     val BaseType: Option<TypeInfo> { get }
     func GetInterfaces() -> Sequence<TypeInfo>
+    func GetEnumValues() -> Sequence<Object>
     func GetEnumNames() -> Sequence<string>
     func GetEnumUnderlyingType() -> TypeInfo
     func GetFields() -> Sequence<FieldInfo>
@@ -340,6 +341,10 @@ internal class RuntimeTypeInfo : TypeInfo {
 
     func GetInterfaces() -> Sequence<TypeInfo> {
         return RuntimeServices.TypeInterfaces(Handle)
+    }
+
+    func GetEnumValues() -> Sequence<Object> {
+        return RuntimeServices.TypeEnumValues(Handle)
     }
 
     func GetEnumNames() -> Sequence<string> {

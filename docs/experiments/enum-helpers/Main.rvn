@@ -1,0 +1,42 @@
+import System.*
+import System.Storage.EntryKind
+import System.Introspection.BindingFlags
+
+func Check(condition: bool) {
+    if !condition {
+        Fault("Enum helper contract changed")
+    }
+}
+
+func Main() {
+    let names = Enum.GetNames<EntryKind>()
+    let values = Enum.GetValues<EntryKind>()
+    Check(names.Count == 2)
+    Check(names[0] == "File")
+    Check(names[1] == "Directory")
+    Check(values[0] == EntryKind.File)
+    Check(values[0].ToString() == "File")
+    Check(values[1] == EntryKind.Directory)
+
+    let boxed: Object = EntryKind.File
+    let enumType = boxed.GetType()
+    let discoveredNames = Enum.GetNames(enumType)
+    let discoveredValues = Enum.GetValues(enumType)
+    Check(discoveredNames[0] == names[0])
+    Check((EntryKind)discoveredValues[0] == values[0])
+    Check(discoveredValues[0].GetType().Equals(enumType))
+    Check(discoveredValues[0].ToString() == "File")
+    let unnamed: Object = (EntryKind)0
+    Check(unnamed.ToString() == "0")
+    let flags: Object = BindingFlags.Public | BindingFlags.Instance
+    Check(flags.ToString() == "Instance, Public")
+    var round = 0
+    while round < 80 {
+        let snapshot = Enum.GetValues<EntryKind>()
+        Check(snapshot[1] == EntryKind.Directory)
+        round = round + 1
+    }
+    Check(values[0] == EntryKind.File)
+    Check(discoveredValues[0].ToString() == "File")
+    Console.WriteLine("Enum names, typed values, discovery and formatting: passed")
+}

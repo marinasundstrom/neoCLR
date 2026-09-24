@@ -67,6 +67,13 @@ ldfld 0
 ceq
 ret
 .end
+.method instance override byref ToString() -> String
+ldtoken System.Storage.EntryKind
+ldarg this
+ldfld 0
+call neoCLR.Runtime.EnumFormat(System.RuntimeTypeHandle,Int32)
+ret
+.end
 .method static File() -> System.Storage.EntryKind
 ldc.i4 1
 newobj System.Storage.EntryKind

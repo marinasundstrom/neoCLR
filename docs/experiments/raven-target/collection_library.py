@@ -30,6 +30,9 @@ def adapt(text: str, name: str) -> str:
 
 
 def build(path: Path) -> str:
+    if path.resolve().parent == ROOT / 'runtime/legacy':
+        return (build(ROOT / 'runtime/raven/generated' / (path.stem + '.methods.neoil'))
+                + build(ROOT / 'runtime/raven/generated' / (path.stem + '.helpers.neoil')))
     if path.parent == ROOT / 'runtime/System' and path.stem in {'Environment', 'Console', 'Clonable', 'LocalDateTime', 'Disposable', 'Equatable', 'Comparable', 'SystemClock', 'Closable'}:
         return build(ROOT / 'runtime/raven' / path.name)
     if path == ROOT / 'runtime/System/Storage/File.neoil':
@@ -86,6 +89,7 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/ModuleInfo.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/AssemblyInfo.neoil')
         result += build(ROOT / 'runtime/raven/Object.neoil')
+        result += build(ROOT / 'runtime/neoCLR/Runtime/EnumInspection.neoil')
         result += build(ROOT / 'runtime/raven/HashCode.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectTypeHandle.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectIdentity.neoil')

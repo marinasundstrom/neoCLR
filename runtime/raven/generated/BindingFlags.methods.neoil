@@ -71,6 +71,13 @@ ldfld 0
 ceq
 ret
 .end
+.method instance override byref ToString() -> String
+ldtoken System.Introspection.BindingFlags
+ldarg this
+ldfld 0
+call neoCLR.Runtime.EnumFormat(System.RuntimeTypeHandle,Int32)
+ret
+.end
 .method static Default() -> System.Introspection.BindingFlags
 ldc.i4 0
 newobj System.Introspection.BindingFlags

@@ -6880,3 +6880,43 @@ configuration/content, not target-specific code added to Raven main.
   enum type and requires an enum constraint. All forms share metadata and ordering;
   enum formatting should use that same metadata. Implementation is the next slice,
   not a shipped API in the union migration.
+
+### 2026-09-25 — Built-in range and Boolean text fields
+
+- **Author proposal:** add MinValue and MaxValue fields to built-in types where
+  applicable; points to .NET Boolean.FalseString and TrueString.
+- **Assistant response:** schedules an audit after the Enum helper slice, covering
+  numeric and Char limits and Boolean text fields. The supplied
+  [Microsoft reference](https://learn.microsoft.com/en-us/dotnet/api/system.boolean.falsestring?view=net-10.0)
+  defines FalseString as a static read-only field containing `"False"`. Field shape,
+  pointer-sized limits and existing Boolean formatting need validation. No fields
+  are claimed implemented by this planning entry.
+
+### 2026-09-25 — Enum flags helpers
+
+- **Author proposal:** consider methods for enum flags on Enum.
+- **Assistant response/investigation:** identifies HasFlag as the first candidate,
+  with `(value & flag) == flag` semantics including zero. Existing nominal runtime
+  enums already emit typed HasFlag and bitwise helpers, but the current Raven
+  reference does not expose HasFlag on System.Enum. A public surface and validation
+  are still needed; no new helper is claimed shipped. Broader has-any/set/remove
+  convenience APIs remain use-case-driven candidates.
+- **Related correction:** Char is a grapheme in neoCLR, so the earlier suggestion
+  to copy UTF-16 Char bounds does not fit. Restrict the upcoming numeric field audit
+  accordingly; pointer ranges must follow the target contract.
+
+### 2026-09-25 — Finish the current slice and return to HTTP
+
+- **Author direction:** “When done with this, put other changes on hold, finish
+  union migration, continue with work on Http.”
+- **Assistant response/actions:** completes the Enum helper slice first and places
+  numeric/Boolean fields and further flags APIs on hold. The SDK probe validates
+  names/typed values/TypeInfo discovery, formatting, compiler rejection of non-enum
+  arguments and runtime rejection of non-enum TypeInfo; GC run reports 501 allocations,
+  ten collections and zero live objects. Broader checks expose the historical Neo
+  manifest accidentally using Raven-only generated union bodies. Explicit legacy
+  snapshots restore that profile boundary; Raven still uses normal union declarations.
+- **Next:** close remaining applicable migrations, keeping generic Option/Result/
+  TaskOutcome projection blockers explicit, then resume the HTTP error/URI pipeline.
+  Those generic carriers are not claimed migrated and do not automatically become a
+  prerequisite for the author-directed HTTP work.

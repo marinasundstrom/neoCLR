@@ -116,6 +116,7 @@ static class RuntimeServiceBindings
             ("TypeElementType", ["System.RuntimeTypeHandle"], "System.Option<System.Introspection.TypeInfo>"),
             ("TypeInterfaces", ["System.RuntimeTypeHandle"], "arrayref<System.Introspection.TypeInfo>"),
             ("TypeGenericArguments", ["System.RuntimeTypeHandle"], "arrayref<System.Introspection.TypeInfo>"),
+            ("TypeEnumValues", ["System.RuntimeTypeHandle"], "arrayref<System.Object>"),
             ("TypeEnumNames", ["System.RuntimeTypeHandle"], "arrayref<String>"),
             ("TypeEnumUnderlying", ["System.RuntimeTypeHandle"], "System.Introspection.TypeInfo")
         }).ToArray();

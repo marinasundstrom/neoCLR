@@ -33,7 +33,7 @@ static class UnionImport
     {
         if (dependencies.Length > 8) throw new InvalidDataException("Library input limit exceeded.");
         GenericUnionBindings.Reset();
-        TaskBindings.Reset(); CollectionBindings.Reset(); ReflectionBindings.Reset(); RuntimeServiceBindings.Reset();
+        TaskBindings.Reset(); CollectionBindings.Reset(); ReflectionBindings.Reset(); EnumHelpersBindings.Reset(); RuntimeServiceBindings.Reset();
         DelegateBindings.Reset();
         var inputs = new[] { application, core }.Concat(dependencies).ToArray();
         foreach (var path in inputs)
@@ -854,7 +854,7 @@ static class UnionImport
                             var pathCall = HashCodeBindings.Bind(reference, targetMethod) ?? UriBindings.Bind(reference, targetMethod) ?? PathBindings.Bind(reference, targetMethod);
                             var interfaceCall = collectionProfile ? InterfaceBindings.Bind(reference, targetMethod) : null;
                             var nativeCall = collectionProfile ? NativeMemoryBindings.Bind(reference, targetMethod) : null;
-                            var reflectionCall = collectionProfile ? ReflectionBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
+                            var reflectionCall = collectionProfile ? EnumHelpersBindings.Bind(reference, targetMethod) ?? ReflectionBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
                             var queryCall = collectionProfile ? QueryBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt)
                                 ?? OutcomeOperatorBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
                             var arrayCallback = collectionProfile ? ArrayCallbackBindings.Bind(reference, targetMethod, libraryOwner is null ? null : t => ProfileType(t)) : null;
@@ -983,7 +983,7 @@ static class UnionImport
             if (!ApplicationTypes.OnlyLibraryTypes) throw new InvalidDataException("Library fragments cannot introduce application type identities.");
         }
         output.Append(ApplicationTypes.Declarations(ProfileType, instanceBodies));
-        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters(collectionProfile)).AppendLine(BooleanBindings.Adapters).AppendLine(ReflectionBindings.Adapters).AppendLine(EnumBindings.Adapters);
+        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters(collectionProfile)).AppendLine(BooleanBindings.Adapters).AppendLine(ReflectionBindings.Adapters).AppendLine(EnumBindings.Adapters).AppendLine(EnumHelpersBindings.Adapters);
         foreach (var helper in coercions.Values) output.Append(helper.Body);
         output.Append(RuntimeServiceBindings.Adapters);
         output.Append(HashCodeBindings.ConstructorAdapter);

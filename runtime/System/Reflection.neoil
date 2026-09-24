@@ -510,4 +510,4 @@
 .end
 
 ; Int32-backed flags enum. Existing factories remain compatible. CLR bit values.
-.include "../raven/BindingFlags.neoil"
+.include "../legacy/BindingFlags.neoil"

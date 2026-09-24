@@ -187,3 +187,27 @@ Questions, sample programs and documentation corrections are welcome. See [how t
 
 The generated reference describes development after Preview 9. Use the availability
 notes above to distinguish it from the published toolchain.
+
+## Enum names and values
+
+Development APIs on `System.Enum` support both a known enum and discovery through
+`TypeInfo`:
+
+```raven
+let names = Enum.GetNames<EntryKind>()
+let values = Enum.GetValues<EntryKind>()
+let boxed: Object = EntryKind.File
+let discovered = Enum.GetValues(boxed.GetType())
+```
+
+The generic values stay typed as `EntryKind`; discovery returns boxed enum values.
+Both return fresh `Sequence` snapshots ordered by unsigned underlying value, with
+aliases retained. Current supported enums are `EntryKind`, `TaskState` and
+`BindingFlags`. Generic calls reject non-enum arguments; a non-enum `TypeInfo` faults.
+This sample uses imports from `System` and `System.Storage`.
+
+Boxed enums now format named values, flags combinations and unnamed numeric values.
+An unnamed zero prints `0`. This follows the basic .NET behavior, with stable
+metadata order for aliases and Sequence results instead of public array contracts.
+The current generic implementation allocates an intermediate boxed snapshot.
+See [Enum API reference](/docs/api/System/Enum/) for both overload families.

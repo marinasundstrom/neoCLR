@@ -93,6 +93,6 @@
 .include "System/Storage/FileWriteError.neoil"
 .include "neoCLR/Runtime/WriteAllText.neoil"
 
-.include "raven/StreamError.neoil"
+.include "legacy/StreamError.neoil"
 .include "raven/InputStream.neoil"
 .include "raven/OutputStream.neoil"

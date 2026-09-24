@@ -306,7 +306,15 @@ TaskOutcome needs its terminal-state/task integration checked. Per-case helpers 
 not a future requirement. Payload-bearing explicit layout is separately rejected.
 These are tracked implementation boundaries, not permanent exemptions.
 
-Boxed enum ToString currently lacks an Object override. The next author-directed
-slice is helpers on System.Enum with both TypeInfo and generic overloads, backed by
-shared metadata for names/values and formatting. Existing TypeInfo.GetEnumNames and
-GetEnumUnderlyingType are foundations, not substitutes for that public surface.
+The Enum helper slice now supplies both TypeInfo and generic overloads on
+System.Enum, typed value snapshots and boxed formatting. See the
+[verified sample](../enum-helpers/README.md). The historical Neo bootstrap uses
+explicit legacy carrier/BindingFlags snapshots; the Raven profile uses the migrated
+unions. This compatibility boundary does not restore Is*/Get* requirements.
+
+The applicable nongeneric empty-case migration batch is complete. Generic Option,
+Result and TaskOutcome remain documented manual exceptions pending their specific
+projection/propagation work. Author direction on 2026-09-25 places other additions
+on hold and returns work to HTTP. The next necessary bridge work is importing a
+nongeneric data-bearing HttpError union into the class library, followed by typed
+HTTP errors and string/Uri BaseUri resolution.

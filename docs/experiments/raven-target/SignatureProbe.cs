@@ -73,6 +73,25 @@ static class SignatureProbe
         cancelled.Constant = 2;
         EnumBindings.Validate(module, EnumBindings.EntryKind);
         var entryKind = module.GetType(EnumBindings.EntryKind);
+        foreach (var helper in module.GetType("System.Enum").Methods.Where(m => m.IsStatic))
+        {
+            if (!helper.HasGenericParameters)
+            {
+                Check("Enum TypeInfo overload " + helper.Name, EnumHelpersBindings.Bind(helper, helper) is not null);
+                continue;
+            }
+            var call = new GenericInstanceMethod(helper);
+            call.GenericArguments.Add(entryKind);
+            Check("Enum generic overload " + helper.Name, EnumHelpersBindings.Bind(call, helper) is not null);
+            var attributes = helper.GenericParameters[0].Attributes;
+            helper.GenericParameters[0].Attributes = GenericParameterAttributes.NonVariant;
+            Reject("Enum missing value constraint " + helper.Name, () => EnumHelpersBindings.Bind(call, helper));
+            helper.GenericParameters[0].Attributes = attributes;
+            call.GenericArguments[0] = module.TypeSystem.Int32;
+            Reject("Enum non-enum argument " + helper.Name, () => EnumHelpersBindings.Bind(call, helper));
+        }
+        EnumHelpersBindings.Reset();
+
         Check("EntryKind is a non-flags enum", entryKind.IsEnum && !entryKind.HasNestedTypes && entryKind.CustomAttributes.Count == 0);
         var directoryKind = entryKind.Fields.Single(f => f.Name == "Directory");
         directoryKind.Constant = 99;

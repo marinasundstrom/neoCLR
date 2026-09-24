@@ -16,6 +16,10 @@ UTF-8 operations, with [Object content behavior](objects.md#string-through-objec
 construction, equality, ordering and display; see [Object contracts](objects.md)
 for boxed behavior.
 
+[Enum](xref:System.Enum) provides names and values through either a TypeInfo or an
+enum type parameter. Generic values remain typed; discovery preserves the exact
+boxed enum identity. See [Introspection](/features/introspection/) for current limits.
+
 Start with a feature guide for behavior and working examples, or open a namespace
 for generated type and member documentation. Both are parts of this site.
 

@@ -1,0 +1,706 @@
+; Historical Neo bootstrap carrier, retained from 00c1828a.
+; Raven uses the migrated runtime/raven declaration. See README.md.
+
+.type System.IO.StreamError
+.sealed
+.custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+.field private Stored Value
+.property instance IsInvalidPath() -> Boolean
+.get instance System.IO.StreamError::get_IsInvalidPath()
+.end
+.property instance IsNotFound() -> Boolean
+.get instance System.IO.StreamError::get_IsNotFound()
+.end
+.property instance IsAccessDenied() -> Boolean
+.get instance System.IO.StreamError::get_IsAccessDenied()
+.end
+.property instance IsWrongKind() -> Boolean
+.get instance System.IO.StreamError::get_IsWrongKind()
+.end
+.property instance IsAlreadyExists() -> Boolean
+.get instance System.IO.StreamError::get_IsAlreadyExists()
+.end
+.property instance IsClosed() -> Boolean
+.get instance System.IO.StreamError::get_IsClosed()
+.end
+.property instance IsInvalidRange() -> Boolean
+.get instance System.IO.StreamError::get_IsInvalidRange()
+.end
+.property instance IsLimitExceeded() -> Boolean
+.get instance System.IO.StreamError::get_IsLimitExceeded()
+.end
+.property instance IsWrongAccess() -> Boolean
+.get instance System.IO.StreamError::get_IsWrongAccess()
+.end
+.property instance IsIoFailure() -> Boolean
+.get instance System.IO.StreamError::get_IsIoFailure()
+.end
+.method instance .ctor(System.IO.StreamError.InvalidPath value) -> Void
+ldarg value
+value.pack System.IO.StreamError.InvalidPath
+newobj System.IO.StreamError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsInvalidPath() -> Boolean
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldfld System.IO.StreamError::Stored
+M00000002_IL_0008:
+value.is System.IO.StreamError.InvalidPath
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_000d:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetInvalidPath() -> System.IO.StreamError.InvalidPath
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.IO.StreamError::Stored
+M00000003_IL_0008:
+value.unpack System.IO.StreamError.InvalidPath
+M00000003_IL_000d:
+ret
+.end
+.method instance .ctor(System.IO.StreamError.NotFound value) -> Void
+ldarg value
+value.pack System.IO.StreamError.NotFound
+newobj System.IO.StreamError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsNotFound() -> Boolean
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.IO.StreamError::Stored
+M00000005_IL_0008:
+value.is System.IO.StreamError.NotFound
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_000d:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetNotFound() -> System.IO.StreamError.NotFound
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.IO.StreamError::Stored
+M00000006_IL_0008:
+value.unpack System.IO.StreamError.NotFound
+M00000006_IL_000d:
+ret
+.end
+.method instance .ctor(System.IO.StreamError.AccessDenied value) -> Void
+ldarg value
+value.pack System.IO.StreamError.AccessDenied
+newobj System.IO.StreamError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsAccessDenied() -> Boolean
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldfld System.IO.StreamError::Stored
+M00000008_IL_0008:
+value.is System.IO.StreamError.AccessDenied
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_000d:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetAccessDenied() -> System.IO.StreamError.AccessDenied
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldfld System.IO.StreamError::Stored
+M00000009_IL_0008:
+value.unpack System.IO.StreamError.AccessDenied
+M00000009_IL_000d:
+ret
+.end
+.method instance .ctor(System.IO.StreamError.WrongKind value) -> Void
+ldarg value
+value.pack System.IO.StreamError.WrongKind
+newobj System.IO.StreamError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsWrongKind() -> Boolean
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+ldfld System.IO.StreamError::Stored
+M0000000b_IL_0008:
+value.is System.IO.StreamError.WrongKind
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_000d:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetWrongKind() -> System.IO.StreamError.WrongKind
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+ldfld System.IO.StreamError::Stored
+M0000000c_IL_0008:
+value.unpack System.IO.StreamError.WrongKind
+M0000000c_IL_000d:
+ret
+.end
+.method instance .ctor(System.IO.StreamError.AlreadyExists value) -> Void
+ldarg value
+value.pack System.IO.StreamError.AlreadyExists
+newobj System.IO.StreamError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsAlreadyExists() -> Boolean
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+M0000000e_IL_0002:
+ldarg 0
+M0000000e_IL_0003:
+ldfld System.IO.StreamError::Stored
+M0000000e_IL_0008:
+value.is System.IO.StreamError.AlreadyExists
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_000d:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetAlreadyExists() -> System.IO.StreamError.AlreadyExists
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+ldarg 0
+M0000000f_IL_0003:
+ldfld System.IO.StreamError::Stored
+M0000000f_IL_0008:
+value.unpack System.IO.StreamError.AlreadyExists
+M0000000f_IL_000d:
+ret
+.end
+.method instance .ctor(System.IO.StreamError.Closed value) -> Void
+ldarg value
+value.pack System.IO.StreamError.Closed
+newobj System.IO.StreamError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsClosed() -> Boolean
+M00000011_IL_0000:
+M00000011_IL_0001:
+M00000011_IL_0002:
+ldarg 0
+M00000011_IL_0003:
+ldfld System.IO.StreamError::Stored
+M00000011_IL_0008:
+value.is System.IO.StreamError.Closed
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_000d:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetClosed() -> System.IO.StreamError.Closed
+M00000012_IL_0000:
+M00000012_IL_0001:
+M00000012_IL_0002:
+ldarg 0
+M00000012_IL_0003:
+ldfld System.IO.StreamError::Stored
+M00000012_IL_0008:
+value.unpack System.IO.StreamError.Closed
+M00000012_IL_000d:
+ret
+.end
+.method instance .ctor(System.IO.StreamError.InvalidRange value) -> Void
+ldarg value
+value.pack System.IO.StreamError.InvalidRange
+newobj System.IO.StreamError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsInvalidRange() -> Boolean
+M00000014_IL_0000:
+M00000014_IL_0001:
+M00000014_IL_0002:
+ldarg 0
+M00000014_IL_0003:
+ldfld System.IO.StreamError::Stored
+M00000014_IL_0008:
+value.is System.IO.StreamError.InvalidRange
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000014_IL_000d:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetInvalidRange() -> System.IO.StreamError.InvalidRange
+M00000015_IL_0000:
+M00000015_IL_0001:
+M00000015_IL_0002:
+ldarg 0
+M00000015_IL_0003:
+ldfld System.IO.StreamError::Stored
+M00000015_IL_0008:
+value.unpack System.IO.StreamError.InvalidRange
+M00000015_IL_000d:
+ret
+.end
+.method instance .ctor(System.IO.StreamError.LimitExceeded value) -> Void
+ldarg value
+value.pack System.IO.StreamError.LimitExceeded
+newobj System.IO.StreamError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsLimitExceeded() -> Boolean
+M00000017_IL_0000:
+M00000017_IL_0001:
+M00000017_IL_0002:
+ldarg 0
+M00000017_IL_0003:
+ldfld System.IO.StreamError::Stored
+M00000017_IL_0008:
+value.is System.IO.StreamError.LimitExceeded
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_000d:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetLimitExceeded() -> System.IO.StreamError.LimitExceeded
+M00000018_IL_0000:
+M00000018_IL_0001:
+M00000018_IL_0002:
+ldarg 0
+M00000018_IL_0003:
+ldfld System.IO.StreamError::Stored
+M00000018_IL_0008:
+value.unpack System.IO.StreamError.LimitExceeded
+M00000018_IL_000d:
+ret
+.end
+.method instance .ctor(System.IO.StreamError.WrongAccess value) -> Void
+ldarg value
+value.pack System.IO.StreamError.WrongAccess
+newobj System.IO.StreamError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsWrongAccess() -> Boolean
+M0000001a_IL_0000:
+M0000001a_IL_0001:
+M0000001a_IL_0002:
+ldarg 0
+M0000001a_IL_0003:
+ldfld System.IO.StreamError::Stored
+M0000001a_IL_0008:
+value.is System.IO.StreamError.WrongAccess
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000001a_IL_000d:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetWrongAccess() -> System.IO.StreamError.WrongAccess
+M0000001b_IL_0000:
+M0000001b_IL_0001:
+M0000001b_IL_0002:
+ldarg 0
+M0000001b_IL_0003:
+ldfld System.IO.StreamError::Stored
+M0000001b_IL_0008:
+value.unpack System.IO.StreamError.WrongAccess
+M0000001b_IL_000d:
+ret
+.end
+.method instance .ctor(System.IO.StreamError.IoFailure value) -> Void
+ldarg value
+value.pack System.IO.StreamError.IoFailure
+newobj System.IO.StreamError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsIoFailure() -> Boolean
+M0000001d_IL_0000:
+M0000001d_IL_0001:
+M0000001d_IL_0002:
+ldarg 0
+M0000001d_IL_0003:
+ldfld System.IO.StreamError::Stored
+M0000001d_IL_0008:
+value.is System.IO.StreamError.IoFailure
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000001d_IL_000d:
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetIoFailure() -> System.IO.StreamError.IoFailure
+M0000001e_IL_0000:
+M0000001e_IL_0001:
+M0000001e_IL_0002:
+ldarg 0
+M0000001e_IL_0003:
+ldfld System.IO.StreamError::Stored
+M0000001e_IL_0008:
+value.unpack System.IO.StreamError.IoFailure
+M0000001e_IL_000d:
+ret
+.end
+.method instance ToString() -> String
+M0000001f_IL_0000:
+M0000001f_IL_0001:
+M0000001f_IL_0002:
+ldarg 0
+M0000001f_IL_0003:
+call instance System.IO.StreamError::get_IsInvalidPath()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000001f_IL_0008:
+brtrue M0000001f_IL_0012
+M0000001f_IL_000d:
+br M0000001f_IL_0019
+M0000001f_IL_0012:
+M0000001f_IL_0013:
+ldstr "InvalidPath"
+M0000001f_IL_0018:
+ret
+M0000001f_IL_0019:
+M0000001f_IL_001a:
+M0000001f_IL_001b:
+ldarg 0
+M0000001f_IL_001c:
+call instance System.IO.StreamError::get_IsNotFound()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000001f_IL_0021:
+brtrue M0000001f_IL_002b
+M0000001f_IL_0026:
+br M0000001f_IL_0032
+M0000001f_IL_002b:
+M0000001f_IL_002c:
+ldstr "NotFound"
+M0000001f_IL_0031:
+ret
+M0000001f_IL_0032:
+M0000001f_IL_0033:
+M0000001f_IL_0034:
+ldarg 0
+M0000001f_IL_0035:
+call instance System.IO.StreamError::get_IsAccessDenied()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000001f_IL_003a:
+brtrue M0000001f_IL_0044
+M0000001f_IL_003f:
+br M0000001f_IL_004b
+M0000001f_IL_0044:
+M0000001f_IL_0045:
+ldstr "AccessDenied"
+M0000001f_IL_004a:
+ret
+M0000001f_IL_004b:
+M0000001f_IL_004c:
+M0000001f_IL_004d:
+ldarg 0
+M0000001f_IL_004e:
+call instance System.IO.StreamError::get_IsWrongKind()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000001f_IL_0053:
+brtrue M0000001f_IL_005d
+M0000001f_IL_0058:
+br M0000001f_IL_0064
+M0000001f_IL_005d:
+M0000001f_IL_005e:
+ldstr "WrongKind"
+M0000001f_IL_0063:
+ret
+M0000001f_IL_0064:
+M0000001f_IL_0065:
+M0000001f_IL_0066:
+ldarg 0
+M0000001f_IL_0067:
+call instance System.IO.StreamError::get_IsAlreadyExists()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000001f_IL_006c:
+brtrue M0000001f_IL_0076
+M0000001f_IL_0071:
+br M0000001f_IL_007d
+M0000001f_IL_0076:
+M0000001f_IL_0077:
+ldstr "AlreadyExists"
+M0000001f_IL_007c:
+ret
+M0000001f_IL_007d:
+M0000001f_IL_007e:
+M0000001f_IL_007f:
+ldarg 0
+M0000001f_IL_0080:
+call instance System.IO.StreamError::get_IsClosed()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000001f_IL_0085:
+brtrue M0000001f_IL_008f
+M0000001f_IL_008a:
+br M0000001f_IL_0096
+M0000001f_IL_008f:
+M0000001f_IL_0090:
+ldstr "Closed"
+M0000001f_IL_0095:
+ret
+M0000001f_IL_0096:
+M0000001f_IL_0097:
+M0000001f_IL_0098:
+ldarg 0
+M0000001f_IL_0099:
+call instance System.IO.StreamError::get_IsInvalidRange()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000001f_IL_009e:
+brtrue M0000001f_IL_00a8
+M0000001f_IL_00a3:
+br M0000001f_IL_00af
+M0000001f_IL_00a8:
+M0000001f_IL_00a9:
+ldstr "InvalidRange"
+M0000001f_IL_00ae:
+ret
+M0000001f_IL_00af:
+M0000001f_IL_00b0:
+M0000001f_IL_00b1:
+ldarg 0
+M0000001f_IL_00b2:
+call instance System.IO.StreamError::get_IsLimitExceeded()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000001f_IL_00b7:
+brtrue M0000001f_IL_00c1
+M0000001f_IL_00bc:
+br M0000001f_IL_00c8
+M0000001f_IL_00c1:
+M0000001f_IL_00c2:
+ldstr "LimitExceeded"
+M0000001f_IL_00c7:
+ret
+M0000001f_IL_00c8:
+M0000001f_IL_00c9:
+M0000001f_IL_00ca:
+ldarg 0
+M0000001f_IL_00cb:
+call instance System.IO.StreamError::get_IsWrongAccess()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000001f_IL_00d0:
+brtrue M0000001f_IL_00da
+M0000001f_IL_00d5:
+br M0000001f_IL_00e1
+M0000001f_IL_00da:
+M0000001f_IL_00db:
+ldstr "WrongAccess"
+M0000001f_IL_00e0:
+ret
+M0000001f_IL_00e1:
+M0000001f_IL_00e2:
+M0000001f_IL_00e3:
+ldarg 0
+M0000001f_IL_00e4:
+call instance System.IO.StreamError::get_IsIoFailure()
+call neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean)
+M0000001f_IL_00e9:
+brtrue M0000001f_IL_00f3
+M0000001f_IL_00ee:
+br M0000001f_IL_00fa
+M0000001f_IL_00f3:
+M0000001f_IL_00f4:
+ldstr "IoFailure"
+M0000001f_IL_00f9:
+ret
+M0000001f_IL_00fa:
+M0000001f_IL_00fb:
+M0000001f_IL_00fc:
+ldstr "invalid stream error case"
+M0000001f_IL_0101:
+call System.Fault(String)
+M0000001f_IL_0106:
+M0000001f_IL_0107:
+ldstr ""
+M0000001f_IL_010c:
+ret
+.end
+.end
+
+.function neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.IO.StreamError.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.type System.IO.StreamError.InvalidPath
+.sealed
+.method instance .ctor() -> Void
+M00000020_IL_0000:
+M00000020_IL_0001:
+ldarg 0
+M00000020_IL_0002:
+pop
+M00000020_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.StreamError.NotFound
+.sealed
+.method instance .ctor() -> Void
+M00000021_IL_0000:
+M00000021_IL_0001:
+ldarg 0
+M00000021_IL_0002:
+pop
+M00000021_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.StreamError.AccessDenied
+.sealed
+.method instance .ctor() -> Void
+M00000022_IL_0000:
+M00000022_IL_0001:
+ldarg 0
+M00000022_IL_0002:
+pop
+M00000022_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.StreamError.WrongKind
+.sealed
+.method instance .ctor() -> Void
+M00000023_IL_0000:
+M00000023_IL_0001:
+ldarg 0
+M00000023_IL_0002:
+pop
+M00000023_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.StreamError.AlreadyExists
+.sealed
+.method instance .ctor() -> Void
+M00000024_IL_0000:
+M00000024_IL_0001:
+ldarg 0
+M00000024_IL_0002:
+pop
+M00000024_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.StreamError.Closed
+.sealed
+.method instance .ctor() -> Void
+M00000025_IL_0000:
+M00000025_IL_0001:
+ldarg 0
+M00000025_IL_0002:
+pop
+M00000025_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.StreamError.InvalidRange
+.sealed
+.method instance .ctor() -> Void
+M00000026_IL_0000:
+M00000026_IL_0001:
+ldarg 0
+M00000026_IL_0002:
+pop
+M00000026_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.StreamError.LimitExceeded
+.sealed
+.method instance .ctor() -> Void
+M00000027_IL_0000:
+M00000027_IL_0001:
+ldarg 0
+M00000027_IL_0002:
+pop
+M00000027_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.StreamError.WrongAccess
+.sealed
+.method instance .ctor() -> Void
+M00000028_IL_0000:
+M00000028_IL_0001:
+ldarg 0
+M00000028_IL_0002:
+pop
+M00000028_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.StreamError.IoFailure
+.sealed
+.method instance .ctor() -> Void
+M00000029_IL_0000:
+M00000029_IL_0001:
+ldarg 0
+M00000029_IL_0002:
+pop
+M00000029_IL_0007:
+ldvoid
+ret
+.end
+.end

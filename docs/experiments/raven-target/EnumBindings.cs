@@ -9,7 +9,7 @@ static class EnumBindings
     public const string EntryKind = "System.Storage.EntryKind";
     public static bool IsType(string name) => name is Flags or TaskState or EntryKind;
     static readonly (string Name, int Value)[] EntryLiterals = [("File", 1), ("Directory", 2)];
-    public static string? Type(TypeReference type) => IsType(type.FullName) && type.IsValueType && RuntimeSignatures.IsCore(type.Scope) ? type.FullName : null;
+    public static string? Type(TypeReference type) => IsType(type.FullName) && RuntimeSignatures.IsCore(type.Scope) && (type.IsValueType || type.Resolve()?.IsEnum == true) ? type.FullName : null;
     static readonly (string Name, int Value)[] TaskLiterals = [("Pending", 0), ("Completed", 1), ("Cancelled", 2)];
     static readonly (string Name, int Value)[] Literals = [("Default", 0), ("DeclaredOnly", 2), ("Instance", 4), ("Static", 8), ("Public", 16), ("NonPublic", 32)];
     public static void Validate(ModuleDefinition module, string name = Flags)
@@ -40,6 +40,7 @@ static class EnumBindings
         Method($"instance Not() -> {name}", $"ldarg this\nldfld 0\nnot\nnewobj {name}");
         Method($"instance HasFlag({name} other) -> Boolean", "ldarg this\nldfld 0\nldarg other\nldfld 0\nand\nldarg other\nldfld 0\nceq");
         Method($"instance Equals({name} other) -> Boolean", "ldarg this\nldfld 0\nldarg other\nldfld 0\nceq");
+        Method("instance override byref ToString() -> String", $"ldtoken {name}\nldarg this\nldfld 0\ncall neoCLR.Runtime.EnumFormat(System.RuntimeTypeHandle,Int32)");
         foreach (var member in type.Fields.Where(f => f.IsLiteral))
             Method($"static {member.Name}() -> {name}", $"ldc.i4 {member.Constant}\nnewobj {name}");
         result.AppendLine(".end");

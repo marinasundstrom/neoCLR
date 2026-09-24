@@ -20,7 +20,7 @@ static class CoreDeclarations
             .Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
             .Replace("// Union probe attribute", unionProbe ? "public sealed class UnionAttribute : System.Attribute { }" : "");
         if (unionProbe) source = PrimitiveBindings.Project(source).Replace("public struct Boolean { }", BooleanBindings.Declaration);
-        if (collectionProbe) source = InterfaceBindings.Project(source.Replace("public class Type { }", "")
+        if (collectionProbe) source = InterfaceBindings.Project(source.Replace("public class Type { }", "").Replace("public abstract class Enum : ValueType { }", EnumHelpersBindings.Declaration)
             .Replace("public abstract class Object {", "public abstract class Object { public System.Introspection.TypeInfo GetType() => default;"));
         var compilation = CSharpCompilation.Create(Identity,
             [CSharpSyntaxTree.ParseText(source)], references: [],

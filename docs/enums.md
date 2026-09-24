@@ -22,8 +22,9 @@ The underlying type defaults to int. An omitted member value starts at zero, or 
 one greater than the previous member; overflow is rejected. Signed decimal literals
 are supported. Different names can share a value. Empty enums are allowed. Definitions
 are nongeneric and cannot participate in inheritance or interface conformance in this
-slice. Other integer widths, expressions in member initializers, casts, formatting,
-parsing and general constant declarations remain future work.
+historical Neo slice. Other integer widths, expressions in member initializers,
+parsing and general constant declarations remain future work. The current Raven
+profile adds the helpers and formatting described below.
 
 `flags` is contextual at a declaration; a local may still be named flags. `enum` is
 reserved. The generated helper names FromValue, Value, get_Value, Or, And, Xor, Not,
@@ -94,9 +95,8 @@ frontend/library API conventions rather than loader requirements.
 Type.IsEnum distinguishes an enum from its managed-reference/array forms.
 GetEnumUnderlyingType() returns typeof(int). GetEnumNames() returns Sequence<string> in the Raven profile (an owned String[] in the historical Neo profile)
 snapshot ordered by unsigned integer magnitude, preserving declaration order for
-aliases. The latter two calls fault when used on a non-enum. General FieldInfo literal
-queries and GetEnumValues are not yet projected; names are available through
-GetEnumNames and host enum_info metadata.
+aliases. The latter two calls fault when used on a non-enum. General FieldInfo literal queries are not yet projected. The current Raven profile
+also exposes GetEnumValues and the System.Enum overloads below.
 
 BindingFlags retains its existing bits: Default=0, DeclaredOnly=2, Instance=4,
 Static=8, Public=16, NonPublic=32. Its existing FromValue, get_Value, Or and named
@@ -157,3 +157,54 @@ The Neo sample prints read, 3, 1, enum and returns 0. The pinned .NET 10 probe e
 bit combinations, unnamed/zero values, HasFlag, name ordering and BindingFlags bits.
 Regression tests cover metadata/artifact validation, checked nominal calls, constants,
 private payload access, generic/reference behavior and reflection queries.
+
+## Raven Enum helpers (development)
+
+The current target exposes both discovery and compile-time forms on System.Enum:
+
+| Method | Result |
+| --- | --- |
+| `Enum.GetNames(enumType: TypeInfo)` | `Sequence<string>` |
+| `Enum.GetNames<TEnum>()` | `Sequence<string>` |
+| `Enum.GetValues(enumType: TypeInfo)` | `Sequence<Object>` |
+| `Enum.GetValues<TEnum>()` | `Sequence<TEnum>` |
+
+The generic methods require `TEnum : struct, Enum`. Current bridge admission covers
+EntryKind, TaskState and BindingFlags; arbitrary application enum declarations are
+not added by this slice. TypeInfo retains GetEnumNames/GetEnumUnderlyingType and
+adds GetEnumValues. Supplying a non-enum TypeInfo faults. Every call returns a fresh
+snapshot in unsigned underlying-value order, retaining aliases. Boxed values retain
+the enum's nominal identity. The generic values adapter currently unboxes a metadata
+snapshot into a typed array; avoiding those intermediate allocations is future work.
+
+The Raven target generates a by-reference Object.ToString override for each admitted
+enum. Exact named values use the first declared alias. Flags combinations use named
+masks when they cover every bit, joined by comma and space; unnamed values and
+uncovered flag bits use signed decimal. Unnamed zero prints `0`. Equality and hashing
+continue to follow the existing value semantics; names do not alter numeric identity.
+
+This follows [.NET GetValues](https://learn.microsoft.com/en-us/dotnet/api/system.enum.getvalues)
+for unsigned sorting and duplicates, and [general enum formatting](https://learn.microsoft.com/en-us/dotnet/standard/base-types/enumeration-format-strings)
+for names, flags and numeric fallback. Unlike .NET's array-returning API, the public
+contract exposes Sequence snapshots; the non-generic form boxes each value. Alias
+choice is explicitly stable here, whereas callers should not assume .NET chooses
+the same alias. [CoreLib Enum](https://source.dot.net/System.Private.CoreLib/src/runtime/src/libraries/System/Enum.cs.html)
+likewise shares metadata for names, values and formatting; neoCLR uses its existing
+Int32 enum metadata and internal queries, without copying CoreLib's full implementation.
+
+See the tested [Raven sample](experiments/enum-helpers/Main.rvn) and its
+[verification procedure](experiments/enum-helpers/README.md). Rebuild the matching
+reference, bridge and runtime library when adopting these development APIs.
+
+
+### Flags helpers under consideration
+
+Author direction also calls for evaluating flags methods on Enum. The current
+runtime enum emitter already provides a typed HasFlag operation, but the Raven
+reference does not yet expose it. [.NET HasFlag](https://learn.microsoft.com/en-us/dotnet/api/system.enum.hasflag)
+tests all supplied bits, including `true` for a zero mask, and rejects a different
+enum type. Preserve these semantics when selecting the public shape; do not silently
+accept integers or compare different nominal enum types. Generic overloads can
+avoid mismatched types at compilation, while an Enum-instance contract must validate
+boxed type identity. Has-any/set/remove convenience methods need a concrete caller
+before expanding the initial surface.

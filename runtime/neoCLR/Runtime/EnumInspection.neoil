@@ -1,0 +1,7 @@
+
+.function neoCLR.Runtime.TypeEnumValues(System.RuntimeTypeHandle type) -> System.Object[]
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.EnumFormat(System.RuntimeTypeHandle type, Int32 value) -> String
+    .methodimpl InternalCall
+.end

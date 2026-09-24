@@ -855,10 +855,17 @@ case/default/boxing checks pass. Generic Option/Result/TaskOutcome still require
 companion/generic reference projection and payload-body import, plus propagation
 and task-contract validation; their projection is explicitly rejected today.
 
-**Next author-directed slice:** System.Enum helpers for names and values, retaining
-TypeInfo arguments and adding enum type-parameter overloads. Use shared metadata for
-ordering and formatting; boxed enum ToString currently lacks an Object override.
-Do not substitute TypeInfo methods for this Enum API. The future Error interface
+**Enum helper slice:** System.Enum now has names/values helpers retaining TypeInfo
+arguments and adding constrained enum type-parameter overloads. Shared metadata
+orders names/values and formats boxed enums. The [SDK probe](experiments/enum-helpers/README.md)
+checks typed/discovered results, non-enum rejection and retained snapshots under GC.
+The historical Neo bootstrap retains explicit legacy carrier/enum snapshots; Raven
+uses migrated unions without mandatory per-case predicates.
+
+**Author direction, 2026-09-25:** after finishing this slice, put other additions on
+hold, close out applicable union migrations, and resume HTTP. MinValue/MaxValue,
+Boolean.FalseString/TrueString and further Enum flags helpers are recorded follow-ups,
+not prerequisites for HTTP. Grapheme Char should not receive UTF-16 bounds. The future Error interface
 for diagnostics, composition and decoration remains a proposal, without current
 stack capture or wrapper contracts. Raven case/companion metadata remains a provisional bridge concern,
 not a runtime dependency or a standardized platform case map. Generic and

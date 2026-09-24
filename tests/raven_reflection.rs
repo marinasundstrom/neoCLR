@@ -931,3 +931,67 @@ fn inheritance_classification_metadata_round_trips_and_checks_directives() {
         );
     }
 }
+
+#[test]
+fn enum_snapshots_keep_unsigned_order_aliases_and_nominal_boxes() {
+    let source = r#"
+.module EnumSnapshots
+.entry Main
+.type Codes
+.enum Int32
+.field private Bits Int32
+.literal Negative -1
+.literal Second 2
+.literal First 1
+.literal Alias 1
+.method instance get_Value() -> Int32
+ldarg this
+ldfld 0
+ret
+.end
+.end
+.function Main() -> Int32
+.local String[] names
+.local String name
+.local System.Object[] values
+ldtoken Codes
+call neoCLR.Runtime.TypeEnumNames(System.RuntimeTypeHandle)
+stloc names
+ldloc names
+ldc.i4 0
+ldelem String
+stloc name
+ldloca name
+ldstr "First"
+call instance String::Equals(String)
+brtrue NamesOk
+fault "enum names not sorted by unsigned magnitude"
+NamesOk:
+ldloc names
+ldc.i4 1
+ldelem String
+stloc name
+ldloca name
+ldstr "Alias"
+call instance String::Equals(String)
+brtrue AliasesOk
+fault "enum alias omitted"
+AliasesOk:
+ldtoken Codes
+call neoCLR.Runtime.TypeEnumValues(System.RuntimeTypeHandle)
+stloc values
+ldloc values
+ldc.i4 3
+ldelem System.Object
+unbox.any Codes
+call instance Codes::get_Value()
+ret
+.end
+"#;
+    let app = assemble(source).unwrap();
+    let program = LoadedProgram::with_library(&app, library()).unwrap();
+    program.verify().unwrap();
+    assert_eq!(program.run(Limits::default()).unwrap().value, Value::Int32(-1));
+    let fault = program.run(Limits { heap_objects: 2, ..Limits::default() }).unwrap_err();
+    assert_eq!(fault.code, neoclr::FaultCode::HeapLimitExceeded);
+}

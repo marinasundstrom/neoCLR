@@ -40,6 +40,39 @@ pub(crate) fn validate(def: &TypeDef) -> Result<(), Fault> {
     Ok(())
 }
 
+/// Shared unsigned-value ordering for names and values. Stable sorting preserves
+/// metadata order for aliases, without promising .NET's unspecified alias choice.
+pub(crate) fn members(info: &EnumInfo) -> Vec<&crate::metadata::EnumMember> {
+    let mut result = info.members.iter().collect::<Vec<_>>();
+    result.sort_by_key(|member| member.value as u32);
+    result
+}
+
+pub(crate) fn format(info: &EnumInfo, value: i32) -> String {
+    if let Some(member) = info.members.iter().find(|member| member.value == value) {
+        return member.name.clone();
+    }
+    if info.flags && value != 0 {
+        let mut remaining = value as u32;
+        let mut names = Vec::new();
+        // Prefer the first declared alias for a given mask.
+        let mut unique = members(info);
+        unique.dedup_by_key(|member| member.value);
+        for member in unique.into_iter().rev() {
+            let bits = member.value as u32;
+            if bits != 0 && remaining & bits == bits {
+                remaining &= !bits;
+                names.push(member.name.as_str());
+            }
+        }
+        if remaining == 0 {
+            names.reverse();
+            return names.join(", ");
+        }
+    }
+    value.to_string()
+}
+
 pub(crate) fn emit(name: &str, info: &EnumInfo) -> String {
     let mut il = format!(
         ".type {name}\n.enum Int32{}\n.field private Bits Int32\n",
@@ -61,4 +94,47 @@ pub(crate) fn emit(name: &str, info: &EnumInfo) -> String {
     }
     il.push_str(".end\n");
     il
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::metadata::EnumMember;
+
+    #[test]
+    fn names_values_and_formatting_share_unsigned_metadata_order() {
+        let info = EnumInfo {
+            underlying: Type::Int32,
+            flags: true,
+            members: [("Negative", -1), ("Two", 2), ("One", 1), ("Alias", 1)]
+                .into_iter()
+                .map(|(name, value)| EnumMember {
+                    name: name.into(),
+                    value,
+                })
+                .collect(),
+        };
+        assert_eq!(
+            members(&info)
+                .iter()
+                .map(|m| m.name.as_str())
+                .collect::<Vec<_>>(),
+            ["One", "Alias", "Two", "Negative"]
+        );
+        assert_eq!(format(&info, 1), "One");
+        assert_eq!(format(&info, 3), "One, Two");
+        assert_eq!(format(&info, -1), "Negative");
+        assert_eq!(format(&info, 0), "0");
+        assert_eq!(format(&info, 5), "5");
+        assert_eq!(
+            format(
+                &EnumInfo {
+                    flags: false,
+                    ..info
+                },
+                3
+            ),
+            "3"
+        );
+    }
 }

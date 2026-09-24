@@ -19,6 +19,8 @@ pub(crate) enum Query {
     Shape,
     DisplayName,
     EnumNames,
+    EnumValues,
+    EnumFormat,
     EnumUnderlying,
 }
 
@@ -50,6 +52,8 @@ impl Query {
                 (Self::ElementType, false, "System.Option<System.Type>")
             }
             "neoCLR.Runtime.TypeEnumNames" => (Self::EnumNames, false, "String[]"),
+            "neoCLR.Runtime.TypeEnumValues" => (Self::EnumValues, false, "System.Object[]"),
+            "neoCLR.Runtime.EnumFormat" => (Self::EnumFormat, true, "String"),
             "neoCLR.Runtime.TypeEnumUnderlying" => (Self::EnumUnderlying, false, "System.Type"),
             "neoCLR.Runtime.TypeShape" => (Self::Shape, true, "Boolean"),
             "neoCLR.Runtime.TypeDisplayName" => (Self::DisplayName, true, "String"),
@@ -231,16 +235,31 @@ impl Query {
                 }
                 _ => return Err(Fault::new("unknown type name query")),
             }).into())),
-            Self::EnumNames | Self::EnumUnderlying => {
+            Self::EnumNames | Self::EnumValues | Self::EnumFormat | Self::EnumUnderlying => {
                 let info = definition
                     .and_then(|d| d.enum_info.as_ref())
                     .ok_or_else(|| Fault::new("enum reflection requires an enum type"))?;
                 if matches!(self, Self::EnumUnderlying) {
                     return type_value(module, &info.underlying);
                 }
-                // Match .NET's unsigned underlying-value ordering; aliases retain metadata order.
-                let mut members = info.members.iter().collect::<Vec<_>>();
-                members.sort_by_key(|m| m.value as u32);
+                if matches!(self, Self::EnumFormat) {
+                    return Ok(Value::String(crate::enums::format(info, argument).into()));
+                }
+                let members = crate::enums::members(info);
+                if matches!(self, Self::EnumValues) {
+                    return array(
+                        "System.Object",
+                        members.into_iter().map(|member| {
+                            // Internal snapshot request: materialization creates an
+                            // exact enum box, not a box of its underlying integer.
+                            Ok(Value::Erased(Box::new(Value::Object {
+                                ty: ty.clone(),
+                                fields: vec![Value::Int32(member.value)],
+                            })))
+                        }),
+                        limits,
+                    );
+                }
                 array(
                     "String",
                     members
@@ -562,7 +581,13 @@ fn parameters(
                 _ => ty.clone(),
             };
             let mut fields = vec![
-                Value::String(names.get(i).and_then(|n| n.clone()).unwrap_or_default().into()),
+                Value::String(
+                    names
+                        .get(i)
+                        .and_then(|n| n.clone())
+                        .unwrap_or_default()
+                        .into(),
+                ),
                 index_value(i)?,
                 type_value(module, &qualified)?,
                 Value::Boolean(out.contains(&i)),
@@ -706,6 +731,30 @@ pub(crate) fn materialize(
             return Err(Fault::new("reflection snapshot nesting limit exceeded"));
         }
         match value {
+            Value::Erased(value) if matches!(&*value, Value::Object { ty, .. } if module.type_definition(ty).is_some_and(|definition| definition.enum_info.is_some())) =>
+            {
+                let Value::Object { ref ty, ref fields } = *value else {
+                    return Err(Fault::new("invalid boxed enum snapshot"));
+                };
+                if module
+                    .type_definition(ty)
+                    .is_none_or(|d| d.enum_info.is_none())
+                    || !matches!(fields.as_slice(), [Value::Int32(_)])
+                {
+                    return Err(Fault::new("invalid boxed enum snapshot"));
+                }
+                if heap.len() >= limits.heap_objects {
+                    return Err(Fault::coded(
+                        crate::FaultCode::HeapLimitExceeded,
+                        "heap object limit exceeded",
+                    ));
+                }
+                let index = heap.allocate(*value)?;
+                Ok(Value::ObjectReference(crate::value::ObjectReference {
+                    reference: heap.address(index)?,
+                    view: Some(Type::from_name("System.Object")),
+                }))
+            }
             Value::Object { ty, fields } => {
                 // Native snapshots name the descriptive contract. The Raven profile
                 // realizes it with an internal provider; the legacy value profile

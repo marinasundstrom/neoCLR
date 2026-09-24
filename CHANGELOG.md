@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add development System.Enum.GetNames/GetValues helpers with both TypeInfo and
+  constrained generic overloads; typed values preserve enum identity. Add
+  TypeInfo.GetEnumValues snapshots and shared unsigned ordering with aliases.
+  Format admitted Raven enums through Object.ToString, including flags and unnamed
+  numeric values. Document current Int32/three-enum admission and snapshot costs.
+  Keep the historical Neo bootstrap on explicit legacy carrier/enum snapshots
+  while Raven uses migrated unions. Refresh the stale bootstrap native-service
+  count for existing string services. Record built-in constants and additional flags
+  helpers as on hold; return to union closure and HTTP after this slice.
+
 - Migrate the remaining empty-case storage, stream, text, console, parsing,
   division and LINQ error unions to standard Raven declarations. Replace their
   Is*/Get* helpers with case patterns, preserve producer outcomes, and document
@@ -17,7 +27,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   SDK, runtime library and applications. Update API references and legacy routes.
   Record generic/payload projection blockers explicitly. The large storage contract
   fixture needs a larger explicit test instruction budget; production limits stay
-  unchanged. System.Enum helpers and boxed formatting are the next planned slice.
+  unchanged.
 - Record the proposed future Error interface for diagnostic integration,
   composition and decoration; no Error API or stack capture is implemented.
 
