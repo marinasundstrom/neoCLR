@@ -842,7 +842,9 @@ slice is implemented. Author direction now requires normal Raven union syntax fo
 class-library unions by default, with documented rare manual exceptions. Establish
 target support for a standard-syntax HttpError before integrating typed HTTP errors
 and base-address request resolution; do not expand the manual carrier catalog as
-the default path.
+the default path. The [source-union probe](experiments/http-error-unions/README.md)
+now executes nested standard declarations with members, defaults, copying and boxing.
+Mixed erased-carrier defaults and runtime-library bootstrap integration remain open.
 Handler/server cancellation ownership and public JSON contracts remain later work. The [JSON report](experiments/http-json/README.md) now passes between two
 neoCLR applications and independent peers; it does not promote a public JSON API. The
 [HTTP sample](experiments/http-client/README.md) imports development System.Web.Http

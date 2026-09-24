@@ -70,7 +70,7 @@ static class UnionImport
         string ProfileType(TypeReference type, bool result = false)
         {
             if (result && ApplicationTypes.IsInitReturn(type)) return "noresult";
-            if ((libraryOwner is not null || type is ByReferenceType { ElementType.MetadataType: MetadataType.Int32 or MetadataType.String }) && type is ByReferenceType byref)
+            if ((libraryOwner is not null || type is ByReferenceType { ElementType.MetadataType: MetadataType.Int32 or MetadataType.String } || type is ByReferenceType errorReference && ErrorBindings.Type(errorReference.ElementType) is not null) && type is ByReferenceType byref)
                 return ProfileType(byref.ElementType) + "&";
             if (libraryOwner is not null && type is GenericParameter parameter)
             {
@@ -266,7 +266,18 @@ static class UnionImport
                     case Code.Initobj:
                         var initializedType = ProfileType((TypeReference)instruction.Operand);
                         var address = Expect(initializedType + "&");
-                        if (address.Local < 0) throw new InvalidDataException("Only local initialization is admitted.");
+                        if (address.Local < 0)
+                        {
+                            // Generated value-type constructors zero their own receiver before
+                            // assigning fields. Do not extend this to arbitrary argument stores.
+                            if (address.Argument != 0 || !method.IsConstructor || !method.HasThis
+                                || !method.DeclaringType.IsValueType
+                                || initializedType != ProfileType(method.DeclaringType)
+                                || NeedsInitialization(initializedType))
+                                throw new InvalidDataException("Only local or value-constructor receiver initialization is admitted.");
+                            code.AppendLine("initobj " + initializedType);
+                            break;
+                        }
                         if (initializedType is Carrier or Option or VoidOption or VoidResult || NeedsInitialization(initializedType))
                         {
                             if (assigned[address.Local]) throw new InvalidDataException("Resetting an initialized carrier is unsupported.");
@@ -788,7 +799,9 @@ static class UnionImport
                                 call = targetMethod.HasThis && (libraryOwner is not null || !(targetMethod.IsConstructor && targetMethod.DeclaringType.IsValueType))
                                     ? new("", new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray(), ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true), Instruction: $"{(instruction.OpCode.Code == Code.Callvirt ? "callvirt" : "call")} instance {ProfileType(reference.DeclaringType)}::{ApplicationTypes.MethodName(targetMethod)}({string.Join(',', parameters)})" + (targetMethod.DeclaringType.IsValueType && targetMethod.ReturnType.MetadataType == MetadataType.Void ? "\npop" : ""))
                                     : new(libraryOwner is not null && targetMethod.IsStatic && ((((StorageItemBindings.IsName(targetMethod.DeclaringType.FullName) || (UriBindings.IsName(targetMethod.DeclaringType.FullName) || PathBindings.IsName(targetMethod.DeclaringType.FullName))) || StreamBindings.IsName(targetMethod.DeclaringType.FullName)) || ((HttpBindings.IsName(targetMethod.DeclaringType.FullName) || SocketBindings.IsName(targetMethod.DeclaringType.FullName)) || WorkerBindings.IsName(targetMethod.DeclaringType.FullName))) || AsyncBindings.IsName(targetMethod.DeclaringType.FullName) || targetMethod.DeclaringType.FullName == "System.Tasks.TaskQueue" || targetMethod.DeclaringType.IsValueType || DescriptorLibrary.IsProvider(targetMethod.DeclaringType)) ? ProfileType(reference.DeclaringType) + "::" + targetMethod.Name : Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray() : parameters, ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true));
-                                if (libraryOwner is null)
+                                if (libraryOwner is null && ApplicationTypes.IsConditionalUnionOutput(targetMethod))
+                                    call = call with { OutArgument = 1, ConditionalOutput = true };
+                                else if (libraryOwner is null)
                                     call = call with { Outputs = targetMethod.Parameters.Select((p, i) => (p, i))
                                         .Where(x => x.p.IsOut).Select(x => x.i + (targetMethod.HasThis ? 1 : 0)).ToArray() };
                                 if (libraryOwner == "System.Console" && targetMethod.IsStatic && targetMethod.ReturnType.MetadataType == MetadataType.Void)
@@ -905,7 +918,7 @@ static class UnionImport
             // Unreachable guest instructions are omitted, not admitted as executable code.
             // Library metadata keeps author-supplied parameter names for introspection.
             var declaredParameters = args.Skip(method.HasThis ? 1 : 0).Select((t, i) =>
-                libraryOwner is not null ? (GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[i]) ? "out(true) " : "") + t + " " + OpaqueLibrary.ParameterName(method, i) : (method.Parameters[i].IsOut ? "out " : "") + t);
+                libraryOwner is not null ? (GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[i]) ? "out(true) " : "") + t + " " + OpaqueLibrary.ParameterName(method, i) : (ApplicationTypes.IsConditionalUnionOutput(method) ? "out(true) " : method.Parameters[i].IsOut ? "out " : "") + t);
             output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "noresult" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {method.Name}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : (DescriptorLibrary.IsBaseConstructor(method) || libraryOwner is not null && method.IsAssembly) ? "internal " : "")}instance {ApplicationTypes.Modifiers(method)}{(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "byref " : "")}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && !asyncStateMember && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
             if (OpaqueLibrary.IsExplicitStringCount(method))
                 output.AppendLine(".override instance System.Collections.Collection<Char>::get_Count()");

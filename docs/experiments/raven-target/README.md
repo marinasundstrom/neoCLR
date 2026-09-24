@@ -1160,3 +1160,14 @@ with Uri admitted as a collection/array reference element. No new native service
 Runtime Contract setting or compiler emission change is required. Regenerate the
 reference and bootstrap together; the [URI probe](../uri/README.md) covers parsing,
 resolution, both overloads, Object dispatch, collections and live-object cleanup.
+
+### Standard-syntax union application imports — 2026-09-24
+
+The [HTTP error union probe](../http-error-unions/README.md) uses ordinary Raven union
+syntax with members. The importer admits initobj on a value constructor's own
+receiver and maps recognized core-UnionAttribute TryGetValue methods with a nested
+case out parameter to `out(true)` at declarations and calls. Other instance outputs
+remain unconditional. Known error types are admitted by reference; runtime verification
+still rejects defaults containing erased System.Value. No native union opcode,
+compiler emission change or public library API is introduced. Generic and explicit
+layouts and runtime-library migration are outside this application-import slice.

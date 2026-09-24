@@ -6760,3 +6760,16 @@ configuration/content, not target-specific code added to Raven main.
 - **Evidence:** [direct union probe](experiments/http-error-unions/README.md).
   HttpError/BaseUri integration remains pending. Existing custom carriers are not
   migrated wholesale during this investigation.
+
+- **Continuation outcome:** the bridge now imports and executes a reduced nested
+  standard-syntax union. Constructor receiver initialization is bounded to its own
+  value type, and recognized TryGetValue methods use conditional outputs. The probe
+  exercises empty defaults, matching/nonmatching cases, copies and boxed display
+  under GC pressure. A mixed legacy SocketError now reaches runtime verification,
+  which rejects its non-defaultable System.Value field. No public HttpError or
+  runtime-library carrier migration is claimed; those remain subsequent work.
+- **Validation:** the probe reports 101 allocations, two collections and zero live
+  objects. Three malformed-contract checks and the mixed-default rejection pass,
+  as does the constructor-argument regression. The broader record suite fails before
+  import on Equatable/Equals diagnostics with the installed SDK; this remains an
+  open validation gap, not a passing check or a claimed compiler regression fix.

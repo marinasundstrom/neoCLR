@@ -1,59 +1,83 @@
 # Standard-syntax HTTP error union investigation
 
-This reduced probe authors cases, a computed property and an override directly in a
-Raven `union`. It is not the public HttpError API. Standard syntax is the
-[class-library default](../../raven-conventions.md); manual carriers require a
-specific bootstrap/runtime reason and a condition for revisiting that exception.
+This reduced application probe authors cases, a computed property and an override
+directly in Raven `union` declarations. It is not the public HttpError API. Standard
+syntax is the [class-library default](../../raven-conventions.md); manual carriers
+require a specific reason and a condition for revisiting that exception.
 
 ## Reproduce
 
 Build `../raven-target/Probe.csproj` with the matching Raven checkout, and use a
-matching installed neoCLR bundle containing that bridge, core metadata and Raven SDK.
-The shape reporter uses Mono.Cecil from that local bridge build.
+matching development neoCLR bundle containing that bridge, core metadata and Raven
+SDK. The shape reporter uses Mono.Cecil from that local bridge build. Build the
+`measure_async` example for forced collections and final cleanup measurements.
 
 ```sh
 python3 docs/experiments/http-error-unions/verify.py \
-  --bundle /path/to/matching/neoclr-bundle --expect-import-rejection
+  --bundle /path/to/matching/neoclr-bundle \
+  --runner target/release/examples/measure_async
 ```
 
-The script compiles in a temporary directory, prints CLI metadata and constructor /
-TryGetValue instructions, and checks the exact known importer rejection. Omit the
-explicit rejection flag when testing importer support; import failures then fail the
-command. Neither mode claims successful runtime execution. Generated files are not
-reference snapshots, and the observed field layout is not asserted as a permanent ABI.
+The script compiles in a temporary directory, inspects the CLI shape, imports and
+verifies the program, and executes it under collection pressure. It checks:
 
-## Observed on 2026-09-24
+- Default unions report no case; unsuccessful patterns do not invent a payload.
+- Nested standard unions, empty cases, computed properties and authored ToString.
+- Copies and boxed values retain their payload after the original is replaced.
+- Live values survive collections; all tracked objects are reclaimed at completion.
+- Constructor receiver initialization is accepted; the same initobj in an ordinary
+  method is rejected by the importer.
+- Ordinary out methods still must assign their output. A union extraction method
+  that returns true without assignment also faults.
+- Mixing the old erased SocketError into this carrier remains rejected during
+  runtime verification because its System.Value field has no managed default.
 
-The source compiles with the matching experimental Raven SDK. The carrier is a
-sequential value type with a byte tag and typed fields for all three cases. The
-string payload requires managed-reference-aware layout. Nested case types hold
-payload fields. The compiler emits constructors, TryGetValue methods, Value and
-HasValue, alongside the authored property and ToString override. It also emits an
-IUnion interface into this application because the target core lacks that interface.
+## Findings and implemented bridge support — 2026-09-24
 
-The baseline bridge rejects `System.Networking.Sockets.SocketError&`. A temporary,
-subsequently reverted admission of that byref exposed the next diagnostic:
-`Only local initialization is admitted.` Generated carrier constructors use
-`ldarg.0; initobj` to initialize their receiver. TryGetValue writes its output on the
-matching path only. The probe has **not executed on neoCLR**.
+The compiler emits a sequential value type with a byte tag and typed fields for all
+cases containing managed references. Nested case types contain their payloads.
+Constructors initialize the receiver with `initobj`; `TryGetValue` writes its output
+only on the matching branch. The compiler also emits Value, HasValue and an IUnion
+interface in this application. The physical layout remains compiler-owned; the
+report and tests describe this bounded fixture, not a permanent neoCLR ABI.
+
+The bridge now admits known error byrefs, value-constructor initialization of its
+own receiver, and conditional output for a recognized union's public Boolean
+TryGetValue method with one out parameter of a nested value case. Recognition
+requires the core UnionAttribute. Both method declarations and call-site assignment
+tracking use the runtime's existing `out(true)` contract. Ordinary outputs retain
+`out`; no new VM instruction or relaxed managed default is introduced.
+
+This is an application-import slice. Runtime-library source projection, metadata
+catalogs and bootstrap exports still need integration before public APIs can migrate.
+The previous probe stopped at SocketError byref and then receiver initialization.
+`LegacyErrors.rvn` retains that mixed-form investigation; it now imports but the
+runtime verifier correctly rejects its non-defaultable erased payload.
+
+## Comparison and remaining decisions
 
 Raven's language spec currently describes Value as the only instance storage; the
-emitted artifact here has tagged typed fields instead. That discrepancy needs a
-separate compiler-documentation review. Do not infer an approved .NET-compatible
-physical ABI from the metadata member convention. See the existing comparisons in
-[union conventions](../../union-convention.md) and
-[unions and enums](../../unions-and-enums.md).
+artifact here has tagged typed fields instead. Reconcile the spec independently.
+Do not infer .NET binary compatibility from a metadata member convention. Existing
+comparisons are in [union conventions](../../union-convention.md) and
+[unions and enums](../../unions-and-enums.md). CLI zero-initialization is useful here,
+but differs from the legacy neoCLR carriers whose erased storage has no default.
+We retain that distinction rather than fabricate a valid legacy error case.
 
-## Next bounded work
+Compiler-owned case machinery reduces handwritten library code; it requires explicit
+bridge support and validation. This slice does not cover generic or explicit-layout
+unions, equality synthesis, all IUnion interface calls or runtime-library migration.
+Next, resolve the mixed-carrier boundary and bootstrap integration before shipping
+HttpError/BaseUri. Existing carriers are migration candidates, not an instruction
+to rewrite all working unions in one change.
 
-Admit generated initialization and case extraction deliberately, with reduced tests
-for receiver initialization and nonmatching output behavior. Validate default and
-inactive states, copies, boxing, Object members and GC tracing/cleanup for active and
-inactive managed payloads before using this form in the runtime library. Review the
-synthesized IUnion boundary separately. The benefit is compiler-owned case machinery
-and ordinary source members; the cost is closing these importer/runtime gaps before
-migrating existing hand-authored carriers. No new VM union opcode is implied.
+## Validation for this slice
 
-HttpError and BaseUri remain pending. Existing manual carriers are migration
-candidates, not automatically permanent exceptions or an instruction to rewrite
-all working unions in one change.
+The focused verifier passes: 101 tracked allocations, two collections, peak 64 and
+zero live objects at completion. All three mutated-contract rejection checks and
+the mixed-legacy default rejection pass. The existing constructor-argument regression
+also passes. The broader records verifier was attempted with the same installed
+bundle but fails before import on record-to-Equatable conversions and ambiguous
+Equals overloads; it is not counted as passing. That compiler/SDK validation gap
+requires separate investigation. No website or public API signature changes occur
+in this slice, so the existing API snapshot is unchanged.

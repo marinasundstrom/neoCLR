@@ -177,6 +177,21 @@ static class ApplicationTypes
             !(caller.IsConstructor && !caller.IsStatic || IsInitSetter(caller))))
             throw new InvalidDataException("Readonly field writes require the declaring constructor or init accessor.");
     }
+    // Raven's union extraction contract assigns the case only when it returns true.
+    // Ordinary application out parameters retain their unconditional obligation.
+    public static bool IsConditionalUnionOutput(MethodDefinition method) =>
+        method.HasThis && method.IsPublic && method.Name == "TryGetValue"
+        && method.DeclaringType.IsValueType
+        && method.ReturnType.MetadataType == MetadataType.Boolean
+        && method.Parameters.Count == 1 && method.Parameters[0].IsOut
+        && !method.Parameters[0].IsIn
+        && method.Parameters[0].ParameterType is ByReferenceType output
+        && output.ElementType.Resolve() is { IsValueType: true } caseType
+        && caseType.DeclaringType == method.DeclaringType
+        && method.DeclaringType.CustomAttributes.Any(attribute =>
+            attribute.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute"
+            && RuntimeSignatures.IsCore(attribute.AttributeType.Scope));
+
     public static void CheckMethod(MethodReference method)
     {
         if (method.ReturnType is RequiredModifierType &&

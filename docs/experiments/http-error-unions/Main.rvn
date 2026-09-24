@@ -1,20 +1,51 @@
 import System.*
-import System.Networking.Sockets.*
 import HttpErrorProbe.*
 
+func Check(value: bool) {
+    if !value {
+        System.Fault("Union assertion failed")
+    }
+}
+
 func Main() {
-    let failure: HttpError = HttpError.Transport(SocketError.ConnectionRefused())
+    let absent = default(HttpError)
+    Check(!absent.HasValue)
+    Check(!absent.IsTransportFailure)
+    if let HttpError.InvalidRequest(_) = absent {
+        System.Fault("Default union invented a case")
+    }
+    if let HttpError.Transport(_) = absent {
+        System.Fault("Default union invented a nested case")
+    }
+    if let HttpError.TimedOut = absent {
+        System.Fault("Default union invented an empty case")
+    }
+    let failure: HttpError = HttpError.Transport(TransportError.ConnectionRefused("localhost"))
     if let HttpError.Transport(cause) = failure {
-        if !cause.IsConnectionRefused {
-            System.Fault("Wrong nested cause")
-        }
+        Check(cause.ToString() == "localhost")
     } else {
         System.Fault("Wrong HTTP case")
     }
-    if !failure.IsTransportFailure {
-        System.Fault("Union property failed")
-    }
+    Check(failure.IsTransportFailure)
     Console.WriteLine(failure.ToString())
     let input: HttpError = HttpError.InvalidRequest("Invalid request")
     Console.WriteLine(input.ToString())
+
+    var original: HttpError = HttpError.InvalidRequest(String.Concat("retained", " payload"))
+    let copy = original
+    let boxed: Object = original
+    original = HttpError.TimedOut
+    Check(!original.IsTransportFailure)
+    Check(original.ToString() == "TimedOut")
+    var index = 0
+    while index < 100 {
+        let message = String.Concat("temporary ", index.ToString())
+        let temporary: HttpError = HttpError.Transport(TransportError.ConnectionRefused(message))
+        let temporaryBox: Object = temporary
+        Check(temporaryBox.ToString() == message)
+        Check(copy.ToString() == "retained payload")
+        Check(boxed.ToString() == "retained payload")
+        index += 1
+    }
+    Console.WriteLine("Union defaults, cases, copies and boxing passed")
 }
