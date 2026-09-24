@@ -247,3 +247,15 @@ Nullable structs (`Nullable<T>`) and nullable-value boxing are deliberately defe
 they may be reconsidered later. Existing reference nulls and default initialization
 remain unchanged. This direction does not yet add Option-valued components to the
 configured record contract, and the final metadata representation remains open.
+
+### Development compiler policy for absence
+
+The neoCLR target disables nullable value declarations through Raven's
+RavenAllowNullableValueTypes option. A known value type declared with `?`, such as
+`int?` or a record struct, produces RAV0407: "Value types can't be declared as
+nullable". Reference annotations such as `Object?` remain valid. Prefer `Option<T>`
+for intentional absence in both value and reference API models.
+
+Generated record Object.Equals preserves Object's nullable comparison parameter;
+the separate typed Equals parameter is unchanged. This does not add Nullable<T>,
+nullable-value boxing or Option components to the supported record component set.

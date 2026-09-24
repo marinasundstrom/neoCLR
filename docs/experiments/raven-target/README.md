@@ -1,5 +1,24 @@
 # Raven targeting neoCLR
 
+## Development compiler policy (2026-09-24)
+
+The shared neoCLR build props now require Raven's AllowNullableValueTypes option
+(general compiler commit `48466d258`, integrated as `04b19639f`). They select
+RavenAllowNullableValueTypes=false: RAV0407 rejects nullable value declarations with
+"Value types can't be declared as nullable". Nullable references remain valid.
+The `--nullable-value-types` CLI switch can override a project policy, but enabling it
+does not add neoCLR runtime support for Nullable<T>. Unconstrained generics and
+inferred/imported values are outside this declaration-only restriction.
+
+The preceding general fix `37b3ad81f` (integration `1b2c6afee`) also preserves inherited
+nullable metadata on generated record Object.Equals. The target-only follow-up `fd2fd7881` narrows a guarded Object? argument before
+record-struct unboxing. No record Runtime Contract configuration or runtime
+instruction changes are required. The checked
+[record sample](../records/README.md) covers class/struct nullable Object comparisons
+and the new rejection diagnostic. Use a matching development compiler; previously
+packaged SDKs are not updated by these source changes.
+
+
 Post-Preview-4 source work: [application classes/interfaces](../../raven-application-types.md)
 and the [order-workflow demo](../../raven-order-workflow.md) now exercise user-defined
 objects against the runtime library. These require the updated experimental Raven

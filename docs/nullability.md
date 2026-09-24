@@ -152,3 +152,22 @@ use annotations and flow analysis without a distinct runtime reference type;
 [nullable value types](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/nullable-value-types)
 use Nullable<T>. This layering provides compatibility and useful diagnostics. Whether
 neoCLR can simplify it without shifting excessive complexity to compilers remains open.
+
+## Current declaration policy (2026-09-24)
+
+The author prefers Option<T> for modeled absence across value and reference types,
+while retaining nullable reference annotations for Raven compatibility. Nullable
+structs/Nullable<T> remain deferred. The author additionally requested a compiler
+option with the diagnostic "Value types can't be declared as nullable".
+
+Raven now provides AllowNullableValueTypes (default true), the corresponding
+RavenAllowNullableValueTypes project property, and --no-nullable-value-types /
+--nullable-value-types overrides. neoCLR's development build props select false.
+RAV0407 rejects known nullable value declarations, including struct-constrained
+type parameters; reference annotations remain valid. This gives an earlier compiler
+error instead of relying on unsupported runtime/importer behavior. It intentionally
+reduces .NET source compatibility; Option<T> is the supported absence model.
+
+The option is a source declaration policy, not a verifier guarantee for arbitrary
+metadata or inferred values. Unconstrained generic parameters are not diagnosed as
+known value types. This does not settle the future metadata representation.

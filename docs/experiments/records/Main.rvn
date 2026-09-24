@@ -54,6 +54,11 @@ func CheckStructs() {
     let first = Coordinate(42, 7)
     let same = Coordinate(42, 7)
     let value: Object = first
+    let absentObject: Object? = null
+    let boxedObject: Object? = first
+    if first.Equals(absentObject) || !first.Equals(boxedObject) {
+        System.Fault("Record struct Object equality must accept nullable comparison arguments")
+    }
     let secondBox: Object = same
     let comparable: Equatable<Coordinate> = first
     if first != same || !first.Equals(same) || !value.Equals(secondBox) || !comparable.Equals(same) {
@@ -78,6 +83,11 @@ func Main() {
     let second = Key(42)
     let alias = first
     let value: Object = first
+    let absentObject: Object? = null
+    let boxedObject: Object? = second
+    if first.Equals(absentObject) || !first.Equals(boxedObject) {
+        System.Fault("Record class Object equality must accept nullable comparison arguments")
+    }
     let equatable: Equatable<Key> = first
     if !Object.ReferenceEquals(first, alias) {
         System.Fault("Record assignment must preserve class identity")

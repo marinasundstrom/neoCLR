@@ -8,6 +8,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Enable Raven's nullable-value declaration restriction for the development target:
+  RAV0407 reports "Value types can't be declared as nullable" while nullable reference
+  annotations remain valid. General Raven defaults stay compatible with .NET;
+  Option remains the preferred absence model. Preserve inherited nullable metadata
+  on generated record Object.Equals, with class/struct nullable Object comparisons
+  and compiler rejection cases in the checked sample. Update integration, roadmap,
+  on-site guidance and the development conversation record. Requires a matching
+  development compiler; packaged SDKs are not refreshed by this change. The target
+  record-struct generator narrows its comparison argument after an exact-type guard
+  before unboxing. Validation: 117 integration compiler checks, record/Object samples,
+  385 API entries and the combined website. Regeneration changes 102 input/compiler
+  manifests only; runtime IL is unchanged.
+
 - Implement the first non-generic struct/record-struct Object integration: explicit
   named-value overrides dispatch into boxed payloads with readonly protection;
   value isinst preserves exact boxes and unbox.any copies their payloads. Null

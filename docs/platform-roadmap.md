@@ -740,7 +740,8 @@ null is preserved even for non-nullable declarations, and generated equality/has
 handle it. Object.Equals and ReferenceEquals now annotate nullable comparison
 arguments for Raven compatibility. The author keeps reference annotations for now
 while leaving the future nullability model and metadata format open. Explicit
-nullable-string components and generated record-method annotations remain separate work. Value retirement remains a separate storage migration.
+nullable-string components and typed record Equals annotations remain separate work.
+Generated Object.Equals now preserves the inherited nullable parameter contract. Value retirement remains a separate storage migration.
 
 **Absence-model direction, 2026-09-24:** prefer Option<T> for intentional absence in
 API/domain models, for both value types and reference types. Retain nullable reference
@@ -749,6 +750,11 @@ such as Object equality. Do not implement Nullable<T>/nullable structs or nullab
 boxing in the current work; reconsider only when a concrete future need warrants it.
 This does not promise Option components in generated records before they are supported,
 remove runtime reference nulls, or settle the future metadata representation.
+The author additionally requests an opt-in Raven diagnostic for nullable value
+declarations. The development target now selects RavenAllowNullableValueTypes=false:
+RAV0407 rejects known nullable value declarations while allowing reference annotations.
+Raven's ordinary .NET default remains unchanged. See the
+[record sample and rejection checks](experiments/records/README.md).
 
 This is a bounded foundation review; networking remains later. Console ownership,
 cleanup on propagated errors and buffering remain follow-up questions, not selected

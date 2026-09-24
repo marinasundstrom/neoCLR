@@ -106,13 +106,13 @@
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "572baaae21e63bb6f1d53cd99de6099e42962caadc4f4148518a233b2d3cd12d",
     "runtime/raven/System.Runtime.rvnproj": "86fdce720912de17cf0f5044a78cf15646383c27efe075456bd39b4140bd8d86",
-    "build/NeoCLR.Raven.props": "981cd3de8b8a36a3a1583186d797212a5f0c1cda4856969310042255e28dded3"
+    "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
     "Int64.methods.neoil": "cf45f6e585bfa2b8a8118dfa2f808bcab19480472fca6c6f49aa19f6d32c232d",
     "Int64.helpers.neoil": "5d1be9baa724535162e6c45d77ff703581d3ff95e1d5a29ec3504a6ccaed43fb"
   },
-  "compilerSha256": "dfa2755f79572ade366961c87067911e23d49942eee31a07ad44ca99fa7ce057",
+  "compilerSha256": "3929934792068c2937ba481db944e6fd76587c42b37fc363ed19560c7ab21a5f",
   "coreSha256": "b93380d986808be37b07107832f76c129dd21df7fa63ed3060427f39fdf53bd9",
   "exports": [
     "readonly byref CompareTo(Int64 other) -> Int32"

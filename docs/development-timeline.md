@@ -25,6 +25,31 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-24 — Nullable value declaration policy
+
+**Author request.** Following the direction to prefer Option for absence and defer
+nullable structs, the author requests an option in Raven to diagnose value types
+when declared nullable: “Value types can’t be declared as nullable”.
+
+**Assistant response and action.** Proposed an opt-in compiler policy while retaining
+Raven's default .NET behavior and nullable reference annotations. Implemented the
+general AllowNullableValueTypes option on an isolated main-based Raven branch, with
+RAV0407, project settings and CLI switches; integrated the general changes separately
+into Raven main and the neoCLR integration branch. neoCLR's shared build props select
+false. Also completed the previously selected record Object.Equals annotation fix,
+validated independently against ordinary .NET metadata before target integration.
+
+**Evidence and limits.** The general policy passed 105 focused nullable/project checks,
+a project-save check and five CLI default/override cases. Target integration exposed
+a generated record-struct unboxing conversion failure; the assistant fixed narrowing
+after the existing exact-type guard on the experimental branch. All 117 focused
+integration checks and the record/Object sample checks then passed. See the
+[integration notes](experiments/raven-target/README.md#development-compiler-policy-2026-09-24)
+and [nullability policy](nullability.md#current-declaration-policy-2026-09-24).
+This is source declaration validation; it does not implement nullable values, settle
+metadata redesign, or promise Option components in generated records. Packaged SDK
+updates and publication are separate work.
+
 ## 2026-09-24 — Future minimal HTTP application namespace map
 
 **Author direction.** Described a future minimal HttpServer application using

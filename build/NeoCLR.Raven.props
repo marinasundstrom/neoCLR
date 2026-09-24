@@ -19,6 +19,7 @@
     <RavenCaptureAsyncExceptions>false</RavenCaptureAsyncExceptions>
     <RavenUseHostFrameworkReferences>false</RavenUseHostFrameworkReferences>
     <RavenAllowArrayCovariance>false</RavenAllowArrayCovariance>
+    <RavenAllowNullableValueTypes>false</RavenAllowNullableValueTypes>
     <RavenPropagationAssemblyName>NeoCLR.CoreProbe</RavenPropagationAssemblyName>
     <RavenPropagationInterfaceType>System.Propagatable`3</RavenPropagationInterfaceType>
     <RavenIterationAssemblyName>NeoCLR.CoreProbe</RavenIterationAssemblyName>

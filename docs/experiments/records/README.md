@@ -57,3 +57,19 @@ component text; deconstruction preserves it. The verifier runs all three project
 Before this repair, the default string hash reached Utf8Encode with null and raised
 RuntimeError. This does not widen the direct HashCode.Add(string) contract or admit
 explicit nullable-string record declarations.
+
+Generated Object.Equals now inherits Object's nullable comparison parameter. The
+sample passes nullable Object locals (both null and boxed values) directly to record
+class and record struct Equals methods. This is separate from typed Equals, whose
+parameter contract has not been widened.
+
+The development target selects RavenAllowNullableValueTypes=false. Nullable value
+declarations now fail in Raven with RAV0407 ("Value types can't be declared as
+nullable"), before importing the program. The verifier checks this for integers,
+record structs and an ordinary method parameter. Nullable reference annotations
+remain supported; Option<T> is the preferred model for intentional absence.
+
+Validation for this slice: 117 focused integration compiler tests, all three record
+programs and their rejection cases, plus the Object equality sample pass. Runtime
+library regeneration changes only 102 provenance/input manifests; emitted runtime
+IL is unchanged. The 385-item API snapshot and combined 14-page website build pass.

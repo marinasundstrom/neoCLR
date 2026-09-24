@@ -106,13 +106,13 @@
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "572baaae21e63bb6f1d53cd99de6099e42962caadc4f4148518a233b2d3cd12d",
     "runtime/raven/System.Runtime.rvnproj": "86fdce720912de17cf0f5044a78cf15646383c27efe075456bd39b4140bd8d86",
-    "build/NeoCLR.Raven.props": "981cd3de8b8a36a3a1583186d797212a5f0c1cda4856969310042255e28dded3"
+    "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
     "Time.methods.neoil": "88a02c5a1602201e9f64d89a126d908c8ff80f24ec85bf18d588b7d0b6ea45de",
     "Time.helpers.neoil": "54232da7ba841d01a73d7d99cff42bab25631311edfca604c76ea1807308db6e"
   },
-  "compilerSha256": "dfa2755f79572ade366961c87067911e23d49942eee31a07ad44ca99fa7ce057",
+  "compilerSha256": "3929934792068c2937ba481db944e6fd76587c42b37fc363ed19560c7ab21a5f",
   "coreSha256": "b93380d986808be37b07107832f76c129dd21df7fa63ed3060427f39fdf53bd9",
   "exports": [
     "Create(Int32 hour,Int32 minute,Int32 second) -> System.Result<System.Time,System.InvalidTimeError>",

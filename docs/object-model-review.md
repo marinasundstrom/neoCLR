@@ -529,3 +529,19 @@ contracts. This direction neither changes default reference initialization nor
 claims that Option components already work in configured records. It supersedes
 earlier suggestions here that nullable-value representation was a prerequisite for
 continuing the bounded Object/record work. No runtime or compiler code changes.
+
+### Record Object equality and nullable-value diagnostics — 2026-09-24
+
+The generated Object.Equals override now preserves its inherited nullable parameter
+annotation. A general Raven fix was developed and tested independently on a main-based
+branch before integration; .NET reflection/import checks retain the annotation and
+execution checks cover equal, unequal, null and unrelated objects. neoCLR's record
+sample covers nullable Object locals passed directly to record class and struct
+Equals. The separately generated typed Equals contract remains unchanged.
+
+The author also requests an opt-in Raven diagnostic for nullable value declarations.
+The general AllowNullableValueTypes option retains true as Raven's .NET default;
+neoCLR selects false through its shared build props. RAV0407 reports "Value types
+can't be declared as nullable". This keeps source diagnostics consistent with the
+current absence model without implementing a nullable value carrier. Reference
+annotations remain available; Option record components remain separate work.
