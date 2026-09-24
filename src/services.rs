@@ -57,6 +57,8 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
     }
     if function.is_internal_call() {
         let service = match crate::native::bind(function)? {
+            #[cfg(test)]
+            crate::native::Binding::TestSocketReceive => RuntimeService::TaskDispatch,
             crate::native::Binding::StartWorker(_)
             | crate::native::Binding::JoinWorker
             | crate::native::Binding::JoinWorkerResult

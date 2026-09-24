@@ -14,6 +14,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Extend the fixture to actual managed arrays and collector roots with five TCP
   cases; cancellation preserves the connection, and admission counts ready callbacks
   as well as pending reads. All 13 managed-heap ownership cases pass.
+  Add a test-only TCP adapter to the actual VM collection and TaskQueue paths.
+  Move bounded worker waits into invocation-level arbitration; the normal runtime
+  still exposes no Socket API. Cover queue progress and terminal resource cleanup;
+  five VM socket tests and all 26 worker tests pass.
 
 - Select sockets as the next API work towards a web app running on neoCLR, keeping
   the networking proposal as the direction. Record provisional interfaces and

@@ -272,6 +272,33 @@ impl Workers {
         None
     }
 
+    pub(crate) fn has_notifications(&self) -> bool {
+        self.results.iter().any(|result| result.notification.is_some())
+    }
+
+    // One bounded wait only. The invocation must poll other completion sources
+    // between waits rather than letting a pending worker monopolize quiescence.
+    pub(crate) fn wait_notification_tick(&mut self) {
+        let Some(result) = self.results.iter_mut().find(|r| r.notification.is_some()) else {
+            return;
+        };
+        let Some(receive) = &result.receive else {
+            return;
+        };
+        match receive.recv_timeout(std::time::Duration::from_millis(10)) {
+            Ok(outcome) => {
+                result.ready = Some(outcome);
+                result.receive = None;
+            }
+            Err(mpsc::RecvTimeoutError::Disconnected) => {
+                result.ready = Some(Err(Fault::new("Worker terminated without a result")));
+                result.receive = None;
+            }
+            Err(mpsc::RecvTimeoutError::Timeout) => {}
+        }
+    }
+
+    #[cfg(test)]
     pub(crate) fn wait_notification(
         &mut self,
         options: &ExecutionOptions,
@@ -281,32 +308,10 @@ impl Workers {
             if let Some(callback) = self.poll_notification() {
                 return Ok(Some(callback));
             }
-            let waiting = self
-                .results
-                .iter()
-                .position(|result| result.notification.is_some());
-            let Some(index) = waiting else {
+            if !self.has_notifications() {
                 return Ok(None);
-            };
-            let result = &mut self.results[index];
-            // Bounded wait, then poll every registered result again: an earlier
-            // unfinished worker cannot indefinitely block a later ready worker.
-            match result
-                .receive
-                .as_ref()
-                .unwrap()
-                .recv_timeout(std::time::Duration::from_millis(10))
-            {
-                Ok(outcome) => {
-                    result.ready = Some(outcome);
-                    result.receive = None;
-                }
-                Err(mpsc::RecvTimeoutError::Disconnected) => {
-                    result.ready = Some(Err(Fault::new("Worker terminated without a result")));
-                    result.receive = None;
-                }
-                Err(mpsc::RecvTimeoutError::Timeout) => {}
             }
+            self.wait_notification_tick();
         }
     }
 

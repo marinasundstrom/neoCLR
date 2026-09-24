@@ -165,3 +165,7 @@ mod metadata_tokens;
 #[cfg(test)]
 #[path = "../docs/experiments/external-io-progress/gc_probe.rs"]
 mod external_io_gc_probe;
+
+#[cfg(test)]
+#[path = "../docs/experiments/socket-completion/vm_probe.rs"]
+mod socket_vm_probe;

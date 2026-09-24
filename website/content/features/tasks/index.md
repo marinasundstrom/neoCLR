@@ -136,7 +136,13 @@ Generated state machines help us build the platform now. Runtime-owned async sus
 
 Cancellation tokens, host I/O completion, stream operations, scheduling policies and broader cleanup support remain development work. This page demonstrates the current direction, not a final design.
 
-A development [Delayed Copy experiment](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/delayed-copy/README.md) now connects worker completion to the interpreter and default TaskQueue. A Raven consumer retains its byte array through collection and resumes to copy the result. This uses an isolated worker-library adapter; the normal Thread APIs above still use queued joins. The experiment now checks ready completions between default-queue callbacks, so a callback that reposts itself no longer prevents delivery. Callbacks must still return; preemption, explicit queue affinity, per-operation cancellation and real I/O remain open.
+A development [Delayed Copy experiment](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/delayed-copy/README.md) now connects worker completion to the interpreter and default TaskQueue. A Raven consumer retains its byte array through collection and resumes to copy the result. This uses an isolated worker-library adapter; the normal Thread APIs above still use queued joins. The experiment now checks ready completions between default-queue callbacks, so a callback that reposts itself no longer prevents delivery. Callbacks must still return; preemption, explicit queue affinity and per-operation cancellation remain open.
+
+A separate development test adapter now connects real loopback TCP reads to the
+interpreter’s managed-array roots and default TaskQueue callbacks. It checks
+collection during a pending read, callback delivery while the queue remains busy,
+and completion alongside a pending worker. The socket adapter exists only in test
+builds; this does not yet provide a public Socket API or Task-based network I/O.
 
 **Development after Preview 9:** explicit thread APIs move to `System.Concurrency`; Task and Promise stay in `System.Tasks`. A retained `Thread(callback, input)` exposes a pending `Task` before instance `Start()`. Starting twice faults. `Thread.Run(callback, input)` is the immediate-start shortcut. Both retain the current isolated string callback restriction; successful completion includes native thread termination. These changes require matching development artifacts and are not in the Preview 9 downloads.
 

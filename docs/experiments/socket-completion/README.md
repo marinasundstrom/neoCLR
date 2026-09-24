@@ -76,3 +76,10 @@ The [real-heap TCP fixture](GC-OWNERSHIP.md) now checks actual collector roots a
 separates socket ownership from pending reads. Cancellation preserves the connection
 in that fixture. The original reduced probe above remains evidence of the earlier
 model; neither fixture exposes a public Socket API.
+
+## Interpreter follow-up
+
+The [VM adapter](VM-INTEGRATION.md) connects real TCP input to actual guest
+execution, collector safepoints and default TaskQueue callbacks under cfg(test).
+Production worker waiting now yields to invocation-level completion arbitration;
+public Socket/Task contracts remain unfinished.

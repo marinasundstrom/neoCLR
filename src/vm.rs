@@ -1565,6 +1565,8 @@ fn interpret_instructions(
     let mut collection_threshold = limits.heap_objects.min(64);
     let mut arrays_used = false;
     let mut workers = crate::workers::Workers::default();
+    #[cfg(test)]
+    let mut socket_probe = crate::socket_vm_probe::Receives::default();
     let mut files = crate::file_streams::Files::default();
     let mut interned = crate::string_interning::Pool::new(limits.intern_entries, limits.intern_bytes);
     // An invocation-local guest root; isolated workers have their own registry.
@@ -1608,6 +1610,8 @@ fn interpret_instructions(
             if check(frames, heap).is_err() {
                 let mut roots = vec![];
                 workers.trace_roots(&mut roots);
+                #[cfg(test)]
+                socket_probe.trace_roots(&mut roots);
                 if let Some(queue) = &default_task_queue {
                     crate::gc::trace(queue, &mut roots);
                 }
@@ -1674,6 +1678,8 @@ fn interpret_instructions(
         {
             let mut roots = vec![];
             workers.trace_roots(&mut roots);
+            #[cfg(test)]
+            socket_probe.trace_roots(&mut roots);
             if let Some(queue) = &default_task_queue {
                 crate::gc::trace(queue, &mut roots);
             }
@@ -2722,6 +2728,15 @@ fn interpret_instructions(
                         ) {
                             arrays_used = true;
                         }
+                        #[cfg(test)]
+                        if matches!(binding, crate::native::Binding::TestSocketReceive) {
+                            if default_task_queue.is_none() {
+                                return Err(Fault::new("Socket probe requires the default TaskQueue"));
+                            }
+                            socket_probe.begin(args, heap)?;
+                            frame.stack.push(Value::Void);
+                            return Ok(None);
+                        }
                         let prior_output = output.len();
                         let value = if matches!(binding, crate::native::Binding::CurrentTaskQueue) {
                             current_task_queue
@@ -3469,7 +3484,27 @@ fn interpret_instructions(
                         continue;
                     }
                 }
-                if let Some(callback) = workers.wait_notification(options)? {
+                let notification = loop {
+                    options.check_cancellation("Worker.Completion", 0)?;
+                    #[cfg(test)]
+                    if let Some(callback) = socket_probe.poll(heap)? {
+                        break Some(callback);
+                    }
+                    if let Some(callback) = workers.poll_notification() {
+                        break Some(callback);
+                    }
+                    if workers.has_notifications() {
+                        workers.wait_notification_tick();
+                        continue;
+                    }
+                    #[cfg(test)]
+                    if socket_probe.is_pending() {
+                        std::thread::sleep(std::time::Duration::from_millis(1));
+                        continue;
+                    }
+                    break None;
+                };
+                if let Some(callback) = notification {
                     let queue = default_task_queue
                         .as_ref()
                         .ok_or_else(|| Fault::new("Missing default TaskQueue"))?;
@@ -3517,7 +3552,13 @@ fn interpret_instructions(
                             && target.owner.as_ref() == Some(&crate::assembler::parse_type("System.Func<Void>")?)
                             && target.parameters.is_empty())
                         {
-                            if let Some(callback) = workers.poll_notification() {
+                            let callback = workers.poll_notification();
+                            #[cfg(test)]
+                            let callback = match callback {
+                                Some(callback) => Some(callback),
+                                None => socket_probe.poll(heap)?,
+                            };
+                            if let Some(callback) = callback {
                                 frames.push(worker_notification_frame(
                                     module,
                                     queue.clone(),

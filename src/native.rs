@@ -6,6 +6,8 @@ use crate::{
 use unicode_segmentation::UnicodeSegmentation;
 
 pub(crate) enum Binding {
+    #[cfg(test)]
+    TestSocketReceive,
     EnvironmentArguments,
     EnvironmentCurrentDirectory,
     EnvironmentVariable,
@@ -299,6 +301,12 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.JoinWorkerResult", [Type::Int32]) => {
             (Binding::JoinWorkerResult, Type::Value)
+        }
+        #[cfg(test)]
+        ("neoCLR.Runtime.TestSocketReceive", [Type::ArrayRef(element), Type::Int32, Type::Int32, callback])
+            if **element == Type::Byte && callback == &crate::assembler::parse_type("System.Func<Void>")? =>
+        {
+            (Binding::TestSocketReceive, Type::Void)
         }
         ("neoCLR.Runtime.JoinWorker", [Type::Int32]) => (Binding::JoinWorker, Type::String),
         ("neoCLR.Runtime.NotifyWorker", [Type::Int32, callback])

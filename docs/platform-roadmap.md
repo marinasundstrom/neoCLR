@@ -83,8 +83,10 @@ with retained destinations, bounded admission, exact range delivery and serializ
 completion/cancellation. The six host-side cases now have a
 [real-heap TCP follow-up](experiments/socket-completion/GC-OWNERSHIP.md): five added
 cases verify collector roots, separate socket/read ownership and bounded ready
-callbacks (13 managed-heap cases pass overall). Actual VM safepoints and Task delivery
-remain open. This does not expose a guest Socket API.
+callbacks (13 managed-heap cases pass overall). This does not expose a guest Socket API.
+The [VM adapter](experiments/socket-completion/VM-INTEGRATION.md) now wires a test-only
+TCP source into actual collection safepoints and default TaskQueue dispatch.
+Production Socket/Task contracts and the Raven echo application remain pending.
 
 **Author-directed interning exploration, 2026-09-24:** investigate explicit String
 interning with a repeated-identifier case before choosing the public contract.
