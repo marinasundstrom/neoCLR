@@ -1,0 +1,107 @@
+{
+  "date": "2026-09-24",
+  "configuration": "Release",
+  "heapLimitObjects": 96,
+  "ravenCommit": "89a40051e",
+  "neoclrBaseCommit": "8d97f179",
+  "neoclrChanges": "Ref builder projection and retained-state implementation in the commit containing this evidence",
+  "measurement": "Managed object counts, not bytes, host allocations, copies or timing",
+  "cases": {
+    "ready": {
+      "heap": {
+        "allocated": 359,
+        "live": 0,
+        "peak": 64,
+        "collections": 8,
+        "reclaimed": 359
+      },
+      "value": {
+        "allocated": 358,
+        "live": 0,
+        "peak": 64,
+        "collections": 8,
+        "reclaimed": 358
+      }
+    },
+    "one": {
+      "heap": {
+        "allocated": 366,
+        "live": 0,
+        "peak": 64,
+        "collections": 9,
+        "reclaimed": 366
+      },
+      "value": {
+        "allocated": 366,
+        "live": 0,
+        "peak": 64,
+        "collections": 9,
+        "reclaimed": 366
+      }
+    },
+    "two": {
+      "heap": {
+        "allocated": 372,
+        "live": 0,
+        "peak": 64,
+        "collections": 10,
+        "reclaimed": 372
+      },
+      "value": {
+        "allocated": 372,
+        "live": 0,
+        "peak": 64,
+        "collections": 10,
+        "reclaimed": 372
+      }
+    },
+    "cancel": {
+      "heap": {
+        "allocated": 372,
+        "live": 0,
+        "peak": 64,
+        "collections": 10,
+        "reclaimed": 372
+      },
+      "value": {
+        "allocated": 372,
+        "live": 0,
+        "peak": 64,
+        "collections": 10,
+        "reclaimed": 372
+      }
+    },
+    "ready-cancel": {
+      "heap": {
+        "allocated": 359,
+        "live": 0,
+        "peak": 64,
+        "collections": 8,
+        "reclaimed": 359
+      },
+      "value": {
+        "allocated": 358,
+        "live": 0,
+        "peak": 64,
+        "collections": 8,
+        "reclaimed": 358
+      }
+    },
+    "payloads": {
+      "heap": {
+        "allocated": 391,
+        "live": 0,
+        "peak": 72,
+        "collections": 10,
+        "reclaimed": 391
+      },
+      "value": {
+        "allocated": 390,
+        "live": 0,
+        "peak": 72,
+        "collections": 10,
+        "reclaimed": 390
+      }
+    }
+  }
+}

@@ -1,0 +1,53 @@
+import System.*
+import System.Tasks.*
+
+class Kept {
+    var Number: int
+    init(number: int) {
+        Number = number
+    }
+}
+
+func Churn() {
+    var index = 0
+    while index < 160 {
+        _ = Kept(index)
+        index += 1
+    }
+}
+
+async func Add(first: Task<int>, second: Task<int>) -> Task<int> {
+    let kept = Kept(40)
+    var total = await first
+    kept.Number += total
+    total = await second
+    return kept.Number + total
+}
+
+func Observe(result: Task<int>) {
+    result.OnCompleted(() => {
+        if result.IsCancelled {
+            Console.WriteLine("Cancelled")
+        } else {
+            Console.WriteLine(result.GetResult())
+        }
+    })
+}
+
+func Main() {
+    let queue = TaskQueue()
+    let first = Promise<int>(queue)
+    let second = Promise<int>(queue)
+    queue.Run(() => {
+        // READY
+        Observe(Add(first.Task, second.Task))
+    })
+    Churn()
+    queue.Run(() => {
+        _ = first.Complete(1)
+    })
+    Churn()
+    queue.Run(() => {
+        // FINISH
+    })
+}

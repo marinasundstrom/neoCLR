@@ -176,6 +176,9 @@ static class UnionImport
             var args = (method.HasThis ? new[] { ApplicationTypes.Receiver(method) } : Array.Empty<string>()).Concat(method.Parameters.Select(p => ProfileType(p.ParameterType))).ToArray();
             var valueConstructor = libraryOwner is null && method.IsConstructor && method.DeclaringType.IsValueType;
             var emitInstance = method.HasThis && !valueConstructor;
+            var asyncStateMember = method.HasThis && method.Name is "MoveNext" or "SetStateMachine"
+                && method.DeclaringType.Interfaces.Any(i => i.InterfaceType.FullName == "System.Runtime.CompilerServices.IAsyncStateMachine"
+                    && RuntimeSignatures.IsCore(i.InterfaceType.Scope));
             var emitOwnedStatic = libraryOwner is not null && method.IsStatic && ((((StorageItemBindings.IsName(method.DeclaringType.FullName) || PathBindings.IsName(method.DeclaringType.FullName)) || StreamBindings.IsName(method.DeclaringType.FullName)) || WorkerBindings.IsName(method.DeclaringType.FullName)) || AsyncBindings.IsName(method.DeclaringType.FullName) || method.DeclaringType.FullName == "System.Tasks.TaskQueue" || method.DeclaringType.IsValueType || OpaqueLibrary.IsString(method.DeclaringType) || ArrayLibrary.IsMatched(method.DeclaringType) || MarkerLibrary.IsMatched(method.DeclaringType) || DescriptorLibrary.IsProvider(method.DeclaringType));
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
@@ -355,6 +358,18 @@ static class UnionImport
                         if (!ManagedArrayBindings.IsReference(storedArray[9..^1])) throw new InvalidDataException("Unsupported reference vector store.");
                         ConvertTop(storedArray[9..^1]); Expect("Int32"); Expect(storedArray);
                         code.AppendLine("stelem " + storedArray[9..^1]); break;
+                    case Code.Ldflda:
+                        if (!collectionProfile) throw new InvalidDataException("Field addresses require target profile.");
+                        var addressField = (FieldReference)instruction.Operand;
+                        ApplicationTypes.CheckFieldWrite(addressField.Resolve(), method);
+                        var addressed = ApplicationTypes.Field(addressField, method, ProfileType)
+                            ?? throw new InvalidDataException("Unsupported application field address.");
+                        var addressOwner = Pop().Type;
+                        if (addressOwner != addressed.Owner + "&" && (!ApplicationTypes.IsReference(addressed.Owner) || !ApplicationTypes.Assignable(addressOwner, addressed.Owner)))
+                            throw new InvalidDataException("Field addresses require stored values or reference owners.");
+                        Push(new(addressed.Type + "&"));
+                        code.AppendLine($"ldflda {addressed.Owner}::{addressed.Name}");
+                        break;
                     case Code.Ldfld:
                         if (!collectionProfile) throw new InvalidDataException("Native fields require target profile.");
                         var readField = (FieldReference)instruction.Operand;
@@ -390,7 +405,7 @@ static class UnionImport
                         throw new InvalidDataException("Unsupported runtime field write.");
                     case Code.Ldobj:
                         var copiedToken = (TypeReference)instruction.Operand;
-                        if (libraryOwner is null || !copiedToken.IsValueType || copiedToken.Resolve()?.IsValueType != true || !ApplicationTypes.IsLibrary(copiedToken))
+                        if (!copiedToken.IsValueType || copiedToken.Resolve()?.IsValueType != true || !(ApplicationTypes.IsLibrary(copiedToken) || ApplicationTypes.IsModule(copiedToken.Resolve().Module)))
                             throw new InvalidDataException("Only matched library value loads are admitted.");
                         var copiedType = ProfileType(copiedToken);
                         if (LibraryImplementation.IsByValueReceiver(method) && GenericUnionLibrary.IsMatched(method.DeclaringType)
@@ -820,7 +835,7 @@ static class UnionImport
                             else
                             {
                                 var binding = collectionProfile ? CollectionBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt, libraryOwner is null ? null : t => ProfileType(t)) : null;
-                                var taskBinding = collectionProfile ? ReaderBindings.Bind(reference, targetMethod, false) ?? FileSystemBindings.Bind(reference, targetMethod, false) ?? StorageItemBindings.Bind(reference, targetMethod, false) ?? StreamBindings.Bind(reference, targetMethod, false, libraryOwner is not null) ?? WorkerBindings.Bind(reference, targetMethod, false, libraryOwner is not null) ?? AsyncBindings.Bind(reference, targetMethod, false) ?? TaskBindings.Bind(reference, targetMethod, false, libraryOwner is not null) : null;
+                                var taskBinding = collectionProfile ? AsyncBindings.BindByRef(reference, targetMethod, index.ToString(), t => ProfileType(t)) ?? ReaderBindings.Bind(reference, targetMethod, false) ?? FileSystemBindings.Bind(reference, targetMethod, false) ?? StorageItemBindings.Bind(reference, targetMethod, false) ?? StreamBindings.Bind(reference, targetMethod, false, libraryOwner is not null) ?? WorkerBindings.Bind(reference, targetMethod, false, libraryOwner is not null) ?? AsyncBindings.Bind(reference, targetMethod, false) ?? TaskBindings.Bind(reference, targetMethod, false, libraryOwner is not null) : null;
                                 var textBinding = StringBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt);
                                 if (taskBinding is not null) call = new("", taskBinding.Arguments, taskBinding.Result, Instruction: taskBinding.Instruction);
                                 else if (textBinding is not null) call = new("", textBinding.Arguments, textBinding.Result, Instruction: textBinding.Instruction);
@@ -843,11 +858,15 @@ static class UnionImport
                             {
                                 if (argument.Argument >= 0)
                                 {
+                                    if (reference is GenericInstanceMethod && AsyncBindings.BindByRef(reference, targetMethod, index.ToString(), t => ProfileType(t)) is not null) continue;
                                     if (n != 0 || !reference.HasThis || !(ApplicationTypes.Type(reference.DeclaringType) is not null || PrimitiveBindings.IsReceiver(reference.DeclaringType.Name) || (CalendarBindings.Types.Contains(reference.DeclaringType.FullName) || HashCodeBindings.Type(reference.DeclaringType) is not null) || ErrorBindings.IsType(reference.DeclaringType.FullName.Replace('/', '.')) || GenericUnionBindings.IsType(GenericUnionBindings.Type(reference.DeclaringType) ?? "")))
                                         throw new InvalidDataException("Argument addresses are only admitted as primitive receivers.");
                                     continue;
                                 }
-                                if (argument.Local < 0) throw new InvalidDataException("Only local addresses admitted.");
+                                if (argument.Local < 0) {
+                                    if (reference is GenericInstanceMethod && AsyncBindings.BindByRef(reference, targetMethod, index.ToString(), t => ProfileType(t)) is not null) continue;
+                                    throw new InvalidDataException("Only local addresses admitted.");
+                                }
                                 if (n == call.OutArgument)
                                 {
                                     if (call.ConditionalOutput) conditionalOut = argument.Local;
@@ -867,7 +886,7 @@ static class UnionImport
                     case Code.Ret:
                         if (result != "noresult") ConvertTop(result);
                         if (stack.Count != 0) throw new InvalidDataException($"Input ret stack not empty in {method.FullName}, expected {result}, remaining {string.Join(',', stack.Select(s => s.Type))}.");
-                        if ((emitInstance && method.DeclaringType.IsValueType || libraryOwner == "System.Console" && !emitInstance && !emitOwnedStatic) && result == "noresult") code.AppendLine("ldvoid");
+                        if ((emitInstance && method.DeclaringType.IsValueType && !asyncStateMember || libraryOwner == "System.Console" && !emitInstance && !emitOwnedStatic) && result == "noresult") code.AppendLine("ldvoid");
                         code.AppendLine("ret"); terminates = true; break;
                     default: throw new InvalidDataException("Unsupported reachable instruction: " + instruction.OpCode);
                 }
@@ -880,14 +899,23 @@ static class UnionImport
             // Library metadata keeps author-supplied parameter names for introspection.
             var declaredParameters = args.Skip(method.HasThis ? 1 : 0).Select((t, i) =>
                 libraryOwner is not null ? (GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[i]) ? "out(true) " : "") + t + " " + OpaqueLibrary.ParameterName(method, i) : (method.Parameters[i].IsOut ? "out " : "") + t);
-            output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "noresult" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {method.Name}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : (DescriptorLibrary.IsBaseConstructor(method) || libraryOwner is not null && method.IsAssembly) ? "internal " : "")}instance {ApplicationTypes.Modifiers(method)}{(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "byref " : "")}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
+            output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "noresult" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {method.Name}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : (DescriptorLibrary.IsBaseConstructor(method) || libraryOwner is not null && method.IsAssembly) ? "internal " : "")}instance {ApplicationTypes.Modifiers(method)}{(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "byref " : "")}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && !asyncStateMember && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
             if (libraryOwner is null) output.AppendLine(SourceMetadata.Method(method, explicitReceiver: method.HasThis && !emitInstance));
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
+            // Adapter temporaries are declared before code and assigned explicitly;
+            // in particular, ref-protocol temporaries must never be default roots.
+            foreach (var index in bodies.Keys.ToArray())
+            {
+                var lines = bodies[index].Split('\n');
+                foreach (var declaration in lines.Where(line => line.StartsWith(".local ")))
+                    output.AppendLine(declaration);
+                bodies[index] = string.Join('\n', lines.Where(line => !line.StartsWith(".local ")));
+            }
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
                 {
                     if (ApplicationTypes.LibraryUnionRequiresInitialization(locals[n]) || ErrorBindings.Cases.TryGetValue(locals[n], out var errorCases) && errorCases.Length > 0) continue;
-                    if ((((StorageItemBindings.IsName(locals[n]) || PathBindings.IsName(locals[n])) || StreamBindings.IsName(locals[n])) || WorkerBindings.IsName(locals[n])) || TaskBindings.IsType(locals[n]) || ApplicationTypes.IsType(locals[n]) || ReflectionBindings.IsType(locals[n]) && locals[n] != "System.RuntimeTypeHandle" || ManagedArrayBindings.IsType(locals[n]) || CollectionBindings.IsReference(locals[n]) || (CalendarBindings.Types.Contains(locals[n]) || locals[n] == HashCodeBindings.Owner) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
+                    if ((((StorageItemBindings.IsName(locals[n]) || PathBindings.IsName(locals[n])) || StreamBindings.IsName(locals[n])) || WorkerBindings.IsName(locals[n])) || TaskBindings.IsType(locals[n]) || AsyncBindings.IsType(locals[n]) || ApplicationTypes.IsType(locals[n]) || ReflectionBindings.IsType(locals[n]) && locals[n] != "System.RuntimeTypeHandle" || ManagedArrayBindings.IsType(locals[n]) || CollectionBindings.IsReference(locals[n]) || (CalendarBindings.Types.Contains(locals[n]) || locals[n] == HashCodeBindings.Owner) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
                     else if (!method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => locals[n] == "T" + p.Position) && locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !NeedsInitialization(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
                 }
             foreach (var index in bodies.Keys.Order())

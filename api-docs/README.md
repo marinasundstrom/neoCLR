@@ -197,3 +197,10 @@ chaining; reference accessibility and constructor-state checks restrict its use.
 in metadata selection with summaries for every newly exposed member. The Object guide
 and namespace overview describe the bounded record/hash contract. HashCode has no generic
 or comparer overloads. IsExternalInit is metadata support, not an executable service.
+
+The development async builder reference now selects IAsyncStateMachine, ITaskAwaiter
+and AsyncTaskMethodBuilder<T>. Exactly ITaskAwaiter.OnCompleted is excluded because
+DocFX cannot render Func<Void>; [the manual protocol guide](async-builders.md) covers
+its signature and semantics. These temporary compiler APIs may be removed when
+runtime-owned suspension replaces state machines. Application-facing ref metadata
+is an importer projection over bootstrap retained-owner helpers.

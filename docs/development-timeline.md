@@ -6025,3 +6025,19 @@ failure remains the next acceptance target.
   gates in the async assessment.
 - **Open:** target value-state execution and allocation benefit are not established;
   no new public scheduling model, default switch or optimized SDK release is claimed.
+
+### 2026-09-24 — Transitional state-machine implementation
+
+- **Author:** directs continuing through the value-state slices, then clarifies that
+  runtime-owned async suspension remains the future direction. Generated state
+  machines are a shortcut to building the platform; their support APIs may later
+  be deprecated or removed.
+- **Assistant action:** implement a ref compiler/importer protocol over the existing
+  reference builder, with one retained owner on first suspension. Keep application
+  Task/await behavior separate from the temporary builder ABI. Add managed class
+  field addressing and no-result byref value methods exposed by the real generated
+  program. Preserve the working heap policy while comparing both representations.
+- **Validation/outcome:** see the [retained experiment](experiments/value-async/README.md)
+  for the final ready/pending/GC/cancellation measurements and bounded limitations.
+  No runtime-owned suspension, general custom-builder contract or stable builder API
+  is implied by this implementation.

@@ -139,6 +139,15 @@ items:
   name: System.Runtime.CompilerServices
   type: Namespace
   items:
+  - uid: System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1
+    name: AsyncTaskMethodBuilder<T>
+    type: Class
+  - uid: System.Runtime.CompilerServices.IAsyncStateMachine
+    name: IAsyncStateMachine
+    type: Interface
+  - uid: System.Runtime.CompilerServices.ITaskAwaiter
+    name: ITaskAwaiter
+    type: Interface
   - uid: System.Runtime.CompilerServices.IsExternalInit
     name: IsExternalInit
     type: Class

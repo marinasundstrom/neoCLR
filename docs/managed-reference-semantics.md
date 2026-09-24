@@ -116,3 +116,13 @@ managed access at runtime, with Neo declarations and ParameterInfo.IsReadOnly.
 Readonly instance receivers are also implemented, with MethodInfo.IsReadOnly.
 [Readonly storage and return signatures](readonly-storage.md) now preserve declared
 permissions. The verifier remains conservative about aliases and lifetime provenance.
+
+## Class field addresses — development, 2026-09-24
+
+Checked field addressing also accepts a nominal class reference. The resulting
+managed reference retains its heap owner, so collecting the original object local
+does not invalidate the field address. Null receivers report NullReference; field
+visibility and write restrictions still apply. This follows the CLI managed-field
+address model needed by ref async builder calls, without introducing unmanaged
+pointers. Runtime regressions cover mutation, owner tracing under pressure, final
+reclamation and private/null receiver rejection.

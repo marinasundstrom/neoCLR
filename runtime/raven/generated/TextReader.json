@@ -22,7 +22,7 @@
     "runtime/raven/src/System/IO/FileOutputStream.rvn": "129c328784d5ce7033ccde0463e932b5aa681386adfb3c3dc3711dfc402a7466",
     "runtime/raven/src/System/Tasks/TaskOutcome.rvn": "746ea27b2d33c5840214ce6ca154e969205b45880aef4e1959a5c65b35e5b5e6",
     "runtime/raven/src/System/Tasks/TaskState.rvn": "297cecd35247b5d8b83e6b9c2d7288a556bd6ec81071f4c0d269d251b64acc87",
-    "runtime/raven/src/System/Tasks/Tasks.rvn": "5c88a6a8c203f5276956456421b5b15400b10b18e239d37b97603e457255f237",
+    "runtime/raven/src/System/Tasks/Tasks.rvn": "5935966a4a6ec0c2a754ac1fc4ecd6b7104bb9f19e99dfffec17a687572bf9c6",
     "runtime/raven/src/System/Concurrency/Workers.rvn": "aa21357c65b4b9d081e3bcb01dde1e152012684120e30cc7747072758dabc941",
     "runtime/raven/src/System/Array.rvn": "8015702d1767e692f05502b65d5cd06939936c73f0dbb16b12ab9768d7ae0ae9",
     "runtime/raven/src/System/Object.rvn": "08ab2ced4f543f591a1cda673445363d68ade4a898b415628df01954a3a9766a",
@@ -113,7 +113,7 @@
     "TextReader.helpers.neoil": "5051efaf569d15a323038d4f180b6d93b437e5e4080db04d9a1ce153ad7ac94d"
   },
   "compilerSha256": "3929934792068c2937ba481db944e6fd76587c42b37fc363ed19560c7ab21a5f",
-  "coreSha256": "b93380d986808be37b07107832f76c129dd21df7fa63ed3060427f39fdf53bd9",
+  "coreSha256": "e7d2fbd771fedd03ed86f369c2feb0c1838afed37b5989f9c79c5582e4a5f78b",
   "exports": [
     "ReadLine(Int32 maxUtf8Bytes) -> System.Result<System.Option<String>,System.IO.TextReadError>",
     "ReadToEnd(Int32 maxUtf8Bytes) -> System.Result<String,System.IO.TextReadError>",

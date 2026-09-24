@@ -143,3 +143,52 @@ fn cli_void_return_rejects_unit_on_stack_but_accepts_unit_generic_storage() {
     verify(&good).unwrap();
     run(&good, Limits::default()).unwrap();
 }
+
+#[test]
+fn value_no_result_method_mutates_local_and_box_without_stack_payload() {
+    let m = module(r#"
+.type class System.Object
+.end
+.interface Stepper
+.method instance Step() -> noresult
+.end
+.end
+.type State
+.implements Stepper
+.field Number Int32
+.method instance byref Step() -> noresult
+ldarg this
+ldflda 0
+ldarg this
+ldfld 0
+ldc.i4 1
+add
+stobj Int32
+ret
+.end
+.end
+.function Main() -> Int32
+.local State state
+.local Stepper boxed
+ldc.i4 40
+newobj State
+stloc state
+ldloca state
+call instance State::Step()
+ldloc state
+box State
+castclass Stepper
+stloc boxed
+ldc.i4 42
+ldloc boxed
+callvirt instance Stepper::Step()
+pop
+ldloc boxed
+unbox.any State
+ldfld State::Number
+ret
+.end
+"#);
+    verify(&m).unwrap();
+    assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
+}

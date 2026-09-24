@@ -1,0 +1,68 @@
+import System.*
+import System.Tasks.*
+import System.Result.*
+
+class Garbage {
+    var Number: int
+    init(number: int) {
+        Number = number
+    }
+}
+
+func Churn() {
+    var index = 0
+    while index < 160 {
+        _ = Garbage(index)
+        index += 1
+    }
+}
+
+async func Immediate() -> Task<int> {
+    return 42
+}
+
+async func Unit(input: Task<int>) -> Task<unit> {
+    _ = await input
+    return ()
+}
+
+async func Propagate(input: Task<Result<int, string>>) -> Task<Result<int, string>> {
+    let value = (await input)?
+    return Ok(value + 1)
+}
+
+func ObserveUnit(result: Task<unit>) {
+    result.OnCompleted(() => {
+        _ = result.GetResult()
+        Console.WriteLine("Unit")
+    })
+}
+
+func ObserveResult(result: Task<Result<int, string>>) {
+    result.OnCompleted(() => {
+        if let Error(text) = result.GetResult() {
+            Console.WriteLine(text)
+        } else {
+            System.Fault("Expected propagated error")
+        }
+    })
+}
+
+func Main() {
+    let queue = TaskQueue()
+    let first = Promise<int>(queue)
+    let second = Promise<Result<int, string>>(queue)
+    queue.Run(() => {
+        if Immediate().GetResult() != 42 {
+            System.Fault("Awaitless result was lost")
+        }
+        ObserveUnit(Unit(first.Task))
+        ObserveResult(Propagate(second.Task))
+    })
+    Churn()
+    queue.Run(() => {
+        _ = first.Complete(1)
+        _ = second.Complete(Error("Expected error"))
+    })
+    Churn()
+}

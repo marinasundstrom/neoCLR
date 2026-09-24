@@ -912,3 +912,32 @@ path now reaches bounded runtime Equals/GetHashCode dispatch for Boolean, alongs
 Int32. No Runtime Contract setting, emission change or reference signature changes.
 The Object sample checks copied flags, exact-type/null comparisons, distinct identity
 and 1/0 hashes. This does not enable Boolean record components or typed Boolean APIs.
+
+### Transitional ref async protocol (2026-09-24)
+
+The application reference now exposes generic ref Start<TState> and
+AwaitOnCompleted<TAwaiter,TState>. The importer validates these exact core contracts
+and specializes them for nongeneric application state machines and target Task
+awaiters. Startup invokes MoveNext on existing storage. Pending registration retains
+one state owner in the shared class builder, boxing only on the first suspension of
+a value state. Later suspensions use the same owner; completion/cancellation clears
+the builder's retained reference. No frame-backed ref escapes.
+
+The bootstrap reference keeps the by-value helper signatures implemented in Raven;
+they are not executed as declaration stubs. Source-generated state MoveNext and
+SetStateMachine preserve no-result signatures even with byref value receivers.
+The importer now admits checked application value loads and writable field addresses.
+Runtime class field addresses retain their GC owner and enforce null/access checks.
+Raven’s existing generic/ref builder selection supplies the protocol. A target-branch
+policy correction separates target Task recognition and awaitless builder lowering
+from the heap/value choice; ordinary .NET policy remains unchanged. RavenHeapAsyncStateMachines=false selects a value
+state when written after the neoCLR props import. The default remains true.
+
+The compiler-facing builder APIs are transitional and may be removed for runtime
+suspension. This does not add generic async methods, custom awaiters, CLR exception
+capture or a new scheduler. See [the experiment](../value-async/README.md) and the
+[on-site protocol reference](../../../api-docs/async-builders.md).
+
+Raven target policy fix: `89a40051e` on `codex/async-preview-readiness`; six existing
+state-machine tests pass. The strict target matrix runs twelve Release cases,
+including awaitless completion. No target changes were integrated into Raven main.

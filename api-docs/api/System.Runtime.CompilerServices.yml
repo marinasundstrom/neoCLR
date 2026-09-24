@@ -4,6 +4,9 @@ items:
   commentId: N:System.Runtime.CompilerServices
   id: System.Runtime.CompilerServices
   children:
+  - System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1
+  - System.Runtime.CompilerServices.IAsyncStateMachine
+  - System.Runtime.CompilerServices.ITaskAwaiter
   - System.Runtime.CompilerServices.IsExternalInit
   langs:
   - csharp
@@ -15,6 +18,51 @@ items:
   assemblies:
   - NeoCLR.CoreProbe
 references:
+- uid: System.Runtime.CompilerServices.IAsyncStateMachine
+  commentId: T:System.Runtime.CompilerServices.IAsyncStateMachine
+  parent: System.Runtime.CompilerServices
+  isExternal: true
+  href: System.Runtime.CompilerServices.IAsyncStateMachine.html
+  name: IAsyncStateMachine
+  nameWithType: IAsyncStateMachine
+  fullName: System.Runtime.CompilerServices.IAsyncStateMachine
+- uid: System.Runtime.CompilerServices.ITaskAwaiter
+  commentId: T:System.Runtime.CompilerServices.ITaskAwaiter
+  parent: System.Runtime.CompilerServices
+  isExternal: true
+  href: System.Runtime.CompilerServices.ITaskAwaiter.html
+  name: ITaskAwaiter
+  nameWithType: ITaskAwaiter
+  fullName: System.Runtime.CompilerServices.ITaskAwaiter
+- uid: System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1
+  commentId: T:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1
+  parent: System.Runtime.CompilerServices
+  isExternal: true
+  href: System.Runtime.CompilerServices.AsyncTaskMethodBuilder-1.html
+  name: AsyncTaskMethodBuilder<T>
+  nameWithType: AsyncTaskMethodBuilder<T>
+  fullName: System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T>
+  nameWithType.vb: AsyncTaskMethodBuilder(Of T)
+  fullName.vb: System.Runtime.CompilerServices.AsyncTaskMethodBuilder(Of T)
+  name.vb: AsyncTaskMethodBuilder(Of T)
+  spec.csharp:
+  - uid: System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1
+    name: AsyncTaskMethodBuilder
+    isExternal: true
+    href: System.Runtime.CompilerServices.AsyncTaskMethodBuilder-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1
+    name: AsyncTaskMethodBuilder
+    isExternal: true
+    href: System.Runtime.CompilerServices.AsyncTaskMethodBuilder-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
 - uid: System.Runtime.CompilerServices.IsExternalInit
   commentId: T:System.Runtime.CompilerServices.IsExternalInit
   isExternal: true
@@ -22,3 +70,40 @@ references:
   name: IsExternalInit
   nameWithType: IsExternalInit
   fullName: System.Runtime.CompilerServices.IsExternalInit
+- uid: System.Runtime.CompilerServices
+  commentId: N:System.Runtime.CompilerServices
+  isExternal: true
+  href: System.html
+  name: System.Runtime.CompilerServices
+  nameWithType: System.Runtime.CompilerServices
+  fullName: System.Runtime.CompilerServices
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Runtime
+    name: Runtime
+    isExternal: true
+    href: System.Runtime.html
+  - name: .
+  - uid: System.Runtime.CompilerServices
+    name: CompilerServices
+    isExternal: true
+    href: System.Runtime.CompilerServices.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Runtime
+    name: Runtime
+    isExternal: true
+    href: System.Runtime.html
+  - name: .
+  - uid: System.Runtime.CompilerServices
+    name: CompilerServices
+    isExternal: true
+    href: System.Runtime.CompilerServices.html

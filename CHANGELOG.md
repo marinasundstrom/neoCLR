@@ -9,10 +9,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 ### 2026-09-24
 
 - Investigate value-type async state machines as the next author-directed priority.
-  Add a reproducible Release heap/value probe: heap execution succeeds; struct
-  emission currently fails target import and boxes at builder boundaries. Record
+  Add a reproducible Release heap/value probe: the initial heap baseline succeeds;
+  struct emission exposes an import rejection and boxing at builder boundaries. Record
   by-reference startup, suspension ownership, GC and allocation measurement gates;
-  keep the existing heap default and label website guidance as investigation.
+  keep the existing heap default. Implement the bounded ref builder projection,
+  in-place startup and one retained state across suspensions, with completion cleanup.
+  Add checked class field references and no-result byref value/interface methods.
+  Validate ready/pending/cancelled states, unit/Result payloads and awaitless results
+  under GC pressure; ready completion saves one managed object, pending counts match
+  heap states. Keep broader performance claims open. Update API reference and website;
+  builder APIs are transitional pending future runtime-owned suspension. Validation:
+  37 runtime regressions, six Raven policy tests, twelve target matrix runs, metadata
+  rejection checks, library/API snapshots and the combined website build. Raven
+  target policy fix is 89a40051e; no change is integrated into Raven main.
 
 - Add boxed Boolean Object equality and hashing alongside Int32: compare copied
   values only with the exact Boolean type, with hashes 1/0 for true/false. Preserve

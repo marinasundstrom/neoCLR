@@ -776,9 +776,13 @@ semantics to establish efficient async state-machine ownership. Raven already em
 struct states by default; neoCLR still explicitly selects classes. Prioritize the
 [value-state-machine gates](async-state-machine-assessment.md#value-state-machine-priority--2026-09-24)
 ahead of Path: by-reference startup, one retained state across suspension, GC/root
-checks, then measured Release comparison. The first Release probe emits a struct but
-fails import, and current interface-by-value builders introduce boxing. Keep the
-working heap default until the new protocol has correctness and allocation evidence.
+checks, then measured Release comparison. The initial probe exposed by-value boxing and an import rejection. The development
+ref protocol now starts value states in place and retains one state across pending
+awaits. Ready/pending/cancelled, unit and Result cases run under GC pressure; managed
+object counts show one saved state for ready completion and pending allocation parity.
+Keep the working heap default while broader shapes and byte/copy costs remain unmeasured.
+Generated-code builder APIs are explicitly transitional and may be removed when
+runtime-owned suspension replaces them; this work supports building the platform now.
 
 This is a bounded foundation review; networking remains later. Console ownership,
 cleanup on propagated errors and buffering remain follow-up questions, not selected

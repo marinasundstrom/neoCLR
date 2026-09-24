@@ -47,3 +47,5 @@ explains how to read them for Raven.
 
 Future namespace ideas belong in [proposals](/proposals/index.html) until they have
 implemented APIs. This list will expand alongside the library.
+
+The [transitional async builder guide](async-builders.md) covers generated state ownership and links the compiler-facing System.Runtime.CompilerServices contracts to their temporary role.

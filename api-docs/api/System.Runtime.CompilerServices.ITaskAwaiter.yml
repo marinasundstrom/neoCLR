@@ -1,0 +1,63 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Runtime.CompilerServices.ITaskAwaiter
+  commentId: T:System.Runtime.CompilerServices.ITaskAwaiter
+  id: ITaskAwaiter
+  parent: System.Runtime.CompilerServices
+  children: []
+  langs:
+  - csharp
+  - vb
+  name: ITaskAwaiter
+  nameWithType: ITaskAwaiter
+  fullName: System.Runtime.CompilerServices.ITaskAwaiter
+  type: Interface
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Runtime.CompilerServices
+  summary: Temporary continuation-registration contract used by the async compiler protocol.
+  remarks: OnCompleted is documented in the async builder guide because its Func&lt;Void&gt; signature cannot be rendered by DocFX.
+  example: []
+  syntax:
+    content: public interface ITaskAwaiter
+    content.vb: Public Interface ITaskAwaiter
+  derivedClasses:
+  - System.Tasks.Task`1
+references:
+- uid: System.Runtime.CompilerServices
+  commentId: N:System.Runtime.CompilerServices
+  isExternal: true
+  href: System.html
+  name: System.Runtime.CompilerServices
+  nameWithType: System.Runtime.CompilerServices
+  fullName: System.Runtime.CompilerServices
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Runtime
+    name: Runtime
+    isExternal: true
+    href: System.Runtime.html
+  - name: .
+  - uid: System.Runtime.CompilerServices
+    name: CompilerServices
+    isExternal: true
+    href: System.Runtime.CompilerServices.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Runtime
+    name: Runtime
+    isExternal: true
+    href: System.Runtime.html
+  - name: .
+  - uid: System.Runtime.CompilerServices
+    name: CompilerServices
+    isExternal: true
+    href: System.Runtime.CompilerServices.html

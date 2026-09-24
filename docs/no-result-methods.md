@@ -34,7 +34,9 @@ Both the verifier and interpreter enforce the distinction. Frame cleanup still r
 
 The supported subset now includes static/free and ordinary nominal-class instance IL
 methods, including class constructors, and static/free generic IL methods. Bodyless
-nominal interface contracts also support no-result signatures. Generic class methods,
+nominal interface contracts also support no-result signatures. Development support
+also includes by-reference value receivers, including their explicit interface
+implementations; generated async MoveNext preserves the no-result stack contract. Generic class methods,
 virtual class/delegate contracts, InternalCall and P/Invoke declarations cannot opt in yet. Delegates with inhabited Void results cannot bind no-result targets.
 These bounds are explicit validation rules, not claims that CLR no-result methods have
 those restrictions. Neo source-language projection is not implemented by this slice.

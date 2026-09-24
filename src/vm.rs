@@ -526,18 +526,20 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             && crate::interfaces::is_bodyless(module, function)
             && !function.receiver_byref
             && !function.receiver_readonly;
+        let value_receiver = function.instance && function.receiver_byref
+            && function.owner.as_ref().is_some_and(|owner| !module.is_reference_type(owner));
         if function.no_result
             && (function.returns != Type::Void
-                || (function.instance && !class_owner && !nominal_interface_contract)
-                || (function.is_virtual && !nominal_interface_contract && !class_owner)
-                || (function.is_override && !class_owner)
+                || (function.instance && !class_owner && !value_receiver && !nominal_interface_contract)
+                || (function.is_virtual && !nominal_interface_contract && !class_owner && !value_receiver)
+                || (function.is_override && !class_owner && !value_receiver)
                 || (function.is_abstract && !nominal_interface_contract && !class_owner)
                 || function.is_internal_call()
                 || function.pinvoke.is_some()
-                || !function.interface_implementations.is_empty())
+                || (!value_receiver && !function.interface_implementations.is_empty()))
         {
             return Err(Fault::new(
-                "no-result methods require IL bodies with Void metadata and static or class receivers",
+                "no-result methods require IL bodies with Void metadata and static, class or by-reference value receivers",
             ));
         }
         crate::metadata::validate_slot_names(
@@ -3201,6 +3203,18 @@ fn interpret_instructions(
                         .push(Value::Pointer(memory.offset(&pointer, offset)?));
                 }
                 Op::FieldAddress(index) => {
+                    if matches!(frame.stack.last(), Some(Value::NullObjectReference(_))) {
+                        return Err(Fault::coded(crate::FaultCode::NullReference, "null object reference in field address"));
+                    }
+                    if let Some(Value::ObjectReference(object)) = frame.stack.last() {
+                        crate::access::check_field(module, &function, object.target(), *index)?;
+                        let fields = module.instantiated_fields(object.target())?;
+                        let target = fields.get(*index).ok_or_else(|| Fault::new("field index out of range"))?.ty.clone();
+                        let reference = object.reference.field(*index, target)?;
+                        frame.pop()?;
+                        frame.stack.push(Value::SlotReference(reference));
+                        return Ok(None);
+                    }
                     if let Some(Value::SlotReference(reference)) = frame.stack.last() {
                         crate::access::check_field(module, &function, reference.target(), *index)?;
                         let fields = module.instantiated_fields(reference.target())?;

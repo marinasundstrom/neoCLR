@@ -1,4 +1,9 @@
 apiRules:
+- exclude:
+    uidRegex: '^System\.Runtime\.CompilerServices\.ITaskAwaiter\.OnCompleted($|\()'
+    type: Method
+- include:
+    uidRegex: '^System\.Runtime\.CompilerServices\.(IAsyncStateMachine|ITaskAwaiter|AsyncTaskMethodBuilder`1)($|\.)'
 - include:
     uidRegex: '^System\.Runtime\.CompilerServices($|\.IsExternalInit$)'
 - include:

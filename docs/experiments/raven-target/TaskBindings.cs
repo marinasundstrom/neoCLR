@@ -75,14 +75,24 @@ static class TaskBindings
                 public AsyncTaskMethodBuilder(Tasks.TaskQueue queue) { }
                 public static AsyncTaskMethodBuilder<T> Create() => default;
                 public Tasks.Task<T> Task => default;
-                public void Start(IAsyncStateMachine stateMachine) { }
+                public void Start<TState>(ref TState stateMachine) where TState : IAsyncStateMachine { }
                 public void SetStateMachine(IAsyncStateMachine stateMachine) { }
+                public bool HasStateMachine() => false;
+                public IAsyncStateMachine GetStateMachine() => default;
                 public void SetResult(T value) { }
                 public void SetCancelled() { }
-                public void AwaitOnCompleted(ITaskAwaiter awaiter, IAsyncStateMachine stateMachine) { }
+                public void AwaitOnCompleted<TAwaiter, TState>(ref TAwaiter awaiter, ref TState stateMachine) where TAwaiter : ITaskAwaiter where TState : IAsyncStateMachine { }
             }
         }
         """;
+
+    // Application metadata exposes the ref compiler protocol; the bootstrap
+    // library implements the retained-owner operations used by its specialization.
+    public static string ForReference(bool libraryBootstrap) => !libraryBootstrap ? Declarations : Declarations
+        .Replace("public void Start<TState>(ref TState stateMachine) where TState : IAsyncStateMachine { }",
+            "public void Start(IAsyncStateMachine stateMachine) { }")
+        .Replace("public void AwaitOnCompleted<TAwaiter, TState>(ref TAwaiter awaiter, ref TState stateMachine) where TAwaiter : ITaskAwaiter where TState : IAsyncStateMachine { }",
+            "public void AwaitOnCompleted(ITaskAwaiter awaiter, IAsyncStateMachine stateMachine) { }");
 
     public static void Project(ModuleDefinition module)
     {

@@ -179,8 +179,8 @@ heap baseline and a struct import rejection, not working target value async yet.
 
 ### Why changing the flag is insufficient
 
-The current neoCLR builder is a class holding a shared Promise. Start and
-AwaitOnCompleted accept IAsyncStateMachine by value; SetStateMachine is a no-op.
+At the initial investigation, the neoCLR builder was a class holding a shared Promise. Start and
+AwaitOnCompleted accepted IAsyncStateMachine by value; SetStateMachine was a no-op.
 Raven therefore boxes the struct at startup and again at continuation registration.
 Import currently rejects a reference cast along this path. Struct field/boxing/GC
 support is a prerequisite, but does not establish a correct, efficient builder
@@ -223,3 +223,30 @@ choices, not prerequisites for every slice. The cost of byref generic contracts 
 promotion machinery must be compared with keeping the existing simple heap state.
 Runtime-owned suspension remains a longer-term alternative. None of this selects a
 public Scheduler API or requires networking work.
+
+## Implemented transitional protocol — 2026-09-24
+
+The [strict Release matrix](experiments/value-async/README.md) now passes for the
+bounded target shape. The application reference projects generic ref startup and
+continuation signatures; the library bootstrap retains its by-value implementation
+helpers. The importer validates those contracts before emitting an in-place Start
+and a first-suspension promotion adapter. The reference builder keeps one owner
+and clears it at completion/cancellation. Checked class-field managed references
+and no-result byref value methods supply the runtime prerequisites.
+
+Compared with .NET's generic ref startup and retained box, this reuses the ownership
+principle while keeping neoCLR's separate Promise, Task, queue and class builder.
+The cost is importer specialization and a retained-state protocol. This is not
+.NET ExecutionContext flow or CLR exception support. Task identity and awaitless
+builder lowering are now independent of heap-state selection in experimental Raven.
+
+The matrix checks ready, independently pending awaits, cancellation, unit and Result
+payloads, reference-field mutation and collection between resumes. All managed
+objects are reclaimed at scalar return. Ready/awaitless completion saves one state
+object; pending cases match heap-state object counts. Byte costs, host allocations,
+copy counts and timings remain unmeasured, so the default stays heap-based.
+
+The author clarified that generated-code support is a shortcut to building the
+platform, with runtime suspension planned later. Builder interfaces and retention
+helpers are transitional and may be deprecated or removed. This does not commit
+the eventual suspension/scheduling model to generated state machines.

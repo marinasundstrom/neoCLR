@@ -31,6 +31,9 @@ for name, heap in [('heap', 'true'), ('value', 'false')]:
                                 '-nologo', '-v:minimal', '-p:Configuration=Release'],
                                env=env, capture_output=True, text=True, timeout=120)
         (output / f'{name}-build.log').write_text(build.stdout + build.stderr)
+        artifacts = list((root / 'obj').glob('**/imported/App.neoil'))
+        if artifacts:
+            shutil.copyfile(artifacts[-1], output / f'{name}.neoil')
         assemblies = list((root / 'obj').glob('**/compiled/Probe.dll'))
         if assemblies:
             shutil.copyfile(assemblies[-1], output / f'{name}.dll')

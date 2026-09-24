@@ -1,0 +1,129 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Runtime.CompilerServices.IAsyncStateMachine
+  commentId: T:System.Runtime.CompilerServices.IAsyncStateMachine
+  id: IAsyncStateMachine
+  parent: System.Runtime.CompilerServices
+  children:
+  - System.Runtime.CompilerServices.IAsyncStateMachine.MoveNext
+  - System.Runtime.CompilerServices.IAsyncStateMachine.SetStateMachine(System.Runtime.CompilerServices.IAsyncStateMachine)
+  langs:
+  - csharp
+  - vb
+  name: IAsyncStateMachine
+  nameWithType: IAsyncStateMachine
+  fullName: System.Runtime.CompilerServices.IAsyncStateMachine
+  type: Interface
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Runtime.CompilerServices
+  summary: Temporary compiler-generated async state contract.
+  remarks: May be replaced or removed when runtime-owned suspension is implemented. Application code should use Task and await.
+  example: []
+  syntax:
+    content: public interface IAsyncStateMachine
+    content.vb: Public Interface IAsyncStateMachine
+- uid: System.Runtime.CompilerServices.IAsyncStateMachine.MoveNext
+  commentId: M:System.Runtime.CompilerServices.IAsyncStateMachine.MoveNext
+  id: MoveNext
+  parent: System.Runtime.CompilerServices.IAsyncStateMachine
+  langs:
+  - csharp
+  - vb
+  name: MoveNext()
+  nameWithType: IAsyncStateMachine.MoveNext()
+  fullName: System.Runtime.CompilerServices.IAsyncStateMachine.MoveNext()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Runtime.CompilerServices
+  summary: Resumes the retained state until completion or its next pending await.
+  example: []
+  syntax:
+    content: void MoveNext()
+    content.vb: Sub MoveNext()
+  overload: System.Runtime.CompilerServices.IAsyncStateMachine.MoveNext*
+- uid: System.Runtime.CompilerServices.IAsyncStateMachine.SetStateMachine(System.Runtime.CompilerServices.IAsyncStateMachine)
+  commentId: M:System.Runtime.CompilerServices.IAsyncStateMachine.SetStateMachine(System.Runtime.CompilerServices.IAsyncStateMachine)
+  id: SetStateMachine(System.Runtime.CompilerServices.IAsyncStateMachine)
+  parent: System.Runtime.CompilerServices.IAsyncStateMachine
+  langs:
+  - csharp
+  - vb
+  name: SetStateMachine(IAsyncStateMachine)
+  nameWithType: IAsyncStateMachine.SetStateMachine(IAsyncStateMachine)
+  fullName: System.Runtime.CompilerServices.IAsyncStateMachine.SetStateMachine(System.Runtime.CompilerServices.IAsyncStateMachine)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Runtime.CompilerServices
+  summary: Associates a heap-owned state with its shared builder.
+  example: []
+  syntax:
+    content: void SetStateMachine(IAsyncStateMachine stateMachine)
+    parameters:
+    - id: stateMachine
+      type: System.Runtime.CompilerServices.IAsyncStateMachine
+      description: The retained state owner.
+    content.vb: Sub SetStateMachine(stateMachine As IAsyncStateMachine)
+  overload: System.Runtime.CompilerServices.IAsyncStateMachine.SetStateMachine*
+references:
+- uid: System.Runtime.CompilerServices
+  commentId: N:System.Runtime.CompilerServices
+  isExternal: true
+  href: System.html
+  name: System.Runtime.CompilerServices
+  nameWithType: System.Runtime.CompilerServices
+  fullName: System.Runtime.CompilerServices
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Runtime
+    name: Runtime
+    isExternal: true
+    href: System.Runtime.html
+  - name: .
+  - uid: System.Runtime.CompilerServices
+    name: CompilerServices
+    isExternal: true
+    href: System.Runtime.CompilerServices.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Runtime
+    name: Runtime
+    isExternal: true
+    href: System.Runtime.html
+  - name: .
+  - uid: System.Runtime.CompilerServices
+    name: CompilerServices
+    isExternal: true
+    href: System.Runtime.CompilerServices.html
+- uid: System.Runtime.CompilerServices.IAsyncStateMachine.MoveNext*
+  commentId: Overload:System.Runtime.CompilerServices.IAsyncStateMachine.MoveNext
+  isExternal: true
+  href: System.Runtime.CompilerServices.IAsyncStateMachine.html#System_Runtime_CompilerServices_IAsyncStateMachine_MoveNext
+  name: MoveNext
+  nameWithType: IAsyncStateMachine.MoveNext
+  fullName: System.Runtime.CompilerServices.IAsyncStateMachine.MoveNext
+- uid: System.Runtime.CompilerServices.IAsyncStateMachine.SetStateMachine*
+  commentId: Overload:System.Runtime.CompilerServices.IAsyncStateMachine.SetStateMachine
+  isExternal: true
+  href: System.Runtime.CompilerServices.IAsyncStateMachine.html#System_Runtime_CompilerServices_IAsyncStateMachine_SetStateMachine_System_Runtime_CompilerServices_IAsyncStateMachine_
+  name: SetStateMachine
+  nameWithType: IAsyncStateMachine.SetStateMachine
+  fullName: System.Runtime.CompilerServices.IAsyncStateMachine.SetStateMachine
+- uid: System.Runtime.CompilerServices.IAsyncStateMachine
+  commentId: T:System.Runtime.CompilerServices.IAsyncStateMachine
+  parent: System.Runtime.CompilerServices
+  isExternal: true
+  href: System.Runtime.CompilerServices.IAsyncStateMachine.html
+  name: IAsyncStateMachine
+  nameWithType: IAsyncStateMachine
+  fullName: System.Runtime.CompilerServices.IAsyncStateMachine

@@ -1,38 +1,59 @@
-# Value-type async state-machine probe
+# Value-type async state machines
 
-Development investigation, 2026-09-24. This is not a supported application sample or
-an allocation benchmark. Run against a matching development bundle:
+Development evidence, 2026-09-24. Generated state machines are a transitional route
+to building the platform. Runtime-owned suspension remains the intended future
+direction; compiler-facing builder APIs may be deprecated or removed.
+
+The development importer supports non-generic application state machines with
+neoCLR Task awaiters. Generic `ref` startup runs the state in place. On the first
+pending await the reference-type builder retains one boxed state; later awaits
+reuse that owner. No continuation retains a reference into the kickoff frame.
+Completion and cancellation clear the builder's retained state. Heap states remain
+the default; set `RavenHeapAsyncStateMachines=false` after the props import to opt in.
+
+## Validation
+
+Build a matching development bundle and measurement runner, then run:
 
 ```sh
-python3 docs/experiments/value-async/probe.py \
-  --toolchain-root /path/to/bundle --output /tmp/value-async-evidence
+cargo build --example measure_async
+python3 docs/experiments/value-async/validate.py \
+  --toolchain-root /path/to/bundle \
+  --runner target/debug/examples/measure_async --output /tmp/value-async-evidence
 ```
 
-The probe builds the same pending-await program in Release with the current heap
-policy and with RavenHeapAsyncStateMachines=false. It checks `Pending` then `42`
-for executable cases and retains compiler assemblies and build/run logs for inspection.
-A blocked value case is reported, not counted as supported; failure of the existing
-heap baseline fails the probe. Changing an outer MSBuild command-line property alone
-is insufficient here: rvnc reevaluates the project, so the policy is written after
-its props import in each temporary project.
+The script compiles identical Release fixtures with each storage policy, imports
+and verifies their IL, checks output and runs with a 96-object heap limit. It retains
+build/run logs and imported IL. `Matrix.rvn` covers ready, one-pending, two-pending,
+ready-cancelled and cancellation after a resume. A reference field is used and
+mutated across awaits, with allocation pressure between resumes. `Payloads.rvn`
+adds pending unit and propagated Result error completion plus an awaitless result.
+All fixtures must reclaim their managed objects after the scalar entry returns.
 
-Observed with Raven target branch d2a583386 and neoCLR b3b3cfc5:
+[Recorded counts](results.json) compare managed objects, including tasks, promises,
+continuations and 320 allocation-pressure objects. Ready completion avoids one
+state allocation; pending cases have allocation parity with heap states. The
+payload fixture also avoids one state allocation for its awaitless method.
+This does not measure allocated bytes, host allocations, payload copies or elapsed
+time, and does not justify a broad speed claim or a new Release default.
 
-- The existing heap policy builds, imports and runs the pending continuation.
-- Value policy emits a struct extending the target System.ValueType and implementing
-  IAsyncStateMachine, but import rejects `Unsupported reference cast`.
-- Inspection of the emitted value assembly shows boxing at builder Start and at
-  AwaitOnCompleted. The current builder takes IAsyncStateMachine by value in both
-  places. Accepting its cast alone would not establish the intended allocation model.
-- Raven's six existing HeapAsyncStateMachineTests pass on .NET 11, including default
-  struct and opt-in class states, ready/pending awaits, retained locals and GC.
-  Those tests do not prove neoCLR execution or a Release allocation benefit.
+Generic states, arbitrary awaiters, async lambdas and scheduler/runtime suspension
+remain outside this gate. The builder remains a class holding a shared Promise;
+lazy/fused task-state storage is a separate possible optimization.
+
+## Initial investigation
+
+The earlier probe at Raven d2a583386 / neoCLR b3b3cfc5 emitted a struct but failed
+import. Its by-value builder contracts boxed at startup and continuation registration.
+That finding motivated the ref projection and ownership protocol above. `probe.py`
+retains that smaller diagnostic experiment; `validate.py` is the strict acceptance
+check and does not count rejected imports as supported.
 
 An initial scratch fixture captured queue in a nested callback and hit the previously
-noted `Missing local builder for 'queue'` emission issue under both policies. Moving
-Promise construction outside the callback isolates the async storage question; the
-shared closure candidate remains deferred, not repaired by this experiment.
+noted `Missing local builder for 'queue'` issue under both policies. Promise creation
+outside the callback isolates state storage; the shared closure candidate remains
+open. The six Raven HeapAsyncStateMachineTests check ordinary .NET policy behavior,
+not target execution.
 
 See [the assessment](../../async-state-machine-assessment.md#value-state-machine-priority--2026-09-24)
-for the next implementation gates. No default, builder ABI or public Task contract
-changes in this probe. Do not publish its rejected value case as a working sample.
+and [builder contracts](../../../api-docs/async-builders.md) for tradeoffs and limits.

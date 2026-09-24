@@ -200,6 +200,7 @@ public class Promise<T> {
 
 namespace System.Runtime.CompilerServices {
     import System.*
+    import System.Option.*
     import System.Tasks.*
 
     public interface IAsyncStateMachine {
@@ -213,9 +214,11 @@ namespace System.Runtime.CompilerServices {
 
     public class AsyncTaskMethodBuilder<T> {
         private field source: Promise<T>
+        private field machine: Option<IAsyncStateMachine>
 
         init(queue: TaskQueue) {
             source = Promise<T>(queue)
+            machine = None
         }
 
         static func Create() -> AsyncTaskMethodBuilder<T> {
@@ -228,13 +231,29 @@ namespace System.Runtime.CompilerServices {
             stateMachine.MoveNext()
         }
 
-        func SetStateMachine(stateMachine: IAsyncStateMachine) { }
+        func SetStateMachine(stateMachine: IAsyncStateMachine) {
+            machine = Some(stateMachine)
+        }
+
+        func HasStateMachine() -> bool {
+            return machine is Some(_)
+        }
+
+        func GetStateMachine() -> IAsyncStateMachine {
+            if let Some(state) = machine {
+                return state
+            }
+            System.Fault("Async state has not been retained")
+            return GetStateMachine()
+        }
 
         func SetResult(value: T) {
+            machine = None
             _ = source.Complete(value)
         }
 
         func SetCancelled() {
+            machine = None
             _ = source.Cancel()
         }
 

@@ -25,13 +25,15 @@ items:
   remarks: Obtain a task from Promise&lt;T&gt;.Task or an async method. Consumers cannot complete it. Expected failures belong in the result type; there is no faulted Task state. This provisional API is confined to one guest invocation. Callback methods using Func&lt;System.Void&gt; are described in the [callback guide](/docs/callbacks.html).
   example: []
   syntax:
-    content: public sealed class Task<T>
+    content: 'public sealed class Task<T> : ITaskAwaiter'
     typeParameters:
     - id: T
       description: The value type carried by successful completion, including Result values for expected failures.
-    content.vb: Public NotInheritable Class Task(Of T)
+    content.vb: Public NotInheritable Class Task(Of T) Implements ITaskAwaiter
   inheritance:
   - System.Object
+  implements:
+  - System.Runtime.CompilerServices.ITaskAwaiter
   inheritedMembers:
   - System.Object.GetType
   - System.Object.ReferenceEquals(System.Object,System.Object)
@@ -235,6 +237,14 @@ references:
   nameWithType.vb: Object
   fullName.vb: Object
   name.vb: Object
+- uid: System.Runtime.CompilerServices.ITaskAwaiter
+  commentId: T:System.Runtime.CompilerServices.ITaskAwaiter
+  parent: System.Runtime.CompilerServices
+  isExternal: true
+  href: System.Runtime.CompilerServices.ITaskAwaiter.html
+  name: ITaskAwaiter
+  nameWithType: ITaskAwaiter
+  fullName: System.Runtime.CompilerServices.ITaskAwaiter
 - uid: System.Object.GetType
   commentId: M:System.Object.GetType
   parent: System.Object
@@ -392,6 +402,43 @@ references:
   name: System
   nameWithType: System
   fullName: System
+- uid: System.Runtime.CompilerServices
+  commentId: N:System.Runtime.CompilerServices
+  isExternal: true
+  href: System.html
+  name: System.Runtime.CompilerServices
+  nameWithType: System.Runtime.CompilerServices
+  fullName: System.Runtime.CompilerServices
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Runtime
+    name: Runtime
+    isExternal: true
+    href: System.Runtime.html
+  - name: .
+  - uid: System.Runtime.CompilerServices
+    name: CompilerServices
+    isExternal: true
+    href: System.Runtime.CompilerServices.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Runtime
+    name: Runtime
+    isExternal: true
+    href: System.Runtime.html
+  - name: .
+  - uid: System.Runtime.CompilerServices
+    name: CompilerServices
+    isExternal: true
+    href: System.Runtime.CompilerServices.html
 - uid: System.Tasks.Task`1.GetResult*
   commentId: Overload:System.Tasks.Task`1.GetResult
   isExternal: true

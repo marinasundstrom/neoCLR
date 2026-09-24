@@ -110,3 +110,5 @@ use a file stream or an application-defined memory stream. See the
 
 The [Storage POC](storage-poc.md) demonstrates provider lookup, writing, text reading,
 seekability and mixed-item enumeration using the integrated development APIs.
+
+[Transitional async builders](async-builders.md) documents the compiler-facing state-machine protocol and its current limits. It may be replaced by runtime suspension.

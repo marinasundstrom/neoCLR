@@ -30,7 +30,7 @@ static class AsyncBindings
         var allowed = owner switch {
             Prefix + "IAsyncStateMachine" => definition.Name is "MoveNext" or "SetStateMachine",
             Prefix + "ITaskAwaiter" => definition.Name == "OnCompleted",
-            _ => definition.Name is ".ctor" or "Create" or "get_Task" or "SetResult" or "SetCancelled" or "Start" or "SetStateMachine" or "AwaitOnCompleted"
+            _ => definition.Name is ".ctor" or "Create" or "get_Task" or "SetResult" or "SetCancelled" or "Start" or "SetStateMachine" or "HasStateMachine" or "GetStateMachine" or "AwaitOnCompleted"
         };
         if (!allowed || contract.IsInterface != interfaceOwner || contract.HasInterfaces
             || (!interfaceOwner && !contract.IsSealed)
@@ -47,6 +47,8 @@ static class AsyncBindings
             "SetCancelled" => ("", "noresult"),
             "SetResult" => (payload!, "noresult"),
             "Start" or "SetStateMachine" => (state, "noresult"),
+            "HasStateMachine" => ("", "Boolean"),
+            "GetStateMachine" => ("", state),
             "AwaitOnCompleted" => (Prefix + "ITaskAwaiter," + state, "noresult"),
             "MoveNext" => ("", "noresult"),
             "OnCompleted" => ("System.Func<Void>", "noresult"),
@@ -58,5 +60,77 @@ static class AsyncBindings
         return construct ? new(args, owner, $"newobj instance {owner}::.ctor({signature})")
             : new(definition.IsStatic ? args : new[] { owner }.Concat(args).ToArray(), result,
                 $"{(definition.DeclaringType.IsInterface ? "callvirt" : "call")} {(definition.IsStatic ? "" : "instance ")}{owner}::{definition.Name}({signature})");
+    }
+
+    // Compiler-facing ref protocol is specialized at the importer boundary. No
+    // managed reference is stored: only the copied first suspended state escapes.
+    public static CollectionBindings.Binding? BindByRef(MethodReference reference, MethodDefinition definition,
+        string suffix, Func<TypeReference, string> map)
+    {
+        if (reference is not GenericInstanceMethod generic || Type(reference.DeclaringType) is not { } owner
+            || !owner.StartsWith(Prefix + "AsyncTaskMethodBuilder<")) return null;
+        _ = RuntimeSignatures.Match(reference, definition, t => map(t));
+        if (!definition.DeclaringType.IsSealed || definition.DeclaringType.IsValueType || definition.IsConstructor)
+            throw new InvalidDataException("Invalid by-reference async builder owner.");
+        var start = definition.Name == "Start";
+        if ((!start && definition.Name != "AwaitOnCompleted") || !definition.IsPublic || definition.IsStatic
+            || definition.ReturnType.MetadataType != MetadataType.Void
+            || generic.GenericArguments.Count != (start ? 1 : 2)
+            || definition.GenericParameters.Count != generic.GenericArguments.Count
+            || definition.Parameters.Count != generic.GenericArguments.Count)
+            throw new InvalidDataException("Invalid by-reference async contract.");
+        for (var i = 0; i < definition.Parameters.Count; i++)
+        {
+            if (definition.Parameters[i].IsOut || definition.Parameters[i].ParameterType is not ByReferenceType { ElementType: GenericParameter parameter }
+                || parameter.Position != i || parameter.Type != GenericParameterType.Method)
+                throw new InvalidDataException("Async protocol requires exact ref generic parameters.");
+            var expected = Prefix + (start || i == 1 ? "IAsyncStateMachine" : "ITaskAwaiter");
+            var constraints = definition.GenericParameters[i].Constraints;
+            if (constraints.Count != 1 || constraints[0].ConstraintType.FullName != expected
+                || !RuntimeSignatures.IsCore(constraints[0].ConstraintType.Scope))
+                throw new InvalidDataException("Invalid async generic constraint.");
+        }
+        var stateType = generic.GenericArguments.Last();
+        var state = map(stateType);
+        var stateDefinition = stateType.Resolve();
+        if (!ApplicationTypes.IsModule(stateDefinition.Module) || stateDefinition.HasGenericParameters
+            || !stateDefinition.Interfaces.Any(i => i.InterfaceType.FullName == Prefix + "IAsyncStateMachine" && RuntimeSignatures.IsCore(i.InterfaceType.Scope)))
+            throw new InvalidDataException("Async state must be an admitted non-generic application state machine.");
+        var machine = Prefix + "IAsyncStateMachine";
+        if (start)
+        {
+            var load = stateDefinition.IsValueType ? "" : "ldobj " + state + "\n";
+            return new([owner, state + "&"], "noresult", load + $"call instance {state}::MoveNext()\npop");
+        }
+        var awaiter = map(generic.GenericArguments[0]);
+        if (!awaiter.StartsWith("System.Tasks.Task<"))
+            throw new InvalidDataException("Only target Task awaiters are admitted by the ref async protocol.");
+        var id = "async_" + suffix;
+        var promote = stateDefinition.IsValueType ? $"box {state}\ncastclass {machine}" : $"castclass {machine}";
+        var body = $"""
+.local {owner} {id}_builder
+.local {state}& {id}_state
+.local {awaiter}& {id}_awaiter
+stloc {id}_state
+stloc {id}_awaiter
+stloc {id}_builder
+ldloc {id}_builder
+call instance {owner}::HasStateMachine()
+brtrue {id}_retained
+ldloc {id}_builder
+ldloc {id}_state
+ldobj {state}
+{promote}
+call instance {owner}::SetStateMachine({machine})
+{id}_retained:
+ldloc {id}_builder
+ldloc {id}_awaiter
+ldobj {awaiter}
+castclass {Prefix}ITaskAwaiter
+ldloc {id}_builder
+call instance {owner}::GetStateMachine()
+call instance {owner}::AwaitOnCompleted({Prefix}ITaskAwaiter,{machine})
+""";
+        return new([owner, awaiter + "&", state + "&"], "noresult", body);
     }
 }
