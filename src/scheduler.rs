@@ -56,6 +56,18 @@ impl Source for crate::socket_io::Sockets {
     }
 }
 
+impl Source for crate::name_resolution::Resolver {
+    fn poll(&mut self, _: &ManagedHeap) -> Result<Option<Value>, Fault> {
+        Ok(self.poll())
+    }
+    fn pending(&self) -> bool {
+        self.pending()
+    }
+    fn trace_roots(&self, roots: &mut Vec<usize>) {
+        self.trace_roots(roots);
+    }
+}
+
 #[derive(Debug, PartialEq)]
 enum Progress {
     Ready(Value),
@@ -98,6 +110,7 @@ struct Ready {
 pub(crate) struct Scheduler {
     pub(crate) workers: crate::workers::Workers,
     pub(crate) sockets: crate::socket_io::Sockets,
+    pub(crate) resolver: crate::name_resolution::Resolver,
     ready: Option<Ready>,
     arbitration: Arbitration,
     wake: Arc<Wake>,
@@ -108,6 +121,7 @@ impl Default for Scheduler {
         Self {
             workers: crate::workers::Workers::with_wake(wake.clone()),
             sockets: Default::default(),
+            resolver: crate::name_resolution::Resolver::with_wake(wake.clone()),
             ready: None,
             arbitration: Default::default(),
             wake,
@@ -116,7 +130,8 @@ impl Default for Scheduler {
 }
 impl Scheduler {
     fn progress(&mut self, heap: &ManagedHeap) -> Result<Progress, Fault> {
-        let sources: &mut [&mut dyn Source] = &mut [&mut self.workers, &mut self.sockets];
+        let sources: &mut [&mut dyn Source] =
+            &mut [&mut self.workers, &mut self.sockets, &mut self.resolver];
         self.arbitration.poll(sources, heap)
     }
 
@@ -127,6 +142,7 @@ impl Scheduler {
         }
         Source::trace_roots(&self.workers, roots);
         Source::trace_roots(&self.sockets, roots);
+        Source::trace_roots(&self.resolver, roots);
     }
 
     fn stage(&mut self, callback: Value, destination: &Value) {
@@ -171,7 +187,7 @@ impl Scheduler {
                 Progress::Idle => return Ok(false),
                 Progress::Pending => {}
             }
-            // Cancellation and the test socket source have no wake subscription.
+            // Cancellation and the socket source have no wake subscription.
             self.wake.park(Duration::from_millis(10));
         }
     }
@@ -214,6 +230,41 @@ mod tests {
             ready: values.iter().map(|n| Value::Int32(*n)).collect(),
             pending: false,
         }
+    }
+
+    #[test]
+    fn resolver_callback_transfers_through_ready_slot_and_survives_collection() {
+        let mut heap = ManagedHeap::default();
+        let mut scheduler = Scheduler::default();
+        let (callback, destination) = ready_graphs(&mut heap);
+        let id = scheduler
+            .resolver
+            .submit("127.0.0.1", callback, Duration::from_secs(5))
+            .unwrap();
+        collect(&mut heap, &scheduler, &[destination.clone()]);
+        assert_eq!(heap.statistics().live_objects, 4);
+        assert!(
+            scheduler
+                .wait(&heap, Some(&destination), &ExecutionOptions::default())
+                .unwrap()
+        );
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(heap.statistics().live_objects, 4);
+        assert_eq!(
+            scheduler.resolver.take_result(id).unwrap(),
+            Some(Ok(vec![std::net::Ipv4Addr::LOCALHOST]))
+        );
+        let mut active = vec![];
+        scheduler
+            .install_ready(|queue, callback| {
+                active.extend([queue.clone(), callback.clone()]);
+                Ok(())
+            })
+            .unwrap();
+        collect(&mut heap, &scheduler, &active);
+        assert_eq!(heap.statistics().live_objects, 4);
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(heap.statistics().live_objects, 0);
     }
 
     #[test]

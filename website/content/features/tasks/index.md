@@ -181,6 +181,11 @@ buffers and completion objects are traced until delivery. It uses nonblocking
 sockets and the private scheduler, with the current generated async state machines.
 Sends snapshot their source ranges and permit short writes. Listener/accept is still pending; this is not yet a complete networking API.
 
+A private host-resolution backend now keeps blocking lookups off the VM thread,
+with bounded concurrency and scheduler-delivered completion. Public DNS lookup and
+a hostname client sample remain development work; Socket.Connect still requires a
+numeric IPv4 address.
+
 **Development after Preview 9:** explicit thread APIs move to `System.Concurrency`; Task and Promise stay in `System.Tasks`. A retained `Thread(callback, input)` exposes a pending `Task` before instance `Start()`. Starting twice faults. `Thread.Run(callback, input)` is the immediate-start shortcut. Both retain the current isolated string callback restriction; successful completion includes native thread termination. These changes require matching development artifacts and are not in the Preview 9 downloads.
 
 `Task.Run` is planned to spawn work concurrently, with overloads for completion-only and value-producing callbacks. Calling Run submits the work; awaiting its Task observes completion. Scheduling, captured state and async callback behavior need to be defined with the suspension model. The string-only worker API is not the intended general Task.Run contract.

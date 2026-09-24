@@ -806,8 +806,12 @@ No later major milestone has started.
 
 ## Working rules and immediate next step
 
-**Active next step, 2026-09-24:** add host-backed DNS for a hostname byte-exchange
-case, with listener/accept as the next server-side slice toward two-sided echo.
+**Active next step, 2026-09-24:** expose the private host-backed resolver through
+a Task/Result API and a compiled hostname byte-exchange case, with listener/accept
+as the next server-side slice toward two-sided echo. The
+[resolver lifetime checkpoint](socket-api-design.md#private-resolver-lifetime-checkpoint--2026-09-24)
+adds bounded off-owner lookup, timeout/cancellation accounting and traced scheduler
+delivery; it does not yet expose a guest DNS API.
 The [public TCP client](experiments/socket-client/README.md) now has
 Connect/Send/Receive/Close and a Task/Result bridge over nonblocking transfers.
 Its compiled sample sends bytes and receives a host echo with collection while pending. Keep exact addressing/lifecycle choices provisional and maintain the API

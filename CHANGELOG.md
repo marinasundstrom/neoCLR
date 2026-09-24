@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add a private host-resolution scheduler source as the first DNS integration slice.
+  Keep blocking lookups off the VM thread, bound process-wide host work and retained
+  invocation results, and preserve capacity accounting after cancellation/teardown.
+  Add deadline, late-result, failure and traced-callback lifecycle coverage. Public
+  DNS APIs and the compiled hostname client remain pending; Socket.Connect is unchanged.
+  Validate 20 focused resolver/scheduler/socket-VM tests and the 555-page website.
+
 - Add Socket.Send with Task/Result byte-count completion and bounded source snapshots.
   Allow one pending send and one receive per connection, sharing transfer/operation
   budgets; preserve short writes, pending backpressure and committed close outcomes.

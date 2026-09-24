@@ -374,3 +374,56 @@ Validation on 2026-09-24: 35 focused backend, VM, scheduler and service tests pa
 The compiled send/receive sample uses `await Foo()?`, reclaims all 1,380 allocated
 objects over 30 collections, and passes both negative visibility checks. The matching
 API snapshot and combined 555-page website build pass. Evidence is local macOS.
+
+## Private resolver lifetime checkpoint — 2026-09-24
+
+The next hostname-client slice now has a private host-resolution source in the
+scheduler. It is not yet a public Dns API or a compiled Raven hostname sample.
+Keep the public Task/Result and address/error shapes for the following bridge slice.
+No Socket.Connect behavior changes: its address remains numeric IPv4.
+
+Compare [.NET 10 Dns.GetHostAddressesAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.dns.gethostaddressesasync?view=net-10.0):
+retain asynchronous address-list lookup, separate from connecting. The prototype
+uses the host resolver via Rust's [ToSocketAddrs](https://doc.rust-lang.org/std/net/trait.ToSocketAddrs.html),
+which may block the calling thread (sources retrieved 2026-09-24). Blocking work
+runs on bounded host threads, not the VM owner and not an isolated guest Task.Run
+worker. A platform asynchronous resolver or reusable host pool remains an alternative;
+the current implementation pays thread-start cost for a small controlled demo.
+
+Only owned hostname text and IPv4 address results cross threads. Guest callbacks
+stay in the invocation's traced registry and then the existing scheduler ready slot.
+A worker sends a durable outcome before signalling the coalesced wake. Resolver
+completion rotates alongside socket and worker sources; generated state machines
+remain unchanged, and this adds no public scheduler or runtime suspension contract.
+
+Provisional limits are four simultaneous blocking lookups across the process, eight
+operations per invocation including delivered-but-unconsumed outcomes, 253 ASCII
+hostname bytes, and 16 unique IPv4 results. The host adapter inspects at most 256
+returned endpoints; exceeding the bounds returns a limit error rather than silently
+truncating the answer. Hostname admission excludes whitespace, ports, NUL and Unicode;
+it is a narrow input guard, not a full DNS-name validator or IDNA implementation.
+IPv6 results are filtered explicitly, with a distinct no-usable-address outcome.
+Native resolver failure is currently generic; platform-specific error mapping is open.
+The host's resolver allocations and its initial address-list allocation are outside
+these result-retention budgets; they are not a whole-process memory bound.
+
+Every private submission supplies a deadline. If the owner has not observed a
+completion before expiry, timeout wins; cancellation similarly commits one outcome.
+Results are consumed once after notification. No guest callback runs on a host thread.
+Dropping an invocation drops its receivers and guest roots without joining a blocked
+host call. Crucially, that call retains a process-wide permit until it exits: repeated
+cancellation/teardown cannot evade the host concurrency bound. Late results cannot
+reach a destroyed invocation. An indefinitely stuck host resolver may therefore
+exhaust capacity; a deadline cannot force libc to stop. This is an explicit availability
+tradeoff, not a claim of interruptible native DNS or an overall connection deadline.
+
+Focused tests use injected blocked, failed and panicking resolvers for lifecycle and
+accounting, plus numeric/localhost host lookups without public DNS. The scheduler
+integration test collects captured callback graphs before completion and while staged,
+then checks their release. Public API, API-reference entries, compiled hostname
+exchange and end-to-end connection deadlines remain the next integration gate.
+
+Validation on 2026-09-24: seven resolver tests, eight scheduler tests and five
+existing socket/VM integration tests pass locally (20 total). The combined website
+build checks 555 pages and the unchanged API snapshot. No public API or compiler
+contract changes in this checkpoint; no SDK artifacts are regenerated.

@@ -173,3 +173,5 @@ mod socket_vm_probe;
 mod scheduler;
 
 mod socket_io;
+
+mod name_resolution;
