@@ -2780,7 +2780,7 @@ fn interpret_instructions(
                         } else if let crate::native::Binding::Socket(operation) = binding {
                             if matches!(
                                 operation,
-                                crate::socket_io::Operation::Connect | crate::socket_io::Operation::Receive | crate::socket_io::Operation::Send
+                                crate::socket_io::Operation::Accept | crate::socket_io::Operation::Connect | crate::socket_io::Operation::Receive | crate::socket_io::Operation::Send
                             ) && default_task_queue.is_none() {
                                 return Err(Fault::new("Socket completion requires the default TaskQueue"));
                             }

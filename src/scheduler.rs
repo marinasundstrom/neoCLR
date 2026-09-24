@@ -233,6 +233,62 @@ mod tests {
     }
 
     #[test]
+    fn accept_callback_is_rooted_while_pending_and_staged() {
+        use crate::socket_io::Operation;
+        let mut heap = ManagedHeap::default();
+        let mut scheduler = Scheduler::default();
+        let (callback, destination) = ready_graphs(&mut heap);
+        let Value::Erased(handle) = scheduler
+            .sockets
+            .invoke(
+                Operation::Listen,
+                &[
+                    Value::String("127.0.0.1".into()),
+                    Value::Int32(0),
+                    Value::Int32(1),
+                ],
+                &heap,
+            )
+            .unwrap()
+        else {
+            panic!()
+        };
+        let Value::Erased(port) = scheduler
+            .sockets
+            .invoke(Operation::LocalPort, &[*handle.clone()], &heap)
+            .unwrap()
+        else {
+            panic!()
+        };
+        let Value::Int32(port) = *port else { panic!() };
+        let Value::Erased(operation) = scheduler
+            .sockets
+            .invoke(Operation::Accept, &[*handle, callback], &heap)
+            .unwrap()
+        else {
+            panic!()
+        };
+        collect(&mut heap, &scheduler, &[destination.clone()]);
+        assert_eq!(heap.statistics().live_objects, 4);
+        assert!(!scheduler.poll(&heap, &destination).unwrap());
+        let _peer = std::net::TcpStream::connect(("127.0.0.1", port as u16)).unwrap();
+        assert!(
+            scheduler
+                .wait(&heap, Some(&destination), &ExecutionOptions::default())
+                .unwrap()
+        );
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(heap.statistics().live_objects, 4);
+        scheduler
+            .sockets
+            .invoke(Operation::ConnectResult, &[*operation], &heap)
+            .unwrap();
+        scheduler.install_ready(|_, _| Ok(())).unwrap();
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(heap.statistics().live_objects, 0);
+    }
+
+    #[test]
     fn resolver_callback_transfers_through_ready_slot_and_survives_collection() {
         let mut heap = ManagedHeap::default();
         let mut scheduler = Scheduler::default();

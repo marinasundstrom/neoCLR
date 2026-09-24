@@ -26,84 +26,6 @@ False:
 .type System.Networking.Sockets.SocketError.Closed
 .sealed
 .method instance .ctor() -> Void
-M00000023_IL_0000:
-M00000023_IL_0001:
-ldarg 0
-M00000023_IL_0002:
-pop
-M00000023_IL_0007:
-ldvoid
-ret
-.end
-.end
-.type System.Networking.Sockets.SocketError.Busy
-.sealed
-.method instance .ctor() -> Void
-M00000024_IL_0000:
-M00000024_IL_0001:
-ldarg 0
-M00000024_IL_0002:
-pop
-M00000024_IL_0007:
-ldvoid
-ret
-.end
-.end
-.type System.Networking.Sockets.SocketError.InvalidRange
-.sealed
-.method instance .ctor() -> Void
-M00000025_IL_0000:
-M00000025_IL_0001:
-ldarg 0
-M00000025_IL_0002:
-pop
-M00000025_IL_0007:
-ldvoid
-ret
-.end
-.end
-.type System.Networking.Sockets.SocketError.LimitExceeded
-.sealed
-.method instance .ctor() -> Void
-M00000026_IL_0000:
-M00000026_IL_0001:
-ldarg 0
-M00000026_IL_0002:
-pop
-M00000026_IL_0007:
-ldvoid
-ret
-.end
-.end
-.type System.Networking.Sockets.SocketError.Cancelled
-.sealed
-.method instance .ctor() -> Void
-M00000027_IL_0000:
-M00000027_IL_0001:
-ldarg 0
-M00000027_IL_0002:
-pop
-M00000027_IL_0007:
-ldvoid
-ret
-.end
-.end
-.type System.Networking.Sockets.SocketError.InvalidAddress
-.sealed
-.method instance .ctor() -> Void
-M00000028_IL_0000:
-M00000028_IL_0001:
-ldarg 0
-M00000028_IL_0002:
-pop
-M00000028_IL_0007:
-ldvoid
-ret
-.end
-.end
-.type System.Networking.Sockets.SocketError.ConnectionRefused
-.sealed
-.method instance .ctor() -> Void
 M00000029_IL_0000:
 M00000029_IL_0001:
 ldarg 0
@@ -114,7 +36,7 @@ ldvoid
 ret
 .end
 .end
-.type System.Networking.Sockets.SocketError.ConnectionReset
+.type System.Networking.Sockets.SocketError.Busy
 .sealed
 .method instance .ctor() -> Void
 M0000002a_IL_0000:
@@ -127,7 +49,7 @@ ldvoid
 ret
 .end
 .end
-.type System.Networking.Sockets.SocketError.AccessDenied
+.type System.Networking.Sockets.SocketError.InvalidRange
 .sealed
 .method instance .ctor() -> Void
 M0000002b_IL_0000:
@@ -140,7 +62,7 @@ ldvoid
 ret
 .end
 .end
-.type System.Networking.Sockets.SocketError.TimedOut
+.type System.Networking.Sockets.SocketError.LimitExceeded
 .sealed
 .method instance .ctor() -> Void
 M0000002c_IL_0000:
@@ -153,7 +75,7 @@ ldvoid
 ret
 .end
 .end
-.type System.Networking.Sockets.SocketError.IoFailure
+.type System.Networking.Sockets.SocketError.Cancelled
 .sealed
 .method instance .ctor() -> Void
 M0000002d_IL_0000:
@@ -162,6 +84,110 @@ ldarg 0
 M0000002d_IL_0002:
 pop
 M0000002d_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Networking.Sockets.SocketError.InvalidAddress
+.sealed
+.method instance .ctor() -> Void
+M0000002e_IL_0000:
+M0000002e_IL_0001:
+ldarg 0
+M0000002e_IL_0002:
+pop
+M0000002e_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Networking.Sockets.SocketError.ConnectionRefused
+.sealed
+.method instance .ctor() -> Void
+M0000002f_IL_0000:
+M0000002f_IL_0001:
+ldarg 0
+M0000002f_IL_0002:
+pop
+M0000002f_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Networking.Sockets.SocketError.ConnectionReset
+.sealed
+.method instance .ctor() -> Void
+M00000030_IL_0000:
+M00000030_IL_0001:
+ldarg 0
+M00000030_IL_0002:
+pop
+M00000030_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Networking.Sockets.SocketError.AccessDenied
+.sealed
+.method instance .ctor() -> Void
+M00000031_IL_0000:
+M00000031_IL_0001:
+ldarg 0
+M00000031_IL_0002:
+pop
+M00000031_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Networking.Sockets.SocketError.TimedOut
+.sealed
+.method instance .ctor() -> Void
+M00000032_IL_0000:
+M00000032_IL_0001:
+ldarg 0
+M00000032_IL_0002:
+pop
+M00000032_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Networking.Sockets.SocketError.IoFailure
+.sealed
+.method instance .ctor() -> Void
+M00000033_IL_0000:
+M00000033_IL_0001:
+ldarg 0
+M00000033_IL_0002:
+pop
+M00000033_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Networking.Sockets.SocketError.InvalidOperation
+.sealed
+.method instance .ctor() -> Void
+M00000034_IL_0000:
+M00000034_IL_0001:
+ldarg 0
+M00000034_IL_0002:
+pop
+M00000034_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Networking.Sockets.SocketError.AddressInUse
+.sealed
+.method instance .ctor() -> Void
+M00000035_IL_0000:
+M00000035_IL_0001:
+ldarg 0
+M00000035_IL_0002:
+pop
+M00000035_IL_0007:
 ldvoid
 ret
 .end

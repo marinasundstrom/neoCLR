@@ -1,0 +1,65 @@
+import System.*
+import System.Result.*
+import System.Tasks.*
+import System.Networking.Sockets.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("Echo server contract failed")
+    }
+}
+
+async func Echo(socket: Socket) -> Task<Result<int, SocketError>> {
+    let buffer: byte[] = [(byte)0, (byte)0]
+    var received = 0
+    while received < 2 {
+        let count = await socket.Receive(buffer, received, 2 - received)?
+        Check(count > 0)
+        received += count
+    }
+    Check(buffer[0] == 72 && buffer[1] == 105)
+    var sent = 0
+    while sent < received {
+        let count = await socket.Send(buffer, sent, received - sent)?
+        Check(count > 0)
+        sent += count
+    }
+    Console.WriteLine("Echoed Hi")
+    return Ok(sent)
+}
+
+async func Serve(listener: Socket) -> Task<Result<int, SocketError>> {
+    let socket = await listener.Accept()?
+    // Stop accepting; the accepted connection stays usable.
+    listener.Close()
+    let result = await Echo(socket)
+    socket.Close()
+    return result
+}
+
+func StartServer(listener: Socket) {
+    let serving = Serve(listener)
+    serving.OnCompleted(() => {
+        if let Ok(count) = serving.GetResult() {
+            Check(count == 2)
+            Console.WriteLine("Server closed")
+        } else {
+            System.Fault("Echo failed")
+        }
+    })
+    TaskQueue.Default.Post(() => Console.WriteLine("Other work runs while accept is pending"))
+}
+
+func Main() {
+    if let Ok(listener) = Socket.Listen("127.0.0.1", 0, 8) {
+        if let Ok(port) = listener.GetLocalPort() {
+            Console.WriteLine(port)
+            StartServer(listener)
+        } else {
+            listener.Close()
+            System.Fault("Local port unavailable")
+        }
+    } else {
+        System.Fault("Listen failed")
+    }
+}

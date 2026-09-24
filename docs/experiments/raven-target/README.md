@@ -1099,3 +1099,11 @@ are unchanged; rebuild the bridge, core reference and runtime library together.
 This does not add general raw-IL closed-family enforcement. See the
 [contract](../../introspection-design.md#type-classification-flags--development-2026-09-24)
 and [compiled validation](../introspection-flags/README.md).
+
+
+The socket bridge now admits Listen(string,int,int) -> Result<Socket,SocketError>,
+Accept() -> Task<Result<Socket,SocketError>> and GetLocalPort() -> Result<int,SocketError>.
+Accept reuses the private connection completion/result bridge. AddressInUse and
+InvalidOperation extend SocketError. Rebuild core metadata, importer, library and
+runtime together. The two-process socket-echo sample checks the public surface;
+no compiler semantics or Runtime Contract settings change.

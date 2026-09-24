@@ -3,7 +3,7 @@ use crate::{Fault, ManagedHeap, Value, metadata::Type};
 use std::{
     collections::BTreeMap,
     io::{self, Read, Write},
-    net::{Ipv4Addr, SocketAddrV4, TcpStream},
+    net::{Ipv4Addr, SocketAddrV4, TcpListener, TcpStream},
     sync::atomic::{AtomicU64, Ordering},
 };
 
@@ -35,6 +35,8 @@ pub(crate) enum Error {
     ConnectionReset,
     AccessDenied,
     TimedOut,
+    InvalidOperation,
+    AddressInUse,
 }
 impl From<io::Error> for Error {
     fn from(error: io::Error) -> Self {
@@ -43,6 +45,7 @@ impl From<io::Error> for Error {
             io::ErrorKind::ConnectionReset | io::ErrorKind::BrokenPipe => Self::ConnectionReset,
             io::ErrorKind::PermissionDenied => Self::AccessDenied,
             io::ErrorKind::TimedOut => Self::TimedOut,
+            io::ErrorKind::AddrInUse => Self::AddressInUse,
             _ => Self::Io,
         }
     }
@@ -63,12 +66,16 @@ fn connecting(error: &io::Error) -> bool {
     false
 }
 struct Connect {
+    listener: Option<SocketId>,
     stream: Option<TcpStream>,
     callback: Option<Value>,
     outcome: Option<Result<SocketId, Error>>,
 }
 #[derive(Clone, Copy)]
 pub(crate) enum Operation {
+    Listen,
+    Accept,
+    LocalPort,
     Connect,
     ConnectResult,
     Receive,
@@ -89,6 +96,8 @@ fn payload(result: Result<Value, Error>) -> Value {
             Error::ConnectionReset => 8,
             Error::AccessDenied => 9,
             Error::TimedOut => 10,
+            Error::InvalidOperation => 12,
+            Error::AddressInUse => 13,
             _ => 11,
         })
     })))
@@ -119,6 +128,7 @@ struct Transfer {
 }
 pub(crate) struct Sockets {
     sockets: BTreeMap<SocketId, TcpStream>,
+    listeners: BTreeMap<SocketId, TcpListener>,
     operations: BTreeMap<OperationId, Transfer>,
     connects: BTreeMap<OperationId, Connect>,
     reserved: usize,
@@ -129,6 +139,7 @@ impl Default for Sockets {
     fn default() -> Self {
         Self {
             sockets: BTreeMap::new(),
+            listeners: BTreeMap::new(),
             operations: BTreeMap::new(),
             connects: BTreeMap::new(),
             reserved: 0,
@@ -141,6 +152,89 @@ impl Default for Sockets {
 // entry points; application code uses invoke through the library bridge.
 #[allow(dead_code)]
 impl Sockets {
+    fn resource_count(&self) -> usize {
+        self.sockets.len()
+            + self.listeners.len()
+            + self
+                .connects
+                .values()
+                .filter(|op| op.stream.is_some() || op.listener.is_some() && op.outcome.is_none())
+                .count()
+    }
+    fn listen(&mut self, address: &str, port: i32, backlog: i32) -> Result<SocketId, Error> {
+        let address = address
+            .parse::<Ipv4Addr>()
+            .map_err(|_| Error::InvalidAddress)?;
+        let port = u16::try_from(port).map_err(|_| Error::InvalidRange)?;
+        if !(1..=128).contains(&backlog) {
+            return Err(Error::InvalidRange);
+        }
+        if self.resource_count() >= self.budget.sockets {
+            return Err(Error::Limit);
+        }
+        let id = SocketId(next_id()?);
+        let socket = socket2::Socket::new(
+            socket2::Domain::IPV4,
+            socket2::Type::STREAM,
+            Some(socket2::Protocol::TCP),
+        )
+        .map_err(Error::from)?;
+        socket.set_nonblocking(true).map_err(Error::from)?;
+        socket
+            .bind(&SocketAddrV4::new(address, port).into())
+            .map_err(Error::from)?;
+        socket.listen(backlog).map_err(Error::from)?;
+        self.listeners.insert(id, socket.into());
+        Ok(id)
+    }
+    fn local_port(&self, socket: SocketId) -> Result<i32, Error> {
+        let address = if let Some(listener) = self.listeners.get(&socket) {
+            listener.local_addr()
+        } else if let Some(stream) = self.sockets.get(&socket) {
+            stream.local_addr()
+        } else {
+            return Err(Error::Closed);
+        };
+        address
+            .map(|address| i32::from(address.port()))
+            .map_err(Error::from)
+    }
+    fn accept(&mut self, listener: SocketId, callback: Value) -> Result<OperationId, Error> {
+        if self.sockets.contains_key(&listener) {
+            return Err(Error::InvalidOperation);
+        }
+        if !self.listeners.contains_key(&listener) {
+            return Err(Error::Closed);
+        }
+        if !matches!(&callback, Value::Delegate(_))
+            || callback.ty() != crate::assembler::parse_type("System.Func<Void>").unwrap()
+        {
+            return Err(Error::InvalidCallback);
+        }
+        if self
+            .connects
+            .values()
+            .any(|op| op.listener == Some(listener) && op.outcome.is_none())
+        {
+            return Err(Error::Busy);
+        }
+        if self.resource_count() >= self.budget.sockets
+            || self.connects.len() + self.operations.len() >= self.budget.operations
+        {
+            return Err(Error::Limit);
+        }
+        let id = OperationId(next_id()?);
+        self.connects.insert(
+            id,
+            Connect {
+                listener: Some(listener),
+                stream: None,
+                callback: Some(callback),
+                outcome: None,
+            },
+        );
+        Ok(id)
+    }
     fn connect(&mut self, address: &str, port: i32, callback: Value) -> Result<OperationId, Error> {
         let address = address
             .parse::<Ipv4Addr>()
@@ -155,13 +249,7 @@ impl Sockets {
             return Err(Error::InvalidCallback);
         }
         if self.operations.len() + self.connects.len() >= self.budget.operations
-            || self.sockets.len()
-                + self
-                    .connects
-                    .values()
-                    .filter(|op| op.stream.is_some())
-                    .count()
-                >= self.budget.sockets
+            || self.resource_count() >= self.budget.sockets
         {
             return Err(Error::Limit);
         }
@@ -180,6 +268,7 @@ impl Sockets {
                 self.connects.insert(
                     id,
                     Connect {
+                        listener: None,
                         stream: None,
                         callback: Some(callback),
                         outcome: Some(Ok(socket_id)),
@@ -198,6 +287,7 @@ impl Sockets {
         self.connects.insert(
             id,
             Connect {
+                listener: None,
                 stream,
                 callback: Some(callback),
                 outcome,
@@ -212,6 +302,22 @@ impl Sockets {
         heap: &ManagedHeap,
     ) -> Result<Value, Fault> {
         let result = match (operation, args) {
+            (
+                Operation::Listen,
+                [
+                    Value::String(address),
+                    Value::Int32(port),
+                    Value::Int32(backlog),
+                ],
+            ) => self
+                .listen(address, *port, *backlog)
+                .map(|id| Value::Int64(id.0 as i64)),
+            (Operation::Accept, [Value::Int64(listener), callback]) => self
+                .accept(SocketId(*listener as u64), callback.clone())
+                .map(|id| Value::Int64(id.0 as i64)),
+            (Operation::LocalPort, [Value::Int64(socket)]) => {
+                self.local_port(SocketId(*socket as u64)).map(Value::Int32)
+            }
             (Operation::Connect, [Value::String(address), Value::Int32(port), callback]) => self
                 .connect(address, *port, callback.clone())
                 .map(|id| Value::Int64(id.0 as i64)),
@@ -265,14 +371,7 @@ impl Sockets {
         Ok(payload(result))
     }
     pub(crate) fn adopt(&mut self, socket: TcpStream) -> Result<SocketId, Error> {
-        if self.sockets.len()
-            + self
-                .connects
-                .values()
-                .filter(|op| op.stream.is_some())
-                .count()
-            >= self.budget.sockets
-        {
+        if self.resource_count() >= self.budget.sockets {
             return Err(Error::Limit);
         }
         socket.set_nonblocking(true).map_err(Error::from)?;
@@ -312,6 +411,9 @@ impl Sockets {
         count: i32,
         callback: Value,
     ) -> Result<OperationId, Error> {
+        if self.listeners.contains_key(&socket) {
+            return Err(Error::InvalidOperation);
+        }
         if !self.sockets.contains_key(&socket) {
             return Err(Error::Closed);
         }
@@ -403,6 +505,14 @@ impl Sockets {
     }
     pub(crate) fn close(&mut self, socket: SocketId) {
         self.sockets.remove(&socket);
+        self.listeners.remove(&socket);
+        for op in self
+            .connects
+            .values_mut()
+            .filter(|op| op.listener == Some(socket) && op.outcome.is_none())
+        {
+            op.outcome = Some(Err(Error::Closed));
+        }
         for op in self
             .operations
             .values_mut()
@@ -463,6 +573,30 @@ impl Sockets {
                 continue;
             }
             if op.outcome.is_none() {
+                if let Some(listener) = op.listener {
+                    let listener = self
+                        .listeners
+                        .get(&listener)
+                        .expect("close settles pending accept");
+                    let accepted = match listener.accept() {
+                        Err(error)
+                            if matches!(
+                                error.kind(),
+                                io::ErrorKind::WouldBlock | io::ErrorKind::Interrupted
+                            ) =>
+                        {
+                            continue;
+                        }
+                        result => result.map_err(Error::from),
+                    };
+                    op.outcome = Some(accepted.and_then(|(stream, _)| {
+                        stream.set_nonblocking(true).map_err(Error::from)?;
+                        let id = SocketId(next_id()?);
+                        self.sockets.insert(id, stream);
+                        Ok(id)
+                    }));
+                    return Ok(op.callback.take());
+                }
                 let stream = op.stream.as_ref().expect("pending connection owns stream");
                 let status = match stream.take_error() {
                     Ok(Some(error)) | Err(error) => Err(Error::from(error)),
@@ -602,6 +736,145 @@ mod tests {
             .invoke(Operation::ConnectResult, &[Value::Int64(id.0 as i64)], heap)
             .unwrap()
     }
+    fn accepted(sockets: &mut Sockets, heap: &ManagedHeap, id: OperationId) -> SocketId {
+        let Value::Erased(value) = connect_result(sockets, heap, id) else {
+            panic!()
+        };
+        let Value::Int64(id) = *value else {
+            panic!("accept failed: {value:?}")
+        };
+        SocketId(id as u64)
+    }
+    #[test]
+    fn listener_accept_echo_and_close_leave_accepted_connection_independent() {
+        let mut sockets = Sockets::default();
+        let mut heap = ManagedHeap::default();
+        let listener = sockets.listen("127.0.0.1", 0, 8).unwrap();
+        let port = sockets.local_port(listener).unwrap();
+        assert!(port > 0);
+        let id = sockets.accept(listener, callback()).unwrap();
+        assert!(sockets.poll(&heap).unwrap().is_none());
+        assert_eq!(sockets.accept(listener, callback()), Err(Error::Busy));
+        let mut peer = TcpStream::connect(("127.0.0.1", port as u16)).unwrap();
+        peer.set_read_timeout(Some(std::time::Duration::from_secs(5)))
+            .unwrap();
+        deliver(&mut sockets, &heap);
+        sockets.close(listener); // committed accept must survive even before consumption
+        let connected = accepted(&mut sockets, &heap, id);
+        assert_eq!(sockets.local_port(connected).unwrap(), port);
+        assert!(
+            sockets
+                .invoke(
+                    Operation::ConnectResult,
+                    &[Value::Int64(id.0 as i64)],
+                    &heap
+                )
+                .is_err()
+        );
+        let buffer = array(&mut heap);
+        peer.write_all(&[72, 105]).unwrap();
+        let read = sockets
+            .receive(connected, &heap, buffer.clone(), 1, 2, callback())
+            .unwrap();
+        deliver(&mut sockets, &heap);
+        let count = sockets.take_result(read).unwrap().unwrap().unwrap();
+        let send = sockets
+            .send(connected, &heap, buffer, 1, count as i32, callback())
+            .unwrap();
+        deliver(&mut sockets, &heap);
+        let sent = sockets.take_result(send).unwrap().unwrap().unwrap();
+        let mut echo = vec![0; sent];
+        peer.read_exact(&mut echo).unwrap();
+        assert_eq!(echo, [72, 105][..sent]);
+        sockets.close(connected);
+        assert_eq!(peer.read(&mut [0]).unwrap(), 0);
+    }
+    #[test]
+    fn listener_validation_wrong_kind_and_address_in_use_are_distinct() {
+        let mut sockets = Sockets::default();
+        let mut heap = ManagedHeap::default();
+        for (address, port, backlog, error) in [
+            ("localhost", 0, 1, Error::InvalidAddress),
+            ("127.0.0.1", -1, 1, Error::InvalidRange),
+            ("127.0.0.1", 65536, 1, Error::InvalidRange),
+            ("127.0.0.1", 0, 0, Error::InvalidRange),
+            ("127.0.0.1", 0, 129, Error::InvalidRange),
+        ] {
+            assert_eq!(sockets.listen(address, port, backlog), Err(error));
+        }
+        let listener = sockets.listen("127.0.0.1", 0, 1).unwrap();
+        let port = sockets.local_port(listener).unwrap();
+        assert_eq!(
+            sockets.listen("127.0.0.1", port, 1),
+            Err(Error::AddressInUse)
+        );
+        assert_eq!(
+            sockets.accept(listener, Value::Int32(0)),
+            Err(Error::InvalidCallback)
+        );
+        let buffer = array(&mut heap);
+        assert_eq!(
+            sockets.receive(listener, &heap, buffer.clone(), 0, 1, callback()),
+            Err(Error::InvalidOperation)
+        );
+        assert_eq!(
+            sockets.send(listener, &heap, buffer, 0, 1, callback()),
+            Err(Error::InvalidOperation)
+        );
+        let (_peer, stream) = pair();
+        let connected = sockets.adopt(stream).unwrap();
+        assert_eq!(
+            sockets.accept(connected, callback()),
+            Err(Error::InvalidOperation)
+        );
+        let mut other = Sockets::default();
+        assert_eq!(other.accept(listener, callback()), Err(Error::Closed));
+        sockets.close(listener);
+        sockets.close(listener);
+        assert_eq!(sockets.local_port(listener), Err(Error::Closed));
+        assert_eq!(sockets.accept(listener, callback()), Err(Error::Closed));
+    }
+    #[test]
+    fn pending_accept_reserves_socket_capacity_and_close_settles_once() {
+        let mut sockets = Sockets {
+            budget: Budget {
+                sockets: 2,
+                operations: 1,
+                bytes: 4,
+            },
+            ..Default::default()
+        };
+        let heap = ManagedHeap::default();
+        let listener = sockets.listen("127.0.0.1", 0, 1).unwrap();
+        let id = sockets.accept(listener, callback()).unwrap();
+        assert_eq!(sockets.resource_count(), 2);
+        assert_eq!(sockets.listen("127.0.0.1", 0, 1), Err(Error::Limit));
+        assert_eq!(
+            sockets.connect("127.0.0.1", 1, callback()),
+            Err(Error::Limit)
+        );
+        sockets.close(listener);
+        assert_eq!(sockets.resource_count(), 0);
+        deliver(&mut sockets, &heap);
+        assert_eq!(
+            connect_result(&mut sockets, &heap, id),
+            payload(Err(Error::Closed))
+        );
+        assert!(sockets.poll(&heap).unwrap().is_none());
+        let listener = sockets.listen("127.0.0.1", 0, 1).unwrap();
+        let port = sockets.local_port(listener).unwrap();
+        let id = sockets.accept(listener, callback()).unwrap();
+        let mut peer = TcpStream::connect(("127.0.0.1", port as u16)).unwrap();
+        peer.set_read_timeout(Some(std::time::Duration::from_secs(5)))
+            .unwrap();
+        deliver(&mut sockets, &heap);
+        assert_eq!(sockets.resource_count(), 2);
+        assert_eq!(sockets.accept(listener, callback()), Err(Error::Limit));
+        let _ = id; // result intentionally unconsumed at invocation teardown
+        drop(sockets);
+        assert_eq!(peer.read(&mut [0]).unwrap(), 0);
+    }
+
     #[test]
     fn send_snapshots_only_range_and_releases_guest_source_before_completion() {
         let (mut peer, stream) = pair();
@@ -853,6 +1126,7 @@ mod tests {
             sockets.connects.insert(
                 OperationId(next_id().unwrap()),
                 Connect {
+                    listener: None,
                     stream: None,
                     callback: Some(callback()),
                     outcome: Some(Err(Error::Io)),

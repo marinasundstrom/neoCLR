@@ -503,3 +503,47 @@ sequence. Select hostname/alias fields only when the host resolver can supply th
 keep the original requested hostname distinct from any reported canonical name.
 A lookup result is a snapshot, not permanent host identity or peer authentication.
 Its equality and collection semantics need a concrete use case before being fixed.
+
+
+## Listener/accept and two-process echo — 2026-09-24
+
+Socket.Listen(address, port, backlog) -> Result<Socket, SocketError> binds a numeric
+IPv4 address and listens synchronously. Port zero requests an OS-selected port,
+reported by GetLocalPort() -> Result<int, SocketError>. Accept() returns
+Task<Result<Socket, SocketError>>. The [two-process POC](experiments/socket-echo/README.md)
+now runs a neoCLR listener and a separate neoCLR hostname client.
+
+Compare [.NET Socket.Listen](https://learn.microsoft.com/en-us/dotnet/api/system.net.sockets.socket.listen?view=net-10.0)
+and [Socket.AcceptAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.sockets.socket.acceptasync?view=net-10.0)
+(primary sources reviewed 2026-09-24). Keep nonblocking accept and a separately owned
+accepted socket. Combine bind/listen in a factory to avoid exposing partly initialized
+resources; this removes pre-bind configuration flexibility. Typed Result errors
+include AddressInUse and InvalidOperation. A single Socket class has connected and
+listening roles; wrong-role calls are checked at runtime. Separate capability types
+remain an alternative if real consumers justify the larger surface. No throughput
+or portability advantage is claimed.
+
+Listen admits ports 0–65535 and requested backlogs 1–128 (subject to OS limits),
+without reuse-address options. One accept may be pending per listener. Listeners,
+connections and pending connect/accept reservations share 64 native socket slots;
+a pending accept reserves its future connection slot before touching the native queue.
+Accepted outcomes retain ownership until the application consumes them or teardown
+releases them. Operation slots are shared with transfers and connects. Nonblocking
+accept is polled alongside transfers under the existing scheduler policy. WouldBlock
+and Interrupted preserve the pending operation; callbacks remain traced guest roots.
+
+Closing a listener settles its uncommitted accept once as Closed, frees its reservation
+and closes the listening resource. It does not revoke an already accepted connection,
+even if the completion callback has not run yet. No accept deadline or public
+per-operation cancellation is added. Host cancellation and invocation teardown remain
+available. The sample's watchdog does not substitute for a future connection policy.
+GetLocalPort is a minimal fixture/application need; IPAddress and HostEntry remain
+future direction rather than prerequisites for this POC.
+
+Validation: 18 backend tests and nine scheduler tests include real loopback accept,
+address-in-use, invalid ranges/roles, same-listener Busy, shared quota reservations,
+close before/after acceptance, independent ownership, teardown and callback GC.
+Nine runtime-service tests include Accept's SocketIo + TaskDispatch requirement.
+The compiled two-process fixture completes with zero live objects: server 104
+allocations/three collections, client 1,428 allocations/31 collections. This is
+local macOS evidence. HTTP framing, overall connect deadlines and fallback remain open.

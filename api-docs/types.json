@@ -121,5 +121,7 @@
   "System.Networking.DnsError.NoAddress",
   "System.Networking.DnsError.TimedOut",
   "System.Networking.DnsError.Cancelled",
-  "System.Networking.DnsError.LookupFailed"
+  "System.Networking.DnsError.LookupFailed",
+  "System.Networking.Sockets.SocketError.InvalidOperation",
+  "System.Networking.Sockets.SocketError.AddressInUse"
 ]

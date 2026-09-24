@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add Socket.Listen, asynchronous Accept and GetLocalPort for a two-process neoCLR
+  echo POC. Reserve connection capacity for pending accepts; preserve accepted sockets
+  after listener close, with that ownership rule documented on Close. Add
+  AddressInUse and InvalidOperation outcomes, generated
+  API docs and the downloadable server/client example. Validate 36 focused runtime
+  tests, ten website tests, 582 API/site pages and both processes with zero retained
+  objects. Accept deadlines, individual
+  cancellation, overall connection deadlines and address fallback remain open.
+
 - Record future IPAddress value-object direction and a possible HostEntry, with
   .NET comparisons and open parsing, equality and migration choices. This is planning;
   current DNS/socket signatures and immediate listener work remain unchanged.

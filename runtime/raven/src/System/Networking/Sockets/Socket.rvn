@@ -19,6 +19,29 @@ public class Socket {
         return source.Task
     }
 
+    static func Listen(address: string, port: int, backlog: int) -> Result<Socket, SocketError> {
+        let payload = RuntimeServices.SocketListen(address, port, backlog)
+        if RuntimeServices.IsValue<byte>(payload) {
+            return Error(DecodeError(RuntimeServices.UnpackValue<byte>(payload)))
+        }
+        return Ok(Socket(RuntimeServices.UnpackValue<long>(payload)))
+    }
+
+    func Accept() -> Task<Result<Socket, SocketError>> {
+        let source = Promise<Result<Socket, SocketError>>()
+        let completion = SocketConnectCompletion(source)
+        completion.StartAccept(handle)
+        return source.Task
+    }
+
+    func GetLocalPort() -> Result<int, SocketError> {
+        let payload = RuntimeServices.SocketLocalPort(handle)
+        if RuntimeServices.IsValue<byte>(payload) {
+            return Error(DecodeError(RuntimeServices.UnpackValue<byte>(payload)))
+        }
+        return Ok(RuntimeServices.UnpackValue<int>(payload))
+    }
+
     func Receive(buffer: byte[], offset: int, count: int) -> Task<Result<int, SocketError>> {
         let source = Promise<Result<int, SocketError>>()
         let completion = SocketTransferCompletion(source)
@@ -71,6 +94,12 @@ public class Socket {
         if code == 11 {
             return SocketError.IoFailure()
         }
+        if code == 12 {
+            return SocketError.InvalidOperation()
+        }
+        if code == 13 {
+            return SocketError.AddressInUse()
+        }
         System.Fault("invalid native socket error")
         return SocketError.IoFailure()
     }
@@ -88,6 +117,16 @@ internal class SocketConnectCompletion {
     internal func Start(address: string, port: int) {
         _ = TaskQueue.Default
         let payload = RuntimeServices.SocketConnect(address, port, self.Complete)
+        if RuntimeServices.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        } else {
+            operation = RuntimeServices.UnpackValue<long>(payload)
+        }
+    }
+
+    internal func StartAccept(handle: long) {
+        _ = TaskQueue.Default
+        let payload = RuntimeServices.SocketAccept(handle, self.Complete)
         if RuntimeServices.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {

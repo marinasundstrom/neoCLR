@@ -4,7 +4,7 @@ title: Networking
 # Networking
 
 **Development after Preview 9.** The current POC resolves a host name, connects a
-TCP client, sends bytes and reads the reply. It is available with matching development
+TCP client, sends bytes and reads the reply from a separate neoCLR server. It is available with matching development
 artifacts; the published Preview 9 SDK does not include these APIs.
 
 ## Resolve, connect, exchange
@@ -26,11 +26,28 @@ transfers. It then observes EOF and closes the connection. It also verifies inva
 hostname handling and performs allocation churn while operations are pending.
 
 [Download the sample and verifier](/samples/socket-client.zip). The verifier starts
-a local host echo server; it requires no external DNS or Internet service.
+a local echo server; it requires no external DNS or Internet service.
+
+## A neoCLR listener
+
+The [two-process echo sample](/samples/socket-echo.zip) runs both sides on neoCLR.
+The server calls Socket.Listen with loopback and port zero, then reports GetLocalPort
+so the client can connect. Accept returns a new connection through Task/Result.
+
+```raven
+{{SOCKET_SERVER_SAMPLE}}
+```
+
+Closing the listener stops new accepts; the accepted connection remains usable.
+Echo loops over Receive and Send until the two-byte greeting is exchanged. The
+sample checks EOF, cleanup and unrelated queued work while Accept is pending.
+Listen binds synchronously. Bind conflicts return AddressInUse; another pending
+accept returns Busy. Send/Receive on a listener or Accept on a connected socket
+returns InvalidOperation.
 
 ## Bytes and ownership
 
-`System.Networking.Sockets.Socket` supplies Connect, Send, Receive and Close.
+`System.Networking.Sockets.Socket` supplies Connect, Listen, Accept, Send, Receive, GetLocalPort and Close.
 Send and Receive complete with an actual byte count: callers loop to handle partial
 transfers. A positive-size receive returning zero means EOF. One send and one receive
 can be pending on a connection at the same time.
@@ -70,7 +87,8 @@ remains future work.
 
 ## Where we’re heading
 
-Listener/accept will allow two neoCLR programs to exchange bytes. Then a bounded
+Two neoCLR programs can now exchange bytes. Next, bounded connection deadlines
+and address fallback will prepare a
 HTTP client and server will exercise requests, headers, responses and bodies, using
 Socket directly where useful. TLS is a separate requirement for HTTPS. TcpClient and
 UdpClient may follow when a working case needs them.

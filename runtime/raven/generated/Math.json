@@ -4,8 +4,8 @@
   "inputs": {
     "runtime/raven/src/System/Networking/DnsError.rvn": "652823f199e6d95b14518917d27306ac83c97d7bac1ee2f62578bb224b3b1d3c",
     "runtime/raven/src/System/Networking/Dns.rvn": "d64bfe87d3ed679bf3fbb26efe9b86fcc6e832358319c4ff23d46c7d3a55ba21",
-    "runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "37dde67dc4a25ed1f2b66b28cc2d6250ed002fa2442b5b757f49b98a98b63dbb",
-    "runtime/raven/src/System/Networking/Sockets/Socket.rvn": "5f6c4f1e883c5b1488ad634f4dcbc6feebf37c72cff85e10f0771f3e4bd6ccd2",
+    "runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "908aedf618e5cc664268b2769910543c60bc5fe00642b687e6f6e4af9333adc9",
+    "runtime/raven/src/System/Networking/Sockets/Socket.rvn": "a8b2f688042966ffb8965be780607b5bcda57c59326ddff0bafccf4d4c58e4df",
     "runtime/raven/src/System/IO/TextReadError.rvn": "bd5cc31983f8aaa1b7e4a68fe63d06e45166e8a3c0c9537673a1ebab09d3659c",
     "runtime/raven/src/System/IO/TextReader.rvn": "6f9f6159741cec9acaded9e5b2705d3c1beaac4fa3fbb1be8a2146f18f575ce0",
     "runtime/raven/src/System/IO/TextWriter.rvn": "ee053d0893f533207e580eba37509aca9284dd0c37d13dff1941a2485b506fec",
@@ -117,7 +117,7 @@
     "Math.helpers.neoil": "c2d506c3773bf642d4b74c1f387cd467493072649aa2f217a0fd59bfa5729cc5"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "c551a4914a605f5ee2605e0b1b3e63496db86c9e47e35b1fe3b63178183d7429",
+  "coreSha256": "2ab3137639cfa8df1b19b60e195f794efc9808db392940bae8c32c3aab734457",
   "exports": [
     "Abs(Int32 value) -> System.Result<Int32,System.OverflowError>",
     "Min(Int32 left,Int32 right) -> Int32",

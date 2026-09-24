@@ -54,6 +54,16 @@ ldarg value
 newobj instance System.Networking.Sockets.SocketError::.ctor(System.Networking.Sockets.SocketError.IoFailure)
 ret
 .end
+.function neoCLR.Library.System.Networking.Sockets.Socket.RuntimeErrorSystemNetworkingSocketsSocketErrorNewSystemNetworkingSocketsSocketErrorInvalidOperation(System.Networking.Sockets.SocketError.InvalidOperation value) -> System.Networking.Sockets.SocketError
+ldarg value
+newobj instance System.Networking.Sockets.SocketError::.ctor(System.Networking.Sockets.SocketError.InvalidOperation)
+ret
+.end
+.function neoCLR.Library.System.Networking.Sockets.Socket.RuntimeErrorSystemNetworkingSocketsSocketErrorNewSystemNetworkingSocketsSocketErrorAddressInUse(System.Networking.Sockets.SocketError.AddressInUse value) -> System.Networking.Sockets.SocketError
+ldarg value
+newobj instance System.Networking.Sockets.SocketError::.ctor(System.Networking.Sockets.SocketError.AddressInUse)
+ret
+.end
 .function neoCLR.Library.System.Networking.Sockets.Socket.RuntimeErrorSystemNetworkingSocketsSocketErrorClosedNew() -> System.Networking.Sockets.SocketError.Closed
 newobj instance System.Networking.Sockets.SocketError.Closed::.ctor()
 ret
@@ -96,6 +106,14 @@ ret
 .end
 .function neoCLR.Library.System.Networking.Sockets.Socket.RuntimeErrorSystemNetworkingSocketsSocketErrorIoFailureNew() -> System.Networking.Sockets.SocketError.IoFailure
 newobj instance System.Networking.Sockets.SocketError.IoFailure::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Networking.Sockets.Socket.RuntimeErrorSystemNetworkingSocketsSocketErrorInvalidOperationNew() -> System.Networking.Sockets.SocketError.InvalidOperation
+newobj instance System.Networking.Sockets.SocketError.InvalidOperation::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Networking.Sockets.Socket.RuntimeErrorSystemNetworkingSocketsSocketErrorAddressInUseNew() -> System.Networking.Sockets.SocketError.AddressInUse
+newobj instance System.Networking.Sockets.SocketError.AddressInUse::.ctor()
 ret
 .end
 .function neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError arg0) -> System.Result.Error<System.Networking.Sockets.SocketError>
@@ -147,179 +165,6 @@ False:
 .field private source System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 .field private operation Int64
 .method internal instance .ctor(System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> source) -> noresult
-M00000007_IL_0000:
-M00000007_IL_0001:
-ldarg 0
-M00000007_IL_0002:
-pop
-M00000007_IL_0007:
-M00000007_IL_0008:
-ldarg 0
-M00000007_IL_0009:
-ldarg 1
-M00000007_IL_000a:
-stfld System.Networking.Sockets.SocketConnectCompletion::source
-M00000007_IL_000f:
-M00000007_IL_0010:
-ldarg 0
-M00000007_IL_0011:
-ldc.i4 0
-M00000007_IL_0012:
-conv.i8
-M00000007_IL_0013:
-stfld System.Networking.Sockets.SocketConnectCompletion::operation
-M00000007_IL_0018:
-ret
-.end
-.method internal instance Start(String address,Int32 port) -> noresult
-.local Value local0
-M00000008_IL_0000:
-M00000008_IL_0001:
-M00000008_IL_0002:
-call System.Tasks.TaskQueue::get_Default()
-M00000008_IL_0007:
-pop
-M00000008_IL_0008:
-M00000008_IL_0009:
-ldarg 1
-M00000008_IL_000a:
-ldarg 2
-M00000008_IL_000b:
-ldarg 0
-M00000008_IL_000c:
-M00000008_IL_0012:
-delegate.bind System.Func<Void> = instance System.Networking.Sockets.SocketConnectCompletion::DelegateTarget_Application_V1_M_363A6D6574686F643133323A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32353A53797374656D2E4E6574776F726B696E672E536F636B65747332333A536F636B6574436F6E6E656374436F6D706C6574696F6E383A436F6D706C657465343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
-M00000008_IL_0017:
-call neoCLR.Runtime.SocketConnect(String,Int32,System.Func<Void>)
-M00000008_IL_001c:
-stloc local0
-M00000008_IL_001d:
-M00000008_IL_001e:
-ldloc local0
-M00000008_IL_001f:
-value.is Byte
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
-M00000008_IL_0024:
-brtrue M00000008_IL_002e
-M00000008_IL_0029:
-br M00000008_IL_0056
-M00000008_IL_002e:
-M00000008_IL_002f:
-ldarg 0
-M00000008_IL_0030:
-ldfld System.Networking.Sockets.SocketConnectCompletion::source
-M00000008_IL_0035:
-ldloc local0
-M00000008_IL_0036:
-value.unpack Byte
-M00000008_IL_003b:
-call System.Networking.Sockets.Socket::DecodeError(Byte)
-M00000008_IL_0040:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
-M00000008_IL_0045:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError>)
-M00000008_IL_004a:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
-M00000008_IL_004f:
-pop
-M00000008_IL_0050:
-br M00000008_IL_0063
-M00000008_IL_0056:
-M00000008_IL_0057:
-ldarg 0
-M00000008_IL_0058:
-ldloc local0
-M00000008_IL_0059:
-value.unpack Int64
-M00000008_IL_005e:
-stfld System.Networking.Sockets.SocketConnectCompletion::operation
-M00000008_IL_0063:
-M00000008_IL_0064:
-M00000008_IL_0065:
-ret
-.end
-.method internal instance Complete() -> noresult
-.local Value local0
-M00000009_IL_0000:
-M00000009_IL_0001:
-M00000009_IL_0002:
-ldarg 0
-M00000009_IL_0003:
-ldfld System.Networking.Sockets.SocketConnectCompletion::operation
-M00000009_IL_0008:
-call neoCLR.Runtime.SocketConnectResult(Int64)
-M00000009_IL_000d:
-stloc local0
-M00000009_IL_000e:
-M00000009_IL_000f:
-ldloc local0
-M00000009_IL_0010:
-value.is Byte
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
-M00000009_IL_0015:
-brtrue M00000009_IL_001f
-M00000009_IL_001a:
-br M00000009_IL_0047
-M00000009_IL_001f:
-M00000009_IL_0020:
-ldarg 0
-M00000009_IL_0021:
-ldfld System.Networking.Sockets.SocketConnectCompletion::source
-M00000009_IL_0026:
-ldloc local0
-M00000009_IL_0027:
-value.unpack Byte
-M00000009_IL_002c:
-call System.Networking.Sockets.Socket::DecodeError(Byte)
-M00000009_IL_0031:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
-M00000009_IL_0036:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError>)
-M00000009_IL_003b:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
-M00000009_IL_0040:
-pop
-M00000009_IL_0041:
-br M00000009_IL_0069
-M00000009_IL_0047:
-M00000009_IL_0048:
-ldarg 0
-M00000009_IL_0049:
-ldfld System.Networking.Sockets.SocketConnectCompletion::source
-M00000009_IL_004e:
-ldloc local0
-M00000009_IL_004f:
-value.unpack Int64
-M00000009_IL_0054:
-newobj instance System.Networking.Sockets.Socket::.ctor(Int64)
-M00000009_IL_0059:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion2(System.Networking.Sockets.Socket)
-M00000009_IL_005e:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion3(System.Result.Ok<System.Networking.Sockets.Socket>)
-M00000009_IL_0063:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
-M00000009_IL_0068:
-pop
-M00000009_IL_0069:
-M00000009_IL_006a:
-M00000009_IL_006b:
-ret
-.end
-.method instance DelegateTarget_Application_V1_M_363A6D6574686F643133323A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32353A53797374656D2E4E6574776F726B696E672E536F636B65747332333A536F636B6574436F6E6E656374436F6D706C6574696F6E383A436F6D706C657465343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect() -> Void
-ldarg 0
-call instance System.Networking.Sockets.SocketConnectCompletion::Complete()
-ldvoid
-ret
-.end
-.end
-.type internal class System.Networking.Sockets.SocketTransferCompletion
-.sealed
-.field private source System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>
-.field private operation Int64
-.method internal instance .ctor(System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>> source) -> noresult
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 ldarg 0
@@ -331,7 +176,7 @@ ldarg 0
 M0000000a_IL_0009:
 ldarg 1
 M0000000a_IL_000a:
-stfld System.Networking.Sockets.SocketTransferCompletion::source
+stfld System.Networking.Sockets.SocketConnectCompletion::source
 M0000000a_IL_000f:
 M0000000a_IL_0010:
 ldarg 0
@@ -340,11 +185,11 @@ ldc.i4 0
 M0000000a_IL_0012:
 conv.i8
 M0000000a_IL_0013:
-stfld System.Networking.Sockets.SocketTransferCompletion::operation
+stfld System.Networking.Sockets.SocketConnectCompletion::operation
 M0000000a_IL_0018:
 ret
 .end
-.method internal instance StartReceive(Int64 handle,arrayref<Byte> buffer,Int32 offset,Int32 count) -> noresult
+.method internal instance Start(String address,Int32 port) -> noresult
 .local Value local0
 M0000000b_IL_0000:
 M0000000b_IL_0001:
@@ -358,65 +203,61 @@ ldarg 1
 M0000000b_IL_000a:
 ldarg 2
 M0000000b_IL_000b:
-ldarg 3
-M0000000b_IL_000c:
-ldarg 4
-M0000000b_IL_000e:
 ldarg 0
-M0000000b_IL_000f:
-M0000000b_IL_0015:
-delegate.bind System.Func<Void> = instance System.Networking.Sockets.SocketTransferCompletion::DelegateTarget_Application_V1_M_363A6D6574686F643133333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32353A53797374656D2E4E6574776F726B696E672E536F636B65747332343A536F636B65745472616E73666572436F6D706C6574696F6E383A436F6D706C657465343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
-M0000000b_IL_001a:
-call neoCLR.Runtime.SocketReceive(Int64,arrayref<Byte>,Int32,Int32,System.Func<Void>)
-M0000000b_IL_001f:
+M0000000b_IL_000c:
+M0000000b_IL_0012:
+delegate.bind System.Func<Void> = instance System.Networking.Sockets.SocketConnectCompletion::DelegateTarget_Application_V1_M_363A6D6574686F643133323A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32353A53797374656D2E4E6574776F726B696E672E536F636B65747332333A536F636B6574436F6E6E656374436F6D706C6574696F6E383A436F6D706C657465343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
+M0000000b_IL_0017:
+call neoCLR.Runtime.SocketConnect(String,Int32,System.Func<Void>)
+M0000000b_IL_001c:
 stloc local0
-M0000000b_IL_0020:
-M0000000b_IL_0021:
+M0000000b_IL_001d:
+M0000000b_IL_001e:
 ldloc local0
-M0000000b_IL_0022:
+M0000000b_IL_001f:
 value.is Byte
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
-M0000000b_IL_0027:
-brtrue M0000000b_IL_0031
-M0000000b_IL_002c:
-br M0000000b_IL_0059
-M0000000b_IL_0031:
-M0000000b_IL_0032:
+M0000000b_IL_0024:
+brtrue M0000000b_IL_002e
+M0000000b_IL_0029:
+br M0000000b_IL_0056
+M0000000b_IL_002e:
+M0000000b_IL_002f:
 ldarg 0
-M0000000b_IL_0033:
-ldfld System.Networking.Sockets.SocketTransferCompletion::source
-M0000000b_IL_0038:
+M0000000b_IL_0030:
+ldfld System.Networking.Sockets.SocketConnectCompletion::source
+M0000000b_IL_0035:
 ldloc local0
-M0000000b_IL_0039:
+M0000000b_IL_0036:
 value.unpack Byte
-M0000000b_IL_003e:
+M0000000b_IL_003b:
 call System.Networking.Sockets.Socket::DecodeError(Byte)
-M0000000b_IL_0043:
+M0000000b_IL_0040:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
-M0000000b_IL_0048:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion4(System.Result.Error<System.Networking.Sockets.SocketError>)
-M0000000b_IL_004d:
-call instance System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::Complete(System.Result<Int32,System.Networking.Sockets.SocketError>)
+M0000000b_IL_0045:
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError>)
+M0000000b_IL_004a:
+call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
-M0000000b_IL_0052:
+M0000000b_IL_004f:
 pop
-M0000000b_IL_0053:
-br M0000000b_IL_0066
-M0000000b_IL_0059:
-M0000000b_IL_005a:
+M0000000b_IL_0050:
+br M0000000b_IL_0063
+M0000000b_IL_0056:
+M0000000b_IL_0057:
 ldarg 0
-M0000000b_IL_005b:
+M0000000b_IL_0058:
 ldloc local0
-M0000000b_IL_005c:
+M0000000b_IL_0059:
 value.unpack Int64
-M0000000b_IL_0061:
-stfld System.Networking.Sockets.SocketTransferCompletion::operation
-M0000000b_IL_0066:
-M0000000b_IL_0067:
-M0000000b_IL_0068:
+M0000000b_IL_005e:
+stfld System.Networking.Sockets.SocketConnectCompletion::operation
+M0000000b_IL_0063:
+M0000000b_IL_0064:
+M0000000b_IL_0065:
 ret
 .end
-.method internal instance StartSend(Int64 handle,arrayref<Byte> buffer,Int32 offset,Int32 count) -> noresult
+.method internal instance StartAccept(Int64 handle) -> noresult
 .local Value local0
 M0000000c_IL_0000:
 M0000000c_IL_0001:
@@ -428,64 +269,58 @@ M0000000c_IL_0008:
 M0000000c_IL_0009:
 ldarg 1
 M0000000c_IL_000a:
-ldarg 2
-M0000000c_IL_000b:
-ldarg 3
-M0000000c_IL_000c:
-ldarg 4
-M0000000c_IL_000e:
 ldarg 0
-M0000000c_IL_000f:
-M0000000c_IL_0015:
-delegate.bind System.Func<Void> = instance System.Networking.Sockets.SocketTransferCompletion::DelegateTarget_Application_V1_M_363A6D6574686F643133333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32353A53797374656D2E4E6574776F726B696E672E536F636B65747332343A536F636B65745472616E73666572436F6D706C6574696F6E383A436F6D706C657465343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
-M0000000c_IL_001a:
-call neoCLR.Runtime.SocketSend(Int64,arrayref<Byte>,Int32,Int32,System.Func<Void>)
-M0000000c_IL_001f:
+M0000000c_IL_000b:
+M0000000c_IL_0011:
+delegate.bind System.Func<Void> = instance System.Networking.Sockets.SocketConnectCompletion::DelegateTarget_Application_V1_M_363A6D6574686F643133323A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32353A53797374656D2E4E6574776F726B696E672E536F636B65747332333A536F636B6574436F6E6E656374436F6D706C6574696F6E383A436F6D706C657465343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
+M0000000c_IL_0016:
+call neoCLR.Runtime.SocketAccept(Int64,System.Func<Void>)
+M0000000c_IL_001b:
 stloc local0
-M0000000c_IL_0020:
-M0000000c_IL_0021:
+M0000000c_IL_001c:
+M0000000c_IL_001d:
 ldloc local0
-M0000000c_IL_0022:
+M0000000c_IL_001e:
 value.is Byte
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_0027:
-brtrue M0000000c_IL_0031
-M0000000c_IL_002c:
-br M0000000c_IL_0059
-M0000000c_IL_0031:
-M0000000c_IL_0032:
+M0000000c_IL_0023:
+brtrue M0000000c_IL_002d
+M0000000c_IL_0028:
+br M0000000c_IL_0055
+M0000000c_IL_002d:
+M0000000c_IL_002e:
 ldarg 0
-M0000000c_IL_0033:
-ldfld System.Networking.Sockets.SocketTransferCompletion::source
-M0000000c_IL_0038:
+M0000000c_IL_002f:
+ldfld System.Networking.Sockets.SocketConnectCompletion::source
+M0000000c_IL_0034:
 ldloc local0
-M0000000c_IL_0039:
+M0000000c_IL_0035:
 value.unpack Byte
-M0000000c_IL_003e:
+M0000000c_IL_003a:
 call System.Networking.Sockets.Socket::DecodeError(Byte)
-M0000000c_IL_0043:
+M0000000c_IL_003f:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
-M0000000c_IL_0048:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion4(System.Result.Error<System.Networking.Sockets.SocketError>)
-M0000000c_IL_004d:
-call instance System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::Complete(System.Result<Int32,System.Networking.Sockets.SocketError>)
+M0000000c_IL_0044:
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError>)
+M0000000c_IL_0049:
+call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_0052:
+M0000000c_IL_004e:
 pop
-M0000000c_IL_0053:
-br M0000000c_IL_0066
-M0000000c_IL_0059:
-M0000000c_IL_005a:
+M0000000c_IL_004f:
+br M0000000c_IL_0062
+M0000000c_IL_0055:
+M0000000c_IL_0056:
 ldarg 0
-M0000000c_IL_005b:
+M0000000c_IL_0057:
 ldloc local0
-M0000000c_IL_005c:
+M0000000c_IL_0058:
 value.unpack Int64
-M0000000c_IL_0061:
-stfld System.Networking.Sockets.SocketTransferCompletion::operation
-M0000000c_IL_0066:
-M0000000c_IL_0067:
-M0000000c_IL_0068:
+M0000000c_IL_005d:
+stfld System.Networking.Sockets.SocketConnectCompletion::operation
+M0000000c_IL_0062:
+M0000000c_IL_0063:
+M0000000c_IL_0064:
 ret
 .end
 .method internal instance Complete() -> noresult
@@ -495,9 +330,9 @@ M0000000d_IL_0001:
 M0000000d_IL_0002:
 ldarg 0
 M0000000d_IL_0003:
-ldfld System.Networking.Sockets.SocketTransferCompletion::operation
+ldfld System.Networking.Sockets.SocketConnectCompletion::operation
 M0000000d_IL_0008:
-call neoCLR.Runtime.SocketTransferResult(Int64)
+call neoCLR.Runtime.SocketConnectResult(Int64)
 M0000000d_IL_000d:
 stloc local0
 M0000000d_IL_000e:
@@ -514,7 +349,7 @@ M0000000d_IL_001f:
 M0000000d_IL_0020:
 ldarg 0
 M0000000d_IL_0021:
-ldfld System.Networking.Sockets.SocketTransferCompletion::source
+ldfld System.Networking.Sockets.SocketConnectCompletion::source
 M0000000d_IL_0026:
 ldloc local0
 M0000000d_IL_0027:
@@ -524,35 +359,284 @@ call System.Networking.Sockets.Socket::DecodeError(Byte)
 M0000000d_IL_0031:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
 M0000000d_IL_0036:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion4(System.Result.Error<System.Networking.Sockets.SocketError>)
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError>)
 M0000000d_IL_003b:
-call instance System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::Complete(System.Result<Int32,System.Networking.Sockets.SocketError>)
+call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
 M0000000d_IL_0040:
 pop
 M0000000d_IL_0041:
-br M0000000d_IL_0064
+br M0000000d_IL_0069
 M0000000d_IL_0047:
 M0000000d_IL_0048:
 ldarg 0
 M0000000d_IL_0049:
-ldfld System.Networking.Sockets.SocketTransferCompletion::source
+ldfld System.Networking.Sockets.SocketConnectCompletion::source
 M0000000d_IL_004e:
 ldloc local0
 M0000000d_IL_004f:
-value.unpack Int32
+value.unpack Int64
 M0000000d_IL_0054:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion5(Int32)
+newobj instance System.Networking.Sockets.Socket::.ctor(Int64)
 M0000000d_IL_0059:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion6(System.Result.Ok<Int32>)
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion2(System.Networking.Sockets.Socket)
 M0000000d_IL_005e:
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion3(System.Result.Ok<System.Networking.Sockets.Socket>)
+M0000000d_IL_0063:
+call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0068:
+pop
+M0000000d_IL_0069:
+M0000000d_IL_006a:
+M0000000d_IL_006b:
+ret
+.end
+.method instance DelegateTarget_Application_V1_M_363A6D6574686F643133323A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32353A53797374656D2E4E6574776F726B696E672E536F636B65747332333A536F636B6574436F6E6E656374436F6D706C6574696F6E383A436F6D706C657465343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect() -> Void
+ldarg 0
+call instance System.Networking.Sockets.SocketConnectCompletion::Complete()
+ldvoid
+ret
+.end
+.end
+.type internal class System.Networking.Sockets.SocketTransferCompletion
+.sealed
+.field private source System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>
+.field private operation Int64
+.method internal instance .ctor(System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>> source) -> noresult
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+ldarg 0
+M0000000e_IL_0002:
+pop
+M0000000e_IL_0007:
+M0000000e_IL_0008:
+ldarg 0
+M0000000e_IL_0009:
+ldarg 1
+M0000000e_IL_000a:
+stfld System.Networking.Sockets.SocketTransferCompletion::source
+M0000000e_IL_000f:
+M0000000e_IL_0010:
+ldarg 0
+M0000000e_IL_0011:
+ldc.i4 0
+M0000000e_IL_0012:
+conv.i8
+M0000000e_IL_0013:
+stfld System.Networking.Sockets.SocketTransferCompletion::operation
+M0000000e_IL_0018:
+ret
+.end
+.method internal instance StartReceive(Int64 handle,arrayref<Byte> buffer,Int32 offset,Int32 count) -> noresult
+.local Value local0
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+call System.Tasks.TaskQueue::get_Default()
+M0000000f_IL_0007:
+pop
+M0000000f_IL_0008:
+M0000000f_IL_0009:
+ldarg 1
+M0000000f_IL_000a:
+ldarg 2
+M0000000f_IL_000b:
+ldarg 3
+M0000000f_IL_000c:
+ldarg 4
+M0000000f_IL_000e:
+ldarg 0
+M0000000f_IL_000f:
+M0000000f_IL_0015:
+delegate.bind System.Func<Void> = instance System.Networking.Sockets.SocketTransferCompletion::DelegateTarget_Application_V1_M_363A6D6574686F643133333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32353A53797374656D2E4E6574776F726B696E672E536F636B65747332343A536F636B65745472616E73666572436F6D706C6574696F6E383A436F6D706C657465343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
+M0000000f_IL_001a:
+call neoCLR.Runtime.SocketReceive(Int64,arrayref<Byte>,Int32,Int32,System.Func<Void>)
+M0000000f_IL_001f:
+stloc local0
+M0000000f_IL_0020:
+M0000000f_IL_0021:
+ldloc local0
+M0000000f_IL_0022:
+value.is Byte
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_0027:
+brtrue M0000000f_IL_0031
+M0000000f_IL_002c:
+br M0000000f_IL_0059
+M0000000f_IL_0031:
+M0000000f_IL_0032:
+ldarg 0
+M0000000f_IL_0033:
+ldfld System.Networking.Sockets.SocketTransferCompletion::source
+M0000000f_IL_0038:
+ldloc local0
+M0000000f_IL_0039:
+value.unpack Byte
+M0000000f_IL_003e:
+call System.Networking.Sockets.Socket::DecodeError(Byte)
+M0000000f_IL_0043:
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
+M0000000f_IL_0048:
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion4(System.Result.Error<System.Networking.Sockets.SocketError>)
+M0000000f_IL_004d:
 call instance System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::Complete(System.Result<Int32,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
-M0000000d_IL_0063:
+M0000000f_IL_0052:
 pop
-M0000000d_IL_0064:
-M0000000d_IL_0065:
-M0000000d_IL_0066:
+M0000000f_IL_0053:
+br M0000000f_IL_0066
+M0000000f_IL_0059:
+M0000000f_IL_005a:
+ldarg 0
+M0000000f_IL_005b:
+ldloc local0
+M0000000f_IL_005c:
+value.unpack Int64
+M0000000f_IL_0061:
+stfld System.Networking.Sockets.SocketTransferCompletion::operation
+M0000000f_IL_0066:
+M0000000f_IL_0067:
+M0000000f_IL_0068:
+ret
+.end
+.method internal instance StartSend(Int64 handle,arrayref<Byte> buffer,Int32 offset,Int32 count) -> noresult
+.local Value local0
+M00000010_IL_0000:
+M00000010_IL_0001:
+M00000010_IL_0002:
+call System.Tasks.TaskQueue::get_Default()
+M00000010_IL_0007:
+pop
+M00000010_IL_0008:
+M00000010_IL_0009:
+ldarg 1
+M00000010_IL_000a:
+ldarg 2
+M00000010_IL_000b:
+ldarg 3
+M00000010_IL_000c:
+ldarg 4
+M00000010_IL_000e:
+ldarg 0
+M00000010_IL_000f:
+M00000010_IL_0015:
+delegate.bind System.Func<Void> = instance System.Networking.Sockets.SocketTransferCompletion::DelegateTarget_Application_V1_M_363A6D6574686F643133333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32353A53797374656D2E4E6574776F726B696E672E536F636B65747332343A536F636B65745472616E73666572436F6D706C6574696F6E383A436F6D706C657465343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
+M00000010_IL_001a:
+call neoCLR.Runtime.SocketSend(Int64,arrayref<Byte>,Int32,Int32,System.Func<Void>)
+M00000010_IL_001f:
+stloc local0
+M00000010_IL_0020:
+M00000010_IL_0021:
+ldloc local0
+M00000010_IL_0022:
+value.is Byte
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_0027:
+brtrue M00000010_IL_0031
+M00000010_IL_002c:
+br M00000010_IL_0059
+M00000010_IL_0031:
+M00000010_IL_0032:
+ldarg 0
+M00000010_IL_0033:
+ldfld System.Networking.Sockets.SocketTransferCompletion::source
+M00000010_IL_0038:
+ldloc local0
+M00000010_IL_0039:
+value.unpack Byte
+M00000010_IL_003e:
+call System.Networking.Sockets.Socket::DecodeError(Byte)
+M00000010_IL_0043:
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
+M00000010_IL_0048:
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion4(System.Result.Error<System.Networking.Sockets.SocketError>)
+M00000010_IL_004d:
+call instance System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::Complete(System.Result<Int32,System.Networking.Sockets.SocketError>)
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_0052:
+pop
+M00000010_IL_0053:
+br M00000010_IL_0066
+M00000010_IL_0059:
+M00000010_IL_005a:
+ldarg 0
+M00000010_IL_005b:
+ldloc local0
+M00000010_IL_005c:
+value.unpack Int64
+M00000010_IL_0061:
+stfld System.Networking.Sockets.SocketTransferCompletion::operation
+M00000010_IL_0066:
+M00000010_IL_0067:
+M00000010_IL_0068:
+ret
+.end
+.method internal instance Complete() -> noresult
+.local Value local0
+M00000011_IL_0000:
+M00000011_IL_0001:
+M00000011_IL_0002:
+ldarg 0
+M00000011_IL_0003:
+ldfld System.Networking.Sockets.SocketTransferCompletion::operation
+M00000011_IL_0008:
+call neoCLR.Runtime.SocketTransferResult(Int64)
+M00000011_IL_000d:
+stloc local0
+M00000011_IL_000e:
+M00000011_IL_000f:
+ldloc local0
+M00000011_IL_0010:
+value.is Byte
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_0015:
+brtrue M00000011_IL_001f
+M00000011_IL_001a:
+br M00000011_IL_0047
+M00000011_IL_001f:
+M00000011_IL_0020:
+ldarg 0
+M00000011_IL_0021:
+ldfld System.Networking.Sockets.SocketTransferCompletion::source
+M00000011_IL_0026:
+ldloc local0
+M00000011_IL_0027:
+value.unpack Byte
+M00000011_IL_002c:
+call System.Networking.Sockets.Socket::DecodeError(Byte)
+M00000011_IL_0031:
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
+M00000011_IL_0036:
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion4(System.Result.Error<System.Networking.Sockets.SocketError>)
+M00000011_IL_003b:
+call instance System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::Complete(System.Result<Int32,System.Networking.Sockets.SocketError>)
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_0040:
+pop
+M00000011_IL_0041:
+br M00000011_IL_0064
+M00000011_IL_0047:
+M00000011_IL_0048:
+ldarg 0
+M00000011_IL_0049:
+ldfld System.Networking.Sockets.SocketTransferCompletion::source
+M00000011_IL_004e:
+ldloc local0
+M00000011_IL_004f:
+value.unpack Int32
+M00000011_IL_0054:
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion5(Int32)
+M00000011_IL_0059:
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion6(System.Result.Ok<Int32>)
+M00000011_IL_005e:
+call instance System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::Complete(System.Result<Int32,System.Networking.Sockets.SocketError>)
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_0063:
+pop
+M00000011_IL_0064:
+M00000011_IL_0065:
+M00000011_IL_0066:
 ret
 .end
 .method instance DelegateTarget_Application_V1_M_363A6D6574686F643133333A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32353A53797374656D2E4E6574776F726B696E672E536F636B65747332343A536F636B65745472616E73666572436F6D706C6574696F6E383A436F6D706C657465343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect() -> Void

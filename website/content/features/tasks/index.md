@@ -179,7 +179,7 @@ The first public development [TCP client API](/docs/sockets.html) now connects t
 numeric IPv4 addresses and sends/receives bytes through `Task<Result<...>>`. Pending
 buffers and completion objects are traced until delivery. It uses nonblocking
 sockets and the private scheduler, with the current generated async state machines.
-Sends snapshot their source ranges and permit short writes. Listener/accept is still pending; this is not yet a complete networking API.
+Sends snapshot their source ranges and permit short writes. Listen and asynchronous Accept now support a two-process echo POC; this is not yet a complete networking API.
 
 The [networking POC](../networking/) now resolves hostnames through Dns and
 connects using the returned IPv4 addresses. Host lookup runs off the VM thread,

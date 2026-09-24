@@ -114,3 +114,8 @@ lookup returns Sequence<String>; private operation and completion types stay hid
 The Rust reachability service `RuntimeService::NameResolution` identifies host lookup
 requirements; submission additionally requires TaskDispatch, not SocketIo or
 IsolatedWorkers. Result consumption requires NameResolution without TaskDispatch.
+
+
+Socket listener coverage includes Listen, Accept, GetLocalPort, AddressInUse and
+InvalidOperation, with XML descriptions and generated member routes. The guide
+links the separate-process echo sample; private handles/completions remain hidden.

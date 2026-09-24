@@ -1,16 +1,20 @@
-# TCP socket clients
+# TCP sockets and listeners
 
 **Development after Preview 9.** `System.Networking.Sockets` starts with an IPv4 TCP
-client. It can connect, send and receive bytes, and close. Listener operations are
-the next server-side step toward a two-sided neoCLR echo application; this is not a complete Socket API.
+API. Connections can send and receive bytes; listeners accept new connections.
+The two-sided POC runs separate neoCLR server and client processes on loopback.
+This remains a provisional subset of a complete Socket API.
 
-[Socket](xref:System.Networking.Sockets.Socket) has four public operations:
+[Socket](xref:System.Networking.Sockets.Socket) has these public operations:
 
 | Operation | Result | Behavior |
 | --- | --- | --- |
 | `Socket.Connect(address, port)` | `Task<Result<Socket, SocketError>>` | Connect to a numeric IPv4 address and port 1–65535. Resolve hostnames separately with Dns.GetHostAddresses. |
 | `socket.Receive(buffer, offset, count)` | `Task<Result<int, SocketError>>` | Receive up to count bytes; short reads are normal. |
 | `socket.Send(buffer, offset, count)` | `Task<Result<int, SocketError>>` | Send from a snapshot of the range; loop on short writes. |
+| `Socket.Listen(address, port, backlog)` | `Result<Socket, SocketError>` | Bind and listen; port zero selects an available local port. |
+| `listener.Accept()` | `Task<Result<Socket, SocketError>>` | Accept one connection; close accepted sockets separately. |
+| `socket.GetLocalPort()` | `Result<int, SocketError>` | Query a live listener or connection port. |
 | `socket.Close()` | unit | Close both directions; repeated calls are harmless. |
 
 The [tested echo client](/samples/socket-client/Main.rvn) uses both await and `?`:
@@ -73,7 +77,7 @@ Compared with .NET Socket.ConnectAsync/SendAsync/ReceiveAsync, this first slice 
 completion, short reads, EOF and explicit ownership, but returns typed Result values
 for recoverable errors. The connect factory avoids exposing an unusable half-created
 connection, at the cost of no pre-connect options or local binding. It is provisional;
-address value objects, IPv6, listener/accept, stream adaptation and individual
+address value objects, IPv6, stream adaptation and individual
 cancellation need their own working cases. No performance advantage is claimed.
 
 The demo goal is a web application that receives and sends HTTP messages. Broader
@@ -89,8 +93,23 @@ result without another suspension; the general hoisted-Result case remains open.
 
 
 Host-backed hostname resolution is available through Dns.GetHostAddresses.
-Planned next: listener/accept and a bounded HTTP request/response client using
+Planned next: bounded connection lifetime/address fallback and an HTTP request/response client using
 Socket directly; TcpClient and UdpClient are not required for it. The HTTP
 prototype will include headers, status and byte bodies with explicit message framing.
 The first controlled demo uses plain HTTP; HTTPS needs a separate TLS implementation.
 These planned additions are not available in the current Socket API.
+
+
+## Listening and accepting
+
+[The two-process echo sample](/samples/socket-echo.zip) binds to 127.0.0.1 with port
+zero and reports GetLocalPort to its verifier. Listen accepts ports 0–65535 and
+backlogs 1–128; the OS may cap the backlog. Bind conflicts return AddressInUse.
+No address-reuse options are exposed. Listen is synchronous; Accept is asynchronous.
+One accept may be pending per listener. Accept reserves capacity before waiting;
+listeners, connections and pending connect/accept reservations share 64 socket slots.
+Completed results retain their operation slot until consumed. Closing a listener
+settles its waiting accept as Closed; an already committed accepted connection stays
+open independently. Send/Receive on a listener and Accept on a connected socket
+return InvalidOperation. Listener teardown closes remaining native resources.
+No public accept deadline or individual cancellation API is provided yet.

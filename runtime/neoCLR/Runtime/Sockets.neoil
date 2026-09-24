@@ -16,3 +16,12 @@
 .function neoCLR.Runtime.SocketSend(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,System.Func<Void> callback) -> Value
 .methodimpl InternalCall
 .end
+.function neoCLR.Runtime.SocketListen(String address,Int32 port,Int32 backlog) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketAccept(Int64 listener,System.Func<Void> callback) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketLocalPort(Int64 socket) -> Value
+.methodimpl InternalCall
+.end

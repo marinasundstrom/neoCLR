@@ -17,6 +17,8 @@ public struct SocketError {
     public struct AccessDenied { }
     public struct TimedOut { }
     public struct IoFailure { }
+    public struct InvalidOperation { }
+    public struct AddressInUse { }
 
     init(value: SocketError.Closed) {
         Stored = ValueStorage.Pack(value)
@@ -128,6 +130,26 @@ public struct SocketError {
         return ValueStorage.Unpack<SocketError.IoFailure>(Stored)
     }
 
+    init(value: SocketError.InvalidOperation) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsInvalidOperation: bool => ValueStorage.Is<SocketError.InvalidOperation>(Stored)
+
+    func GetInvalidOperation() -> SocketError.InvalidOperation {
+        return ValueStorage.Unpack<SocketError.InvalidOperation>(Stored)
+    }
+
+    init(value: SocketError.AddressInUse) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsAddressInUse: bool => ValueStorage.Is<SocketError.AddressInUse>(Stored)
+
+    func GetAddressInUse() -> SocketError.AddressInUse {
+        return ValueStorage.Unpack<SocketError.AddressInUse>(Stored)
+    }
+
     func ToString() -> string {
         if IsClosed {
             return "Closed"
@@ -161,6 +183,12 @@ public struct SocketError {
         }
         if IsIoFailure {
             return "IoFailure"
+        }
+        if IsInvalidOperation {
+            return "InvalidOperation"
+        }
+        if IsAddressInUse {
+            return "AddressInUse"
         }
         System.Fault("invalid socket error case")
         return ""

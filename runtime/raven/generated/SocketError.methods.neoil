@@ -36,6 +36,12 @@
 .property instance IsIoFailure() -> Boolean
 .get instance System.Networking.Sockets.SocketError::get_IsIoFailure()
 .end
+.property instance IsInvalidOperation() -> Boolean
+.get instance System.Networking.Sockets.SocketError::get_IsInvalidOperation()
+.end
+.property instance IsAddressInUse() -> Boolean
+.get instance System.Networking.Sockets.SocketError::get_IsAddressInUse()
+.end
 .method instance .ctor(System.Networking.Sockets.SocketError.Closed value) -> Void
 ldarg value
 value.pack System.Networking.Sockets.SocketError.Closed
@@ -410,193 +416,293 @@ value.unpack System.Networking.Sockets.SocketError.IoFailure
 M00000021_IL_000d:
 ret
 .end
-.method instance ToString() -> String
-M00000022_IL_0000:
-M00000022_IL_0001:
-M00000022_IL_0002:
+.method instance .ctor(System.Networking.Sockets.SocketError.InvalidOperation value) -> Void
+ldarg value
+value.pack System.Networking.Sockets.SocketError.InvalidOperation
+newobj System.Networking.Sockets.SocketError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsInvalidOperation() -> Boolean
+M00000023_IL_0000:
+M00000023_IL_0001:
+M00000023_IL_0002:
 ldarg 0
-M00000022_IL_0003:
+M00000023_IL_0003:
+ldfld System.Networking.Sockets.SocketError::Stored
+M00000023_IL_0008:
+value.is System.Networking.Sockets.SocketError.InvalidOperation
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M00000023_IL_000d:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetInvalidOperation() -> System.Networking.Sockets.SocketError.InvalidOperation
+M00000024_IL_0000:
+M00000024_IL_0001:
+M00000024_IL_0002:
+ldarg 0
+M00000024_IL_0003:
+ldfld System.Networking.Sockets.SocketError::Stored
+M00000024_IL_0008:
+value.unpack System.Networking.Sockets.SocketError.InvalidOperation
+M00000024_IL_000d:
+ret
+.end
+.method instance .ctor(System.Networking.Sockets.SocketError.AddressInUse value) -> Void
+ldarg value
+value.pack System.Networking.Sockets.SocketError.AddressInUse
+newobj System.Networking.Sockets.SocketError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsAddressInUse() -> Boolean
+M00000026_IL_0000:
+M00000026_IL_0001:
+M00000026_IL_0002:
+ldarg 0
+M00000026_IL_0003:
+ldfld System.Networking.Sockets.SocketError::Stored
+M00000026_IL_0008:
+value.is System.Networking.Sockets.SocketError.AddressInUse
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M00000026_IL_000d:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetAddressInUse() -> System.Networking.Sockets.SocketError.AddressInUse
+M00000027_IL_0000:
+M00000027_IL_0001:
+M00000027_IL_0002:
+ldarg 0
+M00000027_IL_0003:
+ldfld System.Networking.Sockets.SocketError::Stored
+M00000027_IL_0008:
+value.unpack System.Networking.Sockets.SocketError.AddressInUse
+M00000027_IL_000d:
+ret
+.end
+.method instance ToString() -> String
+M00000028_IL_0000:
+M00000028_IL_0001:
+M00000028_IL_0002:
+ldarg 0
+M00000028_IL_0003:
 call instance System.Networking.Sockets.SocketError::get_IsClosed()
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_0008:
-brtrue M00000022_IL_0012
-M00000022_IL_000d:
-br M00000022_IL_0019
-M00000022_IL_0012:
-M00000022_IL_0013:
+M00000028_IL_0008:
+brtrue M00000028_IL_0012
+M00000028_IL_000d:
+br M00000028_IL_0019
+M00000028_IL_0012:
+M00000028_IL_0013:
 ldstr "Closed"
-M00000022_IL_0018:
+M00000028_IL_0018:
 ret
-M00000022_IL_0019:
-M00000022_IL_001a:
-M00000022_IL_001b:
+M00000028_IL_0019:
+M00000028_IL_001a:
+M00000028_IL_001b:
 ldarg 0
-M00000022_IL_001c:
+M00000028_IL_001c:
 call instance System.Networking.Sockets.SocketError::get_IsBusy()
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_0021:
-brtrue M00000022_IL_002b
-M00000022_IL_0026:
-br M00000022_IL_0032
-M00000022_IL_002b:
-M00000022_IL_002c:
+M00000028_IL_0021:
+brtrue M00000028_IL_002b
+M00000028_IL_0026:
+br M00000028_IL_0032
+M00000028_IL_002b:
+M00000028_IL_002c:
 ldstr "Busy"
-M00000022_IL_0031:
+M00000028_IL_0031:
 ret
-M00000022_IL_0032:
-M00000022_IL_0033:
-M00000022_IL_0034:
+M00000028_IL_0032:
+M00000028_IL_0033:
+M00000028_IL_0034:
 ldarg 0
-M00000022_IL_0035:
+M00000028_IL_0035:
 call instance System.Networking.Sockets.SocketError::get_IsInvalidRange()
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_003a:
-brtrue M00000022_IL_0044
-M00000022_IL_003f:
-br M00000022_IL_004b
-M00000022_IL_0044:
-M00000022_IL_0045:
+M00000028_IL_003a:
+brtrue M00000028_IL_0044
+M00000028_IL_003f:
+br M00000028_IL_004b
+M00000028_IL_0044:
+M00000028_IL_0045:
 ldstr "InvalidRange"
-M00000022_IL_004a:
+M00000028_IL_004a:
 ret
-M00000022_IL_004b:
-M00000022_IL_004c:
-M00000022_IL_004d:
+M00000028_IL_004b:
+M00000028_IL_004c:
+M00000028_IL_004d:
 ldarg 0
-M00000022_IL_004e:
+M00000028_IL_004e:
 call instance System.Networking.Sockets.SocketError::get_IsLimitExceeded()
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_0053:
-brtrue M00000022_IL_005d
-M00000022_IL_0058:
-br M00000022_IL_0064
-M00000022_IL_005d:
-M00000022_IL_005e:
+M00000028_IL_0053:
+brtrue M00000028_IL_005d
+M00000028_IL_0058:
+br M00000028_IL_0064
+M00000028_IL_005d:
+M00000028_IL_005e:
 ldstr "LimitExceeded"
-M00000022_IL_0063:
+M00000028_IL_0063:
 ret
-M00000022_IL_0064:
-M00000022_IL_0065:
-M00000022_IL_0066:
+M00000028_IL_0064:
+M00000028_IL_0065:
+M00000028_IL_0066:
 ldarg 0
-M00000022_IL_0067:
+M00000028_IL_0067:
 call instance System.Networking.Sockets.SocketError::get_IsCancelled()
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_006c:
-brtrue M00000022_IL_0076
-M00000022_IL_0071:
-br M00000022_IL_007d
-M00000022_IL_0076:
-M00000022_IL_0077:
+M00000028_IL_006c:
+brtrue M00000028_IL_0076
+M00000028_IL_0071:
+br M00000028_IL_007d
+M00000028_IL_0076:
+M00000028_IL_0077:
 ldstr "Cancelled"
-M00000022_IL_007c:
+M00000028_IL_007c:
 ret
-M00000022_IL_007d:
-M00000022_IL_007e:
-M00000022_IL_007f:
+M00000028_IL_007d:
+M00000028_IL_007e:
+M00000028_IL_007f:
 ldarg 0
-M00000022_IL_0080:
+M00000028_IL_0080:
 call instance System.Networking.Sockets.SocketError::get_IsInvalidAddress()
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_0085:
-brtrue M00000022_IL_008f
-M00000022_IL_008a:
-br M00000022_IL_0096
-M00000022_IL_008f:
-M00000022_IL_0090:
+M00000028_IL_0085:
+brtrue M00000028_IL_008f
+M00000028_IL_008a:
+br M00000028_IL_0096
+M00000028_IL_008f:
+M00000028_IL_0090:
 ldstr "InvalidAddress"
-M00000022_IL_0095:
+M00000028_IL_0095:
 ret
-M00000022_IL_0096:
-M00000022_IL_0097:
-M00000022_IL_0098:
+M00000028_IL_0096:
+M00000028_IL_0097:
+M00000028_IL_0098:
 ldarg 0
-M00000022_IL_0099:
+M00000028_IL_0099:
 call instance System.Networking.Sockets.SocketError::get_IsConnectionRefused()
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_009e:
-brtrue M00000022_IL_00a8
-M00000022_IL_00a3:
-br M00000022_IL_00af
-M00000022_IL_00a8:
-M00000022_IL_00a9:
+M00000028_IL_009e:
+brtrue M00000028_IL_00a8
+M00000028_IL_00a3:
+br M00000028_IL_00af
+M00000028_IL_00a8:
+M00000028_IL_00a9:
 ldstr "ConnectionRefused"
-M00000022_IL_00ae:
+M00000028_IL_00ae:
 ret
-M00000022_IL_00af:
-M00000022_IL_00b0:
-M00000022_IL_00b1:
+M00000028_IL_00af:
+M00000028_IL_00b0:
+M00000028_IL_00b1:
 ldarg 0
-M00000022_IL_00b2:
+M00000028_IL_00b2:
 call instance System.Networking.Sockets.SocketError::get_IsConnectionReset()
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_00b7:
-brtrue M00000022_IL_00c1
-M00000022_IL_00bc:
-br M00000022_IL_00c8
-M00000022_IL_00c1:
-M00000022_IL_00c2:
+M00000028_IL_00b7:
+brtrue M00000028_IL_00c1
+M00000028_IL_00bc:
+br M00000028_IL_00c8
+M00000028_IL_00c1:
+M00000028_IL_00c2:
 ldstr "ConnectionReset"
-M00000022_IL_00c7:
+M00000028_IL_00c7:
 ret
-M00000022_IL_00c8:
-M00000022_IL_00c9:
-M00000022_IL_00ca:
+M00000028_IL_00c8:
+M00000028_IL_00c9:
+M00000028_IL_00ca:
 ldarg 0
-M00000022_IL_00cb:
+M00000028_IL_00cb:
 call instance System.Networking.Sockets.SocketError::get_IsAccessDenied()
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_00d0:
-brtrue M00000022_IL_00da
-M00000022_IL_00d5:
-br M00000022_IL_00e1
-M00000022_IL_00da:
-M00000022_IL_00db:
+M00000028_IL_00d0:
+brtrue M00000028_IL_00da
+M00000028_IL_00d5:
+br M00000028_IL_00e1
+M00000028_IL_00da:
+M00000028_IL_00db:
 ldstr "AccessDenied"
-M00000022_IL_00e0:
+M00000028_IL_00e0:
 ret
-M00000022_IL_00e1:
-M00000022_IL_00e2:
-M00000022_IL_00e3:
+M00000028_IL_00e1:
+M00000028_IL_00e2:
+M00000028_IL_00e3:
 ldarg 0
-M00000022_IL_00e4:
+M00000028_IL_00e4:
 call instance System.Networking.Sockets.SocketError::get_IsTimedOut()
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_00e9:
-brtrue M00000022_IL_00f3
-M00000022_IL_00ee:
-br M00000022_IL_00fa
-M00000022_IL_00f3:
-M00000022_IL_00f4:
+M00000028_IL_00e9:
+brtrue M00000028_IL_00f3
+M00000028_IL_00ee:
+br M00000028_IL_00fa
+M00000028_IL_00f3:
+M00000028_IL_00f4:
 ldstr "TimedOut"
-M00000022_IL_00f9:
+M00000028_IL_00f9:
 ret
-M00000022_IL_00fa:
-M00000022_IL_00fb:
-M00000022_IL_00fc:
+M00000028_IL_00fa:
+M00000028_IL_00fb:
+M00000028_IL_00fc:
 ldarg 0
-M00000022_IL_00fd:
+M00000028_IL_00fd:
 call instance System.Networking.Sockets.SocketError::get_IsIoFailure()
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_0102:
-brtrue M00000022_IL_010c
-M00000022_IL_0107:
-br M00000022_IL_0113
-M00000022_IL_010c:
-M00000022_IL_010d:
+M00000028_IL_0102:
+brtrue M00000028_IL_010c
+M00000028_IL_0107:
+br M00000028_IL_0113
+M00000028_IL_010c:
+M00000028_IL_010d:
 ldstr "IoFailure"
-M00000022_IL_0112:
+M00000028_IL_0112:
 ret
-M00000022_IL_0113:
-M00000022_IL_0114:
-M00000022_IL_0115:
+M00000028_IL_0113:
+M00000028_IL_0114:
+M00000028_IL_0115:
+ldarg 0
+M00000028_IL_0116:
+call instance System.Networking.Sockets.SocketError::get_IsInvalidOperation()
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M00000028_IL_011b:
+brtrue M00000028_IL_0125
+M00000028_IL_0120:
+br M00000028_IL_012c
+M00000028_IL_0125:
+M00000028_IL_0126:
+ldstr "InvalidOperation"
+M00000028_IL_012b:
+ret
+M00000028_IL_012c:
+M00000028_IL_012d:
+M00000028_IL_012e:
+ldarg 0
+M00000028_IL_012f:
+call instance System.Networking.Sockets.SocketError::get_IsAddressInUse()
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M00000028_IL_0134:
+brtrue M00000028_IL_013e
+M00000028_IL_0139:
+br M00000028_IL_0145
+M00000028_IL_013e:
+M00000028_IL_013f:
+ldstr "AddressInUse"
+M00000028_IL_0144:
+ret
+M00000028_IL_0145:
+M00000028_IL_0146:
+M00000028_IL_0147:
 ldstr "invalid socket error case"
-M00000022_IL_011a:
+M00000028_IL_014c:
 call System.Fault(String)
-M00000022_IL_011f:
-M00000022_IL_0120:
+M00000028_IL_0151:
+M00000028_IL_0152:
 ldstr ""
-M00000022_IL_0125:
+M00000028_IL_0157:
 ret
 .end
 .end

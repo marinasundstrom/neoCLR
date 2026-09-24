@@ -812,8 +812,9 @@ No later major milestone has started.
 
 ## Working rules and immediate next step
 
-**Active next step, 2026-09-24:** add listener/accept for a two-sided neoCLR echo
-case. The [hostname client](experiments/socket-client/README.md) now uses public
+**Active next step, 2026-09-24:** bound connection lifetime and define address
+fallback for the first HTTP client. The [two-process echo](experiments/socket-echo/README.md)
+now uses Listen/Accept on the server and the hostname client on the other side. The [hostname client](experiments/socket-client/README.md) now uses public
 Dns.GetHostAddresses with Task/Result and a read-only IPv4 address sequence over the
 [bounded resolver](socket-api-design.md#public-hostname-lookup-and-networking-poc--2026-09-24).
 Future author direction: introduce an IPAddress value object when the networking

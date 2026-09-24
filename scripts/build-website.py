@@ -203,6 +203,7 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'SOCKET_SERVER_SAMPLE': ('docs/experiments/socket-echo/Server.rvn', 'async func Serve(', '\n}', True),
         'DNS_RESOLVE_SAMPLE': ('docs/experiments/socket-client/Main.rvn', 'async func ResolveHost()', '\n}', True),
         'OBJECT_DISPLAY_SAMPLE': ('docs/experiments/object-display/Main.rvn', 'open class Plain', '\nfunc Main()', False),
         'CONSOLE_PROPAGATION_SAMPLE': ('docs/experiments/console-streams/Propagation.rvn', 'func ReadInput()', '\n}', True),
@@ -262,6 +263,14 @@ def main():
     for name in ('Main.rvn', 'SocketClient.rvnproj', 'README.md', 'verify.py'):
         shutil.copyfile(ROOT / 'docs/experiments/socket-client' / name, socket_downloads / name)
     shutil.make_archive(str(downloads / 'socket-client'), 'zip', socket_downloads)
+    echo_downloads = downloads / 'socket-echo'
+    echo_downloads.mkdir()
+    for name in ('Server.rvn', 'Server.rvnproj', 'README.md', 'verify.py'):
+        shutil.copyfile(ROOT / 'docs/experiments/socket-echo' / name, echo_downloads / name)
+    shutil.copyfile(ROOT / 'docs/experiments/socket-client/Main.rvn', echo_downloads / 'Client.rvn')
+    (echo_downloads / 'Client.rvnproj').write_text((ROOT / 'docs/experiments/socket-client/SocketClient.rvnproj').read_text().replace('Main.rvn', 'Client.rvn'))
+    shutil.make_archive(str(downloads / 'socket-echo'), 'zip', echo_downloads)
+
     storage_downloads = downloads / 'storage-provider'
     storage_downloads.mkdir()
     for name in ('Storage.rvn', 'Path.rvn', 'Streams.rvn', 'ByteRoundTrip.rvn', 'Main.rvn', 'StorageExplorer.rvnproj', 'expected.txt'):
