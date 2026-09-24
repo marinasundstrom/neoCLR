@@ -51,23 +51,24 @@ a[id] { scroll-margin-top: 2rem; }
 @media (max-width: 720px) { .landing-hero, .landing-split, .feature-grid { grid-template-columns: minmax(0, 1fr); } .landing-hero { padding-top: 1.5rem; } .landing-section { padding-inline: .25rem; } .landing-reference { padding: 1.25rem; } }
 .layout-landing .api-content { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .layout-landing .api-content > * { max-width: none; }
-.landing-hero { background: #173a32; color: #f5f8f0; box-shadow: 0 0 0 100vmax #173a32; clip-path: inset(0 -100vmax); margin-bottom: 2rem; }
-.landing-hero .landing-lead, .landing-hero .landing-note, .landing-hero > div > .landing-eyebrow { color: #ceded4; }
-.landing-hero > div:first-child a:not(.primary-action) { color: #c5efa6; }
-.landing-hero .primary-action { background: #c5efa6; color: #18392d; }
-.landing-hero .landing-example { color: var(--raven-ink); }
+.landing-hero { background: var(--hero-bg); color: var(--hero-ink); box-shadow: 0 0 0 100vmax var(--hero-bg); clip-path: inset(0 -100vmax); margin-bottom: 2rem; }
 /* Restrained project palette, separate from Raven's purple documentation theme. */
-:root { --raven-bg: #f7f8fa; --raven-surface: #fff; --raven-surface-raised: #eef1f5; --raven-ink: #202a37; --raven-muted: #657080; --raven-line: #dfe4eb; --raven-accent: #3664a0; --raven-accent-strong: #244d83; --raven-header-bg: rgba(255,255,255,.95); }
+:root { --hero-ink: #202a37; --hero-muted: #657080; --hero-link: #3664a0; --hero-bg: #e8eef6; --hero-code-bg: #edf2f8; --raven-bg: #f7f8fa; --raven-surface: #fff; --raven-surface-raised: #eef1f5; --raven-ink: #202a37; --raven-muted: #657080; --raven-line: #dfe4eb; --raven-accent: #3664a0; --raven-accent-strong: #244d83; --raven-header-bg: rgba(255,255,255,.95); }
 .release-notice { margin: 0 auto; padding: .45rem 1.5rem; max-width: 1280px; border: 0; background: transparent; color: var(--raven-muted); font-size: .78rem; }
 .release-notice a { margin-left: .5rem; }
 .layout-landing .documentation-shell { padding-top: 0; }
-.landing-hero { background: #182332; box-shadow: 0 0 0 100vmax #182332; color: #f7f9fc; }
-.landing-hero .landing-lead, .landing-hero .landing-note, .landing-hero > div:first-child > .landing-eyebrow { color: #bdcad9; }
-.landing-hero > div:first-child a:not(.primary-action) { color: #b6d3f5; }
 .landing-hero .primary-action, .api-content .primary-action { background: #3d6db0; color: #fff; }
 .landing-hero .landing-example > .landing-eyebrow { color: var(--raven-muted); }
 .landing-example { box-shadow: 0 14px 45px #0002; }
-:root[data-theme="dark"] { --raven-bg: #141a23; --raven-surface: #1c2531; --raven-surface-raised: #222e3b; --raven-ink: #e8edf4; --raven-muted: #a5b2c2; --raven-line: #344151; --raven-accent: #9fc3f2; --raven-header-bg: rgba(20,26,35,.95); }
+:root[data-theme="dark"] { --hero-ink: #f7f9fc; --hero-muted: #bdcad9; --hero-link: #b6d3f5; --hero-bg: #182332; --hero-code-bg: #111923; --raven-bg: #141a23; --raven-surface: #1c2531; --raven-surface-raised: #222e3b; --raven-ink: #e8edf4; --raven-muted: #a5b2c2; --raven-line: #344151; --raven-accent: #9fc3f2; --raven-header-bg: rgba(20,26,35,.95); }
 @media (prefers-color-scheme: dark) {
-:root:not([data-theme]) { --raven-bg: #141a23; --raven-surface: #1c2531; --raven-surface-raised: #222e3b; --raven-ink: #e8edf4; --raven-muted: #a5b2c2; --raven-line: #344151; --raven-accent: #9fc3f2; --raven-header-bg: rgba(20,26,35,.95); }
+:root:not([data-theme]) { --hero-ink: #f7f9fc; --hero-muted: #bdcad9; --hero-link: #b6d3f5; --hero-bg: #182332; --hero-code-bg: #111923; --raven-bg: #141a23; --raven-surface: #1c2531; --raven-surface-raised: #222e3b; --raven-ink: #e8edf4; --raven-muted: #a5b2c2; --raven-line: #344151; --raven-accent: #9fc3f2; --raven-header-bg: rgba(20,26,35,.95); }
 }
+
+/* Keep the highlighted code inset distinct from its surrounding example card. */
+.landing-example pre { background: var(--hero-code-bg); border-color: var(--raven-line); }
+.landing-example pre code.hljs { background: transparent; }
+
+.landing-hero .landing-lead, .landing-hero .landing-note, .landing-hero > div:first-child > .landing-eyebrow { color: var(--hero-muted); }
+.landing-hero > div:first-child a:not(.primary-action) { color: var(--hero-link); }
+.landing-hero .landing-example { color: var(--raven-ink); }

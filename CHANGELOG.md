@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Adapt the landing hero and inset code background to Light/Dark/Auto while
+  preserving Raven syntax highlighting. Correct development async documentation
+  and the executable sample to use `await input?`: await first, then propagate
+  Result Error or Option None; explicit parentheses remain valid on older tools.
+  Document manual website-only publication without a runtime build or release.
+
 - Mark custom case carriers, including StreamError and TextReadError, with
   UnionAttribute in runtime source and reference metadata. Raven imports the
   typed constructor/IsCase/GetCase contract as IUnionSymbol and RavenDoc groups

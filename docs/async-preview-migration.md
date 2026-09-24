@@ -61,8 +61,10 @@ These names appeared during development, not in published Preview 8:
 - `Map` transforms the entire payload. `MapResult` maps only an Ok payload and preserves
   Error; `Then` chains tasks. Cancellation bypasses their user callbacks. Awaiting a
   cancelled task cancels the enclosing async task; it does not invent a value.
-- Use `(await input)?` with the current postfix-first precedence for awaited Result
-  propagation. Await inside `for` loops remains diagnosed until iterator cleanup is
+- With the development compiler, use `await input?`: await completes first, then
+  `?` propagates Error from a Result or None from an Option. Parentheses around
+  `await input` are no longer required; they remain valid for older toolchains.
+  Await inside `for` loops remains diagnosed until iterator cleanup is
   suspension-aware. These compiler protocols remain provisional.
 
 ## Worker and host boundaries

@@ -4,7 +4,7 @@ import System.Result.*
 import System.Console.*
 
 async func Read(input: Task<Result<int, string>>) -> Task<Result<int, string>> {
-    let value = (await input)?
+    let value = await input?
     return Ok(value + 1)
 }
 

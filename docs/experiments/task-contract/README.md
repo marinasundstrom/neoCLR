@@ -149,7 +149,7 @@ access. See the [current Task contracts](../../task-contracts.md#task-compositio
 ## Current generated async and editor probes — 2026-09-23
 
 - `verify_async.py`: generated async, Result propagation, immediate/resumed
-  cancellation, combined `(await input)?`, GC and unsupported cleanup diagnostics.
+  cancellation, combined `await input?` for Result and Option (updated 2026-09-24), GC and unsupported cleanup diagnostics.
 - `verify_default_queue.py`: default Promise construction and automatic invocation
   dispatch, worker progress, retained callbacks and execution-budget faults.
 - `verify_map_result.py`: explicit Ok mapping, Error/cancellation bypass, async

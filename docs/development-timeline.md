@@ -6168,3 +6168,23 @@ failure remains the next acceptance target.
 - **Open:** assembly/module scoped identity is the next candidate; member equality
   needs kind and closed-owner checks. Parameter snapshots lack declaring-member
   identity, so their equality is deferred rather than inferred from names or positions.
+
+### 2026-09-24 — Await propagation documentation and landing theme refinement
+
+- **Author:** corrects the earlier await precedence discussion: `await input?`
+  now awaits first, then propagates Result Error or Option None. Parentheses are
+  unnecessary. Asks for a clearer code inset and a hero adapted to the selected
+  theme, preserving syntax highlighting; confirms the dark palette already works.
+- **Assistant action:** updates current migration/feature documentation and the
+  executable sample, and exercises the shorthand in the async propagation probes.
+  Keeps the earlier discussion above as history and published release notes intact.
+  Gives the light hero a pale slate-blue background and the sample a tinted inset,
+  preserving the dark hero palette and shared Raven token highlighting.
+- **Validation:** all six immediate/resumed Result success/error/cancellation
+  probes and four Option Some/None probes pass. The combined site builds and
+  checks 491 pages; all ten website contract tests pass. Both theme palettes and
+  highlighted code were inspected in the browser.
+- **Author follow-up:** requests publishing only the site, without a full repository
+  build or runtime release. The assistant selects a `[skip ci]` push followed by
+  manual dispatch of `pages.yml`; that workflow has only site build/deploy jobs.
+  Publication outcome is recorded by the GitHub Actions run.

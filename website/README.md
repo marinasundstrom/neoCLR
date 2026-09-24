@@ -52,7 +52,13 @@ on manual dispatch on `main`, with Pages/OIDC permissions limited to the deploy 
 Review the revision, release notice, downloads and page-specific availability before
 **Project website → Run workflow → main**. The expected public URL remains
 https://marinasundstrom.github.io/neoCLR/; relative links also work at a domain root.
-A successful local build is not a deployment.
+A successful local build is not a deployment. The manual website workflow does not
+build the runtime or create a release. If the author explicitly requests a site-only
+publication while a push includes code changes, a `[skip ci]` commit message skips
+push-triggered validation; then dispatch `pages.yml` manually on `main`. This is a
+per-publication choice, not a permanent bypass of runtime validation. See
+[GitHub skip instructions](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/skip-workflow-runs).
+
 
 Follow [website maintenance](../docs/design/feature-pages.md) for feature/release
 reviews. Inspect desktop and narrow layouts when changing CSS or upgrading RavenDoc.

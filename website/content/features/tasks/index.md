@@ -65,7 +65,7 @@ For an operation returning `Task<Result<T, E>>`, await yields the Result and `?`
 {{TASK_PROPAGATION_SAMPLE}}
 ```
 
-Parentheses make the order explicit: `(await input)?` awaits first, then propagates from the Result. Today, `await input?` applies `?` first; ergonomic shorthand is a future language-design question.
+With the development compiler, `await input?` awaits first, then applies `?` to the result: Error from a Result or None from an Option is propagated to the enclosing function. Parentheses are no longer required. The explicit `(await input)?` form remains valid, including with older toolchains.
 
 Here, Error skips the rest of Read and completes its Task with that same Error. The complete example supplies `Error("Unavailable")` and prints `Unavailable`. Propagation also works before an await, returning without waiting for later inputs.
 
