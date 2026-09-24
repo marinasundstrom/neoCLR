@@ -5,6 +5,7 @@ static class StringBindings
 {
     sealed record Member(string Name, string[] Parameters, string Result, bool Instance = false, bool ByRefReceiver = false);
     static readonly Member[] Members = [
+        new("Intern", ["String"], "String"),
         new("Concat", ["String", "String"], "String"),
         new("op_Equality", ["String", "String"], "Boolean"),
         new("op_Inequality", ["String", "String"], "Boolean"),
@@ -21,6 +22,16 @@ static class StringBindings
         new("get_IsEmpty", [], "Boolean", true),
         new("SliceUtf8", ["Int32", "Int32"], ResultBindings.Slice, true)
     ];
+    static string ParameterName(Member member, int index) => member.Name switch {
+        "Concat" or "CompareOrdinal" => index == 0 ? "left" : "right",
+        "Intern" => "text",
+        "Equals" => "other",
+        "ContainsOrdinal" => "substring",
+        "StartsWithOrdinal" => "prefix",
+        "EndsWithOrdinal" => "suffix",
+        "SliceUtf8" => index == 0 ? "byteStart" : "byteLength",
+        _ => throw new InvalidDataException("Missing String parameter name: " + member.Name)
+    };
     static string CSharp(string type) => type switch { "String" => "string", "Char" => "char", "System.Collections.Iterator<Char>" => "Collections.Iterator<char>", "System.Collections.Sequence<UInt32>" => "Collections.Sequence<uint>", "Int32" => "int", "Boolean" => "bool", ResultBindings.Slice => "Result<string, Text.Utf8SliceError>", _ => throw new InvalidDataException(type) };
     public static string Declarations(bool results, bool collections) => "public sealed class String { " + string.Join(" ", Members.Where(m => (results || m.Result != ResultBindings.Slice)
         && (collections || m.Name is not ("GetIterator" or "GetScalars" or "get_Item"))).Select(m =>
@@ -28,7 +39,7 @@ static class StringBindings
         m.Name == "get_Length" ? "public int Length => default;" :
         m.Name == "get_IsEmpty" ? "public bool IsEmpty => default;" : m.Name is "op_Equality" or "op_Inequality"
             ? $"public static bool operator {(m.Name == "op_Equality" ? "==" : "!=")}(string left, string right) => default;"
-            : $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Parameters.Select((p, i) => CSharp(p) + " value" + i))}) => default;")) + (collections ? " int Collections.Collection<char>.Count => default; public String() {} public String(Collections.Sequence<char> value0) {} public static string CreateFromCharacters(Collections.Sequence<char> value0) => default;" : "") + " }";
+            : $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Parameters.Select((p, i) => CSharp(p) + " " + ParameterName(m, i)))}) => default;")) + (collections ? " int Collections.Collection<char>.Count => default; public String() {} public String(Collections.Sequence<char> characters) {} public static string CreateFromCharacters(Collections.Sequence<char> characters) => default;" : "") + " }";
     public static bool IsSequenceConstructor(MethodDefinition method) =>
         method.DeclaringType.FullName == "System.String" && RuntimeSignatures.IsCore(method.DeclaringType.Scope)
         && method.IsConstructor && method.IsPublic && !method.IsStatic && !method.IsVirtual

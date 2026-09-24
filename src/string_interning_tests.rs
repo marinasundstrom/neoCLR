@@ -1,70 +1,7 @@
-//! Exploration only: no production pool, guest API or automatic literal interning.
+//! Canonical text, quota and lifetime checks for the execution-owned pool.
 use super::StringValue;
-use std::{
-    borrow::Borrow,
-    collections::HashSet,
-    hash::{Hash, Hasher},
-    sync::Arc,
-};
-
-#[derive(Clone, PartialEq, Eq)]
-struct Entry(StringValue);
-impl Hash for Entry {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.0.as_str().hash(state);
-    }
-}
-impl Borrow<str> for Entry {
-    fn borrow(&self) -> &str {
-        self.0.as_str()
-    }
-}
-
-#[derive(Debug, PartialEq, Eq)]
-enum Rejected {
-    Entries,
-    Bytes,
-    Allocation,
-}
-
-/// Strong retention within one explicitly owned pool. Quotas are logical payload
-/// limits, not a measurement of HashSet, Arc or allocator overhead.
-struct Pool {
-    entries: HashSet<Entry>,
-    bytes: usize,
-    max_entries: usize,
-    max_bytes: usize,
-}
-impl Pool {
-    fn new(max_entries: usize, max_bytes: usize) -> Self {
-        Self {
-            entries: HashSet::new(),
-            bytes: 0,
-            max_entries,
-            max_bytes,
-        }
-    }
-    fn intern(&mut self, value: StringValue) -> Result<StringValue, Rejected> {
-        // Existing hits must remain available even when insertion quotas are full.
-        if let Some(found) = self.entries.get(value.as_str()) {
-            return Ok(found.0.clone());
-        }
-        if self.entries.len() >= self.max_entries {
-            return Err(Rejected::Entries);
-        }
-        let bytes = self
-            .bytes
-            .checked_add(value.len())
-            .filter(|b| *b <= self.max_bytes)
-            .ok_or(Rejected::Bytes)?;
-        self.entries
-            .try_reserve(1)
-            .map_err(|_| Rejected::Allocation)?;
-        self.entries.insert(Entry(value.clone()));
-        self.bytes = bytes;
-        Ok(value)
-    }
-}
+use crate::string_interning::{Pool, Rejected};
+use std::sync::Arc;
 
 #[test]
 fn repeated_log_field_names_share_canonical_owners() {
@@ -178,4 +115,187 @@ fn pool_retention_and_gc_have_separate_lifetimes() {
         observer.upgrade().is_none(),
         "host release must release the last owner"
     );
+}
+
+fn execute(
+    program: &crate::LoadedProgram,
+    input: StringValue,
+    options: impl Into<crate::ExecutionOptions>,
+) -> Result<crate::Execution, crate::Fault> {
+    program
+        .resolve_function(&crate::assembler::parse_function_ref("Test(String)").unwrap())
+        .unwrap()
+        .invoke(vec![crate::Value::String(input)], options)
+}
+
+#[test]
+fn execution_interning_is_fresh_per_host_invocation_and_retains_returned_owners() {
+    use super::ownership_tests::program;
+    use crate::{Limits, Value};
+    let p = program(
+        "ldarg input\ncall neoCLR.Runtime.StringIntern(String)\nret",
+        "",
+        "String",
+    );
+    let limits = Limits {
+        intern_entries: 1,
+        intern_bytes: 4,
+        ..Limits::default()
+    };
+    let left = execute(&p, "same".into(), limits).unwrap();
+    let right = execute(&p, "same".into(), limits).unwrap();
+    let (Value::String(a), Value::String(b)) = (&left.value, &right.value) else {
+        panic!("expected text")
+    };
+    assert_eq!(a, b);
+    assert!(
+        !a.same_owner(b),
+        "independent invocations unexpectedly shared a pool"
+    );
+    let host = a.clone();
+    let hash = host.identity_hash();
+    drop(left);
+    drop(right);
+    let repeated = execute(&p, host.clone(), limits).unwrap();
+    let Value::String(returned) = repeated.value else {
+        panic!("expected text")
+    };
+    assert!(
+        returned.same_owner(&host),
+        "explicitly shared host input lost its identity"
+    );
+    assert_eq!(returned.identity_hash(), hash);
+}
+
+#[test]
+fn execution_interning_enforces_limits_and_keeps_existing_hits_usable() {
+    use super::ownership_tests::program;
+    use crate::{FaultCode, Limits, Value};
+    let p = program(
+        "ldarg input\ncall neoCLR.Runtime.StringIntern(String)\npop\nldstr \"same\"\ncall neoCLR.Runtime.StringIntern(String)\nret",
+        "",
+        "String",
+    );
+    let limits = Limits {
+        intern_entries: 1,
+        intern_bytes: 4,
+        ..Limits::default()
+    };
+    let original: StringValue = "same".into();
+    let result = execute(&p, original.clone(), limits).unwrap();
+    let Value::String(returned) = result.value else {
+        panic!("expected text")
+    };
+    assert!(original.same_owner(&returned));
+    for (input, limits) in [
+        ("else", limits),
+        (
+            "same",
+            Limits {
+                intern_entries: 0,
+                ..limits
+            },
+        ),
+        (
+            "é",
+            Limits {
+                intern_bytes: 1,
+                ..limits
+            },
+        ),
+    ] {
+        assert_eq!(
+            execute(&p, input.into(), limits).unwrap_err().code,
+            FaultCode::InternPoolLimitExceeded
+        );
+    }
+    assert_eq!(
+        FaultCode::InternPoolLimitExceeded.as_str(),
+        "InternPoolLimitExceeded"
+    );
+}
+
+#[test]
+fn execution_pool_releases_unreturned_text_on_completion_fault_and_cancellation() {
+    use super::ownership_tests::program;
+    use crate::{CancellationToken, ExecutionOptions, FaultCode, Limits};
+    #[derive(Debug)]
+    struct CancelOnWrite(CancellationToken);
+    impl crate::Console for CancelOnWrite {
+        fn read_byte(&self) -> std::io::Result<Option<u8>> {
+            Ok(None)
+        }
+        fn write_line(&self, _: &str) -> std::io::Result<()> {
+            self.0.cancel();
+            Ok(())
+        }
+    }
+    for (tail, expected) in [
+        ("ldstr \"done\"\nret", None),
+        ("fault \"intentional\"", Some(FaultCode::UserFault)),
+        (
+            "ldstr \"cancel\"\ncall neoCLR.Runtime.WriteLine(String)\npop\nldstr \"done\"\nret",
+            Some(FaultCode::ExecutionCancelled),
+        ),
+    ] {
+        let p = program(
+            &format!("ldarg input\ncall neoCLR.Runtime.StringIntern(String)\npop\n{tail}"),
+            "",
+            "String",
+        );
+        let token = CancellationToken::new();
+        let options = ExecutionOptions {
+            limits: Limits::default(),
+            cancellation: Some(token.clone()),
+            console: Some(Arc::new(CancelOnWrite(token))),
+            ..Default::default()
+        };
+        let input: StringValue = "pool-owned".into();
+        let observer = Arc::downgrade(&input.0);
+        let result = execute(&p, input, options);
+        if let Some(code) = expected {
+            assert_eq!(result.unwrap_err().code, code);
+        } else {
+            assert!(result.is_ok());
+        }
+        assert!(
+            observer.upgrade().is_none(),
+            "pool retained input after {tail}"
+        );
+    }
+}
+
+#[test]
+fn isolated_workers_receive_independent_intern_quotas() {
+    use super::ownership_tests::program;
+    use crate::{Limits, Value};
+    let helper = ".function Canon(String input) -> String\nldarg input\ncall neoCLR.Runtime.StringIntern(String)\nret\n.end";
+    for operation in ["StartWorker", "QueueWorker"] {
+        let body = format!(
+            "ldarg input\ncall neoCLR.Runtime.StringIntern(String)\npop\ndelegate.bind System.Func<String,String> = Canon(String)\nldstr \"child\"\ncall neoCLR.Runtime.{operation}(System.Func<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)\nret"
+        );
+        let p = program(&body, helper, "String");
+        let result = execute(
+            &p,
+            "parent".into(),
+            Limits {
+                intern_entries: 1,
+                intern_bytes: 6,
+                ..Limits::default()
+            },
+        )
+        .unwrap();
+        assert_eq!(result.value, Value::String("child".into()));
+    }
+}
+
+#[test]
+fn interning_null_default_string_has_a_null_reference_fault() {
+    let p = super::ownership_tests::program(
+        ".local String missing\nldloca missing\ninitobj String\nldloc missing\ncall neoCLR.Runtime.StringIntern(String)\nret",
+        "",
+        "String",
+    );
+    let fault = execute(&p, "unused".into(), crate::Limits::default()).unwrap_err();
+    assert_eq!(fault.code, crate::FaultCode::NullReference);
 }

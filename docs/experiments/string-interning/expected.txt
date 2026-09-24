@@ -1,0 +1,2 @@
+Repeated field names: 64 interned values, 4 canonical strings
+String interning, exact text and GC: passed

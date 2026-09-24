@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Integrate explicit `String.Intern` with one bounded strong pool per execution;
+  isolated workers and separate host invocations have independent pools. Retain
+  canonical text until completion, Fault or cancellation while preserving returned
+  owners. Add `Limits.intern_entries`/`intern_bytes` (4096/1 MiB defaults) and
+  `InternPoolLimitExceeded`; hosts with exhaustive Limits initializers must add the
+  fields. Update compiler reference/importer, API docs and samples together. No
+  automatic literal interning, lookup API or shared runtime-session pool is added.
+  Give String parameters meaningful names across source, reference metadata,
+  runtime introspection and API docs. Positional calls are unchanged; named callers
+  must replace value0/value1 with the documented operand/range names.
+
 - Explore explicit String interning with a test-only bounded owner pool and repeated
   log-field names. Check canonical identity, insertion quotas, GC/host retention and
   pool teardown against a .NET baseline. Record execution/session lifetime questions;

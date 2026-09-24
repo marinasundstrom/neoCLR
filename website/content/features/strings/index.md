@@ -104,8 +104,8 @@ unchanged text. Comparison does not normalize Unicode or apply culture rules.
 The current runtime wraps shared immutable UTF-8 text when converting it to Object.
 String is a reference type: ReferenceEquals compares the shared text owner, even
 through separate Object/interface wrappers. An alias is identical; a separately
-constructed equal string has equal contents but a different identity. Interning is
-not provided. Virtual GetHashCode remains content-based; explicit Object base hashing
+constructed equal string has equal contents but a different identity. Explicit String.Intern shares text within one execution; literals are not
+automatically interned. Virtual GetHashCode remains content-based; explicit Object base hashing
 uses identity.
 The current UTF-8 content hash also differs from .NET's randomized hash and is not
 a persisted identifier or a defense against deliberate collisions.
@@ -164,7 +164,27 @@ These development semantics are checked across Object/Sequence conversions, arra
 storage and garbage collection. Identity hashes may collide and are not persistent IDs.
 
 
-Explicit interning is under investigation using repeated parsed field names. A private
-experiment checks canonical references, memory limits and release of a scoped pool.
-There is no public String.Intern API or automatic literal interning yet. Pool lifetime
-and behavior when limits are reached remain design questions.
+## Explicit interning (development)
+
+```raven
+let first = String(['F', 'o', 'o'])
+let second = String(['F', 'o', 'o'])
+let canonical = String.Intern(first)
+let repeated = String.Intern(second)
+// Object.ReferenceEquals(canonical, repeated) is true.
+// first and second still have their original, distinct references.
+```
+
+String.Intern returns a canonical reference for exact text within the current execution.
+Use its return value: existing references are not rewritten. Matching does not normalize
+Unicode or fold case, and literals are not automatically interned.
+
+The pool retains text until execution completes, faults or is cancelled. Independent
+host invocations and isolated workers have separate pools; host-held results remain
+valid after execution ends. This differs from .NET's longer-lived interning pool.
+
+Hosts can limit the number of distinct entries and unique UTF-8 payload bytes. Defaults
+are 4096 entries and 1 MiB; exceeding either budget for a new entry raises
+InternPoolLimitExceeded. Existing entries remain available when full. Table/owner
+overhead and temporary inputs are not included in those payload counts. See the
+[String API reference](xref:System.String) and [Fault/limit reference](../../docs/faults.html).

@@ -66,6 +66,7 @@ Fault values itself is trusted host code; this is not a guest capability.
 | `HeapLimitExceeded` | Managed heap object or identity budget exhausted |
 | `ArrayLimitExceeded` | Managed array payload budget or supported length exceeded |
 | `NativeMemoryLimitExceeded` | Native pointer heap byte or allocation budget exhausted |
+| `InternPoolLimitExceeded` | String intern entry or unique UTF-8 payload budget exhausted |
 | `InvalidProgram` | Classified verifier failures or execution falling through without a return |
 | `RuntimeError` | Other runtime, loader or host failures not yet assigned a narrower category |
 
@@ -101,3 +102,17 @@ small terminal host outcome with a symbolic code. It supplies stable classificat
 without a guest exception hierarchy, but has coarser categories and no HRESULT
 compatibility or catchable-fault semantics. The embedding process is not deliberately
 aborted by an ordinary neoCLR Fault.
+
+
+### String intern retention limits (development)
+
+Rust hosts configure `Limits.intern_entries` (default 4096) and `Limits.intern_bytes`
+(default 1 MiB). Each interpreter execution has its own strong intern pool, including
+an isolated worker execution. A new entry beyond either quota raises
+`InternPoolLimitExceeded`; looking up an existing value still succeeds at capacity.
+Empty text consumes an entry even though it consumes no payload bytes. These budgets
+count unique retained UTF-8 payload, not table capacity, Arc headers, allocator
+metadata, temporary input Strings or total process memory. Setting the entry quota
+to zero prevents all insertions. Limits are terminal runtime budgets, not recoverable
+Storage errors or guest-selected Fault codes. Hosts constructing Limits exhaustively
+must supply the two new fields; using `..Limits::default()` picks up the defaults.

@@ -41,6 +41,7 @@ pub(crate) enum Binding {
     Utf8Encode,
     Utf8Decode,
     StringConcat,
+    StringIntern,
     StringFromChars,
     StringGraphemeAt,
     StringGraphemeCount,
@@ -148,6 +149,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.StringGraphemeAt", [Type::String, Type::Int32]) => {
             (Binding::StringGraphemeAt, Type::Char)
+        }
+        ("neoCLR.Runtime.StringIntern", [Type::String]) => {
+            (Binding::StringIntern, Type::String)
         }
         ("neoCLR.Runtime.StringConcat", [Type::String, Type::String]) => {
             (Binding::StringConcat, Type::String)

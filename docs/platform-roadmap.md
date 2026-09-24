@@ -51,7 +51,8 @@ UTF-8 buffers and retains text across value copies. Private ownership checks now
 cover Object/interface round-trips, fields,
 arrays, erasure, GC pressure, host retention and cyclic/fault teardown. Owner-based
 reference comparison and stable identity/base hashes now use that retained owner;
-wrapper IDs are not String IDs. No interning is introduced. The internal shared-owner
+wrapper IDs are not String IDs. The identity slice did not add interning; its follow-up
+is recorded below. The internal shared-owner
 layout remains provisional. Next perform a bounded Object/value consistency review,
 then choose API work from a real application case; do not expand text contracts
 without a concrete need.
@@ -60,10 +61,12 @@ without a concrete need.
 interning with a repeated-identifier case before choosing the public contract.
 The [owned-pool experiment](experiments/string-interning/README.md) validates exact
 content canonicalization, entry/payload quotas, GC retention and pool teardown.
-It is test-only, not a shipped String.Intern API. Next compare execution versus
-runtime-session ownership with repeated host invocations; automatic literal interning,
-lookup helpers and process-wide retention remain unselected. This bounded exploration
-precedes the general consistency review without expanding the text API roadmap.
+The first development String.Intern now uses an execution-owned pool: repeated host
+invocations and isolated workers have separate quotas and pool lifetimes. This fits
+existing execution state without introducing a runtime-session abstraction. Explicit
+entry/payload limits fault on new insertions at capacity; retained results survive
+pool teardown. Automatic literal interning, lookup helpers and shared session pools
+remain unselected. This completes the bounded interning follow-up.
 
 **Author-directed String API slice, 2026-09-24:** support construction from
 Sequence<char>, including arrays, and expose String as a read-only Sequence with

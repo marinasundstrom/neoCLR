@@ -35,6 +35,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-string-sequence-') as directory:
     for name, body in [
         ('Count is interface-only', 'let count = "Foo".Count\nif count != 3 { System.Fault("count") }'),
         ('String indexer is read-only', 'var text = "Foo"\ntext[0] = \'B\''),
+        ('Old generic parameter names are rejected', 'let text = String.Concat(value0: \"F\", value1: \"oo\")'),
         ('Constructor requires characters', 'let text = String(42)'),
     ]:
         (root / 'Main.rvn').write_text('import System.*\nfunc Main() {\n' + body + '\n}\n')

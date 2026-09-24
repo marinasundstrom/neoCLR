@@ -195,6 +195,21 @@ static class SignatureProbe
         Check("String Count rejects a public mapping", !OpaqueLibrary.MatchesStringCount(explicitCount));
         explicitCount.IsPublic = false;
         explicitCount.IsPrivate = true;
+        foreach (var (methodName, expectedNames) in new[] {
+            ("Intern", new[]{"text"}), ("Concat", new[]{"left", "right"}),
+            ("CompareOrdinal", new[]{"left", "right"}), ("Equals", new[]{"other"}),
+            ("ContainsOrdinal", new[]{"substring"}), ("StartsWithOrdinal", new[]{"prefix"}),
+            ("EndsWithOrdinal", new[]{"suffix"}), ("SliceUtf8", new[]{"byteStart", "byteLength"}) }) {
+            var method = stringType.Methods.Single(m => m.Name == methodName);
+            Check("String " + methodName + " meaningful parameter names", method.Parameters.Select(p => p.Name).SequenceEqual(expectedNames));
+        }
+        Check("String constructor characters parameter", stringConstructor.Parameters.Single().Name == "characters");
+        var intern = stringType.Methods.Single(m => m.Name == "Intern");
+        Check("String Intern static contract", StringBindings.Bind(Reference(intern, stringType), intern, false)?.Result == "String");
+        Reject("String Intern rejects static callvirt", () => StringBindings.Bind(Reference(intern, stringType), intern, true));
+        var badIntern = Reference(intern, stringType);
+        badIntern.Parameters[0].ParameterType = module.TypeSystem.Int32;
+        Reject("String Intern rejects wrong operand", () => StringBindings.Bind(badIntern, intern, false));
         var concat = stringType.Methods.Single(m => m.Name == "Concat");
         Reject("Static String callvirt", () => StringBindings.Bind(Reference(concat, stringType), concat, true));
         var wrongStringArgument = Reference(concat, stringType);

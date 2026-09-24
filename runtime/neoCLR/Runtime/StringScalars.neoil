@@ -20,3 +20,7 @@
 .function neoCLR.Runtime.StringGraphemeAt(String value, Int32 index) -> Char
     .methodimpl InternalCall
 .end
+
+.function neoCLR.Runtime.StringIntern(String value) -> String
+    .methodimpl InternalCall
+.end

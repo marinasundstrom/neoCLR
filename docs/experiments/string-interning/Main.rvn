@@ -1,0 +1,35 @@
+import System.*
+
+func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fault(message)
+    }
+}
+
+func Canonical(name: string) -> string {
+    return String.Intern(text: name)
+}
+
+func Main() {
+    let names = ["timestamp", "level", "service", "message"]
+    let canonical = [Canonical(names[0]), Canonical(names[1]), Canonical(names[2]), Canonical(names[3])]
+    var recordIndex = 0
+    while recordIndex < 16 {
+        var fieldIndex = 0
+        while fieldIndex < names.Length {
+            // A fresh String models a field name arriving from another input recordIndex.
+            let received = String(characters: names[fieldIndex])
+            let interned = Canonical(received)
+            Check(received == interned, "Contents changed")
+            Check(!Object.ReferenceEquals(received, interned), "Existing reference changed")
+            Check(Object.ReferenceEquals(canonical[fieldIndex], interned), "Canonical reference changed")
+            fieldIndex += 1
+        }
+        recordIndex += 1
+    }
+    let empty: char[] = []
+    Check(Object.ReferenceEquals(String.Intern(String(empty)), String.Intern(String(empty))), "Empty canonicalization")
+    Check(!Object.ReferenceEquals(String.Intern("é"), String.Intern("é")), "Unexpected normalization")
+    Console.WriteLine("Repeated field names: 64 interned values, 4 canonical strings")
+    Console.WriteLine("String interning, exact text and GC: passed")
+}

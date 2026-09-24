@@ -9,10 +9,10 @@ public class String : Equatable<string>, Collections.Sequence<char> {
     #pragma warning disable-next-line RAV9032
     private field m_value: string
 
-    internal static func CreateFromCharacters(value0: Collections.Sequence<char>) -> string {
-        let count = value0.Count
+    internal static func CreateFromCharacters(characters: Collections.Sequence<char>) -> string {
+        let count = characters.Count
         let snapshot = Runtime.CompilerServices.CheckedStorage.Reserve<char>(count)
-        let iterator = value0.GetIterator()
+        let iterator = characters.GetIterator()
         var index = 0
         while iterator.MoveNext() {
             snapshot[index] = iterator.Current
@@ -31,28 +31,32 @@ public class String : Equatable<string>, Collections.Sequence<char> {
         get => RuntimeServices.StringGraphemeAt(m_value, index)
     }
 
-    static func Concat(value0: string, value1: string) -> string {
-        return RuntimeServices.StringConcat(value0, value1)
+    static func Intern(text: string) -> string {
+        return RuntimeServices.StringIntern(text)
     }
 
-    func Equals(value0: string) -> bool {
-        return RuntimeServices.StringEquals(m_value, value0)
+    static func Concat(left: string, right: string) -> string {
+        return RuntimeServices.StringConcat(left, right)
     }
 
-    static func CompareOrdinal(value0: string, value1: string) -> int {
-        return RuntimeServices.StringCompareOrdinal(value0, value1)
+    func Equals(other: string) -> bool {
+        return RuntimeServices.StringEquals(m_value, other)
     }
 
-    func ContainsOrdinal(value0: string) -> bool {
-        return RuntimeServices.StringContainsOrdinal(m_value, value0)
+    static func CompareOrdinal(left: string, right: string) -> int {
+        return RuntimeServices.StringCompareOrdinal(left, right)
     }
 
-    func StartsWithOrdinal(value0: string) -> bool {
-        return RuntimeServices.StringStartsWithOrdinal(m_value, value0)
+    func ContainsOrdinal(substring: string) -> bool {
+        return RuntimeServices.StringContainsOrdinal(m_value, substring)
     }
 
-    func EndsWithOrdinal(value0: string) -> bool {
-        return RuntimeServices.StringEndsWithOrdinal(m_value, value0)
+    func StartsWithOrdinal(prefix: string) -> bool {
+        return RuntimeServices.StringStartsWithOrdinal(m_value, prefix)
+    }
+
+    func EndsWithOrdinal(suffix: string) -> bool {
+        return RuntimeServices.StringEndsWithOrdinal(m_value, suffix)
     }
 
     func GetUtf8ByteCount() -> int {
@@ -73,8 +77,8 @@ public class String : Equatable<string>, Collections.Sequence<char> {
 
     val IsEmpty: bool => RuntimeServices.StringEquals(m_value, "")
 
-    func SliceUtf8(value0: int, value1: int) -> Result<string, Utf8SliceError> {
-        let payload = RuntimeServices.StringSliceUtf8(m_value, value0, value1)
+    func SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError> {
+        let payload = RuntimeServices.StringSliceUtf8(m_value, byteStart, byteLength)
         if RuntimeServices.IsValue<string>(payload) {
             return Ok(RuntimeServices.UnpackValue<string>(payload))
         }

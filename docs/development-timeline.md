@@ -6305,3 +6305,32 @@ This is retained-payload evidence, not an allocation benchmark or a production A
 choose exhaustion behavior and public exposure from the case. String.Intern remains a
 candidate spelling; no automatic literal interning or lookup method is selected.
 See the [experiment](experiments/string-interning/README.md).
+
+
+## 2026-09-24 — Integrating interning with execution lifetime
+
+**Author:** Asked to continue after the bounded interning experiment and proposed
+execution/session ownership comparison.
+
+**Assistant decision/action:** Selected execution ownership for the first implementation:
+LoadedProgram is immutable and existing invocations/workers own fresh state. A persistent
+runtime session would add an abstraction without a current case requiring it. Promoted
+the pool into runtime state and added String.Intern, configurable entry/payload quotas
+and InternPoolLimitExceeded. Added host-invocation, worker, terminal cleanup and Raven
+sample checks; these distinguish independently created text from an already shared
+host input. The author did not separately specify the lifetime or quota defaults;
+these are documented assistant implementation choices, subject to future case evidence.
+
+**Open:** shared-session requirements, future suspension ownership, automatic literal
+interning and lookup helpers remain separate questions. No SDK release or website
+publication is part of this slice.
+
+
+## 2026-09-24 — Meaningful String parameter names
+
+**Author follow-up:** While interning integration was underway, requested better names
+for String method parameters. **Assistant action:** Aligned constructor `characters`,
+Intern `text`, Concat/CompareOrdinal `left`/`right`, Equals `other`, search `substring`,
+`prefix`, `suffix`, and SliceUtf8 `byteStart`/`byteLength` across source, reference,
+introspection and docs. Added named-argument sample checks and a rejection check for
+old generic names. Positional signatures remain unchanged; named callers must migrate.

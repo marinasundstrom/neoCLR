@@ -157,6 +157,7 @@ fn verifier_and_debugger_launch_failures_keep_codes_without_execution() {
 #[test]
 fn symbolic_code_serialization_is_stable_and_has_no_numeric_ordinal_contract() {
     let codes = [
+        (FaultCode::InternPoolLimitExceeded, "InternPoolLimitExceeded"),
         (FaultCode::RuntimeError, "RuntimeError"),
         (FaultCode::UserFault, "UserFault"),
         (FaultCode::InvalidProgram, "InvalidProgram"),

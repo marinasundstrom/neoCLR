@@ -280,3 +280,29 @@ returns, unchanged prior references, exact text, quotas, separate pools and life
 through GC/host retention. The .NET 10 comparison passes. Strong scoped retention is
 viable, but production ownership (execution or runtime session), exhaustion behavior
 and API exposure remain undecided. No automatic interning or public method is added.
+
+
+## Execution-owned interning — development, 2026-09-24
+
+The subsequent integration selects one strong pool per interpreter execution. This
+uses an existing lifetime boundary: LoadedProgram is immutable metadata, while each
+host invocation and isolated worker creates mutable execution state. A shared host
+session would introduce a new abstraction and retention policy without a current case
+requiring it. Repeated-invocation checks contrast independent equal inputs with inputs
+whose owner the host already shares; pool separation does not undo normal aliasing.
+
+String.Intern now returns the canonical owner within that execution. It does not
+rewrite earlier references, normalize text or intern literals automatically. Entry and
+unique UTF-8 payload quotas use the existing terminal resource-budget model, with
+InternPoolLimitExceeded rather than a recoverable domain Result. Defaults are 4096
+entries/1 MiB; overhead, inputs and total memory remain separate accounting questions.
+The pool drops on completion, faults or host cancellation; returned Strings retain
+ordinary ownership afterward. Workers have independent inherited limits. A future
+suspended execution must retain its pool as execution state, not create a new pool
+on each resumption; runtime-owned suspension is not implemented by this slice.
+
+This differs deliberately from .NET's longer-lived pool. It bounds retention with the
+current runtime's lifecycle, but provides no canonical identity guarantee across host
+invocations. Public API, quota and migration details are in the
+[checked sample](experiments/string-interning/README.md). No IsInterned method or public
+pool class is added. Runtime Contract configuration and Raven emission remain unchanged.

@@ -36,6 +36,7 @@ static class RuntimeServiceBindings
             ("StringEquals", ["String", "String"], "Boolean"),
             ("StringFromChars", ["arrayref<Char>"], "String"),
             ("StringGraphemeAt", ["String", "Int32"], "Char"),
+            ("StringIntern", ["String"], "String"),
             ("StringConcat", ["String", "String"], "String"),
             ("StringCompareOrdinal", ["String", "String"], "Int32"),
             ("StringContainsOrdinal", ["String", "String"], "Boolean"),

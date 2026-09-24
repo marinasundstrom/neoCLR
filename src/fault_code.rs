@@ -41,6 +41,8 @@ pub enum FaultCode {
     ArrayLimitExceeded,
     /// The native pointer heap byte or allocation budget was exceeded.
     NativeMemoryLimitExceeded,
+    /// The execution's String intern entry or UTF-8 payload budget was exceeded.
+    InternPoolLimitExceeded,
 }
 impl FaultCode {
     /// Stable, case-sensitive identifier for logs and machine-readable diagnostics.
@@ -62,6 +64,7 @@ impl FaultCode {
             Self::HeapLimitExceeded => "HeapLimitExceeded",
             Self::ArrayLimitExceeded => "ArrayLimitExceeded",
             Self::NativeMemoryLimitExceeded => "NativeMemoryLimitExceeded",
+            Self::InternPoolLimitExceeded => "InternPoolLimitExceeded",
         }
     }
 }

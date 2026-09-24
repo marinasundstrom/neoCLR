@@ -1038,3 +1038,23 @@ Contract settings and Raven compiler emission are unchanged. The archived Neo
 bootstrap excludes the Raven collection contracts and factory. The
 [construction sample](../string-sequence/README.md) documents validation and the
 existing direct-empty-literal compiler limitation. No Iterable overload is selected.
+
+### Explicit String interning — 2026-09-24
+
+The String reference catalog exposes static Intern(String) -> String. The exact
+signature binds to the Raven-authored method, which calls the trusted StringIntern
+runtime service. The VM supplies one bounded pool per execution; loaded metadata
+remains immutable. Isolated workers and separate host invocations have independent
+pool state and inherited quota values. No literal rewriting or compiler interning is
+performed. Rebuild the bridge/reference and runtime together; Runtime Contract
+configuration and Raven emission are unchanged. See the
+[checked sample](../string-interning/README.md) for quotas, lifetime and differences
+from the longer-lived CLR pool. Wrong parameter shapes and static callvirt are
+rejected by the bridge probe.
+
+
+String parameter names now agree between authored methods, reference metadata and
+runtime introspection. Replace value0/value1 named arguments with the member's
+meaningful names: characters, text, left/right, other, substring, prefix, suffix or
+byteStart/byteLength. Indexers retain index. Positional signatures do not change.
+The String sequence sample verifies named arguments, including reordered arguments.

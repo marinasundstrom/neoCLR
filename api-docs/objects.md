@@ -79,7 +79,7 @@ String identity follows the shared immutable text owner. Object/interface wrappe
 may be separate allocations while still referring to the same String. ReferenceEquals
 and explicit Object base Equals/GetHashCode use that owner; virtual String equality
 and hashing continue to compare contents. Separate constructions can have equal
-contents without sharing identity. No interning is provided. Virtual
+contents without sharing identity. Explicit String.Intern canonicalizes text within one execution; literals are not automatically interned. Virtual
 boxed-value Equals/GetHashCode support Int32, Int64, Boolean, Single, Double, Char and explicit named-struct overrides, described below.
 ReferenceEquals can compare box identities, but does not supply boxed value equality.
 Null instance receivers raise NullReference; default Equals accepts a null argument
@@ -328,7 +328,7 @@ and explicit Object base equality/hashing follow that text owner, preserving ide
 through casts and independent wrappers. Hashes remain stable across collection and
 host retention, but can collide and must not be persisted. Virtual GetHashCode uses
 the content hash instead.
-No interning, nullable String storage, stable hash numbers or source-declared String
+No automatic literal interning, nullable String storage, stable hash numbers or source-declared String
 Object overrides are added. The reference-only scaffold constructor is excluded:
 create strings with literals, `String(Sequence<char>)`, Concat and text APIs.
 String implements `Sequence<char>`; its Count is explicit and Length remains public.

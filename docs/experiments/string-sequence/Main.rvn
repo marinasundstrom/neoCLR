@@ -1,5 +1,6 @@
 import System.*
 import System.Collections.*
+import System.Result.*
 
 func Check(condition: bool, message: string) {
     if !condition {
@@ -29,6 +30,19 @@ func Main() {
     Check(unicode[1] == emoji, "Grapheme index")
     let merging: char[] = ['e', Char.FromString("́")]
     Check(String(merging).Length == 1, "Grapheme boundaries can merge")
+
+    let named = String.Concat(right: "o", left: "Fo")
+    Check(String(characters: ['F', 'o', 'o']) == named, "Named character constructor")
+    Check(named.Equals(other: "Foo"), "Named equality operand")
+    Check(String.CompareOrdinal(right: "Food", left: named) < 0, "Named comparison operands")
+    Check(named.ContainsOrdinal(substring: "oo"), "Named substring")
+    Check(named.StartsWithOrdinal(prefix: "Fo"), "Named prefix")
+    Check(named.EndsWithOrdinal(suffix: "oo"), "Named suffix")
+    if let Ok(piece) = named.SliceUtf8(byteLength: 1, byteStart: 1) {
+        Check(piece == "o", "Named byte range")
+    } else {
+        System.Fault("Named byte range failed")
+    }
 
     Console.WriteLine(text)
     Console.WriteLine("String Sequence construction, indexing and copying: passed")

@@ -93,3 +93,8 @@ coverage. Its reference-only parameterless scaffold constructor is excluded in
 exclusions.json and explained in the [Object guide](objects.md#string-through-object-development);
 it is not an executable application API. UTF-8 slice errors are described on the
 method; remaining text/encoding type coverage is still incremental.
+
+
+String.Intern now has generated member documentation. Its execution-owned retention
+and host quotas are described there and in the manual Fault reference, including
+InternPoolLimitExceeded. This does not add a public interning-pool type or IsInterned.

@@ -123,6 +123,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             | crate::native::Binding::Utf8Decode
             | crate::native::Binding::StringFromChars
             | crate::native::Binding::StringGraphemeAt
+            | crate::native::Binding::StringIntern
             | crate::native::Binding::StringConcat
             | crate::native::Binding::StringCompareOrdinal
             | crate::native::Binding::StringContainsOrdinal

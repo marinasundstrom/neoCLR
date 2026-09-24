@@ -37,17 +37,10 @@ static class OpaqueLibrary
     }
     public static bool IsStringOperator(MethodDefinition method) =>
         method.DeclaringType.FullName == "System.String" && method.Name is "op_Equality" or "op_Inequality";
-    // The Raven reference already exposes value0/value1 named arguments, while
-    // the existing runtime introspection surface uses these descriptive names.
-    // Preserve both contracts during source migration; API alignment is separate.
-    public static string ParameterName(MethodDefinition method, int index) => IsString(method.DeclaringType)
-        ? method.Name switch {
-            "Concat" or "CompareOrdinal" => index == 0 ? "left" : "right",
-            "Equals" => "other",
-            "ContainsOrdinal" or "StartsWithOrdinal" or "EndsWithOrdinal" => "value",
-            "SliceUtf8" => index == 0 ? "byteStart" : "byteLength",
-            _ => method.Parameters[index].Name
-        } : GenericUnionLibrary.IsMatched(method.DeclaringType) && GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[index]) ? "destination" : method.Parameters[index].Name;
+    // Preserve authored parameter names in both runtime and reference metadata.
+    public static string ParameterName(MethodDefinition method, int index) =>
+        GenericUnionLibrary.IsMatched(method.DeclaringType) && GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[index])
+            ? "destination" : method.Parameters[index].Name;
     public static void Project(ModuleDefinition module)
     {
         var type = module.GetType("System.String");

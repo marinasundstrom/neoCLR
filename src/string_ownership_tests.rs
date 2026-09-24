@@ -20,7 +20,7 @@ fn library() -> &'static Module {
     })
 }
 
-fn program(body: &str, declarations: &str, returns: &str) -> LoadedProgram {
+pub(super) fn program(body: &str, declarations: &str, returns: &str) -> LoadedProgram {
     let source = format!(
         ".module StringOwnership\n{declarations}\n.function Test(String input) -> {returns}\n{body}\n.end"
     );

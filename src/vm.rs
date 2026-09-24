@@ -19,6 +19,10 @@ pub struct Limits {
     /// Per-worker successful result and captured output UTF-8 bytes; each line costs one extra byte.
     /// Excludes inputs, interpreter temporaries, diagnostics and allocator overhead.
     pub worker_result_bytes: usize,
+    /// Maximum distinct Strings strongly retained by this execution's intern pool.
+    pub intern_entries: usize,
+    /// Maximum unique UTF-8 payload bytes in the intern pool, excluding allocation overhead.
+    pub intern_bytes: usize,
 }
 
 impl Default for Limits {
@@ -33,6 +37,8 @@ impl Default for Limits {
             pointer_bytes: 16 * 1024 * 1024,
             pointer_allocations: 4096,
             worker_result_bytes: 1024 * 1024,
+            intern_entries: 4096,
+            intern_bytes: 1024 * 1024,
         }
     }
 }
@@ -1560,6 +1566,7 @@ fn interpret_instructions(
     let mut arrays_used = false;
     let mut workers = crate::workers::Workers::default();
     let mut files = crate::file_streams::Files::default();
+    let mut interned = crate::string_interning::Pool::new(limits.intern_entries, limits.intern_bytes);
     // An invocation-local guest root; isolated workers have their own registry.
     let mut default_task_queue: Option<Value> = None;
     let mut invocation_result: Option<Value> = None;
@@ -2744,6 +2751,18 @@ fn interpret_instructions(
                             }
                             default_task_queue = Some(args[0].clone());
                             Value::Void
+                        } else if matches!(binding, crate::native::Binding::StringIntern) {
+                            let text = match args.as_slice() {
+                                [Value::String(text)] => text,
+                                [Value::NullObjectReference(_)] => {
+                                    return Err(Fault::coded(
+                                        crate::FaultCode::NullReference,
+                                        "String.Intern requires non-null text",
+                                    ));
+                                }
+                                _ => return Err(Fault::new("String.Intern requires text")),
+                            };
+                            Value::String(interned.intern(text.clone()).map_err(|e| e.fault())?)
                         } else if let crate::native::Binding::FileResource(operation) = binding {
                             files.invoke(operation, &args, &limits)?
                         } else if let crate::native::Binding::StartWorker(pooled) = binding {

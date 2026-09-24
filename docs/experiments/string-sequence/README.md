@@ -44,3 +44,13 @@ construction/metadata tests and twelve explicit-interface regressions pass. The
 bridge signature probe, generated runtime snapshot check, .NET comparison and
 522-page combined website build pass. These are local development checks, not a
 published SDK or website deployment.
+
+
+Public String parameters now use meaningful names, tested with Raven named arguments:
+constructor `characters`; Intern `text`; Concat/CompareOrdinal `left` and `right`;
+Equals `other`; ContainsOrdinal `substring`; StartsWithOrdinal `prefix`;
+EndsWithOrdinal `suffix`; SliceUtf8 `byteStart` and `byteLength`. Indexers retain `index`.
+The sample reorders named arguments for Concat, CompareOrdinal and SliceUtf8. The
+verifier rejects the old value0/value1 Concat names. Positional calls and member
+signatures remain compatible; named callers must migrate to these names. Reference
+metadata, authored bodies, runtime parameter introspection and API docs now agree.
