@@ -27,7 +27,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Raven metadata in the development bridge, without a runtime dependency or a new
   platform case-map convention. Admit a validated core-owned IUnion protocol during
   library import, without duplicating its declaration; retain the source-owned
-  bootstrap path and exercise shared-interface compilation and execution.
+  bootstrap path and exercise shared-interface compilation and execution. Extract a
+  reusable empty-case reference projector that replaces existing carrier/case definitions
+  in place, reuses shared support definitions and rejects changed case identities.
+  Check SocketError reference consumers and native import from standard union syntax;
+  matched standard shapes override legacy erased-carrier initialization assumptions.
+  Public SocketError migration and production packaging remain pending.
   Legacy erased SocketError
   nesting remains rejected by runtime verification. HttpError/BaseUri remain unimplemented.
 

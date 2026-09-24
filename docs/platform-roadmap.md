@@ -850,8 +850,10 @@ native library bodies with constructor checks preserved. Raven case/companion me
 is supported at the development bridge boundary only; it is not a runtime dependency
 or a standardized platform case map. Limit this work to enabling class-library source
 unions, then resume HttpError/BaseUri. The bridge now also accepts the supplied core's shared
-IUnion interface without redeclaring it in each imported union. Mixed erased-carrier defaults,
-production reference/consumer integration and public API migration remain open.
+IUnion interface without redeclaring it in each imported union. A reusable projector
+now replaces an existing empty-case reference family in place; SocketError reference
+consumers and native import are the focused migration check. Production packaging,
+runtime call adapters, mixed-carrier execution and public API migration remain open.
 Handler/server cancellation ownership and public JSON contracts remain later work. The [JSON report](experiments/http-json/README.md) now passes between two
 neoCLR applications and independent peers; it does not promote a public JSON API. The
 [HTTP sample](experiments/http-client/README.md) imports development System.Web.Http

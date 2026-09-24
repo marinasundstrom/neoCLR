@@ -5,7 +5,8 @@ using Mono.Cecil.Cil;
 // nested empty cases and all public exports must match the bootstrap contract.
 static class ErrorCarrierLibrary
 {
-    public static bool IsCarrier(TypeDefinition type) => ErrorBindings.Cases.TryGetValue(type.FullName, out var cases) && cases.Length > 0;
+    public static bool IsCarrier(TypeDefinition type) => ErrorBindings.Cases.TryGetValue(type.FullName, out var cases)
+        && cases.Length > 0 && !ApplicationTypes.IsEmptyCaseUnion(type);
     public static bool IsMatched(TypeDefinition type) => IsCarrier(type) && ApplicationTypes.IsLibrary(type);
     public static bool IsByValueReceiver(MethodReference method) => IsMatched(method.DeclaringType.Resolve()) && method.HasThis;
     public static bool IsCase(TypeDefinition type) => type.DeclaringType is { } owner && IsCarrier(owner)

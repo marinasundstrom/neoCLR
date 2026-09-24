@@ -182,3 +182,42 @@ python3 docs/experiments/http-error-unions/verify_metadata.py \
 This validates compiler metadata consumption, not generic-union execution in neoCLR.
 The Raven convention remains compiler-owned. No platform case-map standard is being
 introduced; reconsider it later without blocking the class-library/HTTP objective.
+
+
+## Replacing an existing reference family
+
+The bridge now exposes a bounded source-to-reference projection command:
+
+```sh
+dotnet /path/to/Probe.dll --project-union-reference \
+  /path/to/Implementation.dll /path/to/NeoCLR.CoreProbe.dll \
+  System.Networking.Sockets.SocketError /path/to/output/NeoCLR.CoreProbe.dll
+python3 docs/experiments/http-error-unions/verify_reference.py \
+  --bundle /path/to/matching/neoclr-bundle \
+  --bridge docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll
+```
+
+It copies the supported empty-case union shape emitted by Raven, including members,
+field layout and selected case metadata. Existing carrier and nested case definitions
+are updated in place, preserving references from other core signatures. Replacement
+requires the same case identities; a mismatch fails without an output artifact.
+Shared support definitions are reused on subsequent projections. As in the previous
+fixture, concrete reference method bodies throw and are never the runtime implementation.
+This remains a bounded projection, not a general CLI assembly merger or lossless
+custom-attribute copier. Payload-bearing/generic unions remain outside this command.
+
+The focused check projects all thirteen SocketError cases from normal Raven syntax,
+compiles consumers of construction, matching and Socket.Connect's nested Task/Result
+signature, then recompiles and projects again with core-owned support definitions.
+It also imports the resulting native union implementation. A validated standard
+empty-case family now takes precedence over the legacy error catalog's erased-storage
+constructor/default assumptions. The check also recompiles and imports the existing erased SocketError source as a
+regression; legacy error carriers retain their existing behavior.
+
+This follows CLI reference type identity while taking the reference shape from emitted
+source rather than maintaining a second hand-written union declaration. The cost is a
+staged compile/project/recompile bootstrap that must be wired into SDK production.
+The public SocketError source, generated System library and reference snapshot have not
+yet migrated: existing runtime call adapters and public API documentation must change
+together in that migration. This check does not claim that a network application has
+executed with the replacement. The runtime remains independent of Raven attributes.

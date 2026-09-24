@@ -64,6 +64,8 @@ static class ApplicationTypes
             if (!(owner.IsPublic || owner.IsNestedPublic))
                 throw new InvalidDataException("Nonpublic imported type access unsupported: " + type.FullName);
     }
+    public static bool IsEmptyCaseLibraryUnion(string name) => Types.TryGetValue(name, out var type)
+        && LibraryNames.ContainsKey(type) && IsEmptyCaseUnion(type);
     public static bool IsLibraryUnion(string name) => (Types.TryGetValue(name, out var type) || LibraryReferences.TryGetValue(name, out type))
         && LibraryNames.ContainsKey(type) && GenericUnionLibrary.IsFamily(type);
     public static bool LibraryUnionRequiresInitialization(string name) => (Types.TryGetValue(name, out var type) || LibraryReferences.TryGetValue(name, out type))

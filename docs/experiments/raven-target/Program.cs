@@ -18,6 +18,12 @@ if (args.Length == 2 && args[0] == "--union-metadata-report")
     return;
 }
 
+if (args.Length == 5 && args[0] == "--project-union-reference")
+{
+    StandardUnionReference.WriteReference(args[1], args[2], args[3], args[4]);
+    return;
+}
+
 if (args.Length is 5 or 6 && args[0] == "--standard-union-library-core")
 {
     StandardUnionLibraryChecks.WriteReference(args[1], args[2], args[3], args[4], args.Length == 6 ? args[5] : null);
