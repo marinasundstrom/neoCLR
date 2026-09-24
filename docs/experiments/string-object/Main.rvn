@@ -1,0 +1,36 @@
+import System.*
+import System.Collections.*
+import System.Option.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+class Plain {}
+
+func Main() {
+    let first: Object = "hello 👩‍💻"
+    let repeated: Object = "hello " + "👩‍💻"
+    Check(first.Equals(repeated), "String content equality through Object")
+    Check(first.GetHashCode() == repeated.GetHashCode(), "Matching text hashes")
+    Check(first.ToString() == "hello 👩‍💻", "String Object display")
+    Check(!first.Equals(null) && !first.Equals(42), "Wrong-type and null rejection")
+    let plain: Object = Plain()
+    Check(!plain.Equals(first) && !first.Equals(plain), "Symmetric class/String mismatch")
+    let values = HashMap<Object, int>((left, right) => left.Equals(right), key => key.GetHashCode())
+    Check(values.TryAdd(first, 1) && !values.TryAdd(repeated, 2), "Repeated text key")
+    var n = 0
+    while n < 400 {
+        let garbage: Object = "hello 👩‍💻"
+        Check(garbage.Equals(first), "String wrapper churn")
+        n += 1
+    }
+    if let Some(value) = values.Find("hello 👩‍💻") {
+        Check(value == 1, "Text key after GC")
+    } else {
+        System.Fault("Text key lost")
+    }
+    Console.WriteLine("String Object equality, hashing, display and GC: passed")
+}

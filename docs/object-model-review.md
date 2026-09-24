@@ -1004,3 +1004,49 @@ Char's existing public methods are now included in the generated API reference.
 Validation: the Raven fixture reclaims all 422 objects across nine collections
 (peak 64, zero live). The native grapheme matrix and .NET comparison pass; all
 four Char methods are rendered in the successful 496-page combined website build.
+
+
+### String Object content contracts — 2026-09-24
+
+The author explicitly requests continuing from Char into String. The initial Raven
+probe compiled and converted text to Object, then faulted because virtual dispatch
+tried ordinary class inheritance for intrinsic String. The bounded repair extends
+the exact System.Object-slot intrinsic to String wrappers. Equality compares exact
+contents, hashing uses the same UTF-8 FNV-1a component algorithm as Char, and display
+returns all text. String and Char remain unequal even when their text matches.
+
+Comparison, reviewed 2026-09-24: .NET 10
+[String comparison](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/String.Comparison.cs)
+uses ordinal Object equality and randomized content hashing;
+[String](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/String.cs)
+returns itself from ToString. neoCLR matches exact content behavior for its valid
+Unicode text, but retains UTF-8 storage and wrappers around copied text. This is
+not value-type boxing and does not establish string allocation identity or interning.
+ReferenceEquals and explicit Object base identity/hash calls still fault.
+
+Replacing intrinsic text with a shared heap string would address identity but touches
+all string storage, copying and GC paths. That remains a separate migration. Retaining
+the temporary wrappers closes usable content contracts now, with extra allocation
+and copying costs. The provisional deterministic FNV-1a hash reuses the current text
+hashing convention; it is not .NET-compatible numerically or resistant to deliberate
+collisions. Randomized hashing and default comparer design remain future work.
+
+No compiler, managed layout, normalization, culture policy or nullable String storage
+changes. The existing public String surface is now documented in generated reference;
+its non-executable reference scaffold constructor has an explicit exclusion and guide.
+The [Raven sample](experiments/string-object/README.md) checks Object map callbacks
+and GC. Native checks cover empty/embedded-NUL/combining/emoji text, exact types,
+casts back to String and the retained identity rejection.
+
+Small-heap validation exposed a pre-existing GC gap: CastClass and IsInstance could
+allocate String wrappers without the VM's pre-allocation collection safe point. Those
+operations now enter that safe point when intrinsic String operands can allocate a
+wrapper, before operands leave the traced stack. Both paths are tested with retained
+wrappers under an eight-object limit. Default class/array Object equality also rejects
+a String operand as unequal instead of invoking unsupported String identity, preserving
+symmetric type mismatch while keeping explicit ReferenceEquals rejected.
+
+Final validation: three String runtime regressions pass, including small-heap local
+and operand-stack roots; all eight display regressions pass. The Raven map fixture
+reclaims all 421 allocations across nine collections (peak 64, zero live). The .NET
+content baseline and API snapshot/510-page combined website build pass.

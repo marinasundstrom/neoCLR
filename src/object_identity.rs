@@ -33,6 +33,14 @@ pub(crate) fn equals(left: &Value, right: &Value) -> Result<bool, Fault> {
             "Equals requires a non-null instance",
         )
     })?;
+    // Default class/array equality cannot match intrinsic String contents. Do not
+    // route this type mismatch through String's unsupported identity operation.
+    if let Value::ObjectReference(other) = right {
+        other.reference.assigned()?;
+        if other.concrete_type() == Type::String {
+            return Ok(false);
+        }
+    }
     reference_equals(left, right)
 }
 

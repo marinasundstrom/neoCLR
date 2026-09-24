@@ -93,3 +93,20 @@ therefore follows its text representation, not .NET's code-unit formula.
 
 Use the [Char API reference](xref:System.Char) for construction, typed equality and
 comparison, and the [Object guide](/docs/objects.html) for boxing contracts.
+
+
+## String through Object (development)
+
+Text now retains exact content equality and matching hashes through Object, so it
+can be used as a HashMap key with explicit Object callbacks. ToString returns the
+unchanged text. Comparison does not normalize Unicode or apply culture rules.
+
+The current runtime wraps copied intrinsic text when converting it to Object.
+String is still a reference type, but String ReferenceEquals and identity hashes
+remain unsupported; the wrappers do not establish stable string allocation identity.
+This differs from .NET's identity-preserving String references and interning.
+The current UTF-8 content hash also differs from .NET's randomized hash and is not
+a persisted identifier or a defense against deliberate collisions.
+
+See the [String API reference](xref:System.String) and
+[Object contract](../../docs/objects.html#string-through-object-development).

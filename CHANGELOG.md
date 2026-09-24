@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Support String Object content equality, matching UTF-8 hashes and unchanged text
+  display through existing wrappers. Cover Object map keys, casts and GC; retain
+  explicit rejection of String identity operations. Add generated reference for
+  existing String methods/properties/operators and document the representation and
+  provisional hash limitations. Collect before casts/type tests allocate String
+  wrappers, retaining stack roots; default class/array equality rejects String
+  operands without invoking identity. No compiler or managed layout change.
+
 - Align boxed Char equality, hashing and display with its exact grapheme text,
   preserving copied values and distinct box identity without Unicode normalization.
   Add combining-text/emoji map and GC checks, and generated reference coverage for

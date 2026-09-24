@@ -1659,7 +1659,9 @@ fn interpret_instructions(
                 | Op::NewArray(_)
                 | Op::AllocateArray(_)
                 | Op::ReserveArray(_)
-        ) || matches!(op, Op::New(ty) if module.is_reference_type(ty))
+        ) || (matches!(op, Op::CastClass(target) | Op::IsInstance(target) if *target != Type::String)
+            && matches!(frame.stack.last(), Some(Value::String(_))))
+            || matches!(op, Op::New(ty) if module.is_reference_type(ty))
             || matches!(op, Op::Construct(target) if target.owner.as_ref().is_some_and(|ty| module.is_reference_type(ty))))
             && heap.len() >= collection_threshold
         {
@@ -2083,7 +2085,7 @@ fn interpret_instructions(
                             };
                             object.reference.assigned()?;
                             if let Some(value) =
-                                crate::boxed_values::dispatch(&object, &contract, &args)?
+                                crate::intrinsic_objects::dispatch(&object, &contract, &args)?
                             {
                                 frame.stack.push(value);
                                 return Ok(None);

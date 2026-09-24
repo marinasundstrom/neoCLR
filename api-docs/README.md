@@ -81,3 +81,9 @@ changes still require regeneration from the bridge.
 Char now has generated coverage for FromString, ToString, Equals(Char) and CompareTo.
 Its grapheme semantics and boxed Object behavior are documented; other primitive
 reference coverage remains incremental.
+
+String's existing public text methods, properties and operators now have generated
+coverage. Its reference-only parameterless scaffold constructor is excluded in
+exclusions.json and explained in the [Object guide](objects.md#string-through-object-development);
+it is not an executable application API. UTF-8 slice errors are described on the
+method; remaining text/encoding type coverage is still incremental.

@@ -66,11 +66,8 @@ fn null_object_display_reports_null_reference() {
 }
 
 #[test]
-fn boxed_value_and_string_virtual_display_are_not_silently_type_names() {
-    for body in [
-        "ldc.r8 42\nbox Double",
-        "ldstr \"hello\"\ncastclass System.Object",
-    ] {
+fn unsupported_boxed_value_display_is_not_silently_a_type_name() {
+    for body in ["ldc.r8 42\nbox Double"] {
         let fault = run(
             &format!("{body}\ncallvirt instance System.Object::ToString()"),
             "",

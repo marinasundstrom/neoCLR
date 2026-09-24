@@ -91,6 +91,7 @@
   "System.Storage.StorageLookupError.NotFound",
   "System.Storage.StorageLookupError.WrongKind",
   "System.Storage.StorageProvider",
+  "System.String",
   "System.Tasks.Promise`1",
   "System.Tasks.TaskQueue",
   "System.Tasks.TaskState",

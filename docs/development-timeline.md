@@ -6200,3 +6200,16 @@ failure remains the next acceptance target.
   static-member questions and conversion/overflow/special-value validation needs.
 - **Open:** interface names, breadth, language/runtime support and scheduling are
   undecided. No generic math API has been implemented or committed for a release.
+
+
+### 2026-09-24 — Continue from Char into String
+
+- **Author:** requests not stopping after the current slice and continuing with the
+  next one, assumed to be Strings.
+- **Assistant response/action:** completes and commits Char contracts as cf65c1aa,
+  then reproduces String Object dispatch failure and implements bounded content
+  equality/hash/display. Keeps String allocation identity as separate unresolved work.
+- **Evidence:** [String Object sample](experiments/string-object/README.md) and
+  [Object review](object-model-review.md) track the behavior and validation.
+- **Open:** stable String identity, interning and a shared heap-text representation
+  are not implied by the content-contract change.

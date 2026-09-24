@@ -594,3 +594,55 @@ fn boxed_char_uses_exact_grapheme_text_without_normalization() {
     assert!(result.heap.collections() > 0);
     assert!(result.heap.is_empty());
 }
+
+#[test]
+fn string_object_contracts_use_exact_content_and_preserve_casts() {
+    let mut body = ".local System.Object empty\nldloca empty\ninitobj System.Object\n".to_owned();
+    for text in ["", "A", "a\\u0000b", "hello 👩‍💻", "é"] {
+        let object = format!("ldstr \"{text}\"\ncastclass System.Object");
+        body.push_str(&format!("{object}\n{object}\n{EQUALS}\nbrfalse failed\n{object}\n{HASH}\n{object}\n{HASH}\nceq\nbrfalse failed\n{object}\ncallvirt instance System.Object::ToString()\nldstr \"{text}\"\ncall neoCLR.Runtime.StringCompareOrdinal(String,String)\nbrtrue failed\n{object}\ncastclass String\nldstr \"{text}\"\ncall neoCLR.Runtime.StringCompareOrdinal(String,String)\nbrtrue failed\n"));
+    }
+    for other in [
+        "ldc.i4 65\nbox Int32",
+        "ldstr \"A\"\ncall neoCLR.Runtime.CharFromString(String)\nbox Char",
+        "ldloc empty",
+        "ldstr \"a\"\ncastclass System.Object",
+    ] {
+        body.push_str(&format!(
+            "ldstr \"A\"\ncastclass System.Object\n{other}\n{EQUALS}\nbrtrue failed\n"
+        ));
+    }
+    body.push_str(&format!("ldstr \"é\"\ncastclass System.Object\nldstr \"é\"\ncastclass System.Object\n{EQUALS}\nbrtrue failed\n"));
+    // Ordinary identity-based classes must reject String in either direction.
+    body.push_str(&format!("newobj Plain\nldstr \"text\"\ncastclass System.Object\n{EQUALS}\nbrtrue failed\nldstr \"text\"\ncastclass System.Object\nnewobj Plain\n{EQUALS}\nbrtrue failed\nldc.bool true\nret\nfailed:\nldc.bool false"));
+    let result = run(&body, ".type class Plain\n.end", "Boolean", 12).unwrap();
+    assert_eq!(result.value, Value::Boolean(true));
+    assert!(result.heap.collections() > 0);
+    assert!(result.heap.is_empty());
+}
+
+#[test]
+fn string_wrapper_casts_collect_before_operands_leave_gc_roots() {
+    for opcode in ["castclass", "isinst"] {
+        let mut body = format!(
+            ".local System.Object retained\nldstr \"retained 👩‍💻\"\n{opcode} System.Object\nstloc retained\n"
+        );
+        for _ in 0..30 {
+            body.push_str(&format!(
+                "ldstr \"temporary\"\n{opcode} System.Object\npop\n"
+            ));
+        }
+        // Remove the local root; keep the retained wrapper only on the operand stack.
+        body.push_str("ldloc retained\nldloca retained\ninitobj System.Object\n");
+        for _ in 0..30 {
+            body.push_str(&format!(
+                "ldstr \"temporary\"\n{opcode} System.Object\npop\n"
+            ));
+        }
+        body.push_str("callvirt instance System.Object::ToString()\nldstr \"retained 👩‍💻\"\ncall neoCLR.Runtime.StringCompareOrdinal(String,String)\nldc.i4 0\nceq");
+        let result = run(&body, "", "Boolean", 8).unwrap();
+        assert_eq!(result.value, Value::Boolean(true));
+        assert!(result.heap.collections() > 1);
+        assert!(result.heap.is_empty());
+    }
+}

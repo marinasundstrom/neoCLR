@@ -748,7 +748,9 @@ culture-independent decimal integers and True/False. Boxed Single/Double now hav
 exact-type Object equality and hashes consistent for NaNs and signed zero, with a
 [floating map sample](experiments/floating-object/README.md). Floating display remains open. Boxed Char now aligns exact grapheme equality/hash
 and display with typed Char; the [sample](experiments/char-object/README.md) checks
-combining text, emoji and Object map keys through GC.
+combining text, emoji and Object map keys through GC. String Object content equality,
+hash and display now work through existing wrappers, with a [map sample](experiments/string-object/README.md);
+String reference identity remains deferred.
 Other primitive Object implementations and generic struct components
 remain follow-ups.
 Nullable value types and their boxing behavior are not part of the current scope. Default reference fields now have a checked record case:

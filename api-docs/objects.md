@@ -26,8 +26,7 @@ that bypassing the override still describes the concrete object.
 
 Virtual ToString dispatch supports named structs with explicit overrides and boxed
 Int32, Int64 and Boolean values. Integers produce culture-independent decimal text;
-Boolean produces True or False, matching .NET spelling. Char returns its full grapheme text. Other primitive boxes and
-intrinsic strings remain unsupported; use typed formatting where available. It does
+Boolean produces True or False, matching .NET spelling. Char returns its full grapheme text. String through Object returns its unchanged text. Other primitive boxes remain unsupported; use typed formatting where available. It does
 not add Console.WriteLine(Object), serialization, culture/format overloads or string
 identity. GetType's existing string/boxed paths remain supported.
 
@@ -308,6 +307,29 @@ ordinary classes retain allocation identity. Equal keys must have equal hashes.
 
 The compiled sample checks duplicate keys, replacement, deliberate collisions,
 growth and reference-preserving Object values returned through `Option<Object>` under
-GC. This adds no default comparer, string-to-Object conversion, nullable-key policy
+GC. The String slice also supports content keys through the existing Object conversion.
+This adds no default comparer, nullable-key policy
 or support for other boxed primitives. It is an importer coverage fix, not a new map
 algorithm or runtime layout.
+
+
+## String through Object (development)
+
+[String](xref:System.String) now supports Object equality, hashing and display through
+the existing intrinsic-text wrappers. Equality compares exact contents with another
+String; null and other concrete types compare false. The UTF-8 content hash agrees
+for equal text. ToString returns the full text unchanged. Empty text, embedded NUL,
+combining sequences and emoji are preserved. No normalization or collation is implied.
+
+String remains a reference type. Conversion currently creates a GC-owned wrapper
+around copied intrinsic text; this is not value-type boxing or stable String identity.
+ReferenceEquals and explicit Object base identity/hash calls remain unsupported, even
+for aliases. Casts back to String preserve contents, not an allocation identity.
+No interning, nullable String storage, stable hash numbers or source-declared String
+Object overrides are added. The reference-only scaffold constructor is excluded:
+create strings with literals, Concat and text APIs.
+
+The content contract follows .NET String Object equality and display. neoCLR uses
+UTF-8 rather than .NET UTF-16 and does not adopt .NET's randomized hash algorithm;
+its current FNV-1a hash is provisional, non-cryptographic and not collision-attack
+resistant. Hashes are not persistent identifiers. Default comparers remain future work.
