@@ -113,9 +113,10 @@ See the [String API reference](xref:System.String) and
 
 
 Development String copies now share immutable text internally. Owned text producers
-transfer their buffer; Object conversions still allocate wrappers. The next step is
-to establish identity-preserving conversions and verify their GC and host lifetimes
-before enabling String identity.
+transfer their buffer; Object conversions still allocate wrappers. Internal checks
+cover owner retention across conversions, storage and GC, including host results
+and fault teardown. Public String identity remains disabled while reference comparison
+and identity hashing are defined together.
 
 Future work includes a coherent System.Text API and comparer infrastructure, especially
 string comparers. Equality, hashing and ordering should use compatible, explicit

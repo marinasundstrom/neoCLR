@@ -114,3 +114,7 @@ mod tests {
         assert!(weak.upgrade().is_none());
     }
 }
+
+#[cfg(test)]
+#[path = "string_ownership_tests.rs"]
+mod ownership_tests;

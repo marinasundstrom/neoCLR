@@ -39,3 +39,12 @@ equality/display, arrays, graphemes, String helpers, file streams and reflection
 regressions pass. UTF-8 and worker tests, including the combined result/output byte
 budget, pass as well: 116 focused tests in total. API snapshot checks and the combined
 510-page website build pass.
+
+
+The next internal gate is reproducible with `cargo test --lib string_ownership`.
+Five tests cover the real VM conversion/storage paths across four text shapes,
+separate equal owners, GC pressure, host-retained results and cyclic/fault teardown.
+They use private Arc ownership checks, not guest ReferenceEquals; guest identity
+and identity/base hashing remain disabled. See the
+[conversion gate](../../string-storage-design.md#vm-conversion-ownership-gate-2026-09-24)
+for scope and the remaining identity contract.

@@ -42,8 +42,11 @@ contracts, Path and introspection semantics have checked samples. The
 ReferenceEquals remains unsupported; content equality does not establish identity.
 The [storage investigation](string-storage-design.md) measures current copy/wrapper
 costs and a shared-text prototype. Immutable shared String storage now adopts owned
-UTF-8 buffers and retains text across value copies. The next gate is identity-preserving
-conversions, with GC and host-lifetime validation before enabling String identity.
+UTF-8 buffers and retains text across value copies. Private ownership checks now
+cover Object/interface round-trips, fields,
+arrays, erasure, GC pressure, host retention and cyclic/fault teardown. Next define
+owner-based reference comparison and stable identity/base hashes together before
+enabling String identity; wrapper IDs must not become String IDs.
 The internal `Arc<String>` choice remains provisional.
 
 **Author-selected end-to-end acceptance case:** Raven record syntax now exercises

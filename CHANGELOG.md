@@ -17,7 +17,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   migrate owned constructors to `Value::String(text.into())` and extraction to
   `into_owned()`. Cover GC/host lifetimes and record future System.Text and general/
   string comparers, casing and comparison methods without introducing those APIs.
-  Use .NET as a design reference, allowing justified API differences.
+  Use .NET as a design reference, allowing justified API differences. Add direct VM
+  owner-retention checks across Object/interface conversions, display, fields, arrays,
+  erasure and local byrefs, including GC pressure and host/cyclic/fault teardown.
+  Keep guest identity disabled pending a complete comparison/hash contract.
 
 - Support String Object content equality, matching UTF-8 hashes and unchanged text
   display through existing wrappers. Cover Object map keys, casts and GC; retain

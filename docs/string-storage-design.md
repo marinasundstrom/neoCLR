@@ -146,6 +146,35 @@ Construction is excluded; zero clone allocations does not measure atomic costs.
 The next gate is identity-preserving conversions and their lifetime/GC tests, before
 enabling guest identity.
 
+## VM conversion ownership gate (2026-09-24)
+
+The private `string_ownership` tests exercise the actual selected System library,
+serialized metadata, verification and host invocation. They compare Arc owners rather
+than contents or text-buffer addresses. In particular, empty text needs an owner
+comparison: independent empty String buffers can have the same data pointer.
+
+The matrix covers Object casts, successful type tests, Equatable interface views,
+Object ToString, local byrefs, class/value fields, arrays and erased payloads. Empty
+text, embedded NUL, combining text and emoji must keep the original owner. Separate
+equal host inputs must remain separate owners. This validates the current internal
+representation without promising interning behavior for future text producers.
+
+Additional checks retain a wrapper only on the operand stack while repeated casts
+force collection; all temporary wrappers must be reclaimed without replacing its
+text owner. A host-held result must survive execution/heap destruction, then release
+its last owner. Cyclic class fields must release text both after normal completion
+and after an intentional guest Fault.
+
+This closes the first conversion/teardown gate against the alias/field/array cases
+in the existing .NET comparison. It does **not** enable guest ReferenceEquals or
+identity hashes. Existing wrapper IDs must not become String IDs. The next slice
+must define owner-based reference comparison, stable identity/base hashing without
+exposing addresses, and null/mixed-type behavior together. Content hashes remain
+separate from that contract; culture, casing and comparer design stay future work.
+
+Run `cargo test --lib string_ownership`. These are internal runtime checks; there
+is no new guest API, compiler policy or RavenDoc signature in this slice.
+
 ## Future text and comparer direction
 
 The author requested a coherent System.Text API and general comparer infrastructure,
