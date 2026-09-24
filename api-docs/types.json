@@ -1,4 +1,5 @@
 [
+  "System.Char",
   "System.Concurrency.Thread",
   "System.Concurrency.ThreadPool",
   "System.Console",

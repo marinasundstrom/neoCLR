@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Align boxed Char equality, hashing and display with its exact grapheme text,
+  preserving copied values and distinct box identity without Unicode normalization.
+  Add combining-text/emoji map and GC checks, and generated reference coverage for
+  Char’s existing typed methods. Unlike .NET Char, the value remains a grapheme,
+  not a UTF-16 code unit.
+
 - Add boxed Single/Double Object equality and hashing with .NET-compatible NaN and
   signed-zero semantics. Preserve exact types, copied boxes and IEEE operators;
   floating boxed display remains unsupported. Add native and Raven map/GC checks,

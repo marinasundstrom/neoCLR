@@ -80,3 +80,16 @@ Share a concrete input, the code you tried and the result you expected.
 [Discuss on GitHub ↗](https://github.com/marinasundstrom/neoCLR/issues)
 
 Questions, sample programs and documentation corrections are welcome. See [how to contribute](../../#feedback) for ways to participate.
+
+
+## Char through Object (development)
+
+Boxing a Char preserves a copy of its complete grapheme text. Object equality and
+hashing use that exact text; Object ToString returns it unchanged. Separate boxes
+retain separate identities. This includes combining sequences and joined emoji.
+Composed `é` and decomposed `é` remain different keys because comparison does not
+normalize text. .NET Char instead represents one UTF-16 code unit; neoCLR's hash
+therefore follows its text representation, not .NET's code-unit formula.
+
+Use the [Char API reference](xref:System.Char) for construction, typed equality and
+comparison, and the [Object guide](/docs/objects.html) for boxing contracts.

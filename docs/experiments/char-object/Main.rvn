@@ -1,0 +1,39 @@
+import System.*
+import System.Collections.*
+import System.Option.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+func Main() {
+    var character = Char.FromString("👩‍💻")
+    let first: Object = character
+    let repeated: Object = Char.FromString("👩‍💻")
+    Check(character.Equals(Char.FromString("👩‍💻")), "Typed equality")
+    character = Char.FromString("A")
+    Check(first.Equals(repeated) && !Object.ReferenceEquals(first, repeated), "Copied grapheme and box identity")
+    Check(first.ToString() == "👩‍💻", "Full grapheme display")
+    let composed: Object = Char.FromString("é")
+    let decomposed: Object = Char.FromString("é")
+    Check(!composed.Equals(decomposed), "No implicit Unicode normalization")
+    Check(!first.Equals(null) && !first.Equals(65), "Exact Char type")
+    let values = HashMap<Object, int>((left, right) => left.Equals(right), key => key.GetHashCode())
+    Check(values.TryAdd(first, 1) && !values.TryAdd(repeated, 2), "Repeated grapheme key")
+    Check(values.TryAdd(composed, 3) && values.TryAdd(decomposed, 4), "Distinct text forms")
+    var n = 0
+    while n < 400 {
+        let garbage: Object = Char.FromString("👩‍💻")
+        Check(garbage.Equals(first), "Grapheme allocation churn")
+        n += 1
+    }
+    if let Some(value) = values.Find(Char.FromString("👩‍💻")) {
+        Check(value == 1 && values.Count == 3, "Retained grapheme key")
+    } else {
+        System.Fault("Grapheme key lost")
+    }
+    Check(first.ToString() == "👩‍💻", "Display after collection")
+    Console.WriteLine("Char Object equality, display, map keys and GC: passed")
+}

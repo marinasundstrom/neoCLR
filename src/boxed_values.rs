@@ -5,7 +5,7 @@ use crate::{
     value::ObjectReference,
 };
 
-/// Supported numeric types and Boolean have intrinsic value contracts. Other types still
+/// Supported numeric types, Boolean and Char have intrinsic value contracts. Other types still
 /// require their own validated equality/hash implementation.
 pub(crate) fn dispatch(
     object: &ObjectReference,
@@ -14,7 +14,7 @@ pub(crate) fn dispatch(
 ) -> Result<Option<Value>, Fault> {
     if !matches!(
         object.concrete_type(),
-        Type::Int32 | Type::Int64 | Type::Boolean | Type::Single | Type::Double
+        Type::Int32 | Type::Int64 | Type::Boolean | Type::Single | Type::Double | Type::Char
     ) || contract.owner.as_ref() != Some(&Type::from_name("System.Object"))
         || contract
             .definition
@@ -81,6 +81,7 @@ enum PrimitiveValue {
     Boolean(bool),
     Single(f32),
     Double(f64),
+    Char(String),
 }
 
 impl PrimitiveValue {
@@ -89,6 +90,7 @@ impl PrimitiveValue {
             (Self::Int32(a), Self::Int32(b)) => a == b,
             (Self::Int64(a), Self::Int64(b)) => a == b,
             (Self::Boolean(a), Self::Boolean(b)) => a == b,
+            (Self::Char(a), Self::Char(b)) => a == b,
             (Self::Single(a), Self::Single(b)) => a == b || (a.is_nan() && b.is_nan()),
             (Self::Double(a), Self::Double(b)) => a == b || (a.is_nan() && b.is_nan()),
             _ => false,
@@ -100,6 +102,7 @@ impl PrimitiveValue {
             Self::Int32(value) => value.to_string(),
             Self::Int64(value) => value.to_string(),
             Self::Boolean(value) => if value { "True" } else { "False" }.to_owned(),
+            Self::Char(ref value) => value.clone(),
             Self::Single(_) | Self::Double(_) => return None,
         })
     }
@@ -109,6 +112,10 @@ impl PrimitiveValue {
             Self::Int32(value) => value,
             Self::Int64(value) => (value as i32) ^ ((value >> 32) as i32),
             Self::Boolean(value) => i32::from(value),
+            // Same UTF-8 FNV-1a component hash used by HashCode.Add(string).
+            Self::Char(ref value) => value.as_bytes().iter().fold(2166136261u32, |hash, byte| {
+                (hash ^ u32::from(*byte)).wrapping_mul(16777619)
+            }) as i32,
             Self::Single(value) => {
                 let bits = if value == 0.0 {
                     0
@@ -140,6 +147,7 @@ fn primitive_value(object: &ObjectReference) -> Result<PrimitiveValue, Fault> {
         (Type::Boolean, Value::Boolean(value)) => Ok(PrimitiveValue::Boolean(value)),
         (Type::Single, Value::Single(value)) => Ok(PrimitiveValue::Single(value)),
         (Type::Double, Value::Double(value)) => Ok(PrimitiveValue::Double(value)),
+        (Type::Char, Value::Char(value)) => Ok(PrimitiveValue::Char(value)),
         _ => Err(Fault::new("boxed primitive has an invalid payload")),
     }
 }

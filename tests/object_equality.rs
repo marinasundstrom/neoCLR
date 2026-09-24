@@ -575,3 +575,22 @@ fn floating_object_equality_and_hash_follow_exact_type_value_contracts() {
     assert!(result.heap.collections() > 0);
     assert!(result.heap.is_empty());
 }
+
+#[test]
+fn boxed_char_uses_exact_grapheme_text_without_normalization() {
+    let mut body = ".local System.Object empty\nldloca empty\ninitobj System.Object\n".to_owned();
+    for text in ["A", "é", "e\u{301}", "👩‍💻"] {
+        let character =
+            format!("ldstr \"{text}\"\ncall neoCLR.Runtime.CharFromString(String)\nbox Char");
+        body.push_str(&format!("{character}\n{character}\n{EQUALS}\nbrfalse failed\n{character}\n{character}\n{IDENTITY}\nbrtrue failed\n{character}\n{HASH}\n{character}\n{HASH}\nceq\nbrfalse failed\n{character}\ncallvirt instance System.Object::ToString()\nldstr \"{text}\"\ncall neoCLR.Runtime.StringCompareOrdinal(String,String)\nbrtrue failed\n"));
+    }
+    body.push_str(&format!("ldstr \"é\"\ncall neoCLR.Runtime.CharFromString(String)\nbox Char\nldstr \"é\"\ncall neoCLR.Runtime.CharFromString(String)\nbox Char\n{EQUALS}\nbrtrue failed\n"));
+    for other in ["ldc.i4 65\nbox Int32", "ldloc empty"] {
+        body.push_str(&format!("ldstr \"A\"\ncall neoCLR.Runtime.CharFromString(String)\nbox Char\n{other}\n{EQUALS}\nbrtrue failed\n"));
+    }
+    body.push_str("ldc.bool true\nret\nfailed:\nldc.bool false");
+    let result = run(&body, "", "Boolean", 12).unwrap();
+    assert_eq!(result.value, Value::Boolean(true));
+    assert!(result.heap.collections() > 0);
+    assert!(result.heap.is_empty());
+}

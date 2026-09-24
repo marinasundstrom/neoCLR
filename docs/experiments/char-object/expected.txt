@@ -1,0 +1,1 @@
+Char Object equality, display, map keys and GC: passed

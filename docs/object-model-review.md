@@ -975,3 +975,32 @@ and copied values under GC pressure; a .NET baseline compares equality and hashe
 The Raven run reclaimed all 426 allocations across ten collections (peak 64, no
 live objects). Native checks, the .NET baseline and all eight Object display
 regressions passed; the API snapshot and 491-page combined website build passed.
+
+
+### Char Object consistency — 2026-09-24
+
+Char's typed equality already compares exact stored grapheme text. Boxed equality,
+hash and display now preserve that contract: copied text, exact Char type, no implicit
+normalization, and distinct allocation identity for separate boxes. Display returns
+the full text; hashing uses the UTF-8 FNV-1a component algorithm already used inside
+HashCode.Add(string). This does not promise matching hash numbers across types or
+versions, or introduce a typed Char.GetHashCode declaration.
+
+The [.NET 10 Char source](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Char.cs),
+reviewed 2026-09-24, uses exact Char equality, code-unit display and a hash derived
+from its 16-bit value. neoCLR intentionally retains its existing grapheme model.
+Its benefit is preserving a reader-facing character across boxing; the cost is
+variable-size text storage and text-length-dependent comparisons/hashes, with no
+UTF-16 numeric compatibility. Unicode normalization would change typed equality
+and is not introduced implicitly here.
+
+The [sample](experiments/char-object/README.md) compares typed/Object views, repeated
+emoji keys, composed/decomposed text, copy independence and retained text under GC.
+Native checks include ASCII, combining sequences, emoji, null/wrong-type rejection,
+full display and separate box identity. The .NET baseline contrasts code units with
+StringInfo text elements; it does not assert identical Char representation or hashes.
+Char's existing public methods are now included in the generated API reference.
+
+Validation: the Raven fixture reclaims all 422 objects across nine collections
+(peak 64, zero live). The native grapheme matrix and .NET comparison pass; all
+four Char methods are rendered in the successful 496-page combined website build.

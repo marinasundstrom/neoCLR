@@ -26,7 +26,7 @@ that bypassing the override still describes the concrete object.
 
 Virtual ToString dispatch supports named structs with explicit overrides and boxed
 Int32, Int64 and Boolean values. Integers produce culture-independent decimal text;
-Boolean produces True or False, matching .NET spelling. Other primitive boxes and
+Boolean produces True or False, matching .NET spelling. Char returns its full grapheme text. Other primitive boxes and
 intrinsic strings remain unsupported; use typed formatting where available. It does
 not add Console.WriteLine(Object), serialization, culture/format overloads or string
 identity. GetType's existing string/boxed paths remain supported.
@@ -79,7 +79,7 @@ are unchanged.
 String identity is deliberately unsupported: the current String/Object conversion
 creates wrappers instead of preserving an underlying String allocation. Identity
 calls on String payloads or their wrappers raise a terminal RuntimeError. Virtual
-boxed-value Equals/GetHashCode support Int32, Int64, Boolean, Single, Double and explicit named-struct overrides, described below.
+boxed-value Equals/GetHashCode support Int32, Int64, Boolean, Single, Double, Char and explicit named-struct overrides, described below.
 ReferenceEquals can compare box identities, but does not supply boxed value equality.
 Null instance receivers raise NullReference; default Equals accepts a null argument
 and returns false. Static two-argument Object.Equals is not yet available.
@@ -159,6 +159,12 @@ Double XORs its upper/lower halves. NaN and positive infinity may share a hash b
 remain unequal. These rules allow explicit Object comparer callbacks to find NaN
 and signed-zero map keys reliably. Hashes are not persistent identifiers. Floating
 boxed ToString and source-declared typed Equals/GetHashCode remain outside this slice.
+
+[Char](xref:System.Char) compares its complete grapheme text exactly, rejects other
+concrete types and null, and hashes the same UTF-8 text. Composed and decomposed
+spellings remain distinct: no normalization is implicit. Object ToString returns
+all stored text, including combining marks and emoji joiners. Unlike .NET Char,
+neoCLR Char is not a UTF-16 code unit and does not use .NET's code-unit hash.
 
 These are bounded interpreter intrinsics for the System library's exact Object slots.
 It does not add typed primitive GetHashCode members, general struct equality, nullable
@@ -297,7 +303,7 @@ values. Explicitly authored operators retain their own contracts.
 Supported generic API signatures now admit Object, including `HashMap<Object, Object>`.
 Supply explicit callbacks: `(left, right) => left.Equals(right)` and
 `key => key.GetHashCode()`. Paths and type descriptors use their represented-value
-contracts; supported boxed Int32/Int64/Boolean/Single/Double values use exact-type value equality, while
+contracts; supported boxed Int32/Int64/Boolean/Single/Double/Char values use exact-type value equality, while
 ordinary classes retain allocation identity. Equal keys must have equal hashes.
 
 The compiled sample checks duplicate keys, replacement, deliberate collisions,

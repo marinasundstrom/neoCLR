@@ -8,6 +8,10 @@ toc: false
 contracts. They may precede a downloadable release. In particular, the development
 `System.Concurrency` APIs replace the `System.Threading` names in Preview 9 bundles.
 
+[Char](xref:System.Char) now has a generated type/member reference for grapheme
+construction, equality, ordering and display; see [Object contracts](objects.md)
+for boxed behavior.
+
 Start with a feature guide for behavior and working examples, or open a namespace
 for generated type and member documentation. Both are parts of this site.
 

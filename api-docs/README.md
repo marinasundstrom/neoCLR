@@ -77,3 +77,7 @@ member has a generated route, checks XML summaries, rejects missing member summa
 and validates links across the entire result. Documentation-only XML changes can
 refresh the manifest against the existing matching reference assembly; source/API
 changes still require regeneration from the bridge.
+
+Char now has generated coverage for FromString, ToString, Equals(Char) and CompareTo.
+Its grapheme semantics and boxed Object behavior are documented; other primitive
+reference coverage remains incremental.
