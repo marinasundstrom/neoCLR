@@ -64,6 +64,8 @@ internal sealed class RuntimeMemberInfo {
     val Module: ModuleInfo => StoredDeclaringType.Module
     val Name: string => StoredName
     val DeclaringType: Option<TypeInfo> => Some(StoredDeclaringType)
+
+    override func ToString() -> string => Name
 }
 
 internal class RuntimeFieldInfo : RuntimeMemberInfo, FieldInfo {
@@ -93,6 +95,28 @@ internal class RuntimeFieldInfo : RuntimeMemberInfo, FieldInfo {
     val IsAssembly: bool => StoredIsAssembly
     val IsStatic: bool => StoredIsStatic
     val DefinitionIndex: int => StoredDefinitionIndex
+
+    override func Equals(other: Object?) -> bool {
+        if other is RuntimeFieldInfo implementation {
+            if let Some(owner) = DeclaringType {
+                if let Some(otherOwner) = implementation.DeclaringType {
+                    return owner.Equals(otherOwner) && DefinitionIndex == implementation.DefinitionIndex
+                }
+            }
+        }
+        return false
+    }
+
+    override func GetHashCode() -> int {
+        var hash = HashCode()
+        hash.Add(1)
+        if let Some(owner) = DeclaringType {
+            hash.Add(owner.FullName)
+        }
+        hash.Add(DefinitionIndex)
+        return hash.ToHashCode()
+    }
+
 }
 
 internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
@@ -153,6 +177,28 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
     val IsVirtual: bool => StoredIsVirtual
     val IsOverride: bool => StoredIsOverride
     val IsAbstract: bool => StoredIsAbstract
+
+    override func Equals(other: Object?) -> bool {
+        if other is RuntimeMethodInfo implementation {
+            if let Some(owner) = DeclaringType {
+                if let Some(otherOwner) = implementation.DeclaringType {
+                    return owner.Equals(otherOwner) && DefinitionIndex == implementation.DefinitionIndex
+                }
+            }
+        }
+        return false
+    }
+
+    override func GetHashCode() -> int {
+        var hash = HashCode()
+        hash.Add(2)
+        if let Some(owner) = DeclaringType {
+            hash.Add(owner.FullName)
+        }
+        hash.Add(DefinitionIndex)
+        return hash.ToHashCode()
+    }
+
 }
 
 internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
@@ -223,6 +269,28 @@ internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
         }
         return None()
     }
+
+    override func Equals(other: Object?) -> bool {
+        if other is RuntimePropertyInfo implementation {
+            if let Some(owner) = DeclaringType {
+                if let Some(otherOwner) = implementation.DeclaringType {
+                    return owner.Equals(otherOwner) && DefinitionIndex == implementation.DefinitionIndex
+                }
+            }
+        }
+        return false
+    }
+
+    override func GetHashCode() -> int {
+        var hash = HashCode()
+        hash.Add(3)
+        if let Some(owner) = DeclaringType {
+            hash.Add(owner.FullName)
+        }
+        hash.Add(DefinitionIndex)
+        return hash.ToHashCode()
+    }
+
 }
 
 public sealed interface TypeInfo : MemberInfo, Equatable<TypeInfo> {

@@ -791,3 +791,41 @@ encoding allocations in hashing; hashes are neither unique nor persistent. The
 introspection fixture checks map reuse and GC, while a catalog regression distinguishes
 same short-name assemblies and same-name modules, including two modules within one
 assembly. Member/parameter identity remains the next ownership investigation.
+
+
+### Declared member Object contracts — 2026-09-24
+
+FieldInfo, MethodInfo and PropertyInfo now compare descriptor kind, closed declaring
+type and definition index. Existing native snapshots already carry these components;
+no layout, native factory or type-identity changes are needed. Hashing combines kind,
+owner FullName and index; display returns Name. ReferenceEquals retains wrapper
+identity, and Object.Equals rejects null/unrelated objects. ParameterInfo is unchanged:
+its snapshot lacks declaring-member identity, so position/type/token equality would
+be unsound. This scope deliberately leaves owner representation for the next slice.
+
+.NET 10 primary sources, reviewed 2026-09-24:
+[RuntimeFieldInfo](https://github.com/dotnet/runtime/blob/v10.0.0/src/coreclr/System.Private.CoreLib/src/System/Reflection/RuntimeFieldInfo.cs)
+formats field type and name; [RuntimeMethodInfo](https://github.com/dotnet/runtime/blob/v10.0.0/src/coreclr/System.Private.CoreLib/src/System/Reflection/RuntimeMethodInfo.CoreCLR.cs)
+compares its method handle, declaring type and reflected context and formats a full
+method signature. neoCLR retains declared identity but does not model ReflectedType
+or generic method instantiations. Queries currently enumerate declarations only;
+inherited traversal is not implemented, even when DeclaredOnly is absent. Earlier
+documentation implying inherited selection was corrected. This is a narrower contract,
+not a claim of full System.Reflection equivalence.
+
+Alternatives were retaining allocation equality, caching wrappers, or introducing a
+new native member handle. Reusing existing owner/index data enables map lookups across
+queries without a cache or storage migration. Costs are string hashing/encoding
+allocations and possible collisions; owner-name hashes never replace type equality.
+Simple Name display is readable but cannot distinguish overloads; full signature
+formatting remains future work. These indexes and hashes are not persistent IDs.
+
+The bridge's shared-member projection previously cleared virtual flags on all base
+methods. It now normalizes only property getters, preserving the explicit Object
+ToString override. The inherited base dispatch is checked by the member fixture.
+Reference metadata and runtime library fragments are regenerated together; no Raven
+compiler or target-policy changes are required. Public field/method/property APIs now
+have generated documentation; parameter reference coverage remains explicit work.
+
+Validation covers repeated queries, wrong kinds/null, different closed generic owners,
+different definitions, property/accessor agreement, and map retention through GC.

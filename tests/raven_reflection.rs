@@ -687,3 +687,91 @@ ret
         Value::Boolean(true)
     );
 }
+
+#[test]
+fn member_object_identity_includes_kind_closed_owner_and_definition() {
+    let mut checks = String::new();
+    for (kind, query) in [
+        ("Field", "GetFields"),
+        ("Method", "GetMethods"),
+        ("Property", "GetProperties"),
+    ] {
+        let member = |owner: &str, index| {
+            format!(
+                "call System.Runtime.RuntimeContext::get_Current()\nldtoken {owner}\ncall instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)\ncallvirt instance System.Introspection.TypeInfo::{query}()\nldc.i4 {index}\ncallvirt instance System.Collections.Sequence<System.Introspection.{kind}Info>::get_Item(Int32)\ncastclass System.Object\n"
+            )
+        };
+        for (other_owner, other_index, branch) in [
+            ("Box<Int32>", 0, "brfalse"),
+            ("Box<Int32>", 1, "brtrue"),
+            ("Box<String>", 0, "brtrue"),
+            ("Other<Int32>", 0, "brtrue"),
+        ] {
+            checks.push_str(&member("Box<Int32>", 0));
+            checks.push_str(&member(other_owner, other_index));
+            checks.push_str(&format!(
+                "callvirt instance System.Object::Equals(System.Object)\n{branch} failed\n"
+            ));
+        }
+    }
+    let mut types = String::new();
+    for name in ["Box", "Other"] {
+        types.push_str(&format!(
+            r#"
+.type class {name}<T>
+.field First !0
+.field Second !0
+.method instance FirstMethod() -> Int32
+ldc.i4 1
+ret
+.end
+.method instance SecondMethod() -> Int32
+ldc.i4 2
+ret
+.end
+.property instance FirstProperty() -> Int32
+.get instance {name}<!0>::FirstMethod()
+.end
+.property instance SecondProperty() -> Int32
+.get instance {name}<!0>::SecondMethod()
+.end
+.end
+"#
+        ));
+    }
+    assert_eq!(
+        run_introspection(&format!(
+            ".module MemberIdentity\n.entry Main\n{types}\n.function Main() -> Boolean\n{checks}ldc.bool true\nret\nfailed:\nldc.bool false\nret\n.end\n"
+        )),
+        Value::Boolean(true)
+    );
+}
+
+#[test]
+fn member_queries_currently_enumerate_declarations_only() {
+    assert_eq!(
+        run_introspection(
+            r#"
+.module DeclaredMembers
+.entry Main
+.type class Parent
+.field ParentField Int32
+.end
+.type class Child
+.extends Parent
+.field ChildField Int32
+.end
+.function Main() -> Int32
+call System.Runtime.RuntimeContext::get_Current()
+ldtoken Child
+call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
+callvirt instance System.Introspection.TypeInfo::GetFields()
+castclass System.Collections.Collection<System.Introspection.FieldInfo>
+callvirt instance System.Collections.Collection<System.Introspection.FieldInfo>::get_Count()
+ret
+.end
+"#
+        ),
+        Value::Int32(1)
+    );
+}

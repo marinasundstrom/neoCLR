@@ -5,8 +5,11 @@ items:
   id: System.Introspection
   children:
   - System.Introspection.AssemblyInfo
+  - System.Introspection.FieldInfo
   - System.Introspection.MemberInfo
+  - System.Introspection.MethodInfo
   - System.Introspection.ModuleInfo
+  - System.Introspection.PropertyInfo
   - System.Introspection.TypeInfo
   langs:
   - csharp
@@ -50,6 +53,27 @@ references:
   name: MemberInfo
   nameWithType: MemberInfo
   fullName: System.Introspection.MemberInfo
+- uid: System.Introspection.FieldInfo
+  commentId: T:System.Introspection.FieldInfo
+  isExternal: true
+  href: System.Introspection.FieldInfo.html
+  name: FieldInfo
+  nameWithType: FieldInfo
+  fullName: System.Introspection.FieldInfo
+- uid: System.Introspection.MethodInfo
+  commentId: T:System.Introspection.MethodInfo
+  isExternal: true
+  href: System.Introspection.MethodInfo.html
+  name: MethodInfo
+  nameWithType: MethodInfo
+  fullName: System.Introspection.MethodInfo
+- uid: System.Introspection.PropertyInfo
+  commentId: T:System.Introspection.PropertyInfo
+  isExternal: true
+  href: System.Introspection.PropertyInfo.html
+  name: PropertyInfo
+  nameWithType: PropertyInfo
+  fullName: System.Introspection.PropertyInfo
 - uid: System.Introspection
   commentId: N:System.Introspection
   isExternal: true

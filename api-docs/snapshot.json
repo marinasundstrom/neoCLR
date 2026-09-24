@@ -1,10 +1,10 @@
 {
-  "assemblySha256": "82d02a3f5f1ce41b36acc947c0bb80db75de0f09e5c21bd3c01e1f019795c2fe",
+  "assemblySha256": "832597e6e6f18816cf3fcdb17afe120b1b8860c5108e9a8cec0bb5f8e6f7800a",
   "inputs": {
     ".config/dotnet-tools.json": "48ba0318d227fd625ec31f043c11330548a60ea8fff4a6020b62c76f44492f6b",
-    "api-docs/NeoCLR.CoreProbe.xml": "78818128a614b17bb16e20416ebc4bccd0ac22102ff90c0969447ed4e3b2d02c",
+    "api-docs/NeoCLR.CoreProbe.xml": "3318fd979a8b56e048337a08940c79d83610ca95d820631d8c13241ded0b9f36",
     "api-docs/docfx.json": "c1aca352fe0b1e7ba92fe789108f7d6d7ba160b9d889003f97b6b339afcc1dd0",
-    "api-docs/filter.yml": "08a64e174f2ceb599f275cf4fed1d9d1083d0bb63341a6a956a2f32eecdf667a",
+    "api-docs/filter.yml": "6dafe64c941ea76de83dbd34e4eab6e52be0ff7f71bcf66861869573971084f1",
     "docs/experiments/raven-target/ApplicationImport.cs": "66855a52e0d43532222cdbae0530de57ce13f25a00cd7e7d0cd791da7bf2607a",
     "docs/experiments/raven-target/ApplicationTypes.cs": "ee4d334e52d96214245cf6c13a01ee1f8093bd01b85bca04e5dafd5d83aa0c3c",
     "docs/experiments/raven-target/ArrayApiProbe.cs": "d222179a4736c127d160eee0282ee6d7eca7b2fbade571c491b0b2bb02d8731c",
@@ -44,7 +44,7 @@
     "docs/experiments/raven-target/Int32Bindings.cs": "3f3db868d00a619d46679d71e942b184c8edb08cdd2d8ae085da711f21ecf3db",
     "docs/experiments/raven-target/InterfaceBindings.cs": "d78573594e8c7e57b454cebb3e82dc8ed4d16cd9a1d01037aa4bfc4fedc17778",
     "docs/experiments/raven-target/InterfaceProbe.cs": "0b34f95158a95abf3e1928cd80012c929f32d25d3aea3bc7d29babb876dfaa4d",
-    "docs/experiments/raven-target/IntrospectionHierarchy.cs": "96955b4e7badf6420b232f830021d5189bda6778049ba8a189c9effc9903d45b",
+    "docs/experiments/raven-target/IntrospectionHierarchy.cs": "598f5754500eaf355b0a3645a3076061739705beda9927eff0a2c594ad291e3b",
     "docs/experiments/raven-target/LibraryImplementation.cs": "7cef97e618ae47350a0843adf8f2505708cd1a9d165db4d0eaca214645c3467a",
     "docs/experiments/raven-target/LibrarySignatureChecks.cs": "8f2efb17ad25b15b2ca67a91fcb3e298a7d06a0a32414cb0bec569bbfa5582b1",
     "docs/experiments/raven-target/ManagedArrayBindings.cs": "ed25b3db88ecb4f7c4bab94571ec19b7def3a2a3a4ee0a9b6ddff66b7cc9e599",
@@ -73,7 +73,7 @@
     "docs/experiments/raven-target/QueryBindings.cs": "fbd29ef04e2368a2345379a1037f924bfd5c16598261b0872d0566d2586cbe72",
     "docs/experiments/raven-target/ReaderBindings.cs": "0829df0cd8970866de73e7af224ef9d5f486de07cbc888e12102655c1ca63e10",
     "docs/experiments/raven-target/RecordMetadataChecks.cs": "7935a1effdc1939a0c7d4e4bd3ac4234be602011389ec3c7242f648a0601ba81",
-    "docs/experiments/raven-target/ReflectionBindings.cs": "894f99c3df9f3ac22b6f4bd55387898c26107234c3a6a4232e635ffad0e78137",
+    "docs/experiments/raven-target/ReflectionBindings.cs": "9b9b19b4c44f2fbfa670653e63c09f991a5619788ea556221da4fdf6fe5c1f7a",
     "docs/experiments/raven-target/ResultBindings.cs": "620629b272a8cc3f8614854cd9085551bcfcae8e6050a3d29edf1a6cf9d5dcd2",
     "docs/experiments/raven-target/ResultImportChecks.cs": "7450bb06c66f7343fc4150e3dfa46632e9a93b30d4e09a802ebb98da5c85d7f3",
     "docs/experiments/raven-target/RuntimeFailureBindings.cs": "119133892f5c2024a8b869d3b0446511207dded1aba1afff66f147a3c65bce7f",
@@ -179,10 +179,13 @@
     "api/System.IO.TextWriter.yml": "cdede6f2b5e8dc2f7f175fe8e06a2e4789d895553d7ea7f95bdfa6cbebcfe79a",
     "api/System.IO.yml": "2fad92430311d0108ee7a5258c727c552c9f13c7ce12bb50720a240a9b9c4e1b",
     "api/System.Introspection.AssemblyInfo.yml": "53c5ef43ac6701f40fd98dc40cb8a728517e31363f31f0043294bda368ca84a5",
+    "api/System.Introspection.FieldInfo.yml": "b8bbafe6d759c9d2a878a8e6873a7133a8c473fdb13d257a276e18285f2194bc",
     "api/System.Introspection.MemberInfo.yml": "bafbd4b44e07a2060d0b47e0bb8fe30bb9b597810b076275cf122c0ee1a220df",
+    "api/System.Introspection.MethodInfo.yml": "c62694ef47036840e70f1186fa713e9665930b7248c1caf3c284740833619528",
     "api/System.Introspection.ModuleInfo.yml": "53984faea15cce97c450ad8e5f970006423db9980e941924f296dc9bb6cbc757",
-    "api/System.Introspection.TypeInfo.yml": "6cf5eb2c4ccb16b6b16447455516c31e0ab040206adedbefd5d134177f12bcd3",
-    "api/System.Introspection.yml": "5f10d4d95c312cd23b4161b51de9d7e101e3ac9dfed1b2cb2b08a35150f5b596",
+    "api/System.Introspection.PropertyInfo.yml": "ec7af199b98f5d69991455fadf7df5f833d6788c8bb9781d751e9727d8214f42",
+    "api/System.Introspection.TypeInfo.yml": "6aa30d44adb8401984e156f61ba6c34de3ef172d49c2521b6ac6c6439eaa5661",
+    "api/System.Introspection.yml": "d5e7603a5a0352d876f832c6175d9c54d80c46b164498bbce6bc7d2c7e5c54f1",
     "api/System.Object.yml": "9a840c6867f340fc518dbad9893f9157978dbeb1b3db11f96bb9e88f4604dd82",
     "api/System.Runtime.CompilerServices.AsyncTaskMethodBuilder-1.yml": "356d7753edb4092a2b48b9646a81c57f296da34d7c3d912b9ce80470201034f3",
     "api/System.Runtime.CompilerServices.IAsyncStateMachine.yml": "cbe175f18620f36b30f43a3eaa4344a1d908e3cfb6d669b03e08083054c95b95",
@@ -234,6 +237,6 @@
     "api/System.Tasks.yml": "29bb21a52461de10ead15a1ceea6780ebb72194fade98f1fded122421fcddc9b",
     "api/System.Value.yml": "a415a13f5a32f9f26497bdec05c0e350691ac8ec4a9fc4465bfdef7907efb353",
     "api/System.yml": "0f8964861d3d5a4c6efc609abc218f1ac0daf0412a9e5fb4f4133d5f25cda40d",
-    "api/toc.yml": "26758f43b8bea0b23bc5058c60ca44658f07a1d8b8cc8e87170063f966b5c9da"
+    "api/toc.yml": "2b9c07de1eb95e008a59e3a45aefd72a91b64c36585b1044dbdc5ed38c3cfcc1"
   }
 }

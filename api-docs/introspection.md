@@ -65,11 +65,35 @@ under collection pressure. A separate catalog regression uses assemblies with ma
 short names and module names but different full identities, plus multiple modules in
 one assembly.
 
-## Other descriptors
+## Field, method and property identity
 
-FieldInfo, MethodInfo, PropertyInfo and ParameterInfo still use Object allocation
-identity. Further equality work must include defining scope and owner context;
-parameter snapshots do not yet retain their declaring member. Tokens can be absent
-or module-scoped. Their generated reference coverage remains an explicit gap in the
-maintenance notes. TypeInfo, MemberInfo, AssemblyInfo and ModuleInfo now have generated
-type/member reference coverage.
+[FieldInfo](xref:System.Introspection.FieldInfo), [MethodInfo](xref:System.Introspection.MethodInfo)
+and [PropertyInfo](xref:System.Introspection.PropertyInfo) now implement Object equality
+using descriptor kind, closed declaring-type identity and definition index. Two queries
+for the same declaration compare equal even with separate wrappers. Different generic
+owners, different declarations and different descriptor kinds compare unequal. Null
+and unrelated objects compare false. There is no new nullable typed equality operand.
+
+Their hashes combine kind, declaring FullName and definition index. Equal members
+have equal hashes; distinct type definitions with matching names may collide. Neither
+the hash nor DefinitionIndex is a persistent key. ToString returns the member Name;
+it does not format a .NET-style signature or uniquely distinguish overloads.
+
+Current queries enumerate retained declarations on the requested type. They do not
+walk base types, even without DeclaredOnly; callers can inspect BaseType explicitly.
+The closed declaring owner is used for identity; no ReflectedType is exposed. This
+is narrower than .NET reflection, where reflected context can participate in equality.
+Generic method-definition queries still fault; the current equality contract does
+not add generic method instantiation support. Property accessor queries preserve the
+same method definition identity as direct method queries.
+
+All three interfaces now have generated member reference coverage. Queries describe
+metadata only: they do not read fields, invoke methods or execute accessors. Public
+application property metadata projection remains limited.
+
+## Parameters
+
+ParameterInfo retains Object allocation identity. Snapshots contain position and type
+but do not expose or retain a declaring-member identity. Matching those fields or an
+optional metadata token is insufficient for equality. Establishing ownership remains
+the next investigation, together with its currently missing generated reference coverage.

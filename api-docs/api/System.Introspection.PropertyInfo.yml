@@ -1,0 +1,581 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Introspection.PropertyInfo
+  commentId: T:System.Introspection.PropertyInfo
+  id: PropertyInfo
+  parent: System.Introspection
+  children:
+  - System.Introspection.PropertyInfo.CanRead
+  - System.Introspection.PropertyInfo.CanWrite
+  - System.Introspection.PropertyInfo.DefinitionIndex
+  - System.Introspection.PropertyInfo.GetGetMethod
+  - System.Introspection.PropertyInfo.GetGetMethod(System.Boolean)
+  - System.Introspection.PropertyInfo.GetIndexParameters
+  - System.Introspection.PropertyInfo.GetSetMethod
+  - System.Introspection.PropertyInfo.GetSetMethod(System.Boolean)
+  - System.Introspection.PropertyInfo.IsStatic
+  - System.Introspection.PropertyInfo.PropertyType
+  langs:
+  - csharp
+  - vb
+  name: PropertyInfo
+  nameWithType: PropertyInfo
+  fullName: System.Introspection.PropertyInfo
+  type: Interface
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Describes a retained property declaration in the loaded program.
+  remarks: Development after Preview 9. Object equality uses descriptor kind, closed declaring type and definition index. Repeated wrappers can compare equal; Object hashes agree and ToString returns Name, not a complete signature. This API describes metadata and does not invoke, read or write application members. See the introspection guide for query and identity limitations.
+  example: []
+  syntax:
+    content: 'public interface PropertyInfo : MemberInfo'
+    content.vb: Public Interface PropertyInfo Inherits MemberInfo
+  inheritedMembers:
+  - System.Introspection.MemberInfo.MetadataToken
+  - System.Introspection.MemberInfo.Module
+  - System.Introspection.MemberInfo.Name
+  - System.Introspection.MemberInfo.DeclaringType
+- uid: System.Introspection.PropertyInfo.GetIndexParameters
+  commentId: M:System.Introspection.PropertyInfo.GetIndexParameters
+  id: GetIndexParameters
+  parent: System.Introspection.PropertyInfo
+  langs:
+  - csharp
+  - vb
+  name: GetIndexParameters()
+  nameWithType: PropertyInfo.GetIndexParameters()
+  fullName: System.Introspection.PropertyInfo.GetIndexParameters()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the index parameters in declaration order.
+  example: []
+  syntax:
+    content: Sequence<ParameterInfo> GetIndexParameters()
+    return:
+      type: System.Collections.Sequence{System.Introspection.ParameterInfo}
+      description: A fresh sequence; empty for a non-indexed property. Parameter Object equality remains allocation identity.
+    content.vb: Function GetIndexParameters() As Sequence(Of ParameterInfo)
+  overload: System.Introspection.PropertyInfo.GetIndexParameters*
+- uid: System.Introspection.PropertyInfo.GetGetMethod
+  commentId: M:System.Introspection.PropertyInfo.GetGetMethod
+  id: GetGetMethod
+  parent: System.Introspection.PropertyInfo
+  langs:
+  - csharp
+  - vb
+  name: GetGetMethod()
+  nameWithType: PropertyInfo.GetGetMethod()
+  fullName: System.Introspection.PropertyInfo.GetGetMethod()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the property getter when public.
+  example: []
+  syntax:
+    content: Option<MethodInfo> GetGetMethod()
+    return:
+      type: System.Option{System.Introspection.MethodInfo}
+      description: Some containing the accessor, or None when absent or excluded by visibility.
+    content.vb: Function GetGetMethod() As [Option](Of MethodInfo)
+  overload: System.Introspection.PropertyInfo.GetGetMethod*
+- uid: System.Introspection.PropertyInfo.GetGetMethod(System.Boolean)
+  commentId: M:System.Introspection.PropertyInfo.GetGetMethod(System.Boolean)
+  id: GetGetMethod(System.Boolean)
+  parent: System.Introspection.PropertyInfo
+  langs:
+  - csharp
+  - vb
+  name: GetGetMethod(bool)
+  nameWithType: PropertyInfo.GetGetMethod(bool)
+  fullName: System.Introspection.PropertyInfo.GetGetMethod(bool)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the property getter with explicit nonpublic selection.
+  example: []
+  syntax:
+    content: Option<MethodInfo> GetGetMethod(bool arg0)
+    parameters:
+    - id: arg0
+      type: System.Boolean
+      description: True to include a nonpublic accessor; false to require a public accessor.
+    return:
+      type: System.Option{System.Introspection.MethodInfo}
+      description: Some containing the accessor, or None when absent or excluded by visibility.
+    content.vb: Function GetGetMethod(arg0 As Boolean) As [Option](Of MethodInfo)
+  overload: System.Introspection.PropertyInfo.GetGetMethod*
+  nameWithType.vb: PropertyInfo.GetGetMethod(Boolean)
+  fullName.vb: System.Introspection.PropertyInfo.GetGetMethod(Boolean)
+  name.vb: GetGetMethod(Boolean)
+- uid: System.Introspection.PropertyInfo.GetSetMethod
+  commentId: M:System.Introspection.PropertyInfo.GetSetMethod
+  id: GetSetMethod
+  parent: System.Introspection.PropertyInfo
+  langs:
+  - csharp
+  - vb
+  name: GetSetMethod()
+  nameWithType: PropertyInfo.GetSetMethod()
+  fullName: System.Introspection.PropertyInfo.GetSetMethod()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the property setter when public.
+  example: []
+  syntax:
+    content: Option<MethodInfo> GetSetMethod()
+    return:
+      type: System.Option{System.Introspection.MethodInfo}
+      description: Some containing the accessor, or None when absent or excluded by visibility.
+    content.vb: Function GetSetMethod() As [Option](Of MethodInfo)
+  overload: System.Introspection.PropertyInfo.GetSetMethod*
+- uid: System.Introspection.PropertyInfo.GetSetMethod(System.Boolean)
+  commentId: M:System.Introspection.PropertyInfo.GetSetMethod(System.Boolean)
+  id: GetSetMethod(System.Boolean)
+  parent: System.Introspection.PropertyInfo
+  langs:
+  - csharp
+  - vb
+  name: GetSetMethod(bool)
+  nameWithType: PropertyInfo.GetSetMethod(bool)
+  fullName: System.Introspection.PropertyInfo.GetSetMethod(bool)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the property setter with explicit nonpublic selection.
+  example: []
+  syntax:
+    content: Option<MethodInfo> GetSetMethod(bool arg0)
+    parameters:
+    - id: arg0
+      type: System.Boolean
+      description: True to include a nonpublic accessor; false to require a public accessor.
+    return:
+      type: System.Option{System.Introspection.MethodInfo}
+      description: Some containing the accessor, or None when absent or excluded by visibility.
+    content.vb: Function GetSetMethod(arg0 As Boolean) As [Option](Of MethodInfo)
+  overload: System.Introspection.PropertyInfo.GetSetMethod*
+  nameWithType.vb: PropertyInfo.GetSetMethod(Boolean)
+  fullName.vb: System.Introspection.PropertyInfo.GetSetMethod(Boolean)
+  name.vb: GetSetMethod(Boolean)
+- uid: System.Introspection.PropertyInfo.PropertyType
+  commentId: P:System.Introspection.PropertyInfo.PropertyType
+  id: PropertyType
+  parent: System.Introspection.PropertyInfo
+  langs:
+  - csharp
+  - vb
+  name: PropertyType
+  nameWithType: PropertyInfo.PropertyType
+  fullName: System.Introspection.PropertyInfo.PropertyType
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the property type with declaring-type generic arguments substituted.
+  example: []
+  syntax:
+    content: TypeInfo PropertyType { get; }
+    parameters: []
+    return:
+      type: System.Introspection.TypeInfo
+    content.vb: ReadOnly Property PropertyType As TypeInfo
+  overload: System.Introspection.PropertyInfo.PropertyType*
+- uid: System.Introspection.PropertyInfo.IsStatic
+  commentId: P:System.Introspection.PropertyInfo.IsStatic
+  id: IsStatic
+  parent: System.Introspection.PropertyInfo
+  langs:
+  - csharp
+  - vb
+  name: IsStatic
+  nameWithType: PropertyInfo.IsStatic
+  fullName: System.Introspection.PropertyInfo.IsStatic
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Reports whether the property is static.
+  example: []
+  syntax:
+    content: bool IsStatic { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property IsStatic As Boolean
+  overload: System.Introspection.PropertyInfo.IsStatic*
+- uid: System.Introspection.PropertyInfo.CanRead
+  commentId: P:System.Introspection.PropertyInfo.CanRead
+  id: CanRead
+  parent: System.Introspection.PropertyInfo
+  langs:
+  - csharp
+  - vb
+  name: CanRead
+  nameWithType: PropertyInfo.CanRead
+  fullName: System.Introspection.PropertyInfo.CanRead
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Reports whether a getter exists, including a nonpublic getter.
+  example: []
+  syntax:
+    content: bool CanRead { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property CanRead As Boolean
+  overload: System.Introspection.PropertyInfo.CanRead*
+- uid: System.Introspection.PropertyInfo.CanWrite
+  commentId: P:System.Introspection.PropertyInfo.CanWrite
+  id: CanWrite
+  parent: System.Introspection.PropertyInfo
+  langs:
+  - csharp
+  - vb
+  name: CanWrite
+  nameWithType: PropertyInfo.CanWrite
+  fullName: System.Introspection.PropertyInfo.CanWrite
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Reports whether a setter exists, including a nonpublic setter.
+  example: []
+  syntax:
+    content: bool CanWrite { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property CanWrite As Boolean
+  overload: System.Introspection.PropertyInfo.CanWrite*
+- uid: System.Introspection.PropertyInfo.DefinitionIndex
+  commentId: P:System.Introspection.PropertyInfo.DefinitionIndex
+  id: DefinitionIndex
+  parent: System.Introspection.PropertyInfo
+  langs:
+  - csharp
+  - vb
+  name: DefinitionIndex
+  nameWithType: PropertyInfo.DefinitionIndex
+  fullName: System.Introspection.PropertyInfo.DefinitionIndex
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the runtime definition index. This is not a metadata token or persistent ID; interpret it with the member kind and declaring type.
+  example: []
+  syntax:
+    content: int DefinitionIndex { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: ReadOnly Property DefinitionIndex As Integer
+  overload: System.Introspection.PropertyInfo.DefinitionIndex*
+references:
+- uid: System.Introspection
+  commentId: N:System.Introspection
+  isExternal: true
+  href: System.html
+  name: System.Introspection
+  nameWithType: System.Introspection
+  fullName: System.Introspection
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Introspection
+    name: Introspection
+    isExternal: true
+    href: System.Introspection.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Introspection
+    name: Introspection
+    isExternal: true
+    href: System.Introspection.html
+- uid: System.Introspection.MemberInfo.MetadataToken
+  commentId: P:System.Introspection.MemberInfo.MetadataToken
+  parent: System.Introspection.MemberInfo
+  isExternal: true
+  href: System.Introspection.MemberInfo.html#System_Introspection_MemberInfo_MetadataToken
+  name: MetadataToken
+  nameWithType: MemberInfo.MetadataToken
+  fullName: System.Introspection.MemberInfo.MetadataToken
+- uid: System.Introspection.MemberInfo.Module
+  commentId: P:System.Introspection.MemberInfo.Module
+  parent: System.Introspection.MemberInfo
+  isExternal: true
+  href: System.Introspection.MemberInfo.html#System_Introspection_MemberInfo_Module
+  name: Module
+  nameWithType: MemberInfo.Module
+  fullName: System.Introspection.MemberInfo.Module
+- uid: System.Introspection.MemberInfo.Name
+  commentId: P:System.Introspection.MemberInfo.Name
+  parent: System.Introspection.MemberInfo
+  isExternal: true
+  href: System.Introspection.MemberInfo.html#System_Introspection_MemberInfo_Name
+  name: Name
+  nameWithType: MemberInfo.Name
+  fullName: System.Introspection.MemberInfo.Name
+- uid: System.Introspection.MemberInfo.DeclaringType
+  commentId: P:System.Introspection.MemberInfo.DeclaringType
+  parent: System.Introspection.MemberInfo
+  isExternal: true
+  href: System.Introspection.MemberInfo.html#System_Introspection_MemberInfo_DeclaringType
+  name: DeclaringType
+  nameWithType: MemberInfo.DeclaringType
+  fullName: System.Introspection.MemberInfo.DeclaringType
+- uid: System.Introspection.MemberInfo
+  commentId: T:System.Introspection.MemberInfo
+  parent: System.Introspection
+  isExternal: true
+  href: System.Introspection.MemberInfo.html
+  name: MemberInfo
+  nameWithType: MemberInfo
+  fullName: System.Introspection.MemberInfo
+- uid: System.Introspection.PropertyInfo.GetIndexParameters*
+  commentId: Overload:System.Introspection.PropertyInfo.GetIndexParameters
+  isExternal: true
+  href: System.Introspection.PropertyInfo.html#System_Introspection_PropertyInfo_GetIndexParameters
+  name: GetIndexParameters
+  nameWithType: PropertyInfo.GetIndexParameters
+  fullName: System.Introspection.PropertyInfo.GetIndexParameters
+- uid: System.Collections.Sequence{System.Introspection.ParameterInfo}
+  commentId: T:System.Collections.Sequence{System.Introspection.ParameterInfo}
+  parent: System.Collections
+  definition: System.Collections.Sequence`1
+  name: Sequence<ParameterInfo>
+  nameWithType: Sequence<ParameterInfo>
+  fullName: System.Collections.Sequence<System.Introspection.ParameterInfo>
+  nameWithType.vb: Sequence(Of ParameterInfo)
+  fullName.vb: System.Collections.Sequence(Of System.Introspection.ParameterInfo)
+  name.vb: Sequence(Of ParameterInfo)
+  spec.csharp:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: <
+  - uid: System.Introspection.ParameterInfo
+    name: ParameterInfo
+    isExternal: true
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Introspection.ParameterInfo
+    name: ParameterInfo
+    isExternal: true
+  - name: )
+- uid: System.Collections.Sequence`1
+  commentId: T:System.Collections.Sequence`1
+  isExternal: true
+  name: Sequence<T>
+  nameWithType: Sequence<T>
+  fullName: System.Collections.Sequence<T>
+  nameWithType.vb: Sequence(Of T)
+  fullName.vb: System.Collections.Sequence(Of T)
+  name.vb: Sequence(Of T)
+  spec.csharp:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections
+  commentId: N:System.Collections
+  isExternal: true
+  href: System.html
+  name: System.Collections
+  nameWithType: System.Collections
+  fullName: System.Collections
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: System.Collections.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: System.Collections.html
+- uid: System.Introspection.PropertyInfo.GetGetMethod*
+  commentId: Overload:System.Introspection.PropertyInfo.GetGetMethod
+  isExternal: true
+  href: System.Introspection.PropertyInfo.html#System_Introspection_PropertyInfo_GetGetMethod
+  name: GetGetMethod
+  nameWithType: PropertyInfo.GetGetMethod
+  fullName: System.Introspection.PropertyInfo.GetGetMethod
+- uid: System.Option{System.Introspection.MethodInfo}
+  commentId: T:System.Option{System.Introspection.MethodInfo}
+  parent: System
+  definition: System.Option`1
+  href: System.Introspection.MethodInfo.html
+  name: Option<MethodInfo>
+  nameWithType: Option<MethodInfo>
+  fullName: System.Option<System.Introspection.MethodInfo>
+  nameWithType.vb: Option(Of MethodInfo)
+  fullName.vb: System.Option(Of System.Introspection.MethodInfo)
+  name.vb: Option(Of MethodInfo)
+  spec.csharp:
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: <
+  - uid: System.Introspection.MethodInfo
+    name: MethodInfo
+    isExternal: true
+    href: System.Introspection.MethodInfo.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Introspection.MethodInfo
+    name: MethodInfo
+    isExternal: true
+    href: System.Introspection.MethodInfo.html
+  - name: )
+- uid: System.Option`1
+  commentId: T:System.Option`1
+  isExternal: true
+  name: Option<T>
+  nameWithType: Option<T>
+  fullName: System.Option<T>
+  nameWithType.vb: Option(Of T)
+  fullName.vb: System.Option(Of T)
+  name.vb: Option(Of T)
+  spec.csharp:
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Option`1
+    name: Option
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System.Introspection.PropertyInfo.GetSetMethod*
+  commentId: Overload:System.Introspection.PropertyInfo.GetSetMethod
+  isExternal: true
+  href: System.Introspection.PropertyInfo.html#System_Introspection_PropertyInfo_GetSetMethod
+  name: GetSetMethod
+  nameWithType: PropertyInfo.GetSetMethod
+  fullName: System.Introspection.PropertyInfo.GetSetMethod
+- uid: System.Introspection.PropertyInfo.PropertyType*
+  commentId: Overload:System.Introspection.PropertyInfo.PropertyType
+  isExternal: true
+  href: System.Introspection.PropertyInfo.html#System_Introspection_PropertyInfo_PropertyType
+  name: PropertyType
+  nameWithType: PropertyInfo.PropertyType
+  fullName: System.Introspection.PropertyInfo.PropertyType
+- uid: System.Introspection.TypeInfo
+  commentId: T:System.Introspection.TypeInfo
+  parent: System.Introspection
+  isExternal: true
+  href: System.Introspection.TypeInfo.html
+  name: TypeInfo
+  nameWithType: TypeInfo
+  fullName: System.Introspection.TypeInfo
+- uid: System.Introspection.PropertyInfo.IsStatic*
+  commentId: Overload:System.Introspection.PropertyInfo.IsStatic
+  isExternal: true
+  href: System.Introspection.PropertyInfo.html#System_Introspection_PropertyInfo_IsStatic
+  name: IsStatic
+  nameWithType: PropertyInfo.IsStatic
+  fullName: System.Introspection.PropertyInfo.IsStatic
+- uid: System.Introspection.PropertyInfo.CanRead*
+  commentId: Overload:System.Introspection.PropertyInfo.CanRead
+  isExternal: true
+  href: System.Introspection.PropertyInfo.html#System_Introspection_PropertyInfo_CanRead
+  name: CanRead
+  nameWithType: PropertyInfo.CanRead
+  fullName: System.Introspection.PropertyInfo.CanRead
+- uid: System.Introspection.PropertyInfo.CanWrite*
+  commentId: Overload:System.Introspection.PropertyInfo.CanWrite
+  isExternal: true
+  href: System.Introspection.PropertyInfo.html#System_Introspection_PropertyInfo_CanWrite
+  name: CanWrite
+  nameWithType: PropertyInfo.CanWrite
+  fullName: System.Introspection.PropertyInfo.CanWrite
+- uid: System.Introspection.PropertyInfo.DefinitionIndex*
+  commentId: Overload:System.Introspection.PropertyInfo.DefinitionIndex
+  isExternal: true
+  href: System.Introspection.PropertyInfo.html#System_Introspection_PropertyInfo_DefinitionIndex
+  name: DefinitionIndex
+  nameWithType: PropertyInfo.DefinitionIndex
+  fullName: System.Introspection.PropertyInfo.DefinitionIndex
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer

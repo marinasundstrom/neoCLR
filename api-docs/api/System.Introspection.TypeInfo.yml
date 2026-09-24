@@ -268,7 +268,7 @@ items:
     parameters:
     - id: flags
       type: System.Introspection.BindingFlags
-      description: Visibility, instance/static and declared/inherited selection flags.
+      description: Visibility and instance/static selection flags. Queries currently enumerate declarations only; inherited traversal is not implemented.
     return:
       type: System.Collections.Sequence{System.Introspection.FieldInfo}
       description: The matching member descriptors.
@@ -318,7 +318,7 @@ items:
     parameters:
     - id: flags
       type: System.Introspection.BindingFlags
-      description: Visibility, instance/static and declared/inherited selection flags.
+      description: Visibility and instance/static selection flags. Queries currently enumerate declarations only; inherited traversal is not implemented.
     return:
       type: System.Collections.Sequence{System.Introspection.MethodInfo}
       description: The matching member descriptors.
@@ -368,7 +368,7 @@ items:
     parameters:
     - id: flags
       type: System.Introspection.BindingFlags
-      description: Visibility, instance/static and declared/inherited selection flags.
+      description: Visibility and instance/static selection flags. Queries currently enumerate declarations only; inherited traversal is not implemented.
     return:
       type: System.Collections.Sequence{System.Introspection.PropertyInfo}
       description: The matching member descriptors.
@@ -986,6 +986,7 @@ references:
   commentId: T:System.Collections.Sequence{System.Introspection.FieldInfo}
   parent: System.Collections
   definition: System.Collections.Sequence`1
+  href: System.Introspection.FieldInfo.html
   name: Sequence<FieldInfo>
   nameWithType: Sequence<FieldInfo>
   fullName: System.Collections.Sequence<System.Introspection.FieldInfo>
@@ -1000,6 +1001,7 @@ references:
   - uid: System.Introspection.FieldInfo
     name: FieldInfo
     isExternal: true
+    href: System.Introspection.FieldInfo.html
   - name: '>'
   spec.vb:
   - uid: System.Collections.Sequence`1
@@ -1011,6 +1013,7 @@ references:
   - uid: System.Introspection.FieldInfo
     name: FieldInfo
     isExternal: true
+    href: System.Introspection.FieldInfo.html
   - name: )
 - uid: System.Introspection.BindingFlags
   commentId: T:System.Introspection.BindingFlags
@@ -1030,6 +1033,7 @@ references:
   commentId: T:System.Collections.Sequence{System.Introspection.MethodInfo}
   parent: System.Collections
   definition: System.Collections.Sequence`1
+  href: System.Introspection.MethodInfo.html
   name: Sequence<MethodInfo>
   nameWithType: Sequence<MethodInfo>
   fullName: System.Collections.Sequence<System.Introspection.MethodInfo>
@@ -1044,6 +1048,7 @@ references:
   - uid: System.Introspection.MethodInfo
     name: MethodInfo
     isExternal: true
+    href: System.Introspection.MethodInfo.html
   - name: '>'
   spec.vb:
   - uid: System.Collections.Sequence`1
@@ -1055,6 +1060,7 @@ references:
   - uid: System.Introspection.MethodInfo
     name: MethodInfo
     isExternal: true
+    href: System.Introspection.MethodInfo.html
   - name: )
 - uid: System.Introspection.TypeInfo.GetProperties*
   commentId: Overload:System.Introspection.TypeInfo.GetProperties
@@ -1067,6 +1073,7 @@ references:
   commentId: T:System.Collections.Sequence{System.Introspection.PropertyInfo}
   parent: System.Collections
   definition: System.Collections.Sequence`1
+  href: System.Introspection.PropertyInfo.html
   name: Sequence<PropertyInfo>
   nameWithType: Sequence<PropertyInfo>
   fullName: System.Collections.Sequence<System.Introspection.PropertyInfo>
@@ -1081,6 +1088,7 @@ references:
   - uid: System.Introspection.PropertyInfo
     name: PropertyInfo
     isExternal: true
+    href: System.Introspection.PropertyInfo.html
   - name: '>'
   spec.vb:
   - uid: System.Collections.Sequence`1
@@ -1092,6 +1100,7 @@ references:
   - uid: System.Introspection.PropertyInfo
     name: PropertyInfo
     isExternal: true
+    href: System.Introspection.PropertyInfo.html
   - name: )
 - uid: System.Introspection.TypeInfo.FullName*
   commentId: Overload:System.Introspection.TypeInfo.FullName

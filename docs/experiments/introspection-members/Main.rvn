@@ -1,0 +1,66 @@
+import System.*
+import System.Introspection.*
+import System.Collections.*
+import System.Option.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+func Same(left: Object, right: Object?) -> bool => left.Equals(right)
+func Hash(value: Object) -> int => value.GetHashCode()
+func Display(value: Object) -> string => value.ToString()
+
+func CheckMember(first: MemberInfo, repeated: MemberInfo) {
+    Check(!Object.ReferenceEquals(first, repeated), "Queries allocate distinct wrappers")
+    Check(Same(first, repeated) && Same(repeated, first), "Same declared member")
+    Check(!Same(first, null) && !Same(first, 42), "Reject null and non-members")
+    Check(Hash(first) == Hash(repeated), "Matching member hashes")
+    Check(Display(first) == first.Name, "Member display")
+}
+
+func Main() {
+    let description = typeof(Date)
+    let flags = BindingFlags.Instance | BindingFlags.NonPublic
+    let fieldInfo = description.GetFields(flags)[0]
+    let method = description.GetMethods()[0]
+    let property = description.GetProperties()[0]
+    CheckMember(fieldInfo, typeof(Date).GetFields(flags)[0])
+    CheckMember(method, typeof(Date).GetMethods()[0])
+    CheckMember(property, typeof(Date).GetProperties()[0])
+    Check(!Same(fieldInfo, method) && !Same(method, property) && !Same(property, fieldInfo), "Member kinds differ")
+
+    if let Some(getter) = property.GetGetMethod() {
+        var found = false
+        for candidate in description.GetMethods() {
+            if Same(getter, candidate) {
+                Check(Hash(getter) == Hash(candidate), "Accessor hash agrees with method query")
+                found = true
+            }
+        }
+        Check(found, "Accessor has the same identity as its method declaration")
+    } else {
+        System.Fault("Fixture property must have a public getter")
+    }
+
+    let members = HashMap<MemberInfo, int>((left, right) => Same(left, right), key => Hash(key))
+    Check(members.TryAdd(fieldInfo, 1) && members.TryAdd(method, 2) && members.TryAdd(property, 3), "Distinct member keys")
+    Check(!members.TryAdd(description.GetFields(flags)[0], 4), "Repeated fieldInfo key")
+    Check(!members.TryAdd(description.GetMethods()[0], 5), "Repeated method key")
+    Check(!members.TryAdd(description.GetProperties()[0], 6), "Repeated property key")
+    var n = 0
+    while n < 180 {
+        _ = typeof(Date)
+        n += 1
+    }
+    if let Some(value) = members.Find(typeof(Date).GetProperties()[0]) {
+        Check(value == 3 && members.Count == 3, "Lookup survives collection")
+    } else {
+        System.Fault("Member lookup failed after collection")
+    }
+    CheckMember(fieldInfo, typeof(Date).GetFields(flags)[0])
+    CheckMember(method, typeof(Date).GetMethods()[0])
+    Console.WriteLine("Member equality, hash, display and map lookup: passed")
+}

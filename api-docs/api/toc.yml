@@ -145,11 +145,20 @@ items:
   - uid: System.Introspection.AssemblyInfo
     name: AssemblyInfo
     type: Interface
+  - uid: System.Introspection.FieldInfo
+    name: FieldInfo
+    type: Interface
   - uid: System.Introspection.MemberInfo
     name: MemberInfo
     type: Interface
+  - uid: System.Introspection.MethodInfo
+    name: MethodInfo
+    type: Interface
   - uid: System.Introspection.ModuleInfo
     name: ModuleInfo
+    type: Interface
+  - uid: System.Introspection.PropertyInfo
+    name: PropertyInfo
     type: Interface
   - uid: System.Introspection.TypeInfo
     name: TypeInfo

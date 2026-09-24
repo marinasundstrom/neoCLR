@@ -756,8 +756,10 @@ consumer case. That slice now passes through existing HashMap callbacks. The
 [wider audit](object-model-review.md#path-integration-and-wider-library-audit--2026-09-24)
 confirmed the RuntimeTypeInfo mismatch. The author-directed introspection slice
 now aligns represented-type equality/hash/display, with GC-tested map reuse.
-AssemblyInfo/ModuleInfo now use scoped catalog equality/hash/display; member and parameter equality
-requires explicit declaring-owner checks. Keep Equatable<T>.Equals(T) explicit;
+AssemblyInfo/ModuleInfo now use scoped catalog equality/hash/display. Field, method
+and property equality includes descriptor kind, closed declaring owner and definition
+index. Parameter ownership remains the next bounded investigation. Keep
+Equatable<T>.Equals(T) explicit;
 nullable value operands are not introduced by equality contracts. Other descriptor
 identities remain design work. Broader primitive,
 formatting and default-comparer coverage remains incremental; do not imply universal

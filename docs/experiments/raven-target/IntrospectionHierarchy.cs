@@ -23,7 +23,7 @@ static class IntrospectionHierarchy
         // C# marks inherited implicit interface implementations virtual/final.
         // Raven keeps these shared storage accessors ordinary methods; only the
         // concrete leaves implement the public interfaces.
-        foreach (var method in module.GetType(Prefix + "RuntimeMemberInfo").Methods.Where(m => !m.IsConstructor))
+        foreach (var method in module.GetType(Prefix + "RuntimeMemberInfo").Methods.Where(m => m.IsGetter))
         {
             method.IsVirtual = false;
             method.IsFinal = false;

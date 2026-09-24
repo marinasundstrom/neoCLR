@@ -960,3 +960,12 @@ the bounded library hash uses FullName and can collide across distinct definitio
 The introspection fixture exercises generic/array shapes and boxed GetType under GC
 pressure. Typed TypeInfo/Equatable operands stay non-nullable. No compiler code changes
 are needed, and other descriptor identity contracts remain open.
+
+Assembly/module wrappers now use their scoped catalog keys. Field/method/property
+wrappers use kind, closed declaring type and definition index, with Name display.
+The shared member-base reference projection normalizes virtual flags only on getters,
+so explicit Object overrides retain dispatch metadata. Its closed hierarchy and native
+field layouts are unchanged. Runtime Contract configuration and Raven compiler behavior
+are unchanged; the member fixture checks reference imports, inherited Object display,
+generic owner distinctions and map retention. Parameter ownership and reflected-context
+semantics remain open, and member queries currently enumerate declarations only.

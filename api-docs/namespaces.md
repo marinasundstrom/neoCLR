@@ -55,4 +55,4 @@ imposing nullable value types. Path now supplies that contract and Object overri
 
 ## System.Introspection
 
-[TypeInfo](xref:System.Introspection.TypeInfo) and [MemberInfo](xref:System.Introspection.MemberInfo) describe types and metadata. [AssemblyInfo](xref:System.Introspection.AssemblyInfo) and [ModuleInfo](xref:System.Introspection.ModuleInfo) describe the loaded catalog. See [descriptor identity](introspection.md) for Object behavior and remaining descriptor coverage.
+[TypeInfo](xref:System.Introspection.TypeInfo) and [MemberInfo](xref:System.Introspection.MemberInfo) describe types and metadata. [AssemblyInfo](xref:System.Introspection.AssemblyInfo) and [ModuleInfo](xref:System.Introspection.ModuleInfo) describe the loaded catalog. [FieldInfo](xref:System.Introspection.FieldInfo), [MethodInfo](xref:System.Introspection.MethodInfo) and [PropertyInfo](xref:System.Introspection.PropertyInfo) describe declarations. See [descriptor identity](introspection.md) for Object behavior and remaining descriptor coverage.

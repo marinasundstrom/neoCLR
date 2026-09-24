@@ -1,0 +1,1 @@
+Member equality, hash, display and map lookup: passed

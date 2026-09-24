@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Align field, method and property descriptor Object equality with kind, closed
+  declaring type and definition index, with consistent hashes and Name display.
+  Preserve Object overrides when projecting the shared descriptor base metadata.
+  Add generated API coverage and document declaration-only queries; inherited
+  traversal and parameter owner identity remain unimplemented. Add focused member
+  identity and map/GC validation, reclaiming all 785 objects over ten collections;
+  hashes and indexes are not persistent identities.
+
 - Give AssemblyInfo and ModuleInfo wrappers scoped catalog equality, consistent
   Object hashing and assembly/module display names. Equal descriptors may remain
   distinct allocations; full assembly identity and module scope are required, not
@@ -21,7 +29,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Keep Equals(TypeInfo) non-nullable and Object.Equals(Object?) explicitly null-aware.
   Validate repeated, generic and array descriptors, typeof/GetType agreement and
   HashMap use under collection pressure. Add browsable TypeInfo/MemberInfo API
-  reference and website guidance. Member/parameter equality remains
+  reference and website guidance. Parameter ownership remains
   separate work; hashes are neither unique nor persistent identifiers. Validation:
   the fixture reclaims all 422 managed objects across ten collections; three
   descriptor regressions and the Object reachability regression pass.
