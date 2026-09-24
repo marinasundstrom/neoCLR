@@ -23,7 +23,7 @@ static class InterfaceBindings
         var element = parameterMap?.Invoke(g.GenericArguments[0]) ?? ReflectionBindings.Type(g.GenericArguments[0]) ?? GenericUnionBindings.Type(g.GenericArguments[0]);
         return element is null ? null : name + "<" + element + ">";
     }
-    public static bool Converts(string source, string target) => (source == "System.Storage.Path" && target == "System.Equatable<System.Storage.Path>") || (source == ReaderBindings.Stream && target == ReaderBindings.Reader || source == ReaderBindings.StreamWriter && target == ReaderBindings.Writer) || source == FileSystemBindings.Name && target == StorageProviderBindings.Name || StorageItemBindings.Assignable(source, target) || StreamBindings.Assignable(source, target) || source == "String" && target == "System.Collections.Iterable<Char>" || IsInterface(target)
+    public static bool Converts(string source, string target) => (source == "System.Storage.Path" && target == "System.Equatable<System.Storage.Path>") || (source == ReaderBindings.Stream && target == ReaderBindings.Reader || source == ReaderBindings.StreamWriter && target == ReaderBindings.Writer) || source == FileSystemBindings.Name && target == StorageProviderBindings.Name || StorageItemBindings.Assignable(source, target) || StreamBindings.Assignable(source, target) || (source == "String" && target is "System.Collections.Iterable<Char>" or "System.Collections.Collection<Char>" or "System.Collections.Sequence<Char>") || IsInterface(target)
         && (source == "System.Object" || source == "String" || ReflectionBindings.IsReference(source) || CalendarBindings.IsReference(source));
     public static string Convert(string source, string target) => Converts(source,target) ? "castclass " + target + "\n" : "";
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
@@ -71,7 +71,7 @@ static class InterfaceBindings
             source = source.Replace("public struct " + name + " {", "public struct " + name + " : Comparable<" + name + ">" + (name == "Int32" ? ", Equatable<Int32>" : "") + " {");
         foreach (var name in new[]{"Date","Time","Instant","Duration"})
             source = source.Replace("public struct " + name + " {", "public struct " + name + " : Comparable<" + name + ">, Equatable<" + name + "> {");
-        source = source.Replace("public sealed class String {", "public sealed class String : Equatable<String>, Collections.Iterable<char> {");
+        source = source.Replace("public sealed class String {", "public sealed class String : Equatable<String>, Collections.Sequence<char> {");
         source = source.Replace("public class Type {", "public class Type : Equatable<Type> {");
         return source;
     }

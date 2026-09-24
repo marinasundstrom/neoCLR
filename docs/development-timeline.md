@@ -6247,3 +6247,28 @@ the plan, and clarified that the API need not copy .NET directly: improvements a
 welcome where appropriate. **Assistant:** Recorded casing, culture/Unicode behavior,
 comparison/hash consistency and compatibility tradeoffs as design questions; no
 implementation commitment beyond future text work was inferred.
+
+## 2026-09-24 — String construction and explicit Count
+
+**Author:** Asked for `String(['F', 'o', 'o'])`, suggested Sequence<char> as the
+parameter and a contract String would naturally implement, then proposed explicitly
+implementing Count so it appears through Sequence<char>.
+
+**Assistant action:** Added sequence construction, public grapheme indexing and
+explicit Collection.Count while retaining public Length. The
+[sample](experiments/string-sequence/README.md) compiles and runs, verifies immutable
+copies and Unicode boundaries, and rejects direct Count/index mutation. Recorded the
+installed compiler's direct empty-literal emission limitation; a typed empty char
+array works. API reference and integration documentation accompany the change.
+
+**Author follow-up:** Asked whether an Iterable<char> overload should take count.
+**Assistant proposal:** Count is useful for allocation but not essential; a growable
+buffer could consume an iterator. Keep Sequence in this slice and revisit Iterable
+with buffering/limits. An explicit count needs a precise meaning. No author decision
+on that future overload is recorded, and no such overload was implemented.
+
+**Author decision:** Avoid defining contracts prematurely. After the semantics slices,
+implement APIs and behaviors as needed for real cases, considering the case first;
+some choices are inexpensive to change. **Assistant action:** Recorded this development
+policy in the authoritative roadmap. Iterable construction remains undecided, rather
+than a selected future overload.

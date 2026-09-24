@@ -57,7 +57,11 @@ not synthetic CLI types. The Rust-only StringValue payload and owned-text migrat
 are documented in the [Object guide](objects.md#rust-host-string-payloads) and source
 rustdoc; StringValue is not a guest CLI type selected for RavenDoc.
 
-Remaining coverage gaps are not exemptions: arrays/collections, delegates, query
+Sequence, Collection, Iterable and Iterator now have generated reference coverage,
+including String construction and its read-only grapheme indexer. String Count is
+an explicit Collection implementation, visible through Sequence/Collection only.
+
+Remaining coverage gaps are not exemptions: arrays/remaining collections, delegates, query
 operators, Option/Result and TaskOutcome helpers, primitives/text/encoding/process,
 time/calendar and remaining public resource/interop contracts need reference coverage
 as developed. `namespaces.md` inventories implemented APIs; do not add proposed

@@ -1,26 +1,133 @@
 ; Generated from runtime/raven/src/System/String.rvn. Regenerate with build_runtime_library.py.
 .type System.String
 .implements System.Equatable<String>
+.implements System.Collections.Sequence<Char>
+.implements System.Collections.Collection<Char>
 .implements System.Collections.Iterable<Char>
+.property instance Metadata_V1_53797374656D2E436F6C6C656374696F6E732E436F6C6C656374696F6E60312E436F756E74() -> Int32
+.get instance System.String::CollectionCount()
+.end
+.property instance Item(Int32) -> Char
+.get instance System.String::get_Item(Int32)
+.end
 .property instance Length() -> Int32
 .get instance System.String::get_Length()
 .end
 .property instance IsEmpty() -> Boolean
 .get instance System.String::get_IsEmpty()
 .end
-.method static Concat(String left,String right) -> String
+.method internal static CreateFromCharacters(System.Collections.Sequence<Char> value0) -> String
+.local Int32 local0
+.local arrayref<Char> local1
+.local System.Collections.Iterator<Char> local2
+.local Int32 local3
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj arrayref<Char>
+ldloca local2
+initobj System.Collections.Iterator<Char>
+ldc.i4 0
+stloc local3
 M00000001_IL_0000:
 M00000001_IL_0001:
 M00000001_IL_0002:
 ldarg 0
 M00000001_IL_0003:
-ldarg 1
-M00000001_IL_0004:
-call neoCLR.Runtime.StringConcat(String,String)
+callvirt instance System.Collections.Collection<Char>::get_Count()
+M00000001_IL_0008:
+stloc local0
 M00000001_IL_0009:
+M00000001_IL_000a:
+ldloc local0
+M00000001_IL_000b:
+array.reserve Char
+M00000001_IL_0010:
+stloc local1
+M00000001_IL_0011:
+M00000001_IL_0012:
+ldarg 0
+M00000001_IL_0013:
+callvirt instance System.Collections.Iterable<Char>::GetIterator()
+M00000001_IL_0018:
+stloc local2
+M00000001_IL_0019:
+M00000001_IL_001a:
+ldc.i4 0
+M00000001_IL_001b:
+stloc local3
+M00000001_IL_001c:
+M00000001_IL_001d:
+M00000001_IL_001e:
+ldloc local2
+M00000001_IL_001f:
+callvirt instance System.Collections.Iterator<Char>::MoveNext()
+call neoCLR.Library.System.String.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0024:
+brtrue M00000001_IL_002e
+M00000001_IL_0029:
+br M00000001_IL_0046
+M00000001_IL_002e:
+M00000001_IL_002f:
+ldloc local1
+M00000001_IL_0030:
+ldloc local3
+M00000001_IL_0031:
+ldloc local2
+M00000001_IL_0032:
+callvirt instance System.Collections.Iterator<Char>::get_Current()
+M00000001_IL_0037:
+stelem Char
+M00000001_IL_003c:
+M00000001_IL_003d:
+ldloc local3
+M00000001_IL_003e:
+ldc.i4 1
+M00000001_IL_003f:
+add
+M00000001_IL_0040:
+stloc local3
+M00000001_IL_0041:
+br M00000001_IL_001d
+M00000001_IL_0046:
+M00000001_IL_0047:
+M00000001_IL_0048:
+ldloc local2
+M00000001_IL_0049:
+callvirt instance System.Disposable::Dispose()
+M00000001_IL_004e:
+M00000001_IL_004f:
+ldloc local3
+M00000001_IL_0050:
+ldloc local0
+M00000001_IL_0051:
+ceq
+call neoCLR.Library.System.String.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0053:
+ldc.i4 0
+M00000001_IL_0054:
+ceq
+call neoCLR.Library.System.String.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0056:
+brtrue M00000001_IL_0060
+M00000001_IL_005b:
+br M00000001_IL_006b
+M00000001_IL_0060:
+M00000001_IL_0061:
+ldstr "Character sequence count changed during construction"
+M00000001_IL_0066:
+call System.Fault(String)
+M00000001_IL_006b:
+M00000001_IL_006c:
+M00000001_IL_006d:
+ldloc local1
+M00000001_IL_006e:
+call neoCLR.Runtime.StringFromChars(arrayref<Char>)
+M00000001_IL_0073:
 ret
 .end
-.method instance readonly byref Equals(String other) -> Boolean
+.method private instance readonly byref CollectionCount() -> Int32
+.override instance System.Collections.Collection<Char>::get_Count()
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
@@ -28,43 +135,37 @@ ldarg 0
 M00000002_IL_0003:
 ldobj String
 M00000002_IL_0008:
-ldarg 1
-M00000002_IL_0009:
-ceq
-call neoCLR.Library.System.String.RuntimeBooleanToInt32(Boolean)
-M00000002_IL_000e:
-call neoCLR.Library.System.String.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Runtime.StringGraphemeCount(String)
+M00000002_IL_000d:
 ret
 .end
-.method static CompareOrdinal(String left,String right) -> Int32
+.method instance readonly byref get_Item(Int32 index) -> Char
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
 ldarg 0
 M00000003_IL_0003:
+ldobj String
+M00000003_IL_0008:
 ldarg 1
-M00000003_IL_0004:
-call neoCLR.Runtime.StringCompareOrdinal(String,String)
 M00000003_IL_0009:
+call neoCLR.Runtime.StringGraphemeAt(String,Int32)
+M00000003_IL_000e:
 ret
 .end
-.method instance readonly byref ContainsOrdinal(String value) -> Boolean
+.method static Concat(String left,String right) -> String
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
 ldarg 0
 M00000004_IL_0003:
-ldobj String
-M00000004_IL_0008:
 ldarg 1
+M00000004_IL_0004:
+call neoCLR.Runtime.StringConcat(String,String)
 M00000004_IL_0009:
-call neoCLR.Runtime.StringContainsOrdinal(String,String)
-call neoCLR.Library.System.String.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_000e:
-call neoCLR.Library.System.String.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance readonly byref StartsWithOrdinal(String value) -> Boolean
+.method instance readonly byref Equals(String other) -> Boolean
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -74,54 +175,57 @@ ldobj String
 M00000005_IL_0008:
 ldarg 1
 M00000005_IL_0009:
-call neoCLR.Runtime.StringStartsWithOrdinal(String,String)
+ceq
 call neoCLR.Library.System.String.RuntimeBooleanToInt32(Boolean)
 M00000005_IL_000e:
 call neoCLR.Library.System.String.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance readonly byref EndsWithOrdinal(String value) -> Boolean
+.method static CompareOrdinal(String left,String right) -> Int32
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
 ldarg 0
 M00000006_IL_0003:
-ldobj String
-M00000006_IL_0008:
 ldarg 1
+M00000006_IL_0004:
+call neoCLR.Runtime.StringCompareOrdinal(String,String)
 M00000006_IL_0009:
-call neoCLR.Runtime.StringEndsWithOrdinal(String,String)
-call neoCLR.Library.System.String.RuntimeBooleanToInt32(Boolean)
-M00000006_IL_000e:
-call neoCLR.Library.System.String.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetUtf8ByteCount() -> Int32
+.method instance readonly byref ContainsOrdinal(String value) -> Boolean
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
 ldarg 0
 M00000007_IL_0003:
+ldobj String
 M00000007_IL_0008:
-call neoCLR.Runtime.StringByteCount(String)
-M00000007_IL_000d:
+ldarg 1
+M00000007_IL_0009:
+call neoCLR.Runtime.StringContainsOrdinal(String,String)
+call neoCLR.Library.System.String.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_000e:
+call neoCLR.Library.System.String.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance get_Length() -> Int32
+.method instance readonly byref StartsWithOrdinal(String value) -> Boolean
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:
 ldarg 0
 M00000008_IL_0003:
+ldobj String
 M00000008_IL_0008:
-call neoCLR.Runtime.StringGraphemeCount(String)
-M00000008_IL_000d:
+ldarg 1
+M00000008_IL_0009:
+call neoCLR.Runtime.StringStartsWithOrdinal(String,String)
+call neoCLR.Library.System.String.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_000e:
+call neoCLR.Library.System.String.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance readonly byref GetIterator() -> System.Collections.Iterator<Char>
-.local arrayref<Char> local0
-ldloca local0
-initobj arrayref<Char>
+.method instance readonly byref EndsWithOrdinal(String value) -> Boolean
 M00000009_IL_0000:
 M00000009_IL_0001:
 M00000009_IL_0002:
@@ -129,40 +233,81 @@ ldarg 0
 M00000009_IL_0003:
 ldobj String
 M00000009_IL_0008:
-call neoCLR.Library.System.String.RuntimeServiceStringGraphemes(String)
-M00000009_IL_000d:
-stloc local0
+ldarg 1
+M00000009_IL_0009:
+call neoCLR.Runtime.StringEndsWithOrdinal(String,String)
+call neoCLR.Library.System.String.RuntimeBooleanToInt32(Boolean)
 M00000009_IL_000e:
-M00000009_IL_000f:
-ldloc local0
-M00000009_IL_0010:
-callvirt instance System.Collections.Iterable<Char>::GetIterator()
-M00000009_IL_0015:
+call neoCLR.Library.System.String.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetScalars() -> System.Collections.Sequence<UInt32>
+.method instance GetUtf8ByteCount() -> Int32
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 M0000000a_IL_0002:
 ldarg 0
 M0000000a_IL_0003:
 M0000000a_IL_0008:
-call neoCLR.Library.System.String.RuntimeServiceStringScalars(String)
+call neoCLR.Runtime.StringByteCount(String)
 M0000000a_IL_000d:
 ret
 .end
-.method instance get_IsEmpty() -> Boolean
+.method instance get_Length() -> Int32
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 M0000000b_IL_0002:
 ldarg 0
 M0000000b_IL_0003:
 M0000000b_IL_0008:
-ldstr ""
+call neoCLR.Runtime.StringGraphemeCount(String)
 M0000000b_IL_000d:
+ret
+.end
+.method instance readonly byref GetIterator() -> System.Collections.Iterator<Char>
+.local arrayref<Char> local0
+ldloca local0
+initobj arrayref<Char>
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+ldobj String
+M0000000c_IL_0008:
+call neoCLR.Library.System.String.RuntimeServiceStringGraphemes(String)
+M0000000c_IL_000d:
+stloc local0
+M0000000c_IL_000e:
+M0000000c_IL_000f:
+ldloc local0
+M0000000c_IL_0010:
+callvirt instance System.Collections.Iterable<Char>::GetIterator()
+M0000000c_IL_0015:
+ret
+.end
+.method instance GetScalars() -> System.Collections.Sequence<UInt32>
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
+ldarg 0
+M0000000d_IL_0003:
+M0000000d_IL_0008:
+call neoCLR.Library.System.String.RuntimeServiceStringScalars(String)
+M0000000d_IL_000d:
+ret
+.end
+.method instance get_IsEmpty() -> Boolean
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+M0000000e_IL_0002:
+ldarg 0
+M0000000e_IL_0003:
+M0000000e_IL_0008:
+ldstr ""
+M0000000e_IL_000d:
 ceq
 call neoCLR.Library.System.String.RuntimeBooleanToInt32(Boolean)
-M0000000b_IL_0012:
+M0000000e_IL_0012:
 call neoCLR.Library.System.String.RuntimeBooleanFromInt32(Int32)
 ret
 .end
@@ -171,112 +316,112 @@ ret
 .local Byte local1
 ldc.i4 0
 stloc local1
-M0000000c_IL_0000:
-M0000000c_IL_0001:
-M0000000c_IL_0002:
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+M0000000f_IL_0002:
 ldarg 0
-M0000000c_IL_0003:
-M0000000c_IL_0008:
+M0000000f_IL_0003:
+M0000000f_IL_0008:
 ldarg 1
-M0000000c_IL_0009:
+M0000000f_IL_0009:
 ldarg 2
-M0000000c_IL_000a:
+M0000000f_IL_000a:
 call neoCLR.Runtime.StringSliceUtf8(String,Int32,Int32)
-M0000000c_IL_000f:
+M0000000f_IL_000f:
 stloc local0
-M0000000c_IL_0010:
-M0000000c_IL_0011:
+M0000000f_IL_0010:
+M0000000f_IL_0011:
 ldloc local0
-M0000000c_IL_0012:
+M0000000f_IL_0012:
 value.is String
 call neoCLR.Library.System.String.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_0017:
-brtrue M0000000c_IL_0021
-M0000000c_IL_001c:
-br M0000000c_IL_0033
-M0000000c_IL_0021:
-M0000000c_IL_0022:
+M0000000f_IL_0017:
+brtrue M0000000f_IL_0021
+M0000000f_IL_001c:
+br M0000000f_IL_0033
+M0000000f_IL_0021:
+M0000000f_IL_0022:
 ldloc local0
-M0000000c_IL_0023:
+M0000000f_IL_0023:
 value.unpack String
-M0000000c_IL_0028:
+M0000000f_IL_0028:
 call neoCLR.Library.System.String.RuntimeUnion0(String)
-M0000000c_IL_002d:
+M0000000f_IL_002d:
 call neoCLR.Library.System.String.RuntimeUnion1(System.Result.Ok<String>)
-M0000000c_IL_0032:
+M0000000f_IL_0032:
 ret
-M0000000c_IL_0033:
-M0000000c_IL_0034:
-M0000000c_IL_0035:
+M0000000f_IL_0033:
+M0000000f_IL_0034:
+M0000000f_IL_0035:
 ldloc local0
-M0000000c_IL_0036:
+M0000000f_IL_0036:
 value.unpack Byte
-M0000000c_IL_003b:
+M0000000f_IL_003b:
 stloc local1
-M0000000c_IL_003c:
-M0000000c_IL_003d:
+M0000000f_IL_003c:
+M0000000f_IL_003d:
 ldloc local1
-M0000000c_IL_003e:
+M0000000f_IL_003e:
 conv.i4
-M0000000c_IL_003f:
+M0000000f_IL_003f:
 ldc.i4 1
-M0000000c_IL_0040:
+M0000000f_IL_0040:
 ceq
 call neoCLR.Library.System.String.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_0042:
-brtrue M0000000c_IL_004c
-M0000000c_IL_0047:
-br M0000000c_IL_0061
-M0000000c_IL_004c:
+M0000000f_IL_0042:
+brtrue M0000000f_IL_004c
+M0000000f_IL_0047:
+br M0000000f_IL_0061
+M0000000f_IL_004c:
 call neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorOutOfRangeNew()
-M0000000c_IL_0051:
+M0000000f_IL_0051:
 call neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorNewSystemTextUtf8SliceErrorOutOfRange(System.Text.Utf8SliceError.OutOfRange)
-M0000000c_IL_0056:
+M0000000f_IL_0056:
 call neoCLR.Library.System.String.RuntimeUnion2(System.Text.Utf8SliceError)
-M0000000c_IL_005b:
+M0000000f_IL_005b:
 call neoCLR.Library.System.String.RuntimeUnion3(System.Result.Error<System.Text.Utf8SliceError>)
-M0000000c_IL_0060:
+M0000000f_IL_0060:
 ret
-M0000000c_IL_0061:
-M0000000c_IL_0062:
-M0000000c_IL_0063:
+M0000000f_IL_0061:
+M0000000f_IL_0062:
+M0000000f_IL_0063:
 ldloc local1
-M0000000c_IL_0064:
+M0000000f_IL_0064:
 conv.i4
-M0000000c_IL_0065:
+M0000000f_IL_0065:
 ldc.i4 2
-M0000000c_IL_0066:
+M0000000f_IL_0066:
 ceq
 call neoCLR.Library.System.String.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_0068:
-brtrue M0000000c_IL_0072
-M0000000c_IL_006d:
-br M0000000c_IL_0087
-M0000000c_IL_0072:
+M0000000f_IL_0068:
+brtrue M0000000f_IL_0072
+M0000000f_IL_006d:
+br M0000000f_IL_0087
+M0000000f_IL_0072:
 call neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorInvalidBoundaryNew()
-M0000000c_IL_0077:
+M0000000f_IL_0077:
 call neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorNewSystemTextUtf8SliceErrorInvalidBoundary(System.Text.Utf8SliceError.InvalidBoundary)
-M0000000c_IL_007c:
+M0000000f_IL_007c:
 call neoCLR.Library.System.String.RuntimeUnion2(System.Text.Utf8SliceError)
-M0000000c_IL_0081:
+M0000000f_IL_0081:
 call neoCLR.Library.System.String.RuntimeUnion3(System.Result.Error<System.Text.Utf8SliceError>)
-M0000000c_IL_0086:
+M0000000f_IL_0086:
 ret
-M0000000c_IL_0087:
-M0000000c_IL_0088:
-M0000000c_IL_0089:
+M0000000f_IL_0087:
+M0000000f_IL_0088:
+M0000000f_IL_0089:
 ldstr "invalid native UTF-8 slice status"
-M0000000c_IL_008e:
+M0000000f_IL_008e:
 call System.Fault(String)
-M0000000c_IL_0093:
+M0000000f_IL_0093:
 call neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorOutOfRangeNew()
-M0000000c_IL_0098:
+M0000000f_IL_0098:
 call neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorNewSystemTextUtf8SliceErrorOutOfRange(System.Text.Utf8SliceError.OutOfRange)
-M0000000c_IL_009d:
+M0000000f_IL_009d:
 call neoCLR.Library.System.String.RuntimeUnion2(System.Text.Utf8SliceError)
-M0000000c_IL_00a2:
+M0000000f_IL_00a2:
 call neoCLR.Library.System.String.RuntimeUnion3(System.Result.Error<System.Text.Utf8SliceError>)
-M0000000c_IL_00a7:
+M0000000f_IL_00a7:
 ret
 .end
 .end

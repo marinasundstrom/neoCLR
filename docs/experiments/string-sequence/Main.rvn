@@ -1,0 +1,35 @@
+import System.*
+import System.Collections.*
+
+func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fault(message)
+    }
+}
+
+func Main() {
+    let text = String(['F', 'o', 'o'])
+    Check(text == "Foo", "Character array construction")
+
+    let characters: char[] = ['F', 'o', 'o']
+    let copied = String(characters)
+    characters[0] = 'B'
+    Check(copied == "Foo" && String(characters) == "Boo", "Independent immutable result")
+
+    let sequence: Sequence<char> = text
+    Check(sequence.Count == text.Length && sequence[1] == 'o', "Read-only String sequence")
+    Check(String(sequence) == text, "String sequence construction")
+    let empty: char[] = []
+    Check(String(empty) == "", "Empty sequence")
+
+    let emoji = Char.FromString("👩‍💻")
+    let graphemes: char[] = [Char.FromString("é"), emoji]
+    let unicode = String(graphemes)
+    Check(unicode == "é👩‍💻" && unicode.Length == 2, "Grapheme construction")
+    Check(unicode[1] == emoji, "Grapheme index")
+    let merging: char[] = ['e', Char.FromString("́")]
+    Check(String(merging).Length == 1, "Grapheme boundaries can merge")
+
+    Console.WriteLine(text)
+    Console.WriteLine("String Sequence construction, indexing and copying: passed")
+}

@@ -1,4 +1,4 @@
 {
   "M:System.Concurrency.ThreadPool.#ctor": "Reference-only scaffold constructor; ThreadPool is a static service, not application-constructible.",
-  "M:System.String.#ctor": "Reference-only scaffold constructor; intrinsic String is created through literals and text APIs, not application construction. See /docs/objects.html#string-through-object-development."
+  "M:System.String.#ctor": "Reference-only parameterless scaffold constructor. Use String(Sequence<Char>), literals or text APIs. See /docs/objects.html#string-through-object-development."
 }

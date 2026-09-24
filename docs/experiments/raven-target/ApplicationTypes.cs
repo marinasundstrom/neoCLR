@@ -141,9 +141,9 @@ static class ApplicationTypes
             foreach (var method in type.Methods.Where(m => !m.IsStatic && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && (OpaqueLibrary.IsOmittedConstructor(m) || ArrayLibrary.OmitConstructor(m) || EmptyLibrary.OmitConstructor(m) || (ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)))))
             {
                 CheckMethod(method);
-                if (method.Overrides.Any(o => !method.IsPublic || o.Name != method.Name || o.DeclaringType.Resolve()?.IsInterface != true
+                if (!OpaqueLibrary.IsExplicitStringCount(method) && (method.Overrides.Any(o => !method.IsPublic || o.Name != method.Name || o.DeclaringType.Resolve()?.IsInterface != true
                     || !o.Parameters.Select(p => map(RuntimeSignatures.Close(p.ParameterType, o.DeclaringType, allowOpenMethodParameters: LibraryNames.ContainsKey(type)), false)).SequenceEqual(method.Parameters.Select(p => map(p.ParameterType, false)))
-                    || map(RuntimeSignatures.Close(o.ReturnType, o.DeclaringType, allowOpenMethodParameters: LibraryNames.ContainsKey(type)), true) != map(method.ReturnType, true)) || method.IsFinal && !method.IsNewSlot) throw new InvalidDataException("Explicit implementations and sealed overrides are not admitted yet.");
+                    || map(RuntimeSignatures.Close(o.ReturnType, o.DeclaringType, allowOpenMethodParameters: LibraryNames.ContainsKey(type)), true) != map(method.ReturnType, true)) || method.IsFinal && !method.IsNewSlot)) throw new InvalidDataException("Explicit implementations and sealed overrides are not admitted yet.");
                 foreach (var parameter in method.Parameters) map(parameter.ParameterType, false);
                 map(method.ReturnType, true);
                 if (type.IsInterface)
@@ -159,6 +159,7 @@ static class ApplicationTypes
         method.IsVirtual && !method.IsFinal ? (method.IsNewSlot ? "virtual " : "override ") : "";
     public static string MethodName(MethodDefinition method)
     {
+        if (OpaqueLibrary.IsExplicitStringCount(method)) return "CollectionCount";
         if (method.IsConstructor) return ".ctor";
         return MetadataIdentity.MemberName(method.Name);
     }

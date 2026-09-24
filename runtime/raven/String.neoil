@@ -1,2 +1,9 @@
 .include "generated/String.methods.neoil"
 .include "generated/String.helpers.neoil"
+
+; Constructor transport: the implementation stays internal to the System library.
+.function neoCLR.Runtime.StringFromSequence(System.Collections.Sequence<Char> value) -> String
+ldarg value
+call System.String::CreateFromCharacters(System.Collections.Sequence<Char>)
+ret
+.end

@@ -474,10 +474,15 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             .type_definition(owner)
             .ok_or_else(|| Fault::new("unknown explicit implementation owner"))?;
         let interface_owner = definition.representation == Representation::Interface;
+        // Intrinsic String supplies readonly IL members over its text payload.
+        let string_owner = *owner == Type::String
+            && definition.representation == Representation::Runtime
+            && body.receiver_readonly;
         if !matches!(
             definition.representation,
             Representation::Record | Representation::Interface
-        ) || !body.instance
+        ) && !string_owner
+            || !body.instance
             || !body.receiver_byref
             || body.visibility != Visibility::Private
             || (body.is_virtual && !interface_owner)
@@ -488,7 +493,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             || body.pinvoke.is_some()
         {
             return Err(Fault::new(
-                "explicit implementations require private concrete managed IL record methods",
+                "explicit implementations require private concrete managed IL record or readonly String methods",
             ));
         }
         for target in &body.interface_implementations {

@@ -130,3 +130,22 @@ concrete benefit justifies the compatibility cost. Culture selection, Unicode ca
 (including length changes), ordering and equality/hash consistency need explicit
 choices and tests. Additional casing/comparison APIs remain planned; the existing
 bounded ordinal helpers retain their current contract.
+
+## Constructing and indexing text (development)
+
+```raven
+let text = String(['F', 'o', 'o'])
+let characters: Sequence<char> = text
+Console.WriteLine(text)
+```
+
+With `System.*` and `System.Collections.*` imported, arrays and String can supply
+`Sequence<char>`. Construction copies the characters into immutable text. String has
+public Length and a read-only indexer (`text[1]` is `'o'`); Count is available only
+through Collection/Sequence. Indexes refer to graphemes, unlike .NET's UTF-16 code
+units. Length and indexing currently scan the text.
+
+The input must stay stable during construction. No normalization is performed, but
+adjacent characters can merge into a grapheme: output Length can differ from input
+Count. Empty input currently requires a typed empty char array. See the
+[String API](xref:System.String) and [Sequence contract](xref:System.Collections.Sequence`1).

@@ -8,7 +8,8 @@ toc: false
 contracts. They may precede a downloadable release. In particular, the development
 `System.Concurrency` APIs replace the `System.Threading` names in Preview 9 bundles.
 
-[String](xref:System.String) documents exact text comparison, graphemes and explicit
+[String](xref:System.String) documents construction from [Sequence&lt;Char&gt;](xref:System.Collections.Sequence`1),
+read-only grapheme indexing, exact text comparison and explicit
 UTF-8 operations, with [Object content behavior](objects.md#string-through-object-development).
 
 [Char](xref:System.Char) now has a generated type/member reference for grapheme

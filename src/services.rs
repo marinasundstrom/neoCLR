@@ -121,6 +121,8 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::CharCategory => RuntimeService::CharacterClassification,
             crate::native::Binding::Utf8Encode
             | crate::native::Binding::Utf8Decode
+            | crate::native::Binding::StringFromChars
+            | crate::native::Binding::StringGraphemeAt
             | crate::native::Binding::StringConcat
             | crate::native::Binding::StringCompareOrdinal
             | crate::native::Binding::StringContainsOrdinal
@@ -153,6 +155,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
                 | crate::native::Binding::EnvironmentArguments
                 | crate::native::Binding::Utf8Encode
                 | crate::native::Binding::Utf8Decode
+                | crate::native::Binding::StringFromChars
         ) {
             uses.push(ServiceUse {
                 service: RuntimeService::ManagedArrays,

@@ -1022,3 +1022,19 @@ virtual/final metadata flags. Focused .NET unit/array interface tests passed.
 All bootstrap slices regenerated successfully with unchanged emitted `.neoil`
 fragments; source/compiler/reference fingerprints changed. The 14 carrier
 admission checks and targeted error runtime tests passed.
+
+### String sequence construction — 2026-09-24
+
+The target reference exposes String(Sequence<Char>) and a read-only grapheme indexer.
+String implements Sequence with a private explicit Collection.Count; public Length
+remains unchanged. The importer validates the trusted core constructor signature and
+lowers newobj to the managed StringFromSequence transport. That facade invokes an
+internal Raven factory; native services only concatenate snapshot chars and index
+UTF-8 graphemes. Explicit Count matching uses MethodImpl identity rather than the
+different explicit-property names emitted by C# and Raven.
+
+Rebuild the bridge, target reference and selected Raven runtime together. Runtime
+Contract settings and Raven compiler emission are unchanged. The archived Neo
+bootstrap excludes the Raven collection contracts and factory. The
+[construction sample](../string-sequence/README.md) documents validation and the
+existing direct-empty-literal compiler limitation. No Iterable overload is selected.

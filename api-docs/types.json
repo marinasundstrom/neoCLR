@@ -1,5 +1,9 @@
 [
   "System.Char",
+  "System.Collections.Collection`1",
+  "System.Collections.Iterable`1",
+  "System.Collections.Iterator`1",
+  "System.Collections.Sequence`1",
   "System.Concurrency.Thread",
   "System.Concurrency.ThreadPool",
   "System.Console",

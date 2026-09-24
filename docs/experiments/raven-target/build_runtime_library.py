@@ -301,8 +301,12 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
     if name == 'String' and bootstrap:
         # The archived Neo profile uses borrowed collection interfaces. Keep its
         # scalar-independent String operations; Raven uses the complete source.
-        methods = [re.sub(r'(?ms)^\.method instance (?:readonly byref )?(?:GetIterator|GetScalars)\(\).*?^\.end\n', '', body)
-                   .replace('.implements System.Collections.Iterable<Char>\n', '') for body in methods]
+        methods = [re.sub(r'(?ms)^\.method (?:private )?(?:internal static |instance (?:readonly byref )?)(?:GetIterator|GetScalars|CreateFromCharacters|CollectionCount)\(.*?^\.end\n', '', body)
+                   for body in methods]
+        methods = [re.sub(r'(?m)^\.implements System\.Collections\.(?:Iterable|Collection|Sequence)<Char>\n', '', body)
+                   for body in methods]
+        methods = [re.sub(r'(?ms)^\.property instance Metadata_[^\n]+\n\.get instance System\.String::CollectionCount\(\)\n\.end\n', '', body)
+                   for body in methods]
     # Retain only transitively called adapters; no application entry-point shim.
     used = set()
     pending = re.findall(r'(?m)^(?:call|ldftn) ([^(]+)\(', ''.join(methods + types))

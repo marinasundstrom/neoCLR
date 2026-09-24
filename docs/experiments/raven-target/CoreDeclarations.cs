@@ -35,6 +35,11 @@ static class CoreDeclarations
             var module = image.MainModule;
             CalendarBindings.ProjectLayout(module);
             HashCodeBindings.ProjectLayout(module);
+            if (collectionProbe) {
+                var stringFactory = module.GetType("System.String").Methods.Single(m => m.Name == "CreateFromCharacters");
+                stringFactory.IsPublic = false;
+                stringFactory.IsAssembly = true;
+            }
             if (libraryBootstrap) { PrimitiveLibrary.Project(module); OpaqueLibrary.Project(module); EmptyLibrary.Project(module); ErrorCarrierLibrary.Project(module); GenericUnionLibrary.Project(module); }
             if (libraryBootstrap && collectionProbe)
             {

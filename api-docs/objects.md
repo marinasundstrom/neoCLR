@@ -327,7 +327,8 @@ ReferenceEquals and explicit Object base identity/hash calls remain unsupported,
 for aliases. Casts back to String preserve contents, not an allocation identity.
 No interning, nullable String storage, stable hash numbers or source-declared String
 Object overrides are added. The reference-only scaffold constructor is excluded:
-create strings with literals, Concat and text APIs.
+create strings with literals, `String(Sequence<char>)`, Concat and text APIs.
+String implements `Sequence<char>`; its Count is explicit and Length remains public.
 
 The content contract follows .NET String Object equality and display. neoCLR uses
 UTF-8 rather than .NET UTF-16 and does not adopt .NET's randomized hash algorithm;

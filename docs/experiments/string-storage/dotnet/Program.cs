@@ -18,4 +18,11 @@ GC.WaitForPendingFinalizers();
 if (!ReferenceEquals(array[0], holder.Text) || holder.Text != "hello 👩‍💻")
     throw new Exception("String roots did not survive collection");
 Console.WriteLine(".NET String identity through locals, Object, records, arrays and GC: passed");
+char[] characters = ['F', 'o', 'o'];
+string copied = new string(characters);
+characters[0] = 'B';
+if (copied != "Foo" || new string(Array.Empty<char>()) != ""
+    || new string(['e', '\u0301']).Length != 2)
+    throw new Exception("String char-array snapshot or UTF-16 length failed");
+Console.WriteLine(".NET String char-array snapshot and UTF-16 length: passed");
 record Holder(string Text);

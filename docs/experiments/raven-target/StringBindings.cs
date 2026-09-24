@@ -14,6 +14,7 @@ static class StringBindings
         new("StartsWithOrdinal", ["String"], "Boolean", true, true),
         new("EndsWithOrdinal", ["String"], "Boolean", true, true),
         new("GetUtf8ByteCount", [], "Int32", true),
+        new("get_Item", ["Int32"], "Char", true, true),
         new("get_Length", [], "Int32", true),
         new("GetIterator", [], "System.Collections.Iterator<Char>", true, true),
         new("GetScalars", [], "System.Collections.Sequence<UInt32>", true),
@@ -22,11 +23,28 @@ static class StringBindings
     ];
     static string CSharp(string type) => type switch { "String" => "string", "Char" => "char", "System.Collections.Iterator<Char>" => "Collections.Iterator<char>", "System.Collections.Sequence<UInt32>" => "Collections.Sequence<uint>", "Int32" => "int", "Boolean" => "bool", ResultBindings.Slice => "Result<string, Text.Utf8SliceError>", _ => throw new InvalidDataException(type) };
     public static string Declarations(bool results, bool collections) => "public sealed class String { " + string.Join(" ", Members.Where(m => (results || m.Result != ResultBindings.Slice)
-        && (collections || m.Name is not ("GetIterator" or "GetScalars"))).Select(m =>
+        && (collections || m.Name is not ("GetIterator" or "GetScalars" or "get_Item"))).Select(m =>
+        m.Name == "get_Item" ? "public char this[int index] => default;" :
         m.Name == "get_Length" ? "public int Length => default;" :
         m.Name == "get_IsEmpty" ? "public bool IsEmpty => default;" : m.Name is "op_Equality" or "op_Inequality"
             ? $"public static bool operator {(m.Name == "op_Equality" ? "==" : "!=")}(string left, string right) => default;"
-            : $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Parameters.Select((p, i) => CSharp(p) + " value" + i))}) => default;")) + " }";
+            : $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Parameters.Select((p, i) => CSharp(p) + " value" + i))}) => default;")) + (collections ? " int Collections.Collection<char>.Count => default; public String() {} public String(Collections.Sequence<char> value0) {} public static string CreateFromCharacters(Collections.Sequence<char> value0) => default;" : "") + " }";
+    public static bool IsSequenceConstructor(MethodDefinition method) =>
+        method.DeclaringType.FullName == "System.String" && RuntimeSignatures.IsCore(method.DeclaringType.Scope)
+        && method.IsConstructor && method.IsPublic && !method.IsStatic && !method.IsVirtual
+        && !method.HasGenericParameters && !method.ExplicitThis
+        && method.CallingConvention == MethodCallingConvention.Default && method.ReturnType.MetadataType == MetadataType.Void
+        && method.Parameters.Count == 1
+        && CollectionBindings.Type(method.Parameters[0].ParameterType) == "System.Collections.Sequence<Char>";
+    public static string? Construct(MethodReference reference, MethodDefinition definition) {
+        if (reference.DeclaringType.FullName != "System.String" || !RuntimeSignatures.IsCore(reference.DeclaringType.Scope)) return null;
+        if (!IsSequenceConstructor(definition) || !reference.HasThis || reference.ExplicitThis || reference.HasGenericParameters
+            || reference.CallingConvention != MethodCallingConvention.Default || reference.Name != ".ctor"
+            || reference.ReturnType.MetadataType != MetadataType.Void || reference.Parameters.Count != 1
+            || CollectionBindings.Type(reference.Parameters[0].ParameterType) != "System.Collections.Sequence<Char>")
+            throw new InvalidDataException("Unsupported String constructor: " + reference.FullName);
+        return "System.Collections.Sequence<Char>";
+    }
     public sealed record Binding(string[] Arguments, string Result, string Instruction);
     public static Binding? Bind(MethodReference reference, MethodDefinition definition, bool callvirt)
     {

@@ -13,3 +13,10 @@
 .function neoCLR.Runtime.StringGraphemes(String value) -> Char[]
     .methodimpl InternalCall
 .end
+
+.function neoCLR.Runtime.StringFromChars(arrayref<Char> value) -> String
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringGraphemeAt(String value, Int32 index) -> Char
+    .methodimpl InternalCall
+.end

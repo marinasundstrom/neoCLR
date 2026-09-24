@@ -545,6 +545,13 @@ static class UnionImport
                     case Code.Newobj:
                         var constructor = (MethodReference)instruction.Operand;
                         var constructorDefinition = constructor.Resolve() ?? throw new InvalidDataException("Unresolved constructor.");
+                        if (StringBindings.Construct(constructor, constructorDefinition) is { } stringInput) {
+                            var actual = Argument(stringInput).Type;
+                            var factory = Coerce(new Call("", [stringInput], "String",
+                                Instruction: "call neoCLR.Runtime.StringFromSequence(System.Collections.Sequence<Char>)"), [actual]);
+                            code.AppendLine(factory.Instruction ?? $"call {factory.Name}({string.Join(',', factory.Arguments)})");
+                            Push(new("String")); break;
+                        }
                         if (ArrayLibrary.IsMatched(constructorDefinition.DeclaringType)) throw new InvalidDataException("Managed arrays require intrinsic allocation.");
                         if (ApplicationTypes.IsLibrary(constructor.DeclaringType)
                             && constructor.DeclaringType.FullName == "System.String")
@@ -900,6 +907,8 @@ static class UnionImport
             var declaredParameters = args.Skip(method.HasThis ? 1 : 0).Select((t, i) =>
                 libraryOwner is not null ? (GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[i]) ? "out(true) " : "") + t + " " + OpaqueLibrary.ParameterName(method, i) : (method.Parameters[i].IsOut ? "out " : "") + t);
             output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "noresult" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {method.Name}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : (DescriptorLibrary.IsBaseConstructor(method) || libraryOwner is not null && method.IsAssembly) ? "internal " : "")}instance {ApplicationTypes.Modifiers(method)}{(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "byref " : "")}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && !asyncStateMember && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
+            if (OpaqueLibrary.IsExplicitStringCount(method))
+                output.AppendLine(".override instance System.Collections.Collection<Char>::get_Count()");
             if (libraryOwner is null) output.AppendLine(SourceMetadata.Method(method, explicitReceiver: method.HasThis && !emitInstance));
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             // Adapter temporaries are declared before code and assigned explicitly;

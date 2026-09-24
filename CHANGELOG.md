@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add `String(Sequence<char>)` with immutable snapshot construction, including char
+  arrays. String implements Sequence with a read-only grapheme indexer and explicit
+  Collection.Count; Length stays public. Preserve exact text without normalization;
+  adjacent input characters can merge into a grapheme. Update target metadata,
+  constructor lowering, API reference and tested Raven examples. Rebuild the matching
+  bridge/reference and runtime together; Runtime Contract settings are unchanged.
+  Record the author’s direction to let real cases drive APIs after the semantics
+  slices; Iterable construction remains undecided.
+
 - Investigate String storage and identity with an allocation-counting Release probe,
   a private shared-text prototype and a .NET alias/record/array baseline. Record
   migration, GC, host-lifetime and accounting gates, and consolidate stale roadmap

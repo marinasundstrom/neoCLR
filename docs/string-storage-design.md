@@ -194,3 +194,31 @@ concrete benefit justifies the compatibility cost. Culture selection, Unicode ca
 (including length changes), ordering and equality/hash consistency need explicit
 choices and tests. Additional casing/comparison APIs remain planned; the existing
 bounded ordinal helpers retain their current contract.
+
+## Sequence construction — development, 2026-09-24
+
+The author requested String construction from char arrays, then suggested Sequence<char>
+and explicit Count. String now implements Sequence with interface-only Count, public
+Length and a read-only grapheme indexer. The constructor snapshots Count characters
+through one iterator traversal and concatenates exact UTF-8 text. No normalization,
+identity or interning behavior is introduced. A mutable input must stay stable during
+construction; later mutation is independent. Concatenation can merge grapheme boundaries.
+
+Compared with [.NET String constructors](https://learn.microsoft.com/en-us/dotnet/api/system.string.-ctor?view=net-10.0),
+this uses the existing sequence abstraction instead of an array-only contract and
+operates on graphemes instead of UTF-16 code units. Snapshot allocation and scanning
+indexes are costs, not a claimed performance improvement. See the
+[checked sample and limitations](experiments/string-sequence/README.md).
+
+The author also asked about Iterable<char>, possibly with an explicit count.
+Assistant recommendation: keep Sequence for this slice; a later growable-buffer
+constructor could consume Iterable without a count. An explicit count would require
+choosing between an exact-length invariant, prefix operation and capacity hint.
+No Iterable overload or count parameter has been added or approved.
+
+Author clarification: after the semantics slices, let real cases drive API additions
+and behavior. Revisit inexpensive choices as evidence emerges; do not select an
+Iterable construction contract ahead of a concrete need. The .NET 10 constructor
+reference above was consulted on 2026-09-24. The executable comparison in
+`experiments/string-storage/dotnet` checks array copying, empty input and UTF-16
+length; it does not imply identical Unicode units between the platforms.

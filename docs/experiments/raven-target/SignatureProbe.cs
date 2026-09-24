@@ -177,6 +177,24 @@ static class SignatureProbe
         Check("Generic Void result remains a carrier", RuntimeSignatures.Map(voidOwner, ResultBindings.Type, returns: true)
             == "System.Result<Void,System.Storage.FileWriteError>");
         var stringType = module.GetType("System.String");
+        var stringConstructor = stringType.Methods.Single(StringBindings.IsSequenceConstructor);
+        Check("String converts to Sequence", InterfaceBindings.Convert("String", "System.Collections.Sequence<Char>") == "castclass System.Collections.Sequence<Char>\n");
+        Check("String converts to Collection", InterfaceBindings.Converts("String", "System.Collections.Collection<Char>"));
+        Check("String assignment needs no interface cast", !InterfaceBindings.Converts("String", "String"));
+        Check("String Sequence constructor", StringBindings.Construct(Reference(stringConstructor, stringType), stringConstructor) == "System.Collections.Sequence<Char>");
+        var badConstructor = Reference(stringConstructor, stringType);
+        badConstructor.Parameters[0].ParameterType = module.TypeSystem.Int32;
+        Reject("String constructor wrong element contract", () => StringBindings.Construct(badConstructor, stringConstructor));
+        badConstructor = Reference(stringConstructor, stringType);
+        badConstructor.HasThis = false;
+        Reject("String constructor static receiver", () => StringBindings.Construct(badConstructor, stringConstructor));
+        var explicitCount = stringType.Methods.Single(OpaqueLibrary.MatchesStringCount);
+        Check("String Count is interface-only", !stringType.Properties.Any(p => p.Name == "Count") && explicitCount.IsPrivate);
+        explicitCount.IsPrivate = false;
+        explicitCount.IsPublic = true;
+        Check("String Count rejects a public mapping", !OpaqueLibrary.MatchesStringCount(explicitCount));
+        explicitCount.IsPublic = false;
+        explicitCount.IsPrivate = true;
         var concat = stringType.Methods.Single(m => m.Name == "Concat");
         Reject("Static String callvirt", () => StringBindings.Bind(Reference(concat, stringType), concat, true));
         var wrongStringArgument = Reference(concat, stringType);

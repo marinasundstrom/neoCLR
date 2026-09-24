@@ -34,6 +34,8 @@ static class RuntimeServiceBindings
             ("PathGetFileName", ["String"], "String"),
             ("WriteAllText", ["String", "String", "Int32"], "Int32"),
             ("StringEquals", ["String", "String"], "Boolean"),
+            ("StringFromChars", ["arrayref<Char>"], "String"),
+            ("StringGraphemeAt", ["String", "Int32"], "Char"),
             ("StringConcat", ["String", "String"], "String"),
             ("StringCompareOrdinal", ["String", "String"], "Int32"),
             ("StringContainsOrdinal", ["String", "String"], "Boolean"),

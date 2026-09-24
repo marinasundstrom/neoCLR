@@ -141,7 +141,7 @@ static class LibraryImplementation
                 && c.Parameters.Count == p.Parameters.Count
                 && c.Parameters.Zip(p.Parameters).All(a => a.First.Name == a.Second.Name
                     && SameType(a.First.ParameterType, a.Second.ParameterType))
-                && c.GetMethod?.Name == p.GetMethod?.Name && c.SetMethod?.Name == p.SetMethod?.Name) != 1))
+                && (c.GetMethod?.Name == p.GetMethod?.Name || c.GetMethod is { } cg2 && p.GetMethod is { } pg2 && OpaqueLibrary.MatchesStringCount(cg2) && OpaqueLibrary.MatchesStringCount(pg2)) && c.SetMethod?.Name == p.SetMethod?.Name) != 1))
             throw new InvalidDataException("Library interface does not match reference contract.");
         _ = ApplicationTypes.Type(type);
         return [];
@@ -253,7 +253,7 @@ static class LibraryImplementation
             && !contract.HasMethods && !type.HasProperties && !type.HasInterfaces
             && type.Methods.All(PrimitiveLibrary.IsDefaultConstructor);
         var methods = type.Methods.Where(m => !OpaqueLibrary.IsOmittedConstructor(m) && !ArrayLibrary.OmitConstructor(m) && !EmptyLibrary.OmitConstructor(m) && !((ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)) && (!(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m))).ToArray();
-        if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || DescriptorLibrary.IsDescriptor(type) && m.IsFamily && m.IsConstructor || m.IsPrivate && !m.IsVirtual
+        if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || DescriptorLibrary.IsDescriptor(type) && m.IsFamily && m.IsConstructor || m.IsPrivate && (!m.IsVirtual || OpaqueLibrary.MatchesStringCount(m) && contract.Methods.Count(OpaqueLibrary.MatchesStringCount) == 1)
             || m.IsAssembly && !m.IsVirtual && contract.Methods.Count(c => c.IsAssembly && MatchMethod(c, m)) == 1) || !m.HasBody || m.HasGenericParameters
             || m.ExplicitThis || m.IsConstructor && m.IsStatic || m.CallingConvention != MethodCallingConvention.Default
             || m.Parameters.Any(p => (p.IsOut || p.ParameterType.IsByReference) && !GenericUnionLibrary.IsConditionalOutput(m, p))))
@@ -268,11 +268,11 @@ static class LibraryImplementation
         if (expected.Length != exports.Length || exports.Any(m => expected.Count(e => MatchMethod(e, m)) != 1))
             throw new InvalidDataException("Instance library export does not match reference contract: missing=[" + string.Join(";", expected.Where(e => !exports.Any(m => MatchMethod(e, m))).Select(m => m.FullName + " " + m.Attributes)) + "]; unmatched=[" + string.Join(";", exports.Where(m => !expected.Any(e => MatchMethod(e, m))).Select(m => m.FullName + " " + m.Attributes)) + "]");
         if (type.Properties.Count(p => p.Name != "Value" || !GenericUnionLibrary.IsCarrier(type)) != contract.Properties.Count(p => p.Name != "Value" || !GenericUnionLibrary.IsCarrier(contract)) || type.Properties.Any(p =>
-            contract.Properties.Count(c => c.Name == p.Name && MatchType(c.PropertyType, p.PropertyType)
+            contract.Properties.Count(c => (c.Name == p.Name || c.GetMethod is { } cg && p.GetMethod is { } pg && OpaqueLibrary.MatchesStringCount(cg) && OpaqueLibrary.MatchesStringCount(pg)) && MatchType(c.PropertyType, p.PropertyType)
                 && c.Parameters.Count == p.Parameters.Count
                 && c.Parameters.Zip(p.Parameters).All(a => MatchType(a.First.ParameterType, a.Second.ParameterType))
-                && c.GetMethod?.Name == p.GetMethod?.Name && (GenericUnionLibrary.IsCase(type) && p.SetMethod is null || c.SetMethod?.Name == p.SetMethod?.Name)) != 1))
-            throw new InvalidDataException("Instance library property does not match reference contract.");
+                && (c.GetMethod?.Name == p.GetMethod?.Name || c.GetMethod is { } cg2 && p.GetMethod is { } pg2 && OpaqueLibrary.MatchesStringCount(cg2) && OpaqueLibrary.MatchesStringCount(pg2)) && (GenericUnionLibrary.IsCase(type) && p.SetMethod is null || c.SetMethod?.Name == p.SetMethod?.Name)) != 1))
+            throw new InvalidDataException("Instance library property does not match reference contract: source=[" + string.Join(";", type.Properties.Select(p => p.Name + ":" + p.GetMethod?.Name)) + "]; reference=[" + string.Join(";", contract.Properties.Select(p => p.Name + ":" + p.GetMethod?.Name)) + "]");
         foreach (var method in exports.Where(m => m.HasThis && !m.IsConstructor && type.IsValueType))
             if (expected.Single(e => MatchMethod(e, method)).CustomAttributes.Any(a =>
                 a.AttributeType.FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute"))

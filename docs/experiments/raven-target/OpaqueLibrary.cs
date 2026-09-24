@@ -6,9 +6,19 @@ static class OpaqueLibrary
 {
     public static bool IsString(TypeDefinition type) => type.FullName == "System.String" && ApplicationTypes.IsLibrary(type);
     public static bool IsByRefString(MethodReference method) => IsString(method.DeclaringType.Resolve())
-        && method.HasThis && method.Name is "Equals" or "ContainsOrdinal" or "StartsWithOrdinal" or "EndsWithOrdinal" or "GetIterator";
+        && method.HasThis && (IsExplicitStringCount(method.Resolve()) || method.Name is "Equals" or "ContainsOrdinal" or "StartsWithOrdinal" or "EndsWithOrdinal" or "GetIterator" or "get_Item");
+    public static bool IsExplicitStringCount(MethodDefinition method) =>
+        (IsString(method.DeclaringType) || RuntimeSignatures.IsCore(method.DeclaringType.Scope)) && MatchesStringCount(method);
+    public static bool MatchesStringCount(MethodDefinition method) =>
+        method.DeclaringType.FullName == "System.String"
+        && method.IsPrivate && method.IsVirtual && method.IsFinal && method.IsNewSlot
+        && method.HasThis && !method.HasParameters && !method.HasGenericParameters
+        && method.ReturnType.MetadataType == MetadataType.Int32 && method.Overrides.Count == 1
+        && method.Overrides[0].Name == "get_Count"
+        && CollectionBindings.Type(method.Overrides[0].DeclaringType) == "System.Collections.Collection<Char>"
+        && !method.Overrides[0].HasParameters && method.Overrides[0].ReturnType.MetadataType == MetadataType.Int32;
     public static bool IsOmittedConstructor(MethodDefinition method) =>
-        method.DeclaringType.FullName == "System.String" && IsStringConstructor(method);
+        method.DeclaringType.FullName == "System.String" && (IsStringConstructor(method) || StringBindings.IsSequenceConstructor(method));
     static bool IsStringConstructor(MethodDefinition method)
     {
         if (!method.IsConstructor || !method.IsPublic || method.IsStatic || method.HasParameters
@@ -51,7 +61,7 @@ static class OpaqueLibrary
                 || candidate.Fields.Count != 1 || candidate.Fields[0].Name != "m_value"
                 || candidate.Fields[0].FieldType.MetadataType != MetadataType.String
                 || !candidate.Fields[0].IsPrivate || candidate.Fields[0].IsStatic
-                || candidate.Methods.Any(m => m.IsConstructor && !IsStringConstructor(m)))
+                || candidate.Methods.Any(m => m.IsConstructor && !IsStringConstructor(m) && !StringBindings.IsSequenceConstructor(m)))
                 throw new InvalidDataException("Unsupported intrinsic String storage or constructor: " + candidate.Module.Name + " sealed=" + candidate.IsSealed + " fields=" + string.Join(";", candidate.Fields.Select(f => f.FullName)) + " ctors=" + string.Join(";", candidate.Methods.Where(m => m.IsConstructor).Select(m => m.Attributes + ":" + string.Join(",", m.Body.Instructions))));
         if (type.Methods.Any(IsStringOperator)) throw new InvalidDataException("String operators remain compiler intrinsics.");
     }

@@ -15,7 +15,7 @@ static class CollectionBindings
     public static bool IsArrayList(string? type) => type is not null && type.StartsWith("System.Collections.ArrayList<", StringComparison.Ordinal);
     public static bool Assignable(string source, string target)
     {
-        if (source == "String" && target == "System.Collections.Iterable<Char>") return true;
+        if (source == "String" && target is "System.Collections.Iterable<Char>" or "System.Collections.Collection<Char>" or "System.Collections.Sequence<Char>") return true;
         if (source == target || MapBindings.Assignable(source, target)) return true;
         if (ManagedArrayBindings.IsType(source))
             return new[] { "Iterable", "Collection", "Sequence", "MutableSequence" }

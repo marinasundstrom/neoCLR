@@ -4,10 +4,32 @@ import System.Runtime.CompilerServices.RuntimeServices
 import System.Result.*
 import System.Text.Utf8SliceError
 
-public class String : Equatable<string>, Collections.Iterable<char> {
+public class String : Equatable<string>, Collections.Sequence<char> {
     // Intrinsic storage supplied by the runtime, never an allocated class field.
     #pragma warning disable-next-line RAV9032
     private field m_value: string
+
+    internal static func CreateFromCharacters(value0: Collections.Sequence<char>) -> string {
+        let count = value0.Count
+        let snapshot = Runtime.CompilerServices.CheckedStorage.Reserve<char>(count)
+        let iterator = value0.GetIterator()
+        var index = 0
+        while iterator.MoveNext() {
+            snapshot[index] = iterator.Current
+            index += 1
+        }
+        iterator.Dispose()
+        if index != count {
+            System.Fault("Character sequence count changed during construction")
+        }
+        return RuntimeServices.StringFromChars(snapshot)
+    }
+
+    val Collections.Collection<char>.Count: int => RuntimeServices.StringGraphemeCount(m_value)
+
+    val self[index: int]: char {
+        get => RuntimeServices.StringGraphemeAt(m_value, index)
+    }
 
     static func Concat(value0: string, value1: string) -> string {
         return RuntimeServices.StringConcat(value0, value1)

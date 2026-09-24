@@ -41,6 +41,8 @@ pub(crate) enum Binding {
     Utf8Encode,
     Utf8Decode,
     StringConcat,
+    StringFromChars,
+    StringGraphemeAt,
     StringGraphemeCount,
     CharFromString,
     CharText,
@@ -140,6 +142,12 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.Utf8Decode", [Type::ArrayRef(element)]) if **element == Type::Byte => {
             (Binding::Utf8Decode, Type::Value)
+        }
+        ("neoCLR.Runtime.StringFromChars", [Type::ArrayRef(element)]) if **element == Type::Char => {
+            (Binding::StringFromChars, Type::String)
+        }
+        ("neoCLR.Runtime.StringGraphemeAt", [Type::String, Type::Int32]) => {
+            (Binding::StringGraphemeAt, Type::Char)
         }
         ("neoCLR.Runtime.StringConcat", [Type::String, Type::String]) => {
             (Binding::StringConcat, Type::String)
@@ -618,6 +626,52 @@ impl Binding {
                     Err(_) => Value::Byte(1),
                 };
                 Ok(Value::Erased(Box::new(payload)))
+            }
+            (Self::StringFromChars, [Value::ObjectReference(chars)]) => {
+                let Value::Array {
+                    element: Type::Char,
+                    elements,
+                } = chars.reference.read()?
+                else {
+                    return Err(Fault::new("String construction requires a Char array"));
+                };
+                let mut length = 0usize;
+                for element in &elements {
+                    element.initialized()?;
+                    let Value::Char(text) = element else {
+                        return Err(Fault::new(
+                            "String construction requires initialized characters",
+                        ));
+                    };
+                    length = length
+                        .checked_add(text.len())
+                        .ok_or_else(|| Fault::new("string size overflow"))?;
+                }
+                let mut text = String::new();
+                text.try_reserve_exact(length)
+                    .map_err(|_| Fault::new("string allocation failed"))?;
+                for element in elements {
+                    let Value::Char(character) = element else {
+                        unreachable!()
+                    };
+                    text.push_str(&character);
+                }
+                Ok(Value::String(text.into()))
+            }
+            (Self::StringGraphemeAt, [Value::String(text), Value::Int32(index)]) => {
+                let index = usize::try_from(*index).map_err(|_| {
+                    Fault::coded(
+                        crate::FaultCode::IndexOutOfRange,
+                        "String index is out of range",
+                    )
+                })?;
+                let character = text.graphemes(true).nth(index).ok_or_else(|| {
+                    Fault::coded(
+                        crate::FaultCode::IndexOutOfRange,
+                        "String index is out of range",
+                    )
+                })?;
+                Ok(Value::Char(character.to_owned()))
             }
             (Self::StringConcat, [Value::String(left), Value::String(right)]) => {
                 let length = left

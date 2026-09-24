@@ -20,6 +20,11 @@ controls and a pinned portable CI build. Documentation may precede a runtime rel
 show that status explicitly. This bounded publishing change does not reorder the
 application milestones. See [website maintenance](design/feature-pages.md#ravendoc-site-and-landing-page--2026-09-24).
 
+**Author direction, 2026-09-24:** after finishing the semantics slices, implement
+APIs and behavior as concrete application cases need them. Examine each case before
+choosing its contract; keep readily changeable choices provisional. The discussed
+Iterable<char> constructor/count overload remains undecided, not a planned API.
+
 ## Authority and use
 
 **This roadmap is authoritative for our work unless the author explicitly directs
@@ -48,6 +53,14 @@ arrays, erasure, GC pressure, host retention and cyclic/fault teardown. Next def
 owner-based reference comparison and stable identity/base hashes together before
 enabling String identity; wrapper IDs must not become String IDs.
 The internal `Arc<String>` choice remains provisional.
+
+**Author-directed String API slice, 2026-09-24:** support construction from
+Sequence<char>, including arrays, and expose String as a read-only Sequence with
+explicit Count and public Length/indexer. The [sample](experiments/string-sequence/README.md)
+covers immutable copies and grapheme behavior. Compared with .NET's char-array
+constructor and UTF-16 indexer, this accepts the platform's sequence abstraction
+and grapheme characters, at the cost of traversal/snapshot allocation and scanning
+indexes. This bounded addition does not enable String identity or select comparers.
 
 **Author-selected end-to-end acceptance case:** Raven record syntax now exercises
 class and struct equality/hash/display, assignment, nested components and null default
