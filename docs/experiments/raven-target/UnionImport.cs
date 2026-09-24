@@ -793,7 +793,7 @@ static class UnionImport
                             if (targetMethod.IsConstructor && targetMethod.DeclaringType.FullName is "System.Object" or "System.ValueType" && targetMethod.Parameters.Count == 0 && method.IsConstructor && method.DeclaringType.BaseType?.FullName == targetMethod.DeclaringType.FullName && instruction.OpCode.Code == Code.Call)
                             {
                                 Expect(ApplicationTypes.Receiver(method));
-                                code.AppendLine(libraryOwner is null && !method.DeclaringType.IsValueType && targetMethod.DeclaringType.FullName == "System.Object"
+                                code.AppendLine((libraryOwner is null || method.DeclaringType.Methods.Any(m => m.IsVirtual && !m.IsNewSlot)) && !method.DeclaringType.IsValueType && targetMethod.DeclaringType.FullName == "System.Object"
                                     ? "call instance System.Object::.ctor()" : "pop");
                                 break;
                             }

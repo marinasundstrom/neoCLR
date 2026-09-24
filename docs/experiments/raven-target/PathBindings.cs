@@ -9,8 +9,9 @@ static class PathBindings
         && !type.IsValueType && IsName(type.FullName) ? Owner : null;
     public static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
-    public const string Declarations = """
-        namespace Storage { public sealed class Path {
+    public const string Declarations = "\n" + """
+        #nullable enable annotations
+        namespace Storage { public sealed class Path : Equatable<Path> {
             private Path(string text) { }
             public static string Combine(string value0, string value1) => default;
             public static string GetFileName(string value0) => default;
@@ -19,9 +20,12 @@ static class PathBindings
             public bool IsAbsolute => default;
             public bool IsRelative => default;
             public bool Equals(Path other) => default;
-            public string ToString() => default;
+            public override bool Equals(object? other) => default;
+            public override int GetHashCode() => default;
+            public override string ToString() => default;
         } }
-        """;
+        #nullable restore annotations
+        """ + "\n";
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
         if (Type(reference.DeclaringType) is null) return null;
@@ -32,10 +36,14 @@ static class PathBindings
             "Parse" => ("String", "System.Result<System.Storage.Path,System.Storage.InvalidPathError>", true),
             "get_Text" or "ToString" => ("", "String", false),
             "get_IsAbsolute" or "get_IsRelative" => ("", "Boolean", false),
-            "Equals" => (Owner, "Boolean", false),
+            "Equals" => (args.Length == 1 && args[0] == "System.Object" ? "System.Object" : Owner, "Boolean", false),
+            "GetHashCode" => ("", "Int32", false),
             _ => throw new InvalidDataException("Unsupported Path member: " + reference.FullName)
         };
-        if (!definition.IsPublic || definition.IsVirtual || definition.HasGenericParameters
+        var objectOverride = definition.Name is "ToString" or "GetHashCode" || definition.Name == "Equals" && expected.Item1 == "System.Object";
+        var typedEquality = definition.Name == "Equals" && expected.Item1 == Owner;
+        if (!definition.IsPublic || definition.IsVirtual != (objectOverride || typedEquality)
+            || definition.IsNewSlot != typedEquality || definition.IsFinal != typedEquality || definition.HasGenericParameters
             || !definition.DeclaringType.IsSealed || definition.DeclaringType.HasGenericParameters
             || definition.IsStatic != expected.Item3 || reference.HasThis == expected.Item3
             || string.Join(',', args) != expected.Item1 || result != expected.Item2)

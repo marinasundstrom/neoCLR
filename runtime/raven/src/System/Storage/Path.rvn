@@ -4,7 +4,7 @@ import System.*
 import System.Result.*
 import System.Runtime.CompilerServices.RuntimeServices
 
-public class Path {
+public class Path : Equatable<Path> {
     static func Combine(value0: string, value1: string) -> string {
         return RuntimeServices.PathCombine(value0, value1)
     }
@@ -53,7 +53,20 @@ public class Path {
         return text.Equals(other.Text)
     }
 
-    func ToString() -> string {
+    override func Equals(other: Object?) -> bool {
+        if other is Path path {
+            return Equals(path)
+        }
+        return false
+    }
+
+    override func GetHashCode() -> int {
+        var hash = HashCode()
+        hash.Add(text)
+        return hash.ToHashCode()
+    }
+
+    override func ToString() -> string {
         return text
     }
 }

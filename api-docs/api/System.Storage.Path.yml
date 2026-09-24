@@ -6,8 +6,10 @@ items:
   parent: System.Storage
   children:
   - System.Storage.Path.Combine(System.String,System.String)
+  - System.Storage.Path.Equals(System.Object)
   - System.Storage.Path.Equals(System.Storage.Path)
   - System.Storage.Path.GetFileName(System.String)
+  - System.Storage.Path.GetHashCode
   - System.Storage.Path.IsAbsolute
   - System.Storage.Path.IsRelative
   - System.Storage.Path.Parse(System.String)
@@ -34,8 +36,6 @@ items:
   inheritedMembers:
   - System.Object.GetType
   - System.Object.ReferenceEquals(System.Object,System.Object)
-  - System.Object.Equals(System.Object)
-  - System.Object.GetHashCode
 - uid: System.Storage.Path.Combine(System.String,System.String)
   commentId: M:System.Storage.Path.Combine(System.String,System.String)
   id: Combine(System.String,System.String)
@@ -147,19 +147,75 @@ items:
   - NeoCLR.CoreProbe
   namespace: System.Storage
   summary: Compares accepted spellings using ordinal equality.
-  remarks: Does not resolve a provider or compare filesystem identity. Use this method explicitly; reference equality and hashing are not value contracts.
+  remarks: Implements Equatable&lt;Path&gt;. Requires a non-null Path, matching Equatable&lt;T&gt;.Equals(T); this contract does not require nullable value types. Object.Equals(Object?) is the separate null-aware overload. No provider resolution or filesystem identity comparison is performed.
   example: []
   syntax:
     content: public bool Equals(Path other)
     parameters:
     - id: other
       type: System.Storage.Path
-      description: The other validated logical path.
+      description: The non-null validated logical path to compare.
     return:
       type: System.Boolean
       description: True when the spellings are identical.
     content.vb: Public Function Equals(other As Path) As Boolean
   overload: System.Storage.Path.Equals*
+- uid: System.Storage.Path.Equals(System.Object)
+  commentId: M:System.Storage.Path.Equals(System.Object)
+  id: Equals(System.Object)
+  parent: System.Storage.Path
+  langs:
+  - csharp
+  - vb
+  name: Equals(object?)
+  nameWithType: Path.Equals(object?)
+  fullName: System.Storage.Path.Equals(object?)
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Compares another Path by its exact accepted spelling through Object dispatch.
+  example: []
+  syntax:
+    content: public override bool Equals(object? other)
+    parameters:
+    - id: other
+      type: System.Object
+      description: A Path, another object, or null.
+    return:
+      type: System.Boolean
+      description: True for a Path with identical spelling; false for null or another type.
+    content.vb: Public Overrides Function Equals(other As Object) As Boolean
+  overridden: System.Object.Equals(System.Object)
+  overload: System.Storage.Path.Equals*
+  nameWithType.vb: Path.Equals(Object)
+  fullName.vb: System.Storage.Path.Equals(Object)
+  name.vb: Equals(Object)
+- uid: System.Storage.Path.GetHashCode
+  commentId: M:System.Storage.Path.GetHashCode
+  id: GetHashCode
+  parent: System.Storage.Path
+  langs:
+  - csharp
+  - vb
+  name: GetHashCode()
+  nameWithType: Path.GetHashCode()
+  fullName: System.Storage.Path.GetHashCode()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Storage
+  summary: Hashes the accepted spelling using System.HashCode.
+  remarks: No case folding, Unicode normalization or provider resolution. Hash values are not persistent identifiers and may change between runtime versions.
+  example: []
+  syntax:
+    content: public override int GetHashCode()
+    return:
+      type: System.Int32
+      description: A hash consistent with typed and Object equality.
+    content.vb: Public Overrides Function GetHashCode() As Integer
+  overridden: System.Object.GetHashCode
+  overload: System.Storage.Path.GetHashCode*
 - uid: System.Storage.Path.ToString
   commentId: M:System.Storage.Path.ToString
   id: ToString
@@ -177,11 +233,12 @@ items:
   summary: Returns the accepted logical spelling.
   example: []
   syntax:
-    content: public string ToString()
+    content: public override string ToString()
     return:
       type: System.String
       description: The same string as Text.
-    content.vb: Public Function ToString() As String
+    content.vb: Public Overrides Function ToString() As String
+  overridden: System.Object.ToString
   overload: System.Storage.Path.ToString*
 - uid: System.Storage.Path.Text
   commentId: P:System.Storage.Path.Text
@@ -361,63 +418,6 @@ references:
     isExternal: true
     href: System.Object.html
   - name: )
-- uid: System.Object.Equals(System.Object)
-  commentId: M:System.Object.Equals(System.Object)
-  parent: System.Object
-  isExternal: true
-  href: System.Object.html#System_Object_Equals_System_Object_
-  name: Equals(object)
-  nameWithType: object.Equals(object)
-  fullName: object.Equals(object)
-  nameWithType.vb: Object.Equals(Object)
-  fullName.vb: Object.Equals(Object)
-  name.vb: Equals(Object)
-  spec.csharp:
-  - uid: System.Object.Equals(System.Object)
-    name: Equals
-    isExternal: true
-    href: System.Object.html#System_Object_Equals_System_Object_
-  - name: (
-  - uid: System.Object
-    name: object
-    isExternal: true
-    href: System.Object.html
-  - name: )
-  spec.vb:
-  - uid: System.Object.Equals(System.Object)
-    name: Equals
-    isExternal: true
-    href: System.Object.html#System_Object_Equals_System_Object_
-  - name: (
-  - uid: System.Object
-    name: Object
-    isExternal: true
-    href: System.Object.html
-  - name: )
-- uid: System.Object.GetHashCode
-  commentId: M:System.Object.GetHashCode
-  parent: System.Object
-  isExternal: true
-  href: System.Object.html#System_Object_GetHashCode
-  name: GetHashCode()
-  nameWithType: object.GetHashCode()
-  fullName: object.GetHashCode()
-  nameWithType.vb: Object.GetHashCode()
-  fullName.vb: Object.GetHashCode()
-  spec.csharp:
-  - uid: System.Object.GetHashCode
-    name: GetHashCode
-    isExternal: true
-    href: System.Object.html#System_Object_GetHashCode
-  - name: (
-  - name: )
-  spec.vb:
-  - uid: System.Object.GetHashCode
-    name: GetHashCode
-    isExternal: true
-    href: System.Object.html#System_Object_GetHashCode
-  - name: (
-  - name: )
 - uid: System
   commentId: N:System
   isExternal: true
@@ -557,6 +557,104 @@ references:
   nameWithType.vb: Boolean
   fullName.vb: Boolean
   name.vb: Boolean
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: System.Object.html#System_Object_Equals_System_Object_
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: System.Object.html#System_Object_Equals_System_Object_
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: System.Object.html
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: System.Object.html#System_Object_Equals_System_Object_
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: System.Object.html
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: System.Object.html#System_Object_GetHashCode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: System.Object.html#System_Object_GetHashCode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: System.Object.html#System_Object_GetHashCode
+  - name: (
+  - name: )
+- uid: System.Storage.Path.GetHashCode*
+  commentId: Overload:System.Storage.Path.GetHashCode
+  isExternal: true
+  href: System.Storage.Path.html#System_Storage_Path_GetHashCode
+  name: GetHashCode
+  nameWithType: Path.GetHashCode
+  fullName: System.Storage.Path.GetHashCode
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: System.Object.html#System_Object_ToString
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: System.Object.html#System_Object_ToString
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: System.Object.html#System_Object_ToString
+  - name: (
+  - name: )
 - uid: System.Storage.Path.ToString*
   commentId: Overload:System.Storage.Path.ToString
   isExternal: true

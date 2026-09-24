@@ -1,4 +1,6 @@
 apiRules:
+- include:
+    uidRegex: '^System\.Equatable`1($|\.)'
 - exclude:
     uidRegex: '^System\.Runtime\.CompilerServices\.ITaskAwaiter\.OnCompleted($|\()'
     type: Method

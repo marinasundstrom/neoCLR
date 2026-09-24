@@ -1,5 +1,7 @@
 ; Generated from runtime/raven/src/System/Storage/Path.rvn. Regenerate with build_runtime_library.py.
 .type class System.Storage.Path
+.extends System.Object
+.implements System.Equatable<System.Storage.Path>
 .field private text String
 .property instance Text() -> String
 .get instance System.Storage.Path::get_Text()
@@ -37,7 +39,7 @@ M00000003_IL_0000:
 M00000003_IL_0001:
 ldarg 0
 M00000003_IL_0002:
-pop
+call instance System.Object::.ctor()
 M00000003_IL_0007:
 M00000003_IL_0008:
 ldarg 0
@@ -375,14 +377,84 @@ M00000008_IL_0013:
 call neoCLR.Library.System.Storage.Path.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance ToString() -> String
+.method instance override Equals(System.Object other) -> Boolean
+.local System.Storage.Path local0
+ldloca local0
+initobj System.Storage.Path
 M00000009_IL_0000:
 M00000009_IL_0001:
 M00000009_IL_0002:
-ldarg 0
+ldarg 1
 M00000009_IL_0003:
-ldfld System.Storage.Path::text
+isinst System.Storage.Path
 M00000009_IL_0008:
+dup
+M00000009_IL_0009:
+stloc local0
+M00000009_IL_000a:
+M00000009_IL_000b:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_000d:
+brtrue M00000009_IL_0017
+M00000009_IL_0012:
+br M00000009_IL_0020
+M00000009_IL_0017:
+M00000009_IL_0018:
+ldarg 0
+M00000009_IL_0019:
+ldloc local0
+M00000009_IL_001a:
+callvirt instance System.Storage.Path::Equals(System.Storage.Path)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_001f:
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanFromInt32(Int32)
+ret
+M00000009_IL_0020:
+M00000009_IL_0021:
+M00000009_IL_0022:
+ldc.i4 0
+M00000009_IL_0023:
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance override GetHashCode() -> Int32
+.local System.HashCode local0
+ldloca local0
+initobj System.HashCode
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+call neoCLR.Library.System.Storage.Path.RuntimeNewHashCode()
+M0000000a_IL_0006:
+stloc local0
+M0000000a_IL_0007:
+M0000000a_IL_0008:
+ldloca local0
+M0000000a_IL_000a:
+ldarg 0
+M0000000a_IL_000b:
+ldfld System.Storage.Path::text
+M0000000a_IL_0010:
+call instance System.HashCode::Add(String)
+pop
+M0000000a_IL_0015:
+M0000000a_IL_0016:
+ldloca local0
+M0000000a_IL_0018:
+call instance System.HashCode::ToHashCode()
+M0000000a_IL_001d:
+ret
+.end
+.method instance override ToString() -> String
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+ldfld System.Storage.Path::text
+M0000000b_IL_0008:
 ret
 .end
 .end

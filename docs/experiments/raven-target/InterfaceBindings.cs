@@ -2,8 +2,10 @@ using Mono.Cecil;
 
 static class InterfaceBindings
 {
-    public const string Declarations = """
+    public const string Declarations = "\n" + """
+        #nullable enable annotations
         public interface Equatable<T> { bool Equals(T other); }
+        #nullable restore annotations
         public interface Comparable<T> { int CompareTo(T other); }
         public interface Clonable<T> { T Clone(); }
         public interface Closable<E> { Result<PropagationUnit,E> Close(); }
@@ -21,7 +23,7 @@ static class InterfaceBindings
         var element = parameterMap?.Invoke(g.GenericArguments[0]) ?? ReflectionBindings.Type(g.GenericArguments[0]) ?? GenericUnionBindings.Type(g.GenericArguments[0]);
         return element is null ? null : name + "<" + element + ">";
     }
-    public static bool Converts(string source, string target) => (source == ReaderBindings.Stream && target == ReaderBindings.Reader || source == ReaderBindings.StreamWriter && target == ReaderBindings.Writer) || source == FileSystemBindings.Name && target == StorageProviderBindings.Name || StorageItemBindings.Assignable(source, target) || StreamBindings.Assignable(source, target) || source == "String" && target == "System.Collections.Iterable<Char>" || IsInterface(target)
+    public static bool Converts(string source, string target) => (source == "System.Storage.Path" && target == "System.Equatable<System.Storage.Path>") || (source == ReaderBindings.Stream && target == ReaderBindings.Reader || source == ReaderBindings.StreamWriter && target == ReaderBindings.Writer) || source == FileSystemBindings.Name && target == StorageProviderBindings.Name || StorageItemBindings.Assignable(source, target) || StreamBindings.Assignable(source, target) || source == "String" && target == "System.Collections.Iterable<Char>" || IsInterface(target)
         && (source == "System.Object" || source == "String" || ReflectionBindings.IsReference(source) || CalendarBindings.IsReference(source));
     public static string Convert(string source, string target) => Converts(source,target) ? "castclass " + target + "\n" : "";
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)

@@ -1,0 +1,2 @@
+.include "generated/Path.methods.neoil"
+.include "generated/Path.helpers.neoil"

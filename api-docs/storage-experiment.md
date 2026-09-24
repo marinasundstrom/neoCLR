@@ -260,7 +260,9 @@ logical syntax below, not existence, permissions or support by every provider.
 | `IsAbsolute: bool` | True when the spelling starts with `/`; rooted within a provider namespace. |
 | `IsRelative: bool` | The inverse of IsAbsolute; resolution requires provider/directory context. |
 | `Equals(other: Path) -> bool` | Ordinal lexical equality. Different objects with identical spelling compare equal; it does not resolve paths or compare filesystem identity. Use this method, not reference equality. |
-| `ToString() -> string` | Return the validated spelling. |
+| `Equals(other: Object?) -> bool` | Virtual spelling comparison; null and other types return false. |
+| `GetHashCode() -> int` | Hash the same spelling; equal paths have equal hashes. Not a persistent identifier. |
+| `ToString() -> string` | Return the validated spelling, including through Object dispatch. |
 | `System.Storage.InvalidPathError()` | Empty error value identifying invalid logical syntax; no filesystem error is implied. |
 
 This first grammar accepts `/` as root, `.` as the current relative location, and
@@ -280,7 +282,10 @@ remaining unequal Path values.
 
 Path is currently an immutable reference class with value comparison, avoiding a
 struct's invalid default value. That costs an allocation and does not yet supply
-value operators or a hashing/Equatable contract. Additional operations are deferred;
+value operators. Development Path now implements Equatable<Path>, matching Object
+equality/hash/display to its typed comparison. Equals(Path) requires a non-null
+operand; Equatable<T> takes T, never an automatically introduced T?. The existing
+Object.Equals(Object?) overload is the explicit null-aware reference boundary. Additional operations are deferred;
 Directory owns child resolution and calls Parse to validate its result. The existing
 static Combine(string, string) and GetFileName(string) compatibility methods retain
 their native string behavior; they do not return or validate Path values.

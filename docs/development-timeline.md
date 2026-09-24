@@ -6041,3 +6041,20 @@ failure remains the next acceptance target.
   for the final ready/pending/GC/cancellation measurements and bounded limitations.
   No runtime-owned suspension, general custom-builder contract or stable builder API
   is implied by this implementation.
+
+### 2026-09-24 — Library Object semantics and explicit equality operands
+
+- **Author:** requests applying Object semantics to the runtime library, particularly
+  Path, and investigating other classes.
+- **Assistant:** implements Path typed/interface/Object consistency and exercises it
+  through existing HashMap callbacks. Audits value-like wrappers separately from
+  mutable collections, resources and provider-bound objects.
+- **Author correction:** warns that equality interfaces must not casually impose
+  nullable operands when value types cannot be nullable; asks for explicit contracts.
+- **Assistant action:** removes its uncommitted Path? typed parameter. Preserves
+  Equatable<T>.Equals(T) and Equals(Path); keeps the existing Object.Equals(Object?)
+  boundary distinct. Documents and tests reference and value equality contracts.
+- **Outcome:** the Path fixture passes. The TypeInfo probe reports typed equality
+  but different Object equality/hashes for wrappers of the same type. The
+  [audit](object-model-review.md#path-integration-and-wider-library-audit--2026-09-24)
+  records this next repair and unresolved provider/descriptor identity decisions.

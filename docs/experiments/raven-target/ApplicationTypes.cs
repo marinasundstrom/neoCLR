@@ -261,7 +261,7 @@ static class ApplicationTypes
             output.AppendLine(type.IsInterface ? $".interface {name}" : $".type {((LibraryDependencies.Contains(type) || IsLibrary(type) && type.IsNotPublic) ? "internal " : "")}{(type.IsValueType || OpaqueLibrary.IsString(type) || IsLibrary(type) && GenericUnionLibrary.IsContainer(type) ? "" : "class ")}{(type.IsAbstract && !GenericUnionLibrary.IsContainer(type) ? "abstract " : "")}{declarationName}");
             if (!IsLibrary(type)) output.AppendLine(SourceMetadata.Type(type));
             if (IsModule(type.BaseType?.Resolve()?.Module)) output.AppendLine(".extends " + map(type.BaseType, false));
-            else if (!IsLibrary(type) && !type.IsValueType && !type.IsInterface
+            else if ((!IsLibrary(type) || type.Methods.Any(m => m.IsVirtual && !m.IsNewSlot)) && !type.IsValueType && !type.IsInterface
                 && type.BaseType?.FullName == "System.Object" && RuntimeSignatures.IsCore(type.BaseType.Scope))
                 output.AppendLine(".extends System.Object");
             if (ErrorCarrierLibrary.IsMatched(type) || GenericUnionLibrary.IsMatched(type) && GenericUnionLibrary.IsCarrier(type)) output.AppendLine(".custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()");

@@ -88,3 +88,7 @@ False:
     ldc.i4 0
     ret
 .end
+.function neoCLR.Library.System.Storage.Path.RuntimeNewHashCode() -> System.HashCode
+newobj instance System.HashCode::.ctor()
+ret
+.end

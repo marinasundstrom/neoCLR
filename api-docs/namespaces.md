@@ -49,3 +49,6 @@ Future namespace ideas belong in [proposals](/proposals/index.html) until they h
 implemented APIs. This list will expand alongside the library.
 
 The [transitional async builder guide](async-builders.md) covers generated state ownership and links the compiler-facing System.Runtime.CompilerServices contracts to their temporary role.
+
+[Equatable<T>](xref:System.Equatable`1) defines typed equality as Equals(T), without
+imposing nullable value types. Path now supplies that contract and Object overrides.

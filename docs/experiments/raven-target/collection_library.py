@@ -34,6 +34,8 @@ def build(path: Path) -> str:
         return build(ROOT / 'runtime/raven' / path.name)
     if path == ROOT / 'runtime/System/Storage/File.neoil':
         return build(ROOT / 'runtime/raven/FileText.neoil')
+    if path == ROOT / 'runtime/System/Storage/Path.neoil':
+        return build(ROOT / 'runtime/raven/Path.neoil')
     if path == ROOT / 'runtime/System/String.neoil':
         return build(ROOT / 'runtime/raven/String.neoil')
     if path == ROOT / 'runtime/System/Clock.neoil':

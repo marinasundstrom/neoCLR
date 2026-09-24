@@ -16,6 +16,9 @@ items:
   - uid: System.ConsoleReadError.Unavailable
     name: ConsoleReadError.Unavailable
     type: Struct
+  - uid: System.Equatable`1
+    name: Equatable<T>
+    type: Interface
   - uid: System.HashCode
     name: HashCode
     type: Struct

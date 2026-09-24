@@ -1,0 +1,388 @@
+; Generated from runtime/raven/src/System/Storage/Path.rvn. Regenerate with build_runtime_library.py.
+.type class System.Storage.Path
+.field private text String
+.property instance Text() -> String
+.get instance System.Storage.Path::get_Text()
+.end
+.property instance IsAbsolute() -> Boolean
+.get instance System.Storage.Path::get_IsAbsolute()
+.end
+.property instance IsRelative() -> Boolean
+.get instance System.Storage.Path::get_IsRelative()
+.end
+.method static Combine(String value0,String value1) -> String
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldarg 0
+M00000001_IL_0003:
+ldarg 1
+M00000001_IL_0004:
+call neoCLR.Runtime.PathCombine(String,String)
+M00000001_IL_0009:
+ret
+.end
+.method static GetFileName(String value0) -> String
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+call neoCLR.Runtime.PathGetFileName(String)
+M00000002_IL_0008:
+ret
+.end
+.method private instance .ctor(String text) -> noresult
+M00000003_IL_0000:
+M00000003_IL_0001:
+ldarg 0
+M00000003_IL_0002:
+pop
+M00000003_IL_0007:
+M00000003_IL_0008:
+ldarg 0
+M00000003_IL_0009:
+ldarg 1
+M00000003_IL_000a:
+stfld System.Storage.Path::text
+M00000003_IL_000f:
+ret
+.end
+.method instance get_Text() -> String
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.Storage.Path::text
+M00000004_IL_0008:
+ret
+.end
+.method instance get_IsAbsolute() -> Boolean
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.Storage.Path::text
+M00000005_IL_0008:
+ldstr "/"
+M00000005_IL_000d:
+call neoCLR.Library.System.Storage.Path.RuntimeStringStartsWithOrdinal(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0012:
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_IsRelative() -> Boolean
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+callvirt instance System.Storage.Path::get_IsAbsolute()
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0008:
+ldc.i4 0
+M00000006_IL_0009:
+ceq
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_000b:
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static Parse(String text) -> System.Result<System.Storage.Path,System.Storage.InvalidPathError>
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+call neoCLR.Library.System.Storage.Path.RuntimeStringget_IsEmpty(String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0008:
+brtrue M00000007_IL_001d
+M00000007_IL_000d:
+ldarg 0
+M00000007_IL_000e:
+ldstr "\u0000"
+M00000007_IL_0013:
+call neoCLR.Library.System.Storage.Path.RuntimeStringContainsOrdinal(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0018:
+br M00000007_IL_001e
+M00000007_IL_001d:
+ldc.i4 1
+M00000007_IL_001e:
+brtrue M00000007_IL_0028
+M00000007_IL_0023:
+br M00000007_IL_0038
+M00000007_IL_0028:
+call neoCLR.Library.System.Storage.Path.RuntimeErrorSystemStorageInvalidPathErrorNew()
+M00000007_IL_002d:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion0(System.Storage.InvalidPathError)
+M00000007_IL_0032:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Error<System.Storage.InvalidPathError>)
+M00000007_IL_0037:
+ret
+M00000007_IL_0038:
+M00000007_IL_0039:
+M00000007_IL_003a:
+ldarg 0
+M00000007_IL_003b:
+ldstr "\\"
+M00000007_IL_0040:
+call neoCLR.Library.System.Storage.Path.RuntimeStringContainsOrdinal(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0045:
+brtrue M00000007_IL_005a
+M00000007_IL_004a:
+ldarg 0
+M00000007_IL_004b:
+ldstr ":"
+M00000007_IL_0050:
+call neoCLR.Library.System.Storage.Path.RuntimeStringContainsOrdinal(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0055:
+br M00000007_IL_005b
+M00000007_IL_005a:
+ldc.i4 1
+M00000007_IL_005b:
+brtrue M00000007_IL_0065
+M00000007_IL_0060:
+br M00000007_IL_0075
+M00000007_IL_0065:
+call neoCLR.Library.System.Storage.Path.RuntimeErrorSystemStorageInvalidPathErrorNew()
+M00000007_IL_006a:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion0(System.Storage.InvalidPathError)
+M00000007_IL_006f:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Error<System.Storage.InvalidPathError>)
+M00000007_IL_0074:
+ret
+M00000007_IL_0075:
+M00000007_IL_0076:
+M00000007_IL_0077:
+ldarg 0
+M00000007_IL_0078:
+ldstr "."
+M00000007_IL_007d:
+call neoCLR.Library.System.Storage.Path.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0082:
+brtrue M00000007_IL_0097
+M00000007_IL_0087:
+ldarg 0
+M00000007_IL_0088:
+ldstr "/"
+M00000007_IL_008d:
+call neoCLR.Library.System.Storage.Path.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0092:
+br M00000007_IL_0098
+M00000007_IL_0097:
+ldc.i4 1
+M00000007_IL_0098:
+brtrue M00000007_IL_00a2
+M00000007_IL_009d:
+br M00000007_IL_00b4
+M00000007_IL_00a2:
+M00000007_IL_00a3:
+ldarg 0
+M00000007_IL_00a4:
+newobj instance System.Storage.Path::.ctor(String)
+M00000007_IL_00a9:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion2(System.Storage.Path)
+M00000007_IL_00ae:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion3(System.Result.Ok<System.Storage.Path>)
+M00000007_IL_00b3:
+ret
+M00000007_IL_00b4:
+M00000007_IL_00b5:
+M00000007_IL_00b6:
+ldarg 0
+M00000007_IL_00b7:
+ldstr "//"
+M00000007_IL_00bc:
+call neoCLR.Library.System.Storage.Path.RuntimeStringContainsOrdinal(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_00c1:
+brtrue M00000007_IL_00d6
+M00000007_IL_00c6:
+ldarg 0
+M00000007_IL_00c7:
+ldstr "/"
+M00000007_IL_00cc:
+call neoCLR.Library.System.Storage.Path.RuntimeStringEndsWithOrdinal(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_00d1:
+br M00000007_IL_00d7
+M00000007_IL_00d6:
+ldc.i4 1
+M00000007_IL_00d7:
+brtrue M00000007_IL_00e1
+M00000007_IL_00dc:
+br M00000007_IL_00f1
+M00000007_IL_00e1:
+call neoCLR.Library.System.Storage.Path.RuntimeErrorSystemStorageInvalidPathErrorNew()
+M00000007_IL_00e6:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion0(System.Storage.InvalidPathError)
+M00000007_IL_00eb:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Error<System.Storage.InvalidPathError>)
+M00000007_IL_00f0:
+ret
+M00000007_IL_00f1:
+M00000007_IL_00f2:
+M00000007_IL_00f3:
+ldarg 0
+M00000007_IL_00f4:
+ldstr ".."
+M00000007_IL_00f9:
+call neoCLR.Library.System.Storage.Path.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_00fe:
+brtrue M00000007_IL_0113
+M00000007_IL_0103:
+ldarg 0
+M00000007_IL_0104:
+ldstr "./"
+M00000007_IL_0109:
+call neoCLR.Library.System.Storage.Path.RuntimeStringStartsWithOrdinal(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_010e:
+br M00000007_IL_0114
+M00000007_IL_0113:
+ldc.i4 1
+M00000007_IL_0114:
+brtrue M00000007_IL_0129
+M00000007_IL_0119:
+ldarg 0
+M00000007_IL_011a:
+ldstr "../"
+M00000007_IL_011f:
+call neoCLR.Library.System.Storage.Path.RuntimeStringStartsWithOrdinal(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0124:
+br M00000007_IL_012a
+M00000007_IL_0129:
+ldc.i4 1
+M00000007_IL_012a:
+brtrue M00000007_IL_0134
+M00000007_IL_012f:
+br M00000007_IL_0144
+M00000007_IL_0134:
+call neoCLR.Library.System.Storage.Path.RuntimeErrorSystemStorageInvalidPathErrorNew()
+M00000007_IL_0139:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion0(System.Storage.InvalidPathError)
+M00000007_IL_013e:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Error<System.Storage.InvalidPathError>)
+M00000007_IL_0143:
+ret
+M00000007_IL_0144:
+M00000007_IL_0145:
+M00000007_IL_0146:
+ldarg 0
+M00000007_IL_0147:
+ldstr "/./"
+M00000007_IL_014c:
+call neoCLR.Library.System.Storage.Path.RuntimeStringContainsOrdinal(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0151:
+brtrue M00000007_IL_0166
+M00000007_IL_0156:
+ldarg 0
+M00000007_IL_0157:
+ldstr "/../"
+M00000007_IL_015c:
+call neoCLR.Library.System.Storage.Path.RuntimeStringContainsOrdinal(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0161:
+br M00000007_IL_0167
+M00000007_IL_0166:
+ldc.i4 1
+M00000007_IL_0167:
+brtrue M00000007_IL_0171
+M00000007_IL_016c:
+br M00000007_IL_0181
+M00000007_IL_0171:
+call neoCLR.Library.System.Storage.Path.RuntimeErrorSystemStorageInvalidPathErrorNew()
+M00000007_IL_0176:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion0(System.Storage.InvalidPathError)
+M00000007_IL_017b:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Error<System.Storage.InvalidPathError>)
+M00000007_IL_0180:
+ret
+M00000007_IL_0181:
+M00000007_IL_0182:
+M00000007_IL_0183:
+ldarg 0
+M00000007_IL_0184:
+ldstr "/."
+M00000007_IL_0189:
+call neoCLR.Library.System.Storage.Path.RuntimeStringEndsWithOrdinal(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_018e:
+brtrue M00000007_IL_01a3
+M00000007_IL_0193:
+ldarg 0
+M00000007_IL_0194:
+ldstr "/.."
+M00000007_IL_0199:
+call neoCLR.Library.System.Storage.Path.RuntimeStringEndsWithOrdinal(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_019e:
+br M00000007_IL_01a4
+M00000007_IL_01a3:
+ldc.i4 1
+M00000007_IL_01a4:
+brtrue M00000007_IL_01ae
+M00000007_IL_01a9:
+br M00000007_IL_01be
+M00000007_IL_01ae:
+call neoCLR.Library.System.Storage.Path.RuntimeErrorSystemStorageInvalidPathErrorNew()
+M00000007_IL_01b3:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion0(System.Storage.InvalidPathError)
+M00000007_IL_01b8:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Error<System.Storage.InvalidPathError>)
+M00000007_IL_01bd:
+ret
+M00000007_IL_01be:
+M00000007_IL_01bf:
+M00000007_IL_01c0:
+ldarg 0
+M00000007_IL_01c1:
+newobj instance System.Storage.Path::.ctor(String)
+M00000007_IL_01c6:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion2(System.Storage.Path)
+M00000007_IL_01cb:
+call neoCLR.Library.System.Storage.Path.RuntimeUnion3(System.Result.Ok<System.Storage.Path>)
+M00000007_IL_01d0:
+ret
+.end
+.method instance Equals(System.Storage.Path other) -> Boolean
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldfld System.Storage.Path::text
+M00000008_IL_0008:
+ldarg 1
+M00000008_IL_0009:
+callvirt instance System.Storage.Path::get_Text()
+M00000008_IL_000e:
+call neoCLR.Library.System.Storage.Path.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0013:
+call neoCLR.Library.System.Storage.Path.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance ToString() -> String
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+ldfld System.Storage.Path::text
+M0000000b_IL_0008:
+ret
+.end
+.end

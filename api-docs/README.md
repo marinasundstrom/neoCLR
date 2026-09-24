@@ -204,3 +204,8 @@ DocFX cannot render Func<Void>; [the manual protocol guide](async-builders.md) c
 its signature and semantics. These temporary compiler APIs may be removed when
 runtime-owned suspension replaces state machines. Application-facing ref metadata
 is an importer projection over bootstrap retained-owner helpers.
+
+Development Path Object alignment includes Equatable<T> and Equals(T) in generated
+metadata. Typed operands remain non-nullable; only the separate Object equality
+overload accepts a nullable reference. The Path hash and overrides are documented
+alongside the Storage guide.

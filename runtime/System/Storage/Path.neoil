@@ -1,2 +1,3 @@
-.include "../../raven/generated/Path.methods.neoil"
-.include "../../raven/generated/Path.helpers.neoil"
+; Archived Neo profile; the Raven platform uses runtime/raven/Path.neoil.
+.include "../../raven/generated/Path.bootstrap.methods.neoil"
+.include "../../raven/generated/Path.bootstrap.helpers.neoil"

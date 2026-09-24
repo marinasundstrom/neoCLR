@@ -1,0 +1,22 @@
+import System.*
+
+func Main() {
+    let first = typeof(int)
+    let second = typeof(int)
+    let firstObject: Object = first
+    let secondObject: Object = second
+    if !first.Equals(second) {
+        System.Fault("Same type handles should compare equal")
+    }
+    Console.WriteLine("TypeInfo typed equality: equal")
+    if firstObject.Equals(secondObject) {
+        Console.WriteLine("TypeInfo Object equality: equal")
+    } else {
+        Console.WriteLine("TypeInfo Object equality: unequal")
+    }
+    if firstObject.GetHashCode() == secondObject.GetHashCode() {
+        Console.WriteLine("TypeInfo Object hashes: equal")
+    } else {
+        Console.WriteLine("TypeInfo Object hashes: unequal")
+    }
+}

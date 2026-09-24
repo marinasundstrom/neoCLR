@@ -1,0 +1,63 @@
+import System.*
+import System.Storage.Path
+import System.Collections.*
+import System.Result.*
+import System.Option.*
+
+func Parsed(text: string) -> Path {
+    if let Ok(path) = Path.Parse(text) {
+        return path
+    }
+    System.Fault("Invalid fixture path")
+    return Parsed(text)
+}
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+func Same(left: Object, right: Object?) -> bool => left.Equals(right)
+func Hash(value: Object) -> int => value.GetHashCode()
+func Display(value: Object) -> string => value.ToString()
+
+func Main() {
+    let scalar: Equatable<int> = 42
+    Check(scalar.Equals(42) && !scalar.Equals(7), "Value-type equality needs no nullable type")
+    let first = Parsed("notes/naïve.txt")
+    let second = Parsed("notes/naïve.txt")
+    let third = Parsed("notes/naïve.txt")
+    let typed: Equatable<Path> = first
+    Check(!Object.ReferenceEquals(first, second), "Parse must create distinct references")
+    Check(first.Equals(second) && second.Equals(third) && first.Equals(third), "Typed equality")
+    Check(typed.Equals(second) && Same(first, second) && Same(second, first), "Interface and Object equality")
+    Check(!Same(first, null) && !Same(first, 42), "Null and wrong type")
+    Check(Hash(first) == Hash(second) && first.GetHashCode() == Hash(first), "Equal path hashes")
+    Check(Display(first) == first.Text && first.ToString() == first.Text, "Virtual display")
+    Check(!Same(first, Parsed("notes/NAÏVE.txt")), "Ordinal case")
+    Check(!Same(first, Parsed("/notes/naïve.txt")), "Relative and rooted paths differ")
+    Check(!Same(Parsed("café"), Parsed("cafe\u0301")), "No Unicode normalization")
+
+    // A path-keyed index stores one logical entry for separately parsed equal keys.
+    let index = HashMap<Path, int>((left, right) => left.Equals(right), key => key.GetHashCode())
+    Check(index.TryAdd(first, 1), "Initial insertion")
+    Check(!index.TryAdd(second, 2), "Equal key is a duplicate")
+    index.Set(third, 3)
+    if let Some(value) = index.Find(Parsed("notes/naïve.txt")) {
+        Check(value == 3 && index.Count == 1, "Equal-key replacement")
+    } else {
+        System.Fault("Equal-key lookup missed")
+    }
+    // Keep Object dispatch in a second map; force collisions to check equality too.
+    let objects = HashMap<Path, int>((left, right) => Same(left, right), key => 0)
+    Check(objects.TryAdd(first, 7) && !objects.TryAdd(second, 8), "Object-key equality")
+    Check(objects.TryAdd(Parsed("other"), 9), "Unequal colliding key")
+    var n = 0
+    while n < 12 {
+        index.Set(Parsed("entry-" + n.ToString()), n)
+        n += 1
+    }
+    Check(index.Count == 13 && index.ContainsKey(second), "Rehash preserves path lookup")
+    Console.WriteLine("Path equality, hash, display and map lookup: passed")
+}

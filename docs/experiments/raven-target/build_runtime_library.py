@@ -237,6 +237,13 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 def fragments(text, name="Math", owner="System.Math", bootstrap=False):
+    if name == 'Path' and bootstrap:
+        # The archived Neo profile has no Object or HashCode class contract.
+        # Keep its existing lexical surface; Raven uses the complete implementation.
+        text = text.replace('.extends System.Object\n', '').replace('.implements System.Equatable<System.Storage.Path>\n', '')
+        text = text.replace('call instance System.Object::.ctor()', 'pop')
+        text = re.sub(r'(?ms)^\.method instance override (?:Equals\(System.Object other\)|GetHashCode\(\))[^\n]*\n.*?^\.end\n', '', text)
+        text = text.replace('.method instance override ToString()', '.method instance ToString()')
     lines = text.splitlines(keepends=True)
     methods, helpers, types = [], {}, []
     task_operators = {}
@@ -309,7 +316,7 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
     prefix = name + ('.bootstrap' if bootstrap else '')
     result = {prefix + '.methods.neoil': banner + ''.join(methods),
               prefix + '.helpers.neoil': banner + ''.join(body for name, body in helpers.items() if name in used) + ''.join(types)}
-    if name == 'String' and not bootstrap:
+    if name in ('String', 'Path') and not bootstrap:
         result.update(fragments(text, name, owner, bootstrap=True))
     return result
 

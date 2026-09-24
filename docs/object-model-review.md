@@ -655,3 +655,69 @@ cover shared mutable box aliases, readonly overrides, identity, heap limits and
 primitive copied payloads. This is evidence for these root paths, not proof of every
 GC path or a change to the current non-moving collector. The Raven sample, 37 pinned
 .NET assertions, refreshed 385-item API reference and 14-page website build pass.
+
+### Path integration and wider library audit — 2026-09-24
+
+The author requests continuing Object semantics in the library, including Path,
+and investigating other classes. Path now implements Equatable<Path> and overrides
+Object.Equals, GetHashCode and ToString. Equality compares the exact accepted text;
+hashing feeds that same text to the existing HashCode accumulator. Separate parsed
+objects retain separate reference identities. Provider resolution, native formats,
+normalization and equality operators are unchanged. The importer now retains Object
+ancestry and constructor chaining for library reference classes declaring overrides,
+and admits Path's reference/interface conversions.
+
+**Explicit operand policy:** the author objects to automatically nullable equality
+operands, particularly because nullable value types are excluded. Equatable<T> stays
+`Equals(other: T)`, not `T?`. The initial assistant implementation added Path? to the
+typed overload; it was corrected before commit. Equals(Path) requires Path. The
+existing Object.Equals(Object?) override is the explicit null-aware reference
+boundary and returns false for null or another type. No interface change, Nullable<T>
+or implicit Option is introduced. The sample checks both Equatable<Path> and
+Equatable<int>; API absence remains a separate Option design concern.
+
+The .NET comparison remains useful at the contract level:
+[Object.Equals](https://learn.microsoft.com/en-us/dotnet/api/system.object.equals?view=net-10.0)
+and [GetHashCode](https://learn.microsoft.com/en-us/dotnet/api/system.object.gethashcode?view=net-10.0)
+require equality/hash consistency. [.NET Path](https://learn.microsoft.com/en-us/dotnet/api/system.io.path?view=net-10.0)
+is a static helper surface, not this validated value object. Keeping Path as an
+immutable class avoids an invalid default struct at the cost of allocation. Its
+hash is not persistent, collision-free or compatible with .NET string hash values.
+The current string hash path encodes UTF-8 on each call; caching and generic comparer
+automation are not part of this correctness slice. Sources reviewed 2026-09-24.
+
+The [executable fixture](experiments/path-object/README.md) checks typed/interface/
+Object consistency, null/wrong types, Unicode/case/root distinctions, map duplicate
+keys, replacement, collisions and rehashing. An Object-keyed generic map currently
+fails importer admission; the tested map uses Path keys with Object-dispatch callbacks.
+This remains an explicit importer coverage gap, not a runtime map equality limitation.
+
+#### Audit findings and follow-up order
+
+| Area / source evidence | Finding | Proposed action |
+| --- | --- | --- |
+| Introspection/Descriptors.rvn: RuntimeTypeInfo.Equals and FromHandle | Typed equality uses handles; each query can create a wrapper. No Object overrides. The probe reports equal typed results, unequal Object results and unequal hashes for the same type. | Next bounded repair: preserve represented-type identity through Object equality/hash/display, with null and generic-type distinctions. |
+| Introspection/AssemblyInfo.rvn, ModuleInfo.rvn, Descriptors.rvn member wrappers | Wrappers retain identities, handles, tokens or owner context but do not override Object contracts. | Define assembly/module/owner identity before equality; do not compare names or tokens without their scope. Audit repeated-query wrappers after TypeInfo. |
+| String.rvn | Intrinsic String has typed equality but no source Object equality/hash/display overrides; boxed/string reference handling is special. | Separate representation-aware slice; align content hash with equality without inventing String reference identity. |
+| Storage/FileSystem.rvn: FileSystem, LocalFile, LocalDirectory | Provider/root/path context and possibly aliases; no Object overrides. | Keep identity now. Lexically equal paths across providers do not establish equal storage items; do not reuse Path equality automatically. |
+| IO stream/readers/writers, Tasks/Promise/TaskQueue, Concurrency Thread | Mutable progress, ownership or resource state. | Identity remains appropriate unless a specific contract says otherwise; add targeted alias/lifetime tests when these APIs change. |
+| Collections ArrayList/HashMap and Array | Mutable contents with no sequence-equality contract; HashMap already consumes explicit callbacks. | Keep identity and custom callbacks. Evaluate a default comparer only after its typed/Object dispatch and boxing policy are explicit. |
+| Date, Time, Instant, Duration; LocalDateTime | First four have typed equality; boxed overrides/hash/display are incomplete. LocalDateTime has no typed equality yet. | Incremental exact-type boxed/typed matrices; define component semantics before default structural behavior. |
+| Char, numeric primitives, error structs and union carriers | Typed display/equality varies; most do not override Object. Int32/Boolean boxed equality/hash are special runtime paths. | Close supported primitive dispatch, then diagnostic display. Do not infer universal structural equality for Result/Option/errors. |
+
+The [TypeInfo comparison](https://learn.microsoft.com/en-us/dotnet/api/system.type.equals?view=net-10.0)
+is represented-type equality across typed/Object overloads in .NET. neoCLR should
+compare its own handle identity, including context, rather than blindly copy wrapper
+identity or CLR runtime caches. This is a selected investigation, not implemented
+TypeInfo behavior in this commit. Broader reference conversion/importer coverage
+must be verified alongside each consumer; source declarations alone are insufficient.
+
+Compiler diagnostic gap: the probe `value: Equatable<Path>; value.Equals(null)`
+currently compiles, even with explicit non-nullable reference metadata. Typed
+implementations still require T; null handling is not promised by that acceptance.
+Track generic-argument nullability checking as a separate Raven investigation.
+
+Runtime follow-up exposed by Path ancestry: reachability incorrectly tried virtual
+dispatch for nonvirtual class callvirt (Object.GetType). It now records the static
+callee, matching execution's receiver-null-check behavior. A small independent
+base/derived regression and the existing Object-default reachability case cover it.

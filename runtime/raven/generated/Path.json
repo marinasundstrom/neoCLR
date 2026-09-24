@@ -91,7 +91,7 @@
     "runtime/raven/src/System/Collections/HashMap.rvn": "b41f6da8155ee5d9d4df62d55e18f2cc47fea1bbc9c46d9cff7fa729d955d31e",
     "runtime/raven/src/System/Time.rvn": "32057665602a216c60d011e9a6f1c9dbb3161ac0ad2b7cf041df6552baf1352c",
     "runtime/raven/src/System/Date.rvn": "e6fa47d6b202e2b2e7e4bc61f6ded4105baf4d3e256b38b3b33c0712a06da4fe",
-    "runtime/raven/src/System/Storage/Path.rvn": "4163b625f589c019bad3f3801b957b547bd38ba1fe176125c8e970ce5a794550",
+    "runtime/raven/src/System/Storage/Path.rvn": "38f08699af2b8a90d00c847ccb49dcf7f60261856df284800a241d86e93eb664",
     "runtime/raven/src/System/Storage/FileText.rvn": "dbed8561728a7d48e605f5e36a2ea1ba6d1992d162911d570f9bdeca6c075d60",
     "runtime/raven/src/System/Int64.rvn": "0a6bf2bb36f1a76e6674534681a8405f3d0969f63a6de7744aa8234f018765bc",
     "runtime/raven/src/System/SByte.rvn": "3c90d534988afed3fb18bcb34e695a54b6d7a05df147626e4d80ccb3c6fdbc76",
@@ -109,11 +109,13 @@
     "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
-    "Path.methods.neoil": "4a8601f6917e0958c7b4da89b72e773a50a37fed1e2a18e4219ddd05884a3ac2",
-    "Path.helpers.neoil": "27ac0fa7e3f0468eaebb3b4b3850ce303650e3ed1526c12da05efc18b8b556c7"
+    "Path.methods.neoil": "565bbf0c6d967549b93f55b306e22c1741ea36c92b6b1ae98c82b549a9c07bb7",
+    "Path.helpers.neoil": "866ceedfb5c574f757400bd6ff0a21c4621502c2cb3ca45f720f132a7db85a15",
+    "Path.bootstrap.methods.neoil": "399ceff670c08b376875c3336b17b66a67084ce1642d8fce7380ef72fca764ae",
+    "Path.bootstrap.helpers.neoil": "27ac0fa7e3f0468eaebb3b4b3850ce303650e3ed1526c12da05efc18b8b556c7"
   },
   "compilerSha256": "3929934792068c2937ba481db944e6fd76587c42b37fc363ed19560c7ab21a5f",
-  "coreSha256": "e7d2fbd771fedd03ed86f369c2feb0c1838afed37b5989f9c79c5582e4a5f78b",
+  "coreSha256": "97076bff3ade0d237428815bfa4eac28e5adcb75f40fbd8d7f6ad69eb9a33c91",
   "exports": [
     "Combine(String value0,String value1) -> String",
     "GetFileName(String value0) -> String",
@@ -122,6 +124,8 @@
     "get_IsRelative() -> Boolean",
     "Parse(String text) -> System.Result<System.Storage.Path,System.Storage.InvalidPathError>",
     "Equals(System.Storage.Path other) -> Boolean",
-    "ToString() -> String"
+    "override Equals(System.Object other) -> Boolean",
+    "override GetHashCode() -> Int32",
+    "override ToString() -> String"
   ]
 }

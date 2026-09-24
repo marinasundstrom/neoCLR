@@ -107,3 +107,14 @@ fn rootless_object_default_remains_reachable_with_an_abstract_root() {
             .any(|function| function.target.name == "System.Object.ToString")
     );
 }
+
+#[test]
+fn nonvirtual_class_callvirt_has_one_reachable_implementation() {
+    let app = neoclr::assemble(".module Calls\n.entry Main\n.type class Base\n.method instance Read() -> Int32\nldc.i4 42\nret\n.end\n.end\n.type class Child\n.extends Base\n.end\n.function Main() -> Int32\nnewobj Child\ncallvirt instance Base::Read()\nret\n.end").unwrap();
+    let program = LoadedProgram::new(&app).unwrap();
+    let graph = program.analyze_reachability(
+        &[neoclr::assembler::parse_function_ref("Main()").unwrap()], 10
+    ).unwrap();
+    assert_eq!(graph.functions.len(), 2);
+    assert!(graph.functions.iter().any(|f| f.target.name == "Base.Read"));
+}

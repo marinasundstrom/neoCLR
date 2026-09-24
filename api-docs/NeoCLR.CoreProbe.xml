@@ -746,9 +746,29 @@
     </member>
     <member name="M:System.Storage.Path.Equals(System.Storage.Path)">
       <summary>Compares accepted spellings using ordinal equality.</summary>
-      <remarks>Does not resolve a provider or compare filesystem identity. Use this method explicitly; reference equality and hashing are not value contracts.</remarks>
-      <param name="other">The other validated logical path.</param>
+      <remarks>Implements Equatable&lt;Path&gt;. Requires a non-null Path, matching Equatable&lt;T&gt;.Equals(T); this contract does not require nullable value types. Object.Equals(Object?) is the separate null-aware overload. No provider resolution or filesystem identity comparison is performed.</remarks>
+      <param name="other">The non-null validated logical path to compare.</param>
       <returns>True when the spellings are identical.</returns>
+    </member>
+    <member name="M:System.Storage.Path.Equals(System.Object)">
+      <summary>Compares another Path by its exact accepted spelling through Object dispatch.</summary>
+      <param name="other">A Path, another object, or null.</param>
+      <returns>True for a Path with identical spelling; false for null or another type.</returns>
+    </member>
+    <member name="M:System.Storage.Path.GetHashCode">
+      <summary>Hashes the accepted spelling using System.HashCode.</summary>
+      <returns>A hash consistent with typed and Object equality.</returns>
+      <remarks>No case folding, Unicode normalization or provider resolution. Hash values are not persistent identifiers and may change between runtime versions.</remarks>
+    </member>
+    <member name="T:System.Equatable`1">
+      <summary>Defines typed equality without imposing nullable or optional operands.</summary>
+      <typeparam name="T">The operand type, which may be a value type or reference type.</typeparam>
+      <remarks>Equals takes T, not T?. A reference implementation need not accept null through this contract. Object.Equals(Object?) is a separate, explicitly null-aware boundary. Absence in domain APIs is represented with Option when needed.</remarks>
+    </member>
+    <member name="M:System.Equatable`1.Equals(`0)">
+      <summary>Compares this instance with another value of the declared operand type.</summary>
+      <param name="other">The T operand; no nullable wrapper is introduced.</param>
+      <returns>True when the values are equal according to the implementing type.</returns>
     </member>
     <member name="M:System.Storage.Path.ToString">
       <summary>Returns the accepted logical spelling.</summary>

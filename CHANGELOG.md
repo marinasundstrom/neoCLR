@@ -8,6 +8,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Align Storage.Path typed and Object equality, hashing and display; implement
+  Equatable<Path> and reuse the contract in HashMap lookup, replacement and rehashing.
+  Keep typed equality operands non-nullable (Equatable<T>.Equals(T)); the existing
+  Object.Equals(Object?) overload explicitly rejects null and unrelated objects.
+  Preserve ordinal spelling and provider-independent semantics. Retain Object
+  ancestry/constructor chaining for library class overrides and admit Path interface
+  conversions. Preserve the archived Neo lexical Path surface in generated bootstrap
+  fragments. Fix reachability analysis of nonvirtual class callvirt, exposed by
+  Path becoming an Object subclass: retain its one static target and runtime null
+  check. Update API reference and website. Audit other library classes and
+  reproduce RuntimeTypeInfo's typed/Object inconsistency as the next bounded repair;
+  provider/resource identity and general comparers remain separate decisions.
+
 - Investigate value-type async state machines as the next author-directed priority.
   Add a reproducible Release heap/value probe: the initial heap baseline succeeds;
   struct emission exposes an import rejection and boxing at builder boundaries. Record

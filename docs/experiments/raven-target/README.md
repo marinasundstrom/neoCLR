@@ -941,3 +941,15 @@ capture or a new scheduler. See [the experiment](../value-async/README.md) and t
 Raven target policy fix: `89a40051e` on `codex/async-preview-readiness`; six existing
 state-machine tests pass. The strict target matrix runs twelve Release cases,
 including awaitless completion. No target changes were integrated into Raven main.
+
+### Library Object consumers — 2026-09-24
+
+Path implements Equatable<Path> and consistent Object equality/hash/display. Typed
+equality takes T, not T?; Object.Equals(Object?) is the explicit null-aware boundary.
+The reference marks Equatable's T operand non-nullable, though Raven currently
+accepts a null literal through a constructed generic interface: a diagnostic gap,
+not a nullable contract. No compiler source change is made in this slice. The
+importer preserves Object ancestry and base construction for library class overrides.
+Path reference/interface conversions are admitted and tested through HashMap callbacks.
+The archived Neo profile keeps generated Path.bootstrap fragments because it lacks
+the platform Object/HashCode classes; the Raven profile uses the complete source.

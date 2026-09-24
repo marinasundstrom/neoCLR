@@ -8,6 +8,7 @@ items:
   - System.ConsoleReadError
   - System.ConsoleReadError.ReadFailed
   - System.ConsoleReadError.Unavailable
+  - System.Equatable`1
   - System.HashCode
   - System.Object
   - System.Value
@@ -116,6 +117,34 @@ references:
     name: ReadFailed
     isExternal: true
     href: System.ConsoleReadError.ReadFailed.html
+- uid: System.Equatable`1
+  commentId: T:System.Equatable`1
+  isExternal: true
+  href: System.Equatable-1.html
+  name: Equatable<T>
+  nameWithType: Equatable<T>
+  fullName: System.Equatable<T>
+  nameWithType.vb: Equatable(Of T)
+  fullName.vb: System.Equatable(Of T)
+  name.vb: Equatable(Of T)
+  spec.csharp:
+  - uid: System.Equatable`1
+    name: Equatable
+    isExternal: true
+    href: System.Equatable-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Equatable`1
+    name: Equatable
+    isExternal: true
+    href: System.Equatable-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
 - uid: System
   commentId: N:System
   isExternal: true

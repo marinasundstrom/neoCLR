@@ -142,8 +142,12 @@ pub(crate) fn analyze(
                     crate::vm::resolve(module, target).and_then(|contract| {
                         if crate::interfaces::is_contract(module, &contract) {
                             crate::interfaces::dispatch_targets(module, &contract)
-                        } else {
+                        } else if contract.is_virtual {
                             crate::inheritance::dispatch_targets(module, &contract)
+                        } else {
+                            // Nonvirtual class callvirt performs a receiver null check,
+                            // but has one statically selected implementation.
+                            Ok(vec![contract])
                         }
                     })
                 }
