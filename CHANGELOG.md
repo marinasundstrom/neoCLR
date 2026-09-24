@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add a two-process HTTP JSON report sample using the integrated client/server APIs
+  and the unchanged application-local JSON codec. Validate both applications against
+  independent Python peers, structured JSON output and GC reclamation. Include the
+  tested source as a website example/download; no public JSON API or POST is added.
+
 - Add a provisional HttpServer with Listen/GetLocalPort/ServeOne/Close and received
   HttpRequest.Headers. Serve one bounded GET/200 exchange, validate response headers
   and supply framing; expected errors close the connection. Add a greeting app,

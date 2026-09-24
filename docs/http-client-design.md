@@ -62,7 +62,8 @@ README records remaining compiler limitations and the source-level workarounds.
 ## Next gates
 
 1. The [HttpServer POC](http-server-design.md) now supplies the greeting exchange,
-   checked with neoCLR and independent peers. Next connect the existing JSON consumer.
+   checked with neoCLR and independent peers. The [JSON report](experiments/http-json/README.md)
+   now composes the existing application-local JSON consumer with these APIs.
 2. Define request/transfer cancellation and deadlines at the existing operation-owner
    boundary, without exposing generated state-machine mechanics in HTTP contracts.
 3. Decide which additional statuses, methods, request headers and content shapes the

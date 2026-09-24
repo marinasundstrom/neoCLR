@@ -1,0 +1,42 @@
+import System.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+func Summarize(payload: string) -> Result<string, string> {
+    let report = ReadDocument(payload)?
+    let stationValue = report.Field("station")?
+    let station = stationValue.AsString()?
+    let readings = report.Field("readings")?
+    if !(readings is JsonArray) {
+        return Error("Expected readings array")
+    }
+    let first = readings.Item(0)?
+    let reading = first.AsInt32()?
+    Console.WriteLine(String.Concat("Station: ", station))
+    Console.WriteLine(String.Concat("First reading: ", reading.ToString()))
+    let reply = JsonValue.ObjectValue()
+    _ = reply.Put("station", JsonValue.StringValue(station))?
+    _ = reply.Put("accepted", JsonValue.BooleanValue(true))?
+    let count = JsonValue.NumberValue(readings.Count.ToString())?
+    _ = reply.Put("count", count)?
+    return WriteDocument(reply)
+}
+
+async func ReadReport(client: HttpClient, url: string) -> Task<Result<string, string>> {
+    let response = await client.Get(url)?
+    let text = await response.Content.ReadText()?
+    return Summarize(text)
+}
+
+func Main() {
+    let client = HttpClient()
+    let reading = ReadReport(client, "http://localhost:19091/report")
+    reading.OnCompleted(() => {
+        if let Ok(reply) = reading.GetResult() {
+            Console.WriteLine(reply)
+        } else if let Error(message) = reading.GetResult() {
+            System.Fault(message)
+        }
+    })
+}

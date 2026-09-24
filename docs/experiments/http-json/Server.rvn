@@ -1,0 +1,54 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Tasks.*
+import System.Text.*
+import System.Web.Http.*
+
+func CreateReport() -> Result<string, string> {
+    let report = JsonValue.ObjectValue()
+    _ = report.Put("station", JsonValue.StringValue("Café"))?
+    let readings = JsonValue.ArrayValue()
+    let first = JsonValue.NumberValue("21")?
+    let second = JsonValue.NumberValue("22.5")?
+    _ = readings.Add(first)?
+    _ = readings.Add(second)?
+    _ = report.Put("readings", readings)?
+    return WriteDocument(report)
+}
+
+func Respond(request: HttpRequest) -> Task<Result<HttpResponse, string>> {
+    let source = Promise<Result<HttpResponse, string>>()
+    if request.Target != "/report" {
+        _ = source.Complete(Error("Unknown report"))
+    } else if let Ok(text) = CreateReport() {
+        let headers = ArrayList<HttpHeader>()
+        headers.Add(HttpHeader("Content-Type", "application/json"))
+        _ = source.Complete(Ok(HttpResponse(200, headers, Utf8.Encode(text))))
+    } else {
+        _ = source.Complete(Error("Report construction failed"))
+    }
+    return source.Task
+}
+
+func Main() {
+    if let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) {
+        if let Ok(port) = server.GetLocalPort() {
+            Console.WriteLine(port)
+            let serving = server.ServeOne(Respond)
+            serving.OnCompleted(() => {
+                let result = serving.GetResult()
+                server.Close()
+                if let Error(message) = result {
+                    System.Fault(message)
+                }
+                Console.WriteLine("Report served")
+            })
+        } else {
+            server.Close()
+            System.Fault("Local port unavailable")
+        }
+    } else {
+        System.Fault("Listen failed")
+    }
+}

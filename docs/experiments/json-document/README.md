@@ -23,7 +23,9 @@ Int32 and constructs a fresh reply:
 
 The number `22.5` is accepted without needing a floating-point conversion. The
 [expected output](expected.txt) also displays the station and first reading. This
-is an in-memory application checkpoint, not an HTTP or file consumer.
+is the original in-memory checkpoint. The later [HTTP report](../http-json/README.md)
+reuses these sources between separate client/server applications without promoting
+a public JSON API.
 
 ```sh
 python3 docs/experiments/json-document/verify.py --toolchain-root /absolute/path/to/development-bundle
@@ -148,7 +150,7 @@ pending native-I/O GC rooting. The earlier string codec remains unchanged.
 
 The product makes the small in-memory JSON case concrete. Public error types and
 locations, efficient buffering, API ergonomics, broader conformance and production
-limits remain open. The next platform checkpoint should return to controlled delayed
+limits remain open. At this earlier checkpoint, the next step was controlled delayed
 completion with actual guest GC retention, then reuse the pipeline for files before
 sockets. The application-enum and protected-constructor findings are bounded future
 integration probes, not automatic reasons to redesign metadata or the runtime.

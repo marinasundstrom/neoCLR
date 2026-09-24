@@ -6632,3 +6632,19 @@ configuration/content, not target-specific code added to Raven main.
 - **Open:** request deadlines/cancellation, general HTTP status/body support, structured
   errors and a permanent hosting contract. Next use the existing JSON experiment in
   the network application; Uri/BaseAddress remain later as directed.
+
+### 2026-09-24 — JSON over the HTTP POC
+
+- **Author context:** the application goal includes a small JSON API and the author
+  asks to continue subsequent slices after the HTTP integration. The user favors
+  deciding contracts from concrete cases, rather than prematurely completing layers.
+- **Assistant action:** reuses the existing JSON document experiment in a report server
+  and client. The server constructs a report; the client fetches and parses it, reads
+  fields and prints a locally constructed acknowledgement. No POST or public JSON API
+  is implied. The shared JSON codec is unchanged.
+- **Outcome:** [the verifier](experiments/http-json/README.md) passes a neoCLR pair and
+  independent Python HTTP peers. Server/client executions collect six or seven times
+  with a 256-object heap and finish with zero live objects. The website includes the
+  tested async consumer and a downloadable sample. No compiler changes or release.
+- **Next gate:** bounded HTTP request/transfer lifetime, then use this concrete consumer
+  to evaluate public JSON contracts. The full web-application milestone remains open.

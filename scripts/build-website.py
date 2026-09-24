@@ -230,6 +230,7 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'HTTP_JSON_SAMPLE': ('docs/experiments/http-json/Client.rvn', 'async func ReadReport(', '\n}', True),
         'HTTP_SERVER_SAMPLE': ('docs/experiments/http-server/Server.rvn', 'func Respond(', '\n}', True),
         'HTTP_CLIENT_SAMPLE': ('docs/experiments/http-client/Main.rvn', 'async func ReadGreeting(', '\n}', True),
         'SOCKET_SERVER_SAMPLE': ('docs/experiments/socket-echo/Server.rvn', 'async func Serve(', '\n}', True),
@@ -299,6 +300,18 @@ def main():
     for name in ('Main.rvn', 'Handlers.rvn', 'HttpClient.rvnproj', 'Reference.cs'):
         shutil.copyfile(ROOT / 'docs/experiments/http-client' / name, server_downloads / name)
     shutil.make_archive(str(downloads / 'http-server'), 'zip', server_downloads)
+    json_downloads = downloads / 'http-json'
+    for directory, names in (
+        ('http-json', ('Client.rvn', 'Server.rvn', 'Client.rvnproj', 'Server.rvnproj', 'README.md', 'verify.py')),
+        ('json-message', ('JsonMessage.rvn',)),
+        ('json-document', ('JsonValue.rvn', 'JsonDocument.rvn')),
+    ):
+        destination = json_downloads / directory
+        destination.mkdir(parents=True, exist_ok=True)
+        for name in names:
+            shutil.copyfile(ROOT / 'docs/experiments' / directory / name, destination / name)
+    shutil.make_archive(str(downloads / 'http-json'), 'zip', json_downloads)
+
 
     socket_downloads = downloads / 'socket-client'
     socket_downloads.mkdir()

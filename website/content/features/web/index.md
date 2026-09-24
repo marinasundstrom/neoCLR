@@ -67,6 +67,24 @@ must be `0`. It validates application response headers, computes the byte length
 and adds `Connection: close`. Malformed requests or callback errors close the
 connection without an HTTP error response. Only 200 responses are supported.
 
+## Read a JSON report
+
+```raven
+{{HTTP_JSON_SAMPLE}}
+```
+
+The next [application sample](/samples/http-json/http-json/Client.rvn) fetches a sensor
+report from a neoCLR server. `Summarize` checks fields and types, reads the first
+measurement and constructs a local JSON acknowledgement. Each `?` propagates an
+error from its own layer: HTTP, UTF-8 decoding or JSON access. The acknowledgement
+is printed locally; the sample does not implement POST.
+
+[Download the JSON client/server sample](/samples/http-json.zip). It includes the
+application-local JSON codec and a verifier using independent Python HTTP peers.
+The codec handles the six JSON value kinds with explicit field access and construction;
+its 128-byte, four-container-depth and 32-value bounds are demonstration policies.
+It remains exploratory source, not a public runtime-library JSON API.
+
 ## Current limits
 
 Only plain HTTP/1.1 GET and a 200 response with exactly one Content-Length are
@@ -82,8 +100,8 @@ is a correctness POC, not a performance benchmark. Generated async states still 
 
 ## Direction
 
-The client/server greeting is in place. The next application case exchanges JSON;
-operation lifetime/deadlines remain a separate open gate. The System.Web.Http boundary
+The client/server greeting and JSON report are in place. Request lifetime/deadlines,
+a public JSON contract and broader request/response behavior remain open gates. The System.Web.Http boundary
 separates HTTP policy from [networking](/features/networking/); a future transport
 could use sockets or a host facility. Handler ownership, concurrency, cancellation
 and a structured error model need concrete cases as these provisional APIs evolve. No complete HTTP stack or runtime suspension is claimed.
