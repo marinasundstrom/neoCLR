@@ -12,6 +12,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   full namespace names as peers and expandable type groups. Update the pinned
   upstream generator; hierarchical mode remains available and URLs are unchanged.
 
+- Include every public reference type in API generation, rather than maintaining a
+  selected subset. Add collection classes/interfaces and the remaining public API
+  families, with type/member descriptions and sample-oriented navigation. Check the
+  full metadata inventory automatically; missing prose no longer suppresses pages.
+  Document three pinned-renderer limitations through explicit manual type entries.
+  Website publication remains a separate operation.
+
 - Add Socket.Listen, asynchronous Accept and GetLocalPort for a two-process neoCLR
   echo POC. Reserve connection capacity for pending accepts; preserve accepted sockets
   after listener close, with that ownership rule documented on Close. Add

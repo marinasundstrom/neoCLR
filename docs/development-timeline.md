@@ -6490,3 +6490,25 @@ No implementation or change to immediate milestone order is implied.
 **Outcome:** the compiled flag sample passes with seven collections and zero live
 objects; matching library/API snapshots and the combined 575-page website validate.
 No interface-family redesign or website publication is included.
+
+
+## 2026-09-24 — Complete public API reference coverage
+
+**Author:** reported missing collection classes and other library types on the
+website, clarified that coverage means public types, and emphasized the types used
+in samples to understand the platform. Further clarified that every public type
+should participate in generation even without documentation content, preferably
+with type and member descriptions.
+
+**Assistant action:** audit the public reference metadata, replace selection by
+automatic public-type generation, add descriptions for the missing API families
+and improve sample-oriented navigation. Preserve explicit manual references for
+namespace containers and the readonly marker where the pinned renderer omits a
+type page. Missing prose is reported without hiding public APIs; missing pages
+remain a validation failure. Publication is separate from the local site build.
+
+**Author follow-up:** RavenDoc changes must be on both Raven main and neoclr.
+**Verification:** the general flat-namespace navigation change is on main as
+`9775eca0f` and neoclr as `9e196cc4b`; RavenDoc sources and docs match across those
+branches. This task's public inventory and documentation additions are neoCLR site
+configuration/content, not target-specific code added to Raven main.

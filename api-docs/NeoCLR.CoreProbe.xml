@@ -1466,7 +1466,675 @@
     <member name="M:System.Networking.DnsError.#ctor(System.Networking.DnsError.LookupFailed)"><summary>Wraps the LookupFailed case.</summary><param name="value">The case to wrap.</param></member>
     <member name="P:System.Networking.DnsError.IsLookupFailed"><summary>Reports whether this is the LookupFailed case.</summary></member>
     <member name="M:System.Networking.DnsError.GetLookupFailed"><summary>Extracts the LookupFailed case.</summary><returns>The case payload.</returns><remarks>Requires the matching case; prefer a union pattern in Raven.</remarks></member>
-    <member name="M:System.Networking.Sockets.Socket.Listen(System.String,System.Int32,System.Int32)"><summary>Binds an IPv4 TCP listener and starts listening.</summary><param name="address">Numeric local IPv4 address. Use 127.0.0.1 for loopback; 0.0.0.0 binds all IPv4 interfaces.</param><param name="port">Port from zero through 65535. Zero requests an OS-assigned port; query it with GetLocalPort.</param><param name="backlog">Requested pending-connection backlog from 1 through 128; the OS may apply its own bound.</param><returns>A listening Socket or a SocketError such as InvalidAddress, InvalidRange, AddressInUse, AccessDenied or LimitExceeded.</returns><remarks>Development API. This synchronous factory completes bind/listen without waiting for a client. No reuse-address option or separate unbound socket state is exposed. Listeners share invocation socket capacity with connections and pending connection reservations. Close promptly.</remarks></member>
+    <member name="T:System.ValueType"><summary>CLI base metadata for value-type declarations; the neoCLR application model uses Value.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
+    <member name="T:System.Enum"><summary>CLI base metadata for enum declarations; it is not an application-constructible enum.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
+    <member name="T:System.Void"><summary>The inhabited unit value used when an operation has no meaningful result.</summary></member>
+    <member name="T:System.Boolean"><summary>A Boolean true or false value.</summary></member>
+    <member name="M:System.Boolean.CompareTo(System.Boolean)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="T:System.SByte"><summary>A signed 8-bit integer.</summary></member>
+    <member name="M:System.SByte.CompareTo(System.SByte)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="T:System.Byte"><summary>A unsigned 8-bit integer.</summary></member>
+    <member name="M:System.Byte.CompareTo(System.Byte)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="T:System.Int16"><summary>A signed 16-bit integer.</summary></member>
+    <member name="M:System.Int16.CompareTo(System.Int16)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="T:System.UInt16"><summary>A unsigned 16-bit integer.</summary></member>
+    <member name="M:System.UInt16.CompareTo(System.UInt16)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="T:System.Int32"><summary>A signed 32-bit integer.</summary></member>
+    <member name="M:System.Int32.Parse(System.String)"><summary>Parses an Int32, returning InvalidFormat or Overflow when the input cannot be represented.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Int32.Divide(System.Int32,System.Int32)"><summary>Divides two signed integers, returning DivisionByZero or Overflow for invalid division.</summary></member>
+
+    <member name="M:System.Int32.Equals(System.Int32)"><summary>Tests value equality with the other value.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="M:System.Int32.CompareTo(System.Int32)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="M:System.Int32.ToString"><summary>Returns the value or active error case name for display.</summary></member>
+
+    <member name="T:System.UInt32"><summary>A unsigned 32-bit integer.</summary></member>
+    <member name="M:System.UInt32.CompareTo(System.UInt32)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="T:System.Int64"><summary>A signed 64-bit integer.</summary></member>
+    <member name="M:System.Int64.CompareTo(System.Int64)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="T:System.UInt64"><summary>A unsigned 64-bit integer.</summary></member>
+    <member name="M:System.UInt64.CompareTo(System.UInt64)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="T:System.Single"><summary>A single-precision floating-point value.</summary></member>
+    <member name="M:System.Single.CompareTo(System.Single)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="T:System.Double"><summary>A double-precision floating-point value.</summary></member>
+    <member name="M:System.Double.CompareTo(System.Double)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="T:System.IntPtr"><summary>A signed native-sized integer.</summary></member>
+    <member name="M:System.IntPtr.CompareTo(System.IntPtr)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="T:System.UIntPtr"><summary>A unsigned native-sized integer.</summary></member>
+    <member name="M:System.UIntPtr.CompareTo(System.UIntPtr)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="T:System.Array"><summary>Compiler-facing base shape for managed arrays; Length reports the allocated element count.</summary></member>
+    <member name="P:System.Array.Length"><summary>Gets the allocated element count.</summary></member>
+    <member name="T:System.Attribute"><summary>Compiler-reference base for custom-attribute metadata.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
+    <member name="M:System.Attribute.#ctor"><summary>Creates Attribute.</summary></member>
+
+    <member name="T:System.NotImplementedException"><summary>Compiler-reference placeholder used in non-executable reference method bodies.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
+    <member name="M:System.NotImplementedException.#ctor"><summary>Creates NotImplementedException.</summary></member>
+
+    <member name="T:System.FlagsAttribute"><summary>Compiler-reference marker for flag enum declarations.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
+    <member name="M:System.FlagsAttribute.#ctor"><summary>Creates FlagsAttribute.</summary></member>
+
+    <member name="T:System.AttributeTargets"><summary>Compiler-reference targets used by attribute declarations; this bounded scaffold provides All.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
+    <member name="F:System.AttributeTargets.All"><summary>The All metadata constant.</summary></member>
+    <member name="T:System.AttributeUsageAttribute"><summary>Compiler-reference metadata describing where attributes may be used.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
+    <member name="M:System.AttributeUsageAttribute.#ctor(System.AttributeTargets)"><summary>Constructs AttributeUsageAttribute with the supplied arguments.</summary></member>
+
+    <member name="P:System.AttributeUsageAttribute.AllowMultiple"><summary>Gets or sets whether the attribute permits repeated applications.</summary></member>
+    <member name="P:System.AttributeUsageAttribute.Inherited"><summary>Gets or sets whether attribute metadata is inherited.</summary></member>
+    <member name="T:System.Math.NamespaceMembers"><summary>Namespace functions for integer and floating-point mathematics.</summary></member>
+    <member name="M:System.Math.NamespaceMembers.Abs(System.Double)"><summary>Returns the absolute value; the Int32 overload returns OverflowError for the minimum signed value.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Sqrt(System.Double)"><summary>Returns the floating-point square root.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Floor(System.Double)"><summary>Rounds toward negative infinity.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Ceiling(System.Double)"><summary>Rounds toward positive infinity.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Truncate(System.Double)"><summary>Discards the fractional part toward zero.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Round(System.Double)"><summary>Rounds to the nearest integral floating-point value.</summary><param name="value">The value on which this operation acts.</param><remarks>Floating-point behavior follows the current runtime math service; this overload has no configurable rounding mode.</remarks></member>
+
+    <member name="M:System.Math.NamespaceMembers.Exp(System.Double)"><summary>Returns e raised to the supplied power.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Log(System.Double)"><summary>Returns the natural logarithm.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Log10(System.Double)"><summary>Returns the base-10 logarithm.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Sin(System.Double)"><summary>Returns the sine of the angle in radians.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Cos(System.Double)"><summary>Returns the cosine of the angle in radians.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Tan(System.Double)"><summary>Returns the tangent of the angle in radians.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Pow(System.Double,System.Double)"><summary>Raises the first operand to the power of the second.</summary><param name="left">The first operand.</param><param name="right">The second operand.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Min(System.Double,System.Double)"><summary>Returns the smaller operand.</summary><param name="left">The first operand.</param><param name="right">The second operand.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Max(System.Double,System.Double)"><summary>Returns the larger operand.</summary><param name="left">The first operand.</param><param name="right">The second operand.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Abs(System.Int32)"><summary>Returns the absolute value; the Int32 overload returns OverflowError for the minimum signed value.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Clamp(System.Int32,System.Int32,System.Int32)"><summary>Restricts a value to the inclusive minimum/maximum range, or returns InvalidRangeError for reversed bounds.</summary><param name="value">The value on which this operation acts.</param><param name="min">The inclusive lower bound.</param><param name="max">The inclusive upper bound.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Min(System.Int32,System.Int32)"><summary>Returns the smaller operand.</summary><param name="left">The first operand.</param><param name="right">The second operand.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Max(System.Int32,System.Int32)"><summary>Returns the larger operand.</summary><param name="left">The first operand.</param><param name="right">The second operand.</param></member>
+
+    <member name="M:System.Math.NamespaceMembers.Sign(System.Int32)"><summary>Returns -1, 0 or 1 according to the integer sign.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="T:System.NamespaceMembers"><summary>Namespace functions including the terminal Fault operation.</summary></member>
+    <member name="M:System.NamespaceMembers.Fault(System.String)"><summary>Terminates the current invocation with the supplied fault message.</summary><param name="message">The terminal fault message.</param></member>
+
+    <member name="T:System.Propagatable`3"><summary>The compiler-facing contract for separating successful output from a residual outcome during propagation.</summary></member>
+    <member name="M:System.Propagatable`3.TryGetOutput(`1@)"><summary>Returns true and assigns the successful output only when the value represents success.</summary><param name="output">Receives the successful output when the method returns true.</param></member>
+
+    <member name="M:System.Propagatable`3.TryGetResidual(`2@)"><summary>Returns true and assigns the residual only when propagation should leave the current operation.</summary><param name="residual">Receives or supplies the residual outcome used by propagation.</param></member>
+
+    <member name="T:System.Option"><summary>Contains the None and Some cases used to construct Option values.</summary></member>
+    <member name="T:System.Option.None"><summary>The None case of System.Option.</summary></member>
+    <member name="M:System.Option.None.#ctor"><summary>Creates None.</summary></member>
+
+    <member name="T:System.Option.Some`1"><summary>The Some case of System.Option.</summary></member>
+    <member name="M:System.Option.Some`1.#ctor(`0)"><summary>Constructs Some with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Option.Some`1.Deconstruct(`0@)"><summary>Writes the case payload to the output parameter.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="P:System.Option.Some`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
+    <member name="T:System.Option`1"><summary>A nominal union containing Some with a value or None without one.</summary><remarks>Prefer Some/None construction, union patterns and propagation in Raven source. The carrier accessors are metadata-facing conveniences; extraction of the wrong case faults.</remarks></member>
+    <member name="M:System.Option`1.GetSomeCase"><summary>Extracts the Some case; requesting an inactive case faults.</summary></member>
+
+    <member name="M:System.Option`1.GetNoneCase"><summary>Extracts the None case; requesting an inactive case faults.</summary></member>
+
+    <member name="M:System.Option`1.TryGet(System.Option.Some{`0}@)"><summary>Tests the requested case and assigns its payload only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Option`1.TryGet(System.Option.None@)"><summary>Tests the requested case and assigns its payload only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Option`1.TryGetOutput(`0@)"><summary>Returns true and assigns the successful output only when the value represents success.</summary><param name="output">Receives the successful output when the method returns true.</param></member>
+
+    <member name="M:System.Option`1.TryGetResidual(System.Void@)"><summary>Returns true and assigns the residual only when propagation should leave the current operation.</summary><param name="residual">Receives or supplies the residual outcome used by propagation.</param></member>
+
+    <member name="M:System.Option`1.FromResidual(System.Void)"><summary>Constructs an outcome from a propagated residual.</summary><param name="residual">Receives or supplies the residual outcome used by propagation.</param></member>
+
+    <member name="M:System.Option`1.#ctor(System.Option.Some{`0})"><summary>Constructs Option with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Option`1.#ctor(System.Option.None)"><summary>Constructs Option with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Option`1.TryGetValue(System.Option.Some{`0}@)"><summary>Tests the requested case and assigns its case value only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Option`1.TryGetValue(System.Option.None@)"><summary>Tests the requested case and assigns its case value only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="P:System.Option`1.IsSome"><summary>Tests whether the active case is Some.</summary></member>
+    <member name="P:System.Option`1.IsNone"><summary>Tests whether the active case is None.</summary></member>
+    <member name="P:System.Option`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
+    <member name="T:System.Result"><summary>Contains the Ok and Error cases used to construct Result values.</summary></member>
+    <member name="T:System.Result.Ok`1"><summary>The Ok case of System.Result.</summary></member>
+    <member name="M:System.Result.Ok`1.#ctor(`0)"><summary>Constructs Ok with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Result.Ok`1.Deconstruct(`0@)"><summary>Writes the case payload to the output parameter.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="P:System.Result.Ok`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
+    <member name="T:System.Result.Error`1"><summary>The Error case of System.Result.</summary></member>
+    <member name="M:System.Result.Error`1.#ctor(`0)"><summary>Constructs Error with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Result.Error`1.Deconstruct(`0@)"><summary>Writes the case payload to the output parameter.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="P:System.Result.Error`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
+    <member name="T:System.Result`2"><summary>A nominal union containing a successful value or an expected error.</summary><remarks>Prefer Ok/Error construction, union patterns and propagation in Raven source. Expected errors remain values. The carrier accessors expose the compiler representation; extraction of the wrong case faults.</remarks></member>
+    <member name="M:System.Result`2.Ok(`0)"><summary>Constructs a successful result containing the supplied value.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Result`2.Error(`1)"><summary>Constructs an error result containing the supplied error.</summary><param name="error">The error value or error-case callback indicated by this overload.</param></member>
+
+    <member name="M:System.Result`2.GetOkCase"><summary>Extracts the Ok case; requesting an inactive case faults.</summary></member>
+
+    <member name="M:System.Result`2.GetErrorCase"><summary>Extracts the Error case; requesting an inactive case faults.</summary></member>
+
+    <member name="M:System.Result`2.TryGet(System.Result.Ok{`0}@)"><summary>Tests the requested case and assigns its payload only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Result`2.TryGet(System.Result.Error{`1}@)"><summary>Tests the requested case and assigns its payload only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Result`2.TryGetOutput(`0@)"><summary>Returns true and assigns the successful output only when the value represents success.</summary><param name="output">Receives the successful output when the method returns true.</param></member>
+
+    <member name="M:System.Result`2.TryGetResidual(`1@)"><summary>Returns true and assigns the residual only when propagation should leave the current operation.</summary><param name="residual">Receives or supplies the residual outcome used by propagation.</param></member>
+
+    <member name="M:System.Result`2.FromResidual(`1)"><summary>Constructs an outcome from a propagated residual.</summary><param name="residual">Receives or supplies the residual outcome used by propagation.</param></member>
+
+    <member name="M:System.Result`2.#ctor(System.Result.Ok{`0})"><summary>Constructs Result with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Result`2.#ctor(System.Result.Error{`1})"><summary>Constructs Result with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Result`2.TryGetValue(System.Result.Ok{`0}@)"><summary>Tests the requested case and assigns its case value only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Result`2.TryGetValue(System.Result.Error{`1}@)"><summary>Tests the requested case and assigns its case value only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="P:System.Result`2.IsOk"><summary>Tests whether the active case is Ok.</summary></member>
+    <member name="P:System.Result`2.IsOkCase"><summary>Tests whether the active case is Ok.</summary></member>
+    <member name="P:System.Result`2.IsErr"><summary>Tests whether the active case is Err.</summary></member>
+    <member name="P:System.Result`2.IsErrorCase"><summary>Tests whether the active case is Error.</summary></member>
+    <member name="P:System.Result`2.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
+    <member name="T:System.Delegate"><summary>CLI base metadata for delegate declarations; application callbacks use the Func family.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
+    <member name="T:System.MulticastDelegate"><summary>CLI delegate base metadata; its presence does not add multicast invocation to neoCLR.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
+    <member name="T:System.Func`1"><summary>A single-target callback with 0 input parameters and a result.</summary><remarks>Use a compatible lambda or method group in Raven source. The metadata constructor is compiler-facing binding machinery. The current runtime supports single-target invocation, not multicast combination.</remarks></member>
+    <member name="M:System.Func`1.#ctor(System.Object,System.IntPtr)"><summary>Binds a delegate target and method pointer; intended for compiler lowering of lambdas and method groups.</summary><param name="method">The compiler-provided method pointer.</param></member>
+
+    <member name="M:System.Func`1.Invoke"><summary>Invokes the bound callback with the declared arguments and returns its result.</summary></member>
+
+    <member name="T:System.Func`2"><summary>A single-target callback with 1 input parameters and a result.</summary><remarks>Use a compatible lambda or method group in Raven source. The metadata constructor is compiler-facing binding machinery. The current runtime supports single-target invocation, not multicast combination.</remarks></member>
+    <member name="M:System.Func`2.#ctor(System.Object,System.IntPtr)"><summary>Binds a delegate target and method pointer; intended for compiler lowering of lambdas and method groups.</summary><param name="method">The compiler-provided method pointer.</param></member>
+
+    <member name="M:System.Func`2.Invoke(`0)"><summary>Invokes the bound callback with the declared arguments and returns its result.</summary></member>
+
+    <member name="T:System.Func`3"><summary>A single-target callback with 2 input parameters and a result.</summary><remarks>Use a compatible lambda or method group in Raven source. The metadata constructor is compiler-facing binding machinery. The current runtime supports single-target invocation, not multicast combination.</remarks></member>
+    <member name="M:System.Func`3.#ctor(System.Object,System.IntPtr)"><summary>Binds a delegate target and method pointer; intended for compiler lowering of lambdas and method groups.</summary><param name="method">The compiler-provided method pointer.</param></member>
+
+    <member name="M:System.Func`3.Invoke(`0,`1)"><summary>Invokes the bound callback with the declared arguments and returns its result.</summary></member>
+
+    <member name="T:System.Func`4"><summary>A single-target callback with 3 input parameters and a result.</summary><remarks>Use a compatible lambda or method group in Raven source. The metadata constructor is compiler-facing binding machinery. The current runtime supports single-target invocation, not multicast combination.</remarks></member>
+    <member name="M:System.Func`4.#ctor(System.Object,System.IntPtr)"><summary>Binds a delegate target and method pointer; intended for compiler lowering of lambdas and method groups.</summary><param name="method">The compiler-provided method pointer.</param></member>
+
+    <member name="M:System.Func`4.Invoke(`0,`1,`2)"><summary>Invokes the bound callback with the declared arguments and returns its result.</summary></member>
+
+    <member name="T:System.Func`5"><summary>A single-target callback with 4 input parameters and a result.</summary><remarks>Use a compatible lambda or method group in Raven source. The metadata constructor is compiler-facing binding machinery. The current runtime supports single-target invocation, not multicast combination.</remarks></member>
+    <member name="M:System.Func`5.#ctor(System.Object,System.IntPtr)"><summary>Binds a delegate target and method pointer; intended for compiler lowering of lambdas and method groups.</summary><param name="method">The compiler-provided method pointer.</param></member>
+
+    <member name="M:System.Func`5.Invoke(`0,`1,`2,`3)"><summary>Invokes the bound callback with the declared arguments and returns its result.</summary></member>
+
+    <member name="T:System.Environment"><summary>Host environment queries for arguments, the current directory and named variables.</summary></member>
+    <member name="M:System.Environment.GetCommandLineArgs"><summary>Returns the invocation command-line arguments as a string array.</summary></member>
+
+    <member name="M:System.Environment.GetCurrentDirectory"><summary>Returns the host current directory or an EnvironmentError when it cannot be read.</summary></member>
+
+    <member name="M:System.Environment.GetEnvironmentVariable(System.String)"><summary>Returns Some for an existing variable, None for a missing variable, or EnvironmentError when access fails.</summary><param name="name">The environment-variable name.</param></member>
+
+    <member name="T:System.Clock"><summary>An injectable source of the current instant.</summary></member>
+    <member name="P:System.Clock.Now"><summary>Gets the current instant from this clock.</summary></member>
+    <member name="T:System.SystemClock"><summary>Reads the current instant from the host wall clock.</summary></member>
+    <member name="M:System.SystemClock.#ctor"><summary>Creates SystemClock.</summary></member>
+
+    <member name="P:System.SystemClock.Now"><summary>Gets the current instant from this clock.</summary></member>
+    <member name="T:System.Instant"><summary>An instant represented by signed 100-nanosecond ticks since the Unix epoch.</summary><remarks>UnixTimeTicks uses an epoch of 1970-01-01T00:00:00Z. ToLocalDateTime consults the host time-zone configuration; the result does not preserve an offset or zone identifier.</remarks></member>
+    <member name="M:System.Instant.FromUnixTimeTicks(System.Int64)"><summary>Creates an instant from signed 100-nanosecond ticks since the Unix epoch.</summary><param name="ticks">The number of 100-nanosecond ticks.</param></member>
+
+    <member name="M:System.Instant.Equals(System.Instant)"><summary>Tests value equality with the other value.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="M:System.Instant.CompareTo(System.Instant)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="M:System.Instant.ToLocalDateTime"><summary>Converts this instant to host-local calendar and clock components.</summary></member>
+
+    <member name="P:System.Instant.UnixTimeTicks"><summary>Gets signed 100-nanosecond ticks since the Unix epoch.</summary></member>
+    <member name="T:System.Duration"><summary>A signed elapsed duration represented by 100-nanosecond ticks.</summary></member>
+    <member name="M:System.Duration.FromTicks(System.Int64)"><summary>Creates a value from 100-nanosecond ticks; Time rejects ticks outside a single day.</summary><param name="ticks">The number of 100-nanosecond ticks.</param></member>
+
+    <member name="M:System.Duration.Equals(System.Duration)"><summary>Tests value equality with the other value.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="M:System.Duration.CompareTo(System.Duration)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="P:System.Duration.Ticks"><summary>Gets the stored 100-nanosecond tick count.</summary></member>
+    <member name="T:System.Date"><summary>A Gregorian calendar date from year 1 through 9999, without a time or time zone.</summary><remarks>DayNumber 0 is 0001-01-01; the last supported day number is 3652058. Create and FromDayNumber return InvalidDateError outside the supported Gregorian range.</remarks></member>
+    <member name="M:System.Date.Create(System.Int32,System.Int32,System.Int32)"><summary>Validates the supplied date components and returns the value or its typed validation error.</summary><param name="year">The Gregorian year, from 1 through 9999.</param><param name="month">The month, from 1 through 12.</param><param name="day">The day in the specified month, starting at 1.</param></member>
+
+    <member name="M:System.Date.FromDayNumber(System.Int32)"><summary>Creates a date from the zero-based day number, or returns InvalidDateError outside 0–3652058.</summary><param name="dayNumber">The zero-based day number since 0001-01-01.</param></member>
+
+    <member name="M:System.Date.Equals(System.Date)"><summary>Tests value equality with the other value.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="M:System.Date.CompareTo(System.Date)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="P:System.Date.DayNumber"><summary>Gets the zero-based number of days since 0001-01-01.</summary></member>
+    <member name="P:System.Date.Year"><summary>Gets the Gregorian year from 1 through 9999.</summary></member>
+    <member name="P:System.Date.DayOfYear"><summary>Gets the day within the year, starting at 1.</summary></member>
+    <member name="P:System.Date.Month"><summary>Gets the month from 1 through 12.</summary></member>
+    <member name="P:System.Date.Day"><summary>Gets the day within the month, starting at 1.</summary></member>
+    <member name="T:System.Time"><summary>A time of day with 100-nanosecond precision, without a date or time zone.</summary><remarks>Valid ticks range from 0 through 863999999999. Hour is 0–23; Minute and Second are 0–59; Millisecond is 0–999. Create and FromTicks return InvalidTimeError for invalid input.</remarks></member>
+    <member name="M:System.Time.Create(System.Int32,System.Int32,System.Int32)"><summary>Validates the supplied time components and returns the value or its typed validation error.</summary><param name="hour">The hour, from 0 through 23.</param><param name="minute">The minute, from 0 through 59.</param><param name="second">The second, from 0 through 59.</param></member>
+
+    <member name="M:System.Time.Create(System.Int32,System.Int32,System.Int32,System.Int32)"><summary>Validates the supplied time components and returns the value or its typed validation error.</summary><param name="hour">The hour, from 0 through 23.</param><param name="minute">The minute, from 0 through 59.</param><param name="second">The second, from 0 through 59.</param></member>
+
+    <member name="M:System.Time.FromTicks(System.Int64)"><summary>Creates a value from 100-nanosecond ticks; Time rejects ticks outside a single day.</summary><param name="ticks">The number of 100-nanosecond ticks.</param></member>
+
+    <member name="M:System.Time.Equals(System.Time)"><summary>Tests value equality with the other value.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="M:System.Time.CompareTo(System.Time)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="P:System.Time.Ticks"><summary>Gets the stored 100-nanosecond tick count.</summary></member>
+    <member name="P:System.Time.Hour"><summary>Gets the hour from 0 through 23.</summary></member>
+    <member name="P:System.Time.Minute"><summary>Gets the minute from 0 through 59.</summary></member>
+    <member name="P:System.Time.Second"><summary>Gets the second from 0 through 59.</summary></member>
+    <member name="P:System.Time.Millisecond"><summary>Gets the millisecond component from 0 through 999.</summary></member>
+    <member name="P:System.Time.FractionTicks"><summary>Gets the fractional-second component in 100-nanosecond ticks.</summary></member>
+    <member name="T:System.LocalDateTime"><summary>A date and time expressed in the host local time zone, without retaining a zone identifier.</summary></member>
+    <member name="P:System.LocalDateTime.Date"><summary>Gets the local calendar date.</summary></member>
+    <member name="P:System.LocalDateTime.Time"><summary>Gets the local time of day.</summary></member>
+    <member name="T:System.Int32ParseError"><summary>An expected integer parsing failure: invalid syntax or a value outside the Int32 range.</summary></member>
+    <member name="M:System.Int32ParseError.ToString"><summary>Returns the value or active error case name for display.</summary></member>
+
+    <member name="M:System.Int32ParseError.#ctor(System.Int32ParseError.InvalidFormat)"><summary>Constructs Int32ParseError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Int32ParseError.GetInvalidFormat"><summary>Extracts the InvalidFormat case; requesting an inactive case faults.</summary></member>
+
+    <member name="M:System.Int32ParseError.#ctor(System.Int32ParseError.Overflow)"><summary>Constructs Int32ParseError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Int32ParseError.GetOverflow"><summary>Extracts the Overflow case; requesting an inactive case faults.</summary></member>
+
+    <member name="P:System.Int32ParseError.IsInvalidFormat"><summary>Tests whether the active case is InvalidFormat.</summary></member>
+    <member name="P:System.Int32ParseError.IsOverflow"><summary>Tests whether the active case is Overflow.</summary></member>
+    <member name="T:System.Int32ParseError.InvalidFormat"><summary>The InvalidFormat case of System.Int32ParseError.</summary></member>
+    <member name="M:System.Int32ParseError.InvalidFormat.#ctor"><summary>Creates InvalidFormat.</summary></member>
+
+    <member name="T:System.Int32ParseError.Overflow"><summary>The Overflow case of System.Int32ParseError.</summary></member>
+    <member name="M:System.Int32ParseError.Overflow.#ctor"><summary>Creates Overflow.</summary></member>
+
+    <member name="T:System.IntegerDivisionError"><summary>An expected integer division failure: division by zero or signed overflow.</summary></member>
+    <member name="M:System.IntegerDivisionError.ToString"><summary>Returns the value or active error case name for display.</summary></member>
+
+    <member name="M:System.IntegerDivisionError.#ctor(System.IntegerDivisionError.DivisionByZero)"><summary>Constructs IntegerDivisionError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.IntegerDivisionError.GetDivisionByZero"><summary>Extracts the DivisionByZero case; requesting an inactive case faults.</summary></member>
+
+    <member name="M:System.IntegerDivisionError.#ctor(System.IntegerDivisionError.Overflow)"><summary>Constructs IntegerDivisionError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.IntegerDivisionError.GetOverflow"><summary>Extracts the Overflow case; requesting an inactive case faults.</summary></member>
+
+    <member name="P:System.IntegerDivisionError.IsDivisionByZero"><summary>Tests whether the active case is DivisionByZero.</summary></member>
+    <member name="P:System.IntegerDivisionError.IsOverflow"><summary>Tests whether the active case is Overflow.</summary></member>
+    <member name="T:System.IntegerDivisionError.DivisionByZero"><summary>The DivisionByZero case of System.IntegerDivisionError.</summary></member>
+    <member name="M:System.IntegerDivisionError.DivisionByZero.#ctor"><summary>Creates DivisionByZero.</summary></member>
+
+    <member name="T:System.IntegerDivisionError.Overflow"><summary>The Overflow case of System.IntegerDivisionError.</summary></member>
+    <member name="M:System.IntegerDivisionError.Overflow.#ctor"><summary>Creates Overflow.</summary></member>
+
+    <member name="T:System.InvalidRangeError"><summary>An error indicating an invalid range or bound ordering.</summary></member>
+    <member name="M:System.InvalidRangeError.ToString"><summary>Returns the value or active error case name for display.</summary></member>
+
+    <member name="M:System.InvalidRangeError.#ctor"><summary>Creates InvalidRangeError.</summary></member>
+
+    <member name="T:System.InvalidDateError"><summary>An error indicating invalid Gregorian date components or an unsupported day number.</summary></member>
+    <member name="M:System.InvalidDateError.ToString"><summary>Returns the value or active error case name for display.</summary></member>
+
+    <member name="M:System.InvalidDateError.#ctor"><summary>Creates InvalidDateError.</summary></member>
+
+    <member name="T:System.InvalidTimeError"><summary>An error indicating time components or ticks outside a single day.</summary></member>
+    <member name="M:System.InvalidTimeError.ToString"><summary>Returns the value or active error case name for display.</summary></member>
+
+    <member name="M:System.InvalidTimeError.#ctor"><summary>Creates InvalidTimeError.</summary></member>
+
+    <member name="T:System.OverflowError"><summary>An error indicating that the result cannot be represented in the requested numeric range.</summary></member>
+    <member name="M:System.OverflowError.ToString"><summary>Returns the value or active error case name for display.</summary></member>
+
+    <member name="M:System.OverflowError.#ctor"><summary>Creates OverflowError.</summary></member>
+
+    <member name="T:System.EnvironmentError"><summary>An expected failure to access the requested host environment information.</summary></member>
+    <member name="M:System.EnvironmentError.ToString"><summary>Returns the value or active error case name for display.</summary></member>
+
+    <member name="T:System.OptionOperators"><summary>Extension operations for transforming, inspecting and providing fallbacks for optional values.</summary></member>
+    <member name="M:System.OptionOperators.Map``2(System.Option{``0},System.Func{``0,``1})"><summary>Transforms each available successful value with the selector, preserving absence, failure or cancellation as applicable.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="mapper">The callback that transforms an available value.</param></member>
+
+    <member name="M:System.OptionOperators.Then``2(System.Option{``0},System.Func{``0,System.Option{``1}})"><summary>Chains a successful value to the next outcome-producing operation, preserving absence, error or cancellation.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="binder">The callback producing the next outcome or task.</param></member>
+
+    <member name="M:System.OptionOperators.Filter``1(System.Option{``0},System.Func{``0,System.Boolean})"><summary>Retains values satisfying the predicate; an Option that fails the predicate becomes None.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="predicate">The predicate used to test each available value.</param></member>
+
+    <member name="M:System.OptionOperators.OrElse``1(System.Option{``0},System.Func{System.Option{``0}})"><summary>Returns the current successful value, or invokes the fallback when the option is absent or the result is an error.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="alternative">The fallback callback invoked for absence or error.</param></member>
+
+    <member name="M:System.OptionOperators.UnwrapOrElse``1(System.Option{``0},System.Func{``0})"><summary>Returns the successful value, or invokes the fallback to produce a replacement.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="factory">The callback producing a fallback value.</param></member>
+
+    <member name="M:System.OptionOperators.UnwrapOr``1(System.Option{``0},``0)"><summary>Returns the successful value, or the supplied fallback value.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="defaultValue">The fallback returned when no successful value is available.</param></member>
+
+    <member name="M:System.OptionOperators.Match``2(System.Option{``0},System.Func{``0,``1},System.Func{``1})"><summary>Invokes the callback corresponding to the active outcome and returns its result.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="some">The callback invoked for Some.</param><param name="none">The callback invoked for None.</param></member>
+
+    <member name="M:System.OptionOperators.Tap``1(System.Option{``0},System.Func{``0,System.Void})"><summary>Invokes the callback for a successful value and returns the original outcome.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="action">The callback invoked for each applicable value.</param></member>
+
+    <member name="M:System.OptionOperators.TapNone``1(System.Option{``0},System.Func{System.Void})"><summary>Invokes the callback only for None and returns the original option.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="action">The callback invoked for each applicable value.</param></member>
+
+    <member name="M:System.OptionOperators.ToIterable``1(System.Option{``0})"><summary>Returns an iterable containing the successful value, or an empty iterable for absence or error.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+
+    <member name="M:System.OptionOperators.ThenResult``3(System.Option{``0},System.Func{``0,System.Result{``1,``2}},System.Func{``2})"><summary>Chains a present value to a result-producing callback, using the error callback when absent.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="binder">The callback producing the next outcome or task.</param><param name="noneError">The callback producing an error for None.</param></member>
+
+    <member name="M:System.OptionOperators.MapResult``3(System.Option{``0},System.Func{``0,``1},System.Func{``2})"><summary>Maps Some to Ok using the mapper, or None to Error using the error callback.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="mapper">The callback that transforms an available value.</param><param name="noneError">The callback producing an error for None.</param></member>
+
+    <member name="M:System.OptionOperators.OkOr``2(System.Option{``0},``1)"><summary>Converts Some to Ok, or None to Error using the supplied error or error-producing callback.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="error">The error value or error-case callback indicated by this overload.</param></member>
+
+    <member name="M:System.OptionOperators.OkOr``2(System.Option{``0},System.Func{``1})"><summary>Converts Some to Ok, or None to Error using the supplied error or error-producing callback.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="errorFactory">The callback producing an error when the option is absent.</param></member>
+
+    <member name="T:System.ResultOperators"><summary>Extension operations for transforming successful values, mapping errors and recovering from expected failures.</summary></member>
+    <member name="M:System.ResultOperators.Map``3(System.Result{``0,``1},System.Func{``0,``2})"><summary>Transforms each available successful value with the selector, preserving absence, failure or cancellation as applicable.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="mapper">The callback that transforms an available value.</param></member>
+
+    <member name="M:System.ResultOperators.Then``3(System.Result{``0,``1},System.Func{``0,System.Result{``2,``1}})"><summary>Chains a successful value to the next outcome-producing operation, preserving absence, error or cancellation.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="binder">The callback producing the next outcome or task.</param></member>
+
+    <member name="M:System.ResultOperators.MapError``3(System.Result{``0,``1},System.Func{``1,``2})"><summary>Transforms the error value while leaving a successful result unchanged.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="mapper">The callback that transforms an available value.</param></member>
+
+    <member name="M:System.ResultOperators.Match``3(System.Result{``0,``1},System.Func{``0,``2},System.Func{``1,``2})"><summary>Invokes the callback corresponding to the active outcome and returns its result.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="ok">The callback invoked for Ok.</param><param name="error">The error value or error-case callback indicated by this overload.</param></member>
+
+    <member name="M:System.ResultOperators.Tap``2(System.Result{``0,``1},System.Func{``0,System.Void})"><summary>Invokes the callback for a successful value and returns the original outcome.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="action">The callback invoked for each applicable value.</param></member>
+
+    <member name="M:System.ResultOperators.TapError``2(System.Result{``0,``1},System.Func{``1,System.Void})"><summary>Invokes the callback only for an error and returns the original result.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="action">The callback invoked for each applicable value.</param></member>
+
+    <member name="M:System.ResultOperators.OrElse``2(System.Result{``0,``1},System.Func{``1,System.Result{``0,``1}})"><summary>Returns the current successful value, or invokes the fallback when the option is absent or the result is an error.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+
+    <member name="M:System.ResultOperators.UnwrapOrElse``2(System.Result{``0,``1},System.Func{``0})"><summary>Returns the successful value, or invokes the fallback to produce a replacement.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="factory">The callback producing a fallback value.</param></member>
+
+    <member name="M:System.ResultOperators.UnwrapOr``2(System.Result{``0,``1},``0)"><summary>Returns the successful value, or the supplied fallback value.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="defaultValue">The fallback returned when no successful value is available.</param></member>
+
+    <member name="M:System.ResultOperators.ToIterable``2(System.Result{``0,``1})"><summary>Returns an iterable containing the successful value, or an empty iterable for absence or error.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+
+    <member name="T:System.OptionNestedOperators"><summary>Operations for reducing nested optional values.</summary></member>
+    <member name="M:System.OptionNestedOperators.Flatten``1(System.Option{System.Option{``0}})"><summary>Removes one Option layer; an absent outer or inner option becomes None.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+
+    <member name="T:System.Array`1"><summary>A fixed-length mutable sequence of elements, with iteration and element-wise callbacks.</summary><remarks>Array length is fixed. Indexed reads require initialized elements; out-of-range access faults. Element replacement does not resize the array. Empty returns an empty managed array.</remarks></member>
+    <member name="M:System.Array`1.ForEach(System.Func{`0,System.Void})"><summary>Invokes the callback once for each element in order.</summary><param name="action">The callback invoked for each applicable value.</param></member>
+
+    <member name="M:System.Array`1.GetIterator"><summary>Creates an iterator over the current sequence.</summary></member>
+
+    <member name="P:System.Array`1.Empty"><summary>Gets an empty managed array.</summary></member>
+    <member name="P:System.Array`1.Count"><summary>Gets the number of elements or entries.</summary></member>
+    <member name="P:System.Array`1.Item(System.Int32)"><summary>Gets or replaces the element at the zero-based index; an index outside the sequence bounds faults.</summary></member>
+    <member name="T:System.Disposable"><summary>A capability for explicitly releasing resources after use.</summary></member>
+    <member name="M:System.Disposable.Dispose"><summary>Releases the resources governed by this implementation.</summary></member>
+
+    <member name="T:System.RuntimeTypeHandle"><summary>An opaque runtime identity for a represented type, used by compiler lowering and RuntimeContext.</summary></member>
+    <member name="T:System.Comparable`1"><summary>Compares a value with another value of the declared type.</summary></member>
+    <member name="M:System.Comparable`1.CompareTo(`0)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
+
+    <member name="T:System.Clonable`1"><summary>Produces a clone using the implementation-defined copying contract.</summary></member>
+    <member name="M:System.Clonable`1.Clone"><summary>Returns a clone according to the implementing type’s copying contract.</summary></member>
+
+    <member name="T:System.Closable`1"><summary>Closes a resource and reports an expected failure through Result.</summary></member>
+    <member name="M:System.Closable`1.Close"><summary>Closes the resource and returns either a unit success or the declared expected error.</summary></member>
+
+    <member name="T:System.Collections.Map`2"><summary>Read-only key lookup, key enumeration and entry count capabilities.</summary><remarks>Find returns None for a missing key. The interface alone does not require Keys to be a snapshot; HashMap documents its own snapshot behavior.</remarks></member>
+    <member name="M:System.Collections.Map`2.Find(`0)"><summary>Returns the value associated with the key, or None when the key is absent.</summary><param name="key">The key to look up or update.</param><returns>Some containing the associated value, or None if the key is absent.</returns></member>
+
+    <member name="M:System.Collections.Map`2.ContainsKey(`0)"><summary>Tests whether the map contains an entry for the supplied key.</summary><param name="key">The key to look up or update.</param></member>
+
+    <member name="P:System.Collections.Map`2.Count"><summary>Gets the number of elements or entries.</summary></member>
+    <member name="P:System.Collections.Map`2.Keys"><summary>Gets the keys exposed by this map.</summary></member>
+    <member name="T:System.Collections.MutableMap`2"><summary>A map that supports inserting entries and replacing values.</summary></member>
+    <member name="M:System.Collections.MutableMap`2.TryAdd(`0,`1)"><summary>Inserts the key and value only when the key is absent; returns false without replacing an existing entry.</summary><param name="key">The key to look up or update.</param><param name="value">The value on which this operation acts.</param><returns>True if a new entry was inserted; false if the key already existed.</returns></member>
+
+    <member name="M:System.Collections.MutableMap`2.Set(`0,`1)"><summary>Inserts a missing key or replaces the value associated with an existing key.</summary><param name="key">The key to look up or update.</param><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="T:System.Collections.HashMap`2"><summary>A mutable hash table using caller-provided key equality and hash callbacks.</summary><remarks>Equal keys must have equal hashes, and keys must remain stable while stored. Hash and equality callbacks must not reenter the same map; reentry faults. Keys returns a shallow snapshot in insertion order. Set preserves an existing key while replacing its value. No removal or concurrent-use contract is provided.</remarks></member>
+    <member name="M:System.Collections.HashMap`2.#ctor(System.Func{`0,`0,System.Boolean},System.Func{`0,System.Int32})"><summary>Creates an empty map using the supplied equality and hash callbacks; equal keys must have equal hashes.</summary><param name="equal">The key equality callback. Equal keys must produce equal hashes.</param><param name="hash">The key hash callback; must remain consistent with equality.</param></member>
+
+    <member name="M:System.Collections.HashMap`2.Find(`0)"><summary>Returns the value associated with the key, or None when the key is absent.</summary><param name="key">The key to look up or update.</param><returns>Some containing the associated value, or None if the key is absent.</returns></member>
+
+    <member name="M:System.Collections.HashMap`2.ContainsKey(`0)"><summary>Tests whether the map contains an entry for the supplied key.</summary><param name="key">The key to look up or update.</param></member>
+
+    <member name="M:System.Collections.HashMap`2.TryAdd(`0,`1)"><summary>Inserts the key and value only when the key is absent; returns false without replacing an existing entry.</summary><param name="key">The key to look up or update.</param><param name="value">The value on which this operation acts.</param><returns>True if a new entry was inserted; false if the key already existed.</returns></member>
+
+    <member name="M:System.Collections.HashMap`2.Set(`0,`1)"><summary>Inserts a missing key or replaces the value associated with an existing key.</summary><param name="key">The key to look up or update.</param><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="P:System.Collections.HashMap`2.Count"><summary>Gets the number of elements or entries.</summary></member>
+    <member name="P:System.Collections.HashMap`2.Keys"><summary>Returns a shallow snapshot of keys in insertion order; later map mutations do not change this snapshot.</summary></member>
+    <member name="T:System.Collections.MutableSequence`1"><summary>An indexed sequence whose existing elements can be replaced.</summary></member>
+    <member name="P:System.Collections.MutableSequence`1.Item(System.Int32)"><summary>Gets or replaces the element at the zero-based index; an index outside the sequence bounds faults.</summary></member>
+    <member name="T:System.Collections.List`1"><summary>An indexed mutable sequence that supports appending elements.</summary></member>
+    <member name="M:System.Collections.List`1.Add(`0)"><summary>Appends an element to the end of the list.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="T:System.Collections.ArrayList`1"><summary>A growable array-backed list with indexed access, shallow copying and predicate searches.</summary><remarks>Count is the readable initialized prefix; Capacity may be larger. Negative capacity and indexes outside [0, Count) fault. Add grows storage as needed. Copy duplicates the sequence storage but does not deep-clone referenced elements.</remarks></member>
+    <member name="M:System.Collections.ArrayList`1.#ctor"><summary>Creates an empty list with zero or the requested initial capacity; negative capacity faults.</summary></member>
+
+    <member name="M:System.Collections.ArrayList`1.#ctor(System.Int32)"><summary>Creates an empty list with zero or the requested initial capacity; negative capacity faults.</summary><param name="capacity">The initial number of reserved slots; must be nonnegative. The new list remains empty.</param></member>
+
+    <member name="M:System.Collections.ArrayList`1.FindIndex(System.Func{`0,System.Boolean})"><summary>Returns the first matching element index, or None when no element matches.</summary><param name="match">The predicate used to select matching elements.</param></member>
+
+    <member name="M:System.Collections.ArrayList`1.FindLastIndex(System.Func{`0,System.Boolean})"><summary>Returns the last matching element index, or None when no element matches.</summary><param name="match">The predicate used to select matching elements.</param></member>
+
+    <member name="M:System.Collections.ArrayList`1.FindLast(System.Func{`0,System.Boolean})"><summary>Returns the last matching element, or None when no element matches.</summary><param name="match">The predicate used to select matching elements.</param></member>
+
+    <member name="M:System.Collections.ArrayList`1.FindAll(System.Func{`0,System.Boolean})"><summary>Creates a new list containing all matching elements in their original order.</summary><param name="match">The predicate used to select matching elements.</param></member>
+
+    <member name="M:System.Collections.ArrayList`1.TrueForAll(System.Func{`0,System.Boolean})"><summary>Tests whether every element satisfies the predicate; returns true for an empty list.</summary><param name="match">The predicate used to select matching elements.</param></member>
+
+    <member name="M:System.Collections.ArrayList`1.Exists(System.Func{`0,System.Boolean})"><summary>Tests whether any element satisfies the predicate.</summary><param name="match">The predicate used to select matching elements.</param></member>
+
+    <member name="M:System.Collections.ArrayList`1.Find(System.Func{`0,System.Boolean})"><summary>Returns the first matching element, or None when no element matches.</summary><param name="match">The predicate used to select matching elements.</param></member>
+
+    <member name="M:System.Collections.ArrayList`1.Copy"><summary>Creates a new list containing the current elements in order; reference-valued elements remain shared.</summary></member>
+
+    <member name="M:System.Collections.ArrayList`1.Add(`0)"><summary>Appends an element to the end of the list.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Collections.ArrayList`1.GetIterator"><summary>Creates an iterator over the current sequence.</summary><remarks>Captures the original buffer and element count. Later changes in that buffer are visible, but appended elements are not included; growth can move the list to a different buffer. This is not a fail-fast mutation detector.</remarks></member>
+
+    <member name="P:System.Collections.ArrayList`1.Capacity"><summary>Gets the allocated list capacity, which may exceed Count.</summary></member>
+    <member name="P:System.Collections.ArrayList`1.Count"><summary>Gets the number of elements or entries.</summary></member>
+    <member name="P:System.Collections.ArrayList`1.Item(System.Int32)"><summary>Gets or replaces the element at the zero-based index; an index outside the sequence bounds faults.</summary></member>
+    <member name="T:System.Runtime.RuntimeContext"><summary>Provides type acquisition and assembly discovery for the current loaded program.</summary><remarks>The current implementation describes one loaded program. It does not create independent execution universes or load arbitrary assemblies.</remarks></member>
+    <member name="M:System.Runtime.RuntimeContext.GetTypeInfoFromHandle(System.RuntimeTypeHandle)"><summary>Resolves a runtime type handle to its public TypeInfo descriptor in this context.</summary><param name="handle">The opaque identity of the type to describe.</param></member>
+
+    <member name="P:System.Runtime.RuntimeContext.Current"><summary>Gets the context for the current loaded program.</summary></member>
+    <member name="P:System.Runtime.RuntimeContext.ExecutingAssembly"><summary>Gets the assembly containing the source caller.</summary></member>
+    <member name="T:System.Runtime.InteropServices.NativeMemory"><summary>Allocates and releases unmanaged memory through the supported unsafe pointer surface.</summary><remarks>Callers own the allocation and must release it exactly once. Use only valid live pointers within the allocated range. Managed garbage collection does not reclaim this memory. These methods expose the unsafe native-memory boundary; use managed arrays for ordinary collection storage.</remarks></member>
+    <member name="M:System.Runtime.InteropServices.NativeMemory.Alloc(System.UIntPtr)"><summary>Allocates unmanaged storage for the requested byte count or element-count/size product.</summary><param name="byteCount">The number of bytes to allocate.</param></member>
+
+    <member name="M:System.Runtime.InteropServices.NativeMemory.Alloc(System.UIntPtr,System.UIntPtr)"><summary>Allocates unmanaged storage for the requested byte count or element-count/size product.</summary><param name="elementCount">The number of elements to allocate.</param><param name="elementSize">The size of each element in bytes.</param></member>
+
+    <member name="M:System.Runtime.InteropServices.NativeMemory.Free(System.Void*)"><summary>Releases a previously allocated unmanaged block.</summary></member>
+
+    <member name="T:System.Runtime.CompilerServices.UnionAttribute"><summary>A metadata marker identifying a nominal union declaration.</summary></member>
+    <member name="M:System.Runtime.CompilerServices.UnionAttribute.#ctor"><summary>Creates UnionAttribute.</summary></member>
+
+    <member name="T:System.Runtime.CompilerServices.ReferenceAssemblyAttribute"><summary>Marks compiler-reference assemblies as metadata rather than executable implementation.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
+    <member name="M:System.Runtime.CompilerServices.ReferenceAssemblyAttribute.#ctor"><summary>Creates ReferenceAssemblyAttribute.</summary></member>
+
+    <member name="T:System.Runtime.CompilerServices.TopLevelAttribute"><summary>Identifies compiler-emitted containers for namespace-level declarations.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
+    <member name="M:System.Runtime.CompilerServices.TopLevelAttribute.#ctor"><summary>Creates TopLevelAttribute.</summary></member>
+
+    <member name="T:System.Runtime.CompilerServices.CompilerGeneratedAttribute"><summary>Marks declarations synthesized by the compiler.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
+    <member name="M:System.Runtime.CompilerServices.CompilerGeneratedAttribute.#ctor"><summary>Creates CompilerGeneratedAttribute.</summary></member>
+
+    <member name="T:System.Runtime.CompilerServices.ExtensionAttribute"><summary>Marks extension method metadata.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
+    <member name="M:System.Runtime.CompilerServices.ExtensionAttribute.#ctor"><summary>Creates ExtensionAttribute.</summary></member>
+
+    <member name="T:System.Runtime.CompilerServices.RefSafetyRulesAttribute"><summary>Records the compiler reference-safety metadata version.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
+    <member name="M:System.Runtime.CompilerServices.RefSafetyRulesAttribute.#ctor(System.Int32)"><summary>Constructs RefSafetyRulesAttribute with the supplied arguments.</summary></member>
+
+    <member name="T:System.Tasks.TaskOutcome"><summary>Contains the Completed and Cancelled cases used by TaskOutcome values.</summary></member>
+    <member name="T:System.Tasks.TaskOutcome.Cancelled"><summary>The Cancelled case of System.Tasks.TaskOutcome.</summary></member>
+    <member name="M:System.Tasks.TaskOutcome.Cancelled.#ctor"><summary>Creates Cancelled.</summary></member>
+
+    <member name="T:System.Tasks.TaskOutcome.Completed`1"><summary>The Completed case of System.Tasks.TaskOutcome.</summary></member>
+    <member name="M:System.Tasks.TaskOutcome.Completed`1.#ctor(`0)"><summary>Constructs Completed with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Tasks.TaskOutcome.Completed`1.Deconstruct(`0@)"><summary>Writes the case payload to the output parameter.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="P:System.Tasks.TaskOutcome.Completed`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
+    <member name="T:System.Tasks.TaskOutcome`1"><summary>A nominal union containing a completed task value or cancellation.</summary><remarks>Completed carries the task result; Cancelled carries no value. Cancellation is distinct from an expected error inside a completed Result.</remarks></member>
+    <member name="M:System.Tasks.TaskOutcome`1.#ctor(System.Tasks.TaskOutcome.Completed{`0})"><summary>Constructs TaskOutcome with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Tasks.TaskOutcome`1.#ctor(System.Tasks.TaskOutcome.Cancelled)"><summary>Constructs TaskOutcome with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Tasks.TaskOutcome`1.GetCompletedCase"><summary>Extracts the Completed case; requesting an inactive case faults.</summary></member>
+
+    <member name="M:System.Tasks.TaskOutcome`1.GetCancelledCase"><summary>Extracts the Cancelled case; requesting an inactive case faults.</summary></member>
+
+    <member name="M:System.Tasks.TaskOutcome`1.TryGet(System.Tasks.TaskOutcome.Completed{`0}@)"><summary>Tests the requested case and assigns its payload only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Tasks.TaskOutcome`1.TryGet(System.Tasks.TaskOutcome.Cancelled@)"><summary>Tests the requested case and assigns its payload only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Tasks.TaskOutcome`1.TryGetValue(System.Tasks.TaskOutcome.Completed{`0}@)"><summary>Tests the requested case and assigns its case value only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Tasks.TaskOutcome`1.TryGetValue(System.Tasks.TaskOutcome.Cancelled@)"><summary>Tests the requested case and assigns its case value only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="P:System.Tasks.TaskOutcome`1.IsCompleted"><summary>Tests whether the active case is Completed.</summary></member>
+    <member name="P:System.Tasks.TaskOutcome`1.IsCancelled"><summary>Tests whether the active case is Cancelled.</summary></member>
+    <member name="P:System.Tasks.TaskOutcome`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
+    <member name="T:System.Tasks.TaskResultOperators"><summary>Transforms successful results inside tasks while preserving expected errors and cancellation.</summary></member>
+    <member name="M:System.Tasks.TaskResultOperators.MapResult``3(System.Tasks.Task{System.Result{``0,``1}},System.Func{``0,``2})"><summary>Transforms the successful value into the returned result or task result, preserving the enclosing absence/error/cancellation contract.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+
+    <member name="T:System.Tasks.TaskOperators"><summary>Transforms or chains task completion while preserving cancellation.</summary></member>
+    <member name="M:System.Tasks.TaskOperators.Map``2(System.Tasks.Task{``0},System.Func{``0,``1})"><summary>Transforms each available successful value with the selector, preserving absence, failure or cancellation as applicable.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+
+    <member name="M:System.Tasks.TaskOperators.Then``2(System.Tasks.Task{``0},System.Func{``0,System.Tasks.Task{``1}})"><summary>Chains a successful value to the next outcome-producing operation, preserving absence, error or cancellation.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+
+    <member name="T:System.Linq.SingleError"><summary>An expected cardinality failure when a query requires exactly one matching element.</summary></member>
+    <member name="M:System.Linq.SingleError.ToString"><summary>Returns the value or active error case name for display.</summary></member>
+
+    <member name="M:System.Linq.SingleError.#ctor(System.Linq.SingleError.Empty)"><summary>Constructs SingleError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Linq.SingleError.GetEmpty"><summary>Extracts the Empty case; requesting an inactive case faults.</summary></member>
+
+    <member name="M:System.Linq.SingleError.#ctor(System.Linq.SingleError.Multiple)"><summary>Constructs SingleError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Linq.SingleError.GetMultiple"><summary>Extracts the Multiple case; requesting an inactive case faults.</summary></member>
+
+    <member name="P:System.Linq.SingleError.IsEmpty"><summary>Tests whether the active case is Empty.</summary></member>
+    <member name="P:System.Linq.SingleError.IsMultiple"><summary>Tests whether the active case is Multiple.</summary></member>
+    <member name="T:System.Linq.SingleError.Empty"><summary>The Empty case of System.Linq.SingleError.</summary></member>
+    <member name="M:System.Linq.SingleError.Empty.#ctor"><summary>Creates Empty.</summary></member>
+
+    <member name="T:System.Linq.SingleError.Multiple"><summary>The Multiple case of System.Linq.SingleError.</summary></member>
+    <member name="M:System.Linq.SingleError.Multiple.#ctor"><summary>Creates Multiple.</summary></member>
+
+    <member name="T:System.Linq.Operators"><summary>Iterable query operators for filtering, projection, composition and terminal results.</summary><remarks>Filter, Map, Take, Skip, Concat and FlatMap return iterable adapters; terminal operations enumerate the source. First and Last return None when no element matches. Single returns Empty or Multiple instead of throwing for cardinality failures. ToList materializes a new ArrayList.</remarks></member>
+    <member name="M:System.Linq.Operators.Filter``1(System.Collections.Iterable{``0},System.Func{``0,System.Boolean})"><summary>Retains values satisfying the predicate; an Option that fails the predicate becomes None.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="predicate">The predicate used to test each available value.</param></member>
+
+    <member name="M:System.Linq.Operators.Map``2(System.Collections.Iterable{``0},System.Func{``0,``1})"><summary>Lazily projects each source element using the selector.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="selector">The callback projecting each source element.</param></member>
+
+    <member name="M:System.Linq.Operators.Any``1(System.Collections.Iterable{``0})"><summary>Tests whether the source contains an element, or an element satisfying the supplied predicate.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+
+    <member name="M:System.Linq.Operators.Any``1(System.Collections.Iterable{``0},System.Func{``0,System.Boolean})"><summary>Tests whether the source contains an element, or an element satisfying the supplied predicate.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="predicate">The predicate used to test each available value.</param></member>
+
+    <member name="M:System.Linq.Operators.All``1(System.Collections.Iterable{``0},System.Func{``0,System.Boolean})"><summary>Tests whether every source element satisfies the predicate; returns true for an empty source.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="predicate">The predicate used to test each available value.</param></member>
+
+    <member name="M:System.Linq.Operators.Count``1(System.Collections.Iterable{``0})"><summary>Counts source elements, optionally restricted by the supplied predicate.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+
+    <member name="M:System.Linq.Operators.Count``1(System.Collections.Iterable{``0},System.Func{``0,System.Boolean})"><summary>Counts source elements, optionally restricted by the supplied predicate.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="predicate">The predicate used to test each available value.</param></member>
+
+    <member name="M:System.Linq.Operators.Fold``2(System.Collections.Iterable{``0},``1,System.Func{``1,``0,``1})"><summary>Accumulates source elements in order, starting with the supplied seed.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="seed">The initial accumulator value.</param></member>
+
+    <member name="M:System.Linq.Operators.Take``1(System.Collections.Iterable{``0},System.Int32)"><summary>Returns an iterable containing at most the requested number of leading elements.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="count">The requested number of elements.</param></member>
+
+    <member name="M:System.Linq.Operators.Skip``1(System.Collections.Iterable{``0},System.Int32)"><summary>Returns an iterable that skips the requested number of leading elements.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="count">The requested number of elements.</param></member>
+
+    <member name="M:System.Linq.Operators.Concat``1(System.Collections.Iterable{``0},System.Collections.Iterable{``0})"><summary>Enumerates the first source followed by the second source.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="second">The second, from 0 through 59.</param></member>
+
+    <member name="M:System.Linq.Operators.FlatMap``2(System.Collections.Iterable{``0},System.Func{``0,System.Collections.Iterable{``1}})"><summary>Projects each element to an iterable and enumerates the resulting elements in order.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="selector">The callback projecting each source element.</param></member>
+
+    <member name="M:System.Linq.Operators.First``1(System.Collections.Iterable{``0})"><summary>Returns the first source element matching the optional predicate, or None when none exists.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+
+    <member name="M:System.Linq.Operators.First``1(System.Collections.Iterable{``0},System.Func{``0,System.Boolean})"><summary>Returns the first source element matching the optional predicate, or None when none exists.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="predicate">The predicate used to test each available value.</param></member>
+
+    <member name="M:System.Linq.Operators.Last``1(System.Collections.Iterable{``0})"><summary>Returns the last source element matching the optional predicate, or None when none exists.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+
+    <member name="M:System.Linq.Operators.Last``1(System.Collections.Iterable{``0},System.Func{``0,System.Boolean})"><summary>Returns the last source element matching the optional predicate, or None when none exists.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="predicate">The predicate used to test each available value.</param></member>
+
+    <member name="M:System.Linq.Operators.Single``1(System.Collections.Iterable{``0})"><summary>Returns the sole matching element, or SingleError.Empty or SingleError.Multiple for a cardinality mismatch.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+
+    <member name="M:System.Linq.Operators.Single``1(System.Collections.Iterable{``0},System.Func{``0,System.Boolean})"><summary>Returns the sole matching element, or SingleError.Empty or SingleError.Multiple for a cardinality mismatch.</summary><param name="self">The source outcome or iterable on which the extension operates.</param><param name="predicate">The predicate used to test each available value.</param></member>
+
+    <member name="M:System.Linq.Operators.ToList``1(System.Collections.Iterable{``0})"><summary>Materializes the source into a new ArrayList in enumeration order.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+
+    <member name="T:System.Text.InvalidUtf8Error"><summary>An error indicating a byte sequence that is not valid UTF-8.</summary></member>
+    <member name="M:System.Text.InvalidUtf8Error.ToString"><summary>Returns the value or active error case name for display.</summary></member>
+
+    <member name="M:System.Text.InvalidUtf8Error.#ctor"><summary>Creates InvalidUtf8Error.</summary></member>
+
+    <member name="T:System.Text.Utf8SliceError"><summary>An error indicating an out-of-range byte slice or an invalid UTF-8 boundary.</summary></member>
+    <member name="M:System.Text.Utf8SliceError.ToString"><summary>Returns the value or active error case name for display.</summary></member>
+
+    <member name="M:System.Text.Utf8SliceError.#ctor(System.Text.Utf8SliceError.OutOfRange)"><summary>Constructs Utf8SliceError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Text.Utf8SliceError.GetOutOfRange"><summary>Extracts the OutOfRange case; requesting an inactive case faults.</summary></member>
+
+    <member name="M:System.Text.Utf8SliceError.#ctor(System.Text.Utf8SliceError.InvalidBoundary)"><summary>Constructs Utf8SliceError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Text.Utf8SliceError.GetInvalidBoundary"><summary>Extracts the InvalidBoundary case; requesting an inactive case faults.</summary></member>
+
+    <member name="P:System.Text.Utf8SliceError.IsOutOfRange"><summary>Tests whether the active case is OutOfRange.</summary></member>
+    <member name="P:System.Text.Utf8SliceError.IsInvalidBoundary"><summary>Tests whether the active case is InvalidBoundary.</summary></member>
+    <member name="T:System.Text.Utf8SliceError.OutOfRange"><summary>The OutOfRange case of System.Text.Utf8SliceError.</summary></member>
+    <member name="M:System.Text.Utf8SliceError.OutOfRange.#ctor"><summary>Creates OutOfRange.</summary></member>
+
+    <member name="T:System.Text.Utf8SliceError.InvalidBoundary"><summary>The InvalidBoundary case of System.Text.Utf8SliceError.</summary></member>
+    <member name="M:System.Text.Utf8SliceError.InvalidBoundary.#ctor"><summary>Creates InvalidBoundary.</summary></member>
+
+    <member name="T:System.Text.Utf8"><summary>Strict UTF-8 conversion between strings and byte sequences.</summary><remarks>Decode snapshots the supplied sequence and returns InvalidUtf8Error for malformed input. It does not silently replace invalid bytes.</remarks></member>
+    <member name="M:System.Text.Utf8.Encode(System.String)"><summary>Encodes the string as a UTF-8 byte sequence.</summary><param name="text">The input text.</param></member>
+
+    <member name="M:System.Text.Utf8.Decode(System.Collections.Sequence{System.Byte})"><summary>Decodes a byte sequence as strict UTF-8, returning InvalidUtf8Error for malformed input.</summary><param name="bytes">The input byte sequence.</param></member>
+
+    <member name="T:System.Text.UnicodeScalar"><summary>Unicode category and ASCII predicates over scalar code points.</summary><remarks>Predicates accept UInt32 code points. These operations classify Unicode scalars, not the extended grapheme clusters represented by Char.</remarks></member>
+    <member name="M:System.Text.UnicodeScalar.IsDigit(System.UInt32)"><summary>Tests whether the code point is a Unicode decimal digit.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Text.UnicodeScalar.IsNumber(System.UInt32)"><summary>Tests whether the code point is a Unicode number.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Text.UnicodeScalar.IsLetter(System.UInt32)"><summary>Tests whether the code point is a Unicode letter.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Text.UnicodeScalar.IsUpper(System.UInt32)"><summary>Tests whether the code point is an uppercase letter.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Text.UnicodeScalar.IsLower(System.UInt32)"><summary>Tests whether the code point is a lowercase letter.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Text.UnicodeScalar.IsSeparator(System.UInt32)"><summary>Tests whether the code point is a Unicode separator.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Text.UnicodeScalar.IsControl(System.UInt32)"><summary>Tests whether the code point is a Unicode control character.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Text.UnicodeScalar.IsPunctuation(System.UInt32)"><summary>Tests whether the code point is Unicode punctuation.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Text.UnicodeScalar.IsSymbol(System.UInt32)"><summary>Tests whether the code point is a Unicode symbol.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Text.UnicodeScalar.IsAscii(System.UInt32)"><summary>Tests whether the code point is in the ASCII range.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Text.UnicodeScalar.IsAsciiDigit(System.UInt32)"><summary>Tests whether the code point is an ASCII decimal digit.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Text.UnicodeScalar.IsLetterOrDigit(System.UInt32)"><summary>Tests whether the code point is a Unicode letter or decimal digit.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="M:System.Text.UnicodeScalar.IsWhiteSpace(System.UInt32)"><summary>Tests whether the code point is Unicode whitespace.</summary><param name="value">The value on which this operation acts.</param></member>
+
+    <member name="T:System.Runtime.CompilerServices.IsReadOnlyAttribute"><summary>Marks readonly metadata emitted or consumed by the compiler.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
+    <member name="M:System.Runtime.CompilerServices.IsReadOnlyAttribute.#ctor"><summary>Creates IsReadOnlyAttribute.</summary></member>
+
+      <member name="M:System.Networking.Sockets.Socket.Listen(System.String,System.Int32,System.Int32)"><summary>Binds an IPv4 TCP listener and starts listening.</summary><param name="address">Numeric local IPv4 address. Use 127.0.0.1 for loopback; 0.0.0.0 binds all IPv4 interfaces.</param><param name="port">Port from zero through 65535. Zero requests an OS-assigned port; query it with GetLocalPort.</param><param name="backlog">Requested pending-connection backlog from 1 through 128; the OS may apply its own bound.</param><returns>A listening Socket or a SocketError such as InvalidAddress, InvalidRange, AddressInUse, AccessDenied or LimitExceeded.</returns><remarks>Development API. This synchronous factory completes bind/listen without waiting for a client. No reuse-address option or separate unbound socket state is exposed. Listeners share invocation socket capacity with connections and pending connection reservations. Close promptly.</remarks></member>
     <member name="M:System.Networking.Sockets.Socket.Accept"><summary>Waits asynchronously for one incoming connection on this listener.</summary><returns>A Task containing a new connected Socket or SocketError. Only one accept may be pending per listener; another returns Busy. Calling on a connected socket returns InvalidOperation.</returns><remarks>Reserves one socket slot before waiting. Closing the listener settles an uncommitted accept as Closed and releases its reservation. An already accepted connection remains usable even if the listener closes before callback delivery. The caller owns and must close each accepted socket separately. No accept deadline or public cancellation parameter is provided; host invocation cancellation and teardown remain available.</remarks></member>
     <member name="M:System.Networking.Sockets.Socket.GetLocalPort"><summary>Gets the OS-selected local port of a live listener or connected socket.</summary><returns>The local port or SocketError; a closed socket returns Closed.</returns><remarks>Useful after Listen with port zero. This provisional helper does not introduce an endpoint or IPAddress value object.</remarks></member>
     <member name="T:System.Networking.Sockets.SocketError.InvalidOperation"><summary>The operation requires a different socket role: Accept requires a listener; Send and Receive require a connected socket.</summary></member>

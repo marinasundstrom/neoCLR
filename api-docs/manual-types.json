@@ -1,0 +1,22 @@
+{
+  "System.NamespaceMembers": {
+    "source": "manual/System.NamespaceMembers.md",
+    "output": "docs/reference-system-functions.html",
+    "reason": "RavenDoc promotes namespace-container functions to System and registers a type route without emitting a container page.",
+    "members": {}
+  },
+  "System.Math.NamespaceMembers": {
+    "source": "manual/System.Math.NamespaceMembers.md",
+    "output": "docs/reference-math-functions.html",
+    "reason": "RavenDoc promotes namespace-container functions to System.Math and registers a type route without emitting a container page.",
+    "members": {}
+  },
+  "System.Runtime.CompilerServices.IsReadOnlyAttribute": {
+    "source": "manual/IsReadOnlyAttribute.md",
+    "output": "docs/reference-readonly-attribute.html",
+    "reason": "The pinned Raven metadata model consumes the readonly marker without exposing its public reference definition to RavenDoc.",
+    "members": {
+      "M:System.Runtime.CompilerServices.IsReadOnlyAttribute.#ctor": "constructor"
+    }
+  }
+}

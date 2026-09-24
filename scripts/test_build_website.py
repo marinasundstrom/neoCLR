@@ -190,5 +190,69 @@ class RavenDocPages(unittest.TestCase):
         self.assertIn('body fragment', result.stderr)
 
 
+
+
+class PublicApiCoverage(unittest.TestCase):
+    def setUp(self):
+        import json
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        for name in ('ROOT', 'OUTPUT'):
+            self.addCleanup(setattr, build, name, getattr(build, name))
+        build.ROOT = self.root
+        build.OUTPUT = self.root / 'site'
+        build.OUTPUT.mkdir()
+        docs = self.root / 'api-docs'
+        docs.mkdir()
+        (docs / 'types.json').write_text(json.dumps(['Example.Public']))
+        (docs / 'exclusions.json').write_text('{}')
+        (docs / 'NeoCLR.CoreProbe.xml').write_text('<doc><members /></doc>')
+        (build.OUTPUT / 'xref-map.json').write_text(json.dumps({'T:Example.Public': 'public.html'}))
+
+    def test_public_type_without_comments_remains_publishable(self):
+        (build.OUTPUT / 'public.html').write_text('<span class="member-summary--empty"></span>')
+        build.check_api_coverage()
+
+    def test_public_type_without_page_fails_even_without_comments(self):
+        with self.assertRaisesRegex(ValueError, 'Missing public type reference'):
+            build.check_api_coverage()
+
+    def test_manual_entries_repair_phantom_routes_without_hiding_types(self):
+        import json
+        (build.OUTPUT / 'manual.html').write_text('<h1 id="constructor">Public</h1>')
+        (self.root / 'api-docs/manual-types.json').write_text(json.dumps({
+            'Example.Public': {'output': 'manual.html', 'reason': 'Renderer limitation',
+                               'members': {'M:Example.Public.#ctor': 'constructor'}}
+        }))
+        build.register_manual_api_routes()
+        routes = json.loads((build.OUTPUT / 'xref-map.json').read_text())
+        self.assertEqual(routes['T:Example.Public'], 'manual.html')
+        self.assertEqual(routes['M:Example.Public.#ctor'], 'manual.html#constructor')
+        self.assertIn('manual.html', (build.OUTPUT / 'public.html').read_text())
+        build.check_api_coverage()
+
+    def test_manual_entry_requires_a_reason_and_a_real_page(self):
+        import json
+        (self.root / 'api-docs/manual-types.json').write_text(json.dumps({
+            'Example.Public': {'output': 'missing.html', 'reason': '', 'members': {}}
+        }))
+        with self.assertRaisesRegex(ValueError, 'Missing manual API entry'):
+            build.register_manual_api_routes()
+
+
+class PublicMetadataInventory(unittest.TestCase):
+    def test_reference_snapshot_covers_all_public_types_and_no_internal_providers(self):
+        import json
+        from api_inventory import public_types
+        root = Path(__file__).resolve().parent.parent
+        actual = public_types(root / 'api-docs/reference/NeoCLR.CoreProbe.dll')
+        self.assertEqual(actual, json.loads((root / 'api-docs/types.json').read_text()))
+        for name in ('System.Collections.ArrayList`1', 'System.Collections.HashMap`2',
+                     'System.Option.Some`1', 'System.Runtime.CompilerServices.IsReadOnlyAttribute'):
+            self.assertIn(name, actual)
+        self.assertNotIn('System.Introspection.RuntimeTypeInfo', actual)
+
+
 if __name__ == '__main__':
     unittest.main()

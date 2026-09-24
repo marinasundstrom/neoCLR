@@ -141,6 +141,31 @@ def check_reference_links():
         parser.feed(page.read_text(encoding='utf-8'))
 
 
+def register_manual_api_routes():
+    """Keep documented renderer limitations visible, rather than excluding types."""
+    path = OUTPUT / 'xref-map.json'
+    xrefs = json.loads(path.read_text())
+    for name, entry in json.loads((ROOT / 'api-docs/manual-types.json').read_text()).items():
+        target = entry['output']
+        if not entry['reason'] or not (OUTPUT / target).is_file():
+            raise ValueError('Missing manual API entry or reason: ' + name)
+        previous = xrefs.get('T:' + name)
+        if previous and previous != target and not (OUTPUT / previous).is_file():
+            # Namespace promotion leaves a registered container route without a page.
+            # Preserve already-rendered links to it with a checked redirect.
+            alias = OUTPUT / previous
+            alias.parent.mkdir(parents=True, exist_ok=True)
+            relative = posixpath.relpath(target, posixpath.dirname(previous))
+            alias.write_text('<!doctype html><html lang="en"><head><meta charset="utf-8">'
+                             '<title>Public type reference</title></head><body>'
+                             f'<p><a href="{escape(relative)}">{escape(name)}</a></p>'
+                             '<script>location.replace(' + json.dumps(relative) + ');</script></body></html>')
+        xrefs['T:' + name] = target
+        for uid, anchor in entry['members'].items():
+            xrefs[uid] = target + ('#' + anchor if anchor else '')
+    path.write_text(json.dumps(xrefs, indent=2) + '\n')
+
+
 def check_api_coverage():
     import xml.etree.ElementTree as ET
     xrefs = {uid.replace('+', '.').replace('..ctor', '.#ctor'): path
@@ -151,11 +176,11 @@ def check_api_coverage():
                 ET.parse(ROOT / 'api-docs/NeoCLR.CoreProbe.xml').findall('./members/member')}
     for name in types:
         uid = 'T:' + name
-        if uid not in xrefs or uid not in comments:
-            raise ValueError('Missing generated type or XML description: ' + uid)
-        page = OUTPUT / xrefs[uid]
-        if 'member-summary--empty' in page.read_text():
-            raise ValueError('Missing public member summary in ' + str(page))
+        if uid not in xrefs or not (OUTPUT / xrefs[uid].split('#', 1)[0]).is_file():
+            raise ValueError('Missing public type reference: ' + uid)
+        page = OUTPUT / xrefs[uid].split('#', 1)[0]
+        if uid not in comments or 'member-summary--empty' in page.read_text():
+            print('API descriptions still needed: ' + name, flush=True)
     for uid, node in comments.items():
         normalized = re.sub(r'``[0-9]+', '', uid.split('(', 1)[0])
         selected = uid.startswith('T:') and uid[2:] in types or (
@@ -166,7 +191,7 @@ def check_api_coverage():
             raise ValueError('Documented API missing from generated reference: ' + uid)
         summary = node.find('summary')
         if summary is None or not ''.join(summary.itertext()).strip():
-            raise ValueError('Missing API summary: ' + uid)
+            print('API summary still needed: ' + uid, flush=True)
 
 
 def write_legacy_routes():
@@ -341,12 +366,14 @@ def main():
         raise ValueError('The site must explain development/release availability and link the published release')
     publisher_output = ROOT / 'target/website-rendered'
     config.update(output=str(publisher_output), api=str(ROOT / 'api-docs/reference/NeoCLR.CoreProbe.dll'),
-                  types=json.loads((ROOT / 'api-docs/types.json').read_text()),
+                  types=None,  # Generate every public type, regardless of comment availability.
                   excludedMembers=list(json.loads((ROOT / 'api-docs/exclusions.json').read_text())), pages=[])
     sources = [(source, source.relative_to(SOURCE / 'content').with_suffix('.html'))
                for source in sorted((SOURCE / 'content').rglob('*')) if source.suffix in ('.md', '.html')]
     sources += [(source, Path('docs') / source.with_suffix('.html').name)
                 for source in sorted((ROOT / 'api-docs').glob('*.md')) if source.name != 'README.md']
+    sources += [(ROOT / 'api-docs' / entry['source'], Path(entry['output']))
+                for entry in json.loads((ROOT / 'api-docs/manual-types.json').read_text()).values()]
     for source, relative in sources:
         template = source.read_text().replace('{{TOUR_OUTPUT}}', output_text).replace('{{ARRAY_OUTPUT}}', array_output)
         markdown = render(template, samples, html=source.suffix == '.html')
@@ -363,6 +390,7 @@ def main():
     manifest.write_text(json.dumps(config))
     subprocess.run([sys.executable, str(ROOT / 'scripts/ravendoc.py'), '--site', str(manifest)], check=True)
     shutil.copytree(publisher_output, OUTPUT, dirs_exist_ok=True)
+    register_manual_api_routes()
     check_api_coverage()
     write_legacy_routes()
     # All site links must work at the domain root and under a Pages project prefix.

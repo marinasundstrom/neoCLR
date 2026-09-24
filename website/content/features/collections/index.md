@@ -99,3 +99,11 @@ Report issues with a small program, the toolchain version, expected behavior and
 ## Mixed Object keys
 
 Development generic API signatures now admit Object map keys and values. `HashMap<Object, Object>` uses explicit equality and hash callbacks: Path and type descriptors use their own contracts, supported boxed integers and Booleans compare by value, and ordinary classes retain allocation identity. A tested sample covers mixed keys, collisions, replacement, table growth and reference-preserving values through GC. This does not add a default comparer or string-to-Object conversion.
+
+## API reference
+
+Browse [ArrayList](xref:System.Collections.ArrayList`1),
+[HashMap](xref:System.Collections.HashMap`2),
+[collection interfaces](xref:System.Collections) and
+[query operators](xref:System.Linq.Operators) for signatures,
+member descriptions and the current development contract.

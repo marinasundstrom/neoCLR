@@ -4,6 +4,10 @@
   items:
     - name: Namespaces
       href: docs/namespaces.md
+    - name: Collections and queries
+      href: features/collections/index.md
+    - name: Public reference coverage
+      href: docs/reference-support.md
     - name: Objects and equality
       href: docs/objects.md
     - name: Tasks and async
