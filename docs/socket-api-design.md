@@ -111,3 +111,74 @@ scheduler. Keep full runtime frame suspension separate from this first bridge.
 
 S4 closes only when real Raven programs run on neoCLR with these lifecycle checks.
 The full web-app goal remains open after this initial transport implementation.
+
+## Reusable private receive backend — 2026-09-24
+
+[src/socket_io.rs](../src/socket_io.rs) now supplies the scheduler's TCP receive source.
+It adopts an already-connected host TcpStream, retaining that resource independently
+of pending reads and completed results. The guest injection service remains test-only;
+normal application code has no Socket constructor, addressing API or binding yet.
+This is internal implementation, not a public contract or release announcement.
+
+The owner-thread registry uses nonblocking reads into owned native buffers and copies
+only the reported bytes into checked managed arrays. It retains pending destination
+and callback roots, then transfers callbacks to the scheduler ready slot. A completed
+byte count or internal error stays in the registry until its result is taken exactly
+once; it cannot be consumed before callback delivery to the scheduler. Transferring
+into a ready slot is not a claim that the guest callback has already executed.
+
+Cancelling before a read poll settles that operation without consuming transport bytes
+or closing the socket. Cancellation after terminal completion returns false. There is
+no concurrent OS operation needing acknowledgement in this backend. Close is idempotent,
+settles outstanding reads as Closed and drops the connection; closing an unknown/foreign
+ID has no effect. Later reads on a closed ID fail. These internal choices remain
+provisional until their public error/cancellation mapping is documented and tested.
+
+Socket and operation IDs are separate private types backed by process-unique, checked
+monotonic allocation. IDs never wrap/recycle and do not alias another invocation's
+registry. They are not OS descriptors or a public capability/security model. A retired
+operation result cannot be read twice or cancel a later operation.
+
+Current private budgets are 64 open sockets, 64 pending-or-unconsumed operations and
+64 KiB of aggregate requested receive storage. One pending receive per socket is
+allowed. Terminal completion releases receive storage; consuming the delivered result
+releases its operation slot. These limits exclude table/allocator overhead and retained
+managed graphs, which remain under existing heap accounting. There is no public Limits
+extension or frozen quota contract. Admission failure keeps a registered socket usable;
+failed adoption consumes/drops the supplied host stream owner.
+
+Comparison reuses the .NET ReceiveAsync and owned-buffer research above. Connection
+reuse after cancellation and independent asynchronous operation results support the
+future Task<Result<...>> bridge without requiring runtime suspension. Costs include a
+host buffer, managed-array replacement copy, retained outcome records and linear scans
+of the bounded operation table. No performance advantage is claimed. I/O errors are
+currently collapsed into an internal Io category; public diagnostic/error mapping,
+send/accept/connect, OS readiness notification and per-operation guest cancellation
+remain work for the application bridge.
+
+Focused backend checks cover cancellation followed by a real second read, result quota
+retention/consumption, foreign and stale handles, transactional range/type/byte-budget
+admission, open-socket budget rejection/recovery, close/EOF, and later-ready progress
+past an idle socket. The existing TCP VM
+fixture now runs through this backend for actual collector and TaskQueue integration.
+
+```sh
+cargo test --lib socket_io::tests
+cargo test --lib socket_vm_probe
+cargo test --lib scheduler::tests
+cargo test --test workers
+```
+
+Callback target binding remains the VM's responsibility; the registry checks the
+callback's declared Func<Void> shape. It does not enforce exclusive aliases to a
+pending destination: caller writes or overlapping reads on different sockets remain
+an open public buffer-usage contract. Managed-array replacement keeps array identity
+but currently copies the destination; this is the same conservative ownership path
+used in the earlier GC probes.
+
+Next introduce the smallest Raven-facing addressing/socket/operation-result bridge,
+with matching reference/API documentation and a runnable echo case. Preserve current
+queue affinity for this bridge; generated state machines remain the execution model.
+
+Validation: all 35 targeted backend, VM, scheduler and worker checks pass; the
+combined website builds with all 523 current API pages checked.

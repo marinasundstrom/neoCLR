@@ -2727,7 +2727,7 @@ fn interpret_instructions(
                             if default_task_queue.is_none() {
                                 return Err(Fault::new("Socket probe requires the default TaskQueue"));
                             }
-                            scheduler.socket_probe.begin(args, heap)?;
+                            crate::socket_vm_probe::begin(&mut scheduler.sockets, args, heap)?;
                             frame.stack.push(Value::Void);
                             return Ok(None);
                         }

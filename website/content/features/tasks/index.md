@@ -170,8 +170,10 @@ A development [Delayed Copy experiment](https://github.com/marinasundstrom/neoCL
 A separate development test adapter now connects real loopback TCP reads to the
 interpreter’s managed-array roots and default TaskQueue callbacks. It checks
 collection during a pending read, callback delivery while the queue remains busy,
-and completion alongside a pending worker. The socket adapter exists only in test
-builds; this does not yet provide a public Socket API or Task-based network I/O.
+and completion alongside a pending worker. The host-connection injection service exists only in test builds. The private receive
+backend now retains reusable connections and accounts for pending and completed read
+results separately. It supports cancellation before reading without closing the
+connection. This still does not provide a public Socket API or Task-based network I/O.
 
 **Development after Preview 9:** explicit thread APIs move to `System.Concurrency`; Task and Promise stay in `System.Tasks`. A retained `Thread(callback, input)` exposes a pending `Task` before instance `Start()`. Starting twice faults. `Thread.Run(callback, input)` is the immediate-start shortcut. Both retain the current isolated string callback restriction; successful completion includes native thread termination. These changes require matching development artifacts and are not in the Preview 9 downloads.
 

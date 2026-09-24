@@ -806,13 +806,14 @@ No later major milestone has started.
 
 ## Working rules and immediate next step
 
-**Active next step, 2026-09-24:** continue the reusable operation/socket bridge using
-the [internal scheduler boundary](runtime-scheduling-design.md#next-implementation-slices).
-The driver and ready-to-active callback handoff now have explicit ownership. Add
-bounded pending/completed operation accounting and reusable socket results, retaining
-current affinity until its migration is explicitly tested. Generated state machines
-remain the execution mechanism; runtime suspension and general context customization
-are not prerequisites for TCP echo.
+**Active next step, 2026-09-24:** add the smallest Raven-facing addressing/socket
+and operation-result bridge, with matching API docs and a runnable echo case.
+The [private receive source](socket-api-design.md#reusable-private-receive-backend--2026-09-24)
+now separates reusable connection ownership from pending reads and consumed results,
+counts completed outcomes against admission, and runs through the scheduler/VM fixture.
+Preserve current affinity for this bridge. Generated state machines remain the
+execution mechanism; runtime suspension and general context customization are not
+prerequisites for TCP echo.
 Earlier foundation checkpoints below are dated evidence, not competing priorities.
 
 Each selected slice should leave a checked sample, expected output, a matching build/run

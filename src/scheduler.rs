@@ -44,13 +44,12 @@ impl Source for crate::workers::Workers {
         self.trace_roots(roots);
     }
 }
-#[cfg(test)]
-impl Source for crate::socket_vm_probe::Receives {
+impl Source for crate::socket_io::Sockets {
     fn poll(&mut self, heap: &ManagedHeap) -> Result<Option<Value>, Fault> {
         self.poll(heap)
     }
     fn pending(&self) -> bool {
-        self.is_pending()
+        self.pending()
     }
     fn trace_roots(&self, roots: &mut Vec<usize>) {
         self.trace_roots(roots);
@@ -98,8 +97,7 @@ struct Ready {
 
 pub(crate) struct Scheduler {
     pub(crate) workers: crate::workers::Workers,
-    #[cfg(test)]
-    pub(crate) socket_probe: crate::socket_vm_probe::Receives,
+    pub(crate) sockets: crate::socket_io::Sockets,
     ready: Option<Ready>,
     arbitration: Arbitration,
     wake: Arc<Wake>,
@@ -109,8 +107,7 @@ impl Default for Scheduler {
         let wake = Arc::new(Wake::default());
         Self {
             workers: crate::workers::Workers::with_wake(wake.clone()),
-            #[cfg(test)]
-            socket_probe: Default::default(),
+            sockets: Default::default(),
             ready: None,
             arbitration: Default::default(),
             wake,
@@ -119,11 +116,7 @@ impl Default for Scheduler {
 }
 impl Scheduler {
     fn progress(&mut self, heap: &ManagedHeap) -> Result<Progress, Fault> {
-        let sources: &mut [&mut dyn Source] = &mut [
-            &mut self.workers,
-            #[cfg(test)]
-            &mut self.socket_probe,
-        ];
+        let sources: &mut [&mut dyn Source] = &mut [&mut self.workers, &mut self.sockets];
         self.arbitration.poll(sources, heap)
     }
 
@@ -133,8 +126,7 @@ impl Scheduler {
             crate::gc::trace(&ready.destination, roots);
         }
         Source::trace_roots(&self.workers, roots);
-        #[cfg(test)]
-        Source::trace_roots(&self.socket_probe, roots);
+        Source::trace_roots(&self.sockets, roots);
     }
 
     fn stage(&mut self, callback: Value, destination: &Value) {

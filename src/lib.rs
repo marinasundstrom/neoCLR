@@ -171,3 +171,5 @@ mod external_io_gc_probe;
 mod socket_vm_probe;
 
 mod scheduler;
+
+mod socket_io;

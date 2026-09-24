@@ -268,3 +268,13 @@ full runtime suspension and broader execution-context policies remain later work
 Validation for this handoff slice: 7 scheduler tests, 5 real-TCP VM tests and
 16 worker integration tests pass on Darwin arm64. API-reference checks and the
 523-page combined website build also pass.
+
+## Reusable operation source — 2026-09-24
+
+The [private receive backend](socket-api-design.md#reusable-private-receive-backend--2026-09-24)
+now separates socket ownership, pending buffer/callback roots, scheduler-ready
+registrations and completed results awaiting consumption. Completed outcomes retain
+operation admission slots until taken. The source is normal runtime code; only host
+stream injection remains test-only. Public operation IDs, Task producers and error
+mapping are not exposed yet. This uses generated callbacks and the existing default
+queue adapter; no runtime suspension or new affinity behavior is introduced.

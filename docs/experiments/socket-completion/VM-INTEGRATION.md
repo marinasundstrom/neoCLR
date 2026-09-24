@@ -15,11 +15,13 @@ sitting in a modeled ready queue. The entry point returns while work remains pen
 
 ## Implementation boundary
 
-The socket adapter, injected stream and exact InternalCall binding exist only in
-`cfg(test)` library builds. Normal runtime builds cannot bind TestSocketReceive and
-contain no socket polling branch. Injection is thread-local so independent tests do
-not share streams. No Raven reference metadata, application Socket API, production
-socket dependency or SDK artifact is added.
+The injected stream and exact TestSocketReceive binding exist only in cfg(test)
+library builds. The private `socket_io` registry and scheduler source are now normal
+runtime code; the test adapter delegates ownership and progress to that backend.
+Normal builds still cannot bind TestSocketReceive and have no public socket creation
+or operation service. Injection is thread-local so tests do not share streams.
+No Raven reference metadata, application Socket API, external socket dependency or
+SDK artifact is added.
 
 The [private scheduler](../../runtime-scheduling-design.md#initial-native-host-driver--implemented-2026-09-24)
 now owns source arbitration and waiting. Idle and callback-return polling use the same
@@ -33,13 +35,17 @@ safe callback-return boundary. There is no collection point between removing its
 pending owner and creating the TaskQueue.Post frame. Pending socket ownership drops
 on VM exit, including guest Fault and host cancellation.
 
-The adapter admits one receive of at most eight bytes, requires the default dispatcher,
-and validates signed ranges and heap-backed byte storage before taking the injected
-socket. Its delegate must have Func<Void> type; ordinary VM delegate binding resolves
-the target. Native errors become invocation Faults in this test seam; that is **not**
-the proposed public SocketError/Result contract. Completion receives no byte count and
-releases the injected connection. General socket handles, per-operation cancellation,
-reusable connections and byte-count results remain with the production bridge work.
+The test adapter injects one already-connected stream per invocation, requires the
+default dispatcher and validates signed ranges before taking the resource. It registers
+a receive through the private registry. Actual I/O failures and byte counts now stay
+as operation results; the callback shape in this original fixture still carries no
+result handle. The fixture checks copied bytes directly. Separate backend tests consume
+results, preserve connections after cancellation, and verify admission budgets.
+
+The registry retains a connection after read completion until explicit close or
+invocation teardown. Results remain accounted for until consumed or teardown; the
+original VM callback does not consume them. This is not a selected public
+SocketError/Result mapping or an application Socket API.
 
 ## Validation
 

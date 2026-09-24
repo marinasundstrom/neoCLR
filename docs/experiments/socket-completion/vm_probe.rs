@@ -9,101 +9,53 @@ use std::{
 };
 
 thread_local! { static INPUT: RefCell<Option<TcpStream>> = const { RefCell::new(None) }; }
-struct Pending {
-    socket: TcpStream,
-    destination: Value,
-    callback: Value,
-    offset: usize,
-    bytes: Vec<u8>,
-}
-#[derive(Default)]
-pub(crate) struct Receives {
-    pending: Option<Pending>,
-}
-impl Receives {
-    pub(crate) fn begin(&mut self, args: Vec<Value>, heap: &ManagedHeap) -> Result<(), Fault> {
-        if self.pending.is_some() {
-            return Err(Fault::new("Socket probe operation limit"));
-        }
-        let [
-            destination @ Value::ObjectReference(object),
-            Value::Int32(offset),
-            Value::Int32(count),
-            callback @ Value::Delegate(_),
-        ] = args.as_slice()
-        else {
-            return Err(Fault::new("Invalid socket probe arguments"));
-        };
-        let Value::Array {
-            element: Type::Byte,
-            elements,
-        } = heap.read_reference(&object.reference)?
-        else {
-            return Err(Fault::new("Expected byte array"));
-        };
-        if callback.ty() != crate::assembler::parse_type("System.Func<Void>")? {
-            return Err(Fault::new("Expected completion callback"));
-        }
-        let offset = usize::try_from(*offset).map_err(|_| Fault::new("Invalid socket range"))?;
-        let count = usize::try_from(*count).map_err(|_| Fault::new("Invalid socket range"))?;
-        if offset > elements.len() || count > elements.len() - offset || count > 8 {
-            return Err(Fault::new("Invalid socket range"));
-        }
-        let socket = INPUT
-            .with(|input| input.borrow_mut().take())
-            .ok_or_else(|| Fault::new("No injected socket"))?;
-        socket
-            .set_nonblocking(true)
-            .map_err(|e| Fault::new(e.to_string()))?;
-        self.pending = Some(Pending {
+// Only test injection remains here. Ownership and progress use the private runtime backend.
+pub(crate) fn begin(
+    sockets: &mut crate::socket_io::Sockets,
+    args: Vec<Value>,
+    heap: &ManagedHeap,
+) -> Result<(), Fault> {
+    let [
+        destination @ Value::ObjectReference(object),
+        Value::Int32(offset),
+        Value::Int32(count),
+        callback,
+    ] = args.as_slice()
+    else {
+        return Err(Fault::new("Invalid socket probe arguments"));
+    };
+    let Value::Array {
+        element: Type::Byte,
+        elements,
+    } = heap.read_reference(&object.reference)?
+    else {
+        return Err(Fault::new("Expected byte array"));
+    };
+    // Reject malformed test input before consuming the injected resource.
+    if *offset < 0
+        || *count < 0
+        || (*offset as usize) > elements.len()
+        || (*count as usize) > elements.len() - *offset as usize
+    {
+        return Err(Fault::new("Invalid socket range"));
+    }
+    let socket = INPUT
+        .with(|input| input.borrow_mut().take())
+        .ok_or_else(|| Fault::new("No injected socket"))?;
+    let socket = sockets
+        .adopt(socket)
+        .map_err(|e| Fault::new(format!("Socket admission: {e:?}")))?;
+    sockets
+        .receive(
             socket,
-            destination: destination.clone(),
-            callback: callback.clone(),
-            offset,
-            bytes: vec![0; count],
-        });
-        Ok(())
-    }
-    pub(crate) fn trace_roots(&self, roots: &mut Vec<usize>) {
-        if let Some(pending) = &self.pending {
-            crate::gc::trace(&pending.destination, roots);
-            crate::gc::trace(&pending.callback, roots);
-        }
-    }
-    pub(crate) fn is_pending(&self) -> bool {
-        self.pending.is_some()
-    }
-    pub(crate) fn poll(&mut self, heap: &ManagedHeap) -> Result<Option<Value>, Fault> {
-        let Some(pending) = &mut self.pending else {
-            return Ok(None);
-        };
-        let count = match pending.socket.read(&mut pending.bytes) {
-            Err(e)
-                if matches!(
-                    e.kind(),
-                    io::ErrorKind::WouldBlock | io::ErrorKind::Interrupted
-                ) =>
-            {
-                return Ok(None);
-            }
-            result => result.map_err(|e| Fault::new(e.to_string()))?,
-        };
-        let Value::ObjectReference(object) = &pending.destination else {
-            unreachable!()
-        };
-        let mut replacement = heap.read_reference(&object.reference)?;
-        let Value::Array { elements, .. } = &mut replacement else {
-            unreachable!()
-        };
-        for (slot, byte) in elements[pending.offset..pending.offset + count]
-            .iter_mut()
-            .zip(&pending.bytes)
-        {
-            *slot = Value::Byte(*byte);
-        }
-        object.reference.write(replacement)?;
-        Ok(Some(self.pending.take().unwrap().callback))
-    }
+            heap,
+            destination.clone(),
+            *offset,
+            *count,
+            callback.clone(),
+        )
+        .map_err(|e| Fault::new(format!("Socket receive: {e:?}")))?;
+    Ok(())
 }
 
 fn library() -> &'static crate::Module {

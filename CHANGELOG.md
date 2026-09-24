@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add a private reusable TCP receive registry behind the invocation scheduler.
+  Separate connection/read lifetimes, preserve connections on read cancellation,
+  retain completed results within admission quotas until consumed, and reject
+  stale/foreign handles. Route the real-TCP VM fixture through this backend; host
+  injection remains test-only, with no public Socket API or runtime suspension.
+  All 35 targeted backend/VM/scheduler/worker checks and the combined website build pass.
+
 - Retain ready callbacks and their default-queue destinations in a bounded, traced
   scheduler slot until active-frame installation succeeds. Failed installation keeps
   the roots; occupied slots do not consume more completions. Preserve current affinity.
