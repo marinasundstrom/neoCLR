@@ -1,4 +1,14 @@
 {
   "M:System.Concurrency.ThreadPool.#ctor": "Reference-only scaffold constructor; ThreadPool is a static service, not application-constructible.",
-  "M:System.String.#ctor": "Reference-only parameterless scaffold constructor. Use String(Sequence<Char>), literals or text APIs. See /docs/objects.html#string-through-object-development."
+  "M:System.String.#ctor": "Reference-only parameterless scaffold constructor. Use String(Sequence<Char>), literals or text APIs. See /docs/objects.html#string-through-object-development.",
+  "T:System.Array": "CLR array base scaffold used by the importer/exporter; the application array API is System.Array`1.",
+  "T:System.Option": "Non-generic metadata container for projected union cases; document System.Option`1 instead.",
+  "T:System.Result": "Non-generic metadata container for projected union cases; document System.Result`2 instead.",
+  "T:System.Tasks.TaskOutcome": "Non-generic metadata container for projected union cases; document System.Tasks.TaskOutcome`1 instead.",
+  "T:System.Option.None": "CLR case-carrier scaffold in the non-generic union container; not a separate application type.",
+  "T:System.Option.Some`1": "CLR case-carrier scaffold in the non-generic union container; not a separate application type.",
+  "T:System.Result.Ok`1": "CLR case-carrier scaffold in the non-generic union container; not a separate application type.",
+  "T:System.Result.Error`1": "CLR case-carrier scaffold in the non-generic union container; not a separate application type.",
+  "T:System.Tasks.TaskOutcome.Cancelled": "CLR case-carrier scaffold in the non-generic union container; not a separate application type.",
+  "T:System.Tasks.TaskOutcome.Completed`1": "CLR case-carrier scaffold in the non-generic union container; not a separate application type."
 }

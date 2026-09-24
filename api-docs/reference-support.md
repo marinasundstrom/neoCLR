@@ -1,6 +1,6 @@
 # Public reference coverage and compiler support
 
-The reference includes all 224 public types in the current compiler-reference
+The metadata inventory includes all public types in the compiler-reference
 assembly, including public nested types. New public types are automatically selected
 for generation; missing prose is reported without hiding their pages. Internal
 runtime providers and private helpers are outside this public inventory.
@@ -20,6 +20,13 @@ reference-body scaffolding. Their pages identify that role. In particular,
 MulticastDelegate does not promise multicast callbacks, and the placeholder exception
 does not add exception construction or throwing to applications.
 
+The non-generic Array, Option, Result and TaskOutcome metadata scaffolds are
+intentionally excluded from generated pages and navigation to avoid duplicate
+application types. Use `Array<T>`, `Option<T>`, `Result<T, E>` and
+`TaskOutcome<T>`. CLR case-carrier types nested in the non-generic containers are
+excluded as well. Exact exclusions and reasons
+are recorded in `exclusions.json`; the complete metadata inventory is retained.
+
 ## Manual entries for renderer limitations
 
 No public type is silently excluded. The following entries preserve declarations
@@ -32,5 +39,6 @@ that the pinned metadata model or publisher does not emit as ordinary type pages
 | System.Runtime.CompilerServices.IsReadOnlyAttribute | [Marker and constructor](/docs/reference-readonly-attribute.html). The metadata model consumes the marker without exposing its public definition to RavenDoc. |
 
 These are rendering limitations, not application-type exclusions. All other public
-types have generated reference pages. The existing String and ThreadPool scaffold
+types, except the explicitly excluded scaffolds above, have generated reference
+pages. The existing String and ThreadPool scaffold
 constructor exclusions remain explicit; they are not supported application constructors.

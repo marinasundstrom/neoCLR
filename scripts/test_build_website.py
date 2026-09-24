@@ -99,6 +99,24 @@ class RavenDocPages(unittest.TestCase):
         result = subprocess.run(['dotnet', str(self.runtime), '--site', str(manifest)], capture_output=True, text=True)
         return result, root / 'site'
 
+    def test_scaffold_types_are_excluded_but_generic_apis_remain(self):
+        import json
+        repo = Path(__file__).resolve().parent.parent
+        exclusions = json.loads((repo / 'api-docs/exclusions.json').read_text())
+        result, output = self.publish('# Reference', extra=dict(
+            api=str(repo / 'api-docs/reference/NeoCLR.CoreProbe.dll'),
+            excludedMembers=list(exclusions)))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        xrefs = {uid.replace('+', '.'): path for uid, path in
+                 json.loads((output / 'xref-map.json').read_text()).items()}
+        for name in ('System.Array', 'System.Option', 'System.Result', 'System.Tasks.TaskOutcome',
+                     'System.Option.Some`1', 'System.Result.Ok`1', 'System.Tasks.TaskOutcome.Cancelled'):
+            self.assertNotIn('T:' + name, xrefs)
+        for name in ('System.Array`1', 'System.Option`1', 'System.Result`2',
+                     'System.Tasks.TaskOutcome`1'):
+            self.assertIn('T:' + name, xrefs)
+            self.assertTrue((output / xrefs['T:' + name].split('#')[0]).is_file(), name)
+
     def test_api_list_labels_and_signature_opt_in(self):
         import shutil
         temporary = tempfile.TemporaryDirectory()
@@ -215,6 +233,14 @@ class PublicApiCoverage(unittest.TestCase):
         build.check_api_coverage()
 
     def test_public_type_without_page_fails_even_without_comments(self):
+        with self.assertRaisesRegex(ValueError, 'Missing public type reference'):
+            build.check_api_coverage()
+
+    def test_exact_type_exclusion_does_not_hide_other_missing_types(self):
+        import json
+        (self.root / 'api-docs/exclusions.json').write_text(json.dumps({'T:Example.Public': 'Scaffold'}))
+        build.check_api_coverage()
+        (self.root / 'api-docs/types.json').write_text(json.dumps(['Example.Public', 'Example.Public`1']))
         with self.assertRaisesRegex(ValueError, 'Missing public type reference'):
             build.check_api_coverage()
 

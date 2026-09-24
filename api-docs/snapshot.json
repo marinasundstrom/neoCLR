@@ -2,7 +2,7 @@
   "assemblySha256": "4fdd8192eed42c91a5a6fccb5c1970a690221fdf542edf9a56d729b0538afe95",
   "inputs": {
     "api-docs/NeoCLR.CoreProbe.xml": "01b5821137b8bdc50ff060a4782d3a4c60cb74f3fd7e08522b1e15fe212e2bee",
-    "api-docs/exclusions.json": "c9d8e0475c59cb043c13de833cd89c3a1943b0619afb5c03b165d4bfe4de796d",
+    "api-docs/exclusions.json": "52917e8675b593c52d1ae814e34c28327dfa2fd62a0fc43fe2a885579d5ec6aa",
     "api-docs/manual-types.json": "7d7f9b3611c9a42f7b05df0a24f9f58b297705eefdcd316a0947feafba49228b",
     "api-docs/types.json": "23536823b1d3561f4e8f427b37a84fbfd7ce02d473281fd15c06d7617a7a4682",
     "docs/experiments/raven-target/ApplicationImport.cs": "66855a52e0d43532222cdbae0530de57ce13f25a00cd7e7d0cd791da7bf2607a",

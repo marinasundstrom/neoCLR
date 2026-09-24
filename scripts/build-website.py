@@ -176,6 +176,8 @@ def check_api_coverage():
                 ET.parse(ROOT / 'api-docs/NeoCLR.CoreProbe.xml').findall('./members/member')}
     for name in types:
         uid = 'T:' + name
+        if uid in exclusions:
+            continue
         if uid not in xrefs or not (OUTPUT / xrefs[uid].split('#', 1)[0]).is_file():
             raise ValueError('Missing public type reference: ' + uid)
         page = OUTPUT / xrefs[uid].split('#', 1)[0]
@@ -184,7 +186,7 @@ def check_api_coverage():
     for uid, node in comments.items():
         normalized = re.sub(r'``[0-9]+', '', uid.split('(', 1)[0])
         selected = uid.startswith('T:') and uid[2:] in types or (
-            uid[:2] in ('M:', 'P:', 'F:') and any(normalized[2:].startswith(name + '.') for name in types))
+            uid[:2] in ('M:', 'P:', 'F:') and any(normalized[2:].startswith(name + '.') for name in types if 'T:' + name not in exclusions))
         if not selected or normalized in exclusions:
             continue
         if normalized not in xrefs:

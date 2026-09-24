@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Exclude non-generic Array, Option, Result and TaskOutcome importer/exporter
+  scaffolds and their CLR case carriers from API pages and navigation; retain
+  generic APIs and the full metadata inventory with explicit, reasoned coverage exclusions.
+
 - Add symbol-derived member documentation structure with linked parameter and
   property/return/field/event types, even without authored prose. XML and Markdown
   enhance the generated contract; label the owner as Declaring type. Update the

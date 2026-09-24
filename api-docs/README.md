@@ -54,7 +54,12 @@ to be extracted from Raven source comments.
 `manual-types.json` records the exact pinned-renderer limitations and manual routes:
 the two namespace-function containers and IsReadOnlyAttribute. These remain part of
 the public inventory, with linked manual entries and checked routes. No public type
-is excluded from the inventory. Keep [reference support](reference-support.md) aligned
+is excluded from the inventory. `exclusions.json` records intentional page exclusions
+with reasons: non-generic Array, Option, Result and TaskOutcome are importer/exporter
+scaffolds, not additional application types. Their generic APIs remain documented;
+CLR case-carrier types inside the non-generic containers are also explicitly
+excluded. Coverage checks honor these exact type exclusions.
+Keep [reference support](reference-support.md) aligned
 when those renderer limitations change.
 
 RavenDoc now renders the previously excluded TaskQueue Post/Run, Task OnCompleted,
@@ -72,8 +77,8 @@ Sequence, Collection, Iterable and Iterator now have generated reference coverag
 including String construction and its read-only grapheme indexer. String Count is
 an explicit Collection implementation, visible through Sequence/Collection only.
 
-The current audit covers all 224 public reference types: 221 generated type pages
-and three explicit manual entries. Collections, arrays, delegates, query operators,
+The current audit covers all 224 public reference types: 211 generated type pages,
+three explicit manual entries and ten explicitly excluded metadata scaffolds. Collections, arrays, delegates, query operators,
 Option/Result, TaskOutcome, numeric types, text/encoding, environment, time/calendar,
 resource capabilities and interop now have type/member descriptions. Compiler-reference
 scaffolds are identified as such; they do not promise executable CLR services.

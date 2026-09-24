@@ -6532,3 +6532,18 @@ configuration/content, not target-specific code added to Raven main.
 - **neoCLR validation:** the pinned publisher builds and checks 955 pages; all 15
   website tests pass. RuntimeContext.Current has a linked Property value, and
   InputStream.Read displays linked parameter/return types with existing XML prose.
+
+### 2026-09-24 — Hide importer/exporter scaffolds from the API browser
+
+- **Author:** identifies duplicate non-generic Array, Option and Result entries and
+  asks to exclude importer/exporter artifacts without confusing readers.
+- **Assistant:** identifies the analogous TaskOutcome container and their six CLR
+  case-carrier types. Adds exact, reasoned exclusions using RavenDoc's existing
+  configuration; keeps all generic application types and the complete metadata
+  inventory. These exclusions are neoCLR policy, not a universal RavenDoc rule.
+- **Validation:** 17 website tests pass, including real publisher checks that
+  generic APIs remain and scaffold entries disappear. Full-site validation uses
+  an isolated copy of committed compiler inputs because parallel compiler work
+  makes the working checkout's reference fingerprints stale.
+- **Outcome:** all 930 remaining pages build and pass link/anchor checks. The local
+  preview is refreshed; publication remains separate.
