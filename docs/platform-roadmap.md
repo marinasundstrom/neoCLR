@@ -41,18 +41,29 @@ contracts, Path and introspection semantics have checked samples. The
 [consistency review](object-model-review.md) records their exact limits. String
 ReferenceEquals remains unsupported; content equality does not establish identity.
 The [storage investigation](string-storage-design.md) measures current copy/wrapper
-costs and a shared-text prototype. The next gate is an internal immutable text handle,
-with identity following its owner through copies/conversions, then GC and host-lifetime
-validation before enabling String identity. The representation choice is provisional.
+costs and a shared-text prototype. Immutable shared String storage now adopts owned
+UTF-8 buffers and retains text across value copies. The next gate is identity-preserving
+conversions, with GC and host-lifetime validation before enabling String identity.
+The internal `Arc<String>` choice remains provisional.
 
 **Author-selected end-to-end acceptance case:** Raven record syntax now exercises
 class and struct equality/hash/display, assignment, nested components and null default
 fields within the documented non-generic component contract. See the
 [record sample](experiments/records/README.md) and [HashCode design](hash-code-design.md).
 Generic/inherited records, additional component shapes, remaining primitive/calendar
-Object contracts and default comparers remain follow-ups. Generic math is later
+Object contracts and default comparers remain follow-ups. The author also selected
+a coherent System.Text API and general/string comparer infrastructure as future work,
+using .NET comparison policies as a reference; see the [text design](string-storage-design.md#future-text-and-comparer-direction).
+These are not a commitment to culture support or an immediate namespace migration. Generic math is later
 exploration. Value removal still requires its own storage migration, not a rename to
 Object; String work does not implicitly select that migration.
+
+Planned text work also includes ToUpper/ToLower-style casing and comparison methods.
+.NET is a reference, not an API-copy requirement: adapt names and contracts where a
+concrete benefit justifies the compatibility cost. Culture selection, Unicode casing
+(including length changes), ordering and equality/hash consistency need explicit
+choices and tests. Additional casing/comparison APIs remain planned; the existing
+bounded ordinal helpers retain their current contract.
 
 When choosing work autonomously, follow the current author-directed focus and the
 [immediate next step](#working-rules-and-immediate-next-step). The post-release

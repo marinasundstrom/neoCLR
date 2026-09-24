@@ -1770,7 +1770,7 @@ fn interpret_instructions(
                 }
                 Op::Int64(n) => frame.stack.push(Value::Int64(*n)),
                 Op::Bool(b) => frame.stack.push(Value::Boolean(*b)),
-                Op::String(s) => frame.stack.push(Value::String(s.clone())),
+                Op::String(s) => frame.stack.push(Value::String(s.clone().into())),
                 Op::Void => frame.stack.push(Value::Void),
                 Op::Receiver {
                     argument,
@@ -3674,7 +3674,11 @@ fn debug_value(
             };
         }
         Value::RuntimeTypeHandle(handle) => result.value = debug_text(&handle.name),
-        Value::String(text) | Value::Char(text) => {
+        Value::Char(text) => {
+            result.value = debug_text(text);
+            result.truncated = text.chars().count() > 256;
+        }
+        Value::String(text) => {
             result.value = debug_text(text);
             result.truncated = text.chars().count() > 256;
         }

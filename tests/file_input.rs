@@ -143,7 +143,7 @@ fn sample_round_trips_verifies_computes_and_handles_parse_errors() {
     let missing = fixture.0.join("missing").to_str().unwrap().to_owned();
     assert_eq!(
         report
-            .invoke(vec![Value::String(missing)], Limits::default())
+            .invoke(vec![Value::String(missing.into())], Limits::default())
             .unwrap()
             .output,
         ["FileNotFound"]

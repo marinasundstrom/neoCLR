@@ -296,7 +296,7 @@ impl Files {
             (Operation::List, [Value::String(name), Value::Int32(max_items)]) => {
                 match Self::list(name, *max_items, limits) {
                     Ok(names) => Ok(crate::reflection::array(
-                        "String", names.into_iter().map(|name| Ok(Value::String(name))), limits,
+                        "String", names.into_iter().map(|name| Ok(Value::String(name.into()))), limits,
                     )?),
                     Err(error) => Err(error),
                 }
@@ -486,7 +486,7 @@ mod tests {
             let result = files
                 .invoke(
                     Operation::Kind,
-                    &[Value::String(path.clone())],
+                    &[Value::String(path.clone().into())],
                     &Limits::default(),
                 )
                 .unwrap();
@@ -511,7 +511,7 @@ mod tests {
             files
                 .invoke(
                     Operation::Kind,
-                    &[Value::String(path.clone())],
+                    &[Value::String(path.clone().into())],
                     &Limits::default()
                 )
                 .unwrap(),

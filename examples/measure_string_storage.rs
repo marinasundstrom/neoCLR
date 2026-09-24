@@ -1,5 +1,5 @@
-//! Exploration only: compare current Value clones with shared immutable UTF-8.
-//! This does not change the VM representation, GC or guest String identity.
+//! Compare an owned String baseline with production shared Value clones.
+//! This does not measure guest String identity or construction costs.
 use neoclr::Value;
 use std::{
     alloc::{GlobalAlloc, Layout, System},
@@ -62,8 +62,8 @@ fn main() {
     );
     for size in [0, 32, 4096, 65536] {
         let text = "x".repeat(size);
-        let owned = Value::String(text.clone());
-        let shared = SharedText::new(&text);
+        let owned = text.clone();
+        let shared = Value::String(text.clone().into());
         let (owned_count, owned_bytes) = measure(|| {
             for _ in 0..COPIES {
                 black_box(owned.clone());

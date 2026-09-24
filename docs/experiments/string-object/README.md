@@ -17,7 +17,7 @@ Validation on 2026-09-24 reclaimed all 421 allocations across nine collections
 (peak 64, zero live). The verifier requires multiple collections and zero live objects. The .NET 10
 baseline checks content equality, matching hashes and display, not identical hash
 numbers. String ReferenceEquals and identity/base hash calls remain unsupported:
-wrapping copied intrinsic text does not establish stable string allocation identity.
+wrapping shared immutable text does not establish stable string allocation identity.
 Cast/type-test wrapper allocations now participate in pre-allocation GC; retained
 wrappers survive small-heap pressure. No interning, Unicode normalization, culture-sensitive comparison or nullable string
 storage is introduced. See the [Object review](../../object-model-review.md).

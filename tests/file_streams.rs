@@ -247,7 +247,7 @@ fn a_managed_function_named_like_a_service_does_not_open_a_file() {
     let result = loaded
         .resolve_function(&parse_function_ref("neoCLR.Runtime.FileCreateNew(String)").unwrap())
         .unwrap()
-        .invoke(vec![Value::String(fixture.path())], Limits::default())
+        .invoke(vec![Value::String(fixture.path().into())], Limits::default())
         .unwrap();
     assert_eq!(result.value, Value::Erased(Box::new(Value::Int32(42))));
     assert!(!std::path::Path::new(&fixture.path()).exists());

@@ -75,7 +75,7 @@ fn native_decoder_strictly_validates_unicode_and_preserves_text() {
             .unwrap()
             .value;
         let payload = match String::from_utf8(bytes) {
-            Ok(text) => Value::String(text),
+            Ok(text) => Value::String(text.into()),
             Err(_) => Value::Byte(1),
         };
         assert_eq!(actual, Value::Erased(Box::new(payload)));

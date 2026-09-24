@@ -61,7 +61,7 @@ fn execute(mut job: Job) {
     let result = crate::vm::interpret_function(
         &job.module,
         job.function,
-        vec![Value::String(job.input)],
+        vec![Value::String(job.input.into())],
         job.options,
         None,
     )
@@ -71,7 +71,7 @@ fn execute(mut job: Job) {
             if value.len() > capture.remaining {
                 return Err(Fault::new("Worker result byte limit exceeded"));
             }
-            Ok((value, std::mem::take(&mut capture.lines)))
+            Ok((value.into_owned(), std::mem::take(&mut capture.lines)))
         }
         _ => Err(Fault::new("Worker must return String")),
     });
@@ -141,7 +141,7 @@ impl Workers {
         let job = Job {
             module: Arc::new(module.clone()),
             function,
-            input: input.clone(),
+            input: input.as_str().to_owned(),
             options: ExecutionOptions {
                 limits: options.limits,
                 arguments: options.arguments.clone(),
@@ -386,7 +386,7 @@ impl Workers {
                     }
                     // The last host write may itself request cancellation.
                     options.check_cancellation("Worker.Join", 0)?;
-                    return Ok(Value::String(value));
+                    return Ok(Value::String(value.into()));
                 }
                 Err(mpsc::RecvTimeoutError::Timeout) => {}
                 Err(_) => return Err(Fault::new("Worker terminated without a result")),

@@ -65,7 +65,7 @@ pub(crate) fn read_all_text(path: &str, max_bytes: i32) -> Result<Value, Fault> 
         bytes.extend_from_slice(&chunk[..count]);
     }
     Ok(match String::from_utf8(bytes) {
-        Ok(text) => Value::Erased(Box::new(Value::String(text))),
+        Ok(text) => Value::Erased(Box::new(Value::String(text.into()))),
         Err(_) => error(ReadStatus::InvalidUtf8),
     })
 }

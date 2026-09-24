@@ -42,7 +42,7 @@ func Main() -> int {
                 )
                 .unwrap()
                 .value,
-            Value::String(expected)
+            Value::String(expected.into())
         );
     }
     let filename = p

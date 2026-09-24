@@ -42,6 +42,8 @@ pub use reachability::{FunctionImplementation, Reachability, ReachableCall, Reac
 mod scope;
 mod services;
 mod stack_trace;
+mod string_value;
+pub use string_value::StringValue;
 pub use services::{MissingService, RuntimeService, ServiceUse};
 pub use stack_trace::{CodeLocation, StackFrame, StackTrace};
 mod type_identity;

@@ -47,7 +47,7 @@ impl Query {
         };
         let assembly = lookup(module, identity)?;
         let selected_module = if let Some(Value::String(name)) = args.get(1) {
-            if !assembly.modules.contains(name) {
+            if !assembly.modules.iter().any(|module| module == name.as_str()) {
                 return Err(Fault::new("module does not belong to assembly"));
             }
             Some(name.as_str())
@@ -55,7 +55,7 @@ impl Query {
             None
         };
         match self {
-            Self::Name => Ok(Value::String(assembly.name.clone())),
+            Self::Name => Ok(Value::String(assembly.name.clone().into())),
             Self::Token => Ok(Value::Int32(0x20000001)),
             Self::ModuleToken => Ok(Value::Int32(1)),
             Self::ModuleAssembly => assembly_value(module, identity),

@@ -12,9 +12,13 @@ pub(crate) fn measure(value: &Value, usage: &mut Usage, limits: &Limits) -> Resu
     while let Some((value, inside)) = pending.pop() {
         if inside {
             usage.bytes = usage.bytes.saturating_add(std::mem::size_of::<Value>());
-            if let Value::String(s) | Value::Char(s) = value {
-                usage.bytes = usage.bytes.saturating_add(s.len());
-            }
+            // Quotas charge logical text per occurrence, even when owners are shared.
+            let bytes = match value {
+                Value::String(s) => s.len(),
+                Value::Char(s) => s.len(),
+                _ => 0,
+            };
+            usage.bytes = usage.bytes.saturating_add(bytes);
         }
         match value {
             Value::Array { elements, .. } => {

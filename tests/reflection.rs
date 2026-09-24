@@ -351,7 +351,7 @@ ret
     assert_eq!(property[3], Value::Boolean(true));
     assert_eq!(property[5], Value::Boolean(false));
     let parameter = fields(&array(&property[7])[0]);
-    assert_eq!(parameter[0], Value::String(String::new()));
+    assert_eq!(parameter[0], Value::String(String::new().into()));
     assert_eq!(type_name(&parameter[2]), "System.Int32");
 }
 

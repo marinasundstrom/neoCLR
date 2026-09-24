@@ -417,14 +417,14 @@ impl Binding {
                     .arguments
                     .iter()
                     .cloned()
-                    .map(Value::String)
+                    .map(|text| Value::String(text.into()))
                     .collect(),
             }),
             (Self::EnvironmentCurrentDirectory, []) => {
                 let payload = std::env::current_dir()
                     .ok()
                     .and_then(|p| p.into_os_string().into_string().ok())
-                    .map(Value::String)
+                    .map(|text| Value::String(text.into()))
                     .unwrap_or(Value::Int32(1));
                 Ok(Value::Erased(Box::new(payload)))
             }
@@ -432,8 +432,8 @@ impl Binding {
                 let payload = if name.is_empty() || name.contains(['=', '\0']) {
                     Value::Int32(1)
                 } else {
-                    match std::env::var(name) {
-                        Ok(value) => Value::String(value),
+                    match std::env::var(name.as_str()) {
+                        Ok(value) => Value::String(value.into()),
                         Err(std::env::VarError::NotPresent) => Value::Void,
                         Err(std::env::VarError::NotUnicode(_)) => Value::Int32(1),
                     }
@@ -441,15 +441,15 @@ impl Binding {
                 Ok(Value::Erased(Box::new(payload)))
             }
             (Self::PathCombine, [Value::String(left), Value::String(right)]) => {
-                Ok(Value::String(crate::path::combine(left, right)))
+                Ok(Value::String(crate::path::combine(left, right).into()))
             }
             (Self::PathGetFileName, [Value::String(path)]) => {
-                Ok(Value::String(crate::path::file_name(path)))
+                Ok(Value::String(crate::path::file_name(path).into()))
             }
             (Self::UnixTimeToLocal, [Value::Int64(ticks)]) => crate::clock::local_at(*ticks),
             (Self::UnixTimeTicks, []) => crate::clock::read_instant(),
             (Self::TypeName, [Value::RuntimeTypeHandle(handle)]) => {
-                Ok(Value::String(handle.name.clone()))
+                Ok(Value::String(handle.name.clone().into()))
             }
             (
                 Self::TypeEquals,
@@ -570,9 +570,9 @@ impl Binding {
                 };
                 Ok(Value::Erased(Box::new(payload)))
             }
-            (Self::Int32ToString, [Value::Int32(number)]) => Ok(Value::String(number.to_string())),
+            (Self::Int32ToString, [Value::Int32(number)]) => Ok(Value::String(number.to_string().into())),
             (Self::Fault, [Value::String(message)]) => {
-                Err(Fault::coded(crate::FaultCode::UserFault, message))
+                Err(Fault::coded(crate::FaultCode::UserFault, message.as_str()))
             }
             (Self::WriteLine, [Value::String(text)]) => {
                 if let Some(console) = console {
@@ -580,7 +580,7 @@ impl Binding {
                         .write_line(text)
                         .map_err(|_| Fault::new("console output failed"))?;
                 } else {
-                    output.push(text.clone());
+                    output.push(text.as_str().to_owned());
                     console_bytes[0].extend_from_slice(text.as_bytes());
                     console_bytes[0].push(b'\n');
                 }
@@ -614,7 +614,7 @@ impl Binding {
                     buffer.push(byte);
                 }
                 let payload = match String::from_utf8(buffer) {
-                    Ok(text) => Value::String(text),
+                    Ok(text) => Value::String(text.into()),
                     Err(_) => Value::Byte(1),
                 };
                 Ok(Value::Erased(Box::new(payload)))
@@ -630,7 +630,7 @@ impl Binding {
                     .map_err(|_| Fault::new("string allocation failed"))?;
                 value.push_str(left);
                 value.push_str(right);
-                Ok(Value::String(value))
+                Ok(Value::String(value.into()))
             }
             (Self::StringCompareOrdinal, [Value::String(left), Value::String(right)]) => {
                 // Valid UTF-8 byte order agrees with Unicode scalar order.
@@ -656,11 +656,11 @@ impl Binding {
                 Ok(Value::Int32(count))
             }
             (Self::CharFromString, [Value::String(value)]) => {
-                let character = Value::Char(value.clone());
+                let character = Value::Char(value.as_str().to_owned());
                 character.initialized()?;
                 Ok(character)
             }
-            (Self::CharText, [Value::Char(value)]) => Ok(Value::String(value.clone())),
+            (Self::CharText, [Value::Char(value)]) => Ok(Value::String(value.clone().into())),
             (Self::StringGraphemes, [Value::String(value)]) => crate::reflection::array(
                 "Char",
                 value.graphemes(true).map(|g| Ok(Value::Char(g.into()))),
@@ -701,7 +701,7 @@ impl Binding {
                     .try_reserve_exact(slice.len())
                     .map_err(|_| Fault::new("string allocation failed"))?;
                 result.push_str(slice);
-                Ok(Value::Erased(Box::new(Value::String(result))))
+                Ok(Value::Erased(Box::new(Value::String(result.into()))))
             }
             _ => Err(Fault::new("invalid native arguments")),
         }

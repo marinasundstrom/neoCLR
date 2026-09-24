@@ -21,7 +21,8 @@ pub enum Value {
     IntPtr(isize),
     UIntPtr(usize),
     Boolean(bool),
-    String(String),
+    /// Immutable UTF-8 text. Host-owned strings convert with `text.into()`.
+    String(crate::StringValue),
     /// Interpreter storage for explicit erasure, not a guest heap reference.
     Erased(Box<Value>),
     /// Owned metadata snapshot, not an arbitrary-value container or native pointer.

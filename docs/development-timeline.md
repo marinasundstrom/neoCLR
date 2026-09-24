@@ -6228,3 +6228,22 @@ failure remains the next acceptance target.
 - **Open:** the production representation, text-byte accounting and host/worker
   lifetime rules remain to be implemented and validated. The prototype does not
   enable String ReferenceEquals or change guest APIs.
+
+
+## 2026-09-24 — Future System.Text and comparer infrastructure
+
+**Author:** Requested a more consistent System.Text API in the future and, sooner or
+later, general comparers, especially string comparers similar to .NET.
+
+**Assistant:** Recorded this as future roadmap/design work while completing immutable
+String storage. Proposed separating ownership from equality/hashing/ordering policies,
+with ordinal, case and culture behavior evaluated explicitly against .NET. No new
+comparer API or System.Text migration is claimed. The [String design](string-storage-design.md)
+records tradeoffs and the remaining identity work.
+
+
+**Author follow-up:** Added ToUpper/ToLower-style functions and comparison methods to
+the plan, and clarified that the API need not copy .NET directly: improvements are
+welcome where appropriate. **Assistant:** Recorded casing, culture/Unicode behavior,
+comparison/hash consistency and compatibility tradeoffs as design questions; no
+implementation commitment beyond future text work was inferred.

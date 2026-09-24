@@ -1061,3 +1061,13 @@ Release probe compares current Value clones with private shared immutable text; 
 The preferred next gate is an internal immutable text handle, with ownership and
 accounting validated before guest String identity is enabled. No production String
 representation or public behavior changes in this exploration slice.
+
+
+### Shared String payload phase (2026-09-24)
+
+String value copies now retain an immutable `Arc<String>` owner instead of copying bytes.
+Owned text producers transfer their buffers. GC drops text owners when sweeping
+containers; retained host Values remain valid. Object wrappers still allocate, and
+String identity remains unsupported. The [storage design](string-storage-design.md)
+records .NET differences, logical byte accounting, host migration and future comparer
+work. This is an internal ownership change, not a new comparison policy.

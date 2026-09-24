@@ -88,7 +88,7 @@ enum IntrinsicValue {
     Single(f32),
     Double(f64),
     Char(String),
-    String(String),
+    String(crate::StringValue),
 }
 
 impl IntrinsicValue {
@@ -97,19 +97,21 @@ impl IntrinsicValue {
             (Self::Int32(a), Self::Int32(b)) => a == b,
             (Self::Int64(a), Self::Int64(b)) => a == b,
             (Self::Boolean(a), Self::Boolean(b)) => a == b,
-            (Self::Char(a), Self::Char(b)) | (Self::String(a), Self::String(b)) => a == b,
+            (Self::Char(a), Self::Char(b)) => a == b,
+            (Self::String(a), Self::String(b)) => a == b,
             (Self::Single(a), Self::Single(b)) => a == b || (a.is_nan() && b.is_nan()),
             (Self::Double(a), Self::Double(b)) => a == b || (a.is_nan() && b.is_nan()),
             _ => false,
         }
     }
 
-    fn display(&self) -> Option<String> {
+    fn display(&self) -> Option<crate::StringValue> {
         Some(match *self {
-            Self::Int32(value) => value.to_string(),
-            Self::Int64(value) => value.to_string(),
-            Self::Boolean(value) => if value { "True" } else { "False" }.to_owned(),
-            Self::Char(ref value) | Self::String(ref value) => value.clone(),
+            Self::Int32(value) => value.to_string().into(),
+            Self::Int64(value) => value.to_string().into(),
+            Self::Boolean(value) => if value { "True" } else { "False" }.into(),
+            Self::Char(ref value) => value.clone().into(),
+            Self::String(ref value) => value.clone(),
             Self::Single(_) | Self::Double(_) => return None,
         })
     }
@@ -120,11 +122,12 @@ impl IntrinsicValue {
             Self::Int64(value) => (value as i32) ^ ((value >> 32) as i32),
             Self::Boolean(value) => i32::from(value),
             // Same UTF-8 FNV-1a component hash used by HashCode.Add(string).
-            Self::Char(ref value) | Self::String(ref value) => {
-                value.as_bytes().iter().fold(2166136261u32, |hash, byte| {
-                    (hash ^ u32::from(*byte)).wrapping_mul(16777619)
-                }) as i32
-            }
+            Self::Char(ref value) => value.as_bytes().iter().fold(2166136261u32, |hash, byte| {
+                (hash ^ u32::from(*byte)).wrapping_mul(16777619)
+            }) as i32,
+            Self::String(ref value) => value.as_bytes().iter().fold(2166136261u32, |hash, byte| {
+                (hash ^ u32::from(*byte)).wrapping_mul(16777619)
+            }) as i32,
             Self::Single(value) => {
                 let bits = if value == 0.0 {
                     0
@@ -165,6 +168,15 @@ fn intrinsic_value(object: &ObjectReference) -> Result<IntrinsicValue, Fault> {
 #[cfg(test)]
 mod tests {
     use super::IntrinsicValue;
+
+    #[test]
+    fn string_object_display_retains_text_owner() {
+        let text = crate::StringValue::from("display 👩‍💻");
+        let value = IntrinsicValue::String(text.clone());
+        let display = value.display().unwrap();
+        assert_eq!(display, text);
+        assert_eq!(display.as_ptr(), text.as_ptr());
+    }
 
     #[test]
     fn floating_object_nan_payloads_and_zero_hashes_are_canonical() {

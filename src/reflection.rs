@@ -181,7 +181,7 @@ impl Query {
                 3 => definition.is_some_and(|d| d.representation == Representation::Interface),
                 _ => return Err(Fault::new("unknown type shape query")),
             })),
-            Self::DisplayName => Ok(Value::String(match argument {
+            Self::DisplayName => Ok(Value::String((match argument {
                 0 if matches!(handle.identity, TypeIdentity::GenericParameter { .. }) => {
                     handle.name.clone()
                 }
@@ -214,7 +214,7 @@ impl Query {
                         .to_owned()
                 }
                 _ => return Err(Fault::new("unknown type name query")),
-            })),
+            }).into())),
             Self::EnumNames | Self::EnumUnderlying => {
                 let info = definition
                     .and_then(|d| d.enum_info.as_ref())
@@ -229,7 +229,7 @@ impl Query {
                     "String",
                     members
                         .into_iter()
-                        .map(|m| Ok(Value::String(m.name.clone()))),
+                        .map(|m| Ok(Value::String(m.name.clone().into()))),
                     limits,
                 )
             }
@@ -293,7 +293,7 @@ impl Query {
                                 )?,
                                 "System.Introspection.FieldInfo",
                                 vec![
-                                    Value::String(f.name.clone()),
+                                    Value::String(f.name.clone().into()),
                                     wrap_type(module, (**handle).clone()),
                                     type_value(
                                         module,
@@ -397,7 +397,7 @@ impl Query {
                                     )?,
                                     "System.Introspection.PropertyInfo",
                                     vec![
-                                        Value::String(p.name),
+                                        Value::String(p.name.into()),
                                         wrap_type(module, (**handle).clone()),
                                         type_value(module, &p.ty)?,
                                         Value::Boolean(!p.instance),
@@ -546,7 +546,7 @@ fn parameters(
                 _ => ty.clone(),
             };
             let mut fields = vec![
-                Value::String(names.get(i).and_then(|n| n.clone()).unwrap_or_default()),
+                Value::String(names.get(i).and_then(|n| n.clone()).unwrap_or_default().into()),
                 index_value(i)?,
                 type_value(module, &qualified)?,
                 Value::Boolean(out.contains(&i)),

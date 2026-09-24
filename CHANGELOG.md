@@ -11,7 +11,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Investigate String storage and identity with an allocation-counting Release probe,
   a private shared-text prototype and a .NET alias/record/array baseline. Record
   migration, GC, host-lifetime and accounting gates, and consolidate stale roadmap
-  status. This is exploration; production String storage and identity are unchanged.
+  status. Implement immutable shared UTF-8 String payloads: value copies and String
+  Object display retain text; owned producers transfer their buffer. Keep String
+  identity disabled, worker transfers owned and array byte quotas logical. Rust hosts
+  migrate owned constructors to `Value::String(text.into())` and extraction to
+  `into_owned()`. Cover GC/host lifetimes and record future System.Text and general/
+  string comparers, casing and comparison methods without introducing those APIs.
+  Use .NET as a design reference, allowing justified API differences.
 
 - Support String Object content equality, matching UTF-8 hashes and unchanged text
   display through existing wrappers. Cover Object map keys, casts and GC; retain

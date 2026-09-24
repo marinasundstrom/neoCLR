@@ -81,7 +81,7 @@ ret
     );
     // Host platforms may report directory opens as access denied or as non-regular.
     assert!(
-        matches!(write(directory.to_str().unwrap(),"",0), Value::String(s) if s == "NotRegularFile" || s == "AccessDenied")
+        matches!(write(directory.to_str().unwrap(),"",0), Value::String(s) if s.as_str() == "NotRegularFile" || s.as_str() == "AccessDenied")
     );
     let services = p
         .analyze_reachability(

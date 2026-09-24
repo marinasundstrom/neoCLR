@@ -322,7 +322,7 @@ for equal text. ToString returns the full text unchanged. Empty text, embedded N
 combining sequences and emoji are preserved. No normalization or collation is implied.
 
 String remains a reference type. Conversion currently creates a GC-owned wrapper
-around copied intrinsic text; this is not value-type boxing or stable String identity.
+around shared immutable UTF-8 text; this is not value-type boxing or stable String identity.
 ReferenceEquals and explicit Object base identity/hash calls remain unsupported, even
 for aliases. Casts back to String preserve contents, not an allocation identity.
 No interning, nullable String storage, stable hash numbers or source-declared String
@@ -333,3 +333,14 @@ The content contract follows .NET String Object equality and display. neoCLR use
 UTF-8 rather than .NET UTF-16 and does not adopt .NET's randomized hash algorithm;
 its current FNV-1a hash is provisional, non-cryptographic and not collision-attack
 resistant. Hashes are not persistent identifiers. Default comparers remain future work.
+
+
+### Rust host String payloads
+
+`Value::String` holds the immutable `StringValue` host type. Construct it with
+`Value::String(owned_text.into())` or `Value::String("text".into())`. Cloning
+retains the text owner. `as_str()` borrows text; `into_owned()` returns a Rust
+String, copying only when other owners remain. A retained host Value keeps its text
+alive after heap collection. This host representation is not a new guest type and
+does not enable String ReferenceEquals. Array budgets still count text bytes per
+logical occurrence; GC object counts exclude these text allocations.

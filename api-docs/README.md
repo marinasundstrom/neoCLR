@@ -53,7 +53,9 @@ Their Markdown guides remain behavioral reference, not renderer exclusions.
 Existing selected types include Tasks, Thread/ThreadPool, Storage, IO, Console,
 Object/Value, HashCode, Equatable, compiler async support and Introspection descriptors.
 Host Fault/FaultCode and debugger fields remain a complete manual [reference](faults.md),
-not synthetic CLI types.
+not synthetic CLI types. The Rust-only StringValue payload and owned-text migration
+are documented in the [Object guide](objects.md#rust-host-string-payloads) and source
+rustdoc; StringValue is not a guest CLI type selected for RavenDoc.
 
 Remaining coverage gaps are not exemptions: arrays/collections, delegates, query
 operators, Option/Result and TaskOutcome helpers, primitives/text/encoding/process,

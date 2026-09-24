@@ -101,7 +101,7 @@ Text now retains exact content equality and matching hashes through Object, so i
 can be used as a HashMap key with explicit Object callbacks. ToString returns the
 unchanged text. Comparison does not normalize Unicode or apply culture rules.
 
-The current runtime wraps copied intrinsic text when converting it to Object.
+The current runtime wraps shared immutable UTF-8 text when converting it to Object.
 String is still a reference type, but String ReferenceEquals and identity hashes
 remain unsupported; the wrappers do not establish stable string allocation identity.
 This differs from .NET's identity-preserving String references and interning.
@@ -112,7 +112,20 @@ See the [String API reference](xref:System.String) and
 [Object contract](../../docs/objects.html#string-through-object-development).
 
 
-The next storage investigation compares current text copies and Object wrappers with
-shared immutable text. Its goal is to preserve String identity through assignments
-and conversions while validating ownership and memory accounting. This is exploration;
-the current runtime still rejects String identity operations.
+Development String copies now share immutable text internally. Owned text producers
+transfer their buffer; Object conversions still allocate wrappers. The next step is
+to establish identity-preserving conversions and verify their GC and host lifetimes
+before enabling String identity.
+
+Future work includes a coherent System.Text API and comparer infrastructure, especially
+string comparers. Equality, hashing and ordering should use compatible, explicit
+policies. Ordinal, case-insensitive and culture-aware behavior will need their own
+design and validation; these comparers are not available yet.
+
+
+Planned text work also includes ToUpper/ToLower-style casing and comparison methods.
+.NET is a reference, not an API-copy requirement: adapt names and contracts where a
+concrete benefit justifies the compatibility cost. Culture selection, Unicode casing
+(including length changes), ordering and equality/hash consistency need explicit
+choices and tests. Additional casing/comparison APIs remain planned; the existing
+bounded ordinal helpers retain their current contract.
