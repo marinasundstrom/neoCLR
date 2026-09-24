@@ -6972,3 +6972,14 @@ configuration/content, not target-specific code added to Raven main.
   [roadmap](platform-roadmap.md#networking-and-web-release-target--discussion-2026-09-25).
 - **Status:** this is scope planning; no new networking APIs, release version/date
   or author approval of the additional recommended gates is claimed.
+
+### 2026-09-25 — IPAddress union selected for the release
+
+- **Author direction:** adds IPAddress to release scope, showing a union containing
+  IPv4Address(...) and IPv6Address(...) cases and optional additional members.
+- **Assistant response/action:** removes IPAddress from the deferred release list
+  and records the standard-union shape in the roadmap and socket design. Proposes
+  parsing, formatting, value semantics and DNS/socket integration as the minimal
+  useful slice, keeping payload details open and IPv6 transport support distinct.
+- **Status:** the release inclusion and case names are author-selected; payload
+  representation, scope/mapped-address policies and implementation remain pending.

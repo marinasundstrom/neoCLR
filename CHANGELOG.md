@@ -11,7 +11,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Record the networking/web release objective and a proposed scope: request/body
   and status support, cancellation/lifetimes, interoperable framing, server shutdown,
   a storage-backed sample and focused release validation. HTTPS remains an explicit
-  scope decision; these are planning recommendations, not implemented capabilities.
+  scope decision. Add the author-selected IPAddress union with IPv4Address and
+  IPv6Address cases to release scope, superseding its suggested deferral; payload
+  design and integration remain pending. These are plans, not implemented capabilities.
 
 - Extend the development union projector/importer to matched nongeneric sequential
   payload families. Verify an HttpError library prototype with URI/DNS/socket causes

@@ -64,7 +64,8 @@ retry policy and runtime suspension are not prerequisites for this controlled PO
 
 **Author direction:** work toward a release containing networking and web that feels
 coherent and reasonably complete, without requiring a finished platform. HttpClient
-and cancellation tokens are explicitly included. The additional scope below is the
+and cancellation tokens are explicitly included. The author subsequently adds
+IPAddress as a standard union with IPv4Address and IPv6Address cases. The additional scope below is the
 assistant's recommendation for review, not approval of every proposed API or a
 release date. Continue the current typed HTTP/error/base-address integration first.
 
@@ -74,6 +75,7 @@ narrow to be the whole release experience. Prefer these connected release gates:
 | Slice | Proposed release outcome and evidence |
 | --- | --- |
 | Client contract | Token-aware Send, Get/GetString and common verb helpers; optional string BaseUri with the recorded relative/absolute rules; fake and forwarding handlers use the same pipeline |
+| Address values (author-selected) | System.Networking.IPAddress using normal Raven union syntax with IPv4Address and IPv6Address cases; validated parsing, formatting and value semantics, followed by DNS/socket integration with explicit transport limits |
 | Requests and content | Method, resolved URI, usable case-insensitive headers, byte and UTF-8 text bodies with content type; POST round-trip, empty content and non-ASCII content tested |
 | Responses and errors | General status values, headers and content; 201/204/400/404/500 examples; typed HttpError with inspectable causes; distinguish HTTP status, transport failure, cancellation, timeout and decoding failure |
 | Cancellation and lifetime | A source/token pair usable beyond HTTP; cancel before dispatch and during pending work; configurable request deadline; deterministic connection/buffer cleanup and explicit handler ownership/reuse rules |
@@ -98,9 +100,9 @@ Do not implement cryptography or accept invalid certificates as a shortcut.
 
 **Defer by default:** HTTP/2/3, automatic retries/redirects, cookies, proxies,
 compression, WebSockets, connection pooling, a general hosting/routing framework,
-TcpClient/UdpClient convenience wrappers and runtime suspension. IPAddress/HostEntry
-and IPv6 remain useful follow-ups; do not require them merely to replace currently
-working string boundaries. The additional .NET client machinery has real lifetime
+TcpClient/UdpClient convenience wrappers and runtime suspension. HostEntry and full
+IPv6 transport remain follow-ups; IPAddress itself is now author-selected release
+scope. Its two address-family cases do not imply implemented IPv6 transport. The additional .NET client machinery has real lifetime
 and performance benefits, but also broadens this release's contracts and tests.
 Document the costs of connection-per-request behavior and retained IPv4-only limits.
 
@@ -968,8 +970,9 @@ HTTP errors and BaseUri request integration follow. The author clarifies on
 verb methods expect relative URLs and resolve them against that base; otherwise,
 they take absolute URIs. Keep Uri parsing internal to validation/resolution and
 retain string/Uri address overloads. Parameterless HttpClient already
-selects the socket handler. IPv4Address/IPv6Address and HostEntry remain later
-networking evaluations, not requirements to replace all strings now. Author-directed
+selects the socket handler. The 2026-09-25 release direction now includes an
+IPAddress union with IPv4Address/IPv6Address cases; HostEntry remains a later
+networking evaluation. Author-directed
 later work also includes URI/URL encoding utilities, with component-specific
 contracts evaluated separately from the current parser.
 Bounded address fallback and its shared connection deadline now have an executable

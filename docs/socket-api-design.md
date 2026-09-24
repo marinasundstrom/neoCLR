@@ -772,3 +772,34 @@ rows change. Production callers and the API reference follow the generated contr
 The author rejects mandatory per-case predicates even for Option and Result. Existing
 unions should migrate where applicable after this slice; generic/payload-bearing
 families need their own bridge, default/copy/boxing and GC validation.
+
+## IPAddress union in release scope — author direction, 2026-09-25
+
+The author explicitly adds IPAddress to the networking/web release, selecting a
+standard Raven union with cases named IPv4Address and IPv6Address and additional
+members as needed. This supersedes the earlier suggestion to defer the address
+value itself. The case payloads are intentionally unspecified; this does not select
+two standalone address classes or an unvalidated mutable byte-array contract.
+
+Proposed minimal implementation: validated Parse returning Result, stable textual
+formatting, equality and hashing by address value, and case matching using ordinary
+Raven patterns. Keep hostnames and ports outside IPAddress. Select immutable payload
+storage, IPv6 scope handling and mapped-IPv4 equality rules through focused tests
+before publishing signatures. Integrate with DNS and socket entry points so the
+value is useful, documenting compatibility for existing string callers. Defining an
+IPv6 value does not establish IPv6 transport support: unsupported families must have
+an explicit outcome until the backend supports them.
+
+.NET 10's [IPAddress](https://learn.microsoft.com/en-us/dotnet/api/system.net.ipaddress?view=net-10.0)
+uses one class with address-family-dependent behavior (reviewed 2026-09-25).
+The selected union makes family-specific payloads and matching explicit; costs
+include tagged representation, case-aware callers and bridge admission for payload
+layouts. Use normal union syntax rather than hand-authoring another carrier.
+The current bridge rejects overlapping payload layouts; if generated address cases
+hit that boundary, investigate it with a reduced probe and preserve the selected
+source contract. No physical layout or compiler convention is standardized here.
+
+Validation should include parse/format round-trips, invalid addresses, equivalent
+IPv6 spellings, equality/hash agreement, default union behavior, case payload
+copying/boxing/GC, and a DNS-to-socket sample. Publish API reference and website
+coverage with implementation. These are planned APIs, not yet runtime capabilities.
