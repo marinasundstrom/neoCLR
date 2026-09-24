@@ -357,3 +357,13 @@ The prototype cases are integration evidence, not a commitment to the complete f
 HttpError taxonomy. The current published development HttpClient/handler/server
 signatures still return string errors; wire the new union into those contracts next,
 then add Uri/string overloads and BaseUri resolution with matching API documentation.
+
+## Public HTTP integration
+
+The development library now declares HttpError in ordinary union syntax and uses it
+in client/handler/server contracts. The isolated payload-library probe uses the
+separate ProbeHttpError name so its four-case experimental family cannot overwrite
+the public family. Projected consumer binding follows the selected core metadata,
+checks signatures and preserves constructors and conditional extraction. Generic
+companion and overlapping-layout rejection remain unchanged. See the HTTP client,
+server and JSON samples for execution through the actual public API.

@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    "HttpError": "System.Web.Http.HttpError",
     "Uri": "System.Uri",
     "UriError": "System.UriError",
     "HttpClient": "System.Web.Http.HttpClient",
@@ -132,6 +133,7 @@ SOURCES = {
     "UriError": "runtime/raven/src/System/UriError.rvn",
     "HttpServer": "runtime/raven/src/System/Web/Http/HttpServer.rvn",
     "HttpClient": "runtime/raven/src/System/Web/Http/HttpClient.rvn",
+    "HttpError": "runtime/raven/src/System/Web/Http/HttpError.rvn",
     "DnsError": "runtime/raven/src/System/Networking/DnsError.rvn",
     "Dns": "runtime/raven/src/System/Networking/Dns.rvn",
     "SocketError": "runtime/raven/src/System/Networking/Sockets/SocketError.rvn",
@@ -354,6 +356,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--compiler', type=Path)
     parser.add_argument('--bridge', type=Path)
+    parser.add_argument('--slice', action='append', choices=tuple(SLICES), help='Regenerate only selected implementation slices; omitted means all')
     parser.add_argument('--check', action='store_true', help='Regenerate and compare without modifying the snapshot')
     parser.add_argument('--check-snapshot', action='store_true', help='Check source/artifact hashes without an SDK')
     args = parser.parse_args()
@@ -374,6 +377,8 @@ def main():
             check_snapshot()
         generated = {}
         for name, owner in SLICES.items():
+            if args.slice and name not in args.slice:
+                continue
             compiled = root / 'compiled'
             if name not in ('Math', 'Linq', 'OptionOperators', 'OptionNestedOperators', 'ResultOperators'):
                 compiled = root / ('compiled-' + name)

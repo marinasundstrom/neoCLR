@@ -6983,3 +6983,28 @@ configuration/content, not target-specific code added to Raven main.
   useful slice, keeping payload details open and IPv6 transport support distinct.
 - **Status:** the release inclusion and case names are author-selected; payload
   representation, scope/mapped-address policies and implementation remain pending.
+
+### 2026-09-25 — Execute the networking/web slices in order
+
+- **Author direction:** “Let's start working. Finish all slices one by one.” This
+  follows the proposed nine-slice sequence and the IPAddress addition.
+- **Assistant action:** starts public typed HTTP errors, preserving native causes
+  through normal HttpError union cases. Adds projected payload-family consumer
+  bindings and fixes constructor instruction emission. No Raven compiler emission
+  or Runtime Contract option changes. Public signatures now require matching
+  rebuilt library/reference/application artifacts; cancellation and BaseUri are next
+  contracts, not silently implemented by this change.
+- **Integration observation:** storing the intermediate awaited Result as an async
+  local exposes the already tracked hoisted-field initialization issue. Direct
+  MapError composition works in the client sample. This is not claimed as a compiler
+  fix; a reduced independent compiler investigation remains necessary.
+- **Progress:** client cases and the JSON application pass with independent peers
+  and zero live managed objects after GC. Server error paths also pass, including transfer timeout and invalid application
+  responses. Matching API reference and clean generated-library checks pass; the
+  site build completed before the subsequent validation correction.
+
+- **Author validation correction:** asks to select only the most relevant tests for
+  each slice and skip website builds. The assistant adopts focused validation,
+  keeps docs/reference snapshots synchronized and reserves broader checks for
+  release stabilization or demonstrated risk. The typed-error website build had
+  already completed; no further website build is required for this slice sequence.

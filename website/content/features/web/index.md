@@ -15,7 +15,7 @@ development toolchain and are not part of the published Preview 9 SDK.
 ```
 
 This function comes from the [tested source](/samples/http-client/Main.rvn).
-`await ...?` propagates a failed request; the response exposes headers and byte content.
+The sample maps typed HTTP failures to display text at its application boundary; `?` propagates that result; the response exposes headers and byte content.
 ReadText returns a Task/Result and strictly decodes UTF-8. The prototype buffers the
 complete small body before returning a response, so decoding currently finishes
 immediately. Wire lengths count bytes, not characters.
@@ -23,7 +23,7 @@ immediately. Wire lengths count bytes, not characters.
 ## Attach behavior with handlers
 
 HttpClient delegates `Send(HttpRequest)` to an `HttpHandler`. Its contract returns
-`Task<Result<HttpResponse, string>>`. A forwarding handler receives an inner handler:
+`Task<Result<HttpResponse, HttpError>>`. A forwarding handler receives an inner handler:
 it can act before sending and after the result arrives. Several handlers can form
 a pipeline, with socket transport at the end. A fake handler can return a response
 without a network connection.
@@ -118,10 +118,13 @@ and a structured error model need concrete cases as these provisional APIs evolv
 Browse the [HTTP API reference](xref:System.Web.Http) for constructors, members,
 parameters and ownership details. The parser and operation adapter remain internal.
 
-One error-model candidate groups request, transport and response failures, nesting
-resolver/socket causes where useful. HTTP statuses should remain response values as
-status support expands; decoding errors belong to ReadText. This is a proposal:
-the current POC returns explicitly provisional string errors.
+HTTP operations now return the standard `HttpError` union. Match NameResolution
+and Transport to inspect the original DNS or socket cause. InvalidRequest, Protocol,
+Unsupported and LimitExceeded distinguish validation and message failures; TimedOut
+represents the shared exchange deadline, and Handler can carry an application error.
+InvalidUri is available for URI integration. HTTP statuses remain response values as
+status support expands. ReadText still has its separate provisional string error for
+UTF-8 decoding. Default HttpError is inactive and formats as Empty.
 
 ## URI references in development
 
@@ -140,13 +143,13 @@ Its former per-case `Is*`/`Get*` helpers have been removed; match the cases dire
 
 The [API reference](/docs/api/System/Uri/) describes both overloads and the limits.
 
-The next HTTP work is typed `HttpError` results and `HttpClient.BaseUri`, with string
+Typed `HttpError` results are integrated. The next HTTP work includes `HttpClient.BaseUri`, with string
 and Uri request overloads. The planned base address is optional string configuration:
 with a base set, verb helpers resolve relative URLs against it; without one, callers
 provide absolute URLs. The planned core operation is Send(request, cancellationToken),
 with Get and GetString using the same handler pipeline.
 These HTTP additions are planned; the existing client
-still accepts absolute plain-HTTP strings and returns provisional string errors.
+still accepts absolute plain-HTTP strings and has no public cancellation token.
 
 URI/URL encoding utilities are also planned separately. Their design will distinguish
 path segments, query values and form data; the current Uri parser expects text that

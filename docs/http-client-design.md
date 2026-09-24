@@ -31,8 +31,8 @@ Send naming. .NET's GetStringAsync also rejects non-success status codes; neoCLR
 convenience-method status policy still needs an explicit choice and test. A received
 HTTP error response and a transport failure must remain distinguishable.
 
-**Implementation gap:** the current client and handler still expose tokenless
-Send with string errors. Tasks have a cancellation outcome, but the library has no
+**Implementation gap:** the current client and handler expose tokenless
+Send with HttpError results. Tasks have a cancellation outcome, but the library has no
 public CancellationToken. The new signature is a target, not a shipped overload.
 Define cooperative cancellation at the operation-owner boundary, including behavior
 before dispatch, during DNS/connect/transfer, completion races and socket cleanup.
@@ -82,7 +82,7 @@ absolute request address even with a base configured.
 .NET 10's [HttpMessageHandler](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpmessagehandler?view=net-10.0)
 is the transport/behavior boundary; [DelegatingHandler](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.delegatinghandler?view=net-10.0)
 composes an inner handler. The sample adopts that pipeline concept with an interface:
-`Send(HttpRequest) -> Task<Result<HttpResponse, string>>`. A forwarding handler can
+`Send(HttpRequest) -> Task<Result<HttpResponse, HttpError>>`. A forwarding handler can
 act before dispatch and after the outcome, while a terminal handler supplies the
 response. Tests can replace the terminal handler. An interface is enough for this
 probe; an abstract base and convenience delegation class remain open. Handlers do
@@ -93,7 +93,7 @@ future host transports to client policy. A complete .NET-like handler stack now 
 require premature decisions about cancellation, concurrency, disposal and streaming.
 The small interface preserves the boundary at the cost of explicitly provisional
 lifetime/error contracts. Returning Result adapts expected failures to neoCLR's style;
-string errors are temporary and remain an explicit API evolution question.
+the initial string errors have now been replaced by the development HttpError union.
 Automatic retry requires request replayability and idempotence decisions; none is added.
 
 The byte parser uses [RFC 9112](https://www.rfc-editor.org/rfc/rfc9112.html) as the
@@ -354,3 +354,33 @@ dependencies through the bridge. An empty-case bootstrap fragment also executes
 against a matched core reference. Mixed legacy carrier defaults and production
 reference/consumer integration remain open. This is not a shipped HTTP error
 contract or a fixed physical ABI. Existing nested-error comparisons still guide the eventual public cases.
+
+## Typed error integration — 2026-09-25
+
+The public client, request factory, handler and server contracts now use HttpError
+from normal Raven union source. NameResolution(DnsError) and Transport(SocketError)
+preserve native causes. InvalidUri(UriError) prepares URI integration; InvalidRequest,
+Protocol, Unsupported and LimitExceeded carry diagnostic text. TimedOut denotes the
+shared exchange deadline, while Handler carries an application failure. Status codes
+remain response data; this slice does not expand the GET/200 protocol subset.
+ReadText is deliberately separate and retains its provisional decoding-error string.
+
+This adapts .NET's exception-based failure surface into typed Result cases without
+copying an exception inheritance tree. Inspecting a cause no longer requires parsing
+text, at the cost of larger generated union values and source/artifact migration.
+No stack-trace capture or future Error interface is added. The reference seed is
+replaced by compiled union metadata; consumer case binding follows that projected
+family rather than a second handwritten carrier layout. Inactive defaults are not
+meaningful failures. No new Runtime Contract option or Raven compiler emission rule
+is required. CancellationToken and BaseUri remain following work.
+
+Validation: the public handler sample checks nested causes, inactive defaults,
+copies and boxed payloads under allocation churn. Fragmented UTF-8, early EOF,
+ambiguous framing, body bounds, invalid UTF-8, stalled transfer, shared deadline
+and an independent Python HTTP server pass; measured client runs finish with zero
+live objects (fragmented success: 486 allocations, ten collections). The JSON
+application passes with independent peers. Signature checks reject changed payload
+and extraction types and private formatter calls. Payload-projection mismatch and
+overlapping-layout negative probes remain passing. Clean regeneration of HttpError
+and HttpClient matches; API reference checks pass. The site build completed before
+the author's instruction to skip future per-slice website builds.

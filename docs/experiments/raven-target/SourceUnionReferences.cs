@@ -16,7 +16,7 @@ static class SourceUnionReferences
         "System.Text.Utf8SliceError",
         "System.Int32ParseError",
         "System.Linq.SingleError",
-        "System.IntegerDivisionError"];
+        "System.IntegerDivisionError", "System.Web.Http.HttpError"];
 
     public static void Project(string corePath)
     {

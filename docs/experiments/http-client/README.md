@@ -46,7 +46,7 @@ The external watchdog is a test guard, not an HTTP request deadline.
 
 `HttpClient()` selects HttpSocketHandler; `HttpClient(handler)` allows composition.
 `Get(string)` parses a limited URL and delegates to `Send(HttpRequest)`.
-Handlers return `Task<Result<HttpResponse, string>>`. A forwarding handler can act
+Handlers return `Task<Result<HttpResponse, HttpError>>`. A forwarding handler can act
 before/after the inner handler's result; the socket handler owns connection cleanup.
 Each socket-backed Send has separate buffers, pending tasks and a connection.
 Custom mutable handlers must define their own concurrent-use policy; there is no
@@ -121,3 +121,20 @@ The focused shared-budget run passes both trickles, silent headers and fragmente
 success, with zero live objects after every run. Body/header trickles collect nine
 and eleven times respectively with a 256-object heap. The .NET comparison still
 passes. No general handler/server cancellation or production timeout tuning is claimed.
+
+## Typed errors — development integration
+
+Client, handler, request factory and server exchange APIs now use HttpError.
+Rebuild applications and use matching reference/library/importer artifacts. Match
+normal union cases; DNS and socket failures retain their original error value.
+HTTP parsing, bounds, unsupported behavior, request validation and shared timeout
+have distinct cases. Application handlers may return Handler(message). Faults are
+not caught into the union. ReadText retains its separate decoding error contract.
+The reporting sample maps an HTTP error to string explicitly before propagating it;
+handler tests instead inspect cases and verify that causes survive composition.
+
+The typed-error reporting sample composes MapError directly with the awaited result;
+a named intermediate Result exposed the earlier hoisted-local initialization issue.
+The server report calls the error's ToString explicitly before concatenation because
+interpolating the union directly did not emit the expected line. These are documented
+integration limitations, not compiler fixes or restrictions on HttpError matching.

@@ -4,8 +4,9 @@
   "inputs": {
     "runtime/raven/src/System/Uri.rvn": "b366425867c4b84f126de1689d4a03bf9855a6a881a4abe4dba1836a381537b7",
     "runtime/raven/src/System/UriError.rvn": "4cb6c1aa4d9c8bb51e3eb1964a5e5c57330e0b9091bd44bf5125a8a99c027dce",
-    "runtime/raven/src/System/Web/Http/HttpServer.rvn": "e64d5b8a6d4a3dc5f5dd8df7d6a551deededd6f5da8d9bad32ff6d4b5b02b563",
-    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "859dc96f2458c3359922d5a8cd596809edc1669946cfcc886788fcc39e22c9c6",
+    "runtime/raven/src/System/Web/Http/HttpServer.rvn": "da44d8c6db3945b7fd03d396d8ac3f76b4b52f8fb568cf7259c3961fc971b045",
+    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "7eaf273c93cad1d81301691946d0766869b51aee560c6438cadbbd80ec050632",
+    "runtime/raven/src/System/Web/Http/HttpError.rvn": "05367cc2e6ccc2b3d4085b1a48ba43218c7271ae9a6a96bb6e4437e7a37e0d1c",
     "runtime/raven/src/System/Networking/DnsError.rvn": "3d29e8b2008d54270cb35a581f4ba38e6d0672f4576b334100fc72d8f729a7bd",
     "runtime/raven/src/System/Networking/Dns.rvn": "59a6602715d4965feb78ed97327df0b8ebbaf1e4a04eecc074c2e57f14bdebb7",
     "runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "8bef0a016957620d757b082c7875e2ed87162a7b6fa936585c8d21264eb10014",
@@ -113,7 +114,7 @@
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
-    "runtime/raven/System.Runtime.rvnproj": "8a8c86fd58d478c360440649474725db43b76540244fde5f381a9caa873535c4",
+    "runtime/raven/System.Runtime.rvnproj": "4c3142d878923df3d559e77f664fa1448125125a850ccb4c4bc73b1dcabccd2e",
     "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
@@ -121,7 +122,7 @@
     "FileWriteError.helpers.neoil": "d2851e4f9f1ba240726085030958818a5ae053ed43bde9667d4919cf4c60321c"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "8eeed28fe1fab62130335aee62a8a790f4b8b5447a997b9a235db3c2e2e1ebbb",
+  "coreSha256": "91bd16e64906d1dcdcddc9ea4b4fc6e55be064f9dff615edf518f106c17dfc38",
   "exports": [
     "byref .ctor(System.Storage.FileWriteError.InvalidLimit value) -> Void",
     "byref TryGetValue(out(true) System.Storage.FileWriteError.InvalidLimit& value) -> Boolean",

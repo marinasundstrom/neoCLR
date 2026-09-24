@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Integrate development HttpError results into HTTP client, handler, request and
+  server APIs using a standard payload-bearing union. Preserve resolver/socket
+  causes and distinguish request, protocol, unsupported, limit, timeout and handler
+  failures. Rebuild matching SDK/reference/library/application artifacts. Content
+  decoding retains its separate provisional string-error contract. Add projected
+  union consumer bindings and retain constructor instructions during import; public
+  payloads, extraction and private access receive focused checks. Add selected-slice
+  library regeneration for focused iteration. Follow author direction to use
+  relevant per-slice tests and skip website builds while keeping docs current.
+  Cancellation and BaseUri remain pending.
+
 - Record the networking/web release objective and a proposed scope: request/body
   and status support, cancellation/lifetimes, interoperable framing, server shutdown,
   a storage-backed sample and focused release validation. HTTPS remains an explicit

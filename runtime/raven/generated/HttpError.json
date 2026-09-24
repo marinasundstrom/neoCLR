@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.Func",
+  "owner": "System.Web.Http.HttpError",
   "inputs": {
     "runtime/raven/src/System/Uri.rvn": "b366425867c4b84f126de1689d4a03bf9855a6a881a4abe4dba1836a381537b7",
     "runtime/raven/src/System/UriError.rvn": "4cb6c1aa4d9c8bb51e3eb1964a5e5c57330e0b9091bd44bf5125a8a99c027dce",
@@ -118,16 +118,32 @@
     "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
-    "Func.methods.neoil": "6ecbcb89f6bcc572dee3c78b868fedc35e2cfb0d57ac41930db6b29e3fb4ec3c",
-    "Func.helpers.neoil": "c68f87a6506db1433b34945b842b9acac1d1eb8d9c3f7946326de5137c4e8612"
+    "HttpError.methods.neoil": "80713d03f545df3ce14ead2a37fd1f3fe08213fe4c619c47ccd8525178d10532",
+    "HttpError.helpers.neoil": "de81901945fdd98bcdcabf3ece37510efe6e0148d7d4c566d47c47ec8dbc8b83"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
   "coreSha256": "91bd16e64906d1dcdcddc9ea4b4fc6e55be064f9dff615edf518f106c17dfc38",
   "exports": [
-    "Invoke() -> T0",
-    "Invoke(T0 arg1) -> T1",
-    "Invoke(T0 arg1,T1 arg2) -> T2",
-    "Invoke(T0 arg1,T1 arg2,T2 arg3) -> T3",
-    "Invoke(T0 arg1,T1 arg2,T2 arg3,T3 arg4) -> T4"
+    "byref .ctor(System.Web.Http.HttpError.InvalidUri value) -> Void",
+    "byref TryGetValue(out(true) System.Web.Http.HttpError.InvalidUri& value) -> Boolean",
+    "byref .ctor(System.Web.Http.HttpError.NameResolution value) -> Void",
+    "byref TryGetValue(out(true) System.Web.Http.HttpError.NameResolution& value) -> Boolean",
+    "byref .ctor(System.Web.Http.HttpError.Transport value) -> Void",
+    "byref TryGetValue(out(true) System.Web.Http.HttpError.Transport& value) -> Boolean",
+    "byref .ctor(System.Web.Http.HttpError.InvalidRequest value) -> Void",
+    "byref TryGetValue(out(true) System.Web.Http.HttpError.InvalidRequest& value) -> Boolean",
+    "byref .ctor(System.Web.Http.HttpError.Protocol value) -> Void",
+    "byref TryGetValue(out(true) System.Web.Http.HttpError.Protocol& value) -> Boolean",
+    "byref .ctor(System.Web.Http.HttpError.Unsupported value) -> Void",
+    "byref TryGetValue(out(true) System.Web.Http.HttpError.Unsupported& value) -> Boolean",
+    "byref .ctor(System.Web.Http.HttpError.LimitExceeded value) -> Void",
+    "byref TryGetValue(out(true) System.Web.Http.HttpError.LimitExceeded& value) -> Boolean",
+    "byref .ctor(System.Web.Http.HttpError.TimedOut value) -> Void",
+    "byref TryGetValue(out(true) System.Web.Http.HttpError.TimedOut& value) -> Boolean",
+    "byref .ctor(System.Web.Http.HttpError.Handler value) -> Void",
+    "byref TryGetValue(out(true) System.Web.Http.HttpError.Handler& value) -> Boolean",
+    "override byref ToString() -> String",
+    "byref get_Value() -> System.Object",
+    "byref get_HasValue() -> Boolean"
   ]
 }

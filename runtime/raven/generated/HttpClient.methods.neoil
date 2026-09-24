@@ -34,7 +34,7 @@ stfld System.Web.Http.HttpClient::handler
 M00000002_IL_000f:
 ret
 .end
-.method instance Send(System.Web.Http.HttpRequest request) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,String>>
+.method instance Send(System.Web.Http.HttpRequest request) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
@@ -48,25 +48,29 @@ callvirt instance System.Web.Http.HttpHandler::Send(System.Web.Http.HttpRequest)
 M00000003_IL_000e:
 ret
 .end
-.method instance Get(String url) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,String>>
-.local System.Result<System.Web.Http.HttpRequest,String> local0
+.method instance Get(String url) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local0
 .local System.Web.Http.HttpRequest local1
-.local System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,String>> local2
-.local String local3
-.local System.Result<System.Web.Http.HttpRequest,String> local4
+.local System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> local2
+.local System.Web.Http.HttpError local3
+.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local4
 .local System.Result.Ok<System.Web.Http.HttpRequest> local5
 .local System.Result.Ok<System.Web.Http.HttpRequest> local6
 .local System.Web.Http.HttpRequest local7
-.local System.Result<System.Web.Http.HttpRequest,String> local8
-.local System.Result.Error<String> local9
-.local System.Result.Error<String> local10
-.local String local11
+.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local8
+.local System.Result.Error<System.Web.Http.HttpError> local9
+.local System.Result.Error<System.Web.Http.HttpError> local10
+.local System.Web.Http.HttpError local11
 ldloca local1
 initobj System.Web.Http.HttpRequest
 ldloca local2
-initobj System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,String>>
+initobj System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+ldloca local3
+initobj System.Web.Http.HttpError
 ldloca local7
 initobj System.Web.Http.HttpRequest
+ldloca local11
+initobj System.Web.Http.HttpError
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
@@ -85,7 +89,7 @@ ldloca local4
 M00000004_IL_000f:
 ldloca local5
 M00000004_IL_0011:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion0(System.Result<System.Web.Http.HttpRequest,String>&,System.Result.Ok<System.Web.Http.HttpRequest>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion0(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Ok<System.Web.Http.HttpRequest>&)
 M00000004_IL_0016:
 brfalse M00000004_IL_0043
 M00000004_IL_001b:
@@ -124,7 +128,7 @@ M00000004_IL_0050:
 ret
 M00000004_IL_0051:
 M00000004_IL_0052:
-newobj instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,String>>::.ctor()
+newobj instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::.ctor()
 M00000004_IL_0057:
 stloc local2
 M00000004_IL_0058:
@@ -137,7 +141,7 @@ ldloca local8
 M00000004_IL_005e:
 ldloca local9
 M00000004_IL_0060:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion2(System.Result<System.Web.Http.HttpRequest,String>&,System.Result.Error<String>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion2(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Error<System.Web.Http.HttpError>&)
 M00000004_IL_0065:
 brfalse M00000004_IL_0092
 M00000004_IL_006a:
@@ -149,7 +153,7 @@ ldloca local10
 M00000004_IL_0070:
 ldloca local11
 M00000004_IL_0072:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion3(System.Result.Error<String>&,String&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion3(System.Result.Error<System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
 M00000004_IL_0077:
 ldloc local11
 M00000004_IL_0079:
@@ -171,11 +175,11 @@ ldloc local2
 M00000004_IL_0099:
 ldloc local3
 M00000004_IL_009a:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(System.Web.Http.HttpError)
 M00000004_IL_009f:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<String>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Result.Error<System.Web.Http.HttpError>)
 M00000004_IL_00a4:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,String>>::Complete(System.Result<System.Web.Http.HttpResponse,String>)
+call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000004_IL_00a9:
 pop
@@ -184,7 +188,7 @@ M00000004_IL_00ab:
 M00000004_IL_00ac:
 ldloc local2
 M00000004_IL_00ad:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,String>>::get_Task()
+call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_Task()
 M00000004_IL_00b2:
 ret
 .end

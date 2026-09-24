@@ -99,8 +99,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-client-') as folder, socket
     cases = [
         ('trickling body', [head] + [(bytes([value]), 3) for value in body], False, 'HTTP error: Request deadline exceeded\n'),
         ('trickling headers', [(bytes([value]), 1) for value in head], False, 'HTTP error: Request deadline exceeded\n'),
-        ('stalled headers', [], False, 'HTTP error: Response receive failed\n'),
-        ('stalled body', [head, body[:1]], False, 'HTTP error: Response receive failed\n'),
+        ('stalled headers', [], False, 'HTTP error: TimedOut\n'),
+        ('stalled body', [head, body[:1]], False, 'HTTP error: TimedOut\n'),
         ('fragmented UTF-8', fragments, False, 'HTTP 200\nCafé 🌍\n'),
         ('truncated body', [head, body[:-1]], True, 'HTTP error: EOF before complete response\n'),
         ('ambiguous framing', [b'HTTP/1.1 200 OK\r\nContent-Length: 0\r\ncontent-length: 1\r\n\r\n'], False, 'HTTP error: Duplicate Content-Length\n'),
@@ -122,6 +122,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-client-') as folder, socket
         ('header bytes', [b'HTTP/1.1 200 OK\r\nX: ' + b'x' * 2048], False, 'HTTP error: Header limit exceeded\n'),
         ('invalid UTF-8', [b'HTTP/1.1 200 OK\r\nContent-Length: 1\r\n\r\n' + bytes([255])], False, 'HTTP error: Invalid UTF-8 body\n'),
     ])
+    unknown = set(args.case or []) - {case[0] for case in cases} - {'independent server'}
+    assert not unknown, 'Unknown HTTP cases: ' + ', '.join(sorted(unknown))
     for name, parts, truncate, expected in cases:
         if args.case and name not in args.case:
             continue
@@ -163,7 +165,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-client-') as folder, socket
     thread.start()
     run = subprocess.run(command, capture_output=True, text=True, timeout=180)
     thread.join(5)
-    assert not thread.is_alive() and not server_errors, server_errors
+    assert not thread.is_alive() and not server_errors, (server_errors, run.stdout, run.stderr)
     assert run.returncode == 0 and run.stdout == prefix + 'HTTP 200\nCafé 🌍\n', run.stdout + run.stderr
     stats = {key: int(value) for key, value in re.findall(r'(\w+)=(\d+)', run.stderr)}
     assert stats['live'] == 0 and stats['collections'] > 1, stats

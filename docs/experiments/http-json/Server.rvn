@@ -17,16 +17,16 @@ func CreateReport() -> Result<string, string> {
     return WriteDocument(report)
 }
 
-func Respond(request: HttpRequest) -> Task<Result<HttpResponse, string>> {
-    let source = Promise<Result<HttpResponse, string>>()
+func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    let source = Promise<Result<HttpResponse, HttpError>>()
     if request.Target != "/report" {
-        _ = source.Complete(Error("Unknown report"))
+        _ = source.Complete(Error(HttpError.Handler("Unknown report")))
     } else if let Ok(text) = CreateReport() {
         let headers = ArrayList<HttpHeader>()
         headers.Add(HttpHeader("Content-Type", "application/json"))
         _ = source.Complete(Ok(HttpResponse(200, headers, Utf8.Encode(text))))
     } else {
-        _ = source.Complete(Error("Report construction failed"))
+        _ = source.Complete(Error(HttpError.Handler("Report construction failed")))
     }
     return source.Task
 }
@@ -40,7 +40,7 @@ func Main() {
                 let result = serving.GetResult()
                 server.Close()
                 if let Error(message) = result {
-                    System.Fault(message)
+                    System.Fault(message.ToString())
                 }
                 Console.WriteLine("Report served")
             })

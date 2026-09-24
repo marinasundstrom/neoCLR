@@ -4,12 +4,14 @@ import System.Result.*
 import System.Tasks.*
 import System.Text.*
 import System.Web.Http.*
+import System.Networking.*
+import System.Networking.Sockets.*
 
 // A forwarding handler can observe both sides of the exchange without owning sockets.
 class RecordingHandler : HttpHandler {
-    private field name: string
-    private field inner: HttpHandler
-    private field events: ArrayList<string>
+    private var name: string
+    private var inner: HttpHandler
+    private var events: ArrayList<string>
 
     init(name: string, inner: HttpHandler, events: ArrayList<string>) {
         self.name = name
@@ -17,7 +19,7 @@ class RecordingHandler : HttpHandler {
         self.events = events
     }
 
-    async func Send(request: HttpRequest) -> Task<Result<HttpResponse, string>> {
+    async func Send(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
         events.Add(String.Concat(name, " before"))
         let outcome = await inner.Send(request)
         events.Add(String.Concat(name, " after"))
@@ -26,22 +28,22 @@ class RecordingHandler : HttpHandler {
 }
 
 class FakeHandler : HttpHandler {
-    private field fail: bool
+    private var fail: bool
     var Calls: int = 0
 
     init(fail: bool) {
         self.fail = fail
     }
 
-    func Send(request: HttpRequest) -> Task<Result<HttpResponse, string>> {
+    func Send(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
         Calls += 1
         Check(request.Method == "GET")
         Check(request.Host == "example.test")
         Check(request.Port == 80)
         Check(request.Target == "/greeting")
-        let source = Promise<Result<HttpResponse, string>>()
+        let source = Promise<Result<HttpResponse, HttpError>>()
         if fail {
-            _ = source.Complete(Error("Fake failure"))
+            _ = source.Complete(Error(HttpError.Handler("Fake failure")))
         } else {
             _ = source.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), Utf8.Encode("Café 🌍"))))
         }
@@ -50,6 +52,7 @@ class FakeHandler : HttpHandler {
 }
 
 func CheckHandlers() {
+    CheckTypedErrors()
     let events = ArrayList<string>()
     let fake = FakeHandler(false)
     let client = HttpClient(RecordingHandler("outer", RecordingHandler("inner", fake, events), events))
@@ -62,12 +65,12 @@ func CheckHandlers() {
     Check(events.Count == 4)
     Check(events[0] == "outer before" && events[1] == "inner before")
     Check(events[2] == "inner after" && events[3] == "outer after")
-    if let Error(message) = client.Get("http://example.test/unsafe\r\nHeader: injected").GetResult() {
+    if let Error(HttpError.Unsupported(message)) = client.Get("http://example.test/unsafe\r\nHeader: injected").GetResult() {
         Check(message == "Unsupported request target")
     } else {
         System.Fault("Unsafe target admitted")
     }
-    if let Error(message) = client.Get("https://example.test/greeting").GetResult() {
+    if let Error(HttpError.Unsupported(message)) = client.Get("https://example.test/greeting").GetResult() {
         Check(message == "Only plain http:// URLs are supported")
     } else {
         System.Fault("Unsupported scheme admitted")
@@ -76,7 +79,7 @@ func CheckHandlers() {
     Check(events.Count == 4)
     let failureEvents = ArrayList<string>()
     let failed = HttpClient(RecordingHandler("failure", FakeHandler(true), failureEvents))
-    if let Error(message) = failed.Get("http://example.test/greeting").GetResult() {
+    if let Error(HttpError.Handler(message)) = failed.Get("http://example.test/greeting").GetResult() {
         Check(message == "Fake failure")
     } else {
         System.Fault("Handler failure lost")
@@ -89,4 +92,38 @@ func Check(condition: bool) {
     if !condition {
         System.Fault("HTTP contract failed")
     }
+}
+
+func CheckTypedErrors() {
+    let absent = default(HttpError)
+    Check(absent.ToString() == "Empty")
+    if let HttpError.Transport(_) = absent {
+        System.Fault("Inactive error matched a case")
+    }
+    let transport: HttpError = HttpError.Transport(SocketError.ConnectionRefused)
+    if let HttpError.Transport(SocketError.ConnectionRefused) = transport {
+        Check(transport.ToString() == "ConnectionRefused")
+    } else {
+        System.Fault("Socket cause lost")
+    }
+    let lookup: HttpError = HttpError.NameResolution(DnsError.NoAddress)
+    if let HttpError.NameResolution(DnsError.NoAddress) = lookup {
+        Check(lookup.ToString() == "NoAddress")
+    } else {
+        System.Fault("DNS cause lost")
+    }
+    var original: HttpError = HttpError.Protocol(String.Concat("retained", " payload"))
+    let copy = original
+    let boxed: Object = original
+    original = HttpError.TimedOut
+    Check(original.ToString() == "Request deadline exceeded")
+    var index = 0
+    while index < 100 {
+        let transient: HttpError = HttpError.Handler(index.ToString())
+        let boxedTransient: Object = transient
+        Check(boxedTransient.ToString() == index.ToString())
+        index += 1
+    }
+    Check(copy.ToString() == "retained payload")
+    Check(boxed.ToString() == "retained payload")
 }

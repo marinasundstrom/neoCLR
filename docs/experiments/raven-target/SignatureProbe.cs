@@ -308,6 +308,23 @@ static class SignatureProbe
         Check("Error case constructor mapping", ErrorBindings.Construct(Reference(notFoundConstructor, notFound), notFoundConstructor)?.Result == "System.Storage.FileReadError.NotFound");
         Check("Empty errors differ from union carriers", ErrorBindings.IsEmpty("System.InvalidDateError") && !ErrorBindings.IsEmpty("System.Int32ParseError"));
         ErrorBindings.Reset(module);
+        var httpError = module.GetType("System.Web.Http.HttpError");
+        var transportCase = httpError.NestedTypes.Single(t => t.Name == "Transport");
+        var transportCtor = transportCase.Methods.Single(m => m.IsConstructor);
+        var transportCall = Reference(transportCtor, transportCase);
+        Check("HTTP error preserves socket payload", ErrorBindings.Construct(transportCall, transportCtor)
+            is { Result: "System.Web.Http.HttpError.Transport", Arguments: ["System.Networking.Sockets.SocketError"] });
+        transportCall.Parameters[0].ParameterType = module.GetType("System.Networking.DnsError");
+        Reject("HTTP error rejects changed payload type", () => ErrorBindings.Construct(transportCall, transportCtor));
+        var privateFormatter = httpError.Methods.Single(m => m.IsPrivate && m.IsStatic);
+        Reject("HTTP union formatter remains private", () => ErrorBindings.Bind(Reference(privateFormatter, httpError), privateFormatter));
+        var extractTransport = httpError.Methods.Single(m => m.Name == "TryGetValue"
+            && m.Parameters[0].ParameterType.GetElementType().FullName == transportCase.FullName);
+        var extractCall = Reference(extractTransport, httpError);
+        Check("HTTP payload extraction is conditional", ErrorBindings.Bind(extractCall, extractTransport)?.OutArgument == 1);
+        extractCall.ReturnType = module.TypeSystem.Int32;
+        Reject("HTTP extraction rejects forged result", () => ErrorBindings.Bind(extractCall, extractTransport));
+
         var checkedGetter = readError.Methods.Single(m => m.Name == "TryGetValue"
             && m.Parameters[0].ParameterType.GetElementType().FullName == notFound.FullName);
         var getterReference = Reference(checkedGetter, readError);

@@ -24,10 +24,11 @@ static class ErrorBindings
         ["System.InvalidTimeError"] = [], ["System.OverflowError"] = [], ["System.EnvironmentError"] = []
     };
     static readonly HashSet<string> Standard = new();
-    public static bool IsStandard(string type) => Standard.Contains(type);
+    public static bool IsStandard(string type) => Standard.Contains(type) || PayloadUnionBindings.IsType(type);
     public static void Reset(ModuleDefinition core)
     {
         Standard.Clear();
+        PayloadUnionBindings.Reset(core);
         foreach (var (name, cases) in Cases)
             if (core.GetType(name) is { } type && ApplicationTypes.IsEmptyCaseUnion(type))
             {
@@ -39,13 +40,13 @@ static class ErrorBindings
     }
     public static IEnumerable<string> Errors => Cases.Keys;
     static IEnumerable<string> CaseTypes => Cases.SelectMany(e => e.Value.Select(c => e.Key + "." + c));
-    public static bool IsType(string type) => Errors.Contains(type) || CaseTypes.Contains(type);
+    public static bool IsType(string type) => PayloadUnionBindings.IsType(type) || Errors.Contains(type) || CaseTypes.Contains(type);
     public static bool IsEmpty(string type) => CaseTypes.Contains(type) || Cases.TryGetValue(type, out var cases) && cases.Length == 0;
-    public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope)
-        && IsType(type.FullName.Replace('/', '.'))
+    public static string? Type(TypeReference type) => PayloadUnionBindings.Type(type) ?? (RuntimeSignatures.IsCore(type.Scope)
+        && (Errors.Contains(type.FullName.Replace('/', '.')) || CaseTypes.Contains(type.FullName.Replace('/', '.')))
         // isinst operands can omit the CLI valuetype signature flag. Resolve the
         // supplied-core definition rather than rejecting a valid case type token.
-        && (type.IsValueType || type.Resolve()?.IsValueType == true) ? type.FullName.Replace('/', '.') : null;
+        && (type.IsValueType || type.Resolve()?.IsValueType == true) ? type.FullName.Replace('/', '.') : null);
     public static string Declarations => string.Join("\n", Cases.Select(entry => {
         var error = entry.Key; var name = error.Split('.').Last();
         var declaration = (entry.Value.Length > 0 ? "[System.Runtime.CompilerServices.Union] " : "")
@@ -58,6 +59,8 @@ static class ErrorBindings
     static string Helper(string owner, string member) => "RuntimeError" + new string((owner + member).Where(char.IsLetterOrDigit).ToArray());
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
+        if (PayloadUnionBindings.IsType(reference.DeclaringType.FullName.Replace('/', '.')))
+            return PayloadUnionBindings.Bind(reference, definition);
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
         var signature = RuntimeSignatures.Match(reference, definition,
@@ -90,6 +93,8 @@ static class ErrorBindings
     }
     public static ResultBindings.Binding? Construct(MethodReference reference, MethodDefinition definition)
     {
+        if (PayloadUnionBindings.IsType(reference.DeclaringType.FullName.Replace('/', '.')))
+            return PayloadUnionBindings.Bind(reference, definition, construct: true);
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
         var signature = RuntimeSignatures.Match(reference, definition, Type);

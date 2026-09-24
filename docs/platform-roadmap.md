@@ -69,6 +69,13 @@ IPAddress as a standard union with IPv4Address and IPv6Address cases. The additi
 assistant's recommendation for review, not approval of every proposed API or a
 release date. Continue the current typed HTTP/error/base-address integration first.
 
+**Author follow-up:** requests completion of the slices one by one. The sequence is
+1. typed HTTP errors; 2. IPAddress; 3. cancellation foundations; 4. HttpClient/base
+address; 5. methods/content/statuses; 6. framing; 7. server lifecycle; 8. application;
+9. release stabilization. Investigate HTTPS feasibility after cancellation foundations
+and decide its scope before the application slice. Finish validation and documentation
+for each slice before advancing; a source change alone is not completion.
+
 The current GET/200, small-buffer and ServeOne POC proves the path, but it is too
 narrow to be the whole release experience. Prefer these connected release gates:
 
@@ -105,6 +112,12 @@ IPv6 transport remain follow-ups; IPAddress itself is now author-selected releas
 scope. Its two address-family cases do not imply implemented IPv6 transport. The additional .NET client machinery has real lifetime
 and performance benefits, but also broadens this release's contracts and tests.
 Document the costs of connection-per-request behavior and retained IPv4-only limits.
+
+**Author validation direction, 2026-09-25:** for each slice, run only the most relevant
+checks and skip website builds. Keep documentation/reference snapshots current;
+reserve broad integration/site validation for release stabilization or a concrete
+regression need. This overrides the default per-API-change website build requirement
+for the current slice sequence.
 
 **Efficient validation:** run common parser, URI, handler and error behavior once per
 relevant change. On each supported target, exercise the actual socket/DNS/TLS and
@@ -937,8 +950,10 @@ not a runtime dependency or a standardized platform case map. The [nongeneric pa
 now projects a sequential HttpError prototype, compiles a separate consumer and
 executes imported payload bodies under GC pressure. Generic companion projection
 and nonempty overlapping layouts remain rejected. The migration batch is closed
-for applicable nongeneric families. Next integrate typed HTTP errors into public
-client/handler/server contracts, then string/Uri overloads and BaseUri resolution;
+for applicable nongeneric families. Typed HTTP errors are now integrated into the
+client/handler/server contracts, with public consumer, independent-peer,
+framing/timeout, payload-GC and signature rejection checks passing.
+IPAddress follows this slice, then cancellation and string/Uri overloads with BaseUri;
 do not extend the manual carrier catalog.
 The author's 2026-09-25 HTTP contract makes
 `Send(HttpRequest, CancellationToken) -> Task<Result<HttpResponse, HttpError>>` the

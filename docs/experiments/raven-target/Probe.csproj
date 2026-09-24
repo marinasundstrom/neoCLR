@@ -11,6 +11,7 @@
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="../../../runtime/raven/src/System/Web/Http/HttpError.rvn" LogicalName="NeoCLR.HttpError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Networking/Sockets/SocketError.rvn" LogicalName="NeoCLR.SocketError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Networking/DnsError.rvn" LogicalName="NeoCLR.DnsError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/UriError.rvn" LogicalName="NeoCLR.UriError.rvn" />

@@ -130,7 +130,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-server-') as folder:
     if not args.responses_only:
         serve('fragmented request', raw(b'GET /greeting HTTP/1.1\r\nhOsT:\tlocalhost:{port} \t\r\nContent-Length: 0\r\n\r\n', valid=True, fragment=True))
     if not args.responses_only:
-        serve('stalled request', raw(b'GET /greeting HTTP/1.1\r\nHost: local', stall=True), 'Server error: Request receive failed')
+        serve('stalled request', raw(b'GET /greeting HTTP/1.1\r\nHost: local', stall=True), 'Server error: TimedOut')
     cases = [
         ('Host with path', b'GET /greeting HTTP/1.1\r\nHost: localhost/path\r\n\r\n', 'Invalid Host authority'),
         ('missing Host', b'GET /greeting HTTP/1.1\r\n\r\n', 'Host required'),
@@ -155,7 +155,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-server-') as folder:
         ('unsupported-status', source.replace('HttpResponse(200,', 'HttpResponse(404,'), 'Only status 200 is supported'),
         ('header-limit', source.replace('text/plain; charset=utf-8', 'x' * 2047), 'Response header limit exceeded'),
         ('body-limit', source.replace('Café 🌍', 'x' * 1025), 'Response body limit exceeded'),
-        ('handler-error', source.replace('source.Complete(Ok(HttpResponse(200, headers, Utf8.Encode("Café 🌍"))))', 'source.Complete(Error("Handler rejected request"))'), 'Handler rejected request'),
+        ('handler-error', source.replace('source.Complete(Ok(HttpResponse(200, headers, Utf8.Encode("Café 🌍"))))', 'source.Complete(Error(HttpError.Handler("Handler rejected request")))'), 'Handler rejected request'),
     ]
     for name, code, error in ([] if args.requests_only else variants):
         if args.case and name not in args.case:

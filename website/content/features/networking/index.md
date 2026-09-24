@@ -107,12 +107,11 @@ up to 16 numeric IPv4 addresses, skip duplicates and try them in order within fi
 seconds. Pending attempts get at most one second while alternatives remain; the last
 gets the remaining time. The echo demo checks fallback and caller-list reuse.
 These provisional limits are not configurable and can reject slow connections.
-An [development HTTP client](/features/web/) now exercises requests, headers,
-responses, UTF-8 bodies and handlers over Socket. A neoCLR HTTP responder remains
-next. TLS is a separate requirement for HTTPS. TcpClient and
+A [development HTTP client](/features/web/) now exercises requests, headers,
+responses, UTF-8 bodies and handlers over Socket. A bounded neoCLR HTTP responder also exchanges messages with independent clients. TLS is a separate requirement for HTTPS. TcpClient and
 UdpClient may follow when a working case needs them.
 
-The HTTP experiment is a bounded client, not a complete HTTP stack or web server.
+The HTTP experiment provides bounded client/server exchanges; it is not a complete HTTP stack.
 
 ## Reference and participation
 

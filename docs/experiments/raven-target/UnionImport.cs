@@ -704,7 +704,7 @@ static class UnionImport
                         for (var n = construction.Arguments.Length - 1; n >= 0; n--) constructedArguments[n] = Argument(construction.Arguments[n]).Type;
                         construction = Coerce(construction, constructedArguments);
                         Push(new(construction.Result));
-                        code.AppendLine($"call {construction.Name}({string.Join(',', construction.Arguments)})"); break;
+                        code.AppendLine(construction.Instruction ?? $"call {construction.Name}({string.Join(',', construction.Arguments)})"); break;
                     case Code.Add: case Code.Sub: case Code.Mul:
                         var numericRight = Pop(); var numericLeft = Pop();
                         if (numericLeft.Type != numericRight.Type || numericLeft.Type is not ("Int32" or "Int64" or "Double")) throw new InvalidDataException("Unsupported arithmetic operands.");
@@ -1260,7 +1260,7 @@ static class UnionImport
             return new("RuntimeNewSystemClock", [], "System.SystemClock");
         }
         var file = GenericUnionBindings.Construct(reference, definition) ?? ErrorBindings.Construct(reference, definition) ?? ResultBindings.Construct(reference, definition);
-        if (file is not null) return new(file.Name, file.Arguments, file.Result);
+        if (file is not null) return new(file.Name, file.Arguments, file.Result, Instruction: file.Instruction);
         var key = definition.FullName;
         var owner = Type(reference.DeclaringType);
         var parameters = reference.Parameters.Select(p => p.ParameterType.FullName).ToArray();

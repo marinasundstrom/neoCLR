@@ -6,8 +6,8 @@ Run versus async request iteration open until cancellation and concurrency devel
 Start with a bounded ServeOne callback, not a permanent application hosting loop.
 
 Implemented provisional development surface: HttpServer.Listen(address, port, backlog) returns
-Result<HttpServer, string>; GetLocalPort exposes a port-zero bind; ServeOne accepts
-Func<HttpRequest, Task<Result<HttpResponse, string>>> and returns a Task/Result once
+Result<HttpServer, HttpError>; GetLocalPort exposes a port-zero bind; ServeOne accepts
+Func<HttpRequest, Task<Result<HttpResponse, HttpError>>> and returns a Task/Result once
 one connection is handled and its response has been sent; Close stops listening.
 Each operation owns its accepted connection. Closing the listener does not revoke an
 already accepted connection; operation deadlines/cancellation remain explicit gaps.
@@ -39,8 +39,8 @@ reference/importer/library snapshots, API XML and website coverage in the same s
 
 The callback model does not translate a cancelled callback Task or runtime Fault into
 an HTTP Result. Those retain the existing Task/runtime behavior; a future cancellation
-contract must cover both request ownership and callback completion. String errors remain
-provisional pending the separately recorded nested-union design. ServeOne owns the
+contract must cover both request ownership and callback completion. HTTP errors now use the standard HttpError union, retaining socket causes and
+application-provided failures. ServeOne owns the
 connection through completion, while request/response buffered values may be retained
 by application code subject to their stable-sequence contract.
 
@@ -52,3 +52,11 @@ check rejects a slash that could otherwise be misread as a request target. Each
 completed run uses a 256-object heap, collects and finishes with zero live objects.
 The request/response snapshots and callback adapters add managed allocations; these
 checks make no throughput or production robustness claim.
+
+Typed-error regression: .NET and neoCLR clients and fragmented requests pass.
+Malformed request, transfer timeout and application-response rejection paths retain
+connection cleanup and finish with no live objects. The sample explicitly renders
+HttpError.ToString at its reporting boundary. A transfer timeout now reports the
+underlying TimedOut socket cause rather than the former generic receive-failed text;
+application Handler errors preserve their message. No method/status/body expansion
+is included in this error-model slice.

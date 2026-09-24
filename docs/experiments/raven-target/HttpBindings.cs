@@ -13,18 +13,19 @@ static class HttpBindings
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
     public const string Declarations = """
         namespace Web.Http {
+            public struct HttpError { public struct InvalidUri { } public struct NameResolution { } public struct Transport { } public struct InvalidRequest { } public struct Protocol { } public struct Unsupported { } public struct LimitExceeded { } public struct TimedOut { } public struct Handler { } }
             public interface HttpHandler {
-                Tasks.Task<Result<HttpResponse, string>> Send(HttpRequest request);
+                Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request);
             }
             public sealed class HttpClient {
                 public HttpClient() { }
                 public HttpClient(HttpHandler handler) { }
-                public Tasks.Task<Result<HttpResponse, string>> Get(string url) => default;
-                public Tasks.Task<Result<HttpResponse, string>> Send(HttpRequest request) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Get(string url) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request) => default;
             }
             public sealed class HttpSocketHandler : HttpHandler {
                 public HttpSocketHandler() { }
-                public Tasks.Task<Result<HttpResponse, string>> Send(HttpRequest request) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request) => default;
             }
             public sealed class HttpHeader {
                 public HttpHeader(string name, string value) { }
@@ -33,9 +34,9 @@ static class HttpBindings
             }
             public sealed class HttpRequest {
                 private HttpRequest(string host, int port, string target) { }
-                public static Result<HttpRequest, string> Get(string url) => default;
+                public static Result<HttpRequest, HttpError> Get(string url) => default;
                 public Collections.Sequence<HttpHeader> Headers => default;
-                public static Result<HttpRequest, string> FromIncoming(string target, string host, Collections.Sequence<HttpHeader> headers) => default;
+                public static Result<HttpRequest, HttpError> FromIncoming(string target, string host, Collections.Sequence<HttpHeader> headers) => default;
                 public string Method => default;
                 public string Host => default;
                 public int Port => default;
@@ -54,31 +55,31 @@ static class HttpBindings
             }
             public sealed class HttpServer {
                 public HttpServer(Networking.Sockets.Socket listener) { }
-                public static Result<HttpServer, string> Listen(string address, int port, int backlog) => default;
-                public Result<int, string> GetLocalPort() => default;
-                public Tasks.Task<Result<PropagationUnit, string>> ServeOne(Func<HttpRequest, Tasks.Task<Result<HttpResponse, string>>> handler) => default;
+                public static Result<HttpServer, HttpError> Listen(string address, int port, int backlog) => default;
+                public Result<int, HttpError> GetLocalPort() => default;
+                public Tasks.Task<Result<PropagationUnit, HttpError>> ServeOne(Func<HttpRequest, Tasks.Task<Result<HttpResponse, HttpError>>> handler) => default;
                 public void Close() { }
-                public static Result<Collections.Sequence<byte>, string> EncodeResponse(HttpResponse response) => default;
+                public static Result<Collections.Sequence<byte>, HttpError> EncodeResponse(HttpResponse response) => default;
             }
             public sealed class HttpRequestDecoder {
                 public HttpRequestDecoder() { }
                 public bool Complete => default;
-                public Result<bool, string> Push(byte value) => default;
-                public Result<HttpRequest, string> Finish() => default;
+                public Result<bool, HttpError> Push(byte value) => default;
+                public Result<HttpRequest, HttpError> Finish() => default;
             }
             public sealed class HttpServerExchange {
-                public HttpServerExchange(Networking.Sockets.Socket listener, Func<HttpRequest, Tasks.Task<Result<HttpResponse, string>>> handler) { }
-                public Tasks.Task<Result<PropagationUnit, string>> Start() => default;
+                public HttpServerExchange(Networking.Sockets.Socket listener, Func<HttpRequest, Tasks.Task<Result<HttpResponse, HttpError>>> handler) { }
+                public Tasks.Task<Result<PropagationUnit, HttpError>> Start() => default;
             }
             public sealed class HttpResponseDecoder {
                 public HttpResponseDecoder() { }
                 public bool Complete => default;
-                public Result<bool, string> Push(byte value) => default;
-                public Result<HttpResponse, string> Finish() => default;
+                public Result<bool, HttpError> Push(byte value) => default;
+                public Result<HttpResponse, HttpError> Finish() => default;
             }
             public sealed class HttpExchange {
                 public HttpExchange(HttpRequest request) { }
-                public Tasks.Task<Result<HttpResponse, string>> Execute() => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Execute() => default;
             }
         }
         """;
@@ -103,23 +104,23 @@ static class HttpBindings
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var request = Prefix + "HttpRequest";
         var response = Prefix + "HttpResponse";
-        var outcome = $"System.Result<{response},String>";
+        var outcome = $"System.Result<{response},System.Web.Http.HttpError>";
         var task = $"System.Tasks.Task<{outcome}>";
         var expected = (owner[Prefix.Length..], definition.Name) switch {
             ("HttpServer", ".ctor") when library => ("System.Networking.Sockets.Socket", "noresult", false),
-            ("HttpServer", "Listen") => ("String,Int32,Int32", $"System.Result<{Prefix}HttpServer,String>", true),
-            ("HttpServer", "GetLocalPort") => ("", "System.Result<Int32,String>", false),
+            ("HttpServer", "Listen") => ("String,Int32,Int32", $"System.Result<{Prefix}HttpServer,System.Web.Http.HttpError>", true),
+            ("HttpServer", "GetLocalPort") => ("", "System.Result<Int32,System.Web.Http.HttpError>", false),
             ("HttpServer", "Close") => ("", "noresult", false),
-            ("HttpServer", "ServeOne") => ($"System.Func<{request},{task}>", "System.Tasks.Task<System.Result<Void,String>>", false),
-            ("HttpServer", "EncodeResponse") when library => (response, "System.Result<System.Collections.Sequence<Byte>,String>", true),
-            ("HttpRequest", "FromIncoming") when library => ($"String,String,System.Collections.Sequence<{Prefix}HttpHeader>", $"System.Result<{request},String>", true),
+            ("HttpServer", "ServeOne") => ($"System.Func<{request},{task}>", "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
+            ("HttpServer", "EncodeResponse") when library => (response, "System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>", true),
+            ("HttpRequest", "FromIncoming") when library => ($"String,String,System.Collections.Sequence<{Prefix}HttpHeader>", $"System.Result<{request},System.Web.Http.HttpError>", true),
             ("HttpRequest", "get_Headers") => ("", $"System.Collections.Sequence<{Prefix}HttpHeader>", false),
             ("HttpRequestDecoder", ".ctor") when library => ("", "noresult", false),
             ("HttpRequestDecoder", "get_Complete") when library => ("", "Boolean", false),
-            ("HttpRequestDecoder", "Push") when library => ("Byte", "System.Result<Boolean,String>", false),
-            ("HttpRequestDecoder", "Finish") when library => ("", $"System.Result<{request},String>", false),
+            ("HttpRequestDecoder", "Push") when library => ("Byte", "System.Result<Boolean,System.Web.Http.HttpError>", false),
+            ("HttpRequestDecoder", "Finish") when library => ("", $"System.Result<{request},System.Web.Http.HttpError>", false),
             ("HttpServerExchange", ".ctor") when library => ($"System.Networking.Sockets.Socket,System.Func<{request},{task}>", "noresult", false),
-            ("HttpServerExchange", "Start") when library => ("", "System.Tasks.Task<System.Result<Void,String>>", false),
+            ("HttpServerExchange", "Start") when library => ("", "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
             ("HttpClient", ".ctor") when args.Length == 0 => ("", "noresult", false),
             ("HttpClient", ".ctor") => (Prefix + "HttpHandler", "noresult", false),
             ("HttpClient", "Get") => ("String", task, false),
@@ -127,7 +128,7 @@ static class HttpBindings
             ("HttpSocketHandler" or "HttpResponseDecoder", ".ctor") => ("", "noresult", false),
             ("HttpHeader", ".ctor") => ("String,String", "noresult", false),
             ("HttpHeader", "get_Name" or "get_Value") => ("", "String", false),
-            ("HttpRequest", "Get") => ("String", $"System.Result<{request},String>", true),
+            ("HttpRequest", "Get") => ("String", $"System.Result<{request},System.Web.Http.HttpError>", true),
             ("HttpRequest", "get_Method" or "get_Host" or "get_Target") => ("", "String", false),
             ("HttpRequest", "get_Port") => ("", "Int32", false),
             ("HttpResponse", ".ctor") => ($"Int32,System.Collections.Sequence<{Prefix}HttpHeader>,System.Collections.Sequence<Byte>", "noresult", false),
@@ -138,7 +139,7 @@ static class HttpBindings
             ("HttpContent", "get_Bytes") => ("", "System.Collections.Sequence<Byte>", false),
             ("HttpContent", "ReadText") => ("", "System.Tasks.Task<System.Result<String,String>>", false),
             ("HttpResponseDecoder", "get_Complete") when library => ("", "Boolean", false),
-            ("HttpResponseDecoder", "Push") when library => ("Byte", "System.Result<Boolean,String>", false),
+            ("HttpResponseDecoder", "Push") when library => ("Byte", "System.Result<Boolean,System.Web.Http.HttpError>", false),
             ("HttpResponseDecoder", "Finish") when library => ("", outcome, false),
             ("HttpExchange", ".ctor") when library => (request, "noresult", false),
             ("HttpExchange", "Execute") when library => ("", task, false),

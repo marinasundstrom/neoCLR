@@ -5,10 +5,10 @@ import System.Tasks.*
 import System.Text.*
 import System.Web.Http.*
 
-func Respond(request: HttpRequest) -> Task<Result<HttpResponse, string>> {
-    let source = Promise<Result<HttpResponse, string>>()
+func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    let source = Promise<Result<HttpResponse, HttpError>>()
     if request.Method != "GET" || request.Target != "/greeting" || request.Headers.Count == 0 {
-        _ = source.Complete(Error("Unexpected request"))
+        _ = source.Complete(Error(HttpError.Handler("Unexpected request")))
         return source.Task
     }
     let headers = ArrayList<HttpHeader>()
@@ -25,7 +25,7 @@ func Start(server: HttpServer) {
         if let Ok(_) = result {
             Console.WriteLine("Served greeting; server closed")
         } else if let Error(message) = result {
-            Console.WriteLine("Server error: $message")
+            Console.WriteLine(String.Concat("Server error: ", message.ToString()))
         }
     })
     TaskQueue.Default.Post(() => Console.WriteLine("Other work runs while HTTP accept is pending"))

@@ -15,7 +15,7 @@ args = parser.parse_args()
 bundle = args.bundle.resolve()
 bridge = args.bridge.resolve()
 env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(bundle / 'raven-sdk'))
-owner = 'System.Web.Http.HttpError'
+owner = 'System.Web.Http.ProbeHttpError'
 
 
 def run(command, success=True):
@@ -53,12 +53,12 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-payload-library-') as direc
     (root / 'Consumer.rvn').write_text('''import System.*
 import System.Web.Http.*
 import System.Networking.Sockets.*
-func Create() -> HttpError { HttpError.Transport(SocketError.Closed) }
-func Inspect(error: HttpError) -> bool {
-    if let HttpError.Transport(SocketError.Closed) = error { return true }
+func Create() -> ProbeHttpError { ProbeHttpError.Transport(SocketError.Closed) }
+func Inspect(error: ProbeHttpError) -> bool {
+    if let ProbeHttpError.Transport(SocketError.Closed) = error { return true }
     return false
 }
-func Message() -> HttpError { HttpError.Protocol("bad status") }
+func Message() -> ProbeHttpError { ProbeHttpError.Protocol("bad status") }
 ''')
     compile('Consumer', 'Consumer.rvn', projected)
     shared = compile('Shared', 'Errors.rvn', projected)

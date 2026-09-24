@@ -1,0 +1,43 @@
+namespace System.Web.Http
+
+import System.*
+import System.Networking.*
+import System.Networking.Sockets.*
+
+/// An expected failure while constructing or exchanging an HTTP message.
+public union HttpError {
+    /// A URI could not be parsed or resolved.
+    case InvalidUri(reason: UriError)
+    /// Host name resolution failed.
+    case NameResolution(reason: DnsError)
+    /// A socket operation failed.
+    case Transport(reason: SocketError)
+    /// The request is invalid for this HTTP implementation.
+    case InvalidRequest(message: string)
+    /// The peer supplied an invalid or incomplete HTTP message.
+    case Protocol(message: string)
+    /// The requested HTTP behavior is not supported.
+    case Unsupported(message: string)
+    /// A configured message or resource bound was exceeded.
+    case LimitExceeded(message: string)
+    /// The shared request deadline expired.
+    case TimedOut
+    /// An application handler could not produce a response.
+    case Handler(message: string)
+
+    /// Returns diagnostic text; match cases to inspect structured causes.
+    override func ToString() -> string {
+        return match self {
+            InvalidUri(let reason) => reason.ToString()
+            NameResolution(let reason) => reason.ToString()
+            Transport(let reason) => reason.ToString()
+            InvalidRequest(let message) => message
+            Protocol(let message) => message
+            Unsupported(let message) => message
+            LimitExceeded(let message) => message
+            TimedOut => "Request deadline exceeded"
+            Handler(let message) => message
+            _ => "Empty"
+        }
+    }
+}

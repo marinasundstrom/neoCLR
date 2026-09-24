@@ -9,7 +9,8 @@ import System.Networking.Sockets.*
 import System.Web.Http.*
 
 async func ReadGreeting(client: HttpClient, url: string) -> Task<Result<string, string>> {
-    let response = await client.Get(url)?
+    // This application presents failures as text at its reporting boundary.
+    let response = (await client.Get(url)).MapError(error => error.ToString())?
     Check(response.StatusCode == 200)
     return await response.Content.ReadText()
 }
