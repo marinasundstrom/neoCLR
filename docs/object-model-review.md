@@ -896,3 +896,27 @@ reuses the established intrinsic mapping rule instead of adding a new API mechan
 Remaining limitations: string-to-Object conversion, other primitive Object operations,
 nullable-key policy and a default comparer require separate work. Mutable/resource
 objects retain identity; this slice does not prescribe universal structural equality.
+
+
+### Boxed Int64 equality and hash — 2026-09-24
+
+The bounded next primitive slice extends the existing Object-slot interpreter intrinsic
+to Int64. Equality compares the full copied payload and requires the same concrete
+type; null, Int32 and Boolean compare unequal. ReferenceEquals still distinguishes
+separate boxes. Hashing XORs the upper and lower 32-bit halves, matching the
+[.NET 10 Int64 implementation](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Int64.cs)
+(reviewed 2026-09-24). Equal hashes do not establish equality, and these hashes are
+not persistent or cross-version identifiers.
+
+The helper now represents each supported primitive explicitly rather than reducing
+all payloads to an Int32. Truncating Int64 or comparing hashes would incorrectly merge
+unequal values. Source-declared primitive overrides remain a future alternative; this
+choice reuses the current intrinsic boundary without changing reference metadata,
+compiler policy or managed layouts. Its cost is another runtime special case; it does
+not provide typed primitive hash APIs, boxed formatting or universal struct equality.
+
+The [checked Raven sample](experiments/int64-object/README.md) exercises Object-keyed
+map collisions, copied boxing, exact types and collection. Native regressions cover
+minimum/maximum values, upper-bit differences, deliberate hash collisions, copied
+unboxing and GC. A separate .NET 10 baseline verifies the compared equality/hash rules. The Raven
+fixture reclaims all 827 allocations across 18 collections (peak 64, zero live).

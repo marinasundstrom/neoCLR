@@ -5,15 +5,17 @@ use crate::{
     value::ObjectReference,
 };
 
-/// Int32 and Boolean have intrinsic value contracts. Other intrinsic types still
+/// Int32, Int64 and Boolean have intrinsic value contracts. Other intrinsic types still
 /// require their own validated equality/hash implementation.
 pub(crate) fn dispatch(
     object: &ObjectReference,
     contract: &Function,
     arguments: &[Value],
 ) -> Result<Option<Value>, Fault> {
-    if !matches!(object.concrete_type(), Type::Int32 | Type::Boolean)
-        || contract.owner.as_ref() != Some(&Type::from_name("System.Object"))
+    if !matches!(
+        object.concrete_type(),
+        Type::Int32 | Type::Int64 | Type::Boolean
+    ) || contract.owner.as_ref() != Some(&Type::from_name("System.Object"))
         || contract
             .definition
             .as_ref()
@@ -39,7 +41,7 @@ pub(crate) fn dispatch(
     }
     let value = primitive_value(object)?;
     if hashing {
-        return Ok(Some(Value::Int32(value)));
+        return Ok(Some(Value::Int32(value.hash())));
     }
     let [other] = arguments else {
         return Err(Fault::new(
@@ -65,12 +67,30 @@ pub(crate) fn dispatch(
     Ok(Some(Value::Boolean(equal)))
 }
 
-// Only called after selecting a supported concrete type. Type identity is checked
-// separately: Boolean true and Int32 one must never compare equal.
-fn primitive_value(object: &ObjectReference) -> Result<i32, Fault> {
+// Keep full payloads for equality; a hash can collide and must never be the
+// compared value. Concrete type checks also distinguish Boolean/Int32/Int64.
+#[derive(PartialEq, Eq)]
+enum PrimitiveValue {
+    Int32(i32),
+    Int64(i64),
+    Boolean(bool),
+}
+
+impl PrimitiveValue {
+    fn hash(&self) -> i32 {
+        match *self {
+            Self::Int32(value) => value,
+            Self::Int64(value) => (value as i32) ^ ((value >> 32) as i32),
+            Self::Boolean(value) => i32::from(value),
+        }
+    }
+}
+
+fn primitive_value(object: &ObjectReference) -> Result<PrimitiveValue, Fault> {
     match (object.concrete_type(), object.reference.read()?) {
-        (Type::Int32, Value::Int32(value)) => Ok(value),
-        (Type::Boolean, Value::Boolean(value)) => Ok(i32::from(value)),
+        (Type::Int32, Value::Int32(value)) => Ok(PrimitiveValue::Int32(value)),
+        (Type::Int64, Value::Int64(value)) => Ok(PrimitiveValue::Int64(value)),
+        (Type::Boolean, Value::Boolean(value)) => Ok(PrimitiveValue::Boolean(value)),
         _ => Err(Fault::new("boxed primitive has an invalid payload")),
     }
 }

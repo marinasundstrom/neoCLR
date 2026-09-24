@@ -76,7 +76,7 @@ are unchanged.
 String identity is deliberately unsupported: the current String/Object conversion
 creates wrappers instead of preserving an underlying String allocation. Identity
 calls on String payloads or their wrappers raise a terminal RuntimeError. Virtual
-boxed-value Equals/GetHashCode support Int32, Boolean and explicit named-struct overrides, described below.
+boxed-value Equals/GetHashCode support Int32, Int64, Boolean and explicit named-struct overrides, described below.
 ReferenceEquals can compare box identities, but does not supply boxed value equality.
 Null instance receivers raise NullReference; default Equals accepts a null argument
 and returns false. Static two-argument Object.Equals is not yet available.
@@ -136,6 +136,11 @@ Its virtual GetHashCode returns the stored integer, including negative values an
 Int32 limits. Boxing copies the value, so changing the original variable has no effect.
 ReferenceEquals still distinguishes separately allocated boxes. Explicit Object base
 calls retain allocation equality/hash rather than dispatching to the integer behavior.
+
+A boxed Int64 compares its complete 64-bit copied value, only with another Int64.
+Its hash XORs the lower and upper 32-bit halves, matching .NET 10. Different values
+can share a hash; equality still compares every bit. Null, Int32 and Boolean operands
+compare unequal. Separate boxes retain separate identities. Hashes are not persistent keys.
 
 A boxed Boolean compares by its copied true/false value, only with another Boolean.
 Null and boxed integers (including 0 and 1) compare unequal. GetHashCode returns 1
@@ -277,7 +282,7 @@ values. Explicitly authored operators retain their own contracts.
 Supported generic API signatures now admit Object, including `HashMap<Object, Object>`.
 Supply explicit callbacks: `(left, right) => left.Equals(right)` and
 `key => key.GetHashCode()`. Paths and type descriptors use their represented-value
-contracts; supported boxed Int32/Boolean values use exact-type value equality, while
+contracts; supported boxed Int32/Int64/Boolean values use exact-type value equality, while
 ordinary classes retain allocation identity. Equal keys must have equal hashes.
 
 The compiled sample checks duplicate keys, replacement, deliberate collisions,

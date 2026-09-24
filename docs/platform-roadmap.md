@@ -735,7 +735,10 @@ The author-directed struct/record-struct gate is complete for non-generic types 
 the documented component contract. Nested same-compilation record structs now compose in both record classes and structs,
 with a checked Point/Rectangle sample and value-output deconstruction. Boxed Boolean
 now joins Int32 for exact-type Object equality and hashing, with a checked flag sample.
-Other primitive Object implementations and generic struct components remain follow-ups.
+Boxed Int64 now also has full-width exact-type equality and a .NET-compatible hash;
+the [Int64 sample](experiments/int64-object/README.md) checks colliding Object map keys
+and collection. Other primitive Object implementations and generic struct components
+remain follow-ups.
 Nullable value types and their boxing behavior are not part of the current scope. Default reference fields now have a checked record case:
 null is preserved even for non-nullable declarations, and generated equality/hash/display
 handle it. Object.Equals and ReferenceEquals now annotate nullable comparison

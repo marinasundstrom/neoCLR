@@ -183,7 +183,7 @@ fn other_boxed_virtual_value_equality_remains_explicitly_unsupported() {
         (format!("ldc.i4 42\nbox Int32\n{EQUALS}"), "Boolean"),
         (HASH.into(), "Int32"),
     ] {
-        assert!(run(&format!("ldc.i8 42\nbox Int64\n{tail}"), "", returns, 8).is_err());
+        assert!(run(&format!("ldc.r8 42\nbox Double\n{tail}"), "", returns, 8).is_err());
     }
 }
 
@@ -479,4 +479,59 @@ fn boxed_struct_traces_reference_fields_after_source_is_cleared() {
         result.heap.is_empty(),
         "completed scalar result must not retain the box or its child"
     );
+}
+
+#[test]
+fn boxed_int64_uses_full_payload_exact_type_and_dotnet_hash() {
+    let mut body = ".local System.Object empty\nldloca empty\ninitobj System.Object\n".to_owned();
+    for value in [
+        i64::MIN,
+        -4294967296,
+        -1,
+        0,
+        1,
+        4294967296,
+        4294967297,
+        i64::MAX,
+    ] {
+        body.push_str(&format!(
+            "ldc.i8 {value}\nbox Int64\nldc.i8 {value}\nbox Int64\n{EQUALS}\nbrfalse failed\n"
+        ));
+        // Different halves can have the same XOR hash; equality must still differ.
+        let different = value ^ 0x0000_0001_0000_0001;
+        body.push_str(&format!(
+            "ldc.i8 {value}\nbox Int64\nldc.i8 {different}\nbox Int64\n{EQUALS}\nbrtrue failed\n"
+        ));
+        let expected = (value as i32) ^ ((value >> 32) as i32);
+        body.push_str(&format!(
+            "ldc.i8 {value}\nbox Int64\n{HASH}\nldc.i4 {expected}\nceq\nbrfalse failed\n"
+        ));
+    }
+    for other in [
+        "ldc.i4 1\nbox Int32",
+        "ldc.bool true\nbox Boolean",
+        "ldloc empty",
+    ] {
+        body.push_str(&format!(
+            "ldc.i8 1\nbox Int64\n{other}\n{EQUALS}\nbrtrue failed\n"
+        ));
+    }
+    body.push_str(&format!("ldc.i8 1\nbox Int64\nldc.i8 1\nbox Int64\n{IDENTITY}\nbrtrue failed\nldc.bool true\nret\nfailed:\nldc.bool false"));
+    assert_eq!(
+        run(&body, "", "Boolean", 16).unwrap().value,
+        Value::Boolean(true)
+    );
+}
+
+#[test]
+fn boxed_int64_copy_and_hash_survive_collection() {
+    let mut body = ".local Int64 original\n.local System.Object boxed\nldc.i8 4294967297\nstloc original\nldloc original\nbox Int64\nstloc boxed\nldc.i8 9\nstloc original\n".to_owned();
+    for _ in 0..20 {
+        body.push_str("ldc.i8 0\nbox Int64\npop\n");
+    }
+    body.push_str(&format!("ldloc boxed\n{HASH}\nldc.i4 0\nceq\nbrfalse failed\nldloc boxed\nunbox.any Int64\nldc.i8 4294967297\nceq\nret\nfailed:\nldc.bool false"));
+    let result = run(&body, "", "Boolean", 8).unwrap();
+    assert_eq!(result.value, Value::Boolean(true));
+    assert!(result.heap.collections() > 0);
+    assert!(result.heap.is_empty());
 }

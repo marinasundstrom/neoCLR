@@ -1,0 +1,44 @@
+import System.*
+import System.Collections.*
+import System.Option.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+func Hash(value: Object) -> int => value.GetHashCode()
+
+func Main() {
+    var source = 4294967297L
+    let first: Object = source
+    let repeated: Object = 4294967297L
+    let colliding: Object = 0L
+    source = 9L
+    Check(first.Equals(repeated) && repeated.Equals(first), "Int64 boxes compare copied values")
+    Check(!Object.ReferenceEquals(first, repeated), "Distinct box identity")
+    Check(!first.Equals(colliding), "Equal hash does not imply equal Int64 value")
+    Check(Hash(first) == 0 && Hash(colliding) == 0, "High/low half hash collision")
+    Check(!first.Equals(null) && !first.Equals(1) && !first.Equals(true), "Exact Int64 type required")
+    let one: Object = 1L
+    Check(!one.Equals(1) && !one.Equals(true), "Equal numeric magnitude does not merge types")
+
+    let values = HashMap<Object, int>((left, right) => left.Equals(right), key => Hash(key))
+    Check(values.TryAdd(first, 1) && !values.TryAdd(repeated, 2), "Repeated Int64 key")
+    Check(values.TryAdd(colliding, 3), "Distinct colliding Int64 key")
+    Check(values.TryAdd(1, 4) && values.TryAdd(true, 5), "Other intrinsic key kinds")
+    var n = 0
+    while n < 400 {
+        let garbage: Object = 7L
+        Check(garbage.Equals(7L), "Boxed Int64 churn")
+        n += 1
+    }
+    if let Some(value) = values.Find(4294967297L) {
+        Check(value == 1 && values.Count == 4, "Int64 key survives collection")
+    } else {
+        System.Fault("Int64 lookup failed after collection")
+    }
+    Check(first.Equals(repeated) && Hash(first) == 0, "Retained box remains unchanged")
+    Console.WriteLine("Int64 Object equality, hash, collision handling and GC: passed")
+}

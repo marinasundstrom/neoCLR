@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add boxed Int64 Object equality over the complete copied payload and a .NET-compatible
+  lower/upper-half hash. Preserve exact-type comparisons and distinct box identity.
+  Cover limits, deliberate hash collisions, Object-keyed maps and collection; boxed
+  formatting and other primitive contracts remain separate work.
+
 - Admit intrinsic Object in supported generic API signatures, matching ordinary
   import mapping. This enables HashMap<Object, Object> with explicit equality/hash
   callbacks and Option<Object> results. Check mixed Path/type/class/boxed keys,
