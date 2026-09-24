@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Bound each pending nonempty socket Send/Receive to a provisional five seconds from
+  native admission. Timeout releases transfer storage and returns TimedOut without
+  closing the connection; committed outcomes and empty transfers retain their behavior.
+  This changes previously unbounded development operations and is not configurable.
+  HTTP closes its owned connection through existing error paths. Add deterministic
+  owner-clock and stalled HTTP peer checks, and update API/website documentation.
+  Whole-request, accept and handler deadlines remain open.
+
 - Add a two-process HTTP JSON report sample using the integrated client/server APIs
   and the unchanged application-local JSON codec. Validate both applications against
   independent Python peers, structured JSON output and GC reclamation. Include the

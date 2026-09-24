@@ -37,8 +37,8 @@ distinguishes headers-only and buffered completion. The sample buffers the entir
 small response before Send completes. ReadText keeps the proposed Task contract even
 though decoding currently completes immediately. The .NET comparison uses
 ResponseHeadersRead and passes one five-second cancellation token through both send
-and body reading. The Raven sample has separate DNS/connect bounds, but no total
-request or transfer deadline. A verifier watchdog does not close that gap.
+and body reading. The Raven sample has separate DNS/connect bounds and now five seconds per pending
+nonempty transfer, but no total request deadline. A verifier watchdog does not close that gap.
 
 Primary sources above reviewed 2026-09-24. No performance equivalence is claimed.
 
@@ -168,3 +168,13 @@ approximate resolution by concatenating strings. Compare .NET's
 when implementing it, including absolute-base validation, relative requests and policy
 for changing client configuration after work starts. Uri precedes that convenience,
 not the already-selected minimal HttpServer case.
+
+## Stalled transfer checkpoint — 2026-09-24
+
+The private socket operation owner now applies a five-second bound to each nonempty
+Send/Receive. The existing HTTP client/server error paths close their owned connection
+when the operation expires; string errors currently retain the stage, not the typed
+SocketError cause. Stalled response headers/body and partial request headers are
+integration cases. No managed timer race, new HTTP signature or public scheduler is
+introduced. See the [socket policy and comparisons](socket-api-design.md#pending-transfer-deadline--2026-09-24).
+A single request budget, handler cancellation and slow-trickle protection remain open.

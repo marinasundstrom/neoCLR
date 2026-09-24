@@ -827,8 +827,13 @@ No later major milestone has started.
 
 ## Working rules and immediate next step
 
-**Active next step, 2026-09-24:** establish bounded request/transfer lifetime for the
-validated HTTP application, then evaluate public JSON contracts from the existing
+The [pending transfer checkpoint](socket-api-design.md#pending-transfer-deadline--2026-09-24)
+now returns TimedOut after five seconds per nonempty Send/Receive, releasing buffers
+without closing the caller's socket. HTTP closes its owned connection on that error.
+This does not bound repeated short transfers, accept or application handler work.
+
+**Active next step, 2026-09-24:** extend per-transfer bounds into a coherent whole-request
+lifetime for the validated HTTP application, then evaluate public JSON contracts from the existing
 consumer. The [JSON report](experiments/http-json/README.md) now passes between two
 neoCLR applications and independent peers; it does not promote a public JSON API. The
 [HTTP sample](experiments/http-client/README.md) imports development System.Web.Http

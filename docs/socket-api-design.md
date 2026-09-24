@@ -674,3 +674,78 @@ separate syntactic validation from scheme-specific HTTP policy and define normal
 escaping and original-text preservation explicitly. Avoid imposing a typed value on
 all string-taking APIs; choose overloads from real cases, as with Path. Primary sources
 reviewed 2026-09-24. The current limited HTTP URL parser is not a general Uri contract.
+
+## Pending transfer deadline — 2026-09-24
+
+The next bounded HTTP lifetime slice puts a five-second monotonic deadline on each
+nonempty native Send/Receive admission. The owner checks expiry before another native
+I/O attempt. A committed result survives later delivery, cancellation or Close;
+unobserved readiness at the deadline loses to TimedOut. Zero-length transfers retain
+the existing successful-zero rule and do no native I/O. Accept still waits without
+an operation deadline. These fixed bounds are provisional development policy, not a
+new configurable public timeout contract.
+
+Expiry settles just that transfer, releases its owned buffer and receive destination
+root, and preserves the connection. Its callback/result still occupy the operation
+slot until delivery/consumption. Native calls only happen on the owner and never stay
+in flight, so an expired receive cannot later write into guest memory; an expired
+send has not written a prefix. An already completed short send is a success, not a
+later timeout. Another operation can use the connection. The HTTP adapters already
+close their owned connection on a transfer Result error, so stalled headers/body
+now unwind without adding timer callbacks to managed generated states.
+
+This is not an overall request deadline or a minimum transfer-rate policy: each new
+transfer gets another five seconds. A trickling peer, application response callback,
+DNS plus connect, or an unpumped guest queue can still exceed five seconds. The owner
+must continue scheduling to observe expiry; no preemptive execution is claimed.
+This changes development Socket behavior: a previously indefinitely pending positive
+transfer can now return TimedOut, even if an application legitimately needed longer.
+The cost of the simple POC policy is that callers cannot yet choose that tradeoff.
+
+### Comparison and alternatives
+
+Primary contracts reviewed 2026-09-24:
+
+- .NET 10 [Socket.ReceiveTimeout](https://learn.microsoft.com/en-us/dotnet/api/system.net.sockets.socket.receivetimeout?view=net-10.0)
+  configures synchronous Receive only. It is not an async cancellation contract.
+  [ReceiveAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.sockets.socket.receiveasync?view=net-10.0)
+  offers cancellation-token overloads. neoCLR's fixed owner deadline is deliberately
+  less configurable; it avoids prematurely exposing a replacement cancellation model.
+- Rust [TcpStream](https://doc.rust-lang.org/std/net/struct.TcpStream.html#method.set_read_timeout)
+  supplies native read/write timeout options, with platform-dependent timeout errors.
+  The neoCLR backend uses nonblocking attempts and an owner-observed clock, so native
+  blocking options would not supply the selected operation lifecycle. No extra thread
+  or runtime instruction is needed.
+- The existing [HTTP comparison](http-client-design.md) uses .NET cancellation across
+  headers and body. A single request budget is stronger than these per-transfer
+  bounds. The transfer policy must not be described as matching HttpClient.Timeout.
+
+An application timer racing Task completion was considered but would need to stop
+its losing operation, retain roots safely and prevent late buffer writes anyway.
+Settling at the existing operation owner keeps those guarantees together and remains
+usable by future runtime suspension. A public duration/token overload and a shared
+absolute HTTP deadline are later alternatives, not rejected designs. Existing native
+ownership research is reused; this slice adds no new general scheduling abstraction.
+
+### Validation
+
+Deterministic owner-clock tests cover expiry equality, no renewal on polling,
+readiness losing to expiry, committed completion/close/cancellation, empty sends,
+connection reuse, no guest buffer writes or peer sends after timeout, release of
+buffer/root reservations and one-shot delivery/result consumption. Existing socket
+backpressure, listener, fallback and GC tests remain in the targeted native suite.
+Controlled HTTP peers hold response headers/body or a partial request open; the
+existing managed adapters must finish with an error, close the peer connection and
+reclaim their managed objects under a 256-object heap. Watchdogs only guard the tests.
+
+The next lifetime slice should carry one absolute request budget through resolver,
+connect and repeated transfers. It must define owner cancellation, a stalled handler,
+and whether accept waiting belongs to an individual request before exposing public
+HttpClient timeout/cancellation properties. This slice does not settle those APIs.
+
+Local validation: all 28 native socket tests pass. The .NET baseline and Raven
+fragmented-success, stalled-response-head and stalled-response-body cases pass; the
+Raven server also closes a stalled partial request. All four Raven executions collect
+and end with zero live managed objects. The API snapshot and combined 967-page site
+validate, and all 17 website tests pass. No cross-platform matrix was rerun: deadline
+selection is shared owner logic and no platform-specific socket adapter changed.

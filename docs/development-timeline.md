@@ -6648,3 +6648,21 @@ configuration/content, not target-specific code added to Raven main.
   tested async consumer and a downloadable sample. No compiler changes or release.
 - **Next gate:** bounded HTTP request/transfer lifetime, then use this concrete consumer
   to evaluate public JSON contracts. The full web-application milestone remains open.
+
+### 2026-09-24 — First HTTP lifetime checkpoint
+
+- **Context:** after the client/server and JSON application cases, the roadmap selects
+  request/transfer lifetime; the author asks to continue.
+- **Assistant choice:** adds a provisional five-second bound at the existing native
+  Send/Receive owner, matching the style of the earlier fixed connect budget. This is
+  an implementation choice for the demo, not an author-selected general timeout API.
+- **Behavior:** expiry commits SocketError.TimedOut, releases transfer storage and
+  preserves the socket. Existing HTTP adapters close their owned connection on an
+  error. No managed timer race, public Scheduler or new compiler contract is added.
+- **Evidence:** [design and comparisons](socket-api-design.md#pending-transfer-deadline--2026-09-24)
+  record .NET async cancellation versus synchronous socket timeouts and Rust's native
+  options. Deterministic owner-clock checks and stalled HTTP peers exercise cleanup.
+- **Open:** configurable budgets, one total request deadline, cancellation of accept
+  and application handler work. This changes previously unbounded development
+  transfers and can reject legitimately slow peers; repeated short progress can
+  still exceed the per-transfer bound in aggregate.

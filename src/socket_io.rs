@@ -10,6 +10,8 @@ use std::{
 
 // Provisional shared connection budget; DNS remains a separate operation.
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(5);
+// Provisional per-transfer budget; not a connection idle or whole-request timeout.
+const TRANSFER_TIMEOUT: Duration = Duration::from_secs(5);
 const ADDRESS_TIMEOUT: Duration = Duration::from_secs(1);
 const MAX_ADDRESSES: usize = 16;
 
@@ -128,6 +130,7 @@ impl Default for Budget {
     }
 }
 struct Transfer {
+    deadline: Instant,
     sending: bool,
     socket: SocketId,
     destination: Option<Value>,
@@ -564,6 +567,7 @@ impl Sockets {
         self.operations.insert(
             id,
             Transfer {
+                deadline: Instant::now() + TRANSFER_TIMEOUT,
                 sending,
                 socket,
                 destination: if sending { None } else { Some(destination) },
@@ -699,7 +703,9 @@ impl Sockets {
                     }));
                     return Ok(op.callback.take());
                 }
-                if !op.remaining.is_empty() && op.attempt_deadline.is_some_and(|deadline| now >= deadline) {
+                if !op.remaining.is_empty()
+                    && op.attempt_deadline.is_some_and(|deadline| now >= deadline)
+                {
                     Self::start_next_address(op, &mut self.sockets, now);
                     if op.outcome.is_some() {
                         return Ok(op.callback.take());
@@ -742,11 +748,26 @@ impl Sockets {
         Ok(None)
     }
     fn poll_transfer(&mut self, heap: &ManagedHeap) -> Result<Option<Value>, Fault> {
+        self.poll_transfer_at(heap, Instant::now())
+    }
+    fn poll_transfer_at(
+        &mut self,
+        heap: &ManagedHeap,
+        now: Instant,
+    ) -> Result<Option<Value>, Fault> {
         for op in self.operations.values_mut() {
             if op.callback.is_none() {
                 continue;
             }
             if op.outcome.is_none() {
+                // Expiry wins over readiness not yet observed by the owner. No
+                // native I/O is in flight elsewhere, so no bytes can arrive late
+                // into guest storage after this operation has settled. Empty
+                // transfers perform no I/O and retain their successful-zero rule.
+                if !op.buffer.is_empty() && now >= op.deadline {
+                    Self::settle(op, &mut self.reserved, Err(Error::TimedOut));
+                    return Ok(op.callback.take());
+                }
                 let socket = self
                     .sockets
                     .get_mut(&op.socket)
@@ -845,6 +866,121 @@ mod tests {
         while sockets.poll(heap).unwrap().is_none() {
             assert!(Instant::now() < deadline, "receive watchdog");
             std::thread::sleep(Duration::from_millis(1));
+        }
+    }
+
+    #[test]
+    fn transfer_expiry_releases_storage_without_transferring_or_closing_socket() {
+        for sending in [false, true] {
+            let (mut peer, stream) = pair();
+            let mut sockets = Sockets::default();
+            let socket = sockets.adopt(stream).unwrap();
+            let mut heap = ManagedHeap::default();
+            let buffer = array(&mut heap);
+            let id = sockets
+                .transfer(sending, socket, &heap, buffer.clone(), 0, 4, callback())
+                .unwrap();
+            let deadline = sockets.operations[&id].deadline;
+            // Even ready bytes must not beat expiry at the owner observation point.
+            peer.write_all(b"H").unwrap();
+            assert_eq!(sockets.reserved, 4);
+            assert!(sockets.poll_transfer_at(&heap, deadline).unwrap().is_some());
+            assert_eq!(sockets.reserved, 0);
+            assert!(sockets.operations[&id].destination.is_none());
+            assert!(!sockets.cancel(id).unwrap());
+            assert!(sockets.poll_transfer_at(&heap, deadline).unwrap().is_none());
+            assert_eq!(sockets.take_result(id), Ok(Some(Err(Error::TimedOut))));
+            assert_eq!(sockets.take_result(id), Err(Error::UnknownOperation));
+            assert_eq!(bytes(&heap, &buffer), vec![Value::Byte(9); 4]);
+            peer.set_nonblocking(true).unwrap();
+            assert_eq!(
+                peer.read(&mut [0]).unwrap_err().kind(),
+                io::ErrorKind::WouldBlock
+            );
+            let next = sockets
+                .receive(socket, &heap, buffer.clone(), 1, 1, callback())
+                .unwrap();
+            deliver(&mut sockets, &heap);
+            assert_eq!(sockets.take_result(next), Ok(Some(Ok(1))));
+            assert_eq!(bytes(&heap, &buffer)[1], Value::Byte(b'H'));
+            let mut roots = vec![];
+            sockets.trace_roots(&mut roots);
+            assert!(roots.is_empty(), "completed transfers release guest roots");
+        }
+    }
+
+    #[test]
+    fn pending_transfer_expires_at_boundary_and_does_not_renew_while_polled() {
+        let (_peer, stream) = pair();
+        let mut sockets = Sockets::default();
+        sockets.budget.operations = 1;
+        let socket = sockets.adopt(stream).unwrap();
+        let mut heap = ManagedHeap::default();
+        let buffer = array(&mut heap);
+        let id = sockets
+            .receive(socket, &heap, buffer.clone(), 0, 1, callback())
+            .unwrap();
+        let deadline = sockets.operations[&id].deadline;
+        assert!(
+            sockets
+                .poll_transfer_at(&heap, deadline - Duration::from_nanos(1))
+                .unwrap()
+                .is_none()
+        );
+        assert_eq!(sockets.operations[&id].deadline, deadline);
+        assert!(sockets.poll_transfer_at(&heap, deadline).unwrap().is_some());
+        assert_eq!(
+            sockets.send(socket, &heap, buffer.clone(), 0, 1, callback()),
+            Err(Error::Limit)
+        );
+        assert_eq!(sockets.take_result(id), Ok(Some(Err(Error::TimedOut))));
+        let next = sockets
+            .send(socket, &heap, buffer, 0, 1, callback())
+            .unwrap();
+        deliver(&mut sockets, &heap);
+        assert_eq!(sockets.take_result(next), Ok(Some(Ok(1))));
+    }
+
+    #[test]
+    fn committed_outcomes_and_empty_transfers_survive_late_poll() {
+        for mode in 0..4 {
+            let (_peer, stream) = pair();
+            let mut sockets = Sockets::default();
+            let socket = sockets.adopt(stream).unwrap();
+            let mut heap = ManagedHeap::default();
+            let buffer = array(&mut heap);
+            let id = sockets
+                .send(
+                    socket,
+                    &heap,
+                    buffer,
+                    0,
+                    if mode == 3 { 0 } else { 1 },
+                    callback(),
+                )
+                .unwrap();
+            let deadline = sockets.operations[&id].deadline;
+            let expected = match mode {
+                0 => {
+                    sockets.cancel(id).unwrap();
+                    Err(Error::Cancelled)
+                }
+                1 => {
+                    sockets.close(socket);
+                    Err(Error::Closed)
+                }
+                2 => {
+                    deliver(&mut sockets, &heap);
+                    Ok(1)
+                }
+                _ => Ok(0),
+            };
+            let delivered = sockets
+                .poll_transfer_at(&heap, deadline + Duration::from_secs(1))
+                .unwrap();
+            assert_eq!(delivered.is_some(), mode != 2);
+            assert_eq!(sockets.take_result(id), Ok(Some(expected)));
+            assert_eq!(sockets.reserved, 0);
         }
     }
 

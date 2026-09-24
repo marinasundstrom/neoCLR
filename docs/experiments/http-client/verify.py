@@ -15,6 +15,7 @@ import time
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--toolchain-root', type=Path, required=True)
 parser.add_argument('--runner', type=Path, required=True)
+parser.add_argument('--case', action='append', help='Select named Raven cases; the .NET baseline still runs')
 args = parser.parse_args()
 here = Path(__file__).resolve().parent
 bundle = args.toolchain_root.resolve()
@@ -84,6 +85,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-client-') as folder, socket
     command = [str(args.runner.resolve()), str(root / 'bin/neoclr/Debug/App.neoil'), str(bundle / 'lib/System.neoil'), '256', '10000000']
     prefix = 'Handler checks passed\nOther work runs while HTTP is pending\n'
     cases = [
+        ('stalled headers', [], False, 'HTTP error: Response receive failed\n'),
+        ('stalled body', [head, body[:1]], False, 'HTTP error: Response receive failed\n'),
         ('fragmented UTF-8', fragments, False, 'HTTP 200\nCafé 🌍\n'),
         ('truncated body', [head, body[:-1]], True, 'HTTP error: EOF before complete response\n'),
         ('ambiguous framing', [b'HTTP/1.1 200 OK\r\nContent-Length: 0\r\ncontent-length: 1\r\n\r\n'], False, 'HTTP error: Duplicate Content-Length\n'),
@@ -106,12 +109,17 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-client-') as folder, socket
         ('invalid UTF-8', [b'HTTP/1.1 200 OK\r\nContent-Length: 1\r\n\r\n' + bytes([255])], False, 'HTTP error: Invalid UTF-8 body\n'),
     ])
     for name, parts, truncate, expected in cases:
+        if args.case and name not in args.case:
+            continue
         run = exchange(command, parts, truncate, allow_reset=expected.startswith('HTTP error:'))
         assert run.stdout == prefix + expected, run.stdout
         stats = {key: int(value) for key, value in re.findall(r'(\w+)=(\d+)', run.stderr)}
         assert stats['live'] == 0 and stats['collections'] > 1, stats
         print(name + ': ' + expected.strip(), flush=True)
         print('GC:', stats, flush=True)
+
+    if args.case and 'independent server' not in args.case:
+        raise SystemExit(0)
 
     class IndependentHandler(http.server.BaseHTTPRequestHandler):
         protocol_version = 'HTTP/1.1'

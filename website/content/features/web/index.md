@@ -93,8 +93,11 @@ fields, and bodies to 1,024 bytes. It rejects duplicate lengths, transfer encodi
 and content encodings. It does not implement chunking, TLS, redirects, pooling,
 streaming content or general HTTP status handling. Text always means strict UTF-8.
 
-DNS and connection attempts have separate bounds. Transfers and the overall HTTP
-request do not yet have a deadline; the verifier's watchdog is only a test guard.
+DNS and connection attempts have separate bounds. Each nonempty socket transfer
+now has a five-second deadline; HTTP closes its connection when a transfer fails.
+A silent peer therefore ends with an error, but a trickling peer can keep completing
+short transfers. There is no whole-request deadline, accept deadline or bound on an
+application handler task yet. The verifier's watchdog is only a test guard.
 The transport uses a 256-byte reusable buffer and handles short transfers. This
 is a correctness POC, not a performance benchmark. Generated async states still perform suspension.
 

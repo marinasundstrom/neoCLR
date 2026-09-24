@@ -43,3 +43,8 @@ runtime Faults retain existing Task/runtime behavior.
 
 See ../../http-server-design.md for .NET comparisons and tradeoffs, and the on-site
 Web guide and API reference for browsable public contracts.
+
+The native transfer deadline now also covers a peer that connects but leaves request
+headers incomplete. Select `--requests-only --case 'stalled request'` for this case.
+It must close the accepted connection and finish with the existing receive error,
+without depending on peer EOF. Accept and handler waiting still have no deadline.

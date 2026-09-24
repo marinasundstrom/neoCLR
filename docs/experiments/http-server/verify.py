@@ -95,7 +95,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-server-') as folder:
     if not args.responses_only:
         serve('neoCLR HttpClient', raven_client)
 
-    def raw(request, valid=False, fragment=False):
+    def raw(request, valid=False, fragment=False, stall=False):
         def send(port):
             wire = request.replace(b'{port}', str(port).encode())
             with socket.create_connection(('127.0.0.1', port), timeout=10) as peer:
@@ -106,7 +106,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-server-') as folder:
                         time.sleep(0.002)
                 else:
                     peer.sendall(wire)
-                peer.shutdown(socket.SHUT_WR)
+                if not stall:
+                    peer.shutdown(socket.SHUT_WR)
                 response = bytearray()
                 try:
                     while True:
@@ -128,6 +129,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-server-') as folder:
 
     if not args.responses_only:
         serve('fragmented request', raw(b'GET /greeting HTTP/1.1\r\nhOsT:\tlocalhost:{port} \t\r\nContent-Length: 0\r\n\r\n', valid=True, fragment=True))
+    if not args.responses_only:
+        serve('stalled request', raw(b'GET /greeting HTTP/1.1\r\nHost: local', stall=True), 'Server error: Request receive failed')
     cases = [
         ('Host with path', b'GET /greeting HTTP/1.1\r\nHost: localhost/path\r\n\r\n', 'Invalid Host authority'),
         ('missing Host', b'GET /greeting HTTP/1.1\r\n\r\n', 'Host required'),

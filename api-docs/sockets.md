@@ -73,12 +73,21 @@ the native socket and returns TimedOut. Already committed success or failure sur
 later delivery. The timeout releases socket capacity immediately; the outcome retains
 its operation slot until consumed. This bounds native waiting, not arbitrary guest
 work or callback delivery: the owner must continue scheduling. Host invocation
-cancellation remains available. Accept, Send and Receive have no operation deadline.
+cancellation remains available. Accept has no operation deadline.
 The timeout is not configurable and does not cover DNS lookup. The sequence overload
 shares it across all connection attempts. While alternatives remain, a pending attempt
 gets at most one second; the final address gets the remaining time. Failed attempts
 release their native socket before trying another. If all fail, the last error is
 returned. Overall expiry returns TimedOut. A committed success ends the search.
+
+Each nonempty Send/Receive now has its own provisional five-second deadline from
+native admission. Expiry is checked before the next I/O attempt and returns TimedOut.
+It releases transfer storage and the receive destination root, without closing the
+connection. No bytes are transferred by the expired operation. Already committed
+results remain unchanged, and empty transfers still return zero. These bounds can
+reject legitimately slow peers and are not yet configurable. The caller can start a
+new operation or close the connection; HTTP closes its owned connection on this error.
+Repeated short transfers get fresh bounds, so this is not a whole-request deadline.
 
 The sequence must remain stable while Connect reads Count and its indexed values.
 It is snapshotted before Connect returns; later mutation is safe. All entries are

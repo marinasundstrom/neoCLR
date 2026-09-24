@@ -97,3 +97,12 @@ Every neoCLR run has multiple collections and zero live managed objects afterwar
 The fragmented success allocates 359 objects with eight collections; Python HTTP server
 success allocates 379 with eight. These are fixture observations, not throughput or
 cross-platform claims. The compiler has no code changes in this slice.
+
+### Stalled transfer checks — 2026-09-24
+
+The current native backend bounds each nonempty Send/Receive to five seconds. Run
+`verify.py` with repeated `--case` arguments to select `stalled headers`, `stalled body`
+and `fragmented UTF-8`; the .NET baseline still runs. A peer keeps its write side open,
+so timeout must reach the managed error/Close path without EOF. The verifier checks
+zero final live objects. This is not a whole-request deadline; short progress can
+restart the per-transfer budget. Full runs now include these two extra cases.

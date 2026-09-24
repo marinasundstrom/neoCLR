@@ -80,7 +80,10 @@ bounded result sizes. A timed-out native lookup may continue until the host retu
 retaining its capacity slot. The VM remains able to dispatch other work.
 
 A pending TCP connect has a five-second deadline and releases its native socket on
-timeout. Delivery still requires scheduler progress. There is no public operation
+timeout. Each nonempty Send/Receive also has a separate five-second deadline.
+Transfer timeout releases its buffers and returns TimedOut while leaving the socket
+open. This bounds a stalled operation, not a full exchange; the limits are provisional
+and cannot yet be configured. Delivery still requires scheduler progress. There is no public operation
 cancellation or a shared DNS/connection deadline. The example
 controls its host and uses a verifier watchdog.
 Socket completion uses nonblocking polling; host lookup runs on bounded host threads.
