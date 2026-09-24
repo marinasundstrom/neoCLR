@@ -503,3 +503,15 @@ Before a consumer requires these guarantees, use executable cases to settle:
 
 These questions guide the next need-driven slice. They do not require exposing
 TaskQueue, Scheduler or a thread to every Storage caller.
+
+
+### Runtime scheduling follow-up — 2026-09-24
+
+The author revisited runtime async during socket integration. The
+[runtime scheduling design](runtime-scheduling-design.md) recommends a private
+invocation scheduler before extending the public socket bridge. TaskQueue remains
+an adapter for existing behavior; neither a public Scheduler class nor permanent
+producer-queue affinity is selected. Operation completion must make work runnable
+independently of whether it is represented by today's generated callback or a future
+runtime-owned frame. The affinity behavior recorded above remains implemented until
+an explicit migration slice changes and validates it.

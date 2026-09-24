@@ -25,6 +25,26 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-24 — Runtime async and the scheduler boundary
+
+- **Author:** “Continue. Do you take the direction with runtime async into account?
+  And whether we need a scheduler concept instead of just task queues.”
+- **Assistant:** acknowledged that generated state machines and TaskQueue are
+  transitional. Reviewed the existing producer-queue affinity behavior and the
+  latest TCP VM adapter; the adapter proves progress/rooting, not a scheduler model.
+  Recommended an internal invocation scheduler with a compatibility queue adapter,
+  keeping completion sources independent of callback versus future suspended-frame
+  representation. A public Scheduler API is not selected by this recommendation.
+- **Actions:** recorded responsibilities, .NET comparisons, tradeoffs, GC/lifetime
+  invariants, portable wakeup requirements and a staged migration in the
+  [runtime scheduling design](runtime-scheduling-design.md). Updated the roadmap to
+  make that boundary the next checkpoint within socket work, and explained the
+  distinction and current affinity limitation on the Tasks feature page.
+- **Open:** implement and validate the internal boundary, select affinity migration,
+  add reusable sockets/Task results and later runtime-owned suspension. These are
+  plans; this conversation does not approve every proposed scheduler rule or establish
+  that runtime suspension or a public scheduler has been implemented.
+
 ## 2026-09-24 — Socket APIs towards a web application
 
 - **Author:** “Our first goal is the socket api - as per proposal. Keep the proposal

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Plan an internal scheduling boundary before public socket integration, preserving
+  runtime-owned async as the direction and TaskQueue as transitional machinery.
+  Record completion/continuation ownership, wakeup and affinity requirements with
+  .NET comparisons; update roadmap and Tasks documentation. No scheduler or runtime
+  suspension API is added in this design checkpoint.
+
 - Check pending socket-receive ownership with real loopback TCP in an isolated
   six-case probe: exact range delivery, retained destinations, terminal ordering,
   admission quotas and teardown. Guest Socket/Task integration remains pending.

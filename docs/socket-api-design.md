@@ -89,11 +89,18 @@ GC roots. Direct native writes to guest memory remain unselected.
 
 ## Next implementation checkpoint
 
+First establish the [internal scheduling boundary](runtime-scheduling-design.md),
+following the author's runtime-async question. Existing queue behavior is a transitional
+adapter; transport completion must not require a particular generated continuation.
+The current TCP/GC/VM probes validate parts of that ownership boundary, not a portable
+scheduler. Keep full runtime frame suspension separate from this first bridge.
+
 1. Add the smallest Raven-facing addressing, Socket and error contracts needed by
    echo; implement matching runtime services and checked artifact metadata. Refresh
    the API reference from the matching bridge in the same change.
 2. Integrate pending accept/connect/read/write with invocation-owned completion and
-   the default TaskQueue. Empty-queue wakeup and unrelated ready work must progress.
+   the internal scheduler through the transitional queue adapter. Empty-queue wakeup
+   and unrelated ready work must progress.
    Bound open sockets, admitted connections, operations and retained payload bytes.
 3. Run Raven echo under forced GC with exact buffer ranges and native-owned payloads.
    Add direct-IL invalid-range/handle tests, completion/cancellation orderings,

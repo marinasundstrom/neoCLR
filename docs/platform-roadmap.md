@@ -45,6 +45,21 @@ checks plus a .NET comparison baseline. It is not a guest Socket API: Task deliv
 GC roots, operation cancellation and the runnable Raven/neoCLR echo remain open.
 Continue with that bridge, then TCP streams and HTTP. S4 has started, not completed.
 
+## Scheduling checkpoint before the public socket bridge — 2026-09-24
+
+The author asks that socket work account for runtime-owned async and reevaluate
+scheduling beyond TaskQueue. The [runtime scheduling design](runtime-scheduling-design.md)
+selects an internal scheduling boundary as the next implementation checkpoint:
+operation completion, ready-work arbitration, durable wakeup, continuation destination
+and GC ownership must not depend on generated state-machine callbacks. TaskQueue is
+transitional compatibility machinery; no public Scheduler class or full suspension
+implementation is selected. This refines the socket path rather than replacing it.
+
+First extract that boundary while preserving current queue behavior, then settle
+continuation affinity explicitly, then attach reusable sockets and Task/Result
+completion for Raven echo. Current TCP/GC/VM probes remain evidence; they do not
+establish a portable scheduler or runtime-owned suspension.
+
 ## Authority and use
 
 **This roadmap is authoritative for our work unless the author explicitly directs
@@ -781,12 +796,13 @@ No later major milestone has started.
 
 ## Working rules and immediate next step
 
-**Active next step, 2026-09-24:** implement the Raven/neoCLR socket bridge described
-in the [socket design](socket-api-design.md#next-implementation-checkpoint), following
-the networking proposal. The host transport probe is the first checked slice;
-it does not establish guest async completion or close the TCP echo milestone.
-Earlier foundation checkpoints below are retained as dated evidence, not a competing
-instruction to postpone sockets.
+**Active next step, 2026-09-24:** extract the internal scheduling boundary described
+in [runtime scheduling](runtime-scheduling-design.md#next-implementation-slices),
+then continue the Raven/neoCLR socket bridge. Preserve generated-async compatibility
+while separating operation completion from the runnable representation. Require one
+source-arbitration policy, no lost wakeups and explicit continuation ownership before
+public socket integration; full runtime suspension is not a prerequisite for TCP echo.
+Earlier foundation checkpoints below are dated evidence, not competing priorities.
 
 Each selected slice should leave a checked sample, expected output, a matching build/run
 path, failure cases and a short decision record. Record the .NET baseline, alternatives,

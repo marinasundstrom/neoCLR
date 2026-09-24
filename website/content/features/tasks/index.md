@@ -128,7 +128,21 @@ A [development sample](../../docs/pending-read.html) separates a cancellation re
 
 Both platforms expose awaitable completion. neoCLR uses Promise for producer completion and Result values for expected errors; Task has no faulted outcome. This differs from .NET Task’s exception-based fault state and requires different library and compiler contracts.
 
-Raven currently emits state machines. Runtime suspension is a longer-term direction, but it is not required for the next sample. TaskQueue is provisional scaffolding: we will adapt the model when concrete requirements arise, including runtime suspension. No public Scheduler API or TaskQueue replacement has been selected. The immediate questions are completion progress, continuation ownership, cancellation and cleanup.
+Raven currently emits state machines. Runtime-owned suspension is the intended
+longer-term direction. Task describes eventual completion; scheduling determines
+when and where runnable work executes. TaskQueue currently stores and dispatches
+callbacks, but it is transitional scaffolding rather than the full scheduling model.
+
+The next internal design separates ready work, pending I/O, wakeups and continuation
+ownership. It should support current generated continuations and later runtime-owned
+suspended executions. This is planned work, not an implemented scheduler or suspension
+feature, and no public Scheduler API has been selected. Full runtime suspension is
+not required before the first socket application.
+
+Continuation affinity also needs refinement: a pending await currently resumes through
+the awaited Task’s producer queue. That behavior is not a permanent affinity guarantee.
+The proposed initial resumption target is the owning invocation; custom queues and
+future UI or worker contexts need explicit behavior and migration checks.
 
 Development: the importer now supports opt-in value-type state machines for non-generic methods using Task awaiters. Startup runs in place; pending awaits reuse one retained state. Ready, pending and cancelled cases are checked under garbage collection pressure, including unit and Result payloads. Ready completion saves one managed state object in the focused comparison; pending cases have allocation parity. Heap states remain the default while broader cases and costs are evaluated.
 
