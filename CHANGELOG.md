@@ -16,10 +16,20 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   equality, hashing, display and deconstruction. Add a checked sample covering
   ordinary struct copies, box independence, default fields and string/reference
   components. Update the API reference, website, research and roadmap. General
-  ValueType fallback equality, generic/nested-struct record components, nullable
+  ValueType fallback equality, generic record components, nullable
   boxing and address-returning unbox remain unsupported. Validation: 55 compiler tests,
   47 focused runtime tests, 26 .NET baseline assertions, the compiled Raven sample,
   385 API items and the combined website. No VS Code build or release.
+
+  Extend record components to same-compilation non-generic record structs, in both
+  record classes and structs. Use typed value equality/hash without reference null
+  guards and admit exact struct writes to declared instance output parameters for
+  deconstruction. Add a separate Point/Rectangle/Drawing sample covering nested
+  defaults, copy independence, equality, hashes and display. Keep the importer method
+  limit unchanged and include both sample projects in the website download. Nullable
+  struct components and arbitrary byref stores remain unsupported. Validation:
+  58 focused compiler tests, both target samples, 28 pinned .NET assertions and
+  combined website/API documentation checks.
 
 - Implement bounded virtual Object equality/hash for boxed Int32: compare exact
   type and integer value, and return the stored integer hash. Preserve separate-box

@@ -732,8 +732,10 @@ representations and boxed-value equality remain prerequisites to broad record su
 boxed Int32 equality/hash now has a bounded intrinsic and sample. Named value-type Object overrides, exact copied unboxing and the first Raven record-struct
 slice now have [checked evidence](object-model-review.md#struct-object-slots-and-record-structs--2026-09-24).
 The author-directed struct/record-struct gate is complete for non-generic types with
-the documented component contract. Other primitive Object implementations, generic/nested
-struct components and nullable-value/default-reference semantics remain follow-ups. Value retirement remains a separate storage migration.
+the documented component contract. Nested same-compilation record structs now compose in both record classes and structs,
+with a checked Point/Rectangle sample and value-output deconstruction. Other primitive
+Object implementations, generic struct components and nullable-value/default-reference
+semantics remain follow-ups. Value retirement remains a separate storage migration.
 This is a bounded foundation review; networking remains later. Console ownership,
 cleanup on propagated errors and buffering remain follow-up questions, not selected
 redesigns. The scheduling/operation-cancellation work below remains open.

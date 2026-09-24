@@ -14,10 +14,10 @@ HashCode value copies. Numeric hashes are not unique IDs or persistent identifie
 
 The opt-in RuntimeRecordContract supports non-generic record classes with Object as
 their direct base, and record structs. Components can be Int32, non-null String, or another supported
-record class declared in the same compilation. Strings compare by contents without
+record class or record struct declared in the same compilation. Strings compare by contents without
 normalization; nested records use typed Equals and GetHashCode. This is recursive
 component comparison, not general graph/collection equality or implicit boxing.
-Nullable string/value components, externally compiled record components, nested struct components and
+Nullable string/value components, externally compiled record components and
 generic/inherited records remain outside this slice (RAVT004).
 
 The importer recognizes init-only property metadata, checks readonly-field writes,
@@ -40,4 +40,12 @@ other-type rejection, matching hashes, virtual display and deconstruction.
 Default Coordinate has zero integers; default OwnedCoordinate has a null record
 reference. NamedCoordinate checks constructed string components. Struct reference
 fields copy references, not the referenced objects. Non-null reference defaults,
-nullable value boxing and generic/nested struct components are not established here.
+nullable value boxing and generic struct components are not established here.
+
+
+`Nested.rvnproj` is a separate small program with Point, Rectangle and Drawing.
+It checks nested struct defaults, typed/Object/interface equality, hashing, display,
+and independent construction/deconstruction copies. Point deliberately has mutable
+properties so the copying behavior is observable. Both projects are included in the
+website download and run by verify.py. Keeping them separate also stays within the
+importer's existing per-application method limit. No limit has been raised.

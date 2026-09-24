@@ -259,7 +259,7 @@ def main():
     shutil.rmtree(object_sources.parent)
     record_sources = OUTPUT / '_records-source' / 'records'
     record_sources.mkdir(parents=True)
-    for name in ('Main.rvn', 'Records.rvnproj', 'expected.txt', 'verify.py', 'README.md'):
+    for name in ('Main.rvn', 'Records.rvnproj', 'expected.txt', 'Nested.rvn', 'Nested.rvnproj', 'nested-expected.txt', 'verify.py', 'README.md'):
         shutil.copyfile(ROOT / 'docs/experiments/records' / name, record_sources / name)
     shutil.make_archive(str(downloads / 'records'), 'zip', record_sources.parent)
     shutil.rmtree(record_sources.parent)

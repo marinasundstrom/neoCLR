@@ -1,0 +1,1 @@
+Rectangle { Start = Point { X = 1, Y = 2 }, End = Point { X = 3, Y = 4 } }

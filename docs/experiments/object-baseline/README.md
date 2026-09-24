@@ -45,3 +45,8 @@ The struct follow-up adds four assertions (26 total), covering record-struct cop
 and box independence, exact-type Object equality, interface equality, hashes and
 zero default fields. All pass on SDK 10.0.100/.NET 10.0.0. neoCLR's checked records
 sample now provides corresponding target execution evidence for the bounded contract.
+
+
+The nested-struct follow-up adds two assertions (28 total): Rectangle construction
+and deconstruction copy Coordinate components; boxed/interface equality, hashes and
+nested display agree. SDK/runtime pins are unchanged.

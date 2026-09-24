@@ -173,8 +173,8 @@ integers to zero. The sample also checks constructed non-null strings and nullab
 record-class fields, including default absent references.
 
 The configured contract admits the same component types for record structs as for
-record classes: Int32, non-null String and supported same-compilation record-class
-references. Nested struct components, nullable values/strings, generic records and
+record classes: Int32, non-null String, supported same-compilation record structs and record-class
+references. Nullable values/strings, generic records and
 external record components remain outside this first implementation. Default values
 with non-null reference fields need separate representation review; the sample does
 not claim .NET null-string default semantics.
@@ -183,3 +183,21 @@ At the instruction layer, value `isinst` preserves a matching box or returns nul
 `unbox.any` copies an exact value payload. Null unboxing faults with NullReference,
 and a different concrete type faults with InvalidCast. Reference-type unbox.any,
 nullable boxing and address-returning unbox remain unsupported.
+
+
+### Nested record structs
+
+The record sample also includes a separate `Nested.rvnproj`:
+
+```raven
+record class Drawing(Bounds: Rectangle)
+record struct Rectangle(Start: Point, End: Point)
+record struct Point(var X: int, var Y: int)
+```
+
+Rectangle compares Point components with typed equality and combines their hashes.
+Display includes each Point's display text. Construction and deconstruction copy
+Point values: changing the original point or a deconstructed copy does not modify
+the rectangle. Drawing demonstrates a record class containing a record struct.
+Default Rectangle initializes its nested integer fields to zero. Nullable struct
+components and externally compiled component records remain unsupported.

@@ -71,6 +71,18 @@ Check(boxedPoint.Equals(copiedPoint) && !boxedPoint.Equals(new Coordinate(7, 42)
 Check(boxedPoint.GetHashCode() == copiedPoint.GetHashCode()
     && ((IEquatable<Coordinate>)boxedPoint).Equals(copiedPoint), "Boxed record struct hash and interface equality agree");
 Check(default(Coordinate) == new Coordinate(0, 0), "Record struct default initializes value fields");
+var corner = new Coordinate(1, 2);
+var bounds = new Rectangle(corner, new Coordinate(3, 4));
+var equalBounds = new Rectangle(new Coordinate(1, 2), new Coordinate(3, 4));
+corner.X = 99;
+var (start, end) = bounds;
+start.X = 77;
+Check(bounds == equalBounds && bounds.Start.X == 1 && end.Y == 4,
+    "Nested record structs copy constructor and deconstruction values");
+Check(((object)bounds).Equals(equalBounds) && ((IEquatable<Rectangle>)bounds).Equals(equalBounds)
+    && bounds.GetHashCode() == equalBounds.GetHashCode()
+    && bounds.ToString() == "Rectangle { Start = Coordinate { X = 1, Y = 2 }, End = Coordinate { X = 3, Y = 4 } }",
+    "Nested record struct equality, hash and display use component semantics");
 Console.WriteLine($"Runtime: {System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}");
 
 sealed class Cell { public int Number; }
@@ -86,3 +98,5 @@ sealed class Key(int number)
 sealed record KeyRecord(int Number);
 
 record struct Coordinate(int X, int Y);
+
+record struct Rectangle(Coordinate Start, Coordinate End);

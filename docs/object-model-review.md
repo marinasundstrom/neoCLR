@@ -430,3 +430,29 @@ component gate remains Int32, non-null String and supported same-compilation rec
 classes (optionally nullable). Those are follow-up capabilities, not required to
 claim the checked first struct/record-struct implementation. System.Value retirement
 remains a separate migration.
+
+
+### Nested record-struct components — 2026-09-24
+
+The next composition slice extends the existing typed-component contract to
+same-compilation, non-generic record structs, in both record classes and structs.
+Reuse the .NET/CLI baseline above: nested assignment and deconstruction copy values;
+reference fields still retain references. The pinned .NET comparison now checks
+nested Rectangle values, boxed/interface equality, hash agreement and display.
+This is compatibility work, with no performance or deep-copy claim.
+
+Synthesis calls typed Equals/GetHashCode using an addressable value receiver; it
+adds null guards only for reference components. Existing typed display already
+supports value receivers. The importer admits exact stores into declared instance
+output parameters, enabling nested Deconstruct without permitting arbitrary byref
+stores. Alternatives—boxing each component or reflecting over fields—would add
+allocation or duplicate the component policy; neither is needed here. No runtime
+instruction, library member or RuntimeRecordContract configuration is added.
+
+Evidence: the compiler execution test covers class/struct containers, forward type
+declarations, copy independence and reflected deconstruction. `Nested.rvnproj`
+checks target Object/interface calls, recursive zero initialization, nested display
+and independent deconstruction copies. It is separate from the larger Records
+sample to remain within the unchanged importer method limit. Nullable struct
+components still report RAVT004. Syntax, semantic symbol shapes and editor grammar
+are unchanged; component properties remain ordinary typed properties.

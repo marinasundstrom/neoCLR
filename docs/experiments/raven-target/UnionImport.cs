@@ -406,9 +406,13 @@ static class UnionImport
                         var storedOutput = ProfileType((TypeReference)instruction.Operand);
                         ConvertTop(storedOutput);
                         var outputAddress = Expect(storedOutput + "&");
-                        if (libraryOwner is null || outputAddress.Argument != 1 || method.Parameters.Count != 1
-                            || !GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[0]))
-                            throw new InvalidDataException("Only checked union output stores are admitted.");
+                        var declaredOutput = method.HasThis && outputAddress.Argument > 0
+                            && outputAddress.Argument <= method.Parameters.Count
+                            && method.Parameters[outputAddress.Argument - 1].IsOut;
+                        var conditionalOutput = libraryOwner is not null && outputAddress.Argument == 1
+                            && method.Parameters.Count == 1 && GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[0]);
+                        if (!declaredOutput && !conditionalOutput)
+                            throw new InvalidDataException("Value stores require a declared instance output or checked union output.");
                         code.AppendLine("stobj " + storedOutput); break;
                     case Code.Ldind_I4:
                         Expect("Int32*"); Push(new("Int32")); code.AppendLine("ldobj Int32"); break;

@@ -172,3 +172,13 @@ SDK publication is part of this slice. Compiler changes remain on the Raven feat
 branch and are documented in its compiler runtime-contract guide and changelog.
 
 Matching Raven implementation: `9bb7cc8be` on `codex/async-preview-readiness`.
+
+
+Nested record components now also admit same-compilation non-generic record structs.
+Typed equality/hash synthesis uses value receivers without reference/null guards;
+record classes may contain these values too. Declared instance out parameters can
+receive exact struct copies, supporting generated deconstruction. Nullable struct
+components remain rejected. No new configuration or syntax is required. See
+`docs/experiments/records/Nested.rvnproj` and the Object review for validation.
+
+Matching nested-component compiler commit: `8b703083b` on the Raven feature branch.
