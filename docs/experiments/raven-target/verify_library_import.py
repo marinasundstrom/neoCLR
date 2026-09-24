@@ -163,6 +163,8 @@ func Main() {
     import_case('library-types-reversed-inputs', [derived, base], expected=instance_expected)
     hidden = compile('HiddenBase', base_source.replace('public abstract class CounterBase', 'internal abstract class CounterBase'), library=True, identity='BaseLibrary')
     import_case('hidden-library-type', [hidden, derived], False, 'Nonpublic imported type')
+    protected_ctor = compile('ProtectedConstructor', base_source.replace('public init(age:', 'protected init(age:'), library=True, identity='BaseLibrary')
+    import_case('protected-library-base-constructor', [protected_ctor, derived], expected=instance_expected)
     private_ctor = compile('PrivateConstructor', base_source.replace('public init(age:', 'private init(age:'), library=True, identity='BaseLibrary')
     import_case('private-library-base-constructor', [private_ctor, derived], False, 'Nonpublic cross-type call')
 

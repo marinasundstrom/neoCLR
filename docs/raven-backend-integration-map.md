@@ -160,3 +160,17 @@ negative exposed host fallback; the output also retains a fixture mscorlib depen
 This supplies the HelloWorld inventory left open above, without establishing a closed
 core library, target isolation or runtime execution. Existing retargeting xUnit tests
 were not run; the standalone control/fixture probe is the executed baseline.
+
+
+## Closed address hierarchy constructor checkpoint — 2026-09-25
+
+The author selects a closed IPAddress class hierarchy instead of the previously
+planned value union. An isolated neoCLR probe compiles with current Raven but
+exposed a target importer gap for protected base constructors. The bridge now admits
+a direct `call` from a derived constructor to its immediate base's protected
+constructor. Private constructors and unrelated protected calls remain excluded;
+this is not a general protected-member admission change. No Raven compiler source,
+Runtime Contract setting or emission policy changes. The address probe checks
+immutable copied data, root/Object value equality, hash agreement and GC rooting.
+Public IPAddress projection, parsing, formatting and DNS/socket integration remain
+pending. This is a target integration checkpoint, not a general Raven fix.

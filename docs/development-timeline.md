@@ -7008,3 +7008,19 @@ configuration/content, not target-specific code added to Raven main.
   keeps docs/reference snapshots synchronized and reserves broader checks for
   release stabilization or demonstrated risk. The typed-error website build had
   already completed; no further website build is required for this slice sequence.
+
+
+### 2026-09-25 — Select a closed IPAddress class hierarchy
+
+- **Author:** raises a closed hierarchy as an alternative to the earlier IPAddress
+  union, then explicitly chooses “Use a closed class hierarchy.”
+- **Assistant:** compares separate family reference types with the single value-union
+  representation; proposes immutable address data and value equality. Notes that
+  importer layout limitations should not decide the public model.
+- **Action:** updates the release roadmap, records the comparison in the
+  [address hierarchy probe](experiments/ip-address-hierarchy/README.md), and starts
+  with an executable inheritance/equality/GC check. The probe exposed a protected
+  base-constructor importer gap; a bounded direct-base allowance addresses it.
+- **Open:** public reference projection, parsing/formatting, scope identifiers,
+  DNS/socket integration and API documentation. This checkpoint does not complete
+  the address slice or imply IPv6 transport support.

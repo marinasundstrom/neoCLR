@@ -65,14 +65,17 @@ retry policy and runtime suspension are not prerequisites for this controlled PO
 **Author direction:** work toward a release containing networking and web that feels
 coherent and reasonably complete, without requiring a finished platform. HttpClient
 and cancellation tokens are explicitly included. The author subsequently adds
-IPAddress as a standard union with IPv4Address and IPv6Address cases. The additional scope below is the
+IPAddress, initially as a standard union. The author subsequently selects a closed
+class hierarchy with IPv4Address and IPv6Address implementations instead. The additional scope below is the
 assistant's recommendation for review, not approval of every proposed API or a
 release date. Continue the current typed HTTP/error/base-address integration first.
 
 **Author follow-up:** requests completion of the slices one by one. The sequence is
 1. typed HTTP errors; 2. IPAddress; 3. cancellation foundations; 4. HttpClient/base
 address; 5. methods/content/statuses; 6. framing; 7. server lifecycle; 8. application;
-9. release stabilization. Investigate HTTPS feasibility after cancellation foundations
+9. release stabilization. The [address hierarchy checkpoint](experiments/ip-address-hierarchy/README.md)
+validates reference/value semantics and protected base construction; public address
+parsing and DNS/socket integration remain open. Investigate HTTPS feasibility after cancellation foundations
 and decide its scope before the application slice. Finish validation and documentation
 for each slice before advancing; a source change alone is not completion.
 
@@ -82,7 +85,7 @@ narrow to be the whole release experience. Prefer these connected release gates:
 | Slice | Proposed release outcome and evidence |
 | --- | --- |
 | Client contract | Token-aware Send, Get/GetString and common verb helpers; optional string BaseUri with the recorded relative/absolute rules; fake and forwarding handlers use the same pipeline |
-| Address values (author-selected) | System.Networking.IPAddress using normal Raven union syntax with IPv4Address and IPv6Address cases; validated parsing, formatting and value semantics, followed by DNS/socket integration with explicit transport limits |
+| Address values (author-selected) | System.Networking.IPAddress as a closed class hierarchy with immutable IPv4Address and IPv6Address implementations; validated parsing, formatting and value semantics, followed by DNS/socket integration with explicit transport limits |
 | Requests and content | Method, resolved URI, usable case-insensitive headers, byte and UTF-8 text bodies with content type; POST round-trip, empty content and non-ASCII content tested |
 | Responses and errors | General status values, headers and content; 201/204/400/404/500 examples; typed HttpError with inspectable causes; distinguish HTTP status, transport failure, cancellation, timeout and decoding failure |
 | Cancellation and lifetime | A source/token pair usable beyond HTTP; cancel before dispatch and during pending work; configurable request deadline; deterministic connection/buffer cleanup and explicit handler ownership/reuse rules |
@@ -986,7 +989,8 @@ verb methods expect relative URLs and resolve them against that base; otherwise,
 they take absolute URIs. Keep Uri parsing internal to validation/resolution and
 retain string/Uri address overloads. Parameterless HttpClient already
 selects the socket handler. The 2026-09-25 release direction now includes an
-IPAddress union with IPv4Address/IPv6Address cases; HostEntry remains a later
+IPAddress closed class hierarchy with IPv4Address/IPv6Address implementations
+(superseding the initial union selection); HostEntry remains a later
 networking evaluation. Author-directed
 later work also includes URI/URL encoding utilities, with component-specific
 contracts evaluated separately from the current parser.

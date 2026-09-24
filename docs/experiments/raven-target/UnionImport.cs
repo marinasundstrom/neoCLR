@@ -817,7 +817,9 @@ static class UnionImport
                                 ApplicationTypes.CheckMethod(reference); ApplicationTypes.CheckMethod(targetMethod);
                                 if (reference.HasThis != targetMethod.HasThis || instruction.OpCode.Code == Code.Callvirt && targetMethod.IsStatic) throw new InvalidDataException("Invalid application call receiver.");
                                 if (!targetMethod.IsPublic && targetMethod.DeclaringType != method.DeclaringType && !InternalLibraryAccess(targetMethod, method) && !(targetMethod.IsAssembly && targetMethod.Module == method.Module)
-                                    && !(DescriptorLibrary.IsBaseConstructor(targetMethod) && method.IsConstructor && method.DeclaringType.BaseType?.Resolve() == targetMethod.DeclaringType))
+                                    && !((DescriptorLibrary.IsBaseConstructor(targetMethod) || targetMethod.IsFamily && targetMethod.IsConstructor)
+                                        && instruction.OpCode.Code == Code.Call && method.IsConstructor
+                                        && method.DeclaringType.BaseType?.Resolve() == targetMethod.DeclaringType))
                                     throw new InvalidDataException("Nonpublic cross-type call unsupported.");
                                 if (!ApplicationTypes.Matches(reference, targetMethod)) throw new InvalidDataException("Resolved signature mismatch.");
                                 if (!targetMethod.IsAbstract) pending.Enqueue(targetMethod);

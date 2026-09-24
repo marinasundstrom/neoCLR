@@ -23,8 +23,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and status support, cancellation/lifetimes, interoperable framing, server shutdown,
   a storage-backed sample and focused release validation. HTTPS remains an explicit
   scope decision. Add the author-selected IPAddress union with IPv4Address and
-  IPv6Address cases to release scope, superseding its suggested deferral; payload
-  design and integration remain pending. These are plans, not implemented capabilities.
+  IPv6Address cases to release scope, superseding its suggested deferral. The author
+  subsequently selects a closed class hierarchy instead; public integration remains
+  pending. These are plans, not implemented capabilities.
+
+- Begin the address hierarchy slice with an isolated immutable-address probe. Admit
+  protected direct-base constructor calls from derived constructors in the bridge,
+  retaining private and unrelated-call restrictions. Check value equality, hashing,
+  defensive copying and collection with live base-typed references. No public
+  IPAddress API or IPv6 transport is introduced by this checkpoint.
 
 - Extend the development union projector/importer to matched nongeneric sequential
   payload families. Verify an HttpError library prototype with URI/DNS/socket causes
