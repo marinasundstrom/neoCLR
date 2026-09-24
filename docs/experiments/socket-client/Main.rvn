@@ -58,12 +58,12 @@ async func Exchange(socket: Socket) -> Task<Result<int, SocketError>> {
     return await ReadGreeting(socket)
 }
 
-async func ResolveHost() -> Task<Result<Sequence<string>, DnsError>> {
+async func ResolveHost() -> Task<Result<Sequence<IPAddress>, DnsError>> {
     let addresses = await Dns.GetHostAddresses("localhost")?
     return Ok(addresses)
 }
 
-async func ExchangeGreeting(addresses: Sequence<string>) -> Task<Result<int, SocketError>> {
+async func ExchangeGreeting(addresses: Sequence<IPAddress>) -> Task<Result<int, SocketError>> {
     // The verifier substitutes the host's ephemeral loopback port.
     let pending = Socket.Connect(addresses, 19090)
     Churn()
@@ -86,10 +86,18 @@ async func ExchangeGreeting(addresses: Sequence<string>) -> Task<Result<int, Soc
     return result
 }
 
-func StartExchange(addresses: Sequence<string>) {
+func StartExchange(addresses: Sequence<IPAddress>) {
     // The controlled loopback demo deliberately tries an address with no listener first.
-    let candidates = ArrayList<string>()
-    candidates.Add("127.0.0.2")
+    let Ok(fallback) = IPAddress.Parse("127.0.0.2") else {
+        System.Fault("Invalid fallback address in sample")
+        return
+    }
+    let Ok(replacement) = IPAddress.Parse("127.0.0.3") else {
+        System.Fault("Invalid replacement address in sample")
+        return
+    }
+    let candidates = ArrayList<IPAddress>()
+    candidates.Add(fallback)
     var index = 0
     while index < addresses.Count {
         candidates.Add(addresses[index])
@@ -97,8 +105,8 @@ func StartExchange(addresses: Sequence<string>) {
     }
     let greeting = ExchangeGreeting(candidates)
     // Connect already owns the address snapshot; caller reuse is safe.
-    candidates[0] = "not an address"
-    candidates[1] = "not an address"
+    candidates[0] = replacement
+    candidates[1] = replacement
     greeting.OnCompleted(() => {
         if let Ok(count) = greeting.GetResult() {
             Check(count == 2)

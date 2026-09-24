@@ -2,15 +2,17 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Object",
   "inputs": {
+    "runtime/raven/src/System/Networking/IPAddress.rvn": "41767cb5076e1ed2ab4ee6b60c09416b2ee80a0510d056301db078af9f585874",
+    "runtime/raven/src/System/Networking/IPAddressError.rvn": "ff7036e74bf83a7f5fc62cd2cf194bf27d4d4255c996f9d1d45437dc51f3dce9",
     "runtime/raven/src/System/Uri.rvn": "b366425867c4b84f126de1689d4a03bf9855a6a881a4abe4dba1836a381537b7",
     "runtime/raven/src/System/UriError.rvn": "4cb6c1aa4d9c8bb51e3eb1964a5e5c57330e0b9091bd44bf5125a8a99c027dce",
     "runtime/raven/src/System/Web/Http/HttpServer.rvn": "da44d8c6db3945b7fd03d396d8ac3f76b4b52f8fb568cf7259c3961fc971b045",
-    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "7eaf273c93cad1d81301691946d0766869b51aee560c6438cadbbd80ec050632",
+    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "3a19438a4af3504f3d9a225f133989d99063ce2d894a20f10280a17c02028768",
     "runtime/raven/src/System/Web/Http/HttpError.rvn": "05367cc2e6ccc2b3d4085b1a48ba43218c7271ae9a6a96bb6e4437e7a37e0d1c",
     "runtime/raven/src/System/Networking/DnsError.rvn": "3d29e8b2008d54270cb35a581f4ba38e6d0672f4576b334100fc72d8f729a7bd",
-    "runtime/raven/src/System/Networking/Dns.rvn": "59a6602715d4965feb78ed97327df0b8ebbaf1e4a04eecc074c2e57f14bdebb7",
-    "runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "8bef0a016957620d757b082c7875e2ed87162a7b6fa936585c8d21264eb10014",
-    "runtime/raven/src/System/Networking/Sockets/Socket.rvn": "24108b0b3e6003fda27588211303df99618d58ce6c9c1ee5d70be446bc75866a",
+    "runtime/raven/src/System/Networking/Dns.rvn": "a93fbf79789efdf630640378fc59e2b822e31f5a339ed3daea2fe21b56e7d514",
+    "runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "15f9d2bb496458f8f4077c3a0b4f7606c4f4c35feff62c277d76e324c0c4d4ef",
+    "runtime/raven/src/System/Networking/Sockets/Socket.rvn": "bf74ef55ecb2ca8360b3b8233de102797215b2fb5ea92c5eec2cb7a4653cc0f1",
     "runtime/raven/src/System/IO/TextReadError.rvn": "0f68bf5b8875fc91b0234ccb18ee2f32d334197c38a12f438eae34f65de8a441",
     "runtime/raven/src/System/IO/TextReader.rvn": "6f9f6159741cec9acaded9e5b2705d3c1beaac4fa3fbb1be8a2146f18f575ce0",
     "runtime/raven/src/System/IO/TextWriter.rvn": "ee053d0893f533207e580eba37509aca9284dd0c37d13dff1941a2485b506fec",
@@ -114,7 +116,7 @@
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
-    "runtime/raven/System.Runtime.rvnproj": "4c3142d878923df3d559e77f664fa1448125125a850ccb4c4bc73b1dcabccd2e",
+    "runtime/raven/System.Runtime.rvnproj": "d63561e385840eb6bc3df4a13304d87e6190a15ad279cdd517d13984aa14235c",
     "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
@@ -122,7 +124,7 @@
     "Object.helpers.neoil": "31d7db145a863cacd67f6bab16caaef125d346c1de8acb1346360e93020be09f"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "91bd16e64906d1dcdcddc9ea4b4fc6e55be064f9dff615edf518f106c17dfc38",
+  "coreSha256": "5c37f6f43bf0e271dd551144472824d159b2ed98739a913a85eaaea1cc6b9531",
   "exports": [
     ".ctor() -> noresult",
     "GetType() -> System.Introspection.TypeInfo",

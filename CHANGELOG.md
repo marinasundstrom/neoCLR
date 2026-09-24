@@ -31,7 +31,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   protected direct-base constructor calls from derived constructors in the bridge,
   retaining private and unrelated-call restrictions. Check value equality, hashing,
   defensive copying and collection with live base-typed references. No public
-  IPAddress API or IPv6 transport is introduced by this checkpoint.
+  IPAddress API or IPv6 transport is introduced by that initial checkpoint.
+  Follow with public IPAddress, IPv4Address and IPv6Address classes, strict parsing,
+  canonical formatting, value equality and typed IPAddressError outcomes. DNS now
+  returns Sequence<IPAddress>; update explicit string-result annotations and rebuild
+  matching artifacts. Socket retains string overloads and adds address/value-sequence
+  overloads, preserving bounded snapshots/deadlines. IPv6 transport reports the new
+  UnsupportedAddressFamily case; scopes and IPv6 DNS/transport remain unsupported.
+  Update HTTP's DNS stage, the loopback sample, on-site API reference and networking
+  guide. Record reduced compiler/runtime observations without claiming compiler fixes.
 
 - Extend the development union projector/importer to matched nongeneric sequential
   payload families. Verify an HttpError library prototype with URI/DNS/socket causes

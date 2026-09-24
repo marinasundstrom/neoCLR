@@ -74,8 +74,9 @@ release date. Continue the current typed HTTP/error/base-address integration fir
 1. typed HTTP errors; 2. IPAddress; 3. cancellation foundations; 4. HttpClient/base
 address; 5. methods/content/statuses; 6. framing; 7. server lifecycle; 8. application;
 9. release stabilization. The [address hierarchy checkpoint](experiments/ip-address-hierarchy/README.md)
-validates reference/value semantics and protected base construction; public address
-parsing and DNS/socket integration remain open. Investigate HTTPS feasibility after cancellation foundations
+now links the [implemented address slice](ip-address-design.md): public parsing/formatting,
+value semantics, typed DNS results and Socket overloads. Cancellation foundations
+are next; IPv6 transport and scope identifiers remain explicit follow-ups. Investigate HTTPS feasibility after cancellation foundations
 and decide its scope before the application slice. Finish validation and documentation
 for each slice before advancing; a source change alone is not completion.
 
@@ -956,7 +957,8 @@ and nonempty overlapping layouts remain rejected. The migration batch is closed
 for applicable nongeneric families. Typed HTTP errors are now integrated into the
 client/handler/server contracts, with public consumer, independent-peer,
 framing/timeout, payload-GC and signature rejection checks passing.
-IPAddress follows this slice, then cancellation and string/Uri overloads with BaseUri;
+The [IPAddress slice](ip-address-design.md) now follows this with a closed class
+hierarchy, typed DNS results and Socket overloads. Cancellation and string/Uri overloads with BaseUri are next;
 do not extend the manual carrier catalog.
 The author's 2026-09-25 HTTP contract makes
 `Send(HttpRequest, CancellationToken) -> Task<Result<HttpResponse, HttpError>>` the

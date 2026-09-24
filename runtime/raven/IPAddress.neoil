@@ -1,0 +1,2 @@
+.include "generated/IPAddress.methods.neoil"
+.include "generated/IPAddress.helpers.neoil"

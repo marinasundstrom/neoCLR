@@ -10,6 +10,8 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    "IPAddress": "System.Networking.IPAddress",
+    "IPAddressError": "System.Networking.IPAddressError",
     "HttpError": "System.Web.Http.HttpError",
     "Uri": "System.Uri",
     "UriError": "System.UriError",
@@ -129,6 +131,8 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    "IPAddress": "runtime/raven/src/System/Networking/IPAddress.rvn",
+    "IPAddressError": "runtime/raven/src/System/Networking/IPAddressError.rvn",
     "Uri": "runtime/raven/src/System/Uri.rvn",
     "UriError": "runtime/raven/src/System/UriError.rvn",
     "HttpServer": "runtime/raven/src/System/Web/Http/HttpServer.rvn",

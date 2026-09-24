@@ -253,6 +253,21 @@ static class SignatureProbe
             wrong.HasThis = true;
             Reject("Utf8 instance " + method.Name, () => Utf8Bindings.Bind(wrong, method));
         }
+        var addressType = module.GetType(IPAddressBindings.Root);
+        var parseAddress = addressType.Methods.Single(m => m.Name == "Parse");
+        Check("IPAddress parse mapping", IPAddressBindings.Bind(Reference(parseAddress, addressType), parseAddress)?.Name == IPAddressBindings.Root + "::Parse");
+        var invalidAddressCall = Reference(parseAddress, addressType);
+        invalidAddressCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
+        Reject("IPAddress argument mismatch", () => IPAddressBindings.Bind(invalidAddressCall, parseAddress));
+        var closedMarker = addressType.CustomAttributes.Single(a => a.AttributeType.FullName.EndsWith("ClosedHierarchyAttribute"));
+        addressType.CustomAttributes.Remove(closedMarker);
+        Reject("IPAddress requires closed family", () => IPAddressBindings.Validate(addressType));
+        addressType.CustomAttributes.Add(closedMarker);
+        using (var externalAddressModule = ModuleDefinition.CreateModule("ExternalAddresses", ModuleKind.Dll)) {
+            externalAddressModule.Types.Add(new TypeDefinition("", "ForgedAddress", TypeAttributes.Public | TypeAttributes.Class,
+                externalAddressModule.ImportReference(addressType)));
+            Reject("External IPAddress inheritance", () => IPAddressBindings.RejectExternalBranches([externalAddressModule]));
+        }
         var pathType = module.GetType("System.Storage.Path");
         var combine = pathType.Methods.Single(m => m.Name == "Combine");
         var pathCall = Reference(combine, pathType);

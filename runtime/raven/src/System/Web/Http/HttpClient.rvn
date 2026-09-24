@@ -376,7 +376,7 @@ internal class HttpExchange {
     private var request: HttpRequest
     private var source: Promise<Result<HttpResponse, HttpError>>
     private var socket: Option<Socket>
-    private var lookup: Option<Task<Result<Sequence<string>, DnsError>>>
+    private var lookup: Option<Task<Result<Sequence<IPAddress>, DnsError>>>
     private var connecting: Option<Task<Result<Socket, SocketError>>>
     private var transfer: Option<Task<Result<int, SocketError>>>
     private var outgoing: Sequence<byte>

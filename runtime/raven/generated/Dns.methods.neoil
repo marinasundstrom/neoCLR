@@ -10,7 +10,7 @@ pop
 M00000001_IL_0007:
 ret
 .end
-.method static GetHostAddresses(String hostName) -> System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>
+.method static GetHostAddresses(String hostName) -> System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
@@ -24,23 +24,23 @@ call System.Networking.Dns::GetHostAddressesUntil(String,Int64)
 M00000002_IL_000a:
 ret
 .end
-.method internal static GetHostAddressesUntil(String hostName,Int64 deadline) -> System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>
-.local System.Tasks.Promise<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>> local0
+.method internal static GetHostAddressesUntil(String hostName,Int64 deadline) -> System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
+.local System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> local0
 .local System.Networking.DnsCompletion local1
 ldloca local0
-initobj System.Tasks.Promise<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>
+initobj System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 ldloca local1
 initobj System.Networking.DnsCompletion
 M00000003_IL_0000:
 M00000003_IL_0001:
-newobj instance System.Tasks.Promise<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>::.ctor()
+newobj instance System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::.ctor()
 M00000003_IL_0006:
 stloc local0
 M00000003_IL_0007:
 M00000003_IL_0008:
 ldloc local0
 M00000003_IL_0009:
-newobj instance System.Networking.DnsCompletion::.ctor(System.Tasks.Promise<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>)
+newobj instance System.Networking.DnsCompletion::.ctor(System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>)
 M00000003_IL_000e:
 stloc local1
 M00000003_IL_000f:
@@ -56,7 +56,7 @@ M00000003_IL_0018:
 M00000003_IL_0019:
 ldloc local0
 M00000003_IL_001a:
-call instance System.Tasks.Promise<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>::get_Task()
+call instance System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::get_Task()
 M00000003_IL_001f:
 ret
 .end

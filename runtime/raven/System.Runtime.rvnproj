@@ -5,6 +5,12 @@
     <NeoCLRRoot>$(NeoCLRBootstrapRoot)</NeoCLRRoot>
   </PropertyGroup>
   <Import Project="../../build/NeoCLR.Raven.props" />
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'IPAddress'">
+    <Compile Include="src/System/Networking/IPAddress.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'IPAddressError'">
+    <Compile Include="src/System/Networking/IPAddressError.rvn" />
+  </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Uri'">
     <Compile Include="src/System/Uri.rvn" />
   </ItemGroup>

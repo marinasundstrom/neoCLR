@@ -31,7 +31,7 @@ individual cancellation/deadline API yet. No thread is created per socket operat
 This is a neoCLR echo client against a host server. The full two-sided neoCLR echo
 milestone still requires listener/accept;
 endpoint value types, stream integration and IPv6 remain future slices. DNS now
-returns a read-only Sequence of IPv4 strings with a five-second lookup deadline.
+returns a read-only Sequence of immutable IPv4Address values with a five-second lookup deadline.
 The controlled sample uses the first address; multi-address fallback and an overall
 connection deadline remain open. TcpClient
 and UdpClient are candidates for later convenience layers, not current APIs.
@@ -75,7 +75,7 @@ pass. Networking was inspected in the local browser. This is local macOS evidenc
 not cross-platform networking certification or a runtime release.
 
 
-The client now passes a `Sequence<string>` to Socket.Connect. For this controlled
+The client now passes a `Sequence<IPAddress>` to Socket.Connect. For this controlled
 loopback POC it prepends 127.0.0.2, where the verifier has no listener, before the
 addresses returned for localhost. Connect snapshots the inputs; the sample overwrites
 the first entries afterwards and still reaches 127.0.0.1. All attempts share five

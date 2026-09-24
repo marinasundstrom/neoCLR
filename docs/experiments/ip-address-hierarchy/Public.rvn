@@ -1,0 +1,114 @@
+import System.*
+import System.Networking.*
+import System.Networking.Sockets.*
+import System.Collections.*
+import System.Result.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("Address hierarchy assertion failed")
+    }
+}
+
+func Valid(text: string, expected: string) {
+    if let Ok(address) = IPAddress.Parse(text) {
+        Check(address.ToString() == expected)
+        if let Ok(roundTrip) = IPAddress.Parse(address.ToString()) {
+            Check(address.Equals(roundTrip))
+            Check(address.GetHashCode() == roundTrip.GetHashCode())
+        } else {
+            System.Fault("Formatted address must parse")
+        }
+        if text.ContainsOrdinal(":") {
+            Check(address is IPv6Address)
+        } else {
+            Check(address is IPv4Address)
+        }
+    } else {
+        System.Fault(String.Concat("Valid address rejected: ", text))
+    }
+}
+
+func Invalid(text: string) {
+    if let Ok(address) = IPAddress.Parse(text) {
+        System.Fault(String.Concat("Invalid address accepted: ", address.ToString()))
+    }
+}
+
+func Main() {
+    // PARSER_CASES
+
+    if let Ok(first) = IPAddress.Parse("127.0.0.1") {
+        let boxed: Object = first
+        Check(!boxed.Equals(null))
+        Check(!boxed.Equals("127.0.0.1"))
+        if let Ok(second) = IPAddress.Parse("127.0.0.1") {
+            Check(!Object.ReferenceEquals(first, second))
+            Check(boxed.Equals(second))
+            Check(boxed.GetHashCode() == second.GetHashCode())
+        } else {
+            System.Fault("Second address must parse")
+        }
+        if let Ok(mapped) = IPAddress.Parse("::ffff:127.0.0.1") {
+            Check(!first.Equals(mapped))
+            Check(!mapped.Equals(first))
+        } else {
+            System.Fault("Mapped address must parse")
+        }
+        var index = 0
+        while index < 100 {
+            if let Ok(churn) = IPAddress.Parse("127.0.0.1") {
+                Check(first.Equals(churn))
+            } else {
+                System.Fault("Churn address must parse")
+            }
+            index += 1
+        }
+        Check(first.ToString() == "127.0.0.1")
+    } else {
+        System.Fault("First address must parse")
+    }
+    if let Error(error) = IPAddress.Parse("fe80::1%3") {
+        Check(error is IPAddressError.UnsupportedScope)
+    } else {
+        System.Fault("Scope should be unsupported")
+    }
+    if let Error(formatError) = IPAddress.Parse("127.1") {
+        Check(formatError is IPAddressError.InvalidFormat)
+    } else {
+        System.Fault("Abbreviated IPv4 should be invalid")
+    }
+    if let Ok(loopback) = IPAddress.Parse("127.0.0.1") {
+        if let Ok(listener) = Socket.Listen(loopback, 0, 1) {
+            listener.Close()
+        } else {
+            System.Fault("Address listener failed")
+        }
+    }
+    if let Ok(ipv6) = IPAddress.Parse("::1") {
+        if let Error(unsupported) = Socket.Connect(ipv6, 80).GetResult() {
+            Check(unsupported is SocketError.UnsupportedAddressFamily)
+        } else {
+            System.Fault("IPv6 connect unexpectedly supported")
+        }
+        if let Error(listenError) = Socket.Listen(ipv6, 0, 1) {
+            Check(listenError is SocketError.UnsupportedAddressFamily)
+        } else {
+            System.Fault("IPv6 listen unexpectedly supported")
+        }
+        let mixed = ArrayList<IPAddress>()
+        mixed.Add(ipv6)
+        if let Error(sequenceError) = Socket.Connect(mixed, 80).GetResult() {
+            Check(sequenceError is SocketError.UnsupportedAddressFamily)
+        } else {
+            System.Fault("IPv6 sequence unexpectedly supported")
+        }
+    }
+    let empty = ArrayList<IPAddress>()
+    if let Error(emptyError) = Socket.Connect(empty, 80).GetResult() {
+        Check(emptyError is SocketError.InvalidRange)
+    } else {
+        System.Fault("Empty address values unexpectedly supported")
+    }
+    Console.WriteLine("Closed address hierarchy value and GC checks passed")
+}

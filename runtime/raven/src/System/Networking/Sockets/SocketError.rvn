@@ -14,9 +14,12 @@ public union SocketError {
     case IoFailure
     case InvalidOperation
     case AddressInUse
+    /// The address family has no transport implementation in this backend.
+    case UnsupportedAddressFamily
 
     override func ToString() -> string {
         return match self {
+            UnsupportedAddressFamily => "UnsupportedAddressFamily"
             Closed => "Closed"
             Busy => "Busy"
             InvalidRange => "InvalidRange"

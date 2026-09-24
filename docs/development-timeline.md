@@ -7024,3 +7024,21 @@ configuration/content, not target-specific code added to Raven main.
 - **Open:** public reference projection, parsing/formatting, scope identifiers,
   DNS/socket integration and API documentation. This checkpoint does not complete
   the address slice or imply IPv6 transport support.
+
+
+### 2026-09-25 — Implement the selected address hierarchy
+
+- **Author:** asks to continue after selecting the closed class hierarchy.
+- **Assistant action:** implements public IPAddress/IPv4Address/IPv6Address with
+  immutable data, value equality, parsing and canonical formatting. Adds typed
+  IPAddressError, changes DNS to return address values, retains string Socket
+  overloads and adds typed ones. IPv6 values are accepted independently of transport;
+  the IPv4 backend returns UnsupportedAddressFamily for IPv6 socket operations.
+- **Tradeoffs:** strict decimal IPv4 intentionally differs from legacy forms accepted
+  by .NET. Scope identifiers, public byte construction and IPv6 transport remain
+  open. These bounded choices are assistant implementation decisions, not separately
+  quoted author approvals. See the [design and evidence](ip-address-design.md).
+- **Validation:** focused parser/Object/GC and closure checks, .NET parsing comparison,
+  typed DNS/loopback echo, independent HTTP-server interoperability, signature and
+  artifact/API snapshot checks. Website source is updated; the author-requested
+  website build skip remains in force. Runtime cancellation is the next release slice.

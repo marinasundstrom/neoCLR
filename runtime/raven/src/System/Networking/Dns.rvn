@@ -9,12 +9,12 @@ import System.Runtime.CompilerServices.*
 public class Dns {
     private init() { }
 
-    static func GetHostAddresses(hostName: string) -> Task<Result<Sequence<string>, DnsError>> {
+    static func GetHostAddresses(hostName: string) -> Task<Result<Sequence<IPAddress>, DnsError>> {
         return GetHostAddressesUntil(hostName, 0)
     }
 
-    internal static func GetHostAddressesUntil(hostName: string, deadline: long) -> Task<Result<Sequence<string>, DnsError>> {
-        let source = Promise<Result<Sequence<string>, DnsError>>()
+    internal static func GetHostAddressesUntil(hostName: string, deadline: long) -> Task<Result<Sequence<IPAddress>, DnsError>> {
+        let source = Promise<Result<Sequence<IPAddress>, DnsError>>()
         let completion = DnsCompletion(source)
         completion.StartUntil(hostName, deadline)
         return source.Task
@@ -45,10 +45,10 @@ public class Dns {
 }
 
 internal class DnsCompletion {
-    private field source: Promise<Result<Sequence<string>, DnsError>>
+    private field source: Promise<Result<Sequence<IPAddress>, DnsError>>
     private field operation: long
 
-    internal init(source: Promise<Result<Sequence<string>, DnsError>>) {
+    internal init(source: Promise<Result<Sequence<IPAddress>, DnsError>>) {
         self.source = source
         operation = 0
     }
@@ -77,7 +77,19 @@ internal class DnsCompletion {
             _ = source.Complete(Error(Dns.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {
             let addresses: Sequence<string> = RuntimeServices.DnsAddresses(payload)
-            _ = source.Complete(Ok(addresses))
+            let values = ArrayList<IPAddress>()
+            var index = 0
+            while index < addresses.Count {
+                if let Ok(address) = IPAddress.Parse(addresses[index]) {
+                    values.Add(address)
+                } else {
+                    _ = source.Complete(Error(DnsError.LookupFailed()))
+                    return
+                }
+                index += 1
+            }
+            let result: Sequence<IPAddress> = values
+            _ = source.Complete(Ok(result))
         }
     }
 }

@@ -1,0 +1,296 @@
+namespace System.Networking
+
+import System.*
+import System.Result.*
+
+/// An immutable IP address in the closed IPv4 and IPv6 family.
+public sealed class IPAddress : Equatable<IPAddress> {
+    private var octets: byte[]
+
+    protected init(bytes: byte[]) {
+        octets = if bytes.Length == 4 {
+            [(byte)0, (byte)0, (byte)0, (byte)0]
+        } else {
+            [(byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0]
+        }
+        var index = 0
+        while index < bytes.Length {
+            octets[index] = bytes[index]
+            index += 1
+        }
+    }
+
+    /// Formats the address using decimal IPv4 or canonical lowercase IPv6.
+    override func ToString() -> string {
+        if octets.Length == 4 {
+            return FormatIPv4(0)
+        }
+        if Group(0) == 0 && Group(1) == 0 && Group(2) == 0 && Group(3) == 0 && Group(4) == 0 && Group(5) == 65535 {
+            return String.Concat("::ffff:", FormatIPv4(12))
+        }
+        // RFC 5952: longest zero run, first on ties; never compress one group.
+        var bestStart = -1
+        var bestLength = 1
+        var position = 0
+        while position < 8 {
+            if Group(position) != 0 {
+                position += 1
+                continue
+            }
+            let start = position
+            while position < 8 && Group(position) == 0 {
+                position += 1
+            }
+            if position - start > bestLength {
+                bestStart = start
+                bestLength = position - start
+            }
+        }
+        var text = ""
+        position = 0
+        while position < 8 {
+            if position == bestStart {
+                text = String.Concat(text, "::")
+                position += bestLength
+                continue
+            }
+            if !text.IsEmpty && At(text, text.GetUtf8ByteCount() - 1) != ":" {
+                text = String.Concat(text, ":")
+            }
+            var value = Group(position)
+            var digits = ""
+            if value == 0 {
+                digits = "0"
+            }
+            while value != 0 {
+                digits = String.Concat(At("0123456789abcdef", value % 16), digits)
+                value = value / 16
+            }
+            text = String.Concat(text, digits)
+            position += 1
+        }
+        return text
+    }
+
+    private func FormatIPv4(offset: int) -> string {
+        return String.Concat(String.Concat(String.Concat(((int)octets[offset]).ToString(), "."),
+            String.Concat(((int)octets[offset + 1]).ToString(), ".")),
+            String.Concat(String.Concat(((int)octets[offset + 2]).ToString(), "."), ((int)octets[offset + 3]).ToString()))
+    }
+
+    private func Group(index: int) -> int {
+        return octets[index * 2] * 256 + octets[index * 2 + 1]
+    }
+
+    private static func At(text: string, index: int) -> string {
+        if let Ok(value) = text.SliceUtf8(index, 1) {
+            return value
+        }
+        return ""
+    }
+
+    private static func Part(text: string, start: int, count: int) -> string {
+        if let Ok(value) = text.SliceUtf8(start, count) {
+            return value
+        }
+        return ""
+    }
+
+    private static func Digit(text: string) -> int {
+        var index = 0
+        while index < 16 {
+            if text == At("0123456789abcdef", index) || text == At("0123456789ABCDEF", index) {
+                return index
+            }
+            index += 1
+        }
+        return -1
+    }
+
+    /// Parses a strict IPv4 or IPv6 literal without resolving a host name.
+    /// Scope identifiers and URI brackets are not supported in this iteration.
+    static func Parse(text: string) -> Result<IPAddress, IPAddressError> {
+        if text.ContainsOrdinal("%") {
+            return Error(IPAddressError.UnsupportedScope())
+        }
+        let count = text.GetUtf8ByteCount()
+        if count == 0 || count > 45 {
+            return Error(IPAddressError.InvalidFormat())
+        }
+        if !text.ContainsOrdinal(":") {
+            let narrowBytes: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0]
+            if !ReadIPv4(text, narrowBytes, 0) {
+                return Error(IPAddressError.InvalidFormat())
+            }
+            let narrow: IPAddress = IPv4Address(narrowBytes)
+            return Ok(narrow)
+        }
+        let bytes: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0]
+        var position = 0
+        var groups = 0
+        var compressed = -1
+        if At(text, 0) == ":" {
+            if At(text, 1) != ":" {
+                return Error(IPAddressError.InvalidFormat())
+            }
+            compressed = 0
+            position = 2
+        }
+        while position < count {
+            if groups >= 8 {
+                return Error(IPAddressError.InvalidFormat())
+            }
+            let start = position
+            while position < count && At(text, position) != ":" {
+                position += 1
+            }
+            let length = position - start
+            let part = Part(text, start, length)
+            if part.ContainsOrdinal(".") {
+                if position != count || groups > 6 {
+                    return Error(IPAddressError.InvalidFormat())
+                }
+                if !ReadIPv4(part, bytes, groups * 2) {
+                    return Error(IPAddressError.InvalidFormat())
+                }
+                groups += 2
+                break
+            }
+            if length == 0 || length > 4 {
+                return Error(IPAddressError.InvalidFormat())
+            }
+            var value = 0
+            var index = start
+            while index < position {
+                let digit = Digit(At(text, index))
+                if digit < 0 {
+                    return Error(IPAddressError.InvalidFormat())
+                }
+                value = value * 16 + digit
+                index += 1
+            }
+            bytes[groups * 2] = (byte)(value / 256)
+            bytes[groups * 2 + 1] = (byte)(value % 256)
+            groups += 1
+            if position < count {
+                position += 1
+                if position < count && At(text, position) == ":" {
+                    if compressed >= 0 {
+                        return Error(IPAddressError.InvalidFormat())
+                    }
+                    compressed = groups
+                    position += 1
+                } else if position == count {
+                    return Error(IPAddressError.InvalidFormat())
+                }
+            }
+        }
+        if compressed < 0 && groups != 8 || compressed >= 0 && groups >= 8 {
+            return Error(IPAddressError.InvalidFormat())
+        }
+        if compressed >= 0 {
+            let missing = (8 - groups) * 2
+            var index = groups * 2 - 1
+            while index >= compressed * 2 {
+                bytes[index + missing] = bytes[index]
+                index -= 1
+            }
+            index = compressed * 2
+            while index < compressed * 2 + missing {
+                bytes[index] = (byte)0
+                index += 1
+            }
+        }
+        let wide: IPAddress = IPv6Address(bytes)
+        return Ok(wide)
+    }
+
+    private static func ReadIPv4(text: string, bytes: byte[], offset: int) -> bool {
+        let count = text.GetUtf8ByteCount()
+        var position = 0
+        var part = 0
+        while part < 4 {
+            let start = position
+            var value = 0
+            while position < count && At(text, position) != "." {
+                let digit = Digit(At(text, position))
+                if digit < 0 {
+                    return false
+                }
+                if digit > 9 || position - start >= 3 {
+                    return false
+                }
+                value = value * 10 + digit
+                position += 1
+            }
+            if position == start || value > 255 || position - start > 1 && At(text, start) == "0" {
+                return false
+            }
+            bytes[offset + part] = (byte)value
+            part += 1
+            if part < 4 {
+                if position >= count || At(text, position) != "." {
+                    return false
+                }
+                position += 1
+            }
+        }
+        if position != count {
+            return false
+        }
+        return true
+    }
+
+    /// Compares address family and bytes; reference identity does not affect equality.
+    func Equals(other: IPAddress) -> bool {
+        if octets.Length != other.octets.Length {
+            return false
+        }
+        var index = 0
+        while index < octets.Length {
+            if octets[index] != other.octets[index] {
+                return false
+            }
+            index += 1
+        }
+        return true
+    }
+
+    /// Compares another address by value; null and other objects are unequal.
+    override func Equals(other: Object?) -> bool {
+        if other is IPAddress address {
+            return Equals(address)
+        }
+        return false
+    }
+
+    /// Returns a hash consistent with address value equality.
+    override func GetHashCode() -> int {
+        var hash = HashCode()
+        hash.Add(octets.Length)
+        var index = 0
+        while index < octets.Length {
+            hash.Add(octets[index])
+            index += 1
+        }
+        return hash.ToHashCode()
+    }
+}
+
+/// An immutable four-byte IPv4 address, created by IPAddress.Parse.
+public class IPv4Address : IPAddress {
+    internal init(bytes: byte[]) : base(bytes) {
+        if bytes.Length != 4 {
+            System.Fault("Probe requires four IPv4 octets")
+        }
+    }
+}
+
+/// An immutable sixteen-byte IPv6 address, created by IPAddress.Parse.
+public class IPv6Address : IPAddress {
+    internal init(bytes: byte[]) : base(bytes) {
+        if bytes.Length != 16 {
+            System.Fault("Probe requires sixteen IPv6 octets")
+        }
+    }
+}

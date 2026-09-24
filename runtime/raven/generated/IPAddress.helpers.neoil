@@ -1,0 +1,205 @@
+; Generated from runtime/raven/src/System/Networking/IPAddress.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeStringEquals(String source,String value0) -> Boolean
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::Equals(String)
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeStringContainsOrdinal(String source,String value0) -> Boolean
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::ContainsOrdinal(String)
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeStringGetUtf8ByteCount(String source) -> Int32
+ldarg source
+call instance System.String::GetUtf8ByteCount()
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeStringget_IsEmpty(String source) -> Boolean
+ldarg source
+call instance System.String::get_IsEmpty()
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeStringSliceUtf8(String source,Int32 value0,Int32 value1) -> System.Result<String,System.Text.Utf8SliceError>
+ldarg source
+ldarg value0
+ldarg value1
+call instance System.String::SliceUtf8(Int32,Int32)
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeInt32ToString(Int32& source) -> String
+ldarg source
+ldobj Int32
+call instance System.Int32::ToString()
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorNewSystemNetworkingIPAddressErrorInvalidFormat(System.Networking.IPAddressError.InvalidFormat value) -> System.Networking.IPAddressError
+ldarg value
+newobj instance System.Networking.IPAddressError::.ctor(System.Networking.IPAddressError.InvalidFormat)
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorNewSystemNetworkingIPAddressErrorUnsupportedScope(System.Networking.IPAddressError.UnsupportedScope value) -> System.Networking.IPAddressError
+ldarg value
+newobj instance System.Networking.IPAddressError::.ctor(System.Networking.IPAddressError.UnsupportedScope)
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorInvalidFormatNew() -> System.Networking.IPAddressError.InvalidFormat
+newobj instance System.Networking.IPAddressError.InvalidFormat::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorUnsupportedScopeNew() -> System.Networking.IPAddressError.UnsupportedScope
+newobj instance System.Networking.IPAddressError.UnsupportedScope::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeUnion0(System.Result<String,System.Text.Utf8SliceError>& arg0,out(true) System.Result.Ok<String>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Result<String,System.Text.Utf8SliceError>
+ldarg arg1
+call instance System.Result<String,System.Text.Utf8SliceError>::TryGet(System.Result.Ok<String>&)
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeUnion1(System.Result.Ok<String>& receiver,out String& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Result.Ok<String>
+call instance System.Result.Ok<String>::get_Value()
+stobj String
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError arg0) -> System.Result.Error<System.Networking.IPAddressError>
+ldarg arg0
+newobj instance System.Result.Error<System.Networking.IPAddressError>::.ctor(System.Networking.IPAddressError)
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError> arg0) -> System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>
+ldarg arg0
+newobj instance System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>::.ctor(System.Result.Error<System.Networking.IPAddressError>)
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeUnion4(System.Networking.IPAddress arg0) -> System.Result.Ok<System.Networking.IPAddress>
+ldarg arg0
+newobj instance System.Result.Ok<System.Networking.IPAddress>::.ctor(System.Networking.IPAddress)
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeUnion5(System.Result.Ok<System.Networking.IPAddress> arg0) -> System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>
+ldarg arg0
+newobj instance System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>::.ctor(System.Result.Ok<System.Networking.IPAddress>)
+ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeNewHashCode() -> System.HashCode
+newobj instance System.HashCode::.ctor()
+ret
+.end
+.type class System.Networking.IPv4Address
+.sealed
+.extends System.Networking.IPAddress
+.method internal instance .ctor(arrayref<Byte> bytes) -> noresult
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+ldarg 0
+M0000000d_IL_0002:
+ldarg 1
+M0000000d_IL_0003:
+call instance System.Networking.IPAddress::.ctor(arrayref<Byte>)
+M0000000d_IL_0008:
+M0000000d_IL_0009:
+ldarg 1
+M0000000d_IL_000a:
+ldlen
+conv.i4
+M0000000d_IL_000f:
+ldc.i4 4
+M0000000d_IL_0010:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0012:
+ldc.i4 0
+M0000000d_IL_0013:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0015:
+brtrue M0000000d_IL_001f
+M0000000d_IL_001a:
+br M0000000d_IL_002a
+M0000000d_IL_001f:
+M0000000d_IL_0020:
+ldstr "Probe requires four IPv4 octets"
+M0000000d_IL_0025:
+call System.Fault(String)
+M0000000d_IL_002a:
+M0000000d_IL_002b:
+ret
+.end
+.end
+.type class System.Networking.IPv6Address
+.sealed
+.extends System.Networking.IPAddress
+.method internal instance .ctor(arrayref<Byte> bytes) -> noresult
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+ldarg 0
+M0000000e_IL_0002:
+ldarg 1
+M0000000e_IL_0003:
+call instance System.Networking.IPAddress::.ctor(arrayref<Byte>)
+M0000000e_IL_0008:
+M0000000e_IL_0009:
+ldarg 1
+M0000000e_IL_000a:
+ldlen
+conv.i4
+M0000000e_IL_000f:
+ldc.i4 16
+M0000000e_IL_0011:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0013:
+ldc.i4 0
+M0000000e_IL_0014:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0016:
+brtrue M0000000e_IL_0020
+M0000000e_IL_001b:
+br M0000000e_IL_002b
+M0000000e_IL_0020:
+M0000000e_IL_0021:
+ldstr "Probe requires sixteen IPv6 octets"
+M0000000e_IL_0026:
+call System.Fault(String)
+M0000000e_IL_002b:
+M0000000e_IL_002c:
+ret
+.end
+.end

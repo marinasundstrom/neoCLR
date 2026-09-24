@@ -1,6 +1,7 @@
 namespace System.Networking.Sockets
 
 import System.*
+import System.Networking.*
 import System.Result.*
 import System.Tasks.*
 import System.Collections.*
@@ -11,6 +12,55 @@ public class Socket {
 
     internal init(handle: long) {
         self.handle = handle
+    }
+
+    /// Connects to an address value. IPv6 transport is not supported yet.
+    static func Connect(address: IPAddress, port: int) -> Task<Result<Socket, SocketError>> {
+        if address is IPv4Address {
+            return Connect(address.ToString(), port)
+        }
+        let source = Promise<Result<Socket, SocketError>>()
+        _ = source.Complete(Error(SocketError.UnsupportedAddressFamily()))
+        return source.Task
+    }
+
+    /// Tries address values within the existing bounded connection policy.
+    static func Connect(addresses: Sequence<IPAddress>, port: int) -> Task<Result<Socket, SocketError>> {
+        return ConnectUntil(addresses, port, 0)
+    }
+
+    internal static func ConnectUntil(addresses: Sequence<IPAddress>, port: int, deadline: long) -> Task<Result<Socket, SocketError>> {
+        if addresses.Count == 0 {
+            let empty = Promise<Result<Socket, SocketError>>()
+            _ = empty.Complete(Error(SocketError.InvalidRange()))
+            return empty.Task
+        }
+        if addresses.Count > 16 {
+            let excessive = Promise<Result<Socket, SocketError>>()
+            _ = excessive.Complete(Error(SocketError.LimitExceeded()))
+            return excessive.Task
+        }
+        let text = ArrayList<string>()
+        var index = 0
+        while index < addresses.Count {
+            let address = addresses[index]
+            if !(address is IPv4Address) {
+                let source = Promise<Result<Socket, SocketError>>()
+                _ = source.Complete(Error(SocketError.UnsupportedAddressFamily()))
+                return source.Task
+            }
+            text.Add(address.ToString())
+            index += 1
+        }
+        return ConnectUntil(text, port, deadline)
+    }
+
+    /// Listens on an address value. IPv6 transport is not supported yet.
+    static func Listen(address: IPAddress, port: int, backlog: int) -> Result<Socket, SocketError> {
+        if address is IPv4Address {
+            return Listen(address.ToString(), port, backlog)
+        }
+        return Error(SocketError.UnsupportedAddressFamily())
     }
 
     static func Connect(address: string, port: int) -> Task<Result<Socket, SocketError>> {

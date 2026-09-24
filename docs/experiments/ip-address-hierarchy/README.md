@@ -1,4 +1,9 @@
-# IPAddress closed hierarchy checkpoint
+# IPAddress closed hierarchy checks
+
+Use `--public` to verify the integrated runtime API described below. The original
+local-source experiment remains available as a separate representation check.
+
+## Initial checkpoint (historical)
 
 2026-09-25. An isolated target experiment, **not a public API or a completed address
 slice**. The author selected a closed IPAddress class hierarchy after first selecting
@@ -61,3 +66,31 @@ case and private-base/private-cross-type rejection cases. Raven rejects an exter
 address branch in a different source file with RAV0334. Website build is skipped
 under the author's per-slice validation direction. Public `/docs/` entries belong
 with the future public API, not these unexported experiment types.
+
+
+## Public integration follow-up
+
+The development runtime now supplies the family described in the
+[address design](../../ip-address-design.md). The original local-source probe remains
+separate so its representation/access checks can still run independently. The public
+API has typed IPAddressError outcomes. `Address.rvn` is the original experiment, not the public implementation.
+
+```sh
+python3 docs/experiments/ip-address-hierarchy/verify.py --public \
+  --toolchain-root /path/to/matching-bundle --runner target/release/examples/measure_async
+```
+
+Public mode uses 13 valid and 29 invalid literals from cases.json. It also
+checks socket overloads, explicit IPv6 rejection, mapped-family inequality and the
+imported family's closure. Reference.cs compares the same corpus with .NET 10,
+including the five deliberately different accepted forms. The runtime source is
+`runtime/raven/src/System/Networking/IPAddress.rvn`; public callers compile against
+the core reference instead of including that implementation in their application.
+
+Public integration validation (2026-09-25): 460 managed allocations, 9 collections,
+zero final live objects. The typed DNS/fallback echo passes with 1,871 allocations
+and 41 collections; the independent Python HTTP-server case passes with 496
+allocations and 10 collections. Both finish with zero live objects. Public source
+closure rejection is RAV0306; the local same-file probe uses RAV0334. Signature
+checks reject malformed public calls and external inheritance metadata. Generated
+library and API snapshot checks pass. No website build was run.

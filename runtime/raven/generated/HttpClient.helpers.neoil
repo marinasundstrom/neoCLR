@@ -240,9 +240,9 @@ ldarg arg0
 newobj instance System.Option<System.Networking.Sockets.Socket>::.ctor(System.Option.None)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion37(System.Option.None arg0) -> System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion37(System.Option.None arg0) -> System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
 ldarg arg0
-newobj instance System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>::.ctor(System.Option.None)
+newobj instance System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>::.ctor(System.Option.None)
 ret
 .end
 .function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion38(System.Option.None arg0) -> System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
@@ -255,14 +255,14 @@ ldarg arg0
 newobj instance System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>::.ctor(System.Option.None)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion40(System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>> arg0) -> System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion40(System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> arg0) -> System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
 ldarg arg0
-newobj instance System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>::.ctor(System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>)
+newobj instance System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>::.ctor(System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion41(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>> arg0) -> System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion41(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>> arg0) -> System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
 ldarg arg0
-newobj instance System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>::.ctor(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>)
+newobj instance System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>::.ctor(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>)
 ret
 .end
 .function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion42(System.Option<System.Networking.Sockets.Socket>& arg0,out(true) System.Option.Some<System.Networking.Sockets.Socket>& arg1) -> Boolean
@@ -280,41 +280,41 @@ call instance System.Option.Some<System.Networking.Sockets.Socket>::get_Value()
 stobj System.Networking.Sockets.Socket
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion44(System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>& arg0,out(true) System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>& arg1) -> Boolean
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion44(System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>& arg0,out(true) System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>& arg1) -> Boolean
 ldarg arg0
-ldobj System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>
+ldobj System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
 ldarg arg1
-call instance System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>::TryGet(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>&)
+call instance System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>::TryGet(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>&)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion45(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>& receiver,out System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>& value) -> void
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion45(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>& receiver,out System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>& value) -> void
 ldarg value
 ldarg receiver
-ldobj System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>
-call instance System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>::get_Value()
-stobj System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>
+ldobj System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
+call instance System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>::get_Value()
+stobj System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion46(System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>& arg0,out(true) System.Result.Ok<System.Collections.Sequence<String>>& arg1) -> Boolean
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion46(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>& arg0,out(true) System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>& arg1) -> Boolean
 ldarg arg0
-ldobj System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>
+ldobj System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>
 ldarg arg1
-call instance System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>::TryGet(System.Result.Ok<System.Collections.Sequence<String>>&)
+call instance System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>::TryGet(System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>&)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion47(System.Result.Ok<System.Collections.Sequence<String>>& receiver,out System.Collections.Sequence<String>& value) -> void
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion47(System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>& receiver,out System.Collections.Sequence<System.Networking.IPAddress>& value) -> void
 ldarg value
 ldarg receiver
-ldobj System.Result.Ok<System.Collections.Sequence<String>>
-call instance System.Result.Ok<System.Collections.Sequence<String>>::get_Value()
-stobj System.Collections.Sequence<String>
+ldobj System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>
+call instance System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>::get_Value()
+stobj System.Collections.Sequence<System.Networking.IPAddress>
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion48(System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>& arg0,out(true) System.Result.Error<System.Networking.DnsError>& arg1) -> Boolean
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion48(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>& arg0,out(true) System.Result.Error<System.Networking.DnsError>& arg1) -> Boolean
 ldarg arg0
-ldobj System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>
+ldobj System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>
 ldarg arg1
-call instance System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>::TryGet(System.Result.Error<System.Networking.DnsError>&)
+call instance System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>::TryGet(System.Result.Error<System.Networking.DnsError>&)
 ret
 .end
 .function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion49(System.Result.Error<System.Networking.DnsError>& receiver,out System.Networking.DnsError& value) -> void
@@ -4619,7 +4619,7 @@ ret
 .field private request System.Web.Http.HttpRequest
 .field private source System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .field private socket System.Option<System.Networking.Sockets.Socket>
-.field private lookup System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>
+.field private lookup System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
 .field private connecting System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
 .field private transfer System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 .field private outgoing System.Collections.Sequence<Byte>
@@ -4799,9 +4799,9 @@ M00000022_IL_00f8:
 ret
 .end
 .method internal instance Execute() -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
-.local System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>> local0
+.local System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> local0
 ldloca local0
-initobj System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>
+initobj System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 M00000023_IL_0000:
 M00000023_IL_0001:
 M00000023_IL_0002:
@@ -4833,9 +4833,9 @@ ldarg 0
 M00000023_IL_002c:
 ldloc local0
 M00000023_IL_002d:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion40(System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion40(System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>)
 M00000023_IL_0032:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion41(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion41(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>)
 M00000023_IL_0037:
 stfld System.Web.Http.HttpExchange::lookup
 M00000023_IL_003c:
@@ -4847,7 +4847,7 @@ M00000023_IL_003f:
 M00000023_IL_0045:
 delegate.bind System.Func<Void> = instance System.Web.Http.HttpExchange::DelegateTarget_Application_V1_M_363A6D6574686F643131313A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A4874747045786368616E6765383A4F6E4C6F6F6B7570343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
 M00000023_IL_004a:
-call instance System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>::OnCompleted(System.Func<Void>)
+call instance System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::OnCompleted(System.Func<Void>)
 M00000023_IL_004f:
 M00000023_IL_0050:
 ldarg 0
@@ -4997,35 +4997,35 @@ M00000024_IL_00d7:
 ret
 .end
 .method private instance OnLookup() -> noresult
-.local System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>> local0
-.local System.Result<System.Collections.Sequence<String>,System.Networking.DnsError> local1
-.local System.Collections.Sequence<String> local2
+.local System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> local0
+.local System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError> local1
+.local System.Collections.Sequence<System.Networking.IPAddress> local2
 .local System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local3
 .local System.Networking.DnsError local4
-.local System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>> local5
-.local System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>> local6
-.local System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>> local7
-.local System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>> local8
-.local System.Result<System.Collections.Sequence<String>,System.Networking.DnsError> local9
-.local System.Result.Ok<System.Collections.Sequence<String>> local10
-.local System.Result.Ok<System.Collections.Sequence<String>> local11
-.local System.Collections.Sequence<String> local12
-.local System.Result<System.Collections.Sequence<String>,System.Networking.DnsError> local13
+.local System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>> local5
+.local System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>> local6
+.local System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>> local7
+.local System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> local8
+.local System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError> local9
+.local System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>> local10
+.local System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>> local11
+.local System.Collections.Sequence<System.Networking.IPAddress> local12
+.local System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError> local13
 .local System.Result.Error<System.Networking.DnsError> local14
 .local System.Result.Error<System.Networking.DnsError> local15
 .local System.Networking.DnsError local16
 ldloca local0
-initobj System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>
+initobj System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 ldloca local2
-initobj System.Collections.Sequence<String>
+initobj System.Collections.Sequence<System.Networking.IPAddress>
 ldloca local3
 initobj System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 ldloca local4
 initobj System.Networking.DnsError
 ldloca local8
-initobj System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>
+initobj System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 ldloca local12
-initobj System.Collections.Sequence<String>
+initobj System.Collections.Sequence<System.Networking.IPAddress>
 ldloca local16
 initobj System.Networking.DnsError
 M00000025_IL_0000:
@@ -5041,7 +5041,7 @@ ldloca local5
 M00000025_IL_000c:
 ldloca local6
 M00000025_IL_000e:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion44(System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>&,System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion44(System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>&,System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>&)
 M00000025_IL_0013:
 brfalse M00000025_IL_0040
 M00000025_IL_0018:
@@ -5053,7 +5053,7 @@ ldloca local7
 M00000025_IL_001e:
 ldloca local8
 M00000025_IL_0020:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion45(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>>&,System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion45(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>&,System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>&)
 M00000025_IL_0025:
 ldloc local8
 M00000025_IL_0027:
@@ -5073,7 +5073,7 @@ M00000025_IL_0045:
 M00000025_IL_0046:
 ldloc local0
 M00000025_IL_0047:
-call instance System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>::GetResult()
+call instance System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::GetResult()
 M00000025_IL_004c:
 stloc local1
 M00000025_IL_004d:
@@ -5122,7 +5122,7 @@ ldloca local9
 M00000025_IL_0096:
 ldloca local10
 M00000025_IL_0098:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion46(System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>&,System.Result.Ok<System.Collections.Sequence<String>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion46(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>&,System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>&)
 M00000025_IL_009d:
 brfalse M00000025_IL_00ca
 M00000025_IL_00a2:
@@ -5134,7 +5134,7 @@ ldloca local11
 M00000025_IL_00a8:
 ldloca local12
 M00000025_IL_00aa:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion47(System.Result.Ok<System.Collections.Sequence<String>>&,System.Collections.Sequence<String>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion47(System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>&,System.Collections.Sequence<System.Networking.IPAddress>&)
 M00000025_IL_00af:
 ldloc local12
 M00000025_IL_00b1:
@@ -5164,7 +5164,7 @@ ldarg 0
 M00000025_IL_00dd:
 ldfld System.Web.Http.HttpExchange::deadline
 M00000025_IL_00e2:
-call System.Networking.Sockets.Socket::ConnectUntil(System.Collections.Sequence<String>,Int32,Int64)
+call System.Networking.Sockets.Socket::ConnectUntil(System.Collections.Sequence<System.Networking.IPAddress>,Int32,Int64)
 M00000025_IL_00e7:
 stloc local3
 M00000025_IL_00e8:
@@ -5200,7 +5200,7 @@ ldloca local13
 M00000025_IL_0119:
 ldloca local14
 M00000025_IL_011b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion48(System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>&,System.Result.Error<System.Networking.DnsError>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion48(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>&,System.Result.Error<System.Networking.DnsError>&)
 M00000025_IL_0120:
 brfalse M00000025_IL_014e
 M00000025_IL_0125:

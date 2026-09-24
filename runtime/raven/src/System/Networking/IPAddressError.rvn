@@ -1,0 +1,17 @@
+namespace System.Networking
+
+/// Expected failures when parsing an IP address literal.
+public union IPAddressError {
+    /// The text is not a supported strict IPv4 or IPv6 literal.
+    case InvalidFormat
+    /// IPv6 scope identifiers are not supported by this first iteration.
+    case UnsupportedScope
+
+    override func ToString() -> string {
+        return self match {
+            InvalidFormat => "Invalid IP address"
+            UnsupportedScope => "IP address scope identifiers are not supported"
+            _ => "Empty"
+        }
+    }
+}

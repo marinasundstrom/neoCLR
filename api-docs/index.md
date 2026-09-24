@@ -32,7 +32,8 @@ for generated type and member documentation. Both are parts of this site.
 
 [Socket clients](sockets.md) documents the development TCP connection and listener
 APIs, its Task/Result behavior and current limits. [Dns](xref:System.Networking.Dns)
-resolves hostnames to IPv4 addresses; the [networking guide](/features/networking/)
+resolves hostnames to immutable [IPAddress](xref:System.Networking.IPAddress) values
+from the closed IPv4Address/IPv6Address hierarchy (IPv4 answers only today); the [networking guide](/features/networking/)
 walks through the compiled hostname/echo POC.
 
 ## Features and reference

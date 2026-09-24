@@ -30,4 +30,5 @@
   <Target Name="RequireRaven" BeforeTargets="Restore;PrepareForBuild" Condition="'$(RavenRoot)' == ''">
     <Error Text="Pass -p:RavenRoot=/absolute/path/to/Raven at the documented revision." />
   </Target>
+<ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Networking/IPAddressError.rvn" LogicalName="NeoCLR.IPAddressError.rvn" /></ItemGroup>
 </Project>

@@ -7,11 +7,31 @@ title: Networking
 TCP client, sends bytes and reads the reply from a separate neoCLR server. It is available with matching development
 artifacts; the published Preview 9 SDK does not include these APIs.
 
+## Address values
+
+[IPAddress](xref:System.Networking.IPAddress) is a closed class hierarchy with
+IPv4Address and IPv6Address implementations. `IPAddress.Parse(text)` returns
+`Result<IPAddress, IPAddressError>` without DNS or network I/O. Addresses compare
+by family and bytes, with matching hashes; two equal addresses can be separate
+objects. An IPv4-mapped IPv6 address remains distinct from an IPv4 address.
+
+IPv4 parsing accepts four decimal components and rejects abbreviated, hexadecimal,
+octal and leading-zero forms. IPv6 accepts hexadecimal groups, `::` compression
+and a final dotted IPv4 component. Formatting produces lowercase IPv6, compresses
+the longest zero run (first on ties), and uses dotted decimal for mapped IPv4.
+URI brackets and IPv6 scope identifiers are not supported in this iteration.
+
+Unlike .NET's single IPAddress class, the families have distinct types. The current
+socket backend and DNS lookup remain IPv4-only. Socket overloads accept IPAddress
+values; IPv6 produces `SocketError.UnsupportedAddressFamily` before starting I/O.
+String socket overloads remain available. Development callers of DNS should update
+from `Sequence<string>` to `Sequence<IPAddress>` and rebuild with matching artifacts.
+
 ## Resolve, connect, exchange
 
 [Dns.GetHostAddresses](xref:System.Networking.Dns) returns a
-`Task<Result<Sequence<string>, DnsError>>`. Resolution uses the host configuration,
-including local host entries. The numeric IPv4 strings can be passed to Socket.Connect.
+`Task<Result<Sequence<IPAddress>, DnsError>>`. Resolution uses the host configuration,
+including local host entries. The immutable IPv4 address values can be passed to Socket.Connect.
 Lookup errors and connection errors are separate outcomes. `DnsError` also uses
 normal union syntax; match cases such as `DnsError.InvalidName` directly. Its former
 per-case `Is*`/`Get*` helpers have been removed in the development API. `SocketError` is authored

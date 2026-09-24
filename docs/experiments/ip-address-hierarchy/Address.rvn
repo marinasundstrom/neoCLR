@@ -1,0 +1,67 @@
+import System.*
+
+// Representation probe, not the public System.Networking API.
+sealed class IPAddress : Equatable<IPAddress> {
+    private val octets: byte[]
+
+    protected init(bytes: byte[]) {
+        octets = if bytes.Length == 4 {
+            [(byte)0, (byte)0, (byte)0, (byte)0]
+        } else {
+            [(byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0]
+        }
+        var index = 0
+        while index < bytes.Length {
+            octets[index] = bytes[index]
+            index += 1
+        }
+    }
+
+    func Equals(other: IPAddress) -> bool {
+        if octets.Length != other.octets.Length {
+            return false
+        }
+        var index = 0
+        while index < octets.Length {
+            if octets[index] != other.octets[index] {
+                return false
+            }
+            index += 1
+        }
+        return true
+    }
+
+    override func Equals(other: Object?) -> bool {
+        if other is IPAddress address {
+            return Equals(address)
+        }
+        return false
+    }
+
+    override func GetHashCode() -> int {
+        var hash = HashCode()
+        hash.Add(octets.Length)
+        var index = 0
+        while index < octets.Length {
+            hash.Add(octets[index])
+            index += 1
+        }
+        return hash.ToHashCode()
+    }
+}
+
+class IPv4Address : IPAddress {
+    init(bytes: byte[]) : base(bytes) {
+        if bytes.Length != 4 {
+            System.Fault("Probe requires four IPv4 octets")
+        }
+    }
+}
+
+class IPv6Address : IPAddress {
+    init(bytes: byte[]) : base(bytes) {
+        if bytes.Length != 16 {
+            System.Fault("Probe requires sixteen IPv6 octets")
+        }
+    }
+}

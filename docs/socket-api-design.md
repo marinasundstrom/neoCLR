@@ -803,3 +803,12 @@ Validation should include parse/format round-trips, invalid addresses, equivalen
 IPv6 spellings, equality/hash agreement, default union behavior, case payload
 copying/boxing/GC, and a DNS-to-socket sample. Publish API reference and website
 coverage with implementation. These are planned APIs, not yet runtime capabilities.
+
+
+## Address values — 2026-09-25
+
+The [address slice](ip-address-design.md) replaces DNS string results with the closed
+IPAddress hierarchy and adds typed Socket Connect/Listen overloads. The earlier
+string-result checkpoint above is historical. String Socket overloads remain available,
+and native transport/DNS remain IPv4-only. IPv6 address values are valid independently
+of transport and produce UnsupportedAddressFamily at the Socket boundary.

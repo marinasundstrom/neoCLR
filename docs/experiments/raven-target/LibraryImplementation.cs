@@ -23,6 +23,10 @@ static class LibraryImplementation
         SocketBindings.Project(core);
         if (owner != "System" && !Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
             throw new InvalidDataException("Invalid library owner.");
+        if (owner == IPAddressBindings.Root) {
+            foreach (var name in IPAddressBindings.Names) ApplicationTypes.BindLibrary(source.GetType(name), name);
+            return IPAddressBindings.Names.SelectMany(name => InstanceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
+        }
         if (owner == "System.Storage.StorageItem")
         {
             var names = new[] { "System.Storage.StorageItem", "System.Storage.File", "System.Storage.Directory" };
@@ -132,8 +136,10 @@ static class LibraryImplementation
     {
         IntrospectionHierarchy.Validate(type);
         StorageHierarchy.Validate(type);
+        IPAddressBindings.Validate(type);
         IntrospectionHierarchy.Validate(contract);
         StorageHierarchy.Validate(contract);
+        IPAddressBindings.Validate(contract);
         // Bounded invariant declaration authoring, not permission to replace a class with an
         // interface or supply executable default/static interface members.
         foreach (var candidate in new[] { type, contract })
@@ -176,8 +182,10 @@ static class LibraryImplementation
     {
         IntrospectionHierarchy.Validate(type);
         StorageHierarchy.Validate(type);
+        IPAddressBindings.Validate(type);
         IntrospectionHierarchy.Validate(contract);
         StorageHierarchy.Validate(contract);
+        IPAddressBindings.Validate(contract);
         if (DescriptorLibrary.IsProvider(type) && (!type.IsNotPublic || !contract.IsNotPublic))
             throw new InvalidDataException("Runtime descriptor providers must remain internal.");
         if (GenericUnionLibrary.IsFamily(type)) GenericUnionLibrary.Validate(type, contract);
@@ -185,9 +193,9 @@ static class LibraryImplementation
         // A single explicitly selected reference/implementation pair. Never alias arbitrary
         // guest types by namespace/name, and never execute reference-assembly stub bodies.
         foreach (var candidate in new[] { type, contract })
-            if (!(candidate.IsPublic || candidate.IsNotPublic && (DescriptorLibrary.IsProvider(candidate) || HttpBindings.IsProvider(candidate) || SocketBindings.IsProvider(candidate) || WorkerBindings.IsProvider(candidate) || ReaderBindings.IsProvider(candidate)) || candidate.IsNestedPublic && GenericUnionLibrary.IsCase(candidate)) || candidate.IsInterface || candidate.IsAbstract != (DescriptorLibrary.IsDescriptor(candidate) && candidate.Name == "RuntimeMemberInfo")
+            if (!(candidate.IsPublic || candidate.IsNotPublic && (DescriptorLibrary.IsProvider(candidate) || HttpBindings.IsProvider(candidate) || SocketBindings.IsProvider(candidate) || WorkerBindings.IsProvider(candidate) || ReaderBindings.IsProvider(candidate)) || candidate.IsNestedPublic && GenericUnionLibrary.IsCase(candidate)) || candidate.IsInterface || candidate.IsAbstract != (candidate.FullName == IPAddressBindings.Root || DescriptorLibrary.IsDescriptor(candidate) && candidate.Name == "RuntimeMemberInfo")
                 || candidate.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant) || candidate.HasNestedTypes && !ErrorCarrierLibrary.IsCarrier(candidate) || candidate.HasEvents
-                || candidate.BaseType?.FullName != (DescriptorLibrary.IsDescriptor(candidate) ? DescriptorLibrary.Base(candidate) : candidate.IsValueType ? "System.ValueType" : "System.Object") || candidate.IsExplicitLayout)
+                || candidate.BaseType?.FullName != (IPAddressBindings.IsName(candidate.FullName) && candidate.FullName != IPAddressBindings.Root ? IPAddressBindings.Root : DescriptorLibrary.IsDescriptor(candidate) ? DescriptorLibrary.Base(candidate) : candidate.IsValueType ? "System.ValueType" : "System.Object") || candidate.IsExplicitLayout)
                 throw new InvalidDataException($"Unsupported instance library owner: {candidate.FullName}, base={candidate.BaseType}, public={candidate.IsPublic}, abstract={candidate.IsAbstract}, nested={candidate.HasNestedTypes}, value={candidate.IsValueType}.");
         if (type.IsValueType != contract.IsValueType)
             throw new InvalidDataException("Library value/reference representation does not match reference contract.");
@@ -278,7 +286,7 @@ static class LibraryImplementation
             && !contract.HasMethods && !type.HasProperties && !type.HasInterfaces
             && type.Methods.All(PrimitiveLibrary.IsDefaultConstructor);
         var methods = type.Methods.Where(m => !OpaqueLibrary.IsOmittedConstructor(m) && !ArrayLibrary.OmitConstructor(m) && !EmptyLibrary.OmitConstructor(m) && !((ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)) && (!(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m))).ToArray();
-        if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || DescriptorLibrary.IsDescriptor(type) && m.IsFamily && m.IsConstructor || m.IsPrivate && (!m.IsVirtual || OpaqueLibrary.MatchesStringCount(m) && contract.Methods.Count(OpaqueLibrary.MatchesStringCount) == 1)
+        if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || (DescriptorLibrary.IsDescriptor(type) || type.FullName == IPAddressBindings.Root) && m.IsFamily && m.IsConstructor || m.IsPrivate && (!m.IsVirtual || OpaqueLibrary.MatchesStringCount(m) && contract.Methods.Count(OpaqueLibrary.MatchesStringCount) == 1)
             || m.IsAssembly && !m.IsVirtual && contract.Methods.Count(c => c.IsAssembly && MatchMethod(c, m)) == 1) || !m.HasBody || m.HasGenericParameters
             || m.ExplicitThis || m.IsConstructor && m.IsStatic || m.CallingConvention != MethodCallingConvention.Default
             || m.Parameters.Any(p => (p.IsOut || p.ParameterType.IsByReference) && !GenericUnionLibrary.IsConditionalOutput(m, p))))
@@ -322,7 +330,7 @@ static class LibraryImplementation
 
     public static bool SameType(TypeReference left, TypeReference right)
     {
-        if (HttpBindings.SameType(left, right) || ReaderBindings.SameType(left, right) || FileSystemBindings.SameType(left, right) || StorageItemBindings.SameType(left, right) || StorageProviderBindings.SameType(left, right) || UriBindings.SameType(left, right) || PathBindings.SameType(left, right) || StreamBindings.SameType(left, right) || SocketBindings.SameType(left, right) || WorkerBindings.SameType(left, right) || AsyncBindings.SameType(left, right) || TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right)) return true;
+        if (HttpBindings.SameType(left, right) || ReaderBindings.SameType(left, right) || FileSystemBindings.SameType(left, right) || StorageItemBindings.SameType(left, right) || StorageProviderBindings.SameType(left, right) || IPAddressBindings.SameType(left, right) || UriBindings.SameType(left, right) || PathBindings.SameType(left, right) || StreamBindings.SameType(left, right) || SocketBindings.SameType(left, right) || WorkerBindings.SameType(left, right) || AsyncBindings.SameType(left, right) || TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right)) return true;
         if (left is ByReferenceType lb)
             return right is ByReferenceType rb && SameType(lb.ElementType, rb.ElementType);
         if (left is ArrayType la)

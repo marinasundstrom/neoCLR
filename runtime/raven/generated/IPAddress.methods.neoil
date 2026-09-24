@@ -1,0 +1,3015 @@
+; Generated from runtime/raven/src/System/Networking/IPAddress.rvn. Regenerate with build_runtime_library.py.
+.type class abstract System.Networking.IPAddress
+.closedhierarchy
+.extends System.Object
+.implements System.Equatable<System.Networking.IPAddress>
+.field private octets arrayref<Byte>
+.method instance .ctor(arrayref<Byte> bytes) -> noresult
+.local Int32 local0
+.local arrayref<Byte> local1
+.local arrayref<Byte> local2
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj arrayref<Byte>
+ldloca local2
+initobj arrayref<Byte>
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+call instance System.Object::.ctor()
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 0
+M00000001_IL_0009:
+ldarg 1
+M00000001_IL_000a:
+ldlen
+conv.i4
+M00000001_IL_000f:
+ldc.i4 4
+M00000001_IL_0010:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0012:
+brfalse M00000001_IL_0038
+M00000001_IL_0017:
+ldc.i4 4
+M00000001_IL_0018:
+newarr Byte
+M00000001_IL_001d:
+dup
+M00000001_IL_001e:
+ldc.i4 0
+M00000001_IL_001f:
+ldc.i4 0
+M00000001_IL_0020:
+conv.u1
+M00000001_IL_0021:
+stelem Byte
+M00000001_IL_0022:
+dup
+M00000001_IL_0023:
+ldc.i4 1
+M00000001_IL_0024:
+ldc.i4 0
+M00000001_IL_0025:
+conv.u1
+M00000001_IL_0026:
+stelem Byte
+M00000001_IL_0027:
+dup
+M00000001_IL_0028:
+ldc.i4 2
+M00000001_IL_0029:
+ldc.i4 0
+M00000001_IL_002a:
+conv.u1
+M00000001_IL_002b:
+stelem Byte
+M00000001_IL_002c:
+dup
+M00000001_IL_002d:
+ldc.i4 3
+M00000001_IL_002e:
+ldc.i4 0
+M00000001_IL_002f:
+conv.u1
+M00000001_IL_0030:
+stelem Byte
+M00000001_IL_0031:
+stloc local1
+M00000001_IL_0032:
+ldloc local1
+M00000001_IL_0033:
+br M00000001_IL_0098
+M00000001_IL_0038:
+ldc.i4 16
+M00000001_IL_003a:
+newarr Byte
+M00000001_IL_003f:
+dup
+M00000001_IL_0040:
+ldc.i4 0
+M00000001_IL_0041:
+ldc.i4 0
+M00000001_IL_0042:
+conv.u1
+M00000001_IL_0043:
+stelem Byte
+M00000001_IL_0044:
+dup
+M00000001_IL_0045:
+ldc.i4 1
+M00000001_IL_0046:
+ldc.i4 0
+M00000001_IL_0047:
+conv.u1
+M00000001_IL_0048:
+stelem Byte
+M00000001_IL_0049:
+dup
+M00000001_IL_004a:
+ldc.i4 2
+M00000001_IL_004b:
+ldc.i4 0
+M00000001_IL_004c:
+conv.u1
+M00000001_IL_004d:
+stelem Byte
+M00000001_IL_004e:
+dup
+M00000001_IL_004f:
+ldc.i4 3
+M00000001_IL_0050:
+ldc.i4 0
+M00000001_IL_0051:
+conv.u1
+M00000001_IL_0052:
+stelem Byte
+M00000001_IL_0053:
+dup
+M00000001_IL_0054:
+ldc.i4 4
+M00000001_IL_0055:
+ldc.i4 0
+M00000001_IL_0056:
+conv.u1
+M00000001_IL_0057:
+stelem Byte
+M00000001_IL_0058:
+dup
+M00000001_IL_0059:
+ldc.i4 5
+M00000001_IL_005a:
+ldc.i4 0
+M00000001_IL_005b:
+conv.u1
+M00000001_IL_005c:
+stelem Byte
+M00000001_IL_005d:
+dup
+M00000001_IL_005e:
+ldc.i4 6
+M00000001_IL_005f:
+ldc.i4 0
+M00000001_IL_0060:
+conv.u1
+M00000001_IL_0061:
+stelem Byte
+M00000001_IL_0062:
+dup
+M00000001_IL_0063:
+ldc.i4 7
+M00000001_IL_0064:
+ldc.i4 0
+M00000001_IL_0065:
+conv.u1
+M00000001_IL_0066:
+stelem Byte
+M00000001_IL_0067:
+dup
+M00000001_IL_0068:
+ldc.i4 8
+M00000001_IL_0069:
+ldc.i4 0
+M00000001_IL_006a:
+conv.u1
+M00000001_IL_006b:
+stelem Byte
+M00000001_IL_006c:
+dup
+M00000001_IL_006d:
+ldc.i4 9
+M00000001_IL_006f:
+ldc.i4 0
+M00000001_IL_0070:
+conv.u1
+M00000001_IL_0071:
+stelem Byte
+M00000001_IL_0072:
+dup
+M00000001_IL_0073:
+ldc.i4 10
+M00000001_IL_0075:
+ldc.i4 0
+M00000001_IL_0076:
+conv.u1
+M00000001_IL_0077:
+stelem Byte
+M00000001_IL_0078:
+dup
+M00000001_IL_0079:
+ldc.i4 11
+M00000001_IL_007b:
+ldc.i4 0
+M00000001_IL_007c:
+conv.u1
+M00000001_IL_007d:
+stelem Byte
+M00000001_IL_007e:
+dup
+M00000001_IL_007f:
+ldc.i4 12
+M00000001_IL_0081:
+ldc.i4 0
+M00000001_IL_0082:
+conv.u1
+M00000001_IL_0083:
+stelem Byte
+M00000001_IL_0084:
+dup
+M00000001_IL_0085:
+ldc.i4 13
+M00000001_IL_0087:
+ldc.i4 0
+M00000001_IL_0088:
+conv.u1
+M00000001_IL_0089:
+stelem Byte
+M00000001_IL_008a:
+dup
+M00000001_IL_008b:
+ldc.i4 14
+M00000001_IL_008d:
+ldc.i4 0
+M00000001_IL_008e:
+conv.u1
+M00000001_IL_008f:
+stelem Byte
+M00000001_IL_0090:
+dup
+M00000001_IL_0091:
+ldc.i4 15
+M00000001_IL_0093:
+ldc.i4 0
+M00000001_IL_0094:
+conv.u1
+M00000001_IL_0095:
+stelem Byte
+M00000001_IL_0096:
+stloc local2
+M00000001_IL_0097:
+ldloc local2
+M00000001_IL_0098:
+stfld System.Networking.IPAddress::octets
+M00000001_IL_009d:
+M00000001_IL_009e:
+ldc.i4 0
+M00000001_IL_009f:
+stloc local0
+M00000001_IL_00a0:
+M00000001_IL_00a1:
+M00000001_IL_00a2:
+ldloc local0
+M00000001_IL_00a3:
+ldarg 1
+M00000001_IL_00a4:
+ldlen
+conv.i4
+M00000001_IL_00a9:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_00ab:
+brtrue M00000001_IL_00b5
+M00000001_IL_00b0:
+br M00000001_IL_00cb
+M00000001_IL_00b5:
+M00000001_IL_00b6:
+ldarg 0
+M00000001_IL_00b7:
+ldfld System.Networking.IPAddress::octets
+M00000001_IL_00bc:
+ldloc local0
+M00000001_IL_00bd:
+ldarg 1
+M00000001_IL_00be:
+ldloc local0
+M00000001_IL_00bf:
+ldelem Byte
+M00000001_IL_00c0:
+stelem Byte
+M00000001_IL_00c1:
+M00000001_IL_00c2:
+ldloc local0
+M00000001_IL_00c3:
+ldc.i4 1
+M00000001_IL_00c4:
+add
+M00000001_IL_00c5:
+stloc local0
+M00000001_IL_00c6:
+br M00000001_IL_00a1
+M00000001_IL_00cb:
+M00000001_IL_00cc:
+ret
+.end
+.method instance override ToString() -> String
+.local Int32 local0
+.local Int32 local1
+.local Int32 local2
+.local Int32 local3
+.local String local4
+.local Int32 local5
+.local String local6
+ldc.i4 0
+stloc local0
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local2
+ldc.i4 0
+stloc local3
+ldc.i4 0
+stloc local5
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldfld System.Networking.IPAddress::octets
+M00000002_IL_0008:
+ldlen
+conv.i4
+M00000002_IL_000d:
+ldc.i4 4
+M00000002_IL_000e:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0010:
+brtrue M00000002_IL_001a
+M00000002_IL_0015:
+br M00000002_IL_0023
+M00000002_IL_001a:
+M00000002_IL_001b:
+ldarg 0
+M00000002_IL_001c:
+ldc.i4 0
+M00000002_IL_001d:
+callvirt instance System.Networking.IPAddress::FormatIPv4(Int32)
+M00000002_IL_0022:
+ret
+M00000002_IL_0023:
+M00000002_IL_0024:
+M00000002_IL_0025:
+ldarg 0
+M00000002_IL_0026:
+ldc.i4 0
+M00000002_IL_0027:
+callvirt instance System.Networking.IPAddress::Group(Int32)
+M00000002_IL_002c:
+ldc.i4 0
+M00000002_IL_002d:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_002f:
+brfalse M00000002_IL_009b
+M00000002_IL_0034:
+ldarg 0
+M00000002_IL_0035:
+ldc.i4 1
+M00000002_IL_0036:
+callvirt instance System.Networking.IPAddress::Group(Int32)
+M00000002_IL_003b:
+ldc.i4 0
+M00000002_IL_003c:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_003e:
+brfalse M00000002_IL_0095
+M00000002_IL_0043:
+ldarg 0
+M00000002_IL_0044:
+ldc.i4 2
+M00000002_IL_0045:
+callvirt instance System.Networking.IPAddress::Group(Int32)
+M00000002_IL_004a:
+ldc.i4 0
+M00000002_IL_004b:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_004d:
+brfalse M00000002_IL_008f
+M00000002_IL_0052:
+ldarg 0
+M00000002_IL_0053:
+ldc.i4 3
+M00000002_IL_0054:
+callvirt instance System.Networking.IPAddress::Group(Int32)
+M00000002_IL_0059:
+ldc.i4 0
+M00000002_IL_005a:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_005c:
+brfalse M00000002_IL_0089
+M00000002_IL_0061:
+ldarg 0
+M00000002_IL_0062:
+ldc.i4 4
+M00000002_IL_0063:
+callvirt instance System.Networking.IPAddress::Group(Int32)
+M00000002_IL_0068:
+ldc.i4 0
+M00000002_IL_0069:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_006b:
+brfalse M00000002_IL_0083
+M00000002_IL_0070:
+ldarg 0
+M00000002_IL_0071:
+ldc.i4 5
+M00000002_IL_0072:
+callvirt instance System.Networking.IPAddress::Group(Int32)
+M00000002_IL_0077:
+ldc.i4 65535
+M00000002_IL_007c:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_007e:
+br M00000002_IL_0084
+M00000002_IL_0083:
+ldc.i4 0
+M00000002_IL_0084:
+br M00000002_IL_008a
+M00000002_IL_0089:
+ldc.i4 0
+M00000002_IL_008a:
+br M00000002_IL_0090
+M00000002_IL_008f:
+ldc.i4 0
+M00000002_IL_0090:
+br M00000002_IL_0096
+M00000002_IL_0095:
+ldc.i4 0
+M00000002_IL_0096:
+br M00000002_IL_009c
+M00000002_IL_009b:
+ldc.i4 0
+M00000002_IL_009c:
+brtrue M00000002_IL_00a6
+M00000002_IL_00a1:
+br M00000002_IL_00ba
+M00000002_IL_00a6:
+M00000002_IL_00a7:
+ldstr "::ffff:"
+M00000002_IL_00ac:
+ldarg 0
+M00000002_IL_00ad:
+ldc.i4 12
+M00000002_IL_00af:
+callvirt instance System.Networking.IPAddress::FormatIPv4(Int32)
+M00000002_IL_00b4:
+call System.String::Concat(String,String)
+M00000002_IL_00b9:
+ret
+M00000002_IL_00ba:
+M00000002_IL_00bb:
+M00000002_IL_00bc:
+ldc.i4 -1
+M00000002_IL_00bd:
+stloc local0
+M00000002_IL_00be:
+M00000002_IL_00bf:
+ldc.i4 1
+M00000002_IL_00c0:
+stloc local1
+M00000002_IL_00c1:
+M00000002_IL_00c2:
+ldc.i4 0
+M00000002_IL_00c3:
+stloc local2
+M00000002_IL_00c4:
+M00000002_IL_00c5:
+M00000002_IL_00c6:
+ldloc local2
+M00000002_IL_00c7:
+ldc.i4 8
+M00000002_IL_00c8:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_00ca:
+brtrue M00000002_IL_00d4
+M00000002_IL_00cf:
+br M00000002_IL_0149
+M00000002_IL_00d4:
+M00000002_IL_00d5:
+ldarg 0
+M00000002_IL_00d6:
+ldloc local2
+M00000002_IL_00d7:
+callvirt instance System.Networking.IPAddress::Group(Int32)
+M00000002_IL_00dc:
+ldc.i4 0
+M00000002_IL_00dd:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_00df:
+ldc.i4 0
+M00000002_IL_00e0:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_00e2:
+brtrue M00000002_IL_00ec
+M00000002_IL_00e7:
+br M00000002_IL_00f6
+M00000002_IL_00ec:
+M00000002_IL_00ed:
+ldloc local2
+M00000002_IL_00ee:
+ldc.i4 1
+M00000002_IL_00ef:
+add
+M00000002_IL_00f0:
+stloc local2
+M00000002_IL_00f1:
+br M00000002_IL_00c5
+M00000002_IL_00f6:
+M00000002_IL_00f7:
+M00000002_IL_00f8:
+ldloc local2
+M00000002_IL_00f9:
+stloc local3
+M00000002_IL_00fa:
+M00000002_IL_00fb:
+M00000002_IL_00fc:
+ldloc local2
+M00000002_IL_00fd:
+ldc.i4 8
+M00000002_IL_00fe:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0100:
+brfalse M00000002_IL_0114
+M00000002_IL_0105:
+ldarg 0
+M00000002_IL_0106:
+ldloc local2
+M00000002_IL_0107:
+callvirt instance System.Networking.IPAddress::Group(Int32)
+M00000002_IL_010c:
+ldc.i4 0
+M00000002_IL_010d:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_010f:
+br M00000002_IL_0115
+M00000002_IL_0114:
+ldc.i4 0
+M00000002_IL_0115:
+brtrue M00000002_IL_011f
+M00000002_IL_011a:
+br M00000002_IL_0129
+M00000002_IL_011f:
+M00000002_IL_0120:
+ldloc local2
+M00000002_IL_0121:
+ldc.i4 1
+M00000002_IL_0122:
+add
+M00000002_IL_0123:
+stloc local2
+M00000002_IL_0124:
+br M00000002_IL_00fb
+M00000002_IL_0129:
+M00000002_IL_012a:
+M00000002_IL_012b:
+ldloc local2
+M00000002_IL_012c:
+ldloc local3
+M00000002_IL_012d:
+sub
+M00000002_IL_012e:
+ldloc local1
+M00000002_IL_012f:
+cgt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0131:
+brtrue M00000002_IL_013b
+M00000002_IL_0136:
+br M00000002_IL_0143
+M00000002_IL_013b:
+M00000002_IL_013c:
+ldloc local3
+M00000002_IL_013d:
+stloc local0
+M00000002_IL_013e:
+M00000002_IL_013f:
+ldloc local2
+M00000002_IL_0140:
+ldloc local3
+M00000002_IL_0141:
+sub
+M00000002_IL_0142:
+stloc local1
+M00000002_IL_0143:
+M00000002_IL_0144:
+br M00000002_IL_00c5
+M00000002_IL_0149:
+M00000002_IL_014a:
+M00000002_IL_014b:
+ldstr ""
+M00000002_IL_0150:
+stloc local4
+M00000002_IL_0152:
+M00000002_IL_0153:
+ldc.i4 0
+M00000002_IL_0154:
+stloc local2
+M00000002_IL_0155:
+M00000002_IL_0156:
+M00000002_IL_0157:
+ldloc local2
+M00000002_IL_0158:
+ldc.i4 8
+M00000002_IL_0159:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_015b:
+brtrue M00000002_IL_0165
+M00000002_IL_0160:
+br M00000002_IL_0254
+M00000002_IL_0165:
+M00000002_IL_0166:
+ldloc local2
+M00000002_IL_0167:
+ldloc local0
+M00000002_IL_0168:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_016a:
+brtrue M00000002_IL_0174
+M00000002_IL_016f:
+br M00000002_IL_018d
+M00000002_IL_0174:
+M00000002_IL_0175:
+ldloc local4
+M00000002_IL_0177:
+ldstr "::"
+M00000002_IL_017c:
+call System.String::Concat(String,String)
+M00000002_IL_0181:
+stloc local4
+M00000002_IL_0183:
+M00000002_IL_0184:
+ldloc local2
+M00000002_IL_0185:
+ldloc local1
+M00000002_IL_0186:
+add
+M00000002_IL_0187:
+stloc local2
+M00000002_IL_0188:
+br M00000002_IL_0156
+M00000002_IL_018d:
+M00000002_IL_018e:
+M00000002_IL_018f:
+ldloc local4
+M00000002_IL_0191:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringget_IsEmpty(String)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0196:
+ldc.i4 0
+M00000002_IL_0197:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0199:
+brfalse M00000002_IL_01bd
+M00000002_IL_019e:
+ldloc local4
+M00000002_IL_01a0:
+ldloc local4
+M00000002_IL_01a2:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringGetUtf8ByteCount(String)
+M00000002_IL_01a7:
+ldc.i4 1
+M00000002_IL_01a8:
+sub
+M00000002_IL_01a9:
+call System.Networking.IPAddress::At(String,Int32)
+M00000002_IL_01ae:
+ldstr ":"
+M00000002_IL_01b3:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringEquals(String,String)
+ldc.bool false
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_01b8:
+br M00000002_IL_01be
+M00000002_IL_01bd:
+ldc.i4 0
+M00000002_IL_01be:
+brtrue M00000002_IL_01c8
+M00000002_IL_01c3:
+br M00000002_IL_01d7
+M00000002_IL_01c8:
+M00000002_IL_01c9:
+ldloc local4
+M00000002_IL_01cb:
+ldstr ":"
+M00000002_IL_01d0:
+call System.String::Concat(String,String)
+M00000002_IL_01d5:
+stloc local4
+M00000002_IL_01d7:
+M00000002_IL_01d8:
+M00000002_IL_01d9:
+ldarg 0
+M00000002_IL_01da:
+ldloc local2
+M00000002_IL_01db:
+callvirt instance System.Networking.IPAddress::Group(Int32)
+M00000002_IL_01e0:
+stloc local5
+M00000002_IL_01e2:
+M00000002_IL_01e3:
+ldstr ""
+M00000002_IL_01e8:
+stloc local6
+M00000002_IL_01ea:
+M00000002_IL_01eb:
+ldloc local5
+M00000002_IL_01ed:
+ldc.i4 0
+M00000002_IL_01ee:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_01f0:
+brtrue M00000002_IL_01fa
+M00000002_IL_01f5:
+br M00000002_IL_0202
+M00000002_IL_01fa:
+M00000002_IL_01fb:
+ldstr "0"
+M00000002_IL_0200:
+stloc local6
+M00000002_IL_0202:
+M00000002_IL_0203:
+M00000002_IL_0204:
+M00000002_IL_0205:
+ldloc local5
+M00000002_IL_0207:
+ldc.i4 0
+M00000002_IL_0208:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_020a:
+ldc.i4 0
+M00000002_IL_020b:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_020d:
+brtrue M00000002_IL_0217
+M00000002_IL_0212:
+br M00000002_IL_023d
+M00000002_IL_0217:
+M00000002_IL_0218:
+ldstr "0123456789abcdef"
+M00000002_IL_021d:
+ldloc local5
+M00000002_IL_021f:
+ldc.i4 16
+M00000002_IL_0221:
+rem
+M00000002_IL_0222:
+call System.Networking.IPAddress::At(String,Int32)
+M00000002_IL_0227:
+ldloc local6
+M00000002_IL_0229:
+call System.String::Concat(String,String)
+M00000002_IL_022e:
+stloc local6
+M00000002_IL_0230:
+M00000002_IL_0231:
+ldloc local5
+M00000002_IL_0233:
+ldc.i4 16
+M00000002_IL_0235:
+div
+M00000002_IL_0236:
+stloc local5
+M00000002_IL_0238:
+br M00000002_IL_0204
+M00000002_IL_023d:
+M00000002_IL_023e:
+M00000002_IL_023f:
+ldloc local4
+M00000002_IL_0241:
+ldloc local6
+M00000002_IL_0243:
+call System.String::Concat(String,String)
+M00000002_IL_0248:
+stloc local4
+M00000002_IL_024a:
+M00000002_IL_024b:
+ldloc local2
+M00000002_IL_024c:
+ldc.i4 1
+M00000002_IL_024d:
+add
+M00000002_IL_024e:
+stloc local2
+M00000002_IL_024f:
+br M00000002_IL_0156
+M00000002_IL_0254:
+M00000002_IL_0255:
+M00000002_IL_0256:
+ldloc local4
+M00000002_IL_0258:
+ret
+.end
+.method private instance FormatIPv4(Int32 offset) -> String
+.local Int32 local0
+.local Int32 local1
+.local Int32 local2
+.local Int32 local3
+ldc.i4 0
+stloc local0
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local2
+ldc.i4 0
+stloc local3
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.Networking.IPAddress::octets
+M00000003_IL_0008:
+ldarg 1
+M00000003_IL_0009:
+ldelem Byte
+M00000003_IL_000a:
+conv.i4
+M00000003_IL_000b:
+stloc local0
+M00000003_IL_000c:
+ldloca local0
+M00000003_IL_000e:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeInt32ToString(Int32&)
+M00000003_IL_0013:
+ldstr "."
+M00000003_IL_0018:
+call System.String::Concat(String,String)
+M00000003_IL_001d:
+ldarg 0
+M00000003_IL_001e:
+ldfld System.Networking.IPAddress::octets
+M00000003_IL_0023:
+ldarg 1
+M00000003_IL_0024:
+ldc.i4 1
+M00000003_IL_0025:
+add
+M00000003_IL_0026:
+ldelem Byte
+M00000003_IL_0027:
+conv.i4
+M00000003_IL_0028:
+stloc local1
+M00000003_IL_0029:
+ldloca local1
+M00000003_IL_002b:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeInt32ToString(Int32&)
+M00000003_IL_0030:
+ldstr "."
+M00000003_IL_0035:
+call System.String::Concat(String,String)
+M00000003_IL_003a:
+call System.String::Concat(String,String)
+M00000003_IL_003f:
+ldarg 0
+M00000003_IL_0040:
+ldfld System.Networking.IPAddress::octets
+M00000003_IL_0045:
+ldarg 1
+M00000003_IL_0046:
+ldc.i4 2
+M00000003_IL_0047:
+add
+M00000003_IL_0048:
+ldelem Byte
+M00000003_IL_0049:
+conv.i4
+M00000003_IL_004a:
+stloc local2
+M00000003_IL_004b:
+ldloca local2
+M00000003_IL_004d:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeInt32ToString(Int32&)
+M00000003_IL_0052:
+ldstr "."
+M00000003_IL_0057:
+call System.String::Concat(String,String)
+M00000003_IL_005c:
+ldarg 0
+M00000003_IL_005d:
+ldfld System.Networking.IPAddress::octets
+M00000003_IL_0062:
+ldarg 1
+M00000003_IL_0063:
+ldc.i4 3
+M00000003_IL_0064:
+add
+M00000003_IL_0065:
+ldelem Byte
+M00000003_IL_0066:
+conv.i4
+M00000003_IL_0067:
+stloc local3
+M00000003_IL_0068:
+ldloca local3
+M00000003_IL_006a:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeInt32ToString(Int32&)
+M00000003_IL_006f:
+call System.String::Concat(String,String)
+M00000003_IL_0074:
+call System.String::Concat(String,String)
+M00000003_IL_0079:
+ret
+.end
+.method private instance Group(Int32 index) -> Int32
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.Networking.IPAddress::octets
+M00000004_IL_0008:
+ldarg 1
+M00000004_IL_0009:
+ldc.i4 2
+M00000004_IL_000a:
+mul
+M00000004_IL_000b:
+ldelem Byte
+M00000004_IL_000c:
+conv.i4
+M00000004_IL_000d:
+ldc.i4 256
+M00000004_IL_0012:
+mul
+M00000004_IL_0013:
+ldarg 0
+M00000004_IL_0014:
+ldfld System.Networking.IPAddress::octets
+M00000004_IL_0019:
+ldarg 1
+M00000004_IL_001a:
+ldc.i4 2
+M00000004_IL_001b:
+mul
+M00000004_IL_001c:
+ldc.i4 1
+M00000004_IL_001d:
+add
+M00000004_IL_001e:
+ldelem Byte
+M00000004_IL_001f:
+conv.i4
+M00000004_IL_0020:
+add
+M00000004_IL_0021:
+ret
+.end
+.method private static At(String text,Int32 index) -> String
+.local String local0
+.local System.Result<String,System.Text.Utf8SliceError> local1
+.local System.Result.Ok<String> local2
+.local System.Result.Ok<String> local3
+.local String local4
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldarg 1
+M00000005_IL_0004:
+ldc.i4 1
+M00000005_IL_0005:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringSliceUtf8(String,Int32,Int32)
+M00000005_IL_000a:
+stloc local1
+M00000005_IL_000b:
+ldloca local1
+M00000005_IL_000d:
+ldloca local2
+M00000005_IL_000f:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion0(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Ok<String>&)
+M00000005_IL_0014:
+brfalse M00000005_IL_003f
+M00000005_IL_0019:
+ldloc local2
+M00000005_IL_001a:
+stloc local3
+M00000005_IL_001b:
+ldloca local3
+M00000005_IL_001d:
+ldloca local4
+M00000005_IL_001f:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion1(System.Result.Ok<String>&,String&)
+M00000005_IL_0024:
+ldloc local4
+M00000005_IL_0026:
+stloc local0
+M00000005_IL_0027:
+ldc.i4 1
+M00000005_IL_0028:
+br M00000005_IL_002e
+M00000005_IL_002e:
+brfalse M00000005_IL_003f
+M00000005_IL_0033:
+M00000005_IL_0034:
+br M00000005_IL_0044
+M00000005_IL_003f:
+br M00000005_IL_0047
+M00000005_IL_0044:
+M00000005_IL_0045:
+ldloc local0
+M00000005_IL_0046:
+ret
+M00000005_IL_0047:
+M00000005_IL_0048:
+M00000005_IL_0049:
+ldstr ""
+M00000005_IL_004e:
+ret
+.end
+.method private static Part(String text,Int32 start,Int32 count) -> String
+.local String local0
+.local System.Result<String,System.Text.Utf8SliceError> local1
+.local System.Result.Ok<String> local2
+.local System.Result.Ok<String> local3
+.local String local4
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldarg 1
+M00000006_IL_0004:
+ldarg 2
+M00000006_IL_0005:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringSliceUtf8(String,Int32,Int32)
+M00000006_IL_000a:
+stloc local1
+M00000006_IL_000b:
+ldloca local1
+M00000006_IL_000d:
+ldloca local2
+M00000006_IL_000f:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion0(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Ok<String>&)
+M00000006_IL_0014:
+brfalse M00000006_IL_003f
+M00000006_IL_0019:
+ldloc local2
+M00000006_IL_001a:
+stloc local3
+M00000006_IL_001b:
+ldloca local3
+M00000006_IL_001d:
+ldloca local4
+M00000006_IL_001f:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion1(System.Result.Ok<String>&,String&)
+M00000006_IL_0024:
+ldloc local4
+M00000006_IL_0026:
+stloc local0
+M00000006_IL_0027:
+ldc.i4 1
+M00000006_IL_0028:
+br M00000006_IL_002e
+M00000006_IL_002e:
+brfalse M00000006_IL_003f
+M00000006_IL_0033:
+M00000006_IL_0034:
+br M00000006_IL_0044
+M00000006_IL_003f:
+br M00000006_IL_0047
+M00000006_IL_0044:
+M00000006_IL_0045:
+ldloc local0
+M00000006_IL_0046:
+ret
+M00000006_IL_0047:
+M00000006_IL_0048:
+M00000006_IL_0049:
+ldstr ""
+M00000006_IL_004e:
+ret
+.end
+.method private static Digit(String text) -> Int32
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldc.i4 0
+M00000007_IL_0003:
+stloc local0
+M00000007_IL_0004:
+M00000007_IL_0005:
+M00000007_IL_0006:
+ldloc local0
+M00000007_IL_0007:
+ldc.i4 16
+M00000007_IL_0009:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_000b:
+brtrue M00000007_IL_0015
+M00000007_IL_0010:
+br M00000007_IL_005b
+M00000007_IL_0015:
+M00000007_IL_0016:
+ldarg 0
+M00000007_IL_0017:
+ldstr "0123456789abcdef"
+M00000007_IL_001c:
+ldloc local0
+M00000007_IL_001d:
+call System.Networking.IPAddress::At(String,Int32)
+M00000007_IL_0022:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0027:
+brtrue M00000007_IL_0042
+M00000007_IL_002c:
+ldarg 0
+M00000007_IL_002d:
+ldstr "0123456789ABCDEF"
+M00000007_IL_0032:
+ldloc local0
+M00000007_IL_0033:
+call System.Networking.IPAddress::At(String,Int32)
+M00000007_IL_0038:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_003d:
+br M00000007_IL_0043
+M00000007_IL_0042:
+ldc.i4 1
+M00000007_IL_0043:
+brtrue M00000007_IL_004d
+M00000007_IL_0048:
+br M00000007_IL_0050
+M00000007_IL_004d:
+M00000007_IL_004e:
+ldloc local0
+M00000007_IL_004f:
+ret
+M00000007_IL_0050:
+M00000007_IL_0051:
+M00000007_IL_0052:
+ldloc local0
+M00000007_IL_0053:
+ldc.i4 1
+M00000007_IL_0054:
+add
+M00000007_IL_0055:
+stloc local0
+M00000007_IL_0056:
+br M00000007_IL_0005
+M00000007_IL_005b:
+M00000007_IL_005c:
+M00000007_IL_005d:
+ldc.i4 -1
+M00000007_IL_005e:
+ret
+.end
+.method static Parse(String text) -> System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>
+.local Int32 local0
+.local arrayref<Byte> local1
+.local System.Networking.IPAddress local2
+.local arrayref<Byte> local3
+.local Int32 local4
+.local Int32 local5
+.local Int32 local6
+.local Int32 local7
+.local Int32 local8
+.local String local9
+.local Int32 local10
+.local Int32 local11
+.local Int32 local12
+.local Int32 local13
+.local Int32 local14
+.local System.Networking.IPAddress local15
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj arrayref<Byte>
+ldloca local2
+initobj System.Networking.IPAddress
+ldloca local3
+initobj arrayref<Byte>
+ldc.i4 0
+stloc local4
+ldc.i4 0
+stloc local5
+ldc.i4 0
+stloc local6
+ldc.i4 0
+stloc local7
+ldc.i4 0
+stloc local8
+ldc.i4 0
+stloc local10
+ldc.i4 0
+stloc local11
+ldc.i4 0
+stloc local12
+ldc.i4 0
+stloc local13
+ldc.i4 0
+stloc local14
+ldloca local15
+initobj System.Networking.IPAddress
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldstr "%"
+M00000008_IL_0008:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringContainsOrdinal(String,String)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_000d:
+brtrue M00000008_IL_0017
+M00000008_IL_0012:
+br M00000008_IL_002c
+M00000008_IL_0017:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorUnsupportedScopeNew()
+M00000008_IL_001c:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorNewSystemNetworkingIPAddressErrorUnsupportedScope(System.Networking.IPAddressError.UnsupportedScope)
+M00000008_IL_0021:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
+M00000008_IL_0026:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+M00000008_IL_002b:
+ret
+M00000008_IL_002c:
+M00000008_IL_002d:
+M00000008_IL_002e:
+ldarg 0
+M00000008_IL_002f:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringGetUtf8ByteCount(String)
+M00000008_IL_0034:
+stloc local0
+M00000008_IL_0035:
+M00000008_IL_0036:
+ldloc local0
+M00000008_IL_0037:
+ldc.i4 0
+M00000008_IL_0038:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_003a:
+brtrue M00000008_IL_0049
+M00000008_IL_003f:
+ldloc local0
+M00000008_IL_0040:
+ldc.i4 45
+M00000008_IL_0042:
+cgt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0044:
+br M00000008_IL_004a
+M00000008_IL_0049:
+ldc.i4 1
+M00000008_IL_004a:
+brtrue M00000008_IL_0054
+M00000008_IL_004f:
+br M00000008_IL_0069
+M00000008_IL_0054:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorInvalidFormatNew()
+M00000008_IL_0059:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorNewSystemNetworkingIPAddressErrorInvalidFormat(System.Networking.IPAddressError.InvalidFormat)
+M00000008_IL_005e:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
+M00000008_IL_0063:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+M00000008_IL_0068:
+ret
+M00000008_IL_0069:
+M00000008_IL_006a:
+M00000008_IL_006b:
+ldarg 0
+M00000008_IL_006c:
+ldstr ":"
+M00000008_IL_0071:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringContainsOrdinal(String,String)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0076:
+ldc.i4 0
+M00000008_IL_0077:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0079:
+brtrue M00000008_IL_0083
+M00000008_IL_007e:
+br M00000008_IL_00e0
+M00000008_IL_0083:
+M00000008_IL_0084:
+ldc.i4 4
+M00000008_IL_0085:
+newarr Byte
+M00000008_IL_008a:
+dup
+M00000008_IL_008b:
+ldc.i4 0
+M00000008_IL_008c:
+ldc.i4 0
+M00000008_IL_008d:
+conv.u1
+M00000008_IL_008e:
+stelem Byte
+M00000008_IL_008f:
+dup
+M00000008_IL_0090:
+ldc.i4 1
+M00000008_IL_0091:
+ldc.i4 0
+M00000008_IL_0092:
+conv.u1
+M00000008_IL_0093:
+stelem Byte
+M00000008_IL_0094:
+dup
+M00000008_IL_0095:
+ldc.i4 2
+M00000008_IL_0096:
+ldc.i4 0
+M00000008_IL_0097:
+conv.u1
+M00000008_IL_0098:
+stelem Byte
+M00000008_IL_0099:
+dup
+M00000008_IL_009a:
+ldc.i4 3
+M00000008_IL_009b:
+ldc.i4 0
+M00000008_IL_009c:
+conv.u1
+M00000008_IL_009d:
+stelem Byte
+M00000008_IL_009e:
+stloc local1
+M00000008_IL_009f:
+M00000008_IL_00a0:
+ldarg 0
+M00000008_IL_00a1:
+ldloc local1
+M00000008_IL_00a2:
+ldc.i4 0
+M00000008_IL_00a3:
+call System.Networking.IPAddress::ReadIPv4(String,arrayref<Byte>,Int32)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_00a8:
+ldc.i4 0
+M00000008_IL_00a9:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_00ab:
+brtrue M00000008_IL_00b5
+M00000008_IL_00b0:
+br M00000008_IL_00ca
+M00000008_IL_00b5:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorInvalidFormatNew()
+M00000008_IL_00ba:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorNewSystemNetworkingIPAddressErrorInvalidFormat(System.Networking.IPAddressError.InvalidFormat)
+M00000008_IL_00bf:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
+M00000008_IL_00c4:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+M00000008_IL_00c9:
+ret
+M00000008_IL_00ca:
+M00000008_IL_00cb:
+M00000008_IL_00cc:
+ldloc local1
+M00000008_IL_00cd:
+newobj instance System.Networking.IPv4Address::.ctor(arrayref<Byte>)
+M00000008_IL_00d2:
+stloc local2
+M00000008_IL_00d3:
+M00000008_IL_00d4:
+ldloc local2
+M00000008_IL_00d5:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion4(System.Networking.IPAddress)
+M00000008_IL_00da:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion5(System.Result.Ok<System.Networking.IPAddress>)
+M00000008_IL_00df:
+ret
+M00000008_IL_00e0:
+M00000008_IL_00e1:
+M00000008_IL_00e2:
+ldc.i4 16
+M00000008_IL_00e4:
+newarr Byte
+M00000008_IL_00e9:
+dup
+M00000008_IL_00ea:
+ldc.i4 0
+M00000008_IL_00eb:
+ldc.i4 0
+M00000008_IL_00ec:
+conv.u1
+M00000008_IL_00ed:
+stelem Byte
+M00000008_IL_00ee:
+dup
+M00000008_IL_00ef:
+ldc.i4 1
+M00000008_IL_00f0:
+ldc.i4 0
+M00000008_IL_00f1:
+conv.u1
+M00000008_IL_00f2:
+stelem Byte
+M00000008_IL_00f3:
+dup
+M00000008_IL_00f4:
+ldc.i4 2
+M00000008_IL_00f5:
+ldc.i4 0
+M00000008_IL_00f6:
+conv.u1
+M00000008_IL_00f7:
+stelem Byte
+M00000008_IL_00f8:
+dup
+M00000008_IL_00f9:
+ldc.i4 3
+M00000008_IL_00fa:
+ldc.i4 0
+M00000008_IL_00fb:
+conv.u1
+M00000008_IL_00fc:
+stelem Byte
+M00000008_IL_00fd:
+dup
+M00000008_IL_00fe:
+ldc.i4 4
+M00000008_IL_00ff:
+ldc.i4 0
+M00000008_IL_0100:
+conv.u1
+M00000008_IL_0101:
+stelem Byte
+M00000008_IL_0102:
+dup
+M00000008_IL_0103:
+ldc.i4 5
+M00000008_IL_0104:
+ldc.i4 0
+M00000008_IL_0105:
+conv.u1
+M00000008_IL_0106:
+stelem Byte
+M00000008_IL_0107:
+dup
+M00000008_IL_0108:
+ldc.i4 6
+M00000008_IL_0109:
+ldc.i4 0
+M00000008_IL_010a:
+conv.u1
+M00000008_IL_010b:
+stelem Byte
+M00000008_IL_010c:
+dup
+M00000008_IL_010d:
+ldc.i4 7
+M00000008_IL_010e:
+ldc.i4 0
+M00000008_IL_010f:
+conv.u1
+M00000008_IL_0110:
+stelem Byte
+M00000008_IL_0111:
+dup
+M00000008_IL_0112:
+ldc.i4 8
+M00000008_IL_0113:
+ldc.i4 0
+M00000008_IL_0114:
+conv.u1
+M00000008_IL_0115:
+stelem Byte
+M00000008_IL_0116:
+dup
+M00000008_IL_0117:
+ldc.i4 9
+M00000008_IL_0119:
+ldc.i4 0
+M00000008_IL_011a:
+conv.u1
+M00000008_IL_011b:
+stelem Byte
+M00000008_IL_011c:
+dup
+M00000008_IL_011d:
+ldc.i4 10
+M00000008_IL_011f:
+ldc.i4 0
+M00000008_IL_0120:
+conv.u1
+M00000008_IL_0121:
+stelem Byte
+M00000008_IL_0122:
+dup
+M00000008_IL_0123:
+ldc.i4 11
+M00000008_IL_0125:
+ldc.i4 0
+M00000008_IL_0126:
+conv.u1
+M00000008_IL_0127:
+stelem Byte
+M00000008_IL_0128:
+dup
+M00000008_IL_0129:
+ldc.i4 12
+M00000008_IL_012b:
+ldc.i4 0
+M00000008_IL_012c:
+conv.u1
+M00000008_IL_012d:
+stelem Byte
+M00000008_IL_012e:
+dup
+M00000008_IL_012f:
+ldc.i4 13
+M00000008_IL_0131:
+ldc.i4 0
+M00000008_IL_0132:
+conv.u1
+M00000008_IL_0133:
+stelem Byte
+M00000008_IL_0134:
+dup
+M00000008_IL_0135:
+ldc.i4 14
+M00000008_IL_0137:
+ldc.i4 0
+M00000008_IL_0138:
+conv.u1
+M00000008_IL_0139:
+stelem Byte
+M00000008_IL_013a:
+dup
+M00000008_IL_013b:
+ldc.i4 15
+M00000008_IL_013d:
+ldc.i4 0
+M00000008_IL_013e:
+conv.u1
+M00000008_IL_013f:
+stelem Byte
+M00000008_IL_0140:
+stloc local3
+M00000008_IL_0141:
+M00000008_IL_0142:
+ldc.i4 0
+M00000008_IL_0143:
+stloc local4
+M00000008_IL_0145:
+M00000008_IL_0146:
+ldc.i4 0
+M00000008_IL_0147:
+stloc local5
+M00000008_IL_0149:
+M00000008_IL_014a:
+ldc.i4 -1
+M00000008_IL_014b:
+stloc local6
+M00000008_IL_014d:
+M00000008_IL_014e:
+ldarg 0
+M00000008_IL_014f:
+ldc.i4 0
+M00000008_IL_0150:
+call System.Networking.IPAddress::At(String,Int32)
+M00000008_IL_0155:
+ldstr ":"
+M00000008_IL_015a:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_015f:
+brtrue M00000008_IL_0169
+M00000008_IL_0164:
+br M00000008_IL_01a3
+M00000008_IL_0169:
+M00000008_IL_016a:
+ldarg 0
+M00000008_IL_016b:
+ldc.i4 1
+M00000008_IL_016c:
+call System.Networking.IPAddress::At(String,Int32)
+M00000008_IL_0171:
+ldstr ":"
+M00000008_IL_0176:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringEquals(String,String)
+ldc.bool false
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_017b:
+brtrue M00000008_IL_0185
+M00000008_IL_0180:
+br M00000008_IL_019a
+M00000008_IL_0185:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorInvalidFormatNew()
+M00000008_IL_018a:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorNewSystemNetworkingIPAddressErrorInvalidFormat(System.Networking.IPAddressError.InvalidFormat)
+M00000008_IL_018f:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
+M00000008_IL_0194:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+M00000008_IL_0199:
+ret
+M00000008_IL_019a:
+M00000008_IL_019b:
+M00000008_IL_019c:
+ldc.i4 0
+M00000008_IL_019d:
+stloc local6
+M00000008_IL_019f:
+M00000008_IL_01a0:
+ldc.i4 2
+M00000008_IL_01a1:
+stloc local4
+M00000008_IL_01a3:
+M00000008_IL_01a4:
+M00000008_IL_01a5:
+M00000008_IL_01a6:
+ldloc local4
+M00000008_IL_01a8:
+ldloc local0
+M00000008_IL_01a9:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_01ab:
+brtrue M00000008_IL_01b5
+M00000008_IL_01b0:
+br M00000008_IL_0434
+M00000008_IL_01b5:
+M00000008_IL_01b6:
+ldloc local5
+M00000008_IL_01b8:
+ldc.i4 8
+M00000008_IL_01b9:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_01bb:
+ldc.i4 0
+M00000008_IL_01bc:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_01be:
+brtrue M00000008_IL_01c8
+M00000008_IL_01c3:
+br M00000008_IL_01dd
+M00000008_IL_01c8:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorInvalidFormatNew()
+M00000008_IL_01cd:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorNewSystemNetworkingIPAddressErrorInvalidFormat(System.Networking.IPAddressError.InvalidFormat)
+M00000008_IL_01d2:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
+M00000008_IL_01d7:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+M00000008_IL_01dc:
+ret
+M00000008_IL_01dd:
+M00000008_IL_01de:
+M00000008_IL_01df:
+ldloc local4
+M00000008_IL_01e1:
+stloc local7
+M00000008_IL_01e3:
+M00000008_IL_01e4:
+M00000008_IL_01e5:
+ldloc local4
+M00000008_IL_01e7:
+ldloc local0
+M00000008_IL_01e8:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_01ea:
+brfalse M00000008_IL_0206
+M00000008_IL_01ef:
+ldarg 0
+M00000008_IL_01f0:
+ldloc local4
+M00000008_IL_01f2:
+call System.Networking.IPAddress::At(String,Int32)
+M00000008_IL_01f7:
+ldstr ":"
+M00000008_IL_01fc:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringEquals(String,String)
+ldc.bool false
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0201:
+br M00000008_IL_0207
+M00000008_IL_0206:
+ldc.i4 0
+M00000008_IL_0207:
+brtrue M00000008_IL_0211
+M00000008_IL_020c:
+br M00000008_IL_021d
+M00000008_IL_0211:
+M00000008_IL_0212:
+ldloc local4
+M00000008_IL_0214:
+ldc.i4 1
+M00000008_IL_0215:
+add
+M00000008_IL_0216:
+stloc local4
+M00000008_IL_0218:
+br M00000008_IL_01e4
+M00000008_IL_021d:
+M00000008_IL_021e:
+M00000008_IL_021f:
+ldloc local4
+M00000008_IL_0221:
+ldloc local7
+M00000008_IL_0223:
+sub
+M00000008_IL_0224:
+stloc local8
+M00000008_IL_0226:
+M00000008_IL_0227:
+ldarg 0
+M00000008_IL_0228:
+ldloc local7
+M00000008_IL_022a:
+ldloc local8
+M00000008_IL_022c:
+call System.Networking.IPAddress::Part(String,Int32,Int32)
+M00000008_IL_0231:
+stloc local9
+M00000008_IL_0233:
+M00000008_IL_0234:
+ldloc local9
+M00000008_IL_0236:
+ldstr "."
+M00000008_IL_023b:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringContainsOrdinal(String,String)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0240:
+brtrue M00000008_IL_024a
+M00000008_IL_0245:
+br M00000008_IL_02bf
+M00000008_IL_024a:
+M00000008_IL_024b:
+ldloc local4
+M00000008_IL_024d:
+ldloc local0
+M00000008_IL_024e:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0250:
+ldc.i4 0
+M00000008_IL_0251:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0253:
+brtrue M00000008_IL_0262
+M00000008_IL_0258:
+ldloc local5
+M00000008_IL_025a:
+ldc.i4 6
+M00000008_IL_025b:
+cgt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_025d:
+br M00000008_IL_0263
+M00000008_IL_0262:
+ldc.i4 1
+M00000008_IL_0263:
+brtrue M00000008_IL_026d
+M00000008_IL_0268:
+br M00000008_IL_0282
+M00000008_IL_026d:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorInvalidFormatNew()
+M00000008_IL_0272:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorNewSystemNetworkingIPAddressErrorInvalidFormat(System.Networking.IPAddressError.InvalidFormat)
+M00000008_IL_0277:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
+M00000008_IL_027c:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+M00000008_IL_0281:
+ret
+M00000008_IL_0282:
+M00000008_IL_0283:
+M00000008_IL_0284:
+ldloc local9
+M00000008_IL_0286:
+ldloc local3
+M00000008_IL_0287:
+ldloc local5
+M00000008_IL_0289:
+ldc.i4 2
+M00000008_IL_028a:
+mul
+M00000008_IL_028b:
+call System.Networking.IPAddress::ReadIPv4(String,arrayref<Byte>,Int32)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0290:
+ldc.i4 0
+M00000008_IL_0291:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0293:
+brtrue M00000008_IL_029d
+M00000008_IL_0298:
+br M00000008_IL_02b2
+M00000008_IL_029d:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorInvalidFormatNew()
+M00000008_IL_02a2:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorNewSystemNetworkingIPAddressErrorInvalidFormat(System.Networking.IPAddressError.InvalidFormat)
+M00000008_IL_02a7:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
+M00000008_IL_02ac:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+M00000008_IL_02b1:
+ret
+M00000008_IL_02b2:
+M00000008_IL_02b3:
+M00000008_IL_02b4:
+ldloc local5
+M00000008_IL_02b6:
+ldc.i4 2
+M00000008_IL_02b7:
+add
+M00000008_IL_02b8:
+stloc local5
+M00000008_IL_02ba:
+br M00000008_IL_0434
+M00000008_IL_02bf:
+M00000008_IL_02c0:
+M00000008_IL_02c1:
+ldloc local8
+M00000008_IL_02c3:
+ldc.i4 0
+M00000008_IL_02c4:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_02c6:
+brtrue M00000008_IL_02d5
+M00000008_IL_02cb:
+ldloc local8
+M00000008_IL_02cd:
+ldc.i4 4
+M00000008_IL_02ce:
+cgt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_02d0:
+br M00000008_IL_02d6
+M00000008_IL_02d5:
+ldc.i4 1
+M00000008_IL_02d6:
+brtrue M00000008_IL_02e0
+M00000008_IL_02db:
+br M00000008_IL_02f5
+M00000008_IL_02e0:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorInvalidFormatNew()
+M00000008_IL_02e5:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorNewSystemNetworkingIPAddressErrorInvalidFormat(System.Networking.IPAddressError.InvalidFormat)
+M00000008_IL_02ea:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
+M00000008_IL_02ef:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+M00000008_IL_02f4:
+ret
+M00000008_IL_02f5:
+M00000008_IL_02f6:
+M00000008_IL_02f7:
+ldc.i4 0
+M00000008_IL_02f8:
+stloc local10
+M00000008_IL_02fa:
+M00000008_IL_02fb:
+ldloc local7
+M00000008_IL_02fd:
+stloc local11
+M00000008_IL_02ff:
+M00000008_IL_0300:
+M00000008_IL_0301:
+ldloc local11
+M00000008_IL_0303:
+ldloc local4
+M00000008_IL_0305:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0307:
+brtrue M00000008_IL_0311
+M00000008_IL_030c:
+br M00000008_IL_035e
+M00000008_IL_0311:
+M00000008_IL_0312:
+ldarg 0
+M00000008_IL_0313:
+ldloc local11
+M00000008_IL_0315:
+call System.Networking.IPAddress::At(String,Int32)
+M00000008_IL_031a:
+call System.Networking.IPAddress::Digit(String)
+M00000008_IL_031f:
+stloc local12
+M00000008_IL_0321:
+M00000008_IL_0322:
+ldloc local12
+M00000008_IL_0324:
+ldc.i4 0
+M00000008_IL_0325:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0327:
+brtrue M00000008_IL_0331
+M00000008_IL_032c:
+br M00000008_IL_0346
+M00000008_IL_0331:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorInvalidFormatNew()
+M00000008_IL_0336:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorNewSystemNetworkingIPAddressErrorInvalidFormat(System.Networking.IPAddressError.InvalidFormat)
+M00000008_IL_033b:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
+M00000008_IL_0340:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+M00000008_IL_0345:
+ret
+M00000008_IL_0346:
+M00000008_IL_0347:
+M00000008_IL_0348:
+ldloc local10
+M00000008_IL_034a:
+ldc.i4 16
+M00000008_IL_034c:
+mul
+M00000008_IL_034d:
+ldloc local12
+M00000008_IL_034f:
+add
+M00000008_IL_0350:
+stloc local10
+M00000008_IL_0352:
+M00000008_IL_0353:
+ldloc local11
+M00000008_IL_0355:
+ldc.i4 1
+M00000008_IL_0356:
+add
+M00000008_IL_0357:
+stloc local11
+M00000008_IL_0359:
+br M00000008_IL_0300
+M00000008_IL_035e:
+M00000008_IL_035f:
+M00000008_IL_0360:
+ldloc local3
+M00000008_IL_0361:
+ldloc local5
+M00000008_IL_0363:
+ldc.i4 2
+M00000008_IL_0364:
+mul
+M00000008_IL_0365:
+ldloc local10
+M00000008_IL_0367:
+ldc.i4 256
+M00000008_IL_036c:
+div
+M00000008_IL_036d:
+conv.u1
+M00000008_IL_036e:
+stelem Byte
+M00000008_IL_036f:
+M00000008_IL_0370:
+ldloc local3
+M00000008_IL_0371:
+ldloc local5
+M00000008_IL_0373:
+ldc.i4 2
+M00000008_IL_0374:
+mul
+M00000008_IL_0375:
+ldc.i4 1
+M00000008_IL_0376:
+add
+M00000008_IL_0377:
+ldloc local10
+M00000008_IL_0379:
+ldc.i4 256
+M00000008_IL_037e:
+rem
+M00000008_IL_037f:
+conv.u1
+M00000008_IL_0380:
+stelem Byte
+M00000008_IL_0381:
+M00000008_IL_0382:
+ldloc local5
+M00000008_IL_0384:
+ldc.i4 1
+M00000008_IL_0385:
+add
+M00000008_IL_0386:
+stloc local5
+M00000008_IL_0388:
+M00000008_IL_0389:
+ldloc local4
+M00000008_IL_038b:
+ldloc local0
+M00000008_IL_038c:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_038e:
+brtrue M00000008_IL_0398
+M00000008_IL_0393:
+br M00000008_IL_042e
+M00000008_IL_0398:
+M00000008_IL_0399:
+ldloc local4
+M00000008_IL_039b:
+ldc.i4 1
+M00000008_IL_039c:
+add
+M00000008_IL_039d:
+stloc local4
+M00000008_IL_039f:
+M00000008_IL_03a0:
+ldloc local4
+M00000008_IL_03a2:
+ldloc local0
+M00000008_IL_03a3:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_03a5:
+brfalse M00000008_IL_03c1
+M00000008_IL_03aa:
+ldarg 0
+M00000008_IL_03ab:
+ldloc local4
+M00000008_IL_03ad:
+call System.Networking.IPAddress::At(String,Int32)
+M00000008_IL_03b2:
+ldstr ":"
+M00000008_IL_03b7:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_03bc:
+br M00000008_IL_03c2
+M00000008_IL_03c1:
+ldc.i4 0
+M00000008_IL_03c2:
+brtrue M00000008_IL_03cc
+M00000008_IL_03c7:
+br M00000008_IL_0407
+M00000008_IL_03cc:
+M00000008_IL_03cd:
+ldloc local6
+M00000008_IL_03cf:
+ldc.i4 0
+M00000008_IL_03d0:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_03d2:
+ldc.i4 0
+M00000008_IL_03d3:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_03d5:
+brtrue M00000008_IL_03df
+M00000008_IL_03da:
+br M00000008_IL_03f4
+M00000008_IL_03df:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorInvalidFormatNew()
+M00000008_IL_03e4:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorNewSystemNetworkingIPAddressErrorInvalidFormat(System.Networking.IPAddressError.InvalidFormat)
+M00000008_IL_03e9:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
+M00000008_IL_03ee:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+M00000008_IL_03f3:
+ret
+M00000008_IL_03f4:
+M00000008_IL_03f5:
+M00000008_IL_03f6:
+ldloc local5
+M00000008_IL_03f8:
+stloc local6
+M00000008_IL_03fa:
+M00000008_IL_03fb:
+ldloc local4
+M00000008_IL_03fd:
+ldc.i4 1
+M00000008_IL_03fe:
+add
+M00000008_IL_03ff:
+stloc local4
+M00000008_IL_0401:
+br M00000008_IL_042d
+M00000008_IL_0407:
+M00000008_IL_0408:
+ldloc local4
+M00000008_IL_040a:
+ldloc local0
+M00000008_IL_040b:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_040d:
+brtrue M00000008_IL_0417
+M00000008_IL_0412:
+br M00000008_IL_042c
+M00000008_IL_0417:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorInvalidFormatNew()
+M00000008_IL_041c:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorNewSystemNetworkingIPAddressErrorInvalidFormat(System.Networking.IPAddressError.InvalidFormat)
+M00000008_IL_0421:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
+M00000008_IL_0426:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+M00000008_IL_042b:
+ret
+M00000008_IL_042c:
+M00000008_IL_042d:
+M00000008_IL_042e:
+M00000008_IL_042f:
+br M00000008_IL_01a5
+M00000008_IL_0434:
+M00000008_IL_0435:
+M00000008_IL_0436:
+ldloc local6
+M00000008_IL_0438:
+ldc.i4 0
+M00000008_IL_0439:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_043b:
+brfalse M00000008_IL_044d
+M00000008_IL_0440:
+ldloc local5
+M00000008_IL_0442:
+ldc.i4 8
+M00000008_IL_0443:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0445:
+ldc.i4 0
+M00000008_IL_0446:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0448:
+br M00000008_IL_044e
+M00000008_IL_044d:
+ldc.i4 0
+M00000008_IL_044e:
+brtrue M00000008_IL_0473
+M00000008_IL_0453:
+ldloc local6
+M00000008_IL_0455:
+ldc.i4 0
+M00000008_IL_0456:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0458:
+ldc.i4 0
+M00000008_IL_0459:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_045b:
+brfalse M00000008_IL_046d
+M00000008_IL_0460:
+ldloc local5
+M00000008_IL_0462:
+ldc.i4 8
+M00000008_IL_0463:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0465:
+ldc.i4 0
+M00000008_IL_0466:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0468:
+br M00000008_IL_046e
+M00000008_IL_046d:
+ldc.i4 0
+M00000008_IL_046e:
+br M00000008_IL_0474
+M00000008_IL_0473:
+ldc.i4 1
+M00000008_IL_0474:
+brtrue M00000008_IL_047e
+M00000008_IL_0479:
+br M00000008_IL_0493
+M00000008_IL_047e:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorInvalidFormatNew()
+M00000008_IL_0483:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAddressErrorNewSystemNetworkingIPAddressErrorInvalidFormat(System.Networking.IPAddressError.InvalidFormat)
+M00000008_IL_0488:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
+M00000008_IL_048d:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+M00000008_IL_0492:
+ret
+M00000008_IL_0493:
+M00000008_IL_0494:
+M00000008_IL_0495:
+ldloc local6
+M00000008_IL_0497:
+ldc.i4 0
+M00000008_IL_0498:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_049a:
+ldc.i4 0
+M00000008_IL_049b:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_049d:
+brtrue M00000008_IL_04a7
+M00000008_IL_04a2:
+br M00000008_IL_051b
+M00000008_IL_04a7:
+M00000008_IL_04a8:
+ldc.i4 8
+M00000008_IL_04a9:
+ldloc local5
+M00000008_IL_04ab:
+sub
+M00000008_IL_04ac:
+ldc.i4 2
+M00000008_IL_04ad:
+mul
+M00000008_IL_04ae:
+stloc local13
+M00000008_IL_04b0:
+M00000008_IL_04b1:
+ldloc local5
+M00000008_IL_04b3:
+ldc.i4 2
+M00000008_IL_04b4:
+mul
+M00000008_IL_04b5:
+ldc.i4 1
+M00000008_IL_04b6:
+sub
+M00000008_IL_04b7:
+stloc local14
+M00000008_IL_04b9:
+M00000008_IL_04ba:
+M00000008_IL_04bb:
+ldloc local14
+M00000008_IL_04bd:
+ldloc local6
+M00000008_IL_04bf:
+ldc.i4 2
+M00000008_IL_04c0:
+mul
+M00000008_IL_04c1:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_04c3:
+ldc.i4 0
+M00000008_IL_04c4:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_04c6:
+brtrue M00000008_IL_04d0
+M00000008_IL_04cb:
+br M00000008_IL_04e8
+M00000008_IL_04d0:
+M00000008_IL_04d1:
+ldloc local3
+M00000008_IL_04d2:
+ldloc local14
+M00000008_IL_04d4:
+ldloc local13
+M00000008_IL_04d6:
+add
+M00000008_IL_04d7:
+ldloc local3
+M00000008_IL_04d8:
+ldloc local14
+M00000008_IL_04da:
+ldelem Byte
+M00000008_IL_04db:
+stelem Byte
+M00000008_IL_04dc:
+M00000008_IL_04dd:
+ldloc local14
+M00000008_IL_04df:
+ldc.i4 1
+M00000008_IL_04e0:
+sub
+M00000008_IL_04e1:
+stloc local14
+M00000008_IL_04e3:
+br M00000008_IL_04ba
+M00000008_IL_04e8:
+M00000008_IL_04e9:
+M00000008_IL_04ea:
+ldloc local6
+M00000008_IL_04ec:
+ldc.i4 2
+M00000008_IL_04ed:
+mul
+M00000008_IL_04ee:
+stloc local14
+M00000008_IL_04f0:
+M00000008_IL_04f1:
+M00000008_IL_04f2:
+ldloc local14
+M00000008_IL_04f4:
+ldloc local6
+M00000008_IL_04f6:
+ldc.i4 2
+M00000008_IL_04f7:
+mul
+M00000008_IL_04f8:
+ldloc local13
+M00000008_IL_04fa:
+add
+M00000008_IL_04fb:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_04fd:
+brtrue M00000008_IL_0507
+M00000008_IL_0502:
+br M00000008_IL_051a
+M00000008_IL_0507:
+M00000008_IL_0508:
+ldloc local3
+M00000008_IL_0509:
+ldloc local14
+M00000008_IL_050b:
+ldc.i4 0
+M00000008_IL_050c:
+conv.u1
+M00000008_IL_050d:
+stelem Byte
+M00000008_IL_050e:
+M00000008_IL_050f:
+ldloc local14
+M00000008_IL_0511:
+ldc.i4 1
+M00000008_IL_0512:
+add
+M00000008_IL_0513:
+stloc local14
+M00000008_IL_0515:
+br M00000008_IL_04f1
+M00000008_IL_051a:
+M00000008_IL_051b:
+M00000008_IL_051c:
+M00000008_IL_051d:
+ldloc local3
+M00000008_IL_051e:
+newobj instance System.Networking.IPv6Address::.ctor(arrayref<Byte>)
+M00000008_IL_0523:
+stloc local15
+M00000008_IL_0525:
+M00000008_IL_0526:
+ldloc local15
+M00000008_IL_0528:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion4(System.Networking.IPAddress)
+M00000008_IL_052d:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion5(System.Result.Ok<System.Networking.IPAddress>)
+M00000008_IL_0532:
+ret
+.end
+.method private static ReadIPv4(String text,arrayref<Byte> bytes,Int32 offset) -> Boolean
+.local Int32 local0
+.local Int32 local1
+.local Int32 local2
+.local Int32 local3
+.local Int32 local4
+.local Int32 local5
+ldc.i4 0
+stloc local0
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local2
+ldc.i4 0
+stloc local3
+ldc.i4 0
+stloc local4
+ldc.i4 0
+stloc local5
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringGetUtf8ByteCount(String)
+M00000009_IL_0008:
+stloc local0
+M00000009_IL_0009:
+M00000009_IL_000a:
+ldc.i4 0
+M00000009_IL_000b:
+stloc local1
+M00000009_IL_000c:
+M00000009_IL_000d:
+ldc.i4 0
+M00000009_IL_000e:
+stloc local2
+M00000009_IL_000f:
+M00000009_IL_0010:
+M00000009_IL_0011:
+ldloc local2
+M00000009_IL_0012:
+ldc.i4 4
+M00000009_IL_0013:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0015:
+brtrue M00000009_IL_001f
+M00000009_IL_001a:
+br M00000009_IL_0162
+M00000009_IL_001f:
+M00000009_IL_0020:
+ldloc local1
+M00000009_IL_0021:
+stloc local3
+M00000009_IL_0022:
+M00000009_IL_0023:
+ldc.i4 0
+M00000009_IL_0024:
+stloc local4
+M00000009_IL_0026:
+M00000009_IL_0027:
+M00000009_IL_0028:
+ldloc local1
+M00000009_IL_0029:
+ldloc local0
+M00000009_IL_002a:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_002c:
+brfalse M00000009_IL_0047
+M00000009_IL_0031:
+ldarg 0
+M00000009_IL_0032:
+ldloc local1
+M00000009_IL_0033:
+call System.Networking.IPAddress::At(String,Int32)
+M00000009_IL_0038:
+ldstr "."
+M00000009_IL_003d:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringEquals(String,String)
+ldc.bool false
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0042:
+br M00000009_IL_0048
+M00000009_IL_0047:
+ldc.i4 0
+M00000009_IL_0048:
+brtrue M00000009_IL_0052
+M00000009_IL_004d:
+br M00000009_IL_00b3
+M00000009_IL_0052:
+M00000009_IL_0053:
+ldarg 0
+M00000009_IL_0054:
+ldloc local1
+M00000009_IL_0055:
+call System.Networking.IPAddress::At(String,Int32)
+M00000009_IL_005a:
+call System.Networking.IPAddress::Digit(String)
+M00000009_IL_005f:
+stloc local5
+M00000009_IL_0061:
+M00000009_IL_0062:
+ldloc local5
+M00000009_IL_0064:
+ldc.i4 0
+M00000009_IL_0065:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0067:
+brtrue M00000009_IL_0071
+M00000009_IL_006c:
+br M00000009_IL_0074
+M00000009_IL_0071:
+M00000009_IL_0072:
+ldc.i4 0
+M00000009_IL_0073:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanFromInt32(Int32)
+ret
+M00000009_IL_0074:
+M00000009_IL_0075:
+M00000009_IL_0076:
+ldloc local5
+M00000009_IL_0078:
+ldc.i4 9
+M00000009_IL_007a:
+cgt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_007c:
+brtrue M00000009_IL_008f
+M00000009_IL_0081:
+ldloc local1
+M00000009_IL_0082:
+ldloc local3
+M00000009_IL_0083:
+sub
+M00000009_IL_0084:
+ldc.i4 3
+M00000009_IL_0085:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0087:
+ldc.i4 0
+M00000009_IL_0088:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_008a:
+br M00000009_IL_0090
+M00000009_IL_008f:
+ldc.i4 1
+M00000009_IL_0090:
+brtrue M00000009_IL_009a
+M00000009_IL_0095:
+br M00000009_IL_009d
+M00000009_IL_009a:
+M00000009_IL_009b:
+ldc.i4 0
+M00000009_IL_009c:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanFromInt32(Int32)
+ret
+M00000009_IL_009d:
+M00000009_IL_009e:
+M00000009_IL_009f:
+ldloc local4
+M00000009_IL_00a1:
+ldc.i4 10
+M00000009_IL_00a3:
+mul
+M00000009_IL_00a4:
+ldloc local5
+M00000009_IL_00a6:
+add
+M00000009_IL_00a7:
+stloc local4
+M00000009_IL_00a9:
+M00000009_IL_00aa:
+ldloc local1
+M00000009_IL_00ab:
+ldc.i4 1
+M00000009_IL_00ac:
+add
+M00000009_IL_00ad:
+stloc local1
+M00000009_IL_00ae:
+br M00000009_IL_0027
+M00000009_IL_00b3:
+M00000009_IL_00b4:
+M00000009_IL_00b5:
+ldloc local1
+M00000009_IL_00b6:
+ldloc local3
+M00000009_IL_00b7:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_00b9:
+brtrue M00000009_IL_00cc
+M00000009_IL_00be:
+ldloc local4
+M00000009_IL_00c0:
+ldc.i4 255
+M00000009_IL_00c5:
+cgt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_00c7:
+br M00000009_IL_00cd
+M00000009_IL_00cc:
+ldc.i4 1
+M00000009_IL_00cd:
+brtrue M00000009_IL_00f9
+M00000009_IL_00d2:
+ldloc local1
+M00000009_IL_00d3:
+ldloc local3
+M00000009_IL_00d4:
+sub
+M00000009_IL_00d5:
+ldc.i4 1
+M00000009_IL_00d6:
+cgt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_00d8:
+brfalse M00000009_IL_00f3
+M00000009_IL_00dd:
+ldarg 0
+M00000009_IL_00de:
+ldloc local3
+M00000009_IL_00df:
+call System.Networking.IPAddress::At(String,Int32)
+M00000009_IL_00e4:
+ldstr "0"
+M00000009_IL_00e9:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_00ee:
+br M00000009_IL_00f4
+M00000009_IL_00f3:
+ldc.i4 0
+M00000009_IL_00f4:
+br M00000009_IL_00fa
+M00000009_IL_00f9:
+ldc.i4 1
+M00000009_IL_00fa:
+brtrue M00000009_IL_0104
+M00000009_IL_00ff:
+br M00000009_IL_0107
+M00000009_IL_0104:
+M00000009_IL_0105:
+ldc.i4 0
+M00000009_IL_0106:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanFromInt32(Int32)
+ret
+M00000009_IL_0107:
+M00000009_IL_0108:
+M00000009_IL_0109:
+ldarg 1
+M00000009_IL_010a:
+ldarg 2
+M00000009_IL_010b:
+ldloc local2
+M00000009_IL_010c:
+add
+M00000009_IL_010d:
+ldloc local4
+M00000009_IL_010f:
+conv.u1
+M00000009_IL_0110:
+stelem Byte
+M00000009_IL_0111:
+M00000009_IL_0112:
+ldloc local2
+M00000009_IL_0113:
+ldc.i4 1
+M00000009_IL_0114:
+add
+M00000009_IL_0115:
+stloc local2
+M00000009_IL_0116:
+M00000009_IL_0117:
+ldloc local2
+M00000009_IL_0118:
+ldc.i4 4
+M00000009_IL_0119:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_011b:
+brtrue M00000009_IL_0125
+M00000009_IL_0120:
+br M00000009_IL_015c
+M00000009_IL_0125:
+M00000009_IL_0126:
+ldloc local1
+M00000009_IL_0127:
+ldloc local0
+M00000009_IL_0128:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_012a:
+ldc.i4 0
+M00000009_IL_012b:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_012d:
+brtrue M00000009_IL_0148
+M00000009_IL_0132:
+ldarg 0
+M00000009_IL_0133:
+ldloc local1
+M00000009_IL_0134:
+call System.Networking.IPAddress::At(String,Int32)
+M00000009_IL_0139:
+ldstr "."
+M00000009_IL_013e:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeStringEquals(String,String)
+ldc.bool false
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0143:
+br M00000009_IL_0149
+M00000009_IL_0148:
+ldc.i4 1
+M00000009_IL_0149:
+brtrue M00000009_IL_0153
+M00000009_IL_014e:
+br M00000009_IL_0156
+M00000009_IL_0153:
+M00000009_IL_0154:
+ldc.i4 0
+M00000009_IL_0155:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanFromInt32(Int32)
+ret
+M00000009_IL_0156:
+M00000009_IL_0157:
+M00000009_IL_0158:
+ldloc local1
+M00000009_IL_0159:
+ldc.i4 1
+M00000009_IL_015a:
+add
+M00000009_IL_015b:
+stloc local1
+M00000009_IL_015c:
+M00000009_IL_015d:
+br M00000009_IL_0010
+M00000009_IL_0162:
+M00000009_IL_0163:
+M00000009_IL_0164:
+ldloc local1
+M00000009_IL_0165:
+ldloc local0
+M00000009_IL_0166:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0168:
+ldc.i4 0
+M00000009_IL_0169:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_016b:
+brtrue M00000009_IL_0175
+M00000009_IL_0170:
+br M00000009_IL_0178
+M00000009_IL_0175:
+M00000009_IL_0176:
+ldc.i4 0
+M00000009_IL_0177:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanFromInt32(Int32)
+ret
+M00000009_IL_0178:
+M00000009_IL_0179:
+M00000009_IL_017a:
+ldc.i4 1
+M00000009_IL_017b:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance Equals(System.Networking.IPAddress other) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+ldfld System.Networking.IPAddress::octets
+M0000000a_IL_0008:
+ldlen
+conv.i4
+M0000000a_IL_000d:
+ldarg 1
+M0000000a_IL_000e:
+ldfld System.Networking.IPAddress::octets
+M0000000a_IL_0013:
+ldlen
+conv.i4
+M0000000a_IL_0018:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_001a:
+ldc.i4 0
+M0000000a_IL_001b:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_001d:
+brtrue M0000000a_IL_0027
+M0000000a_IL_0022:
+br M0000000a_IL_002a
+M0000000a_IL_0027:
+M0000000a_IL_0028:
+ldc.i4 0
+M0000000a_IL_0029:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000a_IL_002a:
+M0000000a_IL_002b:
+M0000000a_IL_002c:
+ldc.i4 0
+M0000000a_IL_002d:
+stloc local0
+M0000000a_IL_002e:
+M0000000a_IL_002f:
+M0000000a_IL_0030:
+ldloc local0
+M0000000a_IL_0031:
+ldarg 0
+M0000000a_IL_0032:
+ldfld System.Networking.IPAddress::octets
+M0000000a_IL_0037:
+ldlen
+conv.i4
+M0000000a_IL_003c:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_003e:
+brtrue M0000000a_IL_0048
+M0000000a_IL_0043:
+br M0000000a_IL_0078
+M0000000a_IL_0048:
+M0000000a_IL_0049:
+ldarg 0
+M0000000a_IL_004a:
+ldfld System.Networking.IPAddress::octets
+M0000000a_IL_004f:
+ldloc local0
+M0000000a_IL_0050:
+ldelem Byte
+M0000000a_IL_0051:
+conv.i4
+M0000000a_IL_0052:
+ldarg 1
+M0000000a_IL_0053:
+ldfld System.Networking.IPAddress::octets
+M0000000a_IL_0058:
+ldloc local0
+M0000000a_IL_0059:
+ldelem Byte
+M0000000a_IL_005a:
+conv.i4
+M0000000a_IL_005b:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_005d:
+ldc.i4 0
+M0000000a_IL_005e:
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0060:
+brtrue M0000000a_IL_006a
+M0000000a_IL_0065:
+br M0000000a_IL_006d
+M0000000a_IL_006a:
+M0000000a_IL_006b:
+ldc.i4 0
+M0000000a_IL_006c:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000a_IL_006d:
+M0000000a_IL_006e:
+M0000000a_IL_006f:
+ldloc local0
+M0000000a_IL_0070:
+ldc.i4 1
+M0000000a_IL_0071:
+add
+M0000000a_IL_0072:
+stloc local0
+M0000000a_IL_0073:
+br M0000000a_IL_002f
+M0000000a_IL_0078:
+M0000000a_IL_0079:
+M0000000a_IL_007a:
+ldc.i4 1
+M0000000a_IL_007b:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance override Equals(System.Object other) -> Boolean
+.local System.Networking.IPAddress local0
+ldloca local0
+initobj System.Networking.IPAddress
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 1
+M0000000b_IL_0003:
+isinst System.Networking.IPAddress
+M0000000b_IL_0008:
+dup
+M0000000b_IL_0009:
+stloc local0
+M0000000b_IL_000a:
+M0000000b_IL_000b:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_000d:
+brtrue M0000000b_IL_0017
+M0000000b_IL_0012:
+br M0000000b_IL_0020
+M0000000b_IL_0017:
+M0000000b_IL_0018:
+ldarg 0
+M0000000b_IL_0019:
+ldloc local0
+M0000000b_IL_001a:
+callvirt instance System.Networking.IPAddress::Equals(System.Networking.IPAddress)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_001f:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000b_IL_0020:
+M0000000b_IL_0021:
+M0000000b_IL_0022:
+ldc.i4 0
+M0000000b_IL_0023:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance override GetHashCode() -> Int32
+.local System.HashCode local0
+.local Int32 local1
+ldloca local0
+initobj System.HashCode
+ldc.i4 0
+stloc local1
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeNewHashCode()
+M0000000c_IL_0006:
+stloc local0
+M0000000c_IL_0007:
+M0000000c_IL_0008:
+ldloca local0
+M0000000c_IL_000a:
+ldarg 0
+M0000000c_IL_000b:
+ldfld System.Networking.IPAddress::octets
+M0000000c_IL_0010:
+ldlen
+conv.i4
+M0000000c_IL_0015:
+call instance System.HashCode::Add(Int32)
+pop
+M0000000c_IL_001a:
+M0000000c_IL_001b:
+ldc.i4 0
+M0000000c_IL_001c:
+stloc local1
+M0000000c_IL_001d:
+M0000000c_IL_001e:
+M0000000c_IL_001f:
+ldloc local1
+M0000000c_IL_0020:
+ldarg 0
+M0000000c_IL_0021:
+ldfld System.Networking.IPAddress::octets
+M0000000c_IL_0026:
+ldlen
+conv.i4
+M0000000c_IL_002b:
+clt
+call neoCLR.Library.System.Networking.IPAddress.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_002d:
+brtrue M0000000c_IL_0037
+M0000000c_IL_0032:
+br M0000000c_IL_0052
+M0000000c_IL_0037:
+M0000000c_IL_0038:
+ldloca local0
+M0000000c_IL_003a:
+ldarg 0
+M0000000c_IL_003b:
+ldfld System.Networking.IPAddress::octets
+M0000000c_IL_0040:
+ldloc local1
+M0000000c_IL_0041:
+ldelem Byte
+M0000000c_IL_0042:
+conv.i4
+M0000000c_IL_0043:
+call instance System.HashCode::Add(Int32)
+pop
+M0000000c_IL_0048:
+M0000000c_IL_0049:
+ldloc local1
+M0000000c_IL_004a:
+ldc.i4 1
+M0000000c_IL_004b:
+add
+M0000000c_IL_004c:
+stloc local1
+M0000000c_IL_004d:
+br M0000000c_IL_001e
+M0000000c_IL_0052:
+M0000000c_IL_0053:
+M0000000c_IL_0054:
+ldloca local0
+M0000000c_IL_0056:
+call instance System.HashCode::ToHashCode()
+M0000000c_IL_005b:
+ret
+.end
+.end
