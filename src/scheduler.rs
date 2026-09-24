@@ -89,10 +89,18 @@ impl Arbitration {
     }
 }
 
+/// Owned runnable registration for the current callback adapter. The destination
+/// is explicit even though only the invocation's default queue is supported today.
+struct Ready {
+    callback: Value,
+    destination: Value,
+}
+
 pub(crate) struct Scheduler {
     pub(crate) workers: crate::workers::Workers,
     #[cfg(test)]
     pub(crate) socket_probe: crate::socket_vm_probe::Receives,
+    ready: Option<Ready>,
     arbitration: Arbitration,
     wake: Arc<Wake>,
 }
@@ -103,6 +111,7 @@ impl Default for Scheduler {
             workers: crate::workers::Workers::with_wake(wake.clone()),
             #[cfg(test)]
             socket_probe: Default::default(),
+            ready: None,
             arbitration: Default::default(),
             wake,
         }
@@ -119,35 +128,75 @@ impl Scheduler {
     }
 
     pub(crate) fn trace_roots(&self, roots: &mut Vec<usize>) {
+        if let Some(ready) = &self.ready {
+            crate::gc::trace(&ready.callback, roots);
+            crate::gc::trace(&ready.destination, roots);
+        }
         Source::trace_roots(&self.workers, roots);
         #[cfg(test)]
         Source::trace_roots(&self.socket_probe, roots);
     }
 
-    pub(crate) fn poll(&mut self, heap: &ManagedHeap) -> Result<Option<Value>, Fault> {
-        Ok(match self.progress(heap)? {
-            Progress::Ready(work) => Some(work),
-            _ => None,
-        })
+    fn stage(&mut self, callback: Value, destination: &Value) {
+        assert!(
+            self.ready.is_none(),
+            "ready work must be installed before admitting more"
+        );
+        self.ready = Some(Ready {
+            callback,
+            destination: destination.clone(),
+        });
+    }
+
+    pub(crate) fn poll(&mut self, heap: &ManagedHeap, destination: &Value) -> Result<bool, Fault> {
+        if self.ready.is_some() {
+            return Ok(true);
+        }
+        if let Progress::Ready(callback) = self.progress(heap)? {
+            self.stage(callback, destination);
+        }
+        Ok(self.ready.is_some())
     }
 
     pub(crate) fn wait(
         &mut self,
         heap: &ManagedHeap,
+        destination: Option<&Value>,
         options: &ExecutionOptions,
-    ) -> Result<Option<Value>, Fault> {
+    ) -> Result<bool, Fault> {
         loop {
-            // Preserve the existing host-cancellation fault location for now.
             options.check_cancellation("Worker.Completion", 0)?;
+            if self.ready.is_some() {
+                return Ok(true);
+            }
             match self.progress(heap)? {
-                Progress::Ready(work) => return Ok(Some(work)),
-                Progress::Idle => return Ok(None),
+                Progress::Ready(callback) => {
+                    let destination =
+                        destination.ok_or_else(|| Fault::new("Missing default TaskQueue"))?;
+                    self.stage(callback, destination);
+                    return Ok(true);
+                }
+                Progress::Idle => return Ok(false),
                 Progress::Pending => {}
             }
-            // Cancellation currently has no wake subscription. Keep a bounded
-            // timeout; the test socket source also has no OS readiness notifier.
+            // Cancellation and the test socket source have no wake subscription.
             self.wake.park(Duration::from_millis(10));
         }
+    }
+
+    /// Installation must publish into an active traced owner before returning Ok.
+    /// On Err, installation must not publish. Keep ready roots on failure.
+    /// No source is polled while this slot is occupied.
+    pub(crate) fn install_ready(
+        &mut self,
+        install: impl FnOnce(&Value, &Value) -> Result<(), Fault>,
+    ) -> Result<bool, Fault> {
+        let Some(ready) = &self.ready else {
+            return Ok(false);
+        };
+        install(&ready.destination, &ready.callback)?;
+        self.ready = None;
+        Ok(true)
     }
 }
 
@@ -258,5 +307,136 @@ mod tests {
         let producer = std::thread::spawn(move || other.signal());
         assert!(wake.park(Duration::from_secs(5)));
         producer.join().unwrap();
+    }
+    fn object(heap: &mut ManagedHeap, fields: Vec<Value>) -> Value {
+        let id = heap
+            .allocate(Value::Object {
+                ty: crate::metadata::Type::from_name("TestOwner"),
+                fields,
+            })
+            .unwrap();
+        Value::ObjectReference(crate::value::ObjectReference {
+            reference: heap.address(id).unwrap(),
+            view: None,
+        })
+    }
+
+    fn ready_graphs(heap: &mut ManagedHeap) -> (Value, Value) {
+        let captured = object(heap, vec![Value::Int32(42)]);
+        let receiver = object(heap, vec![captured]);
+        let callback = Value::Delegate(crate::Delegate {
+            ty: crate::assembler::parse_type("System.Func<Void>").unwrap(),
+            target: crate::assembler::parse_function_ref("instance TestOwner::Complete()").unwrap(),
+            receiver: Some(Box::new(receiver)),
+        });
+        let marker = object(heap, vec![Value::Int32(7)]);
+        (callback, object(heap, vec![marker]))
+    }
+
+    fn collect(heap: &mut ManagedHeap, scheduler: &Scheduler, active: &[Value]) {
+        let mut roots = vec![];
+        scheduler.trace_roots(&mut roots);
+        for value in active {
+            crate::gc::trace(value, &mut roots);
+        }
+        heap.collect(roots, crate::CollectionReason::AllocationPressure)
+            .unwrap();
+    }
+
+    #[test]
+    fn ready_roots_survive_failed_install_then_transfer_to_active_owner_once() {
+        let mut heap = ManagedHeap::default();
+        let mut scheduler = Scheduler::default();
+        let (callback, destination) = ready_graphs(&mut heap);
+        scheduler.stage(callback, &destination);
+        drop(destination);
+        for _ in 0..100 {
+            object(&mut heap, vec![]);
+        }
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(
+            heap.len(),
+            4,
+            "callback and independent destination graphs must survive"
+        );
+        assert_eq!(heap.statistics().reclaimed_objects, 100);
+        assert!(
+            scheduler
+                .install_ready(|_, _| Err(Fault::new("frame rejected")))
+                .is_err()
+        );
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(heap.len(), 4);
+        let mut active = vec![];
+        assert!(
+            scheduler
+                .install_ready(|queue, callback| {
+                    active.extend([queue.clone(), callback.clone()]);
+                    Ok(())
+                })
+                .unwrap()
+        );
+        assert!(
+            !scheduler
+                .install_ready(|_, _| panic!("duplicate installation"))
+                .unwrap()
+        );
+        collect(&mut heap, &scheduler, &active);
+        assert_eq!(
+            heap.len(),
+            4,
+            "active frame roots take over from ready ownership"
+        );
+        active.clear();
+        collect(&mut heap, &scheduler, &active);
+        assert!(heap.is_empty());
+    }
+
+    #[test]
+    fn occupied_ready_slot_preserves_destination_until_acknowledged() {
+        let heap = ManagedHeap::default();
+        let mut scheduler = Scheduler::default();
+        scheduler.stage(Value::Int32(1), &Value::Int32(2));
+        assert!(scheduler.poll(&heap, &Value::Int32(99)).unwrap());
+        assert!(
+            scheduler
+                .wait(&heap, Some(&Value::Int32(98)), &Default::default())
+                .unwrap()
+        );
+        assert!(
+            scheduler
+                .install_ready(|destination, callback| {
+                    assert_eq!(*destination, Value::Int32(2));
+                    assert_eq!(*callback, Value::Int32(1));
+                    Ok(())
+                })
+                .unwrap()
+        );
+        assert!(!scheduler.wait(&heap, None, &Default::default()).unwrap());
+    }
+
+    #[test]
+    fn cancellation_keeps_ready_roots_until_invocation_teardown() {
+        let mut heap = ManagedHeap::default();
+        let mut scheduler = Scheduler::default();
+        let (callback, destination) = ready_graphs(&mut heap);
+        scheduler.stage(callback, &destination);
+        drop(destination);
+        let token = crate::CancellationToken::new();
+        token.cancel();
+        let options = ExecutionOptions {
+            cancellation: Some(token),
+            ..Default::default()
+        };
+        assert_eq!(
+            scheduler.wait(&heap, None, &options).unwrap_err().code,
+            crate::FaultCode::ExecutionCancelled
+        );
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(heap.len(), 4);
+        drop(scheduler);
+        heap.collect(vec![], crate::CollectionReason::ExecutionCompleted)
+            .unwrap();
+        assert!(heap.is_empty());
     }
 }

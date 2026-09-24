@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Retain ready callbacks and their default-queue destinations in a bounded, traced
+  scheduler slot until active-frame installation succeeds. Failed installation keeps
+  the roots; occupied slots do not consume more completions. Preserve current affinity.
+  Clarify application, transitional compiler/TaskQueue and private runtime contract
+  tiers: implement useful APIs now with generated state machines; defer suspension.
+  All 28 targeted scheduler/TCP/worker checks and the combined website build pass.
+
 - Plan an internal scheduling boundary before public socket integration, preserving
   runtime-owned async as the direction and TaskQueue as transitional machinery.
   Record completion/continuation ownership, wakeup and affinity requirements with

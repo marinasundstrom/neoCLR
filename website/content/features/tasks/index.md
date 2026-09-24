@@ -144,6 +144,16 @@ runtime-owned suspended executions later. Those suspended frames are not impleme
 and no public Scheduler API has been selected. Full runtime suspension is not required
 before the first socket application.
 
+Application-facing Task/Promise outcomes, await behavior and I/O results are separate
+from compiler and runtime integration machinery. Generated state machines remain the
+implementation we use to build useful APIs now. Async builders and the current public
+TaskQueue surface are transitional contracts; private scheduling records can change
+without becoming APIs applications must use. Runtime suspension itself is deferred.
+
+The private scheduler now retains each ready callback and its default-queue destination
+until an active VM frame takes ownership. A failed handoff retains those roots. This
+clarifies ownership without changing current continuation affinity.
+
 Continuation affinity also needs refinement: a pending await currently resumes through
 the awaited Task’s producer queue. That behavior is not a permanent affinity guarantee.
 The proposed initial resumption target is the owning invocation; custom queues and

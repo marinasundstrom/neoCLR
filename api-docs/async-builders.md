@@ -8,6 +8,21 @@ Use Task and await in application code; no public scheduler design is implied.
 The reference includes IAsyncStateMachine, ITaskAwaiter and
 AsyncTaskMethodBuilder&lt;T&gt; under System.Runtime.CompilerServices.
 
+## Visibility and intended use
+
+Application-facing Task/Promise outcomes, await behavior and I/O results should remain
+independent of the machinery used to execute them. The builder and awaiter protocol
+is a separate, transitional integration contract. These members are visible in current
+reference metadata because generated code needs them; that visibility does not promise
+a permanent custom-builder or scheduler extension API. Use matching compiler, reference
+assembly and runtime versions when working with this protocol.
+
+TaskQueue is also currently public and supported within its documented limits, but
+remains transitional. Private scheduler records, wakeups and callback/frame handoffs
+are implementation details. No saved runtime frames are implemented by the current
+scheduler. The goal is to support useful APIs with generated state machines now while
+allowing runtime-owned suspension later; it is not a prerequisite for those APIs.
+
 ## State ownership
 
 The builder remains a class with shared completion storage. The development

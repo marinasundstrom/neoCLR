@@ -14,6 +14,26 @@ This document refines the socket integration sequence in the
 suspension before TCP echo. The initial private native-host completion driver is now
 implemented; runtime suspension and a public scheduler are not.
 
+## Scope and contract visibility — author clarification, 2026-09-24
+
+The author explicitly directs us **not to implement runtime suspension yet**. Build
+structure and contracts that permit it later, while implementing the application
+capabilities we need now. Generated state machines remain the working execution
+mechanism. Do not block usable I/O on a saved-frame implementation, a general context
+framework or a public scheduler design.
+
+| Contract tier | Examples | Compatibility expectation |
+| --- | --- | --- |
+| Application-facing | Task/Promise outcomes, await behavior, Result errors, I/O operation results, cancellation and resource ownership | Document and test observable behavior independently of execution machinery. Development APIs can still evolve, with explicit migration notes. |
+| Transitional integration | Async builders/awaiters, generated continuation entry points, current explicit TaskQueue APIs | Some are publicly visible in metadata today; that does not make them a permanent application extension model. Keep matching compiler/reference/runtime artifacts and document migration or removal. |
+| Private implementation | Scheduler source polling, wake latch, ready-slot representation, native operation registration and frame installation | May change without exposing their types as application contracts; preserve supported observable behavior and validate ownership/cleanup. |
+
+Public visibility and intended stability are separate. Existing public TaskQueue and
+compiler protocol members remain documented and functional; we are not silently making
+them private. Future frame resumption must replace the integration adapter rather than
+force applications to adopt internal scheduler handles. General affinity migration
+remains explicit work, not an incidental change to the socket backend.
+
 ## Separate responsibilities
 
 | Responsibility | Meaning | Current implementation / next boundary |
@@ -215,3 +235,36 @@ producer-queue affinity has not changed.
 Checked locally on Darwin arm64: 4 scheduler cases, 5 real-TCP VM cases,
 11 worker-registry cases (including the reply-order check), and 16 worker integration
 cases pass. The combined website build validates 523 pages.
+
+## Ready-to-active ownership — implemented 2026-09-24
+
+The driver now has a single traced ready slot holding a callback and its explicit
+legacy default-queue destination. Polling stops consuming source completions while
+the slot is occupied. The VM installs the Post frame before acknowledging release
+of that slot; a failed installation retains both root graphs. This makes the handoff
+an explicit private contract instead of returning an unowned callback Value.
+
+Pending sources still retain their callbacks/buffers until polling completes. The
+source-to-ready transfer has no GC safepoint; both GC paths trace the ready slot
+thereafter. Installation must not publish on failure and must publish to a traced
+active owner before returning success. The current VM closure resolves/creates its
+frame before pushing it, and contains no intervening collection. The adapter is
+single-owner and admits at most one ready registration; additional source outcomes
+remain with their existing owners and limits.
+
+This is not a new suspended-frame representation or an await-site affinity change.
+The destination is the existing invocation default queue at completion admission,
+not newly captured from the await site. Source-operation quotas and completed results
+awaiting consumption still need their own lifecycle accounting; a one-slot handoff does
+not claim to bound all retained application graphs or the existing TaskQueue backlog.
+
+Three new collector-backed/ownership checks cover independent callback/destination
+roots across failed installation and successful active transfer, immutable destination
+while occupied, exactly-once acknowledgement, and cancellation followed by teardown.
+The existing real TCP and worker VM checks validate the actual Post-frame path.
+Continue with the smallest reusable operation/socket bridge using these contracts;
+full runtime suspension and broader execution-context policies remain later work.
+
+Validation for this handoff slice: 7 scheduler tests, 5 real-TCP VM tests and
+16 worker integration tests pass on Darwin arm64. API-reference checks and the
+523-page combined website build also pass.

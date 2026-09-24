@@ -3478,12 +3478,15 @@ fn interpret_instructions(
                         continue;
                     }
                 }
-                let notification = scheduler.wait(heap, options)?;
-                if let Some(callback) = notification {
-                    let queue = default_task_queue
-                        .as_ref()
-                        .ok_or_else(|| Fault::new("Missing default TaskQueue"))?;
-                    frames.push(completion_notification_frame(module, queue.clone(), callback)?);
+                if scheduler.wait(heap, default_task_queue.as_ref(), options)? {
+                    scheduler.install_ready(|queue, callback| {
+                        frames.push(completion_notification_frame(
+                            module,
+                            queue.clone(),
+                            callback.clone(),
+                        )?);
+                        Ok(())
+                    })?;
                     drain_required = true;
                     continue;
                 }
@@ -3527,13 +3530,15 @@ fn interpret_instructions(
                             && target.owner.as_ref() == Some(&crate::assembler::parse_type("System.Func<Void>")?)
                             && target.parameters.is_empty())
                         {
-                            let callback = scheduler.poll(heap)?;
-                            if let Some(callback) = callback {
-                                frames.push(completion_notification_frame(
-                                    module,
-                                    queue.clone(),
-                                    callback,
-                                )?);
+                            if scheduler.poll(heap, queue)? {
+                                scheduler.install_ready(|queue, callback| {
+                                    frames.push(completion_notification_frame(
+                                        module,
+                                        queue.clone(),
+                                        callback.clone(),
+                                    )?);
+                                    Ok(())
+                                })?;
                             }
                         }
                     }

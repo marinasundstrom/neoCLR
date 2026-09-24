@@ -25,6 +25,23 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-24 — Enable future suspension without implementing it now
+
+- **Author:** clarified that the intention is not to go all the way to runtime
+  suspension yet. Requested structure/contracts that allow it later, a clear split
+  between public and changeable integration contracts, and behavior that enables
+  useful platform features before suspension itself is implemented.
+- **Assistant:** agreed to retain generated state machines, separate application-facing
+  behavior from transitional compiler/TaskQueue protocols and private implementation,
+  and avoid making a general context framework a prerequisite for useful I/O.
+- **Actions:** documented those tiers without pretending metadata-visible builder or
+  TaskQueue APIs are already private. Added a private, traced ready callback/destination
+  slot with acknowledgement only after active-frame installation. Current affinity
+  stays unchanged; no saved runtime frame representation was added. All 28 targeted
+  scheduler/TCP/worker checks and the combined website build passed.
+- **Open:** reusable operation/socket integration, bounded completed outcomes and
+  separately validated affinity migration. Runtime suspension remains deferred.
+
 ## 2026-09-24 — Runtime async and the scheduler boundary
 
 - **Author:** “Continue. Do you take the direction with runtime async into account?

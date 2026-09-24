@@ -62,6 +62,14 @@ Next make operation/resumption ownership explicit and settle continuation affini
 then attach reusable sockets and Task/Result completion for Raven echo. Current TCP/GC/VM probes remain evidence; they do not
 establish a portable scheduler or runtime-owned suspension.
 
+**Author clarification, 2026-09-24:** do not implement runtime suspension yet. Keep
+application contracts distinct from transitional compiler/TaskQueue protocols and
+private scheduler machinery. Build the capabilities needed now with generated state
+machines; preserve a replaceable execution mechanism for later suspension. The ready
+callback/destination handoff now has explicit traced ownership until active frame
+installation. Broader affinity/context machinery must not become a prerequisite for
+all useful I/O; any affinity change still needs its own migration checks.
+
 ## Authority and use
 
 **This roadmap is authoritative for our work unless the author explicitly directs
@@ -798,12 +806,13 @@ No later major milestone has started.
 
 ## Working rules and immediate next step
 
-**Active next step, 2026-09-24:** implement explicit operation and resumption ownership
-at the [internal scheduler boundary](runtime-scheduling-design.md#next-implementation-slices),
-then continue the Raven/neoCLR socket bridge. The initial driver now uses one source
-arbitration policy and durable worker wakeups. Preserve generated-async compatibility;
-settle await-site affinity and bounded pending/ready ownership before public sockets.
-Full runtime suspension is not a prerequisite for TCP echo.
+**Active next step, 2026-09-24:** continue the reusable operation/socket bridge using
+the [internal scheduler boundary](runtime-scheduling-design.md#next-implementation-slices).
+The driver and ready-to-active callback handoff now have explicit ownership. Add
+bounded pending/completed operation accounting and reusable socket results, retaining
+current affinity until its migration is explicitly tested. Generated state machines
+remain the execution mechanism; runtime suspension and general context customization
+are not prerequisites for TCP echo.
 Earlier foundation checkpoints below are dated evidence, not competing priorities.
 
 Each selected slice should leave a checked sample, expected output, a matching build/run
