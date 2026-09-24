@@ -2,15 +2,17 @@
 
 These documents propose possible runtime and library contracts. The platform roadmap selects the current work; individual proposals may conflict, change or be rejected. Comparisons with .NET identify differences and their costs.
 
-**Design snapshot · September 23, 2026.** This is not a release checklist or a promise to implement every proposal. The proposals may conflict and do not prescribe the final design. Names, contracts and priorities will be evaluated through small application experiments. Feature pages show the current implementation; the linked design records contain the fuller discussion.
+**Design snapshot · September 24, 2026.** This is not a release checklist or a promise to implement every proposal. The proposals may conflict and do not prescribe the final design. Names, contracts and priorities will be evaluated through small application experiments. Feature pages show the current implementation; the linked design records contain the fuller discussion.
 
 <a id="http-poc"></a>
 
 ## First major milestone: HTTP applications
 
-The immediate priority is the [async and Tasks preview](../features/tasks/#release-checkpoint). After that release checkpoint, Streams, Storage and Encoding come before networking.
+Preview 9's async and Tasks checkpoint has shipped. The author now selects the socket API as the first implementation goal towards a web app running on neoCLR. Keep the networking proposal as the direction and establish interfaces and behavior through small application cases.
 
-The first major milestone is a Raven HTTP client and server running on neoCLR, exchanging UTF-8 text and a small JSON document through real sockets and shared streams. Start with memory byte copy and text/JSON transformation, then test delayed operations against guest garbage collection and reuse the pipeline for a bounded file transformer. Add TCP echo and HTTP after those smaller cases have shaped the APIs, then test each HTTP side against an independent peer.
+The first major milestone is a Raven HTTP client and server running on neoCLR, exchanging UTF-8 text and a small JSON document through real sockets and shared streams. Existing memory, text/JSON, delayed-copy and storage cases supply the foundations. The next case is loopback TCP echo, followed by HTTP; test each HTTP side against an independent peer.
+
+**Socket implementation started:** an isolated host transport probe checks nonblocking TCP lifecycle, short reads, EOF, half-close, errors and close behavior. Eight checks and a .NET baseline pass on macOS. This is not yet a guest Socket API; Task delivery, GC retention and operation cancellation remain integration work. [Socket contracts and next steps →](https://github.com/marinasundstrom/neoCLR/blob/main/docs/socket-api-design.md)
 
 **Current evidence:** memory byte-copy, strict UTF-8 chunk decoding and bounded JSON document experiments run. The delayed-copy checkpoint connects worker completion to the real VM, retains a suspended Raven consumer through garbage collection and resumes it through the default TaskQueue. Its adapter is experimental; ordinary worker APIs still use queued joins. Completion now progresses between returning default-queue callbacks even when they repost work. Successful worker text/output payloads now have a default 1 MiB limit per worker. Host cancellation now has controlled completion and output-delivery checks. Guest operation cancellation races, queue affinity and broader host-memory accounting remain open before a general I/O API.
 

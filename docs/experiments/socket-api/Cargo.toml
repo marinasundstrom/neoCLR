@@ -1,0 +1,14 @@
+[package]
+name = "neoclr-socket-contract-probe"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+socket2 = "=0.6.1"
+
+[target.'cfg(unix)'.dependencies]
+libc = "=0.2.189"
+
+[lib]
+path = "probe.rs"

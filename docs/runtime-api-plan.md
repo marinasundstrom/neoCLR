@@ -1,6 +1,9 @@
 # Runtime-library API plan
 
-**Current priority (2026-09-23):** follow the [platform milestone roadmap](platform-roadmap.md).
+**Current priority (2026-09-24):** start with the [socket API](socket-api-design.md)
+towards a web app running on neoCLR, retaining the networking proposal as the
+direction. Establish interfaces and behavior as the application needs them; follow
+the [platform milestone roadmap](platform-roadmap.md).
 Its first major milestone, the [HTTP application POC](http-poc-roadmap.md)
 orders work by the socket, stream, encoding and small JSON dependencies of real
 client/server apps. Its smaller executable slices supersede the historical immediate

@@ -15,6 +15,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   cases; cancellation preserves the connection, and admission counts ready callbacks
   as well as pending reads. All 13 managed-heap ownership cases pass.
 
+- Select sockets as the next API work towards a web app running on neoCLR, keeping
+  the networking proposal as the direction. Record provisional interfaces and
+  lifecycle behavior. Add an isolated nonblocking TCP transport probe with eight
+  checks and a .NET baseline; guest Socket APIs, completion/GC integration and
+  cancellation remain pending. Update roadmap and website direction without
+  changing production runtime or compiler APIs.
+
 - Integrate explicit `String.Intern` with one bounded strong pool per execution;
   isolated workers and separate host invocations have independent pools. Retain
   canonical text until completion, Fault or cancellation while preserving returned

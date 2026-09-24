@@ -16,6 +16,12 @@ clarifies that proposals may conflict and do not prescribe the eventual API: use
 them as inputs to scenario-driven experiments, not specifications to reconcile into
 a final design.
 
+**Author direction, 2026-09-24:** retain the networking proposal as the direction
+for APIs towards a web app on neoCLR, starting with sockets. Exact interfaces and
+behavior are established incrementally; the original text remains preserved.
+See the [socket implementation design](../socket-api-design.md) for current scope
+and evidence. This does not select every proposal as a specification.
+
 | Proposal | Maintained design or implementation context |
 | --- | --- |
 | [Runtime architecture and language interoperability](runtime-architecture.md) | [Platform direction](../platform-direction.md), [execution architecture](../execution-architecture.md), [System.Runtime assembly](../system-runtime-assembly.md) |
@@ -26,7 +32,7 @@ a final design.
 | [Storage/filesystem](storage-api.md) | [Filesystem design](../filesystem-design.md), [current file API](../raven-file-api.md) |
 | [Streams](streams-api.md) | [Stream design](../stream-design.md) |
 | [Task and async](task-model.md) | [Async API design](../async-api-design.md), [implementation assessment](../async-state-machine-assessment.md) |
-| [Networking and HTTP](network-api.md) | [Platform backlog](../platform-backlog.md); the proposal does not establish an implemented networking API |
+| [Networking and HTTP](network-api.md) | [Socket implementation design](../socket-api-design.md), [transport probe](../experiments/socket-api/README.md); guest API pending |
 
 The author requested source porting before API alignment on 2026-09-19. Differences
 between these proposals and the current library remain explicit follow-up work.

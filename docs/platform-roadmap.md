@@ -25,6 +25,26 @@ APIs and behavior as concrete application cases need them. Examine each case bef
 choosing its contract; keep readily changeable choices provisional. The discussed
 Iterable<char> constructor/count overload remains undecided, not a planned API.
 
+## Active direction — sockets for a web application, 2026-09-24
+
+The author directs us to start implementing the APIs needed to build a web app
+running on neoCLR, establishing interfaces and behavior as we go. **The first goal
+is the socket API; keep the [networking proposal](proposals/network-api.md) as the
+direction.** Its async I/O, Result failures, portable sockets and shared-stream
+layering guide the work; exact signatures develop through executable cases.
+
+This direction supersedes earlier “networking remains later” priorities and the
+requirement to finish a general semantics review first. Preserve the unfinished
+Object/String work and its evidence; handle further foundations when the socket or
+web-app case needs them. It does not select all later proposal features at once.
+
+Start with bounded loopback TCP echo. The [socket design](socket-api-design.md)
+records candidate contracts and the next integration gates. The initial
+[transport implementation](experiments/socket-api/README.md) passes eight host-side
+checks plus a .NET comparison baseline. It is not a guest Socket API: Task delivery,
+GC roots, operation cancellation and the runnable Raven/neoCLR echo remain open.
+Continue with that bridge, then TCP streams and HTTP. S4 has started, not completed.
+
 ## Authority and use
 
 **This roadmap is authoritative for our work unless the author explicitly directs
@@ -39,7 +59,7 @@ streams. Console stays a class, with static In/Out/Error access. The bounded
 text/byte output channels and reader/writer ownership. This is synchronous I/O;
 TaskQueue/suspension exploration remains open and networking stays later.
 
-**Current author-directed focus, updated 2026-09-24:** consolidate Object/value
+**Previous author-directed focus, updated 2026-09-24:** consolidate Object/value
 semantics and investigate String storage and reference identity. Object is abstract;
 class identity and overrides, bounded primitive equality/hash/display, String content
 contracts, Path and introspection semantics have checked samples. The
@@ -53,9 +73,9 @@ arrays, erasure, GC pressure, host retention and cyclic/fault teardown. Owner-ba
 reference comparison and stable identity/base hashes now use that retained owner;
 wrapper IDs are not String IDs. The identity slice did not add interning; its follow-up
 is recorded below. The internal shared-owner
-layout remains provisional. Next perform a bounded Object/value consistency review,
-then choose API work from a real application case; do not expand text contracts
-without a concrete need.
+layout remains provisional. The general Object/value consistency review remains
+open; the later socket direction above now selects the next application case.
+Do not expand text contracts without a concrete need.
 
 **Socket completion checkpoint, 2026-09-24:** the
 [receive ownership probe](experiments/socket-completion/README.md) checks real TCP
@@ -75,7 +95,8 @@ invocations and isolated workers have separate quotas and pool lifetimes. This f
 existing execution state without introducing a runtime-session abstraction. Explicit
 entry/payload limits fault on new insertions at capacity; retained results survive
 pool teardown. Automatic literal interning, lookup helpers and shared session pools
-remain unselected. This completes the bounded interning follow-up.
+remain unselected. This completes the bounded interning follow-up; the active socket direction governs
+subsequent API work.
 
 **Author-directed String API slice, 2026-09-24:** support construction from
 Sequence<char>, including arrays, and expose String as a read-only Sequence with
@@ -109,7 +130,8 @@ When choosing work autonomously, follow the current author-directed focus and th
 [immediate next step](#working-rules-and-immediate-next-step). The post-release
 concurrency, Storage and file Stream POC has working evidence below; broader
 suspension and cancellation remain within M1. The async/Tasks preview has shipped.
-The early memory-copy checkpoint has evidence; sockets and HTTP remain later.
+The early memory-copy checkpoint has evidence; sockets are now the active API
+work and HTTP follows the transport integration.
 Use the progression below and its detailed plan for validation.
 Later milestone candidates remain provisional: listing them here does not authorize
 wholesale implementation of their proposals or freeze their order. Update completion
@@ -757,6 +779,13 @@ No later major milestone has started.
 
 ## Working rules and immediate next step
 
+**Active next step, 2026-09-24:** implement the Raven/neoCLR socket bridge described
+in the [socket design](socket-api-design.md#next-implementation-checkpoint), following
+the networking proposal. The host transport probe is the first checked slice;
+it does not establish guest async completion or close the TCP echo milestone.
+Earlier foundation checkpoints below are retained as dated evidence, not a competing
+instruction to postpone sockets.
+
 Each selected slice should leave a checked sample, expected output, a matching build/run
 path, failure cases and a short decision record. Record the .NET baseline, alternatives,
 selected layer (language, library, metadata, runtime or host), benefits, costs and open
@@ -849,7 +878,7 @@ RAV0407 rejects known nullable value declarations while allowing reference annot
 Raven's ordinary .NET default remains unchanged. See the
 [record sample and rejection checks](experiments/records/README.md).
 
-**Immediate author-directed investigation, 2026-09-24:** use the now-supported value
+**Earlier author-directed investigation, 2026-09-24:** use the now-supported value
 semantics to establish efficient async state-machine ownership. Raven already emits
 struct states by default; neoCLR still explicitly selects classes. Prioritize the
 [value-state-machine gates](async-state-machine-assessment.md#value-state-machine-priority--2026-09-24)
@@ -862,7 +891,8 @@ Keep the working heap default while broader shapes and byte/copy costs remain un
 Generated-code builder APIs are explicitly transitional and may be removed when
 runtime-owned suspension replaces them; this work supports building the platform now.
 
-This is a bounded foundation review; networking remains later. Console ownership,
+This was a bounded foundation review; the later socket direction above now governs
+next work. Console ownership,
 cleanup on propagated errors and buffering remain follow-up questions, not selected
 redesigns. The scheduling/operation-cancellation work below remains open.
 

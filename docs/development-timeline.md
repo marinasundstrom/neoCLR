@@ -25,6 +25,27 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-24 — Socket APIs towards a web application
+
+- **Author:** “Our first goal is the socket api - as per proposal. Keep the proposal
+  as the direction.” Directed incremental implementation of the APIs needed for a
+  web app running on neoCLR, establishing interfaces and behavior along the way.
+- **Assistant:** selected bounded loopback TCP echo as the first application case,
+  preserving async I/O, recoverable Result failures, portable sockets and common
+  streams from the proposal. Updated the active roadmap rather than retaining the
+  older instruction to postpone networking until a general semantics review.
+- **Actions and checked outcome:** added the [socket design](socket-api-design.md)
+  with candidate guest contracts and an isolated [transport implementation](experiments/socket-api/README.md).
+  Eight Rust checks passed on Darwin arm64, with a net10.0 comparison baseline for
+  endpoints, cancellation, short reads, EOF and half-close. The refusal fixture was
+  corrected after a bound non-listening macOS port left connect pending. Existing
+  uncommitted String work was preserved. No production runtime, compiler or public
+  API was changed by this slice.
+- **Open:** implement the Raven/VM bridge, pending-operation delivery, GC ownership,
+  cancellation races and resource quotas before calling the socket API usable from
+  neoCLR. The full echo and web-app goals are not complete; later TCP/HTTP details
+  remain provisional. The original networking proposal text remains intact.
+
 ## 2026-09-24 — Upstream navigation and custom union classification
 
 **Author direction.** Distinguished nested main navigation, authored per-section

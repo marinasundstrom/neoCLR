@@ -1,10 +1,12 @@
 # Roadmap: prove neoCLR with HTTP applications
 
-**Current priority (2026-09-23):** the async/Tasks preview has shipped and the
-synchronous Storage POC is implemented. The File Transformer below connects the
-existing JSON experiment to those APIs. Pending I/O ownership, scheduling and
-cancellation remain pre-networking questions. The [platform roadmap](platform-roadmap.md)
-remains authoritative.
+**Current priority (2026-09-24):** start the socket API towards a web application
+running on neoCLR, keeping the [networking proposal](proposals/network-api.md) as
+the direction. Establish interfaces and behavior through bounded cases. The
+[socket design](socket-api-design.md) records the first transport implementation
+and the pending Raven/VM integration. S0 ownership, progress and cancellation gaps
+are part of making sockets work, rather than a reason to postpone all socket work.
+The [platform roadmap](platform-roadmap.md) remains authoritative.
 
 
 Detailed M1 plan subordinate to the [authoritative platform roadmap](platform-roadmap.md).
@@ -85,6 +87,11 @@ performed for this planning update.
 
 ## Delivery ordering update — 2026-09-23
 
+**Superseded priority, 2026-09-24:** the author now selects sockets first for the
+next API work. The smaller foundation cases below remain evidence and dependencies
+where needed; they no longer defer starting S4. Keep the networking proposal as the
+direction while defining its exact contracts through implementation.
+
 Follow the [platform roadmap's progressive checkpoints](platform-roadmap.md#progressive-delivery-before-networking--revised-2026-09-23):
 memory byte copy, text/JSON transformation, controlled delayed copy with guest GC,
 a bounded file transformer, TCP echo, then HTTP. The author asks for gradual API
@@ -141,7 +148,7 @@ and a short contract/comparison note. The isolated S0 host probe is only partial
 | S2 — partial; strict chunk decoder experiment | Encode/decode a multilingual message split at every UTF-8 byte boundary; depends on S1 | Strict invalid/truncated input outcomes, carried decoder state, final-flush behavior and byte counts; reuse current whole-buffer conversions rather than change Char again |
 | S3 — partial; document consumer runs | Small JSON round trip in memory; depends on S2 | Read/write object, array, string, number, boolean and null; escaped strings and Unicode, malformed syntax, duplicate-key policy, numeric limits/precision and nesting/size bounds are explicit. Prefer explicit field access and construction; benchmark only if making performance claims |
 | S1F — partial; synchronous file consumer runs | Reuse the memory/text/JSON pipeline with bounded file input/output; after S1–S3 and the delayed-lifetime checkpoint | Shared stream behavior, open/read/write errors, cleanup and a declared failed-save policy; no directory/provider redesign or claim of nonblocking I/O |
-| S4 — exploration then implementation | TCP listener and echo client; depends on S0/S1 and resolved ownership | Bind/listen/accept/connect/read/write/close, endpoint reporting, short transfers, peer EOF/reset, refused connection, pending accept/read cancellation and repeated shutdown. A stalled connection must not freeze unrelated work; bound admitted connections |
+| S4 — active; [host transport checks pass](experiments/socket-api/README.md), guest bridge pending | TCP listener and echo client; depends on S0/S1 and resolved ownership | Bind/listen/accept/connect/read/write/close, endpoint reporting, short transfers, peer EOF/reset, refused connection, pending accept/read cancellation and repeated shutdown. A stalled connection must not freeze unrelated work; bound admitted connections |
 | S5 — planned | HTTP server returns text to an independent client; depends on S2/S4 | Split start lines/headers/body boundaries, methods/targets/status/headers, byte Content-Length, case-insensitive header names, bounded input and explicit rejection of unsupported/ambiguous framing. Choose accept/respond versus handler API using this case |
 | S6 — planned | HttpClient calls an independent local server; depends on S2/S4 and shared HTTP framing work | Parse supported endpoint URLs, send GET/POST, inspect non-2xx responses as responses, consume bounded bodies, report transport/protocol errors distinctly and close resources after cancellation/error |
 | M1 — planned | Two neoCLR apps exchange text and JSON; depends on S3/S5/S6 | All milestone cases above, independent-peer checks, shutdown/resource stress, recorded platform limits and packaged reproduction |
