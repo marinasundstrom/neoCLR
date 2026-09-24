@@ -121,3 +121,10 @@ neoCLR. `favicon` in `site.json` selects the N-logo SVG copied by the build.
 RavenDoc embeds the Raven website's shared Highlight.js lexer and color rules,
 so fenced Raven examples and generated declarations use the same highlighting
 without a CDN. The generic implementation and demonstration site live in Raven.
+
+## Analytics
+
+`site.json` restores the existing Google Analytics measurement ID `G-SVXYRRCEEK`
+through RavenDoc's optional `googleAnalyticsId` setting. The Google tag is included
+once on authored pages and generated API pages. Remove the setting to disable it.
+Local builds include the same tag; omit the ID for an unmeasured preview.

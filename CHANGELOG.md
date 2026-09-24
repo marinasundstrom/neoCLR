@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Restore Google Analytics measurement ID `G-SVXYRRCEEK` across authored and
+  generated API pages through RavenDoc configuration, after the website migration
+  dropped the previous tag. Update the pinned upstream publisher.
+
 - Bound pending numeric TCP connects to five seconds from native admission. Expiry
   closes the native socket and returns SocketError.TimedOut; outcomes already committed
   survive delayed delivery. Accept and transfers keep their existing behavior. Update
