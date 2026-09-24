@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Investigate value-type async state machines as the next author-directed priority.
+  Add a reproducible Release heap/value probe: heap execution succeeds; struct
+  emission currently fails target import and boxes at builder boundaries. Record
+  by-reference startup, suspension ownership, GC and allocation measurement gates;
+  keep the existing heap default and label website guidance as investigation.
+
 - Add boxed Boolean Object equality and hashing alongside Int32: compare copied
   values only with the exact Boolean type, with hashes 1/0 for true/false. Preserve
   separate box identity and explicit Object base behavior. Extend the Raven sample,

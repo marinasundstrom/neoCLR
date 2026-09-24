@@ -6008,3 +6008,20 @@ failure remains the next acceptance target.
   payloads in the consistency gate. Add a focused regression that clears the source
   struct, forces collection and invokes the boxed override through its retained child.
   Existing box/alias/heap-limit checks remain part of validation.
+
+### 2026-09-24 — Value-type async state machines
+
+- **Author:** asks how true value-type support can improve async state-machine
+  efficiency in Release, whether Raven supports that representation, and directs
+  focusing on making it work if so.
+- **Assistant findings:** Raven defaults to struct states; neoCLR opts into classes.
+  Existing Raven tests pass, but the target Release struct probe is rejected during
+  import. Emitted code boxes at startup and continuation registration because the
+  current builder takes an interface by value. The scratch closure failure shared
+  by both modes was isolated, not fixed.
+- **Action:** retain a reproducible probe and prioritize byref startup, one suspended
+  state owner, GC/completion checks and measured allocation comparison ahead of Path.
+  Keep the working heap default. Record the .NET builder comparison and implementation
+  gates in the async assessment.
+- **Open:** target value-state execution and allocation benefit are not established;
+  no new public scheduling model, default switch or optimized SDK release is claimed.

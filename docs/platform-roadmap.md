@@ -751,7 +751,7 @@ Value retirement remains a separate storage migration.
 
 **Library consistency direction, 2026-09-24:** the author requests applying Object
 contracts throughout the runtime class library. The [library audit](object-model-review.md#library-wide-consistency-checkpoint--2026-09-24)
-selects Path typed/Object equality, hash and display alignment as the next bounded
+identifies Path typed/Object equality, hash and display alignment as the next library
 consumer case, followed by reuse through existing HashMap callbacks. Broader primitive,
 formatting and default-comparer coverage remains incremental; do not imply universal
 Object support from the completed record gate. The author also requires correct GC
@@ -770,6 +770,15 @@ declarations. The development target now selects RavenAllowNullableValueTypes=fa
 RAV0407 rejects known nullable value declarations while allowing reference annotations.
 Raven's ordinary .NET default remains unchanged. See the
 [record sample and rejection checks](experiments/records/README.md).
+
+**Immediate author-directed investigation, 2026-09-24:** use the now-supported value
+semantics to establish efficient async state-machine ownership. Raven already emits
+struct states by default; neoCLR still explicitly selects classes. Prioritize the
+[value-state-machine gates](async-state-machine-assessment.md#value-state-machine-priority--2026-09-24)
+ahead of Path: by-reference startup, one retained state across suspension, GC/root
+checks, then measured Release comparison. The first Release probe emits a struct but
+fails import, and current interface-by-value builders introduce boxing. Keep the
+working heap default until the new protocol has correctness and allocation evidence.
 
 This is a bounded foundation review; networking remains later. Console ownership,
 cleanup on propagated errors and buffering remain follow-up questions, not selected

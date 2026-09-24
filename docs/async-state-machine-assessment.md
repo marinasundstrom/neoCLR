@@ -161,3 +161,65 @@ cherry-picked to neoclr as b67d1e11b. All 145 tests in the selected async/resour
 suite pass on .NET 11, including ten new unit-task execution cases and two
 nongeneric diagnostic checks. The temporary main-based branch is removed after
 integration; the long-lived neoCLR branch remains separate.
+
+## Value state-machine priority — 2026-09-24
+
+The author asks whether true value support can make async state machines efficient
+in Release and directs focusing on that path if Raven supports it. This is now the
+next bounded foundation investigation, ahead of the Path consistency case. The
+library-wide Object/GC consistency work remains required, not cancelled.
+
+Raven does support value state machines. Current target-branch code in
+SynthesizedAsyncStateMachineTypeSymbol chooses Struct/System.ValueType by default;
+UseHeapAsyncStateMachines explicitly selects Class/System.Object. That selection is
+not itself conditioned on Release. neoCLR's props select heap states in both build
+configurations. Six existing Raven policy/runtime tests pass on .NET 11. The new
+[Release target probe](experiments/value-async/README.md) establishes a successful
+heap baseline and a struct import rejection, not working target value async yet.
+
+### Why changing the flag is insufficient
+
+The current neoCLR builder is a class holding a shared Promise. Start and
+AwaitOnCompleted accept IAsyncStateMachine by value; SetStateMachine is a no-op.
+Raven therefore boxes the struct at startup and again at continuation registration.
+Import currently rejects a reference cast along this path. Struct field/boxing/GC
+support is a prerequisite, but does not establish a correct, efficient builder
+ownership protocol. Repeated boxing might preserve some simple results while still
+allocating and copying state at every suspension. Do not claim allocation savings
+from a metadata type change.
+
+The [.NET 10 builder source](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Runtime/CompilerServices/AsyncTaskMethodBuilderT.cs)
+(reviewed 2026-09-24) starts through a generic ref state parameter, stores suspended
+state in a typed box and reuses that box. Its builder/task initialization order avoids
+copies building distinct tasks. This is an implementation comparison, not a mandate
+to copy ExecutionContext, CLR exception handling or the exact Task layout into neoCLR.
+
+### Implementation gates, in order
+
+1. **By-reference startup:** prove a generated non-generic struct machine runs a
+   ready await against the target builder without boxing its state at Start. Keep
+   result ownership shared with the caller; check unit and Result payloads. Separate
+   target Task recognition from heap selection where necessary. Review importer
+   generic/byref/constrained-call support instead of silently coercing references.
+2. **First suspension ownership:** transfer saved state into one traced heap owner.
+   Retain that owner for subsequent MoveNext calls. Do not retain a frame-backed
+   managed reference or capture one in a continuation. Check pending completion
+   after kickoff returns, and two independently pending awaits with observable
+   mutations so stale copies cannot pass unnoticed.
+3. **GC and completion:** keep reference fields, awaiters and the result source alive
+   under forced collection between resumes. Verify aliases see the same state,
+   completion/cancellation fires once, and completion releases unnecessary roots.
+   Preserve terminal Fault and Task<Result<...>> semantics; do not import CLR catches.
+4. **Measured Release gate:** compare identical ready, one-pending and two-pending
+   programs against the existing heap policy. Record state-specific allocations,
+   total allocations, copied payloads, peak live objects and collections before any
+   speed claim. Promise/task/continuation allocations still count. Only select a
+   new Release default after correctness and a demonstrated benefit; retain debugging
+   behavior deliberately rather than assuming Debug must use classes.
+
+The first experiment may retain the existing reference-type builder to isolate
+state ownership. A value builder and lazy/fused task-state storage are subsequent
+choices, not prerequisites for every slice. The cost of byref generic contracts and
+promotion machinery must be compared with keeping the existing simple heap state.
+Runtime-owned suspension remains a longer-term alternative. None of this selects a
+public Scheduler API or requires networking work.

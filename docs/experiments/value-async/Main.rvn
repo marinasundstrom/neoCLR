@@ -1,0 +1,18 @@
+import System.*
+import System.Tasks.*
+
+async func Add(input: Task<int>) -> Task<int> {
+    let value = await input
+    Console.WriteLine(value + 1)
+    return value + 1
+}
+
+func Main() {
+    let queue = TaskQueue()
+    let source = Promise<int>(queue)
+    queue.Run(() => {
+        _ = Add(source.Task)
+        Console.WriteLine("Pending")
+        _ = source.Complete(41)
+    })
+}
