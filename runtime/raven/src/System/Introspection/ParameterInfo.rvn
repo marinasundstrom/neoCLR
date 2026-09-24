@@ -22,9 +22,13 @@ internal class RuntimeParameterInfo : ParameterInfo {
     private field StoredIsReadOnly: bool
     private field StoredMetadataToken: int
     private field StoredModule: ModuleInfo
+    private field StoredDeclaringType: TypeInfo
+    private field StoredMemberKind: int
+    private field StoredMemberIndex: int
 
     private init(name: string, position: int, parameterType: TypeInfo,
-        isOut: bool, isOutWhenTrue: bool, isReadOnly: bool, metadataToken: int, module: ModuleInfo) {
+        isOut: bool, isOutWhenTrue: bool, isReadOnly: bool, metadataToken: int, module: ModuleInfo,
+        declaringType: TypeInfo, memberKind: int, memberIndex: int) {
         StoredName = name
         StoredPosition = position
         StoredParameterType = parameterType
@@ -33,6 +37,9 @@ internal class RuntimeParameterInfo : ParameterInfo {
         StoredIsReadOnly = isReadOnly
         StoredMetadataToken = metadataToken
         StoredModule = module
+        StoredDeclaringType = declaringType
+        StoredMemberKind = memberKind
+        StoredMemberIndex = memberIndex
     }
 
     val MetadataToken: int => StoredMetadataToken
@@ -43,4 +50,26 @@ internal class RuntimeParameterInfo : ParameterInfo {
     val IsOut: bool => StoredIsOut
     val IsOutWhenTrue: bool => StoredIsOutWhenTrue
     val IsReadOnly: bool => StoredIsReadOnly
+
+    override func Equals(other: Object?) -> bool {
+        if other is RuntimeParameterInfo implementation {
+            return StoredDeclaringType.Equals(implementation.StoredDeclaringType)
+                && StoredMemberKind == implementation.StoredMemberKind
+                && StoredMemberIndex == implementation.StoredMemberIndex
+                && Position == implementation.Position
+        }
+        return false
+    }
+
+    override func GetHashCode() -> int {
+        var hash = HashCode()
+        hash.Add(StoredDeclaringType.FullName)
+        hash.Add(StoredMemberKind)
+        hash.Add(StoredMemberIndex)
+        hash.Add(Position)
+        return hash.ToHashCode()
+    }
+
+    override func ToString() -> string => Name
+
 }

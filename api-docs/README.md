@@ -182,7 +182,8 @@ and its temporary role are explained in the guide. TypeInfo and MemberInfo now h
 generated type/member coverage and an [introspection guide](introspection.md).
 AssemblyInfo and ModuleInfo now also have generated type/member coverage.
 FieldInfo, MethodInfo and PropertyInfo now have generated member coverage.
-ParameterInfo remains an explicit coverage gap until its owner contract is established. Object/Value source files participate in the reference
+ParameterInfo and BindingFlags now have generated member coverage too. Parameter
+owner identity is internal; the guide distinguishes this from a future Member property. Object/Value source files participate in the reference
 snapshot fingerprint.
 
 The metadata refresh normalizes two DocFX core-type assumptions: Object's declaration

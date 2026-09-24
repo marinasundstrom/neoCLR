@@ -145,6 +145,9 @@ items:
   - uid: System.Introspection.AssemblyInfo
     name: AssemblyInfo
     type: Interface
+  - uid: System.Introspection.BindingFlags
+    name: BindingFlags
+    type: Enum
   - uid: System.Introspection.FieldInfo
     name: FieldInfo
     type: Interface
@@ -156,6 +159,9 @@ items:
     type: Interface
   - uid: System.Introspection.ModuleInfo
     name: ModuleInfo
+    type: Interface
+  - uid: System.Introspection.ParameterInfo
+    name: ParameterInfo
     type: Interface
   - uid: System.Introspection.PropertyInfo
     name: PropertyInfo

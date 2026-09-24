@@ -5,10 +5,12 @@ items:
   id: System.Introspection
   children:
   - System.Introspection.AssemblyInfo
+  - System.Introspection.BindingFlags
   - System.Introspection.FieldInfo
   - System.Introspection.MemberInfo
   - System.Introspection.MethodInfo
   - System.Introspection.ModuleInfo
+  - System.Introspection.ParameterInfo
   - System.Introspection.PropertyInfo
   - System.Introspection.TypeInfo
   langs:
@@ -45,6 +47,13 @@ references:
   name: TypeInfo
   nameWithType: TypeInfo
   fullName: System.Introspection.TypeInfo
+- uid: System.Introspection.ParameterInfo
+  commentId: T:System.Introspection.ParameterInfo
+  isExternal: true
+  href: System.Introspection.ParameterInfo.html
+  name: ParameterInfo
+  nameWithType: ParameterInfo
+  fullName: System.Introspection.ParameterInfo
 - uid: System.Introspection.MemberInfo
   commentId: T:System.Introspection.MemberInfo
   parent: System.Introspection
@@ -74,6 +83,14 @@ references:
   name: PropertyInfo
   nameWithType: PropertyInfo
   fullName: System.Introspection.PropertyInfo
+- uid: System.Introspection.BindingFlags
+  commentId: T:System.Introspection.BindingFlags
+  parent: System.Introspection
+  isExternal: true
+  href: System.Introspection.BindingFlags.html
+  name: BindingFlags
+  nameWithType: BindingFlags
+  fullName: System.Introspection.BindingFlags
 - uid: System.Introspection
   commentId: N:System.Introspection
   isExternal: true

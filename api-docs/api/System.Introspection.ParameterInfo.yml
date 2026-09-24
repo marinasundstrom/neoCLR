@@ -1,0 +1,352 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Introspection.ParameterInfo
+  commentId: T:System.Introspection.ParameterInfo
+  id: ParameterInfo
+  parent: System.Introspection
+  children:
+  - System.Introspection.ParameterInfo.IsOut
+  - System.Introspection.ParameterInfo.IsOutWhenTrue
+  - System.Introspection.ParameterInfo.IsReadOnly
+  - System.Introspection.ParameterInfo.MetadataToken
+  - System.Introspection.ParameterInfo.Module
+  - System.Introspection.ParameterInfo.Name
+  - System.Introspection.ParameterInfo.ParameterType
+  - System.Introspection.ParameterInfo.Position
+  langs:
+  - csharp
+  - vb
+  name: ParameterInfo
+  nameWithType: ParameterInfo
+  fullName: System.Introspection.ParameterInfo
+  type: Interface
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Describes an explicit method parameter or property index parameter in the loaded program.
+  remarks: Development after Preview 9. Object equality compares the closed declaring type, owner kind and definition index, and zero-based parameter position. Matching names, types or tokens alone are insufficient. Hashes agree for equal parameters; ToString returns Name, which may be empty. Owner identity is retained internally; a public Member property, return parameters, defaults and custom attributes are not implemented.
+  example: []
+  syntax:
+    content: public interface ParameterInfo
+    content.vb: Public Interface ParameterInfo
+- uid: System.Introspection.ParameterInfo.MetadataToken
+  commentId: P:System.Introspection.ParameterInfo.MetadataToken
+  id: MetadataToken
+  parent: System.Introspection.ParameterInfo
+  langs:
+  - csharp
+  - vb
+  name: MetadataToken
+  nameWithType: ParameterInfo.MetadataToken
+  fullName: System.Introspection.ParameterInfo.MetadataToken
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the source parameter token, or zero when no Param row was retained. This token is scoped and is not the equality key. Property index snapshots currently report the selected accessor parameter token.
+  example: []
+  syntax:
+    content: int MetadataToken { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: ReadOnly Property MetadataToken As Integer
+  overload: System.Introspection.ParameterInfo.MetadataToken*
+- uid: System.Introspection.ParameterInfo.Module
+  commentId: P:System.Introspection.ParameterInfo.Module
+  id: Module
+  parent: System.Introspection.ParameterInfo
+  langs:
+  - csharp
+  - vb
+  name: Module
+  nameWithType: ParameterInfo.Module
+  fullName: System.Introspection.ParameterInfo.Module
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the defining module descriptor. Repeated wrappers can compare equal without sharing allocation identity.
+  example: []
+  syntax:
+    content: ModuleInfo Module { get; }
+    parameters: []
+    return:
+      type: System.Introspection.ModuleInfo
+    content.vb: ReadOnly Property [Module] As ModuleInfo
+  overload: System.Introspection.ParameterInfo.Module*
+- uid: System.Introspection.ParameterInfo.Name
+  commentId: P:System.Introspection.ParameterInfo.Name
+  id: Name
+  parent: System.Introspection.ParameterInfo
+  langs:
+  - csharp
+  - vb
+  name: Name
+  nameWithType: ParameterInfo.Name
+  fullName: System.Introspection.ParameterInfo.Name
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the retained parameter name, or an empty string when unavailable. Property index parameter names are currently empty.
+  example: []
+  syntax:
+    content: string Name { get; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: ReadOnly Property Name As String
+  overload: System.Introspection.ParameterInfo.Name*
+- uid: System.Introspection.ParameterInfo.Position
+  commentId: P:System.Introspection.ParameterInfo.Position
+  id: Position
+  parent: System.Introspection.ParameterInfo
+  langs:
+  - csharp
+  - vb
+  name: Position
+  nameWithType: ParameterInfo.Position
+  fullName: System.Introspection.ParameterInfo.Position
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the zero-based position among explicit parameters. The instance receiver is not included; return parameters are not exposed.
+  example: []
+  syntax:
+    content: int Position { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: ReadOnly Property Position As Integer
+  overload: System.Introspection.ParameterInfo.Position*
+- uid: System.Introspection.ParameterInfo.ParameterType
+  commentId: P:System.Introspection.ParameterInfo.ParameterType
+  id: ParameterType
+  parent: System.Introspection.ParameterInfo
+  langs:
+  - csharp
+  - vb
+  name: ParameterType
+  nameWithType: ParameterInfo.ParameterType
+  fullName: System.Introspection.ParameterInfo.ParameterType
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the parameter type with declaring-type generic arguments substituted, including reference/read-only qualification.
+  example: []
+  syntax:
+    content: TypeInfo ParameterType { get; }
+    parameters: []
+    return:
+      type: System.Introspection.TypeInfo
+    content.vb: ReadOnly Property ParameterType As TypeInfo
+  overload: System.Introspection.ParameterInfo.ParameterType*
+- uid: System.Introspection.ParameterInfo.IsOut
+  commentId: P:System.Introspection.ParameterInfo.IsOut
+  id: IsOut
+  parent: System.Introspection.ParameterInfo
+  langs:
+  - csharp
+  - vb
+  name: IsOut
+  nameWithType: ParameterInfo.IsOut
+  fullName: System.Introspection.ParameterInfo.IsOut
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Reports an unconditional out parameter. Property index snapshots currently have no out annotations.
+  example: []
+  syntax:
+    content: bool IsOut { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property IsOut As Boolean
+  overload: System.Introspection.ParameterInfo.IsOut*
+- uid: System.Introspection.ParameterInfo.IsOutWhenTrue
+  commentId: P:System.Introspection.ParameterInfo.IsOutWhenTrue
+  id: IsOutWhenTrue
+  parent: System.Introspection.ParameterInfo
+  langs:
+  - csharp
+  - vb
+  name: IsOutWhenTrue
+  nameWithType: ParameterInfo.IsOutWhenTrue
+  fullName: System.Introspection.ParameterInfo.IsOutWhenTrue
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Reports a conditional out parameter whose assignment is guaranteed on a true return. Property index snapshots currently have no conditional out annotations.
+  example: []
+  syntax:
+    content: bool IsOutWhenTrue { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property IsOutWhenTrue As Boolean
+  overload: System.Introspection.ParameterInfo.IsOutWhenTrue*
+- uid: System.Introspection.ParameterInfo.IsReadOnly
+  commentId: P:System.Introspection.ParameterInfo.IsReadOnly
+  id: IsReadOnly
+  parent: System.Introspection.ParameterInfo
+  langs:
+  - csharp
+  - vb
+  name: IsReadOnly
+  nameWithType: ParameterInfo.IsReadOnly
+  fullName: System.Introspection.ParameterInfo.IsReadOnly
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Reports a read-only parameter or read-only by-reference type.
+  example: []
+  syntax:
+    content: bool IsReadOnly { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property IsReadOnly As Boolean
+  overload: System.Introspection.ParameterInfo.IsReadOnly*
+references:
+- uid: System.Introspection
+  commentId: N:System.Introspection
+  isExternal: true
+  href: System.html
+  name: System.Introspection
+  nameWithType: System.Introspection
+  fullName: System.Introspection
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Introspection
+    name: Introspection
+    isExternal: true
+    href: System.Introspection.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Introspection
+    name: Introspection
+    isExternal: true
+    href: System.Introspection.html
+- uid: System.Introspection.ParameterInfo.MetadataToken*
+  commentId: Overload:System.Introspection.ParameterInfo.MetadataToken
+  isExternal: true
+  href: System.Introspection.ParameterInfo.html#System_Introspection_ParameterInfo_MetadataToken
+  name: MetadataToken
+  nameWithType: ParameterInfo.MetadataToken
+  fullName: System.Introspection.ParameterInfo.MetadataToken
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Introspection.ParameterInfo.Module*
+  commentId: Overload:System.Introspection.ParameterInfo.Module
+  isExternal: true
+  href: System.Introspection.ParameterInfo.html#System_Introspection_ParameterInfo_Module
+  name: Module
+  nameWithType: ParameterInfo.Module
+  fullName: System.Introspection.ParameterInfo.Module
+- uid: System.Introspection.ModuleInfo
+  commentId: T:System.Introspection.ModuleInfo
+  parent: System.Introspection
+  isExternal: true
+  href: System.Introspection.ModuleInfo.html
+  name: ModuleInfo
+  nameWithType: ModuleInfo
+  fullName: System.Introspection.ModuleInfo
+- uid: System.Introspection.ParameterInfo.Name*
+  commentId: Overload:System.Introspection.ParameterInfo.Name
+  isExternal: true
+  href: System.Introspection.ParameterInfo.html#System_Introspection_ParameterInfo_Name
+  name: Name
+  nameWithType: ParameterInfo.Name
+  fullName: System.Introspection.ParameterInfo.Name
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System.Introspection.ParameterInfo.Position*
+  commentId: Overload:System.Introspection.ParameterInfo.Position
+  isExternal: true
+  href: System.Introspection.ParameterInfo.html#System_Introspection_ParameterInfo_Position
+  name: Position
+  nameWithType: ParameterInfo.Position
+  fullName: System.Introspection.ParameterInfo.Position
+- uid: System.Introspection.ParameterInfo.ParameterType*
+  commentId: Overload:System.Introspection.ParameterInfo.ParameterType
+  isExternal: true
+  href: System.Introspection.ParameterInfo.html#System_Introspection_ParameterInfo_ParameterType
+  name: ParameterType
+  nameWithType: ParameterInfo.ParameterType
+  fullName: System.Introspection.ParameterInfo.ParameterType
+- uid: System.Introspection.TypeInfo
+  commentId: T:System.Introspection.TypeInfo
+  parent: System.Introspection
+  isExternal: true
+  href: System.Introspection.TypeInfo.html
+  name: TypeInfo
+  nameWithType: TypeInfo
+  fullName: System.Introspection.TypeInfo
+- uid: System.Introspection.ParameterInfo.IsOut*
+  commentId: Overload:System.Introspection.ParameterInfo.IsOut
+  isExternal: true
+  href: System.Introspection.ParameterInfo.html#System_Introspection_ParameterInfo_IsOut
+  name: IsOut
+  nameWithType: ParameterInfo.IsOut
+  fullName: System.Introspection.ParameterInfo.IsOut
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System.Introspection.ParameterInfo.IsOutWhenTrue*
+  commentId: Overload:System.Introspection.ParameterInfo.IsOutWhenTrue
+  isExternal: true
+  href: System.Introspection.ParameterInfo.html#System_Introspection_ParameterInfo_IsOutWhenTrue
+  name: IsOutWhenTrue
+  nameWithType: ParameterInfo.IsOutWhenTrue
+  fullName: System.Introspection.ParameterInfo.IsOutWhenTrue
+- uid: System.Introspection.ParameterInfo.IsReadOnly*
+  commentId: Overload:System.Introspection.ParameterInfo.IsReadOnly
+  isExternal: true
+  href: System.Introspection.ParameterInfo.html#System_Introspection_ParameterInfo_IsReadOnly
+  name: IsReadOnly
+  nameWithType: ParameterInfo.IsReadOnly
+  fullName: System.Introspection.ParameterInfo.IsReadOnly

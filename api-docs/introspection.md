@@ -93,7 +93,32 @@ application property metadata projection remains limited.
 
 ## Parameters
 
-ParameterInfo retains Object allocation identity. Snapshots contain position and type
-but do not expose or retain a declaring-member identity. Matching those fields or an
-optional metadata token is insufficient for equality. Establishing ownership remains
-the next investigation, together with its currently missing generated reference coverage.
+[ParameterInfo](xref:System.Introspection.ParameterInfo) describes explicit method
+parameters and property index parameters. Object equality now uses the closed declaring
+type, owner kind (method or property), definition index and zero-based position.
+Repeated queries compare equal; matching names/types/positions from different members
+do not. A property index parameter differs from its getter/setter parameter, including
+when their metadata token is the same. Tokens can be zero and are not equality keys.
+
+GetHashCode combines the same owner components and position, hashing the declaring
+FullName. Distinct definitions with matching display names may collide. Hashes/indexes
+are not persistent IDs. ToString returns Name, which can be empty for missing names
+and current property index snapshots. Null and other object kinds compare false.
+ReferenceEquals still compares wrapper allocations; no nullable typed equality is added.
+
+Ownership is retained internally as a compact key rather than a member/parameter
+object cycle. This adds a type descriptor and two integers to each runtime snapshot.
+There is no public Member property yet. .NET ParameterInfo exposes Member and Position,
+but its base class does not define owner-based Object equality; this is a deliberate
+neoCLR snapshot contract. A future Member property needs direct, scoped resolution
+without recursively materializing member/parameter graphs or enumerating unrelated
+members. Return parameters, optional/default values and custom attributes remain absent.
+
+The native layout changed: rebuild the development runtime, library and SDK together.
+Mixing new parameter fragments with an older runtime is unsupported. The archived
+value-descriptor profile retains its original layout.
+
+ParameterInfo and [BindingFlags](xref:System.Introspection.BindingFlags) now have
+generated member coverage, closing the descriptor-interface documentation gap. Binding
+flags select visibility and instance/static categories; they do not enable inherited
+traversal or grant member invocation access.

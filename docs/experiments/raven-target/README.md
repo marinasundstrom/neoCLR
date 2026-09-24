@@ -969,3 +969,12 @@ field layouts are unchanged. Runtime Contract configuration and Raven compiler b
 are unchanged; the member fixture checks reference imports, inherited Object display,
 generic owner distinctions and map retention. Parameter ownership and reflected-context
 semantics remain open, and member queries currently enumerate declarations only.
+
+Parameter snapshots now carry a closed declaring TypeInfo, owner-kind integer and
+member-definition index for Object equality/hash together with position. Native factory
+layout and bridge validation changed together; rebuild the development runtime, library
+and SDK as a unit. The archived value profile is unchanged. Public parameter ownership
+resolution is not added; metadata remains descriptive. Runtime Contract configuration,
+compiler semantics and emission are unchanged. The parameter fixture covers owner-aware
+map lookup under GC; raw metadata regressions cover zero tokens, generic owners and
+property/accessor distinctions. No Raven compiler changes are required.

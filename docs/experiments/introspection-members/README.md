@@ -28,3 +28,6 @@ Parameter ownership/equality remains separate work.
 Recorded run: 785 allocated/reclaimed objects, peak 252, ten collections and zero
 retained objects under the 256-object limit. These are correctness measurements,
 not an allocation/performance comparison with .NET.
+
+After parameter owner keys were added, the same fixture passes at the unchanged
+256-object limit: 815 allocated/reclaimed, peak 256, ten collections, zero retained.

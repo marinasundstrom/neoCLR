@@ -1,0 +1,49 @@
+import System.*
+import System.Introspection.*
+import System.Collections.*
+import System.Option.*
+
+class Converter {
+    func Convert(value: int, other: int) -> int => value + other
+    func Repeat(value: int) -> int => value
+}
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+func Same(left: Object, right: Object?) -> bool => left.Equals(right)
+func Hash(value: Object) -> int => value.GetHashCode()
+func Display(value: Object) -> string => value.ToString()
+
+func Main() {
+    let methods = typeof(Converter).GetMethods()
+    let first = methods[0].GetParameters()[0]
+    let second = methods[0].GetParameters()[1]
+    let anotherMethod = methods[1].GetParameters()[0]
+    let repeated = typeof(Converter).GetMethods()[0].GetParameters()[0]
+    Check(!Object.ReferenceEquals(first, repeated), "Fresh parameter wrappers")
+    Check(Same(first, repeated) && Same(repeated, first), "Same owner and position")
+    Check(!Same(first, second) && !Same(first, anotherMethod), "Distinct positions and owners")
+    Check(!Same(first, null) && !Same(first, methods[0]) && !Same(first, 42), "Reject null and other objects")
+    Check(Hash(first) == Hash(repeated), "Consistent parameter hash")
+    Check(Display(first) == first.Name, "Parameter name display")
+
+    let parameters = HashMap<ParameterInfo, int>((left, right) => Same(left, right), key => Hash(key))
+    Check(parameters.TryAdd(first, 1) && parameters.TryAdd(second, 2), "Distinct parameter keys")
+    Check(parameters.TryAdd(anotherMethod, 3) && !parameters.TryAdd(repeated, 4), "Owner-aware map lookup")
+    var n = 0
+    while n < 400 {
+        _ = typeof(Converter)
+        n += 1
+    }
+    if let Some(value) = parameters.Find(typeof(Converter).GetMethods()[0].GetParameters()[0]) {
+        Check(value == 1 && parameters.Count == 3, "Parameter owner survives collection")
+    } else {
+        System.Fault("Parameter lookup failed after collection")
+    }
+    Check(Same(first, repeated) && Hash(first) == Hash(repeated), "Retained descriptors remain valid")
+    Console.WriteLine("Parameter ownership, equality, hash, display and map lookup: passed")
+}

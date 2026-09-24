@@ -58,7 +58,7 @@ items:
     content: Sequence<ParameterInfo> GetParameters()
     return:
       type: System.Collections.Sequence{System.Introspection.ParameterInfo}
-      description: A fresh sequence containing parameter snapshots. Parameter Object equality remains allocation identity; no declaring-member identity API is exposed yet.
+      description: A fresh sequence containing parameter snapshots. Parameter equality uses retained owner identity and position. A public declaring-member property is not exposed yet.
     content.vb: Function GetParameters() As Sequence(Of ParameterInfo)
   overload: System.Introspection.MethodInfo.GetParameters*
 - uid: System.Introspection.MethodInfo.ReturnType
@@ -393,6 +393,7 @@ references:
   commentId: T:System.Collections.Sequence{System.Introspection.ParameterInfo}
   parent: System.Collections
   definition: System.Collections.Sequence`1
+  href: System.Introspection.ParameterInfo.html
   name: Sequence<ParameterInfo>
   nameWithType: Sequence<ParameterInfo>
   fullName: System.Collections.Sequence<System.Introspection.ParameterInfo>
@@ -407,6 +408,7 @@ references:
   - uid: System.Introspection.ParameterInfo
     name: ParameterInfo
     isExternal: true
+    href: System.Introspection.ParameterInfo.html
   - name: '>'
   spec.vb:
   - uid: System.Collections.Sequence`1
@@ -418,6 +420,7 @@ references:
   - uid: System.Introspection.ParameterInfo
     name: ParameterInfo
     isExternal: true
+    href: System.Introspection.ParameterInfo.html
   - name: )
 - uid: System.Collections.Sequence`1
   commentId: T:System.Collections.Sequence`1

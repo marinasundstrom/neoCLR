@@ -1019,6 +1019,7 @@ references:
   commentId: T:System.Introspection.BindingFlags
   parent: System.Introspection
   isExternal: true
+  href: System.Introspection.BindingFlags.html
   name: BindingFlags
   nameWithType: BindingFlags
   fullName: System.Introspection.BindingFlags

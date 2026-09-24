@@ -8,11 +8,20 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Give parameter snapshots owner-aware Object equality/hash and Name display,
+  using closed declaring type, member kind/index and position even with absent
+  parameter tokens or shared property accessors. Retain compact owner keys without
+  member/parameter cycles; a public Member property remains future work. Document
+  ParameterInfo and BindingFlags in the generated API reference. The internal
+  parameter layout changes: rebuild the development runtime/library/SDK together;
+  the archived value-descriptor profile retains its original layout. The parameter
+  sample reclaims all 894 objects over 25 collections.
+
 - Align field, method and property descriptor Object equality with kind, closed
   declaring type and definition index, with consistent hashes and Name display.
   Preserve Object overrides when projecting the shared descriptor base metadata.
   Add generated API coverage and document declaration-only queries; inherited
-  traversal and parameter owner identity remain unimplemented. Add focused member
+  traversal remains unimplemented. Add focused member
   identity and map/GC validation, reclaiming all 785 objects over ten collections;
   hashes and indexes are not persistent identities.
 
@@ -29,8 +38,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Keep Equals(TypeInfo) non-nullable and Object.Equals(Object?) explicitly null-aware.
   Validate repeated, generic and array descriptors, typeof/GetType agreement and
   HashMap use under collection pressure. Add browsable TypeInfo/MemberInfo API
-  reference and website guidance. Parameter ownership remains
-  separate work; hashes are neither unique nor persistent identifiers. Validation:
+  reference and website guidance; hashes are neither unique nor persistent
+  identifiers. Validation:
   the fixture reclaims all 422 managed objects across ten collections; three
   descriptor regressions and the Object reachability regression pass.
 

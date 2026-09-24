@@ -829,3 +829,43 @@ have generated documentation; parameter reference coverage remains explicit work
 
 Validation covers repeated queries, wrong kinds/null, different closed generic owners,
 different definitions, property/accessor agreement, and map retention through GC.
+
+### Parameter owner identity — 2026-09-24
+
+Parameter snapshots now retain the closed declaring TypeInfo, owner kind and definition
+index, alongside their existing position. Object equality compares that key and
+position; it rejects other objects and null. Method parameters and property index
+parameters are distinct, even when a property reuses an accessor's Param token. Two
+properties sharing one accessor are distinct owners. Names/types/tokens do not establish
+identity; source Param rows may be absent (token zero). Hashing uses owner FullName,
+kind, index and position; Name display may be empty. Typed nullable operands are not
+introduced. These hashes/indexes are not persistent keys.
+
+Primary comparison, reviewed 2026-09-24: .NET 10
+[ParameterInfo](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Reflection/ParameterInfo.cs)
+exposes Member and Position, uses them for serialization-era parameter reconstruction,
+and formats type plus name. It does not define owner-based Object equality in that
+base class. neoCLR deliberately uses declaration identity across fresh snapshots;
+its simple Name display and lack of a public Member/return-parameter API are narrower
+than .NET. This is not a claim of full reflection parity.
+
+Alternatives: retain allocation identity; retain entire member snapshots; or expose a
+Member getter that scans all declarations. Allocation identity breaks repeat-query map
+keys. Whole member retention risks cycles or recursive native snapshot construction.
+Scanning adds unrelated allocations and can fault on unsupported sibling metadata.
+The bounded choice is an internal key with no public Member property yet. Future public
+owner resolution should target the exact declaration directly, preserve closed type
+scope, and avoid recursively materializing member/parameter graphs. No new service or
+runtime scheduling/handle model is introduced here.
+
+The Raven native snapshot adds one TypeInfo and two integer fields; its importer layout
+check changes in lockstep. The archived System.Type/value-descriptor profile keeps its
+original fields. This costs additional per-parameter allocation/tracing; it is not a
+performance improvement claim. Development runtime/library/SDK builds must be updated
+together. ParameterInfo and BindingFlags now have generated member documentation.
+
+Validation includes token-zero parameters, differing positions and method definitions,
+closed generic owners, separate declaring types, property/accessor distinctions and
+two properties sharing an accessor. The compiled Raven fixture checks Object dispatch,
+null/wrong-type rejection, repeat-query map keys and retained owner data through GC:
+894 allocated/reclaimed objects, peak 72, 25 collections, zero retained objects.

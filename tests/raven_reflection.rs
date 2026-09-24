@@ -775,3 +775,66 @@ ret
         Value::Int32(1)
     );
 }
+
+#[test]
+fn parameter_identity_uses_owner_kind_closed_type_definition_and_position() {
+    let parameter = |owner: &str, property: bool, member_index, position| {
+        let (kind, query, params) = if property {
+            ("Property", "GetProperties", "GetIndexParameters")
+        } else {
+            ("Method", "GetMethods", "GetParameters")
+        };
+        format!(
+            "call System.Runtime.RuntimeContext::get_Current()\nldtoken {owner}\ncall instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)\ncallvirt instance System.Introspection.TypeInfo::{query}()\nldc.i4 {member_index}\ncallvirt instance System.Collections.Sequence<System.Introspection.{kind}Info>::get_Item(Int32)\ncallvirt instance System.Introspection.{kind}Info::{params}()\nldc.i4 {position}\ncallvirt instance System.Collections.Sequence<System.Introspection.ParameterInfo>::get_Item(Int32)\ncastclass System.Object\n"
+        )
+    };
+    let mut checks = String::new();
+    for property in [false, true] {
+        for (owner, other_kind, member, position, branch) in [
+            ("Box<Int32>", property, 0, 0, "brfalse"),
+            ("Box<Int32>", property, 0, 1, "brtrue"),
+            ("Box<Int32>", property, 1, 0, "brtrue"),
+            ("Box<String>", property, 0, 0, "brtrue"),
+            ("Other<Int32>", property, 0, 0, "brtrue"),
+            ("Box<Int32>", !property, 0, 0, "brtrue"),
+        ] {
+            checks.push_str(&parameter("Box<Int32>", property, 0, 0));
+            checks.push_str(&parameter(owner, other_kind, member, position));
+            checks.push_str(&format!(
+                "callvirt instance System.Object::Equals(System.Object)\n{branch} failed\n"
+            ));
+        }
+    }
+    let mut types = String::new();
+    for (i, name) in ["Box", "Other"].iter().enumerate() {
+        // Every parameter has token zero. Properties share an accessor, so its
+        // token, name and types cannot accidentally become property identity.
+        types.push_str(&format!(r#"
+.type class {name}<T>
+.origin {{"assembly":"App","module":"App.dll","name":"{name}","token":{type_token},"property_tokens":[{prop1},{prop2}]}}
+.method static Read(Int32 value, Int32 other) -> Int32
+.origin {{"assembly":"App","module":"App.dll","name":"Read","token":{method1},"parameter_tokens":[0,0]}}
+ldarg value
+ret
+.end
+.method static Another(Int32 value, Int32 other) -> Int32
+.origin {{"assembly":"App","module":"App.dll","name":"Another","token":{method2},"parameter_tokens":[0,0]}}
+ldarg value
+ret
+.end
+.property static First(Int32, Int32) -> Int32
+.get {name}<!0>::Read(Int32, Int32)
+.end
+.property static Second(Int32, Int32) -> Int32
+.get {name}<!0>::Read(Int32, Int32)
+.end
+.end
+"#, type_token = 0x02000001+i, prop1=0x17000001+2*i, prop2=0x17000002+2*i, method1=0x06000001+2*i, method2=0x06000002+2*i));
+    }
+    assert_eq!(
+        run_introspection(&format!(
+            ".module Parameters\n.assembly {{\"name\":\"App\",\"full_name\":\"App\",\"modules\":[\"App.dll\"],\"references\":[\"System.Runtime\"]}}\n.entry Main\n{types}\n.function Main() -> Boolean\n{checks}ldc.bool true\nret\nfailed:\nldc.bool false\nret\n.end\n"
+        )),
+        Value::Boolean(true)
+    );
+}

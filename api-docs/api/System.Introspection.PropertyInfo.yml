@@ -56,7 +56,7 @@ items:
     content: Sequence<ParameterInfo> GetIndexParameters()
     return:
       type: System.Collections.Sequence{System.Introspection.ParameterInfo}
-      description: A fresh sequence; empty for a non-indexed property. Parameter Object equality remains allocation identity.
+      description: A fresh sequence; empty for a non-indexed property. Parameter equality uses property owner identity and position, distinct from accessor parameters.
     content.vb: Function GetIndexParameters() As Sequence(Of ParameterInfo)
   overload: System.Introspection.PropertyInfo.GetIndexParameters*
 - uid: System.Introspection.PropertyInfo.GetGetMethod
@@ -359,6 +359,7 @@ references:
   commentId: T:System.Collections.Sequence{System.Introspection.ParameterInfo}
   parent: System.Collections
   definition: System.Collections.Sequence`1
+  href: System.Introspection.ParameterInfo.html
   name: Sequence<ParameterInfo>
   nameWithType: Sequence<ParameterInfo>
   fullName: System.Collections.Sequence<System.Introspection.ParameterInfo>
@@ -373,6 +374,7 @@ references:
   - uid: System.Introspection.ParameterInfo
     name: ParameterInfo
     isExternal: true
+    href: System.Introspection.ParameterInfo.html
   - name: '>'
   spec.vb:
   - uid: System.Collections.Sequence`1
@@ -384,6 +386,7 @@ references:
   - uid: System.Introspection.ParameterInfo
     name: ParameterInfo
     isExternal: true
+    href: System.Introspection.ParameterInfo.html
   - name: )
 - uid: System.Collections.Sequence`1
   commentId: T:System.Collections.Sequence`1

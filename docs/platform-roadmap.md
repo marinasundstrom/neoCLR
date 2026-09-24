@@ -758,10 +758,11 @@ confirmed the RuntimeTypeInfo mismatch. The author-directed introspection slice
 now aligns represented-type equality/hash/display, with GC-tested map reuse.
 AssemblyInfo/ModuleInfo now use scoped catalog equality/hash/display. Field, method
 and property equality includes descriptor kind, closed declaring owner and definition
-index. Parameter ownership remains the next bounded investigation. Keep
+index. Parameter snapshots now retain that owner key plus position, with equality/hash
+and Name display. Public owner resolution remains future work. Keep
 Equatable<T>.Equals(T) explicit;
-nullable value operands are not introduced by equality contracts. Other descriptor
-identities remain design work. Broader primitive,
+nullable value operands are not introduced by equality contracts. Reflected context,
+inherited queries and a public parameter Member property remain design work. Broader primitive,
 formatting and default-comparer coverage remains incremental; do not imply universal
 Object support from the completed record gate. The author also requires correct GC
 behavior for boxing: verify copied payloads, aliases, reference-field tracing, roots

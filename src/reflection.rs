@@ -369,6 +369,9 @@ impl Query {
                                 let parameters = parameters(
                                     module,
                                     getter.as_ref().or(setter.as_ref()),
+                                    &ty,
+                                    3, // Property identity, distinct from its accessor method.
+                                    index,
                                     &p.parameters,
                                     &[],
                                     &[],
@@ -525,6 +528,9 @@ pub(crate) fn array(
 fn parameters(
     module: &Module,
     function: Option<&Function>,
+    declaring_type: &Type,
+    member_kind: i32,
+    member_index: usize,
     types: &[Type],
     names: &[Option<String>],
     out: &[usize],
@@ -561,6 +567,11 @@ fn parameters(
                         .ok_or_else(|| Fault::new("missing method identity"))?
                         .module,
                 )?);
+                // Retain a compact owner key, not a member snapshot containing
+                // this parameter list. Equality does not depend on token presence.
+                fields.push(type_value(module, declaring_type)?);
+                fields.push(Value::Int32(member_kind));
+                fields.push(index_value(member_index)?);
             }
             Ok(record("System.Introspection.ParameterInfo", fields))
         }),
@@ -611,6 +622,12 @@ fn method(
             parameters(
                 module,
                 Some(f),
+                owner,
+                2, // Method identity; keep in step with the descriptor hash kinds.
+                f.definition
+                    .as_ref()
+                    .ok_or_else(|| Fault::new("missing method identity"))?
+                    .index as usize,
                 &parameter_types,
                 &f.parameter_names,
                 &f.out_parameters,
