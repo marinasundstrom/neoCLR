@@ -1,4 +1,37 @@
 ; Generated from runtime/raven/src/System/Introspection/ModuleInfo.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Introspection.ModuleInfo.RuntimeStringEquals(String source,String value0) -> Boolean
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::Equals(String)
+ret
+.end
+.function neoCLR.Library.System.Introspection.ModuleInfo.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Introspection.ModuleInfo.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
 .function neoCLR.Library.System.Introspection.ModuleInfo.RuntimeServiceModuleTypes(String arg0,String arg1) -> arrayref<System.Introspection.TypeInfo>
 .local System.Introspection.TypeInfo[] source
 .local arrayref<System.Introspection.TypeInfo> destination
@@ -35,7 +68,12 @@ blt Copy
 ldloc destination
 ret
 .end
+.function neoCLR.Library.System.Introspection.ModuleInfo.RuntimeNewHashCode() -> System.HashCode
+newobj instance System.HashCode::.ctor()
+ret
+.end
 .type internal class System.Introspection.RuntimeModuleInfo
+.extends System.Object
 .implements System.Introspection.ModuleInfo
 .field private StoredIdentity String
 .field private StoredName String
@@ -53,7 +91,7 @@ M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
 M00000001_IL_0002:
-pop
+call instance System.Object::.ctor()
 M00000001_IL_0007:
 M00000001_IL_0008:
 ldarg 0
@@ -127,6 +165,117 @@ ldfld System.Introspection.RuntimeModuleInfo::StoredName
 M00000005_IL_000e:
 call neoCLR.Library.System.Introspection.ModuleInfo.RuntimeServiceModuleTypes(String,String)
 M00000005_IL_0013:
+ret
+.end
+.method instance override Equals(System.Object other) -> Boolean
+.local System.Introspection.RuntimeModuleInfo local0
+ldloca local0
+initobj System.Introspection.RuntimeModuleInfo
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 1
+M00000006_IL_0003:
+isinst System.Introspection.RuntimeModuleInfo
+M00000006_IL_0008:
+dup
+M00000006_IL_0009:
+stloc local0
+M00000006_IL_000a:
+M00000006_IL_000b:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Introspection.ModuleInfo.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_000d:
+brtrue M00000006_IL_0017
+M00000006_IL_0012:
+br M00000006_IL_0046
+M00000006_IL_0017:
+M00000006_IL_0018:
+ldarg 0
+M00000006_IL_0019:
+ldfld System.Introspection.RuntimeModuleInfo::StoredIdentity
+M00000006_IL_001e:
+ldloc local0
+M00000006_IL_001f:
+ldfld System.Introspection.RuntimeModuleInfo::StoredIdentity
+M00000006_IL_0024:
+call neoCLR.Library.System.Introspection.ModuleInfo.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Introspection.ModuleInfo.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0029:
+brfalse M00000006_IL_0044
+M00000006_IL_002e:
+ldarg 0
+M00000006_IL_002f:
+ldfld System.Introspection.RuntimeModuleInfo::StoredName
+M00000006_IL_0034:
+ldloc local0
+M00000006_IL_0035:
+ldfld System.Introspection.RuntimeModuleInfo::StoredName
+M00000006_IL_003a:
+call neoCLR.Library.System.Introspection.ModuleInfo.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Introspection.ModuleInfo.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_003f:
+br M00000006_IL_0045
+M00000006_IL_0044:
+ldc.i4 0
+M00000006_IL_0045:
+call neoCLR.Library.System.Introspection.ModuleInfo.RuntimeBooleanFromInt32(Int32)
+ret
+M00000006_IL_0046:
+M00000006_IL_0047:
+M00000006_IL_0048:
+ldc.i4 0
+M00000006_IL_0049:
+call neoCLR.Library.System.Introspection.ModuleInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance override GetHashCode() -> Int32
+.local System.HashCode local0
+ldloca local0
+initobj System.HashCode
+M00000007_IL_0000:
+M00000007_IL_0001:
+call neoCLR.Library.System.Introspection.ModuleInfo.RuntimeNewHashCode()
+M00000007_IL_0006:
+stloc local0
+M00000007_IL_0007:
+M00000007_IL_0008:
+ldloca local0
+M00000007_IL_000a:
+ldarg 0
+M00000007_IL_000b:
+ldfld System.Introspection.RuntimeModuleInfo::StoredIdentity
+M00000007_IL_0010:
+call instance System.HashCode::Add(String)
+pop
+M00000007_IL_0015:
+M00000007_IL_0016:
+ldloca local0
+M00000007_IL_0018:
+ldarg 0
+M00000007_IL_0019:
+ldfld System.Introspection.RuntimeModuleInfo::StoredName
+M00000007_IL_001e:
+call instance System.HashCode::Add(String)
+pop
+M00000007_IL_0023:
+M00000007_IL_0024:
+ldloca local0
+M00000007_IL_0026:
+call instance System.HashCode::ToHashCode()
+M00000007_IL_002b:
+ret
+.end
+.method instance override ToString() -> String
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+callvirt instance System.Introspection.RuntimeModuleInfo::get_Name()
+M00000008_IL_0008:
 ret
 .end
 .end

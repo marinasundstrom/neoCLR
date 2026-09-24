@@ -180,7 +180,8 @@ virtual equality/hash remain unsupported. Static Object.Equals is not yet declar
 Value has no public member API; low-level operations
 and its temporary role are explained in the guide. TypeInfo and MemberInfo now have
 generated type/member coverage and an [introspection guide](introspection.md).
-AssemblyInfo, ModuleInfo, FieldInfo, MethodInfo, PropertyInfo and ParameterInfo remain
+AssemblyInfo and ModuleInfo now also have generated type/member coverage.
+FieldInfo, MethodInfo, PropertyInfo and ParameterInfo remain
 explicit coverage gaps. Object/Value source files participate in the reference
 snapshot fingerprint.
 

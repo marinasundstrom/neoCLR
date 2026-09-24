@@ -1,1 +1,1 @@
-TypeInfo equality, hash, display and map lookup: passed
+TypeInfo, AssemblyInfo and ModuleInfo equality, hash, display and map lookup: passed

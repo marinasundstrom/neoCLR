@@ -23,13 +23,21 @@ implementation, not a unique type ID, cross-build key or hash performance claim.
 Typed Equals(TypeInfo) remains non-nullable. Object.Equals(Object?) explicitly handles
 null; no nullable value type or automatic Option conversion is introduced.
 
-Other introspection wrappers are investigated in the Object model review. This fixture
-does not promise value equality for AssemblyInfo, ModuleInfo or member/parameter
-snapshots. Their defining scope and owner must be represented before changing their
-Object contracts. TypeInfo/MemberInfo API documentation is generated; remaining
-introspection reference gaps are tracked in api-docs/README.md.
+The fixture also checks assembly and module wrappers through Object equality/hash/display,
+rejects null and other descriptor kinds, and retains descriptor-keyed HashMap entries
+through collection. Assembly identity is its full loaded catalog identity; module
+identity adds the module name. A Rust catalog regression deliberately reuses short
+assembly names, module names and tokens across distinct scopes. Member and parameter
+snapshots still require ownership investigation; this fixture makes no claim of value
+equality for them. TypeInfo, MemberInfo, AssemblyInfo and ModuleInfo have generated
+API reference; remaining gaps are tracked in api-docs/README.md.
 
-Recorded development run: 422 managed objects allocated/reclaimed, peak 64, ten
-collections, zero retained objects at completion (heap limit 96). These totals include
+The original TypeInfo-only run allocated/reclaimed 422 managed objects with peak 64,
+ten collections and zero retained objects (heap limit 96). The expanded fixture
+continues to require multiple collections and full reclamation. These totals include
 fixture churn, maps and hashing temporaries; they are correctness evidence, not an
 allocation or timing comparison with .NET.
+
+Expanded run: 476 allocated/reclaimed objects, peak 96, ten collections and zero
+retained objects at completion under the same 96-object limit. The scoped catalog
+regression also passes with matching short names and module names.

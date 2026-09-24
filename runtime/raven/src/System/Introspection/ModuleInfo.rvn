@@ -29,4 +29,21 @@ internal class RuntimeModuleInfo : ModuleInfo {
     func GetTypes() -> Sequence<TypeInfo> {
         return RuntimeServices.ModuleTypes(StoredIdentity, StoredName)
     }
+
+    override func Equals(other: Object?) -> bool {
+        if other is RuntimeModuleInfo implementation {
+            return StoredIdentity == implementation.StoredIdentity && StoredName == implementation.StoredName
+        }
+        return false
+    }
+
+    override func GetHashCode() -> int {
+        var hash = HashCode()
+        hash.Add(StoredIdentity)
+        hash.Add(StoredName)
+        return hash.ToHashCode()
+    }
+
+    override func ToString() -> string => Name
+
 }

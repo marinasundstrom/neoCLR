@@ -763,3 +763,31 @@ These findings are investigations, not newly implemented equality for those wrap
 The immediate next bounded consumer is AssemblyInfo/ModuleInfo; member/parameter
 identity follows after their ownership checks. Mutable resources and collections retain
 identity semantics; this is not a move to universal structural equality.
+
+
+### Assembly and module Object contracts — 2026-09-24
+
+The next bounded slice implements the catalog keys identified above. Assembly equality
+uses exact StoredIdentity; module equality uses (StoredIdentity, StoredName). The
+metadata-origin validator rejects duplicate full assembly identities and duplicate
+module names within one assembly. No fields or native layouts changed. Both wrappers
+override Object equality/hash/display, reject null and other kinds, and retain separate
+allocation identity. HashCode consumes those same strings; display returns assembly
+FullName or module Name. Public interfaces gain no nullable typed equality requirement.
+
+Comparison: .NET 10's [Assembly implementation](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Reflection/Assembly.cs)
+and [Module implementation](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Reflection/Module.cs)
+default Equals/GetHashCode to Object, with virtual dispatch for runtime implementations;
+Assembly displays FullName and Module displays ScopeName. neoCLR reuses descriptive
+display and the equality/hash contract, but its current catalog is not the CLR loader.
+Full identity strings are unique only within the loaded program. Future independent
+load contexts must participate in equality; comparing display names across contexts
+would be incorrect. This is a provisional scope constraint, not a universal .NET
+Assembly equality rule.
+
+The benefit is stable descriptor-keyed lookup across fresh query wrappers without
+adding caching or native identity machinery. Costs include string comparison and
+encoding allocations in hashing; hashes are neither unique nor persistent. The
+introspection fixture checks map reuse and GC, while a catalog regression distinguishes
+same short-name assemblies and same-name modules, including two modules within one
+assembly. Member/parameter identity remains the next ownership investigation.

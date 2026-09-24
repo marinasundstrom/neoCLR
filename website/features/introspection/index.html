@@ -39,7 +39,7 @@
         <h2>Type identity through Object</h2>
         <p><strong>Development after Preview 9:</strong> TypeInfo now compares represented types through both typed equality and Object.Equals. Repeated queries may allocate different descriptors; ReferenceEquals still compares those allocations. Generic arguments and array element types participate in type identity.</p>
         <p>Object.GetHashCode is consistent with that equality, and ToString displays the represented FullName. Different types can have colliding hashes; neither names nor hashes are persistent identity keys. Equatable&lt;TypeInfo&gt; takes a non-null TypeInfo. Object.Equals(Object?) is the explicitly null-aware boundary.</p>
-        <p>Assembly, module and member descriptor equality still needs separate identity work. See the <a href="../../docs/introspection.html">introspection guide</a> and <a href="../../docs/api/System.Introspection.TypeInfo.html">TypeInfo API reference</a> for current contracts.</p>
+        <p>Development assembly descriptors now compare full catalog identities; module descriptors compare that identity plus their module name. Their Object hashes use the same keys, and display returns the assembly FullName or module Name. This is scoped to one loaded program, without CLR loader-context semantics. Member and parameter identity remains separate work. See the <a href="../../docs/introspection.html">introspection guide</a> and <a href="../../docs/api/System.Introspection.TypeInfo.html">TypeInfo API reference</a> for current contracts.</p>
       </section>
       <section id="context">
         <p class="eyebrow">02 · ASSEMBLIES AND MODULES</p><h2>Assembly discovery through RuntimeContext</h2>

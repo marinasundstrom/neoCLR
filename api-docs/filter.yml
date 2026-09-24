@@ -1,6 +1,6 @@
 apiRules:
 - include:
-    uidRegex: '^System\.Introspection($|\.(TypeInfo|MemberInfo)($|\.))'
+    uidRegex: '^System\.Introspection($|\.(TypeInfo|MemberInfo|AssemblyInfo|ModuleInfo)($|\.))'
 - include:
     uidRegex: '^System\.Equatable`1($|\.)'
 - exclude:

@@ -29,6 +29,23 @@ func Main() {
     Check(Hash(first) == Hash(second), "Equal type hashes")
     Check(Display(first) == first.FullName, "Represented-type display")
 
+    let module = first.Module
+    let repeatedModule = second.Module
+    let assembly = module.Assembly
+    let repeatedAssembly = repeatedModule.Assembly
+    Check(!Object.ReferenceEquals(module, repeatedModule), "Separate module wrappers")
+    Check(!Object.ReferenceEquals(assembly, repeatedAssembly), "Separate assembly wrappers")
+    Check(Same(module, repeatedModule) && Same(repeatedModule, module), "Module identity")
+    Check(Same(assembly, repeatedAssembly) && Same(repeatedAssembly, assembly), "Assembly identity")
+    Check(!Same(module, assembly) && !Same(assembly, module), "Descriptor kinds differ")
+    Check(!Same(module, null) && !Same(assembly, null), "Null is not a descriptor")
+    Check(Hash(module) == Hash(repeatedModule) && Hash(assembly) == Hash(repeatedAssembly), "Descriptor hashes")
+    Check(Display(module) == module.Name && Display(assembly) == assembly.FullName, "Descriptor display")
+    let assemblies = HashMap<AssemblyInfo, int>((left, right) => Same(left, right), key => Hash(key))
+    let modules = HashMap<ModuleInfo, int>((left, right) => Same(left, right), key => Hash(key))
+    Check(assemblies.TryAdd(assembly, 1) && !assemblies.TryAdd(repeatedAssembly, 2), "Assembly map key")
+    Check(modules.TryAdd(module, 1) && !modules.TryAdd(repeatedModule, 2), "Module map key")
+
     let boxed: Object = 42
     let actual = boxed.GetType()
     Check(Same(actual, typeof(int)) && Hash(actual) == Hash(typeof(int)), "Object and metadata type acquisition agree")
@@ -54,5 +71,15 @@ func Main() {
         System.Fault("Repeated descriptor missed map entry")
     }
     Check(Same(first, typeof(First)) && Display(first) == first.FullName, "Retained descriptor survives collection")
-    Console.WriteLine("TypeInfo equality, hash, display and map lookup: passed")
+    if let Some(value) = assemblies.Find(first.Module.Assembly) {
+        Check(value == 1, "Assembly identity survives collection")
+    } else {
+        System.Fault("Assembly lookup failed after collection")
+    }
+    if let Some(value) = modules.Find(first.Module) {
+        Check(value == 1, "Module identity survives collection")
+    } else {
+        System.Fault("Module lookup failed after collection")
+    }
+    Console.WriteLine("TypeInfo, AssemblyInfo and ModuleInfo equality, hash, display and map lookup: passed")
 }

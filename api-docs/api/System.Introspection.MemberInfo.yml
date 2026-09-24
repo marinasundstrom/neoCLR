@@ -179,6 +179,7 @@ references:
   commentId: T:System.Introspection.ModuleInfo
   parent: System.Introspection
   isExternal: true
+  href: System.Introspection.ModuleInfo.html
   name: ModuleInfo
   nameWithType: ModuleInfo
   fullName: System.Introspection.ModuleInfo

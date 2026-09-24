@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the TypeInfo Object contract sample using a matching development bundle."""
+"""Build the introspection Object contract sample using a matching development bundle."""
 import argparse
 import os
 import re

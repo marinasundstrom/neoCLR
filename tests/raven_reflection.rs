@@ -608,3 +608,82 @@ ret
         Value::String("System.Runtime".into())
     );
 }
+
+#[test]
+fn assembly_module_object_identity_preserves_catalog_scope() {
+    // Both assemblies deliberately share short names, module names and tokens.
+    // The first also has a second module to check the other half of the key.
+    assert_eq!(
+        run_introspection(
+            r#"
+.module ScopedDescriptors
+.assembly {"name":"Shared","full_name":"Shared, Version=1","modules":["Shared.dll","Other.netmodule"],"references":["Shared, Version=2","System.Runtime"]}
+.assembly {"name":"Shared","full_name":"Shared, Version=2","modules":["Shared.dll"],"references":["System.Runtime"]}
+.entry Main
+.function First() -> System.Introspection.AssemblyInfo
+.origin {"assembly":"Shared, Version=1","module":"Shared.dll","name":"First","token":100663297}
+call System.Runtime.RuntimeContext::get_Current()
+call instance System.Runtime.RuntimeContext::get_ExecutingAssembly()
+ret
+.end
+.function Second() -> System.Introspection.AssemblyInfo
+.origin {"assembly":"Shared, Version=2","module":"Shared.dll","name":"Second","token":100663297}
+call System.Runtime.RuntimeContext::get_Current()
+call instance System.Runtime.RuntimeContext::get_ExecutingAssembly()
+ret
+.end
+.function ModuleAt(System.Introspection.AssemblyInfo assembly, Int32 index) -> System.Object
+ldarg assembly
+callvirt instance System.Introspection.AssemblyInfo::GetModules()
+ldarg index
+callvirt instance System.Collections.Sequence<System.Introspection.ModuleInfo>::get_Item(Int32)
+castclass System.Object
+ret
+.end
+.function Main() -> Boolean
+.origin {"assembly":"Shared, Version=1","module":"Shared.dll","name":"Main","token":100663298}
+call First()
+castclass System.Object
+call Second()
+castclass System.Object
+callvirt instance System.Object::Equals(System.Object)
+brtrue failed
+call First()
+castclass System.Object
+call First()
+castclass System.Object
+callvirt instance System.Object::Equals(System.Object)
+brfalse failed
+call First()
+ldc.i4 0
+call ModuleAt(System.Introspection.AssemblyInfo, Int32)
+call Second()
+ldc.i4 0
+call ModuleAt(System.Introspection.AssemblyInfo, Int32)
+callvirt instance System.Object::Equals(System.Object)
+brtrue failed
+call First()
+ldc.i4 0
+call ModuleAt(System.Introspection.AssemblyInfo, Int32)
+call First()
+ldc.i4 1
+call ModuleAt(System.Introspection.AssemblyInfo, Int32)
+callvirt instance System.Object::Equals(System.Object)
+brtrue failed
+call First()
+ldc.i4 0
+call ModuleAt(System.Introspection.AssemblyInfo, Int32)
+call First()
+ldc.i4 0
+call ModuleAt(System.Introspection.AssemblyInfo, Int32)
+callvirt instance System.Object::Equals(System.Object)
+ret
+failed:
+ldc.bool false
+ret
+.end
+"#
+        ),
+        Value::Boolean(true)
+    );
+}

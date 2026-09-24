@@ -35,4 +35,20 @@ internal class RuntimeAssemblyInfo : AssemblyInfo {
     func GetTypes() -> Sequence<TypeInfo> {
         return RuntimeServices.AssemblyTypes(StoredIdentity)
     }
+
+    override func Equals(other: Object?) -> bool {
+        if other is RuntimeAssemblyInfo implementation {
+            return StoredIdentity == implementation.StoredIdentity
+        }
+        return false
+    }
+
+    override func GetHashCode() -> int {
+        var hash = HashCode()
+        hash.Add(StoredIdentity)
+        return hash.ToHashCode()
+    }
+
+    override func ToString() -> string => FullName
+
 }

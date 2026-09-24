@@ -1,4 +1,37 @@
 ; Generated from runtime/raven/src/System/Introspection/AssemblyInfo.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeStringEquals(String source,String value0) -> Boolean
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::Equals(String)
+ret
+.end
+.function neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
 .function neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeServiceAssemblyReferences(String arg0) -> arrayref<System.Introspection.AssemblyInfo>
 .local System.Introspection.AssemblyInfo[] source
 .local arrayref<System.Introspection.AssemblyInfo> destination
@@ -104,7 +137,12 @@ blt Copy
 ldloc destination
 ret
 .end
+.function neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeNewHashCode() -> System.HashCode
+newobj instance System.HashCode::.ctor()
+ret
+.end
 .type internal class System.Introspection.RuntimeAssemblyInfo
+.extends System.Object
 .implements System.Introspection.AssemblyInfo
 .field private StoredIdentity String
 .property instance Name() -> String
@@ -124,7 +162,7 @@ M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
 M00000001_IL_0002:
-pop
+call instance System.Object::.ctor()
 M00000001_IL_0007:
 M00000001_IL_0008:
 ldarg 0
@@ -203,6 +241,90 @@ ldfld System.Introspection.RuntimeAssemblyInfo::StoredIdentity
 M00000007_IL_0008:
 call neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeServiceAssemblyTypes(String)
 M00000007_IL_000d:
+ret
+.end
+.method instance override Equals(System.Object other) -> Boolean
+.local System.Introspection.RuntimeAssemblyInfo local0
+ldloca local0
+initobj System.Introspection.RuntimeAssemblyInfo
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 1
+M00000008_IL_0003:
+isinst System.Introspection.RuntimeAssemblyInfo
+M00000008_IL_0008:
+dup
+M00000008_IL_0009:
+stloc local0
+M00000008_IL_000a:
+M00000008_IL_000b:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_000d:
+brtrue M00000008_IL_0017
+M00000008_IL_0012:
+br M00000008_IL_002a
+M00000008_IL_0017:
+M00000008_IL_0018:
+ldarg 0
+M00000008_IL_0019:
+ldfld System.Introspection.RuntimeAssemblyInfo::StoredIdentity
+M00000008_IL_001e:
+ldloc local0
+M00000008_IL_001f:
+ldfld System.Introspection.RuntimeAssemblyInfo::StoredIdentity
+M00000008_IL_0024:
+call neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0029:
+call neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeBooleanFromInt32(Int32)
+ret
+M00000008_IL_002a:
+M00000008_IL_002b:
+M00000008_IL_002c:
+ldc.i4 0
+M00000008_IL_002d:
+call neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance override GetHashCode() -> Int32
+.local System.HashCode local0
+ldloca local0
+initobj System.HashCode
+M00000009_IL_0000:
+M00000009_IL_0001:
+call neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeNewHashCode()
+M00000009_IL_0006:
+stloc local0
+M00000009_IL_0007:
+M00000009_IL_0008:
+ldloca local0
+M00000009_IL_000a:
+ldarg 0
+M00000009_IL_000b:
+ldfld System.Introspection.RuntimeAssemblyInfo::StoredIdentity
+M00000009_IL_0010:
+call instance System.HashCode::Add(String)
+pop
+M00000009_IL_0015:
+M00000009_IL_0016:
+ldloca local0
+M00000009_IL_0018:
+call instance System.HashCode::ToHashCode()
+M00000009_IL_001d:
+ret
+.end
+.method instance override ToString() -> String
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+callvirt instance System.Introspection.RuntimeAssemblyInfo::get_FullName()
+M0000000a_IL_0008:
 ret
 .end
 .end

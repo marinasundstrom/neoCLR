@@ -1,0 +1,295 @@
+### YamlMime:ManagedReference
+items:
+- uid: System.Introspection.ModuleInfo
+  commentId: T:System.Introspection.ModuleInfo
+  id: ModuleInfo
+  parent: System.Introspection
+  children:
+  - System.Introspection.ModuleInfo.Assembly
+  - System.Introspection.ModuleInfo.GetTypes
+  - System.Introspection.ModuleInfo.MetadataToken
+  - System.Introspection.ModuleInfo.Name
+  langs:
+  - csharp
+  - vb
+  name: ModuleInfo
+  nameWithType: ModuleInfo
+  fullName: System.Introspection.ModuleInfo
+  type: Interface
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Describes a retained, loaded module in the current program.
+  remarks: Development after Preview 9. Object equality compares full assembly identity and module name; hashes use the same components. Separate wrappers can compare equal. Null and other descriptor kinds compare false. No dynamic loading or cross-program identity is supported. See the introspection guide for Object display and identity limitations.
+  example: []
+  syntax:
+    content: public interface ModuleInfo
+    content.vb: Public Interface ModuleInfo
+- uid: System.Introspection.ModuleInfo.GetTypes
+  commentId: M:System.Introspection.ModuleInfo.GetTypes
+  id: GetTypes
+  parent: System.Introspection.ModuleInfo
+  langs:
+  - csharp
+  - vb
+  name: GetTypes()
+  nameWithType: ModuleInfo.GetTypes()
+  fullName: System.Introspection.ModuleInfo.GetTypes()
+  type: Method
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets retained type definitions, including nonpublic and open generic definitions.
+  example: []
+  syntax:
+    content: Sequence<TypeInfo> GetTypes()
+    return:
+      type: System.Collections.Sequence{System.Introspection.TypeInfo}
+      description: A snapshot sequence of descriptors in the loaded catalog, not an inventory read from disk. Importer-discarded metadata is not restored.
+    content.vb: Function GetTypes() As Sequence(Of TypeInfo)
+  overload: System.Introspection.ModuleInfo.GetTypes*
+- uid: System.Introspection.ModuleInfo.Name
+  commentId: P:System.Introspection.ModuleInfo.Name
+  id: Name
+  parent: System.Introspection.ModuleInfo
+  langs:
+  - csharp
+  - vb
+  name: Name
+  nameWithType: ModuleInfo.Name
+  fullName: System.Introspection.ModuleInfo.Name
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the catalog name. This name alone is not a globally unique identity.
+  example: []
+  syntax:
+    content: string Name { get; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: ReadOnly Property Name As String
+  overload: System.Introspection.ModuleInfo.Name*
+- uid: System.Introspection.ModuleInfo.Assembly
+  commentId: P:System.Introspection.ModuleInfo.Assembly
+  id: Assembly
+  parent: System.Introspection.ModuleInfo
+  langs:
+  - csharp
+  - vb
+  name: Assembly
+  nameWithType: ModuleInfo.Assembly
+  fullName: System.Introspection.ModuleInfo.Assembly
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the owning assembly descriptor. Repeated calls may allocate equal but distinct wrappers.
+  example: []
+  syntax:
+    content: AssemblyInfo Assembly { get; }
+    parameters: []
+    return:
+      type: System.Introspection.AssemblyInfo
+    content.vb: ReadOnly Property Assembly As AssemblyInfo
+  overload: System.Introspection.ModuleInfo.Assembly*
+- uid: System.Introspection.ModuleInfo.MetadataToken
+  commentId: P:System.Introspection.ModuleInfo.MetadataToken
+  id: MetadataToken
+  parent: System.Introspection.ModuleInfo
+  langs:
+  - csharp
+  - vb
+  name: MetadataToken
+  nameWithType: ModuleInfo.MetadataToken
+  fullName: System.Introspection.ModuleInfo.MetadataToken
+  type: Property
+  assemblies:
+  - NeoCLR.CoreProbe
+  namespace: System.Introspection
+  summary: Gets the catalog metadata token. Tokens are scoped and must not be used alone for equality.
+  example: []
+  syntax:
+    content: int MetadataToken { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: ReadOnly Property MetadataToken As Integer
+  overload: System.Introspection.ModuleInfo.MetadataToken*
+references:
+- uid: System.Introspection
+  commentId: N:System.Introspection
+  isExternal: true
+  href: System.html
+  name: System.Introspection
+  nameWithType: System.Introspection
+  fullName: System.Introspection
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Introspection
+    name: Introspection
+    isExternal: true
+    href: System.Introspection.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Introspection
+    name: Introspection
+    isExternal: true
+    href: System.Introspection.html
+- uid: System.Introspection.ModuleInfo.GetTypes*
+  commentId: Overload:System.Introspection.ModuleInfo.GetTypes
+  isExternal: true
+  href: System.Introspection.ModuleInfo.html#System_Introspection_ModuleInfo_GetTypes
+  name: GetTypes
+  nameWithType: ModuleInfo.GetTypes
+  fullName: System.Introspection.ModuleInfo.GetTypes
+- uid: System.Collections.Sequence{System.Introspection.TypeInfo}
+  commentId: T:System.Collections.Sequence{System.Introspection.TypeInfo}
+  parent: System.Collections
+  definition: System.Collections.Sequence`1
+  href: System.Introspection.TypeInfo.html
+  name: Sequence<TypeInfo>
+  nameWithType: Sequence<TypeInfo>
+  fullName: System.Collections.Sequence<System.Introspection.TypeInfo>
+  nameWithType.vb: Sequence(Of TypeInfo)
+  fullName.vb: System.Collections.Sequence(Of System.Introspection.TypeInfo)
+  name.vb: Sequence(Of TypeInfo)
+  spec.csharp:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: <
+  - uid: System.Introspection.TypeInfo
+    name: TypeInfo
+    isExternal: true
+    href: System.Introspection.TypeInfo.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Introspection.TypeInfo
+    name: TypeInfo
+    isExternal: true
+    href: System.Introspection.TypeInfo.html
+  - name: )
+- uid: System.Collections.Sequence`1
+  commentId: T:System.Collections.Sequence`1
+  isExternal: true
+  name: Sequence<T>
+  nameWithType: Sequence<T>
+  fullName: System.Collections.Sequence<T>
+  nameWithType.vb: Sequence(Of T)
+  fullName.vb: System.Collections.Sequence(Of T)
+  name.vb: Sequence(Of T)
+  spec.csharp:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Sequence`1
+    name: Sequence
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections
+  commentId: N:System.Collections
+  isExternal: true
+  href: System.html
+  name: System.Collections
+  nameWithType: System.Collections
+  fullName: System.Collections
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: System.Collections.html
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: System.html
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: System.Collections.html
+- uid: System.Introspection.ModuleInfo.Name*
+  commentId: Overload:System.Introspection.ModuleInfo.Name
+  isExternal: true
+  href: System.Introspection.ModuleInfo.html#System_Introspection_ModuleInfo_Name
+  name: Name
+  nameWithType: ModuleInfo.Name
+  fullName: System.Introspection.ModuleInfo.Name
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: System.html
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Introspection.ModuleInfo.Assembly*
+  commentId: Overload:System.Introspection.ModuleInfo.Assembly
+  isExternal: true
+  href: System.Introspection.ModuleInfo.html#System_Introspection_ModuleInfo_Assembly
+  name: Assembly
+  nameWithType: ModuleInfo.Assembly
+  fullName: System.Introspection.ModuleInfo.Assembly
+- uid: System.Introspection.AssemblyInfo
+  commentId: T:System.Introspection.AssemblyInfo
+  parent: System.Introspection
+  isExternal: true
+  href: System.Introspection.AssemblyInfo.html
+  name: AssemblyInfo
+  nameWithType: AssemblyInfo
+  fullName: System.Introspection.AssemblyInfo
+- uid: System.Introspection.ModuleInfo.MetadataToken*
+  commentId: Overload:System.Introspection.ModuleInfo.MetadataToken
+  isExternal: true
+  href: System.Introspection.ModuleInfo.html#System_Introspection_ModuleInfo_MetadataToken
+  name: MetadataToken
+  nameWithType: ModuleInfo.MetadataToken
+  fullName: System.Introspection.ModuleInfo.MetadataToken
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer

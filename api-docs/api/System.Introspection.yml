@@ -4,7 +4,9 @@ items:
   commentId: N:System.Introspection
   id: System.Introspection
   children:
+  - System.Introspection.AssemblyInfo
   - System.Introspection.MemberInfo
+  - System.Introspection.ModuleInfo
   - System.Introspection.TypeInfo
   langs:
   - csharp
@@ -16,6 +18,22 @@ items:
   assemblies:
   - NeoCLR.CoreProbe
 references:
+- uid: System.Introspection.ModuleInfo
+  commentId: T:System.Introspection.ModuleInfo
+  parent: System.Introspection
+  isExternal: true
+  href: System.Introspection.ModuleInfo.html
+  name: ModuleInfo
+  nameWithType: ModuleInfo
+  fullName: System.Introspection.ModuleInfo
+- uid: System.Introspection.AssemblyInfo
+  commentId: T:System.Introspection.AssemblyInfo
+  parent: System.Introspection
+  isExternal: true
+  href: System.Introspection.AssemblyInfo.html
+  name: AssemblyInfo
+  nameWithType: AssemblyInfo
+  fullName: System.Introspection.AssemblyInfo
 - uid: System.Introspection.TypeInfo
   commentId: T:System.Introspection.TypeInfo
   parent: System.Introspection

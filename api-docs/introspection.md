@@ -39,14 +39,37 @@ The executable integration fixture also checks constructed generic types, arrays
 wrong types, null at the Object boundary, HashMap callbacks and retention through GC.
 There is no general default comparer or cross-program descriptor identity contract.
 
+## Assembly and module identity
+
+[AssemblyInfo](xref:System.Introspection.AssemblyInfo) compares the full assembly
+identity in the current loaded catalog. [ModuleInfo](xref:System.Introspection.ModuleInfo)
+compares that identity together with its module name. Catalog validation ensures
+these keys are unique within one loaded program. Short assembly names, module names
+alone and metadata tokens are not sufficient keys. Repeated queries can allocate
+separate, equal wrappers; ReferenceEquals still compares allocations.
+
+These contracts apply through Object.Equals(Object?). Null and other descriptor kinds
+compare false. GetHashCode hashes the same identity components with System.HashCode;
+collisions are allowed and hashes must not be persisted. Assembly display returns
+FullName; module display returns Name. This does not introduce nullable typed equality
+or a new Equatable interface on these descriptors.
+
+.NET Assembly/Module describe loaded runtime entities, with loader contexts and
+runtime-specific identity. neoCLR currently has one descriptive loaded catalog and
+no dynamic assembly loading. Its full-name-based assembly equality is scoped to that
+model, not a promise of CLR loader equivalence. Additional load contexts would require
+an additional identity component. String hashing currently creates encoding temporaries.
+
+The executable fixture checks repeated wrappers, Object dispatch and HashMap callbacks
+under collection pressure. A separate catalog regression uses assemblies with matching
+short names and module names but different full identities, plus multiple modules in
+one assembly.
+
 ## Other descriptors
 
-AssemblyInfo, ModuleInfo, FieldInfo, MethodInfo, PropertyInfo and ParameterInfo still
-use Object allocation identity in this slice. Their existing metadata-query behavior
-is unchanged. Further equality work must include the defining assembly/module and
-owner context. In particular, metadata tokens can be absent or scoped to one module;
-name equality and token equality alone are not valid general implementations.
-
-TypeInfo and MemberInfo now have generated type/member reference coverage. The remaining
-introspection interfaces are an explicit documentation gap, tracked in the maintenance
-notes while their identity contracts are investigated.
+FieldInfo, MethodInfo, PropertyInfo and ParameterInfo still use Object allocation
+identity. Further equality work must include defining scope and owner context;
+parameter snapshots do not yet retain their declaring member. Tokens can be absent
+or module-scoped. Their generated reference coverage remains an explicit gap in the
+maintenance notes. TypeInfo, MemberInfo, AssemblyInfo and ModuleInfo now have generated
+type/member reference coverage.
