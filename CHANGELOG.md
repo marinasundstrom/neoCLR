@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Clarify Raven storage conventions: prefer private `var`/`val`, which emit fields;
+  reserve explicit `field` for intentional field declarations or compatibility.
+
 - Make standard Raven union declarations the class-library default, with documented
   rare manual-contract exceptions. Add a direct HTTP-error union probe with members
   and a CLI shape report; record current importer gaps instead of extending the
@@ -15,7 +18,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   recognized union conditional outputs in application imports; validate nested source
   unions, defaults, copies and boxing under GC pressure. Admit marked empty-case-only
   explicit-layout unions as managed field slots; reject nonempty or malformed layouts
-  and exercise unions across a separately compiled dependency. Legacy erased SocketError
+  and exercise unions across a separately compiled dependency. Add a bounded bootstrap
+  path that matches an empty-case union family against a separate core reference,
+  imports generated bodies and conditional outputs, and preserves constructor checks
+  through per-field default initialization. Encode generated static helper names.
+  Legacy erased SocketError
   nesting remains rejected by runtime verification. HttpError/BaseUri remain unimplemented.
 
 - Add managed System.Uri and UriError with strict escaped-ASCII parsing, string/Uri

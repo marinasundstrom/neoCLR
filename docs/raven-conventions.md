@@ -35,6 +35,15 @@ Use `val` for a read-only property. `val` remains legal for locals, but matching
 Raven's standard spelling makes the roles easier to distinguish. Neither `let`
 nor `val` promises deep immutability of an object.
 
+For ordinary private storage, prefer private `var` or `val` declarations. Raven
+emits these storage members as fields rather than CLR properties; a private computed
+property with an accessor remains a different construct. Use explicit `field` when
+field declaration itself is intended, whether public or private, or for a concrete
+compatibility requirement. Bootstrap validation should inspect the emitted metadata
+contract, not require explicit `field` syntax in the source. This author clarification
+was recorded on 2026-09-24; it does not require rewriting every existing storage
+declaration at once.
+
 Prefer an expression-bodied property for a single getter expression:
 
 ```raven

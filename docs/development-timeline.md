@@ -6773,3 +6773,16 @@ configuration/content, not target-specific code added to Raven main.
   as does the constructor-argument regression. The broader record suite fails before
   import on Equatable/Equals diagnostics with the installed SDK; this remains an
   open validation gap, not a passing check or a claimed compiler regression fix.
+
+
+### 2026-09-24 — Private Raven storage declarations
+
+- **Author clarification:** private storage `var` and `val` declarations are emitted
+  as fields rather than properties. Explicit `field` is primarily for compatibility
+  or when a field declaration is specifically intended, public or private.
+- **Assistant action:** records this in the Raven conventions and repository guidance.
+  Bootstrap contract checks should follow emitted metadata rather than insist on
+  explicit source `field` spelling. The existing instance-library regression uses
+  private `var` storage and passes; no wholesale storage rewrite is claimed.
+- **Scope:** this clarification accompanies the ongoing standard-union bootstrap
+  work and does not replace the HttpError/BaseUri objective.

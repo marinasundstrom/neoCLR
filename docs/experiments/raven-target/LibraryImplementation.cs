@@ -85,6 +85,8 @@ static class LibraryImplementation
             ?? throw new InvalidDataException("Missing namespace implementation: " + owner);
         var contract = core.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? core.Types.SingleOrDefault(t => t.FullName.Split('`')[0] == owner)
             ?? throw new InvalidDataException("Missing namespace reference contract: " + owner);
+        if (StandardUnionLibrary.IsCandidate(type))
+            return StandardUnionLibrary.Roots(type, contract);
         if (type.IsInterface || contract.IsInterface)
             return InterfaceRoots(type, contract, owner);
         if (!(type.IsAbstract && type.IsSealed))

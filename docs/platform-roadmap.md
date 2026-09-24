@@ -845,7 +845,9 @@ and base-address request resolution; do not expand the manual carrier catalog as
 the default path. The [source-union probe](experiments/http-error-unions/README.md)
 now executes nested standard declarations with members, defaults, copying and boxing,
 including empty-case-only unions and separately compiled dependencies.
-Mixed erased-carrier defaults and runtime-library bootstrap integration remain open.
+The empty-case bootstrap probe now matches a separate core reference and imports
+native library bodies with constructor checks preserved. Mixed erased-carrier defaults,
+production reference/consumer integration and public API migration remain open.
 Handler/server cancellation ownership and public JSON contracts remain later work. The [JSON report](experiments/http-json/README.md) now passes between two
 neoCLR applications and independent peers; it does not promote a public JSON API. The
 [HTTP sample](experiments/http-client/README.md) imports development System.Web.Http

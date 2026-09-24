@@ -6,6 +6,12 @@ using Raven.CodeAnalysis;
 using Raven.CodeAnalysis.Syntax;
 using AssemblyDefinition = Mono.Cecil.AssemblyDefinition;
 
+if (args.Length is 5 or 6 && args[0] == "--standard-union-library-core")
+{
+    StandardUnionLibraryChecks.WriteReference(args[1], args[2], args[3], args[4], args.Length == 6 ? args[5] : null);
+    return;
+}
+
 if (args.Length == 1 && args[0] == "--network-budget-checks")
 {
     NetworkBudgetChecks.Run();

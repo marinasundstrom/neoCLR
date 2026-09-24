@@ -52,6 +52,8 @@
   case accessors such as GetSomeCase(). Use idiomatic case construction, such as
   Option<TypeInfo>.Some(owner) or Some(owner) when the target is known; avoid
   explicit carrier wrappers in ordinary API implementations and samples.
+- Prefer private `var`/`val` for ordinary storage; Raven emits these as fields.
+  Reserve explicit `field` for intentional field declarations (public or private) or compatibility.
 - Prefer expression-bodied properties (`val Name: string => expression`) when
   a property has only a getter expression.
 

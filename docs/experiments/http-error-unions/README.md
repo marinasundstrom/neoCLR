@@ -60,8 +60,9 @@ offset. There is no payload data whose overlapping storage must be preserved, so
 these become ordinary managed field slots. This is not permission to import general
 explicit-layout structs or nonempty overlaid cases.
 
-This is an application/dependency-import slice. Runtime-library source projection, metadata
-catalogs and bootstrap exports still need integration before public APIs can migrate.
+Application/dependency imports are covered above. The bounded bootstrap experiment
+below now imports empty-case union implementations.
+Production reference catalogs and public API migration still need integration.
 The previous probe stopped at SocketError byref and then receiver initialization.
 `LegacyErrors.rvn` retains that mixed-form investigation; it now imports but the
 runtime verifier correctly rejects its non-defaultable erased payload.
@@ -78,8 +79,8 @@ We retain that distinction rather than fabricate a valid legacy error case.
 
 Compiler-owned case machinery reduces handwritten library code; it requires explicit
 bridge support and validation. This slice does not cover generic or payload-bearing explicit-layout
-unions, equality synthesis, all IUnion interface calls or runtime-library migration.
-Next, resolve the mixed-carrier boundary and bootstrap integration before shipping
+unions, equality synthesis, all IUnion interface calls or public runtime-library migration.
+Next, resolve the mixed-carrier boundary and production reference integration before shipping
 HttpError/BaseUri. Existing carriers are migration candidates, not an instruction
 to rewrite all working unions in one change.
 
@@ -94,3 +95,51 @@ bundle fails before import on record-to-Equatable conversions and ambiguous
 Equals overloads; it is not counted as passing. That compiler/SDK validation gap
 requires separate investigation. No website or public API signature changes occur
 in this slice, so the existing API snapshot is unchanged.
+
+
+## Empty-case union bootstrap
+
+```sh
+python3 docs/experiments/http-error-unions/verify_bootstrap.py \
+  --bundle /path/to/matching/neoclr-bundle \
+  --bridge docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll \
+  --runner target/release/examples/measure_async
+```
+
+This fixture compiles a standard `Probe.Limit` union with two empty cases and authored
+members. A test-only command creates a separate core reference containing its carrier,
+cases and IUnion metadata. Reference method bodies deliberately throw. The normal
+`--library-implementation` path matches the family and imports the source bodies as
+named runtime library types; an explicit neoIL harness exercises the resulting fragment.
+It does not execute the reference stubs or substitute application type identities.
+
+The bootstrap path compares field layouts, case identities, signatures, parameter
+names/output modes, properties and interface mappings. It retains conditional outputs
+in both declarations and calls. Generated static helper names use normal metadata-name
+encoding. This is a bounded empty-case family path, not a generic source-to-reference
+packaging system; payload-bearing and generic unions still need their own validation.
+
+Native value constructors hold an unpublished receiver capability. To retain its
+existing checks, the importer lowers the compiler's receiver `initobj` to checked
+default writes to each field; an empty case needs no field writes. The runtime and
+its general default-value policy are unchanged. This adapts CLI constructor behavior
+to neoCLR's construction model without hand-authoring union constructors in Raven.
+
+Validation covers both cases, unsuccessful extraction, a computed property, empty
+defaults, boxed-copy display after reassignment, and Value extraction. It reports
+three allocations and zero live objects after final collection. Five independently
+altered reference contracts—case identity, return type, output mode, nonempty case,
+and missing marker—are rejected before producing an implementation artifact. The
+existing instance-library regression, including its private `var` storage and five
+contract rejections, also passes.
+
+The fixture compiles against the existing core, so Raven supplies IUnion in the
+source assembly. The bootstrap currently requires that source protocol and a matching
+reference declaration. Making the production core own the protocol once, and admitting
+that core-owned reference during compilation, are explicit follow-up work.
+
+No public core-library type has migrated yet. Production reference/catalog integration,
+consumer binding and API documentation must accompany the first real migration.
+Private storage `var`/`val` should be used normally; checking the emitted field layout
+is not a requirement to write explicit `field` syntax. The fixture uses qualified
+empty-case patterns so a bare identifier is not interpreted as a new binding.

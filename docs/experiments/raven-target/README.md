@@ -1174,3 +1174,13 @@ private byte tag is separate from their empty case slots. Nonempty overlaid payl
 generic unions and runtime-library migration remain outside this slice. The probe
 also exercises a separately compiled union library; this does not yet replace the
 runtime library's reference catalogs and bootstrap exports.
+
+The bounded [empty-case bootstrap verifier](../http-error-unions/README.md#empty-case-union-bootstrap)
+also imports a standard Raven union family through `--library-implementation` against
+separate core reference metadata. `StandardUnionLibrary` matches layouts and member
+contracts before binding native names. Receiver initobj becomes checked field-default
+writes to preserve native construction capabilities; static helper names are encoded
+consistently. The test-only `--standard-union-library-core` command builds throwing
+reference stubs for this fixture, not a production reference pack. Public library
+migration and consumer binding remain later work; runtime instructions, Raven emission
+and Runtime Contract configuration are unchanged.

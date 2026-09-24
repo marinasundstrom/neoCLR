@@ -180,7 +180,7 @@ static class ApplicationTypes
     // Empty union cases have no overlapping data to preserve. Import their tag and
     // empty case slots as ordinary managed fields, not as a native-layout promise.
     // Payload-bearing explicit layouts remain outside this bounded admission.
-    static bool IsEmptyCaseUnion(TypeDefinition type)
+    public static bool IsEmptyCaseUnion(TypeDefinition type)
     {
         if (!type.IsValueType || !type.IsSealed || type.HasGenericParameters
             || !type.CustomAttributes.Any(attribute =>
