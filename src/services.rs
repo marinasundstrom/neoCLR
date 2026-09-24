@@ -150,7 +150,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::bind(function)?,
             crate::native::Binding::NotifyWorker
                 | crate::native::Binding::Socket(
-                    crate::socket_io::Operation::Connect | crate::socket_io::Operation::Receive
+                    crate::socket_io::Operation::Connect | crate::socket_io::Operation::Receive | crate::socket_io::Operation::Send
                 )
         ) {
             uses.push(ServiceUse {

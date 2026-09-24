@@ -7,9 +7,12 @@
 .function neoCLR.Runtime.SocketReceive(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,System.Func<Void> callback) -> Value
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.SocketReceiveResult(Int64 operation) -> Value
+.function neoCLR.Runtime.SocketTransferResult(Int64 operation) -> Value
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.SocketClose(Int64 socket) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketSend(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,System.Func<Void> callback) -> Value
 .methodimpl InternalCall
 .end

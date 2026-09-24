@@ -6438,3 +6438,14 @@ thread, and a bounded HTTP client with explicit framing and ownership.
 and web-app products, essential protocol behavior, validation and the local-HTTP/TLS
 boundary. Exact public resolver/address/HTTP signatures remain provisional. This
 exchange adds implementation direction; it does not report DNS or HTTP as implemented.
+
+
+## 2026-09-24 — Encoding boundaries and propagation syntax
+
+**Author:** the socket case also shows the need to handle character and string
+encoding later. Clarified that the Raven compiler fix makes `await Foo()?` and
+`try Foo()?` sufficient: propagation surrounds the complete expression.
+**Assistant action:** record explicit text conversion and fragmented multibyte
+validation in the HTTP direction; simplify the active socket sample and documentation
+and refresh its local compiler bundle to verify the syntax. No new encoding API
+is implemented in this slice.

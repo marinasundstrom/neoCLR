@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the Raven TCP client against a bounded, real loopback greeting server."""
+"""Run the Raven TCP client against a bounded, real loopback echo server."""
 import argparse
 import os
 from pathlib import Path
@@ -32,10 +32,16 @@ with tempfile.TemporaryDirectory(prefix='neoclr-socket-client-') as folder, sock
         try:
             with listener.accept()[0] as peer:
                 peer.settimeout(30)
+                greeting = bytearray()
+                while len(greeting) < 2:
+                    part = peer.recv(2 - len(greeting))
+                    assert part, 'Guest closed before sending the greeting'
+                    greeting.extend(part)
+                assert greeting == b'Hi', greeting
                 time.sleep(0.1)
-                peer.sendall(b'H')
+                peer.sendall(greeting[:1])
                 time.sleep(0.1)
-                peer.sendall(b'i')
+                peer.sendall(greeting[1:])
                 peer.shutdown(socket.SHUT_WR)
                 assert peer.recv(1) == b'', 'Guest failed to close the connection'
         except BaseException as error:
@@ -46,7 +52,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-socket-client-') as folder, sock
     assert run.returncode == 0, run.stdout + run.stderr
     thread.join(5)
     assert not thread.is_alive() and not errors, errors
-    assert run.stdout == 'Other work runs while TCP is pending\nReceived Hi; peer finished sending\nSocket closed\n', run.stdout
+    assert run.stdout == 'Other work runs while TCP is pending\nSent Hi\nReceived Hi; peer finished sending\nSocket closed\n', run.stdout
     stats = {key: int(value) for key, value in re.findall(r'(\w+)=(\d+)', run.stderr)}
     assert stats['live'] == 0 and stats['collections'] > 1, stats
     print(run.stdout, end='')

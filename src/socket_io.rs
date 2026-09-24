@@ -2,7 +2,7 @@
 use crate::{Fault, ManagedHeap, Value, metadata::Type};
 use std::{
     collections::BTreeMap,
-    io::{self, Read},
+    io::{self, Read, Write},
     net::{Ipv4Addr, SocketAddrV4, TcpStream},
     sync::atomic::{AtomicU64, Ordering},
 };
@@ -72,7 +72,8 @@ pub(crate) enum Operation {
     Connect,
     ConnectResult,
     Receive,
-    ReceiveResult,
+    Send,
+    TransferResult,
     Close,
 }
 fn payload(result: Result<Value, Error>) -> Value {
@@ -107,7 +108,8 @@ impl Default for Budget {
         }
     }
 }
-struct Receive {
+struct Transfer {
+    sending: bool,
     socket: SocketId,
     destination: Option<Value>,
     callback: Option<Value>,
@@ -117,11 +119,11 @@ struct Receive {
 }
 pub(crate) struct Sockets {
     sockets: BTreeMap<SocketId, TcpStream>,
-    operations: BTreeMap<OperationId, Receive>,
+    operations: BTreeMap<OperationId, Transfer>,
     connects: BTreeMap<OperationId, Connect>,
     reserved: usize,
     budget: Budget,
-    receive_first: bool,
+    transfer_first: bool,
 }
 impl Default for Sockets {
     fn default() -> Self {
@@ -131,7 +133,7 @@ impl Default for Sockets {
             connects: BTreeMap::new(),
             reserved: 0,
             budget: Budget::default(),
-            receive_first: false,
+            transfer_first: false,
         }
     }
 }
@@ -214,7 +216,7 @@ impl Sockets {
                 .connect(address, *port, callback.clone())
                 .map(|id| Value::Int64(id.0 as i64)),
             (
-                Operation::Receive,
+                Operation::Receive | Operation::Send,
                 [
                     Value::Int64(socket),
                     destination,
@@ -223,7 +225,8 @@ impl Sockets {
                     callback,
                 ],
             ) => self
-                .receive(
+                .transfer(
+                    matches!(operation, Operation::Send),
                     SocketId(*socket as u64),
                     heap,
                     destination.clone(),
@@ -252,10 +255,10 @@ impl Sockets {
                     .unwrap()
                     .map(|socket| Value::Int64(socket.0 as i64))
             }
-            (Operation::ReceiveResult, [Value::Int64(id)]) => self
+            (Operation::TransferResult, [Value::Int64(id)]) => self
                 .take_result(OperationId(*id as u64))
-                .map_err(|_| Fault::new("Unknown socket receive operation"))?
-                .ok_or_else(|| Fault::new("Socket receive result is not ready"))?
+                .map_err(|_| Fault::new("Unknown socket transfer operation"))?
+                .ok_or_else(|| Fault::new("Socket transfer result is not ready"))?
                 .map(|count| Value::Int32(count as i32)),
             _ => return Err(Fault::new("Invalid socket runtime service arguments")),
         };
@@ -286,13 +289,36 @@ impl Sockets {
         count: i32,
         callback: Value,
     ) -> Result<OperationId, Error> {
+        self.transfer(false, socket, heap, destination, offset, count, callback)
+    }
+    fn send(
+        &mut self,
+        socket: SocketId,
+        heap: &ManagedHeap,
+        source: Value,
+        offset: i32,
+        count: i32,
+        callback: Value,
+    ) -> Result<OperationId, Error> {
+        self.transfer(true, socket, heap, source, offset, count, callback)
+    }
+    fn transfer(
+        &mut self,
+        sending: bool,
+        socket: SocketId,
+        heap: &ManagedHeap,
+        destination: Value,
+        offset: i32,
+        count: i32,
+        callback: Value,
+    ) -> Result<OperationId, Error> {
         if !self.sockets.contains_key(&socket) {
             return Err(Error::Closed);
         }
         if self
             .operations
             .values()
-            .any(|op| op.socket == socket && op.outcome.is_none())
+            .any(|op| op.socket == socket && op.sending == sending && op.outcome.is_none())
         {
             return Err(Error::Busy);
         }
@@ -329,13 +355,25 @@ impl Sockets {
             .ok_or(Error::Limit)?;
         let mut buffer = Vec::new();
         buffer.try_reserve_exact(count).map_err(|_| Error::Limit)?;
-        buffer.resize(count, 0);
+        if sending {
+            // Snapshot only after admission checks. No borrowed guest storage crosses
+            // a pending send; later mutations cannot change this operation's bytes.
+            for value in &elements[offset..offset + count] {
+                let Value::Byte(byte) = value else {
+                    return Err(Error::InvalidBuffer);
+                };
+                buffer.push(*byte);
+            }
+        } else {
+            buffer.resize(count, 0);
+        }
         let id = OperationId(next_id()?);
         self.operations.insert(
             id,
-            Receive {
+            Transfer {
+                sending,
                 socket,
-                destination: Some(destination),
+                destination: if sending { None } else { Some(destination) },
                 callback: Some(callback),
                 offset,
                 buffer,
@@ -345,7 +383,7 @@ impl Sockets {
         self.reserved = reserved;
         Ok(id)
     }
-    fn settle(op: &mut Receive, reserved: &mut usize, outcome: Result<usize, Error>) {
+    fn settle(op: &mut Transfer, reserved: &mut usize, outcome: Result<usize, Error>) {
         *reserved -= op.buffer.len();
         op.buffer = Vec::new();
         op.destination = None;
@@ -359,7 +397,7 @@ impl Sockets {
         if op.outcome.is_some() {
             return Ok(false);
         }
-        // No native read is in flight concurrently: all calls run on the owner.
+        // No native transfer is in flight concurrently: all calls run on the owner.
         Self::settle(op, &mut self.reserved, Err(Error::Cancelled));
         Ok(true)
     }
@@ -403,19 +441,19 @@ impl Sockets {
         }
     }
     pub(crate) fn poll(&mut self, heap: &ManagedHeap) -> Result<Option<Value>, Fault> {
-        let ready = if self.receive_first {
-            match self.poll_receive(heap)? {
+        let ready = if self.transfer_first {
+            match self.poll_transfer(heap)? {
                 Some(value) => Some(value),
                 None => self.poll_connect()?,
             }
         } else {
             match self.poll_connect()? {
                 Some(value) => Some(value),
-                None => self.poll_receive(heap)?,
+                None => self.poll_transfer(heap)?,
             }
         };
         if ready.is_some() {
-            self.receive_first = !self.receive_first;
+            self.transfer_first = !self.transfer_first;
         }
         Ok(ready)
     }
@@ -452,7 +490,7 @@ impl Sockets {
         }
         Ok(None)
     }
-    fn poll_receive(&mut self, heap: &ManagedHeap) -> Result<Option<Value>, Fault> {
+    fn poll_transfer(&mut self, heap: &ManagedHeap) -> Result<Option<Value>, Fault> {
         for op in self.operations.values_mut() {
             if op.callback.is_none() {
                 continue;
@@ -462,12 +500,14 @@ impl Sockets {
                     .sockets
                     .get_mut(&op.socket)
                     .expect("close settles pending operations");
-                let read = if op.buffer.is_empty() {
+                let transfer = if op.buffer.is_empty() {
                     Ok(0)
+                } else if op.sending {
+                    socket.write(&op.buffer)
                 } else {
                     socket.read(&mut op.buffer)
                 };
-                let outcome = match read {
+                let outcome = match transfer {
                     Err(e)
                         if matches!(
                             e.kind(),
@@ -477,6 +517,8 @@ impl Sockets {
                         continue;
                     }
                     Err(error) => Err(Error::from(error)),
+                    Ok(0) if op.sending && !op.buffer.is_empty() => Err(Error::Io),
+                    Ok(count) if op.sending => Ok(count),
                     Ok(count) => {
                         let Some(Value::ObjectReference(object)) = &op.destination else {
                             unreachable!()
@@ -560,6 +602,243 @@ mod tests {
             .invoke(Operation::ConnectResult, &[Value::Int64(id.0 as i64)], heap)
             .unwrap()
     }
+    #[test]
+    fn send_snapshots_only_range_and_releases_guest_source_before_completion() {
+        let (mut peer, stream) = pair();
+        let mut sockets = Sockets::default();
+        let socket = sockets.adopt(stream).unwrap();
+        let mut heap = ManagedHeap::default();
+        let source = array(&mut heap);
+        let id = sockets
+            .send(socket, &heap, source.clone(), 1, 2, callback())
+            .unwrap();
+        let Value::ObjectReference(object) = &source else {
+            panic!()
+        };
+        object
+            .reference
+            .write(Value::Array {
+                element: Type::Byte,
+                elements: vec![Value::Byte(42); 4],
+            })
+            .unwrap();
+        let mut roots = vec![];
+        sockets.trace_roots(&mut roots);
+        heap.collect(roots, crate::CollectionReason::AllocationPressure)
+            .unwrap();
+        assert_eq!(heap.statistics().live_objects, 0);
+        deliver(&mut sockets, &heap);
+        assert_eq!(sockets.take_result(id).unwrap(), Some(Ok(2)));
+        assert_eq!(sockets.reserved, 0);
+        let mut output = [0; 2];
+        peer.read_exact(&mut output).unwrap();
+        assert_eq!(output, [9, 9]);
+        assert!(sockets.poll(&heap).unwrap().is_none());
+        assert_eq!(sockets.take_result(id), Err(Error::UnknownOperation));
+        sockets.close(socket);
+        assert_eq!(peer.read(&mut [0]).unwrap(), 0);
+    }
+
+    #[test]
+    fn one_send_and_one_receive_can_wait_on_same_connection() {
+        let (mut peer, stream) = pair();
+        let mut sockets = Sockets::default();
+        let socket = sockets.adopt(stream).unwrap();
+        let mut heap = ManagedHeap::default();
+        let destination = array(&mut heap);
+        let source = array(&mut heap);
+        let read = sockets
+            .receive(socket, &heap, destination.clone(), 0, 1, callback())
+            .unwrap();
+        let write = sockets
+            .send(socket, &heap, source.clone(), 1, 2, callback())
+            .unwrap();
+        assert_eq!(
+            sockets.send(socket, &heap, source, 0, 0, callback()),
+            Err(Error::Busy)
+        );
+        assert_eq!(
+            sockets.receive(socket, &heap, destination.clone(), 0, 0, callback()),
+            Err(Error::Busy)
+        );
+        deliver(&mut sockets, &heap);
+        assert_eq!(sockets.take_result(write).unwrap(), Some(Ok(2)));
+        assert_eq!(sockets.take_result(read).unwrap(), None);
+        let mut output = [0; 2];
+        peer.read_exact(&mut output).unwrap();
+        assert_eq!(output, [9, 9]);
+        peer.write_all(b"R").unwrap();
+        deliver(&mut sockets, &heap);
+        assert_eq!(sockets.take_result(read).unwrap(), Some(Ok(1)));
+        assert_eq!(bytes(&heap, &destination)[0], Value::Byte(b'R'));
+    }
+
+    #[test]
+    fn send_admission_empty_close_and_cancel_preserve_shared_accounting() {
+        let (mut peer, stream) = pair();
+        let mut sockets = Sockets::default();
+        let socket = sockets.adopt(stream).unwrap();
+        let mut heap = ManagedHeap::default();
+        let source = array(&mut heap);
+        for (offset, count) in [(-1, 1), (0, -1), (5, 0), (3, 2)] {
+            assert_eq!(
+                sockets.send(socket, &heap, source.clone(), offset, count, callback()),
+                Err(Error::InvalidRange)
+            );
+        }
+        assert_eq!(
+            sockets.send(
+                socket,
+                &ManagedHeap::default(),
+                source.clone(),
+                0,
+                1,
+                callback()
+            ),
+            Err(Error::InvalidBuffer)
+        );
+        assert_eq!(
+            sockets.send(socket, &heap, source.clone(), 0, 1, Value::Void),
+            Err(Error::InvalidCallback)
+        );
+        let mut foreign = Sockets::default();
+        assert_eq!(
+            foreign.send(socket, &heap, source.clone(), 0, 1, callback()),
+            Err(Error::Closed)
+        );
+        sockets.budget.bytes = 4;
+        let read = sockets
+            .receive(socket, &heap, source.clone(), 0, 3, callback())
+            .unwrap();
+        assert_eq!(
+            sockets.send(socket, &heap, source.clone(), 0, 2, callback()),
+            Err(Error::Limit)
+        );
+        let write = sockets
+            .send(socket, &heap, source.clone(), 0, 1, callback())
+            .unwrap();
+        assert_eq!(sockets.reserved, 4);
+        assert!(sockets.cancel(write).unwrap());
+        assert_eq!(sockets.reserved, 3);
+        deliver(&mut sockets, &heap);
+        assert_eq!(
+            sockets.take_result(write).unwrap(),
+            Some(Err(Error::Cancelled))
+        );
+        let empty = sockets
+            .send(socket, &heap, source.clone(), 4, 0, callback())
+            .unwrap();
+        deliver(&mut sockets, &heap);
+        assert_eq!(sockets.take_result(empty).unwrap(), Some(Ok(0)));
+        let closed = sockets
+            .send(socket, &heap, source.clone(), 0, 1, callback())
+            .unwrap();
+        sockets.close(socket);
+        assert_eq!(sockets.reserved, 0);
+        deliver(&mut sockets, &heap);
+        deliver(&mut sockets, &heap);
+        assert_eq!(sockets.take_result(read).unwrap(), Some(Err(Error::Closed)));
+        assert_eq!(
+            sockets.take_result(closed).unwrap(),
+            Some(Err(Error::Closed))
+        );
+        assert_eq!(
+            sockets.send(socket, &heap, source, 0, 0, callback()),
+            Err(Error::Closed)
+        );
+        assert_eq!(
+            peer.read(&mut [0]).unwrap(),
+            0,
+            "cancelled/closed writes must not reach peer"
+        );
+    }
+
+    #[test]
+    fn tcp_short_sends_and_backpressure_keep_pending_bytes_until_progress() {
+        let (mut peer, stream) = pair();
+        socket2::SockRef::from(&stream)
+            .set_send_buffer_size(4096)
+            .unwrap();
+        peer.set_nonblocking(true).unwrap();
+        let mut sockets = Sockets::default();
+        let socket = sockets.adopt(stream).unwrap();
+        let mut heap = ManagedHeap::default();
+        let id = heap
+            .allocate(Value::Array {
+                element: Type::Byte,
+                elements: vec![Value::Byte(9); 65536],
+            })
+            .unwrap();
+        let source = Value::ObjectReference(crate::value::ObjectReference {
+            reference: heap.address(id).unwrap(),
+            view: None,
+        });
+        let deadline = Instant::now() + Duration::from_secs(10);
+        let mut total_sent = 0;
+        let mut saw_short = false;
+        let blocked = loop {
+            assert!(
+                total_sent < 16 * 1024 * 1024 && Instant::now() < deadline,
+                "TCP backpressure watchdog"
+            );
+            let id = sockets
+                .send(socket, &heap, source.clone(), 0, 65536, callback())
+                .unwrap();
+            if sockets.poll(&heap).unwrap().is_none() {
+                break id;
+            }
+            let count = sockets.take_result(id).unwrap().unwrap().unwrap();
+            assert!(count > 0 && count <= 65536);
+            saw_short |= count < 65536;
+            total_sent += count;
+        };
+        assert_eq!(sockets.reserved, 65536);
+        assert_eq!(sockets.take_result(blocked).unwrap(), None);
+        assert_eq!(
+            sockets.send(socket, &heap, source.clone(), 0, 1, callback()),
+            Err(Error::Busy)
+        );
+        let mut received = 0;
+        let mut chunk = [0; 32768];
+        let count = loop {
+            assert!(Instant::now() < deadline, "TCP send progress watchdog");
+            match peer.read(&mut chunk) {
+                Ok(count) if count > 0 => {
+                    assert!(chunk[..count].iter().all(|byte| *byte == 9));
+                    received += count;
+                }
+                Err(error) if error.kind() == io::ErrorKind::WouldBlock => {}
+                other => panic!("Unexpected peer read: {other:?}"),
+            }
+            if sockets.poll(&heap).unwrap().is_some() {
+                break sockets.take_result(blocked).unwrap().unwrap().unwrap();
+            }
+            std::thread::sleep(Duration::from_millis(1));
+        };
+        assert!(count > 0 && count <= 65536);
+        assert!(
+            saw_short || count < 65536,
+            "small send buffer should exercise a short send"
+        );
+        total_sent += count;
+        assert_eq!(sockets.reserved, 0);
+        assert!(sockets.poll(&heap).unwrap().is_none());
+        sockets.close(socket);
+        peer.set_nonblocking(false).unwrap();
+        loop {
+            let count = peer.read(&mut chunk).unwrap();
+            if count == 0 {
+                break;
+            }
+            assert!(chunk[..count].iter().all(|byte| *byte == 9));
+            received += count;
+        }
+        assert_eq!(
+            received, total_sent,
+            "only reported prefixes are sent, exactly once"
+        );
+    }
+
     #[test]
     fn ready_connects_do_not_starve_ready_receives() {
         let (_, stream) = pair();
@@ -649,7 +928,7 @@ mod tests {
         assert_eq!(
             sockets
                 .invoke(
-                    Operation::ReceiveResult,
+                    Operation::TransferResult,
                     &[Value::Int64(operation.0 as i64)],
                     &heap
                 )

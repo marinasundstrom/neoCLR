@@ -1063,8 +1063,8 @@ The String sequence sample verifies named arguments, including reordered argumen
 ### Development TCP client integration
 
 SocketBindings admits only the selected System.Networking.Sockets.Socket factory,
-Receive and Close signatures from the matching core reference. SocketError has the
-existing union-carrier shape. SocketConnectCompletion and SocketReceiveCompletion,
+Send, Receive and Close signatures from the matching core reference. SocketError has the
+existing union-carrier shape. SocketConnectCompletion and SocketTransferCompletion,
 Socket's handle constructor and error decoder remain internal, and native operations
 are bootstrap-only RuntimeServices calls. Native IDs are erased private Int64 values;
 they are never part of the public API. Rebuild the reference, bootstrap library and
@@ -1072,3 +1072,10 @@ importer together. No Raven compiler change, Runtime Contract option, emitted st
 machine convention or nullable policy changes in this slice. Socket awaits use the
 existing Task/Promise and generated-state-machine contracts. See the
 [client sample](../socket-client/README.md) for validation and current restrictions.
+
+
+The send slice reuses a private SocketTransferCompletion for receive/send outcomes.
+Socket.Send has the same Task<Result<int, SocketError>> shape as Receive. Its exact
+reference binding calls the Raven-authored method; no new compiler or Runtime Contract
+setting is required. Bootstrap-only SocketTransferResult replaces SocketReceiveResult;
+rebuild all matching artifacts, since private services are not compatibility contracts.

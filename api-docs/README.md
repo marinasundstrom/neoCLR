@@ -103,3 +103,8 @@ Socket and SocketError now have generated reference coverage under
 System.Networking.Sockets, including every error case. The on-site socket guide
 describes the first TCP client slice and pending listener/send/addressing work.
 Private completion classes and runtime operation handles are not public APIs.
+
+Socket.Send has generated member coverage. Transfer snapshots, short writes, shared
+budgets and simultaneous send/receive behavior are described in the socket guide.
+The private transfer-result service replaces the former receive-only result service;
+refresh matching library, importer and runtime artifacts together.

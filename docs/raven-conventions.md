@@ -242,3 +242,8 @@ For code after a successful binding, the current toolchain uses
 For a success block, use `if let Some(input) = expression { ... } else { ... }`.
 Compile the sample before publishing syntax or interpolation examples. See the
 [Console propagation examples](experiments/console-streams/README.md).
+
+With the current Raven precedence fix, prefer `await Foo()?` and `try Foo()?`.
+Propagation applies to the complete await or try expression; `(await Foo())?` and
+`(try Foo())?` do not need the outer parentheses. Parenthesize the operand only
+when inner propagation is intended. Use a matching compiler when verifying samples.

@@ -18,26 +18,48 @@ func Churn() {
     }
 }
 
+async func SendGreeting(socket: Socket) -> Task<Result<int, SocketError>> {
+    var sent = 0
+    while sent < 2 {
+        let buffer: byte[] = [(byte)9, (byte)72, (byte)105, (byte)9]
+        let pending = socket.Send(buffer, 1 + sent, 2 - sent)
+        // Each Send owns a snapshot; this reuse must not alter the transmitted bytes.
+        buffer[1] = (byte)0
+        buffer[2] = (byte)0
+        Churn()
+        let count = await pending?
+        Check(count > 0)
+        sent += count
+    }
+    Console.WriteLine("Sent Hi")
+    return Ok(sent)
+}
+
 async func ReadGreeting(socket: Socket) -> Task<Result<int, SocketError>> {
     let buffer: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9]
     var received = 0
     while received < 2 {
         let pending = socket.Receive(buffer, 1 + received, 2 - received)
         Churn()
-        let count = (await pending)?
+        let count = await pending?
         Check(count > 0)
         received += count
     }
     Check(buffer[0] == 9 && buffer[1] == 72 && buffer[2] == 105 && buffer[3] == 9)
-    Check((await socket.Receive(buffer, 0, 1))? == 0)
+    Check(await socket.Receive(buffer, 0, 1)? == 0)
     Console.WriteLine("Received Hi; peer finished sending")
     return Ok(received)
 }
 
-async func ReceiveGreeting() -> Task<Result<int, SocketError>> {
+async func Exchange(socket: Socket) -> Task<Result<int, SocketError>> {
+    Check(await SendGreeting(socket)? == 2)
+    return await ReadGreeting(socket)
+}
+
+async func ExchangeGreeting() -> Task<Result<int, SocketError>> {
     // The verifier substitutes the host's ephemeral loopback port.
-    let socket = (await Socket.Connect("127.0.0.1", 19090))?
-    let result = await ReadGreeting(socket)
+    let socket = await Socket.Connect("127.0.0.1", 19090)?
+    let result = await Exchange(socket)
     socket.Close()
     socket.Close()
     let closed = socket.Receive([(byte)0], 0, 1).GetResult()
@@ -46,11 +68,17 @@ async func ReceiveGreeting() -> Task<Result<int, SocketError>> {
     } else {
         System.Fault("Closed socket admitted a receive")
     }
+    let closedSend = socket.Send([(byte)0], 0, 1).GetResult()
+    if let Error(error) = closedSend {
+        Check(error.IsClosed)
+    } else {
+        System.Fault("Closed socket admitted a send")
+    }
     return result
 }
 
 func Main() {
-    let greeting = ReceiveGreeting()
+    let greeting = ExchangeGreeting()
     Churn()
     greeting.OnCompleted(() => {
         if let Ok(count) = greeting.GetResult() {

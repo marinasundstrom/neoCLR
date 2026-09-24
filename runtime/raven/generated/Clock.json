@@ -3,7 +3,7 @@
   "owner": "System.Clock",
   "inputs": {
     "runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "37dde67dc4a25ed1f2b66b28cc2d6250ed002fa2442b5b757f49b98a98b63dbb",
-    "runtime/raven/src/System/Networking/Sockets/Socket.rvn": "11f8020c774a249ad3a997ccd3189d87f95d3ac0e9f3c6395c5d383be39f71ca",
+    "runtime/raven/src/System/Networking/Sockets/Socket.rvn": "5f6c4f1e883c5b1488ad634f4dcbc6feebf37c72cff85e10f0771f3e4bd6ccd2",
     "runtime/raven/src/System/IO/TextReadError.rvn": "bd5cc31983f8aaa1b7e4a68fe63d06e45166e8a3c0c9537673a1ebab09d3659c",
     "runtime/raven/src/System/IO/TextReader.rvn": "6f9f6159741cec9acaded9e5b2705d3c1beaac4fa3fbb1be8a2146f18f575ce0",
     "runtime/raven/src/System/IO/TextWriter.rvn": "ee053d0893f533207e580eba37509aca9284dd0c37d13dff1941a2485b506fec",
@@ -115,7 +115,7 @@
     "Clock.helpers.neoil": "eeda6c34f4c4e23159ac7e86d1cfcbe77e06a5915d1b6f6ea9f430045eddb7f4"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "e6d36ae60096d2e0bcbcbada0e11bf4f54c91ac64990de804d3d5bc9c1a5ea0c",
+  "coreSha256": "68d6df2dba5ab89bc8c861262751624eccd5250fe0c384a23287fe0df7709f98",
   "exports": [
     "get_Now() -> System.Instant"
   ]

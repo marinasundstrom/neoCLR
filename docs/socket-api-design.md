@@ -319,3 +319,58 @@ outcomes, loopback transport tests and one compiled Raven GET/POST sample. Compa
 observable requests/responses with a conventional HTTP implementation. Keep OS-specific
 resolver/socket tests separate from reusable protocol tests, following the author's
 CI direction. Update the generated public API reference as each API is implemented.
+
+
+## Public Send and bidirectional client exchange — 2026-09-24
+
+Socket.Send(buffer, offset, count) returns Task<Result<int, SocketError>>. The
+[client sample](experiments/socket-client/README.md) now sends Hi and receives the
+host server's echo. This is progress toward HTTP request/response bytes, not a neoCLR
+listener or HTTP implementation. Host-backed DNS and listener/accept remain next work.
+
+Compare [.NET 10 Socket.SendAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.sockets.socket.sendasync?view=net-10.0)
+(retrieved 2026-09-24): retain asynchronous byte-count completion, partial sends and
+explicit close; expected errors use Result. Unlike a borrowed-memory contract, this
+prototype snapshots the selected range before returning. That allows immediate source
+reuse and avoids retaining guest storage for a pending send, at an allocation/copy
+cost. The 64 KiB aggregate native buffer budget now covers both receive buffers and
+send snapshots. No throughput/allocation improvement is claimed. Borrowing/pinning
+remains a later alternative if a measured case warrants the extra ownership contract.
+
+A shared transfer registry checks socket ownership, signed ranges, byte array shape,
+callback shape and quotas before sending anything. It permits one pending transfer
+per direction per socket. A stalled receive does not stop its send, nor does a stalled
+send stop later ready operations. WouldBlock/Interrupted remain pending observations.
+Each operation completes after one successful native write, consuming only its
+reported prefix; unsent snapshot bytes are released, so callers resubmit the remainder.
+An empty send completes with zero on an open socket; zero native progress for nonempty
+data is IoFailure. Success is local acceptance, not a peer-delivery acknowledgement.
+
+Close/cancel before native completion settles outstanding transfers once, frees buffer
+budget and preserves the connection policy of the existing private cancellation path.
+Already committed outcomes are retained even if Close precedes callback execution.
+Callbacks remain traced roots. Send snapshots contain only host bytes; collection can
+reclaim the original array before completion. Completed results retain their operation
+slots until consumed. Private result/completion names are generalized from receive to
+transfer; the public Receive signature is unchanged. No runtime suspension, public
+scheduler or per-operation cancellation API is added.
+
+Validation includes a real TCP send-buffer pressure test that observes short writes,
+retains a blocked send until the peer drains, and verifies that received bytes equal
+exactly the sum of reported counts. Focused tests cover source mutation/collection,
+shared budgets, direction-specific Busy, simultaneous send/receive, invalid ranges,
+foreign handles, empty sends, cancellation/close and exactly-once outcomes. The Raven
+sample checks the full source/reference/importer/library/runtime chain, including
+collection while pending and early source reuse. These are local transport tests,
+not a benchmark or proof of every target platform's networking behavior.
+
+Author clarification, 2026-09-24: character/string encoding belongs in a later
+text/HTTP slice. Socket continues to transfer bytes. Exercise existing UTF-8
+conversion with non-ASCII text and characters split across reads; protocol framing
+must count encoded bytes rather than characters. Additional encoding contracts
+remain provisional until that case requires them.
+
+Validation on 2026-09-24: 35 focused backend, VM, scheduler and service tests pass.
+The compiled send/receive sample uses `await Foo()?`, reclaims all 1,380 allocated
+objects over 30 collections, and passes both negative visibility checks. The matching
+API snapshot and combined 555-page website build pass. Evidence is local macOS.

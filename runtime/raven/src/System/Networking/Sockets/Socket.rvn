@@ -21,8 +21,15 @@ public class Socket {
 
     func Receive(buffer: byte[], offset: int, count: int) -> Task<Result<int, SocketError>> {
         let source = Promise<Result<int, SocketError>>()
-        let completion = SocketReceiveCompletion(source)
-        completion.Start(handle, buffer, offset, count)
+        let completion = SocketTransferCompletion(source)
+        completion.StartReceive(handle, buffer, offset, count)
+        return source.Task
+    }
+
+    func Send(buffer: byte[], offset: int, count: int) -> Task<Result<int, SocketError>> {
+        let source = Promise<Result<int, SocketError>>()
+        let completion = SocketTransferCompletion(source)
+        completion.StartSend(handle, buffer, offset, count)
         return source.Task
     }
 
@@ -98,7 +105,7 @@ internal class SocketConnectCompletion {
     }
 }
 
-internal class SocketReceiveCompletion {
+internal class SocketTransferCompletion {
     private field source: Promise<Result<int, SocketError>>
     private field operation: long
 
@@ -107,7 +114,7 @@ internal class SocketReceiveCompletion {
         operation = 0
     }
 
-    internal func Start(handle: long, buffer: byte[], offset: int, count: int) {
+    internal func StartReceive(handle: long, buffer: byte[], offset: int, count: int) {
         _ = TaskQueue.Default
         let payload = RuntimeServices.SocketReceive(handle, buffer, offset, count, self.Complete)
         if RuntimeServices.IsValue<byte>(payload) {
@@ -117,8 +124,18 @@ internal class SocketReceiveCompletion {
         }
     }
 
+    internal func StartSend(handle: long, buffer: byte[], offset: int, count: int) {
+        _ = TaskQueue.Default
+        let payload = RuntimeServices.SocketSend(handle, buffer, offset, count, self.Complete)
+        if RuntimeServices.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        } else {
+            operation = RuntimeServices.UnpackValue<long>(payload)
+        }
+    }
+
     internal func Complete() {
-        let payload = RuntimeServices.SocketReceiveResult(operation)
+        let payload = RuntimeServices.SocketTransferResult(operation)
         if RuntimeServices.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {

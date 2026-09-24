@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add Socket.Send with Task/Result byte-count completion and bounded source snapshots.
+  Allow one pending send and one receive per connection, sharing transfer/operation
+  budgets; preserve short writes, pending backpressure and committed close outcomes.
+  Extend the Raven client to send and receive a real host echo, and refresh its API
+  reference. Private completion/result services change; rebuild matching artifacts.
+  DNS, listener/accept and HTTP remain pending. Record explicit character/string
+  encoding in the later HTTP path and adopt the current Raven `await Foo()?`
+  propagation syntax in the socket sample and conventions. Validate 35 focused
+  runtime tests, the compiled echo with 30 collections and zero live objects,
+  matching bootstrap/API snapshots and the combined 555-page website.
+
 - Refine the networking plan toward the HTTP demo: use Socket directly beneath a
   private byte-I/O boundary, bring host-backed DNS into near-term client work, and
   define bounded request/header/response and framing milestones. DNS, HTTP and TLS
