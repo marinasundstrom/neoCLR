@@ -947,3 +947,31 @@ The .NET baseline checks equivalent default output under its default culture.
 
 Validation: the Raven sample reclaims all 830 objects across 20 collections, with
 peak 64 and zero live objects. The API snapshot and combined website build pass.
+
+
+### Floating Object equality and hashes — 2026-09-24
+
+Boxed Single/Double now compare copied values only with the same concrete type. All
+NaNs of that type compare equal, including differing payload/sign bits; signed zeros
+compare equal. Operators still use IEEE comparison. This follows .NET 10
+[Single](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Single.cs)
+and [Double](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Double.cs)
+(reviewed 2026-09-24). Hashes normalize zero to zero and NaNs to the positive-infinity
+bit pattern, then use the Single bits or XOR Double halves. Infinity and NaN hash
+collisions are allowed; equality still distinguishes them. Hashes are not persistent.
+
+Using operator equality directly would make NaN keys unfindable with these Object
+callbacks. Comparing raw bits would split signed zero and NaN payloads. The selected
+Object-specific semantics support repeatable map lookup, at the cost of explicitly
+different operator/Object behavior that applications must understand. No floating
+formatting, typed methods, generic math interfaces, compiler policy or managed layout
+changes are introduced. Primitive dispatch remains a bounded interpreter intrinsic.
+
+Validation covers payload/sign variants, finite/subnormal values, infinities, zeros,
+exact-type rejection, separate box identity and unchanged NaN operator behavior. The
+[Raven sample](experiments/floating-object/README.md) demonstrates NaN/zero map keys
+and copied values under GC pressure; a .NET baseline compares equality and hashes.
+
+The Raven run reclaimed all 426 allocations across ten collections (peak 64, no
+live objects). Native checks, the .NET baseline and all eight Object display
+regressions passed; the API snapshot and 491-page combined website build passed.

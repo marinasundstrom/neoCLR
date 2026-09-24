@@ -1,0 +1,1 @@
+Floating Object keys, copied values and GC: passed

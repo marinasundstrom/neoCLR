@@ -79,7 +79,7 @@ are unchanged.
 String identity is deliberately unsupported: the current String/Object conversion
 creates wrappers instead of preserving an underlying String allocation. Identity
 calls on String payloads or their wrappers raise a terminal RuntimeError. Virtual
-boxed-value Equals/GetHashCode support Int32, Int64, Boolean and explicit named-struct overrides, described below.
+boxed-value Equals/GetHashCode support Int32, Int64, Boolean, Single, Double and explicit named-struct overrides, described below.
 ReferenceEquals can compare box identities, but does not supply boxed value equality.
 Null instance receivers raise NullReference; default Equals accepts a null argument
 and returns false. Static two-argument Object.Equals is not yet available.
@@ -148,6 +148,17 @@ compare unequal. Separate boxes retain separate identities. Hashes are not persi
 A boxed Boolean compares by its copied true/false value, only with another Boolean.
 Null and boxed integers (including 0 and 1) compare unequal. GetHashCode returns 1
 for true and 0 for false. Separate Boolean boxes retain distinct reference identities.
+
+Boxed Single and Double use exact-type value equality: Single never equals Double,
+even at the same magnitude. All NaNs of the same type compare equal; positive and
+negative zero compare equal. This follows .NET Object equality. Floating `==` still
+uses IEEE comparisons, so NaN is unequal to itself with that operator.
+
+Hashing normalizes signed zero and NaN payloads before hashing the bit pattern;
+Double XORs its upper/lower halves. NaN and positive infinity may share a hash but
+remain unequal. These rules allow explicit Object comparer callbacks to find NaN
+and signed-zero map keys reliably. Hashes are not persistent identifiers. Floating
+boxed ToString and source-declared typed Equals/GetHashCode remain outside this slice.
 
 These are bounded interpreter intrinsics for the System library's exact Object slots.
 It does not add typed primitive GetHashCode members, general struct equality, nullable
@@ -286,7 +297,7 @@ values. Explicitly authored operators retain their own contracts.
 Supported generic API signatures now admit Object, including `HashMap<Object, Object>`.
 Supply explicit callbacks: `(left, right) => left.Equals(right)` and
 `key => key.GetHashCode()`. Paths and type descriptors use their represented-value
-contracts; supported boxed Int32/Int64/Boolean values use exact-type value equality, while
+contracts; supported boxed Int32/Int64/Boolean/Single/Double values use exact-type value equality, while
 ordinary classes retain allocation identity. Equal keys must have equal hashes.
 
 The compiled sample checks duplicate keys, replacement, deliberate collisions,

@@ -183,7 +183,7 @@ fn other_boxed_virtual_value_equality_remains_explicitly_unsupported() {
         (format!("ldc.i4 42\nbox Int32\n{EQUALS}"), "Boolean"),
         (HASH.into(), "Int32"),
     ] {
-        assert!(run(&format!("ldc.r8 42\nbox Double\n{tail}"), "", returns, 8).is_err());
+        assert!(run(&format!("ldc.i4 42\nnewobj Unimplemented\nbox Unimplemented\n{tail}"), ".type Unimplemented\n.field Number Int32\n.end", returns, 8).is_err());
     }
 }
 
@@ -531,6 +531,46 @@ fn boxed_int64_copy_and_hash_survive_collection() {
     }
     body.push_str(&format!("ldloc boxed\n{HASH}\nldc.i4 0\nceq\nbrfalse failed\nldloc boxed\nunbox.any Int64\nldc.i8 4294967297\nceq\nret\nfailed:\nldc.bool false"));
     let result = run(&body, "", "Boolean", 8).unwrap();
+    assert_eq!(result.value, Value::Boolean(true));
+    assert!(result.heap.collections() > 0);
+    assert!(result.heap.is_empty());
+}
+
+#[test]
+fn floating_object_equality_and_hash_follow_exact_type_value_contracts() {
+    let mut body = ".local System.Object empty\nldloca empty\ninitobj System.Object\n".to_owned();
+    for (opcode, ty, nan_hash) in [
+        ("ldc.r4", "Single", 0x7f800000),
+        ("ldc.r8", "Double", 0x7ff00000),
+    ] {
+        for (left, right, equal) in [
+            ("NaN", "NaN", true),
+            ("0", "-0", true),
+            ("inf", "inf", true),
+            ("inf", "-inf", false),
+            ("NaN", "0", false),
+            ("1.5", "1.5", true),
+            ("1.5", "1.25", false),
+        ] {
+            let branch = if equal { "brfalse" } else { "brtrue" };
+            body.push_str(&format!(
+                "{opcode} {left}\nbox {ty}\n{opcode} {right}\nbox {ty}\n{EQUALS}\n{branch} failed\n"
+            ));
+        }
+        for (value, expected) in [("NaN", nan_hash), ("0", 0), ("-0", 0)] {
+            body.push_str(&format!(
+                "{opcode} {value}\nbox {ty}\n{HASH}\nldc.i4 {expected}\nceq\nbrfalse failed\n"
+            ));
+        }
+        for other in ["ldc.i4 1\nbox Int32", "ldloc empty"] {
+            body.push_str(&format!(
+                "{opcode} 1\nbox {ty}\n{other}\n{EQUALS}\nbrtrue failed\n"
+            ));
+        }
+        body.push_str(&format!("{opcode} 1\nbox {ty}\n{opcode} 1\nbox {ty}\n{IDENTITY}\nbrtrue failed\n{opcode} NaN\n{opcode} NaN\nceq\nbrtrue failed\n"));
+    }
+    body.push_str(&format!("ldc.r4 1\nbox Single\nldc.r8 1\nbox Double\n{EQUALS}\nbrtrue failed\nldc.bool true\nret\nfailed:\nldc.bool false"));
+    let result = run(&body, "", "Boolean", 12).unwrap();
     assert_eq!(result.value, Value::Boolean(true));
     assert!(result.heap.collections() > 0);
     assert!(result.heap.is_empty());

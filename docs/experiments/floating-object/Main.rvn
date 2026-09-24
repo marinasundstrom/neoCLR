@@ -1,0 +1,43 @@
+import System.*
+import System.Collections.*
+import System.Option.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+func Main() {
+    let nan = 0.0 / 0.0
+    var original = 1.5
+    let copied: Object = original
+    original = 9.0
+    let first: Object = nan
+    let repeated: Object = nan
+    let positiveZero: Object = 0.0
+    let negativeZero: Object = -0.0
+    let single: Object = 1.0f
+    let doubleValue: Object = 1.0
+    Check(first.Equals(repeated) && !Object.ReferenceEquals(first, repeated), "NaN value equality and box identity")
+    Check(!(nan == nan), "Floating operator still follows IEEE NaN comparison")
+    Check(positiveZero.Equals(negativeZero) && positiveZero.GetHashCode() == negativeZero.GetHashCode(), "Signed zero keys")
+    Check(!single.Equals(doubleValue) && !doubleValue.Equals(1) && !first.Equals(null), "Exact concrete types")
+    let values = HashMap<Object, int>((left, right) => left.Equals(right), key => key.GetHashCode())
+    Check(values.TryAdd(first, 1) && !values.TryAdd(repeated, 2), "Repeated NaN key")
+    Check(values.TryAdd(positiveZero, 3) && !values.TryAdd(negativeZero, 4), "Repeated zero key")
+    Check(values.TryAdd(single, 5) && values.TryAdd(doubleValue, 6), "Single and Double keys stay distinct")
+    var n = 0
+    while n < 400 {
+        let garbage: Object = 1.5
+        Check(garbage.Equals(copied), "Copied floating value")
+        n += 1
+    }
+    if let Some(value) = values.Find(nan) {
+        Check(value == 1 && values.Count == 4, "NaN lookup after collection")
+    } else {
+        System.Fault("NaN key lost")
+    }
+    Check(copied.Equals(1.5), "Copy survives collection")
+    Console.WriteLine("Floating Object keys, copied values and GC: passed")
+}

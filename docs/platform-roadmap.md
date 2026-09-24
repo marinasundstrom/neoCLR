@@ -744,7 +744,10 @@ now joins Int32 for exact-type Object equality and hashing, with a checked flag 
 Boxed Int64 now also has full-width exact-type equality and a .NET-compatible hash;
 the [Int64 sample](experiments/int64-object/README.md) checks colliding Object map keys
 and collection. Boxed Int32/Int64/Boolean now also provide bounded Object display:
-culture-independent decimal integers and True/False. Other primitive Object implementations and generic struct components
+culture-independent decimal integers and True/False. Boxed Single/Double now have
+exact-type Object equality and hashes consistent for NaNs and signed zero, with a
+[floating map sample](experiments/floating-object/README.md). Floating display remains open.
+Other primitive Object implementations and generic struct components
 remain follow-ups.
 Nullable value types and their boxing behavior are not part of the current scope. Default reference fields now have a checked record case:
 null is preserved even for non-nullable declarations, and generated equality/hash/display
@@ -823,3 +826,17 @@ application-enum and protected-constructor importer limitations exposed by the J
 not require a metadata redesign or block this next lifetime checkpoint. Reassess
 priorities at each checkpoint and M2 onward after the first major HTTP application
 milestone.
+
+
+### Later exploration: generic math interfaces — 2026-09-24
+
+The author suggests possible generic math support later; no implementation or release
+commitment is made. Compare .NET's [generic math interfaces](https://learn.microsoft.com/en-us/dotnet/standard/generics/math),
+including narrow operator/identity contracts and broader numeric hierarchies. A future
+slice should establish Raven static interface-member and runtime dispatch support,
+conversion/overflow policy, and floating special-value behavior before choosing a
+surface. Start with a comprehensible generic sum sample across integer and floating
+types; compare interface-based dispatch with today's concrete overloads. Interfaces
+could reduce overload duplication but add compiler/runtime and contract complexity.
+This remains after current primitive Object consistency work and does not reprioritize
+the active milestone.

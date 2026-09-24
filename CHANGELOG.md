@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add boxed Single/Double Object equality and hashing with .NET-compatible NaN and
+  signed-zero semantics. Preserve exact types, copied boxes and IEEE operators;
+  floating boxed display remains unsupported. Add native and Raven map/GC checks,
+  a .NET baseline and API documentation. Record generic math interfaces as a later
+  exploration, not an implemented API or release commitment.
+
 - Adapt the landing hero and inset code background to Light/Dark/Auto while
   preserving Raven syntax highlighting. Correct development async documentation
   and the executable sample to use `await input?`: await first, then propagate

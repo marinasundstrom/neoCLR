@@ -6188,3 +6188,15 @@ failure remains the next acceptance target.
   build or runtime release. The assistant selects a `[skip ci]` push followed by
   manual dispatch of `pages.yml`; that workflow has only site build/deploy jobs.
   Publication outcome is recorded by the GitHub Actions run.
+
+
+### 2026-09-24 — Generic math as a later exploration
+
+- **Author:** “We might also add support for generic math interfaces later”.
+- **Assistant response:** proposes recording this as exploration after consistent
+  numeric contracts, comparing .NET generic math rather than expanding the current
+  floating-point Object slice.
+- **Action:** adds a roadmap exploration with a generic sum sample, compiler/runtime
+  static-member questions and conversion/overflow/special-value validation needs.
+- **Open:** interface names, breadth, language/runtime support and scheduling are
+  undecided. No generic math API has been implemented or committed for a release.
