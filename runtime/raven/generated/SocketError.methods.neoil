@@ -2,707 +2,3223 @@
 .type System.Networking.Sockets.SocketError
 .sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
-.field private Stored Value
-.property instance IsClosed() -> Boolean
-.get instance System.Networking.Sockets.SocketError::get_IsClosed()
+.implements System.Runtime.CompilerServices.IUnion
+.field private Metadata_V1_3C5461673E Byte
+.field private Metadata_V1_3C436C6F7365645061796C6F61643E System.Networking.Sockets.SocketError.Closed
+.field private Metadata_V1_3C427573795061796C6F61643E System.Networking.Sockets.SocketError.Busy
+.field private Metadata_V1_3C496E76616C696452616E67655061796C6F61643E System.Networking.Sockets.SocketError.InvalidRange
+.field private Metadata_V1_3C4C696D697445786365656465645061796C6F61643E System.Networking.Sockets.SocketError.LimitExceeded
+.field private Metadata_V1_3C43616E63656C6C65645061796C6F61643E System.Networking.Sockets.SocketError.Cancelled
+.field private Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E System.Networking.Sockets.SocketError.InvalidAddress
+.field private Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E System.Networking.Sockets.SocketError.ConnectionRefused
+.field private Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E System.Networking.Sockets.SocketError.ConnectionReset
+.field private Metadata_V1_3C41636365737344656E6965645061796C6F61643E System.Networking.Sockets.SocketError.AccessDenied
+.field private Metadata_V1_3C54696D65644F75745061796C6F61643E System.Networking.Sockets.SocketError.TimedOut
+.field private Metadata_V1_3C496F4661696C7572655061796C6F61643E System.Networking.Sockets.SocketError.IoFailure
+.field private Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E System.Networking.Sockets.SocketError.InvalidOperation
+.field private Metadata_V1_3C41646472657373496E5573655061796C6F61643E System.Networking.Sockets.SocketError.AddressInUse
+.property instance Value() -> System.Object
+.get instance System.Networking.Sockets.SocketError::get_Value()
 .end
-.property instance IsBusy() -> Boolean
-.get instance System.Networking.Sockets.SocketError::get_IsBusy()
+.property instance HasValue() -> Boolean
+.get instance System.Networking.Sockets.SocketError::get_HasValue()
 .end
-.property instance IsInvalidRange() -> Boolean
-.get instance System.Networking.Sockets.SocketError::get_IsInvalidRange()
-.end
-.property instance IsLimitExceeded() -> Boolean
-.get instance System.Networking.Sockets.SocketError::get_IsLimitExceeded()
-.end
-.property instance IsCancelled() -> Boolean
-.get instance System.Networking.Sockets.SocketError::get_IsCancelled()
-.end
-.property instance IsInvalidAddress() -> Boolean
-.get instance System.Networking.Sockets.SocketError::get_IsInvalidAddress()
-.end
-.property instance IsConnectionRefused() -> Boolean
-.get instance System.Networking.Sockets.SocketError::get_IsConnectionRefused()
-.end
-.property instance IsConnectionReset() -> Boolean
-.get instance System.Networking.Sockets.SocketError::get_IsConnectionReset()
-.end
-.property instance IsAccessDenied() -> Boolean
-.get instance System.Networking.Sockets.SocketError::get_IsAccessDenied()
-.end
-.property instance IsTimedOut() -> Boolean
-.get instance System.Networking.Sockets.SocketError::get_IsTimedOut()
-.end
-.property instance IsIoFailure() -> Boolean
-.get instance System.Networking.Sockets.SocketError::get_IsIoFailure()
-.end
-.property instance IsInvalidOperation() -> Boolean
-.get instance System.Networking.Sockets.SocketError::get_IsInvalidOperation()
-.end
-.property instance IsAddressInUse() -> Boolean
-.get instance System.Networking.Sockets.SocketError::get_IsAddressInUse()
-.end
-.method instance .ctor(System.Networking.Sockets.SocketError.Closed value) -> Void
-ldarg value
-value.pack System.Networking.Sockets.SocketError.Closed
-newobj System.Networking.Sockets.SocketError
-starg this
-ldvoid
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000001_IL_0000:
+ldarg 0
+M00000001_IL_0001:
+M00000001_IL_0002:
+ref.isnull
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0004:
+brtrue M00000001_IL_000e
+M00000001_IL_0009:
+br M00000001_IL_0014
+M00000001_IL_000e:
+ldstr "null"
+M00000001_IL_0013:
+ret
+M00000001_IL_0014:
+M00000001_IL_0015:
+ldarg 0
+M00000001_IL_0016:
+isinst String
+M00000001_IL_001b:
+M00000001_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_001e:
+brtrue M00000001_IL_0028
+M00000001_IL_0023:
+br M00000001_IL_0043
+M00000001_IL_0028:
+ldstr "\u0022"
+M00000001_IL_002d:
+ldarg 0
+M00000001_IL_002e:
+castclass String
+M00000001_IL_0033:
+call System.String::Concat(String,String)
+M00000001_IL_0038:
+ldstr "\u0022"
+M00000001_IL_003d:
+call System.String::Concat(String,String)
+M00000001_IL_0042:
+ret
+M00000001_IL_0043:
+M00000001_IL_0044:
+ldarg 0
+M00000001_IL_0045:
+isinst Char
+M00000001_IL_004a:
+dup
+M00000001_IL_004b:
+ref.isnull
+brfalse M00000001_IL_0057
+M00000001_IL_0050:
+pop
+M00000001_IL_0051:
+ldc.i4 0
+M00000001_IL_0052:
+br M00000001_IL_005e
+M00000001_IL_0057:
+unbox.any Char
+M00000001_IL_005c:
+pop
+M00000001_IL_005d:
+ldc.i4 1
+M00000001_IL_005e:
+brtrue M00000001_IL_0068
+M00000001_IL_0063:
+br M00000001_IL_0083
+M00000001_IL_0068:
+ldstr "\u0027"
+M00000001_IL_006d:
+ldarg 0
+M00000001_IL_006e:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000001_IL_0073:
+call System.String::Concat(String,String)
+M00000001_IL_0078:
+ldstr "\u0027"
+M00000001_IL_007d:
+call System.String::Concat(String,String)
+M00000001_IL_0082:
+ret
+M00000001_IL_0083:
+M00000001_IL_0084:
+ldarg 0
+M00000001_IL_0085:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000001_IL_008a:
 ret
 .end
-.method instance get_IsClosed() -> Boolean
+.method instance byref .ctor(System.Networking.Sockets.SocketError.Closed value) -> Void
+.local Byte local0
+.local System.Networking.Sockets.SocketError.Closed local1
+.local Byte unionDefault1_0
+.local System.Networking.Sockets.SocketError.Closed unionDefault1_1
+.local System.Networking.Sockets.SocketError.Busy unionDefault1_2
+.local System.Networking.Sockets.SocketError.InvalidRange unionDefault1_3
+.local System.Networking.Sockets.SocketError.LimitExceeded unionDefault1_4
+.local System.Networking.Sockets.SocketError.Cancelled unionDefault1_5
+.local System.Networking.Sockets.SocketError.InvalidAddress unionDefault1_6
+.local System.Networking.Sockets.SocketError.ConnectionRefused unionDefault1_7
+.local System.Networking.Sockets.SocketError.ConnectionReset unionDefault1_8
+.local System.Networking.Sockets.SocketError.AccessDenied unionDefault1_9
+.local System.Networking.Sockets.SocketError.TimedOut unionDefault1_10
+.local System.Networking.Sockets.SocketError.IoFailure unionDefault1_11
+.local System.Networking.Sockets.SocketError.InvalidOperation unionDefault1_12
+.local System.Networking.Sockets.SocketError.AddressInUse unionDefault1_13
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Networking.Sockets.SocketError.Closed
 M00000002_IL_0000:
+ldarg 0
 M00000002_IL_0001:
-M00000002_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000002_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
+ldloc unionDefault1_0
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Networking.Sockets.SocketError.Closed
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Networking.Sockets.SocketError.Busy
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Networking.Sockets.SocketError.InvalidRange
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Networking.Sockets.SocketError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Networking.Sockets.SocketError.Cancelled
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Networking.Sockets.SocketError.InvalidAddress
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Networking.Sockets.SocketError.AccessDenied
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Networking.Sockets.SocketError.TimedOut
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_11
+initobj System.Networking.Sockets.SocketError.IoFailure
+ldarg 0
+ldloc unionDefault1_11
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+ldloca unionDefault1_12
+initobj System.Networking.Sockets.SocketError.InvalidOperation
+ldarg 0
+ldloc unionDefault1_12
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+pop
+ldloca unionDefault1_13
+initobj System.Networking.Sockets.SocketError.AddressInUse
+ldarg 0
+ldloc unionDefault1_13
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+pop
+M00000002_IL_0007:
+ldc.i4 1
 M00000002_IL_0008:
-value.is System.Networking.Sockets.SocketError.Closed
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000002_IL_000d:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+stloc local0
+M00000002_IL_0009:
+ldarg 0
+M00000002_IL_000a:
+ldloc local0
+M00000002_IL_000b:
+conv.u1
+M00000002_IL_000c:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+M00000002_IL_0011:
+ldarg 1
+M00000002_IL_0012:
+stloc local1
+M00000002_IL_0013:
+ldarg 0
+M00000002_IL_0014:
+ldloc local1
+M00000002_IL_0015:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+M00000002_IL_001a:
+ldvoid
 ret
 .end
-.method instance GetClosed() -> System.Networking.Sockets.SocketError.Closed
+.method instance byref TryGetValue(out(true) System.Networking.Sockets.SocketError.Closed& value) -> Boolean
 M00000003_IL_0000:
+ldarg 0
 M00000003_IL_0001:
-M00000003_IL_0002:
-ldarg 0
-M00000003_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M00000003_IL_0006:
+conv.i4
+M00000003_IL_0007:
+ldc.i4 1
 M00000003_IL_0008:
-value.unpack System.Networking.Sockets.SocketError.Closed
-M00000003_IL_000d:
+conv.i4
+M00000003_IL_0009:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_000b:
+brtrue M00000003_IL_0015
+M00000003_IL_0010:
+br M00000003_IL_0023
+M00000003_IL_0015:
+ldarg 1
+M00000003_IL_0016:
+ldarg 0
+M00000003_IL_0017:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+M00000003_IL_001c:
+stobj System.Networking.Sockets.SocketError.Closed
+M00000003_IL_0021:
+ldc.i4 1
+M00000003_IL_0022:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000003_IL_0023:
+M00000003_IL_0024:
+ldc.i4 0
+M00000003_IL_0025:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance .ctor(System.Networking.Sockets.SocketError.Busy value) -> Void
-ldarg value
-value.pack System.Networking.Sockets.SocketError.Busy
-newobj System.Networking.Sockets.SocketError
-starg this
+.method instance byref .ctor(System.Networking.Sockets.SocketError.Busy value) -> Void
+.local Byte local0
+.local System.Networking.Sockets.SocketError.Busy local1
+.local Byte unionDefault1_0
+.local System.Networking.Sockets.SocketError.Closed unionDefault1_1
+.local System.Networking.Sockets.SocketError.Busy unionDefault1_2
+.local System.Networking.Sockets.SocketError.InvalidRange unionDefault1_3
+.local System.Networking.Sockets.SocketError.LimitExceeded unionDefault1_4
+.local System.Networking.Sockets.SocketError.Cancelled unionDefault1_5
+.local System.Networking.Sockets.SocketError.InvalidAddress unionDefault1_6
+.local System.Networking.Sockets.SocketError.ConnectionRefused unionDefault1_7
+.local System.Networking.Sockets.SocketError.ConnectionReset unionDefault1_8
+.local System.Networking.Sockets.SocketError.AccessDenied unionDefault1_9
+.local System.Networking.Sockets.SocketError.TimedOut unionDefault1_10
+.local System.Networking.Sockets.SocketError.IoFailure unionDefault1_11
+.local System.Networking.Sockets.SocketError.InvalidOperation unionDefault1_12
+.local System.Networking.Sockets.SocketError.AddressInUse unionDefault1_13
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Networking.Sockets.SocketError.Busy
+M00000004_IL_0000:
+ldarg 0
+M00000004_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Networking.Sockets.SocketError.Closed
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Networking.Sockets.SocketError.Busy
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Networking.Sockets.SocketError.InvalidRange
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Networking.Sockets.SocketError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Networking.Sockets.SocketError.Cancelled
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Networking.Sockets.SocketError.InvalidAddress
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Networking.Sockets.SocketError.AccessDenied
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Networking.Sockets.SocketError.TimedOut
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_11
+initobj System.Networking.Sockets.SocketError.IoFailure
+ldarg 0
+ldloc unionDefault1_11
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+ldloca unionDefault1_12
+initobj System.Networking.Sockets.SocketError.InvalidOperation
+ldarg 0
+ldloc unionDefault1_12
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+pop
+ldloca unionDefault1_13
+initobj System.Networking.Sockets.SocketError.AddressInUse
+ldarg 0
+ldloc unionDefault1_13
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+pop
+M00000004_IL_0007:
+ldc.i4 2
+M00000004_IL_0008:
+stloc local0
+M00000004_IL_0009:
+ldarg 0
+M00000004_IL_000a:
+ldloc local0
+M00000004_IL_000b:
+conv.u1
+M00000004_IL_000c:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+M00000004_IL_0011:
+ldarg 1
+M00000004_IL_0012:
+stloc local1
+M00000004_IL_0013:
+ldarg 0
+M00000004_IL_0014:
+ldloc local1
+M00000004_IL_0015:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+pop
+M00000004_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsBusy() -> Boolean
+.method instance byref TryGetValue(out(true) System.Networking.Sockets.SocketError.Busy& value) -> Boolean
 M00000005_IL_0000:
+ldarg 0
 M00000005_IL_0001:
-M00000005_IL_0002:
-ldarg 0
-M00000005_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M00000005_IL_0006:
+conv.i4
+M00000005_IL_0007:
+ldc.i4 2
 M00000005_IL_0008:
-value.is System.Networking.Sockets.SocketError.Busy
+conv.i4
+M00000005_IL_0009:
+ceq
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_000d:
+M00000005_IL_000b:
+brtrue M00000005_IL_0015
+M00000005_IL_0010:
+br M00000005_IL_0023
+M00000005_IL_0015:
+ldarg 1
+M00000005_IL_0016:
+ldarg 0
+M00000005_IL_0017:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+M00000005_IL_001c:
+stobj System.Networking.Sockets.SocketError.Busy
+M00000005_IL_0021:
+ldc.i4 1
+M00000005_IL_0022:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000005_IL_0023:
+M00000005_IL_0024:
+ldc.i4 0
+M00000005_IL_0025:
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetBusy() -> System.Networking.Sockets.SocketError.Busy
+.method instance byref .ctor(System.Networking.Sockets.SocketError.InvalidRange value) -> Void
+.local Byte local0
+.local System.Networking.Sockets.SocketError.InvalidRange local1
+.local Byte unionDefault1_0
+.local System.Networking.Sockets.SocketError.Closed unionDefault1_1
+.local System.Networking.Sockets.SocketError.Busy unionDefault1_2
+.local System.Networking.Sockets.SocketError.InvalidRange unionDefault1_3
+.local System.Networking.Sockets.SocketError.LimitExceeded unionDefault1_4
+.local System.Networking.Sockets.SocketError.Cancelled unionDefault1_5
+.local System.Networking.Sockets.SocketError.InvalidAddress unionDefault1_6
+.local System.Networking.Sockets.SocketError.ConnectionRefused unionDefault1_7
+.local System.Networking.Sockets.SocketError.ConnectionReset unionDefault1_8
+.local System.Networking.Sockets.SocketError.AccessDenied unionDefault1_9
+.local System.Networking.Sockets.SocketError.TimedOut unionDefault1_10
+.local System.Networking.Sockets.SocketError.IoFailure unionDefault1_11
+.local System.Networking.Sockets.SocketError.InvalidOperation unionDefault1_12
+.local System.Networking.Sockets.SocketError.AddressInUse unionDefault1_13
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Networking.Sockets.SocketError.InvalidRange
 M00000006_IL_0000:
+ldarg 0
 M00000006_IL_0001:
-M00000006_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000006_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
+ldloc unionDefault1_0
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Networking.Sockets.SocketError.Closed
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Networking.Sockets.SocketError.Busy
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Networking.Sockets.SocketError.InvalidRange
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Networking.Sockets.SocketError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Networking.Sockets.SocketError.Cancelled
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Networking.Sockets.SocketError.InvalidAddress
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Networking.Sockets.SocketError.AccessDenied
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Networking.Sockets.SocketError.TimedOut
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_11
+initobj System.Networking.Sockets.SocketError.IoFailure
+ldarg 0
+ldloc unionDefault1_11
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+ldloca unionDefault1_12
+initobj System.Networking.Sockets.SocketError.InvalidOperation
+ldarg 0
+ldloc unionDefault1_12
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+pop
+ldloca unionDefault1_13
+initobj System.Networking.Sockets.SocketError.AddressInUse
+ldarg 0
+ldloc unionDefault1_13
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+pop
+M00000006_IL_0007:
+ldc.i4 3
 M00000006_IL_0008:
-value.unpack System.Networking.Sockets.SocketError.Busy
-M00000006_IL_000d:
-ret
-.end
-.method instance .ctor(System.Networking.Sockets.SocketError.InvalidRange value) -> Void
-ldarg value
-value.pack System.Networking.Sockets.SocketError.InvalidRange
-newobj System.Networking.Sockets.SocketError
-starg this
+stloc local0
+M00000006_IL_0009:
+ldarg 0
+M00000006_IL_000a:
+ldloc local0
+M00000006_IL_000b:
+conv.u1
+M00000006_IL_000c:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+M00000006_IL_0011:
+ldarg 1
+M00000006_IL_0012:
+stloc local1
+M00000006_IL_0013:
+ldarg 0
+M00000006_IL_0014:
+ldloc local1
+M00000006_IL_0015:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M00000006_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsInvalidRange() -> Boolean
+.method instance byref TryGetValue(out(true) System.Networking.Sockets.SocketError.InvalidRange& value) -> Boolean
+M00000007_IL_0000:
+ldarg 0
+M00000007_IL_0001:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M00000007_IL_0006:
+conv.i4
+M00000007_IL_0007:
+ldc.i4 3
+M00000007_IL_0008:
+conv.i4
+M00000007_IL_0009:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_000b:
+brtrue M00000007_IL_0015
+M00000007_IL_0010:
+br M00000007_IL_0023
+M00000007_IL_0015:
+ldarg 1
+M00000007_IL_0016:
+ldarg 0
+M00000007_IL_0017:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+M00000007_IL_001c:
+stobj System.Networking.Sockets.SocketError.InvalidRange
+M00000007_IL_0021:
+ldc.i4 1
+M00000007_IL_0022:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000007_IL_0023:
+M00000007_IL_0024:
+ldc.i4 0
+M00000007_IL_0025:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Networking.Sockets.SocketError.LimitExceeded value) -> Void
+.local Byte local0
+.local System.Networking.Sockets.SocketError.LimitExceeded local1
+.local Byte unionDefault1_0
+.local System.Networking.Sockets.SocketError.Closed unionDefault1_1
+.local System.Networking.Sockets.SocketError.Busy unionDefault1_2
+.local System.Networking.Sockets.SocketError.InvalidRange unionDefault1_3
+.local System.Networking.Sockets.SocketError.LimitExceeded unionDefault1_4
+.local System.Networking.Sockets.SocketError.Cancelled unionDefault1_5
+.local System.Networking.Sockets.SocketError.InvalidAddress unionDefault1_6
+.local System.Networking.Sockets.SocketError.ConnectionRefused unionDefault1_7
+.local System.Networking.Sockets.SocketError.ConnectionReset unionDefault1_8
+.local System.Networking.Sockets.SocketError.AccessDenied unionDefault1_9
+.local System.Networking.Sockets.SocketError.TimedOut unionDefault1_10
+.local System.Networking.Sockets.SocketError.IoFailure unionDefault1_11
+.local System.Networking.Sockets.SocketError.InvalidOperation unionDefault1_12
+.local System.Networking.Sockets.SocketError.AddressInUse unionDefault1_13
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Networking.Sockets.SocketError.LimitExceeded
 M00000008_IL_0000:
+ldarg 0
 M00000008_IL_0001:
-M00000008_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000008_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
+ldloc unionDefault1_0
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Networking.Sockets.SocketError.Closed
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Networking.Sockets.SocketError.Busy
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Networking.Sockets.SocketError.InvalidRange
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Networking.Sockets.SocketError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Networking.Sockets.SocketError.Cancelled
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Networking.Sockets.SocketError.InvalidAddress
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Networking.Sockets.SocketError.AccessDenied
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Networking.Sockets.SocketError.TimedOut
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_11
+initobj System.Networking.Sockets.SocketError.IoFailure
+ldarg 0
+ldloc unionDefault1_11
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+ldloca unionDefault1_12
+initobj System.Networking.Sockets.SocketError.InvalidOperation
+ldarg 0
+ldloc unionDefault1_12
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+pop
+ldloca unionDefault1_13
+initobj System.Networking.Sockets.SocketError.AddressInUse
+ldarg 0
+ldloc unionDefault1_13
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+pop
+M00000008_IL_0007:
+ldc.i4 4
 M00000008_IL_0008:
-value.is System.Networking.Sockets.SocketError.InvalidRange
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000008_IL_000d:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+stloc local0
+M00000008_IL_0009:
+ldarg 0
+M00000008_IL_000a:
+ldloc local0
+M00000008_IL_000b:
+conv.u1
+M00000008_IL_000c:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+M00000008_IL_0011:
+ldarg 1
+M00000008_IL_0012:
+stloc local1
+M00000008_IL_0013:
+ldarg 0
+M00000008_IL_0014:
+ldloc local1
+M00000008_IL_0015:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000008_IL_001a:
+ldvoid
 ret
 .end
-.method instance GetInvalidRange() -> System.Networking.Sockets.SocketError.InvalidRange
+.method instance byref TryGetValue(out(true) System.Networking.Sockets.SocketError.LimitExceeded& value) -> Boolean
 M00000009_IL_0000:
+ldarg 0
 M00000009_IL_0001:
-M00000009_IL_0002:
-ldarg 0
-M00000009_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M00000009_IL_0006:
+conv.i4
+M00000009_IL_0007:
+ldc.i4 4
 M00000009_IL_0008:
-value.unpack System.Networking.Sockets.SocketError.InvalidRange
-M00000009_IL_000d:
+conv.i4
+M00000009_IL_0009:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_000b:
+brtrue M00000009_IL_0015
+M00000009_IL_0010:
+br M00000009_IL_0023
+M00000009_IL_0015:
+ldarg 1
+M00000009_IL_0016:
+ldarg 0
+M00000009_IL_0017:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+M00000009_IL_001c:
+stobj System.Networking.Sockets.SocketError.LimitExceeded
+M00000009_IL_0021:
+ldc.i4 1
+M00000009_IL_0022:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000009_IL_0023:
+M00000009_IL_0024:
+ldc.i4 0
+M00000009_IL_0025:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance .ctor(System.Networking.Sockets.SocketError.LimitExceeded value) -> Void
-ldarg value
-value.pack System.Networking.Sockets.SocketError.LimitExceeded
-newobj System.Networking.Sockets.SocketError
-starg this
+.method instance byref .ctor(System.Networking.Sockets.SocketError.Cancelled value) -> Void
+.local Byte local0
+.local System.Networking.Sockets.SocketError.Cancelled local1
+.local Byte unionDefault1_0
+.local System.Networking.Sockets.SocketError.Closed unionDefault1_1
+.local System.Networking.Sockets.SocketError.Busy unionDefault1_2
+.local System.Networking.Sockets.SocketError.InvalidRange unionDefault1_3
+.local System.Networking.Sockets.SocketError.LimitExceeded unionDefault1_4
+.local System.Networking.Sockets.SocketError.Cancelled unionDefault1_5
+.local System.Networking.Sockets.SocketError.InvalidAddress unionDefault1_6
+.local System.Networking.Sockets.SocketError.ConnectionRefused unionDefault1_7
+.local System.Networking.Sockets.SocketError.ConnectionReset unionDefault1_8
+.local System.Networking.Sockets.SocketError.AccessDenied unionDefault1_9
+.local System.Networking.Sockets.SocketError.TimedOut unionDefault1_10
+.local System.Networking.Sockets.SocketError.IoFailure unionDefault1_11
+.local System.Networking.Sockets.SocketError.InvalidOperation unionDefault1_12
+.local System.Networking.Sockets.SocketError.AddressInUse unionDefault1_13
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Networking.Sockets.SocketError.Cancelled
+M0000000a_IL_0000:
+ldarg 0
+M0000000a_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Networking.Sockets.SocketError.Closed
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Networking.Sockets.SocketError.Busy
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Networking.Sockets.SocketError.InvalidRange
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Networking.Sockets.SocketError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Networking.Sockets.SocketError.Cancelled
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Networking.Sockets.SocketError.InvalidAddress
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Networking.Sockets.SocketError.AccessDenied
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Networking.Sockets.SocketError.TimedOut
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_11
+initobj System.Networking.Sockets.SocketError.IoFailure
+ldarg 0
+ldloc unionDefault1_11
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+ldloca unionDefault1_12
+initobj System.Networking.Sockets.SocketError.InvalidOperation
+ldarg 0
+ldloc unionDefault1_12
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+pop
+ldloca unionDefault1_13
+initobj System.Networking.Sockets.SocketError.AddressInUse
+ldarg 0
+ldloc unionDefault1_13
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+pop
+M0000000a_IL_0007:
+ldc.i4 5
+M0000000a_IL_0008:
+stloc local0
+M0000000a_IL_0009:
+ldarg 0
+M0000000a_IL_000a:
+ldloc local0
+M0000000a_IL_000b:
+conv.u1
+M0000000a_IL_000c:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+M0000000a_IL_0011:
+ldarg 1
+M0000000a_IL_0012:
+stloc local1
+M0000000a_IL_0013:
+ldarg 0
+M0000000a_IL_0014:
+ldloc local1
+M0000000a_IL_0015:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+M0000000a_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsLimitExceeded() -> Boolean
+.method instance byref TryGetValue(out(true) System.Networking.Sockets.SocketError.Cancelled& value) -> Boolean
 M0000000b_IL_0000:
+ldarg 0
 M0000000b_IL_0001:
-M0000000b_IL_0002:
-ldarg 0
-M0000000b_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000000b_IL_0006:
+conv.i4
+M0000000b_IL_0007:
+ldc.i4 5
 M0000000b_IL_0008:
-value.is System.Networking.Sockets.SocketError.LimitExceeded
+conv.i4
+M0000000b_IL_0009:
+ceq
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M0000000b_IL_000d:
+M0000000b_IL_000b:
+brtrue M0000000b_IL_0015
+M0000000b_IL_0010:
+br M0000000b_IL_0023
+M0000000b_IL_0015:
+ldarg 1
+M0000000b_IL_0016:
+ldarg 0
+M0000000b_IL_0017:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+M0000000b_IL_001c:
+stobj System.Networking.Sockets.SocketError.Cancelled
+M0000000b_IL_0021:
+ldc.i4 1
+M0000000b_IL_0022:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000b_IL_0023:
+M0000000b_IL_0024:
+ldc.i4 0
+M0000000b_IL_0025:
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetLimitExceeded() -> System.Networking.Sockets.SocketError.LimitExceeded
+.method instance byref .ctor(System.Networking.Sockets.SocketError.InvalidAddress value) -> Void
+.local Byte local0
+.local System.Networking.Sockets.SocketError.InvalidAddress local1
+.local Byte unionDefault1_0
+.local System.Networking.Sockets.SocketError.Closed unionDefault1_1
+.local System.Networking.Sockets.SocketError.Busy unionDefault1_2
+.local System.Networking.Sockets.SocketError.InvalidRange unionDefault1_3
+.local System.Networking.Sockets.SocketError.LimitExceeded unionDefault1_4
+.local System.Networking.Sockets.SocketError.Cancelled unionDefault1_5
+.local System.Networking.Sockets.SocketError.InvalidAddress unionDefault1_6
+.local System.Networking.Sockets.SocketError.ConnectionRefused unionDefault1_7
+.local System.Networking.Sockets.SocketError.ConnectionReset unionDefault1_8
+.local System.Networking.Sockets.SocketError.AccessDenied unionDefault1_9
+.local System.Networking.Sockets.SocketError.TimedOut unionDefault1_10
+.local System.Networking.Sockets.SocketError.IoFailure unionDefault1_11
+.local System.Networking.Sockets.SocketError.InvalidOperation unionDefault1_12
+.local System.Networking.Sockets.SocketError.AddressInUse unionDefault1_13
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Networking.Sockets.SocketError.InvalidAddress
 M0000000c_IL_0000:
+ldarg 0
 M0000000c_IL_0001:
-M0000000c_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M0000000c_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
+ldloc unionDefault1_0
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Networking.Sockets.SocketError.Closed
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Networking.Sockets.SocketError.Busy
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Networking.Sockets.SocketError.InvalidRange
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Networking.Sockets.SocketError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Networking.Sockets.SocketError.Cancelled
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Networking.Sockets.SocketError.InvalidAddress
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Networking.Sockets.SocketError.AccessDenied
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Networking.Sockets.SocketError.TimedOut
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_11
+initobj System.Networking.Sockets.SocketError.IoFailure
+ldarg 0
+ldloc unionDefault1_11
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+ldloca unionDefault1_12
+initobj System.Networking.Sockets.SocketError.InvalidOperation
+ldarg 0
+ldloc unionDefault1_12
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+pop
+ldloca unionDefault1_13
+initobj System.Networking.Sockets.SocketError.AddressInUse
+ldarg 0
+ldloc unionDefault1_13
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+pop
+M0000000c_IL_0007:
+ldc.i4 6
 M0000000c_IL_0008:
-value.unpack System.Networking.Sockets.SocketError.LimitExceeded
-M0000000c_IL_000d:
-ret
-.end
-.method instance .ctor(System.Networking.Sockets.SocketError.Cancelled value) -> Void
-ldarg value
-value.pack System.Networking.Sockets.SocketError.Cancelled
-newobj System.Networking.Sockets.SocketError
-starg this
+stloc local0
+M0000000c_IL_0009:
+ldarg 0
+M0000000c_IL_000a:
+ldloc local0
+M0000000c_IL_000b:
+conv.u1
+M0000000c_IL_000c:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+M0000000c_IL_0011:
+ldarg 1
+M0000000c_IL_0012:
+stloc local1
+M0000000c_IL_0013:
+ldarg 0
+M0000000c_IL_0014:
+ldloc local1
+M0000000c_IL_0015:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+pop
+M0000000c_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsCancelled() -> Boolean
+.method instance byref TryGetValue(out(true) System.Networking.Sockets.SocketError.InvalidAddress& value) -> Boolean
+M0000000d_IL_0000:
+ldarg 0
+M0000000d_IL_0001:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000000d_IL_0006:
+conv.i4
+M0000000d_IL_0007:
+ldc.i4 6
+M0000000d_IL_0008:
+conv.i4
+M0000000d_IL_0009:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_000b:
+brtrue M0000000d_IL_0015
+M0000000d_IL_0010:
+br M0000000d_IL_0023
+M0000000d_IL_0015:
+ldarg 1
+M0000000d_IL_0016:
+ldarg 0
+M0000000d_IL_0017:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+M0000000d_IL_001c:
+stobj System.Networking.Sockets.SocketError.InvalidAddress
+M0000000d_IL_0021:
+ldc.i4 1
+M0000000d_IL_0022:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000d_IL_0023:
+M0000000d_IL_0024:
+ldc.i4 0
+M0000000d_IL_0025:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Networking.Sockets.SocketError.ConnectionRefused value) -> Void
+.local Byte local0
+.local System.Networking.Sockets.SocketError.ConnectionRefused local1
+.local Byte unionDefault1_0
+.local System.Networking.Sockets.SocketError.Closed unionDefault1_1
+.local System.Networking.Sockets.SocketError.Busy unionDefault1_2
+.local System.Networking.Sockets.SocketError.InvalidRange unionDefault1_3
+.local System.Networking.Sockets.SocketError.LimitExceeded unionDefault1_4
+.local System.Networking.Sockets.SocketError.Cancelled unionDefault1_5
+.local System.Networking.Sockets.SocketError.InvalidAddress unionDefault1_6
+.local System.Networking.Sockets.SocketError.ConnectionRefused unionDefault1_7
+.local System.Networking.Sockets.SocketError.ConnectionReset unionDefault1_8
+.local System.Networking.Sockets.SocketError.AccessDenied unionDefault1_9
+.local System.Networking.Sockets.SocketError.TimedOut unionDefault1_10
+.local System.Networking.Sockets.SocketError.IoFailure unionDefault1_11
+.local System.Networking.Sockets.SocketError.InvalidOperation unionDefault1_12
+.local System.Networking.Sockets.SocketError.AddressInUse unionDefault1_13
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
 M0000000e_IL_0000:
+ldarg 0
 M0000000e_IL_0001:
-M0000000e_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M0000000e_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
+ldloc unionDefault1_0
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Networking.Sockets.SocketError.Closed
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Networking.Sockets.SocketError.Busy
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Networking.Sockets.SocketError.InvalidRange
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Networking.Sockets.SocketError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Networking.Sockets.SocketError.Cancelled
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Networking.Sockets.SocketError.InvalidAddress
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Networking.Sockets.SocketError.AccessDenied
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Networking.Sockets.SocketError.TimedOut
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_11
+initobj System.Networking.Sockets.SocketError.IoFailure
+ldarg 0
+ldloc unionDefault1_11
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+ldloca unionDefault1_12
+initobj System.Networking.Sockets.SocketError.InvalidOperation
+ldarg 0
+ldloc unionDefault1_12
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+pop
+ldloca unionDefault1_13
+initobj System.Networking.Sockets.SocketError.AddressInUse
+ldarg 0
+ldloc unionDefault1_13
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+pop
+M0000000e_IL_0007:
+ldc.i4 7
 M0000000e_IL_0008:
-value.is System.Networking.Sockets.SocketError.Cancelled
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M0000000e_IL_000d:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+stloc local0
+M0000000e_IL_0009:
+ldarg 0
+M0000000e_IL_000a:
+ldloc local0
+M0000000e_IL_000b:
+conv.u1
+M0000000e_IL_000c:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+M0000000e_IL_0011:
+ldarg 1
+M0000000e_IL_0012:
+stloc local1
+M0000000e_IL_0013:
+ldarg 0
+M0000000e_IL_0014:
+ldloc local1
+M0000000e_IL_0015:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+pop
+M0000000e_IL_001a:
+ldvoid
 ret
 .end
-.method instance GetCancelled() -> System.Networking.Sockets.SocketError.Cancelled
+.method instance byref TryGetValue(out(true) System.Networking.Sockets.SocketError.ConnectionRefused& value) -> Boolean
 M0000000f_IL_0000:
+ldarg 0
 M0000000f_IL_0001:
-M0000000f_IL_0002:
-ldarg 0
-M0000000f_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000000f_IL_0006:
+conv.i4
+M0000000f_IL_0007:
+ldc.i4 7
 M0000000f_IL_0008:
-value.unpack System.Networking.Sockets.SocketError.Cancelled
-M0000000f_IL_000d:
+conv.i4
+M0000000f_IL_0009:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_000b:
+brtrue M0000000f_IL_0015
+M0000000f_IL_0010:
+br M0000000f_IL_0023
+M0000000f_IL_0015:
+ldarg 1
+M0000000f_IL_0016:
+ldarg 0
+M0000000f_IL_0017:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+M0000000f_IL_001c:
+stobj System.Networking.Sockets.SocketError.ConnectionRefused
+M0000000f_IL_0021:
+ldc.i4 1
+M0000000f_IL_0022:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000f_IL_0023:
+M0000000f_IL_0024:
+ldc.i4 0
+M0000000f_IL_0025:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance .ctor(System.Networking.Sockets.SocketError.InvalidAddress value) -> Void
-ldarg value
-value.pack System.Networking.Sockets.SocketError.InvalidAddress
-newobj System.Networking.Sockets.SocketError
-starg this
+.method instance byref .ctor(System.Networking.Sockets.SocketError.ConnectionReset value) -> Void
+.local Byte local0
+.local System.Networking.Sockets.SocketError.ConnectionReset local1
+.local Byte unionDefault1_0
+.local System.Networking.Sockets.SocketError.Closed unionDefault1_1
+.local System.Networking.Sockets.SocketError.Busy unionDefault1_2
+.local System.Networking.Sockets.SocketError.InvalidRange unionDefault1_3
+.local System.Networking.Sockets.SocketError.LimitExceeded unionDefault1_4
+.local System.Networking.Sockets.SocketError.Cancelled unionDefault1_5
+.local System.Networking.Sockets.SocketError.InvalidAddress unionDefault1_6
+.local System.Networking.Sockets.SocketError.ConnectionRefused unionDefault1_7
+.local System.Networking.Sockets.SocketError.ConnectionReset unionDefault1_8
+.local System.Networking.Sockets.SocketError.AccessDenied unionDefault1_9
+.local System.Networking.Sockets.SocketError.TimedOut unionDefault1_10
+.local System.Networking.Sockets.SocketError.IoFailure unionDefault1_11
+.local System.Networking.Sockets.SocketError.InvalidOperation unionDefault1_12
+.local System.Networking.Sockets.SocketError.AddressInUse unionDefault1_13
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+M00000010_IL_0000:
+ldarg 0
+M00000010_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Networking.Sockets.SocketError.Closed
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Networking.Sockets.SocketError.Busy
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Networking.Sockets.SocketError.InvalidRange
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Networking.Sockets.SocketError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Networking.Sockets.SocketError.Cancelled
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Networking.Sockets.SocketError.InvalidAddress
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Networking.Sockets.SocketError.AccessDenied
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Networking.Sockets.SocketError.TimedOut
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_11
+initobj System.Networking.Sockets.SocketError.IoFailure
+ldarg 0
+ldloc unionDefault1_11
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+ldloca unionDefault1_12
+initobj System.Networking.Sockets.SocketError.InvalidOperation
+ldarg 0
+ldloc unionDefault1_12
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+pop
+ldloca unionDefault1_13
+initobj System.Networking.Sockets.SocketError.AddressInUse
+ldarg 0
+ldloc unionDefault1_13
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+pop
+M00000010_IL_0007:
+ldc.i4 8
+M00000010_IL_0008:
+stloc local0
+M00000010_IL_0009:
+ldarg 0
+M00000010_IL_000a:
+ldloc local0
+M00000010_IL_000b:
+conv.u1
+M00000010_IL_000c:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+M00000010_IL_0011:
+ldarg 1
+M00000010_IL_0012:
+stloc local1
+M00000010_IL_0013:
+ldarg 0
+M00000010_IL_0014:
+ldloc local1
+M00000010_IL_0015:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+pop
+M00000010_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsInvalidAddress() -> Boolean
+.method instance byref TryGetValue(out(true) System.Networking.Sockets.SocketError.ConnectionReset& value) -> Boolean
 M00000011_IL_0000:
+ldarg 0
 M00000011_IL_0001:
-M00000011_IL_0002:
-ldarg 0
-M00000011_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M00000011_IL_0006:
+conv.i4
+M00000011_IL_0007:
+ldc.i4 8
 M00000011_IL_0008:
-value.is System.Networking.Sockets.SocketError.InvalidAddress
+conv.i4
+M00000011_IL_0009:
+ceq
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000011_IL_000d:
+M00000011_IL_000b:
+brtrue M00000011_IL_0015
+M00000011_IL_0010:
+br M00000011_IL_0023
+M00000011_IL_0015:
+ldarg 1
+M00000011_IL_0016:
+ldarg 0
+M00000011_IL_0017:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+M00000011_IL_001c:
+stobj System.Networking.Sockets.SocketError.ConnectionReset
+M00000011_IL_0021:
+ldc.i4 1
+M00000011_IL_0022:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000011_IL_0023:
+M00000011_IL_0024:
+ldc.i4 0
+M00000011_IL_0025:
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetInvalidAddress() -> System.Networking.Sockets.SocketError.InvalidAddress
+.method instance byref .ctor(System.Networking.Sockets.SocketError.AccessDenied value) -> Void
+.local Byte local0
+.local System.Networking.Sockets.SocketError.AccessDenied local1
+.local Byte unionDefault1_0
+.local System.Networking.Sockets.SocketError.Closed unionDefault1_1
+.local System.Networking.Sockets.SocketError.Busy unionDefault1_2
+.local System.Networking.Sockets.SocketError.InvalidRange unionDefault1_3
+.local System.Networking.Sockets.SocketError.LimitExceeded unionDefault1_4
+.local System.Networking.Sockets.SocketError.Cancelled unionDefault1_5
+.local System.Networking.Sockets.SocketError.InvalidAddress unionDefault1_6
+.local System.Networking.Sockets.SocketError.ConnectionRefused unionDefault1_7
+.local System.Networking.Sockets.SocketError.ConnectionReset unionDefault1_8
+.local System.Networking.Sockets.SocketError.AccessDenied unionDefault1_9
+.local System.Networking.Sockets.SocketError.TimedOut unionDefault1_10
+.local System.Networking.Sockets.SocketError.IoFailure unionDefault1_11
+.local System.Networking.Sockets.SocketError.InvalidOperation unionDefault1_12
+.local System.Networking.Sockets.SocketError.AddressInUse unionDefault1_13
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Networking.Sockets.SocketError.AccessDenied
 M00000012_IL_0000:
+ldarg 0
 M00000012_IL_0001:
-M00000012_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000012_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
-M00000012_IL_0008:
-value.unpack System.Networking.Sockets.SocketError.InvalidAddress
+ldloc unionDefault1_0
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Networking.Sockets.SocketError.Closed
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Networking.Sockets.SocketError.Busy
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Networking.Sockets.SocketError.InvalidRange
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Networking.Sockets.SocketError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Networking.Sockets.SocketError.Cancelled
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Networking.Sockets.SocketError.InvalidAddress
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Networking.Sockets.SocketError.AccessDenied
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Networking.Sockets.SocketError.TimedOut
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_11
+initobj System.Networking.Sockets.SocketError.IoFailure
+ldarg 0
+ldloc unionDefault1_11
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+ldloca unionDefault1_12
+initobj System.Networking.Sockets.SocketError.InvalidOperation
+ldarg 0
+ldloc unionDefault1_12
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+pop
+ldloca unionDefault1_13
+initobj System.Networking.Sockets.SocketError.AddressInUse
+ldarg 0
+ldloc unionDefault1_13
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+pop
+M00000012_IL_0007:
+ldc.i4 9
+M00000012_IL_0009:
+stloc local0
+M00000012_IL_000a:
+ldarg 0
+M00000012_IL_000b:
+ldloc local0
+M00000012_IL_000c:
+conv.u1
 M00000012_IL_000d:
-ret
-.end
-.method instance .ctor(System.Networking.Sockets.SocketError.ConnectionRefused value) -> Void
-ldarg value
-value.pack System.Networking.Sockets.SocketError.ConnectionRefused
-newobj System.Networking.Sockets.SocketError
-starg this
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+M00000012_IL_0012:
+ldarg 1
+M00000012_IL_0013:
+stloc local1
+M00000012_IL_0014:
+ldarg 0
+M00000012_IL_0015:
+ldloc local1
+M00000012_IL_0016:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000012_IL_001b:
 ldvoid
 ret
 .end
-.method instance get_IsConnectionRefused() -> Boolean
+.method instance byref TryGetValue(out(true) System.Networking.Sockets.SocketError.AccessDenied& value) -> Boolean
+M00000013_IL_0000:
+ldarg 0
+M00000013_IL_0001:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M00000013_IL_0006:
+conv.i4
+M00000013_IL_0007:
+ldc.i4 9
+M00000013_IL_0009:
+conv.i4
+M00000013_IL_000a:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_000c:
+brtrue M00000013_IL_0016
+M00000013_IL_0011:
+br M00000013_IL_0024
+M00000013_IL_0016:
+ldarg 1
+M00000013_IL_0017:
+ldarg 0
+M00000013_IL_0018:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+M00000013_IL_001d:
+stobj System.Networking.Sockets.SocketError.AccessDenied
+M00000013_IL_0022:
+ldc.i4 1
+M00000013_IL_0023:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000013_IL_0024:
+M00000013_IL_0025:
+ldc.i4 0
+M00000013_IL_0026:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Networking.Sockets.SocketError.TimedOut value) -> Void
+.local Byte local0
+.local System.Networking.Sockets.SocketError.TimedOut local1
+.local Byte unionDefault1_0
+.local System.Networking.Sockets.SocketError.Closed unionDefault1_1
+.local System.Networking.Sockets.SocketError.Busy unionDefault1_2
+.local System.Networking.Sockets.SocketError.InvalidRange unionDefault1_3
+.local System.Networking.Sockets.SocketError.LimitExceeded unionDefault1_4
+.local System.Networking.Sockets.SocketError.Cancelled unionDefault1_5
+.local System.Networking.Sockets.SocketError.InvalidAddress unionDefault1_6
+.local System.Networking.Sockets.SocketError.ConnectionRefused unionDefault1_7
+.local System.Networking.Sockets.SocketError.ConnectionReset unionDefault1_8
+.local System.Networking.Sockets.SocketError.AccessDenied unionDefault1_9
+.local System.Networking.Sockets.SocketError.TimedOut unionDefault1_10
+.local System.Networking.Sockets.SocketError.IoFailure unionDefault1_11
+.local System.Networking.Sockets.SocketError.InvalidOperation unionDefault1_12
+.local System.Networking.Sockets.SocketError.AddressInUse unionDefault1_13
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Networking.Sockets.SocketError.TimedOut
 M00000014_IL_0000:
+ldarg 0
 M00000014_IL_0001:
-M00000014_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000014_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
-M00000014_IL_0008:
-value.is System.Networking.Sockets.SocketError.ConnectionRefused
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+ldloc unionDefault1_0
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Networking.Sockets.SocketError.Closed
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Networking.Sockets.SocketError.Busy
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Networking.Sockets.SocketError.InvalidRange
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Networking.Sockets.SocketError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Networking.Sockets.SocketError.Cancelled
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Networking.Sockets.SocketError.InvalidAddress
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Networking.Sockets.SocketError.AccessDenied
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Networking.Sockets.SocketError.TimedOut
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_11
+initobj System.Networking.Sockets.SocketError.IoFailure
+ldarg 0
+ldloc unionDefault1_11
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+ldloca unionDefault1_12
+initobj System.Networking.Sockets.SocketError.InvalidOperation
+ldarg 0
+ldloc unionDefault1_12
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+pop
+ldloca unionDefault1_13
+initobj System.Networking.Sockets.SocketError.AddressInUse
+ldarg 0
+ldloc unionDefault1_13
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+pop
+M00000014_IL_0007:
+ldc.i4 10
+M00000014_IL_0009:
+stloc local0
+M00000014_IL_000a:
+ldarg 0
+M00000014_IL_000b:
+ldloc local0
+M00000014_IL_000c:
+conv.u1
 M00000014_IL_000d:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+M00000014_IL_0012:
+ldarg 1
+M00000014_IL_0013:
+stloc local1
+M00000014_IL_0014:
+ldarg 0
+M00000014_IL_0015:
+ldloc local1
+M00000014_IL_0016:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+M00000014_IL_001b:
+ldvoid
 ret
 .end
-.method instance GetConnectionRefused() -> System.Networking.Sockets.SocketError.ConnectionRefused
+.method instance byref TryGetValue(out(true) System.Networking.Sockets.SocketError.TimedOut& value) -> Boolean
 M00000015_IL_0000:
+ldarg 0
 M00000015_IL_0001:
-M00000015_IL_0002:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M00000015_IL_0006:
+conv.i4
+M00000015_IL_0007:
+ldc.i4 10
+M00000015_IL_0009:
+conv.i4
+M00000015_IL_000a:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M00000015_IL_000c:
+brtrue M00000015_IL_0016
+M00000015_IL_0011:
+br M00000015_IL_0024
+M00000015_IL_0016:
+ldarg 1
+M00000015_IL_0017:
 ldarg 0
-M00000015_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
-M00000015_IL_0008:
-value.unpack System.Networking.Sockets.SocketError.ConnectionRefused
-M00000015_IL_000d:
+M00000015_IL_0018:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+M00000015_IL_001d:
+stobj System.Networking.Sockets.SocketError.TimedOut
+M00000015_IL_0022:
+ldc.i4 1
+M00000015_IL_0023:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000015_IL_0024:
+M00000015_IL_0025:
+ldc.i4 0
+M00000015_IL_0026:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance .ctor(System.Networking.Sockets.SocketError.ConnectionReset value) -> Void
-ldarg value
-value.pack System.Networking.Sockets.SocketError.ConnectionReset
-newobj System.Networking.Sockets.SocketError
-starg this
+.method instance byref .ctor(System.Networking.Sockets.SocketError.IoFailure value) -> Void
+.local Byte local0
+.local System.Networking.Sockets.SocketError.IoFailure local1
+.local Byte unionDefault1_0
+.local System.Networking.Sockets.SocketError.Closed unionDefault1_1
+.local System.Networking.Sockets.SocketError.Busy unionDefault1_2
+.local System.Networking.Sockets.SocketError.InvalidRange unionDefault1_3
+.local System.Networking.Sockets.SocketError.LimitExceeded unionDefault1_4
+.local System.Networking.Sockets.SocketError.Cancelled unionDefault1_5
+.local System.Networking.Sockets.SocketError.InvalidAddress unionDefault1_6
+.local System.Networking.Sockets.SocketError.ConnectionRefused unionDefault1_7
+.local System.Networking.Sockets.SocketError.ConnectionReset unionDefault1_8
+.local System.Networking.Sockets.SocketError.AccessDenied unionDefault1_9
+.local System.Networking.Sockets.SocketError.TimedOut unionDefault1_10
+.local System.Networking.Sockets.SocketError.IoFailure unionDefault1_11
+.local System.Networking.Sockets.SocketError.InvalidOperation unionDefault1_12
+.local System.Networking.Sockets.SocketError.AddressInUse unionDefault1_13
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Networking.Sockets.SocketError.IoFailure
+M00000016_IL_0000:
+ldarg 0
+M00000016_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Networking.Sockets.SocketError.Closed
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Networking.Sockets.SocketError.Busy
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Networking.Sockets.SocketError.InvalidRange
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Networking.Sockets.SocketError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Networking.Sockets.SocketError.Cancelled
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Networking.Sockets.SocketError.InvalidAddress
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Networking.Sockets.SocketError.AccessDenied
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Networking.Sockets.SocketError.TimedOut
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_11
+initobj System.Networking.Sockets.SocketError.IoFailure
+ldarg 0
+ldloc unionDefault1_11
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+ldloca unionDefault1_12
+initobj System.Networking.Sockets.SocketError.InvalidOperation
+ldarg 0
+ldloc unionDefault1_12
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+pop
+ldloca unionDefault1_13
+initobj System.Networking.Sockets.SocketError.AddressInUse
+ldarg 0
+ldloc unionDefault1_13
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+pop
+M00000016_IL_0007:
+ldc.i4 11
+M00000016_IL_0009:
+stloc local0
+M00000016_IL_000a:
+ldarg 0
+M00000016_IL_000b:
+ldloc local0
+M00000016_IL_000c:
+conv.u1
+M00000016_IL_000d:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+M00000016_IL_0012:
+ldarg 1
+M00000016_IL_0013:
+stloc local1
+M00000016_IL_0014:
+ldarg 0
+M00000016_IL_0015:
+ldloc local1
+M00000016_IL_0016:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+M00000016_IL_001b:
 ldvoid
 ret
 .end
-.method instance get_IsConnectionReset() -> Boolean
+.method instance byref TryGetValue(out(true) System.Networking.Sockets.SocketError.IoFailure& value) -> Boolean
 M00000017_IL_0000:
+ldarg 0
 M00000017_IL_0001:
-M00000017_IL_0002:
-ldarg 0
-M00000017_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
-M00000017_IL_0008:
-value.is System.Networking.Sockets.SocketError.ConnectionReset
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M00000017_IL_0006:
+conv.i4
+M00000017_IL_0007:
+ldc.i4 11
+M00000017_IL_0009:
+conv.i4
+M00000017_IL_000a:
+ceq
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000017_IL_000d:
+M00000017_IL_000c:
+brtrue M00000017_IL_0016
+M00000017_IL_0011:
+br M00000017_IL_0024
+M00000017_IL_0016:
+ldarg 1
+M00000017_IL_0017:
+ldarg 0
+M00000017_IL_0018:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+M00000017_IL_001d:
+stobj System.Networking.Sockets.SocketError.IoFailure
+M00000017_IL_0022:
+ldc.i4 1
+M00000017_IL_0023:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000017_IL_0024:
+M00000017_IL_0025:
+ldc.i4 0
+M00000017_IL_0026:
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetConnectionReset() -> System.Networking.Sockets.SocketError.ConnectionReset
+.method instance byref .ctor(System.Networking.Sockets.SocketError.InvalidOperation value) -> Void
+.local Byte local0
+.local System.Networking.Sockets.SocketError.InvalidOperation local1
+.local Byte unionDefault1_0
+.local System.Networking.Sockets.SocketError.Closed unionDefault1_1
+.local System.Networking.Sockets.SocketError.Busy unionDefault1_2
+.local System.Networking.Sockets.SocketError.InvalidRange unionDefault1_3
+.local System.Networking.Sockets.SocketError.LimitExceeded unionDefault1_4
+.local System.Networking.Sockets.SocketError.Cancelled unionDefault1_5
+.local System.Networking.Sockets.SocketError.InvalidAddress unionDefault1_6
+.local System.Networking.Sockets.SocketError.ConnectionRefused unionDefault1_7
+.local System.Networking.Sockets.SocketError.ConnectionReset unionDefault1_8
+.local System.Networking.Sockets.SocketError.AccessDenied unionDefault1_9
+.local System.Networking.Sockets.SocketError.TimedOut unionDefault1_10
+.local System.Networking.Sockets.SocketError.IoFailure unionDefault1_11
+.local System.Networking.Sockets.SocketError.InvalidOperation unionDefault1_12
+.local System.Networking.Sockets.SocketError.AddressInUse unionDefault1_13
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Networking.Sockets.SocketError.InvalidOperation
 M00000018_IL_0000:
+ldarg 0
 M00000018_IL_0001:
-M00000018_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M00000018_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
-M00000018_IL_0008:
-value.unpack System.Networking.Sockets.SocketError.ConnectionReset
+ldloc unionDefault1_0
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Networking.Sockets.SocketError.Closed
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Networking.Sockets.SocketError.Busy
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Networking.Sockets.SocketError.InvalidRange
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Networking.Sockets.SocketError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Networking.Sockets.SocketError.Cancelled
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Networking.Sockets.SocketError.InvalidAddress
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Networking.Sockets.SocketError.AccessDenied
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Networking.Sockets.SocketError.TimedOut
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_11
+initobj System.Networking.Sockets.SocketError.IoFailure
+ldarg 0
+ldloc unionDefault1_11
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+ldloca unionDefault1_12
+initobj System.Networking.Sockets.SocketError.InvalidOperation
+ldarg 0
+ldloc unionDefault1_12
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+pop
+ldloca unionDefault1_13
+initobj System.Networking.Sockets.SocketError.AddressInUse
+ldarg 0
+ldloc unionDefault1_13
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+pop
+M00000018_IL_0007:
+ldc.i4 12
+M00000018_IL_0009:
+stloc local0
+M00000018_IL_000a:
+ldarg 0
+M00000018_IL_000b:
+ldloc local0
+M00000018_IL_000c:
+conv.u1
 M00000018_IL_000d:
-ret
-.end
-.method instance .ctor(System.Networking.Sockets.SocketError.AccessDenied value) -> Void
-ldarg value
-value.pack System.Networking.Sockets.SocketError.AccessDenied
-newobj System.Networking.Sockets.SocketError
-starg this
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+M00000018_IL_0012:
+ldarg 1
+M00000018_IL_0013:
+stloc local1
+M00000018_IL_0014:
+ldarg 0
+M00000018_IL_0015:
+ldloc local1
+M00000018_IL_0016:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+pop
+M00000018_IL_001b:
 ldvoid
 ret
 .end
-.method instance get_IsAccessDenied() -> Boolean
+.method instance byref TryGetValue(out(true) System.Networking.Sockets.SocketError.InvalidOperation& value) -> Boolean
+M00000019_IL_0000:
+ldarg 0
+M00000019_IL_0001:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M00000019_IL_0006:
+conv.i4
+M00000019_IL_0007:
+ldc.i4 12
+M00000019_IL_0009:
+conv.i4
+M00000019_IL_000a:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M00000019_IL_000c:
+brtrue M00000019_IL_0016
+M00000019_IL_0011:
+br M00000019_IL_0024
+M00000019_IL_0016:
+ldarg 1
+M00000019_IL_0017:
+ldarg 0
+M00000019_IL_0018:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+M00000019_IL_001d:
+stobj System.Networking.Sockets.SocketError.InvalidOperation
+M00000019_IL_0022:
+ldc.i4 1
+M00000019_IL_0023:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000019_IL_0024:
+M00000019_IL_0025:
+ldc.i4 0
+M00000019_IL_0026:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Networking.Sockets.SocketError.AddressInUse value) -> Void
+.local Byte local0
+.local System.Networking.Sockets.SocketError.AddressInUse local1
+.local Byte unionDefault1_0
+.local System.Networking.Sockets.SocketError.Closed unionDefault1_1
+.local System.Networking.Sockets.SocketError.Busy unionDefault1_2
+.local System.Networking.Sockets.SocketError.InvalidRange unionDefault1_3
+.local System.Networking.Sockets.SocketError.LimitExceeded unionDefault1_4
+.local System.Networking.Sockets.SocketError.Cancelled unionDefault1_5
+.local System.Networking.Sockets.SocketError.InvalidAddress unionDefault1_6
+.local System.Networking.Sockets.SocketError.ConnectionRefused unionDefault1_7
+.local System.Networking.Sockets.SocketError.ConnectionReset unionDefault1_8
+.local System.Networking.Sockets.SocketError.AccessDenied unionDefault1_9
+.local System.Networking.Sockets.SocketError.TimedOut unionDefault1_10
+.local System.Networking.Sockets.SocketError.IoFailure unionDefault1_11
+.local System.Networking.Sockets.SocketError.InvalidOperation unionDefault1_12
+.local System.Networking.Sockets.SocketError.AddressInUse unionDefault1_13
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Networking.Sockets.SocketError.AddressInUse
 M0000001a_IL_0000:
+ldarg 0
 M0000001a_IL_0001:
-M0000001a_IL_0002:
+pop
+ldloca unionDefault1_0
+initobj Byte
 ldarg 0
-M0000001a_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
-M0000001a_IL_0008:
-value.is System.Networking.Sockets.SocketError.AccessDenied
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+ldloc unionDefault1_0
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Networking.Sockets.SocketError.Closed
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Networking.Sockets.SocketError.Busy
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Networking.Sockets.SocketError.InvalidRange
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Networking.Sockets.SocketError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Networking.Sockets.SocketError.Cancelled
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Networking.Sockets.SocketError.InvalidAddress
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Networking.Sockets.SocketError.AccessDenied
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Networking.Sockets.SocketError.TimedOut
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_11
+initobj System.Networking.Sockets.SocketError.IoFailure
+ldarg 0
+ldloc unionDefault1_11
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+pop
+ldloca unionDefault1_12
+initobj System.Networking.Sockets.SocketError.InvalidOperation
+ldarg 0
+ldloc unionDefault1_12
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+pop
+ldloca unionDefault1_13
+initobj System.Networking.Sockets.SocketError.AddressInUse
+ldarg 0
+ldloc unionDefault1_13
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+pop
+M0000001a_IL_0007:
+ldc.i4 13
+M0000001a_IL_0009:
+stloc local0
+M0000001a_IL_000a:
+ldarg 0
+M0000001a_IL_000b:
+ldloc local0
+M0000001a_IL_000c:
+conv.u1
 M0000001a_IL_000d:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+pop
+M0000001a_IL_0012:
+ldarg 1
+M0000001a_IL_0013:
+stloc local1
+M0000001a_IL_0014:
+ldarg 0
+M0000001a_IL_0015:
+ldloc local1
+M0000001a_IL_0016:
+stfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+pop
+M0000001a_IL_001b:
+ldvoid
 ret
 .end
-.method instance GetAccessDenied() -> System.Networking.Sockets.SocketError.AccessDenied
+.method instance byref TryGetValue(out(true) System.Networking.Sockets.SocketError.AddressInUse& value) -> Boolean
 M0000001b_IL_0000:
+ldarg 0
 M0000001b_IL_0001:
-M0000001b_IL_0002:
-ldarg 0
-M0000001b_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
-M0000001b_IL_0008:
-value.unpack System.Networking.Sockets.SocketError.AccessDenied
-M0000001b_IL_000d:
-ret
-.end
-.method instance .ctor(System.Networking.Sockets.SocketError.TimedOut value) -> Void
-ldarg value
-value.pack System.Networking.Sockets.SocketError.TimedOut
-newobj System.Networking.Sockets.SocketError
-starg this
-ldvoid
-ret
-.end
-.method instance get_IsTimedOut() -> Boolean
-M0000001d_IL_0000:
-M0000001d_IL_0001:
-M0000001d_IL_0002:
-ldarg 0
-M0000001d_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
-M0000001d_IL_0008:
-value.is System.Networking.Sockets.SocketError.TimedOut
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000001b_IL_0006:
+conv.i4
+M0000001b_IL_0007:
+ldc.i4 13
+M0000001b_IL_0009:
+conv.i4
+M0000001b_IL_000a:
+ceq
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M0000001d_IL_000d:
+M0000001b_IL_000c:
+brtrue M0000001b_IL_0016
+M0000001b_IL_0011:
+br M0000001b_IL_0024
+M0000001b_IL_0016:
+ldarg 1
+M0000001b_IL_0017:
+ldarg 0
+M0000001b_IL_0018:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+M0000001b_IL_001d:
+stobj System.Networking.Sockets.SocketError.AddressInUse
+M0000001b_IL_0022:
+ldc.i4 1
+M0000001b_IL_0023:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000001b_IL_0024:
+M0000001b_IL_0025:
+ldc.i4 0
+M0000001b_IL_0026:
 call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetTimedOut() -> System.Networking.Sockets.SocketError.TimedOut
-M0000001e_IL_0000:
-M0000001e_IL_0001:
-M0000001e_IL_0002:
+.method instance override byref ToString() -> String
+.local System.Networking.Sockets.SocketError local0
+.local String local1
+.local System.Networking.Sockets.SocketError local2
+.local System.Networking.Sockets.SocketError.Closed local3
+.local System.Networking.Sockets.SocketError local4
+.local System.Networking.Sockets.SocketError.Busy local5
+.local System.Networking.Sockets.SocketError local6
+.local System.Networking.Sockets.SocketError.InvalidRange local7
+.local System.Networking.Sockets.SocketError local8
+.local System.Networking.Sockets.SocketError.LimitExceeded local9
+.local System.Networking.Sockets.SocketError local10
+.local System.Networking.Sockets.SocketError.Cancelled local11
+.local System.Networking.Sockets.SocketError local12
+.local System.Networking.Sockets.SocketError.InvalidAddress local13
+.local System.Networking.Sockets.SocketError local14
+.local System.Networking.Sockets.SocketError.ConnectionRefused local15
+.local System.Networking.Sockets.SocketError local16
+.local System.Networking.Sockets.SocketError.ConnectionReset local17
+.local System.Networking.Sockets.SocketError local18
+.local System.Networking.Sockets.SocketError.AccessDenied local19
+.local System.Networking.Sockets.SocketError local20
+.local System.Networking.Sockets.SocketError.TimedOut local21
+.local System.Networking.Sockets.SocketError local22
+.local System.Networking.Sockets.SocketError.IoFailure local23
+.local System.Networking.Sockets.SocketError local24
+.local System.Networking.Sockets.SocketError.InvalidOperation local25
+.local System.Networking.Sockets.SocketError local26
+.local System.Networking.Sockets.SocketError.AddressInUse local27
+ldloca local0
+initobj System.Networking.Sockets.SocketError
+ldloca local2
+initobj System.Networking.Sockets.SocketError
+ldloca local3
+initobj System.Networking.Sockets.SocketError.Closed
+ldloca local4
+initobj System.Networking.Sockets.SocketError
+ldloca local5
+initobj System.Networking.Sockets.SocketError.Busy
+ldloca local6
+initobj System.Networking.Sockets.SocketError
+ldloca local7
+initobj System.Networking.Sockets.SocketError.InvalidRange
+ldloca local8
+initobj System.Networking.Sockets.SocketError
+ldloca local9
+initobj System.Networking.Sockets.SocketError.LimitExceeded
+ldloca local10
+initobj System.Networking.Sockets.SocketError
+ldloca local11
+initobj System.Networking.Sockets.SocketError.Cancelled
+ldloca local12
+initobj System.Networking.Sockets.SocketError
+ldloca local13
+initobj System.Networking.Sockets.SocketError.InvalidAddress
+ldloca local14
+initobj System.Networking.Sockets.SocketError
+ldloca local15
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
+ldloca local16
+initobj System.Networking.Sockets.SocketError
+ldloca local17
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+ldloca local18
+initobj System.Networking.Sockets.SocketError
+ldloca local19
+initobj System.Networking.Sockets.SocketError.AccessDenied
+ldloca local20
+initobj System.Networking.Sockets.SocketError
+ldloca local21
+initobj System.Networking.Sockets.SocketError.TimedOut
+ldloca local22
+initobj System.Networking.Sockets.SocketError
+ldloca local23
+initobj System.Networking.Sockets.SocketError.IoFailure
+ldloca local24
+initobj System.Networking.Sockets.SocketError
+ldloca local25
+initobj System.Networking.Sockets.SocketError.InvalidOperation
+ldloca local26
+initobj System.Networking.Sockets.SocketError
+ldloca local27
+initobj System.Networking.Sockets.SocketError.AddressInUse
+M0000001c_IL_0000:
+M0000001c_IL_0001:
+M0000001c_IL_0002:
+M0000001c_IL_0003:
 ldarg 0
-M0000001e_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
-M0000001e_IL_0008:
-value.unpack System.Networking.Sockets.SocketError.TimedOut
-M0000001e_IL_000d:
-ret
-.end
-.method instance .ctor(System.Networking.Sockets.SocketError.IoFailure value) -> Void
-ldarg value
-value.pack System.Networking.Sockets.SocketError.IoFailure
-newobj System.Networking.Sockets.SocketError
-starg this
-ldvoid
-ret
-.end
-.method instance get_IsIoFailure() -> Boolean
-M00000020_IL_0000:
-M00000020_IL_0001:
-M00000020_IL_0002:
-ldarg 0
-M00000020_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
-M00000020_IL_0008:
-value.is System.Networking.Sockets.SocketError.IoFailure
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000020_IL_000d:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method instance GetIoFailure() -> System.Networking.Sockets.SocketError.IoFailure
-M00000021_IL_0000:
-M00000021_IL_0001:
-M00000021_IL_0002:
-ldarg 0
-M00000021_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
-M00000021_IL_0008:
-value.unpack System.Networking.Sockets.SocketError.IoFailure
-M00000021_IL_000d:
-ret
-.end
-.method instance .ctor(System.Networking.Sockets.SocketError.InvalidOperation value) -> Void
-ldarg value
-value.pack System.Networking.Sockets.SocketError.InvalidOperation
-newobj System.Networking.Sockets.SocketError
-starg this
-ldvoid
-ret
-.end
-.method instance get_IsInvalidOperation() -> Boolean
-M00000023_IL_0000:
-M00000023_IL_0001:
-M00000023_IL_0002:
-ldarg 0
-M00000023_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
-M00000023_IL_0008:
-value.is System.Networking.Sockets.SocketError.InvalidOperation
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000023_IL_000d:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method instance GetInvalidOperation() -> System.Networking.Sockets.SocketError.InvalidOperation
-M00000024_IL_0000:
-M00000024_IL_0001:
-M00000024_IL_0002:
-ldarg 0
-M00000024_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
-M00000024_IL_0008:
-value.unpack System.Networking.Sockets.SocketError.InvalidOperation
-M00000024_IL_000d:
-ret
-.end
-.method instance .ctor(System.Networking.Sockets.SocketError.AddressInUse value) -> Void
-ldarg value
-value.pack System.Networking.Sockets.SocketError.AddressInUse
-newobj System.Networking.Sockets.SocketError
-starg this
-ldvoid
-ret
-.end
-.method instance get_IsAddressInUse() -> Boolean
-M00000026_IL_0000:
-M00000026_IL_0001:
-M00000026_IL_0002:
-ldarg 0
-M00000026_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
-M00000026_IL_0008:
-value.is System.Networking.Sockets.SocketError.AddressInUse
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000026_IL_000d:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method instance GetAddressInUse() -> System.Networking.Sockets.SocketError.AddressInUse
-M00000027_IL_0000:
-M00000027_IL_0001:
-M00000027_IL_0002:
-ldarg 0
-M00000027_IL_0003:
-ldfld System.Networking.Sockets.SocketError::Stored
-M00000027_IL_0008:
-value.unpack System.Networking.Sockets.SocketError.AddressInUse
-M00000027_IL_000d:
-ret
-.end
-.method instance ToString() -> String
-M00000028_IL_0000:
-M00000028_IL_0001:
-M00000028_IL_0002:
-ldarg 0
-M00000028_IL_0003:
-call instance System.Networking.Sockets.SocketError::get_IsClosed()
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000028_IL_0008:
-brtrue M00000028_IL_0012
-M00000028_IL_000d:
-br M00000028_IL_0019
-M00000028_IL_0012:
-M00000028_IL_0013:
+M0000001c_IL_0004:
+ldobj System.Networking.Sockets.SocketError
+M0000001c_IL_0009:
+stloc local0
+M0000001c_IL_000a:
+M0000001c_IL_000b:
+ldloc local0
+M0000001c_IL_000c:
+stloc local2
+M0000001c_IL_000d:
+ldloca local2
+M0000001c_IL_000f:
+ldloca local3
+M0000001c_IL_0011:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.Closed&)
+M0000001c_IL_0016:
+brfalse M0000001c_IL_0034
+M0000001c_IL_001b:
+ldloc local3
+M0000001c_IL_001c:
+pop
+M0000001c_IL_001d:
+M0000001c_IL_001e:
+br M0000001c_IL_0029
+M0000001c_IL_0029:
 ldstr "Closed"
-M00000028_IL_0018:
-ret
-M00000028_IL_0019:
-M00000028_IL_001a:
-M00000028_IL_001b:
-ldarg 0
-M00000028_IL_001c:
-call instance System.Networking.Sockets.SocketError::get_IsBusy()
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000028_IL_0021:
-brtrue M00000028_IL_002b
-M00000028_IL_0026:
-br M00000028_IL_0032
-M00000028_IL_002b:
-M00000028_IL_002c:
+M0000001c_IL_002e:
+stloc local1
+M0000001c_IL_002f:
+br M0000001c_IL_0269
+M0000001c_IL_0034:
+M0000001c_IL_0035:
+M0000001c_IL_0036:
+ldloc local0
+M0000001c_IL_0037:
+stloc local4
+M0000001c_IL_0039:
+ldloca local4
+M0000001c_IL_003b:
+ldloca local5
+M0000001c_IL_003d:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.Busy&)
+M0000001c_IL_0042:
+brfalse M0000001c_IL_0061
+M0000001c_IL_0047:
+ldloc local5
+M0000001c_IL_0049:
+pop
+M0000001c_IL_004a:
+M0000001c_IL_004b:
+br M0000001c_IL_0056
+M0000001c_IL_0056:
 ldstr "Busy"
-M00000028_IL_0031:
-ret
-M00000028_IL_0032:
-M00000028_IL_0033:
-M00000028_IL_0034:
-ldarg 0
-M00000028_IL_0035:
-call instance System.Networking.Sockets.SocketError::get_IsInvalidRange()
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000028_IL_003a:
-brtrue M00000028_IL_0044
-M00000028_IL_003f:
-br M00000028_IL_004b
-M00000028_IL_0044:
-M00000028_IL_0045:
+M0000001c_IL_005b:
+stloc local1
+M0000001c_IL_005c:
+br M0000001c_IL_0269
+M0000001c_IL_0061:
+M0000001c_IL_0062:
+M0000001c_IL_0063:
+ldloc local0
+M0000001c_IL_0064:
+stloc local6
+M0000001c_IL_0066:
+ldloca local6
+M0000001c_IL_0068:
+ldloca local7
+M0000001c_IL_006a:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.InvalidRange&)
+M0000001c_IL_006f:
+brfalse M0000001c_IL_008e
+M0000001c_IL_0074:
+ldloc local7
+M0000001c_IL_0076:
+pop
+M0000001c_IL_0077:
+M0000001c_IL_0078:
+br M0000001c_IL_0083
+M0000001c_IL_0083:
 ldstr "InvalidRange"
-M00000028_IL_004a:
-ret
-M00000028_IL_004b:
-M00000028_IL_004c:
-M00000028_IL_004d:
-ldarg 0
-M00000028_IL_004e:
-call instance System.Networking.Sockets.SocketError::get_IsLimitExceeded()
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000028_IL_0053:
-brtrue M00000028_IL_005d
-M00000028_IL_0058:
-br M00000028_IL_0064
-M00000028_IL_005d:
-M00000028_IL_005e:
+M0000001c_IL_0088:
+stloc local1
+M0000001c_IL_0089:
+br M0000001c_IL_0269
+M0000001c_IL_008e:
+M0000001c_IL_008f:
+M0000001c_IL_0090:
+ldloc local0
+M0000001c_IL_0091:
+stloc local8
+M0000001c_IL_0093:
+ldloca local8
+M0000001c_IL_0095:
+ldloca local9
+M0000001c_IL_0097:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.LimitExceeded&)
+M0000001c_IL_009c:
+brfalse M0000001c_IL_00bb
+M0000001c_IL_00a1:
+ldloc local9
+M0000001c_IL_00a3:
+pop
+M0000001c_IL_00a4:
+M0000001c_IL_00a5:
+br M0000001c_IL_00b0
+M0000001c_IL_00b0:
 ldstr "LimitExceeded"
-M00000028_IL_0063:
-ret
-M00000028_IL_0064:
-M00000028_IL_0065:
-M00000028_IL_0066:
-ldarg 0
-M00000028_IL_0067:
-call instance System.Networking.Sockets.SocketError::get_IsCancelled()
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000028_IL_006c:
-brtrue M00000028_IL_0076
-M00000028_IL_0071:
-br M00000028_IL_007d
-M00000028_IL_0076:
-M00000028_IL_0077:
+M0000001c_IL_00b5:
+stloc local1
+M0000001c_IL_00b6:
+br M0000001c_IL_0269
+M0000001c_IL_00bb:
+M0000001c_IL_00bc:
+M0000001c_IL_00bd:
+ldloc local0
+M0000001c_IL_00be:
+stloc local10
+M0000001c_IL_00c0:
+ldloca local10
+M0000001c_IL_00c2:
+ldloca local11
+M0000001c_IL_00c4:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.Cancelled&)
+M0000001c_IL_00c9:
+brfalse M0000001c_IL_00e8
+M0000001c_IL_00ce:
+ldloc local11
+M0000001c_IL_00d0:
+pop
+M0000001c_IL_00d1:
+M0000001c_IL_00d2:
+br M0000001c_IL_00dd
+M0000001c_IL_00dd:
 ldstr "Cancelled"
-M00000028_IL_007c:
-ret
-M00000028_IL_007d:
-M00000028_IL_007e:
-M00000028_IL_007f:
-ldarg 0
-M00000028_IL_0080:
-call instance System.Networking.Sockets.SocketError::get_IsInvalidAddress()
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000028_IL_0085:
-brtrue M00000028_IL_008f
-M00000028_IL_008a:
-br M00000028_IL_0096
-M00000028_IL_008f:
-M00000028_IL_0090:
+M0000001c_IL_00e2:
+stloc local1
+M0000001c_IL_00e3:
+br M0000001c_IL_0269
+M0000001c_IL_00e8:
+M0000001c_IL_00e9:
+M0000001c_IL_00ea:
+ldloc local0
+M0000001c_IL_00eb:
+stloc local12
+M0000001c_IL_00ed:
+ldloca local12
+M0000001c_IL_00ef:
+ldloca local13
+M0000001c_IL_00f1:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.InvalidAddress&)
+M0000001c_IL_00f6:
+brfalse M0000001c_IL_0115
+M0000001c_IL_00fb:
+ldloc local13
+M0000001c_IL_00fd:
+pop
+M0000001c_IL_00fe:
+M0000001c_IL_00ff:
+br M0000001c_IL_010a
+M0000001c_IL_010a:
 ldstr "InvalidAddress"
-M00000028_IL_0095:
-ret
-M00000028_IL_0096:
-M00000028_IL_0097:
-M00000028_IL_0098:
-ldarg 0
-M00000028_IL_0099:
-call instance System.Networking.Sockets.SocketError::get_IsConnectionRefused()
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000028_IL_009e:
-brtrue M00000028_IL_00a8
-M00000028_IL_00a3:
-br M00000028_IL_00af
-M00000028_IL_00a8:
-M00000028_IL_00a9:
+M0000001c_IL_010f:
+stloc local1
+M0000001c_IL_0110:
+br M0000001c_IL_0269
+M0000001c_IL_0115:
+M0000001c_IL_0116:
+ldloc local0
+M0000001c_IL_0117:
+stloc local14
+M0000001c_IL_0119:
+ldloca local14
+M0000001c_IL_011b:
+ldloca local15
+M0000001c_IL_011d:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.ConnectionRefused&)
+M0000001c_IL_0122:
+brfalse M0000001c_IL_0141
+M0000001c_IL_0127:
+ldloc local15
+M0000001c_IL_0129:
+pop
+M0000001c_IL_012a:
+M0000001c_IL_012b:
+br M0000001c_IL_0136
+M0000001c_IL_0136:
 ldstr "ConnectionRefused"
-M00000028_IL_00ae:
-ret
-M00000028_IL_00af:
-M00000028_IL_00b0:
-M00000028_IL_00b1:
-ldarg 0
-M00000028_IL_00b2:
-call instance System.Networking.Sockets.SocketError::get_IsConnectionReset()
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000028_IL_00b7:
-brtrue M00000028_IL_00c1
-M00000028_IL_00bc:
-br M00000028_IL_00c8
-M00000028_IL_00c1:
-M00000028_IL_00c2:
+M0000001c_IL_013b:
+stloc local1
+M0000001c_IL_013c:
+br M0000001c_IL_0269
+M0000001c_IL_0141:
+M0000001c_IL_0142:
+M0000001c_IL_0143:
+ldloc local0
+M0000001c_IL_0144:
+stloc local16
+M0000001c_IL_0146:
+ldloca local16
+M0000001c_IL_0148:
+ldloca local17
+M0000001c_IL_014a:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.ConnectionReset&)
+M0000001c_IL_014f:
+brfalse M0000001c_IL_016e
+M0000001c_IL_0154:
+ldloc local17
+M0000001c_IL_0156:
+pop
+M0000001c_IL_0157:
+M0000001c_IL_0158:
+br M0000001c_IL_0163
+M0000001c_IL_0163:
 ldstr "ConnectionReset"
-M00000028_IL_00c7:
-ret
-M00000028_IL_00c8:
-M00000028_IL_00c9:
-M00000028_IL_00ca:
-ldarg 0
-M00000028_IL_00cb:
-call instance System.Networking.Sockets.SocketError::get_IsAccessDenied()
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000028_IL_00d0:
-brtrue M00000028_IL_00da
-M00000028_IL_00d5:
-br M00000028_IL_00e1
-M00000028_IL_00da:
-M00000028_IL_00db:
+M0000001c_IL_0168:
+stloc local1
+M0000001c_IL_0169:
+br M0000001c_IL_0269
+M0000001c_IL_016e:
+M0000001c_IL_016f:
+M0000001c_IL_0170:
+ldloc local0
+M0000001c_IL_0171:
+stloc local18
+M0000001c_IL_0173:
+ldloca local18
+M0000001c_IL_0175:
+ldloca local19
+M0000001c_IL_0177:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.AccessDenied&)
+M0000001c_IL_017c:
+brfalse M0000001c_IL_019b
+M0000001c_IL_0181:
+ldloc local19
+M0000001c_IL_0183:
+pop
+M0000001c_IL_0184:
+M0000001c_IL_0185:
+br M0000001c_IL_0190
+M0000001c_IL_0190:
 ldstr "AccessDenied"
-M00000028_IL_00e0:
-ret
-M00000028_IL_00e1:
-M00000028_IL_00e2:
-M00000028_IL_00e3:
-ldarg 0
-M00000028_IL_00e4:
-call instance System.Networking.Sockets.SocketError::get_IsTimedOut()
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000028_IL_00e9:
-brtrue M00000028_IL_00f3
-M00000028_IL_00ee:
-br M00000028_IL_00fa
-M00000028_IL_00f3:
-M00000028_IL_00f4:
+M0000001c_IL_0195:
+stloc local1
+M0000001c_IL_0196:
+br M0000001c_IL_0269
+M0000001c_IL_019b:
+M0000001c_IL_019c:
+M0000001c_IL_019d:
+ldloc local0
+M0000001c_IL_019e:
+stloc local20
+M0000001c_IL_01a0:
+ldloca local20
+M0000001c_IL_01a2:
+ldloca local21
+M0000001c_IL_01a4:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.TimedOut&)
+M0000001c_IL_01a9:
+brfalse M0000001c_IL_01c8
+M0000001c_IL_01ae:
+ldloc local21
+M0000001c_IL_01b0:
+pop
+M0000001c_IL_01b1:
+M0000001c_IL_01b2:
+br M0000001c_IL_01bd
+M0000001c_IL_01bd:
 ldstr "TimedOut"
-M00000028_IL_00f9:
-ret
-M00000028_IL_00fa:
-M00000028_IL_00fb:
-M00000028_IL_00fc:
-ldarg 0
-M00000028_IL_00fd:
-call instance System.Networking.Sockets.SocketError::get_IsIoFailure()
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000028_IL_0102:
-brtrue M00000028_IL_010c
-M00000028_IL_0107:
-br M00000028_IL_0113
-M00000028_IL_010c:
-M00000028_IL_010d:
+M0000001c_IL_01c2:
+stloc local1
+M0000001c_IL_01c3:
+br M0000001c_IL_0269
+M0000001c_IL_01c8:
+M0000001c_IL_01c9:
+M0000001c_IL_01ca:
+ldloc local0
+M0000001c_IL_01cb:
+stloc local22
+M0000001c_IL_01cd:
+ldloca local22
+M0000001c_IL_01cf:
+ldloca local23
+M0000001c_IL_01d1:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.IoFailure&)
+M0000001c_IL_01d6:
+brfalse M0000001c_IL_01f5
+M0000001c_IL_01db:
+ldloc local23
+M0000001c_IL_01dd:
+pop
+M0000001c_IL_01de:
+M0000001c_IL_01df:
+br M0000001c_IL_01ea
+M0000001c_IL_01ea:
 ldstr "IoFailure"
-M00000028_IL_0112:
-ret
-M00000028_IL_0113:
-M00000028_IL_0114:
-M00000028_IL_0115:
-ldarg 0
-M00000028_IL_0116:
-call instance System.Networking.Sockets.SocketError::get_IsInvalidOperation()
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000028_IL_011b:
-brtrue M00000028_IL_0125
-M00000028_IL_0120:
-br M00000028_IL_012c
-M00000028_IL_0125:
-M00000028_IL_0126:
+M0000001c_IL_01ef:
+stloc local1
+M0000001c_IL_01f0:
+br M0000001c_IL_0269
+M0000001c_IL_01f5:
+M0000001c_IL_01f6:
+M0000001c_IL_01f7:
+ldloc local0
+M0000001c_IL_01f8:
+stloc local24
+M0000001c_IL_01fa:
+ldloca local24
+M0000001c_IL_01fc:
+ldloca local25
+M0000001c_IL_01fe:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.InvalidOperation&)
+M0000001c_IL_0203:
+brfalse M0000001c_IL_0222
+M0000001c_IL_0208:
+ldloc local25
+M0000001c_IL_020a:
+pop
+M0000001c_IL_020b:
+M0000001c_IL_020c:
+br M0000001c_IL_0217
+M0000001c_IL_0217:
 ldstr "InvalidOperation"
-M00000028_IL_012b:
-ret
-M00000028_IL_012c:
-M00000028_IL_012d:
-M00000028_IL_012e:
-ldarg 0
-M00000028_IL_012f:
-call instance System.Networking.Sockets.SocketError::get_IsAddressInUse()
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
-M00000028_IL_0134:
-brtrue M00000028_IL_013e
-M00000028_IL_0139:
-br M00000028_IL_0145
-M00000028_IL_013e:
-M00000028_IL_013f:
+M0000001c_IL_021c:
+stloc local1
+M0000001c_IL_021d:
+br M0000001c_IL_0269
+M0000001c_IL_0222:
+M0000001c_IL_0223:
+M0000001c_IL_0224:
+ldloc local0
+M0000001c_IL_0225:
+stloc local26
+M0000001c_IL_0227:
+ldloca local26
+M0000001c_IL_0229:
+ldloca local27
+M0000001c_IL_022b:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.AddressInUse&)
+M0000001c_IL_0230:
+brfalse M0000001c_IL_024f
+M0000001c_IL_0235:
+ldloc local27
+M0000001c_IL_0237:
+pop
+M0000001c_IL_0238:
+M0000001c_IL_0239:
+br M0000001c_IL_0244
+M0000001c_IL_0244:
 ldstr "AddressInUse"
-M00000028_IL_0144:
+M0000001c_IL_0249:
+stloc local1
+M0000001c_IL_024a:
+br M0000001c_IL_0269
+M0000001c_IL_024f:
+M0000001c_IL_0250:
+ldloc local0
+M0000001c_IL_0251:
+pop
+M0000001c_IL_0252:
+ldc.i4 1
+M0000001c_IL_0253:
+brfalse M0000001c_IL_0264
+M0000001c_IL_0258:
+M0000001c_IL_0259:
+ldstr "Empty"
+M0000001c_IL_025e:
+stloc local1
+M0000001c_IL_025f:
+br M0000001c_IL_0269
+M0000001c_IL_0264:
+M0000001c_IL_0265:
+M0000001c_IL_0266:
+M0000001c_IL_0267:
+M0000001c_IL_0268:
+fault "Guest program reached a terminal failure"
+M0000001c_IL_0269:
+M0000001c_IL_026a:
+ldloc local1
+M0000001c_IL_026b:
 ret
-M00000028_IL_0145:
-M00000028_IL_0146:
-M00000028_IL_0147:
-ldstr "invalid socket error case"
-M00000028_IL_014c:
-call System.Fault(String)
-M00000028_IL_0151:
-M00000028_IL_0152:
-ldstr ""
-M00000028_IL_0157:
+.end
+.method instance byref get_Value() -> System.Object
+M0000001d_IL_0000:
+ldarg 0
+M0000001d_IL_0001:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000001d_IL_0006:
+conv.i4
+M0000001d_IL_0007:
+ldc.i4 1
+M0000001d_IL_0008:
+conv.i4
+M0000001d_IL_0009:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000001d_IL_000b:
+brtrue M0000001d_IL_0015
+M0000001d_IL_0010:
+br M0000001d_IL_0021
+M0000001d_IL_0015:
+ldarg 0
+M0000001d_IL_0016:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6F61643E
+M0000001d_IL_001b:
+box System.Networking.Sockets.SocketError.Closed
+M0000001d_IL_0020:
+ret
+M0000001d_IL_0021:
+M0000001d_IL_0022:
+ldarg 0
+M0000001d_IL_0023:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000001d_IL_0028:
+conv.i4
+M0000001d_IL_0029:
+ldc.i4 2
+M0000001d_IL_002a:
+conv.i4
+M0000001d_IL_002b:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000001d_IL_002d:
+brtrue M0000001d_IL_0037
+M0000001d_IL_0032:
+br M0000001d_IL_0043
+M0000001d_IL_0037:
+ldarg 0
+M0000001d_IL_0038:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F61643E
+M0000001d_IL_003d:
+box System.Networking.Sockets.SocketError.Busy
+M0000001d_IL_0042:
+ret
+M0000001d_IL_0043:
+M0000001d_IL_0044:
+ldarg 0
+M0000001d_IL_0045:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000001d_IL_004a:
+conv.i4
+M0000001d_IL_004b:
+ldc.i4 3
+M0000001d_IL_004c:
+conv.i4
+M0000001d_IL_004d:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000001d_IL_004f:
+brtrue M0000001d_IL_0059
+M0000001d_IL_0054:
+br M0000001d_IL_0065
+M0000001d_IL_0059:
+ldarg 0
+M0000001d_IL_005a:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+M0000001d_IL_005f:
+box System.Networking.Sockets.SocketError.InvalidRange
+M0000001d_IL_0064:
+ret
+M0000001d_IL_0065:
+M0000001d_IL_0066:
+ldarg 0
+M0000001d_IL_0067:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000001d_IL_006c:
+conv.i4
+M0000001d_IL_006d:
+ldc.i4 4
+M0000001d_IL_006e:
+conv.i4
+M0000001d_IL_006f:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000001d_IL_0071:
+brtrue M0000001d_IL_007b
+M0000001d_IL_0076:
+br M0000001d_IL_0087
+M0000001d_IL_007b:
+ldarg 0
+M0000001d_IL_007c:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+M0000001d_IL_0081:
+box System.Networking.Sockets.SocketError.LimitExceeded
+M0000001d_IL_0086:
+ret
+M0000001d_IL_0087:
+M0000001d_IL_0088:
+ldarg 0
+M0000001d_IL_0089:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000001d_IL_008e:
+conv.i4
+M0000001d_IL_008f:
+ldc.i4 5
+M0000001d_IL_0090:
+conv.i4
+M0000001d_IL_0091:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000001d_IL_0093:
+brtrue M0000001d_IL_009d
+M0000001d_IL_0098:
+br M0000001d_IL_00a9
+M0000001d_IL_009d:
+ldarg 0
+M0000001d_IL_009e:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+M0000001d_IL_00a3:
+box System.Networking.Sockets.SocketError.Cancelled
+M0000001d_IL_00a8:
+ret
+M0000001d_IL_00a9:
+M0000001d_IL_00aa:
+ldarg 0
+M0000001d_IL_00ab:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000001d_IL_00b0:
+conv.i4
+M0000001d_IL_00b1:
+ldc.i4 6
+M0000001d_IL_00b2:
+conv.i4
+M0000001d_IL_00b3:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000001d_IL_00b5:
+brtrue M0000001d_IL_00bf
+M0000001d_IL_00ba:
+br M0000001d_IL_00cb
+M0000001d_IL_00bf:
+ldarg 0
+M0000001d_IL_00c0:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C6964416464726573735061796C6F61643E
+M0000001d_IL_00c5:
+box System.Networking.Sockets.SocketError.InvalidAddress
+M0000001d_IL_00ca:
+ret
+M0000001d_IL_00cb:
+M0000001d_IL_00cc:
+ldarg 0
+M0000001d_IL_00cd:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000001d_IL_00d2:
+conv.i4
+M0000001d_IL_00d3:
+ldc.i4 7
+M0000001d_IL_00d4:
+conv.i4
+M0000001d_IL_00d5:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000001d_IL_00d7:
+brtrue M0000001d_IL_00e1
+M0000001d_IL_00dc:
+br M0000001d_IL_00ed
+M0000001d_IL_00e1:
+ldarg 0
+M0000001d_IL_00e2:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E526566757365645061796C6F61643E
+M0000001d_IL_00e7:
+box System.Networking.Sockets.SocketError.ConnectionRefused
+M0000001d_IL_00ec:
+ret
+M0000001d_IL_00ed:
+M0000001d_IL_00ee:
+ldarg 0
+M0000001d_IL_00ef:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000001d_IL_00f4:
+conv.i4
+M0000001d_IL_00f5:
+ldc.i4 8
+M0000001d_IL_00f6:
+conv.i4
+M0000001d_IL_00f7:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000001d_IL_00f9:
+brtrue M0000001d_IL_0103
+M0000001d_IL_00fe:
+br M0000001d_IL_010f
+M0000001d_IL_0103:
+ldarg 0
+M0000001d_IL_0104:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E52657365745061796C6F61643E
+M0000001d_IL_0109:
+box System.Networking.Sockets.SocketError.ConnectionReset
+M0000001d_IL_010e:
+ret
+M0000001d_IL_010f:
+M0000001d_IL_0110:
+ldarg 0
+M0000001d_IL_0111:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000001d_IL_0116:
+conv.i4
+M0000001d_IL_0117:
+ldc.i4 9
+M0000001d_IL_0119:
+conv.i4
+M0000001d_IL_011a:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000001d_IL_011c:
+brtrue M0000001d_IL_0126
+M0000001d_IL_0121:
+br M0000001d_IL_0132
+M0000001d_IL_0126:
+ldarg 0
+M0000001d_IL_0127:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+M0000001d_IL_012c:
+box System.Networking.Sockets.SocketError.AccessDenied
+M0000001d_IL_0131:
+ret
+M0000001d_IL_0132:
+M0000001d_IL_0133:
+ldarg 0
+M0000001d_IL_0134:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000001d_IL_0139:
+conv.i4
+M0000001d_IL_013a:
+ldc.i4 10
+M0000001d_IL_013c:
+conv.i4
+M0000001d_IL_013d:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000001d_IL_013f:
+brtrue M0000001d_IL_0149
+M0000001d_IL_0144:
+br M0000001d_IL_0155
+M0000001d_IL_0149:
+ldarg 0
+M0000001d_IL_014a:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+M0000001d_IL_014f:
+box System.Networking.Sockets.SocketError.TimedOut
+M0000001d_IL_0154:
+ret
+M0000001d_IL_0155:
+M0000001d_IL_0156:
+ldarg 0
+M0000001d_IL_0157:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000001d_IL_015c:
+conv.i4
+M0000001d_IL_015d:
+ldc.i4 11
+M0000001d_IL_015f:
+conv.i4
+M0000001d_IL_0160:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000001d_IL_0162:
+brtrue M0000001d_IL_016c
+M0000001d_IL_0167:
+br M0000001d_IL_0178
+M0000001d_IL_016c:
+ldarg 0
+M0000001d_IL_016d:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
+M0000001d_IL_0172:
+box System.Networking.Sockets.SocketError.IoFailure
+M0000001d_IL_0177:
+ret
+M0000001d_IL_0178:
+M0000001d_IL_0179:
+ldarg 0
+M0000001d_IL_017a:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000001d_IL_017f:
+conv.i4
+M0000001d_IL_0180:
+ldc.i4 12
+M0000001d_IL_0182:
+conv.i4
+M0000001d_IL_0183:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000001d_IL_0185:
+brtrue M0000001d_IL_018f
+M0000001d_IL_018a:
+br M0000001d_IL_019b
+M0000001d_IL_018f:
+ldarg 0
+M0000001d_IL_0190:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F7065726174696F6E5061796C6F61643E
+M0000001d_IL_0195:
+box System.Networking.Sockets.SocketError.InvalidOperation
+M0000001d_IL_019a:
+ret
+M0000001d_IL_019b:
+M0000001d_IL_019c:
+ldarg 0
+M0000001d_IL_019d:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C5461673E
+M0000001d_IL_01a2:
+conv.i4
+M0000001d_IL_01a3:
+ldc.i4 13
+M0000001d_IL_01a5:
+conv.i4
+M0000001d_IL_01a6:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000001d_IL_01a8:
+brtrue M0000001d_IL_01b2
+M0000001d_IL_01ad:
+br M0000001d_IL_01be
+M0000001d_IL_01b2:
+ldarg 0
+M0000001d_IL_01b3:
+ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E5573655061796C6F61643E
+M0000001d_IL_01b8:
+box System.Networking.Sockets.SocketError.AddressInUse
+M0000001d_IL_01bd:
+ret
+M0000001d_IL_01be:
+M0000001d_IL_01bf:
+M0000001d_IL_01c0:
+call neoCLR.Library.System.Networking.Sockets.SocketError.DefaultReference53797374656D2E4F626A656374()
+ret
+.end
+.method instance byref get_HasValue() -> Boolean
+M0000001e_IL_0000:
+ldarg 0
+M0000001e_IL_0001:
+call instance System.Networking.Sockets.SocketError::get_Value()
+M0000001e_IL_0006:
+M0000001e_IL_0007:
+ref.isnull
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000001e_IL_0009:
+ldc.i4 0
+M0000001e_IL_000a:
+ceq
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanToInt32(Boolean)
+M0000001e_IL_000c:
+call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .end

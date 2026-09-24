@@ -6804,3 +6804,36 @@ configuration/content, not target-specific code added to Raven main.
   methods do not depend on Raven attributes. This is not a new union ABI. Production
   reference integration and mixed legacy carrier defaults still block HttpError;
   generic companion execution is not a new prerequisite for that HTTP objective.
+
+
+### 2026-09-24 — No mandatory per-case union predicates
+
+- **Author direction:** rejects a hard convention requiring an `Is*` property for
+  every union case, explicitly including Result and Option. Directs migration of
+  existing unions to normal union syntax where applicable after the current slice.
+- **Assistant response/action:** removes the proposed compatibility predicates and
+  accessors from the SocketError source migration. Uses generated case matching and
+  updates the convention docs so the older manual-carrier contract is historical,
+  not a requirement imposed on new unions.
+- **Sequence:** finish SocketError SDK/runtime integration, then migrate applicable
+  existing unions in bounded slices. Generic Option/Result/TaskOutcome and other
+  remaining manual carriers need their own target validation; no completed migration
+  of those families is implied by this direction.
+
+- **Author follow-up:** suggests a match expression for SocketError.ToString and
+  notes that cases need not be qualified inside their containing union.
+- **Assistant action/validation:** uses unqualified match arms; verifies all 13
+  names directly and through Object, inactive defaults, nested unions and copies
+  under GC pressure (127 allocations, three collections, zero live objects).
+  Raven warns that the final catch-all is unreachable for declared cases; the
+  runtime test confirms it still handles the inactive default as Empty.
+
+### 2026-09-24 — Empty cases, data-bearing variants and enums
+
+- **Author clarification:** SocketError can be recorded as a basic union. Unions
+  shine when grouped variants hold their own data; enums should remain an option
+  when the model is a set of named constants. Keeping SocketError as a union is
+  acceptable, without implying that every named set should become one.
+- **Assistant action:** records the distinction in the modeling and Raven
+  conventions. Retains SocketError and points to the tested nested HttpError probe
+  as the data-bearing example; the public HttpError API is still planned.

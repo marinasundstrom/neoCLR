@@ -62,6 +62,13 @@ ConnectionRefused and ConnectionReset. Unexpected native failures use IoFailure.
 Errors are Result values, separate from runtime Faults. No public native error-number
 contract or individual cancellation method is available yet.
 
+The development SocketError now uses normal union syntax. Use case patterns rather
+than the removed per-case `Is*` properties and `Get*` accessors. `default(SocketError)`
+has no active case (`HasValue` is false) and formats as `Empty`; it does not represent
+a successful operation or a transport error. Its `Value` projection boxes an active
+case and returns null when inactive. This is compiler support; ordinary callers
+should match the union. Rebuild the library and applications together.
+
 Connections belong to their invocation. Close promptly; teardown releases anything
 left open. The current backend allows 64 open-or-connecting sockets, 64 operations
 including completed results awaiting delivery/consumption, and 64 KiB of aggregate

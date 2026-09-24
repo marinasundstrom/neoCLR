@@ -32,9 +32,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   in place, reuses shared support definitions and rejects changed case identities.
   Check SocketError reference consumers and native import from standard union syntax;
   matched standard shapes override legacy erased-carrier initialization assumptions.
-  Public SocketError migration and production packaging remain pending.
-  Legacy erased SocketError
-  nesting remains rejected by runtime verification. HttpError/BaseUri remain unimplemented.
+  Migrate SocketError to normal union syntax and generate its reference shape from
+  embedded source in both SDK/core paths. Remove per-case Is*/Get* helpers; use case
+  patterns. Add shared IUnion support, conditional case calls and inactive defaults;
+  rebuild matching library and applications because storage and member contracts change.
+  Nested source unions containing SocketError now execute with copying/boxing/GC checks.
+  Use unqualified match arms in ToString; check all 13 cases and inactive defaults.
+  Clarify empty-case unions as the basic form, data-bearing variants as the stronger
+  modeling case, and enums as an alternative for named constants.
+  Real TCP, managed listener/client and selected HTTP success/failure checks pass.
+  Update generated library and API/website documentation. Per-case predicates are not
+  a required convention for any union, including Option and Result. Batch remaining
+  applicable union migrations before resuming HttpError/BaseUri (still unimplemented).
 
 - Add managed System.Uri and UriError with strict escaped-ASCII parsing, string/Uri
   Resolve overloads and RFC 3986 relative resolution. Preserve lexical Text equality

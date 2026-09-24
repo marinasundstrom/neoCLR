@@ -105,8 +105,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-union-') as directory:
     print('Separate union library: ' + library_run.stderr)
     shutil.copyfile(source / 'Probe.rvnproj', work / 'Probe.rvnproj')
 
-    # Mixing the existing erased SocketError with zero-initialized source unions is
-    # deliberately still unsupported. Do not invent a default System.Value payload.
+    # The migrated core SocketError now nests in an ordinary source union.
     shutil.copyfile(source / 'LegacyErrors.rvn', work / 'Errors.rvn')
     (work / 'Main.rvn').write_text('''import System.*
 import System.Networking.Sockets.*
@@ -119,6 +118,7 @@ func Main() {
     run(compiler)
     imported, artifact = import_image(assembly, 'legacy')
     assert imported.returncode == 0, imported.stdout + imported.stderr
-    rejected(run([bundle / 'bin/neoclr', 'verify', artifact, '--system', system], success=False),
-             'managed default initialization is not defined for Value')
-    print('Mixed legacy SocketError still rejected: no erased-payload default.')
+    nested = run([args.runner.resolve(), artifact, system, '64', '10000000'])
+    assert nested.stdout.splitlines() == ['ConnectionRefused'], nested.stdout
+    assert 'live=0' in nested.stderr, nested.stderr
+    print('Migrated SocketError nesting: ' + nested.stderr)

@@ -95,6 +95,7 @@ static class CoreDeclarations
             image.Write(path);
         }
         else File.WriteAllBytes(path, stream.ToArray());
+        if (unionProbe && collectionProbe) SourceUnionReferences.Project(path);
     }
 
     public static string[] ReadDeclaredTypes(string path)

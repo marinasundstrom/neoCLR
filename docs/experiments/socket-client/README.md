@@ -37,9 +37,8 @@ connection deadline remain open. TcpClient
 and UdpClient are candidates for later convenience layers, not current APIs.
 
 The sample uses `?` for Result propagation and `if let` for payloads. Empty error
-cases are tested with their IsClosed predicate: the current application importer
-does not yet admit the direct `error is SocketError.Closed` value-type test. This
-is an explicit frontend limitation, not different runtime union semantics.
+cases use the generated SocketError case-matching contract. SocketError no longer
+requires Is*/Get* helpers. Other not-yet-migrated errors retain their current surface.
 
 
 A second existing state-machine limitation surfaced during validation: keeping a

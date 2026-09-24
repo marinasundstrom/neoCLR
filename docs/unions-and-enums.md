@@ -13,6 +13,15 @@ The carrier and its variants are ordinary types with value semantics. Allocation
 and ownership remain separate choices. Use **enum** for named integer constants,
 including flags; native overlapping storage is a separate layout capability.
 
+SocketError demonstrates the basic empty-case form of a union. The stronger
+modeling example groups variants with their own data: the tested HttpError probe
+can carry a SocketError in its Transport case. This does not make a union preferable
+for every named set. As with .NET enums, named constants (including flags) remain
+an enum use case. Keeping SocketError as a union supports case-based matching,
+while its generated carrier and case machinery is more involved than an integer
+enum; no storage or performance advantage is claimed. The public HttpError API
+remains planned. This author clarification was recorded on 2026-09-24.
+
 Follow the attribute/member approach described in the
 [.NET 11-era C# union documentation](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/union)
 (reviewed 2026-09-06; preview contracts may change). Its custom union pattern marks

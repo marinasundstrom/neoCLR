@@ -165,6 +165,12 @@ contract. neoCLR's own API choices may deliberately differ; document their meani
 and migration instead of silently reproducing .NET shapes or treating different
 spelling as an improvement.
 
+An empty-case union such as SocketError is a basic union, not the main motivation
+for the feature. Unions are particularly useful when variants carry their own
+different data. Enums remain appropriate for a set of named constants; choosing
+standard syntax for an existing union does not require choosing unions for all
+finite sets. SocketError remains a union in the current API.
+
 ## Prefer standard union declarations
 
 Use Raven's standard `union` syntax for class-library unions by default. It supports
@@ -172,6 +178,16 @@ payload-bearing cases, ordinary methods and computed properties; an authored
 `override ToString()` can provide domain-specific diagnostics. Keep case construction
 and pattern matching in source instead of hand-writing erased storage, constructors,
 predicates and checked accessors for each domain error family.
+
+Do not require an `Is*` property or `Get*` accessor for every case, including cases
+in Option and Result. Prefer construction and patterns through the generated case
+contract. Existing helpers are implementation history, not a template or condition
+for recognizing every future union. Migrate applicable existing unions to standard
+syntax; document any remaining manual exception and its blocker.
+
+Within a union, prefer unqualified case names in `match` arms when they resolve
+unambiguously. SocketError.ToString exercises this form for every declared case,
+including boxed calls. Keep qualification where it clarifies an external union.
 
 Hand-authored carriers are rare exceptions. Record the concrete bootstrap or runtime
 constraint that requires one and the condition for removing it. Existing custom

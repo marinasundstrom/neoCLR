@@ -52,6 +52,7 @@ static class UnionImport
             IntrospectionHierarchy.RejectExternalProviders(guestLibraries.Append(app.MainModule));
             StorageHierarchy.RejectExternalBranches(guestLibraries.Append(app.MainModule));
         }
+        ErrorBindings.Reset(library.MainModule);
         ApplicationTypes.Reset(guestLibraries.Append(app.MainModule).ToArray());
         var exports = libraryOwner is null ? [] : LibraryImplementation.Roots(app.MainModule, library.MainModule, libraryOwner);
         if (libraryOwner is not null) ApplicationTypes.SetLibraryScope(app.MainModule, libraryOwner);
@@ -302,7 +303,7 @@ static class UnionImport
                         }
                         else
                         {
-                            code.AppendLine((ApplicationTypes.IsType(initializedType) || ManagedArrayBindings.IsReference(initializedType) || CalendarBindings.Types.Contains(initializedType) || initializedType == HashCodeBindings.Owner || GenericUnionBindings.IsType(initializedType)) ? "initobj " + initializedType : Default(initializedType) + "\nstobj " + initializedType);
+                            code.AppendLine((ApplicationTypes.IsType(initializedType) || ErrorBindings.IsStandard(initializedType) || ManagedArrayBindings.IsReference(initializedType) || CalendarBindings.Types.Contains(initializedType) || initializedType == HashCodeBindings.Owner || GenericUnionBindings.IsType(initializedType)) ? "initobj " + initializedType : Default(initializedType) + "\nstobj " + initializedType);
                             assigned[address.Local] = true;
                         }
                         break;
@@ -951,8 +952,8 @@ static class UnionImport
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
                 {
-                    if (ApplicationTypes.LibraryUnionRequiresInitialization(locals[n]) || ErrorBindings.Cases.TryGetValue(locals[n], out var errorCases) && errorCases.Length > 0) continue;
-                    if ((((StorageItemBindings.IsName(locals[n]) || (UriBindings.IsName(locals[n]) || PathBindings.IsName(locals[n]))) || StreamBindings.IsName(locals[n])) || ((HttpBindings.IsName(locals[n]) || SocketBindings.IsName(locals[n])) || WorkerBindings.IsName(locals[n]))) || TaskBindings.IsType(locals[n]) || AsyncBindings.IsType(locals[n]) || ApplicationTypes.IsType(locals[n]) || ReflectionBindings.IsType(locals[n]) && locals[n] != "System.RuntimeTypeHandle" || ManagedArrayBindings.IsType(locals[n]) || CollectionBindings.IsReference(locals[n]) || (CalendarBindings.Types.Contains(locals[n]) || locals[n] == HashCodeBindings.Owner) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
+                    if (ApplicationTypes.LibraryUnionRequiresInitialization(locals[n]) || !ErrorBindings.IsStandard(locals[n]) && ErrorBindings.Cases.TryGetValue(locals[n], out var errorCases) && errorCases.Length > 0) continue;
+                    if ((((StorageItemBindings.IsName(locals[n]) || (UriBindings.IsName(locals[n]) || PathBindings.IsName(locals[n]))) || StreamBindings.IsName(locals[n])) || ((HttpBindings.IsName(locals[n]) || SocketBindings.IsName(locals[n])) || WorkerBindings.IsName(locals[n]))) || TaskBindings.IsType(locals[n]) || AsyncBindings.IsType(locals[n]) || ApplicationTypes.IsType(locals[n]) || ErrorBindings.IsStandard(locals[n]) || ReflectionBindings.IsType(locals[n]) && locals[n] != "System.RuntimeTypeHandle" || ManagedArrayBindings.IsType(locals[n]) || CollectionBindings.IsReference(locals[n]) || (CalendarBindings.Types.Contains(locals[n]) || locals[n] == HashCodeBindings.Owner) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
                     else if (!method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => locals[n] == "T" + p.Position) && locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !NeedsInitialization(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
                 }
             foreach (var index in bodies.Keys.Order())
@@ -1065,7 +1066,7 @@ static class UnionImport
     };
     static bool Converts(string source, string target) => source == "FaultNull" && (target == "System.Object" || ApplicationTypes.IsReference(target)) || source != target && target == "System.Object" && ManagedArrayBindings.IsReference(source) || ApplicationTypes.IsLibraryUnion(target) && source == target + "&" || InterfaceBindings.Converts(source, target) || BooleanBindings.Converts(source, target) || EnumBindings.Converts(source, target);
     static string ConvertStack(string source, string target) => (source != target && target == "System.Object" && ManagedArrayBindings.IsReference(source) ? "castclass System.Object\n" : "") + (ApplicationTypes.IsLibraryUnion(target) && source == target + "&" ? "ldobj " + target + "\n" : "") + InterfaceBindings.Convert(source, target) + BooleanBindings.Convert(source, target) + EnumBindings.Convert(source, target);
-    static bool NeedsInitialization(string type) => !ApplicationTypes.IsEmptyCaseLibraryUnion(type) && (HttpBindings.IsName(type) || ReaderBindings.IsName(type) || ApplicationTypes.LibraryUnionRequiresInitialization(type) || CalendarBindings.IsReference(type) || type is "System.Object" or ParameterSnapshotBindings.Vector || InterfaceBindings.IsInterface(type) || NativeMemoryBindings.IsPointer(type) || type is "System.RuntimeTypeHandle" or "Value" || DelegateBindings.IsType(type) || (GenericUnionBindings.IsType(type)
+    static bool NeedsInitialization(string type) => !ApplicationTypes.IsEmptyCaseLibraryUnion(type) && !ErrorBindings.IsStandard(type) && (HttpBindings.IsName(type) || ReaderBindings.IsName(type) || ApplicationTypes.LibraryUnionRequiresInitialization(type) || CalendarBindings.IsReference(type) || type is "System.Object" or ParameterSnapshotBindings.Vector || InterfaceBindings.IsInterface(type) || NativeMemoryBindings.IsPointer(type) || type is "System.RuntimeTypeHandle" or "Value" || DelegateBindings.IsType(type) || (GenericUnionBindings.IsType(type)
         ? GenericUnionBindings.RequiresInitialization(type) : ResultBindings.RequiresInitialization(type)));
     static bool HasNamedVoid(TypeReference type) => type is GenericInstanceType generic
         && generic.GenericArguments.Count == 1 && generic.GenericArguments[0].IsValueType
@@ -1082,7 +1083,8 @@ static class UnionImport
         if (file is not null)
         {
             if ((file.OutArgument >= 0 && file.Result == "Boolean" || reference.Name == "FromResidual")
-                && definition.DeclaringType.FullName != "System.Tasks.TaskOutcome`1") ValidatePropagation(definition.DeclaringType);
+                && definition.DeclaringType.FullName != "System.Tasks.TaskOutcome`1"
+                && !ErrorBindings.IsStandard(definition.DeclaringType.FullName)) ValidatePropagation(definition.DeclaringType);
             return new(file.Name, file.Arguments, file.Result, file.OutArgument, file.Instruction, file.OutArgument >= 0 && file.Result == "Boolean");
         }
         if (NamespaceFunctions.Owner(reference.DeclaringType) == "System.Math" && reference.Name == "Clamp")

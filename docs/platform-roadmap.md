@@ -836,24 +836,22 @@ Public Socket operations keep their phase bounds. Request construction, custom p
 work outside transport, server accept and server application handlers remain outside
 that budget. A configurable general timeout/token API is not yet selected.
 
-**Active next step, 2026-09-24 (author-directed):** finish Uri, HttpError and
-HttpClient.BaseUri with string/Uri request overloads. The initial managed Uri
-slice is implemented. Author direction now requires normal Raven union syntax for
-class-library unions by default, with documented rare manual exceptions. Establish
-target support for a standard-syntax HttpError before integrating typed HTTP errors
-and base-address request resolution; do not expand the manual carrier catalog as
-the default path. The [source-union probe](experiments/http-error-unions/README.md)
-now executes nested standard declarations with members, defaults, copying and boxing,
-including empty-case-only unions and separately compiled dependencies.
-The empty-case bootstrap probe now matches a separate core reference and imports
-native library bodies with constructor checks preserved. Raven case/companion metadata
-is supported at the development bridge boundary only; it is not a runtime dependency
-or a standardized platform case map. Limit this work to enabling class-library source
-unions, then resume HttpError/BaseUri. The bridge now also accepts the supplied core's shared
-IUnion interface without redeclaring it in each imported union. A reusable projector
-now replaces an existing empty-case reference family in place; SocketError reference
-consumers and native import are the focused migration check. Production packaging,
-runtime call adapters, mixed-carrier execution and public API migration remain open.
+**Active next step, 2026-09-24 (author-directed):** complete union migrations in a
+batch before resuming HttpError and HttpClient.BaseUri. Uri is implemented.
+SocketError is now the first public error migrated to normal Raven union syntax:
+consumer/bootstrap references compile embedded source, native callers use generated
+case matching, and nested HttpError probes pass copying/boxing/GC checks. Real TCP,
+managed listener/client and selected HTTP cases pass. Rebuild matching SDK/library/apps;
+SocketError's Is*/Get* helpers are removed and its default is inactive.
+
+Per-case Is* properties are not a required convention, including for Option/Result.
+Migrate applicable existing unions next, recording concrete blockers for remaining
+manual carriers. Raven case/companion metadata remains a provisional bridge concern,
+not a runtime dependency or a standardized platform case map. Generic and
+payload-bearing class-library projection still need validation; the application
+[source-union probe](experiments/http-error-unions/README.md) does not establish that
+broader library support. After the migration batch, resume typed HTTP errors and
+string/Uri BaseUri request resolution rather than extending the manual carrier catalog.
 Handler/server cancellation ownership and public JSON contracts remain later work. The [JSON report](experiments/http-json/README.md) now passes between two
 neoCLR applications and independent peers; it does not promote a public JSON API. The
 [HTTP sample](experiments/http-client/README.md) imports development System.Web.Http

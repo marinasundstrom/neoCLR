@@ -1,0 +1,8 @@
+; Provisional library interface used by Raven-generated unions. Ordinary VM interface.
+.interface System.Runtime.CompilerServices.IUnion
+.method instance get_Value() -> System.Object
+.end
+.property instance Value() -> System.Object
+.get instance System.Runtime.CompilerServices.IUnion::get_Value()
+.end
+.end

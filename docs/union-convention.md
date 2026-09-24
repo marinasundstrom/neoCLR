@@ -1,9 +1,13 @@
-# Preview 1 ordinary union member convention
+# Union conventions and source integration
 
-This is the selected member contract for Preview 1 library carriers and a future
-compiler. System.Option and System.Result now implement it in platform IL. The
-runtime executes ordinary types and methods; no convention recognizer or high-level
-compiler is implemented yet. The marker does not certify an implementation's behavior.
+Normal Raven `union` syntax is the default for class-library unions. Per-case `Is*`
+properties and `Get*` accessors are not a required convention, including for Option
+and Result. Prefer generated construction and case matching. The runtime executes
+ordinary types and methods, without a union opcode or Raven metadata dependency.
+
+The Preview 1 member convention retained below documents the older manual carriers;
+it does not prescribe the API of new or migrated unions. Existing unions should move
+to source syntax where supported, with concrete blockers recorded for exceptions.
 
 ## Raven development adapter — 2026-09-24
 
@@ -24,13 +28,13 @@ finish the class-library support needed for HttpError and return to the HTTP wor
 See the [focused probe](experiments/http-error-unions/README.md) for the supported
 shapes and remaining production integration work.
 
-## Recognizing the contract
+## Historical Preview 1 manual-carrier contract
 
 A carrier has the ordinary System.Runtime.CompilerServices.UnionAttribute marker.
 Tools resolve its constructor reference to the System definition; a similarly named
 attribute in some other module is not the marker. No new union type kind is introduced.
 
-For this first convention:
+The original convention used the following rules (not requirements for new unions):
 
 1. The carrier declares one or more public instance `.ctor(Variant) -> Void` overloads.
    Every public constructor has exactly one parameter. Each parameter is an ordinary

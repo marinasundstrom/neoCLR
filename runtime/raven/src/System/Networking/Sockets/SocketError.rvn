@@ -1,196 +1,36 @@
 namespace System.Networking.Sockets
 
-import System.Runtime.CompilerServices.ValueStorage
+public union SocketError {
+    case Closed
+    case Busy
+    case InvalidRange
+    case LimitExceeded
+    case Cancelled
+    case InvalidAddress
+    case ConnectionRefused
+    case ConnectionReset
+    case AccessDenied
+    case TimedOut
+    case IoFailure
+    case InvalidOperation
+    case AddressInUse
 
-[System.Runtime.CompilerServices.Union]
-public struct SocketError {
-    private field Stored: System.Value
-
-    public struct Closed { }
-    public struct Busy { }
-    public struct InvalidRange { }
-    public struct LimitExceeded { }
-    public struct Cancelled { }
-    public struct InvalidAddress { }
-    public struct ConnectionRefused { }
-    public struct ConnectionReset { }
-    public struct AccessDenied { }
-    public struct TimedOut { }
-    public struct IoFailure { }
-    public struct InvalidOperation { }
-    public struct AddressInUse { }
-
-    init(value: SocketError.Closed) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsClosed: bool => ValueStorage.Is<SocketError.Closed>(Stored)
-
-    func GetClosed() -> SocketError.Closed {
-        return ValueStorage.Unpack<SocketError.Closed>(Stored)
-    }
-
-    init(value: SocketError.Busy) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsBusy: bool => ValueStorage.Is<SocketError.Busy>(Stored)
-
-    func GetBusy() -> SocketError.Busy {
-        return ValueStorage.Unpack<SocketError.Busy>(Stored)
-    }
-
-    init(value: SocketError.InvalidRange) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsInvalidRange: bool => ValueStorage.Is<SocketError.InvalidRange>(Stored)
-
-    func GetInvalidRange() -> SocketError.InvalidRange {
-        return ValueStorage.Unpack<SocketError.InvalidRange>(Stored)
-    }
-
-    init(value: SocketError.LimitExceeded) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsLimitExceeded: bool => ValueStorage.Is<SocketError.LimitExceeded>(Stored)
-
-    func GetLimitExceeded() -> SocketError.LimitExceeded {
-        return ValueStorage.Unpack<SocketError.LimitExceeded>(Stored)
-    }
-
-    init(value: SocketError.Cancelled) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsCancelled: bool => ValueStorage.Is<SocketError.Cancelled>(Stored)
-
-    func GetCancelled() -> SocketError.Cancelled {
-        return ValueStorage.Unpack<SocketError.Cancelled>(Stored)
-    }
-
-    init(value: SocketError.InvalidAddress) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsInvalidAddress: bool => ValueStorage.Is<SocketError.InvalidAddress>(Stored)
-
-    func GetInvalidAddress() -> SocketError.InvalidAddress {
-        return ValueStorage.Unpack<SocketError.InvalidAddress>(Stored)
-    }
-
-    init(value: SocketError.ConnectionRefused) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsConnectionRefused: bool => ValueStorage.Is<SocketError.ConnectionRefused>(Stored)
-
-    func GetConnectionRefused() -> SocketError.ConnectionRefused {
-        return ValueStorage.Unpack<SocketError.ConnectionRefused>(Stored)
-    }
-
-    init(value: SocketError.ConnectionReset) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsConnectionReset: bool => ValueStorage.Is<SocketError.ConnectionReset>(Stored)
-
-    func GetConnectionReset() -> SocketError.ConnectionReset {
-        return ValueStorage.Unpack<SocketError.ConnectionReset>(Stored)
-    }
-
-    init(value: SocketError.AccessDenied) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsAccessDenied: bool => ValueStorage.Is<SocketError.AccessDenied>(Stored)
-
-    func GetAccessDenied() -> SocketError.AccessDenied {
-        return ValueStorage.Unpack<SocketError.AccessDenied>(Stored)
-    }
-
-    init(value: SocketError.TimedOut) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsTimedOut: bool => ValueStorage.Is<SocketError.TimedOut>(Stored)
-
-    func GetTimedOut() -> SocketError.TimedOut {
-        return ValueStorage.Unpack<SocketError.TimedOut>(Stored)
-    }
-
-    init(value: SocketError.IoFailure) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsIoFailure: bool => ValueStorage.Is<SocketError.IoFailure>(Stored)
-
-    func GetIoFailure() -> SocketError.IoFailure {
-        return ValueStorage.Unpack<SocketError.IoFailure>(Stored)
-    }
-
-    init(value: SocketError.InvalidOperation) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsInvalidOperation: bool => ValueStorage.Is<SocketError.InvalidOperation>(Stored)
-
-    func GetInvalidOperation() -> SocketError.InvalidOperation {
-        return ValueStorage.Unpack<SocketError.InvalidOperation>(Stored)
-    }
-
-    init(value: SocketError.AddressInUse) {
-        Stored = ValueStorage.Pack(value)
-    }
-
-    val IsAddressInUse: bool => ValueStorage.Is<SocketError.AddressInUse>(Stored)
-
-    func GetAddressInUse() -> SocketError.AddressInUse {
-        return ValueStorage.Unpack<SocketError.AddressInUse>(Stored)
-    }
-
-    func ToString() -> string {
-        if IsClosed {
-            return "Closed"
+    override func ToString() -> string {
+        return match self {
+            Closed => "Closed"
+            Busy => "Busy"
+            InvalidRange => "InvalidRange"
+            LimitExceeded => "LimitExceeded"
+            Cancelled => "Cancelled"
+            InvalidAddress => "InvalidAddress"
+            ConnectionRefused => "ConnectionRefused"
+            ConnectionReset => "ConnectionReset"
+            AccessDenied => "AccessDenied"
+            TimedOut => "TimedOut"
+            IoFailure => "IoFailure"
+            InvalidOperation => "InvalidOperation"
+            AddressInUse => "AddressInUse"
+            _ => "Empty"
         }
-        if IsBusy {
-            return "Busy"
-        }
-        if IsInvalidRange {
-            return "InvalidRange"
-        }
-        if IsLimitExceeded {
-            return "LimitExceeded"
-        }
-        if IsCancelled {
-            return "Cancelled"
-        }
-        if IsInvalidAddress {
-            return "InvalidAddress"
-        }
-        if IsConnectionRefused {
-            return "ConnectionRefused"
-        }
-        if IsConnectionReset {
-            return "ConnectionReset"
-        }
-        if IsAccessDenied {
-            return "AccessDenied"
-        }
-        if IsTimedOut {
-            return "TimedOut"
-        }
-        if IsIoFailure {
-            return "IoFailure"
-        }
-        if IsInvalidOperation {
-            return "InvalidOperation"
-        }
-        if IsAddressInUse {
-            return "AddressInUse"
-        }
-        System.Fault("invalid socket error case")
-        return ""
     }
 }

@@ -1,3 +1,8 @@
+> **Current development status:** SocketError is now migrated and integrated into
+> consumer/bootstrap references and the generated System library. The former mixed
+> erased-carrier rejection is now an execution check. See the migration check below.
+> Earlier bootstrap descriptions document the path to that integration.
+
 # Standard-syntax HTTP error union investigation
 
 This reduced application probe authors cases, a computed property and an override
@@ -62,10 +67,10 @@ explicit-layout structs or nonempty overlaid cases.
 
 Application/dependency imports are covered above. The bounded bootstrap experiment
 below now imports empty-case union implementations.
-Production reference catalogs and public API migration still need integration.
+SocketError now uses that integration in the production reference catalog.
 The previous probe stopped at SocketError byref and then receiver initialization.
-`LegacyErrors.rvn` retains that mixed-form investigation; it now imports but the
-runtime verifier correctly rejects its non-defaultable erased payload.
+`LegacyErrors.rvn` retains the original probe name; its nested SocketError now
+executes successfully with the migrated core type.
 
 ## Comparison and remaining decisions
 
@@ -79,22 +84,21 @@ We retain that distinction rather than fabricate a valid legacy error case.
 
 Compiler-owned case machinery reduces handwritten library code; it requires explicit
 bridge support and validation. This slice does not cover generic or payload-bearing explicit-layout
-unions, equality synthesis, general IUnion conversions or public runtime-library migration.
-Next, resolve the mixed-carrier boundary and production reference integration before shipping
-HttpError/BaseUri. Existing carriers are migration candidates, not an instruction
-to rewrite all working unions in one change.
+unions, equality synthesis or general IUnion conversions. SocketError is the first
+public runtime-library migration. The next author-directed step is a batch of
+applicable existing union migrations before HttpError/BaseUri.
 
 ## Validation for this slice
 
 The focused verifier passes: 103 tracked allocations, two collections, peak 64 and
 zero live objects at completion in both the single-assembly and separate-library
 arrangements. All six mutated-contract rejection checks and
-the mixed-legacy default rejection pass. The existing constructor-argument regression
+the integrated SocketError execution check pass. The existing constructor-argument regression
 also passes. The prior broader records verifier attempt with the installed
 bundle fails before import on record-to-Equatable conversions and ambiguous
 Equals overloads; it is not counted as passing. That compiler/SDK validation gap
-requires separate investigation. No website or public API signature changes occur
-in this slice, so the existing API snapshot is unchanged.
+requires separate investigation. The subsequent SocketError integration updates
+the public API snapshot and networking website documentation.
 
 
 ## Empty-case union bootstrap
@@ -150,9 +154,8 @@ provisional compiler bridge mapping. The selected member shape remains Raven-dri
 not a new platform case-mapping standard. Production core packaging still needs to
 supply that interface once and project each migrated union's reference metadata.
 
-No public core-library type has migrated yet. Production reference/catalog integration,
-application import/execution through production catalogs and API documentation must
-accompany the first real migration. The fixture now compiles a separate Raven consumer
+SocketError is the first migrated public error. Its reference, runtime callers and
+API documentation now use the source-generated contract. The fixture now compiles a separate Raven consumer
 that constructs and matches the projected core union; that compilation does not yet
 validate execution through the production consumer pipeline.
 Private storage `var`/`val` should be used normally; checking the emitted field layout
@@ -217,7 +220,30 @@ regression; legacy error carriers retain their existing behavior.
 This follows CLI reference type identity while taking the reference shape from emitted
 source rather than maintaining a second hand-written union declaration. The cost is a
 staged compile/project/recompile bootstrap that must be wired into SDK production.
-The public SocketError source, generated System library and reference snapshot have not
-yet migrated: existing runtime call adapters and public API documentation must change
-together in that migration. This check does not claim that a network application has
+The public SocketError source, generated System library, call adapters and API
+reference snapshot have now migrated together. This check does not claim that a network application has
 executed with the replacement. The runtime remains independent of Raven attributes.
+
+
+## Integrated SocketError execution
+
+```sh
+python3 docs/experiments/http-error-unions/verify_socket_union.py \
+  --bundle /path/to/matching/neoclr-bundle \
+  --runner target/release/examples/measure_async
+```
+
+Core generation compiles embedded SocketError Raven source using the bridge's matching
+compiler, then projects it into both consumer and bootstrap references. No extra binary
+shape snapshot or checkout path is required by a packaged bridge. The generated System
+library supplies IUnion once as an ordinary interface; it does not execute Raven
+metadata attributes. Per-case Is*/Get* helpers are removed, not a requirement carried
+forward from the manual carrier. The default has HasValue false and formats as Empty.
+
+The integrated check covers all 13 display names with unqualified match cases,
+matching/nonmatching cases, inactive Value, nesting in
+HttpError, copying and boxed values under GC pressure: 127 allocations, three collections,
+zero live objects. Socket client, separate neoCLR listener/client and selected HTTP
+success/failure checks pass with the matching artifacts. The next author-directed
+work is batch migration of applicable existing unions before resuming public HttpError
+and BaseUri. Generic families remain a separate validation boundary.

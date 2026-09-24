@@ -24,6 +24,20 @@ static class ErrorBindings
         ["System.InvalidRangeError"] = [], ["System.InvalidDateError"] = [],
         ["System.InvalidTimeError"] = [], ["System.OverflowError"] = [], ["System.EnvironmentError"] = []
     };
+    static readonly HashSet<string> Standard = new();
+    public static bool IsStandard(string type) => Standard.Contains(type);
+    public static void Reset(ModuleDefinition core)
+    {
+        Standard.Clear();
+        foreach (var (name, cases) in Cases)
+            if (core.GetType(name) is { } type && ApplicationTypes.IsEmptyCaseUnion(type))
+            {
+                var metadata = RavenUnionMetadata.ValidateEmptyCases(type);
+                if (!metadata.Select(c => c.Name).SequenceEqual(cases))
+                    throw new InvalidDataException("Unexpected standard error case catalog: " + name);
+                Standard.Add(name);
+            }
+    }
     public static IEnumerable<string> Errors => Cases.Keys;
     static IEnumerable<string> CaseTypes => Cases.SelectMany(e => e.Value.Select(c => e.Key + "." + c));
     public static bool IsType(string type) => Errors.Contains(type) || CaseTypes.Contains(type);
@@ -44,7 +58,27 @@ static class ErrorBindings
     {
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
-        var signature = RuntimeSignatures.Match(reference, definition, Type);
+        var signature = RuntimeSignatures.Match(reference, definition,
+            type => type.FullName == "System.Object" && (type.MetadataType == MetadataType.Object || RuntimeSignatures.IsCore(type.Scope)) ? "System.Object" : Type(type));
+        if (IsStandard(owner))
+        {
+            var output = ApplicationTypes.IsConditionalUnionOutput(definition);
+            var caseNames = Cases[owner].Select(c => owner + "." + c).ToArray();
+            var allowed = reference.HasThis
+                ? output || signature.Args.Length == 0 && (reference.Name == "get_HasValue" && signature.Result == "Boolean"
+                    || reference.Name == "get_Value" && signature.Result == "System.Object"
+                    || reference.Name == "ToString" && signature.Result == "String"
+                    || Cases[owner].Any(c => reference.Name == "get_Is" + c && signature.Result == "Boolean"
+                        || reference.Name == "Get" + c && signature.Result == owner + "." + c))
+                : reference.Name == "op_Implicit" && signature.Args.Length == 1 && caseNames.Contains(signature.Args[0]) && signature.Result == owner
+                    || reference.Name == "op_Explicit" && signature.Args.SequenceEqual(new[] { owner }) && caseNames.Contains(signature.Result)
+                    || signature.Args.Length == 0 && Cases[owner].Any(c => reference.Name == "get_" + c && signature.Result == owner + "." + c);
+            if (!allowed) throw new InvalidDataException("Unsupported standard error member: " + reference.FullName);
+            var name = ApplicationTypes.MethodName(definition);
+            return new(owner + "::" + name,
+                (reference.HasThis ? new[] { owner + "&" } : []).Concat(signature.Args).ToArray(), signature.Result,
+                output ? 1 : -1, Instruction: $"call {(reference.HasThis ? "instance " : "")}{owner}::{name}({string.Join(',', signature.Args)})");
+        }
         if (Errors.Contains(owner) && reference.HasThis && !definition.IsVirtual && signature.Args.Length == 0
             && (reference.Name == "ToString" && signature.Result == "String"
                 || Cases[owner].Any(c => reference.Name == "get_Is" + c && signature.Result == "Boolean"
@@ -67,9 +101,9 @@ static class ErrorBindings
         var text = new StringBuilder();
         foreach (var owner in Errors)
         {
-            var methods = Cases[owner].SelectMany(c => new[] { ("get_Is" + c, "Boolean"), ("Get" + c, owner + "." + c) }).Append(("ToString", "String"));
+            var methods = IsStandard(owner) ? Enumerable.Empty<(string, string)>() : Cases[owner].SelectMany(c => new[] { ("get_Is" + c, "Boolean"), ("Get" + c, owner + "." + c) }).Append(("ToString", "String"));
             foreach (var (name, result) in methods)
-                text.AppendLine($".function {Helper(owner, name)}({owner}& source) -> {result}\nldarg source\nldobj {owner}\ncall instance {owner}::{name}()\nret\n.end");
+                text.AppendLine($".function {Helper(owner, name)}({owner}& source) -> {result}\nldarg source\n{(IsStandard(owner) ? "" : "ldobj " + owner + "\n")}call instance {owner}::{name}()\nret\n.end");
             foreach (var arg in Cases[owner].Select(c => owner + "." + c))
                 text.AppendLine($".function {Helper(owner, "New" + arg)}({arg} value) -> {owner}\nldarg value\nnewobj instance {owner}::.ctor({arg})\nret\n.end");
         }

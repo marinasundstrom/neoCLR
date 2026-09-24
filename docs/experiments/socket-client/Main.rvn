@@ -73,13 +73,13 @@ async func ExchangeGreeting(addresses: Sequence<string>) -> Task<Result<int, Soc
     socket.Close()
     let closed = socket.Receive([(byte)0], 0, 1).GetResult()
     if let Error(error) = closed {
-        Check(error.IsClosed)
+        Check(error is SocketError.Closed)
     } else {
         System.Fault("Closed socket admitted a receive")
     }
     let closedSend = socket.Send([(byte)0], 0, 1).GetResult()
     if let Error(error) = closedSend {
-        Check(error.IsClosed)
+        Check(error is SocketError.Closed)
     } else {
         System.Fault("Closed socket admitted a send")
     }
@@ -112,13 +112,13 @@ func StartExchange(addresses: Sequence<string>) {
 func Main() {
     let empty = ArrayList<string>()
     if let Error(error) = Socket.Connect(empty, 19090).GetResult() {
-        Check(error.IsInvalidRange)
+        Check(error is SocketError.InvalidRange)
     } else {
         System.Fault("Empty address sequence admitted")
     }
     let invalid: Sequence<string> = ["127.0.0.1", "bad address"]
     if let Error(error) = Socket.Connect(invalid, 19090).GetResult() {
-        Check(error.IsInvalidAddress)
+        Check(error is SocketError.InvalidAddress)
     } else {
         System.Fault("Malformed address sequence admitted")
     }

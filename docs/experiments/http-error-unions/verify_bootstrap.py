@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Import an empty-case Raven union against a separate core reference contract."""
 import argparse
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -65,7 +66,9 @@ public union Limit {
          bundle / 'demo/NeoCLR.CoreProbe.dll', 'Probe.Limit', reference])
     source_metadata = run(['dotnet', bridge, '--union-metadata-report', source]).stdout
     reference_metadata = run(['dotnet', bridge, '--union-metadata-report', reference]).stdout
-    assert source_metadata == reference_metadata, (source_metadata, reference_metadata)
+    def limit_metadata(text):
+        return next(item for line in text.splitlines() if (item := json.loads(line))['Carrier'] == 'Probe.Limit')
+    assert limit_metadata(source_metadata) == limit_metadata(reference_metadata)
     (root / 'Consumer.rvn').write_text("""import Probe.*
 func Create() -> Limit {
     Limit.Headers
@@ -192,10 +195,11 @@ fault "WrongDefault"
     assert result.stdout.splitlines() == ['Headers', 'Headers', 'Body', 'Empty'], result.stdout
     assert 'live=0' in result.stderr, result.stderr
     print(result.stdout + result.stderr)
-    shared_program = root / 'Shared.neoil'
-    shared_program.write_text(program.read_text().replace(body,
+    protocol = '' if '.interface System.Runtime.CompilerServices.IUnion\n' in system.read_text() else (
         '.interface System.Runtime.CompilerServices.IUnion\n'
-        '.method instance get_Value() -> System.Object\n.end\n.end\n' + shared_body))
+        '.method instance get_Value() -> System.Object\n.end\n.end\n')
+    shared_program = root / 'Shared.neoil'
+    shared_program.write_text(program.read_text().replace(body, protocol + shared_body))
     shared_result = run([args.runner.resolve(), shared_program, system, '64', '10000000'])
     assert shared_result.stdout == result.stdout, shared_result.stdout
     assert 'live=0' in shared_result.stderr, shared_result.stderr
@@ -226,9 +230,7 @@ func Main() {
     run(['dotnet', bridge, '--import', root / 'application/Application.dll', reference,
          root / 'application-import'])
     application_system = root / 'System.neoil'
-    application_system.write_text(system.read_text() +
-        '\n.interface System.Runtime.CompilerServices.IUnion\n'
-        '.method instance get_Value() -> System.Object\n.end\n.end\n')
+    application_system.write_text(system.read_text() + '\n' + protocol)
     application_result = run([args.runner.resolve(), root / 'application-import/App.neoil',
         application_system, '64', '10000000'])
     assert 'live=0' in application_result.stderr, application_result.stderr

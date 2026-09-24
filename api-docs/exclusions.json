@@ -10,5 +10,6 @@
   "T:System.Result.Ok`1": "CLR case-carrier scaffold in the non-generic union container; not a separate application type.",
   "T:System.Result.Error`1": "CLR case-carrier scaffold in the non-generic union container; not a separate application type.",
   "T:System.Tasks.TaskOutcome.Cancelled": "CLR case-carrier scaffold in the non-generic union container; not a separate application type.",
-  "T:System.Tasks.TaskOutcome.Completed`1": "CLR case-carrier scaffold in the non-generic union container; not a separate application type."
+  "T:System.Tasks.TaskOutcome.Completed`1": "CLR case-carrier scaffold in the non-generic union container; not a separate application type.",
+  "T:Raven.Runtime.CompilerServices.RavenUnionCaseAttribute": "Raven-owned compiler-reference case metadata, not an executable platform API. The bridge consumes it; the runtime has no dependency on this attribute."
 }

@@ -11,6 +11,7 @@
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="../../../runtime/raven/src/System/Networking/Sockets/SocketError.rvn" LogicalName="NeoCLR.SocketError.rvn" />
     <None Update="samples/*.rvn" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <Target Name="RequireRaven" BeforeTargets="Restore;PrepareForBuild" Condition="'$(RavenRoot)' == ''">

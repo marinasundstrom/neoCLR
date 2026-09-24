@@ -168,3 +168,11 @@ System.Uri and UriError now have generated type/member coverage. Parse and both
 Resolve overloads document strict ASCII grammar, the 4096-byte bound, unsupported
 IP literals, lexical equality and RFC relative resolution. HttpError and
 HttpClient.BaseUri remain planned; Uri parsing alone does not broaden HTTP support.
+
+
+SocketError is now projected from its normal Raven union source when the bridge
+builds either core reference. Its old Is*/Get* helpers are removed; the generated
+HasValue, Value and conditional TryGetValue members are documented. IUnion is a
+provisional ordinary compiler-support interface. RavenUnionCaseAttribute is excluded
+as compiler-reference metadata, with the exact reason in exclusions.json; it is not
+an executable runtime API. Rebuild the bridge after changing the embedded source.

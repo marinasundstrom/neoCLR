@@ -52,10 +52,10 @@ with tempfile.TemporaryDirectory(prefix='neoclr-union-reference-') as directory:
     legacy_core.parent.mkdir()
     run(['dotnet', bridge, '--reference-library-core', legacy_core])
     repository = Path(__file__).resolve().parents[3]
-    legacy_source = compile_source('Legacy', [repository / 'runtime/raven/src/System/Networking/Sockets/SocketError.rvn'], legacy_core)
-    run(['dotnet', bridge, '--library-implementation', legacy_source, legacy_core, owner, root / 'legacy-native'])
+    legacy_source = compile_source('Legacy', [repository / 'runtime/raven/src/System/Int32ParseError.rvn'], legacy_core)
+    run(['dotnet', bridge, '--library-implementation', legacy_source, legacy_core, 'System.Int32ParseError', root / 'legacy-native'])
     assert '.field private Stored Value' in (root / 'legacy-native/Implementation.neoil').read_text()
-    print('Existing erased SocketError implementation still imports.')
+    print('Existing erased Int32ParseError implementation still imports.')
     source = compile_source('Source', ['Errors.rvn'], core)
     projected = root / 'projected/NeoCLR.CoreProbe.dll'
     projected.parent.mkdir()
@@ -100,4 +100,4 @@ func Create() -> SocketError {
     assert rejected.returncode != 0 and 'case identities do not match' in rejected.stderr, rejected.stdout + rejected.stderr
     assert not rejected_output.exists()
     print('SocketError reference replacement, shared reprojection, consumer signatures and native import passed.')
-    print('Public SocketError and SDK unchanged; runtime callers still require migration.')
+    print('Reference replacement and shared support remain consistent with the migrated SocketError.')

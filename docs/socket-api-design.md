@@ -749,3 +749,26 @@ Raven server also closes a stalled partial request. All four Raven executions co
 and end with zero live managed objects. The API snapshot and combined 967-page site
 validate, and all 17 website tests pass. No cross-platform matrix was rerun: deadline
 selection is shared owner logic and no platform-specific socket adapter changed.
+
+
+## Standard SocketError union — 2026-09-24
+
+SocketError is authored with Raven's normal union syntax. Its thirteen cases keep
+their meanings, while compiler-generated tagged fields replace the erased System.Value
+storage. Case patterns use conditional TryGetValue; Is*/Get* helpers are removed.
+The default is inactive (HasValue false, display Empty), not a successful result.
+Compared with .NET's numeric SocketError enum, the neoCLR error remains a union of
+recoverable categories rather than a public native error-code mapping. No claim of
+binary compatibility or a performance improvement is made.
+
+The bridge compiles embedded source against a temporary seed reference and projects
+its emitted shape into both consumer and library references. A shared ordinary IUnion
+interface supports the generated Value projection; Raven's case metadata remains at
+the compiler boundary. This avoids a second handwritten shape catalog but couples
+reference generation to the bundled matching compiler. Rebuild references, the native
+System library and applications together: storage, receiver conventions and member
+rows change. Production callers and the API reference follow the generated contract.
+
+The author rejects mandatory per-case predicates even for Option and Result. Existing
+unions should migrate where applicable after this slice; generic/payload-bearing
+families need their own bridge, default/copy/boxing and GC validation.

@@ -8,7 +8,7 @@
     "runtime/raven/src/System/Web/Http/HttpClient.rvn": "859dc96f2458c3359922d5a8cd596809edc1669946cfcc886788fcc39e22c9c6",
     "runtime/raven/src/System/Networking/DnsError.rvn": "652823f199e6d95b14518917d27306ac83c97d7bac1ee2f62578bb224b3b1d3c",
     "runtime/raven/src/System/Networking/Dns.rvn": "59a6602715d4965feb78ed97327df0b8ebbaf1e4a04eecc074c2e57f14bdebb7",
-    "runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "908aedf618e5cc664268b2769910543c60bc5fe00642b687e6f6e4af9333adc9",
+    "runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "8bef0a016957620d757b082c7875e2ed87162a7b6fa936585c8d21264eb10014",
     "runtime/raven/src/System/Networking/Sockets/Socket.rvn": "24108b0b3e6003fda27588211303df99618d58ce6c9c1ee5d70be446bc75866a",
     "runtime/raven/src/System/IO/TextReadError.rvn": "bd5cc31983f8aaa1b7e4a68fe63d06e45166e8a3c0c9537673a1ebab09d3659c",
     "runtime/raven/src/System/IO/TextReader.rvn": "6f9f6159741cec9acaded9e5b2705d3c1beaac4fa3fbb1be8a2146f18f575ce0",
@@ -121,7 +121,7 @@
     "SeekableStream.helpers.neoil": "f59a989db93dcb4f687fbdadbd9edb70f63c32bd74b234514a6a703d6b4a8ba1"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "23d895573829807a3b4558845599740ca96e725f3dc7ca9eacefaec3f4e858e1",
+  "coreSha256": "6b7eb4a6c8283345438f953cec85fe8d48011124213560c104c93c9f04dce303",
   "exports": [
     "GetPosition() -> System.Result<Int64,System.IO.StreamError>",
     "Seek(Int64 position) -> System.Result<Int64,System.IO.StreamError>"

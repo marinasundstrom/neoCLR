@@ -12,7 +12,15 @@ artifacts; the published Preview 9 SDK does not include these APIs.
 [Dns.GetHostAddresses](xref:System.Networking.Dns) returns a
 `Task<Result<Sequence<string>, DnsError>>`. Resolution uses the host configuration,
 including local host entries. The numeric IPv4 strings can be passed to Socket.Connect.
-Lookup errors and connection errors are separate outcomes.
+Lookup errors and connection errors are separate outcomes. `SocketError` is authored
+with normal union syntax in the development library. Match its named cases directly;
+per-case `Is*` properties and `Get*` methods are no longer part of that API. Rebuild
+applications with the matching development SDK and runtime library.
+
+SocketError is a basic union whose cases carry no data. Unions become more useful
+when different variants carry different data. Enums remain an appropriate option
+for models that only need named constants; this API does not prescribe unions
+for every such model.
 
 ```raven
 {{DNS_RESOLVE_SAMPLE}}
