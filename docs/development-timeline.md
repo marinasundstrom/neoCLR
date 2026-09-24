@@ -6287,3 +6287,21 @@ change or new helper API. Expanded the Raven String Object sample and .NET basel
 The [design record](string-storage-design.md#shared-owner-identity--development-2026-09-24)
 explains hash collisions, cost and remaining boundaries. Follow with a bounded semantics
 review before choosing API additions from a concrete case.
+
+
+## 2026-09-24 — Explicit interning exploration
+
+**Author:** Suggested that some interning functionality should be in place, then asked
+to continue after the assistant proposed explicit interning and a repeated-identifier
+case without prematurely selecting permanent pool lifetime or literal interning.
+
+**Assistant action:** Inspected immutable LoadedProgram versus per-execution mutable
+state; built a test-only owned pool with entry and UTF-8 payload limits. The sample's
+4,000 field-name occurrences reuse four owners/28 payload bytes. Four checks pass for
+identity, quotas, separate pools and GC/host/pool lifetime; the .NET baseline also passes.
+This is retained-payload evidence, not an allocation benchmark or a production API.
+
+**Open:** compare execution/session ownership using repeated host invocations, then
+choose exhaustion behavior and public exposure from the case. String.Intern remains a
+candidate spelling; no automatic literal interning or lookup method is selected.
+See the [experiment](experiments/string-interning/README.md).

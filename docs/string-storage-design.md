@@ -270,3 +270,13 @@ in the suite, and the new alias/base-call case passed its focused rerun after fi
 local-declaration ordering in the test fixture. The Raven sample reclaimed 446
 allocations across ten collections; the .NET baseline, API snapshot and 522-page
 website build pass. No publication or SDK release is performed.
+
+
+## Explicit interning exploration — 2026-09-24
+
+Following the author's request, the [repeated-identifier experiment](experiments/string-interning/README.md)
+uses a test-only bounded pool over existing String owners. Four tests cover canonical
+returns, unchanged prior references, exact text, quotas, separate pools and lifetime
+through GC/host retention. The .NET 10 comparison passes. Strong scoped retention is
+viable, but production ownership (execution or runtime session), exhaustion behavior
+and API exposure remain undecided. No automatic interning or public method is added.

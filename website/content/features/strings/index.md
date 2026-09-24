@@ -162,3 +162,9 @@ let separate = String(['F', 'o', 'o'])
 
 These development semantics are checked across Object/Sequence conversions, array
 storage and garbage collection. Identity hashes may collide and are not persistent IDs.
+
+
+Explicit interning is under investigation using repeated parsed field names. A private
+experiment checks canonical references, memory limits and release of a scoped pool.
+There is no public String.Intern API or automatic literal interning yet. Pool lifetime
+and behavior when limits are reached remain design questions.

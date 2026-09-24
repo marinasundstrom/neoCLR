@@ -170,3 +170,7 @@ mod tests {
 #[cfg(test)]
 #[path = "string_ownership_tests.rs"]
 mod ownership_tests;
+
+#[cfg(test)]
+#[path = "string_interning_tests.rs"]
+mod interning_tests;

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Explore explicit String interning with a test-only bounded owner pool and repeated
+  log-field names. Check canonical identity, insertion quotas, GC/host retention and
+  pool teardown against a .NET baseline. Record execution/session lifetime questions;
+  no production pool, guest API or automatic literal interning is introduced.
+
 - Enable String ReferenceEquals and explicit Object base equality/identity hashing
   using the shared text owner across Object/interface wrappers. Preserve virtual
   content equality/hashing and ToString identity. Identity hashes survive GC and

@@ -56,6 +56,15 @@ layout remains provisional. Next perform a bounded Object/value consistency revi
 then choose API work from a real application case; do not expand text contracts
 without a concrete need.
 
+**Author-directed interning exploration, 2026-09-24:** investigate explicit String
+interning with a repeated-identifier case before choosing the public contract.
+The [owned-pool experiment](experiments/string-interning/README.md) validates exact
+content canonicalization, entry/payload quotas, GC retention and pool teardown.
+It is test-only, not a shipped String.Intern API. Next compare execution versus
+runtime-session ownership with repeated host invocations; automatic literal interning,
+lookup helpers and process-wide retention remain unselected. This bounded exploration
+precedes the general consistency review without expanding the text API roadmap.
+
 **Author-directed String API slice, 2026-09-24:** support construction from
 Sequence<char>, including arrays, and expose String as a read-only Sequence with
 explicit Count and public Length/indexer. The [sample](experiments/string-sequence/README.md)
