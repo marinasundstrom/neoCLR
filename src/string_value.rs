@@ -1,27 +1,61 @@
-//! Immutable UTF-8 payload shared by VM value copies. This is not guest identity.
-use std::{fmt, ops::Deref, sync::Arc};
+//! Immutable UTF-8 payload with owner identity shared by VM value copies.
+use std::{
+    fmt,
+    ops::Deref,
+    sync::{
+        Arc,
+        atomic::{AtomicU32, Ordering},
+    },
+};
 
 /// Host representation of intrinsic String text.
 ///
 /// Cloning shares immutable bytes. Construction from an owned String adopts its
 /// buffer; conversion back to an owned String copies only when another owner exists.
 /// Text is a leaf outside the tracing heap's object count, as owned text was before.
-#[derive(Clone, PartialEq, Eq)]
-pub struct StringValue(Arc<String>);
+/// Aliases share guest reference identity; independently constructed equal text does
+/// not. Rust equality remains content-based. Extracting and reconstructing owned
+/// text creates a new identity; hashes are process-local and may collide.
+#[derive(Clone)]
+pub struct StringValue(Arc<StringData>);
+
+struct StringData {
+    text: String,
+    // Hash seed only: wrapping is harmless because hashes may collide.
+    identity_hash: u32,
+}
+static NEXT_HASH: AtomicU32 = AtomicU32::new(1);
+impl PartialEq for StringValue {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_str() == other.as_str()
+    }
+}
+impl Eq for StringValue {}
 
 impl StringValue {
+    pub(crate) fn same_owner(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.0, &other.0)
+    }
+    pub(crate) fn identity_hash(&self) -> i32 {
+        crate::object_identity::mix_hash(self.0.identity_hash as u64)
+    }
     /// Borrow the immutable UTF-8 text.
     pub fn as_str(&self) -> &str {
-        self.0.as_str()
+        self.0.text.as_str()
     }
     /// Recover owned text, copying bytes only if other shared owners remain.
     pub fn into_owned(self) -> String {
-        Arc::try_unwrap(self.0).unwrap_or_else(|shared| shared.as_ref().clone())
+        Arc::try_unwrap(self.0)
+            .map(|data| data.text)
+            .unwrap_or_else(|shared| shared.text.clone())
     }
 }
 impl From<String> for StringValue {
     fn from(value: String) -> Self {
-        Self(Arc::new(value))
+        Self(Arc::new(StringData {
+            text: value,
+            identity_hash: NEXT_HASH.fetch_add(1, Ordering::Relaxed),
+        }))
     }
 }
 impl From<&str> for StringValue {
@@ -77,6 +111,24 @@ mod tests {
         let right = StringValue::from("same");
         assert_eq!(left, right);
         assert!(!Arc::ptr_eq(&left.0, &right.0));
+    }
+
+    #[test]
+    fn identity_hash_collisions_do_not_merge_distinct_owners() {
+        let make = || {
+            StringValue(Arc::new(StringData {
+                text: "same".into(),
+                identity_hash: 7,
+            }))
+        };
+        let left = make();
+        let right = make();
+        assert_eq!(left, right);
+        assert_eq!(left.identity_hash(), right.identity_hash());
+        assert!(
+            !crate::object_identity::reference_equals(&Value::String(left), &Value::String(right))
+                .unwrap()
+        );
     }
 
     #[test]

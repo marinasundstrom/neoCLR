@@ -1,4 +1,4 @@
-//! Private ownership gates: guest ReferenceEquals is deliberately not enabled here.
+//! Ownership and identity gates across VM conversions and teardown.
 use super::StringValue;
 use crate::{
     Execution, Fault, Limits, LoadedProgram, Module, Value, assembler::parse_function_ref,
@@ -63,11 +63,24 @@ fn assert_owner(program: &LoadedProgram) {
             "owner changed for {source:?}"
         );
         assert_eq!(returned.as_str(), source);
+        assert!(
+            crate::object_identity::reference_equals(
+                &Value::String(original.clone()),
+                &execution.value
+            )
+            .unwrap()
+        );
+        assert_eq!(
+            crate::object_identity::hash(&Value::String(original.clone())).unwrap(),
+            crate::object_identity::hash(&execution.value).unwrap()
+        );
         assert!(execution.heap.is_empty());
+        let retained_hash = original.identity_hash();
         drop(original);
         drop(execution);
         // Host results survive the originating execution and its heap.
         assert_eq!(returned.as_str(), source);
+        assert_eq!(returned.identity_hash(), retained_hash);
         assert!(observer.upgrade().is_some());
         drop(returned);
         assert!(observer.upgrade().is_none(), "owner leaked for {source:?}");
@@ -163,5 +176,12 @@ fn string_ownership_does_not_intern_separate_equal_inputs() {
         };
         assert_eq!(left, right);
         assert!(!Arc::ptr_eq(&left.0, &right.0));
+        assert!(
+            !crate::object_identity::reference_equals(
+                &Value::String(left.clone()),
+                &Value::String(right.clone())
+            )
+            .unwrap()
+        );
     }
 }

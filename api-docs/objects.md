@@ -75,9 +75,11 @@ Object select the overrides. ReferenceEquals remains an identity comparison, and
 explicit base calls retain the base implementation. Existing Equatable contracts
 are unchanged.
 
-String identity is deliberately unsupported: the current String/Object conversion
-creates wrappers instead of preserving an underlying String allocation. Identity
-calls on String payloads or their wrappers raise a terminal RuntimeError. Virtual
+String identity follows the shared immutable text owner. Object/interface wrappers
+may be separate allocations while still referring to the same String. ReferenceEquals
+and explicit Object base Equals/GetHashCode use that owner; virtual String equality
+and hashing continue to compare contents. Separate constructions can have equal
+contents without sharing identity. No interning is provided. Virtual
 boxed-value Equals/GetHashCode support Int32, Int64, Boolean, Single, Double, Char and explicit named-struct overrides, described below.
 ReferenceEquals can compare box identities, but does not supply boxed value equality.
 Null instance receivers raise NullReference; default Equals accepts a null argument
@@ -86,8 +88,7 @@ and returns false. Static two-argument Object.Equals is not yet available.
 ## Direction under review
 
 The intended baseline is .NET-compatible reference/value semantics. Class display,
-reference identity and class equality/hash now have bounded implementations. String
-identity and general boxed-value dispatch remain representation gaps. Raven record syntax
+reference identity and class equality/hash now have bounded implementations. General boxed-value dispatch still has coverage gaps. Raven record syntax
 now passes an end-to-end record-class sample with integer, string and nested components with generated equality,
 hashing, display and deconstruction. Generic/inherited records and
 nullable string/value and arbitrary component types are not supported by this target contract. See Microsoft's
@@ -322,9 +323,11 @@ for equal text. ToString returns the full text unchanged. Empty text, embedded N
 combining sequences and emoji are preserved. No normalization or collation is implied.
 
 String remains a reference type. Conversion currently creates a GC-owned wrapper
-around shared immutable UTF-8 text; this is not value-type boxing or stable String identity.
-ReferenceEquals and explicit Object base identity/hash calls remain unsupported, even
-for aliases. Casts back to String preserve contents, not an allocation identity.
+around shared immutable UTF-8 text; this is not value-type boxing. ReferenceEquals
+and explicit Object base equality/hashing follow that text owner, preserving identity
+through casts and independent wrappers. Hashes remain stable across collection and
+host retention, but can collide and must not be persisted. Virtual GetHashCode uses
+the content hash instead.
 No interning, nullable String storage, stable hash numbers or source-declared String
 Object overrides are added. The reference-only scaffold constructor is excluded:
 create strings with literals, `String(Sequence<char>)`, Concat and text APIs.

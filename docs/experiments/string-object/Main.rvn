@@ -17,6 +17,19 @@ func Main() {
     Check(first.GetHashCode() == repeated.GetHashCode(), "Matching text hashes")
     Check(first.ToString() == "hello 👩‍💻", "String Object display")
     Check(!first.Equals(null) && !first.Equals(42), "Wrong-type and null rejection")
+    let source = String(['F', 'o', 'o'])
+    let alias = source
+    let view: Object = source
+    let sequence: Sequence<char> = source
+    let array: string[] = [source]
+    let separate = String(['F', 'o', 'o'])
+    Check(Object.ReferenceEquals(source, alias), "String alias identity")
+    Check(Object.ReferenceEquals(source, view), "String Object identity")
+    Check(Object.ReferenceEquals(source, sequence), "String Sequence identity")
+    Check(Object.ReferenceEquals(source, array[0]), "String array identity")
+    Check(Object.ReferenceEquals(source, view.ToString()), "String display identity")
+    Check(!Object.ReferenceEquals(source, separate) && source == separate, "Identity differs from content")
+    Check(!Object.ReferenceEquals(source, null) && !Object.ReferenceEquals(null, source), "String null identity")
     let plain: Object = Plain()
     Check(!plain.Equals(first) && !first.Equals(plain), "Symmetric class/String mismatch")
     let values = HashMap<Object, int>((left, right) => left.Equals(right), key => key.GetHashCode())
@@ -27,6 +40,8 @@ func Main() {
         Check(garbage.Equals(first), "String wrapper churn")
         n += 1
     }
+    Check(Object.ReferenceEquals(source, view) && Object.ReferenceEquals(source, array[0]), "String identity after GC")
+    Check(!Object.ReferenceEquals(source, plain), "String class identity mismatch")
     if let Some(value) = values.Find("hello 👩‍💻") {
         Check(value == 1, "Text key after GC")
     } else {

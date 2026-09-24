@@ -1071,3 +1071,13 @@ containers; retained host Values remain valid. Object wrappers still allocate, a
 String identity remains unsupported. The [storage design](string-storage-design.md)
 records .NET differences, logical byte accounting, host migration and future comparer
 work. This is an internal ownership change, not a new comparison policy.
+
+
+### String reference identity — 2026-09-24
+
+The shared-owner migration now supports ReferenceEquals and explicit Object base
+Equals/GetHashCode for String. Independent wrappers retain the same text identity;
+separately constructed equal strings remain distinct. Virtual String methods keep
+content equality/hash behavior. GC and retained host results preserve owner hashes;
+hashes may collide and do not expose addresses. No interning or compiler change.
+See the [implemented contract](string-storage-design.md#shared-owner-identity--development-2026-09-24).

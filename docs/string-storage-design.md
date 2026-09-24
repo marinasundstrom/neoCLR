@@ -1,7 +1,8 @@
 # String storage and reference identity investigation
 
 **Development, 2026-09-24.** Shared immutable String storage is implemented.
-String reference identity remains an investigation, not an enabled runtime capability.
+String reference identity is now enabled in development through the shared owner.
+Earlier sections retain the investigation history; the final section records the implemented contract.
 
 ## Original scenario and measured baseline
 
@@ -222,3 +223,50 @@ Iterable construction contract ahead of a concrete need. The .NET 10 constructor
 reference above was consulted on 2026-09-24. The executable comparison in
 `experiments/string-storage/dotnet` checks array copying, empty input and UTF-16
 length; it does not imply identical Unicode units between the platforms.
+
+## Shared-owner identity — development, 2026-09-24
+
+The author accepted the next bounded semantics slice: reference comparison and
+identity/base hashing together. String now identifies its immutable shared text owner,
+not its temporary Object/interface wrapper. Aliases retain identity through conversions,
+fields, arrays, erasure, ToString, GC and host results. Independently constructed equal
+text remains distinct, including empty strings. Literal interning is not introduced;
+callers must not depend on identity of separately evaluated literals or text producers.
+
+ReferenceEquals compares owner pointers internally without exposing addresses.
+Explicit Object base Equals uses reference identity; virtual String Equals/GetHashCode
+retain exact content behavior. Each shared owner carries a process-local 32-bit hash
+seed assigned with a relaxed atomic counter. The existing integer mixer produces its
+identity hash. Counter wrap and collisions are allowed: neither the seed nor hash is
+used to determine equality. No address, persistent ID or cryptographic guarantee is
+provided. Host clones retain the seed after their originating heap is destroyed.
+Converting to owned Rust text and reconstructing StringValue creates a new owner.
+Worker text serialization likewise does not transport identity across isolates.
+
+The previous Arc<String> becomes an Arc of text plus its hash seed. This adds one
+atomic operation per owner creation and payload storage/padding; cloning remains a
+shared-owner operation. A lazily allocated hash would avoid eager assignment but adds
+synchronization/state; address-derived hashes would expose allocation details. This
+simple internal choice remains replaceable. No performance improvement is claimed.
+
+Comparison sources reviewed 2026-09-24:
+[.NET 10 ReferenceEquals](https://learn.microsoft.com/en-us/dotnet/api/system.object.referenceequals?view=net-10.0)
+separates reference identity from contents;
+[RuntimeHelpers.GetHashCode](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.runtimehelpers.gethashcode?view=net-10.0)
+provides identity-oriented hashing independent of overrides. neoCLR uses its existing
+explicit Object base-call path rather than adding that helper API. The extended .NET
+probe checks alias hashes before/after GC without requiring unequal hashes for distinct
+objects. UTF-8 storage and lack of interning remain differences from the CLR model.
+
+Validation uses the expanded String Object Raven sample, Object identity/content
+regressions, and private conversion/GC/host/teardown checks. Compiler metadata, emission
+and Runtime Contract settings are unchanged; only runtime behavior and documentation
+change. The next checkpoint is a bounded Object/value consistency review, with later
+API additions driven by real application cases.
+
+Validation outcome: ten String ownership/storage tests plus a forced identity-hash
+collision test pass. Object equality/identity validation covers 30 cases: 29 passed
+in the suite, and the new alias/base-call case passed its focused rerun after fixing
+local-declaration ordering in the test fixture. The Raven sample reclaimed 446
+allocations across ten collections; the .NET baseline, API snapshot and 522-page
+website build pass. No publication or SDK release is performed.

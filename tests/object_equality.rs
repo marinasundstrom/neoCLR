@@ -155,25 +155,19 @@ fn arrays_use_identity_equality_and_stable_default_hash() {
 }
 
 #[test]
-fn string_wrappers_cannot_accidentally_acquire_a_public_identity_contract() {
-    for (body, returns) in [
-        (
-            format!("ldstr \"text\"\ncastclass System.Object\ndup\n{IDENTITY}"),
-            "Boolean",
-        ),
-        (
-            "ldstr \"text\"\ncastclass System.Object\ncall instance System.Object::GetHashCode()"
-                .into(),
-            "Int32",
-        ),
+fn string_identity_follows_text_owner_not_wrapper_or_contents() {
+    let prefix = ".local System.Object empty\n.local String text\nldloca empty\ninitobj System.Object\nldstr \"text\"\nstloc text\n";
+    for (tail, expected) in [
+        (format!("ldloc text\ncastclass System.Object\nldloc text\ncastclass System.Object\n{IDENTITY}"), true),
+        (format!("ldloc text\ncastclass System.Object\nldstr \"text\"\ncastclass System.Object\n{IDENTITY}"), false),
+        (format!("ldloc text\ncastclass System.Object\nldloc empty\n{IDENTITY}"), false),
+        (format!("ldloc empty\nldloc text\ncastclass System.Object\n{IDENTITY}"), false),
+        (format!("ldloc text\ncastclass System.Object\nldc.i4 0\nnewobj Cell\n{IDENTITY}"), false),
+        ("ldloc text\ncastclass System.Object\ncall instance System.Object::GetHashCode()\nldloc text\ncastclass System.Object\ncall instance System.Object::GetHashCode()\nceq".into(), true),
+        ("ldloc text\ncastclass System.Object\nldloc text\ncastclass System.Object\ncall instance System.Object::Equals(System.Object)".into(), true),
+        ("ldloc text\ncastclass System.Object\nldstr \"text\"\ncastclass System.Object\ncall instance System.Object::Equals(System.Object)".into(), false),
     ] {
-        let fault = run(&body, "", returns, 8).unwrap_err();
-        assert!(
-            fault
-                .message
-                .contains("String object identity is not supported"),
-            "{fault}"
-        );
+        assert_eq!(run(&format!("{prefix}{tail}"), CELL, "Boolean", 4).unwrap().value, Value::Boolean(expected));
     }
 }
 
@@ -645,4 +639,17 @@ fn string_wrapper_casts_collect_before_operands_leave_gc_roots() {
         assert!(result.heap.collections() > 1);
         assert!(result.heap.is_empty());
     }
+}
+
+#[test]
+fn string_identity_hash_survives_wrapper_collection_and_recreation() {
+    let mut body = ".local String text\n.local Int32 hash\nldstr \"é👩‍💻\"\nstloc text\nldloc text\ncastclass System.Object\ncall instance System.Object::GetHashCode()\nstloc hash\n".to_owned();
+    for _ in 0..24 {
+        body.push_str("ldloc text\ncastclass System.Object\npop\n");
+    }
+    body.push_str("ldloc text\ncastclass System.Object\ncall instance System.Object::GetHashCode()\nldloc hash\nceq");
+    let result = run(&body, "", "Boolean", 4).unwrap();
+    assert_eq!(result.value, Value::Boolean(true));
+    assert!(result.heap.collections() > 1);
+    assert!(result.heap.is_empty());
 }

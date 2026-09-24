@@ -102,9 +102,11 @@ can be used as a HashMap key with explicit Object callbacks. ToString returns th
 unchanged text. Comparison does not normalize Unicode or apply culture rules.
 
 The current runtime wraps shared immutable UTF-8 text when converting it to Object.
-String is still a reference type, but String ReferenceEquals and identity hashes
-remain unsupported; the wrappers do not establish stable string allocation identity.
-This differs from .NET's identity-preserving String references and interning.
+String is a reference type: ReferenceEquals compares the shared text owner, even
+through separate Object/interface wrappers. An alias is identical; a separately
+constructed equal string has equal contents but a different identity. Interning is
+not provided. Virtual GetHashCode remains content-based; explicit Object base hashing
+uses identity.
 The current UTF-8 content hash also differs from .NET's randomized hash and is not
 a persisted identifier or a defense against deliberate collisions.
 
@@ -115,8 +117,7 @@ See the [String API reference](xref:System.String) and
 Development String copies now share immutable text internally. Owned text producers
 transfer their buffer; Object conversions still allocate wrappers. Internal checks
 cover owner retention across conversions, storage and GC, including host results
-and fault teardown. Public String identity remains disabled while reference comparison
-and identity hashing are defined together.
+and fault teardown. Reference comparison and identity hashing now follow that retained text owner.
 
 Future work includes a coherent System.Text API and comparer infrastructure, especially
 string comparers. Equality, hashing and ordering should use compatible, explicit
@@ -149,3 +150,15 @@ The input must stay stable during construction. No normalization is performed, b
 adjacent characters can merge into a grapheme: output Length can differ from input
 Count. Empty input currently requires a typed empty char array. See the
 [String API](xref:System.String) and [Sequence contract](xref:System.Collections.Sequence`1).
+
+
+```raven
+let text = String(['F', 'o', 'o'])
+let alias = text
+let separate = String(['F', 'o', 'o'])
+// Object.ReferenceEquals(text, alias) is true.
+// Object.ReferenceEquals(text, separate) is false; text == separate is true.
+```
+
+These development semantics are checked across Object/Sequence conversions, array
+storage and garbage collection. Identity hashes may collide and are not persistent IDs.

@@ -6272,3 +6272,18 @@ implement APIs and behaviors as needed for real cases, considering the case firs
 some choices are inexpensive to change. **Assistant action:** Recorded this development
 policy in the authoritative roadmap. Iterable construction remains undecided, rather
 than a selected future overload.
+
+
+## 2026-09-24 — Completing String reference semantics
+
+**Author:** Asked what was next, then accepted the proposed String reference-identity
+and identity-hash slice with “Let’s do it!”
+
+**Assistant proposal/action:** Use the shared text owner across aliases and conversions,
+keep content equality/hashes separate, and validate distinct equal constructions,
+GC and host lifetime. Implemented owner-based comparison and address-independent
+identity hashes through existing Object operations; no interning, compiler metadata
+change or new helper API. Expanded the Raven String Object sample and .NET baseline.
+The [design record](string-storage-design.md#shared-owner-identity--development-2026-09-24)
+explains hash collisions, cost and remaining boundaries. Follow with a bounded semantics
+review before choosing API additions from a concrete case.

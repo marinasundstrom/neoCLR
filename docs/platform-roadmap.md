@@ -44,15 +44,17 @@ semantics and investigate String storage and reference identity. Object is abstr
 class identity and overrides, bounded primitive equality/hash/display, String content
 contracts, Path and introspection semantics have checked samples. The
 [consistency review](object-model-review.md) records their exact limits. String
-ReferenceEquals remains unsupported; content equality does not establish identity.
+ReferenceEquals now follows the shared text owner, separately from content equality.
 The [storage investigation](string-storage-design.md) measures current copy/wrapper
 costs and a shared-text prototype. Immutable shared String storage now adopts owned
 UTF-8 buffers and retains text across value copies. Private ownership checks now
 cover Object/interface round-trips, fields,
-arrays, erasure, GC pressure, host retention and cyclic/fault teardown. Next define
-owner-based reference comparison and stable identity/base hashes together before
-enabling String identity; wrapper IDs must not become String IDs.
-The internal `Arc<String>` choice remains provisional.
+arrays, erasure, GC pressure, host retention and cyclic/fault teardown. Owner-based
+reference comparison and stable identity/base hashes now use that retained owner;
+wrapper IDs are not String IDs. No interning is introduced. The internal shared-owner
+layout remains provisional. Next perform a bounded Object/value consistency review,
+then choose API work from a real application case; do not expand text contracts
+without a concrete need.
 
 **Author-directed String API slice, 2026-09-24:** support construction from
 Sequence<char>, including arrays, and expose String as a read-only Sequence with
@@ -60,7 +62,8 @@ explicit Count and public Length/indexer. The [sample](experiments/string-sequen
 covers immutable copies and grapheme behavior. Compared with .NET's char-array
 constructor and UTF-16 indexer, this accepts the platform's sequence abstraction
 and grapheme characters, at the cost of traversal/snapshot allocation and scanning
-indexes. This bounded addition does not enable String identity or select comparers.
+indexes. This bounded addition did not select comparers; the subsequent identity slice is
+described above.
 
 **Author-selected end-to-end acceptance case:** Raven record syntax now exercises
 class and struct equality/hash/display, assignment, nested components and null default

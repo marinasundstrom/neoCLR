@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Enable String ReferenceEquals and explicit Object base equality/identity hashing
+  using the shared text owner across Object/interface wrappers. Preserve virtual
+  content equality/hashing and ToString identity. Identity hashes survive GC and
+  host retention without exposing addresses; collisions are allowed. No interning
+  or literal-identity guarantee is added. Update runtime/Raven checks and API docs;
+  compiler metadata and Runtime Contract settings are unchanged.
+
 - Add `String(Sequence<char>)` with immutable snapshot construction, including char
   arrays. String implements Sequence with a read-only grapheme indexer and explicit
   Collection.Count; Length stays public. Preserve exact text without normalization;

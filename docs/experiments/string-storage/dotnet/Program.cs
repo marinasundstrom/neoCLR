@@ -13,9 +13,13 @@ if (!ReferenceEquals(original, alias) || !ReferenceEquals(original, view)
     throw new Exception("String identity was lost");
 if (ReferenceEquals(original, separate) || !original.Equals(separate))
     throw new Exception("Identity and content equality were conflated");
+int identityHash = System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(original);
+if (identityHash != System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(view))
+    throw new Exception("String identity hashes differ for aliases");
 GC.Collect();
 GC.WaitForPendingFinalizers();
-if (!ReferenceEquals(array[0], holder.Text) || holder.Text != "hello 👩‍💻")
+if (identityHash != System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(original)
+    || !ReferenceEquals(array[0], holder.Text) || holder.Text != "hello 👩‍💻")
     throw new Exception("String roots did not survive collection");
 Console.WriteLine(".NET String identity through locals, Object, records, arrays and GC: passed");
 char[] characters = ['F', 'o', 'o'];
