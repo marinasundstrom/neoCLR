@@ -228,6 +228,7 @@ Valid:
 ret
 .end
 .type class System.Tasks.TaskQueue
+.sealed
 .field private pending System.Collections.ArrayList<System.Func<Void>>
 .field private running Boolean
 .property static Default() -> System.Tasks.TaskQueue
@@ -514,6 +515,7 @@ ret
 .end
 .end
 .type class System.Tasks.Promise<T0>
+.sealed
 .field private queue System.Tasks.TaskQueue
 .field private slot System.Collections.ArrayList<T0>
 .field private callbacks System.Collections.ArrayList<System.Func<Void>>
@@ -945,6 +947,7 @@ ret
 .end
 .end
 .type class System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>
+.sealed
 .field private source System.Tasks.Promise<T0>
 .field private machine System.Option<System.Runtime.CompilerServices.IAsyncStateMachine>
 .property instance Task() -> System.Tasks.Task<T0>
@@ -1230,6 +1233,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4D6170436F6E74696E756174696F6E6032<T0,T1>
+.sealed
 .field private input System.Tasks.Task<T0>
 .field private output System.Tasks.Promise<T1>
 .field private transform System.Func<T0,T1>
@@ -1454,6 +1458,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E5468656E436F6E74696E756174696F6E6032<T0,T1>
+.sealed
 .field private input System.Tasks.Task<T0>
 .field private output System.Tasks.Promise<T1>
 .field private continuation System.Func<T0,System.Tasks.Task<T1>>
@@ -1698,6 +1703,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E5461736B526573756C744D6170436F6E74696E756174696F6E6033<T0,T1,T2>
+.sealed
 .field private input System.Tasks.Task<System.Result<T0,T1>>
 .field private output System.Tasks.Promise<System.Result<T2,T1>>
 .field private transform System.Func<T0,T2>
@@ -2032,6 +2038,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Tasks.Task.Type_53797374656D2E5461736B732E4F7574636F6D655472616E736665726031<T0>
+.sealed
 .field private input System.Tasks.Task<T0>
 .field private output System.Tasks.Promise<T0>
 .method instance .ctor(System.Tasks.Task<T0> input,System.Tasks.Promise<T0> output) -> noresult

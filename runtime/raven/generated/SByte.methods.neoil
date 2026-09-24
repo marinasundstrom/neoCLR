@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/SByte.rvn. Regenerate with build_runtime_library.py.
 .type System.SByte
+.sealed
 .implements System.Comparable<SByte>
 .method instance readonly byref CompareTo(SByte other) -> Int32
 M00000001_IL_0000:

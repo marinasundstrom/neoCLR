@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Array.rvn. Regenerate with build_runtime_library.py.
 .type class System.Array<T0>
+.sealed
 .implements System.Collections.MutableSequence<T0>
 .implements System.Collections.Sequence<T0>
 .implements System.Collections.Collection<T0>

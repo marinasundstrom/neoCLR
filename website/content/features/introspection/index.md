@@ -30,6 +30,15 @@ Object.GetHashCode is consistent with that equality, and ToString displays the r
 
 Development assembly descriptors now compare full catalog identities; module descriptors compare that identity plus their module name. Their Object hashes use the same keys, and display returns the assembly FullName or module Name. This is scoped to one loaded program, without CLR loader-context semantics. Field, method and property descriptors now compare their kind, closed declaring type and definition index, with matching hashes and Name display. Parameter descriptors now retain owner kind, closed declaring type, definition index and position for equality and hashing. Tokens may be zero; a property index parameter remains distinct from its accessor parameter. Owner resolution through a public Member property is still future work. See the [introspection guide](../../docs/introspection.html) and [TypeInfo API reference](../../docs/api/System.Introspection.TypeInfo.html) for current contracts.
 
+## Type classification (development)
+
+TypeInfo exposes IsAbstract, IsOpen, IsClosedHierarchy, IsUnion, IsEnum and
+IsValueType. IsOpen means open to unrestricted inheritance or implementation.
+IsClosedHierarchy describes a declared closed family, while IsUnion specifically
+identifies a nominal union such as Option or Result. A non-inheritable leaf is not
+itself a closed family. These flags describe metadata; the fuller hierarchy of
+specialized TypeInfo interfaces remains planned.
+
 <a id="context"></a>
 
 ## Assembly discovery through RuntimeContext

@@ -24,6 +24,7 @@ False:
     ret
 .end
 .type System.Storage.FileReadError.InvalidLimit
+.sealed
 .method instance .ctor() -> Void
 M0000001a_IL_0000:
 M0000001a_IL_0001:
@@ -36,6 +37,7 @@ ret
 .end
 .end
 .type System.Storage.FileReadError.InvalidPath
+.sealed
 .method instance .ctor() -> Void
 M0000001b_IL_0000:
 M0000001b_IL_0001:
@@ -48,6 +50,7 @@ ret
 .end
 .end
 .type System.Storage.FileReadError.NotFound
+.sealed
 .method instance .ctor() -> Void
 M0000001c_IL_0000:
 M0000001c_IL_0001:
@@ -60,6 +63,7 @@ ret
 .end
 .end
 .type System.Storage.FileReadError.AccessDenied
+.sealed
 .method instance .ctor() -> Void
 M0000001d_IL_0000:
 M0000001d_IL_0001:
@@ -72,6 +76,7 @@ ret
 .end
 .end
 .type System.Storage.FileReadError.NotRegularFile
+.sealed
 .method instance .ctor() -> Void
 M0000001e_IL_0000:
 M0000001e_IL_0001:
@@ -84,6 +89,7 @@ ret
 .end
 .end
 .type System.Storage.FileReadError.TooLarge
+.sealed
 .method instance .ctor() -> Void
 M0000001f_IL_0000:
 M0000001f_IL_0001:
@@ -96,6 +102,7 @@ ret
 .end
 .end
 .type System.Storage.FileReadError.ReadFailed
+.sealed
 .method instance .ctor() -> Void
 M00000020_IL_0000:
 M00000020_IL_0001:
@@ -108,6 +115,7 @@ ret
 .end
 .end
 .type System.Storage.FileReadError.InvalidUtf8
+.sealed
 .method instance .ctor() -> Void
 M00000021_IL_0000:
 M00000021_IL_0001:

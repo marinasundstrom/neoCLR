@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Tasks/Tasks.rvn. Regenerate with build_runtime_library.py.
 .type class System.Tasks.Task<T0>
+.sealed
 .implements System.Runtime.CompilerServices.ITaskAwaiter
 .field private source System.Tasks.Promise<T0>
 .property instance IsCompleted() -> Boolean

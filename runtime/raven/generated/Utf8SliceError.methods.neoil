@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Text/Utf8SliceError.rvn. Regenerate with build_runtime_library.py.
 .type System.Text.Utf8SliceError
+.sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .field private Stored Value
 .property instance IsOutOfRange() -> Boolean

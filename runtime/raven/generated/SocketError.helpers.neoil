@@ -24,6 +24,7 @@ False:
     ret
 .end
 .type System.Networking.Sockets.SocketError.Closed
+.sealed
 .method instance .ctor() -> Void
 M00000023_IL_0000:
 M00000023_IL_0001:
@@ -36,6 +37,7 @@ ret
 .end
 .end
 .type System.Networking.Sockets.SocketError.Busy
+.sealed
 .method instance .ctor() -> Void
 M00000024_IL_0000:
 M00000024_IL_0001:
@@ -48,6 +50,7 @@ ret
 .end
 .end
 .type System.Networking.Sockets.SocketError.InvalidRange
+.sealed
 .method instance .ctor() -> Void
 M00000025_IL_0000:
 M00000025_IL_0001:
@@ -60,6 +63,7 @@ ret
 .end
 .end
 .type System.Networking.Sockets.SocketError.LimitExceeded
+.sealed
 .method instance .ctor() -> Void
 M00000026_IL_0000:
 M00000026_IL_0001:
@@ -72,6 +76,7 @@ ret
 .end
 .end
 .type System.Networking.Sockets.SocketError.Cancelled
+.sealed
 .method instance .ctor() -> Void
 M00000027_IL_0000:
 M00000027_IL_0001:
@@ -84,6 +89,7 @@ ret
 .end
 .end
 .type System.Networking.Sockets.SocketError.InvalidAddress
+.sealed
 .method instance .ctor() -> Void
 M00000028_IL_0000:
 M00000028_IL_0001:
@@ -96,6 +102,7 @@ ret
 .end
 .end
 .type System.Networking.Sockets.SocketError.ConnectionRefused
+.sealed
 .method instance .ctor() -> Void
 M00000029_IL_0000:
 M00000029_IL_0001:
@@ -108,6 +115,7 @@ ret
 .end
 .end
 .type System.Networking.Sockets.SocketError.ConnectionReset
+.sealed
 .method instance .ctor() -> Void
 M0000002a_IL_0000:
 M0000002a_IL_0001:
@@ -120,6 +128,7 @@ ret
 .end
 .end
 .type System.Networking.Sockets.SocketError.AccessDenied
+.sealed
 .method instance .ctor() -> Void
 M0000002b_IL_0000:
 M0000002b_IL_0001:
@@ -132,6 +141,7 @@ ret
 .end
 .end
 .type System.Networking.Sockets.SocketError.TimedOut
+.sealed
 .method instance .ctor() -> Void
 M0000002c_IL_0000:
 M0000002c_IL_0001:
@@ -144,6 +154,7 @@ ret
 .end
 .end
 .type System.Networking.Sockets.SocketError.IoFailure
+.sealed
 .method instance .ctor() -> Void
 M0000002d_IL_0000:
 M0000002d_IL_0001:

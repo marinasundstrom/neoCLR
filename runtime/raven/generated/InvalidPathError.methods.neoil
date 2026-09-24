@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Storage/InvalidPathError.rvn. Regenerate with build_runtime_library.py.
 .type System.Storage.InvalidPathError
+.sealed
 .method instance ToString() -> String
 M00000001_IL_0000:
 M00000001_IL_0001:

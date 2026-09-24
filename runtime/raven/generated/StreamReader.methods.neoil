@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/IO/StreamReader.rvn. Regenerate with build_runtime_library.py.
 .type class System.IO.StreamReader
+.sealed
 .implements System.IO.TextReader
 .field private input System.IO.InputStream
 .field private leaveOpen Boolean

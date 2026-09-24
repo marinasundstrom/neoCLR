@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Storage/Path.rvn. Regenerate with build_runtime_library.py.
 .type class System.Storage.Path
+.sealed
 .extends System.Object
 .implements System.Equatable<System.Storage.Path>
 .field private text String

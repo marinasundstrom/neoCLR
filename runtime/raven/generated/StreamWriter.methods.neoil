@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/IO/StreamWriter.rvn. Regenerate with build_runtime_library.py.
 .type class System.IO.StreamWriter
+.sealed
 .implements System.IO.TextWriter
 .field private output System.IO.OutputStream
 .field private leaveOpen Boolean

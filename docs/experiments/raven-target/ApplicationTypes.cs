@@ -260,12 +260,15 @@ static class ApplicationTypes
             var declarationStart = output.Length;
             var declarationName = nestedCase ? name[(name.LastIndexOf('.') + 1)..] : name;
             output.AppendLine(type.IsInterface ? $".interface {name}" : $".type {((LibraryDependencies.Contains(type) || IsLibrary(type) && type.IsNotPublic) ? "internal " : "")}{(type.IsValueType || OpaqueLibrary.IsString(type) || IsLibrary(type) && GenericUnionLibrary.IsContainer(type) ? "" : "class ")}{(type.IsAbstract && !GenericUnionLibrary.IsContainer(type) ? "abstract " : "")}{declarationName}");
+            if (type.IsSealed) output.AppendLine(".sealed");
+            if (type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.ClosedHierarchyAttribute"))
+                output.AppendLine(".closedhierarchy");
             if (!IsLibrary(type)) output.AppendLine(SourceMetadata.Type(type));
             if (IsModule(type.BaseType?.Resolve()?.Module)) output.AppendLine(".extends " + map(type.BaseType, false));
             else if ((!IsLibrary(type) || type.Methods.Any(m => m.IsVirtual && !m.IsNewSlot)) && !type.IsValueType && !type.IsInterface
                 && type.BaseType?.FullName == "System.Object" && RuntimeSignatures.IsCore(type.BaseType.Scope))
                 output.AppendLine(".extends System.Object");
-            if (ErrorCarrierLibrary.IsMatched(type) || GenericUnionLibrary.IsMatched(type) && GenericUnionLibrary.IsCarrier(type)) output.AppendLine(".custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()");
+            if (type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute") || ErrorCarrierLibrary.IsMatched(type) || GenericUnionLibrary.IsMatched(type) && GenericUnionLibrary.IsCarrier(type)) output.AppendLine(".custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()");
             foreach (var contract in type.Interfaces) output.AppendLine(".implements " + map(contract.InterfaceType, false));
             foreach (var method in type.Methods.Where(m => m.IsAbstract))
                 output.AppendLine($".method instance {(LibraryNames.ContainsKey(type) && PropagationLibrary.IsContract(type) ? "readonly byref " : "")}{(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => (LibraryNames.ContainsKey(type) && PropagationLibrary.IsConditionalOutput(method, p) ? "out(true) " : "") + map(p.ParameterType, false) + (LibraryNames.ContainsKey(type) ? " " + p.Name : "")))}) -> {map(method.ReturnType, true)}\n.end");

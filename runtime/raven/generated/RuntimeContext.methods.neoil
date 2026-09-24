@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Runtime/RuntimeContext.rvn. Regenerate with build_runtime_library.py.
 .type class System.Runtime.RuntimeContext
+.sealed
 .property static Current() -> System.Runtime.RuntimeContext
 .get System.Runtime.RuntimeContext::get_Current()
 .end

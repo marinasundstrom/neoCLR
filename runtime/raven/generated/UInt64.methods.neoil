@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/UInt64.rvn. Regenerate with build_runtime_library.py.
 .type System.UInt64
+.sealed
 .implements System.Comparable<UInt64>
 .method instance readonly byref CompareTo(UInt64 other) -> Int32
 M00000001_IL_0000:

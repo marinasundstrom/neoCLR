@@ -118,6 +118,7 @@ ldloc destination
 ret
 .end
 .type internal class System.Networking.DnsCompletion
+.sealed
 .field private source System.Tasks.Promise<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>
 .field private operation Int64
 .method internal instance .ctor(System.Tasks.Promise<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>> source) -> noresult

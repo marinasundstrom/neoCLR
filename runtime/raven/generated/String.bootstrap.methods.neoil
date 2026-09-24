@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/String.rvn. Regenerate with build_runtime_library.py.
 .type System.String
+.sealed
 .implements System.Equatable<String>
 .property instance Item(Int32) -> Char
 .get instance System.String::get_Item(Int32)

@@ -12,6 +12,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   .NET comparisons and open parsing, equality and migration choices. This is planning;
   current DNS/socket signatures and immediate listener work remain unchanged.
 
+- Add TypeInfo.IsOpen, IsClosedHierarchy and nominal IsUnion alongside IsAbstract,
+  IsEnum and IsValueType. Preserve descriptive sealed/closed-family metadata in the
+  Raven importer and neoIL; closed families are distinct from non-inheritable leaves.
+  Rebuild matching bridge, reference and library artifacts. General raw-IL hierarchy
+  enforcement and the richer TypeInfo interface family remain future work.
+  Validate the compiled flag sample with seven collections and zero live objects,
+  matching bootstrap/API snapshots and the combined 575-page website.
+
 - Add development Dns.GetHostAddresses with Task/Result, read-only IPv4 address
   sequences, typed lookup errors and a provisional five-second deadline. Extend
   the socket echo client to resolve localhost, and keep lookup separate from

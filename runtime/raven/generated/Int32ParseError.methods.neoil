@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Int32ParseError.rvn. Regenerate with build_runtime_library.py.
 .type System.Int32ParseError
+.sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .field private Stored Value
 .property instance IsInvalidFormat() -> Boolean

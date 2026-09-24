@@ -187,6 +187,23 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                 function.is_none() && word != ".method" && word != ".type" && word != ".interface",
                 typedef.as_mut(),
             ) {
+                if matches!(word, ".sealed" | ".closedhierarchy") {
+                    if !rest.is_empty() {
+                        return Err(Fault::new(
+                            "type classification directive takes no arguments",
+                        ));
+                    }
+                    let flag = if word == ".sealed" {
+                        &mut def.is_sealed
+                    } else {
+                        &mut def.is_closed_hierarchy
+                    };
+                    if *flag {
+                        return Err(Fault::new("duplicate type classification directive"));
+                    }
+                    *flag = true;
+                    return Ok(());
+                }
                 if word == ".enum" {
                     if def.enum_info.is_some() || !matches!(rest, "Int32" | "Int32 flags") {
                         return Err(Fault::new("expected one .enum Int32 [flags] directive"));
@@ -312,7 +329,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                 }
                 if word != ".field" {
                     return Err(Fault::new(
-                        "expected .type, .interface, .implements, .extends, .field, .property, .pack, .size, .custom, .method or .end",
+                        "expected .type, .interface, .implements, .extends, .sealed, .closedhierarchy, .field, .property, .pack, .size, .custom, .method or .end",
                     ));
                 }
                 let (name, ty) = rest
@@ -725,6 +742,8 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         implements: vec![],
                         base: None,
                         is_abstract,
+                        is_sealed: false,
+                        is_closed_hierarchy: false,
                         properties: vec![],
                         packing: None,
                         minimum_size: None,

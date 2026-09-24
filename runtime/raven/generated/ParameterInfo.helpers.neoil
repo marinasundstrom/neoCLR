@@ -39,6 +39,7 @@ newobj instance System.HashCode::.ctor()
 ret
 .end
 .type internal class System.Introspection.RuntimeParameterInfo
+.sealed
 .extends System.Object
 .implements System.Introspection.ParameterInfo
 .field private StoredName String

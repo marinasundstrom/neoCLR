@@ -24,6 +24,7 @@ False:
     ret
 .end
 .type System.Storage.FileWriteError.InvalidLimit
+.sealed
 .method instance .ctor() -> Void
 M00000017_IL_0000:
 M00000017_IL_0001:
@@ -36,6 +37,7 @@ ret
 .end
 .end
 .type System.Storage.FileWriteError.InvalidPath
+.sealed
 .method instance .ctor() -> Void
 M00000018_IL_0000:
 M00000018_IL_0001:
@@ -48,6 +50,7 @@ ret
 .end
 .end
 .type System.Storage.FileWriteError.NotFound
+.sealed
 .method instance .ctor() -> Void
 M00000019_IL_0000:
 M00000019_IL_0001:
@@ -60,6 +63,7 @@ ret
 .end
 .end
 .type System.Storage.FileWriteError.AccessDenied
+.sealed
 .method instance .ctor() -> Void
 M0000001a_IL_0000:
 M0000001a_IL_0001:
@@ -72,6 +76,7 @@ ret
 .end
 .end
 .type System.Storage.FileWriteError.NotRegularFile
+.sealed
 .method instance .ctor() -> Void
 M0000001b_IL_0000:
 M0000001b_IL_0001:
@@ -84,6 +89,7 @@ ret
 .end
 .end
 .type System.Storage.FileWriteError.TooLarge
+.sealed
 .method instance .ctor() -> Void
 M0000001c_IL_0000:
 M0000001c_IL_0001:
@@ -96,6 +102,7 @@ ret
 .end
 .end
 .type System.Storage.FileWriteError.WriteFailed
+.sealed
 .method instance .ctor() -> Void
 M0000001d_IL_0000:
 M0000001d_IL_0001:

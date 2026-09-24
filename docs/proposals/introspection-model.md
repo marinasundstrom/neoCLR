@@ -1,5 +1,19 @@
 # NeoCLR Introspection Model — Capability-Oriented Metadata Proposal
 
+## Author clarification — 2026-09-24
+
+The immediate implementation requirement is to ensure TypeInfo has IsAbstract,
+IsOpen, IsClosedHierarchy, IsUnion, IsEnum and IsValueType. IsUnion specifically means
+**nominal union**; earlier illustrative IsUnion examples below must be read with
+that clarification. IsOpen uses positive inheritance terminology; IsClosedHierarchy
+separately describes a declared closed family. See the
+[current contract](../introspection-design.md#type-classification-flags--development-2026-09-24).
+
+The author also directs work toward the more extensive closed hierarchy of TypeInfo
+interfaces described here. This is an incremental direction, not a request to
+implement the entire proposal with the flags. Specialized contracts should retain
+the nominal/non-nominal distinction and overlapping qualities described below.
+
 ## 1. Purpose
 
 `System.Introspection` provides NeoCLR's model for describing program metadata and type-system information.

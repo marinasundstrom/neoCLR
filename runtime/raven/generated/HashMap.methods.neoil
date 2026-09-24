@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Collections/HashMap.rvn. Regenerate with build_runtime_library.py.
 .type class System.Collections.HashMap<T0,T1>
+.sealed
 .implements System.Collections.MutableMap<T0,T1>
 .implements System.Collections.Map<T0,T1>
 .field private equal System.Func<T0,T0,Boolean>

@@ -58,6 +58,7 @@ False:
     ret
 .end
 .type internal class neoCLR.Library.System.Collections.ArrayList.Type_53797374656D2E436F6C6C656374696F6E732E41727261794C6973744974657261746F726031<T0>
+.sealed
 .implements System.Collections.Iterator<T0>
 .implements System.Disposable
 .field private data arrayref<T0>

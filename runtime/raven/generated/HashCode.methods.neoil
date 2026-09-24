@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/HashCode.rvn. Regenerate with build_runtime_library.py.
 .type System.HashCode
+.sealed
 .field private State Int32
 .method instance byref .ctor() -> Void
 .local Int32 local0

@@ -24,6 +24,7 @@ False:
     ret
 .end
 .type System.Networking.DnsError.InvalidName
+.sealed
 .method instance .ctor() -> Void
 M00000014_IL_0000:
 M00000014_IL_0001:
@@ -36,6 +37,7 @@ ret
 .end
 .end
 .type System.Networking.DnsError.LimitExceeded
+.sealed
 .method instance .ctor() -> Void
 M00000015_IL_0000:
 M00000015_IL_0001:
@@ -48,6 +50,7 @@ ret
 .end
 .end
 .type System.Networking.DnsError.NoAddress
+.sealed
 .method instance .ctor() -> Void
 M00000016_IL_0000:
 M00000016_IL_0001:
@@ -60,6 +63,7 @@ ret
 .end
 .end
 .type System.Networking.DnsError.TimedOut
+.sealed
 .method instance .ctor() -> Void
 M00000017_IL_0000:
 M00000017_IL_0001:
@@ -72,6 +76,7 @@ ret
 .end
 .end
 .type System.Networking.DnsError.Cancelled
+.sealed
 .method instance .ctor() -> Void
 M00000018_IL_0000:
 M00000018_IL_0001:
@@ -84,6 +89,7 @@ ret
 .end
 .end
 .type System.Networking.DnsError.LookupFailed
+.sealed
 .method instance .ctor() -> Void
 M00000019_IL_0000:
 M00000019_IL_0001:

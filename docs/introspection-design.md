@@ -62,6 +62,49 @@ identity rather than display names. A single current execution universe is the
 initial scope; multiple contexts, interning and cross-context binding need separate
 contracts before those capabilities are exposed.
 
+## Type classification flags — development, 2026-09-24
+
+TypeInfo exposes `IsAbstract`, `IsOpen`, `IsClosedHierarchy`, `IsUnion`, `IsEnum`
+and `IsValueType`. These classify the represented type, not the descriptor provider.
+
+- `IsAbstract` identifies abstract declarations, including interfaces.
+- `IsOpen` identifies classes/interfaces open to unrestricted inheritance or
+  implementation. It is false for ordinary non-inheritable leaves and declared closed
+  families. It does not mean an open generic type or promise public accessibility.
+- `IsClosedHierarchy` identifies a declared closed family of direct subtypes or
+  implementations. A leaf alone is not a closed hierarchy. An admitted open subtype
+  can still allow further descendants; this flag does not promise transitive closure.
+- `IsUnion` identifies a nominal union by its retained UnionAttribute, including
+  constructed Option/Result types. It does not identify individual cases or ad-hoc
+  union type expressions and does not imply an inheritance-based closed hierarchy.
+- `IsEnum` and `IsValueType` retain their existing type-category behavior; enums are
+  value types. These predicates are independent rather than mutually exclusive.
+
+Arrays, references and pointers are not open declarations or closed families.
+Constructed nominal types retain their definition's classifications. The importer
+preserves CLI Sealed and Raven ClosedHierarchyAttribute independently; nominal union
+markers already used by the runtime are retained for the new query. neoIL `.sealed`
+and `.closedhierarchy` preserve descriptive metadata, with JSON defaults of false
+for older artifacts. They do not themselves enforce inheritance or encode a permits
+list. Known runtime contract families retain their existing importer checks.
+
+Rebuild the matching bridge, reference and runtime library for the three added
+properties. Runtime Contract configuration is unchanged; private TypeShape selectors
+8, 9 and 10 provide IsOpen, IsClosedHierarchy and IsUnion respectively. The broader
+[capability-oriented hierarchy](proposals/introspection-model.md) remains future work.
+The [compiled flags case](experiments/introspection-flags/README.md) exercises the
+public properties through the actual source/import/runtime path.
+
+The .NET 10 baseline, checked 2026-09-24, exposes
+[IsSealed](https://learn.microsoft.com/en-us/dotnet/api/system.type.issealed?view=net-10.0)
+and [IsValueType](https://learn.microsoft.com/en-us/dotnet/api/system.type.isvaluetype?view=net-10.0).
+Using positive IsOpen terminology expresses the author's chosen inheritance language;
+it is not blindly `!IsSealed` for arbitrary type expressions. Keeping closed families
+separate avoids conflating Raven's permitted-type metadata with a CLI sealed leaf.
+The benefit is explicit classification for consumers; the cost is a frontend metadata
+obligation and a development API addition. Reuse the existing closed-interface
+comparison below; permits enumeration and universal runtime enforcement remain open.
+
 ## Responsibilities
 
 Introspection describes structure. RuntimeContext defines the execution universe.

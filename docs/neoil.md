@@ -708,3 +708,13 @@ See [enums](enums.md) for compatibility, helper methods and Neo projection.
 `arrayref<T>` is the explicit neoIL signature for an ordinary CLI-style array reference;
 `T[]` remains an owned array. Old `newarr` artifacts targeting `T[]&` must migrate to
 `array.new` or be recompiled. See [array migration](managed-arrays.md#ordinary-array-references-and-migration-2026-09-12).
+
+## Descriptive inheritance classifications
+
+Within a type or interface, `.sealed` records a non-inheritable CLI leaf and
+`.closedhierarchy` records a declared closed direct family. Each takes no arguments
+and may appear once. They serialize as `is_sealed` and `is_closed_hierarchy`, with
+false defaults for older artifacts. These flags support TypeInfo queries; they do
+not introduce a permits list or general runtime inheritance enforcement. A retained
+UnionAttribute marks a nominal union independently. See the
+[introspection contract](introspection-design.md#type-classification-flags--development-2026-09-24).

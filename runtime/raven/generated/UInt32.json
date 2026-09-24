@@ -36,7 +36,7 @@
     "runtime/raven/src/System/Func.rvn": "4720a0463a88be11a4ff213363cad1c6680cd41afd457c813e247e5c4e3cbd2e",
     "runtime/raven/src/System/Functions.rvn": "ac8c17cd3cde8cfd78b2d1214454a92120d7f65b93d27d5d8e7258981fb1a70d",
     "runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn": "ef66171b634c2e59249dd875a8d13b275c0c8243c8a8e7f575238683a91ced7d",
-    "runtime/raven/src/System/Introspection/Descriptors.rvn": "94a5d94ae265a70abfb7de3853f534dee17d23533fdc37fff275eb2eda719cd2",
+    "runtime/raven/src/System/Introspection/Descriptors.rvn": "7f3d01e06067a8866e4d95e455122acfc93b468bca039f596b84b022ae67dbe1",
     "runtime/raven/src/System/Option.rvn": "0f0b624d9dd94dcf0f3159b651985892f92bd1d26df649d9806689d0277d79ec",
     "runtime/raven/src/System/Result.rvn": "8400722abccdc84277e7a8d7652d9f9d0e10d76c23decdac4f4fd971ddbc367f",
     "runtime/raven/src/System/Propagatable.rvn": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e",
@@ -113,11 +113,11 @@
     "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
-    "UInt32.methods.neoil": "cf884dda348c4ed3004d4494da2a500eb08273b2979e9c962ed6256741c580e8",
+    "UInt32.methods.neoil": "f56243aba237f7c6fdaf1923edebf5a01519274303f33f15c99ed8ae0d39d521",
     "UInt32.helpers.neoil": "ee7eb2493e0403c6cc2e32bf625b520602109db54e41cee05d84c18aea37fcb0"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "e30d3e45b1a51688c4ba1201e387b944e8f83fe498b8ae5d09697605e4ebb719",
+  "coreSha256": "c551a4914a605f5ee2605e0b1b3e63496db86c9e47e35b1fe3b63178183d7429",
   "exports": [
     "readonly byref CompareTo(UInt32 other) -> Int32"
   ]

@@ -73,6 +73,7 @@ newobj instance System.HashCode::.ctor()
 ret
 .end
 .type internal class System.Introspection.RuntimeModuleInfo
+.sealed
 .extends System.Object
 .implements System.Introspection.ModuleInfo
 .field private StoredIdentity String

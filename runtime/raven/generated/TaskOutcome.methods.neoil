@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Tasks/TaskOutcome.rvn. Regenerate with build_runtime_library.py.
 .type System.Tasks.TaskOutcome<T0>
+.sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .field private Stored Value
 .property instance IsCancelled() -> Boolean
@@ -155,6 +156,7 @@ ret
 .end
 .type System.Tasks.TaskOutcome
 .type Cancelled
+.sealed
 .method instance .ctor() -> Void
 M00000001_IL_0000:
 M00000001_IL_0001:
@@ -167,6 +169,7 @@ ret
 .end
 .end
 .type Completed<T0>
+.sealed
 .field Value T0
 .property instance Value() -> T0
 .get instance System.Tasks.TaskOutcome.Completed<T0>::get_Value()

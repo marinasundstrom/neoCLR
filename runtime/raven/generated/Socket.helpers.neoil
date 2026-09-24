@@ -143,6 +143,7 @@ False:
     ret
 .end
 .type internal class System.Networking.Sockets.SocketConnectCompletion
+.sealed
 .field private source System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 .field private operation Int64
 .method internal instance .ctor(System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> source) -> noresult
@@ -315,6 +316,7 @@ ret
 .end
 .end
 .type internal class System.Networking.Sockets.SocketTransferCompletion
+.sealed
 .field private source System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>
 .field private operation Int64
 .method internal instance .ctor(System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>> source) -> noresult

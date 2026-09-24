@@ -24,6 +24,7 @@ False:
     ret
 .end
 .type class System.Concurrency.ThreadPool
+.sealed
 .method static Queue(System.Func<String,String> callback,String input) -> System.Tasks.Task<String>
 .local System.Tasks.Promise<String> local0
 .local System.Tasks.TaskQueue local1
@@ -94,6 +95,7 @@ ret
 .end
 .end
 .type internal class System.Concurrency.WorkerCompletion
+.sealed
 .field private handle Int32
 .field private source System.Tasks.Promise<String>
 .method internal instance .ctor(Int32 handle,System.Tasks.Promise<String> source) -> noresult

@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Option.rvn. Regenerate with build_runtime_library.py.
 .type System.Option<T0>
+.sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .implements System.Propagatable<System.Option<T0>,T0,Void>
 .field private Stored Value
@@ -252,6 +253,7 @@ ret
 .end
 .type System.Option
 .type None
+.sealed
 .method instance .ctor() -> Void
 M00000001_IL_0000:
 M00000001_IL_0001:
@@ -264,6 +266,7 @@ ret
 .end
 .end
 .type Some<T0>
+.sealed
 .field Value T0
 .property instance Value() -> T0
 .get instance System.Option.Some<T0>::get_Value()

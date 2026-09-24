@@ -24,6 +24,7 @@ False:
     ret
 .end
 .type System.Int32ParseError.InvalidFormat
+.sealed
 .method instance .ctor() -> Void
 M00000008_IL_0000:
 M00000008_IL_0001:
@@ -36,6 +37,7 @@ ret
 .end
 .end
 .type System.Int32ParseError.Overflow
+.sealed
 .method instance .ctor() -> Void
 M00000009_IL_0000:
 M00000009_IL_0001:

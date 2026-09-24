@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Storage/StorageItems.rvn. Regenerate with build_runtime_library.py.
 .interface System.Storage.StorageItem
+.closedhierarchy
 .method instance get_Path() -> System.Storage.Path
 .end
 .method instance get_Name() -> String

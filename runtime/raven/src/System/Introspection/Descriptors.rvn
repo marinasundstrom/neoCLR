@@ -305,6 +305,9 @@ public sealed interface TypeInfo : MemberInfo, Equatable<TypeInfo> {
     val IsInterface: bool { get }
     val IsReadOnly: bool { get }
     val IsAbstract: bool { get }
+    val IsOpen: bool { get }
+    val IsClosedHierarchy: bool { get }
+    val IsUnion: bool { get }
     val IsEnum: bool { get }
     val IsValueType: bool { get }
     func GetGenericArguments() -> Sequence<TypeInfo>
@@ -408,6 +411,9 @@ internal class RuntimeTypeInfo : TypeInfo {
     val IsInterface: bool => RuntimeServices.TypeShape(Handle, 3)
     val IsReadOnly: bool => RuntimeServices.TypeShape(Handle, 4)
     val IsAbstract: bool => RuntimeServices.TypeShape(Handle, 5)
+    val IsOpen: bool => RuntimeServices.TypeShape(Handle, 8)
+    val IsClosedHierarchy: bool => RuntimeServices.TypeShape(Handle, 9)
+    val IsUnion: bool => RuntimeServices.TypeShape(Handle, 10)
     val IsEnum: bool => RuntimeServices.TypeShape(Handle, 6)
     val IsValueType: bool => RuntimeServices.TypeShape(Handle, 7)
 

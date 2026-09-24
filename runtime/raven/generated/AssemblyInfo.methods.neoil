@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Introspection/AssemblyInfo.rvn. Regenerate with build_runtime_library.py.
 .interface System.Introspection.AssemblyInfo
+.closedhierarchy
 .method instance get_Name() -> String
 .end
 .method instance get_FullName() -> String

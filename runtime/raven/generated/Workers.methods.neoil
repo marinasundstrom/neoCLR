@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Concurrency/Workers.rvn. Regenerate with build_runtime_library.py.
 .type class System.Concurrency.Thread
+.sealed
 .field private callback System.Func<String,String>
 .field private input String
 .field private source System.Tasks.Promise<String>

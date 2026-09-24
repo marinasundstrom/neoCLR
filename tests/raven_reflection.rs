@@ -838,3 +838,96 @@ ret
         Value::Boolean(true)
     );
 }
+
+#[test]
+fn type_classification_distinguishes_open_closed_leaf_and_nominal_union() {
+    let definitions = r#"
+.type class Open<T>
+.end
+.type class abstract Abstract
+.end
+.type class Leaf
+.sealed
+.end
+.interface Closed
+.closedhierarchy
+.end
+.interface Contract
+.end
+.type Choice<T>
+.custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+.end
+.type Number
+.field private Stored Int32
+.enum Int32
+.literal Zero 0
+.end
+"#;
+    let mut body = String::new();
+    let mut check = 0;
+    // Columns are IsAbstract, IsOpen, IsClosedHierarchy, IsUnion, IsEnum, IsValueType.
+    for (ty, expected) in [
+        ("Open<Int32>", [false, true, false, false, false, false]),
+        ("Abstract", [true, true, false, false, false, false]),
+        ("Leaf", [false, false, false, false, false, false]),
+        ("Closed", [true, false, true, false, false, false]),
+        ("Contract", [true, true, false, false, false, false]),
+        ("Choice<Int32>", [false, false, false, true, false, true]),
+        ("Number", [false, false, false, false, true, true]),
+        ("Int32", [false, false, false, false, false, true]),
+        ("Int32&", [false, false, false, false, false, false]),
+        (
+            "arrayref<Int32>",
+            [false, false, false, false, false, false],
+        ),
+    ] {
+        for (property, expected) in [
+            "IsAbstract",
+            "IsOpen",
+            "IsClosedHierarchy",
+            "IsUnion",
+            "IsEnum",
+            "IsValueType",
+        ]
+        .into_iter()
+        .zip(expected)
+        {
+            let branch = if expected { "brtrue" } else { "brfalse" };
+            body.push_str(&format!(
+                "call System.Runtime.RuntimeContext::get_Current()\nldtoken {ty}\ncall instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)\ncallvirt instance System.Introspection.TypeInfo::get_{property}()\n{branch} checked{check}\nfault \"{ty}.{property}\"\nchecked{check}:\n"
+            ));
+            check += 1;
+        }
+    }
+    let source = format!(
+        ".module Flags\n.entry Main\n{definitions}\n.function Main() -> Boolean\n{body}ldc.bool true\nret\n.end"
+    );
+    let app = assemble(&source).unwrap();
+    let program = LoadedProgram::with_library(&app, library()).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Boolean(true)
+    );
+}
+
+#[test]
+fn inheritance_classification_metadata_round_trips_and_checks_directives() {
+    let module = neoclr::assemble(
+        ".module Flags\n.type class Leaf\n.sealed\n.end\n.interface Family\n.closedhierarchy\n.end",
+    )
+    .unwrap();
+    let loaded = neoclr::load(&serde_json::to_string(&module).unwrap()).unwrap();
+    assert!(loaded.types[0].is_sealed);
+    assert!(loaded.types[1].is_closed_hierarchy);
+    for directive in [
+        ".sealed extra",
+        ".closedhierarchy extra",
+        ".sealed\n.sealed",
+        ".closedhierarchy\n.closedhierarchy",
+    ] {
+        assert!(
+            neoclr::assemble(&format!(".module Flags\n.type class X\n{directive}\n.end")).is_err()
+        );
+    }
+}

@@ -142,6 +142,7 @@ newobj instance System.HashCode::.ctor()
 ret
 .end
 .type internal class System.Introspection.RuntimeAssemblyInfo
+.sealed
 .extends System.Object
 .implements System.Introspection.AssemblyInfo
 .field private StoredIdentity String

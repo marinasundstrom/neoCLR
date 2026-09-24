@@ -81,6 +81,7 @@ False:
     ret
 .end
 .type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E576865726553657175656E63656031<T0>
+.sealed
 .implements System.Collections.Iterable<T0>
 .field private source System.Collections.Iterable<T0>
 .field private callback System.Func<T0,Boolean>
@@ -127,6 +128,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C65637453657175656E63656032<T0,T1>
+.sealed
 .implements System.Collections.Iterable<T1>
 .field private source System.Collections.Iterable<T0>
 .field private callback System.Func<T0,T1>
@@ -173,6 +175,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E54616B6553657175656E63656031<T0>
+.sealed
 .implements System.Collections.Iterable<T0>
 .field private source System.Collections.Iterable<T0>
 .field private count Int32
@@ -217,6 +220,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E536B697053657175656E63656031<T0>
+.sealed
 .implements System.Collections.Iterable<T0>
 .field private source System.Collections.Iterable<T0>
 .field private count Int32
@@ -261,6 +265,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E436F6E63617453657175656E63656031<T0>
+.sealed
 .implements System.Collections.Iterable<T0>
 .field private first System.Collections.Iterable<T0>
 .field private second System.Collections.Iterable<T0>
@@ -305,6 +310,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E466C61744D617053657175656E63656032<T0,T1>
+.sealed
 .implements System.Collections.Iterable<T1>
 .field private source System.Collections.Iterable<T0>
 .field private callback System.Func<T0,System.Collections.Iterable<T1>>
@@ -349,6 +355,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>
+.sealed
 .implements System.Collections.Iterator<T0>
 .implements System.Disposable
 .field private source System.Collections.Iterator<T0>
@@ -600,6 +607,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>
+.sealed
 .implements System.Collections.Iterator<T1>
 .implements System.Disposable
 .field private source System.Collections.Iterator<T0>
@@ -833,6 +841,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E54616B654974657261746F726031<T0>
+.sealed
 .implements System.Collections.Iterator<T0>
 .implements System.Disposable
 .field private input System.Collections.Iterable<T0>
@@ -1196,6 +1205,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E536B69704974657261746F726031<T0>
+.sealed
 .implements System.Collections.Iterator<T0>
 .implements System.Disposable
 .field private input System.Collections.Iterable<T0>
@@ -1579,6 +1589,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E436F6E6361744974657261746F726031<T0>
+.sealed
 .implements System.Collections.Iterator<T0>
 .implements System.Disposable
 .field private sources arrayref<System.Collections.Iterable<T0>>
@@ -1983,6 +1994,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E466C61744D61704974657261746F726032<T0,T1>
+.sealed
 .implements System.Collections.Iterator<T1>
 .implements System.Disposable
 .field private input System.Collections.Iterable<T0>

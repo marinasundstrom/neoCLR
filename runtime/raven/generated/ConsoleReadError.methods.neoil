@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/ConsoleReadError.rvn. Regenerate with build_runtime_library.py.
 .type System.ConsoleReadError
+.sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .field private Stored Value
 .property instance IsUnavailable() -> Boolean

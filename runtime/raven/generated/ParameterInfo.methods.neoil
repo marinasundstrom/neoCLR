@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Introspection/ParameterInfo.rvn. Regenerate with build_runtime_library.py.
 .interface System.Introspection.ParameterInfo
+.closedhierarchy
 .method instance get_MetadataToken() -> Int32
 .end
 .method instance get_Module() -> System.Introspection.ModuleInfo

@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Duration.rvn. Regenerate with build_runtime_library.py.
 .type System.Duration
+.sealed
 .implements System.Comparable<System.Duration>
 .implements System.Equatable<System.Duration>
 .field private StoredTicks Int64

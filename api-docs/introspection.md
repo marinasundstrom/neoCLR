@@ -122,3 +122,13 @@ ParameterInfo and [BindingFlags](xref:System.Introspection.BindingFlags) now hav
 generated member coverage, closing the descriptor-interface documentation gap. Binding
 flags select visibility and instance/static categories; they do not enable inherited
 traversal or grant member invocation access.
+
+## Type classification flags (development)
+
+TypeInfo exposes IsAbstract, IsOpen, IsClosedHierarchy, IsUnion, IsEnum and
+IsValueType. IsOpen means unrestricted inheritance/implementation, not generic
+openness. A closed family reports IsClosedHierarchy, while an ordinary leaf reports
+neither IsOpen nor IsClosedHierarchy. IsUnion identifies nominal union declarations
+(including constructed Option/Result), not their cases or ad-hoc union expressions.
+ClosedHierarchy describes the direct family; permitted open subtypes may themselves
+have descendants. These are descriptive metadata queries, not added raw-IL enforcement.

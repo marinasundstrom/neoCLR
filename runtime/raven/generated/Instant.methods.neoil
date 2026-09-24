@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Instant.rvn. Regenerate with build_runtime_library.py.
 .type System.Instant
+.sealed
 .implements System.Comparable<System.Instant>
 .implements System.Equatable<System.Instant>
 .field private StoredTicks Int64

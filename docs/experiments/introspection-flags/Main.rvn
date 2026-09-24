@@ -1,0 +1,43 @@
+import System.*
+import System.Introspection.*
+
+open class Open { }
+abstract class Abstract { }
+class Leaf { }
+interface Contract { }
+sealed interface Family { }
+class Case : Family { }
+sealed class Root { }
+class Child : Root { }
+
+func CheckFlags(info: TypeInfo, abstractType: bool, openType: bool, closedHierarchy: bool, unionType: bool, enumType: bool, valueType: bool) {
+    if info.IsAbstract != abstractType || info.IsOpen != openType ||
+        info.IsClosedHierarchy != closedHierarchy || info.IsUnion != unionType ||
+        info.IsEnum != enumType || info.IsValueType != valueType {
+        System.Fault(info.FullName)
+    }
+}
+
+func Main() {
+    CheckFlags(typeof(Open), false, true, false, false, false, false)
+    CheckFlags(typeof(Abstract), true, true, false, false, false, false)
+    CheckFlags(typeof(Leaf), false, false, false, false, false, false)
+    CheckFlags(typeof(Contract), true, true, false, false, false, false)
+    CheckFlags(typeof(Family), true, false, true, false, false, false)
+    CheckFlags(typeof(Case), false, false, false, false, false, false)
+    CheckFlags(typeof(Root), true, false, true, false, false, false)
+    CheckFlags(typeof(Child), false, false, false, false, false, false)
+    CheckFlags(typeof(TypeInfo), true, false, true, false, false, false)
+    CheckFlags(typeof(Option<int>), false, false, false, true, false, true)
+    CheckFlags(typeof(Result<int, string>), false, false, false, true, false, true)
+    CheckFlags(typeof(BindingFlags), false, false, false, false, true, true)
+    CheckFlags(typeof(int), false, false, false, false, false, true)
+    CheckFlags(typeof(string), false, false, false, false, false, false)
+    CheckFlags(typeof(int[]), false, false, false, false, false, false)
+    var index = 0
+    while index < 180 {
+        CheckFlags(typeof(Option<string>), false, false, false, true, false, true)
+        index += 1
+    }
+    Console.WriteLine("TypeInfo flags passed")
+}

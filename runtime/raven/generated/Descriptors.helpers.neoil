@@ -314,6 +314,7 @@ newobj instance System.HashCode::.ctor()
 ret
 .end
 .interface System.Introspection.FieldInfo
+.closedhierarchy
 .implements System.Introspection.MemberInfo
 .method instance get_FieldType() -> System.Introspection.TypeInfo
 .end
@@ -347,6 +348,7 @@ ret
 .end
 .end
 .interface System.Introspection.MethodInfo
+.closedhierarchy
 .implements System.Introspection.MemberInfo
 .method instance get_ReturnType() -> System.Introspection.TypeInfo
 .end
@@ -407,6 +409,7 @@ ret
 .end
 .end
 .interface System.Introspection.PropertyInfo
+.closedhierarchy
 .implements System.Introspection.MemberInfo
 .method instance get_PropertyType() -> System.Introspection.TypeInfo
 .end
@@ -445,6 +448,7 @@ ret
 .end
 .end
 .interface System.Introspection.TypeInfo
+.closedhierarchy
 .implements System.Introspection.MemberInfo
 .implements System.Equatable<System.Introspection.TypeInfo>
 .method instance get_FullName() -> String
@@ -468,6 +472,12 @@ ret
 .method instance get_IsReadOnly() -> Boolean
 .end
 .method instance get_IsAbstract() -> Boolean
+.end
+.method instance get_IsOpen() -> Boolean
+.end
+.method instance get_IsClosedHierarchy() -> Boolean
+.end
+.method instance get_IsUnion() -> Boolean
 .end
 .method instance get_IsEnum() -> Boolean
 .end
@@ -524,6 +534,15 @@ ret
 .property instance IsAbstract() -> Boolean
 .get instance System.Introspection.TypeInfo::get_IsAbstract()
 .end
+.property instance IsOpen() -> Boolean
+.get instance System.Introspection.TypeInfo::get_IsOpen()
+.end
+.property instance IsClosedHierarchy() -> Boolean
+.get instance System.Introspection.TypeInfo::get_IsClosedHierarchy()
+.end
+.property instance IsUnion() -> Boolean
+.get instance System.Introspection.TypeInfo::get_IsUnion()
+.end
 .property instance IsEnum() -> Boolean
 .get instance System.Introspection.TypeInfo::get_IsEnum()
 .end
@@ -535,6 +554,7 @@ ret
 .end
 .end
 .type internal class abstract System.Introspection.RuntimeMemberInfo
+.closedhierarchy
 .extends System.Object
 .field private Name String
 .field private DeclaringType System.Introspection.TypeInfo
@@ -638,6 +658,7 @@ ret
 .end
 .end
 .type internal class System.Introspection.RuntimeFieldInfo
+.sealed
 .extends System.Introspection.RuntimeMemberInfo
 .implements System.Introspection.FieldInfo
 .implements System.Introspection.MemberInfo
@@ -1055,6 +1076,7 @@ ret
 .end
 .end
 .type internal class System.Introspection.RuntimeMethodInfo
+.sealed
 .extends System.Introspection.RuntimeMemberInfo
 .implements System.Introspection.MethodInfo
 .implements System.Introspection.MemberInfo
@@ -1684,6 +1706,7 @@ ret
 .end
 .end
 .type internal class System.Introspection.RuntimePropertyInfo
+.sealed
 .extends System.Introspection.RuntimeMemberInfo
 .implements System.Introspection.PropertyInfo
 .implements System.Introspection.MemberInfo
@@ -2379,6 +2402,7 @@ ret
 .end
 .end
 .type internal class System.Introspection.RuntimeTypeInfo
+.sealed
 .extends System.Object
 .implements System.Introspection.TypeInfo
 .implements System.Introspection.MemberInfo
@@ -2425,6 +2449,15 @@ ret
 .end
 .property instance IsAbstract() -> Boolean
 .get instance System.Introspection.RuntimeTypeInfo::get_IsAbstract()
+.end
+.property instance IsOpen() -> Boolean
+.get instance System.Introspection.RuntimeTypeInfo::get_IsOpen()
+.end
+.property instance IsClosedHierarchy() -> Boolean
+.get instance System.Introspection.RuntimeTypeInfo::get_IsClosedHierarchy()
+.end
+.property instance IsUnion() -> Boolean
+.get instance System.Introspection.RuntimeTypeInfo::get_IsUnion()
 .end
 .property instance IsEnum() -> Boolean
 .get instance System.Introspection.RuntimeTypeInfo::get_IsEnum()
@@ -2911,7 +2944,7 @@ M00000049_IL_000e:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance get_IsEnum() -> Boolean
+.method instance get_IsOpen() -> Boolean
 M0000004a_IL_0000:
 M0000004a_IL_0001:
 M0000004a_IL_0002:
@@ -2919,7 +2952,7 @@ ldarg 0
 M0000004a_IL_0003:
 ldfld System.Introspection.RuntimeTypeInfo::Handle
 M0000004a_IL_0008:
-ldc.i4 6
+ldc.i4 8
 M0000004a_IL_0009:
 call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
@@ -2927,7 +2960,7 @@ M0000004a_IL_000e:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance get_IsValueType() -> Boolean
+.method instance get_IsClosedHierarchy() -> Boolean
 M0000004b_IL_0000:
 M0000004b_IL_0001:
 M0000004b_IL_0002:
@@ -2935,15 +2968,15 @@ ldarg 0
 M0000004b_IL_0003:
 ldfld System.Introspection.RuntimeTypeInfo::Handle
 M0000004b_IL_0008:
-ldc.i4 7
-M0000004b_IL_0009:
+ldc.i4 9
+M0000004b_IL_000a:
 call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
-M0000004b_IL_000e:
+M0000004b_IL_000f:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetGenericArguments() -> System.Collections.Sequence<System.Introspection.TypeInfo>
+.method instance get_IsUnion() -> Boolean
 M0000004c_IL_0000:
 M0000004c_IL_0001:
 M0000004c_IL_0002:
@@ -2951,11 +2984,15 @@ ldarg 0
 M0000004c_IL_0003:
 ldfld System.Introspection.RuntimeTypeInfo::Handle
 M0000004c_IL_0008:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeGenericArguments(System.RuntimeTypeHandle)
-M0000004c_IL_000d:
+ldc.i4 10
+M0000004c_IL_000a:
+call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
+M0000004c_IL_000f:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetElementType() -> System.Option<System.Introspection.TypeInfo>
+.method instance get_IsEnum() -> Boolean
 M0000004d_IL_0000:
 M0000004d_IL_0001:
 M0000004d_IL_0002:
@@ -2963,8 +3000,52 @@ ldarg 0
 M0000004d_IL_0003:
 ldfld System.Introspection.RuntimeTypeInfo::Handle
 M0000004d_IL_0008:
+ldc.i4 6
+M0000004d_IL_0009:
+call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
+M0000004d_IL_000e:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_IsValueType() -> Boolean
+M0000004e_IL_0000:
+M0000004e_IL_0001:
+M0000004e_IL_0002:
+ldarg 0
+M0000004e_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M0000004e_IL_0008:
+ldc.i4 7
+M0000004e_IL_0009:
+call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
+M0000004e_IL_000e:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetGenericArguments() -> System.Collections.Sequence<System.Introspection.TypeInfo>
+M0000004f_IL_0000:
+M0000004f_IL_0001:
+M0000004f_IL_0002:
+ldarg 0
+M0000004f_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M0000004f_IL_0008:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeGenericArguments(System.RuntimeTypeHandle)
+M0000004f_IL_000d:
+ret
+.end
+.method instance GetElementType() -> System.Option<System.Introspection.TypeInfo>
+M00000050_IL_0000:
+M00000050_IL_0001:
+M00000050_IL_0002:
+ldarg 0
+M00000050_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000050_IL_0008:
 call neoCLR.Runtime.TypeElementType(System.RuntimeTypeHandle)
-M0000004d_IL_000d:
+M00000050_IL_000d:
 ret
 .end
 .end

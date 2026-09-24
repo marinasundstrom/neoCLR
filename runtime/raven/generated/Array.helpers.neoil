@@ -37,6 +37,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>
+.sealed
 .implements System.Collections.Iterator<T0>
 .implements System.Disposable
 .field private data arrayref<T0>

@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Result.rvn. Regenerate with build_runtime_library.py.
 .type System.Result<T0,T1>
+.sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .implements System.Propagatable<System.Result<T0,T1>,T0,T1>
 .field private Stored Value
@@ -304,6 +305,7 @@ ret
 .end
 .type System.Result
 .type Ok<T0>
+.sealed
 .field Value T0
 .property instance Value() -> T0
 .get instance System.Result.Ok<T0>::get_Value()
@@ -327,6 +329,7 @@ ret
 .end
 .end
 .type Error<T0>
+.sealed
 .field Value T0
 .property instance Value() -> T0
 .get instance System.Result.Error<T0>::get_Value()

@@ -272,6 +272,7 @@ call neoCLR.Runtime.ConsoleFlush(Boolean)
 ret
 .end
 .type internal class System.IO.ConsoleInputStream
+.sealed
 .implements System.IO.InputStream
 .field private closed Boolean
 .method internal instance .ctor() -> noresult
@@ -723,6 +724,7 @@ ret
 .end
 .end
 .type internal class System.IO.ConsoleOutputStream
+.sealed
 .implements System.IO.OutputStream
 .field private error Boolean
 .field private closed Boolean

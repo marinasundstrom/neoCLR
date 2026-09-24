@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/InvalidRangeError.rvn. Regenerate with build_runtime_library.py.
 .type System.InvalidRangeError
+.sealed
 .method instance .ctor() -> Void
 M00000001_IL_0000:
 M00000001_IL_0001:

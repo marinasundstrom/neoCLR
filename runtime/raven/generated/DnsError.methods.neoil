@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Networking/DnsError.rvn. Regenerate with build_runtime_library.py.
 .type System.Networking.DnsError
+.sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .field private Stored Value
 .property instance IsInvalidName() -> Boolean

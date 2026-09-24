@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/IO/FileInputStream.rvn. Regenerate with build_runtime_library.py.
 .type class System.IO.FileInputStream
+.sealed
 .implements System.IO.InputStream
 .implements System.IO.SeekableStream
 .field private handle Int32

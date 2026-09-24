@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Storage/FileSystem.rvn. Regenerate with build_runtime_library.py.
 .type class System.Storage.FileSystem
+.sealed
 .implements System.Storage.StorageProvider
 .field private root String
 .method instance .ctor(String root) -> noresult

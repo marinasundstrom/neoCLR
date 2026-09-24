@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/IO/FileOutputStream.rvn. Regenerate with build_runtime_library.py.
 .type class System.IO.FileOutputStream
+.sealed
 .implements System.IO.OutputStream
 .field private handle Int32
 .field private closed Boolean

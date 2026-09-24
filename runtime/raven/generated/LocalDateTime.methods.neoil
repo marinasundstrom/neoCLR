@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/LocalDateTime.rvn. Regenerate with build_runtime_library.py.
 .type System.LocalDateTime
+.sealed
 .field private StoredDate System.Date
 .field private StoredTime System.Time
 .property instance Date() -> System.Date

@@ -6461,6 +6461,21 @@ homepage/guide navigation. Record the Web publication gate in the roadmap. No HT
 implementation or website deployment is implied.
 
 
+## 2026-09-24 — TypeInfo flags and the closed interface direction
+
+**Author:** requested IsAbstract, IsOpen (positive inheritance terminology rather
+than IsSealed), IsClosedHierarchy, nominal IsUnion, IsEnum and IsValueType; directed
+future work toward the proposal's more extensive closed TypeInfo interface hierarchy.
+**Assistant initially proposed:** recording the set as target direction before
+implementation. **Author correction:** “The flags is what we should make sure are there”.
+**Assistant action:** implement the three missing flags, retain the existing three,
+preserve descriptive inheritance metadata in the importer, and add runtime and Raven
+source validation. The broader interface hierarchy remains an incremental direction.
+**Assistant contract choice:** IsOpen excludes closed families; IsClosedHierarchy
+refers to the declared direct family, not necessarily all transitive descendants.
+See the [contract and evidence](introspection-design.md#type-classification-flags--development-2026-09-24).
+
+
 ## 2026-09-24 — Future IPAddress and possible HostEntry
 
 **Author:** suggested creating IPAddress when ready, and perhaps HostEntry, following
@@ -6471,3 +6486,7 @@ hashing for later evaluation; class versus struct and exact signatures remain op
 The [design comparison](socket-api-design.md#address-value-objects--future-direction-2026-09-24)
 records the .NET baseline, benefits, migration costs and validation questions.
 No implementation or change to immediate milestone order is implied.
+
+**Outcome:** the compiled flag sample passes with seven collections and zero live
+objects; matching library/API snapshots and the combined 575-page website validate.
+No interface-family redesign or website publication is included.

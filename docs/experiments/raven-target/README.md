@@ -1088,3 +1088,14 @@ bootstrap and runtime together. No Runtime Contract configuration or compiler
 implementation changes are required. The socket client tests hostname resolution.
 Array-in-Result metadata emission and nested callback capture failures remain open;
 see the socket design for the observed errors and independent reproduction gates.
+
+## TypeInfo classifications (2026-09-24)
+
+The bridge now preserves CLI sealed leaves and Raven ClosedHierarchyAttribute as
+descriptive `.sealed`/`.closedhierarchy` metadata, and retains nominal UnionAttribute.
+TypeInfo adds IsOpen, IsClosedHierarchy and IsUnion alongside the existing IsAbstract,
+IsEnum and IsValueType. Runtime Contract configuration and Raven compiler emission
+are unchanged; rebuild the bridge, core reference and runtime library together.
+This does not add general raw-IL closed-family enforcement. See the
+[contract](../../introspection-design.md#type-classification-flags--development-2026-09-24)
+and [compiled validation](../introspection-flags/README.md).

@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Storage/EntryKind.rvn. Regenerate with build_runtime_library.py.
 .type System.Storage.EntryKind
+.sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .field private Stored Value
 .property instance IsFile() -> Boolean

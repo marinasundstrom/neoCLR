@@ -475,6 +475,7 @@ ldloc destination
 ret
 .end
 .type internal class neoCLR.Library.System.Storage.FileSystem.Type_53797374656D2E53746F726167652E4C6F63616C46696C65
+.sealed
 .implements System.Storage.File
 .implements System.Storage.StorageItem
 .field private path System.Storage.Path
@@ -830,6 +831,7 @@ ret
 .end
 .end
 .type internal class neoCLR.Library.System.Storage.FileSystem.Type_53797374656D2E53746F726167652E4C6F63616C4469726563746F7279
+.sealed
 .implements System.Storage.Directory
 .implements System.Storage.StorageItem
 .field private provider System.Storage.FileSystem

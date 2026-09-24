@@ -714,6 +714,12 @@ redesigning the complete descriptor model.
 and [capability-model](proposals/introspection-model.md) texts, [metadata](proposals/metadata-format.md),
 collections and runtime architecture.
 
+**Author clarification, 2026-09-24:** ensure the six TypeInfo classification flags
+(IsAbstract, IsOpen, IsClosedHierarchy, nominal IsUnion, IsEnum, IsValueType) are
+available now; evolve toward the proposal's richer closed interface hierarchy
+incrementally. See the [classification contract](introspection-design.md#type-classification-flags--development-2026-09-24).
+This bounded API work does not reprioritize the active product milestones.
+
 **Explore:** descriptor identity and lifetime, nominal versus compound type views,
 missing metadata versus unsupported operations, and compatibility of the container
 with conventional readers. Keep description separate from invocation. Dynamic loading,

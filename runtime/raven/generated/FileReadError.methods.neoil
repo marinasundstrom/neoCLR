@@ -1,5 +1,6 @@
 ; Generated from runtime/raven/src/System/Storage/FileReadError.rvn. Regenerate with build_runtime_library.py.
 .type System.Storage.FileReadError
+.sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .field private Stored Value
 .property instance IsInvalidLimit() -> Boolean

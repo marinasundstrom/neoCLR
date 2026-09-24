@@ -138,6 +138,22 @@ impl Query {
                 )
             }
             Self::Shape => Ok(Value::Boolean(match argument {
+                8 => definition.is_some_and(|d| {
+                    (d.is_reference_type || d.representation == Representation::Interface)
+                        && !d.is_sealed
+                        && !d.is_closed_hierarchy
+                }),
+                9 => definition.is_some_and(|d| d.is_closed_hierarchy),
+                10 => definition.is_some_and(|d| {
+                    d.custom_attributes.iter().any(|attribute| {
+                        attribute
+                            .constructor
+                            .owner
+                            .as_ref()
+                            .and_then(Type::definition_name)
+                            == Some("System.Runtime.CompilerServices.UnionAttribute")
+                    })
+                }),
                 6 => definition.is_some_and(|d| d.enum_info.is_some()),
                 7 => match &ty {
                     Type::Void
