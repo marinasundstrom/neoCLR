@@ -49,6 +49,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Validation: Object plus three record samples, non-nullable assignment rejection,
   regenerated bootstrap snapshot checks, 385 API items and the combined website.
 
+  Clarify the author-directed absence model: prefer Option<T> for value and reference
+  types; retain nullable reference annotations for Raven compatibility and existing
+  null contracts. Defer nullable structs and nullable-value boxing rather than treating
+  them as the next slice. Update roadmap, design record and on-site guidance; no
+  runtime/compiler behavior or final metadata-format commitment changes.
+
 - Implement bounded virtual Object equality/hash for boxed Int32: compare exact
   type and integer value, and return the stored integer hash. Preserve separate-box
   identity and explicit Object base behavior. Other boxed primitives and primitive boxed ToString

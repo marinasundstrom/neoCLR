@@ -234,3 +234,16 @@ neoCLR to a final nullability model or metadata representation. Runtime signatur
 reference storage, virtual slots and Fault behavior are unchanged. Use matching
 reference artifacts to make the corrected annotations visible to the compiler.
 Generated record-specific Equals signatures are a separate compiler follow-up.
+
+
+## Modeling absence
+
+neoCLR favors `Option<T>` when an API or domain model needs to express absence, for
+both value types and reference types. Nullable reference annotations remain useful
+for Raven compatibility and existing null-based contracts such as Object equality.
+They do not make nullable values the platform's preferred absence model.
+
+Nullable structs (`Nullable<T>`) and nullable-value boxing are deliberately deferred;
+they may be reconsidered later. Existing reference nulls and default initialization
+remain unchanged. This direction does not yet add Option-valued components to the
+configured record contract, and the final metadata representation remains open.

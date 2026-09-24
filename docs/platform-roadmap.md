@@ -727,20 +727,29 @@ The [Object/Value review](object-model-review.md) now records those dependencies
 missing members. The bounded class display/override case now preserves
 .NET-style class reference sharing and value copying. Class equality/hash and the first integer record-class gate now have checked evidence.
 The record sample now also covers non-null strings and nested same-compilation record
-classes, including nullable record references and deconstruction. Nullable string/value
-representations and boxed-value equality remain prerequisites to broad record support;
-boxed Int32 equality/hash now has a bounded intrinsic and sample. Named value-type Object overrides, exact copied unboxing and the first Raven record-struct
+classes, including nullable record references and deconstruction. Broader component
+support and boxed-value behavior remain bounded; nullable value types are deferred.
+Boxed Int32 equality/hash now has a bounded intrinsic and sample. Named value-type Object overrides, exact copied unboxing and the first Raven record-struct
 slice now have [checked evidence](object-model-review.md#struct-object-slots-and-record-structs--2026-09-24).
 The author-directed struct/record-struct gate is complete for non-generic types with
 the documented component contract. Nested same-compilation record structs now compose in both record classes and structs,
 with a checked Point/Rectangle sample and value-output deconstruction. Other primitive
-Object implementations, generic struct components and nullable-value boxing remain
-follow-ups. Default reference fields now have a checked record case:
+Object implementations and generic struct components remain follow-ups. Nullable
+value types and their boxing behavior are not part of the current scope. Default reference fields now have a checked record case:
 null is preserved even for non-nullable declarations, and generated equality/hash/display
 handle it. Object.Equals and ReferenceEquals now annotate nullable comparison
 arguments for Raven compatibility. The author keeps reference annotations for now
 while leaving the future nullability model and metadata format open. Explicit
 nullable-string components and generated record-method annotations remain separate work. Value retirement remains a separate storage migration.
+
+**Absence-model direction, 2026-09-24:** prefer Option<T> for intentional absence in
+API/domain models, for both value types and reference types. Retain nullable reference
+annotations for Raven compatibility and APIs whose contract already involves null,
+such as Object equality. Do not implement Nullable<T>/nullable structs or nullable-value
+boxing in the current work; reconsider only when a concrete future need warrants it.
+This does not promise Option components in generated records before they are supported,
+remove runtime reference nulls, or settle the future metadata representation.
+
 This is a bounded foundation review; networking remains later. Console ownership,
 cleanup on propagated errors and buffering remain follow-up questions, not selected
 redesigns. The scheduling/operation-cancellation work below remains open.

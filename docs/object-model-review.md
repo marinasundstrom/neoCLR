@@ -510,3 +510,22 @@ locals, default/class-override/boxed equality, and a negative non-nullable assig
 The source library and bootstrap snapshots are regenerated, and the on-site reference
 shows the corrected signatures. Direct generated record Equals annotations remain
 a separate compiler issue; calls through Object use the corrected base contract.
+
+
+### Absence model clarified — 2026-09-24
+
+The author clarifies the previous provisional-nullability direction: neoCLR favors
+Option<T> for modeled absence for both value and reference types. Keep reference
+annotations for Raven compatibility and existing null-based contracts. Nullable
+structs/Nullable<T> and nullable-value boxing are explicitly deferred, not the next
+implementation slice. They may be reconsidered later; no final metadata format is
+selected.
+
+The .NET/Raven comparison above distinguishes reference annotations from a nullable
+value carrier. Retaining the former does not require implementing the latter.
+Option provides an explicit union case for absence across both categories; the cost
+is that its operations and generated-record integration need their own validated
+contracts. This direction neither changes default reference initialization nor
+claims that Option components already work in configured records. It supersedes
+earlier suggestions here that nullable-value representation was a prerequisite for
+continuing the bounded Object/record work. No runtime or compiler code changes.

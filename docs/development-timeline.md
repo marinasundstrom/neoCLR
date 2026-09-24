@@ -5948,3 +5948,17 @@ failure remains the next acceptance target.
 - **Open:** final nullability policy and metadata representation, nullable values,
   and generated record-specific equality annotations. This does not infer a permanent
   commitment beyond the author's stated reference-type compatibility direction.
+
+
+### 2026-09-24 — Prefer Option for modeled absence
+
+- **Author:** neoCLR should favor the Option union to model absence for value types
+  and reference types. Current nullable annotations are mainly for reference-type
+  compatibility; nullable structs might be added later but should not be added now.
+- **Assistant response/action:** record Option<T> as the preferred absence model,
+  keep reference annotations for existing null-based contracts and Raven compatibility,
+  and explicitly defer Nullable<T>/nullable-value boxing in the roadmap and on-site
+  guidance. Preserve the earlier metadata-format question as open.
+- **Outcome:** documentation and priorities change; no runtime/compiler behavior is
+  changed or Option-record component support claimed. Earlier nullable-value
+  follow-up suggestions are superseded for the current scope.
