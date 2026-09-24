@@ -817,6 +817,13 @@ state machines remain the execution mechanism; runtime suspension and general
 context customization are not prerequisites for TCP echo. The author clarifies that
 the product is a web-app demo receiving and sending HTTP messages: follow echo with
 the minimal provisional stream/text/HTTP chain, not completion of every layer.
+The [HTTP prototype essentials](socket-api-design.md#http-prototype-essentials-and-dns--2026-09-24)
+now include near-term host-backed DNS resolution after send, independently of listener
+completion. Build HTTP directly over Socket behind a private byte-I/O boundary;
+TcpClient is not required. Concrete products are socket echo, hostname byte exchange,
+a bounded HTTP GET/POST client, and the web-app request/response demo. Include request,
+response and header models, correct framing, bounds and deadline/error behavior.
+Start with a declared local HTTP subset; HTTPS requires a later TLS slice.
 Earlier foundation checkpoints below are dated evidence, not competing priorities.
 
 Each selected slice should leave a checked sample, expected output, a matching build/run

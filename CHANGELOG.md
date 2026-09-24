@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Refine the networking plan toward the HTTP demo: use Socket directly beneath a
+  private byte-I/O boundary, bring host-backed DNS into near-term client work, and
+  define bounded request/header/response and framing milestones. DNS, HTTP and TLS
+  remain planned, not implemented; TcpClient/UdpClient are not prerequisites.
+
 - Add the first development System.Networking.Sockets client: Socket.Connect and
   Receive return Task<Result<...>>, with typed SocketError and idempotent Close.
   Numeric IPv4 TCP uses nonblocking native operations and the private scheduler;

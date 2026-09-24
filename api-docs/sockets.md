@@ -72,3 +72,11 @@ this importer does not yet admit direct value-type case tests. Keeping a Result
 local across an additional await can also produce an uninitialized carrier field
 in a generated heap state machine. The sample checks its already-completed Closed
 result without another suspension; the general hoisted-Result case remains open.
+
+
+Planned next: send and listener/accept, followed by host-backed hostname resolution
+and a bounded HTTP request/response client using Socket directly. DNS belongs in
+near-term client work; TcpClient and UdpClient are not required for it. The HTTP
+prototype will include headers, status and byte bodies with explicit message framing.
+The first controlled demo uses plain HTTP; HTTPS needs a separate TLS implementation.
+None of these planned additions is available in the current Socket API.

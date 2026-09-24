@@ -249,3 +249,73 @@ Validation: 31 targeted backend, VM, scheduler and service-analysis tests pass.
 The Raven client and both negative visibility checks pass with 914 allocations,
 22 collections and zero live objects; all 554 API/site pages and ten website
 regression checks pass. Validation is local macOS evidence.
+
+## HTTP prototype essentials and DNS — 2026-09-24
+
+**Author direction:** build the HTTP client over Socket directly if that is the
+simplest starting point; include the essential request, header and response model,
+and consider DNS now. This refines the demo sequence without requiring a complete
+networking stack. The following is a plan, not additional shipped APIs.
+
+**.NET baseline:** .NET 10's [SocketsHttpHandler connection setup](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Net.Http/src/System/Net/Http/SocketsHttpHandler/ConnectionPool/HttpConnectionPool.cs)
+creates/connects a Socket and wraps it in an owning NetworkStream; TcpClient is not
+a prerequisite. Start neoCLR HTTP directly on Socket with a private byte reader/writer
+boundary. A stream adapter can replace that boundary when TLS or another consumer
+needs it. This avoids a public wrapper prerequisite but leaves buffering, partial
+transfers and ownership to implement explicitly. Do not put HTTP parsing in Socket.
+
+Promote hostname resolution into the near-term client work. Compare
+[Dns.GetHostAddressesAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.dns.gethostaddressesasync?view=net-10.0):
+asynchronous address lookup with address-family selection is useful; adapt failures
+to Result. Use the host resolver, respecting host configuration, rather than writing
+a DNS packet client or requiring UdpClient. Keep resolution and connection separate
+internally; preserve the original hostname for HTTP Host and later TLS identity.
+Try supported returned addresses with a bounded overall deadline, distinguishing
+resolution failure, no usable address and connection failure. The current transport
+is IPv4-only: make filtering explicit, not a claim of IPv6 support. Names, address
+value types and exact signatures remain provisional.
+
+Blocking host resolution must not run on the VM scheduler thread. Evaluate a bounded
+host worker or platform async resolver. A worker completion should carry owned host
+data, not guest references. Limit requests and result sizes; cancellation must prevent
+late delivery and release accounting correctly even when the host lookup itself
+cannot be interrupted. This is necessary operation-lifetime work, not a requirement
+for runtime frame suspension. Test with an injectable resolver; public DNS is not a
+reliable required test dependency.
+
+### Concrete products and order
+
+1. **Socket exchange:** send with partial-write handling, then bind/listen/accept;
+   a bounded two-sided echo proves byte flow and resource cleanup. DNS work can follow
+   send without waiting for listener completion.
+2. **Hostname client:** resolve a controlled hostname, select/connect an address,
+   and exchange bytes. Add connection/operation deadline behavior needed for stalled
+   hosts. Show lookup and connection errors distinctly.
+3. **HTTP client:** an HTTP/1.1 GET and small POST against a controlled local server.
+   Model method, target, headers and byte body on requests; status, headers and byte
+   body on responses. Keep text decoding separate from body framing. Expose typed
+   transport/protocol failures and bounded headers/body sizes.
+4. **Web-app exchange:** the neoCLR listener receives a request and returns a small
+   HTTP response that the client and a conventional client can both consume.
+
+[HTTP/1.1 RFC 9112](https://www.rfc-editor.org/rfc/rfc9112.html) requires parsing a
+byte stream, independent of receive boundaries. The prototype must handle split and
+coalesced messages, case-insensitive field names without losing repeated values,
+Host and correct request-target construction, partial writes, and body framing.
+Start with explicit connection close and Content-Length for the controlled demo.
+Before broader HTTP/1.1 interoperability, include chunked decoding, informational
+responses and method/status-specific body rules. Reject conflicting lengths,
+unsupported transfer codings, malformed headers and truncated bodies; do not silently
+interpret them as supported messages. Validate outgoing fields against CR/LF injection.
+A restricted demo must state its accepted subset, not claim general HTTP/1.1 support.
+
+TLS is required for HTTPS; it remains a separate explicit milestone before testing
+arbitrary HTTPS services. Reject unsupported schemes rather than downgrade. Pooling,
+redirects, cookies, compression, proxies, HTTP/2, HTTP/3, general DNS record APIs and
+TcpClient/UdpClient wrappers are not initial demo gates. Source retrieval: 2026-09-24.
+
+Validation should combine fragmented in-memory protocol fixtures, injected resolver
+outcomes, loopback transport tests and one compiled Raven GET/POST sample. Compare
+observable requests/responses with a conventional HTTP implementation. Keep OS-specific
+resolver/socket tests separate from reusable protocol tests, following the author's
+CI direction. Update the generated public API reference as each API is implemented.

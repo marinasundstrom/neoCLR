@@ -6423,3 +6423,18 @@ client slice, select send and listener/accept next, then the minimum stream/text
 HTTP behavior required by the demo. Do not make TcpClient/UdpClient or a complete
 network stack prerequisites. The demo purpose and this sequencing are recorded in
 the socket design and roadmap.
+
+
+## 2026-09-24 — HTTP directly over Socket and near-term DNS
+
+**Author:** suggested direct use of Socket for the HTTP client's TCP flow, requested
+networking/HTTP essentials including headers, requests and responses, and proposed
+adding DNS now. **Assistant assessment:** direct Socket use is appropriate; .NET's
+SocketsHttpHandler also establishes sockets without requiring TcpClient. Propose
+host-backed async name resolution early, keeping blocking resolver work off the VM
+thread, and a bounded HTTP client with explicit framing and ownership.
+
+**Action:** updated the roadmap and socket design with hostname exchange, GET/POST
+and web-app products, essential protocol behavior, validation and the local-HTTP/TLS
+boundary. Exact public resolver/address/HTTP signatures remain provisional. This
+exchange adds implementation direction; it does not report DNS or HTTP as implemented.
