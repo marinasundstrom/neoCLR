@@ -11,6 +11,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Enable RavenDoc flat namespace navigation for the neoCLR API Browser, with
   full namespace names as peers and expandable type groups. Update the pinned
   upstream generator; hierarchical mode remains available and URLs are unchanged.
+  Keep namespace rows expandable even when they only contain an overview, and
+  display declared built-in type names in navigation and headings while preserving
+  Raven aliases in code signatures. Ignore API-inventory build outputs.
 
 - Include every public reference type in API generation, rather than maintaining a
   selected subset. Add collection classes/interfaces and the remaining public API
