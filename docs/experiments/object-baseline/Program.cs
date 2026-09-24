@@ -61,6 +61,20 @@ Check(nullability.Create(typeof(KeyRecord).GetMethod("Equals", [typeof(KeyRecord
     == System.Reflection.NullabilityState.NotNull,
     "Typed equality annotates record-class arguments but keeps record-struct values non-nullable");
 
+KeyRecord? nullableRecord = sameRecord;
+KeyRecord? differentRecord = new KeyRecord(7);
+Check(nullableRecord == record && nullableRecord != differentRecord
+    && nullableRecord != absentRecord && absentRecord != nullableRecord
+    && absentRecord == null && null == absentRecord
+    && nullableRecord != null && null != nullableRecord,
+    "Nullable record operators preserve component equality and null symmetry");
+Check(new[] { "op_Equality", "op_Inequality" }.All(name =>
+    typeof(KeyRecord).GetMethod(name)!.GetParameters().All(parameter =>
+        nullability.Create(parameter).ReadState == System.Reflection.NullabilityState.Nullable)
+    && typeof(Coordinate).GetMethod(name)!.GetParameters().All(parameter =>
+        nullability.Create(parameter).ReadState == System.Reflection.NullabilityState.NotNull)),
+    "Record-class operators annotate both references while struct operators take values");
+
 object integer = 42;
 object equalInteger = 42;
 Check(integer.Equals(equalInteger) && !ReferenceEquals(integer, equalInteger),

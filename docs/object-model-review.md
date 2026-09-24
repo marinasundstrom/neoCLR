@@ -577,3 +577,26 @@ record support on .NET is compiler regression coverage, not new neoCLR component
 support. Option components, nullable strings and broader signature matching remain
 separate questions; no public library API, runtime instruction or metadata format is
 added by this slice.
+
+### Record comparison operators — 2026-09-24
+
+The next annotation gap was generated class `==`/`!=`: both parameters were marked
+non-null even though null comparisons already worked. The .NET comparison above
+and the pinned baseline now check both operator parameters and null/value symmetry
+(34 total assertions). Generated record-struct operands remain values. This is
+reference contract alignment, not nullable-value support or a change to Option policy.
+
+Annotating the operands exposed an internal lowering bug: a generated null guard
+resolved overloaded `==`, recursively calling the operator until stack overflow.
+The general fix uses Object.ReferenceEquals for these guards and preserves explicit
+operators with nullable, non-nullable or mixed operands. Tests check runtime behavior,
+emitted/reimported metadata and misleading custom operators. It was independently
+validated on Raven's main-based feature branch and integrated as `1394aca99`.
+
+The target branch additionally uses identity guards for record-class components in
+equality, hashing and display (`d2a583386`, after general cherry-pick `da9481e50`).
+String guards retain existing intrinsic lowering; this does not add String identity.
+The focused target suite passes 66 tests. The general suite passes 61 tests plus a
+separate custom-operator guard regression. No RuntimeRecordContract configuration or
+public library signature changes are required. Existing generic/external record and
+nullable string/value restrictions remain.

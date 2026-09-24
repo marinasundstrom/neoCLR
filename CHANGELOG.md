@@ -26,6 +26,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Extend the checked record sample and pinned .NET comparison; no library API changes.
   Typed-equality validation includes 61 target record checks, all three record programs,
   32 pinned .NET assertions, API/snapshot checks and the combined website build.
+  Align generated record-class ==/!= nullable annotations with existing behavior,
+  preserving value operands for structs and explicitly authored operators. Fix
+  internal null guards to use identity, avoiding operator recursion and misleading
+  custom operators in component equality/hash/display. Extend the sample and on-site
+  guide. Operator validation: 66 target compiler checks, 34 pinned .NET assertions,
+  all three record programs and rejection cases, API/snapshot and website checks.
 
 - Implement the first non-generic struct/record-struct Object integration: explicit
   named-value overrides dispatch into boxed payloads with readonly protection;

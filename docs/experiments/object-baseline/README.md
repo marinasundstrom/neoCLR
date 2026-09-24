@@ -61,3 +61,8 @@ record-class Equals accepts a nullable record local and literal null, including
 IEquatable dispatch; reflected typed class parameters are nullable, while typed
 record-struct parameters remain non-nullable values. All pass with the pinned
 SDK 10.0.100 and runtime .NET 10.0.0.
+
+The comparison-operator follow-up (2026-09-24) adds two assertions (34 total):
+nullable record operands preserve value equality and symmetric null handling;
+both generated class operator parameters are nullable, while struct operator
+parameters remain values. SDK/runtime pins are unchanged.

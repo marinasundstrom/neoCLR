@@ -93,6 +93,13 @@ func Main() {
     if first.Equals(absentKey) || first.Equals(null) || !first.Equals(maybeKey) {
         System.Fault("Typed record equality must accept nullable record references")
     }
+    let differentKey: Key? = Key(7)
+    if first != maybeKey || maybeKey != first || maybeKey == differentKey {
+        System.Fault("Nullable record operators must preserve value equality")
+    }
+    if absentKey != null || null != absentKey || absentKey == maybeKey || maybeKey == absentKey {
+        System.Fault("Nullable record operators must handle absence symmetrically")
+    }
     let equatable: Equatable<Key> = first
     if !Object.ReferenceEquals(first, alias) {
         System.Fault("Record assignment must preserve class identity")

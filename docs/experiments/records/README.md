@@ -80,3 +80,10 @@ Typed-equality follow-up: the general compiler regression also checks nullable
 parameter metadata after reimport, generic record classes on .NET and user-written
 Equals declarations. The 61 target record checks pass with the updated component
 lookup. Generic records remain unsupported by the neoCLR RuntimeRecordContract.
+
+Comparison-operator follow-up: the main sample checks nullable present/equal/different
+records and symmetric null comparisons. Generated class `==`/`!=` parameters are
+nullable, while struct operands remain values. Internal record-class null guards use
+identity so overloaded equality cannot recurse or change component null handling.
+The focused target compiler suite passes 66 tests, including metadata and custom
+component-operator isolation; the pinned .NET baseline passes 34 assertions.

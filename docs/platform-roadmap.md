@@ -743,7 +743,10 @@ while leaving the future nullability model and metadata format open. Explicit
 nullable-string components remain separate work. Generated Object.Equals preserves
 the inherited nullable parameter contract, and typed record-class Equals now accepts
 a nullable record reference. Typed record-struct parameters remain values; the checked
-sample covers absent/present Key? locals and literal null. Value retirement remains a separate storage migration.
+sample covers absent/present Key? locals and literal null. Generated class `==`/`!=`
+also accept nullable references, with symmetric null handling and value equality.
+Internal null guards use reference identity, independent of overloaded operators.
+Value retirement remains a separate storage migration.
 
 **Absence-model direction, 2026-09-24:** prefer Option<T> for intentional absence in
 API/domain models, for both value types and reference types. Retain nullable reference

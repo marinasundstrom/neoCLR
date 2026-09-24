@@ -261,3 +261,8 @@ generated typed record-class Equals also accepts a nullable reference to its rec
 type and compares null as false. Record-struct typed parameters remain non-nullable
 values. The Equatable<T> interface contract is unchanged. This does not add Nullable<T>,
 nullable-value boxing or Option components to the supported record component set.
+
+Generated record-class `==` and `!=` also accept nullable operands in development.
+Two absent references compare equal; an absent and present reference compare unequal;
+present records compare by components. Record-struct operator parameters remain
+values. Explicitly authored operators retain their own contracts.

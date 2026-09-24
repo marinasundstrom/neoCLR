@@ -898,3 +898,11 @@ nulls only for application-reference call/constructor arguments through typed ad
 preserving mixed/multiple argument positions. Intrinsic null strings remain rejected.
 The sample verifies both paths; no new RuntimeRecordContract settings or public
 library members are added.
+
+Record comparison-operator follow-up (2026-09-24): generated class `==` and `!=`
+preserve nullable reference annotations; struct operands remain values. No new
+RuntimeRecordContract setting is needed. General Raven equality null guards use
+Object.ReferenceEquals to avoid recursive operator calls. The target branch also
+uses identity guards for record-class components in equality, hashing and display;
+intrinsic string guards keep their existing target-supported lowering. User-defined
+operators cannot redefine those internal null tests. Nullable value support is unchanged.
