@@ -57,6 +57,12 @@ layout remains provisional. Next perform a bounded Object/value consistency revi
 then choose API work from a real application case; do not expand text contracts
 without a concrete need.
 
+**Socket completion checkpoint, 2026-09-24:** the
+[receive ownership probe](experiments/socket-completion/README.md) checks real TCP
+with retained destinations, bounded admission, exact range delivery and serialized
+completion/cancellation. Six host-side cases pass; managed GC roots, socket handle
+ownership and Task delivery remain open. This does not expose a guest Socket API.
+
 **Author-directed interning exploration, 2026-09-24:** investigate explicit String
 interning with a repeated-identifier case before choosing the public contract.
 The [owned-pool experiment](experiments/string-interning/README.md) validates exact

@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Check pending socket-receive ownership with real loopback TCP in an isolated
+  six-case probe: exact range delivery, retained destinations, terminal ordering,
+  admission quotas and teardown. Guest Socket/Task integration remains pending.
+
 - Integrate explicit `String.Intern` with one bounded strong pool per execution;
   isolated workers and separate host invocations have independent pools. Retain
   canonical text until completion, Fault or cancellation while preserving returned
