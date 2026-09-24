@@ -1,6 +1,6 @@
 # Socket API: first application-driven slice
 
-**2026-09-24 · Development TCP client slice; full echo and broader Socket API remain open.**
+**2026-09-24 · Development TCP echo POC; HTTP and broader Socket API remain open.**
 
 The author selects APIs needed to build a web application running on neoCLR,
 starting with sockets. Keep the [networking proposal](proposals/network-api.md)
@@ -547,3 +547,48 @@ Nine runtime-service tests include Accept's SocketIo + TaskDispatch requirement.
 The compiled two-process fixture completes with zero live objects: server 104
 allocations/three collections, client 1,428 allocations/31 collections. This is
 local macOS evidence. HTTP framing, overall connect deadlines and fallback remain open.
+
+
+## Pending connect deadline — 2026-09-24
+
+Pending numeric-address connects now use a fixed five-second monotonic deadline
+from native admission. The owner checks expiry before observing transport completion.
+An outcome committed earlier survives expiry and delayed callback delivery. On expiry,
+the registry drops the native stream, releases socket capacity and queues the existing
+TimedOut result exactly once. The operation record remains bounded and retained until
+result consumption. Accept has no deadline; shared completion storage must not make
+listeners expire. Send/Receive remain unchanged.
+
+This is a provisional POC policy, not a general timeout API. No new public signature,
+compiler service, thread or timer queue is introduced. The existing private scheduler
+poll observes deadlines; arbitrary guest execution or an unpumped custom queue can
+still delay delivery. Runtime suspension remains future work.
+
+Comparison checked 2026-09-24: [.NET Socket.ConnectAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.sockets.socket.connectasync?view=net-10.0)
+has address-list and cancellation-token overloads. The current neoCLR factory uses
+one address and Result errors, so it cannot express that full policy. A fixed bound
+is useful for the controlled demo but can reject slow legitimate connections and
+cannot be tuned by applications. This is a limitation, not an improvement over .NET.
+The existing nonblocking/owned-resource research above continues to apply.
+
+**Next policy to implement and validate:** retain DNS host order, attempt a bounded
+number of distinct addresses sequentially, and use one absolute deadline across the
+operation rather than granting every retry a fresh five seconds. Preserve the original
+hostname for HTTP Host (and later TLS identity). Keep this policy in a private client
+adapter until its use establishes a public contract; IPAddress/HostEntry and parallel
+IPv4/IPv6 racing are not prerequisites. DNS currently has a separate five-second bound;
+combining lookup and connection into one deadline remains open. This paragraph is a
+plan, not implemented fallback.
+
+Deterministic backend tests inject owner time with real native streams: expiry wins
+over unobserved success at the exact boundary, a committed success/failure survives
+expiry, timed-out transport closes, results are single-use, socket/operation quotas
+recover and listeners remain pending. They do not depend on public unreachable IPs
+or wall-clock sleeps. Existing VM/scheduler and echo checks exercise the unchanged
+Task/Result bridge and GC ownership.
+
+Validation: 44 focused Rust checks pass (21 socket backend, nine scheduler, nine
+runtime-service and five VM socket checks). The API snapshot validates, the combined
+website builds with 955 RavenDoc pages checked, and all 15 website tests pass. No
+compiler/library signature changed, so the existing matching reference assembly is
+retained and its XML snapshot refreshed. No SDK or website publication was performed.

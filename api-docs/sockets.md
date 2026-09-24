@@ -64,8 +64,16 @@ contract or individual cancellation method is available yet.
 Connections belong to their invocation. Close promptly; teardown releases anything
 left open. The current backend allows 64 open-or-connecting sockets, 64 operations
 including completed results awaiting delivery/consumption, and 64 KiB of aggregate
-receive storage plus send snapshots. These provisional limits are implementation budgets. There is no
-configured connect deadline; host invocation cancellation remains available.
+receive storage plus send snapshots. These provisional limits are implementation budgets.
+
+Pending connects have a provisional five-second monotonic deadline from native
+admission. If no outcome has been committed before expiry, the next owner poll closes
+the native socket and returns TimedOut. Already committed success or failure survives
+later delivery. The timeout releases socket capacity immediately; the outcome retains
+its operation slot until consumed. This bounds native waiting, not arbitrary guest
+work or callback delivery: the owner must continue scheduling. Host invocation
+cancellation remains available. Accept, Send and Receive have no operation deadline.
+The timeout is not configurable and does not cover DNS or multiple address attempts.
 
 Connect, Send and Receive use nonblocking sockets polled by the private scheduler. No
 thread is created for each operation. Pending receive buffers and completion objects remain
@@ -93,7 +101,7 @@ result without another suspension; the general hoisted-Result case remains open.
 
 
 Host-backed hostname resolution is available through Dns.GetHostAddresses.
-Planned next: bounded connection lifetime/address fallback and an HTTP request/response client using
+Planned next: address fallback under one overall connection deadline and an HTTP request/response client using
 Socket directly; TcpClient and UdpClient are not required for it. The HTTP
 prototype will include headers, status and byte bodies with explicit message framing.
 The first controlled demo uses plain HTTP; HTTPS needs a separate TLS implementation.

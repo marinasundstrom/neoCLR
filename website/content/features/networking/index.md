@@ -79,17 +79,19 @@ a five-second deadline, four concurrent blocking host calls across the process a
 bounded result sizes. A timed-out native lookup may continue until the host returns,
 retaining its capacity slot. The VM remains able to dispatch other work.
 
-There is no public operation cancellation, automatic address fallback or overall
-connection deadline. The example controls its host and uses a verifier watchdog.
+A pending TCP connect has a five-second deadline and releases its native socket on
+timeout. Delivery still requires scheduler progress. There is no public operation
+cancellation, automatic address fallback or shared DNS/connection deadline. The example
+controls its host and uses a verifier watchdog.
 Socket completion uses nonblocking polling; host lookup runs on bounded host threads.
 Generated Raven state machines still implement async execution. Runtime suspension
 remains future work.
 
 ## Where we’re heading
 
-Two neoCLR programs can now exchange bytes. Next, bounded connection deadlines
-and address fallback will prepare a
-HTTP client and server will exercise requests, headers, responses and bodies, using
+Two neoCLR programs can now exchange bytes. Next, address fallback under one shared
+connection deadline will prepare the HTTP case. A small HTTP client and server will
+exercise requests, headers, responses and bodies, using
 Socket directly where useful. TLS is a separate requirement for HTTPS. TcpClient and
 UdpClient may follow when a working case needs them.
 

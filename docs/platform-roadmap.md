@@ -812,8 +812,11 @@ No later major milestone has started.
 
 ## Working rules and immediate next step
 
-**Active next step, 2026-09-24:** bound connection lifetime and define address
-fallback for the first HTTP client. The [two-process echo](experiments/socket-echo/README.md)
+**Active next step, 2026-09-24:** add address fallback under one shared connection
+deadline for the first HTTP client. Pending numeric-address connects now have a
+[provisional five-second bound](socket-api-design.md#pending-connect-deadline--2026-09-24),
+including owner-observed expiry, native socket cleanup and once-only result delivery.
+This per-attempt guard does not complete the overall DNS/fallback deadline gate. The [two-process echo](experiments/socket-echo/README.md)
 now uses Listen/Accept on the server and the hostname client on the other side. The [hostname client](experiments/socket-client/README.md) now uses public
 Dns.GetHostAddresses with Task/Result and a read-only IPv4 address sequence over the
 [bounded resolver](socket-api-design.md#public-hostname-lookup-and-networking-poc--2026-09-24).

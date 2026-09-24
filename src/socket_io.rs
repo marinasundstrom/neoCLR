@@ -5,7 +5,11 @@ use std::{
     io::{self, Read, Write},
     net::{Ipv4Addr, SocketAddrV4, TcpListener, TcpStream},
     sync::atomic::{AtomicU64, Ordering},
+    time::{Duration, Instant},
 };
+
+// Provisional per-attempt bound; a multi-address operation needs a shared deadline.
+const CONNECT_TIMEOUT: Duration = Duration::from_secs(5);
 
 static NEXT_ID: AtomicU64 = AtomicU64::new(1);
 fn next_id() -> Result<u64, Error> {
@@ -66,6 +70,7 @@ fn connecting(error: &io::Error) -> bool {
     false
 }
 struct Connect {
+    deadline: Option<Instant>,
     listener: Option<SocketId>,
     stream: Option<TcpStream>,
     callback: Option<Value>,
@@ -227,6 +232,7 @@ impl Sockets {
         self.connects.insert(
             id,
             Connect {
+                deadline: None,
                 listener: Some(listener),
                 stream: None,
                 callback: Some(callback),
@@ -253,6 +259,7 @@ impl Sockets {
         {
             return Err(Error::Limit);
         }
+        let deadline = Instant::now() + CONNECT_TIMEOUT;
         let id = OperationId(next_id()?);
         let socket = socket2::Socket::new(
             socket2::Domain::IPV4,
@@ -268,6 +275,7 @@ impl Sockets {
                 self.connects.insert(
                     id,
                     Connect {
+                        deadline: Some(deadline),
                         listener: None,
                         stream: None,
                         callback: Some(callback),
@@ -287,6 +295,7 @@ impl Sockets {
         self.connects.insert(
             id,
             Connect {
+                deadline: Some(deadline),
                 listener: None,
                 stream,
                 callback: Some(callback),
@@ -568,11 +577,21 @@ impl Sockets {
         Ok(ready)
     }
     fn poll_connect(&mut self) -> Result<Option<Value>, Fault> {
+        self.poll_connect_at(Instant::now())
+    }
+    fn poll_connect_at(&mut self, now: Instant) -> Result<Option<Value>, Fault> {
         for op in self.connects.values_mut() {
             if op.callback.is_none() {
                 continue;
             }
             if op.outcome.is_none() {
+                // Owner-observed completion wins only before expiry. Once committed,
+                // an outcome survives later polls and delayed guest delivery.
+                if op.deadline.is_some_and(|deadline| now >= deadline) {
+                    op.stream = None;
+                    op.outcome = Some(Err(Error::TimedOut));
+                    return Ok(op.callback.take());
+                }
                 if let Some(listener) = op.listener {
                     let listener = self
                         .listeners
@@ -745,6 +764,137 @@ mod tests {
         };
         SocketId(id as u64)
     }
+    // A native stream plus an owner-controlled clock makes expiry deterministic:
+    // no external black-hole address, routing assumption or five-second sleep.
+    fn staged_connect(sockets: &mut Sockets, stream: TcpStream, deadline: Instant) -> OperationId {
+        stream.set_nonblocking(true).unwrap();
+        let id = OperationId(next_id().unwrap());
+        sockets.connects.insert(
+            id,
+            Connect {
+                deadline: Some(deadline),
+                listener: None,
+                stream: Some(stream),
+                callback: Some(callback()),
+                outcome: None,
+            },
+        );
+        id
+    }
+
+    #[test]
+    fn expired_connect_drops_native_owner_and_retains_result_until_consumed() {
+        let (mut peer, stream) = pair();
+        let mut sockets = Sockets::default();
+        sockets.budget.sockets = 1;
+        sockets.budget.operations = 1;
+        let heap = ManagedHeap::default();
+        let deadline = Instant::now();
+        let id = staged_connect(&mut sockets, stream, deadline);
+        assert_eq!(sockets.resource_count(), 1);
+        assert!(
+            sockets
+                .invoke(
+                    Operation::ConnectResult,
+                    &[Value::Int64(id.0 as i64)],
+                    &heap
+                )
+                .is_err()
+        );
+        // Even a native connection already ready loses if not observed before expiry.
+        assert!(sockets.poll_connect_at(deadline).unwrap().is_some());
+        assert_eq!(sockets.connects[&id].outcome, Some(Err(Error::TimedOut)));
+        assert_eq!(sockets.resource_count(), 0);
+        assert_eq!(
+            peer.read(&mut [0; 1]).unwrap(),
+            0,
+            "timeout must close transport"
+        );
+        assert!(!sockets.pending());
+        assert!(
+            sockets
+                .poll_connect_at(deadline + Duration::from_secs(1))
+                .unwrap()
+                .is_none()
+        );
+        assert_eq!(
+            sockets.connect("127.0.0.1", 1, callback()),
+            Err(Error::Limit)
+        );
+        assert_eq!(
+            connect_result(&mut sockets, &heap, id),
+            payload(Err(Error::TimedOut))
+        );
+        assert!(
+            sockets
+                .invoke(
+                    Operation::ConnectResult,
+                    &[Value::Int64(id.0 as i64)],
+                    &heap
+                )
+                .is_err()
+        );
+        // Both capacity reservations are reusable after consuming the outcome.
+        assert!(sockets.connect("127.0.0.1", 1, callback()).is_ok());
+    }
+
+    #[test]
+    fn connect_committed_before_expiry_survives_delayed_consumption() {
+        let (_peer, stream) = pair();
+        let mut sockets = Sockets::default();
+        let heap = ManagedHeap::default();
+        let deadline = Instant::now() + CONNECT_TIMEOUT;
+        let id = staged_connect(&mut sockets, stream, deadline);
+        assert!(
+            sockets
+                .poll_connect_at(deadline - Duration::from_nanos(1))
+                .unwrap()
+                .is_some()
+        );
+        assert!(sockets.poll_connect_at(deadline).unwrap().is_none());
+        let socket = accepted(&mut sockets, &heap, id);
+        assert!(sockets.local_port(socket).is_ok());
+        sockets.close(socket);
+        assert_eq!(sockets.resource_count(), 0);
+    }
+
+    #[test]
+    fn connect_deadline_does_not_expire_accept_or_committed_failure() {
+        let mut sockets = Sockets::default();
+        let listener = sockets.listen("127.0.0.1", 0, 8).unwrap();
+        let accept = sockets.accept(listener, callback()).unwrap();
+        let now = Instant::now();
+        assert!(
+            sockets
+                .poll_connect_at(now + CONNECT_TIMEOUT * 2)
+                .unwrap()
+                .is_none()
+        );
+        assert!(sockets.connects[&accept].outcome.is_none());
+        let id = OperationId(next_id().unwrap());
+        sockets.connects.insert(
+            id,
+            Connect {
+                deadline: Some(now),
+                listener: None,
+                stream: None,
+                callback: Some(callback()),
+                outcome: Some(Err(Error::ConnectionRefused)),
+            },
+        );
+        assert!(
+            sockets
+                .poll_connect_at(now + CONNECT_TIMEOUT)
+                .unwrap()
+                .is_some()
+        );
+        assert_eq!(
+            sockets.connects[&id].outcome,
+            Some(Err(Error::ConnectionRefused))
+        );
+        sockets.close(listener);
+    }
+
     #[test]
     fn listener_accept_echo_and_close_leave_accepted_connection_independent() {
         let mut sockets = Sockets::default();
@@ -1126,6 +1276,7 @@ mod tests {
             sockets.connects.insert(
                 OperationId(next_id().unwrap()),
                 Connect {
+                    deadline: None,
                     listener: None,
                     stream: None,
                     callback: Some(callback()),

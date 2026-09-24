@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Bound pending numeric TCP connects to five seconds from native admission. Expiry
+  closes the native socket and returns SocketError.TimedOut; outcomes already committed
+  survive delayed delivery. Accept and transfers keep their existing behavior. Update
+  API/website documentation and deterministic lifecycle tests. This provisional fixed
+  timeout can reject slower connections; a shared deadline and address fallback remain
+  the next slice.
+
 - Enable RavenDoc flat namespace navigation for the neoCLR API Browser, with
   full namespace names as peers and expandable type groups. Update the pinned
   upstream generator; hierarchical mode remains available and URLs are unchanged.
