@@ -472,3 +472,34 @@ scheduler tests pass (25 total). The compiled hostname/echo sample reclaims all
 visibility checks pass. Ten website tests and the combined 572-page API/site build
 pass. Networking was inspected in the local browser. This is local macOS evidence,
 not cross-platform networking certification or a runtime release.
+
+
+## Address value objects — future direction, 2026-09-24
+
+The author proposes introducing IPAddress when the networking model is ready, and
+possibly HostEntry, continuing the platform's value-object direction. This does not
+replace the immediate listener/accept slice or require changing the POC's string
+addresses now. Neither type is implemented or a prerequisite for the first HTTP demo.
+
+Compare [.NET IPAddress](https://learn.microsoft.com/en-us/dotnet/api/system.net.ipaddress?view=net-10.0)
+and [IPHostEntry](https://learn.microsoft.com/en-us/dotnet/api/system.net.iphostentry?view=net-10.0)
+(primary sources reviewed 2026-09-24). IPAddress models an address; IPHostEntry groups
+host information and addresses. Borrow that separation without committing to the
+complete .NET surface or its mutability. Value-object semantics do not decide whether
+the eventual neoCLR representation is a class or a struct.
+
+Assistant proposal for evaluation: make IPAddress immutable, with validated parsing
+returning Result, equality/hash based on the address representation, and deterministic
+formatting. Keep hostnames and ports separate from an IP address. Define IPv4/IPv6
+family, mapped-address and scope handling deliberately when those cases are needed;
+do not infer identity from display text alone. Richer validation and stable equality
+would reduce repeated parsing and ambiguous string comparisons, at the cost of new
+contracts and migration from the current DNS/socket signatures. Decide string
+convenience overloads from actual call sites rather than requiring typed addresses
+everywhere in the platform.
+
+HostEntry remains optional: introduce it if a resolver case needs more than an address
+sequence. Select hostname/alias fields only when the host resolver can supply them;
+keep the original requested hostname distinct from any reported canonical name.
+A lookup result is a snapshot, not permanent host identity or peer authentication.
+Its equality and collection semantics need a concrete use case before being fixed.

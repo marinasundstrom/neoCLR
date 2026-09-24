@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Record future IPAddress value-object direction and a possible HostEntry, with
+  .NET comparisons and open parsing, equality and migration choices. This is planning;
+  current DNS/socket signatures and immediate listener work remain unchanged.
+
 - Add development Dns.GetHostAddresses with Task/Result, read-only IPv4 address
   sequences, typed lookup errors and a provisional five-second deadline. Extend
   the socket echo client to resolve localhost, and keep lookup separate from

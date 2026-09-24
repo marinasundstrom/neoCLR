@@ -810,6 +810,10 @@ No later major milestone has started.
 case. The [hostname client](experiments/socket-client/README.md) now uses public
 Dns.GetHostAddresses with Task/Result and a read-only IPv4 address sequence over the
 [bounded resolver](socket-api-design.md#public-hostname-lookup-and-networking-poc--2026-09-24).
+Future author direction: introduce an IPAddress value object when the networking
+model is ready; consider HostEntry if richer lookup results become useful. See the
+[address model notes](socket-api-design.md#address-value-objects--future-direction-2026-09-24).
+These are not requirements to replace the current POC strings immediately.
 Keep bounded address fallback and an overall connection deadline as gates before
 broader HTTP client use. Networking has its own feature page and homepage box;
 add a separate Web page and box when the HTTP POC works, as requested by the author.

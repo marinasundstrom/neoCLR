@@ -6459,3 +6459,15 @@ the hostname/TCP echo POC; give Web its separate page and box when HTTP works.
 **Action:** add the Networking overview, tested-source lookup example, API links and
 homepage/guide navigation. Record the Web publication gate in the roadmap. No HTTP
 implementation or website deployment is implied.
+
+
+## 2026-09-24 — Future IPAddress and possible HostEntry
+
+**Author:** suggested creating IPAddress when ready, and perhaps HostEntry, following
+the theme of value objects. **Assistant response/action:** record IPAddress as future
+direction and HostEntry as a candidate, while retaining the current string-address
+POC. Proposed immutable address semantics, Result-based parsing and explicit equality/
+hashing for later evaluation; class versus struct and exact signatures remain open.
+The [design comparison](socket-api-design.md#address-value-objects--future-direction-2026-09-24)
+records the .NET baseline, benefits, migration costs and validation questions.
+No implementation or change to immediate milestone order is implied.
