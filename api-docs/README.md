@@ -108,3 +108,9 @@ Socket.Send has generated member coverage. Transfer snapshots, short writes, sha
 budgets and simultaneous send/receive behavior are described in the socket guide.
 The private transfer-result service replaces the former receive-only result service;
 refresh matching library, importer and runtime artifacts together.
+
+Dns, DnsError and every error case now have generated reference coverage. The public
+lookup returns Sequence<String>; private operation and completion types stay hidden.
+The Rust reachability service `RuntimeService::NameResolution` identifies host lookup
+requirements; submission additionally requires TaskDispatch, not SocketIo or
+IsolatedWorkers. Result consumption requires NameResolution without TaskDispatch.

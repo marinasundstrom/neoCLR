@@ -52,13 +52,14 @@ with tempfile.TemporaryDirectory(prefix='neoclr-socket-client-') as folder, sock
     assert run.returncode == 0, run.stdout + run.stderr
     thread.join(5)
     assert not thread.is_alive() and not errors, errors
-    assert run.stdout == 'Other work runs while TCP is pending\nSent Hi\nReceived Hi; peer finished sending\nSocket closed\n', run.stdout
+    assert run.stdout == 'Other work runs while TCP is pending\nResolved localhost\nSent Hi\nReceived Hi; peer finished sending\nSocket closed\n', run.stdout
     stats = {key: int(value) for key, value in re.findall(r'(\w+)=(\d+)', run.stderr)}
     assert stats['live'] == 0 and stats['collections'] > 1, stats
     print(run.stdout, end='')
     print(run.stderr, end='')
     for name, code in [
         ('opaque constructor', 'let socket = Socket(1L)'),
+        ('private DNS completion', 'let completion = System.Networking.DnsCompletion(Promise<Result<System.Collections.Sequence<string>, System.Networking.DnsError>>())'),
         ('private completion type', 'let completion = SocketConnectCompletion(Promise<Result<Socket, SocketError>>())'),
     ]:
         (root / 'Main.rvn').write_text('import System.*\nimport System.Tasks.*\nimport System.Networking.Sockets.*\nfunc Main() {\n' + code + '\n}\n')

@@ -10,6 +10,8 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    "DnsError": "System.Networking.DnsError",
+    "Dns": "System.Networking.Dns",
     "SocketError": "System.Networking.Sockets.SocketError",
     "Socket": "System.Networking.Sockets.Socket",
     'TextReadError': 'System.IO.TextReadError',
@@ -123,6 +125,8 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    "DnsError": "runtime/raven/src/System/Networking/DnsError.rvn",
+    "Dns": "runtime/raven/src/System/Networking/Dns.rvn",
     "SocketError": "runtime/raven/src/System/Networking/Sockets/SocketError.rvn",
     "Socket": "runtime/raven/src/System/Networking/Sockets/Socket.rvn",
     'TextReadError': 'runtime/raven/src/System/IO/TextReadError.rvn',

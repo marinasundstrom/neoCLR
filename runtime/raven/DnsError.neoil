@@ -1,0 +1,2 @@
+.include "generated/DnsError.methods.neoil"
+.include "generated/DnsError.helpers.neoil"

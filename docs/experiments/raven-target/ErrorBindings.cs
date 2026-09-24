@@ -5,6 +5,7 @@ using System.Text;
 static class ErrorBindings
 {
     public static readonly Dictionary<string, string[]> Cases = new() {
+        ["System.Networking.DnsError"] = ["InvalidName", "LimitExceeded", "NoAddress", "TimedOut", "Cancelled", "LookupFailed"],
         ["System.Networking.Sockets.SocketError"] = ["Closed", "Busy", "InvalidRange", "LimitExceeded", "Cancelled", "InvalidAddress", "ConnectionRefused", "ConnectionReset", "AccessDenied", "TimedOut", "IoFailure"],
         ["System.Storage.InvalidPathError"] = [],
         ["System.Storage.EntryKind"] = ["File", "Directory"],

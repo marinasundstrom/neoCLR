@@ -6449,3 +6449,13 @@ encoding later. Clarified that the Raven compiler fix makes `await Foo()?` and
 validation in the HTTP direction; simplify the active socket sample and documentation
 and refresh its local compiler bundle to verify the syntax. No new encoding API
 is implemented in this slice.
+
+
+## 2026-09-24 — Separate Networking and Web feature entry points
+
+**Author:** requested feature pages and landing-page boxes for both Networking and
+Web once their POCs are in place. **Assistant response:** introduce Networking with
+the hostname/TCP echo POC; give Web its separate page and box when HTTP works.
+**Action:** add the Networking overview, tested-source lookup example, API links and
+homepage/guide navigation. Record the Web publication gate in the roadmap. No HTTP
+implementation or website deployment is implied.

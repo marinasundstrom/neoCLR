@@ -1,0 +1,336 @@
+; Generated from runtime/raven/src/System/Networking/DnsError.rvn. Regenerate with build_runtime_library.py.
+.type System.Networking.DnsError
+.custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+.field private Stored Value
+.property instance IsInvalidName() -> Boolean
+.get instance System.Networking.DnsError::get_IsInvalidName()
+.end
+.property instance IsLimitExceeded() -> Boolean
+.get instance System.Networking.DnsError::get_IsLimitExceeded()
+.end
+.property instance IsNoAddress() -> Boolean
+.get instance System.Networking.DnsError::get_IsNoAddress()
+.end
+.property instance IsTimedOut() -> Boolean
+.get instance System.Networking.DnsError::get_IsTimedOut()
+.end
+.property instance IsCancelled() -> Boolean
+.get instance System.Networking.DnsError::get_IsCancelled()
+.end
+.property instance IsLookupFailed() -> Boolean
+.get instance System.Networking.DnsError::get_IsLookupFailed()
+.end
+.method instance .ctor(System.Networking.DnsError.InvalidName value) -> Void
+ldarg value
+value.pack System.Networking.DnsError.InvalidName
+newobj System.Networking.DnsError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsInvalidName() -> Boolean
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldfld System.Networking.DnsError::Stored
+M00000002_IL_0008:
+value.is System.Networking.DnsError.InvalidName
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_000d:
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetInvalidName() -> System.Networking.DnsError.InvalidName
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.Networking.DnsError::Stored
+M00000003_IL_0008:
+value.unpack System.Networking.DnsError.InvalidName
+M00000003_IL_000d:
+ret
+.end
+.method instance .ctor(System.Networking.DnsError.LimitExceeded value) -> Void
+ldarg value
+value.pack System.Networking.DnsError.LimitExceeded
+newobj System.Networking.DnsError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsLimitExceeded() -> Boolean
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.Networking.DnsError::Stored
+M00000005_IL_0008:
+value.is System.Networking.DnsError.LimitExceeded
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_000d:
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetLimitExceeded() -> System.Networking.DnsError.LimitExceeded
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.Networking.DnsError::Stored
+M00000006_IL_0008:
+value.unpack System.Networking.DnsError.LimitExceeded
+M00000006_IL_000d:
+ret
+.end
+.method instance .ctor(System.Networking.DnsError.NoAddress value) -> Void
+ldarg value
+value.pack System.Networking.DnsError.NoAddress
+newobj System.Networking.DnsError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsNoAddress() -> Boolean
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldfld System.Networking.DnsError::Stored
+M00000008_IL_0008:
+value.is System.Networking.DnsError.NoAddress
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_000d:
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetNoAddress() -> System.Networking.DnsError.NoAddress
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldfld System.Networking.DnsError::Stored
+M00000009_IL_0008:
+value.unpack System.Networking.DnsError.NoAddress
+M00000009_IL_000d:
+ret
+.end
+.method instance .ctor(System.Networking.DnsError.TimedOut value) -> Void
+ldarg value
+value.pack System.Networking.DnsError.TimedOut
+newobj System.Networking.DnsError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsTimedOut() -> Boolean
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+ldfld System.Networking.DnsError::Stored
+M0000000b_IL_0008:
+value.is System.Networking.DnsError.TimedOut
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_000d:
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetTimedOut() -> System.Networking.DnsError.TimedOut
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+ldfld System.Networking.DnsError::Stored
+M0000000c_IL_0008:
+value.unpack System.Networking.DnsError.TimedOut
+M0000000c_IL_000d:
+ret
+.end
+.method instance .ctor(System.Networking.DnsError.Cancelled value) -> Void
+ldarg value
+value.pack System.Networking.DnsError.Cancelled
+newobj System.Networking.DnsError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsCancelled() -> Boolean
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+M0000000e_IL_0002:
+ldarg 0
+M0000000e_IL_0003:
+ldfld System.Networking.DnsError::Stored
+M0000000e_IL_0008:
+value.is System.Networking.DnsError.Cancelled
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_000d:
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetCancelled() -> System.Networking.DnsError.Cancelled
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+ldarg 0
+M0000000f_IL_0003:
+ldfld System.Networking.DnsError::Stored
+M0000000f_IL_0008:
+value.unpack System.Networking.DnsError.Cancelled
+M0000000f_IL_000d:
+ret
+.end
+.method instance .ctor(System.Networking.DnsError.LookupFailed value) -> Void
+ldarg value
+value.pack System.Networking.DnsError.LookupFailed
+newobj System.Networking.DnsError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsLookupFailed() -> Boolean
+M00000011_IL_0000:
+M00000011_IL_0001:
+M00000011_IL_0002:
+ldarg 0
+M00000011_IL_0003:
+ldfld System.Networking.DnsError::Stored
+M00000011_IL_0008:
+value.is System.Networking.DnsError.LookupFailed
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_000d:
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetLookupFailed() -> System.Networking.DnsError.LookupFailed
+M00000012_IL_0000:
+M00000012_IL_0001:
+M00000012_IL_0002:
+ldarg 0
+M00000012_IL_0003:
+ldfld System.Networking.DnsError::Stored
+M00000012_IL_0008:
+value.unpack System.Networking.DnsError.LookupFailed
+M00000012_IL_000d:
+ret
+.end
+.method instance ToString() -> String
+M00000013_IL_0000:
+M00000013_IL_0001:
+M00000013_IL_0002:
+ldarg 0
+M00000013_IL_0003:
+call instance System.Networking.DnsError::get_IsInvalidName()
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_0008:
+brtrue M00000013_IL_0012
+M00000013_IL_000d:
+br M00000013_IL_0019
+M00000013_IL_0012:
+M00000013_IL_0013:
+ldstr "InvalidName"
+M00000013_IL_0018:
+ret
+M00000013_IL_0019:
+M00000013_IL_001a:
+M00000013_IL_001b:
+ldarg 0
+M00000013_IL_001c:
+call instance System.Networking.DnsError::get_IsLimitExceeded()
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_0021:
+brtrue M00000013_IL_002b
+M00000013_IL_0026:
+br M00000013_IL_0032
+M00000013_IL_002b:
+M00000013_IL_002c:
+ldstr "LimitExceeded"
+M00000013_IL_0031:
+ret
+M00000013_IL_0032:
+M00000013_IL_0033:
+M00000013_IL_0034:
+ldarg 0
+M00000013_IL_0035:
+call instance System.Networking.DnsError::get_IsNoAddress()
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_003a:
+brtrue M00000013_IL_0044
+M00000013_IL_003f:
+br M00000013_IL_004b
+M00000013_IL_0044:
+M00000013_IL_0045:
+ldstr "NoAddress"
+M00000013_IL_004a:
+ret
+M00000013_IL_004b:
+M00000013_IL_004c:
+M00000013_IL_004d:
+ldarg 0
+M00000013_IL_004e:
+call instance System.Networking.DnsError::get_IsTimedOut()
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_0053:
+brtrue M00000013_IL_005d
+M00000013_IL_0058:
+br M00000013_IL_0064
+M00000013_IL_005d:
+M00000013_IL_005e:
+ldstr "TimedOut"
+M00000013_IL_0063:
+ret
+M00000013_IL_0064:
+M00000013_IL_0065:
+M00000013_IL_0066:
+ldarg 0
+M00000013_IL_0067:
+call instance System.Networking.DnsError::get_IsCancelled()
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_006c:
+brtrue M00000013_IL_0076
+M00000013_IL_0071:
+br M00000013_IL_007d
+M00000013_IL_0076:
+M00000013_IL_0077:
+ldstr "Cancelled"
+M00000013_IL_007c:
+ret
+M00000013_IL_007d:
+M00000013_IL_007e:
+M00000013_IL_007f:
+ldarg 0
+M00000013_IL_0080:
+call instance System.Networking.DnsError::get_IsLookupFailed()
+call neoCLR.Library.System.Networking.DnsError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_0085:
+brtrue M00000013_IL_008f
+M00000013_IL_008a:
+br M00000013_IL_0096
+M00000013_IL_008f:
+M00000013_IL_0090:
+ldstr "LookupFailed"
+M00000013_IL_0095:
+ret
+M00000013_IL_0096:
+M00000013_IL_0097:
+M00000013_IL_0098:
+ldstr "invalid DNS error case"
+M00000013_IL_009d:
+call System.Fault(String)
+M00000013_IL_00a2:
+M00000013_IL_00a3:
+ldstr ""
+M00000013_IL_00a8:
+ret
+.end
+.end

@@ -2,6 +2,8 @@ import System.*
 import System.Result.*
 import System.Tasks.*
 import System.Networking.Sockets.*
+import System.Networking.*
+import System.Collections.*
 
 func Check(condition: bool) {
     if !condition {
@@ -56,9 +58,14 @@ async func Exchange(socket: Socket) -> Task<Result<int, SocketError>> {
     return await ReadGreeting(socket)
 }
 
-async func ExchangeGreeting() -> Task<Result<int, SocketError>> {
+async func ResolveHost() -> Task<Result<Sequence<string>, DnsError>> {
+    let addresses = await Dns.GetHostAddresses("localhost")?
+    return Ok(addresses)
+}
+
+async func ExchangeGreeting(address: string) -> Task<Result<int, SocketError>> {
     // The verifier substitutes the host's ephemeral loopback port.
-    let socket = await Socket.Connect("127.0.0.1", 19090)?
+    let socket = await Socket.Connect(address, 19090)?
     let result = await Exchange(socket)
     socket.Close()
     socket.Close()
@@ -77,15 +84,33 @@ async func ExchangeGreeting() -> Task<Result<int, SocketError>> {
     return result
 }
 
-func Main() {
-    let greeting = ExchangeGreeting()
-    Churn()
+func StartExchange(address: string) {
+    let greeting = ExchangeGreeting(address)
     greeting.OnCompleted(() => {
         if let Ok(count) = greeting.GetResult() {
             Check(count == 2)
             Console.WriteLine("Socket closed")
         } else {
-            System.Fault("Greeting failed")
+            System.Fault("TCP exchange failed")
+        }
+    })
+}
+
+func Main() {
+    if let Error(error) = Dns.GetHostAddresses("bad name").GetResult() {
+        Check(error.IsInvalidName)
+    } else {
+        System.Fault("Invalid hostname admitted")
+    }
+    let lookup = ResolveHost()
+    Churn()
+    lookup.OnCompleted(() => {
+        if let Ok(addresses) = lookup.GetResult() {
+            Check(addresses.Count > 0)
+            Console.WriteLine("Resolved localhost")
+            StartExchange(addresses[0])
+        } else {
+            System.Fault("Hostname lookup failed")
         }
     })
     TaskQueue.Default.Post(() => Console.WriteLine("Other work runs while TCP is pending"))

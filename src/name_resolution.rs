@@ -1,6 +1,6 @@
 //! Private host resolver. Blocking work owns host data only; the VM owns callbacks.
 //! No guest-facing DNS contract is exposed by this checkpoint.
-#![allow(dead_code)] // Submission will be bound by the next public DNS slice.
+
 use crate::Value;
 use std::{
     collections::BTreeMap,
@@ -20,6 +20,11 @@ static HOST_WORK: AtomicUsize = AtomicUsize::new(0);
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct OperationId(u64);
+#[derive(Clone, Copy)]
+pub(crate) enum Operation {
+    Lookup,
+    Result,
+}
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum Error {
     InvalidName,
@@ -90,6 +95,43 @@ pub(crate) struct Resolver {
     permits: &'static AtomicUsize,
 }
 impl Resolver {
+    pub(crate) fn invoke(
+        &mut self,
+        operation: Operation,
+        args: &[Value],
+    ) -> Result<Value, crate::Fault> {
+        let result = match (operation, args) {
+            (Operation::Lookup, [Value::String(name), callback]) => self
+                .submit(name, callback.clone(), Duration::from_secs(5))
+                .map(|id| Value::Int64(id.0 as i64)),
+            (Operation::Result, [Value::Int64(id)]) => self
+                .take_result(OperationId(*id as u64))
+                .map_err(|_| crate::Fault::new("Unknown resolver operation"))?
+                .ok_or_else(|| crate::Fault::new("Resolver result is not ready"))?
+                .map(|addresses| Value::Array {
+                    element: crate::metadata::Type::String,
+                    elements: addresses
+                        .into_iter()
+                        .map(|ip| Value::String(ip.to_string().into()))
+                        .collect(),
+                }),
+            _ => {
+                return Err(crate::Fault::new(
+                    "Invalid resolver runtime service arguments",
+                ));
+            }
+        };
+        Ok(Value::Erased(Box::new(result.unwrap_or_else(|error| {
+            Value::Byte(match error {
+                Error::InvalidName => 1,
+                Error::Limit => 2,
+                Error::NoAddress => 3,
+                Error::TimedOut => 4,
+                Error::Cancelled => 5,
+                _ => 6,
+            })
+        }))))
+    }
     pub(crate) fn with_wake(wake: Arc<crate::scheduler::Wake>) -> Self {
         Self {
             operations: BTreeMap::new(),
@@ -165,6 +207,7 @@ impl Resolver {
         );
         Ok(id)
     }
+    #[allow(dead_code)] // Private cancellation; no guest cancellation API yet.
     pub(crate) fn cancel(&mut self, id: OperationId) -> Result<bool, Error> {
         let op = self.operations.get_mut(&id).ok_or(Error::Failed)?;
         if op.outcome.is_some() {
@@ -265,6 +308,55 @@ mod tests {
         });
         (resolver, gate, receiver)
     }
+    #[test]
+    fn native_bridge_validates_arguments_and_consumes_owned_address_result_once() {
+        let mut resolver = resolver(|_| Ok(vec![Ipv4Addr::LOCALHOST]));
+        assert!(
+            resolver
+                .invoke(Operation::Lookup, &[Value::Int32(1), callback()])
+                .is_err()
+        );
+        assert_eq!(
+            resolver
+                .invoke(
+                    Operation::Lookup,
+                    &[Value::String("bad name".into()), callback()]
+                )
+                .unwrap(),
+            Value::Erased(Box::new(Value::Byte(1)))
+        );
+        let Value::Erased(payload) = resolver
+            .invoke(
+                Operation::Lookup,
+                &[Value::String("localhost".into()), callback()],
+            )
+            .unwrap()
+        else {
+            panic!()
+        };
+        let Value::Int64(id) = *payload else { panic!() };
+        assert!(
+            resolver
+                .invoke(Operation::Result, &[Value::Int64(id)])
+                .is_err()
+        );
+        complete(&mut resolver);
+        assert_eq!(
+            resolver
+                .invoke(Operation::Result, &[Value::Int64(id)])
+                .unwrap(),
+            Value::Erased(Box::new(Value::Array {
+                element: crate::metadata::Type::String,
+                elements: vec![Value::String("127.0.0.1".into())]
+            }))
+        );
+        assert!(
+            resolver
+                .invoke(Operation::Result, &[Value::Int64(id)])
+                .is_err()
+        );
+    }
+
     #[test]
     fn host_lookup_numeric_and_localhost_only_no_external_dns() {
         assert_eq!(host_lookup("127.0.0.1"), Ok(vec![Ipv4Addr::LOCALHOST]));

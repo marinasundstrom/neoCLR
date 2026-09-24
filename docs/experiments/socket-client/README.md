@@ -1,9 +1,9 @@
 # First Raven TCP client (development)
 
-This sample connects to a real loopback echo server, sends `Hi` and receives the reply across potentially
+This sample resolves localhost through Dns.GetHostAddresses, then connects to a real loopback echo server, sends `Hi` and receives the reply across potentially
 short reads, observes EOF, closes the socket twice, and checks that a subsequent
 receive or send reports Closed. Other TaskQueue work runs while input is pending. Allocation
-churn forces collection during pending connect, send and receive, while the native registry
+churn forces collection during pending lookup, connect, send and receive, while the native registry
 owns callbacks, native send snapshots and the receive destination. The source array
 is modified after each Send to verify that only the submitted snapshot reaches the peer.
 
@@ -11,7 +11,7 @@ The Python verifier starts a host server on an ephemeral port, substitutes that 
 in the sample, compiles with the matching development reference/importer, and runs
 with a 256-object heap. It checks exact output, multiple collections, zero retained
 managed objects, peer-observed close, and compile-time rejection of the private
-constructor/completion type. All network access is loopback; waits have watchdogs.
+constructor/completion types. All network access is loopback; waits have watchdogs.
 
 ```sh
 python3 docs/experiments/socket-client/verify.py \
@@ -30,7 +30,10 @@ individual cancellation/deadline API yet. No thread is created per socket operat
 
 This is a neoCLR echo client against a host server. The full two-sided neoCLR echo
 milestone still requires listener/accept;
-endpoint value types, stream integration, DNS and IPv6 remain future slices. TcpClient
+endpoint value types, stream integration and IPv6 remain future slices. DNS now
+returns a read-only Sequence of IPv4 strings with a five-second lookup deadline.
+The controlled sample uses the first address; multi-address fallback and an overall
+connection deadline remain open. TcpClient
 and UdpClient are candidates for later convenience layers, not current APIs.
 
 The sample uses `?` for Result propagation and `if let` for payloads. Empty error
@@ -56,3 +59,18 @@ Validation on 2026-09-24: 35 focused backend, VM, scheduler and service tests pa
 The compiled send/receive sample uses `await Foo()?`, reclaims all 1,380 allocated
 objects over 30 collections, and passes both negative visibility checks. The matching
 API snapshot and combined 555-page website build pass. Evidence is local macOS.
+
+
+DNS integration limits: a direct array nested in Task/Result exposed a compiler
+MetadataLoadContext mismatch; Sequence is the current read-only contract. A nested
+callback capturing the newly created exchange task also faulted with a null task
+capture; StartExchange now registers that callback in its own function. Neither
+change claims to fix those general compiler/importer paths. See the socket design
+record for the deferred independent reproduction work.
+
+Validation on 2026-09-24: eight resolver tests, nine runtime-service tests and eight
+scheduler tests pass (25 total). The compiled hostname/echo sample reclaims all
+1,428 allocations across 31 collections, with zero live objects; all three negative
+visibility checks pass. Ten website tests and the combined 572-page API/site build
+pass. Networking was inspected in the local browser. This is local macOS evidence,
+not cross-platform networking certification or a runtime release.

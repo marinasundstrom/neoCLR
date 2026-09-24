@@ -27,7 +27,9 @@ for generated type and member documentation. Both are parts of this site.
 <a id="terminal-failures"></a>
 
 [Socket clients](sockets.md) documents the first development TCP Connect/Send/Receive/Close
-API, its Task/Result behavior and current limits.
+API, its Task/Result behavior and current limits. [Dns](xref:System.Networking.Dns)
+resolves hostnames to IPv4 addresses; the [networking guide](/features/networking/)
+walks through the compiled hostname/echo POC.
 
 ## Features and reference
 

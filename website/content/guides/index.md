@@ -26,6 +26,7 @@ relevant differences from .NET. Use the [API reference](../docs/) to look up exa
 | [Tasks and async](../features/tasks/) | Await results, complete promises and understand isolated workers | Preview 9 baseline; evolving development contracts |
 | [Files and Storage](../features/files/) | Read bounded UTF-8 files and follow the provider model | Preview 9 file helpers; Storage and streams are development |
 | [Console and standard streams](../features/console/) | Handle input, output, end-of-input and typed errors | Development after Preview 9 |
+| [Networking](../features/networking/) | Resolve a hostname and exchange bytes through a TCP client | Development after Preview 9 |
 | [Introspection](../features/introspection/) | Discover types and members and understand descriptor identity | Preview 9 discovery; later equality and ownership changes are development |
 
 ## Development walkthroughs

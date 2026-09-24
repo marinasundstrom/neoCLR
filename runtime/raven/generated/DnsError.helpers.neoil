@@ -1,0 +1,97 @@
+; Generated from runtime/raven/src/System/Networking/DnsError.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Networking.DnsError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Networking.DnsError.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.type System.Networking.DnsError.InvalidName
+.method instance .ctor() -> Void
+M00000014_IL_0000:
+M00000014_IL_0001:
+ldarg 0
+M00000014_IL_0002:
+pop
+M00000014_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Networking.DnsError.LimitExceeded
+.method instance .ctor() -> Void
+M00000015_IL_0000:
+M00000015_IL_0001:
+ldarg 0
+M00000015_IL_0002:
+pop
+M00000015_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Networking.DnsError.NoAddress
+.method instance .ctor() -> Void
+M00000016_IL_0000:
+M00000016_IL_0001:
+ldarg 0
+M00000016_IL_0002:
+pop
+M00000016_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Networking.DnsError.TimedOut
+.method instance .ctor() -> Void
+M00000017_IL_0000:
+M00000017_IL_0001:
+ldarg 0
+M00000017_IL_0002:
+pop
+M00000017_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Networking.DnsError.Cancelled
+.method instance .ctor() -> Void
+M00000018_IL_0000:
+M00000018_IL_0001:
+ldarg 0
+M00000018_IL_0002:
+pop
+M00000018_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.Networking.DnsError.LookupFailed
+.method instance .ctor() -> Void
+M00000019_IL_0000:
+M00000019_IL_0001:
+ldarg 0
+M00000019_IL_0002:
+pop
+M00000019_IL_0007:
+ldvoid
+ret
+.end
+.end

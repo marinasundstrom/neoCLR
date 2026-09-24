@@ -4,12 +4,23 @@ using Mono.Cecil;
 static class SocketBindings
 {
     const string Prefix = "System.Networking.Sockets.";
-    public static bool IsName(string name) => name is Prefix + "Socket" or Prefix + "SocketConnectCompletion" or Prefix + "SocketTransferCompletion";
-    public static bool IsProvider(TypeDefinition type) => IsName(type.FullName) && type.FullName != Prefix + "Socket";
+    public static bool IsName(string name) => name is "System.Networking.Dns" or "System.Networking.DnsCompletion" or Prefix + "Socket" or Prefix + "SocketConnectCompletion" or Prefix + "SocketTransferCompletion";
+    public static bool IsProvider(TypeDefinition type) => IsName(type.FullName) && type.FullName != Prefix + "Socket" && type.FullName != "System.Networking.Dns";
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
     public static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
     public const string Declarations = """
+        namespace Networking {
+            public sealed class Dns {
+                public static Tasks.Task<Result<Collections.Sequence<string>, DnsError>> GetHostAddresses(string hostName) => default;
+                public static DnsError DecodeError(byte code) => default;
+            }
+            public sealed class DnsCompletion {
+                public DnsCompletion(Tasks.Promise<Result<Collections.Sequence<string>, DnsError>> source) { }
+                public void Start(string hostName) { }
+                public void Complete() { }
+            }
+        }
         namespace Networking.Sockets {
             public sealed class Socket {
                 public Socket(long handle) { }
@@ -47,6 +58,10 @@ static class SocketBindings
         const string Error = Prefix + "SocketError";
         const string Socket = Prefix + "Socket";
         var expected = (owner, definition.Name) switch {
+            ("System.Networking.Dns", "GetHostAddresses") => ("String", "System.Tasks.Task<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>", true),
+            ("System.Networking.Dns", "DecodeError") when library => ("Byte", "System.Networking.DnsError", true),
+            ("System.Networking.DnsCompletion", ".ctor") when library => ("System.Tasks.Promise<System.Result<System.Collections.Sequence<String>,System.Networking.DnsError>>", "noresult", false),
+            ("System.Networking.DnsCompletion", "Start") when library => ("String", "noresult", false),
             (Socket, "Connect") => ("String,Int32", $"System.Tasks.Task<System.Result<{Socket},{Error}>>", true),
             (Socket, "Receive" or "Send") => ("arrayref<Byte>,Int32,Int32", $"System.Tasks.Task<System.Result<Int32,{Error}>>", false),
             (Socket, "Close") => ("", "noresult", false),

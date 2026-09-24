@@ -1,0 +1,71 @@
+namespace System.Networking
+
+import System.*
+import System.Result.*
+import System.Collections.*
+import System.Tasks.*
+import System.Runtime.CompilerServices.*
+
+public class Dns {
+    private init() { }
+
+    static func GetHostAddresses(hostName: string) -> Task<Result<Sequence<string>, DnsError>> {
+        let source = Promise<Result<Sequence<string>, DnsError>>()
+        let completion = DnsCompletion(source)
+        completion.Start(hostName)
+        return source.Task
+    }
+
+    internal static func DecodeError(code: byte) -> DnsError {
+        if code == 1 {
+            return DnsError.InvalidName()
+        }
+        if code == 2 {
+            return DnsError.LimitExceeded()
+        }
+        if code == 3 {
+            return DnsError.NoAddress()
+        }
+        if code == 4 {
+            return DnsError.TimedOut()
+        }
+        if code == 5 {
+            return DnsError.Cancelled()
+        }
+        if code == 6 {
+            return DnsError.LookupFailed()
+        }
+        System.Fault("invalid native DNS error")
+        return DnsError.LookupFailed()
+    }
+}
+
+internal class DnsCompletion {
+    private field source: Promise<Result<Sequence<string>, DnsError>>
+    private field operation: long
+
+    internal init(source: Promise<Result<Sequence<string>, DnsError>>) {
+        self.source = source
+        operation = 0
+    }
+
+    internal func Start(hostName: string) {
+        _ = TaskQueue.Default
+        let payload = RuntimeServices.DnsLookup(hostName, self.Complete)
+        if RuntimeServices.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Dns.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        } else {
+            operation = RuntimeServices.UnpackValue<long>(payload)
+        }
+    }
+
+    internal func Complete() {
+        let payload = RuntimeServices.DnsResult(operation)
+        if RuntimeServices.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Dns.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        } else {
+            let addresses: Sequence<string> = RuntimeServices.DnsAddresses(payload)
+            _ = source.Complete(Ok(addresses))
+        }
+    }
+}

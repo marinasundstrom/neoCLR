@@ -109,3 +109,15 @@ The service does not start threads or provide progress after an invocation. See
 IsolatedWorkers covers the bootstrap StartWorker, QueueWorker and JoinWorker
 services. Handles are scoped to one invocation. See [isolated workers](isolated-workers.md)
 for lifecycle, resource bounds, transfer restrictions and blocking behavior.
+
+
+## Host name resolution
+
+NameResolution covers the private DnsLookup and DnsResult bindings behind public
+System.Networking.Dns. DnsLookup also requires TaskDispatch for owner-thread
+completion. It does not require SocketIo or IsolatedWorkers: host lookup is separate
+from transport and does not execute guest code on a worker. DnsResult consumes the
+retained native outcome without requiring dispatch. The generated array-copy helper
+additionally uses managed-array services through its actual instructions. These
+requirements describe reachability, not permission grants or a complete platform
+support check. See the [DNS contract](socket-api-design.md#public-hostname-lookup-and-networking-poc--2026-09-24).

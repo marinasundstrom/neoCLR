@@ -1079,3 +1079,12 @@ Socket.Send has the same Task<Result<int, SocketError>> shape as Receive. Its ex
 reference binding calls the Raven-authored method; no new compiler or Runtime Contract
 setting is required. Bootstrap-only SocketTransferResult replaces SocketReceiveResult;
 rebuild all matching artifacts, since private services are not compatibility contracts.
+
+
+Dns now uses the networking binder for public GetHostAddresses and private
+DnsCompletion. The native result is copied into a managed array, exposed as
+Sequence<String> through Task<Result<...,DnsError>>. Rebuild the reference, importer,
+bootstrap and runtime together. No Runtime Contract configuration or compiler
+implementation changes are required. The socket client tests hostname resolution.
+Array-in-Result metadata emission and nested callback capture failures remain open;
+see the socket design for the observed errors and independent reproduction gates.

@@ -2772,6 +2772,11 @@ fn interpret_instructions(
                                 _ => return Err(Fault::new("String.Intern requires text")),
                             };
                             Value::String(interned.intern(text.clone()).map_err(|e| e.fault())?)
+                        } else if let crate::native::Binding::Resolve(operation) = binding {
+                            if matches!(operation, crate::name_resolution::Operation::Lookup) && default_task_queue.is_none() {
+                                return Err(Fault::new("Resolver completion requires the default TaskQueue"));
+                            }
+                            scheduler.resolver.invoke(operation, &args)?
                         } else if let crate::native::Binding::Socket(operation) = binding {
                             if matches!(
                                 operation,

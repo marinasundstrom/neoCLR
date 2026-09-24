@@ -1429,5 +1429,39 @@
     <member name="M:System.Networking.Sockets.SocketError.#ctor(System.Networking.Sockets.SocketError.IoFailure)"><summary>Wraps the IoFailure case.</summary><param name="value">The case to wrap.</param></member>
     <member name="P:System.Networking.Sockets.SocketError.IsIoFailure"><summary>Reports whether this error is IoFailure.</summary></member>
     <member name="M:System.Networking.Sockets.SocketError.GetIoFailure"><summary>Extracts the IoFailure case.</summary><returns>The case payload.</returns><remarks>Requires the matching case; prefer a union pattern in Raven.</remarks></member>
+    <member name="T:System.Networking.Dns"><summary>Resolves hostnames to a bounded read-only sequence of numeric IPv4 addresses.</summary><remarks>Development after Preview 9. Host-backed resolution runs off the VM owner thread. It is separate from connecting; preserve the original hostname for HTTP and future TLS identity. No IPv6, IDNA conversion, DNS record API or public cancellation overload is provided. See the on-site networking guide.</remarks></member>
+    <member name="M:System.Networking.Dns.GetHostAddresses(System.String)"><summary>Resolves a hostname using host configuration without blocking the VM owner.</summary><param name="hostName">Nonempty ASCII host name or numeric IPv4 address, at most 253 bytes; only letters, digits, dots and hyphens are admitted. This guard is not a full DNS-name parser.</param><returns>A Task containing a read-only Sequence of distinct numeric IPv4 strings in host order, or DnsError. Returned strings can be supplied to Socket.Connect. Lookup does not establish a connection.</returns><remarks>The provisional deadline is five seconds from admission; timeout wins if completion was not observed before expiry. Native lookup may continue after timeout, retaining its host-work slot until it exits. Limits are four blocking lookups across the process, eight retained operations per invocation and 16 distinct IPv4 addresses. IPv6-only answers return NoAddress. Results are not silently truncated. The original host name is not canonicalized or preserved in each result. No overall connection deadline, address fallback policy, DNS cache or peer authentication is implied.</remarks></member>
+    <member name="T:System.Networking.DnsError"><summary>A recoverable name-resolution failure, separate from socket connection errors and runtime Faults.</summary><remarks>Use named cases; uninitialized carrier storage is invalid. This development union does not expose native resolver error numbers.</remarks></member>
+    <member name="M:System.Networking.DnsError.ToString"><summary>Returns the active error case name.</summary><returns>The case name.</returns></member>
+    <member name="T:System.Networking.DnsError.InvalidName"><summary>The input is empty, exceeds 253 bytes or contains characters outside the provisional ASCII hostname input set.</summary></member>
+    <member name="M:System.Networking.DnsError.InvalidName.#ctor"><summary>Creates the InvalidName case.</summary></member>
+    <member name="M:System.Networking.DnsError.#ctor(System.Networking.DnsError.InvalidName)"><summary>Wraps the InvalidName case.</summary><param name="value">The case to wrap.</param></member>
+    <member name="P:System.Networking.DnsError.IsInvalidName"><summary>Reports whether this is the InvalidName case.</summary></member>
+    <member name="M:System.Networking.DnsError.GetInvalidName"><summary>Extracts the InvalidName case.</summary><returns>The case payload.</returns><remarks>Requires the matching case; prefer a union pattern in Raven.</remarks></member>
+    <member name="T:System.Networking.DnsError.LimitExceeded"><summary>Host lookup capacity, retained operation slots or bounded address results exceed the provisional limits.</summary></member>
+    <member name="M:System.Networking.DnsError.LimitExceeded.#ctor"><summary>Creates the LimitExceeded case.</summary></member>
+    <member name="M:System.Networking.DnsError.#ctor(System.Networking.DnsError.LimitExceeded)"><summary>Wraps the LimitExceeded case.</summary><param name="value">The case to wrap.</param></member>
+    <member name="P:System.Networking.DnsError.IsLimitExceeded"><summary>Reports whether this is the LimitExceeded case.</summary></member>
+    <member name="M:System.Networking.DnsError.GetLimitExceeded"><summary>Extracts the LimitExceeded case.</summary><returns>The case payload.</returns><remarks>Requires the matching case; prefer a union pattern in Raven.</remarks></member>
+    <member name="T:System.Networking.DnsError.NoAddress"><summary>The host returned no usable IPv4 address.</summary></member>
+    <member name="M:System.Networking.DnsError.NoAddress.#ctor"><summary>Creates the NoAddress case.</summary></member>
+    <member name="M:System.Networking.DnsError.#ctor(System.Networking.DnsError.NoAddress)"><summary>Wraps the NoAddress case.</summary><param name="value">The case to wrap.</param></member>
+    <member name="P:System.Networking.DnsError.IsNoAddress"><summary>Reports whether this is the NoAddress case.</summary></member>
+    <member name="M:System.Networking.DnsError.GetNoAddress"><summary>Extracts the NoAddress case.</summary><returns>The case payload.</returns><remarks>Requires the matching case; prefer a union pattern in Raven.</remarks></member>
+    <member name="T:System.Networking.DnsError.TimedOut"><summary>The lookup deadline expired before its outcome was observed by the owner.</summary></member>
+    <member name="M:System.Networking.DnsError.TimedOut.#ctor"><summary>Creates the TimedOut case.</summary></member>
+    <member name="M:System.Networking.DnsError.#ctor(System.Networking.DnsError.TimedOut)"><summary>Wraps the TimedOut case.</summary><param name="value">The case to wrap.</param></member>
+    <member name="P:System.Networking.DnsError.IsTimedOut"><summary>Reports whether this is the TimedOut case.</summary></member>
+    <member name="M:System.Networking.DnsError.GetTimedOut"><summary>Extracts the TimedOut case.</summary><returns>The case payload.</returns><remarks>Requires the matching case; prefer a union pattern in Raven.</remarks></member>
+    <member name="T:System.Networking.DnsError.Cancelled"><summary>The private resolver operation was cancelled. No public per-lookup cancellation API is provided yet.</summary></member>
+    <member name="M:System.Networking.DnsError.Cancelled.#ctor"><summary>Creates the Cancelled case.</summary></member>
+    <member name="M:System.Networking.DnsError.#ctor(System.Networking.DnsError.Cancelled)"><summary>Wraps the Cancelled case.</summary><param name="value">The case to wrap.</param></member>
+    <member name="P:System.Networking.DnsError.IsCancelled"><summary>Reports whether this is the Cancelled case.</summary></member>
+    <member name="M:System.Networking.DnsError.GetCancelled"><summary>Extracts the Cancelled case.</summary><returns>The case payload.</returns><remarks>Requires the matching case; prefer a union pattern in Raven.</remarks></member>
+    <member name="T:System.Networking.DnsError.LookupFailed"><summary>The host resolver failed. Native resolver codes are not a public contract.</summary></member>
+    <member name="M:System.Networking.DnsError.LookupFailed.#ctor"><summary>Creates the LookupFailed case.</summary></member>
+    <member name="M:System.Networking.DnsError.#ctor(System.Networking.DnsError.LookupFailed)"><summary>Wraps the LookupFailed case.</summary><param name="value">The case to wrap.</param></member>
+    <member name="P:System.Networking.DnsError.IsLookupFailed"><summary>Reports whether this is the LookupFailed case.</summary></member>
+    <member name="M:System.Networking.DnsError.GetLookupFailed"><summary>Extracts the LookupFailed case.</summary><returns>The case payload.</returns><remarks>Requires the matching case; prefer a union pattern in Raven.</remarks></member>
 </members>
 </doc>

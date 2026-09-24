@@ -806,12 +806,13 @@ No later major milestone has started.
 
 ## Working rules and immediate next step
 
-**Active next step, 2026-09-24:** expose the private host-backed resolver through
-a Task/Result API and a compiled hostname byte-exchange case, with listener/accept
-as the next server-side slice toward two-sided echo. The
-[resolver lifetime checkpoint](socket-api-design.md#private-resolver-lifetime-checkpoint--2026-09-24)
-adds bounded off-owner lookup, timeout/cancellation accounting and traced scheduler
-delivery; it does not yet expose a guest DNS API.
+**Active next step, 2026-09-24:** add listener/accept for a two-sided neoCLR echo
+case. The [hostname client](experiments/socket-client/README.md) now uses public
+Dns.GetHostAddresses with Task/Result and a read-only IPv4 address sequence over the
+[bounded resolver](socket-api-design.md#public-hostname-lookup-and-networking-poc--2026-09-24).
+Keep bounded address fallback and an overall connection deadline as gates before
+broader HTTP client use. Networking has its own feature page and homepage box;
+add a separate Web page and box when the HTTP POC works, as requested by the author.
 The [public TCP client](experiments/socket-client/README.md) now has
 Connect/Send/Receive/Close and a Task/Result bridge over nonblocking transfers.
 Its compiled sample sends bytes and receives a host echo with collection while pending. Keep exact addressing/lifecycle choices provisional and maintain the API

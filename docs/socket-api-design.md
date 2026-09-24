@@ -427,3 +427,48 @@ Validation on 2026-09-24: seven resolver tests, eight scheduler tests and five
 existing socket/VM integration tests pass locally (20 total). The combined website
 build checks 555 pages and the unchanged API snapshot. No public API or compiler
 contract changes in this checkpoint; no SDK artifacts are regenerated.
+
+
+## Public hostname lookup and networking POC — 2026-09-24
+
+System.Networking.Dns.GetHostAddresses(hostName) now returns
+Task<Result<Sequence<string>, DnsError>>. Numeric IPv4 strings work with the existing
+Socket.Connect contract; lookup does not connect, pick an address or replace the
+original hostname needed for HTTP/TLS. The five-second lookup deadline, host-work
+bounds and cancellation/late-result lifetime rules from the private checkpoint apply.
+No public cancellation overload is added; Cancelled represents the private backend
+outcome and is not currently requested by an application. No overall connect deadline
+or automatic multi-address fallback is claimed by this slice.
+
+Compared with the .NET address array above, a read-only Sequence states the consumer
+capability needed by this POC without committing to an IPAddress-style value object.
+Strings defer address equality/family/normalization APIs, at the cost of no static
+address validation at subsequent call sites. IPv4-only output is explicit. The
+underlying sequence is an ordinary managed array view, not an immutable collection.
+The native result carries owned strings; generated library code copies them into a
+managed array on the VM owner before completing the Promise. Worker threads never
+allocate in the guest heap. Native service bindings distinguish NameResolution from
+SocketIo and IsolatedWorkers; only submission additionally requires TaskDispatch.
+
+The tested product is the existing socket client extended to resolve localhost,
+then exchange Hi with a controlled host server. Its first-address selection is a
+local fixture policy, not a general robust connection algorithm. Before broader HTTP
+client use, define bounded address fallback and an overall connection deadline.
+The Networking feature page and homepage box are added for this working POC; Web
+gets its own page and box when the HTTP POC is executable, per author direction.
+
+Two integration cases remain open. Task<Result<string[], DnsError>> triggered a Raven
+MetadataLoadContext mismatch for System.String[] during code generation; using a
+Sequence avoids that path but is not a compiler fix. A nested OnCompleted callback
+capturing a locally created task faulted with a null capture at Task.GetResult. The
+sample separates callback registration into a named function; the original nested
+capture case needs an independent .NET-target reproduction before assigning the bug
+to Raven emission or neoCLR import. These are deferred general-fix candidates, not
+neoCLR semantic changes or reasons to weaken runtime reference checks.
+
+Validation on 2026-09-24: eight resolver tests, nine runtime-service tests and eight
+scheduler tests pass (25 total). The compiled hostname/echo sample reclaims all
+1,428 allocations across 31 collections, with zero live objects; all three negative
+visibility checks pass. Ten website tests and the combined 572-page API/site build
+pass. Networking was inspected in the local browser. This is local macOS evidence,
+not cross-platform networking certification or a runtime release.

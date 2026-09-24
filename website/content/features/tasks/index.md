@@ -181,10 +181,9 @@ buffers and completion objects are traced until delivery. It uses nonblocking
 sockets and the private scheduler, with the current generated async state machines.
 Sends snapshot their source ranges and permit short writes. Listener/accept is still pending; this is not yet a complete networking API.
 
-A private host-resolution backend now keeps blocking lookups off the VM thread,
-with bounded concurrency and scheduler-delivered completion. Public DNS lookup and
-a hostname client sample remain development work; Socket.Connect still requires a
-numeric IPv4 address.
+The [networking POC](../networking/) now resolves hostnames through Dns and
+connects using the returned IPv4 addresses. Host lookup runs off the VM thread,
+with bounded concurrency and scheduler-delivered completion.
 
 **Development after Preview 9:** explicit thread APIs move to `System.Concurrency`; Task and Promise stay in `System.Tasks`. A retained `Thread(callback, input)` exposes a pending `Task` before instance `Start()`. Starting twice faults. `Thread.Run(callback, input)` is the immediate-start shortcut. Both retain the current isolated string callback restriction; successful completion includes native thread termination. These changes require matching development artifacts and are not in the Preview 9 downloads.
 

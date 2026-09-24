@@ -153,3 +153,9 @@ The portable RavenDoc archive, immutable source revision, checksum and upstream
 source revision are maintained in `tools/ravendoc`. Follow its README to
 update the build, then verify the whole site before publication. CI validates the
 same repository-contained build without a sibling Raven checkout or DocFX restore.
+
+
+Author direction, 2026-09-24: Networking and Web each deserve their own feature
+page and homepage box once the corresponding POC is working. Networking starts
+with the hostname/TCP echo client; Web remains gated on an executable HTTP POC.
+Keep protocol-level Web information separate from transport and hostname contracts.

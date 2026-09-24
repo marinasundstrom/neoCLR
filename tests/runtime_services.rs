@@ -201,3 +201,36 @@ fn socket_submission_requires_socket_and_dispatch_services() {
     assert!(graph.required_services().contains(&Service::SocketIo));
     assert!(!graph.required_services().contains(&Service::TaskDispatch));
 }
+
+#[test]
+fn dns_uses_host_resolution_and_dispatch_without_guest_workers() {
+    let module = assemble(concat!(
+        ".module System\n",
+        include_str!("../runtime/raven/generated/Func.methods.neoil"),
+        include_str!("../runtime/neoCLR/Runtime/Dns.neoil")
+    ))
+    .unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    let graph = program
+        .analyze_reachability(
+            &[parse_function_ref("neoCLR.Runtime.DnsLookup(String,System.Func<Void>)").unwrap()],
+            1,
+        )
+        .unwrap();
+    assert!(graph.required_services().contains(&Service::NameResolution));
+    assert!(graph.required_services().contains(&Service::TaskDispatch));
+    assert!(
+        !graph
+            .required_services()
+            .contains(&Service::IsolatedWorkers)
+    );
+    assert!(!graph.required_services().contains(&Service::SocketIo));
+    let graph = program
+        .analyze_reachability(
+            &[parse_function_ref("neoCLR.Runtime.DnsResult(Int64)").unwrap()],
+            1,
+        )
+        .unwrap();
+    assert!(graph.required_services().contains(&Service::NameResolution));
+    assert!(!graph.required_services().contains(&Service::TaskDispatch));
+}

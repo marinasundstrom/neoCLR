@@ -26,6 +26,12 @@ static class LibraryImplementation
             foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name);
             return names.SelectMany(name => InterfaceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
         }
+        if (owner == "System.Networking.Dns")
+        {
+            var names = new[] { owner, "System.Networking.DnsCompletion" };
+            foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name);
+            return names.SelectMany(name => InstanceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
+        }
         if (owner == "System.Networking.Sockets.Socket")
         {
             var names = new[] { owner, "System.Networking.Sockets.SocketConnectCompletion", "System.Networking.Sockets.SocketTransferCompletion" };

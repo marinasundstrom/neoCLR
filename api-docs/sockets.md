@@ -8,7 +8,7 @@ the next server-side step toward a two-sided neoCLR echo application; this is no
 
 | Operation | Result | Behavior |
 | --- | --- | --- |
-| `Socket.Connect(address, port)` | `Task<Result<Socket, SocketError>>` | Connect to a numeric IPv4 address and port 1–65535. No hostname resolution. |
+| `Socket.Connect(address, port)` | `Task<Result<Socket, SocketError>>` | Connect to a numeric IPv4 address and port 1–65535. Resolve hostnames separately with Dns.GetHostAddresses. |
 | `socket.Receive(buffer, offset, count)` | `Task<Result<int, SocketError>>` | Receive up to count bytes; short reads are normal. |
 | `socket.Send(buffer, offset, count)` | `Task<Result<int, SocketError>>` | Send from a snapshot of the range; loop on short writes. |
 | `socket.Close()` | unit | Close both directions; repeated calls are harmless. |
@@ -16,14 +16,15 @@ the next server-side step toward a two-sided neoCLR echo application; this is no
 The [tested echo client](/samples/socket-client/Main.rvn) uses both await and `?`:
 
 ```raven
-let socket = await Socket.Connect("127.0.0.1", 19090)?
+let socket = await Socket.Connect(address, 19090)?
 let result = await Exchange(socket)
 socket.Close()
 return result
 ```
 
 The enclosing function returns `Task<Result<int, SocketError>>`. `?` propagates a
-connection error. Exchange sends the greeting and handles short writes and reads and returns its outcome before
+connection error. Here address is a numeric address returned by
+[Dns.GetHostAddresses](xref:System.Networking.Dns). Exchange sends the greeting and handles short writes and reads and returns its outcome before
 the caller closes the socket, so a recoverable receive error also reaches Close.
 The [complete sample and verifier](/samples/socket-client.zip) run against a
 small host echo server and check collection during pending connect, send and receive.
@@ -72,7 +73,7 @@ Compared with .NET Socket.ConnectAsync/SendAsync/ReceiveAsync, this first slice 
 completion, short reads, EOF and explicit ownership, but returns typed Result values
 for recoverable errors. The connect factory avoids exposing an unusable half-created
 connection, at the cost of no pre-connect options or local binding. It is provisional;
-address value objects, DNS, IPv6, listener/accept, stream adaptation and individual
+address value objects, IPv6, listener/accept, stream adaptation and individual
 cancellation need their own working cases. No performance advantage is claimed.
 
 The demo goal is a web application that receives and sends HTTP messages. Broader
@@ -87,9 +88,9 @@ in a generated heap state machine. The sample checks its already-completed Close
 result without another suspension; the general hoisted-Result case remains open.
 
 
-Planned next: host-backed hostname resolution and listener/accept
-and a bounded HTTP request/response client using Socket directly. DNS belongs in
-near-term client work; TcpClient and UdpClient are not required for it. The HTTP
+Host-backed hostname resolution is available through Dns.GetHostAddresses.
+Planned next: listener/accept and a bounded HTTP request/response client using
+Socket directly; TcpClient and UdpClient are not required for it. The HTTP
 prototype will include headers, status and byte bodies with explicit message framing.
 The first controlled demo uses plain HTTP; HTTPS needs a separate TLS implementation.
-None of these planned additions is available in the current Socket API.
+These planned additions are not available in the current Socket API.

@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add development Dns.GetHostAddresses with Task/Result, read-only IPv4 address
+  sequences, typed lookup errors and a provisional five-second deadline. Extend
+  the socket echo client to resolve localhost, and keep lookup separate from
+  connection. Refresh matching runtime/bridge/API artifacts and add the Networking
+  feature page and homepage box; Web gets its own entry when its HTTP POC works.
+  Document open array-generic metadata and nested callback capture integration cases;
+  no compiler fix, automatic address fallback or overall connection deadline is claimed.
+  Validate 25 focused runtime tests, the compiled hostname echo (31 collections,
+  zero live objects), three visibility checks, ten website tests and 572 API/site pages.
+
 - Add a private host-resolution scheduler source as the first DNS integration slice.
   Keep blocking lookups off the VM thread, bound process-wide host work and retained
   invocation results, and preserve capacity accounting after cancellation/teardown.

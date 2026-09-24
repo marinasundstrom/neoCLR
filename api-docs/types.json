@@ -113,5 +113,13 @@
   "System.Tasks.TaskQueue",
   "System.Tasks.TaskState",
   "System.Tasks.Task`1",
-  "System.Value"
+  "System.Value",
+  "System.Networking.Dns",
+  "System.Networking.DnsError",
+  "System.Networking.DnsError.InvalidName",
+  "System.Networking.DnsError.LimitExceeded",
+  "System.Networking.DnsError.NoAddress",
+  "System.Networking.DnsError.TimedOut",
+  "System.Networking.DnsError.Cancelled",
+  "System.Networking.DnsError.LookupFailed"
 ]

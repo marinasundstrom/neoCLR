@@ -33,6 +33,8 @@ pub enum RuntimeService {
     IsolatedWorkers,
     /// Native socket ownership and I/O; submissions also require TaskDispatch.
     SocketIo,
+    /// Host name resolution; submissions also require TaskDispatch.
+    NameResolution,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -60,6 +62,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
     if function.is_internal_call() {
         let service = match crate::native::bind(function)? {
             crate::native::Binding::Socket(_) => RuntimeService::SocketIo,
+            crate::native::Binding::Resolve(_) => RuntimeService::NameResolution,
             #[cfg(test)]
             crate::native::Binding::TestSocketReceive => RuntimeService::TaskDispatch,
             crate::native::Binding::StartWorker(_)
@@ -149,6 +152,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
         if matches!(
             crate::native::bind(function)?,
             crate::native::Binding::NotifyWorker
+                | crate::native::Binding::Resolve(crate::name_resolution::Operation::Lookup)
                 | crate::native::Binding::Socket(
                     crate::socket_io::Operation::Connect | crate::socket_io::Operation::Receive | crate::socket_io::Operation::Send
                 )

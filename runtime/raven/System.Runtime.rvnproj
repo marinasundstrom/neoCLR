@@ -5,6 +5,12 @@
     <NeoCLRRoot>$(NeoCLRBootstrapRoot)</NeoCLRRoot>
   </PropertyGroup>
   <Import Project="../../build/NeoCLR.Raven.props" />
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Dns'">
+    <Compile Include="src/System/Networking/Dns.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'DnsError'">
+    <Compile Include="src/System/Networking/DnsError.rvn" />
+  </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Socket'">
     <Compile Include="src/System/Networking/Sockets/Socket.rvn" />
   </ItemGroup>

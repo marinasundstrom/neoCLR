@@ -1,0 +1,11 @@
+.function neoCLR.Runtime.DnsLookup(String hostName,System.Func<Void> callback) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.DnsResult(Int64 operation) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.DnsAddresses(Value payload) -> String[]
+ldarg payload
+value.unpack String[]
+ret
+.end
