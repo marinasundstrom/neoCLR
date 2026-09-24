@@ -104,7 +104,9 @@ is a correctness POC, not a performance benchmark. Generated async states still 
 ## Direction
 
 The client/server greeting and JSON report are in place. Request lifetime/deadlines,
-a public JSON contract and broader request/response behavior remain open gates. The System.Web.Http boundary
+a public JSON contract and broader request/response behavior remain open gates.
+The native I/O owners now have a tested shared-deadline path; connecting it through
+the private HTTP bridge is the next step. It is not yet an HTTP timeout feature. The System.Web.Http boundary
 separates HTTP policy from [networking](/features/networking/); a future transport
 could use sockets or a host facility. Handler ownership, concurrency, cancellation
 and a structured error model need concrete cases as these provisional APIs evolve. No complete HTTP stack or runtime suspension is claimed.

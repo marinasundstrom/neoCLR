@@ -6666,3 +6666,19 @@ configuration/content, not target-specific code added to Raven main.
   and application handler work. This changes previously unbounded development
   transfers and can reject legitimately slow peers; repeated short progress can
   still exceed the per-transfer bound in aggregate.
+
+### 2026-09-24 — Shared deadline beneath the HTTP bridge
+
+- **Context:** the author continues work after the pending-transfer timeout slice;
+  the roadmap's remaining gate is one request lifetime across phases.
+- **Assistant action:** adds private absolute-deadline paths to resolver and socket
+  owners. The shorter phase bound remains active, and a shared budget is not renewed
+  by fallback or short reads. A combined numeric-loopback probe exercises lookup,
+  connect, initial body progress and expiry of the remaining receive.
+- **Outcome:** 32 socket tests and nine resolver tests pass. Expired native admission,
+  buffer cleanup and detached late resolver results are covered. The public managed
+  HTTP behavior is unchanged; no service ABI or compiler work has happened yet.
+- **Next:** carry the shared deadline through the private Raven bridge, then define
+  handler/server ownership. No public timeout/token type is selected in this slice.
+- **Evidence:** [probe](experiments/request-budget/README.md) and
+  [contract comparisons](http-client-design.md#shared-native-deadline-checkpoint--2026-09-24).

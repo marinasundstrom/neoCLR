@@ -260,6 +260,17 @@ impl Sockets {
         port: i32,
         callback: Value,
     ) -> Result<OperationId, Error> {
+        self.connect_addresses_until(addresses, port, callback, None)
+    }
+    // A provider can share one absolute budget across lookup, connect and I/O.
+    // Existing guest entry points retain their phase-local policies.
+    pub(crate) fn connect_addresses_until(
+        &mut self,
+        addresses: &[&str],
+        port: i32,
+        callback: Value,
+        until: Option<Instant>,
+    ) -> Result<OperationId, Error> {
         if addresses.is_empty() {
             return Err(Error::InvalidRange);
         }
@@ -291,9 +302,13 @@ impl Sockets {
             return Err(Error::Limit);
         }
         let now = Instant::now();
+        let deadline = until.map_or(now + CONNECT_TIMEOUT, |end| end.min(now + CONNECT_TIMEOUT));
+        if now >= deadline {
+            return Err(Error::TimedOut);
+        }
         let id = OperationId(next_id()?);
         let mut op = Connect {
-            deadline: Some(now + CONNECT_TIMEOUT),
+            deadline: Some(deadline),
             attempt_deadline: None,
             remaining,
             listener: None,
@@ -312,6 +327,11 @@ impl Sockets {
     ) {
         // Every retry drops the previous native owner before opening another one.
         op.stream = None;
+        if op.deadline.is_some_and(|deadline| now >= deadline) {
+            op.remaining.clear();
+            op.outcome = Some(Err(Error::TimedOut));
+            return;
+        }
         while let Some(address) = op.remaining.pop_front() {
             let attempt = (|| {
                 let socket = socket2::Socket::new(
@@ -505,6 +525,28 @@ impl Sockets {
         count: i32,
         callback: Value,
     ) -> Result<OperationId, Error> {
+        self.transfer_until(
+            sending,
+            socket,
+            heap,
+            destination,
+            offset,
+            count,
+            callback,
+            None,
+        )
+    }
+    pub(crate) fn transfer_until(
+        &mut self,
+        sending: bool,
+        socket: SocketId,
+        heap: &ManagedHeap,
+        destination: Value,
+        offset: i32,
+        count: i32,
+        callback: Value,
+        until: Option<Instant>,
+    ) -> Result<OperationId, Error> {
         if self.listeners.contains_key(&socket) {
             return Err(Error::InvalidOperation);
         }
@@ -549,6 +591,15 @@ impl Sockets {
             .checked_add(count)
             .filter(|n| *n <= self.budget.bytes)
             .ok_or(Error::Limit)?;
+        let now = Instant::now();
+        let deadline = until.map_or(now + TRANSFER_TIMEOUT, |end| {
+            end.min(now + TRANSFER_TIMEOUT)
+        });
+        // A request budget also forbids starting an empty operation after expiry;
+        // ordinary empty Send/Receive retain their successful-zero behavior.
+        if until.is_some_and(|end| now >= end) {
+            return Err(Error::TimedOut);
+        }
         let mut buffer = Vec::new();
         buffer.try_reserve_exact(count).map_err(|_| Error::Limit)?;
         if sending {
@@ -567,7 +618,7 @@ impl Sockets {
         self.operations.insert(
             id,
             Transfer {
-                deadline: Instant::now() + TRANSFER_TIMEOUT,
+                deadline,
                 sending,
                 socket,
                 destination: if sending { None } else { Some(destination) },
@@ -982,6 +1033,201 @@ mod tests {
             assert_eq!(sockets.take_result(id), Ok(Some(expected)));
             assert_eq!(sockets.reserved, 0);
         }
+    }
+
+    #[test]
+    fn shared_request_deadline_is_not_renewed_by_successful_short_transfers() {
+        let (mut peer, stream) = pair();
+        let mut sockets = Sockets::default();
+        let socket = sockets.adopt(stream).unwrap();
+        let mut heap = ManagedHeap::default();
+        let buffer = array(&mut heap);
+        let end = Instant::now() + Duration::from_secs(1);
+        // Same absolute budget, progressing through two one-byte body fragments.
+        for value in [b'A', b'B'] {
+            peer.write_all(&[value]).unwrap();
+            let id = sockets
+                .transfer_until(
+                    false,
+                    socket,
+                    &heap,
+                    buffer.clone(),
+                    0,
+                    4,
+                    callback(),
+                    Some(end),
+                )
+                .unwrap();
+            assert_eq!(sockets.operations[&id].deadline, end);
+            deliver(&mut sockets, &heap);
+            assert_eq!(sockets.take_result(id), Ok(Some(Ok(1))));
+            assert_eq!(bytes(&heap, &buffer)[0], Value::Byte(value));
+        }
+        let id = sockets
+            .transfer_until(
+                false,
+                socket,
+                &heap,
+                buffer.clone(),
+                0,
+                4,
+                callback(),
+                Some(end),
+            )
+            .unwrap();
+        assert_eq!(sockets.operations[&id].deadline, end);
+        peer.write_all(b"C").unwrap();
+        assert!(sockets.poll_transfer_at(&heap, end).unwrap().is_some());
+        assert_eq!(sockets.take_result(id), Ok(Some(Err(Error::TimedOut))));
+        assert_eq!(bytes(&heap, &buffer)[0], Value::Byte(b'B'));
+        assert_eq!(sockets.reserved, 0);
+        sockets.close(socket);
+    }
+
+    #[test]
+    fn lookup_connect_and_body_progress_share_one_absolute_budget() {
+        let end = Instant::now() + Duration::from_secs(4);
+        let mut resolver = crate::name_resolution::Resolver::with_wake(std::sync::Arc::new(
+            crate::scheduler::Wake::default(),
+        ));
+        let lookup = resolver
+            .submit_until("127.0.0.1", callback(), Duration::from_secs(5), Some(end))
+            .unwrap();
+        while resolver.poll().is_none() {
+            assert!(Instant::now() < end, "local resolver watchdog");
+            std::thread::yield_now();
+        }
+        let addresses = resolver.take_result(lookup).unwrap().unwrap().unwrap();
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let mut sockets = Sockets::default();
+        let mut heap = ManagedHeap::default();
+        let address = addresses[0].to_string();
+        let connect = sockets
+            .connect_addresses_until(
+                &[&address],
+                listener.local_addr().unwrap().port().into(),
+                callback(),
+                Some(end),
+            )
+            .unwrap();
+        assert_eq!(sockets.connects[&connect].deadline, Some(end));
+        deliver(&mut sockets, &heap);
+        let socket = accepted(&mut sockets, &heap, connect);
+        let (mut peer, _) = listener.accept().unwrap();
+        let buffer = array(&mut heap);
+        peer.write_all(b"A").unwrap();
+        let first = sockets
+            .transfer_until(
+                false,
+                socket,
+                &heap,
+                buffer.clone(),
+                0,
+                4,
+                callback(),
+                Some(end),
+            )
+            .unwrap();
+        assert_eq!(sockets.operations[&first].deadline, end);
+        deliver(&mut sockets, &heap);
+        assert_eq!(sockets.take_result(first), Ok(Some(Ok(1))));
+        let next = sockets
+            .transfer_until(
+                false,
+                socket,
+                &heap,
+                buffer.clone(),
+                1,
+                3,
+                callback(),
+                Some(end),
+            )
+            .unwrap();
+        assert_eq!(sockets.operations[&next].deadline, end);
+        assert!(sockets.poll_transfer_at(&heap, end).unwrap().is_some());
+        assert_eq!(sockets.take_result(next), Ok(Some(Err(Error::TimedOut))));
+        assert_eq!(
+            bytes(&heap, &buffer),
+            vec![
+                Value::Byte(b'A'),
+                Value::Byte(9),
+                Value::Byte(9),
+                Value::Byte(9)
+            ]
+        );
+        sockets.close(socket);
+        assert!(sockets.operations.is_empty() && sockets.connects.is_empty());
+        assert!(!resolver.pending());
+        assert_eq!(sockets.reserved, 0);
+    }
+
+    #[test]
+    fn expired_request_does_not_admit_connect_or_transfer_and_long_budget_keeps_phase_bound() {
+        let (mut peer, stream) = pair();
+        let mut sockets = Sockets::default();
+        let socket = sockets.adopt(stream).unwrap();
+        let mut heap = ManagedHeap::default();
+        let buffer = array(&mut heap);
+        let expired = Instant::now();
+        assert_eq!(
+            sockets.connect_addresses_until(&["127.0.0.1"], 80, callback(), Some(expired)),
+            Err(Error::TimedOut)
+        );
+        for sending in [false, true] {
+            assert_eq!(
+                sockets.transfer_until(
+                    sending,
+                    socket,
+                    &heap,
+                    buffer.clone(),
+                    0,
+                    1,
+                    callback(),
+                    Some(expired)
+                ),
+                Err(Error::TimedOut)
+            );
+        }
+        assert!(sockets.operations.is_empty() && sockets.connects.is_empty());
+        assert_eq!(sockets.reserved, 0);
+        peer.set_nonblocking(true).unwrap();
+        assert_eq!(
+            peer.read(&mut [0]).unwrap_err().kind(),
+            io::ErrorKind::WouldBlock
+        );
+        let now = Instant::now();
+        let id = sockets
+            .transfer_until(
+                false,
+                socket,
+                &heap,
+                buffer,
+                0,
+                1,
+                callback(),
+                Some(now + Duration::from_secs(60)),
+            )
+            .unwrap();
+        assert!(sockets.operations[&id].deadline <= Instant::now() + TRANSFER_TIMEOUT);
+        assert!(sockets.operations[&id].deadline < now + Duration::from_secs(60));
+        sockets.close(socket);
+    }
+
+    #[test]
+    fn shared_connect_budget_survives_fallback_and_stops_next_attempt() {
+        let (_peer, stream) = pair();
+        let mut sockets = Sockets::default();
+        let end = Instant::now() + Duration::from_secs(2);
+        let id = staged_connect(&mut sockets, stream, end);
+        let op = sockets.connects.get_mut(&id).unwrap();
+        op.remaining
+            .push_back(SocketAddrV4::new(Ipv4Addr::LOCALHOST, 80));
+        // Even a prepared fallback must not open another native socket at expiry.
+        Sockets::start_next_address(op, &mut sockets.sockets, end);
+        assert_eq!(op.outcome, Some(Err(Error::TimedOut)));
+        assert_eq!(op.deadline, Some(end));
+        assert!(op.stream.is_none() && op.remaining.is_empty());
+        assert!(sockets.sockets.is_empty());
     }
 
     fn connect_result(sockets: &mut Sockets, heap: &ManagedHeap, id: OperationId) -> Value {

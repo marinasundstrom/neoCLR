@@ -832,8 +832,11 @@ now returns TimedOut after five seconds per nonempty Send/Receive, releasing buf
 without closing the caller's socket. HTTP closes its owned connection on that error.
 This does not bound repeated short transfers, accept or application handler work.
 
-**Active next step, 2026-09-24:** extend per-transfer bounds into a coherent whole-request
-lifetime for the validated HTTP application, then evaluate public JSON contracts from the existing
+**Active next step, 2026-09-24:** carry one owner-scoped deadline through the private
+Raven HTTP bridge. The [native shared-budget probe](experiments/request-budget/README.md)
+now verifies lookup, connect and repeated reads under one absolute deadline; public
+HTTP still has separate operation bounds. Complete this request-lifetime integration,
+then evaluate public JSON contracts from the existing
 consumer. The [JSON report](experiments/http-json/README.md) now passes between two
 neoCLR applications and independent peers; it does not promote a public JSON API. The
 [HTTP sample](experiments/http-client/README.md) imports development System.Web.Http

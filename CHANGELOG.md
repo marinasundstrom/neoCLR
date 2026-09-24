@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add private absolute-deadline submission paths for resolver, address fallback and
+  socket transfers. Preserve the shorter phase bound, reject expired work before
+  native admission and prevent short progress from renewing a shared budget. Add a
+  native loopback lookup/connect/body probe and deterministic ownership tests. Raven
+  HTTP integration remains pending; no public API or service ABI changed.
+
 - Bound each pending nonempty socket Send/Receive to a provisional five seconds from
   native admission. Timeout releases transfer storage and returns TimedOut without
   closing the connection; committed outcomes and empty transfers retain their behavior.

@@ -178,3 +178,41 @@ SocketError cause. Stalled response headers/body and partial request headers are
 integration cases. No managed timer race, new HTTP signature or public scheduler is
 introduced. See the [socket policy and comparisons](socket-api-design.md#pending-transfer-deadline--2026-09-24).
 A single request budget, handler cancellation and slow-trickle protection remain open.
+
+## Shared native deadline checkpoint — 2026-09-24
+
+The private resolver/socket owners now accept an optional absolute monotonic deadline.
+Each operation uses the earlier of its existing phase bound and that shared deadline.
+Already expired valid submissions reject before native work; retries and short I/O do
+not reset it. The [native loopback probe](experiments/request-budget/README.md) carries
+one deadline across lookup, connect and successive body reads, with deterministic
+expiry and existing cleanup. This is implemented native infrastructure, **not yet wired
+through the Raven HTTP bridge**. The public POC still has separate phase bounds.
+
+This reuses the existing .NET HttpClient cancellation comparison. Additional primary
+contracts checked 2026-09-24:
+
+- .NET 10 [CancellationTokenSource.CancelAfter](https://learn.microsoft.com/en-us/dotnet/api/system.threading.cancellationtokensource.cancelafter?view=net-10.0)
+  resets its countdown on another call while not yet cancelled. Reusing a source with
+  one initial cancellation time can express a whole budget; restarting a full delay
+  for each transfer cannot. Absolute expiry makes that distinction explicit internally.
+- [Task.WaitAsync](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task.waitasync?view=net-10.0)
+  gives a wait that completes with the task, timeout or cancellation. That waiting
+  contract alone does not establish native buffer quiescence; neoCLR keeps settling
+  and releasing buffers at their existing operation owner.
+- Tokio 1.53.1 [timeout_at](https://docs.rs/tokio/1.53.1/tokio/time/fn.timeout_at.html)
+  uses an absolute instant, but permits an immediately completed future to succeed
+  regardless of the deadline. The neoCLR private path deliberately rejects expired
+  admission and gives expiry precedence over unobserved native readiness. This is a
+  stricter policy with the cost of rejecting ready work after scheduling delays, not
+  a claim of equivalent semantics or a general improvement.
+
+No new scheduler, task state or managed timer race is needed for the native path.
+The next bridge slice must give HttpExchange one owner-scoped deadline and pass it to
+DNS/connect/send/receive. A private opaque handle or checked time representation
+remains an implementation choice; do not expose host Instant through public metadata.
+A late successful connect must still be closed if the exchange has expired, and a
+completed response must not become success after the request budget has expired.
+Expiry cannot preempt arbitrary guest code or force a blocking host resolver to stop.
+Custom handler pipelines, accepted server connections and accept waiting need explicit
+cancellation ownership before claiming a general HttpClient/HttpServer timeout API.

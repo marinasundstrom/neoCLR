@@ -146,6 +146,15 @@ impl Resolver {
         callback: Value,
         timeout: Duration,
     ) -> Result<OperationId, Error> {
+        self.submit_until(name, callback, timeout, None)
+    }
+    pub(crate) fn submit_until(
+        &mut self,
+        name: &str,
+        callback: Value,
+        timeout: Duration,
+        until: Option<Instant>,
+    ) -> Result<OperationId, Error> {
         if name.is_empty()
             || name.len() > 253
             || !name
@@ -162,7 +171,12 @@ impl Resolver {
         if self.operations.len() >= MAX_OPERATIONS {
             return Err(Error::Limit);
         }
-        let deadline = Instant::now().checked_add(timeout).ok_or(Error::Limit)?;
+        let now = Instant::now();
+        let phase_deadline = now.checked_add(timeout).ok_or(Error::Limit)?;
+        let deadline = until.map_or(phase_deadline, |end| end.min(phase_deadline));
+        if until.is_some_and(|end| now >= end) {
+            return Err(Error::TimedOut);
+        }
         let permit = Permit::acquire(self.permits)?;
         let id = OperationId(
             NEXT_ID
@@ -217,13 +231,16 @@ impl Resolver {
         Ok(true)
     }
     pub(crate) fn poll(&mut self) -> Option<Value> {
+        self.poll_at(Instant::now())
+    }
+    fn poll_at(&mut self, now: Instant) -> Option<Value> {
         for op in self.operations.values_mut() {
             if op.callback.is_none() {
                 continue;
             }
             if op.outcome.is_none() {
                 // Deadline wins if completion wasn't observed before it expired.
-                op.outcome = if Instant::now() >= op.deadline {
+                op.outcome = if now >= op.deadline {
                     Some(Err(Error::TimedOut))
                 } else {
                     match op.receiver.try_recv() {
@@ -480,6 +497,51 @@ mod tests {
         entered.recv_timeout(Duration::from_secs(5)).unwrap();
         assert!(resolver.pending());
         assert!(resolver.poll().is_none());
+    }
+    #[test]
+    fn shared_deadline_clamps_lookup_and_rejects_expired_work_before_host_admission() {
+        let (mut resolver, gate, entered) = blocked();
+        let expired = Instant::now();
+        assert_eq!(
+            resolver.submit_until(
+                "localhost",
+                callback(),
+                Duration::from_secs(5),
+                Some(expired)
+            ),
+            Err(Error::TimedOut)
+        );
+        assert!(resolver.operations.is_empty());
+        assert_eq!(resolver.permits.load(Ordering::Acquire), 0);
+        assert!(
+            entered.try_recv().is_err(),
+            "expired lookup must not start host work"
+        );
+
+        let end = Instant::now() + Duration::from_secs(1);
+        let id = resolver
+            .submit_until("localhost", callback(), Duration::from_secs(5), Some(end))
+            .unwrap();
+        entered.recv_timeout(Duration::from_secs(5)).unwrap();
+        assert_eq!(resolver.operations[&id].deadline, end);
+        assert!(resolver.poll_at(end - Duration::from_nanos(1)).is_none());
+        assert!(resolver.poll_at(end).is_some());
+        assert_eq!(resolver.take_result(id), Ok(Some(Err(Error::TimedOut))));
+        assert_eq!(
+            resolver.permits.load(Ordering::Acquire),
+            1,
+            "timeout cannot stop libc or release its worker permit"
+        );
+        gate.release();
+        let watchdog = Instant::now() + Duration::from_secs(5);
+        while resolver.permits.load(Ordering::Acquire) != 0 {
+            assert!(Instant::now() < watchdog);
+            std::thread::yield_now();
+        }
+        assert!(
+            resolver.poll_at(end).is_none(),
+            "late native result is detached"
+        );
     }
     #[test]
     fn errors_panics_and_oversized_results_settle_without_losing_capacity() {
