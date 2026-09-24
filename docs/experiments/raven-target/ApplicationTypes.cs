@@ -89,7 +89,7 @@ static class ApplicationTypes
         var type = reference.Resolve();
         if (type is null || !Modules.Contains(type.Module) || type.FullName == "System.Unit" || type.Name == "<Module>") return null;
         if (type.HasGenericParameters && !LibraryNames.ContainsKey(type) || type.IsEnum && !FlagsLibrary.IsMatched(type)
-            || type.IsExplicitLayout || (type.DeclaringType?.HasGenericParameters ?? false)
+            || type.IsExplicitLayout && !IsEmptyCaseUnion(type) || (type.DeclaringType?.HasGenericParameters ?? false)
             || (!type.IsInterface && !DelegateLibrary.IsMatched(type) && !FlagsLibrary.IsMatched(type) && !MarkerLibrary.IsMatched(type) && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && !IsModule(type.BaseType?.Resolve()?.Module))
             || !FlagsLibrary.IsMatched(type) && type.Fields.Any(f => f.IsStatic || f.HasMarshalInfo || f.IsInitOnly && !f.IsPrivate)
             || type.Methods.Any(m => m.IsConstructor && m.IsStatic))
@@ -177,6 +177,27 @@ static class ApplicationTypes
             !(caller.IsConstructor && !caller.IsStatic || IsInitSetter(caller))))
             throw new InvalidDataException("Readonly field writes require the declaring constructor or init accessor.");
     }
+    // Empty union cases have no overlapping data to preserve. Import their tag and
+    // empty case slots as ordinary managed fields, not as a native-layout promise.
+    // Payload-bearing explicit layouts remain outside this bounded admission.
+    static bool IsEmptyCaseUnion(TypeDefinition type)
+    {
+        if (!type.IsValueType || !type.IsSealed || type.HasGenericParameters
+            || !type.CustomAttributes.Any(attribute =>
+                attribute.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute"
+                && RuntimeSignatures.IsCore(attribute.AttributeType.Scope))
+            || type.NestedTypes.Count == 0 || type.Fields.Count != type.NestedTypes.Count + 1
+            || type.Fields.Any(field => !field.IsPrivate || field.IsStatic || field.HasMarshalInfo))
+            return false;
+        var tag = type.Fields.SingleOrDefault(field => field.Name == "<Tag>");
+        if (tag is null || tag.FieldType.MetadataType != MetadataType.Byte || tag.Offset != 0)
+            return false;
+        return type.NestedTypes.All(caseType => caseType.IsNestedPublic && caseType.IsValueType
+            && caseType.IsSequentialLayout && !caseType.HasFields && !caseType.HasGenericParameters
+            && !caseType.HasNestedTypes && type.Fields.Count(field => field != tag
+                && field.Offset > 0 && field.FieldType.Resolve() == caseType) == 1);
+    }
+
     // Raven's union extraction contract assigns the case only when it returns true.
     // Ordinary application out parameters retain their unconditional obligation.
     public static bool IsConditionalUnionOutput(MethodDefinition method) =>

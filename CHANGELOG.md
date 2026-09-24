@@ -13,7 +13,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and a CLI shape report; record current importer gaps instead of extending the
   hand-authored carrier catalog. Admit value-constructor receiver initialization and
   recognized union conditional outputs in application imports; validate nested source
-  unions, defaults, copies and boxing under GC pressure. Legacy erased SocketError
+  unions, defaults, copies and boxing under GC pressure. Admit marked empty-case-only
+  explicit-layout unions as managed field slots; reject nonempty or malformed layouts
+  and exercise unions across a separately compiled dependency. Legacy erased SocketError
   nesting remains rejected by runtime verification. HttpError/BaseUri remain unimplemented.
 
 - Add managed System.Uri and UriError with strict escaped-ASCII parsing, string/Uri

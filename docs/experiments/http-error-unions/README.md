@@ -22,13 +22,18 @@ The script compiles in a temporary directory, inspects the CLI shape, imports an
 verifies the program, and executes it under collection pressure. It checks:
 
 - Default unions report no case; unsuccessful patterns do not invent a payload.
-- Nested standard unions, empty cases, computed properties and authored ToString.
+- Nested standard unions, empty-case-only unions, computed properties, authored
+  ToString and generated display through Object.
 - Copies and boxed values retain their payload after the original is replaced.
 - Live values survive collections; all tracked objects are reclaimed at completion.
 - Constructor receiver initialization is accepted; the same initobj in an ordinary
   method is rejected by the importer.
 - Ordinary out methods still must assign their output. A union extraction method
   that returns true without assignment also faults.
+- Explicit layouts lacking the union marker, containing payload data, or overlapping
+  the tag remain rejected.
+- The same program consumes a separately compiled union library, with matching
+  output and collection/cleanup checks.
 - Mixing the old erased SocketError into this carrier remains rejected during
   runtime verification because its System.Value field has no managed default.
 
@@ -48,7 +53,14 @@ requires the core UnionAttribute. Both method declarations and call-site assignm
 tracking use the runtime's existing `out(true)` contract. Ordinary outputs retain
 `out`; no new VM instruction or relaxed managed default is introduced.
 
-This is an application-import slice. Runtime-library source projection, metadata
+Empty-case-only unions use explicit CLI layout in Raven. The importer now admits
+that bounded shape when a marked sealed value carrier contains one private byte tag
+at offset zero and one private field per empty nested value case at a positive
+offset. There is no payload data whose overlapping storage must be preserved, so
+these become ordinary managed field slots. This is not permission to import general
+explicit-layout structs or nonempty overlaid cases.
+
+This is an application/dependency-import slice. Runtime-library source projection, metadata
 catalogs and bootstrap exports still need integration before public APIs can migrate.
 The previous probe stopped at SocketError byref and then receiver initialization.
 `LegacyErrors.rvn` retains that mixed-form investigation; it now imports but the
@@ -65,7 +77,7 @@ but differs from the legacy neoCLR carriers whose erased storage has no default.
 We retain that distinction rather than fabricate a valid legacy error case.
 
 Compiler-owned case machinery reduces handwritten library code; it requires explicit
-bridge support and validation. This slice does not cover generic or explicit-layout
+bridge support and validation. This slice does not cover generic or payload-bearing explicit-layout
 unions, equality synthesis, all IUnion interface calls or runtime-library migration.
 Next, resolve the mixed-carrier boundary and bootstrap integration before shipping
 HttpError/BaseUri. Existing carriers are migration candidates, not an instruction
@@ -73,11 +85,12 @@ to rewrite all working unions in one change.
 
 ## Validation for this slice
 
-The focused verifier passes: 101 tracked allocations, two collections, peak 64 and
-zero live objects at completion. All three mutated-contract rejection checks and
+The focused verifier passes: 103 tracked allocations, two collections, peak 64 and
+zero live objects at completion in both the single-assembly and separate-library
+arrangements. All six mutated-contract rejection checks and
 the mixed-legacy default rejection pass. The existing constructor-argument regression
-also passes. The broader records verifier was attempted with the same installed
-bundle but fails before import on record-to-Equatable conversions and ambiguous
+also passes. The prior broader records verifier attempt with the installed
+bundle fails before import on record-to-Equatable conversions and ambiguous
 Equals overloads; it is not counted as passing. That compiler/SDK validation gap
 requires separate investigation. No website or public API signature changes occur
 in this slice, so the existing API snapshot is unchanged.

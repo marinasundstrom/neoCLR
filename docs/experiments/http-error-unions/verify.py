@@ -47,10 +47,10 @@ with tempfile.TemporaryDirectory(prefix='neoclr-union-') as directory:
     assert 'field <Tag>: System.Byte' in report, report
     print(report)
 
-    def import_image(image, name):
+    def import_image(image, name, dependencies=()):
         destination = work / name
         result = run(['dotnet', bundle / 'tools/bridge/Probe.dll', '--import', image,
-                      bundle / 'demo/NeoCLR.CoreProbe.dll', destination], success=False)
+                      bundle / 'demo/NeoCLR.CoreProbe.dll', destination, *dependencies], success=False)
         return result, destination / 'App.neoil'
 
     imported, artifact = import_image(assembly, 'imported')
@@ -59,23 +59,51 @@ with tempfile.TemporaryDirectory(prefix='neoclr-union-') as directory:
     run([bundle / 'bin/neoclr', 'verify', artifact, '--system', system])
     executed = run([args.runner.resolve(), artifact, system, '64', '10000000'])
     assert executed.stdout.splitlines() == [
-        'localhost', 'Invalid request', 'Union defaults, cases, copies and boxing passed'
+        'Header limit', 'localhost', 'Invalid request', 'Union defaults, cases, copies and boxing passed'
     ], executed.stdout
     assert re.search(r'\blive=0\b', executed.stderr), executed.stderr
     assert re.search(r'\bcollections=[1-9][0-9]*\b', executed.stderr), executed.stderr
     print(executed.stdout + executed.stderr)
 
-    for mutation in ('nonconstructor-init', 'ordinary-out', 'unassigned-success'):
+    for mutation in ('nonconstructor-init', 'ordinary-out', 'unassigned-success',
+                     'explicit-unmarked', 'explicit-payload', 'explicit-tag-overlap'):
         image = compiled / (mutation + '.dll')
         run([*inspector, assembly, mutation, image])
         imported, artifact = import_image(image, mutation)
-        if mutation == 'nonconstructor-init':
+        if mutation.startswith('explicit-'):
+            rejected(imported, 'Unsupported application type: HttpErrorProbe.HttpLimit')
+        elif mutation == 'nonconstructor-init':
             rejected(imported, 'Only local or value-constructor receiver initialization is admitted.')
         else:
             assert imported.returncode == 0, imported.stdout + imported.stderr
             rejected(run([bundle / 'bin/neoclr', 'run', artifact, '--system', system], success=False),
                      'out parameter has not been assigned')
         print('Rejected invalid contract: ' + mutation)
+
+    # Exercise the metadata contract across a separately compiled library boundary.
+    (work / 'Errors.rvnproj').write_text('''<Project>
+  <Import Project="$(NeoCLRRoot)/build/NeoCLR.Raven.props" />
+  <PropertyGroup><OutputType>Library</OutputType></PropertyGroup>
+  <ItemGroup><Compile Include="Errors.rvn" /></ItemGroup>
+</Project>''')
+    library_output = work / 'library'
+    library_output.mkdir()
+    run(['dotnet', bundle / 'raven-sdk/tools/rvnc/rvnc.dll', work / 'Errors.rvnproj',
+         '--no-project-restore', '-o', library_output])
+    library = library_output / 'Errors.dll'
+    (work / 'Probe.rvnproj').write_text((source / 'Probe.rvnproj').read_text()
+        .replace('    <Compile Include="Errors.rvn" />',
+                 '    <Reference Include="Errors"><HintPath>library/Errors.dll</HintPath></Reference>'))
+    run(compiler)
+    imported, artifact = import_image(assembly, 'library-import', (library,))
+    assert imported.returncode == 0, imported.stdout + imported.stderr
+    run([bundle / 'bin/neoclr', 'verify', artifact, '--system', system])
+    library_run = run([args.runner.resolve(), artifact, system, '64', '10000000'])
+    assert library_run.stdout == executed.stdout, library_run.stdout
+    assert re.search(r'\blive=0\b', library_run.stderr), library_run.stderr
+    assert re.search(r'\bcollections=[1-9][0-9]*\b', library_run.stderr), library_run.stderr
+    print('Separate union library: ' + library_run.stderr)
+    shutil.copyfile(source / 'Probe.rvnproj', work / 'Probe.rvnproj')
 
     # Mixing the existing erased SocketError with zero-initialized source unions is
     # deliberately still unsupported. Do not invent a default System.Value payload.

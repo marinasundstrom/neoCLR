@@ -6,7 +6,20 @@ var originalReferences = assembly.MainModule.AssemblyReferences.ToHashSet();
 if (args.Length == 3)
 {
     var carrier = assembly.MainModule.Types.Single(t => t.FullName == "HttpErrorProbe.HttpError");
-    if (args[1] == "nonconstructor-init")
+    if (args[1].StartsWith("explicit-"))
+    {
+        var limit = assembly.MainModule.Types.Single(t => t.FullName == "HttpErrorProbe.HttpLimit");
+        if (args[1] == "explicit-unmarked")
+            limit.CustomAttributes.Remove(limit.CustomAttributes.Single(a =>
+                a.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute"));
+        else if (args[1] == "explicit-payload")
+            limit.NestedTypes[0].Fields.Add(new FieldDefinition("Payload", FieldAttributes.Private,
+                limit.Fields.Single(f => f.Name == "<Tag>").FieldType));
+        else if (args[1] == "explicit-tag-overlap")
+            limit.Fields.Single(f => f.Name == "<HeadersPayload>").Offset = 0;
+        else throw new Exception("Unknown explicit-layout mutation");
+    }
+    else if (args[1] == "nonconstructor-init")
     {
         var body = carrier.Methods.Single(m => m.Name == "ToString").Body;
         var il = body.GetILProcessor();
@@ -48,7 +61,7 @@ foreach (var type in assembly.MainModule.Types.Where(t => t.Namespace == "HttpEr
     foreach (var contract in type.Interfaces)
         Console.WriteLine($"  implements {contract.InterfaceType}");
     foreach (var field in type.Fields)
-        Console.WriteLine($"  field {field.Name}: {field.FieldType}; {field.Attributes}");
+        Console.WriteLine($"  field {field.Name}: {field.FieldType}; {field.Attributes}; offset={field.Offset}");
     foreach (var method in type.Methods)
     {
         Console.WriteLine($"  {method.FullName}");
@@ -60,6 +73,6 @@ foreach (var type in assembly.MainModule.Types.Where(t => t.Namespace == "HttpEr
     {
         Console.WriteLine($"  nested {nested.FullName}: {nested.Attributes}");
         foreach (var field in nested.Fields)
-            Console.WriteLine($"    field {field.Name}: {field.FieldType}; {field.Attributes}");
+            Console.WriteLine($"    field {field.Name}: {field.FieldType}; {field.Attributes}; offset={field.Offset}");
     }
 }

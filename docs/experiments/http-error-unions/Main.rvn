@@ -8,6 +8,28 @@ func Check(value: bool) {
 }
 
 func Main() {
+    let limit: HttpLimit = HttpLimit.Headers
+    if let HttpLimit.Headers = limit {
+        Console.WriteLine("Header limit")
+    } else {
+        System.Fault("Wrong limit case")
+    }
+    Check(!default(HttpLimit).HasValue)
+    if let HttpLimit.Body = limit {
+        System.Fault("Nonmatching empty case succeeded")
+    }
+    let boxedLimit: Object = limit
+    Check(boxedLimit.ToString() == limit.ToString())
+    let limited: HttpError = HttpError.Limit(limit)
+    if let HttpError.Limit(reason) = limited {
+        if let HttpLimit.Headers = reason {
+            Check(reason.HasValue)
+        } else {
+            System.Fault("Nested empty-case union changed")
+        }
+    } else {
+        System.Fault("Missing nested limit")
+    }
     let absent = default(HttpError)
     Check(!absent.HasValue)
     Check(!absent.IsTransportFailure)

@@ -6,6 +6,7 @@ public union HttpError {
     case InvalidRequest(message: string)
     case Transport(cause: TransportError)
     case TimedOut
+    case Limit(reason: HttpLimit)
 
     val IsTransportFailure: bool {
         get {
@@ -36,4 +37,9 @@ public union TransportError {
         }
         return "No transport error"
     }
+}
+
+public union HttpLimit {
+    case Headers
+    case Body
 }

@@ -1169,5 +1169,8 @@ receiver and maps recognized core-UnionAttribute TryGetValue methods with a nest
 case out parameter to `out(true)` at declarations and calls. Other instance outputs
 remain unconditional. Known error types are admitted by reference; runtime verification
 still rejects defaults containing erased System.Value. No native union opcode,
-compiler emission change or public library API is introduced. Generic and explicit
-layouts and runtime-library migration are outside this application-import slice.
+compiler emission change or public library API is introduced. Empty-case-only marked explicit layouts are admitted as managed fields when their
+private byte tag is separate from their empty case slots. Nonempty overlaid payloads,
+generic unions and runtime-library migration remain outside this slice. The probe
+also exercises a separately compiled union library; this does not yet replace the
+runtime library's reference catalogs and bootstrap exports.
