@@ -1058,3 +1058,17 @@ runtime introspection. Replace value0/value1 named arguments with the member's
 meaningful names: characters, text, left/right, other, substring, prefix, suffix or
 byteStart/byteLength. Indexers retain index. Positional signatures do not change.
 The String sequence sample verifies named arguments, including reordered arguments.
+
+
+### Development TCP client integration
+
+SocketBindings admits only the selected System.Networking.Sockets.Socket factory,
+Receive and Close signatures from the matching core reference. SocketError has the
+existing union-carrier shape. SocketConnectCompletion and SocketReceiveCompletion,
+Socket's handle constructor and error decoder remain internal, and native operations
+are bootstrap-only RuntimeServices calls. Native IDs are erased private Int64 values;
+they are never part of the public API. Rebuild the reference, bootstrap library and
+importer together. No Raven compiler change, Runtime Contract option, emitted state
+machine convention or nullable policy changes in this slice. Socket awaits use the
+existing Task/Promise and generated-state-machine contracts. See the
+[client sample](../socket-client/README.md) for validation and current restrictions.

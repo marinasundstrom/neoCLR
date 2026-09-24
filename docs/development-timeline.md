@@ -6398,3 +6398,28 @@ Intern `text`, Concat/CompareOrdinal `left`/`right`, Equals `other`, search `sub
 `prefix`, `suffix`, and SliceUtf8 `byteStart`/`byteLength` across source, reference,
 introspection and docs. Added named-argument sample checks and a rejection check for
 old generic names. Positional signatures remain unchanged; named callers must migrate.
+
+
+## 2026-09-24 — Socket API immediately after the ownership slice
+
+**Author:** directed the assistant to continue immediately toward the Socket API after
+finishing the current slice. **Assistant action:** completed and committed the private
+receive registry (`cff9d0df`), then implemented the first public Connect/Receive/Close
+client and Task/Result bridge. A host greeting server supplies the first application
+case; two-sided echo still requires send and accept/listen. Validation evidence is
+maintained in the [sample](experiments/socket-client/README.md).
+
+**Author follow-up:** “I didn’t realize we need UdpClient and TcpClient classes on top
+of sockets later”. **Assistant response:** these can be useful convenience layers;
+record them for later evaluation without making them prerequisites for Socket.
+TcpClient/stream adaptation and UdpClient/datagram behavior need separate cases.
+This is a proposed layering direction, not a commitment to exact .NET names or APIs.
+
+
+**Further author clarification:** the immediate goal is a provisional Socket API
+sufficient to eventually receive and send HTTP messages for the web-app demo; the
+whole chain need not be fully developed. **Assistant response/action:** retain the
+client slice, select send and listener/accept next, then the minimum stream/text and
+HTTP behavior required by the demo. Do not make TcpClient/UdpClient or a complete
+network stack prerequisites. The demo purpose and this sequencing are recorded in
+the socket design and roadmap.

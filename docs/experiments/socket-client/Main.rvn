@@ -1,0 +1,64 @@
+import System.*
+import System.Result.*
+import System.Tasks.*
+import System.Networking.Sockets.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("Socket client contract failed")
+    }
+}
+
+func Churn() {
+    var index = 0
+    while index < 400 {
+        let garbage: byte[] = [(byte)0]
+        _ = garbage
+        index += 1
+    }
+}
+
+async func ReadGreeting(socket: Socket) -> Task<Result<int, SocketError>> {
+    let buffer: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9]
+    var received = 0
+    while received < 2 {
+        let pending = socket.Receive(buffer, 1 + received, 2 - received)
+        Churn()
+        let count = (await pending)?
+        Check(count > 0)
+        received += count
+    }
+    Check(buffer[0] == 9 && buffer[1] == 72 && buffer[2] == 105 && buffer[3] == 9)
+    Check((await socket.Receive(buffer, 0, 1))? == 0)
+    Console.WriteLine("Received Hi; peer finished sending")
+    return Ok(received)
+}
+
+async func ReceiveGreeting() -> Task<Result<int, SocketError>> {
+    // The verifier substitutes the host's ephemeral loopback port.
+    let socket = (await Socket.Connect("127.0.0.1", 19090))?
+    let result = await ReadGreeting(socket)
+    socket.Close()
+    socket.Close()
+    let closed = socket.Receive([(byte)0], 0, 1).GetResult()
+    if let Error(error) = closed {
+        Check(error.IsClosed)
+    } else {
+        System.Fault("Closed socket admitted a receive")
+    }
+    return result
+}
+
+func Main() {
+    let greeting = ReceiveGreeting()
+    Churn()
+    greeting.OnCompleted(() => {
+        if let Ok(count) = greeting.GetResult() {
+            Check(count == 2)
+            Console.WriteLine("Socket closed")
+        } else {
+            System.Fault("Greeting failed")
+        }
+    })
+    TaskQueue.Default.Post(() => Console.WriteLine("Other work runs while TCP is pending"))
+}

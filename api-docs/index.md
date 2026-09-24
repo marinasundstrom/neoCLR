@@ -26,6 +26,9 @@ for generated type and member documentation. Both are parts of this site.
 <a id="storage-exploration"></a>
 <a id="terminal-failures"></a>
 
+[Socket clients](sockets.md) documents the first development TCP Connect/Receive/Close
+API, its Task/Result behavior and current limits.
+
 ## Features and reference
 
 | Area | Read the guide | Browse types and members |

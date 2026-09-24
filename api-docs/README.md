@@ -98,3 +98,8 @@ method; remaining text/encoding type coverage is still incremental.
 String.Intern now has generated member documentation. Its execution-owned retention
 and host quotas are described there and in the manual Fault reference, including
 InternPoolLimitExceeded. This does not add a public interning-pool type or IsInterned.
+
+Socket and SocketError now have generated reference coverage under
+System.Networking.Sockets, including every error case. The on-site socket guide
+describes the first TCP client slice and pending listener/send/addressing work.
+Private completion classes and runtime operation handles are not public APIs.

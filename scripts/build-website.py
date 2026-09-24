@@ -256,6 +256,11 @@ def main():
             # Published examples retain the release contract during development.
             source_sample = SOURCE / 'samples/preview9' / name
         shutil.copyfile(source_sample, downloads / name)
+    socket_downloads = downloads / 'socket-client'
+    socket_downloads.mkdir()
+    for name in ('Main.rvn', 'SocketClient.rvnproj', 'README.md', 'verify.py'):
+        shutil.copyfile(ROOT / 'docs/experiments/socket-client' / name, socket_downloads / name)
+    shutil.make_archive(str(downloads / 'socket-client'), 'zip', socket_downloads)
     storage_downloads = downloads / 'storage-provider'
     storage_downloads.mkdir()
     for name in ('Storage.rvn', 'Path.rvn', 'Streams.rvn', 'ByteRoundTrip.rvn', 'Main.rvn', 'StorageExplorer.rvnproj', 'expected.txt'):

@@ -31,6 +31,8 @@ pub enum RuntimeService {
     ManagedArrays,
     TaskDispatch,
     IsolatedWorkers,
+    /// Native socket ownership and I/O; submissions also require TaskDispatch.
+    SocketIo,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -57,6 +59,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
     }
     if function.is_internal_call() {
         let service = match crate::native::bind(function)? {
+            crate::native::Binding::Socket(_) => RuntimeService::SocketIo,
             #[cfg(test)]
             crate::native::Binding::TestSocketReceive => RuntimeService::TaskDispatch,
             crate::native::Binding::StartWorker(_)
@@ -146,6 +149,9 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
         if matches!(
             crate::native::bind(function)?,
             crate::native::Binding::NotifyWorker
+                | crate::native::Binding::Socket(
+                    crate::socket_io::Operation::Connect | crate::socket_io::Operation::Receive
+                )
         ) {
             uses.push(ServiceUse {
                 service: RuntimeService::TaskDispatch,

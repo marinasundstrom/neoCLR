@@ -806,14 +806,17 @@ No later major milestone has started.
 
 ## Working rules and immediate next step
 
-**Active next step, 2026-09-24:** add the smallest Raven-facing addressing/socket
-and operation-result bridge, with matching API docs and a runnable echo case.
-The [private receive source](socket-api-design.md#reusable-private-receive-backend--2026-09-24)
-now separates reusable connection ownership from pending reads and consumed results,
-counts completed outcomes against admission, and runs through the scheduler/VM fixture.
-Preserve current affinity for this bridge. Generated state machines remain the
-execution mechanism; runtime suspension and general context customization are not
-prerequisites for TCP echo.
+**Active next step, 2026-09-24:** extend the first [public TCP client](experiments/socket-client/README.md)
+with send and listener/accept support toward a runnable two-sided echo case.
+Connect/Receive/Close and their Task/Result bridge now follow the private receive
+backend. Keep exact addressing/lifecycle choices provisional and maintain the API
+reference with each addition. Later evaluate TcpClient (or TcpConnection) with stream
+adaptation and UdpClient when a datagram case needs it; these convenience layers are
+not prerequisites for the first Socket case. Preserve current affinity. Generated
+state machines remain the execution mechanism; runtime suspension and general
+context customization are not prerequisites for TCP echo. The author clarifies that
+the product is a web-app demo receiving and sending HTTP messages: follow echo with
+the minimal provisional stream/text/HTTP chain, not completion of every layer.
 Earlier foundation checkpoints below are dated evidence, not competing priorities.
 
 Each selected slice should leave a checked sample, expected output, a matching build/run

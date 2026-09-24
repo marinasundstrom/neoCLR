@@ -1,6 +1,6 @@
 # Socket API: first application-driven slice
 
-**2026-09-24 · Active implementation direction; guest API not yet available.**
+**2026-09-24 · Development TCP client slice; full echo and broader Socket API remain open.**
 
 The author selects APIs needed to build a web application running on neoCLR,
 starting with sockets. Keep the [networking proposal](proposals/network-api.md)
@@ -116,8 +116,8 @@ The full web-app goal remains open after this initial transport implementation.
 
 [src/socket_io.rs](../src/socket_io.rs) now supplies the scheduler's TCP receive source.
 It adopts an already-connected host TcpStream, retaining that resource independently
-of pending reads and completed results. The guest injection service remains test-only;
-normal application code has no Socket constructor, addressing API or binding yet.
+of pending reads and completed results. At this checkpoint the guest injection service remained test-only; the public
+client bridge described below follows it.
 This is internal implementation, not a public contract or release announcement.
 
 The owner-thread registry uses nonblocking reads into owned native buffers and copies
@@ -182,3 +182,70 @@ queue affinity for this bridge; generated state machines remain the execution mo
 
 Validation: all 35 targeted backend, VM, scheduler and worker checks pass; the
 combined website builds with all 523 current API pages checked.
+
+## First public TCP client — 2026-09-24
+
+The next bounded product is a [Raven greeting client](experiments/socket-client/README.md)
+running against a host loopback server. System.Networking.Sockets now exposes
+Socket.Connect(string address, int port) as Task<Result<Socket, SocketError>>,
+Receive(byte[] buffer, int offset, int count) as Task<Result<int, SocketError>>,
+and idempotent Close(). This is development work, not a published SDK release.
+The [on-site guide](../api-docs/sockets.md) and generated reference cover the exact surface.
+
+Compared with [.NET 10 Socket.ConnectAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.sockets.socket.connectasync?view=net-10.0)
+(retrieved 2026-09-24), the provisional factory returns a connected owner and a typed
+Result, avoiding public partially initialized state. The cost is no explicit family,
+pre-connect options or local bind. Retaining .NET's separate create/bind/connect
+shape remains the option for the lower-level API as listener/configuration cases are
+added. Numeric IPv4 strings avoid freezing a broad IP/endpoint model in this case;
+they do not imply hostname lookup. No automatic DNS, IPv6 or UDP fallback occurs.
+
+Private socket2 0.6.1 creation/nonblocking connect joins the existing receive registry.
+Native pending-connect errno mapping is isolated in socket_io.rs; it is not a guest
+error number or compiler rule. Connect callbacks are traced; connected resources and
+operation results have distinct lifetimes. Failed connects release native sockets,
+while their results occupy the operation budget until consumed. Shared quotas include
+pending connects. Internal completion classes translate erased private results into
+Promise<Result<...>>; their types, handles and methods remain internal. Existing
+TaskQueue affinity and generated state machines are retained. No runtime suspension,
+worker-per-socket or public scheduler is introduced.
+
+The factory cannot be individually closed while still pending. Host invocation
+cancellation and teardown remain the escape path; native TCP timeout is not an
+application deadline contract. Read aliasing remains a caller obligation. Error
+classification is deliberately small and falls back to IoFailure. Public send,
+listen/accept, endpoint queries, deadlines and stream adaptation remain open.
+
+### Convenience layers to evaluate later
+
+**Author follow-up:** noted the future need for TcpClient and UdpClient above sockets.
+**Assistant response:** record them as later convenience-layer candidates, not new
+prerequisites for this slice. [.NET TcpClient](https://learn.microsoft.com/en-us/dotnet/api/system.net.sockets.tcpclient?view=net-10.0)
+provides a connection-oriented API and NetworkStream access;
+[UdpClient](https://learn.microsoft.com/en-us/dotnet/api/system.net.sockets.udpclient?view=net-10.0)
+provides datagram operations (both retrieved 2026-09-24). They simplify common cases
+but add ownership and overlapping surface to maintain. Evaluate TcpClient or the
+proposal's TcpConnection when adapting TCP to streams; evaluate UdpClient with an
+actual datagram use case. Preserve message boundaries for UDP, which is not a byte
+stream. Exact names and wrapping/ownership rules remain uncommitted design choices.
+The current Socket.Connect factory may move to such a convenience layer when the
+explicit socket lifecycle is in place; do not mistake it for the final full design.
+
+
+**Author clarification:** the immediate purpose is an HTTP-capable web-app demo
+showing that the platform could become something useful. Implement only the
+provisional interfaces needed along that path; do not complete every networking
+layer first. The immediate sequence is receive client, send plus listen/accept and
+echo, then bounded HTTP request/response handling with the necessary stream/text
+pieces. General-purpose client wrappers and broad protocol coverage remain later.
+
+The first sample also exposes an existing frontend/runtime boundary limitation:
+hoisting a Result across an additional await can leave its non-defaultable carrier
+uninitialized in the generated heap state machine. The sample avoids that extra
+suspension for its already-completed Closed result; no initialization checks were
+weakened. Track a focused hoisted-union fix if the next HTTP/echo case needs it.
+
+Validation: 31 targeted backend, VM, scheduler and service-analysis tests pass.
+The Raven client and both negative visibility checks pass with 914 allocations,
+22 collections and zero live objects; all 554 API/site pages and ten website
+regression checks pass. Validation is local macOS evidence.

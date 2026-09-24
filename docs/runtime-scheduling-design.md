@@ -57,7 +57,7 @@ relabelled as threads. No Task.Run overload or capture policy is selected by thi
 
 The [TCP VM adapter](experiments/socket-completion/VM-INTEGRATION.md) checks real input,
 managed-buffer roots, default-queue callback delivery, busy-queue progress, a pending
-worker and terminal cleanup. Its receive binding and socket poller exist only in test
+worker and terminal cleanup. At that original checkpoint, its receive binding and socket poller existed only in test
 builds. Production worker waits now return control to the invocation every bounded
 wait step. This is useful integration evidence, not a complete scheduler.
 
@@ -278,3 +278,10 @@ operation admission slots until taken. The source is normal runtime code; only h
 stream injection remains test-only. Public operation IDs, Task producers and error
 mapping are not exposed yet. This uses generated callbacks and the existing default
 queue adapter; no runtime suspension or new affinity behavior is introduced.
+
+
+The subsequent [public socket client](socket-api-design.md#first-public-tcp-client--2026-09-24)
+uses the same ready slot and default queue adapter. Connect and receive callbacks
+complete library-owned Promises with Result values; no compiler builder protocol is
+added. The private registry also owns pending native connects and retains their
+callbacks as roots. Application methods expose neither registry IDs nor callbacks.

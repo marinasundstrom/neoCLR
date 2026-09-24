@@ -6,6 +6,7 @@ use crate::{
 use unicode_segmentation::UnicodeSegmentation;
 
 pub(crate) enum Binding {
+    Socket(crate::socket_io::Operation),
     #[cfg(test)]
     TestSocketReceive,
     EnvironmentArguments,
@@ -187,6 +188,11 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.StringSliceUtf8", [Type::String, Type::Int32, Type::Int32]) => {
             (Binding::StringSliceUtf8, Type::Value)
         }
+        ("neoCLR.Runtime.SocketConnect", [Type::String, Type::Int32, callback]) if *callback == crate::assembler::parse_type("System.Func<Void>")? => (Binding::Socket(crate::socket_io::Operation::Connect), Type::Value),
+        ("neoCLR.Runtime.SocketReceive", [Type::Int64, buffer, Type::Int32, Type::Int32, callback]) if *buffer == crate::assembler::parse_type("arrayref<Byte>")? && *callback == crate::assembler::parse_type("System.Func<Void>")? => (Binding::Socket(crate::socket_io::Operation::Receive), Type::Value),
+        ("neoCLR.Runtime.SocketConnectResult", [Type::Int64]) => (Binding::Socket(crate::socket_io::Operation::ConnectResult), Type::Value),
+        ("neoCLR.Runtime.SocketReceiveResult", [Type::Int64]) => (Binding::Socket(crate::socket_io::Operation::ReceiveResult), Type::Value),
+        ("neoCLR.Runtime.SocketClose", [Type::Int64]) => (Binding::Socket(crate::socket_io::Operation::Close), Type::Value),
         ("neoCLR.Runtime.FileOpenRead", [Type::String]) => (
             Binding::FileResource(crate::file_streams::Operation::OpenRead),
             Type::Value,

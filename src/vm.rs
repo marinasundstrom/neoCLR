@@ -2772,6 +2772,14 @@ fn interpret_instructions(
                                 _ => return Err(Fault::new("String.Intern requires text")),
                             };
                             Value::String(interned.intern(text.clone()).map_err(|e| e.fault())?)
+                        } else if let crate::native::Binding::Socket(operation) = binding {
+                            if matches!(
+                                operation,
+                                crate::socket_io::Operation::Connect | crate::socket_io::Operation::Receive
+                            ) && default_task_queue.is_none() {
+                                return Err(Fault::new("Socket completion requires the default TaskQueue"));
+                            }
+                            scheduler.sockets.invoke(operation, &args, heap)?
                         } else if let crate::native::Binding::FileResource(operation) = binding {
                             files.invoke(operation, &args, &limits)?
                         } else if let crate::native::Binding::StartWorker(pooled) = binding {

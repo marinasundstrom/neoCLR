@@ -1,16 +1,18 @@
-//! Private owned TCP receive backend. Public addressing and Socket APIs are pending.
+//! Private owned TCP client backend behind the library Task/Result bridge.
 use crate::{Fault, ManagedHeap, Value, metadata::Type};
 use std::{
     collections::BTreeMap,
     io::{self, Read},
-    net::TcpStream,
+    net::{Ipv4Addr, SocketAddrV4, TcpStream},
     sync::atomic::{AtomicU64, Ordering},
 };
 
 static NEXT_ID: AtomicU64 = AtomicU64::new(1);
 fn next_id() -> Result<u64, Error> {
     NEXT_ID
-        .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+        .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| {
+            id.checked_add(1).filter(|next| *next <= i64::MAX as u64)
+        })
         .map_err(|_| Error::Limit)
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -28,6 +30,67 @@ pub(crate) enum Error {
     Limit,
     Cancelled,
     Io,
+    InvalidAddress,
+    ConnectionRefused,
+    ConnectionReset,
+    AccessDenied,
+    TimedOut,
+}
+impl From<io::Error> for Error {
+    fn from(error: io::Error) -> Self {
+        match error.kind() {
+            io::ErrorKind::ConnectionRefused => Self::ConnectionRefused,
+            io::ErrorKind::ConnectionReset | io::ErrorKind::BrokenPipe => Self::ConnectionReset,
+            io::ErrorKind::PermissionDenied => Self::AccessDenied,
+            io::ErrorKind::TimedOut => Self::TimedOut,
+            _ => Self::Io,
+        }
+    }
+}
+// Platform-specific pending-connect errno stays below the guest contract.
+fn connecting(error: &io::Error) -> bool {
+    if error.kind() == io::ErrorKind::WouldBlock {
+        return true;
+    }
+    #[cfg(unix)]
+    if error.raw_os_error() == Some(libc::EINPROGRESS) {
+        return true;
+    }
+    #[cfg(windows)]
+    if error.raw_os_error() == Some(10036) {
+        return true;
+    }
+    false
+}
+struct Connect {
+    stream: Option<TcpStream>,
+    callback: Option<Value>,
+    outcome: Option<Result<SocketId, Error>>,
+}
+#[derive(Clone, Copy)]
+pub(crate) enum Operation {
+    Connect,
+    ConnectResult,
+    Receive,
+    ReceiveResult,
+    Close,
+}
+fn payload(result: Result<Value, Error>) -> Value {
+    Value::Erased(Box::new(result.unwrap_or_else(|error| {
+        Value::Byte(match error {
+            Error::Closed => 1,
+            Error::Busy => 2,
+            Error::InvalidBuffer | Error::InvalidRange => 3,
+            Error::Limit => 4,
+            Error::Cancelled => 5,
+            Error::InvalidAddress => 6,
+            Error::ConnectionRefused => 7,
+            Error::ConnectionReset => 8,
+            Error::AccessDenied => 9,
+            Error::TimedOut => 10,
+            _ => 11,
+        })
+    })))
 }
 #[derive(Clone, Copy)]
 struct Budget {
@@ -55,28 +118,161 @@ struct Receive {
 pub(crate) struct Sockets {
     sockets: BTreeMap<SocketId, TcpStream>,
     operations: BTreeMap<OperationId, Receive>,
+    connects: BTreeMap<OperationId, Connect>,
     reserved: usize,
     budget: Budget,
+    receive_first: bool,
 }
 impl Default for Sockets {
     fn default() -> Self {
         Self {
             sockets: BTreeMap::new(),
             operations: BTreeMap::new(),
+            connects: BTreeMap::new(),
             reserved: 0,
             budget: Budget::default(),
+            receive_first: false,
         }
     }
 }
-// Admission/result methods are used by the test-only VM adapter until the public
-// library bridge is added. Polling and root ownership already use this backend.
+// Adoption and individual cancellation remain private fixture/prospective-provider
+// entry points; application code uses invoke through the library bridge.
 #[allow(dead_code)]
 impl Sockets {
-    pub(crate) fn adopt(&mut self, socket: TcpStream) -> Result<SocketId, Error> {
-        if self.sockets.len() >= self.budget.sockets {
+    fn connect(&mut self, address: &str, port: i32, callback: Value) -> Result<OperationId, Error> {
+        let address = address
+            .parse::<Ipv4Addr>()
+            .map_err(|_| Error::InvalidAddress)?;
+        let port = u16::try_from(port)
+            .ok()
+            .filter(|port| *port != 0)
+            .ok_or(Error::InvalidRange)?;
+        if !matches!(&callback, Value::Delegate(_))
+            || callback.ty() != crate::assembler::parse_type("System.Func<Void>").unwrap()
+        {
+            return Err(Error::InvalidCallback);
+        }
+        if self.operations.len() + self.connects.len() >= self.budget.operations
+            || self.sockets.len()
+                + self
+                    .connects
+                    .values()
+                    .filter(|op| op.stream.is_some())
+                    .count()
+                >= self.budget.sockets
+        {
             return Err(Error::Limit);
         }
-        socket.set_nonblocking(true).map_err(|_| Error::Io)?;
+        let id = OperationId(next_id()?);
+        let socket = socket2::Socket::new(
+            socket2::Domain::IPV4,
+            socket2::Type::STREAM,
+            Some(socket2::Protocol::TCP),
+        )
+        .map_err(Error::from)?;
+        socket.set_nonblocking(true).map_err(Error::from)?;
+        let outcome = match socket.connect(&SocketAddrV4::new(address, port).into()) {
+            Ok(()) => {
+                let socket_id = SocketId(next_id()?);
+                self.sockets.insert(socket_id, socket.into());
+                self.connects.insert(
+                    id,
+                    Connect {
+                        stream: None,
+                        callback: Some(callback),
+                        outcome: Some(Ok(socket_id)),
+                    },
+                );
+                return Ok(id);
+            }
+            Err(error) if connecting(&error) => None,
+            Err(error) => Some(Err(Error::from(error))),
+        };
+        let stream = if outcome.is_none() {
+            Some(socket.into())
+        } else {
+            None
+        };
+        self.connects.insert(
+            id,
+            Connect {
+                stream,
+                callback: Some(callback),
+                outcome,
+            },
+        );
+        Ok(id)
+    }
+    pub(crate) fn invoke(
+        &mut self,
+        operation: Operation,
+        args: &[Value],
+        heap: &ManagedHeap,
+    ) -> Result<Value, Fault> {
+        let result = match (operation, args) {
+            (Operation::Connect, [Value::String(address), Value::Int32(port), callback]) => self
+                .connect(address, *port, callback.clone())
+                .map(|id| Value::Int64(id.0 as i64)),
+            (
+                Operation::Receive,
+                [
+                    Value::Int64(socket),
+                    destination,
+                    Value::Int32(offset),
+                    Value::Int32(count),
+                    callback,
+                ],
+            ) => self
+                .receive(
+                    SocketId(*socket as u64),
+                    heap,
+                    destination.clone(),
+                    *offset,
+                    *count,
+                    callback.clone(),
+                )
+                .map(|id| Value::Int64(id.0 as i64)),
+            (Operation::Close, [Value::Int64(socket)]) => {
+                self.close(SocketId(*socket as u64));
+                Ok(Value::Void)
+            }
+            (Operation::ConnectResult, [Value::Int64(id)]) => {
+                let id = OperationId(*id as u64);
+                let op = self
+                    .connects
+                    .get(&id)
+                    .ok_or_else(|| Fault::new("Unknown socket connect operation"))?;
+                if op.callback.is_some() || op.outcome.is_none() {
+                    return Err(Fault::new("Socket connect result is not ready"));
+                }
+                self.connects
+                    .remove(&id)
+                    .unwrap()
+                    .outcome
+                    .unwrap()
+                    .map(|socket| Value::Int64(socket.0 as i64))
+            }
+            (Operation::ReceiveResult, [Value::Int64(id)]) => self
+                .take_result(OperationId(*id as u64))
+                .map_err(|_| Fault::new("Unknown socket receive operation"))?
+                .ok_or_else(|| Fault::new("Socket receive result is not ready"))?
+                .map(|count| Value::Int32(count as i32)),
+            _ => return Err(Fault::new("Invalid socket runtime service arguments")),
+        };
+        Ok(payload(result))
+    }
+    pub(crate) fn adopt(&mut self, socket: TcpStream) -> Result<SocketId, Error> {
+        if self.sockets.len()
+            + self
+                .connects
+                .values()
+                .filter(|op| op.stream.is_some())
+                .count()
+            >= self.budget.sockets
+        {
+            return Err(Error::Limit);
+        }
+        socket.set_nonblocking(true).map_err(Error::from)?;
         let id = SocketId(next_id()?);
         self.sockets.insert(id, socket);
         Ok(id)
@@ -123,7 +319,7 @@ impl Sockets {
             return Err(Error::InvalidCallback);
         }
         // Pending and completed-but-unconsumed operations occupy the same slots.
-        if self.operations.len() >= self.budget.operations {
+        if self.operations.len() + self.connects.len() >= self.budget.operations {
             return Err(Error::Limit);
         }
         let reserved = self
@@ -188,9 +384,15 @@ impl Sockets {
         Ok(self.operations.remove(&id).unwrap().outcome)
     }
     pub(crate) fn pending(&self) -> bool {
-        self.operations.values().any(|op| op.callback.is_some())
+        self.connects.values().any(|op| op.callback.is_some())
+            || self.operations.values().any(|op| op.callback.is_some())
     }
     pub(crate) fn trace_roots(&self, roots: &mut Vec<usize>) {
+        for op in self.connects.values() {
+            if let Some(callback) = &op.callback {
+                crate::gc::trace(callback, roots);
+            }
+        }
         for op in self.operations.values() {
             if let Some(destination) = &op.destination {
                 crate::gc::trace(destination, roots);
@@ -201,6 +403,56 @@ impl Sockets {
         }
     }
     pub(crate) fn poll(&mut self, heap: &ManagedHeap) -> Result<Option<Value>, Fault> {
+        let ready = if self.receive_first {
+            match self.poll_receive(heap)? {
+                Some(value) => Some(value),
+                None => self.poll_connect()?,
+            }
+        } else {
+            match self.poll_connect()? {
+                Some(value) => Some(value),
+                None => self.poll_receive(heap)?,
+            }
+        };
+        if ready.is_some() {
+            self.receive_first = !self.receive_first;
+        }
+        Ok(ready)
+    }
+    fn poll_connect(&mut self) -> Result<Option<Value>, Fault> {
+        for op in self.connects.values_mut() {
+            if op.callback.is_none() {
+                continue;
+            }
+            if op.outcome.is_none() {
+                let stream = op.stream.as_ref().expect("pending connection owns stream");
+                let status = match stream.take_error() {
+                    Ok(Some(error)) | Err(error) => Err(Error::from(error)),
+                    Ok(None) => match stream.peer_addr() {
+                        Ok(_) => Ok(()),
+                        Err(error)
+                            if matches!(
+                                error.kind(),
+                                io::ErrorKind::NotConnected | io::ErrorKind::WouldBlock
+                            ) =>
+                        {
+                            continue;
+                        }
+                        Err(error) => Err(Error::from(error)),
+                    },
+                };
+                op.outcome = Some(status.and_then(|()| {
+                    let id = SocketId(next_id()?);
+                    self.sockets.insert(id, op.stream.take().unwrap());
+                    Ok(id)
+                }));
+                op.stream = None;
+            }
+            return Ok(op.callback.take());
+        }
+        Ok(None)
+    }
+    fn poll_receive(&mut self, heap: &ManagedHeap) -> Result<Option<Value>, Fault> {
         for op in self.operations.values_mut() {
             if op.callback.is_none() {
                 continue;
@@ -224,7 +476,7 @@ impl Sockets {
                     {
                         continue;
                     }
-                    Err(_) => Err(Error::Io),
+                    Err(error) => Err(Error::from(error)),
                     Ok(count) => {
                         let Some(Value::ObjectReference(object)) = &op.destination else {
                             unreachable!()
@@ -301,6 +553,211 @@ mod tests {
             assert!(Instant::now() < deadline, "receive watchdog");
             std::thread::sleep(Duration::from_millis(1));
         }
+    }
+
+    fn connect_result(sockets: &mut Sockets, heap: &ManagedHeap, id: OperationId) -> Value {
+        sockets
+            .invoke(Operation::ConnectResult, &[Value::Int64(id.0 as i64)], heap)
+            .unwrap()
+    }
+    #[test]
+    fn ready_connects_do_not_starve_ready_receives() {
+        let (_, stream) = pair();
+        let mut sockets = Sockets::default();
+        let mut heap = ManagedHeap::default();
+        let socket = sockets.adopt(stream).unwrap();
+        let buffer = array(&mut heap);
+        let read = sockets
+            .receive(socket, &heap, buffer, 0, 0, callback())
+            .unwrap();
+        for _ in 0..2 {
+            sockets.connects.insert(
+                OperationId(next_id().unwrap()),
+                Connect {
+                    stream: None,
+                    callback: Some(callback()),
+                    outcome: Some(Err(Error::Io)),
+                },
+            );
+        }
+        assert!(sockets.poll(&heap).unwrap().is_some());
+        assert!(sockets.operations[&read].callback.is_some());
+        assert!(sockets.poll(&heap).unwrap().is_some());
+        assert!(sockets.operations[&read].callback.is_none());
+        assert_eq!(
+            sockets
+                .connects
+                .values()
+                .filter(|op| op.callback.is_some())
+                .count(),
+            1
+        );
+    }
+
+    #[test]
+    fn public_connect_receive_bridge_consumes_results_and_closes() {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let mut sockets = Sockets::default();
+        let mut heap = ManagedHeap::default();
+        let id = sockets
+            .connect(
+                "127.0.0.1",
+                listener.local_addr().unwrap().port().into(),
+                callback(),
+            )
+            .unwrap();
+        assert!(
+            sockets
+                .invoke(
+                    Operation::ConnectResult,
+                    &[Value::Int64(id.0 as i64)],
+                    &heap
+                )
+                .is_err()
+        );
+        deliver(&mut sockets, &heap);
+        let Value::Erased(result) = connect_result(&mut sockets, &heap, id) else {
+            panic!()
+        };
+        let Value::Int64(handle) = *result else {
+            panic!("{result:?}")
+        };
+        assert!(
+            sockets
+                .invoke(
+                    Operation::ConnectResult,
+                    &[Value::Int64(id.0 as i64)],
+                    &heap
+                )
+                .is_err()
+        );
+        let mut peer = listener.accept().unwrap().0;
+        peer.set_read_timeout(Some(Duration::from_secs(5))).unwrap();
+        let buffer = array(&mut heap);
+        let operation = sockets
+            .receive(
+                SocketId(handle as u64),
+                &heap,
+                buffer.clone(),
+                1,
+                2,
+                callback(),
+            )
+            .unwrap();
+        peer.write_all(b"Hi").unwrap();
+        deliver(&mut sockets, &heap);
+        assert_eq!(
+            sockets
+                .invoke(
+                    Operation::ReceiveResult,
+                    &[Value::Int64(operation.0 as i64)],
+                    &heap
+                )
+                .unwrap(),
+            Value::Erased(Box::new(Value::Int32(2)))
+        );
+        assert_eq!(
+            bytes(&heap, &buffer),
+            vec![
+                Value::Byte(9),
+                Value::Byte(72),
+                Value::Byte(105),
+                Value::Byte(9)
+            ]
+        );
+        sockets
+            .invoke(Operation::Close, &[Value::Int64(handle)], &heap)
+            .unwrap();
+        assert_eq!(peer.read(&mut [0]).unwrap(), 0);
+        assert!(
+            sockets.operations.is_empty()
+                && sockets.connects.is_empty()
+                && sockets.sockets.is_empty()
+        );
+    }
+    #[test]
+    fn connect_validation_and_shared_quotas_are_transactional() {
+        let mut sockets = Sockets::default();
+        let heap = ManagedHeap::default();
+        assert_eq!(
+            sockets.connect("localhost", 80, callback()),
+            Err(Error::InvalidAddress)
+        );
+        assert_eq!(
+            sockets.connect("::1", 80, callback()),
+            Err(Error::InvalidAddress)
+        );
+        for port in [-1, 0, 65536] {
+            assert_eq!(
+                sockets.connect("127.0.0.1", port, callback()),
+                Err(Error::InvalidRange)
+            );
+        }
+        assert_eq!(
+            sockets.connect("127.0.0.1", 80, Value::Void),
+            Err(Error::InvalidCallback)
+        );
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = listener.local_addr().unwrap().port().into();
+        sockets.budget.sockets = 1;
+        sockets.budget.operations = 1;
+        let first = sockets.connect("127.0.0.1", port, callback()).unwrap();
+        assert_eq!(
+            sockets.connect("127.0.0.1", port, callback()),
+            Err(Error::Limit)
+        );
+        deliver(&mut sockets, &heap);
+        assert_eq!(
+            sockets.connect("127.0.0.1", port, callback()),
+            Err(Error::Limit)
+        );
+        assert!(sockets.poll(&heap).unwrap().is_none());
+        let Value::Erased(result) = connect_result(&mut sockets, &heap, first) else {
+            panic!()
+        };
+        let Value::Int64(socket) = *result else {
+            panic!()
+        };
+        sockets.close(SocketId(socket as u64));
+        assert!(sockets.connect("127.0.0.1", port, callback()).is_ok());
+    }
+    #[test]
+    fn refused_connect_releases_socket_slot_but_retains_result_until_consumed() {
+        // Select an ephemeral loopback port, then release it so the kernel refuses connect.
+        // Keeping it bound without listen can silently drop SYN on macOS.
+        let reserved = socket2::Socket::new(
+            socket2::Domain::IPV4,
+            socket2::Type::STREAM,
+            Some(socket2::Protocol::TCP),
+        )
+        .unwrap();
+        reserved
+            .bind(
+                &"127.0.0.1:0"
+                    .parse::<std::net::SocketAddr>()
+                    .unwrap()
+                    .into(),
+            )
+            .unwrap();
+        let port = reserved
+            .local_addr()
+            .unwrap()
+            .as_socket()
+            .unwrap()
+            .port()
+            .into();
+        drop(reserved);
+        let mut sockets = Sockets::default();
+        let heap = ManagedHeap::default();
+        let id = sockets.connect("127.0.0.1", port, callback()).unwrap();
+        deliver(&mut sockets, &heap);
+        assert!(sockets.sockets.is_empty());
+        assert!(sockets.connects[&id].stream.is_none());
+        assert_eq!(
+            connect_result(&mut sockets, &heap, id),
+            Value::Erased(Box::new(Value::Byte(7)))
+        );
+        assert!(sockets.connects.is_empty());
     }
 
     #[test]

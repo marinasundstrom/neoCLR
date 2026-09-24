@@ -173,7 +173,13 @@ collection during a pending read, callback delivery while the queue remains busy
 and completion alongside a pending worker. The host-connection injection service exists only in test builds. The private receive
 backend now retains reusable connections and accounts for pending and completed read
 results separately. It supports cancellation before reading without closing the
-connection. This still does not provide a public Socket API or Task-based network I/O.
+connection.
+
+The first public development [TCP client API](/docs/sockets.html) now connects to
+numeric IPv4 addresses and receives bytes through `Task<Result<...>>`. Pending
+buffers and completion objects are traced until delivery. It uses nonblocking
+sockets and the private scheduler, with the current generated async state machines.
+Send and listener/accept are still pending; this is not yet a complete networking API.
 
 **Development after Preview 9:** explicit thread APIs move to `System.Concurrency`; Task and Promise stay in `System.Tasks`. A retained `Thread(callback, input)` exposes a pending `Task` before instance `Start()`. Starting twice faults. `Thread.Run(callback, input)` is the immediate-start shortcut. Both retain the current isolated string callback restriction; successful completion includes native thread termination. These changes require matching development artifacts and are not in the Preview 9 downloads.
 

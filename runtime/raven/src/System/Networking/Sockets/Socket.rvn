@@ -1,0 +1,128 @@
+namespace System.Networking.Sockets
+
+import System.*
+import System.Result.*
+import System.Tasks.*
+import System.Runtime.CompilerServices.*
+
+public class Socket {
+    private field handle: long
+
+    internal init(handle: long) {
+        self.handle = handle
+    }
+
+    static func Connect(address: string, port: int) -> Task<Result<Socket, SocketError>> {
+        let source = Promise<Result<Socket, SocketError>>()
+        let completion = SocketConnectCompletion(source)
+        completion.Start(address, port)
+        return source.Task
+    }
+
+    func Receive(buffer: byte[], offset: int, count: int) -> Task<Result<int, SocketError>> {
+        let source = Promise<Result<int, SocketError>>()
+        let completion = SocketReceiveCompletion(source)
+        completion.Start(handle, buffer, offset, count)
+        return source.Task
+    }
+
+    func Close() {
+        _ = RuntimeServices.SocketClose(handle)
+    }
+
+    internal static func DecodeError(code: byte) -> SocketError {
+        if code == 1 {
+            return SocketError.Closed()
+        }
+        if code == 2 {
+            return SocketError.Busy()
+        }
+        if code == 3 {
+            return SocketError.InvalidRange()
+        }
+        if code == 4 {
+            return SocketError.LimitExceeded()
+        }
+        if code == 5 {
+            return SocketError.Cancelled()
+        }
+        if code == 6 {
+            return SocketError.InvalidAddress()
+        }
+        if code == 7 {
+            return SocketError.ConnectionRefused()
+        }
+        if code == 8 {
+            return SocketError.ConnectionReset()
+        }
+        if code == 9 {
+            return SocketError.AccessDenied()
+        }
+        if code == 10 {
+            return SocketError.TimedOut()
+        }
+        if code == 11 {
+            return SocketError.IoFailure()
+        }
+        System.Fault("invalid native socket error")
+        return SocketError.IoFailure()
+    }
+}
+
+internal class SocketConnectCompletion {
+    private field source: Promise<Result<Socket, SocketError>>
+    private field operation: long
+
+    internal init(source: Promise<Result<Socket, SocketError>>) {
+        self.source = source
+        operation = 0
+    }
+
+    internal func Start(address: string, port: int) {
+        _ = TaskQueue.Default
+        let payload = RuntimeServices.SocketConnect(address, port, self.Complete)
+        if RuntimeServices.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        } else {
+            operation = RuntimeServices.UnpackValue<long>(payload)
+        }
+    }
+
+    internal func Complete() {
+        let payload = RuntimeServices.SocketConnectResult(operation)
+        if RuntimeServices.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        } else {
+            _ = source.Complete(Ok(Socket(RuntimeServices.UnpackValue<long>(payload))))
+        }
+    }
+}
+
+internal class SocketReceiveCompletion {
+    private field source: Promise<Result<int, SocketError>>
+    private field operation: long
+
+    internal init(source: Promise<Result<int, SocketError>>) {
+        self.source = source
+        operation = 0
+    }
+
+    internal func Start(handle: long, buffer: byte[], offset: int, count: int) {
+        _ = TaskQueue.Default
+        let payload = RuntimeServices.SocketReceive(handle, buffer, offset, count, self.Complete)
+        if RuntimeServices.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        } else {
+            operation = RuntimeServices.UnpackValue<long>(payload)
+        }
+    }
+
+    internal func Complete() {
+        let payload = RuntimeServices.SocketReceiveResult(operation)
+        if RuntimeServices.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        } else {
+            _ = source.Complete(Ok(RuntimeServices.UnpackValue<int>(payload)))
+        }
+    }
+}

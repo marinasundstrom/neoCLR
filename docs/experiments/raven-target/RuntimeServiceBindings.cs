@@ -10,6 +10,11 @@ static class RuntimeServiceBindings
     static readonly (string Name, string[] Args, string Result)[] Members =
         UnaryMath.Select(n => ("Math" + n, new[] { "Double" }, "Double"))
         .Concat(BinaryMath.Select(n => ("Math" + n, new[] { "Double", "Double" }, "Double"))).Concat(new (string Name, string[] Args, string Result)[] {
+            ("SocketConnect", ["String", "Int32", "System.Func<Void>"], "Value"),
+            ("SocketConnectResult", ["Int64"], "Value"),
+            ("SocketReceive", ["Int64", "arrayref<Byte>", "Int32", "Int32", "System.Func<Void>"], "Value"),
+            ("SocketReceiveResult", ["Int64"], "Value"),
+            ("SocketClose", ["Int64"], "Value"),
             ("StorageList", ["String", "Int32"], "Value"),
             ("StorageNames", ["Value"], "arrayref<String>"),
             ("StorageKind", ["String"], "Value"),

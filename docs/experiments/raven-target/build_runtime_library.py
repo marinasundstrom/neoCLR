@@ -10,6 +10,8 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    "SocketError": "System.Networking.Sockets.SocketError",
+    "Socket": "System.Networking.Sockets.Socket",
     'TextReadError': 'System.IO.TextReadError',
     'TextReader': 'System.IO.TextReader',
     'TextWriter': 'System.IO.TextWriter',
@@ -121,6 +123,8 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    "SocketError": "runtime/raven/src/System/Networking/Sockets/SocketError.rvn",
+    "Socket": "runtime/raven/src/System/Networking/Sockets/Socket.rvn",
     'TextReadError': 'runtime/raven/src/System/IO/TextReadError.rvn',
     'TextReader': 'runtime/raven/src/System/IO/TextReader.rvn',
     'TextWriter': 'runtime/raven/src/System/IO/TextWriter.rvn',

@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add the first development System.Networking.Sockets client: Socket.Connect and
+  Receive return Task<Result<...>>, with typed SocketError and idempotent Close.
+  Numeric IPv4 TCP uses nonblocking native operations and the private scheduler;
+  pending callbacks/buffers are traced and results consumed once. Add a Raven greeting
+  sample and on-site API reference. Send, listener/accept, DNS, IPv6, per-operation
+  cancellation and runtime suspension remain pending. Record TcpClient/UdpClient as
+  later convenience-layer candidates, not prerequisites or implemented APIs.
+  All 31 targeted runtime checks, the Raven client/visibility checks and 554-page
+  website build pass. Keep the existing hoisted-Result-across-await limitation
+  explicit; this slice does not relax initialization checks or implement suspension.
+
 - Add a private reusable TCP receive registry behind the invocation scheduler.
   Separate connection/read lifetimes, preserve connections on read cancellation,
   retain completed results within admission quotas until consumed, and reject

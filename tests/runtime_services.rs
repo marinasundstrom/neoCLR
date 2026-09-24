@@ -182,3 +182,22 @@ fn worker_notification_requires_worker_and_dispatch_services() {
         });
     }
 }
+
+#[test]
+fn socket_submission_requires_socket_and_dispatch_services() {
+    let module = assemble(concat!(
+        ".module System\n",
+        include_str!("../runtime/raven/generated/Func.methods.neoil"),
+        include_str!("../runtime/neoCLR/Runtime/Sockets.neoil")
+    )).unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    for signature in ["SocketConnect(String,Int32,System.Func<Void>)", "SocketReceive(Int64,arrayref<Byte>,Int32,Int32,System.Func<Void>)"] {
+        let graph = program.analyze_reachability(&[parse_function_ref(&format!("neoCLR.Runtime.{signature}")).unwrap()], 1).unwrap();
+        assert!(graph.required_services().contains(&Service::SocketIo));
+        assert!(graph.required_services().contains(&Service::TaskDispatch));
+        assert!(!graph.required_services().contains(&Service::IsolatedWorkers));
+    }
+    let graph = program.analyze_reachability(&[parse_function_ref("neoCLR.Runtime.SocketClose(Int64)").unwrap()], 1).unwrap();
+    assert!(graph.required_services().contains(&Service::SocketIo));
+    assert!(!graph.required_services().contains(&Service::TaskDispatch));
+}

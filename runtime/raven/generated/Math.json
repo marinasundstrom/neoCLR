@@ -2,6 +2,8 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Math",
   "inputs": {
+    "runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "37dde67dc4a25ed1f2b66b28cc2d6250ed002fa2442b5b757f49b98a98b63dbb",
+    "runtime/raven/src/System/Networking/Sockets/Socket.rvn": "11f8020c774a249ad3a997ccd3189d87f95d3ac0e9f3c6395c5d383be39f71ca",
     "runtime/raven/src/System/IO/TextReadError.rvn": "bd5cc31983f8aaa1b7e4a68fe63d06e45166e8a3c0c9537673a1ebab09d3659c",
     "runtime/raven/src/System/IO/TextReader.rvn": "6f9f6159741cec9acaded9e5b2705d3c1beaac4fa3fbb1be8a2146f18f575ce0",
     "runtime/raven/src/System/IO/TextWriter.rvn": "ee053d0893f533207e580eba37509aca9284dd0c37d13dff1941a2485b506fec",
@@ -105,7 +107,7 @@
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
-    "runtime/raven/System.Runtime.rvnproj": "86fdce720912de17cf0f5044a78cf15646383c27efe075456bd39b4140bd8d86",
+    "runtime/raven/System.Runtime.rvnproj": "9e01d2502004e0529e525434c7df777068da71059ca23acd1e7c59588e10ef21",
     "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
@@ -113,7 +115,7 @@
     "Math.helpers.neoil": "c2d506c3773bf642d4b74c1f387cd467493072649aa2f217a0fd59bfa5729cc5"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "138c9f6fbfc2955cee00b12168c5bcc5aa184d25f95ea8001ab74ed173085a3a",
+  "coreSha256": "e6d36ae60096d2e0bcbcbada0e11bf4f54c91ac64990de804d3d5bc9c1a5ea0c",
   "exports": [
     "Abs(Int32 value) -> System.Result<Int32,System.OverflowError>",
     "Min(Int32 left,Int32 right) -> Int32",
