@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Extend the development union projector/importer to matched nongeneric sequential
+  payload families. Verify an HttpError library prototype with URI/DNS/socket causes
+  and text payloads, separate consumer compilation, copies/boxing/GC, and rejection
+  of changed payloads and overlapping layouts. Keep private single-argument
+  conversions at their validated call sites. Generic companions remain unsupported;
+  public HTTP signatures are unchanged in this bridge checkpoint. Record the
+  token-aware Send primitive and Get/GetString layering as the HTTP integration
+  target, with cancellation behavior still to be implemented. Record BaseUri as
+  planned optional string configuration: relative verb addresses with a base,
+  absolute addresses without one.
+
 - Add development System.Enum.GetNames/GetValues helpers with both TypeInfo and
   constrained generic overloads; typed values preserve enum identity. Add
   TypeInfo.GetEnumValues snapshots and shared unsigned ordering with aliases.

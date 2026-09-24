@@ -7,6 +7,76 @@ with handlers attaching behavior to the request/response pipeline. The executabl
 HttpResponse and HttpContent separate from transport. They are now provisional System.Web.Http runtime-library APIs with generated reference
 coverage. This is not a completed web application milestone.
 
+## Core request contract — author direction, 2026-09-25
+
+The integration target is:
+
+```text
+Send(request: HttpRequest, cancellationToken: CancellationToken)
+    -> Task<Result<HttpResponse, HttpError>>
+```
+
+`Send` is the fundamental client operation. `Get` and later verb helpers construct
+requests and delegate through it; `GetString` additionally reads/decodes the response
+body. String and Uri overloads share request construction and BaseUri resolution.
+The handler boundary must carry the same token so decorators and replacement
+transports participate in cancellation. Convenience methods must not bypass that
+pipeline or create a separate transport implementation.
+
+This follows the operation split in .NET 10's
+[SendAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.sendasync?view=net-10.0)
+and [GetStringAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.getstringasync?view=net-10.0)
+(reviewed 2026-09-25), adapting expected failures to Result and retaining neoCLR's
+Send naming. .NET's GetStringAsync also rejects non-success status codes; neoCLR's
+convenience-method status policy still needs an explicit choice and test. A received
+HTTP error response and a transport failure must remain distinguishable.
+
+**Implementation gap:** the current client and handler still expose tokenless
+Send with string errors. Tasks have a cancellation outcome, but the library has no
+public CancellationToken. The new signature is a target, not a shipped overload.
+Define cooperative cancellation at the operation-owner boundary, including behavior
+before dispatch, during DNS/connect/transfer, completion races and socket cleanup.
+Decide explicitly whether observed cancellation uses the task cancellation outcome
+or an HttpError case; do not silently provide both channels for the same event.
+This does not require implementing runtime suspension or a new scheduler now.
+
+Validation must exercise a replacement handler, token forwarding through decorated
+handlers, Get/GetString delegation, typed error preservation, decoding failures,
+pre-cancelled requests and cancellation of an in-flight exchange with resources
+reclaimed. Keep URI/error integration moving; the broader cancellation infrastructure
+is not a reason to expand into unrelated task redesign.
+
+## Optional base address — author direction, 2026-09-25
+
+Keep the current `BaseUri` spelling for the planned property, with `Option<string>`
+(the library's optional-value type), rather than requiring a Uri object as
+configuration. The author described this as `BaseUrl/BaseUri: Optional<string>`.
+
+| BaseUri | Verb-method address | Construction |
+| --- | --- | --- |
+| None | Absolute URI | Validate and use the supplied absolute address |
+| Some(absolute base URL) | Relative URL | Parse and resolve against the base |
+
+For example, base `http://localhost:8080/api/` and relative `items` resolve to
+`http://localhost:8080/api/items`. With no base configured, callers supply the full
+`http://localhost:8080/api/items`. A relative address without a base is an error.
+With a base configured, the expected input is relative; do not add an implicit
+absolute-address override as part of this slice. This supersedes the earlier
+proposed absolute-override test. Retain the requested string/Uri overloads for
+addresses, applying the same addressing rules to each.
+
+Use the existing Uri parser/resolver internally rather than string concatenation.
+Trailing-slash, parent-path, root-relative and query-only resolution need explicit
+samples and tests. Invalid base configuration or a mismatched address kind must be
+reported before handler dispatch. The exact validation API/error cases remain
+implementation work; no setter exceptions or silent base fallback are implied.
+
+.NET's [BaseAddress](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.baseaddress?view=net-10.0)
+uses a Uri property. This planned adaptation keeps string configuration convenient
+and models absence explicitly, at the cost of validating text at the HTTP boundary.
+The user-directed addressing rule is narrower than .NET's ability to accept an
+absolute request address even with a base configured.
+
 ## Comparison and provisional choice
 
 .NET 10's [HttpMessageHandler](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpmessagehandler?view=net-10.0)

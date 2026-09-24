@@ -1,6 +1,6 @@
 using Mono.Cecil;
 
-// Bounded bootstrap path for standard-syntax unions with empty cases. The selected
+// Bounded bootstrap path for nongeneric standard-syntax unions. The selected
 // reference family must match; application namespaces alone never authorize aliasing.
 static class StandardUnionLibrary
 {
@@ -24,16 +24,16 @@ static class StandardUnionLibrary
             throw new InvalidDataException("Unsupported standard union protocol.");
     }
 
-    public static bool IsCandidate(TypeDefinition type) => type.IsExplicitLayout
+    public static bool IsCandidate(TypeDefinition type) => type.IsValueType
         && type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute"
             && RuntimeSignatures.IsCore(a.AttributeType.Scope));
 
     public static MethodDefinition[] Roots(TypeDefinition source, TypeDefinition reference)
     {
-        if (!ApplicationTypes.IsEmptyCaseUnion(source) || !ApplicationTypes.IsEmptyCaseUnion(reference)
+        if (!ApplicationTypes.IsStandardLibraryUnion(source) || !ApplicationTypes.IsStandardLibraryUnion(reference)
             || source.FullName != reference.FullName)
             throw new InvalidDataException("Unsupported standard union library shape.");
-        if (!RavenUnionMetadata.ValidateEmptyCases(source).SequenceEqual(RavenUnionMetadata.ValidateEmptyCases(reference)))
+        if (!RavenUnionMetadata.ValidateNestedCases(source).SequenceEqual(RavenUnionMetadata.ValidateNestedCases(reference)))
             throw new InvalidDataException("Raven union case metadata does not match reference contract.");
         const string protocolName = ProtocolName;
         var protocol = source.Interfaces.SingleOrDefault(i => i.InterfaceType.FullName == protocolName)?.InterfaceType.Resolve()

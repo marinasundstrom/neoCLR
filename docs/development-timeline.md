@@ -6920,3 +6920,36 @@ configuration/content, not target-specific code added to Raven main.
   TaskOutcome projection blockers explicit, then resume the HTTP error/URI pipeline.
   Those generic carriers are not claimed migrated and do not automatically become a
   prerequisite for the author-directed HTTP work.
+
+
+- **HTTP follow-through:** the assistant extends the bounded library projector to
+  a normal nongeneric sequential HttpError prototype with URI, DNS, socket and text
+  payloads. A separate Raven consumer compiles; imported library methods execute
+  extraction/default/copy/boxing checks (101 allocations, four collections, no live
+  objects). It fixes a private-helper conversion wrapper without relaxing visibility.
+  Payload mismatches and overlapping layouts are rejected. This completes a bridge
+  prerequisite; public HttpClient/handler/server signatures still need integration.
+
+### 2026-09-25 — HttpClient's fundamental operation
+
+- **Author direction:** specifies Send(HttpRequest, CancellationToken) returning
+  Task<Result<HttpResponse, ...>> as the basic operation, with Get, other methods
+  and GetString as variants.
+- **Assistant response:** adopts this as the integration target, using the planned
+  HttpError union and routing convenience methods through the handler pipeline.
+  Inspection finds task cancellation outcomes but no public CancellationToken.
+  Records cancellation forwarding/cleanup and convenience-method validation in the
+  [HTTP design](http-client-design.md#core-request-contract--author-direction-2026-09-25).
+- **Still open:** cancellation outcome versus HttpError representation, GetString
+  non-success status policy and implementation of the token-aware overloads. The
+  payload-union bridge checks pass; the public HTTP surface is still tokenless and
+  string-error-based at this checkpoint.
+
+- **Author base-address clarification:** BaseUrl/BaseUri should be Optional<string>.
+  Verb methods construct URLs from it when set and expect relative URLs in that
+  mode; without a base, callers use absolute URIs.
+- **Assistant response/action:** records Option<string>, the existing library type,
+  retaining BaseUri as the working name. Updates the HTTP/URI design and roadmap;
+  replaces the earlier planned absolute-override test with the stated two-mode
+  contract. Uri remains useful internally for parsing/resolution and as an address
+  overload. Implementation and exact error cases remain pending.

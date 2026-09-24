@@ -31,7 +31,7 @@ static class ErrorBindings
         foreach (var (name, cases) in Cases)
             if (core.GetType(name) is { } type && ApplicationTypes.IsEmptyCaseUnion(type))
             {
-                var metadata = RavenUnionMetadata.ValidateEmptyCases(type);
+                var metadata = RavenUnionMetadata.ValidateNestedCases(type);
                 if (!metadata.Select(c => c.Name).SequenceEqual(cases))
                     throw new InvalidDataException("Unexpected standard error case catalog: " + name);
                 Standard.Add(name);

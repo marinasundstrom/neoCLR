@@ -37,13 +37,13 @@ static class RavenUnionMetadata
         return name;
     }
 
-    public static Case[] ValidateEmptyCases(TypeDefinition carrier)
+    public static Case[] ValidateNestedCases(TypeDefinition carrier)
     {
         var cases = Cases(carrier);
         if (CompanionTarget(carrier) is not null || cases.Length != carrier.NestedTypes.Count
             || cases.Where((c, i) => c.Ordinal != i || !carrier.NestedTypes.Any(t =>
                 t.FullName.Replace('/', '+') == c.MetadataName && t.Name == c.Name)).Any())
-            throw new InvalidDataException("Raven union case metadata does not describe the empty-case family.");
+            throw new InvalidDataException("Raven union case metadata does not describe the nongeneric case family.");
         return cases;
     }
 }

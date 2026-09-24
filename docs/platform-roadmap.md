@@ -868,12 +868,20 @@ Boolean.FalseString/TrueString and further Enum flags helpers are recorded follo
 not prerequisites for HTTP. Grapheme Char should not receive UTF-16 bounds. The future Error interface
 for diagnostics, composition and decoration remains a proposal, without current
 stack capture or wrapper contracts. Raven case/companion metadata remains a provisional bridge concern,
-not a runtime dependency or a standardized platform case map. Generic and
-payload-bearing class-library projection still need validation; the application
-[source-union probe](experiments/http-error-unions/README.md) does not establish that
-broader library support. After the migration batch, resume typed HTTP errors and
-string/Uri BaseUri request resolution rather than extending the manual carrier catalog.
-Handler/server cancellation ownership and public JSON contracts remain later work. The [JSON report](experiments/http-json/README.md) now passes between two
+not a runtime dependency or a standardized platform case map. The [nongeneric payload-library probe](experiments/http-error-unions/README.md#nongeneric-payload-bearing-library-projection)
+now projects a sequential HttpError prototype, compiles a separate consumer and
+executes imported payload bodies under GC pressure. Generic companion projection
+and nonempty overlapping layouts remain rejected. The migration batch is closed
+for applicable nongeneric families. Next integrate typed HTTP errors into public
+client/handler/server contracts, then string/Uri overloads and BaseUri resolution;
+do not extend the manual carrier catalog.
+The author's 2026-09-25 HTTP contract makes
+`Send(HttpRequest, CancellationToken) -> Task<Result<HttpResponse, HttpError>>` the
+client primitive; Get, later verb helpers and GetString layer on it through the
+same handler pipeline. Token propagation and operation cleanup are part of this
+integration target; public CancellationToken is not implemented yet. See the
+[contract and validation gates](http-client-design.md#core-request-contract--author-direction-2026-09-25).
+Server cancellation ownership and public JSON contracts remain later work. The [JSON report](experiments/http-json/README.md) now passes between two
 neoCLR applications and independent peers; it does not promote a public JSON API. The
 [HTTP sample](experiments/http-client/README.md) imports development System.Web.Http
 client, request/response/content and handler APIs; the bounded GET/200 client is the
@@ -889,10 +897,14 @@ now uses Listen/Accept on the server and the hostname client on the other side. 
 Dns.GetHostAddresses with Task/Result and a read-only IPv4 address sequence over the
 [bounded resolver](socket-api-design.md#public-hostname-lookup-and-networking-poc--2026-09-24).
 Immediate author direction (2026-09-24): complete Uri, HttpError and
-HttpClient.BaseUri, retaining string and Uri request overloads. This takes priority
-over further cancellation exploration. The [managed Uri slice](uri-design.md) adds
+HttpClient.BaseUri, retaining string and Uri request overloads. The 2026-09-25 Send direction adds client token propagation to this scope, without
+reprioritizing broader scheduler or runtime-suspension exploration. The [managed Uri slice](uri-design.md) adds
 bounded ASCII parsing, RFC reference resolution and lexical value semantics; typed
-HTTP errors and BaseUri request integration follow. Parameterless HttpClient already
+HTTP errors and BaseUri request integration follow. The author clarifies on
+2026-09-25 that BaseUri is an optional string (Option<string>): when configured,
+verb methods expect relative URLs and resolve them against that base; otherwise,
+they take absolute URIs. Keep Uri parsing internal to validation/resolution and
+retain string/Uri address overloads. Parameterless HttpClient already
 selects the socket handler. IPv4Address/IPv6Address and HostEntry remain later
 networking evaluations, not requirements to replace all strings now. Author-directed
 later work also includes URI/URL encoding utilities, with component-specific

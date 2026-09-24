@@ -15,9 +15,9 @@ static class StandardUnionReference
         var module = core.MainModule;
         var originals = module.AssemblyReferences.ToHashSet();
         var root = source.MainModule.GetType(owner) ?? throw new InvalidDataException("Missing source union.");
-        if (!ApplicationTypes.IsEmptyCaseUnion(root))
-            throw new InvalidDataException("Only standard empty-case unions can be projected.");
-        RavenUnionMetadata.ValidateEmptyCases(root);
+        if (!ApplicationTypes.IsStandardLibraryUnion(root))
+            throw new InvalidDataException("Only supported nongeneric standard unions can be projected.");
+        RavenUnionMetadata.ValidateNestedCases(root);
         var supportNames = new[] { StandardUnionLibrary.ProtocolName, RavenUnionMetadata.CaseAttribute };
         var selected = new[] { root }.Concat(root.NestedTypes).Concat(supportNames
             .Where(name => module.GetType(name) is null).Select(name => source.MainModule.GetType(name)

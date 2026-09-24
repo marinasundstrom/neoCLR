@@ -85,10 +85,14 @@ IP literals, canonicalization and convenience members need their own use cases.
    inspectable lower-level causes where useful; malformed protocol data, unsupported
    features, resource limits and exchange timeout must be distinguishable. Content
    decoding failures remain separate from obtaining the response bytes.
-2. Add BaseUri and string/Uri request overloads. Validate configuration and resolve
+2. Add BaseUri as Option<string> and retain string/Uri request overloads, following
+   the author's 2026-09-25 clarification. When set, verb helpers expect relative
+   addresses; without it, they require absolute addresses. Validate and resolve
    before dispatch; handlers receive a resolved request. Check ordinary relative,
-   root-relative, query-only and absolute overrides with a fake handler and a real
-   loopback peer. Keep parameterless HttpClient construction.
+   root-relative and query-only resolution, missing/invalid base and mismatched
+   address kinds with a fake handler and a real loopback peer. Absolute overrides
+   of a configured base are no longer the integration target. Keep parameterless
+   HttpClient construction. See the [base-address contract](http-client-design.md#optional-base-address--author-direction-2026-09-25).
 3. Update the sample and generated API reference together with each contract change.
 
 These following APIs are not implemented by the Uri slice. Public signatures and

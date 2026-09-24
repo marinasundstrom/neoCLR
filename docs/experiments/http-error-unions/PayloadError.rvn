@@ -1,0 +1,22 @@
+namespace System.Web.Http
+
+import System.*
+import System.Networking.*
+import System.Networking.Sockets.*
+
+public union HttpError {
+    case InvalidUri(reason: UriError)
+    case NameResolution(reason: DnsError)
+    case Transport(reason: SocketError)
+    case Protocol(message: string)
+
+    override func ToString() -> string {
+        return match self {
+            InvalidUri(let reason) => reason.ToString()
+            NameResolution(let reason) => reason.ToString()
+            Transport(let reason) => reason.ToString()
+            Protocol(let message) => message
+            _ => "Empty"
+        }
+    }
+}

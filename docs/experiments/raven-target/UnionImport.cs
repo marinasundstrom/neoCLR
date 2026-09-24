@@ -100,9 +100,19 @@ static class UnionImport
             foreach (var module in new[] { app.MainModule }.Concat(guestLibraries))
                 output.AppendLine(SourceMetadata.Assembly(module));
         var coercions = new Dictionary<string, (string Name, string Body)>();
-        Call Coerce(Call call, string[] actual)
+        Call Coerce(Call call, string[] actual, bool preserveAccess = false)
         {
             if (!actual.Where((t, i) => Converts(t, call.Arguments[i])).Any()) return call;
+            if (preserveAccess)
+            {
+                // A free-standing adapter cannot call a private member on behalf
+                // of its declaring type. Keep this conversion at the checked call
+                // site; do not weaken the generated helper's visibility.
+                if (actual.Length != 1 || actual[0] == "FaultNull")
+                    throw new InvalidDataException("Nonpublic argument conversion requires one materialized argument.");
+                return call with { Arguments = actual, Instruction = ConvertStack(actual[0], call.Arguments[0])
+                    + (call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})") };
+            }
             var key = (call.Instruction ?? call.Name) + string.Join(',', call.Arguments) + string.Join(',', actual) + call.Result + call.OutArgument + ":" + string.Join(',', call.Outputs ?? []);
             if (!coercions.TryGetValue(key, out var helper))
             {
@@ -913,7 +923,7 @@ static class UnionImport
                             }
                         }
                         if (call.Result != "noresult") Push(new(call.Result == "Boolean" && conditionalOut < 0 ? "Int32" : PrimitiveBindings.Stack(call.Result), ConditionalOut: conditionalOut));
-                        call = Coerce(call, actualArguments);
+                        call = Coerce(call, actualArguments, preserveAccess: !targetMethod.IsPublic);
                         code.AppendLine(call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})");
                         // Conditional-out results must reach their branch directly so the runtime
                         // verifier retains the relationship between success and assignment.

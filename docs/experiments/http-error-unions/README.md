@@ -207,7 +207,8 @@ requires the same case identities; a mismatch fails without an output artifact.
 Shared support definitions are reused on subsequent projections. As in the previous
 fixture, concrete reference method bodies throw and are never the runtime implementation.
 This remains a bounded projection, not a general CLI assembly merger or lossless
-custom-attribute copier. Payload-bearing/generic unions remain outside this command.
+custom-attribute copier. Generic unions remain outside this command. Nongeneric sequential payload families
+are covered by the later HTTP library probe below; overlapping payload layouts remain rejected.
 
 The focused check projects all thirteen SocketError cases from normal Raven syntax,
 compiles consumers of construction, matching and Socket.Connect's nested Task/Result
@@ -315,6 +316,44 @@ unions. This compatibility boundary does not restore Is*/Get* requirements.
 The applicable nongeneric empty-case migration batch is complete. Generic Option,
 Result and TaskOutcome remain documented manual exceptions pending their specific
 projection/propagation work. Author direction on 2026-09-25 places other additions
-on hold and returns work to HTTP. The next necessary bridge work is importing a
-nongeneric data-bearing HttpError union into the class library, followed by typed
-HTTP errors and string/Uri BaseUri resolution.
+on hold and returns work to HTTP. The nongeneric data-bearing projection checkpoint below is complete. Public HTTP
+error bindings and string/Uri BaseUri resolution are the next integration work.
+
+
+## Nongeneric payload-bearing library projection
+
+The HTTP prototype now projects a normal `HttpError` declaration into a separate
+compiler reference and imports its Raven source bodies. Cases retain UriError,
+DnsError, SocketError or a message string. A separate Raven consumer compiles case
+construction and nested patterns against that projected reference. Native execution
+uses the imported library methods directly; this is not yet a public HTTP API or
+an end-to-end Raven HttpClient integration.
+
+```sh
+python3 docs/experiments/http-error-unions/verify_payload_library.py \
+  --bundle /path/to/matching/development-sdk \
+  --bridge docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll \
+  --runner target/release/examples/measure_async
+```
+
+Admission remains bounded: nongeneric sequential fields for managed payload unions,
+or the existing empty-case explicit-layout exception. Source/reference case maps,
+fields and signatures must agree. The VM still sees ordinary records/interfaces;
+Raven metadata is consumed by the development bridge, without a runtime dependency
+or a new platform-wide convention. Generic companion projection and overlapping
+nonempty payload layouts remain rejected.
+
+The test checks payload extraction, defaults, copies and boxing under GC pressure:
+101 allocations, four collections, zero live objects. Changed payload contracts and
+all-value overlapping layouts are rejected before use. No invalid reference is
+published on projection rejection. A private generated formatting helper exposed an
+adapter visibility bug: single-argument conversions now stay at the validated
+nonpublic call site. Visibility is preserved and a direct external call is rejected;
+more complex nonpublic conversions still require dedicated adapter support.
+
+This follows the existing CLI/value-copy comparison and .NET error-model research:
+expected HTTP failures retain domain causes instead of recreating Exception subclasses.
+The prototype cases are integration evidence, not a commitment to the complete final
+HttpError taxonomy. The current published development HttpClient/handler/server
+signatures still return string errors; wire the new union into those contracts next,
+then add Uri/string overloads and BaseUri resolution with matching API documentation.

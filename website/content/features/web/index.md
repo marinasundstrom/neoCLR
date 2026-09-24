@@ -141,7 +141,11 @@ Its former per-case `Is*`/`Get*` helpers have been removed; match the cases dire
 The [API reference](/docs/api/System/Uri/) describes both overloads and the limits.
 
 The next HTTP work is typed `HttpError` results and `HttpClient.BaseUri`, with string
-and Uri request overloads. These HTTP additions are planned; the existing client
+and Uri request overloads. The planned base address is optional string configuration:
+with a base set, verb helpers resolve relative URLs against it; without one, callers
+provide absolute URLs. The planned core operation is Send(request, cancellationToken),
+with Get and GetString using the same handler pipeline.
+These HTTP additions are planned; the existing client
 still accepts absolute plain-HTTP strings and returns provisional string errors.
 
 URI/URL encoding utilities are also planned separately. Their design will distinguish

@@ -200,6 +200,25 @@ static class ApplicationTypes
                 && field.Offset > 0 && field.FieldType.Resolve() == caseType) == 1);
     }
 
+    // Bounded nongeneric source-library projection. Managed payload unions use
+    // separate sequential fields; overlapping payload layouts remain unsupported.
+    // This is Raven's current bridge shape, not a platform-wide case convention.
+    public static bool IsStandardLibraryUnion(TypeDefinition type)
+    {
+        if (IsEmptyCaseUnion(type)) return true;
+        if (!type.IsValueType || !type.IsSealed || !type.IsSequentialLayout
+            || type.HasGenericParameters || type.NestedTypes.Count == 0
+            || !type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute"
+                && RuntimeSignatures.IsCore(a.AttributeType.Scope))
+            || type.Fields.Count != type.NestedTypes.Count + 1
+            || type.Fields.Any(f => !f.IsPrivate || f.IsStatic || f.HasMarshalInfo)) return false;
+        var tag = type.Fields.SingleOrDefault(f => f.Name == "<Tag>");
+        return tag?.FieldType.MetadataType == MetadataType.Byte
+            && type.NestedTypes.All(c => c.IsNestedPublic && c.IsValueType && c.IsSequentialLayout
+                && !c.HasGenericParameters && !c.HasNestedTypes
+                && type.Fields.Count(f => f != tag && f.FieldType.Resolve() == c) == 1);
+    }
+
     // Raven's union extraction contract assigns the case only when it returns true.
     // Ordinary application out parameters retain their unconditional obligation.
     public static bool IsConditionalUnionOutput(MethodDefinition method) =>

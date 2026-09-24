@@ -76,7 +76,7 @@ func Inspect(value: Reply<int>) -> int {
     projected = root / 'Generic.Core.dll'
     rejected = run(['dotnet', bridge, '--project-union-reference', assembly,
         bundle / 'demo/NeoCLR.CoreProbe.dll', 'UnionMetadataProbe.Reply`1', projected], success=False)
-    assert rejected.returncode != 0 and 'Only standard empty-case unions can be projected' in rejected.stderr, rejected.stdout + rejected.stderr
+    assert rejected.returncode != 0 and 'Only supported nongeneric standard unions can be projected' in rejected.stderr, rejected.stdout + rejected.stderr
     assert not projected.exists()
     print('Generic library projection remains rejected before producing a reference')
     print('Generic union metadata and separate consumer compilation passed; no neoCLR generic-union execution claimed.')
