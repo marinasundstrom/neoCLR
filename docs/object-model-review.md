@@ -600,3 +600,58 @@ The focused target suite passes 66 tests. The general suite passes 61 tests plus
 separate custom-operator guard regression. No RuntimeRecordContract configuration or
 public library signature changes are required. Existing generic/external record and
 nullable string/value restrictions remain.
+
+### Boxed Boolean equality and hash — 2026-09-24
+
+Selected bounded follow-up: Boolean values passed through Object should retain
+value equality and matching hashes, as Int32 already does. The pinned
+[.NET 10 Boolean implementation](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Boolean.cs)
+(reviewed 2026-09-24) checks the exact Boolean type and returns 1/0 for true/false
+hashes. A boxed integer 1 is not equal to true. Distinct boxes retain distinct identity.
+
+Extend the existing exact System.Object virtual-slot intrinsic, rather than inventing
+structural equality for every value or waiting for a complete ValueType hierarchy.
+This keeps the implementation small and allocates nothing beyond ordinary boxing,
+but retains the limitation that these overrides are runtime special cases, not
+reflection-visible Boolean methods. Typed Boolean APIs, boxed display, other
+primitive contracts and other execution backends remain separate work. No compiler,
+metadata-format, nullability policy or public signature change is needed.
+
+Validation compares the pinned .NET baseline with raw runtime tests and the Raven
+Object sample: both values, wrong type/null, copied payloads, identity, explicit base
+calls and survival through collection. Existing class/struct/Int32 checks must remain
+valid; unsupported primitive dispatch must still reject rather than guess equality.
+
+### Library-wide consistency checkpoint — 2026-09-24
+
+The author now directs using these contracts throughout the runtime class library.
+The foundation is bounded, not complete: primitive boxed ToString and most primitive
+Object equality/hash remain missing, and typed methods alone do not establish virtual
+Object dispatch. A source audit identifies these concrete next consumers:
+
+| Area | Current evidence | Next bounded check |
+| --- | --- | --- |
+| Storage.Path | Typed Equals(Path) compares text; ToString is not an override; no GetHashCode | Make typed/Object equality, hash and display agree for separately parsed equal paths, null and unrelated values |
+| HashMap | Constructor requires equality/hash callbacks and uses them for lookup | Demonstrate existing callbacks using a complete value-object contract, then evaluate a default comparer without removing custom policies |
+| HashCode | Add(int) and Add(string) only; strings are hashed from UTF-8 bytes | Define a shared string hash contract before introducing general Object or generic inputs |
+| Int32, Char, time/calendar values | Typed equality/display methods do not uniformly supply Object overrides | Add per-type typed/boxed/interface comparison matrices and close gaps incrementally |
+| Error objects and Console | Error display methods and typed Console formatting exist | Check virtual display first; evaluate Object formatting overloads after supported values agree |
+
+Proposed next implementation: Path is an existing value-like API with a concrete
+storage use case and a visible typed/Object inconsistency. Preserve its current
+ordinal logical-path semantics; do not add Windows normalization or provider identity
+as part of this repair. Compare .NET value-object equality/hash rules and System.IO.Path's
+static helper role before implementation. Then exercise Path through HashMap callbacks
+to prove library reuse. A universal comparer or automatic structural fallback is not
+yet selected: either could silently give identity semantics to value-like types or
+allocate boxes in generic hot paths. Keep custom equality policies available.
+
+Boolean/GC validation outcome: 43 focused Object/display/identity/boxing regressions
+pass, plus a separate reference-field tracing regression. The latter clears the
+source struct, retains its box under a three-object heap limit, allocates temporary
+boxes to force collection, then reads the child through a virtual override. Final
+collection must reclaim the box and child after returning a scalar. Existing tests
+cover shared mutable box aliases, readonly overrides, identity, heap limits and
+primitive copied payloads. This is evidence for these root paths, not proof of every
+GC path or a change to the current non-moving collector. The Raven sample, 37 pinned
+.NET assertions, refreshed 385-item API reference and 14-page website build pass.

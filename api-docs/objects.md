@@ -76,7 +76,7 @@ are unchanged.
 String identity is deliberately unsupported: the current String/Object conversion
 creates wrappers instead of preserving an underlying String allocation. Identity
 calls on String payloads or their wrappers raise a terminal RuntimeError. Virtual
-boxed-value Equals/GetHashCode support Int32 and explicit named-struct overrides, described below.
+boxed-value Equals/GetHashCode support Int32, Boolean and explicit named-struct overrides, described below.
 ReferenceEquals can compare box identities, but does not supply boxed value equality.
 Null instance receivers raise NullReference; default Equals accepts a null argument
 and returns false. Static two-argument Object.Equals is not yet available.
@@ -128,7 +128,7 @@ the importer recognizes the IsExternalInit metadata marker and permits readonly
 backing-field stores only in declaring constructors or recognized init accessors.
 Application-property reflection and a runtime init-only field flag remain gaps.
 
-## Boxed Int32 equality (development)
+## Boxed primitive equality (development)
 
 Through an Object view, a boxed Int32 compares equal to another boxed Int32 with the
 same value. Null, another integer type, strings and application classes compare false.
@@ -137,8 +137,12 @@ Int32 limits. Boxing copies the value, so changing the original variable has no 
 ReferenceEquals still distinguishes separately allocated boxes. Explicit Object base
 calls retain allocation equality/hash rather than dispatching to the integer behavior.
 
-This is a bounded interpreter intrinsic for the System library's exact Object slots.
-It does not add a typed Int32.GetHashCode member, general struct equality, nullable
+A boxed Boolean compares by its copied true/false value, only with another Boolean.
+Null and boxed integers (including 0 and 1) compare unequal. GetHashCode returns 1
+for true and 0 for false. Separate Boolean boxes retain distinct reference identities.
+
+These are bounded interpreter intrinsics for the System library's exact Object slots.
+It does not add typed primitive GetHashCode members, general struct equality, nullable
 boxing, or primitive boxed ToString. Other primitive types still require
 explicit implementation. Named structs now dispatch their explicit overrides. System.Value is not involved in this dispatch.
 The [Object equality sample](/samples/object-equality.zip) demonstrates the behavior.

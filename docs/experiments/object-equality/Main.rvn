@@ -73,4 +73,15 @@ func Main() {
     Check(SameValue(boxed, equalBox), "Boxed integers compare their values")
     Check(!SameValue(boxed, first), "Boxed integer equality checks the concrete type")
     Check(Hash(boxed) == 42 && Hash(boxed) == Hash(equalBox), "Boxed integer hashes preserve the copied value")
+
+    var enabled = true
+    let boxedFlag: Object = enabled
+    let sameFlag: Object = true
+    let disabledFlag: Object = false
+    let integerOne: Object = 1
+    enabled = false
+    Check(SameValue(boxedFlag, sameFlag) && !SameValue(boxedFlag, disabledFlag), "Boxed Booleans compare their copied values")
+    Check(!SameValue(boxedFlag, integerOne) && !SameValue(integerOne, boxedFlag) && !SameValue(boxedFlag, absent), "Boolean equality rejects integer and null values")
+    Check(!Object.ReferenceEquals(boxedFlag, sameFlag), "Equal boxed Booleans have distinct identities")
+    Check(Hash(boxedFlag) == 1 && Hash(disabledFlag) == 0, "Boolean hashes distinguish true and false")
 }

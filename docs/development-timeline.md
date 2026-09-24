@@ -5987,3 +5987,24 @@ failure remains the next acceptance target.
 - **Outcome:** documentation and priorities change; no runtime/compiler behavior is
   changed or Option-record component support claimed. Earlier nullable-value
   follow-up suggestions are superseded for the current scope.
+
+### 2026-09-24 — Apply Object contracts across the class library
+
+- **Author:** confirms the direction and asks that the established Object hierarchy,
+  equality, hashing and ToString behavior work across the platform and be used
+  wherever the runtime class library needs those operations. The available message
+  ends mid-sentence; no additional design choice is inferred.
+- **Assistant response:** finish the active boxed Boolean slice, then audit library
+  consumers and value-like types against the common contracts. Distinguish bounded
+  existing implementations from complete cross-library support.
+- **Initial findings:** Path has typed equality and a non-override ToString but no
+  matching Object equality/hash; HashMap requires explicit equality/hash callbacks;
+  HashCode has only integer/string inputs; several time/value/error types have typed
+  methods without a complete Object contract. These are inspection findings, not
+  repaired behavior. See the Object review for the proposed implementation order.
+
+- **Author follow-up:** also ensure correct garbage-collector behavior for boxing.
+- **Assistant response/action:** include GC roots, aliasing and reference-bearing boxed
+  payloads in the consistency gate. Add a focused regression that clears the source
+  struct, forces collection and invokes the boxed override through its retained child.
+  Existing box/alias/heap-limit checks remain part of validation.

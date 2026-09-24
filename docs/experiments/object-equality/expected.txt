@@ -10,3 +10,7 @@ Equal boxed integers have distinct identities
 Boxed integers compare their values
 Boxed integer equality checks the concrete type
 Boxed integer hashes preserve the copied value
+Boxed Booleans compare their copied values
+Boolean equality rejects integer and null values
+Equal boxed Booleans have distinct identities
+Boolean hashes distinguish true and false

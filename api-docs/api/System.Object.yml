@@ -21,7 +21,7 @@ items:
   - NeoCLR.CoreProbe
   namespace: System
   summary: Provides an abstract common object-reference base with runtime type inspection, display and bounded identity/equality behavior.
-  remarks: 'Development support is bounded: GetType, ToString, ReferenceEquals, Equals and GetHashCode are implemented with the type restrictions in the Object and Value guide. String identity remains unsupported. Boxed Int32 supplies value equality/hash; named structs dispatch explicit Object overrides, including generated record-struct members. Object is abstract; its protected constructor initializes the base portion of a derived instance. See the Object and Value guide. Ordinary class assignment shares a reference; value assignment copies fields.'
+  remarks: 'Development support is bounded: GetType, ToString, ReferenceEquals, Equals and GetHashCode are implemented with the type restrictions in the Object and Value guide. String identity remains unsupported. Boxed Int32 and Boolean supply value equality/hash; named structs dispatch explicit Object overrides, including generated record-struct members. Object is abstract; its protected constructor initializes the base portion of a derived instance. See the Object and Value guide. Ordinary class assignment shares a reference; value assignment copies fields.'
   example: []
   syntax:
     content: public abstract class Object
@@ -105,7 +105,7 @@ items:
   - NeoCLR.CoreProbe
   namespace: System
   summary: Tests reference identity by default; an ordinary class may override equality.
-  remarks: 'The other parameter is nullable for Raven compatibility: Equals(Object? other). Null other returns false for a supported non-null default receiver. A null receiver raises NullReference. Class overrides must be consistent with GetHashCode: equal objects must have equal hashes. Virtual calls on boxed Int32 compare values only with another boxed Int32; null or another concrete type compares false. Boxed named structs dispatch explicit Equals overrides; record structs generate exact-type component equality. Other boxed primitives and String equality remain unsupported. Explicit Object base calls retain reference equality. This does not add structural class equality or change Equatable contracts.'
+  remarks: 'The other parameter is nullable for Raven compatibility: Equals(Object? other). Null other returns false for a supported non-null default receiver. A null receiver raises NullReference. Class overrides must be consistent with GetHashCode: equal objects must have equal hashes. Virtual calls on boxed Int32 or Boolean compare copied values only with the same concrete type; null or another concrete type compares false. Boolean true does not equal Int32 one. Boxed named structs dispatch explicit Equals overrides; record structs generate exact-type component equality. Other boxed primitives and String equality remain unsupported. Explicit Object base calls retain reference equality. This does not add structural class equality or change Equatable contracts.'
   example: []
   syntax:
     content: public virtual bool Equals(object? other)
@@ -136,7 +136,7 @@ items:
   - NeoCLR.CoreProbe
   namespace: System
   summary: Returns a stable identity hash by default; an ordinary class may override it consistently with equality.
-  remarks: The default class/array hash survives mutation and garbage collection and is shared by aliases. Collisions are allowed. It is not a unique object identifier, persisted value, native address or cross-execution contract. A null receiver raises NullReference. Virtual calls on boxed Int32 return its integer value as the hash. Boxed named structs dispatch explicit GetHashCode overrides, including generated record-struct hashes. Other boxed primitives and String identity hashes remain unsupported. Explicit Object base calls retain the identity hash. An equality override must provide a compatible hash.
+  remarks: The default class/array hash survives mutation and garbage collection and is shared by aliases. Collisions are allowed. It is not a unique object identifier, persisted value, native address or cross-execution contract. A null receiver raises NullReference. Virtual calls on boxed Int32 return its integer value as the hash. Boxed Boolean returns 1 for true and 0 for false. Boxed named structs dispatch explicit GetHashCode overrides, including generated record-struct hashes. Other boxed primitives and String identity hashes remain unsupported. Explicit Object base calls retain the identity hash. An equality override must provide a compatible hash.
   example: []
   syntax:
     content: public virtual int GetHashCode()

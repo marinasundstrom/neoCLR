@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Add boxed Boolean Object equality and hashing alongside Int32: compare copied
+  values only with the exact Boolean type, with hashes 1/0 for true/false. Preserve
+  separate box identity and explicit Object base behavior. Extend the Raven sample,
+  .NET comparison, runtime regressions and generated API reference; other primitive
+  virtual equality/hash implementations remain outside this bounded slice. Check
+  boxed reference-field tracing under allocation pressure and reclamation after
+  scalar return. Record the author-directed library-wide Object/GC consistency audit
+  and select Path contract alignment next. Validation: 44 runtime regressions,
+  37 .NET assertions, the Raven Object sample, API reference and website build.
+
 - Enable Raven's nullable-value declaration restriction for the development target:
   RAV0407 reports "Value types can't be declared as nullable" while nullable reference
   annotations remain valid. General Raven defaults stay compatible with .NET;

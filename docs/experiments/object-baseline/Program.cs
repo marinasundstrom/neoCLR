@@ -75,6 +75,17 @@ Check(new[] { "op_Equality", "op_Inequality" }.All(name =>
         nullability.Create(parameter).ReadState == System.Reflection.NullabilityState.NotNull)),
     "Record-class operators annotate both references while struct operators take values");
 
+object boxedTrue = true;
+object otherTrue = true;
+object boxedFalse = false;
+Check(boxedTrue.Equals(otherTrue) && !ReferenceEquals(boxedTrue, otherTrue)
+    && !boxedTrue.Equals(boxedFalse) && boxedFalse.Equals((object)false),
+    "Boxed Boolean equality compares values while identity distinguishes boxes");
+Check(!boxedTrue.Equals(1) && !boxedFalse.Equals(0) && !boxedTrue.Equals(null),
+    "Boxed Boolean equality requires an exact Boolean type");
+Check(boxedTrue.GetHashCode() == 1 && boxedFalse.GetHashCode() == 0,
+    "Boxed Boolean hashes are one for true and zero for false");
+
 object integer = 42;
 object equalInteger = 42;
 Check(integer.Equals(equalInteger) && !ReferenceEquals(integer, equalInteger),

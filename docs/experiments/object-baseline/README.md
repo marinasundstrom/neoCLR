@@ -66,3 +66,7 @@ The comparison-operator follow-up (2026-09-24) adds two assertions (34 total):
 nullable record operands preserve value equality and symmetric null handling;
 both generated class operator parameters are nullable, while struct operator
 parameters remain values. SDK/runtime pins are unchanged.
+
+The Boolean follow-up (2026-09-24) adds three assertions (37 total): boxed value
+equality with separate identity, exact-type/null rejection and 1/0 hashes. These
+compare the bounded neoCLR Object dispatch with pinned .NET behavior.

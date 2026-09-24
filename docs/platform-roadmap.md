@@ -733,9 +733,10 @@ Boxed Int32 equality/hash now has a bounded intrinsic and sample. Named value-ty
 slice now have [checked evidence](object-model-review.md#struct-object-slots-and-record-structs--2026-09-24).
 The author-directed struct/record-struct gate is complete for non-generic types with
 the documented component contract. Nested same-compilation record structs now compose in both record classes and structs,
-with a checked Point/Rectangle sample and value-output deconstruction. Other primitive
-Object implementations and generic struct components remain follow-ups. Nullable
-value types and their boxing behavior are not part of the current scope. Default reference fields now have a checked record case:
+with a checked Point/Rectangle sample and value-output deconstruction. Boxed Boolean
+now joins Int32 for exact-type Object equality and hashing, with a checked flag sample.
+Other primitive Object implementations and generic struct components remain follow-ups.
+Nullable value types and their boxing behavior are not part of the current scope. Default reference fields now have a checked record case:
 null is preserved even for non-nullable declarations, and generated equality/hash/display
 handle it. Object.Equals and ReferenceEquals now annotate nullable comparison
 arguments for Raven compatibility. The author keeps reference annotations for now
@@ -747,6 +748,15 @@ sample covers absent/present Key? locals and literal null. Generated class `==`/
 also accept nullable references, with symmetric null handling and value equality.
 Internal null guards use reference identity, independent of overloaded operators.
 Value retirement remains a separate storage migration.
+
+**Library consistency direction, 2026-09-24:** the author requests applying Object
+contracts throughout the runtime class library. The [library audit](object-model-review.md#library-wide-consistency-checkpoint--2026-09-24)
+selects Path typed/Object equality, hash and display alignment as the next bounded
+consumer case, followed by reuse through existing HashMap callbacks. Broader primitive,
+formatting and default-comparer coverage remains incremental; do not imply universal
+Object support from the completed record gate. The author also requires correct GC
+behavior for boxing: verify copied payloads, aliases, reference-field tracing, roots
+and collection pressure alongside observable equality/hash/display behavior.
 
 **Absence-model direction, 2026-09-24:** prefer Option<T> for intentional absence in
 API/domain models, for both value types and reference types. Retain nullable reference

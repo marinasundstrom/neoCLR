@@ -906,3 +906,9 @@ Object.ReferenceEquals to avoid recursive operator calls. The target branch also
 uses identity guards for record-class components in equality, hashing and display;
 intrinsic string guards keep their existing target-supported lowering. User-defined
 operators cannot redefine those internal null tests. Nullable value support is unchanged.
+
+Boxed Boolean Object follow-up (2026-09-24): the existing compiler/importer boxing
+path now reaches bounded runtime Equals/GetHashCode dispatch for Boolean, alongside
+Int32. No Runtime Contract setting, emission change or reference signature changes.
+The Object sample checks copied flags, exact-type/null comparisons, distinct identity
+and 1/0 hashes. This does not enable Boolean record components or typed Boolean APIs.

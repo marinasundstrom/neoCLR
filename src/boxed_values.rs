@@ -5,14 +5,14 @@ use crate::{
     value::ObjectReference,
 };
 
-/// Int32 is the first intrinsic value contract. Named structs and other intrinsic
-/// types still require their own validated equality/hash implementation.
+/// Int32 and Boolean have intrinsic value contracts. Other intrinsic types still
+/// require their own validated equality/hash implementation.
 pub(crate) fn dispatch(
     object: &ObjectReference,
     contract: &Function,
     arguments: &[Value],
 ) -> Result<Option<Value>, Fault> {
-    if object.concrete_type() != Type::Int32
+    if !matches!(object.concrete_type(), Type::Int32 | Type::Boolean)
         || contract.owner.as_ref() != Some(&Type::from_name("System.Object"))
         || contract
             .definition
@@ -37,35 +37,40 @@ pub(crate) fn dispatch(
     if !equality && !hashing {
         return Ok(None);
     }
-    let Value::Int32(value) = object.reference.read()? else {
-        return Err(Fault::new("boxed Int32 has an invalid payload"));
-    };
+    let value = primitive_value(object)?;
     if hashing {
         return Ok(Some(Value::Int32(value)));
     }
     let [other] = arguments else {
         return Err(Fault::new(
-            "boxed Int32 equality requires one Object argument",
+            "boxed primitive equality requires one Object argument",
         ));
     };
     let equal = match other {
         Value::NullObjectReference(_) => false,
         Value::ObjectReference(other) => {
             other.reference.assigned()?;
-            if other.concrete_type() == Type::Int32 {
-                let Value::Int32(other) = other.reference.read()? else {
-                    return Err(Fault::new("boxed Int32 has an invalid payload"));
-                };
-                value == other
+            if other.concrete_type() == object.concrete_type() {
+                value == primitive_value(other)?
             } else {
                 false
             }
         }
         _ => {
             return Err(Fault::new(
-                "boxed Int32 equality requires an Object argument",
+                "boxed primitive equality requires an Object argument",
             ));
         }
     };
     Ok(Some(Value::Boolean(equal)))
+}
+
+// Only called after selecting a supported concrete type. Type identity is checked
+// separately: Boolean true and Int32 one must never compare equal.
+fn primitive_value(object: &ObjectReference) -> Result<i32, Fault> {
+    match (object.concrete_type(), object.reference.read()?) {
+        (Type::Int32, Value::Int32(value)) => Ok(value),
+        (Type::Boolean, Value::Boolean(value)) => Ok(i32::from(value)),
+        _ => Err(Fault::new("boxed primitive has an invalid payload")),
+    }
 }

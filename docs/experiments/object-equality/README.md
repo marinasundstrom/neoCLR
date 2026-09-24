@@ -15,7 +15,7 @@ Hash numbers are deliberately not printed or used as unique IDs.
 This is a handwritten class prerequisite for the later Raven record-syntax case,
 not a record implementation. Boxed Int32 now compares and hashes its stored value through Object; separate boxes
 still have distinct identities and source mutation does not change the copy. String
-identity, other boxed virtual equality/hash and static Object.Equals remain unsupported. Raw tests additionally cover
+identity, other primitive boxed virtual equality/hash and static Object.Equals remain unsupported. Raw tests additionally cover
 nulls, GC, arrays, explicit base calls and separate box identity.
 
 ## Record acceptance history
@@ -42,3 +42,9 @@ checks literal nulls and nullable locals through default equality, an explicit c
 override and boxed Int32 equality. Null is still rejected for a non-nullable Object
 local (RAV1509), checked by verify.py. Reference annotations are Raven compatibility
 metadata; runtime types/slots and identity semantics are unchanged.
+
+Boolean follow-up (2026-09-24): the sample now compares boxed flags through Object,
+rejects integer/null operands, distinguishes box identity and checks true/false hashes.
+Changing the original flag preserves the boxed copy. This adds Boolean alongside
+Int32; named structs retain explicit overrides and other primitive types remain
+unsupported for these virtual calls.

@@ -234,6 +234,7 @@ fn boxed_int32_virtual_equality_uses_exact_type_and_value() {
         ("ldc.i4 42\nbox Int32", true),
         ("ldc.i4 7\nbox Int32", false),
         ("ldc.i8 42\nbox Int64", false),
+        ("ldc.bool true\nbox Boolean", false),
         ("ldstr \"42\"\ncastclass System.Object", false),
         ("ldc.i4 42\nnewobj Cell", false),
         ("ldloc empty", false),
@@ -412,4 +413,70 @@ fn unbox_does_not_convert_integer_widths_or_admit_reference_targets() {
 fn named_struct_generic_object_overrides_are_rejected_until_reachability_is_closed() {
     let declarations = STRUCT_KEY.replace(".type Key", ".type Key<T>");
     assert!(run("ldc.i4 0", &declarations, "Int32", 8).is_err());
+}
+
+#[test]
+fn boxed_boolean_equality_requires_exact_type_and_preserves_identity() {
+    for left in [false, true] {
+        for (right, expected) in [
+            (format!("ldc.bool {left}\nbox Boolean"), true),
+            (format!("ldc.bool {}\nbox Boolean", !left), false),
+            (format!("ldc.i4 {}\nbox Int32", i32::from(left)), false),
+            ("ldloc empty".into(), false),
+            ("ldc.i4 1\nnewobj Cell".into(), false),
+        ] {
+            let body = format!(
+                ".local System.Object empty\nldloca empty\ninitobj System.Object\nldc.bool {left}\nbox Boolean\n{right}\n{EQUALS}"
+            );
+            assert_eq!(
+                run(&body, CELL, "Boolean", 8).unwrap().value,
+                Value::Boolean(expected)
+            );
+        }
+        for call in [
+            IDENTITY,
+            "call instance System.Object::Equals(System.Object)",
+        ] {
+            let body =
+                format!("ldc.bool {left}\nbox Boolean\nldc.bool {left}\nbox Boolean\n{call}");
+            assert_eq!(
+                run(&body, "", "Boolean", 8).unwrap().value,
+                Value::Boolean(false)
+            );
+        }
+    }
+}
+
+#[test]
+fn boxed_boolean_hash_preserves_copied_value_through_collection() {
+    for value in [false, true] {
+        let mut body = format!(
+            ".local Boolean original\n.local System.Object boxed\nldc.bool {value}\nstloc original\nldloc original\nbox Boolean\nstloc boxed\nldc.bool {}\nstloc original\n",
+            !value
+        );
+        for _ in 0..8 {
+            body.push_str("ldc.bool false\nbox Boolean\npop\n");
+        }
+        body.push_str(&format!("ldloc boxed\n{HASH}"));
+        let result = run(&body, "", "Int32", 2).unwrap();
+        assert_eq!(result.value, Value::Int32(i32::from(value)));
+        assert!(result.heap.collections() > 1);
+    }
+}
+
+#[test]
+fn boxed_struct_traces_reference_fields_after_source_is_cleared() {
+    let declarations = format!("{CELL}\n.type Holder\n.field Child Cell\n.method instance override readonly byref GetHashCode() -> Int32\nldarg this\nldfld 0\nldfld Cell::Number\nret\n.end\n.end");
+    let mut body = ".local Holder source\n.local System.Object boxed\nldc.i4 42\nnewobj Cell\nnewobj Holder\nstloc source\nldloc source\nbox Holder\nstloc boxed\nldloca source\ninitobj Holder\n".to_string();
+    for _ in 0..8 {
+        body.push_str("ldc.i4 0\nbox Int32\npop\n");
+    }
+    body.push_str(&format!("ldloc boxed\n{HASH}"));
+    let result = run(&body, &declarations, "Int32", 3).unwrap();
+    assert_eq!(result.value, Value::Int32(42));
+    assert!(result.heap.collections() > 1);
+    assert!(
+        result.heap.is_empty(),
+        "completed scalar result must not retain the box or its child"
+    );
 }
