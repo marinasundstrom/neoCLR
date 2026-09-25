@@ -17,14 +17,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if !(4..=5).contains(&args.len()) {
         return Err("usage: measure_async APP.neoil System.neoil HEAP_LIMIT [INSTRUCTION_LIMIT] [--live-output] [-- GUEST_ARGUMENTS...]".into());
     }
+    let started = std::time::Instant::now();
     let text = std::fs::read_to_string(&args[1])?;
     let system = assemble(&std::fs::read_to_string(&args[2])?).map_err(|e| e.to_string())?;
     let app =
         neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&text)], &system)
             .map_err(|e| e.to_string())?
             .remove(0);
+    let assembled = std::time::Instant::now();
     let program = LoadedProgram::with_library(&app, &system).map_err(|e| e.to_string())?;
+    let loaded = std::time::Instant::now();
     program.verify().map_err(|e| e.to_string())?;
+    let verified = std::time::Instant::now();
     let execution = program
         .run(ExecutionOptions {
             arguments: guest_arguments,
@@ -41,7 +45,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             },
             ..ExecutionOptions::default()
         })
-        .map_err(|e| e.to_string())?;
+        .map_err(|e| e.to_string());
+    eprintln!(
+        "assembly_ms={} load_ms={} verify_ms={} run_ms={}",
+        assembled.duration_since(started).as_millis(),
+        loaded.duration_since(assembled).as_millis(),
+        verified.duration_since(loaded).as_millis(),
+        verified.elapsed().as_millis(),
+    );
+    let execution = execution?;
     if !live {
         print!("{}", String::from_utf8(execution.stdout)?);
     }

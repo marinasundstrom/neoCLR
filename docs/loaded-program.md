@@ -75,3 +75,11 @@ verifies HelloWorld once, drops the source Module, and executes it twice.
 [Closed call-graph analysis](reachability.md) shares the prepared definition bindings and
 follows explicit closed roots without execution. Its bounded conservative report supports
 backend planning; it does not perform typed verification or establish AOT support.
+
+
+The [mapped JSON cost checkpoint](experiments/json-object-mapping/cost.md) removes
+identity-string copies for unrelated method names/call forms/generic arities during
+lookup. Matching methods retain every existing resolution check. This is a local
+allocation reduction in linear lookup, not a prepared-call cache or verification
+shortcut. The focused runner reports assembly/loading/verification/execution timings
+separately; these diagnostic measurements are not API performance guarantees.

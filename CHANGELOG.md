@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Reduce method-resolution allocations by rejecting unrelated names, call forms
+  and generic arities before copying definition identities. Preserve existing
+  resolution checks and add separate load/verification/execution timings to the
+  focused sample runner; HTTP deadline policy is unchanged.
+
 - Record planned JSON HTTP extensions for all four request/response boundaries,
   with shared content conversion beneath client and server conveniences. Exact
   signatures remain open; no new API or asynchronous serializer is implemented.

@@ -200,8 +200,11 @@ metadata, source-access checks and API reference coverage. An
 round-trips through these operations and MemoryStream. An opt-in HTTP variant
 passes against independent peers and as an isolated managed pair, with zero final
 live objects. An earlier overlapping run hit the transport deadline; retain this
-timing observation and the default DOM demo. Next, evaluate the smallest reusable
-JSON mapping contract and request-path cost before making this variant the default.
+timing observation and the default DOM demo. A [focused cost investigation](experiments/json-object-mapping/cost.md)
+removed avoidable identity-string copying in method lookup, reducing preparation
+and execution time on the same fixture without changing deadline policy. Next,
+evaluate the smallest reusable JSON mapping contract; retain latency under load
+as an open validation item before making the mapped variant the default.
 General invocation and field assignment remain outside this checkpoint. **Author clarification:** `System.Runtime.Reflection`
 will provide extensions to the `System.Introspection` model; those operations work
 when the model is backed by loaded runtime types. Preserve introspection as the

@@ -82,3 +82,9 @@ latency under load; no specific root cause or timeout-policy change is establish
 Keep this mapper opt-in until request-path cost and the public mapping contract have
 been evaluated. The original larger DOM report also exposed a transport/performance
 limit. Reproduce the mapped pair with `--mapped --case pair`, running it in isolation.
+
+
+A follow-up [cost investigation](cost.md) found avoidable identity-string copying
+in method resolution. Rejecting unrelated methods earlier reduces both preparation
+and execution time for this fixture while retaining the same GC results. It does
+not change the HTTP deadline or establish predictable performance under load.

@@ -1,0 +1,60 @@
+{
+  "date": "2026-09-25",
+  "baseline": "2789002d plus runner phase timing only",
+  "candidate": "same baseline plus early method name/call form/generic arity rejection",
+  "configuration": "release; sequential single runs; 512-object heap; 100000000 instruction limit",
+  "platform": "local macOS arm64",
+  "inputs": {
+    "App.neoil": "f8c448c4cea888d5f15ac5c4393c0c705ade384452e581c3cba6adfb35d6b0af",
+    "System.neoil": "74628f24c0a50636cef4a3a02b0562511d26603e8227b995dd1a5e18868d0856"
+  },
+  "observations": {
+    "before": {
+      "assembly_ms": 12314,
+      "load_ms": 9436,
+      "verify_ms": 5331,
+      "run_ms": 3511,
+      "allocated": 195,
+      "live": 0,
+      "peak": 72,
+      "collections": 4,
+      "reclaimed": 195
+    },
+    "after": {
+      "assembly_ms": 1814,
+      "load_ms": 1034,
+      "verify_ms": 502,
+      "run_ms": 1484,
+      "allocated": 195,
+      "live": 0,
+      "peak": 72,
+      "collections": 4,
+      "reclaimed": 195
+    }
+  },
+  "limitations": "Single before/after observations, not a statistical benchmark or proof that transport timeouts are resolved. A separate preliminary baseline overlapping compilation was excluded.",
+  "mapped_http_pair": {
+    "client": {
+      "assembly_ms": 2240,
+      "load_ms": 2106,
+      "verify_ms": 861,
+      "run_ms": 12206,
+      "allocated": 335,
+      "live": 0,
+      "peak": 100,
+      "collections": 7,
+      "reclaimed": 335
+    },
+    "server": {
+      "assembly_ms": 2092,
+      "load_ms": 1369,
+      "verify_ms": 577,
+      "run_ms": 14247,
+      "allocated": 336,
+      "live": 0,
+      "peak": 130,
+      "collections": 7,
+      "reclaimed": 336
+    }
+  }
+}

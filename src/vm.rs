@@ -64,6 +64,13 @@ pub(crate) fn resolve(
 ) -> Result<crate::metadata::Function, Fault> {
     let mut found = None;
     for (index, definition) in module.functions.iter().enumerate() {
+        // Reject unrelated definitions before copying their identity strings.
+        if definition.name != target.name
+            || definition.instance != target.instance
+            || definition.generic_parameters.len() != target.generic_arguments.len()
+        {
+            continue;
+        }
         let identity = definition
             .definition
             .clone()
@@ -76,12 +83,6 @@ pub(crate) fn resolve(
             .definition
             .as_ref()
             .is_some_and(|wanted| wanted != &identity)
-        {
-            continue;
-        }
-        if definition.name != target.name
-            || definition.instance != target.instance
-            || definition.generic_parameters.len() != target.generic_arguments.len()
         {
             continue;
         }
