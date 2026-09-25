@@ -10,7 +10,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Record an exploratory HttpServer accept/context API alongside callbacks for the
   server-lifecycle slice, including response completion, ownership and cancellation
-  questions and the .NET comparison. No runtime or public API change.
+  questions and the .NET comparison. Record the author's clarification that HttpContext
+  is the foundational per-exchange application scope, closed/disposed when handling is
+  done; distinguish completion/error reporting from cleanup. No runtime or public API change.
 
 - Add development HttpRequest.WithHeader returning a new request with a replaced
   application field. Validate names/values and reserve transport/content controls;

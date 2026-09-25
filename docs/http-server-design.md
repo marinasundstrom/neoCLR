@@ -115,10 +115,12 @@ Contracts to settle and test before implementation:
 
 - Accept completes once a valid request is available. Initially that can include the
   buffered body; streaming must revisit the header/body boundary.
-- Context owns the accepted exchange, not the listener. Disposal/Close abandons an
-  unfinished response and releases resources; garbage collection is not the cleanup
-  protocol. Sending completes one final response; duplicate sends and operations after
-  close need explicit errors. Decide whether pre-send validation permits correction.
+- Context owns the accepted exchange, not the listener. Close/dispose ends its lifetime
+  when the application is done; this is the normal scope boundary, not only an abort
+  operation. Define response completion versus abandonment explicitly, including pending
+  writes and observable send failures. Garbage collection is not the cleanup protocol.
+  Sending completes one final response; duplicate sends and operations after close need
+  explicit errors. Decide whether pre-send validation permits correction.
 - Accept cancellation and response cancellation have distinct lifetimes. Cancelling
   a pending accept must not silently invalidate an already returned context. Specify
   how listener shutdown affects active contexts and pending operations.
@@ -133,3 +135,26 @@ response streams, at the cost of exposing lifetime management currently hidden b
 ServeOne. Validate peer disconnects, malformed input, early return/abandonment,
 duplicate response, cancellation and shutdown with independent peers and GC/resource
 checks. This proposal does not require runtime suspension or a new public scheduler.
+
+### Author clarification: the application context
+
+The author identifies HttpContext as a foundational concept for building HTTP web
+applications, explicitly closed or disposed when handling is done. This establishes
+its architectural role beyond an accept-result container. Both explicit accept loops
+and callback-based hosting should share this per-exchange context and lifecycle; the
+exact callback migration remains to be designed. Future application handling can build
+on the same request/response scope without exposing a socket or adding routing now.
+
+A context represents one HTTP exchange, not necessarily one physical connection.
+Closing it must not close the listener; later keep-alive or multiplexing must not make
+its lifetime synonymous with closing a transport connection. Disposal should be safe
+on repeated calls and release owned resources on normal completion and early exit.
+Stream ownership, outstanding operations and retained request data need explicit rules.
+
+The current System.Disposable.Dispose returns no result, whereas Closable<E>.Close
+can return a Result. Async response completion may fail, so decide how callers await
+and observe completion before releasing the context; synchronous disposal alone cannot
+promise successful network delivery. The author's clarification does not select a
+completion method, implicit flush policy or response writer signature. These are
+implementation questions within the planned foundational context, not objections to
+using close/dispose as the application scope boundary. No public context API exists yet.

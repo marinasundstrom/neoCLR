@@ -7198,3 +7198,17 @@ configuration/content, not target-specific code added to Raven main.
   one-response state and server shutdown explicit; keep ServeOne as a possible adapter.
 - **Outcome:** record the design candidate in the server-lifecycle slice. No Accept,
   HttpContext, response writer or options type is implemented or finalized here.
+
+## 2026-09-25 — HttpContext as the HTTP application foundation
+
+- **Author clarification:** the application could close or dispose the context when
+  ready; “The http context would be a foundational concept for building http web apps”.
+- **Assistant response:** treat HttpContext as the lifetime scope of one HTTP exchange,
+  shared by explicit acceptance and callback-based hosting. Update the roadmap from an
+  optional return-container exploration to this architectural direction, keeping the
+  current slice order and exact API signatures open.
+- **Correction to earlier assistant proposal:** close/dispose is a normal end-of-scope
+  operation, not merely abandonment. Async completion and error reporting, cleanup on
+  early exit, repeated disposal and future stream/connection ownership still need rules.
+- **Action:** update server design and roadmap. No public API or runtime implementation
+  is introduced by this documentation change.

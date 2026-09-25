@@ -76,7 +76,10 @@ address; 5. methods/content/statuses; 6. framing; 7. server lifecycle; 8. applic
 9. release stabilization. The author proposes an explicit asynchronous
 Accept/AcceptRequest returning a Result<HttpContext, HttpError> alongside callbacks;
 [evaluate ownership and response completion in slice 7](http-server-design.md#explicit-asynchronous-acceptance--exploration-2026-09-25).
-This is a design candidate, not an implemented API or a change to the current slice order.
+The author clarifies HttpContext as a foundational per-exchange concept for HTTP web
+applications, closed/disposed when handling is done. That is the architectural direction;
+accept naming, response completion and disposal details remain design work. No context
+API is implemented yet, and the current slice order is unchanged.
 The [address hierarchy checkpoint](experiments/ip-address-hierarchy/README.md)
 now links the [implemented address slice](ip-address-design.md): public parsing/formatting,
 value semantics, typed DNS results and Socket overloads. The [cancellation foundations](cancellation-design.md)
@@ -123,7 +126,7 @@ narrow to be the whole release experience. Prefer these connected release gates:
 | Responses and errors | General status values, headers and content; 201/204/400/404/500 examples; typed HttpError with inspectable causes; distinguish HTTP status, transport failure, cancellation, timeout and decoding failure |
 | Cancellation and lifetime | A source/token pair usable beyond HTTP; cancel before dispatch and during pending work; configurable request deadline; deterministic connection/buffer cleanup and explicit handler ownership/reuse rules |
 | HTTP interoperability | Bounded Content-Length and chunked-body reception, legal no-body responses, close-delimited response handling, malformed/ambiguous framing rejection; client and server each checked with independent peers |
-| Server lifecycle | Repeated requests, GET and POST bodies, application-selected statuses, cancellation while waiting/serving and bounded shutdown; define in-flight request ownership; demonstrate a small bounded concurrent workload without adding a routing framework |
+| Server lifecycle | Foundational HttpContext with request/response lifetime and explicit close/dispose, shared by accept and callback styles; repeated requests, GET and POST bodies, application-selected statuses, cancellation while waiting/serving and bounded shutdown; define in-flight request ownership; demonstrate a small bounded concurrent workload without adding a routing framework |
 | Release product | A storage-backed notes app: list/read notes, POST UTF-8 content to save one, report missing/invalid input and stop cleanly; packaged client/server samples, API docs and matching SDK/compiler/runtime artifacts |
 
 Keep bodies buffered initially with documented/configurable bounds. A stream-backed
