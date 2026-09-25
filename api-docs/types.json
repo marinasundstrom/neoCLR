@@ -241,6 +241,7 @@
   "System.Void",
   "System.Web.Http.HttpClient",
   "System.Web.Http.HttpContent",
+  "System.Web.Http.HttpContext",
   "System.Web.Http.HttpError",
   "System.Web.Http.HttpError.Handler",
   "System.Web.Http.HttpError.InvalidRequest",

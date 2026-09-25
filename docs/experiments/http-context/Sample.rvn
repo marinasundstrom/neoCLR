@@ -1,0 +1,12 @@
+import System.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+// Accept owns request buffering; Complete reports sending and closes the exchange.
+async func ReplyToNext(server: HttpServer) -> Task<Result<unit, HttpError>> {
+    let context = await server.Accept()?
+    let target = context.Request.Target
+    context.RespondText("Requested: $target")
+    return await context.Complete()
+}

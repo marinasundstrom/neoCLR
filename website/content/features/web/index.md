@@ -74,7 +74,7 @@ This [server callback](/samples/http-server/Server.rvn) builds a byte response.
 `HttpServer.Listen("127.0.0.1", 0, 4)` binds a loopback listener; `GetLocalPort()`
 reports the selected port. `ServeOne(Respond)` accepts one GET, HEAD, POST, PUT, PATCH or DELETE, awaits the callback,
 sends its response and closes that connection. The caller closes the listener.
-`Close()` stops listening; an already accepted exchange remains active.
+`Close()` stops listening and closes owned exchanges, including pending accepts and callback waits.
 
 [Download the server and interoperability verifier](/samples/http-server.zip).
 It pairs separate neoCLR processes, tests an independent .NET client, and sends
@@ -83,11 +83,39 @@ and finish with no live managed objects. This is a bounded exchange, not an
 application hosting framework.
 
 Received headers have lowercase names and trimmed surrounding whitespace.
-The development server requires exactly one Host. GET/DELETE bodies remain unsupported;
+The development server requires exactly one Host. GET/HEAD/DELETE bodies remain unsupported;
 POST, PUT and PATCH read up to 1,024 bytes according to Content-Length before calling the handler.
 Without Content-Length, a request has an empty body. It validates application response headers, computes the byte length
 and adds `Connection: close`. Malformed requests or callback errors close the
 connection without an HTTP error response. Final statuses 200–599 are supported in development. Statuses 204, 205 and 304 require empty content; the server omits Content-Length for 204/304.
+
+## Own an HTTP exchange
+
+In development, `HttpServer.Accept()` returns a context with the buffered request and
+outgoing response. The context keeps their lifetime together:
+
+```raven
+{{HTTP_CONTEXT_SAMPLE}}
+```
+
+`context.Response.Respond(statusCode, content)` sets status and content without sending.
+The status-only overload clears the content. `context.Respond(...)` forwards those
+same operations, while `RespondText` supplies UTF-8 text/plain content. `Complete(token)`
+validates, snapshots and sends the response, returning a Task with a Result. Completion
+ends the scope on success, failure or acknowledged cancellation. `Close()`/`Dispose()`
+ends the scope without sending; both are safe to repeat. Sending twice returns an error.
+
+The server permits at most 16 outstanding accept/context scopes, with one native accept
+pending at a time. Applications can hold two contexts and complete the second before the
+first. `ServeOne` uses this same ownership path. Cancellation can stop waiting for a
+callback but cannot preempt its code; shutdown closes exchanges rather than draining
+handlers. Request reads and response sends have separate provisional 15-second budgets.
+These contracts still use buffered content and one connection per exchange.
+
+See [HttpContext](/docs/api/System/Web/Http/HttpContext/) in the API reference for the
+complete signatures and limits. A future interface split could give inbound and outbound
+requests/responses different capabilities. Today they remain concrete message classes;
+configuring a received client response only changes the local object.
 
 ## Read a JSON report
 

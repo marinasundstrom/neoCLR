@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add development HttpServer.Accept and HttpContext ownership with Request/Response,
+  explicit asynchronous Complete, Close/Dispose, Respond forwarding and UTF-8 RespondText.
+  HttpResponse.Respond configures status and optional content without sending. ServeOne
+  shares the context path and gains cancellation; handler errors/cancellation end the scope.
+  Server.Close now closes active exchanges as well as the listener (a behavior change).
+  Bound outstanding scopes and request/send deadlines; keep interface-based inbound/outbound
+  message implementations as future direction. Update API docs, examples and lifecycle checks.
+  Record the author’s provisional JSON DOM/reflection round-trip release exploration and
+  its missing reflective access/construction prerequisites and string/stream serializer
+  acceptance cases as planned work. Retain a failing captured-callback reproduction and document frozen-toolchain stabilization gaps.
+
 - Add bounded chunked and close-delimited HTTP response reception and HEAD request/client
   overloads, with request-aware decoding and body suppression in server replies. Preserve
   body/header limits, reject ambiguous/truncated framing, and document unsupported chunk

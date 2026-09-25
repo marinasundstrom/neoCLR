@@ -356,6 +356,14 @@ static class SignatureProbe
                     parameter.ParameterType = originalType;
                 }
             }
+        foreach (var httpOwner in new[] { "HttpServer", "HttpContext", "HttpResponse" })
+            foreach (var member in module.GetType(HttpBindings.Prefix + httpOwner).Methods.Where(m => m.IsPublic && !m.IsConstructor))
+                Check("HTTP lifecycle member " + member.FullName, HttpBindings.Bind(member, member, false, false) is not null);
+        Check("Context is disposable", InterfaceBindings.Converts(HttpBindings.Prefix + "HttpContext", CollectionBindings.Disposable));
+        Check("Disposable does not imply context", !InterfaceBindings.Converts(CollectionBindings.Disposable, HttpBindings.Prefix + "HttpContext"));
+        foreach (var hiddenOwner in new[] { "HttpContext", "HttpServer" })
+            foreach (var member in module.GetType(HttpBindings.Prefix + hiddenOwner).Methods.Where(m => m.IsAssembly))
+                Reject("HTTP lifecycle internals are private to the library " + member.FullName, () => HttpBindings.Bind(member, member, member.IsConstructor, false));
         var requestType = module.GetType("System.Web.Http.HttpRequest");
         foreach (var post in requestType.Methods.Where(m => m.Name is "Post" or "Put" or "Patch" or "Delete" or "Head")) {
             Check("HTTP request factory " + post.FullName, HttpBindings.Bind(post, post, false, false) is not null);

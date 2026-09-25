@@ -5,6 +5,7 @@ import System.Option.*
 import System.Result.*
 import System.Collections.*
 import System.Tasks.*
+import System.Concurrency.*
 import System.Text.*
 import System.Networking.Sockets.*
 import System.Runtime.CompilerServices.*
@@ -199,6 +200,15 @@ internal class HttpRequestDecoder {
 
 public class HttpServer {
     private var listener: Socket
+    private var shutdown: CancellationTokenSource = CancellationTokenSource()
+    private var active: int = 0
+    private var closed: bool = false
+
+    internal val StopToken: CancellationToken => shutdown.Token
+
+    internal func Release() {
+        active -= 1
+    }
 
     internal init(listener: Socket) {
         self.listener = listener
@@ -223,12 +233,47 @@ public class HttpServer {
         return Error(HttpError.InvalidRequest("Listener port unavailable"))
     }
 
-    func ServeOne(handler: Func<HttpRequest, Task<Result<HttpResponse, HttpError>>>) -> Task<Result<System.Void, HttpError>> {
-        let operation = HttpServerExchange(listener, handler)
-        return operation.Start()
+    /// Accepts and buffers one request, transferring its exchange lifetime to the caller.
+    func Accept() -> Task<Result<HttpContext, HttpError>> {
+        return Accept(CancellationToken.None)
     }
 
+    /// Cancellation covers waiting for a connection and reading the complete request.
+    func Accept(cancellationToken: CancellationToken) -> Task<Result<HttpContext, HttpError>> {
+        let rejected = Promise<Result<HttpContext, HttpError>>()
+        if cancellationToken.IsCancellationRequested {
+            _ = rejected.Cancel()
+            return rejected.Task
+        }
+        if closed {
+            _ = rejected.Complete(Error(HttpError.InvalidRequest("Server is closed")))
+            return rejected.Task
+        }
+        if active >= 16 {
+            _ = rejected.Complete(Error(HttpError.LimitExceeded("Server exchange limit exceeded")))
+            return rejected.Task
+        }
+        active += 1
+        return HttpServerExchange(self, listener, cancellationToken).Start()
+    }
+
+    /// Handles one accepted context and sends the callback's buffered response.
+    func ServeOne(handler: Func<HttpRequest, Task<Result<HttpResponse, HttpError>>>) -> Task<Result<System.Void, HttpError>> {
+        return ServeOne(handler, CancellationToken.None)
+    }
+
+    /// Cancellation ends this exchange, including an outstanding handler wait.
+    func ServeOne(handler: Func<HttpRequest, Task<Result<HttpResponse, HttpError>>>, cancellationToken: CancellationToken) -> Task<Result<System.Void, HttpError>> {
+        return HttpServeOperation(self, handler, cancellationToken).Start()
+    }
+
+    /// Stops acceptance and closes all owned exchanges. Idempotent; does not drain handlers.
     func Close() {
+        if closed {
+            return
+        }
+        closed = true
+        shutdown.Cancel()
         listener.Close()
     }
 
@@ -330,68 +375,256 @@ public class HttpServer {
     }
 }
 
-internal class HttpServerExchange {
-    private var listener: Socket
-    private var handler: Func<HttpRequest, Task<Result<HttpResponse, HttpError>>>
-    private var source: Promise<Result<System.Void, HttpError>>
-    private var socket: Option<Socket>
-    private var accepting: Option<Task<Result<Socket, SocketError>>>
-    private var transfer: Option<Task<Result<int, SocketError>>>
-    private var handling: Option<Task<Result<HttpResponse, HttpError>>>
-    private var decoder: HttpRequestDecoder
-    private var buffer: byte[]
-    private var outgoing: Sequence<byte>
-    private var isHead: bool = false
-    private var sent: int
+// A context owns one exchange, not a reusable physical connection contract.
+public class HttpContext : Disposable {
+    private var owner: HttpServer
+    private var connection: Socket
+    private var request: HttpRequest
+    private var response: HttpResponse = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), ArrayList<byte>())
+    private var closed: bool = false
+    private var started: bool = false
+    private var shutdownRegistration: CancellationRegistration? = null
+    private var source: Promise<Result<System.Void, HttpError>> = Promise<Result<System.Void, HttpError>>()
+    private var transfer: Option<Task<Result<int, SocketError>>> = None()
+    private var buffer: byte[] = CheckedStorage.Reserve<byte>(256)
+    private var outgoing: Sequence<byte> = ArrayList<byte>()
+    private var sent: int = 0
+    private var token: CancellationToken = CancellationToken.None
+    private var deadline: long = 0
 
-    internal init(listener: Socket, handler: Func<HttpRequest, Task<Result<HttpResponse, HttpError>>>) {
-        self.listener = listener
-        self.handler = handler
-        source = Promise<Result<System.Void, HttpError>>()
-        socket = None()
-        accepting = None()
-        transfer = None()
-        handling = None()
-        decoder = HttpRequestDecoder()
-        buffer = CheckedStorage.Reserve<byte>(256)
-        outgoing = ArrayList<byte>()
-        sent = 0
+    internal init(owner: HttpServer, connection: Socket, request: HttpRequest) {
+        self.owner = owner
+        self.connection = connection
+        self.request = request
+        shutdownRegistration = owner.StopToken.Register(self.Close)
     }
 
-    internal func Start() -> Task<Result<System.Void, HttpError>> {
-        let pending = listener.Accept()
+    /// The fully buffered incoming request; readable after the context closes.
+    val Request: HttpRequest => request
+
+    /// The outgoing response configuration. Initially status 200 with empty content.
+    val Response: HttpResponse => response
+
+    /// Forwards status and empty-content configuration to Response without sending.
+    func Respond(statusCode: HttpStatusCode) {
+        response.Respond(statusCode)
+    }
+
+    /// Forwards status and content configuration to Response without sending.
+    func Respond(statusCode: HttpStatusCode, content: HttpContent) {
+        response.Respond(statusCode, content)
+    }
+
+    /// Configures status 200 and UTF-8 text/plain content; does not send it.
+    func RespondText(text: string) {
+        RespondText(HttpStatusCode.OK, text)
+    }
+
+    /// Configures a status and UTF-8 text/plain content; call Complete to send it.
+    func RespondText(statusCode: HttpStatusCode, text: string) {
+        response.Respond(statusCode, HttpContent.FromText(text))
+    }
+
+    /// Snapshots and sends the configured response, then closes the exchange.
+    func Complete() -> Task<Result<System.Void, HttpError>> {
+        return Complete(CancellationToken.None)
+    }
+
+    /// Reports validation/send errors or acknowledged cancellation; all end the exchange.
+    func Complete(cancellationToken: CancellationToken) -> Task<Result<System.Void, HttpError>> {
+        return Send(response, cancellationToken)
+    }
+
+    internal func Send(response: HttpResponse, cancellationToken: CancellationToken) -> Task<Result<System.Void, HttpError>> {
+        if started || closed {
+            let rejected = Promise<Result<System.Void, HttpError>>()
+            _ = rejected.Complete(Error(HttpError.InvalidRequest("Context is closed or response already started")))
+            return rejected.Task
+        }
+        started = true
+        self.response = response
+        token = cancellationToken
+        if token.IsCancellationRequested {
+            Close()
+            _ = source.Cancel()
+            return source.Task
+        }
+        let encoded = HttpServer.EncodeResponse(response, if request.Method == "HEAD" { 1 } else { 0 })
+        if let Ok(bytes) = encoded {
+            outgoing = bytes
+            deadline = RuntimeServices.SocketDeadlineAfter(15000)
+            SendNext()
+        } else if let Error(reason) = encoded {
+            Finish(Error(reason))
+        }
+        return source.Task
+    }
+
+    /// Ends the exchange without implicitly sending a response. Safe to repeat.
+    func Close() {
+        if closed {
+            return
+        }
+        closed = true
+        connection.Close()
+        let registration = shutdownRegistration
+        shutdownRegistration = null
+        if registration is CancellationRegistration active {
+            active.Dispose()
+        }
+        owner.Release()
+    }
+
+    /// Equivalent to Close; await Respond separately to observe send completion.
+    func Dispose() {
+        Close()
+    }
+
+    private func Finish(result: Result<System.Void, HttpError>) {
+        Close()
+        outgoing = ArrayList<byte>()
+        _ = source.Complete(result)
+    }
+
+    private func SendNext() {
+        if closed || token.IsCancellationRequested {
+            Close()
+            outgoing = ArrayList<byte>()
+            _ = source.Cancel()
+            return
+        }
+        if RuntimeServices.SocketDeadlineExpired(deadline) {
+            Finish(Error(HttpError.TimedOut))
+            return
+        }
+        if sent == outgoing.Count {
+            Finish(Ok(()))
+            return
+        }
+        var count = 0
+        while count < 256 && sent + count < outgoing.Count {
+            buffer[count] = outgoing[sent + count]
+            count += 1
+        }
+        let pending = connection.SendUntil(buffer, 0, count, deadline, token)
+        transfer = Some(pending)
+        pending.OnCompleted(self.OnSent)
+    }
+
+    private func OnSent() {
+        if let Some(pending) = transfer {
+            transfer = None()
+            if pending.IsCancelled || closed || token.IsCancellationRequested {
+                Close()
+                outgoing = ArrayList<byte>()
+                _ = source.Cancel()
+                return
+            }
+            if RuntimeServices.SocketDeadlineExpired(deadline) {
+                Finish(Error(HttpError.TimedOut))
+                return
+            }
+            if let Ok(count) = pending.GetResult() {
+                if count == 0 {
+                    Finish(Error(HttpError.Protocol("Response send made no progress")))
+                    return
+                }
+                sent += count
+                SendNext()
+            } else if let Error(reason) = pending.GetResult() {
+                Finish(Error(HttpError.Transport(reason)))
+            }
+        }
+    }
+}
+
+internal class HttpServerExchange {
+    private var owner: HttpServer
+    private var listener: Socket
+    private var cancellation: CancellationTokenSource = CancellationTokenSource()
+    private var callerRegistration: CancellationRegistration? = null
+    private var shutdownRegistration: CancellationRegistration? = null
+    private var source: Promise<Result<HttpContext, HttpError>> = Promise<Result<HttpContext, HttpError>>()
+    private var socket: Option<Socket> = None()
+    private var accepting: Option<Task<Result<Socket, SocketError>>> = None()
+    private var transfer: Option<Task<Result<int, SocketError>>> = None()
+    private var decoder: HttpRequestDecoder = HttpRequestDecoder()
+    private var buffer: byte[] = CheckedStorage.Reserve<byte>(256)
+    private var deadline: long = 0
+
+    internal init(owner: HttpServer, listener: Socket, token: CancellationToken) {
+        self.owner = owner
+        self.listener = listener
+        callerRegistration = token.Register(self.RequestCancellation)
+        shutdownRegistration = owner.StopToken.Register(self.RequestCancellation)
+    }
+
+    private func RequestCancellation() {
+        cancellation.Cancel()
+    }
+
+    internal func Start() -> Task<Result<HttpContext, HttpError>> {
+        let pending = listener.Accept(cancellation.Token)
         accepting = Some(pending)
         pending.OnCompleted(self.OnAccepted)
         return source.Task
     }
 
-    private func Finish(result: Result<System.Void, HttpError>) {
+    private func Cleanup() {
+        let caller = callerRegistration
+        callerRegistration = null
+        if caller is CancellationRegistration active {
+            active.Dispose()
+        }
+        let shutdown = shutdownRegistration
+        shutdownRegistration = null
+        if shutdown is CancellationRegistration active {
+            active.Dispose()
+        }
+        cancellation.Dispose()
+        accepting = None()
+        transfer = None()
+    }
+
+    private func Fail(reason: HttpError) {
         if let Some(connection) = socket {
             connection.Close()
         }
         socket = None()
-        accepting = None()
-        transfer = None()
-        handling = None()
-        _ = source.Complete(result)
+        let cancelled = cancellation.IsCancellationRequested
+        Cleanup()
+        owner.Release()
+        if cancelled {
+            _ = source.Cancel()
+        } else {
+            _ = source.Complete(Error(reason))
+        }
     }
 
     private func OnAccepted() {
         if let Some(pending) = accepting {
-            let result = pending.GetResult()
             accepting = None()
-            if let Ok(connection) = result {
+            if pending.IsCancelled {
+                Fail(HttpError.InvalidRequest("Accept cancelled"))
+                return
+            }
+            if let Ok(connection) = pending.GetResult() {
                 socket = Some(connection)
+                deadline = RuntimeServices.SocketDeadlineAfter(15000)
                 ReceiveNext()
-            } else if let Error(reason) = result {
-                Finish(Error(HttpError.Transport(reason)))
+            } else if let Error(reason) = pending.GetResult() {
+                Fail(HttpError.Transport(reason))
             }
         }
     }
 
     private func ReceiveNext() {
+        if cancellation.IsCancellationRequested {
+            Fail(HttpError.InvalidRequest("Request cancelled"))
+            return
+        }
         if let Some(connection) = socket {
-            let pending = connection.Receive(buffer, 0, 256)
+            let pending = connection.ReceiveUntil(buffer, 0, 256, deadline, cancellation.Token)
             transfer = Some(pending)
             pending.OnCompleted(self.OnReceived)
         }
@@ -399,88 +632,168 @@ internal class HttpServerExchange {
 
     private func OnReceived() {
         if let Some(pending) = transfer {
-            let result = pending.GetResult()
             transfer = None()
-            if let Ok(count) = result {
+            if pending.IsCancelled || cancellation.IsCancellationRequested {
+                Fail(HttpError.InvalidRequest("Request cancelled"))
+                return
+            }
+            if RuntimeServices.SocketDeadlineExpired(deadline) {
+                Fail(HttpError.TimedOut)
+                return
+            }
+            if let Ok(count) = pending.GetResult() {
                 if count == 0 {
-                    Finish(Error(HttpError.Protocol("EOF before complete request")))
+                    Fail(HttpError.Protocol("EOF before complete request"))
                     return
                 }
                 var index = 0
                 while index < count && !decoder.Complete {
-                    if let Error(message) = decoder.Push(buffer[index]) {
-                        Finish(Error(message))
+                    if let Error(reason) = decoder.Push(buffer[index]) {
+                        Fail(reason)
                         return
                     }
                     index += 1
                 }
                 if decoder.Complete {
                     if let Ok(request) = decoder.Finish() {
-                        isHead = request.Method == "HEAD"
-                        let response = handler(request)
-                        handling = Some(response)
-                        response.OnCompleted(self.OnHandled)
+                        if let Some(connection) = socket {
+                            let context = HttpContext(owner, connection, request)
+                            socket = None()
+                            Cleanup()
+                            _ = source.Complete(Ok(context))
+                        }
                     } else {
-                        Finish(Error(HttpError.Protocol("Invalid request")))
+                        Fail(HttpError.Protocol("Invalid request"))
                     }
                 } else {
                     ReceiveNext()
                 }
-            } else if let Error(reason) = result {
-                Finish(Error(HttpError.Transport(reason)))
+            } else if let Error(reason) = pending.GetResult() {
+                Fail(HttpError.Transport(reason))
+            }
+        }
+    }
+}
+
+internal class HttpServeOperation {
+    private var server: HttpServer
+    private var handler: Func<HttpRequest, Task<Result<HttpResponse, HttpError>>>
+    private var token: CancellationToken
+    private var source: Promise<Result<System.Void, HttpError>> = Promise<Result<System.Void, HttpError>>()
+    private var context: Option<HttpContext> = None()
+    private var accepting: Option<Task<Result<HttpContext, HttpError>>> = None()
+    private var handling: Option<Task<Result<HttpResponse, HttpError>>> = None()
+    private var sending: Option<Task<Result<System.Void, HttpError>>> = None()
+    private var callerRegistration: CancellationRegistration? = null
+    private var shutdownRegistration: CancellationRegistration? = null
+
+    internal init(server: HttpServer, handler: Func<HttpRequest, Task<Result<HttpResponse, HttpError>>>, token: CancellationToken) {
+        self.server = server
+        self.handler = handler
+        self.token = token
+    }
+
+    internal func Start() -> Task<Result<System.Void, HttpError>> {
+        let pending = server.Accept(token)
+        accepting = Some(pending)
+        pending.OnCompleted(self.OnAccepted)
+        return source.Task
+    }
+
+    private func Cleanup() {
+        let caller = callerRegistration
+        callerRegistration = null
+        if caller is CancellationRegistration active {
+            active.Dispose()
+        }
+        let shutdown = shutdownRegistration
+        shutdownRegistration = null
+        if shutdown is CancellationRegistration active {
+            active.Dispose()
+        }
+        if let Some(active) = context {
+            active.Close()
+        }
+        context = None()
+        handling = None()
+    }
+
+    private func Cancel() {
+        // During a send the socket callback owns acknowledgement. During an
+        // application handler wait there is no transport operation to acknowledge.
+        if let Some(active) = context {
+            active.Close()
+        }
+        if let Some(_) = sending {
+            return
+        }
+        Cleanup()
+        _ = source.Cancel()
+    }
+
+    private func Finish(result: Result<System.Void, HttpError>) {
+        Cleanup()
+        _ = source.Complete(result)
+    }
+
+    private func OnAccepted() {
+        if let Some(pending) = accepting {
+            accepting = None()
+            if pending.IsCancelled {
+                Cancel()
+                return
+            }
+            if let Ok(active) = pending.GetResult() {
+                context = Some(active)
+                callerRegistration = token.Register(self.Cancel)
+                shutdownRegistration = server.StopToken.Register(self.Cancel)
+                if source.Task.IsCompleted {
+                    Cleanup()
+                    return
+                }
+                let response = handler(active.Request)
+                if source.Task.IsCompleted {
+                    Cleanup()
+                    return
+                }
+                handling = Some(response)
+                response.OnCompleted(self.OnHandled)
+            } else if let Error(reason) = pending.GetResult() {
+                Finish(Error(reason))
             }
         }
     }
 
     private func OnHandled() {
-        if let Some(pending) = handling {
-            let result = pending.GetResult()
-            handling = None()
-            if let Ok(response) = result {
-                let encoded = HttpServer.EncodeResponse(response, if isHead { 1 } else { 0 })
-                if let Ok(bytes) = encoded {
-                    outgoing = bytes
-                    SendNext()
-                } else if let Error(message) = encoded {
-                    Finish(Error(message))
-                }
-            } else if let Error(message) = result {
-                Finish(Error(message))
-            }
-        }
-    }
-
-    private func SendNext() {
-        if sent == outgoing.Count {
-            Finish(Ok(()))
+        if source.Task.IsCompleted {
             return
         }
-        if let Some(connection) = socket {
-            var count = 0
-            while count < 256 && sent + count < outgoing.Count {
-                buffer[count] = outgoing[sent + count]
-                count += 1
+        if let Some(pending) = handling {
+            handling = None()
+            if pending.IsCancelled {
+                Cancel()
+                return
             }
-            let pending = connection.Send(buffer, 0, count)
-            transfer = Some(pending)
-            pending.OnCompleted(self.OnSent)
+            if let Ok(response) = pending.GetResult() {
+                if let Some(active) = context {
+                    let result = active.Send(response, token)
+                    sending = Some(result)
+                    result.OnCompleted(self.OnSent)
+                }
+            } else if let Error(reason) = pending.GetResult() {
+                Finish(Error(reason))
+            }
         }
     }
 
     private func OnSent() {
-        if let Some(pending) = transfer {
-            let result = pending.GetResult()
-            transfer = None()
-            if let Ok(count) = result {
-                if count == 0 {
-                    Finish(Error(HttpError.Protocol("Response send made no progress")))
-                    return
-                }
-                sent += count
-                SendNext()
-            } else if let Error(reason) = result {
-                Finish(Error(HttpError.Transport(reason)))
+        if let Some(pending) = sending {
+            sending = None()
+            if pending.IsCancelled {
+                Cancel()
+                return
             }
+            Finish(pending.GetResult())
         }
     }
 }

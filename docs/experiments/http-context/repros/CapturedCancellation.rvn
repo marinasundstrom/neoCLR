@@ -1,0 +1,65 @@
+import System.*
+import System.Concurrency.*
+import System.Networking.Sockets.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+func Main() {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+        System.Fault("Listen failed")
+        return
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fault("Port failed")
+        return
+    }
+    Console.WriteLine(port)
+    let stop = CancellationTokenSource()
+    let pending = server.Accept(stop.Token)
+    Observe(pending, server, stop)
+    StartControl(server, stop)
+}
+
+func Observe(pending: Task<Result<HttpContext, HttpError>>, server: HttpServer, stop: CancellationTokenSource) {
+    pending.OnCompleted(() => {
+        if !pending.IsCancelled {
+            System.Fault("Accept did not acknowledge cancellation")
+        }
+        server.Close()
+        stop.Dispose()
+        Console.WriteLine("Pending request cancellation passed")
+    })
+}
+
+func StartControl(server: HttpServer, stop: CancellationTokenSource) {
+    // The peer signals only after sending an incomplete POST to this listener.
+    let control = Socket.Connect("127.0.0.1", 19092)
+    control.OnCompleted(() => {
+        let Ok(connection) = control.GetResult() else {
+            System.Fault("Control connect failed")
+            return
+        }
+        ReadControl(connection, server, stop)
+    })
+}
+
+func ReadControl(connection: Socket, server: HttpServer, stop: CancellationTokenSource) {
+    let buffer: byte[] = [(byte)0]
+    let reading = connection.Receive(buffer, 0, 1)
+    reading.OnCompleted(() => {
+        let Ok(count) = reading.GetResult() else {
+            System.Fault("Control read failed")
+            return
+        }
+        if count != 1 {
+            System.Fault("Control signal missing")
+        }
+        if buffer[0] == 1 {
+            stop.Cancel()
+        } else {
+            server.Close()
+        }
+        connection.Close()
+    })
+}

@@ -1,0 +1,214 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+func Check(value: bool) {
+    if !value {
+        System.Fault("HTTP context assertion failed")
+    }
+}
+
+func CheckCompleted(result: Result<unit, HttpError>) {
+    if let Error(reason) = result {
+        System.Fault(reason.ToString())
+    }
+}
+
+func ObserveCancellation(pending: Task<Result<unit, HttpError>>) -> Task<bool> {
+    let completed = Promise<bool>()
+    pending.OnCompleted(() => {
+        _ = completed.Complete(pending.IsCancelled)
+    })
+    return completed.Task
+}
+
+func ObserveAcceptCancellation(pending: Task<Result<HttpContext, HttpError>>) -> Task<bool> {
+    let completed = Promise<bool>()
+    pending.OnCompleted(() => {
+        _ = completed.Complete(pending.IsCancelled)
+    })
+    return completed.Task
+}
+
+func FailedHandler(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    let source = Promise<Result<HttpResponse, HttpError>>()
+    _ = source.Complete(Error(HttpError.Handler("application rejected request")))
+    return source.Task
+}
+
+func CancelledHandler(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    let source = Promise<Result<HttpResponse, HttpError>>()
+    _ = source.Cancel()
+    return source.Task
+}
+
+class CapacityProbe {
+    private var remaining: int = 16
+    private var finished: Promise<bool> = Promise<bool>()
+
+    func Observe(pending: Task<Result<HttpContext, HttpError>>) {
+        pending.OnCompleted(() => {
+            Check(pending.IsCancelled)
+            Advance()
+        })
+    }
+
+    func Advance() {
+        remaining -= 1
+        if remaining == 0 {
+            _ = finished.Complete(true)
+        }
+    }
+
+    func Run() -> Task<bool> {
+        let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+            System.Fault("Capacity listener failed")
+            return finished.Task
+        }
+        var index = 0
+        while index < 16 {
+            Observe(server.Accept())
+            index += 1
+        }
+        if let Error(HttpError.LimitExceeded(_)) = server.Accept().GetResult() {
+            Check(true)
+        } else {
+            System.Fault("Server exchange limit not enforced")
+        }
+        server.Close()
+        return finished.Task
+    }
+}
+
+async func Exercise(server: HttpServer) -> Task<Result<unit, HttpError>> {
+    Check(await CapacityProbe().Run())
+    // Two requests remain independently owned; complete the second first.
+    let first = await server.Accept()?
+    let second = await server.Accept(CancellationToken.None)?
+    Check(first.Request.Target == "/first" && second.Request.Target == "/second")
+    second.RespondText(HttpStatusCode.OK, "Second: Café")
+    Check(second.Response.StatusCode == HttpStatusCode.OK)
+    Check(second.Response.Content.Bytes.Count == 13)
+    CheckCompleted(await second.Complete(CancellationToken.None))
+    first.Response.Respond(HttpStatusCode.Accepted, HttpContent.FromText("Replacement"))
+    Check(first.Response.StatusCode == HttpStatusCode.Accepted)
+    first.Response.Respond(HttpStatusCode.NoContent)
+    Check(first.Response.Content.Bytes.Count == 0)
+    first.RespondText("First: Café")
+    CheckCompleted(await first.Complete())
+    first.Close()
+    let disposable: Disposable = second
+    disposable.Dispose()
+    if let Error(HttpError.InvalidRequest(_)) = await first.Complete() {
+        Check(true)
+    } else {
+        System.Fault("Duplicate response accepted")
+    }
+
+    CheckCompleted(await ReplyToNext(server))
+
+    let statusOnly = await server.Accept()?
+    statusOnly.RespondText("Will be replaced")
+    statusOnly.Respond(HttpStatusCode.NoContent)
+    Check(statusOnly.Response.Content.Bytes.Count == 0)
+    Check(statusOnly.Response.GetHeaderValues("Content-Type").Count == 0)
+    CheckCompleted(await statusOnly.Complete())
+
+    let abandoned = await server.Accept()?
+    abandoned.Dispose()
+    abandoned.Close()
+    Check(abandoned.Request.Target == "/abandon")
+    if let Error(HttpError.InvalidRequest(_)) = await abandoned.Complete() {
+        Check(true)
+    } else {
+        System.Fault("Disposed context accepted response")
+    }
+
+    let invalid = await server.Accept()?
+    invalid.Respond(HttpStatusCode.NoContent, HttpContent.FromText("Illegal content"))
+    if let Error(HttpError.InvalidRequest(_)) = await invalid.Complete() {
+        Check(true)
+    } else {
+        System.Fault("Invalid framing response accepted")
+    }
+    if let Error(HttpError.InvalidRequest(_)) = await invalid.Complete() {
+        Check(true)
+    } else {
+        System.Fault("Failed response did not end context")
+    }
+
+    if let Error(HttpError.Handler(_)) = await server.ServeOne(FailedHandler) {
+        Check(true)
+    } else {
+        System.Fault("Handler error lost")
+    }
+    Check(await ObserveCancellation(server.ServeOne(CancelledHandler, CancellationToken.None)))
+
+    let handlerStop = CancellationTokenSource()
+    let handlerWait = server.ServeOne(request => {
+        TaskQueue.Default.Post(() => handlerStop.Cancel())
+        return Promise<Result<HttpResponse, HttpError>>().Task
+    }, handlerStop.Token)
+    Check(await ObserveCancellation(handlerWait))
+    handlerStop.Dispose()
+
+    let preCancelled = CancellationTokenSource()
+    preCancelled.Cancel()
+    Check(await ObserveAcceptCancellation(server.Accept(preCancelled.Token)))
+    let cancelled = await server.Accept()?
+    Check(await ObserveCancellation(cancelled.Complete(preCancelled.Token)))
+    preCancelled.Dispose()
+
+    let sending = await server.Accept()?
+    sending.RespondText("Closing while response is pending")
+    let pendingSend = sending.Complete()
+    sending.Close()
+    Check(await ObserveCancellation(pendingSend))
+
+    let waitingStop = CancellationTokenSource()
+    let waiting = server.Accept(waitingStop.Token)
+    TaskQueue.Default.Post(() => waitingStop.Cancel())
+    Check(await ObserveAcceptCancellation(waiting))
+    waitingStop.Dispose()
+
+    Console.WriteLine("Ready for shutdown")
+    let survivor = await server.Accept()?
+    let pendingAccept = server.Accept()
+    server.Close()
+    server.Close()
+    Check(await ObserveAcceptCancellation(pendingAccept))
+    if let Error(HttpError.InvalidRequest(_)) = await survivor.Complete() {
+        Check(true)
+    } else {
+        System.Fault("Shutdown left context open")
+    }
+    if let Error(HttpError.InvalidRequest(_)) = await server.Accept() {
+        Check(true)
+    } else {
+        System.Fault("Closed server accepted request")
+    }
+    return Ok(())
+}
+
+func Main() {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+        System.Fault("Listen failed")
+        return
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fault("Port failed")
+        return
+    }
+    Console.WriteLine(port)
+    let running = Exercise(server)
+    running.OnCompleted(() => {
+        server.Close()
+        if let Error(reason) = running.GetResult() {
+            System.Fault(reason.ToString())
+        }
+        Console.WriteLine("Context lifecycle checks passed")
+    })
+}

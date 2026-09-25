@@ -230,6 +230,7 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'HTTP_CONTEXT_SAMPLE': ('docs/experiments/http-context/Sample.rvn', 'async func ReplyToNext(', '\n}', True),
         'HTTP_VERB_SAMPLE': ('docs/experiments/http-verbs/Sample.rvn', 'async func ReplaceText(', '\n}', True),
         'HTTP_POST_SAMPLE': ('docs/experiments/http-post/Sample.rvn', 'async func PostText(', '\n}', True),
         'HTTP_JSON_SAMPLE': ('docs/experiments/http-json/Client.rvn', 'async func ReadReport(', '\n}', True),

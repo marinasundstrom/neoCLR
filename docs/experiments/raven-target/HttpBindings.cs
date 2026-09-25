@@ -4,10 +4,10 @@ using Mono.Cecil;
 static class HttpBindings
 {
     public const string Prefix = "System.Web.Http.";
-    public static readonly string[] Names = ["HttpClient", "HttpHandler", "HttpRequest", "HttpResponse", "HttpContent", "HttpHeader", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange", "HttpServer", "HttpRequestDecoder", "HttpServerExchange"];
+    public static readonly string[] Names = ["HttpClient", "HttpHandler", "HttpRequest", "HttpResponse", "HttpContent", "HttpHeader", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange", "HttpServer", "HttpRequestDecoder", "HttpServerExchange", "HttpContext", "HttpServeOperation"];
     public static bool IsName(string name) => Names.Any(n => name == Prefix + n);
     public static bool IsContract(string name) => name == Prefix + "HttpHandler";
-    public static bool IsProvider(TypeDefinition type) => type.FullName is Prefix + "HttpResponseDecoder" or Prefix + "HttpExchange" or Prefix + "HttpRequestDecoder" or Prefix + "HttpServerExchange";
+    public static bool IsProvider(TypeDefinition type) => type.FullName is Prefix + "HttpResponseDecoder" or Prefix + "HttpExchange" or Prefix + "HttpRequestDecoder" or Prefix + "HttpServerExchange" or Prefix + "HttpServeOperation";
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
     public static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
@@ -92,6 +92,8 @@ static class HttpBindings
             public sealed class HttpResponse {
                 public HttpResponse(int statusCode, Collections.Sequence<HttpHeader> headers, Collections.Sequence<byte> body) { }
                 public HttpResponse(HttpStatusCode statusCode, Collections.Sequence<HttpHeader> headers, Collections.Sequence<byte> body) { }
+                public void Respond(HttpStatusCode statusCode) { }
+                public void Respond(HttpStatusCode statusCode, HttpContent content) { }
                 public HttpStatusCode StatusCode => default;
                 public bool IsSuccessStatusCode => default;
                 public Collections.Sequence<HttpHeader> Headers => default;
@@ -110,7 +112,12 @@ static class HttpBindings
                 public HttpServer(Networking.Sockets.Socket listener) { }
                 public static Result<HttpServer, HttpError> Listen(string address, int port, int backlog) => default;
                 public Result<int, HttpError> GetLocalPort() => default;
+                public Tasks.Task<Result<HttpContext, HttpError>> Accept() => default;
+                public Tasks.Task<Result<HttpContext, HttpError>> Accept(Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.CancellationToken StopToken => default;
+                public void Release() { }
                 public Tasks.Task<Result<PropagationUnit, HttpError>> ServeOne(Func<HttpRequest, Tasks.Task<Result<HttpResponse, HttpError>>> handler) => default;
+                public Tasks.Task<Result<PropagationUnit, HttpError>> ServeOne(Func<HttpRequest, Tasks.Task<Result<HttpResponse, HttpError>>> handler, Concurrency.CancellationToken cancellationToken) => default;
                 public void Close() { }
                 public static Result<Collections.Sequence<byte>, HttpError> EncodeResponse(HttpResponse response, int headOnly) => default;
             }
@@ -120,8 +127,26 @@ static class HttpBindings
                 public Result<bool, HttpError> Push(byte value) => default;
                 public Result<HttpRequest, HttpError> Finish() => default;
             }
+            public sealed class HttpContext : Disposable {
+                public HttpContext(HttpServer owner, Networking.Sockets.Socket connection, HttpRequest request) { }
+                public HttpRequest Request => default;
+                public HttpResponse Response => default;
+                public void Respond(HttpStatusCode statusCode) { }
+                public void Respond(HttpStatusCode statusCode, HttpContent content) { }
+                public void RespondText(string text) { }
+                public void RespondText(HttpStatusCode statusCode, string text) { }
+                public Tasks.Task<Result<PropagationUnit, HttpError>> Complete() => default;
+                public Tasks.Task<Result<PropagationUnit, HttpError>> Complete(Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<PropagationUnit, HttpError>> Send(HttpResponse response, Concurrency.CancellationToken cancellationToken) => default;
+                public void Close() { }
+                public void Dispose() { }
+            }
             public sealed class HttpServerExchange {
-                public HttpServerExchange(Networking.Sockets.Socket listener, Func<HttpRequest, Tasks.Task<Result<HttpResponse, HttpError>>> handler) { }
+                public HttpServerExchange(HttpServer owner, Networking.Sockets.Socket listener, Concurrency.CancellationToken token) { }
+                public Tasks.Task<Result<HttpContext, HttpError>> Start() => default;
+            }
+            public sealed class HttpServeOperation {
+                public HttpServeOperation(HttpServer server, Func<HttpRequest, Tasks.Task<Result<HttpResponse, HttpError>>> handler, Concurrency.CancellationToken token) { }
                 public Tasks.Task<Result<PropagationUnit, HttpError>> Start() => default;
             }
             public sealed class HttpResponseDecoder {
@@ -140,7 +165,7 @@ static class HttpBindings
     public static void Project(ModuleDefinition module)
     {
         foreach (var type in module.Types.Where(t => IsName(t.FullName)))
-            foreach (var method in type.Methods.Where(m => m.Name == "FindValues" || m.Name == "FromIncoming" || m.Name == "EncodeResponse" || type.Name == "HttpRequest" && m.Name == "Encode" || type.Name == "HttpContent" && m.Name == "get_MediaType" || type.Name == "HttpServer" && m.IsConstructor))
+            foreach (var method in type.Methods.Where(m => m.Name == "FindValues" || m.Name == "FromIncoming" || m.Name == "EncodeResponse" || type.Name == "HttpRequest" && m.Name == "Encode" || type.Name == "HttpContent" && m.Name == "get_MediaType" || type.Name == "HttpServer" && (m.IsConstructor || m.Name is "Release" or "get_StopToken") || type.Name == "HttpContext" && (m.IsConstructor || m.Name == "Send")))
                 method.Attributes = (method.Attributes & ~MethodAttributes.MemberAccessMask) | MethodAttributes.Assembly;
         foreach (var type in module.Types.Where(IsProvider))
         {
@@ -165,7 +190,7 @@ static class HttpBindings
             ("HttpServer", "Listen") => ("String,Int32,Int32", $"System.Result<{Prefix}HttpServer,System.Web.Http.HttpError>", true),
             ("HttpServer", "GetLocalPort") => ("", "System.Result<Int32,System.Web.Http.HttpError>", false),
             ("HttpServer", "Close") => ("", "noresult", false),
-            ("HttpServer", "ServeOne") => ($"System.Func<{request},{task}>", "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
+            ("HttpServer", "ServeOne") => ($"System.Func<{request},{task}>" + (args.Length == 2 ? "," + CancellationBindings.Token : ""), "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
             ("HttpServer", "EncodeResponse") when library => (response + ",Int32", "System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>", true),
             ("HttpRequest", "FromIncoming") when library => ($"String,String,String,System.Collections.Sequence<{Prefix}HttpHeader>,System.Collections.Sequence<Byte>", $"System.Result<{request},System.Web.Http.HttpError>", true),
             ("HttpHeader", "FindValues") when library => ($"System.Collections.Sequence<{Prefix}HttpHeader>,String", "System.Collections.Sequence<String>", true),
@@ -175,8 +200,21 @@ static class HttpBindings
             ("HttpRequestDecoder", "get_Complete") when library => ("", "Boolean", false),
             ("HttpRequestDecoder", "Push") when library => ("Byte", "System.Result<Boolean,System.Web.Http.HttpError>", false),
             ("HttpRequestDecoder", "Finish") when library => ("", $"System.Result<{request},System.Web.Http.HttpError>", false),
-            ("HttpServerExchange", ".ctor") when library => ($"System.Networking.Sockets.Socket,System.Func<{request},{task}>", "noresult", false),
-            ("HttpServerExchange", "Start") when library => ("", "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
+            ("HttpServerExchange", ".ctor") when library => ($"{Prefix}HttpServer,System.Networking.Sockets.Socket,{CancellationBindings.Token}", "noresult", false),
+            ("HttpServerExchange", "Start") when library => ("", $"System.Tasks.Task<System.Result<{Prefix}HttpContext,System.Web.Http.HttpError>>", false),
+            ("HttpServeOperation", ".ctor") when library => ($"{Prefix}HttpServer,System.Func<{request},{task}>,{CancellationBindings.Token}", "noresult", false),
+            ("HttpServeOperation", "Start") when library => ("", "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
+            ("HttpServer", "Accept") => (args.Length == 1 ? CancellationBindings.Token : "", $"System.Tasks.Task<System.Result<{Prefix}HttpContext,System.Web.Http.HttpError>>", false),
+            ("HttpServer", "Release") when library => ("", "noresult", false),
+            ("HttpServer", "get_StopToken") when library => ("", CancellationBindings.Token, false),
+            ("HttpContext", ".ctor") when library => ($"{Prefix}HttpServer,System.Networking.Sockets.Socket,{request}", "noresult", false),
+            ("HttpContext", "get_Response") => ("", response, false),
+            ("HttpContext", "Complete") => (args.Length == 1 ? CancellationBindings.Token : "", "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
+            ("HttpContext", "RespondText") => (args.Length == 1 ? "String" : Prefix + "HttpStatusCode,String", "noresult", false),
+            ("HttpResponse" or "HttpContext", "Respond") => (Prefix + "HttpStatusCode" + (args.Length == 2 ? "," + Prefix + "HttpContent" : ""), "noresult", false),
+            ("HttpContext", "get_Request") => ("", request, false),
+            ("HttpContext", "Close" or "Dispose") => ("", "noresult", false),
+            ("HttpContext", "Send") when library => (response + (args.Length == 2 ? "," + CancellationBindings.Token : ""), "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
             ("HttpClient", ".ctor") when args.Length == 0 => ("", "noresult", false),
             ("HttpClient", ".ctor") => (Prefix + "HttpHandler", "noresult", false),
             ("HttpClient", "Get" or "GetString" or "Delete" or "Head") => (args.Length > 0 && args[0] == "String" ? "String" : "System.Uri",
@@ -218,7 +256,7 @@ static class HttpBindings
             && definition.Name is "Get" or "GetString" or "Send" or "Post" or "Put" or "Patch" or "Delete" or "Head"
             && args.LastOrDefault() == CancellationBindings.Token)
             expected.Item1 += "," + CancellationBindings.Token;
-        var virtualMember = IsContract(owner) || owner == Prefix + "HttpSocketHandler"
+        var virtualMember = owner == Prefix + "HttpContext" && definition.Name == "Dispose" || IsContract(owner) || owner == Prefix + "HttpSocketHandler"
             && definition.Name == "Send" && args.Length == 2;
         if (definition.IsConstructor != construct || definition.IsStatic != expected.Item3
             || !(definition.IsPublic || library && definition.IsAssembly)

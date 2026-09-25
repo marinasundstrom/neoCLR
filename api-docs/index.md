@@ -48,6 +48,7 @@ walks through the compiled hostname/echo POC.
 | Mathematics and environment | [Expected outcomes](/features/outcomes/) | [System.Math](xref:System.Math) · [Environment](xref:System.Environment) |
 | Tasks and completion | [Tasks and async](/features/tasks/) · [Callbacks](callbacks.md) | [System.Tasks](xref:System.Tasks) |
 | Isolated workers | [Thread and worker behavior](/features/tasks/) | [System.Concurrency](xref:System.Concurrency) |
+| HTTP messages and exchanges | [Web guide](/features/web/) | [HttpClient](xref:System.Web.Http.HttpClient) · [HttpContext](xref:System.Web.Http.HttpContext) · [HttpServer](xref:System.Web.Http.HttpServer) |
 | Storage and files | [Files and Storage](/features/files/) · [Providers](storage-provider.md) | [System.Storage](xref:System.Storage) |
 | Byte and text streams | [Stream contracts](streams.md) · [Pending reads](pending-read.md) | [System.IO](xref:System.IO) |
 | Console | [Console guide](/features/console/) · [Standard stream ownership](console.md) | [Console](xref:System.Console) |

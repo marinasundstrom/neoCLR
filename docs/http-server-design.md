@@ -1,5 +1,9 @@
 # Minimal HTTP server — development POC, 2026-09-24
 
+The opening sections retain the initial checkpoint and its limitations. The
+[current context/lifecycle contract](#context-ownership-and-response-configuration--2026-09-25)
+supersedes the original listener-only Close and callback cancellation gaps.
+
 The author selects HttpServer after the integrated HttpClient POC, testing both
 against each other and independent peers. The networking proposal deliberately leaves
 Run versus async request iteration open until cancellation and concurrency develop.
@@ -176,3 +180,82 @@ representation it would for GET; the encoder computes its byte Content-Length an
 omits the body. Existing 204/205/304 content restrictions still apply. The .NET peer
 in `experiments/http-verbs` checks a five-byte UTF-8 representation and empty received
 content. See the [framing comparison](http-client-design.md#bounded-response-framing-and-head--2026-09-25).
+
+## Context ownership and response configuration — 2026-09-25
+
+This development checkpoint resolves the earlier explicit-accept exploration:
+
+- `Accept(token)` returns `Task<Result<HttpContext, HttpError>>` after validating and
+  buffering a request. Its token covers acceptance/reading, then detaches. The caller
+  owns the returned scope and passes a token separately to `Complete` if needed.
+- `context.Request` is the incoming message. `context.Response` is outgoing mutable
+  configuration, initially status 200 with empty content.
+- `HttpResponse.Respond(statusCode)` replaces status and clears content;
+  `Respond(statusCode, content)` sets both. Content-Type is replaced from content
+  metadata (removed if absent); other headers remain. These methods perform no I/O.
+  `context.Respond` forwards both shapes. `RespondText(text)` and
+  `RespondText(statusCode, text)` configure UTF-8 text/plain content through them.
+- `context.Complete(token)` validates and snapshots the configured response, sends it,
+  then closes the exchange. Validation/send failure and acknowledged cancellation
+  also end it. Duplicate completion or completion after closure is InvalidRequest.
+  Header/content mutations after the snapshot cannot change captured wire bytes;
+  they can still change the local message object. Keep sequences stable while consumed.
+- `Close`/`Dispose` end the scope without sending unsent content. They are idempotent;
+  closing an in-progress completion causes cancellation after native acknowledgement.
+  Bytes may already have reached the peer. Request/response data remain readable.
+- `ServeOne` retains its request-to-response callback for compatibility, adds a token
+  overload and uses the same context sender and cleanup. Handler Result errors and
+  cancelled tasks close the scope. Cancellation during a handler wait stops waiting
+  and ignores a later result; it cannot preempt code or cancel unrelated handler work.
+- `HttpServer.Close` now cancels pending accepts and ends active contexts/callback
+  waits. **Migration:** it previously closed only the listener. Shutdown does not drain
+  handlers, block for native callbacks or guarantee delivery. Continue pumping the
+  scheduler to observe pending operation acknowledgement. Terminal Faults do not
+  promise managed cleanup; invocation teardown owns native resources in that case.
+
+At most 16 accept/context scopes may be outstanding per server. Native listeners
+still admit one pending accept, but applications can hold multiple completed contexts.
+Reading has a provisional 15-second budget starting after acceptance; sending has a
+separate 15-second budget starting after snapshotting. Both retain shorter native phase
+bounds. Waiting for connections/handlers has no automatic deadline; cancellation and
+server shutdown end those waits. These invocation-local APIs add no worker pool or
+public scheduler dependency. Private continuation machines remain replaceable when
+runtime suspension is available.
+
+### Comparison and deliberate limits
+
+Primary sources reviewed 2026-09-25: [.NET HttpListener.GetContextAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistener.getcontextasync?view=net-10.0)
+returns a request/response context, while [HttpListenerResponse.Close](https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistenerresponse.close?view=net-10.0)
+combines sending with cleanup. [ASP.NET Core HttpResponse.CompleteAsync](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.httpresponse.completeasync?view=aspnetcore-10.0)
+provides an asynchronous response-completion boundary. neoCLR separates synchronous
+configuration, observable asynchronous completion and synchronous abandonment, so
+sending errors are Result outcomes rather than hidden in disposal. The cost is an
+explicit completion step; disposal alone does not deliver a response. This is a small
+buffered contract, not ASP.NET Core's streaming writer or host feature system.
+
+[Go Server.Close and Shutdown](https://pkg.go.dev/net/http#Server.Close) distinguish
+immediate closure from graceful draining. This checkpoint chooses immediate scope
+closure for bounded shutdown. Graceful draining needs a later explicit deadline and
+in-flight-work policy; it must not be implied by the current Close name. An independent
+.NET hosting-framework comparison beyond these platform APIs remains open; this slice
+does not claim a better server architecture or performance.
+
+**Author direction:** consider HttpRequest/HttpResponse interfaces with separate
+InboundHttpRequest/OutboundHttpRequest and response implementations later. That could
+make configuration legal only on outbound messages and support different behavior.
+For now the existing concrete response carries the setter-style Respond methods.
+Calling them on a received client response only changes that local object. This
+provisional mutability is not a final interface/implementation split or a commitment
+to the inbound/outbound names. No new class hierarchy is introduced prematurely.
+
+The [context fixture](experiments/http-context/README.md) covers these ownership
+boundaries and the compiled convenience sample; existing independent .NET verb/HEAD
+checks exercise the callback path over the same context implementation.
+
+Validation on 2026-09-25: the context stress/sample fixture, caller/server cancellation
+peers and existing .NET verb/HEAD callback fixture pass with final live-object count
+zero. Signature admission/private-helper rejection, Disposable conversion and matching
+API/bootstrap checks pass. Website build remains skipped by author direction. The
+frozen-toolchain callback/propagation limitations and retained reproduction are listed
+in the [integration notes](raven-backend-integration-map.md#http-context-and-configured-responses--2026-09-25);
+they remain stabilization work, not fixes claimed by this API slice.

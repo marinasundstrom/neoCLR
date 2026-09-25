@@ -78,8 +78,16 @@ Accept/AcceptRequest returning a Result<HttpContext, HttpError> alongside callba
 [evaluate ownership and response completion in slice 7](http-server-design.md#explicit-asynchronous-acceptance--exploration-2026-09-25).
 The author clarifies HttpContext as a foundational per-exchange concept for HTTP web
 applications, closed/disposed when handling is done. That is the architectural direction;
-accept naming, response completion and disposal details remain design work. No context
-API is implemented yet, and the current slice order is unchanged.
+the development checkpoint now uses Accept, configuration through context.Response.Respond
+and context convenience methods, explicit asynchronous Complete, and Close/Dispose.
+[The lifecycle contract](http-server-design.md#context-ownership-and-response-configuration--2026-09-25)
+records cancellation, bounded ownership and the change to server shutdown. Inbound/outbound
+request/response implementations behind interfaces remain a future author direction.
+Slice 7's bounded checkpoint now passes [context/cancellation/peer evidence](experiments/http-context/README.md).
+Next is the release application slice, including the newly requested provisional JSON
+and runtime-reflection evaluation below. Frozen-toolchain capture/propagation findings
+remain explicit release-stabilization follow-ups; completing this checkpoint is not a
+release-readiness claim.
 The [address hierarchy checkpoint](experiments/ip-address-hierarchy/README.md)
 now links the [implemented address slice](ip-address-design.md): public parsing/formatting,
 value semantics, typed DNS results and Socket overloads. The [cancellation foundations](cancellation-design.md)
@@ -136,9 +144,38 @@ Keep bodies buffered initially with documented/configurable bounds. A stream-bac
 body API is a follow-up unless the chosen sample demonstrates a concrete need;
 do not require full duplex streaming just to release ordinary request/response I/O.
 The notes app should reuse storage APIs and the bounded JSON work, extracting only
-the small public JSON contract the app needs. A serializer/reflection framework is
-not a prerequisite. Check the application API with familiar .NET patterns while
-retaining Result/Option and explicit ownership.
+the small public JSON contract the app needs. A general serializer/reflection framework
+is not a prerequisite. **Author follow-up (2026-09-25):** evaluate a provisional
+`System.Data.Json` DOM and minimal reflection-based serialization/deserialization POC
+for the approaching release demonstration. Follow the HTTP framing/context slices with
+a bounded DOM/parser/writer extraction, then a single application-model round trip.
+The author specifies a provisional `JsonSerializer` supporting string input/output
+and stream input/output. Use the same model through both paths to exercise StreamReader,
+StreamWriter, encoding and the underlying Stream contracts, including partial transfers,
+malformed input, ownership/cleanup and collection during pending I/O. This is an
+acceptance case for the POC, not a promise of complete .NET serializer compatibility.
+Current introspection exposes member metadata but not public value access, assignment
+or construction/invocation. **Author clarification:** `System.Runtime.Reflection`
+will provide extensions to the `System.Introspection` model; those operations work
+when the model is backed by loaded runtime types. Preserve introspection as the
+metadata model instead of putting runtime execution on every metadata provider.
+Define the unsupported-operation result for metadata-only models during that design.
+The author's later sketch illustrates public operations backed by internal runtime
+machinery. **Clarification:** it is not a request to create that API or prescribe its
+type names. Keep exact interfaces, extension/helper/error names, signatures and failure
+shapes open; use the runtime-backed extension of introspection as architectural direction.
+The author corrects the illustrative property-operation receiver to `PropertyInfo`,
+not TypeInfo; corresponding field operations naturally belong with FieldInfo.
+The concrete goal is minimal object construction and property assignment; field
+assignment is also an acceptable route. Serialization needs corresponding value reads.
+Keep the operation semantics familiar to .NET users while applying neoCLR's own type,
+visibility and failure contracts. Identify and research the smallest checked reflection
+operations needed before promising that round trip; do not disguise handwritten
+field mapping as reflection serialization. Compare .NET System.Text.Json and reflection
+contracts, include malformed/type-mismatch inputs and GC checks, and label the surface
+provisional. This is an exploration/release candidate, not implemented capability or
+a commitment to general serializer compatibility. Check the application API with
+familiar .NET patterns while retaining Result/Option and explicit ownership.
 
 **HTTPS scope decision:** investigate a maintained native/platform TLS backend early,
 including certificate trust, hostname validation, cancellation and target packaging.

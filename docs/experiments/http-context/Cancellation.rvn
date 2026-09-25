@@ -1,0 +1,87 @@
+import System.*
+import System.Concurrency.*
+import System.Networking.Sockets.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+class CancellationProbe {
+    private var server: HttpServer
+    private var stop: CancellationTokenSource = CancellationTokenSource()
+    private var pending: Task<Result<HttpContext, HttpError>>
+    private var connecting: Option<Task<Result<Socket, SocketError>>> = None()
+    private var connection: Option<Socket> = None()
+    private var reading: Option<Task<Result<int, SocketError>>> = None()
+    private var buffer: byte[] = [(byte)0]
+
+    init(server: HttpServer) {
+        self.server = server
+        pending = server.Accept(stop.Token)
+    }
+
+    func Start() {
+        pending.OnCompleted(self.OnAccepted)
+        let control = Socket.Connect("127.0.0.1", 19092)
+        connecting = Some(control)
+        control.OnCompleted(self.OnConnected)
+    }
+
+    func OnAccepted() {
+        if !pending.IsCancelled {
+            System.Fault("Accept did not acknowledge cancellation")
+        }
+        server.Close()
+        stop.Dispose()
+        Console.WriteLine("Pending request cancellation passed")
+    }
+
+    func OnConnected() {
+        if let Some(control) = connecting {
+            connecting = None()
+            let Ok(socket) = control.GetResult() else {
+                System.Fault("Control connect failed")
+                return
+            }
+            connection = Some(socket)
+            let read = socket.Receive(buffer, 0, 1)
+            reading = Some(read)
+            read.OnCompleted(self.OnSignal)
+        }
+    }
+
+    func OnSignal() {
+        if let Some(read) = reading {
+            reading = None()
+            let Ok(count) = read.GetResult() else {
+                System.Fault("Control read failed")
+                return
+            }
+            if count != 1 {
+                System.Fault("Control signal missing")
+            }
+            if buffer[0] == 1 {
+                stop.Cancel()
+            } else {
+                server.Close()
+            }
+            if let Some(socket) = connection {
+                socket.Close()
+            }
+            connection = None()
+        }
+    }
+}
+
+func Main() {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+        System.Fault("Listen failed")
+        return
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fault("Port failed")
+        return
+    }
+    Console.WriteLine(port)
+    CancellationProbe(server).Start()
+}

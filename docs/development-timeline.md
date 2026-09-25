@@ -7223,3 +7223,87 @@ configuration/content, not target-specific code added to Raven main.
   Website content was updated; its build was skipped as directed.
 - **Remaining:** the context lifetime slice follows this checkpoint. No release or
   deployment has been performed.
+
+### 2026-09-25 — response configuration versus context convenience
+
+- **Author:** HttpContext should offer shortcuts such as responding with text, on top
+  of managing the combined request/response lifetime.
+- **Assistant proposal:** initially suggested RespondText forwarding to an asynchronous
+  context Respond operation.
+- **Author correction:** “HttpResponse of course have the real Respond methods,” with
+  status-code and optional-content overloads, and convenience indirection on HttpContext.
+  Clarified: “Respond on the HttpResponse sets the status code and content.”
+- **Assistant response:** accepted `context.Response` as the response API and asked
+  whether Respond only configures it, with separate asynchronous context completion,
+  or also sends. This completion boundary is pending clarification; the earlier
+  context-owned Respond suggestion is not treated as the selected contract.
+
+- **Author follow-up:** considers request/response interfaces with separate inbound and
+  outbound implementations as a direction, while saying that setting status/content may
+  be enough now. Also requests context Respond forwards matching HttpResponse.Respond.
+- **Assistant implementation choice:** setter-style Respond methods, an explicit asynchronous
+  context Complete boundary, context forwards/text helpers, and shared accept/callback
+  lifetime management. The interface split is recorded for later; no new hierarchy is added.
+
+
+### 2026-09-25 — provisional JSON release demonstration
+
+- **Author:** says it is soon time to consider release and suggests a provisional JSON
+  DOM in System.Data.Json, plus minimal reflection-based serialization/deserialization
+  to demonstrate the platform, without claiming the API is finished.
+- **Assistant proposal:** after the two active HTTP slices, evaluate a bounded DOM and
+  one concrete model round trip. Inspection finds public member metadata but no public
+  reflective value access, assignment or construction/invocation in current descriptors.
+- **Action:** record that dependency and scope on the authoritative roadmap. No JSON or
+  reflective access implementation is claimed; the broader serializer remains future work.
+
+- **Author clarification:** System.Runtime.Reflection will extend the
+  System.Introspection model; its operations work for models backed by loaded runtime
+  types. **Assistant response:** keep metadata description separate from runtime
+  capabilities and evaluate an explicit unsupported-operation result for metadata-only
+  models. Namespace/layering direction is recorded; exact extension signatures and
+  failure shape remain to be designed for the JSON POC.
+
+- **Author sketch:** internal ReflectionHelpers and a ReflectionExtensions extension
+  over TypeInfo, illustrated with a SetValue operation returning Result<void,
+  ReflectionError>. The author labels it “the concept.” **Assistant response:** public
+  extensions delegate to internal helpers; settle receiver/parameter shapes around
+  the JSON round trip. The sketch is not recorded as compilable Raven or a final API.
+
+- **Author correction:** “I don't say you should create that API. Or name types that
+  way.” **Assistant response:** treat the sketch as illustrative separation of
+  responsibilities only. Exact APIs and type/helper/error names remain open; the
+  roadmap was revised to avoid turning the sketch into an implementation requirement.
+
+- **Author scope:** the minimum should allow creating objects and setting properties,
+  or fields, in a way familiar to .NET users while remaining neoCLR. **Assistant
+  response:** scope construction and value reads/writes around the serialization round
+  trip, with neoCLR type/failure contracts; retain API/name decisions for that work.
+
+- **Author correction:** “the extension should be on PropertyInfo,” correcting the
+  earlier TypeInfo sketch. **Assistant response:** property operations extend
+  PropertyInfo; corresponding field operations would extend FieldInfo. This updates
+  the receiver direction without finalizing illustrative method names/signatures.
+
+
+### 2026-09-25 — HTTP lifecycle checkpoint outcome
+
+- **Assistant-reported implementation:** Accept/HttpContext, synchronous response
+  configuration and matching context conveniences, asynchronous Complete and explicit
+  close/dispose now share the callback path. Server.Close ends owned exchanges;
+  cancellation and outstanding scope/read/send bounds are documented.
+- **Validation:** direct context/sample and two cancellation peers pass, as does the
+  independent .NET verb/HEAD callback regression. Each finishes with zero live objects.
+  API/signature/bootstrap checks pass; website build was skipped as directed.
+- **Open:** the frozen compiler/bridge has captured-callback and discarded-unit
+  propagation failures; the passing fixtures use explicit state/result assertions.
+  A [captured-callback reproduction](experiments/http-context/repros/README.md) is saved
+  for reduction and independent Raven validation. No compiler fix is claimed. The
+  JSON/runtime-reflection discussion is roadmap direction, not an implemented API.
+
+- **Author extension:** a JSON serializer POC should exercise StreamReader,
+  StreamWriter and Stream APIs; JsonSerializer should read/write streams and support
+  string input/output. **Assistant response:** use the same model round trip through
+  both paths, checking partial transfers, malformed input, encoding and ownership as
+  release-demo acceptance criteria. This updates planned scope; no serializer API is
+  implemented by the HTTP lifecycle checkpoint.

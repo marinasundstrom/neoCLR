@@ -66,7 +66,8 @@ RavenDoc now renders the previously excluded TaskQueue Post/Run, Task OnComplete
 ITaskAwaiter OnCompleted, FileText WriteAllText and OutputStream/FileOutputStream/
 TextWriter/StreamWriter Flush signatures, including Func<Void> and Result<Void,E>.
 Their Markdown guides remain behavioral reference, not renderer exclusions.
-Existing selected types include Tasks, Thread/ThreadPool, Storage, IO, Console,
+Existing selected types include the HTTP client/server/context and response configuration APIs,
+Tasks, Thread/ThreadPool, Storage, IO, Console,
 Object/Value, HashCode, Equatable, compiler async support and Introspection descriptors.
 Host Fault/FaultCode and debugger fields remain a complete manual [reference](faults.md),
 not synthetic CLI types. The Rust-only StringValue payload and owned-text migration

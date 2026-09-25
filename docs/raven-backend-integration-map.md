@@ -205,3 +205,38 @@ nonpublic argument conversion currently handles only one materialized argument;
 no public API carries that workaround. The same frozen compiler SDK builds the
 library and consumer/reference snapshots. See the [framing design](http-client-design.md#bounded-response-framing-and-head--2026-09-25)
 and focused HTTP fixtures for limitations and evidence.
+
+### HTTP context and configured responses — 2026-09-25
+
+The target bridge now projects HttpContext (including Disposable conversion), Accept,
+Complete, configuration-only Respond methods, text convenience and token-bearing
+ServeOne. Internal context constructors/sending and server lifecycle helpers remain
+inaccessible to consumer imports. The new callback adapter/accept operation are private
+library types. Runtime Contract settings and compiler emission policy are unchanged;
+private wrappers bind cancellation delegates within the imported library rather than
+requiring direct delegate binding to a reference-only core method.
+
+The frozen compiler exposed a separate limitation in a stress fixture: discarding a
+propagated `Result<unit, E>` after await leaves a unit stack value on a later resume
+merge, including `_ = await operation()?`. The fixture explicitly asserts completion
+results instead. The user-facing sample propagates typed Accept failure and returns
+Complete's Result directly. Record the discarded-unit lowering case for independent
+Raven reduction/validation; no bridge stack checks are weakened and no compiler fix
+is claimed here. Future runtime suspension does not make invalid current CIL acceptable.
+
+
+The cancellation fixture's original combined Main/nested-callback shape also failed
+in the frozen compiler with `Missing local builder for 'pending'`. Separating observer,
+connect and read callbacks into ordinary functions avoids that emission failure.
+This is recorded evidence, not an isolated general root cause or a compiler fix.
+The lifecycle stress test uses a counter observer rather than a collection of nested
+Task/Result values, which remains outside the current importer's collection profile.
+
+The separated captured-callback variant subsequently reached execution but faulted
+reading a null captured pending task. The final cancellation probe keeps operation
+state in explicit instance fields and uses method-group callbacks; both cancellation
+and shutdown cases pass. The earlier capture failure remains a compiler/bridge
+investigation candidate, not evidence of a diagnosed GC bug or a completed fix.
+
+The [captured-callback source and reproduction command](experiments/http-context/repros/README.md)
+are retained for that follow-up and are explicitly excluded from passing sample claims.
