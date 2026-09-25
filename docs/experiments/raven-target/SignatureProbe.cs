@@ -367,6 +367,8 @@ static class SignatureProbe
         var findValues = module.GetType(HttpBindings.Prefix + "HttpHeader").Methods.Single(m => m.Name == "FindValues");
         Reject("Header lookup helper is internal", () => HttpBindings.Bind(findValues, findValues, false, false));
         Check("Header lookup helper available to library", HttpBindings.Bind(findValues, findValues, false, true) is not null);
+        var withHeader = requestType.Methods.Single(m => m.Name == "WithHeader");
+        Check("Request header construction", HttpBindings.Bind(withHeader, withHeader, false, false)?.Result == "System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>");
         var requestContent = requestType.Methods.Single(m => m.Name == "get_Content");
         Check("Request content contract", HttpBindings.Bind(requestContent, requestContent, false, false)?.Result == "System.Web.Http.HttpContent");
         foreach (var member in new[] { requestType.Methods.Single(m => m.Name == "Encode"),

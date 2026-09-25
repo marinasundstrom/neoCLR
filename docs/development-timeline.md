@@ -7165,3 +7165,20 @@ configuration/content, not target-specific code added to Raven main.
 - **Scope:** no stream overload or transport streaming is implemented by this header
   checkpoint. Linked design compares .NET StreamContent and identifies lifetime/framing
   questions rather than assuming its ownership policy.
+
+## 2026-09-25 — With methods and Raven with-expressions
+
+- **Author direction:** “When implementing the With* methods we can eventually
+  support Raven with-expression”.
+- **Assistant response:** preserve copy-producing WithHeader as an API building block
+  and record eventual language integration. Determine how with-expressions would handle
+  Result-returning updates and validation errors before selecting a compiler convention.
+- **Scope:** no with-expression lowering change or automatic method-discovery contract
+  is implemented in this HTTP slice. Shared content still prevents deep immutability;
+  update syntax alone does not imply records or value equality.
+
+- **Author correction:** “Perhaps not in this case though since WithHeader is not
+  complying with that expectation”. **Assistant response:** agree that WithHeader
+  selects a collection entry by name and can fail validation, rather than directly
+  setting a property in a copy. Keep it outside the prospective with-expression mapping;
+  the broader future direction for suitable With* methods remains open.

@@ -87,11 +87,12 @@ are verified separately from proposed positional deconstruction. Slice 5 now inc
 string/Uri and token overloads, byte/UTF-8 content, bounded server reads and independent
 peer checks. Request/response GetHeaderValues now supplies ASCII case-insensitive
 lookup preserving repeated fields; [header evidence](experiments/http-headers/README.md).
-General header building and additional verb helpers remain within
-slice 5 before moving to broader response framing. The cancellation fixture now signals independently of the third request;
+WithHeader now constructs replacement application fields on a new request and the
+socket provider validates/serializes them; [request header evidence](experiments/http-request-headers/README.md).
+Additional verb helpers remain within slice 5 before moving to broader response framing. The cancellation fixture now signals independently of the third request;
 headers and isolated-body checks pass. [The evidence](experiments/http-status/README.md)
 retains timeout sensitivity under competing local work for serial release validation;
-no production scheduler/deadline fix is claimed. Stream-backed HttpContent is an
+no production scheduler/deadline fix is claimed for that cancellation fixture. Stream-backed HttpContent is an
 explicit author direction (2026-09-25), not yet implemented. Plan ownership/close,
 cancellation, known/unknown lengths and repeatability with the stream/framing slice;
 current byte buffering is a checkpoint rather than the final content contract.

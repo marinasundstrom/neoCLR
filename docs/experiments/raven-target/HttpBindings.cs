@@ -57,6 +57,7 @@ static class HttpBindings
                 public HttpContent Content => default;
                 public Collections.Sequence<HttpHeader> Headers => default;
                 public Collections.Sequence<string> GetHeaderValues(string name) => default;
+                public Result<HttpRequest, HttpError> WithHeader(string name, string value) => default;
                 public Result<Collections.Sequence<byte>, HttpError> Encode() => default;
                 public static Result<HttpRequest, HttpError> FromIncoming(string method, string target, string host, Collections.Sequence<HttpHeader> headers, Collections.Sequence<byte> body) => default;
                 public string Method => default;
@@ -158,6 +159,7 @@ static class HttpBindings
             ("HttpClient", "Post") => ((args.Length > 0 && args[0] == "String" ? "String" : "System.Uri") + "," + Prefix + "HttpContent", task, false),
             ("HttpRequest", "Post") => ((args.Length > 0 && args[0] == "String" ? "String" : "System.Uri") + "," + Prefix + "HttpContent", $"System.Result<{request},System.Web.Http.HttpError>", true),
             ("HttpRequest", "get_Content") => ("", Prefix + "HttpContent", false),
+            ("HttpRequest", "WithHeader") => ("String,String", $"System.Result<{request},System.Web.Http.HttpError>", false),
             ("HttpRequest", "Encode") when library => ("", "System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>", false),
             ("HttpContent", "get_MediaType") when library => ("", "System.Option<String>", false),
             ("HttpContent", "FromText") => ("String", Prefix + "HttpContent", true),

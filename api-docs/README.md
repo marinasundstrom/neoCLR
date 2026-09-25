@@ -235,3 +235,9 @@ slice by author direction; feature source and downloadable sample are maintained
 Both selected request/response types document GetHeaderValues, including ordering,
 case rules, absence and invalid names. The shared HttpHeader.FindValues implementation
 remains internal. Stream-backed content remains planned and has no public signature.
+
+### Request header construction (2026-09-25)
+
+HttpRequest.WithHeader is included in the selected request type and XML reference.
+Its copy/replacement behavior, shared content, reserved fields and validation limits
+are documented with the matching bridge/library snapshot. No new type is omitted.

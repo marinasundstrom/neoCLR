@@ -693,3 +693,61 @@ response stream lifetime must be coordinated with slice 6; materializing every i
 stream would not by itself demonstrate streaming transport. The present synchronous
 InputStream contract and replaceable continuation adapter remain constraints to assess.
 No StreamContent type, ownership default or public signature is selected yet.
+
+## Request header construction checkpoint — 2026-09-25
+
+WithHeader(name, value) returns Result<HttpRequest, HttpError>. It copies the header
+sequence, removes all case-insensitive same-name fields and appends the new field,
+preserving other field order, method, target and content reference. The original stays
+unchanged. This lets a forwarding handler add context without modifying a caller's
+request. Content remains shared; neither request nor exposed Headers promises deep
+immutability or concurrent mutation safety. The propagation-based
+[sample and fixture](experiments/http-request-headers/README.md) show construction and Send.
+
+Primary sources reviewed 2026-09-25: [.NET HttpHeaders.Add](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.headers.httpheaders.add?view=net-10.0)
+validates tokens and field-specific values, mutates a collection and reports invalid
+input with exceptions. [RFC 9110 section 7.6.1](https://www.rfc-editor.org/rfc/rfc9110.html#section-7.6.1)
+identifies Connection's role in hop-by-hop processing. neoCLR's provisional helper
+uses Result and copies the sequence. This costs a request/list allocation but makes
+preserving the original explicit. It does not reproduce .NET's typed header parsers.
+A mutable HttpHeaders collection remains an alternative when append/remove or typed
+headers are needed; adding that now would replace existing Sequence properties.
+
+Names must be nonempty ASCII tokens; values are printable ASCII including space,
+with empty allowed. Tabs, CR/LF and non-ASCII values are rejected. The narrow ASCII
+policy is a POC restriction, not the complete HTTP field-value grammar. Framing,
+connection controls, expectations and encoding stay provider-owned: Host,
+Content-Length, Transfer-Encoding, Connection, Keep-Alive, Proxy-Connection, TE,
+Trailer, Upgrade, Expect and Content-Encoding are reserved. Content-Type stays with
+HttpContent construction. General value semantics (for example Accept parsing) are
+not validated. Header construction allows at most 13 stored application fields,
+including content type, leaving room for the three generated POST fields.
+
+Socket Send serializes application Headers for both GET and POST, revalidating names,
+values and reserved fields before DNS. Duplicate Content-Type is rejected. It computes
+Content-Length from body bytes and keeps the combined header bound at 2,048 bytes.
+WithHeader may succeed when the final wire head is too large; Send then returns
+LimitExceeded. Incoming requests include wire framing fields and cannot be blindly
+resent through this outbound provider; build a fresh request for forwarding policy.
+This is a managed change; parser, cancellation and native socket behavior are unchanged.
+
+Preflight validation and snapshotting complete before starting the 15-second network
+exchange budget. Invalid requests complete directly with their validation error; they
+cannot be converted to TimedOut by the exchange completion path. The initial full
+fixture failed to observe LimitExceeded for its oversized POST; an isolated oversized
+GET returned it. Inspection found that Finish could replace any validation error when
+the timer elapsed. Moving the timer after preflight enforces the documented
+lookup-to-response scope regardless of validation cost; no new configurable timeout
+or claim about the exact original elapsed time is made. Native phase budgets remain.
+
+The author considers eventual Raven with-expression support for suitable With* methods,
+but explicitly excludes WithHeader from that expectation. This name/value collection
+update and Result return do not represent a direct property-copy operation. Keep this
+builder independent of future with-expression support; the method prefix alone is not
+a compiler convention. Copying headers implies neither record equality nor deep copying
+of content. The development timeline retains the original suggestion and correction.
+
+Final validation: the complete request-header fixture passes with zero live objects,
+and the existing trickling-body deadline regression still reports TimedOut and closes
+the connection. Its independent .NET baseline passes. API/managed snapshot checks and
+public WithHeader signature admission pass; the website build is skipped by direction.

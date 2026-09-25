@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add development HttpRequest.WithHeader returning a new request with a replaced
+  application field. Validate names/values and reserve transport/content controls;
+  socket Send now serializes application headers for GET and POST, revalidates before
+  DNS and enforces count/byte limits. Add propagation-based construction and focused
+  handler/wire checks. Start the network deadline after request validation/snapshotting
+  so preflight errors retain their type. Update API/reference snapshots; content remains
+  buffered/shared. Record eventual with-expression exploration for suitable With*
+  methods, excluding this collection-entry builder; no compiler convention is added.
+
 - Raven neoCLR compiler analysis now treats `System.Fault(string)` as terminal,
   diagnosing following code as unreachable and accepting Fault-only return paths.
   Preserve runtime calls and recognize terminal statements in lowering/emission;

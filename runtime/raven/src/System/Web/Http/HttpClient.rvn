@@ -414,6 +414,75 @@ public class HttpRequest {
         return Ok(request)
     }
 
+    /// Returns a new request with one application header replaced case-insensitively.
+    /// The original request is unchanged; content is shared and framing stays provider-owned.
+    func WithHeader(name: string, value: string) -> Result<HttpRequest, HttpError> {
+        let key = HeaderName(name)?
+        if ReservedHeader(key) || key == "content-type" {
+            return Error(HttpError.InvalidRequest("Header is controlled by transport or content"))
+        }
+        if !HeaderValueValid(value) {
+            return Error(HttpError.InvalidRequest("Invalid request header value"))
+        }
+        let headers = ArrayList<HttpHeader>()
+        for header in storedHeaders {
+            if HeaderName(header.Name)? != key {
+                headers.Add(header)
+            }
+        }
+        headers.Add(HttpHeader(name, value))
+        if headers.Count > 13 {
+            return Error(HttpError.LimitExceeded("Request application header count exceeded"))
+        }
+        let request = HttpRequest(storedHost, storedPort, storedTarget)
+        request.storedMethod = storedMethod
+        request.storedContent = storedContent
+        request.storedHeaders = headers
+        return Ok(request)
+    }
+
+    private static func HeaderName(name: string) -> Result<string, HttpError> {
+        let bytes = Utf8.Encode(name)
+        if bytes.Count == 0 || bytes.Count > 2048 {
+            return Error(HttpError.InvalidRequest("Invalid request header name"))
+        }
+        let lower = ArrayList<byte>()
+        for value in bytes {
+            if !((value >= 48 && value <= 57) || (value >= 65 && value <= 90) ||
+                (value >= 97 && value <= 122) || value == 33 || value == 35 || value == 36 ||
+                value == 37 || value == 38 || value == 39 || value == 42 || value == 43 ||
+                value == 45 || value == 46 || value == 94 || value == 95 || value == 96 ||
+                value == 124 || value == 126) {
+                return Error(HttpError.InvalidRequest("Invalid request header name"))
+            }
+            lower.Add(if value >= 65 && value <= 90 { (byte)((int)value + 32) } else { value })
+        }
+        if let Ok(text) = Utf8.Decode(lower) {
+            return Ok(text)
+        }
+        return Error(HttpError.InvalidRequest("Invalid request header name"))
+    }
+
+    private static func HeaderValueValid(value: string) -> bool {
+        let bytes = Utf8.Encode(value)
+        if bytes.Count > 2048 {
+            return false
+        }
+        for item in bytes {
+            if !(item >= 32 && item <= 126) {
+                return false
+            }
+        }
+        return true
+    }
+
+    private static func ReservedHeader(name: string) -> bool {
+        return name == "host" || name == "content-length" || name == "transfer-encoding" ||
+            name == "connection" || name == "keep-alive" || name == "proxy-connection" ||
+            name == "te" || name == "trailer" || name == "upgrade" || name == "expect" ||
+            name == "content-encoding"
+    }
+
     internal func Encode() -> Result<Sequence<byte>, HttpError> {
         let body = storedContent.Bytes
         let count = body.Count
@@ -428,22 +497,27 @@ public class HttpRequest {
         if storedMethod == "POST" {
             wire = String.Concat(wire, String.Concat("Content-Length: ", count.ToString()))
             wire = String.Concat(wire, "\r\n")
-            if let Some(contentType) = storedContent.MediaType {
-                let bytes = Utf8.Encode(contentType)
-                if bytes.Count == 0 {
-                    return Error(HttpError.InvalidRequest("Empty Content-Type"))
+        }
+        if storedHeaders.Count > 13 {
+            return Error(HttpError.LimitExceeded("Request application header count exceeded"))
+        }
+        var hasContentType = false
+        for header in storedHeaders {
+            let key = HeaderName(header.Name)?
+            if key == "content-type" {
+                if hasContentType {
+                    return Error(HttpError.InvalidRequest("Duplicate request Content-Type"))
                 }
-                var index = 0
-                while index < bytes.Count {
-                    let value = bytes[index]
-                    if !(value >= 32 && value <= 126) {
-                        return Error(HttpError.InvalidRequest("Invalid Content-Type header value"))
-                    }
-                    index += 1
-                }
-                wire = String.Concat(wire, String.Concat("Content-Type: ", contentType))
-                wire = String.Concat(wire, "\r\n")
+                hasContentType = true
             }
+            if ReservedHeader(key) {
+                return Error(HttpError.InvalidRequest("Header is controlled by transport"))
+            }
+            if !HeaderValueValid(header.Value) || (key == "content-type" && header.Value.IsEmpty) {
+                return Error(HttpError.InvalidRequest("Invalid request header value"))
+            }
+            wire = String.Concat(wire, String.Concat(header.Name, ": "))
+            wire = String.Concat(wire, String.Concat(header.Value, "\r\n"))
         }
         let encoded = Utf8.Encode(String.Concat(wire, "\r\n"))
         if encoded.Count > 2048 {
@@ -819,14 +893,15 @@ internal class HttpExchange {
     }
 
     internal func Execute() -> Task<Result<HttpResponse, HttpError>> {
-        deadline = RuntimeServices.SocketDeadlineAfter(15000)
+        // Validate and snapshot before starting the network exchange budget.
         let encoded = request.Encode()
         if let Ok(bytes) = encoded {
             outgoing = bytes
         } else if let Error(reason) = encoded {
-            Finish(Error(reason))
+            _ = source.Complete(Error(reason))
             return source.Task
         }
+        deadline = RuntimeServices.SocketDeadlineAfter(15000)
         let pending = Dns.GetHostAddressesUntil(request.Host, deadline, token)
         lookup = Some(pending)
         pending.OnCompleted(self.OnLookup)

@@ -240,7 +240,7 @@ before DNS. Content sources must remain stable while consumed.
 
 [Download the POST echo example and focused checks](/samples/http-post.zip).
 The checks cover neoCLR peers, an independent raw peer and a .NET client, including
-empty and binary bodies. General header builders, other request verbs, chunking,
+empty and binary bodies. Header append/remove operations, other request verbs, chunking,
 streaming, compression and Expect/continue are still outside this checkpoint.
 
 ## Looking up headers
@@ -253,3 +253,20 @@ present, and repeated fields are not joined or split at commas. For example,
 
 Stream-backed `HttpContent` is planned. Content is currently buffered; stream ownership,
 cancellation and unknown-length framing still need contracts and implementation.
+
+## Adding request headers
+
+In development, `request.WithHeader(name, value)` returns a new request with that
+application header set, replacing existing matches case-insensitively. It returns a
+Result, so request preparation can use `?` before calling `HttpClient.Send`:
+
+```raven
+let acceptsText = request.WithHeader("Accept", "text/plain")?
+```
+
+The original request keeps its headers. Content is shared, so keep it stable during
+use. The current helper validates ASCII names and printable ASCII values; it does not
+parse field-specific syntax. Transport headers such as Host and Content-Length are
+reserved, and Content-Type comes from HttpContent. The provider allows 13 stored
+application fields and at most 2,048 encoded header bytes. Stream-backed content
+remains planned.
