@@ -360,6 +360,13 @@ static class SignatureProbe
         foreach (var post in requestType.Methods.Where(m => m.Name == "Post")) {
             Check("POST request factory " + post.FullName, HttpBindings.Bind(post, post, false, false) is not null);
         }
+        foreach (var headerOwner in new[] { "HttpRequest", "HttpResponse" }) {
+            var lookup = module.GetType(HttpBindings.Prefix + headerOwner).Methods.Single(m => m.Name == "GetHeaderValues");
+            Check("HTTP header lookup " + headerOwner, HttpBindings.Bind(lookup, lookup, false, false)?.Result == "System.Collections.Sequence<String>");
+        }
+        var findValues = module.GetType(HttpBindings.Prefix + "HttpHeader").Methods.Single(m => m.Name == "FindValues");
+        Reject("Header lookup helper is internal", () => HttpBindings.Bind(findValues, findValues, false, false));
+        Check("Header lookup helper available to library", HttpBindings.Bind(findValues, findValues, false, true) is not null);
         var requestContent = requestType.Methods.Single(m => m.Name == "get_Content");
         Check("Request content contract", HttpBindings.Bind(requestContent, requestContent, false, false)?.Result == "System.Web.Http.HttpContent");
         foreach (var member in new[] { requestType.Methods.Single(m => m.Name == "Encode"),

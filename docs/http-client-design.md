@@ -654,3 +654,42 @@ by this checkpoint. See the [focused fixture](experiments/http-post/README.md).
 No native socket/scheduler or Raven compiler policy changes. Bridge signatures admit
 new public members and retain internal-only request serialization/content metadata.
 The reference, managed library and generated fingerprints must be refreshed together.
+
+## Header lookup checkpoint — 2026-09-25
+
+Request and response GetHeaderValues(name) return a fresh Sequence<string> of stored
+field values in order. HTTP names use ASCII case-insensitive comparison, not Unicode
+or culture-sensitive comparison. Absent or invalid token names return empty; empty
+field values remain present. Values are not comma-split or joined, preserving Set-Cookie
+and other fields with field-specific grammar. Lookup does not synthesize wire headers.
+
+Primary sources reviewed 2026-09-25:
+[.NET HttpHeaders.TryGetValues](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.headers.httpheaders.trygetvalues?view=net-10.0)
+returns presence and multiple values through an out parameter;
+[RFC 9110 sections 5.1–5.3](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.1)
+define case-insensitive names, combination rules and significant same-name field order.
+We preserve multiple values but return an empty sequence for absence, avoiding an out
+parameter and leaving Headers compatible with existing consumers. This raw-line lookup
+is narrower than .NET's parsed, typed collection. It allocates a new sequence and UTF-8
+name buffers; no performance improvement is claimed. The alternative of a new HttpHeaders
+collection could centralize typed parsing and mutation but would change existing public
+property types. Defer that choice until request building needs it. Returning only the
+first match would discard useful repeated fields, so it is not the default helper.
+
+[Focused checks](experiments/http-headers/README.md) exercise mixed case, duplicate fields,
+empty and absent values, invalid names, commas, result isolation and request content type.
+No native runtime, parser, serializer or compiler policy change is needed.
+
+## Stream-backed content direction — 2026-09-25
+
+The author explicitly directs support for streams in HttpContent. This is planned
+capability; current Bytes and ReadText still expose buffered content. .NET's
+[StreamContent](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.streamcontent?view=net-10.0)
+provides the comparison point. Evaluate a content abstraction or factories around the
+existing System.IO contracts; do not assume every body is seekable, replayable or has
+a known length. Specify ownership/leave-open behavior, one-shot consumption, cancellation
+and disposal on failure before adding an overload. Unknown-length wire framing and
+response stream lifetime must be coordinated with slice 6; materializing every input
+stream would not by itself demonstrate streaming transport. The present synchronous
+InputStream contract and replaceable continuation adapter remain constraints to assess.
+No StreamContent type, ownership default or public signature is selected yet.

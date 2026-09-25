@@ -46,6 +46,7 @@ static class HttpBindings
                 public HttpHeader(string name, string value) { }
                 public string Name => default;
                 public string Value => default;
+                public static Collections.Sequence<string> FindValues(Collections.Sequence<HttpHeader> headers, string name) => default;
             }
             public sealed class HttpRequest {
                 private HttpRequest(string host, int port, string target) { }
@@ -55,6 +56,7 @@ static class HttpBindings
                 public static Result<HttpRequest, HttpError> Post(Uri uri, HttpContent content) => default;
                 public HttpContent Content => default;
                 public Collections.Sequence<HttpHeader> Headers => default;
+                public Collections.Sequence<string> GetHeaderValues(string name) => default;
                 public Result<Collections.Sequence<byte>, HttpError> Encode() => default;
                 public static Result<HttpRequest, HttpError> FromIncoming(string method, string target, string host, Collections.Sequence<HttpHeader> headers, Collections.Sequence<byte> body) => default;
                 public string Method => default;
@@ -68,6 +70,7 @@ static class HttpBindings
                 public HttpStatusCode StatusCode => default;
                 public bool IsSuccessStatusCode => default;
                 public Collections.Sequence<HttpHeader> Headers => default;
+                public Collections.Sequence<string> GetHeaderValues(string name) => default;
                 public HttpContent Content => default;
             }
             public sealed class HttpContent {
@@ -111,7 +114,7 @@ static class HttpBindings
     public static void Project(ModuleDefinition module)
     {
         foreach (var type in module.Types.Where(t => IsName(t.FullName)))
-            foreach (var method in type.Methods.Where(m => m.Name == "FromIncoming" || m.Name == "EncodeResponse" || type.Name == "HttpRequest" && m.Name == "Encode" || type.Name == "HttpContent" && m.Name == "get_MediaType" || type.Name == "HttpServer" && m.IsConstructor))
+            foreach (var method in type.Methods.Where(m => m.Name == "FindValues" || m.Name == "FromIncoming" || m.Name == "EncodeResponse" || type.Name == "HttpRequest" && m.Name == "Encode" || type.Name == "HttpContent" && m.Name == "get_MediaType" || type.Name == "HttpServer" && m.IsConstructor))
                 method.Attributes = (method.Attributes & ~MethodAttributes.MemberAccessMask) | MethodAttributes.Assembly;
         foreach (var type in module.Types.Where(IsProvider))
         {
@@ -139,6 +142,8 @@ static class HttpBindings
             ("HttpServer", "ServeOne") => ($"System.Func<{request},{task}>", "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
             ("HttpServer", "EncodeResponse") when library => (response, "System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>", true),
             ("HttpRequest", "FromIncoming") when library => ($"String,String,String,System.Collections.Sequence<{Prefix}HttpHeader>,System.Collections.Sequence<Byte>", $"System.Result<{request},System.Web.Http.HttpError>", true),
+            ("HttpHeader", "FindValues") when library => ($"System.Collections.Sequence<{Prefix}HttpHeader>,String", "System.Collections.Sequence<String>", true),
+            ("HttpRequest" or "HttpResponse", "GetHeaderValues") => ("String", "System.Collections.Sequence<String>", false),
             ("HttpRequest", "get_Headers") => ("", $"System.Collections.Sequence<{Prefix}HttpHeader>", false),
             ("HttpRequestDecoder", ".ctor") when library => ("", "noresult", false),
             ("HttpRequestDecoder", "get_Complete") when library => ("", "Boolean", false),

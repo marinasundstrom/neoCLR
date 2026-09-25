@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add request/response GetHeaderValues with ASCII case-insensitive matching and ordered,
+  separate values for repeated fields. Missing or invalid names return an empty snapshot;
+  no comma splitting, field parsing or synthesized transport headers. Update API reference
+  and focused checks. Record stream-backed HttpContent as planned support, with lifetime
+  and framing contracts still open; the current implementation remains buffered.
+
 - Add development buffered POST through HttpClient string/Uri/token overloads and
   HttpRequest factories. Expose request content and UTF-8 content construction;
   validate/snapshot outbound bytes before I/O and read bounded Content-Length bodies

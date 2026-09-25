@@ -229,3 +229,9 @@ Content, HttpContent.FromText and the content-type constructor. XML documents li
 body ownership, errors and cancellation. Encode and MediaType remain library-internal.
 The snapshot is refreshed with the matching bridge. Website build is skipped for this
 slice by author direction; feature source and downloadable sample are maintained.
+
+### Header lookup checkpoint (2026-09-25)
+
+Both selected request/response types document GetHeaderValues, including ordering,
+case rules, absence and invalid names. The shared HttpHeader.FindValues implementation
+remains internal. Stream-backed content remains planned and has no public signature.

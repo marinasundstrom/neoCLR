@@ -85,11 +85,16 @@ and [independent status evidence](experiments/http-status/README.md). HttpStatus
 signatures carry it, with a retained numeric constructor. Optional property patterns
 are verified separately from proposed positional deconstruction. Slice 5 now includes a [buffered POST echo checkpoint](experiments/http-post/README.md):
 string/Uri and token overloads, byte/UTF-8 content, bounded server reads and independent
-peer checks. General header lookup/building and additional verb helpers remain within
+peer checks. Request/response GetHeaderValues now supplies ASCII case-insensitive
+lookup preserving repeated fields; [header evidence](experiments/http-headers/README.md).
+General header building and additional verb helpers remain within
 slice 5 before moving to broader response framing. The cancellation fixture now signals independently of the third request;
 headers and isolated-body checks pass. [The evidence](experiments/http-status/README.md)
 retains timeout sensitivity under competing local work for serial release validation;
-no production scheduler/deadline fix is claimed.
+no production scheduler/deadline fix is claimed. Stream-backed HttpContent is an
+explicit author direction (2026-09-25), not yet implemented. Plan ownership/close,
+cancellation, known/unknown lengths and repeatability with the stream/framing slice;
+current byte buffering is a checkpoint rather than the final content contract.
 The [private native cancellation hooks](cancellation-design.md#native-operation-acknowledgement--implemented-2026-09-25)
 now cover DNS, connect, accept and transfers, preserving completion ownership.
 Managed DNS/socket token registration and acknowledgement are now implemented, with
@@ -102,7 +107,7 @@ or a release-scope decision. IPv6 transport and scope identifiers remain explici
 feasibility after cancellation foundations and decide its scope before the application slice. Finish validation and documentation
 for each slice before advancing; a source change alone is not completion.
 
-The current GET/200, small-buffer and ServeOne POC proves the path, but it is too
+The initial GET/200, small-buffer and ServeOne POC proved the path, but it was too
 narrow to be the whole release experience. Prefer these connected release gates:
 
 | Slice | Proposed release outcome and evidence |

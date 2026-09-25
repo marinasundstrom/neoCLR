@@ -242,3 +242,14 @@ before DNS. Content sources must remain stable while consumed.
 The checks cover neoCLR peers, an independent raw peer and a .NET client, including
 empty and binary bodies. General header builders, other request verbs, chunking,
 streaming, compression and Expect/continue are still outside this checkpoint.
+
+## Looking up headers
+
+In development, requests and responses provide `GetHeaderValues(name)`. Names use
+ASCII case-insensitive comparison. The returned sequence contains every stored matching
+field value in order; it is empty if the name is absent or invalid. Empty values remain
+present, and repeated fields are not joined or split at commas. For example,
+`response.GetHeaderValues("Set-Cookie")` preserves separate cookie fields.
+
+Stream-backed `HttpContent` is planned. Content is currently buffered; stream ownership,
+cancellation and unknown-length framing still need contracts and implementation.

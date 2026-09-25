@@ -7154,3 +7154,14 @@ configuration/content, not target-specific code added to Raven main.
   wrapping from application-specific domain mapping, and leave interface conversion
   lookup and representation to investigation. No System.Error implementation or automatic
   wrapping is claimed for this HTTP slice.
+
+## 2026-09-25 — HTTP content will support streams
+
+- **Author direction:** “We will support streams also for HttpContent. But continue.”
+- **Assistant action:** record stream-backed content as planned capability, with
+  ownership, cancellation, unknown lengths and repeatability still requiring design.
+  Continue the bounded HTTP slice with case-insensitive, duplicate-preserving header
+  lookup. Byte buffering is an intermediate implementation, not the final constraint.
+- **Scope:** no stream overload or transport streaming is implemented by this header
+  checkpoint. Linked design compares .NET StreamContent and identifies lifetime/framing
+  questions rather than assuming its ownership policy.

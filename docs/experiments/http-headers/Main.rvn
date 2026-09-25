@@ -1,0 +1,57 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Web.Http.*
+
+// An ordinary caller propagates request errors before inspecting its headers.
+func RequestMediaTypes() -> Result<Sequence<string>, HttpError> {
+    let request = HttpRequest.Post("http://example.test/echo", HttpContent.FromText("Hello"))?
+    return Ok(request.GetHeaderValues("content-type"))
+}
+
+func Main() {
+    let headers = ArrayList<HttpHeader>()
+    headers.Add(HttpHeader("Set-Cookie", "a=1; Expires=Wed, 21 Oct 2030 07:28:00 GMT"))
+    headers.Add(HttpHeader("set-cookie", "b=2"))
+    headers.Add(HttpHeader("X-Empty", ""))
+    headers.Add(HttpHeader("X-List", "one, two"))
+    headers.Add(HttpHeader("x-list", "three"))
+    headers.Add(HttpHeader("X-İ", "not an ASCII name"))
+    let response = HttpResponse(HttpStatusCode.OK, headers, ArrayList<byte>())
+    let cookies = response.GetHeaderValues("sEt-CoOkIe")
+    if cookies.Count != 2 || cookies[0] != headers[0].Value || cookies[1] != "b=2" {
+        System.Fault("Repeated cookie values changed")
+    }
+    let lists = response.GetHeaderValues("X-LIST")
+    if lists.Count != 2 || lists[0] != "one, two" || lists[1] != "three" {
+        System.Fault("Header values split, merged or reordered")
+    }
+    let empty = response.GetHeaderValues("x-empty")
+    if empty.Count != 1 || empty[0] != "" {
+        System.Fault("Empty value confused with absent field")
+    }
+    if response.GetHeaderValues("missing").Count != 0 || response.GetHeaderValues("").Count != 0 ||
+        response.GetHeaderValues(" X-List").Count != 0 || response.GetHeaderValues("X-List:").Count != 0 ||
+        response.GetHeaderValues("X-İ").Count != 0 || response.GetHeaderValues("X-List\r\n").Count != 0 {
+        System.Fault("Absent or invalid header name matched")
+    }
+    headers.Add(HttpHeader("SET-COOKIE", "c=3"))
+    if cookies.Count != 2 || response.GetHeaderValues("set-cookie").Count != 3 {
+        System.Fault("Lookup is not a separate snapshot")
+    }
+    let Ok(types) = RequestMediaTypes() else {
+        System.Fault("Request construction failed")
+        return
+    }
+    if types.Count != 1 || types[0] != "text/plain; charset=utf-8" {
+        System.Fault("Request lookup failed")
+    }
+    let Ok(get) = HttpRequest.Get("http://example.test/") else {
+        System.Fault("GET construction failed")
+        return
+    }
+    if get.GetHeaderValues("Host").Count != 0 {
+        System.Fault("Lookup invented provider-generated headers")
+    }
+    Console.WriteLine("HTTP header lookup checks passed")
+}
