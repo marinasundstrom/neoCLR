@@ -7363,3 +7363,13 @@ configuration/content, not target-specific code added to Raven main.
 - **Final validation:** all 54 JSON document cases and 12 checked integer conversions
   pass through the public API against the .NET baseline; signature and matching
   API/bootstrap snapshot checks pass. Website build remains skipped.
+
+### 2026-09-25 — Command-line entry injection
+
+- **Author question:** “Can't neoCLR inject commandline args as parameter to Main?”
+- **Assistant finding:** the Raven bridge rejected parameters; runtime startup was
+  parameterless. Proposed a generated adapter preserving that ABI.
+- **Action and outcome:** implement collection-profile Main(string[]) with a fresh
+  argument array excluding the executable, matching .NET. Keep the full vector in
+  Environment.GetCommandLineArgs and migrate the JSON corpus. Three argument/GC
+  cases and signature checks pass. No compiler configuration change.

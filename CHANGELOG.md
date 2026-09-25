@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Support Main(arguments: string[]) in the Raven managed collection profile through
+  a parameterless startup adapter. Supply a fresh array excluding the executable;
+  preserve Environment.GetCommandLineArgs semantics. Include focused argument/GC
+  and signature checks and migrate the JSON corpus entry.
+
 - Add provisional System.Data.Json DOM APIs: a closed JsonValue hierarchy with
   kind-specific containers and scalar properties, exact number tokens, JsonError
   unions retaining I/O causes, and DOM-only JsonSerializer string/stream overloads.

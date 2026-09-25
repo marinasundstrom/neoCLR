@@ -280,3 +280,14 @@ runtime default resource policy. See [JSON DOM evidence](experiments/json-dom/RE
 The pinned compiler still requires the existing explicit discard for propagated
 unit results in synchronous code. Reflection/object mapping, general class-family
 admission and Raven-main policy changes are not part of this slice.
+
+### Managed entry arguments — 2026-09-25
+
+The collection-profile bridge accepts static nongeneric no-result Main(string[])
+through a generated parameterless adapter. It copies the host vector excluding
+its executable element; empty startup gives an empty managed array. No Runtime
+Contract setting or runtime entry ABI changes. Other parameter shapes and direct
+result-returning entries remain rejected. Three argument/GC cases and signature
+checks pass. Website build skipped as directed.
+
+See [contract and fixture](experiments/entry-arguments/README.md).

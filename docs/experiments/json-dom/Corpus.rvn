@@ -16,10 +16,9 @@ func Integer(text: string) -> Result<string, JsonError> {
     return Error(JsonError.TypeMismatch("number"))
 }
 
-func Main() {
-    let arguments = Environment.GetCommandLineArgs()
-    for index in 2..<arguments.Length {
-        let result = if arguments[1] == "integer" {
+func Main(arguments: string[]) {
+    for index in 1..<arguments.Length {
+        let result = if arguments[0] == "integer" {
             Integer(arguments[index])
         } else {
             RoundTrip(arguments[index])

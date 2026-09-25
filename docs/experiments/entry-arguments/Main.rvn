@@ -1,0 +1,16 @@
+import System.*
+
+func Main(arguments: string[]) {
+    Console.WriteLine(arguments.Length.ToString())
+    for argument in arguments {
+        Console.WriteLine("[$argument]")
+    }
+    if arguments.Length > 0 {
+        let original = arguments[0]
+        arguments[0] = "changed"
+        let processArguments = Environment.GetCommandLineArgs()
+        if processArguments[1] == original {
+            Console.WriteLine("independent")
+        }
+    }
+}

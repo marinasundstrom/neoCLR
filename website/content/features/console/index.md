@@ -59,3 +59,22 @@ Expected errors use normal Raven union declarations. Match their named cases;
 handwritten per-case `Is*`/`Get*` helpers have been removed in the development API.
 Rebuild applications with matching SDK and runtime artifacts. The case names and
 operation error meanings are unchanged.
+
+## Command-line arguments
+
+The development Raven toolchain accepts a no-result entry with a string array:
+
+```raven
+import System.*
+
+func Main(arguments: string[]) {
+    for argument in arguments {
+        Console.WriteLine(argument)
+    }
+}
+```
+
+The array contains application arguments, excluding the executable name, as in .NET.
+Without arguments it is empty. Environment.GetCommandLineArgs() includes the
+executable name. Main() without parameters continues to work. This support requires
+the development managed collection profile and is not part of Preview 9.

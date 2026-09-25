@@ -170,6 +170,9 @@ The [public consumer](experiments/json-dom/README.md) exercises the matching lib
 POC limits remain deliberately small. Object deserialization is not part of this slice.
 **Author decision:** keep JsonSerializer synchronous and Result-based for now;
 asynchronous reads remain a separate potential optimization/evolution track.
+**Author-requested entry convenience:** the managed Raven bridge now supplies
+[Main(arguments: string[])](experiments/entry-arguments/README.md), excluding the
+executable name. The JSON corpus uses this entry shape.
 Current introspection exposes member metadata but not public value access, assignment
 or construction/invocation. **Author clarification:** `System.Runtime.Reflection`
 will provide extensions to the `System.Introspection` model; those operations work

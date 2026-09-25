@@ -28,6 +28,33 @@ static class SignatureProbe
             catch (InvalidDataException) { checks.Add(name); return; }
             throw new Exception("Malformed signature accepted: " + name);
         }
+        var entryOwner = new TypeDefinition("Probe", "Entry", TypeAttributes.Public, module.TypeSystem.Object);
+        var entry = new MethodDefinition("Main", MethodAttributes.Public | MethodAttributes.Static, module.TypeSystem.Void);
+        entryOwner.Methods.Add(entry);
+        Check("Parameterless entry", !EntryPointBindings.HasArguments(entry, false));
+        entry.Parameters.Add(new ParameterDefinition(new ArrayType(module.TypeSystem.String)));
+        Check("String vector entry", EntryPointBindings.HasArguments(entry, true));
+        Reject("Entry arguments outside collection profile", () => EntryPointBindings.HasArguments(entry, false));
+        foreach (var invalidType in new TypeReference[] {
+            module.TypeSystem.String, new ArrayType(module.TypeSystem.Int32),
+            new ArrayType(module.TypeSystem.String, 2),
+            new ByReferenceType(new ArrayType(module.TypeSystem.String)) })
+        {
+            entry.Parameters[0].ParameterType = invalidType;
+            Reject("Entry argument type " + invalidType.FullName, () => EntryPointBindings.HasArguments(entry, true));
+        }
+        entry.Parameters[0].ParameterType = new ArrayType(module.TypeSystem.String);
+        entry.Parameters.Add(new ParameterDefinition(module.TypeSystem.Int32));
+        Reject("Multiple entry arguments", () => EntryPointBindings.HasArguments(entry, true));
+        entry.Parameters.RemoveAt(1);
+        entry.IsStatic = false;
+        Reject("Instance entry", () => EntryPointBindings.HasArguments(entry, true));
+        entry.IsStatic = true;
+        entry.ReturnType = module.TypeSystem.Int32;
+        Reject("Value-returning entry", () => EntryPointBindings.HasArguments(entry, true));
+        entry.ReturnType = module.TypeSystem.Void;
+        entry.GenericParameters.Add(new GenericParameter("T", entry));
+        Reject("Generic entry", () => EntryPointBindings.HasArguments(entry, true));
         var cancellationToken = module.GetType(CancellationBindings.Token);
         Check("Cancellation token source-reference layout", CancellationBindings.IsTokenLayout(cancellationToken));
         cancellationToken.Fields[0].FieldType = module.TypeSystem.Int32;

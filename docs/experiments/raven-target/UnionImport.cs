@@ -62,8 +62,7 @@ static class UnionImport
         string Name(MethodDefinition method) => libraryOwner is null ? MetadataIdentity.FunctionName(method)
             : exports.Contains(method) ? (method.DeclaringType.FullName is "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators" ? method.DeclaringType.FullName : libraryOwner) + "." + LibraryImplementation.GenericName(method)
             : throw new InvalidDataException("Unexported implementation dependency: " + method.FullName);
-        if (entry is not null && (entry.Parameters.Count != 0 || entry.ReturnType.MetadataType != MetadataType.Void))
-            throw new InvalidDataException("Result profile requires a parameterless no-result entry.");
+        var entryHasArguments = entry is not null && EntryPointBindings.HasArguments(entry, collectionProfile);
         if (collectionProfile) { InterfaceBindings.Validate(library.MainModule); CollectionBindings.Validate(library.MainModule); ReflectionBindings.Validate(library.MainModule); NativeMemoryBindings.Validate(library.MainModule); }
         bool InternalLibraryAccess(MethodDefinition target, MethodDefinition caller) => libraryOwner is not null
             && target.IsAssembly && target.Module == caller.Module
@@ -97,7 +96,7 @@ static class UnionImport
             GenericUnionBindings.ParameterMap = parameter => ProfileType(parameter);
             ApplicationTypes.LibraryMap = type => ProfileType(type);
         }
-        var output = new StringBuilder(entry is not null ? $".module ImportedUnion\n.entry {Name(entry)}\n" : "");
+        var output = new StringBuilder(entry is not null ? $".module ImportedUnion\n.entry {(entryHasArguments ? EntryPointBindings.Startup : Name(entry))}\n" : "");
         if (libraryOwner is null)
             foreach (var module in new[] { app.MainModule }.Concat(guestLibraries))
                 output.AppendLine(SourceMetadata.Assembly(module));
@@ -1001,6 +1000,7 @@ static class UnionImport
         {
             if (!ApplicationTypes.OnlyLibraryTypes) throw new InvalidDataException("Library fragments cannot introduce application type identities.");
         }
+        if (entryHasArguments) output.Append(EntryPointBindings.Adapter(Name(entry!)));
         output.Append(ApplicationTypes.Declarations(ProfileType, instanceBodies));
         output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters(collectionProfile)).AppendLine(BooleanBindings.Adapters).AppendLine(ReflectionBindings.Adapters).AppendLine(EnumBindings.Adapters).AppendLine(EnumHelpersBindings.Adapters);
         foreach (var helper in coercions.Values) output.Append(helper.Body);
