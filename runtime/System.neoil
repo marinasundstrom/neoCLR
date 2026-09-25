@@ -32,6 +32,7 @@
 .include "neoCLR/Runtime/Math.neoil"
 .include "neoCLR/Runtime/WriteLine.neoil"
 .include "neoCLR/Runtime/Int32ToString.neoil"
+.include "neoCLR/Runtime/IntegerToString.neoil"
 .include "neoCLR/Runtime/ParseInt32.neoil"
 .include "System/Runtime/CompilerServices/UnionAttribute.neoil"
 .include "neoCLR/Runtime/StringConcat.neoil"

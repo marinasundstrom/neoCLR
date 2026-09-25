@@ -512,6 +512,9 @@ static class SignatureProbe
         variableCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
         Reject("Environment name signature mismatch", () => ProcessBindings.Bind(variableCall, variable));
         var console = module.GetType("System.Console");
+        var objectWriteLine = console.Methods.Single(m => m.Name == "WriteLine" && m.Parameters.Count == 1
+            && m.Parameters[0].ParameterType.MetadataType == MetadataType.Object);
+        Check("Console object fallback", ProcessBindings.Bind(Reference(objectWriteLine, console), objectWriteLine)?.Arguments.SequenceEqual(new[] { "System.Object" }) == true);
         var readByte = console.Methods.Single(m => m.Name == "ReadByte");
         Check("Console retains Byte payload", ProcessBindings.Bind(Reference(readByte, console), readByte)?.Result == "System.Result<System.Option<Byte>,System.ConsoleReadError>");
         Check("Process vectors exclude multidimensional arrays", ProcessBindings.ArrayType(new ArrayType(module.TypeSystem.String, 2)) is null);

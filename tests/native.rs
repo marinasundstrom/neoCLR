@@ -22,14 +22,21 @@ fn methodimpl_internalcall_round_trips_as_clr_flag() {
             .functions
             .iter()
             .filter(|f| f.impl_flags == INTERNAL_CALL)
-            .count(),
-        57 // Includes grapheme/scalar text, reflection, enum, text, math, clock, environment, path and file I/O helpers.
+            .map(|f| (&f.name, &f.parameters, &f.returns))
+            .collect::<Vec<_>>(),
+        compiled.functions.iter()
+            .filter(|f| f.impl_flags == INTERNAL_CALL)
+            .map(|f| (&f.name, &f.parameters, &f.returns))
+            .collect::<Vec<_>>()
     );
 }
 
 #[test]
 fn native_registry_checks_full_signature_and_implementation_shape() {
     for declaration in [
+        ".function neoCLR.Runtime.Int64ToString(UInt64) -> String\n.methodimpl InternalCall",
+        ".function neoCLR.Runtime.UInt64ToString(Int64) -> String\n.methodimpl InternalCall",
+        ".function neoCLR.Runtime.Int64ToString(Int64) -> Int64\n.methodimpl InternalCall",
         ".function neoCLR.Runtime.StringCompareOrdinal(String,String) -> Boolean\n.methodimpl InternalCall",
         ".function neoCLR.Runtime.StringContainsOrdinal(String,Int32) -> Boolean\n.methodimpl InternalCall",
         ".function Unknown() -> Void\n.methodimpl InternalCall",

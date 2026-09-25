@@ -134,3 +134,19 @@ of stream writes. Legacy WriteLine also contributes text plus LF to stdout captu
 With a live host, output goes to the host and capture vectors stay empty.
 Closing a guest wrapper never closes the process channel. Worker/debugger hosts
 need byte-hook implementations before they support the new output streams.
+
+### Object and scalar WriteLine — 2026-09-25
+
+WriteLine(object?) dispatches virtual ToString; null writes an empty line. Direct
+Boolean, Char and integral overloads avoid boxing. Signed/unsigned 64-bit decimal
+formatters are private runtime services, also used after native-sized conversion;
+small integer overloads widen to Int32. Those services are classified as string
+operations. No compiler setting or Runtime Contract configuration changes.
+
+Compared with [.NET Console.WriteLine](https://learn.microsoft.com/en-us/dotnet/api/system.console.writeline?view=net-10.0),
+object/null handling follows the same basic contract. neoCLR offers exact overloads
+for narrow/native integers too, uses invariant decimal output, and Char is grapheme
+text rather than a UTF-16 code unit. There is no formatting-provider contract.
+The cost avoided is temporary boxed scalar allocation; output still creates text.
+Floating-point formatting remains deferred; its current Object fallback does not
+promise numeric output. This does not broaden ToString semantics for other types.

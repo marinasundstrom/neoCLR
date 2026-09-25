@@ -1,0 +1,44 @@
+import System.*
+
+class Named {
+    override func ToString() -> string => "Named instance"
+}
+
+func Main() {
+    Console.WriteLine(Named())
+    let named: object = Named()
+    Console.WriteLine(named)
+    let integer: object = 42
+    Console.WriteLine(integer)
+    Console.WriteLine(true)
+    let text: object = "boxed text"
+    Console.WriteLine(text)
+    let absent: object? = null
+    Console.WriteLine(absent)
+    Console.WriteLine("text")
+    Console.WriteLine(7)
+    Scalars()
+}
+
+func Scalars() {
+    Console.WriteLine(false)
+    Console.WriteLine('😀')
+    let signedByte: sbyte = -128
+    let unsignedByte: byte = 255
+    let signedShort: short = -32768
+    let unsignedShort: ushort = 65535
+    let unsignedInt: uint = 4294967295
+    let signedLong: long = -9223372036854775807 - 1
+    let unsignedLong = (ulong)-1L
+    let signedNative = default(nint)
+    let unsignedNative = default(nuint)
+    Console.WriteLine(signedByte)
+    Console.WriteLine(unsignedByte)
+    Console.WriteLine(signedShort)
+    Console.WriteLine(unsignedShort)
+    Console.WriteLine(unsignedInt)
+    Console.WriteLine(signedLong)
+    Console.WriteLine(unsignedLong)
+    Console.WriteLine(signedNative)
+    Console.WriteLine(unsignedNative)
+}

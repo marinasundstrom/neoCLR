@@ -250,6 +250,11 @@ False:
     ldc.i4 0
     ret
 .end
+.function neoCLR.Library.System.Console.RuntimeReflection936F30A1978F475D(System.Object arg0) -> String
+ldarg arg0
+callvirt instance System.Object::ToString()
+ret
+.end
 .function neoCLR.Library.System.Console.RuntimeCliCall0(Int32 arg0) -> System.IO.ConsoleOutputStream
 ldarg arg0
 call neoCLR.Library.System.Console.RuntimeBooleanFromInt32(Int32)
@@ -276,20 +281,20 @@ ret
 .implements System.IO.InputStream
 .field private closed Boolean
 .method internal instance .ctor() -> noresult
-M0000000f_IL_0000:
-M0000000f_IL_0001:
+M0000001b_IL_0000:
+M0000001b_IL_0001:
 ldarg 0
-M0000000f_IL_0002:
+M0000001b_IL_0002:
 pop
-M0000000f_IL_0007:
-M0000000f_IL_0008:
+M0000001b_IL_0007:
+M0000001b_IL_0008:
 ldarg 0
-M0000000f_IL_0009:
+M0000001b_IL_0009:
 ldc.i4 0
-M0000000f_IL_000a:
+M0000001b_IL_000a:
 call neoCLR.Library.System.Console.RuntimeBooleanFromInt32(Int32)
 stfld System.IO.ConsoleInputStream::closed
-M0000000f_IL_000f:
+M0000001b_IL_000f:
 ret
 .end
 .method instance Read(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Result<Int32,System.IO.StreamError>
@@ -327,401 +332,401 @@ ldloca local15
 initobj System.Option.None
 ldloca local19
 initobj System.ConsoleReadError
-M00000010_IL_0000:
-M00000010_IL_0001:
-M00000010_IL_0002:
+M0000001c_IL_0000:
+M0000001c_IL_0001:
+M0000001c_IL_0002:
 ldarg 0
-M00000010_IL_0003:
+M0000001c_IL_0003:
 ldfld System.IO.ConsoleInputStream::closed
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000010_IL_0008:
-brtrue M00000010_IL_0012
-M00000010_IL_000d:
-br M00000010_IL_0027
-M00000010_IL_0012:
+M0000001c_IL_0008:
+brtrue M0000001c_IL_0012
+M0000001c_IL_000d:
+br M0000001c_IL_0027
+M0000001c_IL_0012:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorClosedNew()
-M00000010_IL_0017:
+M0000001c_IL_0017:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorClosed(System.IO.StreamError.Closed)
-M00000010_IL_001c:
+M0000001c_IL_001c:
 call neoCLR.Library.System.Console.RuntimeUnion14(System.IO.StreamError)
-M00000010_IL_0021:
+M0000001c_IL_0021:
 call neoCLR.Library.System.Console.RuntimeUnion15(System.Result.Error<System.IO.StreamError>)
-M00000010_IL_0026:
+M0000001c_IL_0026:
 ret
-M00000010_IL_0027:
-M00000010_IL_0028:
-M00000010_IL_0029:
+M0000001c_IL_0027:
+M0000001c_IL_0028:
+M0000001c_IL_0029:
 ldarg 2
-M00000010_IL_002a:
+M0000001c_IL_002a:
 ldc.i4 0
-M00000010_IL_002b:
+M0000001c_IL_002b:
 clt
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000010_IL_002d:
-brtrue M00000010_IL_0037
-M00000010_IL_0032:
-br M00000010_IL_004c
-M00000010_IL_0037:
+M0000001c_IL_002d:
+brtrue M0000001c_IL_0037
+M0000001c_IL_0032:
+br M0000001c_IL_004c
+M0000001c_IL_0037:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorInvalidRangeNew()
-M00000010_IL_003c:
+M0000001c_IL_003c:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorInvalidRange(System.IO.StreamError.InvalidRange)
-M00000010_IL_0041:
+M0000001c_IL_0041:
 call neoCLR.Library.System.Console.RuntimeUnion14(System.IO.StreamError)
-M00000010_IL_0046:
+M0000001c_IL_0046:
 call neoCLR.Library.System.Console.RuntimeUnion15(System.Result.Error<System.IO.StreamError>)
-M00000010_IL_004b:
+M0000001c_IL_004b:
 ret
-M00000010_IL_004c:
-M00000010_IL_004d:
-M00000010_IL_004e:
+M0000001c_IL_004c:
+M0000001c_IL_004d:
+M0000001c_IL_004e:
 ldarg 3
-M00000010_IL_004f:
+M0000001c_IL_004f:
 ldc.i4 0
-M00000010_IL_0050:
+M0000001c_IL_0050:
 clt
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000010_IL_0052:
-brtrue M00000010_IL_005c
-M00000010_IL_0057:
-br M00000010_IL_0071
-M00000010_IL_005c:
+M0000001c_IL_0052:
+brtrue M0000001c_IL_005c
+M0000001c_IL_0057:
+br M0000001c_IL_0071
+M0000001c_IL_005c:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorInvalidRangeNew()
-M00000010_IL_0061:
+M0000001c_IL_0061:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorInvalidRange(System.IO.StreamError.InvalidRange)
-M00000010_IL_0066:
+M0000001c_IL_0066:
 call neoCLR.Library.System.Console.RuntimeUnion14(System.IO.StreamError)
-M00000010_IL_006b:
+M0000001c_IL_006b:
 call neoCLR.Library.System.Console.RuntimeUnion15(System.Result.Error<System.IO.StreamError>)
-M00000010_IL_0070:
+M0000001c_IL_0070:
 ret
-M00000010_IL_0071:
-M00000010_IL_0072:
-M00000010_IL_0073:
+M0000001c_IL_0071:
+M0000001c_IL_0072:
+M0000001c_IL_0073:
 ldarg 2
-M00000010_IL_0074:
+M0000001c_IL_0074:
 ldarg 1
-M00000010_IL_0075:
+M0000001c_IL_0075:
 ldlen
 conv.i4
-M00000010_IL_007a:
+M0000001c_IL_007a:
 cgt
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000010_IL_007c:
-brtrue M00000010_IL_0086
-M00000010_IL_0081:
-br M00000010_IL_009b
-M00000010_IL_0086:
+M0000001c_IL_007c:
+brtrue M0000001c_IL_0086
+M0000001c_IL_0081:
+br M0000001c_IL_009b
+M0000001c_IL_0086:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorInvalidRangeNew()
-M00000010_IL_008b:
+M0000001c_IL_008b:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorInvalidRange(System.IO.StreamError.InvalidRange)
-M00000010_IL_0090:
+M0000001c_IL_0090:
 call neoCLR.Library.System.Console.RuntimeUnion14(System.IO.StreamError)
-M00000010_IL_0095:
+M0000001c_IL_0095:
 call neoCLR.Library.System.Console.RuntimeUnion15(System.Result.Error<System.IO.StreamError>)
-M00000010_IL_009a:
+M0000001c_IL_009a:
 ret
-M00000010_IL_009b:
-M00000010_IL_009c:
-M00000010_IL_009d:
+M0000001c_IL_009b:
+M0000001c_IL_009c:
+M0000001c_IL_009d:
 ldarg 3
-M00000010_IL_009e:
+M0000001c_IL_009e:
 ldarg 1
-M00000010_IL_009f:
+M0000001c_IL_009f:
 ldlen
 conv.i4
-M00000010_IL_00a4:
+M0000001c_IL_00a4:
 ldarg 2
-M00000010_IL_00a5:
+M0000001c_IL_00a5:
 sub
-M00000010_IL_00a6:
+M0000001c_IL_00a6:
 cgt
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000010_IL_00a8:
-brtrue M00000010_IL_00b2
-M00000010_IL_00ad:
-br M00000010_IL_00c7
-M00000010_IL_00b2:
+M0000001c_IL_00a8:
+brtrue M0000001c_IL_00b2
+M0000001c_IL_00ad:
+br M0000001c_IL_00c7
+M0000001c_IL_00b2:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorInvalidRangeNew()
-M00000010_IL_00b7:
+M0000001c_IL_00b7:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorInvalidRange(System.IO.StreamError.InvalidRange)
-M00000010_IL_00bc:
+M0000001c_IL_00bc:
 call neoCLR.Library.System.Console.RuntimeUnion14(System.IO.StreamError)
-M00000010_IL_00c1:
+M0000001c_IL_00c1:
 call neoCLR.Library.System.Console.RuntimeUnion15(System.Result.Error<System.IO.StreamError>)
-M00000010_IL_00c6:
+M0000001c_IL_00c6:
 ret
-M00000010_IL_00c7:
-M00000010_IL_00c8:
-M00000010_IL_00c9:
+M0000001c_IL_00c7:
+M0000001c_IL_00c8:
+M0000001c_IL_00c9:
 ldarg 3
-M00000010_IL_00ca:
+M0000001c_IL_00ca:
 ldc.i4 65536
-M00000010_IL_00cf:
+M0000001c_IL_00cf:
 cgt
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000010_IL_00d1:
-brtrue M00000010_IL_00db
-M00000010_IL_00d6:
-br M00000010_IL_00f0
-M00000010_IL_00db:
+M0000001c_IL_00d1:
+brtrue M0000001c_IL_00db
+M0000001c_IL_00d6:
+br M0000001c_IL_00f0
+M0000001c_IL_00db:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorLimitExceededNew()
-M00000010_IL_00e0:
+M0000001c_IL_00e0:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorLimitExceeded(System.IO.StreamError.LimitExceeded)
-M00000010_IL_00e5:
+M0000001c_IL_00e5:
 call neoCLR.Library.System.Console.RuntimeUnion14(System.IO.StreamError)
-M00000010_IL_00ea:
+M0000001c_IL_00ea:
 call neoCLR.Library.System.Console.RuntimeUnion15(System.Result.Error<System.IO.StreamError>)
-M00000010_IL_00ef:
+M0000001c_IL_00ef:
 ret
-M00000010_IL_00f0:
-M00000010_IL_00f1:
-M00000010_IL_00f2:
+M0000001c_IL_00f0:
+M0000001c_IL_00f1:
+M0000001c_IL_00f2:
 ldarg 3
-M00000010_IL_00f3:
+M0000001c_IL_00f3:
 ldc.i4 0
-M00000010_IL_00f4:
+M0000001c_IL_00f4:
 ceq
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000010_IL_00f6:
-brtrue M00000010_IL_0100
-M00000010_IL_00fb:
-br M00000010_IL_010d
-M00000010_IL_0100:
-M00000010_IL_0101:
+M0000001c_IL_00f6:
+brtrue M0000001c_IL_0100
+M0000001c_IL_00fb:
+br M0000001c_IL_010d
+M0000001c_IL_0100:
+M0000001c_IL_0101:
 ldc.i4 0
-M00000010_IL_0102:
+M0000001c_IL_0102:
 call neoCLR.Library.System.Console.RuntimeUnion16(Int32)
-M00000010_IL_0107:
+M0000001c_IL_0107:
 call neoCLR.Library.System.Console.RuntimeUnion17(System.Result.Ok<Int32>)
-M00000010_IL_010c:
+M0000001c_IL_010c:
 ret
-M00000010_IL_010d:
-M00000010_IL_010e:
-M00000010_IL_010f:
-M00000010_IL_0110:
+M0000001c_IL_010d:
+M0000001c_IL_010e:
+M0000001c_IL_010f:
+M0000001c_IL_0110:
 call System.Console.ReadByte()
-M00000010_IL_0115:
+M0000001c_IL_0115:
 stloc local0
-M00000010_IL_0116:
+M0000001c_IL_0116:
 ldloca local1
-M00000010_IL_0118:
+M0000001c_IL_0118:
 pop
-M00000010_IL_011e:
-M00000010_IL_011f:
+M0000001c_IL_011e:
+M0000001c_IL_011f:
 ldloc local0
-M00000010_IL_0120:
+M0000001c_IL_0120:
 stloc local3
-M00000010_IL_0121:
+M0000001c_IL_0121:
 ldloca local3
-M00000010_IL_0123:
+M0000001c_IL_0123:
 ldloca local4
-M00000010_IL_0125:
+M0000001c_IL_0125:
 call neoCLR.Library.System.Console.RuntimeUnion18(System.Result<System.Option<Byte>,System.ConsoleReadError>&,System.Result.Ok<System.Option<Byte>>&)
-M00000010_IL_012a:
-brfalse M00000010_IL_01f9
-M00000010_IL_012f:
+M0000001c_IL_012a:
+brfalse M0000001c_IL_01f9
+M0000001c_IL_012f:
 ldloc local4
-M00000010_IL_0131:
+M0000001c_IL_0131:
 stloc local5
-M00000010_IL_0133:
+M0000001c_IL_0133:
 ldloca local5
-M00000010_IL_0135:
+M0000001c_IL_0135:
 ldloca local6
-M00000010_IL_0137:
+M0000001c_IL_0137:
 call neoCLR.Library.System.Console.RuntimeUnion19(System.Result.Ok<System.Option<Byte>>&,System.Option<Byte>&)
-M00000010_IL_013c:
+M0000001c_IL_013c:
 ldloc local6
-M00000010_IL_013e:
+M0000001c_IL_013e:
 stloc local2
-M00000010_IL_013f:
+M0000001c_IL_013f:
 ldc.i4 1
-M00000010_IL_0140:
-br M00000010_IL_0146
-M00000010_IL_0146:
-brfalse M00000010_IL_01f9
-M00000010_IL_014b:
-M00000010_IL_014c:
-br M00000010_IL_0157
-M00000010_IL_0157:
+M0000001c_IL_0140:
+br M0000001c_IL_0146
+M0000001c_IL_0146:
+brfalse M0000001c_IL_01f9
+M0000001c_IL_014b:
+M0000001c_IL_014c:
+br M0000001c_IL_0157
+M0000001c_IL_0157:
 ldloca local7
-M00000010_IL_0159:
+M0000001c_IL_0159:
 pop
-M00000010_IL_015f:
-M00000010_IL_0160:
+M0000001c_IL_015f:
+M0000001c_IL_0160:
 ldloc local2
-M00000010_IL_0161:
+M0000001c_IL_0161:
 stloc local9
-M00000010_IL_0163:
+M0000001c_IL_0163:
 ldloca local9
-M00000010_IL_0165:
+M0000001c_IL_0165:
 ldloca local10
-M00000010_IL_0167:
+M0000001c_IL_0167:
 call neoCLR.Library.System.Console.RuntimeUnion22(System.Option<Byte>&,System.Option.Some<Byte>&)
-M00000010_IL_016c:
-brfalse M00000010_IL_01b6
-M00000010_IL_0171:
+M0000001c_IL_016c:
+brfalse M0000001c_IL_01b6
+M0000001c_IL_0171:
 ldloc local10
-M00000010_IL_0173:
+M0000001c_IL_0173:
 stloc local11
-M00000010_IL_0175:
+M0000001c_IL_0175:
 ldloca local11
-M00000010_IL_0177:
+M0000001c_IL_0177:
 ldloca local12
-M00000010_IL_0179:
+M0000001c_IL_0179:
 call neoCLR.Library.System.Console.RuntimeUnion23(System.Option.Some<Byte>&,Byte&)
-M00000010_IL_017e:
+M0000001c_IL_017e:
 ldloc local12
-M00000010_IL_0180:
+M0000001c_IL_0180:
 stloc local8
-M00000010_IL_0182:
+M0000001c_IL_0182:
 ldc.i4 1
-M00000010_IL_0183:
-br M00000010_IL_0189
-M00000010_IL_0189:
-brfalse M00000010_IL_01b6
-M00000010_IL_018e:
-M00000010_IL_018f:
-br M00000010_IL_019a
-M00000010_IL_019a:
-M00000010_IL_019b:
+M0000001c_IL_0183:
+br M0000001c_IL_0189
+M0000001c_IL_0189:
+brfalse M0000001c_IL_01b6
+M0000001c_IL_018e:
+M0000001c_IL_018f:
+br M0000001c_IL_019a
+M0000001c_IL_019a:
+M0000001c_IL_019b:
 ldarg 1
-M00000010_IL_019c:
+M0000001c_IL_019c:
 ldarg 2
-M00000010_IL_019d:
+M0000001c_IL_019d:
 ldloc local8
-M00000010_IL_019f:
+M0000001c_IL_019f:
 stelem Byte
-M00000010_IL_01a0:
+M0000001c_IL_01a0:
 ldc.i4 1
-M00000010_IL_01a1:
+M0000001c_IL_01a1:
 call neoCLR.Library.System.Console.RuntimeUnion16(Int32)
-M00000010_IL_01a6:
+M0000001c_IL_01a6:
 stloc local13
-M00000010_IL_01a8:
+M0000001c_IL_01a8:
 ldloc local13
-M00000010_IL_01aa:
+M0000001c_IL_01aa:
 call neoCLR.Library.System.Console.RuntimeUnion17(System.Result.Ok<Int32>)
-M00000010_IL_01af:
+M0000001c_IL_01af:
 stloc local7
-M00000010_IL_01b1:
-br M00000010_IL_01f0
-M00000010_IL_01b6:
-M00000010_IL_01b7:
-M00000010_IL_01b8:
+M0000001c_IL_01b1:
+br M0000001c_IL_01f0
+M0000001c_IL_01b6:
+M0000001c_IL_01b7:
+M0000001c_IL_01b8:
 ldloc local2
-M00000010_IL_01b9:
+M0000001c_IL_01b9:
 stloc local14
-M00000010_IL_01bb:
+M0000001c_IL_01bb:
 ldloca local14
-M00000010_IL_01bd:
+M0000001c_IL_01bd:
 ldloca local15
-M00000010_IL_01bf:
+M0000001c_IL_01bf:
 call neoCLR.Library.System.Console.RuntimeUnion24(System.Option<Byte>&,System.Option.None&)
-M00000010_IL_01c4:
-brfalse M00000010_IL_01eb
-M00000010_IL_01c9:
+M0000001c_IL_01c4:
+brfalse M0000001c_IL_01eb
+M0000001c_IL_01c9:
 ldloc local15
-M00000010_IL_01cb:
+M0000001c_IL_01cb:
 pop
-M00000010_IL_01cc:
-M00000010_IL_01cd:
-br M00000010_IL_01d8
-M00000010_IL_01d8:
-M00000010_IL_01d9:
+M0000001c_IL_01cc:
+M0000001c_IL_01cd:
+br M0000001c_IL_01d8
+M0000001c_IL_01d8:
+M0000001c_IL_01d9:
 ldc.i4 0
-M00000010_IL_01da:
+M0000001c_IL_01da:
 call neoCLR.Library.System.Console.RuntimeUnion16(Int32)
-M00000010_IL_01df:
+M0000001c_IL_01df:
 call neoCLR.Library.System.Console.RuntimeUnion17(System.Result.Ok<Int32>)
-M00000010_IL_01e4:
+M0000001c_IL_01e4:
 stloc local7
-M00000010_IL_01e6:
-br M00000010_IL_01f0
-M00000010_IL_01eb:
-M00000010_IL_01ec:
-M00000010_IL_01ed:
-M00000010_IL_01ee:
-M00000010_IL_01ef:
+M0000001c_IL_01e6:
+br M0000001c_IL_01f0
+M0000001c_IL_01eb:
+M0000001c_IL_01ec:
+M0000001c_IL_01ed:
+M0000001c_IL_01ee:
+M0000001c_IL_01ef:
 fault "Guest program reached a terminal failure"
-M00000010_IL_01f0:
-M00000010_IL_01f1:
+M0000001c_IL_01f0:
+M0000001c_IL_01f1:
 ldloc local7
-M00000010_IL_01f3:
+M0000001c_IL_01f3:
 stloc local1
-M00000010_IL_01f4:
-br M00000010_IL_0252
-M00000010_IL_01f9:
-M00000010_IL_01fa:
+M0000001c_IL_01f4:
+br M0000001c_IL_0252
+M0000001c_IL_01f9:
+M0000001c_IL_01fa:
 ldloc local0
-M00000010_IL_01fb:
+M0000001c_IL_01fb:
 stloc local16
-M00000010_IL_01fd:
+M0000001c_IL_01fd:
 ldloca local16
-M00000010_IL_01ff:
+M0000001c_IL_01ff:
 ldloca local17
-M00000010_IL_0201:
+M0000001c_IL_0201:
 call neoCLR.Library.System.Console.RuntimeUnion20(System.Result<System.Option<Byte>,System.ConsoleReadError>&,System.Result.Error<System.ConsoleReadError>&)
-M00000010_IL_0206:
-brfalse M00000010_IL_024d
-M00000010_IL_020b:
+M0000001c_IL_0206:
+brfalse M0000001c_IL_024d
+M0000001c_IL_020b:
 ldloc local17
-M00000010_IL_020d:
+M0000001c_IL_020d:
 stloc local18
-M00000010_IL_020f:
+M0000001c_IL_020f:
 ldloca local18
-M00000010_IL_0211:
+M0000001c_IL_0211:
 ldloca local19
-M00000010_IL_0213:
+M0000001c_IL_0213:
 call neoCLR.Library.System.Console.RuntimeUnion21(System.Result.Error<System.ConsoleReadError>&,System.ConsoleReadError&)
-M00000010_IL_0218:
+M0000001c_IL_0218:
 ldloc local19
-M00000010_IL_021a:
+M0000001c_IL_021a:
 pop
-M00000010_IL_021b:
+M0000001c_IL_021b:
 ldc.i4 1
-M00000010_IL_021c:
-br M00000010_IL_0222
-M00000010_IL_0222:
-brfalse M00000010_IL_024d
-M00000010_IL_0227:
-M00000010_IL_0228:
-br M00000010_IL_0233
-M00000010_IL_0233:
+M0000001c_IL_021c:
+br M0000001c_IL_0222
+M0000001c_IL_0222:
+brfalse M0000001c_IL_024d
+M0000001c_IL_0227:
+M0000001c_IL_0228:
+br M0000001c_IL_0233
+M0000001c_IL_0233:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorIoFailureNew()
-M00000010_IL_0238:
+M0000001c_IL_0238:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorIoFailure(System.IO.StreamError.IoFailure)
-M00000010_IL_023d:
+M0000001c_IL_023d:
 call neoCLR.Library.System.Console.RuntimeUnion14(System.IO.StreamError)
-M00000010_IL_0242:
+M0000001c_IL_0242:
 call neoCLR.Library.System.Console.RuntimeUnion15(System.Result.Error<System.IO.StreamError>)
-M00000010_IL_0247:
+M0000001c_IL_0247:
 stloc local1
-M00000010_IL_0248:
-br M00000010_IL_0252
-M00000010_IL_024d:
-M00000010_IL_024e:
-M00000010_IL_024f:
-M00000010_IL_0250:
-M00000010_IL_0251:
+M0000001c_IL_0248:
+br M0000001c_IL_0252
+M0000001c_IL_024d:
+M0000001c_IL_024e:
+M0000001c_IL_024f:
+M0000001c_IL_0250:
+M0000001c_IL_0251:
 fault "Guest program reached a terminal failure"
-M00000010_IL_0252:
-M00000010_IL_0253:
+M0000001c_IL_0252:
+M0000001c_IL_0253:
 ldloc local1
-M00000010_IL_0254:
+M0000001c_IL_0254:
 ret
 .end
 .method instance Close() -> noresult
-M00000011_IL_0000:
-M00000011_IL_0001:
-M00000011_IL_0002:
+M0000001d_IL_0000:
+M0000001d_IL_0001:
+M0000001d_IL_0002:
 ldarg 0
-M00000011_IL_0003:
+M0000001d_IL_0003:
 ldc.i4 1
-M00000011_IL_0004:
+M0000001d_IL_0004:
 call neoCLR.Library.System.Console.RuntimeBooleanFromInt32(Int32)
 stfld System.IO.ConsoleInputStream::closed
-M00000011_IL_0009:
-M00000011_IL_000a:
+M0000001d_IL_0009:
+M0000001d_IL_000a:
 ret
 .end
 .end
@@ -731,29 +736,29 @@ ret
 .field private error Boolean
 .field private closed Boolean
 .method internal instance .ctor(Boolean error) -> noresult
-M00000012_IL_0000:
-M00000012_IL_0001:
+M0000001e_IL_0000:
+M0000001e_IL_0001:
 ldarg 0
-M00000012_IL_0002:
+M0000001e_IL_0002:
 pop
-M00000012_IL_0007:
-M00000012_IL_0008:
+M0000001e_IL_0007:
+M0000001e_IL_0008:
 ldarg 0
-M00000012_IL_0009:
+M0000001e_IL_0009:
 ldc.i4 0
-M00000012_IL_000a:
+M0000001e_IL_000a:
 call neoCLR.Library.System.Console.RuntimeBooleanFromInt32(Int32)
 stfld System.IO.ConsoleOutputStream::closed
-M00000012_IL_000f:
-M00000012_IL_0010:
+M0000001e_IL_000f:
+M0000001e_IL_0010:
 ldarg 0
-M00000012_IL_0011:
+M0000001e_IL_0011:
 ldarg 1
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000012_IL_0012:
+M0000001e_IL_0012:
 call neoCLR.Library.System.Console.RuntimeBooleanFromInt32(Int32)
 stfld System.IO.ConsoleOutputStream::error
-M00000012_IL_0017:
+M0000001e_IL_0017:
 ret
 .end
 .method instance Write(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Result<Int32,System.IO.StreamError>
@@ -761,132 +766,132 @@ ret
 .local Byte local1
 ldc.i4 0
 stloc local1
-M00000013_IL_0000:
-M00000013_IL_0001:
-M00000013_IL_0002:
+M0000001f_IL_0000:
+M0000001f_IL_0001:
+M0000001f_IL_0002:
 ldarg 0
-M00000013_IL_0003:
+M0000001f_IL_0003:
 ldfld System.IO.ConsoleOutputStream::closed
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000013_IL_0008:
-brtrue M00000013_IL_0012
-M00000013_IL_000d:
-br M00000013_IL_0027
-M00000013_IL_0012:
+M0000001f_IL_0008:
+brtrue M0000001f_IL_0012
+M0000001f_IL_000d:
+br M0000001f_IL_0027
+M0000001f_IL_0012:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorClosedNew()
-M00000013_IL_0017:
+M0000001f_IL_0017:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorClosed(System.IO.StreamError.Closed)
-M00000013_IL_001c:
+M0000001f_IL_001c:
 call neoCLR.Library.System.Console.RuntimeUnion14(System.IO.StreamError)
-M00000013_IL_0021:
+M0000001f_IL_0021:
 call neoCLR.Library.System.Console.RuntimeUnion15(System.Result.Error<System.IO.StreamError>)
-M00000013_IL_0026:
+M0000001f_IL_0026:
 ret
-M00000013_IL_0027:
-M00000013_IL_0028:
-M00000013_IL_0029:
+M0000001f_IL_0027:
+M0000001f_IL_0028:
+M0000001f_IL_0029:
 ldarg 0
-M00000013_IL_002a:
+M0000001f_IL_002a:
 ldfld System.IO.ConsoleOutputStream::error
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000013_IL_002f:
+M0000001f_IL_002f:
 ldarg 1
-M00000013_IL_0030:
+M0000001f_IL_0030:
 ldarg 2
-M00000013_IL_0031:
+M0000001f_IL_0031:
 ldarg 3
-M00000013_IL_0032:
+M0000001f_IL_0032:
 call neoCLR.Library.System.Console.RuntimeCliCall1(Int32,arrayref<Byte>,Int32,Int32)
-M00000013_IL_0037:
+M0000001f_IL_0037:
 stloc local0
-M00000013_IL_0038:
-M00000013_IL_0039:
+M0000001f_IL_0038:
+M0000001f_IL_0039:
 ldloc local0
-M00000013_IL_003a:
+M0000001f_IL_003a:
 value.is Byte
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000013_IL_003f:
-brtrue M00000013_IL_0049
-M00000013_IL_0044:
-br M00000013_IL_00b2
-M00000013_IL_0049:
-M00000013_IL_004a:
+M0000001f_IL_003f:
+brtrue M0000001f_IL_0049
+M0000001f_IL_0044:
+br M0000001f_IL_00b2
+M0000001f_IL_0049:
+M0000001f_IL_004a:
 ldloc local0
-M00000013_IL_004b:
+M0000001f_IL_004b:
 value.unpack Byte
-M00000013_IL_0050:
+M0000001f_IL_0050:
 stloc local1
-M00000013_IL_0051:
-M00000013_IL_0052:
+M0000001f_IL_0051:
+M0000001f_IL_0052:
 ldloc local1
-M00000013_IL_0053:
+M0000001f_IL_0053:
 conv.i4
-M00000013_IL_0054:
+M0000001f_IL_0054:
 ldc.i4 7
-M00000013_IL_0055:
+M0000001f_IL_0055:
 ceq
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000013_IL_0057:
-brtrue M00000013_IL_0061
-M00000013_IL_005c:
-br M00000013_IL_0076
-M00000013_IL_0061:
+M0000001f_IL_0057:
+brtrue M0000001f_IL_0061
+M0000001f_IL_005c:
+br M0000001f_IL_0076
+M0000001f_IL_0061:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorInvalidRangeNew()
-M00000013_IL_0066:
+M0000001f_IL_0066:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorInvalidRange(System.IO.StreamError.InvalidRange)
-M00000013_IL_006b:
+M0000001f_IL_006b:
 call neoCLR.Library.System.Console.RuntimeUnion14(System.IO.StreamError)
-M00000013_IL_0070:
+M0000001f_IL_0070:
 call neoCLR.Library.System.Console.RuntimeUnion15(System.Result.Error<System.IO.StreamError>)
-M00000013_IL_0075:
+M0000001f_IL_0075:
 ret
-M00000013_IL_0076:
-M00000013_IL_0077:
-M00000013_IL_0078:
+M0000001f_IL_0076:
+M0000001f_IL_0077:
+M0000001f_IL_0078:
 ldloc local1
-M00000013_IL_0079:
+M0000001f_IL_0079:
 conv.i4
-M00000013_IL_007a:
+M0000001f_IL_007a:
 ldc.i4 8
-M00000013_IL_007b:
+M0000001f_IL_007b:
 ceq
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000013_IL_007d:
-brtrue M00000013_IL_0087
-M00000013_IL_0082:
-br M00000013_IL_009c
-M00000013_IL_0087:
+M0000001f_IL_007d:
+brtrue M0000001f_IL_0087
+M0000001f_IL_0082:
+br M0000001f_IL_009c
+M0000001f_IL_0087:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorLimitExceededNew()
-M00000013_IL_008c:
+M0000001f_IL_008c:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorLimitExceeded(System.IO.StreamError.LimitExceeded)
-M00000013_IL_0091:
+M0000001f_IL_0091:
 call neoCLR.Library.System.Console.RuntimeUnion14(System.IO.StreamError)
-M00000013_IL_0096:
+M0000001f_IL_0096:
 call neoCLR.Library.System.Console.RuntimeUnion15(System.Result.Error<System.IO.StreamError>)
-M00000013_IL_009b:
+M0000001f_IL_009b:
 ret
-M00000013_IL_009c:
-M00000013_IL_009d:
+M0000001f_IL_009c:
+M0000001f_IL_009d:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorIoFailureNew()
-M00000013_IL_00a2:
+M0000001f_IL_00a2:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorIoFailure(System.IO.StreamError.IoFailure)
-M00000013_IL_00a7:
+M0000001f_IL_00a7:
 call neoCLR.Library.System.Console.RuntimeUnion14(System.IO.StreamError)
-M00000013_IL_00ac:
+M0000001f_IL_00ac:
 call neoCLR.Library.System.Console.RuntimeUnion15(System.Result.Error<System.IO.StreamError>)
-M00000013_IL_00b1:
+M0000001f_IL_00b1:
 ret
-M00000013_IL_00b2:
-M00000013_IL_00b3:
-M00000013_IL_00b4:
+M0000001f_IL_00b2:
+M0000001f_IL_00b3:
+M0000001f_IL_00b4:
 ldloc local0
-M00000013_IL_00b5:
+M0000001f_IL_00b5:
 value.unpack Int32
-M00000013_IL_00ba:
+M0000001f_IL_00ba:
 call neoCLR.Library.System.Console.RuntimeUnion16(Int32)
-M00000013_IL_00bf:
+M0000001f_IL_00bf:
 call neoCLR.Library.System.Console.RuntimeUnion17(System.Result.Ok<Int32>)
-M00000013_IL_00c4:
+M0000001f_IL_00c4:
 ret
 .end
 .method instance Flush() -> System.Result<Void,System.IO.StreamError>
@@ -894,86 +899,86 @@ ret
 .local Void local1
 ldvoid
 stloc local1
-M00000014_IL_0000:
-M00000014_IL_0001:
-M00000014_IL_0002:
+M00000020_IL_0000:
+M00000020_IL_0001:
+M00000020_IL_0002:
 ldarg 0
-M00000014_IL_0003:
+M00000020_IL_0003:
 ldfld System.IO.ConsoleOutputStream::closed
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000014_IL_0008:
-brtrue M00000014_IL_0012
-M00000014_IL_000d:
-br M00000014_IL_0027
-M00000014_IL_0012:
+M00000020_IL_0008:
+brtrue M00000020_IL_0012
+M00000020_IL_000d:
+br M00000020_IL_0027
+M00000020_IL_0012:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorClosedNew()
-M00000014_IL_0017:
+M00000020_IL_0017:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorClosed(System.IO.StreamError.Closed)
-M00000014_IL_001c:
+M00000020_IL_001c:
 call neoCLR.Library.System.Console.RuntimeUnion14(System.IO.StreamError)
-M00000014_IL_0021:
+M00000020_IL_0021:
 call neoCLR.Library.System.Console.RuntimeUnion25(System.Result.Error<System.IO.StreamError>)
-M00000014_IL_0026:
+M00000020_IL_0026:
 ret
-M00000014_IL_0027:
-M00000014_IL_0028:
-M00000014_IL_0029:
+M00000020_IL_0027:
+M00000020_IL_0028:
+M00000020_IL_0029:
 ldarg 0
-M00000014_IL_002a:
+M00000020_IL_002a:
 ldfld System.IO.ConsoleOutputStream::error
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000014_IL_002f:
+M00000020_IL_002f:
 call neoCLR.Library.System.Console.RuntimeCliCall2(Int32)
-M00000014_IL_0034:
+M00000020_IL_0034:
 stloc local0
-M00000014_IL_0035:
-M00000014_IL_0036:
+M00000020_IL_0035:
+M00000020_IL_0036:
 ldloc local0
-M00000014_IL_0037:
+M00000020_IL_0037:
 value.is Byte
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000014_IL_003c:
-brtrue M00000014_IL_0046
-M00000014_IL_0041:
-br M00000014_IL_005b
-M00000014_IL_0046:
+M00000020_IL_003c:
+brtrue M00000020_IL_0046
+M00000020_IL_0041:
+br M00000020_IL_005b
+M00000020_IL_0046:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorIoFailureNew()
-M00000014_IL_004b:
+M00000020_IL_004b:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorIoFailure(System.IO.StreamError.IoFailure)
-M00000014_IL_0050:
+M00000020_IL_0050:
 call neoCLR.Library.System.Console.RuntimeUnion14(System.IO.StreamError)
-M00000014_IL_0055:
+M00000020_IL_0055:
 call neoCLR.Library.System.Console.RuntimeUnion25(System.Result.Error<System.IO.StreamError>)
-M00000014_IL_005a:
+M00000020_IL_005a:
 ret
-M00000014_IL_005b:
-M00000014_IL_005c:
-M00000014_IL_005d:
+M00000020_IL_005b:
+M00000020_IL_005c:
+M00000020_IL_005d:
 ldloca local1
-M00000014_IL_0061:
+M00000020_IL_0061:
 ldvoid
 stobj Void
-M00000014_IL_0067:
+M00000020_IL_0067:
 ldloc local1
-M00000014_IL_006b:
+M00000020_IL_006b:
 call neoCLR.Library.System.Console.RuntimeUnion26(Void)
-M00000014_IL_0070:
+M00000020_IL_0070:
 call neoCLR.Library.System.Console.RuntimeUnion27(System.Result.Ok<Void>)
-M00000014_IL_0075:
+M00000020_IL_0075:
 ret
 .end
 .method instance Close() -> noresult
-M00000015_IL_0000:
-M00000015_IL_0001:
-M00000015_IL_0002:
+M00000021_IL_0000:
+M00000021_IL_0001:
+M00000021_IL_0002:
 ldarg 0
-M00000015_IL_0003:
+M00000021_IL_0003:
 ldc.i4 1
-M00000015_IL_0004:
+M00000021_IL_0004:
 call neoCLR.Library.System.Console.RuntimeBooleanFromInt32(Int32)
 stfld System.IO.ConsoleOutputStream::closed
-M00000015_IL_0009:
-M00000015_IL_000a:
+M00000021_IL_0009:
+M00000021_IL_000a:
 ret
 .end
 .end

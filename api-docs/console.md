@@ -1,7 +1,7 @@
 # Console and standard streams
 
 Development API after Preview 9. `System.Console` is a static class. Its common
-methods are `Write(string/int)`, `WriteLine()`, `WriteLine(string/int)`, `ReadByte()`
+methods are `Write(string/int)`, `WriteLine()`, `WriteLine(string/int/object?)` and Boolean, Char and integral overloads, `ReadByte()`
 and `ReadLine()`/`ReadLine(maxUtf8Bytes)`. Terminal key handling, colors, cursor
 movement, character-at-a-time text input and asynchronous calls are not implemented.
 
@@ -139,3 +139,15 @@ Node exposes separate standard streams too, but output blocking behavior depends
 the destination/platform. neoCLR currently chooses explicitly synchronous host calls;
 future scheduling work must not relabel these blocking operations as asynchronous.
 [Node process I/O](https://nodejs.org/api/process.html#a-note-on-process-io).
+
+## Object and scalar output (development)
+
+WriteLine(object?) calls virtual ToString and writes an empty line for null.
+Specific overloads accept Boolean, Char, SByte, Byte, Int16, UInt16, Int32, UInt32,
+Int64, UInt64, IntPtr and UIntPtr without boxing. Integers use invariant decimal
+text; Boolean writes True/False; Char writes its neoCLR grapheme text. Existing
+string and Int32 overloads remain preferred over object.
+
+The object overload preserves the type's current ToString contract. Floating-point
+formatting is still deferred: Single/Double do not yet provide numeric Object
+formatting. No culture, format-string or IFormatProvider support is introduced.

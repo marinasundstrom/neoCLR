@@ -82,6 +82,8 @@ static class RuntimeServiceBindings
             ("EnvironmentCurrentDirectory", [], "Value"),
             ("EnvironmentVariable", ["String"], "Value"),
             ("Int32ToString", ["Int32"], "String"),
+            ("Int64ToString", ["Int64"], "String"),
+            ("UInt64ToString", ["UInt64"], "String"),
             ("CharCategory", ["UInt32"], "Int32"),
             ("IntPtrToInt64", ["IntPtr"], "Int64"),
             ("UIntPtrToUInt64", ["UIntPtr"], "UInt64"),

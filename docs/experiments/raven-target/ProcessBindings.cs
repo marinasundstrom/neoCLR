@@ -17,6 +17,18 @@ static class ProcessBindings
         ("System.Console", "WriteLine", [], "noresult"),
         ("System.Console", "WriteLine", ["String"], "noresult"),
         ("System.Console", "WriteLine", ["Int32"], "noresult"),
+        ("System.Console", "WriteLine", ["System.Object"], "noresult"),
+        ("System.Console", "WriteLine", ["Boolean"], "noresult"),
+        ("System.Console", "WriteLine", ["Char"], "noresult"),
+        ("System.Console", "WriteLine", ["SByte"], "noresult"),
+        ("System.Console", "WriteLine", ["Byte"], "noresult"),
+        ("System.Console", "WriteLine", ["Int16"], "noresult"),
+        ("System.Console", "WriteLine", ["UInt16"], "noresult"),
+        ("System.Console", "WriteLine", ["UInt32"], "noresult"),
+        ("System.Console", "WriteLine", ["Int64"], "noresult"),
+        ("System.Console", "WriteLine", ["UInt64"], "noresult"),
+        ("System.Console", "WriteLine", ["IntPtr"], "noresult"),
+        ("System.Console", "WriteLine", ["UIntPtr"], "noresult"),
         ("System.Console", "ReadByte", [], "System.Result<System.Option<Byte>,System.ConsoleReadError>"),
         ("System.Environment", "GetCommandLineArgs", [], "arrayref<String>"),
         ("System.Environment", "GetCurrentDirectory", [], "System.Result<String,System.EnvironmentError>"),
@@ -35,6 +47,18 @@ static class ProcessBindings
         public static void Write(string value0) { }
         public static void Write(int value0) { }
         public static void WriteLine() { }
+        public static void WriteLine(object? value) { }
+        public static void WriteLine(bool value) { }
+        public static void WriteLine(char value) { }
+        public static void WriteLine(sbyte value) { }
+        public static void WriteLine(byte value) { }
+        public static void WriteLine(short value) { }
+        public static void WriteLine(ushort value) { }
+        public static void WriteLine(uint value) { }
+        public static void WriteLine(long value) { }
+        public static void WriteLine(ulong value) { }
+        public static void WriteLine(System.IntPtr value) { }
+        public static void WriteLine(System.UIntPtr value) { }
         """;
     public const string Declarations = """
         public static class Environment {

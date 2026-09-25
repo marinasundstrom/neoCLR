@@ -148,101 +148,339 @@ M00000002_IL_0009:
 ldvoid
 ret
 .end
-.method static WriteLine(Int32 value0) -> Void
+.method static WriteLine(System.Object value) -> Void
+.local System.Object local0
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
 ldarg 0
 M00000003_IL_0003:
-call neoCLR.Runtime.Int32ToString(Int32)
+isinst System.Object
 M00000003_IL_0008:
+dup
+M00000003_IL_0009:
+stloc local0
+M00000003_IL_000a:
+M00000003_IL_000b:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_000d:
+brtrue M00000003_IL_0017
+M00000003_IL_0012:
+br M00000003_IL_0028
+M00000003_IL_0017:
+M00000003_IL_0018:
+ldloc local0
+M00000003_IL_0019:
+call neoCLR.Library.System.Console.RuntimeReflection936F30A1978F475D(System.Object)
+M00000003_IL_001e:
+call System.Console.WriteLine(String)
+pop
+M00000003_IL_0023:
+br M00000003_IL_002e
+M00000003_IL_0028:
+M00000003_IL_0029:
+call System.Console.WriteLine()
+pop
+M00000003_IL_002e:
+M00000003_IL_002f:
+M00000003_IL_0030:
+ldvoid
+ret
+.end
+.method static WriteLine(Int32 value0) -> Void
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+call neoCLR.Runtime.Int32ToString(Int32)
+M00000004_IL_0008:
 call neoCLR.Runtime.WriteLine(String)
 pop
-M00000003_IL_000d:
-M00000003_IL_000e:
+M00000004_IL_000d:
+M00000004_IL_000e:
+ldvoid
+ret
+.end
+.method static WriteLine(Boolean value) -> Void
+.local String local0
+.local String local1
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0003:
+brfalse M00000005_IL_0014
+M00000005_IL_0008:
+ldstr "True"
+M00000005_IL_000d:
+stloc local0
+M00000005_IL_000e:
+ldloc local0
+M00000005_IL_000f:
+br M00000005_IL_001b
+M00000005_IL_0014:
+ldstr "False"
+M00000005_IL_0019:
+stloc local1
+M00000005_IL_001a:
+ldloc local1
+M00000005_IL_001b:
+call System.Console.WriteLine(String)
+pop
+M00000005_IL_0020:
+M00000005_IL_0021:
+ldvoid
+ret
+.end
+.method static WriteLine(Char value) -> Void
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+call neoCLR.Runtime.CharText(Char)
+M00000006_IL_0008:
+call System.Console.WriteLine(String)
+pop
+M00000006_IL_000d:
+M00000006_IL_000e:
+ldvoid
+ret
+.end
+.method static WriteLine(SByte value) -> Void
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+conv.i4
+M00000007_IL_0004:
+call neoCLR.Runtime.Int32ToString(Int32)
+M00000007_IL_0009:
+call System.Console.WriteLine(String)
+pop
+M00000007_IL_000e:
+M00000007_IL_000f:
+ldvoid
+ret
+.end
+.method static WriteLine(Byte value) -> Void
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+conv.i4
+M00000008_IL_0004:
+call neoCLR.Runtime.Int32ToString(Int32)
+M00000008_IL_0009:
+call System.Console.WriteLine(String)
+pop
+M00000008_IL_000e:
+M00000008_IL_000f:
+ldvoid
+ret
+.end
+.method static WriteLine(Int16 value) -> Void
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+conv.i4
+M00000009_IL_0004:
+call neoCLR.Runtime.Int32ToString(Int32)
+M00000009_IL_0009:
+call System.Console.WriteLine(String)
+pop
+M00000009_IL_000e:
+M00000009_IL_000f:
+ldvoid
+ret
+.end
+.method static WriteLine(UInt16 value) -> Void
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+conv.i4
+M0000000a_IL_0004:
+call neoCLR.Runtime.Int32ToString(Int32)
+M0000000a_IL_0009:
+call System.Console.WriteLine(String)
+pop
+M0000000a_IL_000e:
+M0000000a_IL_000f:
+ldvoid
+ret
+.end
+.method static WriteLine(UInt32 value) -> Void
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+conv.u8
+M0000000b_IL_0004:
+call neoCLR.Runtime.UInt64ToString(UInt64)
+M0000000b_IL_0009:
+call System.Console.WriteLine(String)
+pop
+M0000000b_IL_000e:
+M0000000b_IL_000f:
+ldvoid
+ret
+.end
+.method static WriteLine(Int64 value) -> Void
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+call neoCLR.Runtime.Int64ToString(Int64)
+M0000000c_IL_0008:
+call System.Console.WriteLine(String)
+pop
+M0000000c_IL_000d:
+M0000000c_IL_000e:
+ldvoid
+ret
+.end
+.method static WriteLine(UInt64 value) -> Void
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
+ldarg 0
+M0000000d_IL_0003:
+call neoCLR.Runtime.UInt64ToString(UInt64)
+M0000000d_IL_0008:
+call System.Console.WriteLine(String)
+pop
+M0000000d_IL_000d:
+M0000000d_IL_000e:
+ldvoid
+ret
+.end
+.method static WriteLine(IntPtr value) -> Void
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+M0000000e_IL_0002:
+ldarg 0
+M0000000e_IL_0003:
+conv.i8
+M0000000e_IL_0008:
+call neoCLR.Runtime.Int64ToString(Int64)
+M0000000e_IL_000d:
+call System.Console.WriteLine(String)
+pop
+M0000000e_IL_0012:
+M0000000e_IL_0013:
+ldvoid
+ret
+.end
+.method static WriteLine(UIntPtr value) -> Void
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+ldarg 0
+M0000000f_IL_0003:
+conv.u8
+M0000000f_IL_0008:
+call neoCLR.Runtime.UInt64ToString(UInt64)
+M0000000f_IL_000d:
+call System.Console.WriteLine(String)
+pop
+M0000000f_IL_0012:
+M0000000f_IL_0013:
 ldvoid
 ret
 .end
 .method static get_In() -> System.IO.TextReader
-M00000004_IL_0000:
-M00000004_IL_0001:
+M00000010_IL_0000:
+M00000010_IL_0001:
 call System.Console.OpenStandardInput()
-M00000004_IL_0006:
+M00000010_IL_0006:
 newobj instance System.IO.StreamReader::.ctor(System.IO.InputStream)
-M00000004_IL_000b:
+M00000010_IL_000b:
 castclass System.IO.TextReader
 ret
 .end
 .method static get_Out() -> System.IO.TextWriter
-M00000005_IL_0000:
-M00000005_IL_0001:
+M00000011_IL_0000:
+M00000011_IL_0001:
 call System.Console.OpenStandardOutput()
-M00000005_IL_0006:
+M00000011_IL_0006:
 newobj instance System.IO.StreamWriter::.ctor(System.IO.OutputStream)
-M00000005_IL_000b:
+M00000011_IL_000b:
 castclass System.IO.TextWriter
 ret
 .end
 .method static get_Error() -> System.IO.TextWriter
-M00000006_IL_0000:
-M00000006_IL_0001:
+M00000012_IL_0000:
+M00000012_IL_0001:
 call System.Console.OpenStandardError()
-M00000006_IL_0006:
+M00000012_IL_0006:
 newobj instance System.IO.StreamWriter::.ctor(System.IO.OutputStream)
-M00000006_IL_000b:
+M00000012_IL_000b:
 castclass System.IO.TextWriter
 ret
 .end
 .method static OpenStandardInput() -> System.IO.InputStream
-M00000007_IL_0000:
-M00000007_IL_0001:
-M00000007_IL_0002:
+M00000013_IL_0000:
+M00000013_IL_0001:
+M00000013_IL_0002:
 newobj instance System.IO.ConsoleInputStream::.ctor()
-M00000007_IL_0007:
+M00000013_IL_0007:
 ret
 .end
 .method static OpenStandardOutput() -> System.IO.OutputStream
-M00000008_IL_0000:
-M00000008_IL_0001:
-M00000008_IL_0002:
+M00000014_IL_0000:
+M00000014_IL_0001:
+M00000014_IL_0002:
 ldc.i4 0
-M00000008_IL_0003:
+M00000014_IL_0003:
 call neoCLR.Library.System.Console.RuntimeCliCall0(Int32)
-M00000008_IL_0008:
+M00000014_IL_0008:
 ret
 .end
 .method static OpenStandardError() -> System.IO.OutputStream
-M00000009_IL_0000:
-M00000009_IL_0001:
-M00000009_IL_0002:
+M00000015_IL_0000:
+M00000015_IL_0001:
+M00000015_IL_0002:
 ldc.i4 1
-M00000009_IL_0003:
+M00000015_IL_0003:
 call neoCLR.Library.System.Console.RuntimeCliCall0(Int32)
-M00000009_IL_0008:
+M00000015_IL_0008:
 ret
 .end
 .method static ReadLine() -> System.Result<System.Option<String>,System.IO.TextReadError>
-M0000000a_IL_0000:
-M0000000a_IL_0001:
-M0000000a_IL_0002:
+M00000016_IL_0000:
+M00000016_IL_0001:
+M00000016_IL_0002:
 call System.Console.get_In()
-M0000000a_IL_0007:
+M00000016_IL_0007:
 ldc.i4 65536
-M0000000a_IL_000c:
+M00000016_IL_000c:
 callvirt instance System.IO.TextReader::ReadLine(Int32)
-M0000000a_IL_0011:
+M00000016_IL_0011:
 ret
 .end
 .method static ReadLine(Int32 maxUtf8Bytes) -> System.Result<System.Option<String>,System.IO.TextReadError>
-M0000000b_IL_0000:
-M0000000b_IL_0001:
-M0000000b_IL_0002:
+M00000017_IL_0000:
+M00000017_IL_0001:
+M00000017_IL_0002:
 call System.Console.get_In()
-M0000000b_IL_0007:
+M00000017_IL_0007:
 ldarg 0
-M0000000b_IL_0008:
+M00000017_IL_0008:
 callvirt instance System.IO.TextReader::ReadLine(Int32)
-M0000000b_IL_000d:
+M00000017_IL_000d:
 ret
 .end
 .method static Write(String value0) -> Void
@@ -281,234 +519,234 @@ ldvoid
 stloc local14
 ldloca local18
 initobj System.IO.StreamError
-M0000000c_IL_0000:
-M0000000c_IL_0001:
-M0000000c_IL_0002:
+M00000018_IL_0000:
+M00000018_IL_0001:
+M00000018_IL_0002:
 call System.Console.get_Out()
-M0000000c_IL_0007:
+M00000018_IL_0007:
 stloc local0
-M0000000c_IL_0008:
-M0000000c_IL_0009:
-M0000000c_IL_000a:
+M00000018_IL_0008:
+M00000018_IL_0009:
+M00000018_IL_000a:
 ldloc local0
-M0000000c_IL_000b:
+M00000018_IL_000b:
 ldarg 0
-M0000000c_IL_000c:
+M00000018_IL_000c:
 callvirt instance System.IO.TextWriter::Write(String)
-M0000000c_IL_0011:
+M00000018_IL_0011:
 stloc local1
-M0000000c_IL_0012:
+M00000018_IL_0012:
 ldloc local1
-M0000000c_IL_0013:
+M00000018_IL_0013:
 stloc local3
-M0000000c_IL_0014:
+M00000018_IL_0014:
 ldloca local3
-M0000000c_IL_0016:
+M00000018_IL_0016:
 ldloca local4
-M0000000c_IL_0018:
+M00000018_IL_0018:
 call neoCLR.Library.System.Console.RuntimeUnion7(System.Result<Int32,System.IO.StreamError>&,System.Result.Ok<Int32>&)
-M0000000c_IL_001d:
-brfalse M0000000c_IL_004f
-M0000000c_IL_0022:
+M00000018_IL_001d:
+brfalse M00000018_IL_004f
+M00000018_IL_0022:
 ldloc local4
-M0000000c_IL_0024:
+M00000018_IL_0024:
 stloc local5
-M0000000c_IL_0026:
+M00000018_IL_0026:
 ldloca local5
-M0000000c_IL_0028:
+M00000018_IL_0028:
 ldloca local6
-M0000000c_IL_002a:
+M00000018_IL_002a:
 call neoCLR.Library.System.Console.RuntimeUnion8(System.Result.Ok<Int32>&,Int32&)
-M0000000c_IL_002f:
+M00000018_IL_002f:
 ldloc local6
-M0000000c_IL_0031:
+M00000018_IL_0031:
 pop
-M0000000c_IL_0032:
+M00000018_IL_0032:
 ldc.i4 1
-M0000000c_IL_0033:
-br M0000000c_IL_0039
-M0000000c_IL_0039:
-brfalse M0000000c_IL_004f
-M0000000c_IL_003e:
-M0000000c_IL_003f:
-br M0000000c_IL_004a
-M0000000c_IL_004a:
-br M0000000c_IL_009e
-M0000000c_IL_004f:
-M0000000c_IL_0050:
+M00000018_IL_0033:
+br M00000018_IL_0039
+M00000018_IL_0039:
+brfalse M00000018_IL_004f
+M00000018_IL_003e:
+M00000018_IL_003f:
+br M00000018_IL_004a
+M00000018_IL_004a:
+br M00000018_IL_009e
+M00000018_IL_004f:
+M00000018_IL_0050:
 ldloc local1
-M0000000c_IL_0051:
+M00000018_IL_0051:
 stloc local7
-M0000000c_IL_0053:
+M00000018_IL_0053:
 ldloca local7
-M0000000c_IL_0055:
+M00000018_IL_0055:
 ldloca local8
-M0000000c_IL_0057:
+M00000018_IL_0057:
 call neoCLR.Library.System.Console.RuntimeUnion9(System.Result<Int32,System.IO.StreamError>&,System.Result.Error<System.IO.StreamError>&)
-M0000000c_IL_005c:
-brfalse M0000000c_IL_0099
-M0000000c_IL_0061:
+M00000018_IL_005c:
+brfalse M00000018_IL_0099
+M00000018_IL_0061:
 ldloc local8
-M0000000c_IL_0063:
+M00000018_IL_0063:
 stloc local9
-M0000000c_IL_0065:
+M00000018_IL_0065:
 ldloca local9
-M0000000c_IL_0067:
+M00000018_IL_0067:
 ldloca local10
-M0000000c_IL_0069:
+M00000018_IL_0069:
 call neoCLR.Library.System.Console.RuntimeUnion10(System.Result.Error<System.IO.StreamError>&,System.IO.StreamError&)
-M0000000c_IL_006e:
+M00000018_IL_006e:
 ldloc local10
-M0000000c_IL_0070:
+M00000018_IL_0070:
 pop
-M0000000c_IL_0071:
+M00000018_IL_0071:
 ldc.i4 1
-M0000000c_IL_0072:
-br M0000000c_IL_0078
-M0000000c_IL_0078:
-brfalse M0000000c_IL_0099
-M0000000c_IL_007d:
-M0000000c_IL_007e:
-br M0000000c_IL_0089
-M0000000c_IL_0089:
-M0000000c_IL_008a:
+M00000018_IL_0072:
+br M00000018_IL_0078
+M00000018_IL_0078:
+brfalse M00000018_IL_0099
+M00000018_IL_007d:
+M00000018_IL_007e:
+br M00000018_IL_0089
+M00000018_IL_0089:
+M00000018_IL_008a:
 ldstr "console output failed"
-M0000000c_IL_008f:
+M00000018_IL_008f:
 call System.Fault(String)
-M0000000c_IL_0094:
-br M0000000c_IL_009e
-M0000000c_IL_0099:
-M0000000c_IL_009a:
-M0000000c_IL_009b:
-M0000000c_IL_009c:
-M0000000c_IL_009d:
+M00000018_IL_0094:
+br M00000018_IL_009e
+M00000018_IL_0099:
+M00000018_IL_009a:
+M00000018_IL_009b:
+M00000018_IL_009c:
+M00000018_IL_009d:
 fault "Guest program reached a terminal failure"
-M0000000c_IL_009e:
-M0000000c_IL_009f:
-M0000000c_IL_00a0:
-M0000000c_IL_00a1:
+M00000018_IL_009e:
+M00000018_IL_009f:
+M00000018_IL_00a0:
+M00000018_IL_00a1:
 ldloc local0
-M0000000c_IL_00a2:
+M00000018_IL_00a2:
 callvirt instance System.IO.TextWriter::Flush()
-M0000000c_IL_00a7:
+M00000018_IL_00a7:
 stloc local2
-M0000000c_IL_00a8:
+M00000018_IL_00a8:
 ldloc local2
-M0000000c_IL_00a9:
+M00000018_IL_00a9:
 stloc local11
-M0000000c_IL_00ab:
+M00000018_IL_00ab:
 ldloca local11
-M0000000c_IL_00ad:
+M00000018_IL_00ad:
 ldloca local12
-M0000000c_IL_00af:
+M00000018_IL_00af:
 call neoCLR.Library.System.Console.RuntimeUnion11(System.Result<Void,System.IO.StreamError>&,System.Result.Ok<Void>&)
-M0000000c_IL_00b4:
-brfalse M0000000c_IL_00e6
-M0000000c_IL_00b9:
+M00000018_IL_00b4:
+brfalse M00000018_IL_00e6
+M00000018_IL_00b9:
 ldloc local12
-M0000000c_IL_00bb:
+M00000018_IL_00bb:
 stloc local13
-M0000000c_IL_00bd:
+M00000018_IL_00bd:
 ldloca local13
-M0000000c_IL_00bf:
+M00000018_IL_00bf:
 ldloca local14
-M0000000c_IL_00c1:
+M00000018_IL_00c1:
 call neoCLR.Library.System.Console.RuntimeUnion12(System.Result.Ok<Void>&,Void&)
-M0000000c_IL_00c6:
+M00000018_IL_00c6:
 ldloc local14
-M0000000c_IL_00c8:
+M00000018_IL_00c8:
 pop
-M0000000c_IL_00c9:
+M00000018_IL_00c9:
 ldc.i4 1
-M0000000c_IL_00ca:
-br M0000000c_IL_00d0
-M0000000c_IL_00d0:
-brfalse M0000000c_IL_00e6
-M0000000c_IL_00d5:
-M0000000c_IL_00d6:
-br M0000000c_IL_00e1
-M0000000c_IL_00e1:
-br M0000000c_IL_0135
-M0000000c_IL_00e6:
-M0000000c_IL_00e7:
+M00000018_IL_00ca:
+br M00000018_IL_00d0
+M00000018_IL_00d0:
+brfalse M00000018_IL_00e6
+M00000018_IL_00d5:
+M00000018_IL_00d6:
+br M00000018_IL_00e1
+M00000018_IL_00e1:
+br M00000018_IL_0135
+M00000018_IL_00e6:
+M00000018_IL_00e7:
 ldloc local2
-M0000000c_IL_00e8:
+M00000018_IL_00e8:
 stloc local15
-M0000000c_IL_00ea:
+M00000018_IL_00ea:
 ldloca local15
-M0000000c_IL_00ec:
+M00000018_IL_00ec:
 ldloca local16
-M0000000c_IL_00ee:
+M00000018_IL_00ee:
 call neoCLR.Library.System.Console.RuntimeUnion13(System.Result<Void,System.IO.StreamError>&,System.Result.Error<System.IO.StreamError>&)
-M0000000c_IL_00f3:
-brfalse M0000000c_IL_0130
-M0000000c_IL_00f8:
+M00000018_IL_00f3:
+brfalse M00000018_IL_0130
+M00000018_IL_00f8:
 ldloc local16
-M0000000c_IL_00fa:
+M00000018_IL_00fa:
 stloc local17
-M0000000c_IL_00fc:
+M00000018_IL_00fc:
 ldloca local17
-M0000000c_IL_00fe:
+M00000018_IL_00fe:
 ldloca local18
-M0000000c_IL_0100:
+M00000018_IL_0100:
 call neoCLR.Library.System.Console.RuntimeUnion10(System.Result.Error<System.IO.StreamError>&,System.IO.StreamError&)
-M0000000c_IL_0105:
+M00000018_IL_0105:
 ldloc local18
-M0000000c_IL_0107:
+M00000018_IL_0107:
 pop
-M0000000c_IL_0108:
+M00000018_IL_0108:
 ldc.i4 1
-M0000000c_IL_0109:
-br M0000000c_IL_010f
-M0000000c_IL_010f:
-brfalse M0000000c_IL_0130
-M0000000c_IL_0114:
-M0000000c_IL_0115:
-br M0000000c_IL_0120
-M0000000c_IL_0120:
-M0000000c_IL_0121:
+M00000018_IL_0109:
+br M00000018_IL_010f
+M00000018_IL_010f:
+brfalse M00000018_IL_0130
+M00000018_IL_0114:
+M00000018_IL_0115:
+br M00000018_IL_0120
+M00000018_IL_0120:
+M00000018_IL_0121:
 ldstr "console output failed"
-M0000000c_IL_0126:
+M00000018_IL_0126:
 call System.Fault(String)
-M0000000c_IL_012b:
-br M0000000c_IL_0135
-M0000000c_IL_0130:
-M0000000c_IL_0131:
-M0000000c_IL_0132:
-M0000000c_IL_0133:
-M0000000c_IL_0134:
+M00000018_IL_012b:
+br M00000018_IL_0135
+M00000018_IL_0130:
+M00000018_IL_0131:
+M00000018_IL_0132:
+M00000018_IL_0133:
+M00000018_IL_0134:
 fault "Guest program reached a terminal failure"
-M0000000c_IL_0135:
-M0000000c_IL_0136:
-M0000000c_IL_0137:
+M00000018_IL_0135:
+M00000018_IL_0136:
+M00000018_IL_0137:
 ldvoid
 ret
 .end
 .method static Write(Int32 value0) -> Void
-M0000000d_IL_0000:
-M0000000d_IL_0001:
-M0000000d_IL_0002:
+M00000019_IL_0000:
+M00000019_IL_0001:
+M00000019_IL_0002:
 ldarg 0
-M0000000d_IL_0003:
+M00000019_IL_0003:
 call neoCLR.Runtime.Int32ToString(Int32)
-M0000000d_IL_0008:
+M00000019_IL_0008:
 call System.Console.Write(String)
 pop
-M0000000d_IL_000d:
-M0000000d_IL_000e:
+M00000019_IL_000d:
+M00000019_IL_000e:
 ldvoid
 ret
 .end
 .method static WriteLine() -> Void
-M0000000e_IL_0000:
-M0000000e_IL_0001:
-M0000000e_IL_0002:
+M0000001a_IL_0000:
+M0000001a_IL_0001:
+M0000001a_IL_0002:
 ldstr ""
-M0000000e_IL_0007:
+M0000001a_IL_0007:
 call neoCLR.Runtime.WriteLine(String)
 pop
-M0000000e_IL_000c:
-M0000000e_IL_000d:
+M0000001a_IL_000c:
+M0000001a_IL_000d:
 ldvoid
 ret
 .end

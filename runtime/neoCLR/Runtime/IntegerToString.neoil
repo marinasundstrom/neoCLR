@@ -1,0 +1,6 @@
+.function neoCLR.Runtime.Int64ToString(Int64 value) -> String
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.UInt64ToString(UInt64 value) -> String
+    .methodimpl InternalCall
+.end

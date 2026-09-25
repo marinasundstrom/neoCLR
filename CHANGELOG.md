@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add Console.WriteLine(object?) with virtual ToString and empty-line null handling,
+  plus unboxed Boolean, Char and integral overloads. Add private signed/unsigned
+  64-bit decimal formatting services; floating-point formatting remains deferred.
+  Update public API documentation and add scalar-boundary/object-dispatch checks.
+
 - Support Main(arguments: string[]) in the Raven managed collection profile through
   a parameterless startup adapter. Supply a fresh array excluding the executable;
   preserve Environment.GetCommandLineArgs semantics. Include focused argument/GC

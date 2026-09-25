@@ -33,8 +33,60 @@ public static class Console {
         RuntimeServices.WriteLine(value0)
     }
 
+    static func WriteLine(value: object?) {
+        if value is object present {
+            WriteLine(present.ToString())
+        } else {
+            WriteLine()
+        }
+    }
+
     static func WriteLine(value0: int) {
         RuntimeServices.WriteLine(RuntimeServices.Int32ToString(value0))
+    }
+
+    static func WriteLine(value: bool) {
+        WriteLine(if value { "True" } else { "False" })
+    }
+
+    static func WriteLine(value: char) {
+        WriteLine(RuntimeServices.CharText(value))
+    }
+
+    static func WriteLine(value: sbyte) {
+        WriteLine(RuntimeServices.Int32ToString(value))
+    }
+
+    static func WriteLine(value: byte) {
+        WriteLine(RuntimeServices.Int32ToString(value))
+    }
+
+    static func WriteLine(value: short) {
+        WriteLine(RuntimeServices.Int32ToString(value))
+    }
+
+    static func WriteLine(value: ushort) {
+        WriteLine(RuntimeServices.Int32ToString(value))
+    }
+
+    static func WriteLine(value: uint) {
+        WriteLine(RuntimeServices.UInt64ToString(value))
+    }
+
+    static func WriteLine(value: long) {
+        WriteLine(RuntimeServices.Int64ToString(value))
+    }
+
+    static func WriteLine(value: ulong) {
+        WriteLine(RuntimeServices.UInt64ToString(value))
+    }
+
+    static func WriteLine(value: nint) {
+        WriteLine(RuntimeServices.Int64ToString(RuntimeServices.IntPtrToInt64(value)))
+    }
+
+    static func WriteLine(value: nuint) {
+        WriteLine(RuntimeServices.UInt64ToString(RuntimeServices.UIntPtrToUInt64(value)))
     }
 
     // Fresh non-owning wrappers share the host's channels; closing one closes only it.

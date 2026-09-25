@@ -7373,3 +7373,13 @@ configuration/content, not target-specific code added to Raven main.
   argument array excluding the executable, matching .NET. Keep the full vector in
   Environment.GetCommandLineArgs and migrate the JSON corpus. Three argument/GC
   cases and signature checks pass. No compiler configuration change.
+
+### 2026-09-25 — Console display fallback and scalar overloads
+
+- **Author direction:** add Console.WriteLine(object) as a fallback, then suggests
+  overloads for known built-in types to avoid boxing.
+- **Assistant response/action:** add virtual ToString dispatch and null-as-empty-line
+  handling, plus direct Boolean, Char and integral overloads. Reuse Int32/Char
+  formatting and add private Int64/UInt64 text services.
+- **Bounded choice:** keep floating-point formatting separate because its Object
+  numeric formatting contract is not yet implemented. No culture/provider API.

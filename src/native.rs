@@ -39,6 +39,7 @@ pub(crate) enum Binding {
     TypeArgument,
     ParseInt32,
     Int32ToString,
+    IntegerToString,
     WriteLine,
     Fault,
     CharCategory,
@@ -139,6 +140,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.UnixTimeTicks", []) => (Binding::UnixTimeTicks, Type::Int64),
         ("neoCLR.Runtime.ParseInt32", [Type::String]) => (Binding::ParseInt32, Type::Value),
         ("neoCLR.Runtime.Int32ToString", [Type::Int32]) => (Binding::Int32ToString, Type::String),
+        ("neoCLR.Runtime.Int64ToString", [Type::Int64])
+        | ("neoCLR.Runtime.UInt64ToString", [Type::UInt64]) => {
+            (Binding::IntegerToString, Type::String)
+        }
         ("neoCLR.Runtime.Fault", [Type::String]) => (Binding::Fault, Type::Void),
         ("neoCLR.Runtime.WriteLine", [Type::String]) => (Binding::WriteLine, Type::Void),
         ("neoCLR.Runtime.CharCategory", [Type::UInt32]) => (Binding::CharCategory, Type::Int32),
@@ -613,6 +618,12 @@ impl Binding {
                 Ok(Value::Erased(Box::new(payload)))
             }
             (Self::Int32ToString, [Value::Int32(number)]) => Ok(Value::String(number.to_string().into())),
+            (Self::IntegerToString, [Value::Int64(number)]) => {
+                Ok(Value::String(number.to_string().into()))
+            }
+            (Self::IntegerToString, [Value::UInt64(number)]) => {
+                Ok(Value::String(number.to_string().into()))
+            }
             (Self::Fault, [Value::String(message)]) => {
                 Err(Fault::coded(crate::FaultCode::UserFault, message.as_str()))
             }
