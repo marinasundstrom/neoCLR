@@ -27,3 +27,11 @@ Validation on 2026-09-25: all contracts and independent exchanges pass. Client:
 19 collections, zero live objects. Signature admission, API snapshot and bootstrap
 hash checks pass; all 18 new signatures have XML entries. Website build skipped by
 user direction; its example comes from the compiled sample. No broad platform rerun.
+
+HEAD follow-up (2026-09-25): all four client overloads and both request factories
+are checked. A raw peer advertises 999,999 representation bytes and keeps the
+connection open: HEAD completes with empty content. .NET HttpClient receives a
+neoCLR HEAD response with UTF-8 representation length five and no body. The rejected
+unknown-method fixture now uses OPTIONS. Client: 1,958 allocations, 44 collections;
+server: 914 allocations, 23 collections; both zero live objects. Focused bridge
+signatures and API/bootstrap snapshot checks pass; website build remains skipped.

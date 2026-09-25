@@ -258,7 +258,7 @@ static calls and returns. Declared maxstack, argument/result types, initializati
 return stacks are checked before output. Local default initialization is preserved.
 Branches, instance methods, generic signatures, initializers, exception regions, native
 methods and unknown external bindings are rejected in this profile. Inputs are bounded
-to 16 MiB, reachable methods to 128, bodies to 64 KiB and local counts to 256.
+to 16 MiB, reachable methods to 128 for applications (256 for managed library slices), bodies to 64 KiB and local counts to 256.
 
 All supplied metadata dependencies are audited before selecting reachable bodies.
 Unreachable Raven Unit/attribute/constructor helpers are retained in the source image

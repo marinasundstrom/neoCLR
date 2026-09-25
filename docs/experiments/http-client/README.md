@@ -142,3 +142,14 @@ a named intermediate Result exposed the earlier hoisted-local initialization iss
 The server report calls the error's ToString explicitly before concatenation because
 interpolating the union directly did not emit the expected line. These are documented
 integration limitations, not compiler fixes or restrictions on HttpError matching.
+
+### Response framing follow-up — 2026-09-25
+
+The `--case` selector now includes `chunked UTF-8`, `close-delimited UTF-8`,
+`truncated chunk`, `invalid chunk size`, `chunk body limit`, `close body limit`,
+`chunk extensions`, `chunk trailers` and `chunk 205 content`. These nine cases,
+plus `transfer encoding` (ambiguous TE/CL) and `truncated body`, pass with zero live
+objects after collection. Chunked UTF-8 passes byte-at-a-time fragmentation, including
+splits within the UTF-8 scalar; close-delimited content completes only on EOF.
+The existing `missing length` case now expects a valid empty close-delimited response.
+See [current limits](../../http-client-design.md#bounded-response-framing-and-head--2026-09-25).

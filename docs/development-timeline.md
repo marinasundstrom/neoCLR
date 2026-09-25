@@ -7212,3 +7212,14 @@ configuration/content, not target-specific code added to Raven main.
   early exit, repeated disposal and future stream/connection ownership still need rules.
 - **Action:** update server design and roadmap. No public API or runtime implementation
   is introduced by this documentation change.
+
+### 2026-09-25 — complete framing, then context ownership
+
+- **Author:** “Continue with both slices,” referring to response framing/HEAD and
+  HttpContext/server lifecycle.
+- **Assistant action:** added bounded chunked and close-delimited reception and HEAD
+  request/client overloads plus server body suppression. Focused raw-peer and .NET
+  HEAD checks, framing negatives, signature admission and API/bootstrap snapshots pass.
+  Website content was updated; its build was skipped as directed.
+- **Remaining:** the context lifetime slice follows this checkpoint. No release or
+  deployment has been performed.

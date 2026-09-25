@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add bounded chunked and close-delimited HTTP response reception and HEAD request/client
+  overloads, with request-aware decoding and body suppression in server replies. Preserve
+  body/header limits, reject ambiguous/truncated framing, and document unsupported chunk
+  extensions/trailers. Expand focused peer/HEAD checks and API documentation. Increase only
+  the bridge library import method bound to 256; application imports remain limited to 128.
+
 - Add development Put/Patch/Delete client string/Uri/token helpers and request factories
   through the existing Send pipeline. Extend server parsing to PUT/PATCH buffered bodies
   and bodyless DELETE; reject nonempty GET/DELETE bodies before client I/O. Preserve

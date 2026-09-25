@@ -148,7 +148,9 @@ static class UnionImport
         {
             if (!seen.Add(method)) continue;
             var methodId = seen.Count;
-            if (seen.Count > 128) throw new InvalidDataException("Method limit exceeded.");
+            // Library slices include public overloads and private transport state machines.
+            // Keep application admission at its existing bound.
+            if (seen.Count > (libraryOwner is null ? 128 : 256)) throw new InvalidDataException("Method limit exceeded.");
             if (libraryOwner is not null && !exports.Contains(method) && !ApplicationTypes.IsLibraryDependency(method.DeclaringType)) throw new InvalidDataException("Unexported library body.");
             activeLibraryMethod = libraryOwner is null ? null : method;
             if (libraryOwner is null) ApplicationTypes.CheckMethod(method);

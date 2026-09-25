@@ -778,3 +778,42 @@ response framing and remains in the framing slice; OPTIONS and extension methods
 remain open. The [focused fixture](experiments/http-verbs/README.md) checks every new
 overload/factory, fake-handler/token behavior, independent client/server wire exchanges,
 UTF-8/binary bodies, 204 and unsupported methods. No native or compiler policy change.
+
+## Bounded response framing and HEAD — 2026-09-25
+
+Development checkpoint after the common verbs: the managed decoder accepts one
+Content-Length, `Transfer-Encoding: chunked`, or a body terminated by peer EOF.
+Decoded content stays limited to 1,024 bytes. Chunk size lines and terminators have
+an additional combined 2,048-byte budget; overflow is checked before accumulation.
+Partial fixed/chunked bodies fail on EOF, while close-delimited bodies complete at
+EOF. Closing the connection remains necessary; close-delimited framing cannot
+distinguish a deliberately short representation from a prematurely closed peer.
+
+HEAD has string/Uri request factories and the four usual client overloads, including
+BaseUri resolution and token forwarding. Its response completes after headers,
+retains representation length metadata and exposes empty content. The server accepts
+HEAD and computes the representation length from the supplied buffered response,
+but omits body bytes. GET/HEAD/DELETE requests remain bodyless in this checkpoint.
+204/304 and HEAD are header-terminated; 205 rejects nonempty content in every framing.
+Ambiguous length plus transfer encoding, duplicate lengths/transfer encodings,
+invalid chunk sizes/terminators and truncated messages are rejected. Chunk extensions,
+nonempty trailers, other transfer codings and compressed content remain explicit
+Unsupported outcomes. These are supported-subset limits, not claims that such HTTP
+messages are invalid. Informational responses remain deferred.
+
+The baseline is [RFC 9112 section 6.3](https://www.rfc-editor.org/rfc/rfc9112.html#section-6.3),
+[chunked coding](https://www.rfc-editor.org/rfc/rfc9112.html#section-7.1) and
+[RFC 9110 HEAD](https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.2), reviewed
+2026-09-25. .NET HttpClient also understands these framing choices; its
+[completion options](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpcompletionoption?view=net-10.0)
+separate headers from content buffering. neoCLR still buffers all supported content
+before completing Send. This requires no new runtime scheduling contract, but incurs
+bounded copying/allocation and cannot yet expose streamed bodies. Keeping only
+Content-Length was simpler but excluded ordinary HTTP peers; implementing a full
+streaming decoder now would expand ownership/API scope beyond this checkpoint.
+
+Evidence lives in the focused `http-client` framing cases and the extended
+`http-verbs` HEAD checks, including a .NET client against the neoCLR server.
+The bridge library import limit is 256 reachable methods (application imports retain
+128), accommodating these overloads/private machines without widening public access.
+EOF and framing helpers remain private to the class-library implementation.

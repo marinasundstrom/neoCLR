@@ -192,3 +192,16 @@ not a compiler fix. Byte.ToString selected an Object path that faulted in neoCLR
 numeric formatting widens octets to int. Treat that as a separate runtime/library
 investigation, not evidence of a general Raven defect. Typed DNS/echo and independent
 HTTP-server checks pass; API and generated snapshots are kept current.
+
+### HTTP framing bridge checkpoint — 2026-09-25
+
+HEAD factories/client overloads and private response-framing helpers are projected
+through the existing neoCLR target bridge; no Raven compiler or Runtime Contract
+configuration change is needed. The class-library import bound rises from 128 to
+256 reachable methods to accommodate HTTP overloads and transport machines. Application
+imports retain 128 and private transport members remain inaccessible to consumers.
+An internal response encoder uses an integer head-only flag because the bridge's
+nonpublic argument conversion currently handles only one materialized argument;
+no public API carries that workaround. The same frozen compiler SDK builds the
+library and consumer/reference snapshots. See the [framing design](http-client-design.md#bounded-response-framing-and-head--2026-09-25)
+and focused HTTP fixtures for limitations and evidence.

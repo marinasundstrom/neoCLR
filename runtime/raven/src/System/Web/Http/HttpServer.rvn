@@ -110,7 +110,7 @@ internal class HttpRequestDecoder {
                     return Error(HttpError.Unsupported("Unsupported request line"))
                 }
                 method = Text(0, methodEnd, 0)?
-                if method != "GET" && method != "POST" && method != "PUT" && method != "PATCH" && method != "DELETE" {
+                if method != "GET" && method != "POST" && method != "PUT" && method != "PATCH" && method != "DELETE" && method != "HEAD" {
                     return Error(HttpError.Unsupported("Unsupported request method"))
                 }
                 let parsedTarget = Text(methodEnd + 1, end - 9, 0)?
@@ -122,7 +122,7 @@ internal class HttpRequestDecoder {
                 if host.IsEmpty {
                     return Error(HttpError.Protocol("Host required"))
                 }
-                if (method == "GET" || method == "DELETE") && length != 0 {
+                if (method == "GET" || method == "DELETE" || method == "HEAD") && length != 0 {
                     return Error(HttpError.Unsupported(String.Concat(method, " request bodies unsupported")))
                 }
                 expected = length
@@ -232,7 +232,7 @@ public class HttpServer {
         listener.Close()
     }
 
-    internal static func EncodeResponse(response: HttpResponse) -> Result<Sequence<byte>, HttpError> {
+    internal static func EncodeResponse(response: HttpResponse, headOnly: int) -> Result<Sequence<byte>, HttpError> {
         let status = (int)response.StatusCode
         if !(status >= 200 && status <= 599) {
             return Error(HttpError.InvalidRequest("A final response status from 200 through 599 is required"))
@@ -306,7 +306,7 @@ public class HttpServer {
             index += 1
         }
         index = 0
-        while index < count {
+        while index < count && headOnly == 0 {
             result.Add(body[index])
             index += 1
         }
@@ -341,6 +341,7 @@ internal class HttpServerExchange {
     private var decoder: HttpRequestDecoder
     private var buffer: byte[]
     private var outgoing: Sequence<byte>
+    private var isHead: bool = false
     private var sent: int
 
     internal init(listener: Socket, handler: Func<HttpRequest, Task<Result<HttpResponse, HttpError>>>) {
@@ -415,6 +416,7 @@ internal class HttpServerExchange {
                 }
                 if decoder.Complete {
                     if let Ok(request) = decoder.Finish() {
+                        isHead = request.Method == "HEAD"
                         let response = handler(request)
                         handling = Some(response)
                         response.OnCompleted(self.OnHandled)
@@ -435,7 +437,7 @@ internal class HttpServerExchange {
             let result = pending.GetResult()
             handling = None()
             if let Ok(response) = result {
-                let encoded = HttpServer.EncodeResponse(response)
+                let encoded = HttpServer.EncodeResponse(response, if isHead { 1 } else { 0 })
                 if let Ok(bytes) = encoded {
                     outgoing = bytes
                     SendNext()

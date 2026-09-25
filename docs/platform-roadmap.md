@@ -98,7 +98,8 @@ WithHeader now constructs replacement application fields on a new request and th
 socket provider validates/serializes them; [request header evidence](experiments/http-request-headers/README.md).
 Put/Patch/Delete helpers and request factories now share the pipeline, with matching
 server parsing and [focused verb evidence](experiments/http-verbs/README.md). This completes
-the bounded slice 5 checkpoint; HEAD joins the request-aware response framing in slice 6. The cancellation fixture now signals independently of the third request;
+the bounded slice 5 checkpoint. Slice 6 now implements HEAD and bounded fixed-length,
+chunked and close-delimited reception; see [framing behavior and limits](http-client-design.md#bounded-response-framing-and-head--2026-09-25). The cancellation fixture now signals independently of the third request;
 headers and isolated-body checks pass. [The evidence](experiments/http-status/README.md)
 retains timeout sensitivity under competing local work for serial release validation;
 no production scheduler/deadline fix is claimed for that cancellation fixture. Stream-backed HttpContent is an

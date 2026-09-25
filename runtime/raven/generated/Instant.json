@@ -7,8 +7,8 @@
     "runtime/raven/src/System/Networking/IPAddressError.rvn": "ff7036e74bf83a7f5fc62cd2cf194bf27d4d4255c996f9d1d45437dc51f3dce9",
     "runtime/raven/src/System/Uri.rvn": "b366425867c4b84f126de1689d4a03bf9855a6a881a4abe4dba1836a381537b7",
     "runtime/raven/src/System/UriError.rvn": "4cb6c1aa4d9c8bb51e3eb1964a5e5c57330e0b9091bd44bf5125a8a99c027dce",
-    "runtime/raven/src/System/Web/Http/HttpServer.rvn": "1f51ec741d4204d0510a49fa1dfb1361e91a2e6d888893e505997e543464aa04",
-    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "5d65ccfe0d2a2d664cf3d488fe0550850663df35573d636f73a96bd7449b8647",
+    "runtime/raven/src/System/Web/Http/HttpServer.rvn": "9c8a87cbd9257a435894d1c3b444ef011e7977652edcb8bac2ff2013803a1bb7",
+    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "19ebc39060eaa68f5d0f6d6a8a4179c65b589ceb6da45a05de1c9caefa067ad0",
     "runtime/raven/src/System/Web/Http/HttpError.rvn": "9418b3e16c9f56e3f5c57ca98108d0ca59d14d870ff26e1b2322f202786a378a",
     "runtime/raven/src/System/Networking/DnsError.rvn": "3d29e8b2008d54270cb35a581f4ba38e6d0672f4576b334100fc72d8f729a7bd",
     "runtime/raven/src/System/Networking/Dns.rvn": "750806e7716026fcfc5d0cf1b77b90c4d9175b1c32d5bdc4a612f1b469ea1074",
@@ -126,7 +126,7 @@
     "Instant.helpers.neoil": "82e735f375c46fc3be9434ca727846589333bafbdc0c7e3d24d7d498caf27fdd"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "dab5886c5d778273d1a74a0d37a4264648941c1ef4db1437c1cec3c646982e2d",
+  "coreSha256": "b4da900ba890e8dade1af24a1e1b3376e8eb00e67517441a249a2e7a867a7806",
   "exports": [
     "FromUnixTimeTicks(Int64 ticks) -> System.Instant",
     "readonly byref ToLocalDateTime() -> System.LocalDateTime",

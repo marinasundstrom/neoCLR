@@ -10,13 +10,13 @@ func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("X-Method", request.Method))
     let source = Promise<Result<HttpResponse, HttpError>>()
-    _ = source.Complete(Ok(HttpResponse(status, headers, request.Content.Bytes)))
+    _ = source.Complete(Ok(HttpResponse(status, headers, if request.Method == "HEAD" { HttpContent.FromText("Café").Bytes } else { request.Content.Bytes })))
     return source.Task
 }
 
 class ServerProbe {
     private val server: HttpServer
-    private var remaining: int = 5
+    private var remaining: int = 6
 
     init(server: HttpServer) {
         self.server = server

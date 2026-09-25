@@ -16,8 +16,8 @@ args = parser.parse_args()
 bundle, runner = args.toolchain_root.resolve(), args.runner.resolve()
 here = Path(__file__).resolve().parent
 env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(bundle / 'raven-sdk'))
-bodies = ['Café'.encode(), bytes([0, 255]), b'']
-methods = ['PUT', 'PATCH', 'DELETE']
+bodies = ['Café'.encode(), bytes([0, 255]), b'', b'']
+methods = ['PUT', 'PATCH', 'DELETE', 'HEAD']
 
 def build(root, source):
     root.mkdir()
@@ -75,6 +75,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-verbs-') as temporary, sock
                         body.extend(part)
                     assert body == expected, body
                     response = b'HTTP/1.1 204 No Content\r\n\r\n' if index == 2 else f'HTTP/1.1 200 OK\r\nContent-Length: {len(body)}\r\n\r\n'.encode() + body
+                    if index == 3:
+                        response = b'HTTP/1.1 200 OK\r\nContent-Length: 999999\r\n\r\n'
                     connection.sendall(response)
                     assert connection.recv(1) == b'', 'Client waited for EOF'
         except BaseException as error:
@@ -95,7 +97,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-verbs-') as temporary, sock
         baseline = subprocess.run(['dotnet', str(reference / 'bin/Debug/net10.0/Reference.dll'), str(port)], capture_output=True, text=True, timeout=120)
         assert baseline.returncode == 0, baseline.stdout + baseline.stderr
         print(baseline.stdout, flush=True)
-        for request in [b'DELETE /item HTTP/1.1\r\nHost: localhost\r\nContent-Length: 1\r\n\r\nx', b'HEAD /item HTTP/1.1\r\nHost: localhost\r\n\r\n']:
+        for request in [b'DELETE /item HTTP/1.1\r\nHost: localhost\r\nContent-Length: 1\r\n\r\nx', b'OPTIONS /item HTTP/1.1\r\nHost: localhost\r\n\r\n']:
             with socket.create_connection(('127.0.0.1', port), timeout=30) as connection:
                 connection.sendall(request)
                 connection.shutdown(socket.SHUT_WR)
@@ -105,7 +107,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-verbs-') as temporary, sock
                     pass
         output, errors = process.communicate(timeout=120)
         assert process.returncode == 0 and 'Verb server checks passed' in output and 'live=0' in errors, output + errors
-        assert output.count('Served') == 3 and 'Rejected: DELETE request bodies unsupported' in output and 'Rejected: Unsupported request method' in output, output
+        assert output.count('Served') == 4 and 'Rejected: DELETE request bodies unsupported' in output and 'Rejected: Unsupported request method' in output, output
         print(output + errors, flush=True)
     finally:
         if process.poll() is None:

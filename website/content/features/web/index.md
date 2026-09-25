@@ -72,7 +72,7 @@ Malformed/truncated responses and collection during pending work are exercised t
 
 This [server callback](/samples/http-server/Server.rvn) builds a byte response.
 `HttpServer.Listen("127.0.0.1", 0, 4)` binds a loopback listener; `GetLocalPort()`
-reports the selected port. `ServeOne(Respond)` accepts one GET, POST, PUT, PATCH or DELETE, awaits the callback,
+reports the selected port. `ServeOne(Respond)` accepts one GET, HEAD, POST, PUT, PATCH or DELETE, awaits the callback,
 sends its response and closes that connection. The caller closes the listener.
 `Close()` stops listening; an already accepted exchange remains active.
 
@@ -109,11 +109,12 @@ It remains exploratory source, not a public runtime-library JSON API.
 
 ## Current limits
 
-Plain HTTP/1.1 GET, DELETE and buffered POST/PUT/PATCH support final statuses 200–599 in development. Responses require
-exactly one Content-Length, except bodyless 204/304. Informational responses are not
+Plain HTTP/1.1 GET, HEAD, DELETE and buffered POST/PUT/PATCH support final statuses 200–599 in development. Responses use a single Content-Length, bounded chunked coding,
+or connection-close framing. HEAD and bodyless 204/304 complete after headers. Informational responses are not
 yet supported. The experiment bounds URLs to 1,024 bytes, headers to 2,048 bytes and 16
-fields, and bodies to 1,024 bytes. It rejects duplicate lengths, transfer encodings
-and content encodings. It does not implement chunking, TLS, redirects, pooling,
+fields, and decoded bodies to 1,024 bytes. Chunk framing has a separate 2,048-byte budget.
+It rejects ambiguous framing, chunk extensions/trailers, other transfer codings
+and content encodings. It does not implement TLS, redirects, pooling,
 streaming content or informational response handling. Text always means strict UTF-8.
 
 The socket handler now has a provisional 15-second exchange budget, starting before
@@ -240,7 +241,7 @@ before DNS. Content sources must remain stable while consumed.
 
 [Download the POST echo example and focused checks](/samples/http-post.zip).
 The checks cover neoCLR peers, an independent raw peer and a .NET client, including
-empty and binary bodies. Header append/remove operations, HEAD/OPTIONS, chunking,
+empty and binary bodies. Header append/remove operations, OPTIONS, streaming,
 streaming, compression and Expect/continue are still outside this checkpoint.
 
 ## Looking up headers
@@ -284,4 +285,4 @@ statuses remain responses, so callers choose their status policy:
 
 The server accepts these methods and exposes their buffered content to its handler.
 PATCH content is opaque: applications choose its media type and behavior. The library
-does not apply patches. HEAD awaits response-framing work; OPTIONS is not implemented.
+does not apply patches. HEAD returns headers with empty content; the server computes representation length from the buffered response without sending its body. OPTIONS is not implemented.

@@ -168,3 +168,11 @@ HEAD/OPTIONS remain outside this checkpoint. Accept/context lifetime work remain
 planned; ServeOne is still the implemented server API. See the
 [verb fixture](experiments/http-verbs/README.md) and the
 [client comparison](http-client-design.md#common-verb-checkpoint--2026-09-25).
+
+### HEAD response serialization — implemented 2026-09-25
+
+The server now accepts bodyless HEAD. Its handler supplies the same bounded response
+representation it would for GET; the encoder computes its byte Content-Length and
+omits the body. Existing 204/205/304 content restrictions still apply. The .NET peer
+in `experiments/http-verbs` checks a five-byte UTF-8 representation and empty received
+content. See the [framing comparison](http-client-design.md#bounded-response-framing-and-head--2026-09-25).

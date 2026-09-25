@@ -18,15 +18,18 @@ class InspectHandler : HttpHandler {
     var PutCalls: int = 0
     var PatchCalls: int = 0
     var DeleteCalls: int = 0
+    var HeadCalls: int = 0
     func Send(request: HttpRequest, token: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         Check(request.Target == "/base/item")
-        Check(request.Method == "PUT" || request.Method == "PATCH" || request.Method == "DELETE")
-        Check(request.Content.Bytes.Count == (if request.Method == "DELETE" { 0 } else { 5 }))
+        Check(request.Method == "PUT" || request.Method == "PATCH" || request.Method == "DELETE" || request.Method == "HEAD")
+        Check(request.Content.Bytes.Count == (if request.Method == "DELETE" || request.Method == "HEAD" { 0 } else { 5 }))
         Calls += 1
         if request.Method == "PUT" {
             PutCalls += 1
         } else if request.Method == "PATCH" {
             PatchCalls += 1
+        } else if request.Method == "HEAD" {
+            HeadCalls += 1
         } else {
             DeleteCalls += 1
         }
@@ -67,7 +70,12 @@ func Contracts() -> Result<unit, HttpError> {
     CheckReply(client.Delete(uri))
     CheckReply(client.Delete("item", token))
     CheckReply(client.Delete(uri, token))
-    Check(handler.Calls == 12 && handler.CancellableCalls == 6)
+    CheckReply(client.Head("item"))
+    CheckReply(client.Head(uri))
+    CheckReply(client.Head("item", token))
+    CheckReply(client.Head(uri, token))
+    Check(handler.HeadCalls == 4)
+    Check(handler.Calls == 16 && handler.CancellableCalls == 8)
     Check(handler.PutCalls == 4 && handler.PatchCalls == 4 && handler.DeleteCalls == 4)
     if let Error(HttpError.InvalidRequest(_)) = client.Put("http://other.test/item", content).GetResult() {
         Check(true)
@@ -81,7 +89,9 @@ func Contracts() -> Result<unit, HttpError> {
     Check(client.Put(uri, content, token).IsCancelled)
     Check(client.Patch(uri, content, token).IsCancelled)
     Check(client.Delete(uri, token).IsCancelled)
-    Check(handler.Calls == 12)
+    Check(client.Head("invalid URL", token).IsCancelled)
+    Check(client.Head(uri, token).IsCancelled)
+    Check(handler.Calls == 16)
     let absolute = Uri.Parse("http://example.test/item").MapError(reason => HttpError.InvalidUri(reason))?
     let prepared1 = HttpRequest.Put("http://example.test/item", content)?
     Check(prepared1.Method == "PUT")
@@ -95,6 +105,9 @@ func Contracts() -> Result<unit, HttpError> {
     Check(prepared5.Method == "DELETE")
     let prepared6 = HttpRequest.Delete(absolute)?
     Check(prepared6.Method == "DELETE")
+    let head1 = HttpRequest.Head("http://example.test/item")?
+    let head2 = HttpRequest.Head(absolute)?
+    Check(head1.Method == "HEAD" && head2.Method == "HEAD")
     Console.WriteLine("Verb contracts passed")
     return Ok(())
 }
@@ -110,7 +123,7 @@ class ClientProbe {
         Next()
     }
     func Next() {
-        if index == 3 {
+        if index == 4 {
             Console.WriteLine("Verb client checks passed")
             return
         }
@@ -119,8 +132,10 @@ class ClientProbe {
             ReplaceText(client, "Café")
         } else if index == 1 {
             client.Patch("item", HttpContent(bytes, "application/octet-stream"))
-        } else {
+        } else if index == 2 {
             client.Delete("item")
+        } else {
+            client.Head("item")
         }
         pending.OnCompleted(() => {
             let Ok(response) = pending.GetResult() else {
