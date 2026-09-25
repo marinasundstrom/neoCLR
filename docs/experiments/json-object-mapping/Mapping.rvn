@@ -1,0 +1,74 @@
+import System.*
+import System.Data.Json.*
+import System.Introspection.*
+import System.Runtime.Reflection.*
+import System.Result.*
+
+// Application schema, not a general JsonSerializer object-mapping contract.
+public class StationReport {
+    private var station: string = "Unassigned"
+    private var assignments: int = 0
+
+    init() { }
+
+    var Station: string {
+        get => station
+        set {
+            station = value
+            assignments += 1
+        }
+    }
+
+    val Assignments: int => assignments
+}
+
+union MappingError {
+    case Json(reason: JsonError)
+    case Reflection(reason: ReflectionError)
+    case Schema(message: string)
+}
+
+extension MappingJsonErrors for JsonError {
+    static func implicit(error: JsonError) -> MappingError => MappingError.Json(error)
+}
+
+extension MappingReflectionErrors for ReflectionError {
+    static func implicit(error: ReflectionError) -> MappingError => MappingError.Reflection(error)
+}
+
+func StationProperty() -> Result<PropertyInfo, MappingError> {
+    for property in typeof(StationReport).GetProperties() {
+        if property.Name == "Station" {
+            return Ok(property)
+        }
+    }
+    return Error(MappingError.Schema("Station property is unavailable"))
+}
+
+func DecodeReport(value: JsonValue) -> Result<StationReport, MappingError> {
+    if value is JsonObject document {
+        let stationValue = document.Field("station")?
+        if stationValue is JsonString station {
+            let instance = typeof(StationReport).CreateInstance()?
+            if instance is StationReport report {
+                let property = StationProperty()?
+                _ = property.SetValue(report, station.Value)?
+                return Ok(report)
+            }
+            return Error(MappingError.Schema("Unexpected constructed type"))
+        }
+        return Error(MappingError.Json(JsonError.TypeMismatch("station string")))
+    }
+    return Error(MappingError.Json(JsonError.TypeMismatch("object")))
+}
+
+func EncodeReport(report: StationReport) -> Result<JsonObject, MappingError> {
+    let property = StationProperty()?
+    let value = property.GetValue(report)?
+    if value is string station {
+        let document = JsonObject()
+        _ = document.Add("station", JsonString(station))?
+        return Ok(document)
+    }
+    return Error(MappingError.Schema("Station getter did not return a string"))
+}

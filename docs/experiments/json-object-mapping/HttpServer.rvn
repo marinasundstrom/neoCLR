@@ -1,0 +1,91 @@
+import System.*
+import System.Data.Json.*
+import System.Result.*
+import System.Tasks.*
+import System.Text.*
+import System.Web.Http.*
+
+func ErrorContent(message: string) -> HttpContent {
+    // Messages passed here are application-owned constants, not unescaped input.
+    return HttpContent(Utf8.Encode(message), "application/json; charset=utf-8")
+}
+
+class ReportServer {
+    func Configure(context: HttpContext) -> Result<unit, AppError> {
+        let request = context.Request
+        if request.Method == "GET" && request.Target == "/report" {
+            let report = CreateReport()?
+            let content = JsonContent(report)?
+            context.Respond(HttpStatusCode.OK, content)
+        } else if request.Method == "POST" && request.Target == "/reports" {
+            let body = Utf8.Decode(request.Content.Bytes)
+            // This boundary handles invalid input as an HTTP response, rather than propagating it.
+            if let Ok(text) = body {
+                let acknowledged = Acknowledge(text)
+                if let Ok(reply) = acknowledged {
+                    if let Ok(content) = JsonContent(reply) {
+                        context.Respond(HttpStatusCode.Created, content)
+                        return Ok(())
+                    }
+                } else if let Error(MappingError.Json(_)) = acknowledged {
+                    context.Respond(HttpStatusCode.BadRequest, ErrorContent("{\"error\":\"Invalid report\"}"))
+                    return Ok(())
+                } else {
+                    context.Respond(HttpStatusCode.InternalServerError, ErrorContent("{\"error\":\"Report mapping failed\"}"))
+                    return Ok(())
+                }
+            }
+            context.Respond(HttpStatusCode.BadRequest, ErrorContent("{\"error\":\"Invalid report\"}"))
+        } else {
+            context.Respond(HttpStatusCode.NotFound, ErrorContent("{\"error\":\"Not found\"}"))
+        }
+        return Ok(())
+    }
+
+    async func Serve(server: HttpServer, count: int) -> Task<Result<unit, AppError>> {
+        var index = 0
+        while index < count {
+            let context = await server.Accept()?
+            // Close the owned exchange before propagating a configuration failure.
+            let configured = Configure(context)
+            if let Error(error) = configured {
+                context.Close()
+                return Error(error)
+            }
+            let sent = await context.Complete()
+            if let Error(sendError) = sent {
+                return Error(AppError.Http(sendError))
+            }
+            index += 1
+        }
+        return Ok(())
+    }
+
+}
+
+func Main(arguments: string[]) {
+    var count = 1
+    if arguments.Length > 0 {
+        if let Ok(parsed) = Int32.Parse(arguments[0]) {
+            count = parsed
+        }
+    }
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+        System.Fault("Listen failed")
+        return
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        server.Close()
+        System.Fault("Local port unavailable")
+        return
+    }
+    Console.WriteLine(port)
+    let serving = ReportServer().Serve(server, count)
+    serving.OnCompleted(() => {
+        server.Close()
+        if let Error(error) = serving.GetResult() {
+            System.Fault(error.ToString())
+        }
+        Console.WriteLine("Reports served")
+    })
+}

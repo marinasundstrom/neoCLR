@@ -1,0 +1,78 @@
+import System.*
+import System.Data.Json.*
+import System.Result.*
+import System.Text.*
+import System.Web.Http.*
+
+union AppError {
+    case Http(reason: HttpError)
+    case Json(reason: JsonError)
+    case Mapping(reason: MappingError)
+    case Body(message: string)
+
+    override func ToString() -> string {
+        return match self {
+            Http(let reason) => reason.ToString()
+            Json(let reason) => reason.ToString()
+            Mapping(_) => "Report object mapping failed"
+            Body(let message) => message
+        }
+    }
+}
+
+// Conversions belong to this application; the library retains the original errors.
+extension HttpErrorConversion for HttpError {
+    static func implicit(error: HttpError) -> AppError => AppError.Http(error)
+}
+
+extension JsonErrorConversion for JsonError {
+    static func implicit(error: JsonError) -> AppError => AppError.Json(error)
+}
+
+extension MappingErrorConversion for MappingError {
+    static func implicit(error: MappingError) -> AppError => AppError.Mapping(error)
+}
+
+func JsonContent(value: JsonValue) -> Result<HttpContent, JsonError> {
+    let text = JsonSerializer.Serialize(value)?
+    return Ok(HttpContent(Utf8.Encode(text), "application/json; charset=utf-8"))
+}
+
+func CreateReport() -> Result<JsonObject, MappingError> {
+    let report = StationReport()
+    report.Station = "Café"
+    return EncodeReport(report)
+}
+
+func Acknowledge(payload: string) -> Result<JsonObject, MappingError> {
+    let value = JsonSerializer.Deserialize(payload)?
+    let report = DecodeReport(value)?
+    let reply = JsonObject()
+    _ = reply.Add("accepted", JsonBoolean(true))?
+    return Ok(reply)
+}
+
+func PrepareReport() -> Result<HttpContent, AppError> {
+    let report = CreateReport()?
+    let content = JsonContent(report)?
+    return Ok(content)
+}
+
+func ReadReply(result: Result<HttpResponse, HttpError>) -> Result<string, AppError> {
+    let response = result?
+    if response.StatusCode != HttpStatusCode.Created {
+        return Error(AppError.Http(HttpError.UnsuccessfulStatus(response.StatusCode)))
+    }
+    let text = Utf8.Decode(response.Content.Bytes).MapError(error => AppError.Body("Invalid UTF-8 response"))?
+    let value = JsonSerializer.Deserialize(text)?
+    if value is JsonObject reply {
+        let accepted = reply.Field("accepted")?
+        if accepted is JsonBoolean success {
+            if success.Value {
+                let output = JsonSerializer.Serialize(reply)?
+                return Ok(output)
+            }
+        }
+    }
+    return Error(AppError.Body("Unexpected acknowledgement"))
+}

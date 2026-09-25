@@ -17,6 +17,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--toolchain-root', type=Path, required=True)
 parser.add_argument('--runner', type=Path, required=True)
 parser.add_argument('--case', choices=['all', 'server', 'pair', 'client'], default='all')
+parser.add_argument('--mapped', action='store_true', help='Use the provisional reflection-backed report variant')
 args = parser.parse_args()
 here = Path(__file__).resolve().parent
 bundle = args.toolchain_root.resolve()
@@ -51,6 +52,14 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
         target.mkdir()
         for filename in (name + '.rvn', name + '.rvnproj', 'Application.rvn'):
             shutil.copyfile(here / filename, target / filename)
+        if args.mapped:
+            mapping = here.parent / 'json-object-mapping'
+            shutil.copyfile(mapping / 'Mapping.rvn', target / 'Mapping.rvn')
+            shutil.copyfile(mapping / 'HttpApplication.rvn', target / 'Application.rvn')
+            if name == 'Server':
+                shutil.copyfile(mapping / 'HttpServer.rvn', target / 'Server.rvn')
+            project = target / (name + '.rvnproj')
+            project.write_text(project.read_text().replace('</ItemGroup>', '<Compile Include="Mapping.rvn" /></ItemGroup>'))
         apps[name] = build(target / (name + '.rvnproj'))
 
     def client(port):
@@ -92,6 +101,10 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
             ('POST', '/reports', b'[]', 400, {'error': 'Invalid report'}),
             ('POST', '/reports', b'{"station":12,"readings":[]}', 400, {'error': 'Invalid report'}),
             ('POST', '/reports', b'{"station":"\xff","readings":[]}', 400, {'error': 'Invalid report'}),
+            ('POST', '/reports', b'{}', 400, {'error': 'Invalid report'}),
+            ('POST', '/reports', b'{"station":null}', 400, {'error': 'Invalid report'}),
+            ('POST', '/reports', b'{"station":""}', 201, reply),
+            ('POST', '/reports', b'{"station":"Caf\\u00e9","extra":true}', 201, reply),
             ('GET', '/missing', None, 404, {'error': 'Not found'}),
         ]
         for method, path, payload, status, expected in cases:
@@ -109,7 +122,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
                 assert json.loads(body) == expected, body
 
     if args.case in ('all', 'server'):
-        serve(independent, 8)
+        serve(independent, 12)
     if args.case in ('all', 'pair'):
         serve(client, 1)
 

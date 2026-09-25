@@ -1,0 +1,45 @@
+import System.*
+import System.Data.Json.*
+import System.IO.*
+import System.Result.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("JSON object mapping check failed")
+    }
+}
+
+func RoundTrip() -> Result<unit, MappingError> {
+    let document = JsonSerializer.Deserialize("{\"station\":\"Café\"}")?
+    let report = DecodeReport(document)?
+    Check(report.Station == "Café")
+    Check(report.Assignments == 1)
+    let mapped = EncodeReport(report)?
+    let text = JsonSerializer.Serialize(mapped)?
+    Check(text == "{\"station\":\"Café\"}")
+
+    // Serializer borrows the stream; mapping remains a separate DOM operation.
+    let stream = MemoryStream()
+    _ = JsonSerializer.Serialize(stream, mapped)?
+    _ = stream.Seek(0).MapError(error => MappingError.Schema("Seek failed"))?
+    let reread = JsonSerializer.Deserialize(stream)?
+    let restored = DecodeReport(reread)?
+    Check(restored.Station == report.Station)
+    Check(restored.Assignments == 1)
+    stream.Close()
+
+    let missing = JsonObject()
+    Check(DecodeReport(missing) is Error(MappingError.Json(JsonError.MissingField(_))))
+    _ = missing.Add("station", JsonNull())?
+    Check(DecodeReport(missing) is Error(MappingError.Json(JsonError.TypeMismatch(_))))
+    Check(DecodeReport(JsonArray()) is Error(MappingError.Json(JsonError.TypeMismatch(_))))
+    return Ok(())
+}
+
+func Main() {
+    if let Ok(_) = RoundTrip() {
+        Console.WriteLine("JSON object mapping checks passed")
+    } else {
+        System.Fault("JSON object mapping failed")
+    }
+}

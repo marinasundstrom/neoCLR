@@ -20,7 +20,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   older imported origins without access information are denied for execution. New
   origin fields require a matching runtime. Preserve terminal System.Fault control
   flow and messages in the bridge. Regenerate the library with Raven's independently
-  tested nullable-reference generic-signature fix. JSON object mapping remains next.
+  tested nullable-reference generic-signature fix. Add an application-owned reflected
+  JSON report mapper with string/MemoryStream round trips, retained JSON/reflection
+  causes and setter-effect checks. An opt-in HTTP variant passes independent peer
+  checks and an isolated managed pair with zero final live objects. An earlier
+  overlapping run hit the transport deadline; retain the default DOM demo and record
+  that timing limitation. Public JsonSerializer object-mapping overloads remain
+  under investigation.
 
 - Fix constructors of imported reference async state machines containing hoisted
   nondefaultable Result/union fields. Explicit deferred field storage preserves

@@ -189,9 +189,14 @@ ordinary interpreter frames. Checked instance property get/set now uses the actu
 accessors and virtual dispatch, with receiver/value validation and GC coverage.
 Public Result-based CreateInstance/GetValue/SetValue extensions now have a
 [compiled consumer](experiments/reflection-execution/README.md), application property
-metadata, source-access checks and API reference coverage. The next bounded slice is
-one JSON object-mapping round trip through these operations. General invocation and
-field assignment remain outside this checkpoint. **Author clarification:** `System.Runtime.Reflection`
+metadata, source-access checks and API reference coverage. An
+[application-owned mapped report](experiments/json-object-mapping/README.md) now
+round-trips through these operations and MemoryStream. An opt-in HTTP variant
+passes against independent peers and as an isolated managed pair, with zero final
+live objects. An earlier overlapping run hit the transport deadline; retain this
+timing observation and the default DOM demo. Next, evaluate the smallest reusable
+JSON mapping contract and request-path cost before making this variant the default.
+General invocation and field assignment remain outside this checkpoint. **Author clarification:** `System.Runtime.Reflection`
 will provide extensions to the `System.Introspection` model; those operations work
 when the model is backed by loaded runtime types. Preserve introspection as the
 metadata model instead of putting runtime execution on every metadata provider.

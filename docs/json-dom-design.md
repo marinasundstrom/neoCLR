@@ -132,3 +132,21 @@ The public extensions now expose checked creation and property execution; the ma
 Checked instance property execution now preserves accessor code and virtual dispatch,
 with exact scalar boxing and reference/null support. The Result-based reflection
 facade and [compiled consumer](experiments/reflection-execution/README.md) are in place.
+
+
+## Mapped report checkpoint — 2026-09-25
+
+The [mapping experiment](experiments/json-object-mapping/README.md) now constructs
+StationReport with CreateInstance, reads Station with GetValue and assigns it with
+SetValue. A setter counter verifies actual accessor execution. The string and
+MemoryStream round trips pass with zero final live objects. JSON/reflection causes
+propagate into an application-owned union. An opt-in HTTP variant shares this mapper
+and unchanged wire schema; independent peers and the isolated managed pair pass.
+An earlier overlapping run hit the existing transport deadline; predictable latency
+under load remains unverified. The default demo remains DOM-based.
+
+This is explicit schema mapping implemented by the application, not automatic
+JsonSerializer object serialization. The public serializer remains DOM-only. The
+next investigation is the mapped HTTP request-path cost, followed by extracting
+only a reusable mapping contract justified by the sample; null policy, recursion, naming rules, attributes and supported property
+kinds are not silently decided by this checkpoint.

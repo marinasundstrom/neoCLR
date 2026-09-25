@@ -72,3 +72,16 @@ pair and the client against Python pass. The managed pair allocates 310 client a
 zero live objects. The independent server batch and client also finish with zero
 live objects. Website sample/download inputs and API snapshot were checked; the
 website build was skipped as directed. These are correctness checks, not benchmarks.
+
+
+## Reflected report investigation
+
+An opt-in variant reuses [one reflected model](../json-object-mapping/README.md)
+in the same endpoint. Pass `--mapped` to the verifier to compile HttpApplication.rvn
+and HttpServer.rvn with Mapping.rvn. The default sample above remains DOM-based.
+Both mapped peers pass against independent Python peers (12 server cases, plus the
+client), with zero final live objects. The isolated managed pair also passes with
+335 client and 336 server allocations and zero final live objects. An earlier pair
+attempt reached the existing 15-second transport deadline while another test ran;
+request latency under load remains unverified. This variant is not yet the default
+demo. The standalone mapper passes string and MemoryStream round trips.
