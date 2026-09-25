@@ -1191,3 +1191,20 @@ for HttpError.UnsuccessfulStatus. Import rejection diagnostics now include the m
 and instruction for invalid application field receivers/nonlocal addresses; admission
 rules are unchanged. The fixture also exercises `?` with an application-owned implicit
 extension conversion and Object boxing. No Runtime Contract setting changes.
+
+### Terminal Fault analysis (2026-09-25)
+
+Raven's neoCLR branch now treats the resolved `System.Fault(string)` namespace
+function in `NeoCLR.CoreProbe` as terminal, with throw-statement reachability.
+Following statements are diagnosed as unreachable; Fault paths do not need a
+return value or out-parameter assignment. Both qualified and imported calls work.
+The compiler preserves the runtime call rather than emitting a CLR throw and
+recognizes terminal statements during lowering/emission. No project/Runtime
+Contract setting changes are needed. Ordinary same-named methods are unaffected.
+All 40 focused Raven host-side control-flow/return-path tests pass on .NET 11,
+including metadata fixtures, cold semantic queries, out parameters and emission.
+A consumer with a Fault-only non-unit function compiles and imports with the actual
+neoCLR core reference and reports RAV0162 for code after Fault. The end-to-end
+`verify_fault.py` gate stopped before execution due to a stale runtime snapshot
+for an unrelated `HttpClient.rvn` edit; guest execution was not validated here.
+This remains experimental target-specific policy, not a general Raven main change.

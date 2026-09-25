@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Raven neoCLR compiler analysis now treats `System.Fault(string)` as terminal,
+  diagnosing following code as unreachable and accepting Fault-only return paths.
+  Preserve runtime calls and recognize terminal statements in lowering/emission;
+  no Runtime Contract configuration change. Validation is recorded in the Raven
+  target integration documentation.
+
 - Add request/response GetHeaderValues with ASCII case-insensitive matching and ordered,
   separate values for repeated fields. Missing or invalid names return an empty snapshot;
   no comma splitting, field parsing or synthesized transport headers. Update API reference
