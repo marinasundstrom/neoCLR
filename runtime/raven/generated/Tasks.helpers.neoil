@@ -371,6 +371,7 @@ M00000005_IL_0013:
 ldstr "Task queue cannot be pumped recursively"
 M00000005_IL_0018:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000005_IL_001d:
 M00000005_IL_001e:
 M00000005_IL_001f:
@@ -427,6 +428,7 @@ M00000006_IL_0013:
 ldstr "Task queue cannot be pumped recursively"
 M00000006_IL_0018:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000006_IL_001d:
 M00000006_IL_001e:
 M00000006_IL_001f:
@@ -874,6 +876,7 @@ M00000018_IL_0013:
 ldstr "Task is cancelled; consume its Outcome"
 M00000018_IL_0018:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000018_IL_001d:
 M00000018_IL_001e:
 M00000018_IL_001f:
@@ -895,6 +898,7 @@ M00000018_IL_0033:
 ldstr "Task is still pending"
 M00000018_IL_0038:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000018_IL_003d:
 M00000018_IL_003e:
 M00000018_IL_003f:
@@ -1144,12 +1148,7 @@ M00000020_IL_0047:
 ldstr "Async state has not been retained"
 M00000020_IL_004c:
 call System.Fault(String)
-M00000020_IL_0051:
-ldarg 0
-M00000020_IL_0052:
-callvirt instance System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::GetStateMachine()
-M00000020_IL_0057:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method instance SetResult(T0 value) -> noresult
 M00000021_IL_0000:
@@ -1444,6 +1443,7 @@ M00000028_IL_0115:
 ldstr "Task continuation ran while pending"
 M00000028_IL_011a:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000028_IL_011f:
 M00000028_IL_0120:
 M00000028_IL_0121:
@@ -1689,6 +1689,7 @@ M0000002a_IL_012d:
 ldstr "Task continuation ran while pending"
 M0000002a_IL_0132:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M0000002a_IL_0137:
 M0000002a_IL_0138:
 M0000002a_IL_0139:
@@ -2024,6 +2025,7 @@ M0000002c_IL_01bf:
 ldstr "Task continuation ran while pending"
 M0000002c_IL_01c4:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M0000002c_IL_01c9:
 M0000002c_IL_01ca:
 M0000002c_IL_01cb:
@@ -2235,6 +2237,7 @@ M0000002e_IL_010a:
 ldstr "Task continuation ran while pending"
 M0000002e_IL_010f:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M0000002e_IL_0114:
 M0000002e_IL_0115:
 M0000002e_IL_0116:

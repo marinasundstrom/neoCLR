@@ -65,6 +65,7 @@ M00000002_IL_0017:
 ldstr "ArrayList capacity must be non-negative"
 M00000002_IL_001c:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000002_IL_0021:
 M00000002_IL_0022:
 M00000002_IL_0023:
@@ -144,6 +145,7 @@ M00000005_IL_0022:
 ldstr "ArrayList index out of range"
 M00000005_IL_0027:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000005_IL_002c:
 M00000005_IL_002d:
 M00000005_IL_002e:
@@ -193,6 +195,7 @@ M00000006_IL_0022:
 ldstr "ArrayList index out of range"
 M00000006_IL_0027:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000006_IL_002c:
 M00000006_IL_002d:
 M00000006_IL_002e:
@@ -296,6 +299,7 @@ M00000007_IL_0054:
 ldstr "ArrayList capacity overflow"
 M00000007_IL_0059:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000007_IL_005e:
 M00000007_IL_005f:
 M00000007_IL_0060:

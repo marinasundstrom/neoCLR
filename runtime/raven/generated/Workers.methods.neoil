@@ -103,6 +103,7 @@ M00000004_IL_0013:
 ldstr "Thread has already been started"
 M00000004_IL_0018:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000004_IL_001d:
 M00000004_IL_001e:
 M00000004_IL_001f:

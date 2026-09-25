@@ -104,6 +104,9 @@ fn resolve(module: &Module, args: &[Value], setter: bool) -> Result<Accessor, Er
     {
         return Err(Error::UnsupportedShape);
     }
+    if !crate::metadata_origin::reflection_public(module, &owner, &method) {
+        return Err(Error::AccessDenied);
+    }
     crate::access::check_call(module, None, &method).map_err(|_| Error::AccessDenied)?;
     crate::access::check_signature(module, None, &method).map_err(|_| Error::AccessDenied)?;
     let Value::ObjectReference(receiver) = &args[2] else {

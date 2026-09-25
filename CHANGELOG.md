@@ -13,8 +13,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   constructor frames, initialization, faults and GC roots. Report dynamic reflection
   in service analysis. Add checked instance property get/set execution through normal
   accessors and virtual dispatch, with exact scalar boxing, reference/null handling,
-  receiver/value validation and GC coverage. Public reflection extensions and JSON
-  mapping remain pending.
+  receiver/value validation and GC coverage. Add public System.Runtime.Reflection
+  CreateInstance/GetValue/SetValue extensions and a standard ReflectionError union,
+  API reference coverage and a propagated application consumer. Project application
+  instance properties and retain original source access for reflective admission;
+  older imported origins without access information are denied for execution. New
+  origin fields require a matching runtime. Preserve terminal System.Fault control
+  flow and messages in the bridge. Regenerate the library with Raven's independently
+  tested nullable-reference generic-signature fix. JSON object mapping remains next.
 
 - Fix constructors of imported reference async state machines containing hoisted
   nondefaultable Result/union fields. Explicit deferred field storage preserves

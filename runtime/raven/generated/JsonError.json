@@ -2,6 +2,8 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Data.Json.JsonError",
   "inputs": {
+    "runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn": "278c700bbfec1a1279298bfe9927278c14227bbcb7e1760f15dbd6f8de06deb1",
+    "runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn": "2b40ec91485820efbde7fac4db1a9e052d1245027fd3998627e98f78b5723ce7",
     "runtime/raven/src/System/Data/Json/JsonValue.rvn": "0c2084dca1bcdf2d1494d9f1942fceb25d060a7a25cd8256a4bfee3fc46a5426",
     "runtime/raven/src/System/Data/Json/JsonError.rvn": "100d73b3cefadfec2f5a069fdebc8764c4655b78a27b0f5c19318cb30fbd4e85",
     "runtime/raven/src/System/Data/Json/JsonDocument.rvn": "8f98eeaaf29f0d173c483b80275a4b681b8923d5b8aafbeaf482cb932f4f430c",
@@ -51,7 +53,7 @@
     "runtime/raven/src/System/Func.rvn": "4720a0463a88be11a4ff213363cad1c6680cd41afd457c813e247e5c4e3cbd2e",
     "runtime/raven/src/System/Functions.rvn": "ac8c17cd3cde8cfd78b2d1214454a92120d7f65b93d27d5d8e7258981fb1a70d",
     "runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn": "ef66171b634c2e59249dd875a8d13b275c0c8243c8a8e7f575238683a91ced7d",
-    "runtime/raven/src/System/Introspection/Descriptors.rvn": "7a9f4911f3a7424c6e9a43764235c9a22c1cff3f99aaff23190887d297ba80bc",
+    "runtime/raven/src/System/Introspection/Descriptors.rvn": "5e1d06213e019703f02e124db8a11b2144b1771d4c5875ba862749d82516d81c",
     "runtime/raven/src/System/Option.rvn": "0f0b624d9dd94dcf0f3159b651985892f92bd1d26df649d9806689d0277d79ec",
     "runtime/raven/src/System/Result.rvn": "8400722abccdc84277e7a8d7652d9f9d0e10d76c23decdac4f4fd971ddbc367f",
     "runtime/raven/src/System/Propagatable.rvn": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e",
@@ -124,15 +126,15 @@
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
-    "runtime/raven/System.Runtime.rvnproj": "69cd24ee21492fd44ec794ecb03aea2bad3ec671e97d5a8f1cd22db37c92c582",
+    "runtime/raven/System.Runtime.rvnproj": "56b8c26e6786f0d9568ee6acc74fa940cd72c154cf8feccd2c85982352219262",
     "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
     "JsonError.methods.neoil": "4103b59f8dc43b2c16307c2f366fab050009bdbfac92b7fbae48b041326b493d",
     "JsonError.helpers.neoil": "d906a96963da2437fd32c5dfb4933c9c98112e20dca029d52aaa0e58190e15c0"
   },
-  "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "3235586a3a2fd1acda3e6576b0f1e01ff203ccd3e9a70be01d80993082009a3a",
+  "compilerSha256": "db9dfab54bcdc2315dce11a5f4498046f0f6be85cd1095f6b11ec32bff70989b",
+  "coreSha256": "2b25a130ca0f9ccd01778b9ce825d5d8e242275960bad5544c10c7a6bf95782c",
   "exports": [
     "byref .ctor(System.Data.Json.JsonError.Syntax value) -> Void",
     "byref TryGetValue(out(true) System.Data.Json.JsonError.Syntax& value) -> Boolean",

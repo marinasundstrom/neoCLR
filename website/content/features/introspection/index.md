@@ -132,11 +132,18 @@ Sequence states the collection capability without requiring an array in the publ
 ## Implemented scope and limitations
 
 - There is one loaded-program context. Dynamic assembly loading and resolution belong to future RuntimeContext work.
-- Queries cover retained metadata. Application property projection and generic method-definition reflection remain limited.
+- Queries cover retained metadata. Development now includes application instance properties and accessor tokens; static application properties and generic method-definition reflection remain limited.
 - Open generic definitions can report identity, shape, arguments, tokens and module. Their member, base-type and interface queries require a closed type and fault otherwise.
-- Dynamic invocation, emit and offline metadata contexts remain future work. TypeInfo is part of the sealed MemberInfo hierarchy.
+- General invocation, emit and offline metadata contexts remain future work. TypeInfo is part of the sealed MemberInfo hierarchy.
 
-The Introspection story closes at this boundary for now. The next slice is described in the [Strings and UTF-8 guide](../strings/).
+Development `System.Runtime.Reflection` extensions now provide checked parameterless
+construction and instance property reads/writes. Expected validation failures return
+Result; constructor and accessor code runs normally, including virtual dispatch,
+GC rooting and terminal faults. The first iteration supports nongeneric reference
+classes and nonindexed properties with references or built-in scalar values. It has
+no binder coercion or private access. This supports the next JSON object-mapping
+experiment, which is not implemented yet. See the [runtime reflection guide](../../docs/reflection.html)
+for signatures, null handling, limitations and source-access requirements.
 
 <a id="objects"></a>
 
@@ -162,7 +169,7 @@ The [record sample](../../samples/records.zip) checks record classes and structs
 
 ## Planned work and open questions
 
-The aim is one descriptive model that can later support reflection and emit. Dynamic assembly loading belongs with RuntimeContext; offline metadata could use a different resolution context. These are directions to explore, not implemented APIs or release commitments. Identity, resolution and lifetime rules need further work.
+The descriptive model now supports the bounded development reflection extensions above. Broader invocation and emit remain future work. Dynamic assembly loading belongs with RuntimeContext; offline metadata could use a different resolution context. These are directions to explore, not implemented APIs or release commitments. Identity, resolution and lifetime rules need further work.
 
 [See the proposals and their tradeoffs →](../../proposals/#introspection)
 

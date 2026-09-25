@@ -100,16 +100,7 @@ M00000001_IL_0082:
 ldstr "invalid native parse status"
 M00000001_IL_0087:
 call System.Fault(String)
-M00000001_IL_008c:
-call neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorInvalidFormatNew()
-M00000001_IL_0091:
-call neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorNewSystemInt32ParseErrorInvalidFormat(System.Int32ParseError.InvalidFormat)
-M00000001_IL_0096:
-call neoCLR.Library.System.Int32.RuntimeUnion2(System.Int32ParseError)
-M00000001_IL_009b:
-call neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Error<System.Int32ParseError>)
-M00000001_IL_00a0:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method static Divide(Int32 dividend,Int32 divisor) -> System.Result<Int32,System.IntegerDivisionError>
 M00000002_IL_0000:

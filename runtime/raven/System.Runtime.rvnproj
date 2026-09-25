@@ -267,6 +267,7 @@
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Descriptors'">
     <Compile Include="src/System/Introspection/Descriptors.rvn" />
+    <Compile Include="src/System/Runtime/Reflection/ReflectionExtensions.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'NativeMemory'">
     <Compile Include="src/System/Runtime/InteropServices/NativeMemory/Functions.rvn" />
@@ -361,5 +362,8 @@
     <Compile Include="src/System/Data/Json/JsonDocument.rvn" />
     <Compile Include="src/System/Data/Json/JsonSyntax.rvn" />
     <Compile Include="src/System/Data/Json/JsonSerializer.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ReflectionError'">
+    <Compile Include="src/System/Runtime/Reflection/ReflectionError.rvn" />
   </ItemGroup>
 </Project>

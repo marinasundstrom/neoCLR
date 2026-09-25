@@ -540,6 +540,7 @@ M00000022_IL_0016:
 ldstr "Query iterator has no current element"
 M00000022_IL_001b:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000022_IL_0020:
 M00000022_IL_0021:
 M00000022_IL_0022:
@@ -774,6 +775,7 @@ M00000026_IL_0016:
 ldstr "Query iterator has no current element"
 M00000026_IL_001b:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000026_IL_0020:
 M00000026_IL_0021:
 M00000026_IL_0022:
@@ -1102,6 +1104,7 @@ M0000002a_IL_0016:
 ldstr "Query iterator has no current element"
 M0000002a_IL_001b:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M0000002a_IL_0020:
 M0000002a_IL_0021:
 M0000002a_IL_0022:
@@ -1486,6 +1489,7 @@ M0000002e_IL_0016:
 ldstr "Query iterator has no current element"
 M0000002e_IL_001b:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M0000002e_IL_0020:
 M0000002e_IL_0021:
 M0000002e_IL_0022:
@@ -1882,6 +1886,7 @@ M00000032_IL_0016:
 ldstr "Query iterator has no current element"
 M00000032_IL_001b:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000032_IL_0020:
 M00000032_IL_0021:
 M00000032_IL_0022:
@@ -2345,6 +2350,7 @@ M00000036_IL_0016:
 ldstr "Query iterator has no current element"
 M00000036_IL_001b:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000036_IL_0020:
 M00000036_IL_0021:
 M00000036_IL_0022:

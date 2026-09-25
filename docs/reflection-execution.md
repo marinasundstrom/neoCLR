@@ -2,8 +2,10 @@
 
 Development implementation, 2026-09-25. This is the private interpreter foundation
 for the [mapped JSON report](json-dom-design.md#next-investigation-one-mapped-report--2026-09-25).
-It is not yet a public System.Runtime.Reflection API or a JsonSerializer mapping
-feature. Introspection remains descriptive; there are no new operations on TypeInfo.
+The public System.Runtime.Reflection extensions now wrap these private services in
+Result-based validation. Introspection remains descriptive: importing the execution
+namespace adds extension methods rather than operations to its descriptor interfaces.
+JsonSerializer object mapping is still the next experiment.
 
 ## Implemented boundary
 
@@ -17,8 +19,8 @@ Two private InternalCall services are admitted by exact signature:
 Check returns 0 for support, 1 for an unbound or noncanonical identity, 2 for an
 unsupported type shape, 3 for denied access and 4 for no supported parameterless
 constructor. These numbers are private bridge details, not a proposed public error
-union. Direct misuse of the execution service faults. A future Result-based facade
-can translate validation failures; executed user-code Faults remain terminal.
+union. Direct misuse of the execution service faults. The Result-based facade
+translates validation failures; executed user-code Faults remain terminal.
 
 The supported target is a concrete, nongeneric reference class assignable to Object
 with a public parameterless IL constructor and publicly accessible containing types.
@@ -29,9 +31,9 @@ Construction never synthesizes missing constructors or bypasses initialization.
 Resolve the handle's full definition identity in the current loaded module set and
 check its canonical round trip; do not bind by display name. Reuse normal access
 checks, including containing-type visibility. This is not an independent-context
-identity policy: RuntimeContext still represents the current loaded program. Public
-provider validation and metadata-only descriptor failures belong in the next facade
-slice; property indices are checked against the resolved declaring type.
+identity policy: RuntimeContext still represents the current loaded program. The public facade accepts the internal RuntimeTypeInfo/RuntimePropertyInfo providers
+and rejects other providers as UnboundMetadata. Property indices are checked against
+the resolved declaring type.
 
 ## Property execution checkpoint
 
@@ -73,8 +75,7 @@ terminal instead of being wrapped as TargetInvocationException. User setter side
 effects are not transactional.
 
 Adapters use normal frames and GC roots for receivers, arguments and boxed results.
-They consume frame/instruction budget and may allocate. Public descriptor/provider
-validation remains necessary in the facade; this is not a public arbitrary-index API.
+They consume frame/instruction budget and may allocate. The facade validates descriptor/provider identity; this is not a public arbitrary-index API.
 
 ## Execution and lifetime
 
@@ -103,8 +104,7 @@ scenarios; it is not claimed as an API improvement.
 Direct host allocation/field writes would be smaller but bypass constructor code
 and its invariants. A nested invocation would duplicate ownership and scheduling
 boundaries. Reusing the existing frame path avoids those semantic splits, at the
-cost of an adapter frame and runtime resolution. Public names, Result error cases,
-and mapping remain separate work; no emission/metadata convention
+cost of an adapter frame and runtime resolution. JSON mapping remains separate work; no emission/metadata convention
 or Raven compiler setting changes here.
 
 ## Validation and next slice
@@ -120,11 +120,41 @@ rejection, missing/private/indexed/static accessors, GC during a setter, termina
 accessor Faults, frame limits and service signature checks. The seven construction
 integration cases and identity-binding unit test pass after sharing identity resolution.
 
-Next expose the smallest Result-based Raven extensions in System.Runtime.Reflection
-with API reference coverage and a compiled consumer. Only then use those operations
-for the mapped JSON round trip. Field access, coercion, private binding and arbitrary
-method invocation remain separate candidates.
+## Public facade and source metadata
 
-The Introspection/Web feature pages still accurately describe reflection and object
-mapping as future public capabilities. This private checkpoint changes no public
-Raven API or reference snapshot; no website build or publication was run.
+The [on-site guide](../api-docs/reflection.md) documents CreateInstance, GetValue,
+SetValue and the standard ReflectionError union. The [compiled consumer](experiments/reflection-execution/README.md)
+uses propagation and verifies real constructor/setter code, boxed values, null,
+accessor tokens/visibility and expected rejections. Next build one mapped JSON report
+through these operations; field access and general invocation remain outside scope.
+
+Application instance properties now retain metadata and accessor references. Static
+application properties remain omitted; init-only setters are not exposed for assignment.
+The importer already retains instance method bodies, so this projection does not add a
+new name-based retention rule. Future pruning still needs an explicit dynamic-target policy.
+
+Imported execution bodies historically use broader accessibility than their source.
+Optional origin fields now retain `publicly_visible` (the type and containing types)
+and exact CLI `member_access`. Reflection requires explicitly public source information
+in addition to ordinary runtime checks. Older imported origins without it are denied;
+hand-authored definitions without an origin still use runtime visibility. These flags
+can restrict reflective execution but cannot bypass ordinary runtime access checks.
+Method accessibility queries and default property filtering use the original member
+accessibility. This does not change ordinary imported call permissions or field APIs.
+
+The metadata parser rejects access flags on the wrong definition kind. New artifacts
+require the matching runtime; older artifacts still load, but their imported members
+are not admitted for reflection execution without the new access information.
+
+The general nullable-reference generic emission fix was reproduced and tested on .NET
+without neoCLR policies, integrated into Raven main (`defb93a49`) and then its neoclr
+branch (`a66df01a1`). No new Runtime Contract setting is required. The bridge also now
+recognizes terminal System.Fault calls without requiring a trailing return, preserves
+the original invocation/message and terminates the lowered control-flow path.
+
+Validation: six Raven generic-signature tests pass (the new target-metadata case failed
+before the fix). The construction/property regression suites pass, including conservative
+source-access admission. The public consumer and terminal-Fault case pass. The full
+library snapshot was regenerated with the corrected compiler; API reference metadata,
+XML summaries and public inventory were refreshed. The website source was reviewed and
+updated; its build/publication were skipped at the author's direction.

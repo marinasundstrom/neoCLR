@@ -120,3 +120,22 @@ fn nested_source_owner_survives_roundtrip_and_rejects_missing_or_cyclic_owners()
     artifact["types"][1]["origin"]["declaring_type_token"] = serde_json::json!(33554436);
     assert!(load(&artifact.to_string()).is_err());
 }
+
+#[test]
+fn reflection_access_metadata_roundtrips_and_is_scoped_to_definition_kind() {
+    let mut json = serde_json::to_value(assemble(&source()).unwrap()).unwrap();
+    json["types"][0]["origin"]["publicly_visible"] = serde_json::json!(true);
+    json["functions"][0]["origin"]["member_access"] = serde_json::json!("Private");
+    let loaded = load(&json.to_string()).unwrap();
+    assert_eq!(loaded.types[0].origin.as_ref().unwrap().publicly_visible, Some(true));
+    assert_eq!(loaded.functions[0].origin.as_ref().unwrap().member_access,
+        Some(neoclr::metadata_origin::SourceAccess::Private));
+    let mut wrong_kind = json.clone();
+    wrong_kind["types"][0]["origin"]["member_access"] = serde_json::json!("Public");
+    assert!(load(&wrong_kind.to_string()).is_err());
+    let mut wrong_kind = json.clone();
+    wrong_kind["functions"][0]["origin"]["publicly_visible"] = serde_json::json!(true);
+    assert!(load(&wrong_kind.to_string()).is_err());
+    json["functions"][0]["origin"]["member_access"] = serde_json::json!("Unknown");
+    assert!(load(&json.to_string()).is_err());
+}

@@ -1,0 +1,1711 @@
+; Generated from runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn. Regenerate with build_runtime_library.py.
+.type System.Runtime.Reflection.ReflectionError
+.sealed
+.custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+.implements System.Runtime.CompilerServices.IUnion
+.field private Metadata_V1_3C5461673E Byte
+.field private Metadata_V1_3C556E626F756E644D657461646174615061796C6F61643E System.Runtime.Reflection.ReflectionError.UnboundMetadata
+.field private Metadata_V1_3C556E737570706F72746564547970655061796C6F61643E System.Runtime.Reflection.ReflectionError.UnsupportedType
+.field private Metadata_V1_3C41636365737344656E6965645061796C6F61643E System.Runtime.Reflection.ReflectionError.AccessDenied
+.field private Metadata_V1_3C4D697373696E67436F6E7374727563746F725061796C6F61643E System.Runtime.Reflection.ReflectionError.MissingConstructor
+.field private Metadata_V1_3C556E737570706F7274656450726F70657274795061796C6F61643E System.Runtime.Reflection.ReflectionError.UnsupportedProperty
+.field private Metadata_V1_3C4D697373696E674163636573736F725061796C6F61643E System.Runtime.Reflection.ReflectionError.MissingAccessor
+.field private Metadata_V1_3C496E76616C696452656365697665725061796C6F61643E System.Runtime.Reflection.ReflectionError.InvalidReceiver
+.field private Metadata_V1_3C496E76616C696456616C75655061796C6F61643E System.Runtime.Reflection.ReflectionError.InvalidValue
+.property instance Value() -> System.Object
+.get instance System.Runtime.Reflection.ReflectionError::get_Value()
+.end
+.property instance HasValue() -> Boolean
+.get instance System.Runtime.Reflection.ReflectionError::get_HasValue()
+.end
+.method instance override byref ToString() -> String
+M00000001_IL_0000:
+ldarg 0
+M00000001_IL_0001:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000001_IL_0006:
+conv.i4
+M00000001_IL_0007:
+ldc.i4 1
+M00000001_IL_0008:
+conv.i4
+M00000001_IL_0009:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_000b:
+brtrue M00000001_IL_0015
+M00000001_IL_0010:
+br M00000001_IL_002f
+M00000001_IL_0015:
+ldstr "ReflectionError"
+M00000001_IL_001a:
+ldstr "."
+M00000001_IL_001f:
+call System.String::Concat(String,String)
+M00000001_IL_0024:
+ldstr "UnboundMetadata"
+M00000001_IL_0029:
+call System.String::Concat(String,String)
+M00000001_IL_002e:
+ret
+M00000001_IL_002f:
+M00000001_IL_0030:
+ldarg 0
+M00000001_IL_0031:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000001_IL_0036:
+conv.i4
+M00000001_IL_0037:
+ldc.i4 2
+M00000001_IL_0038:
+conv.i4
+M00000001_IL_0039:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_003b:
+brtrue M00000001_IL_0045
+M00000001_IL_0040:
+br M00000001_IL_005f
+M00000001_IL_0045:
+ldstr "ReflectionError"
+M00000001_IL_004a:
+ldstr "."
+M00000001_IL_004f:
+call System.String::Concat(String,String)
+M00000001_IL_0054:
+ldstr "UnsupportedType"
+M00000001_IL_0059:
+call System.String::Concat(String,String)
+M00000001_IL_005e:
+ret
+M00000001_IL_005f:
+M00000001_IL_0060:
+ldarg 0
+M00000001_IL_0061:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000001_IL_0066:
+conv.i4
+M00000001_IL_0067:
+ldc.i4 3
+M00000001_IL_0068:
+conv.i4
+M00000001_IL_0069:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_006b:
+brtrue M00000001_IL_0075
+M00000001_IL_0070:
+br M00000001_IL_008f
+M00000001_IL_0075:
+ldstr "ReflectionError"
+M00000001_IL_007a:
+ldstr "."
+M00000001_IL_007f:
+call System.String::Concat(String,String)
+M00000001_IL_0084:
+ldstr "AccessDenied"
+M00000001_IL_0089:
+call System.String::Concat(String,String)
+M00000001_IL_008e:
+ret
+M00000001_IL_008f:
+M00000001_IL_0090:
+ldarg 0
+M00000001_IL_0091:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000001_IL_0096:
+conv.i4
+M00000001_IL_0097:
+ldc.i4 4
+M00000001_IL_0098:
+conv.i4
+M00000001_IL_0099:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_009b:
+brtrue M00000001_IL_00a5
+M00000001_IL_00a0:
+br M00000001_IL_00bf
+M00000001_IL_00a5:
+ldstr "ReflectionError"
+M00000001_IL_00aa:
+ldstr "."
+M00000001_IL_00af:
+call System.String::Concat(String,String)
+M00000001_IL_00b4:
+ldstr "MissingConstructor"
+M00000001_IL_00b9:
+call System.String::Concat(String,String)
+M00000001_IL_00be:
+ret
+M00000001_IL_00bf:
+M00000001_IL_00c0:
+ldarg 0
+M00000001_IL_00c1:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000001_IL_00c6:
+conv.i4
+M00000001_IL_00c7:
+ldc.i4 5
+M00000001_IL_00c8:
+conv.i4
+M00000001_IL_00c9:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_00cb:
+brtrue M00000001_IL_00d5
+M00000001_IL_00d0:
+br M00000001_IL_00ef
+M00000001_IL_00d5:
+ldstr "ReflectionError"
+M00000001_IL_00da:
+ldstr "."
+M00000001_IL_00df:
+call System.String::Concat(String,String)
+M00000001_IL_00e4:
+ldstr "UnsupportedProperty"
+M00000001_IL_00e9:
+call System.String::Concat(String,String)
+M00000001_IL_00ee:
+ret
+M00000001_IL_00ef:
+M00000001_IL_00f0:
+ldarg 0
+M00000001_IL_00f1:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000001_IL_00f6:
+conv.i4
+M00000001_IL_00f7:
+ldc.i4 6
+M00000001_IL_00f8:
+conv.i4
+M00000001_IL_00f9:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_00fb:
+brtrue M00000001_IL_0105
+M00000001_IL_0100:
+br M00000001_IL_011f
+M00000001_IL_0105:
+ldstr "ReflectionError"
+M00000001_IL_010a:
+ldstr "."
+M00000001_IL_010f:
+call System.String::Concat(String,String)
+M00000001_IL_0114:
+ldstr "MissingAccessor"
+M00000001_IL_0119:
+call System.String::Concat(String,String)
+M00000001_IL_011e:
+ret
+M00000001_IL_011f:
+M00000001_IL_0120:
+ldarg 0
+M00000001_IL_0121:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000001_IL_0126:
+conv.i4
+M00000001_IL_0127:
+ldc.i4 7
+M00000001_IL_0128:
+conv.i4
+M00000001_IL_0129:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_012b:
+brtrue M00000001_IL_0135
+M00000001_IL_0130:
+br M00000001_IL_014f
+M00000001_IL_0135:
+ldstr "ReflectionError"
+M00000001_IL_013a:
+ldstr "."
+M00000001_IL_013f:
+call System.String::Concat(String,String)
+M00000001_IL_0144:
+ldstr "InvalidReceiver"
+M00000001_IL_0149:
+call System.String::Concat(String,String)
+M00000001_IL_014e:
+ret
+M00000001_IL_014f:
+M00000001_IL_0150:
+ldarg 0
+M00000001_IL_0151:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000001_IL_0156:
+conv.i4
+M00000001_IL_0157:
+ldc.i4 8
+M00000001_IL_0158:
+conv.i4
+M00000001_IL_0159:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_015b:
+brtrue M00000001_IL_0165
+M00000001_IL_0160:
+br M00000001_IL_017f
+M00000001_IL_0165:
+ldstr "ReflectionError"
+M00000001_IL_016a:
+ldstr "."
+M00000001_IL_016f:
+call System.String::Concat(String,String)
+M00000001_IL_0174:
+ldstr "InvalidValue"
+M00000001_IL_0179:
+call System.String::Concat(String,String)
+M00000001_IL_017e:
+ret
+M00000001_IL_017f:
+M00000001_IL_0180:
+ldstr "\u003CUninitialized\u003E"
+M00000001_IL_0185:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000002_IL_0000:
+ldarg 0
+M00000002_IL_0001:
+M00000002_IL_0002:
+ref.isnull
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0004:
+brtrue M00000002_IL_000e
+M00000002_IL_0009:
+br M00000002_IL_0014
+M00000002_IL_000e:
+ldstr "null"
+M00000002_IL_0013:
+ret
+M00000002_IL_0014:
+M00000002_IL_0015:
+ldarg 0
+M00000002_IL_0016:
+isinst String
+M00000002_IL_001b:
+M00000002_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_001e:
+brtrue M00000002_IL_0028
+M00000002_IL_0023:
+br M00000002_IL_0043
+M00000002_IL_0028:
+ldstr "\u0022"
+M00000002_IL_002d:
+ldarg 0
+M00000002_IL_002e:
+castclass String
+M00000002_IL_0033:
+call System.String::Concat(String,String)
+M00000002_IL_0038:
+ldstr "\u0022"
+M00000002_IL_003d:
+call System.String::Concat(String,String)
+M00000002_IL_0042:
+ret
+M00000002_IL_0043:
+M00000002_IL_0044:
+ldarg 0
+M00000002_IL_0045:
+isinst Char
+M00000002_IL_004a:
+dup
+M00000002_IL_004b:
+ref.isnull
+brfalse M00000002_IL_0057
+M00000002_IL_0050:
+pop
+M00000002_IL_0051:
+ldc.i4 0
+M00000002_IL_0052:
+br M00000002_IL_005e
+M00000002_IL_0057:
+unbox.any Char
+M00000002_IL_005c:
+pop
+M00000002_IL_005d:
+ldc.i4 1
+M00000002_IL_005e:
+brtrue M00000002_IL_0068
+M00000002_IL_0063:
+br M00000002_IL_0083
+M00000002_IL_0068:
+ldstr "\u0027"
+M00000002_IL_006d:
+ldarg 0
+M00000002_IL_006e:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000002_IL_0073:
+call System.String::Concat(String,String)
+M00000002_IL_0078:
+ldstr "\u0027"
+M00000002_IL_007d:
+call System.String::Concat(String,String)
+M00000002_IL_0082:
+ret
+M00000002_IL_0083:
+M00000002_IL_0084:
+ldarg 0
+M00000002_IL_0085:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000002_IL_008a:
+ret
+.end
+.method instance byref .ctor(System.Runtime.Reflection.ReflectionError.UnboundMetadata value) -> Void
+.local Byte local0
+.local System.Runtime.Reflection.ReflectionError.UnboundMetadata local1
+.local Byte unionDefault1_0
+.local System.Runtime.Reflection.ReflectionError.UnboundMetadata unionDefault1_1
+.local System.Runtime.Reflection.ReflectionError.UnsupportedType unionDefault1_2
+.local System.Runtime.Reflection.ReflectionError.AccessDenied unionDefault1_3
+.local System.Runtime.Reflection.ReflectionError.MissingConstructor unionDefault1_4
+.local System.Runtime.Reflection.ReflectionError.UnsupportedProperty unionDefault1_5
+.local System.Runtime.Reflection.ReflectionError.MissingAccessor unionDefault1_6
+.local System.Runtime.Reflection.ReflectionError.InvalidReceiver unionDefault1_7
+.local System.Runtime.Reflection.ReflectionError.InvalidValue unionDefault1_8
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Runtime.Reflection.ReflectionError.UnboundMetadata
+M00000003_IL_0000:
+ldarg 0
+M00000003_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Runtime.Reflection.ReflectionError.UnboundMetadata
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E626F756E644D657461646174615061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedType
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F72746564547970655061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Runtime.Reflection.ReflectionError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Runtime.Reflection.ReflectionError.MissingConstructor
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E67436F6E7374727563746F725061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedProperty
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F7274656450726F70657274795061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Runtime.Reflection.ReflectionError.MissingAccessor
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E674163636573736F725061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Runtime.Reflection.ReflectionError.InvalidReceiver
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696452656365697665725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Runtime.Reflection.ReflectionError.InvalidValue
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696456616C75655061796C6F61643E
+pop
+M00000003_IL_0007:
+ldc.i4 1
+M00000003_IL_0008:
+stloc local0
+M00000003_IL_0009:
+ldarg 0
+M00000003_IL_000a:
+ldloc local0
+M00000003_IL_000b:
+conv.u1
+M00000003_IL_000c:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+M00000003_IL_0011:
+ldarg 1
+M00000003_IL_0012:
+stloc local1
+M00000003_IL_0013:
+ldarg 0
+M00000003_IL_0014:
+ldloc local1
+M00000003_IL_0015:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E626F756E644D657461646174615061796C6F61643E
+pop
+M00000003_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Runtime.Reflection.ReflectionError.UnboundMetadata& value) -> Boolean
+M00000004_IL_0000:
+ldarg 0
+M00000004_IL_0001:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000004_IL_0006:
+conv.i4
+M00000004_IL_0007:
+ldc.i4 1
+M00000004_IL_0008:
+conv.i4
+M00000004_IL_0009:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_000b:
+brtrue M00000004_IL_0015
+M00000004_IL_0010:
+br M00000004_IL_0023
+M00000004_IL_0015:
+ldarg 1
+M00000004_IL_0016:
+ldarg 0
+M00000004_IL_0017:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E626F756E644D657461646174615061796C6F61643E
+M00000004_IL_001c:
+stobj System.Runtime.Reflection.ReflectionError.UnboundMetadata
+M00000004_IL_0021:
+ldc.i4 1
+M00000004_IL_0022:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000004_IL_0023:
+M00000004_IL_0024:
+ldc.i4 0
+M00000004_IL_0025:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Runtime.Reflection.ReflectionError.UnsupportedType value) -> Void
+.local Byte local0
+.local System.Runtime.Reflection.ReflectionError.UnsupportedType local1
+.local Byte unionDefault1_0
+.local System.Runtime.Reflection.ReflectionError.UnboundMetadata unionDefault1_1
+.local System.Runtime.Reflection.ReflectionError.UnsupportedType unionDefault1_2
+.local System.Runtime.Reflection.ReflectionError.AccessDenied unionDefault1_3
+.local System.Runtime.Reflection.ReflectionError.MissingConstructor unionDefault1_4
+.local System.Runtime.Reflection.ReflectionError.UnsupportedProperty unionDefault1_5
+.local System.Runtime.Reflection.ReflectionError.MissingAccessor unionDefault1_6
+.local System.Runtime.Reflection.ReflectionError.InvalidReceiver unionDefault1_7
+.local System.Runtime.Reflection.ReflectionError.InvalidValue unionDefault1_8
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedType
+M00000005_IL_0000:
+ldarg 0
+M00000005_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Runtime.Reflection.ReflectionError.UnboundMetadata
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E626F756E644D657461646174615061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedType
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F72746564547970655061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Runtime.Reflection.ReflectionError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Runtime.Reflection.ReflectionError.MissingConstructor
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E67436F6E7374727563746F725061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedProperty
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F7274656450726F70657274795061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Runtime.Reflection.ReflectionError.MissingAccessor
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E674163636573736F725061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Runtime.Reflection.ReflectionError.InvalidReceiver
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696452656365697665725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Runtime.Reflection.ReflectionError.InvalidValue
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696456616C75655061796C6F61643E
+pop
+M00000005_IL_0007:
+ldc.i4 2
+M00000005_IL_0008:
+stloc local0
+M00000005_IL_0009:
+ldarg 0
+M00000005_IL_000a:
+ldloc local0
+M00000005_IL_000b:
+conv.u1
+M00000005_IL_000c:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+M00000005_IL_0011:
+ldarg 1
+M00000005_IL_0012:
+stloc local1
+M00000005_IL_0013:
+ldarg 0
+M00000005_IL_0014:
+ldloc local1
+M00000005_IL_0015:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F72746564547970655061796C6F61643E
+pop
+M00000005_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Runtime.Reflection.ReflectionError.UnsupportedType& value) -> Boolean
+M00000006_IL_0000:
+ldarg 0
+M00000006_IL_0001:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000006_IL_0006:
+conv.i4
+M00000006_IL_0007:
+ldc.i4 2
+M00000006_IL_0008:
+conv.i4
+M00000006_IL_0009:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_000b:
+brtrue M00000006_IL_0015
+M00000006_IL_0010:
+br M00000006_IL_0023
+M00000006_IL_0015:
+ldarg 1
+M00000006_IL_0016:
+ldarg 0
+M00000006_IL_0017:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F72746564547970655061796C6F61643E
+M00000006_IL_001c:
+stobj System.Runtime.Reflection.ReflectionError.UnsupportedType
+M00000006_IL_0021:
+ldc.i4 1
+M00000006_IL_0022:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000006_IL_0023:
+M00000006_IL_0024:
+ldc.i4 0
+M00000006_IL_0025:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Runtime.Reflection.ReflectionError.AccessDenied value) -> Void
+.local Byte local0
+.local System.Runtime.Reflection.ReflectionError.AccessDenied local1
+.local Byte unionDefault1_0
+.local System.Runtime.Reflection.ReflectionError.UnboundMetadata unionDefault1_1
+.local System.Runtime.Reflection.ReflectionError.UnsupportedType unionDefault1_2
+.local System.Runtime.Reflection.ReflectionError.AccessDenied unionDefault1_3
+.local System.Runtime.Reflection.ReflectionError.MissingConstructor unionDefault1_4
+.local System.Runtime.Reflection.ReflectionError.UnsupportedProperty unionDefault1_5
+.local System.Runtime.Reflection.ReflectionError.MissingAccessor unionDefault1_6
+.local System.Runtime.Reflection.ReflectionError.InvalidReceiver unionDefault1_7
+.local System.Runtime.Reflection.ReflectionError.InvalidValue unionDefault1_8
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Runtime.Reflection.ReflectionError.AccessDenied
+M00000007_IL_0000:
+ldarg 0
+M00000007_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Runtime.Reflection.ReflectionError.UnboundMetadata
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E626F756E644D657461646174615061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedType
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F72746564547970655061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Runtime.Reflection.ReflectionError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Runtime.Reflection.ReflectionError.MissingConstructor
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E67436F6E7374727563746F725061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedProperty
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F7274656450726F70657274795061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Runtime.Reflection.ReflectionError.MissingAccessor
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E674163636573736F725061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Runtime.Reflection.ReflectionError.InvalidReceiver
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696452656365697665725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Runtime.Reflection.ReflectionError.InvalidValue
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696456616C75655061796C6F61643E
+pop
+M00000007_IL_0007:
+ldc.i4 3
+M00000007_IL_0008:
+stloc local0
+M00000007_IL_0009:
+ldarg 0
+M00000007_IL_000a:
+ldloc local0
+M00000007_IL_000b:
+conv.u1
+M00000007_IL_000c:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+M00000007_IL_0011:
+ldarg 1
+M00000007_IL_0012:
+stloc local1
+M00000007_IL_0013:
+ldarg 0
+M00000007_IL_0014:
+ldloc local1
+M00000007_IL_0015:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+M00000007_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Runtime.Reflection.ReflectionError.AccessDenied& value) -> Boolean
+M00000008_IL_0000:
+ldarg 0
+M00000008_IL_0001:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000008_IL_0006:
+conv.i4
+M00000008_IL_0007:
+ldc.i4 3
+M00000008_IL_0008:
+conv.i4
+M00000008_IL_0009:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_000b:
+brtrue M00000008_IL_0015
+M00000008_IL_0010:
+br M00000008_IL_0023
+M00000008_IL_0015:
+ldarg 1
+M00000008_IL_0016:
+ldarg 0
+M00000008_IL_0017:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+M00000008_IL_001c:
+stobj System.Runtime.Reflection.ReflectionError.AccessDenied
+M00000008_IL_0021:
+ldc.i4 1
+M00000008_IL_0022:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000008_IL_0023:
+M00000008_IL_0024:
+ldc.i4 0
+M00000008_IL_0025:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Runtime.Reflection.ReflectionError.MissingConstructor value) -> Void
+.local Byte local0
+.local System.Runtime.Reflection.ReflectionError.MissingConstructor local1
+.local Byte unionDefault1_0
+.local System.Runtime.Reflection.ReflectionError.UnboundMetadata unionDefault1_1
+.local System.Runtime.Reflection.ReflectionError.UnsupportedType unionDefault1_2
+.local System.Runtime.Reflection.ReflectionError.AccessDenied unionDefault1_3
+.local System.Runtime.Reflection.ReflectionError.MissingConstructor unionDefault1_4
+.local System.Runtime.Reflection.ReflectionError.UnsupportedProperty unionDefault1_5
+.local System.Runtime.Reflection.ReflectionError.MissingAccessor unionDefault1_6
+.local System.Runtime.Reflection.ReflectionError.InvalidReceiver unionDefault1_7
+.local System.Runtime.Reflection.ReflectionError.InvalidValue unionDefault1_8
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Runtime.Reflection.ReflectionError.MissingConstructor
+M00000009_IL_0000:
+ldarg 0
+M00000009_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Runtime.Reflection.ReflectionError.UnboundMetadata
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E626F756E644D657461646174615061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedType
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F72746564547970655061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Runtime.Reflection.ReflectionError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Runtime.Reflection.ReflectionError.MissingConstructor
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E67436F6E7374727563746F725061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedProperty
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F7274656450726F70657274795061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Runtime.Reflection.ReflectionError.MissingAccessor
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E674163636573736F725061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Runtime.Reflection.ReflectionError.InvalidReceiver
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696452656365697665725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Runtime.Reflection.ReflectionError.InvalidValue
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696456616C75655061796C6F61643E
+pop
+M00000009_IL_0007:
+ldc.i4 4
+M00000009_IL_0008:
+stloc local0
+M00000009_IL_0009:
+ldarg 0
+M00000009_IL_000a:
+ldloc local0
+M00000009_IL_000b:
+conv.u1
+M00000009_IL_000c:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+M00000009_IL_0011:
+ldarg 1
+M00000009_IL_0012:
+stloc local1
+M00000009_IL_0013:
+ldarg 0
+M00000009_IL_0014:
+ldloc local1
+M00000009_IL_0015:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E67436F6E7374727563746F725061796C6F61643E
+pop
+M00000009_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Runtime.Reflection.ReflectionError.MissingConstructor& value) -> Boolean
+M0000000a_IL_0000:
+ldarg 0
+M0000000a_IL_0001:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M0000000a_IL_0006:
+conv.i4
+M0000000a_IL_0007:
+ldc.i4 4
+M0000000a_IL_0008:
+conv.i4
+M0000000a_IL_0009:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_000b:
+brtrue M0000000a_IL_0015
+M0000000a_IL_0010:
+br M0000000a_IL_0023
+M0000000a_IL_0015:
+ldarg 1
+M0000000a_IL_0016:
+ldarg 0
+M0000000a_IL_0017:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E67436F6E7374727563746F725061796C6F61643E
+M0000000a_IL_001c:
+stobj System.Runtime.Reflection.ReflectionError.MissingConstructor
+M0000000a_IL_0021:
+ldc.i4 1
+M0000000a_IL_0022:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000a_IL_0023:
+M0000000a_IL_0024:
+ldc.i4 0
+M0000000a_IL_0025:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Runtime.Reflection.ReflectionError.UnsupportedProperty value) -> Void
+.local Byte local0
+.local System.Runtime.Reflection.ReflectionError.UnsupportedProperty local1
+.local Byte unionDefault1_0
+.local System.Runtime.Reflection.ReflectionError.UnboundMetadata unionDefault1_1
+.local System.Runtime.Reflection.ReflectionError.UnsupportedType unionDefault1_2
+.local System.Runtime.Reflection.ReflectionError.AccessDenied unionDefault1_3
+.local System.Runtime.Reflection.ReflectionError.MissingConstructor unionDefault1_4
+.local System.Runtime.Reflection.ReflectionError.UnsupportedProperty unionDefault1_5
+.local System.Runtime.Reflection.ReflectionError.MissingAccessor unionDefault1_6
+.local System.Runtime.Reflection.ReflectionError.InvalidReceiver unionDefault1_7
+.local System.Runtime.Reflection.ReflectionError.InvalidValue unionDefault1_8
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedProperty
+M0000000b_IL_0000:
+ldarg 0
+M0000000b_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Runtime.Reflection.ReflectionError.UnboundMetadata
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E626F756E644D657461646174615061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedType
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F72746564547970655061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Runtime.Reflection.ReflectionError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Runtime.Reflection.ReflectionError.MissingConstructor
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E67436F6E7374727563746F725061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedProperty
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F7274656450726F70657274795061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Runtime.Reflection.ReflectionError.MissingAccessor
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E674163636573736F725061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Runtime.Reflection.ReflectionError.InvalidReceiver
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696452656365697665725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Runtime.Reflection.ReflectionError.InvalidValue
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696456616C75655061796C6F61643E
+pop
+M0000000b_IL_0007:
+ldc.i4 5
+M0000000b_IL_0008:
+stloc local0
+M0000000b_IL_0009:
+ldarg 0
+M0000000b_IL_000a:
+ldloc local0
+M0000000b_IL_000b:
+conv.u1
+M0000000b_IL_000c:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+M0000000b_IL_0011:
+ldarg 1
+M0000000b_IL_0012:
+stloc local1
+M0000000b_IL_0013:
+ldarg 0
+M0000000b_IL_0014:
+ldloc local1
+M0000000b_IL_0015:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F7274656450726F70657274795061796C6F61643E
+pop
+M0000000b_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Runtime.Reflection.ReflectionError.UnsupportedProperty& value) -> Boolean
+M0000000c_IL_0000:
+ldarg 0
+M0000000c_IL_0001:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M0000000c_IL_0006:
+conv.i4
+M0000000c_IL_0007:
+ldc.i4 5
+M0000000c_IL_0008:
+conv.i4
+M0000000c_IL_0009:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_000b:
+brtrue M0000000c_IL_0015
+M0000000c_IL_0010:
+br M0000000c_IL_0023
+M0000000c_IL_0015:
+ldarg 1
+M0000000c_IL_0016:
+ldarg 0
+M0000000c_IL_0017:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F7274656450726F70657274795061796C6F61643E
+M0000000c_IL_001c:
+stobj System.Runtime.Reflection.ReflectionError.UnsupportedProperty
+M0000000c_IL_0021:
+ldc.i4 1
+M0000000c_IL_0022:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000c_IL_0023:
+M0000000c_IL_0024:
+ldc.i4 0
+M0000000c_IL_0025:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Runtime.Reflection.ReflectionError.MissingAccessor value) -> Void
+.local Byte local0
+.local System.Runtime.Reflection.ReflectionError.MissingAccessor local1
+.local Byte unionDefault1_0
+.local System.Runtime.Reflection.ReflectionError.UnboundMetadata unionDefault1_1
+.local System.Runtime.Reflection.ReflectionError.UnsupportedType unionDefault1_2
+.local System.Runtime.Reflection.ReflectionError.AccessDenied unionDefault1_3
+.local System.Runtime.Reflection.ReflectionError.MissingConstructor unionDefault1_4
+.local System.Runtime.Reflection.ReflectionError.UnsupportedProperty unionDefault1_5
+.local System.Runtime.Reflection.ReflectionError.MissingAccessor unionDefault1_6
+.local System.Runtime.Reflection.ReflectionError.InvalidReceiver unionDefault1_7
+.local System.Runtime.Reflection.ReflectionError.InvalidValue unionDefault1_8
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Runtime.Reflection.ReflectionError.MissingAccessor
+M0000000d_IL_0000:
+ldarg 0
+M0000000d_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Runtime.Reflection.ReflectionError.UnboundMetadata
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E626F756E644D657461646174615061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedType
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F72746564547970655061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Runtime.Reflection.ReflectionError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Runtime.Reflection.ReflectionError.MissingConstructor
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E67436F6E7374727563746F725061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedProperty
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F7274656450726F70657274795061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Runtime.Reflection.ReflectionError.MissingAccessor
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E674163636573736F725061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Runtime.Reflection.ReflectionError.InvalidReceiver
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696452656365697665725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Runtime.Reflection.ReflectionError.InvalidValue
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696456616C75655061796C6F61643E
+pop
+M0000000d_IL_0007:
+ldc.i4 6
+M0000000d_IL_0008:
+stloc local0
+M0000000d_IL_0009:
+ldarg 0
+M0000000d_IL_000a:
+ldloc local0
+M0000000d_IL_000b:
+conv.u1
+M0000000d_IL_000c:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+M0000000d_IL_0011:
+ldarg 1
+M0000000d_IL_0012:
+stloc local1
+M0000000d_IL_0013:
+ldarg 0
+M0000000d_IL_0014:
+ldloc local1
+M0000000d_IL_0015:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E674163636573736F725061796C6F61643E
+pop
+M0000000d_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Runtime.Reflection.ReflectionError.MissingAccessor& value) -> Boolean
+M0000000e_IL_0000:
+ldarg 0
+M0000000e_IL_0001:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M0000000e_IL_0006:
+conv.i4
+M0000000e_IL_0007:
+ldc.i4 6
+M0000000e_IL_0008:
+conv.i4
+M0000000e_IL_0009:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_000b:
+brtrue M0000000e_IL_0015
+M0000000e_IL_0010:
+br M0000000e_IL_0023
+M0000000e_IL_0015:
+ldarg 1
+M0000000e_IL_0016:
+ldarg 0
+M0000000e_IL_0017:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E674163636573736F725061796C6F61643E
+M0000000e_IL_001c:
+stobj System.Runtime.Reflection.ReflectionError.MissingAccessor
+M0000000e_IL_0021:
+ldc.i4 1
+M0000000e_IL_0022:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000e_IL_0023:
+M0000000e_IL_0024:
+ldc.i4 0
+M0000000e_IL_0025:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Runtime.Reflection.ReflectionError.InvalidReceiver value) -> Void
+.local Byte local0
+.local System.Runtime.Reflection.ReflectionError.InvalidReceiver local1
+.local Byte unionDefault1_0
+.local System.Runtime.Reflection.ReflectionError.UnboundMetadata unionDefault1_1
+.local System.Runtime.Reflection.ReflectionError.UnsupportedType unionDefault1_2
+.local System.Runtime.Reflection.ReflectionError.AccessDenied unionDefault1_3
+.local System.Runtime.Reflection.ReflectionError.MissingConstructor unionDefault1_4
+.local System.Runtime.Reflection.ReflectionError.UnsupportedProperty unionDefault1_5
+.local System.Runtime.Reflection.ReflectionError.MissingAccessor unionDefault1_6
+.local System.Runtime.Reflection.ReflectionError.InvalidReceiver unionDefault1_7
+.local System.Runtime.Reflection.ReflectionError.InvalidValue unionDefault1_8
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Runtime.Reflection.ReflectionError.InvalidReceiver
+M0000000f_IL_0000:
+ldarg 0
+M0000000f_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Runtime.Reflection.ReflectionError.UnboundMetadata
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E626F756E644D657461646174615061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedType
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F72746564547970655061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Runtime.Reflection.ReflectionError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Runtime.Reflection.ReflectionError.MissingConstructor
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E67436F6E7374727563746F725061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedProperty
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F7274656450726F70657274795061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Runtime.Reflection.ReflectionError.MissingAccessor
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E674163636573736F725061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Runtime.Reflection.ReflectionError.InvalidReceiver
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696452656365697665725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Runtime.Reflection.ReflectionError.InvalidValue
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696456616C75655061796C6F61643E
+pop
+M0000000f_IL_0007:
+ldc.i4 7
+M0000000f_IL_0008:
+stloc local0
+M0000000f_IL_0009:
+ldarg 0
+M0000000f_IL_000a:
+ldloc local0
+M0000000f_IL_000b:
+conv.u1
+M0000000f_IL_000c:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+M0000000f_IL_0011:
+ldarg 1
+M0000000f_IL_0012:
+stloc local1
+M0000000f_IL_0013:
+ldarg 0
+M0000000f_IL_0014:
+ldloc local1
+M0000000f_IL_0015:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696452656365697665725061796C6F61643E
+pop
+M0000000f_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Runtime.Reflection.ReflectionError.InvalidReceiver& value) -> Boolean
+M00000010_IL_0000:
+ldarg 0
+M00000010_IL_0001:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000010_IL_0006:
+conv.i4
+M00000010_IL_0007:
+ldc.i4 7
+M00000010_IL_0008:
+conv.i4
+M00000010_IL_0009:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_000b:
+brtrue M00000010_IL_0015
+M00000010_IL_0010:
+br M00000010_IL_0023
+M00000010_IL_0015:
+ldarg 1
+M00000010_IL_0016:
+ldarg 0
+M00000010_IL_0017:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696452656365697665725061796C6F61643E
+M00000010_IL_001c:
+stobj System.Runtime.Reflection.ReflectionError.InvalidReceiver
+M00000010_IL_0021:
+ldc.i4 1
+M00000010_IL_0022:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000010_IL_0023:
+M00000010_IL_0024:
+ldc.i4 0
+M00000010_IL_0025:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Runtime.Reflection.ReflectionError.InvalidValue value) -> Void
+.local Byte local0
+.local System.Runtime.Reflection.ReflectionError.InvalidValue local1
+.local Byte unionDefault1_0
+.local System.Runtime.Reflection.ReflectionError.UnboundMetadata unionDefault1_1
+.local System.Runtime.Reflection.ReflectionError.UnsupportedType unionDefault1_2
+.local System.Runtime.Reflection.ReflectionError.AccessDenied unionDefault1_3
+.local System.Runtime.Reflection.ReflectionError.MissingConstructor unionDefault1_4
+.local System.Runtime.Reflection.ReflectionError.UnsupportedProperty unionDefault1_5
+.local System.Runtime.Reflection.ReflectionError.MissingAccessor unionDefault1_6
+.local System.Runtime.Reflection.ReflectionError.InvalidReceiver unionDefault1_7
+.local System.Runtime.Reflection.ReflectionError.InvalidValue unionDefault1_8
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Runtime.Reflection.ReflectionError.InvalidValue
+M00000011_IL_0000:
+ldarg 0
+M00000011_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Runtime.Reflection.ReflectionError.UnboundMetadata
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E626F756E644D657461646174615061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedType
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F72746564547970655061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Runtime.Reflection.ReflectionError.AccessDenied
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Runtime.Reflection.ReflectionError.MissingConstructor
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E67436F6E7374727563746F725061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Runtime.Reflection.ReflectionError.UnsupportedProperty
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F7274656450726F70657274795061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Runtime.Reflection.ReflectionError.MissingAccessor
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E674163636573736F725061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Runtime.Reflection.ReflectionError.InvalidReceiver
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696452656365697665725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Runtime.Reflection.ReflectionError.InvalidValue
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696456616C75655061796C6F61643E
+pop
+M00000011_IL_0007:
+ldc.i4 8
+M00000011_IL_0008:
+stloc local0
+M00000011_IL_0009:
+ldarg 0
+M00000011_IL_000a:
+ldloc local0
+M00000011_IL_000b:
+conv.u1
+M00000011_IL_000c:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+pop
+M00000011_IL_0011:
+ldarg 1
+M00000011_IL_0012:
+stloc local1
+M00000011_IL_0013:
+ldarg 0
+M00000011_IL_0014:
+ldloc local1
+M00000011_IL_0015:
+stfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696456616C75655061796C6F61643E
+pop
+M00000011_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Runtime.Reflection.ReflectionError.InvalidValue& value) -> Boolean
+M00000012_IL_0000:
+ldarg 0
+M00000012_IL_0001:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000012_IL_0006:
+conv.i4
+M00000012_IL_0007:
+ldc.i4 8
+M00000012_IL_0008:
+conv.i4
+M00000012_IL_0009:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000012_IL_000b:
+brtrue M00000012_IL_0015
+M00000012_IL_0010:
+br M00000012_IL_0023
+M00000012_IL_0015:
+ldarg 1
+M00000012_IL_0016:
+ldarg 0
+M00000012_IL_0017:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696456616C75655061796C6F61643E
+M00000012_IL_001c:
+stobj System.Runtime.Reflection.ReflectionError.InvalidValue
+M00000012_IL_0021:
+ldc.i4 1
+M00000012_IL_0022:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000012_IL_0023:
+M00000012_IL_0024:
+ldc.i4 0
+M00000012_IL_0025:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref get_Value() -> System.Object
+M00000013_IL_0000:
+ldarg 0
+M00000013_IL_0001:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000013_IL_0006:
+conv.i4
+M00000013_IL_0007:
+ldc.i4 1
+M00000013_IL_0008:
+conv.i4
+M00000013_IL_0009:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_000b:
+brtrue M00000013_IL_0015
+M00000013_IL_0010:
+br M00000013_IL_0021
+M00000013_IL_0015:
+ldarg 0
+M00000013_IL_0016:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E626F756E644D657461646174615061796C6F61643E
+M00000013_IL_001b:
+box System.Runtime.Reflection.ReflectionError.UnboundMetadata
+M00000013_IL_0020:
+ret
+M00000013_IL_0021:
+M00000013_IL_0022:
+ldarg 0
+M00000013_IL_0023:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000013_IL_0028:
+conv.i4
+M00000013_IL_0029:
+ldc.i4 2
+M00000013_IL_002a:
+conv.i4
+M00000013_IL_002b:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_002d:
+brtrue M00000013_IL_0037
+M00000013_IL_0032:
+br M00000013_IL_0043
+M00000013_IL_0037:
+ldarg 0
+M00000013_IL_0038:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F72746564547970655061796C6F61643E
+M00000013_IL_003d:
+box System.Runtime.Reflection.ReflectionError.UnsupportedType
+M00000013_IL_0042:
+ret
+M00000013_IL_0043:
+M00000013_IL_0044:
+ldarg 0
+M00000013_IL_0045:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000013_IL_004a:
+conv.i4
+M00000013_IL_004b:
+ldc.i4 3
+M00000013_IL_004c:
+conv.i4
+M00000013_IL_004d:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_004f:
+brtrue M00000013_IL_0059
+M00000013_IL_0054:
+br M00000013_IL_0065
+M00000013_IL_0059:
+ldarg 0
+M00000013_IL_005a:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C41636365737344656E6965645061796C6F61643E
+M00000013_IL_005f:
+box System.Runtime.Reflection.ReflectionError.AccessDenied
+M00000013_IL_0064:
+ret
+M00000013_IL_0065:
+M00000013_IL_0066:
+ldarg 0
+M00000013_IL_0067:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000013_IL_006c:
+conv.i4
+M00000013_IL_006d:
+ldc.i4 4
+M00000013_IL_006e:
+conv.i4
+M00000013_IL_006f:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_0071:
+brtrue M00000013_IL_007b
+M00000013_IL_0076:
+br M00000013_IL_0087
+M00000013_IL_007b:
+ldarg 0
+M00000013_IL_007c:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E67436F6E7374727563746F725061796C6F61643E
+M00000013_IL_0081:
+box System.Runtime.Reflection.ReflectionError.MissingConstructor
+M00000013_IL_0086:
+ret
+M00000013_IL_0087:
+M00000013_IL_0088:
+ldarg 0
+M00000013_IL_0089:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000013_IL_008e:
+conv.i4
+M00000013_IL_008f:
+ldc.i4 5
+M00000013_IL_0090:
+conv.i4
+M00000013_IL_0091:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_0093:
+brtrue M00000013_IL_009d
+M00000013_IL_0098:
+br M00000013_IL_00a9
+M00000013_IL_009d:
+ldarg 0
+M00000013_IL_009e:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F7274656450726F70657274795061796C6F61643E
+M00000013_IL_00a3:
+box System.Runtime.Reflection.ReflectionError.UnsupportedProperty
+M00000013_IL_00a8:
+ret
+M00000013_IL_00a9:
+M00000013_IL_00aa:
+ldarg 0
+M00000013_IL_00ab:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000013_IL_00b0:
+conv.i4
+M00000013_IL_00b1:
+ldc.i4 6
+M00000013_IL_00b2:
+conv.i4
+M00000013_IL_00b3:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_00b5:
+brtrue M00000013_IL_00bf
+M00000013_IL_00ba:
+br M00000013_IL_00cb
+M00000013_IL_00bf:
+ldarg 0
+M00000013_IL_00c0:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E674163636573736F725061796C6F61643E
+M00000013_IL_00c5:
+box System.Runtime.Reflection.ReflectionError.MissingAccessor
+M00000013_IL_00ca:
+ret
+M00000013_IL_00cb:
+M00000013_IL_00cc:
+ldarg 0
+M00000013_IL_00cd:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000013_IL_00d2:
+conv.i4
+M00000013_IL_00d3:
+ldc.i4 7
+M00000013_IL_00d4:
+conv.i4
+M00000013_IL_00d5:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_00d7:
+brtrue M00000013_IL_00e1
+M00000013_IL_00dc:
+br M00000013_IL_00ed
+M00000013_IL_00e1:
+ldarg 0
+M00000013_IL_00e2:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696452656365697665725061796C6F61643E
+M00000013_IL_00e7:
+box System.Runtime.Reflection.ReflectionError.InvalidReceiver
+M00000013_IL_00ec:
+ret
+M00000013_IL_00ed:
+M00000013_IL_00ee:
+ldarg 0
+M00000013_IL_00ef:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C5461673E
+M00000013_IL_00f4:
+conv.i4
+M00000013_IL_00f5:
+ldc.i4 8
+M00000013_IL_00f6:
+conv.i4
+M00000013_IL_00f7:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_00f9:
+brtrue M00000013_IL_0103
+M00000013_IL_00fe:
+br M00000013_IL_010f
+M00000013_IL_0103:
+ldarg 0
+M00000013_IL_0104:
+ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C696456616C75655061796C6F61643E
+M00000013_IL_0109:
+box System.Runtime.Reflection.ReflectionError.InvalidValue
+M00000013_IL_010e:
+ret
+M00000013_IL_010f:
+M00000013_IL_0110:
+M00000013_IL_0111:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.DefaultReference53797374656D2E4F626A656374()
+ret
+.end
+.method instance byref get_HasValue() -> Boolean
+M00000014_IL_0000:
+ldarg 0
+M00000014_IL_0001:
+call instance System.Runtime.Reflection.ReflectionError::get_Value()
+M00000014_IL_0006:
+M00000014_IL_0007:
+ref.isnull
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000014_IL_0009:
+ldc.i4 0
+M00000014_IL_000a:
+ceq
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanToInt32(Boolean)
+M00000014_IL_000c:
+call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.end

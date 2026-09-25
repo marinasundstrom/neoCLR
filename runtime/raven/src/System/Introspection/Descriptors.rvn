@@ -329,6 +329,8 @@ public sealed interface TypeInfo : MemberInfo, Equatable<TypeInfo> {
 internal class RuntimeTypeInfo : TypeInfo {
     private field Handle: RuntimeTypeHandle
 
+    internal val ExecutionHandle: RuntimeTypeHandle => Handle
+
     private init(handle: RuntimeTypeHandle) {
         Handle = handle
     }

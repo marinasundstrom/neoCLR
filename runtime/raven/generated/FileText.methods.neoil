@@ -211,16 +211,7 @@ M00000001_IL_0139:
 ldstr "invalid native file write status"
 M00000001_IL_013e:
 call System.Fault(String)
-M00000001_IL_0143:
-call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorWriteFailedNew()
-M00000001_IL_0148:
-call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorWriteFailed(System.Storage.FileWriteError.WriteFailed)
-M00000001_IL_014d:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
-M00000001_IL_0152:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
-M00000001_IL_0157:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method static ReadAllText(String path,Int32 maxBytes) -> System.Result<String,System.Storage.FileReadError>
 .local Value local0
@@ -476,14 +467,5 @@ M00000002_IL_016a:
 ldstr "invalid native I/O status"
 M00000002_IL_016f:
 call System.Fault(String)
-M00000002_IL_0174:
-call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorReadFailedNew()
-M00000002_IL_0179:
-call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorReadFailed(System.Storage.FileReadError.ReadFailed)
-M00000002_IL_017e:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
-M00000002_IL_0183:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
-M00000002_IL_0188:
-ret
+fault "System.Fault returned unexpectedly"
 .end

@@ -162,6 +162,7 @@ M00000001_IL_00e2:
 ldstr "Unexpected metadata error status"
 M00000001_IL_00e7:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000001_IL_00ec:
 M00000001_IL_00ed:
 M00000001_IL_00ee:
@@ -219,14 +220,5 @@ M00000001_IL_0130:
 ldstr "Unexpected metadata kind"
 M00000001_IL_0135:
 call System.Fault(String)
-M00000001_IL_013a:
-call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorIoFailureNew()
-M00000001_IL_013f:
-call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLookupErrorNewSystemStorageStorageLookupErrorIoFailure(System.Storage.StorageLookupError.IoFailure)
-M00000001_IL_0144:
-call neoCLR.Library.System.Storage.Metadata.RuntimeUnion0(System.Storage.StorageLookupError)
-M00000001_IL_0149:
-call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Error<System.Storage.StorageLookupError>)
-M00000001_IL_014e:
-ret
+fault "System.Fault returned unexpectedly"
 .end

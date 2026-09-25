@@ -4251,19 +4251,7 @@ M00000046_IL_00ae:
 ldstr "URI parser returned no outcome"
 M00000046_IL_00b3:
 call System.Fault(String)
-M00000046_IL_00b8:
-M00000046_IL_00b9:
-ldstr "Invalid URI"
-M00000046_IL_00be:
-newobj instance System.Web.Http.HttpError.InvalidRequest::.ctor(String)
-M00000046_IL_00c3:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidRequest)
-M00000046_IL_00c8:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion21(System.Web.Http.HttpError)
-M00000046_IL_00cd:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion34(System.Result.Error<System.Web.Http.HttpError>)
-M00000046_IL_00d2:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method static Get(System.Uri uri) -> System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 .local String local0

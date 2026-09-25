@@ -302,6 +302,11 @@ static class ApplicationTypes
         if (!Adapters.TryGetValue(owner, out var methods)) Adapters[owner] = methods = new();
         methods[name] = body;
     }
+    public static IEnumerable<PropertyDefinition> RuntimeProperties(TypeDefinition type) =>
+        type.Properties.Where(p => LibraryNames.ContainsKey(type) ? GenericUnionLibrary.IsRuntimeProperty(p)
+            : (p.GetMethod ?? p.SetMethod) is { IsStatic: false }
+                && (p.GetMethod is not null || p.SetMethod is { } setter && !IsInitSetter(setter)));
+
     public static string Declarations(Func<TypeReference, bool, string> map, Dictionary<MethodDefinition, string> bodies)
     {
         var output = new StringBuilder();
@@ -342,15 +347,14 @@ static class ApplicationTypes
                 && RuntimeSignatures.IsCore(i.InterfaceType.Scope));
             foreach (var field in type.Fields.Where(_ => !PrimitiveLibrary.IsMatched(type) && !OpaqueLibrary.IsString(type) && !ArrayLibrary.IsMatched(type)))
                 output.AppendLine($".field {(LibraryNames.ContainsKey(type) && field.IsPrivate && !GenericUnionLibrary.IsCase(type) ? "private " : "")}{(deferredState ? "deferred " : "")}{(FieldName(field))} {map(field.FieldType, false)}");
-            if (LibraryNames.ContainsKey(type))
-                foreach (var property in type.Properties.Where(GenericUnionLibrary.IsRuntimeProperty))
-                {
-                    var receiver = (property.GetMethod ?? property.SetMethod)!.IsStatic ? "static" : "instance";
-                    output.AppendLine($".property {receiver} {MetadataIdentity.MemberName(property.Name)}({string.Join(',', property.Parameters.Select(p => map(p.ParameterType, false)))}) -> {map(property.PropertyType, false)}");
-                    if (property.GetMethod is { } getter) output.AppendLine($".get {(getter.IsStatic ? "" : "instance ")}{name}::{MethodName(getter)}({string.Join(',', getter.Parameters.Select(p => map(p.ParameterType, false)))})");
-                    if (property.SetMethod is { } setter) output.AppendLine($".set {(setter.IsStatic ? "" : "instance ")}{name}::{MethodName(setter)}({string.Join(',', setter.Parameters.Select(p => map(p.ParameterType, false)))})");
-                    output.AppendLine(".end");
-                }
+            foreach (var property in RuntimeProperties(type))
+            {
+                var receiver = (property.GetMethod ?? property.SetMethod)!.IsStatic ? "static" : "instance";
+                output.AppendLine($".property {receiver} {MetadataIdentity.MemberName(property.Name)}({string.Join(',', property.Parameters.Select(p => map(p.ParameterType, false)))}) -> {map(property.PropertyType, false)}");
+                if (property.GetMethod is { } getter) output.AppendLine($".get {(getter.IsStatic ? "" : "instance ")}{name}::{MethodName(getter)}({string.Join(',', getter.Parameters.Select(p => map(p.ParameterType, false)))})");
+                if (property.SetMethod is { } setter && (IsLibrary(type) || !IsInitSetter(setter))) output.AppendLine($".set {(setter.IsStatic ? "" : "instance ")}{name}::{MethodName(setter)}({string.Join(',', setter.Parameters.Select(p => map(p.ParameterType, false)))})");
+                output.AppendLine(".end");
+            }
             foreach (var body in bodies.Where(p => p.Key.DeclaringType == type && !ArrayLibrary.IsIterator(p.Key))) output.Append(body.Value);
             if (Adapters.TryGetValue(name, out var adapters)) foreach (var body in adapters.Values) output.Append(body);
             output.AppendLine(".end");

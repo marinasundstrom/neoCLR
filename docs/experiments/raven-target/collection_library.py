@@ -66,6 +66,7 @@ def build(path: Path) -> str:
         # Raven owns descriptor bodies; legacy Neo retains its value-based profile.
         return (build(ROOT / 'runtime/raven/ParameterInfo.neoil')
                 + build(ROOT / 'runtime/raven/Descriptors.neoil')
+                + build(ROOT / 'runtime/raven/ReflectionError.neoil')
                 + build(ROOT / 'runtime/raven/BindingFlags.neoil'))
     if path == ROOT / 'runtime/System/Collections/List.neoil':
         return build(ROOT / 'runtime/raven/CollectionContracts.neoil') + build(ROOT / 'runtime/raven/List.neoil')
@@ -92,6 +93,7 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/neoCLR/Runtime/EnumInspection.neoil')
         result += build(ROOT / 'runtime/raven/HashCode.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectTypeHandle.neoil')
+        result += build(ROOT / 'runtime/neoCLR/Runtime/ReflectionExecution.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectIdentity.neoil')
         result += build(ROOT / 'runtime/raven/SingleError.neoil')
         result += build(ROOT / 'runtime/raven/Linq.neoil')

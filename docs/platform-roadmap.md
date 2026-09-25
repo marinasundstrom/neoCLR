@@ -187,9 +187,11 @@ keep the remaining frozen-compiler observations explicit.
 now plans and executes a public parameterless nongeneric class constructor through
 ordinary interpreter frames. Checked instance property get/set now uses the actual
 accessors and virtual dispatch, with receiver/value validation and GC coverage.
-Public Result-based extensions are the next bounded slice; object mapping follows.
-Current introspection exposes member metadata but not public value access, assignment
-or construction/invocation. **Author clarification:** `System.Runtime.Reflection`
+Public Result-based CreateInstance/GetValue/SetValue extensions now have a
+[compiled consumer](experiments/reflection-execution/README.md), application property
+metadata, source-access checks and API reference coverage. The next bounded slice is
+one JSON object-mapping round trip through these operations. General invocation and
+field assignment remain outside this checkpoint. **Author clarification:** `System.Runtime.Reflection`
 will provide extensions to the `System.Introspection` model; those operations work
 when the model is backed by loaded runtime types. Preserve introspection as the
 metadata model instead of putting runtime execution on every metadata provider.

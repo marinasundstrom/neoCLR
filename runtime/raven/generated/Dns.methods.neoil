@@ -223,11 +223,6 @@ M00000006_IL_00aa:
 ldstr "invalid native DNS error"
 M00000006_IL_00af:
 call System.Fault(String)
-M00000006_IL_00b4:
-call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorLookupFailedNew()
-M00000006_IL_00b9:
-call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorNewSystemNetworkingDnsErrorLookupFailed(System.Networking.DnsError.LookupFailed)
-M00000006_IL_00be:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .end

@@ -157,6 +157,7 @@ M0000000d_IL_0020:
 ldstr "Probe requires four IPv4 octets"
 M0000000d_IL_0025:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M0000000d_IL_002a:
 M0000000d_IL_002b:
 ret
@@ -198,6 +199,7 @@ M0000000e_IL_0021:
 ldstr "Probe requires sixteen IPv6 octets"
 M0000000e_IL_0026:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M0000000e_IL_002b:
 M0000000e_IL_002c:
 ret

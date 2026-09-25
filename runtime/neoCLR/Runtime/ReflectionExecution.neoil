@@ -1,0 +1,19 @@
+; Private runtime-backed reflection services. Public callers use checked Raven extensions.
+.function neoCLR.Runtime.ReflectionConstructionCheck(System.RuntimeTypeHandle type) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ReflectionConstruct(System.RuntimeTypeHandle type) -> System.Object
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ReflectionPropertyGetCheck(System.RuntimeTypeHandle type,Int32 index,System.Object receiver) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ReflectionPropertySetCheck(System.RuntimeTypeHandle type,Int32 index,System.Object receiver,System.Object value) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ReflectionPropertyGet(System.RuntimeTypeHandle type,Int32 index,System.Object receiver) -> System.Object
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ReflectionPropertySet(System.RuntimeTypeHandle type,Int32 index,System.Object receiver,System.Object value) -> Void
+.methodimpl InternalCall
+.end

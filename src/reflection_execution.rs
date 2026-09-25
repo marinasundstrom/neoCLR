@@ -48,13 +48,16 @@ pub(crate) fn constructor(
     let mut target = FunctionRef {
         definition: None,
         name: format!("{}..ctor", definition.name),
-        owner: Some(owner),
+        owner: Some(owner.clone()),
         instance: true,
         generic_arguments: vec![],
         parameters: vec![],
     };
     let constructor = crate::vm::resolve_constructor(module, &target)
         .map_err(|_| ConstructionError::MissingConstructor)?;
+    if !crate::metadata_origin::reflection_public(module, &owner, &constructor) {
+        return Err(ConstructionError::AccessDenied);
+    }
     crate::access::check_call(module, None, &constructor)
         .map_err(|_| ConstructionError::AccessDenied)?;
     target.definition = constructor.definition;

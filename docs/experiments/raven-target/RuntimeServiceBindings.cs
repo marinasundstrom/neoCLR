@@ -90,6 +90,12 @@ static class RuntimeServiceBindings
             ("ObjectEquals", ["System.Object", "System.Object"], "Boolean"),
             ("ObjectReferenceEquals", ["System.Object", "System.Object"], "Boolean"),
             ("ObjectIdentityHash", ["System.Object"], "Int32"),
+            ("ReflectionConstructionCheck", ["System.RuntimeTypeHandle"], "Int32"),
+            ("ReflectionConstruct", ["System.RuntimeTypeHandle"], "System.Object"),
+            ("ReflectionPropertyGetCheck", ["System.RuntimeTypeHandle", "Int32", "System.Object"], "Int32"),
+            ("ReflectionPropertySetCheck", ["System.RuntimeTypeHandle", "Int32", "System.Object", "System.Object"], "Int32"),
+            ("ReflectionPropertyGet", ["System.RuntimeTypeHandle", "Int32", "System.Object"], "System.Object"),
+            ("ReflectionPropertySet", ["System.RuntimeTypeHandle", "Int32", "System.Object", "System.Object"], "noresult"),
             ("ObjectTypeHandle", ["System.Object"], "System.RuntimeTypeHandle"),
             ("TypeName", ["System.RuntimeTypeHandle"], "String"),
             ("TypeEquals", ["System.RuntimeTypeHandle", "System.RuntimeTypeHandle"], "Boolean"),
@@ -136,7 +142,7 @@ static class RuntimeServiceBindings
     };
     static bool IsProperty(string name) => name is "CurrentTaskQueue" or "DefaultTaskQueue";
     public static string Declarations => "\n#nullable enable annotations\nnamespace Runtime.CompilerServices { public static class RuntimeServices { "
-        + string.Join(" ", Members.Select(m => IsProperty(m.Name) ? $"public static {CSharp(m.Result)} {m.Name} => default;" : $"public static {CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => CSharp(t) + ((m.Name == "ObjectReferenceEquals" || m.Name == "ObjectEquals" && i == 1) ? "?" : "") + " arg" + i))}) {(m.Result == "noresult" ? "{ }" : "=> default;")}")) + " public static bool IsValue<T>(System.Value value) => default; public static T UnpackValue<T>(System.Value value) => default; } }\n#nullable restore annotations\n";
+        + string.Join(" ", Members.Select(m => IsProperty(m.Name) ? $"public static {CSharp(m.Result)} {m.Name} => default;" : $"public static {CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => CSharp(t) + ((m.Name == "ObjectReferenceEquals" || m.Name == "ObjectEquals" && i == 1 || m.Name.StartsWith("ReflectionProperty") && i >= 2) ? "?" : "") + " arg" + i))}) {(m.Result == "noresult" ? "{ }" : "=> default;")}")) + " public static bool IsValue<T>(System.Value value) => default; public static T UnpackValue<T>(System.Value value) => default; } }\n#nullable restore annotations\n";
 
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
@@ -158,6 +164,8 @@ static class RuntimeServiceBindings
             return new("", args, result, Instruction: "call neoCLR.Runtime.NotifyWorker(Int32,System.Func<Void>)\npop");
         if (reference.Name == "RegisterDefaultTaskQueue")
             return new("", args, result, Instruction: "call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue)\npop");
+        if (reference.Name == "ReflectionPropertySet")
+            return new("", args, result, Instruction: "call neoCLR.Runtime.ReflectionPropertySet(System.RuntimeTypeHandle,Int32,System.Object,System.Object)\npop");
         if (reference.Name == "WriteLine")
             return new("", args, result, Instruction: "call neoCLR.Runtime.WriteLine(String)\npop");
         if (reference.Name is "IntPtrToInt64" or "UIntPtrToUInt64")

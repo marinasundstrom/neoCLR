@@ -1,0 +1,10 @@
+import System.*
+import System.Introspection.*
+
+func MissingProperty() -> PropertyInfo {
+    System.Fault("Missing reflection property")
+}
+
+func Main() {
+    let _ = MissingProperty()
+}

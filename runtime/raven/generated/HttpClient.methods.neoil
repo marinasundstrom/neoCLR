@@ -171,6 +171,7 @@ M00000002_IL_0092:
 ldstr "BaseUri requires Some or None"
 M00000002_IL_0097:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000002_IL_009c:
 M00000002_IL_009d:
 M00000002_IL_009e:
@@ -434,17 +435,7 @@ M00000008_IL_00c4:
 ldstr "URI parser returned no outcome"
 M00000008_IL_00c9:
 call System.Fault(String)
-M00000008_IL_00ce:
-M00000008_IL_00cf:
-ldstr "Invalid URI"
-M00000008_IL_00d4:
-newobj instance System.Web.Http.HttpError.InvalidRequest::.ctor(String)
-M00000008_IL_00d9:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidRequest)
-M00000008_IL_00de:
-call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M00000008_IL_00e3:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method instance Get(System.Uri uri) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000009_IL_0000:
@@ -606,17 +597,7 @@ M0000000a_IL_00bb:
 ldstr "Request construction returned no outcome"
 M0000000a_IL_00c0:
 call System.Fault(String)
-M0000000a_IL_00c5:
-M0000000a_IL_00c6:
-ldstr "Invalid request"
-M0000000a_IL_00cb:
-newobj instance System.Web.Http.HttpError.InvalidRequest::.ctor(String)
-M0000000a_IL_00d0:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidRequest)
-M0000000a_IL_00d5:
-call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M0000000a_IL_00da:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method instance Post(String url,System.Web.Http.HttpContent content) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M0000000b_IL_0000:
@@ -784,17 +765,7 @@ M0000000c_IL_00c5:
 ldstr "URI parser returned no outcome"
 M0000000c_IL_00ca:
 call System.Fault(String)
-M0000000c_IL_00cf:
-M0000000c_IL_00d0:
-ldstr "Invalid URI"
-M0000000c_IL_00d5:
-newobj instance System.Web.Http.HttpError.InvalidRequest::.ctor(String)
-M0000000c_IL_00da:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidRequest)
-M0000000c_IL_00df:
-call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M0000000c_IL_00e4:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method instance Post(System.Uri uri,System.Web.Http.HttpContent content) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M0000000d_IL_0000:
@@ -960,17 +931,7 @@ M0000000e_IL_00bc:
 ldstr "Request construction returned no outcome"
 M0000000e_IL_00c1:
 call System.Fault(String)
-M0000000e_IL_00c6:
-M0000000e_IL_00c7:
-ldstr "Invalid request"
-M0000000e_IL_00cc:
-newobj instance System.Web.Http.HttpError.InvalidRequest::.ctor(String)
-M0000000e_IL_00d1:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidRequest)
-M0000000e_IL_00d6:
-call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M0000000e_IL_00db:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method private instance CreatePost(System.Uri uri,System.Web.Http.HttpContent content) -> System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 .local System.Uri local0
@@ -1218,17 +1179,7 @@ M00000011_IL_00c5:
 ldstr "URI parser returned no outcome"
 M00000011_IL_00ca:
 call System.Fault(String)
-M00000011_IL_00cf:
-M00000011_IL_00d0:
-ldstr "Invalid URI"
-M00000011_IL_00d5:
-newobj instance System.Web.Http.HttpError.InvalidRequest::.ctor(String)
-M00000011_IL_00da:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidRequest)
-M00000011_IL_00df:
-call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M00000011_IL_00e4:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method instance Put(System.Uri uri,System.Web.Http.HttpContent content) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000012_IL_0000:
@@ -1394,17 +1345,7 @@ M00000013_IL_00bc:
 ldstr "Request construction returned no outcome"
 M00000013_IL_00c1:
 call System.Fault(String)
-M00000013_IL_00c6:
-M00000013_IL_00c7:
-ldstr "Invalid request"
-M00000013_IL_00cc:
-newobj instance System.Web.Http.HttpError.InvalidRequest::.ctor(String)
-M00000013_IL_00d1:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidRequest)
-M00000013_IL_00d6:
-call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M00000013_IL_00db:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method private instance CreatePut(System.Uri uri,System.Web.Http.HttpContent content) -> System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 .local System.Uri local0
@@ -1652,17 +1593,7 @@ M00000016_IL_00c5:
 ldstr "URI parser returned no outcome"
 M00000016_IL_00ca:
 call System.Fault(String)
-M00000016_IL_00cf:
-M00000016_IL_00d0:
-ldstr "Invalid URI"
-M00000016_IL_00d5:
-newobj instance System.Web.Http.HttpError.InvalidRequest::.ctor(String)
-M00000016_IL_00da:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidRequest)
-M00000016_IL_00df:
-call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M00000016_IL_00e4:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method instance Patch(System.Uri uri,System.Web.Http.HttpContent content) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000017_IL_0000:
@@ -1828,17 +1759,7 @@ M00000018_IL_00bc:
 ldstr "Request construction returned no outcome"
 M00000018_IL_00c1:
 call System.Fault(String)
-M00000018_IL_00c6:
-M00000018_IL_00c7:
-ldstr "Invalid request"
-M00000018_IL_00cc:
-newobj instance System.Web.Http.HttpError.InvalidRequest::.ctor(String)
-M00000018_IL_00d1:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidRequest)
-M00000018_IL_00d6:
-call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M00000018_IL_00db:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method private instance CreatePatch(System.Uri uri,System.Web.Http.HttpContent content) -> System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 .local System.Uri local0
@@ -2082,17 +2003,7 @@ M0000001b_IL_00c4:
 ldstr "URI parser returned no outcome"
 M0000001b_IL_00c9:
 call System.Fault(String)
-M0000001b_IL_00ce:
-M0000001b_IL_00cf:
-ldstr "Invalid URI"
-M0000001b_IL_00d4:
-newobj instance System.Web.Http.HttpError.InvalidRequest::.ctor(String)
-M0000001b_IL_00d9:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidRequest)
-M0000001b_IL_00de:
-call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M0000001b_IL_00e3:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method instance Delete(System.Uri uri) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M0000001c_IL_0000:
@@ -2254,17 +2165,7 @@ M0000001d_IL_00bb:
 ldstr "Request construction returned no outcome"
 M0000001d_IL_00c0:
 call System.Fault(String)
-M0000001d_IL_00c5:
-M0000001d_IL_00c6:
-ldstr "Invalid request"
-M0000001d_IL_00cb:
-newobj instance System.Web.Http.HttpError.InvalidRequest::.ctor(String)
-M0000001d_IL_00d0:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidRequest)
-M0000001d_IL_00d5:
-call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M0000001d_IL_00da:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method private instance CreateDelete(System.Uri uri) -> System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 .local System.Uri local0
@@ -2499,17 +2400,7 @@ M00000020_IL_00c4:
 ldstr "URI parser returned no outcome"
 M00000020_IL_00c9:
 call System.Fault(String)
-M00000020_IL_00ce:
-M00000020_IL_00cf:
-ldstr "Invalid URI"
-M00000020_IL_00d4:
-newobj instance System.Web.Http.HttpError.InvalidRequest::.ctor(String)
-M00000020_IL_00d9:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidRequest)
-M00000020_IL_00de:
-call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M00000020_IL_00e3:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method instance Head(System.Uri uri) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000021_IL_0000:
@@ -2671,17 +2562,7 @@ M00000022_IL_00bb:
 ldstr "Request construction returned no outcome"
 M00000022_IL_00c0:
 call System.Fault(String)
-M00000022_IL_00c5:
-M00000022_IL_00c6:
-ldstr "Invalid request"
-M00000022_IL_00cb:
-newobj instance System.Web.Http.HttpError.InvalidRequest::.ctor(String)
-M00000022_IL_00d0:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidRequest)
-M00000022_IL_00d5:
-call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M00000022_IL_00da:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .method private instance CreateHead(System.Uri uri) -> System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 .local System.Uri local0
@@ -3528,19 +3409,7 @@ M0000002b_IL_0225:
 ldstr "URI resolution returned no outcome"
 M0000002b_IL_022a:
 call System.Fault(String)
-M0000002b_IL_022f:
-M0000002b_IL_0230:
-ldstr "Invalid URI"
-M0000002b_IL_0235:
-newobj instance System.Web.Http.HttpError.InvalidRequest::.ctor(String)
-M0000002b_IL_023a:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidRequest)
-M0000002b_IL_023f:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion21(System.Web.Http.HttpError)
-M0000002b_IL_0244:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion29(System.Result.Error<System.Web.Http.HttpError>)
-M0000002b_IL_0249:
-ret
+fault "System.Fault returned unexpectedly"
 M0000002b_IL_024a:
 M0000002b_IL_024b:
 M0000002b_IL_024c:

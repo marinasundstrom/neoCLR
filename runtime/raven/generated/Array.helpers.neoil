@@ -179,6 +179,7 @@ M0000000a_IL_0037:
 ldstr "Iterator has no current element"
 M0000000a_IL_003c:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M0000000a_IL_0041:
 M0000000a_IL_0042:
 M0000000a_IL_0043:

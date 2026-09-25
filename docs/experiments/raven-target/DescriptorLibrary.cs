@@ -42,6 +42,8 @@ static class DescriptorLibrary
         }
         result.AddRange(roots(source.GetType("System.Introspection.RuntimeTypeInfo"),
             core.GetType("System.Introspection.RuntimeTypeInfo"), "System.Introspection.RuntimeTypeInfo"));
+        result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.TypeReflectionExtensions"));
+        result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.PropertyReflectionExtensions"));
         return result.ToArray();
     }
     static bool CoreStorage(TypeReference type, ModuleDefinition source)

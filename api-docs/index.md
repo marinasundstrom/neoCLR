@@ -112,3 +112,5 @@ without authority; without a base, pass an absolute HTTP URI. See
 The development [MemoryStream](xref:System.IO.MemoryStream) provides bounded managed
 byte storage for InputStream, OutputStream and SeekableStream, including text/JSON
 round trips without file access. It has a shared cursor and a provisional 64 KiB bound.
+
+Development [runtime reflection](reflection.md) adds checked construction and property access to runtime-backed introspection descriptors.

@@ -124,7 +124,7 @@ static class LibraryImplementation
                 && m.Parameters.Zip(method.Parameters).All(p => p.First.Name == p.Second.Name && SameType(p.First.ParameterType, p.Second.ParameterType))).ToArray();
             if (matches.Length == 1) CheckMethod(matches[0]);
             if (matches.Length != 1) throw new InvalidDataException("Library export does not match reference contract: " + method.FullName);
-            if (owner is "System.Linq.Operators" or "System.OptionOperators" or "System.OptionNestedOperators" or "System.ResultOperators" or "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators")
+            if (owner is "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" or "System.Linq.Operators" or "System.OptionOperators" or "System.OptionNestedOperators" or "System.ResultOperators" or "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators")
                 CheckExtensionContract(method, matches[0]);
         }
         return methods.Concat(consoleProviders).ToArray();
@@ -397,6 +397,7 @@ static class LibraryImplementation
     {
         var helpers = Regex.Matches(text, @"(?m)^\.function (?:internal )?([^\(]+)\(").Select(m => m.Groups[1].Value)
             .Where(h => !h.StartsWith(owner + ".", StringComparison.Ordinal)
+                && !(owner == "System.Introspection.MemberInfo" && (h.StartsWith("System.Runtime.Reflection.TypeReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.PropertyReflectionExtensions.", StringComparison.Ordinal)))
                 && !(owner == "System.Tasks.Task" && (h.StartsWith("System.Tasks.TaskOperators.", StringComparison.Ordinal) || h.StartsWith("System.Tasks.TaskResultOperators.", StringComparison.Ordinal)))).ToArray();
         // Adapters generated from open signatures must themselves declare the free
         // method parameters. Propagate through helper calls before qualifying names.
@@ -416,6 +417,7 @@ static class LibraryImplementation
                             changed |= parameters[helper].Add(parameter);
         } while (changed);
         foreach (var helper in helpers.Where(h => !h.StartsWith(owner + ".", StringComparison.Ordinal)
+                && !(owner == "System.Introspection.MemberInfo" && (h.StartsWith("System.Runtime.Reflection.TypeReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.PropertyReflectionExtensions.", StringComparison.Ordinal)))
                 && !(owner == "System.Tasks.Task" && (h.StartsWith("System.Tasks.TaskOperators.", StringComparison.Ordinal) || h.StartsWith("System.Tasks.TaskResultOperators.", StringComparison.Ordinal)))))
         {
             var generic = parameters[helper].Count == 0 ? "" : "<" + string.Join(',',

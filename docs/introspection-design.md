@@ -650,3 +650,16 @@ module-scoped declaring TypeDef token; it is not inferred from dotted display na
 Import retains the owner even when only the nested type is used. Missing owners
 and ownership cycles are rejected in source and serialized artifacts. No nested-type
 query, dynamic loading or reflection invocation is added by this slice.
+
+
+### Application property execution checkpoint — 2026-09-25
+
+The [reflection checkpoint](reflection-execution.md) now projects instance application
+properties and their original Property tokens. Static application properties remain
+outside this projection; init-only setters are omitted from assignment metadata.
+Original CLI member accessibility and containing-type public visibility accompany
+source origins for reflective admission. They restrict execution through the new
+public extensions and correct method-accessibility queries; ordinary lowered call
+permissions are unchanged. Older imported origins without these optional fields
+load but are denied reflective execution. The matching runtime is required to read
+new origin fields. General method invocation and field assignment remain future work.

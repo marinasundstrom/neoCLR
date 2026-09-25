@@ -246,6 +246,7 @@ M00000006_IL_0039:
 ldstr "Query count exceeds Int32 capacity"
 M00000006_IL_003e:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000006_IL_0043:
 M00000006_IL_0044:
 M00000006_IL_0045:
@@ -337,6 +338,7 @@ M00000007_IL_0050:
 ldstr "Query count exceeds Int32 capacity"
 M00000007_IL_0055:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000007_IL_005a:
 M00000007_IL_005b:
 M00000007_IL_005c:

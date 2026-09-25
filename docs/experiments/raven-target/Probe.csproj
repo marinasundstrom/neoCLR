@@ -32,4 +32,5 @@
   </Target>
 <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Networking/IPAddressError.rvn" LogicalName="NeoCLR.IPAddressError.rvn" /></ItemGroup>
 <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Data/Json/JsonError.rvn" LogicalName="NeoCLR.JsonError.rvn" /></ItemGroup>
+<ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn" LogicalName="NeoCLR.ReflectionError.rvn" /></ItemGroup>
 </Project>

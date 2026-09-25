@@ -1,0 +1,88 @@
+import System.*
+import System.Introspection.*
+import System.Runtime.Reflection.*
+import System.Result.*
+import System.Option.*
+
+public class Report {
+    private var stored: int = 0
+
+    init() {
+        stored = 7
+    }
+
+    var Count: int {
+        get => stored
+        set => stored = value + 1
+    }
+
+    var Name: string? { get; set; } = ""
+    val ReadOnly: int => 9
+    val Restricted: int { get; private set; } = 0
+}
+
+public class Locked {
+    private init() { }
+}
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("Reflection contract failed")
+    }
+}
+
+func Property(name: string) -> PropertyInfo {
+    for property in typeof(Report).GetProperties() {
+        if property.Name == name {
+            return property
+        }
+    }
+    System.Fault("Missing fixture property")
+}
+
+// Construction and assignment errors propagate without obscuring the workflow.
+func CreateReport() -> Result<Object, ReflectionError> {
+    let report = typeof(Report).CreateInstance()?
+    let count = Property("Count")
+    let initial = count.GetValue(report)?
+    Check(initial is int value && value == 7)
+    let _ = count.SetValue(report, 41)?
+    let _ = Property("Name").SetValue(report, "Café")?
+    return Ok(report)
+}
+
+func Main() {
+    if let Ok(report) = CreateReport() {
+        let count = Property("Count")
+        if let Ok(value) = count.GetValue(report) {
+            Check(value is int number && number == 42)
+        } else {
+            System.Fault("Property read failed")
+        }
+        Check(count.SetValue(report, "wrong") is Error(ReflectionError.InvalidValue))
+        Check(count.SetValue(report, null) is Error(ReflectionError.InvalidValue))
+        Check(count.GetValue(null) is Error(ReflectionError.InvalidReceiver))
+        Check(Property("ReadOnly").SetValue(report, 1) is Error(ReflectionError.MissingAccessor))
+        Check(typeof(int).CreateInstance() is Error(ReflectionError.UnsupportedType))
+        Check(typeof(Locked).CreateInstance() is Error(ReflectionError.AccessDenied))
+        let restricted = Property("Restricted")
+        Check(restricted.MetadataToken != 0)
+        Check(restricted.GetSetMethod() is None)
+        if let Some(setter) = restricted.GetSetMethod(true) {
+            Check(setter.IsPrivate && !setter.IsPublic)
+        } else {
+            System.Fault("Missing private setter metadata")
+        }
+        Check(restricted.SetValue(report, 1) is Error(ReflectionError.AccessDenied))
+        let name = Property("Name")
+        Check(name.SetValue(report, null) is Ok(_))
+        if let Ok(nullableValue) = name.GetValue(report) {
+            Check(nullableValue is null)
+        } else {
+            System.Fault("Nullable property read failed")
+        }
+        Console.WriteLine("Reflection checks passed")
+    } else {
+        System.Fault("Report creation failed")
+    }
+}

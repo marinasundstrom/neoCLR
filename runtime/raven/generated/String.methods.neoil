@@ -118,6 +118,7 @@ M00000001_IL_0061:
 ldstr "Character sequence count changed during construction"
 M00000001_IL_0066:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000001_IL_006b:
 M00000001_IL_006c:
 M00000001_IL_006d:
@@ -424,15 +425,6 @@ M00000010_IL_0089:
 ldstr "invalid native UTF-8 slice status"
 M00000010_IL_008e:
 call System.Fault(String)
-M00000010_IL_0093:
-call neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorOutOfRangeNew()
-M00000010_IL_0098:
-call neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorNewSystemTextUtf8SliceErrorOutOfRange(System.Text.Utf8SliceError.OutOfRange)
-M00000010_IL_009d:
-call neoCLR.Library.System.String.RuntimeUnion2(System.Text.Utf8SliceError)
-M00000010_IL_00a2:
-call neoCLR.Library.System.String.RuntimeUnion3(System.Result.Error<System.Text.Utf8SliceError>)
-M00000010_IL_00a7:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .end

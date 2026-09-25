@@ -83,7 +83,7 @@ call neoCLR.Library.System.Storage.FileSystem.RuntimeBooleanToInt32(Boolean)
 M00000002_IL_0045:
 brtrue M00000002_IL_004f
 M00000002_IL_004a:
-br M00000002_IL_00f7
+br M00000002_IL_00f1
 M00000002_IL_004f:
 M00000002_IL_0050:
 M00000002_IL_0051:
@@ -160,7 +160,7 @@ ldloca local8
 M00000002_IL_00af:
 call neoCLR.Library.System.Storage.FileSystem.RuntimeUnion2(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Error<System.Text.Utf8SliceError>&)
 M00000002_IL_00b4:
-brfalse M00000002_IL_00f1
+brfalse M00000002_IL_00ec
 M00000002_IL_00b9:
 ldloc local8
 M00000002_IL_00bb:
@@ -180,7 +180,7 @@ ldc.i4 1
 M00000002_IL_00ca:
 br M00000002_IL_00d0
 M00000002_IL_00d0:
-brfalse M00000002_IL_00f1
+brfalse M00000002_IL_00ec
 M00000002_IL_00d5:
 M00000002_IL_00d6:
 br M00000002_IL_00e1
@@ -189,26 +189,24 @@ M00000002_IL_00e2:
 ldstr "Invalid parsed path boundary"
 M00000002_IL_00e7:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000002_IL_00ec:
-br M00000002_IL_00f6
+M00000002_IL_00ed:
+M00000002_IL_00ee:
+M00000002_IL_00ef:
+M00000002_IL_00f0:
+fault "Guest program reached a terminal failure"
 M00000002_IL_00f1:
 M00000002_IL_00f2:
 M00000002_IL_00f3:
-M00000002_IL_00f4:
-M00000002_IL_00f5:
-fault "Guest program reached a terminal failure"
-M00000002_IL_00f6:
-M00000002_IL_00f7:
-M00000002_IL_00f8:
-M00000002_IL_00f9:
 ldarg 0
-M00000002_IL_00fa:
+M00000002_IL_00f4:
 ldfld System.Storage.FileSystem::root
-M00000002_IL_00ff:
+M00000002_IL_00f9:
 ldloc local0
-M00000002_IL_0100:
+M00000002_IL_00fa:
 call System.Storage.Path::Combine(String,String)
-M00000002_IL_0105:
+M00000002_IL_00ff:
 ret
 .end
 .method instance GetItem(System.Storage.Path path) -> System.Result<System.Storage.StorageItem,System.Storage.StorageLookupError>

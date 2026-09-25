@@ -255,3 +255,11 @@ MemoryStream is included with all public members in the development reference. I
 The later System.Data.Json slice now exposes a provisional public DOM and DOM-only
 JsonSerializer. JsonError retains typed lookup/conversion and nested I/O failures.
 Every public type is inventoried; codec helper classes remain internal.
+
+System.Runtime.Reflection now has generated type/member coverage and a linked
+[execution guide](reflection.md). The Rust host's MetadataOrigin additionally carries
+optional publicly_visible and member_access source-access fields; SourceAccess lists
+Public, Private, Assembly, Family, FamilyOrAssembly, FamilyAndAssembly and
+CompilerControlled. These host/artifact fields are documented in that guide, not
+invented as guest CLI APIs. The website build was explicitly skipped for this slice;
+the matching reference assembly, XML and inventory were refreshed and checked.

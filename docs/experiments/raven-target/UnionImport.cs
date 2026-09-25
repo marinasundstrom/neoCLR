@@ -60,7 +60,7 @@ static class UnionImport
         if (libraryOwner is not null) ApplicationTypes.SetLibraryScope(app.MainModule, libraryOwner);
         var entry = libraryOwner is null ? app.EntryPoint ?? throw new InvalidDataException("Missing entry point.") : null;
         string Name(MethodDefinition method) => libraryOwner is null ? MetadataIdentity.FunctionName(method)
-            : exports.Contains(method) ? (method.DeclaringType.FullName is "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators" ? method.DeclaringType.FullName : libraryOwner) + "." + LibraryImplementation.GenericName(method)
+            : exports.Contains(method) ? (method.DeclaringType.FullName is "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators" or "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" ? method.DeclaringType.FullName : libraryOwner) + "." + LibraryImplementation.GenericName(method)
             : throw new InvalidDataException("Unexported implementation dependency: " + method.FullName);
         var entryHasArguments = entry is not null && EntryPointBindings.HasArguments(entry, collectionProfile);
         if (collectionProfile) { InterfaceBindings.Validate(library.MainModule); CollectionBindings.Validate(library.MainModule); ReflectionBindings.Validate(library.MainModule); NativeMemoryBindings.Validate(library.MainModule); }
@@ -936,6 +936,13 @@ static class UnionImport
                         // Conditional-out results must reach their branch directly so the runtime
                         // verifier retains the relationship between success and assignment.
                         if (call.Result == "Boolean" && conditionalOut < 0) code.Append(BooleanBindings.Convert("Boolean", "Int32"));
+                        if (FaultBindings.Bind(reference, targetMethod) is not null)
+                        {
+                            // Raven may end a non-void method at this terminal call.
+                            // Keep its message-bearing invocation and close the IL path.
+                            code.AppendLine("fault \"System.Fault returned unexpectedly\"");
+                            terminates = true;
+                        }
                         break;
                     case Code.Ret:
                         if (result != "noresult") ConvertTop(result);

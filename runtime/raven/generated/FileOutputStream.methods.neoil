@@ -482,11 +482,6 @@ M00000006_IL_011c:
 ldstr "invalid native stream error"
 M00000006_IL_0121:
 call System.Fault(String)
-M00000006_IL_0126:
-call neoCLR.Library.System.IO.FileOutputStream.RuntimeErrorSystemIOStreamErrorIoFailureNew()
-M00000006_IL_012b:
-call neoCLR.Library.System.IO.FileOutputStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorIoFailure(System.IO.StreamError.IoFailure)
-M00000006_IL_0130:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .end

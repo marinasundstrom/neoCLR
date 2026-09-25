@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    "ReflectionError": "System.Runtime.Reflection.ReflectionError",
     'JsonError': 'System.Data.Json.JsonError',
     'JsonValue': 'System.Data.Json.JsonValue',
     "Cancellation": "System.Concurrency.CancellationTokenSource",
@@ -136,6 +137,8 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    "ReflectionError": "runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn",
+    "ReflectionExtensions": "runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn",
     'JsonValue': 'runtime/raven/src/System/Data/Json/JsonValue.rvn',
     'JsonError': 'runtime/raven/src/System/Data/Json/JsonError.rvn',
     'JsonDocument': 'runtime/raven/src/System/Data/Json/JsonDocument.rvn',
@@ -281,7 +284,7 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
         text = text.replace('.method instance override ToString()', '.method instance ToString()')
     lines = text.splitlines(keepends=True)
     methods, helpers, types = [], {}, []
-    task_operators = {}
+    extension_owners = {}
     while lines:
         if not lines[0].strip():
             lines.pop(0)
@@ -309,9 +312,9 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
         assert match, lines[0]
         end = lines.index('.end\n')
         body = ''.join(lines[:end + 1])
-        if name == 'Tasks' and match[1].startswith(('System.Tasks.TaskOperators.', 'System.Tasks.TaskResultOperators.')):
+        if (name == 'Tasks' and match[1].startswith(('System.Tasks.TaskOperators.', 'System.Tasks.TaskResultOperators.'))) or (name == 'Descriptors' and match[1].startswith(('System.Runtime.Reflection.TypeReflectionExtensions.', 'System.Runtime.Reflection.PropertyReflectionExtensions.'))):
             operator_owner = match[1].rsplit('.', 1)[0]
-            task_operators.setdefault(operator_owner, []).append(body.replace('.function ' + operator_owner + '.', '.method static ', 1))
+            extension_owners.setdefault(operator_owner, []).append(body.replace('.function ' + operator_owner + '.', '.method static ', 1))
         elif match[1].startswith(owner + '.'):
             # Retain the bootstrap owner used by direct IL and the archived Neo frontend.
             # Namespace functions use marked containers; static APIs retain their owner.
@@ -325,7 +328,7 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
             assert match[1] not in helpers
             helpers[match[1]] = body
         lines = lines[end + 1:]
-    for operator_owner, bodies in task_operators.items():
+    for operator_owner, bodies in extension_owners.items():
         types.append('.type ' + operator_owner + '\n' + ''.join(bodies) + '.end\n')
     # Nongeneric classes can also own static factories. Merge their function roots
     # into the emitted class rather than leaving top-level method fragments.

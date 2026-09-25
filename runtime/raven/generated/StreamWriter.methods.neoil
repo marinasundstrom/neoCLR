@@ -310,6 +310,7 @@ M00000003_IL_0116:
 ldstr "Invalid output write count"
 M00000003_IL_011b:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000003_IL_0120:
 M00000003_IL_0121:
 M00000003_IL_0122:
@@ -335,6 +336,7 @@ M00000003_IL_0139:
 ldstr "Invalid output write count"
 M00000003_IL_013e:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000003_IL_0143:
 M00000003_IL_0144:
 M00000003_IL_0145:

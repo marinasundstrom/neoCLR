@@ -272,6 +272,7 @@ M00000003_IL_00f0:
 ldstr "Invalid input read count"
 M00000003_IL_00f5:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000003_IL_00fa:
 M00000003_IL_00fb:
 M00000003_IL_00fc:
@@ -290,6 +291,7 @@ M00000003_IL_010b:
 ldstr "Invalid input read count"
 M00000003_IL_0110:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000003_IL_0115:
 M00000003_IL_0116:
 M00000003_IL_0117:
@@ -844,6 +846,7 @@ M00000005_IL_011a:
 ldstr "Invalid input read count"
 M00000005_IL_011f:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000005_IL_0124:
 M00000005_IL_0125:
 M00000005_IL_0126:
@@ -862,6 +865,7 @@ M00000005_IL_0136:
 ldstr "Invalid input read count"
 M00000005_IL_013b:
 call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 M00000005_IL_0140:
 M00000005_IL_0141:
 M00000005_IL_0142:
@@ -1752,11 +1756,6 @@ M00000007_IL_01f2:
 ldstr "Invalid stream error"
 M00000007_IL_01f7:
 call System.Fault(String)
-M00000007_IL_01fc:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorIoFailureNew()
-M00000007_IL_0201:
-call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorIoFailure(System.IO.TextReadError.IoFailure)
-M00000007_IL_0206:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .end

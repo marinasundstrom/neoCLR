@@ -1,4 +1,4 @@
-//! Descriptive source identity, distinct from executable neoIL definition IDs.
+//! Source identity and reflection admission, distinct from executable neoIL definition IDs.
 use crate::{Fault, Module};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
@@ -12,6 +12,18 @@ pub struct AssemblyMetadata {
     pub references: Vec<String>,
 }
 
+/// Original CLI member accessibility, independent of lowered helper visibility.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum SourceAccess {
+    Public,
+    Private,
+    Assembly,
+    Family,
+    FamilyOrAssembly,
+    FamilyAndAssembly,
+    CompilerControlled,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct MetadataOrigin {
@@ -19,6 +31,12 @@ pub struct MetadataOrigin {
     pub module: String,
     pub name: String,
     pub token: u32,
+    /// Type and all containing types are public in the imported source metadata.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub publicly_visible: Option<bool>,
+    /// Original method accessibility. Older origins lack reflection admission data.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub member_access: Option<SourceAccess>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub declaring_type_token: Option<u32>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -87,6 +105,13 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                 "metadata origin does not match its definition or assembly",
             ));
         }
+        if table != 0x02 && origin.publicly_visible.is_some()
+            || table != 0x06 && origin.member_access.is_some()
+        {
+            return Err(Fault::new(
+                "source access metadata does not match definition kind",
+            ));
+        }
         if table != 0x02 && origin.declaring_type_token.is_some() {
             return Err(Fault::new(
                 "declaring type origin applies only to type definitions",
@@ -142,4 +167,34 @@ pub(crate) fn merge(target: &mut Module, source: &Module) -> Result<(), Fault> {
         }
     }
     Ok(())
+}
+
+/// Reflection observes original member accessibility; lowering can use broader helpers.
+pub(crate) fn member_access(function: &crate::metadata::Function) -> SourceAccess {
+    function
+        .origin
+        .as_ref()
+        .and_then(|o| o.member_access)
+        .unwrap_or(match function.visibility {
+            crate::metadata::Visibility::Public => SourceAccess::Public,
+            crate::metadata::Visibility::Private => SourceAccess::Private,
+            crate::metadata::Visibility::Internal => SourceAccess::Assembly,
+        })
+}
+
+pub(crate) fn reflection_public(
+    module: &Module,
+    owner: &crate::metadata::Type,
+    function: &crate::metadata::Function,
+) -> bool {
+    let type_public = module.type_definition(owner).is_some_and(|t| {
+        t.origin
+            .as_ref()
+            .is_none_or(|o| o.publicly_visible == Some(true))
+    });
+    type_public
+        && function
+            .origin
+            .as_ref()
+            .is_none_or(|o| o.member_access == Some(SourceAccess::Public))
 }

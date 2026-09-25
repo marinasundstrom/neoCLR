@@ -114,12 +114,14 @@ fn module_with_create(types: &str, name: &str) -> neoclr::Module {
 
 #[test]
 fn host_boundary_does_not_expose_the_private_type_handle_service() {
-    let types = format!("{MODEL}\n.function Probe(System.RuntimeTypeHandle handle) -> Int32\nldarg handle\ncall neoCLR.Runtime.ReflectionConstructionCheck(System.RuntimeTypeHandle)\nret\n.end");
+    let types = format!(
+        "{MODEL}\n.function Probe(System.RuntimeTypeHandle handle) -> Int32\nldarg handle\ncall neoCLR.Runtime.ReflectionConstructionCheck(System.RuntimeTypeHandle)\nret\n.end"
+    );
     let module = module(&types, "ldc.i4 0");
     let program = LoadedProgram::new(&module).unwrap();
-    let error = match program.resolve_function(
-        &parse_function_ref("Probe(System.RuntimeTypeHandle)").unwrap(),
-    ) {
+    let error = match program
+        .resolve_function(&parse_function_ref("Probe(System.RuntimeTypeHandle)").unwrap())
+    {
         Ok(_) => panic!("private type-handle service exposed to host invocation"),
         Err(error) => error,
     };
@@ -202,5 +204,45 @@ fn reachability_reports_dynamic_execution_and_allocation_services() {
         neoclr::RuntimeService::ManagedHeap,
     ] {
         assert!(services.contains(&expected));
+    }
+}
+
+#[test]
+fn imported_construction_requires_explicit_public_source_access() {
+    for (type_access, method_access, expected) in [
+        (
+            ",\"publicly_visible\":true",
+            ",\"member_access\":\"Public\"",
+            0,
+        ),
+        (
+            ",\"publicly_visible\":false",
+            ",\"member_access\":\"Public\"",
+            3,
+        ),
+        (
+            ",\"publicly_visible\":true",
+            ",\"member_access\":\"Private\"",
+            3,
+        ),
+        (",\"publicly_visible\":true", "", 3),
+        ("", ",\"member_access\":\"Public\"", 3),
+    ] {
+        let types = MODEL.replace(".type class Model\n", &format!(
+            ".type class Model\n.origin {{\"assembly\":\"Fixture\",\"module\":\"Fixture\",\"name\":\"Model\",\"token\":33554433,\"field_tokens\":[67108865]{type_access}}}\n"
+        )).replace(".method instance .ctor() -> noresult\n", &format!(
+            ".method instance .ctor() -> noresult\n.origin {{\"assembly\":\"Fixture\",\"module\":\"Fixture\",\"name\":\".ctor\",\"token\":100663297{method_access}}}\n"
+        ));
+        let types = format!(
+            ".assembly {{\"name\":\"Fixture\",\"full_name\":\"Fixture\",\"modules\":[\"Fixture\"],\"references\":[]}}\n{types}"
+        );
+        let candidate = module(
+            &types,
+            "ldtoken Model\ncall neoCLR.Runtime.ReflectionConstructionCheck(System.RuntimeTypeHandle)",
+        );
+        assert_eq!(
+            run(&candidate, Limits::default()).unwrap().value,
+            Value::Int32(expected)
+        );
     }
 }

@@ -1,0 +1,93 @@
+namespace System.Runtime.Reflection
+
+import System.*
+import System.Introspection.*
+import System.Option.*
+import System.Result.*
+import System.Runtime.CompilerServices.*
+
+public extension TypeReflectionExtensions for TypeInfo {
+    func CreateInstance() -> Result<Object, ReflectionError> {
+        if self is RuntimeTypeInfo implementation {
+            let handle = implementation.ExecutionHandle
+            let status = RuntimeServices.ReflectionConstructionCheck(handle)
+            if status == 0 {
+                return Ok(RuntimeServices.ReflectionConstruct(handle))
+            }
+            if status == 1 {
+                return Error(ReflectionError.UnboundMetadata)
+            }
+            if status == 2 {
+                return Error(ReflectionError.UnsupportedType)
+            }
+            if status == 3 {
+                return Error(ReflectionError.AccessDenied)
+            }
+            return Error(ReflectionError.MissingConstructor)
+        }
+        return Error(ReflectionError.UnboundMetadata)
+    }
+}
+
+public extension PropertyReflectionExtensions for PropertyInfo {
+    func GetValue(receiver: Object?) -> Result<Object?, ReflectionError> {
+        if self is RuntimePropertyInfo implementation {
+            if let Some(owner) = implementation.DeclaringType {
+                if owner is RuntimeTypeInfo runtimeOwner {
+                    let handle = runtimeOwner.ExecutionHandle
+                    let status = RuntimeServices.ReflectionPropertyGetCheck(handle, implementation.DefinitionIndex, receiver)
+                    if status == 0 {
+                        let value: Object? = RuntimeServices.ReflectionPropertyGet(handle, implementation.DefinitionIndex, receiver)
+                        return Ok(value)
+                    }
+                    if status == 1 {
+                        return Error(ReflectionError.UnboundMetadata)
+                    }
+                    if status == 3 {
+                        return Error(ReflectionError.AccessDenied)
+                    }
+                    if status == 5 {
+                        return Error(ReflectionError.MissingAccessor)
+                    }
+                    if status == 6 {
+                        return Error(ReflectionError.InvalidReceiver)
+                    }
+                    return Error(ReflectionError.UnsupportedProperty)
+                }
+            }
+        }
+        return Error(ReflectionError.UnboundMetadata)
+    }
+
+    func SetValue(receiver: Object?, value: Object?) -> Result<(), ReflectionError> {
+        if self is RuntimePropertyInfo implementation {
+            if let Some(owner) = implementation.DeclaringType {
+                if owner is RuntimeTypeInfo runtimeOwner {
+                    let handle = runtimeOwner.ExecutionHandle
+                    let status = RuntimeServices.ReflectionPropertySetCheck(handle, implementation.DefinitionIndex, receiver, value)
+                    if status == 0 {
+                        RuntimeServices.ReflectionPropertySet(handle, implementation.DefinitionIndex, receiver, value)
+                        return Ok(())
+                    }
+                    if status == 1 {
+                        return Error(ReflectionError.UnboundMetadata)
+                    }
+                    if status == 3 {
+                        return Error(ReflectionError.AccessDenied)
+                    }
+                    if status == 5 {
+                        return Error(ReflectionError.MissingAccessor)
+                    }
+                    if status == 6 {
+                        return Error(ReflectionError.InvalidReceiver)
+                    }
+                    if status == 7 {
+                        return Error(ReflectionError.InvalidValue)
+                    }
+                    return Error(ReflectionError.UnsupportedProperty)
+                }
+            }
+        }
+        return Error(ReflectionError.UnboundMetadata)
+    }
+}

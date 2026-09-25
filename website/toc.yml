@@ -22,5 +22,7 @@
       href: docs/storage-items.md
     - name: Introspection
       href: features/introspection/index.md
+    - name: Runtime reflection
+      href: docs/reflection.md
 - name: API reference
   href: api/

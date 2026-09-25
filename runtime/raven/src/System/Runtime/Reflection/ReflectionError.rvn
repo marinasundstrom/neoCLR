@@ -1,0 +1,12 @@
+namespace System.Runtime.Reflection
+
+public union ReflectionError {
+    case UnboundMetadata
+    case UnsupportedType
+    case AccessDenied
+    case MissingConstructor
+    case UnsupportedProperty
+    case MissingAccessor
+    case InvalidReceiver
+    case InvalidValue
+}

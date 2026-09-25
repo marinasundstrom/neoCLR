@@ -2,6 +2,7 @@
 use crate::{
     Fault, Limits, Module, TypeDescriptor, TypeIdentity, Value,
     metadata::{Function, Representation, Type, Visibility},
+    metadata_origin::{SourceAccess, member_access},
 };
 
 #[derive(Clone, Copy)]
@@ -357,7 +358,15 @@ impl Query {
                             owner.is_some()
                                 && f.owner == owner
                                 && !f.name.ends_with("..ctor")
-                                && selected(argument, f.visibility, !f.instance)
+                                && selected(
+                                    argument,
+                                    if member_access(f) == SourceAccess::Public {
+                                        Visibility::Public
+                                    } else {
+                                        Visibility::Private
+                                    },
+                                    !f.instance,
+                                )
                         })
                         .map(|f| method(module, &ty, f, arguments, limits)),
                     limits,
@@ -389,7 +398,7 @@ impl Query {
                                 let public = getter
                                     .iter()
                                     .chain(&setter)
-                                    .any(|f| f.visibility == Visibility::Public);
+                                    .any(|f| member_access(f) == SourceAccess::Public);
                                 if !selected(
                                     argument,
                                     if public {
@@ -650,9 +659,9 @@ fn method(
             type_value(module, owner)?,
             type_value(module, &f.returns.substitute_type_parameters(arguments)?)?,
             Value::Boolean(!f.instance),
-            Value::Boolean(f.visibility == Visibility::Public),
-            Value::Boolean(f.visibility == Visibility::Private),
-            Value::Boolean(f.visibility == Visibility::Internal),
+            Value::Boolean(member_access(f) == SourceAccess::Public),
+            Value::Boolean(member_access(f) == SourceAccess::Private),
+            Value::Boolean(member_access(f) == SourceAccess::Assembly),
             Value::Boolean(f.receiver_byref),
             index_value(
                 f.definition

@@ -132,3 +132,13 @@ neither IsOpen nor IsClosedHierarchy. IsUnion identifies nominal union declarati
 (including constructed Option/Result), not their cases or ad-hoc union expressions.
 ClosedHierarchy describes the direct family; permitted open subtypes may themselves
 have descendants. These are descriptive metadata queries, not added raw-IL enforcement.
+
+
+## Runtime execution — development
+
+Import System.Runtime.Reflection for [checked construction and property execution](reflection.md).
+The descriptor interfaces remain descriptive. Execution accepts runtime-backed
+providers, returns Result for validation failures, and preserves terminal user Faults.
+Application instance properties and their original tokens are now projected; static
+properties remain outside the importer and init-only setters are omitted from assignment.
+Method/accessor visibility queries use retained source accessibility when available.

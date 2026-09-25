@@ -1267,11 +1267,6 @@ M0000001c_IL_0173:
 ldstr "invalid native socket error"
 M0000001c_IL_0178:
 call System.Fault(String)
-M0000001c_IL_017d:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeErrorSystemNetworkingSocketsSocketErrorIoFailureNew()
-M0000001c_IL_0182:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeErrorSystemNetworkingSocketsSocketErrorNewSystemNetworkingSocketsSocketErrorIoFailure(System.Networking.Sockets.SocketError.IoFailure)
-M0000001c_IL_0187:
-ret
+fault "System.Fault returned unexpectedly"
 .end
 .end
