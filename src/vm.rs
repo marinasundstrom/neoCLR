@@ -418,6 +418,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
         let mut fields = HashSet::new();
         for field in &def.fields {
+            if field.deferred && !def.is_reference_type {
+                return Err(Fault::new("deferred fields require a reference type"));
+            }
             if field.name.is_empty() || !fields.insert(&field.name) {
                 return Err(Fault::new("empty or duplicate field name"));
             }
@@ -2916,14 +2919,19 @@ fn interpret_instructions(
                     }
                     let constructed_object = frame.construction_object.clone();
                     if let Some(object) = &constructed_object {
-                        if let Value::Object { fields, .. } = object.reference.read()? {
+                        if let Value::Object { ty, fields } = object.reference.read()? {
                             if fields
                                 .iter()
                                 .any(|field| matches!(field, Value::Uninitialized(_)))
                             {
-                                return Err(Fault::new(
-                                    "constructor returned with an uninitialized field",
-                                ));
+                                let definitions = module.instantiated_fields(&ty)?;
+                                if fields.iter().zip(&definitions).any(|(field, definition)| {
+                                    !definition.deferred && matches!(field, Value::Uninitialized(_))
+                                }) {
+                                    return Err(Fault::new(
+                                        "constructor returned with an uninitialized field",
+                                    ));
+                                }
                             }
                         }
                     }

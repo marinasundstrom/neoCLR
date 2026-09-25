@@ -335,8 +335,13 @@ static class ApplicationTypes
             foreach (var contract in type.Interfaces) output.AppendLine(".implements " + map(contract.InterfaceType, false));
             foreach (var method in type.Methods.Where(m => m.IsAbstract))
                 output.AppendLine($".method instance {(LibraryNames.ContainsKey(type) && PropagationLibrary.IsContract(type) ? "readonly byref " : "")}{(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => (LibraryNames.ContainsKey(type) && PropagationLibrary.IsConditionalOutput(method, p) ? "out(true) " : "") + map(p.ParameterType, false) + (LibraryNames.ContainsKey(type) ? " " + p.Name : "")))}) -> {map(method.ReturnType, true)}\n.end");
+            // Defer storage initialization for the explicit async state-machine contract,
+            // independent of generated names or union-case conventions.
+            var deferredState = !IsLibrary(type) && !type.IsValueType && type.Interfaces.Any(i =>
+                i.InterfaceType.FullName == "System.Runtime.CompilerServices.IAsyncStateMachine"
+                && RuntimeSignatures.IsCore(i.InterfaceType.Scope));
             foreach (var field in type.Fields.Where(_ => !PrimitiveLibrary.IsMatched(type) && !OpaqueLibrary.IsString(type) && !ArrayLibrary.IsMatched(type)))
-                output.AppendLine($".field {(LibraryNames.ContainsKey(type) && field.IsPrivate && !GenericUnionLibrary.IsCase(type) ? "private " : "")}{(FieldName(field))} {map(field.FieldType, false)}");
+                output.AppendLine($".field {(LibraryNames.ContainsKey(type) && field.IsPrivate && !GenericUnionLibrary.IsCase(type) ? "private " : "")}{(deferredState ? "deferred " : "")}{(FieldName(field))} {map(field.FieldType, false)}");
             if (LibraryNames.ContainsKey(type))
                 foreach (var property in type.Properties.Where(GenericUnionLibrary.IsRuntimeProperty))
                 {

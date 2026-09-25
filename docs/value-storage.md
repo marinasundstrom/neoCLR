@@ -166,3 +166,44 @@ An alternative [pointer-backed carrier experiment](pointer-carriers.md) stores a
 and Void* and borrows caller-managed native storage. It demonstrates explicit aliasing
 and release responsibilities. It does not replace System.Value for payloads without
 a native layout, and copying that view does not copy or retain its target.
+
+## Deferred class fields — development
+
+The JSON HTTP application exposed a constructor fault before its async method could
+run: the generated state class contains a hoisted Result whose erased payload has
+no readable default. That local is assigned during MoveNext, not by the constructor.
+
+The provisional `.field [visibility] deferred Name Type` modifier permits a class
+constructor to finish with that particular field unassigned. Existing readable
+defaults still apply; otherwise storage remains explicitly uninitialized. Reading
+it before assignment still faults. Whole-field assignment establishes a valid value;
+normal value copying and GC tracing then apply. The modifier is rejected on value
+types, including loaded metadata. Ordinary constructor checks remain unchanged.
+JSON metadata stores `deferred: true`; absent flags mean false. Older readers reject
+the added property, so new application artifacts require a matching runtime. This
+is an internal storage contract, not a public library member or Raven annotation.
+
+The managed bridge selects application reference types explicitly implementing core
+System.Runtime.CompilerServices.IAsyncStateMachine, independently of generated type
+names or Raven union metadata. It marks their fields deferred; library types and
+ordinary application classes are unchanged. No Runtime Contract setting changes.
+This supports today's generated state machines; it does not implement runtime
+suspension or settle the future scheduling contract.
+
+Compared with [.NET default values](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/default-values),
+neoCLR deliberately has no all-zero readable System.Value payload. Introducing one
+would change value/union semantics everywhere; guessing a first union case would
+couple storage to language conventions. Rejecting the program or flattening its
+errors avoids the fault only by restricting normal async code. Explicit deferred
+storage instead preserves checked reads at the cost of a metadata flag and a runtime
+initialization check. The [.NET IAsyncStateMachine contract](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.iasyncstatemachine?view=net-10.0)
+is compiler infrastructure; selecting it here is a provisional bridge policy, not
+an assertion that .NET uses this storage flag. Sources reviewed 2026-09-25.
+
+`tests/deferred_fields.rs` covers serialization, post-construction assignment,
+unassigned reads, unchanged ordinary constructors, rejection on value types and
+retention of erased heap references under collection. The
+[async consumer](experiments/deferred-async/README.md) checks generated state fields
+and a structured Result across pending await/GC. Broader closure/iterator admission
+and value-state partial initialization remain separate questions. No performance
+improvement is claimed.

@@ -58,6 +58,7 @@ pub(crate) fn fields(module: &Module, ty: &Type) -> Result<Vec<Field>, Fault> {
                 ));
             }
             fields.push(Field {
+                deferred: field.deferred,
                 visibility: field.visibility,
                 name: field.name.clone(),
                 ty: field.ty.substitute_type_parameters(arguments)?,

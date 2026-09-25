@@ -7383,3 +7383,26 @@ configuration/content, not target-specific code added to Raven main.
   formatting and add private Int64/UInt64 text services.
 - **Bounded choice:** keep floating-point formatting separate because its Object
   numeric formatting contract is not yet implemented. No culture/provider API.
+
+### 2026-09-25 — Fix the JSON application's async blocker
+
+- **Author:** directed the Console follow-up into an integrated JSON Web sample,
+  with object mapping/minimal reflection only after an end-to-end example. When
+  integration exposed an issue, explicitly said “This issue must be fixed”.
+- **Assistant investigation:** isolated the startup fault to a hoisted Result field
+  in a reference async state machine. Its System.Value payload has no readable
+  default; assignment happens in MoveNext, after the constructor check. Both
+  HttpError and application-owned AppError reproduced it, ruling out the earlier
+  custom-error-only suspicion.
+- **Action:** added explicit checked deferred class-field storage and selected it
+  in the bridge through the core IAsyncStateMachine contract. Restored structured
+  application errors in the JSON client/server. This does not fabricate default
+  union cases or change normal constructor validation. The focused storage and
+  pending-await/GC regressions pass. See [the decision and evidence](value-storage.md#deferred-class-fields--development).
+- **Open:** other observed frozen-compiler expression/emission issues are recorded
+  separately in the [sample limitations](experiments/http-json/limitations.md).
+  Runtime suspension remains future work. The station-only managed Web round trip
+  now passes; the earlier larger report still reaches transport timeouts and is not
+  claimed fixed. The assistant began a [minimal reflection investigation](json-dom-design.md#next-investigation-one-mapped-report--2026-09-25),
+  finding metadata accessors but no runtime creation/property execution path.
+  No public reflection or object-mapping API was implemented.

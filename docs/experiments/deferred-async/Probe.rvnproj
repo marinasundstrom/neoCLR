@@ -1,8 +1,6 @@
 <Project DefaultTargets="Build">
   <Import Project="$(NeoCLRRoot)/build/NeoCLR.Raven.props" />
-  <ItemGroup>
-    <Compile Include="Server.rvn" />
-    <Compile Include="Application.rvn" />
-  </ItemGroup>
+  <PropertyGroup><RavenHeapAsyncStateMachines>true</RavenHeapAsyncStateMachines></PropertyGroup>
+  <ItemGroup><Compile Include="Main.rvn" /></ItemGroup>
   <Import Project="$(NeoCLRRoot)/build/NeoCLR.Raven.targets" />
 </Project>

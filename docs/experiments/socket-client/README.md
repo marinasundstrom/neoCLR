@@ -45,8 +45,10 @@ A second existing state-machine limitation surfaced during validation: keeping a
 Result local across a later await hoists a union carrier without a readable default
 into the generated heap state-machine constructor, which faults on uninitialized
 storage. This sample reads its completed Closed result synchronously after Close,
-so it does not require that additional suspension. The general hoisted-union case
-remains open; the runtime's constructor initialization rule was not relaxed.
+so it does not require that additional suspension. That original observation is retained here as history. The general heap-state case
+is now addressed by [checked deferred storage](../../value-storage.md#deferred-class-fields--development)
+with an independent pending-await/GC regression; this sample still uses its existing
+synchronous completed-result observation.
 
 Initial receive-only validation on 2026-09-24: the compiled source and both negative visibility checks
 pass. The greeting run allocated and reclaimed 914 managed objects, with zero live

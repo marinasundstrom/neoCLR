@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Fix constructors of imported reference async state machines containing hoisted
+  nondefaultable Result/union fields. Explicit deferred field storage preserves
+  checked reads before assignment and GC tracing afterward; ordinary constructors
+  and value-type rules are unchanged. New artifacts require a matching runtime.
+  Add focused storage and pending-await/GC regressions.
+- Integrate the public JSON DOM into the HTTP report client/server sample: POST
+  acknowledgement, structured application errors and 400/404 JSON responses, checked
+  with independent Python peers. Keep the station-only report minimal; larger payloads
+  still expose a transport/performance limit. Record frozen-compiler limitations
+  and a bounded reflection/object-mapping investigation (not implemented APIs).
+
 - Add Console.WriteLine(object?) with virtual ToString and empty-line null handling,
   plus unboxed Boolean, Char and integral overloads. Add private signed/unsigned
   64-bit decimal formatting services; floating-point formatting remains deferred.

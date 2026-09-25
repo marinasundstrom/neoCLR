@@ -311,6 +311,9 @@ pub enum Representation {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Field {
+    /// Allow checked uninitialized storage when this class field has no default.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub deferred: bool,
     #[serde(default, skip_serializing_if = "Visibility::is_public")]
     pub visibility: Visibility,
     pub name: String,

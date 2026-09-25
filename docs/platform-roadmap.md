@@ -56,8 +56,8 @@ The [HTTP design](http-client-design.md) records .NET comparisons and remaining 
 The [HttpServer sample](experiments/http-server/README.md) now exchanges UTF-8 text
 with the neoCLR client and an independent .NET client. Its bounded ServeOne callback
 keeps the hosting loop provisional. The [JSON report application](experiments/http-json/README.md)
-now composes the existing JSON consumer with this exchange, including independent
-Python client/server checks. JSON remains application-local pending public API design. Keep transfer/request lifetime explicit. M1 remains incomplete; broad HTTP, TLS,
+now composes the public System.Data.Json DOM with this exchange, including independent
+Python client/server checks. Keep transfer/request lifetime explicit. M1 remains incomplete; broad HTTP, TLS,
 retry policy and runtime suspension are not prerequisites for this controlled POC.
 
 ## Networking and web release target — discussion, 2026-09-25
@@ -176,6 +176,13 @@ Boolean/Char/integer WriteLine overloads accompany the entry-argument work; see
 **Author-requested entry convenience:** the managed Raven bridge now supplies
 [Main(arguments: string[])](experiments/entry-arguments/README.md), excluding the
 executable name. The JSON corpus uses this entry shape.
+**Integrated Web slice:** the [report application](experiments/http-json/README.md)
+uses the public JSON DOM for POST/acknowledgement and 400/404 responses, preserving
+structured application errors through async methods. A hoisted Result constructor
+fault is fixed through [checked deferred state storage](value-storage.md#deferred-class-fields--development),
+with a focused pending-await/GC regression. The [initial reflection investigation](json-dom-design.md#next-investigation-one-mapped-report--2026-09-25)
+selects runtime-backed construction and a public property accessor for one mapped report;
+keep the remaining frozen-compiler observations explicit.
 Current introspection exposes member metadata but not public value access, assignment
 or construction/invocation. **Author clarification:** `System.Runtime.Reflection`
 will provide extensions to the `System.Introspection` model; those operations work

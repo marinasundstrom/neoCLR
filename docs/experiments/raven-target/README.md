@@ -1208,3 +1208,15 @@ neoCLR core reference and reports RAV0162 for code after Fault. The end-to-end
 `verify_fault.py` gate stopped before execution due to a stale runtime snapshot
 for an unrelated `HttpClient.rvn` edit; guest execution was not validated here.
 This remains experimental target-specific policy, not a general Raven main change.
+
+### Deferred state fields (2026-09-25)
+
+Application reference types implementing the core IAsyncStateMachine interface now
+import with explicit deferred field storage. Hoisted Result/union locals can be
+assigned during MoveNext instead of failing the state constructor. Unassigned reads
+remain checked. No generated-name or Raven attribute convention is required; no
+Runtime Contract setting or compiler emission changes. Value-state and ordinary
+class import rules are unchanged. New artifacts require the matching runtime.
+See [storage semantics and comparison](../../value-storage.md#deferred-class-fields--development)
+and [the pending-await/GC regression](../deferred-async/README.md). Other compiler
+observations from the JSON sample remain tracked separately in its limitations page.

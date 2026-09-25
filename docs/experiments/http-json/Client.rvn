@@ -1,43 +1,32 @@
 import System.*
+import System.Data.Json.*
+import System.Option.*
 import System.Result.*
 import System.Tasks.*
 import System.Web.Http.*
 
-func Summarize(payload: string) -> Result<string, string> {
-    let report = ReadDocument(payload)?
-    let stationValue = report.Field("station")?
-    let station = stationValue.AsString()?
-    let readings = report.Field("readings")?
-    if !(readings is JsonArray) {
-        return Error("Expected readings array")
+class ReportClient {
+    async func SubmitReport(client: HttpClient) -> Task<Result<string, AppError>> {
+        let content = PrepareReport()?
+        let response = await client.Post("reports", content)
+        return ReadReply(response)
     }
-    let first = readings.Item(0)?
-    let reading = first.AsInt32()?
-    Console.WriteLine(String.Concat("Station: ", station))
-    Console.WriteLine(String.Concat("First reading: ", reading.ToString()))
-    let reply = JsonValue.ObjectValue()
-    _ = reply.Put("station", JsonValue.StringValue(station))?
-    _ = reply.Put("accepted", JsonValue.BooleanValue(true))?
-    let count = JsonValue.NumberValue(readings.Count.ToString())?
-    _ = reply.Put("count", count)?
-    return WriteDocument(reply)
+
 }
 
-async func ReadReport(client: HttpClient, url: string) -> Task<Result<string, string>> {
-    // This application presents failures as text at its reporting boundary.
-    let response = (await client.Get(url)).MapError(error => error.ToString())?
-    let text = await response.Content.ReadText()?
-    return Summarize(text)
-}
-
-func Main() {
+func Main(arguments: string[]) {
+    if arguments.Length != 1 {
+        System.Fault("Supply the server base URL, for example http://localhost:8080/")
+        return
+    }
     let client = HttpClient()
-    let reading = ReadReport(client, "http://localhost:19091/report")
-    reading.OnCompleted(() => {
-        if let Ok(reply) = reading.GetResult() {
+    client.BaseUri = Some(arguments[0])
+    let submission = ReportClient().SubmitReport(client)
+    submission.OnCompleted(() => {
+        if let Ok(reply) = submission.GetResult() {
             Console.WriteLine(reply)
-        } else if let Error(message) = reading.GetResult() {
-            System.Fault(message)
+        } else if let Error(error) = submission.GetResult() {
+            System.Fault(error.ToString())
         }
     })
 }

@@ -84,3 +84,43 @@ limits, duplicate decoded names, and managed GC. A separate public-API corpus re
 Signature checks cover public members, private helpers, upcast direction and closed
 hierarchy enforcement. API reference coverage accompanies this development surface.
 Website build and publication remain separate; this slice does not ship a release.
+
+## Next investigation: one mapped report — 2026-09-25
+
+After the [public DOM Web sample](experiments/http-json/README.md), the smallest
+candidate is a class with a public parameterless constructor and one writable
+string property representing the station. Map that object to the existing DOM and
+back, initially outside HTTP, then reuse the same endpoint. This is an investigation
+scope, not an implemented serializer overload or committed public signature.
+
+Inspection of `System/Introspection/Descriptors.rvn` confirms that PropertyInfo
+already exposes its type, read/write flags, index parameters and getter/setter
+metadata. FieldInfo supplies type, visibility and definition index. `src/reflection.rs`
+only performs metadata queries; none of those member descriptors currently executes
+accessors, writes values or constructs an instance. Runtime-backed execution therefore
+needs a separate bridge/VM path, not merely JSON code calling an existing SetValue.
+
+The .NET baseline is [PropertyInfo.SetValue](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.propertyinfo.setvalue)
+and [Activator.CreateInstance](https://learn.microsoft.com/en-us/dotnet/api/system.activator.createinstance?view=net-10.0)
+(reviewed 2026-09-25). Preserve familiar creation/access concepts while placing
+operations in System.Runtime.Reflection extensions over introspection. First prove
+public parameterless class construction and a public, non-indexed property accessor.
+A property must execute its setter, not bypass it by writing its backing field.
+Field access is a separate candidate, not required to demonstrate this first mapping.
+
+Before exposing the operations, validate that the descriptor belongs to the loaded
+runtime type and module; an index alone is not authority. Check receiver type,
+visibility, member shape and value assignability. Metadata-only or unsupported
+shapes need explicit Result failures; retain terminal Fault semantics for faults
+raised by executed user code. Validate receiver/value rooting through allocation
+and accessor calls, plus rejection of wrong receivers, read-only properties and
+foreign descriptors. Keep binder coercions, private access, indexers, value-type
+mutation, arbitrary method invocation and constructor overload selection outside
+the first case. Exact error cases and public names remain open.
+
+Hand-written DOM mapping remains the functioning baseline and is easier to bound.
+Reflection reduces per-model mapping code but adds execution, lifetime and metadata
+validation costs. Do not introduce serializer caches, attributes, automatic null
+mapping or a new metadata convention until this single round trip establishes the
+needed contract. The larger report's transport/performance limitation remains open
+independently of this reflection investigation.

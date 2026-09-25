@@ -234,7 +234,7 @@ def main():
         'HTTP_CONTEXT_SAMPLE': ('docs/experiments/http-context/Sample.rvn', 'async func ReplyToNext(', '\n}', True),
         'HTTP_VERB_SAMPLE': ('docs/experiments/http-verbs/Sample.rvn', 'async func ReplaceText(', '\n}', True),
         'HTTP_POST_SAMPLE': ('docs/experiments/http-post/Sample.rvn', 'async func PostText(', '\n}', True),
-        'HTTP_JSON_SAMPLE': ('docs/experiments/http-json/Client.rvn', 'async func ReadReport(', '\n}', True),
+        'HTTP_JSON_SAMPLE': ('docs/experiments/http-json/Client.rvn', 'class ReportClient {', '\n}', True),
         'HTTP_SERVER_SAMPLE': ('docs/experiments/http-server/Server.rvn', 'func Respond(', '\n}', True),
         'HTTP_CLIENT_SAMPLE': ('docs/experiments/http-client/Main.rvn', 'async func ReadGreeting(', '\n}', True),
         'SOCKET_SERVER_SAMPLE': ('docs/experiments/socket-echo/Server.rvn', 'async func Serve(', '\n}', True),
@@ -311,9 +311,7 @@ def main():
     shutil.make_archive(str(downloads / 'http-server'), 'zip', server_downloads)
     json_downloads = downloads / 'http-json'
     for directory, names in (
-        ('http-json', ('Client.rvn', 'Server.rvn', 'Client.rvnproj', 'Server.rvnproj', 'README.md', 'verify.py')),
-        ('json-message', ('JsonMessage.rvn',)),
-        ('json-document', ('JsonValue.rvn', 'JsonDocument.rvn')),
+        ('http-json', ('Client.rvn', 'Server.rvn', 'Application.rvn', 'Client.rvnproj', 'Server.rvnproj', 'README.md', 'limitations.md', 'verify.py')),
     ):
         destination = json_downloads / directory
         destination.mkdir(parents=True, exist_ok=True)

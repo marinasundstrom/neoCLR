@@ -1,0 +1,53 @@
+import System.*
+import System.Tasks.*
+import System.Result.*
+
+union Failure {
+    case Message(text: string)
+}
+
+class Garbage {
+    var Number: int
+    init(number: int) {
+        Number = number
+    }
+}
+
+class Worker {
+    async func Keep(input: Task<int>) -> Task<Result<int, Failure>> {
+        let saved: Result<int, Failure> = Error(Failure.Message("Retained error"))
+        _ = await input
+        return saved
+    }
+}
+
+func Churn() {
+    var index = 0
+    while index < 160 {
+        _ = Garbage(index)
+        index += 1
+    }
+}
+
+func Observe(task: Task<Result<int, Failure>>) {
+    task.OnCompleted(() => {
+        if let Error(Failure.Message(text)) = task.GetResult() {
+            Console.WriteLine(text)
+        } else {
+            System.Fault("Expected retained error")
+        }
+    })
+}
+
+func Main() {
+    let queue = TaskQueue()
+    let promise = Promise<int>(queue)
+    queue.Run(() => {
+        Observe(Worker().Keep(promise.Task))
+    })
+    Churn()
+    queue.Run(() => {
+        _ = promise.Complete(42)
+    })
+    Churn()
+}

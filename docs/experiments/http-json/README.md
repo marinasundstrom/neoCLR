@@ -1,27 +1,34 @@
-# A JSON report over HTTP
+# Public JSON DOM over HTTP
 
-Development experiment after Preview 9. This composes the integrated HttpClient and
-HttpServer APIs with the existing application-local JSON document experiment. It
-adds no public JSON API and does not settle its future contract.
+Development sample after Preview 9. It uses the integrated System.Data.Json,
+HttpClient and HttpServer APIs, with no application-local JSON parser.
 
-The server constructs and serves a report at `/report`:
+The client constructs `{"station":"Café"}` with JsonObject/JsonString, serializes it, and POSTs
+UTF-8 application/json to `/reports`. The server owns the exchange through
+HttpContext, parses the body, validates its shape, and returns status 201 with:
 
 ```json
-{"station":"Café","readings":[21,22.5]}
+{"accepted":true}
 ```
 
-The client fetches it, decodes UTF-8, parses the document, explicitly reads the station
-and first reading, and constructs a local acknowledgement:
+GET `/report` returns the example input. Malformed JSON, duplicate fields, invalid
+UTF-8 and the wrong report shape receive a 400 JSON response; unknown routes get
+404. This is deliberately a small report acknowledgement, not persistent storage
+or a routing framework. The server requires a string-valued station field.
 
-```text
-Station: Café
-First reading: 21
-{"station":"Café","accepted":true,"count":2}
-```
+`Application.rvn` contains the shared DOM operations and an AppError union that
+retains HttpError and JsonError causes. Local implicit error converters let `?`
+propagate these causes through helpers and async methods. Both client and server
+retain structured AppError results until the final process-reporting callback. The server deliberately handles invalid user input at its
+HTTP boundary. Accept owns the request/response exchange; Complete sends and closes
+it. A configuration failure explicitly closes the context before propagation.
 
-The acknowledgement is displayed locally; it is not POSTed back. GET-only transport
-is sufficient for this slice. This is a two-process application case demonstrating
-DNS, sockets, HTTP framing, Task/Result, encoding, JSON values and GC together.
+Serialization remains synchronous and buffered. HTTP already buffers each body;
+this sample uses string serialization plus UTF-8 content. Stream overloads and
+borrowed-stream ownership are covered by the adjacent public json-dom fixture.
+The provisional JSON limits remain 128 UTF-8 bytes, four container levels and
+32 value occurrences; HTTP has its own independent bounds. No TLS, reflection,
+object mapping, generic PostJson/GetJson helper or async JSON API is introduced.
 
 ```sh
 python3 docs/experiments/http-json/verify.py \
@@ -29,29 +36,39 @@ python3 docs/experiments/http-json/verify.py \
   --runner target/release/examples/measure_async
 ```
 
-Requires Python 3, the development toolchain, and the trusted runner built with
-`cargo build --release --example measure_async`. The published Preview 9 SDK does
-not contain these HTTP APIs. The verifier builds temporary applications, selects
-loopback ports and checks both a neoCLR pair and independent Python HTTP peers.
-It parses produced JSON independently and checks collection and zero final live
-objects with a 256-object heap. Process/instruction guards are test bounds, not
-application request deadlines.
+Use matching development references, bridge, runtime and SDK. The verifier compiles
+both applications, checks the server with independent Python requests, runs the
+neoCLR client/server pair, and checks the client against a Python server. It checks
+statuses, content type, UTF-8 byte lengths, JSON payloads and zero final live heap
+objects. Process/instruction guards are test bounds, not request timeout policies.
+Both programs accept Main(string[]) arguments: the client takes a base URL; the
+server takes an optional number of requests to serve (default one).
 
-The JSON codec remains shared source from the adjacent json-message/json-document
-experiments. Downloaded archives preserve those sibling directories. Its limits
-remain 128 UTF-8 bytes, four nested containers and 32 values; duplicates are rejected
-and number lexemes preserved. These are demonstration policies, not HTTP limits or
-a proposed general serializer contract. HTTP retains the bounded GET/200,
-Content-Length-only, no-TLS contract described by the Web guide.
+Compared with .NET System.Text.Json + HttpClient, this POC keeps DOM access and
+recoverable errors explicit and demonstrates separate HTTP/JSON error causes.
+It does not add a framework-style JSON endpoint binder or claim equivalent scope.
+See the public JSON DOM design for the existing standards and .NET comparison.
 
-Compared with .NET System.Text.Json, this experiment uses owned managed value objects
-and explicit checked access rather than disposable document-backed elements. Its
-cost is allocation and linear lookup. The existing JSON document research and
-conformance cases remain the evidence for those choices; this slice tests their
-composition with I/O, not a new JSON parser.
+The pinned compiler requires some expressions to be written in separate steps.
+Nested propagation inside a method argument can leave a receiver on the evaluation
+stack. Combined type-pattern captures can fail importer definite-assignment checks.
+The sample uses named values and separate type checks. Async methods live on small
+application classes; top-level variants exposed RAV2704 during this integration.
+These are compiler integration limitations, not intended API restrictions.
 
-Local macOS validation: the Python-consumed server allocates 262 objects; the neoCLR
-pair allocates 236 on the server and 312 on the client; the Python-served client
-allocates 326. These runs record six or seven collections and zero final live objects.
-They are lifecycle evidence, not a performance benchmark. Existing JSON conformance
-checks were not rerun because the shared codec is unchanged.
+See [frozen compiler observations](limitations.md) for observed failures and the
+workarounds used here; their root causes are not all isolated.
+
+The initial larger report also carried readings; its acknowledgement echoed the
+station and reading count. Both peers
+passed independently, but the managed pair reached the provisional transport timeout.
+A smaller acknowledgement alone still timed out. The final station-only report
+and minimal acknowledgement pass the managed pair. This keeps the first integration focused; it is not evidence
+that the larger case performs adequately. Timeout policy is unchanged. Use `--case server`, `--case pair`, or `--case client` to run only the relevant peer checks.
+
+Final local validation (2026-09-25): all eight independent server cases, the managed
+pair and the client against Python pass. The managed pair allocates 310 client and
+309 server objects, with seven and six collections respectively; both finish with
+zero live objects. The independent server batch and client also finish with zero
+live objects. Website sample/download inputs and API snapshot were checked; the
+website build was skipped as directed. These are correctness checks, not benchmarks.

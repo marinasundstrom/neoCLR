@@ -350,8 +350,20 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     }
                     _ => (crate::metadata::Visibility::Public, name, ty),
                 };
+                let (deferred, name, ty) = if name == "deferred" {
+                    let (name, ty) = ty
+                        .trim()
+                        .split_once(char::is_whitespace)
+                        .ok_or_else(|| {
+                            Fault::new("expected .field [visibility] deferred Name Type")
+                        })?;
+                    (true, name, ty)
+                } else {
+                    (false, name, ty)
+                };
                 identifier(name)?;
                 def.fields.push(Field {
+                    deferred,
                     visibility,
                     name: name.into(),
                     ty: bind_type_parameters(parse_type(ty)?, &def.generic_parameters),

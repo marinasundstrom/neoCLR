@@ -117,23 +117,27 @@ complete signatures and limits. A future interface split could give inbound and 
 requests/responses different capabilities. Today they remain concrete message classes;
 configuring a received client response only changes the local object.
 
-## Read a JSON report
+## Exchange JSON reports
 
 ```raven
 {{HTTP_JSON_SAMPLE}}
 ```
 
-The next [application sample](/samples/http-json/http-json/Client.rvn) fetches a sensor
-report from a neoCLR server. `Summarize` checks fields and types, reads the first
-measurement and constructs a local JSON acknowledgement. Each `?` propagates an
-error from its own layer: HTTP, UTF-8 decoding or JSON access. The acknowledgement
-is printed locally; the sample does not implement POST.
+The [application sample](/samples/http-json/http-json/Client.rvn) constructs a report
+with the public System.Data.Json DOM and POSTs it to a neoCLR server. The server
+uses HttpContext to parse the body and return a JSON acknowledgement with status
+201. Bad JSON or report shapes return 400; unknown routes return 404.
 
-[Download the JSON client/server sample](/samples/http-json.zip). It includes the
-application-local JSON codec and a verifier using independent Python HTTP peers.
-The codec handles the six JSON value kinds with explicit field access and construction;
-its 128-byte, four-container-depth and 32-value bounds are demonstration policies.
-It remains exploratory source, not a public runtime-library JSON API.
+Application-owned converters project HttpError and JsonError into AppError while
+retaining the original causes through helpers and async methods. The completion
+callback converts errors to display text at its reporting boundary. Ordinary steps use propagation. The
+server handles invalid input explicitly where it chooses the HTTP response.
+
+[Download the client/server sample](/samples/http-json.zip). It uses the runtime
+library's JSON parser and includes checks against independent Python HTTP peers.
+Serialization is synchronous; HTTP bodies are currently buffered. The provisional
+DOM limits are 128 UTF-8 bytes, four container levels and 32 values. Object mapping
+and runtime reflection are the next investigation, not implemented JSON features.
 
 ## Current limits
 

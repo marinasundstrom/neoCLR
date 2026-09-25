@@ -1,54 +1,84 @@
 import System.*
-import System.Collections.*
+import System.Data.Json.*
 import System.Result.*
 import System.Tasks.*
 import System.Text.*
 import System.Web.Http.*
 
-func CreateReport() -> Result<string, string> {
-    let report = JsonValue.ObjectValue()
-    _ = report.Put("station", JsonValue.StringValue("Café"))?
-    let readings = JsonValue.ArrayValue()
-    let first = JsonValue.NumberValue("21")?
-    let second = JsonValue.NumberValue("22.5")?
-    _ = readings.Add(first)?
-    _ = readings.Add(second)?
-    _ = report.Put("readings", readings)?
-    return WriteDocument(report)
+func ErrorContent(message: string) -> HttpContent {
+    // Messages passed here are application-owned constants, not unescaped input.
+    return HttpContent(Utf8.Encode(message), "application/json; charset=utf-8")
 }
 
-func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-    let source = Promise<Result<HttpResponse, HttpError>>()
-    if request.Target != "/report" {
-        _ = source.Complete(Error(HttpError.Handler("Unknown report")))
-    } else if let Ok(text) = CreateReport() {
-        let headers = ArrayList<HttpHeader>()
-        headers.Add(HttpHeader("Content-Type", "application/json"))
-        _ = source.Complete(Ok(HttpResponse(200, headers, Utf8.Encode(text))))
-    } else {
-        _ = source.Complete(Error(HttpError.Handler("Report construction failed")))
-    }
-    return source.Task
-}
-
-func Main() {
-    if let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) {
-        if let Ok(port) = server.GetLocalPort() {
-            Console.WriteLine(port)
-            let serving = server.ServeOne(Respond)
-            serving.OnCompleted(() => {
-                let result = serving.GetResult()
-                server.Close()
-                if let Error(message) = result {
-                    System.Fault(message.ToString())
+class ReportServer {
+    func Configure(context: HttpContext) -> Result<unit, AppError> {
+        let request = context.Request
+        if request.Method == "GET" && request.Target == "/report" {
+            let report = CreateReport()?
+            let content = JsonContent(report)?
+            context.Respond(HttpStatusCode.OK, content)
+        } else if request.Method == "POST" && request.Target == "/reports" {
+            let body = Utf8.Decode(request.Content.Bytes)
+            // This boundary handles invalid input as an HTTP response, rather than propagating it.
+            if let Ok(text) = body {
+                if let Ok(reply) = Acknowledge(text) {
+                    if let Ok(content) = JsonContent(reply) {
+                        context.Respond(HttpStatusCode.Created, content)
+                        return Ok(())
+                    }
                 }
-                Console.WriteLine("Report served")
-            })
+            }
+            context.Respond(HttpStatusCode.BadRequest, ErrorContent("{\"error\":\"Invalid report\"}"))
         } else {
-            server.Close()
-            System.Fault("Local port unavailable")
+            context.Respond(HttpStatusCode.NotFound, ErrorContent("{\"error\":\"Not found\"}"))
         }
-    } else {
-        System.Fault("Listen failed")
+        return Ok(())
     }
+
+    async func Serve(server: HttpServer, count: int) -> Task<Result<unit, AppError>> {
+        var index = 0
+        while index < count {
+            let context = await server.Accept()?
+            // Close the owned exchange before propagating a configuration failure.
+            let configured = Configure(context)
+            if let Error(error) = configured {
+                context.Close()
+                return Error(error)
+            }
+            let sent = await context.Complete()
+            if let Error(sendError) = sent {
+                return Error(AppError.Http(sendError))
+            }
+            index += 1
+        }
+        return Ok(())
+    }
+
+}
+
+func Main(arguments: string[]) {
+    var count = 1
+    if arguments.Length > 0 {
+        if let Ok(parsed) = Int32.Parse(arguments[0]) {
+            count = parsed
+        }
+    }
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+        System.Fault("Listen failed")
+        return
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        server.Close()
+        System.Fault("Local port unavailable")
+        return
+    }
+    Console.WriteLine(port)
+    let serving = ReportServer().Serve(server, count)
+    serving.OnCompleted(() => {
+        server.Close()
+        if let Error(error) = serving.GetResult() {
+            System.Fault(error.ToString())
+        }
+        Console.WriteLine("Reports served")
+    })
 }
