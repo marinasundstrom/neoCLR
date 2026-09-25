@@ -19,6 +19,8 @@ pub(crate) enum Binding {
     UnixTimeToLocal,
     Math(crate::math::Operation),
     Reflection(crate::reflection::Query),
+    ReflectionConstructionCheck,
+    ReflectionConstruct,
     ObjectTypeHandle,
     ObjectReferenceEquals,
     ObjectEquals,
@@ -118,6 +120,12 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         return Ok(Binding::Reflection(query));
     }
     let (binding, returns) = match (function.name.as_str(), function.parameters.as_slice()) {
+        ("neoCLR.Runtime.ReflectionConstructionCheck", [Type::RuntimeTypeHandle]) => {
+            (Binding::ReflectionConstructionCheck, Type::Int32)
+        }
+        ("neoCLR.Runtime.ReflectionConstruct", [Type::RuntimeTypeHandle]) => {
+            (Binding::ReflectionConstruct, Type::from_name("System.Object"))
+        }
         ("neoCLR.Runtime.EnvironmentArguments", []) => (
             Binding::EnvironmentArguments,
             Type::Array(Box::new(Type::String)),
@@ -430,6 +438,9 @@ impl Binding {
             return query.invoke(module, &args, limits);
         }
         match (self, args.as_slice()) {
+            (Self::ReflectionConstructionCheck, [handle]) => {
+                Ok(Value::Int32(crate::reflection_execution::check(module, handle)))
+            }
             (Self::ObjectEquals, [left, right]) => {
                 crate::object_identity::equals(left, right).map(Value::Boolean)
             }

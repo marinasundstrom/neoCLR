@@ -684,7 +684,7 @@ fn method(
     ))
 }
 
-fn from_identity(module: &Module, identity: &TypeIdentity) -> Result<Type, Fault> {
+pub(crate) fn from_identity(module: &Module, identity: &TypeIdentity) -> Result<Type, Fault> {
     let nested = |id| from_identity(module, id).map(Box::new);
     Ok(match identity {
         TypeIdentity::GenericParameter { index, .. } => Type::TypeParameter(*index),

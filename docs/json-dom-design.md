@@ -124,3 +124,9 @@ validation costs. Do not introduce serializer caches, attributes, automatic null
 mapping or a new metadata convention until this single round trip establishes the
 needed contract. The larger report's transport/performance limitation remains open
 independently of this reflection investigation.
+
+
+The first [private construction checkpoint](reflection-execution.md) now executes
+public parameterless nongeneric class constructors through the normal interpreter.
+This does not yet expose creation on the Raven API or implement the mapped report.
+Property execution and the Result-based reflection facade are next.

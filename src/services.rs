@@ -26,6 +26,8 @@ pub enum RuntimeService {
     ConsoleInput,
     ValueStorage,
     TypeInspection,
+    /// Dynamic managed construction; static reachability alone cannot enumerate targets.
+    ReflectionExecution,
     InterfaceDispatch,
     SlotReferences,
     ManagedArrays,
@@ -86,7 +88,9 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::UnixTimeToLocal => RuntimeService::LocalClock,
             crate::native::Binding::UnixTimeTicks => RuntimeService::WallClock,
             crate::native::Binding::Math(_) => RuntimeService::MathOperations,
-            crate::native::Binding::Reflection(_)
+            crate::native::Binding::ReflectionConstruct => RuntimeService::ReflectionExecution,
+            crate::native::Binding::ReflectionConstructionCheck
+            | crate::native::Binding::Reflection(_)
             | crate::native::Binding::AssemblyInfo(_)
             | crate::native::Binding::ExecutingAssembly
             | crate::native::Binding::ObjectTypeHandle
@@ -150,6 +154,22 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             service,
             instruction: None,
         }];
+        if matches!(
+            crate::native::bind(function)?,
+            crate::native::Binding::ReflectionConstruct
+        ) {
+            uses.extend(
+                [
+                    RuntimeService::TypeInspection,
+                    RuntimeService::FrameAllocation,
+                    RuntimeService::ManagedHeap,
+                ]
+                .map(|service| ServiceUse {
+                    service,
+                    instruction: None,
+                }),
+            );
+        }
         if matches!(
             crate::native::bind(function)?,
             crate::native::Binding::NotifyWorker

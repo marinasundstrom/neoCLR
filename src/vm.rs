@@ -2734,6 +2734,18 @@ fn interpret_instructions(
                             frame.stack.push(Value::Void);
                             return Ok(None);
                         }
+                        if matches!(binding, crate::native::Binding::ReflectionConstruct) {
+                            if frames.len() >= limits.frames {
+                                return Err(Fault::coded(
+                                    crate::FaultCode::StackOverflow,
+                                    "frame limit exceeded",
+                                ));
+                            }
+                            let adapter =
+                                crate::reflection_execution::adapter(module, &callee, &args[0])?;
+                            frames.push(Frame::new(adapter, args)?);
+                            return Ok(None);
+                        }
                         let prior_output = output.len();
                         let value = if matches!(binding, crate::native::Binding::CurrentTaskQueue) {
                             current_task_queue
