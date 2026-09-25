@@ -1,5 +1,5 @@
 //! Private host resolver. Blocking work owns host data only; the VM owns callbacks.
-//! No guest-facing DNS contract is exposed by this checkpoint.
+//! Cancellation retires guest delivery; blocked host work retains its own capacity permit.
 
 use crate::Value;
 use std::{
@@ -25,6 +25,7 @@ pub(crate) enum Operation {
     Lookup,
     LookupUntil,
     Result,
+    Cancel,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum Error {
@@ -101,6 +102,12 @@ impl Resolver {
         operation: Operation,
         args: &[Value],
     ) -> Result<Value, crate::Fault> {
+        if let (Operation::Cancel, [Value::Int64(id)]) = (operation, args) {
+            return self
+                .cancel(OperationId(*id as u64))
+                .map(Value::Boolean)
+                .map_err(|_| crate::Fault::new("Unknown resolver cancellation operation"));
+        }
         let result = match (operation, args) {
             (Operation::LookupUntil, [Value::String(name), Value::Int64(stamp), callback]) => {
                 let until = crate::clock::network_deadline(*stamp)?;
@@ -227,7 +234,6 @@ impl Resolver {
         );
         Ok(id)
     }
-    #[allow(dead_code)] // Private cancellation; no guest cancellation API yet.
     pub(crate) fn cancel(&mut self, id: OperationId) -> Result<bool, Error> {
         let op = self.operations.get_mut(&id).ok_or(Error::Failed)?;
         if op.outcome.is_some() {
@@ -331,6 +337,28 @@ mod tests {
         });
         (resolver, gate, receiver)
     }
+    #[test]
+    fn cancellation_bridge_preserves_observed_completion_and_rejects_foreign_ids() {
+        let mut first = resolver(|_| Ok(vec![Ipv4Addr::LOCALHOST]));
+        let mut second = resolver(|_| Ok(vec![Ipv4Addr::LOCALHOST]));
+        let id = first
+            .submit("localhost", callback(), Duration::from_secs(5))
+            .unwrap();
+        let args = [Value::Int64(id.0 as i64)];
+        assert!(second.invoke(Operation::Cancel, &args).is_err());
+        assert!(first.invoke(Operation::Cancel, &[Value::Int32(1)]).is_err());
+        complete(&mut first);
+        assert_eq!(
+            first.invoke(Operation::Cancel, &args).unwrap(),
+            Value::Boolean(false)
+        );
+        assert_eq!(
+            first.take_result(id),
+            Ok(Some(Ok(vec![Ipv4Addr::LOCALHOST])))
+        );
+        assert!(first.invoke(Operation::Cancel, &args).is_err());
+    }
+
     #[test]
     fn native_bridge_validates_arguments_and_consumes_owned_address_result_once() {
         let mut resolver = resolver(|_| Ok(vec![Ipv4Addr::LOCALHOST]));
@@ -459,9 +487,19 @@ mod tests {
                 .submit("localhost", callback(), Duration::from_secs(5))
                 .unwrap();
             entered.recv_timeout(Duration::from_secs(5)).unwrap();
-            assert!(resolver.cancel(id).unwrap());
+            let args = [Value::Int64(id.0 as i64)];
+            assert_eq!(
+                resolver.invoke(Operation::Cancel, &args).unwrap(),
+                Value::Boolean(true)
+            );
+            assert_eq!(
+                resolver.invoke(Operation::Cancel, &args).unwrap(),
+                Value::Boolean(false)
+            );
+            assert!(resolver.invoke(Operation::Result, &args).is_err());
             complete(&mut resolver);
             assert_eq!(resolver.take_result(id), Ok(Some(Err(Error::Cancelled))));
+            assert!(resolver.invoke(Operation::Cancel, &args).is_err());
         }
         assert_eq!(
             resolver.submit("localhost", callback(), Duration::from_secs(5)),

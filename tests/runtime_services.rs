@@ -242,3 +242,30 @@ fn dns_uses_host_resolution_and_dispatch_without_guest_workers() {
     assert!(graph.required_services().contains(&Service::NameResolution));
     assert!(!graph.required_services().contains(&Service::TaskDispatch));
 }
+
+#[test]
+fn operation_cancellation_hooks_require_exact_signatures_and_services() {
+    for (name, service) in [
+        ("SocketCancel", Service::SocketIo),
+        ("DnsCancel", Service::NameResolution),
+    ] {
+        let source = format!(
+            ".module System\n.function neoCLR.Runtime.{name}(Int64 operation) -> Boolean\n.methodimpl InternalCall\n.end"
+        );
+        let module = assemble(&source).unwrap();
+        let program = LoadedProgram::new(&module).unwrap();
+        let graph = program
+            .analyze_reachability(
+                &[parse_function_ref(&format!("neoCLR.Runtime.{name}(Int64)")).unwrap()],
+                1,
+            )
+            .unwrap();
+        assert_eq!(graph.required_services(), vec![service]);
+        for invalid in [
+            source.replace("Int64 operation", "Int32 operation"),
+            source.replace("-> Boolean", "-> Value"),
+        ] {
+            assert!(assemble(&invalid).is_err());
+        }
+    }
+}

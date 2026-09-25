@@ -76,3 +76,53 @@ configuration and Raven compiler emission are unchanged.
 
 The source, generated library fragments and API reference must be refreshed together.
 The website build is skipped for this slice by author direction.
+
+
+## Native operation acknowledgement — implemented 2026-09-25
+
+The runtime-library bridge now admits private `SocketCancel(operation)` and
+`DnsCancel(operation)` hooks returning Boolean. This extends the existing .NET
+comparison above: the source/token API requests cooperation; the provider must
+still finish operation ownership before completing a Task. These hooks are an
+internal implementation mechanism, not a public handle-based cancellation API.
+HTTP and the managed DNS/socket adapters do not call them yet.
+
+Socket cancellation now covers pending connect, accept, send and receive. The
+invocation owner performs nonblocking socket calls, so cancellation can release a
+pending connection attempt and transfer buffers without waiting for another native
+thread to stop touching guest memory. Cancelling accept preserves the listening
+socket; cancelling a transfer preserves its connection and unread peer bytes.
+Remaining connection attempts are discarded when cancellation wins.
+
+`true` means cancellation committed the operation outcome. `false` means an outcome
+was already committed, including a previous cancellation. Unknown, consumed or
+other-invocation operation IDs fault as provider misuse. IDs are backend-specific;
+providers must pair them with the corresponding DNS or socket hook. These private
+integers are not cross-backend capability tokens. A cancelled outcome still retains
+its callback and operation slot until the normal completion callback is delivered
+and its result consumed. Cancellation neither invokes guest callbacks inline nor
+returns a reusable admission slot prematurely. A later cancellation cannot replace
+an owner-observed success/failure or close the successful connection it produced.
+
+DNS is different: blocking host resolution owns only host data and a global capacity
+permit. Cancellation commits a guest cancellation outcome and discards late delivery;
+it does not stop the host resolver call. Its permit remains charged until that call
+returns, even after guest result consumption or invocation teardown. This existing
+bounded-detachment policy is preserved; cancellation does not mean all host work ended.
+
+For the next managed integration: check pre-cancellation before admission, register
+only a valid admitted operation, preserve the native winning outcome, and dispose
+the token registration before consuming the operation ID. Consume cancelled results
+through the normal provider callback before cancelling the Promise. HTTP must close
+its owned connection before exposing terminal cancellation. No public scheduler or
+runtime suspension is needed for these rules.
+
+Validation uses owner-controlled states for pending connects so OS-dependent
+immediate-versus-pending connect behavior does not decide the assertion. Tests cover
+stream closure, abandoned address attempts, accept/listener reuse, callback/result
+ordering, slot retention, transfer buffer preservation, DNS host-capacity retention,
+completion races, foreign/stale IDs and exact native signatures/services. The
+cancellation-name Rust selection passed 18 tests; the new native signature/service
+check passed separately. The name filter also selected existing worker/string tests;
+future runs should use the narrower socket/resolver module filters. No cross-platform
+matrix or website build is part of this checkpoint.

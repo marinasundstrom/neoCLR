@@ -125,7 +125,7 @@
     "Socket.helpers.neoil": "1009b471cab6ced5ee7cc22e4b5db1125cd760295ad829c8a2d6743df105e128"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "4e2ad329b4b78cabcd295cf80050704d0079f299d09d5897c09a9f63b15782f3",
+  "coreSha256": "3d28b90bda4906e803c93fd3c699b60736d3d5594a4bdb569988c12466a660e2",
   "exports": [
     "Connect(System.Networking.IPAddress address,Int32 port) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>",
     "Connect(System.Collections.Sequence<System.Networking.IPAddress> addresses,Int32 port) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>",

@@ -43,3 +43,6 @@
 .function neoCLR.Runtime.SocketSendUntil(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline,System.Func<Void> callback) -> Value
 .methodimpl InternalCall
 .end
+.function neoCLR.Runtime.SocketCancel(Int64 operation) -> Boolean
+.methodimpl InternalCall
+.end

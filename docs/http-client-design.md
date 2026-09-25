@@ -448,3 +448,14 @@ bypass to make a demo work. An OS TLS backend is an alternative with platform-sp
 adapter/validation costs. Server certificates/configuration are a separate scope decision.
 The release HTTPS decision remains open until this evidence exists, before the application
 slice as required by the roadmap. This checkpoint does not add HTTPS support.
+
+
+## Native cancellation prerequisite — 2026-09-25
+
+The [native acknowledgement checkpoint](cancellation-design.md#native-operation-acknowledgement--implemented-2026-09-25)
+adds bootstrap-only DNS/socket operation cancellation hooks and pending connect/accept
+cancellation. Ready outcomes survive late requests; operation slots survive until
+completion delivery/result consumption. Blocked DNS work retains its host capacity
+permit even when guest delivery is cancelled. The managed adapters and HttpHandler
+still need token forwarding and registration disposal. No token-aware Send/Get or
+GetString overload is claimed by this checkpoint.

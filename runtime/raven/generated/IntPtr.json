@@ -125,7 +125,7 @@
     "IntPtr.helpers.neoil": "9af7283bdadd4dc6ae9970e86b9f9482fd15658ec2155b6d8f2d44f29c32868a"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "4e2ad329b4b78cabcd295cf80050704d0079f299d09d5897c09a9f63b15782f3",
+  "coreSha256": "3d28b90bda4906e803c93fd3c699b60736d3d5594a4bdb569988c12466a660e2",
   "exports": [
     "readonly byref CompareTo(IntPtr other) -> Int32"
   ]

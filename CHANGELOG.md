@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add private runtime-library DNS/socket operation cancellation hooks. Extend socket
+  cancellation to pending connect/accept while preserving listeners, committed
+  outcomes and callback/result acknowledgement. Retain cancelled operation slots
+  until consumption and blocked DNS host-capacity permits until host work returns.
+  Validate cleanup, completion races, stale/foreign handles and exact native service
+  signatures. Managed token registration and HTTP forwarding remain pending.
+
 - Add development HttpClient.BaseUri as Option<string>, plus Get(Uri) overloads
   on HttpClient and HttpRequest. Both address forms use the existing Uri parser
   and resolver before handler dispatch. A configured base requires relative URLs

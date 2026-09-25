@@ -28,6 +28,8 @@ static class RuntimeServiceBindings
             ("SocketReceive", ["Int64", "arrayref<Byte>", "Int32", "Int32", "System.Func<Void>"], "Value"),
             ("SocketSend", ["Int64", "arrayref<Byte>", "Int32", "Int32", "System.Func<Void>"], "Value"),
             ("SocketTransferResult", ["Int64"], "Value"),
+            ("SocketCancel", ["Int64"], "Boolean"),
+            ("DnsCancel", ["Int64"], "Boolean"),
             ("SocketClose", ["Int64"], "Value"),
             ("StorageList", ["String", "Int32"], "Value"),
             ("StorageNames", ["Value"], "arrayref<String>"),

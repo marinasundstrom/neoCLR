@@ -125,7 +125,7 @@
     "IntegerDivisionError.helpers.neoil": "0dc7183a4a6d014c69904fa7ff3b6789dd3690f1b7aef9f3e7bd268d65b72195"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "4e2ad329b4b78cabcd295cf80050704d0079f299d09d5897c09a9f63b15782f3",
+  "coreSha256": "3d28b90bda4906e803c93fd3c699b60736d3d5594a4bdb569988c12466a660e2",
   "exports": [
     "byref .ctor(System.IntegerDivisionError.DivisionByZero value) -> Void",
     "byref TryGetValue(out(true) System.IntegerDivisionError.DivisionByZero& value) -> Boolean",

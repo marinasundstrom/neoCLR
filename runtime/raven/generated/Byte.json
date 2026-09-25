@@ -125,7 +125,7 @@
     "Byte.helpers.neoil": "2af2c1a92e89eda7b6b99458589b12d1ab15db568194382a9c66c03fe9c51c76"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "4e2ad329b4b78cabcd295cf80050704d0079f299d09d5897c09a9f63b15782f3",
+  "coreSha256": "3d28b90bda4906e803c93fd3c699b60736d3d5594a4bdb569988c12466a660e2",
   "exports": [
     "readonly byref CompareTo(Byte other) -> Int32"
   ]

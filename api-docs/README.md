@@ -192,3 +192,8 @@ its named fields replace nested union cases and Is*/Get* accessors. Zero is unna
 Development cancellation source/token/registration APIs now have generated type and
 member descriptions. They are invocation-local and do not yet wire HTTP/native
 operations to tokens. Keep this boundary visible when adding consumer overloads.
+
+Native `SocketCancel`/`DnsCancel` operation hooks are bootstrap-only implementation
+services, not new public reference APIs. Normal application reference metadata still
+omits RuntimeServices; the importer admits these calls only while building the
+runtime library. HTTP and managed DNS/socket token forwarding remain pending.

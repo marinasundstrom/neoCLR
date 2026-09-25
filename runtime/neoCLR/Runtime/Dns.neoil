@@ -12,3 +12,6 @@ ret
 .function neoCLR.Runtime.DnsLookupUntil(String hostName,Int64 deadline,System.Func<Void> callback) -> Value
 .methodimpl InternalCall
 .end
+.function neoCLR.Runtime.DnsCancel(Int64 operation) -> Boolean
+.methodimpl InternalCall
+.end

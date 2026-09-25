@@ -98,6 +98,7 @@ pub(crate) enum Operation {
     Receive,
     Send,
     TransferResult,
+    Cancel,
     Close,
 }
 fn payload(result: Result<Value, Error>) -> Value {
@@ -166,8 +167,8 @@ impl Default for Sockets {
         }
     }
 }
-// Adoption and individual cancellation remain private fixture/prospective-provider
-// entry points; application code uses invoke through the library bridge.
+// Adoption remains a private fixture entry point; operation cancellation is exposed
+// only to runtime-library providers, never as a public operation handle.
 #[allow(dead_code)]
 impl Sockets {
     fn resource_count(&self) -> usize {
@@ -419,6 +420,12 @@ impl Sockets {
         heap: &ManagedHeap,
     ) -> Result<Value, Fault> {
         match (operation, args) {
+            (Operation::Cancel, [Value::Int64(id)]) => {
+                return self
+                    .cancel(OperationId(*id as u64))
+                    .map(Value::Boolean)
+                    .map_err(|_| Fault::new("Unknown socket cancellation operation"));
+            }
             (Operation::DeadlineAfter, [Value::Int32(milliseconds)]) => {
                 return crate::clock::network_deadline_after(*milliseconds).map(Value::Int64);
             }
@@ -686,6 +693,20 @@ impl Sockets {
         op.outcome = Some(outcome);
     }
     pub(crate) fn cancel(&mut self, id: OperationId) -> Result<bool, Error> {
+        if let Some(op) = self.connects.get_mut(&id) {
+            if op.outcome.is_some() {
+                return Ok(false);
+            }
+            // Connect/accept polling runs on the owner. Dropping an uncommitted
+            // stream prevents later adoption; cancelling accept preserves its listener.
+            op.stream = None;
+            op.listener = None;
+            op.remaining.clear();
+            op.deadline = None;
+            op.attempt_deadline = None;
+            op.outcome = Some(Err(Error::Cancelled));
+            return Ok(true);
+        }
         let op = self
             .operations
             .get_mut(&id)
@@ -2095,6 +2116,94 @@ mod tests {
     }
 
     #[test]
+    fn cancelled_accept_delivers_once_retains_slot_and_preserves_listener() {
+        let mut sockets = Sockets::default();
+        sockets.budget.operations = 1;
+        let heap = ManagedHeap::default();
+        let listener = sockets.listen("127.0.0.1", 0, 4).unwrap();
+        let id = sockets.accept(listener, callback()).unwrap();
+        let args = [Value::Int64(id.0 as i64)];
+        assert_eq!(
+            sockets.invoke(Operation::Cancel, &args, &heap).unwrap(),
+            Value::Boolean(true)
+        );
+        assert_eq!(
+            sockets.invoke(Operation::Cancel, &args, &heap).unwrap(),
+            Value::Boolean(false)
+        );
+        assert!(
+            sockets
+                .invoke(Operation::ConnectResult, &args, &heap)
+                .is_err()
+        );
+        assert_eq!(sockets.accept(listener, callback()), Err(Error::Limit));
+        assert_eq!(sockets.resource_count(), 1);
+        deliver(&mut sockets, &heap);
+        assert!(sockets.poll(&heap).unwrap().is_none());
+        assert_eq!(
+            connect_result(&mut sockets, &heap, id),
+            Value::Erased(Box::new(Value::Byte(5)))
+        );
+        assert!(sockets.invoke(Operation::Cancel, &args, &heap).is_err());
+        let next = sockets.accept(listener, callback()).unwrap();
+        let _peer = TcpStream::connect((
+            Ipv4Addr::LOCALHOST,
+            sockets.local_port(listener).unwrap() as u16,
+        ))
+        .unwrap();
+        deliver(&mut sockets, &heap);
+        assert_eq!(
+            sockets
+                .invoke(Operation::Cancel, &[Value::Int64(next.0 as i64)], &heap)
+                .unwrap(),
+            Value::Boolean(false)
+        );
+        let connection = accepted(&mut sockets, &heap, next);
+        sockets.close(connection);
+        sockets.close(listener);
+        assert_eq!(sockets.resource_count(), 0);
+    }
+
+    #[test]
+    fn cancelled_connect_drops_uncommitted_stream_and_remaining_attempts() {
+        // Model an owner-held connection before outcome commitment, independently
+        // of whether this OS reports a loopback connect immediately or as pending.
+        let (mut peer, stream) = pair();
+        peer.set_read_timeout(Some(Duration::from_secs(2))).unwrap();
+        let mut sockets = Sockets::default();
+        let heap = ManagedHeap::default();
+        let id = OperationId(next_id().unwrap());
+        sockets.connects.insert(
+            id,
+            Connect {
+                deadline: Some(Instant::now() + CONNECT_TIMEOUT),
+                attempt_deadline: Some(Instant::now() + ADDRESS_TIMEOUT),
+                remaining: VecDeque::from([SocketAddrV4::new(Ipv4Addr::LOCALHOST, 9)]),
+                listener: None,
+                stream: Some(stream),
+                callback: Some(callback()),
+                outcome: None,
+            },
+        );
+        assert_eq!(sockets.resource_count(), 1);
+        assert_eq!(
+            sockets
+                .invoke(Operation::Cancel, &[Value::Int64(id.0 as i64)], &heap)
+                .unwrap(),
+            Value::Boolean(true)
+        );
+        assert_eq!(sockets.resource_count(), 0);
+        assert!(sockets.connects[&id].remaining.is_empty());
+        assert_eq!(peer.read(&mut [0; 1]).unwrap(), 0);
+        deliver(&mut sockets, &heap);
+        assert_eq!(
+            connect_result(&mut sockets, &heap, id),
+            Value::Erased(Box::new(Value::Byte(5)))
+        );
+        assert!(sockets.connects.is_empty() && sockets.sockets.is_empty());
+    }
+
+    #[test]
     fn cancelled_read_preserves_connection_and_bytes_for_a_new_operation() {
         let (mut peer, stream) = pair();
         let mut sockets = Sockets::default();
@@ -2105,8 +2214,18 @@ mod tests {
             .receive(socket, &heap, buffer.clone(), 0, 4, callback())
             .unwrap();
         peer.write_all(b"H").unwrap();
-        assert!(sockets.cancel(first).unwrap());
-        assert!(!sockets.cancel(first).unwrap());
+        assert_eq!(
+            sockets
+                .invoke(Operation::Cancel, &[Value::Int64(first.0 as i64)], &heap)
+                .unwrap(),
+            Value::Boolean(true)
+        );
+        assert_eq!(
+            sockets
+                .invoke(Operation::Cancel, &[Value::Int64(first.0 as i64)], &heap)
+                .unwrap(),
+            Value::Boolean(false)
+        );
         assert_eq!(
             sockets.take_result(first),
             Ok(None),
