@@ -16,6 +16,8 @@
       href: features/networking/index.md
     - name: Web and HTTP
       href: features/web/index.md
+    - name: JSON serialization
+      href: docs/json.md
     - name: Streams
       href: docs/streams.md
     - name: Storage

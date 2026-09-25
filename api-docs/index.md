@@ -20,6 +20,9 @@ for boxed behavior.
 enum type parameter. Generic values remain typed; discovery preserves the exact
 boxed enum identity. See [Introspection](/features/introspection/) for current limits.
 
+[JSON serialization](json.md) describes the DOM and provisional flat-object overloads,
+including property, error and borrowed-stream rules.
+
 Start with a feature guide for behavior and working examples, or open a namespace
 for generated type and member documentation. Both are parts of this site.
 

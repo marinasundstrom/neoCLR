@@ -1,0 +1,108 @@
+namespace System.Data.Json
+
+import System.*
+import System.Collections.*
+import System.Introspection.*
+import System.Option.*
+import System.Result.*
+import System.Runtime.Reflection.*
+
+internal class ObjectMapper {
+    init() { }
+
+    private static func CheckType(type: TypeInfo) -> Result<unit, JsonError> {
+        if type.IsValueType || type.IsInterface || type.IsArray || type.IsByRef || type.IsPointer || type.IsOpen || type.GenericArgumentCount != 0 || type.Equals(typeof(string)) {
+            return Error(JsonError.UnsupportedMapping("Expected a nongeneric reference class"))
+        }
+        return Ok(())
+    }
+
+    private static func CheckProperty(property: PropertyInfo) -> Result<unit, JsonError> {
+        if property.GetIndexParameters().Count != 0 {
+            return Error(JsonError.UnsupportedMapping("Indexed property: " + property.Name))
+        }
+        let type = property.PropertyType
+        if type.Equals(typeof(string)) || type.Equals(typeof(int)) || type.Equals(typeof(bool)) {
+            return Ok(())
+        }
+        return Error(JsonError.UnsupportedMapping("Unsupported property type: " + property.Name))
+    }
+
+    static func Write(value: Object) -> Result<JsonObject, JsonError> {
+        let type = value.GetType()
+        _ = CheckType(type)?
+        let document = JsonObject()
+        for property in type.GetProperties() {
+            if !property.IsStatic && property.GetGetMethod() is Some(_) {
+                _ = CheckProperty(property)?
+                let item: Object? = match property.GetValue(value) {
+                    Ok(let content) => content
+                    Error(let reason) => {
+                        return Error(JsonError.Reflection(reason))
+                    }
+                }
+                if item is string text {
+                    _ = document.Add(property.Name, JsonString(text))?
+                } else if item is int number {
+                    let scalar = JsonNumber.Parse(number.ToString())?
+                    _ = document.Add(property.Name, scalar)?
+                } else if item is bool flag {
+                    _ = document.Add(property.Name, JsonBoolean(flag))?
+                } else {
+                    return Error(JsonError.UnsupportedMapping("Null property: " + property.Name))
+                }
+            }
+        }
+        return Ok(document)
+    }
+
+    static func Read(value: JsonValue, type: TypeInfo) -> Result<Object, JsonError> {
+        _ = CheckType(type)?
+        if value is JsonObject document {
+            let properties = ArrayList<PropertyInfo>()
+            let values = ArrayList<Object>()
+            // Validate supplied values before invoking any constructor or setter.
+            for property in type.GetProperties() {
+                if !property.IsStatic && property.GetSetMethod() is Some(_) {
+                    _ = CheckProperty(property)?
+                    let item = document.Field(property.Name)?
+                    let propertyType = property.PropertyType
+                    if propertyType.Equals(typeof(string)) {
+                        if item is JsonString text {
+                            values.Add(text.Value)
+                        } else {
+                            return Error(JsonError.TypeMismatch("string property " + property.Name))
+                        }
+                    } else if propertyType.Equals(typeof(int)) {
+                        if item is JsonNumber number {
+                            let parsed = number.AsInt32()?
+                            values.Add(parsed)
+                        } else {
+                            return Error(JsonError.TypeMismatch("Int32 property " + property.Name))
+                        }
+                    } else {
+                        if item is JsonBoolean flag {
+                            values.Add(flag.Value)
+                        } else {
+                            return Error(JsonError.TypeMismatch("Boolean property " + property.Name))
+                        }
+                    }
+                    properties.Add(property)
+                }
+            }
+            let instance = match type.CreateInstance() {
+                Ok(let created) => created
+                Error(let reason) => {
+                    return Error(JsonError.Reflection(reason))
+                }
+            }
+            for index in 0..<properties.Count {
+                if let Error(reason) = properties[index].SetValue(instance, values[index]) {
+                    return Error(JsonError.Reflection(reason))
+                }
+            }
+            return Ok(instance)
+        }
+        return Error(JsonError.TypeMismatch("object"))
+    }
+}

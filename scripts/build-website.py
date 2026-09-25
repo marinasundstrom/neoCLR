@@ -311,7 +311,7 @@ def main():
     shutil.make_archive(str(downloads / 'http-server'), 'zip', server_downloads)
     json_downloads = downloads / 'http-json'
     for directory, names in (
-        ('json-object-mapping', ('Mapping.rvn', 'Main.rvn', 'JsonObjectMapping.rvnproj', 'verify.py', 'HttpApplication.rvn', 'HttpServer.rvn', 'README.md', 'cost.md', 'cost-results.json')),
+        ('json-object-mapping', ('Mapping.rvn', 'Main.rvn', 'Public.rvn', 'JsonObjectMapping.rvnproj', 'verify.py', 'HttpApplication.rvn', 'HttpServer.rvn', 'README.md', 'cost.md', 'cost-results.json')),
         ('http-json', ('Client.rvn', 'Server.rvn', 'Application.rvn', 'Client.rvnproj', 'Server.rvnproj', 'README.md', 'limitations.md', 'verify.py')),
     ):
         destination = json_downloads / directory

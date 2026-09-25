@@ -54,12 +54,9 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
             shutil.copyfile(here / filename, target / filename)
         if args.mapped:
             mapping = here.parent / 'json-object-mapping'
-            shutil.copyfile(mapping / 'Mapping.rvn', target / 'Mapping.rvn')
             shutil.copyfile(mapping / 'HttpApplication.rvn', target / 'Application.rvn')
             if name == 'Server':
                 shutil.copyfile(mapping / 'HttpServer.rvn', target / 'Server.rvn')
-            project = target / (name + '.rvnproj')
-            project.write_text(project.read_text().replace('</ItemGroup>', '<Compile Include="Mapping.rvn" /></ItemGroup>'))
         apps[name] = build(target / (name + '.rvnproj'))
 
     def client(port):

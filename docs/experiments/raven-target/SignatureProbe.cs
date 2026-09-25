@@ -339,10 +339,14 @@ static class SignatureProbe
         jsonRoot.CustomAttributes.Remove(jsonMarker);
         Reject("JSON requires closed family", () => JsonBindings.Validate(jsonRoot));
         jsonRoot.CustomAttributes.Add(jsonMarker);
-        var jsonRead = module.GetType(JsonBindings.Prefix + "JsonSerializer").Methods.Single(m => m.Name == "Deserialize" && m.Parameters[0].ParameterType.MetadataType == MetadataType.String);
+        var jsonRead = module.GetType(JsonBindings.Prefix + "JsonSerializer").Methods.Single(m => m.Name == "Deserialize" && m.Parameters.Count == 1 && m.Parameters[0].ParameterType.MetadataType == MetadataType.String);
         var invalidJsonRead = Reference(jsonRead, jsonRead.DeclaringType);
         invalidJsonRead.Parameters[0].ParameterType = module.TypeSystem.Int32;
         Reject("JSON rejects forged deserialize signature", () => JsonBindings.Bind(invalidJsonRead, jsonRead, false, false));
+        var objectRead = module.GetType(JsonBindings.Prefix + "JsonSerializer").Methods.Single(m => m.Name == "Deserialize" && m.Parameters.Count == 2 && m.Parameters[0].ParameterType.MetadataType == MetadataType.String);
+        var invalidObjectRead = Reference(objectRead, objectRead.DeclaringType);
+        invalidObjectRead.Parameters[1].ParameterType = module.TypeSystem.Object;
+        Reject("JSON mapping requires TypeInfo", () => JsonBindings.Bind(invalidObjectRead, objectRead, false, false));
         var pathType = module.GetType("System.Storage.Path");
         var combine = pathType.Methods.Single(m => m.Name == "Combine");
         var pathCall = Reference(combine, pathType);

@@ -263,3 +263,11 @@ Public, Private, Assembly, Family, FamilyOrAssembly, FamilyAndAssembly and
 CompilerControlled. These host/artifact fields are documented in that guide, not
 invented as guest CLI APIs. The website build was explicitly skipped for this slice;
 the matching reference assembly, XML and inventory were refreshed and checked.
+
+
+2026-09-25 JSON mapping update: the four Object/TypeInfo serializer overloads and
+JsonError.Reflection/UnsupportedMapping cases are included in the matching reference
+snapshot and XML summaries. The linked JSON guide describes exact-name shallow
+properties, strict presence/null rules and stream/error ownership. No public mapping
+API is excluded from RavenDoc. Website build is skipped at the author's direction;
+snapshot and sample archive source checks remain required.

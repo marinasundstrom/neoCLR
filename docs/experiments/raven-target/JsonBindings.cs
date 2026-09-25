@@ -5,16 +5,16 @@ static class JsonBindings {
     public const string Root = "System.Data.Json.JsonValue";
     public const string Prefix = "System.Data.Json.";
     public static readonly string[] Leaves = new[] { "JsonObject", "JsonArray", "JsonString", "JsonNumber", "JsonBoolean", "JsonNull" }.Select(n => Prefix + n).ToArray();
-    public static readonly string[] Names = new[] { Root, Prefix + "JsonSerializer", Prefix + "DocumentReader", Prefix + "DocumentWriter", Prefix + "MessageReader", Prefix + "JsonSyntax" }.Concat(Leaves).ToArray();
+    public static readonly string[] Names = new[] { Root, Prefix + "JsonSerializer", Prefix + "ObjectMapper", Prefix + "DocumentReader", Prefix + "DocumentWriter", Prefix + "MessageReader", Prefix + "JsonSyntax" }.Concat(Leaves).ToArray();
     const string Marker = "System.Runtime.CompilerServices.ClosedHierarchyAttribute";
     public static bool Assignable(string source, string target) => target == Root && Leaves.Contains(source);
     public static bool IsName(string name) => Names.Contains(name);
-    public static bool IsProvider(TypeDefinition type) => IsName(type.FullName) && type.Name is "DocumentReader" or "DocumentWriter" or "MessageReader" or "JsonSyntax";
+    public static bool IsProvider(TypeDefinition type) => IsName(type.FullName) && type.Name is "ObjectMapper" or "DocumentReader" or "DocumentWriter" or "MessageReader" or "JsonSyntax";
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
     public static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
     public const string Declarations = """
 namespace Data.Json {
-public struct JsonError { public struct Syntax { } public struct LimitExceeded { } public struct TypeMismatch { } public struct MissingField { } public struct DuplicateField { } public struct InvalidIndex { } public struct InvalidNumber { } public struct NumberOutOfRange { } public struct Read { } public struct Write { } }
+public struct JsonError { public struct Syntax { } public struct LimitExceeded { } public struct TypeMismatch { } public struct MissingField { } public struct DuplicateField { } public struct InvalidIndex { } public struct InvalidNumber { } public struct NumberOutOfRange { } public struct Read { } public struct Write { } public struct Reflection { } public struct UnsupportedMapping { } }
 public abstract class JsonValue {
     protected JsonValue() { }
 }
@@ -51,10 +51,19 @@ public sealed class JsonNull : JsonValue {
 }
 public sealed class JsonSerializer {
     private JsonSerializer() { }
+    public static Result<object, JsonError> Deserialize(string text, Introspection.TypeInfo type) => default;
+    public static Result<object, JsonError> Deserialize(IO.InputStream input, Introspection.TypeInfo type) => default;
+    public static Result<string, JsonError> Serialize(object value) => default;
+    public static Result<PropagationUnit, JsonError> Serialize(IO.OutputStream output, object value) => default;
     public static Result<JsonValue, JsonError> Deserialize(string text) => default;
     public static Result<JsonValue, JsonError> Deserialize(IO.InputStream input) => default;
     public static Result<string, JsonError> Serialize(JsonValue value) => default;
     public static Result<PropagationUnit, JsonError> Serialize(IO.OutputStream output, JsonValue value) => default;
+}
+internal sealed class ObjectMapper {
+    public ObjectMapper() { }
+    public static Result<JsonObject, JsonError> Write(object value) => default;
+    public static Result<object, JsonError> Read(JsonValue value, Introspection.TypeInfo type) => default;
 }
 internal sealed class DocumentReader { public DocumentReader(string text) { } public Result<JsonValue, JsonError> Read() => default; }
 internal sealed class DocumentWriter { public DocumentWriter() { } public Result<string, JsonError> Write(JsonValue value) => default; }
@@ -124,6 +133,13 @@ internal sealed class JsonSyntax {
         ["JsonSerializer::Deserialize(System.IO.InputStream)"] = ("System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>", true, false),
         ["JsonSerializer::Serialize(System.Data.Json.JsonValue)"] = ("System.Result<String,System.Data.Json.JsonError>", true, false),
         ["JsonSerializer::Serialize(System.IO.OutputStream,System.Data.Json.JsonValue)"] = ("System.Result<Void,System.Data.Json.JsonError>", true, false),
+        ["JsonSerializer::Deserialize(String,System.Introspection.TypeInfo)"] = ("System.Result<System.Object,System.Data.Json.JsonError>", true, false),
+        ["JsonSerializer::Deserialize(System.IO.InputStream,System.Introspection.TypeInfo)"] = ("System.Result<System.Object,System.Data.Json.JsonError>", true, false),
+        ["JsonSerializer::Serialize(System.Object)"] = ("System.Result<String,System.Data.Json.JsonError>", true, false),
+        ["JsonSerializer::Serialize(System.IO.OutputStream,System.Object)"] = ("System.Result<Void,System.Data.Json.JsonError>", true, false),
+        ["ObjectMapper::.ctor()"] = ("noresult", false, true),
+        ["ObjectMapper::Write(System.Object)"] = ("System.Result<System.Data.Json.JsonObject,System.Data.Json.JsonError>", true, false),
+        ["ObjectMapper::Read(System.Data.Json.JsonValue,System.Introspection.TypeInfo)"] = ("System.Result<System.Object,System.Data.Json.JsonError>", true, false),
         ["DocumentReader::.ctor(String)"] = ("noresult", false, true),
         ["DocumentReader::Read()"] = ("System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>", false, false),
         ["DocumentWriter::.ctor()"] = ("noresult", false, true),

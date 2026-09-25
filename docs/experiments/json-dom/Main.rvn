@@ -137,54 +137,43 @@ func MemoryContracts() {
     let data: byte[] = [(byte)65, (byte)66, (byte)67]
     let Ok(initial) = memory.GetLength() else {
         System.Fault("Missing length")
-        return
     }
     Check(initial == 0)
     let Ok(written) = output.Write(data, 0, 3) else {
         System.Fault("Memory write failed")
-        return
     }
     Check(written == 3)
     let Ok(_) = seek.Seek(1) else {
         System.Fault("Seek failed")
-        return
     }
     let Ok(_) = output.Write(data, 0, 1) else {
         System.Fault("Overwrite failed")
-        return
     }
     let Ok(_) = seek.Seek(5) else {
         System.Fault("Gap seek failed")
-        return
     }
     let Ok(_) = output.Write(data, 0, 0) else {
         System.Fault("Empty write failed")
-        return
     }
     let Ok(before) = memory.GetLength() else {
         System.Fault("Missing length")
-        return
     }
     Check(before == 3)
     let Ok(_) = output.Write(data, 2, 1) else {
         System.Fault("Gap write failed")
-        return
     }
     let Ok(_) = seek.Seek(0) else {
         System.Fault("Rewind failed")
-        return
     }
     let buffer: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9, (byte)9, (byte)9, (byte)9, (byte)9]
     let Ok(read) = input.Read(buffer, 1, 7) else {
         System.Fault("Read failed")
-        return
     }
     Check(read == 6 && buffer[0] == 9 && buffer[7] == 9)
     Check(buffer[1] == 65 && buffer[2] == 65 && buffer[3] == 67)
     Check(buffer[4] == 0 && buffer[5] == 0 && buffer[6] == 67)
     let Ok(eof) = input.Read(buffer, 0, 1) else {
         System.Fault("EOF failed")
-        return
     }
     Check(eof == 0)
     match output.Write(data, 2147483647, 1) {
@@ -205,12 +194,10 @@ func MemoryContracts() {
     }
     let Ok(position) = seek.GetPosition() else {
         System.Fault("Missing position")
-        return
     }
     Check(position == 6)
     let Ok(_) = seek.Seek(65536) else {
         System.Fault("Boundary seek failed")
-        return
     }
     match output.Write(data, 0, 1) {
         Error(let error) => Check(error is StreamError.LimitExceeded)
@@ -218,12 +205,10 @@ func MemoryContracts() {
     }
     let Ok(length) = memory.GetLength() else {
         System.Fault("Missing length")
-        return
     }
     Check(length == 6)
     let Ok(_) = output.Flush() else {
         System.Fault("Flush failed")
-        return
     }
     input.Close()
     output.Close()
@@ -260,12 +245,10 @@ func Main() {
     let sampleOutput = ShortOutput(-1, false)
     let Ok(_) = AddAcknowledgement(sampleInput, sampleOutput) else {
         System.Fault("Acknowledgement failed")
-        return
     }
     Check(!sampleInput.Closed && !sampleOutput.Closed)
     let Ok(sampleText) = Utf8.Decode(sampleOutput.Bytes) else {
         System.Fault("Acknowledgement encoding failed")
-        return
     }
     Check(sampleText == "{\"accepted\":true}")
     sampleInput.Close()
@@ -277,7 +260,6 @@ func Main() {
     }
     let Ok(value) = JsonSerializer.Deserialize("[1,2]") else {
         System.Fault("Could not create test value")
-        return
     }
     let failed = ShortOutput(2, false)
     match JsonSerializer.Serialize(failed, value) {
@@ -296,7 +278,6 @@ func Main() {
     let cycle = JsonArray()
     let Ok(_) = cycle.Add(cycle) else {
         System.Fault("Could not create cycle")
-        return
     }
     let untouched = ShortOutput(-1, false)
     match JsonSerializer.Serialize(untouched, cycle) {
@@ -337,7 +318,6 @@ func DomContracts() {
     let array = JsonArray()
     let Ok(number) = JsonNumber.Parse("22.5") else {
         System.Fault("Number parse failed")
-        return
     }
     Check(number.Text == "22.5")
     match number.AsInt32() {
@@ -346,19 +326,15 @@ func DomContracts() {
     }
     let Ok(_) = array.Add(number) else {
         System.Fault("Array add failed")
-        return
     }
     let Ok(_) = document.Add("readings", array) else {
         System.Fault("Object add failed")
-        return
     }
     let Ok(_) = document.Add("note", JsonNull()) else {
         System.Fault("Null add failed")
-        return
     }
     let Ok(note) = document.Field("note") else {
         System.Fault("Missing present null")
-        return
     }
     Check(note is JsonNull)
     match document.Field("missing") {
@@ -376,12 +352,10 @@ func DomContracts() {
     }
     let Ok(name) = document.Name(0) else {
         System.Fault("Name lookup failed")
-        return
     }
     Check(name == "readings")
     let Ok(child) = document.Item(0) else {
         System.Fault("Item lookup failed")
-        return
     }
     Check(child is JsonArray)
     Check(JsonString("hello").Value == "hello" && JsonBoolean(true).Value)

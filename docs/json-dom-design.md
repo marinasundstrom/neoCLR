@@ -20,7 +20,8 @@ reference identity, not deep value equality. Containers retain child references,
 sharing and cycles are possible; writing a cycle reaches the depth bound. There is
 no cloning, ownership tree, parent pointer, replacement/removal or thread-safety API.
 
-JsonSerializer currently operates only on JsonValue. String and stream Deserialize
+JsonSerializer retains its JsonValue DOM overloads. Provisional Object/TypeInfo
+overloads now add shallow mapping as described below. String and stream Deserialize
 parse one complete value; Serialize writes compact JSON. Streams are borrowed, not
 flushed or closed. StreamReader/StreamWriter provide strict UTF-8 and partial-transfer
 handling. The author explicitly selected synchronous Result-returning APIs for this slice.
@@ -192,3 +193,43 @@ stream ownership/consumption. The serializer remains synchronous today; future H
 helpers can compose asynchronous transport with synchronous conversion of buffered
 content without claiming asynchronous stream parsing. Validate an object request
 and object response in one round trip when this later slice is implemented.
+
+
+## Provisional public object mapping — 2026-09-25
+
+JsonSerializer adds non-generic Deserialize(text/input, TypeInfo) returning
+Result<Object, JsonError>, and Serialize(Object)/Serialize(output, Object).
+The [public consumer](experiments/json-object-mapping/Public.rvn) uses the real
+library, not an application copy of the mapper. The opt-in HTTP variant now uses
+these overloads for both report and acknowledgement objects, exercising all four
+client/server conversion boundaries without introducing HTTP JSON extensions yet.
+
+The deliberately shallow contract supports String, Int32 and Boolean properties on
+nongeneric reference classes. Public readable instance properties serialize; public
+writable instance properties deserialize. All writable properties must be present;
+unknown fields are ignored. Exact case-sensitive property names are used. Fields,
+static properties and inaccessible accessors are skipped. Participating indexers,
+unsupported types and null values fail. There is no recursive mapping, attribute,
+naming or coercion policy. DOM objects held as Object retain the DOM codec.
+
+Compare [.NET object deserialization](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/deserialization)
+and [property naming](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/customize-properties)
+(reviewed 2026-09-25). Explicit runtime-type overloads and exact-name matching are
+familiar .NET concepts. Unlike .NET's broad mapper, this POC rejects nested models
+and nulls and requires all writable properties, even without a required-member
+annotation. That strict rule catches missing data without inventing defaults for
+absence, but prevents partial DTO inputs; it is a provisional cost, not a claim of
+superiority. Naming policies/attributes remain future work. The HTTP payload types
+explicitly use lowercase wire-property names to preserve the established schema.
+
+Validate the complete set of input values before constructor/setter execution.
+JsonError.Reflection retains ReflectionError; UnsupportedMapping carries a diagnostic
+for unsupported shapes. Constructor and accessor Faults remain terminal. User-code
+side effects are not transactional. Serialization validates the complete DOM/output
+before stream writes; streams stay borrowed and synchronous. Existing JSON limits
+still apply. API XML and the [on-site guide](../api-docs/json.md) describe each overload.
+
+The JsonValue slice enables the already-existing target typeof Runtime Contract;
+see [compiler integration](raven-system-library.md#json-mapping-typeof-configuration--2026-09-25).
+Generic overloads and shared HTTP JSON content helpers are the next convenience
+candidates after this bounded surface, not implemented by these methods.

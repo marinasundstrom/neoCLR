@@ -2,9 +2,10 @@ namespace System.Data.Json
 
 import System.*
 import System.IO.*
+import System.Introspection.*
 import System.Result.*
 
-// Provisional DOM-only serializer. Object mapping is intentionally separate.
+// Provisional DOM codec and shallow object mapping; all I/O is synchronous.
 public class JsonSerializer {
     private init() { }
 
@@ -39,5 +40,31 @@ public class JsonSerializer {
             Ok(_) => Ok(())
             Error(let error) => Error(JsonError.Write(error))
         }
+    }
+
+    static func Deserialize(text: string, type: TypeInfo) -> Result<Object, JsonError> {
+        let document = Deserialize(text)?
+        return ObjectMapper.Read(document, type)
+    }
+
+    static func Deserialize(input: InputStream, type: TypeInfo) -> Result<Object, JsonError> {
+        let document = Deserialize(input)?
+        return ObjectMapper.Read(document, type)
+    }
+
+    static func Serialize(value: Object) -> Result<string, JsonError> {
+        if value is JsonValue document {
+            return Serialize(document)
+        }
+        let mapped = ObjectMapper.Write(value)?
+        return Serialize(mapped)
+    }
+
+    static func Serialize(output: OutputStream, value: Object) -> Result<unit, JsonError> {
+        if value is JsonValue document {
+            return Serialize(output, document)
+        }
+        let mapped = ObjectMapper.Write(value)?
+        return Serialize(output, mapped)
     }
 }

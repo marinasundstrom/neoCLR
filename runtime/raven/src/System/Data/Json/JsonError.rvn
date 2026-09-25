@@ -2,6 +2,7 @@ namespace System.Data.Json
 
 import System.*
 import System.IO.*
+import System.Runtime.Reflection.*
 
 public union JsonError {
     case Syntax(message: string)
@@ -14,6 +15,8 @@ public union JsonError {
     case NumberOutOfRange
     case Read(reason: TextReadError)
     case Write(reason: StreamError)
+    case Reflection(reason: ReflectionError)
+    case UnsupportedMapping(message: string)
 
     override func ToString() -> string {
         return match self {
@@ -27,6 +30,8 @@ public union JsonError {
             NumberOutOfRange => "Number is not an Int32 integer token"
             Read(let reason) => reason.ToString()
             Write(let reason) => reason.ToString()
+            Reflection(_) => "JSON reflection operation failed"
+            UnsupportedMapping(let message) => message
             _ => "Empty"
         }
     }

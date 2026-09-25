@@ -11,6 +11,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--toolchain-root', type=Path, required=True)
     parser.add_argument('--runner', type=Path, required=True)
+    parser.add_argument('--public', action='store_true', help='Verify the integrated serializer overloads')
     args = parser.parse_args()
     bundle = args.toolchain_root.resolve()
     here = Path(__file__).resolve().parent
@@ -19,6 +20,10 @@ def main():
         root = Path(folder)
         for name in ('Main.rvn', 'Mapping.rvn', 'JsonObjectMapping.rvnproj'):
             shutil.copyfile(here / name, root / name)
+        if args.public:
+            shutil.copyfile(here / 'Public.rvn', root / 'Main.rvn')
+            project = root / 'JsonObjectMapping.rvnproj'
+            project.write_text(project.read_text().replace('<Compile Include="Mapping.rvn" />', ''))
         built = subprocess.run(['dotnet', 'msbuild', str(root / 'JsonObjectMapping.rvnproj'),
                                 '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=240)
         assert built.returncode == 0, built.stdout + built.stderr
@@ -27,7 +32,8 @@ def main():
                                  str(bundle / 'lib/System.neoil'), '512', '100000000'],
                                 capture_output=True, text=True, timeout=120)
         assert result.returncode == 0, result.stdout + result.stderr
-        assert result.stdout.splitlines() == ['JSON object mapping checks passed'], result.stdout
+        expected = 'Public JSON mapping checks passed' if args.public else 'JSON object mapping checks passed'
+        assert result.stdout.splitlines() == [expected], result.stdout
         assert 'live=0' in result.stderr, result.stderr
         print(result.stdout + result.stderr)
 

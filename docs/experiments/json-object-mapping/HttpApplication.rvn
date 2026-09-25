@@ -7,14 +7,12 @@ import System.Web.Http.*
 union AppError {
     case Http(reason: HttpError)
     case Json(reason: JsonError)
-    case Mapping(reason: MappingError)
     case Body(message: string)
 
     override func ToString() -> string {
         return match self {
             Http(let reason) => reason.ToString()
             Json(let reason) => reason.ToString()
-            Mapping(_) => "Report object mapping failed"
             Body(let message) => message
         }
     }
@@ -29,26 +27,32 @@ extension JsonErrorConversion for JsonError {
     static func implicit(error: JsonError) -> AppError => AppError.Json(error)
 }
 
-extension MappingErrorConversion for MappingError {
-    static func implicit(error: MappingError) -> AppError => AppError.Mapping(error)
+// Exact property names deliberately match the existing wire schema.
+public class ReportPayload {
+    init() { }
+    var station: string { get; set; } = ""
 }
 
-func JsonContent(value: JsonValue) -> Result<HttpContent, JsonError> {
+public class Acknowledgement {
+    init() { }
+    var accepted: bool { get; set; } = false
+}
+
+func JsonContent(value: Object) -> Result<HttpContent, JsonError> {
     let text = JsonSerializer.Serialize(value)?
     return Ok(HttpContent(Utf8.Encode(text), "application/json; charset=utf-8"))
 }
 
-func CreateReport() -> Result<JsonObject, MappingError> {
-    let report = StationReport()
-    report.Station = "Café"
-    return EncodeReport(report)
+func CreateReport() -> Result<ReportPayload, JsonError> {
+    let report = ReportPayload()
+    report.station = "Café"
+    return Ok(report)
 }
 
-func Acknowledge(payload: string) -> Result<JsonObject, MappingError> {
-    let value = JsonSerializer.Deserialize(payload)?
-    let report = DecodeReport(value)?
-    let reply = JsonObject()
-    _ = reply.Add("accepted", JsonBoolean(true))?
+func Acknowledge(payload: string) -> Result<Acknowledgement, JsonError> {
+    let report = JsonSerializer.Deserialize(payload, typeof(ReportPayload))?
+    let reply = Acknowledgement()
+    reply.accepted = true
     return Ok(reply)
 }
 
@@ -64,14 +68,11 @@ func ReadReply(result: Result<HttpResponse, HttpError>) -> Result<string, AppErr
         return Error(AppError.Http(HttpError.UnsuccessfulStatus(response.StatusCode)))
     }
     let text = Utf8.Decode(response.Content.Bytes).MapError(error => AppError.Body("Invalid UTF-8 response"))?
-    let value = JsonSerializer.Deserialize(text)?
-    if value is JsonObject reply {
-        let accepted = reply.Field("accepted")?
-        if accepted is JsonBoolean success {
-            if success.Value {
-                let output = JsonSerializer.Serialize(reply)?
-                return Ok(output)
-            }
+    let value = JsonSerializer.Deserialize(text, typeof(Acknowledgement))?
+    if value is Acknowledgement reply {
+        if reply.accepted {
+            let output = JsonSerializer.Serialize(reply)?
+            return Ok(output)
         }
     }
     return Error(AppError.Body("Unexpected acknowledgement"))

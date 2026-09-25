@@ -1,10 +1,10 @@
 # One reflected JSON report — development, 2026-09-25
 
-This is an application-owned mapping experiment using the public JSON DOM and
-System.Runtime.Reflection extensions. It is not a new JsonSerializer overload or
-a generic serializer. The same [Mapping.rvn](Mapping.rvn) is compiled into the
-[HTTP report investigation](../http-json/README.md#reflected-report-investigation)
-when its verifier is run with `--mapped`; the default sample remains DOM-based.
+This directory retains the original application-owned mapping experiment and now
+also verifies public JsonSerializer object overloads. Mapping.rvn remains a useful
+explicit-schema comparison; the HTTP variant has moved to the library mapper.
+Use `--public` with verify.py for the integrated API, or omit it for the original
+application-owned experiment.
 
 `EncodeReport` finds StationReport.Station through TypeInfo.GetProperties and reads
 it through PropertyInfo.GetValue. `DecodeReport` validates the DOM, creates a report
@@ -55,10 +55,11 @@ Keep the DOM API intact while evaluating supported property types, schema decisi
 and errors before adding public object-mapping overloads.
 
 
-## HTTP validation and remaining limit
+## Earlier application-mapper HTTP validation and remaining limit
 
-HttpApplication.rvn and HttpServer.rvn reuse the mapper with the existing HTTP client
-entry point. The HTTP verifier's `--mapped` option selects these sources in temporary
+The earlier HttpApplication.rvn and HttpServer.rvn reused the application mapper.
+They now use public serializer overloads; the observations below describe the earlier
+checkpoint, not the new public mapper. The HTTP verifier's `--mapped` option selects these sources in temporary
 projects; it does not change runtime or transport settings.
 
 ```sh
@@ -88,3 +89,46 @@ A follow-up [cost investigation](cost.md) found avoidable identity-string copyin
 in method resolution. Rejecting unrelated methods earlier reduces both preparation
 and execution time for this fixture while retaining the same GC results. It does
 not change the HTTP deadline or establish predictable performance under load.
+
+
+## Public serializer checkpoint
+
+Public.rvn consumes only the integrated JsonSerializer overloads: three scalar
+property types, string/stream round trips, getter/setter behavior, exact-name/missing
+property checks, invalid numbers/kinds, private constructor causes, unsupported
+nested models, untouched output on mapping failure and DOM values held as Object.
+
+```sh
+python3 docs/experiments/json-object-mapping/verify.py \
+  --public --toolchain-root /absolute/path/to/matching-development-bundle \
+  --runner target/release/examples/measure_async
+```
+
+The current `--mapped` HTTP variant uses those public overloads for both ReportPayload
+and Acknowledgement. Their lowercase property names intentionally match the existing
+wire schema without a naming policy. The library retains JSON/reflection causes;
+the server reports invalid input as 400 and reflection/unsupported model errors as
+500. This composes existing HTTP and serializer APIs; dedicated HTTP JSON extensions
+and generic serializer methods are still future work. See the
+[public contract](../../../api-docs/json.md) and [design comparison](../../json-dom-design.md#provisional-public-object-mapping--2026-09-25).
+
+
+Public checkpoint validation (2026-09-25): the expanded consumer passes with
+1,373 allocations, peak 188, 20 collections and zero final live objects. The existing
+DOM/stream regression and .NET memory/JSON baseline pass; the current compiler's
+terminal Fault analysis required removing 26 redundant returns from that older fixture.
+The public API HTTP pair passes with 408 client / 369 server allocations and zero
+live objects (nine and seven collections). These are correctness observations;
+no load/latency guarantee is inferred. API signatures and snapshots are checked;
+the website build remains skipped.
+
+The fixture binds the stream length and compares it normally: a constant inside
+`Ok(0)` currently emits a host static Object.Equals call rejected by the importer.
+This existing compiler/bridge limitation is not changed by the serializer slice.
+
+
+All 12 independent HTTP server cases pass with the public mapper (3,784 allocations,
+54 collections, peak 198, zero final live objects), including missing/null/type-mismatch
+input, extra fields and an empty string. The reference bridge passes 541 signature
+checks, including all new public overloads, internal-mapper rejection and a forged
+TypeInfo-parameter rejection. Bootstrap and API snapshots match their sources.

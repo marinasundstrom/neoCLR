@@ -66,14 +66,14 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HashCode'">
     <Compile Include="src/System/HashCode.rvn" />
   </ItemGroup>
-  <!-- Declaration slices shadow core types and contain no typeof expressions or records. -->
+  <!-- Declaration slices shadow core types; JSON uses the target typeof contract. -->
   <PropertyGroup>
     <RavenRecordAssemblyName></RavenRecordAssemblyName>
     <RavenRecordEquatableType></RavenRecordEquatableType>
     <RavenRecordHashCodeType></RavenRecordHashCodeType>
-    <RavenTypeOfAssemblyName></RavenTypeOfAssemblyName>
-    <RavenTypeOfInfoType></RavenTypeOfInfoType>
-    <RavenTypeOfContextType></RavenTypeOfContextType>
+    <RavenTypeOfAssemblyName Condition="'$(NeoCLRLibrarySlice)' != 'JsonValue'"></RavenTypeOfAssemblyName>
+    <RavenTypeOfInfoType Condition="'$(NeoCLRLibrarySlice)' != 'JsonValue'"></RavenTypeOfInfoType>
+    <RavenTypeOfContextType Condition="'$(NeoCLRLibrarySlice)' != 'JsonValue'"></RavenTypeOfContextType>
   </PropertyGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == ''">
     <Compile Include="src/System/Math/Functions.rvn" />
@@ -362,6 +362,7 @@
     <Compile Include="src/System/Data/Json/JsonDocument.rvn" />
     <Compile Include="src/System/Data/Json/JsonSyntax.rvn" />
     <Compile Include="src/System/Data/Json/JsonSerializer.rvn" />
+    <Compile Include="src/System/Data/Json/ObjectMapper.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ReflectionError'">
     <Compile Include="src/System/Runtime/Reflection/ReflectionError.rvn" />

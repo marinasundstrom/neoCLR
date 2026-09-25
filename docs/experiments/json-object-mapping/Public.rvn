@@ -1,0 +1,101 @@
+import System.*
+import System.Data.Json.*
+import System.IO.*
+import System.Result.*
+import System.Runtime.Reflection.*
+
+public class Reading {
+    private var station: string = "initial"
+    private var assignments: int = 0
+    init() { }
+    var Station: string {
+        get => station
+        set {
+            station = value
+            assignments += 1
+        }
+    }
+    var Count: int { get; set; } = 7
+    var Active: bool { get; set; } = false
+    val Summary: string => station
+    func GetAssignments() -> int => assignments
+}
+
+public class LockedReading {
+    private init() { }
+    var Station: string { get; set; } = ""
+}
+
+public class NestedReading {
+    init() { }
+    var Child: Reading { get; set; } = Reading()
+}
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("Public JSON mapping check failed")
+    }
+}
+
+func RoundTrip() -> Result<unit, JsonError> {
+    let text = "{\"Station\":\"Café\",\"Count\":42,\"Active\":true,\"extra\":null}"
+    let instance = JsonSerializer.Deserialize(text, typeof(Reading))?
+    if instance is Reading reading {
+        Check(reading.Station == "Café")
+        Check(reading.Count == 42)
+        Check(reading.Active)
+        Check(reading.GetAssignments() == 1)
+    } else {
+        System.Fault("Unexpected mapped type")
+    }
+    let serialized = JsonSerializer.Serialize(instance)?
+    let dom = JsonSerializer.Deserialize(serialized)?
+    if dom is JsonObject document {
+        Check(document.Count == 4)
+        let summary = document.Field("Summary")?
+        Check(summary is JsonString value && value.Value == "Café")
+    } else {
+        System.Fault("Expected mapped object")
+    }
+    let stream = MemoryStream()
+    _ = JsonSerializer.Serialize(stream, instance)?
+    Check(stream.Seek(0) is Ok(_))
+    let restored = JsonSerializer.Deserialize(stream, typeof(Reading))?
+    if restored is Reading copy {
+        Check(copy.Count == 42 && copy.Active)
+        Check(copy.GetAssignments() == 1)
+    } else {
+        System.Fault("Unexpected stream result")
+    }
+    stream.Close()
+    Check(JsonSerializer.Deserialize("{}", typeof(Reading)) is Error(JsonError.MissingField(_)))
+    Check(JsonSerializer.Deserialize("[]", typeof(Reading)) is Error(JsonError.TypeMismatch(_)))
+    Check(JsonSerializer.Deserialize("{\"Station\":null}", typeof(Reading)) is Error(JsonError.TypeMismatch(_)))
+    Check(JsonSerializer.Deserialize("{\"station\":\"x\",\"Count\":1,\"Active\":true}", typeof(Reading)) is Error(JsonError.MissingField(_)))
+    Check(JsonSerializer.Deserialize("{\"Station\":\"x\",\"Count\":1.5,\"Active\":true}", typeof(Reading)) is Error(JsonError.NumberOutOfRange))
+    Check(JsonSerializer.Deserialize("{\"Station\":\"x\",\"Count\":2147483648,\"Active\":true}", typeof(Reading)) is Error(JsonError.NumberOutOfRange))
+    Check(JsonSerializer.Deserialize("{\"Station\":\"x\",\"Count\":1,\"Active\":\"true\"}", typeof(Reading)) is Error(JsonError.TypeMismatch(_)))
+    Check(JsonSerializer.Deserialize("{\"Station\":\"x\"}", typeof(LockedReading)) is Error(JsonError.Reflection(ReflectionError.AccessDenied)))
+    Check(JsonSerializer.Deserialize("{}", typeof(int)) is Error(JsonError.UnsupportedMapping(_)))
+    Check(JsonSerializer.Serialize(NestedReading()) is Error(JsonError.UnsupportedMapping(_)))
+    let untouched = MemoryStream()
+    Check(JsonSerializer.Serialize(untouched, NestedReading()) is Error(JsonError.UnsupportedMapping(_)))
+    if let Ok(length) = untouched.GetLength() {
+        Check(length == 0)
+    } else {
+        System.Fault("Output stream was closed")
+    }
+    untouched.Close()
+    let preserved: Object = dom
+    let reserialized = JsonSerializer.Serialize(preserved)?
+    Check(reserialized == serialized)
+    return Ok(())
+}
+
+func Main() {
+    if let Ok(_) = RoundTrip() {
+        Console.WriteLine("Public JSON mapping checks passed")
+    } else {
+        System.Fault("Public JSON mapping failed")
+    }
+}

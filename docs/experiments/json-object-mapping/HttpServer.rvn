@@ -27,10 +27,7 @@ class ReportServer {
                         context.Respond(HttpStatusCode.Created, content)
                         return Ok(())
                     }
-                } else if let Error(MappingError.Json(_)) = acknowledged {
-                    context.Respond(HttpStatusCode.BadRequest, ErrorContent("{\"error\":\"Invalid report\"}"))
-                    return Ok(())
-                } else {
+                } else if acknowledged is Error(JsonError.Reflection(_)) || acknowledged is Error(JsonError.UnsupportedMapping(_)) {
                     context.Respond(HttpStatusCode.InternalServerError, ErrorContent("{\"error\":\"Report mapping failed\"}"))
                     return Ok(())
                 }

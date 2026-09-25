@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add provisional JsonSerializer Object/TypeInfo overloads for flat String, Int32
+  and Boolean properties, using checked constructors and accessors. Preserve DOM
+  overloads and borrowed synchronous streams; use exact names, require writable
+  properties on input and reject null/nested mappings. Retain ReflectionError inside
+  JsonError and report unsupported mappings explicitly. Integrate request/response
+  models in the opt-in HTTP demo and document the public contract. Enable the existing
+  target typeof contract for the JSON source slice; no compiler code change. Update
+  JSON admission checks and remove redundant post-Fault returns from the DOM fixture.
+  Rebuild development consumers with matching references/library for the new union cases.
+
 - Reduce method-resolution allocations by rejecting unrelated names, call forms
   and generic arities before copying definition identities. Preserve existing
   resolution checks and add separate load/verification/execution timings to the

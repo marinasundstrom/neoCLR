@@ -1273,3 +1273,27 @@ GetPosition/Seek to native read-handle services. Reader reference locals and con
 coercion are part of the bridge contract. The [integration note](integration/README.md#storage-poc-io-surface-2026-09-23)
 describes scope and limitations; [API documentation](../api-docs/streams.md) defines the
 bounded decoding and ownership behavior. Task-based Storage remains future exploration.
+
+
+### JSON mapping typeof configuration — 2026-09-25
+
+The JsonValue source slice now retains the same existing RuntimeTypeOfContract as
+consumer projects (NeoCLR.CoreProbe, System.Introspection.TypeInfo,
+System.Runtime.RuntimeContext). ObjectMapper uses typeof(string/int/bool) to compare
+loaded descriptor identities; clearing the contract emitted the host
+System.Type.GetTypeFromHandle call, which the bridge correctly rejected. Other
+source slices continue clearing it while they shadow descriptor declarations.
+No compiler code, new Runtime Contract option, metadata convention or VM instruction
+is introduced. Generic serializer overloads remain outside this checkpoint.
+
+The current instance-library admission rejects nested closure helper types, so the
+internal mapper explicitly matches ReflectionError results rather than introducing
+MapError lambdas into that owner. Ordinary callers can still use error conversions
+and propagation. This is a bridge/source-slice limitation, not a public mapping rule.
+
+
+Validation: the public object consumer, existing DOM/stream regression and mapped
+HTTP pair pass with zero final live objects. Consumer constant matching of an Int64
+inside Ok(0) still emits unsupported host static Object.Equals; the fixture binds
+and compares the value instead. The older DOM fixture now omits redundant returns
+after terminal Fault calls. Neither adjustment changes the language/runtime contract.

@@ -78,10 +78,23 @@ website build was skipped as directed. These are correctness checks, not benchma
 
 An opt-in variant reuses [one reflected model](../json-object-mapping/README.md)
 in the same endpoint. Pass `--mapped` to the verifier to compile HttpApplication.rvn
-and HttpServer.rvn with Mapping.rvn. The default sample above remains DOM-based.
+and HttpServer.rvn. The current variant uses public JsonSerializer overloads for both
+request and response objects; Mapping.rvn is now only the earlier standalone comparison.
+The default sample above remains DOM-based. The measurements below are from the
+earlier application-owned mapper.
 Both mapped peers pass against independent Python peers (12 server cases, plus the
 client), with zero final live objects. The isolated managed pair also passes with
 335 client and 336 server allocations and zero final live objects. An earlier pair
 attempt reached the existing 15-second transport deadline while another test ran;
 request latency under load remains unverified. This variant is not yet the default
 demo. The standalone mapper passes string and MemoryStream round trips.
+
+
+The current public-serializer variant passes the managed pair: 408 client and 369
+server allocations, nine/seven collections and zero final live objects. Both directions
+now map actual models through library overloads; there are no application-local
+reflection mapping calls in this variant. The default DOM variant remains available.
+
+The public-serializer server also passes all 12 independent Python cases with zero
+final live objects. This includes strict missing/null/type rules and preserved
+empty-string/extra-field behavior for the established wire schema.

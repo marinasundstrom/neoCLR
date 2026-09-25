@@ -5,10 +5,11 @@
     "runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn": "278c700bbfec1a1279298bfe9927278c14227bbcb7e1760f15dbd6f8de06deb1",
     "runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn": "2b40ec91485820efbde7fac4db1a9e052d1245027fd3998627e98f78b5723ce7",
     "runtime/raven/src/System/Data/Json/JsonValue.rvn": "0c2084dca1bcdf2d1494d9f1942fceb25d060a7a25cd8256a4bfee3fc46a5426",
-    "runtime/raven/src/System/Data/Json/JsonError.rvn": "100d73b3cefadfec2f5a069fdebc8764c4655b78a27b0f5c19318cb30fbd4e85",
+    "runtime/raven/src/System/Data/Json/JsonError.rvn": "91c54ccae315e879e1ba14b40386e95d7061e4b1c07a67e74eccbe0e116e8713",
     "runtime/raven/src/System/Data/Json/JsonDocument.rvn": "8f98eeaaf29f0d173c483b80275a4b681b8923d5b8aafbeaf482cb932f4f430c",
     "runtime/raven/src/System/Data/Json/JsonSyntax.rvn": "b6e61952a1a0b9aa9bd870ba497a4f293ee68e9fa7cdf9d9775e3ec1981b7c0e",
-    "runtime/raven/src/System/Data/Json/JsonSerializer.rvn": "91ec0832661e90443ca9c10b2e69cd26cc132f9ea12b54e6fbead0658976ecfd",
+    "runtime/raven/src/System/Data/Json/ObjectMapper.rvn": "7d93ba9ed492c1cc5685089cf27e7c4a9bf972761b55be07fcab7c944c142701",
+    "runtime/raven/src/System/Data/Json/JsonSerializer.rvn": "14f83fb583e7c370aa99a11af32338987133381aac915ffbab16c016e9581393",
     "runtime/raven/src/System/Concurrency/Cancellation.rvn": "282d19a6ce7a57d18ba3fe3f45f59ff1eaeec4545b39048bac6b0bdd2de3111a",
     "runtime/raven/src/System/Networking/IPAddress.rvn": "41767cb5076e1ed2ab4ee6b60c09416b2ee80a0510d056301db078af9f585874",
     "runtime/raven/src/System/Networking/IPAddressError.rvn": "ff7036e74bf83a7f5fc62cd2cf194bf27d4d4255c996f9d1d45437dc51f3dce9",
@@ -126,7 +127,7 @@
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
-    "runtime/raven/System.Runtime.rvnproj": "56b8c26e6786f0d9568ee6acc74fa940cd72c154cf8feccd2c85982352219262",
+    "runtime/raven/System.Runtime.rvnproj": "8155a4c20230e3a487b95a38fc5f4902315fb5e092ead958705c6a7b981413ff",
     "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
@@ -134,7 +135,7 @@
     "FileWriteError.helpers.neoil": "d2851e4f9f1ba240726085030958818a5ae053ed43bde9667d4919cf4c60321c"
   },
   "compilerSha256": "db9dfab54bcdc2315dce11a5f4498046f0f6be85cd1095f6b11ec32bff70989b",
-  "coreSha256": "2b25a130ca0f9ccd01778b9ce825d5d8e242275960bad5544c10c7a6bf95782c",
+  "coreSha256": "7f0e2501cb2f3b6b025f3f288e359d59f409f75aa353cb0c64e58583fb215f27",
   "exports": [
     "byref .ctor(System.Storage.FileWriteError.InvalidLimit value) -> Void",
     "byref TryGetValue(out(true) System.Storage.FileWriteError.InvalidLimit& value) -> Boolean",

@@ -137,11 +137,13 @@ server handles invalid input explicitly where it chooses the HTTP response.
 library's JSON parser and includes checks against independent Python HTTP peers.
 Serialization is synchronous; HTTP bodies are currently buffered. The provisional
 DOM limits are 128 UTF-8 bytes, four container levels and 32 values. The development
-sample has an opt-in experiment mapping a StationReport through the public [runtime reflection APIs](/docs/reflection/):
-CreateInstance runs its constructor, and GetValue/SetValue execute its accessors.
-The experimental mapper explicitly maps `Station` to `station`, requires a string, and ignores
-extra fields. This is a one-model experiment; JsonSerializer still accepts DOM values,
-with no automatic object mapping or naming policy. Both mapped peers pass against
+sample has an opt-in variant using the provisional [object serializer overloads](/docs/json/).
+It maps both report and acknowledgement models through checked runtime reflection:
+constructors, getters and setters execute normally. Flat public `string`, `int` and
+`bool` properties are supported, using exact property names. Writable properties
+must be present; extra JSON fields are ignored. Nested models, null mapping and
+naming policies are not supported. The sample's property names match its lowercase
+wire names explicitly. Both mapped peers pass against
 independent servers/clients and together in an isolated run. An earlier overlapping
 test run reached the transport deadline, so latency under load remains unverified.
 The downloadable demo defaults to direct DOM mapping; its verifier selects this
@@ -352,5 +354,6 @@ fail the depth limit. Nodes use reference identity, with shared mutable children
 The shape is closest to .NET's mutable JsonNode model, but neoCLR calls the root
 `JsonValue` and returns Result errors, including nested stream causes. See the
 [JSON API reference](/docs/api/System/Data/Json/) for the current contracts.
-The report sample explores reflection-backed mapping in application code. General
-object-mapping overloads and HttpClient GetJson/PostJson extensions remain later work.
+The [object-mapping guide](/docs/json/) covers the provisional Object/TypeInfo
+overloads for strings and borrowed streams. Broader mapping, generic overloads and
+HTTP JSON conveniences for both client and server remain later work.

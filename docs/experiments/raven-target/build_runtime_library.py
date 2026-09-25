@@ -143,6 +143,7 @@ SOURCES = {
     'JsonError': 'runtime/raven/src/System/Data/Json/JsonError.rvn',
     'JsonDocument': 'runtime/raven/src/System/Data/Json/JsonDocument.rvn',
     'JsonSyntax': 'runtime/raven/src/System/Data/Json/JsonSyntax.rvn',
+    'ObjectMapper': 'runtime/raven/src/System/Data/Json/ObjectMapper.rvn',
     'JsonSerializer': 'runtime/raven/src/System/Data/Json/JsonSerializer.rvn',
 
     "Cancellation": "runtime/raven/src/System/Concurrency/Cancellation.rvn",

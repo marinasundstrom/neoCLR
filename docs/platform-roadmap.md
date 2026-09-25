@@ -202,9 +202,13 @@ passes against independent peers and as an isolated managed pair, with zero fina
 live objects. An earlier overlapping run hit the transport deadline; retain this
 timing observation and the default DOM demo. A [focused cost investigation](experiments/json-object-mapping/cost.md)
 removed avoidable identity-string copying in method lookup, reducing preparation
-and execution time on the same fixture without changing deadline policy. Next,
-evaluate the smallest reusable JSON mapping contract; retain latency under load
-as an open validation item before making the mapped variant the default.
+and execution time on the same fixture without changing deadline policy.
+The provisional non-generic JsonSerializer mapping overloads support flat String,
+Int32 and Boolean properties through runtime reflection, with a
+[public consumer](experiments/json-object-mapping/Public.rvn) and on-site API coverage.
+The opt-in HTTP variant uses them for request and response models. Generic and HTTP
+JSON convenience overloads remain next candidates; latency under load stays an open
+validation item before making the mapped variant the default.
 General invocation and field assignment remain outside this checkpoint. **Author clarification:** `System.Runtime.Reflection`
 will provide extensions to the `System.Introspection` model; those operations work
 when the model is backed by loaded runtime types. Preserve introspection as the
