@@ -135,7 +135,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-server-') as folder:
         ('Host with path', b'GET /greeting HTTP/1.1\r\nHost: localhost/path\r\n\r\n', 'Invalid Host authority'),
         ('missing Host', b'GET /greeting HTTP/1.1\r\n\r\n', 'Host required'),
         ('duplicate Host', b'GET /greeting HTTP/1.1\r\nHost: localhost\r\nhost: localhost\r\n\r\n', 'Duplicate Host'),
-        ('unsupported method', b'PUT /greeting HTTP/1.1\r\nHost: localhost\r\n\r\n', 'Unsupported request method'),
+        ('unsupported method', b'OPTIONS /greeting HTTP/1.1\r\nHost: localhost\r\n\r\n', 'Unsupported request method'),
         ('bare LF', b'GET /greeting HTTP/1.1\n', 'Bare LF in request'),
         ('truncated request', b'GET /greeting HTTP/1.1\r\nHost: local', 'EOF before complete request'),
         ('request body', b'GET /greeting HTTP/1.1\r\nHost: localhost\r\nContent-Length: 1\r\n\r\nx', 'GET request bodies unsupported'),

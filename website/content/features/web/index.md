@@ -72,7 +72,7 @@ Malformed/truncated responses and collection during pending work are exercised t
 
 This [server callback](/samples/http-server/Server.rvn) builds a byte response.
 `HttpServer.Listen("127.0.0.1", 0, 4)` binds a loopback listener; `GetLocalPort()`
-reports the selected port. `ServeOne(Respond)` accepts one GET or POST, awaits the callback,
+reports the selected port. `ServeOne(Respond)` accepts one GET, POST, PUT, PATCH or DELETE, awaits the callback,
 sends its response and closes that connection. The caller closes the listener.
 `Close()` stops listening; an already accepted exchange remains active.
 
@@ -83,8 +83,8 @@ and finish with no live managed objects. This is a bounded exchange, not an
 application hosting framework.
 
 Received headers have lowercase names and trimmed surrounding whitespace.
-The development server requires exactly one Host. GET bodies remain unsupported;
-POST reads up to 1,024 bytes according to Content-Length before calling the handler.
+The development server requires exactly one Host. GET/DELETE bodies remain unsupported;
+POST, PUT and PATCH read up to 1,024 bytes according to Content-Length before calling the handler.
 Without Content-Length, a request has an empty body. It validates application response headers, computes the byte length
 and adds `Connection: close`. Malformed requests or callback errors close the
 connection without an HTTP error response. Final statuses 200–599 are supported in development. Statuses 204, 205 and 304 require empty content; the server omits Content-Length for 204/304.
@@ -109,7 +109,7 @@ It remains exploratory source, not a public runtime-library JSON API.
 
 ## Current limits
 
-Plain HTTP/1.1 GET and buffered POST support final statuses 200–599 in development. Responses require
+Plain HTTP/1.1 GET, DELETE and buffered POST/PUT/PATCH support final statuses 200–599 in development. Responses require
 exactly one Content-Length, except bodyless 204/304. Informational responses are not
 yet supported. The experiment bounds URLs to 1,024 bytes, headers to 2,048 bytes and 16
 fields, and bodies to 1,024 bytes. It rejects duplicate lengths, transfer encodings
@@ -240,7 +240,7 @@ before DNS. Content sources must remain stable while consumed.
 
 [Download the POST echo example and focused checks](/samples/http-post.zip).
 The checks cover neoCLR peers, an independent raw peer and a .NET client, including
-empty and binary bodies. Header append/remove operations, other request verbs, chunking,
+empty and binary bodies. Header append/remove operations, HEAD/OPTIONS, chunking,
 streaming, compression and Expect/continue are still outside this checkpoint.
 
 ## Looking up headers
@@ -270,3 +270,18 @@ parse field-specific syntax. Transport headers such as Host and Content-Length a
 reserved, and Content-Type comes from HttpContent. The provider allows 13 stored
 application fields and at most 2,048 encoded header bytes. Stream-backed content
 remains planned.
+
+## Other request methods
+
+Development APIs include `Put`, `Patch` and `Delete`, with string/Uri addresses and
+optional cancellation tokens. They use the same BaseUri and handler pipeline as Get
+and Post. PUT/PATCH take HttpContent; DELETE has no body in this checkpoint. Non-success
+statuses remain responses, so callers choose their status policy:
+
+```raven
+{{HTTP_VERB_SAMPLE}}
+```
+
+The server accepts these methods and exposes their buffered content to its handler.
+PATCH content is opaque: applications choose its media type and behavior. The library
+does not apply patches. HEAD awaits response-framing work; OPTIONS is not implemented.

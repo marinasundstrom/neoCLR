@@ -34,6 +34,18 @@ static class HttpBindings
                 public Tasks.Task<Result<HttpResponse, HttpError>> Post(string url, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
                 public Tasks.Task<Result<HttpResponse, HttpError>> Post(Uri uri, HttpContent content) => default;
                 public Tasks.Task<Result<HttpResponse, HttpError>> Post(Uri uri, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Put(string url, HttpContent content) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Put(string url, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Put(Uri uri, HttpContent content) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Put(Uri uri, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Patch(string url, HttpContent content) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Patch(string url, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Patch(Uri uri, HttpContent content) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Patch(Uri uri, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Delete(string url) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Delete(string url, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Delete(Uri uri) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Delete(Uri uri, Concurrency.CancellationToken cancellationToken) => default;
                 public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request) => default;
                 public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken) => default;
             }
@@ -54,6 +66,12 @@ static class HttpBindings
                 public static Result<HttpRequest, HttpError> Get(Uri uri) => default;
                 public static Result<HttpRequest, HttpError> Post(string url, HttpContent content) => default;
                 public static Result<HttpRequest, HttpError> Post(Uri uri, HttpContent content) => default;
+                public static Result<HttpRequest, HttpError> Put(string url, HttpContent content) => default;
+                public static Result<HttpRequest, HttpError> Put(Uri uri, HttpContent content) => default;
+                public static Result<HttpRequest, HttpError> Patch(string url, HttpContent content) => default;
+                public static Result<HttpRequest, HttpError> Patch(Uri uri, HttpContent content) => default;
+                public static Result<HttpRequest, HttpError> Delete(string url) => default;
+                public static Result<HttpRequest, HttpError> Delete(Uri uri) => default;
                 public HttpContent Content => default;
                 public Collections.Sequence<HttpHeader> Headers => default;
                 public Collections.Sequence<string> GetHeaderValues(string name) => default;
@@ -154,10 +172,10 @@ static class HttpBindings
             ("HttpServerExchange", "Start") when library => ("", "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
             ("HttpClient", ".ctor") when args.Length == 0 => ("", "noresult", false),
             ("HttpClient", ".ctor") => (Prefix + "HttpHandler", "noresult", false),
-            ("HttpClient", "Get" or "GetString") => (args.Length > 0 && args[0] == "String" ? "String" : "System.Uri",
-                definition.Name == "Get" ? task : "System.Tasks.Task<System.Result<String,System.Web.Http.HttpError>>", false),
-            ("HttpClient", "Post") => ((args.Length > 0 && args[0] == "String" ? "String" : "System.Uri") + "," + Prefix + "HttpContent", task, false),
-            ("HttpRequest", "Post") => ((args.Length > 0 && args[0] == "String" ? "String" : "System.Uri") + "," + Prefix + "HttpContent", $"System.Result<{request},System.Web.Http.HttpError>", true),
+            ("HttpClient", "Get" or "GetString" or "Delete") => (args.Length > 0 && args[0] == "String" ? "String" : "System.Uri",
+                definition.Name != "GetString" ? task : "System.Tasks.Task<System.Result<String,System.Web.Http.HttpError>>", false),
+            ("HttpClient", "Post" or "Put" or "Patch") => ((args.Length > 0 && args[0] == "String" ? "String" : "System.Uri") + "," + Prefix + "HttpContent", task, false),
+            ("HttpRequest", "Post" or "Put" or "Patch") => ((args.Length > 0 && args[0] == "String" ? "String" : "System.Uri") + "," + Prefix + "HttpContent", $"System.Result<{request},System.Web.Http.HttpError>", true),
             ("HttpRequest", "get_Content") => ("", Prefix + "HttpContent", false),
             ("HttpRequest", "WithHeader") => ("String,String", $"System.Result<{request},System.Web.Http.HttpError>", false),
             ("HttpRequest", "Encode") when library => ("", "System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>", false),
@@ -170,7 +188,7 @@ static class HttpBindings
             ("HttpSocketHandler" or "HttpResponseDecoder", ".ctor") => ("", "noresult", false),
             ("HttpHeader", ".ctor") => ("String,String", "noresult", false),
             ("HttpHeader", "get_Name" or "get_Value") => ("", "String", false),
-            ("HttpRequest", "Get") => (args.Length == 1 && args[0] == "String" ? "String" : "System.Uri", $"System.Result<{request},System.Web.Http.HttpError>", true),
+            ("HttpRequest", "Get" or "Delete") => (args.Length == 1 && args[0] == "String" ? "String" : "System.Uri", $"System.Result<{request},System.Web.Http.HttpError>", true),
             ("HttpRequest", "get_Method" or "get_Host" or "get_Target") => ("", "String", false),
             ("HttpRequest", "get_Port") => ("", "Int32", false),
             ("HttpResponse", ".ctor") => ($"{(definition.Parameters[0].ParameterType.FullName == Prefix + "HttpStatusCode" ? Prefix + "HttpStatusCode" : "Int32")},System.Collections.Sequence<{Prefix}HttpHeader>,System.Collections.Sequence<Byte>", "noresult", false),
@@ -189,7 +207,7 @@ static class HttpBindings
             _ => throw new InvalidDataException("Unsupported HTTP member.")
         };
         if (owner is Prefix + "HttpClient" or Prefix + "HttpSocketHandler"
-            && definition.Name is "Get" or "GetString" or "Send" or "Post"
+            && definition.Name is "Get" or "GetString" or "Send" or "Post" or "Put" or "Patch" or "Delete"
             && args.LastOrDefault() == CancellationBindings.Token)
             expected.Item1 += "," + CancellationBindings.Token;
         var virtualMember = IsContract(owner) || owner == Prefix + "HttpSocketHandler"

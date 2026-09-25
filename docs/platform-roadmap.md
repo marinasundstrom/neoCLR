@@ -96,7 +96,9 @@ peer checks. Request/response GetHeaderValues now supplies ASCII case-insensitiv
 lookup preserving repeated fields; [header evidence](experiments/http-headers/README.md).
 WithHeader now constructs replacement application fields on a new request and the
 socket provider validates/serializes them; [request header evidence](experiments/http-request-headers/README.md).
-Additional verb helpers remain within slice 5 before moving to broader response framing. The cancellation fixture now signals independently of the third request;
+Put/Patch/Delete helpers and request factories now share the pipeline, with matching
+server parsing and [focused verb evidence](experiments/http-verbs/README.md). This completes
+the bounded slice 5 checkpoint; HEAD joins the request-aware response framing in slice 6. The cancellation fixture now signals independently of the third request;
 headers and isolated-body checks pass. [The evidence](experiments/http-status/README.md)
 retains timeout sensitivity under competing local work for serial release validation;
 no production scheduler/deadline fix is claimed for that cancellation fixture. Stream-backed HttpContent is an

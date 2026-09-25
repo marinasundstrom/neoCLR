@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add development Put/Patch/Delete client string/Uri/token helpers and request factories
+  through the existing Send pipeline. Extend server parsing to PUT/PATCH buffered bodies
+  and bodyless DELETE; reject nonempty GET/DELETE bodies before client I/O. Preserve
+  BaseUri, cancellation and response-status behavior. Add focused overload and independent
+  peer checks, API documentation and a propagated PUT example. HEAD/framing and the
+  planned HttpContext lifecycle remain later slices; no native/compiler policy changes.
+
 - Record an exploratory HttpServer accept/context API alongside callbacks for the
   server-lifecycle slice, including response completion, ownership and cancellation
   questions and the .NET comparison. Record the author's clarification that HttpContext

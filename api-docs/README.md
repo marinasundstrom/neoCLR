@@ -241,3 +241,10 @@ remains internal. Stream-backed content remains planned and has no public signat
 HttpRequest.WithHeader is included in the selected request type and XML reference.
 Its copy/replacement behavior, shared content, reserved fields and validation limits
 are documented with the matching bridge/library snapshot. No new type is omitted.
+
+### Common verb helpers (2026-09-25)
+
+The selected HttpClient/HttpRequest types now cover Put, Patch and Delete, including
+all string/Uri/token overloads and request factories. XML distinguishes supported
+buffered bodies, BaseUri resolution, cancellation and response-status policy. No new
+type selection is needed; snapshots must match the updated bridge and managed library.

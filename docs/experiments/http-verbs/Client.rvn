@@ -1,0 +1,143 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+func Check(value: bool) {
+    if !value {
+        System.Fault("HTTP verb assertion failed")
+    }
+}
+
+class InspectHandler : HttpHandler {
+    var Calls: int = 0
+    var CancellableCalls: int = 0
+    var PutCalls: int = 0
+    var PatchCalls: int = 0
+    var DeleteCalls: int = 0
+    func Send(request: HttpRequest, token: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        Check(request.Target == "/base/item")
+        Check(request.Method == "PUT" || request.Method == "PATCH" || request.Method == "DELETE")
+        Check(request.Content.Bytes.Count == (if request.Method == "DELETE" { 0 } else { 5 }))
+        Calls += 1
+        if request.Method == "PUT" {
+            PutCalls += 1
+        } else if request.Method == "PATCH" {
+            PatchCalls += 1
+        } else {
+            DeleteCalls += 1
+        }
+        if token.CanBeCancelled {
+            CancellableCalls += 1
+        }
+        let source = Promise<Result<HttpResponse, HttpError>>()
+        _ = source.Complete(Ok(HttpResponse(HttpStatusCode.NotFound, ArrayList<HttpHeader>(), ArrayList<byte>())))
+        return source.Task
+    }
+}
+
+func CheckReply(pending: Task<Result<HttpResponse, HttpError>>) {
+    let Ok(response) = pending.GetResult() else {
+        System.Fault("Verb hid response status")
+        return
+    }
+    Check(response.StatusCode == HttpStatusCode.NotFound)
+}
+
+func Contracts() -> Result<unit, HttpError> {
+    let handler = InspectHandler()
+    let client = HttpClient(handler)
+    client.BaseUri = Some("http://example.test/base/")
+    let uri = Uri.Parse("item").MapError(reason => HttpError.InvalidUri(reason))?
+    let content = HttpContent.FromText("Café")
+    let cancellation = CancellationTokenSource()
+    let token = cancellation.Token
+    CheckReply(client.Put("item", content))
+    CheckReply(client.Put(uri, content))
+    CheckReply(client.Put("item", content, token))
+    CheckReply(client.Put(uri, content, token))
+    CheckReply(client.Patch("item", content))
+    CheckReply(client.Patch(uri, content))
+    CheckReply(client.Patch("item", content, token))
+    CheckReply(client.Patch(uri, content, token))
+    CheckReply(client.Delete("item"))
+    CheckReply(client.Delete(uri))
+    CheckReply(client.Delete("item", token))
+    CheckReply(client.Delete(uri, token))
+    Check(handler.Calls == 12 && handler.CancellableCalls == 6)
+    Check(handler.PutCalls == 4 && handler.PatchCalls == 4 && handler.DeleteCalls == 4)
+    if let Error(HttpError.InvalidRequest(_)) = client.Put("http://other.test/item", content).GetResult() {
+        Check(true)
+    } else {
+        System.Fault("Absolute URL accepted with BaseUri")
+    }
+    cancellation.Cancel()
+    Check(client.Put("invalid URL", content, token).IsCancelled)
+    Check(client.Patch("invalid URL", content, token).IsCancelled)
+    Check(client.Delete("invalid URL", token).IsCancelled)
+    Check(client.Put(uri, content, token).IsCancelled)
+    Check(client.Patch(uri, content, token).IsCancelled)
+    Check(client.Delete(uri, token).IsCancelled)
+    Check(handler.Calls == 12)
+    let absolute = Uri.Parse("http://example.test/item").MapError(reason => HttpError.InvalidUri(reason))?
+    let prepared1 = HttpRequest.Put("http://example.test/item", content)?
+    Check(prepared1.Method == "PUT")
+    let prepared2 = HttpRequest.Put(absolute, content)?
+    Check(prepared2.Method == "PUT")
+    let prepared3 = HttpRequest.Patch("http://example.test/item", content)?
+    Check(prepared3.Method == "PATCH")
+    let prepared4 = HttpRequest.Patch(absolute, content)?
+    Check(prepared4.Method == "PATCH")
+    let prepared5 = HttpRequest.Delete("http://example.test/item")?
+    Check(prepared5.Method == "DELETE")
+    let prepared6 = HttpRequest.Delete(absolute)?
+    Check(prepared6.Method == "DELETE")
+    Console.WriteLine("Verb contracts passed")
+    return Ok(())
+}
+
+class ClientProbe {
+    private val client: HttpClient = HttpClient()
+    private var index: int = 0
+    init() {
+        client.BaseUri = Some("http://127.0.0.1:19091/")
+    }
+    func Advance() {
+        index += 1
+        Next()
+    }
+    func Next() {
+        if index == 3 {
+            Console.WriteLine("Verb client checks passed")
+            return
+        }
+        let bytes: byte[] = [(byte)0, (byte)255]
+        let pending = if index == 0 {
+            ReplaceText(client, "Café")
+        } else if index == 1 {
+            client.Patch("item", HttpContent(bytes, "application/octet-stream"))
+        } else {
+            client.Delete("item")
+        }
+        pending.OnCompleted(() => {
+            let Ok(response) = pending.GetResult() else {
+                System.Fault("Verb request failed")
+                return
+            }
+            Check(response.StatusCode == (if index == 2 { HttpStatusCode.NoContent } else { HttpStatusCode.OK }))
+            Check(response.Content.Bytes.Count == (if index == 0 { 5 } else if index == 1 { 2 } else { 0 }))
+            Advance()
+        })
+    }
+}
+
+func Main() {
+    let Ok(_) = Contracts() else {
+        System.Fault("Contract setup failed")
+        return
+    }
+    ClientProbe().Next()
+}

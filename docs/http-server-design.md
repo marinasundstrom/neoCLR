@@ -158,3 +158,13 @@ promise successful network delivery. The author's clarification does not select 
 completion method, implicit flush policy or response writer signature. These are
 implementation questions within the planned foundational context, not objections to
 using close/dispose as the application scope boundary. No public context API exists yet.
+
+## PUT, PATCH and DELETE — 2026-09-25
+
+The parser now admits PUT/PATCH through the bounded Content-Length body path and
+DELETE without content. Handlers receive the exact method and buffered content, and
+continue selecting response status and fields. A nonempty DELETE body is Unsupported;
+HEAD/OPTIONS remain outside this checkpoint. Accept/context lifetime work remains
+planned; ServeOne is still the implemented server API. See the
+[verb fixture](experiments/http-verbs/README.md) and the
+[client comparison](http-client-design.md#common-verb-checkpoint--2026-09-25).

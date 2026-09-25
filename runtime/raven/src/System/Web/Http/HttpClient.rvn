@@ -414,6 +414,48 @@ public class HttpRequest {
         return Ok(request)
     }
 
+    /// Constructs an absolute HTTP PUT request with buffered content.
+    static func Put(url: string, content: HttpContent) -> Result<HttpRequest, HttpError> {
+        let request = Post(url, content)?
+        request.storedMethod = "PUT"
+        return Ok(request)
+    }
+
+    /// Constructs an absolute HTTP PUT request with buffered content.
+    static func Put(uri: Uri, content: HttpContent) -> Result<HttpRequest, HttpError> {
+        let request = Post(uri, content)?
+        request.storedMethod = "PUT"
+        return Ok(request)
+    }
+
+    /// Constructs an absolute HTTP PATCH request with buffered content.
+    static func Patch(url: string, content: HttpContent) -> Result<HttpRequest, HttpError> {
+        let request = Post(url, content)?
+        request.storedMethod = "PATCH"
+        return Ok(request)
+    }
+
+    /// Constructs an absolute HTTP PATCH request with buffered content.
+    static func Patch(uri: Uri, content: HttpContent) -> Result<HttpRequest, HttpError> {
+        let request = Post(uri, content)?
+        request.storedMethod = "PATCH"
+        return Ok(request)
+    }
+
+    /// Constructs an absolute HTTP DELETE request without content.
+    static func Delete(url: string) -> Result<HttpRequest, HttpError> {
+        let request = Get(url)?
+        request.storedMethod = "DELETE"
+        return Ok(request)
+    }
+
+    /// Constructs an absolute HTTP DELETE request without content.
+    static func Delete(uri: Uri) -> Result<HttpRequest, HttpError> {
+        let request = Get(uri)?
+        request.storedMethod = "DELETE"
+        return Ok(request)
+    }
+
     /// Returns a new request with one application header replaced case-insensitively.
     /// The original request is unchanged; content is shared and framing stays provider-owned.
     func WithHeader(name: string, value: string) -> Result<HttpRequest, HttpError> {
@@ -489,12 +531,15 @@ public class HttpRequest {
         if count > 1024 {
             return Error(HttpError.LimitExceeded("Request body limit exceeded"))
         }
+        if (storedMethod == "GET" || storedMethod == "DELETE") && count != 0 {
+            return Error(HttpError.InvalidRequest("This request method cannot contain content"))
+        }
         let port = storedPort
         var wire = String.Concat(String.Concat(storedMethod, " "), storedTarget)
         wire = String.Concat(wire, String.Concat(" HTTP/1.1\r\nHost: ", storedHost))
         wire = String.Concat(wire, String.Concat(":", port.ToString()))
         wire = String.Concat(wire, "\r\nConnection: close\r\n")
-        if storedMethod == "POST" {
+        if storedMethod == "POST" || storedMethod == "PUT" || storedMethod == "PATCH" {
             wire = String.Concat(wire, String.Concat("Content-Length: ", count.ToString()))
             wire = String.Concat(wire, "\r\n")
         }
@@ -635,7 +680,7 @@ public class HttpClient {
     private var handler: HttpHandler
     private var baseUri: Option<string> = None()
 
-    /// Optional absolute base URL, validated when Get constructs a request.
+    /// Optional absolute base URL, validated when a verb helper constructs a request.
     var BaseUri: Option<string> {
         get {
             if let Some(text) = baseUri {
@@ -756,6 +801,138 @@ public class HttpClient {
 
     private func CreatePost(uri: Uri, content: HttpContent) -> Result<HttpRequest, HttpError> {
         return HttpRequest.Post(ResolveAddress(uri)?, content)
+    }
+
+    /// Sends PUT buffered content using the same BaseUri and handler rules as Get.
+    func Put(url: string, content: HttpContent) -> Task<Result<HttpResponse, HttpError>> {
+        return Put(url, content, CancellationToken.None)
+    }
+
+    /// Sends PUT content with cooperative exchange cancellation.
+    func Put(url: string, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            return Cancelled()
+        }
+        let parsed = Uri.Parse(url)
+        if let Ok(uri) = parsed {
+            return Put(uri, content, cancellationToken)
+        } else if let Error(reason) = parsed {
+            return Failure(HttpError.InvalidUri(reason))
+        }
+        System.Fault("URI parser returned no outcome")
+        return Failure(HttpError.InvalidRequest("Invalid URI"))
+    }
+
+    /// Sends PUT content to a URI using the same base-resolution rules as Get.
+    func Put(uri: Uri, content: HttpContent) -> Task<Result<HttpResponse, HttpError>> {
+        return Put(uri, content, CancellationToken.None)
+    }
+
+    /// Sends PUT content through Send, forwarding the cancellation token unchanged.
+    func Put(uri: Uri, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            return Cancelled()
+        }
+        let parsed = CreatePut(uri, content)
+        if let Ok(request) = parsed {
+            return Send(request, cancellationToken)
+        } else if let Error(reason) = parsed {
+            return Failure(reason)
+        }
+        System.Fault("Request construction returned no outcome")
+        return Failure(HttpError.InvalidRequest("Invalid request"))
+    }
+
+    private func CreatePut(uri: Uri, content: HttpContent) -> Result<HttpRequest, HttpError> {
+        return HttpRequest.Put(ResolveAddress(uri)?, content)
+    }
+
+    /// Sends PATCH buffered content using the same BaseUri and handler rules as Get.
+    func Patch(url: string, content: HttpContent) -> Task<Result<HttpResponse, HttpError>> {
+        return Patch(url, content, CancellationToken.None)
+    }
+
+    /// Sends PATCH content with cooperative exchange cancellation.
+    func Patch(url: string, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            return Cancelled()
+        }
+        let parsed = Uri.Parse(url)
+        if let Ok(uri) = parsed {
+            return Patch(uri, content, cancellationToken)
+        } else if let Error(reason) = parsed {
+            return Failure(HttpError.InvalidUri(reason))
+        }
+        System.Fault("URI parser returned no outcome")
+        return Failure(HttpError.InvalidRequest("Invalid URI"))
+    }
+
+    /// Sends PATCH content to a URI using the same base-resolution rules as Get.
+    func Patch(uri: Uri, content: HttpContent) -> Task<Result<HttpResponse, HttpError>> {
+        return Patch(uri, content, CancellationToken.None)
+    }
+
+    /// Sends PATCH content through Send, forwarding the cancellation token unchanged.
+    func Patch(uri: Uri, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            return Cancelled()
+        }
+        let parsed = CreatePatch(uri, content)
+        if let Ok(request) = parsed {
+            return Send(request, cancellationToken)
+        } else if let Error(reason) = parsed {
+            return Failure(reason)
+        }
+        System.Fault("Request construction returned no outcome")
+        return Failure(HttpError.InvalidRequest("Invalid request"))
+    }
+
+    private func CreatePatch(uri: Uri, content: HttpContent) -> Result<HttpRequest, HttpError> {
+        return HttpRequest.Patch(ResolveAddress(uri)?, content)
+    }
+
+    /// Sends DELETE without content to an absolute URL without a base, or a relative URL when BaseUri is set.
+    func Delete(url: string) -> Task<Result<HttpResponse, HttpError>> {
+        return Delete(url, CancellationToken.None)
+    }
+
+    /// Uses the same address rules, with cooperative cancellation.
+    func Delete(url: string, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            return Cancelled()
+        }
+        let parsed = Uri.Parse(url)
+        if let Ok(uri) = parsed {
+            return Delete(uri, cancellationToken)
+        } else if let Error(reason) = parsed {
+            return Failure(HttpError.InvalidUri(reason))
+        }
+        System.Fault("URI parser returned no outcome")
+        return Failure(HttpError.InvalidRequest("Invalid URI"))
+    }
+
+    /// Uses the same base-resolution rules as the string overload.
+    func Delete(uri: Uri) -> Task<Result<HttpResponse, HttpError>> {
+        return Delete(uri, CancellationToken.None)
+    }
+
+    /// Uses the same address rules, with cooperative cancellation.
+    func Delete(uri: Uri, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            return Cancelled()
+        }
+        let parsed = CreateDelete(uri)
+        if let Ok(request) = parsed {
+            return Send(request, cancellationToken)
+        } else if let Error(reason) = parsed {
+            return Failure(reason)
+        }
+        System.Fault("Request construction returned no outcome")
+        return Failure(HttpError.InvalidRequest("Invalid request"))
+    }
+
+    private func CreateDelete(uri: Uri) -> Result<HttpRequest, HttpError> {
+        return HttpRequest.Delete(ResolveAddress(uri)?)
     }
 
     /// Fetches a bounded response and decodes its buffered body as strict UTF-8.

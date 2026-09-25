@@ -346,7 +346,7 @@ static class SignatureProbe
                 Check("HTTP address overload " + get.FullName,
                     HttpBindings.Bind(get, get, false, false) is not null);
         foreach (var httpOwner in new[] { "HttpClient", "HttpHandler", "HttpSocketHandler" })
-            foreach (var method in module.GetType(HttpBindings.Prefix + httpOwner).Methods.Where(m => m.Name is "Send" or "GetString" or "Post")) {
+            foreach (var method in module.GetType(HttpBindings.Prefix + httpOwner).Methods.Where(m => m.Name is "Send" or "GetString" or "Post" or "Put" or "Patch" or "Delete")) {
                 Check("HTTP token/text contract " + method.FullName, HttpBindings.Bind(method, method, false, false) is not null);
                 if (method.Parameters.LastOrDefault()?.ParameterType.FullName == CancellationBindings.Token) {
                     var parameter = method.Parameters[^1];
@@ -357,8 +357,8 @@ static class SignatureProbe
                 }
             }
         var requestType = module.GetType("System.Web.Http.HttpRequest");
-        foreach (var post in requestType.Methods.Where(m => m.Name == "Post")) {
-            Check("POST request factory " + post.FullName, HttpBindings.Bind(post, post, false, false) is not null);
+        foreach (var post in requestType.Methods.Where(m => m.Name is "Post" or "Put" or "Patch" or "Delete")) {
+            Check("HTTP request factory " + post.FullName, HttpBindings.Bind(post, post, false, false) is not null);
         }
         foreach (var headerOwner in new[] { "HttpRequest", "HttpResponse" }) {
             var lookup = module.GetType(HttpBindings.Prefix + headerOwner).Methods.Single(m => m.Name == "GetHeaderValues");

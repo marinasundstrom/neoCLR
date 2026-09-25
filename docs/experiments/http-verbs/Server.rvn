@@ -1,0 +1,59 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+// A buffered echo handler: the same content contract is used in each direction.
+func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    let status = if request.Method == "DELETE" { HttpStatusCode.NoContent } else { HttpStatusCode.OK }
+    let headers = ArrayList<HttpHeader>()
+    headers.Add(HttpHeader("X-Method", request.Method))
+    let source = Promise<Result<HttpResponse, HttpError>>()
+    _ = source.Complete(Ok(HttpResponse(status, headers, request.Content.Bytes)))
+    return source.Task
+}
+
+class ServerProbe {
+    private val server: HttpServer
+    private var remaining: int = 5
+
+    init(server: HttpServer) {
+        self.server = server
+    }
+
+    func Advance() {
+        remaining -= 1
+        Next()
+    }
+
+    func Next() {
+        if remaining == 0 {
+            server.Close()
+            Console.WriteLine("Verb server checks passed")
+            return
+        }
+        let pending = server.ServeOne(Echo)
+        pending.OnCompleted(() => {
+            if let Error(reason) = pending.GetResult() {
+                Console.WriteLine(String.Concat("Rejected: ", reason.ToString()))
+            } else {
+                Console.WriteLine("Served")
+            }
+            Advance()
+        })
+    }
+}
+
+func Main() {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+        System.Fault("Listen failed")
+        return
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fault("Port failed")
+        return
+    }
+    Console.WriteLine(port)
+    ServerProbe(server).Next()
+}

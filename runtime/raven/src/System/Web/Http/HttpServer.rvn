@@ -110,7 +110,7 @@ internal class HttpRequestDecoder {
                     return Error(HttpError.Unsupported("Unsupported request line"))
                 }
                 method = Text(0, methodEnd, 0)?
-                if method != "GET" && method != "POST" {
+                if method != "GET" && method != "POST" && method != "PUT" && method != "PATCH" && method != "DELETE" {
                     return Error(HttpError.Unsupported("Unsupported request method"))
                 }
                 let parsedTarget = Text(methodEnd + 1, end - 9, 0)?
@@ -122,8 +122,8 @@ internal class HttpRequestDecoder {
                 if host.IsEmpty {
                     return Error(HttpError.Protocol("Host required"))
                 }
-                if method == "GET" && length != 0 {
-                    return Error(HttpError.Unsupported("GET request bodies unsupported"))
+                if (method == "GET" || method == "DELETE") && length != 0 {
+                    return Error(HttpError.Unsupported(String.Concat(method, " request bodies unsupported")))
                 }
                 expected = length
                 return HttpRequest.FromIncoming(method, target, host, headers, body)
