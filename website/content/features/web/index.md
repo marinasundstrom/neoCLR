@@ -86,7 +86,7 @@ Received headers have lowercase names and trimmed surrounding whitespace.
 The server requires exactly one Host and no request body; optional Content-Length
 must be `0`. It validates application response headers, computes the byte length
 and adds `Connection: close`. Malformed requests or callback errors close the
-connection without an HTTP error response. Only 200 responses are supported.
+connection without an HTTP error response. Final statuses 200–599 are supported in development. Statuses 204, 205 and 304 require empty content; the server omits Content-Length for 204/304.
 
 ## Read a JSON report
 
@@ -108,11 +108,12 @@ It remains exploratory source, not a public runtime-library JSON API.
 
 ## Current limits
 
-Only plain HTTP/1.1 GET and a 200 response with exactly one Content-Length are
-supported. The experiment bounds URLs to 1,024 bytes, headers to 2,048 bytes and 16
+Plain HTTP/1.1 GET supports final statuses 200–599 in development. Responses require
+exactly one Content-Length, except bodyless 204/304. Informational responses are not
+yet supported. The experiment bounds URLs to 1,024 bytes, headers to 2,048 bytes and 16
 fields, and bodies to 1,024 bytes. It rejects duplicate lengths, transfer encodings
 and content encodings. It does not implement chunking, TLS, redirects, pooling,
-streaming content or general HTTP status handling. Text always means strict UTF-8.
+streaming content or informational response handling. Text always means strict UTF-8.
 
 The socket handler now has a provisional 15-second exchange budget, starting before
 DNS lookup and ending with the buffered response. DNS, connection and transfers keep
@@ -167,8 +168,10 @@ Typed HttpError results, BaseUri resolution and token-aware Send/Get/GetString a
 integrated in development. Both string and Uri overloads are available; tokenless
 client overloads use CancellationToken.None. GetString decodes the buffered body as
 strict UTF-8 and preserves HTTP errors. Invalid bytes produce HttpError.Protocol;
-status support is still limited to 200, and other statuses produce Unsupported.
-Charset handling, streaming and broader status behavior remain future work.
+GetString accepts 200–299 and reports other statuses as HttpError.UnsuccessfulStatus
+with the status code. Send/Get return these responses as ordinary response values;
+IsSuccessStatusCode lets callers apply their own policy. Charset handling and streaming
+remain future work.
 
 Cancellation tokens are invocation-local. Pre-cancellation skips parsing and handler
 dispatch. During an exchange the socket handler waits for native acknowledgement and

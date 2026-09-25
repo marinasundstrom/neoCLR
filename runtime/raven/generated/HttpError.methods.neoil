@@ -7,6 +7,7 @@
 .field private Metadata_V1_3C496E76616C69645572695061796C6F61643E System.Web.Http.HttpError.InvalidUri
 .field private Metadata_V1_3C4E616D655265736F6C7574696F6E5061796C6F61643E System.Web.Http.HttpError.NameResolution
 .field private Metadata_V1_3C5472616E73706F72745061796C6F61643E System.Web.Http.HttpError.Transport
+.field private Metadata_V1_3C556E7375636365737366756C5374617475735061796C6F61643E System.Web.Http.HttpError.UnsuccessfulStatus
 .field private Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E System.Web.Http.HttpError.InvalidRequest
 .field private Metadata_V1_3C50726F746F636F6C5061796C6F61643E System.Web.Http.HttpError.Protocol
 .field private Metadata_V1_3C556E737570706F727465645061796C6F61643E System.Web.Http.HttpError.Unsupported
@@ -118,12 +119,13 @@ ret
 .local System.Web.Http.HttpError.InvalidUri unionDefault1_1
 .local System.Web.Http.HttpError.NameResolution unionDefault1_2
 .local System.Web.Http.HttpError.Transport unionDefault1_3
-.local System.Web.Http.HttpError.InvalidRequest unionDefault1_4
-.local System.Web.Http.HttpError.Protocol unionDefault1_5
-.local System.Web.Http.HttpError.Unsupported unionDefault1_6
-.local System.Web.Http.HttpError.LimitExceeded unionDefault1_7
-.local System.Web.Http.HttpError.TimedOut unionDefault1_8
-.local System.Web.Http.HttpError.Handler unionDefault1_9
+.local System.Web.Http.HttpError.UnsuccessfulStatus unionDefault1_4
+.local System.Web.Http.HttpError.InvalidRequest unionDefault1_5
+.local System.Web.Http.HttpError.Protocol unionDefault1_6
+.local System.Web.Http.HttpError.Unsupported unionDefault1_7
+.local System.Web.Http.HttpError.LimitExceeded unionDefault1_8
+.local System.Web.Http.HttpError.TimedOut unionDefault1_9
+.local System.Web.Http.HttpError.Handler unionDefault1_10
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -157,39 +159,45 @@ ldloc unionDefault1_3
 stfld System.Web.Http.HttpError::Metadata_V1_3C5472616E73706F72745061796C6F61643E
 pop
 ldloca unionDefault1_4
-initobj System.Web.Http.HttpError.InvalidRequest
+initobj System.Web.Http.HttpError.UnsuccessfulStatus
 ldarg 0
 ldloc unionDefault1_4
-stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E7375636365737366756C5374617475735061796C6F61643E
 pop
 ldloca unionDefault1_5
-initobj System.Web.Http.HttpError.Protocol
+initobj System.Web.Http.HttpError.InvalidRequest
 ldarg 0
 ldloc unionDefault1_5
-stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
 pop
 ldloca unionDefault1_6
-initobj System.Web.Http.HttpError.Unsupported
+initobj System.Web.Http.HttpError.Protocol
 ldarg 0
 ldloc unionDefault1_6
-stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
 pop
 ldloca unionDefault1_7
-initobj System.Web.Http.HttpError.LimitExceeded
+initobj System.Web.Http.HttpError.Unsupported
 ldarg 0
 ldloc unionDefault1_7
-stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
 pop
 ldloca unionDefault1_8
-initobj System.Web.Http.HttpError.TimedOut
+initobj System.Web.Http.HttpError.LimitExceeded
 ldarg 0
 ldloc unionDefault1_8
-stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 ldloca unionDefault1_9
-initobj System.Web.Http.HttpError.Handler
+initobj System.Web.Http.HttpError.TimedOut
 ldarg 0
 ldloc unionDefault1_9
+stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Web.Http.HttpError.Handler
+ldarg 0
+ldloc unionDefault1_10
 stfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
 pop
 M00000002_IL_0007:
@@ -265,12 +273,13 @@ ret
 .local System.Web.Http.HttpError.InvalidUri unionDefault1_1
 .local System.Web.Http.HttpError.NameResolution unionDefault1_2
 .local System.Web.Http.HttpError.Transport unionDefault1_3
-.local System.Web.Http.HttpError.InvalidRequest unionDefault1_4
-.local System.Web.Http.HttpError.Protocol unionDefault1_5
-.local System.Web.Http.HttpError.Unsupported unionDefault1_6
-.local System.Web.Http.HttpError.LimitExceeded unionDefault1_7
-.local System.Web.Http.HttpError.TimedOut unionDefault1_8
-.local System.Web.Http.HttpError.Handler unionDefault1_9
+.local System.Web.Http.HttpError.UnsuccessfulStatus unionDefault1_4
+.local System.Web.Http.HttpError.InvalidRequest unionDefault1_5
+.local System.Web.Http.HttpError.Protocol unionDefault1_6
+.local System.Web.Http.HttpError.Unsupported unionDefault1_7
+.local System.Web.Http.HttpError.LimitExceeded unionDefault1_8
+.local System.Web.Http.HttpError.TimedOut unionDefault1_9
+.local System.Web.Http.HttpError.Handler unionDefault1_10
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -304,39 +313,45 @@ ldloc unionDefault1_3
 stfld System.Web.Http.HttpError::Metadata_V1_3C5472616E73706F72745061796C6F61643E
 pop
 ldloca unionDefault1_4
-initobj System.Web.Http.HttpError.InvalidRequest
+initobj System.Web.Http.HttpError.UnsuccessfulStatus
 ldarg 0
 ldloc unionDefault1_4
-stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E7375636365737366756C5374617475735061796C6F61643E
 pop
 ldloca unionDefault1_5
-initobj System.Web.Http.HttpError.Protocol
+initobj System.Web.Http.HttpError.InvalidRequest
 ldarg 0
 ldloc unionDefault1_5
-stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
 pop
 ldloca unionDefault1_6
-initobj System.Web.Http.HttpError.Unsupported
+initobj System.Web.Http.HttpError.Protocol
 ldarg 0
 ldloc unionDefault1_6
-stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
 pop
 ldloca unionDefault1_7
-initobj System.Web.Http.HttpError.LimitExceeded
+initobj System.Web.Http.HttpError.Unsupported
 ldarg 0
 ldloc unionDefault1_7
-stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
 pop
 ldloca unionDefault1_8
-initobj System.Web.Http.HttpError.TimedOut
+initobj System.Web.Http.HttpError.LimitExceeded
 ldarg 0
 ldloc unionDefault1_8
-stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 ldloca unionDefault1_9
-initobj System.Web.Http.HttpError.Handler
+initobj System.Web.Http.HttpError.TimedOut
 ldarg 0
 ldloc unionDefault1_9
+stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Web.Http.HttpError.Handler
+ldarg 0
+ldloc unionDefault1_10
 stfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
 pop
 M00000004_IL_0007:
@@ -412,12 +427,13 @@ ret
 .local System.Web.Http.HttpError.InvalidUri unionDefault1_1
 .local System.Web.Http.HttpError.NameResolution unionDefault1_2
 .local System.Web.Http.HttpError.Transport unionDefault1_3
-.local System.Web.Http.HttpError.InvalidRequest unionDefault1_4
-.local System.Web.Http.HttpError.Protocol unionDefault1_5
-.local System.Web.Http.HttpError.Unsupported unionDefault1_6
-.local System.Web.Http.HttpError.LimitExceeded unionDefault1_7
-.local System.Web.Http.HttpError.TimedOut unionDefault1_8
-.local System.Web.Http.HttpError.Handler unionDefault1_9
+.local System.Web.Http.HttpError.UnsuccessfulStatus unionDefault1_4
+.local System.Web.Http.HttpError.InvalidRequest unionDefault1_5
+.local System.Web.Http.HttpError.Protocol unionDefault1_6
+.local System.Web.Http.HttpError.Unsupported unionDefault1_7
+.local System.Web.Http.HttpError.LimitExceeded unionDefault1_8
+.local System.Web.Http.HttpError.TimedOut unionDefault1_9
+.local System.Web.Http.HttpError.Handler unionDefault1_10
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -451,39 +467,45 @@ ldloc unionDefault1_3
 stfld System.Web.Http.HttpError::Metadata_V1_3C5472616E73706F72745061796C6F61643E
 pop
 ldloca unionDefault1_4
-initobj System.Web.Http.HttpError.InvalidRequest
+initobj System.Web.Http.HttpError.UnsuccessfulStatus
 ldarg 0
 ldloc unionDefault1_4
-stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E7375636365737366756C5374617475735061796C6F61643E
 pop
 ldloca unionDefault1_5
-initobj System.Web.Http.HttpError.Protocol
+initobj System.Web.Http.HttpError.InvalidRequest
 ldarg 0
 ldloc unionDefault1_5
-stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
 pop
 ldloca unionDefault1_6
-initobj System.Web.Http.HttpError.Unsupported
+initobj System.Web.Http.HttpError.Protocol
 ldarg 0
 ldloc unionDefault1_6
-stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
 pop
 ldloca unionDefault1_7
-initobj System.Web.Http.HttpError.LimitExceeded
+initobj System.Web.Http.HttpError.Unsupported
 ldarg 0
 ldloc unionDefault1_7
-stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
 pop
 ldloca unionDefault1_8
-initobj System.Web.Http.HttpError.TimedOut
+initobj System.Web.Http.HttpError.LimitExceeded
 ldarg 0
 ldloc unionDefault1_8
-stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 ldloca unionDefault1_9
-initobj System.Web.Http.HttpError.Handler
+initobj System.Web.Http.HttpError.TimedOut
 ldarg 0
 ldloc unionDefault1_9
+stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Web.Http.HttpError.Handler
+ldarg 0
+ldloc unionDefault1_10
 stfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
 pop
 M00000006_IL_0007:
@@ -552,23 +574,24 @@ M00000007_IL_0025:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance byref .ctor(System.Web.Http.HttpError.InvalidRequest value) -> Void
+.method instance byref .ctor(System.Web.Http.HttpError.UnsuccessfulStatus value) -> Void
 .local Byte local0
-.local System.Web.Http.HttpError.InvalidRequest local1
+.local System.Web.Http.HttpError.UnsuccessfulStatus local1
 .local Byte unionDefault1_0
 .local System.Web.Http.HttpError.InvalidUri unionDefault1_1
 .local System.Web.Http.HttpError.NameResolution unionDefault1_2
 .local System.Web.Http.HttpError.Transport unionDefault1_3
-.local System.Web.Http.HttpError.InvalidRequest unionDefault1_4
-.local System.Web.Http.HttpError.Protocol unionDefault1_5
-.local System.Web.Http.HttpError.Unsupported unionDefault1_6
-.local System.Web.Http.HttpError.LimitExceeded unionDefault1_7
-.local System.Web.Http.HttpError.TimedOut unionDefault1_8
-.local System.Web.Http.HttpError.Handler unionDefault1_9
+.local System.Web.Http.HttpError.UnsuccessfulStatus unionDefault1_4
+.local System.Web.Http.HttpError.InvalidRequest unionDefault1_5
+.local System.Web.Http.HttpError.Protocol unionDefault1_6
+.local System.Web.Http.HttpError.Unsupported unionDefault1_7
+.local System.Web.Http.HttpError.LimitExceeded unionDefault1_8
+.local System.Web.Http.HttpError.TimedOut unionDefault1_9
+.local System.Web.Http.HttpError.Handler unionDefault1_10
 ldc.i4 0
 stloc local0
 ldloca local1
-initobj System.Web.Http.HttpError.InvalidRequest
+initobj System.Web.Http.HttpError.UnsuccessfulStatus
 M00000008_IL_0000:
 ldarg 0
 M00000008_IL_0001:
@@ -598,39 +621,45 @@ ldloc unionDefault1_3
 stfld System.Web.Http.HttpError::Metadata_V1_3C5472616E73706F72745061796C6F61643E
 pop
 ldloca unionDefault1_4
-initobj System.Web.Http.HttpError.InvalidRequest
+initobj System.Web.Http.HttpError.UnsuccessfulStatus
 ldarg 0
 ldloc unionDefault1_4
-stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E7375636365737366756C5374617475735061796C6F61643E
 pop
 ldloca unionDefault1_5
-initobj System.Web.Http.HttpError.Protocol
+initobj System.Web.Http.HttpError.InvalidRequest
 ldarg 0
 ldloc unionDefault1_5
-stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
 pop
 ldloca unionDefault1_6
-initobj System.Web.Http.HttpError.Unsupported
+initobj System.Web.Http.HttpError.Protocol
 ldarg 0
 ldloc unionDefault1_6
-stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
 pop
 ldloca unionDefault1_7
-initobj System.Web.Http.HttpError.LimitExceeded
+initobj System.Web.Http.HttpError.Unsupported
 ldarg 0
 ldloc unionDefault1_7
-stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
 pop
 ldloca unionDefault1_8
-initobj System.Web.Http.HttpError.TimedOut
+initobj System.Web.Http.HttpError.LimitExceeded
 ldarg 0
 ldloc unionDefault1_8
-stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 ldloca unionDefault1_9
-initobj System.Web.Http.HttpError.Handler
+initobj System.Web.Http.HttpError.TimedOut
 ldarg 0
 ldloc unionDefault1_9
+stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Web.Http.HttpError.Handler
+ldarg 0
+ldloc unionDefault1_10
 stfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
 pop
 M00000008_IL_0007:
@@ -655,13 +684,13 @@ ldarg 0
 M00000008_IL_0014:
 ldloc local1
 M00000008_IL_0015:
-stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E7375636365737366756C5374617475735061796C6F61643E
 pop
 M00000008_IL_001a:
 ldvoid
 ret
 .end
-.method instance byref TryGetValue(out(true) System.Web.Http.HttpError.InvalidRequest& value) -> Boolean
+.method instance byref TryGetValue(out(true) System.Web.Http.HttpError.UnsuccessfulStatus& value) -> Boolean
 M00000009_IL_0000:
 ldarg 0
 M00000009_IL_0001:
@@ -684,9 +713,9 @@ ldarg 1
 M00000009_IL_0016:
 ldarg 0
 M00000009_IL_0017:
-ldfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
+ldfld System.Web.Http.HttpError::Metadata_V1_3C556E7375636365737366756C5374617475735061796C6F61643E
 M00000009_IL_001c:
-stobj System.Web.Http.HttpError.InvalidRequest
+stobj System.Web.Http.HttpError.UnsuccessfulStatus
 M00000009_IL_0021:
 ldc.i4 1
 M00000009_IL_0022:
@@ -699,23 +728,24 @@ M00000009_IL_0025:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance byref .ctor(System.Web.Http.HttpError.Protocol value) -> Void
+.method instance byref .ctor(System.Web.Http.HttpError.InvalidRequest value) -> Void
 .local Byte local0
-.local System.Web.Http.HttpError.Protocol local1
+.local System.Web.Http.HttpError.InvalidRequest local1
 .local Byte unionDefault1_0
 .local System.Web.Http.HttpError.InvalidUri unionDefault1_1
 .local System.Web.Http.HttpError.NameResolution unionDefault1_2
 .local System.Web.Http.HttpError.Transport unionDefault1_3
-.local System.Web.Http.HttpError.InvalidRequest unionDefault1_4
-.local System.Web.Http.HttpError.Protocol unionDefault1_5
-.local System.Web.Http.HttpError.Unsupported unionDefault1_6
-.local System.Web.Http.HttpError.LimitExceeded unionDefault1_7
-.local System.Web.Http.HttpError.TimedOut unionDefault1_8
-.local System.Web.Http.HttpError.Handler unionDefault1_9
+.local System.Web.Http.HttpError.UnsuccessfulStatus unionDefault1_4
+.local System.Web.Http.HttpError.InvalidRequest unionDefault1_5
+.local System.Web.Http.HttpError.Protocol unionDefault1_6
+.local System.Web.Http.HttpError.Unsupported unionDefault1_7
+.local System.Web.Http.HttpError.LimitExceeded unionDefault1_8
+.local System.Web.Http.HttpError.TimedOut unionDefault1_9
+.local System.Web.Http.HttpError.Handler unionDefault1_10
 ldc.i4 0
 stloc local0
 ldloca local1
-initobj System.Web.Http.HttpError.Protocol
+initobj System.Web.Http.HttpError.InvalidRequest
 M0000000a_IL_0000:
 ldarg 0
 M0000000a_IL_0001:
@@ -745,39 +775,45 @@ ldloc unionDefault1_3
 stfld System.Web.Http.HttpError::Metadata_V1_3C5472616E73706F72745061796C6F61643E
 pop
 ldloca unionDefault1_4
-initobj System.Web.Http.HttpError.InvalidRequest
+initobj System.Web.Http.HttpError.UnsuccessfulStatus
 ldarg 0
 ldloc unionDefault1_4
-stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E7375636365737366756C5374617475735061796C6F61643E
 pop
 ldloca unionDefault1_5
-initobj System.Web.Http.HttpError.Protocol
+initobj System.Web.Http.HttpError.InvalidRequest
 ldarg 0
 ldloc unionDefault1_5
-stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
 pop
 ldloca unionDefault1_6
-initobj System.Web.Http.HttpError.Unsupported
+initobj System.Web.Http.HttpError.Protocol
 ldarg 0
 ldloc unionDefault1_6
-stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
 pop
 ldloca unionDefault1_7
-initobj System.Web.Http.HttpError.LimitExceeded
+initobj System.Web.Http.HttpError.Unsupported
 ldarg 0
 ldloc unionDefault1_7
-stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
 pop
 ldloca unionDefault1_8
-initobj System.Web.Http.HttpError.TimedOut
+initobj System.Web.Http.HttpError.LimitExceeded
 ldarg 0
 ldloc unionDefault1_8
-stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 ldloca unionDefault1_9
-initobj System.Web.Http.HttpError.Handler
+initobj System.Web.Http.HttpError.TimedOut
 ldarg 0
 ldloc unionDefault1_9
+stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Web.Http.HttpError.Handler
+ldarg 0
+ldloc unionDefault1_10
 stfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
 pop
 M0000000a_IL_0007:
@@ -802,13 +838,13 @@ ldarg 0
 M0000000a_IL_0014:
 ldloc local1
 M0000000a_IL_0015:
-stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
 pop
 M0000000a_IL_001a:
 ldvoid
 ret
 .end
-.method instance byref TryGetValue(out(true) System.Web.Http.HttpError.Protocol& value) -> Boolean
+.method instance byref TryGetValue(out(true) System.Web.Http.HttpError.InvalidRequest& value) -> Boolean
 M0000000b_IL_0000:
 ldarg 0
 M0000000b_IL_0001:
@@ -831,9 +867,9 @@ ldarg 1
 M0000000b_IL_0016:
 ldarg 0
 M0000000b_IL_0017:
-ldfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
+ldfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
 M0000000b_IL_001c:
-stobj System.Web.Http.HttpError.Protocol
+stobj System.Web.Http.HttpError.InvalidRequest
 M0000000b_IL_0021:
 ldc.i4 1
 M0000000b_IL_0022:
@@ -846,23 +882,24 @@ M0000000b_IL_0025:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance byref .ctor(System.Web.Http.HttpError.Unsupported value) -> Void
+.method instance byref .ctor(System.Web.Http.HttpError.Protocol value) -> Void
 .local Byte local0
-.local System.Web.Http.HttpError.Unsupported local1
+.local System.Web.Http.HttpError.Protocol local1
 .local Byte unionDefault1_0
 .local System.Web.Http.HttpError.InvalidUri unionDefault1_1
 .local System.Web.Http.HttpError.NameResolution unionDefault1_2
 .local System.Web.Http.HttpError.Transport unionDefault1_3
-.local System.Web.Http.HttpError.InvalidRequest unionDefault1_4
-.local System.Web.Http.HttpError.Protocol unionDefault1_5
-.local System.Web.Http.HttpError.Unsupported unionDefault1_6
-.local System.Web.Http.HttpError.LimitExceeded unionDefault1_7
-.local System.Web.Http.HttpError.TimedOut unionDefault1_8
-.local System.Web.Http.HttpError.Handler unionDefault1_9
+.local System.Web.Http.HttpError.UnsuccessfulStatus unionDefault1_4
+.local System.Web.Http.HttpError.InvalidRequest unionDefault1_5
+.local System.Web.Http.HttpError.Protocol unionDefault1_6
+.local System.Web.Http.HttpError.Unsupported unionDefault1_7
+.local System.Web.Http.HttpError.LimitExceeded unionDefault1_8
+.local System.Web.Http.HttpError.TimedOut unionDefault1_9
+.local System.Web.Http.HttpError.Handler unionDefault1_10
 ldc.i4 0
 stloc local0
 ldloca local1
-initobj System.Web.Http.HttpError.Unsupported
+initobj System.Web.Http.HttpError.Protocol
 M0000000c_IL_0000:
 ldarg 0
 M0000000c_IL_0001:
@@ -892,39 +929,45 @@ ldloc unionDefault1_3
 stfld System.Web.Http.HttpError::Metadata_V1_3C5472616E73706F72745061796C6F61643E
 pop
 ldloca unionDefault1_4
-initobj System.Web.Http.HttpError.InvalidRequest
+initobj System.Web.Http.HttpError.UnsuccessfulStatus
 ldarg 0
 ldloc unionDefault1_4
-stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E7375636365737366756C5374617475735061796C6F61643E
 pop
 ldloca unionDefault1_5
-initobj System.Web.Http.HttpError.Protocol
+initobj System.Web.Http.HttpError.InvalidRequest
 ldarg 0
 ldloc unionDefault1_5
-stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
 pop
 ldloca unionDefault1_6
-initobj System.Web.Http.HttpError.Unsupported
+initobj System.Web.Http.HttpError.Protocol
 ldarg 0
 ldloc unionDefault1_6
-stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
 pop
 ldloca unionDefault1_7
-initobj System.Web.Http.HttpError.LimitExceeded
+initobj System.Web.Http.HttpError.Unsupported
 ldarg 0
 ldloc unionDefault1_7
-stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
 pop
 ldloca unionDefault1_8
-initobj System.Web.Http.HttpError.TimedOut
+initobj System.Web.Http.HttpError.LimitExceeded
 ldarg 0
 ldloc unionDefault1_8
-stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 ldloca unionDefault1_9
-initobj System.Web.Http.HttpError.Handler
+initobj System.Web.Http.HttpError.TimedOut
 ldarg 0
 ldloc unionDefault1_9
+stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Web.Http.HttpError.Handler
+ldarg 0
+ldloc unionDefault1_10
 stfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
 pop
 M0000000c_IL_0007:
@@ -949,13 +992,13 @@ ldarg 0
 M0000000c_IL_0014:
 ldloc local1
 M0000000c_IL_0015:
-stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
 pop
 M0000000c_IL_001a:
 ldvoid
 ret
 .end
-.method instance byref TryGetValue(out(true) System.Web.Http.HttpError.Unsupported& value) -> Boolean
+.method instance byref TryGetValue(out(true) System.Web.Http.HttpError.Protocol& value) -> Boolean
 M0000000d_IL_0000:
 ldarg 0
 M0000000d_IL_0001:
@@ -978,9 +1021,9 @@ ldarg 1
 M0000000d_IL_0016:
 ldarg 0
 M0000000d_IL_0017:
-ldfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
+ldfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
 M0000000d_IL_001c:
-stobj System.Web.Http.HttpError.Unsupported
+stobj System.Web.Http.HttpError.Protocol
 M0000000d_IL_0021:
 ldc.i4 1
 M0000000d_IL_0022:
@@ -993,23 +1036,24 @@ M0000000d_IL_0025:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance byref .ctor(System.Web.Http.HttpError.LimitExceeded value) -> Void
+.method instance byref .ctor(System.Web.Http.HttpError.Unsupported value) -> Void
 .local Byte local0
-.local System.Web.Http.HttpError.LimitExceeded local1
+.local System.Web.Http.HttpError.Unsupported local1
 .local Byte unionDefault1_0
 .local System.Web.Http.HttpError.InvalidUri unionDefault1_1
 .local System.Web.Http.HttpError.NameResolution unionDefault1_2
 .local System.Web.Http.HttpError.Transport unionDefault1_3
-.local System.Web.Http.HttpError.InvalidRequest unionDefault1_4
-.local System.Web.Http.HttpError.Protocol unionDefault1_5
-.local System.Web.Http.HttpError.Unsupported unionDefault1_6
-.local System.Web.Http.HttpError.LimitExceeded unionDefault1_7
-.local System.Web.Http.HttpError.TimedOut unionDefault1_8
-.local System.Web.Http.HttpError.Handler unionDefault1_9
+.local System.Web.Http.HttpError.UnsuccessfulStatus unionDefault1_4
+.local System.Web.Http.HttpError.InvalidRequest unionDefault1_5
+.local System.Web.Http.HttpError.Protocol unionDefault1_6
+.local System.Web.Http.HttpError.Unsupported unionDefault1_7
+.local System.Web.Http.HttpError.LimitExceeded unionDefault1_8
+.local System.Web.Http.HttpError.TimedOut unionDefault1_9
+.local System.Web.Http.HttpError.Handler unionDefault1_10
 ldc.i4 0
 stloc local0
 ldloca local1
-initobj System.Web.Http.HttpError.LimitExceeded
+initobj System.Web.Http.HttpError.Unsupported
 M0000000e_IL_0000:
 ldarg 0
 M0000000e_IL_0001:
@@ -1039,39 +1083,45 @@ ldloc unionDefault1_3
 stfld System.Web.Http.HttpError::Metadata_V1_3C5472616E73706F72745061796C6F61643E
 pop
 ldloca unionDefault1_4
-initobj System.Web.Http.HttpError.InvalidRequest
+initobj System.Web.Http.HttpError.UnsuccessfulStatus
 ldarg 0
 ldloc unionDefault1_4
-stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E7375636365737366756C5374617475735061796C6F61643E
 pop
 ldloca unionDefault1_5
-initobj System.Web.Http.HttpError.Protocol
+initobj System.Web.Http.HttpError.InvalidRequest
 ldarg 0
 ldloc unionDefault1_5
-stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
 pop
 ldloca unionDefault1_6
-initobj System.Web.Http.HttpError.Unsupported
+initobj System.Web.Http.HttpError.Protocol
 ldarg 0
 ldloc unionDefault1_6
-stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
 pop
 ldloca unionDefault1_7
-initobj System.Web.Http.HttpError.LimitExceeded
+initobj System.Web.Http.HttpError.Unsupported
 ldarg 0
 ldloc unionDefault1_7
-stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
 pop
 ldloca unionDefault1_8
-initobj System.Web.Http.HttpError.TimedOut
+initobj System.Web.Http.HttpError.LimitExceeded
 ldarg 0
 ldloc unionDefault1_8
-stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 ldloca unionDefault1_9
-initobj System.Web.Http.HttpError.Handler
+initobj System.Web.Http.HttpError.TimedOut
 ldarg 0
 ldloc unionDefault1_9
+stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Web.Http.HttpError.Handler
+ldarg 0
+ldloc unionDefault1_10
 stfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
 pop
 M0000000e_IL_0007:
@@ -1096,13 +1146,13 @@ ldarg 0
 M0000000e_IL_0014:
 ldloc local1
 M0000000e_IL_0015:
-stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
 pop
 M0000000e_IL_001a:
 ldvoid
 ret
 .end
-.method instance byref TryGetValue(out(true) System.Web.Http.HttpError.LimitExceeded& value) -> Boolean
+.method instance byref TryGetValue(out(true) System.Web.Http.HttpError.Unsupported& value) -> Boolean
 M0000000f_IL_0000:
 ldarg 0
 M0000000f_IL_0001:
@@ -1125,9 +1175,9 @@ ldarg 1
 M0000000f_IL_0016:
 ldarg 0
 M0000000f_IL_0017:
-ldfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+ldfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
 M0000000f_IL_001c:
-stobj System.Web.Http.HttpError.LimitExceeded
+stobj System.Web.Http.HttpError.Unsupported
 M0000000f_IL_0021:
 ldc.i4 1
 M0000000f_IL_0022:
@@ -1140,23 +1190,24 @@ M0000000f_IL_0025:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance byref .ctor(System.Web.Http.HttpError.TimedOut value) -> Void
+.method instance byref .ctor(System.Web.Http.HttpError.LimitExceeded value) -> Void
 .local Byte local0
-.local System.Web.Http.HttpError.TimedOut local1
+.local System.Web.Http.HttpError.LimitExceeded local1
 .local Byte unionDefault1_0
 .local System.Web.Http.HttpError.InvalidUri unionDefault1_1
 .local System.Web.Http.HttpError.NameResolution unionDefault1_2
 .local System.Web.Http.HttpError.Transport unionDefault1_3
-.local System.Web.Http.HttpError.InvalidRequest unionDefault1_4
-.local System.Web.Http.HttpError.Protocol unionDefault1_5
-.local System.Web.Http.HttpError.Unsupported unionDefault1_6
-.local System.Web.Http.HttpError.LimitExceeded unionDefault1_7
-.local System.Web.Http.HttpError.TimedOut unionDefault1_8
-.local System.Web.Http.HttpError.Handler unionDefault1_9
+.local System.Web.Http.HttpError.UnsuccessfulStatus unionDefault1_4
+.local System.Web.Http.HttpError.InvalidRequest unionDefault1_5
+.local System.Web.Http.HttpError.Protocol unionDefault1_6
+.local System.Web.Http.HttpError.Unsupported unionDefault1_7
+.local System.Web.Http.HttpError.LimitExceeded unionDefault1_8
+.local System.Web.Http.HttpError.TimedOut unionDefault1_9
+.local System.Web.Http.HttpError.Handler unionDefault1_10
 ldc.i4 0
 stloc local0
 ldloca local1
-initobj System.Web.Http.HttpError.TimedOut
+initobj System.Web.Http.HttpError.LimitExceeded
 M00000010_IL_0000:
 ldarg 0
 M00000010_IL_0001:
@@ -1186,39 +1237,45 @@ ldloc unionDefault1_3
 stfld System.Web.Http.HttpError::Metadata_V1_3C5472616E73706F72745061796C6F61643E
 pop
 ldloca unionDefault1_4
-initobj System.Web.Http.HttpError.InvalidRequest
+initobj System.Web.Http.HttpError.UnsuccessfulStatus
 ldarg 0
 ldloc unionDefault1_4
-stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E7375636365737366756C5374617475735061796C6F61643E
 pop
 ldloca unionDefault1_5
-initobj System.Web.Http.HttpError.Protocol
+initobj System.Web.Http.HttpError.InvalidRequest
 ldarg 0
 ldloc unionDefault1_5
-stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
 pop
 ldloca unionDefault1_6
-initobj System.Web.Http.HttpError.Unsupported
+initobj System.Web.Http.HttpError.Protocol
 ldarg 0
 ldloc unionDefault1_6
-stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
 pop
 ldloca unionDefault1_7
-initobj System.Web.Http.HttpError.LimitExceeded
+initobj System.Web.Http.HttpError.Unsupported
 ldarg 0
 ldloc unionDefault1_7
-stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
 pop
 ldloca unionDefault1_8
-initobj System.Web.Http.HttpError.TimedOut
+initobj System.Web.Http.HttpError.LimitExceeded
 ldarg 0
 ldloc unionDefault1_8
-stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 ldloca unionDefault1_9
-initobj System.Web.Http.HttpError.Handler
+initobj System.Web.Http.HttpError.TimedOut
 ldarg 0
 ldloc unionDefault1_9
+stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Web.Http.HttpError.Handler
+ldarg 0
+ldloc unionDefault1_10
 stfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
 pop
 M00000010_IL_0007:
@@ -1243,13 +1300,13 @@ ldarg 0
 M00000010_IL_0014:
 ldloc local1
 M00000010_IL_0015:
-stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 M00000010_IL_001a:
 ldvoid
 ret
 .end
-.method instance byref TryGetValue(out(true) System.Web.Http.HttpError.TimedOut& value) -> Boolean
+.method instance byref TryGetValue(out(true) System.Web.Http.HttpError.LimitExceeded& value) -> Boolean
 M00000011_IL_0000:
 ldarg 0
 M00000011_IL_0001:
@@ -1272,9 +1329,9 @@ ldarg 1
 M00000011_IL_0016:
 ldarg 0
 M00000011_IL_0017:
-ldfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+ldfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 M00000011_IL_001c:
-stobj System.Web.Http.HttpError.TimedOut
+stobj System.Web.Http.HttpError.LimitExceeded
 M00000011_IL_0021:
 ldc.i4 1
 M00000011_IL_0022:
@@ -1287,23 +1344,24 @@ M00000011_IL_0025:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance byref .ctor(System.Web.Http.HttpError.Handler value) -> Void
+.method instance byref .ctor(System.Web.Http.HttpError.TimedOut value) -> Void
 .local Byte local0
-.local System.Web.Http.HttpError.Handler local1
+.local System.Web.Http.HttpError.TimedOut local1
 .local Byte unionDefault1_0
 .local System.Web.Http.HttpError.InvalidUri unionDefault1_1
 .local System.Web.Http.HttpError.NameResolution unionDefault1_2
 .local System.Web.Http.HttpError.Transport unionDefault1_3
-.local System.Web.Http.HttpError.InvalidRequest unionDefault1_4
-.local System.Web.Http.HttpError.Protocol unionDefault1_5
-.local System.Web.Http.HttpError.Unsupported unionDefault1_6
-.local System.Web.Http.HttpError.LimitExceeded unionDefault1_7
-.local System.Web.Http.HttpError.TimedOut unionDefault1_8
-.local System.Web.Http.HttpError.Handler unionDefault1_9
+.local System.Web.Http.HttpError.UnsuccessfulStatus unionDefault1_4
+.local System.Web.Http.HttpError.InvalidRequest unionDefault1_5
+.local System.Web.Http.HttpError.Protocol unionDefault1_6
+.local System.Web.Http.HttpError.Unsupported unionDefault1_7
+.local System.Web.Http.HttpError.LimitExceeded unionDefault1_8
+.local System.Web.Http.HttpError.TimedOut unionDefault1_9
+.local System.Web.Http.HttpError.Handler unionDefault1_10
 ldc.i4 0
 stloc local0
 ldloca local1
-initobj System.Web.Http.HttpError.Handler
+initobj System.Web.Http.HttpError.TimedOut
 M00000012_IL_0000:
 ldarg 0
 M00000012_IL_0001:
@@ -1333,39 +1391,45 @@ ldloc unionDefault1_3
 stfld System.Web.Http.HttpError::Metadata_V1_3C5472616E73706F72745061796C6F61643E
 pop
 ldloca unionDefault1_4
-initobj System.Web.Http.HttpError.InvalidRequest
+initobj System.Web.Http.HttpError.UnsuccessfulStatus
 ldarg 0
 ldloc unionDefault1_4
-stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E7375636365737366756C5374617475735061796C6F61643E
 pop
 ldloca unionDefault1_5
-initobj System.Web.Http.HttpError.Protocol
+initobj System.Web.Http.HttpError.InvalidRequest
 ldarg 0
 ldloc unionDefault1_5
-stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
 pop
 ldloca unionDefault1_6
-initobj System.Web.Http.HttpError.Unsupported
+initobj System.Web.Http.HttpError.Protocol
 ldarg 0
 ldloc unionDefault1_6
-stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
 pop
 ldloca unionDefault1_7
-initobj System.Web.Http.HttpError.LimitExceeded
+initobj System.Web.Http.HttpError.Unsupported
 ldarg 0
 ldloc unionDefault1_7
-stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
 pop
 ldloca unionDefault1_8
-initobj System.Web.Http.HttpError.TimedOut
+initobj System.Web.Http.HttpError.LimitExceeded
 ldarg 0
 ldloc unionDefault1_8
-stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
 pop
 ldloca unionDefault1_9
-initobj System.Web.Http.HttpError.Handler
+initobj System.Web.Http.HttpError.TimedOut
 ldarg 0
 ldloc unionDefault1_9
+stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Web.Http.HttpError.Handler
+ldarg 0
+ldloc unionDefault1_10
 stfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
 pop
 M00000012_IL_0007:
@@ -1390,13 +1454,13 @@ ldarg 0
 M00000012_IL_0015:
 ldloc local1
 M00000012_IL_0016:
-stfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
+stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
 pop
 M00000012_IL_001b:
 ldvoid
 ret
 .end
-.method instance byref TryGetValue(out(true) System.Web.Http.HttpError.Handler& value) -> Boolean
+.method instance byref TryGetValue(out(true) System.Web.Http.HttpError.TimedOut& value) -> Boolean
 M00000013_IL_0000:
 ldarg 0
 M00000013_IL_0001:
@@ -1419,9 +1483,9 @@ ldarg 1
 M00000013_IL_0017:
 ldarg 0
 M00000013_IL_0018:
-ldfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
+ldfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
 M00000013_IL_001d:
-stobj System.Web.Http.HttpError.Handler
+stobj System.Web.Http.HttpError.TimedOut
 M00000013_IL_0022:
 ldc.i4 1
 M00000013_IL_0023:
@@ -1434,35 +1498,192 @@ M00000013_IL_0026:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
+.method instance byref .ctor(System.Web.Http.HttpError.Handler value) -> Void
+.local Byte local0
+.local System.Web.Http.HttpError.Handler local1
+.local Byte unionDefault1_0
+.local System.Web.Http.HttpError.InvalidUri unionDefault1_1
+.local System.Web.Http.HttpError.NameResolution unionDefault1_2
+.local System.Web.Http.HttpError.Transport unionDefault1_3
+.local System.Web.Http.HttpError.UnsuccessfulStatus unionDefault1_4
+.local System.Web.Http.HttpError.InvalidRequest unionDefault1_5
+.local System.Web.Http.HttpError.Protocol unionDefault1_6
+.local System.Web.Http.HttpError.Unsupported unionDefault1_7
+.local System.Web.Http.HttpError.LimitExceeded unionDefault1_8
+.local System.Web.Http.HttpError.TimedOut unionDefault1_9
+.local System.Web.Http.HttpError.Handler unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Web.Http.HttpError.Handler
+M00000014_IL_0000:
+ldarg 0
+M00000014_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Web.Http.HttpError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Web.Http.HttpError.InvalidUri
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C69645572695061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Web.Http.HttpError.NameResolution
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Web.Http.HttpError::Metadata_V1_3C4E616D655265736F6C7574696F6E5061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Web.Http.HttpError.Transport
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Web.Http.HttpError::Metadata_V1_3C5472616E73706F72745061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Web.Http.HttpError.UnsuccessfulStatus
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E7375636365737366756C5374617475735061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Web.Http.HttpError.InvalidRequest
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Web.Http.HttpError.Protocol
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Web.Http.HttpError.Unsupported
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Web.Http.HttpError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Web.Http.HttpError.TimedOut
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Web.Http.HttpError.Handler
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
+pop
+M00000014_IL_0007:
+ldc.i4 10
+M00000014_IL_0009:
+stloc local0
+M00000014_IL_000a:
+ldarg 0
+M00000014_IL_000b:
+ldloc local0
+M00000014_IL_000c:
+conv.u1
+M00000014_IL_000d:
+stfld System.Web.Http.HttpError::Metadata_V1_3C5461673E
+pop
+M00000014_IL_0012:
+ldarg 1
+M00000014_IL_0013:
+stloc local1
+M00000014_IL_0014:
+ldarg 0
+M00000014_IL_0015:
+ldloc local1
+M00000014_IL_0016:
+stfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
+pop
+M00000014_IL_001b:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Web.Http.HttpError.Handler& value) -> Boolean
+M00000015_IL_0000:
+ldarg 0
+M00000015_IL_0001:
+ldfld System.Web.Http.HttpError::Metadata_V1_3C5461673E
+M00000015_IL_0006:
+conv.i4
+M00000015_IL_0007:
+ldc.i4 10
+M00000015_IL_0009:
+conv.i4
+M00000015_IL_000a:
+ceq
+call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
+M00000015_IL_000c:
+brtrue M00000015_IL_0016
+M00000015_IL_0011:
+br M00000015_IL_0024
+M00000015_IL_0016:
+ldarg 1
+M00000015_IL_0017:
+ldarg 0
+M00000015_IL_0018:
+ldfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
+M00000015_IL_001d:
+stobj System.Web.Http.HttpError.Handler
+M00000015_IL_0022:
+ldc.i4 1
+M00000015_IL_0023:
+call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000015_IL_0024:
+M00000015_IL_0025:
+ldc.i4 0
+M00000015_IL_0026:
+call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
 .method instance override byref ToString() -> String
 .local System.Web.Http.HttpError local0
 .local String local1
 .local System.UriError local2
 .local System.Networking.DnsError local3
 .local System.Networking.Sockets.SocketError local4
-.local String local5
+.local Int32 local5
 .local String local6
 .local String local7
 .local String local8
 .local String local9
-.local System.Web.Http.HttpError local10
-.local System.Web.Http.HttpError.InvalidUri local11
-.local System.Web.Http.HttpError local12
-.local System.Web.Http.HttpError.NameResolution local13
-.local System.Web.Http.HttpError local14
-.local System.Web.Http.HttpError.Transport local15
-.local System.Web.Http.HttpError local16
-.local System.Web.Http.HttpError.InvalidRequest local17
-.local System.Web.Http.HttpError local18
-.local System.Web.Http.HttpError.Protocol local19
-.local System.Web.Http.HttpError local20
-.local System.Web.Http.HttpError.Unsupported local21
-.local System.Web.Http.HttpError local22
-.local System.Web.Http.HttpError.LimitExceeded local23
-.local System.Web.Http.HttpError local24
-.local System.Web.Http.HttpError.TimedOut local25
-.local System.Web.Http.HttpError local26
-.local System.Web.Http.HttpError.Handler local27
+.local String local10
+.local System.Web.Http.HttpError local11
+.local System.Web.Http.HttpError.InvalidUri local12
+.local System.Web.Http.HttpError local13
+.local System.Web.Http.HttpError.NameResolution local14
+.local System.Web.Http.HttpError local15
+.local System.Web.Http.HttpError.Transport local16
+.local System.Web.Http.HttpError local17
+.local System.Web.Http.HttpError.UnsuccessfulStatus local18
+.local System.Web.Http.HttpError local19
+.local System.Web.Http.HttpError.InvalidRequest local20
+.local System.Web.Http.HttpError local21
+.local System.Web.Http.HttpError.Protocol local22
+.local System.Web.Http.HttpError local23
+.local System.Web.Http.HttpError.Unsupported local24
+.local System.Web.Http.HttpError local25
+.local System.Web.Http.HttpError.LimitExceeded local26
+.local System.Web.Http.HttpError local27
+.local System.Web.Http.HttpError.TimedOut local28
+.local System.Web.Http.HttpError local29
+.local System.Web.Http.HttpError.Handler local30
 ldloca local0
 initobj System.Web.Http.HttpError
 ldloca local2
@@ -1471,630 +1692,701 @@ ldloca local3
 initobj System.Networking.DnsError
 ldloca local4
 initobj System.Networking.Sockets.SocketError
-ldloca local10
-initobj System.Web.Http.HttpError
-ldloca local11
-initobj System.Web.Http.HttpError.InvalidUri
-ldloca local12
-initobj System.Web.Http.HttpError
-ldloca local13
-initobj System.Web.Http.HttpError.NameResolution
-ldloca local14
-initobj System.Web.Http.HttpError
-ldloca local15
-initobj System.Web.Http.HttpError.Transport
-ldloca local16
-initobj System.Web.Http.HttpError
-ldloca local17
-initobj System.Web.Http.HttpError.InvalidRequest
-ldloca local18
-initobj System.Web.Http.HttpError
-ldloca local19
-initobj System.Web.Http.HttpError.Protocol
-ldloca local20
-initobj System.Web.Http.HttpError
-ldloca local21
-initobj System.Web.Http.HttpError.Unsupported
-ldloca local22
-initobj System.Web.Http.HttpError
-ldloca local23
-initobj System.Web.Http.HttpError.LimitExceeded
-ldloca local24
-initobj System.Web.Http.HttpError
-ldloca local25
-initobj System.Web.Http.HttpError.TimedOut
-ldloca local26
-initobj System.Web.Http.HttpError
-ldloca local27
-initobj System.Web.Http.HttpError.Handler
-M00000014_IL_0000:
-M00000014_IL_0001:
-M00000014_IL_0002:
-M00000014_IL_0003:
-ldarg 0
-M00000014_IL_0004:
-ldobj System.Web.Http.HttpError
-M00000014_IL_0009:
-stloc local0
-M00000014_IL_000a:
-ldloc local0
-M00000014_IL_000b:
-stloc local10
-M00000014_IL_000d:
-ldloca local11
-M00000014_IL_000f:
-initobj System.Web.Http.HttpError.InvalidUri
-M00000014_IL_0015:
-ldloca local10
-M00000014_IL_0017:
-ldloca local11
-M00000014_IL_0019:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.InvalidUri&)
-M00000014_IL_001e:
-brfalse M00000014_IL_0045
-M00000014_IL_0023:
-ldloca local11
-M00000014_IL_0025:
-call instance System.Web.Http.HttpError.InvalidUri::get_Reason()
-M00000014_IL_002a:
-stloc local2
-M00000014_IL_002b:
-M00000014_IL_002c:
-br M00000014_IL_0037
-M00000014_IL_0037:
-M00000014_IL_0038:
-ldloca local2
-M00000014_IL_003a:
-call instance System.UriError::ToString()
-M00000014_IL_003f:
-stloc local1
-M00000014_IL_0040:
-br M00000014_IL_021d
-M00000014_IL_0045:
-M00000014_IL_0046:
-ldloc local0
-M00000014_IL_0047:
-stloc local12
-M00000014_IL_0049:
-ldloca local13
-M00000014_IL_004b:
-initobj System.Web.Http.HttpError.NameResolution
-M00000014_IL_0051:
-ldloca local12
-M00000014_IL_0053:
-ldloca local13
-M00000014_IL_0055:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.NameResolution&)
-M00000014_IL_005a:
-brfalse M00000014_IL_0081
-M00000014_IL_005f:
-ldloca local13
-M00000014_IL_0061:
-call instance System.Web.Http.HttpError.NameResolution::get_Reason()
-M00000014_IL_0066:
-stloc local3
-M00000014_IL_0067:
-M00000014_IL_0068:
-br M00000014_IL_0073
-M00000014_IL_0073:
-M00000014_IL_0074:
-ldloca local3
-M00000014_IL_0076:
-call instance System.Networking.DnsError::ToString()
-M00000014_IL_007b:
-stloc local1
-M00000014_IL_007c:
-br M00000014_IL_021d
-M00000014_IL_0081:
-M00000014_IL_0082:
-ldloc local0
-M00000014_IL_0083:
-stloc local14
-M00000014_IL_0085:
-ldloca local15
-M00000014_IL_0087:
-initobj System.Web.Http.HttpError.Transport
-M00000014_IL_008d:
-ldloca local14
-M00000014_IL_008f:
-ldloca local15
-M00000014_IL_0091:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Transport&)
-M00000014_IL_0096:
-brfalse M00000014_IL_00be
-M00000014_IL_009b:
-ldloca local15
-M00000014_IL_009d:
-call instance System.Web.Http.HttpError.Transport::get_Reason()
-M00000014_IL_00a2:
-stloc local4
-M00000014_IL_00a4:
-M00000014_IL_00a5:
-br M00000014_IL_00b0
-M00000014_IL_00b0:
-M00000014_IL_00b1:
-ldloca local4
-M00000014_IL_00b3:
-call instance System.Networking.Sockets.SocketError::ToString()
-M00000014_IL_00b8:
-stloc local1
-M00000014_IL_00b9:
-br M00000014_IL_021d
-M00000014_IL_00be:
-M00000014_IL_00bf:
-ldloc local0
-M00000014_IL_00c0:
-stloc local16
-M00000014_IL_00c2:
-ldloca local17
-M00000014_IL_00c4:
-initobj System.Web.Http.HttpError.InvalidRequest
-M00000014_IL_00ca:
-ldloca local16
-M00000014_IL_00cc:
-ldloca local17
-M00000014_IL_00ce:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.InvalidRequest&)
-M00000014_IL_00d3:
-brfalse M00000014_IL_00f6
-M00000014_IL_00d8:
-ldloca local17
-M00000014_IL_00da:
-call instance System.Web.Http.HttpError.InvalidRequest::get_Message()
-M00000014_IL_00df:
+ldc.i4 0
 stloc local5
-M00000014_IL_00e1:
-M00000014_IL_00e2:
-br M00000014_IL_00ed
-M00000014_IL_00ed:
-M00000014_IL_00ee:
-ldloc local5
-M00000014_IL_00f0:
-stloc local1
-M00000014_IL_00f1:
-br M00000014_IL_021d
-M00000014_IL_00f6:
-M00000014_IL_00f7:
-ldloc local0
-M00000014_IL_00f8:
-stloc local18
-M00000014_IL_00fa:
-ldloca local19
-M00000014_IL_00fc:
-initobj System.Web.Http.HttpError.Protocol
-M00000014_IL_0102:
+ldloca local11
+initobj System.Web.Http.HttpError
+ldloca local12
+initobj System.Web.Http.HttpError.InvalidUri
+ldloca local13
+initobj System.Web.Http.HttpError
+ldloca local14
+initobj System.Web.Http.HttpError.NameResolution
+ldloca local15
+initobj System.Web.Http.HttpError
+ldloca local16
+initobj System.Web.Http.HttpError.Transport
+ldloca local17
+initobj System.Web.Http.HttpError
 ldloca local18
-M00000014_IL_0104:
+initobj System.Web.Http.HttpError.UnsuccessfulStatus
 ldloca local19
-M00000014_IL_0106:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Protocol&)
-M00000014_IL_010b:
-brfalse M00000014_IL_012e
-M00000014_IL_0110:
-ldloca local19
-M00000014_IL_0112:
-call instance System.Web.Http.HttpError.Protocol::get_Message()
-M00000014_IL_0117:
-stloc local6
-M00000014_IL_0119:
-M00000014_IL_011a:
-br M00000014_IL_0125
-M00000014_IL_0125:
-M00000014_IL_0126:
-ldloc local6
-M00000014_IL_0128:
-stloc local1
-M00000014_IL_0129:
-br M00000014_IL_021d
-M00000014_IL_012e:
-M00000014_IL_012f:
-ldloc local0
-M00000014_IL_0130:
-stloc local20
-M00000014_IL_0132:
-ldloca local21
-M00000014_IL_0134:
-initobj System.Web.Http.HttpError.Unsupported
-M00000014_IL_013a:
+initobj System.Web.Http.HttpError
 ldloca local20
-M00000014_IL_013c:
+initobj System.Web.Http.HttpError.InvalidRequest
 ldloca local21
-M00000014_IL_013e:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Unsupported&)
-M00000014_IL_0143:
-brfalse M00000014_IL_0166
-M00000014_IL_0148:
-ldloca local21
-M00000014_IL_014a:
-call instance System.Web.Http.HttpError.Unsupported::get_Message()
-M00000014_IL_014f:
-stloc local7
-M00000014_IL_0151:
-M00000014_IL_0152:
-br M00000014_IL_015d
-M00000014_IL_015d:
-M00000014_IL_015e:
-ldloc local7
-M00000014_IL_0160:
-stloc local1
-M00000014_IL_0161:
-br M00000014_IL_021d
-M00000014_IL_0166:
-M00000014_IL_0167:
-ldloc local0
-M00000014_IL_0168:
-stloc local22
-M00000014_IL_016a:
-ldloca local23
-M00000014_IL_016c:
-initobj System.Web.Http.HttpError.LimitExceeded
-M00000014_IL_0172:
+initobj System.Web.Http.HttpError
 ldloca local22
-M00000014_IL_0174:
+initobj System.Web.Http.HttpError.Protocol
 ldloca local23
-M00000014_IL_0176:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.LimitExceeded&)
-M00000014_IL_017b:
-brfalse M00000014_IL_019e
-M00000014_IL_0180:
-ldloca local23
-M00000014_IL_0182:
-call instance System.Web.Http.HttpError.LimitExceeded::get_Message()
-M00000014_IL_0187:
-stloc local8
-M00000014_IL_0189:
-M00000014_IL_018a:
-br M00000014_IL_0195
-M00000014_IL_0195:
-M00000014_IL_0196:
-ldloc local8
-M00000014_IL_0198:
-stloc local1
-M00000014_IL_0199:
-br M00000014_IL_021d
-M00000014_IL_019e:
-M00000014_IL_019f:
-M00000014_IL_01a0:
-ldloc local0
-M00000014_IL_01a1:
-stloc local24
-M00000014_IL_01a3:
+initobj System.Web.Http.HttpError
 ldloca local24
-M00000014_IL_01a5:
+initobj System.Web.Http.HttpError.Unsupported
 ldloca local25
-M00000014_IL_01a7:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.TimedOut&)
-M00000014_IL_01ac:
-brfalse M00000014_IL_01cb
-M00000014_IL_01b1:
-ldloc local25
-M00000014_IL_01b3:
-pop
-M00000014_IL_01b4:
-M00000014_IL_01b5:
-br M00000014_IL_01c0
-M00000014_IL_01c0:
-ldstr "Request deadline exceeded"
-M00000014_IL_01c5:
-stloc local1
-M00000014_IL_01c6:
-br M00000014_IL_021d
-M00000014_IL_01cb:
-M00000014_IL_01cc:
-ldloc local0
-M00000014_IL_01cd:
-stloc local26
-M00000014_IL_01cf:
-ldloca local27
-M00000014_IL_01d1:
-initobj System.Web.Http.HttpError.Handler
-M00000014_IL_01d7:
+initobj System.Web.Http.HttpError
 ldloca local26
-M00000014_IL_01d9:
+initobj System.Web.Http.HttpError.LimitExceeded
 ldloca local27
-M00000014_IL_01db:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Handler&)
-M00000014_IL_01e0:
-brfalse M00000014_IL_0203
-M00000014_IL_01e5:
-ldloca local27
-M00000014_IL_01e7:
-call instance System.Web.Http.HttpError.Handler::get_Message()
-M00000014_IL_01ec:
-stloc local9
-M00000014_IL_01ee:
-M00000014_IL_01ef:
-br M00000014_IL_01fa
-M00000014_IL_01fa:
-M00000014_IL_01fb:
-ldloc local9
-M00000014_IL_01fd:
-stloc local1
-M00000014_IL_01fe:
-br M00000014_IL_021d
-M00000014_IL_0203:
-M00000014_IL_0204:
+initobj System.Web.Http.HttpError
+ldloca local28
+initobj System.Web.Http.HttpError.TimedOut
+ldloca local29
+initobj System.Web.Http.HttpError
+ldloca local30
+initobj System.Web.Http.HttpError.Handler
+M00000016_IL_0000:
+M00000016_IL_0001:
+M00000016_IL_0002:
+M00000016_IL_0003:
+ldarg 0
+M00000016_IL_0004:
+ldobj System.Web.Http.HttpError
+M00000016_IL_0009:
+stloc local0
+M00000016_IL_000a:
 ldloc local0
-M00000014_IL_0205:
-pop
-M00000014_IL_0206:
-ldc.i4 1
-M00000014_IL_0207:
-brfalse M00000014_IL_0218
-M00000014_IL_020c:
-M00000014_IL_020d:
-ldstr "Empty"
-M00000014_IL_0212:
+M00000016_IL_000b:
+stloc local11
+M00000016_IL_000d:
+ldloca local12
+M00000016_IL_000f:
+initobj System.Web.Http.HttpError.InvalidUri
+M00000016_IL_0015:
+ldloca local11
+M00000016_IL_0017:
+ldloca local12
+M00000016_IL_0019:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.InvalidUri&)
+M00000016_IL_001e:
+brfalse M00000016_IL_0045
+M00000016_IL_0023:
+ldloca local12
+M00000016_IL_0025:
+call instance System.Web.Http.HttpError.InvalidUri::get_Reason()
+M00000016_IL_002a:
+stloc local2
+M00000016_IL_002b:
+M00000016_IL_002c:
+br M00000016_IL_0037
+M00000016_IL_0037:
+M00000016_IL_0038:
+ldloca local2
+M00000016_IL_003a:
+call instance System.UriError::ToString()
+M00000016_IL_003f:
 stloc local1
-M00000014_IL_0213:
-br M00000014_IL_021d
-M00000014_IL_0218:
-M00000014_IL_0219:
-M00000014_IL_021a:
-M00000014_IL_021b:
-M00000014_IL_021c:
+M00000016_IL_0040:
+br M00000016_IL_0264
+M00000016_IL_0045:
+M00000016_IL_0046:
+ldloc local0
+M00000016_IL_0047:
+stloc local13
+M00000016_IL_0049:
+ldloca local14
+M00000016_IL_004b:
+initobj System.Web.Http.HttpError.NameResolution
+M00000016_IL_0051:
+ldloca local13
+M00000016_IL_0053:
+ldloca local14
+M00000016_IL_0055:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.NameResolution&)
+M00000016_IL_005a:
+brfalse M00000016_IL_0081
+M00000016_IL_005f:
+ldloca local14
+M00000016_IL_0061:
+call instance System.Web.Http.HttpError.NameResolution::get_Reason()
+M00000016_IL_0066:
+stloc local3
+M00000016_IL_0067:
+M00000016_IL_0068:
+br M00000016_IL_0073
+M00000016_IL_0073:
+M00000016_IL_0074:
+ldloca local3
+M00000016_IL_0076:
+call instance System.Networking.DnsError::ToString()
+M00000016_IL_007b:
+stloc local1
+M00000016_IL_007c:
+br M00000016_IL_0264
+M00000016_IL_0081:
+M00000016_IL_0082:
+ldloc local0
+M00000016_IL_0083:
+stloc local15
+M00000016_IL_0085:
+ldloca local16
+M00000016_IL_0087:
+initobj System.Web.Http.HttpError.Transport
+M00000016_IL_008d:
+ldloca local15
+M00000016_IL_008f:
+ldloca local16
+M00000016_IL_0091:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Transport&)
+M00000016_IL_0096:
+brfalse M00000016_IL_00be
+M00000016_IL_009b:
+ldloca local16
+M00000016_IL_009d:
+call instance System.Web.Http.HttpError.Transport::get_Reason()
+M00000016_IL_00a2:
+stloc local4
+M00000016_IL_00a4:
+M00000016_IL_00a5:
+br M00000016_IL_00b0
+M00000016_IL_00b0:
+M00000016_IL_00b1:
+ldloca local4
+M00000016_IL_00b3:
+call instance System.Networking.Sockets.SocketError::ToString()
+M00000016_IL_00b8:
+stloc local1
+M00000016_IL_00b9:
+br M00000016_IL_0264
+M00000016_IL_00be:
+M00000016_IL_00bf:
+ldloc local0
+M00000016_IL_00c0:
+stloc local17
+M00000016_IL_00c2:
+ldloca local18
+M00000016_IL_00c4:
+initobj System.Web.Http.HttpError.UnsuccessfulStatus
+M00000016_IL_00ca:
+ldloca local17
+M00000016_IL_00cc:
+ldloca local18
+M00000016_IL_00ce:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.UnsuccessfulStatus&)
+M00000016_IL_00d3:
+brfalse M00000016_IL_0105
+M00000016_IL_00d8:
+ldloca local18
+M00000016_IL_00da:
+call instance System.Web.Http.HttpError.UnsuccessfulStatus::get_StatusCode()
+M00000016_IL_00df:
+stloc local5
+M00000016_IL_00e1:
+M00000016_IL_00e2:
+br M00000016_IL_00ed
+M00000016_IL_00ed:
+M00000016_IL_00ee:
+ldstr "HTTP status "
+M00000016_IL_00f3:
+ldloca local5
+M00000016_IL_00f5:
+call neoCLR.Library.System.Web.Http.HttpError.RuntimeInt32ToString(Int32&)
+M00000016_IL_00fa:
+call System.String::Concat(String,String)
+M00000016_IL_00ff:
+stloc local1
+M00000016_IL_0100:
+br M00000016_IL_0264
+M00000016_IL_0105:
+M00000016_IL_0106:
+ldloc local0
+M00000016_IL_0107:
+stloc local19
+M00000016_IL_0109:
+ldloca local20
+M00000016_IL_010b:
+initobj System.Web.Http.HttpError.InvalidRequest
+M00000016_IL_0111:
+ldloca local19
+M00000016_IL_0113:
+ldloca local20
+M00000016_IL_0115:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.InvalidRequest&)
+M00000016_IL_011a:
+brfalse M00000016_IL_013d
+M00000016_IL_011f:
+ldloca local20
+M00000016_IL_0121:
+call instance System.Web.Http.HttpError.InvalidRequest::get_Message()
+M00000016_IL_0126:
+stloc local6
+M00000016_IL_0128:
+M00000016_IL_0129:
+br M00000016_IL_0134
+M00000016_IL_0134:
+M00000016_IL_0135:
+ldloc local6
+M00000016_IL_0137:
+stloc local1
+M00000016_IL_0138:
+br M00000016_IL_0264
+M00000016_IL_013d:
+M00000016_IL_013e:
+ldloc local0
+M00000016_IL_013f:
+stloc local21
+M00000016_IL_0141:
+ldloca local22
+M00000016_IL_0143:
+initobj System.Web.Http.HttpError.Protocol
+M00000016_IL_0149:
+ldloca local21
+M00000016_IL_014b:
+ldloca local22
+M00000016_IL_014d:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Protocol&)
+M00000016_IL_0152:
+brfalse M00000016_IL_0175
+M00000016_IL_0157:
+ldloca local22
+M00000016_IL_0159:
+call instance System.Web.Http.HttpError.Protocol::get_Message()
+M00000016_IL_015e:
+stloc local7
+M00000016_IL_0160:
+M00000016_IL_0161:
+br M00000016_IL_016c
+M00000016_IL_016c:
+M00000016_IL_016d:
+ldloc local7
+M00000016_IL_016f:
+stloc local1
+M00000016_IL_0170:
+br M00000016_IL_0264
+M00000016_IL_0175:
+M00000016_IL_0176:
+ldloc local0
+M00000016_IL_0177:
+stloc local23
+M00000016_IL_0179:
+ldloca local24
+M00000016_IL_017b:
+initobj System.Web.Http.HttpError.Unsupported
+M00000016_IL_0181:
+ldloca local23
+M00000016_IL_0183:
+ldloca local24
+M00000016_IL_0185:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Unsupported&)
+M00000016_IL_018a:
+brfalse M00000016_IL_01ad
+M00000016_IL_018f:
+ldloca local24
+M00000016_IL_0191:
+call instance System.Web.Http.HttpError.Unsupported::get_Message()
+M00000016_IL_0196:
+stloc local8
+M00000016_IL_0198:
+M00000016_IL_0199:
+br M00000016_IL_01a4
+M00000016_IL_01a4:
+M00000016_IL_01a5:
+ldloc local8
+M00000016_IL_01a7:
+stloc local1
+M00000016_IL_01a8:
+br M00000016_IL_0264
+M00000016_IL_01ad:
+M00000016_IL_01ae:
+ldloc local0
+M00000016_IL_01af:
+stloc local25
+M00000016_IL_01b1:
+ldloca local26
+M00000016_IL_01b3:
+initobj System.Web.Http.HttpError.LimitExceeded
+M00000016_IL_01b9:
+ldloca local25
+M00000016_IL_01bb:
+ldloca local26
+M00000016_IL_01bd:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.LimitExceeded&)
+M00000016_IL_01c2:
+brfalse M00000016_IL_01e5
+M00000016_IL_01c7:
+ldloca local26
+M00000016_IL_01c9:
+call instance System.Web.Http.HttpError.LimitExceeded::get_Message()
+M00000016_IL_01ce:
+stloc local9
+M00000016_IL_01d0:
+M00000016_IL_01d1:
+br M00000016_IL_01dc
+M00000016_IL_01dc:
+M00000016_IL_01dd:
+ldloc local9
+M00000016_IL_01df:
+stloc local1
+M00000016_IL_01e0:
+br M00000016_IL_0264
+M00000016_IL_01e5:
+M00000016_IL_01e6:
+M00000016_IL_01e7:
+ldloc local0
+M00000016_IL_01e8:
+stloc local27
+M00000016_IL_01ea:
+ldloca local27
+M00000016_IL_01ec:
+ldloca local28
+M00000016_IL_01ee:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.TimedOut&)
+M00000016_IL_01f3:
+brfalse M00000016_IL_0212
+M00000016_IL_01f8:
+ldloc local28
+M00000016_IL_01fa:
+pop
+M00000016_IL_01fb:
+M00000016_IL_01fc:
+br M00000016_IL_0207
+M00000016_IL_0207:
+ldstr "Request deadline exceeded"
+M00000016_IL_020c:
+stloc local1
+M00000016_IL_020d:
+br M00000016_IL_0264
+M00000016_IL_0212:
+M00000016_IL_0213:
+ldloc local0
+M00000016_IL_0214:
+stloc local29
+M00000016_IL_0216:
+ldloca local30
+M00000016_IL_0218:
+initobj System.Web.Http.HttpError.Handler
+M00000016_IL_021e:
+ldloca local29
+M00000016_IL_0220:
+ldloca local30
+M00000016_IL_0222:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Handler&)
+M00000016_IL_0227:
+brfalse M00000016_IL_024a
+M00000016_IL_022c:
+ldloca local30
+M00000016_IL_022e:
+call instance System.Web.Http.HttpError.Handler::get_Message()
+M00000016_IL_0233:
+stloc local10
+M00000016_IL_0235:
+M00000016_IL_0236:
+br M00000016_IL_0241
+M00000016_IL_0241:
+M00000016_IL_0242:
+ldloc local10
+M00000016_IL_0244:
+stloc local1
+M00000016_IL_0245:
+br M00000016_IL_0264
+M00000016_IL_024a:
+M00000016_IL_024b:
+ldloc local0
+M00000016_IL_024c:
+pop
+M00000016_IL_024d:
+ldc.i4 1
+M00000016_IL_024e:
+brfalse M00000016_IL_025f
+M00000016_IL_0253:
+M00000016_IL_0254:
+ldstr "Empty"
+M00000016_IL_0259:
+stloc local1
+M00000016_IL_025a:
+br M00000016_IL_0264
+M00000016_IL_025f:
+M00000016_IL_0260:
+M00000016_IL_0261:
+M00000016_IL_0262:
+M00000016_IL_0263:
 fault "Guest program reached a terminal failure"
-M00000014_IL_021d:
-M00000014_IL_021e:
+M00000016_IL_0264:
+M00000016_IL_0265:
 ldloc local1
-M00000014_IL_021f:
+M00000016_IL_0266:
 ret
 .end
 .method instance byref get_Value() -> System.Object
-M00000015_IL_0000:
+M00000017_IL_0000:
 ldarg 0
-M00000015_IL_0001:
+M00000017_IL_0001:
 ldfld System.Web.Http.HttpError::Metadata_V1_3C5461673E
-M00000015_IL_0006:
+M00000017_IL_0006:
 conv.i4
-M00000015_IL_0007:
+M00000017_IL_0007:
 ldc.i4 1
-M00000015_IL_0008:
+M00000017_IL_0008:
 conv.i4
-M00000015_IL_0009:
+M00000017_IL_0009:
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000015_IL_000b:
-brtrue M00000015_IL_0015
-M00000015_IL_0010:
-br M00000015_IL_0021
-M00000015_IL_0015:
+M00000017_IL_000b:
+brtrue M00000017_IL_0015
+M00000017_IL_0010:
+br M00000017_IL_0021
+M00000017_IL_0015:
 ldarg 0
-M00000015_IL_0016:
+M00000017_IL_0016:
 ldfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C69645572695061796C6F61643E
-M00000015_IL_001b:
+M00000017_IL_001b:
 box System.Web.Http.HttpError.InvalidUri
-M00000015_IL_0020:
+M00000017_IL_0020:
 ret
-M00000015_IL_0021:
-M00000015_IL_0022:
+M00000017_IL_0021:
+M00000017_IL_0022:
 ldarg 0
-M00000015_IL_0023:
+M00000017_IL_0023:
 ldfld System.Web.Http.HttpError::Metadata_V1_3C5461673E
-M00000015_IL_0028:
+M00000017_IL_0028:
 conv.i4
-M00000015_IL_0029:
+M00000017_IL_0029:
 ldc.i4 2
-M00000015_IL_002a:
+M00000017_IL_002a:
 conv.i4
-M00000015_IL_002b:
+M00000017_IL_002b:
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000015_IL_002d:
-brtrue M00000015_IL_0037
-M00000015_IL_0032:
-br M00000015_IL_0043
-M00000015_IL_0037:
+M00000017_IL_002d:
+brtrue M00000017_IL_0037
+M00000017_IL_0032:
+br M00000017_IL_0043
+M00000017_IL_0037:
 ldarg 0
-M00000015_IL_0038:
+M00000017_IL_0038:
 ldfld System.Web.Http.HttpError::Metadata_V1_3C4E616D655265736F6C7574696F6E5061796C6F61643E
-M00000015_IL_003d:
+M00000017_IL_003d:
 box System.Web.Http.HttpError.NameResolution
-M00000015_IL_0042:
+M00000017_IL_0042:
 ret
-M00000015_IL_0043:
-M00000015_IL_0044:
+M00000017_IL_0043:
+M00000017_IL_0044:
 ldarg 0
-M00000015_IL_0045:
+M00000017_IL_0045:
 ldfld System.Web.Http.HttpError::Metadata_V1_3C5461673E
-M00000015_IL_004a:
+M00000017_IL_004a:
 conv.i4
-M00000015_IL_004b:
+M00000017_IL_004b:
 ldc.i4 3
-M00000015_IL_004c:
+M00000017_IL_004c:
 conv.i4
-M00000015_IL_004d:
+M00000017_IL_004d:
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000015_IL_004f:
-brtrue M00000015_IL_0059
-M00000015_IL_0054:
-br M00000015_IL_0065
-M00000015_IL_0059:
+M00000017_IL_004f:
+brtrue M00000017_IL_0059
+M00000017_IL_0054:
+br M00000017_IL_0065
+M00000017_IL_0059:
 ldarg 0
-M00000015_IL_005a:
+M00000017_IL_005a:
 ldfld System.Web.Http.HttpError::Metadata_V1_3C5472616E73706F72745061796C6F61643E
-M00000015_IL_005f:
+M00000017_IL_005f:
 box System.Web.Http.HttpError.Transport
-M00000015_IL_0064:
+M00000017_IL_0064:
 ret
-M00000015_IL_0065:
-M00000015_IL_0066:
+M00000017_IL_0065:
+M00000017_IL_0066:
 ldarg 0
-M00000015_IL_0067:
+M00000017_IL_0067:
 ldfld System.Web.Http.HttpError::Metadata_V1_3C5461673E
-M00000015_IL_006c:
+M00000017_IL_006c:
 conv.i4
-M00000015_IL_006d:
+M00000017_IL_006d:
 ldc.i4 4
-M00000015_IL_006e:
+M00000017_IL_006e:
 conv.i4
-M00000015_IL_006f:
+M00000017_IL_006f:
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000015_IL_0071:
-brtrue M00000015_IL_007b
-M00000015_IL_0076:
-br M00000015_IL_0087
-M00000015_IL_007b:
+M00000017_IL_0071:
+brtrue M00000017_IL_007b
+M00000017_IL_0076:
+br M00000017_IL_0087
+M00000017_IL_007b:
 ldarg 0
-M00000015_IL_007c:
-ldfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
-M00000015_IL_0081:
-box System.Web.Http.HttpError.InvalidRequest
-M00000015_IL_0086:
+M00000017_IL_007c:
+ldfld System.Web.Http.HttpError::Metadata_V1_3C556E7375636365737366756C5374617475735061796C6F61643E
+M00000017_IL_0081:
+box System.Web.Http.HttpError.UnsuccessfulStatus
+M00000017_IL_0086:
 ret
-M00000015_IL_0087:
-M00000015_IL_0088:
+M00000017_IL_0087:
+M00000017_IL_0088:
 ldarg 0
-M00000015_IL_0089:
+M00000017_IL_0089:
 ldfld System.Web.Http.HttpError::Metadata_V1_3C5461673E
-M00000015_IL_008e:
+M00000017_IL_008e:
 conv.i4
-M00000015_IL_008f:
+M00000017_IL_008f:
 ldc.i4 5
-M00000015_IL_0090:
+M00000017_IL_0090:
 conv.i4
-M00000015_IL_0091:
+M00000017_IL_0091:
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000015_IL_0093:
-brtrue M00000015_IL_009d
-M00000015_IL_0098:
-br M00000015_IL_00a9
-M00000015_IL_009d:
+M00000017_IL_0093:
+brtrue M00000017_IL_009d
+M00000017_IL_0098:
+br M00000017_IL_00a9
+M00000017_IL_009d:
 ldarg 0
-M00000015_IL_009e:
-ldfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
-M00000015_IL_00a3:
-box System.Web.Http.HttpError.Protocol
-M00000015_IL_00a8:
+M00000017_IL_009e:
+ldfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C6964526571756573745061796C6F61643E
+M00000017_IL_00a3:
+box System.Web.Http.HttpError.InvalidRequest
+M00000017_IL_00a8:
 ret
-M00000015_IL_00a9:
-M00000015_IL_00aa:
+M00000017_IL_00a9:
+M00000017_IL_00aa:
 ldarg 0
-M00000015_IL_00ab:
+M00000017_IL_00ab:
 ldfld System.Web.Http.HttpError::Metadata_V1_3C5461673E
-M00000015_IL_00b0:
+M00000017_IL_00b0:
 conv.i4
-M00000015_IL_00b1:
+M00000017_IL_00b1:
 ldc.i4 6
-M00000015_IL_00b2:
+M00000017_IL_00b2:
 conv.i4
-M00000015_IL_00b3:
+M00000017_IL_00b3:
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000015_IL_00b5:
-brtrue M00000015_IL_00bf
-M00000015_IL_00ba:
-br M00000015_IL_00cb
-M00000015_IL_00bf:
+M00000017_IL_00b5:
+brtrue M00000017_IL_00bf
+M00000017_IL_00ba:
+br M00000017_IL_00cb
+M00000017_IL_00bf:
 ldarg 0
-M00000015_IL_00c0:
-ldfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
-M00000015_IL_00c5:
-box System.Web.Http.HttpError.Unsupported
-M00000015_IL_00ca:
+M00000017_IL_00c0:
+ldfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
+M00000017_IL_00c5:
+box System.Web.Http.HttpError.Protocol
+M00000017_IL_00ca:
 ret
-M00000015_IL_00cb:
-M00000015_IL_00cc:
+M00000017_IL_00cb:
+M00000017_IL_00cc:
 ldarg 0
-M00000015_IL_00cd:
+M00000017_IL_00cd:
 ldfld System.Web.Http.HttpError::Metadata_V1_3C5461673E
-M00000015_IL_00d2:
+M00000017_IL_00d2:
 conv.i4
-M00000015_IL_00d3:
+M00000017_IL_00d3:
 ldc.i4 7
-M00000015_IL_00d4:
+M00000017_IL_00d4:
 conv.i4
-M00000015_IL_00d5:
+M00000017_IL_00d5:
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000015_IL_00d7:
-brtrue M00000015_IL_00e1
-M00000015_IL_00dc:
-br M00000015_IL_00ed
-M00000015_IL_00e1:
+M00000017_IL_00d7:
+brtrue M00000017_IL_00e1
+M00000017_IL_00dc:
+br M00000017_IL_00ed
+M00000017_IL_00e1:
 ldarg 0
-M00000015_IL_00e2:
-ldfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
-M00000015_IL_00e7:
-box System.Web.Http.HttpError.LimitExceeded
-M00000015_IL_00ec:
+M00000017_IL_00e2:
+ldfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F61643E
+M00000017_IL_00e7:
+box System.Web.Http.HttpError.Unsupported
+M00000017_IL_00ec:
 ret
-M00000015_IL_00ed:
-M00000015_IL_00ee:
+M00000017_IL_00ed:
+M00000017_IL_00ee:
 ldarg 0
-M00000015_IL_00ef:
+M00000017_IL_00ef:
 ldfld System.Web.Http.HttpError::Metadata_V1_3C5461673E
-M00000015_IL_00f4:
+M00000017_IL_00f4:
 conv.i4
-M00000015_IL_00f5:
+M00000017_IL_00f5:
 ldc.i4 8
-M00000015_IL_00f6:
+M00000017_IL_00f6:
 conv.i4
-M00000015_IL_00f7:
+M00000017_IL_00f7:
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000015_IL_00f9:
-brtrue M00000015_IL_0103
-M00000015_IL_00fe:
-br M00000015_IL_010f
-M00000015_IL_0103:
+M00000017_IL_00f9:
+brtrue M00000017_IL_0103
+M00000017_IL_00fe:
+br M00000017_IL_010f
+M00000017_IL_0103:
 ldarg 0
-M00000015_IL_0104:
-ldfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
-M00000015_IL_0109:
-box System.Web.Http.HttpError.TimedOut
-M00000015_IL_010e:
+M00000017_IL_0104:
+ldfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+M00000017_IL_0109:
+box System.Web.Http.HttpError.LimitExceeded
+M00000017_IL_010e:
 ret
-M00000015_IL_010f:
-M00000015_IL_0110:
+M00000017_IL_010f:
+M00000017_IL_0110:
 ldarg 0
-M00000015_IL_0111:
+M00000017_IL_0111:
 ldfld System.Web.Http.HttpError::Metadata_V1_3C5461673E
-M00000015_IL_0116:
+M00000017_IL_0116:
 conv.i4
-M00000015_IL_0117:
+M00000017_IL_0117:
 ldc.i4 9
-M00000015_IL_0119:
+M00000017_IL_0119:
 conv.i4
-M00000015_IL_011a:
+M00000017_IL_011a:
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000015_IL_011c:
-brtrue M00000015_IL_0126
-M00000015_IL_0121:
-br M00000015_IL_0132
-M00000015_IL_0126:
+M00000017_IL_011c:
+brtrue M00000017_IL_0126
+M00000017_IL_0121:
+br M00000017_IL_0132
+M00000017_IL_0126:
 ldarg 0
-M00000015_IL_0127:
-ldfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
-M00000015_IL_012c:
-box System.Web.Http.HttpError.Handler
-M00000015_IL_0131:
+M00000017_IL_0127:
+ldfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
+M00000017_IL_012c:
+box System.Web.Http.HttpError.TimedOut
+M00000017_IL_0131:
 ret
-M00000015_IL_0132:
-M00000015_IL_0133:
-M00000015_IL_0134:
+M00000017_IL_0132:
+M00000017_IL_0133:
+ldarg 0
+M00000017_IL_0134:
+ldfld System.Web.Http.HttpError::Metadata_V1_3C5461673E
+M00000017_IL_0139:
+conv.i4
+M00000017_IL_013a:
+ldc.i4 10
+M00000017_IL_013c:
+conv.i4
+M00000017_IL_013d:
+ceq
+call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_013f:
+brtrue M00000017_IL_0149
+M00000017_IL_0144:
+br M00000017_IL_0155
+M00000017_IL_0149:
+ldarg 0
+M00000017_IL_014a:
+ldfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
+M00000017_IL_014f:
+box System.Web.Http.HttpError.Handler
+M00000017_IL_0154:
+ret
+M00000017_IL_0155:
+M00000017_IL_0156:
+M00000017_IL_0157:
 call neoCLR.Library.System.Web.Http.HttpError.DefaultReference53797374656D2E4F626A656374()
 ret
 .end
 .method instance byref get_HasValue() -> Boolean
-M00000016_IL_0000:
+M00000018_IL_0000:
 ldarg 0
-M00000016_IL_0001:
+M00000018_IL_0001:
 call instance System.Web.Http.HttpError::get_Value()
-M00000016_IL_0006:
-M00000016_IL_0007:
+M00000018_IL_0006:
+M00000018_IL_0007:
 ref.isnull
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000016_IL_0009:
+M00000018_IL_0009:
 ldc.i4 0
-M00000016_IL_000a:
+M00000018_IL_000a:
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000016_IL_000c:
+M00000018_IL_000c:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end

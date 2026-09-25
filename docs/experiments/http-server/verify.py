@@ -152,7 +152,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-server-') as folder:
     variants = [
         ('header-injection', source.replace('text/plain; charset=utf-8', r'text/plain\r\nInjected: yes'), 'Invalid response header value'),
         ('framing-override', source.replace('"Content-Type"', '"Content-Length"'), 'Response framing headers are server-owned'),
-        ('unsupported-status', source.replace('HttpResponse(200,', 'HttpResponse(404,'), 'Only status 200 is supported'),
+        ('invalid-status', source.replace('HttpResponse(200,', 'HttpResponse(600,'), 'A final response status from 200 through 599 is required'),
         ('header-limit', source.replace('text/plain; charset=utf-8', 'x' * 2047), 'Response header limit exceeded'),
         ('body-limit', source.replace('Café 🌍', 'x' * 1025), 'Response body limit exceeded'),
         ('handler-error', source.replace('source.Complete(Ok(HttpResponse(200, headers, Utf8.Encode("Café 🌍"))))', 'source.Complete(Error(HttpError.Handler("Handler rejected request")))'), 'Handler rejected request'),

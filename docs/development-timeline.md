@@ -7082,3 +7082,33 @@ configuration/content, not target-specific code added to Raven main.
   GetString. The assistant reviewed HTTPS feasibility and records a possible
   host-side TLS adapter, not an implementation or author-approved dependency choice.
   See [the design](http-client-design.md#baseuri-and-address-overloads--implemented-2026-09-25).
+
+## 2026-09-25 — Propagated error conversions and HTTP status names
+
+- **Author clarification:** Raven supports converting a propagated error through
+  object conversion or an implicit converter, and “Conversions can be defined as
+  extension methods.”
+- **Assistant action:** add an application-owned HttpError-to-AppError extension
+  example alongside propagation to Object in the [status fixture](experiments/http-status/Main.rvn).
+  Keep the HTTP library's own typed error contract. Verification is recorded in the
+  fixture README; no new Raven conversion semantics are claimed.
+- **Author question:** “Should HttpStatusCode get its own enum?”
+- **Assistant proposal:** yes, use named integer constants in System.Web.Http for
+  response status and UnsuccessfulStatus payloads, retaining unnamed valid extension
+  codes and numeric success classification. Finish status behavior checks first,
+  then verify enum conversion/formatting before changing the signatures. This is a
+  follow-up design proposal, not an implemented enum or an explicit author decision.
+
+- **Author follow-up:** response patterns could query/deconstruct HttpResponse when
+  it has a Deconstruct contract; HttpRequest could offer the same on the server side.
+  **Assistant response:** retain this as a sample-driven follow-up in the request/content
+  slice, with named properties primary and no positional signature selected yet.
+
+- **Author design direction:** consider record-like deconstruction for ordinary API
+  objects from the outset; value-object semantics are not required. The author sees
+  room to design APIs around Raven capabilities rather than inherit .NET API shapes.
+  **Assistant interpretation:** assess useful pattern/extraction contracts during API
+  design independently of equality, copying and immutability. .NET also supports
+  deconstruction; the opportunity is consistent Raven-oriented library design, not
+  a claim that the language mechanism is unavailable on .NET. Request/response
+  positional signatures remain open until demonstrated by a real sample.

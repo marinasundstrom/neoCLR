@@ -27,6 +27,8 @@ public class HttpHeader {
 public class HttpResponse {
     private var storedStatusCode: int
     val StatusCode: int => storedStatusCode
+    /// Whether the response status is in the successful 200–299 range.
+    val IsSuccessStatusCode: bool => storedStatusCode >= 200 && storedStatusCode <= 299
     private var storedHeaders: Sequence<HttpHeader>
     val Headers: Sequence<HttpHeader> => storedHeaders
     private var storedContent: HttpContent
@@ -47,6 +49,7 @@ internal class HttpResponseDecoder {
     private var body: ArrayList<byte> = ArrayList<byte>()
     private var headers: ArrayList<HttpHeader> = ArrayList<HttpHeader>()
     private var expected: int = -1
+    private var statusCode: int = 0
     private var failed: bool = false
 
     internal val Complete: bool => expected >= 0 && body.Count == expected && !failed
@@ -129,13 +132,42 @@ internal class HttpResponseDecoder {
                 continue
             }
             if line == 0 {
-                // Only successful GET responses are admitted in this first experiment.
-                if end < 13 || Text(0, 13, 0)? != "HTTP/1.1 200 " {
-                    return Error(HttpError.Unsupported("Unsupported status line"))
+                if end < 13 || Text(0, 9, 0)? != "HTTP/1.1 " || head[12] != 32 {
+                    return Error(HttpError.Protocol("Invalid status line"))
                 }
+                var code = 0
+                var digitIndex = 9
+                while digitIndex < 12 {
+                    let digit = (int)head[digitIndex] - 48
+                    if !(digit >= 0 && digit <= 9) {
+                        return Error(HttpError.Protocol("Invalid status code"))
+                    }
+                    code = code * 10 + digit
+                    digitIndex += 1
+                }
+                if !(code >= 100 && code <= 599) {
+                    return Error(HttpError.Protocol("Invalid status code"))
+                }
+                if code < 200 {
+                    return Error(HttpError.Unsupported("Informational responses are not supported yet"))
+                }
+                statusCode = code
             } else if end == start {
+                if statusCode == 204 {
+                    if length >= 0 {
+                        return Error(HttpError.Protocol("Content-Length is prohibited for status 204"))
+                    }
+                    return Ok(0)
+                }
+                if statusCode == 304 {
+                    // Content-Length describes the selected representation, not a message body.
+                    return Ok(0)
+                }
                 if length < 0 {
                     return Error(HttpError.Protocol("Content-Length required"))
+                }
+                if statusCode == 205 && length != 0 {
+                    return Error(HttpError.Protocol("Status 205 cannot contain content"))
                 }
                 return Ok(length)
             } else {
@@ -180,7 +212,11 @@ internal class HttpResponseDecoder {
                             return Error(HttpError.Protocol("Invalid Content-Length"))
                         }
                         // Bound before multiplication, avoiding integer overflow.
-                        if number > (1024 - digit) / 10 {
+                        let limit = if statusCode == 304 { 2147483647 } else { 1024 }
+                        if number > (limit - digit) / 10 {
+                            if statusCode == 304 {
+                                return Error(HttpError.LimitExceeded("Content-Length metadata limit exceeded"))
+                            }
                             return Error(HttpError.LimitExceeded("Body limit exceeded"))
                         }
                         number = number * 10 + digit
@@ -201,7 +237,7 @@ internal class HttpResponseDecoder {
         if !Complete {
             return Error(HttpError.Protocol("Incomplete or invalid response"))
         }
-        return Ok(HttpResponse(200, headers, body))
+        return Ok(HttpResponse(statusCode, headers, body))
     }
 }
 
@@ -468,8 +504,8 @@ public class HttpClient {
 
     private static func DecodeText(result: Result<HttpResponse, HttpError>) -> Result<string, HttpError> {
         let response = result?
-        if response.StatusCode != 200 {
-            return Error(HttpError.Unsupported("GetString currently requires status 200"))
+        if !response.IsSuccessStatusCode {
+            return Error(HttpError.UnsuccessfulStatus(response.StatusCode))
         }
         if let Ok(text) = Utf8.Decode(response.Content.Bytes) {
             return Ok(text)

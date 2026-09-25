@@ -13,7 +13,7 @@ static class HttpBindings
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
     public const string Declarations = """
         namespace Web.Http {
-            public struct HttpError { public struct InvalidUri { } public struct NameResolution { } public struct Transport { } public struct InvalidRequest { } public struct Protocol { } public struct Unsupported { } public struct LimitExceeded { } public struct TimedOut { } public struct Handler { } }
+            public struct HttpError { public struct InvalidUri { } public struct NameResolution { } public struct Transport { } public struct InvalidRequest { } public struct Protocol { } public struct Unsupported { } public struct LimitExceeded { } public struct TimedOut { } public struct Handler { } public struct UnsuccessfulStatus { } }
             public interface HttpHandler {
                 Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken);
             }
@@ -56,6 +56,7 @@ static class HttpBindings
             public sealed class HttpResponse {
                 public HttpResponse(int statusCode, Collections.Sequence<HttpHeader> headers, Collections.Sequence<byte> body) { }
                 public int StatusCode => default;
+                public bool IsSuccessStatusCode => default;
                 public Collections.Sequence<HttpHeader> Headers => default;
                 public HttpContent Content => default;
             }
@@ -147,6 +148,7 @@ static class HttpBindings
             ("HttpRequest", "get_Method" or "get_Host" or "get_Target") => ("", "String", false),
             ("HttpRequest", "get_Port") => ("", "Int32", false),
             ("HttpResponse", ".ctor") => ($"Int32,System.Collections.Sequence<{Prefix}HttpHeader>,System.Collections.Sequence<Byte>", "noresult", false),
+            ("HttpResponse", "get_IsSuccessStatusCode") => ("", "Boolean", false),
             ("HttpResponse", "get_StatusCode") => ("", "Int32", false),
             ("HttpResponse", "get_Headers") => ("", $"System.Collections.Sequence<{Prefix}HttpHeader>", false),
             ("HttpResponse", "get_Content") => ("", Prefix + "HttpContent", false),

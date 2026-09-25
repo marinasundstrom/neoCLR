@@ -1,4 +1,10 @@
 ; Generated from runtime/raven/src/System/Web/Http/HttpError.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Web.Http.HttpError.RuntimeInt32ToString(Int32& source) -> String
+ldarg source
+ldobj Int32
+call instance System.Int32::ToString()
+ret
+.end
 .function neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
     ldarg value
     ldc.i4 0
@@ -46,9 +52,9 @@ ret
 .local System.UriError unionDefault1_0
 ldloca local0
 initobj System.UriError
-M00000017_IL_0000:
+M00000019_IL_0000:
 ldarg 0
-M00000017_IL_0001:
+M00000019_IL_0001:
 pop
 ldloca unionDefault1_0
 initobj System.UriError
@@ -56,166 +62,166 @@ ldarg 0
 ldloc unionDefault1_0
 stfld System.Web.Http.HttpError.InvalidUri::Metadata_V1_3C726561736F6E3E6B5F5F4261636B696E674669656C64
 pop
-M00000017_IL_0007:
-M00000017_IL_0008:
+M00000019_IL_0007:
+M00000019_IL_0008:
 ldarg 1
-M00000017_IL_0009:
+M00000019_IL_0009:
 stloc local0
-M00000017_IL_000a:
+M00000019_IL_000a:
 ldarg 0
-M00000017_IL_000b:
+M00000019_IL_000b:
 ldloc local0
-M00000017_IL_000c:
+M00000019_IL_000c:
 stfld System.Web.Http.HttpError.InvalidUri::Metadata_V1_3C726561736F6E3E6B5F5F4261636B696E674669656C64
 pop
-M00000017_IL_0011:
+M00000019_IL_0011:
 ldvoid
 ret
 .end
 .method instance byref get_Reason() -> System.UriError
-M00000018_IL_0000:
-M00000018_IL_0001:
+M0000001a_IL_0000:
+M0000001a_IL_0001:
 ldarg 0
-M00000018_IL_0002:
+M0000001a_IL_0002:
 ldfld System.Web.Http.HttpError.InvalidUri::Metadata_V1_3C726561736F6E3E6B5F5F4261636B696E674669656C64
-M00000018_IL_0007:
+M0000001a_IL_0007:
 ret
 .end
 .method instance byref Deconstruct(System.UriError& Reason) -> Void
-M00000019_IL_0000:
+M0000001b_IL_0000:
 ldarg 1
-M00000019_IL_0001:
+M0000001b_IL_0001:
 ldarg 0
-M00000019_IL_0002:
+M0000001b_IL_0002:
 call instance System.Web.Http.HttpError.InvalidUri::get_Reason()
-M00000019_IL_0007:
+M0000001b_IL_0007:
 stobj System.UriError
-M00000019_IL_000c:
+M0000001b_IL_000c:
 ldvoid
 ret
 .end
 .method instance override byref ToString() -> String
-M0000001a_IL_0000:
+M0000001c_IL_0000:
 ldstr "HttpError"
-M0000001a_IL_0005:
+M0000001c_IL_0005:
 ldstr "."
-M0000001a_IL_000a:
+M0000001c_IL_000a:
 call System.String::Concat(String,String)
-M0000001a_IL_000f:
+M0000001c_IL_000f:
 ldstr "InvalidUri"
-M0000001a_IL_0014:
+M0000001c_IL_0014:
 call System.String::Concat(String,String)
-M0000001a_IL_0019:
+M0000001c_IL_0019:
 ldstr "("
-M0000001a_IL_001e:
+M0000001c_IL_001e:
 call System.String::Concat(String,String)
-M0000001a_IL_0023:
+M0000001c_IL_0023:
 ldarg 0
-M0000001a_IL_0024:
+M0000001c_IL_0024:
 call instance System.Web.Http.HttpError.InvalidUri::get_Reason()
-M0000001a_IL_0029:
+M0000001c_IL_0029:
 box System.UriError
-M0000001a_IL_002e:
+M0000001c_IL_002e:
 call System.Web.Http.HttpError.InvalidUri::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
-M0000001a_IL_0033:
+M0000001c_IL_0033:
 call System.String::Concat(String,String)
-M0000001a_IL_0038:
+M0000001c_IL_0038:
 ldstr ")"
-M0000001a_IL_003d:
+M0000001c_IL_003d:
 call System.String::Concat(String,String)
-M0000001a_IL_0042:
+M0000001c_IL_0042:
 ret
 .end
 .method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
-M0000001b_IL_0000:
+M0000001d_IL_0000:
 ldarg 0
-M0000001b_IL_0001:
-M0000001b_IL_0002:
+M0000001d_IL_0001:
+M0000001d_IL_0002:
 ref.isnull
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M0000001b_IL_0004:
-brtrue M0000001b_IL_000e
-M0000001b_IL_0009:
-br M0000001b_IL_0014
-M0000001b_IL_000e:
+M0000001d_IL_0004:
+brtrue M0000001d_IL_000e
+M0000001d_IL_0009:
+br M0000001d_IL_0014
+M0000001d_IL_000e:
 ldstr "null"
-M0000001b_IL_0013:
+M0000001d_IL_0013:
 ret
-M0000001b_IL_0014:
-M0000001b_IL_0015:
+M0000001d_IL_0014:
+M0000001d_IL_0015:
 ldarg 0
-M0000001b_IL_0016:
+M0000001d_IL_0016:
 isinst String
-M0000001b_IL_001b:
-M0000001b_IL_001c:
+M0000001d_IL_001b:
+M0000001d_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M0000001b_IL_001e:
-brtrue M0000001b_IL_0028
-M0000001b_IL_0023:
-br M0000001b_IL_0043
-M0000001b_IL_0028:
+M0000001d_IL_001e:
+brtrue M0000001d_IL_0028
+M0000001d_IL_0023:
+br M0000001d_IL_0043
+M0000001d_IL_0028:
 ldstr "\u0022"
-M0000001b_IL_002d:
+M0000001d_IL_002d:
 ldarg 0
-M0000001b_IL_002e:
+M0000001d_IL_002e:
 castclass String
-M0000001b_IL_0033:
+M0000001d_IL_0033:
 call System.String::Concat(String,String)
-M0000001b_IL_0038:
+M0000001d_IL_0038:
 ldstr "\u0022"
-M0000001b_IL_003d:
+M0000001d_IL_003d:
 call System.String::Concat(String,String)
-M0000001b_IL_0042:
+M0000001d_IL_0042:
 ret
-M0000001b_IL_0043:
-M0000001b_IL_0044:
+M0000001d_IL_0043:
+M0000001d_IL_0044:
 ldarg 0
-M0000001b_IL_0045:
+M0000001d_IL_0045:
 isinst Char
-M0000001b_IL_004a:
+M0000001d_IL_004a:
 dup
-M0000001b_IL_004b:
+M0000001d_IL_004b:
 ref.isnull
-brfalse M0000001b_IL_0057
-M0000001b_IL_0050:
+brfalse M0000001d_IL_0057
+M0000001d_IL_0050:
 pop
-M0000001b_IL_0051:
+M0000001d_IL_0051:
 ldc.i4 0
-M0000001b_IL_0052:
-br M0000001b_IL_005e
-M0000001b_IL_0057:
+M0000001d_IL_0052:
+br M0000001d_IL_005e
+M0000001d_IL_0057:
 unbox.any Char
-M0000001b_IL_005c:
+M0000001d_IL_005c:
 pop
-M0000001b_IL_005d:
+M0000001d_IL_005d:
 ldc.i4 1
-M0000001b_IL_005e:
-brtrue M0000001b_IL_0068
-M0000001b_IL_0063:
-br M0000001b_IL_0083
-M0000001b_IL_0068:
+M0000001d_IL_005e:
+brtrue M0000001d_IL_0068
+M0000001d_IL_0063:
+br M0000001d_IL_0083
+M0000001d_IL_0068:
 ldstr "\u0027"
-M0000001b_IL_006d:
+M0000001d_IL_006d:
 ldarg 0
-M0000001b_IL_006e:
+M0000001d_IL_006e:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M0000001b_IL_0073:
+M0000001d_IL_0073:
 call System.String::Concat(String,String)
-M0000001b_IL_0078:
+M0000001d_IL_0078:
 ldstr "\u0027"
-M0000001b_IL_007d:
+M0000001d_IL_007d:
 call System.String::Concat(String,String)
-M0000001b_IL_0082:
+M0000001d_IL_0082:
 ret
-M0000001b_IL_0083:
-M0000001b_IL_0084:
+M0000001d_IL_0083:
+M0000001d_IL_0084:
 ldarg 0
-M0000001b_IL_0085:
+M0000001d_IL_0085:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M0000001b_IL_008a:
+M0000001d_IL_008a:
 ret
 .end
 .end
@@ -230,9 +236,9 @@ ret
 .local System.Networking.DnsError unionDefault1_0
 ldloca local0
 initobj System.Networking.DnsError
-M0000001c_IL_0000:
+M0000001e_IL_0000:
 ldarg 0
-M0000001c_IL_0001:
+M0000001e_IL_0001:
 pop
 ldloca unionDefault1_0
 initobj System.Networking.DnsError
@@ -240,166 +246,166 @@ ldarg 0
 ldloc unionDefault1_0
 stfld System.Web.Http.HttpError.NameResolution::Metadata_V1_3C726561736F6E3E6B5F5F4261636B696E674669656C64
 pop
-M0000001c_IL_0007:
-M0000001c_IL_0008:
+M0000001e_IL_0007:
+M0000001e_IL_0008:
 ldarg 1
-M0000001c_IL_0009:
+M0000001e_IL_0009:
 stloc local0
-M0000001c_IL_000a:
+M0000001e_IL_000a:
 ldarg 0
-M0000001c_IL_000b:
+M0000001e_IL_000b:
 ldloc local0
-M0000001c_IL_000c:
+M0000001e_IL_000c:
 stfld System.Web.Http.HttpError.NameResolution::Metadata_V1_3C726561736F6E3E6B5F5F4261636B696E674669656C64
 pop
-M0000001c_IL_0011:
+M0000001e_IL_0011:
 ldvoid
 ret
 .end
 .method instance byref get_Reason() -> System.Networking.DnsError
-M0000001d_IL_0000:
-M0000001d_IL_0001:
+M0000001f_IL_0000:
+M0000001f_IL_0001:
 ldarg 0
-M0000001d_IL_0002:
+M0000001f_IL_0002:
 ldfld System.Web.Http.HttpError.NameResolution::Metadata_V1_3C726561736F6E3E6B5F5F4261636B696E674669656C64
-M0000001d_IL_0007:
+M0000001f_IL_0007:
 ret
 .end
 .method instance byref Deconstruct(System.Networking.DnsError& Reason) -> Void
-M0000001e_IL_0000:
+M00000020_IL_0000:
 ldarg 1
-M0000001e_IL_0001:
+M00000020_IL_0001:
 ldarg 0
-M0000001e_IL_0002:
+M00000020_IL_0002:
 call instance System.Web.Http.HttpError.NameResolution::get_Reason()
-M0000001e_IL_0007:
+M00000020_IL_0007:
 stobj System.Networking.DnsError
-M0000001e_IL_000c:
+M00000020_IL_000c:
 ldvoid
 ret
 .end
 .method instance override byref ToString() -> String
-M0000001f_IL_0000:
+M00000021_IL_0000:
 ldstr "HttpError"
-M0000001f_IL_0005:
+M00000021_IL_0005:
 ldstr "."
-M0000001f_IL_000a:
+M00000021_IL_000a:
 call System.String::Concat(String,String)
-M0000001f_IL_000f:
+M00000021_IL_000f:
 ldstr "NameResolution"
-M0000001f_IL_0014:
+M00000021_IL_0014:
 call System.String::Concat(String,String)
-M0000001f_IL_0019:
+M00000021_IL_0019:
 ldstr "("
-M0000001f_IL_001e:
+M00000021_IL_001e:
 call System.String::Concat(String,String)
-M0000001f_IL_0023:
+M00000021_IL_0023:
 ldarg 0
-M0000001f_IL_0024:
+M00000021_IL_0024:
 call instance System.Web.Http.HttpError.NameResolution::get_Reason()
-M0000001f_IL_0029:
+M00000021_IL_0029:
 box System.Networking.DnsError
-M0000001f_IL_002e:
+M00000021_IL_002e:
 call System.Web.Http.HttpError.NameResolution::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
-M0000001f_IL_0033:
+M00000021_IL_0033:
 call System.String::Concat(String,String)
-M0000001f_IL_0038:
+M00000021_IL_0038:
 ldstr ")"
-M0000001f_IL_003d:
+M00000021_IL_003d:
 call System.String::Concat(String,String)
-M0000001f_IL_0042:
+M00000021_IL_0042:
 ret
 .end
 .method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
-M00000020_IL_0000:
+M00000022_IL_0000:
 ldarg 0
-M00000020_IL_0001:
-M00000020_IL_0002:
+M00000022_IL_0001:
+M00000022_IL_0002:
 ref.isnull
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000020_IL_0004:
-brtrue M00000020_IL_000e
-M00000020_IL_0009:
-br M00000020_IL_0014
-M00000020_IL_000e:
+M00000022_IL_0004:
+brtrue M00000022_IL_000e
+M00000022_IL_0009:
+br M00000022_IL_0014
+M00000022_IL_000e:
 ldstr "null"
-M00000020_IL_0013:
+M00000022_IL_0013:
 ret
-M00000020_IL_0014:
-M00000020_IL_0015:
+M00000022_IL_0014:
+M00000022_IL_0015:
 ldarg 0
-M00000020_IL_0016:
+M00000022_IL_0016:
 isinst String
-M00000020_IL_001b:
-M00000020_IL_001c:
+M00000022_IL_001b:
+M00000022_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000020_IL_001e:
-brtrue M00000020_IL_0028
-M00000020_IL_0023:
-br M00000020_IL_0043
-M00000020_IL_0028:
+M00000022_IL_001e:
+brtrue M00000022_IL_0028
+M00000022_IL_0023:
+br M00000022_IL_0043
+M00000022_IL_0028:
 ldstr "\u0022"
-M00000020_IL_002d:
+M00000022_IL_002d:
 ldarg 0
-M00000020_IL_002e:
+M00000022_IL_002e:
 castclass String
-M00000020_IL_0033:
+M00000022_IL_0033:
 call System.String::Concat(String,String)
-M00000020_IL_0038:
+M00000022_IL_0038:
 ldstr "\u0022"
-M00000020_IL_003d:
+M00000022_IL_003d:
 call System.String::Concat(String,String)
-M00000020_IL_0042:
+M00000022_IL_0042:
 ret
-M00000020_IL_0043:
-M00000020_IL_0044:
+M00000022_IL_0043:
+M00000022_IL_0044:
 ldarg 0
-M00000020_IL_0045:
+M00000022_IL_0045:
 isinst Char
-M00000020_IL_004a:
+M00000022_IL_004a:
 dup
-M00000020_IL_004b:
+M00000022_IL_004b:
 ref.isnull
-brfalse M00000020_IL_0057
-M00000020_IL_0050:
+brfalse M00000022_IL_0057
+M00000022_IL_0050:
 pop
-M00000020_IL_0051:
+M00000022_IL_0051:
 ldc.i4 0
-M00000020_IL_0052:
-br M00000020_IL_005e
-M00000020_IL_0057:
+M00000022_IL_0052:
+br M00000022_IL_005e
+M00000022_IL_0057:
 unbox.any Char
-M00000020_IL_005c:
+M00000022_IL_005c:
 pop
-M00000020_IL_005d:
+M00000022_IL_005d:
 ldc.i4 1
-M00000020_IL_005e:
-brtrue M00000020_IL_0068
-M00000020_IL_0063:
-br M00000020_IL_0083
-M00000020_IL_0068:
+M00000022_IL_005e:
+brtrue M00000022_IL_0068
+M00000022_IL_0063:
+br M00000022_IL_0083
+M00000022_IL_0068:
 ldstr "\u0027"
-M00000020_IL_006d:
+M00000022_IL_006d:
 ldarg 0
-M00000020_IL_006e:
+M00000022_IL_006e:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M00000020_IL_0073:
+M00000022_IL_0073:
 call System.String::Concat(String,String)
-M00000020_IL_0078:
+M00000022_IL_0078:
 ldstr "\u0027"
-M00000020_IL_007d:
+M00000022_IL_007d:
 call System.String::Concat(String,String)
-M00000020_IL_0082:
+M00000022_IL_0082:
 ret
-M00000020_IL_0083:
-M00000020_IL_0084:
+M00000022_IL_0083:
+M00000022_IL_0084:
 ldarg 0
-M00000020_IL_0085:
+M00000022_IL_0085:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M00000020_IL_008a:
+M00000022_IL_008a:
 ret
 .end
 .end
@@ -414,9 +420,9 @@ ret
 .local System.Networking.Sockets.SocketError unionDefault1_0
 ldloca local0
 initobj System.Networking.Sockets.SocketError
-M00000021_IL_0000:
+M00000023_IL_0000:
 ldarg 0
-M00000021_IL_0001:
+M00000023_IL_0001:
 pop
 ldloca unionDefault1_0
 initobj System.Networking.Sockets.SocketError
@@ -424,166 +430,350 @@ ldarg 0
 ldloc unionDefault1_0
 stfld System.Web.Http.HttpError.Transport::Metadata_V1_3C726561736F6E3E6B5F5F4261636B696E674669656C64
 pop
-M00000021_IL_0007:
-M00000021_IL_0008:
+M00000023_IL_0007:
+M00000023_IL_0008:
 ldarg 1
-M00000021_IL_0009:
+M00000023_IL_0009:
 stloc local0
-M00000021_IL_000a:
+M00000023_IL_000a:
 ldarg 0
-M00000021_IL_000b:
+M00000023_IL_000b:
 ldloc local0
-M00000021_IL_000c:
+M00000023_IL_000c:
 stfld System.Web.Http.HttpError.Transport::Metadata_V1_3C726561736F6E3E6B5F5F4261636B696E674669656C64
 pop
-M00000021_IL_0011:
+M00000023_IL_0011:
 ldvoid
 ret
 .end
 .method instance byref get_Reason() -> System.Networking.Sockets.SocketError
-M00000022_IL_0000:
-M00000022_IL_0001:
+M00000024_IL_0000:
+M00000024_IL_0001:
 ldarg 0
-M00000022_IL_0002:
+M00000024_IL_0002:
 ldfld System.Web.Http.HttpError.Transport::Metadata_V1_3C726561736F6E3E6B5F5F4261636B696E674669656C64
-M00000022_IL_0007:
+M00000024_IL_0007:
 ret
 .end
 .method instance byref Deconstruct(System.Networking.Sockets.SocketError& Reason) -> Void
-M00000023_IL_0000:
+M00000025_IL_0000:
 ldarg 1
-M00000023_IL_0001:
+M00000025_IL_0001:
 ldarg 0
-M00000023_IL_0002:
+M00000025_IL_0002:
 call instance System.Web.Http.HttpError.Transport::get_Reason()
-M00000023_IL_0007:
+M00000025_IL_0007:
 stobj System.Networking.Sockets.SocketError
-M00000023_IL_000c:
+M00000025_IL_000c:
 ldvoid
 ret
 .end
 .method instance override byref ToString() -> String
-M00000024_IL_0000:
+M00000026_IL_0000:
 ldstr "HttpError"
-M00000024_IL_0005:
+M00000026_IL_0005:
 ldstr "."
-M00000024_IL_000a:
+M00000026_IL_000a:
 call System.String::Concat(String,String)
-M00000024_IL_000f:
+M00000026_IL_000f:
 ldstr "Transport"
-M00000024_IL_0014:
+M00000026_IL_0014:
 call System.String::Concat(String,String)
-M00000024_IL_0019:
+M00000026_IL_0019:
 ldstr "("
-M00000024_IL_001e:
+M00000026_IL_001e:
 call System.String::Concat(String,String)
-M00000024_IL_0023:
+M00000026_IL_0023:
 ldarg 0
-M00000024_IL_0024:
+M00000026_IL_0024:
 call instance System.Web.Http.HttpError.Transport::get_Reason()
-M00000024_IL_0029:
+M00000026_IL_0029:
 box System.Networking.Sockets.SocketError
-M00000024_IL_002e:
+M00000026_IL_002e:
 call System.Web.Http.HttpError.Transport::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
-M00000024_IL_0033:
+M00000026_IL_0033:
 call System.String::Concat(String,String)
-M00000024_IL_0038:
+M00000026_IL_0038:
 ldstr ")"
-M00000024_IL_003d:
+M00000026_IL_003d:
 call System.String::Concat(String,String)
-M00000024_IL_0042:
+M00000026_IL_0042:
 ret
 .end
 .method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
-M00000025_IL_0000:
+M00000027_IL_0000:
 ldarg 0
-M00000025_IL_0001:
-M00000025_IL_0002:
+M00000027_IL_0001:
+M00000027_IL_0002:
 ref.isnull
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000025_IL_0004:
-brtrue M00000025_IL_000e
-M00000025_IL_0009:
-br M00000025_IL_0014
-M00000025_IL_000e:
+M00000027_IL_0004:
+brtrue M00000027_IL_000e
+M00000027_IL_0009:
+br M00000027_IL_0014
+M00000027_IL_000e:
 ldstr "null"
-M00000025_IL_0013:
+M00000027_IL_0013:
 ret
-M00000025_IL_0014:
-M00000025_IL_0015:
+M00000027_IL_0014:
+M00000027_IL_0015:
 ldarg 0
-M00000025_IL_0016:
+M00000027_IL_0016:
 isinst String
-M00000025_IL_001b:
-M00000025_IL_001c:
+M00000027_IL_001b:
+M00000027_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000025_IL_001e:
-brtrue M00000025_IL_0028
-M00000025_IL_0023:
-br M00000025_IL_0043
-M00000025_IL_0028:
+M00000027_IL_001e:
+brtrue M00000027_IL_0028
+M00000027_IL_0023:
+br M00000027_IL_0043
+M00000027_IL_0028:
 ldstr "\u0022"
-M00000025_IL_002d:
+M00000027_IL_002d:
 ldarg 0
-M00000025_IL_002e:
+M00000027_IL_002e:
 castclass String
-M00000025_IL_0033:
+M00000027_IL_0033:
 call System.String::Concat(String,String)
-M00000025_IL_0038:
+M00000027_IL_0038:
 ldstr "\u0022"
-M00000025_IL_003d:
+M00000027_IL_003d:
 call System.String::Concat(String,String)
-M00000025_IL_0042:
+M00000027_IL_0042:
 ret
-M00000025_IL_0043:
-M00000025_IL_0044:
+M00000027_IL_0043:
+M00000027_IL_0044:
 ldarg 0
-M00000025_IL_0045:
+M00000027_IL_0045:
 isinst Char
-M00000025_IL_004a:
+M00000027_IL_004a:
 dup
-M00000025_IL_004b:
+M00000027_IL_004b:
 ref.isnull
-brfalse M00000025_IL_0057
-M00000025_IL_0050:
+brfalse M00000027_IL_0057
+M00000027_IL_0050:
 pop
-M00000025_IL_0051:
+M00000027_IL_0051:
 ldc.i4 0
-M00000025_IL_0052:
-br M00000025_IL_005e
-M00000025_IL_0057:
+M00000027_IL_0052:
+br M00000027_IL_005e
+M00000027_IL_0057:
 unbox.any Char
-M00000025_IL_005c:
+M00000027_IL_005c:
 pop
-M00000025_IL_005d:
+M00000027_IL_005d:
 ldc.i4 1
-M00000025_IL_005e:
-brtrue M00000025_IL_0068
-M00000025_IL_0063:
-br M00000025_IL_0083
-M00000025_IL_0068:
+M00000027_IL_005e:
+brtrue M00000027_IL_0068
+M00000027_IL_0063:
+br M00000027_IL_0083
+M00000027_IL_0068:
 ldstr "\u0027"
-M00000025_IL_006d:
+M00000027_IL_006d:
 ldarg 0
-M00000025_IL_006e:
+M00000027_IL_006e:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M00000025_IL_0073:
+M00000027_IL_0073:
 call System.String::Concat(String,String)
-M00000025_IL_0078:
+M00000027_IL_0078:
 ldstr "\u0027"
-M00000025_IL_007d:
+M00000027_IL_007d:
 call System.String::Concat(String,String)
-M00000025_IL_0082:
+M00000027_IL_0082:
 ret
-M00000025_IL_0083:
-M00000025_IL_0084:
+M00000027_IL_0083:
+M00000027_IL_0084:
 ldarg 0
-M00000025_IL_0085:
+M00000027_IL_0085:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M00000025_IL_008a:
+M00000027_IL_008a:
+ret
+.end
+.end
+.type System.Web.Http.HttpError.UnsuccessfulStatus
+.sealed
+.field private Metadata_V1_3C737461747573436F64653E6B5F5F4261636B696E674669656C64 Int32
+.property instance StatusCode() -> Int32
+.get instance System.Web.Http.HttpError.UnsuccessfulStatus::get_StatusCode()
+.end
+.method instance byref .ctor(Int32 statusCode) -> Void
+.local Int32 local0
+.local Int32 unionDefault1_0
+ldc.i4 0
+stloc local0
+M00000028_IL_0000:
+ldarg 0
+M00000028_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Int32
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Web.Http.HttpError.UnsuccessfulStatus::Metadata_V1_3C737461747573436F64653E6B5F5F4261636B696E674669656C64
+pop
+M00000028_IL_0007:
+M00000028_IL_0008:
+ldarg 1
+M00000028_IL_0009:
+stloc local0
+M00000028_IL_000a:
+ldarg 0
+M00000028_IL_000b:
+ldloc local0
+M00000028_IL_000c:
+stfld System.Web.Http.HttpError.UnsuccessfulStatus::Metadata_V1_3C737461747573436F64653E6B5F5F4261636B696E674669656C64
+pop
+M00000028_IL_0011:
+ldvoid
+ret
+.end
+.method instance byref get_StatusCode() -> Int32
+M00000029_IL_0000:
+M00000029_IL_0001:
+ldarg 0
+M00000029_IL_0002:
+ldfld System.Web.Http.HttpError.UnsuccessfulStatus::Metadata_V1_3C737461747573436F64653E6B5F5F4261636B696E674669656C64
+M00000029_IL_0007:
+ret
+.end
+.method instance byref Deconstruct(Int32& StatusCode) -> Void
+M0000002a_IL_0000:
+ldarg 1
+M0000002a_IL_0001:
+ldarg 0
+M0000002a_IL_0002:
+call instance System.Web.Http.HttpError.UnsuccessfulStatus::get_StatusCode()
+M0000002a_IL_0007:
+stobj Int32
+M0000002a_IL_0008:
+ldvoid
+ret
+.end
+.method instance override byref ToString() -> String
+M0000002b_IL_0000:
+ldstr "HttpError"
+M0000002b_IL_0005:
+ldstr "."
+M0000002b_IL_000a:
+call System.String::Concat(String,String)
+M0000002b_IL_000f:
+ldstr "UnsuccessfulStatus"
+M0000002b_IL_0014:
+call System.String::Concat(String,String)
+M0000002b_IL_0019:
+ldstr "("
+M0000002b_IL_001e:
+call System.String::Concat(String,String)
+M0000002b_IL_0023:
+ldarg 0
+M0000002b_IL_0024:
+call instance System.Web.Http.HttpError.UnsuccessfulStatus::get_StatusCode()
+M0000002b_IL_0029:
+box Int32
+M0000002b_IL_002e:
+call System.Web.Http.HttpError.UnsuccessfulStatus::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+M0000002b_IL_0033:
+call System.String::Concat(String,String)
+M0000002b_IL_0038:
+ldstr ")"
+M0000002b_IL_003d:
+call System.String::Concat(String,String)
+M0000002b_IL_0042:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M0000002c_IL_0000:
+ldarg 0
+M0000002c_IL_0001:
+M0000002c_IL_0002:
+ref.isnull
+call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
+M0000002c_IL_0004:
+brtrue M0000002c_IL_000e
+M0000002c_IL_0009:
+br M0000002c_IL_0014
+M0000002c_IL_000e:
+ldstr "null"
+M0000002c_IL_0013:
+ret
+M0000002c_IL_0014:
+M0000002c_IL_0015:
+ldarg 0
+M0000002c_IL_0016:
+isinst String
+M0000002c_IL_001b:
+M0000002c_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
+M0000002c_IL_001e:
+brtrue M0000002c_IL_0028
+M0000002c_IL_0023:
+br M0000002c_IL_0043
+M0000002c_IL_0028:
+ldstr "\u0022"
+M0000002c_IL_002d:
+ldarg 0
+M0000002c_IL_002e:
+castclass String
+M0000002c_IL_0033:
+call System.String::Concat(String,String)
+M0000002c_IL_0038:
+ldstr "\u0022"
+M0000002c_IL_003d:
+call System.String::Concat(String,String)
+M0000002c_IL_0042:
+ret
+M0000002c_IL_0043:
+M0000002c_IL_0044:
+ldarg 0
+M0000002c_IL_0045:
+isinst Char
+M0000002c_IL_004a:
+dup
+M0000002c_IL_004b:
+ref.isnull
+brfalse M0000002c_IL_0057
+M0000002c_IL_0050:
+pop
+M0000002c_IL_0051:
+ldc.i4 0
+M0000002c_IL_0052:
+br M0000002c_IL_005e
+M0000002c_IL_0057:
+unbox.any Char
+M0000002c_IL_005c:
+pop
+M0000002c_IL_005d:
+ldc.i4 1
+M0000002c_IL_005e:
+brtrue M0000002c_IL_0068
+M0000002c_IL_0063:
+br M0000002c_IL_0083
+M0000002c_IL_0068:
+ldstr "\u0027"
+M0000002c_IL_006d:
+ldarg 0
+M0000002c_IL_006e:
+call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
+M0000002c_IL_0073:
+call System.String::Concat(String,String)
+M0000002c_IL_0078:
+ldstr "\u0027"
+M0000002c_IL_007d:
+call System.String::Concat(String,String)
+M0000002c_IL_0082:
+ret
+M0000002c_IL_0083:
+M0000002c_IL_0084:
+ldarg 0
+M0000002c_IL_0085:
+call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
+M0000002c_IL_008a:
 ret
 .end
 .end
@@ -596,9 +786,9 @@ ret
 .method instance byref .ctor(String message) -> Void
 .local String local0
 .local String unionDefault1_0
-M00000026_IL_0000:
+M0000002d_IL_0000:
 ldarg 0
-M00000026_IL_0001:
+M0000002d_IL_0001:
 pop
 ldloca unionDefault1_0
 initobj String
@@ -606,165 +796,165 @@ ldarg 0
 ldloc unionDefault1_0
 stfld System.Web.Http.HttpError.InvalidRequest::Metadata_V1_3C6D6573736167653E6B5F5F4261636B696E674669656C64
 pop
-M00000026_IL_0007:
-M00000026_IL_0008:
+M0000002d_IL_0007:
+M0000002d_IL_0008:
 ldarg 1
-M00000026_IL_0009:
+M0000002d_IL_0009:
 stloc local0
-M00000026_IL_000a:
+M0000002d_IL_000a:
 ldarg 0
-M00000026_IL_000b:
+M0000002d_IL_000b:
 ldloc local0
-M00000026_IL_000c:
+M0000002d_IL_000c:
 stfld System.Web.Http.HttpError.InvalidRequest::Metadata_V1_3C6D6573736167653E6B5F5F4261636B696E674669656C64
 pop
-M00000026_IL_0011:
+M0000002d_IL_0011:
 ldvoid
 ret
 .end
 .method instance byref get_Message() -> String
-M00000027_IL_0000:
-M00000027_IL_0001:
+M0000002e_IL_0000:
+M0000002e_IL_0001:
 ldarg 0
-M00000027_IL_0002:
+M0000002e_IL_0002:
 ldfld System.Web.Http.HttpError.InvalidRequest::Metadata_V1_3C6D6573736167653E6B5F5F4261636B696E674669656C64
-M00000027_IL_0007:
+M0000002e_IL_0007:
 ret
 .end
 .method instance byref Deconstruct(String& Message) -> Void
-M00000028_IL_0000:
+M0000002f_IL_0000:
 ldarg 1
-M00000028_IL_0001:
+M0000002f_IL_0001:
 ldarg 0
-M00000028_IL_0002:
+M0000002f_IL_0002:
 call instance System.Web.Http.HttpError.InvalidRequest::get_Message()
-M00000028_IL_0007:
+M0000002f_IL_0007:
 stobj String
-M00000028_IL_0008:
+M0000002f_IL_0008:
 ldvoid
 ret
 .end
 .method instance override byref ToString() -> String
-M00000029_IL_0000:
+M00000030_IL_0000:
 ldstr "HttpError"
-M00000029_IL_0005:
+M00000030_IL_0005:
 ldstr "."
-M00000029_IL_000a:
+M00000030_IL_000a:
 call System.String::Concat(String,String)
-M00000029_IL_000f:
+M00000030_IL_000f:
 ldstr "InvalidRequest"
-M00000029_IL_0014:
+M00000030_IL_0014:
 call System.String::Concat(String,String)
-M00000029_IL_0019:
+M00000030_IL_0019:
 ldstr "("
-M00000029_IL_001e:
+M00000030_IL_001e:
 call System.String::Concat(String,String)
-M00000029_IL_0023:
+M00000030_IL_0023:
 ldarg 0
-M00000029_IL_0024:
+M00000030_IL_0024:
 call instance System.Web.Http.HttpError.InvalidRequest::get_Message()
-M00000029_IL_0029:
+M00000030_IL_0029:
 castclass System.Object
 call System.Web.Http.HttpError.InvalidRequest::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
-M00000029_IL_002e:
+M00000030_IL_002e:
 call System.String::Concat(String,String)
-M00000029_IL_0033:
+M00000030_IL_0033:
 ldstr ")"
-M00000029_IL_0038:
+M00000030_IL_0038:
 call System.String::Concat(String,String)
-M00000029_IL_003d:
+M00000030_IL_003d:
 ret
 .end
 .method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
-M0000002a_IL_0000:
+M00000031_IL_0000:
 ldarg 0
-M0000002a_IL_0001:
-M0000002a_IL_0002:
+M00000031_IL_0001:
+M00000031_IL_0002:
 ref.isnull
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M0000002a_IL_0004:
-brtrue M0000002a_IL_000e
-M0000002a_IL_0009:
-br M0000002a_IL_0014
-M0000002a_IL_000e:
+M00000031_IL_0004:
+brtrue M00000031_IL_000e
+M00000031_IL_0009:
+br M00000031_IL_0014
+M00000031_IL_000e:
 ldstr "null"
-M0000002a_IL_0013:
+M00000031_IL_0013:
 ret
-M0000002a_IL_0014:
-M0000002a_IL_0015:
+M00000031_IL_0014:
+M00000031_IL_0015:
 ldarg 0
-M0000002a_IL_0016:
+M00000031_IL_0016:
 isinst String
-M0000002a_IL_001b:
-M0000002a_IL_001c:
+M00000031_IL_001b:
+M00000031_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M0000002a_IL_001e:
-brtrue M0000002a_IL_0028
-M0000002a_IL_0023:
-br M0000002a_IL_0043
-M0000002a_IL_0028:
+M00000031_IL_001e:
+brtrue M00000031_IL_0028
+M00000031_IL_0023:
+br M00000031_IL_0043
+M00000031_IL_0028:
 ldstr "\u0022"
-M0000002a_IL_002d:
+M00000031_IL_002d:
 ldarg 0
-M0000002a_IL_002e:
+M00000031_IL_002e:
 castclass String
-M0000002a_IL_0033:
+M00000031_IL_0033:
 call System.String::Concat(String,String)
-M0000002a_IL_0038:
+M00000031_IL_0038:
 ldstr "\u0022"
-M0000002a_IL_003d:
+M00000031_IL_003d:
 call System.String::Concat(String,String)
-M0000002a_IL_0042:
+M00000031_IL_0042:
 ret
-M0000002a_IL_0043:
-M0000002a_IL_0044:
+M00000031_IL_0043:
+M00000031_IL_0044:
 ldarg 0
-M0000002a_IL_0045:
+M00000031_IL_0045:
 isinst Char
-M0000002a_IL_004a:
+M00000031_IL_004a:
 dup
-M0000002a_IL_004b:
+M00000031_IL_004b:
 ref.isnull
-brfalse M0000002a_IL_0057
-M0000002a_IL_0050:
+brfalse M00000031_IL_0057
+M00000031_IL_0050:
 pop
-M0000002a_IL_0051:
+M00000031_IL_0051:
 ldc.i4 0
-M0000002a_IL_0052:
-br M0000002a_IL_005e
-M0000002a_IL_0057:
+M00000031_IL_0052:
+br M00000031_IL_005e
+M00000031_IL_0057:
 unbox.any Char
-M0000002a_IL_005c:
+M00000031_IL_005c:
 pop
-M0000002a_IL_005d:
+M00000031_IL_005d:
 ldc.i4 1
-M0000002a_IL_005e:
-brtrue M0000002a_IL_0068
-M0000002a_IL_0063:
-br M0000002a_IL_0083
-M0000002a_IL_0068:
+M00000031_IL_005e:
+brtrue M00000031_IL_0068
+M00000031_IL_0063:
+br M00000031_IL_0083
+M00000031_IL_0068:
 ldstr "\u0027"
-M0000002a_IL_006d:
+M00000031_IL_006d:
 ldarg 0
-M0000002a_IL_006e:
+M00000031_IL_006e:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M0000002a_IL_0073:
+M00000031_IL_0073:
 call System.String::Concat(String,String)
-M0000002a_IL_0078:
+M00000031_IL_0078:
 ldstr "\u0027"
-M0000002a_IL_007d:
+M00000031_IL_007d:
 call System.String::Concat(String,String)
-M0000002a_IL_0082:
+M00000031_IL_0082:
 ret
-M0000002a_IL_0083:
-M0000002a_IL_0084:
+M00000031_IL_0083:
+M00000031_IL_0084:
 ldarg 0
-M0000002a_IL_0085:
+M00000031_IL_0085:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M0000002a_IL_008a:
+M00000031_IL_008a:
 ret
 .end
 .end
@@ -777,9 +967,9 @@ ret
 .method instance byref .ctor(String message) -> Void
 .local String local0
 .local String unionDefault1_0
-M0000002b_IL_0000:
+M00000032_IL_0000:
 ldarg 0
-M0000002b_IL_0001:
+M00000032_IL_0001:
 pop
 ldloca unionDefault1_0
 initobj String
@@ -787,165 +977,165 @@ ldarg 0
 ldloc unionDefault1_0
 stfld System.Web.Http.HttpError.Protocol::Metadata_V1_3C6D6573736167653E6B5F5F4261636B696E674669656C64
 pop
-M0000002b_IL_0007:
-M0000002b_IL_0008:
+M00000032_IL_0007:
+M00000032_IL_0008:
 ldarg 1
-M0000002b_IL_0009:
+M00000032_IL_0009:
 stloc local0
-M0000002b_IL_000a:
+M00000032_IL_000a:
 ldarg 0
-M0000002b_IL_000b:
+M00000032_IL_000b:
 ldloc local0
-M0000002b_IL_000c:
+M00000032_IL_000c:
 stfld System.Web.Http.HttpError.Protocol::Metadata_V1_3C6D6573736167653E6B5F5F4261636B696E674669656C64
 pop
-M0000002b_IL_0011:
+M00000032_IL_0011:
 ldvoid
 ret
 .end
 .method instance byref get_Message() -> String
-M0000002c_IL_0000:
-M0000002c_IL_0001:
+M00000033_IL_0000:
+M00000033_IL_0001:
 ldarg 0
-M0000002c_IL_0002:
+M00000033_IL_0002:
 ldfld System.Web.Http.HttpError.Protocol::Metadata_V1_3C6D6573736167653E6B5F5F4261636B696E674669656C64
-M0000002c_IL_0007:
+M00000033_IL_0007:
 ret
 .end
 .method instance byref Deconstruct(String& Message) -> Void
-M0000002d_IL_0000:
+M00000034_IL_0000:
 ldarg 1
-M0000002d_IL_0001:
+M00000034_IL_0001:
 ldarg 0
-M0000002d_IL_0002:
+M00000034_IL_0002:
 call instance System.Web.Http.HttpError.Protocol::get_Message()
-M0000002d_IL_0007:
+M00000034_IL_0007:
 stobj String
-M0000002d_IL_0008:
+M00000034_IL_0008:
 ldvoid
 ret
 .end
 .method instance override byref ToString() -> String
-M0000002e_IL_0000:
+M00000035_IL_0000:
 ldstr "HttpError"
-M0000002e_IL_0005:
+M00000035_IL_0005:
 ldstr "."
-M0000002e_IL_000a:
+M00000035_IL_000a:
 call System.String::Concat(String,String)
-M0000002e_IL_000f:
+M00000035_IL_000f:
 ldstr "Protocol"
-M0000002e_IL_0014:
+M00000035_IL_0014:
 call System.String::Concat(String,String)
-M0000002e_IL_0019:
+M00000035_IL_0019:
 ldstr "("
-M0000002e_IL_001e:
+M00000035_IL_001e:
 call System.String::Concat(String,String)
-M0000002e_IL_0023:
+M00000035_IL_0023:
 ldarg 0
-M0000002e_IL_0024:
+M00000035_IL_0024:
 call instance System.Web.Http.HttpError.Protocol::get_Message()
-M0000002e_IL_0029:
+M00000035_IL_0029:
 castclass System.Object
 call System.Web.Http.HttpError.Protocol::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
-M0000002e_IL_002e:
+M00000035_IL_002e:
 call System.String::Concat(String,String)
-M0000002e_IL_0033:
+M00000035_IL_0033:
 ldstr ")"
-M0000002e_IL_0038:
+M00000035_IL_0038:
 call System.String::Concat(String,String)
-M0000002e_IL_003d:
+M00000035_IL_003d:
 ret
 .end
 .method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
-M0000002f_IL_0000:
+M00000036_IL_0000:
 ldarg 0
-M0000002f_IL_0001:
-M0000002f_IL_0002:
+M00000036_IL_0001:
+M00000036_IL_0002:
 ref.isnull
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M0000002f_IL_0004:
-brtrue M0000002f_IL_000e
-M0000002f_IL_0009:
-br M0000002f_IL_0014
-M0000002f_IL_000e:
+M00000036_IL_0004:
+brtrue M00000036_IL_000e
+M00000036_IL_0009:
+br M00000036_IL_0014
+M00000036_IL_000e:
 ldstr "null"
-M0000002f_IL_0013:
+M00000036_IL_0013:
 ret
-M0000002f_IL_0014:
-M0000002f_IL_0015:
+M00000036_IL_0014:
+M00000036_IL_0015:
 ldarg 0
-M0000002f_IL_0016:
+M00000036_IL_0016:
 isinst String
-M0000002f_IL_001b:
-M0000002f_IL_001c:
+M00000036_IL_001b:
+M00000036_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M0000002f_IL_001e:
-brtrue M0000002f_IL_0028
-M0000002f_IL_0023:
-br M0000002f_IL_0043
-M0000002f_IL_0028:
+M00000036_IL_001e:
+brtrue M00000036_IL_0028
+M00000036_IL_0023:
+br M00000036_IL_0043
+M00000036_IL_0028:
 ldstr "\u0022"
-M0000002f_IL_002d:
+M00000036_IL_002d:
 ldarg 0
-M0000002f_IL_002e:
+M00000036_IL_002e:
 castclass String
-M0000002f_IL_0033:
+M00000036_IL_0033:
 call System.String::Concat(String,String)
-M0000002f_IL_0038:
+M00000036_IL_0038:
 ldstr "\u0022"
-M0000002f_IL_003d:
+M00000036_IL_003d:
 call System.String::Concat(String,String)
-M0000002f_IL_0042:
+M00000036_IL_0042:
 ret
-M0000002f_IL_0043:
-M0000002f_IL_0044:
+M00000036_IL_0043:
+M00000036_IL_0044:
 ldarg 0
-M0000002f_IL_0045:
+M00000036_IL_0045:
 isinst Char
-M0000002f_IL_004a:
+M00000036_IL_004a:
 dup
-M0000002f_IL_004b:
+M00000036_IL_004b:
 ref.isnull
-brfalse M0000002f_IL_0057
-M0000002f_IL_0050:
+brfalse M00000036_IL_0057
+M00000036_IL_0050:
 pop
-M0000002f_IL_0051:
+M00000036_IL_0051:
 ldc.i4 0
-M0000002f_IL_0052:
-br M0000002f_IL_005e
-M0000002f_IL_0057:
+M00000036_IL_0052:
+br M00000036_IL_005e
+M00000036_IL_0057:
 unbox.any Char
-M0000002f_IL_005c:
+M00000036_IL_005c:
 pop
-M0000002f_IL_005d:
+M00000036_IL_005d:
 ldc.i4 1
-M0000002f_IL_005e:
-brtrue M0000002f_IL_0068
-M0000002f_IL_0063:
-br M0000002f_IL_0083
-M0000002f_IL_0068:
+M00000036_IL_005e:
+brtrue M00000036_IL_0068
+M00000036_IL_0063:
+br M00000036_IL_0083
+M00000036_IL_0068:
 ldstr "\u0027"
-M0000002f_IL_006d:
+M00000036_IL_006d:
 ldarg 0
-M0000002f_IL_006e:
+M00000036_IL_006e:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M0000002f_IL_0073:
+M00000036_IL_0073:
 call System.String::Concat(String,String)
-M0000002f_IL_0078:
+M00000036_IL_0078:
 ldstr "\u0027"
-M0000002f_IL_007d:
+M00000036_IL_007d:
 call System.String::Concat(String,String)
-M0000002f_IL_0082:
+M00000036_IL_0082:
 ret
-M0000002f_IL_0083:
-M0000002f_IL_0084:
+M00000036_IL_0083:
+M00000036_IL_0084:
 ldarg 0
-M0000002f_IL_0085:
+M00000036_IL_0085:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M0000002f_IL_008a:
+M00000036_IL_008a:
 ret
 .end
 .end
@@ -958,9 +1148,9 @@ ret
 .method instance byref .ctor(String message) -> Void
 .local String local0
 .local String unionDefault1_0
-M00000030_IL_0000:
+M00000037_IL_0000:
 ldarg 0
-M00000030_IL_0001:
+M00000037_IL_0001:
 pop
 ldloca unionDefault1_0
 initobj String
@@ -968,165 +1158,165 @@ ldarg 0
 ldloc unionDefault1_0
 stfld System.Web.Http.HttpError.Unsupported::Metadata_V1_3C6D6573736167653E6B5F5F4261636B696E674669656C64
 pop
-M00000030_IL_0007:
-M00000030_IL_0008:
+M00000037_IL_0007:
+M00000037_IL_0008:
 ldarg 1
-M00000030_IL_0009:
+M00000037_IL_0009:
 stloc local0
-M00000030_IL_000a:
+M00000037_IL_000a:
 ldarg 0
-M00000030_IL_000b:
+M00000037_IL_000b:
 ldloc local0
-M00000030_IL_000c:
+M00000037_IL_000c:
 stfld System.Web.Http.HttpError.Unsupported::Metadata_V1_3C6D6573736167653E6B5F5F4261636B696E674669656C64
 pop
-M00000030_IL_0011:
+M00000037_IL_0011:
 ldvoid
 ret
 .end
 .method instance byref get_Message() -> String
-M00000031_IL_0000:
-M00000031_IL_0001:
+M00000038_IL_0000:
+M00000038_IL_0001:
 ldarg 0
-M00000031_IL_0002:
+M00000038_IL_0002:
 ldfld System.Web.Http.HttpError.Unsupported::Metadata_V1_3C6D6573736167653E6B5F5F4261636B696E674669656C64
-M00000031_IL_0007:
+M00000038_IL_0007:
 ret
 .end
 .method instance byref Deconstruct(String& Message) -> Void
-M00000032_IL_0000:
+M00000039_IL_0000:
 ldarg 1
-M00000032_IL_0001:
+M00000039_IL_0001:
 ldarg 0
-M00000032_IL_0002:
+M00000039_IL_0002:
 call instance System.Web.Http.HttpError.Unsupported::get_Message()
-M00000032_IL_0007:
+M00000039_IL_0007:
 stobj String
-M00000032_IL_0008:
+M00000039_IL_0008:
 ldvoid
 ret
 .end
 .method instance override byref ToString() -> String
-M00000033_IL_0000:
+M0000003a_IL_0000:
 ldstr "HttpError"
-M00000033_IL_0005:
+M0000003a_IL_0005:
 ldstr "."
-M00000033_IL_000a:
+M0000003a_IL_000a:
 call System.String::Concat(String,String)
-M00000033_IL_000f:
+M0000003a_IL_000f:
 ldstr "Unsupported"
-M00000033_IL_0014:
+M0000003a_IL_0014:
 call System.String::Concat(String,String)
-M00000033_IL_0019:
+M0000003a_IL_0019:
 ldstr "("
-M00000033_IL_001e:
+M0000003a_IL_001e:
 call System.String::Concat(String,String)
-M00000033_IL_0023:
+M0000003a_IL_0023:
 ldarg 0
-M00000033_IL_0024:
+M0000003a_IL_0024:
 call instance System.Web.Http.HttpError.Unsupported::get_Message()
-M00000033_IL_0029:
+M0000003a_IL_0029:
 castclass System.Object
 call System.Web.Http.HttpError.Unsupported::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
-M00000033_IL_002e:
+M0000003a_IL_002e:
 call System.String::Concat(String,String)
-M00000033_IL_0033:
+M0000003a_IL_0033:
 ldstr ")"
-M00000033_IL_0038:
+M0000003a_IL_0038:
 call System.String::Concat(String,String)
-M00000033_IL_003d:
+M0000003a_IL_003d:
 ret
 .end
 .method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
-M00000034_IL_0000:
+M0000003b_IL_0000:
 ldarg 0
-M00000034_IL_0001:
-M00000034_IL_0002:
+M0000003b_IL_0001:
+M0000003b_IL_0002:
 ref.isnull
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000034_IL_0004:
-brtrue M00000034_IL_000e
-M00000034_IL_0009:
-br M00000034_IL_0014
-M00000034_IL_000e:
+M0000003b_IL_0004:
+brtrue M0000003b_IL_000e
+M0000003b_IL_0009:
+br M0000003b_IL_0014
+M0000003b_IL_000e:
 ldstr "null"
-M00000034_IL_0013:
+M0000003b_IL_0013:
 ret
-M00000034_IL_0014:
-M00000034_IL_0015:
+M0000003b_IL_0014:
+M0000003b_IL_0015:
 ldarg 0
-M00000034_IL_0016:
+M0000003b_IL_0016:
 isinst String
-M00000034_IL_001b:
-M00000034_IL_001c:
+M0000003b_IL_001b:
+M0000003b_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000034_IL_001e:
-brtrue M00000034_IL_0028
-M00000034_IL_0023:
-br M00000034_IL_0043
-M00000034_IL_0028:
+M0000003b_IL_001e:
+brtrue M0000003b_IL_0028
+M0000003b_IL_0023:
+br M0000003b_IL_0043
+M0000003b_IL_0028:
 ldstr "\u0022"
-M00000034_IL_002d:
+M0000003b_IL_002d:
 ldarg 0
-M00000034_IL_002e:
+M0000003b_IL_002e:
 castclass String
-M00000034_IL_0033:
+M0000003b_IL_0033:
 call System.String::Concat(String,String)
-M00000034_IL_0038:
+M0000003b_IL_0038:
 ldstr "\u0022"
-M00000034_IL_003d:
+M0000003b_IL_003d:
 call System.String::Concat(String,String)
-M00000034_IL_0042:
+M0000003b_IL_0042:
 ret
-M00000034_IL_0043:
-M00000034_IL_0044:
+M0000003b_IL_0043:
+M0000003b_IL_0044:
 ldarg 0
-M00000034_IL_0045:
+M0000003b_IL_0045:
 isinst Char
-M00000034_IL_004a:
+M0000003b_IL_004a:
 dup
-M00000034_IL_004b:
+M0000003b_IL_004b:
 ref.isnull
-brfalse M00000034_IL_0057
-M00000034_IL_0050:
+brfalse M0000003b_IL_0057
+M0000003b_IL_0050:
 pop
-M00000034_IL_0051:
+M0000003b_IL_0051:
 ldc.i4 0
-M00000034_IL_0052:
-br M00000034_IL_005e
-M00000034_IL_0057:
+M0000003b_IL_0052:
+br M0000003b_IL_005e
+M0000003b_IL_0057:
 unbox.any Char
-M00000034_IL_005c:
+M0000003b_IL_005c:
 pop
-M00000034_IL_005d:
+M0000003b_IL_005d:
 ldc.i4 1
-M00000034_IL_005e:
-brtrue M00000034_IL_0068
-M00000034_IL_0063:
-br M00000034_IL_0083
-M00000034_IL_0068:
+M0000003b_IL_005e:
+brtrue M0000003b_IL_0068
+M0000003b_IL_0063:
+br M0000003b_IL_0083
+M0000003b_IL_0068:
 ldstr "\u0027"
-M00000034_IL_006d:
+M0000003b_IL_006d:
 ldarg 0
-M00000034_IL_006e:
+M0000003b_IL_006e:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M00000034_IL_0073:
+M0000003b_IL_0073:
 call System.String::Concat(String,String)
-M00000034_IL_0078:
+M0000003b_IL_0078:
 ldstr "\u0027"
-M00000034_IL_007d:
+M0000003b_IL_007d:
 call System.String::Concat(String,String)
-M00000034_IL_0082:
+M0000003b_IL_0082:
 ret
-M00000034_IL_0083:
-M00000034_IL_0084:
+M0000003b_IL_0083:
+M0000003b_IL_0084:
 ldarg 0
-M00000034_IL_0085:
+M0000003b_IL_0085:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M00000034_IL_008a:
+M0000003b_IL_008a:
 ret
 .end
 .end
@@ -1139,9 +1329,9 @@ ret
 .method instance byref .ctor(String message) -> Void
 .local String local0
 .local String unionDefault1_0
-M00000035_IL_0000:
+M0000003c_IL_0000:
 ldarg 0
-M00000035_IL_0001:
+M0000003c_IL_0001:
 pop
 ldloca unionDefault1_0
 initobj String
@@ -1149,284 +1339,284 @@ ldarg 0
 ldloc unionDefault1_0
 stfld System.Web.Http.HttpError.LimitExceeded::Metadata_V1_3C6D6573736167653E6B5F5F4261636B696E674669656C64
 pop
-M00000035_IL_0007:
-M00000035_IL_0008:
+M0000003c_IL_0007:
+M0000003c_IL_0008:
 ldarg 1
-M00000035_IL_0009:
+M0000003c_IL_0009:
 stloc local0
-M00000035_IL_000a:
+M0000003c_IL_000a:
 ldarg 0
-M00000035_IL_000b:
+M0000003c_IL_000b:
 ldloc local0
-M00000035_IL_000c:
+M0000003c_IL_000c:
 stfld System.Web.Http.HttpError.LimitExceeded::Metadata_V1_3C6D6573736167653E6B5F5F4261636B696E674669656C64
 pop
-M00000035_IL_0011:
+M0000003c_IL_0011:
 ldvoid
 ret
 .end
 .method instance byref get_Message() -> String
-M00000036_IL_0000:
-M00000036_IL_0001:
+M0000003d_IL_0000:
+M0000003d_IL_0001:
 ldarg 0
-M00000036_IL_0002:
+M0000003d_IL_0002:
 ldfld System.Web.Http.HttpError.LimitExceeded::Metadata_V1_3C6D6573736167653E6B5F5F4261636B696E674669656C64
-M00000036_IL_0007:
+M0000003d_IL_0007:
 ret
 .end
 .method instance byref Deconstruct(String& Message) -> Void
-M00000037_IL_0000:
+M0000003e_IL_0000:
 ldarg 1
-M00000037_IL_0001:
+M0000003e_IL_0001:
 ldarg 0
-M00000037_IL_0002:
+M0000003e_IL_0002:
 call instance System.Web.Http.HttpError.LimitExceeded::get_Message()
-M00000037_IL_0007:
+M0000003e_IL_0007:
 stobj String
-M00000037_IL_0008:
+M0000003e_IL_0008:
 ldvoid
 ret
 .end
 .method instance override byref ToString() -> String
-M00000038_IL_0000:
+M0000003f_IL_0000:
 ldstr "HttpError"
-M00000038_IL_0005:
+M0000003f_IL_0005:
 ldstr "."
-M00000038_IL_000a:
+M0000003f_IL_000a:
 call System.String::Concat(String,String)
-M00000038_IL_000f:
+M0000003f_IL_000f:
 ldstr "LimitExceeded"
-M00000038_IL_0014:
+M0000003f_IL_0014:
 call System.String::Concat(String,String)
-M00000038_IL_0019:
+M0000003f_IL_0019:
 ldstr "("
-M00000038_IL_001e:
+M0000003f_IL_001e:
 call System.String::Concat(String,String)
-M00000038_IL_0023:
+M0000003f_IL_0023:
 ldarg 0
-M00000038_IL_0024:
+M0000003f_IL_0024:
 call instance System.Web.Http.HttpError.LimitExceeded::get_Message()
-M00000038_IL_0029:
+M0000003f_IL_0029:
 castclass System.Object
 call System.Web.Http.HttpError.LimitExceeded::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
-M00000038_IL_002e:
+M0000003f_IL_002e:
 call System.String::Concat(String,String)
-M00000038_IL_0033:
+M0000003f_IL_0033:
 ldstr ")"
-M00000038_IL_0038:
+M0000003f_IL_0038:
 call System.String::Concat(String,String)
-M00000038_IL_003d:
+M0000003f_IL_003d:
 ret
 .end
 .method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
-M00000039_IL_0000:
+M00000040_IL_0000:
 ldarg 0
-M00000039_IL_0001:
-M00000039_IL_0002:
+M00000040_IL_0001:
+M00000040_IL_0002:
 ref.isnull
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000039_IL_0004:
-brtrue M00000039_IL_000e
-M00000039_IL_0009:
-br M00000039_IL_0014
-M00000039_IL_000e:
+M00000040_IL_0004:
+brtrue M00000040_IL_000e
+M00000040_IL_0009:
+br M00000040_IL_0014
+M00000040_IL_000e:
 ldstr "null"
-M00000039_IL_0013:
+M00000040_IL_0013:
 ret
-M00000039_IL_0014:
-M00000039_IL_0015:
+M00000040_IL_0014:
+M00000040_IL_0015:
 ldarg 0
-M00000039_IL_0016:
+M00000040_IL_0016:
 isinst String
-M00000039_IL_001b:
-M00000039_IL_001c:
+M00000040_IL_001b:
+M00000040_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000039_IL_001e:
-brtrue M00000039_IL_0028
-M00000039_IL_0023:
-br M00000039_IL_0043
-M00000039_IL_0028:
+M00000040_IL_001e:
+brtrue M00000040_IL_0028
+M00000040_IL_0023:
+br M00000040_IL_0043
+M00000040_IL_0028:
 ldstr "\u0022"
-M00000039_IL_002d:
+M00000040_IL_002d:
 ldarg 0
-M00000039_IL_002e:
+M00000040_IL_002e:
 castclass String
-M00000039_IL_0033:
+M00000040_IL_0033:
 call System.String::Concat(String,String)
-M00000039_IL_0038:
+M00000040_IL_0038:
 ldstr "\u0022"
-M00000039_IL_003d:
+M00000040_IL_003d:
 call System.String::Concat(String,String)
-M00000039_IL_0042:
+M00000040_IL_0042:
 ret
-M00000039_IL_0043:
-M00000039_IL_0044:
+M00000040_IL_0043:
+M00000040_IL_0044:
 ldarg 0
-M00000039_IL_0045:
+M00000040_IL_0045:
 isinst Char
-M00000039_IL_004a:
+M00000040_IL_004a:
 dup
-M00000039_IL_004b:
+M00000040_IL_004b:
 ref.isnull
-brfalse M00000039_IL_0057
-M00000039_IL_0050:
+brfalse M00000040_IL_0057
+M00000040_IL_0050:
 pop
-M00000039_IL_0051:
+M00000040_IL_0051:
 ldc.i4 0
-M00000039_IL_0052:
-br M00000039_IL_005e
-M00000039_IL_0057:
+M00000040_IL_0052:
+br M00000040_IL_005e
+M00000040_IL_0057:
 unbox.any Char
-M00000039_IL_005c:
+M00000040_IL_005c:
 pop
-M00000039_IL_005d:
+M00000040_IL_005d:
 ldc.i4 1
-M00000039_IL_005e:
-brtrue M00000039_IL_0068
-M00000039_IL_0063:
-br M00000039_IL_0083
-M00000039_IL_0068:
+M00000040_IL_005e:
+brtrue M00000040_IL_0068
+M00000040_IL_0063:
+br M00000040_IL_0083
+M00000040_IL_0068:
 ldstr "\u0027"
-M00000039_IL_006d:
+M00000040_IL_006d:
 ldarg 0
-M00000039_IL_006e:
+M00000040_IL_006e:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M00000039_IL_0073:
+M00000040_IL_0073:
 call System.String::Concat(String,String)
-M00000039_IL_0078:
+M00000040_IL_0078:
 ldstr "\u0027"
-M00000039_IL_007d:
+M00000040_IL_007d:
 call System.String::Concat(String,String)
-M00000039_IL_0082:
+M00000040_IL_0082:
 ret
-M00000039_IL_0083:
-M00000039_IL_0084:
+M00000040_IL_0083:
+M00000040_IL_0084:
 ldarg 0
-M00000039_IL_0085:
+M00000040_IL_0085:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M00000039_IL_008a:
+M00000040_IL_008a:
 ret
 .end
 .end
 .type System.Web.Http.HttpError.TimedOut
 .sealed
 .method instance byref .ctor() -> Void
-M0000003a_IL_0000:
+M00000041_IL_0000:
 ldarg 0
-M0000003a_IL_0001:
+M00000041_IL_0001:
 pop
-M0000003a_IL_0007:
-M0000003a_IL_0008:
+M00000041_IL_0007:
+M00000041_IL_0008:
 ldvoid
 ret
 .end
 .method instance override byref ToString() -> String
-M0000003b_IL_0000:
+M00000042_IL_0000:
 ldstr "HttpError"
-M0000003b_IL_0005:
+M00000042_IL_0005:
 ldstr "."
-M0000003b_IL_000a:
+M00000042_IL_000a:
 call System.String::Concat(String,String)
-M0000003b_IL_000f:
+M00000042_IL_000f:
 ldstr "TimedOut"
-M0000003b_IL_0014:
+M00000042_IL_0014:
 call System.String::Concat(String,String)
-M0000003b_IL_0019:
+M00000042_IL_0019:
 ret
 .end
 .method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
-M0000003c_IL_0000:
+M00000043_IL_0000:
 ldarg 0
-M0000003c_IL_0001:
-M0000003c_IL_0002:
+M00000043_IL_0001:
+M00000043_IL_0002:
 ref.isnull
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M0000003c_IL_0004:
-brtrue M0000003c_IL_000e
-M0000003c_IL_0009:
-br M0000003c_IL_0014
-M0000003c_IL_000e:
+M00000043_IL_0004:
+brtrue M00000043_IL_000e
+M00000043_IL_0009:
+br M00000043_IL_0014
+M00000043_IL_000e:
 ldstr "null"
-M0000003c_IL_0013:
+M00000043_IL_0013:
 ret
-M0000003c_IL_0014:
-M0000003c_IL_0015:
+M00000043_IL_0014:
+M00000043_IL_0015:
 ldarg 0
-M0000003c_IL_0016:
+M00000043_IL_0016:
 isinst String
-M0000003c_IL_001b:
-M0000003c_IL_001c:
+M00000043_IL_001b:
+M00000043_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M0000003c_IL_001e:
-brtrue M0000003c_IL_0028
-M0000003c_IL_0023:
-br M0000003c_IL_0043
-M0000003c_IL_0028:
+M00000043_IL_001e:
+brtrue M00000043_IL_0028
+M00000043_IL_0023:
+br M00000043_IL_0043
+M00000043_IL_0028:
 ldstr "\u0022"
-M0000003c_IL_002d:
+M00000043_IL_002d:
 ldarg 0
-M0000003c_IL_002e:
+M00000043_IL_002e:
 castclass String
-M0000003c_IL_0033:
+M00000043_IL_0033:
 call System.String::Concat(String,String)
-M0000003c_IL_0038:
+M00000043_IL_0038:
 ldstr "\u0022"
-M0000003c_IL_003d:
+M00000043_IL_003d:
 call System.String::Concat(String,String)
-M0000003c_IL_0042:
+M00000043_IL_0042:
 ret
-M0000003c_IL_0043:
-M0000003c_IL_0044:
+M00000043_IL_0043:
+M00000043_IL_0044:
 ldarg 0
-M0000003c_IL_0045:
+M00000043_IL_0045:
 isinst Char
-M0000003c_IL_004a:
+M00000043_IL_004a:
 dup
-M0000003c_IL_004b:
+M00000043_IL_004b:
 ref.isnull
-brfalse M0000003c_IL_0057
-M0000003c_IL_0050:
+brfalse M00000043_IL_0057
+M00000043_IL_0050:
 pop
-M0000003c_IL_0051:
+M00000043_IL_0051:
 ldc.i4 0
-M0000003c_IL_0052:
-br M0000003c_IL_005e
-M0000003c_IL_0057:
+M00000043_IL_0052:
+br M00000043_IL_005e
+M00000043_IL_0057:
 unbox.any Char
-M0000003c_IL_005c:
+M00000043_IL_005c:
 pop
-M0000003c_IL_005d:
+M00000043_IL_005d:
 ldc.i4 1
-M0000003c_IL_005e:
-brtrue M0000003c_IL_0068
-M0000003c_IL_0063:
-br M0000003c_IL_0083
-M0000003c_IL_0068:
+M00000043_IL_005e:
+brtrue M00000043_IL_0068
+M00000043_IL_0063:
+br M00000043_IL_0083
+M00000043_IL_0068:
 ldstr "\u0027"
-M0000003c_IL_006d:
+M00000043_IL_006d:
 ldarg 0
-M0000003c_IL_006e:
+M00000043_IL_006e:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M0000003c_IL_0073:
+M00000043_IL_0073:
 call System.String::Concat(String,String)
-M0000003c_IL_0078:
+M00000043_IL_0078:
 ldstr "\u0027"
-M0000003c_IL_007d:
+M00000043_IL_007d:
 call System.String::Concat(String,String)
-M0000003c_IL_0082:
+M00000043_IL_0082:
 ret
-M0000003c_IL_0083:
-M0000003c_IL_0084:
+M00000043_IL_0083:
+M00000043_IL_0084:
 ldarg 0
-M0000003c_IL_0085:
+M00000043_IL_0085:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M0000003c_IL_008a:
+M00000043_IL_008a:
 ret
 .end
 .end
@@ -1439,9 +1629,9 @@ ret
 .method instance byref .ctor(String message) -> Void
 .local String local0
 .local String unionDefault1_0
-M0000003d_IL_0000:
+M00000044_IL_0000:
 ldarg 0
-M0000003d_IL_0001:
+M00000044_IL_0001:
 pop
 ldloca unionDefault1_0
 initobj String
@@ -1449,165 +1639,165 @@ ldarg 0
 ldloc unionDefault1_0
 stfld System.Web.Http.HttpError.Handler::Metadata_V1_3C6D6573736167653E6B5F5F4261636B696E674669656C64
 pop
-M0000003d_IL_0007:
-M0000003d_IL_0008:
+M00000044_IL_0007:
+M00000044_IL_0008:
 ldarg 1
-M0000003d_IL_0009:
+M00000044_IL_0009:
 stloc local0
-M0000003d_IL_000a:
+M00000044_IL_000a:
 ldarg 0
-M0000003d_IL_000b:
+M00000044_IL_000b:
 ldloc local0
-M0000003d_IL_000c:
+M00000044_IL_000c:
 stfld System.Web.Http.HttpError.Handler::Metadata_V1_3C6D6573736167653E6B5F5F4261636B696E674669656C64
 pop
-M0000003d_IL_0011:
+M00000044_IL_0011:
 ldvoid
 ret
 .end
 .method instance byref get_Message() -> String
-M0000003e_IL_0000:
-M0000003e_IL_0001:
+M00000045_IL_0000:
+M00000045_IL_0001:
 ldarg 0
-M0000003e_IL_0002:
+M00000045_IL_0002:
 ldfld System.Web.Http.HttpError.Handler::Metadata_V1_3C6D6573736167653E6B5F5F4261636B696E674669656C64
-M0000003e_IL_0007:
+M00000045_IL_0007:
 ret
 .end
 .method instance byref Deconstruct(String& Message) -> Void
-M0000003f_IL_0000:
+M00000046_IL_0000:
 ldarg 1
-M0000003f_IL_0001:
+M00000046_IL_0001:
 ldarg 0
-M0000003f_IL_0002:
+M00000046_IL_0002:
 call instance System.Web.Http.HttpError.Handler::get_Message()
-M0000003f_IL_0007:
+M00000046_IL_0007:
 stobj String
-M0000003f_IL_0008:
+M00000046_IL_0008:
 ldvoid
 ret
 .end
 .method instance override byref ToString() -> String
-M00000040_IL_0000:
+M00000047_IL_0000:
 ldstr "HttpError"
-M00000040_IL_0005:
+M00000047_IL_0005:
 ldstr "."
-M00000040_IL_000a:
+M00000047_IL_000a:
 call System.String::Concat(String,String)
-M00000040_IL_000f:
+M00000047_IL_000f:
 ldstr "Handler"
-M00000040_IL_0014:
+M00000047_IL_0014:
 call System.String::Concat(String,String)
-M00000040_IL_0019:
+M00000047_IL_0019:
 ldstr "("
-M00000040_IL_001e:
+M00000047_IL_001e:
 call System.String::Concat(String,String)
-M00000040_IL_0023:
+M00000047_IL_0023:
 ldarg 0
-M00000040_IL_0024:
+M00000047_IL_0024:
 call instance System.Web.Http.HttpError.Handler::get_Message()
-M00000040_IL_0029:
+M00000047_IL_0029:
 castclass System.Object
 call System.Web.Http.HttpError.Handler::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
-M00000040_IL_002e:
+M00000047_IL_002e:
 call System.String::Concat(String,String)
-M00000040_IL_0033:
+M00000047_IL_0033:
 ldstr ")"
-M00000040_IL_0038:
+M00000047_IL_0038:
 call System.String::Concat(String,String)
-M00000040_IL_003d:
+M00000047_IL_003d:
 ret
 .end
 .method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
-M00000041_IL_0000:
+M00000048_IL_0000:
 ldarg 0
-M00000041_IL_0001:
-M00000041_IL_0002:
+M00000048_IL_0001:
+M00000048_IL_0002:
 ref.isnull
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000041_IL_0004:
-brtrue M00000041_IL_000e
-M00000041_IL_0009:
-br M00000041_IL_0014
-M00000041_IL_000e:
+M00000048_IL_0004:
+brtrue M00000048_IL_000e
+M00000048_IL_0009:
+br M00000048_IL_0014
+M00000048_IL_000e:
 ldstr "null"
-M00000041_IL_0013:
+M00000048_IL_0013:
 ret
-M00000041_IL_0014:
-M00000041_IL_0015:
+M00000048_IL_0014:
+M00000048_IL_0015:
 ldarg 0
-M00000041_IL_0016:
+M00000048_IL_0016:
 isinst String
-M00000041_IL_001b:
-M00000041_IL_001c:
+M00000048_IL_001b:
+M00000048_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanToInt32(Boolean)
-M00000041_IL_001e:
-brtrue M00000041_IL_0028
-M00000041_IL_0023:
-br M00000041_IL_0043
-M00000041_IL_0028:
+M00000048_IL_001e:
+brtrue M00000048_IL_0028
+M00000048_IL_0023:
+br M00000048_IL_0043
+M00000048_IL_0028:
 ldstr "\u0022"
-M00000041_IL_002d:
+M00000048_IL_002d:
 ldarg 0
-M00000041_IL_002e:
+M00000048_IL_002e:
 castclass String
-M00000041_IL_0033:
+M00000048_IL_0033:
 call System.String::Concat(String,String)
-M00000041_IL_0038:
+M00000048_IL_0038:
 ldstr "\u0022"
-M00000041_IL_003d:
+M00000048_IL_003d:
 call System.String::Concat(String,String)
-M00000041_IL_0042:
+M00000048_IL_0042:
 ret
-M00000041_IL_0043:
-M00000041_IL_0044:
+M00000048_IL_0043:
+M00000048_IL_0044:
 ldarg 0
-M00000041_IL_0045:
+M00000048_IL_0045:
 isinst Char
-M00000041_IL_004a:
+M00000048_IL_004a:
 dup
-M00000041_IL_004b:
+M00000048_IL_004b:
 ref.isnull
-brfalse M00000041_IL_0057
-M00000041_IL_0050:
+brfalse M00000048_IL_0057
+M00000048_IL_0050:
 pop
-M00000041_IL_0051:
+M00000048_IL_0051:
 ldc.i4 0
-M00000041_IL_0052:
-br M00000041_IL_005e
-M00000041_IL_0057:
+M00000048_IL_0052:
+br M00000048_IL_005e
+M00000048_IL_0057:
 unbox.any Char
-M00000041_IL_005c:
+M00000048_IL_005c:
 pop
-M00000041_IL_005d:
+M00000048_IL_005d:
 ldc.i4 1
-M00000041_IL_005e:
-brtrue M00000041_IL_0068
-M00000041_IL_0063:
-br M00000041_IL_0083
-M00000041_IL_0068:
+M00000048_IL_005e:
+brtrue M00000048_IL_0068
+M00000048_IL_0063:
+br M00000048_IL_0083
+M00000048_IL_0068:
 ldstr "\u0027"
-M00000041_IL_006d:
+M00000048_IL_006d:
 ldarg 0
-M00000041_IL_006e:
+M00000048_IL_006e:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M00000041_IL_0073:
+M00000048_IL_0073:
 call System.String::Concat(String,String)
-M00000041_IL_0078:
+M00000048_IL_0078:
 ldstr "\u0027"
-M00000041_IL_007d:
+M00000048_IL_007d:
 call System.String::Concat(String,String)
-M00000041_IL_0082:
+M00000048_IL_0082:
 ret
-M00000041_IL_0083:
-M00000041_IL_0084:
+M00000048_IL_0083:
+M00000048_IL_0084:
 ldarg 0
-M00000041_IL_0085:
+M00000048_IL_0085:
 call neoCLR.Library.System.Web.Http.HttpError.RuntimeReflection936F30A1978F475D(System.Object)
-M00000041_IL_008a:
+M00000048_IL_008a:
 ret
 .end
 .end

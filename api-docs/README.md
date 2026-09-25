@@ -208,5 +208,10 @@ Development HTTP token/text contracts (2026-09-25) are covered on the existing
 HttpClient, HttpHandler and HttpSocketHandler reference pages. HttpHandler's former
 tokenless Send entry is removed; implementations must accept and forward or honor
 CancellationToken. Both GetString address forms, token variants, strict UTF-8 errors,
-status-200 restriction and ownership behavior are documented with the matching
+success-status policy and ownership behavior are documented with the matching
 reference assembly. Website building remains skipped by explicit author direction.
+
+The final-status slice adds HttpResponse.IsSuccessStatusCode and the source-projected
+HttpError.UnsuccessfulStatus case. The matching reference documents 200–599 responses,
+GetString's 200–299 policy and bodyless status rules. Website sources are updated;
+building the website is deferred by the author's focused-validation direction.

@@ -294,3 +294,38 @@ With the current Raven precedence fix, prefer `await Foo()?` and `try Foo()?`.
 Propagation applies to the complete await or try expression; `(await Foo())?` and
 `(try Foo())?` do not need the outer parentheses. Parenthesize the operand only
 when inner propagation is intended. Use a matching compiler when verifying samples.
+
+## Propagating errors through conversions
+
+Raven's `?` can implicitly convert the error to the enclosing Result's error type,
+including a conversion defined in an extension. Keep domain adaptation owned by the
+application instead of forcing each API to return a shared catch-all error. For example:
+
+```raven
+union AppError {
+    case Http(reason: HttpError)
+}
+
+extension HttpErrorConversion for HttpError {
+    static func implicit(error: HttpError) -> AppError {
+        return AppError.Http(error)
+    }
+}
+```
+
+A function returning `Result<int, AppError>` can propagate `Result<int, HttpError>`
+with `?`; Raven reports RAV1506 for that conversion. The
+[HTTP status fixture](experiments/http-status/Main.rvn) also checks propagation to
+Object through boxing. Matching the nested cause retains structured information;
+converting to Object loses that static structure. Use conversions deliberately at
+application boundaries, not as a replacement for distinct error contracts.
+
+## Pattern-friendly public contracts
+
+Consider deconstruction when designing ordinary classes as well as records. A useful
+Deconstruct contract can expose a stable semantic view for matching/extraction without
+promising value equality, copying or immutability. Choose components and ordering from
+real caller examples; do not mechanically expose all stored members. Named properties
+remain useful alongside positional patterns. This author direction (2026-09-25) asks
+for deliberate Raven-oriented API design, not wholesale adoption of .NET API shapes
+or automatic Deconstruct members on every type.

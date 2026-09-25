@@ -8,11 +8,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Expand development HTTP final statuses to 200–599. Send/Get preserve responses;
+  IsSuccessStatusCode and GetString apply the 200–299 success range, with typed
+  UnsuccessfulStatus errors. Handle bodyless 204/205/304 and serialize final statuses
+  in HttpServer. Add independent client/server status checks and an application-owned
+  extension error-conversion example; improve importer rejection context without
+  widening admitted instructions. Record a supplementary cancellation fixture timeout
+  that remains unresolved; do not count that regression check as passing. Request
+  methods/content remain the next slice.
+
 - Add token-aware HttpClient Send/Get and string/Uri GetString overloads. Forward
   cancellation through DNS/connect/transfers and close exchange-owned connections
   before task cancellation. GetString preserves HTTP errors and strictly decodes
   buffered UTF-8; malformed bytes produce Protocol, with status support still limited
-  to 200. HttpHandler implementations must migrate to Send(request, cancellationToken)
+  to 200 at that checkpoint (expanded above). HttpHandler implementations must migrate
+  to Send(request, cancellationToken)
   and rebuild; client/concrete-handler tokenless overloads remain. Validate request
   isolation, cleanup, late cancellation and selected independent HTTP interoperability.
 

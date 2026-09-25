@@ -1,0 +1,94 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Tasks.*
+import System.Text.*
+import System.Web.Http.*
+
+func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    var status = 600
+    let target = request.Target
+    if target == "/201" {
+        status = 201
+    }
+    if target == "/204" {
+        status = 204
+    }
+    if target == "/205" {
+        status = 205
+    }
+    if target == "/304" {
+        status = 304
+    }
+    if target == "/400" {
+        status = 400
+    }
+    if target == "/404" {
+        status = 404
+    }
+    if target == "/500" {
+        status = 500
+    }
+    if target == "/599" {
+        status = 599
+    }
+    if target == "/bad-body" {
+        status = 204
+    }
+    let empty = (status == 204 || status == 205 || status == 304) && request.Target != "/bad-body"
+    let body = Utf8.Encode(if empty { "" } else { "body" })
+    let result = Promise<Result<HttpResponse, HttpError>>()
+    _ = result.Complete(Ok(HttpResponse(status, ArrayList<HttpHeader>(), body)))
+    return result.Task
+}
+
+class ServerProbe {
+    private val server: HttpServer
+    private var remaining: int = 10
+
+    init(server: HttpServer) {
+        self.server = server
+    }
+
+    func Advance() {
+        remaining -= 1
+        Next()
+    }
+
+    func Next() {
+        if remaining == 0 {
+            server.Close()
+            Console.WriteLine("HTTP statuses served")
+            return
+        }
+        let serving = server.ServeOne(Respond)
+        serving.OnCompleted(() => {
+            let result = serving.GetResult()
+            if remaining > 2 {
+                if let Error(reason) = result {
+                    System.Fault(reason.ToString())
+                }
+            } else {
+                if let Error(HttpError.InvalidRequest(_)) = result {
+                    Console.WriteLine("Rejected response")
+                } else {
+                    System.Fault("Invalid application response was accepted")
+                }
+            }
+            Advance()
+        })
+    }
+}
+
+func Main() {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+        System.Fault("Listen failed")
+        return
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fault("Port unavailable")
+        return
+    }
+    Console.WriteLine(port)
+    ServerProbe(server).Next()
+}

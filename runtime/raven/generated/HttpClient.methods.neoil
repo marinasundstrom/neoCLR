@@ -816,101 +816,99 @@ M0000000f_IL_003b:
 M0000000f_IL_003c:
 ldloc local3
 M0000000f_IL_003d:
-callvirt instance System.Web.Http.HttpResponse::get_StatusCode()
+callvirt instance System.Web.Http.HttpResponse::get_IsSuccessStatusCode()
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M0000000f_IL_0042:
-ldc.i4 200
-M0000000f_IL_0047:
-ceq
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M0000000f_IL_0049:
 ldc.i4 0
-M0000000f_IL_004a:
+M0000000f_IL_0043:
 ceq
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M0000000f_IL_004c:
-brtrue M0000000f_IL_0056
-M0000000f_IL_0051:
-br M0000000f_IL_0071
-M0000000f_IL_0056:
-M0000000f_IL_0057:
-ldstr "GetString currently requires status 200"
-M0000000f_IL_005c:
-newobj instance System.Web.Http.HttpError.Unsupported::.ctor(String)
-M0000000f_IL_0061:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.Unsupported)
-M0000000f_IL_0066:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion18(System.Web.Http.HttpError)
-M0000000f_IL_006b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion19(System.Result.Error<System.Web.Http.HttpError>)
-M0000000f_IL_0070:
-ret
-M0000000f_IL_0071:
-M0000000f_IL_0072:
-M0000000f_IL_0073:
+M0000000f_IL_0045:
+brtrue M0000000f_IL_004f
+M0000000f_IL_004a:
+br M0000000f_IL_006b
+M0000000f_IL_004f:
+M0000000f_IL_0050:
 ldloc local3
-M0000000f_IL_0074:
-callvirt instance System.Web.Http.HttpResponse::get_Content()
-M0000000f_IL_0079:
-callvirt instance System.Web.Http.HttpContent::get_Bytes()
-M0000000f_IL_007e:
-call System.Text.Utf8::Decode(System.Collections.Sequence<Byte>)
-M0000000f_IL_0083:
-stloc local5
-M0000000f_IL_0085:
-ldloca local5
-M0000000f_IL_0087:
-ldloca local6
-M0000000f_IL_0089:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion20(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Ok<String>&)
-M0000000f_IL_008e:
-brfalse M0000000f_IL_00bc
-M0000000f_IL_0093:
-ldloc local6
-M0000000f_IL_0095:
-stloc local7
-M0000000f_IL_0097:
-ldloca local7
-M0000000f_IL_0099:
-ldloca local8
-M0000000f_IL_009b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion21(System.Result.Ok<String>&,String&)
-M0000000f_IL_00a0:
-ldloc local8
-M0000000f_IL_00a2:
-stloc local4
-M0000000f_IL_00a4:
-ldc.i4 1
-M0000000f_IL_00a5:
-br M0000000f_IL_00ab
-M0000000f_IL_00ab:
-brfalse M0000000f_IL_00bc
-M0000000f_IL_00b0:
-M0000000f_IL_00b1:
-br M0000000f_IL_00c1
-M0000000f_IL_00bc:
-br M0000000f_IL_00cf
-M0000000f_IL_00c1:
-M0000000f_IL_00c2:
-ldloc local4
-M0000000f_IL_00c4:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion22(String)
-M0000000f_IL_00c9:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion23(System.Result.Ok<String>)
-M0000000f_IL_00ce:
-ret
-M0000000f_IL_00cf:
-M0000000f_IL_00d0:
-M0000000f_IL_00d1:
-ldstr "Invalid UTF-8 body"
-M0000000f_IL_00d6:
-newobj instance System.Web.Http.HttpError.Protocol::.ctor(String)
-M0000000f_IL_00db:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.Protocol)
-M0000000f_IL_00e0:
+M0000000f_IL_0051:
+callvirt instance System.Web.Http.HttpResponse::get_StatusCode()
+M0000000f_IL_0056:
+newobj instance System.Web.Http.HttpError.UnsuccessfulStatus::.ctor(Int32)
+M0000000f_IL_005b:
+newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.UnsuccessfulStatus)
+M0000000f_IL_0060:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion18(System.Web.Http.HttpError)
-M0000000f_IL_00e5:
+M0000000f_IL_0065:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion19(System.Result.Error<System.Web.Http.HttpError>)
-M0000000f_IL_00ea:
+M0000000f_IL_006a:
+ret
+M0000000f_IL_006b:
+M0000000f_IL_006c:
+M0000000f_IL_006d:
+ldloc local3
+M0000000f_IL_006e:
+callvirt instance System.Web.Http.HttpResponse::get_Content()
+M0000000f_IL_0073:
+callvirt instance System.Web.Http.HttpContent::get_Bytes()
+M0000000f_IL_0078:
+call System.Text.Utf8::Decode(System.Collections.Sequence<Byte>)
+M0000000f_IL_007d:
+stloc local5
+M0000000f_IL_007f:
+ldloca local5
+M0000000f_IL_0081:
+ldloca local6
+M0000000f_IL_0083:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion20(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Ok<String>&)
+M0000000f_IL_0088:
+brfalse M0000000f_IL_00b6
+M0000000f_IL_008d:
+ldloc local6
+M0000000f_IL_008f:
+stloc local7
+M0000000f_IL_0091:
+ldloca local7
+M0000000f_IL_0093:
+ldloca local8
+M0000000f_IL_0095:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion21(System.Result.Ok<String>&,String&)
+M0000000f_IL_009a:
+ldloc local8
+M0000000f_IL_009c:
+stloc local4
+M0000000f_IL_009e:
+ldc.i4 1
+M0000000f_IL_009f:
+br M0000000f_IL_00a5
+M0000000f_IL_00a5:
+brfalse M0000000f_IL_00b6
+M0000000f_IL_00aa:
+M0000000f_IL_00ab:
+br M0000000f_IL_00bb
+M0000000f_IL_00b6:
+br M0000000f_IL_00c9
+M0000000f_IL_00bb:
+M0000000f_IL_00bc:
+ldloc local4
+M0000000f_IL_00be:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion22(String)
+M0000000f_IL_00c3:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion23(System.Result.Ok<String>)
+M0000000f_IL_00c8:
+ret
+M0000000f_IL_00c9:
+M0000000f_IL_00ca:
+M0000000f_IL_00cb:
+ldstr "Invalid UTF-8 body"
+M0000000f_IL_00d0:
+newobj instance System.Web.Http.HttpError.Protocol::.ctor(String)
+M0000000f_IL_00d5:
+newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.Protocol)
+M0000000f_IL_00da:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion18(System.Web.Http.HttpError)
+M0000000f_IL_00df:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion19(System.Result.Error<System.Web.Http.HttpError>)
+M0000000f_IL_00e4:
 ret
 .end
 .method private static Cancelled() -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>

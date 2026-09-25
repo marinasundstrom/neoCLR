@@ -250,6 +250,7 @@
   "System.Web.Http.HttpError.Protocol",
   "System.Web.Http.HttpError.TimedOut",
   "System.Web.Http.HttpError.Transport",
+  "System.Web.Http.HttpError.UnsuccessfulStatus",
   "System.Web.Http.HttpError.Unsupported",
   "System.Web.Http.HttpHandler",
   "System.Web.Http.HttpHeader",

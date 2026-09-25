@@ -363,7 +363,16 @@ static class SignatureProbe
         baseSetter.Parameters[0].ParameterType = module.TypeSystem.String;
         Reject("HTTP base setter rejects plain string signature", () => HttpBindings.Bind(baseSetter, baseSetter, false, false));
         baseSetter.Parameters[0].ParameterType = baseArgument;
+        var successStatus = module.GetType("System.Web.Http.HttpResponse").Methods.Single(m => m.Name == "get_IsSuccessStatusCode");
+        Check("HTTP success status property", HttpBindings.Bind(successStatus, successStatus, false, false)?.Result == "Boolean");
         var httpError = module.GetType("System.Web.Http.HttpError");
+        var statusCase = httpError.NestedTypes.Single(t => t.Name == "UnsuccessfulStatus");
+        var statusCtor = statusCase.Methods.Single(m => m.IsConstructor);
+        var statusCall = Reference(statusCtor, statusCase);
+        Check("HTTP status error preserves numeric payload", ErrorBindings.Construct(statusCall, statusCtor)
+            is { Result: "System.Web.Http.HttpError.UnsuccessfulStatus", Arguments: ["Int32"] });
+        statusCall.Parameters[0].ParameterType = module.TypeSystem.String;
+        Reject("HTTP status error rejects text payload", () => ErrorBindings.Construct(statusCall, statusCtor));
         var transportCase = httpError.NestedTypes.Single(t => t.Name == "Transport");
         var transportCtor = transportCase.Methods.Single(m => m.IsConstructor);
         var transportCall = Reference(transportCtor, transportCase);

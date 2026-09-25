@@ -194,11 +194,15 @@ public class HttpServer {
     }
 
     internal static func EncodeResponse(response: HttpResponse) -> Result<Sequence<byte>, HttpError> {
-        if response.StatusCode != 200 {
-            return Error(HttpError.Unsupported("Only status 200 is supported"))
+        let status = response.StatusCode
+        if !(status >= 200 && status <= 599) {
+            return Error(HttpError.InvalidRequest("A final response status from 200 through 599 is required"))
         }
         let body = response.Content.Bytes
         let count = body.Count
+        if (status == 204 || status == 205 || status == 304) && count != 0 {
+            return Error(HttpError.InvalidRequest("This response status cannot contain content"))
+        }
         if count > 1024 {
             return Error(HttpError.LimitExceeded("Response body limit exceeded"))
         }
@@ -206,7 +210,11 @@ public class HttpServer {
         if fields.Count > 14 {
             return Error(HttpError.LimitExceeded("Response header count exceeded"))
         }
-        var wire = String.Concat("HTTP/1.1 200 OK\r\nContent-Length: ", count.ToString())
+        let reason = if status == 200 { "OK" } else { "" }
+        var wire = String.Concat(String.Concat("HTTP/1.1 ", status.ToString()), String.Concat(" ", reason))
+        if status != 204 && status != 304 {
+            wire = String.Concat(wire, String.Concat("\r\nContent-Length: ", count.ToString()))
+        }
         wire = String.Concat(wire, "\r\nConnection: close\r\n")
         var index = 0
         while index < fields.Count {

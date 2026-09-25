@@ -79,7 +79,12 @@ value semantics, typed DNS results and Socket overloads. The [cancellation found
 now provide invocation-local source/token/registration contracts and keep a request
 separate from acknowledged completion. [BaseUri and string/Uri address overloads](http-client-design.md#baseuri-and-address-overloads--implemented-2026-09-25)
 are now integrated and tested through the handler pipeline. Slice 4 is complete for
-the bounded GET/200 POC; the next slice is methods, content and response statuses.
+the bounded GET POC. Slice 5 now supports final response statuses 200–599,
+IsSuccessStatusCode and GetString status errors, with bodyless 204/205/304 handling
+and [independent status evidence](experiments/http-status/README.md). Request methods
+and content remain next within slice 5. A supplementary cancellation headers rerun
+settled with TimedOut before the control signal; [the evidence](experiments/http-status/README.md)
+keeps this unresolved validation issue visible before release.
 The [private native cancellation hooks](cancellation-design.md#native-operation-acknowledgement--implemented-2026-09-25)
 now cover DNS, connect, accept and transfers, preserving completion ownership.
 Managed DNS/socket token registration and acknowledgement are now implemented, with
@@ -1173,3 +1178,11 @@ types; compare interface-based dispatch with today's concrete overloads. Interfa
 could reduce overload duplication but add compiler/runtime and contract complexity.
 This remains after current primitive Object consistency work and does not reprioritize
 the active milestone.
+
+### HTTP status names and pattern contracts — discussion, 2026-09-25
+
+The author asks about an HttpStatusCode enum; the proposed next bounded follow-up
+is named statuses with unknown numeric values preserved. The author also suggests
+Deconstruct on HttpResponse and HttpRequest for Raven pattern-based inspection.
+Evaluate those shapes against the request/content sample in slice 5; no positional
+contract is committed yet. See [the status design](http-client-design.md#follow-up-httpstatuscode-enum).

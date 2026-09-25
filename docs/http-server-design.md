@@ -60,3 +60,14 @@ HttpError.ToString at its reporting boundary. A transfer timeout now reports the
 underlying TimedOut socket cause rather than the former generic receive-failed text;
 application Handler errors preserve their message. No method/status/body expansion
 is included in this error-model slice.
+
+## Final status serialization — 2026-09-25
+
+The development server now serializes final statuses 200–599. It rejects nonempty
+content for 204/205/304, omits Content-Length for 204/304 and writes length zero for
+205. Other statuses retain computed Content-Length. The reason phrase remains OK for
+200 and is empty for other codes; HTTP does not require a descriptive phrase.
+Invalid status/body combinations return InvalidRequest before writing a response.
+See the [client status design](http-client-design.md#final-response-statuses--implemented-2026-09-25)
+for the RFC/.NET comparison and [focused fixture](experiments/http-status/README.md)
+for independent wire checks. Request methods and bodies remain the next slice.

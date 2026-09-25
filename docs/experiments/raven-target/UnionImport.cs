@@ -415,7 +415,7 @@ static class UnionImport
                         if (appRead is not null)
                         {
                             var receiver = Pop().Type;
-                            if (!ApplicationTypes.Assignable(receiver, appRead.Owner) && receiver != appRead.Owner + "&") throw new InvalidDataException("Invalid application field receiver.");
+                            if (!ApplicationTypes.Assignable(receiver, appRead.Owner) && receiver != appRead.Owner + "&") throw new InvalidDataException($"Invalid application field receiver in {method.FullName} at {instruction.Offset:x4}: {receiver}, expected {appRead.Owner}.");
                             Push(new(appRead.Type == "Boolean" ? "Int32" : PrimitiveBindings.Stack(appRead.Type)));
                             if ((PrimitiveLibrary.IsMatched(readField.DeclaringType.Resolve()) || OpaqueLibrary.IsString(readField.DeclaringType.Resolve()) || ArrayLibrary.IsMatched(readField.DeclaringType.Resolve())))
                             {
@@ -917,7 +917,7 @@ static class UnionImport
                                     // Token members only observe their source; captured/array token receivers are valid.
                                     if (n == 0 && reference.HasThis && CancellationBindings.Type(reference.DeclaringType) == CancellationBindings.Token
                                         && !targetMethod.IsConstructor) continue;
-                                    throw new InvalidDataException("Only local addresses admitted.");
+                                    throw new InvalidDataException($"Only local addresses admitted in {method.FullName} at {instruction.Offset:x4}: {reference.FullName} argument {n}.");
                                 }
                                 if (n == call.OutArgument)
                                 {

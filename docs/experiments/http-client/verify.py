@@ -109,7 +109,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-client-') as folder, socket
         ('empty body', [b'HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n'], False, 'HTTP 200\n\n'),
         ('mixed case and whitespace', [b'HTTP/1.1 200 OK\r\ncOnTeNt-LeNgTh:\t10 \t\r\n\r\n' + body], False, 'HTTP 200\nCafé 🌍\n'),
         ('missing length', [b'HTTP/1.1 200 OK\r\n\r\n'], False, 'HTTP error: Content-Length required\n'),
-        ('unsupported status', [b'HTTP/1.1 204 No Content\r\nContent-Length: 0\r\n\r\n'], False, 'HTTP error: Unsupported status line\n'),
+        ('invalid 204 length', [b'HTTP/1.1 204 No Content\r\nContent-Length: 0\r\n\r\n'], False, 'HTTP error: Content-Length is prohibited for status 204\n'),
         ('bare LF', [b'HTTP/1.1 200 OK\n'], False, 'HTTP error: Bare LF in headers\n'),
         ('bare CR', [b'HTTP/1.1 200 OK\rX'], False, 'HTTP error: Bare CR in headers\n'),
         ('negative length', [b'HTTP/1.1 200 OK\r\nContent-Length: -1\r\n\r\n'], False, 'HTTP error: Invalid Content-Length\n'),

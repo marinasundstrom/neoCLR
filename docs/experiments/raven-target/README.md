@@ -1184,3 +1184,10 @@ consistently. The test-only `--standard-union-library-core` command builds throw
 reference stubs for this fixture, not a production reference pack. Public library
 migration and consumer binding remain later work; runtime instructions, Raven emission
 and Runtime Contract configuration are unchanged.
+
+The [HTTP status checkpoint](../http-status/README.md) adds an exact Boolean getter
+binding for HttpResponse.IsSuccessStatusCode and a source-projected Int32 payload
+for HttpError.UnsuccessfulStatus. Import rejection diagnostics now include the method
+and instruction for invalid application field receivers/nonlocal addresses; admission
+rules are unchanged. The fixture also exercises `?` with an application-owned implicit
+extension conversion and Object boxing. No Runtime Contract setting changes.

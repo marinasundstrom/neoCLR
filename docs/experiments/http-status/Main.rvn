@@ -1,0 +1,147 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("HTTP status contract failed")
+    }
+}
+
+// Application-owned conversion preserves the HTTP cause; no global library conversion is imposed.
+union AppError {
+    case Http(reason: HttpError)
+}
+
+extension HttpErrorConversion for HttpError {
+    static func implicit(error: HttpError) -> AppError {
+        return AppError.Http(error)
+    }
+}
+
+func FailedNumber() -> Result<int, HttpError> {
+    return Error(HttpError.UnsuccessfulStatus(404))
+}
+
+func ConvertedError() -> Result<int, AppError> {
+    let value = FailedNumber()?
+    return Ok(value)
+}
+
+func BoxedError() -> Result<int, Object> {
+    let value = FailedNumber()?
+    return Ok(value)
+}
+
+class StatusProbe {
+    private var client: HttpClient = HttpClient()
+    private var codes: int[] = [201, 204, 205, 304, 400, 404, 500, 599]
+    private var index: int = 0
+    private var failures: int = 0
+
+    func Next() {
+        if index == codes.Length {
+            Invalid()
+            return
+        }
+        let code = codes[index]
+        let statusNumber = code
+        let url = String.Concat("http://127.0.0.1:19091/", statusNumber.ToString())
+        let pending = client.Get(url)
+        pending.OnCompleted(() => {
+            let Ok(response) = pending.GetResult() else {
+                System.Fault("Final status was treated as transport failure")
+                return
+            }
+            Check(response.StatusCode == code)
+            Check(response.IsSuccessStatusCode == (code >= 200 && code <= 299))
+            if code == 204 || code == 205 || code == 304 {
+                Check(response.Content.Bytes.Count == 0)
+            } else {
+                Check(response.Content.Bytes.Count == 4)
+            }
+            Text(url, code)
+        })
+    }
+
+    func Advance() {
+        index += 1
+        Next()
+    }
+
+    func AdvanceFailure() {
+        failures += 1
+        Invalid()
+    }
+
+    func Text(url: string, code: int) {
+        let pending = client.GetString(url)
+        pending.OnCompleted(() => {
+            let result = pending.GetResult()
+            if code >= 200 && code <= 299 {
+                let Ok(text) = result else {
+                    System.Fault("Successful text request failed")
+                    return
+                }
+                Check(text == (if code == 204 || code == 205 { "" } else { "body" }))
+            } else {
+                let Error(HttpError.UnsuccessfulStatus(actual)) = result else {
+                    System.Fault("Non-success status cause lost")
+                    return
+                }
+                Check(actual == code)
+            }
+            Console.WriteLine(code)
+            Advance()
+        })
+    }
+
+    func Invalid() {
+        if failures == 6 {
+            Console.WriteLine("HTTP status and conversion checks passed")
+            return
+        }
+        let failureNumber = failures
+        let pending = client.Get(String.Concat("http://127.0.0.1:19091/invalid-", failureNumber.ToString()))
+        pending.OnCompleted(() => {
+            if failures == 2 {
+                if let Error(HttpError.Unsupported(_)) = pending.GetResult() {
+                    Check(true)
+                } else {
+                    System.Fault("Informational response was accepted")
+                }
+            } else {
+                if let Error(HttpError.Protocol(_)) = pending.GetResult() {
+                    Check(true)
+                } else {
+                    System.Fault("Malformed response was accepted")
+                }
+            }
+            AdvanceFailure()
+        })
+    }
+}
+
+func Main() {
+    let Error(appError) = ConvertedError() else {
+        System.Fault("Extension conversion did not return an error")
+        return
+    }
+    let AppError.Http(reason) = appError else {
+        System.Fault("Extension conversion did not wrap HTTP error")
+        return
+    }
+    if let HttpError.UnsuccessfulStatus(code) = reason {
+        Check(code == 404)
+    } else {
+        System.Fault("Extension conversion did not preserve status")
+    }
+    if let Error(boxed) = BoxedError() {
+        Check(boxed.ToString() == "HTTP status 404")
+    } else {
+        System.Fault("Object error conversion failed")
+    }
+    StatusProbe().Next()
+}

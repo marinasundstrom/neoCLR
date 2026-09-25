@@ -124,10 +124,10 @@ func CheckContracts() {
     } else {
         System.Fault("Invalid UTF-8 was accepted")
     }
-    if let Error(HttpError.Unsupported(_)) = status.GetResult() {
-        Check(true)
+    if let Error(HttpError.UnsuccessfulStatus(code)) = status.GetResult() {
+        Check(code == 404)
     } else {
-        System.Fault("Unsupported status was accepted")
+        System.Fault("Non-success status was accepted")
     }
     if let Error(HttpError.InvalidRequest(_)) = badUri.GetResult() {
         Check(true)
@@ -180,7 +180,12 @@ func Main() {
     let text = client.GetString("cancel-text", source.Token)
     let survivor = client.GetString("keep", CancellationToken.None)
     response.OnCompleted(() => {
-        Check(response.IsCancelled)
+        if !response.IsCancelled {
+            if let Error(reason) = response.GetResult() {
+                System.Fault(String.Concat("Response completed before cancellation: ", reason.ToString()))
+            }
+            System.Fault("Response succeeded before cancellation")
+        }
         Console.WriteLine("HTTP response cancelled")
     })
     text.OnCompleted(() => {

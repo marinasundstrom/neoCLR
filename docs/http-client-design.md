@@ -499,8 +499,8 @@ disposal or cross-invocation thread-safety promise.
 
 GetString uses Get and the existing cancellation-aware Task.Map to decode a completed
 buffered response. HTTP errors remain HttpError; malformed UTF-8 becomes Protocol.
-The helper accepts only status 200, matching the transport's present scope; a custom
-handler returning another status produces Unsupported. ReadText keeps its existing
+The helper now accepts 200–299; other statuses, including custom handler replies,
+produce UnsuccessfulStatus with the original code (see the status checkpoint below). ReadText keeps its existing
 provisional string-error contract. No charset negotiation, decoding replacement,
 streaming or decompression is implied. Conversion does not reread the token after
 its response task completes, so an already settled response is not retroactively
@@ -515,8 +515,8 @@ accepts a cancellation token, while
 has string/Uri and token overloads, reads the complete response body, and requires a
 successful 200–299 status. neoCLR adopts the pipeline/token and buffered-text roles.
 It returns typed Result errors and Task cancellation instead of HTTP exceptions.
-Its 200-only status and strict UTF-8 policy are temporary restrictions, with reduced
-interoperability; broader status/encoding behavior remains future work.
+Its strict UTF-8 policy remains a temporary restriction, with reduced encoding
+interoperability. Final status support is recorded below.
 
 Using the existing Task.Map avoids a second response buffer or another public async
 abstraction, but still allocates a continuation and decoded string. An async method
@@ -529,3 +529,57 @@ pre-cancellation, custom/nested handlers, native acknowledgement and connection 
 request isolation, text errors and completion winning a late request. The independent
 .NET comparison establishes the common behavior while preserving the stated POC
 differences. Selected existing client interoperability checks now exercise GetString.
+
+## Final response statuses — implemented 2026-09-25
+
+Send/Get now preserve final HTTP/1.1 statuses 200–599 as response data. The new
+IsSuccessStatusCode property reports 200–299; GetString applies that policy and
+returns HttpError.UnsuccessfulStatus(statusCode) otherwise. This matches the roles
+of .NET's [IsSuccessStatusCode](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpresponsemessage.issuccessstatuscode?view=net-10.0)
+and GetStringAsync, while exposing a Result case rather than an HTTP exception.
+A caller can inspect a 404 body through Get without treating it as a transport error.
+
+Following [RFC 9112 message body length](https://www.rfc-editor.org/rfc/rfc9112.html#section-6.3),
+204/304 complete after headers without waiting for EOF. A 204 Content-Length is
+rejected; a 304 length is representation metadata, bounded here to Int32.MaxValue,
+and does not allocate a body. A 205 requires Content-Length: 0 in this bounded
+transport. Other responses still require exactly one Content-Length and the existing
+1,024-byte bound. Empty reason phrases are accepted; malformed/out-of-range codes
+are Protocol errors. Informational 1xx is explicitly Unsupported, pending framing
+work. Redirects are returned without following them. Chunking, close-delimited bodies
+and content decoding negotiation remain out of scope.
+
+The alternative of accepting only known named status codes would reject extension
+codes without helping framing. The bounded numeric range permits extensions such as
+599 while retaining status-specific body rules. Strict framing remains deliberately
+less interoperable than .NET's general HTTP implementation.
+
+The [status fixture](experiments/http-status/README.md) compares .NET and neoCLR
+against an independent raw peer, checks server wire output and demonstrates error
+propagation with an application-owned implicit extension conversion. No global
+HttpError-to-application-error conversion is added to the library.
+
+### Follow-up: HttpStatusCode enum
+
+The author asks whether status codes should have an enum. The proposed follow-up is
+System.Web.Http.HttpStatusCode, compared with [.NET's HttpStatusCode](https://learn.microsoft.com/en-us/dotnet/api/system.net.httpstatuscode?view=net-10.0).
+Named constants improve readability; unlisted numeric codes must remain representable
+for protocol extensions. This is not a closed union and names do not imply transport
+support (notably 1xx). Verify casts, unknown-value formatting and metadata before
+changing HttpResponse and UnsuccessfulStatus signatures. The current slice retains
+int and does not claim the enum is implemented.
+
+### Later pattern-based inspection
+
+The author also identifies Raven patterns as a way to inspect/deconstruct both
+HttpResponse and, on the server, HttpRequest. A Deconstruct contract remains proposed;
+no positional signature is selected yet. Evaluate request method/URI and response
+status/header/content shapes against an actual handler sample as request content is
+added. Properties remain the primary contract. Deconstruction adds positional coupling
+and overload choices, so avoid exposing every field simply because it exists.
+
+The author clarifies that record-like deconstruction should be considered for ordinary
+API classes independently of value-object semantics. Treat this as a general design
+consideration, not a request to make requests/responses structurally equal or to freeze
+all their content. Explore semantic patterns in real samples before committing an
+ordered Deconstruct signature; property inspection remains available.

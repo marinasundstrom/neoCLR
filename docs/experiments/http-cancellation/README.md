@@ -43,3 +43,11 @@ matrix or general framing matrix was run for this slice.
 The .NET baseline accepts all 2xx statuses; neoCLR remains limited to 200 until the
 status slice. This is an explicit POC limit, not a proposed improvement. The test does
 not add HTTPS, server cancellation, configurable timeouts or general status support.
+
+Follow-up during the final-status slice (2026-09-25): a selected `headers` rerun
+passed its initial custom-handler/text checks but failed the network cancellation
+expectation because the response settled with HttpError.TimedOut before the control
+signal was processed. The callback now reports that competing error explicitly.
+The check remains strict; no timeout or cancellation semantics were relaxed. Track
+this timing/performance observation before release and compare the earlier checkpoint
+before attributing it to a particular change. Earlier passing evidence remains historical.
