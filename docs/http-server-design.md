@@ -82,3 +82,54 @@ rejected. Request bodies share the 1,024-byte bound; incomplete EOF never invoke
 handler. No keep-alive, streaming or new cancellation/deadline policy is introduced.
 See the [client design comparison](http-client-design.md#buffered-post-checkpoint--2026-09-25)
 and [independent client/server checks](experiments/http-post/README.md).
+
+## Explicit asynchronous acceptance — exploration, 2026-09-25
+
+The author proposes an asynchronous Accept/AcceptRequest alternative to callback-based
+ServeOne, returning Result with a request/response pair such as HttpContext. Record
+this for the server-lifecycle slice; naming, an options argument and response shape
+are not selected APIs. The current implementation remains callback-based.
+
+Primary comparison reviewed 2026-09-25:
+[.NET HttpListener.GetContextAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistener.getcontextasync?view=net-10.0)
+returns a Task<HttpListenerContext>, and
+[HttpListenerContext](https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistenercontext?view=net-10.0)
+groups the incoming request and outgoing response. This is an API-shape comparison,
+not adoption of HttpListener's implementation, URI-prefix model or platform behavior.
+
+A candidate neoCLR shape is Accept(cancellationToken) returning
+Task<Result<HttpContext, HttpError>>. AcceptRequest is an alternative method name;
+do not introduce an AcceptRequest options type without concrete options. Expected
+transport/protocol failures remain Result errors; cancellation follows the existing
+Task cancellation contract. Returning a context transfers responsibility for completing
+or abandoning that exchange to the caller, making cleanup part of the public design.
+
+For the buffered checkpoint, prefer evaluating context.Request plus an explicit
+Respond(HttpResponse, cancellationToken) returning Task<Result<unit, HttpError>>.
+An outgoing response writer exposed as context.Response is another viable shape,
+particularly with stream-backed content, but must be distinguished from the current
+passive HttpResponse message used by clients and callbacks. A bare pair of passive
+messages would not express sending, completion or connection ownership.
+
+Contracts to settle and test before implementation:
+
+- Accept completes once a valid request is available. Initially that can include the
+  buffered body; streaming must revisit the header/body boundary.
+- Context owns the accepted exchange, not the listener. Disposal/Close abandons an
+  unfinished response and releases resources; garbage collection is not the cleanup
+  protocol. Sending completes one final response; duplicate sends and operations after
+  close need explicit errors. Decide whether pre-send validation permits correction.
+- Accept cancellation and response cancellation have distinct lifetimes. Cancelling
+  a pending accept must not silently invalidate an already returned context. Specify
+  how listener shutdown affects active contexts and pending operations.
+- Caller chooses sequential or concurrent handling. Define concurrent accept support
+  and active-context bounds instead of inferring unbounded concurrency.
+- Build ServeOne as an adapter over the same accept/respond machinery where practical,
+  with guaranteed cleanup on handler Result errors, cancellation and runtime failure.
+  Preserve both public styles without duplicating HTTP parsing/framing.
+
+This gives applications an explicit control-flow option and a foundation for future
+response streams, at the cost of exposing lifetime management currently hidden by
+ServeOne. Validate peer disconnects, malformed input, early return/abandonment,
+duplicate response, cancellation and shutdown with independent peers and GC/resource
+checks. This proposal does not require runtime suspension or a new public scheduler.

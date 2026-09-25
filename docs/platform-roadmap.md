@@ -73,7 +73,11 @@ release date. Continue the current typed HTTP/error/base-address integration fir
 **Author follow-up:** requests completion of the slices one by one. The sequence is
 1. typed HTTP errors; 2. IPAddress; 3. cancellation foundations; 4. HttpClient/base
 address; 5. methods/content/statuses; 6. framing; 7. server lifecycle; 8. application;
-9. release stabilization. The [address hierarchy checkpoint](experiments/ip-address-hierarchy/README.md)
+9. release stabilization. The author proposes an explicit asynchronous
+Accept/AcceptRequest returning a Result<HttpContext, HttpError> alongside callbacks;
+[evaluate ownership and response completion in slice 7](http-server-design.md#explicit-asynchronous-acceptance--exploration-2026-09-25).
+This is a design candidate, not an implemented API or a change to the current slice order.
+The [address hierarchy checkpoint](experiments/ip-address-hierarchy/README.md)
 now links the [implemented address slice](ip-address-design.md): public parsing/formatting,
 value semantics, typed DNS results and Socket overloads. The [cancellation foundations](cancellation-design.md)
 now provide invocation-local source/token/registration contracts and keep a request

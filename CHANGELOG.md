@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Record an exploratory HttpServer accept/context API alongside callbacks for the
+  server-lifecycle slice, including response completion, ownership and cancellation
+  questions and the .NET comparison. No runtime or public API change.
+
 - Add development HttpRequest.WithHeader returning a new request with a replaced
   application field. Validate names/values and reserve transport/content controls;
   socket Send now serializes application headers for GET and POST, revalidates before

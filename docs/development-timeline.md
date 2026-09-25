@@ -7182,3 +7182,19 @@ configuration/content, not target-specific code added to Raven main.
   selects a collection entry by name and can fail validation, rather than directly
   setting a property in a copy. Keep it outside the prospective with-expression mapping;
   the broader future direction for suitable With* methods remains open.
+
+## 2026-09-25 — Explicit HTTP accept as a callback alternative
+
+- **Author proposal:** HttpServer could expose asynchronous Accept/AcceptRequest,
+  returning a Result containing a request/response pair such as HttpContext, alongside
+  the callback-focused API. The exact method/argument spelling remains exploratory.
+- **Assistant investigation:** inspect the existing exchange, which owns accept,
+  parsing, handler invocation, sending and connection cleanup; compare .NET
+  HttpListener.GetContextAsync and HttpListenerContext using primary documentation.
+- **Assistant proposal:** evaluate Task<Result<HttpContext, HttpError>>, with request
+  access and an explicit response completion capability. For the buffered stage,
+  Respond(HttpResponse) could reuse the existing message type; a live Response writer
+  remains an alternative for stream-backed output. Make context cleanup, cancellation,
+  one-response state and server shutdown explicit; keep ServeOne as a possible adapter.
+- **Outcome:** record the design candidate in the server-lifecycle slice. No Accept,
+  HttpContext, response writer or options type is implemented or finalized here.
