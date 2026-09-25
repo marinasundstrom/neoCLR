@@ -470,3 +470,62 @@ HTTP calls remain tokenless. The next step is forwarding the token through HttpH
 and HttpExchange, observing cancelled child tasks without calling GetResult, closing
 the exchange-owned socket, then exposing terminal HTTP cancellation. The public
 Send/Get token overloads and GetString are not implemented by this prerequisite.
+
+## HTTP token forwarding and GetString — 2026-09-25
+
+Development HttpHandler now requires `Send(request, cancellationToken)`. HttpClient
+and HttpSocketHandler retain tokenless convenience overloads, and HttpClient adds
+token-aware Get plus GetString for string and Uri addresses. Existing custom handlers
+must add the token parameter and forward or honor it; rebuild callers and library
+with the matching reference assembly. No runtime instruction or compiler policy is
+changed. These are ordinary method/interface contracts over the existing token value.
+
+A pre-requested token returns a cancelled task before request parsing or dispatch.
+The socket handler passes one token through its private shared-deadline DNS/connect/
+send/receive paths. It checks child-task cancellation before GetResult and closes its
+owned connection before cancelling its output Promise. Native outcome commitment
+still decides individual operation races. Cancellation after a successful phase
+prevents the next phase; a fully received response can survive a later cancellation
+request before managed delivery. Existing deadline checks can still produce timeout
+errors. Timeout is not reported as caller cancellation. Blocked host DNS can outlive
+guest acknowledgement under its existing bounded-capacity policy.
+
+The client does not race custom handlers against cancellation. Handlers own their
+work and cleanup: forwarding preserves the token, and a replacement handler must
+acknowledge only after its owned work ends. Forced client-side completion could hide
+live resources. Source disposal still unregisters without cancelling work. Independent
+exchanges use separate buffers, tasks and connections. There is no injected-handler
+disposal or cross-invocation thread-safety promise.
+
+GetString uses Get and the existing cancellation-aware Task.Map to decode a completed
+buffered response. HTTP errors remain HttpError; malformed UTF-8 becomes Protocol.
+The helper accepts only status 200, matching the transport's present scope; a custom
+handler returning another status produces Unsupported. ReadText keeps its existing
+provisional string-error contract. No charset negotiation, decoding replacement,
+streaming or decompression is implied. Conversion does not reread the token after
+its response task completes, so an already settled response is not retroactively
+cancelled while waiting for its mapping continuation.
+
+### Comparison and tradeoffs
+
+Reviewed 2026-09-25: .NET 10's
+[HttpMessageHandler.SendAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpmessagehandler.sendasync?view=net-10.0)
+accepts a cancellation token, while
+[HttpClient.GetStringAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.getstringasync?view=net-10.0)
+has string/Uri and token overloads, reads the complete response body, and requires a
+successful 200–299 status. neoCLR adopts the pipeline/token and buffered-text roles.
+It returns typed Result errors and Task cancellation instead of HTTP exceptions.
+Its 200-only status and strict UTF-8 policy are temporary restrictions, with reduced
+interoperability; broader status/encoding behavior remains future work.
+
+Using the existing Task.Map avoids a second response buffer or another public async
+abstraction, but still allocates a continuation and decoded string. An async method
+or dedicated text adapter was an alternative; neither needs new runtime suspension
+machinery. The private exchange callback state remains replaceable when suspension
+arrives. No speed or allocation-performance advantage is claimed.
+
+The [focused peer-controlled fixture](experiments/http-cancellation/README.md) verifies
+pre-cancellation, custom/nested handlers, native acknowledgement and connection close,
+request isolation, text errors and completion winning a late request. The independent
+.NET comparison establishes the common behavior while preserving the stated POC
+differences. Selected existing client interoperability checks now exercise GetString.

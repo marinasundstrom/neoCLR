@@ -345,6 +345,17 @@ static class SignatureProbe
             foreach (var get in module.GetType(httpOwner).Methods.Where(m => m.Name == "Get"))
                 Check("HTTP address overload " + get.FullName,
                     HttpBindings.Bind(get, get, false, false) is not null);
+        foreach (var httpOwner in new[] { "HttpClient", "HttpHandler", "HttpSocketHandler" })
+            foreach (var method in module.GetType(HttpBindings.Prefix + httpOwner).Methods.Where(m => m.Name is "Send" or "GetString")) {
+                Check("HTTP token/text contract " + method.FullName, HttpBindings.Bind(method, method, false, false) is not null);
+                if (method.Parameters.LastOrDefault()?.ParameterType.FullName == CancellationBindings.Token) {
+                    var parameter = method.Parameters[^1];
+                    var originalType = parameter.ParameterType;
+                    parameter.ParameterType = module.TypeSystem.Int32;
+                    Reject("HTTP rejects non-token signature", () => HttpBindings.Bind(method, method, false, false));
+                    parameter.ParameterType = originalType;
+                }
+            }
         var baseSetter = module.GetType("System.Web.Http.HttpClient").Methods.Single(m => m.Name == "set_BaseUri");
         Check("HTTP optional string base setter", HttpBindings.Bind(baseSetter, baseSetter, false, false)
             is { Arguments: ["System.Web.Http.HttpClient", "System.Option<String>"], Result: "noresult" });

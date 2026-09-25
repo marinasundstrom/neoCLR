@@ -3,6 +3,7 @@ import System.Option.*
 import System.Result.*
 import System.Collections.*
 import System.Tasks.*
+import System.Concurrency.*
 import System.Text.*
 import System.Web.Http.*
 
@@ -18,7 +19,7 @@ class CaptureHandler : HttpHandler {
     var Target: string = ""
     var Port: int = 0
 
-    func Send(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         Calls += 1
         Host = request.Host
         Port = request.Port
@@ -37,9 +38,9 @@ class Forwarder : HttpHandler {
         self.inner = inner
     }
 
-    func Send(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         Calls += 1
-        return inner.Send(request)
+        return inner.Send(request, cancellationToken)
     }
 }
 

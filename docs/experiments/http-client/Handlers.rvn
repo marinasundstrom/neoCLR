@@ -2,6 +2,7 @@ import System.*
 import System.Collections.*
 import System.Result.*
 import System.Tasks.*
+import System.Concurrency.*
 import System.Text.*
 import System.Web.Http.*
 import System.Networking.*
@@ -19,9 +20,9 @@ class RecordingHandler : HttpHandler {
         self.events = events
     }
 
-    async func Send(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    async func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         events.Add(String.Concat(name, " before"))
-        let outcome = await inner.Send(request)
+        let outcome = await inner.Send(request, cancellationToken)
         events.Add(String.Concat(name, " after"))
         return outcome
     }
@@ -35,7 +36,7 @@ class FakeHandler : HttpHandler {
         self.fail = fail
     }
 
-    func Send(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         Calls += 1
         Check(request.Method == "GET")
         Check(request.Host == "example.test")

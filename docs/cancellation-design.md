@@ -85,7 +85,7 @@ The runtime-library bridge now admits private `SocketCancel(operation)` and
 comparison above: the source/token API requests cooperation; the provider must
 still finish operation ownership before completing a Task. These hooks are an
 internal implementation mechanism, not a public handle-based cancellation API.
-The managed DNS/socket adapters now call these hooks; HTTP forwarding remains pending.
+The managed DNS/socket adapters now call these hooks, including the development HTTP client.
 
 Socket cancellation now covers pending connect, accept, send and receive. The
 invocation owner performs nonblocking socket calls, so cancellation can release a
@@ -131,7 +131,7 @@ matrix or website build is part of this checkpoint.
 
 Development DNS lookup and all connect, accept, receive and send overloads now accept
 CancellationToken. Tokenless overloads forward None, preserving existing behavior.
-The internal shared-deadline paths also accept tokens for future HTTP forwarding.
+The internal shared-deadline paths also accept tokens and now carry HTTP cancellation.
 A pre-cancelled token takes precedence over argument validation. After admission,
 only a native cancellation win leads to Promise.Cancel; a completed operation is
 not relabelled because the token flag later changed. Registrations are removed before
@@ -144,3 +144,8 @@ No public scheduler or suspension protocol is added. Future suspension can repla
 callbacks while retaining the request/acknowledgement boundary. Invocation-local
 tokens still cannot coordinate across threads. The [focused managed fixture](experiments/network-cancellation/README.md)
 checks the contract with loopback I/O and the matching compiler bridge.
+
+The [HTTP integration](http-client-design.md#http-token-forwarding-and-getstring--2026-09-25)
+now forwards tokens through handlers and all transport phases. It closes its connection
+after child acknowledgement and before terminal cancellation. Custom handlers retain
+responsibility for their own cancellation/cleanup; the client does not force completion.

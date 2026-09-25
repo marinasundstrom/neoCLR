@@ -42,10 +42,11 @@ accepts optional text and can change after a request has been sent.
 
 ## Attach behavior with handlers
 
-HttpClient delegates `Send(HttpRequest)` to an `HttpHandler`. Its contract returns
+HttpClient delegates `Send(HttpRequest, CancellationToken)` to an `HttpHandler`. Its contract returns
 `Task<Result<HttpResponse, HttpError>>`. A forwarding handler receives an inner handler:
 it can act before sending and after the result arrives. Several handlers can form
-a pipeline, with socket transport at the end. A fake handler can return a response
+a pipeline, with socket transport at the end. Forwarding handlers pass the token to
+their inner handler. A fake handler can return a response
 without a network connection.
 
 The sample checks nested before/after ordering, preserves errors and replaces the
@@ -128,12 +129,11 @@ is a correctness POC, not a performance benchmark. Generated async states still 
 ## Direction
 
 The client/server greeting, JSON report and socket-backed client exchange budget are
-in place. Handler/server cancellation ownership, a public JSON contract and broader
+in place. Server cancellation ownership, a public JSON contract and broader
 request/response behavior remain open gates. The fixed transport budget is a POC
 policy, not a complete HttpClient timeout configuration model. The System.Web.Http boundary
 separates HTTP policy from [networking](/features/networking/); a future transport
-could use sockets or a host facility. Handler ownership, concurrency, cancellation
-and a structured error model need concrete cases as these provisional APIs evolve. No complete HTTP stack or runtime suspension is claimed.
+could use sockets or a host facility. Shared handler concurrency and ownership need further cases as these provisional APIs evolve. No complete HTTP stack or runtime suspension is claimed.
 
 Browse the [HTTP API reference](xref:System.Web.Http) for constructors, members,
 parameters and ownership details. The parser and operation adapter remain internal.
@@ -163,10 +163,24 @@ Its former per-case `Is*`/`Get*` helpers have been removed; match the cases dire
 
 The [API reference](/docs/api/System/Uri/) describes both overloads and the limits.
 
-Typed `HttpError` results and BaseUri resolution are integrated. The planned core
-operation remains Send(request, cancellationToken), with Get and GetString using the
-same handler pipeline. Invocation-local cancellation tokens exist in System.Concurrency;
-HTTP token forwarding and native-operation cancellation are not wired yet.
+Typed HttpError results, BaseUri resolution and token-aware Send/Get/GetString are
+integrated in development. Both string and Uri overloads are available; tokenless
+client overloads use CancellationToken.None. GetString decodes the buffered body as
+strict UTF-8 and preserves HTTP errors. Invalid bytes produce HttpError.Protocol;
+status support is still limited to 200, and other statuses produce Unsupported.
+Charset handling, streaming and broader status behavior remain future work.
+
+Cancellation tokens are invocation-local. Pre-cancellation skips parsing and handler
+dispatch. During an exchange the socket handler waits for native acknowledgement and
+closes its connection before its Task becomes cancelled. A completed native result
+can survive a later request; cancellation between phases prevents the next operation.
+Separate requests retain separate connections and cancellation state. DNS host work
+may continue after guest cancellation, with its bounded capacity still charged.
+
+Custom HttpHandler implementations now require Send(request, cancellationToken).
+They must forward or honor the token and finish owned cleanup before reporting
+cancellation. The client does not force completion of an uncooperative handler or
+dispose injected handlers. Existing implementations must be updated and rebuilt.
 
 URI/URL encoding utilities are also planned separately. Their design will distinguish
 path segments, query values and form data; the current Uri parser expects text that

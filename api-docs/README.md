@@ -203,3 +203,10 @@ Dns and Socket reference pages, with per-member cancellation/ownership descripti
 and the [socket guide](sockets.md#per-operation-cancellation-development). Private
 provider registration and shared-deadline helpers remain excluded from application
 reference navigation. The matching reference snapshot includes all eight new overloads.
+
+Development HTTP token/text contracts (2026-09-25) are covered on the existing
+HttpClient, HttpHandler and HttpSocketHandler reference pages. HttpHandler's former
+tokenless Send entry is removed; implementations must accept and forward or honor
+CancellationToken. Both GetString address forms, token variants, strict UTF-8 errors,
+status-200 restriction and ownership behavior are documented with the matching
+reference assembly. Website building remains skipped by explicit author direction.

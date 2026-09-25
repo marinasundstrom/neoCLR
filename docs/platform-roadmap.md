@@ -78,12 +78,15 @@ now links the [implemented address slice](ip-address-design.md): public parsing/
 value semantics, typed DNS results and Socket overloads. The [cancellation foundations](cancellation-design.md)
 now provide invocation-local source/token/registration contracts and keep a request
 separate from acknowledged completion. [BaseUri and string/Uri address overloads](http-client-design.md#baseuri-and-address-overloads--implemented-2026-09-25)
-are now integrated and tested through the handler pipeline. Slice 4 remains active:
+are now integrated and tested through the handler pipeline. Slice 4 is complete for
+the bounded GET/200 POC; the next slice is methods, content and response statuses.
 The [private native cancellation hooks](cancellation-design.md#native-operation-acknowledgement--implemented-2026-09-25)
 now cover DNS, connect, accept and transfers, preserving completion ownership.
 Managed DNS/socket token registration and acknowledgement are now implemented, with
-[focused loopback evidence](experiments/network-cancellation/README.md). HTTP forwarding
-and GetString remain next. An [HTTPS feasibility checkpoint](http-client-design.md#https-feasibility-checkpoint--2026-09-25)
+[focused loopback evidence](experiments/network-cancellation/README.md).
+[HTTP token forwarding and GetString](experiments/http-cancellation/README.md) now
+complete the client slice, including cancellation cleanup, request isolation and
+strict UTF-8 conversion through the same handler pipeline. An [HTTPS feasibility checkpoint](http-client-design.md#https-feasibility-checkpoint--2026-09-25)
 records a possible TLS adapter and its required validation; it is not an implementation
 or a release-scope decision. IPv6 transport and scope identifiers remain explicit follow-ups. Investigate HTTPS
 feasibility after cancellation foundations and decide its scope before the application slice. Finish validation and documentation

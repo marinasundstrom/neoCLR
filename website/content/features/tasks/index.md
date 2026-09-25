@@ -93,7 +93,8 @@ The first implementation is confined to one invocation; tokens are not shared wi
 isolated worker threads. Timers, linked sources and HTTP/socket token overloads are
 not implemented yet. Private native cancellation hooks now cover DNS and socket
 operations. Development DNS and socket overloads now forward tokens and acknowledge
-cancellation through Task; HTTP forwarding remains pending. Source/token separation follows .NET, while cross-thread
+cancellation through Task. The HTTP client now forwards tokens and closes its owned
+connection before reporting cancellation. Source/token separation follows .NET, while cross-thread
 synchronization and exception aggregation are outside this iteration.
 
 [CancellationToken API →](xref:System.Concurrency.CancellationToken)

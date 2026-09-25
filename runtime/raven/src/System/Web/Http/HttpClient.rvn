@@ -3,6 +3,7 @@ namespace System.Web.Http
 import System.Runtime.CompilerServices.*
 import System.Option.*
 import System.Tasks.*
+import System.Concurrency.*
 import System.Networking.*
 import System.Networking.Sockets.*
 import System.*
@@ -207,7 +208,7 @@ internal class HttpResponseDecoder {
 
 // Request and handler contracts are independent of socket transport.
 public interface HttpHandler {
-    func Send(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>>
+    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>>
 }
 
 public class HttpContent {
@@ -384,14 +385,30 @@ public class HttpClient {
     }
 
     func Send(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-        return handler.Send(request)
+        return Send(request, CancellationToken.None)
+    }
+
+    /// Sends a prepared request, forwarding the token through the handler pipeline.
+    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            return Cancelled()
+        }
+        return handler.Send(request, cancellationToken)
     }
 
     /// Sends an absolute URL without a base, or a relative URL when BaseUri is set.
     func Get(url: string) -> Task<Result<HttpResponse, HttpError>> {
+        return Get(url, CancellationToken.None)
+    }
+
+    /// Uses the same address rules, with cooperative cancellation.
+    func Get(url: string, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            return Cancelled()
+        }
         let parsed = Uri.Parse(url)
         if let Ok(uri) = parsed {
-            return Get(uri)
+            return Get(uri, cancellationToken)
         } else if let Error(reason) = parsed {
             return Failure(HttpError.InvalidUri(reason))
         }
@@ -401,14 +418,69 @@ public class HttpClient {
 
     /// Uses the same base-resolution rules as the string overload.
     func Get(uri: Uri) -> Task<Result<HttpResponse, HttpError>> {
+        return Get(uri, CancellationToken.None)
+    }
+
+    /// Uses the same address rules, with cooperative cancellation.
+    func Get(uri: Uri, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            return Cancelled()
+        }
         let parsed = CreateRequest(uri)
         if let Ok(request) = parsed {
-            return Send(request)
+            return Send(request, cancellationToken)
         } else if let Error(reason) = parsed {
             return Failure(reason)
         }
         System.Fault("Request construction returned no outcome")
         return Failure(HttpError.InvalidRequest("Invalid request"))
+    }
+
+    /// Fetches a bounded response and decodes its buffered body as strict UTF-8.
+    func GetString(url: string) -> Task<Result<string, HttpError>> {
+        return GetString(url, CancellationToken.None)
+    }
+
+    /// Fetches UTF-8 text, preserving HTTP failures and acknowledged task cancellation.
+    func GetString(url: string, cancellationToken: CancellationToken) -> Task<Result<string, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            let source = Promise<Result<string, HttpError>>()
+            _ = source.Cancel()
+            return source.Task
+        }
+        return Get(url, cancellationToken).Map(DecodeText)
+    }
+
+    /// Fetches a bounded response and decodes its buffered body as strict UTF-8.
+    func GetString(uri: Uri) -> Task<Result<string, HttpError>> {
+        return GetString(uri, CancellationToken.None)
+    }
+
+    /// Fetches UTF-8 text, preserving HTTP failures and acknowledged task cancellation.
+    func GetString(uri: Uri, cancellationToken: CancellationToken) -> Task<Result<string, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            let source = Promise<Result<string, HttpError>>()
+            _ = source.Cancel()
+            return source.Task
+        }
+        return Get(uri, cancellationToken).Map(DecodeText)
+    }
+
+    private static func DecodeText(result: Result<HttpResponse, HttpError>) -> Result<string, HttpError> {
+        let response = result?
+        if response.StatusCode != 200 {
+            return Error(HttpError.Unsupported("GetString currently requires status 200"))
+        }
+        if let Ok(text) = Utf8.Decode(response.Content.Bytes) {
+            return Ok(text)
+        }
+        return Error(HttpError.Protocol("Invalid UTF-8 body"))
+    }
+
+    private static func Cancelled() -> Task<Result<HttpResponse, HttpError>> {
+        let source = Promise<Result<HttpResponse, HttpError>>()
+        _ = source.Cancel()
+        return source.Task
     }
 
     private func CreateRequest(uri: Uri) -> Result<HttpRequest, HttpError> {
@@ -449,7 +521,17 @@ public class HttpSocketHandler : HttpHandler {
     init() { }
 
     func Send(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-        let exchange = HttpExchange(request)
+        return Send(request, CancellationToken.None)
+    }
+
+    /// Uses one token across lookup, connect and transfers, closing before cancellation completes.
+    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            let source = Promise<Result<HttpResponse, HttpError>>()
+            _ = source.Cancel()
+            return source.Task
+        }
+        let exchange = HttpExchange(request, cancellationToken)
         return exchange.Execute()
     }
 }
@@ -458,6 +540,7 @@ public class HttpSocketHandler : HttpHandler {
 // Each Send owns independent buffers, pending tasks and one socket.
 internal class HttpExchange {
     private var deadline: long = 0
+    private var token: CancellationToken
     private var request: HttpRequest
     private var source: Promise<Result<HttpResponse, HttpError>>
     private var socket: Option<Socket>
@@ -469,7 +552,8 @@ internal class HttpExchange {
     private var buffer: byte[]
     private var decoder: HttpResponseDecoder
 
-    internal init(request: HttpRequest) {
+    internal init(request: HttpRequest, token: CancellationToken) {
+        self.token = token
         self.request = request
         source = Promise<Result<HttpResponse, HttpError>>()
         socket = None()
@@ -491,13 +575,13 @@ internal class HttpExchange {
 
     internal func Execute() -> Task<Result<HttpResponse, HttpError>> {
         deadline = RuntimeServices.SocketDeadlineAfter(15000)
-        let pending = Dns.GetHostAddressesUntil(request.Host, deadline)
+        let pending = Dns.GetHostAddressesUntil(request.Host, deadline, token)
         lookup = Some(pending)
         pending.OnCompleted(self.OnLookup)
         return source.Task
     }
 
-    private func Finish(result: Result<HttpResponse, HttpError>) {
+    private func Cleanup() {
         if let Some(connection) = socket {
             connection.Close()
         }
@@ -505,6 +589,15 @@ internal class HttpExchange {
         lookup = None()
         connecting = None()
         transfer = None()
+    }
+
+    private func Cancel() {
+        Cleanup()
+        _ = source.Cancel()
+    }
+
+    private func Finish(result: Result<HttpResponse, HttpError>) {
+        Cleanup()
         if RuntimeServices.SocketDeadlineExpired(deadline) {
             _ = source.Complete(Error(HttpError.TimedOut))
         } else {
@@ -514,6 +607,10 @@ internal class HttpExchange {
 
     private func OnLookup() {
         if let Some(pending) = lookup {
+            if pending.IsCancelled {
+                Cancel()
+                return
+            }
             let result = pending.GetResult()
             lookup = None()
             if RuntimeServices.SocketDeadlineExpired(deadline) {
@@ -521,7 +618,7 @@ internal class HttpExchange {
                 return
             }
             if let Ok(addresses) = result {
-                let next = Socket.ConnectUntil(addresses, request.Port, deadline)
+                let next = Socket.ConnectUntil(addresses, request.Port, deadline, token)
                 connecting = Some(next)
                 next.OnCompleted(self.OnConnected)
             } else if let Error(reason) = result {
@@ -532,6 +629,10 @@ internal class HttpExchange {
 
     private func OnConnected() {
         if let Some(pending) = connecting {
+            if pending.IsCancelled {
+                Cancel()
+                return
+            }
             let result = pending.GetResult()
             connecting = None()
             if let Ok(connection) = result {
@@ -558,7 +659,7 @@ internal class HttpExchange {
                 buffer[count] = outgoing[sent + count]
                 count += 1
             }
-            let pending = connection.SendUntil(buffer, 0, count, deadline)
+            let pending = connection.SendUntil(buffer, 0, count, deadline, token)
             transfer = Some(pending)
             pending.OnCompleted(self.OnSent)
         }
@@ -566,6 +667,10 @@ internal class HttpExchange {
 
     private func OnSent() {
         if let Some(pending) = transfer {
+            if pending.IsCancelled {
+                Cancel()
+                return
+            }
             let result = pending.GetResult()
             transfer = None()
             if RuntimeServices.SocketDeadlineExpired(deadline) {
@@ -591,7 +696,7 @@ internal class HttpExchange {
             return
         }
         if let Some(connection) = socket {
-            let pending = connection.ReceiveUntil(buffer, 0, 256, deadline)
+            let pending = connection.ReceiveUntil(buffer, 0, 256, deadline, token)
             transfer = Some(pending)
             pending.OnCompleted(self.OnReceived)
         }
@@ -599,6 +704,10 @@ internal class HttpExchange {
 
     private func OnReceived() {
         if let Some(pending) = transfer {
+            if pending.IsCancelled {
+                Cancel()
+                return
+            }
             let result = pending.GetResult()
             transfer = None()
             if RuntimeServices.SocketDeadlineExpired(deadline) {

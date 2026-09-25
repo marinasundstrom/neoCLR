@@ -152,4 +152,4 @@ the connection open. A cancelled connect releases its pending connection. DNS lo
 may continue in the host after its guest Task is cancelled, retaining its bounded
 host-capacity permit until it returns. Tokens are currently invocation-local.
 [The API guide](/docs/sockets.html#per-operation-cancellation-development) explains
-ownership and limits. HTTP forwarding of these tokens is the next integration step.
+ownership and limits. The development HTTP client forwards these tokens across lookup, connect and transfers.

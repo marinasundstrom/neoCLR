@@ -155,7 +155,7 @@ No public accept deadline is provided yet. Accept(CancellationToken) cancels an 
 The default HTTP socket handler now supplies a shared 15-second exchange deadline
 through private lookup/connect/transfer paths. Each native operation uses the earlier
 of that deadline and its phase bound. Public Socket calls still use the independent
-bounds above; this adds no Socket timeout overload or cancellation token.
+bounds above; this adds no configurable Socket timeout overload. Token overloads are described below.
 
 ## Per-operation cancellation (development)
 
@@ -171,5 +171,5 @@ Cancelling accept preserves the listener; cancelling transfers preserves the
 connection. Cancelling connect discards the pending connection and remaining address
 attempts. DNS cancellation cannot interrupt the host resolver; its bounded permit
 remains occupied until host work returns. Source disposal removes registrations
-without cancelling work. These tokens are invocation-local; HTTP token forwarding
-is still pending. See [Task cancellation contracts](xref:System.Concurrency.CancellationToken).
+without cancelling work. These tokens are invocation-local; the development HTTP
+client now forwards them through the same provider paths. See [Task cancellation contracts](xref:System.Concurrency.CancellationToken).

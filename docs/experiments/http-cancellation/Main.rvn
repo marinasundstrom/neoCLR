@@ -1,0 +1,201 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+import System.Text.*
+import System.Web.Http.*
+import System.Networking.Sockets.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("HTTP cancellation/text assertion failed")
+    }
+}
+
+class ReplyHandler : HttpHandler {
+    var Calls: int = 0
+    var SawToken: bool = false
+    private var status: int
+    private var bytes: Sequence<byte>
+
+    init(status: int, bytes: Sequence<byte>) {
+        self.status = status
+        self.bytes = bytes
+    }
+
+    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        Calls += 1
+        SawToken = cancellationToken.CanBeCancelled
+        let source = Promise<Result<HttpResponse, HttpError>>()
+        _ = source.Complete(Ok(HttpResponse(status, ArrayList<HttpHeader>(), bytes)))
+        return source.Task
+    }
+}
+
+class Forwarder : HttpHandler {
+    private var inner: HttpHandler
+    init(inner: HttpHandler) {
+        self.inner = inner
+    }
+    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        return inner.Send(request, cancellationToken)
+    }
+}
+
+class PendingHandler : HttpHandler {
+    val Completion: Promise<Result<HttpResponse, HttpError>> = Promise<Result<HttpResponse, HttpError>>()
+    var Cleaned: bool = false
+    private var registration: CancellationRegistration? = null
+
+    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        registration = cancellationToken.Register(self.Cancel)
+        return Completion.Task
+    }
+
+    private func Cancel() {
+        let active = registration
+        registration = null
+        if active is CancellationRegistration current {
+            current.Dispose()
+        }
+        Cleaned = true
+        _ = Completion.Cancel()
+    }
+}
+
+func CheckContracts() {
+    let fake = ReplyHandler(200, Utf8.Encode("Café 🌍"))
+    let client = HttpClient(Forwarder(Forwarder(fake)))
+    client.BaseUri = Some("http://example.test/base/")
+    let stopped = CancellationTokenSource()
+    stopped.Cancel()
+    Check(client.Get("bad\r\n", stopped.Token).IsCancelled)
+    Check(client.GetString("bad\r\n", stopped.Token).IsCancelled)
+    let Ok(uri) = Uri.Parse("child") else {
+        System.Fault("Fixture URI failed")
+        return
+    }
+    Check(client.Get(uri, stopped.Token).IsCancelled)
+    Check(client.GetString(uri, stopped.Token).IsCancelled)
+    let Ok(request) = HttpRequest.Get("http://example.test/direct") else {
+        System.Fault("Fixture request failed")
+        return
+    }
+    Check(client.Send(request, stopped.Token).IsCancelled)
+    Check(HttpSocketHandler().Send(request, stopped.Token).IsCancelled)
+    Check(fake.Calls == 0)
+    stopped.Dispose()
+
+    let live = CancellationTokenSource()
+    let text = client.GetString(uri, live.Token)
+    Check(fake.SawToken && fake.Calls == 1)
+    // The handler has returned a result; cancellation before Map runs must not erase it.
+    live.Cancel()
+    TaskQueue.Default.Drain()
+    let Ok(value) = text.GetResult() else {
+        System.Fault("Text conversion failed")
+        return
+    }
+    Check(value == "Café 🌍")
+    live.Dispose()
+    let plain = client.GetString("child")
+    let plainUri = client.GetString(uri)
+    TaskQueue.Default.Drain()
+    Check(!fake.SawToken && fake.Calls == 3)
+    if let Ok(first) = plain.GetResult() {
+        Check(first == "Café 🌍")
+    } else {
+        System.Fault("String overload failed")
+    }
+    if let Ok(second) = plainUri.GetResult() {
+        Check(second == "Café 🌍")
+    } else {
+        System.Fault("URI overload failed")
+    }
+
+    let invalid = HttpClient(ReplyHandler(200, [(byte)255])).GetString("http://example.test/")
+    let status = HttpClient(ReplyHandler(404, Utf8.Encode("missing"))).GetString("http://example.test/")
+    let badUri = client.GetString("http://another.test/")
+    TaskQueue.Default.Drain()
+    if let Error(HttpError.Protocol(message)) = invalid.GetResult() {
+        Check(message == "Invalid UTF-8 body")
+    } else {
+        System.Fault("Invalid UTF-8 was accepted")
+    }
+    if let Error(HttpError.Unsupported(_)) = status.GetResult() {
+        Check(true)
+    } else {
+        System.Fault("Unsupported status was accepted")
+    }
+    if let Error(HttpError.InvalidRequest(_)) = badUri.GetResult() {
+        Check(true)
+    } else {
+        System.Fault("BaseUri failure was lost")
+    }
+
+    let pending = PendingHandler()
+    let stop = CancellationTokenSource()
+    let waiting = HttpClient(Forwarder(pending)).GetString("http://example.test/", stop.Token)
+    stop.Cancel()
+    Check(pending.Cleaned)
+    TaskQueue.Default.Drain()
+    Check(waiting.IsCancelled)
+    stop.Dispose()
+    Console.WriteLine("HTTP handler and text contracts passed")
+}
+
+func StartControl(source: CancellationTokenSource) {
+    let connecting = Socket.Connect("127.0.0.1", 19092)
+    connecting.OnCompleted(() => {
+        let Ok(connection) = connecting.GetResult() else {
+            System.Fault("Control connect failed")
+            return
+        }
+        ReadControl(connection, source)
+    })
+}
+
+func ReadControl(connection: Socket, source: CancellationTokenSource) {
+    let buffer: byte[] = [(byte)0]
+    let read = connection.Receive(buffer, 0, 1)
+    read.OnCompleted(() => {
+        let Ok(count) = read.GetResult() else {
+            System.Fault("Control read failed")
+            return
+        }
+        Check(count == 1 && buffer[0] == 1)
+        source.Cancel()
+        connection.Close()
+    })
+}
+
+func Main() {
+    CheckContracts()
+    let source = CancellationTokenSource()
+    let client = HttpClient(Forwarder(HttpSocketHandler()))
+    client.BaseUri = Some("http://127.0.0.1:19091/")
+    let response = client.Get("cancel-response", source.Token)
+    let text = client.GetString("cancel-text", source.Token)
+    let survivor = client.GetString("keep", CancellationToken.None)
+    response.OnCompleted(() => {
+        Check(response.IsCancelled)
+        Console.WriteLine("HTTP response cancelled")
+    })
+    text.OnCompleted(() => {
+        Check(text.IsCancelled)
+        Console.WriteLine("HTTP text cancelled")
+    })
+    survivor.OnCompleted(() => {
+        let Ok(value) = survivor.GetResult() else {
+            System.Fault("Independent HTTP request failed")
+            return
+        }
+        Check(value == "Café 🌍")
+        Check(response.IsCancelled && text.IsCancelled)
+        source.Dispose()
+        Console.WriteLine("Independent HTTP text completed")
+    })
+    StartControl(source)
+}

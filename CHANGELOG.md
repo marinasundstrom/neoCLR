@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add token-aware HttpClient Send/Get and string/Uri GetString overloads. Forward
+  cancellation through DNS/connect/transfers and close exchange-owned connections
+  before task cancellation. GetString preserves HTTP errors and strictly decodes
+  buffered UTF-8; malformed bytes produce Protocol, with status support still limited
+  to 200. HttpHandler implementations must migrate to Send(request, cancellationToken)
+  and rebuild; client/concrete-handler tokenless overloads remain. Validate request
+  isolation, cleanup, late cancellation and selected independent HTTP interoperability.
+
 - Add private runtime-library DNS/socket operation cancellation hooks. Extend socket
   cancellation to pending connect/accept while preserving listeners, committed
   outcomes and callback/result acknowledgement. Retain cancelled operation slots
@@ -17,7 +25,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   connect/accept/send/receive forms, including private shared-deadline paths. Preserve
   native completion winners, dispose registrations before result consumption and
   acknowledge cancellation through Task. Tokenless overloads remain available; source
-  disposal does not cancel I/O. Refresh API reference coverage. HTTP forwarding remains pending.
+  disposal does not cancel I/O. Refresh API reference coverage.
 
 - Add development HttpClient.BaseUri as Option<string>, plus Get(Uri) overloads
   on HttpClient and HttpRequest. Both address forms use the existing Uri parser

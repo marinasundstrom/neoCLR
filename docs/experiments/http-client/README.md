@@ -5,7 +5,7 @@ runtime library: HttpClient, HttpHandler, HttpSocketHandler, HttpRequest, HttpRe
 HttpHeader and HttpContent. [Design and remaining gates](../../http-client-design.md).
 The public API reference is available on the website under `/docs/`.
 Main now sets `BaseUri = Some("http://localhost:19091/")` and passes `"greeting"`
-to Get through the handler pipeline. The verifier substitutes the selected port.
+to GetString through the handler pipeline. The verifier substitutes the selected port.
 [Focused address checks](../http-base/README.md) cover string/Uri overloads, base
 resolution and errors before dispatch independently of transport framing.
 
@@ -49,18 +49,18 @@ The external watchdog is a test guard, not an HTTP request deadline.
 ## Contracts and limits
 
 `HttpClient()` selects HttpSocketHandler; `HttpClient(handler)` allows composition.
-`Get(string)` parses a limited URL and delegates to `Send(HttpRequest)`.
+`Get` and `GetString` use the same address rules and delegate to `Send(HttpRequest, CancellationToken)`; tokenless client overloads use None.
 Handlers return `Task<Result<HttpResponse, HttpError>>`. A forwarding handler can act
 before/after the inner handler's result; the socket handler owns connection cleanup.
 Each socket-backed Send has separate buffers, pending tasks and a connection.
 Custom mutable handlers must define their own concurrent-use policy; there is no
-handler disposal, automatic retry or cancellation contract yet.
+handler disposal or automatic retry. Handlers now forward or honor invocation-local cancellation tokens.
 
 Only plain HTTP/1.1 GET with a 200 response and exactly one Content-Length is admitted.
 Limits: 1,024 URL bytes, 2,048 header bytes, 16 fields, 1,024 body bytes. Header names
 are ASCII tokens stored lowercase; values trim surrounding spaces/tabs. Invalid
 framing, duplicate lengths, Transfer-Encoding and Content-Encoding fail explicitly.
-Content.ReadText strictly decodes UTF-8 after the complete body is buffered. Public
+GetString strictly decodes UTF-8 after the complete body is buffered and returns HttpError.Protocol for invalid bytes. Content.ReadText remains available with its older string-error contract. Public
 response/content constructors retain their sequences; producers must keep them stable.
 
 No chunking, TLS, redirects, connection reuse, arbitrary methods/statuses, request
@@ -124,7 +124,7 @@ and zero final live objects. Custom handlers and server callback lifetime remain
 The focused shared-budget run passes both trickles, silent headers and fragmented
 success, with zero live objects after every run. Body/header trickles collect nine
 and eleven times respectively with a 256-object heap. The .NET comparison still
-passes. No general handler/server cancellation or production timeout tuning is claimed.
+passes. Client cancellation is now integrated; server cancellation and production timeout tuning remain open.
 
 ## Typed errors — development integration
 

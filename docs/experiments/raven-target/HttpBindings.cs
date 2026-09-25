@@ -15,19 +15,27 @@ static class HttpBindings
         namespace Web.Http {
             public struct HttpError { public struct InvalidUri { } public struct NameResolution { } public struct Transport { } public struct InvalidRequest { } public struct Protocol { } public struct Unsupported { } public struct LimitExceeded { } public struct TimedOut { } public struct Handler { } }
             public interface HttpHandler {
-                Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request);
+                Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken);
             }
             public sealed class HttpClient {
                 public HttpClient() { }
                 public HttpClient(HttpHandler handler) { }
                 public Option<string> BaseUri { get; set; }
                 public Tasks.Task<Result<HttpResponse, HttpError>> Get(string url) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Get(string url, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<string, HttpError>> GetString(string url) => default;
+                public Tasks.Task<Result<string, HttpError>> GetString(string url, Concurrency.CancellationToken cancellationToken) => default;
                 public Tasks.Task<Result<HttpResponse, HttpError>> Get(Uri uri) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Get(Uri uri, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<string, HttpError>> GetString(Uri uri) => default;
+                public Tasks.Task<Result<string, HttpError>> GetString(Uri uri, Concurrency.CancellationToken cancellationToken) => default;
                 public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken) => default;
             }
             public sealed class HttpSocketHandler : HttpHandler {
                 public HttpSocketHandler() { }
                 public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken) => default;
             }
             public sealed class HttpHeader {
                 public HttpHeader(string name, string value) { }
@@ -81,7 +89,7 @@ static class HttpBindings
                 public Result<HttpResponse, HttpError> Finish() => default;
             }
             public sealed class HttpExchange {
-                public HttpExchange(HttpRequest request) { }
+                public HttpExchange(HttpRequest request, Concurrency.CancellationToken token) { }
                 public Tasks.Task<Result<HttpResponse, HttpError>> Execute() => default;
             }
         }
@@ -126,10 +134,12 @@ static class HttpBindings
             ("HttpServerExchange", "Start") when library => ("", "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
             ("HttpClient", ".ctor") when args.Length == 0 => ("", "noresult", false),
             ("HttpClient", ".ctor") => (Prefix + "HttpHandler", "noresult", false),
-            ("HttpClient", "Get") => (args.Length == 1 && args[0] == "String" ? "String" : "System.Uri", task, false),
+            ("HttpClient", "Get" or "GetString") => (args.Length > 0 && args[0] == "String" ? "String" : "System.Uri",
+                definition.Name == "Get" ? task : "System.Tasks.Task<System.Result<String,System.Web.Http.HttpError>>", false),
             ("HttpClient", "get_BaseUri") => ("", "System.Option<String>", false),
             ("HttpClient", "set_BaseUri") => ("System.Option<String>", "noresult", false),
-            ("HttpClient" or "HttpHandler" or "HttpSocketHandler", "Send") => (request, task, false),
+            ("HttpHandler", "Send") => (request + ",System.Concurrency.CancellationToken", task, false),
+            ("HttpClient" or "HttpSocketHandler", "Send") => (request, task, false),
             ("HttpSocketHandler" or "HttpResponseDecoder", ".ctor") => ("", "noresult", false),
             ("HttpHeader", ".ctor") => ("String,String", "noresult", false),
             ("HttpHeader", "get_Name" or "get_Value") => ("", "String", false),
@@ -146,11 +156,16 @@ static class HttpBindings
             ("HttpResponseDecoder", "get_Complete") when library => ("", "Boolean", false),
             ("HttpResponseDecoder", "Push") when library => ("Byte", "System.Result<Boolean,System.Web.Http.HttpError>", false),
             ("HttpResponseDecoder", "Finish") when library => ("", outcome, false),
-            ("HttpExchange", ".ctor") when library => (request, "noresult", false),
+            ("HttpExchange", ".ctor") when library => (request + ",System.Concurrency.CancellationToken", "noresult", false),
             ("HttpExchange", "Execute") when library => ("", task, false),
             _ => throw new InvalidDataException("Unsupported HTTP member.")
         };
-        var virtualMember = IsContract(owner) || owner == Prefix + "HttpSocketHandler" && !construct;
+        if (owner is Prefix + "HttpClient" or Prefix + "HttpSocketHandler"
+            && definition.Name is "Get" or "GetString" or "Send"
+            && args.LastOrDefault() == CancellationBindings.Token)
+            expected.Item1 += "," + CancellationBindings.Token;
+        var virtualMember = IsContract(owner) || owner == Prefix + "HttpSocketHandler"
+            && definition.Name == "Send" && args.Length == 2;
         if (definition.IsConstructor != construct || definition.IsStatic != expected.Item3
             || !(definition.IsPublic || library && definition.IsAssembly)
             || definition.IsVirtual != virtualMember || definition.HasGenericParameters
