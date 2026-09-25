@@ -60,7 +60,7 @@ as Closed. Earlier successful sends are not undone by a later failure or Close.
 addresses/ranges, Busy, Closed, LimitExceeded and common transport failures such as
 ConnectionRefused and ConnectionReset. Unexpected native failures use IoFailure.
 Errors are Result values, separate from runtime Faults. No public native error-number
-contract or individual cancellation method is available yet.
+contract is available. Development overloads accept CancellationToken.
 
 The development SocketError now uses normal union syntax. Use case patterns rather
 than the removed per-case `Is*` properties and `Get*` accessors. `default(SocketError)`
@@ -150,9 +150,26 @@ Completed results retain their operation slot until consumed. Closing a listener
 settles its waiting accept as Closed; an already committed accepted connection stays
 open independently. Send/Receive on a listener and Accept on a connected socket
 return InvalidOperation. Listener teardown closes remaining native resources.
-No public accept deadline or individual cancellation API is provided yet.
+No public accept deadline is provided yet. Accept(CancellationToken) cancels an individual accept while preserving the listener.
 
 The default HTTP socket handler now supplies a shared 15-second exchange deadline
 through private lookup/connect/transfer paths. Each native operation uses the earlier
 of that deadline and its phase bound. Public Socket calls still use the independent
 bounds above; this adds no Socket timeout overload or cancellation token.
+
+## Per-operation cancellation (development)
+
+Dns.GetHostAddresses, all Socket.Connect overloads, Accept, Receive and Send accept
+an optional-by-overload `System.Concurrency.CancellationToken`. Existing overloads
+behave as if passed CancellationToken.None. A token already requested returns a
+cancelled Task before validation or native admission. For pending work, Cancel only
+requests cancellation: observe task completion before reusing receive storage.
+Cancellation is a Task outcome, separate from Result errors. Native results already
+committed survive later requests, even before their managed callback is delivered.
+
+Cancelling accept preserves the listener; cancelling transfers preserves the
+connection. Cancelling connect discards the pending connection and remaining address
+attempts. DNS cancellation cannot interrupt the host resolver; its bounded permit
+remains occupied until host work returns. Source disposal removes registrations
+without cancelling work. These tokens are invocation-local; HTTP token forwarding
+is still pending. See [Task cancellation contracts](xref:System.Concurrency.CancellationToken).

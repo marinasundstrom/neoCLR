@@ -138,3 +138,18 @@ The HTTP experiment provides bounded client/server exchanges; it is not a comple
 Browse [networking types](/docs/namespaces.html) and the [socket reference](/docs/sockets.html).
 A useful contribution is a reproducible transfer, lifetime or error-handling case,
 with expected behavior and the development toolchain used.
+
+## Cancelling an operation
+
+Development overloads on Dns.GetHostAddresses and Socket.Connect, Accept, Receive
+and Send accept a CancellationToken. Existing overloads remain available. A request
+that wins produces a cancelled Task after the provider has consumed native completion;
+transport failures remain Result errors. A completed native result survives late
+cancellation. Wait for task completion before reusing a receive buffer.
+
+Cancelling an accept leaves the listener usable, and cancelling a transfer leaves
+the connection open. A cancelled connect releases its pending connection. DNS lookup
+may continue in the host after its guest Task is cancelled, retaining its bounded
+host-capacity permit until it returns. Tokens are currently invocation-local.
+[The API guide](/docs/sockets.html#per-operation-cancellation-development) explains
+ownership and limits. HTTP forwarding of these tokens is the next integration step.

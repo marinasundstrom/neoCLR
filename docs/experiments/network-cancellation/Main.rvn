@@ -1,0 +1,194 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Networking.*
+import System.Networking.Sockets.*
+import System.Result.*
+import System.Tasks.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("Network cancellation assertion failed")
+    }
+}
+
+func Main() {
+    let stopped = CancellationTokenSource()
+    stopped.Cancel()
+    Check(Dns.GetHostAddresses("", stopped.Token).IsCancelled)
+    Check(Socket.Connect("invalid", 0, stopped.Token).IsCancelled)
+    let addresses: Sequence<string> = ["invalid"]
+    Check(Socket.Connect(addresses, 0, stopped.Token).IsCancelled)
+    let Ok(address) = IPAddress.Parse("127.0.0.1") else {
+        System.Fault("Address parse failed")
+        return
+    }
+    Check(Socket.Connect(address, 0, stopped.Token).IsCancelled)
+    let typed: Sequence<IPAddress> = [address]
+    Check(Socket.Connect(typed, 0, stopped.Token).IsCancelled)
+    stopped.Dispose()
+
+    let source = CancellationTokenSource()
+    let lookup = Dns.GetHostAddresses("localhost", source.Token)
+    source.Cancel()
+    Check(!lookup.IsCompleted)
+    lookup.OnCompleted(() => {
+        Check(lookup.IsCancelled)
+        source.Dispose()
+        CheckLookupCompletion()
+    })
+}
+
+func CheckLookupCompletion() {
+    let source = CancellationTokenSource()
+    let lookup = Dns.GetHostAddresses("localhost", source.Token)
+    lookup.OnCompleted(() => {
+        let Ok(addresses) = lookup.GetResult() else {
+            System.Fault("Lookup failed")
+            return
+        }
+        Check(addresses.Count > 0)
+        source.Cancel()
+        Check(!lookup.IsCancelled)
+        source.Dispose()
+        CheckAccept()
+    })
+}
+
+func CheckAccept() {
+    let Ok(listener) = Socket.Listen("127.0.0.1", 0, 4) else {
+        System.Fault("Listen failed")
+        return
+    }
+    let stopped = CancellationTokenSource()
+    stopped.Cancel()
+    Check(listener.Accept(stopped.Token).IsCancelled)
+    stopped.Dispose()
+    let source = CancellationTokenSource()
+    let accepting = listener.Accept(source.Token)
+    source.Cancel()
+    Check(!accepting.IsCompleted)
+    accepting.OnCompleted(() => {
+        Check(accepting.IsCancelled)
+        source.Dispose()
+        ConnectPair(listener)
+    })
+}
+
+func ConnectPair(listener: Socket) {
+    let Ok(port) = listener.GetLocalPort() else {
+        System.Fault("Port lookup failed")
+        return
+    }
+    let Ok(address) = IPAddress.Parse("127.0.0.1") else {
+        System.Fault("Address parse failed")
+        return
+    }
+    let addresses: Sequence<IPAddress> = [address]
+    let detached = CancellationTokenSource()
+    let accepted = listener.Accept(detached.Token)
+    detached.Dispose()
+    Check(!accepted.IsCompleted)
+    let source = CancellationTokenSource()
+    let connecting = Socket.Connect(addresses, port, source.Token)
+    connecting.OnCompleted(() => {
+        let Ok(client) = connecting.GetResult() else {
+            System.Fault("Connect failed")
+            return
+        }
+        // Completion removed its registration; late cancellation cannot use a stale ID.
+        source.Cancel()
+        source.Dispose()
+        FinishAccept(listener, client, accepted)
+    })
+}
+
+func FinishAccept(listener: Socket, client: Socket, accepted: Task<Result<Socket, SocketError>>) {
+    accepted.OnCompleted(() => {
+        let Ok(server) = accepted.GetResult() else {
+            System.Fault("Accept after cancellation failed")
+            return
+        }
+        CheckTransfers(listener, client, server)
+    })
+}
+
+func CheckTransfers(listener: Socket, client: Socket, server: Socket) {
+    let buffer: byte[] = [(byte)11, (byte)12, (byte)13]
+    let stopped = CancellationTokenSource()
+    stopped.Cancel()
+    Check(server.Receive(buffer, -1, 99, stopped.Token).IsCancelled)
+    Check(client.Send(buffer, -1, 99, stopped.Token).IsCancelled)
+    stopped.Dispose()
+    let source = CancellationTokenSource()
+    let receiving = server.Receive(buffer, 1, 1, source.Token)
+    let sending = client.Send(buffer, 0, 1, source.Token)
+    source.Cancel()
+    Check(!receiving.IsCompleted && !sending.IsCompleted)
+    receiving.OnCompleted(() => {
+        Check(receiving.IsCancelled)
+        Check(buffer[0] == 11 && buffer[1] == 12 && buffer[2] == 13)
+        sending.OnCompleted(() => {
+            Check(sending.IsCancelled)
+            source.Dispose()
+            CheckReuse(listener, client, server)
+        })
+    })
+}
+
+func CheckReuse(listener: Socket, client: Socket, server: Socket) {
+    let buffer: byte[] = [(byte)0]
+    let bytes: byte[] = [(byte)42]
+    let source = CancellationTokenSource()
+    let read = server.Receive(buffer, 0, 1, source.Token)
+    let sent = client.Send(bytes, 0, 1, CancellationToken.None)
+    read.OnCompleted(() => {
+        let Ok(count) = read.GetResult() else {
+            System.Fault("Receive after cancellation failed")
+            return
+        }
+        Check(count == 1 && buffer[0] == 42)
+        source.Cancel()
+        Check(!read.IsCancelled)
+        source.Dispose()
+        sent.OnCompleted(() => {
+            let Ok(written) = sent.GetResult() else {
+                System.Fault("Send after cancellation failed")
+                return
+            }
+            Check(written == 1)
+            CheckCommitted(listener, client, server)
+        })
+    })
+}
+
+func CheckCommitted(listener: Socket, client: Socket, server: Socket) {
+    let buffer: byte[] = [(byte)0]
+    let source = CancellationTokenSource()
+    let empty = server.Receive(buffer, 0, 0, source.Token)
+    source.Cancel()
+    empty.OnCompleted(() => {
+        Check(empty.IsCancelled)
+        source.Dispose()
+        CheckEmptyCompletion(listener, client, server)
+    })
+}
+
+func CheckEmptyCompletion(listener: Socket, client: Socket, server: Socket) {
+    let buffer: byte[] = [(byte)0]
+    let source = CancellationTokenSource()
+    let empty = server.Receive(buffer, 0, 0, source.Token)
+    empty.OnCompleted(() => {
+        let Ok(count) = empty.GetResult() else {
+            System.Fault("Empty receive failed")
+            return
+        }
+        source.Cancel()
+        Check(count == 0 && !empty.IsCancelled)
+        source.Dispose()
+        client.Close()
+        server.Close()
+        listener.Close()
+        Console.WriteLine("Network token cancellation checks passed")
+    })
+}

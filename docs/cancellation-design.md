@@ -85,7 +85,7 @@ The runtime-library bridge now admits private `SocketCancel(operation)` and
 comparison above: the source/token API requests cooperation; the provider must
 still finish operation ownership before completing a Task. These hooks are an
 internal implementation mechanism, not a public handle-based cancellation API.
-HTTP and the managed DNS/socket adapters do not call them yet.
+The managed DNS/socket adapters now call these hooks; HTTP forwarding remains pending.
 
 Socket cancellation now covers pending connect, accept, send and receive. The
 invocation owner performs nonblocking socket calls, so cancellation can release a
@@ -110,9 +110,9 @@ it does not stop the host resolver call. Its permit remains charged until that c
 returns, even after guest result consumption or invocation teardown. This existing
 bounded-detachment policy is preserved; cancellation does not mean all host work ended.
 
-For the next managed integration: check pre-cancellation before admission, register
-only a valid admitted operation, preserve the native winning outcome, and dispose
-the token registration before consuming the operation ID. Consume cancelled results
+The managed integration checks pre-cancellation before admission, registers
+only a valid admitted operation, preserves the native winning outcome, and disposes
+the token registration before consuming the operation ID. It consumes cancelled results
 through the normal provider callback before cancelling the Promise. HTTP must close
 its owned connection before exposing terminal cancellation. No public scheduler or
 runtime suspension is needed for these rules.
@@ -126,3 +126,21 @@ cancellation-name Rust selection passed 18 tests; the new native signature/servi
 check passed separately. The name filter also selected existing worker/string tests;
 future runs should use the narrower socket/resolver module filters. No cross-platform
 matrix or website build is part of this checkpoint.
+
+## Managed networking tokens — 2026-09-25
+
+Development DNS lookup and all connect, accept, receive and send overloads now accept
+CancellationToken. Tokenless overloads forward None, preserving existing behavior.
+The internal shared-deadline paths also accept tokens for future HTTP forwarding.
+A pre-cancelled token takes precedence over argument validation. After admission,
+only a native cancellation win leads to Promise.Cancel; a completed operation is
+not relabelled because the token flag later changed. Registrations are removed before
+consuming the native ID. Source disposal removes callbacks without cancelling I/O.
+
+This uses the existing .NET cooperative-cancellation comparison and the
+[ReceiveAsync ownership baseline](experiments/socket-api/README.md). The naming and
+Result-based error channel remain neoCLR-specific; cancellation is a Task outcome.
+No public scheduler or suspension protocol is added. Future suspension can replace
+callbacks while retaining the request/acknowledgement boundary. Invocation-local
+tokens still cannot coordinate across threads. The [focused managed fixture](experiments/network-cancellation/README.md)
+checks the contract with loopback I/O and the matching compiler bridge.

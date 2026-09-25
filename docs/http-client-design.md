@@ -459,3 +459,14 @@ completion delivery/result consumption. Blocked DNS work retains its host capaci
 permit even when guest delivery is cancelled. The managed adapters and HttpHandler
 still need token forwarding and registration disposal. No token-aware Send/Get or
 GetString overload is claimed by this checkpoint.
+
+
+### Managed networking cancellation prerequisite — 2026-09-25
+
+DNS and sockets now accept CancellationToken on public operations and internal
+shared-deadline paths. They dispose registrations before consuming native results,
+and acknowledge a winning native cancellation through Task cancellation. Existing
+HTTP calls remain tokenless. The next step is forwarding the token through HttpHandler
+and HttpExchange, observing cancelled child tasks without calling GetResult, closing
+the exchange-owned socket, then exposing terminal HTTP cancellation. The public
+Send/Get token overloads and GetString are not implemented by this prerequisite.

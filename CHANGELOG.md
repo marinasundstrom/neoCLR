@@ -13,7 +13,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   outcomes and callback/result acknowledgement. Retain cancelled operation slots
   until consumption and blocked DNS host-capacity permits until host work returns.
   Validate cleanup, completion races, stale/foreign handles and exact native service
-  signatures. Managed token registration and HTTP forwarding remain pending.
+  signatures. Add development CancellationToken overloads to DNS lookup and all socket
+  connect/accept/send/receive forms, including private shared-deadline paths. Preserve
+  native completion winners, dispose registrations before result consumption and
+  acknowledge cancellation through Task. Tokenless overloads remain available; source
+  disposal does not cancel I/O. Refresh API reference coverage. HTTP forwarding remains pending.
 
 - Add development HttpClient.BaseUri as Option<string>, plus Get(Uri) overloads
   on HttpClient and HttpRequest. Both address forms use the existing Uri parser

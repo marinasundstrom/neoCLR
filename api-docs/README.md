@@ -197,3 +197,9 @@ Native `SocketCancel`/`DnsCancel` operation hooks are bootstrap-only implementat
 services, not new public reference APIs. Normal application reference metadata still
 omits RuntimeServices; the importer admits these calls only while building the
 runtime library. HTTP and managed DNS/socket token forwarding remain pending.
+
+Development networking token overloads (2026-09-25) are included on the existing
+Dns and Socket reference pages, with per-member cancellation/ownership descriptions
+and the [socket guide](sockets.md#per-operation-cancellation-development). Private
+provider registration and shared-deadline helpers remain excluded from application
+reference navigation. The matching reference snapshot includes all eight new overloads.

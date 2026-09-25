@@ -4,6 +4,7 @@ import System.*
 import System.Networking.*
 import System.Result.*
 import System.Tasks.*
+import System.Concurrency.*
 import System.Collections.*
 import System.Runtime.CompilerServices.*
 
@@ -16,8 +17,18 @@ public class Socket {
 
     /// Connects to an address value. IPv6 transport is not supported yet.
     static func Connect(address: IPAddress, port: int) -> Task<Result<Socket, SocketError>> {
+        return Connect(address, port, CancellationToken.None)
+    }
+
+    /// Requests cancellation cooperatively; the task is cancelled after provider acknowledgement.
+    static func Connect(address: IPAddress, port: int, cancellationToken: CancellationToken) -> Task<Result<Socket, SocketError>> {
+        if cancellationToken.IsCancellationRequested {
+            let cancelled = Promise<Result<Socket, SocketError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
         if address is IPv4Address {
-            return Connect(address.ToString(), port)
+            return Connect(address.ToString(), port, cancellationToken)
         }
         let source = Promise<Result<Socket, SocketError>>()
         _ = source.Complete(Error(SocketError.UnsupportedAddressFamily()))
@@ -26,10 +37,24 @@ public class Socket {
 
     /// Tries address values within the existing bounded connection policy.
     static func Connect(addresses: Sequence<IPAddress>, port: int) -> Task<Result<Socket, SocketError>> {
-        return ConnectUntil(addresses, port, 0)
+        return Connect(addresses, port, CancellationToken.None)
+    }
+
+    /// Requests cancellation cooperatively; the task is cancelled after provider acknowledgement.
+    static func Connect(addresses: Sequence<IPAddress>, port: int, cancellationToken: CancellationToken) -> Task<Result<Socket, SocketError>> {
+        return ConnectUntil(addresses, port, 0, cancellationToken)
     }
 
     internal static func ConnectUntil(addresses: Sequence<IPAddress>, port: int, deadline: long) -> Task<Result<Socket, SocketError>> {
+        return ConnectUntil(addresses, port, deadline, CancellationToken.None)
+    }
+
+    internal static func ConnectUntil(addresses: Sequence<IPAddress>, port: int, deadline: long, cancellationToken: CancellationToken) -> Task<Result<Socket, SocketError>> {
+        if cancellationToken.IsCancellationRequested {
+            let cancelled = Promise<Result<Socket, SocketError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
         if addresses.Count == 0 {
             let empty = Promise<Result<Socket, SocketError>>()
             _ = empty.Complete(Error(SocketError.InvalidRange()))
@@ -52,7 +77,7 @@ public class Socket {
             text.Add(address.ToString())
             index += 1
         }
-        return ConnectUntil(text, port, deadline)
+        return ConnectUntil(text, port, deadline, cancellationToken)
     }
 
     /// Listens on an address value. IPv6 transport is not supported yet.
@@ -64,19 +89,33 @@ public class Socket {
     }
 
     static func Connect(address: string, port: int) -> Task<Result<Socket, SocketError>> {
+        return Connect(address, port, CancellationToken.None)
+    }
+
+    /// Requests cancellation cooperatively; the task is cancelled after provider acknowledgement.
+    static func Connect(address: string, port: int, cancellationToken: CancellationToken) -> Task<Result<Socket, SocketError>> {
         let source = Promise<Result<Socket, SocketError>>()
-        let completion = SocketConnectCompletion(source)
+        let completion = SocketConnectCompletion(source, cancellationToken)
         completion.Start(address, port)
         return source.Task
     }
 
     static func Connect(addresses: Sequence<string>, port: int) -> Task<Result<Socket, SocketError>> {
-        return ConnectUntil(addresses, port, 0)
+        return Connect(addresses, port, CancellationToken.None)
+    }
+
+    /// Requests cancellation cooperatively; the task is cancelled after provider acknowledgement.
+    static func Connect(addresses: Sequence<string>, port: int, cancellationToken: CancellationToken) -> Task<Result<Socket, SocketError>> {
+        return ConnectUntil(addresses, port, 0, cancellationToken)
     }
 
     internal static func ConnectUntil(addresses: Sequence<string>, port: int, deadline: long) -> Task<Result<Socket, SocketError>> {
+        return ConnectUntil(addresses, port, deadline, CancellationToken.None)
+    }
+
+    internal static func ConnectUntil(addresses: Sequence<string>, port: int, deadline: long, cancellationToken: CancellationToken) -> Task<Result<Socket, SocketError>> {
         let source = Promise<Result<Socket, SocketError>>()
-        let completion = SocketConnectCompletion(source)
+        let completion = SocketConnectCompletion(source, cancellationToken)
         completion.StartAddressesUntil(addresses, port, deadline)
         return source.Task
     }
@@ -90,8 +129,13 @@ public class Socket {
     }
 
     func Accept() -> Task<Result<Socket, SocketError>> {
+        return Accept(CancellationToken.None)
+    }
+
+    /// Requests cancellation cooperatively; the task is cancelled after provider acknowledgement.
+    func Accept(cancellationToken: CancellationToken) -> Task<Result<Socket, SocketError>> {
         let source = Promise<Result<Socket, SocketError>>()
-        let completion = SocketConnectCompletion(source)
+        let completion = SocketConnectCompletion(source, cancellationToken)
         completion.StartAccept(handle)
         return source.Task
     }
@@ -105,23 +149,41 @@ public class Socket {
     }
 
     func Receive(buffer: byte[], offset: int, count: int) -> Task<Result<int, SocketError>> {
-        return ReceiveUntil(buffer, offset, count, 0)
+        return Receive(buffer, offset, count, CancellationToken.None)
+    }
+
+    /// Requests cancellation cooperatively; the task is cancelled after provider acknowledgement.
+    func Receive(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+        return ReceiveUntil(buffer, offset, count, 0, cancellationToken)
     }
 
     internal func ReceiveUntil(buffer: byte[], offset: int, count: int, deadline: long) -> Task<Result<int, SocketError>> {
+        return ReceiveUntil(buffer, offset, count, deadline, CancellationToken.None)
+    }
+
+    internal func ReceiveUntil(buffer: byte[], offset: int, count: int, deadline: long, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
         let source = Promise<Result<int, SocketError>>()
-        let completion = SocketTransferCompletion(source)
+        let completion = SocketTransferCompletion(source, cancellationToken)
         completion.StartReceiveUntil(handle, buffer, offset, count, deadline)
         return source.Task
     }
 
     func Send(buffer: byte[], offset: int, count: int) -> Task<Result<int, SocketError>> {
-        return SendUntil(buffer, offset, count, 0)
+        return Send(buffer, offset, count, CancellationToken.None)
+    }
+
+    /// Requests cancellation cooperatively; the task is cancelled after provider acknowledgement.
+    func Send(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+        return SendUntil(buffer, offset, count, 0, cancellationToken)
     }
 
     internal func SendUntil(buffer: byte[], offset: int, count: int, deadline: long) -> Task<Result<int, SocketError>> {
+        return SendUntil(buffer, offset, count, deadline, CancellationToken.None)
+    }
+
+    internal func SendUntil(buffer: byte[], offset: int, count: int, deadline: long, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
         let source = Promise<Result<int, SocketError>>()
-        let completion = SocketTransferCompletion(source)
+        let completion = SocketTransferCompletion(source, cancellationToken)
         completion.StartSendUntil(handle, buffer, offset, count, deadline)
         return source.Task
     }
@@ -176,21 +238,34 @@ public class Socket {
 }
 
 internal class SocketConnectCompletion {
-    private field source: Promise<Result<Socket, SocketError>>
-    private field operation: long
+    private var source: Promise<Result<Socket, SocketError>>
+    private var operation: long
+    private var token: CancellationToken
+    private var registration: CancellationRegistration?
+    private var cancellationWon: bool
 
-    internal init(source: Promise<Result<Socket, SocketError>>) {
+    internal init(source: Promise<Result<Socket, SocketError>>, token: CancellationToken) {
         self.source = source
         operation = 0
+        self.token = token
+        registration = null
+        cancellationWon = false
     }
 
     internal func Start(address: string, port: int) {
+        if token.IsCancellationRequested {
+            _ = source.Cancel()
+            return
+        }
         _ = TaskQueue.Default
         let payload = RuntimeServices.SocketConnect(address, port, self.Complete)
         if RuntimeServices.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {
             operation = RuntimeServices.UnpackValue<long>(payload)
+            if token.CanBeCancelled {
+                registration = token.Register(self.RequestCancellation)
+            }
         }
     }
 
@@ -199,6 +274,10 @@ internal class SocketConnectCompletion {
     }
 
     internal func StartAddressesUntil(addresses: Sequence<string>, port: int, deadline: long) {
+        if token.IsCancellationRequested {
+            _ = source.Cancel()
+            return
+        }
         let count = addresses.Count
         if count <= 0 {
             _ = source.Complete(Error(SocketError.InvalidRange()))
@@ -224,21 +303,45 @@ internal class SocketConnectCompletion {
             _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {
             operation = RuntimeServices.UnpackValue<long>(payload)
+            if token.CanBeCancelled {
+                registration = token.Register(self.RequestCancellation)
+            }
         }
     }
 
     internal func StartAccept(handle: long) {
+        if token.IsCancellationRequested {
+            _ = source.Cancel()
+            return
+        }
         _ = TaskQueue.Default
         let payload = RuntimeServices.SocketAccept(handle, self.Complete)
         if RuntimeServices.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {
             operation = RuntimeServices.UnpackValue<long>(payload)
+            if token.CanBeCancelled {
+                registration = token.Register(self.RequestCancellation)
+            }
         }
     }
 
+    internal func RequestCancellation() {
+        cancellationWon = RuntimeServices.SocketCancel(operation)
+    }
+
     internal func Complete() {
+        let active = registration
+        registration = null
+        if active is CancellationRegistration current {
+            current.Dispose()
+        }
         let payload = RuntimeServices.SocketConnectResult(operation)
+        operation = 0
+        if cancellationWon {
+            _ = source.Cancel()
+            return
+        }
         if RuntimeServices.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {
@@ -248,12 +351,18 @@ internal class SocketConnectCompletion {
 }
 
 internal class SocketTransferCompletion {
-    private field source: Promise<Result<int, SocketError>>
-    private field operation: long
+    private var source: Promise<Result<int, SocketError>>
+    private var operation: long
+    private var token: CancellationToken
+    private var registration: CancellationRegistration?
+    private var cancellationWon: bool
 
-    internal init(source: Promise<Result<int, SocketError>>) {
+    internal init(source: Promise<Result<int, SocketError>>, token: CancellationToken) {
         self.source = source
         operation = 0
+        self.token = token
+        registration = null
+        cancellationWon = false
     }
 
     internal func StartReceive(handle: long, buffer: byte[], offset: int, count: int) {
@@ -261,6 +370,10 @@ internal class SocketTransferCompletion {
     }
 
     internal func StartReceiveUntil(handle: long, buffer: byte[], offset: int, count: int, deadline: long) {
+        if token.IsCancellationRequested {
+            _ = source.Cancel()
+            return
+        }
         _ = TaskQueue.Default
         let payload = if deadline == 0 {
             RuntimeServices.SocketReceive(handle, buffer, offset, count, self.Complete)
@@ -271,6 +384,9 @@ internal class SocketTransferCompletion {
             _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {
             operation = RuntimeServices.UnpackValue<long>(payload)
+            if token.CanBeCancelled {
+                registration = token.Register(self.RequestCancellation)
+            }
         }
     }
 
@@ -279,6 +395,10 @@ internal class SocketTransferCompletion {
     }
 
     internal func StartSendUntil(handle: long, buffer: byte[], offset: int, count: int, deadline: long) {
+        if token.IsCancellationRequested {
+            _ = source.Cancel()
+            return
+        }
         _ = TaskQueue.Default
         let payload = if deadline == 0 {
             RuntimeServices.SocketSend(handle, buffer, offset, count, self.Complete)
@@ -289,11 +409,28 @@ internal class SocketTransferCompletion {
             _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {
             operation = RuntimeServices.UnpackValue<long>(payload)
+            if token.CanBeCancelled {
+                registration = token.Register(self.RequestCancellation)
+            }
         }
     }
 
+    internal func RequestCancellation() {
+        cancellationWon = RuntimeServices.SocketCancel(operation)
+    }
+
     internal func Complete() {
+        let active = registration
+        registration = null
+        if active is CancellationRegistration current {
+            current.Dispose()
+        }
         let payload = RuntimeServices.SocketTransferResult(operation)
+        operation = 0
+        if cancellationWon {
+            _ = source.Cancel()
+            return
+        }
         if RuntimeServices.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {

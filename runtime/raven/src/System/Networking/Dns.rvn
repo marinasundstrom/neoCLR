@@ -4,18 +4,28 @@ import System.*
 import System.Result.*
 import System.Collections.*
 import System.Tasks.*
+import System.Concurrency.*
 import System.Runtime.CompilerServices.*
 
 public class Dns {
     private init() { }
 
     static func GetHostAddresses(hostName: string) -> Task<Result<Sequence<IPAddress>, DnsError>> {
-        return GetHostAddressesUntil(hostName, 0)
+        return GetHostAddresses(hostName, CancellationToken.None)
+    }
+
+    /// Requests cancellation cooperatively; the task is cancelled after provider acknowledgement.
+    static func GetHostAddresses(hostName: string, cancellationToken: CancellationToken) -> Task<Result<Sequence<IPAddress>, DnsError>> {
+        return GetHostAddressesUntil(hostName, 0, cancellationToken)
     }
 
     internal static func GetHostAddressesUntil(hostName: string, deadline: long) -> Task<Result<Sequence<IPAddress>, DnsError>> {
+        return GetHostAddressesUntil(hostName, deadline, CancellationToken.None)
+    }
+
+    internal static func GetHostAddressesUntil(hostName: string, deadline: long, cancellationToken: CancellationToken) -> Task<Result<Sequence<IPAddress>, DnsError>> {
         let source = Promise<Result<Sequence<IPAddress>, DnsError>>()
-        let completion = DnsCompletion(source)
+        let completion = DnsCompletion(source, cancellationToken)
         completion.StartUntil(hostName, deadline)
         return source.Task
     }
@@ -45,12 +55,18 @@ public class Dns {
 }
 
 internal class DnsCompletion {
-    private field source: Promise<Result<Sequence<IPAddress>, DnsError>>
-    private field operation: long
+    private var source: Promise<Result<Sequence<IPAddress>, DnsError>>
+    private var operation: long
+    private var token: CancellationToken
+    private var registration: CancellationRegistration?
+    private var cancellationWon: bool
 
-    internal init(source: Promise<Result<Sequence<IPAddress>, DnsError>>) {
+    internal init(source: Promise<Result<Sequence<IPAddress>, DnsError>>, token: CancellationToken) {
         self.source = source
         operation = 0
+        self.token = token
+        registration = null
+        cancellationWon = false
     }
 
     internal func Start(hostName: string) {
@@ -58,6 +74,10 @@ internal class DnsCompletion {
     }
 
     internal func StartUntil(hostName: string, deadline: long) {
+        if token.IsCancellationRequested {
+            _ = source.Cancel()
+            return
+        }
         _ = TaskQueue.Default
         let payload = if deadline == 0 {
             RuntimeServices.DnsLookup(hostName, self.Complete)
@@ -68,11 +88,28 @@ internal class DnsCompletion {
             _ = source.Complete(Error(Dns.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {
             operation = RuntimeServices.UnpackValue<long>(payload)
+            if token.CanBeCancelled {
+                registration = token.Register(self.RequestCancellation)
+            }
         }
     }
 
+    internal func RequestCancellation() {
+        cancellationWon = RuntimeServices.DnsCancel(operation)
+    }
+
     internal func Complete() {
+        let active = registration
+        registration = null
+        if active is CancellationRegistration current {
+            current.Dispose()
+        }
         let payload = RuntimeServices.DnsResult(operation)
+        operation = 0
+        if cancellationWon {
+            _ = source.Cancel()
+            return
+        }
         if RuntimeServices.IsValue<byte>(payload) {
             _ = source.Complete(Error(Dns.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
         } else {

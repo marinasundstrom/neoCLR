@@ -16,8 +16,25 @@ static class NetworkBudgetChecks
                 var module = assembly.MainModule;
                 var methods = module.Types.Where(t => t.FullName is "System.Networking.Dns" or "System.Networking.Sockets.Socket")
                     .SelectMany(t => t.Methods).Where(m => m.Name.EndsWith("Until", StringComparison.Ordinal)).ToArray();
-                if (methods.Length != 4 || methods.Any(m => bootstrap ? !m.IsPublic : !m.IsAssembly))
+                if (methods.Length != 10 || methods.Any(m => bootstrap ? !m.IsPublic : !m.IsAssembly))
                     throw new InvalidDataException("Network budget visibility differs from the selected reference profile.");
+                var tokenOverloads = module.Types.Where(t => t.FullName is "System.Networking.Dns" or "System.Networking.Sockets.Socket")
+                    .SelectMany(t => t.Methods).Where(m => !m.Name.EndsWith("Until", StringComparison.Ordinal)
+                        && m.Parameters.LastOrDefault()?.ParameterType.FullName == CancellationBindings.Token).ToArray();
+                if (tokenOverloads.Length != 8)
+                    throw new InvalidDataException("Missing public network cancellation overloads.");
+                foreach (var method in tokenOverloads) {
+                    if (!method.IsPublic || SocketBindings.Bind(method, method, false, false) is null)
+                        throw new InvalidDataException("Public network cancellation binding failed.");
+                    var parameter = method.Parameters[^1];
+                    var token = parameter.ParameterType;
+                    parameter.ParameterType = module.TypeSystem.Int32;
+                    try {
+                        SocketBindings.Bind(method, method, false, false);
+                        throw new Exception("Network cancellation accepted a non-token parameter.");
+                    } catch (InvalidDataException) { }
+                    parameter.ParameterType = token;
+                }
                 SocketBindings.Project(module);
                 foreach (var method in methods)
                 {

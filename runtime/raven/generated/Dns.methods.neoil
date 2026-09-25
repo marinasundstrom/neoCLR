@@ -16,188 +16,218 @@ M00000002_IL_0001:
 M00000002_IL_0002:
 ldarg 0
 M00000002_IL_0003:
+call System.Concurrency.CancellationToken::get_None()
+M00000002_IL_0008:
+call System.Networking.Dns::GetHostAddresses(String,System.Concurrency.CancellationToken)
+M00000002_IL_000d:
+ret
+.end
+.method static GetHostAddresses(String hostName,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
 ldc.i4 0
-M00000002_IL_0004:
+M00000003_IL_0004:
 conv.i8
-M00000002_IL_0005:
-call System.Networking.Dns::GetHostAddressesUntil(String,Int64)
-M00000002_IL_000a:
+M00000003_IL_0005:
+ldarg 1
+M00000003_IL_0006:
+call System.Networking.Dns::GetHostAddressesUntil(String,Int64,System.Concurrency.CancellationToken)
+M00000003_IL_000b:
 ret
 .end
 .method internal static GetHostAddressesUntil(String hostName,Int64 deadline) -> System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldarg 1
+M00000004_IL_0004:
+call System.Concurrency.CancellationToken::get_None()
+M00000004_IL_0009:
+call System.Networking.Dns::GetHostAddressesUntil(String,Int64,System.Concurrency.CancellationToken)
+M00000004_IL_000e:
+ret
+.end
+.method internal static GetHostAddressesUntil(String hostName,Int64 deadline,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 .local System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> local0
 .local System.Networking.DnsCompletion local1
 ldloca local0
 initobj System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 ldloca local1
 initobj System.Networking.DnsCompletion
-M00000003_IL_0000:
-M00000003_IL_0001:
+M00000005_IL_0000:
+M00000005_IL_0001:
 newobj instance System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::.ctor()
-M00000003_IL_0006:
+M00000005_IL_0006:
 stloc local0
-M00000003_IL_0007:
-M00000003_IL_0008:
+M00000005_IL_0007:
+M00000005_IL_0008:
 ldloc local0
-M00000003_IL_0009:
-newobj instance System.Networking.DnsCompletion::.ctor(System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>)
-M00000003_IL_000e:
+M00000005_IL_0009:
+ldarg 2
+M00000005_IL_000a:
+newobj instance System.Networking.DnsCompletion::.ctor(System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>,System.Concurrency.CancellationToken)
+M00000005_IL_000f:
 stloc local1
-M00000003_IL_000f:
-M00000003_IL_0010:
+M00000005_IL_0010:
+M00000005_IL_0011:
 ldloc local1
-M00000003_IL_0011:
+M00000005_IL_0012:
 ldarg 0
-M00000003_IL_0012:
+M00000005_IL_0013:
 ldarg 1
-M00000003_IL_0013:
+M00000005_IL_0014:
 callvirt instance System.Networking.DnsCompletion::StartUntil(String,Int64)
-M00000003_IL_0018:
-M00000003_IL_0019:
+M00000005_IL_0019:
+M00000005_IL_001a:
 ldloc local0
-M00000003_IL_001a:
+M00000005_IL_001b:
 call instance System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::get_Task()
-M00000003_IL_001f:
+M00000005_IL_0020:
 ret
 .end
 .method internal static DecodeError(Byte code) -> System.Networking.DnsError
-M00000004_IL_0000:
-M00000004_IL_0001:
-M00000004_IL_0002:
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
 ldarg 0
-M00000004_IL_0003:
+M00000006_IL_0003:
 conv.i4
-M00000004_IL_0004:
+M00000006_IL_0004:
 ldc.i4 1
-M00000004_IL_0005:
+M00000006_IL_0005:
 ceq
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_0007:
-brtrue M00000004_IL_0011
-M00000004_IL_000c:
-br M00000004_IL_001c
-M00000004_IL_0011:
+M00000006_IL_0007:
+brtrue M00000006_IL_0011
+M00000006_IL_000c:
+br M00000006_IL_001c
+M00000006_IL_0011:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorInvalidNameNew()
-M00000004_IL_0016:
+M00000006_IL_0016:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorNewSystemNetworkingDnsErrorInvalidName(System.Networking.DnsError.InvalidName)
-M00000004_IL_001b:
+M00000006_IL_001b:
 ret
-M00000004_IL_001c:
-M00000004_IL_001d:
-M00000004_IL_001e:
+M00000006_IL_001c:
+M00000006_IL_001d:
+M00000006_IL_001e:
 ldarg 0
-M00000004_IL_001f:
+M00000006_IL_001f:
 conv.i4
-M00000004_IL_0020:
+M00000006_IL_0020:
 ldc.i4 2
-M00000004_IL_0021:
+M00000006_IL_0021:
 ceq
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_0023:
-brtrue M00000004_IL_002d
-M00000004_IL_0028:
-br M00000004_IL_0038
-M00000004_IL_002d:
+M00000006_IL_0023:
+brtrue M00000006_IL_002d
+M00000006_IL_0028:
+br M00000006_IL_0038
+M00000006_IL_002d:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorLimitExceededNew()
-M00000004_IL_0032:
+M00000006_IL_0032:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorNewSystemNetworkingDnsErrorLimitExceeded(System.Networking.DnsError.LimitExceeded)
-M00000004_IL_0037:
+M00000006_IL_0037:
 ret
-M00000004_IL_0038:
-M00000004_IL_0039:
-M00000004_IL_003a:
+M00000006_IL_0038:
+M00000006_IL_0039:
+M00000006_IL_003a:
 ldarg 0
-M00000004_IL_003b:
+M00000006_IL_003b:
 conv.i4
-M00000004_IL_003c:
+M00000006_IL_003c:
 ldc.i4 3
-M00000004_IL_003d:
+M00000006_IL_003d:
 ceq
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_003f:
-brtrue M00000004_IL_0049
-M00000004_IL_0044:
-br M00000004_IL_0054
-M00000004_IL_0049:
+M00000006_IL_003f:
+brtrue M00000006_IL_0049
+M00000006_IL_0044:
+br M00000006_IL_0054
+M00000006_IL_0049:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorNoAddressNew()
-M00000004_IL_004e:
+M00000006_IL_004e:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorNewSystemNetworkingDnsErrorNoAddress(System.Networking.DnsError.NoAddress)
-M00000004_IL_0053:
+M00000006_IL_0053:
 ret
-M00000004_IL_0054:
-M00000004_IL_0055:
-M00000004_IL_0056:
+M00000006_IL_0054:
+M00000006_IL_0055:
+M00000006_IL_0056:
 ldarg 0
-M00000004_IL_0057:
+M00000006_IL_0057:
 conv.i4
-M00000004_IL_0058:
+M00000006_IL_0058:
 ldc.i4 4
-M00000004_IL_0059:
+M00000006_IL_0059:
 ceq
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_005b:
-brtrue M00000004_IL_0065
-M00000004_IL_0060:
-br M00000004_IL_0070
-M00000004_IL_0065:
+M00000006_IL_005b:
+brtrue M00000006_IL_0065
+M00000006_IL_0060:
+br M00000006_IL_0070
+M00000006_IL_0065:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorTimedOutNew()
-M00000004_IL_006a:
+M00000006_IL_006a:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorNewSystemNetworkingDnsErrorTimedOut(System.Networking.DnsError.TimedOut)
-M00000004_IL_006f:
+M00000006_IL_006f:
 ret
-M00000004_IL_0070:
-M00000004_IL_0071:
-M00000004_IL_0072:
+M00000006_IL_0070:
+M00000006_IL_0071:
+M00000006_IL_0072:
 ldarg 0
-M00000004_IL_0073:
+M00000006_IL_0073:
 conv.i4
-M00000004_IL_0074:
+M00000006_IL_0074:
 ldc.i4 5
-M00000004_IL_0075:
+M00000006_IL_0075:
 ceq
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_0077:
-brtrue M00000004_IL_0081
-M00000004_IL_007c:
-br M00000004_IL_008c
-M00000004_IL_0081:
+M00000006_IL_0077:
+brtrue M00000006_IL_0081
+M00000006_IL_007c:
+br M00000006_IL_008c
+M00000006_IL_0081:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorCancelledNew()
-M00000004_IL_0086:
+M00000006_IL_0086:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorNewSystemNetworkingDnsErrorCancelled(System.Networking.DnsError.Cancelled)
-M00000004_IL_008b:
+M00000006_IL_008b:
 ret
-M00000004_IL_008c:
-M00000004_IL_008d:
-M00000004_IL_008e:
+M00000006_IL_008c:
+M00000006_IL_008d:
+M00000006_IL_008e:
 ldarg 0
-M00000004_IL_008f:
+M00000006_IL_008f:
 conv.i4
-M00000004_IL_0090:
+M00000006_IL_0090:
 ldc.i4 6
-M00000004_IL_0091:
+M00000006_IL_0091:
 ceq
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_0093:
-brtrue M00000004_IL_009d
-M00000004_IL_0098:
-br M00000004_IL_00a8
-M00000004_IL_009d:
+M00000006_IL_0093:
+brtrue M00000006_IL_009d
+M00000006_IL_0098:
+br M00000006_IL_00a8
+M00000006_IL_009d:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorLookupFailedNew()
-M00000004_IL_00a2:
+M00000006_IL_00a2:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorNewSystemNetworkingDnsErrorLookupFailed(System.Networking.DnsError.LookupFailed)
-M00000004_IL_00a7:
+M00000006_IL_00a7:
 ret
-M00000004_IL_00a8:
-M00000004_IL_00a9:
-M00000004_IL_00aa:
+M00000006_IL_00a8:
+M00000006_IL_00a9:
+M00000006_IL_00aa:
 ldstr "invalid native DNS error"
-M00000004_IL_00af:
+M00000006_IL_00af:
 call System.Fault(String)
-M00000004_IL_00b4:
+M00000006_IL_00b4:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorLookupFailedNew()
-M00000004_IL_00b9:
+M00000006_IL_00b9:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorNewSystemNetworkingDnsErrorLookupFailed(System.Networking.DnsError.LookupFailed)
-M00000004_IL_00be:
+M00000006_IL_00be:
 ret
 .end
 .end

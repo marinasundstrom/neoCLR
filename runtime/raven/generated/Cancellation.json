@@ -11,9 +11,9 @@
     "runtime/raven/src/System/Web/Http/HttpClient.rvn": "c01c5983e3a276502e5b3cd4683285335b653d7138571ae007730faea99219a9",
     "runtime/raven/src/System/Web/Http/HttpError.rvn": "05367cc2e6ccc2b3d4085b1a48ba43218c7271ae9a6a96bb6e4437e7a37e0d1c",
     "runtime/raven/src/System/Networking/DnsError.rvn": "3d29e8b2008d54270cb35a581f4ba38e6d0672f4576b334100fc72d8f729a7bd",
-    "runtime/raven/src/System/Networking/Dns.rvn": "a93fbf79789efdf630640378fc59e2b822e31f5a339ed3daea2fe21b56e7d514",
+    "runtime/raven/src/System/Networking/Dns.rvn": "750806e7716026fcfc5d0cf1b77b90c4d9175b1c32d5bdc4a612f1b469ea1074",
     "runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "15f9d2bb496458f8f4077c3a0b4f7606c4f4c35feff62c277d76e324c0c4d4ef",
-    "runtime/raven/src/System/Networking/Sockets/Socket.rvn": "bf74ef55ecb2ca8360b3b8233de102797215b2fb5ea92c5eec2cb7a4653cc0f1",
+    "runtime/raven/src/System/Networking/Sockets/Socket.rvn": "493311aaaf400f03b32e9977e45e1c8cfbe65710bccac87562be1e4e8f32f250",
     "runtime/raven/src/System/IO/TextReadError.rvn": "0f68bf5b8875fc91b0234ccb18ee2f32d334197c38a12f438eae34f65de8a441",
     "runtime/raven/src/System/IO/TextReader.rvn": "6f9f6159741cec9acaded9e5b2705d3c1beaac4fa3fbb1be8a2146f18f575ce0",
     "runtime/raven/src/System/IO/TextWriter.rvn": "ee053d0893f533207e580eba37509aca9284dd0c37d13dff1941a2485b506fec",
@@ -125,7 +125,7 @@
     "Cancellation.helpers.neoil": "48d1a683f4890ce5c5cbb2266dd8e544c88c413daafadf1a5b812e8c9cabd996"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "3d28b90bda4906e803c93fd3c699b60736d3d5594a4bdb569988c12466a660e2",
+  "coreSha256": "f5f6bbfb8efeaeadebd54e3ed60dd3cb136ecff104938a750175ec0b3ad5489b",
   "exports": [
     ".ctor() -> noresult",
     "get_Token() -> System.Concurrency.CancellationToken",
