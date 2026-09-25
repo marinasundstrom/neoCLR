@@ -1,0 +1,26 @@
+{
+  "resolved": [
+    ["http://example.test:8080/api/", "items", "/api/items"],
+    ["http://example.test:8080/api", "items", "/items"],
+    ["http://example.test:8080/api/", "../items", "/items"],
+    ["http://example.test:8080/api/", "/root", "/root"],
+    ["http://example.test:8080/api/item?old=1", "?new=2", "/api/item?new=2"],
+    ["http://example.test:8080/api/item?old=1", "", "/api/item?old=1"],
+    ["http://example.test:8080", "items", "/items"],
+    ["http://example.test:8080/api/", "./one/../two", "/api/two"],
+    ["http://example.test:8080/api/", "%2e%2e/item", "/api/%2e%2e/item"],
+    ["http://example.test:8080/api/", "?path=/one:two", "/api/?path=/one:two"]
+  ],
+  "rejected": [
+    ["http://example.test:8080/api/", "http://example.test:8080/item"],
+    ["http://example.test:8080/api/", "//other.test/item"],
+    ["relative/base/", "item"],
+    ["https://example.test:8080/api/", "item"],
+    ["http://example.test:8080/api/#fragment", "item"],
+    ["http://example.test:8080/api/", "item#fragment"],
+    ["http://example.test:8080/api/%broken", "item"],
+    ["http://example.test:8080/api/", "item\r\nInjected: value"],
+    ["http://user@example.test:8080/", "item"],
+    ["http://example.test:0/", "item"]
+  ]
+}

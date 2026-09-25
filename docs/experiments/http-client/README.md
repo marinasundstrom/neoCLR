@@ -4,6 +4,10 @@ Development after Preview 9. This app imports `System.Web.Http` from the neoCLR
 runtime library: HttpClient, HttpHandler, HttpSocketHandler, HttpRequest, HttpResponse,
 HttpHeader and HttpContent. [Design and remaining gates](../../http-client-design.md).
 The public API reference is available on the website under `/docs/`.
+Main now sets `BaseUri = Some("http://localhost:19091/")` and passes `"greeting"`
+to Get through the handler pipeline. The verifier substitutes the selected port.
+[Focused address checks](../http-base/README.md) cover string/Uri overloads, base
+resolution and errors before dispatch independently of transport framing.
 
 ## Run
 

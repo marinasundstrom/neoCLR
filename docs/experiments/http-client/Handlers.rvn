@@ -65,8 +65,8 @@ func CheckHandlers() {
     Check(events.Count == 4)
     Check(events[0] == "outer before" && events[1] == "inner before")
     Check(events[2] == "inner after" && events[3] == "outer after")
-    if let Error(HttpError.Unsupported(message)) = client.Get("http://example.test/unsafe\r\nHeader: injected").GetResult() {
-        Check(message == "Unsupported request target")
+    if let Error(HttpError.InvalidUri(UriError.InvalidFormat)) = client.Get("http://example.test/unsafe\r\nHeader: injected").GetResult() {
+        Check(fake.Calls == 1)
     } else {
         System.Fault("Unsafe target admitted")
     }

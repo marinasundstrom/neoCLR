@@ -7062,3 +7062,23 @@ configuration/content, not target-specific code added to Raven main.
 - **Open:** HTTP/socket token wiring, timers, linked sources and cross-invocation
   cancellation. A nested callback/outer-array compiler emission observation is recorded
   for independent reduction; no compiler fix or runtime suspension is claimed.
+
+
+### 2026-09-25 — Integrate optional HTTP base addresses
+
+- **Prior author direction:** BaseUri should be optional string configuration; use
+  relative verb-method URLs when it is set, absolute URLs otherwise, with both
+  string and Uri overloads. The author also requests relevant per-slice tests and
+  no website build.
+- **Assistant action:** integrates that rule with the existing Uri parser/resolver
+  and handler pipeline. Rejects authority-replacing network-path references with
+  a configured base. Validates text at request construction and allows configuration
+  changes between calls; Send consumes an already constructed request.
+- **Evidence:** both overloads pass the base-resolution/error matrix and the .NET
+  comparison. The updated sample passes against an independent Python HTTP server;
+  both runtime fixtures finish with zero live allocations. API docs and website
+  source are updated, with the website build skipped.
+- **Open:** release slice 4 still needs token-aware Send/Get, native cancellation and
+  GetString. The assistant reviewed HTTPS feasibility and records a possible
+  host-side TLS adapter, not an implementation or author-approved dependency choice.
+  See [the design](http-client-design.md#baseuri-and-address-overloads--implemented-2026-09-25).

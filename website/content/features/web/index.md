@@ -20,6 +20,26 @@ ReadText returns a Task/Result and strictly decodes UTF-8. The prototype buffers
 complete small body before returning a response, so decoding currently finishes
 immediately. Wire lengths count bytes, not characters.
 
+## Base addresses and URI values
+
+`HttpClient.BaseUri` is an `Option<string>`, initially None. With no base configured,
+`Get` requires an absolute URL. With `Some("http://localhost:8080/api/")`,
+`Get("items")` constructs `/api/items`. A base ending in `/api` instead constructs
+`/items`: the last path segment is replaced, following URI resolution rules.
+
+`Get(string)` and `Get(Uri)` have the same behavior. Root-relative paths, parent paths,
+query-only references and empty references use the existing Uri resolver. A configured
+base rejects absolute URLs and `//host/path` references, so helpers cannot replace its
+authority. `Send` takes an already constructed request and does not apply the base.
+
+Invalid URI syntax becomes `HttpError.InvalidUri` with its original UriError. Unsupported
+HTTP forms and invalid base/address combinations are reported before handler dispatch.
+Base text is checked when constructing the request; assigning it does not perform I/O.
+Changes affect subsequent requests. Unlike .NET's Uri-valued BaseAddress, this property
+accepts optional text and can change after a request has been sent.
+
+[HttpClient API →](xref:System.Web.Http.HttpClient) · [Uri API →](xref:System.Uri)
+
 ## Attach behavior with handlers
 
 HttpClient delegates `Send(HttpRequest)` to an `HttpHandler`. Its contract returns
@@ -143,13 +163,10 @@ Its former per-case `Is*`/`Get*` helpers have been removed; match the cases dire
 
 The [API reference](/docs/api/System/Uri/) describes both overloads and the limits.
 
-Typed `HttpError` results are integrated. The next HTTP work includes `HttpClient.BaseUri`, with string
-and Uri request overloads. The planned base address is optional string configuration:
-with a base set, verb helpers resolve relative URLs against it; without one, callers
-provide absolute URLs. The planned core operation is Send(request, cancellationToken),
-with Get and GetString using the same handler pipeline.
-These HTTP additions are planned; the existing client
-still accepts absolute plain-HTTP strings and has no public cancellation token.
+Typed `HttpError` results and BaseUri resolution are integrated. The planned core
+operation remains Send(request, cancellationToken), with Get and GetString using the
+same handler pipeline. Invocation-local cancellation tokens exist in System.Concurrency;
+HTTP token forwarding and native-operation cancellation are not wired yet.
 
 URI/URL encoding utilities are also planned separately. Their design will distinguish
 path segments, query values and form data; the current Uri parser expects text that

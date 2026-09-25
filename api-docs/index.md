@@ -101,3 +101,8 @@ Development cancellation APIs are in `System.Concurrency`:
 They separate a cooperative request from operation completion and are currently
 confined to one invocation. See [the task feature](../features/tasks/#cooperative-cancellation-requests).
 HTTP/socket token overloads, timers and linked sources remain following work.
+
+`HttpClient.BaseUri` now accepts `Option<string>`. Its string and Uri Get overloads
+share validation/resolution and handler dispatch. With a base, pass relative references
+without authority; without a base, pass an absolute HTTP URI. See
+[HttpClient](xref:System.Web.Http.HttpClient) and [HttpRequest](xref:System.Web.Http.HttpRequest).

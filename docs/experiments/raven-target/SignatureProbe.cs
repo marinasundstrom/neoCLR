@@ -341,6 +341,17 @@ static class SignatureProbe
         Check("Error case constructor mapping", ErrorBindings.Construct(Reference(notFoundConstructor, notFound), notFoundConstructor)?.Result == "System.Storage.FileReadError.NotFound");
         Check("Empty errors differ from union carriers", ErrorBindings.IsEmpty("System.InvalidDateError") && !ErrorBindings.IsEmpty("System.Int32ParseError"));
         ErrorBindings.Reset(module);
+        foreach (var httpOwner in new[] { "System.Web.Http.HttpClient", "System.Web.Http.HttpRequest" })
+            foreach (var get in module.GetType(httpOwner).Methods.Where(m => m.Name == "Get"))
+                Check("HTTP address overload " + get.FullName,
+                    HttpBindings.Bind(get, get, false, false) is not null);
+        var baseSetter = module.GetType("System.Web.Http.HttpClient").Methods.Single(m => m.Name == "set_BaseUri");
+        Check("HTTP optional string base setter", HttpBindings.Bind(baseSetter, baseSetter, false, false)
+            is { Arguments: ["System.Web.Http.HttpClient", "System.Option<String>"], Result: "noresult" });
+        var baseArgument = baseSetter.Parameters[0].ParameterType;
+        baseSetter.Parameters[0].ParameterType = module.TypeSystem.String;
+        Reject("HTTP base setter rejects plain string signature", () => HttpBindings.Bind(baseSetter, baseSetter, false, false));
+        baseSetter.Parameters[0].ParameterType = baseArgument;
         var httpError = module.GetType("System.Web.Http.HttpError");
         var transportCase = httpError.NestedTypes.Single(t => t.Name == "Transport");
         var transportCtor = transportCase.Methods.Single(m => m.IsConstructor);

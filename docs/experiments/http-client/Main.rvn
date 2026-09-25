@@ -1,5 +1,6 @@
 import System.*
 import System.Result.*
+import System.Option.*
 import System.Collections.*
 import System.Tasks.*
 import System.Text.*
@@ -21,7 +22,8 @@ func Main() {
     // The verifier substitutes an ephemeral port and controls the peer.
     let events = ArrayList<string>()
     let client = HttpClient(RecordingHandler("transport", HttpSocketHandler(), events))
-    let fetching = ReadGreeting(client, "http://localhost:19091/greeting")
+    client.BaseUri = Some("http://localhost:19091/")
+    let fetching = ReadGreeting(client, "greeting")
     fetching.OnCompleted(() => {
         let result = fetching.GetResult()
         Check(events.Count == 2)

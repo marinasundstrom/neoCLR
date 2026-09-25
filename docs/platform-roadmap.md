@@ -77,8 +77,11 @@ address; 5. methods/content/statuses; 6. framing; 7. server lifecycle; 8. applic
 now links the [implemented address slice](ip-address-design.md): public parsing/formatting,
 value semantics, typed DNS results and Socket overloads. The [cancellation foundations](cancellation-design.md)
 now provide invocation-local source/token/registration contracts and keep a request
-separate from acknowledged completion. HttpClient token wiring and BaseUri are next;
-IPv6 transport and scope identifiers remain explicit follow-ups. Investigate HTTPS
+separate from acknowledged completion. [BaseUri and string/Uri address overloads](http-client-design.md#baseuri-and-address-overloads--implemented-2026-09-25)
+are now integrated and tested through the handler pipeline. Slice 4 remains active:
+HTTP/native token wiring and GetString are next. An [HTTPS feasibility checkpoint](http-client-design.md#https-feasibility-checkpoint--2026-09-25)
+records a possible TLS adapter and its required validation; it is not an implementation
+or a release-scope decision. IPv6 transport and scope identifiers remain explicit follow-ups. Investigate HTTPS
 feasibility after cancellation foundations and decide its scope before the application slice. Finish validation and documentation
 for each slice before advancing; a source change alone is not completion.
 
@@ -960,8 +963,9 @@ for applicable nongeneric families. Typed HTTP errors are now integrated into th
 client/handler/server contracts, with public consumer, independent-peer,
 framing/timeout, payload-GC and signature rejection checks passing.
 The [IPAddress slice](ip-address-design.md) now follows this with a closed class
-hierarchy, typed DNS results and Socket overloads. Cancellation and string/Uri overloads with BaseUri are next;
-do not extend the manual carrier catalog.
+hierarchy, typed DNS results and Socket overloads. Cancellation foundations and
+string/Uri overloads with BaseUri are implemented; HTTP token wiring remains next.
+Do not extend the manual carrier catalog.
 The author's 2026-09-25 HTTP contract makes
 `Send(HttpRequest, CancellationToken) -> Task<Result<HttpResponse, HttpError>>` the
 client primitive; Get, later verb helpers and GetString layer on it through the

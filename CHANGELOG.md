@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add development HttpClient.BaseUri as Option<string>, plus Get(Uri) overloads
+  on HttpClient and HttpRequest. Both address forms use the existing Uri parser
+  and resolver before handler dispatch. A configured base requires relative URLs
+  without authority; no base requires an absolute HTTP URL. Fix query-only absolute
+  URLs, preserve UriError causes, and reject malformed percent escapes/control bytes
+  as HttpError.InvalidUri (a change from the prior request-parser errors). Update
+  the client sample, API reference and focused .NET/handler/interoperability checks.
+  Record HTTPS adapter feasibility and validation needs without adding TLS support.
+  Token-aware HTTP/native cancellation and GetString remain pending in slice 4.
+
 - Add development System.Concurrency cancellation source, copyable token and
   disposable registration APIs. Requests invoke callbacks synchronously within
   one invocation; operations still own cleanup and Task cancellation acknowledgement.
@@ -25,7 +35,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   payloads, extraction and private access receive focused checks. Add selected-slice
   library regeneration for focused iteration. Follow author direction to use
   relevant per-slice tests and skip website builds while keeping docs current.
-  Cancellation and BaseUri remain pending.
+  Later entries cover cancellation foundations and BaseUri; HTTP token wiring remains pending.
 
 - Record the networking/web release objective and a proposed scope: request/body
   and status support, cancellation/lifetimes, interoperable framing, server shutdown,

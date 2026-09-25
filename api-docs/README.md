@@ -166,8 +166,10 @@ Refresh reference, bridge, library and native runtime together for this private 
 
 System.Uri and UriError now have generated type/member coverage. Parse and both
 Resolve overloads document strict ASCII grammar, the 4096-byte bound, unsupported
-IP literals, lexical equality and RFC relative resolution. HttpError and
-HttpClient.BaseUri remain planned; Uri parsing alone does not broaden HTTP support.
+IP literals, lexical equality and RFC relative resolution. HttpError is integrated.
+HttpClient.BaseUri now provides optional-string base configuration and
+matching string/Uri Get overloads. URI syntax failures preserve UriError; HTTP policy
+remains bounded. Token-aware HTTP Send and GetString remain pending.
 
 
 SocketError is now projected from its normal Raven union source when the bridge

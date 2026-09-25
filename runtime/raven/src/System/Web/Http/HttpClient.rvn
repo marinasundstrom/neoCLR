@@ -272,7 +272,24 @@ public class HttpRequest {
         return Error(HttpError.InvalidRequest("Invalid URL text"))
     }
 
+    /// Parses an absolute HTTP URL and constructs a GET request without performing I/O.
     static func Get(url: string) -> Result<HttpRequest, HttpError> {
+        let parsed = Uri.Parse(url)
+        if let Ok(uri) = parsed {
+            return Get(uri)
+        } else if let Error(reason) = parsed {
+            return Error(HttpError.InvalidUri(reason))
+        }
+        System.Fault("URI parser returned no outcome")
+        return Error(HttpError.InvalidRequest("Invalid URI"))
+    }
+
+    /// Constructs a GET request from an absolute URI; unsupported HTTP forms remain errors.
+    static func Get(uri: Uri) -> Result<HttpRequest, HttpError> {
+        if !uri.IsAbsolute {
+            return Error(HttpError.InvalidRequest("An absolute request URI is required"))
+        }
+        let url = uri.Text
         if !url.StartsWithOrdinal("http://") {
             return Error(HttpError.Unsupported("Only plain http:// URLs are supported"))
         }
@@ -281,7 +298,7 @@ public class HttpRequest {
             return Error(HttpError.LimitExceeded("URL limit exceeded"))
         }
         var end = 7
-        while end < bytes.Count && bytes[end] != 47 {
+        while end < bytes.Count && bytes[end] != 47 && bytes[end] != 63 && bytes[end] != 35 {
             end += 1
         }
         var colon = 7
@@ -327,6 +344,9 @@ public class HttpRequest {
                 index += 1
             }
             target = Text(bytes, end, bytes.Count)?
+            if bytes[end] == 63 {
+                target = String.Concat("/", target)
+            }
         }
         return Ok(HttpRequest(host, port, target))
     }
@@ -334,6 +354,26 @@ public class HttpRequest {
 
 public class HttpClient {
     private var handler: HttpHandler
+    private var baseUri: Option<string> = None()
+
+    /// Optional absolute base URL, validated when Get constructs a request.
+    var BaseUri: Option<string> {
+        get {
+            if let Some(text) = baseUri {
+                return Some(text)
+            }
+            return None()
+        }
+        set {
+            if let Some(text) = value {
+                baseUri = Some(text)
+            } else if let System.Option.None = value {
+                baseUri = None()
+            } else {
+                System.Fault("BaseUri requires Some or None")
+            }
+        }
+    }
 
     init() {
         handler = HttpSocketHandler()
@@ -347,17 +387,62 @@ public class HttpClient {
         return handler.Send(request)
     }
 
+    /// Sends an absolute URL without a base, or a relative URL when BaseUri is set.
     func Get(url: string) -> Task<Result<HttpResponse, HttpError>> {
-        let parsed = HttpRequest.Get(url)
+        let parsed = Uri.Parse(url)
+        if let Ok(uri) = parsed {
+            return Get(uri)
+        } else if let Error(reason) = parsed {
+            return Failure(HttpError.InvalidUri(reason))
+        }
+        System.Fault("URI parser returned no outcome")
+        return Failure(HttpError.InvalidRequest("Invalid URI"))
+    }
+
+    /// Uses the same base-resolution rules as the string overload.
+    func Get(uri: Uri) -> Task<Result<HttpResponse, HttpError>> {
+        let parsed = CreateRequest(uri)
         if let Ok(request) = parsed {
             return Send(request)
+        } else if let Error(reason) = parsed {
+            return Failure(reason)
         }
+        System.Fault("Request construction returned no outcome")
+        return Failure(HttpError.InvalidRequest("Invalid request"))
+    }
+
+    private func CreateRequest(uri: Uri) -> Result<HttpRequest, HttpError> {
+        // Snapshot the configuration before calling user-supplied handlers.
+        let configured = baseUri
+        if let Some(baseText) = configured {
+            if uri.IsAbsolute || uri.Text.StartsWithOrdinal("//") {
+                return Error(HttpError.InvalidRequest("A relative URL without authority is required with BaseUri"))
+            }
+            let parsed = Uri.Parse(baseText)
+            if let Error(reason) = parsed {
+                return Error(HttpError.InvalidUri(reason))
+            } else if let Ok(baseAddress) = parsed {
+                // Validate HTTP policy on the base before allowing resolution.
+                _ = HttpRequest.Get(baseAddress)?
+                let resolved = baseAddress.Resolve(uri)
+                if let Ok(address) = resolved {
+                    return HttpRequest.Get(address)
+                } else if let Error(reason) = resolved {
+                    return Error(HttpError.InvalidUri(reason))
+                }
+            }
+            System.Fault("URI resolution returned no outcome")
+            return Error(HttpError.InvalidRequest("Invalid URI"))
+        }
+        return HttpRequest.Get(uri)
+    }
+
+    private static func Failure(reason: HttpError) -> Task<Result<HttpResponse, HttpError>> {
         let source = Promise<Result<HttpResponse, HttpError>>()
-        if let Error(message) = parsed {
-            _ = source.Complete(Error(message))
-        }
+        _ = source.Complete(Error(reason))
         return source.Task
     }
+
 }
 
 public class HttpSocketHandler : HttpHandler {

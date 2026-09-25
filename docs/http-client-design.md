@@ -32,8 +32,8 @@ convenience-method status policy still needs an explicit choice and test. A rece
 HTTP error response and a transport failure must remain distinguishable.
 
 **Implementation gap:** the current client and handler expose tokenless
-Send with HttpError results. Tasks have a cancellation outcome, but the library has no
-public CancellationToken. The new signature is a target, not a shipped overload.
+Send with HttpError results. Tasks have a cancellation outcome and invocation-local CancellationToken foundations
+now exist, but the HTTP/native adapters do not carry tokens yet. The new signature is a target, not a shipped overload.
 Define cooperative cancellation at the operation-owner boundary, including behavior
 before dispatch, during DNS/connect/transfer, completion races and socket cleanup.
 Decide explicitly whether observed cancellation uses the task cancellation outcome
@@ -48,7 +48,7 @@ is not a reason to expand into unrelated task redesign.
 
 ## Optional base address — author direction, 2026-09-25
 
-Keep the current `BaseUri` spelling for the planned property, with `Option<string>`
+Keep the current `BaseUri` spelling for the property, now integrated with `Option<string>`
 (the library's optional-value type), rather than requiring a Uri object as
 configuration. The author described this as `BaseUrl/BaseUri: Optional<string>`.
 
@@ -68,8 +68,8 @@ addresses, applying the same addressing rules to each.
 Use the existing Uri parser/resolver internally rather than string concatenation.
 Trailing-slash, parent-path, root-relative and query-only resolution need explicit
 samples and tests. Invalid base configuration or a mismatched address kind must be
-reported before handler dispatch. The exact validation API/error cases remain
-implementation work; no setter exceptions or silent base fallback are implied.
+reported before handler dispatch. The implemented validation/error choices are recorded below; malformed base text
+is reported at request construction without silent fallback.
 
 .NET's [BaseAddress](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.baseaddress?view=net-10.0)
 uses a Uri property. This planned adaptation keeps string configuration convenient
@@ -372,7 +372,7 @@ No stack-trace capture or future Error interface is added. The reference seed is
 replaced by compiled union metadata; consumer case binding follows that projected
 family rather than a second handwritten carrier layout. Inactive defaults are not
 meaningful failures. No new Runtime Contract option or Raven compiler emission rule
-is required. CancellationToken and BaseUri remain following work.
+is required. HTTP token wiring remains following work; BaseUri integration is recorded below.
 
 Validation: the public handler sample checks nested causes, inactive defaults,
 copies and boxed payloads under allocation churn. Fragmented UTF-8, early EOF,
@@ -384,3 +384,67 @@ and extraction types and private formatter calls. Payload-projection mismatch an
 overlapping-layout negative probes remain passing. Clean regeneration of HttpError
 and HttpClient matches; API reference checks pass. The site build completed before
 the author's instruction to skip future per-slice website builds.
+
+
+## BaseUri and address overloads — implemented 2026-09-25
+
+`HttpClient.BaseUri` is now `Option<string>`, defaulting to None. Get(string) and
+Get(Uri) share request construction, then call Send through the existing handler.
+`HttpRequest.Get(Uri)` complements its string factory; both require an absolute URI
+and apply the same bounded HTTP policy. String syntax failures preserve their UriError
+inside HttpError.InvalidUri. This changes malformed escape/control-character failures
+from the older ad hoc request-parser errors to structured URI errors.
+
+Base text is validated at request construction, not assignment. Some requires relative
+references; None requires absolute ones. A network-path reference (`//other.test/path`)
+is rejected with a configured base: although it is syntactically relative, RFC resolution
+would replace the authority. This bounded choice keeps base-address selection explicit;
+it costs the ability to use RFC authority replacement through Get. Callers can construct
+an absolute request and pass it to Send, which does not consult BaseUri.
+
+The existing Uri resolver supplies trailing-slash, parent-path, root-path, query-only
+and empty-reference rules. The HTTP factory now recognizes an authority ending at `?`,
+so `http://example.test?x=1` produces `/?x=1`. Fragments remain unsupported rather than
+silently removed. A malformed or unsupported base is rejected even when the reference
+would otherwise discard its path. Some/None assignment is accepted; an inactive default
+Option faults as contract misuse.
+
+.NET 10 [BaseAddress](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.baseaddress?view=net-10.0)
+was reviewed again on 2026-09-25. It uses a Uri, rejects a relative base on assignment
+and prevents changing configuration after requests start. neoCLR's provisional property
+keeps author-requested string configuration, reports text errors through Get's Result,
+and allows changes between calls. Request construction snapshots configuration before
+handler dispatch. The benefit is explicit recoverable validation and simple configuration;
+the cost is repeated parsing and no general thread-safe mutation contract. The existing
+invocation ownership rules apply.
+
+The focused [address fixture](experiments/http-base/README.md) compares ten resolution
+cases against .NET, exercises both public overloads, validates ten rejected pairs before
+handler invocation, clearing BaseUri and direct Send. The lexical Uri policy deliberately
+preserves `%2e%2e` while .NET normalizes those encoded dots. This is not a filesystem
+containment guarantee. The network sample also uses BaseUri with an independent Python
+server. GetString, token forwarding, native cancellation and configurable timeout remain
+pending; this is one part of release slice 4, not completion of that slice.
+
+## HTTPS feasibility checkpoint — 2026-09-25
+
+The current socket2 backend supplies TCP; neither the managed HTTP code nor Cargo
+dependencies contain a TLS engine. Recommendation: add TLS below the HTTP framing
+layer, retaining the managed request/response pipeline. Do not implement cryptography
+in Raven or introduce an unrelated native HTTP client that bypasses these contracts.
+
+[Rustls 0.23 documentation](https://docs.rs/rustls/latest/rustls/), reviewed 2026-09-25,
+describes a TLS engine independent of network I/O, with explicit encrypted input/output,
+plaintext access and certificate validation using configured trust roots. That makes a
+host-side adapter over the existing socket owner plausible. This is a feasibility
+inference, not a tested neoCLR integration or a dependency selection. Provider/platform
+support, trust-root loading and packaging must be evaluated against the release targets.
+
+An executable client spike must establish: one budget across connect/handshake/transfers;
+hostname and certificate-chain verification; bounded ciphertext/plaintext buffers;
+cancellation acknowledgement and close while handshake/read/write are pending; and
+interoperability with an independent HTTPS server. Do not expose a certificate-validation
+bypass to make a demo work. An OS TLS backend is an alternative with platform-specific
+adapter/validation costs. Server certificates/configuration are a separate scope decision.
+The release HTTPS decision remains open until this evidence exists, before the application
+slice as required by the roadmap. This checkpoint does not add HTTPS support.

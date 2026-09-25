@@ -8,7 +8,7 @@
     "runtime/raven/src/System/Uri.rvn": "b366425867c4b84f126de1689d4a03bf9855a6a881a4abe4dba1836a381537b7",
     "runtime/raven/src/System/UriError.rvn": "4cb6c1aa4d9c8bb51e3eb1964a5e5c57330e0b9091bd44bf5125a8a99c027dce",
     "runtime/raven/src/System/Web/Http/HttpServer.rvn": "da44d8c6db3945b7fd03d396d8ac3f76b4b52f8fb568cf7259c3961fc971b045",
-    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "3a19438a4af3504f3d9a225f133989d99063ce2d894a20f10280a17c02028768",
+    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "c01c5983e3a276502e5b3cd4683285335b653d7138571ae007730faea99219a9",
     "runtime/raven/src/System/Web/Http/HttpError.rvn": "05367cc2e6ccc2b3d4085b1a48ba43218c7271ae9a6a96bb6e4437e7a37e0d1c",
     "runtime/raven/src/System/Networking/DnsError.rvn": "3d29e8b2008d54270cb35a581f4ba38e6d0672f4576b334100fc72d8f729a7bd",
     "runtime/raven/src/System/Networking/Dns.rvn": "a93fbf79789efdf630640378fc59e2b822e31f5a339ed3daea2fe21b56e7d514",
@@ -125,7 +125,7 @@
     "Socket.helpers.neoil": "1009b471cab6ced5ee7cc22e4b5db1125cd760295ad829c8a2d6743df105e128"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "11529fe15f0b617056c91c6420023639bdedce17b8d7fc0c7019eaf6bafbcdbc",
+  "coreSha256": "4e2ad329b4b78cabcd295cf80050704d0079f299d09d5897c09a9f63b15782f3",
   "exports": [
     "Connect(System.Networking.IPAddress address,Int32 port) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>",
     "Connect(System.Collections.Sequence<System.Networking.IPAddress> addresses,Int32 port) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>",

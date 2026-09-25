@@ -20,7 +20,9 @@ static class HttpBindings
             public sealed class HttpClient {
                 public HttpClient() { }
                 public HttpClient(HttpHandler handler) { }
+                public Option<string> BaseUri { get; set; }
                 public Tasks.Task<Result<HttpResponse, HttpError>> Get(string url) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Get(Uri uri) => default;
                 public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request) => default;
             }
             public sealed class HttpSocketHandler : HttpHandler {
@@ -35,6 +37,7 @@ static class HttpBindings
             public sealed class HttpRequest {
                 private HttpRequest(string host, int port, string target) { }
                 public static Result<HttpRequest, HttpError> Get(string url) => default;
+                public static Result<HttpRequest, HttpError> Get(Uri uri) => default;
                 public Collections.Sequence<HttpHeader> Headers => default;
                 public static Result<HttpRequest, HttpError> FromIncoming(string target, string host, Collections.Sequence<HttpHeader> headers) => default;
                 public string Method => default;
@@ -123,12 +126,14 @@ static class HttpBindings
             ("HttpServerExchange", "Start") when library => ("", "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
             ("HttpClient", ".ctor") when args.Length == 0 => ("", "noresult", false),
             ("HttpClient", ".ctor") => (Prefix + "HttpHandler", "noresult", false),
-            ("HttpClient", "Get") => ("String", task, false),
+            ("HttpClient", "Get") => (args.Length == 1 && args[0] == "String" ? "String" : "System.Uri", task, false),
+            ("HttpClient", "get_BaseUri") => ("", "System.Option<String>", false),
+            ("HttpClient", "set_BaseUri") => ("System.Option<String>", "noresult", false),
             ("HttpClient" or "HttpHandler" or "HttpSocketHandler", "Send") => (request, task, false),
             ("HttpSocketHandler" or "HttpResponseDecoder", ".ctor") => ("", "noresult", false),
             ("HttpHeader", ".ctor") => ("String,String", "noresult", false),
             ("HttpHeader", "get_Name" or "get_Value") => ("", "String", false),
-            ("HttpRequest", "Get") => ("String", $"System.Result<{request},System.Web.Http.HttpError>", true),
+            ("HttpRequest", "Get") => (args.Length == 1 && args[0] == "String" ? "String" : "System.Uri", $"System.Result<{request},System.Web.Http.HttpError>", true),
             ("HttpRequest", "get_Method" or "get_Host" or "get_Target") => ("", "String", false),
             ("HttpRequest", "get_Port") => ("", "Int32", false),
             ("HttpResponse", ".ctor") => ($"Int32,System.Collections.Sequence<{Prefix}HttpHeader>,System.Collections.Sequence<Byte>", "noresult", false),

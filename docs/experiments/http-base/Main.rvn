@@ -1,0 +1,130 @@
+import System.*
+import System.Option.*
+import System.Result.*
+import System.Collections.*
+import System.Tasks.*
+import System.Text.*
+import System.Web.Http.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("HTTP base address assertion failed")
+    }
+}
+
+class CaptureHandler : HttpHandler {
+    var Calls: int = 0
+    var Host: string = ""
+    var Target: string = ""
+    var Port: int = 0
+
+    func Send(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+        Calls += 1
+        Host = request.Host
+        Port = request.Port
+        Target = request.Target
+        let source = Promise<Result<HttpResponse, HttpError>>()
+        _ = source.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), Utf8.Encode(Target))))
+        return source.Task
+    }
+}
+
+class Forwarder : HttpHandler {
+    private var inner: HttpHandler
+    var Calls: int = 0
+
+    init(inner: HttpHandler) {
+        self.inner = inner
+    }
+
+    func Send(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+        Calls += 1
+        return inner.Send(request)
+    }
+}
+
+func Resolved(baseText: string, reference: string, expected: string) {
+    let capture = CaptureHandler()
+    let forwarding = Forwarder(capture)
+    let client = HttpClient(forwarding)
+    client.BaseUri = Some(baseText)
+    if let Some(value) = client.BaseUri {
+        Check(value == baseText)
+    } else {
+        System.Fault("BaseUri was not retained")
+    }
+    if let Ok(response) = client.Get(reference).GetResult() {
+        Check(response.StatusCode == 200)
+    } else {
+        System.Fault("Relative string request failed")
+    }
+    Check(capture.Target == expected)
+    Check(capture.Host == "example.test")
+    Check(capture.Port == 8080)
+    if let Ok(uri) = Uri.Parse(reference) {
+        if let Ok(response) = client.Get(uri).GetResult() {
+            Check(response.StatusCode == 200)
+        } else {
+            System.Fault("Relative Uri request failed")
+        }
+    } else {
+        System.Fault("Valid relative Uri did not parse")
+    }
+    Check(capture.Target == expected)
+    Check(capture.Calls == 2 && forwarding.Calls == 2)
+}
+
+func Rejected(baseText: string, reference: string) {
+    let capture = CaptureHandler()
+    let client = HttpClient(capture)
+    client.BaseUri = Some(baseText)
+    if let Error(_) = client.Get(reference).GetResult() {
+        Check(capture.Calls == 0)
+    } else {
+        System.Fault("Invalid base/reference pair was dispatched")
+    }
+    if let Ok(uri) = Uri.Parse(reference) {
+        if let Error(_) = client.Get(uri).GetResult() {
+            Check(capture.Calls == 0)
+        } else {
+            System.Fault("Invalid Uri pair was dispatched")
+        }
+    }
+}
+
+func Main() {
+    // RESOLUTION_CASES
+    // REJECTED_CASES
+    let capture = CaptureHandler()
+    let client = HttpClient(capture)
+    if let Error(HttpError.InvalidRequest(_)) = client.Get("relative").GetResult() {
+        Check(capture.Calls == 0)
+    } else {
+        System.Fault("Relative URL without base was admitted")
+    }
+    if let Error(HttpError.InvalidUri(UriError.InvalidFormat)) = client.Get("http://example.test/%broken").GetResult() {
+        Check(capture.Calls == 0)
+    } else {
+        System.Fault("Malformed percent escape was admitted")
+    }
+    client.BaseUri = Some("http://example.test:8080/api/")
+    client.BaseUri = None()
+    if let Ok(response) = client.Get("http://example.test?answer=42").GetResult() {
+        Check(response.StatusCode == 200)
+        Check(capture.Target == "/?answer=42")
+        Check(capture.Port == 80)
+    } else {
+        System.Fault("Query-only absolute URL failed")
+    }
+    if let Ok(uri) = Uri.Parse("http://example.test/direct") {
+        if let Ok(request) = HttpRequest.Get(uri) {
+            // Send consumes an already constructed request; BaseUri applies to helpers only.
+            client.BaseUri = Some("not an HTTP base")
+            _ = client.Send(request).GetResult()
+            Check(capture.Target == "/direct")
+        } else {
+            System.Fault("Direct Uri request failed")
+        }
+    }
+    Console.WriteLine("HTTP base address and overload checks passed")
+}
