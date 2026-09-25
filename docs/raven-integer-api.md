@@ -10,7 +10,7 @@ The experimental target now exposes the three existing Int32 instance methods:
 
 Together with [Parse](raven-parsing-api.md) and [Divide](raven-division-api.md), this
 projects all five methods declared directly in the current runtime Int32 source.
-It does not imply complete primitive support or general Comparable/Equatable interface
+It does not imply complete primitive support or general ComparableTo/EquatableTo interface
 dispatch in Raven. Culture, format-string overloads and inherited Object APIs are not
 added by this slice. Inherited metadata members such as GetHashCode can still appear
 in completion; that visibility does not imply an executable binding.

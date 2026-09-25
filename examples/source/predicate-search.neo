@@ -1,6 +1,6 @@
 import System.Console.*
 
-record Person(Name: string, Age: int): System.Equatable<Person> {
+record Person(Name: string, Age: int): System.EquatableTo<Person> {
     readonly func Equals(other: Person) -> bool {
         return this.Name.Equals(other.Name) && this.Age.Equals(other.Age)
     }

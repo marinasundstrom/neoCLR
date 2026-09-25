@@ -4,7 +4,7 @@ import System.Runtime.CompilerServices.RuntimeServices
 import System.Result.*
 import System.Text.Utf8SliceError
 
-public class String : Equatable<string>, Collections.Sequence<char> {
+public class String : EquatableTo<string>, Collections.Sequence<char> {
     // Intrinsic storage supplied by the runtime, never an allocated class field.
     #pragma warning disable-next-line RAV9032
     private field m_value: string

@@ -16,7 +16,7 @@ func Main() {
     var extracted = start
     extracted.X = 77
     let boxedBounds: Object = bounds
-    let comparableBounds: Equatable<Rectangle> = bounds
+    let comparableBounds: EquatableTo<Rectangle> = bounds
     if bounds != sameBounds || bounds.Start.X != 1 || start.X != 1 || end.Y != 4 {
         System.Fault("Nested struct construction and deconstruction must copy values")
     }

@@ -1,6 +1,6 @@
 .type System.Date
-    .implements System.Equatable<System.Date>
-    .implements System.Comparable<System.Date>
+    .implements System.EquatableTo<System.Date>
+    .implements System.ComparableTo<System.Date>
     .field private StoredDayNumber Int32
 
     .method static Create(Int32 year, Int32 month, Int32 day) -> System.Result<System.Date,System.InvalidDateError>

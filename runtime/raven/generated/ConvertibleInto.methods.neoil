@@ -1,0 +1,5 @@
+; Generated from runtime/raven/src/System/ConvertibleInto.rvn. Regenerate with build_runtime_library.py.
+.interface System.ConvertibleInto<T0>
+.method instance Convert() -> T0
+.end
+.end

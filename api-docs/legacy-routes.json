@@ -600,10 +600,10 @@
     }
   },
   "System.Equatable-1.html": {
-    "uid": "T:System.Equatable`1",
+    "uid": "T:System.EquatableTo`1",
     "anchors": {
-      "System_Equatable_1": "T:System.Equatable`1",
-      "System_Equatable_1_Equals__0_": "M:System.Equatable`1.Equals"
+      "System_Equatable_1": "T:System.EquatableTo`1",
+      "System_Equatable_1_Equals__0_": "M:System.EquatableTo`1.Equals"
     }
   },
   "System.Tasks.html": {

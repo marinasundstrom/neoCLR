@@ -74,7 +74,7 @@ Primary sources reviewed 2026-09-24:
   from RFC reference resolution. We retain overload convenience without treating
   path appending as resolution or adopting a builder yet.
 
-Language/compiler/metadata remain unchanged: ordinary class methods, Equatable,
+Language/compiler/metadata remain unchanged: ordinary class methods, EquatableTo,
 Result and the existing closed error carrier representation are sufficient. The
 neoCLR bridge explicitly maps the new types and checked methods. Future URI schemes,
 IP literals, canonicalization and convenience members need their own use cases.
@@ -121,7 +121,7 @@ Uri.Parse continues to require already-escaped input.
 
 The [probe](experiments/uri/README.md) passes 46 stored resolution pairs through
 both overloads plus three base-path cases, invalid grammar and length checks.
-It verifies Object dispatch, Equatable, collection elements and equal hashes, with
+It verifies Object dispatch, EquatableTo, collection elements and equal hashes, with
 504 allocations, nine collections and zero final live managed objects under a
 256-object limit. Matching bootstrap and API snapshots validate; the combined
 986-page site and 17 website tests pass. Boundary parsing is still expensive in the

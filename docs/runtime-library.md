@@ -32,7 +32,7 @@ needs and the primitives required to implement them in platform code.
 
 - [Eager ArrayList filtering and searches](arraylist-filtering.md) use Func<T,Boolean>
   and ordinary iterator/Option IL. Find returns Option<T> without invalid defaults.
-- [Comparable, Iterable and Iterator](common-interfaces.md) provide scalar ordering
+- [ComparableTo, Iterable and Iterator](common-interfaces.md) provide scalar ordering
   and managed ArrayList traversal, implemented entirely in platform IL. List<T>
   inherits Iterable<T>; Iterator<T> inherits Disposable.
 - Ordinary `System.Option<T>` and `System.Result<T,E>` provide variant constructors, predicates and checked accessors. Their Option.None/Some and Result.Ok/Error cases are ordinary nested types. The carrier methods are platform IL; see the [member convention](union-convention.md).

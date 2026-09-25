@@ -282,9 +282,9 @@ remaining unequal Path values.
 
 Path is currently an immutable reference class with value comparison, avoiding a
 struct's invalid default value. That costs an allocation and does not yet supply
-value operators. Development Path now implements Equatable&lt;Path&gt;, matching Object
+value operators. Development Path now implements EquatableTo&lt;Path&gt;, matching Object
 equality/hash/display to its typed comparison. Equals(Path) requires a non-null
-operand; Equatable&lt;T&gt; takes T, never an automatically introduced T?. The existing
+operand; EquatableTo&lt;T&gt; takes T, never an automatically introduced T?. The existing
 Object.Equals(Object?) overload is the explicit null-aware reference boundary. Additional operations are deferred;
 Directory owns child resolution and calls Parse to validate its result. The existing
 static Combine(string, string) and GetFileName(string) compatibility methods retain

@@ -2,7 +2,7 @@
 .type class abstract System.Networking.IPAddress
 .closedhierarchy
 .extends System.Object
-.implements System.Equatable<System.Networking.IPAddress>
+.implements System.EquatableTo<System.Networking.IPAddress>
 .field private octets arrayref<Byte>
 .method instance .ctor(arrayref<Byte> bytes) -> noresult
 .local Int32 local0

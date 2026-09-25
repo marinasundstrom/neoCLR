@@ -27,7 +27,7 @@ assemblies never enter the deployed artifact.
 Use ordinary Markdown headings, lists, tables and fenced `raven`, `neoil`, `xml`,
 `shell` or `text` code. Existing explicit `<a id="…"></a>` anchors retain public
 links; do not duplicate a generated heading ID. Quote type spellings such as
-`Equatable<T>` in backticks. Prefer `[Type](xref:System.Storage.Path)` for API links.
+`EquatableTo<T>` in backticks. Prefer `[Type](xref:System.Storage.Path)` for API links.
 Unresolved xrefs fail the build. Conceptual `.md` links become `.html` links.
 Page paths under `content/` retain their public directory routes. Sample placeholders
 such as `{{ARRAY_TOUR}}` inside fences expand from executable source files via

@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/IntPtr.rvn. Regenerate with build_runtime_library.py.
 .type System.IntPtr
 .sealed
-.implements System.Comparable<IntPtr>
+.implements System.ComparableTo<IntPtr>
 .method instance readonly byref CompareTo(IntPtr other) -> Int32
 .local Int64 local0
 .local Int64 local1

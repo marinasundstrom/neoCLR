@@ -154,7 +154,7 @@ serialized metadata, verification and host invocation. They compare Arc owners r
 than contents or text-buffer addresses. In particular, empty text needs an owner
 comparison: independent empty String buffers can have the same data pointer.
 
-The matrix covers Object casts, successful type tests, Equatable interface views,
+The matrix covers Object casts, successful type tests, EquatableTo interface views,
 Object ToString, local byrefs, class/value fields, arrays and erased payloads. Empty
 text, embedded NUL, combining text and emoji must keep the original owner. Separate
 equal host inputs must remain separate owners. This validates the current internal

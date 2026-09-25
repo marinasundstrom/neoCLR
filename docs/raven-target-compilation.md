@@ -162,7 +162,7 @@ Unicode-version limits, migration, .NET/Swift/Rust comparisons and validation.
 The opt-in RuntimeRecordContract also admits non-generic record structs with the
 existing Int32/non-null String/source-record-class component gate. Struct typed
 Equals compares components directly; Object.Equals first tests the exact boxed
-type and unboxes a copy. The same target Equatable and HashCode metadata providers
+type and unboxes a copy. The same target EquatableTo and HashCode metadata providers
 remain required; default Raven/.NET synthesis is unchanged. The importer admits
 struct interfaces and translates value isinst/unbox.any; named Object overrides
 use the boxed payload receiver. Generated hash, display and deconstruction share

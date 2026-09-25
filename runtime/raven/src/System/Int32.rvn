@@ -3,7 +3,7 @@ namespace System
 import System.Result.*
 import System.Runtime.CompilerServices.RuntimeServices
 
-public struct Int32 : Comparable<int>, Equatable<int> {
+public struct Int32 : ComparableTo<int>, EquatableTo<int> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: int

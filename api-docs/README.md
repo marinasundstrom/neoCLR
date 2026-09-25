@@ -68,7 +68,7 @@ TextWriter/StreamWriter Flush signatures, including Func<Void> and Result<Void,E
 Their Markdown guides remain behavioral reference, not renderer exclusions.
 Existing selected types include the HTTP client/server/context and response configuration APIs,
 Tasks, Thread/ThreadPool, Storage, IO, Console,
-Object/Value, HashCode, Equatable, compiler async support and Introspection descriptors.
+Object/Value, HashCode, EquatableTo, compiler async support and Introspection descriptors.
 Host Fault/FaultCode and debugger fields remain a complete manual [reference](faults.md),
 not synthetic CLI types. The Rust-only StringValue payload and owned-text migration
 are documented in the [Object guide](objects.md#rust-host-string-payloads) and source
@@ -271,3 +271,8 @@ snapshot and XML summaries. The linked JSON guide describes exact-name shallow
 properties, strict presence/null rules and stream/error ownership. No public mapping
 API is excluded from RavenDoc. Website build is skipped at the author's direction;
 snapshot and sample archive source checks remain required.
+
+2026-09-25 directional interfaces: EquatableTo and ComparableTo replace their old
+identities; ConvertibleInto adds Convert() returning T. All three have public type/member
+coverage. Refresh the matching reference and inventory; website build is skipped by
+explicit author instruction for this change.

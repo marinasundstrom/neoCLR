@@ -39,7 +39,7 @@ fn integer_ordering_is_overflow_safe_and_uses_typed_interfaces() {
     ] {
         for (left, right, expected) in [(low, high, -1), (high, low, 1), (high, high, 0)] {
             let source = format!(
-                ".module Test\n.entry Main\n.function Main() -> Int32\n.local {ty} value\n{left}\nstloc value\nldloca value\ninterface.borrow System.Comparable<{ty}>\n{right}\ncallvirt instance System.Comparable<{ty}>::CompareTo({ty})\nret\n.end"
+                ".module Test\n.entry Main\n.function Main() -> Int32\n.local {ty} value\n{left}\nstloc value\nldloca value\ninterface.borrow System.ComparableTo<{ty}>\n{right}\ncallvirt instance System.ComparableTo<{ty}>::CompareTo({ty})\nret\n.end"
             );
             let module = assemble(&source).unwrap();
             assert_eq!(
@@ -189,7 +189,7 @@ fn readonly_iterator_can_read_but_cannot_advance() {
 #[test]
 fn custom_comparable_and_value_elements_use_value_semantics() {
     let p = neo(r#"
-record Score(Value: int): System.Comparable<Score> {
+record Score(Value: int): System.ComparableTo<Score> {
     readonly func CompareTo(other: Score) -> int { return this.Value.CompareTo(other.Value) }
 }
 func Main() -> int {
@@ -199,7 +199,7 @@ func Main() -> int {
     iterator.MoveNext()
     var copy = iterator.Current
     copy.Value = 7
-    let ordering: System.Comparable<Score>& = &copy
+    let ordering: System.ComparableTo<Score>& = &copy
     if ordering.CompareTo(Score(42)) >= 0 { return -1 }
     let original = iterator.Current
     iterator.Dispose()
@@ -207,4 +207,39 @@ func Main() -> int {
 }
 "#);
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[test]
+fn explicit_conversion_dispatches_to_the_declared_result_type() {
+    let module = assemble(
+        r#"
+.module Conversion
+.entry Main
+.type Source
+    .implements System.ConvertibleInto<Int32>
+    .field Number Int32
+    .method instance byref Convert() -> Int32
+        ldarg this
+        ldfld Source::Number
+        ret
+    .end
+.end
+.function Main() -> Int32
+    .local Source source
+    ldc.i4 42
+    newobj Source
+    stloc source
+    ldloca source
+    interface.borrow System.ConvertibleInto<Int32>
+    callvirt instance System.ConvertibleInto<Int32>::Convert()
+    ret
+.end
+"#,
+    )
+    .unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
 }

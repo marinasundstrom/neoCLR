@@ -352,7 +352,7 @@ callables; `value.Invoke(args)` also works through managed references. Custom so
 generic Func and generic IL declarations are supported. Lambdas require an expected delegate type; captures use shared managed storage. See [delegates](delegates.md).
 
 Records and classes may implement bundled System interfaces as well as source-declared
-interfaces, including `System.Comparable<Score>`. The linked runtime verifies the
+interfaces, including `System.ComparableTo<Score>`. The linked runtime verifies the
 method contracts. Source interface inheritance still requires source-declared bases.
 
 `Result<T,E>.Ok(payload)` and `Result<T,E>.Error(payload)` use ordinary static-call

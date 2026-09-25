@@ -4,7 +4,7 @@ import System.*
 import System.Result.*
 import System.Runtime.CompilerServices.RuntimeServices
 
-public class Path : Equatable<Path> {
+public class Path : EquatableTo<Path> {
     static func Combine(value0: string, value1: string) -> string {
         return RuntimeServices.PathCombine(value0, value1)
     }

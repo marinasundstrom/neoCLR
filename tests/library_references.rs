@@ -80,9 +80,9 @@ fn neo_borrows_addressable_library_values_and_rejects_immutable_mutation() {
 
 #[test]
 fn neo_keeps_interface_views_for_readonly_equality_dispatch() {
-    let il = frontend::lower_to_il("func Equal(value: System.Equatable<int>&) -> bool { return value.Equals(42) }\nfunc Main() -> bool { return false }").unwrap();
+    let il = frontend::lower_to_il("func Equal(value: System.EquatableTo<int>&) -> bool { return value.Equals(42) }\nfunc Main() -> bool { return false }").unwrap();
     let helpers = &il[..il.rfind(".function Main(").unwrap()];
-    let module = assemble(&format!("{helpers}\n.function Main() -> Boolean\n.local Int32 value\nldc.i4 42\nstloc value\nldloca value\ninterface.borrow System.Equatable<Int32>\ncall Equal(System.Equatable<Int32>&)\nret\n.end")).unwrap();
+    let module = assemble(&format!("{helpers}\n.function Main() -> Boolean\n.local Int32 value\nldc.i4 42\nstloc value\nldloca value\ninterface.borrow System.EquatableTo<Int32>\ncall Equal(System.EquatableTo<Int32>&)\nret\n.end")).unwrap();
     let program = LoadedProgram::new(&module).unwrap();
     program.verify().unwrap();
     assert_eq!(

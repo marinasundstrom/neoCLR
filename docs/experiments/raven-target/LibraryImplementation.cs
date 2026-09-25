@@ -163,7 +163,7 @@ static class LibraryImplementation
                     || m.CallingConvention != MethodCallingConvention.Default
                     || m.Parameters.Any(p => (p.IsOut || p.ParameterType.IsByReference) && !PropagationLibrary.IsConditionalOutput(m, p))))
                 throw new InvalidDataException("Unsupported library interface contract.");
-        // Self-referential interface signatures (for example Equatable<TypeInfo>)
+        // Self-referential interface signatures (for example EquatableTo<TypeInfo>)
         // use this explicitly selected source/reference pair during validation.
         ApplicationTypes.BindLibrary(type, owner);
         bool Match(MethodDefinition left, MethodDefinition right) =>

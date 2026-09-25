@@ -11,7 +11,7 @@ static class PathBindings
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
     public const string Declarations = "\n" + """
         #nullable enable annotations
-        namespace Storage { public sealed class Path : Equatable<Path> {
+        namespace Storage { public sealed class Path : EquatableTo<Path> {
             private Path(string text) { }
             public static string Combine(string value0, string value1) => default;
             public static string GetFileName(string value0) => default;

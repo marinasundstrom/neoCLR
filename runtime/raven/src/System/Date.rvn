@@ -2,7 +2,7 @@ namespace System
 
 import System.Result.*
 
-public struct Date : Comparable<Date>, Equatable<Date> {
+public struct Date : ComparableTo<Date>, EquatableTo<Date> {
     private field StoredDayNumber: int
 
     private init(dayNumber: int) {

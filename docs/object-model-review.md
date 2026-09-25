@@ -75,7 +75,7 @@ It makes no performance claim and does not claim neoCLR already matches every ca
 
 ## Keep, revisit and remove
 
-**Keep:** reference/value category distinctions, typed `Equatable<T>` contracts,
+**Keep:** reference/value category distinctions, typed `EquatableTo<T>` contracts,
 explicit boxing and GetType's concrete-type behavior. An Object base method must
 not silently change ordinary value assignment or introduce boxing in generic storage.
 Maintain current Result/Option ergonomics independently of payload representation.
@@ -85,7 +85,7 @@ Object, defaults for Equals/GetHashCode, String identity and boxed-value dispatc
 Choose CLR-compatible semantic outcomes where possible; internal layout need not
 copy CoreCLR. Identity hashes must survive collection without exposing pointers.
 Value equality needs a deliberate policy for reference fields, floating point,
-cycles and custom Equatable implementations rather than raw byte comparison.
+cycles and custom EquatableTo implementations rather than raw byte comparison.
 
 **Retain temporarily:** System.Value and its instructions. Option, Result, TaskOutcome,
 native return protocols and host input/inspection still depend on this representation.
@@ -222,7 +222,7 @@ API must state its String exclusion. Boxed value Equals/hash also needs payload
 receiver dispatch and a deliberate value policy; identity alone does not supply it.
 
 Typed collection equality remains a separate review item: an Object override must
-not silently replace existing Equatable<T> contracts. The follow-up adds no public
+not silently replace existing EquatableTo<T> contracts. The follow-up adds no public
 methods, hash algorithm, collection change or Value migration.
 
 
@@ -258,7 +258,7 @@ and getter: general readonly field/init-only admission is not added by this slic
 The raw tests cover GC, array views, separate boxes, nulls, override/base dispatch,
 unsupported String/boxed paths and exact native signatures/service reporting.
 Static Object.Equals, boxed virtual equality/hash, String identity and Value storage
-migration remain unimplemented. Existing typed Equatable contracts are unchanged.
+migration remain unimplemented. Existing typed EquatableTo contracts are unchanged.
 
 ### Record syntax as the end-to-end acceptance case
 
@@ -289,7 +289,7 @@ A general diagnostic improvement is a separately validated Raven candidate; it m
 not move neoCLR policy into Raven main.
 
 Next compare a bounded typed comparer/hash library contract with Runtime Contract
-configuration that maps record synthesis to neoCLR's existing Equatable conventions.
+configuration that maps record synthesis to neoCLR's existing EquatableTo conventions.
 Do not introduce universal structural Object equality to make records work: generated
 record members should express their component policy through normal contracts.
 No compiler change, comparer/hash API or record support is claimed in this slice.
@@ -308,7 +308,7 @@ only with explicit component equality/hash rules and executable evidence.
 ### Integer records and HashCode — 2026-09-24
 
 The author-directed follow-up now has a passing [record sample](experiments/records/README.md).
-Raven uses the opt-in target contract for System.Equatable<Record> and System.HashCode;
+Raven uses the opt-in target contract for System.EquatableTo<Record> and System.HashCode;
 integer components use value comparisons without boxed comparers. Class allocation
 identity, typed/Object equality, operators, hashes, display and Deconstruct agree.
 Normal .NET synthesis retains its existing path. The first target contract rejects
@@ -328,7 +328,7 @@ boundary. That general compiler candidate must be reduced/tested independently o
 ### String and nested record components — 2026-09-24
 
 The next slice extends the checked record sample to Person and Entry. It preserves
-Equatable<Record>, uses content equality for strings, and typed equality/hash/display
+EquatableTo<Record>, uses content equality for strings, and typed equality/hash/display
 for nested same-compilation record classes. Output deconstruction now handles strings
 and application references. Nullable components, metadata-only record components,
 boxed equality and record structs remain open. See the
@@ -479,7 +479,7 @@ continues to require non-null input. Ordinary Raven/.NET synthesis is unchanged.
 
 Evidence: configured compiler execution checks null/empty equality, hashing, display
 and reflected deconstruction. Defaults.rvnproj checks the target through typed, boxed
-Object and Equatable calls, including default class-reference fields. It reproduces
+Object and EquatableTo calls, including default class-reference fields. It reproduces
 the old failure and is included alongside the other checked website samples. Explicit
 nullable-string declarations, nullable-value boxing and Object.Equals parameter
 annotation alignment remain separate follow-ups; non-null declarations are not a
@@ -570,7 +570,7 @@ mismatch: binding ignored reference annotations for interface matching but emiss
 did not, causing TypeLoadException. Emission now matches top-level nullable reference
 parameters and returns without erasing nullable value wrappers. The integration branch
 also resolves nested record-class components by their underlying typed parameter while
-retaining null guards. Equatable<T>'s public contract is unchanged.
+retaining null guards. EquatableTo<T>'s public contract is unchanged.
 
 neoCLR's sample adds absent/present Key? locals and literal-null comparisons. Generic
 record support on .NET is compiler regression coverage, not new neoCLR component
@@ -659,7 +659,7 @@ GC path or a change to the current non-moving collector. The Raven sample, 37 pi
 ### Path integration and wider library audit — 2026-09-24
 
 The author requests continuing Object semantics in the library, including Path,
-and investigating other classes. Path now implements Equatable<Path> and overrides
+and investigating other classes. Path now implements EquatableTo<Path> and overrides
 Object.Equals, GetHashCode and ToString. Equality compares the exact accepted text;
 hashing feeds that same text to the existing HashCode accumulator. Separate parsed
 objects retain separate reference identities. Provider resolution, native formats,
@@ -668,13 +668,13 @@ ancestry and constructor chaining for library reference classes declaring overri
 and admits Path's reference/interface conversions.
 
 **Explicit operand policy:** the author objects to automatically nullable equality
-operands, particularly because nullable value types are excluded. Equatable<T> stays
+operands, particularly because nullable value types are excluded. EquatableTo<T> stays
 `Equals(other: T)`, not `T?`. The initial assistant implementation added Path? to the
 typed overload; it was corrected before commit. Equals(Path) requires Path. The
 existing Object.Equals(Object?) override is the explicit null-aware reference
 boundary and returns false for null or another type. No interface change, Nullable<T>
-or implicit Option is introduced. The sample checks both Equatable<Path> and
-Equatable<int>; API absence remains a separate Option design concern.
+or implicit Option is introduced. The sample checks both EquatableTo<Path> and
+EquatableTo<int>; API absence remains a separate Option design concern.
 
 The .NET comparison remains useful at the contract level:
 [Object.Equals](https://learn.microsoft.com/en-us/dotnet/api/system.object.equals?view=net-10.0)
@@ -712,7 +712,7 @@ identity or CLR runtime caches. This is a selected investigation, not implemente
 TypeInfo behavior in this commit. Broader reference conversion/importer coverage
 must be verified alongside each consumer; source declarations alone are insufficient.
 
-Compiler diagnostic gap: the probe `value: Equatable<Path>; value.Equals(null)`
+Compiler diagnostic gap: the probe `value: EquatableTo<Path>; value.Equals(null)`
 currently compiles, even with explicit non-nullable reference metadata. Typed
 implementations still require T; null handling is not promised by that acceptance.
 Track generic-argument nullability checking as a separate Raven investigation.
@@ -726,7 +726,7 @@ base/derived regression and the existing Object-default reachability case cover 
 
 The author directs the next slice toward introspection types. RuntimeTypeInfo now
 preserves represented-type equality through Object, with null/wrong-type rejection
-at that boundary. Typed Equals(TypeInfo) and Equatable<TypeInfo> remain non-nullable.
+at that boundary. Typed Equals(TypeInfo) and EquatableTo<TypeInfo> remain non-nullable.
 GetHashCode feeds FullName to HashCode; ToString returns FullName. The internal wrapper
 layout remains one opaque handle, and neither type identity nor native factory layout
 changes. The importer changes from the Path slice preserve its Object base and

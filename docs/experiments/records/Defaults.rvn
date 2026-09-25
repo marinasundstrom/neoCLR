@@ -14,7 +14,7 @@ func Main() {
     let same = default(Payload)
     let present = Payload("", Owner("Raven"))
     let boxed: Object = absent
-    let comparable: Equatable<Payload> = absent
+    let comparable: EquatableTo<Payload> = absent
     if absent != same || !boxed.Equals(same) || !comparable.Equals(same) || absent == present {
         System.Fault("Default reference components must compare safely")
     }

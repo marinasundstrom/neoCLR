@@ -45,7 +45,7 @@ must not be inferred from a passing integer record-class example.
 ## String and nested-record components — 2026-09-24
 
 The next checked case is Person(Name: string, Age: int), wrapped by an Entry record.
-The interface remains Equatable<Record>; a separate concern is comparing each
+The interface remains EquatableTo<Record>; a separate concern is comparing each
 component. The [.NET record specification](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-9.0/records)
 uses EqualityComparer<T>.Default for fields. [String equality](https://learn.microsoft.com/en-us/dotnet/api/system.string.equals?view=net-10.0)
 is ordinal; these sources were reviewed on 24 September 2026. A general target

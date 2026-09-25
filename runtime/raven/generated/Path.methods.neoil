@@ -2,7 +2,7 @@
 .type class System.Storage.Path
 .sealed
 .extends System.Object
-.implements System.Equatable<System.Storage.Path>
+.implements System.EquatableTo<System.Storage.Path>
 .field private text String
 .property instance Text() -> String
 .get instance System.Storage.Path::get_Text()

@@ -22,7 +22,7 @@ func Main() {
     }
     let number: Object = 42
     Console.WriteLine(number.GetType().FullName)
-    let comparable: Comparable<int> = 42
+    let comparable: ComparableTo<int> = 42
     let boxed: Object = comparable
     Console.WriteLine(boxed.GetType().FullName)
 }

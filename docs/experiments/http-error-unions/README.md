@@ -95,7 +95,7 @@ zero live objects at completion in both the single-assembly and separate-library
 arrangements. All six mutated-contract rejection checks and
 the integrated SocketError execution check pass. The existing constructor-argument regression
 also passes. The prior broader records verifier attempt with the installed
-bundle fails before import on record-to-Equatable conversions and ambiguous
+bundle fails before import on record-to-EquatableTo conversions and ambiguous
 Equals overloads; it is not counted as passing. That compiler/SDK validation gap
 requires separate investigation. The subsequent SocketError integration updates
 the public API snapshot and networking website documentation.

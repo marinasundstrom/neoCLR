@@ -60,7 +60,7 @@ func CheckStructs() {
         System.Fault("Record struct Object equality must accept nullable comparison arguments")
     }
     let secondBox: Object = same
-    let comparable: Equatable<Coordinate> = first
+    let comparable: EquatableTo<Coordinate> = first
     if first != same || !first.Equals(same) || !value.Equals(secondBox) || !comparable.Equals(same) {
         System.Fault("Record struct equality must agree through value, Object and interface views")
     }
@@ -100,7 +100,7 @@ func Main() {
     if absentKey != null || null != absentKey || absentKey == maybeKey || maybeKey == absentKey {
         System.Fault("Nullable record operators must handle absence symmetrically")
     }
-    let equatable: Equatable<Key> = first
+    let equatable: EquatableTo<Key> = first
     if !Object.ReferenceEquals(first, alias) {
         System.Fault("Record assignment must preserve class identity")
     }
@@ -136,7 +136,7 @@ func Main() {
     let samePerson = Person(BuildName("Ra"), 42)
     let entry = Entry(person, 7)
     let sameEntry = Entry(samePerson, 7)
-    let view: Equatable<Entry> = entry
+    let view: EquatableTo<Entry> = entry
     if !view.Equals(sameEntry) || entry != sameEntry || entry.GetHashCode() != sameEntry.GetHashCode() {
         System.Fault("Nested records must use component equality and hashes")
     }
@@ -159,7 +159,7 @@ func Main() {
     let missing = OptionalEntry(null, 7)
     let sameMissing = Wrap(null, 7)
     let present = OptionalEntry(person, 7)
-    let nullableView: Equatable<OptionalEntry> = missing
+    let nullableView: EquatableTo<OptionalEntry> = missing
     if !nullableView.Equals(sameMissing) || missing != sameMissing || missing.GetHashCode() != sameMissing.GetHashCode() {
         System.Fault("Absent record components must compare and hash equally")
     }

@@ -1,6 +1,6 @@
 namespace System
 
-public struct Int16 : Comparable<short> {
+public struct Int16 : ComparableTo<short> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: short

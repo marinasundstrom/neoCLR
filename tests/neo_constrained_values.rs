@@ -42,7 +42,7 @@ func Main() -> int {{
 fn generic_library_interface_and_static_methods_use_value_receivers() {
     let source = r#"
 record Helpers() {
-    static func Compare<T>(left: T, right: T) -> int where T: System.Comparable<T>, notreference {
+    static func Compare<T>(left: T, right: T) -> int where T: System.ComparableTo<T>, notreference {
         return left.CompareTo(right)
     }
 }

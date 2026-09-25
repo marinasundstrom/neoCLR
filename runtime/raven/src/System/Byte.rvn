@@ -1,6 +1,6 @@
 namespace System
 
-public struct Byte : Comparable<byte> {
+public struct Byte : ComparableTo<byte> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: byte

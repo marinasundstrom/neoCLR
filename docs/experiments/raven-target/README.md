@@ -48,7 +48,7 @@ record-class Equals with the nullable record parameter and keeps typed record-st
 parameters non-nullable. It also aligns top-level nullable reference annotations
 when emitting interface dispatch. Target-only follow-up `5d7f3d5c8` selects nested
 record-class component Equals by the underlying parameter type, preserving null guards.
-RuntimeRecordContract configuration and the public Equatable<T> interface are unchanged.
+RuntimeRecordContract configuration and the public EquatableTo<T> interface are unchanged.
 
 The [record sample](../records/README.md) exercises nullable Key locals and literal
 null, alongside Object/interface calls and the existing value-copy cases. The .NET
@@ -859,7 +859,7 @@ core/runtime artifacts must match this development contract.
 ## Record and HashCode integration — 2026-09-24
 
 The experimental Raven compiler now has an opt-in RuntimeRecordContract. The SDK
-sets RavenRecordAssemblyName=NeoCLR.CoreProbe, RavenRecordEquatableType=System.Equatable`1
+sets RavenRecordAssemblyName=NeoCLR.CoreProbe, RavenRecordEquatableType=System.EquatableTo`1
 and RavenRecordHashCodeType=System.HashCode. Use a matching compiler/reference/library
 bundle; Preview 9 artifacts do not supply this contract. Default .NET record synthesis
 is unchanged.
@@ -944,9 +944,9 @@ including awaitless completion. No target changes were integrated into Raven mai
 
 ### Library Object consumers — 2026-09-24
 
-Path implements Equatable<Path> and consistent Object equality/hash/display. Typed
+Path implements EquatableTo<Path> and consistent Object equality/hash/display. Typed
 equality takes T, not T?; Object.Equals(Object?) is the explicit null-aware boundary.
-The reference marks Equatable's T operand non-nullable, though Raven currently
+The reference marks EquatableTo's T operand non-nullable, though Raven currently
 accepts a null literal through a constructed generic interface: a diagnostic gap,
 not a nullable contract. No compiler source change is made in this slice. The
 importer preserves Object ancestry and base construction for library class overrides.
@@ -958,7 +958,7 @@ RuntimeTypeInfo now overrides Object equality/hash/display without changing the
 opaque-handle layout, TypeIdentity or Raven configuration. Equality uses TypeEquals;
 the bounded library hash uses FullName and can collide across distinct definitions.
 The introspection fixture exercises generic/array shapes and boxed GetType under GC
-pressure. Typed TypeInfo/Equatable operands stay non-nullable. No compiler code changes
+pressure. Typed TypeInfo/EquatableTo operands stay non-nullable. No compiler code changes
 are needed, and other descriptor identity contracts remain open.
 
 Assembly/module wrappers now use their scoped catalog keys. Field/method/property
@@ -1154,8 +1154,8 @@ HTTP design and verifier for exact behavior and focused validation.
 ### Managed URI references
 
 System.Uri and UriError are explicit reference/import catalogs. The Uri slice uses
-ordinary managed String/UTF-8/Result code and the established Equatable/Object
-contract. Core reference assignability includes Uri to Object and Equatable<Uri>,
+ordinary managed String/UTF-8/Result code and the established EquatableTo/Object
+contract. Core reference assignability includes Uri to Object and EquatableTo<Uri>,
 with Uri admitted as a collection/array reference element. No new native service,
 Runtime Contract setting or compiler emission change is required. Regenerate the
 reference and bootstrap together; the [URI probe](../uri/README.md) covers parsing,
@@ -1220,3 +1220,15 @@ class import rules are unchanged. New artifacts require the matching runtime.
 See [storage semantics and comparison](../../value-storage.md#deferred-class-fields--development)
 and [the pending-await/GC regression](../deferred-async/README.md). Other compiler
 observations from the JSON sample remain tracked separately in its limitations page.
+
+## Directional interface names (2026-09-25)
+
+The bridge now projects EquatableTo<T>, ComparableTo<T> and ConvertibleInto<T>.
+NeoCLR.Raven.props selects ``System.EquatableTo`1`` for RavenRecordEquatableType;
+record equality generation otherwise retains the same contract. Convert() -> T is
+an ordinary invariant interface method, with no return-directed overload rule.
+Rebuild reference/library/application artifacts together. This requires no Raven
+compiler implementation change; published SDK artifacts retain their old identities.
+See [contracts and migration](../../common-interfaces.md#directional-interface-names-development-2026-09-25).
+
+Companion Raven compiler documentation: target-branch commit `54ec1c718`.

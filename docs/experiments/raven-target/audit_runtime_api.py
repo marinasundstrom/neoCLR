@@ -17,8 +17,8 @@ groups = {
     'primitives': ('Boolean String SByte Byte Int16 UInt16 Char UInt32 Int64 UInt64 Single Double IntPtr UIntPtr Int32', ['library-primitives.rvn', 'library-integers.rvn', 'library-booleans.rvn', 'library-strings.rvn', 'library-parsing.rvn', 'library-division.rvn']),
     'errors': ('InvalidRangeError Int32ParseError OverflowError IntegerDivisionError Utf8SliceError ConsoleReadError FileReadError FileWriteError InvalidDateError InvalidTimeError EnvironmentError', ['library-errors.rvn']),
     'unions': ('Option Result Propagatable', ['library-case-payloads.rvn', 'library-unions.rvn', 'library-result-void-propagation.rvn', 'library-reference-payloads.rvn']),
-    'interfaces': ('Equatable Comparable Disposable', ['library-value-interfaces.rvn', 'library-interfaces.rvn']),
-    'unimplemented-contracts': ('Clonable Closable', []),
+    'interfaces': ('EquatableTo ComparableTo Disposable', ['library-value-interfaces.rvn', 'library-interfaces.rvn']),
+    'unimplemented-contracts': ('Clonable Closable ConvertibleInto', []),
     'collections': ('Array ArrayList List Iterable Iterator', ['library-managed-array-metadata.rvn', 'library-array-shapes.rvn', 'library-reference-payloads.rvn', 'library-generic-collections.rvn']),
     'delegates': ('Func', ['library-delegates.rvn', 'library-array-callbacks.rvn']),
     'calendar': ('Date Time LocalDateTime Clock SystemClock', ['library-calendar.rvn', 'library-clock.rvn']),
@@ -258,7 +258,7 @@ result['targetProfileAdditions'] += [{
     'note': 'Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers.'
 } for name, samples, tests in [
     *[(name, ['library-value-interfaces.rvn'], ['docs/experiments/raven-target/verify_foundation_library.py'])
-      for name in ('Equatable', 'Comparable', 'Clonable', 'Closable', 'Disposable')],
+      for name in ('EquatableTo', 'ComparableTo', 'Clonable', 'Closable', 'Disposable')],
     *[(name, ['library-collection-capabilities.rvn', 'library-maps.rvn'], ['tests/raven_collections.rs', 'docs/experiments/raven-target/verify_foundation_library.py'])
       for name in ('Collection', 'Sequence', 'MutableSequence', 'List', 'Iterable', 'Iterator', 'MutableMap')],
     *[(name, ['library-clock.rvn', 'library-instants.rvn'], ['tests/raven_calendar.rs', 'docs/experiments/raven-target/verify_interface_library.py'])

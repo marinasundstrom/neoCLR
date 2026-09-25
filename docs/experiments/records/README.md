@@ -8,7 +8,7 @@ python3 verify.py --toolchain-root /path/to/bundle
 
 Key and Pair cover integer components. Person adds a non-null string, and Entry
 contains a Person record. Assignment shares class identity; separately allocated
-records compare by their components. The sample checks typed, Object and Equatable
+records compare by their components. The sample checks typed, Object and EquatableTo
 Equals, operators, equal hashes, nested display, deconstruction and independent
 HashCode value copies. Numeric hashes are not unique IDs or persistent identifiers.
 
@@ -35,7 +35,7 @@ null through the unsupported intrinsic-string argument path.
 
 Coordinate demonstrates record-struct syntax with two integer components. Counter
 shows ordinary struct assignment and boxing copying independent payloads. The sample
-checks typed, boxed Object and Equatable<Coordinate> equality, distinct box identity,
+checks typed, boxed Object and EquatableTo<Coordinate> equality, distinct box identity,
 other-type rejection, matching hashes, virtual display and deconstruction.
 Default Coordinate has zero integers; default OwnedCoordinate has a null record
 reference. NamedCoordinate checks constructed string components. Struct reference
@@ -63,7 +63,7 @@ sample passes nullable Object locals (both null and boxed values) directly to re
 class and record struct Equals methods. Typed record-class Equals now also accepts a nullable reference to that record type:
 Main checks an absent Key?, a present Key? and literal null. These select typed
 equality, with null comparing false. Record-struct typed parameters remain values.
-Equatable<T>'s public signature is unchanged; its call-site annotations still apply.
+EquatableTo<T>'s public signature is unchanged; its call-site annotations still apply.
 
 The development target selects RavenAllowNullableValueTypes=false. Nullable value
 declarations now fail in Raven with RAV0407 ("Value types can't be declared as

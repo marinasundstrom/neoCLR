@@ -290,7 +290,7 @@ try:
                 raise AssertionError('Missing reflection API: ' + str(labels))
             results[expression] = labels
     if collections:
-        for version, contract, expected in ((33, 'Comparable<int>', 'CompareTo'), (34, 'Equatable<System.Introspection.TypeInfo>', 'Equals'), (35, 'Clonable<int>', 'Clone'), (36, 'Closable<OverflowError>', 'Close')):
+        for version, contract, expected in ((33, 'ComparableTo<int>', 'CompareTo'), (34, 'EquatableTo<System.Introspection.TypeInfo>', 'Equals'), (35, 'Clonable<int>', 'Clone'), (36, 'Closable<OverflowError>', 'Close')):
             text = 'import System.*\nfunc Check(value: ' + contract + ') {\n    value.\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri}, 'position': {'line': 2, 'character': 10}, 'context': {'triggerKind': 1}}, True))

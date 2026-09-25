@@ -20,7 +20,7 @@ func Main() {
     let first = typeof(First)
     let second = typeof(First)
     let different = typeof(Second)
-    let contract: Equatable<TypeInfo> = first
+    let contract: EquatableTo<TypeInfo> = first
     let member: MemberInfo = first
     Check(!Object.ReferenceEquals(first, second), "Descriptors have separate allocation identity")
     Check(first.Equals(second) && contract.Equals(second), "Typed represented-type equality")

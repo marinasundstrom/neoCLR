@@ -1,0 +1,3 @@
+; Raven-authored EquatableTo; generated from the existing public contract.
+.include "generated/EquatableTo.methods.neoil"
+.include "generated/EquatableTo.helpers.neoil"

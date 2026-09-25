@@ -1,8 +1,9 @@
 ; System source manifest. Includes are expanded in order into one module.
 .module System
 
-.include "System/Equatable.neoil"
-.include "System/Comparable.neoil"
+.include "System/EquatableTo.neoil"
+.include "System/ComparableTo.neoil"
+.include "System/ConvertibleInto.neoil"
 .include "System/Clonable.neoil"
 .include "System/Propagatable.neoil"
 .include "System/Value.neoil"

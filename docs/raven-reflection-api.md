@@ -214,7 +214,7 @@ of replacing copied descriptor records with familiar class references.
 
 The adapted library omits its old internal byref descriptor constructors: trusted
 factories construct the complete snapshot layout. Public descriptor construction is
-not offered. Direct Type.Equals and its [Equatable contract](raven-fundamental-interfaces.md) are present. These are provisional target-profile
+not offered. Direct Type.Equals and its [EquatableTo contract](raven-fundamental-interfaces.md) are present. These are provisional target-profile
 implementation choices, not changes to Neo's original library profile.
 
 This reuses the [runtime reflection design](reflection.md) and

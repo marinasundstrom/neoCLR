@@ -92,7 +92,7 @@ func Read<T>(readonly value: T&) -> int where T: Readable {
     return value.Read()
 }
 func Compare<T>(readonly left: T&, right: T) -> int
-where T: System.Comparable<T> {
+where T: System.ComparableTo<T> {
     return left.CompareTo(right)
 }
 record Holder<T>(Value: T) where T: Readable
@@ -101,7 +101,7 @@ record Holder<T>(Value: T) where T: Readable
 A bound names a record (the same type or a base) or an interface (direct or inherited
 conformance). At most one record bound is permitted per parameter; multiple distinct
 interface bounds can be combined with the flag restrictions. Constructed bounds can
-refer to owner/method parameters, for example `.constraint T System.Comparable<T>`.
+refer to owner/method parameters, for example `.constraint T System.ComparableTo<T>`.
 Their types participate in binding, substitution, module scope/access checks and JSON
 round trips. Type-parameter bounds such as `where T: U` are not implemented.
 
@@ -190,7 +190,7 @@ func Observe<T>(readonly value: T&) -> readonly Readable& where T: Counter {
 Here Counter must declare Readable conformance (directly or through an ancestor).
 The same conversion works for arguments, local/field assignments and returns.
 Source-type `as` projections use the same rule. Bundled generic interface targets,
-such as `System.Comparable<T>&`, work through target-typed assignments and arguments.
+such as `System.ComparableTo<T>&`, work through target-typed assignments and arguments.
 Converting to an inherited view needs proof from the declared bound; the concrete
 argument happening to implement an unrelated interface does not provide that proof.
 There are no downcasts, container variance, bare-T borrowing or base-value slicing.

@@ -54,7 +54,7 @@ Primary sources consulted 2026-09-08:
 - [List<T> API](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1?view=net-10.0)
   includes FindIndex and Exists and describes automatic equality-comparer selection
   for other methods such as Contains.
-- [Typed equality](equality.md) records the Equatable/CLR receiver comparison and
+- [Typed equality](equality.md) records the EquatableTo/CLR receiver comparison and
   the separate need for a consistent future equality/hash strategy.
 
 Keeping default(T) would make zero indistinguishable from absence and cannot supply a

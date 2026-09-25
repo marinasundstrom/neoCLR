@@ -92,8 +92,8 @@ fn string_ownership_round_trips_object_interface_and_display() {
     for body in [
         "ldarg input\ncastclass System.Object\ncastclass String\nret",
         "ldarg input\nisinst System.Object\nisinst String\nret",
-        "ldarg input\ncastclass System.Equatable<String>\ncastclass System.Object\ncastclass String\nret",
-        "ldarg input\nisinst System.Equatable<String>\ncastclass String\nret",
+        "ldarg input\ncastclass System.EquatableTo<String>\ncastclass System.Object\ncastclass String\nret",
+        "ldarg input\nisinst System.EquatableTo<String>\ncastclass String\nret",
         "ldarg input\ncastclass System.Object\ncallvirt instance System.Object::ToString()\nret",
     ] {
         assert_owner(&program(body, "", "String"));

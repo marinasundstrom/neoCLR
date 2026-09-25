@@ -1,8 +1,8 @@
 ; Generated from runtime/raven/src/System/Date.rvn. Regenerate with build_runtime_library.py.
 .type System.Date
 .sealed
-.implements System.Comparable<System.Date>
-.implements System.Equatable<System.Date>
+.implements System.ComparableTo<System.Date>
+.implements System.EquatableTo<System.Date>
 .field private StoredDayNumber Int32
 .property instance DayNumber() -> Int32
 .get instance System.Date::get_DayNumber()

@@ -2,7 +2,7 @@
 .entry Main
 
 .type Point
-    .implements System.Equatable<Point>
+    .implements System.EquatableTo<Point>
     .field X Int32
     .field Y Int32
     .method instance readonly byref Equals(Point other) -> Boolean
@@ -23,10 +23,10 @@
     .end
 .end
 
-.function SamePoint(System.Equatable<Point>& left, Point right) -> Boolean
+.function SamePoint(System.EquatableTo<Point>& left, Point right) -> Boolean
     ldarg left
     ldarg right
-    callvirt instance System.Equatable<Point>::Equals(Point)
+    callvirt instance System.EquatableTo<Point>::Equals(Point)
     ret
 .end
 
@@ -51,35 +51,35 @@ Different:
     newobj Point
     stloc point
     ldloca point
-    interface.borrow System.Equatable<Point>
+    interface.borrow System.EquatableTo<Point>
     ldc.i4 2
     ldc.i4 3
     newobj Point
-    call SamePoint(System.Equatable<Point>&,Point)
+    call SamePoint(System.EquatableTo<Point>&,Point)
     call PrintEquality(Boolean)
     pop
     ldloca point
-    interface.borrow System.Equatable<Point>
+    interface.borrow System.EquatableTo<Point>
     ldc.i4 2
     ldc.i4 4
     newobj Point
-    call SamePoint(System.Equatable<Point>&,Point)
+    call SamePoint(System.EquatableTo<Point>&,Point)
     call PrintEquality(Boolean)
     pop
     ldc.i4 42
     stloc number
     ldloca number
-    interface.borrow System.Equatable<Int32>
+    interface.borrow System.EquatableTo<Int32>
     ldc.i4 42
-    callvirt instance System.Equatable<Int32>::Equals(Int32)
+    callvirt instance System.EquatableTo<Int32>::Equals(Int32)
     call PrintEquality(Boolean)
     pop
     ldstr "hello"
     stloc text
     ldloca text
-    interface.borrow System.Equatable<String>
+    interface.borrow System.EquatableTo<String>
     ldstr "hello"
-    callvirt instance System.Equatable<String>::Equals(String)
+    callvirt instance System.EquatableTo<String>::Equals(String)
     call PrintEquality(Boolean)
     ret
 .end

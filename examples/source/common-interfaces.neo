@@ -17,7 +17,7 @@ func Main() -> int {
     let list: readonly System.Collections.List<int>& = &values
     let total = Sum(list)
     var expected = 42
-    let comparable: System.Comparable<int>& = &expected
+    let comparable: System.ComparableTo<int>& = &expected
     WriteLine(comparable.CompareTo(total))
     WriteLine(total)
     return total

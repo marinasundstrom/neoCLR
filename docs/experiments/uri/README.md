@@ -11,7 +11,7 @@ python3 docs/experiments/uri/verify.py \
 
 The verifier generates its app from checked-in RFC cases. Both string and Uri
 Resolve overloads must give the expected text. It checks relative/absolute flags,
-Object virtual dispatch, exact-text equality and hashes, Equatable<Uri>, collections,
+Object virtual dispatch, exact-text equality and hashes, EquatableTo<Uri>, collections,
 invalid escaped input, unsupported IP literals, nonabsolute bases and size limits.
 The runtime uses a 256-object limit and must finish with zero live managed objects.
 This is a functional/GC check, not a performance benchmark or cross-platform matrix.

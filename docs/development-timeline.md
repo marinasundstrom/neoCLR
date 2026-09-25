@@ -7422,3 +7422,24 @@ configuration/content, not target-specific code added to Raven main.
   the active mapping/runtime investigation.
 - **Open:** helper placement, empty/null content, media types, status/error handling,
   cancellation and future stream semantics. The current serializer remains synchronous.
+
+### 2026-09-25 — Directional interface names
+
+- **Author:** requested Equatable<T> → EquatableTo<T>, Comparable<T> → ComparableTo<T>
+  and Convertible<T> → ConvertibleInto<T>, adding missing interfaces. Subsequently
+  directed that full tests and website building be skipped, and requested a commit.
+- **Assistant action:** renamed the equality/ordering identities, implementations,
+  interface views, constraints, record configuration and current documentation.
+  Convertible existed only in a proposal; added invariant ConvertibleInto<T> with
+  its proposed Convert() -> T method and ordinary interface dispatch. No implicit
+  conversion or return-type-directed overload feature was added.
+- **Validation:** 47 focused Rust tests and bridge signature checks pass; the Raven
+  consumer compiles, imports and runs with output 42, 0, True. API snapshot
+  validation passes. Generated-record
+  assignment could not be validated with the installed compiler: both the original
+  Equatable<T> and renamed contract fail assignment, so this is a pre-existing
+  compiler limitation. The runtime library/API artifacts are regenerated in an
+  isolated copy to exclude concurrent JSON overload work. Website/full tests were
+  not run, following the author instruction.
+- **Scope:** this author-directed naming change does not reprioritize the active
+  roadmap milestone. See [contracts and migration](common-interfaces.md#directional-interface-names-development-2026-09-25).

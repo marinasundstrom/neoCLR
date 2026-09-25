@@ -11,7 +11,7 @@ static class UriBindings
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
     public const string Declarations = "\n" + """
         #nullable enable annotations
-        public sealed class Uri : Equatable<Uri> {
+        public sealed class Uri : EquatableTo<Uri> {
             private Uri(string text, string scheme, string authority, string path, string query, string fragment) { }
             public Result<Uri, UriError> Resolve(string reference) => default;
             public Result<Uri, UriError> Resolve(Uri reference) => default;

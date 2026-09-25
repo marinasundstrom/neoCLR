@@ -1,3 +1,0 @@
-; Raven-authored Equatable; generated from the existing public contract.
-.include "generated/Equatable.methods.neoil"
-.include "generated/Equatable.helpers.neoil"

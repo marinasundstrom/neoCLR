@@ -45,8 +45,8 @@ fn library_equals_agrees_between_direct_and_interface_calls() {
         for interface in [false, true] {
             let (receiver, call) = if interface {
                 (
-                    format!("ldloca value\ninterface.borrow System.Equatable<{ty}>"),
-                    format!("callvirt instance System.Equatable<{ty}>::Equals({ty})"),
+                    format!("ldloca value\ninterface.borrow System.EquatableTo<{ty}>"),
+                    format!("callvirt instance System.EquatableTo<{ty}>::Equals({ty})"),
                 )
             } else {
                 (
@@ -68,7 +68,7 @@ fn library_equals_agrees_between_direct_and_interface_calls() {
 fn generic_implementations_can_compare_a_different_type() {
     let extra = r#"
 .type Tagged<T>
-    .implements System.Equatable<Int32>
+    .implements System.EquatableTo<Int32>
     .field Tag Int32
     .field Payload T
     .method instance readonly byref Equals(Int32 other) -> Boolean
@@ -82,7 +82,7 @@ fn generic_implementations_can_compare_a_different_type() {
 "#;
     for (other, expected) in [(42, true), (7, false)] {
         let body = format!(
-            ".local Tagged<String> value\nldc.i4 42\nldstr \"payload\"\nnewobj Tagged<String>\nstloc value\nldloca value\ninterface.borrow System.Equatable<Int32>\nldc.i4 {other}\ncallvirt instance System.Equatable<Int32>::Equals(Int32)"
+            ".local Tagged<String> value\nldc.i4 42\nldstr \"payload\"\nnewobj Tagged<String>\nstloc value\nldloca value\ninterface.borrow System.EquatableTo<Int32>\nldc.i4 {other}\ncallvirt instance System.EquatableTo<Int32>::Equals(Int32)"
         );
         assert_eq!(
             program(extra, &body).run(Limits::default()).unwrap().value,
@@ -98,7 +98,7 @@ fn runtime_enforces_readonly_equality_without_verifier() {
 .module Test
 .entry Main
 .type Counter
-.implements System.Equatable<Counter>
+.implements System.EquatableTo<Counter>
 .field Value Int32
 .method instance readonly byref Equals(Counter other) -> Boolean
 ldarg this
@@ -115,9 +115,9 @@ ldc.i4 42
 newobj Counter
 stloc value
 ldloca value
-interface.borrow System.Equatable<Counter>
+interface.borrow System.EquatableTo<Counter>
 ldloc value
-callvirt instance System.Equatable<Counter>::Equals(Counter)
+callvirt instance System.EquatableTo<Counter>::Equals(Counter)
 ret
 .end
 "#,
@@ -137,7 +137,7 @@ fn old_value_receiver_implementations_must_be_migrated() {
             r#"
 .module Old
 .type Item
-.implements System.Equatable<Item>
+.implements System.EquatableTo<Item>
 .method instance Equals(Item other) -> Boolean
 ldc.bool true
 ret

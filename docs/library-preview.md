@@ -187,7 +187,7 @@ end-to-end examples current with every contract change.
 
 Explore these bounded slices in order:
 
-1. **Comparison, equality and collection algorithms.** Equatable and Comparable now share readonly receivers, and eager ArrayList
+1. **Comparison, equality and collection algorithms.** EquatableTo and ComparableTo now share readonly receivers, and eager ArrayList
    predicate searches are implemented. Continue with explicit comparer strategies. Compare .NET's
    IEquatable/IComparable and comparer strategy APIs with explicit T/T& contracts;
    settle equality/hash consistency before adding hash-based containers. Add the

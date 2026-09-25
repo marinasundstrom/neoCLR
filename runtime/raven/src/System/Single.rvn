@@ -1,6 +1,6 @@
 namespace System
 
-public struct Single : Comparable<float> {
+public struct Single : ComparableTo<float> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: float

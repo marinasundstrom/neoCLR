@@ -296,6 +296,16 @@ callback/destination handoff now has explicit traced ownership until active fram
 installation. Broader affinity/context machinery must not become a prerequisite for
 all useful I/O; any affinity change still needs its own migration checks.
 
+## Author-directed interface naming — 2026-09-25
+
+EquatableTo<T> and ComparableTo<T> replace the existing equality/ordering interface
+identities, and ConvertibleInto<T> adds an explicit Convert() contract. This bounded
+clarity change preserves the active milestone priorities. See the
+[contract and migration](common-interfaces.md#directional-interface-names-development-2026-09-25)
+and [consumer](experiments/directional-interfaces/README.md). The renamed record
+configuration still needs a compiler with the record Runtime Contract feature;
+the current compiler also rejects the original-name record assignment baseline.
+
 ## Authority and use
 
 **This roadmap is authoritative for our work unless the author explicitly directs
@@ -1224,7 +1234,7 @@ index. Parameter snapshots now retain that owner key plus position, with equalit
 and Name display. Public owner resolution remains future work. The Object-keyed
 HashMap importer gap is now closed, with mixed keys, Object payloads and GC-tested
 map growth using explicit callbacks. Keep
-Equatable<T>.Equals(T) explicit;
+EquatableTo<T>.Equals(T) explicit;
 nullable value operands are not introduced by equality contracts. Reflected context,
 inherited queries and a public parameter Member property remain design work. Broader primitive,
 formatting and default-comparer coverage remains incremental; do not imply universal

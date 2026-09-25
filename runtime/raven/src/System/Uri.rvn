@@ -3,7 +3,7 @@ namespace System
 import System.Result.*
 
 // Bounded ASCII URI-reference grammar; parsing performs no I/O.
-public class Uri : Equatable<Uri> {
+public class Uri : EquatableTo<Uri> {
     private field text: string
     private field scheme: string
     private field authority: string

@@ -69,8 +69,8 @@ func Main() -> int {{ var local = Derived(40, 2); return Narrow(&local).Read() }
 #[test]
 fn bundled_generic_interface_views_substitute_without_copying() {
     let source = r#"
-func Compare<T>(readonly value: T&, other: T) -> int where T: System.Comparable<T> {
-    let view: readonly System.Comparable<T>& = value
+func Compare<T>(readonly value: T&, other: T) -> int where T: System.ComparableTo<T> {
+    let view: readonly System.ComparableTo<T>& = value
     return view.CompareTo(other)
 }
 func Main() -> int { var n = 42; return Compare(&n, 42) }
@@ -121,10 +121,10 @@ fn example_keeps_views_of_local_and_heap_instances() {
 #[test]
 fn source_base_bound_can_prove_a_bundled_interface_view() {
     let source = r#"
-record Score(Value: int): System.Comparable<int> {
+record Score(Value: int): System.ComparableTo<int> {
     readonly func CompareTo(other: int) -> int { return this.Value - other }
 }
-func View<T>(readonly value: T&) -> readonly System.Comparable<int>& where T: Score { return value }
+func View<T>(readonly value: T&) -> readonly System.ComparableTo<int>& where T: Score { return value }
 func Main() -> int { var value = Score(42); return View(&value).CompareTo(0) }
 "#;
     assert_eq!(execute(source).unwrap().value, Value::Int32(42));

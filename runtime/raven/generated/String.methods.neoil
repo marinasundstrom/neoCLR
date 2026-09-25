@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/String.rvn. Regenerate with build_runtime_library.py.
 .type System.String
 .sealed
-.implements System.Equatable<String>
+.implements System.EquatableTo<String>
 .implements System.Collections.Sequence<Char>
 .implements System.Collections.Collection<Char>
 .implements System.Collections.Iterable<Char>

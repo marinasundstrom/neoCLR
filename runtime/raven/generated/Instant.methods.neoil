@@ -1,8 +1,8 @@
 ; Generated from runtime/raven/src/System/Instant.rvn. Regenerate with build_runtime_library.py.
 .type System.Instant
 .sealed
-.implements System.Comparable<System.Instant>
-.implements System.Equatable<System.Instant>
+.implements System.ComparableTo<System.Instant>
+.implements System.EquatableTo<System.Instant>
 .field private StoredTicks Int64
 .property instance UnixTimeTicks() -> Int64
 .get instance System.Instant::get_UnixTimeTicks()

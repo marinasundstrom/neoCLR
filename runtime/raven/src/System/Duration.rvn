@@ -1,6 +1,6 @@
 namespace System
 
-public struct Duration : Comparable<Duration>, Equatable<Duration> {
+public struct Duration : ComparableTo<Duration>, EquatableTo<Duration> {
     private field StoredTicks: long
 
     private init(ticks: long) {

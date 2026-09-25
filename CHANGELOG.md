@@ -8,6 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Rename Equatable<T> to EquatableTo<T> and Comparable<T> to ComparableTo<T>
+  across runtime contracts, Raven sources, bridge metadata, record configuration,
+  samples and API documentation. Add invariant ConvertibleInto<T>.Convert() -> T
+  with ordinary interface dispatch and implementation-defined conversion policy.
+  This breaks source and metadata identity; rebuild consumers with matching
+  reference/library artifacts. Equality and ordering behavior are unchanged.
+  The local compiler still rejects generated-record interface assignment with
+  either old or new names; explicit interface implementations are validated by
+  the compiled/imported Raven consumer, 47 focused Rust tests and signature checks.
+  Refresh matching library and API snapshots; skip full tests and website build
+  by author direction.
+
 - Add provisional JsonSerializer Object/TypeInfo overloads for flat String, Int32
   and Boolean properties, using checked constructors and accessors. Preserve DOM
   overloads and borrowed synchronous streams; use exact names, require writable

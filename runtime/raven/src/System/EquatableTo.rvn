@@ -1,5 +1,5 @@
 namespace System
 
-public interface Equatable<T> {
+public interface EquatableTo<T> {
     func Equals(other: T) -> bool
 }

@@ -1,0 +1,3 @@
+; Raven-authored explicit conversion contract.
+.include "generated/ConvertibleInto.methods.neoil"
+.include "generated/ConvertibleInto.helpers.neoil"

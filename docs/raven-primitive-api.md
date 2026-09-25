@@ -42,7 +42,7 @@ Copy the sample into a fresh [prepared project](experiments/raven-target/README.
 and use **neoCLR: Run saved project**. The saved-project suite includes it;
 `verify_editor.py --primitives` checks all character method completions. Signature
 checks distinguish Char metadata from Int32 even though both use Int32 stack values.
-General Comparable interface dispatch and arbitrary generic primitive payloads
+General ComparableTo interface dispatch and arbitrary generic primitive payloads
 remain separate coverage work.
 
 ## Numeric comparisons after Preview 5

@@ -5,26 +5,26 @@ neoIL. No new opcode, host intrinsic, nominal reference-type category or Object 
 is required. Neo uses explicit managed interface views and ordinary member/property
 access, including inherited library interface members.
 
-## Comparable
+## ComparableTo
 
-`System.Comparable<T>.CompareTo(T other) -> Int32` describes natural ordering:
+`System.ComparableTo<T>.CompareTo(T other) -> Int32` describes natural ordering:
 negative means before, zero means equivalent in the ordering, positive means after.
 Consumers must use the sign, not assume every implementation returns -1 or 1.
 Implementations should provide a consistent, transitive ordering. Ordering equivalence
 need not be reference identity. The receiver is a readonly managed reference; the compared T uses value semantics.
-T can itself be an explicit managed reference. [Equatable<T>](equality.md) now uses
+T can itself be an explicit managed reference. [EquatableTo<T>](equality.md) now uses
 the same readonly receiver contract; both avoid a mandatory whole-receiver copy and
 match Neo readonly instance methods. See the equality guide for migration details.
 Large argument copies and comparer strategies remain separate API design decisions.
 
 Boolean, Char, all signed/unsigned fixed-width integers, native-sized integers,
-Single and Double now implement Comparable. Built-in results are -1, 0 or 1.
+Single and Double now implement ComparableTo. Built-in results are -1, 0 or 1.
 Integers use comparisons rather than subtraction, preserving extreme-value ordering;
 unsigned types use unsigned comparisons. False precedes true. Floating-point ordering
 matches .NET CompareTo: NaN precedes numbers, two NaNs compare equal, and signed zeros
 compare equal. This is an ordering contract, not a change to floating-point `==`.
 Neo records/classes can declare conformance to bundled interfaces, for example
-`record Score(Value: int): System.Comparable<Score>` with a matching `readonly func CompareTo(other: Score) -> int` method.
+`record Score(Value: int): System.ComparableTo<Score>` with a matching `readonly func CompareTo(other: Score) -> int` method.
 String ordering is deferred until explicit ordinal/culture policies are designed;
 String equality still compares exact text; its receiver now follows the readonly equality contract.
 
@@ -133,3 +133,30 @@ also fixes generic static calls such as ArrayList<int>.Allocate being mistakenly
 parsed as delegate-construction type names. Artifact format remains unchanged.
 Future work includes managed-array adapters, foreach with guaranteed disposal,
 resource-owning iterators, comparer strategies, sorting, string policies and variance.
+
+## Directional interface names (development, 2026-09-25)
+
+EquatableTo<T> and ComparableTo<T> replace Equatable<T> and Comparable<T>.
+Equals(T) and CompareTo(T), including readonly receiver behavior, are unchanged.
+This is a source and metadata identity break: update implementations, constraints,
+interface views and record Runtime Contract configuration, then rebuild consumers
+with matching compiler references and runtime library. No old-name aliases remain.
+The .NET IEquatable<T>/IComparable<T> comparisons above still apply; the naming
+change makes the relation to the other operand explicit, at the cost of migration.
+
+System.ConvertibleInto<T> is a new invariant interface with `func Convert() -> T`.
+It follows the method spelling in the existing generic-type-relationships proposal.
+Its ordinary borrowed receiver may mutate; implementations choose conversion and
+failure policy. There are no built-in implementations, implicit conversions,
+format-provider rules or return-type-directed overload selection. Call through an
+explicitly selected interface when a concrete type exposes multiple conversions.
+
+.NET 10's [IConvertible](https://learn.microsoft.com/en-us/dotnet/api/system.iconvertible?view=net-10.0)
+is non-generic, with conversions to standard types and a Type-based ToType method,
+usually accepting IFormatProvider (retrieved 2026-09-25). This smaller ordinary
+library contract selects one result type statically; it trades that broad conversion
+protocol for a typed result and leaves culture/error conventions to implementers.
+Keeping no conversion interface or adopting IConvertible were alternatives; the
+author explicitly requested this generic capability. No new VM or compiler rule
+is needed. Checked IL interface dispatch and bridge signature rejection validate
+the contract; broader conversion policies remain open.

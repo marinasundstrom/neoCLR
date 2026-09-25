@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/Char.rvn. Regenerate with build_runtime_library.py.
 .type System.Char
 .sealed
-.implements System.Comparable<Char>
+.implements System.ComparableTo<Char>
 .method static FromString(String text) -> Char
 M00000001_IL_0000:
 M00000001_IL_0001:

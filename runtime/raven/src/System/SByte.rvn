@@ -1,6 +1,6 @@
 namespace System
 
-public struct SByte : Comparable<sbyte> {
+public struct SByte : ComparableTo<sbyte> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: sbyte

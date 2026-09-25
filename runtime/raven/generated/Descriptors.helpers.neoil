@@ -592,7 +592,7 @@ ret
 .interface System.Introspection.TypeInfo
 .closedhierarchy
 .implements System.Introspection.MemberInfo
-.implements System.Equatable<System.Introspection.TypeInfo>
+.implements System.EquatableTo<System.Introspection.TypeInfo>
 .method instance get_FullName() -> String
 .end
 .method instance get_Namespace() -> String
@@ -2550,7 +2550,7 @@ ret
 .extends System.Object
 .implements System.Introspection.TypeInfo
 .implements System.Introspection.MemberInfo
-.implements System.Equatable<System.Introspection.TypeInfo>
+.implements System.EquatableTo<System.Introspection.TypeInfo>
 .field private Handle System.RuntimeTypeHandle
 .property instance ExecutionHandle() -> System.RuntimeTypeHandle
 .get instance System.Introspection.RuntimeTypeInfo::get_ExecutionHandle()

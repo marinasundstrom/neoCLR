@@ -4,13 +4,14 @@ static class InterfaceBindings
 {
     public const string Declarations = "\n" + """
         #nullable enable annotations
-        public interface Equatable<T> { bool Equals(T other); }
+        public interface EquatableTo<T> { bool Equals(T other); }
         #nullable restore annotations
-        public interface Comparable<T> { int CompareTo(T other); }
+        public interface ComparableTo<T> { int CompareTo(T other); }
+        public interface ConvertibleInto<T> { T Convert(); }
         public interface Clonable<T> { T Clone(); }
         public interface Closable<E> { Result<PropagationUnit,E> Close(); }
         """;
-    static readonly HashSet<string> Contracts = new() { "System.Equatable", "System.Comparable", "System.Clonable", "System.Closable" };
+    static readonly HashSet<string> Contracts = new() { "System.EquatableTo", "System.ComparableTo", "System.Clonable", "System.Closable", "System.ConvertibleInto" };
     public static bool IsInterface(string type) => type == StandardUnionLibrary.ProtocolName || (HttpBindings.IsContract(type) || ReaderBindings.IsContract(type) || type == "System.Clock" || StorageItemBindings.IsName(type) || StreamBindings.IsCapability(type) || StorageProviderBindings.IsName(type)) || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
     public static string? Type(TypeReference type, Func<TypeReference, string>? parameterMap = null)
     {
@@ -24,7 +25,7 @@ static class InterfaceBindings
         var element = parameterMap?.Invoke(g.GenericArguments[0]) ?? ReflectionBindings.Type(g.GenericArguments[0]) ?? GenericUnionBindings.Type(g.GenericArguments[0]);
         return element is null ? null : name + "<" + element + ">";
     }
-    public static bool Converts(string source, string target) => (source == HttpBindings.Prefix + "HttpContext" && target == CollectionBindings.Disposable) || (source == HttpBindings.Prefix + "HttpSocketHandler" && target == HttpBindings.Prefix + "HttpHandler") || (source == "System.Uri" && target == "System.Equatable<System.Uri>") || (source == "System.Storage.Path" && target == "System.Equatable<System.Storage.Path>") || (source == ReaderBindings.Stream && target == ReaderBindings.Reader || source == ReaderBindings.StreamWriter && target == ReaderBindings.Writer) || source == FileSystemBindings.Name && target == StorageProviderBindings.Name || StorageItemBindings.Assignable(source, target) || StreamBindings.Assignable(source, target) || (source == "String" && target is "System.Collections.Iterable<Char>" or "System.Collections.Collection<Char>" or "System.Collections.Sequence<Char>") || IsInterface(target)
+    public static bool Converts(string source, string target) => (source == HttpBindings.Prefix + "HttpContext" && target == CollectionBindings.Disposable) || (source == HttpBindings.Prefix + "HttpSocketHandler" && target == HttpBindings.Prefix + "HttpHandler") || (source == "System.Uri" && target == "System.EquatableTo<System.Uri>") || (source == "System.Storage.Path" && target == "System.EquatableTo<System.Storage.Path>") || (source == ReaderBindings.Stream && target == ReaderBindings.Reader || source == ReaderBindings.StreamWriter && target == ReaderBindings.Writer) || source == FileSystemBindings.Name && target == StorageProviderBindings.Name || StorageItemBindings.Assignable(source, target) || StreamBindings.Assignable(source, target) || (source == "String" && target is "System.Collections.Iterable<Char>" or "System.Collections.Collection<Char>" or "System.Collections.Sequence<Char>") || IsInterface(target)
         && (source == "System.Object" || source == "String" || ReflectionBindings.IsReference(source) || CalendarBindings.IsReference(source));
     public static string Convert(string source, string target) => Converts(source,target) ? "castclass " + target + "\n" : "";
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
@@ -49,8 +50,9 @@ static class InterfaceBindings
         var element = owner[(owner.IndexOf('<')+1)..^1];
         var name = owner[..owner.IndexOf('<')];
         var expected = name switch {
-            "System.Equatable" => ("Equals", element, "Boolean"),
-            "System.Comparable" => ("CompareTo", element, "Int32"),
+            "System.EquatableTo" => ("Equals", element, "Boolean"),
+            "System.ComparableTo" => ("CompareTo", element, "Int32"),
+            "System.ConvertibleInto" => ("Convert", "", element),
             "System.Clonable" => ("Clone", "", element),
             "System.Closable" => ("Close", "", "System.Result<Void," + element + ">"),
             _ => throw new InvalidDataException("Unsupported interface")
@@ -78,11 +80,11 @@ static class InterfaceBindings
     public static string Project(string source)
     {
         foreach (var name in new[]{"SByte","Byte","Int16","UInt16","Char","Int32","UInt32","Int64","UInt64","IntPtr","UIntPtr","Single","Double","Boolean"})
-            source = source.Replace("public struct " + name + " {", "public struct " + name + " : Comparable<" + name + ">" + (name == "Int32" ? ", Equatable<Int32>" : "") + " {");
+            source = source.Replace("public struct " + name + " {", "public struct " + name + " : ComparableTo<" + name + ">" + (name == "Int32" ? ", EquatableTo<Int32>" : "") + " {");
         foreach (var name in new[]{"Date","Time","Instant","Duration"})
-            source = source.Replace("public struct " + name + " {", "public struct " + name + " : Comparable<" + name + ">, Equatable<" + name + "> {");
-        source = source.Replace("public sealed class String {", "public sealed class String : Equatable<String>, Collections.Sequence<char> {");
-        source = source.Replace("public class Type {", "public class Type : Equatable<Type> {");
+            source = source.Replace("public struct " + name + " {", "public struct " + name + " : ComparableTo<" + name + ">, EquatableTo<" + name + "> {");
+        source = source.Replace("public sealed class String {", "public sealed class String : EquatableTo<String>, Collections.Sequence<char> {");
+        source = source.Replace("public class Type {", "public class Type : EquatableTo<Type> {");
         return source;
     }
 }

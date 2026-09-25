@@ -569,7 +569,7 @@ cargo run --locked -- run examples/source/closures.neo
 
 ### Common comparison and iteration
 
-[Comparable, Iterable and Iterator](docs/common-interfaces.md) provide scalar ordering
+[ComparableTo, Iterable and Iterator](docs/common-interfaces.md) provide scalar ordering
 and managed collection traversal. ArrayList supports independent iterators through
 readonly Iterable views; Iterator exposes MoveNext, Current and Dispose.
 
@@ -579,7 +579,7 @@ cargo run --locked -- run examples/source/common-interfaces.neo
 
 [Eager predicate searches](docs/predicate-search.md) add ArrayList.Find, FindIndex
 and Exists using Func<T,Boolean>. Find returns Option<T>; custom equality uses
-readonly Equatable implementations. LINQ remains future work.
+readonly EquatableTo implementations. LINQ remains future work.
 
 ```sh
 cargo run --locked -- run examples/source/predicate-search.neo

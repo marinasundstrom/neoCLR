@@ -629,7 +629,7 @@ retirement is a separate representation and lifetime migration, not an unfinishe
 union-opcode removal. The Preview 1 plan records the current retention boundary.
 
 Basic interfaces support managed views and explicit receiver modes. List<T> is the
-small collection contract; [Equatable<T>](equality.md) supplies Equals(T) for Int32,
+small collection contract; [EquatableTo<T>](equality.md) supplies Equals(T) for Int32,
 String, System.Type and user-defined implementations. No automatic equality comparer,
 hashing, interface variance or ownership abstraction is implied.
 
@@ -721,7 +721,7 @@ This does not expand the immediate ordinary-type and union-foundation slices.
 
 ### Common library infrastructure milestone
 
-[Comparable, Iterable and Iterator](common-interfaces.md) now provide sign-based
+[ComparableTo, Iterable and Iterator](common-interfaces.md) now provide sign-based
 ordering and typed managed traversal; ArrayList is the first Iterable consumer.
 Next explore comparer-driven algorithms and managed-array adapters, followed by Neo
 foreach lowering once cleanup on early exit and faults has a runtime/language contract.

@@ -1,0 +1,3 @@
+; Raven-authored ComparableTo; generated from the existing public contract.
+.include "generated/ComparableTo.methods.neoil"
+.include "generated/ComparableTo.helpers.neoil"

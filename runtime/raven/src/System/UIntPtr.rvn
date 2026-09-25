@@ -2,7 +2,7 @@ namespace System
 
 import System.Runtime.CompilerServices.RuntimeServices
 
-public struct UIntPtr : Comparable<nuint> {
+public struct UIntPtr : ComparableTo<nuint> {
     // The runtime supplies intrinsic native-width storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: nuint

@@ -33,7 +33,7 @@ subset. Raw pointers are rejected; their existing explicit address comparisons r
 separate. Comparing identity neither extends frame lifetime nor registers persistent
 host roots. It does not expose a native address, allocation number or identity hash.
 
-Ordinary Neo `==` retains its existing value-access behavior. Equatable<T>.Equals and
+Ordinary Neo `==` retains its existing value-access behavior. EquatableTo<T>.Equals and
 value hashing contracts are unchanged. User-declared functions or records named
 ReferenceEquals retain normal resolution; the intrinsic is a fallback when no such
 source declaration exists. No new operator syntax is added.

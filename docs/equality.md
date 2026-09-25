@@ -1,9 +1,9 @@
 # Typed equality
 
-System.Equatable<T> declares an ordinary generic interface:
+System.EquatableTo<T> declares an ordinary generic interface:
 
 ```text
-.interface System.Equatable<T>
+.interface System.EquatableTo<T>
     .method instance readonly byref Equals(T other) -> Boolean
     .end
 .end
@@ -14,7 +14,7 @@ with neoCLR's naming convention. T specifies the compared type; it need not be t
 implementing type. Arguments are invariant. Implementations declare conformance and
 provide matching receiver, parameter and return contracts.
 
-The receiver is now a readonly managed reference, consistently with Comparable<T>.
+The receiver is now a readonly managed reference, consistently with ComparableTo<T>.
 Other is passed by value; T may itself be an explicit managed reference. Dispatch
 uses the actual receiver storage without a mandatory whole-receiver copy or boxing.
 Readonly prevents writes through this receiver and its owned projections; it does
@@ -24,13 +24,13 @@ should avoid observable mutation and remain consistent while compared state is s
 ## Neo and IL implementations
 
 ```swift
-record Point(X: int, Y: int): System.Equatable<Point> {
+record Point(X: int, Y: int): System.EquatableTo<Point> {
     readonly func Equals(other: Point) -> bool {
         return this.X.Equals(other.X) && this.Y.Equals(other.Y)
     }
 }
 
-func SamePoint(left: readonly System.Equatable<Point>&, right: Point) -> bool {
+func SamePoint(left: readonly System.EquatableTo<Point>&, right: Point) -> bool {
     return left.Equals(right)
 }
 ```
@@ -44,9 +44,9 @@ Equals methods use the same readonly managed receiver as interface dispatch.
 ldc.i4 42
 stloc number
 ldloca number
-interface.borrow System.Equatable<Int32>
+interface.borrow System.EquatableTo<Int32>
 ldc.i4 42
-callvirt instance System.Equatable<Int32>::Equals(Int32)
+callvirt instance System.EquatableTo<Int32>::Equals(Int32)
 ```
 
 The [IL sample](../examples/equatable.neoil) implements Point equality and prints
@@ -68,7 +68,7 @@ we choose one readonly receiver contract. This removes the mandatory receiver co
 it does not eliminate argument copies or imply a measured performance improvement.
 A separate by-reference argument/comparer strategy remains a later API decision.
 
-This is a **breaking preview library change**. Update Equatable implementations to
+This is a **breaking preview library change**. Update EquatableTo implementations to
 `instance readonly byref`; Neo uses `readonly func Equals`. Direct IL callers of
 Int32.Equals, String.Equals and Type.Equals must pass a managed receiver address
 instead of an owned value (for example ldloca rather than ldloc). Rebuild old modules;
@@ -92,7 +92,7 @@ For same-type equality, implementations should be reflexive, symmetric and trans
 The runtime checks signatures, access and dispatch, not these mathematical laws.
 Cross-type implementations must document their relation explicitly.
 
-Equatable does not change ceq, introduce equality operators or select a default
+EquatableTo does not change ceq, introduce equality operators or select a default
 collection comparer. [Predicate searches](predicate-search.md) use a caller-supplied
 function, which may call Equals. There is no mandatory Object.Equals fallback, hash
 contract or generic constraint added here. Hash-based containers must wait for a

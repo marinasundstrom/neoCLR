@@ -1,6 +1,6 @@
 namespace System
 
-public struct Boolean : Comparable<bool> {
+public struct Boolean : ComparableTo<bool> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: bool

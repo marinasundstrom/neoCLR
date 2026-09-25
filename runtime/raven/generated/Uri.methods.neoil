@@ -2,7 +2,7 @@
 .type class System.Uri
 .sealed
 .extends System.Object
-.implements System.Equatable<System.Uri>
+.implements System.EquatableTo<System.Uri>
 .field private text String
 .field private scheme String
 .field private authority String

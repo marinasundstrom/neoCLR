@@ -1,0 +1,20 @@
+import System.*
+
+class Answer : ConvertibleInto<int>, EquatableTo<int> {
+    func Convert() -> int {
+        return 42
+    }
+
+    func Equals(other: int) -> bool {
+        return other == 42
+    }
+}
+
+func Main() {
+    let converted: ConvertibleInto<int> = Answer()
+    Console.WriteLine(converted.Convert())
+    let ordered: ComparableTo<int> = 42
+    Console.WriteLine(ordered.CompareTo(42))
+    let equal: EquatableTo<int> = Answer()
+    Console.WriteLine(equal.Equals(42))
+}

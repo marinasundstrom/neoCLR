@@ -85,7 +85,7 @@ static class SignatureProbe
         Reject("Array signedness mismatch", () => ManagedArrayBindings.CheckElement(Mono.Cecil.Cil.Code.Ldelem_I1, "Byte", null));
         Reject("Array token mismatch", () => ManagedArrayBindings.CheckElement(Mono.Cecil.Cil.Code.Stelem_Any, "Int32", "Double"));
         InterfaceBindings.Validate(module);
-        foreach (var contractName in new[]{"Equatable", "Comparable", "Clonable", "Closable"}) {
+        foreach (var contractName in new[]{"EquatableTo", "ComparableTo", "ConvertibleInto", "Clonable", "Closable"}) {
             var contract = module.GetType("System." + contractName + "`1");
             var closed = new GenericInstanceType(contract); closed.GenericArguments.Add(module.TypeSystem.Int32);
             var member = contract.Methods.Single();
@@ -93,9 +93,9 @@ static class SignatureProbe
             var mismatch = Reference(member, closed); mismatch.ReturnType = module.TypeSystem.String;
             Reject(contractName + " mismatched result", () => InterfaceBindings.Bind(mismatch, member));
         }
-        var comparableParameter = module.GetType("System.Comparable`1").GenericParameters[0];
+        var comparableParameter = module.GetType("System.ComparableTo`1").GenericParameters[0];
         comparableParameter.Attributes = GenericParameterAttributes.Covariant;
-        Reject("Comparable invariance", () => InterfaceBindings.Validate(module));
+        Reject("ComparableTo invariance", () => InterfaceBindings.Validate(module));
         comparableParameter.Attributes = GenericParameterAttributes.NonVariant;
         NativeMemoryBindings.Validate(module);
         var native = module.GetType(NativeMemoryBindings.Owner);

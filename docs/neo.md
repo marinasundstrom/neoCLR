@@ -502,7 +502,7 @@ for an Array.ForEach lambda and an escaping counter closure.
 
 ## Common interfaces
 
-[Comparable<T>, Iterable<T> and Iterator<T>](common-interfaces.md) are bundled library
+[ComparableTo<T>, Iterable<T> and Iterator<T>](common-interfaces.md) are bundled library
 contracts. Use `while iterator.MoveNext()` with `iterator.Current`, then Dispose.
 List<T> inherits Iterable<T>; inherited library members work through managed interface
 views. Integer-range for syntax is unchanged. Run
@@ -511,7 +511,7 @@ iteration through readonly collection views.
 
 [Predicate search](predicate-search.md) uses ordinary calls and contextual lambdas:
 `people.Find(person => person.Equals(expected))` returns Option<T> for exhaustive
-match handling. Equatable implementations use `readonly func Equals(other: T) -> bool`.
+match handling. EquatableTo implementations use `readonly func Equals(other: T) -> bool`.
 These are eager ArrayList operations; LINQ remains future work.
 
 [Ordinal text matching](ordinal-text.md) uses ordinary library calls such as

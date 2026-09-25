@@ -1,5 +1,5 @@
 .type System.Type
-    .implements System.Equatable<System.Type>
+    .implements System.EquatableTo<System.Type>
     .field private Handle System.RuntimeTypeHandle
     .method static GetTypeFromHandle(System.RuntimeTypeHandle handle) -> System.Type
         ldarg handle

@@ -57,7 +57,7 @@ walks through the compiled hostname/echo POC.
 | Byte and text streams | [Stream contracts](streams.md) · [Pending reads](pending-read.md) | [System.IO](xref:System.IO) |
 | Console | [Console guide](/features/console/) · [Standard stream ownership](console.md) | [Console](xref:System.Console) |
 | Metadata discovery | [Introspection walkthrough](/features/introspection/) · [Descriptor identity](introspection.md) | [System.Introspection](xref:System.Introspection) |
-| Identity, values and records | [Object and value contracts](objects.md) | [Object](xref:System.Object) · [Value](xref:System.Value) · [HashCode](xref:System.HashCode) · [Equatable&lt;T&gt;](xref:System.Equatable`1) |
+| Identity, values and records | [Object and value contracts](objects.md) | [Object](xref:System.Object) · [Value](xref:System.Value) · [HashCode](xref:System.HashCode) · [EquatableTo&lt;T&gt;](xref:System.EquatableTo`1) |
 | Compiler support | [Transitional async builders](async-builders.md) | [System.Runtime.CompilerServices](xref:System.Runtime.CompilerServices) |
 | Runtime failures | [Terminal faults and host diagnostics](faults.md) | Manual host reference in that guide |
 
@@ -117,3 +117,8 @@ byte storage for InputStream, OutputStream and SeekableStream, including text/JS
 round trips without file access. It has a shared cursor and a provisional 64 KiB bound.
 
 Development [runtime reflection](reflection.md) adds checked construction and property access to runtime-backed introspection descriptors.
+
+Development directional contracts: [EquatableTo&lt;T&gt;](xref:System.EquatableTo`1),
+[ComparableTo&lt;T&gt;](xref:System.ComparableTo`1) and
+[ConvertibleInto&lt;T&gt;](xref:System.ConvertibleInto`1). The former Equatable/Comparable
+identities are removed; rebuild consumers.

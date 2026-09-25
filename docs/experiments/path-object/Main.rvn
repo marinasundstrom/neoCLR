@@ -23,12 +23,12 @@ func Hash(value: Object) -> int => value.GetHashCode()
 func Display(value: Object) -> string => value.ToString()
 
 func Main() {
-    let scalar: Equatable<int> = 42
+    let scalar: EquatableTo<int> = 42
     Check(scalar.Equals(42) && !scalar.Equals(7), "Value-type equality needs no nullable type")
     let first = Parsed("notes/naïve.txt")
     let second = Parsed("notes/naïve.txt")
     let third = Parsed("notes/naïve.txt")
-    let typed: Equatable<Path> = first
+    let typed: EquatableTo<Path> = first
     Check(!Object.ReferenceEquals(first, second), "Parse must create distinct references")
     Check(first.Equals(second) && second.Equals(third) && first.Equals(third), "Typed equality")
     Check(typed.Equals(second) && Same(first, second) && Same(second, first), "Interface and Object equality")

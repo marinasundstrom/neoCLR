@@ -26,19 +26,19 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    source = (ROOT / 'runtime/raven/src/System/Equatable.rvn').read_text()
+    source = (ROOT / 'runtime/raven/src/System/EquatableTo.rvn').read_text()
     local = (ROOT / 'runtime/raven/src/System/LocalDateTime.rvn').read_text()
     file_source = (ROOT / 'runtime/raven/src/System/Storage/FileText.rvn').read_text()
     mapping = (ROOT / 'runtime/raven/src/System/Collections/Map.rvn').read_text()
     mutable = (ROOT / 'runtime/raven/src/System/Collections/MutableMap.rvn').read_text()
     mismatch = 'Library interface does not match reference contract'
     cases = [
-        ('Equality', 'Equatable', source, None),
-        ('WrongArgument', 'Equatable', source.replace('other: T', 'other: int'), mismatch),
-        ('WrongName', 'Equatable', source.replace('other: T', 'renamed: T'), mismatch),
-        ('WrongResult', 'Equatable', source.replace('-> bool', '-> int'), mismatch),
-        ('WrongArity', 'Equatable', source.replace('Equatable<T>', 'Equatable<T, U>'), mismatch),
-        ('WrongParameter', 'Equatable', source.replace('Equatable<T>', 'Equatable<T, U>').replace('other: T', 'other: U'), mismatch),
+        ('Equality', 'EquatableTo', source, None),
+        ('WrongArgument', 'EquatableTo', source.replace('other: T', 'other: int'), mismatch),
+        ('WrongName', 'EquatableTo', source.replace('other: T', 'renamed: T'), mismatch),
+        ('WrongResult', 'EquatableTo', source.replace('-> bool', '-> int'), mismatch),
+        ('WrongArity', 'EquatableTo', source.replace('EquatableTo<T>', 'EquatableTo<T, U>'), mismatch),
+        ('WrongParameter', 'EquatableTo', source.replace('EquatableTo<T>', 'EquatableTo<T, U>').replace('other: T', 'other: U'), mismatch),
         ('Map', 'Collections.Map', mapping, None),
         ('SwappedMapParameter', 'Collections.Map', mapping.replace('Find(key: K)', 'Find(key: V)'), mismatch),
         ('MutableMap', 'Collections.MutableMap', mutable, None),
@@ -71,7 +71,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
             emitted = (output / 'Implementation.neoil').read_text()
             assert '.method internal static FromUnixTimeTicks(Int64 ticks)' in emitted
             assert '.field private StoredDate System.Date\n.field private StoredTime System.Time' in emitted
-        elif owner == 'Equatable':
-            assert '.interface System.Equatable<T0>' in (output / 'Implementation.neoil').read_text()
+        elif owner == 'EquatableTo':
+            assert '.interface System.EquatableTo<T0>' in (output / 'Implementation.neoil').read_text()
 print('Generic contracts reject changed arity, type parameter, argument name/type and return type.')
 print('LocalDateTime preserves nested field order and internal factory visibility; malformed layouts rejected.')

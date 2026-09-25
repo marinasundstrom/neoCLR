@@ -20,7 +20,7 @@ func Main() {
     nested[0].Add(typeof(Date))
     WriteLine(types.Count)
     WriteLine(copy.Count)
-    let comparisons = ArrayList<Comparable<int>>()
+    let comparisons = ArrayList<ComparableTo<int>>()
     comparisons.Add(42)
     WriteLine(comparisons[0].CompareTo(42))
     let optional: Option<ArrayList<TypeInfo>> = Some(types)

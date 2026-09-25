@@ -9,7 +9,7 @@ python3 docs/experiments/introspection-object/verify.py \
 ```
 
 The fixture checks repeated TypeInfo queries with separate allocation identities,
-typed/Equatable/Object equality, MemberInfo views, null/wrong-type rejection at the
+typed/EquatableTo/Object equality, MemberInfo views, null/wrong-type rejection at the
 Object boundary, hash/display consistency, typeof versus boxed GetType, closed
 generic arguments, array element shapes and HashMap callbacks. It retains descriptors
 and map entries across repeated collection under a 96-object heap limit. The runner

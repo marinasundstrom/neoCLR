@@ -402,7 +402,7 @@ interface Subtractive
 interface Multiplicative
 interface Divisible
 interface Negatable
-interface Comparable
+interface ComparableTo
 ```
 
 Higher-level concepts may then compose those capabilities:
@@ -428,7 +428,7 @@ NeoCLR should not assume that every mathematical operation returns the same type
 For example, there may be meaningful contracts such as:
 
 ```raven
-interface Convertible<TResult>
+interface ConvertibleInto<TResult>
 {
     func Convert() -> TResult
 }

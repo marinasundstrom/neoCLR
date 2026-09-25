@@ -22,7 +22,7 @@ Status: [inherited value layout and BaseType](inherited-layout.md) are implement
 as preliminary groundwork. [Base references](base-views.md) are now implemented;
 [virtual dispatch and abstract classes](class-dispatch.md) are implemented.
 [Constructor chaining](constructor-chaining.md) is now implemented; common Object
-methods remain planned. The existing interface system and Equatable<T> remain
+methods remain planned. The existing interface system and EquatableTo<T> remain
 available. Heap allocation and managed references are independent of this proposal.
 
 The runtime should support types with or without a base class. There is no mandatory
@@ -43,7 +43,7 @@ when a value is local, heap allocated, or accessed by reference. There is no inh
 value-type/reference-type distinction that switches these methods to reference
 identity behavior. Equal values must yield equal hashes under the same equality
 policy. This is value equality and value hashing, independent of addressing mode. The
-default record policy and the relationship to Equatable<T> need to be
+default record policy and the relationship to EquatableTo<T> need to be
 specified before adding universal method implementations.
 
 Reference identity is separate: whether two references designate the same stored

@@ -1,9 +1,9 @@
 {
   "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
-  "declarationCount": 772,
+  "declarationCount": 774,
   "sources": [
     {
-      "file": "runtime/System/Equatable.neoil",
+      "file": "runtime/System/EquatableTo.neoil",
       "declarations": 2,
       "disposition": "interfaces",
       "samples": [
@@ -12,13 +12,19 @@
       ]
     },
     {
-      "file": "runtime/System/Comparable.neoil",
+      "file": "runtime/System/ComparableTo.neoil",
       "declarations": 2,
       "disposition": "interfaces",
       "samples": [
         "library-value-interfaces.rvn",
         "library-interfaces.rvn"
       ]
+    },
+    {
+      "file": "runtime/System/ConvertibleInto.neoil",
+      "declarations": 2,
+      "disposition": "unimplemented-contracts",
+      "samples": []
     },
     {
       "file": "runtime/System/Clonable.neoil",
@@ -2117,7 +2123,7 @@
       "note": "Operators, SingleError case/formatting bodies and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md."
     },
     {
-      "file": "runtime/raven/Equatable.neoil",
+      "file": "runtime/raven/EquatableTo.neoil",
       "disposition": "raven-authored-existing-contract",
       "samples": [
         "library-value-interfaces.rvn"
@@ -2128,7 +2134,7 @@
       "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
     },
     {
-      "file": "runtime/raven/Comparable.neoil",
+      "file": "runtime/raven/ComparableTo.neoil",
       "disposition": "raven-authored-existing-contract",
       "samples": [
         "library-value-interfaces.rvn"

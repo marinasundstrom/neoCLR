@@ -1,8 +1,8 @@
 ; Generated from runtime/raven/src/System/Time.rvn. Regenerate with build_runtime_library.py.
 .type System.Time
 .sealed
-.implements System.Comparable<System.Time>
-.implements System.Equatable<System.Time>
+.implements System.ComparableTo<System.Time>
+.implements System.EquatableTo<System.Time>
 .field private StoredTicks Int64
 .property instance Ticks() -> Int64
 .get instance System.Time::get_Ticks()

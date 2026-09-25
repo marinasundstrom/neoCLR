@@ -72,7 +72,7 @@ hashes, even when their allocations differ. The
 <a href="/samples/object-equality.zip">checked sample</a> contrasts a mutable Cell using
 identity with a Key using its Number for both equality and hashing. Calls through
 Object select the overrides. ReferenceEquals remains an identity comparison, and
-explicit base calls retain the base implementation. Existing Equatable contracts
+explicit base calls retain the base implementation. Existing EquatableTo contracts
 are unchanged.
 
 String identity follows the shared immutable text owner. Object/interface wrappers
@@ -125,7 +125,7 @@ Two null components compare equal; null and present values differ. Null contribu
 zero to hashing, prints an empty component value and survives deconstruction. Nullable
 string/value components and externally compiled record components remain unsupported; this is not general graph equality.
 
-Raven's target configuration selects System.Equatable and System.HashCode. Unsupported
+Raven's target configuration selects System.EquatableTo and System.HashCode. Unsupported
 record shapes report RAVT004. Init-only property assignment remains a compiler rule;
 the importer recognizes the IsExternalInit metadata marker and permits readonly
 backing-field stores only in declaring constructors or recognized init accessors.
@@ -192,7 +192,7 @@ record struct Coordinate(X: int, Y: int)
 let first = Coordinate(42, 7)
 let same = Coordinate(42, 7)
 let value: Object = first
-let comparable: Equatable<Coordinate> = first
+let comparable: EquatableTo<Coordinate> = first
 ```
 
 Generated typed/Object/interface equality compares components, GetHashCode combines
@@ -289,7 +289,7 @@ for intentional absence in both value and reference API models.
 Generated record Object.Equals preserves Object's nullable comparison parameter;
 generated typed record-class Equals also accepts a nullable reference to its record
 type and compares null as false. Record-struct typed parameters remain non-nullable
-values. The Equatable&lt;T&gt; interface contract is unchanged. This does not add Nullable&lt;T&gt;,
+values. The EquatableTo&lt;T&gt; interface contract is unchanged. This does not add Nullable&lt;T&gt;,
 nullable-value boxing or Option components to the supported record component set.
 
 Generated record-class `==` and `!=` also accept nullable operands in development.

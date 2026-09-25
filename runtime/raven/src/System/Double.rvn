@@ -1,6 +1,6 @@
 namespace System
 
-public struct Double : Comparable<double> {
+public struct Double : ComparableTo<double> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: double

@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/Single.rvn. Regenerate with build_runtime_library.py.
 .type System.Single
 .sealed
-.implements System.Comparable<Single>
+.implements System.ComparableTo<Single>
 .method instance readonly byref CompareTo(Single other) -> Int32
 M00000001_IL_0000:
 M00000001_IL_0001:

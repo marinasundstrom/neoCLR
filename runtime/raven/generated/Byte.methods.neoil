@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/Byte.rvn. Regenerate with build_runtime_library.py.
 .type System.Byte
 .sealed
-.implements System.Comparable<Byte>
+.implements System.ComparableTo<Byte>
 .method instance readonly byref CompareTo(Byte other) -> Int32
 M00000001_IL_0000:
 M00000001_IL_0001:

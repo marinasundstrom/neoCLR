@@ -27,7 +27,7 @@
     <RavenIterationIterableType>System.Collections.Iterable`1</RavenIterationIterableType>
     <RavenIterationIteratorType>System.Collections.Iterator`1</RavenIterationIteratorType>
     <RavenRecordAssemblyName>NeoCLR.CoreProbe</RavenRecordAssemblyName>
-    <RavenRecordEquatableType>System.Equatable`1</RavenRecordEquatableType>
+    <RavenRecordEquatableType>System.EquatableTo`1</RavenRecordEquatableType>
     <RavenRecordHashCodeType>System.HashCode</RavenRecordHashCodeType>
     <RavenTypeOfAssemblyName>NeoCLR.CoreProbe</RavenTypeOfAssemblyName>
     <RavenTypeOfInfoType>System.Introspection.TypeInfo</RavenTypeOfInfoType>

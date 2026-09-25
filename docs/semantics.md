@@ -89,7 +89,7 @@ a deliberately small contract, not .NET Parse compatibility.
 
 `ceq` requires identical runtime value types and compares data structurally; arena
 references compare identity and pointers compare address and target type. It does
-not dispatch `Equatable<T>.Equals`. Numeric comparisons include integer and
+not dispatch `EquatableTo<T>.Equals`. Numeric comparisons include integer and
 floating-point operands; see [floating point](floating-point.md) for NaN behavior.
 `brtrue` and `brfalse` accept Boolean, integer, native pointer and arena-reference
 operands; see [neoIL](neoil.md) for their truth tests. These operations do not

@@ -162,11 +162,14 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Disposable'">
     <Compile Include="src/System/Disposable.rvn" />
   </ItemGroup>
-  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Equatable'">
-    <Compile Include="src/System/Equatable.rvn" />
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EquatableTo'">
+    <Compile Include="src/System/EquatableTo.rvn" />
   </ItemGroup>
-  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Comparable'">
-    <Compile Include="src/System/Comparable.rvn" />
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ComparableTo'">
+    <Compile Include="src/System/ComparableTo.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ConvertibleInto'">
+    <Compile Include="src/System/ConvertibleInto.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Clonable'">
     <Compile Include="src/System/Clonable.rvn" />

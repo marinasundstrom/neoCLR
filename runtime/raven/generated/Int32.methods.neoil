@@ -1,8 +1,8 @@
 ; Generated from runtime/raven/src/System/Int32.rvn. Regenerate with build_runtime_library.py.
 .type System.Int32
 .sealed
-.implements System.Comparable<Int32>
-.implements System.Equatable<Int32>
+.implements System.ComparableTo<Int32>
+.implements System.EquatableTo<Int32>
 .method static Parse(String value) -> System.Result<Int32,System.Int32ParseError>
 .local Value local0
 .local Byte local1

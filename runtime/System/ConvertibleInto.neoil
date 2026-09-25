@@ -1,0 +1,5 @@
+; Explicit conversion to T through an ordinary borrowed receiver.
+.interface System.ConvertibleInto<T>
+    .method instance byref Convert() -> T
+    .end
+.end

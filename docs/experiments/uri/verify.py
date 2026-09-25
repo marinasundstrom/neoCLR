@@ -44,7 +44,7 @@ func Resolved(baseUri: Uri, reference: string, expected: string) {
         let values = ArrayList<Uri>()
         values.Add(uri)
         Check(values[0].Equals(same))
-        let comparable: Equatable<Uri> = uri
+        let comparable: EquatableTo<Uri> = uri
         Check(comparable.Equals(same))
         let boxed: Object = uri
         Check(boxed.Equals(same))

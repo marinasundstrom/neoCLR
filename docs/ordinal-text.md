@@ -51,7 +51,7 @@ behavior would hide a difference from familiar prefix/suffix defaults. Introduci
 an entire comparison enum and culture implementation now would enlarge the slice.
 The suffix costs source compatibility and verbosity; future overloads can coexist.
 It is a provisional API choice, not a claim that .NET lacks deterministic matching.
-String does not yet implement Comparable<String>: doing so would select a default
+String does not yet implement ComparableTo<String>: doing so would select a default
 ordering, whereas this API keeps that choice explicit.
 
 ## Responsibility and cost

@@ -51,7 +51,7 @@ implemented APIs. This list will expand alongside the library.
 
 The [transitional async builder guide](async-builders.md) covers generated state ownership and links the compiler-facing System.Runtime.CompilerServices contracts to their temporary role.
 
-[Equatable&lt;T&gt;](xref:System.Equatable`1) defines typed equality as Equals(T), without
+[EquatableTo&lt;T&gt;](xref:System.EquatableTo`1) defines typed equality as Equals(T), without
 imposing nullable value types. Path now supplies that contract and Object overrides.
 
 ## System.Introspection
@@ -59,3 +59,6 @@ imposing nullable value types. Path now supplies that contract and Object overri
 [TypeInfo](xref:System.Introspection.TypeInfo) and [MemberInfo](xref:System.Introspection.MemberInfo) describe types and metadata. [AssemblyInfo](xref:System.Introspection.AssemblyInfo) and [ModuleInfo](xref:System.Introspection.ModuleInfo) describe the loaded catalog. [FieldInfo](xref:System.Introspection.FieldInfo), [MethodInfo](xref:System.Introspection.MethodInfo) and [PropertyInfo](xref:System.Introspection.PropertyInfo) describe declarations. [ParameterInfo](xref:System.Introspection.ParameterInfo) describes method and index parameters; [BindingFlags](xref:System.Introspection.BindingFlags) selects metadata query categories. See [descriptor identity](introspection.md) for Object behavior and remaining descriptor coverage.
 
 `System.Runtime.Reflection` provides provisional [construction and property extensions](reflection.md) with Result-based validation errors.
+
+[ConvertibleInto&lt;T&gt;](xref:System.ConvertibleInto`1) provides explicit `Convert() -> T`;
+implementations choose failure policy. No implicit conversion is introduced.

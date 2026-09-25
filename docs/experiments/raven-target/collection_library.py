@@ -33,7 +33,7 @@ def build(path: Path) -> str:
     if path.resolve().parent == ROOT / 'runtime/legacy':
         return (build(ROOT / 'runtime/raven/generated' / (path.stem + '.methods.neoil'))
                 + build(ROOT / 'runtime/raven/generated' / (path.stem + '.helpers.neoil')))
-    if path.parent == ROOT / 'runtime/System' and path.stem in {'Environment', 'Console', 'Clonable', 'LocalDateTime', 'Disposable', 'Equatable', 'Comparable', 'SystemClock', 'Closable'}:
+    if path.parent == ROOT / 'runtime/System' and path.stem in {'Environment', 'Console', 'Clonable', 'LocalDateTime', 'Disposable', 'EquatableTo', 'ComparableTo', 'ConvertibleInto', 'SystemClock', 'Closable'}:
         return build(ROOT / 'runtime/raven' / path.name)
     if path == ROOT / 'runtime/System/Storage/File.neoil':
         return build(ROOT / 'runtime/raven/FileText.neoil')
@@ -60,7 +60,7 @@ def build(path: Path) -> str:
         return build(ROOT / 'runtime/raven/Iterator.neoil')
     if path.stem in COLLECTIONS | {'Disposable'}:
         text = adapt(text, path.stem)
-    if path.stem in {'Equatable', 'Comparable', 'Clonable', 'Closable'}:
+    if path.stem in {'EquatableTo', 'ComparableTo', 'ConvertibleInto', 'Clonable', 'Closable'}:
         text = text.replace('instance readonly byref ', 'instance ').replace('instance byref ', 'instance ')
     if path == ROOT / 'runtime/System/Reflection.neoil':
         # Raven owns descriptor bodies; legacy Neo retains its value-based profile.

@@ -14,7 +14,7 @@ static class IPAddressBindings
     public const string Declarations = "\n" + """
         #nullable enable annotations
         namespace Networking {
-            public abstract class IPAddress : Equatable<IPAddress> {
+            public abstract class IPAddress : EquatableTo<IPAddress> {
                 protected IPAddress(byte[] bytes) { }
                 public static Result<IPAddress, IPAddressError> Parse(string text) => default;
                 public bool Equals(IPAddress other) => default;

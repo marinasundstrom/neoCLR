@@ -1,0 +1,5 @@
+; Generated from runtime/raven/src/System/ComparableTo.rvn. Regenerate with build_runtime_library.py.
+.interface System.ComparableTo<T0>
+.method instance CompareTo(T0 other) -> Int32
+.end
+.end

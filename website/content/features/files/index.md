@@ -36,7 +36,7 @@ Storage uses a closed StorageItem interface hierarchy with File and Directory as
 
 The immediate Storage POC stays small: provider-bound addresses, useful names, explicit lookup and byte access. File.Name is derived from its validated Path; descriptor construction performs no lookup. Directory.FileAt describes an address, while GetFile explicitly checks it. Windows Runtime is a design reference, but richer properties, timestamps, size snapshots and query APIs will follow concrete application needs.
 
-Development Path now compares and hashes its exact accepted spelling through both typed equality and Object dispatch. Separately parsed equal paths work as HashMap keys with explicit equality/hash callbacks. This does not compare filesystem identity or normalize case, Unicode or native path formats. Equatable&lt;T&gt; accepts T; nullable operands are not imposed on value types. Object.Equals(Object?) is the separate null-aware overload.
+Development Path now compares and hashes its exact accepted spelling through both typed equality and Object dispatch. Separately parsed equal paths work as HashMap keys with explicit equality/hash callbacks. This does not compare filesystem identity or normalize case, Unicode or native path formats. EquatableTo&lt;T&gt; accepts T; nullable operands are not imposed on value types. Object.Equals(Object?) is the separate null-aware overload.
 
 ### Console and standard streams
 

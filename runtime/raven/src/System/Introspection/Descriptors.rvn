@@ -293,7 +293,7 @@ internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
 
 }
 
-public sealed interface TypeInfo : MemberInfo, Equatable<TypeInfo> {
+public sealed interface TypeInfo : MemberInfo, EquatableTo<TypeInfo> {
     val FullName: string { get }
     val Namespace: string { get }
     val GenericArgumentCount: int { get }

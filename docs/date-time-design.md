@@ -70,7 +70,7 @@ and validated factories. Continue evaluating the remaining questions:
 1. Decide Date/Time names, representations, defaults and construction invariants;
    add small .NET probes for boundaries and arithmetic behavior.
 2. Implement separate Date and Time values with validated factories, readonly
-   components and Equatable/Comparable (implemented). Demonstrate
+   components and EquatableTo/ComparableTo (implemented). Demonstrate
    birth dates and daily schedules in Neo; test IL/artifact bypasses and errors.
 3. Read the host local date, time and offset in a single snapshot (implemented);
    see [local clock](local-clock.md). This is the preview date/time milestone.

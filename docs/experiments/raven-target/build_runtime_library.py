@@ -97,8 +97,9 @@ SLICES = {
     'SystemClock': 'System.SystemClock',
     'LocalDateTime': 'System.LocalDateTime',
     'Disposable': 'System.Disposable',
-    'Equatable': 'System.Equatable',
-    'Comparable': 'System.Comparable',
+    'EquatableTo': 'System.EquatableTo',
+    'ComparableTo': 'System.ComparableTo',
+    'ConvertibleInto': 'System.ConvertibleInto',
     'Clonable': 'System.Clonable',
     'Closable': 'System.Closable',
 
@@ -230,8 +231,9 @@ SOURCES = {
     'SystemClock': 'runtime/raven/src/System/SystemClock.rvn',
     'LocalDateTime': 'runtime/raven/src/System/LocalDateTime.rvn',
     'Disposable': 'runtime/raven/src/System/Disposable.rvn',
-    'Equatable': 'runtime/raven/src/System/Equatable.rvn',
-    'Comparable': 'runtime/raven/src/System/Comparable.rvn',
+    'EquatableTo': 'runtime/raven/src/System/EquatableTo.rvn',
+    'ComparableTo': 'runtime/raven/src/System/ComparableTo.rvn',
+    'ConvertibleInto': 'runtime/raven/src/System/ConvertibleInto.rvn',
     'Clonable': 'runtime/raven/src/System/Clonable.rvn',
     'Closable': 'runtime/raven/src/System/Closable.rvn',
 
@@ -279,7 +281,7 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
     if name == 'Path' and bootstrap:
         # The archived Neo profile has no Object or HashCode class contract.
         # Keep its existing lexical surface; Raven uses the complete implementation.
-        text = text.replace('.extends System.Object\n', '').replace('.implements System.Equatable<System.Storage.Path>\n', '')
+        text = text.replace('.extends System.Object\n', '').replace('.implements System.EquatableTo<System.Storage.Path>\n', '')
         text = text.replace('call instance System.Object::.ctor()', 'pop')
         text = re.sub(r'(?ms)^\.method instance override (?:Equals\(System.Object other\)|GetHashCode\(\))[^\n]*\n.*?^\.end\n', '', text)
         text = text.replace('.method instance override ToString()', '.method instance ToString()')

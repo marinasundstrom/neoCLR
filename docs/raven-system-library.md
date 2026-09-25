@@ -868,7 +868,7 @@ python3 docs/experiments/raven-target/verify_value_library.py \
 ```
 
 Date and Time have **not** been ported by this gate. Next, establish matching reference
-layout metadata for their stored day number/ticks, retain their Equatable/Comparable
+layout metadata for their stored day number/ticks, retain their EquatableTo/ComparableTo
 contracts and readonly receivers, and admit checked static Result factories with
 private construction. Their current executable IL and public behavior remain in use.
 
@@ -913,7 +913,7 @@ checks pass. No SDK installation or release packaging was performed.
 
 The Raven profile now uses `src/System/Date.rvn` for Date, preserving the existing Gregorian
 algorithm, years 1–9999, day numbers 0–3652058, Result factories, properties and
-Equatable/Comparable contracts. Private static calendar helpers and the private
+EquatableTo/ComparableTo contracts. Private static calendar helpers and the private
 constructor retain their ownership and visibility. Century-cycle clamps are ordinary
 conditionals in Raven; their behavior is unchanged. Existing matched value import
 support was sufficient: no importer or compiler changes were needed for this port.

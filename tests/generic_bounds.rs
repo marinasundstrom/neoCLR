@@ -115,11 +115,11 @@ fn raw_metadata_checks_bounds_and_substitution() {
 #[test]
 fn bundled_generic_interface_bounds_substitute_method_parameters() {
     let source = r#"
-func Compare<T>(readonly left: T&, right: T) -> int where T: System.Comparable<T> {
+func Compare<T>(readonly left: T&, right: T) -> int where T: System.ComparableTo<T> {
     return left.CompareTo(right)
 }
 record Helpers() {
-    static func Compare<T>(readonly left: T&, right: T) -> int where T: System.Comparable<T> {
+    static func Compare<T>(readonly left: T&, right: T) -> int where T: System.ComparableTo<T> {
         return Compare<T>(left, right)
     }
 }

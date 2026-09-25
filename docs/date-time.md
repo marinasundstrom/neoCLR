@@ -23,7 +23,7 @@ Date represents a proleptic Gregorian calendar date from 0001-01-01 through
 | Time.FromTicks(Int64 ticks) | Same Result; validates the time-of-day range |
 | Time.Hour / Minute / Second / Millisecond / FractionTicks | Readonly Int32 components; Millisecond truncates smaller fractions |
 | Time.Ticks | Readonly Int64 total ticks since midnight |
-| Equals(T other) / CompareTo(T other) | Equatable<T>/Comparable<T>, readonly managed receiver and owned input |
+| Equals(T other) / CompareTo(T other) | EquatableTo<T>/ComparableTo<T>, readonly managed receiver and owned input |
 
 Hours are 0–23, minutes and seconds 0–59. Leap-second input 60 and 24:00 are rejected.
 These APIs are culture-independent. Errors currently distinguish invalid date from
