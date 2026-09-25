@@ -1,0 +1,185 @@
+namespace System.Concurrency
+
+import System.*
+import System.Option.*
+
+/// A copyable request-observation capability, independent of any task or scheduler.
+public struct CancellationToken {
+    // Null is the internal default representation of the non-cancellable token.
+    private var source: CancellationTokenSource?
+
+    /// Creates a token that never requests cancellation.
+    init() {
+        source = null
+    }
+
+    internal init(source: CancellationTokenSource) {
+        self.source = source
+    }
+
+    /// A token that never requests cancellation.
+    static val None: CancellationToken => CancellationToken()
+
+    /// Whether this token is associated with a cancellation source.
+    val CanBeCancelled: bool => source is not null
+
+    /// Whether the associated source has requested cancellation.
+    val IsCancellationRequested: bool {
+        get {
+            let owner = source
+            if owner is CancellationTokenSource active {
+                return active.IsCancellationRequested
+            }
+            return false
+        }
+    }
+
+    /// Registers an invocation-local callback; an already requested token invokes it inline.
+    func Register(callback: Func<Void>) -> CancellationRegistration {
+        let owner = source
+        if owner is CancellationTokenSource active {
+            return active.Register(callback)
+        }
+        return CancellationRegistration(null, System.Option.None(), null)
+    }
+}
+
+/// Owns cancellation authority. Requesting cancellation does not complete an operation.
+public class CancellationTokenSource : Disposable {
+    private var requested: bool
+    private var disposed: bool
+    private var head: CancellationRegistration?
+
+    /// Creates an active source with no cancellation request.
+    init() {
+        requested = false
+        disposed = false
+        head = null
+    }
+
+    /// A token sharing this source's request state.
+    val Token: CancellationToken {
+        get {
+            if disposed {
+                System.Fault("Cancellation source is disposed")
+            }
+            return CancellationToken(self)
+        }
+    }
+
+    /// Whether Cancel has been called; this remains readable after disposal.
+    val IsCancellationRequested: bool => requested
+
+    internal val IsDisposed: bool => disposed
+
+    /// Sets the request flag and invokes active callbacks synchronously in reverse registration order.
+    func Cancel() {
+        if disposed {
+            System.Fault("Cancellation source is disposed")
+        }
+        if requested {
+            return
+        }
+        requested = true
+        var pending = head
+        head = null
+        while pending is CancellationRegistration current {
+            pending = current.TakeNext()
+            current.Invoke()
+        }
+    }
+
+    /// Releases registrations without requesting cancellation. Repeated disposal is harmless.
+    func Dispose() {
+        if disposed {
+            return
+        }
+        disposed = true
+        var pending = head
+        head = null
+        while pending is CancellationRegistration current {
+            pending = current.TakeNext()
+            current.Dispose()
+        }
+    }
+
+    internal func Register(callback: Func<Void>) -> CancellationRegistration {
+        if disposed {
+            System.Fault("Cancellation source is disposed")
+        }
+        if requested {
+            callback()
+            return CancellationRegistration(null, System.Option.None(), null)
+        }
+        let registration = CancellationRegistration(self, Some(callback), head)
+        head = registration
+        return registration
+    }
+
+    internal func Remove(registration: CancellationRegistration) {
+        var previous: CancellationRegistration? = null
+        var cursor = head
+        while cursor is CancellationRegistration current {
+            if Object.ReferenceEquals(current, registration) {
+                let remaining = current.TakeNext()
+                if previous is CancellationRegistration preceding {
+                    preceding.SetNext(remaining)
+                } else {
+                    head = remaining
+                }
+                return
+            }
+            previous = current
+            cursor = current.Next
+        }
+    }
+}
+
+/// A disposable callback registration. Disposing removes a callback that has not started.
+public class CancellationRegistration : Disposable {
+    private var owner: CancellationTokenSource?
+    private var callback: Option<Func<Void>>
+    private var next: CancellationRegistration?
+
+    internal init(owner: CancellationTokenSource?, callback: Option<Func<Void>>, next: CancellationRegistration?) {
+        self.owner = owner
+        self.callback = callback
+        self.next = next
+    }
+
+    internal val Next: CancellationRegistration? => next
+
+    internal func SetNext(value: CancellationRegistration?) {
+        next = value
+    }
+
+    internal func TakeNext() -> CancellationRegistration? {
+        let remaining = next
+        next = null
+        return remaining
+    }
+
+    internal func Invoke() {
+        let action = callback
+        let source = owner
+        callback = None()
+        owner = null
+        if source is CancellationTokenSource active {
+            if !active.IsDisposed {
+                if let Some(invoke) = action {
+                    invoke()
+                }
+            }
+        }
+    }
+
+    /// Removes an unstarted callback and releases its captures; repeated disposal is harmless.
+    func Dispose() {
+        callback = None()
+        let source = owner
+        owner = null
+        if source is CancellationTokenSource active {
+            active.Remove(self)
+        }
+    }
+}

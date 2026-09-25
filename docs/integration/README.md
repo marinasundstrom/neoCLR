@@ -5,6 +5,7 @@
 Integration and experiment notes describe bounded supported paths; consult each page for limitations and validation.
 See also the [Raven experiment](../experiments/raven-target/README.md).
 
+- [Cancellation token bridge and ownership](../cancellation-design.md)
 - [Try the application toolchain locally](../raven-application-local-build.md)
 - [Raven application types](../raven-application-types.md)
 - [Managed array shapes in the Raven target](../raven-array-shapes.md)

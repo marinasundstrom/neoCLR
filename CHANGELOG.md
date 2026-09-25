@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add development System.Concurrency cancellation source, copyable token and
+  disposable registration APIs. Requests invoke callbacks synchronously within
+  one invocation; operations still own cleanup and Task cancellation acknowledgement.
+  Cover default/copied/boxed tokens, callback ordering/reentrancy/disposal and GC.
+  Keep timers, linked sources, cross-thread use and HTTP/socket token wiring pending.
+  Admit the token's exact source-reference layout and captured receivers in the
+  compiler bridge, with internal-helper guards and updated API documentation.
+
 - Integrate development HttpError results into HTTP client, handler, request and
   server APIs using a standard payload-bearing union. Preserve resolver/socket
   causes and distinguish request, protocol, unsupported, limit, timeout and handler

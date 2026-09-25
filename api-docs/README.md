@@ -186,3 +186,7 @@ The same generated union documentation now covers StreamError, TextReadError,
 StorageLookupError, FileReadError, FileWriteError, ConsoleReadError, Utf8SliceError,
 Int32ParseError, IntegerDivisionError and SingleError. EntryKind is an enum instead:
 its named fields replace nested union cases and Is*/Get* accessors. Zero is unnamed.
+
+Development cancellation source/token/registration APIs now have generated type and
+member descriptions. They are invocation-local and do not yet wire HTTP/native
+operations to tokens. Keep this boundary visible when adding consumer overloads.

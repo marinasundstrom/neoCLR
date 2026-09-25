@@ -93,3 +93,11 @@ for development examples.
 The development [HTTP client, server and handler APIs](xref:System.Web.Http) support a bounded
 GET/200 POC over sockets. Read the [Web guide](/features/web/) for pipeline examples,
 ownership, framing limits and missing transfer deadlines.
+
+Development cancellation APIs are in `System.Concurrency`:
+[CancellationTokenSource](xref:System.Concurrency.CancellationTokenSource),
+[CancellationToken](xref:System.Concurrency.CancellationToken) and
+[CancellationRegistration](xref:System.Concurrency.CancellationRegistration).
+They separate a cooperative request from operation completion and are currently
+confined to one invocation. See [the task feature](../features/tasks/#cooperative-cancellation-requests).
+HTTP/socket token overloads, timers and linked sources remain following work.

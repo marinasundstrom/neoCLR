@@ -28,6 +28,24 @@ static class SignatureProbe
             catch (InvalidDataException) { checks.Add(name); return; }
             throw new Exception("Malformed signature accepted: " + name);
         }
+        var cancellationToken = module.GetType(CancellationBindings.Token);
+        Check("Cancellation token source-reference layout", CancellationBindings.IsTokenLayout(cancellationToken));
+        cancellationToken.Fields[0].FieldType = module.TypeSystem.Int32;
+        Reject("Cancellation token scalar layout", () => CancellationBindings.IsTokenLayout(cancellationToken));
+        cancellationToken.Fields[0].FieldType = module.GetType(CancellationBindings.Source);
+        foreach (var cancellationName in CancellationBindings.Names)
+            foreach (var member in module.GetType(cancellationName).Methods)
+            {
+                Check("Cancellation library member " + member.FullName,
+                    CancellationBindings.Bind(member, member, member.IsConstructor, true) is not null);
+                if (member.IsAssembly)
+                    Reject("Cancellation application helper access " + member.FullName,
+                        () => CancellationBindings.Bind(member, member, member.IsConstructor, false));
+            }
+        var cancel = module.GetType(CancellationBindings.Source).Methods.Single(m => m.Name == "Cancel");
+        cancel.Attributes |= MethodAttributes.Static;
+        Reject("Cancellation static request mismatch", () => CancellationBindings.Bind(cancel, cancel, false, false));
+        cancel.Attributes &= ~MethodAttributes.Static;
         foreach (var name in new[] { "op_Equality", "op_Inequality" })
         {
             var method = module.GetType("System.String").Methods.Single(m => m.Name == name);

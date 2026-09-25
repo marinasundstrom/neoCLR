@@ -5,6 +5,9 @@
     <NeoCLRRoot>$(NeoCLRBootstrapRoot)</NeoCLRRoot>
   </PropertyGroup>
   <Import Project="../../build/NeoCLR.Raven.props" />
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Cancellation'">
+    <Compile Include="src/System/Concurrency/Cancellation.rvn" />
+  </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'IPAddress'">
     <Compile Include="src/System/Networking/IPAddress.rvn" />
   </ItemGroup>

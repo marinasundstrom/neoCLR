@@ -48,7 +48,7 @@ static class CollectionBindings
         var element = parameterMap?.Invoke(g.GenericArguments[0]) ?? GenericUnionBindings.Type(g.GenericArguments[0]);
         if (element is null || !((parameterMap is not null || GenericUnionBindings.ParameterMap is not null) && g.GenericArguments[0] is GenericParameter || element is "Int32" or "Double" or "Boolean" or "String" or "Void" or "System.Object"
             || (IPAddressBindings.IsName(element) || UriBindings.IsName(element)) || HttpBindings.IsName(element) || ApplicationTypes.IsType(element) || GenericUnionBindings.IsType(element) || ErrorBindings.IsType(element) || DelegateBindings.IsType(element) || ReflectionBindings.IsReference(element) || IsReference(element) || InterfaceBindings.IsInterface(element) || element.StartsWith("arrayref<", StringComparison.Ordinal)
-            || EnumBindings.IsType(element) || PrimitiveBindings.Types.Contains(element) || CalendarBindings.Types.Contains(element) || ErrorBindings.IsEmpty(element))) return null;
+            || CancellationBindings.IsReference(element) || EnumBindings.IsType(element) || PrimitiveBindings.Types.Contains(element) || (element == CancellationBindings.Token || CalendarBindings.Types.Contains(element)) || ErrorBindings.IsEmpty(element))) return null;
         var owner = $"System.Collections.{kind}<{element}>";
         Shapes[owner] = (kind, element);
         return owner;

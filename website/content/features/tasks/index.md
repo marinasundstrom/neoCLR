@@ -59,7 +59,7 @@ This prints only `Cancelled`. The message after the await never runs. `Outcome` 
 
 This prints `42`. [Download the Result mapping example →](../../samples/library-task-result.rvn)
 
-For an operation returning `Task<Result<T, E>>`, await yields the Result and `?` propagates an expected error independently. Cancellation never becomes `Result.Error`. Cancellation tokens remain a follow-up slice; the example uses explicit producer cancellation.
+For an operation returning `Task<Result<T, E>>`, await yields the Result and `?` propagates an expected error independently. Cancellation never becomes `Result.Error`. The example uses explicit producer cancellation. Development cancellation tokens provide a separate request mechanism, described below.
 
 ```raven
 {{TASK_PROPAGATION_SAMPLE}}
@@ -72,6 +72,29 @@ Here, Error skips the rest of Read and completes its Task with that same Error. 
 [Download the propagation example →](../../samples/library-task-propagation.rvn)
 
 [Download the cancellation example →](../../samples/library-async-cancellation.rvn) · [Explore Option and Result →](../outcomes/)
+
+## Cooperative cancellation requests
+
+**Development after Preview 9.** `System.Concurrency.CancellationTokenSource` owns
+cancellation authority. Its `Token` can be copied and passed to cooperating work.
+`CancellationToken.None` never requests cancellation. `token.Register(callback)`
+returns a disposable registration; disposing it removes a callback that has not started.
+
+`source.Cancel()` sets `IsCancellationRequested` and invokes callbacks synchronously
+in reverse registration order. Registering after cancellation invokes the callback
+inline. Disposing a source releases registrations without requesting cancellation.
+
+A request is not completion. The operation must stop using its resources and finish
+cleanup before cancelling its Promise. A Task that already completed keeps its result.
+This distinction also applies to future runtime suspension: changing how execution
+resumes must not shorten the lifetime of buffers still owned by native I/O.
+
+The first implementation is confined to one invocation; tokens are not shared with
+isolated worker threads. Timers, linked sources and HTTP/socket token overloads are
+not implemented yet. Source/token separation follows .NET, while cross-thread
+synchronization and exception aggregation are outside this iteration.
+
+[CancellationToken API →](xref:System.Concurrency.CancellationToken)
 
 <a id="worker-limits"></a>
 

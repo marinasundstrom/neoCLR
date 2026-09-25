@@ -49,13 +49,13 @@ static class GenericUnionBindings
         if (type.FullName == "System.Tasks.TaskOutcome/Cancelled" && type.IsValueType && RuntimeSignatures.IsCore(type.Scope)) return Register("Tasks.TaskOutcome.Cancelled");
         if (type.FullName == "System.Value" && type.IsValueType && RuntimeSignatures.IsCore(type.Scope)) return "Value";
         if (type.FullName == "System.Void" && type.IsValueType && RuntimeSignatures.IsCore(type.Scope)) return "Void";
-        return HttpBindings.Type(type) ?? HashCodeBindings.Type(type) ?? EnumBindings.Type(type) ?? ApplicationTypes.Type(type) ?? ReaderBindings.Type(type) ?? FileSystemBindings.Type(type) ?? StorageItemBindings.Type(type) ?? IPAddressBindings.Type(type) ?? UriBindings.Type(type) ?? PathBindings.Type(type) ?? StreamBindings.Type(type) ?? SocketBindings.Type(type) ?? WorkerBindings.Type(type) ?? TaskBindings.Type(type) ?? AsyncBindings.Type(type) ?? ReflectionBindings.Type(type) ?? CollectionBindings.Type(type) ?? InterfaceBindings.Type(type) ?? DelegateBindings.Type(type) ?? NativeMemoryBindings.Type(type) ?? ManagedArrayBindings.Type(type) ?? CalendarBindings.Type(type) ?? ErrorBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? type.MetadataType switch {
+        return HttpBindings.Type(type) ?? HashCodeBindings.Type(type) ?? EnumBindings.Type(type) ?? ApplicationTypes.Type(type) ?? ReaderBindings.Type(type) ?? FileSystemBindings.Type(type) ?? StorageItemBindings.Type(type) ?? IPAddressBindings.Type(type) ?? UriBindings.Type(type) ?? PathBindings.Type(type) ?? StreamBindings.Type(type) ?? SocketBindings.Type(type) ?? CancellationBindings.Type(type) ?? WorkerBindings.Type(type) ?? TaskBindings.Type(type) ?? AsyncBindings.Type(type) ?? ReflectionBindings.Type(type) ?? CollectionBindings.Type(type) ?? InterfaceBindings.Type(type) ?? DelegateBindings.Type(type) ?? NativeMemoryBindings.Type(type) ?? ManagedArrayBindings.Type(type) ?? CalendarBindings.Type(type) ?? ErrorBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? type.MetadataType switch {
             MetadataType.Int32 => "Int32", MetadataType.Double => "Double", MetadataType.Boolean => "Boolean", MetadataType.String => "String", _ => null
         };
     }
     public static bool IsType(string type) => Shapes.ContainsKey(type);
     static bool DefaultPayload(string type) => type is "Void" or "Int32" or "Double" or "Boolean"
-        || PrimitiveBindings.Types.Contains(type) || CalendarBindings.Types.Contains(type) || ErrorBindings.IsEmpty(type)
+        || PrimitiveBindings.Types.Contains(type) || (type == CancellationBindings.Token || CalendarBindings.Types.Contains(type)) || ErrorBindings.IsEmpty(type)
         || Shapes.TryGetValue(type, out var nested) && CanDefault(nested);
     static bool CanDefault(Shape shape) => shape.Kind is "Option.None" or "Tasks.TaskOutcome.Cancelled"
         || shape.Kind is "Result.Ok" or "Result.Error" or "Option.Some" or "Tasks.TaskOutcome.Completed" && DefaultPayload(shape.Args[0]);

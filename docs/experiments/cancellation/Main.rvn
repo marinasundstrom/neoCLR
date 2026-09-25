@@ -1,0 +1,114 @@
+import System.*
+import System.Concurrency.*
+import System.Tasks.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("Cancellation contract assertion failed")
+    }
+}
+
+func Main() {
+    let never = CancellationToken.None
+    Check(!never.CanBeCancelled)
+    Check(!never.IsCancellationRequested)
+    let ignored = never.Register(() => System.Fault("None invoked callback"))
+    ignored.Dispose()
+    ignored.Dispose()
+
+    let source = CancellationTokenSource()
+    let token = source.Token
+    let copied = token
+    let boxed: Object = token
+    let tokens = [token, CancellationToken()]
+    var order = 0
+    let first = token.Register(() => {
+        Check(token.IsCancellationRequested)
+        order = order * 10 + 1
+    })
+    let removed = token.Register(() => System.Fault("Disposed callback ran"))
+    let second = token.Register(() => {
+        source.Cancel()
+        order = order * 10 + 2
+        removed.Dispose()
+        let inline = token.Register(() => { order = order * 10 + 3 })
+        inline.Dispose()
+    })
+    // Force collection while the token array, source and captures remain live.
+    var index = 0
+    while index < 200 {
+        let temporary = CancellationTokenSource()
+        let capture = temporary.Token.Register(() => System.Fault("Removed churn callback"))
+        capture.Dispose()
+        temporary.Dispose()
+        index += 1
+    }
+    source.Cancel()
+    Check(order == 231)
+    Check(copied.IsCancellationRequested)
+    if boxed is CancellationToken recovered {
+        Check(recovered.IsCancellationRequested)
+    } else {
+        System.Fault("Boxed token lost its type")
+    }
+    Check(tokens[0].IsCancellationRequested)
+    source.Cancel()
+    Check(order == 231)
+    first.Dispose()
+    second.Dispose()
+    source.Dispose()
+    Check(token.IsCancellationRequested)
+
+    let disposed = CancellationTokenSource()
+    let oldToken = disposed.Token
+    let unused = oldToken.Register(() => System.Fault("Disposal requested cancellation"))
+    disposed.Dispose()
+    disposed.Dispose()
+    Check(!oldToken.IsCancellationRequested)
+    unused.Dispose()
+
+    let during = CancellationTokenSource()
+    let suppressed = during.Token.Register(() => System.Fault("Callback after source disposal"))
+    let disposing = during.Token.Register(() => during.Dispose())
+    during.Cancel()
+    Check(during.IsCancellationRequested)
+    suppressed.Dispose()
+    disposing.Dispose()
+
+    // Cancellation is a request. The operation acknowledges it after cleanup.
+    let queue = TaskQueue()
+    let operation = Promise<int>(queue)
+    let stop = CancellationTokenSource()
+    var cleanedUp = false
+    var resumed = false
+    let registration = stop.Token.Register(() => {
+        queue.Post(() => {
+            cleanedUp = true
+            Check(operation.Cancel())
+        })
+    })
+    operation.Task.OnCompleted(() => {
+        Check(cleanedUp)
+        resumed = true
+    })
+    stop.Cancel()
+    Check(stop.IsCancellationRequested)
+    Check(!operation.Task.IsCompleted)
+    Check(!resumed)
+    queue.Drain()
+    Check(operation.Task.IsCancelled)
+    Check(resumed)
+    Check(!operation.Complete(42))
+    registration.Dispose()
+    stop.Dispose()
+
+    let finished = Promise<int>(queue)
+    let late = CancellationTokenSource()
+    let pending = late.Token.Register(() => { _ = finished.Cancel() })
+    Check(finished.Complete(42))
+    pending.Dispose()
+    late.Cancel()
+    Check(finished.Task.GetResult() == 42)
+    late.Dispose()
+    Console.WriteLine("Cancellation ownership and callback checks passed")
+}

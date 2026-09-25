@@ -7042,3 +7042,23 @@ configuration/content, not target-specific code added to Raven main.
   typed DNS/loopback echo, independent HTTP-server interoperability, signature and
   artifact/API snapshot checks. Website source is updated; the author-requested
   website build skip remains in force. Runtime cancellation is the next release slice.
+
+### 2026-09-25 — Cancellation request and acknowledgement foundations
+
+- **Context:** the author includes cancellation tokens in the networking/web release,
+  asks to finish slices one by one, and retains runtime suspension as future work.
+- **Assistant decision and action:** implements an invocation-local source/token pair
+  and disposable registrations in System.Concurrency. Cancel requests synchronously;
+  the operation acknowledges only after cleanup. Keeps this independent of a public
+  scheduler and of the current compiler state-machine representation.
+- **Tradeoffs:** follows .NET's authority/observation split and callback ordering, but
+  does not claim .NET's thread-safety or exception aggregation. Registration is a
+  reference handle. These are bounded implementation choices, not newly quoted
+  author approvals. See [the contract](cancellation-design.md).
+- **Evidence:** callback reentrancy/disposal, copied/boxed/array tokens under GC,
+  cleanup before Task cancellation, access rejection and a .NET 10 behavior baseline
+  passed. The test ends with zero live allocations. The library and reference
+  snapshots are refreshed; the website build remains skipped by author direction.
+- **Open:** HTTP/socket token wiring, timers, linked sources and cross-invocation
+  cancellation. A nested callback/outer-array compiler emission observation is recorded
+  for independent reduction; no compiler fix or runtime suspension is claimed.

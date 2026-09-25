@@ -75,9 +75,11 @@ release date. Continue the current typed HTTP/error/base-address integration fir
 address; 5. methods/content/statuses; 6. framing; 7. server lifecycle; 8. application;
 9. release stabilization. The [address hierarchy checkpoint](experiments/ip-address-hierarchy/README.md)
 now links the [implemented address slice](ip-address-design.md): public parsing/formatting,
-value semantics, typed DNS results and Socket overloads. Cancellation foundations
-are next; IPv6 transport and scope identifiers remain explicit follow-ups. Investigate HTTPS feasibility after cancellation foundations
-and decide its scope before the application slice. Finish validation and documentation
+value semantics, typed DNS results and Socket overloads. The [cancellation foundations](cancellation-design.md)
+now provide invocation-local source/token/registration contracts and keep a request
+separate from acknowledged completion. HttpClient token wiring and BaseUri are next;
+IPv6 transport and scope identifiers remain explicit follow-ups. Investigate HTTPS
+feasibility after cancellation foundations and decide its scope before the application slice. Finish validation and documentation
 for each slice before advancing; a source change alone is not completion.
 
 The current GET/200, small-buffer and ServeOne POC proves the path, but it is too
@@ -964,7 +966,8 @@ The author's 2026-09-25 HTTP contract makes
 `Send(HttpRequest, CancellationToken) -> Task<Result<HttpResponse, HttpError>>` the
 client primitive; Get, later verb helpers and GetString layer on it through the
 same handler pipeline. Token propagation and operation cleanup are part of this
-integration target; public CancellationToken is not implemented yet. See the
+integration target; public CancellationToken foundations now exist, but HTTP/socket
+token wiring is not implemented yet. See the
 [contract and validation gates](http-client-design.md#core-request-contract--author-direction-2026-09-25).
 Server cancellation ownership and public JSON contracts remain later work. The [JSON report](experiments/http-json/README.md) now passes between two
 neoCLR applications and independent peers; it does not promote a public JSON API. The

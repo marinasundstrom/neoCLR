@@ -23,6 +23,10 @@ static class LibraryImplementation
         SocketBindings.Project(core);
         if (owner != "System" && !Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
             throw new InvalidDataException("Invalid library owner.");
+        if (owner == CancellationBindings.Source) {
+            foreach (var name in CancellationBindings.Names) ApplicationTypes.BindLibrary(source.GetType(name), name);
+            return CancellationBindings.Names.SelectMany(name => InstanceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
+        }
         if (owner == IPAddressBindings.Root) {
             foreach (var name in IPAddressBindings.Names) ApplicationTypes.BindLibrary(source.GetType(name), name);
             return IPAddressBindings.Names.SelectMany(name => InstanceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
@@ -197,6 +201,8 @@ static class LibraryImplementation
                 || candidate.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant) || candidate.HasNestedTypes && !ErrorCarrierLibrary.IsCarrier(candidate) || candidate.HasEvents
                 || candidate.BaseType?.FullName != (IPAddressBindings.IsName(candidate.FullName) && candidate.FullName != IPAddressBindings.Root ? IPAddressBindings.Root : DescriptorLibrary.IsDescriptor(candidate) ? DescriptorLibrary.Base(candidate) : candidate.IsValueType ? "System.ValueType" : "System.Object") || candidate.IsExplicitLayout)
                 throw new InvalidDataException($"Unsupported instance library owner: {candidate.FullName}, base={candidate.BaseType}, public={candidate.IsPublic}, abstract={candidate.IsAbstract}, nested={candidate.HasNestedTypes}, value={candidate.IsValueType}.");
+        _ = CancellationBindings.IsTokenLayout(type);
+        _ = CancellationBindings.IsTokenLayout(contract);
         if (type.IsValueType != contract.IsValueType)
             throw new InvalidDataException("Library value/reference representation does not match reference contract.");
         // Native snapshot factories construct Type from precisely one opaque handle.
@@ -242,6 +248,7 @@ static class LibraryImplementation
                     || !SameType(p.First.FieldType, p.Second.FieldType)
                     || (p.First.FieldType.MetadataType is not (MetadataType.Int32 or MetadataType.Int64 or MetadataType.Boolean)
                         && !GenericUnionLibrary.IsFamily(type)
+                        && !CancellationBindings.IsTokenLayout(type)
                         && !(ErrorCarrierLibrary.IsCarrier(type) && p.First.FieldType.FullName == "System.Value" && RuntimeSignatures.IsCore(p.First.FieldType.Scope))
                         && !(owner == "System.LocalDateTime" && p.First.FieldType.FullName is "System.Date" or "System.Time"
                             && RuntimeSignatures.IsCore(p.First.FieldType.Scope)))))
@@ -330,7 +337,7 @@ static class LibraryImplementation
 
     public static bool SameType(TypeReference left, TypeReference right)
     {
-        if (HttpBindings.SameType(left, right) || ReaderBindings.SameType(left, right) || FileSystemBindings.SameType(left, right) || StorageItemBindings.SameType(left, right) || StorageProviderBindings.SameType(left, right) || IPAddressBindings.SameType(left, right) || UriBindings.SameType(left, right) || PathBindings.SameType(left, right) || StreamBindings.SameType(left, right) || SocketBindings.SameType(left, right) || WorkerBindings.SameType(left, right) || AsyncBindings.SameType(left, right) || TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right)) return true;
+        if (HttpBindings.SameType(left, right) || ReaderBindings.SameType(left, right) || FileSystemBindings.SameType(left, right) || StorageItemBindings.SameType(left, right) || StorageProviderBindings.SameType(left, right) || IPAddressBindings.SameType(left, right) || UriBindings.SameType(left, right) || PathBindings.SameType(left, right) || StreamBindings.SameType(left, right) || SocketBindings.SameType(left, right) || CancellationBindings.SameType(left, right) || WorkerBindings.SameType(left, right) || AsyncBindings.SameType(left, right) || TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right)) return true;
         if (left is ByReferenceType lb)
             return right is ByReferenceType rb && SameType(lb.ElementType, rb.ElementType);
         if (left is ArrayType la)

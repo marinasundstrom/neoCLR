@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    "Cancellation": "System.Concurrency.CancellationTokenSource",
     "IPAddress": "System.Networking.IPAddress",
     "IPAddressError": "System.Networking.IPAddressError",
     "HttpError": "System.Web.Http.HttpError",
@@ -131,6 +132,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    "Cancellation": "runtime/raven/src/System/Concurrency/Cancellation.rvn",
     "IPAddress": "runtime/raven/src/System/Networking/IPAddress.rvn",
     "IPAddressError": "runtime/raven/src/System/Networking/IPAddressError.rvn",
     "Uri": "runtime/raven/src/System/Uri.rvn",
