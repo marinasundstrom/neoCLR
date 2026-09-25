@@ -13,6 +13,8 @@ internal class HttpRequestDecoder {
     private var head: ArrayList<byte> = ArrayList<byte>()
     private var request: Option<HttpRequest> = None()
     private var complete: bool = false
+    private var expected: int = -1
+    private var body: ArrayList<byte> = ArrayList<byte>()
 
     internal init() { }
     internal val Complete: bool => complete
@@ -20,6 +22,11 @@ internal class HttpRequestDecoder {
     internal func Push(value: byte) -> Result<bool, HttpError> {
         if complete {
             return Error(HttpError.Protocol("Request already complete"))
+        }
+        if expected >= 0 {
+            body.Add(value)
+            complete = body.Count == expected
+            return Ok(complete)
         }
         if head.Count >= 2048 {
             return Error(HttpError.LimitExceeded("Request header limit exceeded"))
@@ -39,12 +46,15 @@ internal class HttpRequestDecoder {
         if size >= 4 && head[size - 4] == 13 && head[size - 3] == 10 && head[size - 2] == 13 && head[size - 1] == 10 {
             let parsed = Parse()?
             request = Some(parsed)
-            complete = true
+            complete = expected == 0
         }
         return Ok(complete)
     }
 
     internal func Finish() -> Result<HttpRequest, HttpError> {
+        if !complete {
+            return Error(HttpError.Protocol("Incomplete request"))
+        }
         if let Some(parsed) = request {
             return Ok(parsed)
         }
@@ -81,6 +91,8 @@ internal class HttpRequestDecoder {
         var end = 0
         var line = 0
         var target = ""
+        var method = ""
+        var length = 0
         var host = ""
         var hasLength = false
         let headers = ArrayList<HttpHeader>()
@@ -90,10 +102,18 @@ internal class HttpRequestDecoder {
                 continue
             }
             if line == 0 {
-                if end < 14 || Text(0, 4, 0)? != "GET " || Text(end - 9, end, 0)? != " HTTP/1.1" {
+                var methodEnd = 0
+                while methodEnd < end && head[methodEnd] != 32 {
+                    methodEnd += 1
+                }
+                if end < methodEnd + 11 || Text(end - 9, end, 0)? != " HTTP/1.1" {
                     return Error(HttpError.Unsupported("Unsupported request line"))
                 }
-                let parsedTarget = Text(4, end - 9, 0)?
+                method = Text(0, methodEnd, 0)?
+                if method != "GET" && method != "POST" {
+                    return Error(HttpError.Unsupported("Unsupported request method"))
+                }
+                let parsedTarget = Text(methodEnd + 1, end - 9, 0)?
                 target = parsedTarget
                 if !target.StartsWithOrdinal("/") {
                     return Error(HttpError.Protocol("Origin-form target required"))
@@ -102,7 +122,11 @@ internal class HttpRequestDecoder {
                 if host.IsEmpty {
                     return Error(HttpError.Protocol("Host required"))
                 }
-                return HttpRequest.FromIncoming(target, host, headers)
+                if method == "GET" && length != 0 {
+                    return Error(HttpError.Unsupported("GET request bodies unsupported"))
+                }
+                expected = length
+                return HttpRequest.FromIncoming(method, target, host, headers, body)
             } else {
                 if headers.Count >= 16 {
                     return Error(HttpError.LimitExceeded("Request header count exceeded"))
@@ -136,6 +160,9 @@ internal class HttpRequestDecoder {
                     }
                     host = value
                 }
+                if name == "expect" || name == "content-encoding" {
+                    return Error(HttpError.Unsupported("Request expectation or content encoding unsupported"))
+                }
                 if name == "transfer-encoding" {
                     return Error(HttpError.Unsupported("Request transfer encoding unsupported"))
                 }
@@ -144,8 +171,20 @@ internal class HttpRequestDecoder {
                         return Error(HttpError.Protocol("Duplicate request Content-Length"))
                     }
                     hasLength = true
-                    if value != "0" {
-                        return Error(HttpError.Unsupported("Request bodies unsupported"))
+                    if first == last {
+                        return Error(HttpError.Protocol("Invalid request Content-Length"))
+                    }
+                    var cursor = first
+                    while cursor < last {
+                        let digit = (int)head[cursor] - 48
+                        if !(digit >= 0 && digit <= 9) {
+                            return Error(HttpError.Protocol("Invalid request Content-Length"))
+                        }
+                        if length > (1024 - digit) / 10 {
+                            return Error(HttpError.LimitExceeded("Request body limit exceeded"))
+                        }
+                        length = length * 10 + digit
+                        cursor += 1
                     }
                 }
                 headers.Add(HttpHeader(name, value))

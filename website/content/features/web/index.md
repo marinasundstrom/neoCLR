@@ -72,7 +72,7 @@ Malformed/truncated responses and collection during pending work are exercised t
 
 This [server callback](/samples/http-server/Server.rvn) builds a byte response.
 `HttpServer.Listen("127.0.0.1", 0, 4)` binds a loopback listener; `GetLocalPort()`
-reports the selected port. `ServeOne(Respond)` accepts one GET, awaits the callback,
+reports the selected port. `ServeOne(Respond)` accepts one GET or POST, awaits the callback,
 sends its response and closes that connection. The caller closes the listener.
 `Close()` stops listening; an already accepted exchange remains active.
 
@@ -83,8 +83,9 @@ and finish with no live managed objects. This is a bounded exchange, not an
 application hosting framework.
 
 Received headers have lowercase names and trimmed surrounding whitespace.
-The server requires exactly one Host and no request body; optional Content-Length
-must be `0`. It validates application response headers, computes the byte length
+The development server requires exactly one Host. GET bodies remain unsupported;
+POST reads up to 1,024 bytes according to Content-Length before calling the handler.
+Without Content-Length, a request has an empty body. It validates application response headers, computes the byte length
 and adds `Connection: close`. Malformed requests or callback errors close the
 connection without an HTTP error response. Final statuses 200–599 are supported in development. Statuses 204, 205 and 304 require empty content; the server omits Content-Length for 204/304.
 
@@ -108,7 +109,7 @@ It remains exploratory source, not a public runtime-library JSON API.
 
 ## Current limits
 
-Plain HTTP/1.1 GET supports final statuses 200–599 in development. Responses require
+Plain HTTP/1.1 GET and buffered POST support final statuses 200–599 in development. Responses require
 exactly one Content-Length, except bodyless 204/304. Informational responses are not
 yet supported. The experiment bounds URLs to 1,024 bytes, headers to 2,048 bytes and 16
 fields, and bodies to 1,024 bytes. It rejects duplicate lengths, transfer encodings
@@ -218,3 +219,26 @@ forms use readable properties; neither requires `Deconstruct` or value equality.
 Positional deconstruction remains a separate design question. Neither form is a
 preferred style for every caller. The [HTTP API reference](/docs/api/System/Web/Http/)
 describes the response, status enum and errors.
+
+## Post buffered text
+
+Development POST support uses the same handler pipeline, BaseUri rules and cancellation
+token as GET. This sample propagates HTTP failures on its normal path. It separately
+chooses to reject non-success statuses, then adapts ReadText's provisional string error
+to HttpError at the application boundary.
+
+```raven
+{{HTTP_POST_SAMPLE}}
+```
+
+`HttpContent.FromText` encodes UTF-8 and sets the outbound Content-Type to
+`text/plain; charset=utf-8`. `HttpContent(bytes)` preserves binary bytes without a
+Content-Type; its second constructor accepts one explicitly. `HttpRequest.Content`
+exposes the body to the server handler, and incoming headers retain Content-Type.
+The socket provider computes Content-Length from bytes and snapshots the request
+before DNS. Content sources must remain stable while consumed.
+
+[Download the POST echo example and focused checks](/samples/http-post.zip).
+The checks cover neoCLR peers, an independent raw peer and a .NET client, including
+empty and binary bodies. General header builders, other request verbs, chunking,
+streaming, compression and Expect/continue are still outside this checkpoint.

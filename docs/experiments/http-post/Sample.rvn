@@ -1,0 +1,15 @@
+import System.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+// Configure client.BaseUri before calling, for example Some("http://localhost:8080/").
+async func PostText(client: HttpClient, text: string) -> Task<Result<string, HttpError>> {
+    let response = await client.Post("echo", HttpContent.FromText(text))?
+    // This sample requires success; callers using Post can also inspect error responses.
+    if !response.IsSuccessStatusCode {
+        return Error(HttpError.UnsuccessfulStatus(response.StatusCode))
+    }
+    // ReadText currently has a string error; adapt it at this application boundary.
+    return (await response.Content.ReadText()).MapError(message => HttpError.Protocol(message))
+}

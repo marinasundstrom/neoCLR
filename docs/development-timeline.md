@@ -7132,3 +7132,25 @@ configuration/content, not target-specific code added to Raven main.
   explicitly with `Headers: let headers`. **Assistant action:** add both forms to
   the target fixture and distinguish this from the rejected combination of both
   binding styles in one pattern. No Raven syntax or compiler change is requested.
+
+## 2026-09-25 — Propagation in application examples
+
+- **Author clarification:** prefer error and Option propagation in samples and code
+  demonstrating user code, because it becomes clearer once propagation is understood.
+  This does not exclude handling the union when that is useful.
+- **Assistant action:** record the preference in Raven conventions and separate the
+  buffered POST application example from explicit union assertions in its fixtures.
+  The example propagates Send failures, applies a deliberate non-success status policy,
+  and adapts the provisional ReadText string error at the boundary. No language change.
+- **Evidence:** [POST fixture](experiments/http-post/README.md); normal echo, send
+  failure, invalid UTF-8 and cancellation are exercised. Broader example migration
+  remains incremental as each area is edited.
+
+- **Author follow-up:** keep converters near methods to project individual error types
+  into a meaningful common application error returned by Result. A future System.Error
+  interface (the author points to Raven.Core) could wrap errors as causes and add context;
+  the author suggests the interface itself would define that conversion.
+- **Assistant response:** record that as a design candidate, distinguish generic cause
+  wrapping from application-specific domain mapping, and leave interface conversion
+  lookup and representation to investigation. No System.Error implementation or automatic
+  wrapping is claimed for this HTTP slice.

@@ -30,6 +30,10 @@ static class HttpBindings
                 public Tasks.Task<Result<HttpResponse, HttpError>> Get(Uri uri, Concurrency.CancellationToken cancellationToken) => default;
                 public Tasks.Task<Result<string, HttpError>> GetString(Uri uri) => default;
                 public Tasks.Task<Result<string, HttpError>> GetString(Uri uri, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Post(string url, HttpContent content) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Post(string url, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Post(Uri uri, HttpContent content) => default;
+                public Tasks.Task<Result<HttpResponse, HttpError>> Post(Uri uri, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
                 public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request) => default;
                 public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken) => default;
             }
@@ -47,8 +51,12 @@ static class HttpBindings
                 private HttpRequest(string host, int port, string target) { }
                 public static Result<HttpRequest, HttpError> Get(string url) => default;
                 public static Result<HttpRequest, HttpError> Get(Uri uri) => default;
+                public static Result<HttpRequest, HttpError> Post(string url, HttpContent content) => default;
+                public static Result<HttpRequest, HttpError> Post(Uri uri, HttpContent content) => default;
+                public HttpContent Content => default;
                 public Collections.Sequence<HttpHeader> Headers => default;
-                public static Result<HttpRequest, HttpError> FromIncoming(string target, string host, Collections.Sequence<HttpHeader> headers) => default;
+                public Result<Collections.Sequence<byte>, HttpError> Encode() => default;
+                public static Result<HttpRequest, HttpError> FromIncoming(string method, string target, string host, Collections.Sequence<HttpHeader> headers, Collections.Sequence<byte> body) => default;
                 public string Method => default;
                 public string Host => default;
                 public int Port => default;
@@ -64,6 +72,9 @@ static class HttpBindings
             }
             public sealed class HttpContent {
                 public HttpContent(Collections.Sequence<byte> bytes) { }
+                public HttpContent(Collections.Sequence<byte> bytes, string contentType) { }
+                public static HttpContent FromText(string text) => default;
+                public Option<string> MediaType => default;
                 public Collections.Sequence<byte> Bytes => default;
                 public Tasks.Task<Result<string, string>> ReadText() => default;
             }
@@ -100,7 +111,7 @@ static class HttpBindings
     public static void Project(ModuleDefinition module)
     {
         foreach (var type in module.Types.Where(t => IsName(t.FullName)))
-            foreach (var method in type.Methods.Where(m => m.Name == "FromIncoming" || m.Name == "EncodeResponse" || type.Name == "HttpServer" && m.IsConstructor))
+            foreach (var method in type.Methods.Where(m => m.Name == "FromIncoming" || m.Name == "EncodeResponse" || type.Name == "HttpRequest" && m.Name == "Encode" || type.Name == "HttpContent" && m.Name == "get_MediaType" || type.Name == "HttpServer" && m.IsConstructor))
                 method.Attributes = (method.Attributes & ~MethodAttributes.MemberAccessMask) | MethodAttributes.Assembly;
         foreach (var type in module.Types.Where(IsProvider))
         {
@@ -115,7 +126,7 @@ static class HttpBindings
         if (owner is null) return null;
         if (IsProvider(definition.DeclaringType) && !library)
             throw new InvalidDataException("HTTP implementation helpers are internal.");
-        var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
+        var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type, allowInternal: library);
         var request = Prefix + "HttpRequest";
         var response = Prefix + "HttpResponse";
         var outcome = $"System.Result<{response},System.Web.Http.HttpError>";
@@ -127,7 +138,7 @@ static class HttpBindings
             ("HttpServer", "Close") => ("", "noresult", false),
             ("HttpServer", "ServeOne") => ($"System.Func<{request},{task}>", "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
             ("HttpServer", "EncodeResponse") when library => (response, "System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>", true),
-            ("HttpRequest", "FromIncoming") when library => ($"String,String,System.Collections.Sequence<{Prefix}HttpHeader>", $"System.Result<{request},System.Web.Http.HttpError>", true),
+            ("HttpRequest", "FromIncoming") when library => ($"String,String,String,System.Collections.Sequence<{Prefix}HttpHeader>,System.Collections.Sequence<Byte>", $"System.Result<{request},System.Web.Http.HttpError>", true),
             ("HttpRequest", "get_Headers") => ("", $"System.Collections.Sequence<{Prefix}HttpHeader>", false),
             ("HttpRequestDecoder", ".ctor") when library => ("", "noresult", false),
             ("HttpRequestDecoder", "get_Complete") when library => ("", "Boolean", false),
@@ -139,6 +150,12 @@ static class HttpBindings
             ("HttpClient", ".ctor") => (Prefix + "HttpHandler", "noresult", false),
             ("HttpClient", "Get" or "GetString") => (args.Length > 0 && args[0] == "String" ? "String" : "System.Uri",
                 definition.Name == "Get" ? task : "System.Tasks.Task<System.Result<String,System.Web.Http.HttpError>>", false),
+            ("HttpClient", "Post") => ((args.Length > 0 && args[0] == "String" ? "String" : "System.Uri") + "," + Prefix + "HttpContent", task, false),
+            ("HttpRequest", "Post") => ((args.Length > 0 && args[0] == "String" ? "String" : "System.Uri") + "," + Prefix + "HttpContent", $"System.Result<{request},System.Web.Http.HttpError>", true),
+            ("HttpRequest", "get_Content") => ("", Prefix + "HttpContent", false),
+            ("HttpRequest", "Encode") when library => ("", "System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>", false),
+            ("HttpContent", "get_MediaType") when library => ("", "System.Option<String>", false),
+            ("HttpContent", "FromText") => ("String", Prefix + "HttpContent", true),
             ("HttpClient", "get_BaseUri") => ("", "System.Option<String>", false),
             ("HttpClient", "set_BaseUri") => ("System.Option<String>", "noresult", false),
             ("HttpHandler", "Send") => (request + ",System.Concurrency.CancellationToken", task, false),
@@ -154,7 +171,7 @@ static class HttpBindings
             ("HttpResponse", "get_StatusCode") => ("", Prefix + "HttpStatusCode", false),
             ("HttpResponse", "get_Headers") => ("", $"System.Collections.Sequence<{Prefix}HttpHeader>", false),
             ("HttpResponse", "get_Content") => ("", Prefix + "HttpContent", false),
-            ("HttpContent", ".ctor") => ("System.Collections.Sequence<Byte>", "noresult", false),
+            ("HttpContent", ".ctor") => (args.Length == 2 ? "System.Collections.Sequence<Byte>,String" : "System.Collections.Sequence<Byte>", "noresult", false),
             ("HttpContent", "get_Bytes") => ("", "System.Collections.Sequence<Byte>", false),
             ("HttpContent", "ReadText") => ("", "System.Tasks.Task<System.Result<String,String>>", false),
             ("HttpResponseDecoder", "get_Complete") when library => ("", "Boolean", false),
@@ -165,7 +182,7 @@ static class HttpBindings
             _ => throw new InvalidDataException("Unsupported HTTP member.")
         };
         if (owner is Prefix + "HttpClient" or Prefix + "HttpSocketHandler"
-            && definition.Name is "Get" or "GetString" or "Send"
+            && definition.Name is "Get" or "GetString" or "Send" or "Post"
             && args.LastOrDefault() == CancellationBindings.Token)
             expected.Item1 += "," + CancellationBindings.Token;
         var virtualMember = IsContract(owner) || owner == Prefix + "HttpSocketHandler"

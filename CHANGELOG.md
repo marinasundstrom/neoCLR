@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add development buffered POST through HttpClient string/Uri/token overloads and
+  HttpRequest factories. Expose request content and UTF-8 content construction;
+  validate/snapshot outbound bytes before I/O and read bounded Content-Length bodies
+  before server callbacks. Keep framing provider-owned and GET bodies unsupported.
+  Add a propagation-first text example plus independent peer, .NET and malformed-body
+  checks. Update API/website sources; streaming, general headers and other verbs remain
+  later slices. Record nearby application error converters and future System.Error
+  cause/context exploration. Existing private request construction signatures require matching
+  library/reference rebuilds; no native runtime or compiler policy changes.
+
 - Add development HttpStatusCode names using the existing Int32 enum representation.
   HttpResponse.StatusCode and HttpError.UnsuccessfulStatus now carry that enum;
   rebuild consumers and cast to int for numeric formatting. Keep the integer response

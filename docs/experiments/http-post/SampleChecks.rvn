@@ -1,0 +1,67 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+class SampleHandler : HttpHandler {
+    private val mode: int
+    init(mode: int) {
+        self.mode = mode
+    }
+    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        let source = Promise<Result<HttpResponse, HttpError>>()
+        if mode == 1 {
+            _ = source.Complete(Error(HttpError.Protocol("peer")))
+        } else if mode == 2 {
+            let bytes: byte[] = [(byte)255]
+            _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), bytes)))
+        } else if mode == 3 {
+            _ = source.Cancel()
+        } else {
+            _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), request.Content.Bytes)))
+        }
+        return source.Task
+    }
+}
+
+func CheckSample(mode: int) {
+    let client = HttpClient(SampleHandler(mode))
+    client.BaseUri = Some("http://example.test/")
+    let pending = PostText(client, "Café 🌍")
+    TaskQueue.Default.Drain()
+    if mode == 3 {
+        if !pending.IsCancelled {
+            System.Fault("Sample lost task cancellation")
+        }
+        return
+    }
+    if mode == 0 {
+        let Ok(text) = pending.GetResult() else {
+            System.Fault("Sample lost text")
+            return
+        }
+        if text != "Café 🌍" {
+            System.Fault("Sample changed text")
+        }
+    } else {
+        let Error(HttpError.Protocol(message)) = pending.GetResult() else {
+            System.Fault("Sample lost typed error")
+            return
+        }
+        let expected = if mode == 1 { "peer" } else { "Invalid UTF-8 body" }
+        if message != expected {
+            System.Fault("Sample changed error")
+        }
+    }
+}
+
+func Main() {
+    CheckSample(0)
+    CheckSample(1)
+    CheckSample(2)
+    CheckSample(3)
+    Console.WriteLine("Propagating POST sample checks passed")
+}

@@ -230,6 +230,7 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'HTTP_POST_SAMPLE': ('docs/experiments/http-post/Sample.rvn', 'async func PostText(', '\n}', True),
         'HTTP_JSON_SAMPLE': ('docs/experiments/http-json/Client.rvn', 'async func ReadReport(', '\n}', True),
         'HTTP_SERVER_SAMPLE': ('docs/experiments/http-server/Server.rvn', 'func Respond(', '\n}', True),
         'HTTP_CLIENT_SAMPLE': ('docs/experiments/http-client/Main.rvn', 'async func ReadGreeting(', '\n}', True),
@@ -288,6 +289,11 @@ def main():
             # Published examples retain the release contract during development.
             source_sample = SOURCE / 'samples/preview9' / name
         shutil.copyfile(source_sample, downloads / name)
+    post_downloads = downloads / 'http-post'
+    post_downloads.mkdir()
+    for name in ('Sample.rvn', 'SampleChecks.rvn', 'Client.rvn', 'Server.rvn', 'HttpPost.rvnproj', 'Reference.cs', 'README.md', 'verify.py'):
+        shutil.copyfile(ROOT / 'docs/experiments/http-post' / name, post_downloads / name)
+    shutil.make_archive(str(downloads / 'http-post'), 'zip', post_downloads)
     http_downloads = downloads / 'http-client'
     http_downloads.mkdir()
     for name in ('Main.rvn', 'Handlers.rvn', 'HttpClient.rvnproj', 'Reference.cs', 'README.md', 'verify.py'):

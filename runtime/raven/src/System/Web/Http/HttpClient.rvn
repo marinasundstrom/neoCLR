@@ -255,11 +255,31 @@ public interface HttpHandler {
 }
 
 public class HttpContent {
+    private var mediaType: Option<string> = None()
+    internal val MediaType: Option<string> {
+        get {
+            if let Some(value) = mediaType {
+                return Some(value)
+            }
+            return None()
+        }
+    }
     private var storedBytes: Sequence<byte>
     val Bytes: Sequence<byte> => storedBytes
 
     init(bytes: Sequence<byte>) {
         storedBytes = bytes
+    }
+
+    /// Wraps bytes and an outbound Content-Type; socket validation occurs before I/O.
+    init(bytes: Sequence<byte>, contentType: string) {
+        storedBytes = bytes
+        mediaType = Some(contentType)
+    }
+
+    /// Encodes text as UTF-8 and selects text/plain; charset=utf-8 for outbound requests.
+    static func FromText(text: string) -> HttpContent {
+        return HttpContent(Utf8.Encode(text), "text/plain; charset=utf-8")
     }
 
     func ReadText() -> Task<Result<string, string>> {
@@ -274,6 +294,9 @@ public class HttpContent {
 }
 
 public class HttpRequest {
+    private var storedContent: HttpContent = HttpContent(ArrayList<byte>())
+    /// Buffered request content; empty for GET requests.
+    val Content: HttpContent => storedContent
     private var storedHeaders: Sequence<HttpHeader>
     val Headers: Sequence<HttpHeader> => storedHeaders
     private var storedMethod: string
@@ -293,14 +316,97 @@ public class HttpRequest {
         storedTarget = target
     }
 
-    internal static func FromIncoming(target: string, host: string, headers: Sequence<HttpHeader>) -> Result<HttpRequest, HttpError> {
+    internal static func FromIncoming(method: string, target: string, host: string, headers: Sequence<HttpHeader>, body: Sequence<byte>) -> Result<HttpRequest, HttpError> {
         let url = String.Concat(String.Concat("http://", host), target)
         let request = Get(url)?
         if request.Target != target {
             return Error(HttpError.InvalidRequest("Invalid Host authority"))
         }
         request.storedHeaders = headers
+        request.storedMethod = method
+        request.storedContent = HttpContent(body)
+        for header in headers {
+            if header.Name == "content-type" {
+                request.storedContent = HttpContent(body, header.Value)
+            }
+        }
         return Ok(request)
+    }
+
+    /// Constructs a POST request without performing I/O.
+    static func Post(url: string, content: HttpContent) -> Result<HttpRequest, HttpError> {
+        let request = Get(url)?
+        request.storedMethod = "POST"
+        request.storedContent = content
+        let headers = ArrayList<HttpHeader>()
+        if let Some(contentType) = content.MediaType {
+            headers.Add(HttpHeader("Content-Type", contentType))
+        }
+        request.storedHeaders = headers
+        return Ok(request)
+    }
+
+    /// Constructs a POST request from an absolute HTTP URI.
+    static func Post(uri: Uri, content: HttpContent) -> Result<HttpRequest, HttpError> {
+        let request = Get(uri)?
+        request.storedMethod = "POST"
+        request.storedContent = content
+        let headers = ArrayList<HttpHeader>()
+        if let Some(contentType) = content.MediaType {
+            headers.Add(HttpHeader("Content-Type", contentType))
+        }
+        request.storedHeaders = headers
+        return Ok(request)
+    }
+
+    internal func Encode() -> Result<Sequence<byte>, HttpError> {
+        let body = storedContent.Bytes
+        let count = body.Count
+        if count > 1024 {
+            return Error(HttpError.LimitExceeded("Request body limit exceeded"))
+        }
+        let port = storedPort
+        var wire = String.Concat(String.Concat(storedMethod, " "), storedTarget)
+        wire = String.Concat(wire, String.Concat(" HTTP/1.1\r\nHost: ", storedHost))
+        wire = String.Concat(wire, String.Concat(":", port.ToString()))
+        wire = String.Concat(wire, "\r\nConnection: close\r\n")
+        if storedMethod == "POST" {
+            wire = String.Concat(wire, String.Concat("Content-Length: ", count.ToString()))
+            wire = String.Concat(wire, "\r\n")
+            if let Some(contentType) = storedContent.MediaType {
+                let bytes = Utf8.Encode(contentType)
+                if bytes.Count == 0 {
+                    return Error(HttpError.InvalidRequest("Empty Content-Type"))
+                }
+                var index = 0
+                while index < bytes.Count {
+                    let value = bytes[index]
+                    if !(value >= 32 && value <= 126) {
+                        return Error(HttpError.InvalidRequest("Invalid Content-Type header value"))
+                    }
+                    index += 1
+                }
+                wire = String.Concat(wire, String.Concat("Content-Type: ", contentType))
+                wire = String.Concat(wire, "\r\n")
+            }
+        }
+        let encoded = Utf8.Encode(String.Concat(wire, "\r\n"))
+        if encoded.Count > 2048 {
+            return Error(HttpError.LimitExceeded("Request header limit exceeded"))
+        }
+        let outgoing = ArrayList<byte>()
+        var cursor = 0
+        while cursor < encoded.Count {
+            outgoing.Add(encoded[cursor])
+            cursor += 1
+        }
+        cursor = 0
+        while cursor < count {
+            outgoing.Add(body[cursor])
+            cursor += 1
+        }
+        let outgoingBytes: Sequence<byte> = outgoing
+        return Ok(outgoingBytes)
     }
 
     private static func Text(bytes: Sequence<byte>, first: int, last: int) -> Result<string, HttpError> {
@@ -479,6 +585,50 @@ public class HttpClient {
         return Failure(HttpError.InvalidRequest("Invalid request"))
     }
 
+    /// Posts buffered content using the same BaseUri and handler rules as Get.
+    func Post(url: string, content: HttpContent) -> Task<Result<HttpResponse, HttpError>> {
+        return Post(url, content, CancellationToken.None)
+    }
+
+    /// Posts content with cooperative exchange cancellation.
+    func Post(url: string, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            return Cancelled()
+        }
+        let parsed = Uri.Parse(url)
+        if let Ok(uri) = parsed {
+            return Post(uri, content, cancellationToken)
+        } else if let Error(reason) = parsed {
+            return Failure(HttpError.InvalidUri(reason))
+        }
+        System.Fault("URI parser returned no outcome")
+        return Failure(HttpError.InvalidRequest("Invalid URI"))
+    }
+
+    /// Posts content to a URI using the same base-resolution rules as Get.
+    func Post(uri: Uri, content: HttpContent) -> Task<Result<HttpResponse, HttpError>> {
+        return Post(uri, content, CancellationToken.None)
+    }
+
+    /// Posts content through Send, forwarding the cancellation token unchanged.
+    func Post(uri: Uri, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            return Cancelled()
+        }
+        let parsed = CreatePost(uri, content)
+        if let Ok(request) = parsed {
+            return Send(request, cancellationToken)
+        } else if let Error(reason) = parsed {
+            return Failure(reason)
+        }
+        System.Fault("Request construction returned no outcome")
+        return Failure(HttpError.InvalidRequest("Invalid request"))
+    }
+
+    private func CreatePost(uri: Uri, content: HttpContent) -> Result<HttpRequest, HttpError> {
+        return HttpRequest.Post(ResolveAddress(uri)?, content)
+    }
+
     /// Fetches a bounded response and decodes its buffered body as strict UTF-8.
     func GetString(url: string) -> Task<Result<string, HttpError>> {
         return GetString(url, CancellationToken.None)
@@ -527,6 +677,10 @@ public class HttpClient {
     }
 
     private func CreateRequest(uri: Uri) -> Result<HttpRequest, HttpError> {
+        return HttpRequest.Get(ResolveAddress(uri)?)
+    }
+
+    private func ResolveAddress(uri: Uri) -> Result<Uri, HttpError> {
         // Snapshot the configuration before calling user-supplied handlers.
         let configured = baseUri
         if let Some(baseText) = configured {
@@ -541,7 +695,7 @@ public class HttpClient {
                 _ = HttpRequest.Get(baseAddress)?
                 let resolved = baseAddress.Resolve(uri)
                 if let Ok(address) = resolved {
-                    return HttpRequest.Get(address)
+                    return Ok(address)
                 } else if let Error(reason) = resolved {
                     return Error(HttpError.InvalidUri(reason))
                 }
@@ -549,7 +703,7 @@ public class HttpClient {
             System.Fault("URI resolution returned no outcome")
             return Error(HttpError.InvalidRequest("Invalid URI"))
         }
-        return HttpRequest.Get(uri)
+        return Ok(uri)
     }
 
     private static func Failure(reason: HttpError) -> Task<Result<HttpResponse, HttpError>> {
@@ -603,14 +757,7 @@ internal class HttpExchange {
         lookup = None()
         connecting = None()
         transfer = None()
-        let target = request.Target
-        let host = request.Host
-        let port = request.Port
-        let requestLine = String.Concat(String.Concat("GET ", target), " HTTP/1.1\r\nHost: ")
-        let authority = String.Concat(String.Concat(host, ":"), port.ToString())
-        let wire = String.Concat(String.Concat(requestLine, authority), "\r\nConnection: close\r\n\r\n")
-        let encoded = Utf8.Encode(wire)
-        outgoing = encoded
+        outgoing = ArrayList<byte>()
         sent = 0
         buffer = CheckedStorage.Reserve<byte>(256)
         decoder = HttpResponseDecoder()
@@ -618,6 +765,13 @@ internal class HttpExchange {
 
     internal func Execute() -> Task<Result<HttpResponse, HttpError>> {
         deadline = RuntimeServices.SocketDeadlineAfter(15000)
+        let encoded = request.Encode()
+        if let Ok(bytes) = encoded {
+            outgoing = bytes
+        } else if let Error(reason) = encoded {
+            Finish(Error(reason))
+            return source.Task
+        }
         let pending = Dns.GetHostAddressesUntil(request.Host, deadline, token)
         lookup = Some(pending)
         pending.OnCompleted(self.OnLookup)

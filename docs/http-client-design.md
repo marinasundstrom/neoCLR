@@ -622,3 +622,35 @@ and must still finish successfully. Cancellation and peer-observed connection-cl
 assertions remain strict. No native deadlines, scheduler behavior or HTTP cancellation
 implementation changes are made. This removes that fixture ordering dependency,
 without proving the cause of every timing/performance difference between checkpoints.
+
+## Buffered POST checkpoint — 2026-09-25
+
+HttpClient.Post now accepts string/Uri addresses, HttpContent and optional cancellation,
+using the same resolution and Send pipeline as Get. HttpRequest.Post creates a request
+for direct Send. Content.FromText encodes UTF-8 with text/plain; charset=utf-8;
+byte content optionally carries an outbound Content-Type. Request.Content exposes the
+buffered bytes to custom handlers and servers. Non-success statuses remain responses.
+
+Like [.NET PostAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.postasync?view=net-10.0),
+this supports content and cancellation overloads and buffers the response. Unlike the
+abstract .NET HttpContent family, this provisional concrete wrapper only carries bytes;
+streaming, custom serializers and general header mutation remain later work. Result
+represents expected failures, with cancellation remaining a Task outcome.
+
+The socket provider snapshots at most 1,024 body bytes before DNS, computes byte
+Content-Length (including zero), and bounds encoded headers to 2,048 bytes. Content-Type
+must be nonempty printable ASCII; control characters cannot inject headers. This is not
+a complete media-type parser or charset negotiation. Callers must keep content stable
+while consumed. Framing stays provider-owned; no caller-supplied Content-Length.
+
+[RFC 9112 section 6.3](https://www.rfc-editor.org/rfc/rfc9112.html#section-6.3)
+defines request body length from framing, including zero when no framing is present.
+The server now buffers bounded POST bodies before invoking the callback, rejects
+ambiguous/unsupported framing and closes each connection. These bounds make the POC
+reviewable but deliberately exclude ordinary larger uploads and chunked producers.
+The proposal's fluent builders, general headers and additional verbs are not committed
+by this checkpoint. See the [focused fixture](experiments/http-post/README.md).
+
+No native socket/scheduler or Raven compiler policy changes. Bridge signatures admit
+new public members and retain internal-only request serialization/content metadata.
+The reference, managed library and generated fingerprints must be refreshed together.

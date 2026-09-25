@@ -346,7 +346,7 @@ static class SignatureProbe
                 Check("HTTP address overload " + get.FullName,
                     HttpBindings.Bind(get, get, false, false) is not null);
         foreach (var httpOwner in new[] { "HttpClient", "HttpHandler", "HttpSocketHandler" })
-            foreach (var method in module.GetType(HttpBindings.Prefix + httpOwner).Methods.Where(m => m.Name is "Send" or "GetString")) {
+            foreach (var method in module.GetType(HttpBindings.Prefix + httpOwner).Methods.Where(m => m.Name is "Send" or "GetString" or "Post")) {
                 Check("HTTP token/text contract " + method.FullName, HttpBindings.Bind(method, method, false, false) is not null);
                 if (method.Parameters.LastOrDefault()?.ParameterType.FullName == CancellationBindings.Token) {
                     var parameter = method.Parameters[^1];
@@ -356,6 +356,18 @@ static class SignatureProbe
                     parameter.ParameterType = originalType;
                 }
             }
+        var requestType = module.GetType("System.Web.Http.HttpRequest");
+        foreach (var post in requestType.Methods.Where(m => m.Name == "Post")) {
+            Check("POST request factory " + post.FullName, HttpBindings.Bind(post, post, false, false) is not null);
+        }
+        var requestContent = requestType.Methods.Single(m => m.Name == "get_Content");
+        Check("Request content contract", HttpBindings.Bind(requestContent, requestContent, false, false)?.Result == "System.Web.Http.HttpContent");
+        foreach (var member in new[] { requestType.Methods.Single(m => m.Name == "Encode"),
+            module.GetType("System.Web.Http.HttpContent").Methods.Single(m => m.Name == "get_MediaType") }) {
+            Check("HTTP helper remains internal " + member.Name, member.IsAssembly);
+            Reject("HTTP helper is not a consumer capability " + member.Name, () => HttpBindings.Bind(member, member, false, false));
+            Check("HTTP helper available to library " + member.Name, HttpBindings.Bind(member, member, false, true) is not null);
+        }
         var baseSetter = module.GetType("System.Web.Http.HttpClient").Methods.Single(m => m.Name == "set_BaseUri");
         Check("HTTP optional string base setter", HttpBindings.Bind(baseSetter, baseSetter, false, false)
             is { Arguments: ["System.Web.Http.HttpClient", "System.Option<String>"], Result: "noresult" });

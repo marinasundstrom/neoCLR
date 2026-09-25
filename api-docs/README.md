@@ -221,3 +221,11 @@ reference navigation. HttpResponse.StatusCode and UnsuccessfulStatus carry the e
 the typed response constructor is documented alongside the retained integer overload.
 The signature change requires rebuilding development consumers. Unnamed codes and
 optional property-pattern inspection are covered by the target status fixture.
+
+### Buffered POST checkpoint (2026-09-25)
+
+The selected HTTP types include Post string/Uri/token overloads, HttpRequest.Post and
+Content, HttpContent.FromText and the content-type constructor. XML documents limits,
+body ownership, errors and cancellation. Encode and MediaType remain library-internal.
+The snapshot is refreshed with the matching bridge. Website build is skipped for this
+slice by author direction; feature source and downloadable sample are maintained.

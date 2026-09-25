@@ -284,6 +284,12 @@ example: propagate E, then bind Some or handle None. Use match when explaining c
 structure, applying different policies to cases, or handling the final error at an
 application boundary. Do not silently discard errors merely to shorten a sample.
 
+Author clarification, 2026-09-25: this preference applies to all examples showing
+how to write user code, including propagation through Option where the enclosing
+contract supports it. Explicit union handling remains appropriate when it expresses
+a real decision. Keep diagnostic assertions in fixtures separate from the ordinary
+application example; see the [buffered POST example](experiments/http-post/Sample.rvn).
+
 For code after a successful binding, the current toolchain uses
 `let Some(input) = expression else { return ... }`. The else branch must exit.
 For a success block, use `if let Some(input) = expression { ... } else { ... }`.
@@ -319,6 +325,17 @@ with `?`; Raven reports RAV1506 for that conversion. The
 Object through boxing. Matching the nested cause retains structured information;
 converting to Object loses that static structure. Use conversions deliberately at
 application boundaries, not as a replacement for distinct error contracts.
+
+Author direction, 2026-09-25: keep application-specific converters near the consuming
+method or in its nearby declarations. Map each lower-level error into a meaningful
+common application error so `?` can preserve readable method bodies. This is an
+organizational preference, not a claim that conversions can be declared inside methods.
+
+Future exploration: System.Error could own a common wrapping conversion that preserves
+the original error as its cause and supports added context. The author points to
+Raven.Core's Error interface as a reference. Interface conversion lookup, wrapper shape
+and cause/context contracts still need investigation; neoCLR does not implement them
+in this slice. Generic wrapping would not replace domain-specific application mapping.
 
 ## Pattern-friendly public contracts
 

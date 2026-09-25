@@ -1,0 +1,141 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("POST contract failed")
+    }
+}
+
+func ContentFor(index: int) -> HttpContent {
+    if index == 0 {
+        return HttpContent.FromText("Café 🌍")
+    }
+    if index == 1 {
+        let bytes: byte[] = [(byte)0, (byte)255, (byte)13, (byte)10]
+        return HttpContent(bytes)
+    }
+    return HttpContent(ArrayList<byte>(), "application/octet-stream")
+}
+
+class InspectHandler : HttpHandler {
+    var Calls: int = 0
+    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        Calls += 1
+        Check(request.Method == "POST")
+        Check(request.Target == "/base/echo")
+        Check(request.Content.Bytes.Count == 10)
+        Check(request.Headers.Count == 1)
+        Check(request.Headers[0].Value == "text/plain; charset=utf-8")
+        Check(cancellationToken.CanBeCancelled)
+        let source = Promise<Result<HttpResponse, HttpError>>()
+        _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), request.Content.Bytes)))
+        return source.Task
+    }
+}
+
+func CheckContracts() {
+    let handler = InspectHandler()
+    let client = HttpClient(handler)
+    client.BaseUri = Some("http://example.test/base/")
+    let content = ContentFor(0)
+    let source = CancellationTokenSource()
+    let Ok(uri) = Uri.Parse("echo") else {
+        System.Fault("URI failed")
+        return
+    }
+    Check(client.Post("echo", content, source.Token).GetResult() is Ok(_))
+    Check(client.Post(uri, content, source.Token).GetResult() is Ok(_))
+    Check(handler.Calls == 2)
+    source.Cancel()
+    Check(client.Post("\r\n", content, source.Token).IsCancelled)
+    Check(client.Post(uri, content, source.Token).IsCancelled)
+    Check(handler.Calls == 2)
+    source.Dispose()
+
+    let bytes = ArrayList<byte>()
+    let Ok(request) = HttpRequest.Post("http://not-resolved.invalid/", HttpContent(bytes)) else {
+        System.Fault("Request construction failed")
+        return
+    }
+    while bytes.Count <= 1024 {
+        bytes.Add((byte)1)
+    }
+    if let Error(HttpError.LimitExceeded(_)) = HttpClient().Send(request).GetResult() {
+        Check(true)
+    } else {
+        System.Fault("Mutated oversized body reached transport")
+    }
+    let bad = HttpContent(ArrayList<byte>(), "text/plain\r\nInjected: yes")
+    if let Error(HttpError.InvalidRequest(_)) = HttpClient().Post("http://not-resolved.invalid/", bad).GetResult() {
+        Check(true)
+    } else {
+        System.Fault("Header injection reached transport")
+    }
+    Console.WriteLine("POST contracts passed")
+}
+
+class ClientProbe {
+    private var client: HttpClient = HttpClient()
+    private var index: int = 0
+
+    init() {
+        client.BaseUri = Some("http://127.0.0.1:19091/")
+    }
+
+    func Advance() {
+        index += 1
+        Next()
+    }
+
+    func TextSample() {
+        let pending = PostText(client, "Café 🌍")
+        pending.OnCompleted(() => {
+            let Ok(text) = pending.GetResult() else {
+                System.Fault("Propagating POST sample failed")
+                return
+            }
+            Check(text == "Café 🌍")
+            Advance()
+        })
+    }
+
+    func Next() {
+        if index == 0 {
+            TextSample()
+            return
+        }
+        if index == 4 {
+            Console.WriteLine("POST echo checks passed")
+            return
+        }
+        let content = ContentFor(index)
+        let pending = if index == 3 { client.Get("empty") } else { client.Post("echo", content) }
+        pending.OnCompleted(() => {
+            let Ok(response) = pending.GetResult() else {
+                System.Fault("Echo request failed")
+                return
+            }
+            Check(response.StatusCode == (if index == 3 { HttpStatusCode.OK } else { HttpStatusCode.Created }))
+            let actual = response.Content.Bytes
+            let expected = content.Bytes
+            Check(actual.Count == expected.Count)
+            var cursor = 0
+            while cursor < actual.Count {
+                Check(actual[cursor] == expected[cursor])
+                cursor += 1
+            }
+            Advance()
+        })
+    }
+}
+
+func Main() {
+    CheckContracts()
+    ClientProbe().Next()
+}

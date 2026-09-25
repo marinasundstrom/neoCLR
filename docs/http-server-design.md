@@ -71,3 +71,14 @@ Invalid status/body combinations return InvalidRequest before writing a response
 See the [client status design](http-client-design.md#final-response-statuses--implemented-2026-09-25)
 for the RFC/.NET comparison and [focused fixture](experiments/http-status/README.md)
 for independent wire checks. Request methods and bodies remain the next slice.
+
+## Buffered POST requests — 2026-09-25
+
+ServeOne now accepts GET or POST and waits for the complete Content-Length body before
+calling the application. Request.Content exposes received bytes; request Headers retain
+lowercase parsed Content-Type. Absent Content-Length means zero. GET with a nonempty
+body, duplicate/invalid lengths, Transfer-Encoding, Expect and Content-Encoding are
+rejected. Request bodies share the 1,024-byte bound; incomplete EOF never invokes the
+handler. No keep-alive, streaming or new cancellation/deadline policy is introduced.
+See the [client design comparison](http-client-design.md#buffered-post-checkpoint--2026-09-25)
+and [independent client/server checks](experiments/http-post/README.md).
