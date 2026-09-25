@@ -113,6 +113,8 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/TextWriter.neoil')
         result += build(ROOT / 'runtime/raven/StreamWriter.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ConsoleStreams.neoil')
+        result += build(ROOT / 'runtime/raven/JsonError.neoil')
+        result += build(ROOT / 'runtime/raven/JsonValue.neoil')
         result += build(ROOT / 'runtime/raven/MemoryStream.neoil')
         result += build(ROOT / 'runtime/raven/StreamReader.neoil')
         result += build(ROOT / 'runtime/raven/SeekableStream.neoil')

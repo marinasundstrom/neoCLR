@@ -2,6 +2,11 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Tasks.Task",
   "inputs": {
+    "runtime/raven/src/System/Data/Json/JsonValue.rvn": "0c2084dca1bcdf2d1494d9f1942fceb25d060a7a25cd8256a4bfee3fc46a5426",
+    "runtime/raven/src/System/Data/Json/JsonError.rvn": "100d73b3cefadfec2f5a069fdebc8764c4655b78a27b0f5c19318cb30fbd4e85",
+    "runtime/raven/src/System/Data/Json/JsonDocument.rvn": "8f98eeaaf29f0d173c483b80275a4b681b8923d5b8aafbeaf482cb932f4f430c",
+    "runtime/raven/src/System/Data/Json/JsonSyntax.rvn": "b6e61952a1a0b9aa9bd870ba497a4f293ee68e9fa7cdf9d9775e3ec1981b7c0e",
+    "runtime/raven/src/System/Data/Json/JsonSerializer.rvn": "91ec0832661e90443ca9c10b2e69cd26cc132f9ea12b54e6fbead0658976ecfd",
     "runtime/raven/src/System/Concurrency/Cancellation.rvn": "282d19a6ce7a57d18ba3fe3f45f59ff1eaeec4545b39048bac6b0bdd2de3111a",
     "runtime/raven/src/System/Networking/IPAddress.rvn": "41767cb5076e1ed2ab4ee6b60c09416b2ee80a0510d056301db078af9f585874",
     "runtime/raven/src/System/Networking/IPAddressError.rvn": "ff7036e74bf83a7f5fc62cd2cf194bf27d4d4255c996f9d1d45437dc51f3dce9",
@@ -119,7 +124,7 @@
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
-    "runtime/raven/System.Runtime.rvnproj": "dd01d1534dcec4e0f11a137cd8d106ac29206ea4fd6441b70910ca46f49905cc",
+    "runtime/raven/System.Runtime.rvnproj": "69cd24ee21492fd44ec794ecb03aea2bad3ec671e97d5a8f1cd22db37c92c582",
     "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
@@ -127,7 +132,7 @@
     "Tasks.helpers.neoil": "886954a6176b8695f8c6c51f0a9e16ee8817624f2fbe6a382d1209fdf558f06c"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "3675407c194b7b5ba0bb873aef439732db8180c50b0c8eb8ea9944c284cda245",
+  "coreSha256": "25c919c5fdc87a0fad004ab4e869ee9567dd5c9c6eb418d1f749e2a32a65682a",
   "exports": [
     "get_IsCompleted() -> Boolean",
     "get_IsCancelled() -> Boolean",

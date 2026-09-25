@@ -286,6 +286,36 @@ static class SignatureProbe
                 externalAddressModule.ImportReference(addressType)));
             Reject("External IPAddress inheritance", () => IPAddressBindings.RejectExternalBranches([externalAddressModule]));
         }
+        ErrorBindings.Reset(module);
+        var jsonRoot = module.GetType(JsonBindings.Root);
+        foreach (var name in JsonBindings.Names) {
+            var jsonType = module.GetType(name);
+            JsonBindings.Validate(jsonType);
+            foreach (var member in jsonType.Methods.Where(m => m.IsPublic)) {
+                if (JsonBindings.IsProvider(jsonType))
+                    Reject("JSON helpers remain internal " + member.FullName, () => JsonBindings.Bind(member, member, member.IsConstructor, false));
+                else
+                    Check("JSON public member " + member.FullName, JsonBindings.Bind(member, member, member.IsConstructor, false) is not null);
+            }
+        }
+        foreach (var leaf in JsonBindings.Leaves) {
+            Check("JSON leaf upcast " + leaf, JsonBindings.Assignable(leaf, JsonBindings.Root));
+            Check("JSON root cannot downcast implicitly " + leaf, !JsonBindings.Assignable(JsonBindings.Root, leaf));
+        }
+        Check("JSON mutation is kind-specific", !jsonRoot.Methods.Any(m => m.Name is "Add" or "Field" or "Item"));
+        using (var externalJson = ModuleDefinition.CreateModule("ExternalJson", ModuleKind.Dll)) {
+            externalJson.Types.Add(new TypeDefinition("", "ForgedJson", TypeAttributes.Public | TypeAttributes.Class,
+                externalJson.ImportReference(jsonRoot)));
+            Reject("External JSON branches", () => JsonBindings.RejectExternalBranches([externalJson]));
+        }
+        var jsonMarker = jsonRoot.CustomAttributes.Single(a => a.AttributeType.FullName.EndsWith("ClosedHierarchyAttribute"));
+        jsonRoot.CustomAttributes.Remove(jsonMarker);
+        Reject("JSON requires closed family", () => JsonBindings.Validate(jsonRoot));
+        jsonRoot.CustomAttributes.Add(jsonMarker);
+        var jsonRead = module.GetType(JsonBindings.Prefix + "JsonSerializer").Methods.Single(m => m.Name == "Deserialize" && m.Parameters[0].ParameterType.MetadataType == MetadataType.String);
+        var invalidJsonRead = Reference(jsonRead, jsonRead.DeclaringType);
+        invalidJsonRead.Parameters[0].ParameterType = module.TypeSystem.Int32;
+        Reject("JSON rejects forged deserialize signature", () => JsonBindings.Bind(invalidJsonRead, jsonRead, false, false));
         var pathType = module.GetType("System.Storage.Path");
         var combine = pathType.Methods.Single(m => m.Name == "Combine");
         var pathCall = Reference(combine, pathType);

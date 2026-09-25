@@ -50,6 +50,7 @@ walks through the compiled hostname/echo POC.
 | Isolated workers | [Thread and worker behavior](/features/tasks/) | [System.Concurrency](xref:System.Concurrency) |
 | HTTP messages and exchanges | [Web guide](/features/web/) | [HttpClient](xref:System.Web.Http.HttpClient) · [HttpContext](xref:System.Web.Http.HttpContext) · [HttpServer](xref:System.Web.Http.HttpServer) |
 | Storage and files | [Files and Storage](/features/files/) · [Providers](storage-provider.md) | [System.Storage](xref:System.Storage) |
+| JSON DOM (development) | Bounded string/stream parsing and writing; closed, kind-specific node hierarchy | [System.Data.Json](xref:System.Data.Json) |
 | Byte and text streams | [Stream contracts](streams.md) · [Pending reads](pending-read.md) | [System.IO](xref:System.IO) |
 | Console | [Console guide](/features/console/) · [Standard stream ownership](console.md) | [Console](xref:System.Console) |
 | Metadata discovery | [Introspection walkthrough](/features/introspection/) · [Descriptor identity](introspection.md) | [System.Introspection](xref:System.Introspection) |

@@ -257,3 +257,26 @@ after the failed parse produced a duplicate-constructor diagnostic. This was not
 isolated as an independent constructor defect. Focused target/.NET/GC evidence is in
 [JSON streams](experiments/json-streams/README.md); signature checks cover member and
 capability admission. Public API docs and bootstrap snapshots accompany the change.
+
+### Public JSON DOM hierarchy — 2026-09-25
+
+The author selected a closed JsonValue hierarchy with kind-specific APIs. The bridge
+projects its six leaves and ClosedHierarchyAttribute, rejects external branches,
+and admits only the explicit public signatures and leaf-to-root conversions.
+Parser/string-codec helpers remain internal; member metadata is checked against the
+managed implementation before execution. JsonError uses standard Raven union syntax
+and the existing source-projected payload-union path, now cataloguing HttpError and
+JsonError. No manual case ABI, Runtime Contract option, compiler semantics or native
+runtime instruction was introduced.
+
+The public consumer imports the matching reference and System.neoil without compiling
+private JSON copies. It tests typed construction, borrowed text/byte streams, nested
+error causes and collection. A corpus compares JSON acceptance and checked Int32
+conversion with .NET 10. The measured fixture runner accepts guest arguments after
+`--` so corpus documents can be batched under an explicit instruction budget rather
+than reloading the runtime once per document. This affects tooling only, not CLI or
+runtime default resource policy. See [JSON DOM evidence](experiments/json-dom/README.md).
+
+The pinned compiler still requires the existing explicit discard for propagated
+unit results in synchronous code. Reflection/object mapping, general class-family
+admission and Raven-main policy changes are not part of this slice.

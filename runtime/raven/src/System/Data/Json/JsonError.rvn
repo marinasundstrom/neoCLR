@@ -1,0 +1,33 @@
+namespace System.Data.Json
+
+import System.*
+import System.IO.*
+
+public union JsonError {
+    case Syntax(message: string)
+    case LimitExceeded(message: string)
+    case TypeMismatch(expected: string)
+    case MissingField(name: string)
+    case DuplicateField(name: string)
+    case InvalidIndex(index: int)
+    case InvalidNumber
+    case NumberOutOfRange
+    case Read(reason: TextReadError)
+    case Write(reason: StreamError)
+
+    override func ToString() -> string {
+        return match self {
+            Syntax(let message) => message
+            LimitExceeded(let message) => message
+            TypeMismatch(let expected) => "Expected " + expected
+            MissingField(let name) => "Missing field: " + name
+            DuplicateField(let name) => "Duplicate field: " + name
+            InvalidIndex(let index) => "Invalid index: " + index.ToString()
+            InvalidNumber => "Invalid JSON number"
+            NumberOutOfRange => "Number is not an Int32 integer token"
+            Read(let reason) => reason.ToString()
+            Write(let reason) => reason.ToString()
+            _ => "Empty"
+        }
+    }
+}

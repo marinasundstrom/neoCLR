@@ -353,4 +353,13 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'MemoryStream'">
     <Compile Include="src/System/IO/MemoryStream.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'JsonError'">
+    <Compile Include="src/System/Data/Json/JsonError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'JsonValue'">
+    <Compile Include="src/System/Data/Json/JsonValue.rvn" />
+    <Compile Include="src/System/Data/Json/JsonDocument.rvn" />
+    <Compile Include="src/System/Data/Json/JsonSyntax.rvn" />
+    <Compile Include="src/System/Data/Json/JsonSerializer.rvn" />
+  </ItemGroup>
 </Project>

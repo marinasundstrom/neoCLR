@@ -1,0 +1,14 @@
+import System.*
+import System.IO.*
+import System.Data.Json.*
+import System.Result.*
+
+// Both streams belong to the caller; errors propagate without closing them.
+func AddAcknowledgement(input: InputStream, output: OutputStream) -> Result<unit, JsonError> {
+    let value = JsonSerializer.Deserialize(input)?
+    if value is JsonObject report {
+        _ = report.Add("accepted", JsonBoolean(true))?
+        return JsonSerializer.Serialize(output, report)
+    }
+    return Error(JsonError.TypeMismatch("object"))
+}

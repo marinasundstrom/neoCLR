@@ -1,0 +1,32 @@
+import System.*
+import System.Data.Json.*
+import System.Result.*
+
+func RoundTrip(text: string) -> Result<string, JsonError> {
+    let value = JsonSerializer.Deserialize(text)?
+    return JsonSerializer.Serialize(value)
+}
+
+func Integer(text: string) -> Result<string, JsonError> {
+    let value = JsonSerializer.Deserialize(text)?
+    if value is JsonNumber number {
+        let integer = number.AsInt32()?
+        return Ok(integer.ToString())
+    }
+    return Error(JsonError.TypeMismatch("number"))
+}
+
+func Main() {
+    let arguments = Environment.GetCommandLineArgs()
+    for index in 2..<arguments.Length {
+        let result = if arguments[1] == "integer" {
+            Integer(arguments[index])
+        } else {
+            RoundTrip(arguments[index])
+        }
+        match result {
+            Ok(let text) => Console.WriteLine(text)
+            Error(_) => Console.WriteLine("ERROR")
+        }
+    }
+}

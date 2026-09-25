@@ -2277,5 +2277,67 @@
     <member name="M:System.IO.MemoryStream.Close">
       <summary>Closes all capabilities and releases the backing storage. Repeated calls have no effect.</summary>
     </member>
+<member name="T:System.Data.Json.JsonValue"><summary>Closed abstract root of the provisional JSON DOM.</summary><remarks>Development after Preview 9. The six kinds are JsonObject, JsonArray, JsonString, JsonNumber, JsonBoolean and JsonNull. External subclasses are not supported. Nodes use ordinary reference identity, not deep equality; use JsonSerializer to write JSON. Containers may share child references. Mutation and scalar access are kind-specific.</remarks></member>
+<member name="T:System.Data.Json.JsonObject"><summary>Mutable insertion-ordered JSON object. Names compare ordinally after JSON decoding; duplicate names are rejected.</summary></member>
+<member name="T:System.Data.Json.JsonArray"><summary>Mutable ordered JSON array.</summary></member>
+<member name="T:System.Data.Json.JsonString"><summary>Immutable string-valued JSON node.</summary></member>
+<member name="T:System.Data.Json.JsonBoolean"><summary>Immutable boolean-valued JSON node.</summary></member>
+<member name="T:System.Data.Json.JsonNumber"><summary>Immutable validated JSON number token retaining its exact spelling without floating-point conversion.</summary></member>
+<member name="T:System.Data.Json.JsonNull"><summary>Explicit JSON null node, distinct from a missing member.</summary></member>
+<member name="T:System.Data.Json.JsonSerializer"><summary>Provisional DOM-only parser/writer supporting strings and borrowed UTF-8 streams.</summary><remarks>The DOM is not an object/reflection serializer. Containers are limited to 31 entries; complete parsing/writing is limited to 128 UTF-8 bytes, four nested containers and 32 value occurrences. APIs are provisional.</remarks></member>
+<member name="T:System.Data.Json.JsonError"><summary>Expected JSON syntax, resource, lookup, conversion or I/O failure. Match cases to inspect causes; diagnostic strings are not stable identifiers.</summary></member>
+<member name="M:System.Data.Json.JsonObject.#ctor"><summary>Creates an empty container.</summary></member>
+<member name="M:System.Data.Json.JsonArray.#ctor"><summary>Creates an empty container.</summary></member>
+<member name="M:System.Data.Json.JsonNull.#ctor"><summary>Creates an explicit null node.</summary></member>
+<member name="M:System.Data.Json.JsonString.#ctor(System.String)"><summary>Creates a string node.</summary><param name="value">The value to retain.</param></member>
+<member name="P:System.Data.Json.JsonString.Value"><summary>Gets the retained string value.</summary></member>
+<member name="M:System.Data.Json.JsonBoolean.#ctor(System.Boolean)"><summary>Creates a boolean node.</summary><param name="value">The value to retain.</param></member>
+<member name="P:System.Data.Json.JsonBoolean.Value"><summary>Gets the retained boolean value.</summary></member>
+<member name="P:System.Data.Json.JsonObject.Count"><summary>Gets the current number of entries.</summary></member>
+<member name="M:System.Data.Json.JsonObject.Item(System.Int32)"><summary>Gets the child at the given insertion index.</summary><param name="index">Zero-based index.</param><returns>The child or InvalidIndex. No mutation occurs.</returns></member>
+<member name="P:System.Data.Json.JsonArray.Count"><summary>Gets the current number of entries.</summary></member>
+<member name="M:System.Data.Json.JsonArray.Item(System.Int32)"><summary>Gets the child at the given insertion index.</summary><param name="index">Zero-based index.</param><returns>The child or InvalidIndex. No mutation occurs.</returns></member>
+<member name="M:System.Data.Json.JsonObject.Field(System.String)"><summary>Finds an object member by its exact decoded name.</summary><param name="name">Ordinal, case-sensitive member name.</param><returns>The node, including an explicit JsonNull when present, or MissingField.</returns></member>
+<member name="M:System.Data.Json.JsonObject.Name(System.Int32)"><summary>Gets a member name in insertion order.</summary><param name="index">Zero-based member index.</param><returns>The name or InvalidIndex.</returns></member>
+<member name="M:System.Data.Json.JsonObject.Add(System.String,System.Data.Json.JsonValue)"><summary>Adds a named child without replacing existing members.</summary><param name="name">Decoded member name; no normalization is performed.</param><param name="value">Child reference to retain.</param><returns>Unit on success; DuplicateField or LimitExceeded without mutation. Duplicates are checked before capacity.</returns></member>
+<member name="M:System.Data.Json.JsonArray.Add(System.Data.Json.JsonValue)"><summary>Appends a child reference.</summary><param name="value">Child reference to retain.</param><returns>Unit on success or LimitExceeded without mutation at 31 entries.</returns></member>
+<member name="P:System.Data.Json.JsonNumber.Text"><summary>Gets the exact validated JSON number token, including exponent spelling and negative zero.</summary></member>
+<member name="M:System.Data.Json.JsonNumber.Parse(System.String)"><summary>Validates a single JSON number token of at most 128 UTF-8 bytes.</summary><param name="text">Token without surrounding whitespace; JSON number grammar applies.</param><returns>A JsonNumber or InvalidNumber. No numeric rounding or range restriction is imposed.</returns></member>
+<member name="M:System.Data.Json.JsonNumber.AsInt32"><summary>Converts an integer token to Int32.</summary><returns>The integer or NumberOutOfRange. Fractions and exponent notation are not coerced, even when mathematically integral.</returns></member>
+<member name="M:System.Data.Json.JsonSerializer.Deserialize(System.String)"><summary>Parses exactly one bounded JSON value.</summary><param name="text">JSON text; surrounding JSON whitespace is accepted.</param><returns>A DOM node or a structured error.</returns><remarks>Rejects duplicate decoded names, trailing values/commas, comments, BOM and invalid surrogate escapes. Number spelling is preserved. Resource limits are provisional.</remarks></member>
+<member name="M:System.Data.Json.JsonSerializer.Deserialize(System.IO.InputStream)"><summary>Reads bounded UTF-8 input through StreamReader and parses a single JSON value.</summary><param name="input">Borrowed stream, read from its current position through EOF.</param><returns>A DOM node, a parse error or Read wrapping TextReadError.</returns><remarks>Leaves the input open on success and expected error. Reads at most 129 bytes to detect the 128-byte limit; failure does not rewind. Synchronous, whole-buffer operation without cancellation.</remarks></member>
+<member name="M:System.Data.Json.JsonSerializer.Serialize(System.Data.Json.JsonValue)"><summary>Writes a bounded DOM to compact JSON text.</summary><param name="value">Root node; shared child references count on every visit.</param><returns>JSON text or LimitExceeded when output, depth or occurrence limits are exceeded.</returns><remarks>No deep equality, sorting or normalization. Cycles fail the depth bound; no dedicated cycle diagnostic. Strings are escaped and number spelling is preserved.</remarks></member>
+<member name="M:System.Data.Json.JsonSerializer.Serialize(System.IO.OutputStream,System.Data.Json.JsonValue)"><summary>Validates a complete document, then writes UTF-8 through StreamWriter.</summary><param name="output">Borrowed stream; caller owns flushing and closing.</param><param name="value">Root node to serialize.</param><returns>Unit, a JSON limit error or Write wrapping StreamError.</returns><remarks>Does not close or flush output. Validation failures write no bytes, but I/O failure can leave a prefix written. Writes are not transactional. Synchronous, whole-buffer operation.</remarks></member>
+<member name="M:System.Data.Json.JsonError.ToString"><summary>Returns diagnostic text; inspect union cases for stable program logic.</summary></member>
+<member name="T:System.Data.Json.JsonError.Syntax"><summary>Malformed JSON or invalid Unicode escape.</summary></member>
+<member name="M:System.Data.Json.JsonError.Syntax.#ctor(System.String)"><summary>Malformed JSON or invalid Unicode escape.</summary><param name="message">The structured payload.</param></member>
+<member name="P:System.Data.Json.JsonError.Syntax.Message"><summary>Gets the retained message.</summary></member>
+<member name="T:System.Data.Json.JsonError.LimitExceeded"><summary>A bounded document or container limit was exceeded.</summary></member>
+<member name="M:System.Data.Json.JsonError.LimitExceeded.#ctor(System.String)"><summary>A bounded document or container limit was exceeded.</summary><param name="message">The structured payload.</param></member>
+<member name="P:System.Data.Json.JsonError.LimitExceeded.Message"><summary>Gets the retained message.</summary></member>
+<member name="T:System.Data.Json.JsonError.TypeMismatch"><summary>A consumer expected a different JSON kind.</summary></member>
+<member name="M:System.Data.Json.JsonError.TypeMismatch.#ctor(System.String)"><summary>A consumer expected a different JSON kind.</summary><param name="expected">The structured payload.</param></member>
+<member name="P:System.Data.Json.JsonError.TypeMismatch.Expected"><summary>Gets the retained expected.</summary></member>
+<member name="T:System.Data.Json.JsonError.MissingField"><summary>The named object member is absent.</summary></member>
+<member name="M:System.Data.Json.JsonError.MissingField.#ctor(System.String)"><summary>The named object member is absent.</summary><param name="name">The structured payload.</param></member>
+<member name="P:System.Data.Json.JsonError.MissingField.Name"><summary>Gets the retained name.</summary></member>
+<member name="T:System.Data.Json.JsonError.DuplicateField"><summary>A decoded object member name was repeated.</summary></member>
+<member name="M:System.Data.Json.JsonError.DuplicateField.#ctor(System.String)"><summary>A decoded object member name was repeated.</summary><param name="name">The structured payload.</param></member>
+<member name="P:System.Data.Json.JsonError.DuplicateField.Name"><summary>Gets the retained name.</summary></member>
+<member name="T:System.Data.Json.JsonError.InvalidIndex"><summary>An entry index is outside the container.</summary></member>
+<member name="M:System.Data.Json.JsonError.InvalidIndex.#ctor(System.Int32)"><summary>An entry index is outside the container.</summary><param name="index">The structured payload.</param></member>
+<member name="P:System.Data.Json.JsonError.InvalidIndex.Index"><summary>Gets the retained index.</summary></member>
+<member name="T:System.Data.Json.JsonError.InvalidNumber"><summary>The supplied token is not a supported JSON number token.</summary></member>
+<member name="M:System.Data.Json.JsonError.InvalidNumber.#ctor"><summary>The supplied token is not a supported JSON number token.</summary></member>
+<member name="T:System.Data.Json.JsonError.NumberOutOfRange"><summary>The number token cannot be converted to Int32 without coercion.</summary></member>
+<member name="M:System.Data.Json.JsonError.NumberOutOfRange.#ctor"><summary>The number token cannot be converted to Int32 without coercion.</summary></member>
+<member name="T:System.Data.Json.JsonError.Read"><summary>The text input layer failed; retains its cause.</summary></member>
+<member name="M:System.Data.Json.JsonError.Read.#ctor(System.IO.TextReadError)"><summary>The text input layer failed; retains its cause.</summary><param name="reason">The structured payload.</param></member>
+<member name="P:System.Data.Json.JsonError.Read.Reason"><summary>Gets the retained reason.</summary></member>
+<member name="T:System.Data.Json.JsonError.Write"><summary>The output stream failed; retains its cause.</summary></member>
+<member name="M:System.Data.Json.JsonError.Write.#ctor(System.IO.StreamError)"><summary>The output stream failed; retains its cause.</summary><param name="reason">The structured payload.</param></member>
+<member name="P:System.Data.Json.JsonError.Write.Reason"><summary>Gets the retained reason.</summary></member>
+<member name="P:System.Data.Json.JsonError.HasValue"><summary>Indicates whether the union contains a case. A default uninitialized union has no case.</summary></member>
+<member name="P:System.Data.Json.JsonError.Value"><summary>Gets the boxed case payload. Prefer matching the union to inspect typed causes.</summary></member>
 </members>
 </doc>

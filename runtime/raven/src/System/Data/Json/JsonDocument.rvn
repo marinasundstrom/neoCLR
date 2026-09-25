@@ -1,0 +1,234 @@
+namespace System.Data.Json
+
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+
+internal class DocumentReader {
+    private var source: string
+    private var bytes: Sequence<byte>
+    private var position: int
+    private var nodes: int
+
+    init(text: string) {
+        source = text
+        bytes = Utf8.Encode(text)
+        position = 0
+        nodes = 0
+    }
+
+    private func Skip() {
+        while position < bytes.Count && JsonSyntax.Whitespace(bytes[position]) {
+            position += 1
+        }
+    }
+
+    private func Take(value: byte) -> bool {
+        Skip()
+        if position < bytes.Count && bytes[position] == value {
+            position += 1
+            return true
+        }
+        return false
+    }
+
+    private func Slice(start: int) -> Result<string, JsonError> {
+        match source.SliceUtf8(start, position - start) {
+            Ok(let text) => return Ok(text)
+            Error(_) => return Error(JsonError.Syntax("Invalid token boundary"))
+        }
+    }
+
+    private func ReadString() -> Result<string, JsonError> {
+        Skip()
+        let start = position
+        if !Take((byte)34) {
+            return Error(JsonError.Syntax("Expected string"))
+        }
+        var escaped = false
+        while position < bytes.Count {
+            let value = bytes[position]
+            position += 1
+            if escaped {
+                escaped = false
+            } else if value == 92 {
+                escaped = true
+            } else if value == 34 {
+                let token = Slice(start)?
+                return MessageReader(token).Read()
+            }
+        }
+        return Error(JsonError.Syntax("Unclosed string"))
+    }
+
+    private func Value(depth: int) -> Result<JsonValue, JsonError> {
+        Skip()
+        nodes += 1
+        if nodes > 32 {
+            return Error(JsonError.LimitExceeded("Document exceeds 32 values"))
+        }
+        if position == bytes.Count {
+            return Error(JsonError.Syntax("Missing value"))
+        }
+        let first = bytes[position]
+        if first == 34 {
+            let text = ReadString()?
+            let value: JsonValue = JsonString(text)
+            return Ok(value)
+        }
+        if first == 123 || first == 91 {
+            if depth >= 4 {
+                return Error(JsonError.LimitExceeded("Container depth exceeds four"))
+            }
+            position += 1
+            let objectValue = first == 123
+            var result: JsonValue = JsonArray()
+            var closing = (byte)93
+            if objectValue {
+                result = JsonObject()
+                closing = (byte)125
+            }
+            var containerClosed = Take(closing)
+            while !containerClosed {
+                var name = ""
+                if objectValue {
+                    name = ReadString()?
+                    if !Take((byte)58) {
+                        return Error(JsonError.Syntax("Expected colon"))
+                    }
+                }
+                let child = Value(depth + 1)?
+                if objectValue {
+                    _ = ((JsonObject)result).Add(name, child)?
+                } else {
+                    _ = ((JsonArray)result).Add(child)?
+                }
+                containerClosed = Take(closing)
+                if !containerClosed && !Take((byte)44) {
+                    return Error(JsonError.Syntax("Expected comma or container end"))
+                }
+            }
+            return Ok(result)
+        }
+        let start = position
+        var tokenEnd = false
+        while position < bytes.Count && !tokenEnd {
+            let value = bytes[position]
+            tokenEnd = (JsonSyntax.Whitespace(value) || value == 44 || value == 93 || value == 125)
+            if !tokenEnd {
+                position += 1
+            }
+        }
+        let token = Slice(start)?
+        if token.Equals("true") {
+            let value: JsonValue = JsonBoolean(true)
+            return Ok(value)
+        }
+        if token.Equals("false") {
+            let value: JsonValue = JsonBoolean(false)
+            return Ok(value)
+        }
+        if token.Equals("null") {
+            let value: JsonValue = JsonNull()
+            return Ok(value)
+        }
+        let number = JsonNumber.Parse(token)?
+        let numericValue: JsonValue = number
+        return Ok(numericValue)
+    }
+
+    func Read() -> Result<JsonValue, JsonError> {
+        let result = Value(0)?
+        Skip()
+        if position != bytes.Count {
+            return Error(JsonError.Syntax("Trailing content"))
+        }
+        return Ok(result)
+    }
+}
+
+internal class DocumentWriter {
+    private var nodes: int
+    private var output: string
+
+    init() {
+        nodes = 0
+        output = ""
+    }
+
+    private func Append(text: string) -> Result<unit, JsonError> {
+        if text.GetUtf8ByteCount() > 128 - output.GetUtf8ByteCount() {
+            return Error(JsonError.LimitExceeded("Document exceeds 128 UTF-8 bytes"))
+        }
+        output = String.Concat(output, text)
+        return Ok(())
+    }
+
+    private func Value(value: JsonValue, depth: int) -> Result<unit, JsonError> {
+        nodes += 1
+        if nodes > 32 {
+            return Error(JsonError.LimitExceeded("Document exceeds 32 values"))
+        }
+        if value is JsonString {
+            let text = ((JsonString)value).Value
+            let quoted = JsonSyntax.WriteMessage(text)?
+            return Append(quoted)
+        }
+        if value is JsonNumber {
+            let text = ((JsonNumber)value).Text
+            return Append(text)
+        }
+        if value is JsonBoolean {
+            let truth = ((JsonBoolean)value).Value
+            if truth {
+                return Append("true")
+            }
+            return Append("false")
+        }
+        if value is JsonNull {
+            return Append("null")
+        }
+        if depth >= 4 {
+            return Error(JsonError.LimitExceeded("Container depth exceeds four (or cyclic tree)"))
+        }
+        let objectValue = value is JsonObject
+        if objectValue {
+            _ = Append("{")?
+        } else {
+            _ = Append("[")?
+        }
+        var count = 0
+        if objectValue {
+            count = ((JsonObject)value).Count
+        } else {
+            count = ((JsonArray)value).Count
+        }
+        for index in 0..<count {
+            if index > 0 {
+                _ = Append(",")?
+            }
+            if objectValue {
+                let name = ((JsonObject)value).Name(index)?
+                let quoted = JsonSyntax.WriteMessage(name)?
+                _ = Append(quoted)?
+                _ = Append(":")?
+            }
+            let child = if objectValue {
+                ((JsonObject)value).Item(index)?
+            } else {
+                ((JsonArray)value).Item(index)?
+            }
+            _ = Value(child, depth + 1)?
+        }
+        if objectValue {
+            return Append("}")
+        }
+        return Append("]")
+    }
+
+    func Write(value: JsonValue) -> Result<string, JsonError> {
+        _ = Value(value, 0)?
+        return Ok(output)
+    }
+}

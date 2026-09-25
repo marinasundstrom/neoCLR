@@ -7329,3 +7329,37 @@ configuration/content, not target-specific code added to Raven main.
   .NET memory/JSON baseline pass. The target ends with zero live objects after 13
   collections. This establishes synchronous DOM I/O evidence, not a public JSON
   API or reflection implementation.
+
+### 2026-09-25 — choosing the public JSON DOM shape
+
+- **Author question:** whether the DOM should be a union or a closed hierarchy.
+- **Assistant proposal:** compare a six-case union against kind-specific reference
+  types; both can have mutable containers and exhaustive matching. Recommend the
+  hierarchy for container APIs, retaining unions for errors. The first extraction
+  was provisional and based on the earlier experiment, not an author decision.
+- **Author decision:** “Closed JsonValue hierarchy with kind-specific APIs (recommended)”.
+- **Assistant action:** put object/array operations on those node types, scalar
+  payloads on typed properties, and preserve explicit JsonNull vs MissingField.
+  Extract a DOM-only JsonSerializer and structured JsonError into System.Data.Json.
+- **Validation so far:** the public consumer and acknowledgement sample pass, including
+  nested I/O causes and memory/short-stream paths, with zero final live objects.
+  Parser corpus and artifact checks are recorded with the [fixture](experiments/json-dom/README.md).
+- **Open:** larger application-driven limits, replacement/removal/query conveniences,
+  and later reflective object mapping. No inferred decision on those APIs, deep
+  equality or HttpClient JSON extension signatures.
+
+- **Author clarification:** asks whether serialization should be Result-based.
+  **Assistant response:** all four implemented string/stream Serialize/Deserialize
+  overloads already return Result with JsonError; nested I/O causes are preserved
+  and callers can propagate with `?`. This confirms the API direction rather than
+  introducing exception-based failure handling.
+
+- **Author correction:** meant Task/asynchronous stream reading rather than Result.
+  **Assistant response:** proposed checking pending-I/O contracts before exposing an
+  asynchronous serializer path. **Author decision:** “No keep it sync”; asynchronous
+  reads are a possible later optimization track. Continue the current work.
+  **Action:** retain synchronous Result-returning overloads; no Task wrapper, async
+  stream contract or scheduler change was added.
+- **Final validation:** all 54 JSON document cases and 12 checked integer conversions
+  pass through the public API against the .NET baseline; signature and matching
+  API/bootstrap snapshot checks pass. Website build remains skipped.

@@ -1,0 +1,403 @@
+import System.*
+import System.Data.Json.*
+import System.Collections.*
+import System.IO.*
+import System.Result.*
+import System.Text.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("JSON stream contract failed")
+    }
+}
+
+// One byte at a time deliberately splits multibyte UTF-8 characters.
+class ShortInput : InputStream {
+    private val bytes: Sequence<byte>
+    private var position: int = 0
+    private val failAt: int
+    private var closed: bool = false
+
+    init(bytes: Sequence<byte>, failAt: int) {
+        self.bytes = bytes
+        self.failAt = failAt
+    }
+
+    val Closed: bool => closed
+    val Position: int => position
+
+    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if position == failAt {
+            return Error(StreamError.IoFailure)
+        }
+        if count == 0 || position == bytes.Count {
+            return Ok(0)
+        }
+        buffer[offset] = bytes[position]
+        position += 1
+        return Ok(1)
+    }
+
+    func Close() {
+        closed = true
+    }
+}
+
+class ShortOutput : OutputStream {
+    private var bytes: List<byte> = ArrayList<byte>()
+    private val failAt: int
+    private val zeroProgress: bool
+    private var closed: bool = false
+    private var flushes: int = 0
+
+    init(failAt: int, zeroProgress: bool) {
+        self.failAt = failAt
+        self.zeroProgress = zeroProgress
+    }
+
+    val Closed: bool => closed
+    val Count: int => bytes.Count
+    val Flushes: int => flushes
+    val Bytes: Sequence<byte> => bytes
+
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if bytes.Count == failAt {
+            return Error(StreamError.AccessDenied)
+        }
+        if count == 0 || zeroProgress {
+            return Ok(0)
+        }
+        bytes.Add(buffer[offset])
+        return Ok(1)
+    }
+
+    func Flush() -> Result<unit, StreamError> {
+        flushes += 1
+        return Ok(())
+    }
+
+    func Close() {
+        closed = true
+    }
+}
+
+// The same DOM travels through both entry points. Mapping application objects is later.
+func RoundTrip(text: string) -> Result<string, JsonError> {
+    let original = JsonSerializer.Deserialize(text)?
+    let canonical = JsonSerializer.Serialize(original)?
+    let memory = MemoryStream()
+    let write = JsonSerializer.Serialize(memory, original)
+    let Ok(_) = write else {
+        memory.Close()
+        return Error(JsonError.Syntax("Memory serialization failed"))
+    }
+    let Ok(_) = memory.Seek(0) else {
+        memory.Close()
+        return Error(JsonError.Syntax("Memory rewind failed"))
+    }
+    let restored = JsonSerializer.Deserialize(memory)
+    memory.Close()
+    let value = restored?
+    let actual = JsonSerializer.Serialize(value)?
+    Check(actual == canonical)
+    // Also force partial writes and reads independently of MemoryStream.
+    let output = ShortOutput(-1, false)
+    _ = JsonSerializer.Serialize(output, original)?
+    Check(!output.Closed && output.Flushes == 0)
+    let input = ShortInput(output.Bytes, -1)
+    let shortValue = JsonSerializer.Deserialize(input)?
+    Check(!input.Closed && input.Position == output.Count)
+    let shortText = JsonSerializer.Serialize(shortValue)?
+    Check(shortText == canonical)
+    input.Close()
+    output.Close()
+    return Ok(actual)
+}
+
+func ReadFailure(input: ShortInput, expected: string) {
+    match JsonSerializer.Deserialize(input) {
+        Error(let error) => Check(error.ToString() == expected)
+        Ok(_) => System.Fault("Invalid input accepted")
+    }
+    Check(!input.Closed)
+    input.Close()
+}
+
+func MemoryContracts() {
+    let memory = MemoryStream()
+    let input: InputStream = memory
+    let output: OutputStream = memory
+    let seek: SeekableStream = memory
+    let data: byte[] = [(byte)65, (byte)66, (byte)67]
+    let Ok(initial) = memory.GetLength() else {
+        System.Fault("Missing length")
+        return
+    }
+    Check(initial == 0)
+    let Ok(written) = output.Write(data, 0, 3) else {
+        System.Fault("Memory write failed")
+        return
+    }
+    Check(written == 3)
+    let Ok(_) = seek.Seek(1) else {
+        System.Fault("Seek failed")
+        return
+    }
+    let Ok(_) = output.Write(data, 0, 1) else {
+        System.Fault("Overwrite failed")
+        return
+    }
+    let Ok(_) = seek.Seek(5) else {
+        System.Fault("Gap seek failed")
+        return
+    }
+    let Ok(_) = output.Write(data, 0, 0) else {
+        System.Fault("Empty write failed")
+        return
+    }
+    let Ok(before) = memory.GetLength() else {
+        System.Fault("Missing length")
+        return
+    }
+    Check(before == 3)
+    let Ok(_) = output.Write(data, 2, 1) else {
+        System.Fault("Gap write failed")
+        return
+    }
+    let Ok(_) = seek.Seek(0) else {
+        System.Fault("Rewind failed")
+        return
+    }
+    let buffer: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9, (byte)9, (byte)9, (byte)9, (byte)9]
+    let Ok(read) = input.Read(buffer, 1, 7) else {
+        System.Fault("Read failed")
+        return
+    }
+    Check(read == 6 && buffer[0] == 9 && buffer[7] == 9)
+    Check(buffer[1] == 65 && buffer[2] == 65 && buffer[3] == 67)
+    Check(buffer[4] == 0 && buffer[5] == 0 && buffer[6] == 67)
+    let Ok(eof) = input.Read(buffer, 0, 1) else {
+        System.Fault("EOF failed")
+        return
+    }
+    Check(eof == 0)
+    match output.Write(data, 2147483647, 1) {
+        Error(let error) => Check(error is StreamError.InvalidRange)
+        Ok(_) => System.Fault("Invalid write accepted")
+    }
+    match input.Read(buffer, -1, 1) {
+        Error(let error) => Check(error is StreamError.InvalidRange)
+        Ok(_) => System.Fault("Invalid read accepted")
+    }
+    match seek.Seek(-1) {
+        Error(let error) => Check(error is StreamError.InvalidRange)
+        Ok(_) => System.Fault("Negative seek accepted")
+    }
+    match seek.Seek(65537) {
+        Error(let error) => Check(error is StreamError.LimitExceeded)
+        Ok(_) => System.Fault("Oversized seek accepted")
+    }
+    let Ok(position) = seek.GetPosition() else {
+        System.Fault("Missing position")
+        return
+    }
+    Check(position == 6)
+    let Ok(_) = seek.Seek(65536) else {
+        System.Fault("Boundary seek failed")
+        return
+    }
+    match output.Write(data, 0, 1) {
+        Error(let error) => Check(error is StreamError.LimitExceeded)
+        Ok(_) => System.Fault("Oversized write accepted")
+    }
+    let Ok(length) = memory.GetLength() else {
+        System.Fault("Missing length")
+        return
+    }
+    Check(length == 6)
+    let Ok(_) = output.Flush() else {
+        System.Fault("Flush failed")
+        return
+    }
+    input.Close()
+    output.Close()
+    match memory.GetLength() {
+        Error(let error) => Check(error is StreamError.Closed)
+        Ok(_) => System.Fault("Closed length accepted")
+    }
+    match seek.GetPosition() {
+        Error(let error) => Check(error is StreamError.Closed)
+        Ok(_) => System.Fault("Closed position accepted")
+    }
+    match output.Write(data, 0, 0) {
+        Error(let error) => Check(error is StreamError.Closed)
+        Ok(_) => System.Fault("Closed write accepted")
+    }
+    match input.Read(buffer, 0, 0) {
+        Error(let error) => Check(error is StreamError.Closed)
+        Ok(_) => System.Fault("Closed read accepted")
+    }
+    match output.Flush() {
+        Error(let error) => Check(error is StreamError.Closed)
+        Ok(_) => System.Fault("Closed flush accepted")
+    }
+    match seek.Seek(0) {
+        Error(let error) => Check(error is StreamError.Closed)
+        Ok(_) => System.Fault("Closed seek accepted")
+    }
+}
+
+func Main() {
+    MemoryContracts()
+    DomContracts()
+    let sampleInput = ShortInput(Utf8.Encode("{}"), -1)
+    let sampleOutput = ShortOutput(-1, false)
+    let Ok(_) = AddAcknowledgement(sampleInput, sampleOutput) else {
+        System.Fault("Acknowledgement failed")
+        return
+    }
+    Check(!sampleInput.Closed && !sampleOutput.Closed)
+    let Ok(sampleText) = Utf8.Decode(sampleOutput.Bytes) else {
+        System.Fault("Acknowledgement encoding failed")
+        return
+    }
+    Check(sampleText == "{\"accepted\":true}")
+    sampleInput.Close()
+    sampleOutput.Close()
+    let text = "{\"station\":\"Café 😀\",\"readings\":[21,22.5],\"ready\":true,\"note\":null}"
+    match RoundTrip(text) {
+        Ok(let result) => Console.WriteLine(result)
+        Error(let error) => System.Fault(error.ToString())
+    }
+    let Ok(value) = JsonSerializer.Deserialize("[1,2]") else {
+        System.Fault("Could not create test value")
+        return
+    }
+    let failed = ShortOutput(2, false)
+    match JsonSerializer.Serialize(failed, value) {
+        Error(let error) => Check(error is JsonError.Write(System.IO.StreamError.AccessDenied))
+        Ok(_) => System.Fault("Output failure lost")
+    }
+    Check(failed.Count == 2 && !failed.Closed && failed.Flushes == 0)
+    failed.Close()
+    let zero = ShortOutput(-1, true)
+    match JsonSerializer.Serialize(zero, value) {
+        Error(let error) => Check(error is JsonError.Write(System.IO.StreamError.IoFailure))
+        Ok(_) => System.Fault("Zero-progress output accepted")
+    }
+    Check(!zero.Closed && zero.Count == 0)
+    zero.Close()
+    let cycle = JsonArray()
+    let Ok(_) = cycle.Add(cycle) else {
+        System.Fault("Could not create cycle")
+        return
+    }
+    let untouched = ShortOutput(-1, false)
+    match JsonSerializer.Serialize(untouched, cycle) {
+        Error(_) => Check(untouched.Count == 0 && !untouched.Closed)
+        Ok(_) => System.Fault("Cycle accepted")
+    }
+    untouched.Close()
+    ReadFailure(ShortInput(Utf8.Encode("{}"), 1), "IoFailure")
+    let invalid: byte[] = [(byte)34, (byte)195, (byte)34]
+    ReadFailure(ShortInput(invalid, -1), "InvalidUtf8")
+    let tooLarge: List<byte> = ArrayList<byte>()
+    for index in 0..<129 {
+        tooLarge.Add((byte)32)
+    }
+    let oversized = ShortInput(tooLarge, -1)
+    ReadFailure(oversized, "LimitExceeded")
+    Check(oversized.Position == 129)
+    let malformed = ShortInput(Utf8.Encode("[1,"), -1)
+    match JsonSerializer.Deserialize(malformed) {
+        Error(_) => Check(!malformed.Closed)
+        Ok(_) => System.Fault("Truncated JSON accepted")
+    }
+    malformed.Close()
+    var padding = ""
+    for index in 0..<126 {
+        padding += "a"
+    }
+    let boundary = "\"" + padding + "\""
+    match RoundTrip(boundary) {
+        Ok(_) => {}
+        Error(let error) => System.Fault(error.ToString())
+    }
+    Console.WriteLine("JSON stream checks passed")
+}
+
+func DomContracts() {
+    let document = JsonObject()
+    let array = JsonArray()
+    let Ok(number) = JsonNumber.Parse("22.5") else {
+        System.Fault("Number parse failed")
+        return
+    }
+    Check(number.Text == "22.5")
+    match number.AsInt32() {
+        Error(JsonError.NumberOutOfRange) => {}
+        _ => System.Fault("Fraction converted to integer")
+    }
+    let Ok(_) = array.Add(number) else {
+        System.Fault("Array add failed")
+        return
+    }
+    let Ok(_) = document.Add("readings", array) else {
+        System.Fault("Object add failed")
+        return
+    }
+    let Ok(_) = document.Add("note", JsonNull()) else {
+        System.Fault("Null add failed")
+        return
+    }
+    let Ok(note) = document.Field("note") else {
+        System.Fault("Missing present null")
+        return
+    }
+    Check(note is JsonNull)
+    match document.Field("missing") {
+        Error(JsonError.MissingField(let name)) => Check(name == "missing")
+        _ => System.Fault("Missing field error lost")
+    }
+    match document.Add("note", JsonBoolean(false)) {
+        Error(JsonError.DuplicateField(let name)) => Check(name == "note")
+        _ => System.Fault("Duplicate replaced value")
+    }
+    Check(document.Count == 2 && array.Count == 1)
+    match array.Item(-1) {
+        Error(JsonError.InvalidIndex(let index)) => Check(index == -1)
+        _ => System.Fault("Invalid index accepted")
+    }
+    let Ok(name) = document.Name(0) else {
+        System.Fault("Name lookup failed")
+        return
+    }
+    Check(name == "readings")
+    let Ok(child) = document.Item(0) else {
+        System.Fault("Item lookup failed")
+        return
+    }
+    Check(child is JsonArray)
+    Check(JsonString("hello").Value == "hello" && JsonBoolean(true).Value)
+    let malformed = JsonSerializer.Deserialize("{\"a\":1,\"\\u0061\":2}")
+    match malformed {
+        Error(JsonError.DuplicateField(let name)) => Check(name == "a")
+        _ => System.Fault("Escaped duplicate accepted")
+    }
+    match JsonSerializer.Deserialize("[1,]") {
+        Error(_) => {}
+        Ok(_) => System.Fault("Trailing comma accepted")
+    }
+    let broken = ShortInput(Utf8.Encode("{}"), 1)
+    match JsonSerializer.Deserialize(broken) {
+        Error(JsonError.Read(System.IO.TextReadError.IoFailure)) => {}
+        _ => System.Fault("Read cause lost")
+    }
+    broken.Close()
+}

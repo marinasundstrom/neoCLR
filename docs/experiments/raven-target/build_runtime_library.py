@@ -10,6 +10,8 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'JsonError': 'System.Data.Json.JsonError',
+    'JsonValue': 'System.Data.Json.JsonValue',
     "Cancellation": "System.Concurrency.CancellationTokenSource",
     "IPAddress": "System.Networking.IPAddress",
     "IPAddressError": "System.Networking.IPAddressError",
@@ -134,6 +136,12 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'JsonValue': 'runtime/raven/src/System/Data/Json/JsonValue.rvn',
+    'JsonError': 'runtime/raven/src/System/Data/Json/JsonError.rvn',
+    'JsonDocument': 'runtime/raven/src/System/Data/Json/JsonDocument.rvn',
+    'JsonSyntax': 'runtime/raven/src/System/Data/Json/JsonSyntax.rvn',
+    'JsonSerializer': 'runtime/raven/src/System/Data/Json/JsonSerializer.rvn',
+
     "Cancellation": "runtime/raven/src/System/Concurrency/Cancellation.rvn",
     "IPAddress": "runtime/raven/src/System/Networking/IPAddress.rvn",
     "IPAddressError": "runtime/raven/src/System/Networking/IPAddressError.rvn",

@@ -1,0 +1,43 @@
+namespace System.Data.Json
+
+import System.*
+import System.IO.*
+import System.Result.*
+
+// Provisional DOM-only serializer. Object mapping is intentionally separate.
+public class JsonSerializer {
+    private init() { }
+
+    static func Deserialize(text: string) -> Result<JsonValue, JsonError> {
+        if text.GetUtf8ByteCount() > 128 {
+            return Error(JsonError.LimitExceeded("Document exceeds 128 UTF-8 bytes"))
+        }
+        return DocumentReader(text).Read()
+    }
+
+    static func Deserialize(input: InputStream) -> Result<JsonValue, JsonError> {
+        let reader = StreamReader(input, true)
+        let result = reader.ReadToEnd(128)
+        reader.Close()
+        return match result {
+            Ok(let text) => Deserialize(text)
+            Error(let error) => Error(JsonError.Read(error))
+        }
+    }
+
+    static func Serialize(value: JsonValue) -> Result<string, JsonError> {
+        return DocumentWriter().Write(value)
+    }
+
+    static func Serialize(output: OutputStream, value: JsonValue) -> Result<unit, JsonError> {
+        // Validate the whole document before writing any bytes.
+        let text = Serialize(value)?
+        let writer = StreamWriter(output, true)
+        let result = writer.Write(text)
+        writer.Close()
+        return match result {
+            Ok(_) => Ok(())
+            Error(let error) => Error(JsonError.Write(error))
+        }
+    }
+}

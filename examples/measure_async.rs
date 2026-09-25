@@ -2,12 +2,20 @@
 use neoclr::{ExecutionOptions, Limits, LoadedProgram, StdioConsole, assemble};
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args: Vec<_> = std::env::args().collect();
+    let guest_arguments = if let Some(separator) = args.iter().position(|arg| arg == "--") {
+        let mut guest = vec![args.get(1).ok_or("missing app path")?.clone()];
+        guest.extend(args.split_off(separator + 1));
+        args.pop();
+        guest
+    } else {
+        Vec::new()
+    };
     let live = args.last().is_some_and(|arg| arg == "--live-output");
     if live {
         args.pop();
     }
     if !(4..=5).contains(&args.len()) {
-        return Err("usage: measure_async APP.neoil System.neoil HEAP_LIMIT [INSTRUCTION_LIMIT] [--live-output]".into());
+        return Err("usage: measure_async APP.neoil System.neoil HEAP_LIMIT [INSTRUCTION_LIMIT] [--live-output] [-- GUEST_ARGUMENTS...]".into());
     }
     let text = std::fs::read_to_string(&args[1])?;
     let system = assemble(&std::fs::read_to_string(&args[2])?).map_err(|e| e.to_string())?;
@@ -19,6 +27,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     program.verify().map_err(|e| e.to_string())?;
     let execution = program
         .run(ExecutionOptions {
+            arguments: guest_arguments,
             console: live
                 .then(|| std::sync::Arc::new(StdioConsole) as std::sync::Arc<dyn neoclr::Console>),
             limits: Limits {

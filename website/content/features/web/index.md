@@ -315,11 +315,29 @@ The server accepts these methods and exposes their buffered content to its handl
 PATCH content is opaque: applications choose its media type and behavior. The library
 does not apply patches. HEAD returns headers with empty content; the server computes representation length from the buffered response without sending its body. OPTIONS is not implemented.
 
-## JSON direction
+## JSON DOM
 
-The next JSON milestone is a DOM: parse, inspect, construct and write JSON through
-strings and streams. A bounded experiment exercises StreamReader and StreamWriter,
-including a write/rewind/read round trip through the development
-[MemoryStream](/docs/api/System/IO/MemoryStream/). The serializer is still application
-experiment code. Reflective object mapping and HttpClient GetJson/PostJson extensions
-are later work; neither is part of the current public HTTP API.
+The development `System.Data.Json` API can parse, inspect, construct and write a small
+JSON document through strings or streams. `JsonValue` is a closed hierarchy:
+`JsonObject` and `JsonArray` expose their own container methods; strings, numbers,
+booleans and null have distinct node types. A missing member differs from a present
+JSON null. Numbers retain their JSON spelling until an explicit conversion is requested.
+
+```raven
+{{JSON_DOM_SAMPLE}}
+```
+
+The tested example adds an acknowledgement to an object and propagates failures.
+`JsonSerializer` uses StreamReader/StreamWriter and leaves supplied streams open;
+the caller controls flushing and closing. The sample also runs through
+[MemoryStream](/docs/api/System/IO/MemoryStream/) using write, rewind and read.
+
+This POC buffers complete documents and currently limits them to 128 UTF-8 bytes,
+four nested containers and 32 value occurrences. Containers admit 31 children.
+Duplicate names are rejected. A write failure can leave a partial output; cycles
+fail the depth limit. Nodes use reference identity, with shared mutable children.
+
+The shape is closest to .NET's mutable JsonNode model, but neoCLR calls the root
+`JsonValue` and returns Result errors, including nested stream causes. See the
+[JSON API reference](/docs/api/System/Data/Json/) for the current contracts.
+Reflective object mapping and HttpClient GetJson/PostJson extensions remain later work.

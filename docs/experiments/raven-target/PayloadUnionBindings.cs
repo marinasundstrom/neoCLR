@@ -3,17 +3,19 @@ using Mono.Cecil;
 // Selected source-projected families, not a manually maintained case ABI.
 static class PayloadUnionBindings
 {
-    const string Owner = "System.Web.Http.HttpError";
+    static readonly string[] Owners = ["System.Web.Http.HttpError", "System.Data.Json.JsonError"];
     static readonly Dictionary<string, TypeDefinition> Types = new();
     public static void Reset(ModuleDefinition core)
     {
         Types.Clear();
-        if (core.GetType(Owner) is not { } root) return;
-        if (!ApplicationTypes.IsStandardLibraryUnion(root))
-            throw new InvalidDataException("Invalid payload union reference: " + Owner);
-        RavenUnionMetadata.ValidateNestedCases(root);
-        foreach (var type in new[] { root }.Concat(root.NestedTypes))
-            Types.Add(type.FullName.Replace('/', '.'), type);
+        foreach (var owner in Owners) {
+            if (core.GetType(owner) is not { } root) continue;
+            if (!ApplicationTypes.IsStandardLibraryUnion(root))
+                throw new InvalidDataException("Invalid payload union reference: " + owner);
+            RavenUnionMetadata.ValidateNestedCases(root);
+            foreach (var type in new[] { root }.Concat(root.NestedTypes))
+                Types.Add(type.FullName.Replace('/', '.'), type);
+        }
     }
     public static bool IsType(string name) => Types.ContainsKey(name);
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope)

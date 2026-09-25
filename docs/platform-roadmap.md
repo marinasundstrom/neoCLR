@@ -156,13 +156,20 @@ malformed input, ownership/cleanup and collection during pending I/O. This is an
 acceptance case for the POC, not a promise of complete .NET serializer compatibility.
 **First I/O slice:** the [JSON stream experiment](experiments/json-streams/README.md)
 reuses the existing DOM/parser/writer through a local JsonSerializer with string and
-borrowed-stream routes. It is synchronous and fully buffered; public extraction and
-structured errors remain next steps. **Author clarification:** finish the JSON DOM
+borrowed-stream routes. That initial checkpoint was synchronous and fully buffered;
+its public extraction and structured errors follow in the public DOM slice below. **Author clarification:** finish the JSON DOM
 model first, before object deserialization or reflection. The provisional
 [MemoryStream](memory-stream-design.md) is implemented for the write/rewind/read scenario.
 **Author follow-up:** eventually provide GetJson<T> and PostJson HttpClient extension
 methods, layered on the serializer rather than duplicating JSON handling in HTTP.
 Keep their exact signatures and error/cancellation policies open for now.
+**Public DOM slice:** [System.Data.Json](json-dom-design.md) extracts that codec into
+an author-selected closed JsonValue hierarchy, with kind-specific container/scalar
+APIs, a standard JsonError union and DOM-only JsonSerializer string/stream overloads.
+The [public consumer](experiments/json-dom/README.md) exercises the matching library;
+POC limits remain deliberately small. Object deserialization is not part of this slice.
+**Author decision:** keep JsonSerializer synchronous and Result-based for now;
+asynchronous reads remain a separate potential optimization/evolution track.
 Current introspection exposes member metadata but not public value access, assignment
 or construction/invocation. **Author clarification:** `System.Runtime.Reflection`
 will provide extensions to the `System.Introspection` model; those operations work

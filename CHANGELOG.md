@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add provisional System.Data.Json DOM APIs: a closed JsonValue hierarchy with
+  kind-specific containers and scalar properties, exact number tokens, JsonError
+  unions retaining I/O causes, and DOM-only JsonSerializer string/stream overloads.
+  Keep small byte/depth/node bounds and borrowed stream ownership explicit. Include
+  API/website documentation, public-consumer/corpus checks and closed-family bridge
+  admission. Batch corpus inputs through the measured fixture runner with an explicit
+  instruction budget; runtime/CLI defaults are unchanged. Application-local JSON
+  experiments remain historical, not compatibility contracts; reflective object
+  mapping and HTTP JSON extensions remain planned. Serialization stays synchronous
+  and Result-based by author decision.
+
 - Add provisional System.IO.MemoryStream with bounded managed storage, shared
   read/write position, absolute seeking, zero-filled gaps and explicit close semantics.
   Include bridge admission, API documentation and focused stream/DOM checks.

@@ -252,4 +252,6 @@ type selection is needed; snapshots must match the updated bridge and managed li
 
 MemoryStream is included with all public members in the development reference. Its
 64 KiB bound, shared cursor, zero-fill behavior and close/error contracts are documented.
-The JSON serializer adapter remains experiment-local and is not a public library API.
+The later System.Data.Json slice now exposes a provisional public DOM and DOM-only
+JsonSerializer. JsonError retains typed lookup/conversion and nested I/O failures.
+Every public type is inventoried; codec helper classes remain internal.

@@ -1,0 +1,128 @@
+namespace System.Data.Json
+
+import System.*
+import System.Collections.*
+import System.Result.*
+
+// Closed reference hierarchy. Members belong to the kind that supports them.
+public sealed class JsonValue {
+    protected init() { }
+}
+
+public class JsonObject : JsonValue {
+    private var names: ArrayList<string> = ArrayList<string>()
+    private var values: ArrayList<JsonValue> = ArrayList<JsonValue>()
+
+    init(): base() { }
+
+    val Count: int => values.Count
+
+    func Field(name: string) -> Result<JsonValue, JsonError> {
+        for index in 0..<names.Count {
+            if names[index].Equals(name) {
+                return Ok(values[index])
+            }
+        }
+        return Error(JsonError.MissingField(name))
+    }
+
+    func Item(index: int) -> Result<JsonValue, JsonError> {
+        if index < 0 || index >= values.Count {
+            return Error(JsonError.InvalidIndex(index))
+        }
+        return Ok(values[index])
+    }
+
+    func Name(index: int) -> Result<string, JsonError> {
+        if index < 0 || index >= names.Count {
+            return Error(JsonError.InvalidIndex(index))
+        }
+        return Ok(names[index])
+    }
+
+    // Add only: duplicate names never silently replace earlier values.
+    func Add(name: string, value: JsonValue) -> Result<unit, JsonError> {
+        for previous in names {
+            if previous.Equals(name) {
+                return Error(JsonError.DuplicateField(name))
+            }
+        }
+        if values.Count >= 31 {
+            return Error(JsonError.LimitExceeded("Container exceeds 31 entries"))
+        }
+        names.Add(name)
+        values.Add(value)
+        return Ok(())
+    }
+}
+
+public class JsonArray : JsonValue {
+    private var values: ArrayList<JsonValue> = ArrayList<JsonValue>()
+
+    init(): base() { }
+
+    val Count: int => values.Count
+
+    func Item(index: int) -> Result<JsonValue, JsonError> {
+        if index < 0 || index >= values.Count {
+            return Error(JsonError.InvalidIndex(index))
+        }
+        return Ok(values[index])
+    }
+
+    func Add(value: JsonValue) -> Result<unit, JsonError> {
+        if values.Count >= 31 {
+            return Error(JsonError.LimitExceeded("Container exceeds 31 entries"))
+        }
+        values.Add(value)
+        return Ok(())
+    }
+}
+
+public class JsonString : JsonValue {
+    private var value: string = ""
+
+    init(value: string): base() {
+        self.value = value
+    }
+
+    val Value: string => value
+}
+
+public class JsonNumber : JsonValue {
+    private var text: string = ""
+
+    private init(text: string): base() {
+        self.text = text
+    }
+
+    val Text: string => text
+
+    static func Parse(text: string) -> Result<JsonNumber, JsonError> {
+        if !JsonSyntax.ValidNumber(text) {
+            return Error(JsonError.InvalidNumber)
+        }
+        return Ok(JsonNumber(text))
+    }
+
+    func AsInt32() -> Result<int, JsonError> {
+        return match Int32.Parse(text) {
+            Ok(let value) => Ok(value)
+            Error(_) => Error(JsonError.NumberOutOfRange)
+        }
+    }
+}
+
+public class JsonBoolean : JsonValue {
+    private var value: bool = false
+
+    init(value: bool): base() {
+        self.value = value
+    }
+
+    val Value: bool => value
+}
+
+public class JsonNull : JsonValue {
+    init(): base() { }
+}

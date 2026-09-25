@@ -126,7 +126,7 @@ static class ReflectionBindings
     public static bool IsReference(string type) => ReferenceTypes.Contains(type);
     public static bool IsArray(string type) => ReferenceTypes.Any(t => type == $"arrayref<{t}>");
     public static bool IsType(string type) => IsReference(type) || IsArray(type) || type is "System.RuntimeTypeHandle" or "System.Introspection.BindingFlags";
-    public static bool Assignable(string source, string target) => source == target || target == "System.Object" && ManagedArrayBindings.IsReference(source) || target == "System.Introspection.MemberInfo" && source is "System.Introspection.FieldInfo" or "System.Introspection.MethodInfo" or "System.Introspection.PropertyInfo" or "System.Introspection.TypeInfo";
+    public static bool Assignable(string source, string target) => source == target || JsonBindings.Assignable(source, target) || target == "System.Object" && ManagedArrayBindings.IsReference(source) || target == "System.Introspection.MemberInfo" && source is "System.Introspection.FieldInfo" or "System.Introspection.MethodInfo" or "System.Introspection.PropertyInfo" or "System.Introspection.TypeInfo";
     public static string? Type(TypeReference type)
     {
         if (type is ArrayType { IsVector: true } array && ReferenceTypes.Contains(array.ElementType.FullName)) return $"arrayref<{array.ElementType.FullName}>";

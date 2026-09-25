@@ -1,0 +1,2393 @@
+; Generated from runtime/raven/src/System/Data/Json/JsonError.rvn. Regenerate with build_runtime_library.py.
+.type System.Data.Json.JsonError
+.sealed
+.custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+.implements System.Runtime.CompilerServices.IUnion
+.field private Metadata_V1_3C5461673E Byte
+.field private Metadata_V1_3C53796E7461785061796C6F61643E System.Data.Json.JsonError.Syntax
+.field private Metadata_V1_3C4C696D697445786365656465645061796C6F61643E System.Data.Json.JsonError.LimitExceeded
+.field private Metadata_V1_3C547970654D69736D617463685061796C6F61643E System.Data.Json.JsonError.TypeMismatch
+.field private Metadata_V1_3C4D697373696E674669656C645061796C6F61643E System.Data.Json.JsonError.MissingField
+.field private Metadata_V1_3C4475706C69636174654669656C645061796C6F61643E System.Data.Json.JsonError.DuplicateField
+.field private Metadata_V1_3C496E76616C6964496E6465785061796C6F61643E System.Data.Json.JsonError.InvalidIndex
+.field private Metadata_V1_3C496E76616C69644E756D6265725061796C6F61643E System.Data.Json.JsonError.InvalidNumber
+.field private Metadata_V1_3C4E756D6265724F75744F6652616E67655061796C6F61643E System.Data.Json.JsonError.NumberOutOfRange
+.field private Metadata_V1_3C526561645061796C6F61643E System.Data.Json.JsonError.Read
+.field private Metadata_V1_3C57726974655061796C6F61643E System.Data.Json.JsonError.Write
+.property instance Value() -> System.Object
+.get instance System.Data.Json.JsonError::get_Value()
+.end
+.property instance HasValue() -> Boolean
+.get instance System.Data.Json.JsonError::get_HasValue()
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000001_IL_0000:
+ldarg 0
+M00000001_IL_0001:
+M00000001_IL_0002:
+ref.isnull
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0004:
+brtrue M00000001_IL_000e
+M00000001_IL_0009:
+br M00000001_IL_0014
+M00000001_IL_000e:
+ldstr "null"
+M00000001_IL_0013:
+ret
+M00000001_IL_0014:
+M00000001_IL_0015:
+ldarg 0
+M00000001_IL_0016:
+isinst String
+M00000001_IL_001b:
+M00000001_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_001e:
+brtrue M00000001_IL_0028
+M00000001_IL_0023:
+br M00000001_IL_0043
+M00000001_IL_0028:
+ldstr "\u0022"
+M00000001_IL_002d:
+ldarg 0
+M00000001_IL_002e:
+castclass String
+M00000001_IL_0033:
+call System.String::Concat(String,String)
+M00000001_IL_0038:
+ldstr "\u0022"
+M00000001_IL_003d:
+call System.String::Concat(String,String)
+M00000001_IL_0042:
+ret
+M00000001_IL_0043:
+M00000001_IL_0044:
+ldarg 0
+M00000001_IL_0045:
+isinst Char
+M00000001_IL_004a:
+dup
+M00000001_IL_004b:
+ref.isnull
+brfalse M00000001_IL_0057
+M00000001_IL_0050:
+pop
+M00000001_IL_0051:
+ldc.i4 0
+M00000001_IL_0052:
+br M00000001_IL_005e
+M00000001_IL_0057:
+unbox.any Char
+M00000001_IL_005c:
+pop
+M00000001_IL_005d:
+ldc.i4 1
+M00000001_IL_005e:
+brtrue M00000001_IL_0068
+M00000001_IL_0063:
+br M00000001_IL_0083
+M00000001_IL_0068:
+ldstr "\u0027"
+M00000001_IL_006d:
+ldarg 0
+M00000001_IL_006e:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000001_IL_0073:
+call System.String::Concat(String,String)
+M00000001_IL_0078:
+ldstr "\u0027"
+M00000001_IL_007d:
+call System.String::Concat(String,String)
+M00000001_IL_0082:
+ret
+M00000001_IL_0083:
+M00000001_IL_0084:
+ldarg 0
+M00000001_IL_0085:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000001_IL_008a:
+ret
+.end
+.method instance byref .ctor(System.Data.Json.JsonError.Syntax value) -> Void
+.local Byte local0
+.local System.Data.Json.JsonError.Syntax local1
+.local Byte unionDefault1_0
+.local System.Data.Json.JsonError.Syntax unionDefault1_1
+.local System.Data.Json.JsonError.LimitExceeded unionDefault1_2
+.local System.Data.Json.JsonError.TypeMismatch unionDefault1_3
+.local System.Data.Json.JsonError.MissingField unionDefault1_4
+.local System.Data.Json.JsonError.DuplicateField unionDefault1_5
+.local System.Data.Json.JsonError.InvalidIndex unionDefault1_6
+.local System.Data.Json.JsonError.InvalidNumber unionDefault1_7
+.local System.Data.Json.JsonError.NumberOutOfRange unionDefault1_8
+.local System.Data.Json.JsonError.Read unionDefault1_9
+.local System.Data.Json.JsonError.Write unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Data.Json.JsonError.Syntax
+M00000002_IL_0000:
+ldarg 0
+M00000002_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Data.Json.JsonError.Syntax
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Data.Json.JsonError::Metadata_V1_3C53796E7461785061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Data.Json.JsonError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Data.Json.JsonError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Data.Json.JsonError.TypeMismatch
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Data.Json.JsonError::Metadata_V1_3C547970654D69736D617463685061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Data.Json.JsonError.MissingField
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Data.Json.JsonError::Metadata_V1_3C4D697373696E674669656C645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Data.Json.JsonError.DuplicateField
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Data.Json.JsonError::Metadata_V1_3C4475706C69636174654669656C645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Data.Json.JsonError.InvalidIndex
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C6964496E6465785061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Data.Json.JsonError.InvalidNumber
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C69644E756D6265725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Data.Json.JsonError.NumberOutOfRange
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Data.Json.JsonError::Metadata_V1_3C4E756D6265724F75744F6652616E67655061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Data.Json.JsonError.Read
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Data.Json.JsonError::Metadata_V1_3C526561645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Data.Json.JsonError.Write
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Data.Json.JsonError::Metadata_V1_3C57726974655061796C6F61643E
+pop
+M00000002_IL_0007:
+ldc.i4 1
+M00000002_IL_0008:
+stloc local0
+M00000002_IL_0009:
+ldarg 0
+M00000002_IL_000a:
+ldloc local0
+M00000002_IL_000b:
+conv.u1
+M00000002_IL_000c:
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+M00000002_IL_0011:
+ldarg 1
+M00000002_IL_0012:
+stloc local1
+M00000002_IL_0013:
+ldarg 0
+M00000002_IL_0014:
+ldloc local1
+M00000002_IL_0015:
+stfld System.Data.Json.JsonError::Metadata_V1_3C53796E7461785061796C6F61643E
+pop
+M00000002_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Data.Json.JsonError.Syntax& value) -> Boolean
+M00000003_IL_0000:
+ldarg 0
+M00000003_IL_0001:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000003_IL_0006:
+conv.i4
+M00000003_IL_0007:
+ldc.i4 1
+M00000003_IL_0008:
+conv.i4
+M00000003_IL_0009:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_000b:
+brtrue M00000003_IL_0015
+M00000003_IL_0010:
+br M00000003_IL_0023
+M00000003_IL_0015:
+ldarg 1
+M00000003_IL_0016:
+ldarg 0
+M00000003_IL_0017:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C53796E7461785061796C6F61643E
+M00000003_IL_001c:
+stobj System.Data.Json.JsonError.Syntax
+M00000003_IL_0021:
+ldc.i4 1
+M00000003_IL_0022:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000003_IL_0023:
+M00000003_IL_0024:
+ldc.i4 0
+M00000003_IL_0025:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Data.Json.JsonError.LimitExceeded value) -> Void
+.local Byte local0
+.local System.Data.Json.JsonError.LimitExceeded local1
+.local Byte unionDefault1_0
+.local System.Data.Json.JsonError.Syntax unionDefault1_1
+.local System.Data.Json.JsonError.LimitExceeded unionDefault1_2
+.local System.Data.Json.JsonError.TypeMismatch unionDefault1_3
+.local System.Data.Json.JsonError.MissingField unionDefault1_4
+.local System.Data.Json.JsonError.DuplicateField unionDefault1_5
+.local System.Data.Json.JsonError.InvalidIndex unionDefault1_6
+.local System.Data.Json.JsonError.InvalidNumber unionDefault1_7
+.local System.Data.Json.JsonError.NumberOutOfRange unionDefault1_8
+.local System.Data.Json.JsonError.Read unionDefault1_9
+.local System.Data.Json.JsonError.Write unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Data.Json.JsonError.LimitExceeded
+M00000004_IL_0000:
+ldarg 0
+M00000004_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Data.Json.JsonError.Syntax
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Data.Json.JsonError::Metadata_V1_3C53796E7461785061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Data.Json.JsonError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Data.Json.JsonError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Data.Json.JsonError.TypeMismatch
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Data.Json.JsonError::Metadata_V1_3C547970654D69736D617463685061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Data.Json.JsonError.MissingField
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Data.Json.JsonError::Metadata_V1_3C4D697373696E674669656C645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Data.Json.JsonError.DuplicateField
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Data.Json.JsonError::Metadata_V1_3C4475706C69636174654669656C645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Data.Json.JsonError.InvalidIndex
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C6964496E6465785061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Data.Json.JsonError.InvalidNumber
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C69644E756D6265725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Data.Json.JsonError.NumberOutOfRange
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Data.Json.JsonError::Metadata_V1_3C4E756D6265724F75744F6652616E67655061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Data.Json.JsonError.Read
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Data.Json.JsonError::Metadata_V1_3C526561645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Data.Json.JsonError.Write
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Data.Json.JsonError::Metadata_V1_3C57726974655061796C6F61643E
+pop
+M00000004_IL_0007:
+ldc.i4 2
+M00000004_IL_0008:
+stloc local0
+M00000004_IL_0009:
+ldarg 0
+M00000004_IL_000a:
+ldloc local0
+M00000004_IL_000b:
+conv.u1
+M00000004_IL_000c:
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+M00000004_IL_0011:
+ldarg 1
+M00000004_IL_0012:
+stloc local1
+M00000004_IL_0013:
+ldarg 0
+M00000004_IL_0014:
+ldloc local1
+M00000004_IL_0015:
+stfld System.Data.Json.JsonError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000004_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Data.Json.JsonError.LimitExceeded& value) -> Boolean
+M00000005_IL_0000:
+ldarg 0
+M00000005_IL_0001:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000005_IL_0006:
+conv.i4
+M00000005_IL_0007:
+ldc.i4 2
+M00000005_IL_0008:
+conv.i4
+M00000005_IL_0009:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_000b:
+brtrue M00000005_IL_0015
+M00000005_IL_0010:
+br M00000005_IL_0023
+M00000005_IL_0015:
+ldarg 1
+M00000005_IL_0016:
+ldarg 0
+M00000005_IL_0017:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+M00000005_IL_001c:
+stobj System.Data.Json.JsonError.LimitExceeded
+M00000005_IL_0021:
+ldc.i4 1
+M00000005_IL_0022:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000005_IL_0023:
+M00000005_IL_0024:
+ldc.i4 0
+M00000005_IL_0025:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Data.Json.JsonError.TypeMismatch value) -> Void
+.local Byte local0
+.local System.Data.Json.JsonError.TypeMismatch local1
+.local Byte unionDefault1_0
+.local System.Data.Json.JsonError.Syntax unionDefault1_1
+.local System.Data.Json.JsonError.LimitExceeded unionDefault1_2
+.local System.Data.Json.JsonError.TypeMismatch unionDefault1_3
+.local System.Data.Json.JsonError.MissingField unionDefault1_4
+.local System.Data.Json.JsonError.DuplicateField unionDefault1_5
+.local System.Data.Json.JsonError.InvalidIndex unionDefault1_6
+.local System.Data.Json.JsonError.InvalidNumber unionDefault1_7
+.local System.Data.Json.JsonError.NumberOutOfRange unionDefault1_8
+.local System.Data.Json.JsonError.Read unionDefault1_9
+.local System.Data.Json.JsonError.Write unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Data.Json.JsonError.TypeMismatch
+M00000006_IL_0000:
+ldarg 0
+M00000006_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Data.Json.JsonError.Syntax
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Data.Json.JsonError::Metadata_V1_3C53796E7461785061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Data.Json.JsonError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Data.Json.JsonError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Data.Json.JsonError.TypeMismatch
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Data.Json.JsonError::Metadata_V1_3C547970654D69736D617463685061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Data.Json.JsonError.MissingField
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Data.Json.JsonError::Metadata_V1_3C4D697373696E674669656C645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Data.Json.JsonError.DuplicateField
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Data.Json.JsonError::Metadata_V1_3C4475706C69636174654669656C645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Data.Json.JsonError.InvalidIndex
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C6964496E6465785061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Data.Json.JsonError.InvalidNumber
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C69644E756D6265725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Data.Json.JsonError.NumberOutOfRange
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Data.Json.JsonError::Metadata_V1_3C4E756D6265724F75744F6652616E67655061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Data.Json.JsonError.Read
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Data.Json.JsonError::Metadata_V1_3C526561645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Data.Json.JsonError.Write
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Data.Json.JsonError::Metadata_V1_3C57726974655061796C6F61643E
+pop
+M00000006_IL_0007:
+ldc.i4 3
+M00000006_IL_0008:
+stloc local0
+M00000006_IL_0009:
+ldarg 0
+M00000006_IL_000a:
+ldloc local0
+M00000006_IL_000b:
+conv.u1
+M00000006_IL_000c:
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+M00000006_IL_0011:
+ldarg 1
+M00000006_IL_0012:
+stloc local1
+M00000006_IL_0013:
+ldarg 0
+M00000006_IL_0014:
+ldloc local1
+M00000006_IL_0015:
+stfld System.Data.Json.JsonError::Metadata_V1_3C547970654D69736D617463685061796C6F61643E
+pop
+M00000006_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Data.Json.JsonError.TypeMismatch& value) -> Boolean
+M00000007_IL_0000:
+ldarg 0
+M00000007_IL_0001:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000007_IL_0006:
+conv.i4
+M00000007_IL_0007:
+ldc.i4 3
+M00000007_IL_0008:
+conv.i4
+M00000007_IL_0009:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_000b:
+brtrue M00000007_IL_0015
+M00000007_IL_0010:
+br M00000007_IL_0023
+M00000007_IL_0015:
+ldarg 1
+M00000007_IL_0016:
+ldarg 0
+M00000007_IL_0017:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C547970654D69736D617463685061796C6F61643E
+M00000007_IL_001c:
+stobj System.Data.Json.JsonError.TypeMismatch
+M00000007_IL_0021:
+ldc.i4 1
+M00000007_IL_0022:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000007_IL_0023:
+M00000007_IL_0024:
+ldc.i4 0
+M00000007_IL_0025:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Data.Json.JsonError.MissingField value) -> Void
+.local Byte local0
+.local System.Data.Json.JsonError.MissingField local1
+.local Byte unionDefault1_0
+.local System.Data.Json.JsonError.Syntax unionDefault1_1
+.local System.Data.Json.JsonError.LimitExceeded unionDefault1_2
+.local System.Data.Json.JsonError.TypeMismatch unionDefault1_3
+.local System.Data.Json.JsonError.MissingField unionDefault1_4
+.local System.Data.Json.JsonError.DuplicateField unionDefault1_5
+.local System.Data.Json.JsonError.InvalidIndex unionDefault1_6
+.local System.Data.Json.JsonError.InvalidNumber unionDefault1_7
+.local System.Data.Json.JsonError.NumberOutOfRange unionDefault1_8
+.local System.Data.Json.JsonError.Read unionDefault1_9
+.local System.Data.Json.JsonError.Write unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Data.Json.JsonError.MissingField
+M00000008_IL_0000:
+ldarg 0
+M00000008_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Data.Json.JsonError.Syntax
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Data.Json.JsonError::Metadata_V1_3C53796E7461785061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Data.Json.JsonError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Data.Json.JsonError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Data.Json.JsonError.TypeMismatch
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Data.Json.JsonError::Metadata_V1_3C547970654D69736D617463685061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Data.Json.JsonError.MissingField
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Data.Json.JsonError::Metadata_V1_3C4D697373696E674669656C645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Data.Json.JsonError.DuplicateField
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Data.Json.JsonError::Metadata_V1_3C4475706C69636174654669656C645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Data.Json.JsonError.InvalidIndex
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C6964496E6465785061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Data.Json.JsonError.InvalidNumber
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C69644E756D6265725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Data.Json.JsonError.NumberOutOfRange
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Data.Json.JsonError::Metadata_V1_3C4E756D6265724F75744F6652616E67655061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Data.Json.JsonError.Read
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Data.Json.JsonError::Metadata_V1_3C526561645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Data.Json.JsonError.Write
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Data.Json.JsonError::Metadata_V1_3C57726974655061796C6F61643E
+pop
+M00000008_IL_0007:
+ldc.i4 4
+M00000008_IL_0008:
+stloc local0
+M00000008_IL_0009:
+ldarg 0
+M00000008_IL_000a:
+ldloc local0
+M00000008_IL_000b:
+conv.u1
+M00000008_IL_000c:
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+M00000008_IL_0011:
+ldarg 1
+M00000008_IL_0012:
+stloc local1
+M00000008_IL_0013:
+ldarg 0
+M00000008_IL_0014:
+ldloc local1
+M00000008_IL_0015:
+stfld System.Data.Json.JsonError::Metadata_V1_3C4D697373696E674669656C645061796C6F61643E
+pop
+M00000008_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Data.Json.JsonError.MissingField& value) -> Boolean
+M00000009_IL_0000:
+ldarg 0
+M00000009_IL_0001:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000009_IL_0006:
+conv.i4
+M00000009_IL_0007:
+ldc.i4 4
+M00000009_IL_0008:
+conv.i4
+M00000009_IL_0009:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_000b:
+brtrue M00000009_IL_0015
+M00000009_IL_0010:
+br M00000009_IL_0023
+M00000009_IL_0015:
+ldarg 1
+M00000009_IL_0016:
+ldarg 0
+M00000009_IL_0017:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C4D697373696E674669656C645061796C6F61643E
+M00000009_IL_001c:
+stobj System.Data.Json.JsonError.MissingField
+M00000009_IL_0021:
+ldc.i4 1
+M00000009_IL_0022:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000009_IL_0023:
+M00000009_IL_0024:
+ldc.i4 0
+M00000009_IL_0025:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Data.Json.JsonError.DuplicateField value) -> Void
+.local Byte local0
+.local System.Data.Json.JsonError.DuplicateField local1
+.local Byte unionDefault1_0
+.local System.Data.Json.JsonError.Syntax unionDefault1_1
+.local System.Data.Json.JsonError.LimitExceeded unionDefault1_2
+.local System.Data.Json.JsonError.TypeMismatch unionDefault1_3
+.local System.Data.Json.JsonError.MissingField unionDefault1_4
+.local System.Data.Json.JsonError.DuplicateField unionDefault1_5
+.local System.Data.Json.JsonError.InvalidIndex unionDefault1_6
+.local System.Data.Json.JsonError.InvalidNumber unionDefault1_7
+.local System.Data.Json.JsonError.NumberOutOfRange unionDefault1_8
+.local System.Data.Json.JsonError.Read unionDefault1_9
+.local System.Data.Json.JsonError.Write unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Data.Json.JsonError.DuplicateField
+M0000000a_IL_0000:
+ldarg 0
+M0000000a_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Data.Json.JsonError.Syntax
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Data.Json.JsonError::Metadata_V1_3C53796E7461785061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Data.Json.JsonError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Data.Json.JsonError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Data.Json.JsonError.TypeMismatch
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Data.Json.JsonError::Metadata_V1_3C547970654D69736D617463685061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Data.Json.JsonError.MissingField
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Data.Json.JsonError::Metadata_V1_3C4D697373696E674669656C645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Data.Json.JsonError.DuplicateField
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Data.Json.JsonError::Metadata_V1_3C4475706C69636174654669656C645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Data.Json.JsonError.InvalidIndex
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C6964496E6465785061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Data.Json.JsonError.InvalidNumber
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C69644E756D6265725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Data.Json.JsonError.NumberOutOfRange
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Data.Json.JsonError::Metadata_V1_3C4E756D6265724F75744F6652616E67655061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Data.Json.JsonError.Read
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Data.Json.JsonError::Metadata_V1_3C526561645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Data.Json.JsonError.Write
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Data.Json.JsonError::Metadata_V1_3C57726974655061796C6F61643E
+pop
+M0000000a_IL_0007:
+ldc.i4 5
+M0000000a_IL_0008:
+stloc local0
+M0000000a_IL_0009:
+ldarg 0
+M0000000a_IL_000a:
+ldloc local0
+M0000000a_IL_000b:
+conv.u1
+M0000000a_IL_000c:
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+M0000000a_IL_0011:
+ldarg 1
+M0000000a_IL_0012:
+stloc local1
+M0000000a_IL_0013:
+ldarg 0
+M0000000a_IL_0014:
+ldloc local1
+M0000000a_IL_0015:
+stfld System.Data.Json.JsonError::Metadata_V1_3C4475706C69636174654669656C645061796C6F61643E
+pop
+M0000000a_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Data.Json.JsonError.DuplicateField& value) -> Boolean
+M0000000b_IL_0000:
+ldarg 0
+M0000000b_IL_0001:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M0000000b_IL_0006:
+conv.i4
+M0000000b_IL_0007:
+ldc.i4 5
+M0000000b_IL_0008:
+conv.i4
+M0000000b_IL_0009:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_000b:
+brtrue M0000000b_IL_0015
+M0000000b_IL_0010:
+br M0000000b_IL_0023
+M0000000b_IL_0015:
+ldarg 1
+M0000000b_IL_0016:
+ldarg 0
+M0000000b_IL_0017:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C4475706C69636174654669656C645061796C6F61643E
+M0000000b_IL_001c:
+stobj System.Data.Json.JsonError.DuplicateField
+M0000000b_IL_0021:
+ldc.i4 1
+M0000000b_IL_0022:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000b_IL_0023:
+M0000000b_IL_0024:
+ldc.i4 0
+M0000000b_IL_0025:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Data.Json.JsonError.InvalidIndex value) -> Void
+.local Byte local0
+.local System.Data.Json.JsonError.InvalidIndex local1
+.local Byte unionDefault1_0
+.local System.Data.Json.JsonError.Syntax unionDefault1_1
+.local System.Data.Json.JsonError.LimitExceeded unionDefault1_2
+.local System.Data.Json.JsonError.TypeMismatch unionDefault1_3
+.local System.Data.Json.JsonError.MissingField unionDefault1_4
+.local System.Data.Json.JsonError.DuplicateField unionDefault1_5
+.local System.Data.Json.JsonError.InvalidIndex unionDefault1_6
+.local System.Data.Json.JsonError.InvalidNumber unionDefault1_7
+.local System.Data.Json.JsonError.NumberOutOfRange unionDefault1_8
+.local System.Data.Json.JsonError.Read unionDefault1_9
+.local System.Data.Json.JsonError.Write unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Data.Json.JsonError.InvalidIndex
+M0000000c_IL_0000:
+ldarg 0
+M0000000c_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Data.Json.JsonError.Syntax
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Data.Json.JsonError::Metadata_V1_3C53796E7461785061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Data.Json.JsonError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Data.Json.JsonError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Data.Json.JsonError.TypeMismatch
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Data.Json.JsonError::Metadata_V1_3C547970654D69736D617463685061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Data.Json.JsonError.MissingField
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Data.Json.JsonError::Metadata_V1_3C4D697373696E674669656C645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Data.Json.JsonError.DuplicateField
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Data.Json.JsonError::Metadata_V1_3C4475706C69636174654669656C645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Data.Json.JsonError.InvalidIndex
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C6964496E6465785061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Data.Json.JsonError.InvalidNumber
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C69644E756D6265725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Data.Json.JsonError.NumberOutOfRange
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Data.Json.JsonError::Metadata_V1_3C4E756D6265724F75744F6652616E67655061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Data.Json.JsonError.Read
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Data.Json.JsonError::Metadata_V1_3C526561645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Data.Json.JsonError.Write
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Data.Json.JsonError::Metadata_V1_3C57726974655061796C6F61643E
+pop
+M0000000c_IL_0007:
+ldc.i4 6
+M0000000c_IL_0008:
+stloc local0
+M0000000c_IL_0009:
+ldarg 0
+M0000000c_IL_000a:
+ldloc local0
+M0000000c_IL_000b:
+conv.u1
+M0000000c_IL_000c:
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+M0000000c_IL_0011:
+ldarg 1
+M0000000c_IL_0012:
+stloc local1
+M0000000c_IL_0013:
+ldarg 0
+M0000000c_IL_0014:
+ldloc local1
+M0000000c_IL_0015:
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C6964496E6465785061796C6F61643E
+pop
+M0000000c_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Data.Json.JsonError.InvalidIndex& value) -> Boolean
+M0000000d_IL_0000:
+ldarg 0
+M0000000d_IL_0001:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M0000000d_IL_0006:
+conv.i4
+M0000000d_IL_0007:
+ldc.i4 6
+M0000000d_IL_0008:
+conv.i4
+M0000000d_IL_0009:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_000b:
+brtrue M0000000d_IL_0015
+M0000000d_IL_0010:
+br M0000000d_IL_0023
+M0000000d_IL_0015:
+ldarg 1
+M0000000d_IL_0016:
+ldarg 0
+M0000000d_IL_0017:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C6964496E6465785061796C6F61643E
+M0000000d_IL_001c:
+stobj System.Data.Json.JsonError.InvalidIndex
+M0000000d_IL_0021:
+ldc.i4 1
+M0000000d_IL_0022:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000d_IL_0023:
+M0000000d_IL_0024:
+ldc.i4 0
+M0000000d_IL_0025:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Data.Json.JsonError.InvalidNumber value) -> Void
+.local Byte local0
+.local System.Data.Json.JsonError.InvalidNumber local1
+.local Byte unionDefault1_0
+.local System.Data.Json.JsonError.Syntax unionDefault1_1
+.local System.Data.Json.JsonError.LimitExceeded unionDefault1_2
+.local System.Data.Json.JsonError.TypeMismatch unionDefault1_3
+.local System.Data.Json.JsonError.MissingField unionDefault1_4
+.local System.Data.Json.JsonError.DuplicateField unionDefault1_5
+.local System.Data.Json.JsonError.InvalidIndex unionDefault1_6
+.local System.Data.Json.JsonError.InvalidNumber unionDefault1_7
+.local System.Data.Json.JsonError.NumberOutOfRange unionDefault1_8
+.local System.Data.Json.JsonError.Read unionDefault1_9
+.local System.Data.Json.JsonError.Write unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Data.Json.JsonError.InvalidNumber
+M0000000e_IL_0000:
+ldarg 0
+M0000000e_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Data.Json.JsonError.Syntax
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Data.Json.JsonError::Metadata_V1_3C53796E7461785061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Data.Json.JsonError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Data.Json.JsonError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Data.Json.JsonError.TypeMismatch
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Data.Json.JsonError::Metadata_V1_3C547970654D69736D617463685061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Data.Json.JsonError.MissingField
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Data.Json.JsonError::Metadata_V1_3C4D697373696E674669656C645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Data.Json.JsonError.DuplicateField
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Data.Json.JsonError::Metadata_V1_3C4475706C69636174654669656C645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Data.Json.JsonError.InvalidIndex
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C6964496E6465785061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Data.Json.JsonError.InvalidNumber
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C69644E756D6265725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Data.Json.JsonError.NumberOutOfRange
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Data.Json.JsonError::Metadata_V1_3C4E756D6265724F75744F6652616E67655061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Data.Json.JsonError.Read
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Data.Json.JsonError::Metadata_V1_3C526561645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Data.Json.JsonError.Write
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Data.Json.JsonError::Metadata_V1_3C57726974655061796C6F61643E
+pop
+M0000000e_IL_0007:
+ldc.i4 7
+M0000000e_IL_0008:
+stloc local0
+M0000000e_IL_0009:
+ldarg 0
+M0000000e_IL_000a:
+ldloc local0
+M0000000e_IL_000b:
+conv.u1
+M0000000e_IL_000c:
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+M0000000e_IL_0011:
+ldarg 1
+M0000000e_IL_0012:
+stloc local1
+M0000000e_IL_0013:
+ldarg 0
+M0000000e_IL_0014:
+ldloc local1
+M0000000e_IL_0015:
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C69644E756D6265725061796C6F61643E
+pop
+M0000000e_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Data.Json.JsonError.InvalidNumber& value) -> Boolean
+M0000000f_IL_0000:
+ldarg 0
+M0000000f_IL_0001:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M0000000f_IL_0006:
+conv.i4
+M0000000f_IL_0007:
+ldc.i4 7
+M0000000f_IL_0008:
+conv.i4
+M0000000f_IL_0009:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_000b:
+brtrue M0000000f_IL_0015
+M0000000f_IL_0010:
+br M0000000f_IL_0023
+M0000000f_IL_0015:
+ldarg 1
+M0000000f_IL_0016:
+ldarg 0
+M0000000f_IL_0017:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C69644E756D6265725061796C6F61643E
+M0000000f_IL_001c:
+stobj System.Data.Json.JsonError.InvalidNumber
+M0000000f_IL_0021:
+ldc.i4 1
+M0000000f_IL_0022:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000f_IL_0023:
+M0000000f_IL_0024:
+ldc.i4 0
+M0000000f_IL_0025:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Data.Json.JsonError.NumberOutOfRange value) -> Void
+.local Byte local0
+.local System.Data.Json.JsonError.NumberOutOfRange local1
+.local Byte unionDefault1_0
+.local System.Data.Json.JsonError.Syntax unionDefault1_1
+.local System.Data.Json.JsonError.LimitExceeded unionDefault1_2
+.local System.Data.Json.JsonError.TypeMismatch unionDefault1_3
+.local System.Data.Json.JsonError.MissingField unionDefault1_4
+.local System.Data.Json.JsonError.DuplicateField unionDefault1_5
+.local System.Data.Json.JsonError.InvalidIndex unionDefault1_6
+.local System.Data.Json.JsonError.InvalidNumber unionDefault1_7
+.local System.Data.Json.JsonError.NumberOutOfRange unionDefault1_8
+.local System.Data.Json.JsonError.Read unionDefault1_9
+.local System.Data.Json.JsonError.Write unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Data.Json.JsonError.NumberOutOfRange
+M00000010_IL_0000:
+ldarg 0
+M00000010_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Data.Json.JsonError.Syntax
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Data.Json.JsonError::Metadata_V1_3C53796E7461785061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Data.Json.JsonError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Data.Json.JsonError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Data.Json.JsonError.TypeMismatch
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Data.Json.JsonError::Metadata_V1_3C547970654D69736D617463685061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Data.Json.JsonError.MissingField
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Data.Json.JsonError::Metadata_V1_3C4D697373696E674669656C645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Data.Json.JsonError.DuplicateField
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Data.Json.JsonError::Metadata_V1_3C4475706C69636174654669656C645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Data.Json.JsonError.InvalidIndex
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C6964496E6465785061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Data.Json.JsonError.InvalidNumber
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C69644E756D6265725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Data.Json.JsonError.NumberOutOfRange
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Data.Json.JsonError::Metadata_V1_3C4E756D6265724F75744F6652616E67655061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Data.Json.JsonError.Read
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Data.Json.JsonError::Metadata_V1_3C526561645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Data.Json.JsonError.Write
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Data.Json.JsonError::Metadata_V1_3C57726974655061796C6F61643E
+pop
+M00000010_IL_0007:
+ldc.i4 8
+M00000010_IL_0008:
+stloc local0
+M00000010_IL_0009:
+ldarg 0
+M00000010_IL_000a:
+ldloc local0
+M00000010_IL_000b:
+conv.u1
+M00000010_IL_000c:
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+M00000010_IL_0011:
+ldarg 1
+M00000010_IL_0012:
+stloc local1
+M00000010_IL_0013:
+ldarg 0
+M00000010_IL_0014:
+ldloc local1
+M00000010_IL_0015:
+stfld System.Data.Json.JsonError::Metadata_V1_3C4E756D6265724F75744F6652616E67655061796C6F61643E
+pop
+M00000010_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Data.Json.JsonError.NumberOutOfRange& value) -> Boolean
+M00000011_IL_0000:
+ldarg 0
+M00000011_IL_0001:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000011_IL_0006:
+conv.i4
+M00000011_IL_0007:
+ldc.i4 8
+M00000011_IL_0008:
+conv.i4
+M00000011_IL_0009:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_000b:
+brtrue M00000011_IL_0015
+M00000011_IL_0010:
+br M00000011_IL_0023
+M00000011_IL_0015:
+ldarg 1
+M00000011_IL_0016:
+ldarg 0
+M00000011_IL_0017:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C4E756D6265724F75744F6652616E67655061796C6F61643E
+M00000011_IL_001c:
+stobj System.Data.Json.JsonError.NumberOutOfRange
+M00000011_IL_0021:
+ldc.i4 1
+M00000011_IL_0022:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000011_IL_0023:
+M00000011_IL_0024:
+ldc.i4 0
+M00000011_IL_0025:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Data.Json.JsonError.Read value) -> Void
+.local Byte local0
+.local System.Data.Json.JsonError.Read local1
+.local Byte unionDefault1_0
+.local System.Data.Json.JsonError.Syntax unionDefault1_1
+.local System.Data.Json.JsonError.LimitExceeded unionDefault1_2
+.local System.Data.Json.JsonError.TypeMismatch unionDefault1_3
+.local System.Data.Json.JsonError.MissingField unionDefault1_4
+.local System.Data.Json.JsonError.DuplicateField unionDefault1_5
+.local System.Data.Json.JsonError.InvalidIndex unionDefault1_6
+.local System.Data.Json.JsonError.InvalidNumber unionDefault1_7
+.local System.Data.Json.JsonError.NumberOutOfRange unionDefault1_8
+.local System.Data.Json.JsonError.Read unionDefault1_9
+.local System.Data.Json.JsonError.Write unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Data.Json.JsonError.Read
+M00000012_IL_0000:
+ldarg 0
+M00000012_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Data.Json.JsonError.Syntax
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Data.Json.JsonError::Metadata_V1_3C53796E7461785061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Data.Json.JsonError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Data.Json.JsonError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Data.Json.JsonError.TypeMismatch
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Data.Json.JsonError::Metadata_V1_3C547970654D69736D617463685061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Data.Json.JsonError.MissingField
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Data.Json.JsonError::Metadata_V1_3C4D697373696E674669656C645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Data.Json.JsonError.DuplicateField
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Data.Json.JsonError::Metadata_V1_3C4475706C69636174654669656C645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Data.Json.JsonError.InvalidIndex
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C6964496E6465785061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Data.Json.JsonError.InvalidNumber
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C69644E756D6265725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Data.Json.JsonError.NumberOutOfRange
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Data.Json.JsonError::Metadata_V1_3C4E756D6265724F75744F6652616E67655061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Data.Json.JsonError.Read
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Data.Json.JsonError::Metadata_V1_3C526561645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Data.Json.JsonError.Write
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Data.Json.JsonError::Metadata_V1_3C57726974655061796C6F61643E
+pop
+M00000012_IL_0007:
+ldc.i4 9
+M00000012_IL_0009:
+stloc local0
+M00000012_IL_000a:
+ldarg 0
+M00000012_IL_000b:
+ldloc local0
+M00000012_IL_000c:
+conv.u1
+M00000012_IL_000d:
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+M00000012_IL_0012:
+ldarg 1
+M00000012_IL_0013:
+stloc local1
+M00000012_IL_0014:
+ldarg 0
+M00000012_IL_0015:
+ldloc local1
+M00000012_IL_0016:
+stfld System.Data.Json.JsonError::Metadata_V1_3C526561645061796C6F61643E
+pop
+M00000012_IL_001b:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Data.Json.JsonError.Read& value) -> Boolean
+M00000013_IL_0000:
+ldarg 0
+M00000013_IL_0001:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000013_IL_0006:
+conv.i4
+M00000013_IL_0007:
+ldc.i4 9
+M00000013_IL_0009:
+conv.i4
+M00000013_IL_000a:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_000c:
+brtrue M00000013_IL_0016
+M00000013_IL_0011:
+br M00000013_IL_0024
+M00000013_IL_0016:
+ldarg 1
+M00000013_IL_0017:
+ldarg 0
+M00000013_IL_0018:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C526561645061796C6F61643E
+M00000013_IL_001d:
+stobj System.Data.Json.JsonError.Read
+M00000013_IL_0022:
+ldc.i4 1
+M00000013_IL_0023:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000013_IL_0024:
+M00000013_IL_0025:
+ldc.i4 0
+M00000013_IL_0026:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance byref .ctor(System.Data.Json.JsonError.Write value) -> Void
+.local Byte local0
+.local System.Data.Json.JsonError.Write local1
+.local Byte unionDefault1_0
+.local System.Data.Json.JsonError.Syntax unionDefault1_1
+.local System.Data.Json.JsonError.LimitExceeded unionDefault1_2
+.local System.Data.Json.JsonError.TypeMismatch unionDefault1_3
+.local System.Data.Json.JsonError.MissingField unionDefault1_4
+.local System.Data.Json.JsonError.DuplicateField unionDefault1_5
+.local System.Data.Json.JsonError.InvalidIndex unionDefault1_6
+.local System.Data.Json.JsonError.InvalidNumber unionDefault1_7
+.local System.Data.Json.JsonError.NumberOutOfRange unionDefault1_8
+.local System.Data.Json.JsonError.Read unionDefault1_9
+.local System.Data.Json.JsonError.Write unionDefault1_10
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Data.Json.JsonError.Write
+M00000014_IL_0000:
+ldarg 0
+M00000014_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Data.Json.JsonError.Syntax
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Data.Json.JsonError::Metadata_V1_3C53796E7461785061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Data.Json.JsonError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Data.Json.JsonError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Data.Json.JsonError.TypeMismatch
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Data.Json.JsonError::Metadata_V1_3C547970654D69736D617463685061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Data.Json.JsonError.MissingField
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Data.Json.JsonError::Metadata_V1_3C4D697373696E674669656C645061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Data.Json.JsonError.DuplicateField
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Data.Json.JsonError::Metadata_V1_3C4475706C69636174654669656C645061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Data.Json.JsonError.InvalidIndex
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C6964496E6465785061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Data.Json.JsonError.InvalidNumber
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C69644E756D6265725061796C6F61643E
+pop
+ldloca unionDefault1_8
+initobj System.Data.Json.JsonError.NumberOutOfRange
+ldarg 0
+ldloc unionDefault1_8
+stfld System.Data.Json.JsonError::Metadata_V1_3C4E756D6265724F75744F6652616E67655061796C6F61643E
+pop
+ldloca unionDefault1_9
+initobj System.Data.Json.JsonError.Read
+ldarg 0
+ldloc unionDefault1_9
+stfld System.Data.Json.JsonError::Metadata_V1_3C526561645061796C6F61643E
+pop
+ldloca unionDefault1_10
+initobj System.Data.Json.JsonError.Write
+ldarg 0
+ldloc unionDefault1_10
+stfld System.Data.Json.JsonError::Metadata_V1_3C57726974655061796C6F61643E
+pop
+M00000014_IL_0007:
+ldc.i4 10
+M00000014_IL_0009:
+stloc local0
+M00000014_IL_000a:
+ldarg 0
+M00000014_IL_000b:
+ldloc local0
+M00000014_IL_000c:
+conv.u1
+M00000014_IL_000d:
+stfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+pop
+M00000014_IL_0012:
+ldarg 1
+M00000014_IL_0013:
+stloc local1
+M00000014_IL_0014:
+ldarg 0
+M00000014_IL_0015:
+ldloc local1
+M00000014_IL_0016:
+stfld System.Data.Json.JsonError::Metadata_V1_3C57726974655061796C6F61643E
+pop
+M00000014_IL_001b:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Data.Json.JsonError.Write& value) -> Boolean
+M00000015_IL_0000:
+ldarg 0
+M00000015_IL_0001:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000015_IL_0006:
+conv.i4
+M00000015_IL_0007:
+ldc.i4 10
+M00000015_IL_0009:
+conv.i4
+M00000015_IL_000a:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000015_IL_000c:
+brtrue M00000015_IL_0016
+M00000015_IL_0011:
+br M00000015_IL_0024
+M00000015_IL_0016:
+ldarg 1
+M00000015_IL_0017:
+ldarg 0
+M00000015_IL_0018:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C57726974655061796C6F61643E
+M00000015_IL_001d:
+stobj System.Data.Json.JsonError.Write
+M00000015_IL_0022:
+ldc.i4 1
+M00000015_IL_0023:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+M00000015_IL_0024:
+M00000015_IL_0025:
+ldc.i4 0
+M00000015_IL_0026:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance override byref ToString() -> String
+.local System.Data.Json.JsonError local0
+.local String local1
+.local String local2
+.local String local3
+.local String local4
+.local String local5
+.local String local6
+.local Int32 local7
+.local System.IO.TextReadError local8
+.local System.IO.StreamError local9
+.local System.Data.Json.JsonError local10
+.local System.Data.Json.JsonError.Syntax local11
+.local System.Data.Json.JsonError local12
+.local System.Data.Json.JsonError.LimitExceeded local13
+.local System.Data.Json.JsonError local14
+.local System.Data.Json.JsonError.TypeMismatch local15
+.local System.Data.Json.JsonError local16
+.local System.Data.Json.JsonError.MissingField local17
+.local System.Data.Json.JsonError local18
+.local System.Data.Json.JsonError.DuplicateField local19
+.local System.Data.Json.JsonError local20
+.local System.Data.Json.JsonError.InvalidIndex local21
+.local System.Data.Json.JsonError local22
+.local System.Data.Json.JsonError.InvalidNumber local23
+.local System.Data.Json.JsonError local24
+.local System.Data.Json.JsonError.NumberOutOfRange local25
+.local System.Data.Json.JsonError local26
+.local System.Data.Json.JsonError.Read local27
+.local System.Data.Json.JsonError local28
+.local System.Data.Json.JsonError.Write local29
+ldloca local0
+initobj System.Data.Json.JsonError
+ldc.i4 0
+stloc local7
+ldloca local8
+initobj System.IO.TextReadError
+ldloca local9
+initobj System.IO.StreamError
+ldloca local10
+initobj System.Data.Json.JsonError
+ldloca local11
+initobj System.Data.Json.JsonError.Syntax
+ldloca local12
+initobj System.Data.Json.JsonError
+ldloca local13
+initobj System.Data.Json.JsonError.LimitExceeded
+ldloca local14
+initobj System.Data.Json.JsonError
+ldloca local15
+initobj System.Data.Json.JsonError.TypeMismatch
+ldloca local16
+initobj System.Data.Json.JsonError
+ldloca local17
+initobj System.Data.Json.JsonError.MissingField
+ldloca local18
+initobj System.Data.Json.JsonError
+ldloca local19
+initobj System.Data.Json.JsonError.DuplicateField
+ldloca local20
+initobj System.Data.Json.JsonError
+ldloca local21
+initobj System.Data.Json.JsonError.InvalidIndex
+ldloca local22
+initobj System.Data.Json.JsonError
+ldloca local23
+initobj System.Data.Json.JsonError.InvalidNumber
+ldloca local24
+initobj System.Data.Json.JsonError
+ldloca local25
+initobj System.Data.Json.JsonError.NumberOutOfRange
+ldloca local26
+initobj System.Data.Json.JsonError
+ldloca local27
+initobj System.Data.Json.JsonError.Read
+ldloca local28
+initobj System.Data.Json.JsonError
+ldloca local29
+initobj System.Data.Json.JsonError.Write
+M00000016_IL_0000:
+M00000016_IL_0001:
+M00000016_IL_0002:
+M00000016_IL_0003:
+ldarg 0
+M00000016_IL_0004:
+ldobj System.Data.Json.JsonError
+M00000016_IL_0009:
+stloc local0
+M00000016_IL_000a:
+ldloc local0
+M00000016_IL_000b:
+stloc local10
+M00000016_IL_000d:
+ldloca local11
+M00000016_IL_000f:
+initobj System.Data.Json.JsonError.Syntax
+M00000016_IL_0015:
+ldloca local10
+M00000016_IL_0017:
+ldloca local11
+M00000016_IL_0019:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.Syntax&)
+M00000016_IL_001e:
+brfalse M00000016_IL_003f
+M00000016_IL_0023:
+ldloca local11
+M00000016_IL_0025:
+call instance System.Data.Json.JsonError.Syntax::get_Message()
+M00000016_IL_002a:
+stloc local2
+M00000016_IL_002b:
+M00000016_IL_002c:
+br M00000016_IL_0037
+M00000016_IL_0037:
+M00000016_IL_0038:
+ldloc local2
+M00000016_IL_0039:
+stloc local1
+M00000016_IL_003a:
+br M00000016_IL_026f
+M00000016_IL_003f:
+M00000016_IL_0040:
+ldloc local0
+M00000016_IL_0041:
+stloc local12
+M00000016_IL_0043:
+ldloca local13
+M00000016_IL_0045:
+initobj System.Data.Json.JsonError.LimitExceeded
+M00000016_IL_004b:
+ldloca local12
+M00000016_IL_004d:
+ldloca local13
+M00000016_IL_004f:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.LimitExceeded&)
+M00000016_IL_0054:
+brfalse M00000016_IL_0075
+M00000016_IL_0059:
+ldloca local13
+M00000016_IL_005b:
+call instance System.Data.Json.JsonError.LimitExceeded::get_Message()
+M00000016_IL_0060:
+stloc local3
+M00000016_IL_0061:
+M00000016_IL_0062:
+br M00000016_IL_006d
+M00000016_IL_006d:
+M00000016_IL_006e:
+ldloc local3
+M00000016_IL_006f:
+stloc local1
+M00000016_IL_0070:
+br M00000016_IL_026f
+M00000016_IL_0075:
+M00000016_IL_0076:
+ldloc local0
+M00000016_IL_0077:
+stloc local14
+M00000016_IL_0079:
+ldloca local15
+M00000016_IL_007b:
+initobj System.Data.Json.JsonError.TypeMismatch
+M00000016_IL_0081:
+ldloca local14
+M00000016_IL_0083:
+ldloca local15
+M00000016_IL_0085:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.TypeMismatch&)
+M00000016_IL_008a:
+brfalse M00000016_IL_00b7
+M00000016_IL_008f:
+ldloca local15
+M00000016_IL_0091:
+call instance System.Data.Json.JsonError.TypeMismatch::get_Expected()
+M00000016_IL_0096:
+stloc local4
+M00000016_IL_0098:
+M00000016_IL_0099:
+br M00000016_IL_00a4
+M00000016_IL_00a4:
+M00000016_IL_00a5:
+ldstr "Expected "
+M00000016_IL_00aa:
+ldloc local4
+M00000016_IL_00ac:
+call System.String::Concat(String,String)
+M00000016_IL_00b1:
+stloc local1
+M00000016_IL_00b2:
+br M00000016_IL_026f
+M00000016_IL_00b7:
+M00000016_IL_00b8:
+ldloc local0
+M00000016_IL_00b9:
+stloc local16
+M00000016_IL_00bb:
+ldloca local17
+M00000016_IL_00bd:
+initobj System.Data.Json.JsonError.MissingField
+M00000016_IL_00c3:
+ldloca local16
+M00000016_IL_00c5:
+ldloca local17
+M00000016_IL_00c7:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.MissingField&)
+M00000016_IL_00cc:
+brfalse M00000016_IL_00f9
+M00000016_IL_00d1:
+ldloca local17
+M00000016_IL_00d3:
+call instance System.Data.Json.JsonError.MissingField::get_Name()
+M00000016_IL_00d8:
+stloc local5
+M00000016_IL_00da:
+M00000016_IL_00db:
+br M00000016_IL_00e6
+M00000016_IL_00e6:
+M00000016_IL_00e7:
+ldstr "Missing field: "
+M00000016_IL_00ec:
+ldloc local5
+M00000016_IL_00ee:
+call System.String::Concat(String,String)
+M00000016_IL_00f3:
+stloc local1
+M00000016_IL_00f4:
+br M00000016_IL_026f
+M00000016_IL_00f9:
+M00000016_IL_00fa:
+ldloc local0
+M00000016_IL_00fb:
+stloc local18
+M00000016_IL_00fd:
+ldloca local19
+M00000016_IL_00ff:
+initobj System.Data.Json.JsonError.DuplicateField
+M00000016_IL_0105:
+ldloca local18
+M00000016_IL_0107:
+ldloca local19
+M00000016_IL_0109:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.DuplicateField&)
+M00000016_IL_010e:
+brfalse M00000016_IL_013b
+M00000016_IL_0113:
+ldloca local19
+M00000016_IL_0115:
+call instance System.Data.Json.JsonError.DuplicateField::get_Name()
+M00000016_IL_011a:
+stloc local6
+M00000016_IL_011c:
+M00000016_IL_011d:
+br M00000016_IL_0128
+M00000016_IL_0128:
+M00000016_IL_0129:
+ldstr "Duplicate field: "
+M00000016_IL_012e:
+ldloc local6
+M00000016_IL_0130:
+call System.String::Concat(String,String)
+M00000016_IL_0135:
+stloc local1
+M00000016_IL_0136:
+br M00000016_IL_026f
+M00000016_IL_013b:
+M00000016_IL_013c:
+ldloc local0
+M00000016_IL_013d:
+stloc local20
+M00000016_IL_013f:
+ldloca local21
+M00000016_IL_0141:
+initobj System.Data.Json.JsonError.InvalidIndex
+M00000016_IL_0147:
+ldloca local20
+M00000016_IL_0149:
+ldloca local21
+M00000016_IL_014b:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.InvalidIndex&)
+M00000016_IL_0150:
+brfalse M00000016_IL_0182
+M00000016_IL_0155:
+ldloca local21
+M00000016_IL_0157:
+call instance System.Data.Json.JsonError.InvalidIndex::get_Index()
+M00000016_IL_015c:
+stloc local7
+M00000016_IL_015e:
+M00000016_IL_015f:
+br M00000016_IL_016a
+M00000016_IL_016a:
+M00000016_IL_016b:
+ldstr "Invalid index: "
+M00000016_IL_0170:
+ldloca local7
+M00000016_IL_0172:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeInt32ToString(Int32&)
+M00000016_IL_0177:
+call System.String::Concat(String,String)
+M00000016_IL_017c:
+stloc local1
+M00000016_IL_017d:
+br M00000016_IL_026f
+M00000016_IL_0182:
+M00000016_IL_0183:
+M00000016_IL_0184:
+ldloc local0
+M00000016_IL_0185:
+stloc local22
+M00000016_IL_0187:
+ldloca local22
+M00000016_IL_0189:
+ldloca local23
+M00000016_IL_018b:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.InvalidNumber&)
+M00000016_IL_0190:
+brfalse M00000016_IL_01af
+M00000016_IL_0195:
+ldloc local23
+M00000016_IL_0197:
+pop
+M00000016_IL_0198:
+M00000016_IL_0199:
+br M00000016_IL_01a4
+M00000016_IL_01a4:
+ldstr "Invalid JSON number"
+M00000016_IL_01a9:
+stloc local1
+M00000016_IL_01aa:
+br M00000016_IL_026f
+M00000016_IL_01af:
+M00000016_IL_01b0:
+ldloc local0
+M00000016_IL_01b1:
+stloc local24
+M00000016_IL_01b3:
+ldloca local24
+M00000016_IL_01b5:
+ldloca local25
+M00000016_IL_01b7:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.NumberOutOfRange&)
+M00000016_IL_01bc:
+brfalse M00000016_IL_01db
+M00000016_IL_01c1:
+ldloc local25
+M00000016_IL_01c3:
+pop
+M00000016_IL_01c4:
+M00000016_IL_01c5:
+br M00000016_IL_01d0
+M00000016_IL_01d0:
+ldstr "Number is not an Int32 integer token"
+M00000016_IL_01d5:
+stloc local1
+M00000016_IL_01d6:
+br M00000016_IL_026f
+M00000016_IL_01db:
+M00000016_IL_01dc:
+ldloc local0
+M00000016_IL_01dd:
+stloc local26
+M00000016_IL_01df:
+ldloca local27
+M00000016_IL_01e1:
+initobj System.Data.Json.JsonError.Read
+M00000016_IL_01e7:
+ldloca local26
+M00000016_IL_01e9:
+ldloca local27
+M00000016_IL_01eb:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.Read&)
+M00000016_IL_01f0:
+brfalse M00000016_IL_0218
+M00000016_IL_01f5:
+ldloca local27
+M00000016_IL_01f7:
+call instance System.Data.Json.JsonError.Read::get_Reason()
+M00000016_IL_01fc:
+stloc local8
+M00000016_IL_01fe:
+M00000016_IL_01ff:
+br M00000016_IL_020a
+M00000016_IL_020a:
+M00000016_IL_020b:
+ldloca local8
+M00000016_IL_020d:
+call instance System.IO.TextReadError::ToString()
+M00000016_IL_0212:
+stloc local1
+M00000016_IL_0213:
+br M00000016_IL_026f
+M00000016_IL_0218:
+M00000016_IL_0219:
+ldloc local0
+M00000016_IL_021a:
+stloc local28
+M00000016_IL_021c:
+ldloca local29
+M00000016_IL_021e:
+initobj System.Data.Json.JsonError.Write
+M00000016_IL_0224:
+ldloca local28
+M00000016_IL_0226:
+ldloca local29
+M00000016_IL_0228:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.Write&)
+M00000016_IL_022d:
+brfalse M00000016_IL_0255
+M00000016_IL_0232:
+ldloca local29
+M00000016_IL_0234:
+call instance System.Data.Json.JsonError.Write::get_Reason()
+M00000016_IL_0239:
+stloc local9
+M00000016_IL_023b:
+M00000016_IL_023c:
+br M00000016_IL_0247
+M00000016_IL_0247:
+M00000016_IL_0248:
+ldloca local9
+M00000016_IL_024a:
+call instance System.IO.StreamError::ToString()
+M00000016_IL_024f:
+stloc local1
+M00000016_IL_0250:
+br M00000016_IL_026f
+M00000016_IL_0255:
+M00000016_IL_0256:
+ldloc local0
+M00000016_IL_0257:
+pop
+M00000016_IL_0258:
+ldc.i4 1
+M00000016_IL_0259:
+brfalse M00000016_IL_026a
+M00000016_IL_025e:
+M00000016_IL_025f:
+ldstr "Empty"
+M00000016_IL_0264:
+stloc local1
+M00000016_IL_0265:
+br M00000016_IL_026f
+M00000016_IL_026a:
+M00000016_IL_026b:
+M00000016_IL_026c:
+M00000016_IL_026d:
+M00000016_IL_026e:
+fault "Guest program reached a terminal failure"
+M00000016_IL_026f:
+M00000016_IL_0270:
+ldloc local1
+M00000016_IL_0271:
+ret
+.end
+.method instance byref get_Value() -> System.Object
+M00000017_IL_0000:
+ldarg 0
+M00000017_IL_0001:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000017_IL_0006:
+conv.i4
+M00000017_IL_0007:
+ldc.i4 1
+M00000017_IL_0008:
+conv.i4
+M00000017_IL_0009:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_000b:
+brtrue M00000017_IL_0015
+M00000017_IL_0010:
+br M00000017_IL_0021
+M00000017_IL_0015:
+ldarg 0
+M00000017_IL_0016:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C53796E7461785061796C6F61643E
+M00000017_IL_001b:
+box System.Data.Json.JsonError.Syntax
+M00000017_IL_0020:
+ret
+M00000017_IL_0021:
+M00000017_IL_0022:
+ldarg 0
+M00000017_IL_0023:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000017_IL_0028:
+conv.i4
+M00000017_IL_0029:
+ldc.i4 2
+M00000017_IL_002a:
+conv.i4
+M00000017_IL_002b:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_002d:
+brtrue M00000017_IL_0037
+M00000017_IL_0032:
+br M00000017_IL_0043
+M00000017_IL_0037:
+ldarg 0
+M00000017_IL_0038:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+M00000017_IL_003d:
+box System.Data.Json.JsonError.LimitExceeded
+M00000017_IL_0042:
+ret
+M00000017_IL_0043:
+M00000017_IL_0044:
+ldarg 0
+M00000017_IL_0045:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000017_IL_004a:
+conv.i4
+M00000017_IL_004b:
+ldc.i4 3
+M00000017_IL_004c:
+conv.i4
+M00000017_IL_004d:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_004f:
+brtrue M00000017_IL_0059
+M00000017_IL_0054:
+br M00000017_IL_0065
+M00000017_IL_0059:
+ldarg 0
+M00000017_IL_005a:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C547970654D69736D617463685061796C6F61643E
+M00000017_IL_005f:
+box System.Data.Json.JsonError.TypeMismatch
+M00000017_IL_0064:
+ret
+M00000017_IL_0065:
+M00000017_IL_0066:
+ldarg 0
+M00000017_IL_0067:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000017_IL_006c:
+conv.i4
+M00000017_IL_006d:
+ldc.i4 4
+M00000017_IL_006e:
+conv.i4
+M00000017_IL_006f:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_0071:
+brtrue M00000017_IL_007b
+M00000017_IL_0076:
+br M00000017_IL_0087
+M00000017_IL_007b:
+ldarg 0
+M00000017_IL_007c:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C4D697373696E674669656C645061796C6F61643E
+M00000017_IL_0081:
+box System.Data.Json.JsonError.MissingField
+M00000017_IL_0086:
+ret
+M00000017_IL_0087:
+M00000017_IL_0088:
+ldarg 0
+M00000017_IL_0089:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000017_IL_008e:
+conv.i4
+M00000017_IL_008f:
+ldc.i4 5
+M00000017_IL_0090:
+conv.i4
+M00000017_IL_0091:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_0093:
+brtrue M00000017_IL_009d
+M00000017_IL_0098:
+br M00000017_IL_00a9
+M00000017_IL_009d:
+ldarg 0
+M00000017_IL_009e:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C4475706C69636174654669656C645061796C6F61643E
+M00000017_IL_00a3:
+box System.Data.Json.JsonError.DuplicateField
+M00000017_IL_00a8:
+ret
+M00000017_IL_00a9:
+M00000017_IL_00aa:
+ldarg 0
+M00000017_IL_00ab:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000017_IL_00b0:
+conv.i4
+M00000017_IL_00b1:
+ldc.i4 6
+M00000017_IL_00b2:
+conv.i4
+M00000017_IL_00b3:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_00b5:
+brtrue M00000017_IL_00bf
+M00000017_IL_00ba:
+br M00000017_IL_00cb
+M00000017_IL_00bf:
+ldarg 0
+M00000017_IL_00c0:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C6964496E6465785061796C6F61643E
+M00000017_IL_00c5:
+box System.Data.Json.JsonError.InvalidIndex
+M00000017_IL_00ca:
+ret
+M00000017_IL_00cb:
+M00000017_IL_00cc:
+ldarg 0
+M00000017_IL_00cd:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000017_IL_00d2:
+conv.i4
+M00000017_IL_00d3:
+ldc.i4 7
+M00000017_IL_00d4:
+conv.i4
+M00000017_IL_00d5:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_00d7:
+brtrue M00000017_IL_00e1
+M00000017_IL_00dc:
+br M00000017_IL_00ed
+M00000017_IL_00e1:
+ldarg 0
+M00000017_IL_00e2:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C69644E756D6265725061796C6F61643E
+M00000017_IL_00e7:
+box System.Data.Json.JsonError.InvalidNumber
+M00000017_IL_00ec:
+ret
+M00000017_IL_00ed:
+M00000017_IL_00ee:
+ldarg 0
+M00000017_IL_00ef:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000017_IL_00f4:
+conv.i4
+M00000017_IL_00f5:
+ldc.i4 8
+M00000017_IL_00f6:
+conv.i4
+M00000017_IL_00f7:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_00f9:
+brtrue M00000017_IL_0103
+M00000017_IL_00fe:
+br M00000017_IL_010f
+M00000017_IL_0103:
+ldarg 0
+M00000017_IL_0104:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C4E756D6265724F75744F6652616E67655061796C6F61643E
+M00000017_IL_0109:
+box System.Data.Json.JsonError.NumberOutOfRange
+M00000017_IL_010e:
+ret
+M00000017_IL_010f:
+M00000017_IL_0110:
+ldarg 0
+M00000017_IL_0111:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000017_IL_0116:
+conv.i4
+M00000017_IL_0117:
+ldc.i4 9
+M00000017_IL_0119:
+conv.i4
+M00000017_IL_011a:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_011c:
+brtrue M00000017_IL_0126
+M00000017_IL_0121:
+br M00000017_IL_0132
+M00000017_IL_0126:
+ldarg 0
+M00000017_IL_0127:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C526561645061796C6F61643E
+M00000017_IL_012c:
+box System.Data.Json.JsonError.Read
+M00000017_IL_0131:
+ret
+M00000017_IL_0132:
+M00000017_IL_0133:
+ldarg 0
+M00000017_IL_0134:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C5461673E
+M00000017_IL_0139:
+conv.i4
+M00000017_IL_013a:
+ldc.i4 10
+M00000017_IL_013c:
+conv.i4
+M00000017_IL_013d:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_013f:
+brtrue M00000017_IL_0149
+M00000017_IL_0144:
+br M00000017_IL_0155
+M00000017_IL_0149:
+ldarg 0
+M00000017_IL_014a:
+ldfld System.Data.Json.JsonError::Metadata_V1_3C57726974655061796C6F61643E
+M00000017_IL_014f:
+box System.Data.Json.JsonError.Write
+M00000017_IL_0154:
+ret
+M00000017_IL_0155:
+M00000017_IL_0156:
+M00000017_IL_0157:
+call neoCLR.Library.System.Data.Json.JsonError.DefaultReference53797374656D2E4F626A656374()
+ret
+.end
+.method instance byref get_HasValue() -> Boolean
+M00000018_IL_0000:
+ldarg 0
+M00000018_IL_0001:
+call instance System.Data.Json.JsonError::get_Value()
+M00000018_IL_0006:
+M00000018_IL_0007:
+ref.isnull
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_0009:
+ldc.i4 0
+M00000018_IL_000a:
+ceq
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_000c:
+call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.end
