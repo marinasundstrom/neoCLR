@@ -26,13 +26,20 @@ public class HttpHeader {
 
 public class HttpResponse {
     private var storedStatusCode: int
-    val StatusCode: int => storedStatusCode
+    val StatusCode: HttpStatusCode => (HttpStatusCode)storedStatusCode
     /// Whether the response status is in the successful 200–299 range.
     val IsSuccessStatusCode: bool => storedStatusCode >= 200 && storedStatusCode <= 299
     private var storedHeaders: Sequence<HttpHeader>
     val Headers: Sequence<HttpHeader> => storedHeaders
     private var storedContent: HttpContent
     val Content: HttpContent => storedContent
+
+    /// Creates a response using a named or extension status code.
+    init(statusCode: HttpStatusCode, headers: Sequence<HttpHeader>, body: Sequence<byte>) {
+        storedStatusCode = (int)statusCode
+        storedHeaders = headers
+        storedContent = HttpContent(body)
+    }
 
     init(statusCode: int, headers: Sequence<HttpHeader>, body: Sequence<byte>) {
         storedStatusCode = statusCode

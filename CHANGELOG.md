@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add development HttpStatusCode names using the existing Int32 enum representation.
+  HttpResponse.StatusCode and HttpError.UnsuccessfulStatus now carry that enum;
+  rebuild consumers and cast to int for numeric formatting. Keep the integer response
+  constructor and add a typed overload. Preserve unnamed codes and numeric error
+  diagnostics; named constants do not imply transport support. Document optional
+  property patterns separately from positional deconstruction. Remove an unnecessary
+  peer ordering dependency in the cancellation fixture; headers and isolated-body
+  checks pass, while competing-load timeout sensitivity remains documented.
+
 - Expand development HTTP final statuses to 200–599. Send/Get preserve responses;
   IsSuccessStatusCode and GetString apply the 200–299 success range, with typed
   UnsuccessfulStatus errors. Handle bodyless 204/205/304 and serialize final statuses

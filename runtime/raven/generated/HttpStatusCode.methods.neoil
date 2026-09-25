@@ -1,0 +1,303 @@
+; Generated from runtime/raven/src/System/Web/Http/HttpStatusCode.rvn. Regenerate with build_runtime_library.py.
+.type System.Web.Http.HttpStatusCode
+.enum Int32
+.field private Bits Int32
+.literal Continue 100
+.literal SwitchingProtocols 101
+.literal OK 200
+.literal Created 201
+.literal Accepted 202
+.literal NoContent 204
+.literal ResetContent 205
+.literal PartialContent 206
+.literal MultipleChoices 300
+.literal MovedPermanently 301
+.literal Found 302
+.literal SeeOther 303
+.literal NotModified 304
+.literal TemporaryRedirect 307
+.literal PermanentRedirect 308
+.literal BadRequest 400
+.literal Unauthorized 401
+.literal Forbidden 403
+.literal NotFound 404
+.literal MethodNotAllowed 405
+.literal RequestTimeout 408
+.literal Conflict 409
+.literal Gone 410
+.literal LengthRequired 411
+.literal PreconditionFailed 412
+.literal RequestEntityTooLarge 413
+.literal RequestUriTooLong 414
+.literal UnsupportedMediaType 415
+.literal RequestedRangeNotSatisfiable 416
+.literal ExpectationFailed 417
+.literal UnprocessableContent 422
+.literal TooManyRequests 429
+.literal InternalServerError 500
+.literal NotImplemented 501
+.literal BadGateway 502
+.literal ServiceUnavailable 503
+.literal GatewayTimeout 504
+.literal HttpVersionNotSupported 505
+.method static FromValue(Int32 value) -> System.Web.Http.HttpStatusCode
+ldarg value
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method instance get_Value() -> Int32
+ldarg this
+ldfld 0
+ret
+.end
+.method instance Or(System.Web.Http.HttpStatusCode other) -> System.Web.Http.HttpStatusCode
+ldarg this
+ldfld 0
+ldarg other
+ldfld 0
+or
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method instance And(System.Web.Http.HttpStatusCode other) -> System.Web.Http.HttpStatusCode
+ldarg this
+ldfld 0
+ldarg other
+ldfld 0
+and
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method instance Xor(System.Web.Http.HttpStatusCode other) -> System.Web.Http.HttpStatusCode
+ldarg this
+ldfld 0
+ldarg other
+ldfld 0
+xor
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method instance Not() -> System.Web.Http.HttpStatusCode
+ldarg this
+ldfld 0
+not
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method instance HasFlag(System.Web.Http.HttpStatusCode other) -> Boolean
+ldarg this
+ldfld 0
+ldarg other
+ldfld 0
+and
+ldarg other
+ldfld 0
+ceq
+ret
+.end
+.method instance Equals(System.Web.Http.HttpStatusCode other) -> Boolean
+ldarg this
+ldfld 0
+ldarg other
+ldfld 0
+ceq
+ret
+.end
+.method instance override byref ToString() -> String
+ldtoken System.Web.Http.HttpStatusCode
+ldarg this
+ldfld 0
+call neoCLR.Runtime.EnumFormat(System.RuntimeTypeHandle,Int32)
+ret
+.end
+.method static Continue() -> System.Web.Http.HttpStatusCode
+ldc.i4 100
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static SwitchingProtocols() -> System.Web.Http.HttpStatusCode
+ldc.i4 101
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static OK() -> System.Web.Http.HttpStatusCode
+ldc.i4 200
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static Created() -> System.Web.Http.HttpStatusCode
+ldc.i4 201
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static Accepted() -> System.Web.Http.HttpStatusCode
+ldc.i4 202
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static NoContent() -> System.Web.Http.HttpStatusCode
+ldc.i4 204
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static ResetContent() -> System.Web.Http.HttpStatusCode
+ldc.i4 205
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static PartialContent() -> System.Web.Http.HttpStatusCode
+ldc.i4 206
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static MultipleChoices() -> System.Web.Http.HttpStatusCode
+ldc.i4 300
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static MovedPermanently() -> System.Web.Http.HttpStatusCode
+ldc.i4 301
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static Found() -> System.Web.Http.HttpStatusCode
+ldc.i4 302
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static SeeOther() -> System.Web.Http.HttpStatusCode
+ldc.i4 303
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static NotModified() -> System.Web.Http.HttpStatusCode
+ldc.i4 304
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static TemporaryRedirect() -> System.Web.Http.HttpStatusCode
+ldc.i4 307
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static PermanentRedirect() -> System.Web.Http.HttpStatusCode
+ldc.i4 308
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static BadRequest() -> System.Web.Http.HttpStatusCode
+ldc.i4 400
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static Unauthorized() -> System.Web.Http.HttpStatusCode
+ldc.i4 401
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static Forbidden() -> System.Web.Http.HttpStatusCode
+ldc.i4 403
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static NotFound() -> System.Web.Http.HttpStatusCode
+ldc.i4 404
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static MethodNotAllowed() -> System.Web.Http.HttpStatusCode
+ldc.i4 405
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static RequestTimeout() -> System.Web.Http.HttpStatusCode
+ldc.i4 408
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static Conflict() -> System.Web.Http.HttpStatusCode
+ldc.i4 409
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static Gone() -> System.Web.Http.HttpStatusCode
+ldc.i4 410
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static LengthRequired() -> System.Web.Http.HttpStatusCode
+ldc.i4 411
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static PreconditionFailed() -> System.Web.Http.HttpStatusCode
+ldc.i4 412
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static RequestEntityTooLarge() -> System.Web.Http.HttpStatusCode
+ldc.i4 413
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static RequestUriTooLong() -> System.Web.Http.HttpStatusCode
+ldc.i4 414
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static UnsupportedMediaType() -> System.Web.Http.HttpStatusCode
+ldc.i4 415
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static RequestedRangeNotSatisfiable() -> System.Web.Http.HttpStatusCode
+ldc.i4 416
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static ExpectationFailed() -> System.Web.Http.HttpStatusCode
+ldc.i4 417
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static UnprocessableContent() -> System.Web.Http.HttpStatusCode
+ldc.i4 422
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static TooManyRequests() -> System.Web.Http.HttpStatusCode
+ldc.i4 429
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static InternalServerError() -> System.Web.Http.HttpStatusCode
+ldc.i4 500
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static NotImplemented() -> System.Web.Http.HttpStatusCode
+ldc.i4 501
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static BadGateway() -> System.Web.Http.HttpStatusCode
+ldc.i4 502
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static ServiceUnavailable() -> System.Web.Http.HttpStatusCode
+ldc.i4 503
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static GatewayTimeout() -> System.Web.Http.HttpStatusCode
+ldc.i4 504
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.method static HttpVersionNotSupported() -> System.Web.Http.HttpStatusCode
+ldc.i4 505
+newobj System.Web.Http.HttpStatusCode
+ret
+.end
+.end

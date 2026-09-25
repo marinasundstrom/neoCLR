@@ -13,6 +13,7 @@ static class HttpBindings
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
     public const string Declarations = """
         namespace Web.Http {
+            public enum HttpStatusCode { Continue = 100, SwitchingProtocols = 101, OK = 200, Created = 201, Accepted = 202, NoContent = 204, ResetContent = 205, PartialContent = 206, MultipleChoices = 300, MovedPermanently = 301, Found = 302, SeeOther = 303, NotModified = 304, TemporaryRedirect = 307, PermanentRedirect = 308, BadRequest = 400, Unauthorized = 401, Forbidden = 403, NotFound = 404, MethodNotAllowed = 405, RequestTimeout = 408, Conflict = 409, Gone = 410, LengthRequired = 411, PreconditionFailed = 412, RequestEntityTooLarge = 413, RequestUriTooLong = 414, UnsupportedMediaType = 415, RequestedRangeNotSatisfiable = 416, ExpectationFailed = 417, UnprocessableContent = 422, TooManyRequests = 429, InternalServerError = 500, NotImplemented = 501, BadGateway = 502, ServiceUnavailable = 503, GatewayTimeout = 504, HttpVersionNotSupported = 505 }
             public struct HttpError { public struct InvalidUri { } public struct NameResolution { } public struct Transport { } public struct InvalidRequest { } public struct Protocol { } public struct Unsupported { } public struct LimitExceeded { } public struct TimedOut { } public struct Handler { } public struct UnsuccessfulStatus { } }
             public interface HttpHandler {
                 Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken);
@@ -55,7 +56,8 @@ static class HttpBindings
             }
             public sealed class HttpResponse {
                 public HttpResponse(int statusCode, Collections.Sequence<HttpHeader> headers, Collections.Sequence<byte> body) { }
-                public int StatusCode => default;
+                public HttpResponse(HttpStatusCode statusCode, Collections.Sequence<HttpHeader> headers, Collections.Sequence<byte> body) { }
+                public HttpStatusCode StatusCode => default;
                 public bool IsSuccessStatusCode => default;
                 public Collections.Sequence<HttpHeader> Headers => default;
                 public HttpContent Content => default;
@@ -147,9 +149,9 @@ static class HttpBindings
             ("HttpRequest", "Get") => (args.Length == 1 && args[0] == "String" ? "String" : "System.Uri", $"System.Result<{request},System.Web.Http.HttpError>", true),
             ("HttpRequest", "get_Method" or "get_Host" or "get_Target") => ("", "String", false),
             ("HttpRequest", "get_Port") => ("", "Int32", false),
-            ("HttpResponse", ".ctor") => ($"Int32,System.Collections.Sequence<{Prefix}HttpHeader>,System.Collections.Sequence<Byte>", "noresult", false),
+            ("HttpResponse", ".ctor") => ($"{(definition.Parameters[0].ParameterType.FullName == Prefix + "HttpStatusCode" ? Prefix + "HttpStatusCode" : "Int32")},System.Collections.Sequence<{Prefix}HttpHeader>,System.Collections.Sequence<Byte>", "noresult", false),
             ("HttpResponse", "get_IsSuccessStatusCode") => ("", "Boolean", false),
-            ("HttpResponse", "get_StatusCode") => ("", "Int32", false),
+            ("HttpResponse", "get_StatusCode") => ("", Prefix + "HttpStatusCode", false),
             ("HttpResponse", "get_Headers") => ("", $"System.Collections.Sequence<{Prefix}HttpHeader>", false),
             ("HttpResponse", "get_Content") => ("", Prefix + "HttpContent", false),
             ("HttpContent", ".ctor") => ("System.Collections.Sequence<Byte>", "noresult", false),

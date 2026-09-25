@@ -595,21 +595,22 @@ ret
 .end
 .type System.Web.Http.HttpError.UnsuccessfulStatus
 .sealed
-.field private Metadata_V1_3C737461747573436F64653E6B5F5F4261636B696E674669656C64 Int32
-.property instance StatusCode() -> Int32
+.field private Metadata_V1_3C737461747573436F64653E6B5F5F4261636B696E674669656C64 System.Web.Http.HttpStatusCode
+.property instance StatusCode() -> System.Web.Http.HttpStatusCode
 .get instance System.Web.Http.HttpError.UnsuccessfulStatus::get_StatusCode()
 .end
-.method instance byref .ctor(Int32 statusCode) -> Void
-.local Int32 local0
-.local Int32 unionDefault1_0
+.method instance byref .ctor(System.Web.Http.HttpStatusCode statusCode) -> Void
+.local System.Web.Http.HttpStatusCode local0
+.local System.Web.Http.HttpStatusCode unionDefault1_0
 ldc.i4 0
+call System.Web.Http.HttpStatusCode::FromValue(Int32)
 stloc local0
 M00000028_IL_0000:
 ldarg 0
 M00000028_IL_0001:
 pop
 ldloca unionDefault1_0
-initobj Int32
+initobj System.Web.Http.HttpStatusCode
 ldarg 0
 ldloc unionDefault1_0
 stfld System.Web.Http.HttpError.UnsuccessfulStatus::Metadata_V1_3C737461747573436F64653E6B5F5F4261636B696E674669656C64
@@ -630,7 +631,7 @@ M00000028_IL_0011:
 ldvoid
 ret
 .end
-.method instance byref get_StatusCode() -> Int32
+.method instance byref get_StatusCode() -> System.Web.Http.HttpStatusCode
 M00000029_IL_0000:
 M00000029_IL_0001:
 ldarg 0
@@ -639,7 +640,7 @@ ldfld System.Web.Http.HttpError.UnsuccessfulStatus::Metadata_V1_3C73746174757343
 M00000029_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(Int32& StatusCode) -> Void
+.method instance byref Deconstruct(System.Web.Http.HttpStatusCode& StatusCode) -> Void
 M0000002a_IL_0000:
 ldarg 1
 M0000002a_IL_0001:
@@ -647,8 +648,8 @@ ldarg 0
 M0000002a_IL_0002:
 call instance System.Web.Http.HttpError.UnsuccessfulStatus::get_StatusCode()
 M0000002a_IL_0007:
-stobj Int32
-M0000002a_IL_0008:
+stobj System.Web.Http.HttpStatusCode
+M0000002a_IL_000c:
 ldvoid
 ret
 .end
@@ -668,20 +669,28 @@ ldstr "("
 M0000002b_IL_001e:
 call System.String::Concat(String,String)
 M0000002b_IL_0023:
+ldstr "HttpStatusCode"
+M0000002b_IL_0028:
+ldstr "."
+M0000002b_IL_002d:
+call System.String::Concat(String,String)
+M0000002b_IL_0032:
 ldarg 0
-M0000002b_IL_0024:
-call instance System.Web.Http.HttpError.UnsuccessfulStatus::get_StatusCode()
-M0000002b_IL_0029:
-box Int32
-M0000002b_IL_002e:
-call System.Web.Http.HttpError.UnsuccessfulStatus::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
 M0000002b_IL_0033:
-call System.String::Concat(String,String)
+call instance System.Web.Http.HttpError.UnsuccessfulStatus::get_StatusCode()
 M0000002b_IL_0038:
-ldstr ")"
+box System.Web.Http.HttpStatusCode
 M0000002b_IL_003d:
-call System.String::Concat(String,String)
+call System.Web.Http.HttpError.UnsuccessfulStatus::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
 M0000002b_IL_0042:
+call System.String::Concat(String,String)
+M0000002b_IL_0047:
+call System.String::Concat(String,String)
+M0000002b_IL_004c:
+ldstr ")"
+M0000002b_IL_0051:
+call System.String::Concat(String,String)
+M0000002b_IL_0056:
 ret
 .end
 .method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String

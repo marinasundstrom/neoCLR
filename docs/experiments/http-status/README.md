@@ -55,3 +55,29 @@ so native/exchange deadlines can win. The assertion remains strict and the resul
 not counted as a pass. Investigate timing/performance and reproduce the previous
 checkpoint before release; this observation alone does not establish whether the
 status slice caused a regression. Status-fixture successes above remain separate.
+
+## Named-status follow-up
+
+HttpResponse.StatusCode and UnsuccessfulStatus now carry HttpStatusCode. The fixture
+casts to int for wire-code checks, verifies NotFound's name/value and unnamed 599
+formatting, constructs a typed response and matches its readable properties through
+`Ok(HttpResponse { StatusCode: HttpStatusCode.NotFound, Headers: headers })`.
+This is optional property inspection, not positional Deconstruct or record equality.
+The existing integer response constructor remains covered by the server fixture.
+
+The enum/property follow-up passed: client 3,639 allocations, 86 collections; server
+1,501 allocations, 39 collections; both zero live objects. The previous Int32 payload
+signature is intentionally incompatible; bridge checks reject it and unrelated enums.
+These results supersede the earlier numeric-contract totals, not the historical tests.
+
+A focused follow-up executes CheckNamedStatus with all three property-binding forms:
+`if let`, a refutable `let` binding with an else branch, and `is` with an inline
+`let` capture. It passes with eight allocations and zero live objects. This keeps
+syntax/inspection validation independent of another full networking run.
+
+Cancellation follow-up: the previous checkpoint's original headers fixture passes.
+The revised peer removes the independent third request from the cancellation signal's
+prerequisites. Current headers and isolated-body runs pass with strict cancellation,
+connection-close and independent-request assertions (885/957 allocations respectively,
+zero live objects). An overlapping body run still timed out; serial validation avoids
+our own competing workload but is not proof of a runtime timing/performance fix.

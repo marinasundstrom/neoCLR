@@ -51,3 +51,18 @@ signal was processed. The callback now reports that competing error explicitly.
 The check remains strict; no timeout or cancellation semantics were relaxed. Track
 this timing/performance observation before release and compare the earlier checkpoint
 before attributing it to a particular change. Earlier passing evidence remains historical.
+
+## Ordering follow-up — 2026-09-25
+
+The original prior-checkpoint headers fixture passes against its matching older bundle.
+The revised peer now signals once the two cancellable requests have arrived, without
+requiring the independent third request first. All three requests remain concurrent;
+peer-observed closure, Task cancellation and successful independent work remain strict.
+No production timeout or cancellation behavior changes.
+
+Headers pass with 885 allocations/16 collections; body passes in an isolated run with
+957 allocations/17 collections; both end with zero live objects. The .NET comparison
+also passes. A body run overlapping another local verification workload still reached
+TimedOut before the control signal. Run these wall-clock-sensitive checks serially;
+the fixture change removes unnecessary ordering, not deadline sensitivity or a proven
+runtime performance cause. Retain this limitation for release validation.

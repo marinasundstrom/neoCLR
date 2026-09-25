@@ -20,6 +20,9 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UriError'">
     <Compile Include="src/System/UriError.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HttpStatusCode'">
+    <Compile Include="src/System/Web/Http/HttpStatusCode.rvn" />
+  </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HttpError'">
     <Compile Include="src/System/Web/Http/HttpError.rvn" />
   </ItemGroup>

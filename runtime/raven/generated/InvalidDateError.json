@@ -7,9 +7,9 @@
     "runtime/raven/src/System/Networking/IPAddressError.rvn": "ff7036e74bf83a7f5fc62cd2cf194bf27d4d4255c996f9d1d45437dc51f3dce9",
     "runtime/raven/src/System/Uri.rvn": "b366425867c4b84f126de1689d4a03bf9855a6a881a4abe4dba1836a381537b7",
     "runtime/raven/src/System/UriError.rvn": "4cb6c1aa4d9c8bb51e3eb1964a5e5c57330e0b9091bd44bf5125a8a99c027dce",
-    "runtime/raven/src/System/Web/Http/HttpServer.rvn": "d937ae54f86113779efdee23148e22affe951de3c42dd04056febc14bec50f72",
-    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "f159ddb60a27eadacff73ef92f3baef96e4dbb24b743d9df8b3f0c2c000fd6bf",
-    "runtime/raven/src/System/Web/Http/HttpError.rvn": "cd1247b5352557a2211348761a35a932ccc32d7953d57f67002454d841ec66c7",
+    "runtime/raven/src/System/Web/Http/HttpServer.rvn": "91e1ddef2b58a169501a6fd5fa1217bac36a0b1140ec0c8799e5d8235ee1e47c",
+    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "555ea521d56c9af01dfc47a0d286167df42e08c9d7211c4c97bf80b6555f62f0",
+    "runtime/raven/src/System/Web/Http/HttpError.rvn": "9418b3e16c9f56e3f5c57ca98108d0ca59d14d870ff26e1b2322f202786a378a",
     "runtime/raven/src/System/Networking/DnsError.rvn": "3d29e8b2008d54270cb35a581f4ba38e6d0672f4576b334100fc72d8f729a7bd",
     "runtime/raven/src/System/Networking/Dns.rvn": "750806e7716026fcfc5d0cf1b77b90c4d9175b1c32d5bdc4a612f1b469ea1074",
     "runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "15f9d2bb496458f8f4077c3a0b4f7606c4f4c35feff62c277d76e324c0c4d4ef",
@@ -27,6 +27,7 @@
     "runtime/raven/src/System/IO/OutputStream.rvn": "7aeccde6fc270a70f18cb6f5a9d0ec2cefb41c9d807fdc1742566e8e44533824",
     "runtime/raven/src/System/Storage/InvalidPathError.rvn": "9545d4b15c35a592037178548ce68694ce5e82fccc14b8d3c1f5a50a34ec5c6b",
     "runtime/raven/src/System/Storage/EntryKind.rvn": "6ee11545b34b72d7c2bf649839b1cb8da0e05b99bdf5a8a1f8873cc77f1d41af",
+    "runtime/raven/src/System/Web/Http/HttpStatusCode.rvn": "afb26063d246d1d6a4fe8111050a0b6c6166fb0aa70060075e77f1d445794142",
     "runtime/raven/src/System/Storage/StorageLookupError.rvn": "101ba6c0e46d20c780f1fe35ad515231a12a986f7c1dd293618d8d944630aacb",
     "runtime/raven/src/System/Storage/Metadata.rvn": "0d7759c96d71c56af66b73dcabd68d8e30dfd838ef17fb3dfeb0b69e9319d8c4",
     "runtime/raven/src/System/IO/StreamError.rvn": "51bf2e1d6eb848d6cdd06596460b9b7b185756c4f6779232301532a0468dde1e",
@@ -117,7 +118,7 @@
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
-    "runtime/raven/System.Runtime.rvnproj": "8be6c906781b07c7b7a0355e4cbaa4066b13438e4ea0391edb34963e6a109e52",
+    "runtime/raven/System.Runtime.rvnproj": "e2552b35c00df295ff293564b6efe756d00e192e1467fe2707b1e3122fe96554",
     "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
@@ -125,7 +126,7 @@
     "InvalidDateError.helpers.neoil": "8eaf20af81f7d691728b098c02cad1fc9dfef7d4b6779991a8b80e727a3561d2"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "2c28201f85abd4c59dc0d2b0e455cf6853a6d1f6d930662f938c1b2b39e365c0",
+  "coreSha256": "5d4ba423257dca612807553e77e19d34439ca79a13b06c9754c283afee743659",
   "exports": [
     ".ctor() -> Void",
     "ToString() -> String"

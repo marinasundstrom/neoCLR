@@ -1658,7 +1658,7 @@ ret
 .local System.UriError local2
 .local System.Networking.DnsError local3
 .local System.Networking.Sockets.SocketError local4
-.local Int32 local5
+.local System.Web.Http.HttpStatusCode local5
 .local String local6
 .local String local7
 .local String local8
@@ -1672,18 +1672,19 @@ ret
 .local System.Web.Http.HttpError.Transport local16
 .local System.Web.Http.HttpError local17
 .local System.Web.Http.HttpError.UnsuccessfulStatus local18
-.local System.Web.Http.HttpError local19
-.local System.Web.Http.HttpError.InvalidRequest local20
-.local System.Web.Http.HttpError local21
-.local System.Web.Http.HttpError.Protocol local22
-.local System.Web.Http.HttpError local23
-.local System.Web.Http.HttpError.Unsupported local24
-.local System.Web.Http.HttpError local25
-.local System.Web.Http.HttpError.LimitExceeded local26
-.local System.Web.Http.HttpError local27
-.local System.Web.Http.HttpError.TimedOut local28
-.local System.Web.Http.HttpError local29
-.local System.Web.Http.HttpError.Handler local30
+.local Int32 local19
+.local System.Web.Http.HttpError local20
+.local System.Web.Http.HttpError.InvalidRequest local21
+.local System.Web.Http.HttpError local22
+.local System.Web.Http.HttpError.Protocol local23
+.local System.Web.Http.HttpError local24
+.local System.Web.Http.HttpError.Unsupported local25
+.local System.Web.Http.HttpError local26
+.local System.Web.Http.HttpError.LimitExceeded local27
+.local System.Web.Http.HttpError local28
+.local System.Web.Http.HttpError.TimedOut local29
+.local System.Web.Http.HttpError local30
+.local System.Web.Http.HttpError.Handler local31
 ldloca local0
 initobj System.Web.Http.HttpError
 ldloca local2
@@ -1693,6 +1694,7 @@ initobj System.Networking.DnsError
 ldloca local4
 initobj System.Networking.Sockets.SocketError
 ldc.i4 0
+call System.Web.Http.HttpStatusCode::FromValue(Int32)
 stloc local5
 ldloca local11
 initobj System.Web.Http.HttpError
@@ -1710,29 +1712,31 @@ ldloca local17
 initobj System.Web.Http.HttpError
 ldloca local18
 initobj System.Web.Http.HttpError.UnsuccessfulStatus
-ldloca local19
-initobj System.Web.Http.HttpError
+ldc.i4 0
+stloc local19
 ldloca local20
-initobj System.Web.Http.HttpError.InvalidRequest
+initobj System.Web.Http.HttpError
 ldloca local21
-initobj System.Web.Http.HttpError
+initobj System.Web.Http.HttpError.InvalidRequest
 ldloca local22
-initobj System.Web.Http.HttpError.Protocol
+initobj System.Web.Http.HttpError
 ldloca local23
-initobj System.Web.Http.HttpError
+initobj System.Web.Http.HttpError.Protocol
 ldloca local24
-initobj System.Web.Http.HttpError.Unsupported
+initobj System.Web.Http.HttpError
 ldloca local25
-initobj System.Web.Http.HttpError
+initobj System.Web.Http.HttpError.Unsupported
 ldloca local26
-initobj System.Web.Http.HttpError.LimitExceeded
+initobj System.Web.Http.HttpError
 ldloca local27
-initobj System.Web.Http.HttpError
+initobj System.Web.Http.HttpError.LimitExceeded
 ldloca local28
-initobj System.Web.Http.HttpError.TimedOut
-ldloca local29
 initobj System.Web.Http.HttpError
+ldloca local29
+initobj System.Web.Http.HttpError.TimedOut
 ldloca local30
+initobj System.Web.Http.HttpError
+ldloca local31
 initobj System.Web.Http.HttpError.Handler
 M00000016_IL_0000:
 M00000016_IL_0001:
@@ -1776,7 +1780,7 @@ call instance System.UriError::ToString()
 M00000016_IL_003f:
 stloc local1
 M00000016_IL_0040:
-br M00000016_IL_0264
+br M00000016_IL_0269
 M00000016_IL_0045:
 M00000016_IL_0046:
 ldloc local0
@@ -1811,7 +1815,7 @@ call instance System.Networking.DnsError::ToString()
 M00000016_IL_007b:
 stloc local1
 M00000016_IL_007c:
-br M00000016_IL_0264
+br M00000016_IL_0269
 M00000016_IL_0081:
 M00000016_IL_0082:
 ldloc local0
@@ -1846,7 +1850,7 @@ call instance System.Networking.Sockets.SocketError::ToString()
 M00000016_IL_00b8:
 stloc local1
 M00000016_IL_00b9:
-br M00000016_IL_0264
+br M00000016_IL_0269
 M00000016_IL_00be:
 M00000016_IL_00bf:
 ldloc local0
@@ -1863,7 +1867,7 @@ ldloca local18
 M00000016_IL_00ce:
 call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.UnsuccessfulStatus&)
 M00000016_IL_00d3:
-brfalse M00000016_IL_0105
+brfalse M00000016_IL_010a
 M00000016_IL_00d8:
 ldloca local18
 M00000016_IL_00da:
@@ -1877,233 +1881,240 @@ M00000016_IL_00ed:
 M00000016_IL_00ee:
 ldstr "HTTP status "
 M00000016_IL_00f3:
-ldloca local5
+ldloc local5
 M00000016_IL_00f5:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeInt32ToString(Int32&)
-M00000016_IL_00fa:
-call System.String::Concat(String,String)
-M00000016_IL_00ff:
-stloc local1
-M00000016_IL_0100:
-br M00000016_IL_0264
-M00000016_IL_0105:
-M00000016_IL_0106:
-ldloc local0
-M00000016_IL_0107:
+call instance System.Web.Http.HttpStatusCode::get_Value()
+conv.i4
+M00000016_IL_00f6:
 stloc local19
-M00000016_IL_0109:
-ldloca local20
-M00000016_IL_010b:
-initobj System.Web.Http.HttpError.InvalidRequest
-M00000016_IL_0111:
+M00000016_IL_00f8:
 ldloca local19
-M00000016_IL_0113:
-ldloca local20
-M00000016_IL_0115:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.InvalidRequest&)
-M00000016_IL_011a:
-brfalse M00000016_IL_013d
-M00000016_IL_011f:
-ldloca local20
-M00000016_IL_0121:
-call instance System.Web.Http.HttpError.InvalidRequest::get_Message()
-M00000016_IL_0126:
-stloc local6
-M00000016_IL_0128:
-M00000016_IL_0129:
-br M00000016_IL_0134
-M00000016_IL_0134:
-M00000016_IL_0135:
-ldloc local6
-M00000016_IL_0137:
+M00000016_IL_00fa:
+call neoCLR.Library.System.Web.Http.HttpError.RuntimeInt32ToString(Int32&)
+M00000016_IL_00ff:
+call System.String::Concat(String,String)
+M00000016_IL_0104:
 stloc local1
-M00000016_IL_0138:
-br M00000016_IL_0264
-M00000016_IL_013d:
-M00000016_IL_013e:
+M00000016_IL_0105:
+br M00000016_IL_0269
+M00000016_IL_010a:
+M00000016_IL_010b:
 ldloc local0
-M00000016_IL_013f:
-stloc local21
-M00000016_IL_0141:
-ldloca local22
-M00000016_IL_0143:
-initobj System.Web.Http.HttpError.Protocol
-M00000016_IL_0149:
+M00000016_IL_010c:
+stloc local20
+M00000016_IL_010e:
 ldloca local21
-M00000016_IL_014b:
-ldloca local22
-M00000016_IL_014d:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Protocol&)
-M00000016_IL_0152:
-brfalse M00000016_IL_0175
-M00000016_IL_0157:
-ldloca local22
-M00000016_IL_0159:
-call instance System.Web.Http.HttpError.Protocol::get_Message()
-M00000016_IL_015e:
-stloc local7
-M00000016_IL_0160:
-M00000016_IL_0161:
-br M00000016_IL_016c
-M00000016_IL_016c:
-M00000016_IL_016d:
-ldloc local7
-M00000016_IL_016f:
+M00000016_IL_0110:
+initobj System.Web.Http.HttpError.InvalidRequest
+M00000016_IL_0116:
+ldloca local20
+M00000016_IL_0118:
+ldloca local21
+M00000016_IL_011a:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.InvalidRequest&)
+M00000016_IL_011f:
+brfalse M00000016_IL_0142
+M00000016_IL_0124:
+ldloca local21
+M00000016_IL_0126:
+call instance System.Web.Http.HttpError.InvalidRequest::get_Message()
+M00000016_IL_012b:
+stloc local6
+M00000016_IL_012d:
+M00000016_IL_012e:
+br M00000016_IL_0139
+M00000016_IL_0139:
+M00000016_IL_013a:
+ldloc local6
+M00000016_IL_013c:
 stloc local1
-M00000016_IL_0170:
-br M00000016_IL_0264
-M00000016_IL_0175:
-M00000016_IL_0176:
+M00000016_IL_013d:
+br M00000016_IL_0269
+M00000016_IL_0142:
+M00000016_IL_0143:
 ldloc local0
-M00000016_IL_0177:
-stloc local23
-M00000016_IL_0179:
-ldloca local24
-M00000016_IL_017b:
-initobj System.Web.Http.HttpError.Unsupported
-M00000016_IL_0181:
+M00000016_IL_0144:
+stloc local22
+M00000016_IL_0146:
 ldloca local23
-M00000016_IL_0183:
-ldloca local24
-M00000016_IL_0185:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Unsupported&)
-M00000016_IL_018a:
-brfalse M00000016_IL_01ad
-M00000016_IL_018f:
-ldloca local24
-M00000016_IL_0191:
-call instance System.Web.Http.HttpError.Unsupported::get_Message()
-M00000016_IL_0196:
-stloc local8
-M00000016_IL_0198:
-M00000016_IL_0199:
-br M00000016_IL_01a4
-M00000016_IL_01a4:
-M00000016_IL_01a5:
-ldloc local8
-M00000016_IL_01a7:
+M00000016_IL_0148:
+initobj System.Web.Http.HttpError.Protocol
+M00000016_IL_014e:
+ldloca local22
+M00000016_IL_0150:
+ldloca local23
+M00000016_IL_0152:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Protocol&)
+M00000016_IL_0157:
+brfalse M00000016_IL_017a
+M00000016_IL_015c:
+ldloca local23
+M00000016_IL_015e:
+call instance System.Web.Http.HttpError.Protocol::get_Message()
+M00000016_IL_0163:
+stloc local7
+M00000016_IL_0165:
+M00000016_IL_0166:
+br M00000016_IL_0171
+M00000016_IL_0171:
+M00000016_IL_0172:
+ldloc local7
+M00000016_IL_0174:
 stloc local1
-M00000016_IL_01a8:
-br M00000016_IL_0264
-M00000016_IL_01ad:
-M00000016_IL_01ae:
+M00000016_IL_0175:
+br M00000016_IL_0269
+M00000016_IL_017a:
+M00000016_IL_017b:
 ldloc local0
-M00000016_IL_01af:
-stloc local25
-M00000016_IL_01b1:
-ldloca local26
-M00000016_IL_01b3:
-initobj System.Web.Http.HttpError.LimitExceeded
-M00000016_IL_01b9:
+M00000016_IL_017c:
+stloc local24
+M00000016_IL_017e:
 ldloca local25
-M00000016_IL_01bb:
-ldloca local26
-M00000016_IL_01bd:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.LimitExceeded&)
-M00000016_IL_01c2:
-brfalse M00000016_IL_01e5
-M00000016_IL_01c7:
-ldloca local26
-M00000016_IL_01c9:
-call instance System.Web.Http.HttpError.LimitExceeded::get_Message()
-M00000016_IL_01ce:
-stloc local9
-M00000016_IL_01d0:
-M00000016_IL_01d1:
-br M00000016_IL_01dc
-M00000016_IL_01dc:
-M00000016_IL_01dd:
-ldloc local9
-M00000016_IL_01df:
+M00000016_IL_0180:
+initobj System.Web.Http.HttpError.Unsupported
+M00000016_IL_0186:
+ldloca local24
+M00000016_IL_0188:
+ldloca local25
+M00000016_IL_018a:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Unsupported&)
+M00000016_IL_018f:
+brfalse M00000016_IL_01b2
+M00000016_IL_0194:
+ldloca local25
+M00000016_IL_0196:
+call instance System.Web.Http.HttpError.Unsupported::get_Message()
+M00000016_IL_019b:
+stloc local8
+M00000016_IL_019d:
+M00000016_IL_019e:
+br M00000016_IL_01a9
+M00000016_IL_01a9:
+M00000016_IL_01aa:
+ldloc local8
+M00000016_IL_01ac:
 stloc local1
-M00000016_IL_01e0:
-br M00000016_IL_0264
-M00000016_IL_01e5:
-M00000016_IL_01e6:
-M00000016_IL_01e7:
+M00000016_IL_01ad:
+br M00000016_IL_0269
+M00000016_IL_01b2:
+M00000016_IL_01b3:
 ldloc local0
-M00000016_IL_01e8:
-stloc local27
-M00000016_IL_01ea:
+M00000016_IL_01b4:
+stloc local26
+M00000016_IL_01b6:
 ldloca local27
+M00000016_IL_01b8:
+initobj System.Web.Http.HttpError.LimitExceeded
+M00000016_IL_01be:
+ldloca local26
+M00000016_IL_01c0:
+ldloca local27
+M00000016_IL_01c2:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.LimitExceeded&)
+M00000016_IL_01c7:
+brfalse M00000016_IL_01ea
+M00000016_IL_01cc:
+ldloca local27
+M00000016_IL_01ce:
+call instance System.Web.Http.HttpError.LimitExceeded::get_Message()
+M00000016_IL_01d3:
+stloc local9
+M00000016_IL_01d5:
+M00000016_IL_01d6:
+br M00000016_IL_01e1
+M00000016_IL_01e1:
+M00000016_IL_01e2:
+ldloc local9
+M00000016_IL_01e4:
+stloc local1
+M00000016_IL_01e5:
+br M00000016_IL_0269
+M00000016_IL_01ea:
+M00000016_IL_01eb:
 M00000016_IL_01ec:
+ldloc local0
+M00000016_IL_01ed:
+stloc local28
+M00000016_IL_01ef:
 ldloca local28
-M00000016_IL_01ee:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.TimedOut&)
-M00000016_IL_01f3:
-brfalse M00000016_IL_0212
-M00000016_IL_01f8:
-ldloc local28
-M00000016_IL_01fa:
-pop
-M00000016_IL_01fb:
-M00000016_IL_01fc:
-br M00000016_IL_0207
-M00000016_IL_0207:
-ldstr "Request deadline exceeded"
-M00000016_IL_020c:
-stloc local1
-M00000016_IL_020d:
-br M00000016_IL_0264
-M00000016_IL_0212:
-M00000016_IL_0213:
-ldloc local0
-M00000016_IL_0214:
-stloc local29
-M00000016_IL_0216:
-ldloca local30
-M00000016_IL_0218:
-initobj System.Web.Http.HttpError.Handler
-M00000016_IL_021e:
+M00000016_IL_01f1:
 ldloca local29
-M00000016_IL_0220:
-ldloca local30
-M00000016_IL_0222:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Handler&)
-M00000016_IL_0227:
-brfalse M00000016_IL_024a
-M00000016_IL_022c:
-ldloca local30
-M00000016_IL_022e:
-call instance System.Web.Http.HttpError.Handler::get_Message()
-M00000016_IL_0233:
-stloc local10
-M00000016_IL_0235:
-M00000016_IL_0236:
-br M00000016_IL_0241
-M00000016_IL_0241:
-M00000016_IL_0242:
-ldloc local10
-M00000016_IL_0244:
-stloc local1
-M00000016_IL_0245:
-br M00000016_IL_0264
-M00000016_IL_024a:
-M00000016_IL_024b:
-ldloc local0
-M00000016_IL_024c:
+M00000016_IL_01f3:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.TimedOut&)
+M00000016_IL_01f8:
+brfalse M00000016_IL_0217
+M00000016_IL_01fd:
+ldloc local29
+M00000016_IL_01ff:
 pop
-M00000016_IL_024d:
-ldc.i4 1
-M00000016_IL_024e:
-brfalse M00000016_IL_025f
-M00000016_IL_0253:
-M00000016_IL_0254:
-ldstr "Empty"
-M00000016_IL_0259:
+M00000016_IL_0200:
+M00000016_IL_0201:
+br M00000016_IL_020c
+M00000016_IL_020c:
+ldstr "Request deadline exceeded"
+M00000016_IL_0211:
 stloc local1
-M00000016_IL_025a:
-br M00000016_IL_0264
+M00000016_IL_0212:
+br M00000016_IL_0269
+M00000016_IL_0217:
+M00000016_IL_0218:
+ldloc local0
+M00000016_IL_0219:
+stloc local30
+M00000016_IL_021b:
+ldloca local31
+M00000016_IL_021d:
+initobj System.Web.Http.HttpError.Handler
+M00000016_IL_0223:
+ldloca local30
+M00000016_IL_0225:
+ldloca local31
+M00000016_IL_0227:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Handler&)
+M00000016_IL_022c:
+brfalse M00000016_IL_024f
+M00000016_IL_0231:
+ldloca local31
+M00000016_IL_0233:
+call instance System.Web.Http.HttpError.Handler::get_Message()
+M00000016_IL_0238:
+stloc local10
+M00000016_IL_023a:
+M00000016_IL_023b:
+br M00000016_IL_0246
+M00000016_IL_0246:
+M00000016_IL_0247:
+ldloc local10
+M00000016_IL_0249:
+stloc local1
+M00000016_IL_024a:
+br M00000016_IL_0269
+M00000016_IL_024f:
+M00000016_IL_0250:
+ldloc local0
+M00000016_IL_0251:
+pop
+M00000016_IL_0252:
+ldc.i4 1
+M00000016_IL_0253:
+brfalse M00000016_IL_0264
+M00000016_IL_0258:
+M00000016_IL_0259:
+ldstr "Empty"
+M00000016_IL_025e:
+stloc local1
 M00000016_IL_025f:
-M00000016_IL_0260:
-M00000016_IL_0261:
-M00000016_IL_0262:
-M00000016_IL_0263:
-fault "Guest program reached a terminal failure"
+br M00000016_IL_0269
 M00000016_IL_0264:
 M00000016_IL_0265:
-ldloc local1
 M00000016_IL_0266:
+M00000016_IL_0267:
+M00000016_IL_0268:
+fault "Guest program reached a terminal failure"
+M00000016_IL_0269:
+M00000016_IL_026a:
+ldloc local1
+M00000016_IL_026b:
 ret
 .end
 .method instance byref get_Value() -> System.Object

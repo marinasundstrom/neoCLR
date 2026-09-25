@@ -363,14 +363,25 @@ static class SignatureProbe
         baseSetter.Parameters[0].ParameterType = module.TypeSystem.String;
         Reject("HTTP base setter rejects plain string signature", () => HttpBindings.Bind(baseSetter, baseSetter, false, false));
         baseSetter.Parameters[0].ParameterType = baseArgument;
+        EnumBindings.Validate(module, EnumBindings.HttpStatusCode);
+        var statusEnum = module.GetType(EnumBindings.HttpStatusCode);
+        Check("HTTP status is a non-flags CLI enum", statusEnum.IsEnum && statusEnum.CustomAttributes.Count == 0);
+        var statusNotFound = statusEnum.Fields.Single(f => f.Name == "NotFound");
+        statusNotFound.Constant = 405;
+        Reject("HTTP status rejects changed constants", () => EnumBindings.Validate(module, EnumBindings.HttpStatusCode));
+        statusNotFound.Constant = 404;
         var successStatus = module.GetType("System.Web.Http.HttpResponse").Methods.Single(m => m.Name == "get_IsSuccessStatusCode");
         Check("HTTP success status property", HttpBindings.Bind(successStatus, successStatus, false, false)?.Result == "Boolean");
         var httpError = module.GetType("System.Web.Http.HttpError");
         var statusCase = httpError.NestedTypes.Single(t => t.Name == "UnsuccessfulStatus");
         var statusCtor = statusCase.Methods.Single(m => m.IsConstructor);
         var statusCall = Reference(statusCtor, statusCase);
-        Check("HTTP status error preserves numeric payload", ErrorBindings.Construct(statusCall, statusCtor)
-            is { Result: "System.Web.Http.HttpError.UnsuccessfulStatus", Arguments: ["Int32"] });
+        Check("HTTP status error preserves enum payload", ErrorBindings.Construct(statusCall, statusCtor)
+            is { Result: "System.Web.Http.HttpError.UnsuccessfulStatus", Arguments: ["System.Web.Http.HttpStatusCode"] });
+        statusCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
+        Reject("HTTP status error rejects former integer payload", () => ErrorBindings.Construct(statusCall, statusCtor));
+        statusCall.Parameters[0].ParameterType = module.GetType(EnumBindings.EntryKind);
+        Reject("HTTP status error rejects unrelated enum payload", () => ErrorBindings.Construct(statusCall, statusCtor));
         statusCall.Parameters[0].ParameterType = module.TypeSystem.String;
         Reject("HTTP status error rejects text payload", () => ErrorBindings.Construct(statusCall, statusCtor));
         var transportCase = httpError.NestedTypes.Single(t => t.Name == "Transport");

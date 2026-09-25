@@ -329,3 +329,16 @@ real caller examples; do not mechanically expose all stored members. Named prope
 remain useful alongside positional patterns. This author direction (2026-09-25) asks
 for deliberate Raven-oriented API design, not wholesale adoption of .NET API shapes
 or automatic Deconstruct members on every type.
+
+The author subsequently clarifies that patterns are optional developer-experience
+choices, not a preferred style. Property patterns inspect readable properties and
+must be distinguished from positional patterns requiring Deconstruct. Compile concrete
+examples; Raven rejects combining outer `if let` with an inline `let` binding inside
+that same pattern. Prefer direct properties, patterns or ordinary branching according
+to the sample's purpose, without imposing a universal style.
+
+For captures, distinguish an outer binding context from an `is` pattern. The author
+clarifies these forms: `let Ok(HttpResponse { Headers: headers }) = result` inherits
+capture binding from the outer `let` (handle refutable bindings as required), whereas
+`if result is Ok(HttpResponse { Headers: let headers }) { ... }` uses an explicit
+inline capture. The status fixture covers both forms alongside `if let`.

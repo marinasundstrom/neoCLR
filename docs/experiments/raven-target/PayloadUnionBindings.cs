@@ -20,7 +20,7 @@ static class PayloadUnionBindings
         && IsType(type.FullName.Replace('/', '.')) && type.Resolve() is { IsValueType: true } definition
         && Types[type.FullName.Replace('/', '.')] == definition ? type.FullName.Replace('/', '.') : null;
     static string? Map(TypeReference type) => type.MetadataType == MetadataType.Object ? "System.Object"
-        : Type(type) ?? ErrorBindings.Type(type);
+        : Type(type) ?? ErrorBindings.Type(type) ?? EnumBindings.Type(type);
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition, bool construct = false)
     {
         if (Type(reference.DeclaringType) is not { } owner) return null;

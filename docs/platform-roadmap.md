@@ -81,10 +81,13 @@ separate from acknowledged completion. [BaseUri and string/Uri address overloads
 are now integrated and tested through the handler pipeline. Slice 4 is complete for
 the bounded GET POC. Slice 5 now supports final response statuses 200–599,
 IsSuccessStatusCode and GetString status errors, with bodyless 204/205/304 handling
-and [independent status evidence](experiments/http-status/README.md). Request methods
-and content remain next within slice 5. A supplementary cancellation headers rerun
-settled with TimedOut before the control signal; [the evidence](experiments/http-status/README.md)
-keeps this unresolved validation issue visible before release.
+and [independent status evidence](experiments/http-status/README.md). HttpStatusCode now provides common names and preserves unnamed values; response/error
+signatures carry it, with a retained numeric constructor. Optional property patterns
+are verified separately from proposed positional deconstruction. Request methods
+and content remain next within slice 5. The cancellation fixture now signals independently of the third request;
+headers and isolated-body checks pass. [The evidence](experiments/http-status/README.md)
+retains timeout sensitivity under competing local work for serial release validation;
+no production scheduler/deadline fix is claimed.
 The [private native cancellation hooks](cancellation-design.md#native-operation-acknowledgement--implemented-2026-09-25)
 now cover DNS, connect, accept and transfers, preserving completion ownership.
 Managed DNS/socket token registration and acknowledgement are now implemented, with

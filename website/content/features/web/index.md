@@ -188,3 +188,33 @@ dispose injected handlers. Existing implementations must be updated and rebuilt.
 URI/URL encoding utilities are also planned separately. Their design will distinguish
 path segments, query values and form data; the current Uri parser expects text that
 has already been escaped.
+
+## Inspect response properties
+
+Development responses now expose `HttpStatusCode` names such as `NotFound`, while
+retaining unnamed numeric status values. `IsSuccessStatusCode` checks the 200–299
+range. Cast the enum to `int` when you need its numeric value.
+
+Property patterns are one option alongside ordinary property access. For a
+`Result<HttpResponse, HttpError>` named `result`, this target-tested form matches a
+status and captures the headers:
+
+```raven
+if let Ok(HttpResponse { StatusCode: HttpStatusCode.NotFound, Headers: headers }) = result {
+    Console.WriteLine(headers.Count)
+}
+```
+
+An `is` pattern places `let` on the capture instead:
+
+```raven
+if result is Ok(HttpResponse { StatusCode: HttpStatusCode.NotFound, Headers: let headers }) {
+    Console.WriteLine(headers.Count)
+}
+```
+
+The outer `let` in a binding or `if let` already supplies capture binding. Both
+forms use readable properties; neither requires `Deconstruct` or value equality.
+Positional deconstruction remains a separate design question. Neither form is a
+preferred style for every caller. The [HTTP API reference](/docs/api/System/Web/Http/)
+describes the response, status enum and errors.

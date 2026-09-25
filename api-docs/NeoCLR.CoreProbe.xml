@@ -1844,8 +1844,8 @@
     <member name="M:System.Web.Http.HttpHeader.#ctor(System.String,System.String)"><summary>Stores a header without validation or normalization.</summary><param name="name">Non-null header name.</param><param name="value">Non-null header value.</param></member>
     <member name="P:System.Web.Http.HttpHeader.Name"><summary>The stored header name.</summary></member>
     <member name="P:System.Web.Http.HttpHeader.Value"><summary>The stored header value.</summary></member>
-    <member name="M:System.Web.Http.HttpResponse.#ctor(System.Int32,System.Collections.Sequence{System.Web.Http.HttpHeader},System.Collections.Sequence{System.Byte})"><summary>Creates a response without validating HTTP framing.</summary><param name="statusCode">Status supplied by the handler; the socket parser admits 200 only.</param><param name="headers">Non-null sequence retained without copying.</param><param name="body">Non-null byte sequence retained by content without copying.</param><remarks>Read-only sequence capability does not imply immutable storage. Producers must keep supplied sequences stable while consumers use the response.</remarks></member>
-    <member name="P:System.Web.Http.HttpResponse.StatusCode"><summary>The response numeric status.</summary></member>
+    <member name="M:System.Web.Http.HttpResponse.#ctor(System.Int32,System.Collections.Sequence{System.Web.Http.HttpHeader},System.Collections.Sequence{System.Byte})"><summary>Creates a response without validating HTTP framing.</summary><param name="statusCode">Numeric status supplied by the handler; the socket parser admits final statuses 200–599.</param><param name="headers">Non-null sequence retained without copying.</param><param name="body">Non-null byte sequence retained by content without copying.</param><remarks>Read-only sequence capability does not imply immutable storage. Producers must keep supplied sequences stable while consumers use the response.</remarks></member>
+    <member name="P:System.Web.Http.HttpResponse.StatusCode"><summary>The response status as HttpStatusCode; unnamed numeric values remain representable.</summary></member>
     <member name="P:System.Web.Http.HttpResponse.Headers"><summary>The response header sequence.</summary></member>
     <member name="P:System.Web.Http.HttpResponse.Content"><summary>The response buffered content.</summary></member>
     <member name="M:System.Web.Http.HttpContent.#ctor(System.Collections.Sequence{System.Byte})"><summary>Wraps bytes without copying.</summary><param name="bytes">Non-null sequence; its producer must keep storage stable while consumed.</param></member>
@@ -2143,6 +2143,46 @@
     <member name="M:System.Web.Http.HttpClient.GetString(System.Uri,System.Concurrency.CancellationToken)"><summary>Fetches the buffered response body and decodes strict UTF-8.</summary><param name="uri">An address using the same BaseUri rules as Get.</param><param name="cancellationToken">An invocation-local cancellation request; forwarded through the exchange. Pre-cancellation skips request construction.</param><returns>A Task containing text or HttpError, or a cancelled Task when the exchange acknowledges cancellation.</returns><remarks>Development after Preview 9. Uses the Get/Send handler pipeline. Existing HTTP errors remain unchanged; malformed UTF-8 becomes Protocol("Invalid UTF-8 body"). Statuses 200–299 are successful, including custom handler replies; other statuses produce UnsuccessfulStatus with the status code. No charset negotiation, decompression or streaming is added. The socket transport retains its 1,024-byte body bound. Conversion uses the existing Task.Map cancellation behavior and does not reread a token after the response task completes. Tokenless overloads use CancellationToken.None. HttpContent.ReadText retains its separate provisional string-error contract.</remarks></member>
     <member name="P:System.Web.Http.HttpResponse.IsSuccessStatusCode"><summary>Whether StatusCode is in the successful 200–299 range.</summary></member>
     <member name="T:System.Web.Http.HttpError.UnsuccessfulStatus"><summary>A convenience operation received a non-success HTTP status.</summary><remarks>GetString requires 200–299. Send and Get return final statuses as response data.</remarks></member>
-    <member name="M:System.Web.Http.HttpError.UnsuccessfulStatus.#ctor(System.Int32)"><summary>Describes a non-success response status.</summary><param name="statusCode">The response status code, preserved for pattern matching.</param></member>
+    <member name="M:System.Web.Http.HttpError.UnsuccessfulStatus.#ctor(System.Web.Http.HttpStatusCode)"><summary>Describes a non-success response status.</summary><param name="statusCode">The response status code, preserved for pattern matching.</param></member>
+    <member name="T:System.Web.Http.HttpStatusCode"><summary>Named HTTP status codes with Int32 values.</summary><remarks>Development API. This initial set covers common HTTP statuses; casts preserve unnamed values. A named constant does not imply transport support. The current transport handles final statuses 200–599, not informational responses. ToString returns a name when defined and numeric text otherwise.</remarks></member>
+    <member name="M:System.Web.Http.HttpResponse.#ctor(System.Web.Http.HttpStatusCode,System.Collections.Sequence{System.Web.Http.HttpHeader},System.Collections.Sequence{System.Byte})"><summary>Creates a response with a named or extension status.</summary><param name="statusCode">The status code; transport validation applies when sending.</param><param name="headers">Headers whose contents remain stable while consumed.</param><param name="body">Buffered bytes whose contents remain stable while consumed.</param><remarks>The Int32 constructor remains available. StatusCode now returns HttpStatusCode; cast to int for numeric formatting or arithmetic.</remarks></member>
+    <member name="F:System.Web.Http.HttpStatusCode.Continue"><summary>HTTP status 100 (Continue).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.SwitchingProtocols"><summary>HTTP status 101 (SwitchingProtocols).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.OK"><summary>HTTP status 200 (OK).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.Created"><summary>HTTP status 201 (Created).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.Accepted"><summary>HTTP status 202 (Accepted).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.NoContent"><summary>HTTP status 204 (NoContent).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.ResetContent"><summary>HTTP status 205 (ResetContent).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.PartialContent"><summary>HTTP status 206 (PartialContent).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.MultipleChoices"><summary>HTTP status 300 (MultipleChoices).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.MovedPermanently"><summary>HTTP status 301 (MovedPermanently).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.Found"><summary>HTTP status 302 (Found).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.SeeOther"><summary>HTTP status 303 (SeeOther).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.NotModified"><summary>HTTP status 304 (NotModified).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.TemporaryRedirect"><summary>HTTP status 307 (TemporaryRedirect).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.PermanentRedirect"><summary>HTTP status 308 (PermanentRedirect).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.BadRequest"><summary>HTTP status 400 (BadRequest).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.Unauthorized"><summary>HTTP status 401 (Unauthorized).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.Forbidden"><summary>HTTP status 403 (Forbidden).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.NotFound"><summary>HTTP status 404 (NotFound).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.MethodNotAllowed"><summary>HTTP status 405 (MethodNotAllowed).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.RequestTimeout"><summary>HTTP status 408 (RequestTimeout).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.Conflict"><summary>HTTP status 409 (Conflict).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.Gone"><summary>HTTP status 410 (Gone).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.LengthRequired"><summary>HTTP status 411 (LengthRequired).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.PreconditionFailed"><summary>HTTP status 412 (PreconditionFailed).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.RequestEntityTooLarge"><summary>HTTP status 413 (RequestEntityTooLarge).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.RequestUriTooLong"><summary>HTTP status 414 (RequestUriTooLong).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.UnsupportedMediaType"><summary>HTTP status 415 (UnsupportedMediaType).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.RequestedRangeNotSatisfiable"><summary>HTTP status 416 (RequestedRangeNotSatisfiable).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.ExpectationFailed"><summary>HTTP status 417 (ExpectationFailed).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.UnprocessableContent"><summary>HTTP status 422 (UnprocessableContent).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.TooManyRequests"><summary>HTTP status 429 (TooManyRequests).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.InternalServerError"><summary>HTTP status 500 (InternalServerError).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.NotImplemented"><summary>HTTP status 501 (NotImplemented).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.BadGateway"><summary>HTTP status 502 (BadGateway).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.ServiceUnavailable"><summary>HTTP status 503 (ServiceUnavailable).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.GatewayTimeout"><summary>HTTP status 504 (GatewayTimeout).</summary></member>
+    <member name="F:System.Web.Http.HttpStatusCode.HttpVersionNotSupported"><summary>HTTP status 505 (HttpVersionNotSupported).</summary></member>
   </members>
 </doc>

@@ -7,7 +7,9 @@ static class EnumBindings
     public const string Flags = "System.Introspection.BindingFlags";
     public const string TaskState = "System.Tasks.TaskState";
     public const string EntryKind = "System.Storage.EntryKind";
-    public static bool IsType(string name) => name is Flags or TaskState or EntryKind;
+    public const string HttpStatusCode = "System.Web.Http.HttpStatusCode";
+    static readonly (string Name, int Value)[] HttpLiterals = [("Continue", 100), ("SwitchingProtocols", 101), ("OK", 200), ("Created", 201), ("Accepted", 202), ("NoContent", 204), ("ResetContent", 205), ("PartialContent", 206), ("MultipleChoices", 300), ("MovedPermanently", 301), ("Found", 302), ("SeeOther", 303), ("NotModified", 304), ("TemporaryRedirect", 307), ("PermanentRedirect", 308), ("BadRequest", 400), ("Unauthorized", 401), ("Forbidden", 403), ("NotFound", 404), ("MethodNotAllowed", 405), ("RequestTimeout", 408), ("Conflict", 409), ("Gone", 410), ("LengthRequired", 411), ("PreconditionFailed", 412), ("RequestEntityTooLarge", 413), ("RequestUriTooLong", 414), ("UnsupportedMediaType", 415), ("RequestedRangeNotSatisfiable", 416), ("ExpectationFailed", 417), ("UnprocessableContent", 422), ("TooManyRequests", 429), ("InternalServerError", 500), ("NotImplemented", 501), ("BadGateway", 502), ("ServiceUnavailable", 503), ("GatewayTimeout", 504), ("HttpVersionNotSupported", 505)];
+    public static bool IsType(string name) => name is Flags or TaskState or EntryKind or HttpStatusCode;
     static readonly (string Name, int Value)[] EntryLiterals = [("File", 1), ("Directory", 2)];
     public static string? Type(TypeReference type) => IsType(type.FullName) && RuntimeSignatures.IsCore(type.Scope) && (type.IsValueType || type.Resolve()?.IsEnum == true) ? type.FullName : null;
     static readonly (string Name, int Value)[] TaskLiterals = [("Pending", 0), ("Completed", 1), ("Cancelled", 2)];
@@ -20,7 +22,7 @@ static class EnumBindings
             || type.CustomAttributes.Count(a => a.AttributeType.FullName == "System.FlagsAttribute") != (name == Flags ? 1 : 0)
             || type.Fields.Count(f => !f.IsStatic) != 1
             || type.Fields.Single(f => !f.IsStatic) is not { Name: "value__", IsSpecialName: true, IsRuntimeSpecialName: true, FieldType.MetadataType: MetadataType.Int32 }
-            || !type.Fields.Where(f => f.IsStatic).Select(f => (f.Name, f.IsLiteral && f.Constant is int n ? n : int.MinValue)).Order().SequenceEqual((name == Flags ? Literals : name == EntryKind ? EntryLiterals : TaskLiterals).Order()))
+            || !type.Fields.Where(f => f.IsStatic).Select(f => (f.Name, f.IsLiteral && f.Constant is int n ? n : int.MinValue)).Order().SequenceEqual((name == Flags ? Literals : name == EntryKind ? EntryLiterals : name == HttpStatusCode ? HttpLiterals : TaskLiterals).Order()))
             throw new InvalidDataException("Unsupported enum metadata: " + name + ".");
     }
     // CLI enums have literals and an underlying value field, not authored method

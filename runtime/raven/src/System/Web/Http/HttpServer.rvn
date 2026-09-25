@@ -194,7 +194,7 @@ public class HttpServer {
     }
 
     internal static func EncodeResponse(response: HttpResponse) -> Result<Sequence<byte>, HttpError> {
-        let status = response.StatusCode
+        let status = (int)response.StatusCode
         if !(status >= 200 && status <= 599) {
             return Error(HttpError.InvalidRequest("A final response status from 200 through 599 is required"))
         }

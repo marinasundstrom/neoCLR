@@ -125,7 +125,7 @@ func CheckContracts() {
         System.Fault("Invalid UTF-8 was accepted")
     }
     if let Error(HttpError.UnsuccessfulStatus(code)) = status.GetResult() {
-        Check(code == 404)
+        Check(code == HttpStatusCode.NotFound)
     } else {
         System.Fault("Non-success status was accepted")
     }

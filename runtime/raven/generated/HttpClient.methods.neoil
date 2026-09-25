@@ -833,7 +833,7 @@ ldloc local3
 M0000000f_IL_0051:
 callvirt instance System.Web.Http.HttpResponse::get_StatusCode()
 M0000000f_IL_0056:
-newobj instance System.Web.Http.HttpError.UnsuccessfulStatus::.ctor(Int32)
+newobj instance System.Web.Http.HttpError.UnsuccessfulStatus::.ctor(System.Web.Http.HttpStatusCode)
 M0000000f_IL_005b:
 newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.UnsuccessfulStatus)
 M0000000f_IL_0060:

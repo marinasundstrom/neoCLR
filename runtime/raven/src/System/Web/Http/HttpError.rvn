@@ -13,7 +13,7 @@ public union HttpError {
     /// A socket operation failed.
     case Transport(reason: SocketError)
     /// A convenience operation required a successful status but received another status.
-    case UnsuccessfulStatus(statusCode: int)
+    case UnsuccessfulStatus(statusCode: HttpStatusCode)
     /// The request is invalid for this HTTP implementation.
     case InvalidRequest(message: string)
     /// The peer supplied an invalid or incomplete HTTP message.
@@ -33,7 +33,7 @@ public union HttpError {
             InvalidUri(let reason) => reason.ToString()
             NameResolution(let reason) => reason.ToString()
             Transport(let reason) => reason.ToString()
-            UnsuccessfulStatus(let statusCode) => String.Concat("HTTP status ", statusCode.ToString())
+            UnsuccessfulStatus(let statusCode) => String.Concat("HTTP status ", ((int)statusCode).ToString())
             InvalidRequest(let message) => message
             Protocol(let message) => message
             Unsupported(let message) => message

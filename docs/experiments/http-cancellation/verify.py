@@ -36,7 +36,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-cancellation-') as folder, 
         def serve():
             peers = {}
             try:
-                for _ in range(3):
+                def receive_request():
                     peer = listener.accept()[0]
                     peer.settimeout(30)
                     request = bytearray()
@@ -48,6 +48,10 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-cancellation-') as folder, 
                     target = request.split(b' ')[1].decode('ascii')
                     assert target in ['/cancel-response', '/cancel-text', '/keep'] and target not in peers, request
                     peers[target] = peer
+                # Cancellation depends only on the operations being cancelled, not
+                # on unrelated work reaching the peer before its own deadline.
+                while not all(target in peers for target in ('/cancel-response', '/cancel-text')):
+                    receive_request()
                 with control.accept()[0] as signal:
                     signal.settimeout(30)
                     if case == 'body':
@@ -62,6 +66,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-cancellation-') as folder, 
                     except ConnectionResetError:
                         pass  # Closing with unread response bytes may reset rather than send FIN.
                 # Same HttpClient, different token: cancelling the first two must not cancel this exchange.
+                if '/keep' not in peers:
+                    receive_request()
                 peers['/keep'].sendall(head + body)
                 assert peers['/keep'].recv(1) == b'', 'Successful HTTP connection remained open'
             except BaseException as error:

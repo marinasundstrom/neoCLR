@@ -583,3 +583,42 @@ API classes independently of value-object semantics. Treat this as a general des
 consideration, not a request to make requests/responses structurally equal or to freeze
 all their content. Explore semantic patterns in real samples before committing an
 ordered Deconstruct signature; property inspection remains available.
+
+## Named response statuses — development, 2026-09-25
+
+HttpStatusCode is now an Int32-backed CLI enum in System.Web.Http. Its initial named
+set follows familiar [.NET HttpStatusCode](https://learn.microsoft.com/en-us/dotnet/api/system.net.httpstatuscode?view=net-10.0)
+values/names for common statuses; aliases and an exhaustive registry mirror are not
+required for this POC. Unnamed values remain representable, including 599. Enum names
+are not a transport capability claim: 1xx still remains unsupported. IsSuccessStatusCode
+continues to classify the underlying 200–299 range, independently of defined names.
+
+HttpResponse.StatusCode and HttpError.UnsuccessfulStatus now use the enum. A typed
+response constructor is added; the existing Int32 constructor remains for callers
+using numeric status codes. This changes development metadata signatures: rebuild
+library, reference and consumers together. Cast to int for numeric output; enum
+ToString gives a name for a defined value and numeric text for an unnamed value.
+HttpError.ToString retains numeric status diagnostics.
+
+Compared with retaining only int, the enum supplies discoverable names and useful
+static typing at the cost of explicit numeric casts and maintaining the named set.
+A closed union would wrongly suggest only listed HTTP statuses can exist. No new
+runtime enum representation or Raven convention is introduced; the bridge admits
+this exact enum and enum-typed union payloads through its existing enum mapping.
+
+The author clarifies that property/positional patterns are optional ways to inspect
+responses, not a preferred coding style. Property patterns need readable properties;
+they do not require Deconstruct. No positional signature, structural equality or
+copying semantics are introduced by the enum slice. Target property-pattern evidence
+is retained in the status fixture rather than assuming the illustrative syntax compiles.
+
+### Cancellation regression follow-up
+
+The prior token/text checkpoint passes the original headers fixture, so the later
+failure was not dismissed as pre-existing. The fixture unnecessarily waited for the
+uncancelled third request before signalling cancellation of the other two. It now
+signals as soon as the two relevant requests arrive; unrelated work remains concurrent
+and must still finish successfully. Cancellation and peer-observed connection-close
+assertions remain strict. No native deadlines, scheduler behavior or HTTP cancellation
+implementation changes are made. This removes that fixture ordering dependency,
+without proving the cause of every timing/performance difference between checkpoints.

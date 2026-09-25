@@ -215,3 +215,9 @@ The final-status slice adds HttpResponse.IsSuccessStatusCode and the source-proj
 HttpError.UnsuccessfulStatus case. The matching reference documents 200–599 responses,
 GetString's 200–299 policy and bodyless status rules. Website sources are updated;
 building the website is deferred by the author's focused-validation direction.
+
+The named-status checkpoint adds HttpStatusCode and its initial common constants to
+reference navigation. HttpResponse.StatusCode and UnsuccessfulStatus carry the enum;
+the typed response constructor is documented alongside the retained integer overload.
+The signature change requires rebuilding development consumers. Unnamed codes and
+optional property-pattern inspection are covered by the target status fixture.

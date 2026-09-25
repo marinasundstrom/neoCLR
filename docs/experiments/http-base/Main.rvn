@@ -55,7 +55,7 @@ func Resolved(baseText: string, reference: string, expected: string) {
         System.Fault("BaseUri was not retained")
     }
     if let Ok(response) = client.Get(reference).GetResult() {
-        Check(response.StatusCode == 200)
+        Check((int)response.StatusCode == 200)
     } else {
         System.Fault("Relative string request failed")
     }
@@ -64,7 +64,7 @@ func Resolved(baseText: string, reference: string, expected: string) {
     Check(capture.Port == 8080)
     if let Ok(uri) = Uri.Parse(reference) {
         if let Ok(response) = client.Get(uri).GetResult() {
-            Check(response.StatusCode == 200)
+            Check((int)response.StatusCode == 200)
         } else {
             System.Fault("Relative Uri request failed")
         }
@@ -111,7 +111,7 @@ func Main() {
     client.BaseUri = Some("http://example.test:8080/api/")
     client.BaseUri = None()
     if let Ok(response) = client.Get("http://example.test?answer=42").GetResult() {
-        Check(response.StatusCode == 200)
+        Check((int)response.StatusCode == 200)
         Check(capture.Target == "/?answer=42")
         Check(capture.Port == 80)
     } else {

@@ -7112,3 +7112,23 @@ configuration/content, not target-specific code added to Raven main.
   deconstruction; the opportunity is consistent Raven-oriented library design, not
   a claim that the language mechanism is unavailable on .NET. Request/response
   positional signatures remain open until demonstrated by a real sample.
+
+## 2026-09-25 — Response inspection is an optional developer experience
+
+- **Author clarification:** the motivation for request/response deconstruction is
+  developer experience, including nominal/positional inspection and property patterns.
+  The author sketches matching Ok(HttpResponse { StatusCode: HttpStatus.NotFound,
+  Headers: let headers }) and explicitly says it need not be preferred or correct code.
+- **Assistant response:** separate readable-property patterns from a positional
+  Deconstruct contract. Validate syntax against the target before publishing examples;
+  do not make either style mandatory or imply value equality. The chosen enum name
+  for the current slice is HttpStatusCode, consistent with the prior discussion.
+- **Action:** add a bounded property-pattern probe to the status fixture. An initial
+  compile reports RAV1613 for combining outer `if let` with inner `let headers`;
+  the probe uses `Headers: headers`. Execution evidence is recorded with the fixture.
+
+- **Author further clarification:** an outer `let Ok(HttpResponse { ... Headers:
+  headers }) = result` already supplies binding; an `is` pattern instead captures
+  explicitly with `Headers: let headers`. **Assistant action:** add both forms to
+  the target fixture and distinguish this from the rejected combination of both
+  binding styles in one pattern. No Raven syntax or compiler change is requested.

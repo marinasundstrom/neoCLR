@@ -22,7 +22,7 @@ extension HttpErrorConversion for HttpError {
 }
 
 func FailedNumber() -> Result<int, HttpError> {
-    return Error(HttpError.UnsuccessfulStatus(404))
+    return Error(HttpError.UnsuccessfulStatus(HttpStatusCode.NotFound))
 }
 
 func ConvertedError() -> Result<int, AppError> {
@@ -55,7 +55,7 @@ class StatusProbe {
                 System.Fault("Final status was treated as transport failure")
                 return
             }
-            Check(response.StatusCode == code)
+            Check((int)response.StatusCode == code)
             Check(response.IsSuccessStatusCode == (code >= 200 && code <= 299))
             if code == 204 || code == 205 || code == 304 {
                 Check(response.Content.Bytes.Count == 0)
@@ -91,7 +91,7 @@ class StatusProbe {
                     System.Fault("Non-success status cause lost")
                     return
                 }
-                Check(actual == code)
+                Check((int)actual == code)
             }
             Console.WriteLine(code)
             Advance()
@@ -124,7 +124,34 @@ class StatusProbe {
     }
 }
 
+func CheckNamedStatus() {
+    let named = HttpStatusCode.NotFound
+    Check((int)named == 404)
+    Check(named.ToString() == "NotFound")
+    let extension = (HttpStatusCode)599
+    Check((int)extension == 599)
+    Check(extension.ToString() == "599")
+    let response = HttpResponse(named, ArrayList<HttpHeader>(), ArrayList<byte>())
+    let result: Result<HttpResponse, HttpError> = Ok(response)
+    if let Ok(HttpResponse { StatusCode: HttpStatusCode.NotFound, Headers: headers }) = result {
+        Check(headers.Count == 0)
+    } else {
+        System.Fault("Response property pattern failed")
+    }
+    let Ok(HttpResponse { StatusCode: HttpStatusCode.NotFound, Headers: boundHeaders }) = result else {
+        System.Fault("Response property binding failed")
+        return
+    }
+    Check(boundHeaders.Count == 0)
+    if result is Ok(HttpResponse { StatusCode: HttpStatusCode.NotFound, Headers: let headers }) {
+        Check(headers.Count == 0)
+    } else {
+        System.Fault("Response is-pattern capture failed")
+    }
+}
+
 func Main() {
+    CheckNamedStatus()
     let Error(appError) = ConvertedError() else {
         System.Fault("Extension conversion did not return an error")
         return
@@ -134,7 +161,7 @@ func Main() {
         return
     }
     if let HttpError.UnsuccessfulStatus(code) = reason {
-        Check(code == 404)
+        Check(code == HttpStatusCode.NotFound)
     } else {
         System.Fault("Extension conversion did not preserve status")
     }
