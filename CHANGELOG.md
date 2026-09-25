@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Add provisional System.IO.MemoryStream with bounded managed storage, shared
+  read/write position, absolute seeking, zero-filled gaps and explicit close semantics.
+  Include bridge admission, API documentation and focused stream/DOM checks.
+  Prioritize the JSON DOM before reflective object mapping.
+
+- Add an experiment-local JsonSerializer string/stream adapter over the bounded JSON
+  DOM codec. Exercise StreamReader/StreamWriter with short transfers, UTF-8, limits,
+  I/O failures and borrowed ownership. Public System.Data.Json APIs and reflection
+  mapping remain planned; record future HttpClient GetJson/PostJson extensions.
+
 - Add development HttpServer.Accept and HttpContext ownership with Request/Response,
   explicit asynchronous Complete, Close/Dispose, Respond forwarding and UTF-8 RespondText.
   HttpResponse.Respond configures status and optional content without sending. ServeOne

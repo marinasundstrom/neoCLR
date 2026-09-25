@@ -18,6 +18,7 @@
     "runtime/raven/src/System/IO/TextReader.rvn": "6f9f6159741cec9acaded9e5b2705d3c1beaac4fa3fbb1be8a2146f18f575ce0",
     "runtime/raven/src/System/IO/TextWriter.rvn": "ee053d0893f533207e580eba37509aca9284dd0c37d13dff1941a2485b506fec",
     "runtime/raven/src/System/IO/StreamWriter.rvn": "f108f21e5a1ff1c639a97e114af0989adf370bedfb734a1e9d5d247715c85fd4",
+    "runtime/raven/src/System/IO/MemoryStream.rvn": "bd81a43f0f196d2acd8b85aa97876bd472588b0c2d5e2c81c3fc5606a631ea7c",
     "runtime/raven/src/System/IO/StreamReader.rvn": "c33391676f4b55295ae2ae14fa8b27a07f6eba77d6b97e222a11a590f07ee61a",
     "runtime/raven/src/System/IO/SeekableStream.rvn": "b330b07c1e8ea6d2411c4cd78fb74c1a094e6bfcebafe81b815cfb98e230ecf3",
     "runtime/raven/src/System/Storage/FileSystem.rvn": "317025c6492b1494e415c098f121ce90c48c7ad8047b078bc588d03e5565d84b",
@@ -118,7 +119,7 @@
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
-    "runtime/raven/System.Runtime.rvnproj": "e2552b35c00df295ff293564b6efe756d00e192e1467fe2707b1e3122fe96554",
+    "runtime/raven/System.Runtime.rvnproj": "dd01d1534dcec4e0f11a137cd8d106ac29206ea4fd6441b70910ca46f49905cc",
     "build/NeoCLR.Raven.props": "b4779097eddf04b644194f78c8137b32844d2451b5c2db3fea0b0f7c000690ab"
   },
   "outputs": {
@@ -126,7 +127,7 @@
     "Result.helpers.neoil": "24be0176befe260a91a302c65780f7afdac053d913acd6182c3e030e26ac35f9"
   },
   "compilerSha256": "57b6c6e33727de470fe529ee4b5c2b8fb338aeb60d1d6405d9e515276dccd96a",
-  "coreSha256": "9209e4611bb05e7e23eb6c81e01f8dc73507261d72030106b3bce4e36583e6d2",
+  "coreSha256": "3675407c194b7b5ba0bb873aef439732db8180c50b0c8eb8ea9944c284cda245",
   "exports": [
     "Ok(T0 value) -> System.Result<T0,T1>",
     "Error(T1 error) -> System.Result<T0,T1>",

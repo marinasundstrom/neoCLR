@@ -7,8 +7,9 @@ static class StreamBindings
     public static bool IsCapability(string name) => name is Prefix + "InputStream" or Prefix + "OutputStream" or Prefix + "SeekableStream";
     public static bool Assignable(string source, string target) =>
         source == Prefix + "FileInputStream" && target is Prefix + "InputStream" or Prefix + "SeekableStream"
+        || source == Prefix + "MemoryStream" && IsCapability(target)
         || source == Prefix + "FileOutputStream" && target == Prefix + "OutputStream";
-    public static bool IsName(string name) => name is Prefix + "FileInputStream" or Prefix + "FileOutputStream";
+    public static bool IsName(string name) => name is Prefix + "FileInputStream" or Prefix + "FileOutputStream" or Prefix + "MemoryStream";
     public static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName
         && (IsName(left.FullName) || IsCapability(left.FullName)) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
@@ -26,6 +27,16 @@ static class StreamBindings
                 Result<int, StreamError> Write(byte[] buffer, int offset, int count);
                 Result<PropagationUnit, StreamError> Flush();
                 void Close();
+            }
+            public sealed class MemoryStream : InputStream, OutputStream, SeekableStream {
+                public MemoryStream() { }
+                public Result<long, StreamError> GetLength() => default;
+                public Result<long, StreamError> GetPosition() => default;
+                public Result<long, StreamError> Seek(long position) => default;
+                public Result<int, StreamError> Read(byte[] buffer, int offset, int count) => default;
+                public Result<int, StreamError> Write(byte[] buffer, int offset, int count) => default;
+                public Result<PropagationUnit, StreamError> Flush() => default;
+                public void Close() { }
             }
             public sealed class FileInputStream : InputStream, SeekableStream {
                 public Result<long, StreamError> GetPosition() => default;
@@ -85,6 +96,28 @@ static class StreamBindings
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
+        if (owner == Prefix + "MemoryStream") {
+            var expectedMemory = reference.Name switch {
+                ".ctor" => ("", "noresult", false),
+                "Read" or "Write" => ("arrayref<Byte>,Int32,Int32", "System.Result<Int32,System.IO.StreamError>", true),
+                "GetLength" => ("", "System.Result<Int64,System.IO.StreamError>", false),
+                "GetPosition" => ("", "System.Result<Int64,System.IO.StreamError>", true),
+                "Seek" => ("Int64", "System.Result<Int64,System.IO.StreamError>", true),
+                "Flush" => ("", "System.Result<Void,System.IO.StreamError>", true),
+                "Close" => ("", "noresult", true),
+                _ => throw new InvalidDataException("Unsupported memory stream member.")
+            };
+            if (!definition.IsPublic || definition.IsStatic || definition.HasGenericParameters
+                || !definition.DeclaringType.IsSealed || definition.DeclaringType.HasGenericParameters
+                || definition.IsConstructor != construct || !reference.HasThis
+                || definition.IsVirtual != expectedMemory.Item3 || definition.IsFinal != expectedMemory.Item3
+                || definition.IsNewSlot != expectedMemory.Item3
+                || string.Join(',', args) != expectedMemory.Item1 || result != expectedMemory.Item2)
+                throw new InvalidDataException("Unsupported memory stream signature.");
+            return construct ? new(args, owner, $"newobj instance {owner}::.ctor()")
+                : new(new[] { owner }.Concat(args).ToArray(), result,
+                    $"call instance {owner}::{reference.Name}({string.Join(',', args)})");
+        }
         var expected = (owner, definition.Name) switch {
             (Prefix + "FileInputStream", "Open") or (Prefix + "FileOutputStream", "CreateNew") => ("String", $"System.Result<{owner},System.IO.StreamError>", true),
             (Prefix + "FileInputStream", "Read") or (Prefix + "FileOutputStream", "Write") => ("arrayref<Byte>,Int32,Int32", "System.Result<Int32,System.IO.StreamError>", false),

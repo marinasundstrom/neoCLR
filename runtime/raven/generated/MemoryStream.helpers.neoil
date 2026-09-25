@@ -1,0 +1,102 @@
+; Generated from runtime/raven/src/System/IO/MemoryStream.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorClosed(System.IO.StreamError.Closed value) -> System.IO.StreamError
+ldarg value
+newobj instance System.IO.StreamError::.ctor(System.IO.StreamError.Closed)
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorInvalidRange(System.IO.StreamError.InvalidRange value) -> System.IO.StreamError
+ldarg value
+newobj instance System.IO.StreamError::.ctor(System.IO.StreamError.InvalidRange)
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorLimitExceeded(System.IO.StreamError.LimitExceeded value) -> System.IO.StreamError
+ldarg value
+newobj instance System.IO.StreamError::.ctor(System.IO.StreamError.LimitExceeded)
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorClosedNew() -> System.IO.StreamError.Closed
+newobj instance System.IO.StreamError.Closed::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorInvalidRangeNew() -> System.IO.StreamError.InvalidRange
+newobj instance System.IO.StreamError.InvalidRange::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorLimitExceededNew() -> System.IO.StreamError.LimitExceeded
+newobj instance System.IO.StreamError.LimitExceeded::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError arg0) -> System.Result.Error<System.IO.StreamError>
+ldarg arg0
+newobj instance System.Result.Error<System.IO.StreamError>::.ctor(System.IO.StreamError)
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion1(System.Result.Error<System.IO.StreamError> arg0) -> System.Result<Int64,System.IO.StreamError>
+ldarg arg0
+newobj instance System.Result<Int64,System.IO.StreamError>::.ctor(System.Result.Error<System.IO.StreamError>)
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion2(Int64 arg0) -> System.Result.Ok<Int64>
+ldarg arg0
+newobj instance System.Result.Ok<Int64>::.ctor(Int64)
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion3(System.Result.Ok<Int64> arg0) -> System.Result<Int64,System.IO.StreamError>
+ldarg arg0
+newobj instance System.Result<Int64,System.IO.StreamError>::.ctor(System.Result.Ok<Int64>)
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError> arg0) -> System.Result<Int32,System.IO.StreamError>
+ldarg arg0
+newobj instance System.Result<Int32,System.IO.StreamError>::.ctor(System.Result.Error<System.IO.StreamError>)
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion5(Int32 arg0) -> System.Result.Ok<Int32>
+ldarg arg0
+newobj instance System.Result.Ok<Int32>::.ctor(Int32)
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion6(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.IO.StreamError>
+ldarg arg0
+newobj instance System.Result<Int32,System.IO.StreamError>::.ctor(System.Result.Ok<Int32>)
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion7(System.Result.Error<System.IO.StreamError> arg0) -> System.Result<Void,System.IO.StreamError>
+ldarg arg0
+newobj instance System.Result<Void,System.IO.StreamError>::.ctor(System.Result.Error<System.IO.StreamError>)
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion8(Void arg0) -> System.Result.Ok<Void>
+ldarg arg0
+newobj instance System.Result.Ok<Void>::.ctor(Void)
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion9(System.Result.Ok<Void> arg0) -> System.Result<Void,System.IO.StreamError>
+ldarg arg0
+newobj instance System.Result<Void,System.IO.StreamError>::.ctor(System.Result.Ok<Void>)
+ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

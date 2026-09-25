@@ -7307,3 +7307,25 @@ configuration/content, not target-specific code added to Raven main.
   both paths, checking partial transfers, malformed input, encoding and ownership as
   release-demo acceptance criteria. This updates planned scope; no serializer API is
   implemented by the HTTP lifecycle checkpoint.
+
+### 2026-09-25 — JSON string/stream exploration
+
+- **Author direction:** continue the serializer POC; eventually offer GetJson<T> and
+  PostJson extension methods for HttpClient.
+- **Assistant action:** add a bounded, experiment-local JsonSerializer over the
+  existing JSON tree codec, exercising StreamReader/StreamWriter with borrowed
+  streams. Keep public extraction and runtime-reflection object mapping distinct
+  from this I/O probe.
+- **Open:** public structured errors, reflective member access/construction, async
+  stream behavior and the exact HTTP convenience contracts. The HTTP extensions
+  remain planned, not implemented. Evidence: [JSON streams](experiments/json-streams/README.md).
+
+- **Author additions:** provide provisional System.IO.MemoryStream; handle the JSON
+  DOM first, before considering object deserialization. **Assistant action:** implement
+  the three existing byte-stream capabilities with bounded managed storage and use
+  write/rewind/read in the DOM fixture. Reflection remains a later milestone.
+
+- **Validation outcome:** the focused target DOM/memory/short-transfer fixture and
+  .NET memory/JSON baseline pass. The target ends with zero live objects after 13
+  collections. This establishes synchronous DOM I/O evidence, not a public JSON
+  API or reflection implementation.

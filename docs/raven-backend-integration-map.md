@@ -240,3 +240,20 @@ investigation candidate, not evidence of a diagnosed GC bug or a completed fix.
 
 The [captured-callback source and reproduction command](experiments/http-context/repros/README.md)
 are retained for that follow-up and are explicitly excluded from passing sample claims.
+
+### Memory stream / JSON DOM I/O — 2026-09-25
+
+The bridge now admits the provisional System.IO.MemoryStream constructor and methods
+with conversions to InputStream, OutputStream and SeekableStream. This is ordinary
+managed storage/interface dispatch; no compiler semantics or Runtime Contract change.
+The JSON adapter remains application code using the existing tree codec, Result and
+text wrappers. It is not reflection-based object mapping.
+
+The frozen compiler accepts separate range guards but failed parsing a combined
+expression mixing multiple less-than and greater-than comparisons. The implementation
+uses separate guards (also matching Console stream validation); no parser fix is
+claimed. Empty explicit init was replaced by a constructor initializing the cursor
+after the failed parse produced a duplicate-constructor diagnostic. This was not
+isolated as an independent constructor defect. Focused target/.NET/GC evidence is in
+[JSON streams](experiments/json-streams/README.md); signature checks cover member and
+capability admission. Public API docs and bootstrap snapshots accompany the change.

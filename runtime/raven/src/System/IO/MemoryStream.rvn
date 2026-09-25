@@ -1,0 +1,122 @@
+namespace System.IO
+
+import System.*
+import System.Collections.*
+import System.Result.*
+
+// Provisional, bounded managed storage. All stream capabilities share one cursor.
+public class MemoryStream : InputStream, OutputStream, SeekableStream {
+    private var bytes: List<byte> = ArrayList<byte>()
+    private var position: int = 0
+    private var closed: bool = false
+
+    init() {
+        position = 0
+    }
+
+    func GetLength() -> Result<long, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        return Ok((long)bytes.Count)
+    }
+
+    func GetPosition() -> Result<long, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        return Ok((long)position)
+    }
+
+    func Seek(position: long) -> Result<long, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if position < 0 {
+            return Error(StreamError.InvalidRange)
+        }
+        if position > 65536 {
+            return Error(StreamError.LimitExceeded)
+        }
+        self.position = (int)position
+        return Ok(position)
+    }
+
+    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if offset < 0 {
+            return Error(StreamError.InvalidRange)
+        }
+        if count < 0 {
+            return Error(StreamError.InvalidRange)
+        }
+        if offset > buffer.Length {
+            return Error(StreamError.InvalidRange)
+        }
+        if count > buffer.Length - offset {
+            return Error(StreamError.InvalidRange)
+        }
+        var read = 0
+        while read < count && position < bytes.Count {
+            buffer[offset + read] = bytes[position]
+            read += 1
+            position += 1
+        }
+        return Ok(read)
+    }
+
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if offset < 0 {
+            return Error(StreamError.InvalidRange)
+        }
+        if count < 0 {
+            return Error(StreamError.InvalidRange)
+        }
+        if offset > buffer.Length {
+            return Error(StreamError.InvalidRange)
+        }
+        if count > buffer.Length - offset {
+            return Error(StreamError.InvalidRange)
+        }
+        if count > 65536 - position {
+            return Error(StreamError.LimitExceeded)
+        }
+        if count == 0 {
+            return Ok(0)
+        }
+        while bytes.Count < position {
+            bytes.Add((byte)0)
+        }
+        var written = 0
+        while written < count {
+            if position == bytes.Count {
+                bytes.Add(buffer[offset + written])
+            } else {
+                bytes[position] = buffer[offset + written]
+            }
+            position += 1
+            written += 1
+        }
+        return Ok(written)
+    }
+
+    func Flush() -> Result<unit, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        return Ok(())
+    }
+
+    func Close() {
+        if !closed {
+            closed = true
+            bytes = ArrayList<byte>()
+            position = 0
+        }
+    }
+}

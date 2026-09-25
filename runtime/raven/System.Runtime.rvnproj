@@ -350,4 +350,7 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StreamWriter'">
     <Compile Include="src/System/IO/StreamWriter.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'MemoryStream'">
+    <Compile Include="src/System/IO/MemoryStream.rvn" />
+  </ItemGroup>
 </Project>

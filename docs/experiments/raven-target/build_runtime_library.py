@@ -25,6 +25,7 @@ SLICES = {
     'TextReader': 'System.IO.TextReader',
     'TextWriter': 'System.IO.TextWriter',
     'StreamWriter': 'System.IO.StreamWriter',
+    'MemoryStream': 'System.IO.MemoryStream',
     'StreamReader': 'System.IO.StreamReader',
     'SeekableStream': 'System.IO.SeekableStream',
 
@@ -149,6 +150,7 @@ SOURCES = {
     'TextReader': 'runtime/raven/src/System/IO/TextReader.rvn',
     'TextWriter': 'runtime/raven/src/System/IO/TextWriter.rvn',
     'StreamWriter': 'runtime/raven/src/System/IO/StreamWriter.rvn',
+    'MemoryStream': 'runtime/raven/src/System/IO/MemoryStream.rvn',
     'StreamReader': 'runtime/raven/src/System/IO/StreamReader.rvn',
     'SeekableStream': 'runtime/raven/src/System/IO/SeekableStream.rvn',
     'FileSystem': 'runtime/raven/src/System/Storage/FileSystem.rvn',

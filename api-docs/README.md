@@ -249,3 +249,7 @@ The selected HttpClient/HttpRequest types now cover Put, Patch and Delete, inclu
 all string/Uri/token overloads and request factories. XML distinguishes supported
 buffered bodies, BaseUri resolution, cancellation and response-status policy. No new
 type selection is needed; snapshots must match the updated bridge and managed library.
+
+MemoryStream is included with all public members in the development reference. Its
+64 KiB bound, shared cursor, zero-fill behavior and close/error contracts are documented.
+The JSON serializer adapter remains experiment-local and is not a public library API.

@@ -50,6 +50,7 @@
   "System.IO.FileInputStream",
   "System.IO.FileOutputStream",
   "System.IO.InputStream",
+  "System.IO.MemoryStream",
   "System.IO.OutputStream",
   "System.IO.SeekableStream",
   "System.IO.StreamError",

@@ -356,6 +356,18 @@ static class SignatureProbe
                     parameter.ParameterType = originalType;
                 }
             }
+        var memoryType = module.GetType("System.IO.MemoryStream");
+        foreach (var member in memoryType.Methods.Where(m => m.IsPublic))
+            Check("Memory stream member " + member.FullName, StreamBindings.Bind(member, member, member.IsConstructor, false) is not null);
+        foreach (var capability in new[] { "InputStream", "OutputStream", "SeekableStream" }) {
+            Check("Memory stream capability " + capability, StreamBindings.Assignable(memoryType.FullName, "System.IO." + capability));
+            Check("Capability does not imply memory stream " + capability, !StreamBindings.Assignable("System.IO." + capability, memoryType.FullName));
+        }
+        var memorySeek = memoryType.Methods.Single(m => m.Name == "Seek");
+        var memoryPositionType = memorySeek.Parameters[0].ParameterType;
+        memorySeek.Parameters[0].ParameterType = module.TypeSystem.Int32;
+        Reject("Memory seek requires Int64", () => StreamBindings.Bind(memorySeek, memorySeek, false, false));
+        memorySeek.Parameters[0].ParameterType = memoryPositionType;
         foreach (var httpOwner in new[] { "HttpServer", "HttpContext", "HttpResponse" })
             foreach (var member in module.GetType(HttpBindings.Prefix + httpOwner).Methods.Where(m => m.IsPublic && !m.IsConstructor))
                 Check("HTTP lifecycle member " + member.FullName, HttpBindings.Bind(member, member, false, false) is not null);

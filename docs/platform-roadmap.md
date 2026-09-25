@@ -154,6 +154,15 @@ and stream input/output. Use the same model through both paths to exercise Strea
 StreamWriter, encoding and the underlying Stream contracts, including partial transfers,
 malformed input, ownership/cleanup and collection during pending I/O. This is an
 acceptance case for the POC, not a promise of complete .NET serializer compatibility.
+**First I/O slice:** the [JSON stream experiment](experiments/json-streams/README.md)
+reuses the existing DOM/parser/writer through a local JsonSerializer with string and
+borrowed-stream routes. It is synchronous and fully buffered; public extraction and
+structured errors remain next steps. **Author clarification:** finish the JSON DOM
+model first, before object deserialization or reflection. The provisional
+[MemoryStream](memory-stream-design.md) is implemented for the write/rewind/read scenario.
+**Author follow-up:** eventually provide GetJson<T> and PostJson HttpClient extension
+methods, layered on the serializer rather than duplicating JSON handling in HTTP.
+Keep their exact signatures and error/cancellation policies open for now.
 Current introspection exposes member metadata but not public value access, assignment
 or construction/invocation. **Author clarification:** `System.Runtime.Reflection`
 will provide extensions to the `System.Introspection` model; those operations work

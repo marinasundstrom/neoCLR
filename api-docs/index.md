@@ -107,3 +107,7 @@ HTTP/socket token overloads, timers and linked sources remain following work.
 share validation/resolution and handler dispatch. With a base, pass relative references
 without authority; without a base, pass an absolute HTTP URI. See
 [HttpClient](xref:System.Web.Http.HttpClient) and [HttpRequest](xref:System.Web.Http.HttpRequest).
+
+The development [MemoryStream](xref:System.IO.MemoryStream) provides bounded managed
+byte storage for InputStream, OutputStream and SeekableStream, including text/JSON
+round trips without file access. It has a shared cursor and a provisional 64 KiB bound.

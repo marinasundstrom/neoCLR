@@ -2236,5 +2236,46 @@
     <member name="M:System.Web.Http.HttpServer.ServeOne(System.Func{System.Web.Http.HttpRequest,System.Tasks.Task{System.Result{System.Web.Http.HttpResponse,System.Web.Http.HttpError}}},System.Concurrency.CancellationToken)"><summary>Accepts a context, invokes the callback and sends its response through the context lifetime.</summary><param name="handler">Callback returning a buffered response or application error.</param><param name="cancellationToken">Covers accept, request read, callback wait and sending.</param><returns>A completed result or an acknowledged cancelled task.</returns><remarks>Callback errors/cancellation close the context. Cancellation stops waiting for a handler and ignores a later result, but cannot preempt user code or cancel arbitrary handler work. Server.Close has the same scope-ending effect. Runtime Faults remain terminal and are not converted into HTTP errors; managed cleanup is not guaranteed after a terminal Fault.</remarks></member>
     <member name="M:System.Web.Http.HttpContext.Respond(System.Web.Http.HttpStatusCode)"><summary>Forwards to Response.Respond to set status and empty content without network I/O.</summary><param name="statusCode">Sets the local status value; context completion validates final status range and content rules.</param><remarks>Replaces Content-Type using content metadata (removes it when absent); preserves other headers. This is mutable message configuration, not an asynchronous send. HttpContext.Complete sends a snapshot. Separate inbound/outbound implementations are a future design direction.</remarks></member>
     <member name="M:System.Web.Http.HttpContext.Respond(System.Web.Http.HttpStatusCode,System.Web.Http.HttpContent)"><summary>Forwards to Response.Respond to set status and content without network I/O.</summary><param name="statusCode">Sets the local status value; context completion validates final status range and content rules.</param><param name="content">Non-null buffered content retained by reference until context completion snapshots it.</param><remarks>Replaces Content-Type using content metadata (removes it when absent); preserves other headers. This is mutable message configuration, not an asynchronous send. HttpContext.Complete sends a snapshot. Separate inbound/outbound implementations are a future design direction.</remarks></member>
-  </members>
+      <member name="T:System.IO.MemoryStream">
+      <summary>Provisional managed byte stream implementing InputStream, OutputStream and SeekableStream with one shared cursor.</summary>
+      <remarks>Development after Preview 9. Starts empty; at most 65536 bytes. Synchronous, not thread-safe. Writes copy bytes and overwrite or extend storage. Seeking beyond length does not extend it; a later nonempty write zero-fills the gap. No array wrapping, exposed buffer, truncation or asynchronous operations. Close releases the backing storage and all later operations return Closed.</remarks>
+    </member>
+    <member name="M:System.IO.MemoryStream.#ctor">
+      <summary>Creates an empty readable, writable and seekable stream at position zero.</summary>
+    </member>
+    <member name="M:System.IO.MemoryStream.GetLength">
+      <summary>Gets the current byte length, or Closed after closing.</summary>
+      <returns>The length in bytes, independent of the current position.</returns>
+    </member>
+    <member name="M:System.IO.MemoryStream.GetPosition">
+      <summary>Gets the shared read/write byte position, or Closed after closing.</summary>
+      <returns>The absolute position, which may exceed the current length.</returns>
+    </member>
+    <member name="M:System.IO.MemoryStream.Seek(System.Int64)">
+      <summary>Sets the absolute shared position without changing length.</summary>
+      <param name="position">Byte position from zero through 65536.</param>
+      <returns>The new position; InvalidRange for negative positions, LimitExceeded above 65536, or Closed. Errors leave the position unchanged.</returns>
+    </member>
+    <member name="M:System.IO.MemoryStream.Read(System.Byte[],System.Int32,System.Int32)">
+      <summary>Copies available bytes into the supplied range and advances the shared cursor.</summary>
+      <param name="buffer">Destination array; bytes outside the requested range remain unchanged.</param>
+      <param name="offset">Starting array index.</param>
+      <param name="count">Maximum bytes to read.</param>
+      <returns>Bytes read, zero at or beyond EOF or for an empty range; InvalidRange or Closed on failure. Validation errors do not advance the cursor.</returns>
+    </member>
+    <member name="M:System.IO.MemoryStream.Write(System.Byte[],System.Int32,System.Int32)">
+      <summary>Copies the supplied bytes into storage, advancing the cursor and extending length when needed.</summary>
+      <param name="buffer">Source array, copied without retaining an alias.</param>
+      <param name="offset">Starting array index.</param>
+      <param name="count">Bytes to copy. Zero leaves both position and length unchanged.</param>
+      <returns>The requested count; InvalidRange for an invalid source range, LimitExceeded if the end would exceed 65536, or Closed. Validation failures do not mutate storage.</returns>
+    </member>
+    <member name="M:System.IO.MemoryStream.Flush">
+      <summary>Succeeds without work for an open memory stream; returns Closed otherwise.</summary>
+      <returns>A successful unit result or Closed.</returns>
+    </member>
+    <member name="M:System.IO.MemoryStream.Close">
+      <summary>Closes all capabilities and releases the backing storage. Repeated calls have no effect.</summary>
+    </member>
+</members>
 </doc>

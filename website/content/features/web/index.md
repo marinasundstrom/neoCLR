@@ -314,3 +314,12 @@ statuses remain responses, so callers choose their status policy:
 The server accepts these methods and exposes their buffered content to its handler.
 PATCH content is opaque: applications choose its media type and behavior. The library
 does not apply patches. HEAD returns headers with empty content; the server computes representation length from the buffered response without sending its body. OPTIONS is not implemented.
+
+## JSON direction
+
+The next JSON milestone is a DOM: parse, inspect, construct and write JSON through
+strings and streams. A bounded experiment exercises StreamReader and StreamWriter,
+including a write/rewind/read round trip through the development
+[MemoryStream](/docs/api/System/IO/MemoryStream/). The serializer is still application
+experiment code. Reflective object mapping and HttpClient GetJson/PostJson extensions
+are later work; neither is part of the current public HTTP API.

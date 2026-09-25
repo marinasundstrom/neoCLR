@@ -1,0 +1,36 @@
+import System.*
+import System.IO.*
+import System.Result.*
+
+// Experiment-local DOM serializer. Runtime reflection and the public API follow later.
+class JsonSerializer {
+    static func Deserialize(text: string) -> Result<JsonValue, string> {
+        return ReadDocument(text)
+    }
+
+    static func Deserialize(input: InputStream) -> Result<JsonValue, string> {
+        let reader = StreamReader(input, true)
+        let result = reader.ReadToEnd(128)
+        reader.Close()
+        return match result {
+            Ok(let text) => Deserialize(text)
+            Error(let error) => Error("Read: " + error.ToString())
+        }
+    }
+
+    static func Serialize(value: JsonValue) -> Result<string, string> {
+        return WriteDocument(value)
+    }
+
+    static func Serialize(output: OutputStream, value: JsonValue) -> Result<unit, string> {
+        // Validate the whole document before writing any bytes.
+        let text = Serialize(value)?
+        let writer = StreamWriter(output, true)
+        let result = writer.Write(text)
+        writer.Close()
+        return match result {
+            Ok(_) => Ok(())
+            Error(let error) => Error("Write: " + error.ToString())
+        }
+    }
+}
