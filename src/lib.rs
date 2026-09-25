@@ -39,6 +39,7 @@ mod reachability;
 mod references;
 mod reflection;
 mod reflection_execution;
+mod reflection_properties;
 pub use reachability::{FunctionImplementation, Reachability, ReachableCall, ReachableFunction};
 mod scope;
 mod services;

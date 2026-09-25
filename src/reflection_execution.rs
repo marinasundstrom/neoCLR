@@ -14,10 +14,7 @@ pub(crate) enum ConstructionError {
     MissingConstructor = 4,
 }
 
-pub(crate) fn constructor(
-    module: &Module,
-    handle: &Value,
-) -> Result<FunctionRef, ConstructionError> {
+pub(crate) fn bound_type(module: &Module, handle: &Value) -> Result<Type, ConstructionError> {
     let Value::RuntimeTypeHandle(handle) = handle else {
         return Err(ConstructionError::UnboundType);
     };
@@ -28,6 +25,14 @@ pub(crate) fn constructor(
     {
         return Err(ConstructionError::UnboundType);
     }
+    Ok(owner)
+}
+
+pub(crate) fn constructor(
+    module: &Module,
+    handle: &Value,
+) -> Result<FunctionRef, ConstructionError> {
+    let owner = bound_type(module, handle)?;
     let definition = module
         .type_definition(&owner)
         .ok_or(ConstructionError::UnsupportedType)?;

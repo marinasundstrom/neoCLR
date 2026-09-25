@@ -26,7 +26,7 @@ pub enum RuntimeService {
     ConsoleInput,
     ValueStorage,
     TypeInspection,
-    /// Dynamic managed construction; static reachability alone cannot enumerate targets.
+    /// Dynamic construction and property calls; static reachability cannot enumerate targets.
     ReflectionExecution,
     InterfaceDispatch,
     SlotReferences,
@@ -88,8 +88,10 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::UnixTimeToLocal => RuntimeService::LocalClock,
             crate::native::Binding::UnixTimeTicks => RuntimeService::WallClock,
             crate::native::Binding::Math(_) => RuntimeService::MathOperations,
-            crate::native::Binding::ReflectionConstruct => RuntimeService::ReflectionExecution,
+            crate::native::Binding::ReflectionConstruct
+            | crate::native::Binding::ReflectionProperty(_) => RuntimeService::ReflectionExecution,
             crate::native::Binding::ReflectionConstructionCheck
+            | crate::native::Binding::ReflectionPropertyCheck(_)
             | crate::native::Binding::Reflection(_)
             | crate::native::Binding::AssemblyInfo(_)
             | crate::native::Binding::ExecutingAssembly
@@ -157,6 +159,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
         if matches!(
             crate::native::bind(function)?,
             crate::native::Binding::ReflectionConstruct
+                | crate::native::Binding::ReflectionProperty(_)
         ) {
             uses.extend(
                 [

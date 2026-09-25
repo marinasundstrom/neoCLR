@@ -129,4 +129,6 @@ independently of this reflection investigation.
 The first [private construction checkpoint](reflection-execution.md) now executes
 public parameterless nongeneric class constructors through the normal interpreter.
 This does not yet expose creation on the Raven API or implement the mapped report.
-Property execution and the Result-based reflection facade are next.
+Checked instance property execution now preserves accessor code and virtual dispatch,
+with exact scalar boxing and reference/null support. The Result-based reflection
+facade and a compiled consumer are next, before the mapped report.

@@ -11,7 +11,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Add a private reflection construction checkpoint for public parameterless
   nongeneric reference classes. Resolve loaded type identities and reuse normal
   constructor frames, initialization, faults and GC roots. Report dynamic reflection
-  in service analysis; public reflection extensions and JSON mapping remain pending.
+  in service analysis. Add checked instance property get/set execution through normal
+  accessors and virtual dispatch, with exact scalar boxing, reference/null handling,
+  receiver/value validation and GC coverage. Public reflection extensions and JSON
+  mapping remain pending.
 
 - Fix constructors of imported reference async state machines containing hoisted
   nondefaultable Result/union fields. Explicit deferred field storage preserves

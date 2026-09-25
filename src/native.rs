@@ -21,6 +21,8 @@ pub(crate) enum Binding {
     Reflection(crate::reflection::Query),
     ReflectionConstructionCheck,
     ReflectionConstruct,
+    ReflectionPropertyCheck(bool),
+    ReflectionProperty(bool),
     ObjectTypeHandle,
     ObjectReferenceEquals,
     ObjectEquals,
@@ -118,6 +120,37 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             return Err(Fault::new("reflection binding signature mismatch"));
         }
         return Ok(Binding::Reflection(query));
+    }
+    if let Some((setter, check)) = match function.name.as_str() {
+        "neoCLR.Runtime.ReflectionPropertyGetCheck" => Some((false, true)),
+        "neoCLR.Runtime.ReflectionPropertySetCheck" => Some((true, true)),
+        "neoCLR.Runtime.ReflectionPropertyGet" => Some((false, false)),
+        "neoCLR.Runtime.ReflectionPropertySet" => Some((true, false)),
+        _ => None,
+    } {
+        let mut expected = vec![
+            Type::RuntimeTypeHandle,
+            Type::Int32,
+            Type::from_name("System.Object"),
+        ];
+        if setter {
+            expected.push(Type::from_name("System.Object"));
+        }
+        let returns = if check {
+            Type::Int32
+        } else if setter {
+            Type::Void
+        } else {
+            Type::from_name("System.Object")
+        };
+        if function.parameters != expected || function.returns != returns || function.no_result {
+            return Err(Fault::new("reflection property binding signature mismatch"));
+        }
+        return Ok(if check {
+            Binding::ReflectionPropertyCheck(setter)
+        } else {
+            Binding::ReflectionProperty(setter)
+        });
     }
     let (binding, returns) = match (function.name.as_str(), function.parameters.as_slice()) {
         ("neoCLR.Runtime.ReflectionConstructionCheck", [Type::RuntimeTypeHandle]) => {
@@ -438,6 +471,9 @@ impl Binding {
             return query.invoke(module, &args, limits);
         }
         match (self, args.as_slice()) {
+            (Self::ReflectionPropertyCheck(setter), args) => {
+                Ok(Value::Int32(crate::reflection_properties::check(module, args, *setter)))
+            }
             (Self::ReflectionConstructionCheck, [handle]) => {
                 Ok(Value::Int32(crate::reflection_execution::check(module, handle)))
             }

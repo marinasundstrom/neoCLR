@@ -183,10 +183,11 @@ fault is fixed through [checked deferred state storage](value-storage.md#deferre
 with a focused pending-await/GC regression. The [initial reflection investigation](json-dom-design.md#next-investigation-one-mapped-report--2026-09-25)
 selects runtime-backed construction and a public property accessor for one mapped report;
 keep the remaining frozen-compiler observations explicit.
-**Reflection construction checkpoint:** [private runtime construction](reflection-execution.md)
+**Reflection execution checkpoint:** [private runtime construction](reflection-execution.md)
 now plans and executes a public parameterless nongeneric class constructor through
-ordinary interpreter frames. Public Result-based extensions, property execution and
-object mapping are still pending; property execution is the next bounded slice.
+ordinary interpreter frames. Checked instance property get/set now uses the actual
+accessors and virtual dispatch, with receiver/value validation and GC coverage.
+Public Result-based extensions are the next bounded slice; object mapping follows.
 Current introspection exposes member metadata but not public value access, assignment
 or construction/invocation. **Author clarification:** `System.Runtime.Reflection`
 will provide extensions to the `System.Introspection` model; those operations work
