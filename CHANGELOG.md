@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-25
 
+- Record planned JSON HTTP extensions for all four request/response boundaries,
+  with shared content conversion beneath client and server conveniences. Exact
+  signatures remain open; no new API or asynchronous serializer is implemented.
+
 - Add a private reflection construction checkpoint for public parameterless
   nongeneric reference classes. Resolve loaded type identities and reuse normal
   constructor frames, initialization, faults and GC roots. Report dynamic reflection

@@ -162,7 +162,13 @@ model first, before object deserialization or reflection. The provisional
 [MemoryStream](memory-stream-design.md) is implemented for the write/rewind/read scenario.
 **Author follow-up:** eventually provide GetJson<T> and PostJson HttpClient extension
 methods, layered on the serializer rather than duplicating JSON handling in HTTP.
-Keep their exact signatures and error/cancellation policies open for now.
+**Author clarification:** cover both directions on both peers: serialize client
+request objects, deserialize server request content, serialize server response
+objects, and deserialize client response content. Verb helpers are conveniences
+over shared JSON content operations, including requests/responses used through
+Send and Accept. See the [four-way extension direction](json-dom-design.md#future-http-json-extensions--2026-09-25).
+Keep exact signatures and error/cancellation policies open; this is later work,
+not a change to the current synchronous serializer or context completion contract.
 **Public DOM slice:** [System.Data.Json](json-dom-design.md) extracts that codec into
 an author-selected closed JsonValue hierarchy, with kind-specific container/scalar
 APIs, a standard JsonError union and DOM-only JsonSerializer string/stream overloads.

@@ -150,3 +150,45 @@ JsonSerializer object serialization. The public serializer remains DOM-only. The
 next investigation is the mapped HTTP request-path cost, followed by extracting
 only a reusable mapping contract justified by the sample; null policy, recursion, naming rules, attributes and supported property
 kinds are not silently decided by this checkpoint.
+
+
+## Future HTTP JSON extensions — 2026-09-25
+
+Author clarification: the JSON extension story covers the full exchange, not only
+HttpClient verb methods. These are future capabilities, not implemented signatures.
+
+| Boundary | Intended operation |
+| --- | --- |
+| Client sends a request | Serialize an object into JSON request content; PostJson and similar verb helpers compose this with sending. |
+| Server receives a request | Deserialize HttpRequest content directly into the requested model. |
+| Server sends a response | Serialize a model into response content, with response/context conveniences. |
+| Client receives a response | Deserialize response content, including responses obtained from Send; GetJson can compose GET with this read. |
+
+Assistant-proposed layering: share serializer/content conversion across requests
+and responses, then add HttpClient verb and request/response/context conveniences.
+Keep the same mapping rules and structured JSON causes across both peers. This
+avoids separate client/server codecs; it also requires clear ownership and error
+boundaries. Content decoding should not silently choose HTTP status policy or
+complete/dispose a server context. Preserve the current separation between setting
+response status/content and asynchronously completing the exchange unless explicitly
+revisited. Sending a JSON request and decoding a JSON response are distinct operations;
+PostJson need not assume every successful response contains JSON.
+
+Comparison reviewed 2026-09-25: .NET's
+[HttpClientJsonExtensions](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.json.httpclientjsonextensions)
+provides verb conveniences, while
+[HttpContentJsonExtensions](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.json.httpcontentjsonextensions)
+provides content deserialization. ASP.NET Core separately supplies
+[request JSON reading](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.httprequestjsonextensions?view=aspnetcore-10.0)
+and [response JSON writing](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.httpresponsejsonextensions?view=aspnetcore-10.0).
+These are existing APIs used for comparison, not a promise to copy their overloads,
+exception behavior, package split or asynchronous serializer design. neoCLR can
+share its content model across both sides, but still needs distinct send/read and
+response-lifecycle semantics.
+
+Open choices include names/placement, content-type validation, empty bodies versus
+JSON null, mapping failures versus transport/status failures, cancellation and future
+stream ownership/consumption. The serializer remains synchronous today; future HTTP
+helpers can compose asynchronous transport with synchronous conversion of buffered
+content without claiming asynchronous stream parsing. Validate an object request
+and object response in one round trip when this later slice is implemented.

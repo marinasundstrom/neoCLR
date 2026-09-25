@@ -7406,3 +7406,19 @@ configuration/content, not target-specific code added to Raven main.
   claimed fixed. The assistant began a [minimal reflection investigation](json-dom-design.md#next-investigation-one-mapped-report--2026-09-25),
   finding metadata accessors but no runtime creation/property execution path.
   No public reflection or object-mapping API was implemented.
+
+
+### 2026-09-25 — JSON conveniences on both HTTP peers
+
+- **Author clarification:** future GetJson/PostJson-style HttpClient extensions are
+  one side of the story. The server should directly deserialize HttpRequest content,
+  serialize response models, and the client should deserialize received responses.
+- **Assistant proposal:** compose shared serializer/content conversion with verb,
+  request, response and context conveniences. Preserve distinct send/read operations,
+  structured errors and the existing response-configuration/completion boundary.
+- **Action:** recorded all four directions in the roadmap and JSON design, with
+  .NET client/content and ASP.NET Core request/response comparisons. No API was
+  implemented or signature finalized; this is later work and does not reprioritize
+  the active mapping/runtime investigation.
+- **Open:** helper placement, empty/null content, media types, status/error handling,
+  cancellation and future stream semantics. The current serializer remains synchronous.
