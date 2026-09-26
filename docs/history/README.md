@@ -5,6 +5,7 @@
 Release notes describe the published version, not the current development tree.
 The conversation record distinguishes author directions, assistant proposals and reported outcomes.
 
+- [Planning archive before thematic consolidation](planning-20260927/README.md)
 - [Development conversation record](../development-timeline.md)
 - [Local Raven/neoCLR tools — 2026-09-14](../local-tools-20260914.md)
 - [Preview 1: programs and their IL mappings](../preview-1-programs.md)

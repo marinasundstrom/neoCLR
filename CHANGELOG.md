@@ -6,6 +6,23 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-27
+
+- Consolidate active planning into the authoritative roadmap and four theme trackers:
+  HTTP/networking, runtime/language, library/data and tooling/release. Archive six
+  superseded plans with their evidence and preserve old section links. Retain the
+  finite HTTP POC finish gates; no new feature, release or completion is claimed.
+- Refresh all website feature pages around current behavior, limits and possible
+  directions. Remove routine preview migration notes and superseded experiment
+  chronology; correct stale HTTP, cancellation, storage, text and reflection claims.
+  Use the current tested Thread.Run sample for the Tasks page and download. Preserve
+  published release records and accurate setup/package availability. Website
+  publication remains separate from this documentation change. All 18 website tests
+  and the 1,038-page build/link checks pass. All 11 rendered feature pages are
+  inspected; the Task download matches its executable source. Archived-plan text
+  and all 22 dated issue assignments are checked. Existing RavenDoc missing-summary
+  warnings remain; no runtime suite was run for this documentation-only change.
+
 ### 2026-09-26
 
 - Add development known-length HTTP stream uploads through HttpContent.FromStream,

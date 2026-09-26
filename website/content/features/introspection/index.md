@@ -2,7 +2,7 @@
 
 From an object’s type to an assembly’s members, one descriptive model gives you a way to explore what a neoCLR program contains.
 
-**Preview 9 implementation · September 19, 2026.** This guide describes the Preview 9 API. The examples run on neoCLR with its matching Raven toolchain; the design can still change.
+**Current development API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
 
 [Follow the walkthrough ↓](#walkthrough) · [Download the complete sample](../../samples/library-introspection-tour.rvn)
 
@@ -10,7 +10,7 @@ From an object’s type to an assembly’s members, one descriptive model gives 
 
 ## TypeInfo acquisition
 
-Suppose a diagnostic tool wants to describe the types and members available to a program. It needs metadata, without running the methods it discovers. Introspection is that descriptive layer; invoking code is a separate, future capability.
+Suppose a diagnostic tool wants to describe the types and members available to a program. It needs metadata, without running the methods it discovers. Introspection is that descriptive layer; bounded construction and property execution are described separately below.
 
 The example declares an empty `Widget` class. Its instance is held through `Object`, but `GetType()` still describes the concrete allocation. `typeof(Widget)` describes the declared type. Both return the same public contract: `System.Introspection.TypeInfo`.
 
@@ -24,11 +24,11 @@ Use `Equals` to compare type identity. Names are useful for display, but do not 
 
 ## Type identity through Object
 
-**Development after Preview 9:** TypeInfo now compares represented types through both typed equality and Object.Equals. Repeated queries may allocate different descriptors; ReferenceEquals still compares those allocations. Generic arguments and array element types participate in type identity.
+TypeInfo compares represented types through both typed equality and Object.Equals. Repeated queries may allocate different descriptors; ReferenceEquals still compares those allocations. Generic arguments and array element types participate in type identity.
 
 Object.GetHashCode is consistent with that equality, and ToString displays the represented FullName. Different types can have colliding hashes; neither names nor hashes are persistent identity keys. EquatableTo&lt;TypeInfo&gt; takes a non-null TypeInfo. Object.Equals(Object?) is the explicitly null-aware boundary.
 
-Development assembly descriptors now compare full catalog identities; module descriptors compare that identity plus their module name. Their Object hashes use the same keys, and display returns the assembly FullName or module Name. This is scoped to one loaded program, without CLR loader-context semantics. Field, method and property descriptors now compare their kind, closed declaring type and definition index, with matching hashes and Name display. Parameter descriptors now retain owner kind, closed declaring type, definition index and position for equality and hashing. Tokens may be zero; a property index parameter remains distinct from its accessor parameter. Owner resolution through a public Member property is still future work. See the [introspection guide](../../docs/introspection.html) and [TypeInfo API reference](../../docs/api/System.Introspection.TypeInfo.html) for current contracts.
+Development assembly descriptors compare full catalog identities; module descriptors compare that identity plus their module name. Their Object hashes use the same keys, and display returns the assembly FullName or module Name. This is scoped to one loaded program, without CLR loader-context semantics. Field, method and property descriptors compare their kind, closed declaring type and definition index, with matching hashes and Name display. Parameter descriptors retain owner kind, closed declaring type, definition index and position for equality and hashing. Tokens may be zero; a property index parameter remains distinct from its accessor parameter. Owner resolution through a public Member property is still future work. See the [introspection guide](../../docs/introspection.html) and [TypeInfo API reference](../../docs/api/System.Introspection.TypeInfo.html) for current contracts.
 
 ## Type classification (development)
 
@@ -73,11 +73,11 @@ Source definition tokens are preserved where the importer retains them. Merged r
 {{TOUR_SEQUENCES}}
 ```
 
-Every public collection-returning Introspection method now uses `Sequence<T>`. That includes types, members, parameters, generic arguments, interfaces and enum names. The sample uses `Count`, an indexer and a `for` loop; Iterable-based query extensions also work.
+Every public collection-returning Introspection method uses `Sequence<T>`. That includes types, members, parameters, generic arguments, interfaces and enum names. The sample uses `Count`, an indexer and a `for` loop; Iterable-based query extensions also work.
 
 The interface has no collection mutation members. The current implementation returns independent snapshots, but the interface alone does not promise immutable concrete storage. Sequence is invariant: a `Sequence<MethodInfo>` is not implicitly a `Sequence<MemberInfo>`; individual methods can still be passed as `MemberInfo`.
 
-**Updating an older sample?** Replace array result annotations with `Sequence<Element>` and `Length` with `Count`. Rebuild against a matching reference and runtime library. Array assignment and indexer writes through the Sequence contract are rejected.
+Sequence does not expose element replacement.
 
 <a id="members"></a>
 
@@ -101,7 +101,7 @@ Callers work with those public cases, without matching private runtime implement
 
 ## Complete example
 
-Use the matching Preview 9 compiler, runtime and reference library. Follow the [project-based setup guide](../../try/), then save this sample as Main.rvn and run the neoCLR task.
+Use matching development compiler, runtime and reference artifacts. Follow the [project-based setup guide](../../try/), then save this sample as Main.rvn and run the neoCLR task.
 
 1. [Download the complete Raven sample](../../samples/library-introspection-tour.rvn), including its imports, Widget class, helper and Main function.
 2. Copy it into `Main.rvn` in the prepared `Demo` project and save.
@@ -123,7 +123,7 @@ The .NET comparison informs this API’s ergonomics: assembly/module description
 
 .NET’s `Assembly.GetReferencedAssemblies()` returns assembly-name identities. This preview instead returns resolved AssemblyInfo descriptions, making traversal convenient but requiring references to exist in the loaded catalog. An unavailable reference faults explicitly; it is neither hidden nor loaded from disk.
 
-Sequence states the collection capability without requiring an array in the public contract. It permits future storage changes, at the cost of a deliberate API break for existing array-oriented callers. These choices aim for a coherent small API; they do not promise .NET binary compatibility or identical behavior in every edge case.
+Sequence states the collection capability without requiring an array in the public contract. It permits future storage changes, at the cost of requiring callers to use the narrower collection contract. These choices aim for a coherent small API; they do not promise .NET binary compatibility or identical behavior in every edge case.
 
 [Read the design record and primary .NET comparisons →](https://github.com/marinasundstrom/neoCLR/blob/main/docs/introspection-design.md)
 
@@ -132,17 +132,16 @@ Sequence states the collection capability without requiring an array in the publ
 ## Implemented scope and limitations
 
 - There is one loaded-program context. Dynamic assembly loading and resolution belong to future RuntimeContext work.
-- Queries cover retained metadata. Development now includes application instance properties and accessor tokens; static application properties and generic method-definition reflection remain limited.
+- Queries cover retained metadata. Development includes application instance properties and accessor tokens; static application properties and generic method-definition reflection remain limited.
 - Open generic definitions can report identity, shape, arguments, tokens and module. Their member, base-type and interface queries require a closed type and fault otherwise.
 - General invocation, emit and offline metadata contexts remain future work. TypeInfo is part of the sealed MemberInfo hierarchy.
 
-Development `System.Runtime.Reflection` extensions now provide checked parameterless
+Development `System.Runtime.Reflection` extensions provide checked parameterless
 construction and instance property reads/writes. Expected validation failures return
 Result; constructor and accessor code runs normally, including virtual dispatch,
 GC rooting and terminal faults. The first iteration supports nongeneric reference
 classes and nonindexed properties with references or built-in scalar values. It has
-no binder coercion or private access. This supports the next JSON object-mapping
-experiment, which is not implemented yet. See the [runtime reflection guide](../../docs/reflection.html)
+no binder coercion or private access. This supports the bounded [JSON object mapper](../../docs/json.html). See the [runtime reflection guide](../../docs/reflection.html)
 for signatures, null handling, limitations and source-access requirements.
 
 <a id="objects"></a>
@@ -151,11 +150,11 @@ for signatures, null handling, limitations and source-access requirements.
 
 Class assignment shares a reference; value assignment copies fields, including any references those fields contain. GetType preserves the concrete type through an Object view. System.Value is a separate temporary erased-storage facility used by carriers such as Option and Result; it is not the .NET ValueType base class.
 
-The [Object and Value guide](../../docs/objects.html) explains current support and missing methods. Development Object.ReferenceEquals compares class, array and box identity; ordinary class/array Equals and GetHashCode use identity by default. Class overrides can provide equality and matching hashes. Object is abstract: construct a concrete application class, not Object itself. Development ToString supports a type-name fallback and class overrides. Named structs with explicit ToString overrides support boxed formatting. Boxed Int32 and Int64 produce culture-independent decimal text; Boolean produces True or False, matching .NET spelling. String through Object returns unchanged text; format strings, culture providers and other primitive boxed formatting remain unsupported. String Object equality/hash now use exact contents, while identity calls still explicitly fault until conversions preserve identity; boxed Int32 and Int64 virtual equality compare the complete stored integer only with the same concrete type. Int32 hashes to its value; Int64 hashes by XORing its two 32-bit halves, as in .NET. Hash collisions do not make values equal. These hashes are not persistent identifiers, while named structs dispatch their explicit Object overrides. Boxed Single and Double also support exact-type Object equality and hashing: NaNs of the same type compare equal, and positive/negative zero compare equal with matching hashes. Floating `==` retains IEEE behavior (NaN is unequal to itself); boxed floating display remains unsupported. Boxed Char compares and hashes the full grapheme text without normalization, and displays that text unchanged. ReferenceEquals still distinguishes separate boxes. Equals accepts a nullable comparison argument, and ReferenceEquals accepts nullable arguments on both sides. These reference annotations let Raven check calls against the existing runtime null behavior; the final metadata representation remains open. For APIs and domain models that express absence, neoCLR favors Option&lt;T&gt; for both value and reference types. Nullable structs and nullable-value boxing are deferred. The development Raven target rejects nullable value declarations such as `int?` with RAV0407: “Value types can't be declared as nullable.” Reference annotations such as `Object?` remain supported.
+The [Object and Value guide](../../docs/objects.html) explains current support and missing methods. Development Object.ReferenceEquals compares class, array and box identity; ordinary class/array Equals and GetHashCode use identity by default. Class overrides can provide equality and matching hashes. Object is abstract: construct a concrete application class, not Object itself. Development ToString supports a type-name fallback and class overrides. Named structs with explicit ToString overrides support boxed formatting. Boxed Int32 and Int64 produce culture-independent decimal text; Boolean produces True or False, matching .NET spelling. String through Object returns unchanged text; format strings, culture providers and other primitive boxed formatting remain unsupported. String Object equality/hash use exact contents, while identity calls compare the retained immutable text owner; boxed Int32 and Int64 virtual equality compare the complete stored integer only with the same concrete type. Int32 hashes to its value; Int64 hashes by XORing its two 32-bit halves, as in .NET. Hash collisions do not make values equal. These hashes are not persistent identifiers, while named structs dispatch their explicit Object overrides. Boxed Single and Double also support exact-type Object equality and hashing: NaNs of the same type compare equal, and positive/negative zero compare equal with matching hashes. Floating `==` retains IEEE behavior (NaN is unequal to itself); boxed floating display remains unsupported. Boxed Char compares and hashes the full grapheme text without normalization, and displays that text unchanged. ReferenceEquals still distinguishes separate boxes. Equals accepts a nullable comparison argument, and ReferenceEquals accepts nullable arguments on both sides. These reference annotations let Raven check calls against the existing runtime null behavior; the final metadata representation remains open. For APIs and domain models that express absence, neoCLR favors Option&lt;T&gt; for both value and reference types. Nullable structs and nullable-value boxing are deferred. The development Raven target rejects nullable value declarations such as `int?` with RAV0407: “Value types can't be declared as nullable.” Reference annotations such as `Object?` remain supported.
 
 ### Records (development)
 
-Raven record classes now generate equality, hashing and display for integer, non-null string and same-compilation record-class components; class assignment still shares a reference. Strings compare by contents; nested records use typed equality and matching hashes. Nullable record references preserve null through equality, hashing, display and deconstruction. Development record structs now use the same component contract, generating typed/Object/interface equality, hashes, display and deconstruction while preserving value copying. The checked Coordinate sample compares values through Object and EquatableTo&lt;Coordinate&gt;; separate boxes retain distinct identities. A separate Point/Rectangle sample demonstrates nested record structs: equality and display use component methods, and construction/deconstruction copy the point values. Record classes can also contain record structs. Default struct initialization leaves reference fields null, including fields declared non-nullable. Generated record methods handle those defaults: null components compare safely, contribute zero to hashing and display as empty fields; deconstruction preserves null. The Defaults sample demonstrates this behavior. Generated Object.Equals also preserves the inherited nullable comparison parameter; the record sample checks null and boxed comparisons through Object? arguments. Typed record-class Equals accepts a nullable reference to the same record type, including literal null, and returns false for absence. Generated class == and != also accept nullable references: two absent references compare equal, one absent reference compares unequal, and present records compare by components. Record-struct typed Equals and operator operands still take values. EquatableTo&lt;T&gt; keeps its existing interface signature. Nullable string/value components, externally compiled record components and generic/inherited records remain unsupported. Ordinary structs need explicit Object overrides; automatic .NET ValueType field equality is not implemented. Boxed Boolean values also support Object equality and hashing: true and false compare only with Boolean values, and hash to 1 and 0 respectively. Boxing preserves a copy; separate boxes retain separate identities. System.HashCode provides a mutable accumulator for integer and non-null string components, with independent value copies.
+Raven record classes generate equality, hashing and display for integer, non-null string and same-compilation record-class components; class assignment still shares a reference. Strings compare by contents; nested records use typed equality and matching hashes. Nullable record references preserve null through equality, hashing, display and deconstruction. Development record structs use the same component contract, generating typed/Object/interface equality, hashes, display and deconstruction while preserving value copying. The checked Coordinate sample compares values through Object and EquatableTo&lt;Coordinate&gt;; separate boxes retain distinct identities. A separate Point/Rectangle sample demonstrates nested record structs: equality and display use component methods, and construction/deconstruction copy the point values. Record classes can also contain record structs. Default struct initialization leaves reference fields null, including fields declared non-nullable. Generated record methods handle those defaults: null components compare safely, contribute zero to hashing and display as empty fields; deconstruction preserves null. The Defaults sample demonstrates this behavior. Generated Object.Equals also preserves the inherited nullable comparison parameter; the record sample checks null and boxed comparisons through Object? arguments. Typed record-class Equals accepts a nullable reference to the same record type, including literal null, and returns false for absence. Generated class == and != also accept nullable references: two absent references compare equal, one absent reference compares unequal, and present records compare by components. Record-struct typed Equals and operator operands still take values. EquatableTo&lt;T&gt; keeps its existing interface signature. Nullable string/value components, externally compiled record components and generic/inherited records remain unsupported. Ordinary structs need explicit Object overrides; automatic .NET ValueType field equality is not implemented. Boxed Boolean values also support Object equality and hashing: true and false compare only with Boolean values, and hash to 1 and 0 respectively. Boxing preserves a copy; separate boxes retain separate identities. System.HashCode provides a mutable accumulator for integer and non-null string components, with independent value copies.
 
 ```raven
 {{OBJECT_DISPLAY_SAMPLE}}
@@ -169,7 +168,7 @@ The [record sample](../../samples/records.zip) checks record classes and structs
 
 ## Planned work and open questions
 
-The descriptive model now supports the bounded development reflection extensions above. Broader invocation and emit remain future work. Dynamic assembly loading belongs with RuntimeContext; offline metadata could use a different resolution context. These are directions to explore, not implemented APIs or release commitments. Identity, resolution and lifetime rules need further work.
+The descriptive model supports the bounded development reflection extensions above. Broader invocation and emit remain future work. Dynamic assembly loading belongs with RuntimeContext; offline metadata could use a different resolution context. These are directions to explore, not implemented APIs or release commitments. Identity, resolution and lifetime rules need further work.
 
 [See the proposals and their tradeoffs →](../../proposals/#introspection)
 
@@ -209,17 +208,15 @@ let discovered = Enum.GetValues(boxed.GetType())
 
 The generic values stay typed as `EntryKind`; discovery returns boxed enum values.
 Both return fresh `Sequence` snapshots ordered by unsigned underlying value, with
-aliases retained. Current supported enums are `EntryKind`, `TaskState` and
+aliases retained. Supported enum examples include `EntryKind`, `TaskState` and
 `BindingFlags`. Generic calls reject non-enum arguments; a non-enum `TypeInfo` faults.
 This sample uses imports from `System` and `System.Storage`.
 
-Boxed enums now format named values, flags combinations and unnamed numeric values.
+Boxed enums format named values, flags combinations and unnamed numeric values.
 An unnamed zero prints `0`. This follows the basic .NET behavior, with stable
 metadata order for aliases and Sequence results instead of public array contracts.
 The current generic implementation allocates an intermediate boxed snapshot.
 See [Enum API reference](/docs/api/System/Enum/) for both overload families.
 
-Development interface names now express their direction: EquatableTo&lt;T&gt; and
-ComparableTo&lt;T&gt; replace Equatable/Comparable. ConvertibleInto&lt;T&gt; adds an explicit
-Convert() contract with an implementation-defined policy. Rebuild development
-consumers against the matching library and reference metadata.
+EquatableTo&lt;T&gt; and ComparableTo&lt;T&gt; describe equality and comparison.
+ConvertibleInto&lt;T&gt; supplies an explicit Convert() contract with an implementation-defined policy.

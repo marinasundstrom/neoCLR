@@ -1,0 +1,47 @@
+# Toolchain and release tracking
+
+**Consolidated 2026-09-27.** Follow the [platform roadmap](../platform-roadmap.md).
+This page owns shared integration/delivery status. The [HTTP tracker](../http-capabilities.md#finish-this-poc)
+owns whether its packaged sample passes and whether the POC is complete; do not
+maintain a second HTTP completion checklist here.
+
+## Integration and correctness
+
+| Item | Recorded status | Remaining action / evidence |
+| --- | --- | --- |
+| Generic method-group compiler defect | Fixed independently on Raven main `13b9105d8`, integrated as `56083626e`; neoCLR helpers in `afcc8c3d` | Retain [regression evidence](../experiments/http-json-client-prototype/README.md#resolution--2026-09-26); do not reimplement the fix. |
+| Unresolved call accepted as empty body | Open observation on the matched development bundle | [Reproduction](../experiments/http-json/repeatability-20260926.md); reduce/fix independently on a main-based Raven feature branch when selected or blocking. |
+| Conditional expression-bodied getter emits zero | Open observation; explicit getter workaround in the upload feature | [Upload evidence](../experiments/http-stream-upload/README.md); general compiler reduction/fix remains separate. |
+| HTTP reference/library projection | Upload APIs and Disposable conversion integrated in `45b74768` | [623 signature checks and matching artifacts](../experiments/http-stream-upload/validation.json); no compiler Runtime Contract or native API change claimed. |
+| API reference | Source changes require matching bridge/reference and useful member docs | [Maintenance procedure](../../api-docs/README.md), including explicit renderer exclusions; do not substitute a feature page for member coverage. |
+
+General Raven fixes belong on independently tested main-based feature branches;
+neoCLR-specific policies stay isolated. Compiler-affecting integration requires the
+applicable documentation/changelogs in both repositories. The
+[nine Raven issue assessments](../history/planning-20260927/issue-fix-roadmap.md#raven-issues-through-the-neoclr-lens)
+are a 2026-09-26 snapshot, not a new live inventory or authorization to fix all nine.
+
+## Delivery and documentation
+
+| Item | Status / owner boundary | Next action when selected |
+| --- | --- | --- |
+| HTTP evaluator package | Application acceptance is outstanding in the HTTP tracker | Use [local SDK provenance](../local-sdk-snapshot.md) and [runtime/Raven procedure](../runtime-raven-preview.md); test from extracted matching artifacts outside the checkout. A scratch development bundle is not release qualification. |
+| Next runtime release | Not declared ready or scheduled | Select candidate/scope and apply supported-target, package, migration/notices and release-note gates. POC completion is insufficient. |
+| CI efficiency | Proposed broader split, with separately recorded trigger changes | [CI design](../ci-efficiency-plan.md): classify portable versus host-dependent checks before reducing duplication. Do not drop platform coverage to shorten runs. |
+| [#9 RavenDoc](https://github.com/marinasundstrom/neoCLR/issues/9) | Dated inventory spans correctness/navigation and richer rendering | First reproduce a current label/navigation or coverage gap; separate small repairs from union modeling/hierarchy features. Keep linked manual coverage until rendering supports a member. |
+| Website | Local validation and manual publication are separate | [Maintenance](../design/feature-pages.md), [site procedure](../../website/README.md); successful build/push is not deployment. |
+| Tracking consolidation | Completed organization in this change | One owner per theme; keep contracts and evidence linked, archive superseded priority sequences, and update current rows instead of appending competing plans. |
+
+The async/Tasks Preview 9 release is historical: its
+[completed plan](../async-preview-plan.md) and [published evidence](../preview-9-validation.json)
+remain unchanged. Earlier readiness reports do not reopen that release or certify
+the next one. Portable Sample Pack (M6) remains a candidate milestone; no target set
+is selected by this consolidation.
+
+## Comparison and maintenance rules
+
+This reuses existing integration and release research; it introduces no new compiler,
+packaging or API contract. Preserve source/package/release distinctions and exact
+artifact provenance. Issue numbers above retain the 2026-09-26 inventory; no issue
+status was refreshed or closed. Status changes belong here; implementation details
+and commands remain in the linked procedures and evidence.

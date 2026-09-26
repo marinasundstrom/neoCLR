@@ -1,5 +1,8 @@
 # Guides and workflows
 
+[Current thematic tracking](../tracking/library-data.md) owns status and next work; the documents below provide contracts, research and evidence.
+
+
 [Documentation index](../README.md)
 
 - [Interactive debugger](../debugger.md)

@@ -46,21 +46,21 @@ These are selected differences, not a claim of full feature coverage or superior
 
 ## Current implementation
 
-The runtime is a Rust interpreter with a nonmoving tracing collector and an initial terminal debugger. The library includes arrays, collections, typed outcomes, text conversion, date/time values, bounded file helpers and runtime metadata discovery. Preview 9 includes Task/Promise, async state machines and isolated workers. Development extends storage, streams and introspection.
+The runtime is a Rust interpreter with a nonmoving tracing collector and an initial terminal debugger. The library includes arrays, collections, typed outcomes, text conversion, date/time values, bounded file helpers and runtime metadata discovery. Tasks, cancellation, isolated workers, provider-bound storage, byte/text streams, bounded reflection and HTTP client/server exchanges are available in development.
 
 neoCLR and its guest programs run without .NET. Raven compilation, the import bridge, MSBuild and the Raven Language Server use .NET. The [build and run guide](../try/) describes the matching toolchain and distinguishes published examples from development APIs.
 
-Major limits include the bounded importer, no general socket or HTTP API, incomplete cleanup during terminal faults, and no JIT backend. The [guides](../guides/) record the smaller supported subsets.
+Major limits include the bounded importer, bounded IPv4 networking and cleartext HTTP/1.1 rather than a complete network stack, incomplete cleanup during terminal faults, and no JIT backend. The [guides](../guides/) record the smaller supported subsets.
 
 <a id="direction"></a>
 
 ## Roadmap
 
-Preview 9 delivered the [async and Tasks checkpoint](../features/tasks/#release-checkpoint). Current work develops Streams, Storage and Encoding through runnable samples before networking. No date is promised for the next release.
-
-The first major application milestone is a Raven HTTP client/server pair exchanging UTF-8 text and JSON. The sequence starts with byte copy, text and JSON transformation, and controlled delayed operations that test GC lifetimes. A bounded file transformer and TCP echo precede HTTP.
-
-Byte-copy, UTF-8, JSON and reduced VM completion checkpoints now run. Completion progresses between returning default-queue callbacks, including self-reposting work. Operation cancellation, queue affinity and buffer ownership still need work before general I/O. The [on-site roadmap overview](../proposals/#http-poc) describes the current evidence and remaining scope.
+The current HTTP POC exchanges typed JSON between neoCLR client and server and
+supports known-length source uploads. Feature scope is frozen while matching-package
+validation and an explicit completion checkpoint remain. Current capabilities and
+possible extensions are summarized on the [direction page](../proposals/#http-poc).
+No date is promised for the next release.
 
 Later candidates include a file catalog, download queue, time-aware report, assembly explorer and portable sample pack. Their order can change. Memory views, nullability, runtime suspension and alternative execution backends remain research topics rather than prerequisites for every sample.
 

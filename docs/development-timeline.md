@@ -7720,3 +7720,30 @@ configuration/content, not target-specific code added to Raven main.
   replaced by the five optimized focused checks; no full suite or website build.
 - **Still open:** repeatability under load, the separate unresolved-call diagnostic
   issue, and deferred API expansion. See the [sample evidence](experiments/json-object-mapping/README.md#generic-json-verbs--2026-09-26).
+
+
+### 2026-09-27 — Thematic tracking and current-state feature pages
+
+- **Author direction:** asks to consolidate tracking documents by theme, then
+  continues that work. Subsequently permits purging irrelevant website history:
+  “It should reflect the state as is.” Routine preview breakage does not need a
+  migration narrative; brief possible directions per feature may remain. The
+  author reiterates: “Make sure features pages are up to date”.
+- **Assistant action:** retains one authoritative roadmap and four current status
+  owners for HTTP/networking, runtime/language, library/data and tooling/release.
+  Archives the six earlier plans and preserves their entry-point anchors; design
+  notes and experiments remain supporting records rather than independent priorities.
+- **Website action:** reviews all feature pages, corrects stale claims about
+  cancellation, streams, HTTP uploads/JSON, string indexing/identity and reflection,
+  removes routine migration and experiment chronology, and updates overview and
+  proposal summaries. The Tasks page/download use the existing development sample.
+  Records the editorial policy in [website maintenance](design/feature-pages.md).
+- **Scope:** no runtime/API behavior changes, release or website deployment. The
+  [HTTP tracker](http-capabilities.md#finish-this-poc) still owns the outstanding
+  packaged-SDK verification and explicit POC completion checkpoint. This direction
+  changes documentation presentation, not the frozen POC feature scope.
+- **Validation:** all 18 website tests and the 1,038-page site/link build pass.
+  Rendered content from all 11 feature pages and the current Task download are
+  checked. Six archived plans preserve their original body after link relocation;
+  all 22 dated neoCLR issues have theme assignments. Existing RavenDoc missing-summary
+  warnings remain. No runtime/API behavior changed or full runtime suite ran.

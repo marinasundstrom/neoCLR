@@ -143,9 +143,8 @@ constructors, getters and setters execute normally. Flat public `string`, `int` 
 `bool` properties are supported, using exact property names. Writable properties
 must be present; extra JSON fields are ignored. Nested models, null mapping and
 naming policies are not supported. The sample's property names match its lowercase
-wire names explicitly. Both mapped peers pass against
-independent servers/clients and together in an isolated run. An earlier overlapping
-test run reached the transport deadline, so latency under load remains unverified.
+wire names explicitly. Both mapped peers are checked against independent peers and each other.
+Latency under load is not characterized.
 The downloadable demo defaults to direct DOM mapping; its verifier selects this
 experiment with `--mapped`.
 
@@ -159,7 +158,7 @@ It rejects ambiguous framing, chunk extensions/trailers, other transfer codings
 and content encodings. It does not implement TLS, redirects, pooling,
 streaming responses, unknown-length uploads or informational response handling. Text always means strict UTF-8.
 
-The socket handler now has a provisional 15-second exchange budget, starting before
+The socket handler has a provisional 15-second exchange budget, starting before
 DNS lookup and ending with the buffered response. DNS, connection and transfers keep
 their shorter five-second bounds. Short progress does not renew the shared budget;
 expiry closes the connection and returns an error. This requires scheduler progress
@@ -173,17 +172,16 @@ is a correctness POC, not a performance benchmark. Generated async states still 
 
 ## Direction
 
-The client/server greeting, JSON report and socket-backed client exchange budget are
-in place. Server cancellation ownership, a public JSON contract and broader
-request/response behavior remain open gates. The fixed transport budget is a POC
-policy, not a complete HttpClient timeout configuration model. The System.Web.Http boundary
-separates HTTP policy from [networking](/features/networking/); a future transport
-could use sockets or a host facility. Shared handler concurrency and ownership need further cases as these provisional APIs evolve. No complete HTTP stack or runtime suspension is claimed.
+Possible next steps include asynchronous body contracts, response streaming, TLS
+and persistent connections. HTTP/2 and HTTP/3 would also require version-specific
+providers, multiplexing, flow control and independent stream lifetimes. These are
+future directions, not requirements for the bounded POC or promises for the next release.
+See the [client/server tracker](https://github.com/marinasundstrom/neoCLR/blob/main/docs/http-capabilities.md).
 
 Browse the [HTTP API reference](xref:System.Web.Http) for constructors, members,
 parameters and ownership details. The parser and operation adapter remain internal.
 
-HTTP operations now return the standard `HttpError` union. Match NameResolution
+HTTP operations return the standard `HttpError` union. Match NameResolution
 and Transport to inspect the original DNS or socket cause. InvalidRequest, Protocol,
 Unsupported and LimitExceeded distinguish validation and message failures; TimedOut
 represents the shared exchange deadline, and Handler can carry an application error.
@@ -193,7 +191,7 @@ UTF-8 decoding. Default HttpError is inactive and formats as Empty.
 
 ## URI references in development
 
-`System.Uri` now parses escaped ASCII references and resolves relative references
+`System.Uri` parses escaped ASCII references and resolves relative references
 against an absolute base. `Parse` returns `Result<Uri, UriError>`; `Resolve` accepts
 either a string or another Uri. A trailing slash matters: resolving `child` against
 `http://example.test/api/` gives `/api/child`, while a base ending in `/api` gives
@@ -204,7 +202,7 @@ This first iteration preserves exact text for equality and hashing. It does not
 perform network access, implicit escaping, IDNA conversion or IPv6-literal parsing.
 Input is limited to 4096 bytes. A parsed Uri does not imply transport support.
 UriError is a development union with named cases and generated pattern support.
-Its former per-case `Is*`/`Get*` helpers have been removed; match the cases directly.
+Match its named cases directly.
 
 The [API reference](/docs/api/System/Uri/) describes both overloads and the limits.
 
@@ -214,8 +212,7 @@ client overloads use CancellationToken.None. GetString decodes the buffered body
 strict UTF-8 and preserves HTTP errors. Invalid bytes produce HttpError.Protocol;
 GetString accepts 200–299 and reports other statuses as HttpError.UnsuccessfulStatus
 with the status code. Send/Get return these responses as ordinary response values;
-IsSuccessStatusCode lets callers apply their own policy. Charset handling and streaming
-remain future work.
+IsSuccessStatusCode lets callers apply their own policy. Charset handling and response streaming remain future work.
 
 Cancellation tokens are invocation-local. Pre-cancellation skips parsing and handler
 dispatch. During an exchange the socket handler waits for native acknowledgement and
@@ -224,10 +221,10 @@ can survive a later request; cancellation between phases prevents the next opera
 Separate requests retain separate connections and cancellation state. DNS host work
 may continue after guest cancellation, with its bounded capacity still charged.
 
-Custom HttpHandler implementations now require Send(request, cancellationToken).
+Custom HttpHandler implementations require Send(request, cancellationToken).
 They must forward or honor the token and finish owned cleanup before reporting
 cancellation. The client does not force completion of an uncooperative handler or
-dispose injected handlers. Existing implementations must be updated and rebuilt.
+dispose injected handlers.
 
 URI/URL encoding utilities are also planned separately. Their design will distinguish
 path segments, query values and form data; the current Uri parser expects text that
@@ -235,7 +232,7 @@ has already been escaped.
 
 ## Inspect response properties
 
-Development responses now expose `HttpStatusCode` names such as `NotFound`, while
+Development responses expose `HttpStatusCode` names such as `NotFound`, while
 retaining unnamed numeric status values. `IsSuccessStatusCode` checks the 200–299
 range. Cast the enum to `int` when you need its numeric value.
 
@@ -329,8 +326,7 @@ The original request keeps its headers. Content is shared, so keep it stable dur
 use. The current helper validates ASCII names and printable ASCII values; it does not
 parse field-specific syntax. Transport headers such as Host and Content-Length are
 reserved, and Content-Type comes from HttpContent. The provider allows 13 stored
-application fields and at most 2,048 encoded header bytes. Stream-backed content
-remains planned.
+application fields and at most 2,048 encoded header bytes. Stream-backed content uses the same header rules.
 
 ## Other request methods
 
@@ -347,7 +343,7 @@ The server accepts these methods and exposes their buffered content to its handl
 PATCH content is opaque: applications choose its media type and behavior. The library
 does not apply patches. HEAD returns headers with empty content; the server computes representation length from the buffered response without sending its body. OPTIONS is not implemented.
 
-Client responses now expose `Request: Option<HttpRequest>`. A response returned
+Client responses expose `Request: Option<HttpRequest>`. A response returned
 through `HttpClient.Send` retains the effective request passed to the handler, including when a custom
 handler produced the response. `DefaultRequestHeaders` supplies shared application
 headers; explicit request headers take precedence. Applying defaults creates a new
@@ -400,7 +396,7 @@ The shape is closest to .NET's mutable JsonNode model, but neoCLR calls the root
 [JSON API reference](/docs/api/System/Data/Json/) for the current contracts.
 The [object-mapping guide](/docs/json.html) covers the provisional Object/TypeInfo
 overloads and typed `Deserialize<T>` reads for strings and borrowed streams. Broader mapping and
-HTTP verb conveniences remain later work. The development
+additional HTTP conveniences remain later work. The development
 `System.Web.Http.Json.JsonContent` helpers create JSON content and read models or
 nodes from buffered content on either peer. They preserve Result errors and leave
 status handling and exchange completion to the application. Reads are synchronous

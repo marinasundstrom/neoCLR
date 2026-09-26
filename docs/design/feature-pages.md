@@ -28,6 +28,16 @@ criticism without inventing an established contributor community, governance pro
 or commitment to proposed APIs. The overview page explains background and goals;
 the homepage provides current status and feature entry points.
 
+## Current-state presentation — 2026-09-27
+
+At the author's direction, feature pages describe current behavior, useful examples
+and limits. Remove superseded experiments, development chronology and routine preview
+migration notes. Keep only a breaking-change note that is necessary to use an
+available artifact; preview churn does not need a page-by-page history. Brief possible
+directions are welcome, clearly distinguished from implementation. Setup/download
+pages retain accurate package availability. Preserve changelog, published release
+notes and development history outside the feature narrative.
+
 ## Information structure
 
 | Location | Purpose | Required distinction |
@@ -62,7 +72,7 @@ commitment to the next release. Names, signatures and behavior may change.
 ## With each feature change
 
 1. Review the homepage, relevant feature page and proposals overview alongside the
-   implementation. Update affected descriptions, status, limits and migration notes
+   implementation. Update affected descriptions, status and limits
    in the feature's documentation slice. A new page is optional; an accurate update
    to an existing page may be enough.
 2. When a proposal becomes executable, update its status and link to the current

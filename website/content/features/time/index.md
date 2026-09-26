@@ -2,7 +2,7 @@
 
 Date and Time represent civil values. Instant identifies a point on the timeline, Duration an elapsed amount, and Clock supplies Now. SystemClock is the current system provider.
 
-**Preview 9 implementation · September 19, 2026.** This is a bounded implementation, not a complete or frozen API. Use the matching Preview 9 packages.
+**Current development API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
 
 <a id="example"></a>
 

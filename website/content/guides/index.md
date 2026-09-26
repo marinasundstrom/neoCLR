@@ -10,25 +10,25 @@ relevant differences from .NET. Use the [API reference](../docs/) to look up exa
 
 ## Language and everyday code
 
-| Guide | What you’ll learn | Availability |
-| --- | --- | --- |
-| [Raven for neoCLR](../raven/) | Read the language examples and distinguish the two targets | Preview 9 |
-| [Option and Result](../features/outcomes/) | Match and propagate absence or expected errors | Preview 9 |
-| [Arrays](../features/arrays/) | Use shared array storage, bounds and collection capabilities | Preview 9; later development notes labeled |
-| [Collections and queries](../features/collections/) | Read, replace, grow, filter and transform collections | Preview 9 |
-| [Strings and UTF-8](../features/strings/) | Distinguish graphemes, scalars and bytes | Preview 9; later development notes labeled |
-| [Dates and clocks](../features/time/) | Validate civil dates and obtain a clock instant | Preview 9 |
+| Guide | What you’ll learn |
+| --- | --- |
+| [Raven for neoCLR](../raven/) | Read the language examples and distinguish the two targets |
+| [Option and Result](../features/outcomes/) | Match and propagate absence or expected errors |
+| [Arrays](../features/arrays/) | Use shared array storage, bounds and collection capabilities |
+| [Collections and queries](../features/collections/) | Read, replace, grow, filter and transform collections |
+| [Strings and UTF-8](../features/strings/) | Distinguish graphemes, scalars and bytes |
+| [Dates and clocks](../features/time/) | Validate civil dates and obtain a clock instant |
 
 ## Operations and runtime services
 
-| Guide | What you’ll learn | Availability |
-| --- | --- | --- |
-| [Tasks and async](../features/tasks/) | Await results, complete promises and understand isolated workers | Preview 9 baseline; evolving development contracts |
-| [Files and Storage](../features/files/) | Read bounded UTF-8 files and follow the provider model | Preview 9 file helpers; Storage and streams are development |
-| [Console and standard streams](../features/console/) | Handle input, output, end-of-input and typed errors | Development after Preview 9 |
-| [Networking](../features/networking/) | Resolve a hostname and exchange bytes through a TCP client | Development after Preview 9 |
-| [Web and HTTP](../features/web/) | Request/response contracts, handler pipelines and a bounded client | Development experiment |
-| [Introspection](../features/introspection/) | Discover types and members and understand descriptor identity | Preview 9 discovery; later equality and ownership changes are development |
+| Guide | What you’ll learn |
+| --- | --- |
+| [Tasks and async](../features/tasks/) | Await results, complete promises and understand isolated workers |
+| [Files and Storage](../features/files/) | Resolve storage items and use byte/text streams |
+| [Console and standard streams](../features/console/) | Handle input, output, end-of-input and typed errors |
+| [Networking](../features/networking/) | Resolve a hostname and exchange bytes through a TCP client |
+| [Web and HTTP](../features/web/) | Client/server exchanges, handlers, JSON and bounded stream uploads |
+| [Introspection](../features/introspection/) | Discover types and members and understand descriptor identity |
 
 ## Development walkthroughs
 

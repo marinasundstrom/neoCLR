@@ -36,7 +36,7 @@ The shape is familiar from .NET Console: text properties and standard byte-strea
 
 Calls block. ReadLine recognizes LF and CRLF, preserves a lone CR as data, and accepts at most 65,536 UTF-8 bytes per line. The overload accepts a smaller bound. Writers emit LF without a BOM and allow at most 65,536 encoded bytes per call, including a newline. StreamWriter retries partial writes; callers flush explicitly. Encoding selection, console redirection setters and terminal controls are not implemented.
 
-Embedding hosts opt into the byte-output hooks. Older hosts, including the current worker and debugger adapters, support legacy WriteLine but return an I/O error for the new output streams. See the [API guide](../../docs/console.html) for ownership, host behavior and migration details.
+Embedding hosts opt into the byte-output hooks. Older hosts, including the current worker and debugger adapters, support legacy WriteLine but return an I/O error for the new output streams. See the [API guide](../../docs/console.html) for ownership and host behavior.
 
 <a id="direction"></a>
 
@@ -52,13 +52,6 @@ Reports with input bytes, expected output and the toolchain revision help us eva
 
 The generated reference describes development after Preview 9. Use the availability
 notes above to distinguish it from the published toolchain.
-
-## Development error representation
-
-Expected errors use normal Raven union declarations. Match their named cases;
-handwritten per-case `Is*`/`Get*` helpers have been removed in the development API.
-Rebuild applications with matching SDK and runtime artifacts. The case names and
-operation error meanings are unchanged.
 
 ## Command-line arguments
 

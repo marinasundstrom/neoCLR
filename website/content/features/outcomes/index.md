@@ -2,7 +2,7 @@
 
 Option represents absence; Result represents recoverable failure. Raven patterns extract case values, and ? propagates an outcome to the caller.
 
-**Preview 9 implementation.** Patterns, propagation and the operators below are included in Preview 9. Use its matching references and libraries.
+**Current development API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
 
 <a id="handling"></a>
 
@@ -40,7 +40,7 @@ Normalize(-42) produces Ok(42). The minimum Int32 value cannot be made positive,
 <a id="operators"></a>
 
 ## Composing outcomes
-**Preview 9 API.** These operators are included in Preview 9 and need its matching references and System library. Names and contracts remain open to feedback.
+Use matching references and runtime libraries for these operators.
 
 Map transforms a successful value. Then chains an operation that already returns an outcome. OrElse supplies a fallback only when needed. Patterns remain useful when you want to handle each case directly.
 
@@ -55,9 +55,9 @@ This example prints 42, 43, 7, Read: Unavailable, 9 and 42 on separate lines. Th
 <a id="error-payloads"></a>
 
 ## Errors are ordinary values
-**Preview 9 API.** The legacy System.Error message wrapper is removed. Use a string for a simple message or a dedicated error type when callers need to distinguish cases. Result.Error is the union case; it does not require an error base class.
+Use a string for a simple message or a dedicated error type when callers need to distinguish cases. Result.Error is the union case; it does not require an error base class.
 
-With imported Result cases and an expected type, write `let failure: Result<int, string> = Error("Unavailable")`, as in the tested example above. Rebuild callers with matching Preview 9 references and libraries.
+With imported Result cases and an expected type, write `let failure: Result<int, string> = Error("Unavailable")`, as in the tested example above.
 
 <a id="operator-list"></a>
 
@@ -91,9 +91,9 @@ Unlike exception-based APIs in .NET, recoverable outcomes are in the return type
 
 ## Planned work and open questions
 
-Keep patterns and propagation consistent across the library. Broader async APIs may combine Task with Result, while cancellation and cleanup need their own contracts. No complete async model is implied by this working slice.
+Keep patterns and propagation consistent across the library. DNS, sockets and HTTP combine Task with Result, with cooperative cancellation and explicit cleanup. Broader async disposal remains future work.
 
-**Development after Preview 9:** terminal failures carry [runtime-assigned fault codes](../../docs/faults.html). Explicit guest faults use UserFault; guest code cannot choose a code. These remain separate from recoverable Result errors and Task cancellation.
+Terminal failures carry [runtime-assigned fault codes](../../docs/faults.html). Explicit guest faults use UserFault; guest code cannot choose a code. These remain separate from recoverable Result errors and Task cancellation.
 
 [Related proposals and open questions →](../../proposals/#async)
 

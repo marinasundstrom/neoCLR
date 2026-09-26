@@ -1,5 +1,8 @@
 # Raven integration
 
+[Current thematic tracking](../tracking/toolchain-release.md) owns status and next work; the documents below provide contracts, research and evidence.
+
+
 [Documentation index](../README.md)
 
 Integration and experiment notes describe bounded supported paths; consult each page for limitations and validation.

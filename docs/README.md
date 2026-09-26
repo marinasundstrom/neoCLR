@@ -2,8 +2,9 @@
 
 The [platform roadmap](platform-roadmap.md) is authoritative for work priorities
 unless the author directs otherwise. It organizes themed milestones and concrete
-sample products. The [HTTP POC plan](http-poc-roadmap.md)
-details the first major milestone.
+sample products. The [HTTP tracker](http-capabilities.md) owns the first milestone finish line.
+The [theme trackers](platform-roadmap.md#theme-trackers) group current work across
+HTTP/networking, runtime/language, library/data and tooling/release.
 
 Start with the [build instructions](../README.md#build-and-run-a-sample),
 [website build](../README.md#build-the-website), or
@@ -34,12 +35,3 @@ For new documentation, add a link to the relevant section index. Each substantiv
 design should distinguish proposed behavior, implemented behavior, experiments and
 open validation. Follow [design research](design-research.md) and the
 [changelog workflow](changelog.md). Published release documents remain frozen.
-
-## Current work sequence — 2026-09-19
-
-Organize and commit the documentation first. Then port the remaining managed System
-library implementation from neoIL to Raven with the existing API preserved. Align
-the API with the supplied proposals in a subsequent step. The
-[System.Runtime project](system-runtime-assembly.md) is now established as
-`System.Runtime.rvnproj`. The next API slice implements RuntimeContext and shared
-Info interfaces, with Object.GetTypeInfo as canonical instance acquisition.

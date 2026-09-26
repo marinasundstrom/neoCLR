@@ -1,5 +1,8 @@
 # Design and direction
 
+[Current thematic tracking](../platform-roadmap.md#theme-trackers) owns status and next work; the documents below provide contracts, research and evidence.
+
+
 [Documentation index](../README.md)
 
 These are maintained design discussions and decisions; individual pages state implementation status.

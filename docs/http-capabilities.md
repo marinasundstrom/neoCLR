@@ -1,6 +1,6 @@
 # HTTP client/server capability tracker and POC finish line
 
-**Updated 2026-09-26.** The author asks to reach a point where this POC is “done for
+**Updated 2026-09-27.** The author asks to reach a point where this POC is “done for
 now” and to track HTTP work on both client and server. This is the shared status
 record, subordinate to the [platform roadmap](platform-roadmap.md).
 
@@ -60,9 +60,8 @@ The recorded intermittent timeout and compiler diagnostic debt remain visible in
 [acceptance findings](experiments/http-json/repeatability-20260926.md). Assess them
 against supported sample execution and release quality; do not silently mark them
 fixed, or require indefinite optimization under arbitrary competing machine load.
-The upload consumer also exposed an expression-bodied conditional getter emitting
-zero; the explicit getter workaround is covered by a length assertion. A general
-compiler repair remains separate and must be independently reduced.
+Compiler status and the upload getter workaround are owned by the
+[toolchain tracker](tracking/toolchain-release.md#integration-and-correctness).
 
 A runtime release still needs its own supported-target/package checks, known-defect
 assessment and release notes. Publication is separate. Once these POC finish items
@@ -139,3 +138,18 @@ Do not extend this POC with unknown-length uploads, live response/server bodies,
 HTTP/2, HTTP/3, trailers, pooling, duplex or a general body abstraction. Keep those
 in the capability tracker with status and next evidence. This makes future design
 visible while preserving a finite completion target.
+
+## Issue and dependency ownership
+
+This is the current HTTP/networking theme tracker, including neoCLR issue
+[#18](https://github.com/marinasundstrom/neoCLR/issues/18). Its socket/DNS foundation
+has typed addresses, bounded IPv4 connect/listen/accept/transfers and operation tokens;
+see [networking evidence](experiments/network-cancellation/README.md) and
+[socket contracts](socket-api-design.md). IPv6 transport and broader resolver policy
+remain deferred. Existing design notes explain contracts; they do not add POC gates.
+
+Shared text, streams and JSON work belongs to [library/data](tracking/library-data.md).
+Task/scheduler and ownership foundations belong to [runtime/language](tracking/runtime-language.md).
+Compiler debt, packaging procedures and release qualification belong to
+[tooling/release](tracking/toolchain-release.md). The HTTP package acceptance result
+and POC completion decision are recorded here so they have one owner.

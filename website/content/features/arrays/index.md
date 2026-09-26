@@ -2,7 +2,7 @@
 
 An array is fixed-size managed storage. Assigning it shares the same array; changing an element is visible through its aliases. neoCLR keeps these familiar .NET behaviors while giving arrays a generic API shape and invariant element types.
 
-**Preview 9 implementation.** This example is included in the matching Preview 9 toolchain and sample bundle. The broader API remains open to revision.
+**Current development API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
 
 <a id="example"></a>
 
@@ -39,7 +39,7 @@ The array holds three readings. A second name changes the same storage, and a Se
 
 The generic shape makes the element type and ordinary members available together. Invariance avoids covariant array-store failures, but programs relying on .NET reference-array conversions need adaptation. Separating replacement from growth gives a more precise contract, at the cost of a different interface vocabulary. These are deliberate tradeoffs, not a performance claim or full .NET compatibility.
 
-Baseline checked September 23, 2026: [Microsoft’s C# array guide](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays) and [.NET 10 System.Array reference](https://learn.microsoft.com/en-us/dotnet/api/system.array?view=net-10.0). See the [neoCLR implementation contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/generic-managed-arrays.md) for metadata and compiler details.
+Comparison references: [Microsoft’s C# array guide](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays) and [.NET 10 System.Array reference](https://learn.microsoft.com/en-us/dotnet/api/system.array?view=net-10.0). See the [neoCLR implementation contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/generic-managed-arrays.md) for metadata and compiler details.
 
 <a id="ownership"></a>
 
@@ -58,13 +58,13 @@ The API includes Length, Count, indexed access, iteration, Empty and ForEach, wi
 
 Bounds failures are terminal, so validate user-supplied ranges before accessing elements when invalid input should produce a recoverable Result. Array size and allocation are also constrained by runtime budgets.
 
-Span/Memory APIs, general interface variance and immutable or frozen array families are not introduced by this implementation. Historical Neo owned-array experiments are separate from the ordinary Raven T[] behavior described here.
+Span/Memory APIs, general interface variance and immutable or frozen array families are not introduced by this implementation.
 
 <a id="direction"></a>
 
 ## Buffer experiments and planned work
 
-The platform roadmap starts with byte copy, then text/JSON transformation and controlled delayed operations before sockets. These cases test range arithmetic, overlap, partial transfers and retention through garbage collection. They can reshape provisional APIs before the HTTP application milestone.
+Socket and HTTP operations already exercise byte buffers, partial transfers and retention through garbage collection. Future buffer views or asynchronous streams need explicit aliasing and lifetime contracts; they are not implied by the current array API.
 
 [Platform roadmap →](../../proposals/#http-poc) · [Collection capabilities →](../collections/)
 

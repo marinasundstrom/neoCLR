@@ -259,8 +259,8 @@ def main():
         'CONSOLE_IF_LET_SAMPLE': ('docs/experiments/console-streams/IfLet.rvn', 'func ReadInput()', '\n}', True),
         'STORAGE_POC_SAMPLE': ('docs/experiments/storage-poc/Main.rvn', 'func Main()', '\n}', True),
         'ARRAY_TOUR': (raven + 'library-array-tour.rvn', 'import System.*', '\n}', True),
-        'TASK_AWAIT_SAMPLE': ('website/samples/preview9/library-async-default-queue.rvn', 'func Describe', '\n    return ()\n}', True),
-        'TASK_WORKER_SAMPLE': ('website/samples/preview9/library-async-default-queue.rvn', 'import System.*', '\nfunc Main() {\n    _ = Show()\n}', True),
+        'TASK_AWAIT_SAMPLE': (raven + 'library-async-default-queue.rvn', 'func Describe', '\n    return ()\n}', True),
+        'TASK_WORKER_SAMPLE': (raven + 'library-async-default-queue.rvn', 'import System.*', '\nfunc Main() {\n    _ = Show()\n}', True),
         'TASK_PROMISE_SAMPLE': (raven + 'library-task-producer.rvn', 'import System.*', '\n    promise.Complete(41)\n}', True),
         'TASK_PROPAGATION_SAMPLE': (raven + 'library-task-propagation.rvn', 'async func Read', '\n}\n', True),
         'TASK_RESULT_SAMPLE': (raven + 'library-task-result.rvn', 'import System.*', '\n    promise.Complete(Ok(41))\n}', True),
@@ -303,9 +303,6 @@ def main():
     downloads.mkdir()
     for name in ('library-array-tour.rvn', 'library-array-tour.expected.txt', 'library-task-propagation.rvn', 'library-task-result.rvn', 'library-async-default-queue.rvn', 'library-task-producer.rvn', 'library-async-cancellation.rvn', 'library-outcome-operators.rvn', 'library-outcome-operators.expected.txt', 'library-query-basics.rvn', 'library-query-basics.expected.txt', 'library-query-names.rvn', 'library-query-names.expected.txt', 'library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
         source_sample = ROOT / raven / name
-        if name == 'library-async-default-queue.rvn':
-            # Published examples retain the release contract during development.
-            source_sample = SOURCE / 'samples/preview9' / name
         shutil.copyfile(source_sample, downloads / name)
     post_downloads = downloads / 'http-post'
     post_downloads.mkdir()

@@ -2,7 +2,7 @@
 
 Sequence provides count and indexed read access. MutableSequence adds replacement; List adds growth. Arrays and lists can be consumed through these capabilities.
 
-**Preview 9 implementation.** Collection capabilities are included in Preview 8. Preview 9 adds a basic set of iterable operators and uses Filter and Map; Preview 8 packages still use Where and Select.
+**Current development API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
 
 <a id="example"></a>
 
@@ -29,12 +29,10 @@ Import `System.Linq.*` for the query operators. Filter keeps matching elements; 
 
 [Complete executable sample →](../../samples/library-query-names.rvn) · [Expected output →](../../samples/library-query-names.expected.txt)
 
-When moving from Preview 8, replace `Where` with `Filter` and `Select` with `Map`, then rebuild against the matching Preview 9 references and runtime library. The old names are not aliases. `First`, `Last`, `Single` and `ToList` retain their names.
-
 <a id="basic-operators"></a>
 
 ## A basic operator set
-**Preview 9 API.** Any and All test elements; Count counts them. Take and Skip select a page. Concat joins two sequences in order, and FlatMap turns each element into a sequence and flattens the results. Fold accumulates from an explicit seed, returning that seed for empty input.
+Any and All test elements; Count counts them. Take and Skip select a page. Concat joins two sequences in order, and FlatMap turns each element into a sequence and flattens the results. Fold accumulates from an explicit seed, returning that seed for empty input.
 
 ```raven
 {{QUERY_BASICS_SAMPLE}}
@@ -44,12 +42,12 @@ The page contains 2 and 3. Both tests are true, the matching count is 2, and the
 
 [Complete executable sample →](../../samples/library-query-basics.rvn) · [Expected output →](../../samples/library-query-basics.expected.txt)
 
-Any and All stop as soon as the answer is known. Empty Any is false and empty All is true. Take, Skip, Concat and FlatMap are lazy. Non-positive Take yields nothing; non-positive Skip skips nothing. Fold consumes its input from left to right. These methods require the matching Preview 9 library.
+Any and All stop as soon as the answer is known. Empty Any is false and empty All is true. Take, Skip, Concat and FlatMap are lazy. Non-positive Take yields nothing; non-positive Skip skips nothing. Fold consumes its input from left to right.
 
 <a id="dotnet-mapping"></a>
 
 ## From .NET LINQ to neoCLR
-This maps the Preview 9 API. It is not a promise of full LINQ compatibility; Preview 8 retains Where/Select and has fewer operators.
+The supported operators follow these contracts; the library does not provide full LINQ compatibility.
 
 | .NET Enumerable | neoCLR | Behavior |
 | --- | --- | --- |
@@ -98,7 +96,7 @@ Report issues with a small program, the toolchain version, expected behavior and
 
 ## Mixed Object keys
 
-Development generic API signatures now admit Object map keys and values. `HashMap<Object, Object>` uses explicit equality and hash callbacks: Path and type descriptors use their own contracts, supported boxed integers and Booleans compare by value, and ordinary classes retain allocation identity. A tested sample covers mixed keys, collisions, replacement, table growth and reference-preserving values through GC. This does not add a default comparer or string-to-Object conversion.
+Development generic API signatures admit Object map keys and values. `HashMap<Object, Object>` uses explicit equality and hash callbacks: Path and type descriptors use their own contracts, supported boxed integers and Booleans compare by value, and ordinary classes retain allocation identity. A tested sample covers mixed keys, collisions, replacement, table growth and reference-preserving values through GC. A default comparer is not supplied. Strings use content equality and hashes through Object; callers still select the callbacks.
 
 ## API reference
 
