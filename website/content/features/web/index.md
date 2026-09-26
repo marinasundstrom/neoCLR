@@ -3,10 +3,10 @@ title: Web and HTTP
 ---
 # Web and HTTP
 
-**Development experiment after Preview 9.** Raven client and server applications can exchange a small UTF-8
+**Preview 10.** Raven client and server applications can exchange a small UTF-8
 response through neoCLR TCP sockets, with DNS on the client. HttpClient, HttpServer, request/response types,
-content and handlers are development APIs in System.Web.Http. They require a matching
-development toolchain and are not part of the published Preview 9 SDK.
+content and handlers are experimental APIs in System.Web.Http. Use the matching
+Preview 10 toolchain.
 
 ## A request and its content
 
@@ -58,7 +58,7 @@ retries need decisions about replaying requests and safe methods.
 ## Run the controlled example
 
 [Download the client, handler checks and verifier](/samples/http-client.zip).
-The archive includes run instructions and requires matching development
+The archive includes run instructions and requires matching Preview 10
 artifacts. A local Python peer fragments headers and a `Café 🌍` body; the verifier
 also runs a .NET comparison client. The peer stays open until the client finishes,
 checking that completion follows Content-Length rather than waiting for EOF.
@@ -83,15 +83,15 @@ and finish with no live managed objects. This is a bounded exchange, not an
 application hosting framework.
 
 Received headers have lowercase names and trimmed surrounding whitespace.
-The development server requires exactly one Host. GET/HEAD/DELETE bodies remain unsupported;
+The server requires exactly one Host. GET/HEAD/DELETE bodies remain unsupported;
 POST, PUT and PATCH read up to 1,024 bytes according to Content-Length before calling the handler.
 Without Content-Length, a request has an empty body. It validates application response headers, computes the byte length
 and adds `Connection: close`. Malformed requests or callback errors close the
-connection without an HTTP error response. Final statuses 200–599 are supported in development. Statuses 204, 205 and 304 require empty content; the server omits Content-Length for 204/304.
+connection without an HTTP error response. Final statuses 200–599 are supported in this preview. Statuses 204, 205 and 304 require empty content; the server omits Content-Length for 204/304.
 
 ## Own an HTTP exchange
 
-In development, `HttpServer.Accept()` returns a context with the buffered request and
+In this preview, `HttpServer.Accept()` returns a context with the buffered request and
 outgoing response. The context keeps their lifetime together:
 
 ```raven
@@ -150,7 +150,7 @@ experiment with `--mapped`.
 
 ## Current limits
 
-Plain HTTP/1.1 GET, HEAD, DELETE and POST/PUT/PATCH support final statuses 200–599 in development. Responses use a single Content-Length, bounded chunked coding,
+Plain HTTP/1.1 GET, HEAD, DELETE and POST/PUT/PATCH support final statuses 200–599 in this preview. Responses use a single Content-Length, bounded chunked coding,
 or connection-close framing. HEAD and bodyless 204/304 complete after headers. Informational responses are not
 yet supported. The experiment bounds URLs to 1,024 bytes, headers to 2,048 bytes and 16
 fields, and decoded bodies to 1,024 bytes. Buffered uploads have the same body limit; known-length stream uploads allow up to 65,536 bytes. Chunk framing has a separate 2,048-byte budget.
@@ -189,7 +189,7 @@ InvalidUri is available for URI integration. HTTP statuses remain response value
 status support expands. ReadText still has its separate provisional string error for
 UTF-8 decoding. Default HttpError is inactive and formats as Empty.
 
-## URI references in development
+## URI references in this preview
 
 `System.Uri` parses escaped ASCII references and resolves relative references
 against an absolute base. `Parse` returns `Result<Uri, UriError>`; `Resolve` accepts
@@ -201,13 +201,13 @@ removed during resolution.
 This first iteration preserves exact text for equality and hashing. It does not
 perform network access, implicit escaping, IDNA conversion or IPv6-literal parsing.
 Input is limited to 4096 bytes. A parsed Uri does not imply transport support.
-UriError is a development union with named cases and generated pattern support.
+UriError is an experimental union with named cases and generated pattern support.
 Match its named cases directly.
 
 The [API reference](/docs/api/System/Uri/) describes both overloads and the limits.
 
 Typed HttpError results, BaseUri resolution and token-aware Send/Get/GetString are
-integrated in development. Both string and Uri overloads are available; tokenless
+integrated in this preview. Both string and Uri overloads are available; tokenless
 client overloads use CancellationToken.None. GetString decodes the buffered body as
 strict UTF-8 and preserves HTTP errors. Invalid bytes produce HttpError.Protocol;
 GetString accepts 200–299 and reports other statuses as HttpError.UnsuccessfulStatus
@@ -232,7 +232,7 @@ has already been escaped.
 
 ## Inspect response properties
 
-Development responses expose `HttpStatusCode` names such as `NotFound`, while
+Responses expose `HttpStatusCode` names such as `NotFound`, while
 retaining unnamed numeric status values. `IsSuccessStatusCode` checks the 200–299
 range. Cast the enum to `int` when you need its numeric value.
 
@@ -262,7 +262,7 @@ describes the response, status enum and errors.
 
 ## Post buffered text
 
-Development POST support uses the same handler pipeline, BaseUri rules and cancellation
+POST support uses the same handler pipeline, BaseUri rules and cancellation
 token as GET. This sample propagates HTTP failures on its normal path. It separately
 chooses to reject non-success statuses, then adapts ReadText's provisional string error
 to HttpError at the application boundary.
@@ -284,7 +284,7 @@ empty and binary bodies. Header append/remove operations, OPTIONS, unknown-lengt
 
 ## Looking up headers
 
-In development, requests and responses provide `GetHeaderValues(name)`. Names use
+In this preview, requests and responses provide `GetHeaderValues(name)`. Names use
 ASCII case-insensitive comparison. The returned sequence contains every stored matching
 field value in order; it is empty if the name is absent or invalid. Empty values remain
 present, and repeated fields are not joined or split at commas. For example,
@@ -292,7 +292,7 @@ present, and repeated fields are not joined or split at commas. For example,
 
 ### Known-length stream uploads
 
-Development `HttpContent.FromStream(stream, length, leaveOpen)` creates one-shot
+`HttpContent.FromStream(stream, length, leaveOpen)` creates one-shot
 upload content for POST, PUT and PATCH. The socket handler sends headers, then reads
 and sends chunks of at most 256 bytes. The entire source is not buffered first.
 Owned sources close at exchange completion, failure or cancellation; borrowed sources
@@ -314,7 +314,7 @@ promised for this release; see the
 
 ## Adding request headers
 
-In development, `request.WithHeader(name, value)` returns a new request with that
+In this preview, `request.WithHeader(name, value)` returns a new request with that
 application header set, replacing existing matches case-insensitively. It returns a
 Result, so request preparation can use `?` before calling `HttpClient.Send`:
 
@@ -330,7 +330,7 @@ application fields and at most 2,048 encoded header bytes. Stream-backed content
 
 ## Other request methods
 
-Development APIs include `Put`, `Patch` and `Delete`, with string/Uri addresses and
+Preview 10 APIs include `Put`, `Patch` and `Delete`, with string/Uri addresses and
 optional cancellation tokens. They use the same BaseUri and handler pipeline as Get
 and Post. PUT/PATCH take HttpContent; DELETE has no body in this checkpoint. Non-success
 statuses remain responses, so callers choose their status policy:

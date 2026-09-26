@@ -7771,3 +7771,12 @@ configuration/content, not target-specific code added to Raven main.
 - **Publication authorization:** the author then directs “Continue directly to release”.
   The assistant selects the next unused neoCLR preview version after checking existing
   releases, retains exact-candidate CI/package gates and proceeds toward publication.
+
+- **Release qualification findings/actions:** packaged MSBuild reproduced accepted
+  unresolved calls. The assistant first investigated a general compiler defect;
+  comparison showed Raven main already rejects it. The defect belongs to neoCLR's
+  terminal-Fault flow policy. Raven `d48bf14ba` fixes recursive binding/diagnostic
+  loss with 55 focused tests. Windows host CI also exposed premature TCP connect
+  success; neoCLR now waits for Winsock readiness, and the backpressure test checks
+  portable byte/ownership behavior. Both findings remain release gates until the
+  matching hosted/package checks pass. New SDK/VSIX packaging is in progress.

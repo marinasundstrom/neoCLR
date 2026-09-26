@@ -2,7 +2,7 @@
 
 String represents Unicode text. Char represents one grapheme cluster: a practical approximation of a character as a reader perceives it. UTF-8 is the canonical internal encoding; scalar and byte access are explicit.
 
-**Current development API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
+**Preview 10 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
 
 [See a working example ↓](#characters) · [Download the complete sample](../../samples/library-utf8.rvn)
 
@@ -42,7 +42,7 @@ Use patterns to extract a successful value or its error. For example, `RoundTrip
 
 <a id="try"></a>
 
-## Use the matching development toolchain
+## Use the matching Preview 10 toolchain
 Open the prepared Raven project in VS Code, replace Main.rvn with the complete sample, save it, then run the neoCLR build/run task. Use matching reference and runtime libraries.
 
 [Download Raven source](../../samples/library-utf8.rvn) · [Download expected output](../../samples/library-utf8.expected.txt) · [Toolchain setup →](../../try/#development)
@@ -83,7 +83,9 @@ Share a concrete input, the code you tried and the result you expected.
 Questions, sample programs and documentation corrections are welcome. See [how to contribute](../../#feedback) for ways to participate.
 
 
-## Char through Object (development)
+<a id="char-through-object-development"></a>
+
+## Char through Object
 
 Boxing a Char preserves a copy of its complete grapheme text. Object equality and
 hashing use that exact text; Object ToString returns it unchanged. Separate boxes
@@ -96,7 +98,9 @@ Use the [Char API reference](xref:System.Char) for construction, typed equality 
 comparison, and the [Object guide](/docs/objects.html) for boxing contracts.
 
 
-## String through Object (development)
+<a id="string-through-object-development"></a>
+
+## String through Object
 
 Text retains exact content equality and matching hashes through Object, so it
 can be used as a HashMap key with explicit Object callbacks. ToString returns the
@@ -133,7 +137,9 @@ concrete benefit justifies the compatibility cost. Culture selection, Unicode ca
 choices and tests. Additional casing/comparison APIs remain planned; the existing
 bounded ordinal helpers retain their current contract.
 
-## Constructing and indexing text (development)
+<a id="constructing-and-indexing-text-development"></a>
+
+## Constructing and indexing text
 
 ```raven
 let text = String(['F', 'o', 'o'])
@@ -165,7 +171,9 @@ These development semantics are checked across Object/Sequence conversions, arra
 storage and garbage collection. Identity hashes may collide and are not persistent IDs.
 
 
-## Explicit interning (development)
+<a id="explicit-interning-development"></a>
+
+## Explicit interning
 
 ```raven
 let first = String(['F', 'o', 'o'])

@@ -2,7 +2,7 @@
 
 Start with a saved .rvnproj project. The same project describes your source files and runtime references for the editor and build tools.
 
-**Published Preview 9.** These instructions use the matching macOS arm64 packages. The feature pages distinguish this preview’s API from later development changes and future proposals.
+**Published Preview 10.** These instructions use the matching macOS arm64 packages. The feature pages describe current behavior and possible future directions.
 
 [Set up the preview ↓](#install)
 
@@ -13,11 +13,11 @@ The prebuilt preview supports **macOS on Apple silicon**. For the development to
 
 **neoCLR itself and programs running on neoCLR do not depend on .NET.** The .NET requirement belongs to the surrounding tools: the Raven compiler, MSBuild, the import bridge and Raven Language Server. The VS Code extension uses that language server for editor features. Once a program is built and imported, running it with the neoCLR runtime and its matching runtime library does not require .NET.
 
-Download these four assets from [Preview 9’s downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.9):
+Download these four assets from [Preview 10’s downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.10):
 
-- `neoclr-0.1.0-preview.9-osx-arm64.tar.gz` — runtime, project and samples.
-- `raven-sdk-0.1.12-neoclr.async.20260923-osx-arm64.tar.gz` — matching compiler tools.
-- `raven-vscode-0.1.12-neoclr.async.20260923.vsix` — matching editor extension.
+- `neoclr-0.1.0-preview.10-osx-arm64.tar.gz` — runtime, project and samples.
+- `raven-sdk-0.1.12-neoclr.http.20260927-osx-arm64.tar.gz` — matching compiler tools.
+- `raven-vscode-0.1.12-neoclr.http.20260927.vsix` — matching editor extension.
 - `raven-toolchain-notices.tar.gz` — companion notices.
 
 Extract the runtime and SDK archives into separate folders. In VS Code, open Extensions, use the ⋯ menu, choose **Install from VSIX…** and select the downloaded extension. Reload any open VS Code windows afterward.
@@ -79,7 +79,7 @@ To explore a library, open the bundle’s `project-reference-demo/App` folder. I
 
 Make a copy of `msbuild-demo/Main.rvn`, then replace it with a sample from the bundle’s `tools/samples` folder. Build and run the same Demo.rvnproj. Start with `library-async-default-queue.rvn` for a worker and await, `library-task-composition.rvn` for completion composition, or `library-introspection-tour.rvn` for type discovery, `library-grapheme-strings.rvn` for text, or `library-calendar.rvn` for dates. `library-files.rvn` creates or replaces its demo file in the working directory.
 
-Meet the syntax on the [Raven language page](../raven/), then explore [Option and Result](../features/outcomes/) or [collection capabilities](../features/collections/). Site examples describe their current implementation status; use the samples bundled with Preview 9 when running Preview 9.
+Meet the syntax on the [Raven language page](../raven/), then explore [Option and Result](../features/outcomes/) or [collection capabilities](../features/collections/). Use the matching bundled examples. The `samples/http` folder includes typed JSON client/server and stream-upload checks; see [Web and HTTP](../features/web/).
 
 <a id="limits"></a>
 
@@ -93,8 +93,10 @@ This preview always rebuilds. It has no package restore, incremental build, Clea
 
 <a id="development"></a>
 
-## Version compatibility and migration
+## Preview compatibility
 
-Preview 9 adds Task/Promise, async/await and isolated workers. Rebuild applications and libraries with its complete matching toolchain. From Preview 8: queries use Filter/Map instead of Where/Select; File and Path move to System.Storage; the System.Error wrapper is removed in favor of strings or domain error types. Older Introspection and text migrations still apply. The future System.Concurrency namespace and Task.Run-style API are not included.
+Use the runtime, SDK, extension and reference library from the same preview. Rebuild
+applications and libraries after changing tools. Preview APIs and artifact formats
+remain experimental.
 
 The [feature pages](../#feature-pages) show tested examples and current limits. The [proposal overview](../proposals/) explains the open questions and possible future additions. Tell us what works for your programs and where these contracts should improve.

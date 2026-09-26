@@ -2,7 +2,7 @@
 
 Read a line, write text, or work with the standard streams. Recoverable input errors and end-of-input are separate outcomes.
 
-**Development API.** These additions require matching development references and runtime libraries; they are not included in Preview 9. Console remains a static class in System.
+**Preview 10.** Use matching references and runtime libraries. Console remains a static class in System.
 
 <a id="input"></a>
 
@@ -50,7 +50,7 @@ Reports with input bytes, expected output and the toolchain revision help us eva
 
 [Console](xref:System.Console) · [TextReader](xref:System.IO.TextReader) · [TextWriter](xref:System.IO.TextWriter)
 
-The generated reference describes development after Preview 9. Use the availability
+The generated reference describes Preview 10. Use the availability
 notes above to distinguish it from the published toolchain.
 
 ## Command-line arguments
@@ -70,7 +70,7 @@ func Main(arguments: string[]) {
 The array contains application arguments, excluding the executable name, as in .NET.
 Without arguments it is empty. Environment.GetCommandLineArgs() includes the
 executable name. Main() without parameters continues to work. This support requires
-the development managed collection profile and is not part of Preview 9.
+the managed collection profile in Preview 10.
 
 ## Displaying values
 

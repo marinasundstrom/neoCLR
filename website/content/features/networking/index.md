@@ -4,8 +4,8 @@ title: Networking
 # Networking
 
 The current POC resolves a host name, connects a
-TCP client, sends bytes and reads the reply from a separate neoCLR server. It is available with matching development
-artifacts; the published Preview 9 SDK does not include these APIs.
+TCP client, sends bytes and reads the reply from a separate neoCLR server. It is available with matching Preview 10
+artifacts.
 
 ## Address values
 

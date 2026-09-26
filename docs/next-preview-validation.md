@@ -1,85 +1,51 @@
-# Next-preview validation
+# Release candidate validation
 
-**Historical candidate context:** the procedure below was recorded for
-v0.1.0-preview.6 (2026-09-14). It does not select the current development candidate.
-Use [the async/Tasks preview plan](async-preview-plan.md) for the current working
-release scope and readiness gates. The [2026-09-19 readiness review](preview-readiness-2026-09-19.md)
-is earlier evidence, not the current candidate selection.
-The reusable archive and platform checks below still apply to a newly selected
-candidate. Published release notes remain unchanged.
+The [toolchain/release tracker](tracking/toolchain-release.md) owns candidate status.
+Preview 10 is the selected HTTP POC release. Follow the [CI design](ci-efficiency-plan.md)
+for validation placement and the [package procedure](experiments/raven-target/RELEASING.md)
+for the matching runtime, Raven SDK and editor assets.
 
-## Validation scope
+## Source archive
 
-The current library milestone covers readonly managed references, inheritance and
-constructor/interface dispatch, generic functions/delegates/closures, reflection,
-common interfaces and collections, ordinal text/character helpers, Math, separate
-Date/Time values, the host local clock, guest Environment arguments, lexical Path
-operations and bounded UTF-8 file I/O. These are preview subsets, not a claim of
-complete .NET class-library parity. See [library scope](library-preview.md) and
-individual API design documents for the researched .NET comparisons and limits.
-
-Validation should prove those existing contracts, not expand APIs simply to match a
-BCL inventory. Parsing/formatting/globalization, broader filesystem services and
-asynchronous I/O remain deferred. Verification is mandatory for Neo compilation and
-optional for direct IL/artifact execution; runtime provenance checks remain active.
-
-## Reproducible source-archive check
-
-With Python 3.9+, Git, Rust and the platform's existing native build prerequisites:
+With Python 3.9+, Git, Rust and the host's native build prerequisites:
 
 ```sh
-python3 scripts/validate-release.py --toolchain stable
-python3 scripts/validate-release.py --toolchain 1.85.0
+python3 scripts/validate-release.py --revision COMMIT --toolchain stable --release --output /fresh/output
 ```
 
-On Windows the Python command may be `python`. Use `--revision <commit>` to select a
-candidate and `--output <new-directory>` to preserve results at a chosen location.
-The default is HEAD and a fresh temporary directory. The script validates committed
-content; uncommitted working-tree changes are not included in its archive.
+The validator archives committed source, rejects unexpected paths/member kinds,
+compares archive membership with Git, audits dependency notices, runs the full test
+suite, builds the runtime and checks source/artifact sample outcomes. Native interop
+and embedding checks are included. Its report records revision, archive hash,
+platform/toolchain, profile, timings and results. Uncommitted changes are excluded.
 
-The check:
+`--smoke-only` skips full tests and records `full_tests: false`; use it for a local
+packaging check alongside the canonical full-suite result. Omit `--release` for an
+explicit debug-profile run. Never present a smoke-only report as full-suite evidence.
 
-1. Resolves one exact commit and archives its tracked source with git archive,
-   disabling line-ending conversion so notice bytes agree on Windows and Unix.
-2. Rejects links/special files and unexpected archive paths; compares archive membership
-   with the tracked tree and checks required source/release files.
-3. Checks the dependency notice inventory against Cargo.lock and verifies notice hashes.
-4. Runs all test targets from the extracted source on the selected Rust toolchain,
-   using a fresh target directory, then builds the executable.
-5. Verifies and runs 23 deterministic Neo programs as source and JSON artifacts,
-   checking identical output. Separately checks Environment arguments and process
-   reads, local-clock snapshots against the host instant, and report-file contents
-   from source and artifacts. Then builds and runs the native interop sample.
-6. Writes report.json with the commit, archive SHA-256, platform, rustc version,
-   notice/file counts, smoke programs, full-test status and overall result.
+## Hosted checks
 
-`--smoke-only` skips the full suite for a quicker packaging check. Its report explicitly
-records `full_tests: false`; it cannot substitute for the full release gate. A failing
-check records failure and returns nonzero. Archive membership and hash checks are bounded
-packaging checks, not a complete security or provenance audit.
+Default CI runs the full archive/test gate once on Linux stable. macOS and Windows
+run the focused host/ABI inventory in `scripts/validate-host.py`. All three hosts
+compile all targets with Rust 1.85.0. A manual `full_matrix` dispatch runs the full
+stable suite on all three hosts when warranted. Format and strict Clippy remain
+canonical gates. Reports are retained for successful and failed jobs.
 
-## Platform matrix and release gates
+Require passing checks on the selected code revision. A later documentation-only
+tag may identify that validated code revision explicitly and record its exact delta;
+a green run does not certify untested code. Review actual release notes, changelog,
+notices, package contents and checksums before publication.
 
-CI now runs the archive check on Linux, macOS and Windows with both stable and Rust
-1.85.0. The stable jobs also run formatting and strict Clippy. Reports and source
-archives are retained as per-job CI artifacts, including reports from failed runs.
-A green run for a different commit does not certify this candidate.
+## Binary and editor checks
 
-Before publication, require:
+Source CI does not certify packaged binaries. For every shipped target, archive and
+extract the matching runtime/SDK, compare payload hashes, run the bundled samples,
+check failed-build/stale-output rejection, and verify editor completion/build/run
+with the matching extension. Preview 10 ships prebuilt tools for macOS arm64 only.
+Record compiler/runtime revisions, prerequisites and asset hashes in the release
+validation manifest. Preserve known limitations and distinguish observed failures
+from fixed defects.
 
-- Successful six-job CI for the exact selected release commit, with passing full-test
-  archive reports on every claimed runner/toolchain combination.
-- Review of release notes, changelog migration instructions, dependency notices,
-  source additions and the actual artifacts/checksums being published.
-- Explicit selection of version/date and publication scope. Do not publish development
-  smoke reports as evidence of untested platforms or prebuilt-binary support.
-
-The validator does not push, tag, upload a release or change package versions. CI runs
-require a pushed commit or pull request. Local macOS evidence is not Linux/Windows
-validation. See [source release](source-release.md) for the remaining publication process.
-
-## Current development evidence
-
-See the [library-preview validation record](experiments/library-preview-validation/README.md)
-for the exact macOS commits, toolchains and scope of the locally recorded checks.
-These records do not select a release or replace the full cross-platform CI gate.
+The validator does not publish or deploy. Runtime release and manual website
+publication are separate operations. Earlier release notes and validation records
+remain frozen evidence for their own revisions.

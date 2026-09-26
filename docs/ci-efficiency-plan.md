@@ -14,9 +14,8 @@ each repeated stable and Rust 1.85 checks, sample execution, archive membership 
 notice validation. The Windows minimum-Rust job was the last release gate.
 The [release evidence](preview-9-validation.json) preserves actual timings and results.
 
-The current workflow also repeats direct sample/native checks after the release
-validator. Audit overlap before removing jobs; a different host boundary or artifact
-may justify a check even when its command looks similar.
+The former workflow also repeated direct sample/native checks after the release
+validator. The split below removes duplicate execution while retaining host boundaries.
 
 ## Implemented next-release split — 2026-09-27
 

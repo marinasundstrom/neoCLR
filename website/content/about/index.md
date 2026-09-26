@@ -6,7 +6,9 @@ toc: false
 
 neoCLR is an experimental application platform. It brings together application APIs, managed execution, language integration and development tools. Working programs guide which .NET and CLR contracts to retain and where to investigate alternatives.
 
-**Early development.** Preview 9 is the published baseline, including Tasks, async execution and isolated workers. Streams, Storage and Encoding are the next development focus. The project is open source under the MIT license.
+**Experimental POC.** Preview 10 includes typed JSON HTTP client/server applications,
+TCP networking, streams, Storage, Tasks and isolated workers. The project is open
+source under the MIT license.
 
 ## Background
 

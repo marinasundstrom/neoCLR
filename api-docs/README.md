@@ -5,9 +5,8 @@ It reads a checked-in compiler reference assembly and the authored XML sidecar,
 then renders Raven signatures with the same layout, navigation and development
 notice as the Markdown guides. No DocFX build, metadata YAML or second site exists.
 
-The site documents development after Preview 9 and may be published before a
-runtime release. Generated reference pages are development documentation; per-page
-release labels and published sample/toolchain versions remain authoritative.
+The site documents Preview 10. Keep generated signatures and authored guides
+aligned with the matching runtime and compiler reference artifacts.
 
 ## Build and refresh
 

@@ -2,7 +2,7 @@
 
 System.Storage describes provider-bound paths, files and directories. System.IO
 supplies byte streams, text readers and writers. Operations are synchronous and
-return typed Result errors. Use matching development runtime and SDK artifacts;
+return typed Result errors. Use matching Preview 10 runtime and SDK artifacts;
 see [setup](../../try/#development) for published package availability.
 
 <a id="example"></a>

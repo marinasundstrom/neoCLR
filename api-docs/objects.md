@@ -1,6 +1,6 @@
 # Object and Value
 
-**Development reference after Preview 9.** neoCLR distinguishes reference types from
+**Preview 10.** neoCLR distinguishes reference types from
 value types. Assigning a class instance shares its reference; assigning a value
 copies its fields. A reference field inside a copied value still refers to the same
 object. Neither assignment performs a deep clone.
@@ -55,7 +55,9 @@ an Object/interface reference to it. Aliases can share that box. Replacing Value
 with Object would therefore require a storage migration with copy, identity,
 extraction and lifetime tests, rather than a type rename.
 
-## Identity, equality and hashing (development)
+<a id="identity-equality-and-hashing-development"></a>
+
+## Identity, equality and hashing
 
 `Object.ReferenceEquals(left, right)` is nonvirtual. It compares the allocation
 behind class, array and boxed-value references: aliases compare equal, distinct
@@ -103,7 +105,9 @@ Migration: application classes now retain Object as their metadata base. A class
 that supplies ToString should declare an override; same-name hiding is rejected by
 the current importer/runtime profile. Use matching reference/library artifacts.
 
-## HashCode and records (development)
+<a id="hashcode-and-records-development"></a>
+
+## HashCode and records
 
 [System.HashCode](xref:System.HashCode) is a mutable value accumulator. Add(int),
 Add(string), ToHashCode() and Combine(int, int) are available. Copies retain independent
@@ -131,7 +135,9 @@ the importer recognizes the IsExternalInit metadata marker and permits readonly
 backing-field stores only in declaring constructors or recognized init accessors.
 Application-property reflection and a runtime init-only field flag remain gaps.
 
-## Boxed primitive equality (development)
+<a id="boxed-primitive-equality-development"></a>
+
+## Boxed primitive equality
 
 Through an Object view, a boxed Int32 compares equal to another boxed Int32 with the
 same value. Null, another integer type, strings and application classes compare false.
@@ -174,7 +180,9 @@ explicit implementation. Named structs now dispatch their explicit overrides. Sy
 The [Object equality sample](/samples/object-equality.zip) demonstrates the behavior.
 
 
-## Structs and record structs (development)
+<a id="structs-and-record-structs-development"></a>
+
+## Structs and record structs
 
 Ordinary non-generic application structs support fields, construction, instance
 methods and value copying. Copying reference fields retains their references;
@@ -250,7 +258,9 @@ nullable-string record components and nullable-value boxing remain unsupported.
 Object.Equals and ReferenceEquals now advertise their nullable reference arguments.
 
 
-## Nullable Object arguments (development)
+<a id="nullable-object-arguments-development"></a>
+
+## Nullable Object arguments
 
 `Equals(Object? other)` accepts null as the value to compare. The receiver must still
 be an instance. `ReferenceEquals(Object? left, Object? right)` accepts null on either
@@ -292,13 +302,15 @@ type and compares null as false. Record-struct typed parameters remain non-nulla
 values. The EquatableTo&lt;T&gt; interface contract is unchanged. This does not add Nullable&lt;T&gt;,
 nullable-value boxing or Option components to the supported record component set.
 
-Generated record-class `==` and `!=` also accept nullable operands in development.
+Generated record-class `==` and `!=` also accept nullable operands in this preview.
 Two absent references compare equal; an absent and present reference compare unequal;
 present records compare by components. Record-struct operator parameters remain
 values. Explicitly authored operators retain their own contracts.
 
 
-## Mixed Object map keys (development)
+<a id="mixed-object-map-keys-development"></a>
+
+## Mixed Object map keys
 
 Supported generic API signatures now admit Object, including `HashMap<Object, Object>`.
 Supply explicit callbacks: `(left, right) => left.Equals(right)` and
@@ -314,7 +326,9 @@ or support for other boxed primitives. It is an importer coverage fix, not a new
 algorithm or runtime layout.
 
 
-## String through Object (development)
+<a id="string-through-object-development"></a>
+
+## String through Object
 
 [String](xref:System.String) now supports Object equality, hashing and display through
 the existing intrinsic-text wrappers. Equality compares exact contents with another

@@ -1,7 +1,7 @@
 # Storage metadata lookup
 
-**Development after Preview 9.** This synchronous host adapter queries a native path
-without opening its contents or retaining a stream handle. Use matching development
+**Preview 10.** This synchronous host adapter queries a native path
+without opening its contents or retaining a stream handle. Use matching Preview 10
 artifacts. It is separate from the application-owned Storage provider experiment.
 
 - [Metadata](xref:System.Storage.Metadata): `GetKind(path: string) -> Result<EntryKind, StorageLookupError>`.

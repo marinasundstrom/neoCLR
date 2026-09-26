@@ -14,6 +14,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Select 0.1.0-preview.10 for the author-requested HTTP POC release. Prepare candidate
   notes and matching packages; publication is pending exact-candidate validation.
+  Align website/API guides and installation instructions with the Preview 10 package
+  set. Integrate Raven `d48bf14ba` to preserve missing-call diagnostics during terminal
+  Fault analysis; no Runtime Contract or metadata shape changes.
 
 - Implement the next-release CI split: one canonical full source/archive run,
   focused macOS/Windows OS and ABI checks, and compile-only minimum-Rust checks on

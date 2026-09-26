@@ -1,6 +1,6 @@
 # TCP sockets and listeners
 
-**Development after Preview 9.** `System.Networking.Sockets` starts with an IPv4 TCP
+**Preview 10.** `System.Networking.Sockets` starts with an IPv4 TCP
 API. Connections can send and receive bytes; listeners accept new connections.
 The two-sided POC runs separate neoCLR server and client processes on loopback.
 This remains a provisional subset of a complete Socket API.
@@ -157,7 +157,9 @@ through private lookup/connect/transfer paths. Each native operation uses the ea
 of that deadline and its phase bound. Public Socket calls still use the independent
 bounds above; this adds no configurable Socket timeout overload. Token overloads are described below.
 
-## Per-operation cancellation (development)
+<a id="per-operation-cancellation-development"></a>
+
+## Per-operation cancellation
 
 Dns.GetHostAddresses, all Socket.Connect overloads, Accept, Receive and Send accept
 an optional-by-overload `System.Concurrency.CancellationToken`. Existing overloads

@@ -1,6 +1,6 @@
 # Introspection and Object contracts
 
-Development after Preview 9. [TypeInfo](xref:System.Introspection.TypeInfo) describes
+Preview 10. [TypeInfo](xref:System.Introspection.TypeInfo) describes
 a type in the current loaded program. [MemberInfo](xref:System.Introspection.MemberInfo)
 provides its name, declaring type, module and token; the type interface adds shape,
 generic arguments and member queries. The [type reference](xref:System.Introspection.TypeInfo)
@@ -123,7 +123,9 @@ generated member coverage, closing the descriptor-interface documentation gap. B
 flags select visibility and instance/static categories; they do not enable inherited
 traversal or grant member invocation access.
 
-## Type classification flags (development)
+<a id="type-classification-flags-development"></a>
+
+## Type classification flags
 
 TypeInfo exposes IsAbstract, IsOpen, IsClosedHierarchy, IsUnion, IsEnum and
 IsValueType. IsOpen means unrestricted inheritance/implementation, not generic
@@ -134,7 +136,9 @@ ClosedHierarchy describes the direct family; permitted open subtypes may themsel
 have descendants. These are descriptive metadata queries, not added raw-IL enforcement.
 
 
-## Runtime execution — development
+<a id="runtime-execution-development"></a>
+
+## Runtime execution
 
 Import System.Runtime.Reflection for [checked construction and property execution](reflection.md).
 The descriptor interfaces remain descriptive. Execution accepts runtime-backed

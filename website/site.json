@@ -1,8 +1,8 @@
 {
   "subtitle": "Experimental application platform",
-  "footer": "Experimental \u00b7 Development APIs after Preview 9",
-  "notice": "Development docs \u00b7 Some APIs are not released yet.",
-  "releaseUrl": "https://github.com/marinasundstrom/neoCLR/releases/latest",
+  "footer": "Experimental \u00b7 Preview 10",
+  "notice": "Preview 10 \u00b7 Experimental APIs",
+  "releaseUrl": "https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.10",
   "releaseLabel": "Published release \u2192",
   "apiPath": "docs/api",
   "logo": "mark.svg",

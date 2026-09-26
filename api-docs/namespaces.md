@@ -1,9 +1,8 @@
 # Namespace overview
 
 Use this overview to find the part of the neoCLR library that fits your task.
-It describes the **current development API following Preview 9**. Development
-additions require matching artifacts; the published bundle may expose older names
-or fewer APIs. Names and contracts remain experimental.
+It describes the **Preview 10 API**. Use matching compiler, reference and runtime
+artifacts. Names and contracts remain experimental.
 
 The list grows as APIs are implemented. Every public reference type is inventoried, with generated pages or an explicitly
 linked manual entry for a renderer limitation. A namespace here does not imply the full corresponding .NET API
@@ -15,10 +14,10 @@ is supported.
 | --- | --- | --- |
 | `System` | Core types such as Object, Value, HashCode, primitives, String and Array; Func delegates; Option and Result; common capability and error types; Console; dates, times, durations and clocks. Console is a class in this namespace. | [Core reference](xref:System), [Object and Value](objects.md), [Console](console.md), [arrays](/features/arrays/index.html), [outcomes](/features/outcomes/index.html), [dates and clocks](/features/time/index.html) |
 | `System.Collections` | Iteration and collection capabilities: Iterable, Iterator, Collection, Sequence, List and map interfaces, with ArrayList and HashMap implementations. | [Collections reference](xref:System.Collections) · [ArrayList](xref:System.Collections.ArrayList`1) · [HashMap](xref:System.Collections.HashMap`2) · [Collections guide](/features/collections/index.html) |
-| `System.Networking` | Development host-backed IPv4 lookup through Dns and typed DnsError, separate from connecting. | [Networking guide](/features/networking/), [reference](xref:System.Networking) |
-| `System.Networking.Sockets` | Development IPv4 TCP connections and listeners: Connect, Listen, Accept, Send, Receive, GetLocalPort, Close and typed SocketError. | [Guide](sockets.md), [reference](xref:System.Networking.Sockets) |
-| `System.Web.Http` | Development bounded HTTP client/server, request/response/content and replaceable client handler pipeline. | [Web guide](/features/web/), [reference](xref:System.Web.Http) |
-| `System.Concurrency` | Explicit Thread lifecycle and ThreadPool execution using isolated workers. This development namespace replaces the Preview 9 System.Threading namespace. | [Reference](xref:System.Concurrency), [thread guide](index.md#explicit-threads-in-development) |
+| `System.Networking` | Host-backed IPv4 lookup through Dns and typed DnsError, separate from connecting. | [Networking guide](/features/networking/), [reference](xref:System.Networking) |
+| `System.Networking.Sockets` | IPv4 TCP connections and listeners: Connect, Listen, Accept, Send, Receive, GetLocalPort, Close and typed SocketError. | [Guide](sockets.md), [reference](xref:System.Networking.Sockets) |
+| `System.Web.Http` | Bounded HTTP client/server, request/response/content and replaceable client handler pipeline. | [Web guide](/features/web/), [reference](xref:System.Web.Http) |
+| `System.Concurrency` | Explicit Thread lifecycle and ThreadPool execution using isolated workers. | [Reference](xref:System.Concurrency), [thread guide](index.md#explicit-threads-in-development) |
 | `System.Environment` | Functions for command-line arguments, the current directory and environment-variable lookup. Lookup distinguishes a missing variable from a host access error through Result and Option. | [Environment](xref:System.Environment). |
 | `System.Introspection` | Assembly, module, type, member and parameter descriptions, binding flags and metadata tokens for inspecting the loaded program. | [Introspection guide](/features/introspection/index.html) |
 | `System.IO` | InputStream, OutputStream and optional SeekableStream capabilities; file byte streams; TextReader, TextWriter, StreamReader and StreamWriter; typed stream and text errors. Current text readers use bounded, strict UTF-8 reads. | [Reference](xref:System.IO), [stream guide](streams.md), [standard streams](console.md) |

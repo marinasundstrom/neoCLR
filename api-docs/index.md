@@ -4,9 +4,8 @@ toc: false
 ---
 # API documentation
 
-**Development after Preview 9.** These pages describe the current development
-contracts. They may precede a downloadable release. In particular, the development
-`System.Concurrency` APIs replace the `System.Threading` names in Preview 9 bundles.
+**Preview 10.** These pages describe the experimental API in the matching release
+packages. Rebuild applications with the matching compiler, references and runtime.
 
 [String](xref:System.String) documents construction from [Sequence&lt;Char&gt;](xref:System.Collections.Sequence`1),
 read-only grapheme indexing, exact text comparison and explicit

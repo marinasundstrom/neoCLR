@@ -2,7 +2,7 @@
 
 Task describes whether an operation produced a value. It does not imply a thread. Write async code around the operation you need, with expected errors as values and cancellation as a distinct outcome.
 
-**Current development API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
+**Preview 10 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
 
 [See a working example ↓](#await) · [Download the complete example](../../samples/library-async-default-queue.rvn)
 
@@ -18,7 +18,7 @@ This prints `Hello on a worker`. `Thread.Run` creates an isolated OS worker and 
 
 The worker callback is a named function with owned text input and output. Guest objects are not shared. `ThreadPool.Queue` offers the same completion shape through a small reusable pool.
 
-Current development uses System.Concurrency.Thread: construct a Thread and call its instance Start(), or use Thread.Run for immediate submission. The retained Task observes completion, including native thread termination. DNS, sockets and HTTP also return Tasks without creating a thread per operation.
+This preview uses System.Concurrency.Thread: construct a Thread and call its instance Start(), or use Thread.Run for immediate submission. The retained Task observes completion, including native thread termination. DNS, sockets and HTTP also return Tasks without creating a thread per operation.
 
 <a id="promise"></a>
 
@@ -59,13 +59,13 @@ This prints only `Cancelled`. The message after the await never runs. `Outcome` 
 
 This prints `42`. [Download the Result mapping example →](../../samples/library-task-result.rvn)
 
-For an operation returning `Task<Result<T, E>>`, await yields the Result and `?` propagates an expected error independently. Cancellation never becomes `Result.Error`. The example uses explicit producer cancellation. Development cancellation tokens provide a separate request mechanism, described below.
+For an operation returning `Task<Result<T, E>>`, await yields the Result and `?` propagates an expected error independently. Cancellation never becomes `Result.Error`. The example uses explicit producer cancellation. Cancellation tokens provide a separate request mechanism, described below.
 
 ```raven
 {{TASK_PROPAGATION_SAMPLE}}
 ```
 
-With the development compiler, `await input?` awaits first, then applies `?` to the result: Error from a Result or None from an Option is propagated to the enclosing function. The explicit `(await input)?` form is also valid.
+With the matching compiler, `await input?` awaits first, then applies `?` to the result: Error from a Result or None from an Option is propagated to the enclosing function. The explicit `(await input)?` form is also valid.
 
 Here, Error skips the rest of Read and completes its Task with that same Error. The complete example supplies `Error("Unavailable")` and prints `Unavailable`. Propagation also works before an await, returning without waiting for later inputs.
 
@@ -125,8 +125,8 @@ This dispatcher is small and serialized. Worker joins can block it. An unresolve
 
 <a id="try"></a>
 
-## Use matching development artifacts
-With the matching development SDK, open a prepared `.rvnproj` in VS Code, replace `Main.rvn` with one of the complete downloads above, and run the neoCLR build/run task. Refresh the compiler, reference core and runtime library together. Use the runtime, SDK and editor tools from a matching build.
+## Use matching Preview 10 artifacts
+With the matching Preview 10 SDK, open a prepared `.rvnproj` in VS Code, replace `Main.rvn` with one of the complete downloads above, and run the neoCLR build/run task. Refresh the compiler, reference core and runtime library together. Use the runtime, SDK and editor tools from a matching build.
 
 neoCLR and the programs it runs do not require .NET. The Raven compiler, build tools and Raven Language Server run on .NET.
 
@@ -173,5 +173,5 @@ Questions, sample programs and documentation corrections are welcome. See [how t
 
 [System.Tasks](xref:System.Tasks) · [System.Concurrency](xref:System.Concurrency)
 
-The generated reference describes development after Preview 9. Use the availability
+The generated reference describes Preview 10. Use the availability
 notes above to distinguish it from the published toolchain.

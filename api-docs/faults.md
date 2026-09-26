@@ -1,6 +1,6 @@
 # Terminal faults and codes
 
-**Development after Preview 9.** Every host-visible runtime `Fault` now has a
+**Preview 10.** Every host-visible runtime `Fault` now has a
 machine-readable code as well as its diagnostic message and execution location.
 This is a host API; guest programs cannot catch a Fault or select its code.
 
@@ -104,7 +104,9 @@ compatibility or catchable-fault semantics. The embedding process is not deliber
 aborted by an ordinary neoCLR Fault.
 
 
-### String intern retention limits (development)
+<a id="string-intern-retention-limits-development"></a>
+
+### String intern retention limits
 
 Rust hosts configure `Limits.intern_entries` (default 4096) and `Limits.intern_bytes`
 (default 1 MiB). Each interpreter execution has its own strong intern pool, including

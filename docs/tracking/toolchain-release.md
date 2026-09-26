@@ -10,7 +10,7 @@ maintain a second HTTP completion checklist here.
 | Item | Recorded status | Remaining action / evidence |
 | --- | --- | --- |
 | Generic method-group compiler defect | Fixed independently on Raven main `13b9105d8`, integrated as `56083626e`; neoCLR helpers in `afcc8c3d` | Retain [regression evidence](../experiments/http-json-client-prototype/README.md#resolution--2026-09-26); do not reimplement the fix. |
-| Unresolved call accepted as empty body | Open observation on the matched development bundle | [Reproduction](../experiments/http-json/repeatability-20260926.md); reduce/fix independently on a main-based Raven feature branch when selected or blocking. |
+| Unresolved call accepted as empty body | Fixed on Raven neoCLR branch `d48bf14ba`; main already rejected the minimal case | [Integration evidence](../raven-target-compilation.md#preview-10-terminal-flow-diagnostics--2026-09-27): 55 focused tests pass. Requalify packaged MSBuild/stale-output behavior for Preview 10. |
 | Conditional expression-bodied getter emits zero | Open observation; explicit getter workaround in the upload feature | [Upload evidence](../experiments/http-stream-upload/README.md); general compiler reduction/fix remains separate. |
 | HTTP reference/library projection | Upload APIs and Disposable conversion integrated in `45b74768` | [623 signature checks and matching artifacts](../experiments/http-stream-upload/validation.json); no compiler Runtime Contract or native API change claimed. |
 | API reference | Source changes require matching bridge/reference and useful member docs | [Maintenance procedure](../../api-docs/README.md), including explicit renderer exclusions; do not substitute a feature page for member coverage. |

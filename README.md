@@ -1,7 +1,7 @@
 # neoCLR
 
 [![CI](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml)
-[![Preview 9](https://img.shields.io/badge/release-v0.1.0--preview.9-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.9)
+[![Preview 10](https://img.shields.io/badge/release-v0.1.0--preview.10-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.10)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Rust 1.85+](https://img.shields.io/badge/Rust-1.85%2B-orange)](Cargo.toml)
 
@@ -42,13 +42,11 @@ output is a temporary internal format, not that final binary representation. See
 
 ## Try the runtime and Raven experiment
 
-The current proof of concept demonstrates collections and iteration, Result/Option
-propagation, text and numeric helpers, files, date/time, reflection introspection,
-delegates, interfaces and native buffers. Preview 9 also supports
-[Tasks, Promise and Raven async/await](docs/task-contracts.md), including isolated
-string workers and default callback dispatch. The [async release checkpoint](docs/async-preview-plan.md)
-is published as Preview 9. The APIs are
-experimental and open to feedback.
+Preview 10 demonstrates typed JSON HTTP client/server applications over TCP,
+known-length client stream uploads, files and Storage, text and JSON, reflection,
+collections, Result/Option, Tasks, cancellation and isolated workers. HTTP remains
+a bounded cleartext POC; modern protocol work is tracked separately in the
+[HTTP capabilities plan](docs/http-capabilities.md). APIs remain experimental.
 
 Start with the [runtime and Raven walkthrough](docs/runtime-raven-preview.md), covering
 direct neoIL execution and Raven against the same library.
@@ -56,12 +54,12 @@ direct neoIL execution and Raven against the same library.
 The current [MSBuild workflow](docs/raven-msbuild.md) uses familiar Raven project
 files with standalone neoCLR build assets. It provides completion and explicit
 **neoCLR: Build with MSBuild** / **neoCLR: Run (MSBuild)** tasks, including a bounded
-application-plus-library example. This workflow is included in Preview 9.
+application-plus-library example. This workflow is included in Preview 10.
 The normal Raven toolbar build/run/debug commands do not implement this target.
 See [runtime API coverage](docs/raven-runtime-api-coverage.md) for supported contracts
 and importer limits, and [the packaging procedure](docs/experiments/raven-target/RELEASING.md)
-for producing a matching experimental toolchain. Preview 9 packages these entry points together; see the
-[release notes](docs/preview-9-release-notes.md) for assets, prerequisites and limits.
+for producing a matching experimental toolchain. Preview 10 packages these entry points together; see the
+[release notes](docs/preview-10-release-notes.md) for assets, prerequisites and limits.
 
 ## Release history
 
@@ -71,35 +69,16 @@ separates unreleased work from published capabilities. Every commit updates it u
 The [next-preview validation guide](docs/next-preview-validation.md) documents the
 reproducible source-archive check and exact-commit release gates.
 
-## Preview 9
+## Preview 10
 
-**Preview 9 (v0.1.0-preview.9)** adds Task/Promise, Raven async/await,
-composition, cancellation and isolated workers to the experimental application platform. It includes a macOS arm64 runtime bundle, experimental Raven SDK/VSIX,
-examples, source, attribution and validation evidence. Start with the
-[release notes](docs/preview-9-release-notes.md). The exact source revision passed the six Linux/macOS/Windows CI jobs.
-The GitHub prerelease contains the asset checksums and validation evidence.
+**Preview 10 (v0.1.0-preview.10)** is the HTTP application POC release. It includes
+a macOS arm64 runtime bundle, matching experimental Raven SDK/VSIX, examples,
+source, attribution and validation evidence. See the
+[release notes](docs/preview-10-release-notes.md) for capabilities and limits.
+Source validation uses one full Linux run, focused macOS/Windows host checks and
+minimum-Rust compilation on all three hosts. Binary toolchain support is macOS arm64.
 
-## Earlier previews
-
-
-**Preview 3 (v0.1.0-preview.3)** is the runtime-library foundation preview: readonly
-references, inheritance and constructor chaining, interface implementations, delegates
-and closures, plus comparison/iteration, text/Math helpers, Date/Time, the local clock
-and bounded file I/O. See the [release notes](docs/preview-3-release-notes.md) for
-examples, migration guidance and limitations. Publication is gated on exact-commit
-CI; the GitHub prerelease records validation and source checksums.
-
-Managed references can address frame-owned values or managed heap objects. Neo reads
-and writes their targets automatically; `ReferenceEquals` explicitly compares their
-locations. Returning a reference into the current frame faults. GC reclaims unreachable
-managed heap objects; native allocation/free remains explicit and separate.
-[ArrayList<T>](docs/array-list.md) now uses a managed backing array and requires no Free.
-Automatic destruction and resource cleanup remain future work.
-
-[Preview 1's frozen release notes](docs/preview-1-release-notes.md) describe the earlier
-release. Its [walkthrough](docs/preview-1-walkthrough.md) remains historical evidence;
-Preview 2 also retains its [frozen release notes](docs/preview-2-release-notes.md).
-Use the current [Neo guide](docs/neo.md) and examples for Preview 3.
+Earlier release notes remain linked from the [changelog](CHANGELOG.md).
 
 ## Build and run a sample
 

@@ -1,6 +1,6 @@
 # Console and standard streams
 
-Development API after Preview 9. `System.Console` is a static class. Its common
+Preview 10. `System.Console` is a static class. Its common
 methods are `Write(string/int)`, `WriteLine()`, `WriteLine(string/int/object?)` and Boolean, Char and integral overloads, `ReadByte()`
 and `ReadLine()`/`ReadLine(maxUtf8Bytes)`. Terminal key handling, colors, cursor
 movement, character-at-a-time text input and asynchronous calls are not implemented.
@@ -140,7 +140,9 @@ the destination/platform. neoCLR currently chooses explicitly synchronous host c
 future scheduling work must not relabel these blocking operations as asynchronous.
 [Node process I/O](https://nodejs.org/api/process.html#a-note-on-process-io).
 
-## Object and scalar output (development)
+<a id="object-and-scalar-output-development"></a>
+
+## Object and scalar output
 
 WriteLine(object?) calls virtual ToString and writes an empty line for null.
 Specific overloads accept Boolean, Char, SByte, Byte, Int16, UInt16, Int32, UInt32,

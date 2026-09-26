@@ -206,3 +206,20 @@ sample validates permitted null arguments and continued rejection of non-nullabl
 Object assignments. Generated record-specific Equals signatures remain a separate
 compiler follow-up. The author treats these reference annotations as current Raven
 compatibility, with future nullability policy/metadata representation still open.
+
+## Preview 10 terminal-flow diagnostics — 2026-09-27
+
+Raven neoCLR branch `d48bf14ba` fixes lost diagnostics caused by its terminal-Fault
+flow check. A contextually bound trailing expression is read from its bound
+statement; the flow walker no longer recursively asks GetSymbolInfo to bind it.
+`func Main() { missing() }` again reports RAV0103 and emission fails. Cold and warm
+control-flow queries still recognize the exact neoCLR System.Fault identity.
+
+The same minimal program already fails correctly on Raven main. This fix remains
+on the neoCLR integration branch; no main merge, Runtime Contract option, metadata
+shape, emitted-call convention or guest Fault semantics changes. The .NET/CLR
+comparison remains ordinary compile-time missing-name rejection, with neoCLR's
+explicit terminal-fault policy confined to its target integration. Fifty-five
+focused invocation, flow, return-path and emission-rejection tests passed; the
+selected release must also pass extracted MSBuild diagnostics/stale-output checks.
+The compiler documentation is Raven's `docs/compiler/runtime-contracts.md`.

@@ -1,7 +1,7 @@
 # File byte streams
 
-**Development after Preview 9.** System.IO now has blocking file input and
-output APIs. Use matching development artifacts. These are a first working slice,
+**Preview 10.** System.IO now has blocking file input and
+output APIs. Use matching Preview 10 artifacts. These are a first working slice,
 not a finalized provider model or asynchronous I/O contract.
 
 ## Browse the API
@@ -150,8 +150,8 @@ its input and creating another reader; TextReader has no repositioning API.
 
 Streams and text readers now use System.IO. Update System.Streams imports and type
 names to System.IO and regenerate applications with matching artifacts. System.Storage
-continues to own providers, files, directories and Path. These APIs are development
-work after Preview 9; published downloads are unchanged.
+continues to own providers, files, directories and Path. Use matching Preview 10
+compiler, reference and runtime artifacts.
 
 ## Future asynchronous reads
 

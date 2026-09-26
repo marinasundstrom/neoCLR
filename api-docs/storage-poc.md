@@ -1,6 +1,6 @@
 # Storage POC
 
-**Development after Preview 9.** This runnable app demonstrates the platform APIs
+**Preview 10.** This runnable app demonstrates the platform APIs
 working together, without defining its own filesystem provider:
 
 1. Construct FileSystem and use it through StorageProvider.
@@ -13,8 +13,8 @@ working together, without defining its own filesystem provider:
 
 Download [Main.rvn](/samples/storage-poc/Main.rvn),
 [StoragePoc.rvnproj](/samples/storage-poc/StoragePoc.rvnproj) and
-[expected output](/samples/storage-poc/expected.txt). Use matching development SDK
-and runtime artifacts; these APIs are not in the published Preview 9 downloads.
+[expected output](/samples/storage-poc/expected.txt). Use matching Preview 10 SDK
+and runtime artifacts.
 
 ```sh
 mkdir -p storage-demo/examples

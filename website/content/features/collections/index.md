@@ -2,7 +2,7 @@
 
 Sequence provides count and indexed read access. MutableSequence adds replacement; List adds growth. Arrays and lists can be consumed through these capabilities.
 
-**Current development API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
+**Preview 10 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
 
 <a id="example"></a>
 

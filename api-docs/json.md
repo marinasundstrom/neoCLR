@@ -3,9 +3,9 @@ title: JSON serialization
 ---
 # JSON serialization
 
-**Development after Preview 9.** [JsonSerializer](xref:System.Data.Json.JsonSerializer)
+**Preview 10.** [JsonSerializer](xref:System.Data.Json.JsonSerializer)
 reads/writes the closed JsonValue DOM and now has provisional flat-object overloads.
-Rebuild consumers with the matching development reference and library; JsonError has
+Rebuild consumers with the matching Preview 10 reference and library; JsonError has
 new mapping cases. All operations are synchronous and return Result with [JsonError](xref:System.Data.Json.JsonError).
 
 Use the explicit Node methods for the DOM boundary:
@@ -103,7 +103,9 @@ See [JSON error payloads](json-error-payloads.md) for the case properties and th
 value types. Case signatures also appear on the generated JsonError union page.
 
 
-## Generic HTTP client helpers (development)
+<a id="generic-http-client-helpers-development"></a>
+
+## Generic HTTP client helpers
 
 Import `System.Web.Http.Json.*` to use
 [HttpClientJsonExtensions](xref:System.Web.Http.Json.HttpClientJsonExtensions).

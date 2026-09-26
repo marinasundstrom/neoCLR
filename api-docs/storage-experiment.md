@@ -1,11 +1,11 @@
 # Storage provider experiment
 
-**Development exploration after Preview 9.** The sample imports platform
+**Preview 10.** The sample imports platform
 [StorageItem, File, Directory and StorageProvider](storage-items.md), Path and directional stream
 interfaces. Its concrete HostStorage, MemoryStorage and memory streams remain
 application-owned fixtures for comparing provider ownership and path interpretation.
 ProviderFile and ProviderDirectory are concrete sample implementations, not public platform classes.
-The platform API is provisional; these additions are not in Preview 9 downloads.
+The platform API is provisional; use matching Preview 10 packages.
 
 Download the tested [project file](/samples/storage-provider/StorageExplorer.rvnproj),
 [Storage.rvn](/samples/storage-provider/Storage.rvn),

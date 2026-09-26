@@ -1,6 +1,6 @@
 # Storage item interfaces
 
-**Development after Preview 9.** [StorageItem](xref:System.Storage.StorageItem) has
+**Preview 10.** [StorageItem](xref:System.Storage.StorageItem) has
 two permitted interface branches: [File](xref:System.Storage.File) and
 [Directory](xref:System.Storage.Directory). Providers implement these branches;
 the common model does not require native files, handles or filesystem attributes.
@@ -71,7 +71,7 @@ API is implemented yet.
   currently admit static methods. The legacy raw runtime profile retains the old
   File helper aliases for existing artifacts; the development Raven profile uses FileText.
 - Existing stream, Path and typed-error behavior is unchanged. Use matching
-  regenerated core/runtime artifacts; Preview 9 downloads are unchanged.
+  regenerated core/runtime artifacts; Use matching Preview 10 artifacts.
 
 ## Static native text helpers
 
