@@ -298,7 +298,9 @@ impl Workers {
     }
 
     pub(crate) fn has_notifications(&self) -> bool {
-        self.results.iter().any(|result| result.notification.is_some())
+        self.results
+            .iter()
+            .any(|result| result.notification.is_some())
     }
 
     // One bounded wait only. The invocation must poll other completion sources
@@ -456,14 +458,22 @@ mod tests {
                 wake: wake.clone(),
             };
             if publish {
-                reply.sender.as_ref().unwrap().send(Ok(("done".into(), vec![]))).unwrap();
+                reply
+                    .sender
+                    .as_ref()
+                    .unwrap()
+                    .send(Ok(("done".into(), vec![])))
+                    .unwrap();
             }
             drop(reply);
             assert!(wake.park(std::time::Duration::ZERO));
             if publish {
                 assert_eq!(receiver.try_recv().unwrap().unwrap().0, "done");
             }
-            assert!(matches!(receiver.try_recv(), Err(mpsc::TryRecvError::Disconnected)));
+            assert!(matches!(
+                receiver.try_recv(),
+                Err(mpsc::TryRecvError::Disconnected)
+            ));
             assert!(!wake.park(std::time::Duration::ZERO));
         }
     }

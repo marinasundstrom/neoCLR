@@ -3,8 +3,8 @@
 Author direction recorded 2026-09-23, after Preview 9 publication: improve CI for the
 **next release, not this release**. Avoid running the entire sample and validation
 suite on every platform. Isolate platform-specific behavior so validation remains
-useful without multiplying identical work. The broader matrix redesign remains planned; the immediate trigger correction
-below was separately directed after publication.
+useful without multiplying identical work. The matrix redesign below implements that direction; the earlier trigger correction
+is retained as history.
 
 ## Evidence and problem
 
@@ -18,38 +18,60 @@ The current workflow also repeats direct sample/native checks after the release
 validator. Audit overlap before removing jobs; a different host boundary or artifact
 may justify a check even when its command looks similar.
 
-## Proposed split — to validate before the next release
+## Implemented next-release split — 2026-09-27
 
-| Responsibility | Proposed placement |
+The author clarifies that the HTTP POC is intended for release and reiterates that
+full suites on every target are too costly. The default workflow now separates:
+
+| Responsibility | Placement |
 | --- | --- |
-| Formatting, ordinary static analysis, archive membership, notices and metadata snapshots | One canonical job; do not repeat OS-independent inventory checks per platform |
-| Portable VM/library contracts and complete sample outcomes | One comprehensive canonical run; identify any host dependencies before moving tests here |
-| Platform boundaries | Focused Linux/macOS/Windows jobs covering native FFI/ABI, filesystem paths/errors, environment/time, worker lifecycle/cancellation and other demonstrated host-dependent behavior |
-| Minimum Rust support | A focused compatibility job plus necessary target-specific compilation; avoid a second complete sample suite per OS |
-| Cross-platform execution | A small representative smoke set for packaging/loading/execution, with explicit reasons for each case |
-| Distributed binary bundles | Build and exercise each binary target actually shipped; do not confuse source compilation with package execution evidence |
-| Website/API documentation | Relevant-change validation and the existing separate manual deployment |
+| Format, Clippy, archive membership, notices, library snapshot | Canonical Linux stable job |
+| Complete runtime tests and source/artifact sample outcomes | Once, canonical Linux stable, optimized release profile |
+| OS/ABI boundaries | Focused macOS/Windows stable jobs; Linux is covered by the canonical full suite |
+| Minimum Rust 1.85 | `cargo check --locked --all-targets` on Linux/macOS/Windows; compile tests and target cfg branches without repeating execution |
+| Full stable OS regression | Opt-in `full_matrix` manual dispatch; replaces focused host jobs with full source/archive validation |
+| Distributed SDK/runtime packages | Exact-artifact checks for each binary target selected for release; source CI does not certify SDK packages |
+| Website/API reference | Separate relevant-change validation and manual publication |
 
-These are assistant-proposed assignments, not yet an implemented matrix. Inventory
-tests and measure time first. Portable behavior can still expose OS-specific bugs;
-retain targeted checks or a small cross-platform regression when evidence warrants
-it. Avoid merely deleting coverage or labelling mixed tests platform-independent.
+`validate-release.py --release` uses optimized binaries/tests and records that profile.
+The existing default remains debug for explicit diagnostic runs. CI's release profile
+matches the distributed runtime; debug-only assertions are not exercised by that run.
+The host validator reports each command, duration and outcome and fails if a private
+unit filter silently selects zero tests. Superseded automatic runs are cancelled;
+manual candidate runs are not automatically cancelled by later pushes.
 
-## Completion criteria
+### Test classification and coverage boundary
 
-- Classify existing checks by contract and host dependency, with owners and explicit
-  evidence for the reduced matrix. Split mixed tests where necessary.
-- Remove duplicated setup, sample execution and inventory work; reuse artifacts and
-  caches only with keys that preserve compiler, target and source provenance.
-- Keep exact-candidate evidence, published hashes, supported binary-target checks and
-  clear failure reports. A faster pipeline must still identify what actually passed.
-- Compare critical-path duration and runner minutes with Preview 9, and document any
-  remaining coverage tradeoffs. Select a time budget from measurements, not a guessed
-  promise.
+`scripts/validate-host.py` is the executable host inventory. Integration targets cover
+worker/cancellation behavior; environment, clock and dates; files, paths and console;
+CLI/process/module/source-file loading; native calls, memory and target layout.
+Private unit groups cover DNS, sockets, completion-to-VM roots, scheduler progress,
+file services and workers. All remaining integration targets and unit groups execute
+in the canonical full suite. This retains every existing test in default CI without
+claiming that a portable test can never expose an OS-specific bug. New host-sensitive
+tests must be added to this inventory; mixed targets remain whole rather than
+excluding individual inconvenient cases. The manual full matrix is available for
+cross-platform regressions or substantial runtime changes.
 
-Implement this before the next release's validation cycle. It does not change the
-published Preview 9 gates or displace the foundational Streams/Storage/Encoding work.
+The old post-validator native build/PInvoke and feature-tour runs duplicated existing
+validator/tests. Native execution stays in the validator and host checks; embedding
+`invoke` is checked explicitly. Minimum Rust remains checked against each platform's
+conditional code, rather than assuming Linux compilation proves Windows compatibility.
+No target support is removed by the split. Actual shipped binary targets still need
+extracted-package execution, including the separate Raven toolchain where applicable.
 
+### Baseline and acceptance
+
+The successful Preview 9 run recorded 15.9/29.7/51.1 minutes for stable Linux/macOS/
+Windows and 21.5/39.1/68.0 for minimum Rust: approximately 225 runner-minutes, with a
+68-minute critical job. These are historical measurements, not a forecast for the
+new workflow. The September 26 run at `73e27938` failed format checks before reaching
+validation and cannot serve as a performance baseline.
+
+Record local host/profile validation and the first hosted run before claiming a speedup
+or choosing a duration budget. A successful local macOS run does not certify Linux,
+Windows or the minimum-Rust matrix. Keep exact revisions, artifact hashes and known
+failures with release evidence; do not shorten gates by hiding failures.
 
 ## Immediate trigger correction — 2026-09-23
 

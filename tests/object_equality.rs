@@ -177,19 +177,21 @@ fn other_boxed_virtual_value_equality_remains_explicitly_unsupported() {
         (format!("ldc.i4 42\nbox Int32\n{EQUALS}"), "Boolean"),
         (HASH.into(), "Int32"),
     ] {
-        assert!(run(
-            &format!("ldc.i4 42\nnewobj Unimplemented\nbox Unimplemented\n{tail}"),
-            ".type Unimplemented\n.field Number Int32\n.end",
-            returns,
-            8
-        )
-        .is_err());
+        assert!(
+            run(
+                &format!("ldc.i4 42\nnewobj Unimplemented\nbox Unimplemented\n{tail}"),
+                ".type Unimplemented\n.field Number Int32\n.end",
+                returns,
+                8
+            )
+            .is_err()
+        );
     }
 }
 
 #[test]
 fn identity_imports_require_exact_signatures_and_report_managed_heap_service() {
-    use neoclr::{assemble, assembler::parse_function_ref, RuntimeService};
+    use neoclr::{RuntimeService, assemble, assembler::parse_function_ref};
     for (name, parameters, returns) in [
         (
             "ObjectReferenceEquals",
@@ -297,7 +299,9 @@ const STRUCT_KEY: &str = ".type Key\n.field Number Int32\n.method instance overr
 
 #[test]
 fn named_struct_box_dispatch_reads_copied_payload() {
-    let body = format!(".local Key source\n.local System.Object boxed\nldc.i4 42\nnewobj Key\nstloc source\nldloc source\nbox Key\nstloc boxed\nldloca source\nldflda 0\nldc.i4 99\nstobj Int32\nldloc boxed\n{HASH}");
+    let body = format!(
+        ".local Key source\n.local System.Object boxed\nldc.i4 42\nnewobj Key\nstloc source\nldloc source\nbox Key\nstloc boxed\nldloca source\nldflda 0\nldc.i4 99\nstobj Int32\nldloc boxed\n{HASH}"
+    );
     assert_eq!(
         run(&body, STRUCT_KEY, "Int32", 8).unwrap().value,
         Value::Int32(42)
@@ -307,13 +311,15 @@ fn named_struct_box_dispatch_reads_copied_payload() {
 #[test]
 fn named_struct_same_name_is_not_an_object_override() {
     let declarations = STRUCT_KEY.replace("override ", "");
-    assert!(run(
-        &format!("ldc.i4 42\nnewobj Key\nbox Key\n{HASH}"),
-        &declarations,
-        "Int32",
-        8
-    )
-    .is_err());
+    assert!(
+        run(
+            &format!("ldc.i4 42\nnewobj Key\nbox Key\n{HASH}"),
+            &declarations,
+            "Int32",
+            8
+        )
+        .is_err()
+    );
 }
 
 #[test]
@@ -326,7 +332,9 @@ fn named_struct_override_preserves_return_contract() {
 
 #[test]
 fn unboxing_is_an_exact_type_copy_and_type_test_preserves_the_box() {
-    let body = format!(".local Key copy\n.local System.Object boxed\nldc.i4 42\nnewobj Key\nbox Key\nstloc boxed\nldloc boxed\nisinst Key\nldloc boxed\n{IDENTITY}\nbrfalse failed\nldloc boxed\nunbox.any Key\nstloc copy\nldloca copy\nldflda 0\nldc.i4 99\nstobj Int32\nldloc boxed\n{HASH}\nret\nfailed:\nldc.i4 -1");
+    let body = format!(
+        ".local Key copy\n.local System.Object boxed\nldc.i4 42\nnewobj Key\nbox Key\nstloc boxed\nldloc boxed\nisinst Key\nldloc boxed\n{IDENTITY}\nbrfalse failed\nldloc boxed\nunbox.any Key\nstloc copy\nldloca copy\nldflda 0\nldc.i4 99\nstobj Int32\nldloc boxed\n{HASH}\nret\nfailed:\nldc.i4 -1"
+    );
     assert_eq!(
         run(&body, STRUCT_KEY, "Int32", 8).unwrap().value,
         Value::Int32(42)
@@ -366,7 +374,9 @@ fn unboxing_is_an_exact_type_copy_and_type_test_preserves_the_box() {
 #[test]
 fn boxed_struct_override_mutates_shared_box_and_survives_collection() {
     let declarations = STRUCT_KEY.replace("override readonly", "override").replace("ldarg this\nldfld 0", "ldarg this\nldflda 0\nldarg this\nldfld 0\nldc.i4 1\nadd\nstobj Int32\nldarg this\nldfld 0");
-    let mut body = format!(".local System.Object boxed\n.local System.Object alias\nldc.i4 40\nnewobj Key\nbox Key\nstloc boxed\nldloc boxed\nstloc alias\nldloc boxed\n{HASH}\npop\n");
+    let mut body = format!(
+        ".local System.Object boxed\n.local System.Object alias\nldc.i4 40\nnewobj Key\nbox Key\nstloc boxed\nldloc boxed\nstloc alias\nldloc boxed\n{HASH}\npop\n"
+    );
     for _ in 0..8 {
         body.push_str("ldc.i4 0\nbox Int32\npop\n");
     }
@@ -412,7 +422,9 @@ fn generic_unbox_reference_preserves_identity_and_gc_roots() {
     let declarations = format!(
         "{CELL}\n.function Cast<T>(System.Object value) -> T\nldarg 0\nunbox.any T\nret\n.end"
     );
-    let mut body = String::from(".local Cell original\n.local Cell alias\nldc.i4 42\nnewobj Cell\nstloc original\nldloc original\ncastclass System.Object\ncall Cast<Cell>(System.Object)\nstloc alias\n");
+    let mut body = String::from(
+        ".local Cell original\n.local Cell alias\nldc.i4 42\nnewobj Cell\nstloc original\nldloc original\ncastclass System.Object\ncall Cast<Cell>(System.Object)\nstloc alias\n",
+    );
     for _ in 0..8 {
         body.push_str("ldc.i4 0\nnewobj Cell\npop\n");
     }
@@ -436,7 +448,9 @@ fn unbox_reference_matches_castclass_for_strings_null_and_incompatible_types() {
             run(&string, "", "String", 8).unwrap().value,
             Value::String("value".into())
         );
-        let null = format!(".local System.Object empty\nldloca empty\ninitobj System.Object\nldloc empty\n{cast} Cell\nldloc empty\n{IDENTITY}");
+        let null = format!(
+            ".local System.Object empty\nldloca empty\ninitobj System.Object\nldloc empty\n{cast} Cell\nldloc empty\n{IDENTITY}"
+        );
         assert_eq!(
             run(&null, CELL, "Boolean", 8).unwrap().value,
             Value::Boolean(true)
@@ -511,7 +525,9 @@ fn boxed_boolean_hash_preserves_copied_value_through_collection() {
 
 #[test]
 fn boxed_struct_traces_reference_fields_after_source_is_cleared() {
-    let declarations = format!("{CELL}\n.type Holder\n.field Child Cell\n.method instance override readonly byref GetHashCode() -> Int32\nldarg this\nldfld 0\nldfld Cell::Number\nret\n.end\n.end");
+    let declarations = format!(
+        "{CELL}\n.type Holder\n.field Child Cell\n.method instance override readonly byref GetHashCode() -> Int32\nldarg this\nldfld 0\nldfld Cell::Number\nret\n.end\n.end"
+    );
     let mut body = ".local Holder source\n.local System.Object boxed\nldc.i4 42\nnewobj Cell\nnewobj Holder\nstloc source\nldloc source\nbox Holder\nstloc boxed\nldloca source\ninitobj Holder\n".to_string();
     for _ in 0..8 {
         body.push_str("ldc.i4 0\nbox Int32\npop\n");
@@ -704,7 +720,6 @@ fn string_identity_hash_survives_wrapper_collection_and_recreation() {
     assert!(result.heap.collections() > 1);
     assert!(result.heap.is_empty());
 }
-
 
 #[test]
 fn generic_box_reference_preserves_identity_and_gc_roots() {

@@ -1,6 +1,6 @@
 use crate::{
-    metadata::{FunctionRef, Instruction as Op, Representation, Type},
     ExecutionOptions, Fault, Module, Value,
+    metadata::{FunctionRef, Instruction as Op, Representation, Type},
 };
 use std::collections::HashSet;
 
@@ -536,12 +536,22 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             && crate::interfaces::is_bodyless(module, function)
             && !function.receiver_byref
             && !function.receiver_readonly;
-        let value_receiver = function.instance && function.receiver_byref
-            && function.owner.as_ref().is_some_and(|owner| !module.is_reference_type(owner));
+        let value_receiver = function.instance
+            && function.receiver_byref
+            && function
+                .owner
+                .as_ref()
+                .is_some_and(|owner| !module.is_reference_type(owner));
         if function.no_result
             && (function.returns != Type::Void
-                || (function.instance && !class_owner && !value_receiver && !nominal_interface_contract)
-                || (function.is_virtual && !nominal_interface_contract && !class_owner && !value_receiver)
+                || (function.instance
+                    && !class_owner
+                    && !value_receiver
+                    && !nominal_interface_contract)
+                || (function.is_virtual
+                    && !nominal_interface_contract
+                    && !class_owner
+                    && !value_receiver)
                 || (function.is_override && !class_owner && !value_receiver)
                 || (function.is_abstract && !nominal_interface_contract && !class_owner)
                 || function.is_internal_call()
@@ -1570,7 +1580,8 @@ fn interpret_instructions(
     let mut arrays_used = false;
     let mut scheduler = crate::scheduler::Scheduler::default();
     let mut files = crate::file_streams::Files::default();
-    let mut interned = crate::string_interning::Pool::new(limits.intern_entries, limits.intern_bytes);
+    let mut interned =
+        crate::string_interning::Pool::new(limits.intern_entries, limits.intern_bytes);
     // An invocation-local guest root; isolated workers have their own registry.
     let mut default_task_queue: Option<Value> = None;
     let mut invocation_result: Option<Value> = None;
@@ -2306,7 +2317,7 @@ fn interpret_instructions(
                             return Err(Fault::coded(
                                 crate::FaultCode::NullReference,
                                 "cannot unbox null",
-                            ))
+                            ));
                         }
                         Value::ObjectReference(object) if object.concrete_type() == *target => {
                             frame.stack.push(object.reference.read()?);
@@ -2315,7 +2326,7 @@ fn interpret_instructions(
                             return Err(Fault::coded(
                                 crate::FaultCode::InvalidCast,
                                 "unbox.any requires the exact boxed value type",
-                            ))
+                            ));
                         }
                     }
                 }
@@ -2730,7 +2741,9 @@ fn interpret_instructions(
                         #[cfg(test)]
                         if matches!(binding, crate::native::Binding::TestSocketReceive) {
                             if default_task_queue.is_none() {
-                                return Err(Fault::new("Socket probe requires the default TaskQueue"));
+                                return Err(Fault::new(
+                                    "Socket probe requires the default TaskQueue",
+                                ));
                             }
                             crate::socket_vm_probe::begin(&mut scheduler.sockets, args, heap)?;
                             frame.stack.push(Value::Void);
@@ -2747,13 +2760,15 @@ fn interpret_instructions(
                                     "frame limit exceeded",
                                 ));
                             }
-                            let adapter = if let crate::native::Binding::ReflectionProperty(setter) =
-                                binding
-                            {
-                                crate::reflection_properties::adapter(module, &callee, &args, setter)?
-                            } else {
-                                crate::reflection_execution::adapter(module, &callee, &args[0])?
-                            };
+                            let adapter =
+                                if let crate::native::Binding::ReflectionProperty(setter) = binding
+                                {
+                                    crate::reflection_properties::adapter(
+                                        module, &callee, &args, setter,
+                                    )?
+                                } else {
+                                    crate::reflection_execution::adapter(module, &callee, &args[0])?
+                                };
                             frames.push(Frame::new(adapter, args)?);
                             return Ok(None);
                         }
@@ -2799,23 +2814,33 @@ fn interpret_instructions(
                             };
                             Value::String(interned.intern(text.clone()).map_err(|e| e.fault())?)
                         } else if let crate::native::Binding::Resolve(operation) = binding {
-                            if matches!(operation, crate::name_resolution::Operation::Lookup | crate::name_resolution::Operation::LookupUntil) && default_task_queue.is_none() {
-                                return Err(Fault::new("Resolver completion requires the default TaskQueue"));
+                            if matches!(
+                                operation,
+                                crate::name_resolution::Operation::Lookup
+                                    | crate::name_resolution::Operation::LookupUntil
+                            ) && default_task_queue.is_none()
+                            {
+                                return Err(Fault::new(
+                                    "Resolver completion requires the default TaskQueue",
+                                ));
                             }
                             scheduler.resolver.invoke(operation, &args)?
                         } else if let crate::native::Binding::Socket(operation) = binding {
                             if matches!(
                                 operation,
                                 crate::socket_io::Operation::ConnectAddressesUntil
-                                | crate::socket_io::Operation::ReceiveUntil
-                                | crate::socket_io::Operation::SendUntil
-                                | crate::socket_io::Operation::Accept
-                                | crate::socket_io::Operation::Connect
-                                | crate::socket_io::Operation::ConnectAddresses
-                                | crate::socket_io::Operation::Receive
-                                | crate::socket_io::Operation::Send
-                            ) && default_task_queue.is_none() {
-                                return Err(Fault::new("Socket completion requires the default TaskQueue"));
+                                    | crate::socket_io::Operation::ReceiveUntil
+                                    | crate::socket_io::Operation::SendUntil
+                                    | crate::socket_io::Operation::Accept
+                                    | crate::socket_io::Operation::Connect
+                                    | crate::socket_io::Operation::ConnectAddresses
+                                    | crate::socket_io::Operation::Receive
+                                    | crate::socket_io::Operation::Send
+                            ) && default_task_queue.is_none()
+                            {
+                                return Err(Fault::new(
+                                    "Socket completion requires the default TaskQueue",
+                                ));
                             }
                             scheduler.sockets.invoke(operation, &args, heap)?
                         } else if let crate::native::Binding::FileResource(operation) = binding {
@@ -3285,12 +3310,19 @@ fn interpret_instructions(
                 }
                 Op::FieldAddress(index) => {
                     if matches!(frame.stack.last(), Some(Value::NullObjectReference(_))) {
-                        return Err(Fault::coded(crate::FaultCode::NullReference, "null object reference in field address"));
+                        return Err(Fault::coded(
+                            crate::FaultCode::NullReference,
+                            "null object reference in field address",
+                        ));
                     }
                     if let Some(Value::ObjectReference(object)) = frame.stack.last() {
                         crate::access::check_field(module, &function, object.target(), *index)?;
                         let fields = module.instantiated_fields(object.target())?;
-                        let target = fields.get(*index).ok_or_else(|| Fault::new("field index out of range"))?.ty.clone();
+                        let target = fields
+                            .get(*index)
+                            .ok_or_else(|| Fault::new("field index out of range"))?
+                            .ty
+                            .clone();
                         let reference = object.reference.field(*index, target)?;
                         frame.pop()?;
                         frame.stack.push(Value::SlotReference(reference));
@@ -3588,17 +3620,16 @@ fn interpret_instructions(
                         if target.name == "System.Func.Invoke" && target.instance
                             && target.owner.as_ref() == Some(&crate::assembler::parse_type("System.Func<Void>")?)
                             && target.parameters.is_empty())
+                            && scheduler.poll(heap, queue)?
                         {
-                            if scheduler.poll(heap, queue)? {
-                                scheduler.install_ready(|queue, callback| {
-                                    frames.push(completion_notification_frame(
-                                        module,
-                                        queue.clone(),
-                                        callback.clone(),
-                                    )?);
-                                    Ok(())
-                                })?;
-                            }
+                            scheduler.install_ready(|queue, callback| {
+                                frames.push(completion_notification_frame(
+                                    module,
+                                    queue.clone(),
+                                    callback.clone(),
+                                )?);
+                                Ok(())
+                            })?;
                         }
                     }
                 }

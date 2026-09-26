@@ -1,0 +1,125 @@
+{
+  "date": "2026-09-27",
+  "status": "passed",
+  "scope": "HTTP POC package acceptance on macOS arm64; not complete release qualification",
+  "neoCLRRevision": "edf29520378c50a84424f2a2a37ab2935df31790",
+  "ravenRevision": "56083626ec1aee34f884d53a1d6c90bd5798b5c7",
+  "ravenBranch": "neoclr",
+  "sdkVersion": "0.1.12-neoclr.http-poc.20260927",
+  "dotnetSdk": "11.0.100-rc.1.26425.128",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "archives": [
+    {
+      "name": "raven-sdk-0.1.12-neoclr.http-poc.20260927-osx-arm64.clean.tar.gz",
+      "sha256": "682d68c14c463aab0b8b46a94dcf199a49a510aa1c0df6e27d85b2fed8461470",
+      "regular_files_verified": 440
+    },
+    {
+      "name": "neoclr-http-poc-20260927.clean.tar.gz",
+      "sha256": "dc708a0fdbb8cb47aa27a23f3e5184b5a3c944eede8beb164f81d9f6d4977f8f",
+      "regular_files_verified": 1063
+    }
+  ],
+  "manifest_files_verified": 1062,
+  "artifact_sha256": {
+    "compiler": "b72723a32184f7bc84a2c023805bc28685d07644df98aace75eb10fd0728bfdc",
+    "compiler_analysis": "8aab38d10d7e14ef70bc23036766b43e0bce4523e577d4be75e0c8dc6ea8526f",
+    "bridge": "cfbbedf6f63382e90f3c60ebf80d8f6fe50ee15d9ef07203e08569bb387ce235",
+    "reference": "b1bb8fb0e8a0392cffc53d46c12bcfa0b366808962ec0499640fc6732f34ec3d",
+    "library": "4bf55dee5136c3467398ad2e30ab0233eceb6f9618277ab31f77662bbd1dccc5",
+    "runtime": "67226ff2c80dc60ef7dc3eaa22bff1ac770c9d3fa4bbcb181df4871b9e2079ab",
+    "runner": "b367d31c60a56242ee129c77ab9f1dd87f082e7835676d656410bee3c10b3dcb"
+  },
+  "mapped_http": [
+    "Iteration 1/1: all",
+    "Peer case: GET /report -> 200",
+    "Peer case: POST /reports -> 201",
+    "Peer case: POST /reports -> 400",
+    "Peer case: POST /reports -> 400",
+    "Peer case: POST /reports -> 400",
+    "Peer case: POST /reports -> 400",
+    "Peer case: POST /reports -> 400",
+    "Peer case: POST /reports -> 400",
+    "Peer case: POST /reports -> 400",
+    "Peer case: POST /reports -> 201",
+    "Peer case: POST /reports -> 201",
+    "Peer case: GET /missing -> 404",
+    "JSON server: {'assembly_ms': 1304, 'load_ms': 817, 'verify_ms': 366, 'run_ms': 8226, 'allocated': 3786, 'live': 0, 'peak': 198, 'collections': 53, 'reclaimed': 3786}",
+    "JSON client: {'assembly_ms': 1466, 'load_ms': 931, 'verify_ms': 455, 'run_ms': 2619, 'allocated': 761, 'live': 0, 'peak': 170, 'collections': 13, 'reclaimed': 761}",
+    "JSON server: {'assembly_ms': 1560, 'load_ms': 1164, 'verify_ms': 384, 'run_ms': 5085, 'allocated': 626, 'live': 0, 'peak': 168, 'collections': 11, 'reclaimed': 626}",
+    "JSON client: {'assembly_ms': 1345, 'load_ms': 828, 'verify_ms': 372, 'run_ms': 2118, 'allocated': 789, 'live': 0, 'peak': 170, 'collections': 13, 'reclaimed': 789}",
+    "Public JSON DOM + HTTP checks passed: all (1 iteration(s))"
+  ],
+  "upload_cases": [
+    {
+      "case": "success",
+      "outcome": "passed",
+      "statistics": "assembly_ms=1454 load_ms=864 verify_ms=381 run_ms=1187\nallocated=744 live=0 peak=122 collections=15 reclaimed=744"
+    },
+    {
+      "case": "borrowed",
+      "outcome": "passed",
+      "statistics": "assembly_ms=1464 load_ms=927 verify_ms=421 run_ms=1116\nallocated=693 live=0 peak=118 collections=14 reclaimed=693"
+    },
+    {
+      "case": "empty",
+      "outcome": "passed",
+      "statistics": "assembly_ms=1754 load_ms=853 verify_ms=372 run_ms=463\nallocated=275 live=0 peak=114 collections=6 reclaimed=275"
+    },
+    {
+      "case": "eof",
+      "outcome": "passed",
+      "statistics": "assembly_ms=1411 load_ms=935 verify_ms=414 run_ms=364\nallocated=230 live=0 peak=114 collections=5 reclaimed=230"
+    },
+    {
+      "case": "read-error",
+      "outcome": "passed",
+      "statistics": "assembly_ms=1411 load_ms=872 verify_ms=392 run_ms=357\nallocated=230 live=0 peak=114 collections=5 reclaimed=230"
+    },
+    {
+      "case": "overread",
+      "outcome": "passed",
+      "statistics": "assembly_ms=1372 load_ms=853 verify_ms=382 run_ms=374\nallocated=230 live=0 peak=114 collections=5 reclaimed=230"
+    },
+    {
+      "case": "cancel",
+      "outcome": "passed",
+      "statistics": "assembly_ms=1793 load_ms=1204 verify_ms=757 run_ms=496\nallocated=230 live=0 peak=114 collections=5 reclaimed=230"
+    },
+    {
+      "case": "precancel",
+      "outcome": "passed",
+      "statistics": "assembly_ms=2080 load_ms=1394 verify_ms=420 run_ms=145\nallocated=99 live=0 peak=64 collections=2 reclaimed=99"
+    },
+    {
+      "case": "disposed",
+      "outcome": "passed",
+      "statistics": "assembly_ms=1382 load_ms=850 verify_ms=424 run_ms=413\nallocated=141 live=0 peak=76 collections=4 reclaimed=141"
+    },
+    {
+      "case": "invalid-header",
+      "outcome": "passed",
+      "statistics": "assembly_ms=2085 load_ms=877 verify_ms=347 run_ms=225\nallocated=139 live=0 peak=66 collections=4 reclaimed=139"
+    },
+    {
+      "case": "refused",
+      "outcome": "passed",
+      "statistics": "assembly_ms=1300 load_ms=807 verify_ms=350 run_ms=5299\nallocated=209 live=0 peak=108 collections=5 reclaimed=209"
+    }
+  ],
+  "website_download_pair": [
+    "Iteration 1/1: pair",
+    "JSON client: {'assembly_ms': 1249, 'load_ms': 772, 'verify_ms': 343, 'run_ms': 2107, 'allocated': 761, 'live': 0, 'peak': 170, 'collections': 13, 'reclaimed': 761}",
+    "JSON server: {'assembly_ms': 1268, 'load_ms': 773, 'verify_ms': 339, 'run_ms': 4153, 'allocated': 626, 'live': 0, 'peak': 168, 'collections': 11, 'reclaimed': 626}",
+    "Public JSON DOM + HTTP checks passed: pair (1 iteration(s))"
+  ],
+  "local_artifact_directory": "/Users/robert/.neoclr/builds/http-poc-20260927",
+  "logs_sha256": {
+    "sdk-build.log": "fda3129f5adb1f324e9f2a7c09b87ce37a2b71ec9ef758ea4cb8a419c9f3b698",
+    "bundle-build.log": "326fb1de54c5c95761c2ff549f056c2c2fc6f4e0b35e50715303ece080c18ada",
+    "runtime-build-final.log": "a50f4a953f17e887d3844be51c0df233623b83d4462c96d5392c2671458d7fef",
+    "mapped-http.log": "1075a02e98be7946c8ced5de6304fd627fd6ef86bc837ae27e351620e294c2ee",
+    "upload-http.log": "bb70b850a70d6da63738c140eb21efcd1211b76fedd6ec518fdb420ead31ec30",
+    "website-pair.log": "7500f3c33e69098dbfc635153f8fedcfcbb1f1be010b6e7305e693e98f467ba5"
+  }
+}

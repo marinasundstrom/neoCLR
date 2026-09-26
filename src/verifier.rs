@@ -1,8 +1,8 @@
 //! Opt-in typed-stack, control-flow, and definite-local-initialization analysis.
 //! This is not a memory-safety verifier.
 use crate::{
-    metadata::{Function, Instruction as Op, Type},
     Fault, Module,
+    metadata::{Function, Instruction as Op, Type},
 };
 use std::collections::VecDeque;
 
@@ -1269,7 +1269,9 @@ fn typed_effect(
             }
         }
         FieldAddress(index) => match exact(&values[0])? {
-            owner if module.is_reference_type(owner) => one(T::ByRef(Box::new(field(owner, *index)?))),
+            owner if module.is_reference_type(owner) => {
+                one(T::ByRef(Box::new(field(owner, *index)?)))
+            }
             T::ByRef(owner) => {
                 let ty = T::ByRef(Box::new(field(owner, *index)?));
                 if matches!(values[0], StackType::Readonly(_)) {

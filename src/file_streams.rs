@@ -1,6 +1,6 @@
 //! Invocation-owned, blocking regular-file resources for the file-stream experiment.
 //! Integer handles are private runtime transport, not OS descriptors or capabilities.
-use crate::{metadata::Type, Fault, Limits, Value};
+use crate::{Fault, Limits, Value, metadata::Type};
 use std::{
     collections::{HashMap, HashSet},
     fs::{File, OpenOptions},
@@ -174,7 +174,10 @@ impl Files {
             if names.len() == bound {
                 return Err(Error::LimitExceeded);
             }
-            let name = entry.file_name().into_string().map_err(|_| Error::InvalidPath)?;
+            let name = entry
+                .file_name()
+                .into_string()
+                .map_err(|_| Error::InvalidPath)?;
             bytes = bytes.checked_add(name.len()).ok_or(Error::LimitExceeded)?;
             if bytes > 64 * 1024 || bytes > limits.array_bytes {
                 return Err(Error::LimitExceeded);
@@ -216,7 +219,12 @@ impl Files {
             }
             (
                 Operation::ReadInto,
-                [Value::Int32(id), Value::ObjectReference(array), Value::Int32(offset), Value::Int32(count)],
+                [
+                    Value::Int32(id),
+                    Value::ObjectReference(array),
+                    Value::Int32(offset),
+                    Value::Int32(count),
+                ],
             ) => {
                 if array.reference.target() != &Type::Array(Box::new(Type::Byte)) {
                     return Err(Fault::new("File read requires a byte array"));
@@ -245,7 +253,12 @@ impl Files {
             }
             (
                 Operation::Write,
-                [Value::Int32(id), Value::ObjectReference(array), Value::Int32(offset), Value::Int32(count)],
+                [
+                    Value::Int32(id),
+                    Value::ObjectReference(array),
+                    Value::Int32(offset),
+                    Value::Int32(count),
+                ],
             ) => {
                 let Value::Array {
                     element: Type::Byte,
@@ -296,7 +309,9 @@ impl Files {
             (Operation::List, [Value::String(name), Value::Int32(max_items)]) => {
                 match Self::list(name, *max_items, limits) {
                     Ok(names) => Ok(crate::reflection::array(
-                        "String", names.into_iter().map(|name| Ok(Value::String(name.into()))), limits,
+                        "String",
+                        names.into_iter().map(|name| Ok(Value::String(name.into()))),
+                        limits,
                     )?),
                     Err(error) => Err(error),
                 }
@@ -371,9 +386,18 @@ mod tests {
         assert_eq!(Files::list(root, 1, &limits), Err(Error::LimitExceeded));
         assert_eq!(Files::list(root, -1, &limits), Err(Error::InvalidRange));
         assert_eq!(Files::list(root, 1025, &limits), Err(Error::LimitExceeded));
-        assert_eq!(Files::list(&fixture.path("absent"), 2, &limits), Err(Error::NotFound));
-        assert_eq!(Files::list(&fixture.path("z.txt"), 2, &limits), Err(Error::WrongKind));
-        assert_eq!(Files::list(&fixture.path("a-dir"), 0, &limits).unwrap(), Vec::<String>::new());
+        assert_eq!(
+            Files::list(&fixture.path("absent"), 2, &limits),
+            Err(Error::NotFound)
+        );
+        assert_eq!(
+            Files::list(&fixture.path("z.txt"), 2, &limits),
+            Err(Error::WrongKind)
+        );
+        assert_eq!(
+            Files::list(&fixture.path("a-dir"), 0, &limits).unwrap(),
+            Vec::<String>::new()
+        );
     }
 
     #[test]

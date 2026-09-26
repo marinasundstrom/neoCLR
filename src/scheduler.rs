@@ -68,6 +68,8 @@ impl Source for crate::name_resolution::Resolver {
     }
 }
 
+// Keep ready values inline; boxing would add an allocation to each completion.
+#[allow(clippy::large_enum_variant)]
 #[derive(Debug, PartialEq)]
 enum Progress {
     Ready(Value),
@@ -268,7 +270,7 @@ mod tests {
         else {
             panic!()
         };
-        collect(&mut heap, &scheduler, &[destination.clone()]);
+        collect(&mut heap, &scheduler, std::slice::from_ref(&destination));
         assert_eq!(heap.statistics().live_objects, 4);
         assert!(!scheduler.poll(&heap, &destination).unwrap());
         let _peer = std::net::TcpStream::connect(("127.0.0.1", port as u16)).unwrap();
@@ -297,7 +299,7 @@ mod tests {
             .resolver
             .submit("127.0.0.1", callback, Duration::from_secs(5))
             .unwrap();
-        collect(&mut heap, &scheduler, &[destination.clone()]);
+        collect(&mut heap, &scheduler, std::slice::from_ref(&destination));
         assert_eq!(heap.statistics().live_objects, 4);
         assert!(
             scheduler

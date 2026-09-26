@@ -57,8 +57,8 @@ Major limits include the bounded importer, bounded IPv4 networking and cleartext
 ## Roadmap
 
 The current HTTP POC exchanges typed JSON between neoCLR client and server and
-supports known-length source uploads. Feature scope is frozen while matching-package
-validation and an explicit completion checkpoint remain. Current capabilities and
+supports known-length source uploads. The bounded POC has passed matching-package checks on macOS arm64; release preparation
+is in progress with feature scope frozen. Current capabilities and
 possible extensions are summarized on the [direction page](../proposals/#http-poc).
 No date is promised for the next release.
 

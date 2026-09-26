@@ -5,15 +5,15 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
-The known-length HTTP upload increment is committed as `45b74768`. POC feature scope
-is frozen. The [HTTP tracker](http-capabilities.md#finish-this-poc) owns the remaining
-packaged-SDK verification and explicit completion checkpoint. Local client/server,
-independent-peer, API and website evidence is recorded there; it is not package or
-release qualification. Do not automatically start another HTTP feature.
+The bounded HTTP POC is [complete on macOS arm64](http-capabilities.md#finish-this-poc),
+including independent peers, known-length uploads and the extracted-package check.
+Feature scope is frozen; do not automatically start another HTTP feature.
 
-The author next requested thematic consolidation of tracking documents. That
-organization is now in place. Subsequent continuation returns to the bounded POC
-finish list unless the author selects another task. No release date is selected.
+**Active work is release preparation for this POC**, at the author's direction.
+The [toolchain/release tracker](tracking/toolchain-release.md) owns efficient CI,
+exact-candidate qualification and known-defect disposition. The CI split is implemented;
+hosted acceptance and release readiness are not yet claimed. No release version/date
+is selected. Thematic tracking consolidation is complete; M2–M6 remain candidates.
 
 ## Theme trackers
 
@@ -39,7 +39,7 @@ reassess their ordering after M1 rather than treating the list as approved API s
 
 | Milestone | Sample product | Status / scope owner |
 | --- | --- | --- |
-| M1 — Communicate | Hello Service + Hello Client, now the typed HTTP/JSON exchange | Active POC closure; HTTP tracker |
+| M1 — Communicate | Hello Service + Hello Client, now the typed HTTP/JSON exchange | POC complete; release preparation active in tooling tracker |
 | M2 — Work with data | File Catalog | Candidate; library/data tracker |
 | M3 — Handle waiting and failure | Download Queue | Candidate; HTTP, library and runtime contracts must be selected together |
 | M4 — Human time and presentation | Activity Report | Candidate; library/data tracker |

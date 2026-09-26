@@ -3,7 +3,8 @@
 Feature pages describe current behavior. These ideas are possible extensions,
 not release commitments. The [platform roadmap](https://github.com/marinasundstrom/neoCLR/blob/main/docs/platform-roadmap.md)
 selects work; its theme trackers own status and evidence. The current HTTP POC has a
-finite feature scope, with package validation and an explicit completion checkpoint remaining.
+finite feature scope and has passed its macOS arm64 package checks. Release preparation
+is separate from possible feature extensions.
 
 <a id="http-poc"></a>
 

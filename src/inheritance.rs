@@ -1,7 +1,7 @@
 //! Record ancestry, field layout and managed-receiver dispatch contracts.
 use crate::{
-    metadata::{Field, Representation, Type},
     Fault, Module,
+    metadata::{Field, Representation, Type},
 };
 
 pub(crate) fn base(module: &Module, ty: &Type) -> Result<Option<Type>, Fault> {

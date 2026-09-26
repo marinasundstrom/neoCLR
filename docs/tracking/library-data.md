@@ -2,7 +2,7 @@
 
 **Consolidated 2026-09-27.** [Platform priorities](../platform-roadmap.md) govern work.
 This page owns general library scope. Further additions are deferred while the HTTP
-POC closes; a candidate below does not authorize another feature automatically.
+POC is prepared for release; a candidate below does not authorize another feature automatically.
 
 ## Recorded checkpoints and remaining scope
 

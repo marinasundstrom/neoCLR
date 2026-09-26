@@ -991,7 +991,15 @@ ret
     let app = assemble(source).unwrap();
     let program = LoadedProgram::with_library(&app, library()).unwrap();
     program.verify().unwrap();
-    assert_eq!(program.run(Limits::default()).unwrap().value, Value::Int32(-1));
-    let fault = program.run(Limits { heap_objects: 2, ..Limits::default() }).unwrap_err();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(-1)
+    );
+    let fault = program
+        .run(Limits {
+            heap_objects: 2,
+            ..Limits::default()
+        })
+        .unwrap_err();
     assert_eq!(fault.code, neoclr::FaultCode::HeapLimitExceeded);
 }

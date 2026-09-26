@@ -127,9 +127,14 @@ fn reflection_access_metadata_roundtrips_and_is_scoped_to_definition_kind() {
     json["types"][0]["origin"]["publicly_visible"] = serde_json::json!(true);
     json["functions"][0]["origin"]["member_access"] = serde_json::json!("Private");
     let loaded = load(&json.to_string()).unwrap();
-    assert_eq!(loaded.types[0].origin.as_ref().unwrap().publicly_visible, Some(true));
-    assert_eq!(loaded.functions[0].origin.as_ref().unwrap().member_access,
-        Some(neoclr::metadata_origin::SourceAccess::Private));
+    assert_eq!(
+        loaded.types[0].origin.as_ref().unwrap().publicly_visible,
+        Some(true)
+    );
+    assert_eq!(
+        loaded.functions[0].origin.as_ref().unwrap().member_access,
+        Some(neoclr::metadata_origin::SourceAccess::Private)
+    );
     let mut wrong_kind = json.clone();
     wrong_kind["types"][0]["origin"]["member_access"] = serde_json::json!("Public");
     assert!(load(&wrong_kind.to_string()).is_err());

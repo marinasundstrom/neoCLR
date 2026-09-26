@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import time
 
 
 def run(argv, cwd, capture=False, env=None):
@@ -50,6 +51,7 @@ def main():
     parser.add_argument("--revision", default="HEAD")
     parser.add_argument("--toolchain", default="stable")
     parser.add_argument("--output", type=Path, help="new directory for archive, extraction and report")
+    parser.add_argument("--release", action="store_true", help="Validate optimized release binaries and tests")
     parser.add_argument("--smoke-only", action="store_true", help="skip full tests; report explicitly records this")
     args = parser.parse_args()
     repo = Path(__file__).resolve().parent.parent
@@ -57,8 +59,9 @@ def main():
     if args.output:
         output.mkdir(parents=True, exist_ok=False)
     report = {"status": "running", "platform": platform.platform(), "toolchain": args.toolchain,
-              "full_tests": False, "smoke_programs": [],
+              "full_tests": False, "smoke_programs": [], "build_profile": "release" if args.release else "debug",
               "validator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+    started = time.monotonic()
     print("Validation output: " + str(output), flush=True)
     try:
         revision = run(["git", "rev-parse", "--verify", args.revision + "^{commit}"], repo, True).strip()
@@ -97,11 +100,12 @@ def main():
         env["CARGO_TARGET_DIR"] = str(output / "target")
         report["rustc"] = run(["rustc", "+" + args.toolchain, "-Vv"], source, True, env).strip()
         cargo = ["cargo", "+" + args.toolchain]
+        profile = ["--release"] if args.release else []
         if not args.smoke_only:
-            run(cargo + ["test", "--locked", "--all-targets", "--no-fail-fast"], source, env=env)
+            run(cargo + ["test", "--locked", "--all-targets", "--no-fail-fast"] + profile, source, env=env)
             report["full_tests"] = True
-        run(cargo + ["build", "--locked"], source, env=env)
-        executable = output / "target/debug" / ("neoclr.exe" if os.name == "nt" else "neoclr")
+        run(cargo + ["build", "--locked"] + profile, source, env=env)
+        executable = output / "target" / ("release" if args.release else "debug") / ("neoclr.exe" if os.name == "nt" else "neoclr")
         for name in ["counter", "collections", "outputs", "reflection", "reference-identity",
                      "interfaces", "arrays", "control-flow", "typeof",
                      "ordinal-text", "character-classification", "math", "date-time",
@@ -160,14 +164,16 @@ def main():
                 elif destination.read_bytes() != b"Input: report-input.txt\nUTF-8 bytes: 9\n":
                     raise RuntimeError("file-report output mismatch")
             report["smoke_programs"].append(name)
-        run(cargo + ["run", "--locked", "--example", "build_native"], source, env=env)
+        run(cargo + ["run", "--locked", "--example", "build_native"] + profile, source, env=env)
         run([executable, "run", "examples/pinvoke.neoil"], source)
+        run(cargo + ["run", "--locked", "--example", "invoke"] + profile, source, env=env)
         report["status"] = "passed"
     except Exception as error:
         report["status"] = "failed"
         report["error"] = str(error)
         raise
     finally:
+        report["elapsed_seconds"] = round(time.monotonic() - started, 3)
         (output / "report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
         print("Evidence: " + str(output / "report.json"), flush=True)
 

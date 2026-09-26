@@ -145,6 +145,7 @@ struct Transfer {
     buffer: Vec<u8>,
     outcome: Option<Result<usize, Error>>,
 }
+#[derive(Default)]
 pub(crate) struct Sockets {
     sockets: BTreeMap<SocketId, TcpStream>,
     listeners: BTreeMap<SocketId, TcpListener>,
@@ -153,19 +154,6 @@ pub(crate) struct Sockets {
     reserved: usize,
     budget: Budget,
     transfer_first: bool,
-}
-impl Default for Sockets {
-    fn default() -> Self {
-        Self {
-            sockets: BTreeMap::new(),
-            listeners: BTreeMap::new(),
-            operations: BTreeMap::new(),
-            connects: BTreeMap::new(),
-            reserved: 0,
-            budget: Budget::default(),
-            transfer_first: false,
-        }
-    }
 }
 // Adoption remains a private fixture entry point; operation cancellation is exposed
 // only to runtime-library providers, never as a public operation handle.
@@ -570,6 +558,8 @@ impl Sockets {
     ) -> Result<OperationId, Error> {
         self.transfer(true, socket, heap, source, offset, count, callback)
     }
+    // Mirrors the provider transfer contract, including the retained destination/callback.
+    #[allow(clippy::too_many_arguments)]
     fn transfer(
         &mut self,
         sending: bool,
@@ -591,6 +581,8 @@ impl Sockets {
             None,
         )
     }
+    // The optional shared deadline is independent of the buffer and completion owners.
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn transfer_until(
         &mut self,
         sending: bool,

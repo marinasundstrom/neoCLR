@@ -2,7 +2,7 @@
 
 **Consolidated 2026-09-27.** [Platform priorities](../platform-roadmap.md) govern
 selection. This is the status owner for runtime/type-system work, not an active
-foundation sweep. HTTP POC closure remains selected; expansion below is deferred
+foundation sweep. HTTP POC release preparation remains selected; expansion below is deferred
 unless a concrete blocker or later author direction selects it.
 
 ## Recorded checkpoints and open scope

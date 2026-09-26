@@ -1,0 +1,38 @@
+{
+  "run": "https://github.com/marinasundstrom/neoCLR/actions/runs/35868351666",
+  "retrieved": "2026-09-27",
+  "jobs": [
+    {
+      "job": "minimum-rust (windows-latest)",
+      "conclusion": "success",
+      "seconds": 4082.0
+    },
+    {
+      "job": "test (macos-latest)",
+      "conclusion": "success",
+      "seconds": 1783.0
+    },
+    {
+      "job": "test (windows-latest)",
+      "conclusion": "success",
+      "seconds": 3068.0
+    },
+    {
+      "job": "test (ubuntu-latest)",
+      "conclusion": "success",
+      "seconds": 956.0
+    },
+    {
+      "job": "minimum-rust (ubuntu-latest)",
+      "conclusion": "success",
+      "seconds": 1288.0
+    },
+    {
+      "job": "minimum-rust (macos-latest)",
+      "conclusion": "success",
+      "seconds": 2344.0
+    }
+  ],
+  "total_job_seconds": 13521.0,
+  "slowest_job_seconds": 4082.0
+}

@@ -6,7 +6,9 @@ license and upstream THIRD-PARTY-NOTICES.txt; they do not replace those files.
 
 The inventory was collected from the actual `.13` SDK/server/bridge `.deps.json`
 files, and from esbuild's production extension input graph, using Raven revision
-246d697bf6c69ff8cc56ca4859879edd7c081e7d. It contains 26 NuGet and eight npm packages.
+246d697bf6c69ff8cc56ca4859879edd7c081e7d. The HTTP POC SDK at Raven `56083626e` adds YamlDotNet 16.3.0, verified from its
+NuGet repository commit and preserved MIT notice. The inventory now contains
+27 NuGet and eight npm packages.
 Framework-provided .NET assemblies are external prerequisites, not bundled here.
 
 `manifest.json` records declared licenses, package versions, preserved text hashes

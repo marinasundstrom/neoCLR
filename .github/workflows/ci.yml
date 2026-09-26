@@ -6,6 +6,8 @@ on:
     paths-ignore:
       - '**/*.md'
       - 'docs/*.json'
+      - 'docs/experiments/ci-split/*.json'
+      - 'docs/experiments/http-poc-package/*.json'
       - 'website/**'
       - 'api-docs/**'
       - '.config/dotnet-tools.json'
@@ -17,6 +19,8 @@ on:
     paths-ignore:
       - '**/*.md'
       - 'docs/*.json'
+      - 'docs/experiments/ci-split/*.json'
+      - 'docs/experiments/http-poc-package/*.json'
       - 'website/**'
       - 'api-docs/**'
       - '.config/dotnet-tools.json'
@@ -26,35 +30,62 @@ on:
       - '.github/workflows/pages.yml'
   # Explicit exact-candidate validation remains available regardless of paths.
   workflow_dispatch:
+    inputs:
+      full_matrix:
+        description: Repeat the complete suite on all three operating systems
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: runtime-${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && github.run_id || github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 jobs:
-  test:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+  canonical:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
-      - run: cargo fmt --check
-      - run: cargo clippy --locked --all-targets -- -D warnings
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python scripts/validate-release.py --toolchain stable --output release-validation
+      - run: python -m unittest discover -s scripts -p test_validate_host.py
+      - run: cargo fmt --check
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: python scripts/validate-release.py --toolchain stable --release --output release-validation
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: source-validation-${{ matrix.os }}-stable
+          name: canonical-source-validation
           path: |
             release-validation/report.json
             release-validation/neoclr-source.tar
-      - run: cargo run --locked -- run examples/features.neoil
-      - run: cargo run --locked --example invoke
-      - run: cargo run --locked --example build_native
-      - run: cargo run --locked -- run examples/pinvoke.neoil
+
+  host-boundaries:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - if: ${{ !inputs.full_matrix }}
+        run: python scripts/validate-host.py --toolchain stable --output host-validation
+      - if: ${{ inputs.full_matrix }}
+        run: python scripts/validate-release.py --toolchain stable --release --output release-validation
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: host-validation-${{ matrix.os }}
+          path: |
+            host-validation/
+            release-validation/report.json
 
   minimum-rust:
     strategy:
@@ -65,19 +96,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.85.0
-      - run: cargo build --locked --all-targets
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: python scripts/validate-release.py --toolchain 1.85.0 --output release-validation
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: source-validation-${{ matrix.os }}-minimum
-          path: |
-            release-validation/report.json
-            release-validation/neoclr-source.tar
-      - run: cargo run --locked -- run examples/features.neoil
-      - run: cargo run --locked --example invoke
-      - run: cargo run --locked --example build_native
-      - run: cargo run --locked -- run examples/pinvoke.neoil
+      # Compile all cfg/platform branches, including tests, without rerunning them.
+      - run: cargo check --locked --all-targets

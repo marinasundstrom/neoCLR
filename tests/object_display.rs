@@ -67,14 +67,12 @@ fn null_object_display_reports_null_reference() {
 
 #[test]
 fn unsupported_boxed_value_display_is_not_silently_a_type_name() {
-    for body in ["ldc.r8 42\nbox Double"] {
-        let fault = run(
-            &format!("{body}\ncallvirt instance System.Object::ToString()"),
-            "",
-        )
-        .unwrap_err();
-        assert_ne!(fault.code, neoclr::FaultCode::NullReference);
-    }
+    let fault = run(
+        "ldc.r8 42\nbox Double\ncallvirt instance System.Object::ToString()",
+        "",
+    )
+    .unwrap_err();
+    assert_ne!(fault.code, neoclr::FaultCode::NullReference);
 }
 
 #[test]

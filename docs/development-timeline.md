@@ -7747,3 +7747,27 @@ configuration/content, not target-specific code added to Raven main.
   checked. Six archived plans preserve their original body after link relocation;
   all 22 dated neoCLR issues have theme assignments. Existing RavenDoc missing-summary
   warnings remain. No runtime/API behavior changed or full runtime suite ran.
+
+
+### 2026-09-27 — Release the POC with proportionate CI
+
+- **Author clarification:** “The intention is to release this POC.” Reiterates that
+  running all tests on every target in Actions takes over an hour and the release
+  procedure needs optimization.
+- **Assistant response/actions:** keeps the finite POC scope and exact-package checks,
+  adds an optional HTTP package component, and separates one complete canonical CI
+  run from focused host execution and per-OS minimum-Rust compilation. Preserves a
+  manual full stable matrix. Checks the historical run: its slowest job took 68
+  minutes, with approximately 225 total runner-minutes.
+- **Release boundary:** this author direction selects release preparation, not a
+  version/date or an assertion that known compiler defects are fixed. Package results
+  and hosted acceptance must be recorded before release readiness is claimed.
+- **POC outcome:** fresh SDK/runtime archives pass the typed JSON independent-peer
+  and managed-pair checks, all 11 upload cases, and the repaired website download.
+  Records bounded POC completion on macOS arm64 with known limitations preserved.
+  Runtime package notices pass; the SDK audit identifies YamlDotNet 16.3.0 and its
+  missing notice is added to the companion attribution inventory. Release preparation
+  remains active; neither the final release nor website has been published.
+- **Publication authorization:** the author then directs “Continue directly to release”.
+  The assistant selects the next unused neoCLR preview version after checking existing
+  releases, retains exact-candidate CI/package gates and proceeds toward publication.

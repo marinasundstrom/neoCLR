@@ -8,10 +8,29 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Implement the next-release CI split: one canonical full source/archive run,
+  focused macOS/Windows OS and ABI checks, and compile-only minimum-Rust checks on
+  all three hosts. Retain opt-in full stable matrix validation, record test profile
+  and command timings, and cancel superseded automatic runs. Add optimized release
+  validation while preserving the validator's debug default. Exact binary/SDK
+  package checks remain separate release gates; no hosted speedup is claimed yet.
+  Apply rustfmt to existing runtime formatting drift that blocked the CI format gate;
+  these edits do not change runtime behavior. Resolve existing Clippy style
+  findings and document narrow native-signature/inline-completion exceptions;
+  preserve scheduler polling order and socket defaults.
+
 - Add an optional HTTP POC component to the standard runtime packager, carrying
   the matching runner and complete JSON/client/server/upload checks. Verifiers can
   select a separately extracted SDK explicitly. This enables checkout-independent
-  package validation; it does not itself claim POC completion or release readiness.
+  package validation. Fresh macOS arm64 archives pass typed JSON peer checks,
+  all 11 upload cases and the repaired website download pair, with zero live objects.
+  Record the bounded POC as complete and select release preparation; release
+  readiness, a version/date and publication remain separate.
+  Include the generic JSON client source in the website sample archive so its
+  documented mapped-client check can build outside the checkout. Add the
+  YamlDotNet 16.3.0 notice required by the rebuilt SDK dependency inventory.
+  Restore source-archive notice coverage for socket2 and ten locked Windows support
+  crates, preserving license bytes from checksum-verified Cargo archives.
 
 - Consolidate active planning into the authoritative roadmap and four theme trackers:
   HTTP/networking, runtime/language, library/data and tooling/release. Archive six

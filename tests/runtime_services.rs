@@ -172,14 +172,21 @@ fn worker_notification_requires_worker_and_dispatch_services() {
         [Service::TaskDispatch, Service::IsolatedWorkers]
     );
     for name in ["RequestWorkerCancellation", "JoinWorkerResult"] {
-        let graph = LoadedProgram::new(&module).unwrap().analyze_reachability(
-            &[parse_function_ref(&format!("neoCLR.Runtime.{name}(Int32)")).unwrap()], 1,
-        ).unwrap();
-        assert_eq!(graph.required_services(), if name == "JoinWorkerResult" {
-            vec![Service::ValueStorage, Service::IsolatedWorkers]
-        } else {
-            vec![Service::IsolatedWorkers]
-        });
+        let graph = LoadedProgram::new(&module)
+            .unwrap()
+            .analyze_reachability(
+                &[parse_function_ref(&format!("neoCLR.Runtime.{name}(Int32)")).unwrap()],
+                1,
+            )
+            .unwrap();
+        assert_eq!(
+            graph.required_services(),
+            if name == "JoinWorkerResult" {
+                vec![Service::ValueStorage, Service::IsolatedWorkers]
+            } else {
+                vec![Service::IsolatedWorkers]
+            }
+        );
     }
 }
 
@@ -189,19 +196,48 @@ fn socket_submission_requires_socket_and_dispatch_services() {
         ".module System\n",
         include_str!("../runtime/raven/generated/Func.methods.neoil"),
         include_str!("../runtime/neoCLR/Runtime/Sockets.neoil")
-    )).unwrap();
+    ))
+    .unwrap();
     let program = LoadedProgram::new(&module).unwrap();
-    for signature in ["SocketConnectAddressesUntil(arrayref<String>,Int32,Int64,System.Func<Void>)", "SocketReceiveUntil(Int64,arrayref<Byte>,Int32,Int32,Int64,System.Func<Void>)", "SocketSendUntil(Int64,arrayref<Byte>,Int32,Int32,Int64,System.Func<Void>)", "SocketConnectAddresses(arrayref<String>,Int32,System.Func<Void>)", "SocketAccept(Int64,System.Func<Void>)", "SocketConnect(String,Int32,System.Func<Void>)", "SocketReceive(Int64,arrayref<Byte>,Int32,Int32,System.Func<Void>)", "SocketSend(Int64,arrayref<Byte>,Int32,Int32,System.Func<Void>)"] {
-        let graph = program.analyze_reachability(&[parse_function_ref(&format!("neoCLR.Runtime.{signature}")).unwrap()], 1).unwrap();
+    for signature in [
+        "SocketConnectAddressesUntil(arrayref<String>,Int32,Int64,System.Func<Void>)",
+        "SocketReceiveUntil(Int64,arrayref<Byte>,Int32,Int32,Int64,System.Func<Void>)",
+        "SocketSendUntil(Int64,arrayref<Byte>,Int32,Int32,Int64,System.Func<Void>)",
+        "SocketConnectAddresses(arrayref<String>,Int32,System.Func<Void>)",
+        "SocketAccept(Int64,System.Func<Void>)",
+        "SocketConnect(String,Int32,System.Func<Void>)",
+        "SocketReceive(Int64,arrayref<Byte>,Int32,Int32,System.Func<Void>)",
+        "SocketSend(Int64,arrayref<Byte>,Int32,Int32,System.Func<Void>)",
+    ] {
+        let graph = program
+            .analyze_reachability(
+                &[parse_function_ref(&format!("neoCLR.Runtime.{signature}")).unwrap()],
+                1,
+            )
+            .unwrap();
         assert!(graph.required_services().contains(&Service::SocketIo));
         assert!(graph.required_services().contains(&Service::TaskDispatch));
-        assert!(!graph.required_services().contains(&Service::IsolatedWorkers));
+        assert!(
+            !graph
+                .required_services()
+                .contains(&Service::IsolatedWorkers)
+        );
     }
     for signature in ["SocketDeadlineAfter(Int32)", "SocketDeadlineExpired(Int64)"] {
-        let graph = program.analyze_reachability(&[parse_function_ref(&format!("neoCLR.Runtime.{signature}")).unwrap()], 1).unwrap();
+        let graph = program
+            .analyze_reachability(
+                &[parse_function_ref(&format!("neoCLR.Runtime.{signature}")).unwrap()],
+                1,
+            )
+            .unwrap();
         assert_eq!(graph.required_services(), vec![Service::SocketIo]);
     }
-    let graph = program.analyze_reachability(&[parse_function_ref("neoCLR.Runtime.SocketClose(Int64)").unwrap()], 1).unwrap();
+    let graph = program
+        .analyze_reachability(
+            &[parse_function_ref("neoCLR.Runtime.SocketClose(Int64)").unwrap()],
+            1,
+        )
+        .unwrap();
     assert!(graph.required_services().contains(&Service::SocketIo));
     assert!(!graph.required_services().contains(&Service::TaskDispatch));
 }
@@ -215,10 +251,30 @@ fn dns_uses_host_resolution_and_dispatch_without_guest_workers() {
     ))
     .unwrap();
     let program = LoadedProgram::new(&module).unwrap();
-    let deadline_graph = program.analyze_reachability(&[parse_function_ref("neoCLR.Runtime.DnsLookupUntil(String,Int64,System.Func<Void>)").unwrap()], 1).unwrap();
-    assert!(deadline_graph.required_services().contains(&Service::NameResolution));
-    assert!(deadline_graph.required_services().contains(&Service::TaskDispatch));
-    assert!(!deadline_graph.required_services().contains(&Service::SocketIo));
+    let deadline_graph = program
+        .analyze_reachability(
+            &[
+                parse_function_ref("neoCLR.Runtime.DnsLookupUntil(String,Int64,System.Func<Void>)")
+                    .unwrap(),
+            ],
+            1,
+        )
+        .unwrap();
+    assert!(
+        deadline_graph
+            .required_services()
+            .contains(&Service::NameResolution)
+    );
+    assert!(
+        deadline_graph
+            .required_services()
+            .contains(&Service::TaskDispatch)
+    );
+    assert!(
+        !deadline_graph
+            .required_services()
+            .contains(&Service::SocketIo)
+    );
     let graph = program
         .analyze_reachability(
             &[parse_function_ref("neoCLR.Runtime.DnsLookup(String,System.Func<Void>)").unwrap()],

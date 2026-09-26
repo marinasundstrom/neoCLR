@@ -18,7 +18,7 @@ checks, not a guarantee that every possible secret or provenance issue is detect
 Fixture files deliberately include invalid/empty text for I/O tests and must remain.
 
 The original dependency inventory covered 20 registry packages. The current
-Unreleased inventory covers 48 locked registry packages, including Chrono and its
+current inventory covers 59 locked registry packages, including Chrono and its
 target-specific dependencies. Preserved license texts are byte-hashed in the
 [notice manifest](../third-party/manifest.json). Native libffi and its separately
 licensed build/test tooling are recorded explicitly. No dependency source is copied
@@ -36,7 +36,8 @@ The [next-preview validation guide](next-preview-validation.md) describes the au
 source-archive, notice, full-test and source/artifact checks. Run
 `python3 scripts/validate-release.py --toolchain stable` or select Rust 1.85.0. The
 script records the exact committed tree and checksum without tagging or publishing.
-CI applies this check across the six existing platform/toolchain jobs.
+CI runs comprehensive source validation once, focused OS/ABI execution on the other
+hosts and minimum-Rust compilation on all three. See the [CI split](ci-efficiency-plan.md).
 
 ## Assemble a review archive
 
@@ -76,7 +77,8 @@ release notes unchanged.
 - Refresh dependency metadata and notice hashes against the final Cargo.lock.
 - Review any source/fixture/license additions since the audited snapshot.
 - Confirm archive membership matches the selected tracked tree and preserve its hash.
-- Build/test the extracted archive on claimed platforms using minimum and stable Rust.
+- Run canonical extracted-source validation, focused stable host checks and
+  minimum-Rust compilation for claimed platforms; test each shipped binary package.
 - Finish provenance review, platform evidence and the draft release notes before
   selecting publication as a separate action.
 

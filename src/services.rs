@@ -1,7 +1,7 @@
 //! Logical runtime-service uses; no target ABI or ownership policy is implied.
 use crate::{
-    metadata::{Function, Instruction as Op},
     Fault,
+    metadata::{Function, Instruction as Op},
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -176,16 +176,19 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
         if matches!(
             crate::native::bind(function)?,
             crate::native::Binding::NotifyWorker
-                | crate::native::Binding::Resolve(crate::name_resolution::Operation::Lookup | crate::name_resolution::Operation::LookupUntil)
+                | crate::native::Binding::Resolve(
+                    crate::name_resolution::Operation::Lookup
+                        | crate::name_resolution::Operation::LookupUntil
+                )
                 | crate::native::Binding::Socket(
                     crate::socket_io::Operation::ConnectAddressesUntil
-                    | crate::socket_io::Operation::ReceiveUntil
-                    | crate::socket_io::Operation::SendUntil
-                    | crate::socket_io::Operation::Accept
-                    | crate::socket_io::Operation::Connect
-                    | crate::socket_io::Operation::ConnectAddresses
-                    | crate::socket_io::Operation::Receive
-                    | crate::socket_io::Operation::Send
+                        | crate::socket_io::Operation::ReceiveUntil
+                        | crate::socket_io::Operation::SendUntil
+                        | crate::socket_io::Operation::Accept
+                        | crate::socket_io::Operation::Connect
+                        | crate::socket_io::Operation::ConnectAddresses
+                        | crate::socket_io::Operation::Receive
+                        | crate::socket_io::Operation::Send
                 )
         ) {
             uses.push(ServiceUse {

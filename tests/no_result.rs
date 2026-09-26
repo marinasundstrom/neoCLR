@@ -146,7 +146,8 @@ fn cli_void_return_rejects_unit_on_stack_but_accepts_unit_generic_storage() {
 
 #[test]
 fn value_no_result_method_mutates_local_and_box_without_stack_payload() {
-    let m = module(r#"
+    let m = module(
+        r#"
 .type class System.Object
 .end
 .interface Stepper
@@ -188,7 +189,8 @@ unbox.any State
 ldfld State::Number
 ret
 .end
-"#);
+"#,
+    );
     verify(&m).unwrap();
     assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
 }

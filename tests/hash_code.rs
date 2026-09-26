@@ -38,7 +38,9 @@ fn run(
 #[test]
 fn accumulator_matches_combine_for_signed_boundaries() {
     for (first, second) in [(0, 0), (42, 7), (i32::MIN, i32::MAX), (-1, -1)] {
-        let body = format!(".local System.HashCode hash\nldloca hash\ninitobj System.HashCode\nldloca hash\nldc.i4 {first}\ncall instance System.HashCode::Add(Int32)\npop\nldloca hash\nldc.i4 {second}\ncall instance System.HashCode::Add(Int32)\npop\nldloca hash\ncall instance System.HashCode::ToHashCode()\nldc.i4 {first}\nldc.i4 {second}\ncall System.HashCode::Combine(Int32,Int32)\nceq");
+        let body = format!(
+            ".local System.HashCode hash\nldloca hash\ninitobj System.HashCode\nldloca hash\nldc.i4 {first}\ncall instance System.HashCode::Add(Int32)\npop\nldloca hash\nldc.i4 {second}\ncall instance System.HashCode::Add(Int32)\npop\nldloca hash\ncall instance System.HashCode::ToHashCode()\nldc.i4 {first}\nldc.i4 {second}\ncall System.HashCode::Combine(Int32,Int32)\nceq"
+        );
         assert_eq!(
             run(&body, "", "Boolean", 32).unwrap().value,
             Value::Boolean(true)

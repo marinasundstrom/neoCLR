@@ -34,7 +34,10 @@ fn arguments_are_per_execution_owned_values_and_respect_array_limits() {
             result.value,
             Value::Array {
                 element: neoclr::metadata::Type::String,
-                elements: args.into_iter().map(|text| Value::String(text.into())).collect()
+                elements: args
+                    .into_iter()
+                    .map(|text| Value::String(text.into()))
+                    .collect()
             }
         );
     }

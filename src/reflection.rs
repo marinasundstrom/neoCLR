@@ -202,40 +202,43 @@ impl Query {
                 3 => definition.is_some_and(|d| d.representation == Representation::Interface),
                 _ => return Err(Fault::new("unknown type shape query")),
             })),
-            Self::DisplayName => Ok(Value::String((match argument {
-                0 if matches!(handle.identity, TypeIdentity::GenericParameter { .. }) => {
-                    handle.name.clone()
-                }
-                0 if definition.is_some_and(|d| {
-                    d.origin.is_some()
-                        || !d.generic_parameters.is_empty()
-                            && handle.generic_arguments.iter().any(|a| {
-                                matches!(a.identity, TypeIdentity::GenericParameter { .. })
-                            })
-                }) =>
-                {
-                    handle.name.clone()
-                }
-                0 => crate::type_identity::signature_name(&ty)?,
-                1 => {
-                    let mut outer = definition;
-                    while let Some(parent) =
-                        outer.and_then(|d| crate::type_identity::declaring_definition(module, d))
-                    {
-                        outer = Some(parent);
+            Self::DisplayName => Ok(Value::String(
+                (match argument {
+                    0 if matches!(handle.identity, TypeIdentity::GenericParameter { .. }) => {
+                        handle.name.clone()
                     }
-                    outer
-                        .and_then(|d| {
-                            d.origin
-                                .as_ref()
-                                .map_or(d.name.as_str(), |o| o.name.as_str())
-                                .rsplit_once('.')
-                        })
-                        .map_or("", |(namespace, _)| namespace)
-                        .to_owned()
-                }
-                _ => return Err(Fault::new("unknown type name query")),
-            }).into())),
+                    0 if definition.is_some_and(|d| {
+                        d.origin.is_some()
+                            || !d.generic_parameters.is_empty()
+                                && handle.generic_arguments.iter().any(|a| {
+                                    matches!(a.identity, TypeIdentity::GenericParameter { .. })
+                                })
+                    }) =>
+                    {
+                        handle.name.clone()
+                    }
+                    0 => crate::type_identity::signature_name(&ty)?,
+                    1 => {
+                        let mut outer = definition;
+                        while let Some(parent) = outer
+                            .and_then(|d| crate::type_identity::declaring_definition(module, d))
+                        {
+                            outer = Some(parent);
+                        }
+                        outer
+                            .and_then(|d| {
+                                d.origin
+                                    .as_ref()
+                                    .map_or(d.name.as_str(), |o| o.name.as_str())
+                                    .rsplit_once('.')
+                            })
+                            .map_or("", |(namespace, _)| namespace)
+                            .to_owned()
+                    }
+                    _ => return Err(Fault::new("unknown type name query")),
+                })
+                .into(),
+            )),
             Self::EnumNames | Self::EnumValues | Self::EnumFormat | Self::EnumUnderlying => {
                 let info = definition
                     .and_then(|d| d.enum_info.as_ref())

@@ -11,6 +11,17 @@ windows-link, even though it was not compiled in the local macOS validation.
 
 | Package | Locked version | Declared license expression | Preserved texts |
 | --- | --- | --- | --- |
+| socket2 | 0.6.1 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/socket2-0.6.1/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/socket2-0.6.1/LICENSE-MIT) |
+| windows-sys | 0.60.2 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows-sys-0.60.2/license-apache-2.0), [license-mit](third-party/licenses/windows-sys-0.60.2/license-mit) |
+| windows-targets | 0.53.5 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows-targets-0.53.5/license-apache-2.0), [license-mit](third-party/licenses/windows-targets-0.53.5/license-mit) |
+| windows_aarch64_gnullvm | 0.53.1 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_aarch64_gnullvm-0.53.1/license-apache-2.0), [license-mit](third-party/licenses/windows_aarch64_gnullvm-0.53.1/license-mit) |
+| windows_aarch64_msvc | 0.53.1 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_aarch64_msvc-0.53.1/license-apache-2.0), [license-mit](third-party/licenses/windows_aarch64_msvc-0.53.1/license-mit) |
+| windows_i686_gnu | 0.53.1 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_i686_gnu-0.53.1/license-apache-2.0), [license-mit](third-party/licenses/windows_i686_gnu-0.53.1/license-mit) |
+| windows_i686_gnullvm | 0.53.1 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_i686_gnullvm-0.53.1/license-apache-2.0), [license-mit](third-party/licenses/windows_i686_gnullvm-0.53.1/license-mit) |
+| windows_i686_msvc | 0.53.1 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_i686_msvc-0.53.1/license-apache-2.0), [license-mit](third-party/licenses/windows_i686_msvc-0.53.1/license-mit) |
+| windows_x86_64_gnu | 0.53.1 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_x86_64_gnu-0.53.1/license-apache-2.0), [license-mit](third-party/licenses/windows_x86_64_gnu-0.53.1/license-mit) |
+| windows_x86_64_gnullvm | 0.53.1 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_x86_64_gnullvm-0.53.1/license-apache-2.0), [license-mit](third-party/licenses/windows_x86_64_gnullvm-0.53.1/license-mit) |
+| windows_x86_64_msvc | 0.53.1 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_x86_64_msvc-0.53.1/license-apache-2.0), [license-mit](third-party/licenses/windows_x86_64_msvc-0.53.1/license-mit) |
 | android_system_properties | 0.1.6 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/android_system_properties-0.1.6/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/android_system_properties-0.1.6/LICENSE-MIT) |
 | autocfg | 1.5.1 | Apache-2.0 OR MIT | [LICENSE-APACHE](third-party/licenses/autocfg-1.5.1/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/autocfg-1.5.1/LICENSE-MIT) |
 | bumpalo | 3.20.3 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/bumpalo-3.20.3/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/bumpalo-3.20.3/LICENSE-MIT) |

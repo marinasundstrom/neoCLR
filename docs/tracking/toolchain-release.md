@@ -25,9 +25,9 @@ are a 2026-09-26 snapshot, not a new live inventory or authorization to fix all 
 
 | Item | Status / owner boundary | Next action when selected |
 | --- | --- | --- |
-| HTTP evaluator package | Application acceptance is outstanding in the HTTP tracker | Use [local SDK provenance](../local-sdk-snapshot.md) and [runtime/Raven procedure](../runtime-raven-preview.md); test from extracted matching artifacts outside the checkout. A scratch development bundle is not release qualification. |
-| Next runtime release | Not declared ready or scheduled | Select candidate/scope and apply supported-target, package, migration/notices and release-note gates. POC completion is insufficient. |
-| CI efficiency | Proposed broader split, with separately recorded trigger changes | [CI design](../ci-efficiency-plan.md): classify portable versus host-dependent checks before reducing duplication. Do not drop platform coverage to shorten runs. |
+| HTTP evaluator package | POC acceptance complete on macOS arm64; HTTP tracker owns the evidence | [Package evidence](../experiments/http-poc-package/README.md) records the exact artifacts. Requalify the selected release candidate and shipped targets; do not treat a local POC pass as full release readiness. |
+| Next runtime release | HTTP POC release intended; version/date and readiness not declared | Select candidate/scope and apply supported-target, package, migration/notices and release-note gates. POC completion is insufficient. |
+| CI efficiency | Implemented canonical/host/compile-only split; hosted acceptance pending | [CI design](../ci-efficiency-plan.md): host inventory and tradeoffs are explicit. Measure the first hosted run; retain exact-package release checks. |
 | [#9 RavenDoc](https://github.com/marinasundstrom/neoCLR/issues/9) | Dated inventory spans correctness/navigation and richer rendering | First reproduce a current label/navigation or coverage gap; separate small repairs from union modeling/hierarchy features. Keep linked manual coverage until rendering supports a member. |
 | Website | Local validation and manual publication are separate | [Maintenance](../design/feature-pages.md), [site procedure](../../website/README.md); successful build/push is not deployment. |
 | Tracking consolidation | Completed organization in this change | One owner per theme; keep contracts and evidence linked, archive superseded priority sequences, and update current rows instead of appending competing plans. |

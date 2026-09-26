@@ -47,7 +47,11 @@ impl Query {
         };
         let assembly = lookup(module, identity)?;
         let selected_module = if let Some(Value::String(name)) = args.get(1) {
-            if !assembly.modules.iter().any(|module| module == name.as_str()) {
+            if !assembly
+                .modules
+                .iter()
+                .any(|module| module == name.as_str())
+            {
                 return Err(Fault::new("module does not belong to assembly"));
             }
             Some(name.as_str())

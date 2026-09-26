@@ -24,7 +24,9 @@ fn methodimpl_internalcall_round_trips_as_clr_flag() {
             .filter(|f| f.impl_flags == INTERNAL_CALL)
             .map(|f| (&f.name, &f.parameters, &f.returns))
             .collect::<Vec<_>>(),
-        compiled.functions.iter()
+        compiled
+            .functions
+            .iter()
             .filter(|f| f.impl_flags == INTERNAL_CALL)
             .map(|f| (&f.name, &f.parameters, &f.returns))
             .collect::<Vec<_>>()

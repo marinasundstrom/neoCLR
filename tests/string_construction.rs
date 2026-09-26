@@ -103,9 +103,10 @@ fn explicit_string_count_requires_readonly_private_implementation() {
         } else {
             method.receiver_readonly = false;
         }
-        let fault = LoadedProgram::new(&module)
-            .err()
-            .expect("invalid explicit mapping accepted");
+        let fault = match LoadedProgram::new(&module) {
+            Err(fault) => fault,
+            Ok(_) => panic!("invalid explicit mapping accepted"),
+        };
         assert!(
             fault.message.contains("explicit implementations require"),
             "{fault}"

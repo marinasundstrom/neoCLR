@@ -6,12 +6,12 @@ record, subordinate to the [platform roadmap](platform-roadmap.md).
 
 **POC scope:** two neoCLR programs exchange typed JSON using bounded HTTP/1.1;
 client/server cancellation, explicit resource lifetime, independent interoperability
-and the current known-length upload increment. Finish this increment, then freeze
-feature scope. Modern HTTP capabilities are tracked below without becoming automatic
+and the current known-length upload increment. The bounded POC is complete on macOS arm64 as of 2026-09-27; feature scope is frozen.
+The author intends to release it after separate release qualification. Modern HTTP capabilities are tracked below without becoming automatic
 completion requirements. POC completion is distinct from release qualification.
 
 Statuses: **Implemented** means development source with linked focused evidence;
-**Finish** is an outstanding completion action; **Deferred** is outside this POC.
+**Complete** records a satisfied POC gate; **Deferred** is outside this POC.
 It does not imply inclusion in published Preview 9 or production readiness.
 
 ## Capability matrix
@@ -41,20 +41,20 @@ not promises to implement all capabilities in the next release.
 
 ## Finish this POC
 
-The bounded feature inventory is sufficient after the upload increment. Work remaining
-is completion evidence, not an open-ended new-feature or performance sweep:
+**Complete on macOS arm64 — 2026-09-27.** The finite HTTP POC is done for now.
+No additional HTTP feature or optional optimization is required to close it.
 
-- **Implemented:** the upload increment, reference documentation and this tracker
-  have focused client/server regression and website evidence; see the
-  [validation record](experiments/http-stream-upload/validation.json).
-- **Implemented:** the mapped client/server pair and independent peers pass on the
-  matching local development artifacts, with zero final live objects. Artifact hashes
-  and exact outcomes are in the validation record. This does not replace the package gate.
-- **Finish:** verify the documented sample from a matching packaged SDK outside the
-  source checkout. An ad hoc development bundle does not close this gate.
-- **Finish:** record an explicit POC completion checkpoint listing supported host,
-  constraints and remaining defects. Do not call it done solely because the feature
-  code has landed.
+- **Complete:** upload implementation, API/reference documentation and focused
+  client/server evidence; see [source validation](experiments/http-stream-upload/validation.json).
+- **Complete:** a fresh matching SDK and standard runtime bundle were archived,
+  hash-verified and extracted outside the source checkouts. Typed JSON client/server
+  and independent peers, all 11 upload cases, and the website download's mapped pair
+  pass with zero final live objects. See [package acceptance](experiments/http-poc-package/README.md)
+  and [exact revisions/hashes](experiments/http-poc-package/validation.json).
+- **Complete:** supported POC host is macOS arm64, using the recorded matching .NET
+  11 SDK/compiler for builds. Cleartext HTTP/1.1, fixed bounds/deadlines, synchronous
+  upload sources and buffered server/response bodies remain the supported scope.
+  Modern HTTP rows below remain deferred. No broader host/load/editor claim follows.
 
 The recorded intermittent timeout and compiler diagnostic debt remain visible in
 [acceptance findings](experiments/http-json/repeatability-20260926.md). Assess them
@@ -64,8 +64,9 @@ Compiler status and the upload getter workaround are owned by the
 [toolchain tracker](tracking/toolchain-release.md#integration-and-correctness).
 
 A runtime release still needs its own supported-target/package checks, known-defect
-assessment and release notes. Publication is separate. Once these POC finish items
-are complete, stop this workstream until the author selects another HTTP capability.
+assessment and release notes. Publication is separate. HTTP feature work stops here until the author selects another capability. The
+author intends to release this POC; [toolchain/release](tracking/toolchain-release.md)
+owns efficient CI, selected-candidate packages and remaining release decisions.
 
 ## Modern HTTP direction
 
