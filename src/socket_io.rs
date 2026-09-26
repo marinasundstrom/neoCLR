@@ -1105,7 +1105,7 @@ mod tests {
         let buffer = array(&mut heap);
         let end = Instant::now() + Duration::from_secs(1);
         // Same absolute budget, progressing through two one-byte body fragments.
-        for value in [b'A', b'B'] {
+        for value in *b"AB" {
             peer.write_all(&[value]).unwrap();
             let id = sockets
                 .transfer_until(

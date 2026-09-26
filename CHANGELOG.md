@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Fix the socket test byte-array spelling flagged by Rust 1.98 Clippy in release CI.
+
 - Select 0.1.0-preview.10 for the author-requested HTTP POC release. Prepare candidate
   notes and matching packages; publication is pending exact-candidate validation.
 
