@@ -6,6 +6,18 @@ The author requested investigation of both issue trackers, clarified “Focus is
 neoCLR”, then requested roadmap documentation. The priorities below are assistant
 recommendations, not approval of every issue's proposed design or a release schedule.
 
+## Current execution direction — 2026-09-26
+
+The author subsequently prioritizes adding next-release features and asks to stop
+focusing on optimization unless it matters. Follow the
+[current platform priority](platform-roadmap.md#current-priority--next-release-features-2026-09-26):
+stream-backed HTTP content first, then bounded application-driven library features,
+with one small companion when useful. The ordering below records the earlier triage;
+compiler/HTTP acceptance debt remains tracked for release integration and becomes
+immediate work when it blocks the selected feature. Further profiling is deferred
+unless measured cost materially impairs supported use or a release requirement.
+This changes sequencing, not the status of the known timeout or diagnostic defect.
+
 ## Evidence and scope
 
 Read all **22 open neoCLR issues (#2–#23)** and **nine open Raven issues**, including
@@ -39,8 +51,9 @@ and remaining diagnostic defect must not be conflated.
 The [array-budget cost follow-up](experiments/http-json/array-budget-cost.md) reduces
 temporary host allocation in the per-instruction quota scan. It improves successful
 run timings, but baseline and candidate each pass only two of three comparisons.
-Keep timeout localization on the active application track; do not close it based
-on the optimization or promote further library expansion as if M1 were complete.
+At that checkpoint timeout localization remained next. The subsequent author
+direction now moves feature delivery ahead of it; neither optimization nor that
+reprioritization closes the fault or establishes M1 completion.
 
 The [slot-summary follow-up](experiments/http-json/slot-budget-summary.md) reuses
 unchanged payload counts while enforcing quotas at every instruction. All 88 focused

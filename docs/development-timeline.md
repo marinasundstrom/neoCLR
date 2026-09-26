@@ -25,6 +25,24 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-26 — Return to next-release feature delivery
+
+- **Author correction:** “I think we should move forward and not focus on
+  optimizations unless matters. We want to add more features for our next release.”
+- **Assistant response:** moves feature delivery ahead of further quota profiling
+  and timeout investigation. Proposes resuming the already requested stream-backed
+  HTTP content feature, followed by bounded application-driven library additions,
+  with at most one small companion task. Exact new signatures are not selected by
+  this exchange.
+- **Action:** updates the authoritative platform roadmap and supporting issue/HTTP
+  plans. Preserves the earlier stabilization-first position as history and the
+  existing measurements as evidence. Optimization becomes conditional on a concrete
+  feature blocker, material supported-workflow impact or release criterion.
+- **Outcome/open:** documentation reprioritized; no new API is implemented by this
+  change. Known compiler and intermittent timeout findings remain open for release
+  review or earlier repair if they block the selected feature. No release date or
+  completion claim is inferred.
+
 ## 2026-09-26 — HTTP timeout localization and array-budget cost
 
 - **Author:** requests continuation after the repeatability and compiler acceptance

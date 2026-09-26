@@ -14,6 +14,43 @@ look like. A milestone selects an outcome to investigate, not every abstraction 
 its source proposals. Keep, adapt or discard ideas based on working samples and
 [comparison with .NET/CLR](design-research.md).
 
+## Current priority — next-release features (2026-09-26)
+
+**Author direction:** “move forward and not focus on optimizations unless matters”
+and “add more features for our next release.” Feature delivery now takes precedence
+over further runtime profiling and repeatability investigation. This supersedes the
+stabilization-first execution order recorded below; it does not declare known faults
+fixed or remove release validation. The implemented HTTP/JSON sample is a foundation
+for the next feature, without requiring M1 to be declared complete first.
+
+1. **Stream-backed HTTP content.** Resume the existing author-selected feature in
+   the [HTTP content design](http-client-design.md). Start with a bounded upload
+   from a readable stream through the existing client/handler pipeline. Establish
+   owned versus borrowed lifetime, cancellation and known-length handling, then
+   evaluate unknown-length framing and response streaming as separate increments.
+   Reuse the recorded .NET StreamContent/HttpContent comparison; retaining buffered
+   content is the alternative. Streaming expands the content sources applications
+   can use, but adds read, completion, retry/reuse and cleanup obligations. Do not
+   silently buffer an entire stream and call that end-to-end streaming.
+2. **Application-driven library features.** Select one concrete consumer at a time
+   from the [issue triage](issue-fix-roadmap.md): deterministic comparison, another
+   numeric parser or a metadata operation. Reconcile existing APIs first and compare
+   each addition with its .NET contract. No broad reflection/globalization or
+   compiler architecture redesign is implied by this feature direction.
+3. **Release integration and stabilization.** After the selected feature increments,
+   validate the combined application, matching packaged SDK, supported targets,
+   cancellation/resource cleanup, API reference and website. Retain the HTTPS scope
+   decision and unresolved compiler/timeout findings as explicit release review items.
+
+Keep at most one small companion: numeric constants/confirmed enum helper gaps or
+API discoverability repairs, using the existing comparisons and public-consumer
+checks. Optimization is justified when a feature cannot meet its required limits,
+a normal supported workflow is materially impaired, or an agreed release criterion
+fails because of measured runtime cost. Otherwise record it for later and continue
+feature work. Correctness defects that block a selected feature still take priority.
+The next feature's exact API remains provisional until its focused design and
+executable case are checked; this planning change implements no new capability.
+
 ## Implemented checkpoint — HTTP JSON clients (2026-09-26)
 
 The [generic client helpers](experiments/http-json-client/README.md) and standard
@@ -53,10 +90,14 @@ comparison both runtimes pass three exchanges; candidate client execution is
 2.3–5.2 seconds versus the previous optimization's 5.9–8.1 seconds, with unchanged
 managed counts and zero final live objects. Server timing is mixed. Five diagnostic
 runs also failed to reproduce the old timeout: keep its cause and load qualification
-open, alongside the separate compiler diagnostic defect. Do not expand API scope or
-change deadlines based on these small local samples.
+open, alongside the separate compiler diagnostic defect. These samples do not
+justify deadline changes. The later feature-first author direction above now governs
+next work; these findings no longer gate beginning the next feature.
 
 ## Issue-driven priorities — 2026-09-26
+
+**Earlier execution order:** retained for the original investigation. The current
+next-release feature direction above supersedes stabilization-first scheduling.
 
 The author requests investigation of both repositories' issues, clarifies **the focus
 is neoCLR**, and requests this roadmap update. The [issue triage and fix sequence](issue-fix-roadmap.md)

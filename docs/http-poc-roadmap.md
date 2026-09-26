@@ -2,9 +2,11 @@
 
 **Current checkpoint (2026-09-26):** the managed HTTP/JSON application now has
 implemented transport, context ownership, typed mapping and shared JSON content.
-Follow the [current issue-driven sequence](platform-roadmap.md#issue-driven-priorities--2026-09-26):
-retain the integrated generic-method fix and JSON helpers, check the separate
-unresolved-call acceptance defect, and establish repeatable packaged exchanges. The
+Follow the [current next-release feature direction](platform-roadmap.md#current-priority--next-release-features-2026-09-26):
+resume stream-backed HTTP content and bounded application-driven additions. Further
+optimization is deferred unless it materially affects a feature or release criterion.
+Retain the integrated generic-method fix and JSON helpers; the separate unresolved-call
+defect and repeatable packaged exchanges remain release validation work. The
 [issue triage](issue-fix-roadmap.md) distinguishes existing APIs from remaining gaps
 and identifies bounded companion work. M1 remains incomplete; the dated socket-first
 checkpoint and original dependency plan below are retained as history.

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-26
 
+- Reprioritize the next release toward feature delivery at the author's direction.
+  Plan stream-backed HTTP content next, followed by bounded application-driven
+  library additions; defer optimization unless it materially affects a feature,
+  supported workflow or release requirement. Preserve known compiler/timeout debt
+  and release validation gates. This updates plans, not implemented APIs.
+
 - Reduce temporary host allocation in array-payload quota scans by walking borrowed
   sibling iterators instead of expanding every child into a work list. Preserve
   quota accounting, iterative deep traversal, GC pressure checks and deadlines.
