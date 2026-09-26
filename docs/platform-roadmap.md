@@ -210,7 +210,9 @@ Typed `Deserialize<T>` overloads now wrap the same mapper for string and stream
 input; the public consumer covers successful reads and preserved error cases. The
 opt-in HTTP variant uses typed request and response models. Shared buffered `System.Web.Http.Json.JsonContent` conversion now supports model
 and node creation/reads across both peers; client verb and instance extension
-conveniences are next: the author selects GetJson/PostJson and proposes
+conveniences are next: generic-only `GetFromJson<T>`/`PostAsJson<T>` follow the
+author's .NET naming clarification (omitting Async like neoCLR's existing HTTP verbs).
+POST returns the response rather than implicitly decoding its body. The author proposes
 `HttpResponse.Request: Option<HttpRequest>` for request association. DOM operations now use explicit
 `DeserializeNode`/`SerializeNode` names, separate from object mapping; latency under load stays an open
 validation item before making the mapped variant the default.

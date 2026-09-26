@@ -313,3 +313,24 @@ models. It passes with zero final live objects. The mapped HTTP example now shar
 these helpers for request creation/read and response creation/read; HTTP status and
 server completion stay application decisions. Client verb and instance extension
 conveniences remain the next bounded layer, not implemented here.
+
+
+### Next layer: generic client verbs — author direction, 2026-09-26
+
+The author selects generic-only client conveniences and asks about .NET naming.
+[.NET HttpClientJsonExtensions](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.json.httpclientjsonextensions?view=net-10.0)
+uses GetFromJsonAsync<T> and PostAsJsonAsync<T>, not GetAsJson<T>. The neoCLR direction
+is GetFromJson<T> and PostAsJson<T>, omitting Async consistently with existing verbs.
+GET decodes a successful response into T; POST serializes its T request value and
+returns HttpResponse, leaving response decoding to a separate content operation.
+No TypeInfo, Object-only or DOM-specific client verb overloads are required now.
+Preserve existing string/Uri base-address rules and cancellation behavior when
+implementing these conveniences. The combined HTTP/JSON error contract still needs
+to be established without erasing either structured cause.
+
+The author also proposes HttpResponse.Request: Option<HttpRequest>. The assistant's
+proposed default is None for standalone/server-created responses, with client Send
+associating the originating request even through custom handlers. Validate request
+identity, pending completion, cancellation, handler failures and GC retention before
+adopting that policy; do not imply redirect/final-request behavior the POC lacks.
+These are next-slice directions, not implemented APIs in this checkpoint.

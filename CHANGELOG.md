@@ -16,7 +16,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   conversion across all four client/server boundaries and document the public API.
   Focused content checks, the managed pair and an independent Python server check
   pass with zero final live objects; 559 signature checks and API/library snapshots
-  pass. Full suite and website build skipped.
+  pass. Full suite and website build skipped. Record the next generic-only
+  GetFromJson/PostAsJson direction and proposed optional response/request association
+  as plans, not implemented capabilities.
 
 - Rename the development JSON DOM entry points to DeserializeNode/SerializeNode
   for string and stream overloads. Object mapping keeps Deserialize<T>, TypeInfo

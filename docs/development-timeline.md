@@ -7547,3 +7547,8 @@ configuration/content, not target-specific code added to Raven main.
   HttpResponse.Request of type Option<HttpRequest> to associate a response with its
   request. Assistant proposes client association through the handler pipeline and
   None for standalone/server-created responses; exact policy remains to validate.
+- **Author naming refinement:** asks whether .NET uses GetAsJson/GetFromJson and
+  specifies generic overloads only for now. Assistant verifies the .NET names
+  GetFromJsonAsync<T>/PostAsJsonAsync<T> and proposes neoCLR GetFromJson<T>/
+  PostAsJson<T>, with POST returning HttpResponse and no implicit response mapping.
+  These names and scope are recorded for the next slice; they are not yet shipped.
