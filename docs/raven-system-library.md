@@ -1325,3 +1325,14 @@ and return types. Rebuild consumers with matching compiler, reference and librar
 The wrapper's `unbox.any T` also exposed a runtime reference-cast gap; see the
 [Object review](object-model-review.md#reference-targets-of-generic-unboxing--2026-09-26).
 The importer now permits reference destinations while requiring an object source.
+
+
+### Shared JSON HTTP content — 2026-09-26
+
+The JsonValue source slice includes System.Web.Http.Json.JsonContent, using the
+existing HttpContent and UTF-8 contracts. Five public static helpers share buffered
+conversion across requests and responses. Read<T> uses the same bounded generic
+wrapper admission and namespace-function representation as Deserialize<T>; no new
+VM operation, compiler policy or Runtime Contract configuration is introduced.
+The helper root is retained during bootstrap trimming and selected in the API
+reference. General generic class-method import remains outside this bridge scope.

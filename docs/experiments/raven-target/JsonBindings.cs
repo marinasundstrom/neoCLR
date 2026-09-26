@@ -3,9 +3,10 @@ using Mono.Cecil;
 // Bounded JSON DOM and codec; helpers never become application capabilities.
 static class JsonBindings {
     public const string Root = "System.Data.Json.JsonValue";
+    public const string Content = "System.Web.Http.Json.JsonContent";
     public const string Prefix = "System.Data.Json.";
     public static readonly string[] Leaves = new[] { "JsonObject", "JsonArray", "JsonString", "JsonNumber", "JsonBoolean", "JsonNull" }.Select(n => Prefix + n).ToArray();
-    public static readonly string[] Names = new[] { Root, Prefix + "JsonSerializer", Prefix + "ObjectMapper", Prefix + "DocumentReader", Prefix + "DocumentWriter", Prefix + "MessageReader", Prefix + "JsonSyntax" }.Concat(Leaves).ToArray();
+    public static readonly string[] Names = new[] { Root, Prefix + "JsonSerializer", Prefix + "ObjectMapper", Prefix + "DocumentReader", Prefix + "DocumentWriter", Prefix + "MessageReader", Prefix + "JsonSyntax" }.Concat(Leaves).Append(Content).ToArray();
     const string Marker = "System.Runtime.CompilerServices.ClosedHierarchyAttribute";
     public static bool Assignable(string source, string target) => target == Root && Leaves.Contains(source);
     public static bool IsName(string name) => Names.Contains(name);
@@ -79,6 +80,16 @@ internal sealed class JsonSyntax {
     public static Result<string, JsonError> WriteMessage(string text) => default;
 }
 }
+namespace Web.Http.Json {
+public sealed class JsonContent {
+    private JsonContent() { }
+    public static Result<HttpContent, Data.Json.JsonError> Create(object value) => default;
+    public static Result<HttpContent, Data.Json.JsonError> CreateNode(Data.Json.JsonValue value) => default;
+    public static Result<Data.Json.JsonValue, Data.Json.JsonError> ReadNode(HttpContent content) => default;
+    public static Result<object, Data.Json.JsonError> Read(HttpContent content, Introspection.TypeInfo type) => default;
+    public static Result<T, Data.Json.JsonError> Read<T>(HttpContent content) => default;
+}
+}
 """;
     public static void Project(ModuleDefinition module) {
         var constructor = module.GetType(Marker).Methods.Single(m => m.IsConstructor);
@@ -113,6 +124,10 @@ internal sealed class JsonSyntax {
     }
 
     static readonly Dictionary<string, (string Result, bool Static, bool Construct)> Members = new() {
+        ["JsonContent::Create(System.Object)"] = ("System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>", true, false),
+        ["JsonContent::CreateNode(System.Data.Json.JsonValue)"] = ("System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>", true, false),
+        ["JsonContent::ReadNode(System.Web.Http.HttpContent)"] = ("System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>", true, false),
+        ["JsonContent::Read(System.Web.Http.HttpContent,System.Introspection.TypeInfo)"] = ("System.Result<System.Object,System.Data.Json.JsonError>", true, false),
         ["JsonObject::.ctor()"] = ("noresult", false, true),
         ["JsonObject::get_Count()"] = ("Int32", false, false),
         ["JsonObject::Field(String)"] = ("System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>", false, false),
@@ -155,18 +170,19 @@ internal sealed class JsonSyntax {
         ["JsonSyntax::Whitespace(Byte)"] = ("Boolean", true, false),
         ["JsonSyntax::WriteMessage(String)"] = ("System.Result<String,System.Data.Json.JsonError>", true, false),
     };
-    // Only the two unconstrained static wrappers are admitted as generic methods.
+    // Only the bounded serializer/content wrappers are admitted as generic methods.
     public static bool IsGenericSerializerMethod(MethodDefinition method) =>
-        method.DeclaringType.FullName == Prefix + "JsonSerializer"
-        && method.Name == "Deserialize" && method.IsPublic && method.IsStatic
+        ((method.DeclaringType.FullName == Prefix + "JsonSerializer" && method.Name == "Deserialize")
+            || (method.DeclaringType.FullName == Content && method.Name == "Read")) && method.IsPublic && method.IsStatic
         && !method.IsVirtual && !method.IsAbstract && !method.ExplicitThis
         && method.CallingConvention == MethodCallingConvention.Generic
         && method.GenericParameters.Count == 1
         && method.GenericParameters[0].Attributes == GenericParameterAttributes.NonVariant
         && !method.GenericParameters[0].HasConstraints && method.Parameters.Count == 1
-        && (method.Parameters[0].ParameterType.MetadataType == MetadataType.String
+        && ((method.DeclaringType.FullName == Content && method.Parameters[0].ParameterType.FullName == "System.Web.Http.HttpContent" && RuntimeSignatures.IsCore(method.Parameters[0].ParameterType.Scope))
+            || (method.DeclaringType.FullName == Prefix + "JsonSerializer" && (method.Parameters[0].ParameterType.MetadataType == MetadataType.String
             || method.Parameters[0].ParameterType.FullName == "System.IO.InputStream"
-                && RuntimeSignatures.IsCore(method.Parameters[0].ParameterType.Scope))
+                && RuntimeSignatures.IsCore(method.Parameters[0].ParameterType.Scope))))
         && method.ReturnType is GenericInstanceType returned
         && returned.ElementType.FullName == "System.Result`2"
         && RuntimeSignatures.IsCore(returned.Scope) && returned.GenericArguments.Count == 2
@@ -176,6 +192,7 @@ internal sealed class JsonSyntax {
         && RuntimeSignatures.IsCore(returned.GenericArguments[1].Scope);
 
     public static string GenericImplementationName(MethodDefinition method) =>
+        method.DeclaringType.FullName == Content ? Content + ".ReadModel" :
         Prefix + "JsonSerializer." + (method.Parameters[0].ParameterType.MetadataType == MetadataType.String
             ? "DeserializeText" : "DeserializeStream");
 

@@ -153,3 +153,23 @@ server allocations, with zero final live objects on both sides. Library source a
 bootstrap snapshot hashes match. The website build remains skipped by direction;
 API snapshot verification is complete. These are development checks, not a release
 or a claim about latency under load.
+
+
+## Shared HTTP content conversion — 2026-09-26
+
+The mapped HTTP variant now uses System.Web.Http.Json.JsonContent on both peers:
+Create serializes outgoing models; Read<T> reads incoming request/response models.
+The application still chooses response status, propagates application errors and
+completes/closes its server contexts. Error response literals remain explicit
+application-owned content.
+
+The public fixture additionally covers CreateNode/ReadNode and TypeInfo reads,
+repeat reads of the same buffer, ignored media type, JSON null versus empty bytes,
+malformed JSON, invalid UTF-8, the byte limit and unsupported mapping. It passes
+with 2,396 allocations, 35 collections and zero final live objects. No full suite
+or website build is used for this slice; validation stays on the JSON/HTTP boundary.
+
+The managed pair passes with 407 client / 369 server allocations and zero final
+live objects. The client also passes against the independent Python server, which
+checks the JSON media type and body (421 allocations, zero final live objects).
+All 559 signature checks and matching API/library snapshot checks pass.

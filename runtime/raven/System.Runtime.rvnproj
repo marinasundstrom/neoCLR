@@ -366,6 +366,7 @@
     <Compile Include="src/System/Data/Json/JsonSyntax.rvn" />
     <Compile Include="src/System/Data/Json/JsonSerializer.rvn" />
     <Compile Include="src/System/Data/Json/ObjectMapper.rvn" />
+    <Compile Include="src/System/Web/Http/Json/JsonContent.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ReflectionError'">
     <Compile Include="src/System/Runtime/Reflection/ReflectionError.rvn" />

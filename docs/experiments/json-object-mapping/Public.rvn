@@ -2,6 +2,9 @@ import System.*
 import System.Data.Json.*
 import System.IO.*
 import System.Result.*
+import System.Web.Http.*
+import System.Web.Http.Json.*
+import System.Text.*
 import System.Runtime.Reflection.*
 
 public class Reading {
@@ -51,6 +54,22 @@ func RoundTrip() -> Result<unit, JsonError> {
     let typed = JsonSerializer.Deserialize<Reading>(text)?
     Check(typed.Station == "Café" && typed.Count == 42 && typed.Active)
     Check(typed.GetAssignments() == 1)
+    let content = JsonContent.Create(instance)?
+    let contentCopy = JsonContent.Read<Reading>(content)?
+    Check(contentCopy.Station == "Café" && contentCopy.Count == 42)
+    let node = JsonContent.ReadNode(content)?
+    let nodeContent = JsonContent.CreateNode(node)?
+    let contentCopyAgain = JsonContent.Read(nodeContent, typeof(Reading))?
+    Check(contentCopyAgain is Reading)
+    // Buffered content remains readable; its media type does not choose parsing policy.
+    Check(JsonContent.ReadNode(content) is Ok(_))
+    Check(JsonContent.ReadNode(HttpContent(Utf8.Encode("null"), "text/plain")) is Ok(JsonNull))
+    Check(JsonContent.ReadNode(HttpContent(Utf8.Encode(""))) is Error(JsonError.Syntax(_)))
+    Check(JsonContent.ReadNode(HttpContent(Utf8.Encode("{"))) is Error(JsonError.Syntax(_)))
+    Check(JsonContent.ReadNode(HttpContent([(byte)255])) is Error(JsonError.Read(TextReadError.InvalidUtf8)))
+    let oversized = Utf8.Encode("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+    Check(JsonContent.ReadNode(HttpContent(oversized)) is Error(JsonError.LimitExceeded(_)))
+    Check(JsonContent.Create(NestedReading()) is Error(JsonError.UnsupportedMapping(_)))
     let serialized = JsonSerializer.Serialize(instance)?
     let dom = JsonSerializer.DeserializeNode(serialized)?
     if dom is JsonObject document {

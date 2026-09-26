@@ -281,3 +281,7 @@ explicit author instruction for this change.
 but omits individual member pages. JsonError case payloads currently use
 [the linked payload reference](json-error-payloads.md). Every entry records the
 renderer limitation; the site checks the destination and anchor.
+
+System.Web.Http.Json.JsonContent now has type/member XML and automatic type selection
+for synchronous buffered Create/CreateNode/Read/ReadNode conversions, including
+generic and TypeInfo reads. The API landing page links the namespace's public type.

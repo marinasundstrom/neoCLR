@@ -278,3 +278,38 @@ error, stream ownership or overload-resolution semantics change. A node passed t
 Serialize(Object) retains the existing DOM behavior, avoiding an accidental reflection
 mapping of its implementation properties. Return-directed overload selection remains
 an independent Raven exploration.
+
+
+## Shared buffered HTTP conversion — 2026-09-26
+
+The first shared layer is `System.Web.Http.Json.JsonContent`, a non-instantiable
+helper class with Create(Object), CreateNode(JsonValue), ReadNode(HttpContent),
+Read(HttpContent, TypeInfo) and Read<T>(HttpContent). It composes the existing
+serializer and UTF-8 codec; it is not another HttpContent implementation. Generic
+reads use the existing bounded generic-function bridge representation. The JSON
+source slice now includes this HTTP integration helper; the eventual package split
+remains provisional and adds no transport dependency to the serializer itself.
+
+This follows the previously researched .NET separation of content conversion from
+client verbs, with two deliberate differences: shared request/response content on
+both peers and synchronous Result-based conversion of already buffered bytes.
+The benefit is one error/mapping policy for all four boundaries; the costs are
+whole-buffer work, a provisional static-call surface instead of extension syntax,
+and no cancellation during conversion. Future stream content must revisit lifetime,
+consumption, async reads and limits before reusing this buffered policy.
+
+Create selects application/json; charset=utf-8. Reads explicitly interpret the
+buffer as UTF-8 JSON without checking Content-Type or HTTP status. This permits
+calling code to decode known payloads even when headers are absent or misleading,
+but callers requiring a media-type policy must enforce it themselves. Empty input
+is a syntax error; JSON null remains a node and is not a supported flat model.
+The 128-byte bound is checked before decoding; invalid UTF-8 retains
+JsonError.Read(TextReadError.InvalidUtf8). Serializer/reflection errors are preserved.
+No transport errors, automatic status rejection, completion or disposal are added.
+
+The public mapper consumer checks all five operations, repeat reads, non-JSON media
+type with valid JSON, empty/malformed input, invalid UTF-8, size limits and unsupported
+models. It passes with zero final live objects. The mapped HTTP example now shares
+these helpers for request creation/read and response creation/read; HTTP status and
+server completion stay application decisions. Client verb and instance extension
+conveniences remain the next bounded layer, not implemented here.

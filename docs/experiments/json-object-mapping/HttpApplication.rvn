@@ -1,8 +1,8 @@
 import System.*
 import System.Data.Json.*
 import System.Result.*
-import System.Text.*
 import System.Web.Http.*
+import System.Web.Http.Json.*
 
 union AppError {
     case Http(reason: HttpError)
@@ -38,19 +38,14 @@ public class Acknowledgement {
     var accepted: bool { get; set; } = false
 }
 
-func JsonContent(value: Object) -> Result<HttpContent, JsonError> {
-    let text = JsonSerializer.Serialize(value)?
-    return Ok(HttpContent(Utf8.Encode(text), "application/json; charset=utf-8"))
-}
-
 func CreateReport() -> Result<ReportPayload, JsonError> {
     let report = ReportPayload()
     report.station = "Café"
     return Ok(report)
 }
 
-func Acknowledge(payload: string) -> Result<Acknowledgement, JsonError> {
-    _ = JsonSerializer.Deserialize<ReportPayload>(payload)?
+func Acknowledge(content: HttpContent) -> Result<Acknowledgement, JsonError> {
+    _ = JsonContent.Read<ReportPayload>(content)?
     let reply = Acknowledgement()
     reply.accepted = true
     return Ok(reply)
@@ -58,7 +53,7 @@ func Acknowledge(payload: string) -> Result<Acknowledgement, JsonError> {
 
 func PrepareReport() -> Result<HttpContent, AppError> {
     let report = CreateReport()?
-    let content = JsonContent(report)?
+    let content = JsonContent.Create(report)?
     return Ok(content)
 }
 
@@ -67,8 +62,7 @@ func ReadReply(result: Result<HttpResponse, HttpError>) -> Result<string, AppErr
     if response.StatusCode != HttpStatusCode.Created {
         return Error(AppError.Http(HttpError.UnsuccessfulStatus(response.StatusCode)))
     }
-    let text = Utf8.Decode(response.Content.Bytes).MapError(error => AppError.Body("Invalid UTF-8 response"))?
-    let reply = JsonSerializer.Deserialize<Acknowledgement>(text)?
+    let reply = JsonContent.Read<Acknowledgement>(response.Content)?
     if reply.accepted {
         let output = JsonSerializer.Serialize(reply)?
         return Ok(output)

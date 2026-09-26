@@ -70,7 +70,32 @@ buffered synchronous conversion, not async stream parsing.
 Existing bounds apply: 128 UTF-8 bytes, four container levels, 32 value occurrences,
 31 children per container. Object mapping is flat even though DOM values can nest.
 Recursive models, configurable naming/null policy and
-HTTP JSON extensions for requests and responses remain later work.
+HTTP verb extensions remain later work. Shared content conversion is described below.
+
+## HTTP content conversion
+
+[JsonContent](xref:System.Web.Http.Json.JsonContent) in `System.Web.Http.Json`
+shares these operations between client requests, server requests, server responses
+and client responses:
+
+```text
+Create(value: Object) -> Result<HttpContent, JsonError>
+CreateNode(value: JsonValue) -> Result<HttpContent, JsonError>
+Read<T>(content: HttpContent) -> Result<T, JsonError>
+Read(content: HttpContent, type: TypeInfo) -> Result<Object, JsonError>
+ReadNode(content: HttpContent) -> Result<JsonValue, JsonError>
+```
+
+Creation sets `application/json; charset=utf-8`. Reads interpret buffered bytes as
+UTF-8 JSON; the caller selects header and status policy. All operations are
+synchronous, preserve the serializer's errors and limits, and leave content reusable.
+Invalid UTF-8 is `JsonError.Read(TextReadError.InvalidUtf8)`. Empty bytes fail JSON
+syntax validation; a `null` document is a JsonNull node, while flat model mapping
+continues rejecting it. The byte limit is checked before decoding.
+
+These methods do not send a request, complete/close a context or add cancellation.
+The [mapped HTTP sample](/features/web/) uses the same helpers on both peers.
+HttpClient verb extensions and request/response conveniences remain later work.
 
 ## Error payload reference
 

@@ -128,7 +128,7 @@
     "runtime/raven/src/System/Boolean.rvn": "3daceb359864c13e8b4c1ba2c22b7666e8ac8c4591747cb973e43f0f2cc38081",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
-    "runtime/raven/System.Runtime.rvnproj": "84a082ebd0b88824ca926e1f255f985a2fba5cb5e104fe4eea3f006dbb701c7a",
+    "runtime/raven/System.Runtime.rvnproj": "9125632147a707432a8fd6cc8eecc2344ef75121e195a5912099d3085ed7d81c",
     "build/NeoCLR.Raven.props": "4eb1e8c16f00288330d6ea56b2966d6719dea83e6aab42fa77f38a3dffc3e75b"
   },
   "outputs": {
@@ -136,7 +136,7 @@
     "TextWriter.helpers.neoil": "755a1bde34aced625ffa856f2dc7b1821e32fa34ec5546b3ffd3bfbc1c518738"
   },
   "compilerSha256": "47e60017869670f82c62d83b124983f0dd39e3af0c3bf008cb98d85179405f7a",
-  "coreSha256": "c48adde9c315e02d71033bbf7cfb8a43918e10588dcca8f1259c39a5fa5e1504",
+  "coreSha256": "a82714bb6b56bc749208e60d7345c40e98feaddac4bd6c25e08f05e3981d7c11",
   "exports": [
     "Write(String text) -> System.Result<Int32,System.IO.StreamError>",
     "WriteLine(String text) -> System.Result<Int32,System.IO.StreamError>",

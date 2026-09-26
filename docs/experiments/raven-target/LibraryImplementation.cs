@@ -397,7 +397,7 @@ static class LibraryImplementation
     {
         var helpers = Regex.Matches(text, @"(?m)^\.function (?:internal )?([^\(]+)\(").Select(m => m.Groups[1].Value)
             .Where(h => !h.StartsWith(owner + ".", StringComparison.Ordinal)
-                && !(owner == JsonBindings.Root && h is "System.Data.Json.JsonSerializer.DeserializeText<T0>" or "System.Data.Json.JsonSerializer.DeserializeStream<T0>")
+                && !(owner == JsonBindings.Root && h is "System.Data.Json.JsonSerializer.DeserializeText<T0>" or "System.Data.Json.JsonSerializer.DeserializeStream<T0>" or "System.Web.Http.Json.JsonContent.ReadModel<T0>")
                 && !(owner == "System.Introspection.MemberInfo" && (h.StartsWith("System.Runtime.Reflection.TypeReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.PropertyReflectionExtensions.", StringComparison.Ordinal)))
                 && !(owner == "System.Tasks.Task" && (h.StartsWith("System.Tasks.TaskOperators.", StringComparison.Ordinal) || h.StartsWith("System.Tasks.TaskResultOperators.", StringComparison.Ordinal)))).ToArray();
         // Adapters generated from open signatures must themselves declare the free
@@ -418,7 +418,7 @@ static class LibraryImplementation
                             changed |= parameters[helper].Add(parameter);
         } while (changed);
         foreach (var helper in helpers.Where(h => !h.StartsWith(owner + ".", StringComparison.Ordinal)
-                && !(owner == JsonBindings.Root && h is "System.Data.Json.JsonSerializer.DeserializeText<T0>" or "System.Data.Json.JsonSerializer.DeserializeStream<T0>")
+                && !(owner == JsonBindings.Root && h is "System.Data.Json.JsonSerializer.DeserializeText<T0>" or "System.Data.Json.JsonSerializer.DeserializeStream<T0>" or "System.Web.Http.Json.JsonContent.ReadModel<T0>")
                 && !(owner == "System.Introspection.MemberInfo" && (h.StartsWith("System.Runtime.Reflection.TypeReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.PropertyReflectionExtensions.", StringComparison.Ordinal)))
                 && !(owner == "System.Tasks.Task" && (h.StartsWith("System.Tasks.TaskOperators.", StringComparison.Ordinal) || h.StartsWith("System.Tasks.TaskResultOperators.", StringComparison.Ordinal)))))
         {

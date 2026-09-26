@@ -356,7 +356,8 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
         # They are application roots even when no other library method calls them.
         pending.extend(helper for helper in helpers if helper in (
             'System.Data.Json.JsonSerializer.DeserializeText<T0>',
-            'System.Data.Json.JsonSerializer.DeserializeStream<T0>'))
+            'System.Data.Json.JsonSerializer.DeserializeStream<T0>',
+            'System.Web.Http.Json.JsonContent.ReadModel<T0>'))
     while pending:
         helper = pending.pop()
         if helper in used or helper not in helpers:

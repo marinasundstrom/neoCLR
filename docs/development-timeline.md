@@ -7528,3 +7528,22 @@ configuration/content, not target-specific code added to Raven main.
 - **Outcome:** focused DOM/stream, typed mapper and default HTTP pair pass with
   zero final live objects. All 551 signature checks and API/library snapshot checks
   pass. Website build skipped by author direction; no publication performed.
+
+
+### 2026-09-26 — Shared JSON content conversion
+
+- **Author:** requests continuation and asks not to run the full suite unless needed.
+- **Assistant:** implements the next roadmap layer as System.Web.Http.Json.JsonContent
+  with buffered model/node creation and reads, reusing serializer errors and limits.
+  Both sides of the mapped HTTP sample use the same conversions. This is a
+  provisional static helper surface; extension syntax and client verb wrappers remain
+  later work. Header validation, HTTP status and context completion stay explicit.
+- **Validation scope:** public content/mapping checks, bridge signature checks,
+  matching API/library snapshots and the mapped HTTP pair; no full suite or website
+  build. The public consumer already passes with zero final live objects.
+- **Outcome:** the managed pair and independent Python server check pass with zero
+  final live objects, as do all 559 signature checks and API/library snapshots.
+- **Author follow-up:** selects GetJson/PostJson helpers as the next step and proposes
+  HttpResponse.Request of type Option<HttpRequest> to associate a response with its
+  request. Assistant proposes client association through the handler pipeline and
+  None for standalone/server-created responses; exact policy remains to validate.

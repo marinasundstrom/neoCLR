@@ -141,6 +141,77 @@ call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion20<T0>(System.Result.
 M00000008_IL_0060:
 ret
 .end
+.function System.Web.Http.Json.JsonContent.ReadModel<T0>(System.Web.Http.HttpContent content) -> System.Result<T0,System.Data.Json.JsonError>
+.local System.Result<System.Object,System.Data.Json.JsonError> local0
+.local System.Object local1
+.local System.Data.Json.JsonError local2
+.local System.Object local3
+ldloca local2
+initobj System.Data.Json.JsonError
+M0000003e_IL_0000:
+M0000003e_IL_0001:
+M0000003e_IL_0002:
+ldarg 0
+M0000003e_IL_0003:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeReflectionC67D76CC5C960860()
+M0000003e_IL_0008:
+ldtoken T0
+M0000003e_IL_000d:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeReflection3A6D81CD5FF86035(System.Runtime.RuntimeContext,System.RuntimeTypeHandle)
+M0000003e_IL_0012:
+call System.Web.Http.Json.JsonContent::Read(System.Web.Http.HttpContent,System.Introspection.TypeInfo)
+M0000003e_IL_0017:
+stloc local0
+M0000003e_IL_0018:
+ldloca local0
+M0000003e_IL_001a:
+ldloca local1
+M0000003e_IL_001c:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion16(System.Result<System.Object,System.Data.Json.JsonError>&,System.Object&)
+M0000003e_IL_0021:
+brfalse M0000003e_IL_002b
+M0000003e_IL_0026:
+br M0000003e_IL_004c
+M0000003e_IL_002b:
+ldloca local2
+M0000003e_IL_002d:
+initobj System.Data.Json.JsonError
+M0000003e_IL_0033:
+ldloca local0
+M0000003e_IL_0035:
+ldloca local2
+M0000003e_IL_0037:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion17(System.Result<System.Object,System.Data.Json.JsonError>&,System.Data.Json.JsonError&)
+M0000003e_IL_003c:
+brfalse M0000003e_IL_0048
+M0000003e_IL_0041:
+ldloc local2
+M0000003e_IL_0042:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion18<T0>(System.Data.Json.JsonError)
+M0000003e_IL_0047:
+ret
+M0000003e_IL_0048:
+M0000003e_IL_0049:
+M0000003e_IL_004a:
+M0000003e_IL_004b:
+fault "Guest program reached a terminal failure"
+M0000003e_IL_004c:
+M0000003e_IL_004d:
+ldloc local1
+M0000003e_IL_004e:
+stloc local3
+M0000003e_IL_004f:
+M0000003e_IL_0050:
+ldloc local3
+M0000003e_IL_0051:
+unbox.any T0
+M0000003e_IL_0056:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion19<T0>(T0)
+M0000003e_IL_005b:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion20<T0>(System.Result.Ok<T0>)
+M0000003e_IL_0060:
+ret
+.end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeStringEquals(String source,String value0) -> Boolean
 .local String receiver
 ldarg source
@@ -166,6 +237,15 @@ ret
 ldarg source
 ldobj Int32
 call instance System.Int32::ToString()
+ret
+.end
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorInvalidUtf8(System.IO.TextReadError.InvalidUtf8 value) -> System.IO.TextReadError
+ldarg value
+newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.InvalidUtf8)
+ret
+.end
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeErrorSystemIOTextReadErrorInvalidUtf8New() -> System.IO.TextReadError.InvalidUtf8
+newobj instance System.IO.TextReadError.InvalidUtf8::.ctor()
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError arg0) -> System.Result.Error<System.Data.Json.JsonError>
@@ -578,6 +658,21 @@ ldarg receiver
 ldobj System.Result.Error<System.Int32ParseError>
 call instance System.Result.Error<System.Int32ParseError>::get_Value()
 stobj System.Int32ParseError
+ret
+.end
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion68(System.Data.Json.JsonError arg0) -> System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>
+ldarg arg0
+call System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>::FromResidual(System.Data.Json.JsonError)
+ret
+.end
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion69(System.Web.Http.HttpContent arg0) -> System.Result.Ok<System.Web.Http.HttpContent>
+ldarg arg0
+newobj instance System.Result.Ok<System.Web.Http.HttpContent>::.ctor(System.Web.Http.HttpContent)
+ret
+.end
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion70(System.Result.Ok<System.Web.Http.HttpContent> arg0) -> System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>
+ldarg arg0
+newobj instance System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>::.ctor(System.Result.Ok<System.Web.Http.HttpContent>)
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanFromInt32(Int32 value) -> Boolean
@@ -10016,6 +10111,453 @@ ldarg 0
 M00000038_IL_0002:
 call instance System.Data.Json.JsonValue::.ctor()
 M00000038_IL_0007:
+ret
+.end
+.end
+.type class System.Web.Http.Json.JsonContent
+.sealed
+.method private instance .ctor() -> noresult
+M00000039_IL_0000:
+M00000039_IL_0001:
+ldarg 0
+M00000039_IL_0002:
+pop
+M00000039_IL_0007:
+ret
+.end
+.method static Create(System.Object value) -> System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>
+.local System.Result<String,System.Data.Json.JsonError> local0
+.local String local1
+.local System.Data.Json.JsonError local2
+.local String local3
+ldloca local2
+initobj System.Data.Json.JsonError
+M0000003a_IL_0000:
+M0000003a_IL_0001:
+M0000003a_IL_0002:
+ldarg 0
+M0000003a_IL_0003:
+call System.Data.Json.JsonSerializer::Serialize(System.Object)
+M0000003a_IL_0008:
+stloc local0
+M0000003a_IL_0009:
+ldloca local0
+M0000003a_IL_000b:
+ldloca local1
+M0000003a_IL_000d:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion6(System.Result<String,System.Data.Json.JsonError>&,String&)
+M0000003a_IL_0012:
+brfalse M0000003a_IL_001c
+M0000003a_IL_0017:
+br M0000003a_IL_003d
+M0000003a_IL_001c:
+ldloca local2
+M0000003a_IL_001e:
+initobj System.Data.Json.JsonError
+M0000003a_IL_0024:
+ldloca local0
+M0000003a_IL_0026:
+ldloca local2
+M0000003a_IL_0028:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion7(System.Result<String,System.Data.Json.JsonError>&,System.Data.Json.JsonError&)
+M0000003a_IL_002d:
+brfalse M0000003a_IL_0039
+M0000003a_IL_0032:
+ldloc local2
+M0000003a_IL_0033:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion68(System.Data.Json.JsonError)
+M0000003a_IL_0038:
+ret
+M0000003a_IL_0039:
+M0000003a_IL_003a:
+M0000003a_IL_003b:
+M0000003a_IL_003c:
+fault "Guest program reached a terminal failure"
+M0000003a_IL_003d:
+M0000003a_IL_003e:
+ldloc local1
+M0000003a_IL_003f:
+stloc local3
+M0000003a_IL_0040:
+M0000003a_IL_0041:
+ldloc local3
+M0000003a_IL_0042:
+call System.Text.Utf8::Encode(String)
+M0000003a_IL_0047:
+ldstr "application/json; charset=utf-8"
+M0000003a_IL_004c:
+newobj instance System.Web.Http.HttpContent::.ctor(System.Collections.Sequence<Byte>,String)
+M0000003a_IL_0051:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion69(System.Web.Http.HttpContent)
+M0000003a_IL_0056:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion70(System.Result.Ok<System.Web.Http.HttpContent>)
+M0000003a_IL_005b:
+ret
+.end
+.method static CreateNode(System.Data.Json.JsonValue value) -> System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>
+.local System.Result<String,System.Data.Json.JsonError> local0
+.local String local1
+.local System.Data.Json.JsonError local2
+.local String local3
+ldloca local2
+initobj System.Data.Json.JsonError
+M0000003b_IL_0000:
+M0000003b_IL_0001:
+M0000003b_IL_0002:
+ldarg 0
+M0000003b_IL_0003:
+call System.Data.Json.JsonSerializer::SerializeNode(System.Data.Json.JsonValue)
+M0000003b_IL_0008:
+stloc local0
+M0000003b_IL_0009:
+ldloca local0
+M0000003b_IL_000b:
+ldloca local1
+M0000003b_IL_000d:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion6(System.Result<String,System.Data.Json.JsonError>&,String&)
+M0000003b_IL_0012:
+brfalse M0000003b_IL_001c
+M0000003b_IL_0017:
+br M0000003b_IL_003d
+M0000003b_IL_001c:
+ldloca local2
+M0000003b_IL_001e:
+initobj System.Data.Json.JsonError
+M0000003b_IL_0024:
+ldloca local0
+M0000003b_IL_0026:
+ldloca local2
+M0000003b_IL_0028:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion7(System.Result<String,System.Data.Json.JsonError>&,System.Data.Json.JsonError&)
+M0000003b_IL_002d:
+brfalse M0000003b_IL_0039
+M0000003b_IL_0032:
+ldloc local2
+M0000003b_IL_0033:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion68(System.Data.Json.JsonError)
+M0000003b_IL_0038:
+ret
+M0000003b_IL_0039:
+M0000003b_IL_003a:
+M0000003b_IL_003b:
+M0000003b_IL_003c:
+fault "Guest program reached a terminal failure"
+M0000003b_IL_003d:
+M0000003b_IL_003e:
+ldloc local1
+M0000003b_IL_003f:
+stloc local3
+M0000003b_IL_0040:
+M0000003b_IL_0041:
+ldloc local3
+M0000003b_IL_0042:
+call System.Text.Utf8::Encode(String)
+M0000003b_IL_0047:
+ldstr "application/json; charset=utf-8"
+M0000003b_IL_004c:
+newobj instance System.Web.Http.HttpContent::.ctor(System.Collections.Sequence<Byte>,String)
+M0000003b_IL_0051:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion69(System.Web.Http.HttpContent)
+M0000003b_IL_0056:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion70(System.Result.Ok<System.Web.Http.HttpContent>)
+M0000003b_IL_005b:
+ret
+.end
+.method static ReadNode(System.Web.Http.HttpContent content) -> System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>
+.local System.Result<String,System.Data.Json.JsonError> local0
+.local String local1
+.local System.Data.Json.JsonError local2
+.local String local3
+ldloca local2
+initobj System.Data.Json.JsonError
+M0000003c_IL_0000:
+M0000003c_IL_0001:
+M0000003c_IL_0002:
+ldarg 0
+M0000003c_IL_0003:
+call System.Web.Http.Json.JsonContent::Decode(System.Web.Http.HttpContent)
+M0000003c_IL_0008:
+stloc local0
+M0000003c_IL_0009:
+ldloca local0
+M0000003c_IL_000b:
+ldloca local1
+M0000003c_IL_000d:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion6(System.Result<String,System.Data.Json.JsonError>&,String&)
+M0000003c_IL_0012:
+brfalse M0000003c_IL_001c
+M0000003c_IL_0017:
+br M0000003c_IL_003d
+M0000003c_IL_001c:
+ldloca local2
+M0000003c_IL_001e:
+initobj System.Data.Json.JsonError
+M0000003c_IL_0024:
+ldloca local0
+M0000003c_IL_0026:
+ldloca local2
+M0000003c_IL_0028:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion7(System.Result<String,System.Data.Json.JsonError>&,System.Data.Json.JsonError&)
+M0000003c_IL_002d:
+brfalse M0000003c_IL_0039
+M0000003c_IL_0032:
+ldloc local2
+M0000003c_IL_0033:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion53(System.Data.Json.JsonError)
+M0000003c_IL_0038:
+ret
+M0000003c_IL_0039:
+M0000003c_IL_003a:
+M0000003c_IL_003b:
+M0000003c_IL_003c:
+fault "Guest program reached a terminal failure"
+M0000003c_IL_003d:
+M0000003c_IL_003e:
+ldloc local1
+M0000003c_IL_003f:
+stloc local3
+M0000003c_IL_0040:
+M0000003c_IL_0041:
+ldloc local3
+M0000003c_IL_0042:
+call System.Data.Json.JsonSerializer::DeserializeNode(String)
+M0000003c_IL_0047:
+ret
+.end
+.method static Read(System.Web.Http.HttpContent content,System.Introspection.TypeInfo type) -> System.Result<System.Object,System.Data.Json.JsonError>
+.local System.Result<String,System.Data.Json.JsonError> local0
+.local String local1
+.local System.Data.Json.JsonError local2
+.local String local3
+ldloca local2
+initobj System.Data.Json.JsonError
+M0000003d_IL_0000:
+M0000003d_IL_0001:
+M0000003d_IL_0002:
+ldarg 0
+M0000003d_IL_0003:
+call System.Web.Http.Json.JsonContent::Decode(System.Web.Http.HttpContent)
+M0000003d_IL_0008:
+stloc local0
+M0000003d_IL_0009:
+ldloca local0
+M0000003d_IL_000b:
+ldloca local1
+M0000003d_IL_000d:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion6(System.Result<String,System.Data.Json.JsonError>&,String&)
+M0000003d_IL_0012:
+brfalse M0000003d_IL_001c
+M0000003d_IL_0017:
+br M0000003d_IL_003d
+M0000003d_IL_001c:
+ldloca local2
+M0000003d_IL_001e:
+initobj System.Data.Json.JsonError
+M0000003d_IL_0024:
+ldloca local0
+M0000003d_IL_0026:
+ldloca local2
+M0000003d_IL_0028:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion7(System.Result<String,System.Data.Json.JsonError>&,System.Data.Json.JsonError&)
+M0000003d_IL_002d:
+brfalse M0000003d_IL_0039
+M0000003d_IL_0032:
+ldloc local2
+M0000003d_IL_0033:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion23(System.Data.Json.JsonError)
+M0000003d_IL_0038:
+ret
+M0000003d_IL_0039:
+M0000003d_IL_003a:
+M0000003d_IL_003b:
+M0000003d_IL_003c:
+fault "Guest program reached a terminal failure"
+M0000003d_IL_003d:
+M0000003d_IL_003e:
+ldloc local1
+M0000003d_IL_003f:
+stloc local3
+M0000003d_IL_0040:
+M0000003d_IL_0041:
+ldloc local3
+M0000003d_IL_0042:
+ldarg 1
+M0000003d_IL_0043:
+call System.Data.Json.JsonSerializer::Deserialize(String,System.Introspection.TypeInfo)
+M0000003d_IL_0048:
+ret
+.end
+.method private static Decode(System.Web.Http.HttpContent content) -> System.Result<String,System.Data.Json.JsonError>
+.local System.Result<String,System.Text.InvalidUtf8Error> local0
+.local System.Result<String,System.Data.Json.JsonError> local1
+.local String local2
+.local System.Result<String,System.Text.InvalidUtf8Error> local3
+.local System.Result.Ok<String> local4
+.local System.Result.Ok<String> local5
+.local String local6
+.local System.Result<String,System.Text.InvalidUtf8Error> local7
+.local System.Result.Error<System.Text.InvalidUtf8Error> local8
+.local System.Result.Error<System.Text.InvalidUtf8Error> local9
+.local System.Text.InvalidUtf8Error local10
+ldloca local8
+initobj System.Result.Error<System.Text.InvalidUtf8Error>
+ldloca local9
+initobj System.Result.Error<System.Text.InvalidUtf8Error>
+newobj System.Text.InvalidUtf8Error
+stloc local10
+M0000003f_IL_0000:
+M0000003f_IL_0001:
+M0000003f_IL_0002:
+ldarg 0
+M0000003f_IL_0003:
+call instance System.Web.Http.HttpContent::get_Bytes()
+M0000003f_IL_0008:
+callvirt instance System.Collections.Collection<Byte>::get_Count()
+M0000003f_IL_000d:
+ldc.i4 128
+M0000003f_IL_0012:
+cgt
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
+M0000003f_IL_0014:
+brtrue M0000003f_IL_001e
+M0000003f_IL_0019:
+br M0000003f_IL_0039
+M0000003f_IL_001e:
+M0000003f_IL_001f:
+ldstr "Document exceeds 128 UTF-8 bytes"
+M0000003f_IL_0024:
+newobj instance System.Data.Json.JsonError.LimitExceeded::.ctor(String)
+M0000003f_IL_0029:
+newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.LimitExceeded)
+M0000003f_IL_002e:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
+M0000003f_IL_0033:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Error<System.Data.Json.JsonError>)
+M0000003f_IL_0038:
+ret
+M0000003f_IL_0039:
+M0000003f_IL_003a:
+M0000003f_IL_003b:
+ldarg 0
+M0000003f_IL_003c:
+call instance System.Web.Http.HttpContent::get_Bytes()
+M0000003f_IL_0041:
+call System.Text.Utf8::Decode(System.Collections.Sequence<Byte>)
+M0000003f_IL_0046:
+stloc local0
+M0000003f_IL_0047:
+ldloca local1
+M0000003f_IL_0049:
+pop
+M0000003f_IL_004f:
+M0000003f_IL_0050:
+ldloc local0
+M0000003f_IL_0051:
+stloc local3
+M0000003f_IL_0052:
+ldloca local3
+M0000003f_IL_0054:
+ldloca local4
+M0000003f_IL_0056:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion59(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Ok<String>&)
+M0000003f_IL_005b:
+brfalse M0000003f_IL_009a
+M0000003f_IL_0060:
+ldloc local4
+M0000003f_IL_0062:
+stloc local5
+M0000003f_IL_0064:
+ldloca local5
+M0000003f_IL_0066:
+ldloca local6
+M0000003f_IL_0068:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion3(System.Result.Ok<String>&,String&)
+M0000003f_IL_006d:
+ldloc local6
+M0000003f_IL_006f:
+stloc local2
+M0000003f_IL_0070:
+ldc.i4 1
+M0000003f_IL_0071:
+br M0000003f_IL_0077
+M0000003f_IL_0077:
+brfalse M0000003f_IL_009a
+M0000003f_IL_007c:
+M0000003f_IL_007d:
+br M0000003f_IL_0088
+M0000003f_IL_0088:
+M0000003f_IL_0089:
+ldloc local2
+M0000003f_IL_008a:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion50(String)
+M0000003f_IL_008f:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Ok<String>)
+M0000003f_IL_0094:
+stloc local1
+M0000003f_IL_0095:
+br M0000003f_IL_00fd
+M0000003f_IL_009a:
+M0000003f_IL_009b:
+ldloc local0
+M0000003f_IL_009c:
+stloc local7
+M0000003f_IL_009e:
+ldloca local7
+M0000003f_IL_00a0:
+ldloca local8
+M0000003f_IL_00a2:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion60(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Error<System.Text.InvalidUtf8Error>&)
+M0000003f_IL_00a7:
+brfalse M0000003f_IL_00f8
+M0000003f_IL_00ac:
+ldloc local8
+M0000003f_IL_00ae:
+stloc local9
+M0000003f_IL_00b0:
+ldloca local9
+M0000003f_IL_00b2:
+ldloca local10
+M0000003f_IL_00b4:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion61(System.Result.Error<System.Text.InvalidUtf8Error>&,System.Text.InvalidUtf8Error&)
+M0000003f_IL_00b9:
+ldloc local10
+M0000003f_IL_00bb:
+pop
+M0000003f_IL_00bc:
+ldc.i4 1
+M0000003f_IL_00bd:
+br M0000003f_IL_00c3
+M0000003f_IL_00c3:
+brfalse M0000003f_IL_00f8
+M0000003f_IL_00c8:
+M0000003f_IL_00c9:
+br M0000003f_IL_00d4
+M0000003f_IL_00d4:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeErrorSystemIOTextReadErrorInvalidUtf8New()
+M0000003f_IL_00d9:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorInvalidUtf8(System.IO.TextReadError.InvalidUtf8)
+M0000003f_IL_00de:
+newobj instance System.Data.Json.JsonError.Read::.ctor(System.IO.TextReadError)
+M0000003f_IL_00e3:
+newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Read)
+M0000003f_IL_00e8:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
+M0000003f_IL_00ed:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Error<System.Data.Json.JsonError>)
+M0000003f_IL_00f2:
+stloc local1
+M0000003f_IL_00f3:
+br M0000003f_IL_00fd
+M0000003f_IL_00f8:
+M0000003f_IL_00f9:
+M0000003f_IL_00fa:
+M0000003f_IL_00fb:
+M0000003f_IL_00fc:
+fault "Guest program reached a terminal failure"
+M0000003f_IL_00fd:
+M0000003f_IL_00fe:
+ldloc local1
+M0000003f_IL_00ff:
 ret
 .end
 .end

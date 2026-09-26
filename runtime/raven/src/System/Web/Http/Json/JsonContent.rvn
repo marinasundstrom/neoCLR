@@ -1,0 +1,49 @@
+namespace System.Web.Http.Json
+
+import System.*
+import System.Data.Json.*
+import System.Introspection.*
+import System.IO.*
+import System.Result.*
+import System.Text.*
+import System.Web.Http.*
+
+// Shared buffered conversion for requests and responses, independent of transport.
+public class JsonContent {
+    private init() { }
+
+    static func Create(value: Object) -> Result<HttpContent, JsonError> {
+        let text = JsonSerializer.Serialize(value)?
+        return Ok(HttpContent(Utf8.Encode(text), "application/json; charset=utf-8"))
+    }
+
+    static func CreateNode(value: JsonValue) -> Result<HttpContent, JsonError> {
+        let text = JsonSerializer.SerializeNode(value)?
+        return Ok(HttpContent(Utf8.Encode(text), "application/json; charset=utf-8"))
+    }
+
+    static func ReadNode(content: HttpContent) -> Result<JsonValue, JsonError> {
+        let text = Decode(content)?
+        return JsonSerializer.DeserializeNode(text)
+    }
+
+    static func Read(content: HttpContent, type: TypeInfo) -> Result<Object, JsonError> {
+        let text = Decode(content)?
+        return JsonSerializer.Deserialize(text, type)
+    }
+
+    static func Read<T>(content: HttpContent) -> Result<T, JsonError> {
+        let instance = Read(content, typeof(T))?
+        return Ok((T)instance)
+    }
+
+    private static func Decode(content: HttpContent) -> Result<string, JsonError> {
+        if content.Bytes.Count > 128 {
+            return Error(JsonError.LimitExceeded("Document exceeds 128 UTF-8 bytes"))
+        }
+        return match Utf8.Decode(content.Bytes) {
+            Ok(let text) => Ok(text)
+            Error(_) => Error(JsonError.Read(TextReadError.InvalidUtf8))
+        }
+    }
+}

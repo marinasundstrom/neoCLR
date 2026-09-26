@@ -358,4 +358,8 @@ The shape is closest to .NET's mutable JsonNode model, but neoCLR calls the root
 [JSON API reference](/docs/api/System/Data/Json/) for the current contracts.
 The [object-mapping guide](/docs/json.html) covers the provisional Object/TypeInfo
 overloads and typed `Deserialize<T>` reads for strings and borrowed streams. Broader mapping and
-HTTP JSON conveniences for both client and server remain later work.
+HTTP verb conveniences remain later work. The development
+`System.Web.Http.Json.JsonContent` helpers create JSON content and read models or
+nodes from buffered content on either peer. They preserve Result errors and leave
+status handling and exchange completion to the application. Reads are synchronous
+and do not consume the content; creation sets the JSON UTF-8 media type.
