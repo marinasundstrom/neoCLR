@@ -17,8 +17,8 @@ python3 -m unittest discover -s scripts -p 'test_build_website.py'
 python3 -m http.server 8765 --directory target/website
 ```
 
-Run from the repository root. No Raven checkout, Node install, NuGet restore or
-DocFX is required. The repository carries a checksum-verified portable
+Run from the repository root. No Raven checkout, Node install or DocFX is required. The metadata-inventory
+helper is built with the .NET SDK on first use; normal SDK restore must be available. The repository carries a checksum-verified portable
 [RavenDoc build](../tools/ravendoc/README.md). The build checks the reference snapshot,
 expands tested sample excerpts, generates the complete site, and validates local
 assets and anchors. Output is only `target/website`; tool binaries and reference

@@ -96,10 +96,10 @@ try:
         expected = ('Abs', 'Min', 'Max', 'Sign', 'Clamp', 'Sqrt', 'Floor', 'Ceiling', 'Truncate', 'Round', 'Exp', 'Log', 'Log10', 'Sin', 'Cos', 'Tan', 'Pow') if owner == 'Math' else (('WriteLine',) if owner else (('Collections', 'Option', 'Result', 'Console', 'Math') if collections else ('Option', 'Result', 'Console', 'Math')))
         if any(not any(label == name or label.startswith(name+'(') for label in labels) for name in expected):
             raise AssertionError(f'{owner}: missing target completions: {labels}')
-        if any(label == name or label.startswith(name+'(') for label in labels for name in ('ReadLine', 'Atan', 'Cosh')):
+        if any(label == name or label.startswith(name+'(') for label in labels for name in ('BackgroundColor', 'Atan', 'Cosh')):
             raise AssertionError(f'{owner}: unexpected host API: {labels}')
-        if not owner and 'IO' in labels:
-            raise AssertionError('Host System.IO leaked into target namespace')
+        if not owner and 'Net' in labels:
+            raise AssertionError('Host System.Net leaked into target namespace')
         if files and not owner and 'ConsoleReadError' not in labels:
             raise AssertionError('ConsoleReadError must be in System')
         results[owner or 'System'] = labels
@@ -241,7 +241,7 @@ try:
         for version, expression, expected in (
             (23, 'result.', ('IsOk', 'IsErr', 'GetOkCase', 'GetErrorCase', 'TryGet', 'TryGetOutput', 'TryGetResidual', 'Map', 'Then', 'MapError', 'Match', 'Tap', 'TapError', 'OrElse', 'UnwrapOrElse', 'UnwrapOr', 'ToIterable')),
             (24, 'option.', ('IsSome', 'IsNone', 'GetSomeCase', 'GetNoneCase', 'TryGet', 'Map', 'Then', 'Filter', 'OrElse', 'UnwrapOrElse', 'UnwrapOr', 'Match', 'Tap', 'TapNone', 'ToIterable', 'ThenResult', 'MapResult', 'OkOr'))):
-            text = 'import System.*\nfunc Main() {\n    let result = Result<long, Error>.Ok(42L)\n    let option = Option<string>(Option.None())\n    ' + expression + '\n}'
+            text = 'import System.*\nfunc Inspect(result: Result<long, string>, option: Option<string>) {\n\n\n    ' + expression + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
                 'position': {'line': 4, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))

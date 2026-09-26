@@ -5,7 +5,9 @@ unless the author directs otherwise. It organizes themed milestones and concrete
 sample products. The [HTTP POC plan](http-poc-roadmap.md)
 details the first major milestone.
 
-Start with the [runtime and Raven walkthrough](runtime-raven-preview.md).
+Start with the [build instructions](../README.md#build-and-run-a-sample),
+[website build](../README.md#build-the-website), or
+[runtime and Raven walkthrough](runtime-raven-preview.md).
 The [changelog](../CHANGELOG.md) records implemented changes; proposals and plans
 are not evidence that an API is available.
 

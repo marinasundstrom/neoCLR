@@ -63,22 +63,6 @@ and importer limits, and [the packaging procedure](docs/experiments/raven-target
 for producing a matching experimental toolchain. Preview 9 packages these entry points together; see the
 [release notes](docs/preview-9-release-notes.md) for assets, prerequisites and limits.
 
-## Earlier Neo language experiment
-
-[Neo](docs/neo.md) remains in the repository as the earlier concept language and
-runtime test surface. Its value-by-default model and explicit reference syntax are
-historical experimental behavior, not the current Raven target's default semantics.
-Neo is outside the current migration work.
-
-```sh
-cargo run -- run examples/source/counter.neo
-cargo run -- run examples/source/calculator.neo
-```
-
-The [type-model migration](docs/roadmap.md#type-model-migration-directive-2026-09-12)
-explains the direction change. Legacy Neo and neoIL examples remain useful evidence
-of the earlier model; they should not be read as Raven syntax or its type contract.
-
 ## Release history
 
 This README describes the current development tree. The [changelog](CHANGELOG.md)
@@ -145,19 +129,7 @@ Expected output:
 
 ```text
 Hello, world!
-=> Void
 ```
-
-### Inspect the IL generated from Neo
-
-```sh
-cargo run --locked -- emit-il examples/source/enums.neo
-cargo run --locked -- emit-il examples/source/generic-receivers.neo /tmp/receivers.neoil
-```
-
-The command validates the source and emits readable, reassemblable IL without running
-it. File output refuses overwrites. See [IL inspection](docs/il-inspection.md) for
-round trips and source-mapped debugging; JSON artifact disassembly remains future work.
 
 ### Build, assemble, verify, and run separately
 
@@ -167,6 +139,9 @@ cargo build --locked
 ./target/debug/neoclr verify hello.neo.json
 ./target/debug/neoclr run hello.neo.json
 ```
+
+Use `cargo build --locked --release` for an optimized build in `target/release`.
+Run `cargo test --locked` to execute the Rust test suite.
 
 On Windows the executable is `target\debug\neoclr.exe`. `hello.neo.json` contains
 prototype metadata and IL, not native machine code or a .NET executable. The assembler
@@ -434,9 +409,8 @@ types. Dedicated union opcodes are not planned.
 [Marker custom attributes](docs/custom-attributes.md) are supported on types and
 methods/functions. The System library supplies UnionAttribute as an ordinary marker;
 case behavior lives in ordinary library methods. [Reflection introspection](docs/reflection.md)
-now enumerates fields, methods, properties and parameter signatures. Run
-`cargo run -- run examples/source/reflection.neo` for the Neo example. Reflective
-invocation and guest attribute discovery remain deferred.
+enumerates fields, methods, properties and parameter signatures. See the
+[current reflection guide](api-docs/reflection.md) for development contracts and limits.
 
 Following the strategy review, the [control-flow verifier foundation](docs/verification.md)
 is implemented as an explicit `verify` command. It checks stack types, call/field
@@ -536,79 +510,34 @@ existing typed slots, outputs and constructor receivers.
 [Managed arrays](docs/managed-arrays.md) now support frame-owned values and GC heap
 allocations with common checked element operations and managed element references.
 
-[Neo interfaces](docs/neo-interfaces.md) demonstrate declared contracts, record
-implementations and managed reference projections without boxing. Run
-`cargo run --locked -- run examples/source/interfaces.neo --gc-stats`.
+## Build the website
 
-## Debug a running program
-
-Launch the [interactive terminal debugger](docs/debugger.md):
+From the repository root, with Python 3.9+ and the .NET 10 SDK installed:
 
 ```sh
-cargo run --locked -- debug examples/source/debugger.neo
+python3 -m unittest discover -s scripts -p 'test_build_website.py'
+python3 scripts/build-website.py
+python3 -m http.server 8765 --directory target/website
 ```
 
-Use `source`, `bt`, `stack`, `heap`, `step`, `next` and `continue`. `watch` enables
-live inspection; `pause` freezes execution at an instruction boundary. Neo source
-locations and local labels survive compilation into JSON artifacts.
+Open <http://localhost:8765/>. The build uses the pinned RavenDoc bundle and checked-in
+API reference snapshot; no runtime build or Raven checkout is needed. Use a committed
+checkout for publication. Uncommitted API/compiler changes can intentionally fail
+snapshot validation; refresh matching artifacts following [API maintenance](api-docs/README.md).
 
+See [website maintenance](website/README.md) for content, reference updates and
+publication. The **Project website** workflow publishes only when manually run on
+`main`; it does not build the runtime or create a release.
 
-### Managed callbacks
+## Raven applications and editor tools
 
-[Delegates](docs/delegates.md) provide checked static/heap-bound callbacks with ordinary
-Invoke calls. Neo automatically wraps method groups when a delegate type is expected
-and uses function-style invocation. The Func family includes Void results, so
-Array.ForEach takes Func<T,Void> instead of a separate Action<T> delegate.
-Contextual lambdas share captured bindings in managed storage, including returned
-and nested closures; captured references must satisfy heap-lifetime checks.
+Use `.rvn` source files in `.rvnproj` projects. The matching experimental SDK,
+compiler bridge, reference assembly and runtime library must be used together.
+Follow [the MSBuild guide](docs/raven-msbuild.md) or
+[the local installation record](docs/local-sdk-snapshot.md). In VS Code, use the
+**neoCLR: Build with MSBuild** and **neoCLR: Run (MSBuild)** tasks.
 
-```sh
-cargo run --locked -- run examples/source/func-callbacks.neo
-cargo run --locked -- run examples/source/closures.neo
-```
-
-### Common comparison and iteration
-
-[ComparableTo, Iterable and Iterator](docs/common-interfaces.md) provide scalar ordering
-and managed collection traversal. ArrayList supports independent iterators through
-readonly Iterable views; Iterator exposes MoveNext, Current and Dispose.
-
-```sh
-cargo run --locked -- run examples/source/common-interfaces.neo
-```
-
-[Eager predicate searches](docs/predicate-search.md) add ArrayList.Find, FindIndex
-and Exists using Func<T,Boolean>. Find returns Option<T>; custom equality uses
-readonly EquatableTo implementations. LINQ remains future work.
-
-```sh
-cargo run --locked -- run examples/source/predicate-search.neo
-```
-
-[Ordinal text operations](docs/ordinal-text.md) provide explicit comparison and
-prefix/suffix/containment checks. The file-name search example combines text,
-ArrayList predicates and Option matching:
-
-```sh
-cargo run --locked -- run examples/source/ordinal-text.neo
-```
-
-[Character classification](docs/character-classification.md) adds familiar System.Char predicates and
-Neo character literals, including Unicode IsDigit and explicit IsAsciiDigit.
-
-[Fundamental Math operations](docs/math.md) add integer helpers, typed Clamp and core
-Double functions. Neo supports Double literals and same-type arithmetic/comparison;
-`examples/source/math.neo` demonstrates the APIs.
-
-[Date and Time core values](docs/date-time.md) provide validated factories, readonly
-components and value comparison. Run `examples/source/date-time.neo` for leap-date,
-time-of-day and typed-error handling; parsing and formatting remain planned.
-
-The [local system clock](docs/local-clock.md) provides Date, Time and UTC offset in one reading.
-Run its Neo sample with `cargo run --locked -- run examples/source/local-clock.neo`.
-
-The [Environment API](docs/environment.md) exposes guest arguments, current directory and
-optional process variables; see `examples/source/environment.neo`.
-
-The [file report example](docs/file-output.md) combines guest arguments, paths and bounded
-UTF-8 input/output with typed Results.
+For current API behavior, see the [API guides](api-docs/README.md),
+[collections](website/content/features/collections/index.md), [outcomes](website/content/features/outcomes/index.md) and
+[reflection](api-docs/reflection.md). Historical language experiments are indexed
+separately in [the documentation history](docs/history/README.md).
