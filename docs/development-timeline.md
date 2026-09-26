@@ -25,6 +25,28 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-26 — HTTP timeout localization and array-budget cost
+
+- **Author:** requests continuation after the repeatability and compiler acceptance
+  findings. No deadline-policy or runtime-architecture change is requested.
+- **Assistant investigation:** uses a temporary native-service trace and a POST
+  sampling profile. A successful baseline run spends 4.7 seconds between server
+  request receipt and response-send admission, near the client transfer cap. The
+  sampled interpreter work is dominated by aggregate array-budget accounting.
+- **Implementation:** replace expanded per-child traversal buffers with borrowed
+  sibling iterators, preserving ordering, logical quota counts, per-instruction
+  enforcement and GC behavior. Remove trace instrumentation from runtime source;
+  retain the diagnostic patch and evidence separately for reproduction.
+- **Validation/outcome:** all 44 focused tests pass. Build the mapped apps once and
+  alternate baseline/candidate runners on identical inputs. Successful candidate
+  client execution takes 5.6–7.1 seconds versus baseline 16.0–18.2 seconds, with
+  identical managed counts and zero final live objects. Each runner also times out
+  once in three runs; no improved pass-rate or completed timeout-fix claim is made.
+  See the [cost investigation](experiments/http-json/array-budget-cost.md).
+- **Open:** capture an optimized-run failure at the native-operation boundary before
+  choosing deadline or scheduling changes. The unresolved-call compiler defect and
+  packaged release qualification remain separate. No full suite or website build.
+
 ## 2026-09-26 — Issue investigation and neoCLR fix priorities
 
 - **Author:** requests investigation of the neoCLR and Raven GitHub issue lists,

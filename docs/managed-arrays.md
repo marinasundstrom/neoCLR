@@ -121,6 +121,13 @@ These are payload budgets, not exact process-memory limits; metadata, host alloc
 overhead and transient instruction copies are not fully represented. Scanning and
 copying are intentionally simple preview implementations.
 
+The [2026-09-26 HTTP cost investigation](experiments/http-json/array-budget-cost.md)
+replaces the budget walker's per-child work list with borrowed sibling iterators.
+This avoids traversal allocations for leaves and flat array roots while retaining
+the same logical counts, traversal order and instruction-boundary checks. Nested
+branching payloads still use an iterative stack. It is an internal cost reduction,
+not a different quota or a claim that the HTTP timeout investigation is complete.
+
 Existing GC object statistics include heap arrays as allocations; they do not
 report array payload bytes. Host invocation does not yet accept array input schemas.
 The JSON format remains 5 with additive Array type and array opcode variants.

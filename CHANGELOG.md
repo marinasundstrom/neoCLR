@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-26
 
+- Reduce temporary host allocation in array-payload quota scans by walking borrowed
+  sibling iterators instead of expanding every child into a work list. Preserve
+  quota accounting, iterative deep traversal, GC pressure checks and deadlines.
+  All 44 focused quota/array tests pass. Record the native-call trace, POST profile
+  and identical-input HTTP comparison: successful candidate client runs take
+  5.6–7.1 seconds versus baseline 16.0–18.2 seconds, with unchanged managed counts.
+  Both runtimes also time out once in three runs; this is a cost reduction, not a
+  completed timeout fix. Full suite and website build were not run.
+
 - Add serial `--repeat` runs to the HTTP/JSON verifier, building inputs once and
   stopping on the first failure without changing deadlines or GC checks. Record
   the updated-toolchain managed-pair timeout, two successful independent client runs,

@@ -1,0 +1,215 @@
+{
+  "baseline": "181cb214 plus io-trace.patch",
+  "clock": "milliseconds relative to first event, from host SystemTime; diagnostic only",
+  "traces": {
+    "server": [
+      {
+        "elapsed_ms": 0,
+        "operation": "neoCLR.Runtime.SocketListen",
+        "result": "id:1"
+      },
+      {
+        "elapsed_ms": 1,
+        "operation": "neoCLR.Runtime.SocketLocalPort",
+        "result": "count:54242"
+      },
+      {
+        "elapsed_ms": 18,
+        "operation": "neoCLR.Runtime.SocketAccept",
+        "result": "id:2"
+      },
+      {
+        "elapsed_ms": 3611,
+        "operation": "neoCLR.Runtime.SocketConnectResult",
+        "result": "id:3"
+      },
+      {
+        "elapsed_ms": 3621,
+        "operation": "neoCLR.Runtime.SocketDeadlineAfter",
+        "result": "id:15000"
+      },
+      {
+        "elapsed_ms": 3625,
+        "operation": "neoCLR.Runtime.SocketReceiveUntil",
+        "result": "id:4"
+      },
+      {
+        "elapsed_ms": 3694,
+        "operation": "neoCLR.Runtime.SocketTransferResult",
+        "result": "count:66"
+      },
+      {
+        "elapsed_ms": 5490,
+        "operation": "neoCLR.Runtime.SocketDeadlineAfter",
+        "result": "id:16869"
+      },
+      {
+        "elapsed_ms": 5651,
+        "operation": "neoCLR.Runtime.SocketSendUntil",
+        "result": "id:5"
+      },
+      {
+        "elapsed_ms": 5669,
+        "operation": "neoCLR.Runtime.SocketTransferResult",
+        "result": "count:124"
+      },
+      {
+        "elapsed_ms": 5689,
+        "operation": "neoCLR.Runtime.SocketClose",
+        "result": "value"
+      },
+      {
+        "elapsed_ms": 5719,
+        "operation": "neoCLR.Runtime.SocketAccept",
+        "result": "id:6"
+      },
+      {
+        "elapsed_ms": 10141,
+        "operation": "neoCLR.Runtime.SocketConnectResult",
+        "result": "id:7"
+      },
+      {
+        "elapsed_ms": 10157,
+        "operation": "neoCLR.Runtime.SocketDeadlineAfter",
+        "result": "id:21536"
+      },
+      {
+        "elapsed_ms": 10164,
+        "operation": "neoCLR.Runtime.SocketReceiveUntil",
+        "result": "id:8"
+      },
+      {
+        "elapsed_ms": 10310,
+        "operation": "neoCLR.Runtime.SocketTransferResult",
+        "result": "count:154"
+      },
+      {
+        "elapsed_ms": 14771,
+        "operation": "neoCLR.Runtime.SocketDeadlineAfter",
+        "result": "id:26150"
+      },
+      {
+        "elapsed_ms": 14997,
+        "operation": "neoCLR.Runtime.SocketSendUntil",
+        "result": "id:9"
+      },
+      {
+        "elapsed_ms": 15017,
+        "operation": "neoCLR.Runtime.SocketTransferResult",
+        "result": "count:120"
+      },
+      {
+        "elapsed_ms": 15051,
+        "operation": "neoCLR.Runtime.SocketClose",
+        "result": "value"
+      },
+      {
+        "elapsed_ms": 15089,
+        "operation": "neoCLR.Runtime.SocketClose",
+        "result": "value"
+      }
+    ],
+    "client": [
+      {
+        "elapsed_ms": 3459,
+        "operation": "neoCLR.Runtime.SocketDeadlineAfter",
+        "result": "id:15001"
+      },
+      {
+        "elapsed_ms": 3465,
+        "operation": "neoCLR.Runtime.DnsLookupUntil",
+        "result": "id:1"
+      },
+      {
+        "elapsed_ms": 3497,
+        "operation": "neoCLR.Runtime.DnsResult",
+        "result": "value"
+      },
+      {
+        "elapsed_ms": 3604,
+        "operation": "neoCLR.Runtime.SocketConnectAddressesUntil",
+        "result": "id:1"
+      },
+      {
+        "elapsed_ms": 3612,
+        "operation": "neoCLR.Runtime.SocketConnectResult",
+        "result": "id:2"
+      },
+      {
+        "elapsed_ms": 3682,
+        "operation": "neoCLR.Runtime.SocketSendUntil",
+        "result": "id:3"
+      },
+      {
+        "elapsed_ms": 3689,
+        "operation": "neoCLR.Runtime.SocketTransferResult",
+        "result": "count:66"
+      },
+      {
+        "elapsed_ms": 3709,
+        "operation": "neoCLR.Runtime.SocketReceiveUntil",
+        "result": "id:4"
+      },
+      {
+        "elapsed_ms": 5675,
+        "operation": "neoCLR.Runtime.SocketTransferResult",
+        "result": "count:124"
+      },
+      {
+        "elapsed_ms": 7580,
+        "operation": "neoCLR.Runtime.SocketClose",
+        "result": "value"
+      },
+      {
+        "elapsed_ms": 9945,
+        "operation": "neoCLR.Runtime.SocketDeadlineAfter",
+        "result": "id:21486"
+      },
+      {
+        "elapsed_ms": 9949,
+        "operation": "neoCLR.Runtime.DnsLookupUntil",
+        "result": "id:2"
+      },
+      {
+        "elapsed_ms": 9973,
+        "operation": "neoCLR.Runtime.DnsResult",
+        "result": "value"
+      },
+      {
+        "elapsed_ms": 10134,
+        "operation": "neoCLR.Runtime.SocketConnectAddressesUntil",
+        "result": "id:5"
+      },
+      {
+        "elapsed_ms": 10142,
+        "operation": "neoCLR.Runtime.SocketConnectResult",
+        "result": "id:6"
+      },
+      {
+        "elapsed_ms": 10292,
+        "operation": "neoCLR.Runtime.SocketSendUntil",
+        "result": "id:7"
+      },
+      {
+        "elapsed_ms": 10300,
+        "operation": "neoCLR.Runtime.SocketTransferResult",
+        "result": "count:154"
+      },
+      {
+        "elapsed_ms": 10324,
+        "operation": "neoCLR.Runtime.SocketReceiveUntil",
+        "result": "id:8"
+      },
+      {
+        "elapsed_ms": 15018,
+        "operation": "neoCLR.Runtime.SocketTransferResult",
+        "result": "count:120"
+      },
+      {
+        "elapsed_ms": 16969,
+        "operation": "neoCLR.Runtime.SocketClose",
+        "result": "value"
+      }
+    ]
+  }
+}

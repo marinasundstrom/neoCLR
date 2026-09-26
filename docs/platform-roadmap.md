@@ -37,6 +37,15 @@ The same bundle still accepts `missing()` and emits an empty body. Keep that
 compiler defect and per-operation timeout diagnosis as distinct remaining tasks;
 do not repeat the completed generic-helper implementation.
 
+**Measured runtime follow-up:** [array-budget traversal](experiments/http-json/array-budget-cost.md)
+is now allocation-light for leaf/flat payloads, preserving quota enforcement and
+deadlines. In the same-input alternating comparison, successful candidate client
+runs take 5.6–7.1 seconds versus baseline 16.0–18.2 seconds. Both variants also time
+out once in three runs, so repeatability remains open. All 44 focused quota/array
+checks pass; successful HTTP runs keep identical managed counts and zero final
+live objects. Next trace a candidate failure before selecting any timeout-policy
+or scheduler change. No release-readiness claim follows from the cost reduction.
+
 ## Issue-driven priorities — 2026-09-26
 
 The author requests investigation of both repositories' issues, clarifies **the focus

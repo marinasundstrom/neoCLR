@@ -36,6 +36,12 @@ failure on the updated bundle. Independent client repeats pass. This is fresh
 validation beyond the original read-only inventory; the original compiler blocker
 and remaining diagnostic defect must not be conflated.
 
+The [array-budget cost follow-up](experiments/http-json/array-budget-cost.md) reduces
+temporary host allocation in the per-instruction quota scan. It improves successful
+run timings, but baseline and candidate each pass only two of three comparisons.
+Keep timeout localization on the active application track; do not close it based
+on the optimization or promote further library expansion as if M1 were complete.
+
 ## First: compiler correctness and a repeatable application
 
 The most urgent reported defects are documented locally but are not represented by

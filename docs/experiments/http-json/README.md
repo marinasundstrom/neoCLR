@@ -52,6 +52,11 @@ one are rejected before building. See the [2026-09-26 follow-up](repeatability-2
 for evidence on the generic-helper variant; repeated independent-peer success is
 not equivalent to repeated managed-pair success.
 
+The [array-budget cost investigation](array-budget-cost.md) adds a comparison driver
+that builds once and alternates baseline/candidate runtimes on identical inputs.
+It retains each failed observation and returns failure if any run fails. Its
+measured runtime improvement does not establish repeatability under load.
+
 Compared with .NET System.Text.Json + HttpClient, this POC keeps DOM access and
 recoverable errors explicit and demonstrates separate HTTP/JSON error causes.
 It does not add a framework-style JSON endpoint binder or claim equivalent scope.

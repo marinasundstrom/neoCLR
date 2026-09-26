@@ -8,8 +8,20 @@ pub(crate) struct Usage {
 }
 
 pub(crate) fn measure(value: &Value, usage: &mut Usage, limits: &Limits) -> Result<(), Fault> {
-    let mut pending = vec![(value, false)];
-    while let Some((value, inside)) = pending.pop() {
+    // Walk borrowed sibling iterators rather than copying every child onto a
+    // work list. Leaf values and flat arrays need no traversal allocation.
+    let mut pending = Vec::new();
+    let mut current = std::slice::from_ref(value).iter().rev();
+    let mut inside = false;
+    loop {
+        let Some(value) = current.next() else {
+            let Some((siblings, parent_inside)) = pending.pop() else {
+                break;
+            };
+            current = siblings;
+            inside = parent_inside;
+            continue;
+        };
         if inside {
             usage.bytes = usage.bytes.saturating_add(std::mem::size_of::<Value>());
             // Quotas charge logical text per occurrence, even when owners are shared.
@@ -20,20 +32,31 @@ pub(crate) fn measure(value: &Value, usage: &mut Usage, limits: &Limits) -> Resu
             };
             usage.bytes = usage.bytes.saturating_add(bytes);
         }
-        match value {
+        let children = match value {
             Value::Array { elements, .. } => {
                 usage.elements = usage.elements.saturating_add(elements.len());
-                pending.extend(elements.iter().map(|v| (v, true)));
+                Some((elements.as_slice(), true))
             }
-            Value::Object { fields, .. } => pending.extend(fields.iter().map(|v| (v, inside))),
-            Value::Erased(v) => pending.push((v, inside)),
-            _ => (),
-        }
+            Value::Object { fields, .. } => Some((fields.as_slice(), inside)),
+            Value::Erased(v) => Some((std::slice::from_ref(v.as_ref()), inside)),
+            _ => None,
+        };
         if usage.elements > limits.array_elements || usage.bytes > limits.array_bytes {
             return Err(Fault::coded(
                 crate::FaultCode::ArrayLimitExceeded,
                 "array payload budget exceeded",
             ));
+        }
+        if let Some((children, child_inside)) = children {
+            if !children.is_empty() {
+                // No need to retain a parent with no remaining siblings. This
+                // also keeps single-child chains iterative without a work list.
+                if current.len() != 0 {
+                    pending.push((current, inside));
+                }
+                current = children.iter().rev();
+                inside = child_inside;
+            }
         }
     }
     Ok(())
@@ -138,4 +161,102 @@ pub(crate) fn check_cast(source: &Type, target: &Type) -> Result<(), Fault> {
         ));
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn nested_payload() -> Value {
+        let text: crate::StringValue = "Café".into();
+        Value::Object {
+            ty: Type::from_name("Container"),
+            fields: vec![
+                // Text outside an array does not count toward its payload budget.
+                Value::String("outside".into()),
+                Value::Array {
+                    element: Type::Value,
+                    elements: vec![
+                        Value::String(text.clone()),
+                        Value::String(text),
+                        Value::Object {
+                            ty: Type::from_name("Nested"),
+                            fields: vec![
+                                Value::Char("e\u{301}".into()),
+                                Value::Array {
+                                    element: Type::Byte,
+                                    elements: vec![Value::Byte(1), Value::Byte(2)],
+                                },
+                            ],
+                        },
+                        Value::Erased(Box::new(Value::String("x".into()))),
+                    ],
+                },
+                Value::Array {
+                    element: Type::Byte,
+                    elements: vec![],
+                },
+            ],
+        }
+    }
+
+    #[test]
+    fn nested_array_budget_counts_wrappers_and_shared_text_per_occurrence() {
+        // Six array elements; nine Value payloads including the nested object,
+        // array and erasure wrappers; 5 + 5 + 3 + 1 UTF-8 bytes.
+        let bytes = 9 * std::mem::size_of::<Value>() + 14;
+        let limits = Limits {
+            array_elements: 6,
+            array_bytes: bytes,
+            ..Limits::default()
+        };
+        let mut usage = Usage::default();
+        measure(&nested_payload(), &mut usage, &limits).unwrap();
+        assert_eq!((usage.elements, usage.bytes), (6, bytes));
+        for reduced in [
+            Limits {
+                array_elements: 5,
+                ..limits
+            },
+            Limits {
+                array_bytes: bytes - 1,
+                ..limits
+            },
+        ] {
+            let error = measure(&nested_payload(), &mut Usage::default(), &reduced).unwrap_err();
+            assert_eq!(error.code, crate::FaultCode::ArrayLimitExceeded);
+        }
+    }
+
+    #[test]
+    fn array_budget_accumulates_across_roots_and_keeps_outer_text_free() {
+        let mut usage = Usage::default();
+        let limits = Limits::default();
+        measure(&nested_payload(), &mut usage, &limits).unwrap();
+        measure(&nested_payload(), &mut usage, &limits).unwrap();
+        measure(&Value::String("outside".into()), &mut usage, &limits).unwrap();
+        assert_eq!(usage.elements, 12);
+        assert_eq!(usage.bytes, 2 * (9 * std::mem::size_of::<Value>() + 14));
+    }
+
+    #[test]
+    fn deeply_erased_array_measurement_stays_iterative() {
+        let mut value = Value::Array {
+            element: Type::Byte,
+            elements: vec![Value::Byte(42)],
+        };
+        for _ in 0..4096 {
+            value = Value::Erased(Box::new(value));
+        }
+        let mut usage = Usage::default();
+        measure(&value, &mut usage, &Limits::default()).unwrap();
+        assert_eq!(
+            (usage.elements, usage.bytes),
+            (1, std::mem::size_of::<Value>())
+        );
+        // Avoid recursive destruction of the deliberately deep host fixture.
+        while let Value::Erased(inner) = value {
+            value = *inner;
+        }
+    }
 }

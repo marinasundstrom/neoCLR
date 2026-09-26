@@ -1,0 +1,42 @@
+diff --git a/src/vm.rs b/src/vm.rs
+index 5a39a400..de201ba9 100644
+--- a/src/vm.rs
++++ b/src/vm.rs
+@@ -1565,6 +1565,11 @@ fn interpret_instructions(
+     output: &mut Vec<String>,
+     console_bytes: &mut [Vec<u8>; 2],
+ ) -> Result<Value, Fault> {
++    // TEMPORARY_HTTP_DIAGNOSTIC_START
++    let mut io_trace = std::env::var_os("NEOCLR_IO_TRACE_DIR").and_then(|dir| {
++        std::fs::File::create(std::path::PathBuf::from(dir).join(format!("{}.log", std::process::id()))).ok()
++    });
++    // TEMPORARY_HTTP_DIAGNOSTIC_END
+     let limits = options.limits;
+     let mut collection_threshold = limits.heap_objects.min(64);
+     let mut arrays_used = false;
+@@ -2851,6 +2856,25 @@ fn interpret_instructions(
+                                 options,
+                             )?
+                         };
++                        // TEMPORARY_HTTP_DIAGNOSTIC_START
++                        if matches!(binding, crate::native::Binding::Resolve(_) | crate::native::Binding::Socket(_))
++                            && !matches!(binding, crate::native::Binding::Socket(crate::socket_io::Operation::DeadlineExpired))
++                        {
++                            if let Some(trace) = &mut io_trace {
++                                use std::io::Write;
++                                let result = match &value { Value::Erased(inner) => inner.as_ref(), other => other };
++                                let summary = match result {
++                                    Value::Int64(n) => format!("id:{n}"),
++                                    Value::Int32(n) => format!("count:{n}"),
++                                    Value::Byte(n) => format!("error:{n}"),
++                                    Value::Boolean(n) => format!("bool:{n}"),
++                                    _ => "value".to_owned(),
++                                };
++                                let millis = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_millis();
++                                let _ = writeln!(trace, "{} {} {}", millis, callee.name, summary);
++                            }
++                        }
++                        // TEMPORARY_HTTP_DIAGNOSTIC_END
+                         if options.console.is_none()
+                             && matches!(
+                                 binding,
