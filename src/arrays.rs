@@ -1,10 +1,28 @@
 //! Owned managed-array payloads, independent of the native System.Array<T> descriptor.
 use crate::{Fault, Limits, Value, metadata::Type};
 
-#[derive(Default)]
+#[derive(Clone, Copy, Debug, Default)]
 pub(crate) struct Usage {
     elements: usize,
     bytes: usize,
+}
+
+impl Usage {
+    pub(crate) fn add(&mut self, other: Self, limits: &Limits) -> Result<(), Fault> {
+        self.elements = self.elements.saturating_add(other.elements);
+        self.bytes = self.bytes.saturating_add(other.bytes);
+        self.check(limits)
+    }
+
+    fn check(&self, limits: &Limits) -> Result<(), Fault> {
+        if self.elements > limits.array_elements || self.bytes > limits.array_bytes {
+            return Err(Fault::coded(
+                crate::FaultCode::ArrayLimitExceeded,
+                "array payload budget exceeded",
+            ));
+        }
+        Ok(())
+    }
 }
 
 pub(crate) fn measure(value: &Value, usage: &mut Usage, limits: &Limits) -> Result<(), Fault> {
@@ -41,12 +59,7 @@ pub(crate) fn measure(value: &Value, usage: &mut Usage, limits: &Limits) -> Resu
             Value::Erased(v) => Some((std::slice::from_ref(v.as_ref()), inside)),
             _ => None,
         };
-        if usage.elements > limits.array_elements || usage.bytes > limits.array_bytes {
-            return Err(Fault::coded(
-                crate::FaultCode::ArrayLimitExceeded,
-                "array payload budget exceeded",
-            ));
-        }
+        usage.check(limits)?;
         if let Some((children, child_inside)) = children {
             if !children.is_empty() {
                 // No need to retain a parent with no remaining siblings. This

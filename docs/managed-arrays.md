@@ -115,11 +115,11 @@ and [Neo tests](../tests/neo_arrays.rs) exercise copying, provenance and failure
 `Limits.array_elements` (65,536 by default) and `Limits.array_bytes` (16 MiB)
 bound aggregate logical payload across frame slots, evaluation stacks and managed
 heap objects, including owned copies and nested payloads. Initializer multiplication
-is checked before allocation. The interpreter scans payloads at instruction
+is checked before allocation. The interpreter checks aggregate payload at instruction
 boundaries and collects unreachable heap arrays before rejecting aggregate pressure.
 These are payload budgets, not exact process-memory limits; metadata, host allocator
-overhead and transient instruction copies are not fully represented. Scanning and
-copying are intentionally simple preview implementations.
+overhead and transient instruction copies are not fully represented. Accounting and
+copying remain preview implementations.
 
 The [2026-09-26 HTTP cost investigation](experiments/http-json/array-budget-cost.md)
 replaces the budget walker's per-child work list with borrowed sibling iterators.
@@ -127,6 +127,13 @@ This avoids traversal allocations for leaves and flat array roots while retainin
 the same logical counts, traversal order and instruction-boundary checks. Nested
 branching payloads still use an iterative stack. It is an internal cost reduction,
 not a different quota or a claim that the HTTP timeout investigation is complete.
+
+A [subsequent optimization](experiments/http-json/slot-budget-summary.md) caches
+complete payload counts per storage slot, clearing them on each successful whole
+or interior write and reset. Every instruction still sums slots against current
+limits and scans evaluation stacks; failed stores, aliases and collection preserve
+the quota contract. The numeric cache holds no GC roots. It adds per-slot metadata
+and an invalidation obligation for future mutation paths, outside payload quotas.
 
 Existing GC object statistics include heap arrays as allocations; they do not
 report array payload bytes. Host invocation does not yet accept array input schemas.

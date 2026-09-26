@@ -1,5 +1,5 @@
 diff --git a/src/vm.rs b/src/vm.rs
-index 5a39a400..de201ba9 100644
+index 5a39a400..37965bfd 100644
 --- a/src/vm.rs
 +++ b/src/vm.rs
 @@ -1565,6 +1565,11 @@ fn interpret_instructions(
@@ -20,7 +20,7 @@ index 5a39a400..de201ba9 100644
                          };
 +                        // TEMPORARY_HTTP_DIAGNOSTIC_START
 +                        if matches!(binding, crate::native::Binding::Resolve(_) | crate::native::Binding::Socket(_))
-+                            && !matches!(binding, crate::native::Binding::Socket(crate::socket_io::Operation::DeadlineExpired))
++                            && !(matches!(binding, crate::native::Binding::Socket(crate::socket_io::Operation::DeadlineExpired)) && matches!(value, Value::Boolean(false)))
 +                        {
 +                            if let Some(trace) = &mut io_trace {
 +                                use std::io::Write;

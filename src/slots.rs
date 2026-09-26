@@ -12,6 +12,9 @@ use std::{
 pub(crate) struct Slot {
     ty: Type,
     value: Option<Value>,
+    // Invalidate on every successful value mutation, including interior aliases.
+    // Numeric summaries contain no references and never cache quota permission.
+    array_usage: std::cell::Cell<Option<crate::arrays::Usage>>,
     writes: u64,
     construction: Option<Vec<Type>>,
     replacements: HashMap<Vec<usize>, u64>,
@@ -23,6 +26,7 @@ impl Slot {
         Rc::new(RefCell::new(Self {
             ty,
             value,
+            array_usage: std::cell::Cell::new(None),
             writes: 0,
             construction: None,
             replacements: HashMap::new(),
@@ -77,6 +81,7 @@ impl Slot {
         }
         let mut slot = cell.borrow_mut();
         slot.value = None;
+        slot.array_usage.set(None);
         slot.replacements.clear();
         Ok(())
     }
@@ -90,10 +95,19 @@ impl Slot {
         usage: &mut crate::arrays::Usage,
         limits: &crate::Limits,
     ) -> Result<(), Fault> {
-        if let Some(value) = &self.value {
-            crate::arrays::measure(value, usage, limits)?;
-        }
-        Ok(())
+        let measured = if let Some(measured) = self.array_usage.get() {
+            measured
+        } else {
+            let mut measured = crate::arrays::Usage::default();
+            if let Some(value) = &self.value {
+                // Only successful, complete measurements are reusable. Counts
+                // are independent of limits, but failures must never be cached.
+                crate::arrays::measure(value, &mut measured, limits)?;
+            }
+            self.array_usage.set(Some(measured));
+            measured
+        };
+        usage.add(measured, limits)
     }
     pub(crate) fn inspect_type(&self) -> &Type {
         &self.ty
@@ -116,6 +130,7 @@ impl Slot {
             .checked_add(1)
             .ok_or_else(|| Fault::new("slot write counter exhausted"))?;
         self.value = Some(value);
+        self.array_usage.set(None);
         self.replacements.clear();
         self.replacements.insert(vec![], self.writes);
         Ok(())
@@ -535,6 +550,7 @@ impl SlotReference {
         }
         crate::arrays::check_replacement(field, &value)?;
         *field = value;
+        slot.array_usage.set(None);
         slot.writes = next_write;
         slot.replacements
             .retain(|path, _| !path.starts_with(&self.path));
@@ -573,6 +589,141 @@ pub(crate) fn contains(ty: &Type) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn text_array(text: &str) -> Value {
+        Value::Array {
+            element: Type::String,
+            elements: vec![Value::String(text.into())],
+        }
+    }
+
+    fn budget(cell: &Cell, elements: usize, bytes: usize) -> Result<(), Fault> {
+        cell.borrow().array_usage(
+            &mut crate::arrays::Usage::default(),
+            &crate::Limits {
+                array_elements: elements,
+                array_bytes: bytes,
+                ..Default::default()
+            },
+        )
+    }
+
+    #[test]
+    fn payload_summary_tracks_replacement_failed_stores_and_reset() {
+        let size = std::mem::size_of::<Value>();
+        let cell = Slot::new(Type::Array(Box::new(Type::String)), Some(text_array("a")));
+        budget(&cell, 1, size + 1).unwrap();
+        cell.borrow_mut().set(text_array("longer")).unwrap();
+        assert_eq!(
+            budget(&cell, 1, size + 1).unwrap_err().code,
+            crate::FaultCode::ArrayLimitExceeded
+        );
+        budget(&cell, 1, size + 6).unwrap();
+        assert!(cell.borrow_mut().set(Value::Int32(0)).is_err());
+        assert!(budget(&cell, 1, size + 1).is_err());
+        budget(&cell, 1, size + 6).unwrap();
+        Slot::reset(&cell).unwrap();
+        budget(&cell, 0, 0).unwrap();
+        cell.borrow_mut().set(text_array("x")).unwrap();
+        assert!(budget(&cell, 0, 0).is_err());
+        budget(&cell, 1, size + 1).unwrap();
+    }
+
+    #[test]
+    fn payload_summary_tracks_aliased_element_and_nested_field_writes() {
+        let size = std::mem::size_of::<Value>();
+        let array_type = Type::Array(Box::new(Type::String));
+        let owner = Type::from_name("Container");
+        let cell = Slot::new(
+            owner.clone(),
+            Some(Value::Object {
+                ty: owner,
+                fields: vec![text_array("a")],
+            }),
+        );
+        let field = SlotReference::new(&cell).field(0, array_type).unwrap();
+        let element = field.element(0, &Type::String).unwrap();
+        let alias = element.clone();
+        budget(&cell, 1, size + 1).unwrap();
+        alias.write(Value::String("Café".into())).unwrap();
+        assert!(budget(&cell, 1, size + 1).is_err());
+        budget(&cell, 1, size + 5).unwrap();
+        assert!(element.write(Value::Int32(0)).is_err());
+        budget(&cell, 1, size + 5).unwrap();
+        field.write(text_array("z")).unwrap();
+        budget(&cell, 1, size + 1).unwrap();
+    }
+
+    #[test]
+    fn payload_summary_rechecks_limits_and_accumulates_all_roots() {
+        let size = std::mem::size_of::<Value>();
+        let cell = Slot::new(Type::Array(Box::new(Type::String)), Some(text_array("abc")));
+        // An initial failed measurement must not publish incomplete counts.
+        assert!(budget(&cell, 0, 0).is_err());
+        budget(&cell, 1, size + 3).unwrap();
+        // A successful cache fill must not remember permission from a larger limit.
+        assert!(budget(&cell, 1, size + 2).is_err());
+        let limits = crate::Limits {
+            array_elements: 1,
+            ..Default::default()
+        };
+        let mut usage = crate::arrays::Usage::default();
+        cell.borrow().array_usage(&mut usage, &limits).unwrap();
+        assert_eq!(
+            cell.borrow()
+                .array_usage(&mut usage, &limits)
+                .unwrap_err()
+                .code,
+            crate::FaultCode::ArrayLimitExceeded
+        );
+    }
+
+    #[test]
+    fn heap_payload_summary_tracks_native_style_replacement_and_does_not_root_storage() {
+        let size = std::mem::size_of::<Value>();
+        let mut heap = crate::ManagedHeap::default();
+        let id = heap.allocate(text_array("a")).unwrap();
+        let address = heap.address(id).unwrap();
+        let limits = crate::Limits {
+            array_elements: 1,
+            array_bytes: size + 1,
+            ..Default::default()
+        };
+        heap.array_usage(&mut crate::arrays::Usage::default(), &limits)
+            .unwrap();
+        // Native receive replaces the whole destination array through this path.
+        address.write(text_array("abc")).unwrap();
+        assert!(
+            heap.array_usage(&mut crate::arrays::Usage::default(), &limits)
+                .is_err()
+        );
+        let limits = crate::Limits {
+            array_bytes: size + 3,
+            ..limits
+        };
+        heap.array_usage(&mut crate::arrays::Usage::default(), &limits)
+            .unwrap();
+        address
+            .element(0, &Type::String)
+            .unwrap()
+            .write(Value::String("longer".into()))
+            .unwrap();
+        assert!(
+            heap.array_usage(&mut crate::arrays::Usage::default(), &limits)
+                .is_err()
+        );
+        heap.collect(vec![], crate::CollectionReason::AllocationPressure)
+            .unwrap();
+        let limits = crate::Limits {
+            array_elements: 0,
+            array_bytes: 0,
+            ..limits
+        };
+        heap.array_usage(&mut crate::arrays::Usage::default(), &limits)
+            .unwrap();
+        assert_eq!(heap.len(), 0);
+        assert!(address.read().is_err());
+    }
+
     #[test]
     fn references_retain_storage_and_failed_stores_do_not_fulfill_outputs() {
         let cell = Slot::new(Type::Int32, Some(Value::Int32(7)));

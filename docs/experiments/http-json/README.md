@@ -117,3 +117,7 @@ flow: fetch a report, then submit it and read the acknowledgement. Both the neoC
 pair and independent Python peer checks pass; see the
 [mapped sample evidence](../json-object-mapping/README.md#generic-json-verbs--2026-09-26).
 Its server request count is two, while the default DOM pair still uses one.
+
+The [slot-summary follow-up](slot-budget-summary.md) reduces remaining quota-scan
+cost while retaining instruction-boundary enforcement; it records focused mutation
+and GC checks plus a new comparison against the allocation-light walker.

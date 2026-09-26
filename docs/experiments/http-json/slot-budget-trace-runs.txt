@@ -1,0 +1,16 @@
+Iteration 1/5: pair
+JSON client: {'assembly_ms': 2562, 'load_ms': 1326, 'verify_ms': 413, 'run_ms': 6266, 'allocated': 761, 'live': 0, 'peak': 170, 'collections': 13, 'reclaimed': 761}
+JSON server: {'assembly_ms': 1952, 'load_ms': 1071, 'verify_ms': 498, 'run_ms': 9716, 'allocated': 626, 'live': 0, 'peak': 168, 'collections': 11, 'reclaimed': 626}
+Iteration 2/5: pair
+JSON client: {'assembly_ms': 1494, 'load_ms': 1514, 'verify_ms': 574, 'run_ms': 7634, 'allocated': 761, 'live': 0, 'peak': 170, 'collections': 13, 'reclaimed': 761}
+JSON server: {'assembly_ms': 1572, 'load_ms': 880, 'verify_ms': 414, 'run_ms': 9883, 'allocated': 626, 'live': 0, 'peak': 168, 'collections': 11, 'reclaimed': 626}
+Iteration 3/5: pair
+JSON client: {'assembly_ms': 2052, 'load_ms': 1187, 'verify_ms': 466, 'run_ms': 8368, 'allocated': 761, 'live': 0, 'peak': 170, 'collections': 13, 'reclaimed': 761}
+JSON server: {'assembly_ms': 2135, 'load_ms': 1207, 'verify_ms': 524, 'run_ms': 10932, 'allocated': 626, 'live': 0, 'peak': 168, 'collections': 11, 'reclaimed': 626}
+Iteration 4/5: pair
+JSON client: {'assembly_ms': 1948, 'load_ms': 1135, 'verify_ms': 547, 'run_ms': 8445, 'allocated': 761, 'live': 0, 'peak': 170, 'collections': 13, 'reclaimed': 761}
+JSON server: {'assembly_ms': 3796, 'load_ms': 1529, 'verify_ms': 471, 'run_ms': 11031, 'allocated': 626, 'live': 0, 'peak': 168, 'collections': 11, 'reclaimed': 626}
+Iteration 5/5: pair
+JSON client: {'assembly_ms': 1561, 'load_ms': 1162, 'verify_ms': 865, 'run_ms': 7866, 'allocated': 761, 'live': 0, 'peak': 170, 'collections': 13, 'reclaimed': 761}
+JSON server: {'assembly_ms': 1675, 'load_ms': 1039, 'verify_ms': 415, 'run_ms': 9721, 'allocated': 626, 'live': 0, 'peak': 168, 'collections': 11, 'reclaimed': 626}
+Public JSON DOM + HTTP checks passed: pair (5 iteration(s))

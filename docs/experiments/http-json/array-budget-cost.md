@@ -109,3 +109,6 @@ needed to interpret the finding are preserved here.
 
 The separate unresolved-call compiler diagnostic defect remains open. Neither this
 runtime improvement nor successful HTTP exchanges establish full SDK acceptance.
+
+A [subsequent slot-summary experiment](slot-budget-summary.md) builds on this
+walker. The no-cache description above records this first optimization only.

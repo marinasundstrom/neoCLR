@@ -43,6 +43,18 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   identical managed counts and zero final live objects. Each runner also times out
   once in three runs; no improved pass-rate or completed timeout-fix claim is made.
   See the [cost investigation](experiments/http-json/array-budget-cost.md).
+- **Continued investigation:** five traced runs with the optimized walker pass,
+  leaving the previous failure uncaptured. A further POST profile still attributes
+  472 of 689 main-thread samples to quota accounting. The assistant implements
+  per-slot numeric payload summaries with invalidation on writes/reset, retaining
+  instruction-boundary quota checks and the existing deadlines. This is a bounded
+  implementation choice, not a separately approved architecture change.
+- **Follow-up outcome:** 88 focused mutation/quota/reference/GC tests pass. Both
+  previous and summary runtimes pass three new identical-input exchanges; candidate
+  client execution is 2.3–5.2 seconds versus 5.9–8.1 seconds, with identical managed
+  counts and zero final live objects. Server timing is mixed. See the
+  [summary evidence](experiments/http-json/slot-budget-summary.md); no improved
+  pass-rate or timeout-root-cause claim is made.
 - **Open:** capture an optimized-run failure at the native-operation boundary before
   choosing deadline or scheduling changes. The unresolved-call compiler defect and
   packaged release qualification remain separate. No full suite or website build.

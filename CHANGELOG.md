@@ -15,7 +15,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and identical-input HTTP comparison: successful candidate client runs take
   5.6–7.1 seconds versus baseline 16.0–18.2 seconds, with unchanged managed counts.
   Both runtimes also time out once in three runs; this is a cost reduction, not a
-  completed timeout fix. Full suite and website build were not run.
+  completed timeout fix. Follow up with per-slot payload summaries, invalidated on
+  successful writes/reset and rechecked against current aggregate limits. All 88
+  focused quota/reference/GC checks pass. A new identical-input comparison passes
+  three exchanges per runtime: candidate client execution 2.3–5.2 seconds versus
+  the previous walker’s 5.9–8.1 seconds, with identical managed counts and zero live
+  objects. Five diagnostic runs also pass; the earlier timeout remains unexplained.
+  Numeric summaries add slot metadata but no GC roots or public API changes.
+  Full suite and website build were not run.
 
 - Add serial `--repeat` runs to the HTTP/JSON verifier, building inputs once and
   stopping on the first failure without changing deadlines or GC checks. Record

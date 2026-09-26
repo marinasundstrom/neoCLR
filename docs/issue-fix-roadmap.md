@@ -42,6 +42,13 @@ run timings, but baseline and candidate each pass only two of three comparisons.
 Keep timeout localization on the active application track; do not close it based
 on the optimization or promote further library expansion as if M1 were complete.
 
+The [slot-summary follow-up](experiments/http-json/slot-budget-summary.md) reuses
+unchanged payload counts while enforcing quotas at every instruction. All 88 focused
+checks pass; both variants pass three new identical-input exchanges, with candidate
+client execution 2.3–5.2 seconds versus 5.9–8.1 seconds for the previous walker.
+Managed counts remain identical and final live objects are zero. This improves
+observed client cost; it does not explain the prior timeout or establish M1 completion.
+
 ## First: compiler correctness and a repeatable application
 
 The most urgent reported defects are documented locally but are not represented by

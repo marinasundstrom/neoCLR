@@ -1,0 +1,183 @@
+{
+  "runner_sha256": {
+    "baseline": "92c3312d003a5009353cac7c9ef5bf9b45c123264e72b8955ca504b78c98696d",
+    "candidate": "3e2a8ab5bad0ac3fe66828342853e4faf8105503746ae95002c740c51bf1d465"
+  },
+  "heap_objects": 1024,
+  "instructions": 100000000,
+  "runs": [
+    {
+      "iteration": 1,
+      "runner": "baseline",
+      "client_exit_code": 0,
+      "client": {
+        "assembly_ms": 1457,
+        "load_ms": 785,
+        "verify_ms": 349,
+        "run_ms": 5948,
+        "allocated": 761,
+        "live": 0,
+        "peak": 170,
+        "collections": 13,
+        "reclaimed": 761
+      },
+      "server": {
+        "assembly_ms": 1335,
+        "load_ms": 824,
+        "verify_ms": 375,
+        "run_ms": 7662,
+        "allocated": 626,
+        "live": 0,
+        "peak": 168,
+        "collections": 11,
+        "reclaimed": 626
+      },
+      "outcome": "passed"
+    },
+    {
+      "iteration": 1,
+      "runner": "candidate",
+      "client_exit_code": 0,
+      "client": {
+        "assembly_ms": 1481,
+        "load_ms": 846,
+        "verify_ms": 382,
+        "run_ms": 3128,
+        "allocated": 761,
+        "live": 0,
+        "peak": 170,
+        "collections": 13,
+        "reclaimed": 761
+      },
+      "server": {
+        "assembly_ms": 1266,
+        "load_ms": 769,
+        "verify_ms": 335,
+        "run_ms": 5504,
+        "allocated": 626,
+        "live": 0,
+        "peak": 168,
+        "collections": 11,
+        "reclaimed": 626
+      },
+      "outcome": "passed"
+    },
+    {
+      "iteration": 2,
+      "runner": "candidate",
+      "client_exit_code": 0,
+      "client": {
+        "assembly_ms": 1420,
+        "load_ms": 856,
+        "verify_ms": 406,
+        "run_ms": 2260,
+        "allocated": 761,
+        "live": 0,
+        "peak": 170,
+        "collections": 13,
+        "reclaimed": 761
+      },
+      "server": {
+        "assembly_ms": 1348,
+        "load_ms": 873,
+        "verify_ms": 398,
+        "run_ms": 4613,
+        "allocated": 626,
+        "live": 0,
+        "peak": 168,
+        "collections": 11,
+        "reclaimed": 626
+      },
+      "outcome": "passed"
+    },
+    {
+      "iteration": 2,
+      "runner": "baseline",
+      "client_exit_code": 0,
+      "client": {
+        "assembly_ms": 1275,
+        "load_ms": 882,
+        "verify_ms": 580,
+        "run_ms": 7334,
+        "allocated": 761,
+        "live": 0,
+        "peak": 170,
+        "collections": 13,
+        "reclaimed": 761
+      },
+      "server": {
+        "assembly_ms": 1431,
+        "load_ms": 819,
+        "verify_ms": 339,
+        "run_ms": 8587,
+        "allocated": 626,
+        "live": 0,
+        "peak": 168,
+        "collections": 11,
+        "reclaimed": 626
+      },
+      "outcome": "passed"
+    },
+    {
+      "iteration": 3,
+      "runner": "baseline",
+      "client_exit_code": 0,
+      "client": {
+        "assembly_ms": 1502,
+        "load_ms": 956,
+        "verify_ms": 414,
+        "run_ms": 8094,
+        "allocated": 761,
+        "live": 0,
+        "peak": 170,
+        "collections": 13,
+        "reclaimed": 761
+      },
+      "server": {
+        "assembly_ms": 2029,
+        "load_ms": 1002,
+        "verify_ms": 412,
+        "run_ms": 9802,
+        "allocated": 626,
+        "live": 0,
+        "peak": 168,
+        "collections": 11,
+        "reclaimed": 626
+      },
+      "outcome": "passed"
+    },
+    {
+      "iteration": 3,
+      "runner": "candidate",
+      "client_exit_code": 0,
+      "client": {
+        "assembly_ms": 2552,
+        "load_ms": 2096,
+        "verify_ms": 953,
+        "run_ms": 5239,
+        "allocated": 761,
+        "live": 0,
+        "peak": 170,
+        "collections": 13,
+        "reclaimed": 761
+      },
+      "server": {
+        "assembly_ms": 2951,
+        "load_ms": 1462,
+        "verify_ms": 690,
+        "run_ms": 10118,
+        "allocated": 626,
+        "live": 0,
+        "peak": 168,
+        "collections": 11,
+        "reclaimed": 626
+      },
+      "outcome": "passed"
+    }
+  ],
+  "input_sha256": {
+    "Server": "116ed52e241890d6849e7314a8b6fd34edb80fe5b6b9a52fb0e41cb17ffb5043",
+    "Client": "2b61192d5bc1d891ad84a7ae86ab3a52c0aaf1d1bb79a869e81b7359f2843899",
+    "System": "92e07297f47d89d6cbeb80aa79625c94ae8fc3f1062d61cd7cc0868be6425fc6"
+  }
+}

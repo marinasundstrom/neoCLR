@@ -46,6 +46,16 @@ checks pass; successful HTTP runs keep identical managed counts and zero final
 live objects. Next trace a candidate failure before selecting any timeout-policy
 or scheduler change. No release-readiness claim follows from the cost reduction.
 
+**Slot-summary follow-up:** [unchanged storage payload counts](experiments/http-json/slot-budget-summary.md)
+are now reused, with invalidation on all successful writes/reset and current-limit
+checks at every instruction boundary. All 88 focused checks pass. In a new alternating
+comparison both runtimes pass three exchanges; candidate client execution is
+2.3–5.2 seconds versus the previous optimization's 5.9–8.1 seconds, with unchanged
+managed counts and zero final live objects. Server timing is mixed. Five diagnostic
+runs also failed to reproduce the old timeout: keep its cause and load qualification
+open, alongside the separate compiler diagnostic defect. Do not expand API scope or
+change deadlines based on these small local samples.
+
 ## Issue-driven priorities — 2026-09-26
 
 The author requests investigation of both repositories' issues, clarifies **the focus
