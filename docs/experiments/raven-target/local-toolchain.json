@@ -6,9 +6,9 @@
   "neoCLRRevision": "c135659b591536d88296a3253143cb06ca1abe36",
   "toolVersion": "0.1.12-neoclr.6",
   "dotnetSdk": "11.0.100-rc.1.26425.128",
-  "sdkPath": "/Users/robert/.raven/sdk/0.1.12-neoclr.6",
-  "extensionPath": "/Users/robert/.vscode/extensions/raven.raven-vscode-0.1.12-neoclr.6",
-  "demo": "/Users/robert/.neoclr/experiments/preview-4/demo",
+  "sdkPath": "$HOME/.raven/sdk/0.1.12-neoclr.6",
+  "extensionPath": "$HOME/.vscode/extensions/raven.raven-vscode-0.1.12-neoclr.6",
+  "demo": "$HOME/.neoclr/experiments/preview-4/demo",
   "artifactDirectory": "local/preview-4-release",
   "artifacts": {
     "neoclr-0.1.0-preview.4-osx-arm64.tar.gz": {

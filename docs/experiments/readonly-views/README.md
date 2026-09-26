@@ -36,7 +36,7 @@ array-invariance compiler option (the installed `.10` build was used):
 
 ```sh
 python3 docs/experiments/readonly-views/verify.py \
-  --bundle /Users/robert/.neoclr/experiments/array-diagnostics-20260913
+  --bundle $HOME/.neoclr/experiments/array-diagnostics-20260913
 cargo test --test readonly_view_prototype
 ```
 

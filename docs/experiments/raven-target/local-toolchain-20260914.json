@@ -5,9 +5,9 @@
   "sdkVersion": "0.1.12-neoclr.14",
   "dotnetSdk": "11.0.100-rc.1.26425.128",
   "platform": "osx-arm64",
-  "bundle": "/Users/robert/.neoclr/experiments/arrays-20260914",
-  "sdk": "/Users/robert/.raven/sdk/0.1.12-neoclr.14",
-  "extension": "/Users/robert/.vscode/extensions/raven.raven-vscode-0.1.12-neoclr.14",
+  "bundle": "$HOME/.neoclr/experiments/arrays-20260914",
+  "sdk": "$HOME/.raven/sdk/0.1.12-neoclr.14",
+  "extension": "$HOME/.vscode/extensions/raven.raven-vscode-0.1.12-neoclr.14",
   "publication": "local installation only",
   "manifestFilesVerified": 751,
   "checks": {

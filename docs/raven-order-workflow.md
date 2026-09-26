@@ -35,14 +35,14 @@ archived .7 tools still use the earlier typed-case sample. See the
 ## Try the combined workflow locally
 
 The expanded source sample runs on the installed `.8` tools. A separate project is
-prepared at `/Users/robert/.neoclr/experiments/order-workflow-20260913`; the existing
+prepared at `$HOME/.neoclr/experiments/order-workflow-20260913`; the existing
 query demo and its edits were preserved. Open it with the isolated extension:
 
 ```sh
 code --new-window \
-  --user-data-dir /Users/robert/.neoclr/vscode/queries-20260913 \
-  --extensions-dir /Users/robert/.neoclr/vscode/queries-20260913/extensions \
-  /Users/robert/.neoclr/experiments/order-workflow-20260913
+  --user-data-dir $HOME/.neoclr/vscode/queries-20260913 \
+  --extensions-dir $HOME/.neoclr/vscode/queries-20260913/extensions \
+  $HOME/.neoclr/experiments/order-workflow-20260913
 ```
 
 Save `Main.rvn`, then run **neoCLR: Run saved project** from the task menu. The report

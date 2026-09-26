@@ -8,22 +8,22 @@
   "platform": "osx-arm64",
   "artifacts": {
     "raven-sdk-0.1.12-neoclr.10-osx-arm64.tar.gz": {
-      "path": "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/raven-sdk-0.1.12-neoclr.10-osx-arm64.tar.gz",
+      "path": "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/raven-sdk-0.1.12-neoclr.10-osx-arm64.tar.gz",
       "sha256": "2d9b0dea595f4d54ba45ee0446d4609ca0a38a082a9a1a25c57eae1af98e14fc",
       "bytes": 30945864
     },
     "raven-vscode.vsix": {
-      "path": "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/raven-vscode.vsix",
+      "path": "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/raven-vscode.vsix",
       "sha256": "13bbb96ee862b6190f1623fcc9811662373972cd6b01f88daa2233b8c28690dc",
       "bytes": 10251004
     },
     "neoclr-array-diagnostics-poc-20260913-osx-arm64.tar.gz": {
-      "path": "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/neoclr-array-diagnostics-poc-20260913-osx-arm64.tar.gz",
+      "path": "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/neoclr-array-diagnostics-poc-20260913-osx-arm64.tar.gz",
       "sha256": "a1f03b91ce50759027c9e51eadec4d218a11cdafee1d02873be1014b7e4576c6",
       "bytes": 22956733
     },
     "bundle/manifest.json": {
-      "path": "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/bundle/manifest.json",
+      "path": "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/bundle/manifest.json",
       "sha256": "195ecf58bfb8e6c2d492256b06d5a46c324d3c13630a5697df581db5197379fe",
       "bytes": 83821
     }
@@ -36,14 +36,14 @@
         "seconds": 78.91,
         "command": [
           "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/verify_project.py",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/verify_project.py",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
           "--bridge",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
           "--system",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/lib/System.neoil",
           "--runtime",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/bin/neoclr",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/bin/neoclr",
           "--collections"
         ],
         "checks": 57
@@ -53,14 +53,14 @@
         "seconds": 40.06,
         "command": [
           "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/verify_queries.py",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/verify_queries.py",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
           "--bridge",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
           "--system",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/lib/System.neoil",
           "--runtime",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/bin/neoclr"
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/bin/neoclr"
         ],
         "checks": 28
       },
@@ -69,14 +69,14 @@
         "seconds": 16.86,
         "command": [
           "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/verify_application.py",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/verify_application.py",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
           "--bridge",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
           "--system",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/lib/System.neoil",
           "--runtime",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/bin/neoclr"
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/bin/neoclr"
         ]
       },
       "orders": {
@@ -84,14 +84,14 @@
         "seconds": 5.7,
         "command": [
           "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/verify_orders.py",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/verify_orders.py",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
           "--bridge",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
           "--system",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/lib/System.neoil",
           "--runtime",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/bin/neoclr"
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/bin/neoclr"
         ]
       },
       "neoil": {
@@ -99,13 +99,13 @@
         "seconds": 0.61,
         "command": [
           "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/verify_neoil.py",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/verify_neoil.py",
           "--samples",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/samples/neoil",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/samples/neoil",
           "--system",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/lib/System.neoil",
           "--runtime",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/bin/neoclr"
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/bin/neoclr"
         ]
       },
       "editor": {
@@ -113,8 +113,8 @@
         "seconds": 6.56,
         "command": [
           "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/verify_editor.py",
-          "/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/demo",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/tools/verify_editor.py",
+          "$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913/validation-bundle/demo",
           "--collections",
           "--booleans",
           "--reflection",
@@ -138,9 +138,9 @@
     "bundleDependencyNotices": "23 NuGet dependencies covered; all 31 package notice sets verified"
   },
   "installation": {
-    "sdk": "/Users/robert/.raven/sdk/0.1.12-neoclr.10",
-    "bundle": "/Users/robert/.neoclr/experiments/array-diagnostics-20260913",
-    "profile": "/Users/robert/.neoclr/vscode/array-diagnostics-20260913",
+    "sdk": "$HOME/.raven/sdk/0.1.12-neoclr.10",
+    "bundle": "$HOME/.neoclr/experiments/array-diagnostics-20260913",
+    "profile": "$HOME/.neoclr/vscode/array-diagnostics-20260913",
     "compilerVersion": "0.1.12-neoclr.10",
     "extensions": "raven.raven-vscode@0.1.12-neoclr.10",
     "task": "passed",

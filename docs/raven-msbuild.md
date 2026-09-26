@@ -5,21 +5,27 @@ standalone MSBuild props/targets. It does not import `Microsoft.NET.Sdk`, declar
 .NET target framework, or require a new Raven compiler build. It uses the installed
 experimental .14 compiler and the matching runtime bundle.
 
-## Installed local example
+## Current local setup
+
+For the installed 26 September SDK, configured VS Code launcher and HTTP/JSON
+client/server tasks, follow [the local SDK snapshot](local-sdk-snapshot.md).
+The versioned setup below is retained as an earlier checkpoint.
+
+## Earlier installed local example
 
 A fresh local bundle is available at
-`/Users/robert/.neoclr/experiments/msbuild-20260914`. Open its MSBuild project in VS Code:
+`$HOME/.neoclr/experiments/msbuild-20260914`. Open its MSBuild project in VS Code:
 
 ```sh
-code /Users/robert/.neoclr/experiments/msbuild-20260914/msbuild-demo
+code $HOME/.neoclr/experiments/msbuild-20260914/msbuild-demo
 ```
 
 Use **Tasks: Run Build Task** to compile it. The matching `.14` SDK and language server
 are already selected. Or build from a terminal:
 
 ```sh
-dotnet msbuild /Users/robert/.neoclr/experiments/msbuild-20260914/msbuild-demo/Demo.rvnproj \
-  -p:RavenSdkRoot=/Users/robert/.raven/sdk/0.1.12-neoclr.14
+dotnet msbuild $HOME/.neoclr/experiments/msbuild-20260914/msbuild-demo/Demo.rvnproj \
+  -p:RavenSdkRoot=$HOME/.raven/sdk/0.1.12-neoclr.14
 ```
 
 The packaged assets passed 15 build scenarios and 68 language-server checks on this

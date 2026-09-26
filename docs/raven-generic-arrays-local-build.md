@@ -13,7 +13,7 @@ allocation API, and the existing runtime-library, union and query demonstrations
 Run this prepared launcher:
 
 ```sh
-/Users/robert/.neoclr/experiments/generic-arrays-20260913/open-demo.sh
+$HOME/.neoclr/experiments/generic-arrays-20260913/open-demo.sh
 ```
 
 It opens the new demo with its isolated VS Code profile and extension. Open
@@ -49,10 +49,10 @@ a different sample into Main.rvn.
 
 ## Installation and validation
 
-- SDK: `/Users/robert/.raven/sdk/0.1.12-neoclr.11`
-- Demo: `/Users/robert/.neoclr/experiments/generic-arrays-20260913/demo`
-- VS Code profile: `/Users/robert/.neoclr/vscode/generic-arrays-20260913`
-- Artifacts: `/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913`
+- SDK: `$HOME/.raven/sdk/0.1.12-neoclr.11`
+- Demo: `$HOME/.neoclr/experiments/generic-arrays-20260913/demo`
+- VS Code profile: `$HOME/.neoclr/vscode/generic-arrays-20260913`
+- Artifacts: `$HOME/.neoclr/builds/generic-arrays-toolchain-20260913`
 
 The workspace explicitly selects the SDK and installed VSIX language server. The
 normal SDK selection and older demos/profiles remain available; hashes of 1,074

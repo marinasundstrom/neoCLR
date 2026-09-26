@@ -1,0 +1,23 @@
+{
+  "sdkVersion": "0.1.12-neoclr.20260926",
+  "neoCLRRevision": "cbf7bb704804b04fdf9af1c151e397e7d90eac33",
+  "ravenRevision": "54ec1c7181b1f9fe8d73619daa0746983fa0b7d3",
+  "checks": {
+    "asyncExamples": 8,
+    "editorCollectionsUnionsStrings": "passed",
+    "managedHttpPair": "initial reference verifier passed; repeated installed-workspace attempts timed out",
+    "msbuildAcceptance": "failed: unresolved-call negative test unexpectedly succeeds",
+    "combinedHttpSequence": "failed: transport timeout",
+    "websitePages": 1016,
+    "independentHttpServer": "passed: GET 200, POST 201, invalid JSON 400, unknown route 404"
+  },
+  "sha256": {
+    "$HOME/.neoclr/experiments/development-20260926/bin/neoclr": "d55549bebd09755841e0d504dc066bab3a25b205e0d7d30107bbcb5b50aea267",
+    "$HOME/.neoclr/experiments/development-20260926/tools/http-runner": "443f02936f3e2aba86d63506f5e08740e29745bb8b93e397b731323228e2444a",
+    "$HOME/.neoclr/experiments/development-20260926/tools/bridge/Probe.dll": "88964706072f68a9f586aa7d8e657368c65e6cd455433e49a9fe52a47ec240bd",
+    "$HOME/.neoclr/experiments/development-20260926/demo/NeoCLR.CoreProbe.dll": "33c17e1240e126a41a493aeee1117614fbda1ccfb12a5558039d225ee5cbf617",
+    "$HOME/.neoclr/experiments/development-20260926/lib/System.neoil": "7fe84983ddd731f9110a9b541ad10e590c38bad548037a3b11fe71764e7bdff1",
+    "$HOME/.raven/sdk/0.1.12-neoclr.20260926/tools/rvnc/rvnc.dll": "ec636be8f47f4b4fc52e7af30bc194f47f3c0e394ac670afb53b256fe0e54932",
+    "$HOME/.neoclr/builds/20260926/raven-vscode.vsix": "2082539245eccccede872980478b68bd9472723888bb194cb7295e41ef4a1812"
+  }
+}

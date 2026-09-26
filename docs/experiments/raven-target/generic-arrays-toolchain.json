@@ -9,22 +9,22 @@
   "distribution": "Validated local experiment; not published",
   "artifacts": {
     "raven-sdk-0.1.12-neoclr.11-osx-arm64.tar.gz": {
-      "path": "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/raven-sdk-0.1.12-neoclr.11-osx-arm64.tar.gz",
+      "path": "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/raven-sdk-0.1.12-neoclr.11-osx-arm64.tar.gz",
       "sha256": "547adb6bcd18a015d92e4bdc8935e02a0a5c583e4571525257aea21dc098f580",
       "bytes": 30946266
     },
     "raven-vscode.vsix": {
-      "path": "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/raven-vscode.vsix",
+      "path": "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/raven-vscode.vsix",
       "sha256": "6238c8fd4a35c39c2e6c316eabfde6b0facb2dc20dab77b181106569e9adee58",
       "bytes": 10251970
     },
     "neoclr-generic-arrays-poc-20260913-osx-arm64.tar.gz": {
-      "path": "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/neoclr-generic-arrays-poc-20260913-osx-arm64.tar.gz",
+      "path": "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/neoclr-generic-arrays-poc-20260913-osx-arm64.tar.gz",
       "sha256": "fd96ccd1e3f72d48414683cc5a37c8222d275c5a797d8321b11f40e24278b303",
       "bytes": 22991084
     },
     "manifest.json": {
-      "path": "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/bundle/manifest.json",
+      "path": "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/bundle/manifest.json",
       "sha256": "42104fb6da2e5bdb7d8a4a31fd57701620316e6b7f139479300957c7e2f58ed5",
       "bytes": 85009
     }
@@ -40,14 +40,14 @@
         "seconds": 92.23,
         "command": [
           "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/verify_project.py",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/verify_project.py",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
           "--bridge",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
           "--system",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/lib/System.neoil",
           "--runtime",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/bin/neoclr",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/bin/neoclr",
           "--collections"
         ],
         "checks": 59
@@ -57,14 +57,14 @@
         "seconds": 45.87,
         "command": [
           "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/verify_queries.py",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/verify_queries.py",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
           "--bridge",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
           "--system",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/lib/System.neoil",
           "--runtime",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/bin/neoclr"
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/bin/neoclr"
         ],
         "checks": 28
       },
@@ -73,14 +73,14 @@
         "seconds": 18.71,
         "command": [
           "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/verify_application.py",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/verify_application.py",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
           "--bridge",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
           "--system",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/lib/System.neoil",
           "--runtime",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/bin/neoclr"
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/bin/neoclr"
         ],
         "checks": 12
       },
@@ -89,14 +89,14 @@
         "seconds": 6.82,
         "command": [
           "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/verify_orders.py",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/verify_orders.py",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
           "--bridge",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
           "--system",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/lib/System.neoil",
           "--runtime",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/bin/neoclr"
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/bin/neoclr"
         ],
         "checks": 6
       },
@@ -105,14 +105,14 @@
         "seconds": 2.71,
         "command": [
           "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/verify_native_buffer.py",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/verify_native_buffer.py",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
           "--bridge",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
           "--system",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/lib/System.neoil",
           "--runtime",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/bin/neoclr"
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/bin/neoclr"
         ]
       },
       "neoil": {
@@ -120,13 +120,13 @@
         "seconds": 0.66,
         "command": [
           "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/verify_neoil.py",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/verify_neoil.py",
           "--samples",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/samples/neoil",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/samples/neoil",
           "--system",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/lib/System.neoil",
           "--runtime",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/bin/neoclr"
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/bin/neoclr"
         ]
       },
       "editor": {
@@ -134,8 +134,8 @@
         "seconds": 7.04,
         "command": [
           "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/verify_editor.py",
-          "/Users/robert/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/demo",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/tools/verify_editor.py",
+          "$HOME/.neoclr/builds/generic-arrays-toolchain-20260913/validation-bundle/demo",
           "--collections",
           "--booleans",
           "--reflection",
@@ -161,9 +161,9 @@
     "sourceCompilerTests": 22
   },
   "installation": {
-    "sdk": "/Users/robert/.raven/sdk/0.1.12-neoclr.11",
-    "bundle": "/Users/robert/.neoclr/experiments/generic-arrays-20260913",
-    "profile": "/Users/robert/.neoclr/vscode/generic-arrays-20260913",
+    "sdk": "$HOME/.raven/sdk/0.1.12-neoclr.11",
+    "bundle": "$HOME/.neoclr/experiments/generic-arrays-20260913",
+    "profile": "$HOME/.neoclr/vscode/generic-arrays-20260913",
     "compilerVersion": "0.1.12-neoclr.11",
     "extension": "raven.raven-vscode@0.1.12-neoclr.11",
     "installedVsixEditorChecks": 52,

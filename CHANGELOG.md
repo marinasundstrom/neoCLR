@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-26
 
+- Install a committed local SDK/VS Code snapshot and prepare editable HTTP/JSON,
+  calendar and async projects with a sample-selecting launcher. Add explicit
+  HTTP test-runner budgets, peer verification and reproducible launch instructions.
+  Clean up active build guidance and legacy source examples; document website builds.
+  Normalize personal home-directory paths to $HOME in documentation and historical
+  toolchain records (path spelling only; recorded revisions and checksums retained).
+  Record the outstanding unresolved-call compiler diagnostic failure and HTTP
+  timeout sensitivity rather than claiming full SDK acceptance.
+
 - Add synchronous Result-based JsonSerializer.Deserialize<T> overloads for string
   and InputStream, preserving the existing flat object-mapping policy and errors.
   Use typed models in the opt-in HTTP sample and refresh API/library snapshots.

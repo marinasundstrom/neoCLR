@@ -10,9 +10,9 @@ Open the isolated environment:
 
 ```sh
 code --new-window \
-  --user-data-dir /Users/robert/.neoclr/vscode/queries-20260913 \
-  --extensions-dir /Users/robert/.neoclr/vscode/queries-20260913/extensions \
-  /Users/robert/.neoclr/experiments/queries-20260913/demo
+  --user-data-dir $HOME/.neoclr/vscode/queries-20260913 \
+  --extensions-dir $HOME/.neoclr/vscode/queries-20260913/extensions \
+  $HOME/.neoclr/experiments/queries-20260913/demo
 ```
 
 Open `Main.rvn`. Type `numbers.` or `query.` with `import System.Linq.*` in scope to
@@ -31,7 +31,7 @@ demo's `Main.rvn` to try it: `application-iterable.rvn` demonstrates custom inte
 `application-orders.rvn` demonstrates the workflow and union destructuring. Preserve
 any edits you want to keep before replacing that file.
 
-The SDK is installed at `/Users/robert/.raven/sdk/0.1.12-neoclr.8`. Project settings
+The SDK is installed at `$HOME/.raven/sdk/0.1.12-neoclr.8`. Project settings
 select that SDK and the matching bundled language server. The earlier application
 and pattern demos, their edits, the .7 installation, and the default Raven SDK
 selection were preserved. If an already-open window has stale language service
@@ -51,6 +51,6 @@ hashes were verified; the installed copy then received its local task/settings p
 and query demo. The installed compiler reports .8 and the isolated extension list
 reports `raven.raven-vscode@0.1.12-neoclr.8`.
 
-Artifacts are under `/Users/robert/.neoclr/builds/query-toolchain-20260913`: the SDK
+Artifacts are under `$HOME/.neoclr/builds/query-toolchain-20260913`: the SDK
 archive, `raven-vscode.vsix`, neoCLR bundle archive, manifest and `validation` logs.
 For future builds, follow [the experiment release procedure](experiments/raven-target/RELEASING.md).

@@ -9,9 +9,9 @@ no explicit managed-reference syntax is required for this workflow.
 
 ```sh
 code --new-window \
-  --user-data-dir /Users/robert/.neoclr/vscode/collections-20260913 \
-  --extensions-dir /Users/robert/.neoclr/vscode/collections-20260913/extensions \
-  /Users/robert/.neoclr/experiments/collections-20260913/demo
+  --user-data-dir $HOME/.neoclr/vscode/collections-20260913 \
+  --extensions-dir $HOME/.neoclr/vscode/collections-20260913/extensions \
+  $HOME/.neoclr/experiments/collections-20260913/demo
 ```
 
 Open Main.rvn, save edits, then select **Terminal → Run Task → neoCLR: Run saved
@@ -47,10 +47,10 @@ Other samples are in `../tools/samples`, including `library-list-filters.rvn`,
 
 ## Installation and boundaries
 
-- SDK: `/Users/robert/.raven/sdk/0.1.12-neoclr.12`
-- Demo: `/Users/robert/.neoclr/experiments/collections-20260913/demo`
-- Isolated VS Code profile: `/Users/robert/.neoclr/vscode/collections-20260913`
-- Artifacts: `/Users/robert/.neoclr/builds/collections-toolchain-20260913`
+- SDK: `$HOME/.raven/sdk/0.1.12-neoclr.12`
+- Demo: `$HOME/.neoclr/experiments/collections-20260913/demo`
+- Isolated VS Code profile: `$HOME/.neoclr/vscode/collections-20260913`
+- Artifacts: `$HOME/.neoclr/builds/collections-toolchain-20260913`
 
 The workspace selects this SDK explicitly. Existing SDK versions, normal selection
 and earlier demos remain separate. Do not mix its regenerated core metadata with

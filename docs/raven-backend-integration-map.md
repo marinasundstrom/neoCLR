@@ -5,7 +5,7 @@ compiler target or a binary-format decision. See the [experiment plan](raven-tar
 
 ## Pinned inputs and scope
 
-- Raven checkout: `/Users/robert/Projects/Raven`, revision
+- Raven checkout: `$HOME/Projects/Raven`, revision
   `d92b02812740ae052f277c23151e9cc208f7672d`, clean at inspection.
 - neoCLR: `3140a2a4bd61713ae3cde41a5c94f72673e5998f` on
   `codex/raven-neoclr-target`, clean before this documentation slice.

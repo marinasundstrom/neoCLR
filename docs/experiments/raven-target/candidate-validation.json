@@ -175,7 +175,7 @@
     "rustNoticeFiles": 94,
     "vsixJavaScriptSha256": "eaef391185bcce10201d8f42ab5345e72249e82343544b79f3d378f8f9b7a90f"
   },
-  "installedDemo": "/Users/robert/.neoclr/experiments/runtime-raven-candidate-20260913-2/demo",
+  "installedDemo": "$HOME/.neoclr/experiments/runtime-raven-candidate-20260913-2/demo",
   "guestOutput": [
     "42",
     "Saved",

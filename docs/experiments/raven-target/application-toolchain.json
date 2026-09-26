@@ -9,11 +9,11 @@
   "sdkVersion": "0.1.12-neoclr.7",
   "dotnetSdk": "11.0.100-rc.1.26425.128",
   "platform": "osx-arm64",
-  "bundle": "/Users/robert/.neoclr/experiments/application-poc-20260913",
-  "sdk": "/Users/robert/.raven/sdk/0.1.12-neoclr.7",
-  "vscodeUserData": "/Users/robert/.neoclr/vscode/application-poc-20260913",
-  "vscodeExtensions": "/Users/robert/.neoclr/vscode/application-poc-20260913/extensions",
-  "artifactDirectory": "/Users/robert/.neoclr/builds/application-toolchain-2026-09-13",
+  "bundle": "$HOME/.neoclr/experiments/application-poc-20260913",
+  "sdk": "$HOME/.raven/sdk/0.1.12-neoclr.7",
+  "vscodeUserData": "$HOME/.neoclr/vscode/application-poc-20260913",
+  "vscodeExtensions": "$HOME/.neoclr/vscode/application-poc-20260913/extensions",
+  "artifactDirectory": "$HOME/.neoclr/builds/application-toolchain-2026-09-13",
   "assets": {
     "neoclr-application-poc-20260913-osx-arm64.tar.gz": {
       "sha256": "48fb5a279921db102624cea0099d5716ac916fc0e6a9478e8914e8fa5df57d96",

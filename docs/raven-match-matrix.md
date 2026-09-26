@@ -113,7 +113,7 @@ of support. The saved-project verification also includes both readable match sam
 ## Local pattern demo
 
 On the development machine, a separate source-backed demo is prepared at
-`/Users/robert/.neoclr/experiments/patterns-20260913/editor`. It uses refreshed
+`$HOME/.neoclr/experiments/patterns-20260913/editor`. It uses refreshed
 metadata and an updated language server, with the existing .7 extension frontend.
 The neoCLR task compiles through the source bridge; this is not a repackaged SDK or
 release. The earlier edited application demo and archived tools remain unchanged.

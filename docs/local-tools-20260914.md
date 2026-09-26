@@ -9,7 +9,7 @@ Published Preview 6 artifacts remain unchanged.
 Open the fresh demo directory:
 
 ```sh
-code /Users/robert/.neoclr/experiments/arrays-20260914/demo
+code $HOME/.neoclr/experiments/arrays-20260914/demo
 ```
 
 If VS Code was already open, run **Developer: Reload Window**. The project settings
@@ -29,10 +29,10 @@ properties in dot completion; `[index].` offers the element's members.
 
 ## Installed components and provenance
 
-- SDK: `/Users/robert/.raven/sdk/0.1.12-neoclr.14`
-- Extension: `/Users/robert/.vscode/extensions/raven.raven-vscode-0.1.12-neoclr.14`
-- Runtime bundle: `/Users/robert/.neoclr/experiments/arrays-20260914`
-- Packages and validation logs: `/Users/robert/.neoclr/builds/arrays-20260914`
+- SDK: `$HOME/.raven/sdk/0.1.12-neoclr.14`
+- Extension: `$HOME/.vscode/extensions/raven.raven-vscode-0.1.12-neoclr.14`
+- Runtime bundle: `$HOME/.neoclr/experiments/arrays-20260914`
+- Packages and validation logs: `$HOME/.neoclr/builds/arrays-20260914`
 - neoCLR source: `a71e642829e4cbf00f3670fd8360644c810335e7`
 - Raven experiment: `ee7b2e5af5412ff7af72658fe6de289e7d41ab6b`
 - Host SDK: `.NET 11.0.100-rc.1.26425.128`
@@ -78,7 +78,7 @@ paused while the target/importer stabilization work is evaluated.
 ## Published Preview 7 installation
 
 Installed the published Preview 7 runtime bundle at
-`/Users/robert/.neoclr/experiments/preview7-20260914`, retaining the existing Raven
+`$HOME/.neoclr/experiments/preview7-20260914`, retaining the existing Raven
 SDK/VSIX `0.1.12-neoclr.14` and normal SDK selection. All 765 runtime manifest entries
 matched; the installed MSBuild demo built and produced the expected propagation output.
 Existing experiment folders and edited demos were preserved.
@@ -86,7 +86,7 @@ Existing experiment folders and edited demos were preserved.
 Open the primary project:
 
 ```sh
-code /Users/robert/.neoclr/experiments/preview7-20260914/msbuild-demo
+code $HOME/.neoclr/experiments/preview7-20260914/msbuild-demo
 ```
 
 Use **neoCLR: Build with MSBuild** or **neoCLR: Run (MSBuild)** from Tasks.

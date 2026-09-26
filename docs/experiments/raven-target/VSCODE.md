@@ -1,6 +1,6 @@
 # Test Raven targeting neoCLR in VS Code
 
-Current development snapshot: [native UTF-8 and Introspection (2026-09-19)](../../local-tools-20260919.md).
+Current development snapshot: [SDK and HTTP/JSON workspace (2026-09-26)](../../local-sdk-snapshot.md).
 The versioned installation notes below are historical checkpoints.
 
 Standalone MSBuild project: [local setup and build task](../../raven-msbuild.md#installed-local-example).

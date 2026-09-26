@@ -1,7 +1,7 @@
 # Local native UTF-8 development snapshot — 2026-09-19
 
 A fresh workspace is prepared at
-`/Users/robert/.neoclr/experiments/native-utf8-20260919/demo`.
+`$HOME/.neoclr/experiments/native-utf8-20260919/demo`.
 It contains the strict UTF-8 sample in Main.rvn, current System.Runtime reference
 metadata and a matching runtime/library/bridge/compiler/server. Earlier workspaces
 are preserved. This is a machine-local experiment, not a published release.
@@ -12,9 +12,9 @@ Use this task rather than Raven's ordinary host-.NET run/debug commands.
 
 ```sh
 "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" \
-  --user-data-dir /Users/robert/.neoclr/vscode/raven-port-20260919 \
-  --extensions-dir /Users/robert/.neoclr/vscode/raven-port-20260919/extensions \
-  --new-window /Users/robert/.neoclr/experiments/native-utf8-20260919/demo
+  --user-data-dir $HOME/.neoclr/vscode/raven-port-20260919 \
+  --extensions-dir $HOME/.neoclr/vscode/raven-port-20260919/extensions \
+  --new-window $HOME/.neoclr/experiments/native-utf8-20260919/demo
 ```
 
 The sample prints six successful round trips, a byte count of 7, No preamble, AB,
@@ -32,16 +32,16 @@ that migration is complete. For release gaps, see [the readiness review](preview
 ## Scalar Char follow-up
 
 A separate workspace is prepared at
-`/Users/robert/.neoclr/experiments/scalar-char-20260919/demo`, with neoCLR `0c36087`
+`$HOME/.neoclr/experiments/scalar-char-20260919/demo`, with neoCLR `0c36087`
 and Raven `3bd17488a`. Its manifest pins the binaries; the earlier UTF-8 snapshot
 above is preserved. Open this folder in the same experimental VS Code profile
 and run **neoCLR: Run saved project** against Demo.rvnproj.
 
 ```sh
 "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" \
-  --user-data-dir /Users/robert/.neoclr/vscode/raven-port-20260919 \
-  --extensions-dir /Users/robert/.neoclr/vscode/raven-port-20260919/extensions \
-  --new-window /Users/robert/.neoclr/experiments/scalar-char-20260919/demo
+  --user-data-dir $HOME/.neoclr/vscode/raven-port-20260919 \
+  --extensions-dir $HOME/.neoclr/vscode/raven-port-20260919/extensions \
+  --new-window $HOME/.neoclr/experiments/scalar-char-20260919/demo
 ```
 
 Main.rvn now contains the scalar Char sample. Expected output is:
@@ -64,7 +64,7 @@ new public SDK release. Scalar String access remains unimplemented.
 ## Grapheme text snapshot
 
 The fresh workspace at
-`/Users/robert/.neoclr/experiments/grapheme-text-20260919/demo` supersedes the
+`$HOME/.neoclr/experiments/grapheme-text-20260919/demo` supersedes the
 scalar-Char snapshot for current text work. Earlier workspaces remain intact.
 Open it using the same experimental VS Code profile above, save Main.rvn and run
 **Tasks: Run Build Task → neoCLR: Run saved project**.

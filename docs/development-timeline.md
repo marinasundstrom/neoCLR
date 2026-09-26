@@ -4047,7 +4047,7 @@ copy. UTF-8 remains prominent. APIs are evolving and feedback is welcome.
 **Examples and highlighting:** The author requested Raven union sugar and a note
 about its multiple construction forms, plus syntax highlighting following the adjacent
 Raven repository or MyServiceBus's website. The supplied MyServiceBus path did not
-exist; the assistant found `/Users/robert/Projects/MyServiceBus` and inspected its
+exist; the assistant found `$HOME/Projects/MyServiceBus` and inspected its
 TextMate/Oniguruma integration. Reused Raven's grammar with its MIT license and
 adapted tokenization to build-time HTML spans rather than shipping Monaco or a
 browser tokenizer. Added a test for token scopes, multiline comments, escaping and
@@ -7492,3 +7492,25 @@ configuration/content, not target-specific code added to Raven main.
 - **Open:** explicit Node names and return-directed overload selection remain design
   questions. The separately added ConvertibleInto interface does not establish such
   a compiler selection rule.
+
+### 2026-09-26 — Configured HTTP/JSON testing workspace
+
+- **Author:** asks to commit the work, remove legacy source-file instructions from
+  active build guidance, document the website build and explain launching VS Code
+  with a specific sample. Selects the HTTP/JSON web application as the testing flow.
+- **Assistant:** installs SDK and extension 0.1.12-neoclr.20260926 from Raven
+  54ec1c718, with neoCLR bundle cbf7bb70. Typed JSON edits staged when packaging began
+  are excluded. Later author commits preserve the build-guide cleanup separately.
+- **Validation:** eight async samples and collection/union/string editor protocol
+  checks pass. Independent HTTP routes pass, and the managed pair passes in
+  isolation. A combined sequence hits the existing transport deadline. The ordinary
+  CLI budget is insufficient for this fixture; tasks use the existing measured
+  runner with explicit limits. Full MSBuild acceptance fails its unresolved-call
+  negative test; that compiler defect remains open.
+- **Follow-up:** later installed-workspace managed-pair retries also time out. The
+  default verifier therefore uses an independent Python client for server routes;
+  `--managed-pair` preserves the failing reproduction. No reliable managed-pair
+  claim is made. Personal home paths in documentation are normalized to `$HOME`.
+- **Outcome:** the installation and sample-selection commands are documented in
+  [the local snapshot guide](local-sdk-snapshot.md). Website build on the later
+  committed tree also passes all 1,016 pages. No publication or release performed.

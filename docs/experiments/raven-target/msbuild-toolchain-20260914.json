@@ -4,7 +4,7 @@
   "sdkVersion": "0.1.12-neoclr.14",
   "dotnetSdk": "11.0.100-rc.1.26425.128",
   "platform": "osx-arm64",
-  "bundle": "/Users/robert/.neoclr/experiments/msbuild-20260914",
+  "bundle": "$HOME/.neoclr/experiments/msbuild-20260914",
   "msbuildScenarios": 15,
   "languageServerChecks": 68,
   "verifiedManifestFiles": 758,

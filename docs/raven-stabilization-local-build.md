@@ -11,9 +11,9 @@ diagnostics. This is an installed local build, not a newly published release.
 
 ```sh
 code --new-window \
-  --user-data-dir /Users/robert/.neoclr/vscode/array-diagnostics-20260913 \
-  --extensions-dir /Users/robert/.neoclr/vscode/array-diagnostics-20260913/extensions \
-  /Users/robert/.neoclr/experiments/array-diagnostics-20260913/demo
+  --user-data-dir $HOME/.neoclr/vscode/array-diagnostics-20260913 \
+  --extensions-dir $HOME/.neoclr/vscode/array-diagnostics-20260913/extensions \
+  $HOME/.neoclr/experiments/array-diagnostics-20260913/demo
 ```
 
 Open `Main.rvn`, save edits, then choose **Terminal → Run Task → neoCLR: Run saved
@@ -46,7 +46,7 @@ For smaller experiments, examples are in `../tools/samples`, including
 Main.rvn. Completion is provided by the bundled language server and neoCLR metadata.
 
 The SDK is installed alongside existing versions at
-`/Users/robert/.raven/sdk/0.1.12-neoclr.10`. The workspace selects it explicitly.
+`$HOME/.raven/sdk/0.1.12-neoclr.10`. The workspace selects it explicitly.
 The default SDK, old isolated extensions and existing demos were preserved; hashes
 of 899 existing Raven source files were unchanged after installation.
 
@@ -62,7 +62,7 @@ exercise its LSP protocol; this is not a claim of full source-debugger support.
 
 [Build evidence](experiments/raven-target/array-diagnostics-toolchain.json) records source
 revisions, artifact hashes, paths and results. Artifacts and logs are under
-`/Users/robert/.neoclr/builds/array-diagnostics-toolchain-20260913`. This build uses .NET
+`$HOME/.neoclr/builds/array-diagnostics-toolchain-20260913`. This build uses .NET
 SDK `11.0.100-rc.1.26425.128` on macOS arm64 and requires the matching host runtime.
 
 [Mutable arrays are invariant](array-variance.md). This build rejects differing
