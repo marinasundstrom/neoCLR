@@ -13,6 +13,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   retain portable TCP backpressure checks without assuming the kernel must short-write.
   Refresh full-suite expectations for the existing shared deadline bridge and standard
   SingleError union payloads; preserve cardinality, disposal and allocation assertions.
+  Correct the bundled order sample to match FileWriteError.TooLarge for rejected writes.
 
 - Select 0.1.0-preview.10 for the author-requested HTTP POC release. Prepare candidate
   notes and matching packages; publication is pending exact-candidate validation.
