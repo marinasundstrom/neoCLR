@@ -1,6 +1,15 @@
 # Roadmap: prove neoCLR with HTTP applications
 
-**Current priority (2026-09-24):** start the socket API towards a web application
+**Current checkpoint (2026-09-26):** the managed HTTP/JSON application now has
+implemented transport, context ownership, typed mapping and shared JSON content.
+Follow the [current issue-driven sequence](platform-roadmap.md#issue-driven-priorities--2026-09-26):
+retain the integrated generic-method fix and JSON helpers, check the separate
+unresolved-call acceptance defect, and establish repeatable packaged exchanges. The
+[issue triage](issue-fix-roadmap.md) distinguishes existing APIs from remaining gaps
+and identifies bounded companion work. M1 remains incomplete; the dated socket-first
+checkpoint and original dependency plan below are retained as history.
+
+**Earlier priority (2026-09-24):** start the socket API towards a web application
 running on neoCLR, keeping the [networking proposal](proposals/network-api.md) as
 the direction. Establish interfaces and behavior through bounded cases. The
 [socket design](socket-api-design.md) records the first transport implementation

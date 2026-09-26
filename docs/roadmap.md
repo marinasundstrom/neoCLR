@@ -1,5 +1,11 @@
 # Direction and migration
 
+**Current issue-priority checkpoint (2026-09-26):** follow the
+[platform roadmap's current sequence](platform-roadmap.md#issue-driven-priorities--2026-09-26)
+and [supporting issue triage](issue-fix-roadmap.md). Compiler correctness and a
+repeatable managed HTTP/JSON application lead; small documentation/API tasks may
+accompany them. The earlier immediate sequences below remain historical context.
+
 ## Active priority — HTTP application POC (2026-09-23)
 
 The [unified platform roadmap](platform-roadmap.md) is authoritative unless the

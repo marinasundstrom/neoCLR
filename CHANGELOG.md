@@ -20,6 +20,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   A concurrent-build run timed out; isolated runs pass without deadline changes.
   Full suite and website build skipped.
 
+- Record a neoCLR-focused triage of all 22 open neoCLR and nine open Raven issues.
+  Update roadmap navigation and recommend compiler correctness, the end-to-end
+  managed HTTP/JSON application and bounded ownership work before broader API or
+  architecture changes. Distinguish existing implementations from remaining issue
+  scope, identify small companion tasks and record validation/release gates. This
+  is a planning update; no fixes, API additions or GitHub issue closures are claimed.
+  Reconcile the subsequent generic-method fix and JSON-helper integration before
+  committing the plan; sample repeatability is the next bounded validation task.
+
 - Add HttpResponse.Request as Option<HttpRequest>, associated by HttpClient.Send
   for immediate and pending responses through custom/socket handlers. Add copied
   DefaultRequestHeaders; explicit headers win case-insensitively, invalid defaults

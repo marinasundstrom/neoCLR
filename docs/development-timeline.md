@@ -25,6 +25,35 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-26 — Issue investigation and neoCLR fix priorities
+
+- **Author:** requests investigation of the neoCLR and Raven GitHub issue lists,
+  a fix roadmap explaining priorities and consequences, and work that could fit
+  alongside a bigger feature. Clarifies “Focus is on neoCLR”, then directs
+  “Update roadmap docs”.
+- **Assistant investigation:** reads all 22 open neoCLR and nine open Raven issues,
+  compares source and existing experiment records, and identifies partial/completed
+  issue scope such as response association, field enumeration and explicit conversion.
+  Highlights separately recorded missing-diagnostic/default-body failures and the
+  managed-pair timeout evidence. No new runtime reproduction is claimed.
+- **Assistant recommendation:** prioritize compiler correctness and the managed
+  HTTP/JSON application, then bounded ownership and application-driven API gaps.
+  Use narrow RavenDoc/status/constant/helper work as companion tasks; give importer,
+  callable/type-system and bootstrapping proposals separate experiments and gates.
+  Filter Raven work by its demonstrated benefit to neoCLR.
+- **Actions/outcome:** update the [platform roadmap](platform-roadmap.md#issue-driven-priorities--2026-09-26),
+  supporting roadmap navigation and the [complete issue triage](issue-fix-roadmap.md).
+  Preserve historical checkpoints and distinguish recommendations from selected APIs.
+  No compiler/runtime changes, issue updates, commits or releases performed.
+- **Open:** execute the bounded compiler reproductions and subsequent application
+  checks; settle proposed contracts through their recorded decision gates. The
+  instruction to update documentation does not imply approval of every issue design.
+- **Author follow-up:** requests a commit and continuation, believing compiler work
+  has completed. Assistant confirms the generic-method fix and helper integration
+  in neoCLR `afcc8c3d`, refreshes the pending plan before committing, and selects
+  repeatability checks as the next bounded task. The independent unresolved-call
+  defect remains a separate acceptance item.
+
 ## 2026-09-24 — Enable future suspension without implementing it now
 
 - **Author:** clarified that the intention is not to go all the way to runtime

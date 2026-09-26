@@ -4,6 +4,10 @@ The [platform roadmap](platform-roadmap.md) groups current priorities into theme
 milestones with concrete sample products. This backlog is supporting design material,
 not a competing milestone sequence or a requirement to implement every capability.
 
+For the 2026-09-26 GitHub inventory and recommended execution order, use the
+[issue triage and fix sequence](issue-fix-roadmap.md). The active work remains the
+managed HTTP/JSON application; broad capabilities below are not prerequisites.
+
 All planned capabilities and substantive revisions to implemented behavior follow
 the [research and design comparison](design-research.md): establish the .NET/CLR
 baseline, evaluate alternatives and justify improvements with evidence. Each roadmap

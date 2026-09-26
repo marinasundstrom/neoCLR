@@ -14,17 +14,6 @@ look like. A milestone selects an outcome to investigate, not every abstraction 
 its source proposals. Keep, adapt or discard ideas based on working samples and
 [comparison with .NET/CLR](design-research.md).
 
-**Author-directed website work, 2026-09-24:** migrate the product and API documentation
-to one RavenDoc site, with Markdown guides, an HTML landing page, front-matter layout
-controls and a pinned portable CI build. Documentation may precede a runtime release;
-show that status explicitly. This bounded publishing change does not reorder the
-application milestones. See [website maintenance](design/feature-pages.md#ravendoc-site-and-landing-page--2026-09-24).
-
-**Author direction, 2026-09-24:** after finishing the semantics slices, implement
-APIs and behavior as concrete application cases need them. Examine each case before
-choosing its contract; keep readily changeable choices provisional. The discussed
-Iterable<char> constructor/count overload remains undecided, not a planned API.
-
 ## Implemented checkpoint — HTTP JSON clients (2026-09-26)
 
 The [generic client helpers](experiments/http-json-client/README.md) and standard
@@ -39,6 +28,67 @@ with zero final live objects. This is an implemented development POC, not a rele
 The run overlapping library regeneration timed out; repeatability under load remains
 open. Keep the end-to-end application as the acceptance case and retain the existing
 deadlines. Per-call JSON headers and richer serialization remain deferred.
+
+## Issue-driven priorities — 2026-09-26
+
+The author requests investigation of both repositories' issues, clarifies **the focus
+is neoCLR**, and requests this roadmap update. The [issue triage and fix sequence](issue-fix-roadmap.md)
+covers all 22 open neoCLR issues and filters the nine open Raven issues by their
+benefit to neoCLR. This is the assistant's recommended execution order; the request
+to record it does not approve every proposed API. M1's end-to-end managed HTTP/JSON
+application remains the acceptance goal. Older dated next-step statements below
+are historical checkpoints; use this section with the latest implemented evidence.
+
+1. **Verify remaining compiler acceptance debt.** The generic method-group/default-task
+   failure is resolved by Raven main `13b9105d8`, integrated as `56083626e`, with
+   [regression evidence](experiments/http-json-client-prototype/README.md#resolution--2026-09-26).
+   Generic boxing and the JSON client helpers are integrated in neoCLR `afcc8c3d`.
+   Keep the separate [unresolved-call diagnostic failure](local-sdk-snapshot.md#provenance-and-validation-limits)
+   explicit until reproduced or shown fixed on the matching toolchain. General fixes
+   still belong on main-based Raven feature branches before neoCLR integration.
+2. **Stabilize the implemented application.** GetFromJson/PostAsJson now exercise
+   object conversion in both directions on both peers. Establish repeated runs with
+   matching artifacts and record timings; investigate failures by startup, interpreter
+   work and transport phase before choosing a fix. Require repeatable packaged runs,
+   cancellation/error cleanup and independent-peer checks. Isolated passing runs do
+   not establish reliability under competing builds or an updated installed SDK.
+3. **Make resource ownership easier to use.** Take a bounded slice of
+   [#16](https://github.com/marinasundstrom/neoCLR/issues/16): establish neoCLR's
+   Disposable/Closable policy and verify Raven use lowering across return, propagation
+   and await. Pair this with stream-backed HTTP content ownership when that slice is
+   selected. Explicit cleanup remains the application baseline until verified;
+   a full async-disposal family is not a prerequisite for the buffered demo.
+4. **Fill application-driven library gaps.** Reconcile already implemented parts of
+   #18, #14, #13, #8, #5 and #6 before extending them. Prefer narrow text/comparison,
+   parsing or metadata operations demanded by the next executable case. Broader
+   reflection execution, globalization and generic math remain separate slices.
+5. **Evaluate architecture changes after the application checkpoint.** Split #12
+   into a measured loader/import path improvement and a later Raven backend redesign.
+   Evaluate function types/objects (#23), Self (#21), tuple structs (#20), metadata
+   unions/intersections (#15) and bootstrapping (#19) through bounded comparisons.
+   Neither replacing delegates nor a new metadata format becomes an implicit HTTP
+   dependency. Reprioritize an architectural slice if measured evidence makes it a
+   concrete blocker.
+
+While a larger slice is in progress, keep at most one small companion task: focused
+RavenDoc correctness/navigation repairs (#9), issue/evidence reconciliation, or a
+separately validated numeric-constant/enum helper slice (#4/#6). These follow-ups
+do not reopen the earlier foundation sweep. Stop expanding a companion task when
+it requires a new type-system, ABI, cleanup or culture contract. For release
+stabilization, retain the existing HTTPS scope decision, supported-target checks,
+matching SDK packaging, API reference validation and combined website build gates.
+No release date or completed implementation is claimed by this planning change.
+
+**Author-directed website work, 2026-09-24:** migrate the product and API documentation
+to one RavenDoc site, with Markdown guides, an HTML landing page, front-matter layout
+controls and a pinned portable CI build. Documentation may precede a runtime release;
+show that status explicitly. This bounded publishing change does not reorder the
+application milestones. See [website maintenance](design/feature-pages.md#ravendoc-site-and-landing-page--2026-09-24).
+
+**Author direction, 2026-09-24:** after finishing the semantics slices, implement
+APIs and behavior as concrete application cases need them. Examine each case before
+choosing its contract; keep readily changeable choices provisional. The discussed
+Iterable<char> constructor/count overload remains undecided, not a planned API.
 
 ## Active direction — sockets for a web application, 2026-09-24
 
