@@ -73,6 +73,47 @@ fn connecting(error: &io::Error) -> bool {
     }
     false
 }
+// Winsock getpeername can expose the destination before a nonblocking connect
+// completes. select reports success in writefds and failure in exceptfds.
+#[cfg(windows)]
+fn connect_ready(stream: &TcpStream) -> io::Result<bool> {
+    use std::os::windows::io::AsRawSocket;
+    use windows_sys::Win32::Networking::WinSock::{FD_SET, TIMEVAL, WSAGetLastError, select};
+
+    let mut writable = FD_SET {
+        fd_count: 1,
+        fd_array: [0; 64],
+    };
+    writable.fd_array[0] = stream.as_raw_socket() as usize;
+    let mut failed = writable;
+    let timeout = TIMEVAL {
+        tv_sec: 0,
+        tv_usec: 0,
+    };
+    // SAFETY: both sets contain one live socket and all pointers remain valid
+    // for this synchronous, zero-timeout call. Winsock ignores nfds.
+    let ready = unsafe {
+        select(
+            0,
+            std::ptr::null_mut(),
+            &mut writable,
+            &mut failed,
+            &timeout,
+        )
+    };
+    if ready == -1 {
+        // SAFETY: WSAGetLastError has no pointer or lifetime requirements.
+        Err(io::Error::from_raw_os_error(unsafe { WSAGetLastError() }))
+    } else {
+        Ok(ready > 0)
+    }
+}
+
+#[cfg(not(windows))]
+fn connect_ready(_stream: &TcpStream) -> io::Result<bool> {
+    Ok(true)
+}
+
 struct Connect {
     deadline: Option<Instant>,
     attempt_deadline: Option<Instant>,
@@ -825,7 +866,14 @@ impl Sockets {
                     continue;
                 }
                 let stream = op.stream.as_ref().expect("pending connection owns stream");
-                let status = match stream.take_error() {
+                let status = match connect_ready(stream).and_then(|ready| {
+                    if ready {
+                        stream.take_error()
+                    } else {
+                        Err(io::ErrorKind::WouldBlock.into())
+                    }
+                }) {
+                    Err(error) if error.kind() == io::ErrorKind::WouldBlock => continue,
                     Ok(Some(error)) | Err(error) => Err(Error::from(error)),
                     Ok(None) => match stream.peer_addr() {
                         Ok(_) => Ok(()),
@@ -1818,7 +1866,7 @@ mod tests {
     }
 
     #[test]
-    fn tcp_short_sends_and_backpressure_keep_pending_bytes_until_progress() {
+    fn tcp_backpressure_keeps_pending_bytes_until_progress() {
         let (mut peer, stream) = pair();
         socket2::SockRef::from(&stream)
             .set_send_buffer_size(4096)
@@ -1839,7 +1887,6 @@ mod tests {
         });
         let deadline = Instant::now() + Duration::from_secs(10);
         let mut total_sent = 0;
-        let mut saw_short = false;
         let blocked = loop {
             assert!(
                 total_sent < 16 * 1024 * 1024 && Instant::now() < deadline,
@@ -1853,7 +1900,6 @@ mod tests {
             }
             let count = sockets.take_result(id).unwrap().unwrap().unwrap();
             assert!(count > 0 && count <= 65536);
-            saw_short |= count < 65536;
             total_sent += count;
         };
         assert_eq!(sockets.reserved, 65536);
@@ -1880,10 +1926,8 @@ mod tests {
             std::thread::sleep(Duration::from_millis(1));
         };
         assert!(count > 0 && count <= 65536);
-        assert!(
-            saw_short || count < 65536,
-            "small send buffer should exercise a short send"
-        );
+        // Kernels may accept a full buffer or a prefix. Backpressure, retained
+        // ownership and exact reported-byte delivery are the portable contract.
         total_sent += count;
         assert_eq!(sockets.reserved, 0);
         assert!(sockets.poll(&heap).unwrap().is_none());

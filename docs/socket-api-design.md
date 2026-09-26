@@ -812,3 +812,19 @@ IPAddress hierarchy and adds typed Socket Connect/Listen overloads. The earlier
 string-result checkpoint above is historical. String Socket overloads remain available,
 and native transport/DNS remain IPv4-only. IPv6 address values are valid independently
 of transport and produce UnsupportedAddressFamily at the Socket boundary.
+
+## Windows connection completion (2026-09-27)
+
+The release host gate exposed premature success for a refused nonblocking connect
+on Windows. As with .NET Socket asynchronous completion, a known destination is not
+proof that the connection succeeded. The host implementation now polls Winsock
+`select` with zero timeout: write readiness signals success and exception readiness
+requires `SO_ERROR`. It keeps the same guest Result, deadline and ownership contract.
+This adds a Windows-only readiness check; Unix retains its existing error/peer check.
+See Microsoft's [connect contract](https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-connect)
+and [select contract](https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-select).
+
+The TCP backpressure test validates pending-byte retention and exact reported-byte
+delivery without requiring the kernel to choose a short write. Windows can accept
+the complete buffer even with a small configured send buffer. The refused-connect
+regression remains enabled on every host; Windows CI must pass before release.

@@ -186,6 +186,7 @@ dependencies = [
  "serde_json",
  "socket2",
  "unicode-segmentation",
+ "windows-sys",
 ]
 
 [[package]]
