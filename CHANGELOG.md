@@ -8,6 +8,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-26
 
+- Add synchronous Result-based JsonSerializer.Deserialize<T> overloads for string
+  and InputStream, preserving the existing flat object-mapping policy and errors.
+  Use typed models in the opt-in HTTP sample and refresh API/library snapshots.
+  Integrate Raven's independently tested generic-arity fix; rebuild consumers with
+  the matching compiler, reference and library. Project these bounded wrappers
+  through the existing generic-function ABI rather than broadening class imports.
+  Fix unbox.any for reference targets to preserve casts, identity, nulls and GC
+  roots, including String-to-Object allocation; exact value unboxing is unchanged.
+  Validate five focused runtime tests, 551 bridge signature checks, the public
+  mapper, DOM/stream regression and typed HTTP pair; all sample runs finish with
+  zero live objects. API/library snapshot checks pass; skip website build as directed.
+  Record Node naming and target-directed overload selection as exploration.
+
 - Restore the committed website build with a linked reference for JSON union
   payload properties omitted by the pinned RavenDoc renderer. Validate manual
   member routes and anchors, retain API coverage checks, and correct JSON guide

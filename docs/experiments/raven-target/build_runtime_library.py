@@ -351,6 +351,12 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
     # Retain only transitively called adapters; no application entry-point shim.
     used = set()
     pending = re.findall(r'(?m)^(?:call|ldftn) ([^(]+)\(', ''.join(methods + types))
+    if name == 'JsonValue':
+        # Public generic static wrappers use the existing generic-function ABI.
+        # They are application roots even when no other library method calls them.
+        pending.extend(helper for helper in helpers if helper in (
+            'System.Data.Json.JsonSerializer.DeserializeText<T0>',
+            'System.Data.Json.JsonSerializer.DeserializeStream<T0>'))
     while pending:
         helper = pending.pop()
         if helper in used or helper not in helpers:

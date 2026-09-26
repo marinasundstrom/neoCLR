@@ -9,13 +9,18 @@ Rebuild consumers with the matching development reference and library; JsonError
 new mapping cases. All operations are synchronous and return Result with [JsonError](xref:System.Data.Json.JsonError).
 
 ```text
+Deserialize<T>(text: string) -> Result<T, JsonError>
+Deserialize<T>(input: InputStream) -> Result<T, JsonError>
 Deserialize(text: string, type: TypeInfo) -> Result<Object, JsonError>
 Deserialize(input: InputStream, type: TypeInfo) -> Result<Object, JsonError>
 Serialize(value: Object) -> Result<string, JsonError>
 Serialize(output: OutputStream, value: Object) -> Result<unit, JsonError>
 ```
 
-Pass `typeof(YourClass)` to the non-generic read overload. Construction requires a
+Use `JsonSerializer.Deserialize<YourClass>(text)?` for a typed result, or pass
+`typeof(YourClass)` to the non-generic read overload. Both use the same mapper and
+return the same structured errors, including UnsupportedMapping for unsupported
+targets such as value types. Construction requires a
 runtime-backed public nongeneric reference class with a public parameterless
 constructor. The serializer invokes real constructors/getters/setters through
 [runtime reflection](reflection.md); it never writes backing fields directly.
@@ -50,7 +55,7 @@ buffered synchronous conversion, not async stream parsing.
 
 Existing bounds apply: 128 UTF-8 bytes, four container levels, 32 value occurrences,
 31 children per container. Object mapping is flat even though DOM values can nest.
-Generic mapping overloads, recursive models, configurable naming/null policy and
+Recursive models, configurable naming/null policy and
 HTTP JSON extensions for requests and responses remain later work.
 
 ## Error payload reference

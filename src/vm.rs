@@ -962,7 +962,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 Op::BoxValue(ty) | Op::UnboxAny(ty) => {
                     check(ty)?;
                     if matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_) | Type::Ptr(_))
-                        || module.is_object_reference_type(ty)
+                        || (matches!(op, Op::BoxValue(_)) && module.is_object_reference_type(ty))
                     {
                         return Err(Fault::new("box requires a non-reference value type"));
                     }
@@ -1670,7 +1670,7 @@ fn interpret_instructions(
                 | Op::NewArray(_)
                 | Op::AllocateArray(_)
                 | Op::ReserveArray(_)
-        ) || (matches!(op, Op::CastClass(target) | Op::IsInstance(target) if *target != Type::String)
+        ) || (matches!(op, Op::CastClass(target) | Op::UnboxAny(target) | Op::IsInstance(target) if *target != Type::String)
             && matches!(frame.stack.last(), Some(Value::String(_))))
             || matches!(op, Op::New(ty) if module.is_reference_type(ty))
             || matches!(op, Op::Construct(target) if target.owner.as_ref().is_some_and(|ty| module.is_reference_type(ty))))
@@ -2299,7 +2299,7 @@ fn interpret_instructions(
                         Value::NullObjectReference(_)
                     )));
                 }
-                Op::UnboxAny(target) => {
+                Op::UnboxAny(target) if !module.is_object_reference_type(target) => {
                     let value = frame.pop()?;
                     match value {
                         Value::NullObjectReference(_) => {
@@ -2388,7 +2388,7 @@ fn interpret_instructions(
                         frame.stack.push(Value::NullObjectReference(target.clone()));
                     }
                 }
-                Op::CastClass(target) => {
+                Op::CastClass(target) | Op::UnboxAny(target) => {
                     let source = frame.pop()?;
                     crate::arrays::check_cast(&source.ty(), target)?;
                     let value = match source {
@@ -2423,6 +2423,7 @@ fn interpret_instructions(
                             object.reference.assigned()?;
                             Value::ObjectReference(object)
                         }
+                        value @ Value::String(_) if *target == Type::String => value,
                         value @ Value::String(_)
                             if crate::interfaces::interface_definition(module, target).is_ok()
                                 || (*target == Type::from_name("System.Object")

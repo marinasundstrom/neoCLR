@@ -177,7 +177,13 @@ fn other_boxed_virtual_value_equality_remains_explicitly_unsupported() {
         (format!("ldc.i4 42\nbox Int32\n{EQUALS}"), "Boolean"),
         (HASH.into(), "Int32"),
     ] {
-        assert!(run(&format!("ldc.i4 42\nnewobj Unimplemented\nbox Unimplemented\n{tail}"), ".type Unimplemented\n.field Number Int32\n.end", returns, 8).is_err());
+        assert!(run(
+            &format!("ldc.i4 42\nnewobj Unimplemented\nbox Unimplemented\n{tail}"),
+            ".type Unimplemented\n.field Number Int32\n.end",
+            returns,
+            8
+        )
+        .is_err());
     }
 }
 
@@ -387,20 +393,65 @@ fn boxed_struct_readonly_override_cannot_write_payload() {
 }
 
 #[test]
-fn unbox_does_not_convert_integer_widths_or_admit_reference_targets() {
+fn unbox_does_not_convert_integer_widths_but_reference_targets_preserve_boxes() {
     assert_eq!(
         run("ldc.i4 42\nbox Int32\nunbox.any Int64", "", "Int64", 8)
             .unwrap_err()
             .code,
         FaultCode::InvalidCast
     );
-    assert!(run(
-        "ldc.i4 42\nbox Int32\nunbox.any System.Object",
-        "",
-        "System.Object",
-        8
-    )
-    .is_err());
+    let identity = format!("ldc.i4 42\nbox Int32\ndup\nunbox.any System.Object\n{IDENTITY}");
+    assert_eq!(
+        run(&identity, "", "Boolean", 8).unwrap().value,
+        Value::Boolean(true)
+    );
+}
+
+#[test]
+fn generic_unbox_reference_preserves_identity_and_gc_roots() {
+    let declarations = format!(
+        "{CELL}\n.function Cast<T>(System.Object value) -> T\nldarg 0\nunbox.any T\nret\n.end"
+    );
+    let mut body = String::from(".local Cell original\n.local Cell alias\nldc.i4 42\nnewobj Cell\nstloc original\nldloc original\ncastclass System.Object\ncall Cast<Cell>(System.Object)\nstloc alias\n");
+    for _ in 0..8 {
+        body.push_str("ldc.i4 0\nnewobj Cell\npop\n");
+    }
+    body.push_str(&format!("ldloc original\nldloc alias\n{IDENTITY}"));
+    let result = run(&body, &declarations, "Boolean", 2).unwrap();
+    assert_eq!(result.value, Value::Boolean(true));
+    assert!(result.heap.collections() > 1);
+    assert_eq!(result.heap.len(), 0);
+}
+
+#[test]
+fn unbox_reference_matches_castclass_for_strings_null_and_incompatible_types() {
+    for cast in ["castclass", "unbox.any"] {
+        let direct = format!("ldstr \"value\"\n{cast} String");
+        assert_eq!(
+            run(&direct, "", "String", 8).unwrap().value,
+            Value::String("value".into())
+        );
+        let string = format!("ldstr \"value\"\ncastclass System.Object\n{cast} String");
+        assert_eq!(
+            run(&string, "", "String", 8).unwrap().value,
+            Value::String("value".into())
+        );
+        let null = format!(".local System.Object empty\nldloca empty\ninitobj System.Object\nldloc empty\n{cast} Cell\nldloc empty\n{IDENTITY}");
+        assert_eq!(
+            run(&null, CELL, "Boolean", 8).unwrap().value,
+            Value::Boolean(true)
+        );
+        let invalid = format!("ldc.i4 42\nnewobj Cell\n{cast} String");
+        assert!(run(&invalid, CELL, "String", 8).is_err());
+    }
+}
+
+#[test]
+fn unbox_reference_string_upcast_collects_before_allocation() {
+    let body = "ldstr \"value\"\nunbox.any System.Object\npop\n".repeat(8) + "ldc.i4 42";
+    let result = run(&body, "", "Int32", 2).unwrap();
+    assert_eq!(result.value, Value::Int32(42));
+    assert!(result.heap.collections() > 1);
 }
 
 #[test]

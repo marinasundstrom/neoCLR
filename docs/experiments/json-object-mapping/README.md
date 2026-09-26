@@ -132,3 +132,24 @@ All 12 independent HTTP server cases pass with the public mapper (3,784 allocati
 input, extra fields and an empty string. The reference bridge passes 541 signature
 checks, including all new public overloads, internal-mapper rejection and a forged
 TypeInfo-parameter rejection. Bootstrap and API snapshots match their sources.
+
+
+## Typed reads — 2026-09-26
+
+The public fixture also exercises `Deserialize<Reading>` from strings and borrowed
+streams, constructor/accessor effects, missing fields, inaccessible constructors and
+unsupported value-type models. These overloads wrap the same mapper; they do not add
+recursive or value-type mapping. The typed consumer passes with 1,787 allocations,
+26 collections and zero final live objects. The unchanged DOM/stream regression
+also passes, with 665 allocations and zero final live objects. All 551 bridge
+signature checks and the refreshed API snapshot validation pass. The HTTP application now uses typed
+ReportPayload/Acknowledgement results and no longer needs Object type patterns.
+
+The matching compiler must include Raven's generic-arity fix, and the runtime must
+support reference-target `unbox.any`; see [integration details](../../raven-system-library.md#typed-json-wrappers-and-generic-arity--2026-09-26).
+
+The typed managed HTTP pair passes in isolation: 408 client allocations and 369
+server allocations, with zero final live objects on both sides. Library source and
+bootstrap snapshot hashes match. The website build remains skipped by direction;
+API snapshot verification is complete. These are development checks, not a release
+or a claim about latency under load.

@@ -51,6 +51,8 @@ public sealed class JsonNull : JsonValue {
 }
 public sealed class JsonSerializer {
     private JsonSerializer() { }
+    public static Result<T, JsonError> Deserialize<T>(string text) => default;
+    public static Result<T, JsonError> Deserialize<T>(IO.InputStream input) => default;
     public static Result<object, JsonError> Deserialize(string text, Introspection.TypeInfo type) => default;
     public static Result<object, JsonError> Deserialize(IO.InputStream input, Introspection.TypeInfo type) => default;
     public static Result<string, JsonError> Serialize(object value) => default;
@@ -153,10 +155,45 @@ internal sealed class JsonSyntax {
         ["JsonSyntax::Whitespace(Byte)"] = ("Boolean", true, false),
         ["JsonSyntax::WriteMessage(String)"] = ("System.Result<String,System.Data.Json.JsonError>", true, false),
     };
+    // Only the two unconstrained static wrappers are admitted as generic methods.
+    public static bool IsGenericSerializerMethod(MethodDefinition method) =>
+        method.DeclaringType.FullName == Prefix + "JsonSerializer"
+        && method.Name == "Deserialize" && method.IsPublic && method.IsStatic
+        && !method.IsVirtual && !method.IsAbstract && !method.ExplicitThis
+        && method.CallingConvention == MethodCallingConvention.Generic
+        && method.GenericParameters.Count == 1
+        && method.GenericParameters[0].Attributes == GenericParameterAttributes.NonVariant
+        && !method.GenericParameters[0].HasConstraints && method.Parameters.Count == 1
+        && (method.Parameters[0].ParameterType.MetadataType == MetadataType.String
+            || method.Parameters[0].ParameterType.FullName == "System.IO.InputStream"
+                && RuntimeSignatures.IsCore(method.Parameters[0].ParameterType.Scope))
+        && method.ReturnType is GenericInstanceType returned
+        && returned.ElementType.FullName == "System.Result`2"
+        && RuntimeSignatures.IsCore(returned.Scope) && returned.GenericArguments.Count == 2
+        && returned.GenericArguments[0] is GenericParameter parameter
+        && parameter.Owner == method && parameter.Position == 0
+        && returned.GenericArguments[1].FullName == Prefix + "JsonError"
+        && RuntimeSignatures.IsCore(returned.GenericArguments[1].Scope);
+
+    public static string GenericImplementationName(MethodDefinition method) =>
+        Prefix + "JsonSerializer." + (method.Parameters[0].ParameterType.MetadataType == MetadataType.String
+            ? "DeserializeText" : "DeserializeStream");
+
     public static CollectionBindings.Binding? Bind(MethodReference reference, MethodDefinition definition, bool construct, bool library) {
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
         Validate(definition.DeclaringType);
+        if (reference is GenericInstanceMethod generic) {
+            if (!IsGenericSerializerMethod(definition) || generic.GenericArguments.Count != 1
+                || definition.DeclaringType.FullName != owner || !definition.DeclaringType.IsSealed)
+                throw new InvalidDataException("Unsupported generic JSON member: " + reference.FullName);
+            var signature = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type, allowOpenMethodParameters: library);
+            var argument = RuntimeSignatures.Map(generic.GenericArguments[0], GenericUnionBindings.Type);
+            if (construct || signature.Result != $"System.Result<{argument},System.Data.Json.JsonError>")
+                throw new InvalidDataException("JSON generic result must preserve its type argument.");
+            return new(signature.Args, signature.Result,
+                $"call {GenericImplementationName(definition)}<{argument}>({string.Join(',', signature.Args)})");
+        }
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var key = definition.DeclaringType.Name + "::" + reference.Name + "(" + string.Join(',', args) + ")";
         if (definition.DeclaringType.FullName != owner || definition.DeclaringType.HasGenericParameters

@@ -286,8 +286,8 @@ static class LibraryImplementation
             contract.Interfaces.Count(c => MatchType(c.InterfaceType, i.InterfaceType)) != 1))
             throw new InvalidDataException("Instance library interfaces do not match reference contract.");
         bool MatchMethod(MethodDefinition left, MethodDefinition right) =>
-            left.Name == right.Name && !left.HasGenericParameters && !left.ExplicitThis
-            && left.CallingConvention == MethodCallingConvention.Default && left.IsStatic == right.IsStatic && left.IsConstructor == right.IsConstructor
+            left.Name == right.Name && (!left.HasGenericParameters || JsonBindings.IsGenericSerializerMethod(left) && JsonBindings.IsGenericSerializerMethod(right)) && left.GenericParameters.Count == right.GenericParameters.Count && !left.ExplicitThis
+            && (left.CallingConvention == MethodCallingConvention.Default || JsonBindings.IsGenericSerializerMethod(left)) && left.CallingConvention == right.CallingConvention && left.IsStatic == right.IsStatic && left.IsConstructor == right.IsConstructor
             && left.IsVirtual == right.IsVirtual && left.IsFinal == right.IsFinal && left.IsNewSlot == right.IsNewSlot
             && (left.ReturnType.MetadataType == MetadataType.Void || right.ReturnType.MetadataType == MetadataType.Void
                 ? left.ReturnType.MetadataType == right.ReturnType.MetadataType : MatchType(left.ReturnType, right.ReturnType))
@@ -302,8 +302,8 @@ static class LibraryImplementation
             && type.Methods.All(PrimitiveLibrary.IsDefaultConstructor);
         var methods = type.Methods.Where(m => !OpaqueLibrary.IsOmittedConstructor(m) && !ArrayLibrary.OmitConstructor(m) && !EmptyLibrary.OmitConstructor(m) && !((ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)) && (!(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m))).ToArray();
         if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || (DescriptorLibrary.IsDescriptor(type) || type.FullName == IPAddressBindings.Root || type.FullName == JsonBindings.Root) && m.IsFamily && m.IsConstructor || m.IsPrivate && (!m.IsVirtual || OpaqueLibrary.MatchesStringCount(m) && contract.Methods.Count(OpaqueLibrary.MatchesStringCount) == 1)
-            || m.IsAssembly && !m.IsVirtual && contract.Methods.Count(c => c.IsAssembly && MatchMethod(c, m)) == 1) || !m.HasBody || m.HasGenericParameters
-            || m.ExplicitThis || m.IsConstructor && m.IsStatic || m.CallingConvention != MethodCallingConvention.Default
+            || m.IsAssembly && !m.IsVirtual && contract.Methods.Count(c => c.IsAssembly && MatchMethod(c, m)) == 1) || !m.HasBody || m.HasGenericParameters && !JsonBindings.IsGenericSerializerMethod(m)
+            || m.ExplicitThis || m.IsConstructor && m.IsStatic || (m.CallingConvention != MethodCallingConvention.Default && !JsonBindings.IsGenericSerializerMethod(m))
             || m.Parameters.Any(p => (p.IsOut || p.ParameterType.IsByReference) && !GenericUnionLibrary.IsConditionalOutput(m, p))))
             throw new InvalidDataException("Unsupported instance library export: " + string.Join(";", methods.Select(m => m.FullName + " " + m.Attributes + " matches=" + contract.Methods.Count(c => c.IsAssembly && MatchMethod(c, m)))));
         // Private implementation helpers are not exports, but remain roots so even
@@ -397,6 +397,7 @@ static class LibraryImplementation
     {
         var helpers = Regex.Matches(text, @"(?m)^\.function (?:internal )?([^\(]+)\(").Select(m => m.Groups[1].Value)
             .Where(h => !h.StartsWith(owner + ".", StringComparison.Ordinal)
+                && !(owner == JsonBindings.Root && h is "System.Data.Json.JsonSerializer.DeserializeText<T0>" or "System.Data.Json.JsonSerializer.DeserializeStream<T0>")
                 && !(owner == "System.Introspection.MemberInfo" && (h.StartsWith("System.Runtime.Reflection.TypeReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.PropertyReflectionExtensions.", StringComparison.Ordinal)))
                 && !(owner == "System.Tasks.Task" && (h.StartsWith("System.Tasks.TaskOperators.", StringComparison.Ordinal) || h.StartsWith("System.Tasks.TaskResultOperators.", StringComparison.Ordinal)))).ToArray();
         // Adapters generated from open signatures must themselves declare the free
@@ -417,6 +418,7 @@ static class LibraryImplementation
                             changed |= parameters[helper].Add(parameter);
         } while (changed);
         foreach (var helper in helpers.Where(h => !h.StartsWith(owner + ".", StringComparison.Ordinal)
+                && !(owner == JsonBindings.Root && h is "System.Data.Json.JsonSerializer.DeserializeText<T0>" or "System.Data.Json.JsonSerializer.DeserializeStream<T0>")
                 && !(owner == "System.Introspection.MemberInfo" && (h.StartsWith("System.Runtime.Reflection.TypeReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.PropertyReflectionExtensions.", StringComparison.Ordinal)))
                 && !(owner == "System.Tasks.Task" && (h.StartsWith("System.Tasks.TaskOperators.", StringComparison.Ordinal) || h.StartsWith("System.Tasks.TaskResultOperators.", StringComparison.Ordinal)))))
         {

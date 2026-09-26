@@ -7454,3 +7454,41 @@ configuration/content, not target-specific code added to Raven main.
 - **Tool installation:** building matching local Raven/neoCLR tools; validation and
   installation outcomes will be recorded separately. No website publication or
   release is implied by these local builds.
+
+### 2026-09-25 — JSON node naming and target-directed overload selection
+
+- **Author:** suggested a `Node` suffix for JSON DOM serialization/deserialization
+  methods if they conflict with object mapping. Separately asked whether the observed
+  overload failure is inconsistent with C#/.NET and proposed exploring return-type
+  selection for multiple `Into()` implementations of `ConvertibleTo<T>`, using the
+  expected result type, with Rust as inspiration.
+- **Assistant investigation:** the current compiler rejects methods with identical
+  parameter types but different generic arity. That is a separate declaration bug,
+  not evidence that return-type overloads are needed for generic JSON deserialization.
+  The independently developed main-based Raven fix was subsequently integrated as
+  `9c6860e1d` and cherry-picked onto neoCLR as `9da3c7cb7` (2026-09-26); 145 focused
+  overload/generic tests passed.
+- **Assistant proposal:** evaluate `DeserializeNode` as explicit DOM naming separately;
+  keep return-directed overload selection exploratory. Specify no-target calls,
+  ambiguity, generic inference and interface dispatch before committing a language
+  rule. Existing target typing does not by itself settle those questions.
+- **Status:** no node-method rename or return-type-overload feature implemented in
+  this conversation entry. The immediate work remains typed JSON mapping.
+
+
+### 2026-09-26 — Typed JSON reads expose a generic reference-cast gap
+
+- **Assistant action following continuation:** adds typed string/stream deserialization
+  wrappers over the existing flat mapper and uses them in the HTTP application.
+- **Investigation:** execution revealed that `unbox.any T` extracted a class payload
+  for reference T. The runtime now shares the reference-cast path, preserving identity,
+  null behavior and GC roots while retaining exact value unboxing.
+- **Validation:** five focused runtime tests and the public JSON mapper pass; the
+  latter finishes with zero live objects. The typed managed HTTP pair and DOM/stream
+  regression also pass with zero final live objects; 551 bridge signature checks
+  and API/library snapshot checks pass. Website build skipped by author direction.
+  See the [Object review](object-model-review.md#reference-targets-of-generic-unboxing--2026-09-26)
+  and [compiler integration](raven-system-library.md#typed-json-wrappers-and-generic-arity--2026-09-26).
+- **Open:** explicit Node names and return-directed overload selection remain design
+  questions. The separately added ConvertibleInto interface does not establish such
+  a compiler selection rule.

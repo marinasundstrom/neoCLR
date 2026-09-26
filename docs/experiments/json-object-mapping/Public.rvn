@@ -48,6 +48,9 @@ func RoundTrip() -> Result<unit, JsonError> {
     } else {
         System.Fault("Unexpected mapped type")
     }
+    let typed = JsonSerializer.Deserialize<Reading>(text)?
+    Check(typed.Station == "Café" && typed.Count == 42 && typed.Active)
+    Check(typed.GetAssignments() == 1)
     let serialized = JsonSerializer.Serialize(instance)?
     let dom = JsonSerializer.Deserialize(serialized)?
     if dom is JsonObject document {
@@ -67,7 +70,13 @@ func RoundTrip() -> Result<unit, JsonError> {
     } else {
         System.Fault("Unexpected stream result")
     }
+    Check(stream.Seek(0) is Ok(_))
+    let typedCopy = JsonSerializer.Deserialize<Reading>(stream)?
+    Check(typedCopy.Count == 42 && typedCopy.Active && typedCopy.GetAssignments() == 1)
     stream.Close()
+    Check(JsonSerializer.Deserialize<Reading>("{}") is Error(JsonError.MissingField(_)))
+    Check(JsonSerializer.Deserialize<LockedReading>("{\"Station\":\"x\"}") is Error(JsonError.Reflection(ReflectionError.AccessDenied)))
+    Check(JsonSerializer.Deserialize<int>("{}") is Error(JsonError.UnsupportedMapping(_)))
     Check(JsonSerializer.Deserialize("{}", typeof(Reading)) is Error(JsonError.MissingField(_)))
     Check(JsonSerializer.Deserialize("[]", typeof(Reading)) is Error(JsonError.TypeMismatch(_)))
     Check(JsonSerializer.Deserialize("{\"Station\":null}", typeof(Reading)) is Error(JsonError.TypeMismatch(_)))

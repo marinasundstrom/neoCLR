@@ -321,7 +321,21 @@ static class SignatureProbe
             foreach (var member in jsonType.Methods.Where(m => m.IsPublic)) {
                 if (JsonBindings.IsProvider(jsonType))
                     Reject("JSON helpers remain internal " + member.FullName, () => JsonBindings.Bind(member, member, member.IsConstructor, false));
-                else
+                else if (member.HasGenericParameters) {
+                    var call = new GenericInstanceMethod(member);
+                    call.GenericArguments.Add(module.TypeSystem.String);
+                    Check("JSON generic member " + member.FullName, JsonBindings.Bind(call, member, false, false) is not null);
+                    var resultType = member.ReturnType;
+                    member.ReturnType = module.TypeSystem.Object;
+                    Reject("JSON generic result contract " + member.FullName, () => JsonBindings.Bind(call, member, false, false));
+                    member.ReturnType = resultType;
+                    var parameterAttributes = member.GenericParameters[0].Attributes;
+                    member.GenericParameters[0].Attributes = GenericParameterAttributes.ReferenceTypeConstraint;
+                    Reject("JSON generic constraints " + member.FullName, () => JsonBindings.Bind(call, member, false, false));
+                    member.GenericParameters[0].Attributes = parameterAttributes;
+                    call.GenericArguments.Add(module.TypeSystem.Int32);
+                    Reject("JSON generic arity " + member.FullName, () => JsonBindings.Bind(call, member, false, false));
+                } else
                     Check("JSON public member " + member.FullName, JsonBindings.Bind(member, member, member.IsConstructor, false) is not null);
             }
         }
@@ -339,7 +353,7 @@ static class SignatureProbe
         jsonRoot.CustomAttributes.Remove(jsonMarker);
         Reject("JSON requires closed family", () => JsonBindings.Validate(jsonRoot));
         jsonRoot.CustomAttributes.Add(jsonMarker);
-        var jsonRead = module.GetType(JsonBindings.Prefix + "JsonSerializer").Methods.Single(m => m.Name == "Deserialize" && m.Parameters.Count == 1 && m.Parameters[0].ParameterType.MetadataType == MetadataType.String);
+        var jsonRead = module.GetType(JsonBindings.Prefix + "JsonSerializer").Methods.Single(m => m.Name == "Deserialize" && !m.HasGenericParameters && m.Parameters.Count == 1 && m.Parameters[0].ParameterType.MetadataType == MetadataType.String);
         var invalidJsonRead = Reference(jsonRead, jsonRead.DeclaringType);
         invalidJsonRead.Parameters[0].ParameterType = module.TypeSystem.Int32;
         Reject("JSON rejects forged deserialize signature", () => JsonBindings.Bind(invalidJsonRead, jsonRead, false, false));

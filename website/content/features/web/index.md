@@ -355,5 +355,5 @@ The shape is closest to .NET's mutable JsonNode model, but neoCLR calls the root
 `JsonValue` and returns Result errors, including nested stream causes. See the
 [JSON API reference](/docs/api/System/Data/Json/) for the current contracts.
 The [object-mapping guide](/docs/json.html) covers the provisional Object/TypeInfo
-overloads for strings and borrowed streams. Broader mapping, generic overloads and
+overloads and typed `Deserialize<T>` reads for strings and borrowed streams. Broader mapping and
 HTTP JSON conveniences for both client and server remain later work.

@@ -1297,3 +1297,31 @@ HTTP pair pass with zero final live objects. Consumer constant matching of an In
 inside Ok(0) still emits unsupported host static Object.Equals; the fixture binds
 and compares the value instead. The older DOM fixture now omits redundant returns
 after terminal Fault calls. Neither adjustment changes the language/runtime contract.
+
+
+### Typed JSON wrappers and generic arity — 2026-09-26
+
+`JsonSerializer.Deserialize<T>` wraps the existing TypeInfo-based mapper for String
+and InputStream inputs, preserving Result errors and synchronous borrowed streams.
+No additional model shapes or Runtime Contract settings are admitted. An unsupported
+value-type model returns UnsupportedMapping before the final cast.
+
+General Raven fix `9c6860e1d` was tested independently on a main-based branch, then
+integrated into main and cherry-picked as `9da3c7cb7` on the neoCLR branch. Declaration,
+skeleton reuse and member lookup now distinguish generic arity. Explicit generic
+method calls reject nongeneric candidates; constructors still accept type arguments
+belonging to their declaring type. Raven's compiler documentation and changelog
+record the fix; 145 focused overload/generic tests passed on .NET 11. This is ordinary
+CLI method identity, not return-type-based overload selection, and was not separately
+executed on .NET Framework or NanoFramework.
+
+The bridge narrowly admits these two generic serializer wrappers and projects them
+to the existing generic-function ABI (`DeserializeText<T>` / `DeserializeStream<T>`).
+Those implementation roots are retained by source-slice trimming. Public reference
+metadata retains the normal class methods. General generic class-method import is
+still outside this checkpoint. Signature admission rejects forged arity, constraints
+and return types. Rebuild consumers with matching compiler, reference and library.
+
+The wrapper's `unbox.any T` also exposed a runtime reference-cast gap; see the
+[Object review](object-model-review.md#reference-targets-of-generic-unboxing--2026-09-26).
+The importer now permits reference destinations while requiring an object source.

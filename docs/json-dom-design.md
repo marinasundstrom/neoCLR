@@ -231,5 +231,31 @@ still apply. API XML and the [on-site guide](../api-docs/json.md) describe each 
 
 The JsonValue slice enables the already-existing target typeof Runtime Contract;
 see [compiler integration](raven-system-library.md#json-mapping-typeof-configuration--2026-09-25).
-Generic overloads and shared HTTP JSON content helpers are the next convenience
-candidates after this bounded surface, not implemented by these methods.
+The subsequent typed-read slice adds `Deserialize<T>` for string and InputStream
+inputs using this same mapper. Unsupported T shapes return UnsupportedMapping; no
+value-type or recursive mapping is added. Shared HTTP JSON content helpers remain
+next candidates.
+
+## Node naming and typed reads — exploration, 2026-09-25
+
+The author suggested `DeserializeNode`/`SerializeNode` to make the DOM boundary
+explicit. This is a usability choice independent of the Raven generic-arity
+regression: `Deserialize(string)` and `Deserialize<T>(string)` are distinguishable
+by generic arity. Retaining overloads minimizes churn; separate node names make
+intent visible and avoid depending on inference to select DOM versus model APIs.
+Evaluate the names together before changing this development API and its samples.
+
+The author also proposed selecting `ConvertibleTo<T>.Into()` by expected result
+type. [C# signatures](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/basic-concepts#75-signatures-and-overloading)
+include method generic arity but exclude return type; this proposal is a deliberate
+language extension, not a compatibility fix. [Rust Into](https://doc.rust-lang.org/std/convert/trait.Into.html)
+places the destination in the trait parameter (and recommends implementing From
+for its blanket Into implementation). It is not evidence for arbitrary methods
+with return-type-only differences. Sources checked 2026-09-25.
+
+A later Raven experiment should compare target-directed interface selection with
+ordinary generic methods and explicit interface qualification. Cover absent target
+types, equally convertible return types, argument/return inference cycles, method
+groups, diagnostics, metadata identity and .NET consumers. Existing target typing
+can support the implementation but does not establish a complete selection rule.
+No new conversion interface or return-type-only overload rule is adopted here.

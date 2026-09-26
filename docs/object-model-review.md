@@ -1081,3 +1081,25 @@ separately constructed equal strings remain distinct. Virtual String methods kee
 content equality/hash behavior. GC and retained host results preserve owner hashes;
 hashes may collide and do not expose addresses. No interning or compiler change.
 See the [implemented contract](string-storage-design.md#shared-owner-identity--development-2026-09-24).
+
+
+### Reference targets of generic unboxing — 2026-09-26
+
+Typed JSON deserialization exposed a missing generic-cast behavior: Raven emits
+`unbox.any T` for `(T)instance`. After substitution with a reference type, extracting
+the object's payload loses its reference representation. The earlier value-only
+unboxing boundary is superseded for this case.
+
+The [CLI unbox.any contract](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.unbox_any)
+requires reference targets to behave like `castclass`; generic behavior depends on
+the substituted type. neoCLR now shares its existing reference-cast implementation
+for those targets. Exact value unboxing remains a copy and does not perform numeric
+conversion. Class aliases, null references and boxed values retain their reference
+semantics; String identity casts preserve neoCLR's directly represented strings.
+String-to-Object conversion remains an allocation and therefore participates in the
+existing pre-allocation GC check. No JSON-specific VM operation is introduced.
+
+Focused tests compare casts and reference unboxing, reject incompatible types,
+exercise generic class casts across collections, and force String upcast collection
+with a small heap. This closes a correctness gap; no performance improvement or
+complete CLR instruction conformance is claimed.

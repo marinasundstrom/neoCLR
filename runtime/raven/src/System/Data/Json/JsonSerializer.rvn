@@ -42,6 +42,16 @@ public class JsonSerializer {
         }
     }
 
+    static func Deserialize<T>(text: string) -> Result<T, JsonError> {
+        let instance = Deserialize(text, typeof(T))?
+        return Ok((T)instance)
+    }
+
+    static func Deserialize<T>(input: InputStream) -> Result<T, JsonError> {
+        let instance = Deserialize(input, typeof(T))?
+        return Ok((T)instance)
+    }
+
     static func Deserialize(text: string, type: TypeInfo) -> Result<Object, JsonError> {
         let document = Deserialize(text)?
         return ObjectMapper.Read(document, type)
