@@ -334,3 +334,49 @@ associating the originating request even through custom handlers. Validate reque
 identity, pending completion, cancellation, handler failures and GC retention before
 adopting that policy; do not imply redirect/final-request behavior the POC lacks.
 These are next-slice directions, not implemented APIs in this checkpoint.
+
+
+### Response association checkpoint — 2026-09-26
+
+The author explicitly prioritizes HttpResponse.Request next. The implementation uses
+Option<HttpRequest> with a read-only public getter. HttpClient.Send associates each
+successful Result response with the effective request passed to its handler, for
+socket and custom handlers alike. Without applied defaults this is the caller's
+original request; defaults can produce a derived request. Non-success HTTP statuses still carry a response and are
+associated. Standalone/server-created responses start with None; direct handler calls
+have no association guarantee. Respond changes status/content without clearing Request.
+Failed Results and cancelled tasks do not mutate an unrelated response.
+
+Compared with [.NET RequestMessage](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpresponsemessage.requestmessage?view=net-10.0),
+neoCLR uses explicit Option absence and no public setter. .NET documents the actual
+final request after redirects/authentication; this POC records the request after
+applying client defaults and does not implement those rewrites. This limitation must be revisited
+when adding redirects or request-transforming handlers. A response reused by a custom
+handler across sends is mutable: its last association replaces its previous one.
+
+Already-completed handler tasks preserve their readiness. Pending tasks use a
+per-send Map continuation on the existing dispatcher, retaining the request until
+completion. The extra continuation/allocation is a provisional cost; no scheduler
+or runtime suspension contract is introduced. Keeping a response alive retains its
+request and content through ordinary GC references without transferring ownership.
+
+
+### Client defaults and deferred per-call customization — 2026-09-26
+
+The author postpones per-call header parameters on JSON helpers and requests client
+DefaultRequestHeaders. The property uses Sequence<HttpHeader>, with copies on both
+get and set. Send validates the snapshot before invoking the handler and derives a
+request only when defaults are actually added; the caller request is unchanged and
+its content is shared. Explicit headers override defaults by case-insensitive name.
+Repeated default values for absent fields remain ordered. Transport-controlled
+headers and Content-Type are rejected, as with WithHeader; JSON content keeps its
+media type. Invalid defaults fail before custom or socket handlers are called.
+More than 13 default/merged application fields returns LimitExceeded. Already-requested
+cancellation takes precedence over preparation. These snapshots do not promise
+thread-safe concurrent mutation of configuration or supplied collections.
+
+This follows [.NET's client-wide default-header role](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.defaultrequestheaders?view=net-10.0), using the current sequence model
+rather than adding a new specialized header collection. The benefit is a small API
+composing with existing header validation; the cost is replacement-style configuration
+and copied collections instead of mutating a property-owned header collection.
+Per-call JSON-helper options and richer header APIs remain later design work.

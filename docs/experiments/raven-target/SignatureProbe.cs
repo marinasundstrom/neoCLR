@@ -479,6 +479,21 @@ static class SignatureProbe
         baseSetter.Parameters[0].ParameterType = module.TypeSystem.String;
         Reject("HTTP base setter rejects plain string signature", () => HttpBindings.Bind(baseSetter, baseSetter, false, false));
         baseSetter.Parameters[0].ParameterType = baseArgument;
+        var defaultsType = module.GetType("System.Web.Http.HttpClient");
+        var defaultsGetter = defaultsType.Methods.Single(m => m.Name == "get_DefaultRequestHeaders");
+        var defaultsSetter = defaultsType.Methods.Single(m => m.Name == "set_DefaultRequestHeaders");
+        Check("HTTP default headers getter", HttpBindings.Bind(defaultsGetter, defaultsGetter, false, false)?.Result == "System.Collections.Sequence<System.Web.Http.HttpHeader>");
+        Check("HTTP default headers setter", HttpBindings.Bind(defaultsSetter, defaultsSetter, false, false) is not null);
+        var defaultsArgument = defaultsSetter.Parameters[0].ParameterType;
+        defaultsSetter.Parameters[0].ParameterType = module.TypeSystem.String;
+        Reject("HTTP default headers reject forged setter", () => HttpBindings.Bind(defaultsSetter, defaultsSetter, false, false));
+        defaultsSetter.Parameters[0].ParameterType = defaultsArgument;
+        foreach (var helper in new[] { requestType.Methods.Single(m => m.Name == "WithDefaults"),
+            module.GetType(HttpBindings.Prefix + "HttpResponse").Methods.Single(m => m.Name == "Associate") }) {
+            Check("HTTP association helper remains internal " + helper.Name, helper.IsAssembly);
+            Reject("HTTP association helper excludes consumers " + helper.Name, () => HttpBindings.Bind(helper, helper, false, false));
+            Check("HTTP association helper binds in library " + helper.Name, HttpBindings.Bind(helper, helper, false, true) is not null);
+        }
         EnumBindings.Validate(module, EnumBindings.HttpStatusCode);
         var statusEnum = module.GetType(EnumBindings.HttpStatusCode);
         Check("HTTP status is a non-flags CLI enum", statusEnum.IsEnum && statusEnum.CustomAttributes.Count == 0);

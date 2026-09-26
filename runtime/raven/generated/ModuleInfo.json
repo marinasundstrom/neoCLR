@@ -16,7 +16,7 @@
     "runtime/raven/src/System/Uri.rvn": "e73fc3c47bc8659c23eb787d8e38ff481b4d5d0646311fda49a5697b907f61c9",
     "runtime/raven/src/System/UriError.rvn": "4cb6c1aa4d9c8bb51e3eb1964a5e5c57330e0b9091bd44bf5125a8a99c027dce",
     "runtime/raven/src/System/Web/Http/HttpServer.rvn": "925396df2c6d42d2eecc917e9e298b25390f7ef84ac27e0787ad5878ba74ed49",
-    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "68e188bd5000eaea5609faf27da4489768500bae267d334eaea1eae2ea3ec049",
+    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "8b8690e8365d7b5e511ee7724900d561d5d05c7e3d50dc223a840d377861110b",
     "runtime/raven/src/System/Web/Http/HttpError.rvn": "9418b3e16c9f56e3f5c57ca98108d0ca59d14d870ff26e1b2322f202786a378a",
     "runtime/raven/src/System/Networking/DnsError.rvn": "3d29e8b2008d54270cb35a581f4ba38e6d0672f4576b334100fc72d8f729a7bd",
     "runtime/raven/src/System/Networking/Dns.rvn": "750806e7716026fcfc5d0cf1b77b90c4d9175b1c32d5bdc4a612f1b469ea1074",
@@ -136,7 +136,7 @@
     "ModuleInfo.helpers.neoil": "50bc29f291b4d53b5ef91c287ed8e9e3484246cd5387562d28110769c5efc679"
   },
   "compilerSha256": "47e60017869670f82c62d83b124983f0dd39e3af0c3bf008cb98d85179405f7a",
-  "coreSha256": "a82714bb6b56bc749208e60d7345c40e98feaddac4bd6c25e08f05e3981d7c11",
+  "coreSha256": "721632e1ca6bba5cebf0b8f59abcfeb35a8550053d216d27c5dbc43f3d2a4110",
   "exports": [
     "get_Name() -> String",
     "get_Assembly() -> System.Introspection.AssemblyInfo",

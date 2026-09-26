@@ -38,3 +38,8 @@ The existing HTTP client fixture's single `trickling body` case also passes with
 new boundary: Request deadline exceeded, 590 allocations, 11 collections and zero
 live objects. Its independent .NET Content-Length/UTF-8 baseline passes. Broader
 network/platform matrices and the website build were not repeated.
+
+Client default-header validation on 2026-09-26 adds shared X-Client and Accept
+headers. The independent peer confirms explicit POST Accept overrides the default,
+while GET inherits it; the response exposes the effective request. The fixture
+passes with 2,157 allocations, 48 collections and zero final live objects.

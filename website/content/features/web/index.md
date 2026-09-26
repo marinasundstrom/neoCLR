@@ -329,6 +329,15 @@ The server accepts these methods and exposes their buffered content to its handl
 PATCH content is opaque: applications choose its media type and behavior. The library
 does not apply patches. HEAD returns headers with empty content; the server computes representation length from the buffered response without sending its body. OPTIONS is not implemented.
 
+Client responses now expose `Request: Option<HttpRequest>`. A response returned
+through `HttpClient.Send` retains the effective request passed to the handler, including when a custom
+handler produced the response. `DefaultRequestHeaders` supplies shared application
+headers; explicit request headers take precedence. Applying defaults creates a new
+request without changing the original. Defaults cannot override transport fields or
+content media types. Standalone and server-created responses start
+with `None`. This is an originating-request reference; redirect tracking is not yet
+implemented. Retaining the response also retains that request and its content.
+
 ## JSON DOM
 
 The development `System.Data.Json` API can parse, inspect, construct and write a small

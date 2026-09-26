@@ -8,6 +8,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-26
 
+- Add HttpResponse.Request as Option<HttpRequest>, associated by HttpClient.Send
+  for immediate and pending responses through custom/socket handlers. Add copied
+  DefaultRequestHeaders; explicit headers win case-insensitively, invalid defaults
+  fail before handlers, and transport/content fields remain controlled by their
+  existing APIs. Defaults derive an effective request without mutating the original;
+  response association exposes that effective request. Preserve ready-task behavior,
+  failed/cancelled outcomes and associations when changing response status/content.
+  Record a deferred Raven generic method-group/diagnostic issue found while exploring
+  GetFromJson/PostAsJson; those helpers are not implemented by this change.
+  Focused handler and independent GET/POST wire checks pass with zero final live
+  objects; the neoCLR mapped JSON client/server pair also passes (425/369
+  allocations, zero final live objects). All 569 bridge signature checks and
+  API/library snapshot checks pass.
+  Full suite and website build skipped by direction.
+
 - Add provisional System.Web.Http.Json.JsonContent helpers for model/node content
   creation and typed, TypeInfo or node reads. Reuse synchronous buffered JSON/UTF-8
   conversion with unchanged mapping errors and limits; reject oversized buffers

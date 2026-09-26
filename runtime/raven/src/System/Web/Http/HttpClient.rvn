@@ -68,6 +68,21 @@ public class HttpHeader {
 }
 
 public class HttpResponse {
+    private var originatingRequest: Option<HttpRequest> = None()
+    /// The effective client request passed to the handler, including applied defaults.
+    val Request: Option<HttpRequest> {
+        get {
+            if let Some(request) = originatingRequest {
+                return Some(request)
+            }
+            return None()
+        }
+    }
+
+    internal func Associate(request: HttpRequest) {
+        originatingRequest = Some(request)
+    }
+
     private var storedStatusCode: int
     val StatusCode: HttpStatusCode => (HttpStatusCode)storedStatusCode
     /// Whether the response status is in the successful 200–299 range.
@@ -646,6 +661,42 @@ public class HttpRequest {
         return Ok(request)
     }
 
+    internal func WithDefaults(defaults: Sequence<HttpHeader>) -> Result<HttpRequest, HttpError> {
+        if defaults.Count == 0 {
+            return Ok(self)
+        }
+        if defaults.Count > 13 {
+            return Error(HttpError.LimitExceeded("Default request header count exceeded"))
+        }
+        let headers = ArrayList<HttpHeader>()
+        for header in defaults {
+            let key = HeaderName(header.Name)?
+            if ReservedHeader(key) || key == "content-type" {
+                return Error(HttpError.InvalidRequest("Default header is controlled by transport or content"))
+            }
+            if !HeaderValueValid(header.Value) {
+                return Error(HttpError.InvalidRequest("Invalid default request header value"))
+            }
+            if HttpHeader.FindValues(storedHeaders, header.Name).Count == 0 {
+                headers.Add(header)
+            }
+        }
+        if headers.Count == 0 {
+            return Ok(self)
+        }
+        for header in storedHeaders {
+            headers.Add(header)
+        }
+        if headers.Count > 13 {
+            return Error(HttpError.LimitExceeded("Request application header count exceeded"))
+        }
+        let request = HttpRequest(storedHost, storedPort, storedTarget)
+        request.storedMethod = storedMethod
+        request.storedContent = storedContent
+        request.storedHeaders = headers
+        return Ok(request)
+    }
+
     private static func HeaderName(name: string) -> Result<string, HttpError> {
         let bytes = Utf8.Encode(name)
         if bytes.Count == 0 || bytes.Count > 2048 {
@@ -840,6 +891,26 @@ public class HttpRequest {
 }
 
 public class HttpClient {
+    private var defaultHeaders: Sequence<HttpHeader> = ArrayList<HttpHeader>()
+
+    /// Client-wide application headers, copied on get/set and validated at Send.
+    var DefaultRequestHeaders: Sequence<HttpHeader> {
+        get {
+            let snapshot = ArrayList<HttpHeader>()
+            for header in defaultHeaders {
+                snapshot.Add(header)
+            }
+            return snapshot
+        }
+        set {
+            let snapshot = ArrayList<HttpHeader>()
+            for header in value {
+                snapshot.Add(header)
+            }
+            defaultHeaders = snapshot
+        }
+    }
+
     private var handler: HttpHandler
     private var baseUri: Option<string> = None()
 
@@ -879,7 +950,23 @@ public class HttpClient {
         if cancellationToken.IsCancellationRequested {
             return Cancelled()
         }
-        return handler.Send(request, cancellationToken)
+        let prepared = request.WithDefaults(defaultHeaders)
+        if let Error(error) = prepared {
+            return Failure(error)
+        }
+        let Ok(outgoing) = prepared else {
+            System.Fault("Request preparation returned no outcome")
+        }
+        let sent = handler.Send(outgoing, cancellationToken)
+        if sent.IsCompleted {
+            if !sent.IsCancelled {
+                if let Ok(response) = sent.GetResult() {
+                    response.Associate(outgoing)
+                }
+            }
+            return sent
+        }
+        return sent.Map(HttpResponseAssociation(outgoing).Attach)
     }
 
     /// Sends an absolute URL without a base, or a relative URL when BaseUri is set.
@@ -1448,5 +1535,21 @@ internal class HttpExchange {
                 Finish(Error(HttpError.Transport(reason)))
             }
         }
+    }
+}
+
+
+// Per-send state retains the originating request until completion, including custom handlers.
+internal class HttpResponseAssociation {
+    private var request: HttpRequest
+    internal init(request: HttpRequest) {
+        self.request = request
+    }
+
+    internal func Attach(result: Result<HttpResponse, HttpError>) -> Result<HttpResponse, HttpError> {
+        if let Ok(response) = result {
+            response.Associate(request)
+        }
+        return result
     }
 }

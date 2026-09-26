@@ -1,0 +1,149 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+import System.Text.*
+import System.Web.Http.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("HTTP request/header assertion failed")
+    }
+}
+
+class ReplyHandler : HttpHandler {
+    val Completion: Promise<Result<HttpResponse, HttpError>> = Promise<Result<HttpResponse, HttpError>>()
+    val Response: HttpResponse
+    var Calls: int = 0
+    var SawToken: bool = false
+    private var pending: bool
+
+    init(status: int, text: string, pending: bool) {
+        Response = HttpResponse(status, ArrayList<HttpHeader>(), Utf8.Encode(text))
+        self.pending = pending
+    }
+
+    func Send(request: HttpRequest, token: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        Calls += 1
+        SawToken = token.CanBeCancelled
+        if !pending {
+            _ = Completion.Complete(Ok(Response))
+        }
+        return Completion.Task
+    }
+}
+
+func RequestAssociation() {
+    let ready = ReplyHandler(200, "{}", false)
+    Check(ready.Response.Request is None)
+    let Ok(request) = HttpRequest.Get("http://example.test/direct") else {
+        System.Fault("Request creation failed")
+    }
+    let sent = HttpClient(ready).Send(request)
+    Check(sent.IsCompleted)
+    let Ok(response) = sent.GetResult() else {
+        System.Fault("Send failed")
+    }
+    let Some(original) = response.Request else {
+        System.Fault("Originating request missing")
+    }
+    Check(Object.ReferenceEquals(original, request))
+    Check(Object.ReferenceEquals(response, ready.Response))
+    response.Respond(HttpStatusCode.Accepted)
+    Check(response.Request is Some(_))
+
+    let delayed = ReplyHandler(200, "{}", true)
+    let waiting = HttpClient(delayed).Send(request)
+    Check(!waiting.IsCompleted && delayed.Response.Request is None)
+    // Force allocation pressure while the continuation owns the association state.
+    var i = 0
+    while i < 100 {
+        _ = HttpContent.FromText("temporary")
+        i += 1
+    }
+    _ = delayed.Completion.Complete(Ok(delayed.Response))
+    TaskQueue.Default.Drain()
+    Check(waiting.IsCompleted)
+    let Some(retained) = delayed.Response.Request else {
+        System.Fault("Delayed request missing")
+    }
+    Check(Object.ReferenceEquals(retained, request))
+
+    let failed = ReplyHandler(200, "{}", true)
+    let failure = HttpClient(failed).Send(request)
+    _ = failed.Completion.Complete(Error(HttpError.Handler("expected")))
+    TaskQueue.Default.Drain()
+    let Error(HttpError.Handler(message)) = failure.GetResult() else {
+        System.Fault("Handler error missing")
+    }
+    Check(message == "expected")
+    Check(failed.Response.Request is None)
+
+    let cancelled = ReplyHandler(200, "{}", true)
+    let cancellation = HttpClient(cancelled).Send(request)
+    _ = cancelled.Completion.Cancel()
+    TaskQueue.Default.Drain()
+    Check(cancellation.IsCancelled && cancelled.Response.Request is None)
+
+    let token = CancellationTokenSource()
+    token.Cancel()
+    let untouched = ReplyHandler(200, "{}", false)
+    Check(HttpClient(untouched).Send(request, token.Token).IsCancelled)
+    Check(untouched.Calls == 0 && untouched.Response.Request is None)
+    token.Dispose()
+}
+
+func DefaultHeaders() {
+    let defaults = ArrayList<HttpHeader>()
+    defaults.Add(HttpHeader("X-Mode", "default"))
+    defaults.Add(HttpHeader("X-Group", "first"))
+    defaults.Add(HttpHeader("x-group", "second"))
+    let handler = ReplyHandler(200, "{}", false)
+    let client = HttpClient(handler)
+    client.DefaultRequestHeaders = defaults
+    defaults.Add(HttpHeader("X-Later", "ignored"))
+    Check(client.DefaultRequestHeaders.Count == 3)
+    let Ok(baseRequest) = HttpRequest.Get("http://example.test/") else {
+        System.Fault("Default-header request failed")
+    }
+    let Ok(explicitRequest) = baseRequest.WithHeader("x-mode", "explicit") else {
+        System.Fault("Explicit header failed")
+    }
+    let result = client.Send(explicitRequest)
+    Check(result.IsCompleted)
+    let Some(sent) = handler.Response.Request else {
+        System.Fault("Prepared request missing")
+    }
+    Check(!Object.ReferenceEquals(sent, explicitRequest))
+    Check(sent.GetHeaderValues("X-MODE")[0] == "explicit")
+    Check(sent.GetHeaderValues("X-Group").Count == 2)
+    Check(sent.GetHeaderValues("X-Later").Count == 0)
+    Check(explicitRequest.GetHeaderValues("X-Group").Count == 0)
+    client.DefaultRequestHeaders = ArrayList<HttpHeader>()
+    Check(sent.GetHeaderValues("X-Group").Count == 2)
+
+    let invalid = ArrayList<HttpHeader>()
+    invalid.Add(HttpHeader("Content-Type", "text/plain"))
+    let untouched = ReplyHandler(200, "{}", false)
+    let invalidClient = HttpClient(untouched)
+    invalidClient.DefaultRequestHeaders = invalid
+    Check(invalidClient.Send(baseRequest).GetResult() is Error(HttpError.InvalidRequest(_)))
+    Check(untouched.Calls == 0)
+    let framing = ArrayList<HttpHeader>()
+    framing.Add(HttpHeader("Host", "other.test"))
+    invalidClient.DefaultRequestHeaders = framing
+    Check(invalidClient.Send(baseRequest).GetResult() is Error(HttpError.InvalidRequest(_)))
+    let injected = ArrayList<HttpHeader>()
+    injected.Add(HttpHeader("X-Test", "value\r\nInjected: true"))
+    invalidClient.DefaultRequestHeaders = injected
+    Check(invalidClient.Send(baseRequest).GetResult() is Error(HttpError.InvalidRequest(_)))
+    Check(untouched.Calls == 0)
+}
+
+func Main() {
+    RequestAssociation()
+    DefaultHeaders()
+    Console.WriteLine("HTTP request/header checks passed")
+}

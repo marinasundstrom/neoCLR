@@ -47,6 +47,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-request-headers-') as temporary,
                         headers.setdefault(name.lower(), []).append(value.strip())
                     assert headers['host'] == [f'127.0.0.1:{port}'], headers
                     assert headers['connection'] == ['close'], headers
+                    assert headers['x-client'] == ['shared-default'], headers
                     assert headers['x-request-id'] == [('sample-42' if index == 0 else 'get-42')], headers
                     if index == 0:
                         assert headers['accept'] == ['text/plain'], headers
@@ -59,6 +60,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-request-headers-') as temporary,
                             body.extend(part)
                         assert bytes(body) == 'Café'.encode(), body
                     else:
+                        assert headers['accept'] == ['application/json'], headers
                         assert 'content-length' not in headers and 'content-type' not in headers, headers
                     connection.sendall(b'HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n')
                     assert connection.recv(1) == b'', 'Client did not close before EOF'

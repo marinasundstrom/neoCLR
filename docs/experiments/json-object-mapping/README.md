@@ -173,3 +173,8 @@ The managed pair passes with 407 client / 369 server allocations and zero final
 live objects. The client also passes against the independent Python server, which
 checks the JSON media type and body (421 allocations, zero final live objects).
 All 559 signature checks and matching API/library snapshot checks pass.
+
+After client request association/default-header integration (2026-09-26), the
+managed pair passes again in isolation: 425 client / 369 server allocations,
+zero final live objects. Generic JSON verb helpers remain pending; the sample
+uses the working shared JsonContent conversion APIs.

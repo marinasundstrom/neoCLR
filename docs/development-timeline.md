@@ -7552,3 +7552,25 @@ configuration/content, not target-specific code added to Raven main.
   GetFromJsonAsync<T>/PostAsJsonAsync<T> and proposes neoCLR GetFromJson<T>/
   PostAsJson<T>, with POST returning HttpResponse and no implicit response mapping.
   These names and scope are recorded for the next slice; they are not yet shipped.
+
+
+### 2026-09-26 — Request association, client defaults and JSON-client investigation
+
+- **Author:** asks to continue, then explicitly prioritizes HttpResponse.Request.
+  Subsequently postpones per-call header configuration on the JSON helpers and asks
+  for client-wide default request headers.
+- **Assistant implementation:** adds the optional response association at Send,
+  preserving already-completed tasks and attaching pending results with a private
+  continuation. Adds copied DefaultRequestHeaders with explicit fields taking
+  precedence; defaults derive a request without mutating the caller's request.
+  Response.Request exposes the effective request delivered to the handler.
+- **Validation:** immediate/delayed handler, allocation-pressure, failure/cancellation
+  and default-header tests pass with zero final live objects. No full-suite run.
+- **Separate investigation:** generic GetFromJson/PostAsJson source compiled, but the
+  converter method group inside Map emitted a default task without a diagnostic;
+  an explicitly typed delegate instead reported RAV2203. The prototype is preserved
+  and removed from active compilation. No generic client API is claimed complete.
+  See the [investigation record](experiments/http-json-client-prototype/README.md).
+
+- **Author goal reminder:** “We shouldn't forget our goal to have a sample demonstrating Http end-to-end using neoCLR”. The assistant confirms the managed client/server JSON sample remains the acceptance goal; request association and defaults support it, with generic helper integration still pending the compiler investigation.
+- **Validated outcome:** independent GET/POST header checks pass; the mapped JSON neoCLR client/server pair also passes after this change (425 client and 369 server allocations, zero final live objects). All 569 bridge signature checks and API/library snapshots pass. Website build remains skipped by direction.

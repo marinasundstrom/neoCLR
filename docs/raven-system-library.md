@@ -1336,3 +1336,18 @@ wrapper admission and namespace-function representation as Deserialize<T>; no ne
 VM operation, compiler policy or Runtime Contract configuration is introduced.
 The helper root is retained during bootstrap trimming and selected in the API
 reference. General generic class-method import remains outside this bridge scope.
+
+
+### HTTP request association and deferred generic client prototype — 2026-09-26
+
+HttpResponse.Request and HttpClient.DefaultRequestHeaders use the existing Option,
+Sequence, task continuation and class-reference contracts. A private per-send
+HttpResponseAssociation retains the effective request while a pending task completes.
+The bridge exposes the getter/configuration property and keeps preparation and
+association operations internal. No compiler configuration or runtime operation changes.
+
+The separate [generic JSON client investigation](experiments/http-json-client-prototype/README.md)
+exposed a generic method-group diagnostic/emission problem in the current Raven
+compiler. Its experimental generic bridge/union additions were removed from the
+active library pending an independent compiler reproduction. Existing JsonContent
+and typed serializer wrappers remain supported.

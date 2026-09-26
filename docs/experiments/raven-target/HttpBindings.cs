@@ -4,10 +4,10 @@ using Mono.Cecil;
 static class HttpBindings
 {
     public const string Prefix = "System.Web.Http.";
-    public static readonly string[] Names = ["HttpClient", "HttpHandler", "HttpRequest", "HttpResponse", "HttpContent", "HttpHeader", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange", "HttpServer", "HttpRequestDecoder", "HttpServerExchange", "HttpContext", "HttpServeOperation"];
+    public static readonly string[] Names = ["HttpClient", "HttpHandler", "HttpRequest", "HttpResponse", "HttpContent", "HttpHeader", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange", "HttpServer", "HttpRequestDecoder", "HttpServerExchange", "HttpContext", "HttpServeOperation", "HttpResponseAssociation"];
     public static bool IsName(string name) => Names.Any(n => name == Prefix + n);
     public static bool IsContract(string name) => name == Prefix + "HttpHandler";
-    public static bool IsProvider(TypeDefinition type) => type.FullName is Prefix + "HttpResponseDecoder" or Prefix + "HttpExchange" or Prefix + "HttpRequestDecoder" or Prefix + "HttpServerExchange" or Prefix + "HttpServeOperation";
+    public static bool IsProvider(TypeDefinition type) => type.FullName is Prefix + "HttpResponseDecoder" or Prefix + "HttpExchange" or Prefix + "HttpRequestDecoder" or Prefix + "HttpServerExchange" or Prefix + "HttpServeOperation" or Prefix + "HttpResponseAssociation";
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
     public static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
@@ -22,6 +22,7 @@ static class HttpBindings
                 public HttpClient() { }
                 public HttpClient(HttpHandler handler) { }
                 public Option<string> BaseUri { get; set; }
+                public Collections.Sequence<HttpHeader> DefaultRequestHeaders { get; set; }
                 public Tasks.Task<Result<HttpResponse, HttpError>> Get(string url) => default;
                 public Tasks.Task<Result<HttpResponse, HttpError>> Get(string url, Concurrency.CancellationToken cancellationToken) => default;
                 public Tasks.Task<Result<string, HttpError>> GetString(string url) => default;
@@ -82,6 +83,7 @@ static class HttpBindings
                 public Collections.Sequence<HttpHeader> Headers => default;
                 public Collections.Sequence<string> GetHeaderValues(string name) => default;
                 public Result<HttpRequest, HttpError> WithHeader(string name, string value) => default;
+                public Result<HttpRequest, HttpError> WithDefaults(Collections.Sequence<HttpHeader> defaults) => default;
                 public Result<Collections.Sequence<byte>, HttpError> Encode() => default;
                 public static Result<HttpRequest, HttpError> FromIncoming(string method, string target, string host, Collections.Sequence<HttpHeader> headers, Collections.Sequence<byte> body) => default;
                 public string Method => default;
@@ -90,6 +92,8 @@ static class HttpBindings
                 public string Target => default;
             }
             public sealed class HttpResponse {
+                public Option<HttpRequest> Request => default;
+                public void Associate(HttpRequest request) { }
                 public HttpResponse(int statusCode, Collections.Sequence<HttpHeader> headers, Collections.Sequence<byte> body) { }
                 public HttpResponse(HttpStatusCode statusCode, Collections.Sequence<HttpHeader> headers, Collections.Sequence<byte> body) { }
                 public void Respond(HttpStatusCode statusCode) { }
@@ -156,6 +160,10 @@ static class HttpBindings
                 public Result<HttpResponse, HttpError> Finish() => default;
                 public Result<HttpResponse, HttpError> EndOfInput() => default;
             }
+            public sealed class HttpResponseAssociation {
+                public HttpResponseAssociation(HttpRequest request) { }
+                public Result<HttpResponse, HttpError> Attach(Result<HttpResponse, HttpError> result) => default;
+            }
             public sealed class HttpExchange {
                 public HttpExchange(HttpRequest request, Concurrency.CancellationToken token) { }
                 public Tasks.Task<Result<HttpResponse, HttpError>> Execute() => default;
@@ -165,7 +173,7 @@ static class HttpBindings
     public static void Project(ModuleDefinition module)
     {
         foreach (var type in module.Types.Where(t => IsName(t.FullName)))
-            foreach (var method in type.Methods.Where(m => m.Name == "FindValues" || m.Name == "FromIncoming" || m.Name == "EncodeResponse" || type.Name == "HttpRequest" && m.Name == "Encode" || type.Name == "HttpContent" && m.Name == "get_MediaType" || type.Name == "HttpServer" && (m.IsConstructor || m.Name is "Release" or "get_StopToken") || type.Name == "HttpContext" && (m.IsConstructor || m.Name == "Send")))
+            foreach (var method in type.Methods.Where(m => type.Name == "HttpResponse" && m.Name == "Associate" || m.Name == "FindValues" || m.Name == "FromIncoming" || m.Name == "EncodeResponse" || type.Name == "HttpRequest" && m.Name is "Encode" or "WithDefaults" || type.Name == "HttpContent" && m.Name == "get_MediaType" || type.Name == "HttpServer" && (m.IsConstructor || m.Name is "Release" or "get_StopToken") || type.Name == "HttpContext" && (m.IsConstructor || m.Name == "Send")))
                 method.Attributes = (method.Attributes & ~MethodAttributes.MemberAccessMask) | MethodAttributes.Assembly;
         foreach (var type in module.Types.Where(IsProvider))
         {
@@ -224,8 +232,15 @@ static class HttpBindings
             ("HttpRequest", "get_Content") => ("", Prefix + "HttpContent", false),
             ("HttpRequest", "WithHeader") => ("String,String", $"System.Result<{request},System.Web.Http.HttpError>", false),
             ("HttpRequest", "Encode") when library => ("", "System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>", false),
+            ("HttpResponse", "get_Request") => ("", "System.Option<System.Web.Http.HttpRequest>", false),
+            ("HttpResponse", "Associate") when library => (request, "noresult", false),
+            ("HttpResponseAssociation", ".ctor") when library => (request, "noresult", false),
+            ("HttpResponseAssociation", "Attach") when library => ($"System.Result<{response},System.Web.Http.HttpError>", $"System.Result<{response},System.Web.Http.HttpError>", false),
             ("HttpContent", "get_MediaType") when library => ("", "System.Option<String>", false),
             ("HttpContent", "FromText") => ("String", Prefix + "HttpContent", true),
+            ("HttpRequest", "WithDefaults") when library => ("System.Collections.Sequence<System.Web.Http.HttpHeader>", $"System.Result<{request},System.Web.Http.HttpError>", false),
+            ("HttpClient", "get_DefaultRequestHeaders") => ("", "System.Collections.Sequence<System.Web.Http.HttpHeader>", false),
+            ("HttpClient", "set_DefaultRequestHeaders") => ("System.Collections.Sequence<System.Web.Http.HttpHeader>", "noresult", false),
             ("HttpClient", "get_BaseUri") => ("", "System.Option<String>", false),
             ("HttpClient", "set_BaseUri") => ("System.Option<String>", "noresult", false),
             ("HttpHandler", "Send") => (request + ",System.Concurrency.CancellationToken", task, false),

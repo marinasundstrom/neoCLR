@@ -213,7 +213,14 @@ and node creation/reads across both peers; client verb and instance extension
 conveniences are next: generic-only `GetFromJson<T>`/`PostAsJson<T>` follow the
 author's .NET naming clarification (omitting Async like neoCLR's existing HTTP verbs).
 POST returns the response rather than implicitly decoding its body. The author proposes
-`HttpResponse.Request: Option<HttpRequest>` for request association. DOM operations now use explicit
+`HttpResponse.Request: Option<HttpRequest>` for request association. That association
+and copied `HttpClient.DefaultRequestHeaders` are now implemented and exercised with
+immediate/delayed handlers. The [generic client prototype](experiments/http-json-client-prototype/README.md)
+exposed a Raven generic method-group/diagnostic issue; reduce and fix that independently
+before integrating the client verbs. Per-call JSON-helper header configuration remains
+later work by author direction. The author reaffirms that the acceptance goal is an
+end-to-end HTTP application using neoCLR on both client and server; these helpers
+and header contracts support that sample rather than becoming a separate API-expansion milestone. DOM operations now use explicit
 `DeserializeNode`/`SerializeNode` names, separate from object mapping; latency under load stays an open
 validation item before making the mapped variant the default.
 General invocation and field assignment remain outside this checkpoint. **Author clarification:** `System.Runtime.Reflection`

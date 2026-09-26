@@ -1,4 +1,5 @@
 import System.*
+import System.Option.*
 import System.Collections.*
 import System.Concurrency.*
 import System.Result.*
@@ -94,6 +95,10 @@ func CheckContracts() -> Result<unit, HttpError> {
 class ClientProbe {
     private val client: HttpClient = HttpClient()
     func Start() {
+        let defaults = ArrayList<HttpHeader>()
+        defaults.Add(HttpHeader("X-Client", "shared-default"))
+        defaults.Add(HttpHeader("Accept", "application/json"))
+        client.DefaultRequestHeaders = defaults
         let pending = SendReport(client, "http://127.0.0.1:19091/report", "Café")
         pending.OnCompleted(() => {
             let Ok(response) = pending.GetResult() else {
@@ -101,6 +106,12 @@ class ClientProbe {
                 return
             }
             Check(response.IsSuccessStatusCode)
+            let Some(request) = response.Request else {
+                System.Fault("POST response request missing")
+                return
+            }
+            Check(request.Target == "/report")
+            Check(request.GetHeaderValues("X-Client")[0] == "shared-default")
             SendGet()
         })
     }
