@@ -342,7 +342,9 @@ JSON null. Numbers retain their JSON spelling until an explicit conversion is re
 ```
 
 The tested example adds an acknowledgement to an object and propagates failures.
-`JsonSerializer` uses StreamReader/StreamWriter and leaves supplied streams open;
+`JsonSerializer.DeserializeNode` and `SerializeNode` read and write the DOM.
+Object mapping uses `Deserialize<T>` and `Serialize`. The stream overloads use
+StreamReader/StreamWriter and leave supplied streams open;
 the caller controls flushing and closing. The sample also runs through
 [MemoryStream](/docs/api/System/IO/MemoryStream/) using write, rewind and read.
 

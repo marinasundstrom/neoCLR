@@ -10,19 +10,19 @@ func Check(condition: bool) {
 }
 
 func RoundTrip() -> Result<unit, MappingError> {
-    let document = JsonSerializer.Deserialize("{\"station\":\"Café\"}")?
+    let document = JsonSerializer.DeserializeNode("{\"station\":\"Café\"}")?
     let report = DecodeReport(document)?
     Check(report.Station == "Café")
     Check(report.Assignments == 1)
     let mapped = EncodeReport(report)?
-    let text = JsonSerializer.Serialize(mapped)?
+    let text = JsonSerializer.SerializeNode(mapped)?
     Check(text == "{\"station\":\"Café\"}")
 
     // Serializer borrows the stream; mapping remains a separate DOM operation.
     let stream = MemoryStream()
-    _ = JsonSerializer.Serialize(stream, mapped)?
+    _ = JsonSerializer.SerializeNode(stream, mapped)?
     _ = stream.Seek(0).MapError(error => MappingError.Schema("Seek failed"))?
-    let reread = JsonSerializer.Deserialize(stream)?
+    let reread = JsonSerializer.DeserializeNode(stream)?
     let restored = DecodeReport(reread)?
     Check(restored.Station == report.Station)
     Check(restored.Assignments == 1)

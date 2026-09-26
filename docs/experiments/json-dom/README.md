@@ -49,3 +49,18 @@ for each batch; the ordinary CLI default budget is too small for several documen
 Every batch must finish with zero live managed objects. Signature checks separately
 cover all public members, internal helper rejection, upcast direction, closed-family
 metadata and external-subclass rejection. No broad platform or website build is run.
+
+
+The DOM entry points are `JsonSerializer.DeserializeNode` and `SerializeNode`,
+with string and borrowed-stream overloads. Object mapping retains `Deserialize<T>`
+and `Serialize`; rebuild older consumers after updating their DOM call sites.
+The experiment-local serializer under json-streams is an earlier checkpoint and
+retains its historical names; it is not the public System.Data.Json API.
+
+
+The Node-name migration passes the focused public DOM/stream consumer and typed
+object mapper, both with zero final live objects, plus 551 bridge signature checks.
+Matching API and library snapshots validate. The website build is skipped by author
+direction; its example is sourced from the updated compiled Sample.rvn.
+The default managed HTTP pair also passes using Node calls, with 310 client and
+309 server allocations and zero final live objects on both sides.

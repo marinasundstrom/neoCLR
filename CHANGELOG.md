@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-26
 
+- Rename the development JSON DOM entry points to DeserializeNode/SerializeNode
+  for string and stream overloads. Object mapping keeps Deserialize<T>, TypeInfo
+  reads and Serialize(Object), including its existing node passthrough. Update DOM
+  consumers, API reference and website examples; rebuild consumers with matching
+  references/library. This is a naming migration, not a codec or mapping change.
+  Focused DOM/stream, typed-mapping and HTTP-pair checks pass with zero final live
+  objects; 551 signature checks and API/library snapshots pass. Website build skipped.
+
 - Install a committed local SDK/VS Code snapshot and prepare editable HTTP/JSON,
   calendar and async projects with a sample-selecting launcher. Add explicit
   HTTP test-runner budgets, peer verification and reproducible launch instructions.

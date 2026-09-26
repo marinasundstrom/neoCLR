@@ -28,7 +28,7 @@ extension JsonErrorConversion for JsonError {
 }
 
 func JsonContent(value: JsonValue) -> Result<HttpContent, JsonError> {
-    let text = JsonSerializer.Serialize(value)?
+    let text = JsonSerializer.SerializeNode(value)?
     return Ok(HttpContent(Utf8.Encode(text), "application/json; charset=utf-8"))
 }
 
@@ -39,7 +39,7 @@ func CreateReport() -> Result<JsonObject, JsonError> {
 }
 
 func Acknowledge(payload: string) -> Result<JsonObject, JsonError> {
-    let value = JsonSerializer.Deserialize(payload)?
+    let value = JsonSerializer.DeserializeNode(payload)?
     if value is JsonObject report {
         let stationValue = report.Field("station")?
         if stationValue is JsonString station {
@@ -64,12 +64,12 @@ func ReadReply(result: Result<HttpResponse, HttpError>) -> Result<string, AppErr
         return Error(AppError.Http(HttpError.UnsuccessfulStatus(response.StatusCode)))
     }
     let text = Utf8.Decode(response.Content.Bytes).MapError(error => AppError.Body("Invalid UTF-8 response"))?
-    let value = JsonSerializer.Deserialize(text)?
+    let value = JsonSerializer.DeserializeNode(text)?
     if value is JsonObject reply {
         let accepted = reply.Field("accepted")?
         if accepted is JsonBoolean success {
             if success.Value {
-                let output = JsonSerializer.Serialize(reply)?
+                let output = JsonSerializer.SerializeNode(reply)?
                 return Ok(output)
             }
         }

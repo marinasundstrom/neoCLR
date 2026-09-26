@@ -751,7 +751,7 @@ pop
 M00000002_IL_0007:
 ret
 .end
-.method static Deserialize(String text) -> System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>
+.method static DeserializeNode(String text) -> System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
@@ -791,7 +791,7 @@ callvirt instance System.Data.Json.DocumentReader::Read()
 M00000003_IL_0041:
 ret
 .end
-.method static Deserialize(System.IO.InputStream input) -> System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>
+.method static DeserializeNode(System.IO.InputStream input) -> System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>
 .local System.IO.StreamReader local0
 .local System.Result<String,System.IO.TextReadError> local1
 .local System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError> local2
@@ -878,7 +878,7 @@ M00000004_IL_0061:
 M00000004_IL_0062:
 ldloc local3
 M00000004_IL_0063:
-call System.Data.Json.JsonSerializer::Deserialize(String)
+call System.Data.Json.JsonSerializer::DeserializeNode(String)
 M00000004_IL_0068:
 stloc local2
 M00000004_IL_0069:
@@ -946,7 +946,7 @@ ldloc local2
 M00000004_IL_00cd:
 ret
 .end
-.method static Serialize(System.Data.Json.JsonValue value) -> System.Result<String,System.Data.Json.JsonError>
+.method static SerializeNode(System.Data.Json.JsonValue value) -> System.Result<String,System.Data.Json.JsonError>
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -958,7 +958,7 @@ callvirt instance System.Data.Json.DocumentWriter::Write(System.Data.Json.JsonVa
 M00000005_IL_000d:
 ret
 .end
-.method static Serialize(System.IO.OutputStream output,System.Data.Json.JsonValue value) -> System.Result<Void,System.Data.Json.JsonError>
+.method static SerializeNode(System.IO.OutputStream output,System.Data.Json.JsonValue value) -> System.Result<Void,System.Data.Json.JsonError>
 .local System.Result<String,System.Data.Json.JsonError> local0
 .local String local1
 .local System.Data.Json.JsonError local2
@@ -995,7 +995,7 @@ M00000006_IL_0001:
 M00000006_IL_0002:
 ldarg 1
 M00000006_IL_0003:
-call System.Data.Json.JsonSerializer::Serialize(System.Data.Json.JsonValue)
+call System.Data.Json.JsonSerializer::SerializeNode(System.Data.Json.JsonValue)
 M00000006_IL_0008:
 stloc local0
 M00000006_IL_0009:
@@ -1195,7 +1195,7 @@ M00000009_IL_0001:
 M00000009_IL_0002:
 ldarg 0
 M00000009_IL_0003:
-call System.Data.Json.JsonSerializer::Deserialize(String)
+call System.Data.Json.JsonSerializer::DeserializeNode(String)
 M00000009_IL_0008:
 stloc local0
 M00000009_IL_0009:
@@ -1262,7 +1262,7 @@ M0000000a_IL_0001:
 M0000000a_IL_0002:
 ldarg 0
 M0000000a_IL_0003:
-call System.Data.Json.JsonSerializer::Deserialize(System.IO.InputStream)
+call System.Data.Json.JsonSerializer::DeserializeNode(System.IO.InputStream)
 M0000000a_IL_0008:
 stloc local0
 M0000000a_IL_0009:
@@ -1351,7 +1351,7 @@ M0000000b_IL_0017:
 M0000000b_IL_0018:
 ldloc local0
 M0000000b_IL_0019:
-call System.Data.Json.JsonSerializer::Serialize(System.Data.Json.JsonValue)
+call System.Data.Json.JsonSerializer::SerializeNode(System.Data.Json.JsonValue)
 M0000000b_IL_001e:
 ret
 M0000000b_IL_001f:
@@ -1404,7 +1404,7 @@ M0000000b_IL_0060:
 M0000000b_IL_0061:
 ldloc local4
 M0000000b_IL_0063:
-call System.Data.Json.JsonSerializer::Serialize(System.Data.Json.JsonValue)
+call System.Data.Json.JsonSerializer::SerializeNode(System.Data.Json.JsonValue)
 M0000000b_IL_0068:
 ret
 .end
@@ -1448,7 +1448,7 @@ ldarg 0
 M0000000c_IL_0019:
 ldloc local0
 M0000000c_IL_001a:
-call System.Data.Json.JsonSerializer::Serialize(System.IO.OutputStream,System.Data.Json.JsonValue)
+call System.Data.Json.JsonSerializer::SerializeNode(System.IO.OutputStream,System.Data.Json.JsonValue)
 M0000000c_IL_001f:
 ret
 M0000000c_IL_0020:
@@ -1503,7 +1503,7 @@ ldarg 0
 M0000000c_IL_0063:
 ldloc local4
 M0000000c_IL_0065:
-call System.Data.Json.JsonSerializer::Serialize(System.IO.OutputStream,System.Data.Json.JsonValue)
+call System.Data.Json.JsonSerializer::SerializeNode(System.IO.OutputStream,System.Data.Json.JsonValue)
 M0000000c_IL_006a:
 ret
 .end

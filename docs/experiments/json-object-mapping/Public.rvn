@@ -52,7 +52,7 @@ func RoundTrip() -> Result<unit, JsonError> {
     Check(typed.Station == "Café" && typed.Count == 42 && typed.Active)
     Check(typed.GetAssignments() == 1)
     let serialized = JsonSerializer.Serialize(instance)?
-    let dom = JsonSerializer.Deserialize(serialized)?
+    let dom = JsonSerializer.DeserializeNode(serialized)?
     if dom is JsonObject document {
         Check(document.Count == 4)
         let summary = document.Field("Summary")?

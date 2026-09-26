@@ -8,6 +8,17 @@ reads/writes the closed JsonValue DOM and now has provisional flat-object overlo
 Rebuild consumers with the matching development reference and library; JsonError has
 new mapping cases. All operations are synchronous and return Result with [JsonError](xref:System.Data.Json.JsonError).
 
+Use the explicit Node methods for the DOM boundary:
+
+```text
+DeserializeNode(text: string) -> Result<JsonValue, JsonError>
+DeserializeNode(input: InputStream) -> Result<JsonValue, JsonError>
+SerializeNode(value: JsonValue) -> Result<string, JsonError>
+SerializeNode(output: OutputStream, value: JsonValue) -> Result<unit, JsonError>
+```
+
+Object mapping uses these methods:
+
 ```text
 Deserialize<T>(text: string) -> Result<T, JsonError>
 Deserialize<T>(input: InputStream) -> Result<T, JsonError>
@@ -24,7 +35,10 @@ targets such as value types. Construction requires a
 runtime-backed public nongeneric reference class with a public parameterless
 constructor. The serializer invokes real constructors/getters/setters through
 [runtime reflection](reflection.md); it never writes backing fields directly.
-JsonValue inputs use the existing DOM codec, including when held as Object.
+JsonValue inputs to the Object overload still use the DOM codec, including when
+held as Object. Prefer SerializeNode when explicitly working with nodes. The earlier
+DOM Deserialize/Serialize signatures have been renamed; migrate DOM callers and
+rebuild with matching references and library artifacts.
 
 ## Provisional property rules
 

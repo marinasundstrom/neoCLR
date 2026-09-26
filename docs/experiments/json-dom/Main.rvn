@@ -89,10 +89,10 @@ class ShortOutput : OutputStream {
 
 // The same DOM travels through both entry points. Mapping application objects is later.
 func RoundTrip(text: string) -> Result<string, JsonError> {
-    let original = JsonSerializer.Deserialize(text)?
-    let canonical = JsonSerializer.Serialize(original)?
+    let original = JsonSerializer.DeserializeNode(text)?
+    let canonical = JsonSerializer.SerializeNode(original)?
     let memory = MemoryStream()
-    let write = JsonSerializer.Serialize(memory, original)
+    let write = JsonSerializer.SerializeNode(memory, original)
     let Ok(_) = write else {
         memory.Close()
         return Error(JsonError.Syntax("Memory serialization failed"))
@@ -101,19 +101,19 @@ func RoundTrip(text: string) -> Result<string, JsonError> {
         memory.Close()
         return Error(JsonError.Syntax("Memory rewind failed"))
     }
-    let restored = JsonSerializer.Deserialize(memory)
+    let restored = JsonSerializer.DeserializeNode(memory)
     memory.Close()
     let value = restored?
-    let actual = JsonSerializer.Serialize(value)?
+    let actual = JsonSerializer.SerializeNode(value)?
     Check(actual == canonical)
     // Also force partial writes and reads independently of MemoryStream.
     let output = ShortOutput(-1, false)
-    _ = JsonSerializer.Serialize(output, original)?
+    _ = JsonSerializer.SerializeNode(output, original)?
     Check(!output.Closed && output.Flushes == 0)
     let input = ShortInput(output.Bytes, -1)
-    let shortValue = JsonSerializer.Deserialize(input)?
+    let shortValue = JsonSerializer.DeserializeNode(input)?
     Check(!input.Closed && input.Position == output.Count)
-    let shortText = JsonSerializer.Serialize(shortValue)?
+    let shortText = JsonSerializer.SerializeNode(shortValue)?
     Check(shortText == canonical)
     input.Close()
     output.Close()
@@ -121,7 +121,7 @@ func RoundTrip(text: string) -> Result<string, JsonError> {
 }
 
 func ReadFailure(input: ShortInput, expected: string) {
-    match JsonSerializer.Deserialize(input) {
+    match JsonSerializer.DeserializeNode(input) {
         Error(let error) => Check(error.ToString() == expected)
         Ok(_) => System.Fault("Invalid input accepted")
     }
@@ -258,18 +258,18 @@ func Main() {
         Ok(let result) => Console.WriteLine(result)
         Error(let error) => System.Fault(error.ToString())
     }
-    let Ok(value) = JsonSerializer.Deserialize("[1,2]") else {
+    let Ok(value) = JsonSerializer.DeserializeNode("[1,2]") else {
         System.Fault("Could not create test value")
     }
     let failed = ShortOutput(2, false)
-    match JsonSerializer.Serialize(failed, value) {
+    match JsonSerializer.SerializeNode(failed, value) {
         Error(let error) => Check(error is JsonError.Write(System.IO.StreamError.AccessDenied))
         Ok(_) => System.Fault("Output failure lost")
     }
     Check(failed.Count == 2 && !failed.Closed && failed.Flushes == 0)
     failed.Close()
     let zero = ShortOutput(-1, true)
-    match JsonSerializer.Serialize(zero, value) {
+    match JsonSerializer.SerializeNode(zero, value) {
         Error(let error) => Check(error is JsonError.Write(System.IO.StreamError.IoFailure))
         Ok(_) => System.Fault("Zero-progress output accepted")
     }
@@ -280,7 +280,7 @@ func Main() {
         System.Fault("Could not create cycle")
     }
     let untouched = ShortOutput(-1, false)
-    match JsonSerializer.Serialize(untouched, cycle) {
+    match JsonSerializer.SerializeNode(untouched, cycle) {
         Error(_) => Check(untouched.Count == 0 && !untouched.Closed)
         Ok(_) => System.Fault("Cycle accepted")
     }
@@ -296,7 +296,7 @@ func Main() {
     ReadFailure(oversized, "LimitExceeded")
     Check(oversized.Position == 129)
     let malformed = ShortInput(Utf8.Encode("[1,"), -1)
-    match JsonSerializer.Deserialize(malformed) {
+    match JsonSerializer.DeserializeNode(malformed) {
         Error(_) => Check(!malformed.Closed)
         Ok(_) => System.Fault("Truncated JSON accepted")
     }
@@ -359,17 +359,17 @@ func DomContracts() {
     }
     Check(child is JsonArray)
     Check(JsonString("hello").Value == "hello" && JsonBoolean(true).Value)
-    let malformed = JsonSerializer.Deserialize("{\"a\":1,\"\\u0061\":2}")
+    let malformed = JsonSerializer.DeserializeNode("{\"a\":1,\"\\u0061\":2}")
     match malformed {
         Error(JsonError.DuplicateField(let name)) => Check(name == "a")
         _ => System.Fault("Escaped duplicate accepted")
     }
-    match JsonSerializer.Deserialize("[1,]") {
+    match JsonSerializer.DeserializeNode("[1,]") {
         Error(_) => {}
         Ok(_) => System.Fault("Trailing comma accepted")
     }
     let broken = ShortInput(Utf8.Encode("{}"), 1)
-    match JsonSerializer.Deserialize(broken) {
+    match JsonSerializer.DeserializeNode(broken) {
         Error(JsonError.Read(System.IO.TextReadError.IoFailure)) => {}
         _ => System.Fault("Read cause lost")
     }

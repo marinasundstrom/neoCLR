@@ -3,12 +3,12 @@ import System.Data.Json.*
 import System.Result.*
 
 func RoundTrip(text: string) -> Result<string, JsonError> {
-    let value = JsonSerializer.Deserialize(text)?
-    return JsonSerializer.Serialize(value)
+    let value = JsonSerializer.DeserializeNode(text)?
+    return JsonSerializer.SerializeNode(value)
 }
 
 func Integer(text: string) -> Result<string, JsonError> {
-    let value = JsonSerializer.Deserialize(text)?
+    let value = JsonSerializer.DeserializeNode(text)?
     if value is JsonNumber number {
         let integer = number.AsInt32()?
         return Ok(integer.ToString())

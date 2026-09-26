@@ -57,10 +57,10 @@ public sealed class JsonSerializer {
     public static Result<object, JsonError> Deserialize(IO.InputStream input, Introspection.TypeInfo type) => default;
     public static Result<string, JsonError> Serialize(object value) => default;
     public static Result<PropagationUnit, JsonError> Serialize(IO.OutputStream output, object value) => default;
-    public static Result<JsonValue, JsonError> Deserialize(string text) => default;
-    public static Result<JsonValue, JsonError> Deserialize(IO.InputStream input) => default;
-    public static Result<string, JsonError> Serialize(JsonValue value) => default;
-    public static Result<PropagationUnit, JsonError> Serialize(IO.OutputStream output, JsonValue value) => default;
+    public static Result<JsonValue, JsonError> DeserializeNode(string text) => default;
+    public static Result<JsonValue, JsonError> DeserializeNode(IO.InputStream input) => default;
+    public static Result<string, JsonError> SerializeNode(JsonValue value) => default;
+    public static Result<PropagationUnit, JsonError> SerializeNode(IO.OutputStream output, JsonValue value) => default;
 }
 internal sealed class ObjectMapper {
     public ObjectMapper() { }
@@ -131,10 +131,10 @@ internal sealed class JsonSyntax {
         ["JsonBoolean::.ctor(Boolean)"] = ("noresult", false, true),
         ["JsonBoolean::get_Value()"] = ("Boolean", false, false),
         ["JsonNull::.ctor()"] = ("noresult", false, true),
-        ["JsonSerializer::Deserialize(String)"] = ("System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>", true, false),
-        ["JsonSerializer::Deserialize(System.IO.InputStream)"] = ("System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>", true, false),
-        ["JsonSerializer::Serialize(System.Data.Json.JsonValue)"] = ("System.Result<String,System.Data.Json.JsonError>", true, false),
-        ["JsonSerializer::Serialize(System.IO.OutputStream,System.Data.Json.JsonValue)"] = ("System.Result<Void,System.Data.Json.JsonError>", true, false),
+        ["JsonSerializer::DeserializeNode(String)"] = ("System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>", true, false),
+        ["JsonSerializer::DeserializeNode(System.IO.InputStream)"] = ("System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>", true, false),
+        ["JsonSerializer::SerializeNode(System.Data.Json.JsonValue)"] = ("System.Result<String,System.Data.Json.JsonError>", true, false),
+        ["JsonSerializer::SerializeNode(System.IO.OutputStream,System.Data.Json.JsonValue)"] = ("System.Result<Void,System.Data.Json.JsonError>", true, false),
         ["JsonSerializer::Deserialize(String,System.Introspection.TypeInfo)"] = ("System.Result<System.Object,System.Data.Json.JsonError>", true, false),
         ["JsonSerializer::Deserialize(System.IO.InputStream,System.Introspection.TypeInfo)"] = ("System.Result<System.Object,System.Data.Json.JsonError>", true, false),
         ["JsonSerializer::Serialize(System.Object)"] = ("System.Result<String,System.Data.Json.JsonError>", true, false),

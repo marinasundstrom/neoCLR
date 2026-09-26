@@ -209,7 +209,8 @@ Int32 and Boolean properties through runtime reflection, with a
 Typed `Deserialize<T>` overloads now wrap the same mapper for string and stream
 input; the public consumer covers successful reads and preserved error cases. The
 opt-in HTTP variant uses typed request and response models. Shared HTTP JSON
-convenience methods remain next candidates; latency under load stays an open
+convenience methods remain next candidates. DOM operations now use explicit
+`DeserializeNode`/`SerializeNode` names, separate from object mapping; latency under load stays an open
 validation item before making the mapped variant the default.
 General invocation and field assignment remain outside this checkpoint. **Author clarification:** `System.Runtime.Reflection`
 will provide extensions to the `System.Introspection` model; those operations work

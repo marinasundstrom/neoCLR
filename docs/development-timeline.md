@@ -7514,3 +7514,17 @@ configuration/content, not target-specific code added to Raven main.
 - **Outcome:** the installation and sample-selection commands are documented in
   [the local snapshot guide](local-sdk-snapshot.md). Website build on the later
   committed tree also passes all 1,016 pages. No publication or release performed.
+
+
+### 2026-09-26 — Explicit JSON DOM method names
+
+- **Author:** “Continue. *Node naming is probably what we want.”
+- **Assistant action:** adopts DeserializeNode/SerializeNode for both string and
+  stream DOM overloads, retains object-mapping method names and existing Object
+  node passthrough, and updates public callers/reference documentation.
+- **Decision boundary:** no compatibility aliases in this development API. This
+  naming change does not implement return-type-directed overload selection.
+  Shared HTTP JSON helpers remain the next convenience slice.
+- **Outcome:** focused DOM/stream, typed mapper and default HTTP pair pass with
+  zero final live objects. All 551 signature checks and API/library snapshot checks
+  pass. Website build skipped by author direction; no publication performed.

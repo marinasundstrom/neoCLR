@@ -259,3 +259,22 @@ types, equally convertible return types, argument/return inference cycles, metho
 groups, diagnostics, metadata identity and .NET consumers. Existing target typing
 can support the implementation but does not establish a complete selection rule.
 No new conversion interface or return-type-only overload rule is adopted here.
+
+
+## Explicit DOM names — 2026-09-26
+
+The author selected the Node naming direction. Public DOM reads/writes now use
+`DeserializeNode` / `SerializeNode`; object mapping retains `Deserialize<T>`,
+TypeInfo-based `Deserialize`, and `Serialize(Object)`. String and stream variants
+follow the same split. Old DOM signatures are renamed without compatibility aliases
+in this development API. Rebuild consumers with matching reference/library artifacts.
+
+This builds on the .NET comparison above: System.Text.Json separates DOM parsing
+through JsonNode/JsonDocument entry points while JsonSerializer handles typed
+mapping. neoCLR keeps one provisional serializer class and marks its DOM operations
+by name. The benefit is explicit call intent without target-type inference; the cost
+is call-site migration and an API spelling different from .NET. No parser, mapping,
+error, stream ownership or overload-resolution semantics change. A node passed to
+Serialize(Object) retains the existing DOM behavior, avoiding an accidental reflection
+mapping of its implementation properties. Return-directed overload selection remains
+an independent Raven exploration.
