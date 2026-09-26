@@ -130,8 +130,9 @@ fault "predicate failure"
 .end
 "#;
 fn program(body: &str) -> LoadedProgram {
-    let source =
-        format!(".module Test\n.entry Main\n{PROBE}\n.function Main() -> Int32\n{body}\nret\n.end");
+    let source = format!(
+        ".module Test\n.entry Main\n{PROBE}\n.function Main() -> Int32\n.local System.Linq.SingleError error\n.local System.Linq.SingleError.Empty EmptyPayload\n.local System.Linq.SingleError.Multiple MultiplePayload\n{body}\nret\n.end"
+    );
     let app = neoclr::assembler::read_modules(
         &[neoclr::assembler::ModuleInput::Source(&source)],
         library(),
@@ -170,7 +171,7 @@ fn terminals_report_cardinality_and_dispose_at_the_expected_boundary() {
             "Some" => "call instance System.Option<Int32>::GetSomeCase()\ncall instance System.Option.Some<Int32>::get_Value()".into(),
             "None" => "call instance System.Option<Int32>::get_IsNone()".into(),
             "Ok" => "call instance System.Result<Int32,System.Linq.SingleError>::GetOkCase()\ncall instance System.Result.Ok<Int32>::get_Value()".into(),
-            case => format!("call instance System.Result<Int32,System.Linq.SingleError>::GetErrorCase()\ncall instance System.Result.Error<System.Linq.SingleError>::get_Value()\ncall instance System.Linq.SingleError::get_Is{case}()"),
+            case => format!("call instance System.Result<Int32,System.Linq.SingleError>::GetErrorCase()\ncall instance System.Result.Error<System.Linq.SingleError>::get_Value()\nstloc error\nldloca error\nldloca {case}Payload\ncall instance System.Linq.SingleError::TryGetValue(System.Linq.SingleError.{case}&)"),
         };
         if matches!(outcome, "Some" | "Ok") {
             body += &check(&result, expected, "Outcome");
@@ -306,7 +307,7 @@ fn predicate_terminals_preserve_matching_order_outcomes_and_cleanup_without_quer
                 "Some" => "call instance System.Option<Int32>::GetSomeCase()\ncall instance System.Option.Some<Int32>::get_Value()".into(),
                 "None" => "call instance System.Option<Int32>::get_IsNone()".into(),
                 "Ok" => "call instance System.Result<Int32,System.Linq.SingleError>::GetOkCase()\ncall instance System.Result.Ok<Int32>::get_Value()".into(),
-                case => format!("call instance System.Result<Int32,System.Linq.SingleError>::GetErrorCase()\ncall instance System.Result.Error<System.Linq.SingleError>::get_Value()\ncall instance System.Linq.SingleError::get_Is{case}()"),
+                case => format!("call instance System.Result<Int32,System.Linq.SingleError>::GetErrorCase()\ncall instance System.Result.Error<System.Linq.SingleError>::get_Value()\nstloc error\nldloca error\nldloca {case}Payload\ncall instance System.Linq.SingleError::TryGetValue(System.Linq.SingleError.{case}&)"),
             };
             if matches!(outcome, "Some" | "Ok") {
                 body += &check(&result, expected, "Outcome");

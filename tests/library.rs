@@ -35,7 +35,7 @@ fn runtime_library_is_assembled_platform_code() {
             .iter()
             .filter(|f| f.is_internal_call())
             .count(),
-        60 // Includes the existing StringFromChars, StringGraphemeAt and StringIntern additions.
+        62 // Includes the shared socket deadline creation/expiry bridge.
     );
     assert!(
         module
