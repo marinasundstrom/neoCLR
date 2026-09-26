@@ -12,8 +12,8 @@ Feature scope is frozen; do not automatically start another HTTP feature.
 **Active work is release preparation for this POC**, at the author's direction.
 The [toolchain/release tracker](tracking/toolchain-release.md) owns efficient CI,
 exact-candidate qualification and known-defect disposition. The CI split is implemented;
-hosted acceptance and release readiness are not yet claimed. No release version/date
-is selected. Thematic tracking consolidation is complete; M2–M6 remain candidates.
+hosted acceptance and release readiness are not yet claimed. Preview 10 is selected for the author-requested release; publication awaits
+validation. Thematic tracking consolidation is complete; M2–M6 remain candidates.
 
 ## Theme trackers
 

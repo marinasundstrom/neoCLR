@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Select 0.1.0-preview.10 for the author-requested HTTP POC release. Prepare candidate
+  notes and matching packages; publication is pending exact-candidate validation.
+
 - Implement the next-release CI split: one canonical full source/archive run,
   focused macOS/Windows OS and ABI checks, and compile-only minimum-Rust checks on
   all three hosts. Retain opt-in full stable matrix validation, record test profile
