@@ -1,0 +1,168 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Data.Json.*
+import System.Web.Http.Json.*
+import System.IO.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+func Check(value: bool) {
+    if !value {
+        System.Fault("Stream upload contract failed")
+    }
+}
+
+// Generated binary input: no complete body is retained by this source.
+class GeneratedInput : InputStream {
+    private var mode: string
+    private var cancellation: CancellationTokenSource
+    var Position: int = 0
+    var Reads: int = 0
+    var Closes: int = 0
+
+    init(mode: string, cancellation: CancellationTokenSource) {
+        self.mode = mode
+        self.cancellation = cancellation
+    }
+
+    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        Check(Closes == 0 && offset == 0 && count > 0 && count <= 256)
+        Reads += 1
+        if mode == "read-error" {
+            return Error(StreamError.AccessDenied)
+        }
+        if mode == "overread" {
+            return Ok(count + 1)
+        }
+        if mode == "eof" {
+            return Ok(0)
+        }
+        let read = if count > 71 { 71 } else { count }
+        var index = 0
+        while index < read {
+            buffer[index] = (byte)((Position + index) % 251)
+            index += 1
+        }
+        Position += read
+        if mode == "cancel" {
+            cancellation.Cancel()
+        }
+        return Ok(read)
+    }
+
+    func Close() {
+        Closes += 1
+    }
+}
+
+class ForwardUpload : HttpHandler {
+    private var transport: HttpSocketHandler = HttpSocketHandler()
+    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        Check(!request.Content.IsBuffered)
+        return transport.Send(request, cancellationToken)
+    }
+}
+
+class UploadCase {
+    private var mode: string
+    private var cancellation: CancellationTokenSource = CancellationTokenSource()
+    private var input: GeneratedInput
+    private var content: HttpContent
+    private var client: HttpClient = HttpClient(ForwardUpload())
+    private var pending: Task<Result<HttpResponse, HttpError>>
+    private var url: string
+
+    init(url: string, mode: string) {
+        self.url = url
+        self.mode = mode
+        input = GeneratedInput(mode, cancellation)
+        let length = if mode == "empty" { 0 } else { 1025 }
+        let Ok(body) = HttpContent.FromStream(input, length, mode == "borrowed") else {
+            System.Fault("Content construction failed")
+            return
+        }
+        content = body
+        Check(content.Length == length)
+    }
+
+    func Run() {
+        Check(!content.IsBuffered && content.TryGetBytes() is None)
+        Check(content.ReadText().GetResult() is Error(_))
+        Check(JsonContent.ReadNode(content) is Error(JsonError.Read(TextReadError.IoFailure)))
+        if mode == "precancel" {
+            cancellation.Cancel()
+        }
+        if mode == "disposed" {
+            content.Dispose()
+        }
+        if mode == "invalid-header" {
+            let headers = ArrayList<HttpHeader>()
+            headers.Add(HttpHeader("Content-Length", "0"))
+            client.DefaultRequestHeaders = headers
+        }
+        pending = client.Post(url, content, cancellation.Token)
+        if mode == "success" {
+            // The first exchange owns consumption even while DNS/connect is pending.
+            Check(client.Post(url, content).GetResult() is Error(HttpError.InvalidRequest(_)))
+        }
+        pending.OnCompleted(self.Completed)
+    }
+
+    func Completed() {
+        if mode == "cancel" || mode == "precancel" {
+            Check(pending.IsCancelled)
+        } else if mode == "read-error" {
+            Check(pending.GetResult() is Error(HttpError.Content(StreamError.AccessDenied)))
+        } else if mode == "eof" || mode == "overread" {
+            Check(pending.GetResult() is Error(HttpError.Content(StreamError.IoFailure)))
+        } else if mode == "disposed" || mode == "invalid-header" {
+            Check(pending.GetResult() is Error(HttpError.InvalidRequest(_)))
+        } else if mode == "refused" {
+            Check(pending.GetResult() is Error(HttpError.Transport(_)))
+        } else {
+            let Ok(response) = pending.GetResult() else {
+                System.Fault("Upload failed")
+                return
+            }
+            Check((int)response.StatusCode == 201)
+            Check(response.Request is Some(_))
+            Check(input.Position == content.Length)
+        }
+        if mode == "precancel" || mode == "invalid-header" {
+            Check(input.Reads == 0 && input.Closes == 0)
+        } else {
+            Check(input.Closes == (if mode == "borrowed" { 0 } else { 1 }))
+        }
+        if mode == "empty" || mode == "disposed" || mode == "refused" {
+            Check(input.Reads == 0)
+        }
+        client.DefaultRequestHeaders = ArrayList<HttpHeader>()
+        content.Dispose()
+        content.Dispose()
+        Check(input.Closes == (if mode == "borrowed" { 0 } else { 1 }))
+        Check(client.Post(url, content).GetResult() is Error(HttpError.InvalidRequest(_)))
+        cancellation.Dispose()
+        Console.WriteLine("Stream upload checks passed")
+    }
+}
+
+func Main(arguments: string[]) {
+    let cancellation = CancellationTokenSource()
+    let untouched = GeneratedInput("success", cancellation)
+    Check(HttpContent.FromStream(untouched, -1, false) is Error(HttpError.InvalidRequest(_)))
+    Check(HttpContent.FromStream(untouched, 65537, false) is Error(HttpError.LimitExceeded(_)))
+    Check(untouched.Closes == 0 && untouched.Reads == 0)
+    let Ok(maximum) = HttpContent.FromStream(untouched, 65536, true) else {
+        System.Fault("Maximum length rejected")
+        return
+    }
+    Check(maximum.Length == 65536)
+    let disposable: Disposable = maximum
+    disposable.Dispose()
+    Check(untouched.Closes == 0 && untouched.Reads == 0)
+    cancellation.Dispose()
+    UploadCase(arguments[0], arguments[1]).Run()
+}

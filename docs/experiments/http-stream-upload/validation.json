@@ -1,0 +1,56 @@
+{
+  "date": "2026-09-26",
+  "scope": "local matching development bundle, not packaged release qualification",
+  "sha256": {
+    "compiler": "6b3970440969e901f3d196e8f49c39fcbd1ea3b1bfde905d78afe05b406c097e",
+    "reference": "b1bb8fb0e8a0392cffc53d46c12bcfa0b366808962ec0499640fc6732f34ec3d",
+    "library": "4bf55dee5136c3467398ad2e30ab0233eceb6f9618277ab31f77662bbd1dccc5",
+    "runner": "3e2a8ab5bad0ac3fe66828342853e4faf8105503746ae95002c740c51bf1d465",
+    "bridge": "06880f8ae9eeca45c3df190c0be4fa4783c66c73c8c0f2c558fccdc00c7af3bf"
+  },
+  "additional_consumer_check": {
+    "case": "success",
+    "outcome": "passed",
+    "statistics": "assembly_ms=1343 load_ms=856 verify_ms=406 run_ms=1135\nallocated=744 live=0 peak=122 collections=15 reclaimed=744"
+  },
+  "additional_assertions": [
+    "Disposable interface dispatch",
+    "accepted 65536-byte declared range without reading it",
+    "buffered JSON reader rejects stream input without reading"
+  ],
+  "signature_checks": 623,
+  "website_pages": 1038,
+  "website_tests": 18,
+  "mapped_http_all": [
+    "Iteration 1/1: all",
+    "Peer case: GET /report -> 200",
+    "Peer case: POST /reports -> 201",
+    "Peer case: POST /reports -> 400",
+    "Peer case: POST /reports -> 400",
+    "Peer case: POST /reports -> 400",
+    "Peer case: POST /reports -> 400",
+    "Peer case: POST /reports -> 400",
+    "Peer case: POST /reports -> 400",
+    "Peer case: POST /reports -> 400",
+    "Peer case: POST /reports -> 201",
+    "Peer case: POST /reports -> 201",
+    "Peer case: GET /missing -> 404",
+    "JSON server: {'assembly_ms': 1285, 'load_ms': 807, 'verify_ms': 381, 'run_ms': 7371, 'allocated': 3786, 'live': 0, 'peak': 198, 'collections': 53, 'reclaimed': 3786}",
+    "JSON client: {'assembly_ms': 1306, 'load_ms': 799, 'verify_ms': 352, 'run_ms': 2237, 'allocated': 761, 'live': 0, 'peak': 170, 'collections': 13, 'reclaimed': 761}",
+    "JSON server: {'assembly_ms': 1485, 'load_ms': 842, 'verify_ms': 377, 'run_ms': 4339, 'allocated': 626, 'live': 0, 'peak': 168, 'collections': 11, 'reclaimed': 626}",
+    "JSON client: {'assembly_ms': 1447, 'load_ms': 815, 'verify_ms': 359, 'run_ms': 1546, 'allocated': 789, 'live': 0, 'peak': 170, 'collections': 13, 'reclaimed': 789}",
+    "Public JSON DOM + HTTP checks passed: all (1 iteration(s))"
+  ],
+  "buffered_post_client": [
+    "Propagating POST sample checks passed",
+    "assembly_ms=1425 load_ms=844 verify_ms=375 run_ms=766",
+    "allocated=306 live=0 peak=66 collections=8 reclaimed=306",
+    "",
+    "POST contracts passed",
+    "POST echo checks passed",
+    "assembly_ms=1305 load_ms=862 verify_ms=409 run_ms=2378",
+    "allocated=1153 live=0 peak=134 collections=24 reclaimed=1153",
+    "",
+    "Independent peer verified POST bytes and framing"
+  ]
+}

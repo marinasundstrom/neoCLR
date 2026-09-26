@@ -14,7 +14,7 @@ static class HttpBindings
     public const string Declarations = """
         namespace Web.Http {
             public enum HttpStatusCode { Continue = 100, SwitchingProtocols = 101, OK = 200, Created = 201, Accepted = 202, NoContent = 204, ResetContent = 205, PartialContent = 206, MultipleChoices = 300, MovedPermanently = 301, Found = 302, SeeOther = 303, NotModified = 304, TemporaryRedirect = 307, PermanentRedirect = 308, BadRequest = 400, Unauthorized = 401, Forbidden = 403, NotFound = 404, MethodNotAllowed = 405, RequestTimeout = 408, Conflict = 409, Gone = 410, LengthRequired = 411, PreconditionFailed = 412, RequestEntityTooLarge = 413, RequestUriTooLong = 414, UnsupportedMediaType = 415, RequestedRangeNotSatisfiable = 416, ExpectationFailed = 417, UnprocessableContent = 422, TooManyRequests = 429, InternalServerError = 500, NotImplemented = 501, BadGateway = 502, ServiceUnavailable = 503, GatewayTimeout = 504, HttpVersionNotSupported = 505 }
-            public struct HttpError { public struct InvalidUri { } public struct NameResolution { } public struct Transport { } public struct InvalidRequest { } public struct Protocol { } public struct Unsupported { } public struct LimitExceeded { } public struct TimedOut { } public struct Handler { } public struct UnsuccessfulStatus { } }
+            public struct HttpError { public struct InvalidUri { } public struct NameResolution { } public struct Transport { } public struct Content { } public struct InvalidRequest { } public struct Protocol { } public struct Unsupported { } public struct LimitExceeded { } public struct TimedOut { } public struct Handler { } public struct UnsuccessfulStatus { } }
             public interface HttpHandler {
                 Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken);
             }
@@ -104,10 +104,17 @@ static class HttpBindings
                 public Collections.Sequence<string> GetHeaderValues(string name) => default;
                 public HttpContent Content => default;
             }
-            public sealed class HttpContent {
+            public sealed class HttpContent : Disposable {
                 public HttpContent(Collections.Sequence<byte> bytes) { }
                 public HttpContent(Collections.Sequence<byte> bytes, string contentType) { }
                 public static HttpContent FromText(string text) => default;
+                public static Result<HttpContent, HttpError> FromStream(IO.InputStream stream, int length, bool leaveOpen) => default;
+                public bool IsBuffered => default;
+                public int Length => default;
+                public Option<Collections.Sequence<byte>> TryGetBytes() => default;
+                public void Dispose() { }
+                public Result<PropagationUnit, HttpError> BeginUpload() => default;
+                public Result<int, HttpError> ReadUpload(byte[] buffer, int count) => default;
                 public Option<string> MediaType => default;
                 public Collections.Sequence<byte> Bytes => default;
                 public Tasks.Task<Result<string, string>> ReadText() => default;
@@ -173,7 +180,7 @@ static class HttpBindings
     public static void Project(ModuleDefinition module)
     {
         foreach (var type in module.Types.Where(t => IsName(t.FullName)))
-            foreach (var method in type.Methods.Where(m => type.Name == "HttpResponse" && m.Name == "Associate" || m.Name == "FindValues" || m.Name == "FromIncoming" || m.Name == "EncodeResponse" || type.Name == "HttpRequest" && m.Name is "Encode" or "WithDefaults" || type.Name == "HttpContent" && m.Name == "get_MediaType" || type.Name == "HttpServer" && (m.IsConstructor || m.Name is "Release" or "get_StopToken") || type.Name == "HttpContext" && (m.IsConstructor || m.Name == "Send")))
+            foreach (var method in type.Methods.Where(m => type.Name == "HttpResponse" && m.Name == "Associate" || m.Name == "FindValues" || m.Name == "FromIncoming" || m.Name == "EncodeResponse" || type.Name == "HttpRequest" && m.Name is "Encode" or "WithDefaults" || type.Name == "HttpContent" && m.Name is "get_MediaType" or "BeginUpload" or "ReadUpload" || type.Name == "HttpServer" && (m.IsConstructor || m.Name is "Release" or "get_StopToken") || type.Name == "HttpContext" && (m.IsConstructor || m.Name == "Send")))
                 method.Attributes = (method.Attributes & ~MethodAttributes.MemberAccessMask) | MethodAttributes.Assembly;
         foreach (var type in module.Types.Where(IsProvider))
         {
@@ -237,6 +244,13 @@ static class HttpBindings
             ("HttpResponseAssociation", ".ctor") when library => (request, "noresult", false),
             ("HttpResponseAssociation", "Attach") when library => ($"System.Result<{response},System.Web.Http.HttpError>", $"System.Result<{response},System.Web.Http.HttpError>", false),
             ("HttpContent", "get_MediaType") when library => ("", "System.Option<String>", false),
+            ("HttpContent", "FromStream") => ("System.IO.InputStream,Int32,Boolean", "System.Result<System.Web.Http.HttpContent,System.Web.Http.HttpError>", true),
+            ("HttpContent", "get_IsBuffered") => ("", "Boolean", false),
+            ("HttpContent", "get_Length") => ("", "Int32", false),
+            ("HttpContent", "TryGetBytes") => ("", "System.Option<System.Collections.Sequence<Byte>>", false),
+            ("HttpContent", "Dispose") => ("", "noresult", false),
+            ("HttpContent", "BeginUpload") when library => ("", "System.Result<Void,System.Web.Http.HttpError>", false),
+            ("HttpContent", "ReadUpload") when library => ("arrayref<Byte>,Int32", "System.Result<Int32,System.Web.Http.HttpError>", false),
             ("HttpContent", "FromText") => ("String", Prefix + "HttpContent", true),
             ("HttpRequest", "WithDefaults") when library => ("System.Collections.Sequence<System.Web.Http.HttpHeader>", $"System.Result<{request},System.Web.Http.HttpError>", false),
             ("HttpClient", "get_DefaultRequestHeaders") => ("", "System.Collections.Sequence<System.Web.Http.HttpHeader>", false),
@@ -271,7 +285,7 @@ static class HttpBindings
             && definition.Name is "Get" or "GetString" or "Send" or "Post" or "Put" or "Patch" or "Delete" or "Head"
             && args.LastOrDefault() == CancellationBindings.Token)
             expected.Item1 += "," + CancellationBindings.Token;
-        var virtualMember = owner == Prefix + "HttpContext" && definition.Name == "Dispose" || IsContract(owner) || owner == Prefix + "HttpSocketHandler"
+        var virtualMember = (owner == Prefix + "HttpContext" || owner == Prefix + "HttpContent") && definition.Name == "Dispose" || IsContract(owner) || owner == Prefix + "HttpSocketHandler"
             && definition.Name == "Send" && args.Length == 2;
         if (definition.IsConstructor != construct || definition.IsStatic != expected.Item3
             || !(definition.IsPublic || library && definition.IsAssembly)

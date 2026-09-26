@@ -1,6 +1,12 @@
 # Roadmap: prove neoCLR with HTTP applications
 
-**Current checkpoint (2026-09-26):** the managed HTTP/JSON application now has
+**Current finish line (2026-09-26):** close the known-length upload increment and
+remaining focused/package evidence, then stop adding POC features. The shared
+[HTTP capability tracker](http-capabilities.md) tracks both client and server,
+completion gates and deferred protocol work. The author requests thematic tracking
+consolidation next; the older detailed sequence below is supporting history.
+
+**Earlier checkpoint (2026-09-26):** the managed HTTP/JSON application now has
 implemented transport, context ownership, typed mapping and shared JSON content.
 Follow the [current next-release feature direction](platform-roadmap.md#current-priority--next-release-features-2026-09-26):
 resume stream-backed HTTP content and bounded application-driven additions. Further

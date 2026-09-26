@@ -6,6 +6,13 @@ The author requested investigation of both issue trackers, clarified “Focus is
 neoCLR”, then requested roadmap documentation. The priorities below are assistant
 recommendations, not approval of every issue's proposed design or a release schedule.
 
+## Current finish boundary — 2026-09-26
+
+The author's later direction is to finish this HTTP POC for now and then consolidate
+tracking by theme. Close the current upload slice and the finite completion list in
+the [HTTP client/server tracker](http-capabilities.md). Do not use this issue inventory
+to start another feature automatically. The priorities below retain earlier triage.
+
 ## Current execution direction — 2026-09-26
 
 The author subsequently prioritizes adding next-release features and asks to stop

@@ -38,6 +38,9 @@ public class JsonContent {
     }
 
     private static func Decode(content: HttpContent) -> Result<string, JsonError> {
+        if !content.IsBuffered {
+            return Error(JsonError.Read(TextReadError.IoFailure))
+        }
         if content.Bytes.Count > 128 {
             return Error(JsonError.LimitExceeded("Document exceeds 128 UTF-8 bytes"))
         }

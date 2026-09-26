@@ -151,13 +151,13 @@ experiment with `--mapped`.
 
 ## Current limits
 
-Plain HTTP/1.1 GET, HEAD, DELETE and buffered POST/PUT/PATCH support final statuses 200–599 in development. Responses use a single Content-Length, bounded chunked coding,
+Plain HTTP/1.1 GET, HEAD, DELETE and POST/PUT/PATCH support final statuses 200–599 in development. Responses use a single Content-Length, bounded chunked coding,
 or connection-close framing. HEAD and bodyless 204/304 complete after headers. Informational responses are not
 yet supported. The experiment bounds URLs to 1,024 bytes, headers to 2,048 bytes and 16
-fields, and decoded bodies to 1,024 bytes. Chunk framing has a separate 2,048-byte budget.
+fields, and decoded bodies to 1,024 bytes. Buffered uploads have the same body limit; known-length stream uploads allow up to 65,536 bytes. Chunk framing has a separate 2,048-byte budget.
 It rejects ambiguous framing, chunk extensions/trailers, other transfer codings
 and content encodings. It does not implement TLS, redirects, pooling,
-streaming content or informational response handling. Text always means strict UTF-8.
+streaming responses, unknown-length uploads or informational response handling. Text always means strict UTF-8.
 
 The socket handler now has a provisional 15-second exchange budget, starting before
 DNS lookup and ending with the buffered response. DNS, connection and transfers keep
@@ -283,8 +283,7 @@ before DNS. Content sources must remain stable while consumed.
 
 [Download the POST echo example and focused checks](/samples/http-post.zip).
 The checks cover neoCLR peers, an independent raw peer and a .NET client, including
-empty and binary bodies. Header append/remove operations, OPTIONS, streaming,
-streaming, compression and Expect/continue are still outside this checkpoint.
+empty and binary bodies. Header append/remove operations, OPTIONS, unknown-length uploads, streaming responses, compression and Expect/continue are still outside this checkpoint.
 
 ## Looking up headers
 
@@ -294,8 +293,27 @@ field value in order; it is empty if the name is absent or invalid. Empty values
 present, and repeated fields are not joined or split at commas. For example,
 `response.GetHeaderValues("Set-Cookie")` preserves separate cookie fields.
 
-Stream-backed `HttpContent` is planned. Content is currently buffered; stream ownership,
-cancellation and unknown-length framing still need contracts and implementation.
+### Known-length stream uploads
+
+Development `HttpContent.FromStream(stream, length, leaveOpen)` creates one-shot
+upload content for POST, PUT and PATCH. The socket handler sends headers, then reads
+and sends chunks of at most 256 bytes. The entire source is not buffered first.
+Owned sources close at exchange completion, failure or cancellation; borrowed sources
+remain open. Call Dispose if content never enters an exchange. Length is explicit,
+extra source bytes remain unread, and early EOF is a typed content error.
+
+`IsBuffered` and `TryGetBytes` distinguish buffered content from a source. The existing
+`Bytes` accessor is buffered-only and faults for a stream; `ReadText` returns an error
+for stream content. Custom handlers can inspect or forward it, but a general custom
+body-reading contract is still future work. Source reads are synchronous and cannot
+be interrupted mid-read; responses and server request bodies remain buffered.
+
+The [tested upload fixture](https://github.com/marinasundstrom/neoCLR/tree/main/docs/experiments/http-stream-upload)
+checks short reads, binary data, ownership, reuse, cancellation and source errors.
+Future modern HTTP support needs async bodies, independent exchange lifetimes,
+trailers and version-specific providers. HTTP/2 and HTTP/3 are not implemented or
+promised for this release; see the
+[modern HTTP direction](https://github.com/marinasundstrom/neoCLR/blob/main/docs/http-capabilities.md#modern-http-direction).
 
 ## Adding request headers
 

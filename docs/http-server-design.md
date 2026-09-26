@@ -259,3 +259,13 @@ API/bootstrap checks pass. Website build remains skipped by author direction. Th
 frozen-toolchain callback/propagation limitations and retained reproduction are listed
 in the [integration notes](raven-backend-integration-map.md#http-context-and-configured-responses--2026-09-25);
 they remain stabilization work, not fixes claimed by this API slice.
+
+## Paired client/server tracking — 2026-09-26
+
+The [shared HTTP capability tracker](http-capabilities.md) is the active status and
+POC completion record. The new client known-length upload source does not enlarge
+server request admission: this server still buffers at most 1,024 bytes and emits
+bounded fixed-length responses. Passing stream-backed content to a response returns
+Unsupported during completion, rather than silently sending an empty body. Request
+streaming, response writers, trailers and newer protocol providers remain deferred.
+The author selects a finite POC finish line and thematic tracking consolidation next.

@@ -106,3 +106,8 @@ The current backend is an interpreter. The architecture proposals explore native
 Questions, alternative designs and counterexamples are welcome. A small application scenario helps evaluate a proposal against the existing API and .NET behavior. No implementation is required to join the discussion. See [contribution guidance](../#feedback) for code, sample and documentation work.
 
 [Discuss an idea on GitHub ↗](https://github.com/marinasundstrom/neoCLR/issues) · [Original proposal index →](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/README.md)
+
+The development HTTP provider now supports bounded known-length stream uploads.
+Async bodies, response streaming and HTTP/2/3 remain future work; the
+[modern HTTP direction](https://github.com/marinasundstrom/neoCLR/blob/main/docs/http-capabilities.md#modern-http-direction)
+separates message APIs from protocol and connection concerns.

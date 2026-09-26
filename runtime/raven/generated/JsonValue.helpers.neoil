@@ -568,9 +568,18 @@ ldobj Int32
 call instance System.Int32::ToString()
 ret
 .end
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorIoFailure(System.IO.TextReadError.IoFailure value) -> System.IO.TextReadError
+ldarg value
+newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.IoFailure)
+ret
+.end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorInvalidUtf8(System.IO.TextReadError.InvalidUtf8 value) -> System.IO.TextReadError
 ldarg value
 newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.InvalidUtf8)
+ret
+.end
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeErrorSystemIOTextReadErrorIoFailureNew() -> System.IO.TextReadError.IoFailure
+newobj instance System.IO.TextReadError.IoFailure::.ctor()
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeErrorSystemIOTextReadErrorInvalidUtf8New() -> System.IO.TextReadError.InvalidUtf8
@@ -10865,154 +10874,184 @@ M0000003f_IL_0001:
 M0000003f_IL_0002:
 ldarg 0
 M0000003f_IL_0003:
-call instance System.Web.Http.HttpContent::get_Bytes()
+call instance System.Web.Http.HttpContent::get_IsBuffered()
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
 M0000003f_IL_0008:
+ldc.i4 0
+M0000003f_IL_0009:
+ceq
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
+M0000003f_IL_000b:
+brtrue M0000003f_IL_0015
+M0000003f_IL_0010:
+br M0000003f_IL_0034
+M0000003f_IL_0015:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeErrorSystemIOTextReadErrorIoFailureNew()
+M0000003f_IL_001a:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorIoFailure(System.IO.TextReadError.IoFailure)
+M0000003f_IL_001f:
+newobj instance System.Data.Json.JsonError.Read::.ctor(System.IO.TextReadError)
+M0000003f_IL_0024:
+newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Read)
+M0000003f_IL_0029:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
+M0000003f_IL_002e:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Error<System.Data.Json.JsonError>)
+M0000003f_IL_0033:
+ret
+M0000003f_IL_0034:
+M0000003f_IL_0035:
+M0000003f_IL_0036:
+ldarg 0
+M0000003f_IL_0037:
+call instance System.Web.Http.HttpContent::get_Bytes()
+M0000003f_IL_003c:
 callvirt instance System.Collections.Collection<Byte>::get_Count()
-M0000003f_IL_000d:
+M0000003f_IL_0041:
 ldc.i4 128
-M0000003f_IL_0012:
+M0000003f_IL_0046:
 cgt
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
-M0000003f_IL_0014:
-brtrue M0000003f_IL_001e
-M0000003f_IL_0019:
-br M0000003f_IL_0039
-M0000003f_IL_001e:
-M0000003f_IL_001f:
-ldstr "Document exceeds 128 UTF-8 bytes"
-M0000003f_IL_0024:
-newobj instance System.Data.Json.JsonError.LimitExceeded::.ctor(String)
-M0000003f_IL_0029:
-newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.LimitExceeded)
-M0000003f_IL_002e:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
-M0000003f_IL_0033:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Error<System.Data.Json.JsonError>)
-M0000003f_IL_0038:
-ret
-M0000003f_IL_0039:
-M0000003f_IL_003a:
-M0000003f_IL_003b:
-ldarg 0
-M0000003f_IL_003c:
-call instance System.Web.Http.HttpContent::get_Bytes()
-M0000003f_IL_0041:
-call System.Text.Utf8::Decode(System.Collections.Sequence<Byte>)
-M0000003f_IL_0046:
-stloc local0
-M0000003f_IL_0047:
-ldloca local1
-M0000003f_IL_0049:
-pop
-M0000003f_IL_004f:
-M0000003f_IL_0050:
-ldloc local0
-M0000003f_IL_0051:
-stloc local3
+M0000003f_IL_0048:
+brtrue M0000003f_IL_0052
+M0000003f_IL_004d:
+br M0000003f_IL_006d
 M0000003f_IL_0052:
-ldloca local3
-M0000003f_IL_0054:
-ldloca local4
-M0000003f_IL_0056:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion59(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Ok<String>&)
-M0000003f_IL_005b:
-brfalse M0000003f_IL_009a
-M0000003f_IL_0060:
-ldloc local4
+M0000003f_IL_0053:
+ldstr "Document exceeds 128 UTF-8 bytes"
+M0000003f_IL_0058:
+newobj instance System.Data.Json.JsonError.LimitExceeded::.ctor(String)
+M0000003f_IL_005d:
+newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.LimitExceeded)
 M0000003f_IL_0062:
-stloc local5
-M0000003f_IL_0064:
-ldloca local5
-M0000003f_IL_0066:
-ldloca local6
-M0000003f_IL_0068:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion3(System.Result.Ok<String>&,String&)
-M0000003f_IL_006d:
-ldloc local6
-M0000003f_IL_006f:
-stloc local2
-M0000003f_IL_0070:
-ldc.i4 1
-M0000003f_IL_0071:
-br M0000003f_IL_0077
-M0000003f_IL_0077:
-brfalse M0000003f_IL_009a
-M0000003f_IL_007c:
-M0000003f_IL_007d:
-br M0000003f_IL_0088
-M0000003f_IL_0088:
-M0000003f_IL_0089:
-ldloc local2
-M0000003f_IL_008a:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion50(String)
-M0000003f_IL_008f:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Ok<String>)
-M0000003f_IL_0094:
-stloc local1
-M0000003f_IL_0095:
-br M0000003f_IL_00fd
-M0000003f_IL_009a:
-M0000003f_IL_009b:
-ldloc local0
-M0000003f_IL_009c:
-stloc local7
-M0000003f_IL_009e:
-ldloca local7
-M0000003f_IL_00a0:
-ldloca local8
-M0000003f_IL_00a2:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion60(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Error<System.Text.InvalidUtf8Error>&)
-M0000003f_IL_00a7:
-brfalse M0000003f_IL_00f8
-M0000003f_IL_00ac:
-ldloc local8
-M0000003f_IL_00ae:
-stloc local9
-M0000003f_IL_00b0:
-ldloca local9
-M0000003f_IL_00b2:
-ldloca local10
-M0000003f_IL_00b4:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion61(System.Result.Error<System.Text.InvalidUtf8Error>&,System.Text.InvalidUtf8Error&)
-M0000003f_IL_00b9:
-ldloc local10
-M0000003f_IL_00bb:
-pop
-M0000003f_IL_00bc:
-ldc.i4 1
-M0000003f_IL_00bd:
-br M0000003f_IL_00c3
-M0000003f_IL_00c3:
-brfalse M0000003f_IL_00f8
-M0000003f_IL_00c8:
-M0000003f_IL_00c9:
-br M0000003f_IL_00d4
-M0000003f_IL_00d4:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeErrorSystemIOTextReadErrorInvalidUtf8New()
-M0000003f_IL_00d9:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorInvalidUtf8(System.IO.TextReadError.InvalidUtf8)
-M0000003f_IL_00de:
-newobj instance System.Data.Json.JsonError.Read::.ctor(System.IO.TextReadError)
-M0000003f_IL_00e3:
-newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Read)
-M0000003f_IL_00e8:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
-M0000003f_IL_00ed:
+M0000003f_IL_0067:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Error<System.Data.Json.JsonError>)
-M0000003f_IL_00f2:
+M0000003f_IL_006c:
+ret
+M0000003f_IL_006d:
+M0000003f_IL_006e:
+M0000003f_IL_006f:
+ldarg 0
+M0000003f_IL_0070:
+call instance System.Web.Http.HttpContent::get_Bytes()
+M0000003f_IL_0075:
+call System.Text.Utf8::Decode(System.Collections.Sequence<Byte>)
+M0000003f_IL_007a:
+stloc local0
+M0000003f_IL_007b:
+ldloca local1
+M0000003f_IL_007d:
+pop
+M0000003f_IL_0083:
+M0000003f_IL_0084:
+ldloc local0
+M0000003f_IL_0085:
+stloc local3
+M0000003f_IL_0086:
+ldloca local3
+M0000003f_IL_0088:
+ldloca local4
+M0000003f_IL_008a:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion59(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Ok<String>&)
+M0000003f_IL_008f:
+brfalse M0000003f_IL_00ce
+M0000003f_IL_0094:
+ldloc local4
+M0000003f_IL_0096:
+stloc local5
+M0000003f_IL_0098:
+ldloca local5
+M0000003f_IL_009a:
+ldloca local6
+M0000003f_IL_009c:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion3(System.Result.Ok<String>&,String&)
+M0000003f_IL_00a1:
+ldloc local6
+M0000003f_IL_00a3:
+stloc local2
+M0000003f_IL_00a4:
+ldc.i4 1
+M0000003f_IL_00a5:
+br M0000003f_IL_00ab
+M0000003f_IL_00ab:
+brfalse M0000003f_IL_00ce
+M0000003f_IL_00b0:
+M0000003f_IL_00b1:
+br M0000003f_IL_00bc
+M0000003f_IL_00bc:
+M0000003f_IL_00bd:
+ldloc local2
+M0000003f_IL_00be:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion50(String)
+M0000003f_IL_00c3:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Ok<String>)
+M0000003f_IL_00c8:
 stloc local1
-M0000003f_IL_00f3:
-br M0000003f_IL_00fd
-M0000003f_IL_00f8:
-M0000003f_IL_00f9:
-M0000003f_IL_00fa:
-M0000003f_IL_00fb:
+M0000003f_IL_00c9:
+br M0000003f_IL_0131
+M0000003f_IL_00ce:
+M0000003f_IL_00cf:
+ldloc local0
+M0000003f_IL_00d0:
+stloc local7
+M0000003f_IL_00d2:
+ldloca local7
+M0000003f_IL_00d4:
+ldloca local8
+M0000003f_IL_00d6:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion60(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Error<System.Text.InvalidUtf8Error>&)
+M0000003f_IL_00db:
+brfalse M0000003f_IL_012c
+M0000003f_IL_00e0:
+ldloc local8
+M0000003f_IL_00e2:
+stloc local9
+M0000003f_IL_00e4:
+ldloca local9
+M0000003f_IL_00e6:
+ldloca local10
+M0000003f_IL_00e8:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion61(System.Result.Error<System.Text.InvalidUtf8Error>&,System.Text.InvalidUtf8Error&)
+M0000003f_IL_00ed:
+ldloc local10
+M0000003f_IL_00ef:
+pop
+M0000003f_IL_00f0:
+ldc.i4 1
+M0000003f_IL_00f1:
+br M0000003f_IL_00f7
+M0000003f_IL_00f7:
+brfalse M0000003f_IL_012c
 M0000003f_IL_00fc:
-fault "Guest program reached a terminal failure"
 M0000003f_IL_00fd:
-M0000003f_IL_00fe:
+br M0000003f_IL_0108
+M0000003f_IL_0108:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeErrorSystemIOTextReadErrorInvalidUtf8New()
+M0000003f_IL_010d:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeErrorSystemIOTextReadErrorNewSystemIOTextReadErrorInvalidUtf8(System.IO.TextReadError.InvalidUtf8)
+M0000003f_IL_0112:
+newobj instance System.Data.Json.JsonError.Read::.ctor(System.IO.TextReadError)
+M0000003f_IL_0117:
+newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Read)
+M0000003f_IL_011c:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
+M0000003f_IL_0121:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Error<System.Data.Json.JsonError>)
+M0000003f_IL_0126:
+stloc local1
+M0000003f_IL_0127:
+br M0000003f_IL_0131
+M0000003f_IL_012c:
+M0000003f_IL_012d:
+M0000003f_IL_012e:
+M0000003f_IL_012f:
+M0000003f_IL_0130:
+fault "Guest program reached a terminal failure"
+M0000003f_IL_0131:
+M0000003f_IL_0132:
 ldloc local1
-M0000003f_IL_00ff:
+M0000003f_IL_0133:
 ret
 .end
 .end

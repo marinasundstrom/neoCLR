@@ -494,6 +494,24 @@ static class SignatureProbe
             Reject("HTTP association helper excludes consumers " + helper.Name, () => HttpBindings.Bind(helper, helper, false, false));
             Check("HTTP association helper binds in library " + helper.Name, HttpBindings.Bind(helper, helper, false, true) is not null);
         }
+        Check("HTTP content is disposable", InterfaceBindings.Converts(HttpBindings.Prefix + "HttpContent", CollectionBindings.Disposable));
+        Check("Disposable does not imply HTTP content", !InterfaceBindings.Converts(CollectionBindings.Disposable, HttpBindings.Prefix + "HttpContent"));
+        var contentType = module.GetType(HttpBindings.Prefix + "HttpContent");
+        foreach (var name in new[] { "FromStream", "get_IsBuffered", "get_Length", "TryGetBytes", "Dispose" }) {
+            var method = contentType.Methods.Single(m => m.Name == name);
+            Check("HTTP stream content public signature " + name, HttpBindings.Bind(method, method, false, false) is not null);
+        }
+        foreach (var name in new[] { "BeginUpload", "ReadUpload" }) {
+            var method = contentType.Methods.Single(m => m.Name == name);
+            Check("HTTP upload helper remains internal " + name, method.IsAssembly);
+            Reject("HTTP upload helper rejects consumers " + name, () => HttpBindings.Bind(method, method, false, false));
+            Check("HTTP upload helper binds in library " + name, HttpBindings.Bind(method, method, false, true) is not null);
+        }
+        var fromStream = contentType.Methods.Single(m => m.Name == "FromStream");
+        var streamArgument = fromStream.Parameters[0].ParameterType;
+        fromStream.Parameters[0].ParameterType = module.TypeSystem.String;
+        Reject("HTTP upload rejects forged stream source", () => HttpBindings.Bind(fromStream, fromStream, false, false));
+        fromStream.Parameters[0].ParameterType = streamArgument;
         EnumBindings.Validate(module, EnumBindings.HttpStatusCode);
         var statusEnum = module.GetType(EnumBindings.HttpStatusCode);
         Check("HTTP status is a non-flags CLI enum", statusEnum.IsEnum && statusEnum.CustomAttributes.Count == 0);

@@ -817,3 +817,19 @@ Evidence lives in the focused `http-client` framing cases and the extended
 The bridge library import limit is 256 reachable methods (application imports retain
 128), accommodating these overloads/private machines without widening public access.
 EOF and framing helpers remain private to the class-library implementation.
+
+## Known-length source upload checkpoint — 2026-09-26
+
+The earlier planned stream-content direction now has a bounded implementation:
+HttpContent.FromStream(InputStream, length, leaveOpen), IsBuffered, Length,
+TryGetBytes and Dispose. POST/PUT/PATCH use the same pipeline; HttpSocketHandler
+writes headers and then bounded source chunks, preserving current deadlines.
+The [upload contract and evidence](experiments/http-stream-upload/README.md) specify
+range, ownership, one-shot admission, source errors and cancellation limits. Byte
+access is explicitly buffered-only; JSON/text readers do not implicitly materialize
+streams. Server response streaming and larger server request bodies are not included.
+
+The author now asks to finish this POC for now. Use the shared
+[client/server tracker](http-capabilities.md) for the finish line and future HTTP work,
+including modern protocol boundaries. The current source API is not a universal
+async body contract, and connection-per-request is not a permanent design decision.

@@ -1232,3 +1232,15 @@ compiler implementation change; published SDK artifacts retain their old identit
 See [contracts and migration](../../common-interfaces.md#directional-interface-names-development-2026-09-25).
 
 Companion Raven compiler documentation: target-branch commit `54ec1c718`.
+
+## Known-length HTTP source uploads (2026-09-26)
+
+The bridge now projects HttpContent.FromStream, IsBuffered, Length, TryGetBytes and
+Disposable.Dispose plus HttpError.Content(StreamError). BeginUpload/ReadUpload remain
+library-only. Runtime Contract configuration and Raven compiler implementation are
+unchanged; this is a matching reference/library API increment, not a compiler backend
+change. Rebuild consumers with matching artifacts. The [fixture](../http-stream-upload/README.md)
+records ownership, synchronous-read limitations and focused validation. A conditional
+expression-bodied getter emitted zero on the current compiler; explicit getter returns
+and a consumer length assertion work around that observation. No general compiler
+repair is claimed or integrated into Raven main by this change.

@@ -1,6 +1,7 @@
 namespace System.Web.Http
 
 import System.*
+import System.IO.*
 import System.Networking.*
 import System.Networking.Sockets.*
 
@@ -12,6 +13,8 @@ public union HttpError {
     case NameResolution(reason: DnsError)
     /// A socket operation failed.
     case Transport(reason: SocketError)
+    /// Reading an upload source failed or ended before its declared length.
+    case Content(reason: StreamError)
     /// A convenience operation required a successful status but received another status.
     case UnsuccessfulStatus(statusCode: HttpStatusCode)
     /// The request is invalid for this HTTP implementation.
@@ -33,6 +36,7 @@ public union HttpError {
             InvalidUri(let reason) => reason.ToString()
             NameResolution(let reason) => reason.ToString()
             Transport(let reason) => reason.ToString()
+            Content(let reason) => reason.ToString()
             UnsuccessfulStatus(let statusCode) => String.Concat("HTTP status ", ((int)statusCode).ToString())
             InvalidRequest(let message) => message
             Protocol(let message) => message

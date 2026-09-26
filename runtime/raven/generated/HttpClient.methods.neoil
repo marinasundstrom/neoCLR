@@ -3226,66 +3226,97 @@ ldloc local3
 M0000002a_IL_006e:
 callvirt instance System.Web.Http.HttpResponse::get_Content()
 M0000002a_IL_0073:
-callvirt instance System.Web.Http.HttpContent::get_Bytes()
+callvirt instance System.Web.Http.HttpContent::get_IsBuffered()
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M0000002a_IL_0078:
-call System.Text.Utf8::Decode(System.Collections.Sequence<Byte>)
-M0000002a_IL_007d:
-stloc local5
-M0000002a_IL_007f:
-ldloca local5
-M0000002a_IL_0081:
-ldloca local6
-M0000002a_IL_0083:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion25(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Ok<String>&)
-M0000002a_IL_0088:
-brfalse M0000002a_IL_00b6
-M0000002a_IL_008d:
-ldloc local6
-M0000002a_IL_008f:
-stloc local7
-M0000002a_IL_0091:
-ldloca local7
-M0000002a_IL_0093:
-ldloca local8
+ldc.i4 0
+M0000002a_IL_0079:
+ceq
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
+M0000002a_IL_007b:
+brtrue M0000002a_IL_0085
+M0000002a_IL_0080:
+br M0000002a_IL_00a0
+M0000002a_IL_0085:
+M0000002a_IL_0086:
+ldstr "Response content is not buffered"
+M0000002a_IL_008b:
+newobj instance System.Web.Http.HttpError.Unsupported::.ctor(String)
+M0000002a_IL_0090:
+newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.Unsupported)
 M0000002a_IL_0095:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion26(System.Result.Ok<String>&,String&)
-M0000002a_IL_009a:
-ldloc local8
-M0000002a_IL_009c:
-stloc local4
-M0000002a_IL_009e:
-ldc.i4 1
-M0000002a_IL_009f:
-br M0000002a_IL_00a5
-M0000002a_IL_00a5:
-brfalse M0000002a_IL_00b6
-M0000002a_IL_00aa:
-M0000002a_IL_00ab:
-br M0000002a_IL_00bb
-M0000002a_IL_00b6:
-br M0000002a_IL_00c9
-M0000002a_IL_00bb:
-M0000002a_IL_00bc:
-ldloc local4
-M0000002a_IL_00be:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion27(String)
-M0000002a_IL_00c3:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion28(System.Result.Ok<String>)
-M0000002a_IL_00c8:
-ret
-M0000002a_IL_00c9:
-M0000002a_IL_00ca:
-M0000002a_IL_00cb:
-ldstr "Invalid UTF-8 body"
-M0000002a_IL_00d0:
-newobj instance System.Web.Http.HttpError.Protocol::.ctor(String)
-M0000002a_IL_00d5:
-newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.Protocol)
-M0000002a_IL_00da:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion23(System.Web.Http.HttpError)
-M0000002a_IL_00df:
+M0000002a_IL_009a:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion24(System.Result.Error<System.Web.Http.HttpError>)
-M0000002a_IL_00e4:
+M0000002a_IL_009f:
+ret
+M0000002a_IL_00a0:
+M0000002a_IL_00a1:
+M0000002a_IL_00a2:
+ldloc local3
+M0000002a_IL_00a3:
+callvirt instance System.Web.Http.HttpResponse::get_Content()
+M0000002a_IL_00a8:
+callvirt instance System.Web.Http.HttpContent::get_Bytes()
+M0000002a_IL_00ad:
+call System.Text.Utf8::Decode(System.Collections.Sequence<Byte>)
+M0000002a_IL_00b2:
+stloc local5
+M0000002a_IL_00b4:
+ldloca local5
+M0000002a_IL_00b6:
+ldloca local6
+M0000002a_IL_00b8:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion25(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Ok<String>&)
+M0000002a_IL_00bd:
+brfalse M0000002a_IL_00eb
+M0000002a_IL_00c2:
+ldloc local6
+M0000002a_IL_00c4:
+stloc local7
+M0000002a_IL_00c6:
+ldloca local7
+M0000002a_IL_00c8:
+ldloca local8
+M0000002a_IL_00ca:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion26(System.Result.Ok<String>&,String&)
+M0000002a_IL_00cf:
+ldloc local8
+M0000002a_IL_00d1:
+stloc local4
+M0000002a_IL_00d3:
+ldc.i4 1
+M0000002a_IL_00d4:
+br M0000002a_IL_00da
+M0000002a_IL_00da:
+brfalse M0000002a_IL_00eb
+M0000002a_IL_00df:
+M0000002a_IL_00e0:
+br M0000002a_IL_00f0
+M0000002a_IL_00eb:
+br M0000002a_IL_00fe
+M0000002a_IL_00f0:
+M0000002a_IL_00f1:
+ldloc local4
+M0000002a_IL_00f3:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion27(String)
+M0000002a_IL_00f8:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion28(System.Result.Ok<String>)
+M0000002a_IL_00fd:
+ret
+M0000002a_IL_00fe:
+M0000002a_IL_00ff:
+M0000002a_IL_0100:
+ldstr "Invalid UTF-8 body"
+M0000002a_IL_0105:
+newobj instance System.Web.Http.HttpError.Protocol::.ctor(String)
+M0000002a_IL_010a:
+newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.Protocol)
+M0000002a_IL_010f:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion23(System.Web.Http.HttpError)
+M0000002a_IL_0114:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion24(System.Result.Error<System.Web.Http.HttpError>)
+M0000002a_IL_0119:
 ret
 .end
 .method private static Cancelled() -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>

@@ -277,6 +277,7 @@
   "System.Web.Http.HttpContent",
   "System.Web.Http.HttpContext",
   "System.Web.Http.HttpError",
+  "System.Web.Http.HttpError.Content",
   "System.Web.Http.HttpError.Handler",
   "System.Web.Http.HttpError.InvalidRequest",
   "System.Web.Http.HttpError.InvalidUri",

@@ -1,0 +1,11 @@
+{"case": "success", "outcome": "passed", "statistics": "assembly_ms=1387 load_ms=837 verify_ms=354 run_ms=1096\nallocated=741 live=0 peak=122 collections=14 reclaimed=741"}
+{"case": "borrowed", "outcome": "passed", "statistics": "assembly_ms=1426 load_ms=863 verify_ms=358 run_ms=906\nallocated=690 live=0 peak=118 collections=14 reclaimed=690"}
+{"case": "empty", "outcome": "passed", "statistics": "assembly_ms=1359 load_ms=865 verify_ms=386 run_ms=476\nallocated=272 live=0 peak=114 collections=6 reclaimed=272"}
+{"case": "eof", "outcome": "passed", "statistics": "assembly_ms=1885 load_ms=932 verify_ms=385 run_ms=328\nallocated=227 live=0 peak=114 collections=5 reclaimed=227"}
+{"case": "read-error", "outcome": "passed", "statistics": "assembly_ms=1395 load_ms=904 verify_ms=382 run_ms=354\nallocated=227 live=0 peak=114 collections=5 reclaimed=227"}
+{"case": "overread", "outcome": "passed", "statistics": "assembly_ms=1424 load_ms=908 verify_ms=375 run_ms=334\nallocated=227 live=0 peak=114 collections=5 reclaimed=227"}
+{"case": "cancel", "outcome": "passed", "statistics": "assembly_ms=1380 load_ms=850 verify_ms=351 run_ms=314\nallocated=227 live=0 peak=114 collections=5 reclaimed=227"}
+{"case": "precancel", "outcome": "passed", "statistics": "assembly_ms=1347 load_ms=830 verify_ms=379 run_ms=134\nallocated=96 live=0 peak=64 collections=2 reclaimed=96"}
+{"case": "disposed", "outcome": "passed", "statistics": "assembly_ms=1487 load_ms=867 verify_ms=357 run_ms=255\nallocated=138 live=0 peak=76 collections=3 reclaimed=138"}
+{"case": "invalid-header", "outcome": "passed", "statistics": "assembly_ms=1495 load_ms=913 verify_ms=417 run_ms=273\nallocated=136 live=0 peak=64 collections=4 reclaimed=136"}
+{"case": "refused", "outcome": "passed", "statistics": "assembly_ms=1698 load_ms=982 verify_ms=422 run_ms=5519\nallocated=206 live=0 peak=114 collections=5 reclaimed=206"}

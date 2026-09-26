@@ -10,6 +10,7 @@ import System.*
 import System.Collections.*
 import System.Result.*
 import System.Text.*
+import System.IO.*
 
 // Provisional bounded HTTP response contracts.
 public class HttpHeader {
@@ -467,7 +468,89 @@ public interface HttpHandler {
     func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>>
 }
 
-public class HttpContent {
+public class HttpContent : Disposable {
+    private var input: Option<InputStream> = None()
+    private var inputLength: int = 0
+    private var leaveOpen: bool = true
+    private var started: bool = false
+    private var disposed: bool = false
+
+    /// True when content already has a complete byte sequence.
+    val IsBuffered: bool => input is None
+    /// Declared byte count; stream content begins at the source's current position.
+    val Length: int {
+        get {
+            if IsBuffered {
+                return storedBytes.Count
+            }
+            return inputLength
+        }
+    }
+
+    /// Creates one-shot, known-length upload content. Ownership transfers on success.
+    static func FromStream(stream: InputStream, length: int, leaveOpen: bool) -> Result<HttpContent, HttpError> {
+        if length < 0 {
+            return Error(HttpError.InvalidRequest("Negative stream content length"))
+        }
+        if length > 65536 {
+            return Error(HttpError.LimitExceeded("Stream upload exceeds 65536 bytes"))
+        }
+        let content = HttpContent(ArrayList<byte>())
+        content.input = Some(stream)
+        content.inputLength = length
+        content.leaveOpen = leaveOpen
+        return Ok(content)
+    }
+
+    /// Returns buffered bytes without reading or consuming an input stream.
+    func TryGetBytes() -> Option<Sequence<byte>> {
+        if IsBuffered {
+            return Some(storedBytes)
+        }
+        return None()
+    }
+
+    /// Releases owned stream content; borrowed sources remain open. Idempotent.
+    func Dispose() {
+        if !disposed {
+            disposed = true
+            if !leaveOpen {
+                if let Some(stream) = input {
+                    stream.Close()
+                }
+            }
+        }
+    }
+
+    internal func BeginUpload() -> Result<unit, HttpError> {
+        if !IsBuffered {
+            if started || disposed {
+                return Error(HttpError.InvalidRequest("Stream content has already been consumed or disposed"))
+            }
+            started = true
+        }
+        return Ok(())
+    }
+
+    internal func ReadUpload(buffer: byte[], count: int) -> Result<int, HttpError> {
+        if let Some(stream) = input {
+            if disposed {
+                return Error(HttpError.Content(StreamError.Closed))
+            }
+            let result = stream.Read(buffer, 0, count)
+            if let Error(reason) = result {
+                return Error(HttpError.Content(reason))
+            }
+            if let Ok(read) = result {
+                if read <= 0 || read > count {
+                    return Error(HttpError.Content(StreamError.IoFailure))
+                }
+                return Ok(read)
+            }
+        }
+        return Error(HttpError.InvalidRequest("Content has no stream source"))
+    }
+
     private var mediaType: Option<string> = None()
     internal val MediaType: Option<string> {
         get {
@@ -478,7 +561,15 @@ public class HttpContent {
         }
     }
     private var storedBytes: Sequence<byte>
-    val Bytes: Sequence<byte> => storedBytes
+    /// Buffered-only compatibility accessor. Use TryGetBytes for arbitrary content.
+    val Bytes: Sequence<byte> {
+        get {
+            if !IsBuffered {
+                System.Fault("Stream content has no buffered Bytes; use TryGetBytes")
+            }
+            return storedBytes
+        }
+    }
 
     init(bytes: Sequence<byte>) {
         storedBytes = bytes
@@ -497,6 +588,10 @@ public class HttpContent {
 
     func ReadText() -> Task<Result<string, string>> {
         let source = Promise<Result<string, string>>()
+        if !IsBuffered {
+            _ = source.Complete(Error("Stream content is not buffered"))
+            return source.Task
+        }
         if let Ok(text) = Utf8.Decode(Bytes) {
             _ = source.Complete(Ok(text))
         } else {
@@ -740,9 +835,8 @@ public class HttpRequest {
     }
 
     internal func Encode() -> Result<Sequence<byte>, HttpError> {
-        let body = storedContent.Bytes
-        let count = body.Count
-        if count > 1024 {
+        let count = storedContent.Length
+        if storedContent.IsBuffered && count > 1024 {
             return Error(HttpError.LimitExceeded("Request body limit exceeded"))
         }
         if (storedMethod == "GET" || storedMethod == "DELETE" || storedMethod == "HEAD") && count != 0 {
@@ -788,10 +882,12 @@ public class HttpRequest {
             outgoing.Add(encoded[cursor])
             cursor += 1
         }
-        cursor = 0
-        while cursor < count {
-            outgoing.Add(body[cursor])
-            cursor += 1
+        if let Some(body) = storedContent.TryGetBytes() {
+            cursor = 0
+            while cursor < count {
+                outgoing.Add(body[cursor])
+                cursor += 1
+            }
         }
         let outgoingBytes: Sequence<byte> = outgoing
         return Ok(outgoingBytes)
@@ -1264,6 +1360,9 @@ public class HttpClient {
         if !response.IsSuccessStatusCode {
             return Error(HttpError.UnsuccessfulStatus(response.StatusCode))
         }
+        if !response.Content.IsBuffered {
+            return Error(HttpError.Unsupported("Response content is not buffered"))
+        }
         if let Ok(text) = Utf8.Decode(response.Content.Bytes) {
             return Ok(text)
         }
@@ -1336,6 +1435,8 @@ public class HttpSocketHandler : HttpHandler {
 // Private continuation adapter, replaceable when runtime suspension is available.
 // Each Send owns independent buffers, pending tasks and one socket.
 internal class HttpExchange {
+    private var uploadRemaining: int = 0
+    private var ownsUpload: bool = false
     private var deadline: long = 0
     private var token: CancellationToken
     private var request: HttpRequest
@@ -1372,6 +1473,14 @@ internal class HttpExchange {
             _ = source.Complete(Error(reason))
             return source.Task
         }
+        if let Error(reason) = request.Content.BeginUpload() {
+            _ = source.Complete(Error(reason))
+            return source.Task
+        }
+        if !request.Content.IsBuffered {
+            ownsUpload = true
+            uploadRemaining = request.Content.Length
+        }
         deadline = RuntimeServices.SocketDeadlineAfter(15000)
         let pending = Dns.GetHostAddressesUntil(request.Host, deadline, token)
         lookup = Some(pending)
@@ -1380,6 +1489,10 @@ internal class HttpExchange {
     }
 
     private func Cleanup() {
+        if ownsUpload {
+            ownsUpload = false
+            request.Content.Dispose()
+        }
         if let Some(connection) = socket {
             connection.Close()
         }
@@ -1443,14 +1556,46 @@ internal class HttpExchange {
     }
 
     private func SendNext() {
+        if token.IsCancellationRequested {
+            Cancel()
+            return
+        }
         if RuntimeServices.SocketDeadlineExpired(deadline) {
             Finish(Error(HttpError.TimedOut))
             return
         }
         if let Some(connection) = socket {
             if sent == outgoing.Count {
-                ReceiveNext()
-                return
+                if uploadRemaining == 0 {
+                    ReceiveNext()
+                    return
+                }
+                let requested = if uploadRemaining < 256 { uploadRemaining } else { 256 }
+                let reading = request.Content.ReadUpload(buffer, requested)
+                // A synchronous source may request cancellation during Read.
+                if token.IsCancellationRequested {
+                    Cancel()
+                    return
+                }
+                if RuntimeServices.SocketDeadlineExpired(deadline) {
+                    Finish(Error(HttpError.TimedOut))
+                    return
+                }
+                if let Error(reason) = reading {
+                    Finish(Error(reason))
+                    return
+                }
+                if let Ok(read) = reading {
+                    let chunk = ArrayList<byte>()
+                    var index = 0
+                    while index < read {
+                        chunk.Add(buffer[index])
+                        index += 1
+                    }
+                    outgoing = chunk
+                    sent = 0
+                    uploadRemaining -= read
+                }
             }
             var count = 0
             while count < 256 && sent + count < outgoing.Count {

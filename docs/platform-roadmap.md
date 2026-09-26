@@ -14,6 +14,24 @@ look like. A milestone selects an outcome to investigate, not every abstraction 
 its source proposals. Keep, adapt or discard ideas based on working samples and
 [comparison with .NET/CLR](design-research.md).
 
+## Current checkpoint — finish this HTTP POC (2026-09-26)
+
+The author now asks to reach a point where this POC is **done for now**, with both
+client and server capabilities tracked. Finish the known-length upload increment
+already underway, then freeze POC feature scope and complete its focused application,
+documentation and package checks. Use the [HTTP capability tracker](http-capabilities.md)
+for the matrix, remaining finish items and deferred work. Do not automatically start
+unknown-length bodies, another library feature, or HTTP/2/3 after this increment.
+The following feature-first plan records the preceding direction; this finish line
+now governs continuation. POC completion does not imply release qualification.
+
+The author also asks that the **next step** consolidate tracking documents by theme.
+After closing this slice, consolidate active status/priorities into one entry point
+per theme, beginning with HTTP client/server tracking; retain linked design and test
+evidence and preserve historical decisions. Remove duplicate/stale active sequences
+rather than creating another umbrella status list. This is document maintenance,
+not authorization to start deferred protocol features.
+
 ## Current priority — next-release features (2026-09-26)
 
 **Author direction:** “move forward and not focus on optimizations unless matters”
@@ -23,8 +41,9 @@ stabilization-first execution order recorded below; it does not declare known fa
 fixed or remove release validation. The implemented HTTP/JSON sample is a foundation
 for the next feature, without requiring M1 to be declared complete first.
 
-1. **Stream-backed HTTP content.** Resume the existing author-selected feature in
-   the [HTTP content design](http-client-design.md). Start with a bounded upload
+1. **Stream-backed HTTP content (now implemented in the closing slice).** The
+   existing author-selected feature in the [HTTP content design](http-client-design.md)
+   starts with a bounded upload
    from a readable stream through the existing client/handler pipeline. Establish
    owned versus borrowed lifetime, cancellation and known-length handling, then
    evaluate unknown-length framing and response streaming as separate increments.

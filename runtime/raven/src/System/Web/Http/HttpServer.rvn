@@ -282,6 +282,9 @@ public class HttpServer {
         if !(status >= 200 && status <= 599) {
             return Error(HttpError.InvalidRequest("A final response status from 200 through 599 is required"))
         }
+        if !response.Content.IsBuffered {
+            return Error(HttpError.Unsupported("Stream-backed responses are not implemented"))
+        }
         let body = response.Content.Bytes
         let count = body.Count
         if (status == 204 || status == 205 || status == 304) && count != 0 {

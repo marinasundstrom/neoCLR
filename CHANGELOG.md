@@ -8,6 +8,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-26
 
+- Add development known-length HTTP stream uploads through HttpContent.FromStream,
+  with explicit source ownership, one-shot admission, 256-byte reads, source errors
+  and cancellation cleanup. Buffered byte access remains available; TryGetBytes and
+  IsBuffered expose representation, and Bytes faults for stream content. Client
+  uploads allow 65,536 bytes; server bodies and responses retain their 1,024-byte
+  buffered limits. Refresh bridge/library/API artifacts together for the new
+  HttpError.Content case. Focused upload and buffered HTTP/JSON regression checks
+  pass, along with 623 bridge signature checks, API/library snapshots, 18 website
+  checks and the combined site build. Admit Disposable interface conversion for
+  content. Unknown-length uploads, async sources and response streaming remain deferred.
+- Set a finite HTTP POC finish line at the current upload increment and create a
+  shared client/server capability tracker with completion gates and future HTTP/2/3
+  direction. Record the author's next-step request to consolidate tracking by theme.
+  No POC completion, protocol implementation, release or deployment is claimed.
+
 - Reprioritize the next release toward feature delivery at the author's direction.
   Plan stream-backed HTTP content next, followed by bounded application-driven
   library additions; defer optimization unless it materially affects a feature,

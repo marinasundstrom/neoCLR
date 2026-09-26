@@ -25,6 +25,36 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-26 — Streaming, modern HTTP and a finite POC
+
+- **Author:** requests continuation, then asks how the work fits future streaming
+  HTTP. After the assistant describes body streaming, clarifies: “I don't mean just
+  that, but supporting the newer features of HTTP”.
+- **Assistant:** compares HTTP/2/3 requirements with the current HTTP/1.1 provider:
+  common message APIs, protocol-specific framing, independent exchange/connection
+  lifetime, async bodies, flow control, negotiation and trailers. Records future
+  capabilities without treating the question as approval to implement those protocols.
+- **Author:** “We should reach a point where we are done for now, for this POC. And
+  we should track HTTP work, both client and server capabilities.” Then requests
+  thematic consolidation of tracking documents “In a next step”.
+- **Assistant action:** establishes the [HTTP capability tracker](http-capabilities.md)
+  with client/server status, a bounded finish list and modern HTTP design direction.
+  Selects completion of the underway known-length upload increment as the feature
+  cutoff; records package/application evidence as outstanding gates rather than
+  declaring the POC or release finished. Records thematic consolidation as next
+  document-maintenance work, preserving design/test evidence and historical decisions.
+- **Implementation evidence:** adds FromStream, explicit ownership and one-shot
+  upload admission with 256-byte reads; focused independent-peer cases pass. The
+  conditional expression-bodied Length getter emitted zero on the current compiler;
+  an explicit getter and consumer assertion restore the required behavior. This is
+  a local workaround, not a general compiler fix. Exact validation is retained in
+  the [upload fixture](experiments/http-stream-upload/README.md).
+- **Validation outcome:** 11 upload cases and additional Disposable/JSON/length
+  assertions pass; the bridge conversion to Disposable was corrected after the
+  consumer exposed its omission. All 623 signature checks, buffered HTTP/JSON peers,
+  API/library snapshots and combined site checks pass. Packaged-SDK POC verification
+  remains outstanding; no publication or full runtime suite was run.
+
 ## 2026-09-26 — Return to next-release feature delivery
 
 - **Author correction:** “I think we should move forward and not focus on
