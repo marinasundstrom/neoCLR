@@ -84,3 +84,22 @@ Underlying reflection error.
 **Property value:** `string`
 
 Description of the unsupported object mapping.
+
+
+## HttpJsonError.Http.Reason
+
+<a id="httpjsonerror-http-reason"></a>
+
+**Property value:** `HttpError`
+
+The original HTTP construction, transport, handler or unsuccessful-status failure.
+
+## HttpJsonError.Json.Reason
+
+<a id="httpjsonerror-json-reason"></a>
+
+**Property value:** `JsonError`
+
+The original serialization or decoding failure. See
+[HttpJsonError](xref:System.Web.Http.Json.HttpJsonError) for the union contract.
+Cancellation remains a cancelled task rather than either case.

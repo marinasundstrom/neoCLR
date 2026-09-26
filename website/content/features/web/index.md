@@ -338,6 +338,21 @@ content media types. Standalone and server-created responses start
 with `None`. This is an originating-request reference; redirect tracking is not yet
 implemented. Retaining the response also retains that request and its content.
 
+## Generic JSON client helpers
+
+The development `System.Web.Http.Json` namespace adds `GetFromJson<T>` and
+`PostAsJson<T>`. GET requires a successful status and reads a supported flat model;
+POST serializes a model and returns the response for the application to inspect.
+Both use the client's base URI, default headers and handler, with string/Uri and
+cancellation-token overloads. `HttpJsonError` preserves either the HTTP or JSON
+cause. Cancellation remains task cancellation.
+
+The managed report sample fetches a typed report from a neoCLR server, posts it back,
+and reads a JSON acknowledgement. The initial mapper supports flat String, Int32
+and Boolean properties; the existing 128-byte JSON limit still applies. Conversion
+is synchronous over buffered HTTP content. Per-call header options and richer
+mapping are later work. See [the API guide](/docs/json.html) for the exact scope.
+
 ## JSON DOM
 
 The development `System.Data.Json` API can parse, inspect, construct and write a small

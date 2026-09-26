@@ -7574,3 +7574,29 @@ configuration/content, not target-specific code added to Raven main.
 
 - **Author goal reminder:** “We shouldn't forget our goal to have a sample demonstrating Http end-to-end using neoCLR”. The assistant confirms the managed client/server JSON sample remains the acceptance goal; request association and defaults support it, with generic helper integration still pending the compiler investigation.
 - **Validated outcome:** independent GET/POST header checks pass; the mapped JSON neoCLR client/server pair also passes after this change (425 client and 369 server allocations, zero final live objects). All 569 bridge signature checks and API/library snapshots pass. Website build remains skipped by direction.
+
+
+### 2026-09-26 — Generic JSON clients reach the managed HTTP sample
+
+- **Author direction:** continue toward the end-to-end neoCLR HTTP application,
+  retaining client-wide headers and deferring per-call JSON-header customization.
+- **Assistant investigation:** reduces the method-group failure independently on
+  Raven main; explicitly supplied enclosing type arguments were rejected for typed
+  delegates, while inline higher-order calls emitted default results. Four positive
+  regressions fail before and pass after; the uninferred negative case stays rejected.
+  All 399 relevant overload-resolution tests pass before/after, and the five new
+  checks pass on the neoCLR branch. General fix integrated on main as 13b9105d8,
+  cherry-picked to neoCLR as 56083626e; no runtime-specific policy moved to main.
+- **Implementation:** adds generic GetFromJson/PostAsJson, nested HttpJsonError causes,
+  bounded private callback admission, and reference-preserving generic box T. The
+  mapped sample now fetches a typed report, posts it and reads the acknowledgement.
+  API reference, website and snapshot dependency coverage are updated.
+- **Validated outcome:** public helper/cancellation fixture passes (863 allocations,
+  zero live objects); five focused box/unbox tests and 609 bridge checks pass. The
+  managed pair passes with 761 client / 626 server allocations; the independent
+  client check passes with 789. All end with zero final live objects. A first pair
+  run during regeneration times out; isolated checks pass with unchanged deadlines.
+  The slower debug object test run was stopped after passing relevant cases and
+  replaced by the five optimized focused checks; no full suite or website build.
+- **Still open:** repeatability under load, the separate unresolved-call diagnostic
+  issue, and deferred API expansion. See the [sample evidence](experiments/json-object-mapping/README.md#generic-json-verbs--2026-09-26).

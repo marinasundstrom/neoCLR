@@ -1,0 +1,66 @@
+namespace System.Web.Http.Json
+
+import System.*
+import System.Concurrency.*
+import System.Introspection.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+/// Buffered JSON client conveniences using the configured HTTP handler.
+public extension HttpClientJsonExtensions for HttpClient {
+    /// Sends GET and decodes a successful response as a supported flat model.
+    func GetFromJson<T>(url: string) -> Task<Result<T, HttpJsonError>> {
+        let transform: Func<Result<Object, HttpJsonError>, Result<T, HttpJsonError>> = JsonClientOperations.Convert<T>
+        return JsonClientOperations.Get(self, url, typeof(T), CancellationToken.None).Map(transform)
+    }
+
+    /// Sends GET and decodes a successful response as a supported flat model.
+    func GetFromJson<T>(url: string, cancellationToken: CancellationToken) -> Task<Result<T, HttpJsonError>> {
+        if cancellationToken.IsCancellationRequested {
+            let cancelled = Promise<Result<T, HttpJsonError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        let transform: Func<Result<Object, HttpJsonError>, Result<T, HttpJsonError>> = JsonClientOperations.Convert<T>
+        return JsonClientOperations.Get(self, url, typeof(T), cancellationToken).Map(transform)
+    }
+
+    /// Sends GET and decodes a successful response as a supported flat model.
+    func GetFromJson<T>(url: Uri) -> Task<Result<T, HttpJsonError>> {
+        let transform: Func<Result<Object, HttpJsonError>, Result<T, HttpJsonError>> = JsonClientOperations.Convert<T>
+        return JsonClientOperations.Get(self, url, typeof(T), CancellationToken.None).Map(transform)
+    }
+
+    /// Sends GET and decodes a successful response as a supported flat model.
+    func GetFromJson<T>(url: Uri, cancellationToken: CancellationToken) -> Task<Result<T, HttpJsonError>> {
+        if cancellationToken.IsCancellationRequested {
+            let cancelled = Promise<Result<T, HttpJsonError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        let transform: Func<Result<Object, HttpJsonError>, Result<T, HttpJsonError>> = JsonClientOperations.Convert<T>
+        return JsonClientOperations.Get(self, url, typeof(T), cancellationToken).Map(transform)
+    }
+
+    /// Serializes a supported flat model and returns the HTTP response, including non-success status.
+    func PostAsJson<T>(url: string, value: T) -> Task<Result<HttpResponse, HttpJsonError>> {
+        return JsonClientOperations.Post(self, url, value, CancellationToken.None)
+    }
+
+    /// Serializes a supported flat model and returns the HTTP response, including non-success status.
+    func PostAsJson<T>(url: string, value: T, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpJsonError>> {
+        return JsonClientOperations.Post(self, url, value, cancellationToken)
+    }
+
+    /// Serializes a supported flat model and returns the HTTP response, including non-success status.
+    func PostAsJson<T>(url: Uri, value: T) -> Task<Result<HttpResponse, HttpJsonError>> {
+        return JsonClientOperations.Post(self, url, value, CancellationToken.None)
+    }
+
+    /// Serializes a supported flat model and returns the HTTP response, including non-success status.
+    func PostAsJson<T>(url: Uri, value: T, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpJsonError>> {
+        return JsonClientOperations.Post(self, url, value, cancellationToken)
+    }
+
+}

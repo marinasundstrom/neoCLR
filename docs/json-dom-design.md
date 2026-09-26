@@ -380,3 +380,30 @@ rather than adding a new specialized header collection. The benefit is a small A
 composing with existing header validation; the cost is replacement-style configuration
 and copied collections instead of mutating a property-owned header collection.
 Per-call JSON-helper options and richer header APIs remain later design work.
+
+### Generic client integration — 2026-09-26
+
+The implemented `GetFromJson<T>`/`PostAsJson<T>` layer follows the previously
+recorded .NET naming comparison, without an Async suffix. Both string and Uri
+forms have optional cancellation overloads. GET validates successful HTTP status
+before decoding; POST returns HttpResponse without implicit response decoding or
+success enforcement. Existing BaseUri and default request headers are reused.
+
+A standard `HttpJsonError` union retains either `Http(HttpError)` or `Json(JsonError)`;
+it avoids flattening transport, status, parser and mapping failures into text.
+Applications can project both cases into their own error union via local implicit
+converters and continue using propagation. Cancellation remains task cancellation,
+not another result case. Pre-cancellation skips serialization; later cancellation
+uses the existing HTTP contract. Buffered JSON conversion stays synchronous.
+
+The public surface has only generic verbs. Internal non-generic operations carry
+TypeInfo and adapt the HTTP result; a bounded generic callback returns T. This keeps
+reflection and scheduler details out of the public API. The cost is continuation
+allocation/queue progression and the mapper's existing limitations. It introduces
+no public scheduler contract and can be revised when runtime suspension arrives.
+Per-call headers, streaming serialization and serializer options remain deferred.
+
+The independent compiler reduction and general fix are recorded in the
+[prototype investigation](experiments/http-json-client-prototype/README.md).
+Reference-instantiated generic boxing now preserves Object identity; values retain
+copied boxing. See [runtime semantics](boxed-interface-values.md#generic-reference-boxing--2026-09-26).

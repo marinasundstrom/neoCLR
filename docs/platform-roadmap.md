@@ -1,6 +1,6 @@
 # neoCLR platform roadmap
 
-**Updated 2026-09-25 · Product-led planning, not a release schedule.**
+**Updated 2026-09-26 · Product-led planning, not a release schedule.**
 
 Build a platform that can justify itself through useful programs. Each milestone
 has a theme, a concrete sample product and smaller cases that make the underlying
@@ -24,6 +24,21 @@ application milestones. See [website maintenance](design/feature-pages.md#ravend
 APIs and behavior as concrete application cases need them. Examine each case before
 choosing its contract; keep readily changeable choices provisional. The discussed
 Iterable<char> constructor/count overload remains undecided, not a planned API.
+
+## Implemented checkpoint — HTTP JSON clients (2026-09-26)
+
+The [generic client helpers](experiments/http-json-client/README.md) and standard
+HttpJsonError union are integrated. The independently reduced Raven method-group
+bug is fixed on main and the neoCLR branch; the broader unresolved-call diagnostic
+investigation remains separate. Generic boxing now preserves reference identity.
+
+The [mapped HTTP sample](experiments/json-object-mapping/README.md#generic-json-verbs--2026-09-26)
+uses GetFromJson to fetch a report and PostAsJson to submit it to a neoCLR server,
+then reads the acknowledgement. The managed pair and independent Python peer pass
+with zero final live objects. This is an implemented development POC, not a release.
+The run overlapping library regeneration timed out; repeatability under load remains
+open. Keep the end-to-end application as the acceptance case and retain the existing
+deadlines. Per-call JSON headers and richer serialization remain deferred.
 
 ## Active direction — sockets for a web application, 2026-09-24
 
@@ -216,8 +231,8 @@ POST returns the response rather than implicitly decoding its body. The author p
 `HttpResponse.Request: Option<HttpRequest>` for request association. That association
 and copied `HttpClient.DefaultRequestHeaders` are now implemented and exercised with
 immediate/delayed handlers. The [generic client prototype](experiments/http-json-client-prototype/README.md)
-exposed a Raven generic method-group/diagnostic issue; reduce and fix that independently
-before integrating the client verbs. Per-call JSON-helper header configuration remains
+exposed a Raven generic method-group/diagnostic issue, now independently fixed and
+integrated with the client verbs. Per-call JSON-helper header configuration remains
 later work by author direction. The author reaffirms that the acceptance goal is an
 end-to-end HTTP application using neoCLR on both client and server; these helpers
 and header contracts support that sample rather than becoming a separate API-expansion milestone. DOM operations now use explicit

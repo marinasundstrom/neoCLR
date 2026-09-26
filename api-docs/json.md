@@ -101,3 +101,24 @@ HttpClient verb extensions and request/response conveniences remain later work.
 
 See [JSON error payloads](json-error-payloads.md) for the case properties and their
 value types. Case signatures also appear on the generated JsonError union page.
+
+
+## Generic HTTP client helpers (development)
+
+Import `System.Web.Http.Json.*` to use
+[HttpClientJsonExtensions](xref:System.Web.Http.Json.HttpClientJsonExtensions).
+`GetFromJson<T>` sends GET, requires a 2xx response, and reads the model with the
+same buffered mapping rules as `JsonContent.Read<T>`. `PostAsJson<T>` serializes a
+model before sending and returns `HttpResponse`, preserving non-success statuses
+and content for the application to inspect. Both accept string or Uri addresses,
+with optional CancellationToken overloads, and honor BaseUri and DefaultRequestHeaders.
+
+Failures return [HttpJsonError](xref:System.Web.Http.Json.HttpJsonError): `Http(reason)`
+retains HTTP/transport/status errors; `Json(reason)` retains mapping, syntax, UTF-8
+and limit failures. Cancellation remains task cancellation. No per-call headers,
+serializer options, streaming codec or asynchronous serialization are introduced.
+
+The managed report sample gets a typed report, posts it back, then reads the
+acknowledgement from the response. Application-owned implicit error converters
+allow `?` to propagate either cause into its AppError union. The response's Request
+property identifies the effective POST, including client default headers.

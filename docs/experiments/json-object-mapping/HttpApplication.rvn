@@ -27,6 +27,15 @@ extension JsonErrorConversion for JsonError {
     static func implicit(error: JsonError) -> AppError => AppError.Json(error)
 }
 
+extension HttpJsonErrorConversion for HttpJsonError {
+    static func implicit(error: HttpJsonError) -> AppError {
+        return match error {
+            HttpJsonError.Http(let reason) => AppError.Http(reason)
+            HttpJsonError.Json(let reason) => AppError.Json(reason)
+        }
+    }
+}
+
 // Exact property names deliberately match the existing wire schema.
 public class ReportPayload {
     init() { }
@@ -57,7 +66,7 @@ func PrepareReport() -> Result<HttpContent, AppError> {
     return Ok(content)
 }
 
-func ReadReply(result: Result<HttpResponse, HttpError>) -> Result<string, AppError> {
+func ReadReply(result: Result<HttpResponse, HttpJsonError>) -> Result<string, AppError> {
     let response = result?
     if response.StatusCode != HttpStatusCode.Created {
         return Error(AppError.Http(HttpError.UnsuccessfulStatus(response.StatusCode)))

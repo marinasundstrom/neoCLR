@@ -38,5 +38,13 @@
   "P:System.Data.Json.JsonError.UnsupportedMapping.Message": {
     "output": "docs/json-error-payloads.html#unsupportedmapping-message",
     "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  },
+  "P:System.Web.Http.Json.HttpJsonError.Http.Reason": {
+    "output": "docs/json-error-payloads.html#httpjsonerror-http-reason",
+    "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  },
+  "P:System.Web.Http.Json.HttpJsonError.Json.Reason": {
+    "output": "docs/json-error-payloads.html#httpjsonerror-json-reason",
+    "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
   }
 }

@@ -6,6 +6,10 @@
     "runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn": "2b40ec91485820efbde7fac4db1a9e052d1245027fd3998627e98f78b5723ce7",
     "runtime/raven/src/System/Data/Json/JsonValue.rvn": "0c2084dca1bcdf2d1494d9f1942fceb25d060a7a25cd8256a4bfee3fc46a5426",
     "runtime/raven/src/System/Data/Json/JsonError.rvn": "91c54ccae315e879e1ba14b40386e95d7061e4b1c07a67e74eccbe0e116e8713",
+    "runtime/raven/src/System/Web/Http/Json/HttpJsonError.rvn": "f10af4bc1ee9818f697f7aa7210c4ab85d55184c0752ff6cee48f768b48ddcce",
+    "runtime/raven/src/System/Web/Http/Json/HttpClientJsonExtensions.rvn": "6dce9739cf2884afef04c82b471f922e98dc6b2fa2392d02aa4d2510db15e89f",
+    "runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn": "a9208357e5d15e3b690a1abe619871eb9aae22730f3824708784508dbdf5be6a",
+    "runtime/raven/src/System/Web/Http/Json/JsonContent.rvn": "afa1ad9ad0a8ede919d67a1520857e35a1f21de18c8ed4c268e4bf3b1f3daa96",
     "runtime/raven/src/System/Data/Json/JsonDocument.rvn": "8f98eeaaf29f0d173c483b80275a4b681b8923d5b8aafbeaf482cb932f4f430c",
     "runtime/raven/src/System/Data/Json/JsonSyntax.rvn": "b6e61952a1a0b9aa9bd870ba497a4f293ee68e9fa7cdf9d9775e3ec1981b7c0e",
     "runtime/raven/src/System/Data/Json/ObjectMapper.rvn": "7d93ba9ed492c1cc5685089cf27e7c4a9bf972761b55be07fcab7c944c142701",
@@ -128,15 +132,15 @@
     "runtime/raven/src/System/Boolean.rvn": "3daceb359864c13e8b4c1ba2c22b7666e8ac8c4591747cb973e43f0f2cc38081",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
-    "runtime/raven/System.Runtime.rvnproj": "9125632147a707432a8fd6cc8eecc2344ef75121e195a5912099d3085ed7d81c",
+    "runtime/raven/System.Runtime.rvnproj": "08618b74d979da3901d2f65d0676017fe771152e0f0e8d5e9bd3eb37e8183e09",
     "build/NeoCLR.Raven.props": "4eb1e8c16f00288330d6ea56b2966d6719dea83e6aab42fa77f38a3dffc3e75b"
   },
   "outputs": {
     "ReflectionError.methods.neoil": "86f290c4160a7457f8f697ddab530092cdb322639193474e6205e5956b2c0f5b",
     "ReflectionError.helpers.neoil": "4e61fe727cb6b13d72fc788248c40f27c9f1a7236cdd868e724a0d104923f33a"
   },
-  "compilerSha256": "47e60017869670f82c62d83b124983f0dd39e3af0c3bf008cb98d85179405f7a",
-  "coreSha256": "721632e1ca6bba5cebf0b8f59abcfeb35a8550053d216d27c5dbc43f3d2a4110",
+  "compilerSha256": "6b3970440969e901f3d196e8f49c39fcbd1ea3b1bfde905d78afe05b406c097e",
+  "coreSha256": "6541acf00ce5ed0311f03484b7b0c9fdc880f542816607265d0f57469c4ab6f3",
   "exports": [
     "override byref ToString() -> String",
     "byref .ctor(System.Runtime.Reflection.ReflectionError.UnboundMetadata value) -> Void",

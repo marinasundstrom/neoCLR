@@ -285,3 +285,10 @@ renderer limitation; the site checks the destination and anchor.
 System.Web.Http.Json.JsonContent now has type/member XML and automatic type selection
 for synchronous buffered Create/CreateNode/Read/ReadNode conversions, including
 generic and TypeInfo reads. The API landing page links the namespace's public type.
+
+
+The generic HTTP JSON client slice adds HttpClientJsonExtensions and HttpJsonError,
+including eight string/Uri and optional-token overloads. Type/member XML, namespace
+navigation and the API landing page describe the buffered limits and error/cancellation
+policy. HttpJsonError case payload properties use the same explicitly linked manual
+payload reference as JsonError until RavenDoc produces those individual pages.

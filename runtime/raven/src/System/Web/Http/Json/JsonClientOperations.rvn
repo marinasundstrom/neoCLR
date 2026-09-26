@@ -1,0 +1,90 @@
+namespace System.Web.Http.Json
+
+import System.*
+import System.Concurrency.*
+import System.Data.Json.*
+import System.Introspection.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+internal class JsonClientOperations {
+    init() { }
+
+    static func Convert<T>(result: Result<Object, HttpJsonError>) -> Result<T, HttpJsonError> {
+        let value = result?
+        return Ok((T)value)
+    }
+
+    private static func Adapt(result: Result<HttpResponse, HttpError>) -> Result<HttpResponse, HttpJsonError> {
+        return match result {
+            Ok(let response) => Ok(response)
+            Error(let error) => Error(HttpJsonError.Http(error))
+        }
+    }
+
+    static func Get(client: HttpClient, url: string, type: TypeInfo, token: CancellationToken) -> Task<Result<Object, HttpJsonError>> {
+        return client.Get(url, token).Map(JsonClientRead(type).Decode)
+    }
+
+    static func Post(client: HttpClient, url: string, value: Object, token: CancellationToken) -> Task<Result<HttpResponse, HttpJsonError>> {
+        if token.IsCancellationRequested {
+            let cancelled = Promise<Result<HttpResponse, HttpJsonError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        let created = JsonContent.Create(value)
+        if let Ok(content) = created {
+            return client.Post(url, content, token).Map(Adapt)
+        } else if let Error(error) = created {
+            let failed = Promise<Result<HttpResponse, HttpJsonError>>()
+            _ = failed.Complete(Error(HttpJsonError.Json(error)))
+            return failed.Task
+        }
+        System.Fault("JSON creation returned no outcome")
+    }
+
+    static func Get(client: HttpClient, url: Uri, type: TypeInfo, token: CancellationToken) -> Task<Result<Object, HttpJsonError>> {
+        return client.Get(url, token).Map(JsonClientRead(type).Decode)
+    }
+
+    static func Post(client: HttpClient, url: Uri, value: Object, token: CancellationToken) -> Task<Result<HttpResponse, HttpJsonError>> {
+        if token.IsCancellationRequested {
+            let cancelled = Promise<Result<HttpResponse, HttpJsonError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        let created = JsonContent.Create(value)
+        if let Ok(content) = created {
+            return client.Post(url, content, token).Map(Adapt)
+        } else if let Error(error) = created {
+            let failed = Promise<Result<HttpResponse, HttpJsonError>>()
+            _ = failed.Complete(Error(HttpJsonError.Json(error)))
+            return failed.Task
+        }
+        System.Fault("JSON creation returned no outcome")
+    }
+}
+
+internal class JsonClientRead {
+    private var type: TypeInfo
+    init(type: TypeInfo) {
+        self.type = type
+    }
+
+    func Decode(result: Result<HttpResponse, HttpError>) -> Result<Object, HttpJsonError> {
+        if let Error(error) = result {
+            return Error(HttpJsonError.Http(error))
+        }
+        let Ok(response) = result else {
+            System.Fault("HTTP returned no outcome")
+        }
+        if !response.IsSuccessStatusCode {
+            return Error(HttpJsonError.Http(HttpError.UnsuccessfulStatus(response.StatusCode)))
+        }
+        return match JsonContent.Read(response.Content, type) {
+            Ok(let value) => Ok(value)
+            Error(let error) => Error(HttpJsonError.Json(error))
+        }
+    }
+}

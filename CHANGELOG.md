@@ -8,6 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-26
 
+- Integrate generic GetFromJson<T>/PostAsJson<T> extensions with string/Uri and
+  cancellation overloads, standard HttpJsonError causes, BaseUri/default headers
+  and response association. The mapped neoCLR demo now fetches a report, posts it
+  back and reads an acknowledgement. Preserve reference identity for generic box T;
+  keep value boxing copies. Integrate Raven's independently tested generic
+  method-group fix (main 13b9105d8; neoCLR 56083626e). Track all JSON helper sources
+  in library snapshots and reject omitted inputs. Update public API reference and
+  website content. Focused helpers, five boxing checks, 609 bridge checks and the
+  managed/independent HTTP peers pass with zero final live objects where measured.
+  A concurrent-build run timed out; isolated runs pass without deadline changes.
+  Full suite and website build skipped.
+
 - Add HttpResponse.Request as Option<HttpRequest>, associated by HttpClient.Send
   for immediate and pending responses through custom/socket handlers. Add copied
   DefaultRequestHeaders; explicit headers win case-insensitively, invalid defaults

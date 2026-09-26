@@ -1,0 +1,142 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Data.Json.*
+import System.IO.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+import System.Text.*
+import System.Web.Http.*
+import System.Web.Http.Json.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("HTTP JSON client assertion failed")
+    }
+}
+
+public class Report {
+    init() { }
+    var station: string { get; set; } = ""
+}
+
+class ReplyHandler : HttpHandler {
+    val Completion: Promise<Result<HttpResponse, HttpError>> = Promise<Result<HttpResponse, HttpError>>()
+    val Response: HttpResponse
+    var Calls: int = 0
+    var SawToken: bool = false
+    private var pending: bool
+
+    init(status: int, text: string, pending: bool) {
+        Response = HttpResponse(status, ArrayList<HttpHeader>(), Utf8.Encode(text))
+        self.pending = pending
+    }
+
+    func Send(request: HttpRequest, token: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        Calls += 1
+        SawToken = token.CanBeCancelled
+        if !pending {
+            _ = Completion.Complete(Ok(Response))
+        }
+        return Completion.Task
+    }
+}
+
+func JsonVerbs() {
+    let good = ReplyHandler(200, "{\"station\":\"Café\"}", false)
+    let client = HttpClient(good)
+    client.BaseUri = Some("http://example.test/base/")
+    let defaults = ArrayList<HttpHeader>()
+    defaults.Add(HttpHeader("X-Client", "json-sample"))
+    client.DefaultRequestHeaders = defaults
+    let token = CancellationTokenSource()
+    let reading = client.GetFromJson<Report>("child", token.Token)
+    TaskQueue.Default.Drain()
+    let Ok(report) = reading.GetResult() else {
+        System.Fault("GET JSON failed")
+    }
+    Check(report.station == "Café" && good.SawToken)
+    let Some(request) = good.Response.Request else {
+        System.Fault("GET origin missing")
+    }
+    Check(request.Target == "/base/child")
+    Check(request.GetHeaderValues("x-client")[0] == "json-sample")
+    token.Dispose()
+
+    let Ok(uri) = Uri.Parse("http://example.test/reports") else {
+        System.Fault("URI creation failed")
+    }
+    let posted = ReplyHandler(400, "not JSON", false)
+    let postClient = HttpClient(posted)
+    postClient.DefaultRequestHeaders = defaults
+    let posting = postClient.PostAsJson(uri, report)
+    TaskQueue.Default.Drain()
+    // POST preserves non-success responses and does not decode their bodies.
+    let Ok(postResponse) = posting.GetResult() else {
+        System.Fault("POST response lost")
+    }
+    Check(postResponse.StatusCode == HttpStatusCode.BadRequest)
+    let Some(postRequest) = postResponse.Request else {
+        System.Fault("POST origin missing")
+    }
+    Check(postRequest.Method == "POST")
+    Check(postRequest.GetHeaderValues("x-client")[0] == "json-sample")
+    Check(postRequest.GetHeaderValues("content-type")[0] == "application/json; charset=utf-8")
+    let Ok(postedReport) = JsonContent.Read<Report>(postRequest.Content) else {
+        System.Fault("Posted body invalid")
+    }
+    Check(postedReport.station == report.station)
+
+    let rejected = ReplyHandler(404, "not JSON", false)
+    let rejection = HttpClient(rejected).GetFromJson<Report>(uri)
+    let malformed = HttpClient(ReplyHandler(200, "{", false)).GetFromJson<Report>("http://example.test/")
+    let transport = ReplyHandler(200, "{}", true)
+    let transportResult = HttpClient(transport).GetFromJson<Report>(uri)
+    _ = transport.Completion.Complete(Error(HttpError.TimedOut))
+    TaskQueue.Default.Drain()
+    let Error(HttpJsonError.Http(HttpError.UnsuccessfulStatus(code))) = rejection.GetResult() else {
+        System.Fault("Status error missing")
+    }
+    Check(code == HttpStatusCode.NotFound)
+    Check(malformed.GetResult() is Error(HttpJsonError.Json(JsonError.Syntax(_))))
+    Check(transportResult.GetResult() is Error(HttpJsonError.Http(HttpError.TimedOut)))
+
+    let unsupported = ReplyHandler(200, "{}", false)
+    let badModel = HttpClient(unsupported).PostAsJson("http://example.test/", 42)
+    Check(badModel.GetResult() is Error(HttpJsonError.Json(JsonError.UnsupportedMapping(_))))
+    Check(unsupported.Calls == 0)
+
+    let stopped = CancellationTokenSource()
+    stopped.Cancel()
+    Check(HttpClient(unsupported).GetFromJson<Report>(uri, stopped.Token).IsCancelled)
+    Check(HttpClient(unsupported).PostAsJson(uri, 42, stopped.Token).IsCancelled)
+    Check(unsupported.Calls == 0)
+    stopped.Dispose()
+}
+
+func PendingCancellation() {
+    let source = CancellationTokenSource()
+    let reader = ReplyHandler(200, "{}", true)
+    let reading = HttpClient(reader).GetFromJson<Report>("http://example.test/", source.Token)
+    Check(reader.SawToken && !reading.IsCompleted)
+    _ = reader.Completion.Cancel()
+    TaskQueue.Default.Drain()
+    Check(reading.IsCancelled)
+
+    let writer = ReplyHandler(200, "{}", true)
+    let report = Report()
+    report.station = "Café"
+    let posting = HttpClient(writer).PostAsJson("http://example.test/", report, source.Token)
+    Check(writer.SawToken && !posting.IsCompleted)
+    _ = writer.Completion.Cancel()
+    TaskQueue.Default.Drain()
+    Check(posting.IsCancelled)
+    source.Dispose()
+}
+
+func Main() {
+    JsonVerbs()
+    PendingCancellation()
+    Console.WriteLine("HTTP JSON client checks passed")
+}

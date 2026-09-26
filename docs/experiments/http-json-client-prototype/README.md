@@ -46,3 +46,22 @@ for that separate observation has been made in this slice.
 
 Public GetFromJson<T>/PostAsJson<T> remain the agreed next API layer. The shared
 JsonContent helpers are already implemented and remain usable independently.
+
+
+## Resolution — 2026-09-26
+
+The method-group failure reproduced independently on Raven main: a generic caller's
+supplied type parameter was treated as an unresolved callee parameter. Typed
+assignment reported RAV2203, while inline higher-order calls returned defaults.
+The binder now preserves constructed methods and validates their substituted
+signature. Four positive regressions failed before and pass after; the uninferred
+negative case remains rejected. All 399 overload-resolution checks pass before and
+after, with five focused runtime/diagnostic checks also passing on the neoCLR branch.
+A C# .NET 11 comparison agrees for reference and value instantiations.
+
+General fix: Raven main `13b9105d8`, cherry-picked as neoCLR `56083626e`.
+The [active client fixture](../http-json-client/README.md) replaces the deferred
+prototype. The neoCLR bridge admits only its bounded generic converter callback,
+substituting the callee parameter with the current caller parameter. Generic `box T`
+now preserves reference objects and typed nulls; existing value-copy semantics remain.
+These changes do not resolve every possible missing-diagnostic issue in Raven.

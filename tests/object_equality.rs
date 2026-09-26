@@ -704,3 +704,39 @@ fn string_identity_hash_survives_wrapper_collection_and_recreation() {
     assert!(result.heap.collections() > 1);
     assert!(result.heap.is_empty());
 }
+
+
+#[test]
+fn generic_box_reference_preserves_identity_and_gc_roots() {
+    let declarations =
+        format!("{CELL}\n.function Box<T>(T value) -> System.Object\nldarg 0\nbox T\nret\n.end");
+    let mut body = String::from(
+        ".local Cell original\n.local System.Object alias\nldc.i4 42\nnewobj Cell\nstloc original\nldloc original\ncall Box<Cell>(Cell)\nstloc alias\n",
+    );
+    for _ in 0..8 {
+        body.push_str("ldc.i4 0\nnewobj Cell\npop\n");
+    }
+    body.push_str(&format!("ldloc original\nldloc alias\n{IDENTITY}"));
+    let result = run(&body, &declarations, "Boolean", 2).unwrap();
+    assert_eq!(result.value, Value::Boolean(true));
+    assert!(result.heap.collections() > 1);
+    assert_eq!(result.heap.len(), 0);
+}
+
+#[test]
+fn box_reference_preserves_null_and_string_identity() {
+    let null = format!(
+        ".local Cell empty\nldloca empty\ninitobj Cell\nldloc empty\nbox Cell\nldloc empty\n{IDENTITY}"
+    );
+    assert_eq!(
+        run(&null, CELL, "Boolean", 1).unwrap().value,
+        Value::Boolean(true)
+    );
+    let string = format!(
+        ".local String text\nldstr \"text\"\nstloc text\nldloc text\nbox String\nldloc text\ncastclass System.Object\n{IDENTITY}"
+    );
+    assert_eq!(
+        run(&string, "", "Boolean", 2).unwrap().value,
+        Value::Boolean(true)
+    );
+}

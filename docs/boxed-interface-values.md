@@ -17,7 +17,7 @@ values/byrefs; no universal boxing of generic payloads is introduced.
 
 The current instruction requires an ordinary System.Object class declaration.
 It does not impose Object ancestry on every type. This is a bounded interpreter
-implementation: generic reference-type box no-ops, nullable boxing, address-returning unbox,
+implementation: nullable boxing, address-returning unbox,
 general primitive Object virtual methods and constrained-call allocation optimizations remain
 future work. Boxed Int32 has a bounded Object.Equals/GetHashCode intrinsic, described
 in the [Object review](object-model-review.md#boxed-int32-equality-and-hash--2026-09-24). The typed verifier currently requires an explicit interface cast after box;
@@ -47,3 +47,26 @@ box, restricted when its receiver is readonly. Reachability includes these targe
 InvalidCast. No numeric conversion or interior reference escapes. Reference-type and
 nullable unboxing remain outside this profile. See the [Object review](object-model-review.md)
 and `tests/object_equality.rs` for comparison, tradeoffs and regression evidence.
+
+
+## Generic reference boxing — 2026-09-26
+
+`box T` now accepts ordinary reference instantiations as well as value types.
+Class, array and interface handles and typed nulls preserve their reference identity
+without allocating a second box. Values still copy into independent GC-owned storage.
+Intrinsic String uses the existing Object-handle materialization and string identity
+rules; this representation may allocate, unlike a CLR String reference no-op.
+Managed byrefs and native pointers remain rejected.
+
+This follows ECMA-335 I.8.2.4 and III.4.1, including boxable reference types, and
+supports ordinary generic value-to-Object conversions emitted for JSON helpers.
+The alternative of rejecting reference arguments would make an unconstrained generic
+helper fail for the very model classes it is intended to serialize. A compiler-only
+special case would leave raw IL and other frontends inconsistent. Focused runtime
+checks cover reference identity, nulls, strings and collection pressure alongside
+existing value-copy/unboxing tests. Nullable-value boxing remains outside this slice.
+
+Five optimized reference box/unbox checks pass, including GC and null/string cases.
+The corresponding C# .NET 11 generic boxing comparison preserves reference/null
+identity and the integer value. The runtime is still an interpreter with the String
+representation cost noted above.

@@ -294,5 +294,9 @@
   "System.Web.Http.HttpServer",
   "System.Web.Http.HttpSocketHandler",
   "System.Web.Http.HttpStatusCode",
+  "System.Web.Http.Json.HttpClientJsonExtensions",
+  "System.Web.Http.Json.HttpJsonError",
+  "System.Web.Http.Json.HttpJsonError.Http",
+  "System.Web.Http.Json.HttpJsonError.Json",
   "System.Web.Http.Json.JsonContent"
 ]

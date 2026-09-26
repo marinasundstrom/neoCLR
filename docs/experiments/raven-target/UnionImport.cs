@@ -19,7 +19,7 @@ static class UnionImport
     const string Carrier = "System.Result<Int32,System.OverflowError>";
     const string Ok = "System.Result.Ok<Int32>";
     const string Error = "System.Result.Error<System.OverflowError>";
-    sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1, int Argument = -1, MethodDefinition? Function = null, bool VirtualFunction = false, string? FunctionReceiver = null);
+    sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1, int Argument = -1, MethodDefinition? Function = null, bool VirtualFunction = false, string? FunctionReceiver = null, GenericInstanceMethod? GenericFunction = null);
     sealed record State(List<Slot> Stack, bool[] Assigned);
     sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null, bool ConditionalOutput = false, int[]? Outputs = null);
 
@@ -62,6 +62,8 @@ static class UnionImport
         string Name(MethodDefinition method) => libraryOwner is null ? MetadataIdentity.FunctionName(method)
             : exports.Contains(method) && JsonBindings.IsGenericSerializerMethod(method)
                 ? JsonBindings.GenericImplementationName(method) + "<T0>"
+            : exports.Contains(method) && method.DeclaringType.FullName == HttpJsonBindings.Operations && method.IsStatic
+                ? method.DeclaringType.FullName + "." + LibraryImplementation.GenericName(method)
             : exports.Contains(method) ? (method.DeclaringType.FullName is "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators" or "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" ? method.DeclaringType.FullName : libraryOwner) + "." + LibraryImplementation.GenericName(method)
             : throw new InvalidDataException("Unexported implementation dependency: " + method.FullName);
         var entryHasArguments = entry is not null && EntryPointBindings.HasArguments(entry, collectionProfile);
@@ -555,7 +557,6 @@ static class UnionImport
                     case Code.Ldftn:
                     case Code.Ldvirtftn:
                         var functionReference = (MethodReference)instruction.Operand;
-                        ApplicationTypes.CheckMethod(functionReference);
                         var functionTarget = ClosureAudit.ResolveMethod(functionReference) ?? throw new InvalidDataException("Unresolved delegate target.");
                         var virtualFunction = instruction.OpCode.Code == Code.Ldvirtftn;
                         // A bounded generic library callback retains its constructed receiver.
@@ -566,7 +567,14 @@ static class UnionImport
                             && functionTarget.HasThis && !functionTarget.HasParameters
                             && functionTarget.ReturnType.MetadataType == MetadataType.Void
                             && ApplicationTypes.Matches(functionReference, functionTarget);
-                        if (!ApplicationTypes.IsModule(functionTarget.Module) || (!genericLibraryCallback && functionReference.FullName != functionTarget.FullName)
+                        var genericJsonCallback = libraryOwner == JsonBindings.Root && !virtualFunction
+                            && functionReference is GenericInstanceMethod callback && HttpJsonBindings.IsGeneric(functionTarget)
+                            && functionTarget.DeclaringType.FullName == HttpJsonBindings.Operations && functionTarget.Name == "Convert"
+                            && callback.GenericArguments.Count == 1 && callback.GenericArguments[0] is GenericParameter callbackParameter
+                            && callbackParameter.Owner == method && callbackParameter.Position == 0
+                            && ApplicationTypes.Matches(callback.ElementMethod, functionTarget);
+                        if (!genericJsonCallback) ApplicationTypes.CheckMethod(functionReference);
+                        if (!ApplicationTypes.IsModule(functionTarget.Module) || (!genericLibraryCallback && !genericJsonCallback && functionReference.FullName != functionTarget.FullName)
                             || functionTarget.IsConstructor || (!functionTarget.HasBody && !virtualFunction)
                             || functionTarget.DeclaringType.IsValueType && functionTarget.HasThis)
                             throw new InvalidDataException("Only static or class application delegate targets are admitted: " + functionReference.FullName + "; " + instruction.OpCode);
@@ -583,7 +591,8 @@ static class UnionImport
                             code.AppendLine($"call {checkName}({receiverType})");
                         }
                         Push(new("FunctionAddress", Function: functionTarget, VirtualFunction: virtualFunction,
-                            FunctionReceiver: genericLibraryCallback ? ApplicationTypes.Receiver(functionReference) : null)); break;
+                            FunctionReceiver: genericLibraryCallback ? ApplicationTypes.Receiver(functionReference) : null,
+                            GenericFunction: genericJsonCallback ? (GenericInstanceMethod)functionReference : null)); break;
                     case Code.Newobj:
                         var constructor = (MethodReference)instruction.Operand;
                         var constructorDefinition = constructor.Resolve() ?? throw new InvalidDataException("Unresolved constructor.");
@@ -634,8 +643,11 @@ static class UnionImport
                             if (function.HasThis) Expect(addressSlot.FunctionReceiver ?? ApplicationTypes.Receiver(function));
                             else Expect("FaultNull");
                             var signature = DelegateBindings.Signature(delegateType);
-                            var targetArguments = function.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
-                            var targetResult = ProfileType(function.ReturnType, true);
+                            TypeReference DelegateTargetType(TypeReference type) => addressSlot.GenericFunction is { } genericFunction
+                                ? RuntimeSignatures.Close(type, genericFunction.DeclaringType, method: genericFunction, allowOpenMethodParameters: true)
+                                : type;
+                            var targetArguments = function.Parameters.Select(p => ProfileType(DelegateTargetType(p.ParameterType))).ToArray();
+                            var targetResult = ProfileType(DelegateTargetType(function.ReturnType), true);
                             if (!targetArguments.SequenceEqual(signature[..^1]) || (targetResult != signature[^1] && !(targetResult == "noresult" && signature[^1] == "Void")))
                                 throw new InvalidDataException("Delegate target signature mismatch.");
                             if (!function.IsAbstract) pending.Enqueue(function);

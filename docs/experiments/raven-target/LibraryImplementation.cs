@@ -29,7 +29,7 @@ static class LibraryImplementation
         }
         if (owner == JsonBindings.Root) {
             foreach (var name in JsonBindings.Names) ApplicationTypes.BindLibrary(source.GetType(name), name);
-            return JsonBindings.Names.SelectMany(name => InstanceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
+            return JsonBindings.Names.SelectMany(name => name == HttpJsonBindings.Extensions ? Roots(source, core, name) : InstanceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
         }
         if (owner == IPAddressBindings.Root) {
             foreach (var name in IPAddressBindings.Names) ApplicationTypes.BindLibrary(source.GetType(name), name);
@@ -124,7 +124,7 @@ static class LibraryImplementation
                 && m.Parameters.Zip(method.Parameters).All(p => p.First.Name == p.Second.Name && SameType(p.First.ParameterType, p.Second.ParameterType))).ToArray();
             if (matches.Length == 1) CheckMethod(matches[0]);
             if (matches.Length != 1) throw new InvalidDataException("Library export does not match reference contract: " + method.FullName);
-            if (owner is "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" or "System.Linq.Operators" or "System.OptionOperators" or "System.OptionNestedOperators" or "System.ResultOperators" or "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators")
+            if (owner is HttpJsonBindings.Extensions or "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" or "System.Linq.Operators" or "System.OptionOperators" or "System.OptionNestedOperators" or "System.ResultOperators" or "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators")
                 CheckExtensionContract(method, matches[0]);
         }
         return methods.Concat(consoleProviders).ToArray();
@@ -397,6 +397,7 @@ static class LibraryImplementation
     {
         var helpers = Regex.Matches(text, @"(?m)^\.function (?:internal )?([^\(]+)\(").Select(m => m.Groups[1].Value)
             .Where(h => !h.StartsWith(owner + ".", StringComparison.Ordinal)
+                && !(owner == JsonBindings.Root && (h.StartsWith(HttpJsonBindings.Extensions + ".", StringComparison.Ordinal) || h.StartsWith(HttpJsonBindings.Operations + ".Convert<", StringComparison.Ordinal)))
                 && !(owner == JsonBindings.Root && h is "System.Data.Json.JsonSerializer.DeserializeText<T0>" or "System.Data.Json.JsonSerializer.DeserializeStream<T0>" or "System.Web.Http.Json.JsonContent.ReadModel<T0>")
                 && !(owner == "System.Introspection.MemberInfo" && (h.StartsWith("System.Runtime.Reflection.TypeReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.PropertyReflectionExtensions.", StringComparison.Ordinal)))
                 && !(owner == "System.Tasks.Task" && (h.StartsWith("System.Tasks.TaskOperators.", StringComparison.Ordinal) || h.StartsWith("System.Tasks.TaskResultOperators.", StringComparison.Ordinal)))).ToArray();
@@ -418,6 +419,7 @@ static class LibraryImplementation
                             changed |= parameters[helper].Add(parameter);
         } while (changed);
         foreach (var helper in helpers.Where(h => !h.StartsWith(owner + ".", StringComparison.Ordinal)
+                && !(owner == JsonBindings.Root && (h.StartsWith(HttpJsonBindings.Extensions + ".", StringComparison.Ordinal) || h.StartsWith(HttpJsonBindings.Operations + ".Convert<", StringComparison.Ordinal)))
                 && !(owner == JsonBindings.Root && h is "System.Data.Json.JsonSerializer.DeserializeText<T0>" or "System.Data.Json.JsonSerializer.DeserializeStream<T0>" or "System.Web.Http.Json.JsonContent.ReadModel<T0>")
                 && !(owner == "System.Introspection.MemberInfo" && (h.StartsWith("System.Runtime.Reflection.TypeReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.PropertyReflectionExtensions.", StringComparison.Ordinal)))
                 && !(owner == "System.Tasks.Task" && (h.StartsWith("System.Tasks.TaskOperators.", StringComparison.Ordinal) || h.StartsWith("System.Tasks.TaskResultOperators.", StringComparison.Ordinal)))))

@@ -961,10 +961,10 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 }
                 Op::BoxValue(ty) | Op::UnboxAny(ty) => {
                     check(ty)?;
-                    if matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_) | Type::Ptr(_))
-                        || (matches!(op, Op::BoxValue(_)) && module.is_object_reference_type(ty))
-                    {
-                        return Err(Fault::new("box requires a non-reference value type"));
+                    if matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_) | Type::Ptr(_)) {
+                        return Err(Fault::new(
+                            "box/unbox.any cannot use pointer or byref types",
+                        ));
                     }
                     if !module.is_reference_type(&Type::Named("System.Object".into())) {
                         return Err(Fault::new("box requires a System.Object class declaration"));
@@ -3457,13 +3457,21 @@ fn interpret_instructions(
                     memory.write(&pointer, &layout, &value)?;
                 }
                 Op::BoxValue(ty) => {
+                    let value = frame.pop()?.for_storage_in(module, ty)?;
+                    if module.is_object_reference_type(ty) && !matches!(value, Value::String(_)) {
+                        frame
+                            .stack
+                            .push(value.for_storage_in(module, &Type::from_name("System.Object"))?);
+                        return Ok(None);
+                    }
+                    // Intrinsic String uses the same Object handle materialization as castclass.
+                    // Ordinary references above preserve identity without an extra allocation.
                     if heap.len() >= limits.heap_objects {
                         return Err(Fault::coded(
                             crate::FaultCode::HeapLimitExceeded,
                             "heap object limit exceeded",
                         ));
                     }
-                    let value = frame.pop()?.for_storage_in(module, ty)?;
                     let index = heap.allocate(value)?;
                     frame
                         .stack

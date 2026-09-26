@@ -98,3 +98,9 @@ reflection mapping calls in this variant. The default DOM variant remains availa
 The public-serializer server also passes all 12 independent Python cases with zero
 final live objects. This includes strict missing/null/type rules and preserved
 empty-string/extra-field behavior for the established wire schema.
+
+The current `--mapped` variant uses GetFromJson and PostAsJson for a two-request
+flow: fetch a report, then submit it and read the acknowledgement. Both the neoCLR
+pair and independent Python peer checks pass; see the
+[mapped sample evidence](../json-object-mapping/README.md#generic-json-verbs--2026-09-26).
+Its server request count is two, while the default DOM pair still uses one.

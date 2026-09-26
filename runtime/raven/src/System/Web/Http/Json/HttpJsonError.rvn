@@ -1,0 +1,17 @@
+namespace System.Web.Http.Json
+
+import System.Data.Json.*
+import System.Web.Http.*
+
+/// Preserves the HTTP or JSON cause of a JSON client operation failure.
+public union HttpJsonError {
+    case Http(reason: HttpError)
+    case Json(reason: JsonError)
+
+    override func ToString() -> string {
+        return match self {
+            Http(let reason) => reason.ToString()
+            Json(let reason) => reason.ToString()
+        }
+    }
+}

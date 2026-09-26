@@ -178,3 +178,22 @@ After client request association/default-header integration (2026-09-26), the
 managed pair passes again in isolation: 425 client / 369 server allocations,
 zero final live objects. Generic JSON verb helpers remain pending; the sample
 uses the working shared JsonContent conversion APIs.
+
+## Generic JSON verbs — 2026-09-26
+
+The mapped client now uses GetFromJson<ReportPayload> to fetch `/report`, then
+PostAsJson to submit that model to `/reports`. ReadReply inspects the HTTP status
+and reads the acknowledgement through JsonContent.Read<Acknowledgement>. Local
+implicit converters preserve HttpJsonError causes in AppError. The server still
+reads request content and writes response content with shared JsonContent helpers.
+
+The updated neoCLR pair passes in isolation with 761 client / 626 server allocations,
+zero final live objects. The client against the independent Python peer also passes
+(789 allocations, zero final live objects). That peer verifies GET/POST routes,
+JSON media type, UTF-8 body and acknowledgement. Run `--mapped --case pair` or
+`--mapped --case client` with the matching development toolchain.
+
+A run overlapping library regeneration timed out. The isolated run passed without
+changing any deadline. This remains a limitation under load, not evidence of
+production readiness or a reason to weaken the timeout checks. The DOM sample
+remains available separately; no full suite or website build was run.

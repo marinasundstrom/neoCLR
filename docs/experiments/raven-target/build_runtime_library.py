@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
     "ReflectionError": "System.Runtime.Reflection.ReflectionError",
     'JsonError': 'System.Data.Json.JsonError',
+    'HttpJsonError': 'System.Web.Http.Json.HttpJsonError',
     'JsonValue': 'System.Data.Json.JsonValue',
     "Cancellation": "System.Concurrency.CancellationTokenSource",
     "IPAddress": "System.Networking.IPAddress",
@@ -142,6 +143,10 @@ SOURCES = {
     "ReflectionExtensions": "runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn",
     'JsonValue': 'runtime/raven/src/System/Data/Json/JsonValue.rvn',
     'JsonError': 'runtime/raven/src/System/Data/Json/JsonError.rvn',
+    'HttpJsonError': 'runtime/raven/src/System/Web/Http/Json/HttpJsonError.rvn',
+    'HttpClientJsonExtensions': 'runtime/raven/src/System/Web/Http/Json/HttpClientJsonExtensions.rvn',
+    'JsonClientOperations': 'runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn',
+    'JsonContent': 'runtime/raven/src/System/Web/Http/Json/JsonContent.rvn',
     'JsonDocument': 'runtime/raven/src/System/Data/Json/JsonDocument.rvn',
     'JsonSyntax': 'runtime/raven/src/System/Data/Json/JsonSyntax.rvn',
     'ObjectMapper': 'runtime/raven/src/System/Data/Json/ObjectMapper.rvn',
@@ -354,10 +359,11 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
     if name == 'JsonValue':
         # Public generic static wrappers use the existing generic-function ABI.
         # They are application roots even when no other library method calls them.
-        pending.extend(helper for helper in helpers if helper in (
+        pending.extend(helper for helper in helpers if helper.startswith('System.Web.Http.Json.HttpClientJsonExtensions.') or helper in (
             'System.Data.Json.JsonSerializer.DeserializeText<T0>',
             'System.Data.Json.JsonSerializer.DeserializeStream<T0>',
-            'System.Web.Http.Json.JsonContent.ReadModel<T0>'))
+            'System.Web.Http.Json.JsonContent.ReadModel<T0>',
+            'System.Web.Http.Json.JsonClientOperations.Convert<T0>'))
     while pending:
         helper = pending.pop()
         if helper in used or helper not in helpers:
@@ -375,6 +381,9 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
 def check_snapshot():
     for name in SLICES:
         data = json.loads((GENERATED / (name + '.json')).read_text())
+        missing = set(SOURCES.values()) - set(data['inputs'])
+        if missing:
+            raise SystemExit('Missing Raven library inputs in ' + name + ': ' + ', '.join(sorted(missing)))
         for path, expected in data['inputs'].items():
             if digest(ROOT / path) != expected:
                 raise SystemExit('Stale Raven library input: ' + path)

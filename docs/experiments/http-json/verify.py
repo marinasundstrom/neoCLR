@@ -55,8 +55,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
         if args.mapped:
             mapping = here.parent / 'json-object-mapping'
             shutil.copyfile(mapping / 'HttpApplication.rvn', target / 'Application.rvn')
-            if name == 'Server':
-                shutil.copyfile(mapping / 'HttpServer.rvn', target / 'Server.rvn')
+            shutil.copyfile(mapping / ('Http' + name + '.rvn'), target / (name + '.rvn'))
         apps[name] = build(target / (name + '.rvnproj'))
 
     def client(port):
@@ -121,10 +120,18 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
     if args.case in ('all', 'server'):
         serve(independent, 12)
     if args.case in ('all', 'pair'):
-        serve(client, 1)
+        serve(client, 2 if args.mapped else 1)
 
     class Peer(BaseHTTPRequestHandler):
         protocol_version = 'HTTP/1.1'
+        def do_GET(self):
+            assert self.path == '/report', self.path
+            payload = json.dumps(report, ensure_ascii=False).encode()
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.send_header('Content-Length', str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
         def do_POST(self):
             assert self.path == '/reports', self.path
             assert self.headers['Content-Type'] == 'application/json; charset=utf-8'

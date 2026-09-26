@@ -1351,3 +1351,22 @@ exposed a generic method-group diagnostic/emission problem in the current Raven
 compiler. Its experimental generic bridge/union additions were removed from the
 active library pending an independent compiler reproduction. Existing JsonContent
 and typed serializer wrappers remain supported.
+
+
+### Generic HTTP JSON clients — 2026-09-26
+
+Raven main `13b9105d8` / neoCLR `56083626e` fixes generic method-group conversion
+using an enclosing type parameter. The independent .NET tests preserve object
+identity and integer values for typed and inline delegates, with uninferred methods
+still rejected; 399 overload-resolution checks and five focused regressions pass.
+No Runtime Contract setting or metadata convention changes. .NET Framework and
+NanoFramework execution were not tested. The related compiler documentation is
+`docs/compiler/runtime-contracts.md` in Raven.
+
+The neoCLR bridge admits eight `GetFromJson<T>`/`PostAsJson<T>` extension overloads
+and the bounded private converter callback only. It substitutes the callback's
+method parameter from the current generic caller and validates the delegate shape;
+this is not general admission of arbitrary generic application methods. The public
+HttpJsonError uses standard union syntax and preserves HTTP/JSON causes. Runtime
+`box T` accepts reference instantiations and preserves identity; intrinsic String
+retains its existing Object-handle representation cost. Value boxing still copies.
