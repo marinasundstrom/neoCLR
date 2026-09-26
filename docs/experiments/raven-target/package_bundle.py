@@ -19,6 +19,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--raven', required=True, type=Path)
 parser.add_argument('--sdk', required=True, type=Path)
 parser.add_argument('--runtime', required=True, type=Path)
+parser.add_argument('--http-runner', type=Path, help='Optional matching release measure_async runner; includes HTTP POC samples/checks')
 parser.add_argument('--output', required=True, type=Path)
 parser.add_argument('--version', required=True)
 args = parser.parse_args()
@@ -34,6 +35,8 @@ for repository in (ROOT, raven):
         raise SystemExit('Commit/review source changes before packaging: ' + str(repository))
 if not runtime.is_file() or not (sdk / 'tools/language-server/Raven.LanguageServer.dll').is_file():
     raise SystemExit('Build neoCLR and the experimental Raven SDK first.')
+if args.http_runner and not args.http_runner.is_file():
+    parser.error('--http-runner must name the matching built measure_async binary')
 output.mkdir(parents=True, exist_ok=False)
 for directory in ('bin', 'lib', 'demo', 'msbuild-demo', 'tools', 'docs/experiments/raven-target'):
     (output / directory).mkdir(parents=True, exist_ok=True)
@@ -95,8 +98,22 @@ shutil.copytree(ROOT / 'third-party', output / 'third-party')
 for name in ('LICENSE', 'THIRD-PARTY-NOTICES.txt'):
     shutil.copyfile(raven / name, output / 'licenses/Raven' / name)
 
+# HTTP checks must be runnable from the extracted layout, with no checkout imports.
+if args.http_runner:
+    shutil.copy2(args.http_runner, output / 'tools/http-runner')
+    for folder in ('http-json', 'json-object-mapping', 'http-stream-upload'):
+        source = 'docs/experiments/' + folder
+        for relative in git(ROOT, 'ls-files', source).splitlines():
+            path = Path(relative)
+            if path.suffix not in ('.rvn', '.rvnproj', '.py', '.md'):
+                continue
+            destination = output / 'samples/http' / folder / path.relative_to(source)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / path, destination)
+
 manifest = {'version': args.version, 'createdUtc': datetime.now(timezone.utc).isoformat(),
     'distribution': 'local experiment; not published', 'platform': 'osx-arm64',
+    'httpPocIncluded': args.http_runner is not None,
     'neoCLRRevision': git(ROOT, 'rev-parse', 'HEAD'), 'ravenRevision': git(raven, 'rev-parse', 'HEAD'),
     'ravenBranch': git(raven, 'branch', '--show-current'), 'sdkVersion': (sdk / 'VERSION').read_text().strip(),
     'dotnetSdk': subprocess.check_output(['dotnet', '--version'], text=True).strip(),

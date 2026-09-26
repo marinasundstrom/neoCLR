@@ -143,3 +143,27 @@ Validate the primary build workflow and project-reference support:
 python3 tools/verify_msbuild.py --bundle "$PWD" --sdk /absolute/path/to/raven-sdk
 python3 tools/verify_editor.py project-reference-demo/App --files --project-references
 ```
+
+
+## HTTP POC package component
+
+When `manifest.json` has `httpPocIncluded: true`, the bundle contains the matching
+HTTP runner and complete client/server and upload fixtures. Use the separately
+extracted matching SDK; no source checkout or installed SDK selection is needed.
+From this bundle's directory:
+
+```sh
+python3 samples/http/http-json/verify.py --toolchain-root "$PWD" \
+  --sdk /absolute/path/to/extracted/raven-sdk --runner tools/http-runner --mapped
+python3 samples/http/http-stream-upload/verify.py --toolchain-root "$PWD" \
+  --sdk /absolute/path/to/extracted/raven-sdk --runner tools/http-runner
+```
+
+The first check builds the typed JSON application and tests neoCLR peers against
+one another and independent Python peers. Omit `--mapped` for the DOM variant.
+The second checks known-length upload bytes, partial reads, ownership, one-shot use,
+source errors and cancellation against an independent peer. Both assert cleanup.
+The runner uses 1,024 heap objects and a 100,000,000-instruction guard, preserving
+HTTP's existing deadlines; it is the same runtime implementation as the CLI.
+These are bounded loopback checks, not load tests or full release qualification.
+This optional component does not require VS Code and does not include an editor check.

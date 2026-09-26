@@ -12,13 +12,14 @@ import threading
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--toolchain-root', type=Path, required=True)
 parser.add_argument('--runner', type=Path, required=True)
+parser.add_argument('--sdk', type=Path, help='Separate extracted Raven SDK; defaults to TOOLCHAIN_ROOT/raven-sdk')
 cases = ('success', 'borrowed', 'empty', 'eof', 'read-error', 'overread',
          'cancel', 'precancel', 'disposed', 'invalid-header', 'refused')
 parser.add_argument('--case', choices=cases, help='Run one case instead of the full focused matrix')
 args = parser.parse_args()
 bundle, runner = args.toolchain_root.resolve(), args.runner.resolve()
 here = Path(__file__).resolve().parent
-env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(bundle / 'raven-sdk'))
+env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(args.sdk.resolve() if args.sdk else bundle / 'raven-sdk'))
 with tempfile.TemporaryDirectory(prefix='neoclr-stream-upload-') as folder:
     root = Path(folder)
     for name in ('Main.rvn', 'Upload.rvnproj'):

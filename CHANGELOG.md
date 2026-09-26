@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Add an optional HTTP POC component to the standard runtime packager, carrying
+  the matching runner and complete JSON/client/server/upload checks. Verifiers can
+  select a separately extracted SDK explicitly. This enables checkout-independent
+  package validation; it does not itself claim POC completion or release readiness.
+
 - Consolidate active planning into the authoritative roadmap and four theme trackers:
   HTTP/networking, runtime/language, library/data and tooling/release. Archive six
   superseded plans with their evidence and preserve old section links. Retain the

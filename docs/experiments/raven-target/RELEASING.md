@@ -67,6 +67,10 @@ The script publishes the compiler bridge with its dependencies, generates matchi
 declaration metadata, flattens the target runtime library, copies the language server,
 samples and validation scripts, and records revision/version/file-hash provenance.
 It currently supports the tested macOS arm64 host. It does not publish or install.
+For the HTTP POC gate, also build the matching release `measure_async` example and
+pass `--http-runner /absolute/path/to/measure_async`. This includes complete HTTP
+fixtures and commands in the bundle; the separate SDK is selected with `--sdk` by
+the packaged verifiers. Validate after archiving and extracting, not from staging.
 The resulting README explains extraction, configuration and the dedicated project tasks.
 The builder also copies neoCLR's LICENSE, notice inventory and preserved license
 texts, and Raven's LICENSE/THIRD-PARTY-NOTICES.txt; the file manifest covers them.

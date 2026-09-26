@@ -16,6 +16,7 @@ from urllib.error import HTTPError
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--toolchain-root', type=Path, required=True)
 parser.add_argument('--runner', type=Path, required=True)
+parser.add_argument('--sdk', type=Path, help='Separate extracted Raven SDK; defaults to TOOLCHAIN_ROOT/raven-sdk')
 parser.add_argument('--case', choices=['all', 'server', 'pair', 'client'], default='all')
 parser.add_argument('--repeat', type=int, default=1, help='Repeat the selected peer checks serially after building once')
 parser.add_argument('--mapped', action='store_true', help='Use the provisional reflection-backed report variant')
@@ -25,7 +26,7 @@ if args.repeat < 1:
 here = Path(__file__).resolve().parent
 bundle = args.toolchain_root.resolve()
 runner = args.runner.resolve()
-env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(bundle / 'raven-sdk'))
+env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(args.sdk.resolve() if args.sdk else bundle / 'raven-sdk'))
 report = {'station': 'Café'}
 reply = {'accepted': True}
 
