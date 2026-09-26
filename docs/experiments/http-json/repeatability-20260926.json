@@ -1,0 +1,88 @@
+{
+  "date": "2026-09-26",
+  "application_commit": "afcc8c3d",
+  "roadmap_commit": "73e27938",
+  "raven_generic_fix": {
+    "main": "13b9105d8",
+    "neoclr": "56083626e"
+  },
+  "sha256": {
+    "runner": "e6ce9661943de02d1b1d75a86ca8636a073edffce0bc42cbdbe70d273767d398",
+    "library": "92e07297f47d89d6cbeb80aa79625c94ae8fc3f1062d61cd7cc0868be6425fc6",
+    "compiler": "6b3970440969e901f3d196e8f49c39fcbd1ea3b1bfde905d78afe05b406c097e"
+  },
+  "limits": {
+    "heap_objects": 1024,
+    "instructions": 100000000,
+    "deadline_policy": "unchanged"
+  },
+  "managed_pair": {
+    "requested_iterations": 3,
+    "attempted_iterations": 1,
+    "outcome": "TimedOut",
+    "client_phases_ms": {
+      "assembly": 4066,
+      "load": 2845,
+      "verify": 678,
+      "run": 8090
+    },
+    "server_final_statistics": null
+  },
+  "client_with_python_server": {
+    "outcome": "passed",
+    "iterations": [
+      {
+        "assembly_ms": 1541,
+        "load_ms": 828,
+        "verify_ms": 412,
+        "run_ms": 11614,
+        "allocated": 789,
+        "live": 0,
+        "peak": 170,
+        "collections": 13,
+        "reclaimed": 789
+      },
+      {
+        "assembly_ms": 1639,
+        "load_ms": 1273,
+        "verify_ms": 559,
+        "run_ms": 13363,
+        "allocated": 789,
+        "live": 0,
+        "peak": 170,
+        "collections": 13,
+        "reclaimed": 789
+      }
+    ]
+  },
+  "server_with_python_client": {
+    "outcome": "passed",
+    "request_cases": 12,
+    "iterations": [
+      {
+        "assembly_ms": 2419,
+        "load_ms": 1127,
+        "verify_ms": 471,
+        "run_ms": 86293,
+        "allocated": 3786,
+        "live": 0,
+        "peak": 198,
+        "collections": 53,
+        "reclaimed": 3786
+      }
+    ]
+  },
+  "unresolved_call": {
+    "source": "func Main() { missing() }",
+    "target": "NeoCLRImport",
+    "actual_exit_code": 0,
+    "expected_outcome": "compiler diagnostic and nonzero exit",
+    "actual_outcome": "empty Main body ending in ret"
+  },
+  "limitations": [
+    "Background CPU activity observed; not controlled quiet-machine validation.",
+    "Whole-program timings do not locate the failing native or HTTP operation.",
+    "Development bundle, not installed SDK acceptance.",
+    "Full suite and website build not run."
+  ]
+}

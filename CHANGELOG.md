@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-26
 
+- Add serial `--repeat` runs to the HTTP/JSON verifier, building inputs once and
+  stopping on the first failure without changing deadlines or GC checks. Record
+  the updated-toolchain managed-pair timeout, two successful independent client runs,
+  all 12 independent server cases and a fresh unresolved-call/empty-body reproduction. Preserve artifact hashes
+  and distinguish these open acceptance gaps from the integrated generic compiler
+  fix and JSON helpers. No runtime fix or release-readiness claim is made.
+
 - Integrate generic GetFromJson<T>/PostAsJson<T> extensions with string/Uri and
   cancellation overloads, standard HttpJsonError causes, BaseUri/default headers
   and response association. The mapped neoCLR demo now fetches a report, posts it

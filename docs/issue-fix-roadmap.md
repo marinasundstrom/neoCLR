@@ -30,6 +30,12 @@ and [active fixture](experiments/http-json-client/README.md) supersede the origi
 blocker below. The separate unresolved-call failure is not claimed resolved. Continue
 with sample repeatability and matching-toolchain acceptance, not reimplementation.
 
+The [subsequent focused check](experiments/http-json/repeatability-20260926.md)
+reproduces both the managed-pair timeout and the separate unresolved-call acceptance
+failure on the updated bundle. Independent client repeats pass. This is fresh
+validation beyond the original read-only inventory; the original compiler blocker
+and remaining diagnostic defect must not be conflated.
+
 ## First: compiler correctness and a repeatable application
 
 The most urgent reported defects are documented locally but are not represented by

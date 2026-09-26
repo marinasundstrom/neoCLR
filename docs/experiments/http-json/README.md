@@ -44,6 +44,14 @@ objects. Process/instruction guards are test bounds, not request timeout policie
 Both programs accept Main(string[]) arguments: the client takes a base URL; the
 server takes an optional number of requests to serve (default one).
 
+For repeatability checks, add `--repeat 3` with the selected `--case`. The verifier
+builds each needed application once and runs the checks serially with fresh peer
+processes/connections. It stops at the first failure, preserves the existing GC
+assertions and leaves all runtime/request/process limits unchanged. Counts below
+one are rejected before building. See the [2026-09-26 follow-up](repeatability-20260926.md)
+for evidence on the generic-helper variant; repeated independent-peer success is
+not equivalent to repeated managed-pair success.
+
 Compared with .NET System.Text.Json + HttpClient, this POC keeps DOM access and
 recoverable errors explicit and demonstrates separate HTTP/JSON error causes.
 It does not add a framework-style JSON endpoint binder or claim equivalent scope.

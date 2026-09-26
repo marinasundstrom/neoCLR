@@ -29,6 +29,14 @@ The run overlapping library regeneration timed out; repeatability under load rem
 open. Keep the end-to-end application as the acceptance case and retain the existing
 deadlines. Per-call JSON headers and richer serialization remain deferred.
 
+**Repeatability follow-up:** the [2026-09-26 check](experiments/http-json/repeatability-20260926.md)
+reproduces a managed-pair TimedOut on the first of three requested repetitions;
+the client passes twice against an independent Python server. Background CPU activity
+was observed, so this is not quiet-machine qualification or a proven root cause.
+The same bundle still accepts `missing()` and emits an empty body. Keep that
+compiler defect and per-operation timeout diagnosis as distinct remaining tasks;
+do not repeat the completed generic-helper implementation.
+
 ## Issue-driven priorities — 2026-09-26
 
 The author requests investigation of both repositories' issues, clarifies **the focus

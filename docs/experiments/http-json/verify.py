@@ -17,8 +17,11 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--toolchain-root', type=Path, required=True)
 parser.add_argument('--runner', type=Path, required=True)
 parser.add_argument('--case', choices=['all', 'server', 'pair', 'client'], default='all')
+parser.add_argument('--repeat', type=int, default=1, help='Repeat the selected peer checks serially after building once')
 parser.add_argument('--mapped', action='store_true', help='Use the provisional reflection-backed report variant')
 args = parser.parse_args()
+if args.repeat < 1:
+    parser.error('--repeat must be at least 1')
 here = Path(__file__).resolve().parent
 bundle = args.toolchain_root.resolve()
 runner = args.runner.resolve()
@@ -117,11 +120,6 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
                 assert int(response.headers['Content-Length']) == len(body)
                 assert json.loads(body) == expected, body
 
-    if args.case in ('all', 'server'):
-        serve(independent, 12)
-    if args.case in ('all', 'pair'):
-        serve(client, 2 if args.mapped else 1)
-
     class Peer(BaseHTTPRequestHandler):
         protocol_version = 'HTTP/1.1'
         def do_GET(self):
@@ -145,14 +143,20 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
         def log_message(self, *args):
             pass
 
-    if args.case in ('all', 'client'):
-        peer = ThreadingHTTPServer(('127.0.0.1', 0), Peer)
-        worker = threading.Thread(target=peer.serve_forever, daemon=True)
-        worker.start()
-        try:
-            client(peer.server_port)
-        finally:
-            peer.shutdown()
-            peer.server_close()
-            worker.join()
-    print('Public JSON DOM + HTTP checks passed: ' + args.case, flush=True)
+    for iteration in range(1, args.repeat + 1):
+        print(f'Iteration {iteration}/{args.repeat}: {args.case}', flush=True)
+        if args.case in ('all', 'server'):
+            serve(independent, 12)
+        if args.case in ('all', 'pair'):
+            serve(client, 2 if args.mapped else 1)
+        if args.case in ('all', 'client'):
+            peer = ThreadingHTTPServer(('127.0.0.1', 0), Peer)
+            worker = threading.Thread(target=peer.serve_forever, daemon=True)
+            worker.start()
+            try:
+                client(peer.server_port)
+            finally:
+                peer.shutdown()
+                peer.server_close()
+                worker.join()
+    print(f'Public JSON DOM + HTTP checks passed: {args.case} ({args.repeat} iteration(s))', flush=True)

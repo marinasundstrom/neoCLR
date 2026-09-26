@@ -53,6 +53,15 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   in neoCLR `afcc8c3d`, refreshes the pending plan before committing, and selects
   repeatability checks as the next bounded task. The independent unresolved-call
   defect remains a separate acceptance item.
+- **Continuation outcome:** commit the reconciled plan as `73e27938`, then add
+  serial repeat support to the existing HTTP verifier. The first managed-pair
+  iteration times out; two client runs against Python pass with zero final live
+  objects; all twelve independent server cases also pass with zero final live
+  objects. The updated compiler still accepts `missing()` and emits an empty body.
+  Observe concurrent background CPU activity and retain it as a limitation rather
+  than claiming an isolated run or a known timeout cause. Preserve the
+  [focused evidence](experiments/http-json/repeatability-20260926.md) and leave
+  unrelated staged experiment build outputs untouched.
 
 ## 2026-09-24 — Enable future suspension without implementing it now
 
