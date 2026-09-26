@@ -7443,3 +7443,14 @@ configuration/content, not target-specific code added to Raven main.
   not run, following the author instruction.
 - **Scope:** this author-directed naming change does not reprioritize the active
   roadmap milestone. See [contracts and migration](common-interfaces.md#directional-interface-names-development-2026-09-25).
+
+### 2026-09-26 — Publication-ready website and local testing tools
+
+- **Author:** requests a buildable website and installation of the latest working
+  SDK/VS Code extension, allowing uncommitted changes to be omitted.
+- **Assistant:** isolates committed neoCLR revision 0606af5c from staged JSON work.
+  Repairs missing JSON payload-member documentation with explicit manual routes
+  and fixes two web-feature guide links. All 1,016 pages and 18 website checks pass.
+- **Tool installation:** building matching local Raven/neoCLR tools; validation and
+  installation outcomes will be recorded separately. No website publication or
+  release is implied by these local builds.

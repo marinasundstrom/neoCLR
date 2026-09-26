@@ -228,6 +228,21 @@ class PublicApiCoverage(unittest.TestCase):
         (docs / 'NeoCLR.CoreProbe.xml').write_text('<doc><members /></doc>')
         (build.OUTPUT / 'xref-map.json').write_text(json.dumps({'T:Example.Public': 'public.html'}))
 
+    def test_manual_member_routes_require_existing_page_and_anchor(self):
+        import json
+        manifest = self.root / 'api-docs/manual-members.json'
+        manifest.write_text(json.dumps({'P:Example.Public.Value': {
+            'output': 'value.html#value', 'reason': 'Renderer omits case payloads'}}))
+        with self.assertRaisesRegex(ValueError, 'Missing manual member entry'):
+            build.register_manual_member_routes()
+        (build.OUTPUT / 'value.html').write_text('<h1>Value</h1>')
+        with self.assertRaisesRegex(ValueError, 'Missing manual member anchor'):
+            build.register_manual_member_routes()
+        (build.OUTPUT / 'value.html').write_text('<h1 id="value">Value</h1>')
+        build.register_manual_member_routes()
+        self.assertEqual(json.loads((build.OUTPUT / 'xref-map.json').read_text())[
+            'P:Example.Public.Value'], 'value.html#value')
+
     def test_public_type_without_comments_remains_publishable(self):
         (build.OUTPUT / 'public.html').write_text('<span class="member-summary--empty"></span>')
         build.check_api_coverage()

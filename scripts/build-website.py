@@ -166,6 +166,21 @@ def register_manual_api_routes():
     path.write_text(json.dumps(xrefs, indent=2) + '\n')
 
 
+def register_manual_member_routes():
+    path = OUTPUT / 'xref-map.json'
+    xrefs = json.loads(path.read_text())
+    for uid, entry in json.loads((ROOT / 'api-docs/manual-members.json').read_text()).items():
+        target = entry['output']
+        if not entry.get('reason') or not (OUTPUT / target.split('#', 1)[0]).is_file():
+            raise ValueError('Missing manual member entry or reason: ' + uid)
+        parser = PageCheck()
+        parser.feed((OUTPUT / target.split('#', 1)[0]).read_text())
+        if '#' in target and target.split('#', 1)[1] not in parser.ids:
+            raise ValueError('Missing manual member anchor: ' + uid)
+        xrefs[uid] = target
+    path.write_text(json.dumps(xrefs, indent=2) + '\n')
+
+
 def check_api_coverage():
     import xml.etree.ElementTree as ET
     xrefs = {uid.replace('+', '.').replace('..ctor', '.#ctor'): path
@@ -429,6 +444,7 @@ def main():
     subprocess.run([sys.executable, str(ROOT / 'scripts/ravendoc.py'), '--site', str(manifest)], check=True)
     shutil.copytree(publisher_output, OUTPUT, dirs_exist_ok=True)
     register_manual_api_routes()
+    register_manual_member_routes()
     check_api_coverage()
     write_legacy_routes()
     # All site links must work at the domain root and under a Pages project prefix.

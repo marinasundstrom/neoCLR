@@ -6,6 +6,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-26
+
+- Restore the committed website build with a linked reference for JSON union
+  payload properties omitted by the pinned RavenDoc renderer. Validate manual
+  member routes and anchors, retain API coverage checks, and correct JSON guide
+  URLs on the web feature page. All 1,016 pages and 18 website tests pass.
+
 ### 2026-09-25
 
 - Rename Equatable<T> to EquatableTo<T> and Comparable<T> to ComparableTo<T>

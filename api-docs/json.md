@@ -52,3 +52,8 @@ Existing bounds apply: 128 UTF-8 bytes, four container levels, 32 value occurren
 31 children per container. Object mapping is flat even though DOM values can nest.
 Generic mapping overloads, recursive models, configurable naming/null policy and
 HTTP JSON extensions for requests and responses remain later work.
+
+## Error payload reference
+
+See [JSON error payloads](json-error-payloads.md) for the case properties and their
+value types. Case signatures also appear on the generated JsonError union page.

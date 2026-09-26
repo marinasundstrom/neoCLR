@@ -276,3 +276,8 @@ snapshot and sample archive source checks remain required.
 identities; ConvertibleInto adds Convert() returning T. All three have public type/member
 coverage. Refresh the matching reference and inventory; website build is skipped by
 explicit author instruction for this change.
+
+`manual-members.json` supplies explicit member routes when RavenDoc renders a type
+but omits individual member pages. JsonError case payloads currently use
+[the linked payload reference](json-error-payloads.md). Every entry records the
+renderer limitation; the site checks the destination and anchor.

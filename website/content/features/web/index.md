@@ -137,7 +137,7 @@ server handles invalid input explicitly where it chooses the HTTP response.
 library's JSON parser and includes checks against independent Python HTTP peers.
 Serialization is synchronous; HTTP bodies are currently buffered. The provisional
 DOM limits are 128 UTF-8 bytes, four container levels and 32 values. The development
-sample has an opt-in variant using the provisional [object serializer overloads](/docs/json/).
+sample has an opt-in variant using the provisional [object serializer overloads](/docs/json.html).
 It maps both report and acknowledgement models through checked runtime reflection:
 constructors, getters and setters execute normally. Flat public `string`, `int` and
 `bool` properties are supported, using exact property names. Writable properties
@@ -354,6 +354,6 @@ fail the depth limit. Nodes use reference identity, with shared mutable children
 The shape is closest to .NET's mutable JsonNode model, but neoCLR calls the root
 `JsonValue` and returns Result errors, including nested stream causes. See the
 [JSON API reference](/docs/api/System/Data/Json/) for the current contracts.
-The [object-mapping guide](/docs/json/) covers the provisional Object/TypeInfo
+The [object-mapping guide](/docs/json.html) covers the provisional Object/TypeInfo
 overloads for strings and borrowed streams. Broader mapping, generic overloads and
 HTTP JSON conveniences for both client and server remain later work.

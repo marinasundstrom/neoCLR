@@ -1,0 +1,42 @@
+{
+  "P:System.Data.Json.JsonError.Syntax.Message": {
+    "output": "docs/json-error-payloads.html#syntax-message",
+    "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  },
+  "P:System.Data.Json.JsonError.LimitExceeded.Message": {
+    "output": "docs/json-error-payloads.html#limitexceeded-message",
+    "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  },
+  "P:System.Data.Json.JsonError.TypeMismatch.Expected": {
+    "output": "docs/json-error-payloads.html#typemismatch-expected",
+    "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  },
+  "P:System.Data.Json.JsonError.MissingField.Name": {
+    "output": "docs/json-error-payloads.html#missingfield-name",
+    "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  },
+  "P:System.Data.Json.JsonError.DuplicateField.Name": {
+    "output": "docs/json-error-payloads.html#duplicatefield-name",
+    "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  },
+  "P:System.Data.Json.JsonError.InvalidIndex.Index": {
+    "output": "docs/json-error-payloads.html#invalidindex-index",
+    "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  },
+  "P:System.Data.Json.JsonError.Read.Reason": {
+    "output": "docs/json-error-payloads.html#read-reason",
+    "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  },
+  "P:System.Data.Json.JsonError.Write.Reason": {
+    "output": "docs/json-error-payloads.html#write-reason",
+    "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  },
+  "P:System.Data.Json.JsonError.Reflection.Reason": {
+    "output": "docs/json-error-payloads.html#reflection-reason",
+    "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  },
+  "P:System.Data.Json.JsonError.UnsupportedMapping.Message": {
+    "output": "docs/json-error-payloads.html#unsupportedmapping-message",
+    "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  }
+}

@@ -242,6 +242,7 @@
     "runtime/raven/src/System/Web/Http/HttpClient.rvn": "68e188bd5000eaea5609faf27da4489768500bae267d334eaea1eae2ea3ec049",
     "runtime/raven/src/System/Web/Http/HttpError.rvn": "9418b3e16c9f56e3f5c57ca98108d0ca59d14d870ff26e1b2322f202786a378a",
     "runtime/raven/src/System/Web/Http/HttpServer.rvn": "925396df2c6d42d2eecc917e9e298b25390f7ef84ac27e0787ad5878ba74ed49",
-    "runtime/raven/src/System/Web/Http/HttpStatusCode.rvn": "afb26063d246d1d6a4fe8111050a0b6c6166fb0aa70060075e77f1d445794142"
+    "runtime/raven/src/System/Web/Http/HttpStatusCode.rvn": "afb26063d246d1d6a4fe8111050a0b6c6166fb0aa70060075e77f1d445794142",
+    "api-docs/manual-members.json": "8b864b74ae4b3e2fb3c66b7023909dfdbefb6d071f8b2fe28ecaff1766f77abe"
   }
 }
