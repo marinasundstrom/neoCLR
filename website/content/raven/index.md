@@ -76,3 +76,9 @@ static helper methods. Defaults execute on the original object, and a class's ow
 implementation takes precedence. Private helpers stay private to the interface.
 This development capability is not included in Preview 10. Private instance helpers,
 static virtual defaults and broader interface accessibility remain future work.
+
+Explicit interface methods are also supported in development for non-generic
+application classes and interfaces. Two interfaces can select different private
+implementations of the same-named method while the class keeps a separate public
+method. Explicit accessors, generic/value-type import and implementations of external
+core-library contracts remain outside this bounded slice.

@@ -502,7 +502,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             Representation::Record | Representation::Interface
         ) && !string_owner
             || !body.instance
-            || !body.receiver_byref
+            || (!body.receiver_byref && !module.is_reference_type(owner))
             || body.visibility != Visibility::Private
             || (body.is_virtual && !interface_owner)
             || body.is_override
@@ -512,7 +512,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             || body.pinvoke.is_some()
         {
             return Err(Fault::new(
-                "explicit implementations require private concrete managed IL record or readonly String methods",
+                "explicit implementations require private concrete managed IL value/class or readonly String methods",
             ));
         }
         for target in &body.interface_implementations {

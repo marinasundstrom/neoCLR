@@ -1,0 +1,20 @@
+{
+  "scope": "Explicit application class interface implementations",
+  "runs": {
+    "report": "Explicit interface contracts passed",
+    "rejected": [
+      "ordinary access to explicit-only member",
+      "explicit implementation without interface declaration"
+    ]
+  },
+  "sourceSha256": {
+    "Main.rvn": "6a303b3ccf9672b68f0c5db71c53b38fe48c971c91a1a86ff8df1cec17000395",
+    "Contracts.rvnproj": "2c0bf4b905d0dc333b89d29b7359c19d94f976ec2e640a24f29220ec1af105c7"
+  },
+  "sha256": {
+    "runtime": "2788981c7a1a9f140422f507e5fc10dba52049bc5e7c06446a320439d33492f1",
+    "bridge": "e7b964bd7211b2b1b15e25bd894ceb6cc7b81da2891c271f9957eb557a61e9d8",
+    "system": "ac1b6e134cf218d6516f0b80f878c2e450d554225b220963e4aa430d68e000a6",
+    "reference": "dee37cfe006e173f52de5130e0c34dc9e8ba0f97540cf13a9b2ca2f4762b4d26"
+  }
+}

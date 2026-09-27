@@ -687,9 +687,17 @@ fn method(
         "System.Introspection.MethodInfo",
         vec![
             Value::String(
-                f.name
-                    .strip_prefix(&format!("{}.", owner.definition_name().unwrap_or("")))
-                    .unwrap_or(&f.name)
+                // Explicit bodies use escaped runtime names; expose their source
+                // qualifier without changing the identity used for dispatch.
+                f.origin
+                    .as_ref()
+                    .filter(|_| !f.interface_implementations.is_empty())
+                    .map(|origin| origin.name.as_str())
+                    .unwrap_or_else(|| {
+                        f.name
+                            .strip_prefix(&format!("{}.", owner.definition_name().unwrap_or("")))
+                            .unwrap_or(&f.name)
+                    })
                     .into(),
             ),
             type_value(module, owner)?,

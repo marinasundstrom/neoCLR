@@ -60,8 +60,10 @@ Number is a first consumer, not a permanent numeric-only interface model.
 The next bounded interface slice adds application defaults and public/private static
 helpers through Raven, with [focused evidence](experiments/interface-helpers/README.md).
 The [interface limitations table](tracking/runtime-language.md#interface-limitations--development-checkpoint-2026-09-27)
-separates native support from Raven import gaps, including explicit implementations,
-private instance helpers and broader static/default/accessibility cases.
+separates native support from Raven import gaps. A subsequent bounded
+[explicit class implementation slice](experiments/explicit-interface-implementations/README.md)
+adds ordinary methods on application classes/interfaces. Accessors, generic/value-type
+import, private instance helpers and broader static/default/accessibility cases remain open.
 M2–M6 remain candidate applications; no complete File Catalog
 or additional HTTP feature is required by the comparer slice.
 

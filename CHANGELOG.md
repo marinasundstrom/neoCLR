@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Import explicit interface methods on non-generic Raven application classes and
+  application interfaces. Preserve private MethodImpl mappings, nominal object identity,
+  void bodies and separate public methods; document qualified private reflection and
+  the existing IsVirtual difference from CLI. Add focused source/native checks and
+  narrow the recorded limitations; accessors, value/generic types and external core
+  contracts remain outside this import slice.
+
 - Admit Raven application interface defaults and public/private static helpers in
   development. Preserve nominal receiver identity, nested dispatch, class precedence
   and private access; exclude helpers from conformance obligations and virtual

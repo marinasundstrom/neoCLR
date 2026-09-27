@@ -1,5 +1,14 @@
 # Raven targeting neoCLR
 
+## Explicit application interface integration (2026-09-27)
+
+The development bridge imports ordinary explicit instance implementations on
+non-generic application classes/interfaces. CLI MethodImpl identities become private
+runtime `.override` mappings; private/final/virtual flags do not create class virtual
+slots. Nominal receiver execution, private access and reflection are covered by the
+[focused consumer and limitations](../explicit-interface-implementations/README.md).
+No Raven compiler behavior or Runtime Contract setting changes.
+
 ## Interface helper integration (2026-09-27)
 
 The development bridge admits public defaults and public/private static helpers on

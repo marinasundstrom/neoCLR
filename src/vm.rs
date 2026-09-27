@@ -519,7 +519,6 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 || function.receiver_readonly
                 || function.is_internal_call()
                 || function.pinvoke.is_some()
-                || !function.interface_implementations.is_empty()
                 || !function.generic_parameters.is_empty())
         {
             return Err(Fault::new("class methods require ordinary IL receivers"));
@@ -555,7 +554,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 || (function.is_abstract && !nominal_interface_contract && !class_owner)
                 || function.is_internal_call()
                 || function.pinvoke.is_some()
-                || (!value_receiver && !function.interface_implementations.is_empty()))
+                || (!value_receiver && !class_owner && !function.interface_implementations.is_empty()))
         {
             return Err(Fault::new(
                 "no-result methods require IL bodies with Void metadata and static, class or by-reference value receivers",

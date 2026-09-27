@@ -8353,3 +8353,50 @@ configuration/content, not target-specific code added to Raven main.
   static-helper reflection and negative access/admission cases; API snapshot checks
   pass. The bounded implementation is complete in development. The limitations
   matrix remains open work, and no full suite or website build was run.
+
+
+## 2026-09-27 — Explicit interface implementation follow-up
+
+- **Author direction:** “Continue” after the bounded helper slice and recorded
+  interface limitations. The assistant selected explicit implementations through Raven,
+  including two same-named contracts and ordinary private-access rejection.
+- **Investigation/action:** Raven already emitted private/final/virtual/newslot bodies
+  and MethodImpl declarations. neoCLR's importer rejected them, and runtime validation
+  limited explicit bodies to managed-reference receivers. Add checked mapping import
+  and nominal class receivers without changing compiler semantics or target settings.
+- **Scope:** ordinary methods on non-generic application classes/interfaces; include
+  shared state, void results and private reflection. Preserve the documented IsVirtual
+  divergence from CLI. Broader explicit accessors, value/generic types, core-library
+  contracts and derived defaults remain recorded limitations, not inferred completion.
+  Commands and outcomes belong to the [focused experiment](experiments/explicit-interface-implementations/README.md).
+
+- **Coordination:** the author asked to coordinate reflection changes. The assistant
+  contacted the reflection task and the overlapping entry-point task, preserved
+  unrelated Raven and neoCLR edits, and arranged to commit this bounded interface
+  slice before their main-branch integration. Shared files are staged by owned hunks;
+  the API snapshot is checked from staged sources rather than unrelated in-progress
+  bridge edits. This does not claim that reflection has already been integrated.
+
+
+## 2026-09-27 — Result and Task entry points
+
+- **Author request:** “We need to support Main returning the Raven-supported Result
+  and Task overloads.” The assistant found the target importer restricted entries
+  to no-result methods, Raven's default bridges depended on CLR facilities, and the
+  CLI discarded integer exit statuses.
+- **Assistant decision/action:** retain target Main signatures in Raven's heap-async
+  intermediate metadata and adapt startup in neoCLR's existing importer. Reuse
+  managed Result extraction/display and the default task dispatcher. Keep .NET
+  bridges and ordinary nonblocking GetResult unchanged. Details, limits and evidence
+  are in [entry results](experiments/entry-results/README.md).
+- **Author follow-up:** after the fix is ready, update samples and experiments to
+  use async directly in Main. The assistant accepted that sequence, preserving
+  fixtures whose purpose is callback/queue behavior. This does not authorize new
+  HTTP capabilities or imply a permanent roadmap reprioritization.
+
+- **Outcome:** 15 focused native tests pass. The Raven consumer exposed encoded
+  implementation names in reflection; the assistant preserved source-qualified
+  names for explicit bodies without changing dispatch identities. Final execution
+  and both negative source cases pass. The staged-source API snapshot check passes;
+  no full suite or website build was run. Reflection integration remains coordinated
+  separately rather than included in this bounded implementation.

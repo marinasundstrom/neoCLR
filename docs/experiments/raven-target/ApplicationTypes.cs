@@ -161,9 +161,26 @@ static class ApplicationTypes
             foreach (var method in type.Methods.Where(m => (!m.IsStatic || type.IsInterface) && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && (OpaqueLibrary.IsOmittedConstructor(m) || ArrayLibrary.OmitConstructor(m) || EmptyLibrary.OmitConstructor(m) || (ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)))))
             {
                 CheckMethod(method);
-                if (!OpaqueLibrary.IsExplicitStringCount(method) && (method.Overrides.Any(o => !method.IsPublic || o.Name != method.Name || o.DeclaringType.Resolve()?.IsInterface != true
+                if (!OpaqueLibrary.IsExplicitStringCount(method) && !IsExplicitApplicationImplementation(method) && (method.Overrides.Any(o => !method.IsPublic || o.Name != method.Name || o.DeclaringType.Resolve()?.IsInterface != true
                     || !o.Parameters.Select(p => map(RuntimeSignatures.Close(p.ParameterType, o.DeclaringType, allowOpenMethodParameters: LibraryNames.ContainsKey(type)), false)).SequenceEqual(method.Parameters.Select(p => map(p.ParameterType, false)))
                     || map(RuntimeSignatures.Close(o.ReturnType, o.DeclaringType, allowOpenMethodParameters: LibraryNames.ContainsKey(type)), true) != map(method.ReturnType, true)) || method.IsFinal && !method.IsNewSlot)) throw new InvalidDataException("Explicit implementations and sealed overrides are not admitted yet.");
+                if (IsExplicitApplicationImplementation(method))
+                {
+                    foreach (var declaration in method.Overrides)
+                    {
+                        var contract = declaration.Resolve();
+                        CheckMethod(declaration);
+                        if (contract is null || !IsModule(contract.Module) || !contract.DeclaringType.IsInterface
+                            || !contract.IsPublic || !contract.IsVirtual || !contract.HasThis
+                            || !Matches(declaration, contract)
+                            || !declaration.Parameters.Select(p => map(p.ParameterType, false)).SequenceEqual(method.Parameters.Select(p => map(p.ParameterType, false)))
+                            || map(declaration.ReturnType, true) != map(method.ReturnType, true)
+                            || !contract.Parameters.Select(p => p.IsOut).SequenceEqual(method.Parameters.Select(p => p.IsOut)))
+                            throw new InvalidDataException("Unsupported explicit application interface mapping: " + method.FullName);
+                        CheckAccess(declaration.DeclaringType, method.Module);
+                        map(declaration.DeclaringType, false);
+                    }
+                }
                 foreach (var parameter in method.Parameters) map(parameter.ParameterType, false);
                 map(method.ReturnType, true);
                 if (type.IsInterface)
@@ -180,6 +197,15 @@ static class ApplicationTypes
             }
         }
     }
+    // CLI private/final/virtual/newslot bodies are interface mappings, not
+    // overridable class slots. Preserve their MethodImpl identities explicitly.
+    public static bool IsExplicitApplicationImplementation(MethodDefinition method) =>
+        !IsLibrary(method.DeclaringType) && !method.DeclaringType.IsInterface
+        && !method.DeclaringType.IsValueType && method.HasOverrides
+        && method.IsPrivate && method.IsVirtual && method.IsFinal && method.IsNewSlot
+        && method.HasThis && !method.IsStatic && !method.IsAbstract && !method.IsConstructor
+        && method.HasBody && !method.HasGenericParameters && !method.IsSpecialName;
+
     public static string Modifiers(MethodDefinition method) => method.IsAbstract ? "abstract " :
         !method.DeclaringType.IsInterface && method.IsVirtual && !method.IsFinal ? (method.IsNewSlot ? "virtual " : "override ") : "";
     public static string MethodName(MethodDefinition method)
