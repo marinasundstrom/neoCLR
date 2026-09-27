@@ -2,52 +2,189 @@
 .type System.Int64
 .sealed
 .implements System.ComparableTo<Int64>
-.method instance readonly byref CompareTo(Int64 other) -> Int32
+.property static MinValue() -> Int64
+.get System.Int64::get_MinValue()
+.end
+.property static MaxValue() -> Int64
+.get System.Int64::get_MaxValue()
+.end
+.method static get_MinValue() -> Int64
 M00000001_IL_0000:
 M00000001_IL_0001:
 M00000001_IL_0002:
+ldc.i8 -9223372036854775807
+M00000001_IL_000b:
+ldc.i8 1
+M00000001_IL_0014:
+sub
+M00000001_IL_0015:
+ret
+.end
+.method static get_MaxValue() -> Int64
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldc.i8 9223372036854775807
+M00000002_IL_000b:
+ret
+.end
+.method static Parse(String value) -> System.Result<Int64,System.Int64ParseError>
+.local Value local0
+.local Byte local1
+ldc.i4 0
+stloc local1
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
 ldarg 0
-M00000001_IL_0003:
+M00000003_IL_0003:
+call neoCLR.Runtime.ParseInt64(String)
+M00000003_IL_0008:
+stloc local0
+M00000003_IL_0009:
+M00000003_IL_000a:
+ldloc local0
+M00000003_IL_000b:
+value.is Int64
+call neoCLR.Library.System.Int64.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0010:
+brtrue M00000003_IL_001a
+M00000003_IL_0015:
+br M00000003_IL_002c
+M00000003_IL_001a:
+M00000003_IL_001b:
+ldloc local0
+M00000003_IL_001c:
+value.unpack Int64
+M00000003_IL_0021:
+call neoCLR.Library.System.Int64.RuntimeUnion0(Int64)
+M00000003_IL_0026:
+call neoCLR.Library.System.Int64.RuntimeUnion1(System.Result.Ok<Int64>)
+M00000003_IL_002b:
+ret
+M00000003_IL_002c:
+M00000003_IL_002d:
+M00000003_IL_002e:
+ldloc local0
+M00000003_IL_002f:
+value.unpack Byte
+M00000003_IL_0034:
+stloc local1
+M00000003_IL_0035:
+M00000003_IL_0036:
+ldloc local1
+M00000003_IL_0037:
+conv.i4
+M00000003_IL_0038:
+ldc.i4 1
+M00000003_IL_0039:
+ceq
+call neoCLR.Library.System.Int64.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_003b:
+brtrue M00000003_IL_0045
+M00000003_IL_0040:
+br M00000003_IL_005a
+M00000003_IL_0045:
+call neoCLR.Library.System.Int64.RuntimeErrorSystemInt64ParseErrorInvalidFormatNew()
+M00000003_IL_004a:
+call neoCLR.Library.System.Int64.RuntimeErrorSystemInt64ParseErrorNewSystemInt64ParseErrorInvalidFormat(System.Int64ParseError.InvalidFormat)
+M00000003_IL_004f:
+call neoCLR.Library.System.Int64.RuntimeUnion2(System.Int64ParseError)
+M00000003_IL_0054:
+call neoCLR.Library.System.Int64.RuntimeUnion3(System.Result.Error<System.Int64ParseError>)
+M00000003_IL_0059:
+ret
+M00000003_IL_005a:
+M00000003_IL_005b:
+M00000003_IL_005c:
+ldloc local1
+M00000003_IL_005d:
+conv.i4
+M00000003_IL_005e:
+ldc.i4 2
+M00000003_IL_005f:
+ceq
+call neoCLR.Library.System.Int64.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0061:
+brtrue M00000003_IL_006b
+M00000003_IL_0066:
+br M00000003_IL_0080
+M00000003_IL_006b:
+call neoCLR.Library.System.Int64.RuntimeErrorSystemInt64ParseErrorOverflowNew()
+M00000003_IL_0070:
+call neoCLR.Library.System.Int64.RuntimeErrorSystemInt64ParseErrorNewSystemInt64ParseErrorOverflow(System.Int64ParseError.Overflow)
+M00000003_IL_0075:
+call neoCLR.Library.System.Int64.RuntimeUnion2(System.Int64ParseError)
+M00000003_IL_007a:
+call neoCLR.Library.System.Int64.RuntimeUnion3(System.Result.Error<System.Int64ParseError>)
+M00000003_IL_007f:
+ret
+M00000003_IL_0080:
+M00000003_IL_0081:
+M00000003_IL_0082:
+ldstr "invalid native parse status"
+M00000003_IL_0087:
+call System.Fault(String)
+fault "System.Fault returned unexpectedly"
+.end
+.method instance readonly byref ToString() -> String
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
 ldobj Int64
-M00000001_IL_0008:
+M00000004_IL_0008:
+call neoCLR.Runtime.Int64ToString(Int64)
+M00000004_IL_000d:
+ret
+.end
+.method instance readonly byref CompareTo(Int64 other) -> Int32
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldobj Int64
+M00000005_IL_0008:
 ldarg 1
-M00000001_IL_0009:
+M00000005_IL_0009:
 clt
 call neoCLR.Library.System.Int64.RuntimeBooleanToInt32(Boolean)
-M00000001_IL_000b:
-brtrue M00000001_IL_0015
-M00000001_IL_0010:
-br M00000001_IL_0018
-M00000001_IL_0015:
-M00000001_IL_0016:
+M00000005_IL_000b:
+brtrue M00000005_IL_0015
+M00000005_IL_0010:
+br M00000005_IL_0018
+M00000005_IL_0015:
+M00000005_IL_0016:
 ldc.i4 -1
-M00000001_IL_0017:
+M00000005_IL_0017:
 ret
-M00000001_IL_0018:
-M00000001_IL_0019:
-M00000001_IL_001a:
+M00000005_IL_0018:
+M00000005_IL_0019:
+M00000005_IL_001a:
 ldarg 0
-M00000001_IL_001b:
+M00000005_IL_001b:
 ldobj Int64
-M00000001_IL_0020:
+M00000005_IL_0020:
 ldarg 1
-M00000001_IL_0021:
+M00000005_IL_0021:
 cgt
 call neoCLR.Library.System.Int64.RuntimeBooleanToInt32(Boolean)
-M00000001_IL_0023:
-brtrue M00000001_IL_002d
-M00000001_IL_0028:
-br M00000001_IL_0030
-M00000001_IL_002d:
-M00000001_IL_002e:
+M00000005_IL_0023:
+brtrue M00000005_IL_002d
+M00000005_IL_0028:
+br M00000005_IL_0030
+M00000005_IL_002d:
+M00000005_IL_002e:
 ldc.i4 1
-M00000001_IL_002f:
+M00000005_IL_002f:
 ret
-M00000001_IL_0030:
-M00000001_IL_0031:
-M00000001_IL_0032:
+M00000005_IL_0030:
+M00000005_IL_0031:
+M00000005_IL_0032:
 ldc.i4 0
-M00000001_IL_0033:
+M00000005_IL_0033:
 ret
 .end
 .end

@@ -21,6 +21,8 @@ static class StringBindings
         new("get_Length", [], "Int32", true),
         new("GetIterator", [], "System.Collections.Iterator<Char>", true, true),
         new("GetScalars", [], "System.Collections.Sequence<UInt32>", true),
+        new("ToUpperInvariant", [], "String", true),
+        new("ToLowerInvariant", [], "String", true),
         new("get_IsEmpty", [], "Boolean", true),
         new("SliceUtf8", ["Int32", "Int32"], ResultBindings.Slice, true)
     ];

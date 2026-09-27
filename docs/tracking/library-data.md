@@ -67,6 +67,18 @@ concrete performance question requires them. Reuse unaffected evidence; run a fu
 suite or platform matrix only when the change or unresolved uncertainty requires it,
 per the author’s 2026-09-27 clarification.
 
+## Selected follow-up — casing and Int64 reporting
+
+The author accepted the assistant's two proposed slices on 2026-09-27. Both are
+implemented in development: String.ToUpperInvariant/ToLowerInvariant use Unicode 17
+full default casing; Int64.Parse returns a standard Int64ParseError union through
+Result, ToString uses strict decimal formatting, and static read-only MinValue/
+MaxValue properties expose the range. The bounds are not compiler constant fields.
+[Design and .NET/Unicode/Rust comparisons](../design/text-casing-integer.md) and
+[focused consumer evidence](../experiments/casing-integer/README.md) own the details.
+Broader casing/cultures, generic parsing, additional numeric types and formatting
+remain separately selected work. Builder promotion and additional HTTP remain deferred.
+
 ## String design review before further expansion
 
 **Review completed (2026-09-27); implementation pause retained.** The author directed

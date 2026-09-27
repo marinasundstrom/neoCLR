@@ -1,0 +1,71 @@
+import System.*
+import System.Result.*
+
+public func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+public func Parsed(text: string, expected: long) {
+    match Int64.Parse(text) {
+        Ok(let value) => Check(value == expected, "parsed value")
+        Error(_) => System.Fault("unexpected parse error")
+    }
+}
+
+public func Rejected(text: string, overflow: bool) {
+    match Int64.Parse(text) {
+        Error(Int64ParseError.InvalidFormat) => Check(!overflow, "expected overflow")
+        Error(Int64ParseError.Overflow) => Check(overflow, "expected format")
+        _ => System.Fault("expected parse error")
+    }
+}
+
+public func Main() {
+    Check("Straße ﬃ".ToUpperInvariant() == "STRASSE FFI", "expansion")
+    Check("İıI".ToLowerInvariant() == "i̇ıi", "default dotted I")
+    Check("ΟΣ".ToLowerInvariant() == "ος", "final sigma")
+    Check("ΟΣΑ".ToLowerInvariant() == "οσα", "medial sigma")
+    Check("AΣ́".ToLowerInvariant() == "aς́", "ignored combining mark")
+    Check("AΣ́B".ToLowerInvariant() == "aσ́b", "cased suffix")
+    Check("Σ".ToLowerInvariant() == "σ", "no preceding cased text")
+    Check("𐐀𐐨👩‍💻".ToUpperInvariant() == "𐐀𐐀👩‍💻", "supplementary and emoji")
+    Check("é é".ToUpperInvariant() == "É É", "no normalization")
+    Check("a\u0000b".ToUpperInvariant() == "A\u0000B", "embedded NUL")
+    Check("".ToLowerInvariant() == "", "empty")
+    Check(String.CompareOrdinalIgnoreCase("ß", "ss") != 0, "casing is not folding")
+    Check(Int64.MinValue == -9223372036854775807L - 1L, "minimum")
+    Check(Int64.MaxValue == 9223372036854775807L, "maximum")
+    Parsed("9223372036854775807", Int64.MaxValue)
+    Parsed("-9223372036854775808", Int64.MinValue)
+    Parsed("+42", 42L)
+    Parsed("-0", 0L)
+    Parsed("000000000000000000000000000000001", 1L)
+    Parsed("4294967296", 4294967296L)
+    Rejected("", false)
+    Rejected("+", false)
+    Rejected("-", false)
+    Rejected(" 1", false)
+    Rejected("1 ", false)
+    Rejected("1\u0000", false)
+    Rejected("１２", false)
+    Rejected("1,000", false)
+    Rejected("0x10", false)
+    Rejected("++1", false)
+    Rejected("9223372036854775808", true)
+    Rejected("-9223372036854775809", true)
+    Rejected("99999999999999999999999999999", true)
+    Rejected("99999999999999999999999999999x", false)
+    let minimum = Int64.MinValue
+    let maximum = Int64.MaxValue
+    let zero = 0L
+    Check(minimum.ToString() == "-9223372036854775808", "format minimum")
+    Check(maximum.ToString() == "9223372036854775807", "format maximum")
+    Check(zero.ToString() == "0", "format zero")
+    Parsed(minimum.ToString(), minimum)
+    Parsed(maximum.ToString(), maximum)
+    let report = "file bytes: " + maximum.ToString() + "\n" + "straße".ToUpperInvariant()
+    Check(report == "file bytes: 9223372036854775807\nSTRASSE", "report consumer")
+    System.Console.WriteLine("Unicode casing and Int64 report contracts passed")
+}

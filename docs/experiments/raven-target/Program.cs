@@ -84,6 +84,11 @@ if (args.Length == 2 && args[0] == "--globalization-signatures")
     return;
 }
 
+
+if (args.Length == 2 && args[0] == "--casing-integer-checks") {
+    CasingIntegerChecks.Write(args[1]);
+    return;
+}
 if (args.Length == 2 && args[0] == "--comparer-signatures")
 {
     ComparerChecks.Write(args[1]);

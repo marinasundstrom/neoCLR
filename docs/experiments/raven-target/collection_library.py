@@ -39,6 +39,8 @@ def build(path: Path) -> str:
         return build(ROOT / 'runtime/raven/FileText.neoil')
     if path == ROOT / 'runtime/System/Storage/Path.neoil':
         return build(ROOT / 'runtime/raven/Path.neoil')
+    if path == ROOT / 'runtime/System/Int64.neoil':
+        return build(ROOT / 'runtime/raven/generated/Int64.methods.neoil') + build(ROOT / 'runtime/raven/generated/Int64.helpers.neoil')
     if path == ROOT / 'runtime/System/String.neoil':
         return build(ROOT / 'runtime/raven/String.neoil')
     if path == ROOT / 'runtime/System/Clock.neoil':
@@ -120,6 +122,7 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/DateTimeFormat.neoil')
 
         result += build(ROOT / 'runtime/raven/Map.neoil')
+        result += build(ROOT / 'runtime/raven/Int64ParseError.neoil')
         result += build(ROOT / 'runtime/raven/Encoder.neoil')
         result += build(ROOT / 'runtime/raven/EncoderProgress.neoil')
         result += build(ROOT / 'runtime/raven/EncoderState.neoil')

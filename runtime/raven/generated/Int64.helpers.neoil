@@ -1,4 +1,42 @@
 ; Generated from runtime/raven/src/System/Int64.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Int64.RuntimeErrorSystemInt64ParseErrorNewSystemInt64ParseErrorInvalidFormat(System.Int64ParseError.InvalidFormat value) -> System.Int64ParseError
+ldarg value
+newobj instance System.Int64ParseError::.ctor(System.Int64ParseError.InvalidFormat)
+ret
+.end
+.function neoCLR.Library.System.Int64.RuntimeErrorSystemInt64ParseErrorNewSystemInt64ParseErrorOverflow(System.Int64ParseError.Overflow value) -> System.Int64ParseError
+ldarg value
+newobj instance System.Int64ParseError::.ctor(System.Int64ParseError.Overflow)
+ret
+.end
+.function neoCLR.Library.System.Int64.RuntimeErrorSystemInt64ParseErrorInvalidFormatNew() -> System.Int64ParseError.InvalidFormat
+newobj instance System.Int64ParseError.InvalidFormat::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Int64.RuntimeErrorSystemInt64ParseErrorOverflowNew() -> System.Int64ParseError.Overflow
+newobj instance System.Int64ParseError.Overflow::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Int64.RuntimeUnion0(Int64 arg0) -> System.Result.Ok<Int64>
+ldarg arg0
+newobj instance System.Result.Ok<Int64>::.ctor(Int64)
+ret
+.end
+.function neoCLR.Library.System.Int64.RuntimeUnion1(System.Result.Ok<Int64> arg0) -> System.Result<Int64,System.Int64ParseError>
+ldarg arg0
+newobj instance System.Result<Int64,System.Int64ParseError>::.ctor(System.Result.Ok<Int64>)
+ret
+.end
+.function neoCLR.Library.System.Int64.RuntimeUnion2(System.Int64ParseError arg0) -> System.Result.Error<System.Int64ParseError>
+ldarg arg0
+newobj instance System.Result.Error<System.Int64ParseError>::.ctor(System.Int64ParseError)
+ret
+.end
+.function neoCLR.Library.System.Int64.RuntimeUnion3(System.Result.Error<System.Int64ParseError> arg0) -> System.Result<Int64,System.Int64ParseError>
+ldarg arg0
+newobj instance System.Result<Int64,System.Int64ParseError>::.ctor(System.Result.Error<System.Int64ParseError>)
+ret
+.end
 .function neoCLR.Library.System.Int64.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False

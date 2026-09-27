@@ -986,3 +986,12 @@ the existing measure_async host limits; runtime defaults are unchanged. See
 No full suite, website build or performance claim. This completes the bounded
 UTF-8/strict-ASCII encoding foundation; broader codecs, general TextWriter completion,
 HTTP charset policy and public builder promotion remain separately scoped work.
+
+## Selected casing and Int64 report slice — 2026-09-27
+
+After the encoding foundation, the author accepted two proposed slices: explicit
+Unicode casing and Int64 parsing/formatting, with missing bounds as companion work.
+[Implemented contract and research](text-casing-integer.md) supersede the earlier
+casing deferral for these two methods only. String identity, grapheme Char, encoding,
+normalization and case-insensitive equality/hash remain unchanged. The report is a
+bounded API consumer, not completion of the Activity Report milestone.

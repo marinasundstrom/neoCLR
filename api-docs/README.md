@@ -326,3 +326,11 @@ Focused RavenDoc rendering confirms the DateTime type and member pages. Its head
 omits the parenthesized variant list; [the linked declaration supplement](date-time-union.md)
 records the exact signature. No type is excluded for this limitation. LocalTimeMapping
 payload routes were confirmed absent and are supplied by manual-members.json.
+
+## Casing and Int64 development slice
+
+String.ToUpperInvariant/ToLowerInvariant, Int64.Parse/ToString/MinValue/MaxValue
+and standard Int64ParseError now have generated type/member coverage and XML
+contracts. [Casing and decimal reporting](text-numbers.md) explains Unicode 17 full
+mappings, .NET differences, typed failures and static bounds properties. Matching
+native runtime, library and reference artifacts are required; no manual exclusions.

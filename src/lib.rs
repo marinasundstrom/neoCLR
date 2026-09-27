@@ -42,6 +42,8 @@ mod reflection;
 mod reflection_execution;
 mod reflection_properties;
 mod string_case_folding;
+mod string_casing;
+mod string_casing_data;
 mod string_comparison;
 pub use reachability::{FunctionImplementation, Reachability, ReachableCall, ReachableFunction};
 mod scope;

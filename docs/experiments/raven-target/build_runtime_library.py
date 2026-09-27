@@ -88,6 +88,7 @@ SLICES = {
     'IntegerDivisionError': 'System.IntegerDivisionError',
     'SingleError': 'System.Linq.SingleError',
     'Int32ParseError': 'System.Int32ParseError',
+    'Int64ParseError': 'System.Int64ParseError',
     'Utf8SliceError': 'System.Text.Utf8SliceError',
     'ConsoleReadError': 'System.ConsoleReadError',
     'FileWriteError': 'System.Storage.FileWriteError',
@@ -261,6 +262,7 @@ SOURCES = {
     'IntegerDivisionError': 'runtime/raven/src/System/IntegerDivisionError.rvn',
     'SingleError': 'runtime/raven/src/System/Linq/SingleError.rvn',
     'Int32ParseError': 'runtime/raven/src/System/Int32ParseError.rvn',
+    'Int64ParseError': 'runtime/raven/src/System/Int64ParseError.rvn',
     'Utf8SliceError': 'runtime/raven/src/System/Text/Utf8SliceError.rvn',
     'ConsoleReadError': 'runtime/raven/src/System/ConsoleReadError.rvn',
     'FileWriteError': 'runtime/raven/src/System/Storage/FileWriteError.rvn',
@@ -407,6 +409,10 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
         if body.startswith(('.type class ' + owner + '\n', '.type class abstract ' + owner + '\n')):
             types.remove(body)
             methods = [body[:-len('.end\n')] + ''.join(methods) + '.end\n']
+    if name == 'Int64' and bootstrap:
+        # The archived Neo profile has legacy carriers. New Result APIs belong
+        # to the Raven library; do not add another manual carrier to that profile.
+        methods = [re.sub(r'(?ms)^\.method static Parse\(.*?^\.end\n', '', body) for body in methods]
     if name == 'String' and bootstrap:
         # Explicit comparison modes are a Raven-profile API.
         methods = [re.sub(r'(?ms)^\.method static (?:Compare|CompareOrdinalIgnoreCase)\(.*?^\.end\n', '', body) for body in methods]
@@ -439,7 +445,7 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
     prefix = name + ('.bootstrap' if bootstrap else '')
     result = {prefix + '.methods.neoil': banner + ''.join(methods),
               prefix + '.helpers.neoil': banner + ''.join(body for name, body in helpers.items() if name in used) + ''.join(types)}
-    if name in ('String', 'Path') and not bootstrap:
+    if name in ('String', 'Path', 'Int64') and not bootstrap:
         result.update(fragments(text, name, owner, bootstrap=True))
     return result
 

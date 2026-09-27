@@ -1,0 +1,2 @@
+.include "generated/Int64ParseError.methods.neoil"
+.include "generated/Int64ParseError.helpers.neoil"

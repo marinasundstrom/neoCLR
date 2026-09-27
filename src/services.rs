@@ -11,6 +11,7 @@ pub enum RuntimeService {
     PointerMemory,
     ManagedHeap,
     ParseInt32,
+    ParseInt64,
     FormatInt32,
     ConsoleOutput,
     NativeInterop,
@@ -136,8 +137,11 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::WriteAllText => RuntimeService::FileOutput,
             crate::native::Binding::ReadAllText => RuntimeService::FileInput,
             crate::native::Binding::ParseInt32 => RuntimeService::ParseInt32,
+            crate::native::Binding::ParseInt64 => RuntimeService::ParseInt64,
             crate::native::Binding::Int32ToString => RuntimeService::FormatInt32,
-            crate::native::Binding::IntegerToString => RuntimeService::StringOperations,
+            crate::native::Binding::IntegerToString | crate::native::Binding::StringCasing(_) => {
+                RuntimeService::StringOperations
+            }
             crate::native::Binding::WriteLine
             | crate::native::Binding::ConsoleWriteBytes
             | crate::native::Binding::ConsoleFlush => RuntimeService::ConsoleOutput,

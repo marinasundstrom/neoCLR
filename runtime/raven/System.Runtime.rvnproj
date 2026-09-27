@@ -250,6 +250,9 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ConsoleReadError'">
     <Compile Include="src/System/ConsoleReadError.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Int64ParseError'">
+    <Compile Include="src/System/Int64ParseError.rvn" />
+  </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Int32ParseError'">
     <Compile Include="src/System/Int32ParseError.rvn" />
   </ItemGroup>

@@ -12,6 +12,7 @@ static class PrimitiveBindings
     {
         foreach (var type in Types)
             source = source.Replace($"public struct {type} {{ }}", $"public struct {type} {{ public int CompareTo({type} other) => 0; "
+                + (type == "Int64" ? "public static Result<long, Int64ParseError> Parse(string value) => default; public string ToString() => default; public static long MinValue => default; public static long MaxValue => default;" : "")
                 + (type == "Char" ? "public static char FromString(string text) => default; public string ToString() => default; public bool Equals(char other) => default;" : "") + " }");
         return source;
     }
@@ -25,10 +26,18 @@ static class PrimitiveBindings
         if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope)) return null;
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
-        var (args, result) = RuntimeSignatures.Match(reference, definition, Type);
+        var (args, result) = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? GenericUnionBindings.Type(t) ?? ResultBindings.Type(t));
         if (reference.HasThis && (!definition.IsVirtual || definition.IsFinal) && reference.Name == "CompareTo"
             && result == "Int32" && args.SequenceEqual(new[] { owner }))
             return new("Runtime" + owner + "CompareTo", [owner + "&", owner], result);
+        if (owner == "Int64") {
+            if (!reference.HasThis && reference.Name == "Parse" && result == "System.Result<Int64,System.Int64ParseError>" && args.SequenceEqual(new[] { "String" }))
+                return new("System.Int64::Parse", args, result);
+            if (!reference.HasThis && reference.Name is "get_MinValue" or "get_MaxValue" && result == "Int64" && args.Length == 0)
+                return new("System.Int64::" + reference.Name, args, result);
+            if (reference.HasThis && (!definition.IsVirtual || definition.IsFinal) && reference.Name == "ToString" && result == "String" && args.Length == 0)
+                return new("RuntimeInt64ToString", ["Int64&"], result);
+        }
         if (owner == "Char") {
             if (!reference.HasThis && reference.Name == "FromString" && result == "Char" && args.SequenceEqual(new[] { "String" }))
                 return new("System.Char::FromString", args, result);
@@ -39,7 +48,7 @@ static class PrimitiveBindings
         }
         throw new InvalidDataException("Unsupported primitive member: " + reference.FullName);
     }
-    public static string Adapters => ".function RuntimeCharToString(Char& source) -> String\nldarg source\ncall instance System.Char::ToString()\nret\n.end\n.function RuntimeCharEquals(Char& source,Char other) -> Boolean\nldarg source\nldarg other\ncall instance System.Char::Equals(Char)\nret\n.end\n" + string.Join("\n", Types.Select(t => $".function Runtime{t}CompareTo({t}& source,{t} other) -> Int32\nldarg source\nldarg other\ncall instance System.{t}::CompareTo({t})\nret\n.end\n"));
+    public static string Adapters => ".function RuntimeInt64ToString(Int64& source) -> String\nldarg source\ncall instance System.Int64::ToString()\nret\n.end\n" + ".function RuntimeCharToString(Char& source) -> String\nldarg source\ncall instance System.Char::ToString()\nret\n.end\n.function RuntimeCharEquals(Char& source,Char other) -> Boolean\nldarg source\nldarg other\ncall instance System.Char::Equals(Char)\nret\n.end\n" + string.Join("\n", Types.Select(t => $".function Runtime{t}CompareTo({t}& source,{t} other) -> Int32\nldarg source\nldarg other\ncall instance System.{t}::CompareTo({t})\nret\n.end\n"));
     public static string? Default(string type) => Types.Contains(type) ? type switch {
         "Char" => "ldstr \"\\u0000\"\ncall neoCLR.Runtime.CharFromString(String)", "Single" => "ldc.r4 0", "Int64" or "UInt64" => "ldc.i8 0",
         "IntPtr" => "ldc.i4 0\nconv.i", "UIntPtr" => "ldc.i4 0\nconv.u", _ => "ldc.i4 0"

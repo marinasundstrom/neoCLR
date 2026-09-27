@@ -34,6 +34,9 @@ named IANA rules. [LocalTimeMapping](xref:System.LocalTimeMapping) preserves uni
 ambiguous and skipped local times; [TimeZoneError](xref:System.TimeZoneError) reports
 lookup/range/discovery failures. See [DateTime and zones](/features/time/) and the [exact union declaration](date-time-union.md).
 
+[Casing and decimal reporting](text-numbers.md) covers development
+String.ToUpperInvariant/ToLowerInvariant and Int64 parsing, formatting and bounds.
+
 [Char](xref:System.Char) now has a generated type/member reference for grapheme
 construction, equality, ordering and display; see [Object contracts](objects.md)
 for boxed behavior.

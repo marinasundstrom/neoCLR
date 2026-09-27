@@ -125,18 +125,9 @@ transfer their buffer; Object conversions still allocate wrappers. Internal chec
 cover owner retention across conversions, storage and GC, including host results
 and fault teardown. Reference comparison and identity hashing follow that retained text owner.
 
-Future work includes a coherent System.Text API and comparer infrastructure, especially
-string comparers. Equality, hashing and ordering should use compatible, explicit
-policies. Ordinal, case-insensitive and culture-aware behavior will need their own
-design and validation; these comparers are not available yet.
-
-
-Planned text work also includes ToUpper/ToLower-style casing and comparison methods.
-.NET is a reference, not an API-copy requirement: adapt names and contracts where a
-concrete benefit justifies the compatibility cost. Culture selection, Unicode casing
-(including length changes), ordering and equality/hash consistency need explicit
-choices and tests. Additional casing/comparison APIs remain planned; the existing
-bounded ordinal helpers retain their current contract.
+Development APIs include explicit ordinal comparers and full Unicode casing, described
+below. Culture-sensitive comparison and language-specific casing remain possible
+future directions; equality, hashing and display transformations have separate roles.
 
 <a id="constructing-and-indexing-text-development"></a>
 
@@ -239,3 +230,21 @@ these policies while keeping UTF-8 defaults. See [encoding contracts](../../docs
 for ownership, bounds and errors. [Encoder](xref:System.Text.Encoder) now accepts valid text and drains bounded byte
 output, with explicit progress and finalization. A public builder and broader codecs
 remain possible next steps; these additions are not part of Preview 10.
+
+## Unicode casing and decimal reports (development)
+
+`String.ToUpperInvariant()` and `ToLowerInvariant()` use Unicode 17 full default
+casing. `"Straße ﬃ".ToUpperInvariant()` produces `"STRASSE FFI"`, and
+`"ΟΣ".ToLowerInvariant()` produces `"ος"`. They return new text values, preserve
+existing references and can change byte, scalar and grapheme counts. No culture
+selection or normalization is applied. These rules differ from .NET invariant
+casing; comparison and hashing still use their separately selected policies.
+
+`Int64.Parse(text)` returns a typed Result for signed ASCII decimal input.
+`Int64.ToString()` produces round-trippable decimal text; static read-only
+`MinValue` and `MaxValue` properties expose the bounds. Parsing rejects whitespace
+and distinguishes malformed input from overflow. These operations support reports
+and counters beyond Int32 without adding culture or format-provider APIs.
+See the [API contract](/docs/text-numbers/) and the tested report consumer in
+`docs/experiments/casing-integer/Main.rvn`. Matching development runtime and library
+artifacts are required.

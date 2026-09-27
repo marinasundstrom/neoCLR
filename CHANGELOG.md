@@ -18,8 +18,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   discovery without silent UTC fallback. Fixed offsets retain seconds and ±18h bounds.
   Refresh matching artifacts/API docs and the separate DateTime feature page.
   Windows/Linux discovery, broader ranges, rule updates and scheduling remain open.
-  Integrate concurrent encoding/encoder work from main and regenerate the combined
-  library and API artifacts; verify calendar, zone and encoder consumers together.
+  Integrate concurrent encoding/encoder and casing/Int64 work from main; regenerate
+  combined library/API artifacts and verify calendar, zone, encoder and casing/Int64
+  consumers together.
 
 - Add provisional Gregorian/Hebrew calendar policies, checked Date arithmetic,
   Date display and LocalDateTime construction. Add invariant, Swedish and Israeli
@@ -34,12 +35,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Feature globalization separately from DateTime on the website; record Time and
   time zones as the author-selected next slice.
 
+- Add development String.ToUpperInvariant/ToLowerInvariant with pinned Unicode 17
+  full default casing, expansions and final-sigma context, without normalization or
+  locale tailoring. Add strict ASCII Int64.Parse with standard Raven Int64ParseError,
+  decimal ToString and static read-only MinValue/MaxValue bounds (not const fields).
+  Refresh runtime/library/reference artifacts and feature/API docs; record .NET
+  differences and focused report, native and metadata validation. New casing/parse
+  native services require a matching development runtime; comparison/hash policy
+  and released Preview 10 behavior remain unchanged.
+
 - Record Preview 10 publication, verified remote asset digests and POC completion
   in the roadmap, HTTP and release trackers.
 - Select useful library API coverage as the next author-directed work. Record a
   proposed comparer-first sequence, earlier text/casing/StringBuilder/time requests,
   bounded companion tasks and focused validation in the existing theme trackers.
-  The later text and casing slices remain planned; the bounded time slice is recorded above.
+  Later selected text and time slices are recorded above.
 - Implement Raven EqualityComparer<T> and Comparer<T> interfaces, callback adapters
   and StringComparer.Ordinal. Add HashMap policy construction while preserving the
   callback constructor; both comparer methods retain the map's reentry protection.

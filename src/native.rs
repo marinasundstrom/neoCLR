@@ -48,6 +48,8 @@ pub(crate) enum Binding {
     TypeArgumentCount,
     TypeArgument,
     ParseInt32,
+    ParseInt64,
+    StringCasing(bool),
     Int32ToString,
     IntegerToString,
     WriteLine,
@@ -194,6 +196,13 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::UnixTimeToLocal, Type::Array(Box::new(Type::Int32)))
         }
         ("neoCLR.Runtime.UnixTimeTicks", []) => (Binding::UnixTimeTicks, Type::Int64),
+        ("neoCLR.Runtime.StringToUpperInvariant", [Type::String]) => {
+            (Binding::StringCasing(true), Type::String)
+        }
+        ("neoCLR.Runtime.StringToLowerInvariant", [Type::String]) => {
+            (Binding::StringCasing(false), Type::String)
+        }
+        ("neoCLR.Runtime.ParseInt64", [Type::String]) => (Binding::ParseInt64, Type::Value),
         ("neoCLR.Runtime.ParseInt32", [Type::String]) => (Binding::ParseInt32, Type::Value),
         ("neoCLR.Runtime.Int32ToString", [Type::Int32]) => (Binding::Int32ToString, Type::String),
         ("neoCLR.Runtime.Int64ToString", [Type::Int64])
@@ -828,6 +837,23 @@ impl Binding {
                 };
                 Ok(Value::Erased(Box::new(payload)))
             }
+            (Self::ParseInt64, [Value::String(text)]) => {
+                // Validate the whole grammar first: malformed text wins over overflow.
+                // Byte 1 = InvalidFormat, Byte 2 = Overflow; Int64 = success.
+                let digits = text.strip_prefix(['+', '-']).unwrap_or(text);
+                let payload = if digits.is_empty() || !digits.bytes().all(|b| b.is_ascii_digit()) {
+                    Value::Byte(1)
+                } else {
+                    match text.parse::<i64>() {
+                        Ok(n) => Value::Int64(n),
+                        Err(_) => Value::Byte(2),
+                    }
+                };
+                Ok(Value::Erased(Box::new(payload)))
+            }
+            (Self::StringCasing(uppercase), [Value::String(text)]) => Ok(Value::String(
+                crate::string_casing::convert(text, *uppercase).into(),
+            )),
             (Self::Int32ToString, [Value::Int32(number)]) => {
                 Ok(Value::String(number.to_string().into()))
             }

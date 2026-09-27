@@ -20,7 +20,7 @@ maintain a second HTTP completion checklist here.
 | API reference | Source changes require matching bridge/reference and useful member docs | [Maintenance procedure](../../api-docs/README.md), including explicit renderer exclusions; do not substitute a feature page for member coverage. |
 
 | Boxed Completed pattern binding | Open compiler observation; explicit closed-case cast validates IUnion.Value | [Union guide](../raven-union-api.md#task-outcomes); ordinary task outcome patterns pass. |
-| Historical source API checklist | Still references obsolete generated/File fragments | Refresh the separate source checklist; current on-site metadata inventory and snapshot pass. |
+| Historical source API checklist | Still references obsolete generated/File fragments; 2026-09-27 regeneration reaches an unreviewed UInt64ToString caller and cannot finish the old audit | Refresh the separate source checklist and its caller discovery across current Raven/archived profiles. The casing/Int64 slice leaves this historical artifact unchanged; current on-site metadata inventory and snapshot pass. |
 
 General Raven fixes belong on independently tested main-based feature branches;
 neoCLR-specific policies stay isolated. Compiler-affecting integration requires the

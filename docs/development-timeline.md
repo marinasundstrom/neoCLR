@@ -8247,3 +8247,17 @@ configuration/content, not target-specific code added to Raven main.
   overflow may follow partial output. Accepted text remains retained until drained.
   Bounded UTF-8/ASCII foundations are complete; broader codecs, general TextWriter
   completion, HTTP policy and public builder promotion remain separately scoped.
+
+## 2026-09-27 — select casing and Int64 API slices
+
+- **Author:** asked to list the next couple of API improvements after Encoder completion.
+- **Assistant proposal:** explicit Unicode casing, then one Int64 parsing/decimal
+  formatting slice for file sizes/reports; fill missing numeric bounds as companion
+  work. Keep builder/HTTP deferred and avoid treating recommendations as commitments.
+- **Author decision:** “Continue with those slices”.
+- **Action/outcome:** implemented whole-String Unicode 17 full default upper/lower
+  casing and strict Int64 Result parsing, decimal ToString and read-only bounds.
+  The [design](design/text-casing-integer.md) records .NET differences, existing
+  Unicode-version split, naming and costs. [Focused evidence](experiments/casing-integer/README.md)
+  covers a runnable report and exact runtime/metadata contracts. No general culture,
+  normalization, builder optimization or next milestone was inferred from this direction.

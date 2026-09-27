@@ -43,6 +43,7 @@ Duplicate entries in the supplied service set have no additional effect.
 | ManagedHeap | heap.new, newarr and array.new (also require SlotReferences) |
 | ManagedArrays | Array creation, length and element operations; access operations conservatively also require SlotReferences |
 | ParseInt32 | Validated neoCLR.Runtime.ParseInt32 InternalCall |
+| ParseInt64 | Validated neoCLR.Runtime.ParseInt64 InternalCall (development) |
 | FormatInt32 | Validated neoCLR.Runtime.Int32ToString InternalCall |
 | ConsoleOutput | Validated neoCLR.Runtime.WriteLine InternalCall |
 | NativeInterop | P/Invoke declarations |
@@ -133,3 +134,7 @@ TimeZoneRules classifies queries against bundled IANA rules. TimeZoneMapLocal al
 requires ManagedArrays for the returned numeric mapping, while TimeZoneOffset,
 TimeZoneExists and TimeZoneDatabaseVersion do not. SystemTimeZoneName uses
 ProcessEnvironment and does not read the clock. See [Time/zone boundaries](time-zones.md).
+
+Development full String casing uses StringOperations; Int64 parsing has its own
+ParseInt64 service requirement. Int64 decimal formatting reuses the existing
+StringOperations-classified integer formatting service.
