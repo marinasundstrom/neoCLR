@@ -245,6 +245,7 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'COMPARER_MAP_SAMPLE': (raven + 'library-comparers.rvn', '    let files = HashMap<string, int>(StringComparer.Ordinal)', '\n    files.Set', False),
         'JSON_DOM_SAMPLE': ('docs/experiments/json-dom/Sample.rvn', 'func AddAcknowledgement(', '\n}', True),
         'HTTP_CONTEXT_SAMPLE': ('docs/experiments/http-context/Sample.rvn', 'async func ReplyToNext(', '\n}', True),
         'HTTP_VERB_SAMPLE': ('docs/experiments/http-verbs/Sample.rvn', 'async func ReplaceText(', '\n}', True),
@@ -301,7 +302,7 @@ def main():
     array_output = (ROOT / (raven + 'library-array-tour.expected.txt')).read_text().rstrip()
     downloads = OUTPUT / 'samples'
     downloads.mkdir()
-    for name in ('library-array-tour.rvn', 'library-array-tour.expected.txt', 'library-task-propagation.rvn', 'library-task-result.rvn', 'library-async-default-queue.rvn', 'library-task-producer.rvn', 'library-async-cancellation.rvn', 'library-outcome-operators.rvn', 'library-outcome-operators.expected.txt', 'library-query-basics.rvn', 'library-query-basics.expected.txt', 'library-query-names.rvn', 'library-query-names.expected.txt', 'library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
+    for name in ('library-comparers.rvn', 'library-array-tour.rvn', 'library-array-tour.expected.txt', 'library-task-propagation.rvn', 'library-task-result.rvn', 'library-async-default-queue.rvn', 'library-task-producer.rvn', 'library-async-cancellation.rvn', 'library-outcome-operators.rvn', 'library-outcome-operators.expected.txt', 'library-query-basics.rvn', 'library-query-basics.expected.txt', 'library-query-names.rvn', 'library-query-names.expected.txt', 'library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
         source_sample = ROOT / raven / name
         shutil.copyfile(source_sample, downloads / name)
     post_downloads = downloads / 'http-post'

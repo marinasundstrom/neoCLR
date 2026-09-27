@@ -145,7 +145,8 @@ static class SignatureProbe
         var outcome = new GenericInstanceType(module.GetType("System.Tasks.TaskOutcome`1"));
         outcome.GenericArguments.Add(module.TypeSystem.String);
         Check("TaskOutcome is an ordinary union payload", GenericUnionBindings.Type(outcome) == "System.Tasks.TaskOutcome<String>");
-        Check("TaskOutcome has no Result propagation protocol", outcome.Resolve().Interfaces.Count == 0);
+        Check("TaskOutcome implements IUnion without Result propagation",
+            outcome.Resolve().Interfaces.Select(i => i.InterfaceType.FullName).SequenceEqual(new[] { StandardUnionLibrary.ProtocolName }));
         var task = new GenericInstanceType(module.GetType("System.Tasks.Task`1"));
         task.GenericArguments.Add(module.TypeSystem.String);
         var getOutcome = task.Resolve().Methods.Single(m => m.Name == "get_Outcome");

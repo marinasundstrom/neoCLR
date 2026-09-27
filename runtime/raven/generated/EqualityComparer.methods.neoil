@@ -1,0 +1,7 @@
+; Generated from runtime/raven/src/System/Collections/EqualityComparer.rvn. Regenerate with build_runtime_library.py.
+.interface System.Collections.EqualityComparer<T0>
+.method instance Equals(T0 left,T0 right) -> Boolean
+.end
+.method instance GetHashCode(T0 value) -> Int32
+.end
+.end

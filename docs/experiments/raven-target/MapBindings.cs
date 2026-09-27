@@ -52,7 +52,7 @@ static class MapBindings
         var shape = Shapes[owner];
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var expected = new[] { $"System.Func<{shape.Key},{shape.Key},Boolean>", $"System.Func<{shape.Key},Int32>" };
-        if (shape.Kind != "HashMap" || !definition.IsConstructor || !reference.HasThis || result != "noresult" || !args.SequenceEqual(expected))
+        if (shape.Kind != "HashMap" || !definition.IsConstructor || !reference.HasThis || result != "noresult" || !(args.SequenceEqual(expected) || args.SequenceEqual(new[] { $"System.Collections.EqualityComparer<{shape.Key}>" })))
             throw new InvalidDataException("Unsupported map constructor.");
         return new(args, owner, $"newobj instance {owner}::.ctor({string.Join(',', args)})");
     }

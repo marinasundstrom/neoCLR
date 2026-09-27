@@ -1,0 +1,6 @@
+namespace System.Collections
+
+/// Orders values by the sign of Compare's result.
+public interface Comparer<T> {
+    func Compare(left: T, right: T) -> int
+}

@@ -1,6 +1,9 @@
 # Map prototype for the Raven target
 
-Recorded 2026-09-13. This is a bounded implementation, not the final collection API
+Updated 2026-09-27: the [development comparer slice](#comparer-policies-development)
+adds reusable policies and a HashMap constructor; Preview 10 retains callbacks only.
+
+The original prototype below was recorded 2026-09-13. This is not the final collection API
 or a complete replacement for .NET Dictionary. The [collection capability work](collection-contracts.md)
 is its starting point. The historical Neo profile is unchanged.
 
@@ -149,3 +152,78 @@ preserves the algorithms and contracts described here. Private implementation he
 remain private. The class owns equality/hash delegates directly and uses the
 Raven-authored ArrayList for entry storage. No default comparer, removal or pair
 iteration is added by this migration. See [the authoring gate](raven-system-library.md#hashmap-and-private-instance-helpers--2026-09-15).
+
+## Comparer policies (development)
+
+The author requested comparers on 2026-09-27. This post-Preview-10 slice makes
+HashMap key policies reusable and gives ordinary algorithms an explicit ordering.
+It is library functionality using existing CLI interfaces, generic classes and
+virtual calls; it introduces no opcode or Runtime Contract switch.
+
+| API | Contract |
+| --- | --- |
+| `System.Collections.EqualityComparer<T>` | Invariant interface: `Equals(T left, T right): bool`, `GetHashCode(T value): int`. |
+| `System.Collections.Comparer<T>` | Invariant interface: `Compare(T left, T right): int`; negative/zero/positive means less/equivalent/greater. |
+| `DelegateEqualityComparer<T>(equal, hash)` | Retains both callbacks; invokes them synchronously without suppressing faults. |
+| `DelegateComparer<T>(compare)` | Retains an ordering callback with the same sign contract. |
+| `System.StringComparer.Ordinal` | Stateless policy implementing both string interfaces; exact equality, existing String Object content hash, unsigned UTF-8/scalar ordering. A new policy instance is returned; do not rely on identity. |
+| `HashMap<K,V>(EqualityComparer<K> comparer)` | Retains the policy. Existing callback constructor adapts to DelegateEqualityComparer and remains source-compatible. |
+
+Equality must be reflexive, symmetric and transitive; equal values must have equal
+hashes. Ordering must be transitive with opposite signs on reversed unequal inputs.
+An ordering's zero result need not imply another policy's equality. No runtime
+proof of callback laws is possible. Keys and policy behavior must remain stable
+while stored. Hash codes may be negative, collide, and change between runtime
+versions; never persist them as identities. No universal Default policy is added.
+
+StringComparer accepts non-null strings, including empty text and embedded NUL.
+It neither normalizes Unicode nor ignores case. U+10000 sorts after U+E000, retaining
+neoCLR's [native ordinal order](ordinal-text.md). The map continues to delegate its
+key domain, including nullable reference keys, to the selected policy. It adds no
+uniform null-key rejection; passing null outside a policy's declared domain is
+unsupported. Comparers and callbacks themselves must be non-null. Terminal callback
+faults stay faults. Existing map reentry protection covers both comparer methods;
+this is not a concurrent collection or an async callback contract.
+
+The map and adapters retain ordinary managed references, including callback captures.
+An adapter introduces one object for the legacy callback constructor; the explicit
+policy can be reused across maps. Algorithms and table growth are unchanged. There
+is no performance, collision-attack resistance or singleton allocation claim.
+The pinned compiler needs explicit fields for constructor-assigned storage without
+initializers in these slices; revisit ordinary private var/val when that form is
+supported by the selected compiler.
+
+### Comparisons and alternatives
+
+Primary sources reviewed 2026-09-27 against .NET 10:
+
+- [.NET IEqualityComparer<T>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.iequalitycomparer-1?view=net-10.0)
+  pairs equality and hashing; [IComparer<T>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icomparer-1?view=net-10.0)
+  separately supplies ordering. neoCLR follows these roles and uses its established
+  interface naming without an I prefix. Unlike .NET's abstract EqualityComparer class,
+  our EqualityComparer name denotes the interface. Generic variance and automatic
+  default selection are deliberately absent in this bounded slice.
+- [.NET StringComparer.Ordinal](https://learn.microsoft.com/en-us/dotnet/api/system.stringcomparer.ordinal?view=net-10.0)
+  combines string policies but orders UTF-16 code units. neoCLR preserves its native
+  UTF-8 ordering and non-null string domain. This simplifies consistency with existing
+  String methods at the cost of different supplementary-character order and null behavior.
+- [.NET EqualityComparer.Create](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.equalitycomparer-1.create?view=net-10.0)
+  supports callback adaptation. Explicit Delegate* classes keep construction ordinary
+  in the current target. Requiring a hash callback prevents accidentally selecting a
+  different default hash for custom equality; it cannot guarantee the callbacks agree.
+
+Keeping only two raw callbacks would preserve less API surface but perpetuate policy
+wiring at each map. A universal Object-based default would choose boxing, null and
+value semantics for every T prematurely. A new runtime instruction would add an ABI
+without supplying an operation the existing library cannot express. The existing
+[Map prototype comparison](#why-this-shape-compared-with-net), including Rust and
+LanguageExt, remains applicable to lookup outcomes and stable key requirements.
+
+### Validation
+
+The [comparer sample](experiments/raven-target/samples/library-comparers.rvn) exercises
+ordering through an interface, exact/canonical-distinct/case-distinct Unicode text,
+content hash agreement, collisions including Int32.MinValue, growth, equivalent-key
+replacement, original reference preservation, user-defined policies and the legacy
+constructor. The focused verifier also checks reentrant policy faults and rejects
+mismatched policy types. See the library tracker for completed validation evidence.

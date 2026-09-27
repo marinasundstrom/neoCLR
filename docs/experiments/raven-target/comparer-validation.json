@@ -1,0 +1,74 @@
+{
+  "date": "2026-09-27",
+  "status": "implemented and focused checks passed; not released",
+  "ravenRevision": "a108df82adb84b891cb7171e5602716a88723834",
+  "ravenBranch": "neoclr",
+  "runtime": "extracted Preview 10 macOS arm64 binary with the development bridge and library",
+  "artifacts": {
+    "System.neoil": "9a5e44e96ab567c373b8c3b987022b75aad906a610f4d177dbb646c30cd6b342",
+    "NeoCLR.CoreProbe.dll": "2f197be5102c820ab744eb2a3e7672f19ccb35383cf1b984ccb4a6a5c8092c8f"
+  },
+  "checks": [
+    {
+      "name": "Raven comparer contracts",
+      "command": "python3 docs/experiments/raven-target/verify_comparers.py PROJECT --bridge BRIDGE --system SYSTEM --runtime RUNTIME",
+      "passed": 6,
+      "scenarios": [
+        "equality/hash/ordering interfaces and adapters, Unicode and custom policies",
+        "legacy map consumer",
+        "hash method reentry fault",
+        "equality method reentry fault",
+        "wrong key policy rejected",
+        "ordering policy rejected as equality policy"
+      ]
+    },
+    {
+      "name": "comparer metadata admission",
+      "command": "dotnet BRIDGE --comparer-signatures OUTPUT",
+      "passed": 6
+    },
+    {
+      "name": "map and GC regressions",
+      "command": "cargo test --locked --test raven_collections map_",
+      "passed": 5
+    },
+    {
+      "name": "editor discovery",
+      "command": "python3 docs/experiments/raven-target/verify_editor.py PROJECT_DIRECTORY --comparers",
+      "status": "passed using packaged Preview 10 language server with development reference"
+    },
+    {
+      "name": "library artifacts",
+      "command": "python3 docs/experiments/raven-target/build_runtime_library.py --check-snapshot",
+      "status": "passed; full regeneration leaves the tested profile byte-identical"
+    },
+    {
+      "name": "API snapshot",
+      "command": "python3 scripts/build-api-docs.py --refresh target/api-docs/input/NeoCLR.CoreProbe.dll --check",
+      "status": "passed with freshly generated reference from matching bridge"
+    },
+    {
+      "name": "website",
+      "command": "python3 scripts/build-website.py",
+      "status": "passed before the author requested skipping further website builds"
+    },
+    {
+      "name": "website tooling tests",
+      "command": "python3 -m unittest discover -s scripts -p 'test_build_website.py'",
+      "passed": 18,
+      "scope": "completed before the author validation correction"
+    }
+  ],
+  "broaderProbe": {
+    "status": "not passing; pre-existing union assumptions",
+    "command": "dotnet BRIDGE --signatures OUTPUT",
+    "finding": "Corrected TaskOutcome zero-interface assertion to IUnion. Next failure expects removed Result.Ok.Value setter. Kept outside the comparer acceptance checks; tracked in docs/tracking/toolchain-release.md."
+  },
+  "scope": [
+    "No full runtime/platform suite repeated.",
+    "No performance claim; no benchmark required for this contract change.",
+    "No Raven compiler or native runtime changes.",
+    "No new package or website published.",
+    "Future validation is targeted by default; a full suite is appropriate when actually needed."
+  ]
+}

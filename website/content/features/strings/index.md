@@ -197,3 +197,14 @@ are 4096 entries and 1 MiB; exceeding either budget for a new entry raises
 InternPoolLimitExceeded. Existing entries remain available when full. Table/owner
 overhead and temporary inputs are not included in those payload counts. See the
 [String API reference](xref:System.String) and [Fault/limit reference](../../docs/faults.html).
+
+
+## Comparer policy (development)
+
+`StringComparer.Ordinal` combines exact equality, String's Object content hash and
+native UTF-8 ordering in one reusable policy. It accepts non-null strings and does
+not normalize text or ignore case. Use it with the development HashMap constructor
+or through `EqualityComparer<string>` and `Comparer<string>`.
+See [collections and comparer policies](../collections/#comparer-policies-development)
+for a tested example and [StringComparer](xref:System.StringComparer) for signatures.
+This addition is not included in Preview 10.

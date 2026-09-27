@@ -100,6 +100,7 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/OptionOperators.neoil')
         result += build(ROOT / 'runtime/raven/OptionNestedOperators.neoil')
         result += build(ROOT / 'runtime/raven/ResultOperators.neoil')
+        result += build(ROOT / 'runtime/raven/Comparers.neoil')
         result += build(ROOT / 'runtime/raven/Map.neoil')
         result += build(ROOT / 'runtime/raven/Utf8.neoil')
         result += build(ROOT / 'runtime/raven/EntryKind.neoil')

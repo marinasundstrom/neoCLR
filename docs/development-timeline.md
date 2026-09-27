@@ -7857,3 +7857,34 @@ configuration/content, not target-specific code added to Raven main.
   records the next bounded contract and validation requirements. No new API is
   implemented by this planning change; exact signatures remain open. HTTP stays
   done for now, with future client/server capabilities retained in its own tracker.
+
+
+## 2026-09-27 — Implement comparers and reduce routine validation
+
+- **Author:** “Implement comparers”.
+- **Assistant action:** implements separate equality/hash and ordering interfaces,
+  callback adapters, StringComparer.Ordinal and a HashMap policy constructor in
+  Raven. Preserves callback construction and native UTF-8 ordering. Documents explicit
+  policy domains and defers automatic defaults/culture policies. No Raven compiler
+  or native-runtime change is made.
+- **Outcome:** six focused source scenarios, six comparer metadata checks and five
+  map/GC regressions pass, along with editor discovery and API snapshot validation.
+  Full library regeneration matches the tested artifact. The website build and its
+  18 tests completed before the subsequent author correction. No publication occurs.
+  See [evidence](experiments/raven-target/comparer-validation.json).
+- **Tooling finding:** the broad metadata probe retained old union expectations.
+  Correcting its zero-interface TaskOutcome assertion exposes a removed Result case
+  setter assumption. That remaining maintenance is tracked separately; the assistant
+  does not claim the broad probe passed.
+- **Author correction:** “Skip website build and in future tasks just run the tests
+  that are necessary to verify that the work is actually passing. Of course include
+  any performance test if necessary.”
+- **Assistant response/action:** stops additional website builds and records the
+  standing preference in AGENTS.md, API maintenance guidance and the active roadmap.
+  Content and snapshot maintenance continue; performance tests depend on a relevant
+  performance question.
+- **Author clarification:** “The point is that we shouldn't run the full test suite
+  unless actually needed to.” **Assistant:** refines the standing rule to targeted
+  validation by default, with broader suites/builds when the change or unresolved
+  uncertainty justifies them. The current request to skip another website build
+  still applies; there is no blanket prohibition on necessary future validation.

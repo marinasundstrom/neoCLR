@@ -1,0 +1,100 @@
+import System.*
+import System.Collections.*
+import System.Option.*
+
+public func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fault(message)
+    }
+}
+
+func Minimum(values: Sequence<string>, comparer: Comparer<string>) -> string {
+    var best = values[0]
+    for value in values {
+        if comparer.Compare(value, best) < 0 {
+            best = value
+        }
+    }
+    return best
+}
+
+class Key {
+    val Id: int
+
+    init(id: int) {
+        Id = id
+    }
+}
+
+class KeyComparer : EqualityComparer<Key> {
+    func Equals(left: Key, right: Key) -> bool {
+        return left.Id == right.Id
+    }
+
+    func GetHashCode(value: Key) -> int {
+        return value.Id
+    }
+}
+
+func Main() {
+    let ordinal = StringComparer.Ordinal
+    let equality: EqualityComparer<string> = ordinal
+    let ordering: Comparer<string> = ordinal
+    let reconstructed = String.Concat("ca", "fé")
+    Check(equality.Equals("café", reconstructed), "content equality")
+    Check(equality.GetHashCode("café") == equality.GetHashCode(reconstructed), "equal hashes")
+    let boxed: Object = reconstructed
+    Check(equality.GetHashCode(reconstructed) == boxed.GetHashCode(), "Object hash agreement")
+    Check(!equality.Equals("A", "a"), "case sensitivity")
+    Check(!equality.Equals("é", "é"), "no normalization")
+    Check(ordering.Compare("", "a") < 0, "empty order")
+    Check(ordering.Compare("abc", "abcd") < 0, "prefix order")
+    Check(ordering.Compare("café", reconstructed) == 0, "ordering equality")
+    Check(ordering.Compare("𐀀", "") > 0, "scalar order differs from UTF-16")
+    Check(ordering.Compare("", "𐀀") < 0, "reverse scalar order")
+    let names = ["z", "a", "m"]
+    Check(Minimum(names, ordering) == "a", "ordering consumer")
+
+    let files = HashMap<string, int>(StringComparer.Ordinal)
+    Check(files.TryAdd("café", 42), "add")
+    Check(!files.TryAdd(String.Concat("ca", "fé"), 99), "duplicate equal text")
+    Check(files.TryAdd("CAFÉ", 7), "distinct casing")
+    Check(files.TryAdd("", 0), "empty key")
+    Check(!files.ContainsKey("missing"), "missing key")
+    files.Set(reconstructed, 43)
+    match files.Find("café") {
+        Some(let value) => Check(value == 43, "replace equivalent key")
+        None => System.Fault("missing equivalent key")
+    }
+    Check(files.Count == 3, "map count")
+
+    let divisor = 10
+    let policy = DelegateEqualityComparer<int>(
+        (left, right) => left % divisor == right % divisor,
+        value => -2147483648)
+    let buckets = HashMap<int, int>(policy)
+    for key in 0..9 {
+        Check(buckets.TryAdd(key, key + 100), "collision insertion")
+    }
+    Check(!buckets.TryAdd(12, 999), "custom duplicate")
+    buckets.Set(22, 142)
+    match buckets.Find(32) {
+        Some(let value) => Check(value == 142, "custom lookup after growth")
+        None => System.Fault("missing collision key")
+    }
+    Check(buckets.Count == 10, "custom count")
+    Check(buckets.Keys[2] == 2, "preserve original key")
+    let reverse: Comparer<int> = DelegateComparer<int>((left, right) => right.CompareTo(left))
+    Check(reverse.Compare(-2147483648, 2147483647) > 0, "reverse ordering without subtraction overflow")
+    Check(reverse.Compare(7, 7) == 0, "equal ordering")
+
+    let objects = HashMap<Key, string>(KeyComparer())
+    let original = Key(42)
+    objects.Set(original, "kept")
+    Check(objects.ContainsKey(Key(42)), "user comparer interface")
+    Check(Object.ReferenceEquals(original, objects.Keys[0]), "original reference retained")
+    let legacy = HashMap<int, int>((left, right) => left == right, value => value)
+    legacy.Set(42, 7)
+    Check(legacy.ContainsKey(42), "callback constructor compatibility")
+    Console.WriteLine("Comparer contract passed")
+}

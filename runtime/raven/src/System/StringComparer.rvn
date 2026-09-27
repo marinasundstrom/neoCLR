@@ -1,0 +1,22 @@
+namespace System
+
+/// Exact string equality, content hashing and native UTF-8 ordinal ordering.
+public class StringComparer : Collections.EqualityComparer<string>, Collections.Comparer<string> {
+    private init() { }
+
+    /// Returns a stateless ordinal policy. Instance identity is not guaranteed.
+    static val Ordinal: StringComparer => StringComparer()
+
+    func Equals(left: string, right: string) -> bool {
+        return left.Equals(right)
+    }
+
+    func GetHashCode(value: string) -> int {
+        let instance: Object = value
+        return instance.GetHashCode()
+    }
+
+    func Compare(left: string, right: string) -> int {
+        return String.CompareOrdinal(left, right)
+    }
+}

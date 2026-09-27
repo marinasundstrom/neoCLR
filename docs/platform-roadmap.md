@@ -22,13 +22,12 @@ checks requested by the author and final extracted-package checks. HTTP feature
 scope remains frozen. Thematic consolidation is complete.
 
 **Next direction: useful library APIs**, selected by the author after release.
-Start with the previously requested comparer and text gaps, using the
-[library/data sequence](tracking/library-data.md#active-direction--useful-api-gaps).
-The first bounded task is a paired equality/hash policy and explicit ordinal string
-comparer consumed by HashMap; general ordering is a related contract, not an
-implicit culture policy. This sequencing is the assistant’s recommendation within
-the author-selected direction. M2–M6 remain candidate applications; the complete
-File Catalog is not a prerequisite for delivering this slice.
+The author-selected comparer slice is implemented in development: equality/hash and
+ordering policies, callback adapters, StringComparer.Ordinal and a HashMap policy
+constructor. See the [library/data sequence and evidence](tracking/library-data.md#active-direction--useful-api-gaps).
+The next candidate is useful text construction, including a minimal StringBuilder
+for a report consumer. M2–M6 remain candidate applications; no complete File Catalog
+or additional HTTP feature is required by the comparer slice.
 
 ## Theme trackers
 
@@ -75,6 +74,9 @@ An implemented supporting API does not by itself complete a milestone.
   a prerequisite for unrelated work.
 - At most one small companion task may accompany a larger feature. It must finish
   independently without introducing a new language, ABI, culture or lifetime contract.
+- Run only validation needed for the change, including performance tests when relevant.
+  Avoid routine website builds for unrelated work; keep content and API snapshots
+  current. Run the full suite only when the change or uncertainty requires it. This reflects the author’s 2026-09-27 validation correction.
 - Reuse the relevant .NET/CLR comparisons in linked design notes; deepen research
   when a contract changes. Follow [design research](design-research.md). Proposals
   are exploratory inputs, not specifications or implementation commitments.

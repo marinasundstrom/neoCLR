@@ -1244,3 +1244,22 @@ records ownership, synchronous-read limitations and focused validation. A condit
 expression-bodied getter emitted zero on the current compiler; explicit getter returns
 and a consumer length assertion work around that observation. No general compiler
 repair is claimed or integrated into Raven main by this change.
+
+
+## Comparer policy projection (development, 2026-09-27)
+
+The Raven library now provides EqualityComparer<T>, Comparer<T>, Delegate* adapters
+and StringComparer.Ordinal; HashMap retains callback construction and adds a policy
+constructor. The bridge projects their ordinary CLI class/interface signatures,
+closes generic policy arguments, checks supported members and preserves native
+UTF-8 ordering. See the [contract](../../map-contracts.md#comparer-policies-development)
+and [focused evidence](comparer-validation.json).
+
+No Raven compiler source, Runtime Contract switch, runtime instruction or native
+service changed. Build the bridge against Raven neoclr `a108df82a` or a compatible
+compiler, then regenerate the library and matching reference together. Old references
+do not contain these APIs; the new bridge requires the matching comparer metadata.
+Generic policies are invariant and explicit; no inferred default/culture policy is
+introduced. The focused verifier is `verify_comparers.py`, and
+`Probe --comparer-signatures OUTPUT` checks metadata admission. Editor checks use
+`verify_editor.py PROJECT --comparers`. The package builder includes the verifier.

@@ -1,0 +1,68 @@
+; Generated from runtime/raven/src/System/StringComparer.rvn. Regenerate with build_runtime_library.py.
+.type class System.StringComparer
+.sealed
+.implements System.Collections.EqualityComparer<String>
+.implements System.Collections.Comparer<String>
+.property static Ordinal() -> System.StringComparer
+.get System.StringComparer::get_Ordinal()
+.end
+.method private instance .ctor() -> noresult
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+ret
+.end
+.method static get_Ordinal() -> System.StringComparer
+M00000002_IL_0000:
+M00000002_IL_0001:
+newobj instance System.StringComparer::.ctor()
+M00000002_IL_0006:
+ret
+.end
+.method instance Equals(String left,String right) -> Boolean
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 1
+M00000003_IL_0003:
+ldarg 2
+M00000003_IL_0004:
+call neoCLR.Library.System.StringComparer.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.StringComparer.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0009:
+call neoCLR.Library.System.StringComparer.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetHashCode(String value) -> Int32
+.local System.Object local0
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 1
+M00000004_IL_0003:
+castclass System.Object
+stloc local0
+M00000004_IL_0004:
+M00000004_IL_0005:
+ldloc local0
+M00000004_IL_0006:
+call neoCLR.Library.System.StringComparer.RuntimeReflection9D228A0DB4CAD74E(System.Object)
+M00000004_IL_000b:
+ret
+.end
+.method instance Compare(String left,String right) -> Int32
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 1
+M00000005_IL_0003:
+ldarg 2
+M00000005_IL_0004:
+call System.String::CompareOrdinal(String,String)
+M00000005_IL_0009:
+ret
+.end
+.end

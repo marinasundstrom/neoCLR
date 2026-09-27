@@ -10,8 +10,9 @@ Selected 2026-09-27. Earlier author requests include consistent System.Text APIs
 general/string comparers, ToUpper/ToLower-style operations, String methods,
 StringBuilder and better time APIs. See the [recorded text requests](../development-timeline.md#2026-09-24--future-systemtext-and-comparer-infrastructure)
 and [application discussion](../development-timeline.md#2026-09-24--future-minimal-http-application-namespace-map).
-The following order is an assistant recommendation within that direction; exact
-API names and broader culture/time contracts remain design decisions.
+The author subsequently requested implementing comparers. That first slice is now
+implemented in development. Later ordering remains an assistant recommendation;
+broader culture/time contracts remain design decisions.
 
 | Order | Bounded work | What it enables and completion boundary |
 | --- | --- | --- |
@@ -20,12 +21,22 @@ API names and broader culture/time contracts remain design decisions.
 | 3 | Explicit casing and comparison policies | Cover the requested ToUpper/ToLower-style behavior with Unicode examples. Specify expanding mappings, normalization and culture policy before advertising case-insensitive equality or hashing. HTTP ASCII casing is not a general text implementation. |
 | 4 | Parsing and presentation gaps, then a bounded time/reporting consumer | Add a needed scalar parser or formatter with typed failures; build on existing Date/Time/Instant/Duration and clocks for a concrete report. Time zones and full globalization remain separately scoped. |
 
-**First slice:** inspect the current Raven public surface, define the comparer
-contract in the existing [Map design](../map-contracts.md), implement its HashMap
-consumer, and publish matching API documentation plus a tested sample. Current
-HashMap source still requires separate equality and hash callbacks; String already
-provides exact equality and CompareOrdinal. This is planned work, not a new API
-implemented or released by the roadmap update.
+**Comparer slice complete in development (2026-09-27):** EqualityComparer<T>,
+Comparer<T>, both Delegate* adapters and StringComparer.Ordinal are implemented in
+Raven. HashMap accepts an equality policy and retains callback construction. The
+[Map design](../map-contracts.md#comparer-policies-development) records signatures,
+.NET comparisons, null domains and native UTF-8 ordering. No universal Default,
+culture/case-insensitive policy or sorting API is claimed. Next candidate: the
+bounded text-construction/report slice above.
+
+[Validation evidence](../experiments/raven-target/comparer-validation.json): six
+focused source scenarios, six metadata admission checks and five existing map/GC
+runtime regressions pass. Editor discovery, matching API snapshot and the website
+build/18 website tests passed before the author asked to skip website builds.
+The final library regeneration matches the tested profile. Runtime execution used
+the extracted Preview 10 binary with the new library and bridge; no new package or
+website was published. The broad metadata probe has separate stale union assertions
+tracked with [tooling](toolchain-release.md#integration-and-correctness).
 
 Reuse the Map design’s .NET Dictionary/EqualityComparer comparison and the
 [ordinal text comparison](../ordinal-text.md#net-baseline-alternatives-and-decision).
@@ -44,11 +55,13 @@ are not evidence it is still missing. Skip companions that introduce new culture
 ABI or lifetime decisions. Collection removal/enumeration, richer JSON mapping,
 reflection execution and general resource cleanup remain consumer-driven follow-ups.
 
-**Acceptance per slice:** focused contract tests, one compiled and executed Raven
-consumer, matching reference/XML/snapshot coverage and the combined website build.
-Check editor discovery and packaged execution where the projection changes. Reuse
-unaffected evidence; do not run every platform matrix for each API addition. No
-performance claim or optimization gate is implied.
+**Acceptance per slice:** run only tests necessary for the changed contract and a
+relevant executable Raven consumer; maintain matching reference/XML/snapshot coverage.
+Check editor discovery or packaged execution when the projection makes those checks
+necessary. Avoid routine website builds for unrelated work. Include performance tests when a
+concrete performance question requires them. Reuse unaffected evidence; run a full
+suite or platform matrix only when the change or unresolved uncertainty requires it,
+per the author’s 2026-09-27 clarification.
 
 ## Recorded checkpoints and remaining scope
 
@@ -69,7 +82,7 @@ retains detailed rationale and .NET comparison links.
 
 | Issue | Known boundary and bounded next action |
 | --- | --- |
-| [#3 comparers](https://github.com/marinasundstrom/neoCLR/issues/3), [#8 comparisons](https://github.com/marinasundstrom/neoCLR/issues/8), [#11 Text API](https://github.com/marinasundstrom/neoCLR/issues/11) | Start with a deterministic comparison consumer; specify ordering, equality/hash agreement and Unicode/culture differences before broad overloads or namespaces. |
+| [#3 comparers](https://github.com/marinasundstrom/neoCLR/issues/3), [#8 comparisons](https://github.com/marinasundstrom/neoCLR/issues/8), [#11 Text API](https://github.com/marinasundstrom/neoCLR/issues/11) | Development comparer slice now covers reusable equality/hash and ordering policies, ordinal strings and HashMap integration. Default selection, case/culture policies and broader System.Text remain separate gaps. |
 | [#4 constants](https://github.com/marinasundstrom/neoCLR/issues/4) | Verify missing scalar bounds/Boolean strings against the Raven surface; do not assign UTF-16 bounds to grapheme Char. Suitable companion only when selected. |
 | [#5 parsing](https://github.com/marinasundstrom/neoCLR/issues/5), [#10 globalization](https://github.com/marinasundstrom/neoCLR/issues/10) | Int32.Parse already has a typed Result/ASCII contract. Add one needed type; generic parsing/error and culture policy are separate decisions. |
 | [#6 enum flags](https://github.com/marinasundstrom/neoCLR/issues/6) | Reconcile historical HasFlag support with the current public projection; test zero/combinations/unnamed bits before closing a gap. No enum-model redesign. |

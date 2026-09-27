@@ -78,6 +78,12 @@ if (args.Length == 2 && args[0] == "--slices")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--comparer-signatures")
+{
+    ComparerChecks.Write(args[1]);
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--signatures")
 {
     SignatureProbe.Write(args[1]);

@@ -1,0 +1,5 @@
+; Generated from runtime/raven/src/System/Collections/Comparer.rvn. Regenerate with build_runtime_library.py.
+.interface System.Collections.Comparer<T0>
+.method instance Compare(T0 left,T0 right) -> Int32
+.end
+.end

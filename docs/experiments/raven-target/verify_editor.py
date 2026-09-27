@@ -25,6 +25,7 @@ array_invariance = '--array-invariance' in sys.argv[2:]
 array_shape = '--array-shape' in sys.argv[2:]
 collection_capabilities = '--collection-capabilities' in sys.argv[2:]
 maps = '--maps' in sys.argv[2:]
+comparers = '--comparers' in sys.argv[2:]
 project_references = '--project-references' in sys.argv[2:]
 server = json.loads((project / '.vscode/settings.json').read_text())['raven.languageServerPath']
 messages = queue.Queue()
@@ -426,6 +427,23 @@ try:
             assert {'Count', 'GetIterator', 'ToList'}.issubset(labels), labels
             assert ('Add' in labels) == can_add, labels
             results['Collection capabilities ' + shape] = labels
+    if comparers:
+        for version, shape, expected in (
+                (70, 'EqualityComparer<string>', ('Equals', 'GetHashCode')),
+                (71, 'Comparer<string>', ('Compare',)),
+                (72, 'StringComparer', ('Equals', 'GetHashCode', 'Compare'))):
+            text = ('import System.*\nimport System.Collections.*\n'
+                    'func Inspect(policy: ' + shape + ') {\n    policy.\n}')
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},
+                'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+                'position': {'line': 3, 'character': len('    policy.')},
+                'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
+            items = result if isinstance(result, list) else result['items']
+            labels = sorted({item['label'] for item in items})
+            assert all(any(label == name or label.startswith(name + '(') for label in labels)
+                       for name in expected), labels
+            results['Comparer ' + shape] = labels
     if maps:
         for version, shape, mutable in ((55, 'Map<int, string>', False),
                                         (56, 'MutableMap<int, string>', True),

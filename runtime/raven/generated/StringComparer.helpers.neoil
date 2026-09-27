@@ -1,0 +1,39 @@
+; Generated from runtime/raven/src/System/StringComparer.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.StringComparer.RuntimeStringEquals(String source,String value0) -> Boolean
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::Equals(String)
+ret
+.end
+.function neoCLR.Library.System.StringComparer.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.StringComparer.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.function neoCLR.Library.System.StringComparer.RuntimeReflection9D228A0DB4CAD74E(System.Object arg0) -> Int32
+ldarg arg0
+callvirt instance System.Object::GetHashCode()
+ret
+.end

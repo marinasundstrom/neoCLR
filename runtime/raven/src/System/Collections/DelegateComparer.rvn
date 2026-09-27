@@ -1,0 +1,15 @@
+namespace System.Collections
+
+/// Adapts an ordering callback into a reusable policy.
+public class DelegateComparer<T> : Comparer<T> {
+    // Explicit storage: the pinned compiler treats uninitialized private var as getter-only.
+    private field compare: System.Func<T, T, int>
+
+    init(compare: System.Func<T, T, int>) {
+        self.compare = compare
+    }
+
+    func Compare(left: T, right: T) -> int {
+        return compare(left, right)
+    }
+}

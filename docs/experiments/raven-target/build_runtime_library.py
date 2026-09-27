@@ -10,6 +10,12 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    "EqualityComparer": "System.Collections.EqualityComparer",
+    "Comparer": "System.Collections.Comparer",
+    "DelegateEqualityComparer": "System.Collections.DelegateEqualityComparer",
+    "DelegateComparer": "System.Collections.DelegateComparer",
+    "StringComparer": "System.StringComparer",
+
     "ReflectionError": "System.Runtime.Reflection.ReflectionError",
     'JsonError': 'System.Data.Json.JsonError',
     'HttpJsonError': 'System.Web.Http.Json.HttpJsonError',
@@ -139,6 +145,12 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    "EqualityComparer": "runtime/raven/src/System/Collections/EqualityComparer.rvn",
+    "Comparer": "runtime/raven/src/System/Collections/Comparer.rvn",
+    "DelegateEqualityComparer": "runtime/raven/src/System/Collections/DelegateEqualityComparer.rvn",
+    "DelegateComparer": "runtime/raven/src/System/Collections/DelegateComparer.rvn",
+    "StringComparer": "runtime/raven/src/System/StringComparer.rvn",
+
     "ReflectionError": "runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn",
     "ReflectionExtensions": "runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn",
     'JsonValue': 'runtime/raven/src/System/Data/Json/JsonValue.rvn',

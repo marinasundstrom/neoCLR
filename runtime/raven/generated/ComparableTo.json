@@ -2,6 +2,11 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.ComparableTo",
   "inputs": {
+    "runtime/raven/src/System/Collections/EqualityComparer.rvn": "820c9ab4936879f8f60a4882c3ea0bd266c3de4f562c8f61c49b8aac9801258b",
+    "runtime/raven/src/System/Collections/Comparer.rvn": "bea7287fddab87ad0716aab38e82eb9837a03c121d6dd4fde96ab2f87c793592",
+    "runtime/raven/src/System/Collections/DelegateEqualityComparer.rvn": "8e3f4cc920337f644af19d7fa1837178e9af2c870be367a56616a86507e8bb96",
+    "runtime/raven/src/System/Collections/DelegateComparer.rvn": "763508b3a329f0bb172769167adc1facf06217c4d808bee08586ba9b99af8ed6",
+    "runtime/raven/src/System/StringComparer.rvn": "44f8a3d9b552999a9041d9cdfd86b97d80cb230b1ad2d808508035c42550e7e4",
     "runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn": "278c700bbfec1a1279298bfe9927278c14227bbcb7e1760f15dbd6f8de06deb1",
     "runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn": "2b40ec91485820efbde7fac4db1a9e052d1245027fd3998627e98f78b5723ce7",
     "runtime/raven/src/System/Data/Json/JsonValue.rvn": "0c2084dca1bcdf2d1494d9f1942fceb25d060a7a25cd8256a4bfee3fc46a5426",
@@ -115,7 +120,7 @@
     "runtime/raven/src/System/OptionOperators.rvn": "5cba418c282c5c22028e9b1f2772551bc77a1ce270a066c9139938e95d88fb5e",
     "runtime/raven/src/System/ResultOperators.rvn": "591eaf533a3dd37e8e94b5d9d831ee96188887b344ad6e6670e9b8302d3f4652",
     "runtime/raven/src/System/Collections/ArrayList.rvn": "6bc4ea11b0f4d22235f5b938e5cfb4086075d4989a700a29384361e9447e4d1a",
-    "runtime/raven/src/System/Collections/HashMap.rvn": "b41f6da8155ee5d9d4df62d55e18f2cc47fea1bbc9c46d9cff7fa729d955d31e",
+    "runtime/raven/src/System/Collections/HashMap.rvn": "f2a849712be0607185193d10050b33e8ead474a94a796888b9118bcfe79a3ec0",
     "runtime/raven/src/System/Time.rvn": "00ace8a4a59556ac3c5f6d4284669002d30169c6afe0edb80c3d8f25b56d23fc",
     "runtime/raven/src/System/Date.rvn": "a8d71283f3d0beac6cdc74674a057bb7404c0ff3b7eacb1fe92c25394d3d4277",
     "runtime/raven/src/System/Storage/Path.rvn": "e151a0abe2685cdfb32f5889d83263865435f3abda7e38581f2c18c70ce40bc2",
@@ -132,15 +137,15 @@
     "runtime/raven/src/System/Boolean.rvn": "3daceb359864c13e8b4c1ba2c22b7666e8ac8c4591747cb973e43f0f2cc38081",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
-    "runtime/raven/System.Runtime.rvnproj": "08618b74d979da3901d2f65d0676017fe771152e0f0e8d5e9bd3eb37e8183e09",
+    "runtime/raven/System.Runtime.rvnproj": "d9c219246f4dcda77eb01b82dc6f889f76eec4b75dbc9acc457f2bd6564c54e0",
     "build/NeoCLR.Raven.props": "4eb1e8c16f00288330d6ea56b2966d6719dea83e6aab42fa77f38a3dffc3e75b"
   },
   "outputs": {
     "ComparableTo.methods.neoil": "815d6ca2f968667b8ffec2feed5d91056d37e4e9a554b6eb7a1f103e0d615f34",
     "ComparableTo.helpers.neoil": "36081b28c6292aec5e3ab5daa4cabde593b175239c7eeb826b42c28d176c8b7f"
   },
-  "compilerSha256": "e5c8932f56be6b5de729f51b00a02fcca4a249f0be10b58b79640c94f23a02b8",
-  "coreSha256": "a18797e38a0a8aa64ce4139d74d6f58c149c5dbf5915b0ffcad9404301c06f05",
+  "compilerSha256": "9e540c5c3f3d2ea673e6e60e4bfc621180d8d7b6158a4a22e085e8439a9a7e1c",
+  "coreSha256": "1922a81348abb9d5c8877872d990b4315ae4138281f0d7203a8424835dfe182b",
   "exports": [
     "CompareTo(T0 other) -> Int32"
   ]

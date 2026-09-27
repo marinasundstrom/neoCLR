@@ -13,7 +13,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Select useful library API coverage as the next author-directed work. Record a
   proposed comparer-first sequence, earlier text/casing/StringBuilder/time requests,
   bounded companion tasks and focused validation in the existing theme trackers.
-  This is planning; no new API is implemented.
+  The later text, casing and time slices remain planned.
+- Implement Raven EqualityComparer<T> and Comparer<T> interfaces, callback adapters
+  and StringComparer.Ordinal. Add HashMap policy construction while preserving the
+  callback constructor; both comparer methods retain the map's reentry protection.
+  Ordinal uses exact content equality/hash and native UTF-8 ordering. No universal
+  default, case-insensitive or culture policy is added. Refresh library/reference
+  artifacts, API docs, feature pages and focused source/metadata/GC/editor evidence.
+  Correct the signature probe's TaskOutcome interface assertion; its obsolete
+  Result payload-setter assertion remains tracked separately.
+- Record the author's focused-validation policy: only necessary checks, performance
+  tests when relevant, and a full suite only when needed. Skip unrelated website builds.
 
 ## 0.1.0-preview.10 — 2026-09-27
 

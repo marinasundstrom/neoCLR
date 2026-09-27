@@ -376,4 +376,19 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HttpJsonError'">
     <Compile Include="src/System/Web/Http/Json/HttpJsonError.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EqualityComparer'">
+    <Compile Include="src/System/Collections/EqualityComparer.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Comparer'">
+    <Compile Include="src/System/Collections/Comparer.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'DelegateEqualityComparer'">
+    <Compile Include="src/System/Collections/DelegateEqualityComparer.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'DelegateComparer'">
+    <Compile Include="src/System/Collections/DelegateComparer.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StringComparer'">
+    <Compile Include="src/System/StringComparer.rvn" />
+  </ItemGroup>
 </Project>

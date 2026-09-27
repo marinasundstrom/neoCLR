@@ -98,10 +98,34 @@ Report issues with a small program, the toolchain version, expected behavior and
 
 Development generic API signatures admit Object map keys and values. `HashMap<Object, Object>` uses explicit equality and hash callbacks: Path and type descriptors use their own contracts, supported boxed integers and Booleans compare by value, and ordinary classes retain allocation identity. A tested sample covers mixed keys, collisions, replacement, table growth and reference-preserving values through GC. A default comparer is not supplied. Strings use content equality and hashes through Object; callers still select the callbacks.
 
+## Comparer policies (development)
+
+After Preview 10, `EqualityComparer<T>` pairs equality with hashing and `Comparer<T>`
+supplies ordering. `StringComparer.Ordinal` implements both for exact string content.
+HashMap accepts a reusable policy; the callback constructor remains supported.
+
+```raven
+{{COMPARER_MAP_SAMPLE}}
+```
+
+This excerpt comes from the [executable comparer checks](../../samples/library-comparers.rvn).
+The `Check` helper faults if a condition fails. Equal text has equal hashes, while
+case and normalization differences remain distinct. Ordinal ordering follows UTF-8
+bytes/Unicode scalar values, which differs from .NET UTF-16 ordering for some characters.
+
+Use `DelegateEqualityComparer<T>` or `DelegateComparer<T>` to adapt callbacks, or
+implement the interfaces for a named policy. Policy behavior and keys must remain
+stable while stored; callbacks must not reenter the same map. No universal default,
+culture or case-insensitive policy is supplied. The development APIs require rebuilt
+matching references and runtime library artifacts; they are not in Preview 10.
+
 ## API reference
 
 Browse [ArrayList](xref:System.Collections.ArrayList`1),
 [HashMap](xref:System.Collections.HashMap`2),
+[EqualityComparer](xref:System.Collections.EqualityComparer`1),
+[Comparer](xref:System.Collections.Comparer`1),
+[StringComparer](xref:System.StringComparer),
 [collection interfaces](xref:System.Collections) and
 [query operators](xref:System.Linq.Operators) for signatures,
 member descriptions and the current development contract.

@@ -1,0 +1,7 @@
+namespace System.Collections
+
+/// Defines a stable equality relation and matching hash codes.
+public interface EqualityComparer<T> {
+    func Equals(left: T, right: T) -> bool
+    func GetHashCode(value: T) -> int
+}

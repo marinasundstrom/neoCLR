@@ -5,10 +5,16 @@ It reads a checked-in compiler reference assembly and the authored XML sidecar,
 then renders Raven signatures with the same layout, navigation and development
 notice as the Markdown guides. No DocFX build, metadata YAML or second site exists.
 
-The site documents Preview 10. Keep generated signatures and authored guides
+The site documents Preview 10 plus explicitly labeled development additions.
+Comparer policies and the HashMap policy constructor are post-Preview-10 APIs. Keep generated signatures and authored guides
 aligned with the matching runtime and compiler reference artifacts.
 
 ## Build and refresh
+
+Author direction (2026-09-27): run only validation needed for the change; do not
+routinely run the full suite or website build. Keep matching API artifacts current
+and run necessary snapshot checks. Use the website commands below when relevant
+to the change, explicitly requested, or required by hosted validation.
 
 ```sh
 python3 scripts/build-website.py

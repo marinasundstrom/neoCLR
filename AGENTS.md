@@ -101,6 +101,20 @@ See [the changelog workflow](docs/changelog.md) for consolidation and release ha
 - Keep routine changes in the changelog. A routine "continue" need not receive its own
   entry; do not infer approval of every implementation choice from continuation or silence.
 
+## Focused validation
+
+- Run only the checks necessary to establish that the changed behavior works.
+  Prefer focused contract tests and a relevant executable consumer; reuse unaffected
+  evidence instead of repeating broad suites or platform matrices. Run a full suite
+  when the change’s impact or unresolved uncertainty makes it necessary.
+- Include performance tests when performance is part of the change, a suspected
+  regression materially affects supported use, or a release criterion requires it.
+  Do not add benchmarks to routine API work without a relevant performance question.
+- Do not routinely build the website for unrelated work. Run a website build only
+  when needed to verify the change or explicitly requested; honor task-specific skip
+  directions. This author direction, clarified 2026-09-27, supersedes earlier routine
+  build requirements. Keep website/API content and necessary snapshot checks current.
+
 ## Website maintenance
 
 - Review website content with each feature change and before release. Follow
@@ -127,6 +141,6 @@ See [the changelog workflow](docs/changelog.md) for consolidation and release ha
   record the exact exclusion and reason. Do not silently omit public APIs. Track
   existing coverage gaps explicitly in [API documentation maintenance](api-docs/README.md)
   and close them as those areas are developed.
-- Validate the API snapshot and build the combined website before committing API
-  changes. Follow [the maintenance procedure](api-docs/README.md); publication remains
-  a separate manual operation.
+- Validate the API snapshot before committing API changes; local website builds
+  follow the focused-validation rule above. Follow the
+  [maintenance procedure](api-docs/README.md); publication remains a separate manual operation.

@@ -3,8 +3,8 @@ namespace System.Collections
 import System.Option.*
 
 public class HashMap<K, V> : MutableMap<K, V> {
-    private field equal: System.Func<K, K, bool>
-    private field hash: System.Func<K, int>
+    // Explicit storage: the pinned compiler treats uninitialized private var as getter-only.
+    private field comparer: EqualityComparer<K>
     private field buckets: int[]
     private field keys: ArrayList<K>
     private field values: ArrayList<V>
@@ -13,8 +13,17 @@ public class HashMap<K, V> : MutableMap<K, V> {
     private field busy: bool
 
     init(equal: System.Func<K, K, bool>, hash: System.Func<K, int>) {
-        self.equal = equal
-        self.hash = hash
+        comparer = DelegateEqualityComparer<K>(equal, hash)
+        buckets = [0, 0, 0, 0]
+        keys = ArrayList<K>()
+        values = ArrayList<V>()
+        hashes = ArrayList<int>()
+        next = ArrayList<int>()
+        busy = false
+    }
+
+    init(comparer: EqualityComparer<K>) {
+        self.comparer = comparer
         buckets = [0, 0, 0, 0]
         keys = ArrayList<K>()
         values = ArrayList<V>()
@@ -38,14 +47,14 @@ public class HashMap<K, V> : MutableMap<K, V> {
     }
 
     private func HashKey(key: K) -> int {
-        return hash(key) & 2147483647
+        return comparer.GetHashCode(key) & 2147483647
     }
 
     private func Locate(key: K, hash: int) -> int {
         var node = buckets[hash % buckets.Length]
         while node != 0 {
             let index = node - 1
-            if hashes[index] == hash && equal(keys[index], key) {
+            if hashes[index] == hash && comparer.Equals(keys[index], key) {
                 return index
             }
             node = next[index]
