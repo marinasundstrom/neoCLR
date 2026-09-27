@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Correct the website's shared banner, footer and release link to Preview 11;
+  its site configuration still displayed Preview 10 after the release content update.
+
 - Explain HttpServer through an application-owned accept loop, separating request
   handling models from the listener. Show the existing report-server loop directly
   from its source, including rejection policy, completion and cleanup.
