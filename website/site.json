@@ -40,5 +40,9 @@
   ],
   "showToc": true,
   "toc": "toc.yml",
-  "favicon": "favicon.svg"
+  "favicon": "favicon.svg",
+  "extensionNamespaces": [
+    "System.Linq",
+    "System.Runtime.Reflection"
+  ]
 }

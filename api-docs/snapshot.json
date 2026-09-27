@@ -2,7 +2,7 @@
   "assemblySha256": "3216c1a6feb3a2895984cbc7c2e0f873bcac651380ffabafee66b68ecf01300b",
   "inputs": {
     "api-docs/NeoCLR.CoreProbe.xml": "5d05c0a8d88364853d26aacbfb0b36556fde6fe3d8d6b19127822481609ed4a1",
-    "api-docs/exclusions.json": "956de68b9ec807befaa75a70dd7fef8dae8ee10068aed0c72b17fa58bad0cead",
+    "api-docs/exclusions.json": "071d4f84b97b9c78e408b587e4a6cbd12b285107d384a42c1ed73f7a1d6f0a44",
     "api-docs/manual-members.json": "0095803d78be03e5dfd16ca19bb95a6295c96db48f7c0db190cdd049da2120f4",
     "api-docs/manual-types.json": "7d7f9b3611c9a42f7b05df0a24f9f58b297705eefdcd316a0947feafba49228b",
     "api-docs/types.json": "956fff33bad95b14f3ce4ce5a9b17d7ea396e2329d284754d85b80e128f6bed6",

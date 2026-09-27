@@ -15,7 +15,8 @@ section-navigation model as authored menus. On small screens the sidebar opens
 as an off-canvas drawer. neoCLR selects `namespaceNavigation: flat`, listing full
 namespace names as peers while each expands to its types. RavenDoc also supports
 `hierarchical` (the default); this option does not change reference URLs. Every
-namespace expands to its overview, including namespaces without direct types.
+populated namespace expands to its overview and direct members. Empty namespaces
+are hidden by default; `showEmptyNamespaces: true` restores their grouping rows.
 Type navigation and headings show declared names such as Object, String and Char;
 code signatures keep Raven aliases.
 
@@ -69,3 +70,22 @@ Member pages derive Parameters and Property value/Return value/Field value/Event
 type sections from symbols, with navigable types even without authored comments.
 XML and Markdown descriptions enhance that contract; remarks and examples can be
 added over time. The owner is labeled Declaring type, distinct from the value type.
+
+## Semantic reference browsing
+
+The pinned publisher includes inherited instance members with linked origins and
+interface implementation/default information. Static members appear only on the
+type that declares them. Readers can group by member kind or declaring type and
+toggle inherited members; these preferences persist in their browser.
+
+neoCLR opts into applicable extensions from `System.Linq` and
+`System.Runtime.Reflection`. Extensions join Methods or Properties when grouping
+by kind, and their declaring container when grouping by type. A purple E badge
+distinguishes extensions; ordinary static members have a red S badge.
+
+Union and enum sidebar entries link directly to their overview. Union cases have
+individual pages linked from the union, and generic companion members belong to
+the logical union. The sidebar scrolls independently of the article.
+
+See [RavenDoc integration](../../docs/ravendoc-integration.md) for authored API
+content, upstream ownership, compiler interpretation changes and validation.
