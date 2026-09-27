@@ -20,14 +20,17 @@ parser.add_argument('--sdk', type=Path, help='Separate extracted Raven SDK; defa
 parser.add_argument('--case', choices=['all', 'server', 'pair', 'client'], default='all')
 parser.add_argument('--repeat', type=int, default=1, help='Repeat the selected peer checks serially after building once')
 parser.add_argument('--mapped', action='store_true', help='Use the provisional reflection-backed report variant')
+parser.add_argument('--nested', action='store_true', help='Use development nested station models (implies --mapped)')
 args = parser.parse_args()
+if args.nested:
+    args.mapped = True
 if args.repeat < 1:
     parser.error('--repeat must be at least 1')
 here = Path(__file__).resolve().parent
 bundle = args.toolchain_root.resolve()
 runner = args.runner.resolve()
 env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(args.sdk.resolve() if args.sdk else bundle / 'raven-sdk'))
-report = {'station': 'Café'}
+report = {'station': {'name': 'Café'}} if args.nested else {'station': 'Café'}
 reply = {'accepted': True}
 
 
@@ -58,7 +61,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
             shutil.copyfile(here / filename, target / filename)
         if args.mapped:
             mapping = here.parent / 'json-object-mapping'
-            shutil.copyfile(mapping / 'HttpApplication.rvn', target / 'Application.rvn')
+            shutil.copyfile(mapping / ('NestedHttpApplication.rvn' if args.nested else 'HttpApplication.rvn'), target / 'Application.rvn')
             shutil.copyfile(mapping / ('Http' + name + '.rvn'), target / (name + '.rvn'))
         apps[name] = build(target / (name + '.rvnproj'))
 
@@ -110,6 +113,14 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
             ('POST', '/reports', b'{"station":"Caf\\u00e9","extra":true}', 201, reply),
             ('GET', '/missing', None, 404, {'error': 'Not found'}),
         ]
+        if args.nested:
+            cases[9] = ('POST', '/reports', b'{"station":{"name":""}}', 201, reply)
+            cases[10] = ('POST', '/reports', b'{"station":{"name":"Caf\\u00e9","extra":true}}', 201, reply)
+            cases += [
+                ('POST', '/reports', b'{"station":{}}', 400, {'error': 'Invalid report'}),
+                ('POST', '/reports', b'{"station":{"name":12}}', 400, {'error': 'Invalid report'}),
+                ('POST', '/reports', b'{"station":{"name":null}}', 400, {'error': 'Invalid report'}),
+            ]
         for method, path, payload, status, expected in cases:
             print(f'Peer case: {method} {path} -> {status}', flush=True)
             request = Request(f'http://127.0.0.1:{port}{path}', data=payload, method=method, headers={'Content-Type': 'application/json; charset=utf-8'})
@@ -150,7 +161,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
     for iteration in range(1, args.repeat + 1):
         print(f'Iteration {iteration}/{args.repeat}: {args.case}', flush=True)
         if args.case in ('all', 'server'):
-            serve(independent, 12)
+            serve(independent, 15 if args.nested else 12)
         if args.case in ('all', 'pair'):
             serve(client, 2 if args.mapped else 1)
         if args.case in ('all', 'client'):

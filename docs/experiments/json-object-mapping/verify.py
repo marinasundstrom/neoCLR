@@ -33,7 +33,19 @@ def main():
                                 capture_output=True, text=True, timeout=120)
         assert result.returncode == 0, result.stdout + result.stderr
         expected = 'Public JSON mapping checks passed' if args.public else 'JSON object mapping checks passed'
-        assert result.stdout.splitlines() == [expected], result.stdout
+        lines = result.stdout.splitlines()
+        if args.public:
+            # Instrumented constructors/setters must run for valid models, but no
+            # model code may run while rejecting an invalid nested input tree.
+            start = lines.index('Invalid nested input begins')
+            end = lines.index('Invalid nested input ends')
+            assert end == start + 1, result.stdout
+            for event in ('Nested constructor executed', 'Nested setter executed'):
+                assert event in lines[:start], result.stdout
+            events = {'Nested constructor executed', 'Nested setter executed',
+                      'Invalid nested input begins', 'Invalid nested input ends'}
+            lines = [line for line in lines if line not in events]
+        assert lines == [expected], result.stdout
         assert 'live=0' in result.stderr, result.stderr
         print(result.stdout + result.stderr)
 

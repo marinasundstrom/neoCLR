@@ -25,10 +25,17 @@ internal class ObjectMapper {
         if type.Equals(typeof(string)) || type.Equals(typeof(int)) || type.Equals(typeof(bool)) {
             return Ok(())
         }
-        return Error(JsonError.UnsupportedMapping("Unsupported property type: " + property.Name))
+        return CheckType(type)
     }
 
     static func Write(value: Object) -> Result<JsonObject, JsonError> {
+        return WriteObject(value, 0)
+    }
+
+    private static func WriteObject(value: Object, depth: int) -> Result<JsonObject, JsonError> {
+        if depth >= 4 {
+            return Error(JsonError.LimitExceeded("Object depth exceeds four (or cyclic graph)"))
+        }
         let type = value.GetType()
         _ = CheckType(type)?
         let document = JsonObject()
@@ -41,6 +48,11 @@ internal class ObjectMapper {
                         return Error(JsonError.Reflection(reason))
                     }
                 }
+                if item is Object present {
+                    if !present.GetType().Equals(property.PropertyType) {
+                        return Error(JsonError.UnsupportedMapping("Polymorphic property: " + property.Name))
+                    }
+                }
                 if item is string text {
                     _ = document.Add(property.Name, JsonString(text))?
                 } else if item is int number {
@@ -48,6 +60,9 @@ internal class ObjectMapper {
                     _ = document.Add(property.Name, scalar)?
                 } else if item is bool flag {
                     _ = document.Add(property.Name, JsonBoolean(flag))?
+                } else if item is Object child {
+                    let nested = WriteObject(child, depth + 1)?
+                    _ = document.Add(property.Name, nested)?
                 } else {
                     return Error(JsonError.UnsupportedMapping("Null property: " + property.Name))
                 }
@@ -57,11 +72,22 @@ internal class ObjectMapper {
     }
 
     static func Read(value: JsonValue, type: TypeInfo) -> Result<Object, JsonError> {
+        // Validate the entire input tree before executing any model user code.
+        _ = ReadObject(value, type, 0, 0)?
+        return ReadObject(value, type, 0, 1)
+    }
+
+    // Pass 0 validates; pass 1 constructs. Integer mode avoids the current bridge
+    // limitation on Boolean conversions at multi-argument private calls.
+    private static func ReadObject(value: JsonValue, type: TypeInfo, depth: int, construct: int) -> Result<Object, JsonError> {
+        if depth >= 4 {
+            return Error(JsonError.LimitExceeded("Object depth exceeds four"))
+        }
         _ = CheckType(type)?
         if value is JsonObject document {
             let properties = ArrayList<PropertyInfo>()
             let values = ArrayList<Object>()
-            // Validate supplied values before invoking any constructor or setter.
+            // The validation pass traverses the same shape without model construction.
             for property in type.GetProperties() {
                 if !property.IsStatic && property.GetSetMethod() is Some(_) {
                     _ = CheckProperty(property)?
@@ -80,15 +106,21 @@ internal class ObjectMapper {
                         } else {
                             return Error(JsonError.TypeMismatch("Int32 property " + property.Name))
                         }
-                    } else {
+                    } else if propertyType.Equals(typeof(bool)) {
                         if item is JsonBoolean flag {
                             values.Add(flag.Value)
                         } else {
                             return Error(JsonError.TypeMismatch("Boolean property " + property.Name))
                         }
+                    } else {
+                        let nested = ReadObject(item, propertyType, depth + 1, construct)?
+                        values.Add(nested)
                     }
                     properties.Add(property)
                 }
+            }
+            if construct == 0 {
+                return Ok(document)
             }
             let instance = match type.CreateInstance() {
                 Ok(let created) => created

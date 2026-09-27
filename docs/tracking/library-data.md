@@ -7,12 +7,15 @@ useful API gaps, including earlier requests. The completed HTTP POC remains clos
 
 ## Web API JSON dependency
 
-**Selected 2026-09-27; implementation pending.** Extend the existing flat typed
-mapper to nested reference objects for the [Web API plan](../web-api-plan.md).
+**Implemented in development, 2026-09-27.** The existing typed mapper now supports
+nested reference objects for the [Web API plan](../web-api-plan.md).
+See [focused and HTTP evidence](../experiments/json-object-mapping/nested-validation.json).
 This tracker owns mapping behavior and serializer limits; HTTP owns endpoint and
-application acceptance. Preserve existing scalar/name/error contracts initially,
-validate the whole input tree before constructors/setters, and bound recursion.
-Nulls, collections, cycle handling and useful payload limits need explicit contracts;
+application acceptance. The first slice preserves existing scalar/name/error contracts, validates the whole
+input tree before constructors/setters, and bounds recursion to four object levels.
+Cycles fail at the depth bound; shared children are independent subtrees. Nulls
+remain rejected. Collections, nullable/optional values and useful payload limits
+remain next contract choices;
 the plan distinguishes the first nested-object slice from later API requirements.
 SQLite stays exploratory under the [SQL proposal](../proposals/sql-data-access.md).
 

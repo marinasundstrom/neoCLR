@@ -197,3 +197,49 @@ A run overlapping library regeneration timed out. The isolated run passed withou
 changing any deadline. This remains a limitation under load, not evidence of
 production readiness or a reason to weaken the timeout checks. The DOM sample
 remains available separately; no full suite or website build was run.
+
+
+## Nested objects — development, 2026-09-27
+
+The public mapper now supports nested nongeneric reference properties, retaining
+exact names, required writable properties and String/Int32/Boolean leaves. Full
+input validation precedes all model constructors/setters. Nulls, polymorphic
+property values, collections and generic/value models remain unsupported. Four
+object levels including the root are allowed; cycles/deeper graphs return
+LimitExceeded. Shared children are repeated in JSON and restored independently.
+The 128-byte and 32-value document bounds are unchanged.
+
+Run the existing `--public` command for the expanded contract consumer. Constructor
+and setter markers prove successful execution; the verifier asserts that the
+invalid-input region emits no model side effects. Tests also cover shared children,
+four/five levels, cycles, nulls, unsupported collections, inaccessible nested
+constructors and stream output remaining untouched on mapping failure.
+
+The same station-report client/server case can now use
+[NestedHttpApplication.rvn](NestedHttpApplication.rvn): GET /report returns
+`{"station":{"name":"Café"}}`, and POST /reports reads that nested model and
+returns `{"accepted":true}` with status 201. The original flat variant is unchanged.
+Run the nested case with a matching development bundle and measured runtime:
+
+```sh
+python3 docs/experiments/http-json/verify.py --nested --case all \
+  --toolchain-root /absolute/path/to/matching-development-bundle \
+  --runner target/release/examples/measure_async
+```
+
+The website extracts the models, client and server conversion directly from these
+sources and ships the complete project/verifier download. This is explicit HTTP
+composition, not WebApplication, automatic binding, persistence or a release.
+See the [nested mapping design](../../json-dom-design.md#nested-typed-objects--development-2026-09-27)
+and [validation evidence](nested-validation.json).
+
+
+Validation on macOS arm64: the public consumer passes with 6,295 allocations,
+96 collections, peak 239 and zero final live objects. All 15 nested HTTP server
+cases pass; the neoCLR pair uses 971 client / 799 server allocations, and the
+independent-peer client uses 999, all with zero final live objects. These are
+correctness results, not latency/load guarantees. The general HttpClient website
+example also passes its independent fragmented-UTF-8 peer, checking its Accept
+header and decoded output (570 allocations, zero final live objects).
+The bridge was rebuilt before final validation to retain the current GC and
+Reflection reference surface. No runtime/compiler behavior outside JSON changed.

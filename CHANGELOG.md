@@ -8,12 +8,20 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
-- Record the author-selected minimal Web API direction: nested typed JSON first,
-  a separate WebApplication project with Minimal API endpoints, and optional
-  SQLite-backed SQL exploration. Update roadmap ownership and record the proposed
-  scope and acceptance cases; these are plans, not implemented capabilities. Lead
-  the Web page with the tested station-report client/server case and record
-  case-based website samples as part of application acceptance.
+- Extend development JSON serialization/deserialization to nested nongeneric
+  reference properties, with full input-tree validation before model construction
+  or setters. Preserve scalar/name/null/error policies and existing document limits;
+  bound object depth to four including the root, reject polymorphic property values,
+  and serialize shared children as independent subtrees. Add focused mapping checks
+  and a nested station-report client/server case with on-site walkthrough and
+  downloadable tested sources. Introduce a tested general HttpClient example and
+  capability overview before “Case: Building a Http server app”, with the server
+  followed by its connecting client. Give the case its own page and navigation,
+  retain essential code on the feature page, and record contextual cases as a
+  general website convention. Record the author-selected minimal Web API priority
+  and roadmap acceptance scope; a separate WebApplication project with Minimal API
+  endpoints and optional SQLite-backed SQL remain plans. Preview 10 remains
+  flat-model-only.
 
 - Add development System.Runtime.GC with execution-local collection, allocation,
   retained/peak/reclaimed object counters and the host heap-object limit. Add

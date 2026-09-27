@@ -1,6 +1,6 @@
 # Minimal Web API increment
 
-**Author-selected direction, 2026-09-27; implementation pending.** The
+**Author-selected direction, 2026-09-27; first nested JSON slice implemented in development.** The
 [platform roadmap](platform-roadmap.md) sets priority and the
 [HTTP tracker](http-capabilities.md#active-direction--minimal-web-api) owns
 application acceptance. The sequence and detailed contracts below are assistant
@@ -33,8 +33,8 @@ status handling, buffered bodies, cancellation and server-context completion.
 Application routing and WebApplication do not yet exist. The
 [object mapper](../runtime/raven/src/System/Data/Json/ObjectMapper.rvn) handles
 String, Int32 and Boolean properties on nongeneric reference classes, with public
-accessors and exact property names. DOM nesting already exists; typed nesting does
-not. The [JSON design](json-dom-design.md) records the existing mapping policies.
+accessors and exact property names. Typed nesting is now implemented in development; see the
+[nested mapping evidence](experiments/json-object-mapping/nested-validation.json). The [JSON design](json-dom-design.md) records the existing mapping policies.
 
 Current JSON is bounded to 128 UTF-8 bytes and four container levels. HTTP buffered
 bodies allow 1,024 bytes. These are POC limits, not a useful final Web API budget.
@@ -43,14 +43,14 @@ transport and runtime resource limits together; changing one constant is insuffi
 
 ## Proposed delivery sequence
 
-1. **Nested typed JSON — next bounded task.** Recursively map nongeneric reference
-   properties using the existing scalar rules and public parameterless construction.
-   Retain exact names, required writable properties and ignored unknown fields.
-   Initially reject null and unsupported shapes explicitly. Validate the entire
-   supplied tree before executing constructors/setters; execution side effects
-   remain nontransactional. Bound recursion for reads and writes so cycles cannot
-   overflow the stack. Preserve structured reflection/JSON failures and test sibling
-   reuse separately from cycles. Do not silently add polymorphism or reference IDs.
+1. **Nested typed JSON — implemented in development.** The bounded slice maps
+   nested nongeneric reference properties using existing scalar rules and public
+   parameterless construction. It retains exact names, required writable properties,
+   ignored unknown fields and null rejection. The complete supplied tree is validated
+   before constructors/setters; execution side effects remain nontransactional. Four
+   object levels bound recursion and cycles; structured reflection/JSON errors are
+   preserved. Shared children become independent subtrees; polymorphic properties
+   and reference IDs are unsupported. See the linked implementation evidence.
 2. **Useful API payloads.** Select a documented byte/depth budget from the sample;
    exercise limits immediately below, at and above the boundary. Add a bounded
    collection shape for list results and make missing versus null versus optional
@@ -90,7 +90,10 @@ The author additionally requests presentable samples organized by case around
 client and server, rather than disconnected snippets. Each delivered slice should
 advance a coherent walkthrough: the problem, shared models and wire payloads,
 server endpoints, client operations, successful responses and representative errors.
-Provide tested source excerpts, a complete project download, matching setup/run
+Keep cases small and realistic; give selected cases their own documentation page
+and link from the general API guide. The HttpClient overview precedes the separate
+“Case: Building a Http server app” walkthrough. Provide tested source excerpts,
+a complete project download, matching setup/run
 instructions and expected output. Keep API reference details linked separately.
 The existing station-report client/server case is the current starting point;
 introduce the richer nested-model case only with executable evidence. SQLite, if

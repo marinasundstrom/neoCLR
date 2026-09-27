@@ -1,7 +1,7 @@
 {
   "assemblySha256": "d06667f31384a1355a70a81a5887462af061461f25e05af2127154d8d2e48dde",
   "inputs": {
-    "api-docs/NeoCLR.CoreProbe.xml": "eb8890fc88d078ee936f63db07e74e61d7a835dc887f28dd5aeb0f6a17622c40",
+    "api-docs/NeoCLR.CoreProbe.xml": "647b9ce925615a5ada89ff482fedc88c4ba57bfec74c8c483cfac4590f4deb77",
     "api-docs/exclusions.json": "956de68b9ec807befaa75a70dd7fef8dae8ee10068aed0c72b17fa58bad0cead",
     "api-docs/manual-members.json": "0095803d78be03e5dfd16ca19bb95a6295c96db48f7c0db190cdd049da2120f4",
     "api-docs/manual-types.json": "7d7f9b3611c9a42f7b05df0a24f9f58b297705eefdcd316a0947feafba49228b",
@@ -163,10 +163,10 @@
     "runtime/raven/src/System/ConvertibleInto.rvn": "3b711db6244747a305c60df7d33324b655ef50e66e7d86f850be7c8ec660e7bb",
     "runtime/raven/src/System/Data/Json/JsonDocument.rvn": "8f98eeaaf29f0d173c483b80275a4b681b8923d5b8aafbeaf482cb932f4f430c",
     "runtime/raven/src/System/Data/Json/JsonError.rvn": "91c54ccae315e879e1ba14b40386e95d7061e4b1c07a67e74eccbe0e116e8713",
-    "runtime/raven/src/System/Data/Json/JsonSerializer.rvn": "6a20ee47779a31bca09786d4b69dea86d97ae98f36ba98fd5e9d4211d40db695",
+    "runtime/raven/src/System/Data/Json/JsonSerializer.rvn": "ebaccb04cf34b97375b8884cfffad08a16f3d035834437e8de6515cd1bb5a828",
     "runtime/raven/src/System/Data/Json/JsonSyntax.rvn": "b6e61952a1a0b9aa9bd870ba497a4f293ee68e9fa7cdf9d9775e3ec1981b7c0e",
     "runtime/raven/src/System/Data/Json/JsonValue.rvn": "0c2084dca1bcdf2d1494d9f1942fceb25d060a7a25cd8256a4bfee3fc46a5426",
-    "runtime/raven/src/System/Data/Json/ObjectMapper.rvn": "7d93ba9ed492c1cc5685089cf27e7c4a9bf972761b55be07fcab7c944c142701",
+    "runtime/raven/src/System/Data/Json/ObjectMapper.rvn": "6ac651bfe446794adedfb05daa67764e57fbfee1a7385278733dedad69929f7f",
     "runtime/raven/src/System/Date.rvn": "43d0f6bcdb8529de2fd85b5d99e6d2c535f7ad8a73b3b9bd680de9b9c9c13102",
     "runtime/raven/src/System/DateTime.rvn": "8ba1677cd951cd8da8449ed57f76df8805756c5fa3dadbdcaafac9bbd7f6f870",
     "runtime/raven/src/System/Disposable.rvn": "5899f28a3f77a1e2b463689c2e25e19ce39200ea519f49ffba9a77cf0d35769d",

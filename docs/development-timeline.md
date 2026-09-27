@@ -47,7 +47,25 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
 - **Assistant action:** makes the existing station-report case lead the Web page,
   shows its tested server alongside the client, and records case-based website
   acceptance and editorial guidance. Nested JSON implementation follows this
-  planning/presentation commit; runtime completion is not claimed here.
+  planning/presentation commit.
+- **Author presentation correction:** asks for a general HttpClient sample showing
+  its capabilities first, followed by a server sample and a client connecting to it.
+  The assistant adds a standalone tested client example/capability overview ahead
+  of the paired report case and orders that case server-first. The author then
+  selects the heading “Case: Building a Http server app” and explains that cases
+  should show small real-world or realistic uses in context, without needing large
+  samples. The assistant moves the paired case to its own documentation page,
+  links it from the client guide and cases navigation, and records the convention.
+  The author further clarifies that this applies generally to the website, especially
+  feature pages: the case and code should explain what a feature does and how it is
+  used. The assistant retains essential server/client code on the feature page, with
+  the dedicated case supplying the complete context.
+- **Implementation outcome:** the first nested JSON slice is implemented with
+  whole-input validation, bounded recursion and unchanged scalar/null policies.
+  The focused consumer and nested station-report client/server/independent peers
+  pass with zero final live objects; see [evidence](experiments/json-object-mapping/nested-validation.json).
+  Website code is extracted from the tested case. WebApplication and SQLite remain
+  future work; no release or deployment is implied.
 - **Open:** exact framework/project naming, endpoint binding/result signatures,
   JSON null/collection and limit policies, and whether to select SQLite after the
   in-memory consumer. No subsequent author decision on these details is recorded.

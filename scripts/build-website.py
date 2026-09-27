@@ -251,8 +251,13 @@ def main():
         'HTTP_VERB_SAMPLE': ('docs/experiments/http-verbs/Sample.rvn', 'async func ReplaceText(', '\n}', True),
         'HTTP_POST_SAMPLE': ('docs/experiments/http-post/Sample.rvn', 'async func PostText(', '\n}', True),
         'HTTP_REPORT_SERVER_SAMPLE': ('docs/experiments/http-json/Server.rvn', '    func Configure(', '\n    }', True),
+        'HTTP_NESTED_MODELS_SAMPLE': ('docs/experiments/json-object-mapping/NestedHttpApplication.rvn', 'public class Station {', 'public class Acknowledgement {', False),
+        'HTTP_MAPPED_CLIENT_SAMPLE': ('docs/experiments/json-object-mapping/HttpClient.rvn', 'class ReportClient {', '\n}', True),
+        'HTTP_NESTED_READ_SAMPLE': ('docs/experiments/json-object-mapping/NestedHttpApplication.rvn', 'func Acknowledge(', '\n}', True),
+        'HTTP_REPORT_CONNECT_SAMPLE': ('docs/experiments/http-json/Client.rvn', '    let client = HttpClient()', '\n    submission.OnCompleted', False),
         'HTTP_JSON_SAMPLE': ('docs/experiments/http-json/Client.rvn', 'class ReportClient {', '\n}', True),
         'HTTP_SERVER_SAMPLE': ('docs/experiments/http-server/Server.rvn', 'func Respond(', '\n}', True),
+        'HTTP_CLIENT_OVERVIEW_SAMPLE': ('docs/experiments/http-client/Overview.rvn', 'class GreetingClient {', '\n}', True),
         'HTTP_CLIENT_SAMPLE': ('docs/experiments/http-client/Main.rvn', 'async func ReadGreeting(', '\n}', True),
         'SOCKET_SERVER_SAMPLE': ('docs/experiments/socket-echo/Server.rvn', 'async func Serve(', '\n}', True),
         'DNS_RESOLVE_SAMPLE': ('docs/experiments/socket-client/Main.rvn', 'async func ResolveHost()', '\n}', True),
@@ -323,7 +328,7 @@ def main():
     shutil.make_archive(str(downloads / 'http-post'), 'zip', post_downloads)
     http_downloads = downloads / 'http-client'
     http_downloads.mkdir()
-    for name in ('Main.rvn', 'Handlers.rvn', 'HttpClient.rvnproj', 'Reference.cs', 'README.md', 'verify.py'):
+    for name in ('Main.rvn', 'Overview.rvn', 'Handlers.rvn', 'HttpClient.rvnproj', 'Reference.cs', 'README.md', 'verify.py'):
         shutil.copyfile(ROOT / 'docs/experiments/http-client' / name, http_downloads / name)
     shutil.make_archive(str(downloads / 'http-client'), 'zip', http_downloads)
     server_downloads = downloads / 'http-server'
@@ -335,7 +340,7 @@ def main():
     shutil.make_archive(str(downloads / 'http-server'), 'zip', server_downloads)
     json_downloads = downloads / 'http-json'
     for directory, names in (
-        ('json-object-mapping', ('Mapping.rvn', 'Main.rvn', 'Public.rvn', 'JsonObjectMapping.rvnproj', 'verify.py', 'HttpApplication.rvn', 'HttpClient.rvn', 'HttpServer.rvn', 'README.md', 'cost.md', 'cost-results.json')),
+        ('json-object-mapping', ('Mapping.rvn', 'Main.rvn', 'Public.rvn', 'JsonObjectMapping.rvnproj', 'verify.py', 'HttpApplication.rvn', 'NestedHttpApplication.rvn', 'HttpClient.rvn', 'HttpServer.rvn', 'README.md', 'cost.md', 'cost-results.json')),
         ('http-json', ('Client.rvn', 'Server.rvn', 'Application.rvn', 'Client.rvnproj', 'Server.rvnproj', 'README.md', 'limitations.md', 'verify.py')),
     ):
         destination = json_downloads / directory

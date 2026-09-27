@@ -18,17 +18,19 @@ It does not imply inclusion in published Preview 9 or production readiness.
 
 ## Active direction — minimal Web API
 
-**Selected 2026-09-27; implementation pending.** The author now focuses HTTP work
+**Selected 2026-09-27; nested JSON implemented in development.** The author now focuses HTTP work
 on a minimal Web API: nested typed JSON and a separate WebApplication project with
 Minimal API endpoints. See the [bounded plan](web-api-plan.md) for the proposed
 sequence, .NET comparison, acceptance cases and open contracts. This is a new
 increment; it does not reopen Preview 10's completed POC.
 
-The next bounded task is nested object serialization/deserialization, owned by
+Nested object serialization/deserialization is complete for the bounded first slice, owned by
 [library/data](tracking/library-data.md#web-api-json-dependency). Routing, endpoint
 handling and application lifecycle belong here. SQLite remains an optional later
 consumer of the [SQL proposal](proposals/sql-data-access.md), not a Web API gate.
-No nested mapper, router, WebApplication or SQL provider is implemented by this plan.
+The [nested report evidence](experiments/json-object-mapping/nested-validation.json)
+covers independent peers and the managed pair. Routing, WebApplication, broader
+payload/collection contracts and SQL remain unimplemented.
 
 ## Capability matrix
 
@@ -41,7 +43,7 @@ No nested mapper, router, WebApplication or SQL provider is implemented by this 
 | Unknown-length/chunked request bodies | Deferred | Deferred; rejects request transfer coding | Define async producer and optional length before wire support |
 | Response framing | Implemented: fixed-length, bounded chunked and close-delimited reception | Implemented: fixed-length buffered emission | [Framing contract](http-client-design.md#bounded-response-framing-and-head--2026-09-25); incoming chunked responses still fully buffered |
 | Live response/request body streams | Deferred response reader | Deferred request reader and response writer | Separate body lifetime from connection lifetime; trailers and completion semantics |
-| JSON DOM and flat typed mapping | Implemented: shared conversion and generic client helpers | Implemented: shared conversion through handler/context | [Mapped application](experiments/json-object-mapping/README.md), [helpers](experiments/http-json-client/README.md); current JSON size/shape limits remain |
+| JSON DOM and typed mapping | Implemented: shared conversion and generic client helpers | Implemented: shared conversion through handler/context | [Mapped application](experiments/json-object-mapping/README.md), [helpers](experiments/http-json-client/README.md); nested reference objects are implemented in development with [evidence](experiments/json-object-mapping/nested-validation.json); current JSON size/shape limits remain |
 | Cancellation and cleanup | Implemented through lookup/connect/transfer; upload ownership and one-shot rules | Implemented accept/context/complete/shutdown lifetime | [Network cancellation](experiments/network-cancellation/README.md), [context](experiments/http-context/README.md); synchronous source reads cannot be interrupted mid-read |
 | Application pipeline | Implemented custom/forwarding HttpHandler | Implemented Accept/HttpContext and bounded callback hosting | No routing or application framework implied |
 | HTTPS/TLS | Deferred for this cleartext POC | Deferred for this cleartext POC | [TLS feasibility](http-client-design.md#https-feasibility-checkpoint--2026-09-25); wider release scope remains an explicit decision, never an implicit public-network readiness claim |

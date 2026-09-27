@@ -4,7 +4,8 @@ title: JSON serialization
 # JSON serialization
 
 **Preview 10.** [JsonSerializer](xref:System.Data.Json.JsonSerializer)
-reads/writes the closed JsonValue DOM and now has provisional flat-object overloads.
+reads/writes the closed JsonValue DOM and has provisional flat-object overloads.
+**Development after Preview 10** also maps nested nongeneric reference objects.
 Rebuild consumers with the matching Preview 10 reference and library; JsonError has
 new mapping cases. All operations are synchronous and return Result with [JsonError](xref:System.Data.Json.JsonError).
 
@@ -42,18 +43,24 @@ rebuild with matching references and library artifacts.
 
 ## Provisional property rules
 
-- Map String, Int32 and Boolean public instance properties with exact, case-sensitive
+- Map String, Int32 and Boolean public instance properties, plus nested nongeneric
+  reference objects in development, with exact, case-sensitive
   names. No naming policy or attribute support; property order is not promised.
 - Serialize public getters, including read-only properties. Deserialize public
   setters; read-only/private setters and static properties are ignored. Fields are ignored.
 - Every writable mapped property must be present on input. Unknown JSON fields are
   ignored; duplicate decoded names remain invalid. This strict presence rule differs
   from .NET's default treatment of non-required missing properties.
-- Reject null, nested model objects, collections, Option, enums, unsupported scalars
+- Reject null, collections, Option, enums, unsupported scalars
   and indexers in participating properties. Int32 requires a checked integer token;
   fraction/exponent tokens are not coerced.
 
-Validate input property shapes and values before invoking the constructor. Setter
+Development nested writes require each property value to have its declared runtime
+type; polymorphic properties are rejected. Reads use each declared class and its
+public parameterless constructor. Shared children serialize as repeated JSON objects;
+deserialization constructs independent instances rather than preserving identity.
+
+Validate the entire input tree before invoking any model constructor or setter. Setter
 failures and user Faults are not transactional; side effects are not rolled back.
 The Reflection error case retains ReflectionError. UnsupportedMapping identifies
 unsupported shapes through diagnostic text; ordinary syntax, missing-field,
@@ -68,9 +75,11 @@ before touching output; a stream failure can still leave a written prefix. This 
 buffered synchronous conversion, not async stream parsing.
 
 Existing bounds apply: 128 UTF-8 bytes, four container levels, 32 value occurrences,
-31 children per container. Object mapping is flat even though DOM values can nest.
-Recursive models, configurable naming/null policy and
-HTTP verb extensions remain later work. Shared content conversion is described below.
+31 children per container. Development object mapping supports up to four object
+levels including the root; deeper graphs and cycles return LimitExceeded. This
+bounded recursion does not preserve reference identity. Collections, configurable
+limits and naming/null policies remain later work. Shared content conversion is
+described below.
 
 ## HTTP content conversion
 
@@ -90,12 +99,13 @@ Creation sets `application/json; charset=utf-8`. Reads interpret buffered bytes 
 UTF-8 JSON; the caller selects header and status policy. All operations are
 synchronous, preserve the serializer's errors and limits, and leave content reusable.
 Invalid UTF-8 is `JsonError.Read(TextReadError.InvalidUtf8)`. Empty bytes fail JSON
-syntax validation; a `null` document is a JsonNull node, while flat model mapping
+syntax validation; a `null` document is a JsonNull node, while model mapping
 continues rejecting it. The byte limit is checked before decoding.
 
 These methods do not send a request, complete/close a context or add cancellation.
-The [mapped HTTP sample](/features/web/) uses the same helpers on both peers.
-HttpClient verb extensions and request/response conveniences remain later work.
+The [mapped HTTP sample](/cases/http-server/) uses the same helpers on both peers.
+Generic HttpClient verbs are described below; automatic endpoint binding remains
+future work.
 
 ## Error payload reference
 

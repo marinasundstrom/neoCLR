@@ -12,7 +12,9 @@ A rudimentary SQL interface with a SQLite provider is an optional follow-on base
 on the existing proposal, not a prerequisite or approval of its complete surface.
 The [HTTP tracker](http-capabilities.md#active-direction--minimal-web-api) owns
 application acceptance; the [bounded plan](web-api-plan.md) proposes the sequence
-and records design choices still to validate. Start with nested typed JSON mapping.
+and records design choices still to validate. The first nested typed JSON slice is
+implemented in development with [consumer and HTTP evidence](experiments/json-object-mapping/nested-validation.json).
+Next select useful payload/collection contracts before the WebApplication layer.
 This explicitly supersedes the previous general useful-library priority; M2–M6
 remain candidates. Preview 10's completed POC stays closed.
 

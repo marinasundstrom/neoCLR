@@ -5,7 +5,7 @@ import System.IO.*
 import System.Introspection.*
 import System.Result.*
 
-// Provisional DOM codec and shallow object mapping; all I/O is synchronous.
+// Provisional DOM codec and bounded nested object mapping; all I/O is synchronous.
 public class JsonSerializer {
     private init() { }
 

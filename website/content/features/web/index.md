@@ -8,60 +8,73 @@ response through neoCLR TCP sockets, with DNS on the client. HttpClient, HttpSer
 content and handlers are experimental APIs in System.Web.Http. Use the matching
 Preview 10 toolchain.
 
-## Case study: submit a station report
+## HttpClient: call an HTTP service
 
-A station client sends its name to a report service. The service validates the
-request and acknowledges it. Follow both sides of this exchange before exploring
-individual HTTP APIs below.
-
-| Step | Client | Server |
-| --- | --- | --- |
-| Prepare | Build a report containing the station name `Café` | Listen on loopback and accept an exchange |
-| Submit | POST JSON to `/reports` with `application/json` content | Parse the body and require a string-valued `station` |
-| Acknowledge | Check the status and read the acknowledgement | Return 201 with `{"accepted":true}` |
-| Reject bad input | Handle the error status explicitly | Return 400 for invalid JSON/report data, or 404 for an unknown route |
-| Finish | Report the result to the caller | Complete the response and close the exchange |
-
-This case acknowledges a report; it does not save it. The downloadable project
-contains the client, server, shared JSON/error code and an interoperability verifier.
-Use the [setup guide](/try/) for the matching runtime and compiler.
-
-### Client: send the report
+Use HttpClient on its own to call a service. This example sets a base address and
+an Accept header, then fetches a UTF-8 greeting with cancellation support:
 
 ```raven
-{{HTTP_JSON_SAMPLE}}
+{{HTTP_CLIENT_OVERVIEW_SAMPLE}}
 ```
 
-### Server: validate and acknowledge
+Calling `GreetingClient().Read("http://localhost:8080/", token)` requests
+`http://localhost:8080/greeting`. It returns a Task containing either the response
+text or a structured HttpError. `GetString` rejects non-success statuses and
+invalid UTF-8. Acknowledged cancellation cancels the task instead of returning an
+HTTP error. Use `CancellationToken.None` when no cancellation is needed.
+
+### What the client offers
+
+| Need | API and behavior |
+| --- | --- |
+| Send a request | Get, Head, Post, Put, Patch and Delete; Send accepts a prepared HttpRequest |
+| Inspect a response | Get returns HttpResponse with status, headers, content and its associated request; non-2xx responses remain available to inspect |
+| Read text | GetString checks the status and decodes a buffered UTF-8 body |
+| Exchange JSON | `GetFromJson<T>` reads a successful JSON response; `PostAsJson` serializes a model and returns the response for explicit status/body handling |
+| Set addresses and headers | String or Uri addresses, optional BaseUri, DefaultRequestHeaders and per-request WithHeader |
+| Cancel work | Token overloads cover lookup, connection and transfer |
+| Customize sending | HttpHandler supports forwarding behavior and replacement transports for tests |
+| Upload content | Buffered bytes/text or a known-length InputStream source with explicit ownership |
+
+Import `System.Web.Http.Json.*` for JSON helpers. These are bounded experimental
+HTTP/1.1 APIs: no HTTPS, connection pooling or HTTP/2/3 yet. See the limits below.
+
+[Download the general client example and verifier](/samples/http-client.zip).
+`Overview.rvn` contains the full program. With a matching runtime bundle and SDK,
+run the verifier from the extracted directory:
+
+```sh
+python3 verify.py --overview --case "fragmented UTF-8" \
+  --toolchain-root /absolute/path/to/runtime-with-raven-sdk \
+  --runner /absolute/path/to/runtime-with-raven-sdk/tools/http-runner
+```
+
+It starts an independent local service, verifies the Accept header and runs the
+client against a fragmented response. The program prints `HTTP 200` and `Café 🌍`.
+
+## Case: Building a Http server app
+
+A report service accepts a station report and returns `{"accepted":true}`. Its
+server reads the model and constructs an acknowledgement:
 
 ```raven
-{{HTTP_REPORT_SERVER_SAMPLE}}
+{{HTTP_NESTED_READ_SAMPLE}}
 ```
 
-The [application sample](/samples/http-json/http-json/Client.rvn) constructs a report
-with the public System.Data.Json DOM and POSTs it to a neoCLR server. The server
-uses HttpContext to parse the body and return a JSON acknowledgement with status
-201. Bad JSON or report shapes return 400; unknown routes return 404.
+The client fetches a report from the service, submits it, and reads the reply:
 
-Application-owned converters project HttpError and JsonError into AppError while
-retaining the original causes through helpers and async methods. The completion
-callback converts errors to display text at its reporting boundary. Ordinary steps use propagation. The
-server handles invalid input explicitly where it chooses the HTTP response.
+```raven
+{{HTTP_MAPPED_CLIENT_SAMPLE}}
+```
 
-[Download the client/server sample](/samples/http-json.zip). It uses the runtime
-library's JSON parser and includes checks against independent Python HTTP peers.
-Serialization is synchronous; HTTP bodies are currently buffered. The provisional
-DOM limits are 128 UTF-8 bytes, four container levels and 32 values. The development
-sample has an opt-in variant using the provisional [object serializer overloads](/docs/json.html).
-It maps both report and acknowledgement models through checked runtime reflection:
-constructors, getters and setters execute normally. Flat public `string`, `int` and
-`bool` properties are supported, using exact property names. Writable properties
-must be present; extra JSON fields are ignored. Nested models, null mapping and
-naming policies are not supported. The sample's property names match its lowercase
-wire names explicitly. Both mapped peers are checked against independent peers and each other.
-Latency under load is not characterized.
-The downloadable demo defaults to direct DOM mapping; its verifier selects this
-experiment with `--mapped`.
+The server's POST handler uses the first operation to respond with 201; malformed
+reports receive 400. `ReadReply` checks the response status and reads its JSON.
+Preview 10 handles the flat station model; development builds also support the
+nested station shown in the full case.
+
+[Case: Building a Http server app →](/cases/http-server/)
+The walkthrough includes the shared models, routing, client connection setup,
+complete projects, run instructions and expected responses.
 
 ## HTTP building blocks
 
@@ -200,7 +213,12 @@ is a correctness POC, not a performance benchmark. Generated async states still 
 
 ## Direction
 
-Possible next steps include asynchronous body contracts, response streaming, TLS
+The active development direction is a small Web API with nested JSON and a
+WebApplication layer in a separate project. Nested mapping is implemented in
+development; WebApplication and Minimal API endpoint registration remain planned.
+SQLite-backed persistence is an optional exploration.
+
+Possible later steps include asynchronous body contracts, response streaming, TLS
 and persistent connections. HTTP/2 and HTTP/3 would also require version-specific
 providers, multiplexing, flow control and independent stream lifetimes. These are
 future directions, not requirements for the bounded POC or promises for the next release.
@@ -383,17 +401,18 @@ implemented. Retaining the response also retains that request and its content.
 ## Generic JSON client helpers
 
 The development `System.Web.Http.Json` namespace adds `GetFromJson<T>` and
-`PostAsJson<T>`. GET requires a successful status and reads a supported flat model;
+`PostAsJson<T>`. GET requires a successful status and reads a supported model;
 POST serializes a model and returns the response for the application to inspect.
 Both use the client's base URI, default headers and handler, with string/Uri and
 cancellation-token overloads. `HttpJsonError` preserves either the HTTP or JSON
 cause. Cancellation remains task cancellation.
 
 The managed report sample fetches a typed report from a neoCLR server, posts it back,
-and reads a JSON acknowledgement. The initial mapper supports flat String, Int32
-and Boolean properties; the existing 128-byte JSON limit still applies. Conversion
-is synchronous over buffered HTTP content. Per-call header options and richer
-mapping are later work. See [the API guide](/docs/json.html) for the exact scope.
+and reads a JSON acknowledgement. Preview 10 maps flat String, Int32 and Boolean
+properties. Development builds add nested reference objects with the same scalar
+rules; the 128-byte JSON limit still applies. Conversion is synchronous over
+buffered HTTP content. Per-call header options, collections and nullable mapping
+remain later work. See [the API guide](/docs/json.html) for the exact scope.
 
 ## JSON DOM
 

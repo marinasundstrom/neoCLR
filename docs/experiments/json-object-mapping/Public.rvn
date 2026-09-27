@@ -34,6 +34,74 @@ public class NestedReading {
     var Child: Reading { get; set; } = Reading()
 }
 
+public class UnsupportedReading {
+    init() { }
+    var Values: int[] { get; set; } = [1]
+}
+
+public class ObjectProperty {
+    init() { }
+    var Value: Object { get; set; } = "boxed"
+}
+
+public class PostalAddress {
+    private var city: string = ""
+    init() {
+        Console.WriteLine("Nested constructor executed")
+    }
+    var City: string {
+        get => city
+        set {
+            city = value
+            Console.WriteLine("Nested setter executed")
+        }
+    }
+}
+
+public class Contact {
+    init() {
+        Console.WriteLine("Nested constructor executed")
+    }
+    var Name: string { get; set; } = ""
+    var Address: PostalAddress { get; set; } = PostalAddress()
+}
+
+public class AddressPair {
+    init() { }
+    var A: PostalAddress { get; set; } = PostalAddress()
+    var B: PostalAddress { get; set; } = PostalAddress()
+}
+
+public class Cycle {
+    init() { }
+    var Next: Cycle? { get; set; } = null
+}
+
+public class LevelThree {
+    init() { }
+    var Child: PostalAddress { get; set; } = PostalAddress()
+}
+
+public class LevelTwo {
+    init() { }
+    var Child: LevelThree { get; set; } = LevelThree()
+}
+
+public class LevelOne {
+    init() { }
+    var Child: LevelTwo { get; set; } = LevelTwo()
+}
+
+public class TooDeep {
+    init() { }
+    var Child: LevelOne { get; set; } = LevelOne()
+}
+
+public class LockedParent {
+    init() { }
+    var Child: LockedReading? { get; set; } = null
+}
+
 func Check(condition: bool) {
     if !condition {
         System.Fault("Public JSON mapping check failed")
@@ -69,7 +137,7 @@ func RoundTrip() -> Result<unit, JsonError> {
     Check(JsonContent.ReadNode(HttpContent([(byte)255])) is Error(JsonError.Read(TextReadError.InvalidUtf8)))
     let oversized = Utf8.Encode("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
     Check(JsonContent.ReadNode(HttpContent(oversized)) is Error(JsonError.LimitExceeded(_)))
-    Check(JsonContent.Create(NestedReading()) is Error(JsonError.UnsupportedMapping(_)))
+    Check(JsonContent.Create(UnsupportedReading()) is Error(JsonError.UnsupportedMapping(_)))
     let serialized = JsonSerializer.Serialize(instance)?
     let dom = JsonSerializer.DeserializeNode(serialized)?
     if dom is JsonObject document {
@@ -105,9 +173,9 @@ func RoundTrip() -> Result<unit, JsonError> {
     Check(JsonSerializer.Deserialize("{\"Station\":\"x\",\"Count\":1,\"Active\":\"true\"}", typeof(Reading)) is Error(JsonError.TypeMismatch(_)))
     Check(JsonSerializer.Deserialize("{\"Station\":\"x\"}", typeof(LockedReading)) is Error(JsonError.Reflection(ReflectionError.AccessDenied)))
     Check(JsonSerializer.Deserialize("{}", typeof(int)) is Error(JsonError.UnsupportedMapping(_)))
-    Check(JsonSerializer.Serialize(NestedReading()) is Error(JsonError.UnsupportedMapping(_)))
+    Check(JsonSerializer.Serialize(UnsupportedReading()) is Error(JsonError.UnsupportedMapping(_)))
     let untouched = MemoryStream()
-    Check(JsonSerializer.Serialize(untouched, NestedReading()) is Error(JsonError.UnsupportedMapping(_)))
+    Check(JsonSerializer.Serialize(untouched, UnsupportedReading()) is Error(JsonError.UnsupportedMapping(_)))
     if let Ok(length) = untouched.GetLength() {
         Check(length == 0)
     } else {
@@ -120,8 +188,68 @@ func RoundTrip() -> Result<unit, JsonError> {
     return Ok(())
 }
 
+func NestedRoundTrip() -> Result<unit, JsonError> {
+    let text = "{\"Name\":\"Ada\",\"Address\":{\"City\":\"Café\"}}"
+    let contact = JsonSerializer.Deserialize<Contact>(text)?
+    Check(contact.Name == "Ada" && contact.Address.City == "Café")
+    Check(JsonSerializer.Serialize(contact)? == text)
+    let content = JsonContent.Create(contact)?
+    let response = JsonContent.Read<Contact>(content)?
+    Check(response.Address.City == "Café")
+    let stream = MemoryStream()
+    _ = JsonSerializer.Serialize(stream, response)?
+    Check(stream.Seek(0) is Ok(_))
+    let copy = JsonSerializer.Deserialize<Contact>(stream)?
+    Check(copy.Address.City == "Café")
+    stream.Close()
+
+    // A valid earlier subtree must not execute user code if a later one is invalid.
+    Console.WriteLine("Invalid nested input begins")
+    Check(JsonSerializer.Deserialize<AddressPair>("{\"A\":{\"City\":\"ok\"},\"B\":{\"City\":3}}") is Error(JsonError.TypeMismatch(_)))
+    Check(JsonSerializer.Deserialize<Contact>("{\"Name\":\"Ada\",\"Address\":{}}") is Error(JsonError.MissingField(_)))
+    Check(JsonSerializer.Deserialize<Contact>("{\"Name\":\"Ada\",\"Address\":null}") is Error(JsonError.TypeMismatch(_)))
+    Check(JsonSerializer.Deserialize<Contact>("{\"Name\":\"Ada\",\"Address\":[]}") is Error(JsonError.TypeMismatch(_)))
+    Console.WriteLine("Invalid nested input ends")
+    Check(JsonSerializer.Deserialize<LockedParent>("{\"Child\":{\"Station\":\"x\"}}") is Error(JsonError.Reflection(ReflectionError.AccessDenied)))
+    Check(JsonSerializer.Deserialize<UnsupportedReading>("{\"Values\":[1]}") is Error(JsonError.UnsupportedMapping(_)))
+
+    Check(JsonSerializer.Serialize(ObjectProperty()) is Error(JsonError.UnsupportedMapping(_)))
+
+    let shared = PostalAddress()
+    shared.City = "same"
+    let pair = AddressPair()
+    pair.A = shared
+    pair.B = shared
+    let pairText = JsonSerializer.Serialize(pair)?
+    Check(pairText == "{\"A\":{\"City\":\"same\"},\"B\":{\"City\":\"same\"}}")
+    let pairCopy = JsonSerializer.Deserialize<AddressPair>(pairText)?
+    pairCopy.A.City = "changed"
+    Check(pairCopy.B.City == "same")
+
+    let four = LevelOne()
+    let fourText = JsonSerializer.Serialize(four)?
+    Check(JsonSerializer.Deserialize<LevelOne>(fourText) is Ok(_))
+    Check(JsonSerializer.Serialize(TooDeep()) is Error(JsonError.LimitExceeded(_)))
+    Check(JsonSerializer.Deserialize<TooDeep>("{\"Child\":{\"Child\":{\"Child\":{\"Child\":{\"City\":\"x\"}}}}}") is Error(JsonError.LimitExceeded(_)))
+    let cycle = Cycle()
+    Check(JsonSerializer.Serialize(cycle) is Error(JsonError.UnsupportedMapping(_)))
+    cycle.Next = cycle
+    let untouched = MemoryStream()
+    Check(JsonSerializer.Serialize(untouched, cycle) is Error(JsonError.LimitExceeded(_)))
+    if let Ok(length) = untouched.GetLength() {
+        Check(length == 0)
+    } else {
+        System.Fault("Output stream was closed")
+    }
+    untouched.Close()
+    return Ok(())
+}
+
 func Main() {
     if let Ok(_) = RoundTrip() {
+        if let Error(error) = NestedRoundTrip() {
+            System.Fault(error.ToString())
+        }
         Console.WriteLine("Public JSON mapping checks passed")
     } else {
         System.Fault("Public JSON mapping failed")

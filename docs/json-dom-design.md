@@ -407,3 +407,46 @@ The independent compiler reduction and general fix are recorded in the
 [prototype investigation](experiments/http-json-client-prototype/README.md).
 Reference-instantiated generic boxing now preserves Object identity; values retain
 copied boxing. See [runtime semantics](boxed-interface-values.md#generic-reference-boxing--2026-09-26).
+
+
+## Nested typed objects — development, 2026-09-27
+
+The author-selected Web API direction now extends the existing mapper with nested
+nongeneric reference properties. Reuse the System.Text.Json comparison in the
+[Web API plan](web-api-plan.md#comparison-alternatives-and-costs): typed recursion
+closes a neoCLR implementation gap while retaining its existing UTF-8 byte bounds,
+Result causes and explicit reflection behavior. This is a library change with no
+new public signatures, runtime mechanisms or compiler configuration.
+
+Reads use declared property types and public parameterless construction. A first
+pass validates the complete input tree before any model constructor or setter; a
+second pass constructs children and parents and assigns properties. Exact names,
+required writable properties, ignored unknown fields, String/Int32/Boolean leaves
+and null rejection remain unchanged. Construction/accessor side effects are not
+transactional; reflection failures retain their structured causes and user Faults
+remain terminal. The two passes add traversal and temporary-list allocation; no
+performance improvement is claimed. A retained mapping plan could avoid repeated
+work but would introduce additional lifetime/storage machinery before it is needed.
+
+Writes require a nested property's runtime type to equal its declared type. This
+avoids silently serializing a derived shape that the declared read type cannot
+reconstruct; it also excludes polymorphic DTO properties. Shared children are
+serialized repeatedly and read back as independent instances. Four object levels,
+including the root, are allowed; deeper graphs and cycles return LimitExceeded.
+Depth bounding reuses the existing DOM contract and avoids a reference-tracking
+protocol, but does not distinguish a cycle from an ordinary overly deep graph.
+Nulls, collections, Option, generic/value models, naming policies and configurable
+limits remain deferred. The existing 128-byte/32-value document limits still apply.
+Mapping and encoded-document validation finish before stream writes.
+
+The private traversal uses integer pass selection (0 validate, 1 construct) because
+the current bridge rejects Boolean argument conversion on multi-argument private
+calls. This local workaround does not weaken access or change Raven; a general
+bridge conversion improvement remains outside this serializer slice.
+
+The [focused consumer](experiments/json-object-mapping/Public.rvn) covers string,
+stream and HTTP-content round trips, nested invalid values without constructor or
+setter output, shared siblings, four/five levels, cycles, nulls, inaccessible nested
+constructors and unsupported shapes. The station-report case has an opt-in nested
+variant on the [HTTP case page](../website/content/cases/http-server/index.md); its independent
+peers and complete exchange are recorded with the implementation evidence.

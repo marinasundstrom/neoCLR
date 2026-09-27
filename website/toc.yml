@@ -32,5 +32,9 @@
       href: features/gc/index.md
     - name: Reflection
       href: features/reflection/index.md
+- name: Cases
+  items:
+    - name: "Building a Http server app"
+      href: cases/http-server/index.md
 - name: API reference
   href: api/
