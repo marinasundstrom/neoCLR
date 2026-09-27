@@ -81,3 +81,16 @@ binding. Legacy delegate/closure tests remain in the validation set.
 Published Preview 4 SDK/VSIX assets remain unchanged. Refreshing a distribution and
 Raven source debugging are future release work. Task<Void>, suspension and async/await
 remain a separate design; supporting synchronous Func<Void> does not settle them.
+
+
+## Generic unit invocation during release qualification
+
+The importer preserves the inhabited `Void` result of `Func<Void>.Invoke`; the
+caller's CIL owns discarding that value. It no longer inserts an unconditional pop
+and reports noresult for this generic signature. This follows the CLI distinction
+between a literal void return and a generic result instantiated with the configured
+unit type. No Raven Runtime Contract setting changes. The current compiler emits
+an explicit pop for statement callbacks, which exposed the older importer assumption
+when rebuilding CancellationTokenSource.Register. Source callbacks need no workaround.
+The full library is regenerated with the corrected boundary, with direct unit callback,
+already-cancelled registration and Task.Run consumer checks.

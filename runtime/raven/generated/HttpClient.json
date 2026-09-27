@@ -104,7 +104,7 @@
     "runtime/raven/src/System/OverflowError.rvn": "eaa0f653ef045d8c0898baa8006d9dec11a676fa814bbe79ae277909ed6f46a8",
     "runtime/raven/src/System/EnvironmentError.rvn": "08d7ca88cd6395e47a000c413b910c7c61b501417c9827dda7ef40b63b5c11f4",
     "runtime/raven/src/System/Void.rvn": "cec6e383555235c0144b80860e7e384061f3a74d26e8b74178f1547d2bd12e75",
-    "runtime/raven/src/System/String.rvn": "f79ab65298eb471d9847f57759439618504ca61fdfe09affcf663d28735087b8",
+    "runtime/raven/src/System/String.rvn": "a8c7130708ce1146602928eca6de5f97cd83cc455275b238a624857d141fa2a9",
     "runtime/raven/src/System/Text/Encoder.rvn": "f64587f4cfcde9a66078a4f11dd6caa6c6720b7cb81c0650616098831b78a646",
     "runtime/raven/src/System/Text/EncoderProgress.rvn": "b977d8354120e00ce6c223a2b235774fa4e59e6a0fe9cd86f439a2560d80f094",
     "runtime/raven/src/System/Text/EncoderState.rvn": "0afcb0818ebc85d40ebbb77ffd6ab1f46ac7b758f716d26df7f9f59b4f89414e",
@@ -175,8 +175,8 @@
     "HttpClient.methods.neoil": "c7ec587057b555ab5aa981a090ecd29225632fcf5bcd988808f021dc0cb3db47",
     "HttpClient.helpers.neoil": "13ba77b9a85b3fddfc1d2d220faababc60a9609546b4389cf326c3248fc1e274"
   },
-  "compilerSha256": "3f661299add5dd4f570960ddb296959df949cac08a1bbe9051f8fba4f46d8cc4",
-  "coreSha256": "e736fe58354954050b16e18884c3baacb04aef5ef00dfbdd8f0a94c7b231b060",
+  "compilerSha256": "bf60acd0061b65d5ff171eb77f485807a288fbc550925c6023cb95dd40dbe266",
+  "coreSha256": "bf2400976b1484444097b82e39f24692da3d5213b78467a609f20588df8e8974",
   "exports": [
     "get_DefaultRequestHeaders() -> System.Collections.Sequence<System.Web.Http.HttpHeader>",
     "set_DefaultRequestHeaders(System.Collections.Sequence<System.Web.Http.HttpHeader> value) -> noresult",

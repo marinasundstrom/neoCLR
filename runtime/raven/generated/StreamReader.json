@@ -2,6 +2,7 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.IO.StreamReader",
   "inputs": {
+    "runtime/raven/src/System/Web/Http/Routes.rvn": "d928c737333e3d3e09006d0e641180fd62df170d2ff3df1f9bd5c5273f97e4eb",
     "runtime/raven/src/System/Runtime/GC.rvn": "1c672a79b8eb146f353d73ec5d075235976dbc68397843d2e1b7ce669dd915d0",
     "runtime/raven/src/System/DateTime.rvn": "8ba1677cd951cd8da8449ed57f76df8805756c5fa3dadbdcaafac9bbd7f6f870",
     "runtime/raven/src/System/ZonedDateTime.rvn": "69fb6cac5174b6e4b240996f66a09077e985bbd2531c41b49b6d0bd41b8924f9",
@@ -103,7 +104,7 @@
     "runtime/raven/src/System/OverflowError.rvn": "eaa0f653ef045d8c0898baa8006d9dec11a676fa814bbe79ae277909ed6f46a8",
     "runtime/raven/src/System/EnvironmentError.rvn": "08d7ca88cd6395e47a000c413b910c7c61b501417c9827dda7ef40b63b5c11f4",
     "runtime/raven/src/System/Void.rvn": "cec6e383555235c0144b80860e7e384061f3a74d26e8b74178f1547d2bd12e75",
-    "runtime/raven/src/System/String.rvn": "f79ab65298eb471d9847f57759439618504ca61fdfe09affcf663d28735087b8",
+    "runtime/raven/src/System/String.rvn": "a8c7130708ce1146602928eca6de5f97cd83cc455275b238a624857d141fa2a9",
     "runtime/raven/src/System/Text/Encoder.rvn": "f64587f4cfcde9a66078a4f11dd6caa6c6720b7cb81c0650616098831b78a646",
     "runtime/raven/src/System/Text/EncoderProgress.rvn": "b977d8354120e00ce6c223a2b235774fa4e59e6a0fe9cd86f439a2560d80f094",
     "runtime/raven/src/System/Text/EncoderState.rvn": "0afcb0818ebc85d40ebbb77ffd6ab1f46ac7b758f716d26df7f9f59b4f89414e",
@@ -168,15 +169,14 @@
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
     "runtime/raven/System.Runtime.rvnproj": "d17e991c77a35cb30a97c90730458831fb6b6d04b921f6312814b39478340d1b",
-    "build/NeoCLR.Raven.props": "4eb1e8c16f00288330d6ea56b2966d6719dea83e6aab42fa77f38a3dffc3e75b",
-    "runtime/raven/src/System/Web/Http/Routes.rvn": "d928c737333e3d3e09006d0e641180fd62df170d2ff3df1f9bd5c5273f97e4eb"
+    "build/NeoCLR.Raven.props": "4eb1e8c16f00288330d6ea56b2966d6719dea83e6aab42fa77f38a3dffc3e75b"
   },
   "outputs": {
     "StreamReader.methods.neoil": "0d54250070ca6e060502416599c236eeed0b26f5a4226b59d958e2fb65809dbc",
     "StreamReader.helpers.neoil": "96cf02d66dedd072aa8696f0122f7270ebab9c9390d32c479279bd082c012261"
   },
-  "compilerSha256": "e93241cabea700f511fb141a677919fdd9ff8bd6b19fae571e90fc5f2475c8f3",
-  "coreSha256": "6388a48392633850a157b04fc5ef4cd37e0ddd451c980dbd01f658365c3f4c60",
+  "compilerSha256": "bf60acd0061b65d5ff171eb77f485807a288fbc550925c6023cb95dd40dbe266",
+  "coreSha256": "bf2400976b1484444097b82e39f24692da3d5213b78467a609f20588df8e8974",
   "exports": [
     ".ctor(System.IO.InputStream input) -> noresult",
     ".ctor(System.IO.InputStream input,Boolean leaveOpen) -> noresult",

@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Prepare Preview 11 from the bounded current surface, with Windows x64 native
+  runtime packaging and extracted-sample smoke checks alongside focused host CI.
+  Windows Raven SDK/bridge distribution remains unqualified.
+- Repair numeric/object interpolation with String.Concat(Object?, Object?), using
+  virtual ToString and empty text for null; integrate Raven's general missing-member
+  diagnostic fix. Preserve generic unit delegate results until the caller discards
+  them, regenerate all library slices, and restore current-union signature/sample
+  checks. Update matching API documentation and keep old artifacts unchanged.
+
 - Restore canonical formatting and strict Clippy gates for release preparation.
   Rename the internal slot factory, name the completion observer type and simplify
   equivalent expressions; retain inline completion values to avoid new allocation.

@@ -115,7 +115,7 @@ call neoCLR.Library.System.Array.RuntimeBooleanToInt32(Boolean)
 M00000006_IL_0017:
 brtrue M00000006_IL_0021
 M00000006_IL_001c:
-br M00000006_IL_0039
+br M00000006_IL_003a
 M00000006_IL_0021:
 M00000006_IL_0022:
 ldarg 1
@@ -127,21 +127,22 @@ M00000006_IL_0025:
 ldelem T0
 M00000006_IL_002a:
 callvirt instance System.Func<T0,Void>::Invoke(T0)
-pop
 M00000006_IL_002f:
+pop
 M00000006_IL_0030:
-ldloc local1
 M00000006_IL_0031:
-ldc.i4 1
+ldloc local1
 M00000006_IL_0032:
-add
+ldc.i4 1
 M00000006_IL_0033:
-stloc local1
+add
 M00000006_IL_0034:
+stloc local1
+M00000006_IL_0035:
 br M00000006_IL_000d
-M00000006_IL_0039:
 M00000006_IL_003a:
 M00000006_IL_003b:
+M00000006_IL_003c:
 ret
 .end
 .end

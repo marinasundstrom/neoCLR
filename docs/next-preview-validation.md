@@ -42,7 +42,11 @@ notices, package contents and checksums before publication.
 Source CI does not certify packaged binaries. For every shipped target, archive and
 extract the matching runtime/SDK, compare payload hashes, run the bundled samples,
 check failed-build/stale-output rejection, and verify editor completion/build/run
-with the matching extension. Preview 10 ships prebuilt tools for macOS arm64 only.
+with the matching extension. Preview 10 ships prebuilt tools for macOS arm64 only. The next release is preparing
+a Windows x64 native-runtime ZIP as well: CI builds it, compares extracted payload
+hashes and executes four direct-runtime samples using `scripts/package-native.py`.
+This package carries the library and dependency notices, but no Raven SDK/bridge.
+Do not claim Windows Raven SDK/editor qualification from native host checks.
 Record compiler/runtime revisions, prerequisites and asset hashes in the release
 validation manifest. Preserve known limitations and distinguish observed failures
 from fixed defects.

@@ -1,0 +1,46 @@
+{
+  "date": "2026-09-27",
+  "scope": "Preview 11 release repairs; not final candidate qualification",
+  "ravenMain": "42834d791",
+  "ravenNeoclr": "0d5aa83b9",
+  "format": "passed",
+  "clippyAllTargets": "passed",
+  "slotTests": 10,
+  "metadataChecks": 639,
+  "ravenInterpolationTests": 8,
+  "interpolationConsumers": [
+    "async-interpolation: Value 1",
+    "object-concat: null, boxed primitives, custom virtual ToString, string overload"
+  ],
+  "genericUnitDelegate": "passed; direct callbacks and already-cancelled registration",
+  "conditionalGetterRecheck": "3 and 7 for true/false; old zero result did not reproduce",
+  "librarySlicesRegenerated": 149,
+  "librarySourceSnapshot": "passed",
+  "apiSnapshot": "passed",
+  "hostValidatorTests": 2,
+  "nativePackagingLocal": "4 extracted samples passed on macOS arm64 with the candidate source library and prior runtime binary; Windows still pending",
+  "TaskRunConsumers": [
+    "unit-delegate: passed",
+    "generic-owner: passed",
+    "generic-capture: passed",
+    "generic-suspension: passed",
+    "block-lambda: passed",
+    "unqualified-run: passed",
+    "unit-await: passed",
+    "mutable-capture: passed",
+    "mutable-capture-inline: passed",
+    "capture-and-unwrap: passed",
+    "unobserved-work: passed",
+    "unwrap-unit: passed",
+    "cancelled-inner: passed",
+    "callback-fault: passed"
+  ],
+  "logs": {
+    "/tmp/neoclr-release-clippy4.log": "aad1431048313bc196863d84009438ffc9fff23c194af32bcbc095181301ed42",
+    "/tmp/neoclr-preview11-signatures.log": "62f50c092de5ae14ac6668a2d4bed06be69918b27db53f53dd660ba97af656f8",
+    "/tmp/raven-release-interpolation-after.log": "dae32e1d23928cfbc3dc23928f5501f887cb6d0e3cba4903f9765c4e05efb92e",
+    "/tmp/neoclr-release-library-regeneration2.log": "4069b63b037169f3cc0379aebb0d427f3d1f71b9756a5a5bb14e5c636ba56cc2",
+    "/tmp/neoclr-release-task-consumers.log": "27d6aad3dfdabbb3b56bca55e9625d0b025f846f84ad2a56d1cf28837c90124a",
+    "/tmp/neoclr-release-interpolation-final.log": "94efb24f49ec7a88cfbe7a17aaa0ede018d70f5087bb833e5ab83cfbaee9eaca"
+  }
+}

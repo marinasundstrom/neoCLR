@@ -449,7 +449,7 @@ call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeBooleanToI
 M00000013_IL_0035:
 brtrue M00000013_IL_003f
 M00000013_IL_003a:
-br M00000013_IL_008e
+br M00000013_IL_008f
 M00000013_IL_003f:
 M00000013_IL_0040:
 ldloc local2
@@ -464,7 +464,7 @@ call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeBooleanToI
 M00000013_IL_0049:
 brtrue M00000013_IL_0053
 M00000013_IL_004e:
-br M00000013_IL_008d
+br M00000013_IL_008e
 M00000013_IL_0053:
 M00000013_IL_0054:
 ldloc local0
@@ -492,17 +492,18 @@ M00000013_IL_0075:
 M00000013_IL_0076:
 br M00000013_IL_0086
 M00000013_IL_0081:
-br M00000013_IL_008c
+br M00000013_IL_008d
 M00000013_IL_0086:
 ldloc local3
 M00000013_IL_0087:
 callvirt instance System.Func<Void>::Invoke()
-pop
 M00000013_IL_008c:
+pop
 M00000013_IL_008d:
 M00000013_IL_008e:
 M00000013_IL_008f:
 M00000013_IL_0090:
+M00000013_IL_0091:
 ret
 .end
 .method instance Dispose() -> noresult

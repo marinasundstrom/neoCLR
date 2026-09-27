@@ -197,3 +197,21 @@ matching equality, hash and ordering policies. See the [full comparison contract
 for Unicode 17 default simple folding, .NET differences and invalid-mode behavior.
 These APIs require matching development reference, bridge, library and native runtime.
 Further String expansion is paused for the [author-directed design review](tracking/library-data.md#string-design-review-before-further-expansion).
+
+
+## Interpolation runtime contract — development
+
+`String.Concat(Object?, Object?)` converts non-null values using virtual ToString,
+left then right, treating null as empty text. The existing non-null string overload
+is unchanged. This closes the runtime member gap behind silent numeric interpolation:
+Raven normally selects an object Concat overload. Its general missing-overload
+diagnostic is separately fixed on main (42834d791) and neoclr (0d5aa83b9); no target
+Runtime Contract setting changes. Compiler selection/boxing remains ordinary CLI
+metadata; neoCLR's importer admits this exact overload and its Raven implementation.
+
+This follows the [.NET object-concatenation shape and null convention](https://learn.microsoft.com/en-us/dotnet/api/system.string.concat?view=net-10.0#system-string-concat(system-object-system-object)), while formatting
+uses neoCLR's existing ToString contracts rather than promising .NET culture behavior.
+The benefit is correct familiar interpolation, with boxing/virtual-call overhead for
+object inputs. The string overload keeps its direct path. No formatting framework,
+new encoding or string-model change is implied. Focused consumers cover async output,
+nulls, boxed primitives, custom virtual ToString and unchanged string concatenation.

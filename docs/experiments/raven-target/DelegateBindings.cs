@@ -42,7 +42,9 @@ static class DelegateBindings
         var signature = Shapes[owner];
         if (!reference.HasThis || !callvirt || reference.Name != "Invoke" || !args.SequenceEqual(signature[..^1]) || result != signature[^1])
             throw new InvalidDataException($"Unsupported delegate invocation: {reference.FullName}; callvirt={callvirt}, actual={string.Join(',', args)} -> {result}, expected={string.Join(',', signature)}.");
-        return new(owner + "::Invoke", new[] { owner }.Concat(args).ToArray(), result == "Void" ? "noresult" : result,
-            Instruction: $"callvirt instance {owner}::Invoke({string.Join(',', args)})" + (result == "Void" ? "\npop" : ""));
+        // A generic TResult instantiated with the inhabited unit remains a stack value.
+        // The caller's IL owns any pop; only a literal CLI void return has no result.
+        return new(owner + "::Invoke", new[] { owner }.Concat(args).ToArray(), result,
+            Instruction: $"callvirt instance {owner}::Invoke({string.Join(',', args)})");
     }
 }

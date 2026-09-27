@@ -7,6 +7,7 @@ static class StringBindings
     static readonly Member[] Members = [
         new("Intern", ["String"], "String"),
         new("Concat", ["String", "String"], "String"),
+        new("Concat", ["System.Object", "System.Object"], "String"),
         new("op_Equality", ["String", "String"], "Boolean"),
         new("op_Inequality", ["String", "String"], "Boolean"),
         new("Compare", ["String", "String", "System.StringComparison"], "Int32"),
@@ -37,7 +38,7 @@ static class StringBindings
         "SliceUtf8" => index == 0 ? "byteStart" : "byteLength",
         _ => throw new InvalidDataException("Missing String parameter name: " + member.Name)
     };
-    static string CSharp(string type) => type switch { "System.StringComparison" => "StringComparison", "String" => "string", "Char" => "char", "System.Collections.Iterator<Char>" => "Collections.Iterator<char>", "System.Collections.Sequence<UInt32>" => "Collections.Sequence<uint>", "Int32" => "int", "Boolean" => "bool", ResultBindings.Slice => "Result<string, Text.Utf8SliceError>", _ => throw new InvalidDataException(type) };
+    static string CSharp(string type) => type switch { "System.StringComparison" => "StringComparison", "String" => "string", "System.Object" => "object?", "Char" => "char", "System.Collections.Iterator<Char>" => "Collections.Iterator<char>", "System.Collections.Sequence<UInt32>" => "Collections.Sequence<uint>", "Int32" => "int", "Boolean" => "bool", ResultBindings.Slice => "Result<string, Text.Utf8SliceError>", _ => throw new InvalidDataException(type) };
     public static string Declarations(bool results, bool collections) => "public sealed class String { " + string.Join(" ", Members.Where(m => (results || m.Result != ResultBindings.Slice)
         && (collections || m.Name is not ("GetIterator" or "GetScalars" or "get_Item" or "Compare" or "CompareOrdinalIgnoreCase"))).Select(m =>
         m.Name == "get_Item" ? "public char this[int index] => default;" :
@@ -65,7 +66,7 @@ static class StringBindings
     public static Binding? Bind(MethodReference reference, MethodDefinition definition, bool callvirt)
     {
         if (reference.DeclaringType.FullName != "System.String" || !RuntimeSignatures.IsCore(reference.DeclaringType.Scope)) return null;
-        var signature = RuntimeSignatures.Match(reference, definition, t => EnumBindings.Type(t) ?? CollectionBindings.Type(t) ?? ResultBindings.Type(t));
+        var signature = RuntimeSignatures.Match(reference, definition, t => t.FullName == "System.Object" && (t.MetadataType == MetadataType.Object || RuntimeSignatures.IsCore(t.Scope)) ? "System.Object" : EnumBindings.Type(t) ?? CollectionBindings.Type(t) ?? ResultBindings.Type(t));
         var member = Members.SingleOrDefault(m => m.Name == reference.Name && m.Instance == reference.HasThis
             && m.Result == signature.Result && m.Parameters.SequenceEqual(signature.Args))
             ?? throw new InvalidDataException("Unsupported String member: " + reference.FullName);

@@ -505,7 +505,7 @@ M00000005_IL_0022:
 M00000005_IL_0023:
 br M00000005_IL_0033
 M00000005_IL_002e:
-br M00000005_IL_003b
+br M00000005_IL_003c
 M00000005_IL_0033:
 M00000005_IL_0034:
 ldarg 1
@@ -513,12 +513,13 @@ M00000005_IL_0035:
 ldloc local0
 M00000005_IL_0036:
 callvirt instance System.Func<T0,Void>::Invoke(T0)
-pop
 M00000005_IL_003b:
+pop
 M00000005_IL_003c:
 M00000005_IL_003d:
-ldarg 0
 M00000005_IL_003e:
+ldarg 0
+M00000005_IL_003f:
 ret
 .end
 .method static TapError<T0,T1>(System.Result<T0,T1> self,System.Func<T1,Void> action) -> System.Result<T0,T1>
@@ -557,7 +558,7 @@ M00000006_IL_0022:
 M00000006_IL_0023:
 br M00000006_IL_0033
 M00000006_IL_002e:
-br M00000006_IL_003b
+br M00000006_IL_003c
 M00000006_IL_0033:
 M00000006_IL_0034:
 ldarg 1
@@ -565,12 +566,13 @@ M00000006_IL_0035:
 ldloc local0
 M00000006_IL_0036:
 callvirt instance System.Func<T1,Void>::Invoke(T1)
-pop
 M00000006_IL_003b:
+pop
 M00000006_IL_003c:
 M00000006_IL_003d:
-ldarg 0
 M00000006_IL_003e:
+ldarg 0
+M00000006_IL_003f:
 ret
 .end
 .method static OrElse<T0,T1>(System.Result<T0,T1> self,System.Func<T1,System.Result<T0,T1>> recover) -> System.Result<T0,T1>

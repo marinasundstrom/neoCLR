@@ -29,3 +29,15 @@ longer reproduces. See the [release assessment](../../../tracking/toolchain-rele
 for current checks. A strengthened Main returning the helper Task exits 1 for one
 argument, confirming the captured length reaches the result. This does not certify all
 async callback/capture shapes.
+
+
+## Release repair — 2026-09-27
+
+The interpolation member gap is now repaired: the reference and Raven library expose
+String.Concat(Object?, Object?), with null-as-empty and virtual ToString conversion.
+The original async consumer prints `Value 1`; the focused verifier also checks boxed
+numbers/Boolean, custom ToString, nulls and the existing string overload. General Raven
+now diagnoses missing Concat overloads (main 42834d791, neoclr 0d5aa83b9). Two reduced
+ordinary CLI-reference regressions failed before repair; all eight focused Raven
+interpolation/recovery checks pass. No Runtime Contract setting or async lowering
+policy changes. See [the String contract](../../../raven-string-api.md#interpolation-runtime-contract--development).

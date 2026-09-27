@@ -79,6 +79,18 @@ jobs:
         run: python scripts/validate-host.py --toolchain stable --output host-validation
       - if: ${{ inputs.full_matrix }}
         run: python scripts/validate-release.py --toolchain stable --release --output release-validation
+      - if: runner.os == 'Windows'
+        run: cargo build --locked --release --bin neoclr
+      - if: runner.os == 'Windows'
+        run: python scripts/package-native.py --runtime target/release/neoclr.exe --output native-package
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Windows' && always()
+        with:
+          name: native-package-win-x64
+          path: |
+            native-package/*.zip
+            native-package/validation.json
+            native-package/smoke.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:

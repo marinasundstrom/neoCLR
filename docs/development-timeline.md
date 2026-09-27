@@ -8902,3 +8902,22 @@ See [evidence and limitations](experiments/http-json/cpu-investigation-20260927.
   server remained running. [Exact provenance](experiments/http-json/local-cpu-toolchain-validation.json)
   distinguishes the SDK revision from a concurrent editor-only completion-order
   change included in VSIX packaging. This is not a published release.
+
+
+## 2026-09-27 — Release continuation and Windows candidate
+
+- **Author:** “Continue with release”, then “We might want to release it for windows also”.
+- **Assistant plan:** Freeze the current bounded capability scope, repair confirmed
+  release gates and run canonical source validation once, with focused host checks.
+  Prepare Windows x64 native-runtime packaging and extracted sample execution; full
+  Raven SDK/bridge packaging on Windows is a separate, unqualified target.
+- **Actions so far:** Formatting/strict lint pass. The stale signature probe was
+  updated for standard unions; 639 checks pass. The silent interpolation issue was
+  split into a missing neoCLR object Concat overload and a general Raven diagnostic
+  bug. Focused tests pass; the Raven repair is integrated independently into both
+  branches. Native package extraction exposed a stale Result sample, now corrected.
+- **New qualification finding:** Regenerating the full library with the current
+  compiler exposed a delegate importer that discarded generic Void results before
+  the caller's own pop. Correct the CLI contract rather than altering source callbacks.
+  Final regeneration, exact-candidate hosted checks, platform package validation and
+  publication remain pending; these notes do not claim a completed release.

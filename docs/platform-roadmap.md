@@ -5,11 +5,12 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
-**Immediate author direction — release-readiness assessment (2026-09-27).**
-Broaden validation and identify feature finish lines and general bugs before the
-next release. The [toolchain/release assessment](tracking/toolchain-release.md#pre-release-assessment--2026-09-27)
+**Immediate author direction — release preparation (2026-09-27).**
+Continue toward Preview 11, with a Windows x64 native-runtime package alongside the
+macOS arm64 toolchain bundle if platform/package checks pass. Freeze the current
+bounded surface while resolving confirmed release blockers. The [toolchain/release assessment](tracking/toolchain-release.md#pre-release-assessment--2026-09-27)
 owns priorities and fresh evidence. Pause automatic feature expansion while this
-assessment is completed; it does not select a release version or reopen Preview 10.
+release is qualified; this does not reopen Preview 10 or add optional API work.
 The author explicitly requires functioning async/await for this release, including
 generic async. The bounded generic-method path now has positive suspension/capture
 coverage; generic instance async receivers also pass. The matching

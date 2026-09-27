@@ -8,6 +8,11 @@ String represents Unicode text. Char represents one grapheme cluster: a practica
 
 <a id="characters"></a>
 
+Development builds also support `String.Concat(Object?, Object?)`, using virtual
+`ToString` in left-to-right order and empty text for null. This supplies the runtime
+contract for Raven interpolation of numbers and other objects. Formatting follows
+the value's `ToString` implementation; format-provider overloads are not included.
+
 ## Character counting and iteration
 
 `Length` counts grapheme clusters. Iterating a string yields `Char` values, including combining sequences and emoji sequences. The read-only integer indexer addresses grapheme clusters.

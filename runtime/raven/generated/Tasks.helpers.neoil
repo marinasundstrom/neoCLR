@@ -355,22 +355,23 @@ M00000005_IL_0026:
 ldarg 1
 M00000005_IL_0027:
 callvirt instance System.Func<Void>::Invoke()
-pop
 M00000005_IL_002c:
+pop
 M00000005_IL_002d:
-ldarg 0
 M00000005_IL_002e:
-ldc.i4 0
+ldarg 0
 M00000005_IL_002f:
+ldc.i4 0
+M00000005_IL_0030:
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
 stfld System.Tasks.TaskQueue::running
-M00000005_IL_0034:
 M00000005_IL_0035:
-ldarg 0
 M00000005_IL_0036:
+ldarg 0
+M00000005_IL_0037:
 callvirt instance System.Tasks.TaskQueue::Drain()
-M00000005_IL_003b:
 M00000005_IL_003c:
+M00000005_IL_003d:
 ret
 .end
 .method instance Drain() -> noresult
@@ -429,7 +430,7 @@ call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
 M00000006_IL_0039:
 brtrue M00000006_IL_0043
 M00000006_IL_003e:
-br M00000006_IL_0080
+br M00000006_IL_0081
 M00000006_IL_0043:
 M00000006_IL_0044:
 ldarg 0
@@ -456,7 +457,7 @@ M00000006_IL_005f:
 callvirt instance System.Collections.Iterator<System.Func<Void>>::MoveNext()
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
 M00000006_IL_0064:
-brfalse M00000006_IL_007b
+brfalse M00000006_IL_007c
 M00000006_IL_0069:
 ldloc local2
 M00000006_IL_006a:
@@ -467,22 +468,23 @@ M00000006_IL_0070:
 ldloc local3
 M00000006_IL_0071:
 callvirt instance System.Func<Void>::Invoke()
-pop
 M00000006_IL_0076:
+pop
+M00000006_IL_0077:
 br M00000006_IL_005e
-M00000006_IL_007b:
+M00000006_IL_007c:
 br M00000006_IL_0027
-M00000006_IL_0080:
 M00000006_IL_0081:
 M00000006_IL_0082:
-ldarg 0
 M00000006_IL_0083:
-ldc.i4 0
+ldarg 0
 M00000006_IL_0084:
+ldc.i4 0
+M00000006_IL_0085:
 call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
 stfld System.Tasks.TaskQueue::running
-M00000006_IL_0089:
 M00000006_IL_008a:
+M00000006_IL_008b:
 ret
 .end
 .end

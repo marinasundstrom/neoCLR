@@ -61,3 +61,8 @@ False:
     ldc.i4 0
     ret
 .end
+.function neoCLR.Library.System.String.RuntimeReflection936F30A1978F475D(System.Object arg0) -> String
+ldarg arg0
+callvirt instance System.Object::ToString()
+ret
+.end

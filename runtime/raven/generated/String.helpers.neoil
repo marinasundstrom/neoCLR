@@ -72,6 +72,11 @@ False:
     ldc.i4 0
     ret
 .end
+.function neoCLR.Library.System.String.RuntimeReflection936F30A1978F475D(System.Object arg0) -> String
+ldarg arg0
+callvirt instance System.Object::ToString()
+ret
+.end
 .function neoCLR.Library.System.String.RuntimeCliCall0(System.StringComparison arg0,Int32 arg1) -> Int32
 ldarg arg0
 call instance System.StringComparison::get_Value()

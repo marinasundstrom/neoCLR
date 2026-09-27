@@ -39,6 +39,13 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
         return RuntimeServices.StringConcat(left, right)
     }
 
+    /// Concatenates textual representations; null contributes an empty string.
+    static func Concat(left: Object?, right: Object?) -> string {
+        let first = if left is Object value { value.ToString() } else { "" }
+        let second = if right is Object value { value.ToString() } else { "" }
+        return RuntimeServices.StringConcat(first, second)
+    }
+
     func Equals(other: string) -> bool {
         return RuntimeServices.StringEquals(m_value, other)
     }

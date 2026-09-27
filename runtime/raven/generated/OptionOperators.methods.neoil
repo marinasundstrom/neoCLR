@@ -717,7 +717,7 @@ M00000008_IL_0022:
 M00000008_IL_0023:
 br M00000008_IL_0033
 M00000008_IL_002e:
-br M00000008_IL_003b
+br M00000008_IL_003c
 M00000008_IL_0033:
 M00000008_IL_0034:
 ldarg 1
@@ -725,12 +725,13 @@ M00000008_IL_0035:
 ldloc local0
 M00000008_IL_0036:
 callvirt instance System.Func<T0,Void>::Invoke(T0)
-pop
 M00000008_IL_003b:
+pop
 M00000008_IL_003c:
 M00000008_IL_003d:
-ldarg 0
 M00000008_IL_003e:
+ldarg 0
+M00000008_IL_003f:
 ret
 .end
 .method static TapNone<T0>(System.Option<T0> self,System.Func<Void> action) -> System.Option<T0>
@@ -762,17 +763,18 @@ M00000009_IL_0014:
 M00000009_IL_0015:
 br M00000009_IL_0025
 M00000009_IL_0020:
-br M00000009_IL_002b
+br M00000009_IL_002c
 M00000009_IL_0025:
 ldarg 1
 M00000009_IL_0026:
 callvirt instance System.Func<Void>::Invoke()
-pop
 M00000009_IL_002b:
+pop
 M00000009_IL_002c:
 M00000009_IL_002d:
-ldarg 0
 M00000009_IL_002e:
+ldarg 0
+M00000009_IL_002f:
 ret
 .end
 .method static ToIterable<T0>(System.Option<T0> self) -> System.Collections.Iterable<T0>

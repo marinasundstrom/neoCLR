@@ -216,8 +216,9 @@ static class SignatureProbe
         Reject("Array<T> unsupported element", () => ArrayCallbackBindings.Bind(forEachCall, forEach));
         var ok = module.GetType("System.Result").NestedTypes.Single(t => t.Name == "Ok`1");
         var writableCase = new GenericInstanceType(ok); writableCase.GenericArguments.Add(module.TypeSystem.Int32);
-        var setter = ok.Methods.Single(m => m.Name == "set_Value");
-        Check("Case payload setter preserves value receiver", GenericUnionBindings.Bind(Reference(setter, writableCase), setter)?.Result == "noresult");
+        Check("Standard union case payload is read-only", !ok.Methods.Any(m => m.Name == "set_Value"));
+        var getter = ok.Methods.Single(m => m.Name == "get_Value");
+        Check("Case payload getter preserves value receiver", GenericUnionBindings.Bind(Reference(getter, writableCase), getter)?.Result == "Int32");
         var nested = new GenericInstanceType(ok);
         nested.GenericArguments.Add(new ArrayType(result.GenericParameters[0]));
         var shape = new ByReferenceType(nested);
@@ -299,7 +300,7 @@ static class SignatureProbe
             ("CompareOrdinal", new[]{"left", "right"}), ("Equals", new[]{"other"}),
             ("ContainsOrdinal", new[]{"substring"}), ("StartsWithOrdinal", new[]{"prefix"}),
             ("EndsWithOrdinal", new[]{"suffix"}), ("SliceUtf8", new[]{"byteStart", "byteLength"}) }) {
-            var method = stringType.Methods.Single(m => m.Name == methodName);
+            var method = stringType.Methods.Single(m => m.Name == methodName && (methodName != "Concat" || m.Parameters[0].ParameterType.MetadataType == MetadataType.String));
             Check("String " + methodName + " meaningful parameter names", method.Parameters.Select(p => p.Name).SequenceEqual(expectedNames));
         }
         Check("String constructor characters parameter", stringConstructor.Parameters.Single().Name == "characters");
@@ -309,7 +310,9 @@ static class SignatureProbe
         var badIntern = Reference(intern, stringType);
         badIntern.Parameters[0].ParameterType = module.TypeSystem.Int32;
         Reject("String Intern rejects wrong operand", () => StringBindings.Bind(badIntern, intern, false));
-        var concat = stringType.Methods.Single(m => m.Name == "Concat");
+        var concat = stringType.Methods.Single(m => m.Name == "Concat" && m.Parameters[0].ParameterType.MetadataType == MetadataType.String);
+        var objectConcat = stringType.Methods.Single(m => m.Name == "Concat" && m.Parameters[0].ParameterType.MetadataType == MetadataType.Object);
+        Check("Object Concat static contract", StringBindings.Bind(Reference(objectConcat, stringType), objectConcat, false)?.Arguments.SequenceEqual(new[] { "System.Object", "System.Object" }) == true);
         Reject("Static String callvirt", () => StringBindings.Bind(Reference(concat, stringType), concat, true));
         var wrongStringArgument = Reference(concat, stringType);
         wrongStringArgument.Parameters[0].ParameterType = module.TypeSystem.Int32;
@@ -736,7 +739,7 @@ static class SignatureProbe
         var invoke = func.Methods.Single(m => m.Name == "Invoke");
         var voidInvoke = Reference(invoke, voidFunc);
         Check("Generic Void return stays a value signature", RuntimeSignatures.Match(voidInvoke, invoke, GenericUnionBindings.Type).Result == "Void");
-        Check("Completion delegate call discards interpreter unit", DelegateBindings.Bind(voidInvoke, invoke, true)?.Result == "noresult");
+        Check("Generic completion delegate preserves inhabited unit", DelegateBindings.Bind(voidInvoke, invoke, true)?.Result == "Void");
         Reject("Delegate requires virtual invocation", () => DelegateBindings.Bind(voidInvoke, invoke, false));
         var taskDefinition = module.GetType("System.Tasks.Task`1");
         var taskInt = new GenericInstanceType(taskDefinition);

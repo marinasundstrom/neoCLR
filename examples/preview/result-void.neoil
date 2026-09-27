@@ -15,15 +15,25 @@
     ret
 .end
 .function Main() -> void
+    .local System.Result<Void,String> result
+    .local Void completed
+    .local String error
     call Complete()
-    call instance System.Result<Void,String>::get_IsOkCase()
+    stloc result
+    ldloca result
+    ldloca completed
+    call instance System.Result<Void,String>::TryGetOutput(Void&)
     brfalse Unexpected
     ldstr "Completed"
     call System.Console::WriteLine(String)
     pop
     call Reject()
-    call instance System.Result<Void,String>::GetErrorCase()
-    call instance System.Result.Error<String>::get_Value()
+    stloc result
+    ldloca result
+    ldloca error
+    call instance System.Result<Void,String>::TryGetResidual(String&)
+    brfalse Unexpected
+    ldloc error
     call System.Console::WriteLine(String)
     pop
     ret
