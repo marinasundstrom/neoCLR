@@ -82,3 +82,10 @@ contracts and browser interaction with the ArrayList page.
 Validation for this publisher update: 36 focused RavenDoc/site-builder tests,
 a targeted two-case source/imported XML-text regression rerun, 18 website tests,
 and a clean website build validating 1,755 generated pages and local links.
+
+Member toggles now share a row when space permits and wrap on narrow screens.
+Changing the controls updates `groupBy`, `inherited` and `extensions` in the URL,
+preserving other query parameters and anchors. Valid shared settings override
+saved preferences; opening a shared URL does not change those preferences.
+Desktop/mobile browser checks verify layout, URL precedence, invalid-value fallback
+and preservation of existing query parameters and fragments.

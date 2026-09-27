@@ -8745,3 +8745,8 @@ for scope and remaining lookup/inference work.
   a persisted, initially enabled filter independent of inherited-member visibility.
   Browser checks on ArrayList confirmed both grouping modes, counts, persistence
   and independence; source/imported documentation tests cover type relationships.
+
+- Follow-up: the author asked for the toggles to sit next to one another when
+  space permits, and for the grouping and both toggle values to be shareable in
+  the URL. The assistant implemented wrapping controls and URL precedence over
+  saved preferences, preserving unrelated query parameters and page anchors.

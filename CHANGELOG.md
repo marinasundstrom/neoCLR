@@ -11,6 +11,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Update RavenDoc with linked derived types, derived interfaces and implementing
   types, marking indirect relationships within the documented API surface. Add an
   independent, persisted Show extension members toggle with accurate group counts.
+  Place the toggles alongside one another when space permits and wrap on narrow
+  screens. Share grouping and filter choices through URL query parameters, with
+  valid URL settings taking precedence over saved preferences.
   Preserve the project dark palette when Auto follows a dark system theme.
   Include the publisher fix for literal generic names in XML documentation prose.
 
