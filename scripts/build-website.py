@@ -250,6 +250,7 @@ def main():
         'HTTP_CONTEXT_SAMPLE': ('docs/experiments/http-context/Sample.rvn', 'async func ReplyToNext(', '\n}', True),
         'HTTP_VERB_SAMPLE': ('docs/experiments/http-verbs/Sample.rvn', 'async func ReplaceText(', '\n}', True),
         'HTTP_POST_SAMPLE': ('docs/experiments/http-post/Sample.rvn', 'async func PostText(', '\n}', True),
+        'HTTP_REPORT_SERVER_SAMPLE': ('docs/experiments/http-json/Server.rvn', '    func Configure(', '\n    }', True),
         'HTTP_JSON_SAMPLE': ('docs/experiments/http-json/Client.rvn', 'class ReportClient {', '\n}', True),
         'HTTP_SERVER_SAMPLE': ('docs/experiments/http-server/Server.rvn', 'func Respond(', '\n}', True),
         'HTTP_CLIENT_SAMPLE': ('docs/experiments/http-client/Main.rvn', 'async func ReadGreeting(', '\n}', True),

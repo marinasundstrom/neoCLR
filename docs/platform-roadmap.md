@@ -5,6 +5,19 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Active direction — minimal Web API (author-selected 2026-09-27).** Focus on
+serving a useful Web API, nested JSON serialization/deserialization, and a
+`WebApplication` concept in a separate project with Minimal API endpoints.
+A rudimentary SQL interface with a SQLite provider is an optional follow-on based
+on the existing proposal, not a prerequisite or approval of its complete surface.
+The [HTTP tracker](http-capabilities.md#active-direction--minimal-web-api) owns
+application acceptance; the [bounded plan](web-api-plan.md) proposes the sequence
+and records design choices still to validate. Start with nested typed JSON mapping.
+This explicitly supersedes the previous general useful-library priority; M2–M6
+remain candidates. Preview 10's completed POC stays closed.
+
+### Completed POC and preceding library direction
+
 The bounded HTTP POC is [complete on macOS arm64](http-capabilities.md#finish-this-poc),
 including independent peers, known-length uploads and the extracted-package check.
 Feature scope is frozen; do not automatically start another HTTP feature.
@@ -18,10 +31,10 @@ the matching Option layout. See [release evidence](preview-10-validation.json).
 The [toolchain/release tracker](tracking/toolchain-release.md) owns residual compiler
 observations and delivery maintenance. Hosted CI passed all six split jobs at
 `1404454e` (slowest 8.88 minutes); later migration corrections passed the focused
-checks requested by the author and final extracted-package checks. HTTP feature
-scope remains frozen. Thematic consolidation is complete.
+checks requested by the author and final extracted-package checks. The released POC feature
+scope remains frozen; the new Web API direction is a separate increment. Thematic consolidation is complete.
 
-**Next direction: useful library APIs**, selected by the author after release.
+**Preceding direction: useful library APIs**, selected by the author after release.
 The author-selected comparer slice is implemented in development: equality/hash and
 ordering policies, callback adapters, StringComparer.Ordinal and a HashMap policy
 constructor. See the [library/data sequence and evidence](tracking/library-data.md#active-direction--useful-api-gaps).
@@ -99,12 +112,13 @@ tooling owns packaging procedure and general release checks.
 
 ## Milestones
 
-Retain the application-led milestone sequence. M2–M6 remain candidate products;
-reassess their ordering after M1 rather than treating the list as approved API scope.
+The author now selects the Web API increment after M1. M2–M6 remain candidate
+products; their earlier ordering is not approved API scope.
 
 | Milestone | Sample product | Status / scope owner |
 | --- | --- | --- |
 | M1 — Communicate | Hello Service + Hello Client, now the typed HTTP/JSON exchange | Released in Preview 10; done for now |
+| Web API increment | Nested JSON + separate WebApplication/Minimal API sample | Active direction; [HTTP tracker](http-capabilities.md#active-direction--minimal-web-api); implementation pending |
 | M2 — Work with data | File Catalog | Candidate; library/data tracker |
 | M3 — Handle waiting and failure | Download Queue | Candidate; HTTP, library and runtime contracts must be selected together |
 | M4 — Human time and presentation | Activity Report | Candidate; library/data tracker |

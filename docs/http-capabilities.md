@@ -9,12 +9,26 @@ client/server cancellation, explicit resource lifetime, independent interoperabi
 and the current known-length upload increment. The bounded POC is complete on macOS arm64 as of 2026-09-27; feature scope is frozen.
 [Preview 10](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.10)
 is published with the qualified runtime, SDK and editor packages.
-The author intends to release it after separate release qualification. Modern HTTP capabilities are tracked below without becoming automatic
-completion requirements. POC completion is distinct from release qualification.
+Modern HTTP capabilities are tracked below without becoming automatic
+completion requirements for the new Web API increment.
 
 Statuses: **Implemented** means development source with linked focused evidence;
 **Complete** records a satisfied POC gate; **Deferred** is outside this POC.
 It does not imply inclusion in published Preview 9 or production readiness.
+
+## Active direction — minimal Web API
+
+**Selected 2026-09-27; implementation pending.** The author now focuses HTTP work
+on a minimal Web API: nested typed JSON and a separate WebApplication project with
+Minimal API endpoints. See the [bounded plan](web-api-plan.md) for the proposed
+sequence, .NET comparison, acceptance cases and open contracts. This is a new
+increment; it does not reopen Preview 10's completed POC.
+
+The next bounded task is nested object serialization/deserialization, owned by
+[library/data](tracking/library-data.md#web-api-json-dependency). Routing, endpoint
+handling and application lifecycle belong here. SQLite remains an optional later
+consumer of the [SQL proposal](proposals/sql-data-access.md), not a Web API gate.
+No nested mapper, router, WebApplication or SQL provider is implemented by this plan.
 
 ## Capability matrix
 
@@ -66,9 +80,9 @@ Compiler status and the upload getter workaround are owned by the
 [toolchain tracker](tracking/toolchain-release.md#integration-and-correctness).
 
 A runtime release still needs its own supported-target/package checks, known-defect
-assessment and release notes. Publication is separate. HTTP feature work stops here until the author selects another capability. The
-author intends to release this POC; [toolchain/release](tracking/toolchain-release.md)
-owns efficient CI, selected-candidate packages and remaining release decisions.
+assessment and release notes. Publication is separate. Preview 10 completed this release; the author has now
+selected the Web API increment above. [Toolchain/release](tracking/toolchain-release.md)
+owns subsequent packaging and release qualification.
 
 ## Modern HTTP direction
 

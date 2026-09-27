@@ -25,6 +25,33 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-27 — Focus on a minimal Web API
+
+- **Author:** “We should focus on the Http story”, specifying the minimum features
+  to serve a Web API, JSON serialization/deserialization with nested objects, and
+  a WebApplication concept in a separate project with Minimal API endpoints.
+  Suggests “Perhaps” a rudimentary SQL interface with a SQLite provider, referring
+  to the existing proposal.
+- **Assistant proposal:** nested typed JSON first, then a separate application
+  layer and a small in-memory API consumer; SQLite remains an optional follow-on.
+  Reuse existing HTTP and JSON foundations, revisit the 128-byte JSON bound for
+  realistic payloads, and avoid treating modern protocols or the entire SQL
+  proposal as prerequisites. Detailed contracts and ordering are assistant proposals.
+- **Action/outcome:** updated the authoritative roadmap and theme trackers and
+  wrote the [Web API plan](web-api-plan.md), with primary-source comparisons and
+  focused acceptance cases. The prior POC remains complete. This exchange changes
+  work priority; it does not implement a mapper, framework or database provider.
+- **Author follow-up:** requests more presentable website samples organized around
+  client/server cases instead of random snippets, then asks to commit and continue
+  with the first slice.
+- **Assistant action:** makes the existing station-report case lead the Web page,
+  shows its tested server alongside the client, and records case-based website
+  acceptance and editorial guidance. Nested JSON implementation follows this
+  planning/presentation commit; runtime completion is not claimed here.
+- **Open:** exact framework/project naming, endpoint binding/result signatures,
+  JSON null/collection and limit policies, and whether to select SQLite after the
+  in-memory consumer. No subsequent author decision on these details is recorded.
+
 ## 2026-09-26 — Streaming, modern HTTP and a finite POC
 
 - **Author:** requests continuation, then asks how the work fits future streaming

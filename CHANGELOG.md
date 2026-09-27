@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Record the author-selected minimal Web API direction: nested typed JSON first,
+  a separate WebApplication project with Minimal API endpoints, and optional
+  SQLite-backed SQL exploration. Update roadmap ownership and record the proposed
+  scope and acceptance cases; these are plans, not implemented capabilities. Lead
+  the Web page with the tested station-report client/server case and record
+  case-based website samples as part of application acceptance.
+
 - Add development System.Runtime.GC with execution-local collection, allocation,
   retained/peak/reclaimed object counters and the host heap-object limit. Add
   synchronous full Collect and nullable KeepAlive; share automatic/explicit root

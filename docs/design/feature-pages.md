@@ -38,6 +38,17 @@ directions are welcome, clearly distinguished from implementation. Setup/downloa
 pages retain accurate package availability. Preserve changelog, published release
 notes and development history outside the feature narrative.
 
+## Case-based samples — author direction, 2026-09-27
+
+Present samples as coherent application cases, especially paired HTTP clients and
+servers. Lead with the use case and exchange, then show shared models/payloads,
+server behavior, client calls, expected responses and failure behavior. Include
+complete downloadable projects and on-site run instructions tied to the matching
+release or development toolchain. Extract displayed code from tested sources.
+Individual API snippets can support the walkthrough but should not substitute for
+it. Evolve the report case into the selected Web API story as nested JSON and
+WebApplication become implemented; do not show planned endpoints as runnable code.
+
 ## Information structure
 
 | Location | Purpose | Required distinction |

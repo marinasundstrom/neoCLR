@@ -8,6 +8,65 @@ response through neoCLR TCP sockets, with DNS on the client. HttpClient, HttpSer
 content and handlers are experimental APIs in System.Web.Http. Use the matching
 Preview 10 toolchain.
 
+## Case study: submit a station report
+
+A station client sends its name to a report service. The service validates the
+request and acknowledges it. Follow both sides of this exchange before exploring
+individual HTTP APIs below.
+
+| Step | Client | Server |
+| --- | --- | --- |
+| Prepare | Build a report containing the station name `Café` | Listen on loopback and accept an exchange |
+| Submit | POST JSON to `/reports` with `application/json` content | Parse the body and require a string-valued `station` |
+| Acknowledge | Check the status and read the acknowledgement | Return 201 with `{"accepted":true}` |
+| Reject bad input | Handle the error status explicitly | Return 400 for invalid JSON/report data, or 404 for an unknown route |
+| Finish | Report the result to the caller | Complete the response and close the exchange |
+
+This case acknowledges a report; it does not save it. The downloadable project
+contains the client, server, shared JSON/error code and an interoperability verifier.
+Use the [setup guide](/try/) for the matching runtime and compiler.
+
+### Client: send the report
+
+```raven
+{{HTTP_JSON_SAMPLE}}
+```
+
+### Server: validate and acknowledge
+
+```raven
+{{HTTP_REPORT_SERVER_SAMPLE}}
+```
+
+The [application sample](/samples/http-json/http-json/Client.rvn) constructs a report
+with the public System.Data.Json DOM and POSTs it to a neoCLR server. The server
+uses HttpContext to parse the body and return a JSON acknowledgement with status
+201. Bad JSON or report shapes return 400; unknown routes return 404.
+
+Application-owned converters project HttpError and JsonError into AppError while
+retaining the original causes through helpers and async methods. The completion
+callback converts errors to display text at its reporting boundary. Ordinary steps use propagation. The
+server handles invalid input explicitly where it chooses the HTTP response.
+
+[Download the client/server sample](/samples/http-json.zip). It uses the runtime
+library's JSON parser and includes checks against independent Python HTTP peers.
+Serialization is synchronous; HTTP bodies are currently buffered. The provisional
+DOM limits are 128 UTF-8 bytes, four container levels and 32 values. The development
+sample has an opt-in variant using the provisional [object serializer overloads](/docs/json.html).
+It maps both report and acknowledgement models through checked runtime reflection:
+constructors, getters and setters execute normally. Flat public `string`, `int` and
+`bool` properties are supported, using exact property names. Writable properties
+must be present; extra JSON fields are ignored. Nested models, null mapping and
+naming policies are not supported. The sample's property names match its lowercase
+wire names explicitly. Both mapped peers are checked against independent peers and each other.
+Latency under load is not characterized.
+The downloadable demo defaults to direct DOM mapping; its verifier selects this
+experiment with `--mapped`.
+
+## HTTP building blocks
+
+The following sections explain the lower-level APIs used by client/server applications.
+
 ## A request and its content
 
 ```raven
@@ -116,37 +175,6 @@ See [HttpContext](/docs/api/System/Web/Http/HttpContext/) in the API reference f
 complete signatures and limits. A future interface split could give inbound and outbound
 requests/responses different capabilities. Today they remain concrete message classes;
 configuring a received client response only changes the local object.
-
-## Exchange JSON reports
-
-```raven
-{{HTTP_JSON_SAMPLE}}
-```
-
-The [application sample](/samples/http-json/http-json/Client.rvn) constructs a report
-with the public System.Data.Json DOM and POSTs it to a neoCLR server. The server
-uses HttpContext to parse the body and return a JSON acknowledgement with status
-201. Bad JSON or report shapes return 400; unknown routes return 404.
-
-Application-owned converters project HttpError and JsonError into AppError while
-retaining the original causes through helpers and async methods. The completion
-callback converts errors to display text at its reporting boundary. Ordinary steps use propagation. The
-server handles invalid input explicitly where it chooses the HTTP response.
-
-[Download the client/server sample](/samples/http-json.zip). It uses the runtime
-library's JSON parser and includes checks against independent Python HTTP peers.
-Serialization is synchronous; HTTP bodies are currently buffered. The provisional
-DOM limits are 128 UTF-8 bytes, four container levels and 32 values. The development
-sample has an opt-in variant using the provisional [object serializer overloads](/docs/json.html).
-It maps both report and acknowledgement models through checked runtime reflection:
-constructors, getters and setters execute normally. Flat public `string`, `int` and
-`bool` properties are supported, using exact property names. Writable properties
-must be present; extra JSON fields are ignored. Nested models, null mapping and
-naming policies are not supported. The sample's property names match its lowercase
-wire names explicitly. Both mapped peers are checked against independent peers and each other.
-Latency under load is not characterized.
-The downloadable demo defaults to direct DOM mapping; its verifier selects this
-experiment with `--mapped`.
 
 ## Current limits
 

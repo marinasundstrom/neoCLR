@@ -2,9 +2,23 @@
 
 **Consolidated 2026-09-27.** [Platform priorities](../platform-roadmap.md) govern work.
 This page owns general library scope. After Preview 10, the author selects filling
-useful API gaps, including earlier requests. HTTP POC scope remains closed for now.
+useful API gaps, including earlier requests. The completed HTTP POC remains closed; the author now prioritizes the separate
+[Web API increment](../web-api-plan.md) over further general library expansion.
 
-## Active direction — useful API gaps
+## Web API JSON dependency
+
+**Selected 2026-09-27; implementation pending.** Extend the existing flat typed
+mapper to nested reference objects for the [Web API plan](../web-api-plan.md).
+This tracker owns mapping behavior and serializer limits; HTTP owns endpoint and
+application acceptance. Preserve existing scalar/name/error contracts initially,
+validate the whole input tree before constructors/setters, and bound recursion.
+Nulls, collections, cycle handling and useful payload limits need explicit contracts;
+the plan distinguishes the first nested-object slice from later API requirements.
+SQLite stays exploratory under the [SQL proposal](../proposals/sql-data-access.md).
+
+## Preceding direction — useful API gaps
+
+<a id="active-direction--useful-api-gaps"></a>
 
 Selected 2026-09-27. Earlier author requests include consistent System.Text APIs,
 general/string comparers, ToUpper/ToLower-style operations, String methods,
