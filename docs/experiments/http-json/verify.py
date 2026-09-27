@@ -30,7 +30,14 @@ here = Path(__file__).resolve().parent
 bundle = args.toolchain_root.resolve()
 runner = args.runner.resolve()
 env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(args.sdk.resolve() if args.sdk else bundle / 'raven-sdk'))
-report = {'station': {'name': 'Café'}} if args.nested else {'station': 'Café'}
+report = {'station': 'Café'}
+if args.nested:
+    report = {'station': {
+        'name': 'Café',
+        'description': ('Indoor air-quality sensor near the café entrance. Reports are collected '
+                        'during opening hours to help staff check ventilation and keep the '
+                        'seating area comfortable.'),
+    }}
 reply = {'accepted': True}
 
 
@@ -114,13 +121,20 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
             ('GET', '/missing', None, 404, {'error': 'Not found'}),
         ]
         if args.nested:
-            cases[9] = ('POST', '/reports', b'{"station":{"name":""}}', 201, reply)
-            cases[10] = ('POST', '/reports', b'{"station":{"name":"Caf\\u00e9","extra":true}}', 201, reply)
+            cases[9] = ('POST', '/reports', b'{"station":{"name":"","description":""}}', 201, reply)
+            cases[10] = ('POST', '/reports', b'{"station":{"name":"Caf\\u00e9","extra":true,"description":""}}', 201, reply)
             cases += [
                 ('POST', '/reports', b'{"station":{}}', 400, {'error': 'Invalid report'}),
                 ('POST', '/reports', b'{"station":{"name":12}}', 400, {'error': 'Invalid report'}),
                 ('POST', '/reports', b'{"station":{"name":null}}', 400, {'error': 'Invalid report'}),
             ]
+            for size in (1023, 1024):
+                boundary = {'station': {'name': 'Café', 'description': ''}}
+                base = json.dumps(boundary, ensure_ascii=False, separators=(',', ':')).encode()
+                boundary['station']['description'] = 'a' * (size - len(base))
+                payload = json.dumps(boundary, ensure_ascii=False, separators=(',', ':')).encode()
+                assert len(payload) == size
+                cases.append(('POST', '/reports', payload, 201, reply))
         for method, path, payload, status, expected in cases:
             print(f'Peer case: {method} {path} -> {status}', flush=True)
             request = Request(f'http://127.0.0.1:{port}{path}', data=payload, method=method, headers={'Content-Type': 'application/json; charset=utf-8'})
@@ -161,7 +175,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
     for iteration in range(1, args.repeat + 1):
         print(f'Iteration {iteration}/{args.repeat}: {args.case}', flush=True)
         if args.case in ('all', 'server'):
-            serve(independent, 15 if args.nested else 12)
+            serve(independent, 17 if args.nested else 12)
         if args.case in ('all', 'pair'):
             serve(client, 2 if args.mapped else 1)
         if args.case in ('all', 'client'):

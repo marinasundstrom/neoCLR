@@ -14,7 +14,8 @@ The [HTTP tracker](http-capabilities.md#active-direction--minimal-web-api) owns
 application acceptance; the [bounded plan](web-api-plan.md) proposes the sequence
 and records design choices still to validate. The first nested typed JSON slice is
 implemented in development with [consumer and HTTP evidence](experiments/json-object-mapping/nested-validation.json).
-Next select useful payload/collection contracts before the WebApplication layer.
+JSON now matches the 1,024-byte HTTP body budget, with [boundary and case evidence](experiments/json-object-mapping/payload-validation.json).
+Next select a bounded typed collection contract before the WebApplication layer.
 This explicitly supersedes the previous general useful-library priority; M2–M6
 remain candidates. Preview 10's completed POC stays closed.
 

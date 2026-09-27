@@ -54,7 +54,8 @@ server handles invalid input explicitly where it chooses the HTTP response.
 [Download the client/server sample](/samples/http-json.zip). It uses the runtime
 library's JSON parser and includes checks against independent Python HTTP peers.
 Serialization is synchronous; HTTP bodies are currently buffered. The provisional
-DOM limits are 128 UTF-8 bytes, four container levels and 32 values. The development
+DOM limits are 128 UTF-8 bytes in Preview 10 and 1,024 in development builds,
+with four container levels and 32 values. The development
 sample has an opt-in variant using the provisional [object serializer overloads](/docs/json.html).
 It maps both report and acknowledgement models through checked runtime reflection:
 constructors, getters and setters execute normally. Flat public `string`, `int` and
@@ -88,7 +89,8 @@ Use `--mapped` for the flat typed-model variant, which fetches then submits a re
 ## Development case: a report with a nested station
 
 **Requires a matching development build after Preview 10.** The same report
-exchange can now carry `{"station":{"name":"Café"}}`. The client first fetches
+exchange now carries a station name and a description of where the sensor is
+installed and why staff use it. This report exceeds the old 128-byte JSON limit. The client first fetches
 this model from GET `/report`, then submits it to POST `/reports`. The server
 reads the nested station and returns the same 201 acknowledgement. This is still
 an explicit HttpServer application; WebApplication and automatic endpoint binding
@@ -137,12 +139,13 @@ python3 http-json/verify.py \
 
 The verifier builds both projects, starts the server on a free loopback port,
 checks it with Python requests, runs the neoCLR client/server pair, and checks the
-client against a Python server. Expect 15 server cases, successful JSON client and
+client against a Python server. Expect 17 server cases, successful JSON client and
 server reports, and a final `Public JSON DOM + HTTP checks passed: all` line with
 an iteration count. The client response is `{"accepted":true}`. Individual server
 or client checks can be selected with `--case server` or `--case client`.
 
-Nested mapping retains the 128-byte JSON bound and permits four object levels
+Nested mapping allows 1,024 UTF-8 bytes per document, matching the buffered HTTP
+body limit, and permits four object levels
 including the root. Nulls, typed collections and polymorphic property values
 remain unsupported. Shared child references are serialized as repeated objects;
 cycles fail at the depth limit. See [JSON mapping rules](/docs/json.html) for

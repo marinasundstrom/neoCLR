@@ -74,7 +74,11 @@ consume input before failure. Writes validate mapping and the entire encoded doc
 before touching output; a stream failure can still leave a written prefix. This is
 buffered synchronous conversion, not async stream parsing.
 
-Existing bounds apply: 128 UTF-8 bytes, four container levels, 32 value occurrences,
+Development builds after Preview 10 allow 1,024 UTF-8 bytes per document (Preview 10: 128),
+including whitespace, property names and escaped output. String and buffered HTTP input
+return LimitExceeded above that cap; stream input reads at most 1,025 bytes and returns
+Read(TextReadError.LimitExceeded), leaving the stream open. JSON number tokens use the
+same byte cap; longer tokens return InvalidNumber. Existing shape bounds apply: four container levels, 32 value occurrences,
 31 children per container. Development object mapping supports up to four object
 levels including the root; deeper graphs and cycles return LimitExceeded. This
 bounded recursion does not preserve reference identity. Collections, configurable

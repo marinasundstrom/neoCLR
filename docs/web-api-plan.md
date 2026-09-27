@@ -36,8 +36,9 @@ String, Int32 and Boolean properties on nongeneric reference classes, with publi
 accessors and exact property names. Typed nesting is now implemented in development; see the
 [nested mapping evidence](experiments/json-object-mapping/nested-validation.json). The [JSON design](json-dom-design.md) records the existing mapping policies.
 
-Current JSON is bounded to 128 UTF-8 bytes and four container levels. HTTP buffered
-bodies allow 1,024 bytes. These are POC limits, not a useful final Web API budget.
+Development JSON now allows 1,024 UTF-8 bytes, matching buffered HTTP bodies;
+Preview 10 remains at 128. Four container levels and 32 values remain the shape
+limits. This is a bounded increment, not the final Web API budget.
 Larger bodies must be checked across parser, writer, stream reader, HTTP conversion,
 transport and runtime resource limits together; changing one constant is insufficient.
 
@@ -51,8 +52,10 @@ transport and runtime resource limits together; changing one constant is insuffi
    object levels bound recursion and cycles; structured reflection/JSON errors are
    preserved. Shared children become independent subtrees; polymorphic properties
    and reference IDs are unsupported. See the linked implementation evidence.
-2. **Useful API payloads.** Select a documented byte/depth budget from the sample;
-   exercise limits immediately below, at and above the boundary. Add a bounded
+2. **Useful API payloads — byte budget implemented in development.** JSON now
+   accepts 1,024 UTF-8 bytes, with below/at/above-boundary checks and a longer nested
+   station report. See [budget evidence](experiments/json-object-mapping/payload-validation.json).
+   Four levels and 32 values remain unchanged. Next add a bounded
    collection shape for list results and make missing versus null versus optional
    values explicit. These are separate decisions from accepting a nested object;
    broader numeric/date/converter support is selected only through a consumer.

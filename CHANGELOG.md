@@ -10,7 +10,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Extend development JSON serialization/deserialization to nested nongeneric
   reference properties, with full input-tree validation before model construction
-  or setters. Preserve scalar/name/null/error policies and existing document limits;
+  or setters. Preserve scalar/name/null/error policies; expand the development JSON
+  document and number-token cap from 128 to 1,024 UTF-8 bytes across string, stream
+  and HTTP-content paths, matching buffered HTTP bodies. Count escaped output bytes,
+  validate before stream writes, and add boundary checks plus a longer station report;
   bound object depth to four including the root, reject polymorphic property values,
   and serialize shared children as independent subtrees. Add focused mapping checks
   and a nested station-report client/server case with on-site walkthrough and

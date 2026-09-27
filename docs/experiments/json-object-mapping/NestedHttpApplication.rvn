@@ -40,6 +40,7 @@ extension HttpJsonErrorConversion for HttpJsonError {
 public class Station {
     init() { }
     var name: string { get; set; } = ""
+    var description: string { get; set; } = ""
 }
 
 public class ReportPayload {
@@ -55,6 +56,7 @@ public class Acknowledgement {
 func CreateReport() -> Result<ReportPayload, JsonError> {
     let report = ReportPayload()
     report.station.name = "Café"
+    report.station.description = "Indoor air-quality sensor near the café entrance. Reports are collected during opening hours to help staff check ventilation and keep the seating area comfortable."
     return Ok(report)
 }
 

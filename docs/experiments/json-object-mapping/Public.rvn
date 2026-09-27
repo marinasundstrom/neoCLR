@@ -135,7 +135,11 @@ func RoundTrip() -> Result<unit, JsonError> {
     Check(JsonContent.ReadNode(HttpContent(Utf8.Encode(""))) is Error(JsonError.Syntax(_)))
     Check(JsonContent.ReadNode(HttpContent(Utf8.Encode("{"))) is Error(JsonError.Syntax(_)))
     Check(JsonContent.ReadNode(HttpContent([(byte)255])) is Error(JsonError.Read(TextReadError.InvalidUtf8)))
-    let oversized = Utf8.Encode("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+    var largeText = ""
+    for index in 0..<1025 {
+        largeText += "x"
+    }
+    let oversized = Utf8.Encode(largeText)
     Check(JsonContent.ReadNode(HttpContent(oversized)) is Error(JsonError.LimitExceeded(_)))
     Check(JsonContent.Create(UnsupportedReading()) is Error(JsonError.UnsupportedMapping(_)))
     let serialized = JsonSerializer.Serialize(instance)?
@@ -202,6 +206,29 @@ func NestedRoundTrip() -> Result<unit, JsonError> {
     let copy = JsonSerializer.Deserialize<Contact>(stream)?
     Check(copy.Address.City == "Café")
     stream.Close()
+
+    // The total encoded nested document, including names and punctuation, is bounded.
+    for index in text.GetUtf8ByteCount()..<1023 {
+        contact.Name += "a"
+    }
+    let below = JsonSerializer.Serialize(contact)?
+    Check(below.GetUtf8ByteCount() == 1023)
+    contact.Name += "a"
+    let exact = JsonSerializer.Serialize(contact)?
+    Check(exact.GetUtf8ByteCount() == 1024)
+    let exactContent = JsonContent.Create(contact)?
+    let exactCopy = JsonContent.Read<Contact>(exactContent)?
+    Check(exactCopy.Name == contact.Name)
+    Check(JsonContent.ReadNode(exactContent) is Ok(_))
+    contact.Name += "a"
+    Check(JsonContent.Create(contact) is Error(JsonError.LimitExceeded(_)))
+    let rejected = MemoryStream()
+    Check(JsonSerializer.Serialize(rejected, contact) is Error(JsonError.LimitExceeded(_)))
+    let Ok(rejectedLength) = rejected.GetLength() else {
+        System.Fault("Could not inspect rejected output")
+    }
+    Check(rejectedLength == 0)
+    rejected.Close()
 
     // A valid earlier subtree must not execute user code if a later one is invalid.
     Console.WriteLine("Invalid nested input begins")

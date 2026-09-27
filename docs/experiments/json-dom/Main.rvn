@@ -289,12 +289,12 @@ func Main() {
     let invalid: byte[] = [(byte)34, (byte)195, (byte)34]
     ReadFailure(ShortInput(invalid, -1), "InvalidUtf8")
     let tooLarge: List<byte> = ArrayList<byte>()
-    for index in 0..<129 {
+    for index in 0..<1025 {
         tooLarge.Add((byte)32)
     }
     let oversized = ShortInput(tooLarge, -1)
     ReadFailure(oversized, "LimitExceeded")
-    Check(oversized.Position == 129)
+    Check(oversized.Position == 1025)
     let malformed = ShortInput(Utf8.Encode("[1,"), -1)
     match JsonSerializer.DeserializeNode(malformed) {
         Error(_) => Check(!malformed.Closed)
@@ -302,7 +302,7 @@ func Main() {
     }
     malformed.Close()
     var padding = ""
-    for index in 0..<126 {
+    for index in 0..<1022 {
         padding += "a"
     }
     let boundary = "\"" + padding + "\""
@@ -310,6 +310,37 @@ func Main() {
         Ok(_) => {}
         Error(let error) => System.Fault(error.ToString())
     }
+    // UTF-8 bytes, escaped bytes and number spelling share the document budget.
+    var unicode = ""
+    for index in 0..<511 {
+        unicode += "é"
+    }
+    let Ok(_) = RoundTrip("\"" + unicode + "\"") else {
+        System.Fault("UTF-8 boundary rejected")
+    }
+    Check(JsonSerializer.DeserializeNode("\"" + unicode + "a\"") is Error(JsonError.LimitExceeded(_)))
+    Check(JsonSerializer.DeserializeNode(boundary + " ") is Error(JsonError.LimitExceeded(_)))
+    Check(JsonSerializer.SerializeNode(JsonString(padding + "a")) is Error(JsonError.LimitExceeded(_)))
+    var escaped = ""
+    for index in 0..<511 {
+        escaped += "\\"
+    }
+    let Ok(encoded) = JsonSerializer.SerializeNode(JsonString(escaped)) else {
+        System.Fault("Escaped boundary rejected")
+    }
+    Check(encoded.GetUtf8ByteCount() == 1024)
+    let untouchedLarge = ShortOutput(-1, false)
+    Check(JsonSerializer.SerializeNode(untouchedLarge, JsonString(escaped + "a")) is Error(JsonError.LimitExceeded(_)))
+    Check(untouchedLarge.Count == 0 && !untouchedLarge.Closed)
+    untouchedLarge.Close()
+    var digits = "1"
+    for index in 0..<1023 {
+        digits += "0"
+    }
+    let Ok(_) = RoundTrip(digits) else {
+        System.Fault("Number boundary rejected")
+    }
+    Check(JsonNumber.Parse(digits + "0") is Error(JsonError.InvalidNumber))
     Console.WriteLine("JSON stream checks passed")
 }
 

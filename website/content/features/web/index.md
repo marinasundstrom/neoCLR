@@ -410,7 +410,7 @@ cause. Cancellation remains task cancellation.
 The managed report sample fetches a typed report from a neoCLR server, posts it back,
 and reads a JSON acknowledgement. Preview 10 maps flat String, Int32 and Boolean
 properties. Development builds add nested reference objects with the same scalar
-rules; the 128-byte JSON limit still applies. Conversion is synchronous over
+rules and allow documents up to 1,024 UTF-8 bytes. Conversion is synchronous over
 buffered HTTP content. Per-call header options, collections and nullable mapping
 remain later work. See [the API guide](/docs/json.html) for the exact scope.
 
@@ -433,7 +433,7 @@ StreamReader/StreamWriter and leave supplied streams open;
 the caller controls flushing and closing. The sample also runs through
 [MemoryStream](/docs/api/System/IO/MemoryStream/) using write, rewind and read.
 
-This POC buffers complete documents and currently limits them to 128 UTF-8 bytes,
+Development builds buffer complete documents up to 1,024 UTF-8 bytes (Preview 10: 128),
 four nested containers and 32 value occurrences. Containers admit 31 children.
 Duplicate names are rejected. A write failure can leave a partial output; cycles
 fail the depth limit. Nodes use reference identity, with shared mutable children.

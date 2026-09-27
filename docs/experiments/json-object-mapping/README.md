@@ -207,7 +207,8 @@ input validation precedes all model constructors/setters. Nulls, polymorphic
 property values, collections and generic/value models remain unsupported. Four
 object levels including the root are allowed; cycles/deeper graphs return
 LimitExceeded. Shared children are repeated in JSON and restored independently.
-The 128-byte and 32-value document bounds are unchanged.
+The first nested slice retained the 128-byte and 32-value document bounds; the
+byte-budget follow-up below expands documents to 1,024 bytes.
 
 Run the existing `--public` command for the expanded contract consumer. Constructor
 and setter markers prove successful execution; the verifier asserts that the
@@ -217,7 +218,8 @@ constructors and stream output remaining untouched on mapping failure.
 
 The same station-report client/server case can now use
 [NestedHttpApplication.rvn](NestedHttpApplication.rvn): GET /report returns
-`{"station":{"name":"Café"}}`, and POST /reports reads that nested model and
+a station name and sensor description (the initial slice carried only the name),
+and POST /reports reads that nested model and
 returns `{"accepted":true}` with status 201. The original flat variant is unchanged.
 Run the nested case with a matching development bundle and measured runtime:
 
@@ -243,3 +245,16 @@ example also passes its independent fragmented-UTF-8 peer, checking its Accept
 header and decoded output (570 allocations, zero final live objects).
 The bridge was rebuilt before final validation to retain the current GC and
 Reflection reference surface. No runtime/compiler behavior outside JSON changed.
+
+
+## API payload budget — development, 2026-09-27
+
+Documents and number tokens now allow 1,024 UTF-8 bytes, matching buffered HTTP
+bodies. The same `--public` consumer checks nested models at 1,023 and 1,024 bytes,
+HTTP-content reads, and rejection above the cap without stream writes. The DOM
+consumer checks UTF-8, escaping, number spelling and borrowed stream boundaries.
+The nested case adds a required `station.description` string to its wire model;
+its verifier checks 17 server cases, including 1,023/1,024-byte request bodies,
+the managed pair and an independent server. Preview 10 and the flat sample are
+unchanged. See [current validation](payload-validation.json) and the
+[budget design](../../json-dom-design.md#web-api-byte-budget--development-2026-09-27).

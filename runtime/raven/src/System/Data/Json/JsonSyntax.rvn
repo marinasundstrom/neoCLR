@@ -14,7 +14,7 @@ internal class JsonSyntax {
     static func ValidNumber(text: string) -> bool {
         let bytes = Utf8.Encode(text)
         let count = bytes.Count
-        if count == 0 || count > 128 {
+        if count == 0 || count > 1024 {
             return false
         }
         var index = 0
@@ -79,7 +79,7 @@ internal class JsonSyntax {
 
     static func WriteMessage(text: string) -> Result<string, JsonError> {
         let input = Utf8.Encode(text)
-        if input.Count > 126 {
+        if input.Count > 1022 {
             return Error(JsonError.LimitExceeded("Message exceeds payload limit"))
         }
         let output = ArrayList<byte>(input.Count + 2)
@@ -99,7 +99,7 @@ internal class JsonSyntax {
             } else {
                 output.Add(value)
             }
-            if output.Count > 127 {
+            if output.Count > 1023 {
                 return Error(JsonError.LimitExceeded("Escaped message exceeds payload limit"))
             }
         }
@@ -137,8 +137,8 @@ internal class MessageReader {
     }
 
     func Read() -> Result<string, JsonError> {
-        if bytes.Count > 128 {
-            return Error(JsonError.LimitExceeded("Payload exceeds 128 UTF-8 bytes"))
+        if bytes.Count > 1024 {
+            return Error(JsonError.LimitExceeded("Payload exceeds 1024 UTF-8 bytes"))
         }
         while position < bytes.Count && JsonSyntax.Whitespace(bytes[position]) {
             position += 1

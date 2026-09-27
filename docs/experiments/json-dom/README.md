@@ -64,3 +64,11 @@ Matching API and library snapshots validate. The website build is skipped by aut
 direction; its example is sourced from the updated compiled Sample.rvn.
 The default managed HTTP pair also passes using Node calls, with 310 client and
 309 server allocations and zero final live objects on both sides.
+
+## Development byte-budget follow-up — 2026-09-27
+
+The integrated consumer now checks the 1,024-byte document/number cap, multibyte
+UTF-8, escaped output, one-byte overflow, borrowed input ownership and output
+remaining untouched on validation failure. Shape limits remain unchanged. See
+[payload validation](../json-object-mapping/payload-validation.json) for this run;
+earlier results above describe their original, smaller fixtures.

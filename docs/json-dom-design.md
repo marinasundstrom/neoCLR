@@ -450,3 +450,38 @@ setter output, shared siblings, four/five levels, cycles, nulls, inaccessible ne
 constructors and unsupported shapes. The station-report case has an opt-in nested
 variant on the [HTTP case page](../website/content/cases/http-server/index.md); its independent
 peers and complete exchange are recorded with the implementation evidence.
+
+
+## Web API byte budget — development, 2026-09-27
+
+The next bounded increment raises complete JSON documents and number tokens from
+128 to 1,024 UTF-8 bytes, matching the existing buffered HTTP body limit. A station
+report with a nested sensor name and installation description now fits through
+string, borrowed stream and HTTP-content conversion. Preview 10 remains unchanged.
+The limit includes input whitespace, names, punctuation and escaped output; it is
+not a character count. Four container/object levels, 32 value occurrences and 31
+children per container remain unchanged. Typed collections and optional/null mapping
+are separate next decisions, not implicitly enabled by a larger document budget.
+
+The cap remains fixed to keep this increment within an already supported transport
+budget. Configurable larger budgets would require transport and runtime resource
+policy together. In .NET, [JsonSerializerOptions.DefaultBufferSize](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.jsonserializeroptions.defaultbuffersize)
+is a temporary-buffer setting (16,384 bytes by default), not a document-size cap;
+[MaxDepth](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.jsonserializeroptions.maxdepth)
+defaults to an effective 64 levels. Sources reviewed 2026-09-27. neoCLR's fixed 1 KiB
+and four-level contract is deliberately narrower. The benefit is room for this
+concrete API report without conflicting JSON/HTTP byte caps; the cost is more
+whole-buffer storage and synchronous traversal. No performance advantage is claimed.
+
+String and buffered HTTP input reject more than 1,024 bytes with LimitExceeded.
+Borrowed stream input reads one extra byte to detect overflow and retains the
+existing Read(TextReadError.LimitExceeded) cause without rewinding or closing.
+Writers validate escaped output and the complete document before writing to a
+stream; I/O failures after that may still leave a prefix. Number tokens longer
+than 1,024 bytes retain InvalidNumber. HTTP transport overflow remains its existing
+error contract; this change does not introduce automatic HTTP 413 responses.
+
+[Payload validation](experiments/json-object-mapping/payload-validation.json) records
+focused DOM/stream and nested-model consumers plus independent HTTP peers. Tests
+exercise UTF-8 and escape expansion, long number spelling, the exact byte boundary,
+one byte over, borrowed ownership and untouched output on validation failure.

@@ -29,8 +29,10 @@ Nested object serialization/deserialization is complete for the bounded first sl
 handling and application lifecycle belong here. SQLite remains an optional later
 consumer of the [SQL proposal](proposals/sql-data-access.md), not a Web API gate.
 The [nested report evidence](experiments/json-object-mapping/nested-validation.json)
-covers independent peers and the managed pair. Routing, WebApplication, broader
-payload/collection contracts and SQL remain unimplemented.
+covers independent peers and the managed pair. Development JSON now matches the
+1,024-byte HTTP body cap; [payload evidence](experiments/json-object-mapping/payload-validation.json)
+covers boundaries and the longer report case. Routing, WebApplication, typed
+collections, configurable limits and SQL remain unimplemented.
 
 ## Capability matrix
 

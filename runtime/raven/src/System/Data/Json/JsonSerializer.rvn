@@ -10,15 +10,15 @@ public class JsonSerializer {
     private init() { }
 
     static func DeserializeNode(text: string) -> Result<JsonValue, JsonError> {
-        if text.GetUtf8ByteCount() > 128 {
-            return Error(JsonError.LimitExceeded("Document exceeds 128 UTF-8 bytes"))
+        if text.GetUtf8ByteCount() > 1024 {
+            return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
         }
         return DocumentReader(text).Read()
     }
 
     static func DeserializeNode(input: InputStream) -> Result<JsonValue, JsonError> {
         let reader = StreamReader(input, true)
-        let result = reader.ReadToEnd(128)
+        let result = reader.ReadToEnd(1024)
         reader.Close()
         return match result {
             Ok(let text) => DeserializeNode(text)

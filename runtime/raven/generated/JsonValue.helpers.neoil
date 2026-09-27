@@ -1278,7 +1278,7 @@ ldarg 0
 M00000003_IL_0003:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeStringGetUtf8ByteCount(String)
 M00000003_IL_0008:
-ldc.i4 128
+ldc.i4 1024
 M00000003_IL_000d:
 cgt
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
@@ -1288,7 +1288,7 @@ M00000003_IL_0014:
 br M00000003_IL_0034
 M00000003_IL_0019:
 M00000003_IL_001a:
-ldstr "Document exceeds 128 UTF-8 bytes"
+ldstr "Document exceeds 1024 UTF-8 bytes"
 M00000003_IL_001f:
 newobj instance System.Data.Json.JsonError.LimitExceeded::.ctor(String)
 M00000003_IL_0024:
@@ -1348,7 +1348,7 @@ M00000004_IL_000a:
 M00000004_IL_000b:
 ldloc local0
 M00000004_IL_000c:
-ldc.i4 128
+ldc.i4 1024
 M00000004_IL_0011:
 call instance System.IO.StreamReader::ReadToEnd(Int32)
 M00000004_IL_0016:
@@ -6017,7 +6017,7 @@ ldarg 1
 M0000001c_IL_0003:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeStringGetUtf8ByteCount(String)
 M0000001c_IL_0008:
-ldc.i4 128
+ldc.i4 1024
 M0000001c_IL_000d:
 ldarg 0
 M0000001c_IL_000e:
@@ -6035,7 +6035,7 @@ M0000001c_IL_0020:
 br M0000001c_IL_0040
 M0000001c_IL_0025:
 M0000001c_IL_0026:
-ldstr "Document exceeds 128 UTF-8 bytes"
+ldstr "Document exceeds 1024 UTF-8 bytes"
 M0000001c_IL_002b:
 newobj instance System.Data.Json.JsonError.LimitExceeded::.ctor(String)
 M0000001c_IL_0030:
@@ -7446,7 +7446,7 @@ ldfld System.Data.Json.MessageReader::bytes
 M00000021_IL_0008:
 callvirt instance System.Collections.Collection<Byte>::get_Count()
 M00000021_IL_000d:
-ldc.i4 128
+ldc.i4 1024
 M00000021_IL_0012:
 cgt
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
@@ -7456,7 +7456,7 @@ M00000021_IL_0019:
 br M00000021_IL_0039
 M00000021_IL_001e:
 M00000021_IL_001f:
-ldstr "Payload exceeds 128 UTF-8 bytes"
+ldstr "Payload exceeds 1024 UTF-8 bytes"
 M00000021_IL_0024:
 newobj instance System.Data.Json.JsonError.LimitExceeded::.ctor(String)
 M00000021_IL_0029:
@@ -8952,7 +8952,7 @@ brtrue M00000023_IL_0028
 M00000023_IL_001b:
 ldloc local1
 M00000023_IL_001c:
-ldc.i4 128
+ldc.i4 1024
 M00000023_IL_0021:
 cgt
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
@@ -9706,348 +9706,348 @@ ldloc local0
 M00000026_IL_000b:
 callvirt instance System.Collections.Collection<Byte>::get_Count()
 M00000026_IL_0010:
-ldc.i4 126
-M00000026_IL_0012:
+ldc.i4 1022
+M00000026_IL_0015:
 cgt
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
-M00000026_IL_0014:
-brtrue M00000026_IL_001e
-M00000026_IL_0019:
-br M00000026_IL_0039
-M00000026_IL_001e:
-M00000026_IL_001f:
+M00000026_IL_0017:
+brtrue M00000026_IL_0021
+M00000026_IL_001c:
+br M00000026_IL_003c
+M00000026_IL_0021:
+M00000026_IL_0022:
 ldstr "Message exceeds payload limit"
-M00000026_IL_0024:
+M00000026_IL_0027:
 newobj instance System.Data.Json.JsonError.LimitExceeded::.ctor(String)
-M00000026_IL_0029:
+M00000026_IL_002c:
 newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.LimitExceeded)
-M00000026_IL_002e:
+M00000026_IL_0031:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
-M00000026_IL_0033:
+M00000026_IL_0036:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Error<System.Data.Json.JsonError>)
-M00000026_IL_0038:
-ret
-M00000026_IL_0039:
-M00000026_IL_003a:
 M00000026_IL_003b:
-ldloc local0
+ret
 M00000026_IL_003c:
-callvirt instance System.Collections.Collection<Byte>::get_Count()
-M00000026_IL_0041:
-ldc.i4 2
-M00000026_IL_0042:
-add
-M00000026_IL_0043:
-newobj instance System.Collections.ArrayList<Byte>::.ctor(Int32)
-M00000026_IL_0048:
-stloc local1
-M00000026_IL_0049:
-M00000026_IL_004a:
-ldstr "0123456789abcdef"
-M00000026_IL_004f:
-call System.Text.Utf8::Encode(String)
-M00000026_IL_0054:
-stloc local2
-M00000026_IL_0055:
-M00000026_IL_0056:
-ldloc local1
-M00000026_IL_0057:
-ldc.i4 34
-M00000026_IL_0059:
-conv.u1
-M00000026_IL_005a:
-callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
-M00000026_IL_005f:
-M00000026_IL_0060:
+M00000026_IL_003d:
+M00000026_IL_003e:
 ldloc local0
-M00000026_IL_0061:
+M00000026_IL_003f:
+callvirt instance System.Collections.Collection<Byte>::get_Count()
+M00000026_IL_0044:
+ldc.i4 2
+M00000026_IL_0045:
+add
+M00000026_IL_0046:
+newobj instance System.Collections.ArrayList<Byte>::.ctor(Int32)
+M00000026_IL_004b:
+stloc local1
+M00000026_IL_004c:
+M00000026_IL_004d:
+ldstr "0123456789abcdef"
+M00000026_IL_0052:
+call System.Text.Utf8::Encode(String)
+M00000026_IL_0057:
+stloc local2
+M00000026_IL_0058:
+M00000026_IL_0059:
+ldloc local1
+M00000026_IL_005a:
+ldc.i4 34
+M00000026_IL_005c:
+conv.u1
+M00000026_IL_005d:
+callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
+M00000026_IL_0062:
+M00000026_IL_0063:
+ldloc local0
+M00000026_IL_0064:
 callvirt instance System.Collections.Iterable<Byte>::GetIterator()
-M00000026_IL_0066:
+M00000026_IL_0069:
 stloc local6
-M00000026_IL_0068:
+M00000026_IL_006b:
 ldloc local6
-M00000026_IL_006a:
+M00000026_IL_006d:
 callvirt instance System.Collections.Iterator<Byte>::MoveNext()
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
-M00000026_IL_006f:
-brfalse M00000026_IL_0163
-M00000026_IL_0074:
+M00000026_IL_0072:
+brfalse M00000026_IL_0169
+M00000026_IL_0077:
 ldloc local6
-M00000026_IL_0076:
+M00000026_IL_0079:
 callvirt instance System.Collections.Iterator<Byte>::get_Current()
-M00000026_IL_007b:
-stloc local7
-M00000026_IL_007d:
 M00000026_IL_007e:
-ldloc local7
+stloc local7
 M00000026_IL_0080:
-conv.i4
 M00000026_IL_0081:
-ldc.i4 34
+ldloc local7
 M00000026_IL_0083:
+conv.i4
+M00000026_IL_0084:
+ldc.i4 34
+M00000026_IL_0086:
 ceq
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
-M00000026_IL_0085:
-brtrue M00000026_IL_0096
-M00000026_IL_008a:
-ldloc local7
-M00000026_IL_008c:
-conv.i4
+M00000026_IL_0088:
+brtrue M00000026_IL_0099
 M00000026_IL_008d:
-ldc.i4 92
+ldloc local7
 M00000026_IL_008f:
-ceq
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
-M00000026_IL_0091:
-br M00000026_IL_0097
-M00000026_IL_0096:
-ldc.i4 1
-M00000026_IL_0097:
-brtrue M00000026_IL_00a1
-M00000026_IL_009c:
-br M00000026_IL_00ba
-M00000026_IL_00a1:
-M00000026_IL_00a2:
-ldloc local1
-M00000026_IL_00a3:
-ldc.i4 92
-M00000026_IL_00a5:
-conv.u1
-M00000026_IL_00a6:
-callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
-M00000026_IL_00ab:
-M00000026_IL_00ac:
-ldloc local1
-M00000026_IL_00ad:
-ldloc local7
-M00000026_IL_00af:
-callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
-M00000026_IL_00b4:
-br M00000026_IL_012d
-M00000026_IL_00ba:
-M00000026_IL_00bb:
-ldloc local7
-M00000026_IL_00bd:
 conv.i4
-M00000026_IL_00be:
-ldc.i4 31
-M00000026_IL_00c0:
-cgt
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
-M00000026_IL_00c2:
-ldc.i4 0
-M00000026_IL_00c3:
+M00000026_IL_0090:
+ldc.i4 92
+M00000026_IL_0092:
 ceq
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
+M00000026_IL_0094:
+br M00000026_IL_009a
+M00000026_IL_0099:
+ldc.i4 1
+M00000026_IL_009a:
+brtrue M00000026_IL_00a4
+M00000026_IL_009f:
+br M00000026_IL_00bd
+M00000026_IL_00a4:
+M00000026_IL_00a5:
+ldloc local1
+M00000026_IL_00a6:
+ldc.i4 92
+M00000026_IL_00a8:
+conv.u1
+M00000026_IL_00a9:
+callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
+M00000026_IL_00ae:
+M00000026_IL_00af:
+ldloc local1
+M00000026_IL_00b0:
+ldloc local7
+M00000026_IL_00b2:
+callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
+M00000026_IL_00b7:
+br M00000026_IL_0130
+M00000026_IL_00bd:
+M00000026_IL_00be:
+ldloc local7
+M00000026_IL_00c0:
+conv.i4
+M00000026_IL_00c1:
+ldc.i4 31
+M00000026_IL_00c3:
+cgt
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
 M00000026_IL_00c5:
-brtrue M00000026_IL_00cf
-M00000026_IL_00ca:
-br M00000026_IL_0123
-M00000026_IL_00cf:
-M00000026_IL_00d0:
-ldloc local1
-M00000026_IL_00d1:
-ldc.i4 92
+ldc.i4 0
+M00000026_IL_00c6:
+ceq
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
+M00000026_IL_00c8:
+brtrue M00000026_IL_00d2
+M00000026_IL_00cd:
+br M00000026_IL_0126
+M00000026_IL_00d2:
 M00000026_IL_00d3:
-conv.u1
+ldloc local1
 M00000026_IL_00d4:
+ldc.i4 92
+M00000026_IL_00d6:
+conv.u1
+M00000026_IL_00d7:
 callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
-M00000026_IL_00d9:
-M00000026_IL_00da:
-ldloc local1
-M00000026_IL_00db:
-ldc.i4 117
+M00000026_IL_00dc:
 M00000026_IL_00dd:
-conv.u1
+ldloc local1
 M00000026_IL_00de:
+ldc.i4 117
+M00000026_IL_00e0:
+conv.u1
+M00000026_IL_00e1:
 callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
-M00000026_IL_00e3:
-M00000026_IL_00e4:
-ldloc local1
-M00000026_IL_00e5:
-ldc.i4 48
+M00000026_IL_00e6:
 M00000026_IL_00e7:
-conv.u1
+ldloc local1
 M00000026_IL_00e8:
-callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
-M00000026_IL_00ed:
-M00000026_IL_00ee:
-ldloc local1
-M00000026_IL_00ef:
 ldc.i4 48
-M00000026_IL_00f1:
+M00000026_IL_00ea:
 conv.u1
+M00000026_IL_00eb:
+callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
+M00000026_IL_00f0:
+M00000026_IL_00f1:
+ldloc local1
 M00000026_IL_00f2:
+ldc.i4 48
+M00000026_IL_00f4:
+conv.u1
+M00000026_IL_00f5:
 callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
-M00000026_IL_00f7:
-M00000026_IL_00f8:
-ldloc local1
-M00000026_IL_00f9:
-ldloc local2
 M00000026_IL_00fa:
-ldloc local7
+M00000026_IL_00fb:
+ldloc local1
 M00000026_IL_00fc:
-conv.i4
-M00000026_IL_00fd:
-ldc.i4 16
-M00000026_IL_00ff:
-div
-M00000026_IL_0100:
-callvirt instance System.Collections.Sequence<Byte>::get_Item(Int32)
-M00000026_IL_0105:
-callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
-M00000026_IL_010a:
-M00000026_IL_010b:
-ldloc local1
-M00000026_IL_010c:
 ldloc local2
-M00000026_IL_010d:
+M00000026_IL_00fd:
 ldloc local7
-M00000026_IL_010f:
+M00000026_IL_00ff:
 conv.i4
-M00000026_IL_0110:
+M00000026_IL_0100:
 ldc.i4 16
-M00000026_IL_0112:
-rem
-M00000026_IL_0113:
+M00000026_IL_0102:
+div
+M00000026_IL_0103:
 callvirt instance System.Collections.Sequence<Byte>::get_Item(Int32)
-M00000026_IL_0118:
+M00000026_IL_0108:
 callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
-M00000026_IL_011d:
-br M00000026_IL_012c
-M00000026_IL_0123:
-M00000026_IL_0124:
+M00000026_IL_010d:
+M00000026_IL_010e:
 ldloc local1
-M00000026_IL_0125:
+M00000026_IL_010f:
+ldloc local2
+M00000026_IL_0110:
 ldloc local7
-M00000026_IL_0127:
+M00000026_IL_0112:
+conv.i4
+M00000026_IL_0113:
+ldc.i4 16
+M00000026_IL_0115:
+rem
+M00000026_IL_0116:
+callvirt instance System.Collections.Sequence<Byte>::get_Item(Int32)
+M00000026_IL_011b:
 callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
-M00000026_IL_012c:
-M00000026_IL_012d:
-M00000026_IL_012e:
-M00000026_IL_012f:
+M00000026_IL_0120:
+br M00000026_IL_012f
+M00000026_IL_0126:
+M00000026_IL_0127:
 ldloc local1
+M00000026_IL_0128:
+ldloc local7
+M00000026_IL_012a:
+callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
+M00000026_IL_012f:
 M00000026_IL_0130:
+M00000026_IL_0131:
+M00000026_IL_0132:
+ldloc local1
+M00000026_IL_0133:
 callvirt instance System.Collections.ArrayList<Byte>::get_Count()
-M00000026_IL_0135:
-ldc.i4 127
-M00000026_IL_0137:
+M00000026_IL_0138:
+ldc.i4 1023
+M00000026_IL_013d:
 cgt
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
-M00000026_IL_0139:
-brtrue M00000026_IL_0143
-M00000026_IL_013e:
-br M00000026_IL_015d
-M00000026_IL_0143:
+M00000026_IL_013f:
+brtrue M00000026_IL_0149
+M00000026_IL_0144:
+br M00000026_IL_0163
+M00000026_IL_0149:
 ldstr "Escaped message exceeds payload limit"
-M00000026_IL_0148:
+M00000026_IL_014e:
 newobj instance System.Data.Json.JsonError.LimitExceeded::.ctor(String)
-M00000026_IL_014d:
+M00000026_IL_0153:
 newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.LimitExceeded)
-M00000026_IL_0152:
+M00000026_IL_0158:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
-M00000026_IL_0157:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Error<System.Data.Json.JsonError>)
-M00000026_IL_015c:
-ret
 M00000026_IL_015d:
-M00000026_IL_015e:
-br M00000026_IL_0068
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Error<System.Data.Json.JsonError>)
+M00000026_IL_0162:
+ret
 M00000026_IL_0163:
 M00000026_IL_0164:
+br M00000026_IL_006b
+M00000026_IL_0169:
+M00000026_IL_016a:
 ldloc local1
-M00000026_IL_0165:
+M00000026_IL_016b:
 ldc.i4 34
-M00000026_IL_0167:
-conv.u1
-M00000026_IL_0168:
-callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
 M00000026_IL_016d:
+conv.u1
 M00000026_IL_016e:
-M00000026_IL_016f:
-ldloc local1
-M00000026_IL_0170:
-call System.Text.Utf8::Decode(System.Collections.Sequence<Byte>)
+callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
+M00000026_IL_0173:
+M00000026_IL_0174:
 M00000026_IL_0175:
-stloc local4
-M00000026_IL_0177:
-ldloc local4
-M00000026_IL_0179:
-stloc local8
+ldloc local1
+M00000026_IL_0176:
+call System.Text.Utf8::Decode(System.Collections.Sequence<Byte>)
 M00000026_IL_017b:
-ldloca local9
+stloc local4
 M00000026_IL_017d:
-initobj System.Result.Ok<String>
-M00000026_IL_0183:
-ldloca local8
-M00000026_IL_0185:
-ldloca local9
-M00000026_IL_0187:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion59(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Ok<String>&)
-M00000026_IL_018c:
-brfalse M00000026_IL_01b4
-M00000026_IL_0191:
-ldloca local9
-M00000026_IL_0193:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion3(System.Result.Ok<String>&)
-M00000026_IL_0198:
-stloc local5
-M00000026_IL_019a:
-M00000026_IL_019b:
-br M00000026_IL_01a6
-M00000026_IL_01a6:
-M00000026_IL_01a7:
-ldloc local5
-M00000026_IL_01a9:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion49(String)
-M00000026_IL_01ae:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion50(System.Result.Ok<String>)
-M00000026_IL_01b3:
-ret
-M00000026_IL_01b4:
-M00000026_IL_01b5:
 ldloc local4
-M00000026_IL_01b7:
-stloc local10
+M00000026_IL_017f:
+stloc local8
+M00000026_IL_0181:
+ldloca local9
+M00000026_IL_0183:
+initobj System.Result.Ok<String>
+M00000026_IL_0189:
+ldloca local8
+M00000026_IL_018b:
+ldloca local9
+M00000026_IL_018d:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion59(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Ok<String>&)
+M00000026_IL_0192:
+brfalse M00000026_IL_01ba
+M00000026_IL_0197:
+ldloca local9
+M00000026_IL_0199:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion3(System.Result.Ok<String>&)
+M00000026_IL_019e:
+stloc local5
+M00000026_IL_01a0:
+M00000026_IL_01a1:
+br M00000026_IL_01ac
+M00000026_IL_01ac:
+M00000026_IL_01ad:
+ldloc local5
+M00000026_IL_01af:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion49(String)
+M00000026_IL_01b4:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion50(System.Result.Ok<String>)
 M00000026_IL_01b9:
-ldloca local11
-M00000026_IL_01bb:
-initobj System.Result.Error<System.Text.InvalidUtf8Error>
-M00000026_IL_01c1:
-ldloca local10
-M00000026_IL_01c3:
-ldloca local11
-M00000026_IL_01c5:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion60(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Error<System.Text.InvalidUtf8Error>&)
-M00000026_IL_01ca:
-brfalse M00000026_IL_01fe
-M00000026_IL_01cf:
-ldloca local11
-M00000026_IL_01d1:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion61(System.Result.Error<System.Text.InvalidUtf8Error>&)
-M00000026_IL_01d6:
-pop
-M00000026_IL_01d7:
-M00000026_IL_01d8:
-br M00000026_IL_01e3
-M00000026_IL_01e3:
-M00000026_IL_01e4:
-ldstr "Invalid UTF-8"
-M00000026_IL_01e9:
-newobj instance System.Data.Json.JsonError.Syntax::.ctor(String)
-M00000026_IL_01ee:
-newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syntax)
-M00000026_IL_01f3:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
-M00000026_IL_01f8:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Error<System.Data.Json.JsonError>)
-M00000026_IL_01fd:
 ret
+M00000026_IL_01ba:
+M00000026_IL_01bb:
+ldloc local4
+M00000026_IL_01bd:
+stloc local10
+M00000026_IL_01bf:
+ldloca local11
+M00000026_IL_01c1:
+initobj System.Result.Error<System.Text.InvalidUtf8Error>
+M00000026_IL_01c7:
+ldloca local10
+M00000026_IL_01c9:
+ldloca local11
+M00000026_IL_01cb:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion60(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Error<System.Text.InvalidUtf8Error>&)
+M00000026_IL_01d0:
+brfalse M00000026_IL_0204
+M00000026_IL_01d5:
+ldloca local11
+M00000026_IL_01d7:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion61(System.Result.Error<System.Text.InvalidUtf8Error>&)
+M00000026_IL_01dc:
+pop
+M00000026_IL_01dd:
+M00000026_IL_01de:
+br M00000026_IL_01e9
+M00000026_IL_01e9:
+M00000026_IL_01ea:
+ldstr "Invalid UTF-8"
+M00000026_IL_01ef:
+newobj instance System.Data.Json.JsonError.Syntax::.ctor(String)
+M00000026_IL_01f4:
+newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syntax)
+M00000026_IL_01f9:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000026_IL_01fe:
-M00000026_IL_01ff:
-M00000026_IL_0200:
-M00000026_IL_0201:
-M00000026_IL_0202:
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Error<System.Data.Json.JsonError>)
+M00000026_IL_0203:
+ret
+M00000026_IL_0204:
+M00000026_IL_0205:
+M00000026_IL_0206:
+M00000026_IL_0207:
+M00000026_IL_0208:
 fault "Guest program reached a terminal failure"
 .end
 .method instance .ctor() -> noresult
@@ -11315,7 +11315,7 @@ call instance System.Web.Http.HttpContent::get_Bytes()
 M00000041_IL_003c:
 callvirt instance System.Collections.Collection<Byte>::get_Count()
 M00000041_IL_0041:
-ldc.i4 128
+ldc.i4 1024
 M00000041_IL_0046:
 cgt
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
@@ -11325,7 +11325,7 @@ M00000041_IL_004d:
 br M00000041_IL_006d
 M00000041_IL_0052:
 M00000041_IL_0053:
-ldstr "Document exceeds 128 UTF-8 bytes"
+ldstr "Document exceeds 1024 UTF-8 bytes"
 M00000041_IL_0058:
 newobj instance System.Data.Json.JsonError.LimitExceeded::.ctor(String)
 M00000041_IL_005d:

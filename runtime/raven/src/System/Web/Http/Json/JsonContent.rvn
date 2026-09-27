@@ -41,8 +41,8 @@ public class JsonContent {
         if !content.IsBuffered {
             return Error(JsonError.Read(TextReadError.IoFailure))
         }
-        if content.Bytes.Count > 128 {
-            return Error(JsonError.LimitExceeded("Document exceeds 128 UTF-8 bytes"))
+        if content.Bytes.Count > 1024 {
+            return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
         }
         return match Utf8.Decode(content.Bytes) {
             Ok(let text) => Ok(text)

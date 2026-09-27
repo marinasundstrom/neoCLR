@@ -14,7 +14,9 @@ This tracker owns mapping behavior and serializer limits; HTTP owns endpoint and
 application acceptance. The first slice preserves existing scalar/name/error contracts, validates the whole
 input tree before constructors/setters, and bounds recursion to four object levels.
 Cycles fail at the depth bound; shared children are independent subtrees. Nulls
-remain rejected. Collections, nullable/optional values and useful payload limits
+remain rejected. The fixed document budget now matches HTTP at 1,024 UTF-8 bytes; see
+[payload evidence](../experiments/json-object-mapping/payload-validation.json).
+Collections, nullable/optional values and configurable payload limits
 remain next contract choices;
 the plan distinguishes the first nested-object slice from later API requirements.
 SQLite stays exploratory under the [SQL proposal](../proposals/sql-data-access.md).

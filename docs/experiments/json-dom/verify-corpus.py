@@ -41,13 +41,13 @@ def main():
              r'{"a":"\ud83d\ude00","b":[true,false,null,-1.25e+2]}',
              '{"a":1,"A":2}', r'{"a\"b":"x\\y"}', ' \r\n {"x": []}\t ',
              '[[[[0]]]]', '[' + ','.join('0' for _ in range(31)) + ']',
-             '"' + 'a' * 126 + '"'] + numbers
+             '"' + 'a' * 1022 + '"'] + numbers
     invalid = ['', '01', '+1', '-', '.1', '1.', '1e', '1e+', 'NaN', 'Infinity',
                '[1,]', '[,1]', '[1 2]', '{"x" 1}', '{x:1}', '{"x":}',
                '{"x":1,}', '{"x":1 "y":2}', 'true false', '/*x*/0',
                r'{"a":1,"\u0061":2}', '{"x":{"a":1,"a":2}}',
                r'{"\ud800":0}', r'["\udfff"]', '[[[[[0]]]]]',
-               '[' + ','.join('0' for _ in range(32)) + ']', '"' + 'a' * 127 + '"',
+               '[' + ','.join('0' for _ in range(32)) + ']', '"' + 'a' * 1023 + '"',
                '\ufeff{}', '{"a":1]']
     corpus = valid + invalid
     with tempfile.TemporaryDirectory(prefix='neoclr-json-document-') as directory:
@@ -56,7 +56,10 @@ def main():
         reference.mkdir()
         (reference / 'global.json').write_text('{"sdk":{"version":"10.0.100","rollForward":"disable"}}')
         (reference / 'Reference.csproj').write_text('<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><Nullable>enable</Nullable></PropertyGroup></Project>')
-        shutil.copyfile(here.parent / 'json-document/Reference.cs', reference / 'Program.cs')
+        # The older standalone experiment keeps its original 128-byte policy.
+        baseline = (here.parent / 'json-document/Reference.cs').read_text()
+        assert baseline.count('<= 128') == 1
+        (reference / 'Program.cs').write_text(baseline.replace('<= 128', '<= 1024'))
         (reference / 'cases.json').write_text(json.dumps(corpus))
         run(['dotnet', 'build', '-nologo', '-v:q'], cwd=reference)
         compared = run(['dotnet', str(reference / 'bin/Debug/net10.0/Reference.dll'), str(reference / 'cases.json')])
