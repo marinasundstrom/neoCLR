@@ -20,7 +20,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   task pipeline cases, seven runtime task tests and 94 affected/prerequisite tests
   pass, alongside ten focused Raven metadata tests. API snapshot, 18 website tests
   and the 1,025-page build pass. Boxed Completed pattern binding retains a documented
-  compiler limitation; an explicit closed-case cast works. Package qualification remains.
+  compiler limitation; an explicit closed-case cast works. Packaged MSBuild and
+  installed VS Code hover/build/run checks pass. Update completion verification for
+  Raven’s generic labels (Option<T>, Result<T,E>) while retaining host-API rejection.
+  Refreshed package and HTTP qualification remain.
 
 - Fix the socket test byte-array spelling flagged by Rust 1.98 Clippy in release CI.
   Wait for Winsock readiness before reporting a nonblocking connect as successful;

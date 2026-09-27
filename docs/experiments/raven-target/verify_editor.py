@@ -94,9 +94,9 @@ try:
         items = result if isinstance(result, list) else result['items']
         labels = sorted({item['label'] for item in items})
         expected = ('Abs', 'Min', 'Max', 'Sign', 'Clamp', 'Sqrt', 'Floor', 'Ceiling', 'Truncate', 'Round', 'Exp', 'Log', 'Log10', 'Sin', 'Cos', 'Tan', 'Pow') if owner == 'Math' else (('WriteLine',) if owner else (('Collections', 'Option', 'Result', 'Console', 'Math') if collections else ('Option', 'Result', 'Console', 'Math')))
-        if any(not any(label == name or label.startswith(name+'(') for label in labels) for name in expected):
+        if any(not any(label == name or label.startswith((name+'(', name+'<')) for label in labels) for name in expected):
             raise AssertionError(f'{owner}: missing target completions: {labels}')
-        if any(label == name or label.startswith(name+'(') for label in labels for name in ('BackgroundColor', 'Atan', 'Cosh')):
+        if any(label == name or label.startswith((name+'(', name+'<')) for label in labels for name in ('BackgroundColor', 'Atan', 'Cosh')):
             raise AssertionError(f'{owner}: unexpected host API: {labels}')
         if not owner and 'Net' in labels:
             raise AssertionError('Host System.Net leaked into target namespace')
@@ -149,9 +149,9 @@ try:
                 'position': {'line': 2, 'character': len('    ' + access)}, 'context': {'triggerKind': 1}}, True))
             items = result if isinstance(result, list) else result['items']
             labels = sorted({item['label'] for item in items})
-            if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
+            if any(not any(label == name or label.startswith((name + '(', name + '<')) for label in labels) for name in expected):
                 raise AssertionError('Missing target file API: ' + str(labels))
-            if any(label == name or label.startswith(name + '(') for label in labels for name in forbidden):
+            if any(label == name or label.startswith((name + '(', name + '<')) for label in labels for name in forbidden):
                 raise AssertionError('Host file API leaked: ' + str(labels))
             results[owner] = labels
     if strings:
@@ -166,9 +166,9 @@ try:
                 'position': {'line': 3 if prefix else 2, 'character': len('    ' + access)}, 'context': {'triggerKind': 1}}, True))
             items = result if isinstance(result, list) else result['items']
             labels = sorted({item['label'] for item in items})
-            if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
+            if any(not any(label == name or label.startswith((name + '(', name + '<')) for label in labels) for name in expected):
                 raise AssertionError('Missing target String API: ' + str(labels))
-            if any(label == name or label.startswith(name + '(') for label in labels for name in forbidden):
+            if any(label == name or label.startswith((name + '(', name + '<')) for label in labels for name in forbidden):
                 raise AssertionError('Host String API leaked: ' + str(labels))
             if access == 'text.' and not any(item['label'] == 'IsEmpty' and item.get('kind') == 10 for item in items):
                 raise AssertionError('IsEmpty must be a property')
@@ -181,7 +181,7 @@ try:
             'position': {'line': 1, 'character': len('    ' + access)}, 'context': {'triggerKind': 1}}, True))
         items = result if isinstance(result, list) else result['items']
         labels = sorted({item['label'] for item in items})
-        if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in ('Parse', 'Divide')):
+        if any(not any(label == name or label.startswith((name + '(', name + '<')) for label in labels) for name in ('Parse', 'Divide')):
             raise AssertionError('Missing target Parse API: ' + str(labels))
         if any(label == 'TryParse' or label.startswith('TryParse(') for label in labels):
             raise AssertionError('Host TryParse leaked: ' + str(labels))
@@ -193,7 +193,7 @@ try:
             'position': {'line': 2, 'character': 11}, 'context': {'triggerKind': 1}}, True))
         items = result if isinstance(result, list) else result['items']
         labels = sorted({item['label'] for item in items})
-        if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in ('Equals', 'CompareTo', 'ToString')):
+        if any(not any(label == name or label.startswith((name + '(', name + '<')) for label in labels) for name in ('Equals', 'CompareTo', 'ToString')):
             raise AssertionError('Missing Int32 instance API: ' + str(labels))
         results['Int32Instance'] = labels
     if primitives:
@@ -204,7 +204,7 @@ try:
         items = result if isinstance(result, list) else result['items']
         labels = sorted({item['label'] for item in items})
         expected = ('FromString',)
-        if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
+        if any(not any(label == name or label.startswith((name + '(', name + '<')) for label in labels) for name in expected):
             raise AssertionError('Missing character API: ' + str(labels))
         if any('Surrogate' in label or label.startswith('IsDigit') for label in labels):
             raise AssertionError('Removed surrogate API remains visible: ' + str(labels))
@@ -221,7 +221,7 @@ try:
                 'position': {'line': 3, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))
             items = result if isinstance(result, list) else result['items']
             labels = sorted({item['label'] for item in items})
-            if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
+            if any(not any(label == name or label.startswith((name + '(', name + '<')) for label in labels) for name in expected):
                 raise AssertionError('Missing calendar API: ' + str(labels))
             results[expression] = labels
     if errors:
@@ -234,7 +234,7 @@ try:
                 'position': {'line': 2, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))
             items = result if isinstance(result, list) else result['items']
             labels = sorted({item['label'] for item in items})
-            if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
+            if any(not any(label == name or label.startswith((name + '(', name + '<')) for label in labels) for name in expected):
                 raise AssertionError('Missing error API: ' + str(labels))
             results[expression] = labels
     if unions:
@@ -247,7 +247,7 @@ try:
                 'position': {'line': 4, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))
             items = result if isinstance(result, list) else result['items']
             labels = sorted({item['label'] for item in items})
-            if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
+            if any(not any(label == name or label.startswith((name + '(', name + '<')) for label in labels) for name in expected):
                 raise AssertionError('Missing union API: ' + str(labels))
             results[expression] = labels
     if process_apis:
@@ -260,7 +260,7 @@ try:
                 'position': {'line': 1, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))
             items = result if isinstance(result, list) else result['items']
             labels = sorted({item['label'] for item in items})
-            if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
+            if any(not any(label == name or label.startswith((name + '(', name + '<')) for label in labels) for name in expected):
                 raise AssertionError('Missing process API: ' + str(labels))
             results[expression] = labels
     if booleans:
@@ -286,7 +286,7 @@ try:
                 'position': {'line': 5, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))
             items = result if isinstance(result, list) else result['items']
             labels = sorted({item['label'] for item in items})
-            if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
+            if any(not any(label == name or label.startswith((name + '(', name + '<')) for label in labels) for name in expected):
                 raise AssertionError('Missing reflection API: ' + str(labels))
             results[expression] = labels
     if collections:
