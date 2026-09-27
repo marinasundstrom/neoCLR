@@ -1,0 +1,15 @@
+namespace System.Globalization
+
+// Bounded numeric conventions; not a general CLDR pattern interpreter.
+internal class SwedishDateTimeFormat : DateTimeFormatRules {
+    private var digits: DateTimeFormatDigits = DateTimeFormatDigits()
+    val DateTimeSeparator: string => " "
+
+    func FormatDate(year: int, month: int, day: int) -> string {
+        return digits.Pad(year, 4) + "-" + digits.Pad(month, 2) + "-" + digits.Pad(day, 2)
+    }
+
+    func FormatTime(time: System.Time) -> string {
+        return digits.FormatTime(time, ",")
+    }
+}

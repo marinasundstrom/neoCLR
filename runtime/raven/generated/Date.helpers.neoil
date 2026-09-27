@@ -23,6 +23,17 @@ ldarg arg0
 newobj instance System.Result<System.Date,System.InvalidDateError>::.ctor(System.Result.Ok<System.Date>)
 ret
 .end
+.function neoCLR.Library.System.Date.RuntimeUnion4(System.Result<String,System.InvalidDateError>& arg0,out(true) System.Result.Ok<String>& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<String,System.InvalidDateError>::TryGetValue(System.Result.Ok<String>&)
+ret
+.end
+.function neoCLR.Library.System.Date.RuntimeUnion5(System.Result.Ok<String>& arg0) -> String
+ldarg arg0
+call instance System.Result.Ok<String>::get_Value()
+ret
+.end
 .function neoCLR.Library.System.Date.RuntimeBooleanFromInt32(Int32 value) -> Boolean
     ldarg value
     ldc.i4 0

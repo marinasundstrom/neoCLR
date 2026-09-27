@@ -1263,3 +1263,9 @@ Generic policies are invariant and explicit; no inferred default/culture policy 
 introduced. The focused verifier is `verify_comparers.py`, and
 `Probe --comparer-signatures OUTPUT` checks metadata admission. Editor checks use
 `verify_editor.py PROJECT --comparers`. The package builder includes the verifier.
+
+## Provisional calendars and globalization (2026-09-27)
+
+The [calendar slice](../../calendar-globalization.md) adds source declarations and strict bindings for immutable calendar/culture/formatting facades. Runtime Contract selection is unchanged. The importer admits the exact internal CalendarRules and DateTimeFormatRules interfaces only in their matching library slices; they remain internal in emitted metadata. The new private RuntimeServices.SystemCultureName InternalCall returns the host preferred locale under ProcessEnvironment. Regenerate matching reference and all library fragments after these changes; legacy bundled System is unchanged.
+
+No Raven compiler code was changed. The bootstrap source uses an explicit block/local construction for DateTimeFormat.Invariant because the expression-bodied shadow-core factory form emitted null in this experiment. The executed consumer guards the working form. Run --globalization-signatures and verify_globalization.py for signature, executable and source-visibility checks.

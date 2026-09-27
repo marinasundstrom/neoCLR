@@ -49,6 +49,7 @@ static class RuntimeServiceBindings
             ("JoinWorkerResult", ["Int32"], "Value"),
             ("NotifyWorker", ["Int32", "System.Func<Void>"], "noresult"),
             ("LocalDateTime", ["Int64"], "System.LocalDateTime"),
+            ("SystemCultureName", [], "String"),
             ("UnixTimeTicks", [], "Int64"),
             ("UnixTimeToLocal", ["Int64"], "arrayref<Int32>"),
             ("PathCombine", ["String", "String"], "String"),

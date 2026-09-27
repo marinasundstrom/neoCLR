@@ -1,0 +1,5 @@
+namespace System.Globalization
+
+public interface CultureProvider {
+    val Current: Culture { get; }
+}

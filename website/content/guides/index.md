@@ -44,3 +44,5 @@ about the latest downloadable bundle.
 
 See [development setup](../try/#development) for toolchain requirements. Broader ideas
 belong in [direction and proposals](../proposals/), separate from implemented guides.
+
+[Globalization](../features/globalization/) covers culture, language, system discovery and Gregorian/Hebrew rendering (provisional development APIs).

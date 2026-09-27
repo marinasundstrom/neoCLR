@@ -102,6 +102,16 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/ResultOperators.neoil')
         result += build(ROOT / 'runtime/raven/StringComparison.neoil')
         result += build(ROOT / 'runtime/raven/Comparers.neoil')
+        result += build(ROOT / 'runtime/raven/Calendar.neoil')
+        result += build(ROOT / 'runtime/raven/Culture.neoil')
+        result += build(ROOT / 'runtime/neoCLR/Runtime/SystemCultureName.neoil')
+        result += build(ROOT / 'runtime/raven/Language.neoil')
+        result += build(ROOT / 'runtime/raven/CultureProvider.neoil')
+        result += build(ROOT / 'runtime/raven/FixedCultureProvider.neoil')
+        result += build(ROOT / 'runtime/raven/SystemCultureProvider.neoil')
+
+        result += build(ROOT / 'runtime/raven/DateTimeFormat.neoil')
+
         result += build(ROOT / 'runtime/raven/Map.neoil')
         result += build(ROOT / 'runtime/raven/Utf8.neoil')
         result += build(ROOT / 'runtime/raven/EntryKind.neoil')

@@ -1,7 +1,7 @@
 # Namespace overview
 
 Use this overview to find the part of the neoCLR library that fits your task.
-It describes the **Preview 10 API**. Use matching compiler, reference and runtime
+It describes the **Preview 10 API plus labeled development additions**. Use matching compiler, reference and runtime
 artifacts. Names and contracts remain experimental.
 
 The list grows as APIs are implemented. Every public reference type is inventoried, with generated pages or an explicitly
@@ -13,6 +13,7 @@ is supported.
 | Namespace | What it contains | Explore |
 | --- | --- | --- |
 | `System` | Core types such as Object, Value, HashCode, primitives, String and Array; Func delegates; Option and Result; common capability and error types; Console; dates, times, durations and clocks. Console is a class in this namespace. | [Core reference](xref:System), [Object and Value](objects.md), [Console](console.md), [arrays](/features/arrays/index.html), [outcomes](/features/outcomes/index.html), [dates and clocks](/features/time/index.html) |
+| `System.Globalization` | Development culture/language profiles, calendar-selecting date/time formatters and fixed/system culture providers. | [Reference](xref:System.Globalization), [globalization guide](/features/globalization/) |
 | `System.Collections` | Iteration and collection capabilities: Iterable, Iterator, Collection, Sequence, List and map interfaces, with ArrayList and HashMap implementations. | [Collections reference](xref:System.Collections) · [ArrayList](xref:System.Collections.ArrayList`1) · [HashMap](xref:System.Collections.HashMap`2) · [Collections guide](/features/collections/index.html) |
 | `System.Networking` | Host-backed IPv4 lookup through Dns and typed DnsError, separate from connecting. | [Networking guide](/features/networking/), [reference](xref:System.Networking) |
 | `System.Networking.Sockets` | IPv4 TCP connections and listeners: Connect, Listen, Accept, Send, Receive, GetLocalPort, Close and typed SocketError. | [Guide](sockets.md), [reference](xref:System.Networking.Sockets) |

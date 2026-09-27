@@ -394,4 +394,31 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StringComparer'">
     <Compile Include="src/System/StringComparer.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Calendar'">
+    <Compile Include="src/System/Calendar.rvn" />
+    <Compile Include="src/System/GregorianCalendar.rvn" />
+    <Compile Include="src/System/HebrewCalendar.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Culture'">
+    <Compile Include="src/System/Globalization/Culture.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'DateTimeFormat'">
+    <Compile Include="src/System/Globalization/DateTimeFormat.rvn" />
+    <Compile Include="src/System/Globalization/InvariantDateTimeFormat.rvn" />
+    <Compile Include="src/System/Globalization/SwedishDateTimeFormat.rvn" />
+    <Compile Include="src/System/Globalization/HebrewDateTimeFormat.rvn" />
+    <Compile Include="src/System/Globalization/DateTimeFormatDigits.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Language'">
+    <Compile Include="src/System/Globalization/Language.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'CultureProvider'">
+    <Compile Include="src/System/Globalization/CultureProvider.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FixedCultureProvider'">
+    <Compile Include="src/System/Globalization/FixedCultureProvider.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'SystemCultureProvider'">
+    <Compile Include="src/System/Globalization/SystemCultureProvider.rvn" />
+  </ItemGroup>
 </Project>

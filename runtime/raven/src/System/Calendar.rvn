@@ -1,0 +1,83 @@
+namespace System
+
+/// Immutable calendar selection. Values retain Date's absolute day identity.
+public class Calendar {
+    private var rules: CalendarRules
+
+    private init(rules: CalendarRules) {
+        self.rules = rules
+    }
+
+    static val Gregorian: Calendar {
+        get {
+            let implementation: CalendarRules = GregorianCalendar()
+            return Calendar(implementation)
+        }
+    }
+    static val Hebrew: Calendar {
+        get {
+            let implementation: CalendarRules = HebrewCalendar()
+            return Calendar(implementation)
+        }
+    }
+    val Id: string => rules.Id
+    val MinYear: int => rules.MinYear
+    val MaxYear: int => rules.MaxYear
+
+    func CreateDate(year: int, month: int, day: int) -> Result<Date, InvalidDateError> {
+        return rules.CreateDate(year, month, day)
+    }
+
+    func IsLeapYear(year: int) -> Result<bool, InvalidDateError> {
+        return rules.IsLeapYear(year)
+    }
+
+    func GetMonthsInYear(year: int) -> Result<int, InvalidDateError> {
+        return rules.GetMonthsInYear(year)
+    }
+
+    func GetDaysInMonth(year: int, month: int) -> Result<int, InvalidDateError> {
+        return rules.GetDaysInMonth(year, month)
+    }
+
+    func GetYear(date: Date) -> Result<int, InvalidDateError> {
+        return rules.GetYear(date)
+    }
+
+    func GetMonth(date: Date) -> Result<int, InvalidDateError> {
+        return rules.GetMonth(date)
+    }
+
+    func GetDay(date: Date) -> Result<int, InvalidDateError> {
+        return rules.GetDay(date)
+    }
+
+    func AddDays(date: Date, days: int) -> Result<Date, InvalidDateError> {
+        return rules.AddDays(date, days)
+    }
+
+    func AddMonths(date: Date, months: int) -> Result<Date, InvalidDateError> {
+        return rules.AddMonths(date, months)
+    }
+
+    func AddYears(date: Date, years: int) -> Result<Date, InvalidDateError> {
+        return rules.AddYears(date, years)
+    }
+
+}
+
+internal interface CalendarRules {
+    val Id: string { get; }
+    val MinYear: int { get; }
+    val MaxYear: int { get; }
+    func CreateDate(year: int, month: int, day: int) -> Result<Date, InvalidDateError>
+    func IsLeapYear(year: int) -> Result<bool, InvalidDateError>
+    func GetMonthsInYear(year: int) -> Result<int, InvalidDateError>
+    func GetDaysInMonth(year: int, month: int) -> Result<int, InvalidDateError>
+    func GetYear(date: Date) -> Result<int, InvalidDateError>
+    func GetMonth(date: Date) -> Result<int, InvalidDateError>
+    func GetDay(date: Date) -> Result<int, InvalidDateError>
+    func AddDays(date: Date, days: int) -> Result<Date, InvalidDateError>
+    func AddMonths(date: Date, months: int) -> Result<Date, InvalidDateError>
+    func AddYears(date: Date, years: int) -> Result<Date, InvalidDateError>
+}

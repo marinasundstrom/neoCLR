@@ -1,0 +1,75 @@
+namespace System.Globalization
+
+import System.Result.*
+
+// Hebrew-calendar dates use Hebrew letters; Gregorian dates retain numeric he-IL output.
+internal class HebrewDateTimeFormat : DateTimeFormatRules {
+    private var digits: DateTimeFormatDigits = DateTimeFormatDigits()
+    private var calendar: System.Calendar
+
+    init(calendar: System.Calendar) {
+        self.calendar = calendar
+    }
+
+    val DateTimeSeparator: string => " "
+
+    // Only called for validated day numbers (1–30) and year remainders (344–999).
+    func Numeral(value: int) -> string {
+        let amounts = [400, 300, 200, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+        let letters = ["ת", "ש", "ר", "ק", "צ", "פ", "ע", "ס", "נ", "מ", "ל", "כ", "י", "ט", "ח", "ז", "ו", "ה", "ד", "ג", "ב", "א"]
+        var remaining = value
+        var raw = ""
+        var index = 0
+        while remaining > 0 {
+            // Traditional forms avoid the divine-name combinations for 15/16.
+            if remaining == 15 {
+                raw = raw + "טו"
+                remaining = 0
+            } else if remaining == 16 {
+                raw = raw + "טז"
+                remaining = 0
+            } else if remaining >= amounts[index] {
+                raw = raw + letters[index]
+                remaining = remaining - amounts[index]
+            } else {
+                index = index + 1
+            }
+        }
+        if raw.Length == 1 {
+            return raw + "׳"
+        }
+        var result = ""
+        var position = 0
+        while position < raw.Length {
+            if position == raw.Length - 1 {
+                result = result + "״"
+            }
+            result = result + raw[position].ToString()
+            position = position + 1
+        }
+        return result
+    }
+
+    func MonthName(year: int, month: int) -> string {
+        let Ok(count) = calendar.GetMonthsInYear(year) else {
+            System.Fault("Expected validated Hebrew year")
+        }
+        if count == 13 {
+            let leapNames = ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר א׳", "אדר ב׳", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"]
+            return leapNames[month - 1]
+        }
+        let names = ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"]
+        return names[month - 1]
+    }
+
+    func FormatDate(year: int, month: int, day: int) -> string {
+        if calendar.Id.Equals("hebrew") {
+            return Numeral(day) + " " + MonthName(year, month) + " ה׳" + Numeral(year - 5000)
+        }
+        return digits.Pad(day, 2) + "." + digits.Pad(month, 2) + "." + digits.Pad(year, 4)
+    }
+
+    func FormatTime(time: System.Time) -> string {
+        return digits.FormatTime(time, ".")
+    }
+}

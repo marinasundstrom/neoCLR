@@ -10,6 +10,14 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    "Language": "System.Globalization.Language",
+    "CultureProvider": "System.Globalization.CultureProvider",
+    "FixedCultureProvider": "System.Globalization.FixedCultureProvider",
+    "SystemCultureProvider": "System.Globalization.SystemCultureProvider",
+
+    "Calendar": "System.Calendar",
+    "Culture": "System.Globalization.Culture",
+    "DateTimeFormat": "System.Globalization.DateTimeFormat",
     "EqualityComparer": "System.Collections.EqualityComparer",
     "Comparer": "System.Collections.Comparer",
     "DelegateEqualityComparer": "System.Collections.DelegateEqualityComparer",
@@ -146,6 +154,21 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    "Language": "runtime/raven/src/System/Globalization/Language.rvn",
+    "CultureProvider": "runtime/raven/src/System/Globalization/CultureProvider.rvn",
+    "FixedCultureProvider": "runtime/raven/src/System/Globalization/FixedCultureProvider.rvn",
+    "SystemCultureProvider": "runtime/raven/src/System/Globalization/SystemCultureProvider.rvn",
+
+    "InvariantDateTimeFormat": "runtime/raven/src/System/Globalization/InvariantDateTimeFormat.rvn",
+    "SwedishDateTimeFormat": "runtime/raven/src/System/Globalization/SwedishDateTimeFormat.rvn",
+    "HebrewDateTimeFormat": "runtime/raven/src/System/Globalization/HebrewDateTimeFormat.rvn",
+    "DateTimeFormatDigits": "runtime/raven/src/System/Globalization/DateTimeFormatDigits.rvn",
+
+    "GregorianCalendar": "runtime/raven/src/System/GregorianCalendar.rvn",
+    "HebrewCalendar": "runtime/raven/src/System/HebrewCalendar.rvn",
+    "Calendar": "runtime/raven/src/System/Calendar.rvn",
+    "Culture": "runtime/raven/src/System/Globalization/Culture.rvn",
+    "DateTimeFormat": "runtime/raven/src/System/Globalization/DateTimeFormat.rvn",
     "EqualityComparer": "runtime/raven/src/System/Collections/EqualityComparer.rvn",
     "Comparer": "runtime/raven/src/System/Collections/Comparer.rvn",
     "DelegateEqualityComparer": "runtime/raven/src/System/Collections/DelegateEqualityComparer.rvn",

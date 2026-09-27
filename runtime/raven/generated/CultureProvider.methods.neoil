@@ -1,0 +1,8 @@
+; Generated from runtime/raven/src/System/Globalization/CultureProvider.rvn. Regenerate with build_runtime_library.py.
+.interface System.Globalization.CultureProvider
+.method instance get_Current() -> System.Globalization.Culture
+.end
+.property instance Current() -> System.Globalization.Culture
+.get instance System.Globalization.CultureProvider::get_Current()
+.end
+.end

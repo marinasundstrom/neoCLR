@@ -1,47 +1,26 @@
-# Raven date, time and local clock APIs
+# Raven date, time and calendar APIs
 
-The target exposes all 24 current public methods/accessors on Date, Time,
-LocalDateTime and Clock:
+The development [calendar/globalization contract](calendar-globalization.md) extends
+Preview 10 with Date arithmetic and display, LocalDateTime.Create, Calendar and
+minimal Culture/Language/DateTimeFormat/provider contracts. These are provisional;
+use matching compiler reference and generated runtime artifacts.
 
-| Type | Surface |
-| --- | --- |
-| Date | Create, FromDayNumber; DayNumber, Year, DayOfYear, Month, Day; Equals, CompareTo |
-| Time | Both Create overloads, FromTicks; Ticks, Hour, Minute, Second, Millisecond, FractionTicks; Equals, CompareTo |
-| LocalDateTime | Date, Time, UtcOffsetSeconds |
-| Clock | GetLocalNow |
+Date remains an absolute Gregorian day number. Gregorian and Hebrew calendar
+policies convert between fields and that day, so conversion works in both directions
+without formatting/parsing strings. Hebrew supports complete years 5344–5999.
+Invalid construction, projection and arithmetic return Result with InvalidDateError.
 
-Date/Time factories return `Result<Date,InvalidDateError>` or
-`Result<Time,InvalidTimeError>`. Typed matches and `?` propagation work with these
-value payloads. Clock returns the existing LocalDateTime snapshot directly; the
-internal Capture method is not exposed. The [error-value APIs](raven-error-api.md) also expose constructors and ToString.
+[The tested formatting sample](experiments/raven-target/samples/library-date-formatting.rvn)
+renders the same day as Gregorian, Hebrew alphabet and invariant Hebrew fields.
+[The contract consumer](experiments/raven-target/samples/library-globalization.rvn)
+also exercises arithmetic, provider discovery, fallback and Hebrew leap-month rules.
+Run verify_globalization.py as described in the calendar guide.
 
-The existing [date/time design](date-time.md) defines the contracts and their .NET
-comparison. This projection preserves the separate calendar-date, time-of-day and
-local-clock concepts, with Result-based validation instead of exception-producing
-construction. It does not add globalization, parsing, formatting or timezone-rule APIs.
-All values retain their runtime value semantics and private storage. CLI default
-initialization maps to initobj rather than constructing through private fields.
-Concrete instance calls use the existing readonly managed receiver contracts.
+Time retains validated tick-based time-of-day construction. LocalDateTime combines
+Date and Time without an offset. Instant/Duration and injectable Clock/SystemClock
+remain separate; see [date/time design](date-time-design.md) and
+[the instant sample](experiments/raven-target/samples/library-instants.rvn).
+The older GetLocalNow/UtcOffsetSeconds projection is historical, not the current API.
 
-## Trying the examples
-
-Copy [the fixed calendar sample](experiments/raven-target/samples/library-calendar.rvn)
-into Main.rvn in a fresh [prepared project](experiments/raven-target/README.md).
-**neoCLR: Run saved project** demonstrates leap-day validation, day-number conversion,
-invalid input, fractional ticks, component access, comparisons and error propagation.
-The saved-project suite checks its exact output.
-
-The [live clock sample](experiments/raven-target/samples/library-clock.rvn) prints
-year, month, day, hour, minute, second and UTC offset in seconds. Verify it against
-the host clock using:
-
-```sh
-python3 docs/experiments/raven-target/verify_clock.py /tmp/PROBE/editor/Demo.rvnproj \
-  --raven /path/to/Raven --runtime /path/to/neoclr
-```
-
-The check captures a time window around execution, validates the returned instant,
-and compares the local components/offset with the host timezone. It does not assert
-that the clock call returns a predetermined date or prove behavior on other hosts.
-`verify_editor.py --calendar` checks factory and snapshot completion. Use fresh
-metadata; installed SDK/VSIX assets are unchanged.
+Localization is independent of culture: future unified interfaces can use different
+providers and JSON/resource sources. No resource-loading implementation is included.

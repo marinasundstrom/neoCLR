@@ -8,12 +8,25 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Add provisional Gregorian/Hebrew calendar policies, checked Date arithmetic,
+  Date display and LocalDateTime construction. Add invariant, Swedish and Israeli
+  cultures with Language, immutable calendar-selecting date/time formatters, Hebrew
+  alphabet or Latin rendering, and fixed/system culture providers. Host preferred
+  locale discovery uses sys-locale 0.3.2 through ProcessEnvironment; unsupported
+  preferences fall back to invariant. Hebrew supports complete years 5344–5999.
+  Refresh matching bridge/library/API artifacts; rebuild consumers together.
+  Validate against .NET calendar fixtures and executable Raven consumers on macOS;
+  Windows/Linux discovery remains unexecuted. Record the independent unified
+  localization direction, with interchangeable JSON/resource sources still planned.
+  Feature globalization separately from DateTime on the website; record Time and
+  time zones as the author-selected next slice.
+
 - Record Preview 10 publication, verified remote asset digests and POC completion
   in the roadmap, HTTP and release trackers.
 - Select useful library API coverage as the next author-directed work. Record a
   proposed comparer-first sequence, earlier text/casing/StringBuilder/time requests,
   bounded companion tasks and focused validation in the existing theme trackers.
-  The later text, casing and time slices remain planned.
+  The later text and casing slices remain planned; the bounded time slice is recorded above.
 - Implement Raven EqualityComparer<T> and Comparer<T> interfaces, callback adapters
   and StringComparer.Ordinal. Add HashMap policy construction while preserving the
   callback constructor; both comparer methods retain the map's reentry protection.

@@ -121,6 +121,61 @@ public struct Date : ComparableTo<Date>, EquatableTo<Date> {
     }
     val Day: int => DayOfYear - DaysBeforeMonth(Year, Month)
 
+    /// Adds calendar days, returning an error outside years 1–9999.
+    func AddDays(days: int) -> Result<Date, InvalidDateError> {
+        let target = (long)StoredDayNumber + days
+        if target < 0L {
+            return Error(InvalidDateError())
+        }
+        if target > 3652058L {
+            return Error(InvalidDateError())
+        }
+        return FromDayNumber((int)target)
+    }
+
+    /// Adds months and clamps the day to the last day of the target month.
+    func AddMonths(months: int) -> Result<Date, InvalidDateError> {
+        let target = (long)(Year - 1) * 12L + Month - 1 + months
+        if target < 0L {
+            return Error(InvalidDateError())
+        }
+        if target > 119987L {
+            return Error(InvalidDateError())
+        }
+        let year = (int)(target / 12L) + 1
+        let month = (int)(target % 12L) + 1
+        var day = Day
+        let last = DaysInMonth(year, month)
+        if day > last {
+            day = last
+        }
+        return Create(year, month, day)
+    }
+
+    /// Adds years, clamping February 29 to February 28 when necessary.
+    func AddYears(years: int) -> Result<Date, InvalidDateError> {
+        if years < -9998 {
+            return Error(InvalidDateError())
+        }
+        if years > 9998 {
+            return Error(InvalidDateError())
+        }
+        return AddMonths(years * 12)
+    }
+
+    /// Formats using Culture.Current; pass Culture.Invariant for deterministic output.
+    override func ToString() -> string {
+        return ToString(Globalization.Culture.Current)
+    }
+
+    /// Formats with a culture's Gregorian default; no ambient culture is read.
+    func ToString(culture: Globalization.Culture) -> string {
+        let Ok(text) = culture.DateTimeFormat.FormatDate(self) else {
+            System.Fault("A supported culture must format every valid Date")
+        }
+        return text
+    }
+
     func Equals(other: Date) -> bool {
         return StoredDayNumber == other.StoredDayNumber
     }

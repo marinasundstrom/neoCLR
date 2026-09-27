@@ -12,6 +12,11 @@ public struct LocalDateTime {
         StoredTime = time
     }
 
+    /// Combines already validated civil values without selecting a zone or offset.
+    static func Create(date: Date, time: Time) -> LocalDateTime {
+        return LocalDateTime(date, time)
+    }
+
     internal static func FromUnixTimeTicks(ticks: long) -> LocalDateTime {
         let parts = RuntimeServices.UnixTimeToLocal(ticks)
         let Ok(date) = System.Date.Create(parts[0], parts[1], parts[2]) else {

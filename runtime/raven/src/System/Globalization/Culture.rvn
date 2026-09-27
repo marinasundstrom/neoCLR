@@ -1,0 +1,42 @@
+namespace System.Globalization
+
+/// Immutable, bounded date/time conventions; no ambient culture or locale resolver.
+public class Culture {
+    private var kind: int
+
+    private init(value: int) {
+        kind = value
+    }
+
+    static val Invariant: Culture => Culture(0)
+    static val SwedishSweden: Culture => Culture(1)
+    static val HebrewIsrael: Culture => Culture(2)
+
+    val Name: string {
+        get {
+            if kind == 1 {
+                return "sv-SE"
+            }
+            if kind == 2 {
+                return "he-IL"
+            }
+            return ""
+        }
+    }
+    val Language: Language {
+        get {
+            if kind == 1 {
+                return System.Globalization.Language.Swedish
+            }
+            if kind == 2 {
+                return System.Globalization.Language.Hebrew
+            }
+            return System.Globalization.Language.Undetermined
+        }
+    }
+    /// Resolves a fresh snapshot of the host preference with invariant fallback.
+    static val Current: Culture => SystemCultureProvider().Current
+
+    val DefaultCalendar: System.Calendar => System.Calendar.Gregorian
+    val DateTimeFormat: DateTimeFormat => System.Globalization.DateTimeFormat.Create(self, DefaultCalendar)
+}

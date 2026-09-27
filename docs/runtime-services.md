@@ -121,3 +121,7 @@ retained native outcome without requiring dispatch. The generated array-copy hel
 additionally uses managed-array services through its actual instructions. These
 requirements describe reachability, not permission grants or a complete platform
 support check. See the [DNS contract](socket-api-design.md#public-hostname-lookup-and-networking-poc--2026-09-24).
+
+### System culture discovery (development, 2026-09-27)
+
+SystemCultureProvider reaches ProcessEnvironment through the private SystemCultureName InternalCall. The host returns its preferred locale via sys-locale 0.3.2 (empty if unavailable); Raven resolves the supported culture or invariant fallback. This does not read localization resources or change host settings. See [contract and limitations](calendar-globalization.md).

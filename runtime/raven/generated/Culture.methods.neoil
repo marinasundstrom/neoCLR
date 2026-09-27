@@ -1,0 +1,199 @@
+; Generated from runtime/raven/src/System/Globalization/Culture.rvn. Regenerate with build_runtime_library.py.
+.type class System.Globalization.Culture
+.sealed
+.field private kind Int32
+.property static Invariant() -> System.Globalization.Culture
+.get System.Globalization.Culture::get_Invariant()
+.end
+.property static SwedishSweden() -> System.Globalization.Culture
+.get System.Globalization.Culture::get_SwedishSweden()
+.end
+.property static HebrewIsrael() -> System.Globalization.Culture
+.get System.Globalization.Culture::get_HebrewIsrael()
+.end
+.property instance Name() -> String
+.get instance System.Globalization.Culture::get_Name()
+.end
+.property instance Language() -> System.Globalization.Language
+.get instance System.Globalization.Culture::get_Language()
+.end
+.property static Current() -> System.Globalization.Culture
+.get System.Globalization.Culture::get_Current()
+.end
+.property instance DefaultCalendar() -> System.Calendar
+.get instance System.Globalization.Culture::get_DefaultCalendar()
+.end
+.property instance DateTimeFormat() -> System.Globalization.DateTimeFormat
+.get instance System.Globalization.Culture::get_DateTimeFormat()
+.end
+.method private instance .ctor(Int32 value) -> noresult
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 0
+M00000001_IL_0009:
+ldarg 1
+M00000001_IL_000a:
+stfld System.Globalization.Culture::kind
+M00000001_IL_000f:
+ret
+.end
+.method static get_Invariant() -> System.Globalization.Culture
+M00000002_IL_0000:
+M00000002_IL_0001:
+ldc.i4 0
+M00000002_IL_0002:
+newobj instance System.Globalization.Culture::.ctor(Int32)
+M00000002_IL_0007:
+ret
+.end
+.method static get_SwedishSweden() -> System.Globalization.Culture
+M00000003_IL_0000:
+M00000003_IL_0001:
+ldc.i4 1
+M00000003_IL_0002:
+newobj instance System.Globalization.Culture::.ctor(Int32)
+M00000003_IL_0007:
+ret
+.end
+.method static get_HebrewIsrael() -> System.Globalization.Culture
+M00000004_IL_0000:
+M00000004_IL_0001:
+ldc.i4 2
+M00000004_IL_0002:
+newobj instance System.Globalization.Culture::.ctor(Int32)
+M00000004_IL_0007:
+ret
+.end
+.method instance get_Name() -> String
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.Globalization.Culture::kind
+M00000005_IL_0008:
+ldc.i4 1
+M00000005_IL_0009:
+ceq
+call neoCLR.Library.System.Globalization.Culture.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_000b:
+brtrue M00000005_IL_0015
+M00000005_IL_0010:
+br M00000005_IL_001c
+M00000005_IL_0015:
+M00000005_IL_0016:
+ldstr "sv-SE"
+M00000005_IL_001b:
+ret
+M00000005_IL_001c:
+M00000005_IL_001d:
+M00000005_IL_001e:
+ldarg 0
+M00000005_IL_001f:
+ldfld System.Globalization.Culture::kind
+M00000005_IL_0024:
+ldc.i4 2
+M00000005_IL_0025:
+ceq
+call neoCLR.Library.System.Globalization.Culture.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0027:
+brtrue M00000005_IL_0031
+M00000005_IL_002c:
+br M00000005_IL_0038
+M00000005_IL_0031:
+M00000005_IL_0032:
+ldstr "he-IL"
+M00000005_IL_0037:
+ret
+M00000005_IL_0038:
+M00000005_IL_0039:
+M00000005_IL_003a:
+ldstr ""
+M00000005_IL_003f:
+ret
+.end
+.method instance get_Language() -> System.Globalization.Language
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.Globalization.Culture::kind
+M00000006_IL_0008:
+ldc.i4 1
+M00000006_IL_0009:
+ceq
+call neoCLR.Library.System.Globalization.Culture.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_000b:
+brtrue M00000006_IL_0015
+M00000006_IL_0010:
+br M00000006_IL_001c
+M00000006_IL_0015:
+M00000006_IL_0016:
+call System.Globalization.Language::get_Swedish()
+M00000006_IL_001b:
+ret
+M00000006_IL_001c:
+M00000006_IL_001d:
+M00000006_IL_001e:
+ldarg 0
+M00000006_IL_001f:
+ldfld System.Globalization.Culture::kind
+M00000006_IL_0024:
+ldc.i4 2
+M00000006_IL_0025:
+ceq
+call neoCLR.Library.System.Globalization.Culture.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0027:
+brtrue M00000006_IL_0031
+M00000006_IL_002c:
+br M00000006_IL_0038
+M00000006_IL_0031:
+M00000006_IL_0032:
+call System.Globalization.Language::get_Hebrew()
+M00000006_IL_0037:
+ret
+M00000006_IL_0038:
+M00000006_IL_0039:
+M00000006_IL_003a:
+call System.Globalization.Language::get_Undetermined()
+M00000006_IL_003f:
+ret
+.end
+.method static get_Current() -> System.Globalization.Culture
+M00000007_IL_0000:
+M00000007_IL_0001:
+newobj instance System.Globalization.SystemCultureProvider::.ctor()
+M00000007_IL_0006:
+callvirt instance System.Globalization.SystemCultureProvider::get_Current()
+M00000007_IL_000b:
+ret
+.end
+.method instance get_DefaultCalendar() -> System.Calendar
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+call System.Calendar::get_Gregorian()
+M00000008_IL_0007:
+ret
+.end
+.method instance get_DateTimeFormat() -> System.Globalization.DateTimeFormat
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldarg 0
+M00000009_IL_0004:
+callvirt instance System.Globalization.Culture::get_DefaultCalendar()
+M00000009_IL_0009:
+call System.Globalization.DateTimeFormat::Create(System.Globalization.Culture,System.Calendar)
+M00000009_IL_000e:
+ret
+.end
+.end

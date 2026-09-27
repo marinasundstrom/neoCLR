@@ -30,6 +30,23 @@ static class ApplicationTypes
             || element.Scope is AssemblyNameReference assembly && assembly.FullName != LibraryModule.Assembly.Name.FullName) return;
         var type = element.Resolve();
         if (type is null || type.Module != LibraryModule || type.IsPublic || LibraryNames.ContainsKey(type)) return;
+        // The calendar/formatter strategies use closed, internal interfaces. They
+        // are admitted only in their owning library slice, never as guest core APIs.
+        var privatePolicy = LibraryScope == "System.Calendar" && type.FullName == "System.CalendarRules"
+            || LibraryScope == "System.Globalization.DateTimeFormat" && type.FullName == "System.Globalization.DateTimeFormatRules";
+        if (privatePolicy)
+        {
+            if (!type.IsNotPublic || !type.IsInterface || !type.IsAbstract || type.IsSealed
+                || type.IsNested || type.HasGenericParameters || type.HasFields || type.HasEvents
+                || type.HasNestedTypes || type.HasInterfaces || type.BaseType is not null
+                || type.Methods.Any(m => !m.IsPublic || !m.IsAbstract || !m.IsVirtual || !m.IsNewSlot
+                    || m.IsFinal || m.IsStatic || m.IsConstructor || m.HasBody || m.HasGenericParameters
+                    || m.Parameters.Any(p => p.IsOut || p.ParameterType.IsByReference)))
+                throw new InvalidDataException("Unsupported private policy contract: " + type.FullName);
+            LibraryNames.Add(type, "neoCLR.Library." + LibraryScope + ".Type_" + Convert.ToHexString(Encoding.UTF8.GetBytes(type.FullName)));
+            LibraryDependencies.Add(type);
+            return;
+        }
         if (type.IsNested || type.IsValueType || type.IsInterface || type.IsAbstract || type.IsExplicitLayout
             || type.BaseType?.FullName != "System.Object" || type.HasEvents
             || type.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant)
@@ -330,7 +347,7 @@ static class ApplicationTypes
             var nestedCase = IsLibrary(type) && GenericUnionLibrary.IsCase(type);
             var declarationStart = output.Length;
             var declarationName = nestedCase ? name[(name.LastIndexOf('.') + 1)..] : name;
-            output.AppendLine(type.IsInterface ? $".interface {name}" : $".type {((LibraryDependencies.Contains(type) || IsLibrary(type) && type.IsNotPublic) ? "internal " : "")}{(type.IsValueType || OpaqueLibrary.IsString(type) || IsLibrary(type) && GenericUnionLibrary.IsContainer(type) ? "" : "class ")}{(type.IsAbstract && !GenericUnionLibrary.IsContainer(type) ? "abstract " : "")}{declarationName}");
+            output.AppendLine(type.IsInterface ? $".interface {(LibraryDependencies.Contains(type) ? "internal " : "")}{name}" : $".type {((LibraryDependencies.Contains(type) || IsLibrary(type) && type.IsNotPublic) ? "internal " : "")}{(type.IsValueType || OpaqueLibrary.IsString(type) || IsLibrary(type) && GenericUnionLibrary.IsContainer(type) ? "" : "class ")}{(type.IsAbstract && !GenericUnionLibrary.IsContainer(type) ? "abstract " : "")}{declarationName}");
             if (type.IsSealed) output.AppendLine(".sealed");
             if (type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.ClosedHierarchyAttribute"))
                 output.AppendLine(".closedhierarchy");

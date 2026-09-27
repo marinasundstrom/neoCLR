@@ -1,0 +1,53 @@
+; Generated from runtime/raven/src/System/Globalization/SystemCultureProvider.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeStringEquals(String source,String value0) -> Boolean
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::Equals(String)
+ret
+.end
+.function neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeStringget_Item(String source,Int32 value0) -> Char
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::get_Item(Int32)
+ret
+.end
+.function neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeStringget_Length(String source) -> Int32
+ldarg source
+call instance System.String::get_Length()
+ret
+.end
+.function neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeCharToString(Char& source) -> String
+ldarg source
+call instance System.Char::ToString()
+ret
+.end
+.function neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

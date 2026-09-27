@@ -1,0 +1,306 @@
+; Generated from runtime/raven/src/System/Globalization/SystemCultureProvider.rvn. Regenerate with build_runtime_library.py.
+.type class System.Globalization.SystemCultureProvider
+.sealed
+.implements System.Globalization.CultureProvider
+.field private preference String
+.property instance PreferredCultureName() -> String
+.get instance System.Globalization.SystemCultureProvider::get_PreferredCultureName()
+.end
+.property instance Current() -> System.Globalization.Culture
+.get instance System.Globalization.SystemCultureProvider::get_Current()
+.end
+.property instance IsFallback() -> Boolean
+.get instance System.Globalization.SystemCultureProvider::get_IsFallback()
+.end
+.method instance .ctor() -> noresult
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 0
+M00000001_IL_0009:
+call neoCLR.Runtime.SystemCultureName()
+M00000001_IL_000e:
+stfld System.Globalization.SystemCultureProvider::preference
+M00000001_IL_0013:
+ret
+.end
+.method private instance .ctor(String preference) -> noresult
+M00000002_IL_0000:
+M00000002_IL_0001:
+ldarg 0
+M00000002_IL_0002:
+pop
+M00000002_IL_0007:
+M00000002_IL_0008:
+ldarg 0
+M00000002_IL_0009:
+ldarg 1
+M00000002_IL_000a:
+stfld System.Globalization.SystemCultureProvider::preference
+M00000002_IL_000f:
+ret
+.end
+.method static FromPreference(String preference) -> System.Globalization.SystemCultureProvider
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+newobj instance System.Globalization.SystemCultureProvider::.ctor(String)
+M00000003_IL_0008:
+ret
+.end
+.method instance get_PreferredCultureName() -> String
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.Globalization.SystemCultureProvider::preference
+M00000004_IL_0008:
+ret
+.end
+.method instance get_Current() -> System.Globalization.Culture
+.local String local0
+.local Int32 local1
+.local String local2
+.local Char local3
+ldc.i4 0
+stloc local1
+ldstr "\u0000"
+call neoCLR.Runtime.CharFromString(String)
+stloc local3
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldstr ""
+M00000005_IL_0007:
+stloc local0
+M00000005_IL_0008:
+M00000005_IL_0009:
+ldc.i4 0
+M00000005_IL_000a:
+stloc local1
+M00000005_IL_000b:
+M00000005_IL_000c:
+M00000005_IL_000d:
+ldloc local1
+M00000005_IL_000e:
+ldarg 0
+M00000005_IL_000f:
+ldfld System.Globalization.SystemCultureProvider::preference
+M00000005_IL_0014:
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeStringget_Length(String)
+M00000005_IL_0019:
+clt
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_001b:
+brtrue M00000005_IL_0025
+M00000005_IL_0020:
+br M00000005_IL_00ac
+M00000005_IL_0025:
+M00000005_IL_0026:
+ldarg 0
+M00000005_IL_0027:
+ldfld System.Globalization.SystemCultureProvider::preference
+M00000005_IL_002c:
+ldloc local1
+M00000005_IL_002d:
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeStringget_Item(String,Int32)
+M00000005_IL_0032:
+stloc local3
+M00000005_IL_0033:
+ldloca local3
+M00000005_IL_0035:
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeCharToString(Char&)
+M00000005_IL_003a:
+stloc local2
+M00000005_IL_003b:
+M00000005_IL_003c:
+ldloc local2
+M00000005_IL_003d:
+ldstr "-"
+M00000005_IL_0042:
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0047:
+brtrue M00000005_IL_005c
+M00000005_IL_004c:
+ldloc local2
+M00000005_IL_004d:
+ldstr "_"
+M00000005_IL_0052:
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0057:
+br M00000005_IL_005d
+M00000005_IL_005c:
+ldc.i4 1
+M00000005_IL_005d:
+brtrue M00000005_IL_0072
+M00000005_IL_0062:
+ldloc local2
+M00000005_IL_0063:
+ldstr "."
+M00000005_IL_0068:
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_006d:
+br M00000005_IL_0073
+M00000005_IL_0072:
+ldc.i4 1
+M00000005_IL_0073:
+brtrue M00000005_IL_0088
+M00000005_IL_0078:
+ldloc local2
+M00000005_IL_0079:
+ldstr "@"
+M00000005_IL_007e:
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0083:
+br M00000005_IL_0089
+M00000005_IL_0088:
+ldc.i4 1
+M00000005_IL_0089:
+brtrue M00000005_IL_0093
+M00000005_IL_008e:
+br M00000005_IL_0098
+M00000005_IL_0093:
+br M00000005_IL_00ac
+M00000005_IL_0098:
+M00000005_IL_0099:
+M00000005_IL_009a:
+ldloc local0
+M00000005_IL_009b:
+ldloc local2
+M00000005_IL_009c:
+call System.String::Concat(String,String)
+M00000005_IL_00a1:
+stloc local0
+M00000005_IL_00a2:
+M00000005_IL_00a3:
+ldloc local1
+M00000005_IL_00a4:
+ldc.i4 1
+M00000005_IL_00a5:
+add
+M00000005_IL_00a6:
+stloc local1
+M00000005_IL_00a7:
+br M00000005_IL_000c
+M00000005_IL_00ac:
+M00000005_IL_00ad:
+M00000005_IL_00ae:
+ldloc local0
+M00000005_IL_00af:
+ldstr "sv"
+M00000005_IL_00b4:
+call System.String::CompareOrdinalIgnoreCase(String,String)
+M00000005_IL_00b9:
+ldc.i4 0
+M00000005_IL_00ba:
+ceq
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_00bc:
+brtrue M00000005_IL_00c6
+M00000005_IL_00c1:
+br M00000005_IL_00cd
+M00000005_IL_00c6:
+M00000005_IL_00c7:
+call System.Globalization.Culture::get_SwedishSweden()
+M00000005_IL_00cc:
+ret
+M00000005_IL_00cd:
+M00000005_IL_00ce:
+M00000005_IL_00cf:
+ldloc local0
+M00000005_IL_00d0:
+ldstr "he"
+M00000005_IL_00d5:
+call System.String::CompareOrdinalIgnoreCase(String,String)
+M00000005_IL_00da:
+ldc.i4 0
+M00000005_IL_00db:
+ceq
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_00dd:
+brtrue M00000005_IL_00f5
+M00000005_IL_00e2:
+ldloc local0
+M00000005_IL_00e3:
+ldstr "iw"
+M00000005_IL_00e8:
+call System.String::CompareOrdinalIgnoreCase(String,String)
+M00000005_IL_00ed:
+ldc.i4 0
+M00000005_IL_00ee:
+ceq
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_00f0:
+br M00000005_IL_00f6
+M00000005_IL_00f5:
+ldc.i4 1
+M00000005_IL_00f6:
+brtrue M00000005_IL_0100
+M00000005_IL_00fb:
+br M00000005_IL_0107
+M00000005_IL_0100:
+M00000005_IL_0101:
+call System.Globalization.Culture::get_HebrewIsrael()
+M00000005_IL_0106:
+ret
+M00000005_IL_0107:
+M00000005_IL_0108:
+M00000005_IL_0109:
+call System.Globalization.Culture::get_Invariant()
+M00000005_IL_010e:
+ret
+.end
+.method instance get_IsFallback() -> Boolean
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.Globalization.SystemCultureProvider::preference
+M00000006_IL_0008:
+ldarg 0
+M00000006_IL_0009:
+callvirt instance System.Globalization.SystemCultureProvider::get_Current()
+M00000006_IL_000e:
+call instance System.Globalization.Culture::get_Name()
+M00000006_IL_0013:
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0018:
+ldc.i4 0
+M00000006_IL_0019:
+ceq
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_001b:
+brtrue M00000006_IL_0033
+M00000006_IL_0020:
+ldarg 0
+M00000006_IL_0021:
+ldfld System.Globalization.SystemCultureProvider::preference
+M00000006_IL_0026:
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeStringget_Length(String)
+M00000006_IL_002b:
+ldc.i4 0
+M00000006_IL_002c:
+ceq
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_002e:
+br M00000006_IL_0034
+M00000006_IL_0033:
+ldc.i4 1
+M00000006_IL_0034:
+call neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.end

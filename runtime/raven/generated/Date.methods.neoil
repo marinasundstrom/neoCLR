@@ -851,7 +851,10 @@ sub
 M0000000b_IL_001a:
 ret
 .end
-.method instance readonly byref Equals(System.Date other) -> Boolean
+.method instance readonly byref AddDays(Int32 days) -> System.Result<System.Date,System.InvalidDateError>
+.local Int64 local0
+ldc.i8 0
+stloc local0
 M0000000c_IL_0000:
 M0000000c_IL_0001:
 M0000000c_IL_0002:
@@ -859,66 +862,437 @@ ldarg 0
 M0000000c_IL_0003:
 ldfld System.Date::StoredDayNumber
 M0000000c_IL_0008:
-ldarga 1
+conv.i8
+M0000000c_IL_0009:
+ldarg 1
 M0000000c_IL_000a:
-ldfld System.Date::StoredDayNumber
+conv.i8
+M0000000c_IL_000b:
+add
+M0000000c_IL_000c:
+stloc local0
+M0000000c_IL_000d:
+M0000000c_IL_000e:
+ldloc local0
 M0000000c_IL_000f:
-ceq
+ldc.i8 0
+M0000000c_IL_0018:
+clt
 call neoCLR.Library.System.Date.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_0011:
-call neoCLR.Library.System.Date.RuntimeBooleanFromInt32(Int32)
+M0000000c_IL_001a:
+brtrue M0000000c_IL_0024
+M0000000c_IL_001f:
+br M0000000c_IL_0034
+M0000000c_IL_0024:
+call neoCLR.Library.System.Date.RuntimeErrorSystemInvalidDateErrorNew()
+M0000000c_IL_0029:
+call neoCLR.Library.System.Date.RuntimeUnion0(System.InvalidDateError)
+M0000000c_IL_002e:
+call neoCLR.Library.System.Date.RuntimeUnion1(System.Result.Error<System.InvalidDateError>)
+M0000000c_IL_0033:
+ret
+M0000000c_IL_0034:
+M0000000c_IL_0035:
+M0000000c_IL_0036:
+ldloc local0
+M0000000c_IL_0037:
+ldc.i8 3652058
+M0000000c_IL_0040:
+cgt
+call neoCLR.Library.System.Date.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0042:
+brtrue M0000000c_IL_004c
+M0000000c_IL_0047:
+br M0000000c_IL_005c
+M0000000c_IL_004c:
+call neoCLR.Library.System.Date.RuntimeErrorSystemInvalidDateErrorNew()
+M0000000c_IL_0051:
+call neoCLR.Library.System.Date.RuntimeUnion0(System.InvalidDateError)
+M0000000c_IL_0056:
+call neoCLR.Library.System.Date.RuntimeUnion1(System.Result.Error<System.InvalidDateError>)
+M0000000c_IL_005b:
+ret
+M0000000c_IL_005c:
+M0000000c_IL_005d:
+M0000000c_IL_005e:
+ldloc local0
+M0000000c_IL_005f:
+conv.i4
+M0000000c_IL_0060:
+call System.Date::FromDayNumber(Int32)
+M0000000c_IL_0065:
 ret
 .end
-.method instance readonly byref CompareTo(System.Date other) -> Int32
+.method instance readonly byref AddMonths(Int32 months) -> System.Result<System.Date,System.InvalidDateError>
+.local Int64 local0
+.local Int32 local1
+.local Int32 local2
+.local Int32 local3
+.local Int32 local4
+ldc.i8 0
+stloc local0
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local2
+ldc.i4 0
+stloc local3
+ldc.i4 0
+stloc local4
 M0000000d_IL_0000:
 M0000000d_IL_0001:
 M0000000d_IL_0002:
 ldarg 0
 M0000000d_IL_0003:
-ldfld System.Date::StoredDayNumber
+call instance System.Date::get_Year()
 M0000000d_IL_0008:
-ldarga 1
+ldc.i4 1
+M0000000d_IL_0009:
+sub
 M0000000d_IL_000a:
-ldfld System.Date::StoredDayNumber
-M0000000d_IL_000f:
+conv.i8
+M0000000d_IL_000b:
+ldc.i8 12
+M0000000d_IL_0014:
+mul
+M0000000d_IL_0015:
+ldarg 0
+M0000000d_IL_0016:
+call instance System.Date::get_Month()
+M0000000d_IL_001b:
+conv.i8
+M0000000d_IL_001c:
+add
+M0000000d_IL_001d:
+ldc.i4 1
+M0000000d_IL_001e:
+conv.i8
+M0000000d_IL_001f:
+sub
+M0000000d_IL_0020:
+ldarg 1
+M0000000d_IL_0021:
+conv.i8
+M0000000d_IL_0022:
+add
+M0000000d_IL_0023:
+stloc local0
+M0000000d_IL_0024:
+M0000000d_IL_0025:
+ldloc local0
+M0000000d_IL_0026:
+ldc.i8 0
+M0000000d_IL_002f:
 clt
 call neoCLR.Library.System.Date.RuntimeBooleanToInt32(Boolean)
-M0000000d_IL_0011:
-brtrue M0000000d_IL_001b
-M0000000d_IL_0016:
-br M0000000d_IL_001e
-M0000000d_IL_001b:
-M0000000d_IL_001c:
-ldc.i4 -1
-M0000000d_IL_001d:
+M0000000d_IL_0031:
+brtrue M0000000d_IL_003b
+M0000000d_IL_0036:
+br M0000000d_IL_004b
+M0000000d_IL_003b:
+call neoCLR.Library.System.Date.RuntimeErrorSystemInvalidDateErrorNew()
+M0000000d_IL_0040:
+call neoCLR.Library.System.Date.RuntimeUnion0(System.InvalidDateError)
+M0000000d_IL_0045:
+call neoCLR.Library.System.Date.RuntimeUnion1(System.Result.Error<System.InvalidDateError>)
+M0000000d_IL_004a:
 ret
-M0000000d_IL_001e:
-M0000000d_IL_001f:
-M0000000d_IL_0020:
-ldarg 0
-M0000000d_IL_0021:
-ldfld System.Date::StoredDayNumber
-M0000000d_IL_0026:
-ldarga 1
-M0000000d_IL_0028:
-ldfld System.Date::StoredDayNumber
-M0000000d_IL_002d:
+M0000000d_IL_004b:
+M0000000d_IL_004c:
+M0000000d_IL_004d:
+ldloc local0
+M0000000d_IL_004e:
+ldc.i8 119987
+M0000000d_IL_0057:
 cgt
 call neoCLR.Library.System.Date.RuntimeBooleanToInt32(Boolean)
-M0000000d_IL_002f:
-brtrue M0000000d_IL_0039
-M0000000d_IL_0034:
-br M0000000d_IL_003c
-M0000000d_IL_0039:
-M0000000d_IL_003a:
-ldc.i4 1
-M0000000d_IL_003b:
+M0000000d_IL_0059:
+brtrue M0000000d_IL_0063
+M0000000d_IL_005e:
+br M0000000d_IL_0073
+M0000000d_IL_0063:
+call neoCLR.Library.System.Date.RuntimeErrorSystemInvalidDateErrorNew()
+M0000000d_IL_0068:
+call neoCLR.Library.System.Date.RuntimeUnion0(System.InvalidDateError)
+M0000000d_IL_006d:
+call neoCLR.Library.System.Date.RuntimeUnion1(System.Result.Error<System.InvalidDateError>)
+M0000000d_IL_0072:
 ret
-M0000000d_IL_003c:
-M0000000d_IL_003d:
-M0000000d_IL_003e:
+M0000000d_IL_0073:
+M0000000d_IL_0074:
+M0000000d_IL_0075:
+ldloc local0
+M0000000d_IL_0076:
+ldc.i8 12
+M0000000d_IL_007f:
+div
+M0000000d_IL_0080:
+conv.i4
+M0000000d_IL_0081:
+ldc.i4 1
+M0000000d_IL_0082:
+add
+M0000000d_IL_0083:
+stloc local1
+M0000000d_IL_0084:
+M0000000d_IL_0085:
+ldloc local0
+M0000000d_IL_0086:
+ldc.i8 12
+M0000000d_IL_008f:
+rem
+M0000000d_IL_0090:
+conv.i4
+M0000000d_IL_0091:
+ldc.i4 1
+M0000000d_IL_0092:
+add
+M0000000d_IL_0093:
+stloc local2
+M0000000d_IL_0094:
+M0000000d_IL_0095:
+ldarg 0
+M0000000d_IL_0096:
+call instance System.Date::get_Day()
+M0000000d_IL_009b:
+stloc local3
+M0000000d_IL_009c:
+M0000000d_IL_009d:
+ldloc local1
+M0000000d_IL_009e:
+ldloc local2
+M0000000d_IL_009f:
+call System.Date::DaysInMonth(Int32,Int32)
+M0000000d_IL_00a4:
+stloc local4
+M0000000d_IL_00a6:
+M0000000d_IL_00a7:
+ldloc local3
+M0000000d_IL_00a8:
+ldloc local4
+M0000000d_IL_00aa:
+cgt
+call neoCLR.Library.System.Date.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_00ac:
+brtrue M0000000d_IL_00b6
+M0000000d_IL_00b1:
+br M0000000d_IL_00ba
+M0000000d_IL_00b6:
+M0000000d_IL_00b7:
+ldloc local4
+M0000000d_IL_00b9:
+stloc local3
+M0000000d_IL_00ba:
+M0000000d_IL_00bb:
+M0000000d_IL_00bc:
+ldloc local1
+M0000000d_IL_00bd:
+ldloc local2
+M0000000d_IL_00be:
+ldloc local3
+M0000000d_IL_00bf:
+call System.Date::Create(Int32,Int32,Int32)
+M0000000d_IL_00c4:
+ret
+.end
+.method instance readonly byref AddYears(Int32 years) -> System.Result<System.Date,System.InvalidDateError>
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+M0000000e_IL_0002:
+ldarg 1
+M0000000e_IL_0003:
+ldc.i4 -9998
+M0000000e_IL_0008:
+clt
+call neoCLR.Library.System.Date.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_000a:
+brtrue M0000000e_IL_0014
+M0000000e_IL_000f:
+br M0000000e_IL_0024
+M0000000e_IL_0014:
+call neoCLR.Library.System.Date.RuntimeErrorSystemInvalidDateErrorNew()
+M0000000e_IL_0019:
+call neoCLR.Library.System.Date.RuntimeUnion0(System.InvalidDateError)
+M0000000e_IL_001e:
+call neoCLR.Library.System.Date.RuntimeUnion1(System.Result.Error<System.InvalidDateError>)
+M0000000e_IL_0023:
+ret
+M0000000e_IL_0024:
+M0000000e_IL_0025:
+M0000000e_IL_0026:
+ldarg 1
+M0000000e_IL_0027:
+ldc.i4 9998
+M0000000e_IL_002c:
+cgt
+call neoCLR.Library.System.Date.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_002e:
+brtrue M0000000e_IL_0038
+M0000000e_IL_0033:
+br M0000000e_IL_0048
+M0000000e_IL_0038:
+call neoCLR.Library.System.Date.RuntimeErrorSystemInvalidDateErrorNew()
+M0000000e_IL_003d:
+call neoCLR.Library.System.Date.RuntimeUnion0(System.InvalidDateError)
+M0000000e_IL_0042:
+call neoCLR.Library.System.Date.RuntimeUnion1(System.Result.Error<System.InvalidDateError>)
+M0000000e_IL_0047:
+ret
+M0000000e_IL_0048:
+M0000000e_IL_0049:
+M0000000e_IL_004a:
+ldarg 0
+M0000000e_IL_004b:
+ldarg 1
+M0000000e_IL_004c:
+ldc.i4 12
+M0000000e_IL_004e:
+mul
+M0000000e_IL_004f:
+call instance System.Date::AddMonths(Int32)
+M0000000e_IL_0054:
+ret
+.end
+.method instance override readonly byref ToString() -> String
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+ldarg 0
+M0000000f_IL_0003:
+call System.Globalization.Culture::get_Current()
+M0000000f_IL_0008:
+call instance System.Date::ToString(System.Globalization.Culture)
+M0000000f_IL_000d:
+ret
+.end
+.method instance readonly byref ToString(System.Globalization.Culture culture) -> String
+.local String local0
+.local System.Result<String,System.InvalidDateError> local1
+.local System.Result.Ok<String> local2
+ldloca local1
+initobj System.Result<String,System.InvalidDateError>
+ldloca local2
+initobj System.Result.Ok<String>
+M00000010_IL_0000:
+M00000010_IL_0001:
+M00000010_IL_0002:
+ldarg 1
+M00000010_IL_0003:
+call instance System.Globalization.Culture::get_DateTimeFormat()
+M00000010_IL_0008:
+ldarg 0
+M00000010_IL_0009:
+ldobj System.Date
+M00000010_IL_000e:
+call instance System.Globalization.DateTimeFormat::FormatDate(System.Date)
+M00000010_IL_0013:
+stloc local1
+M00000010_IL_0014:
+ldloca local2
+M00000010_IL_0016:
+initobj System.Result.Ok<String>
+M00000010_IL_001c:
+ldloca local1
+M00000010_IL_001e:
+ldloca local2
+M00000010_IL_0020:
+call neoCLR.Library.System.Date.RuntimeUnion4(System.Result<String,System.InvalidDateError>&,System.Result.Ok<String>&)
+M00000010_IL_0025:
+brfalse M00000010_IL_003e
+M00000010_IL_002a:
+ldloca local2
+M00000010_IL_002c:
+call neoCLR.Library.System.Date.RuntimeUnion5(System.Result.Ok<String>&)
+M00000010_IL_0031:
+stloc local0
+M00000010_IL_0032:
+M00000010_IL_0033:
+br M00000010_IL_0043
+M00000010_IL_003e:
+br M00000010_IL_0049
+M00000010_IL_0043:
+br M00000010_IL_0054
+M00000010_IL_0049:
+M00000010_IL_004a:
+ldstr "A supported culture must format every valid Date"
+M00000010_IL_004f:
+call System.Fault(String)
+fault "System.Fault returned unexpectedly"
+M00000010_IL_0054:
+M00000010_IL_0055:
+M00000010_IL_0056:
+ldloc local0
+M00000010_IL_0057:
+ret
+.end
+.method instance readonly byref Equals(System.Date other) -> Boolean
+M00000011_IL_0000:
+M00000011_IL_0001:
+M00000011_IL_0002:
+ldarg 0
+M00000011_IL_0003:
+ldfld System.Date::StoredDayNumber
+M00000011_IL_0008:
+ldarga 1
+M00000011_IL_000a:
+ldfld System.Date::StoredDayNumber
+M00000011_IL_000f:
+ceq
+call neoCLR.Library.System.Date.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_0011:
+call neoCLR.Library.System.Date.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance readonly byref CompareTo(System.Date other) -> Int32
+M00000012_IL_0000:
+M00000012_IL_0001:
+M00000012_IL_0002:
+ldarg 0
+M00000012_IL_0003:
+ldfld System.Date::StoredDayNumber
+M00000012_IL_0008:
+ldarga 1
+M00000012_IL_000a:
+ldfld System.Date::StoredDayNumber
+M00000012_IL_000f:
+clt
+call neoCLR.Library.System.Date.RuntimeBooleanToInt32(Boolean)
+M00000012_IL_0011:
+brtrue M00000012_IL_001b
+M00000012_IL_0016:
+br M00000012_IL_001e
+M00000012_IL_001b:
+M00000012_IL_001c:
+ldc.i4 -1
+M00000012_IL_001d:
+ret
+M00000012_IL_001e:
+M00000012_IL_001f:
+M00000012_IL_0020:
+ldarg 0
+M00000012_IL_0021:
+ldfld System.Date::StoredDayNumber
+M00000012_IL_0026:
+ldarga 1
+M00000012_IL_0028:
+ldfld System.Date::StoredDayNumber
+M00000012_IL_002d:
+cgt
+call neoCLR.Library.System.Date.RuntimeBooleanToInt32(Boolean)
+M00000012_IL_002f:
+brtrue M00000012_IL_0039
+M00000012_IL_0034:
+br M00000012_IL_003c
+M00000012_IL_0039:
+M00000012_IL_003a:
+ldc.i4 1
+M00000012_IL_003b:
+ret
+M00000012_IL_003c:
+M00000012_IL_003d:
+M00000012_IL_003e:
 ldc.i4 0
-M0000000d_IL_003f:
+M00000012_IL_003f:
 ret
 .end
 .end

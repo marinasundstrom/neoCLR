@@ -303,3 +303,7 @@ including eight string/Uri and optional-token overloads. Type/member XML, namesp
 navigation and the API landing page describe the buffered limits and error/cancellation
 policy. HttpJsonError case payload properties use the same explicitly linked manual
 payload reference as JsonError until RavenDoc produces those individual pages.
+
+### Calendar/globalization checkpoint (2026-09-27)
+
+Calendar, Culture, Language, DateTimeFormat, CultureProvider, FixedCultureProvider and SystemCultureProvider are automatically selected from the matching reference. Date arithmetic/display and LocalDateTime.Create have XML coverage. Internal calendar/formatter rules are deliberately not public APIs; no public type is excluded. System discovery is a ProcessEnvironment service. The API snapshot is refreshed and checked; website source is updated without an unrelated full build.

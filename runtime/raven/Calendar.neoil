@@ -1,0 +1,3 @@
+; Raven-authored Calendar implementation.
+.include "generated/Calendar.methods.neoil"
+.include "generated/Calendar.helpers.neoil"

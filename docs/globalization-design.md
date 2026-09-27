@@ -109,3 +109,7 @@ invariant number/date formatting, language/script/region combinations, culture f
 parsing failures, collation versus ordinal comparison, concurrent contexts and a target
 with no bundled culture data. Compare results with a pinned .NET toolchain; do not claim
 globalization correctness from names or sample output alone.
+
+## Bounded implementation status (2026-09-27)
+
+See [calendar and globalization](calendar-globalization.md) for the provisional implemented subset: Culture, Language, calendar-specific formatting and fixed/system culture providers. The broader proposal remains exploratory. Localization must use shared interfaces across areas, independently of these culture APIs; different providers may read JSON, resource files or other sources. No resource loading is implemented in this slice.

@@ -1,0 +1,200 @@
+import System.*
+import System.Globalization.*
+import System.Result.*
+import System.Console.*
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("Calendar/globalization check failed")
+    }
+}
+
+func RequireDate(result: Result<Date, InvalidDateError>) -> Date {
+    let Ok(date) = result else {
+        System.Fault("Expected valid date")
+    }
+    return date
+}
+
+func RejectDate(result: Result<Date, InvalidDateError>) {
+    match result {
+        .Error(_) => { }
+        .Ok(_) => System.Fault("Expected invalid date")
+    }
+}
+
+func Text(result: Result<string, InvalidDateError>) -> string {
+    let Ok(text) = result else {
+        System.Fault("Expected formatted date")
+    }
+    return text
+}
+
+func Number(result: Result<int, InvalidDateError>) -> int {
+    let Ok(number) = result else {
+        System.Fault("Expected calendar component")
+    }
+    return number
+}
+
+func Main() {
+    let culture = Culture.Invariant
+    Check(culture.Language.Code.Equals("und"))
+    Check(Culture.SwedishSweden.Language.Code.Equals("sv"))
+    Check(Culture.HebrewIsrael.Language.Code.Equals("he"))
+    let fixedProvider: CultureProvider = FixedCultureProvider(Culture.HebrewIsrael)
+    Check(fixedProvider.Current.Language.Code.Equals("he"))
+    let swedishSystem = SystemCultureProvider.FromPreference("sv-SE")
+    Check(!swedishSystem.IsFallback)
+    Check(swedishSystem.Current.Name.Equals("sv-SE"))
+    Check(SystemCultureProvider.FromPreference("SV_fi.UTF-8").Current.Language.Code.Equals("sv"))
+    Check(SystemCultureProvider.FromPreference("he-IL").Current.Language.Code.Equals("he"))
+    Check(SystemCultureProvider.FromPreference("iw_IL").Current.Language.Code.Equals("he"))
+    let unsupported = SystemCultureProvider.FromPreference("fr-FR")
+    Check(unsupported.PreferredCultureName.Equals("fr-FR"))
+    Check(unsupported.Current.Name.Equals(""))
+    Check(unsupported.IsFallback)
+    Check(SystemCultureProvider.FromPreference("").IsFallback)
+    let system = SystemCultureProvider()
+    let selected: CultureProvider = system
+    Check(selected.Current.Name.Equals(system.Current.Name))
+    Check(SystemCultureProvider.FromPreference(system.PreferredCultureName).Current.Name.Equals(system.Current.Name))
+    let calendar = culture.DefaultCalendar
+    let format = culture.DateTimeFormat
+    Check(culture.Name.Equals(""))
+    Check(calendar.Id.Equals("gregory"))
+    Check(format.Calendar.Id.Equals(calendar.Id))
+    let leap = RequireDate(calendar.CreateDate(2024, 2, 29))
+    Check(leap.ToString(Culture.Invariant).Equals("2024-02-29"))
+    Check(leap.ToString(Culture.SwedishSweden).Equals("2024-02-29"))
+    Check(leap.ToString(Culture.HebrewIsrael).Equals("29.02.2024"))
+    WriteLine(leap.ToString(Culture.Invariant))
+    let january = RequireDate(Date.Create(2024, 1, 31))
+    Check(RequireDate(january.AddMonths(1)).Equals(leap))
+    Check(Text(format.FormatDate(RequireDate(calendar.AddYears(leap, 1)))).Equals("2025-02-28"))
+    Check(Text(format.FormatDate(RequireDate(calendar.AddMonths(january, -1)))).Equals("2023-12-31"))
+    Check(Text(format.FormatDate(RequireDate(calendar.AddDays(leap, 1)))).Equals("2024-03-01"))
+    Check(RequireDate(leap.AddYears(0)).Equals(leap))
+    let first = RequireDate(Date.FromDayNumber(0))
+    let last = RequireDate(Date.FromDayNumber(3652058))
+    Check(Text(format.FormatDate(first)).Equals("0001-01-01"))
+    Check(Text(format.FormatDate(last)).Equals("9999-12-31"))
+    RejectDate(first.AddDays(-1))
+    RejectDate(last.AddDays(1))
+    RejectDate(first.AddMonths(-1))
+    RejectDate(last.AddMonths(1))
+    RejectDate(first.AddYears(-1))
+    RejectDate(last.AddYears(1))
+    RejectDate(leap.AddDays(2147483647))
+    RejectDate(leap.AddDays(-2147483647 - 1))
+    RejectDate(leap.AddMonths(2147483647))
+    RejectDate(leap.AddMonths(-2147483647 - 1))
+    RejectDate(leap.AddYears(2147483647))
+    RejectDate(leap.AddYears(-2147483647 - 1))
+    RejectDate(calendar.CreateDate(1900, 2, 29))
+    for year in [1, 4, 100, 400, 1900, 2000, 2024, 9999] {
+        let Ok(isLeap) = calendar.IsLeapYear(year) else {
+            System.Fault("Leap query failed")
+        }
+        let end = RequireDate(calendar.CreateDate(year, 12, 31))
+        Check(isLeap == (end.DayOfYear == 366))
+        var total = 0
+        for month in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] {
+            let Ok(days) = calendar.GetDaysInMonth(year, month) else {
+                System.Fault("Month query failed")
+            }
+            Check(days >= 28 && days <= 31)
+            let endOfMonth = RequireDate(calendar.CreateDate(year, month, days))
+            Check(endOfMonth.Day == days)
+            RejectDate(calendar.CreateDate(year, month, days + 1))
+            total = total + days
+        }
+        Check(total == end.DayOfYear)
+    }
+    match calendar.IsLeapYear(0) {
+        .Error(_) => { }
+        .Ok(_) => System.Fault("Invalid year accepted")
+    }
+    match calendar.GetDaysInMonth(10000, 12) {
+        .Error(_) => { }
+        .Ok(_) => System.Fault("Invalid year accepted")
+    }
+    match calendar.GetDaysInMonth(2024, 13) {
+        .Error(_) => { }
+        .Ok(_) => System.Fault("Invalid month accepted")
+    }
+    let Ok(time) = Time.Create(12, 34, 56, 1234567) else {
+        System.Fault("Expected valid time")
+    }
+    let local = LocalDateTime.Create(leap, time)
+    Check(local.Date.Equals(leap))
+    Check(local.Time.Equals(time))
+    Check(Text(format.FormatLocalDateTime(local)).Equals("2024-02-29T12:34:56.1234567"))
+    let Ok(midnight) = Time.FromTicks(0L) else {
+        System.Fault("Expected midnight")
+    }
+    let Ok(tick) = Time.FromTicks(1L) else {
+        System.Fault("Expected one tick")
+    }
+    let Ok(endOfDay) = Time.FromTicks(863999999999L) else {
+        System.Fault("Expected last tick")
+    }
+    Check(format.FormatTime(midnight).Equals("00:00:00.0000000"))
+    Check(format.FormatTime(tick).Equals("00:00:00.0000001"))
+    Check(DateTimeFormat.Invariant.FormatTime(endOfDay).Equals("23:59:59.9999999"))
+    WriteLine(Text(format.FormatLocalDateTime(local)))
+    let hebrew = Calendar.Hebrew
+    let newYear = RequireDate(hebrew.CreateDate(5784, 1, 1))
+    Check(Text(format.FormatDate(newYear)).Equals("2023-09-16"))
+    Check(Number(hebrew.GetYear(newYear)) == 5784)
+    Check(Number(hebrew.GetMonth(newYear)) == 1)
+    Check(Number(hebrew.GetDay(newYear)) == 1)
+    Check(Number(hebrew.GetMonthsInYear(5784)) == 13)
+    Check(Number(hebrew.GetMonthsInYear(5785)) == 12)
+    let adarOne = RequireDate(hebrew.CreateDate(5784, 6, 30))
+    let adarTwo = RequireDate(hebrew.AddMonths(adarOne, 1))
+    Check(Number(hebrew.GetMonth(adarTwo)) == 7)
+    Check(Number(hebrew.GetDay(adarTwo)) == 29)
+    let lastMonth = RequireDate(hebrew.CreateDate(5784, 13, 29))
+    let nextYear = RequireDate(hebrew.AddYears(lastMonth, 1))
+    Check(Number(hebrew.GetMonth(nextYear)) == 12)
+    Check(Number(hebrew.GetDay(nextYear)) == 29)
+    RejectDate(hebrew.CreateDate(5785, 13, 1))
+    RejectDate(hebrew.CreateDate(5343, 1, 1))
+    RejectDate(hebrew.CreateDate(6000, 1, 1))
+    RejectDate(hebrew.AddDays(RequireDate(hebrew.CreateDate(5344, 1, 1)), -1))
+    RejectDate(hebrew.AddDays(RequireDate(hebrew.CreateDate(5999, 13, 29)), 1))
+    RejectDate(hebrew.AddMonths(newYear, 2147483647))
+    RejectDate(hebrew.AddYears(newYear, -2147483647 - 1))
+    let swedish = Culture.SwedishSweden
+    let israeli = Culture.HebrewIsrael
+    Check(swedish.Name.Equals("sv-SE"))
+    Check(israeli.Name.Equals("he-IL"))
+    Check(israeli.DefaultCalendar.Id.Equals("gregory"))
+    let hebrewFormat = israeli.DateTimeFormat.WithCalendar(hebrew)
+    Check(hebrewFormat.Culture.Name.Equals("he-IL"))
+    Check(israeli.DateTimeFormat.Calendar.Id.Equals("gregory"))
+    Check(Text(hebrewFormat.FormatDate(newYear)).Equals("א׳ תשרי ה׳תשפ״ד"))
+    Check(Text(israeli.DateTimeFormat.FormatDate(newYear)).Equals("16.09.2023"))
+    Check(Text(swedish.DateTimeFormat.FormatLocalDateTime(local)).Equals("2024-02-29 12:34:56,1234567"))
+    Check(Text(israeli.DateTimeFormat.FormatLocalDateTime(local)).Equals("29.02.2024 12:34:56.1234567"))
+    match hebrewFormat.FormatDate(first) {
+        .Error(_) => { }
+        .Ok(_) => System.Fault("Out-of-range Hebrew formatting accepted")
+    }
+    let hebrewLocal = LocalDateTime.Create(newYear, time)
+    Check(Text(hebrewFormat.FormatLocalDateTime(hebrewLocal)).Equals("א׳ תשרי ה׳תשפ״ד 12:34:56.1234567"))
+    let latinHebrew = DateTimeFormat.Invariant.WithCalendar(hebrew)
+    Check(Text(latinHebrew.FormatLocalDateTime(hebrewLocal)).Equals("5784-01-01T12:34:56.1234567"))
+    Check(Text(hebrewFormat.FormatDate(RequireDate(hebrew.CreateDate(5784, 8, 15)))).Equals("ט״ו ניסן ה׳תשפ״ד"))
+    Check(Text(hebrewFormat.FormatDate(RequireDate(hebrew.CreateDate(5784, 8, 16)))).Equals("ט״ז ניסן ה׳תשפ״ד"))
+    Check(Text(hebrewFormat.FormatDate(RequireDate(hebrew.CreateDate(5784, 6, 1)))).Equals("א׳ אדר א׳ ה׳תשפ״ד"))
+    Check(Text(hebrewFormat.FormatDate(RequireDate(hebrew.CreateDate(5784, 7, 1)))).Equals("א׳ אדר ב׳ ה׳תשפ״ד"))
+    Check(Text(hebrewFormat.FormatDate(RequireDate(hebrew.CreateDate(5785, 6, 1)))).Equals("א׳ אדר ה׳תשפ״ה"))
+    WriteLine(Text(hebrewFormat.FormatLocalDateTime(hebrewLocal)))
+    WriteLine(Text(latinHebrew.FormatLocalDateTime(hebrewLocal)))
+    WriteLine("System preference: " + system.PreferredCultureName)
+    WriteLine("Selected culture: " + system.Current.Name)
+    Check(leap.ToString().Equals(leap.ToString(Culture.Current)))
+    WriteLine("Calendar and culture formatting checks passed")
+}

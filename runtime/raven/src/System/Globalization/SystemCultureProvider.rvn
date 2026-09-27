@@ -1,0 +1,48 @@
+namespace System.Globalization
+
+import System.Runtime.CompilerServices.RuntimeServices
+
+/// Captures the host's first preferred locale; no mutable process-wide culture.
+public class SystemCultureProvider : CultureProvider {
+    private var preference: string
+
+    init() {
+        preference = RuntimeServices.SystemCultureName()
+    }
+
+    private init(preference: string) {
+        self.preference = preference
+    }
+
+    /// Deterministic resolver for a reported preference; this does not modify the host.
+    static func FromPreference(preference: string) -> SystemCultureProvider {
+        return SystemCultureProvider(preference)
+    }
+
+    val PreferredCultureName: string => preference
+
+    val Current: Culture {
+        get {
+            var primary = ""
+            var index = 0
+            while index < preference.Length {
+                let part = preference[index].ToString()
+                if part == "-" || part == "_" || part == "." || part == "@" {
+                    break
+                }
+                primary = primary + part
+                index = index + 1
+            }
+            if System.String.CompareOrdinalIgnoreCase(primary, "sv") == 0 {
+                return Culture.SwedishSweden
+            }
+            if System.String.CompareOrdinalIgnoreCase(primary, "he") == 0 || System.String.CompareOrdinalIgnoreCase(primary, "iw") == 0 {
+                return Culture.HebrewIsrael
+            }
+            return Culture.Invariant
+        }
+    }
+
+    /// True when the reported name differs from the selected bounded profile.
+    val IsFallback: bool => !preference.Equals(Current.Name) || preference.Length == 0
+}

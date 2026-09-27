@@ -1,0 +1,3295 @@
+; Generated from runtime/raven/src/System/Calendar.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Calendar.RuntimeDateAddDays(System.Date& source,Int32 arg0) -> System.Result<System.Date,System.InvalidDateError>
+ldarg source
+ldarg arg0
+call instance System.Date::AddDays(Int32)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeDateAddMonths(System.Date& source,Int32 arg0) -> System.Result<System.Date,System.InvalidDateError>
+ldarg source
+ldarg arg0
+call instance System.Date::AddMonths(Int32)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeDateAddYears(System.Date& source,Int32 arg0) -> System.Result<System.Date,System.InvalidDateError>
+ldarg source
+ldarg arg0
+call instance System.Date::AddYears(Int32)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeDateget_DayNumber(System.Date& source) -> Int32
+ldarg source
+call instance System.Date::get_DayNumber()
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeDateget_Year(System.Date& source) -> Int32
+ldarg source
+call instance System.Date::get_Year()
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeDateget_DayOfYear(System.Date& source) -> Int32
+ldarg source
+call instance System.Date::get_DayOfYear()
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeDateget_Month(System.Date& source) -> Int32
+ldarg source
+call instance System.Date::get_Month()
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeDateget_Day(System.Date& source) -> Int32
+ldarg source
+call instance System.Date::get_Day()
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeErrorSystemInvalidDateErrorNew() -> System.InvalidDateError
+newobj instance System.InvalidDateError::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion0(System.Result<System.Date,System.InvalidDateError>& arg0,out System.Date& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<System.Date,System.InvalidDateError>::TryGetOutput(System.Date&)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion1(System.Result<System.Date,System.InvalidDateError>& arg0,out System.InvalidDateError& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<System.Date,System.InvalidDateError>::TryGetResidual(System.InvalidDateError&)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion2(System.InvalidDateError arg0) -> System.Result<Boolean,System.InvalidDateError>
+ldarg arg0
+call System.Result<Boolean,System.InvalidDateError>::FromResidual(System.InvalidDateError)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion3(Boolean arg0) -> System.Result.Ok<Boolean>
+ldarg arg0
+newobj instance System.Result.Ok<Boolean>::.ctor(Boolean)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion4(System.Result.Ok<Boolean> arg0) -> System.Result<Boolean,System.InvalidDateError>
+ldarg arg0
+newobj instance System.Result<Boolean,System.InvalidDateError>::.ctor(System.Result.Ok<Boolean>)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion5(Int32 arg0) -> System.Result.Ok<Int32>
+ldarg arg0
+newobj instance System.Result.Ok<Int32>::.ctor(Int32)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion6(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.InvalidDateError>
+ldarg arg0
+newobj instance System.Result<Int32,System.InvalidDateError>::.ctor(System.Result.Ok<Int32>)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion7(System.InvalidDateError arg0) -> System.Result<Int32,System.InvalidDateError>
+ldarg arg0
+call System.Result<Int32,System.InvalidDateError>::FromResidual(System.InvalidDateError)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion8(System.InvalidDateError arg0) -> System.Result.Error<System.InvalidDateError>
+ldarg arg0
+newobj instance System.Result.Error<System.InvalidDateError>::.ctor(System.InvalidDateError)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion9(System.Result.Error<System.InvalidDateError> arg0) -> System.Result<Boolean,System.InvalidDateError>
+ldarg arg0
+newobj instance System.Result<Boolean,System.InvalidDateError>::.ctor(System.Result.Error<System.InvalidDateError>)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion10(System.Result<Boolean,System.InvalidDateError>& arg0,out Boolean& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<Boolean,System.InvalidDateError>::TryGetOutput(Boolean&)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion11(System.Result<Boolean,System.InvalidDateError>& arg0,out System.InvalidDateError& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<Boolean,System.InvalidDateError>::TryGetResidual(System.InvalidDateError&)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion12(System.Result<Int32,System.InvalidDateError>& arg0,out Int32& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<Int32,System.InvalidDateError>::TryGetOutput(Int32&)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion13(System.Result<Int32,System.InvalidDateError>& arg0,out System.InvalidDateError& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<Int32,System.InvalidDateError>::TryGetResidual(System.InvalidDateError&)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion14(System.Result.Error<System.InvalidDateError> arg0) -> System.Result<Int32,System.InvalidDateError>
+ldarg arg0
+newobj instance System.Result<Int32,System.InvalidDateError>::.ctor(System.Result.Error<System.InvalidDateError>)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion15(System.InvalidDateError arg0) -> System.Result<System.Date,System.InvalidDateError>
+ldarg arg0
+call System.Result<System.Date,System.InvalidDateError>::FromResidual(System.InvalidDateError)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion16(System.Result.Error<System.InvalidDateError> arg0) -> System.Result<System.Date,System.InvalidDateError>
+ldarg arg0
+newobj instance System.Result<System.Date,System.InvalidDateError>::.ctor(System.Result.Error<System.InvalidDateError>)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion17(System.Date arg0) -> System.Result.Ok<System.Date>
+ldarg arg0
+newobj instance System.Result.Ok<System.Date>::.ctor(System.Date)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeUnion18(System.Result.Ok<System.Date> arg0) -> System.Result<System.Date,System.InvalidDateError>
+ldarg arg0
+newobj instance System.Result<System.Date,System.InvalidDateError>::.ctor(System.Result.Ok<System.Date>)
+ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.function neoCLR.Library.System.Calendar.RuntimeCliCall0(Int32 arg0) -> System.Result.Ok<Boolean>
+ldarg arg0
+call neoCLR.Library.System.Calendar.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.Calendar.RuntimeUnion3(Boolean)
+ret
+.end
+.interface internal neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573
+.method instance get_Id() -> String
+.end
+.method instance get_MinYear() -> Int32
+.end
+.method instance get_MaxYear() -> Int32
+.end
+.method instance CreateDate(Int32 year,Int32 month,Int32 day) -> System.Result<System.Date,System.InvalidDateError>
+.end
+.method instance IsLeapYear(Int32 year) -> System.Result<Boolean,System.InvalidDateError>
+.end
+.method instance GetMonthsInYear(Int32 year) -> System.Result<Int32,System.InvalidDateError>
+.end
+.method instance GetDaysInMonth(Int32 year,Int32 month) -> System.Result<Int32,System.InvalidDateError>
+.end
+.method instance GetYear(System.Date date) -> System.Result<Int32,System.InvalidDateError>
+.end
+.method instance GetMonth(System.Date date) -> System.Result<Int32,System.InvalidDateError>
+.end
+.method instance GetDay(System.Date date) -> System.Result<Int32,System.InvalidDateError>
+.end
+.method instance AddDays(System.Date date,Int32 days) -> System.Result<System.Date,System.InvalidDateError>
+.end
+.method instance AddMonths(System.Date date,Int32 months) -> System.Result<System.Date,System.InvalidDateError>
+.end
+.method instance AddYears(System.Date date,Int32 years) -> System.Result<System.Date,System.InvalidDateError>
+.end
+.property instance Id() -> String
+.get instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::get_Id()
+.end
+.property instance MinYear() -> Int32
+.get instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::get_MinYear()
+.end
+.property instance MaxYear() -> Int32
+.get instance neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573::get_MaxYear()
+.end
+.end
+.type internal class neoCLR.Library.System.Calendar.Type_53797374656D2E477265676F7269616E43616C656E646172
+.sealed
+.implements neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573
+.property instance Id() -> String
+.get instance neoCLR.Library.System.Calendar.Type_53797374656D2E477265676F7269616E43616C656E646172::get_Id()
+.end
+.property instance MinYear() -> Int32
+.get instance neoCLR.Library.System.Calendar.Type_53797374656D2E477265676F7269616E43616C656E646172::get_MinYear()
+.end
+.property instance MaxYear() -> Int32
+.get instance neoCLR.Library.System.Calendar.Type_53797374656D2E477265676F7269616E43616C656E646172::get_MaxYear()
+.end
+.method instance .ctor() -> noresult
+M00000011_IL_0000:
+M00000011_IL_0001:
+ldarg 0
+M00000011_IL_0002:
+pop
+M00000011_IL_0007:
+ret
+.end
+.method instance get_Id() -> String
+M00000012_IL_0000:
+M00000012_IL_0001:
+M00000012_IL_0002:
+ldstr "gregory"
+M00000012_IL_0007:
+ret
+.end
+.method instance get_MinYear() -> Int32
+M00000013_IL_0000:
+M00000013_IL_0001:
+M00000013_IL_0002:
+ldc.i4 1
+M00000013_IL_0003:
+ret
+.end
+.method instance get_MaxYear() -> Int32
+M00000014_IL_0000:
+M00000014_IL_0001:
+M00000014_IL_0002:
+ldc.i4 9999
+M00000014_IL_0007:
+ret
+.end
+.method instance CreateDate(Int32 year,Int32 month,Int32 day) -> System.Result<System.Date,System.InvalidDateError>
+M00000015_IL_0000:
+M00000015_IL_0001:
+M00000015_IL_0002:
+ldarg 1
+M00000015_IL_0003:
+ldarg 2
+M00000015_IL_0004:
+ldarg 3
+M00000015_IL_0005:
+call System.Date::Create(Int32,Int32,Int32)
+M00000015_IL_000a:
+ret
+.end
+.method instance IsLeapYear(Int32 year) -> System.Result<Boolean,System.InvalidDateError>
+.local System.Result<System.Date,System.InvalidDateError> local0
+.local System.Date local1
+.local System.InvalidDateError local2
+.local System.Date local3
+ldloca local0
+initobj System.Result<System.Date,System.InvalidDateError>
+ldloca local1
+initobj System.Date
+newobj System.InvalidDateError
+stloc local2
+ldloca local3
+initobj System.Date
+M00000016_IL_0000:
+M00000016_IL_0001:
+M00000016_IL_0002:
+ldarg 1
+M00000016_IL_0003:
+ldc.i4 12
+M00000016_IL_0005:
+ldc.i4 31
+M00000016_IL_0007:
+call System.Date::Create(Int32,Int32,Int32)
+M00000016_IL_000c:
+stloc local0
+M00000016_IL_000d:
+ldloca local1
+M00000016_IL_000f:
+initobj System.Date
+M00000016_IL_0015:
+ldloca local0
+M00000016_IL_0017:
+ldloca local1
+M00000016_IL_0019:
+call neoCLR.Library.System.Calendar.RuntimeUnion0(System.Result<System.Date,System.InvalidDateError>&,System.Date&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000016_IL_001e:
+brfalse M00000016_IL_0028
+M00000016_IL_0023:
+br M00000016_IL_0049
+M00000016_IL_0028:
+ldloca local2
+M00000016_IL_002a:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M00000016_IL_0030:
+ldloca local0
+M00000016_IL_0032:
+ldloca local2
+M00000016_IL_0034:
+call neoCLR.Library.System.Calendar.RuntimeUnion1(System.Result<System.Date,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000016_IL_0039:
+brfalse M00000016_IL_0045
+M00000016_IL_003e:
+ldloc local2
+M00000016_IL_003f:
+call neoCLR.Library.System.Calendar.RuntimeUnion2(System.InvalidDateError)
+M00000016_IL_0044:
+ret
+M00000016_IL_0045:
+M00000016_IL_0046:
+M00000016_IL_0047:
+M00000016_IL_0048:
+fault "Guest program reached a terminal failure"
+M00000016_IL_0049:
+M00000016_IL_004a:
+ldloc local1
+M00000016_IL_004b:
+stloc local3
+M00000016_IL_004c:
+M00000016_IL_004d:
+ldloca local3
+M00000016_IL_004f:
+call neoCLR.Library.System.Calendar.RuntimeDateget_DayOfYear(System.Date&)
+M00000016_IL_0054:
+ldc.i4 366
+M00000016_IL_0059:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000016_IL_005b:
+call neoCLR.Library.System.Calendar.RuntimeCliCall0(Int32)
+M00000016_IL_0060:
+call neoCLR.Library.System.Calendar.RuntimeUnion4(System.Result.Ok<Boolean>)
+M00000016_IL_0065:
+ret
+.end
+.method instance GetMonthsInYear(Int32 year) -> System.Result<Int32,System.InvalidDateError>
+.local System.Result<System.Date,System.InvalidDateError> local0
+.local System.Date local1
+.local System.InvalidDateError local2
+ldloca local0
+initobj System.Result<System.Date,System.InvalidDateError>
+ldloca local1
+initobj System.Date
+newobj System.InvalidDateError
+stloc local2
+M00000017_IL_0000:
+M00000017_IL_0001:
+M00000017_IL_0002:
+ldarg 1
+M00000017_IL_0003:
+ldc.i4 1
+M00000017_IL_0004:
+ldc.i4 1
+M00000017_IL_0005:
+call System.Date::Create(Int32,Int32,Int32)
+M00000017_IL_000a:
+stloc local0
+M00000017_IL_000b:
+ldloca local0
+M00000017_IL_000d:
+ldloca local1
+M00000017_IL_000f:
+call neoCLR.Library.System.Calendar.RuntimeUnion0(System.Result<System.Date,System.InvalidDateError>&,System.Date&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_0014:
+brtrue M00000017_IL_0030
+M00000017_IL_0019:
+ldloca local0
+M00000017_IL_001b:
+ldloca local2
+M00000017_IL_001d:
+call neoCLR.Library.System.Calendar.RuntimeUnion1(System.Result<System.Date,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000017_IL_0022:
+brtrue M00000017_IL_0029
+M00000017_IL_0027:
+M00000017_IL_0028:
+fault "Guest program reached a terminal failure"
+M00000017_IL_0029:
+ldloc local2
+M00000017_IL_002a:
+call neoCLR.Library.System.Calendar.RuntimeUnion7(System.InvalidDateError)
+M00000017_IL_002f:
+ret
+M00000017_IL_0030:
+ldloc local1
+M00000017_IL_0031:
+pop
+M00000017_IL_0032:
+M00000017_IL_0033:
+ldc.i4 12
+M00000017_IL_0035:
+call neoCLR.Library.System.Calendar.RuntimeUnion5(Int32)
+M00000017_IL_003a:
+call neoCLR.Library.System.Calendar.RuntimeUnion6(System.Result.Ok<Int32>)
+M00000017_IL_003f:
+ret
+.end
+.method instance GetDaysInMonth(Int32 year,Int32 month) -> System.Result<Int32,System.InvalidDateError>
+.local System.Result<System.Date,System.InvalidDateError> local0
+.local System.Date local1
+.local System.InvalidDateError local2
+.local System.Date local3
+.local System.Result<System.Date,System.InvalidDateError> local4
+.local System.Date local5
+.local System.InvalidDateError local6
+.local System.Date local7
+ldloca local0
+initobj System.Result<System.Date,System.InvalidDateError>
+ldloca local1
+initobj System.Date
+newobj System.InvalidDateError
+stloc local2
+ldloca local3
+initobj System.Date
+ldloca local4
+initobj System.Result<System.Date,System.InvalidDateError>
+ldloca local5
+initobj System.Date
+newobj System.InvalidDateError
+stloc local6
+ldloca local7
+initobj System.Date
+M00000018_IL_0000:
+M00000018_IL_0001:
+M00000018_IL_0002:
+ldarg 1
+M00000018_IL_0003:
+ldarg 2
+M00000018_IL_0004:
+ldc.i4 1
+M00000018_IL_0005:
+call System.Date::Create(Int32,Int32,Int32)
+M00000018_IL_000a:
+stloc local0
+M00000018_IL_000b:
+ldloca local1
+M00000018_IL_000d:
+initobj System.Date
+M00000018_IL_0013:
+ldloca local0
+M00000018_IL_0015:
+ldloca local1
+M00000018_IL_0017:
+call neoCLR.Library.System.Calendar.RuntimeUnion0(System.Result<System.Date,System.InvalidDateError>&,System.Date&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_001c:
+brfalse M00000018_IL_0026
+M00000018_IL_0021:
+br M00000018_IL_0047
+M00000018_IL_0026:
+ldloca local2
+M00000018_IL_0028:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M00000018_IL_002e:
+ldloca local0
+M00000018_IL_0030:
+ldloca local2
+M00000018_IL_0032:
+call neoCLR.Library.System.Calendar.RuntimeUnion1(System.Result<System.Date,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_0037:
+brfalse M00000018_IL_0043
+M00000018_IL_003c:
+ldloc local2
+M00000018_IL_003d:
+call neoCLR.Library.System.Calendar.RuntimeUnion7(System.InvalidDateError)
+M00000018_IL_0042:
+ret
+M00000018_IL_0043:
+M00000018_IL_0044:
+M00000018_IL_0045:
+M00000018_IL_0046:
+fault "Guest program reached a terminal failure"
+M00000018_IL_0047:
+M00000018_IL_0048:
+ldloc local1
+M00000018_IL_0049:
+stloc local3
+M00000018_IL_004a:
+M00000018_IL_004b:
+ldarg 2
+M00000018_IL_004c:
+ldc.i4 12
+M00000018_IL_004e:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_0050:
+brtrue M00000018_IL_005a
+M00000018_IL_0055:
+br M00000018_IL_0068
+M00000018_IL_005a:
+M00000018_IL_005b:
+ldc.i4 31
+M00000018_IL_005d:
+call neoCLR.Library.System.Calendar.RuntimeUnion5(Int32)
+M00000018_IL_0062:
+call neoCLR.Library.System.Calendar.RuntimeUnion6(System.Result.Ok<Int32>)
+M00000018_IL_0067:
+ret
+M00000018_IL_0068:
+M00000018_IL_0069:
+M00000018_IL_006a:
+ldloca local3
+M00000018_IL_006c:
+ldc.i4 1
+M00000018_IL_006d:
+call neoCLR.Library.System.Calendar.RuntimeDateAddMonths(System.Date&,Int32)
+M00000018_IL_0072:
+stloc local4
+M00000018_IL_0074:
+ldloca local5
+M00000018_IL_0076:
+initobj System.Date
+M00000018_IL_007c:
+ldloca local4
+M00000018_IL_007e:
+ldloca local5
+M00000018_IL_0080:
+call neoCLR.Library.System.Calendar.RuntimeUnion0(System.Result<System.Date,System.InvalidDateError>&,System.Date&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_0085:
+brfalse M00000018_IL_008f
+M00000018_IL_008a:
+br M00000018_IL_00b1
+M00000018_IL_008f:
+ldloca local6
+M00000018_IL_0091:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M00000018_IL_0097:
+ldloca local4
+M00000018_IL_0099:
+ldloca local6
+M00000018_IL_009b:
+call neoCLR.Library.System.Calendar.RuntimeUnion1(System.Result<System.Date,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_00a0:
+brfalse M00000018_IL_00ad
+M00000018_IL_00a5:
+ldloc local6
+M00000018_IL_00a7:
+call neoCLR.Library.System.Calendar.RuntimeUnion7(System.InvalidDateError)
+M00000018_IL_00ac:
+ret
+M00000018_IL_00ad:
+M00000018_IL_00ae:
+M00000018_IL_00af:
+M00000018_IL_00b0:
+fault "Guest program reached a terminal failure"
+M00000018_IL_00b1:
+M00000018_IL_00b2:
+ldloc local5
+M00000018_IL_00b4:
+stloc local7
+M00000018_IL_00b6:
+M00000018_IL_00b7:
+ldloca local7
+M00000018_IL_00b9:
+call neoCLR.Library.System.Calendar.RuntimeDateget_DayNumber(System.Date&)
+M00000018_IL_00be:
+ldloca local3
+M00000018_IL_00c0:
+call neoCLR.Library.System.Calendar.RuntimeDateget_DayNumber(System.Date&)
+M00000018_IL_00c5:
+sub
+M00000018_IL_00c6:
+call neoCLR.Library.System.Calendar.RuntimeUnion5(Int32)
+M00000018_IL_00cb:
+call neoCLR.Library.System.Calendar.RuntimeUnion6(System.Result.Ok<Int32>)
+M00000018_IL_00d0:
+ret
+.end
+.method instance GetYear(System.Date date) -> System.Result<Int32,System.InvalidDateError>
+M00000019_IL_0000:
+M00000019_IL_0001:
+M00000019_IL_0002:
+ldarga 1
+M00000019_IL_0004:
+call neoCLR.Library.System.Calendar.RuntimeDateget_Year(System.Date&)
+M00000019_IL_0009:
+call neoCLR.Library.System.Calendar.RuntimeUnion5(Int32)
+M00000019_IL_000e:
+call neoCLR.Library.System.Calendar.RuntimeUnion6(System.Result.Ok<Int32>)
+M00000019_IL_0013:
+ret
+.end
+.method instance GetMonth(System.Date date) -> System.Result<Int32,System.InvalidDateError>
+M0000001a_IL_0000:
+M0000001a_IL_0001:
+M0000001a_IL_0002:
+ldarga 1
+M0000001a_IL_0004:
+call neoCLR.Library.System.Calendar.RuntimeDateget_Month(System.Date&)
+M0000001a_IL_0009:
+call neoCLR.Library.System.Calendar.RuntimeUnion5(Int32)
+M0000001a_IL_000e:
+call neoCLR.Library.System.Calendar.RuntimeUnion6(System.Result.Ok<Int32>)
+M0000001a_IL_0013:
+ret
+.end
+.method instance GetDay(System.Date date) -> System.Result<Int32,System.InvalidDateError>
+M0000001b_IL_0000:
+M0000001b_IL_0001:
+M0000001b_IL_0002:
+ldarga 1
+M0000001b_IL_0004:
+call neoCLR.Library.System.Calendar.RuntimeDateget_Day(System.Date&)
+M0000001b_IL_0009:
+call neoCLR.Library.System.Calendar.RuntimeUnion5(Int32)
+M0000001b_IL_000e:
+call neoCLR.Library.System.Calendar.RuntimeUnion6(System.Result.Ok<Int32>)
+M0000001b_IL_0013:
+ret
+.end
+.method instance AddDays(System.Date date,Int32 days) -> System.Result<System.Date,System.InvalidDateError>
+M0000001c_IL_0000:
+M0000001c_IL_0001:
+M0000001c_IL_0002:
+ldarga 1
+M0000001c_IL_0004:
+ldarg 2
+M0000001c_IL_0005:
+call neoCLR.Library.System.Calendar.RuntimeDateAddDays(System.Date&,Int32)
+M0000001c_IL_000a:
+ret
+.end
+.method instance AddMonths(System.Date date,Int32 months) -> System.Result<System.Date,System.InvalidDateError>
+M0000001d_IL_0000:
+M0000001d_IL_0001:
+M0000001d_IL_0002:
+ldarga 1
+M0000001d_IL_0004:
+ldarg 2
+M0000001d_IL_0005:
+call neoCLR.Library.System.Calendar.RuntimeDateAddMonths(System.Date&,Int32)
+M0000001d_IL_000a:
+ret
+.end
+.method instance AddYears(System.Date date,Int32 years) -> System.Result<System.Date,System.InvalidDateError>
+M0000001e_IL_0000:
+M0000001e_IL_0001:
+M0000001e_IL_0002:
+ldarga 1
+M0000001e_IL_0004:
+ldarg 2
+M0000001e_IL_0005:
+call neoCLR.Library.System.Calendar.RuntimeDateAddYears(System.Date&,Int32)
+M0000001e_IL_000a:
+ret
+.end
+.end
+.type internal class neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172
+.sealed
+.implements neoCLR.Library.System.Calendar.Type_53797374656D2E43616C656E64617252756C6573
+.property instance Id() -> String
+.get instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::get_Id()
+.end
+.property instance MinYear() -> Int32
+.get instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::get_MinYear()
+.end
+.property instance MaxYear() -> Int32
+.get instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::get_MaxYear()
+.end
+.method instance .ctor() -> noresult
+M0000001f_IL_0000:
+M0000001f_IL_0001:
+ldarg 0
+M0000001f_IL_0002:
+pop
+M0000001f_IL_0007:
+ret
+.end
+.method instance get_Id() -> String
+M00000020_IL_0000:
+M00000020_IL_0001:
+M00000020_IL_0002:
+ldstr "hebrew"
+M00000020_IL_0007:
+ret
+.end
+.method instance get_MinYear() -> Int32
+M00000021_IL_0000:
+M00000021_IL_0001:
+M00000021_IL_0002:
+ldc.i4 5344
+M00000021_IL_0007:
+ret
+.end
+.method instance get_MaxYear() -> Int32
+M00000022_IL_0000:
+M00000022_IL_0001:
+M00000022_IL_0002:
+ldc.i4 5999
+M00000022_IL_0007:
+ret
+.end
+.method instance HebrewLeap(Int32 year) -> Boolean
+M00000023_IL_0000:
+M00000023_IL_0001:
+M00000023_IL_0002:
+ldarg 1
+M00000023_IL_0003:
+ldc.i4 7
+M00000023_IL_0004:
+mul
+M00000023_IL_0005:
+ldc.i4 1
+M00000023_IL_0006:
+add
+M00000023_IL_0007:
+ldc.i4 19
+M00000023_IL_0009:
+rem
+M00000023_IL_000a:
+ldc.i4 7
+M00000023_IL_000b:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000023_IL_000d:
+call neoCLR.Library.System.Calendar.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance HebrewStart(Int32 year) -> Int32
+.local Int32 local0
+.local Int32 local1
+.local Int32 local2
+.local Int32 local3
+.local Int32 local4
+.local Boolean local5
+.local Int32 local6
+ldc.i4 0
+stloc local0
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local2
+ldc.i4 0
+stloc local3
+ldc.i4 0
+stloc local4
+ldc.bool false
+stloc local5
+ldc.i4 0
+stloc local6
+M00000024_IL_0000:
+M00000024_IL_0001:
+M00000024_IL_0002:
+ldc.i4 235
+M00000024_IL_0007:
+ldarg 1
+M00000024_IL_0008:
+mul
+M00000024_IL_0009:
+ldc.i4 234
+M00000024_IL_000e:
+sub
+M00000024_IL_000f:
+ldc.i4 19
+M00000024_IL_0011:
+div
+M00000024_IL_0012:
+stloc local0
+M00000024_IL_0013:
+M00000024_IL_0014:
+ldc.i4 204
+M00000024_IL_0019:
+ldc.i4 793
+M00000024_IL_001e:
+ldloc local0
+M00000024_IL_001f:
+ldc.i4 1080
+M00000024_IL_0024:
+rem
+M00000024_IL_0025:
+mul
+M00000024_IL_0026:
+add
+M00000024_IL_0027:
+stloc local1
+M00000024_IL_0028:
+M00000024_IL_0029:
+ldc.i4 5
+M00000024_IL_002a:
+ldc.i4 12
+M00000024_IL_002c:
+ldloc local0
+M00000024_IL_002d:
+mul
+M00000024_IL_002e:
+add
+M00000024_IL_002f:
+ldc.i4 793
+M00000024_IL_0034:
+ldloc local0
+M00000024_IL_0035:
+ldc.i4 1080
+M00000024_IL_003a:
+div
+M00000024_IL_003b:
+mul
+M00000024_IL_003c:
+add
+M00000024_IL_003d:
+ldloc local1
+M00000024_IL_003e:
+ldc.i4 1080
+M00000024_IL_0043:
+div
+M00000024_IL_0044:
+add
+M00000024_IL_0045:
+stloc local2
+M00000024_IL_0046:
+M00000024_IL_0047:
+ldc.i4 1
+M00000024_IL_0048:
+ldc.i4 29
+M00000024_IL_004a:
+ldloc local0
+M00000024_IL_004b:
+mul
+M00000024_IL_004c:
+add
+M00000024_IL_004d:
+ldloc local2
+M00000024_IL_004e:
+ldc.i4 24
+M00000024_IL_0050:
+div
+M00000024_IL_0051:
+add
+M00000024_IL_0052:
+stloc local3
+M00000024_IL_0053:
+M00000024_IL_0054:
+ldloc local2
+M00000024_IL_0055:
+ldc.i4 24
+M00000024_IL_0057:
+rem
+M00000024_IL_0058:
+ldc.i4 1080
+M00000024_IL_005d:
+mul
+M00000024_IL_005e:
+ldloc local1
+M00000024_IL_005f:
+ldc.i4 1080
+M00000024_IL_0064:
+rem
+M00000024_IL_0065:
+add
+M00000024_IL_0066:
+stloc local4
+M00000024_IL_0068:
+M00000024_IL_0069:
+ldloc local4
+M00000024_IL_006b:
+ldc.i4 19440
+M00000024_IL_0070:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_0072:
+ldc.i4 0
+M00000024_IL_0073:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_0075:
+call neoCLR.Library.System.Calendar.RuntimeBooleanFromInt32(Int32)
+stloc local5
+M00000024_IL_0077:
+M00000024_IL_0078:
+ldloc local3
+M00000024_IL_0079:
+ldc.i4 7
+M00000024_IL_007a:
+rem
+M00000024_IL_007b:
+ldc.i4 2
+M00000024_IL_007c:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_007e:
+brfalse M00000024_IL_00a9
+M00000024_IL_0083:
+ldloc local4
+M00000024_IL_0085:
+ldc.i4 9924
+M00000024_IL_008a:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_008c:
+ldc.i4 0
+M00000024_IL_008d:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_008f:
+brfalse M00000024_IL_00a3
+M00000024_IL_0094:
+ldarg 0
+M00000024_IL_0095:
+ldarg 1
+M00000024_IL_0096:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewLeap(Int32)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_009b:
+ldc.i4 0
+M00000024_IL_009c:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_009e:
+br M00000024_IL_00a4
+M00000024_IL_00a3:
+ldc.i4 0
+M00000024_IL_00a4:
+br M00000024_IL_00aa
+M00000024_IL_00a9:
+ldc.i4 0
+M00000024_IL_00aa:
+brtrue M00000024_IL_00b4
+M00000024_IL_00af:
+br M00000024_IL_00b8
+M00000024_IL_00b4:
+M00000024_IL_00b5:
+ldc.i4 1
+M00000024_IL_00b6:
+call neoCLR.Library.System.Calendar.RuntimeBooleanFromInt32(Int32)
+stloc local5
+M00000024_IL_00b8:
+M00000024_IL_00b9:
+M00000024_IL_00ba:
+ldloc local3
+M00000024_IL_00bb:
+ldc.i4 7
+M00000024_IL_00bc:
+rem
+M00000024_IL_00bd:
+ldc.i4 1
+M00000024_IL_00be:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_00c0:
+brfalse M00000024_IL_00ea
+M00000024_IL_00c5:
+ldloc local4
+M00000024_IL_00c7:
+ldc.i4 16789
+M00000024_IL_00cc:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_00ce:
+ldc.i4 0
+M00000024_IL_00cf:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_00d1:
+brfalse M00000024_IL_00e4
+M00000024_IL_00d6:
+ldarg 0
+M00000024_IL_00d7:
+ldarg 1
+M00000024_IL_00d8:
+ldc.i4 1
+M00000024_IL_00d9:
+sub
+M00000024_IL_00da:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewLeap(Int32)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_00df:
+br M00000024_IL_00e5
+M00000024_IL_00e4:
+ldc.i4 0
+M00000024_IL_00e5:
+br M00000024_IL_00eb
+M00000024_IL_00ea:
+ldc.i4 0
+M00000024_IL_00eb:
+brtrue M00000024_IL_00f5
+M00000024_IL_00f0:
+br M00000024_IL_00f9
+M00000024_IL_00f5:
+M00000024_IL_00f6:
+ldc.i4 1
+M00000024_IL_00f7:
+call neoCLR.Library.System.Calendar.RuntimeBooleanFromInt32(Int32)
+stloc local5
+M00000024_IL_00f9:
+M00000024_IL_00fa:
+M00000024_IL_00fb:
+ldloc local5
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_00fd:
+brtrue M00000024_IL_0107
+M00000024_IL_0102:
+br M00000024_IL_010c
+M00000024_IL_0107:
+M00000024_IL_0108:
+ldloc local3
+M00000024_IL_0109:
+ldc.i4 1
+M00000024_IL_010a:
+add
+M00000024_IL_010b:
+stloc local3
+M00000024_IL_010c:
+M00000024_IL_010d:
+M00000024_IL_010e:
+ldloc local3
+M00000024_IL_010f:
+ldc.i4 7
+M00000024_IL_0110:
+rem
+M00000024_IL_0111:
+stloc local6
+M00000024_IL_0113:
+M00000024_IL_0114:
+ldloc local6
+M00000024_IL_0116:
+ldc.i4 0
+M00000024_IL_0117:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_0119:
+brtrue M00000024_IL_0128
+M00000024_IL_011e:
+ldloc local6
+M00000024_IL_0120:
+ldc.i4 3
+M00000024_IL_0121:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_0123:
+br M00000024_IL_0129
+M00000024_IL_0128:
+ldc.i4 1
+M00000024_IL_0129:
+brtrue M00000024_IL_0138
+M00000024_IL_012e:
+ldloc local6
+M00000024_IL_0130:
+ldc.i4 5
+M00000024_IL_0131:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000024_IL_0133:
+br M00000024_IL_0139
+M00000024_IL_0138:
+ldc.i4 1
+M00000024_IL_0139:
+brtrue M00000024_IL_0143
+M00000024_IL_013e:
+br M00000024_IL_0148
+M00000024_IL_0143:
+M00000024_IL_0144:
+ldloc local3
+M00000024_IL_0145:
+ldc.i4 1
+M00000024_IL_0146:
+add
+M00000024_IL_0147:
+stloc local3
+M00000024_IL_0148:
+M00000024_IL_0149:
+M00000024_IL_014a:
+ldloc local3
+M00000024_IL_014b:
+ldc.i4 1373429
+M00000024_IL_0150:
+sub
+M00000024_IL_0151:
+ret
+.end
+.method instance HebrewMonthCount(Int32 year) -> Int32
+M00000025_IL_0000:
+M00000025_IL_0001:
+M00000025_IL_0002:
+ldarg 0
+M00000025_IL_0003:
+ldarg 1
+M00000025_IL_0004:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewLeap(Int32)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000025_IL_0009:
+brtrue M00000025_IL_0013
+M00000025_IL_000e:
+br M00000025_IL_0017
+M00000025_IL_0013:
+M00000025_IL_0014:
+ldc.i4 13
+M00000025_IL_0016:
+ret
+M00000025_IL_0017:
+M00000025_IL_0018:
+M00000025_IL_0019:
+ldc.i4 12
+M00000025_IL_001b:
+ret
+.end
+.method instance HebrewMonthDays(Int32 year,Int32 month) -> Int32
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000026_IL_0000:
+M00000026_IL_0001:
+M00000026_IL_0002:
+ldarg 0
+M00000026_IL_0003:
+ldarg 1
+M00000026_IL_0004:
+ldc.i4 1
+M00000026_IL_0005:
+add
+M00000026_IL_0006:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewStart(Int32)
+M00000026_IL_000b:
+ldarg 0
+M00000026_IL_000c:
+ldarg 1
+M00000026_IL_000d:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewStart(Int32)
+M00000026_IL_0012:
+sub
+M00000026_IL_0013:
+stloc local0
+M00000026_IL_0014:
+M00000026_IL_0015:
+ldarg 2
+M00000026_IL_0016:
+ldc.i4 2
+M00000026_IL_0017:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000026_IL_0019:
+brtrue M00000026_IL_0023
+M00000026_IL_001e:
+br M00000026_IL_003e
+M00000026_IL_0023:
+M00000026_IL_0024:
+ldloc local0
+M00000026_IL_0025:
+ldc.i4 10
+M00000026_IL_0027:
+rem
+M00000026_IL_0028:
+ldc.i4 5
+M00000026_IL_0029:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000026_IL_002b:
+brtrue M00000026_IL_0035
+M00000026_IL_0030:
+br M00000026_IL_0039
+M00000026_IL_0035:
+M00000026_IL_0036:
+ldc.i4 30
+M00000026_IL_0038:
+ret
+M00000026_IL_0039:
+M00000026_IL_003a:
+M00000026_IL_003b:
+ldc.i4 29
+M00000026_IL_003d:
+ret
+M00000026_IL_003e:
+M00000026_IL_003f:
+M00000026_IL_0040:
+ldarg 2
+M00000026_IL_0041:
+ldc.i4 3
+M00000026_IL_0042:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000026_IL_0044:
+brtrue M00000026_IL_004e
+M00000026_IL_0049:
+br M00000026_IL_0069
+M00000026_IL_004e:
+M00000026_IL_004f:
+ldloc local0
+M00000026_IL_0050:
+ldc.i4 10
+M00000026_IL_0052:
+rem
+M00000026_IL_0053:
+ldc.i4 3
+M00000026_IL_0054:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000026_IL_0056:
+brtrue M00000026_IL_0060
+M00000026_IL_005b:
+br M00000026_IL_0064
+M00000026_IL_0060:
+M00000026_IL_0061:
+ldc.i4 29
+M00000026_IL_0063:
+ret
+M00000026_IL_0064:
+M00000026_IL_0065:
+M00000026_IL_0066:
+ldc.i4 30
+M00000026_IL_0068:
+ret
+M00000026_IL_0069:
+M00000026_IL_006a:
+M00000026_IL_006b:
+ldarg 2
+M00000026_IL_006c:
+ldc.i4 1
+M00000026_IL_006d:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000026_IL_006f:
+brtrue M00000026_IL_007d
+M00000026_IL_0074:
+ldarg 2
+M00000026_IL_0075:
+ldc.i4 5
+M00000026_IL_0076:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000026_IL_0078:
+br M00000026_IL_007e
+M00000026_IL_007d:
+ldc.i4 1
+M00000026_IL_007e:
+brtrue M00000026_IL_0088
+M00000026_IL_0083:
+br M00000026_IL_008c
+M00000026_IL_0088:
+M00000026_IL_0089:
+ldc.i4 30
+M00000026_IL_008b:
+ret
+M00000026_IL_008c:
+M00000026_IL_008d:
+M00000026_IL_008e:
+ldarg 2
+M00000026_IL_008f:
+ldc.i4 4
+M00000026_IL_0090:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000026_IL_0092:
+brtrue M00000026_IL_009c
+M00000026_IL_0097:
+br M00000026_IL_00a0
+M00000026_IL_009c:
+M00000026_IL_009d:
+ldc.i4 29
+M00000026_IL_009f:
+ret
+M00000026_IL_00a0:
+M00000026_IL_00a1:
+M00000026_IL_00a2:
+ldarg 0
+M00000026_IL_00a3:
+ldarg 1
+M00000026_IL_00a4:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewLeap(Int32)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000026_IL_00a9:
+brtrue M00000026_IL_00b3
+M00000026_IL_00ae:
+br M00000026_IL_00cf
+M00000026_IL_00b3:
+M00000026_IL_00b4:
+ldarg 2
+M00000026_IL_00b5:
+ldc.i4 6
+M00000026_IL_00b6:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000026_IL_00b8:
+brtrue M00000026_IL_00c2
+M00000026_IL_00bd:
+br M00000026_IL_00c6
+M00000026_IL_00c2:
+M00000026_IL_00c3:
+ldc.i4 30
+M00000026_IL_00c5:
+ret
+M00000026_IL_00c6:
+M00000026_IL_00c7:
+M00000026_IL_00c8:
+ldc.i4 30
+M00000026_IL_00ca:
+ldarg 2
+M00000026_IL_00cb:
+ldc.i4 2
+M00000026_IL_00cc:
+rem
+M00000026_IL_00cd:
+sub
+M00000026_IL_00ce:
+ret
+M00000026_IL_00cf:
+M00000026_IL_00d0:
+M00000026_IL_00d1:
+ldc.i4 29
+M00000026_IL_00d3:
+ldarg 2
+M00000026_IL_00d4:
+ldc.i4 2
+M00000026_IL_00d5:
+rem
+M00000026_IL_00d6:
+add
+M00000026_IL_00d7:
+ret
+.end
+.method instance IsLeapYear(Int32 year) -> System.Result<Boolean,System.InvalidDateError>
+M00000027_IL_0000:
+M00000027_IL_0001:
+M00000027_IL_0002:
+ldarg 1
+M00000027_IL_0003:
+ldarg 0
+M00000027_IL_0004:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::get_MinYear()
+M00000027_IL_0009:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000027_IL_000b:
+brtrue M00000027_IL_0015
+M00000027_IL_0010:
+br M00000027_IL_0025
+M00000027_IL_0015:
+call neoCLR.Library.System.Calendar.RuntimeErrorSystemInvalidDateErrorNew()
+M00000027_IL_001a:
+call neoCLR.Library.System.Calendar.RuntimeUnion8(System.InvalidDateError)
+M00000027_IL_001f:
+call neoCLR.Library.System.Calendar.RuntimeUnion9(System.Result.Error<System.InvalidDateError>)
+M00000027_IL_0024:
+ret
+M00000027_IL_0025:
+M00000027_IL_0026:
+M00000027_IL_0027:
+ldarg 1
+M00000027_IL_0028:
+ldarg 0
+M00000027_IL_0029:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::get_MaxYear()
+M00000027_IL_002e:
+cgt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000027_IL_0030:
+brtrue M00000027_IL_003a
+M00000027_IL_0035:
+br M00000027_IL_004a
+M00000027_IL_003a:
+call neoCLR.Library.System.Calendar.RuntimeErrorSystemInvalidDateErrorNew()
+M00000027_IL_003f:
+call neoCLR.Library.System.Calendar.RuntimeUnion8(System.InvalidDateError)
+M00000027_IL_0044:
+call neoCLR.Library.System.Calendar.RuntimeUnion9(System.Result.Error<System.InvalidDateError>)
+M00000027_IL_0049:
+ret
+M00000027_IL_004a:
+M00000027_IL_004b:
+M00000027_IL_004c:
+ldarg 0
+M00000027_IL_004d:
+ldarg 1
+M00000027_IL_004e:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewLeap(Int32)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000027_IL_0053:
+call neoCLR.Library.System.Calendar.RuntimeCliCall0(Int32)
+M00000027_IL_0058:
+call neoCLR.Library.System.Calendar.RuntimeUnion4(System.Result.Ok<Boolean>)
+M00000027_IL_005d:
+ret
+.end
+.method instance GetMonthsInYear(Int32 year) -> System.Result<Int32,System.InvalidDateError>
+.local System.Result<Boolean,System.InvalidDateError> local0
+.local Boolean local1
+.local System.InvalidDateError local2
+.local Boolean local3
+ldloca local0
+initobj System.Result<Boolean,System.InvalidDateError>
+ldc.bool false
+stloc local1
+newobj System.InvalidDateError
+stloc local2
+ldc.bool false
+stloc local3
+M00000028_IL_0000:
+M00000028_IL_0001:
+M00000028_IL_0002:
+ldarg 0
+M00000028_IL_0003:
+ldarg 1
+M00000028_IL_0004:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::IsLeapYear(Int32)
+M00000028_IL_0009:
+stloc local0
+M00000028_IL_000a:
+ldloca local1
+M00000028_IL_000c:
+ldc.bool false
+stobj Boolean
+M00000028_IL_0012:
+ldloca local0
+M00000028_IL_0014:
+ldloca local1
+M00000028_IL_0016:
+call neoCLR.Library.System.Calendar.RuntimeUnion10(System.Result<Boolean,System.InvalidDateError>&,Boolean&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000028_IL_001b:
+brfalse M00000028_IL_0025
+M00000028_IL_0020:
+br M00000028_IL_0046
+M00000028_IL_0025:
+ldloca local2
+M00000028_IL_0027:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M00000028_IL_002d:
+ldloca local0
+M00000028_IL_002f:
+ldloca local2
+M00000028_IL_0031:
+call neoCLR.Library.System.Calendar.RuntimeUnion11(System.Result<Boolean,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000028_IL_0036:
+brfalse M00000028_IL_0042
+M00000028_IL_003b:
+ldloc local2
+M00000028_IL_003c:
+call neoCLR.Library.System.Calendar.RuntimeUnion7(System.InvalidDateError)
+M00000028_IL_0041:
+ret
+M00000028_IL_0042:
+M00000028_IL_0043:
+M00000028_IL_0044:
+M00000028_IL_0045:
+fault "Guest program reached a terminal failure"
+M00000028_IL_0046:
+M00000028_IL_0047:
+ldloc local1
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000028_IL_0048:
+call neoCLR.Library.System.Calendar.RuntimeBooleanFromInt32(Int32)
+stloc local3
+M00000028_IL_0049:
+M00000028_IL_004a:
+ldloc local3
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000028_IL_004b:
+brtrue M00000028_IL_0055
+M00000028_IL_0050:
+br M00000028_IL_0063
+M00000028_IL_0055:
+M00000028_IL_0056:
+ldc.i4 13
+M00000028_IL_0058:
+call neoCLR.Library.System.Calendar.RuntimeUnion5(Int32)
+M00000028_IL_005d:
+call neoCLR.Library.System.Calendar.RuntimeUnion6(System.Result.Ok<Int32>)
+M00000028_IL_0062:
+ret
+M00000028_IL_0063:
+M00000028_IL_0064:
+M00000028_IL_0065:
+ldc.i4 12
+M00000028_IL_0067:
+call neoCLR.Library.System.Calendar.RuntimeUnion5(Int32)
+M00000028_IL_006c:
+call neoCLR.Library.System.Calendar.RuntimeUnion6(System.Result.Ok<Int32>)
+M00000028_IL_0071:
+ret
+.end
+.method instance GetDaysInMonth(Int32 year,Int32 month) -> System.Result<Int32,System.InvalidDateError>
+.local System.Result<Int32,System.InvalidDateError> local0
+.local Int32 local1
+.local System.InvalidDateError local2
+.local Int32 local3
+ldloca local0
+initobj System.Result<Int32,System.InvalidDateError>
+ldc.i4 0
+stloc local1
+newobj System.InvalidDateError
+stloc local2
+ldc.i4 0
+stloc local3
+M00000029_IL_0000:
+M00000029_IL_0001:
+M00000029_IL_0002:
+ldarg 0
+M00000029_IL_0003:
+ldarg 1
+M00000029_IL_0004:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::GetMonthsInYear(Int32)
+M00000029_IL_0009:
+stloc local0
+M00000029_IL_000a:
+ldloca local1
+M00000029_IL_000c:
+ldc.i4 0
+stobj Int32
+M00000029_IL_0012:
+ldloca local0
+M00000029_IL_0014:
+ldloca local1
+M00000029_IL_0016:
+call neoCLR.Library.System.Calendar.RuntimeUnion12(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000029_IL_001b:
+brfalse M00000029_IL_0025
+M00000029_IL_0020:
+br M00000029_IL_0046
+M00000029_IL_0025:
+ldloca local2
+M00000029_IL_0027:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M00000029_IL_002d:
+ldloca local0
+M00000029_IL_002f:
+ldloca local2
+M00000029_IL_0031:
+call neoCLR.Library.System.Calendar.RuntimeUnion13(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000029_IL_0036:
+brfalse M00000029_IL_0042
+M00000029_IL_003b:
+ldloc local2
+M00000029_IL_003c:
+call neoCLR.Library.System.Calendar.RuntimeUnion7(System.InvalidDateError)
+M00000029_IL_0041:
+ret
+M00000029_IL_0042:
+M00000029_IL_0043:
+M00000029_IL_0044:
+M00000029_IL_0045:
+fault "Guest program reached a terminal failure"
+M00000029_IL_0046:
+M00000029_IL_0047:
+ldloc local1
+M00000029_IL_0048:
+stloc local3
+M00000029_IL_0049:
+M00000029_IL_004a:
+ldarg 2
+M00000029_IL_004b:
+ldc.i4 1
+M00000029_IL_004c:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000029_IL_004e:
+brtrue M00000029_IL_0058
+M00000029_IL_0053:
+br M00000029_IL_0068
+M00000029_IL_0058:
+call neoCLR.Library.System.Calendar.RuntimeErrorSystemInvalidDateErrorNew()
+M00000029_IL_005d:
+call neoCLR.Library.System.Calendar.RuntimeUnion8(System.InvalidDateError)
+M00000029_IL_0062:
+call neoCLR.Library.System.Calendar.RuntimeUnion14(System.Result.Error<System.InvalidDateError>)
+M00000029_IL_0067:
+ret
+M00000029_IL_0068:
+M00000029_IL_0069:
+M00000029_IL_006a:
+ldarg 2
+M00000029_IL_006b:
+ldloc local3
+M00000029_IL_006c:
+cgt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000029_IL_006e:
+brtrue M00000029_IL_0078
+M00000029_IL_0073:
+br M00000029_IL_0088
+M00000029_IL_0078:
+call neoCLR.Library.System.Calendar.RuntimeErrorSystemInvalidDateErrorNew()
+M00000029_IL_007d:
+call neoCLR.Library.System.Calendar.RuntimeUnion8(System.InvalidDateError)
+M00000029_IL_0082:
+call neoCLR.Library.System.Calendar.RuntimeUnion14(System.Result.Error<System.InvalidDateError>)
+M00000029_IL_0087:
+ret
+M00000029_IL_0088:
+M00000029_IL_0089:
+M00000029_IL_008a:
+ldarg 0
+M00000029_IL_008b:
+ldarg 1
+M00000029_IL_008c:
+ldarg 2
+M00000029_IL_008d:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewMonthDays(Int32,Int32)
+M00000029_IL_0092:
+call neoCLR.Library.System.Calendar.RuntimeUnion5(Int32)
+M00000029_IL_0097:
+call neoCLR.Library.System.Calendar.RuntimeUnion6(System.Result.Ok<Int32>)
+M00000029_IL_009c:
+ret
+.end
+.method instance CreateDate(Int32 year,Int32 month,Int32 day) -> System.Result<System.Date,System.InvalidDateError>
+.local System.Result<Int32,System.InvalidDateError> local0
+.local Int32 local1
+.local System.InvalidDateError local2
+.local Int32 local3
+.local Int32 local4
+.local Int32 local5
+ldloca local0
+initobj System.Result<Int32,System.InvalidDateError>
+ldc.i4 0
+stloc local1
+newobj System.InvalidDateError
+stloc local2
+ldc.i4 0
+stloc local3
+ldc.i4 0
+stloc local4
+ldc.i4 0
+stloc local5
+M0000002a_IL_0000:
+M0000002a_IL_0001:
+M0000002a_IL_0002:
+ldarg 0
+M0000002a_IL_0003:
+ldarg 1
+M0000002a_IL_0004:
+ldarg 2
+M0000002a_IL_0005:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::GetDaysInMonth(Int32,Int32)
+M0000002a_IL_000a:
+stloc local0
+M0000002a_IL_000b:
+ldloca local1
+M0000002a_IL_000d:
+ldc.i4 0
+stobj Int32
+M0000002a_IL_0013:
+ldloca local0
+M0000002a_IL_0015:
+ldloca local1
+M0000002a_IL_0017:
+call neoCLR.Library.System.Calendar.RuntimeUnion12(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002a_IL_001c:
+brfalse M0000002a_IL_0026
+M0000002a_IL_0021:
+br M0000002a_IL_0047
+M0000002a_IL_0026:
+ldloca local2
+M0000002a_IL_0028:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M0000002a_IL_002e:
+ldloca local0
+M0000002a_IL_0030:
+ldloca local2
+M0000002a_IL_0032:
+call neoCLR.Library.System.Calendar.RuntimeUnion13(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002a_IL_0037:
+brfalse M0000002a_IL_0043
+M0000002a_IL_003c:
+ldloc local2
+M0000002a_IL_003d:
+call neoCLR.Library.System.Calendar.RuntimeUnion15(System.InvalidDateError)
+M0000002a_IL_0042:
+ret
+M0000002a_IL_0043:
+M0000002a_IL_0044:
+M0000002a_IL_0045:
+M0000002a_IL_0046:
+fault "Guest program reached a terminal failure"
+M0000002a_IL_0047:
+M0000002a_IL_0048:
+ldloc local1
+M0000002a_IL_0049:
+stloc local3
+M0000002a_IL_004a:
+M0000002a_IL_004b:
+ldarg 3
+M0000002a_IL_004c:
+ldc.i4 1
+M0000002a_IL_004d:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002a_IL_004f:
+brtrue M0000002a_IL_0059
+M0000002a_IL_0054:
+br M0000002a_IL_0069
+M0000002a_IL_0059:
+call neoCLR.Library.System.Calendar.RuntimeErrorSystemInvalidDateErrorNew()
+M0000002a_IL_005e:
+call neoCLR.Library.System.Calendar.RuntimeUnion8(System.InvalidDateError)
+M0000002a_IL_0063:
+call neoCLR.Library.System.Calendar.RuntimeUnion16(System.Result.Error<System.InvalidDateError>)
+M0000002a_IL_0068:
+ret
+M0000002a_IL_0069:
+M0000002a_IL_006a:
+M0000002a_IL_006b:
+ldarg 3
+M0000002a_IL_006c:
+ldloc local3
+M0000002a_IL_006d:
+cgt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002a_IL_006f:
+brtrue M0000002a_IL_0079
+M0000002a_IL_0074:
+br M0000002a_IL_0089
+M0000002a_IL_0079:
+call neoCLR.Library.System.Calendar.RuntimeErrorSystemInvalidDateErrorNew()
+M0000002a_IL_007e:
+call neoCLR.Library.System.Calendar.RuntimeUnion8(System.InvalidDateError)
+M0000002a_IL_0083:
+call neoCLR.Library.System.Calendar.RuntimeUnion16(System.Result.Error<System.InvalidDateError>)
+M0000002a_IL_0088:
+ret
+M0000002a_IL_0089:
+M0000002a_IL_008a:
+M0000002a_IL_008b:
+ldarg 0
+M0000002a_IL_008c:
+ldarg 1
+M0000002a_IL_008d:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewStart(Int32)
+M0000002a_IL_0092:
+ldarg 3
+M0000002a_IL_0093:
+add
+M0000002a_IL_0094:
+ldc.i4 1
+M0000002a_IL_0095:
+sub
+M0000002a_IL_0096:
+stloc local4
+M0000002a_IL_0098:
+M0000002a_IL_0099:
+ldc.i4 1
+M0000002a_IL_009a:
+stloc local5
+M0000002a_IL_009c:
+M0000002a_IL_009d:
+M0000002a_IL_009e:
+ldloc local5
+M0000002a_IL_00a0:
+ldarg 2
+M0000002a_IL_00a1:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002a_IL_00a3:
+brtrue M0000002a_IL_00ad
+M0000002a_IL_00a8:
+br M0000002a_IL_00c8
+M0000002a_IL_00ad:
+M0000002a_IL_00ae:
+ldloc local4
+M0000002a_IL_00b0:
+ldarg 0
+M0000002a_IL_00b1:
+ldarg 1
+M0000002a_IL_00b2:
+ldloc local5
+M0000002a_IL_00b4:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewMonthDays(Int32,Int32)
+M0000002a_IL_00b9:
+add
+M0000002a_IL_00ba:
+stloc local4
+M0000002a_IL_00bc:
+M0000002a_IL_00bd:
+ldloc local5
+M0000002a_IL_00bf:
+ldc.i4 1
+M0000002a_IL_00c0:
+add
+M0000002a_IL_00c1:
+stloc local5
+M0000002a_IL_00c3:
+br M0000002a_IL_009d
+M0000002a_IL_00c8:
+M0000002a_IL_00c9:
+M0000002a_IL_00ca:
+ldloc local4
+M0000002a_IL_00cc:
+call System.Date::FromDayNumber(Int32)
+M0000002a_IL_00d1:
+ret
+.end
+.method instance GetYear(System.Date date) -> System.Result<Int32,System.InvalidDateError>
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M0000002b_IL_0000:
+M0000002b_IL_0001:
+M0000002b_IL_0002:
+ldarga 1
+M0000002b_IL_0004:
+call neoCLR.Library.System.Calendar.RuntimeDateget_DayNumber(System.Date&)
+M0000002b_IL_0009:
+ldarg 0
+M0000002b_IL_000a:
+ldc.i4 5344
+M0000002b_IL_000f:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewStart(Int32)
+M0000002b_IL_0014:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002b_IL_0016:
+brtrue M0000002b_IL_0020
+M0000002b_IL_001b:
+br M0000002b_IL_0030
+M0000002b_IL_0020:
+call neoCLR.Library.System.Calendar.RuntimeErrorSystemInvalidDateErrorNew()
+M0000002b_IL_0025:
+call neoCLR.Library.System.Calendar.RuntimeUnion8(System.InvalidDateError)
+M0000002b_IL_002a:
+call neoCLR.Library.System.Calendar.RuntimeUnion14(System.Result.Error<System.InvalidDateError>)
+M0000002b_IL_002f:
+ret
+M0000002b_IL_0030:
+M0000002b_IL_0031:
+M0000002b_IL_0032:
+ldarga 1
+M0000002b_IL_0034:
+call neoCLR.Library.System.Calendar.RuntimeDateget_DayNumber(System.Date&)
+M0000002b_IL_0039:
+ldarg 0
+M0000002b_IL_003a:
+ldc.i4 6000
+M0000002b_IL_003f:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewStart(Int32)
+M0000002b_IL_0044:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002b_IL_0046:
+ldc.i4 0
+M0000002b_IL_0047:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002b_IL_0049:
+brtrue M0000002b_IL_0053
+M0000002b_IL_004e:
+br M0000002b_IL_0063
+M0000002b_IL_0053:
+call neoCLR.Library.System.Calendar.RuntimeErrorSystemInvalidDateErrorNew()
+M0000002b_IL_0058:
+call neoCLR.Library.System.Calendar.RuntimeUnion8(System.InvalidDateError)
+M0000002b_IL_005d:
+call neoCLR.Library.System.Calendar.RuntimeUnion14(System.Result.Error<System.InvalidDateError>)
+M0000002b_IL_0062:
+ret
+M0000002b_IL_0063:
+M0000002b_IL_0064:
+M0000002b_IL_0065:
+ldarga 1
+M0000002b_IL_0067:
+call neoCLR.Library.System.Calendar.RuntimeDateget_Year(System.Date&)
+M0000002b_IL_006c:
+ldc.i4 3760
+M0000002b_IL_0071:
+add
+M0000002b_IL_0072:
+stloc local0
+M0000002b_IL_0073:
+M0000002b_IL_0074:
+ldarga 1
+M0000002b_IL_0076:
+call neoCLR.Library.System.Calendar.RuntimeDateget_DayNumber(System.Date&)
+M0000002b_IL_007b:
+ldarg 0
+M0000002b_IL_007c:
+ldloc local0
+M0000002b_IL_007d:
+ldc.i4 1
+M0000002b_IL_007e:
+add
+M0000002b_IL_007f:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewStart(Int32)
+M0000002b_IL_0084:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002b_IL_0086:
+ldc.i4 0
+M0000002b_IL_0087:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002b_IL_0089:
+brtrue M0000002b_IL_0093
+M0000002b_IL_008e:
+br M0000002b_IL_0098
+M0000002b_IL_0093:
+M0000002b_IL_0094:
+ldloc local0
+M0000002b_IL_0095:
+ldc.i4 1
+M0000002b_IL_0096:
+add
+M0000002b_IL_0097:
+stloc local0
+M0000002b_IL_0098:
+M0000002b_IL_0099:
+M0000002b_IL_009a:
+ldloc local0
+M0000002b_IL_009b:
+call neoCLR.Library.System.Calendar.RuntimeUnion5(Int32)
+M0000002b_IL_00a0:
+call neoCLR.Library.System.Calendar.RuntimeUnion6(System.Result.Ok<Int32>)
+M0000002b_IL_00a5:
+ret
+.end
+.method instance GetMonth(System.Date date) -> System.Result<Int32,System.InvalidDateError>
+.local System.Result<Int32,System.InvalidDateError> local0
+.local Int32 local1
+.local System.InvalidDateError local2
+.local Int32 local3
+.local Int32 local4
+.local Int32 local5
+ldloca local0
+initobj System.Result<Int32,System.InvalidDateError>
+ldc.i4 0
+stloc local1
+newobj System.InvalidDateError
+stloc local2
+ldc.i4 0
+stloc local3
+ldc.i4 0
+stloc local4
+ldc.i4 0
+stloc local5
+M0000002c_IL_0000:
+M0000002c_IL_0001:
+M0000002c_IL_0002:
+ldarg 0
+M0000002c_IL_0003:
+ldarg 1
+M0000002c_IL_0004:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::GetYear(System.Date)
+M0000002c_IL_0009:
+stloc local0
+M0000002c_IL_000a:
+ldloca local1
+M0000002c_IL_000c:
+ldc.i4 0
+stobj Int32
+M0000002c_IL_0012:
+ldloca local0
+M0000002c_IL_0014:
+ldloca local1
+M0000002c_IL_0016:
+call neoCLR.Library.System.Calendar.RuntimeUnion12(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002c_IL_001b:
+brfalse M0000002c_IL_0025
+M0000002c_IL_0020:
+br M0000002c_IL_0046
+M0000002c_IL_0025:
+ldloca local2
+M0000002c_IL_0027:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M0000002c_IL_002d:
+ldloca local0
+M0000002c_IL_002f:
+ldloca local2
+M0000002c_IL_0031:
+call neoCLR.Library.System.Calendar.RuntimeUnion13(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002c_IL_0036:
+brfalse M0000002c_IL_0042
+M0000002c_IL_003b:
+ldloc local2
+M0000002c_IL_003c:
+call neoCLR.Library.System.Calendar.RuntimeUnion7(System.InvalidDateError)
+M0000002c_IL_0041:
+ret
+M0000002c_IL_0042:
+M0000002c_IL_0043:
+M0000002c_IL_0044:
+M0000002c_IL_0045:
+fault "Guest program reached a terminal failure"
+M0000002c_IL_0046:
+M0000002c_IL_0047:
+ldloc local1
+M0000002c_IL_0048:
+stloc local3
+M0000002c_IL_0049:
+M0000002c_IL_004a:
+ldarga 1
+M0000002c_IL_004c:
+call neoCLR.Library.System.Calendar.RuntimeDateget_DayNumber(System.Date&)
+M0000002c_IL_0051:
+ldarg 0
+M0000002c_IL_0052:
+ldloc local3
+M0000002c_IL_0053:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewStart(Int32)
+M0000002c_IL_0058:
+sub
+M0000002c_IL_0059:
+stloc local4
+M0000002c_IL_005b:
+M0000002c_IL_005c:
+ldc.i4 1
+M0000002c_IL_005d:
+stloc local5
+M0000002c_IL_005f:
+M0000002c_IL_0060:
+M0000002c_IL_0061:
+ldloc local4
+M0000002c_IL_0063:
+ldarg 0
+M0000002c_IL_0064:
+ldloc local3
+M0000002c_IL_0065:
+ldloc local5
+M0000002c_IL_0067:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewMonthDays(Int32,Int32)
+M0000002c_IL_006c:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002c_IL_006e:
+ldc.i4 0
+M0000002c_IL_006f:
+ceq
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002c_IL_0071:
+brtrue M0000002c_IL_007b
+M0000002c_IL_0076:
+br M0000002c_IL_0096
+M0000002c_IL_007b:
+M0000002c_IL_007c:
+ldloc local4
+M0000002c_IL_007e:
+ldarg 0
+M0000002c_IL_007f:
+ldloc local3
+M0000002c_IL_0080:
+ldloc local5
+M0000002c_IL_0082:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewMonthDays(Int32,Int32)
+M0000002c_IL_0087:
+sub
+M0000002c_IL_0088:
+stloc local4
+M0000002c_IL_008a:
+M0000002c_IL_008b:
+ldloc local5
+M0000002c_IL_008d:
+ldc.i4 1
+M0000002c_IL_008e:
+add
+M0000002c_IL_008f:
+stloc local5
+M0000002c_IL_0091:
+br M0000002c_IL_0060
+M0000002c_IL_0096:
+M0000002c_IL_0097:
+M0000002c_IL_0098:
+ldloc local5
+M0000002c_IL_009a:
+call neoCLR.Library.System.Calendar.RuntimeUnion5(Int32)
+M0000002c_IL_009f:
+call neoCLR.Library.System.Calendar.RuntimeUnion6(System.Result.Ok<Int32>)
+M0000002c_IL_00a4:
+ret
+.end
+.method instance GetDay(System.Date date) -> System.Result<Int32,System.InvalidDateError>
+.local System.Result<Int32,System.InvalidDateError> local0
+.local Int32 local1
+.local System.InvalidDateError local2
+.local Int32 local3
+.local System.Result<Int32,System.InvalidDateError> local4
+.local Int32 local5
+.local System.InvalidDateError local6
+.local Int32 local7
+.local System.Result<System.Date,System.InvalidDateError> local8
+.local System.Date local9
+.local System.InvalidDateError local10
+.local System.Date local11
+ldloca local0
+initobj System.Result<Int32,System.InvalidDateError>
+ldc.i4 0
+stloc local1
+newobj System.InvalidDateError
+stloc local2
+ldc.i4 0
+stloc local3
+ldloca local4
+initobj System.Result<Int32,System.InvalidDateError>
+ldc.i4 0
+stloc local5
+newobj System.InvalidDateError
+stloc local6
+ldc.i4 0
+stloc local7
+ldloca local8
+initobj System.Result<System.Date,System.InvalidDateError>
+ldloca local9
+initobj System.Date
+newobj System.InvalidDateError
+stloc local10
+ldloca local11
+initobj System.Date
+M0000002d_IL_0000:
+M0000002d_IL_0001:
+M0000002d_IL_0002:
+ldarg 0
+M0000002d_IL_0003:
+ldarg 1
+M0000002d_IL_0004:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::GetYear(System.Date)
+M0000002d_IL_0009:
+stloc local0
+M0000002d_IL_000a:
+ldloca local1
+M0000002d_IL_000c:
+ldc.i4 0
+stobj Int32
+M0000002d_IL_0012:
+ldloca local0
+M0000002d_IL_0014:
+ldloca local1
+M0000002d_IL_0016:
+call neoCLR.Library.System.Calendar.RuntimeUnion12(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002d_IL_001b:
+brfalse M0000002d_IL_0025
+M0000002d_IL_0020:
+br M0000002d_IL_0046
+M0000002d_IL_0025:
+ldloca local2
+M0000002d_IL_0027:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M0000002d_IL_002d:
+ldloca local0
+M0000002d_IL_002f:
+ldloca local2
+M0000002d_IL_0031:
+call neoCLR.Library.System.Calendar.RuntimeUnion13(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002d_IL_0036:
+brfalse M0000002d_IL_0042
+M0000002d_IL_003b:
+ldloc local2
+M0000002d_IL_003c:
+call neoCLR.Library.System.Calendar.RuntimeUnion7(System.InvalidDateError)
+M0000002d_IL_0041:
+ret
+M0000002d_IL_0042:
+M0000002d_IL_0043:
+M0000002d_IL_0044:
+M0000002d_IL_0045:
+fault "Guest program reached a terminal failure"
+M0000002d_IL_0046:
+M0000002d_IL_0047:
+ldloc local1
+M0000002d_IL_0048:
+stloc local3
+M0000002d_IL_0049:
+M0000002d_IL_004a:
+ldarg 0
+M0000002d_IL_004b:
+ldarg 1
+M0000002d_IL_004c:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::GetMonth(System.Date)
+M0000002d_IL_0051:
+stloc local4
+M0000002d_IL_0053:
+ldloca local5
+M0000002d_IL_0055:
+ldc.i4 0
+stobj Int32
+M0000002d_IL_005b:
+ldloca local4
+M0000002d_IL_005d:
+ldloca local5
+M0000002d_IL_005f:
+call neoCLR.Library.System.Calendar.RuntimeUnion12(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002d_IL_0064:
+brfalse M0000002d_IL_006e
+M0000002d_IL_0069:
+br M0000002d_IL_0090
+M0000002d_IL_006e:
+ldloca local6
+M0000002d_IL_0070:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M0000002d_IL_0076:
+ldloca local4
+M0000002d_IL_0078:
+ldloca local6
+M0000002d_IL_007a:
+call neoCLR.Library.System.Calendar.RuntimeUnion13(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002d_IL_007f:
+brfalse M0000002d_IL_008c
+M0000002d_IL_0084:
+ldloc local6
+M0000002d_IL_0086:
+call neoCLR.Library.System.Calendar.RuntimeUnion7(System.InvalidDateError)
+M0000002d_IL_008b:
+ret
+M0000002d_IL_008c:
+M0000002d_IL_008d:
+M0000002d_IL_008e:
+M0000002d_IL_008f:
+fault "Guest program reached a terminal failure"
+M0000002d_IL_0090:
+M0000002d_IL_0091:
+ldloc local5
+M0000002d_IL_0093:
+stloc local7
+M0000002d_IL_0095:
+M0000002d_IL_0096:
+ldarg 0
+M0000002d_IL_0097:
+ldloc local3
+M0000002d_IL_0098:
+ldloc local7
+M0000002d_IL_009a:
+ldc.i4 1
+M0000002d_IL_009b:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::CreateDate(Int32,Int32,Int32)
+M0000002d_IL_00a0:
+stloc local8
+M0000002d_IL_00a2:
+ldloca local9
+M0000002d_IL_00a4:
+initobj System.Date
+M0000002d_IL_00aa:
+ldloca local8
+M0000002d_IL_00ac:
+ldloca local9
+M0000002d_IL_00ae:
+call neoCLR.Library.System.Calendar.RuntimeUnion0(System.Result<System.Date,System.InvalidDateError>&,System.Date&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002d_IL_00b3:
+brfalse M0000002d_IL_00bd
+M0000002d_IL_00b8:
+br M0000002d_IL_00df
+M0000002d_IL_00bd:
+ldloca local10
+M0000002d_IL_00bf:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M0000002d_IL_00c5:
+ldloca local8
+M0000002d_IL_00c7:
+ldloca local10
+M0000002d_IL_00c9:
+call neoCLR.Library.System.Calendar.RuntimeUnion1(System.Result<System.Date,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002d_IL_00ce:
+brfalse M0000002d_IL_00db
+M0000002d_IL_00d3:
+ldloc local10
+M0000002d_IL_00d5:
+call neoCLR.Library.System.Calendar.RuntimeUnion7(System.InvalidDateError)
+M0000002d_IL_00da:
+ret
+M0000002d_IL_00db:
+M0000002d_IL_00dc:
+M0000002d_IL_00dd:
+M0000002d_IL_00de:
+fault "Guest program reached a terminal failure"
+M0000002d_IL_00df:
+M0000002d_IL_00e0:
+ldloc local9
+M0000002d_IL_00e2:
+stloc local11
+M0000002d_IL_00e4:
+M0000002d_IL_00e5:
+ldarga 1
+M0000002d_IL_00e7:
+call neoCLR.Library.System.Calendar.RuntimeDateget_DayNumber(System.Date&)
+M0000002d_IL_00ec:
+ldloca local11
+M0000002d_IL_00ee:
+call neoCLR.Library.System.Calendar.RuntimeDateget_DayNumber(System.Date&)
+M0000002d_IL_00f3:
+sub
+M0000002d_IL_00f4:
+ldc.i4 1
+M0000002d_IL_00f5:
+add
+M0000002d_IL_00f6:
+call neoCLR.Library.System.Calendar.RuntimeUnion5(Int32)
+M0000002d_IL_00fb:
+call neoCLR.Library.System.Calendar.RuntimeUnion6(System.Result.Ok<Int32>)
+M0000002d_IL_0100:
+ret
+.end
+.method instance AddDays(System.Date date,Int32 days) -> System.Result<System.Date,System.InvalidDateError>
+.local System.Result<System.Date,System.InvalidDateError> local0
+.local System.Date local1
+.local System.InvalidDateError local2
+.local System.Date local3
+.local System.Result<Int32,System.InvalidDateError> local4
+.local Int32 local5
+.local System.InvalidDateError local6
+.local System.Result<Int32,System.InvalidDateError> local7
+.local Int32 local8
+.local System.InvalidDateError local9
+ldloca local0
+initobj System.Result<System.Date,System.InvalidDateError>
+ldloca local1
+initobj System.Date
+newobj System.InvalidDateError
+stloc local2
+ldloca local3
+initobj System.Date
+ldloca local4
+initobj System.Result<Int32,System.InvalidDateError>
+ldc.i4 0
+stloc local5
+newobj System.InvalidDateError
+stloc local6
+ldloca local7
+initobj System.Result<Int32,System.InvalidDateError>
+ldc.i4 0
+stloc local8
+newobj System.InvalidDateError
+stloc local9
+M0000002e_IL_0000:
+M0000002e_IL_0001:
+M0000002e_IL_0002:
+ldarg 0
+M0000002e_IL_0003:
+ldarg 1
+M0000002e_IL_0004:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::GetYear(System.Date)
+M0000002e_IL_0009:
+stloc local4
+M0000002e_IL_000b:
+ldloca local4
+M0000002e_IL_000d:
+ldloca local5
+M0000002e_IL_000f:
+call neoCLR.Library.System.Calendar.RuntimeUnion12(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002e_IL_0014:
+brtrue M0000002e_IL_0031
+M0000002e_IL_0019:
+ldloca local4
+M0000002e_IL_001b:
+ldloca local6
+M0000002e_IL_001d:
+call neoCLR.Library.System.Calendar.RuntimeUnion13(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002e_IL_0022:
+brtrue M0000002e_IL_0029
+M0000002e_IL_0027:
+M0000002e_IL_0028:
+fault "Guest program reached a terminal failure"
+M0000002e_IL_0029:
+ldloc local6
+M0000002e_IL_002b:
+call neoCLR.Library.System.Calendar.RuntimeUnion15(System.InvalidDateError)
+M0000002e_IL_0030:
+ret
+M0000002e_IL_0031:
+ldloc local5
+M0000002e_IL_0033:
+pop
+M0000002e_IL_0034:
+M0000002e_IL_0035:
+ldarga 1
+M0000002e_IL_0037:
+ldarg 2
+M0000002e_IL_0038:
+call neoCLR.Library.System.Calendar.RuntimeDateAddDays(System.Date&,Int32)
+M0000002e_IL_003d:
+stloc local0
+M0000002e_IL_003e:
+ldloca local1
+M0000002e_IL_0040:
+initobj System.Date
+M0000002e_IL_0046:
+ldloca local0
+M0000002e_IL_0048:
+ldloca local1
+M0000002e_IL_004a:
+call neoCLR.Library.System.Calendar.RuntimeUnion0(System.Result<System.Date,System.InvalidDateError>&,System.Date&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002e_IL_004f:
+brfalse M0000002e_IL_0059
+M0000002e_IL_0054:
+br M0000002e_IL_007a
+M0000002e_IL_0059:
+ldloca local2
+M0000002e_IL_005b:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M0000002e_IL_0061:
+ldloca local0
+M0000002e_IL_0063:
+ldloca local2
+M0000002e_IL_0065:
+call neoCLR.Library.System.Calendar.RuntimeUnion1(System.Result<System.Date,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002e_IL_006a:
+brfalse M0000002e_IL_0076
+M0000002e_IL_006f:
+ldloc local2
+M0000002e_IL_0070:
+call neoCLR.Library.System.Calendar.RuntimeUnion15(System.InvalidDateError)
+M0000002e_IL_0075:
+ret
+M0000002e_IL_0076:
+M0000002e_IL_0077:
+M0000002e_IL_0078:
+M0000002e_IL_0079:
+fault "Guest program reached a terminal failure"
+M0000002e_IL_007a:
+M0000002e_IL_007b:
+ldloc local1
+M0000002e_IL_007c:
+stloc local3
+M0000002e_IL_007d:
+M0000002e_IL_007e:
+ldarg 0
+M0000002e_IL_007f:
+ldloc local3
+M0000002e_IL_0080:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::GetYear(System.Date)
+M0000002e_IL_0085:
+stloc local7
+M0000002e_IL_0087:
+ldloca local7
+M0000002e_IL_0089:
+ldloca local8
+M0000002e_IL_008b:
+call neoCLR.Library.System.Calendar.RuntimeUnion12(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002e_IL_0090:
+brtrue M0000002e_IL_00ad
+M0000002e_IL_0095:
+ldloca local7
+M0000002e_IL_0097:
+ldloca local9
+M0000002e_IL_0099:
+call neoCLR.Library.System.Calendar.RuntimeUnion13(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002e_IL_009e:
+brtrue M0000002e_IL_00a5
+M0000002e_IL_00a3:
+M0000002e_IL_00a4:
+fault "Guest program reached a terminal failure"
+M0000002e_IL_00a5:
+ldloc local9
+M0000002e_IL_00a7:
+call neoCLR.Library.System.Calendar.RuntimeUnion15(System.InvalidDateError)
+M0000002e_IL_00ac:
+ret
+M0000002e_IL_00ad:
+ldloc local8
+M0000002e_IL_00af:
+pop
+M0000002e_IL_00b0:
+M0000002e_IL_00b1:
+ldloc local3
+M0000002e_IL_00b2:
+call neoCLR.Library.System.Calendar.RuntimeUnion17(System.Date)
+M0000002e_IL_00b7:
+call neoCLR.Library.System.Calendar.RuntimeUnion18(System.Result.Ok<System.Date>)
+M0000002e_IL_00bc:
+ret
+.end
+.method instance AddMonths(System.Date date,Int32 months) -> System.Result<System.Date,System.InvalidDateError>
+.local System.Result<Int32,System.InvalidDateError> local0
+.local Int32 local1
+.local System.InvalidDateError local2
+.local Int32 local3
+.local Int32 local4
+.local System.Result<Int32,System.InvalidDateError> local5
+.local Int32 local6
+.local System.InvalidDateError local7
+.local Int32 local8
+.local Int32 local9
+.local System.Result<Int32,System.InvalidDateError> local10
+.local Int32 local11
+.local System.InvalidDateError local12
+ldloca local0
+initobj System.Result<Int32,System.InvalidDateError>
+ldc.i4 0
+stloc local1
+newobj System.InvalidDateError
+stloc local2
+ldc.i4 0
+stloc local3
+ldc.i4 0
+stloc local4
+ldloca local5
+initobj System.Result<Int32,System.InvalidDateError>
+ldc.i4 0
+stloc local6
+newobj System.InvalidDateError
+stloc local7
+ldc.i4 0
+stloc local8
+ldc.i4 0
+stloc local9
+ldloca local10
+initobj System.Result<Int32,System.InvalidDateError>
+ldc.i4 0
+stloc local11
+newobj System.InvalidDateError
+stloc local12
+M0000002f_IL_0000:
+M0000002f_IL_0001:
+M0000002f_IL_0002:
+ldarg 0
+M0000002f_IL_0003:
+ldarg 1
+M0000002f_IL_0004:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::GetYear(System.Date)
+M0000002f_IL_0009:
+stloc local0
+M0000002f_IL_000a:
+ldloca local1
+M0000002f_IL_000c:
+ldc.i4 0
+stobj Int32
+M0000002f_IL_0012:
+ldloca local0
+M0000002f_IL_0014:
+ldloca local1
+M0000002f_IL_0016:
+call neoCLR.Library.System.Calendar.RuntimeUnion12(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002f_IL_001b:
+brfalse M0000002f_IL_0025
+M0000002f_IL_0020:
+br M0000002f_IL_0046
+M0000002f_IL_0025:
+ldloca local2
+M0000002f_IL_0027:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M0000002f_IL_002d:
+ldloca local0
+M0000002f_IL_002f:
+ldloca local2
+M0000002f_IL_0031:
+call neoCLR.Library.System.Calendar.RuntimeUnion13(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002f_IL_0036:
+brfalse M0000002f_IL_0042
+M0000002f_IL_003b:
+ldloc local2
+M0000002f_IL_003c:
+call neoCLR.Library.System.Calendar.RuntimeUnion15(System.InvalidDateError)
+M0000002f_IL_0041:
+ret
+M0000002f_IL_0042:
+M0000002f_IL_0043:
+M0000002f_IL_0044:
+M0000002f_IL_0045:
+fault "Guest program reached a terminal failure"
+M0000002f_IL_0046:
+M0000002f_IL_0047:
+ldloc local1
+M0000002f_IL_0048:
+stloc local3
+M0000002f_IL_0049:
+M0000002f_IL_004a:
+ldarg 2
+M0000002f_IL_004b:
+ldc.i4 -9000
+M0000002f_IL_0050:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002f_IL_0052:
+brtrue M0000002f_IL_005c
+M0000002f_IL_0057:
+br M0000002f_IL_006c
+M0000002f_IL_005c:
+call neoCLR.Library.System.Calendar.RuntimeErrorSystemInvalidDateErrorNew()
+M0000002f_IL_0061:
+call neoCLR.Library.System.Calendar.RuntimeUnion8(System.InvalidDateError)
+M0000002f_IL_0066:
+call neoCLR.Library.System.Calendar.RuntimeUnion16(System.Result.Error<System.InvalidDateError>)
+M0000002f_IL_006b:
+ret
+M0000002f_IL_006c:
+M0000002f_IL_006d:
+M0000002f_IL_006e:
+ldarg 2
+M0000002f_IL_006f:
+ldc.i4 9000
+M0000002f_IL_0074:
+cgt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002f_IL_0076:
+brtrue M0000002f_IL_0080
+M0000002f_IL_007b:
+br M0000002f_IL_0090
+M0000002f_IL_0080:
+call neoCLR.Library.System.Calendar.RuntimeErrorSystemInvalidDateErrorNew()
+M0000002f_IL_0085:
+call neoCLR.Library.System.Calendar.RuntimeUnion8(System.InvalidDateError)
+M0000002f_IL_008a:
+call neoCLR.Library.System.Calendar.RuntimeUnion16(System.Result.Error<System.InvalidDateError>)
+M0000002f_IL_008f:
+ret
+M0000002f_IL_0090:
+M0000002f_IL_0091:
+M0000002f_IL_0092:
+ldarg 0
+M0000002f_IL_0093:
+ldarg 1
+M0000002f_IL_0094:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::GetMonth(System.Date)
+M0000002f_IL_0099:
+stloc local10
+M0000002f_IL_009b:
+ldloca local10
+M0000002f_IL_009d:
+ldloca local11
+M0000002f_IL_009f:
+call neoCLR.Library.System.Calendar.RuntimeUnion12(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002f_IL_00a4:
+brtrue M0000002f_IL_00c1
+M0000002f_IL_00a9:
+ldloca local10
+M0000002f_IL_00ab:
+ldloca local12
+M0000002f_IL_00ad:
+call neoCLR.Library.System.Calendar.RuntimeUnion13(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002f_IL_00b2:
+brtrue M0000002f_IL_00b9
+M0000002f_IL_00b7:
+M0000002f_IL_00b8:
+fault "Guest program reached a terminal failure"
+M0000002f_IL_00b9:
+ldloc local12
+M0000002f_IL_00bb:
+call neoCLR.Library.System.Calendar.RuntimeUnion15(System.InvalidDateError)
+M0000002f_IL_00c0:
+ret
+M0000002f_IL_00c1:
+ldloc local11
+M0000002f_IL_00c3:
+ldarg 2
+M0000002f_IL_00c4:
+add
+M0000002f_IL_00c5:
+stloc local4
+M0000002f_IL_00c7:
+M0000002f_IL_00c8:
+M0000002f_IL_00c9:
+ldloc local4
+M0000002f_IL_00cb:
+ldc.i4 1
+M0000002f_IL_00cc:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002f_IL_00ce:
+brtrue M0000002f_IL_00d8
+M0000002f_IL_00d3:
+br M0000002f_IL_0114
+M0000002f_IL_00d8:
+M0000002f_IL_00d9:
+ldloc local3
+M0000002f_IL_00da:
+ldc.i4 1
+M0000002f_IL_00db:
+sub
+M0000002f_IL_00dc:
+stloc local3
+M0000002f_IL_00dd:
+M0000002f_IL_00de:
+ldloc local3
+M0000002f_IL_00df:
+ldarg 0
+M0000002f_IL_00e0:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::get_MinYear()
+M0000002f_IL_00e5:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002f_IL_00e7:
+brtrue M0000002f_IL_00f1
+M0000002f_IL_00ec:
+br M0000002f_IL_0101
+M0000002f_IL_00f1:
+call neoCLR.Library.System.Calendar.RuntimeErrorSystemInvalidDateErrorNew()
+M0000002f_IL_00f6:
+call neoCLR.Library.System.Calendar.RuntimeUnion8(System.InvalidDateError)
+M0000002f_IL_00fb:
+call neoCLR.Library.System.Calendar.RuntimeUnion16(System.Result.Error<System.InvalidDateError>)
+M0000002f_IL_0100:
+ret
+M0000002f_IL_0101:
+M0000002f_IL_0102:
+M0000002f_IL_0103:
+ldloc local4
+M0000002f_IL_0105:
+ldarg 0
+M0000002f_IL_0106:
+ldloc local3
+M0000002f_IL_0107:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewMonthCount(Int32)
+M0000002f_IL_010c:
+add
+M0000002f_IL_010d:
+stloc local4
+M0000002f_IL_010f:
+br M0000002f_IL_00c8
+M0000002f_IL_0114:
+M0000002f_IL_0115:
+M0000002f_IL_0116:
+M0000002f_IL_0117:
+ldloc local4
+M0000002f_IL_0119:
+ldarg 0
+M0000002f_IL_011a:
+ldloc local3
+M0000002f_IL_011b:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewMonthCount(Int32)
+M0000002f_IL_0120:
+cgt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002f_IL_0122:
+brtrue M0000002f_IL_012c
+M0000002f_IL_0127:
+br M0000002f_IL_0168
+M0000002f_IL_012c:
+M0000002f_IL_012d:
+ldloc local4
+M0000002f_IL_012f:
+ldarg 0
+M0000002f_IL_0130:
+ldloc local3
+M0000002f_IL_0131:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewMonthCount(Int32)
+M0000002f_IL_0136:
+sub
+M0000002f_IL_0137:
+stloc local4
+M0000002f_IL_0139:
+M0000002f_IL_013a:
+ldloc local3
+M0000002f_IL_013b:
+ldc.i4 1
+M0000002f_IL_013c:
+add
+M0000002f_IL_013d:
+stloc local3
+M0000002f_IL_013e:
+M0000002f_IL_013f:
+ldloc local3
+M0000002f_IL_0140:
+ldarg 0
+M0000002f_IL_0141:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::get_MaxYear()
+M0000002f_IL_0146:
+cgt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002f_IL_0148:
+brtrue M0000002f_IL_0152
+M0000002f_IL_014d:
+br M0000002f_IL_0162
+M0000002f_IL_0152:
+call neoCLR.Library.System.Calendar.RuntimeErrorSystemInvalidDateErrorNew()
+M0000002f_IL_0157:
+call neoCLR.Library.System.Calendar.RuntimeUnion8(System.InvalidDateError)
+M0000002f_IL_015c:
+call neoCLR.Library.System.Calendar.RuntimeUnion16(System.Result.Error<System.InvalidDateError>)
+M0000002f_IL_0161:
+ret
+M0000002f_IL_0162:
+M0000002f_IL_0163:
+br M0000002f_IL_0116
+M0000002f_IL_0168:
+M0000002f_IL_0169:
+M0000002f_IL_016a:
+ldarg 0
+M0000002f_IL_016b:
+ldarg 1
+M0000002f_IL_016c:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::GetDay(System.Date)
+M0000002f_IL_0171:
+stloc local5
+M0000002f_IL_0173:
+ldloca local6
+M0000002f_IL_0175:
+ldc.i4 0
+stobj Int32
+M0000002f_IL_017b:
+ldloca local5
+M0000002f_IL_017d:
+ldloca local6
+M0000002f_IL_017f:
+call neoCLR.Library.System.Calendar.RuntimeUnion12(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002f_IL_0184:
+brfalse M0000002f_IL_018e
+M0000002f_IL_0189:
+br M0000002f_IL_01b0
+M0000002f_IL_018e:
+ldloca local7
+M0000002f_IL_0190:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M0000002f_IL_0196:
+ldloca local5
+M0000002f_IL_0198:
+ldloca local7
+M0000002f_IL_019a:
+call neoCLR.Library.System.Calendar.RuntimeUnion13(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002f_IL_019f:
+brfalse M0000002f_IL_01ac
+M0000002f_IL_01a4:
+ldloc local7
+M0000002f_IL_01a6:
+call neoCLR.Library.System.Calendar.RuntimeUnion15(System.InvalidDateError)
+M0000002f_IL_01ab:
+ret
+M0000002f_IL_01ac:
+M0000002f_IL_01ad:
+M0000002f_IL_01ae:
+M0000002f_IL_01af:
+fault "Guest program reached a terminal failure"
+M0000002f_IL_01b0:
+M0000002f_IL_01b1:
+ldloc local6
+M0000002f_IL_01b3:
+stloc local8
+M0000002f_IL_01b5:
+M0000002f_IL_01b6:
+ldarg 0
+M0000002f_IL_01b7:
+ldloc local3
+M0000002f_IL_01b8:
+ldloc local4
+M0000002f_IL_01ba:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewMonthDays(Int32,Int32)
+M0000002f_IL_01bf:
+stloc local9
+M0000002f_IL_01c1:
+M0000002f_IL_01c2:
+ldloc local8
+M0000002f_IL_01c4:
+ldloc local9
+M0000002f_IL_01c6:
+cgt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M0000002f_IL_01c8:
+brtrue M0000002f_IL_01d2
+M0000002f_IL_01cd:
+br M0000002f_IL_01d7
+M0000002f_IL_01d2:
+M0000002f_IL_01d3:
+ldloc local9
+M0000002f_IL_01d5:
+stloc local8
+M0000002f_IL_01d7:
+M0000002f_IL_01d8:
+M0000002f_IL_01d9:
+ldarg 0
+M0000002f_IL_01da:
+ldloc local3
+M0000002f_IL_01db:
+ldloc local4
+M0000002f_IL_01dd:
+ldloc local8
+M0000002f_IL_01df:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::CreateDate(Int32,Int32,Int32)
+M0000002f_IL_01e4:
+ret
+.end
+.method instance AddYears(System.Date date,Int32 years) -> System.Result<System.Date,System.InvalidDateError>
+.local System.Result<Int32,System.InvalidDateError> local0
+.local Int32 local1
+.local System.InvalidDateError local2
+.local Int32 local3
+.local Int32 local4
+.local System.Result<Int32,System.InvalidDateError> local5
+.local Int32 local6
+.local System.InvalidDateError local7
+.local Int32 local8
+.local System.Result<Int32,System.InvalidDateError> local9
+.local Int32 local10
+.local System.InvalidDateError local11
+.local Int32 local12
+.local System.Result<Int32,System.InvalidDateError> local13
+.local Int32 local14
+.local System.InvalidDateError local15
+.local Int32 local16
+.local Int32 local17
+ldloca local0
+initobj System.Result<Int32,System.InvalidDateError>
+ldc.i4 0
+stloc local1
+newobj System.InvalidDateError
+stloc local2
+ldc.i4 0
+stloc local3
+ldc.i4 0
+stloc local4
+ldloca local5
+initobj System.Result<Int32,System.InvalidDateError>
+ldc.i4 0
+stloc local6
+newobj System.InvalidDateError
+stloc local7
+ldc.i4 0
+stloc local8
+ldloca local9
+initobj System.Result<Int32,System.InvalidDateError>
+ldc.i4 0
+stloc local10
+newobj System.InvalidDateError
+stloc local11
+ldc.i4 0
+stloc local12
+ldloca local13
+initobj System.Result<Int32,System.InvalidDateError>
+ldc.i4 0
+stloc local14
+newobj System.InvalidDateError
+stloc local15
+ldc.i4 0
+stloc local16
+ldc.i4 0
+stloc local17
+M00000030_IL_0000:
+M00000030_IL_0001:
+M00000030_IL_0002:
+ldarg 0
+M00000030_IL_0003:
+ldarg 1
+M00000030_IL_0004:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::GetYear(System.Date)
+M00000030_IL_0009:
+stloc local0
+M00000030_IL_000a:
+ldloca local1
+M00000030_IL_000c:
+ldc.i4 0
+stobj Int32
+M00000030_IL_0012:
+ldloca local0
+M00000030_IL_0014:
+ldloca local1
+M00000030_IL_0016:
+call neoCLR.Library.System.Calendar.RuntimeUnion12(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000030_IL_001b:
+brfalse M00000030_IL_0025
+M00000030_IL_0020:
+br M00000030_IL_0046
+M00000030_IL_0025:
+ldloca local2
+M00000030_IL_0027:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M00000030_IL_002d:
+ldloca local0
+M00000030_IL_002f:
+ldloca local2
+M00000030_IL_0031:
+call neoCLR.Library.System.Calendar.RuntimeUnion13(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000030_IL_0036:
+brfalse M00000030_IL_0042
+M00000030_IL_003b:
+ldloc local2
+M00000030_IL_003c:
+call neoCLR.Library.System.Calendar.RuntimeUnion15(System.InvalidDateError)
+M00000030_IL_0041:
+ret
+M00000030_IL_0042:
+M00000030_IL_0043:
+M00000030_IL_0044:
+M00000030_IL_0045:
+fault "Guest program reached a terminal failure"
+M00000030_IL_0046:
+M00000030_IL_0047:
+ldloc local1
+M00000030_IL_0048:
+stloc local3
+M00000030_IL_0049:
+M00000030_IL_004a:
+ldarg 2
+M00000030_IL_004b:
+ldc.i4 -655
+M00000030_IL_0050:
+clt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000030_IL_0052:
+brtrue M00000030_IL_005c
+M00000030_IL_0057:
+br M00000030_IL_006c
+M00000030_IL_005c:
+call neoCLR.Library.System.Calendar.RuntimeErrorSystemInvalidDateErrorNew()
+M00000030_IL_0061:
+call neoCLR.Library.System.Calendar.RuntimeUnion8(System.InvalidDateError)
+M00000030_IL_0066:
+call neoCLR.Library.System.Calendar.RuntimeUnion16(System.Result.Error<System.InvalidDateError>)
+M00000030_IL_006b:
+ret
+M00000030_IL_006c:
+M00000030_IL_006d:
+M00000030_IL_006e:
+ldarg 2
+M00000030_IL_006f:
+ldc.i4 655
+M00000030_IL_0074:
+cgt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000030_IL_0076:
+brtrue M00000030_IL_0080
+M00000030_IL_007b:
+br M00000030_IL_0090
+M00000030_IL_0080:
+call neoCLR.Library.System.Calendar.RuntimeErrorSystemInvalidDateErrorNew()
+M00000030_IL_0085:
+call neoCLR.Library.System.Calendar.RuntimeUnion8(System.InvalidDateError)
+M00000030_IL_008a:
+call neoCLR.Library.System.Calendar.RuntimeUnion16(System.Result.Error<System.InvalidDateError>)
+M00000030_IL_008f:
+ret
+M00000030_IL_0090:
+M00000030_IL_0091:
+M00000030_IL_0092:
+ldloc local3
+M00000030_IL_0093:
+ldarg 2
+M00000030_IL_0094:
+add
+M00000030_IL_0095:
+stloc local4
+M00000030_IL_0097:
+M00000030_IL_0098:
+ldarg 0
+M00000030_IL_0099:
+ldloc local4
+M00000030_IL_009b:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::GetMonthsInYear(Int32)
+M00000030_IL_00a0:
+stloc local5
+M00000030_IL_00a2:
+ldloca local6
+M00000030_IL_00a4:
+ldc.i4 0
+stobj Int32
+M00000030_IL_00aa:
+ldloca local5
+M00000030_IL_00ac:
+ldloca local6
+M00000030_IL_00ae:
+call neoCLR.Library.System.Calendar.RuntimeUnion12(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000030_IL_00b3:
+brfalse M00000030_IL_00bd
+M00000030_IL_00b8:
+br M00000030_IL_00df
+M00000030_IL_00bd:
+ldloca local7
+M00000030_IL_00bf:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M00000030_IL_00c5:
+ldloca local5
+M00000030_IL_00c7:
+ldloca local7
+M00000030_IL_00c9:
+call neoCLR.Library.System.Calendar.RuntimeUnion13(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000030_IL_00ce:
+brfalse M00000030_IL_00db
+M00000030_IL_00d3:
+ldloc local7
+M00000030_IL_00d5:
+call neoCLR.Library.System.Calendar.RuntimeUnion15(System.InvalidDateError)
+M00000030_IL_00da:
+ret
+M00000030_IL_00db:
+M00000030_IL_00dc:
+M00000030_IL_00dd:
+M00000030_IL_00de:
+fault "Guest program reached a terminal failure"
+M00000030_IL_00df:
+M00000030_IL_00e0:
+ldloc local6
+M00000030_IL_00e2:
+stloc local8
+M00000030_IL_00e4:
+M00000030_IL_00e5:
+ldarg 0
+M00000030_IL_00e6:
+ldarg 1
+M00000030_IL_00e7:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::GetMonth(System.Date)
+M00000030_IL_00ec:
+stloc local9
+M00000030_IL_00ee:
+ldloca local10
+M00000030_IL_00f0:
+ldc.i4 0
+stobj Int32
+M00000030_IL_00f6:
+ldloca local9
+M00000030_IL_00f8:
+ldloca local10
+M00000030_IL_00fa:
+call neoCLR.Library.System.Calendar.RuntimeUnion12(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000030_IL_00ff:
+brfalse M00000030_IL_0109
+M00000030_IL_0104:
+br M00000030_IL_012b
+M00000030_IL_0109:
+ldloca local11
+M00000030_IL_010b:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M00000030_IL_0111:
+ldloca local9
+M00000030_IL_0113:
+ldloca local11
+M00000030_IL_0115:
+call neoCLR.Library.System.Calendar.RuntimeUnion13(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000030_IL_011a:
+brfalse M00000030_IL_0127
+M00000030_IL_011f:
+ldloc local11
+M00000030_IL_0121:
+call neoCLR.Library.System.Calendar.RuntimeUnion15(System.InvalidDateError)
+M00000030_IL_0126:
+ret
+M00000030_IL_0127:
+M00000030_IL_0128:
+M00000030_IL_0129:
+M00000030_IL_012a:
+fault "Guest program reached a terminal failure"
+M00000030_IL_012b:
+M00000030_IL_012c:
+ldloc local10
+M00000030_IL_012e:
+stloc local12
+M00000030_IL_0130:
+M00000030_IL_0131:
+ldloc local12
+M00000030_IL_0133:
+ldloc local8
+M00000030_IL_0135:
+cgt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000030_IL_0137:
+brtrue M00000030_IL_0141
+M00000030_IL_013c:
+br M00000030_IL_0146
+M00000030_IL_0141:
+M00000030_IL_0142:
+ldloc local8
+M00000030_IL_0144:
+stloc local12
+M00000030_IL_0146:
+M00000030_IL_0147:
+M00000030_IL_0148:
+ldarg 0
+M00000030_IL_0149:
+ldarg 1
+M00000030_IL_014a:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::GetDay(System.Date)
+M00000030_IL_014f:
+stloc local13
+M00000030_IL_0151:
+ldloca local14
+M00000030_IL_0153:
+ldc.i4 0
+stobj Int32
+M00000030_IL_0159:
+ldloca local13
+M00000030_IL_015b:
+ldloca local14
+M00000030_IL_015d:
+call neoCLR.Library.System.Calendar.RuntimeUnion12(System.Result<Int32,System.InvalidDateError>&,Int32&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000030_IL_0162:
+brfalse M00000030_IL_016c
+M00000030_IL_0167:
+br M00000030_IL_018e
+M00000030_IL_016c:
+ldloca local15
+M00000030_IL_016e:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M00000030_IL_0174:
+ldloca local13
+M00000030_IL_0176:
+ldloca local15
+M00000030_IL_0178:
+call neoCLR.Library.System.Calendar.RuntimeUnion13(System.Result<Int32,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000030_IL_017d:
+brfalse M00000030_IL_018a
+M00000030_IL_0182:
+ldloc local15
+M00000030_IL_0184:
+call neoCLR.Library.System.Calendar.RuntimeUnion15(System.InvalidDateError)
+M00000030_IL_0189:
+ret
+M00000030_IL_018a:
+M00000030_IL_018b:
+M00000030_IL_018c:
+M00000030_IL_018d:
+fault "Guest program reached a terminal failure"
+M00000030_IL_018e:
+M00000030_IL_018f:
+ldloc local14
+M00000030_IL_0191:
+stloc local16
+M00000030_IL_0193:
+M00000030_IL_0194:
+ldarg 0
+M00000030_IL_0195:
+ldloc local4
+M00000030_IL_0197:
+ldloc local12
+M00000030_IL_0199:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::HebrewMonthDays(Int32,Int32)
+M00000030_IL_019e:
+stloc local17
+M00000030_IL_01a0:
+M00000030_IL_01a1:
+ldloc local16
+M00000030_IL_01a3:
+ldloc local17
+M00000030_IL_01a5:
+cgt
+call neoCLR.Library.System.Calendar.RuntimeBooleanToInt32(Boolean)
+M00000030_IL_01a7:
+brtrue M00000030_IL_01b1
+M00000030_IL_01ac:
+br M00000030_IL_01b6
+M00000030_IL_01b1:
+M00000030_IL_01b2:
+ldloc local17
+M00000030_IL_01b4:
+stloc local16
+M00000030_IL_01b6:
+M00000030_IL_01b7:
+M00000030_IL_01b8:
+ldarg 0
+M00000030_IL_01b9:
+ldloc local4
+M00000030_IL_01bb:
+ldloc local12
+M00000030_IL_01bd:
+ldloc local16
+M00000030_IL_01bf:
+callvirt instance neoCLR.Library.System.Calendar.Type_53797374656D2E48656272657743616C656E646172::CreateDate(Int32,Int32,Int32)
+M00000030_IL_01c4:
+ret
+.end
+.end

@@ -53,7 +53,7 @@ observe mutations through another alias; stronger guarantees need explicit contr
 ## Time and globalization
 
 [Dates, times, instants, durations and clocks](../features/time/) supply the foundation.
-Time zones, calendars and culture descriptions could extend it. .NET DateOnly,
+[Provisional globalization APIs](../features/globalization/) now add Gregorian/Hebrew calendars, cultures and system discovery. Time zones, broader locale data and independent unified localization remain future work. .NET DateOnly,
 TimeOnly, TimeProvider and CultureInfo are comparison points; additional concepts
 also bring data dependencies and conversion rules.
 

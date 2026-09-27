@@ -1,0 +1,11 @@
+namespace System.Globalization
+
+public class FixedCultureProvider : CultureProvider {
+    private var culture: Culture
+
+    init(culture: Culture) {
+        self.culture = culture
+    }
+
+    val Current: Culture => culture
+}

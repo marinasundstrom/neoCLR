@@ -1,0 +1,15 @@
+namespace System.Globalization
+
+internal class DateTimeFormatDigits {
+    func Pad(value: int, width: int) -> string {
+        var text = value.ToString()
+        while text.Length < width {
+            text = "0" + text
+        }
+        return text
+    }
+
+    func FormatTime(time: System.Time, separator: string) -> string {
+        return Pad(time.Hour, 2) + ":" + Pad(time.Minute, 2) + ":" + Pad(time.Second, 2) + separator + Pad(time.FractionTicks, 7)
+    }
+}

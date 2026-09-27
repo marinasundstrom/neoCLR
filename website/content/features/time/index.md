@@ -1,4 +1,4 @@
-# Date, time and clock APIs
+# DateTime: dates, times and clocks
 
 Date and Time represent civil values. Instant identifies a point on the timeline, Duration an elapsed amount, and Clock supplies Now. SystemClock is the current system provider.
 
@@ -39,3 +39,15 @@ Questions, examples and documentation corrections are welcome. See [how to contr
 Report issues with a small program, the toolchain version, expected behavior and observed output. API proposals should identify the missing operation or contract.
 
 [Discuss on GitHub ↗](https://github.com/marinasundstrom/neoCLR/issues)
+
+## Calendar rendering and globalization
+
+[Globalization has its own feature page](../globalization/), covering culture,
+language, system preferences and Gregorian/Hebrew rendering. DateTime remains the
+separate home for civil values, instants and clocks.
+
+## Next slice
+
+The author has selected the Time API and time-zone handling next. Their contracts,
+zone data and ambiguous or missing local-time behavior remain to be designed and
+validated; they are not implemented by the calendar/globalization slice.

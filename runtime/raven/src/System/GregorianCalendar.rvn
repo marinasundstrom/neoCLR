@@ -1,0 +1,57 @@
+namespace System
+
+import System.Result.*
+
+internal class GregorianCalendar : CalendarRules {
+    val Id: string => "gregory"
+    val MinYear: int => 1
+    val MaxYear: int => 9999
+
+    func CreateDate(year: int, month: int, day: int) -> Result<Date, InvalidDateError> {
+        return Date.Create(year, month, day)
+    }
+
+    func IsLeapYear(year: int) -> Result<bool, InvalidDateError> {
+        let date = Date.Create(year, 12, 31)?
+        return Ok(date.DayOfYear == 366)
+    }
+
+    func GetMonthsInYear(year: int) -> Result<int, InvalidDateError> {
+        _ = Date.Create(year, 1, 1)?
+        return Ok(12)
+    }
+
+    func GetDaysInMonth(year: int, month: int) -> Result<int, InvalidDateError> {
+        let first = Date.Create(year, month, 1)?
+        if month == 12 {
+            return Ok(31)
+        }
+        let next = first.AddMonths(1)?
+        return Ok(next.DayNumber - first.DayNumber)
+    }
+
+    func GetYear(date: Date) -> Result<int, InvalidDateError> {
+        return Ok(date.Year)
+    }
+
+    func GetMonth(date: Date) -> Result<int, InvalidDateError> {
+        return Ok(date.Month)
+    }
+
+    func GetDay(date: Date) -> Result<int, InvalidDateError> {
+        return Ok(date.Day)
+    }
+
+    func AddDays(date: Date, days: int) -> Result<Date, InvalidDateError> {
+        return date.AddDays(days)
+    }
+
+    func AddMonths(date: Date, months: int) -> Result<Date, InvalidDateError> {
+        return date.AddMonths(months)
+    }
+
+    func AddYears(date: Date, years: int) -> Result<Date, InvalidDateError> {
+        return date.AddYears(years)
+    }
+
+}

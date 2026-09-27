@@ -12,7 +12,7 @@ static class InterfaceBindings
         public interface Closable<E> { Result<PropagationUnit,E> Close(); }
         """;
     static readonly HashSet<string> Contracts = new() { "System.EquatableTo", "System.ComparableTo", "System.Clonable", "System.Closable", "System.ConvertibleInto" };
-    public static bool IsInterface(string type) => ComparerBindings.IsInterface(type) || type == StandardUnionLibrary.ProtocolName || (HttpBindings.IsContract(type) || ReaderBindings.IsContract(type) || type == "System.Clock" || StorageItemBindings.IsName(type) || StreamBindings.IsCapability(type) || StorageProviderBindings.IsName(type)) || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
+    public static bool IsInterface(string type) => type == GlobalizationBindings.Provider || ComparerBindings.IsInterface(type) || type == StandardUnionLibrary.ProtocolName || (HttpBindings.IsContract(type) || ReaderBindings.IsContract(type) || type == "System.Clock" || StorageItemBindings.IsName(type) || StreamBindings.IsCapability(type) || StorageProviderBindings.IsName(type)) || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
     public static string? Type(TypeReference type, Func<TypeReference, string>? parameterMap = null)
     {
         if (!RuntimeSignatures.IsCore(type.Scope)) return null;
@@ -25,11 +25,12 @@ static class InterfaceBindings
         var element = parameterMap?.Invoke(g.GenericArguments[0]) ?? ReflectionBindings.Type(g.GenericArguments[0]) ?? GenericUnionBindings.Type(g.GenericArguments[0]);
         return element is null ? null : name + "<" + element + ">";
     }
-    public static bool Converts(string source, string target) => ComparerBindings.Converts(source, target) || ((source == HttpBindings.Prefix + "HttpContext" || source == HttpBindings.Prefix + "HttpContent") && target == CollectionBindings.Disposable) || (source == HttpBindings.Prefix + "HttpSocketHandler" && target == HttpBindings.Prefix + "HttpHandler") || (source == "System.Uri" && target == "System.EquatableTo<System.Uri>") || (source == "System.Storage.Path" && target == "System.EquatableTo<System.Storage.Path>") || (source == ReaderBindings.Stream && target == ReaderBindings.Reader || source == ReaderBindings.StreamWriter && target == ReaderBindings.Writer) || source == FileSystemBindings.Name && target == StorageProviderBindings.Name || StorageItemBindings.Assignable(source, target) || StreamBindings.Assignable(source, target) || (source == "String" && target is "System.Collections.Iterable<Char>" or "System.Collections.Collection<Char>" or "System.Collections.Sequence<Char>") || IsInterface(target)
+    public static bool Converts(string source, string target) => GlobalizationBindings.Converts(source, target) || ComparerBindings.Converts(source, target) || ((source == HttpBindings.Prefix + "HttpContext" || source == HttpBindings.Prefix + "HttpContent") && target == CollectionBindings.Disposable) || (source == HttpBindings.Prefix + "HttpSocketHandler" && target == HttpBindings.Prefix + "HttpHandler") || (source == "System.Uri" && target == "System.EquatableTo<System.Uri>") || (source == "System.Storage.Path" && target == "System.EquatableTo<System.Storage.Path>") || (source == ReaderBindings.Stream && target == ReaderBindings.Reader || source == ReaderBindings.StreamWriter && target == ReaderBindings.Writer) || source == FileSystemBindings.Name && target == StorageProviderBindings.Name || StorageItemBindings.Assignable(source, target) || StreamBindings.Assignable(source, target) || (source == "String" && target is "System.Collections.Iterable<Char>" or "System.Collections.Collection<Char>" or "System.Collections.Sequence<Char>") || IsInterface(target)
         && (source == "System.Object" || source == "String" || ReflectionBindings.IsReference(source) || CalendarBindings.IsReference(source));
     public static string Convert(string source, string target) => Converts(source,target) ? "castclass " + target + "\n" : "";
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
+        if (GlobalizationBindings.Bind(reference, definition) is { } culture) return culture;
         if (ComparerBindings.Bind(reference, definition) is { } comparer) return comparer;
         if (HttpBindings.IsContract(reference.DeclaringType.FullName)) return HttpBindings.BindContract(reference, definition);
         if (ReaderBindings.IsContract(reference.DeclaringType.FullName)) return ReaderBindings.BindContract(reference, definition);

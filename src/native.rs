@@ -10,6 +10,7 @@ pub(crate) enum Binding {
     Resolve(crate::name_resolution::Operation),
     #[cfg(test)]
     TestSocketReceive,
+    SystemCultureName,
     EnvironmentArguments,
     EnvironmentCurrentDirectory,
     EnvironmentVariable,
@@ -162,6 +163,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Binding::ReflectionConstruct,
             Type::from_name("System.Object"),
         ),
+        ("neoCLR.Runtime.SystemCultureName", []) => (Binding::SystemCultureName, Type::String),
         ("neoCLR.Runtime.EnvironmentArguments", []) => (
             Binding::EnvironmentArguments,
             Type::Array(Box::new(Type::String)),
@@ -649,6 +651,9 @@ impl Binding {
                     crate::type_identity::describe_loaded(module, &concrete)?,
                 )))
             }
+            (Self::SystemCultureName, []) => Ok(Value::String(
+                sys_locale::get_locale().unwrap_or_default().into(),
+            )),
             (Self::EnvironmentArguments, []) => Ok(Value::Array {
                 element: Type::String,
                 elements: options

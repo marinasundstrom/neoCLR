@@ -81,7 +81,8 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::Fault => return Ok(vec![]),
             crate::native::Binding::EnvironmentArguments
             | crate::native::Binding::EnvironmentCurrentDirectory
-            | crate::native::Binding::EnvironmentVariable => RuntimeService::ProcessEnvironment,
+            | crate::native::Binding::EnvironmentVariable
+            | crate::native::Binding::SystemCultureName => RuntimeService::ProcessEnvironment,
             crate::native::Binding::PathCombine | crate::native::Binding::PathGetFileName => {
                 RuntimeService::PathOperations
             }

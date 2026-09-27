@@ -1,0 +1,1573 @@
+; Generated from runtime/raven/src/System/Globalization/DateTimeFormat.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeStringEquals(String source,String value0) -> Boolean
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::Equals(String)
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeStringget_Item(String source,Int32 value0) -> Char
+.local String receiver
+ldarg source
+stloc receiver
+ldloca receiver
+ldarg value0
+call instance System.String::get_Item(Int32)
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeStringget_Length(String source) -> Int32
+ldarg source
+call instance System.String::get_Length()
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeInt32ToString(Int32& source) -> String
+ldarg source
+ldobj Int32
+call instance System.Int32::ToString()
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeCharToString(Char& source) -> String
+ldarg source
+call instance System.Char::ToString()
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_Hour(System.Time& source) -> Int32
+ldarg source
+call instance System.Time::get_Hour()
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_Minute(System.Time& source) -> Int32
+ldarg source
+call instance System.Time::get_Minute()
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_Second(System.Time& source) -> Int32
+ldarg source
+call instance System.Time::get_Second()
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_FractionTicks(System.Time& source) -> Int32
+ldarg source
+call instance System.Time::get_FractionTicks()
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeLocalDateTimeget_Date(System.LocalDateTime& source) -> System.Date
+ldarg source
+call instance System.LocalDateTime::get_Date()
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeLocalDateTimeget_Time(System.LocalDateTime& source) -> System.Time
+ldarg source
+call instance System.LocalDateTime::get_Time()
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion0(System.Result<Int32,System.InvalidDateError>& arg0,out Int32& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<Int32,System.InvalidDateError>::TryGetOutput(Int32&)
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion1(System.Result<Int32,System.InvalidDateError>& arg0,out System.InvalidDateError& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<Int32,System.InvalidDateError>::TryGetResidual(System.InvalidDateError&)
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion2(System.InvalidDateError arg0) -> System.Result<String,System.InvalidDateError>
+ldarg arg0
+call System.Result<String,System.InvalidDateError>::FromResidual(System.InvalidDateError)
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion3(String arg0) -> System.Result.Ok<String>
+ldarg arg0
+newobj instance System.Result.Ok<String>::.ctor(String)
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion4(System.Result.Ok<String> arg0) -> System.Result<String,System.InvalidDateError>
+ldarg arg0
+newobj instance System.Result<String,System.InvalidDateError>::.ctor(System.Result.Ok<String>)
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion5(System.Result<String,System.InvalidDateError>& arg0,out String& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<String,System.InvalidDateError>::TryGetOutput(String&)
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion6(System.Result<String,System.InvalidDateError>& arg0,out System.InvalidDateError& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<String,System.InvalidDateError>::TryGetResidual(System.InvalidDateError&)
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion7(System.Result<Int32,System.InvalidDateError>& arg0,out(true) System.Result.Ok<Int32>& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<Int32,System.InvalidDateError>::TryGetValue(System.Result.Ok<Int32>&)
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion8(System.Result.Ok<Int32>& arg0) -> Int32
+ldarg arg0
+call instance System.Result.Ok<Int32>::get_Value()
+ret
+.end
+.function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.type internal class neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174
+.sealed
+.implements neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D617452756C6573
+.field private digits neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473
+.field private calendar System.Calendar
+.property instance DateTimeSeparator() -> String
+.get instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::get_DateTimeSeparator()
+.end
+.method instance .ctor(System.Calendar calendar) -> noresult
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+ldarg 0
+M0000000a_IL_0002:
+pop
+M0000000a_IL_0007:
+M0000000a_IL_0008:
+ldarg 0
+M0000000a_IL_0009:
+newobj instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::.ctor()
+M0000000a_IL_000e:
+stfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::digits
+M0000000a_IL_0013:
+M0000000a_IL_0014:
+ldarg 0
+M0000000a_IL_0015:
+ldarg 1
+M0000000a_IL_0016:
+stfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::calendar
+M0000000a_IL_001b:
+ret
+.end
+.method instance get_DateTimeSeparator() -> String
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
+ldstr " "
+M0000000d_IL_0007:
+ret
+.end
+.method instance Numeral(Int32 value) -> String
+.local arrayref<Int32> local0
+.local arrayref<String> local1
+.local Int32 local2
+.local String local3
+.local Int32 local4
+.local String local5
+.local Int32 local6
+.local Char local7
+ldloca local0
+initobj arrayref<Int32>
+ldloca local1
+initobj arrayref<String>
+ldc.i4 0
+stloc local2
+ldc.i4 0
+stloc local4
+ldc.i4 0
+stloc local6
+ldstr "\u0000"
+call neoCLR.Runtime.CharFromString(String)
+stloc local7
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+M0000000e_IL_0002:
+ldc.i4 22
+M0000000e_IL_0004:
+newarr Int32
+M0000000e_IL_0009:
+dup
+M0000000e_IL_000a:
+ldc.i4 0
+M0000000e_IL_000b:
+ldc.i4 400
+M0000000e_IL_0010:
+stelem Int32
+M0000000e_IL_0011:
+dup
+M0000000e_IL_0012:
+ldc.i4 1
+M0000000e_IL_0013:
+ldc.i4 300
+M0000000e_IL_0018:
+stelem Int32
+M0000000e_IL_0019:
+dup
+M0000000e_IL_001a:
+ldc.i4 2
+M0000000e_IL_001b:
+ldc.i4 200
+M0000000e_IL_0020:
+stelem Int32
+M0000000e_IL_0021:
+dup
+M0000000e_IL_0022:
+ldc.i4 3
+M0000000e_IL_0023:
+ldc.i4 100
+M0000000e_IL_0025:
+stelem Int32
+M0000000e_IL_0026:
+dup
+M0000000e_IL_0027:
+ldc.i4 4
+M0000000e_IL_0028:
+ldc.i4 90
+M0000000e_IL_002a:
+stelem Int32
+M0000000e_IL_002b:
+dup
+M0000000e_IL_002c:
+ldc.i4 5
+M0000000e_IL_002d:
+ldc.i4 80
+M0000000e_IL_002f:
+stelem Int32
+M0000000e_IL_0030:
+dup
+M0000000e_IL_0031:
+ldc.i4 6
+M0000000e_IL_0032:
+ldc.i4 70
+M0000000e_IL_0034:
+stelem Int32
+M0000000e_IL_0035:
+dup
+M0000000e_IL_0036:
+ldc.i4 7
+M0000000e_IL_0037:
+ldc.i4 60
+M0000000e_IL_0039:
+stelem Int32
+M0000000e_IL_003a:
+dup
+M0000000e_IL_003b:
+ldc.i4 8
+M0000000e_IL_003c:
+ldc.i4 50
+M0000000e_IL_003e:
+stelem Int32
+M0000000e_IL_003f:
+dup
+M0000000e_IL_0040:
+ldc.i4 9
+M0000000e_IL_0042:
+ldc.i4 40
+M0000000e_IL_0044:
+stelem Int32
+M0000000e_IL_0045:
+dup
+M0000000e_IL_0046:
+ldc.i4 10
+M0000000e_IL_0048:
+ldc.i4 30
+M0000000e_IL_004a:
+stelem Int32
+M0000000e_IL_004b:
+dup
+M0000000e_IL_004c:
+ldc.i4 11
+M0000000e_IL_004e:
+ldc.i4 20
+M0000000e_IL_0050:
+stelem Int32
+M0000000e_IL_0051:
+dup
+M0000000e_IL_0052:
+ldc.i4 12
+M0000000e_IL_0054:
+ldc.i4 10
+M0000000e_IL_0056:
+stelem Int32
+M0000000e_IL_0057:
+dup
+M0000000e_IL_0058:
+ldc.i4 13
+M0000000e_IL_005a:
+ldc.i4 9
+M0000000e_IL_005c:
+stelem Int32
+M0000000e_IL_005d:
+dup
+M0000000e_IL_005e:
+ldc.i4 14
+M0000000e_IL_0060:
+ldc.i4 8
+M0000000e_IL_0061:
+stelem Int32
+M0000000e_IL_0062:
+dup
+M0000000e_IL_0063:
+ldc.i4 15
+M0000000e_IL_0065:
+ldc.i4 7
+M0000000e_IL_0066:
+stelem Int32
+M0000000e_IL_0067:
+dup
+M0000000e_IL_0068:
+ldc.i4 16
+M0000000e_IL_006a:
+ldc.i4 6
+M0000000e_IL_006b:
+stelem Int32
+M0000000e_IL_006c:
+dup
+M0000000e_IL_006d:
+ldc.i4 17
+M0000000e_IL_006f:
+ldc.i4 5
+M0000000e_IL_0070:
+stelem Int32
+M0000000e_IL_0071:
+dup
+M0000000e_IL_0072:
+ldc.i4 18
+M0000000e_IL_0074:
+ldc.i4 4
+M0000000e_IL_0075:
+stelem Int32
+M0000000e_IL_0076:
+dup
+M0000000e_IL_0077:
+ldc.i4 19
+M0000000e_IL_0079:
+ldc.i4 3
+M0000000e_IL_007a:
+stelem Int32
+M0000000e_IL_007b:
+dup
+M0000000e_IL_007c:
+ldc.i4 20
+M0000000e_IL_007e:
+ldc.i4 2
+M0000000e_IL_007f:
+stelem Int32
+M0000000e_IL_0080:
+dup
+M0000000e_IL_0081:
+ldc.i4 21
+M0000000e_IL_0083:
+ldc.i4 1
+M0000000e_IL_0084:
+stelem Int32
+M0000000e_IL_0085:
+stloc local0
+M0000000e_IL_0086:
+M0000000e_IL_0087:
+ldc.i4 22
+M0000000e_IL_0089:
+newarr String
+M0000000e_IL_008e:
+dup
+M0000000e_IL_008f:
+ldc.i4 0
+M0000000e_IL_0090:
+ldstr "\u05EA"
+M0000000e_IL_0095:
+stelem String
+M0000000e_IL_0096:
+dup
+M0000000e_IL_0097:
+ldc.i4 1
+M0000000e_IL_0098:
+ldstr "\u05E9"
+M0000000e_IL_009d:
+stelem String
+M0000000e_IL_009e:
+dup
+M0000000e_IL_009f:
+ldc.i4 2
+M0000000e_IL_00a0:
+ldstr "\u05E8"
+M0000000e_IL_00a5:
+stelem String
+M0000000e_IL_00a6:
+dup
+M0000000e_IL_00a7:
+ldc.i4 3
+M0000000e_IL_00a8:
+ldstr "\u05E7"
+M0000000e_IL_00ad:
+stelem String
+M0000000e_IL_00ae:
+dup
+M0000000e_IL_00af:
+ldc.i4 4
+M0000000e_IL_00b0:
+ldstr "\u05E6"
+M0000000e_IL_00b5:
+stelem String
+M0000000e_IL_00b6:
+dup
+M0000000e_IL_00b7:
+ldc.i4 5
+M0000000e_IL_00b8:
+ldstr "\u05E4"
+M0000000e_IL_00bd:
+stelem String
+M0000000e_IL_00be:
+dup
+M0000000e_IL_00bf:
+ldc.i4 6
+M0000000e_IL_00c0:
+ldstr "\u05E2"
+M0000000e_IL_00c5:
+stelem String
+M0000000e_IL_00c6:
+dup
+M0000000e_IL_00c7:
+ldc.i4 7
+M0000000e_IL_00c8:
+ldstr "\u05E1"
+M0000000e_IL_00cd:
+stelem String
+M0000000e_IL_00ce:
+dup
+M0000000e_IL_00cf:
+ldc.i4 8
+M0000000e_IL_00d0:
+ldstr "\u05E0"
+M0000000e_IL_00d5:
+stelem String
+M0000000e_IL_00d6:
+dup
+M0000000e_IL_00d7:
+ldc.i4 9
+M0000000e_IL_00d9:
+ldstr "\u05DE"
+M0000000e_IL_00de:
+stelem String
+M0000000e_IL_00df:
+dup
+M0000000e_IL_00e0:
+ldc.i4 10
+M0000000e_IL_00e2:
+ldstr "\u05DC"
+M0000000e_IL_00e7:
+stelem String
+M0000000e_IL_00e8:
+dup
+M0000000e_IL_00e9:
+ldc.i4 11
+M0000000e_IL_00eb:
+ldstr "\u05DB"
+M0000000e_IL_00f0:
+stelem String
+M0000000e_IL_00f1:
+dup
+M0000000e_IL_00f2:
+ldc.i4 12
+M0000000e_IL_00f4:
+ldstr "\u05D9"
+M0000000e_IL_00f9:
+stelem String
+M0000000e_IL_00fa:
+dup
+M0000000e_IL_00fb:
+ldc.i4 13
+M0000000e_IL_00fd:
+ldstr "\u05D8"
+M0000000e_IL_0102:
+stelem String
+M0000000e_IL_0103:
+dup
+M0000000e_IL_0104:
+ldc.i4 14
+M0000000e_IL_0106:
+ldstr "\u05D7"
+M0000000e_IL_010b:
+stelem String
+M0000000e_IL_010c:
+dup
+M0000000e_IL_010d:
+ldc.i4 15
+M0000000e_IL_010f:
+ldstr "\u05D6"
+M0000000e_IL_0114:
+stelem String
+M0000000e_IL_0115:
+dup
+M0000000e_IL_0116:
+ldc.i4 16
+M0000000e_IL_0118:
+ldstr "\u05D5"
+M0000000e_IL_011d:
+stelem String
+M0000000e_IL_011e:
+dup
+M0000000e_IL_011f:
+ldc.i4 17
+M0000000e_IL_0121:
+ldstr "\u05D4"
+M0000000e_IL_0126:
+stelem String
+M0000000e_IL_0127:
+dup
+M0000000e_IL_0128:
+ldc.i4 18
+M0000000e_IL_012a:
+ldstr "\u05D3"
+M0000000e_IL_012f:
+stelem String
+M0000000e_IL_0130:
+dup
+M0000000e_IL_0131:
+ldc.i4 19
+M0000000e_IL_0133:
+ldstr "\u05D2"
+M0000000e_IL_0138:
+stelem String
+M0000000e_IL_0139:
+dup
+M0000000e_IL_013a:
+ldc.i4 20
+M0000000e_IL_013c:
+ldstr "\u05D1"
+M0000000e_IL_0141:
+stelem String
+M0000000e_IL_0142:
+dup
+M0000000e_IL_0143:
+ldc.i4 21
+M0000000e_IL_0145:
+ldstr "\u05D0"
+M0000000e_IL_014a:
+stelem String
+M0000000e_IL_014b:
+stloc local1
+M0000000e_IL_014c:
+M0000000e_IL_014d:
+ldarg 1
+M0000000e_IL_014e:
+stloc local2
+M0000000e_IL_014f:
+M0000000e_IL_0150:
+ldstr ""
+M0000000e_IL_0155:
+stloc local3
+M0000000e_IL_0156:
+M0000000e_IL_0157:
+ldc.i4 0
+M0000000e_IL_0158:
+stloc local4
+M0000000e_IL_015a:
+M0000000e_IL_015b:
+M0000000e_IL_015c:
+ldloc local2
+M0000000e_IL_015d:
+ldc.i4 0
+M0000000e_IL_015e:
+cgt
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0160:
+brtrue M0000000e_IL_016a
+M0000000e_IL_0165:
+br M0000000e_IL_01f4
+M0000000e_IL_016a:
+M0000000e_IL_016b:
+ldloc local2
+M0000000e_IL_016c:
+ldc.i4 15
+M0000000e_IL_016e:
+ceq
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0170:
+brtrue M0000000e_IL_017a
+M0000000e_IL_0175:
+br M0000000e_IL_0190
+M0000000e_IL_017a:
+M0000000e_IL_017b:
+ldloc local3
+M0000000e_IL_017c:
+ldstr "\u05D8\u05D5"
+M0000000e_IL_0181:
+call System.String::Concat(String,String)
+M0000000e_IL_0186:
+stloc local3
+M0000000e_IL_0187:
+M0000000e_IL_0188:
+ldc.i4 0
+M0000000e_IL_0189:
+stloc local2
+M0000000e_IL_018a:
+br M0000000e_IL_01ee
+M0000000e_IL_0190:
+M0000000e_IL_0191:
+M0000000e_IL_0192:
+ldloc local2
+M0000000e_IL_0193:
+ldc.i4 16
+M0000000e_IL_0195:
+ceq
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0197:
+brtrue M0000000e_IL_01a1
+M0000000e_IL_019c:
+br M0000000e_IL_01b6
+M0000000e_IL_01a1:
+M0000000e_IL_01a2:
+ldloc local3
+M0000000e_IL_01a3:
+ldstr "\u05D8\u05D6"
+M0000000e_IL_01a8:
+call System.String::Concat(String,String)
+M0000000e_IL_01ad:
+stloc local3
+M0000000e_IL_01ae:
+M0000000e_IL_01af:
+ldc.i4 0
+M0000000e_IL_01b0:
+stloc local2
+M0000000e_IL_01b1:
+br M0000000e_IL_01ed
+M0000000e_IL_01b6:
+M0000000e_IL_01b7:
+M0000000e_IL_01b8:
+ldloc local2
+M0000000e_IL_01b9:
+ldloc local0
+M0000000e_IL_01ba:
+ldloc local4
+M0000000e_IL_01bc:
+ldelem Int32
+M0000000e_IL_01bd:
+clt
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_01bf:
+ldc.i4 0
+M0000000e_IL_01c0:
+ceq
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_01c2:
+brtrue M0000000e_IL_01cc
+M0000000e_IL_01c7:
+br M0000000e_IL_01e5
+M0000000e_IL_01cc:
+M0000000e_IL_01cd:
+ldloc local3
+M0000000e_IL_01ce:
+ldloc local1
+M0000000e_IL_01cf:
+ldloc local4
+M0000000e_IL_01d1:
+ldelem String
+M0000000e_IL_01d2:
+call System.String::Concat(String,String)
+M0000000e_IL_01d7:
+stloc local3
+M0000000e_IL_01d8:
+M0000000e_IL_01d9:
+ldloc local2
+M0000000e_IL_01da:
+ldloc local0
+M0000000e_IL_01db:
+ldloc local4
+M0000000e_IL_01dd:
+ldelem Int32
+M0000000e_IL_01de:
+sub
+M0000000e_IL_01df:
+stloc local2
+M0000000e_IL_01e0:
+br M0000000e_IL_01ec
+M0000000e_IL_01e5:
+M0000000e_IL_01e6:
+ldloc local4
+M0000000e_IL_01e8:
+ldc.i4 1
+M0000000e_IL_01e9:
+add
+M0000000e_IL_01ea:
+stloc local4
+M0000000e_IL_01ec:
+M0000000e_IL_01ed:
+M0000000e_IL_01ee:
+M0000000e_IL_01ef:
+br M0000000e_IL_015b
+M0000000e_IL_01f4:
+M0000000e_IL_01f5:
+M0000000e_IL_01f6:
+ldloc local3
+M0000000e_IL_01f7:
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeStringget_Length(String)
+M0000000e_IL_01fc:
+ldc.i4 1
+M0000000e_IL_01fd:
+ceq
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_01ff:
+brtrue M0000000e_IL_0209
+M0000000e_IL_0204:
+br M0000000e_IL_0216
+M0000000e_IL_0209:
+M0000000e_IL_020a:
+ldloc local3
+M0000000e_IL_020b:
+ldstr "\u05F3"
+M0000000e_IL_0210:
+call System.String::Concat(String,String)
+M0000000e_IL_0215:
+ret
+M0000000e_IL_0216:
+M0000000e_IL_0217:
+M0000000e_IL_0218:
+ldstr ""
+M0000000e_IL_021d:
+stloc local5
+M0000000e_IL_021f:
+M0000000e_IL_0220:
+ldc.i4 0
+M0000000e_IL_0221:
+stloc local6
+M0000000e_IL_0223:
+M0000000e_IL_0224:
+M0000000e_IL_0225:
+ldloc local6
+M0000000e_IL_0227:
+ldloc local3
+M0000000e_IL_0228:
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeStringget_Length(String)
+M0000000e_IL_022d:
+clt
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_022f:
+brtrue M0000000e_IL_0239
+M0000000e_IL_0234:
+br M0000000e_IL_0287
+M0000000e_IL_0239:
+M0000000e_IL_023a:
+ldloc local6
+M0000000e_IL_023c:
+ldloc local3
+M0000000e_IL_023d:
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeStringget_Length(String)
+M0000000e_IL_0242:
+ldc.i4 1
+M0000000e_IL_0243:
+sub
+M0000000e_IL_0244:
+ceq
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0246:
+brtrue M0000000e_IL_0250
+M0000000e_IL_024b:
+br M0000000e_IL_025f
+M0000000e_IL_0250:
+M0000000e_IL_0251:
+ldloc local5
+M0000000e_IL_0253:
+ldstr "\u05F4"
+M0000000e_IL_0258:
+call System.String::Concat(String,String)
+M0000000e_IL_025d:
+stloc local5
+M0000000e_IL_025f:
+M0000000e_IL_0260:
+M0000000e_IL_0261:
+ldloc local5
+M0000000e_IL_0263:
+ldloc local3
+M0000000e_IL_0264:
+ldloc local6
+M0000000e_IL_0266:
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeStringget_Item(String,Int32)
+M0000000e_IL_026b:
+stloc local7
+M0000000e_IL_026d:
+ldloca local7
+M0000000e_IL_026f:
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeCharToString(Char&)
+M0000000e_IL_0274:
+call System.String::Concat(String,String)
+M0000000e_IL_0279:
+stloc local5
+M0000000e_IL_027b:
+M0000000e_IL_027c:
+ldloc local6
+M0000000e_IL_027e:
+ldc.i4 1
+M0000000e_IL_027f:
+add
+M0000000e_IL_0280:
+stloc local6
+M0000000e_IL_0282:
+br M0000000e_IL_0224
+M0000000e_IL_0287:
+M0000000e_IL_0288:
+M0000000e_IL_0289:
+ldloc local5
+M0000000e_IL_028b:
+ret
+.end
+.method instance MonthName(Int32 year,Int32 month) -> String
+.local Int32 local0
+.local arrayref<String> local1
+.local arrayref<String> local2
+.local System.Result<Int32,System.InvalidDateError> local3
+.local System.Result.Ok<Int32> local4
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj arrayref<String>
+ldloca local2
+initobj arrayref<String>
+ldloca local3
+initobj System.Result<Int32,System.InvalidDateError>
+ldloca local4
+initobj System.Result.Ok<Int32>
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+ldarg 0
+M0000000f_IL_0003:
+ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::calendar
+M0000000f_IL_0008:
+ldarg 1
+M0000000f_IL_0009:
+call instance System.Calendar::GetMonthsInYear(Int32)
+M0000000f_IL_000e:
+stloc local3
+M0000000f_IL_000f:
+ldloca local4
+M0000000f_IL_0011:
+initobj System.Result.Ok<Int32>
+M0000000f_IL_0017:
+ldloca local3
+M0000000f_IL_0019:
+ldloca local4
+M0000000f_IL_001b:
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion7(System.Result<Int32,System.InvalidDateError>&,System.Result.Ok<Int32>&)
+M0000000f_IL_0020:
+brfalse M0000000f_IL_0039
+M0000000f_IL_0025:
+ldloca local4
+M0000000f_IL_0027:
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeUnion8(System.Result.Ok<Int32>&)
+M0000000f_IL_002c:
+stloc local0
+M0000000f_IL_002d:
+M0000000f_IL_002e:
+br M0000000f_IL_003e
+M0000000f_IL_0039:
+br M0000000f_IL_0044
+M0000000f_IL_003e:
+br M0000000f_IL_004f
+M0000000f_IL_0044:
+M0000000f_IL_0045:
+ldstr "Expected validated Hebrew year"
+M0000000f_IL_004a:
+call System.Fault(String)
+fault "System.Fault returned unexpectedly"
+M0000000f_IL_004f:
+M0000000f_IL_0050:
+M0000000f_IL_0051:
+ldloc local0
+M0000000f_IL_0052:
+ldc.i4 13
+M0000000f_IL_0054:
+ceq
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_0056:
+brtrue M0000000f_IL_0060
+M0000000f_IL_005b:
+br M0000000f_IL_00dc
+M0000000f_IL_0060:
+M0000000f_IL_0061:
+ldc.i4 13
+M0000000f_IL_0063:
+newarr String
+M0000000f_IL_0068:
+dup
+M0000000f_IL_0069:
+ldc.i4 0
+M0000000f_IL_006a:
+ldstr "\u05EA\u05E9\u05E8\u05D9"
+M0000000f_IL_006f:
+stelem String
+M0000000f_IL_0070:
+dup
+M0000000f_IL_0071:
+ldc.i4 1
+M0000000f_IL_0072:
+ldstr "\u05D7\u05E9\u05D5\u05D5\u05DF"
+M0000000f_IL_0077:
+stelem String
+M0000000f_IL_0078:
+dup
+M0000000f_IL_0079:
+ldc.i4 2
+M0000000f_IL_007a:
+ldstr "\u05DB\u05E1\u05DC\u05D5"
+M0000000f_IL_007f:
+stelem String
+M0000000f_IL_0080:
+dup
+M0000000f_IL_0081:
+ldc.i4 3
+M0000000f_IL_0082:
+ldstr "\u05D8\u05D1\u05EA"
+M0000000f_IL_0087:
+stelem String
+M0000000f_IL_0088:
+dup
+M0000000f_IL_0089:
+ldc.i4 4
+M0000000f_IL_008a:
+ldstr "\u05E9\u05D1\u05D8"
+M0000000f_IL_008f:
+stelem String
+M0000000f_IL_0090:
+dup
+M0000000f_IL_0091:
+ldc.i4 5
+M0000000f_IL_0092:
+ldstr "\u05D0\u05D3\u05E8 \u05D0\u05F3"
+M0000000f_IL_0097:
+stelem String
+M0000000f_IL_0098:
+dup
+M0000000f_IL_0099:
+ldc.i4 6
+M0000000f_IL_009a:
+ldstr "\u05D0\u05D3\u05E8 \u05D1\u05F3"
+M0000000f_IL_009f:
+stelem String
+M0000000f_IL_00a0:
+dup
+M0000000f_IL_00a1:
+ldc.i4 7
+M0000000f_IL_00a2:
+ldstr "\u05E0\u05D9\u05E1\u05DF"
+M0000000f_IL_00a7:
+stelem String
+M0000000f_IL_00a8:
+dup
+M0000000f_IL_00a9:
+ldc.i4 8
+M0000000f_IL_00aa:
+ldstr "\u05D0\u05D9\u05D9\u05E8"
+M0000000f_IL_00af:
+stelem String
+M0000000f_IL_00b0:
+dup
+M0000000f_IL_00b1:
+ldc.i4 9
+M0000000f_IL_00b3:
+ldstr "\u05E1\u05D9\u05D5\u05D5\u05DF"
+M0000000f_IL_00b8:
+stelem String
+M0000000f_IL_00b9:
+dup
+M0000000f_IL_00ba:
+ldc.i4 10
+M0000000f_IL_00bc:
+ldstr "\u05EA\u05DE\u05D5\u05D6"
+M0000000f_IL_00c1:
+stelem String
+M0000000f_IL_00c2:
+dup
+M0000000f_IL_00c3:
+ldc.i4 11
+M0000000f_IL_00c5:
+ldstr "\u05D0\u05D1"
+M0000000f_IL_00ca:
+stelem String
+M0000000f_IL_00cb:
+dup
+M0000000f_IL_00cc:
+ldc.i4 12
+M0000000f_IL_00ce:
+ldstr "\u05D0\u05DC\u05D5\u05DC"
+M0000000f_IL_00d3:
+stelem String
+M0000000f_IL_00d4:
+stloc local1
+M0000000f_IL_00d5:
+M0000000f_IL_00d6:
+ldloc local1
+M0000000f_IL_00d7:
+ldarg 2
+M0000000f_IL_00d8:
+ldc.i4 1
+M0000000f_IL_00d9:
+sub
+M0000000f_IL_00da:
+ldelem String
+M0000000f_IL_00db:
+ret
+M0000000f_IL_00dc:
+M0000000f_IL_00dd:
+M0000000f_IL_00de:
+ldc.i4 12
+M0000000f_IL_00e0:
+newarr String
+M0000000f_IL_00e5:
+dup
+M0000000f_IL_00e6:
+ldc.i4 0
+M0000000f_IL_00e7:
+ldstr "\u05EA\u05E9\u05E8\u05D9"
+M0000000f_IL_00ec:
+stelem String
+M0000000f_IL_00ed:
+dup
+M0000000f_IL_00ee:
+ldc.i4 1
+M0000000f_IL_00ef:
+ldstr "\u05D7\u05E9\u05D5\u05D5\u05DF"
+M0000000f_IL_00f4:
+stelem String
+M0000000f_IL_00f5:
+dup
+M0000000f_IL_00f6:
+ldc.i4 2
+M0000000f_IL_00f7:
+ldstr "\u05DB\u05E1\u05DC\u05D5"
+M0000000f_IL_00fc:
+stelem String
+M0000000f_IL_00fd:
+dup
+M0000000f_IL_00fe:
+ldc.i4 3
+M0000000f_IL_00ff:
+ldstr "\u05D8\u05D1\u05EA"
+M0000000f_IL_0104:
+stelem String
+M0000000f_IL_0105:
+dup
+M0000000f_IL_0106:
+ldc.i4 4
+M0000000f_IL_0107:
+ldstr "\u05E9\u05D1\u05D8"
+M0000000f_IL_010c:
+stelem String
+M0000000f_IL_010d:
+dup
+M0000000f_IL_010e:
+ldc.i4 5
+M0000000f_IL_010f:
+ldstr "\u05D0\u05D3\u05E8"
+M0000000f_IL_0114:
+stelem String
+M0000000f_IL_0115:
+dup
+M0000000f_IL_0116:
+ldc.i4 6
+M0000000f_IL_0117:
+ldstr "\u05E0\u05D9\u05E1\u05DF"
+M0000000f_IL_011c:
+stelem String
+M0000000f_IL_011d:
+dup
+M0000000f_IL_011e:
+ldc.i4 7
+M0000000f_IL_011f:
+ldstr "\u05D0\u05D9\u05D9\u05E8"
+M0000000f_IL_0124:
+stelem String
+M0000000f_IL_0125:
+dup
+M0000000f_IL_0126:
+ldc.i4 8
+M0000000f_IL_0127:
+ldstr "\u05E1\u05D9\u05D5\u05D5\u05DF"
+M0000000f_IL_012c:
+stelem String
+M0000000f_IL_012d:
+dup
+M0000000f_IL_012e:
+ldc.i4 9
+M0000000f_IL_0130:
+ldstr "\u05EA\u05DE\u05D5\u05D6"
+M0000000f_IL_0135:
+stelem String
+M0000000f_IL_0136:
+dup
+M0000000f_IL_0137:
+ldc.i4 10
+M0000000f_IL_0139:
+ldstr "\u05D0\u05D1"
+M0000000f_IL_013e:
+stelem String
+M0000000f_IL_013f:
+dup
+M0000000f_IL_0140:
+ldc.i4 11
+M0000000f_IL_0142:
+ldstr "\u05D0\u05DC\u05D5\u05DC"
+M0000000f_IL_0147:
+stelem String
+M0000000f_IL_0148:
+stloc local2
+M0000000f_IL_0149:
+M0000000f_IL_014a:
+ldloc local2
+M0000000f_IL_014b:
+ldarg 2
+M0000000f_IL_014c:
+ldc.i4 1
+M0000000f_IL_014d:
+sub
+M0000000f_IL_014e:
+ldelem String
+M0000000f_IL_014f:
+ret
+.end
+.method instance FormatDate(Int32 year,Int32 month,Int32 day) -> String
+M00000010_IL_0000:
+M00000010_IL_0001:
+M00000010_IL_0002:
+ldarg 0
+M00000010_IL_0003:
+ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::calendar
+M00000010_IL_0008:
+call instance System.Calendar::get_Id()
+M00000010_IL_000d:
+ldstr "hebrew"
+M00000010_IL_0012:
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeStringEquals(String,String)
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_0017:
+brtrue M00000010_IL_0021
+M00000010_IL_001c:
+br M00000010_IL_005d
+M00000010_IL_0021:
+M00000010_IL_0022:
+ldarg 0
+M00000010_IL_0023:
+ldarg 3
+M00000010_IL_0024:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::Numeral(Int32)
+M00000010_IL_0029:
+ldstr " "
+M00000010_IL_002e:
+call System.String::Concat(String,String)
+M00000010_IL_0033:
+ldarg 0
+M00000010_IL_0034:
+ldarg 1
+M00000010_IL_0035:
+ldarg 2
+M00000010_IL_0036:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::MonthName(Int32,Int32)
+M00000010_IL_003b:
+call System.String::Concat(String,String)
+M00000010_IL_0040:
+ldstr " \u05D4\u05F3"
+M00000010_IL_0045:
+call System.String::Concat(String,String)
+M00000010_IL_004a:
+ldarg 0
+M00000010_IL_004b:
+ldarg 1
+M00000010_IL_004c:
+ldc.i4 5000
+M00000010_IL_0051:
+sub
+M00000010_IL_0052:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::Numeral(Int32)
+M00000010_IL_0057:
+call System.String::Concat(String,String)
+M00000010_IL_005c:
+ret
+M00000010_IL_005d:
+M00000010_IL_005e:
+M00000010_IL_005f:
+ldarg 0
+M00000010_IL_0060:
+ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::digits
+M00000010_IL_0065:
+ldarg 3
+M00000010_IL_0066:
+ldc.i4 2
+M00000010_IL_0067:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::Pad(Int32,Int32)
+M00000010_IL_006c:
+ldstr "."
+M00000010_IL_0071:
+call System.String::Concat(String,String)
+M00000010_IL_0076:
+ldarg 0
+M00000010_IL_0077:
+ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::digits
+M00000010_IL_007c:
+ldarg 2
+M00000010_IL_007d:
+ldc.i4 2
+M00000010_IL_007e:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::Pad(Int32,Int32)
+M00000010_IL_0083:
+call System.String::Concat(String,String)
+M00000010_IL_0088:
+ldstr "."
+M00000010_IL_008d:
+call System.String::Concat(String,String)
+M00000010_IL_0092:
+ldarg 0
+M00000010_IL_0093:
+ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::digits
+M00000010_IL_0098:
+ldarg 1
+M00000010_IL_0099:
+ldc.i4 4
+M00000010_IL_009a:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::Pad(Int32,Int32)
+M00000010_IL_009f:
+call System.String::Concat(String,String)
+M00000010_IL_00a4:
+ret
+.end
+.method instance FormatTime(System.Time time) -> String
+M00000011_IL_0000:
+M00000011_IL_0001:
+M00000011_IL_0002:
+ldarg 0
+M00000011_IL_0003:
+ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::digits
+M00000011_IL_0008:
+ldarg 1
+M00000011_IL_0009:
+ldstr "."
+M00000011_IL_000e:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::FormatTime(System.Time,String)
+M00000011_IL_0013:
+ret
+.end
+.end
+.interface internal neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D617452756C6573
+.method instance get_DateTimeSeparator() -> String
+.end
+.method instance FormatDate(Int32 year,Int32 month,Int32 day) -> String
+.end
+.method instance FormatTime(System.Time time) -> String
+.end
+.property instance DateTimeSeparator() -> String
+.get instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D617452756C6573::get_DateTimeSeparator()
+.end
+.end
+.type internal class neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E537765646973684461746554696D65466F726D6174
+.sealed
+.implements neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D617452756C6573
+.field private digits neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473
+.property instance DateTimeSeparator() -> String
+.get instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E537765646973684461746554696D65466F726D6174::get_DateTimeSeparator()
+.end
+.method instance .ctor() -> noresult
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+ldarg 0
+M0000000b_IL_0002:
+pop
+M0000000b_IL_0007:
+M0000000b_IL_0008:
+ldarg 0
+M0000000b_IL_0009:
+newobj instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::.ctor()
+M0000000b_IL_000e:
+stfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E537765646973684461746554696D65466F726D6174::digits
+M0000000b_IL_0013:
+ret
+.end
+.method instance get_DateTimeSeparator() -> String
+M00000012_IL_0000:
+M00000012_IL_0001:
+M00000012_IL_0002:
+ldstr " "
+M00000012_IL_0007:
+ret
+.end
+.method instance FormatDate(Int32 year,Int32 month,Int32 day) -> String
+M00000013_IL_0000:
+M00000013_IL_0001:
+M00000013_IL_0002:
+ldarg 0
+M00000013_IL_0003:
+ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E537765646973684461746554696D65466F726D6174::digits
+M00000013_IL_0008:
+ldarg 1
+M00000013_IL_0009:
+ldc.i4 4
+M00000013_IL_000a:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::Pad(Int32,Int32)
+M00000013_IL_000f:
+ldstr "-"
+M00000013_IL_0014:
+call System.String::Concat(String,String)
+M00000013_IL_0019:
+ldarg 0
+M00000013_IL_001a:
+ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E537765646973684461746554696D65466F726D6174::digits
+M00000013_IL_001f:
+ldarg 2
+M00000013_IL_0020:
+ldc.i4 2
+M00000013_IL_0021:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::Pad(Int32,Int32)
+M00000013_IL_0026:
+call System.String::Concat(String,String)
+M00000013_IL_002b:
+ldstr "-"
+M00000013_IL_0030:
+call System.String::Concat(String,String)
+M00000013_IL_0035:
+ldarg 0
+M00000013_IL_0036:
+ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E537765646973684461746554696D65466F726D6174::digits
+M00000013_IL_003b:
+ldarg 3
+M00000013_IL_003c:
+ldc.i4 2
+M00000013_IL_003d:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::Pad(Int32,Int32)
+M00000013_IL_0042:
+call System.String::Concat(String,String)
+M00000013_IL_0047:
+ret
+.end
+.method instance FormatTime(System.Time time) -> String
+M00000014_IL_0000:
+M00000014_IL_0001:
+M00000014_IL_0002:
+ldarg 0
+M00000014_IL_0003:
+ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E537765646973684461746554696D65466F726D6174::digits
+M00000014_IL_0008:
+ldarg 1
+M00000014_IL_0009:
+ldstr ","
+M00000014_IL_000e:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::FormatTime(System.Time,String)
+M00000014_IL_0013:
+ret
+.end
+.end
+.type internal class neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E496E76617269616E744461746554696D65466F726D6174
+.sealed
+.implements neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D617452756C6573
+.field private digits neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473
+.property instance DateTimeSeparator() -> String
+.get instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E496E76617269616E744461746554696D65466F726D6174::get_DateTimeSeparator()
+.end
+.method instance .ctor() -> noresult
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+ldarg 0
+M0000000c_IL_0002:
+pop
+M0000000c_IL_0007:
+M0000000c_IL_0008:
+ldarg 0
+M0000000c_IL_0009:
+newobj instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::.ctor()
+M0000000c_IL_000e:
+stfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E496E76617269616E744461746554696D65466F726D6174::digits
+M0000000c_IL_0013:
+ret
+.end
+.method instance get_DateTimeSeparator() -> String
+M00000015_IL_0000:
+M00000015_IL_0001:
+M00000015_IL_0002:
+ldstr "T"
+M00000015_IL_0007:
+ret
+.end
+.method instance FormatDate(Int32 year,Int32 month,Int32 day) -> String
+M00000016_IL_0000:
+M00000016_IL_0001:
+M00000016_IL_0002:
+ldarg 0
+M00000016_IL_0003:
+ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E496E76617269616E744461746554696D65466F726D6174::digits
+M00000016_IL_0008:
+ldarg 1
+M00000016_IL_0009:
+ldc.i4 4
+M00000016_IL_000a:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::Pad(Int32,Int32)
+M00000016_IL_000f:
+ldstr "-"
+M00000016_IL_0014:
+call System.String::Concat(String,String)
+M00000016_IL_0019:
+ldarg 0
+M00000016_IL_001a:
+ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E496E76617269616E744461746554696D65466F726D6174::digits
+M00000016_IL_001f:
+ldarg 2
+M00000016_IL_0020:
+ldc.i4 2
+M00000016_IL_0021:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::Pad(Int32,Int32)
+M00000016_IL_0026:
+call System.String::Concat(String,String)
+M00000016_IL_002b:
+ldstr "-"
+M00000016_IL_0030:
+call System.String::Concat(String,String)
+M00000016_IL_0035:
+ldarg 0
+M00000016_IL_0036:
+ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E496E76617269616E744461746554696D65466F726D6174::digits
+M00000016_IL_003b:
+ldarg 3
+M00000016_IL_003c:
+ldc.i4 2
+M00000016_IL_003d:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::Pad(Int32,Int32)
+M00000016_IL_0042:
+call System.String::Concat(String,String)
+M00000016_IL_0047:
+ret
+.end
+.method instance FormatTime(System.Time time) -> String
+M00000017_IL_0000:
+M00000017_IL_0001:
+M00000017_IL_0002:
+ldarg 0
+M00000017_IL_0003:
+ldfld neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E496E76617269616E744461746554696D65466F726D6174::digits
+M00000017_IL_0008:
+ldarg 1
+M00000017_IL_0009:
+ldstr "."
+M00000017_IL_000e:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::FormatTime(System.Time,String)
+M00000017_IL_0013:
+ret
+.end
+.end
+.type internal class neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473
+.sealed
+.method instance Pad(Int32 value,Int32 width) -> String
+.local String local0
+M00000018_IL_0000:
+M00000018_IL_0001:
+M00000018_IL_0002:
+ldarga 1
+M00000018_IL_0004:
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeInt32ToString(Int32&)
+M00000018_IL_0009:
+stloc local0
+M00000018_IL_000a:
+M00000018_IL_000b:
+M00000018_IL_000c:
+ldloc local0
+M00000018_IL_000d:
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeStringget_Length(String)
+M00000018_IL_0012:
+ldarg 2
+M00000018_IL_0013:
+clt
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_0015:
+brtrue M00000018_IL_001f
+M00000018_IL_001a:
+br M00000018_IL_0031
+M00000018_IL_001f:
+M00000018_IL_0020:
+ldstr "0"
+M00000018_IL_0025:
+ldloc local0
+M00000018_IL_0026:
+call System.String::Concat(String,String)
+M00000018_IL_002b:
+stloc local0
+M00000018_IL_002c:
+br M00000018_IL_000b
+M00000018_IL_0031:
+M00000018_IL_0032:
+M00000018_IL_0033:
+ldloc local0
+M00000018_IL_0034:
+ret
+.end
+.method instance FormatTime(System.Time time,String separator) -> String
+M00000019_IL_0000:
+M00000019_IL_0001:
+M00000019_IL_0002:
+ldarg 0
+M00000019_IL_0003:
+ldarga 1
+M00000019_IL_0005:
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_Hour(System.Time&)
+M00000019_IL_000a:
+ldc.i4 2
+M00000019_IL_000b:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::Pad(Int32,Int32)
+M00000019_IL_0010:
+ldstr ":"
+M00000019_IL_0015:
+call System.String::Concat(String,String)
+M00000019_IL_001a:
+ldarg 0
+M00000019_IL_001b:
+ldarga 1
+M00000019_IL_001d:
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_Minute(System.Time&)
+M00000019_IL_0022:
+ldc.i4 2
+M00000019_IL_0023:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::Pad(Int32,Int32)
+M00000019_IL_0028:
+call System.String::Concat(String,String)
+M00000019_IL_002d:
+ldstr ":"
+M00000019_IL_0032:
+call System.String::Concat(String,String)
+M00000019_IL_0037:
+ldarg 0
+M00000019_IL_0038:
+ldarga 1
+M00000019_IL_003a:
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_Second(System.Time&)
+M00000019_IL_003f:
+ldc.i4 2
+M00000019_IL_0040:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::Pad(Int32,Int32)
+M00000019_IL_0045:
+call System.String::Concat(String,String)
+M00000019_IL_004a:
+ldarg 2
+M00000019_IL_004b:
+call System.String::Concat(String,String)
+M00000019_IL_0050:
+ldarg 0
+M00000019_IL_0051:
+ldarga 1
+M00000019_IL_0053:
+call neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeget_FractionTicks(System.Time&)
+M00000019_IL_0058:
+ldc.i4 7
+M00000019_IL_0059:
+callvirt instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4461746554696D65466F726D6174446967697473::Pad(Int32,Int32)
+M00000019_IL_005e:
+call System.String::Concat(String,String)
+M00000019_IL_0063:
+ret
+.end
+.method instance .ctor() -> noresult
+M0000001a_IL_0000:
+M0000001a_IL_0001:
+ldarg 0
+M0000001a_IL_0002:
+pop
+M0000001a_IL_0007:
+ret
+.end
+.end

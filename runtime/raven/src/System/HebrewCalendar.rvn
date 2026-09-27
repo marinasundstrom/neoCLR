@@ -1,0 +1,216 @@
+namespace System
+
+import System.Result.*
+
+// Complete civil years within .NET 10 HebrewCalendar's comparison range.
+internal class HebrewCalendar : CalendarRules {
+    val Id: string => "hebrew"
+    val MinYear: int => 5344
+    val MaxYear: int => 5999
+
+    func HebrewLeap(year: int) -> bool {
+        return (year * 7 + 1) % 19 < 7
+    }
+
+    // Molad and postponement rules of the fixed Hebrew calendar. Day numbers
+    // use Date's 0001-01-01 epoch; see docs/calendar-globalization.md.
+    func HebrewStart(year: int) -> int {
+        let months = (235 * year - 234) / 19
+        let parts = 204 + 793 * (months % 1080)
+        let hours = 5 + 12 * months + 793 * (months / 1080) + parts / 1080
+        var day = 1 + 29 * months + hours / 24
+        let remainder = (hours % 24) * 1080 + parts % 1080
+        var postpone = remainder >= 19440
+        if day % 7 == 2 && remainder >= 9924 && !HebrewLeap(year) {
+            postpone = true
+        }
+        if day % 7 == 1 && remainder >= 16789 && HebrewLeap(year - 1) {
+            postpone = true
+        }
+        if postpone {
+            day = day + 1
+        }
+        let weekday = day % 7
+        if weekday == 0 || weekday == 3 || weekday == 5 {
+            day = day + 1
+        }
+        return day - 1373429
+    }
+
+    func HebrewMonthCount(year: int) -> int {
+        if HebrewLeap(year) {
+            return 13
+        }
+        return 12
+    }
+
+    func HebrewMonthDays(year: int, month: int) -> int {
+        let length = HebrewStart(year + 1) - HebrewStart(year)
+        if month == 2 {
+            if length % 10 == 5 {
+                return 30
+            }
+            return 29
+        }
+        if month == 3 {
+            if length % 10 == 3 {
+                return 29
+            }
+            return 30
+        }
+        if month == 1 || month == 5 {
+            return 30
+        }
+        if month == 4 {
+            return 29
+        }
+        if HebrewLeap(year) {
+            if month == 6 {
+                return 30
+            }
+            return 30 - month % 2
+        }
+        return 29 + month % 2
+    }
+
+    func IsLeapYear(year: int) -> Result<bool, InvalidDateError> {
+        if year < MinYear {
+            return Error(InvalidDateError())
+        }
+        if year > MaxYear {
+            return Error(InvalidDateError())
+        }
+        return Ok(HebrewLeap(year))
+    }
+
+    func GetMonthsInYear(year: int) -> Result<int, InvalidDateError> {
+        let leap = IsLeapYear(year)?
+        if leap {
+            return Ok(13)
+        }
+        return Ok(12)
+    }
+
+    func GetDaysInMonth(year: int, month: int) -> Result<int, InvalidDateError> {
+        let count = GetMonthsInYear(year)?
+        if month < 1 {
+            return Error(InvalidDateError())
+        }
+        if month > count {
+            return Error(InvalidDateError())
+        }
+        return Ok(HebrewMonthDays(year, month))
+    }
+
+    func CreateDate(year: int, month: int, day: int) -> Result<Date, InvalidDateError> {
+        let days = GetDaysInMonth(year, month)?
+        if day < 1 {
+            return Error(InvalidDateError())
+        }
+        if day > days {
+            return Error(InvalidDateError())
+        }
+        var number = HebrewStart(year) + day - 1
+        var current = 1
+        while current < month {
+            number = number + HebrewMonthDays(year, current)
+            current = current + 1
+        }
+        return Date.FromDayNumber(number)
+    }
+
+    func GetYear(date: Date) -> Result<int, InvalidDateError> {
+        if date.DayNumber < HebrewStart(5344) {
+            return Error(InvalidDateError())
+        }
+        if date.DayNumber >= HebrewStart(6000) {
+            return Error(InvalidDateError())
+        }
+        var year = date.Year + 3760
+        if date.DayNumber >= HebrewStart(year + 1) {
+            year = year + 1
+        }
+        return Ok(year)
+    }
+
+    func GetMonth(date: Date) -> Result<int, InvalidDateError> {
+        let year = GetYear(date)?
+        var remaining = date.DayNumber - HebrewStart(year)
+        var month = 1
+        while remaining >= HebrewMonthDays(year, month) {
+            remaining = remaining - HebrewMonthDays(year, month)
+            month = month + 1
+        }
+        return Ok(month)
+    }
+
+    func GetDay(date: Date) -> Result<int, InvalidDateError> {
+        let year = GetYear(date)?
+        let month = GetMonth(date)?
+        let first = CreateDate(year, month, 1)?
+        return Ok(date.DayNumber - first.DayNumber + 1)
+    }
+
+    func AddDays(date: Date, days: int) -> Result<Date, InvalidDateError> {
+        _ = GetYear(date)?
+        let result = date.AddDays(days)?
+        _ = GetYear(result)?
+        return Ok(result)
+    }
+
+    /// Adds ordinal calendar months, clamping to the last day when necessary.
+    func AddMonths(date: Date, months: int) -> Result<Date, InvalidDateError> {
+        var year = GetYear(date)?
+        // More than 9000 months cannot fit within the supported Hebrew range.
+        if months < -9000 {
+            return Error(InvalidDateError())
+        }
+        if months > 9000 {
+            return Error(InvalidDateError())
+        }
+        var month = GetMonth(date)? + months
+        while month < 1 {
+            year = year - 1
+            if year < MinYear {
+                return Error(InvalidDateError())
+            }
+            month = month + HebrewMonthCount(year)
+        }
+        while month > HebrewMonthCount(year) {
+            month = month - HebrewMonthCount(year)
+            year = year + 1
+            if year > MaxYear {
+                return Error(InvalidDateError())
+            }
+        }
+        var day = GetDay(date)?
+        let last = HebrewMonthDays(year, month)
+        if day > last {
+            day = last
+        }
+        return CreateDate(year, month, day)
+    }
+
+    /// Preserves the ordinal month, clamping missing month 13 and the day.
+    func AddYears(date: Date, years: int) -> Result<Date, InvalidDateError> {
+        let year = GetYear(date)?
+        if years < -655 {
+            return Error(InvalidDateError())
+        }
+        if years > 655 {
+            return Error(InvalidDateError())
+        }
+        let resultYear = year + years
+        let count = GetMonthsInYear(resultYear)?
+        var month = GetMonth(date)?
+        if month > count {
+            month = count
+        }
+        var day = GetDay(date)?
+        let last = HebrewMonthDays(resultYear, month)
+        if day > last {
+            day = last
+        }
+        return CreateDate(resultYear, month, day)
+    }
+}

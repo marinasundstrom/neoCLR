@@ -1,0 +1,25 @@
+import System.*
+import System.Globalization.*
+import System.Result.*
+import System.Console.*
+
+func Main() {
+    let Ok(date) = Calendar.Hebrew.CreateDate(5784, 1, 1) else {
+        System.Fault("Invalid Hebrew date")
+    }
+    let Ok(time) = Time.Create(12, 34, 56) else {
+        System.Fault("Invalid time")
+    }
+    let value = LocalDateTime.Create(date, time)
+    let hebrew = Culture.HebrewIsrael.DateTimeFormat.WithCalendar(Calendar.Hebrew)
+    let latin = DateTimeFormat.Invariant.WithCalendar(Calendar.Hebrew)
+    let Ok(hebrewText) = hebrew.FormatLocalDateTime(value) else {
+        System.Fault("Date outside Hebrew calendar range")
+    }
+    let Ok(latinText) = latin.FormatLocalDateTime(value) else {
+        System.Fault("Date outside Hebrew calendar range")
+    }
+    WriteLine(date.ToString(Culture.Invariant))
+    WriteLine(hebrewText)
+    WriteLine(latinText)
+}

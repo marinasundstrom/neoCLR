@@ -1,0 +1,15 @@
+namespace System.Globalization
+
+/// Provisional strongly typed language identity for the supported formatting profiles.
+public class Language {
+    private var code: string
+
+    private init(code: string) {
+        self.code = code
+    }
+
+    static val Undetermined: Language => Language("und")
+    static val Swedish: Language => Language("sv")
+    static val Hebrew: Language => Language("he")
+    val Code: string => code
+}

@@ -204,3 +204,7 @@ Instant.ToLocalDateTime. LocalDateTime now contains Date and Time only. The auth
 explicitly requested keeping this change minimal and using Raven, not the archived
 Neo language. All remaining Time API v1 types above are planned, not implemented.
 The broader model remains design direction, not a frozen set of signatures.
+
+## Development calendar/formatting slice (2026-09-27)
+
+The author-directed [calendar and globalization foundation](calendar-globalization.md) now implements Gregorian/Hebrew policies, date arithmetic, invariant/Swedish/Israeli formatting and host culture discovery. This is provisional development work beyond Preview 10; older deferred scope below is design history. Localization interfaces remain independent of culture, with shared contracts and interchangeable JSON/resource sources planned.

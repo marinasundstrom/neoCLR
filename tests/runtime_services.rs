@@ -325,3 +325,29 @@ fn operation_cancellation_hooks_require_exact_signatures_and_services() {
         }
     }
 }
+
+#[test]
+fn system_culture_discovery_uses_process_environment_service() {
+    let source = concat!(
+        ".module CultureProbe\n",
+        ".function neoCLR.Runtime.SystemCultureName() -> String\n.methodimpl InternalCall\n.end\n",
+        ".function Main() -> String\ncall neoCLR.Runtime.SystemCultureName()\nret\n.end\n"
+    );
+    let module = assemble(source).unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    let graph = program
+        .analyze_reachability(&[parse_function_ref("Main()").unwrap()], 4)
+        .unwrap();
+    assert_eq!(graph.required_services(), [Service::ProcessEnvironment]);
+    let result = program
+        .resolve_function(&parse_function_ref("Main()").unwrap())
+        .unwrap()
+        .invoke(vec![], neoclr::Limits::default())
+        .unwrap()
+        .value;
+    let neoclr::Value::String(name) = result else {
+        panic!("Expected locale string")
+    };
+    assert_eq!(name.as_str(), sys_locale::get_locale().unwrap_or_default());
+}

@@ -49,6 +49,18 @@ M00000001_IL_001b:
 ldvoid
 ret
 .end
+.method static Create(System.Date date,System.Time time) -> System.LocalDateTime
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldarg 1
+M00000002_IL_0004:
+newobj instance System.LocalDateTime::.ctor(System.Date,System.Time)
+M00000002_IL_0009:
+ret
+.end
 .method internal static FromUnixTimeTicks(Int64 ticks) -> System.LocalDateTime
 .local arrayref<Int32> local0
 .local System.Date local1
@@ -71,158 +83,158 @@ ldloca local5
 initobj System.Result<System.Time,System.InvalidTimeError>
 ldloca local6
 initobj System.Result.Ok<System.Time>
-M00000002_IL_0000:
-M00000002_IL_0001:
-M00000002_IL_0002:
-ldarg 0
-M00000002_IL_0003:
-call neoCLR.Library.System.LocalDateTime.RuntimeServiceUnixTimeToLocal(Int64)
-M00000002_IL_0008:
-stloc local0
-M00000002_IL_0009:
-M00000002_IL_000a:
-ldloc local0
-M00000002_IL_000b:
-ldc.i4 0
-M00000002_IL_000c:
-ldelem Int32
-M00000002_IL_000d:
-ldloc local0
-M00000002_IL_000e:
-ldc.i4 1
-M00000002_IL_000f:
-ldelem Int32
-M00000002_IL_0010:
-ldloc local0
-M00000002_IL_0011:
-ldc.i4 2
-M00000002_IL_0012:
-ldelem Int32
-M00000002_IL_0013:
-call System.Date::Create(Int32,Int32,Int32)
-M00000002_IL_0018:
-stloc local3
-M00000002_IL_0019:
-ldloca local4
-M00000002_IL_001b:
-initobj System.Result.Ok<System.Date>
-M00000002_IL_0021:
-ldloca local3
-M00000002_IL_0023:
-ldloca local4
-M00000002_IL_0025:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion0(System.Result<System.Date,System.InvalidDateError>&,System.Result.Ok<System.Date>&)
-M00000002_IL_002a:
-brfalse M00000002_IL_0043
-M00000002_IL_002f:
-ldloca local4
-M00000002_IL_0031:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion1(System.Result.Ok<System.Date>&)
-M00000002_IL_0036:
-stloc local1
-M00000002_IL_0037:
-M00000002_IL_0038:
-br M00000002_IL_0048
-M00000002_IL_0043:
-br M00000002_IL_004e
-M00000002_IL_0048:
-br M00000002_IL_0059
-M00000002_IL_004e:
-M00000002_IL_004f:
-ldstr "Invalid local date from runtime"
-M00000002_IL_0054:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
-M00000002_IL_0059:
-M00000002_IL_005a:
-M00000002_IL_005b:
-ldloc local0
-M00000002_IL_005c:
-ldc.i4 3
-M00000002_IL_005d:
-ldelem Int32
-M00000002_IL_005e:
-ldloc local0
-M00000002_IL_005f:
-ldc.i4 4
-M00000002_IL_0060:
-ldelem Int32
-M00000002_IL_0061:
-ldloc local0
-M00000002_IL_0062:
-ldc.i4 5
-M00000002_IL_0063:
-ldelem Int32
-M00000002_IL_0064:
-ldloc local0
-M00000002_IL_0065:
-ldc.i4 6
-M00000002_IL_0066:
-ldelem Int32
-M00000002_IL_0067:
-call System.Time::Create(Int32,Int32,Int32,Int32)
-M00000002_IL_006c:
-stloc local5
-M00000002_IL_006e:
-ldloca local6
-M00000002_IL_0070:
-initobj System.Result.Ok<System.Time>
-M00000002_IL_0076:
-ldloca local5
-M00000002_IL_0078:
-ldloca local6
-M00000002_IL_007a:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion2(System.Result<System.Time,System.InvalidTimeError>&,System.Result.Ok<System.Time>&)
-M00000002_IL_007f:
-brfalse M00000002_IL_0098
-M00000002_IL_0084:
-ldloca local6
-M00000002_IL_0086:
-call neoCLR.Library.System.LocalDateTime.RuntimeUnion3(System.Result.Ok<System.Time>&)
-M00000002_IL_008b:
-stloc local2
-M00000002_IL_008c:
-M00000002_IL_008d:
-br M00000002_IL_009d
-M00000002_IL_0098:
-br M00000002_IL_00a3
-M00000002_IL_009d:
-br M00000002_IL_00ae
-M00000002_IL_00a3:
-M00000002_IL_00a4:
-ldstr "Invalid local time from runtime"
-M00000002_IL_00a9:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
-M00000002_IL_00ae:
-M00000002_IL_00af:
-M00000002_IL_00b0:
-ldloc local1
-M00000002_IL_00b1:
-ldloc local2
-M00000002_IL_00b2:
-newobj instance System.LocalDateTime::.ctor(System.Date,System.Time)
-M00000002_IL_00b7:
-ret
-.end
-.method instance readonly byref get_Date() -> System.Date
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
 ldarg 0
 M00000003_IL_0003:
-ldfld System.LocalDateTime::StoredDate
+call neoCLR.Library.System.LocalDateTime.RuntimeServiceUnixTimeToLocal(Int64)
 M00000003_IL_0008:
+stloc local0
+M00000003_IL_0009:
+M00000003_IL_000a:
+ldloc local0
+M00000003_IL_000b:
+ldc.i4 0
+M00000003_IL_000c:
+ldelem Int32
+M00000003_IL_000d:
+ldloc local0
+M00000003_IL_000e:
+ldc.i4 1
+M00000003_IL_000f:
+ldelem Int32
+M00000003_IL_0010:
+ldloc local0
+M00000003_IL_0011:
+ldc.i4 2
+M00000003_IL_0012:
+ldelem Int32
+M00000003_IL_0013:
+call System.Date::Create(Int32,Int32,Int32)
+M00000003_IL_0018:
+stloc local3
+M00000003_IL_0019:
+ldloca local4
+M00000003_IL_001b:
+initobj System.Result.Ok<System.Date>
+M00000003_IL_0021:
+ldloca local3
+M00000003_IL_0023:
+ldloca local4
+M00000003_IL_0025:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion0(System.Result<System.Date,System.InvalidDateError>&,System.Result.Ok<System.Date>&)
+M00000003_IL_002a:
+brfalse M00000003_IL_0043
+M00000003_IL_002f:
+ldloca local4
+M00000003_IL_0031:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion1(System.Result.Ok<System.Date>&)
+M00000003_IL_0036:
+stloc local1
+M00000003_IL_0037:
+M00000003_IL_0038:
+br M00000003_IL_0048
+M00000003_IL_0043:
+br M00000003_IL_004e
+M00000003_IL_0048:
+br M00000003_IL_0059
+M00000003_IL_004e:
+M00000003_IL_004f:
+ldstr "Invalid local date from runtime"
+M00000003_IL_0054:
+call System.Fault(String)
+fault "System.Fault returned unexpectedly"
+M00000003_IL_0059:
+M00000003_IL_005a:
+M00000003_IL_005b:
+ldloc local0
+M00000003_IL_005c:
+ldc.i4 3
+M00000003_IL_005d:
+ldelem Int32
+M00000003_IL_005e:
+ldloc local0
+M00000003_IL_005f:
+ldc.i4 4
+M00000003_IL_0060:
+ldelem Int32
+M00000003_IL_0061:
+ldloc local0
+M00000003_IL_0062:
+ldc.i4 5
+M00000003_IL_0063:
+ldelem Int32
+M00000003_IL_0064:
+ldloc local0
+M00000003_IL_0065:
+ldc.i4 6
+M00000003_IL_0066:
+ldelem Int32
+M00000003_IL_0067:
+call System.Time::Create(Int32,Int32,Int32,Int32)
+M00000003_IL_006c:
+stloc local5
+M00000003_IL_006e:
+ldloca local6
+M00000003_IL_0070:
+initobj System.Result.Ok<System.Time>
+M00000003_IL_0076:
+ldloca local5
+M00000003_IL_0078:
+ldloca local6
+M00000003_IL_007a:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion2(System.Result<System.Time,System.InvalidTimeError>&,System.Result.Ok<System.Time>&)
+M00000003_IL_007f:
+brfalse M00000003_IL_0098
+M00000003_IL_0084:
+ldloca local6
+M00000003_IL_0086:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion3(System.Result.Ok<System.Time>&)
+M00000003_IL_008b:
+stloc local2
+M00000003_IL_008c:
+M00000003_IL_008d:
+br M00000003_IL_009d
+M00000003_IL_0098:
+br M00000003_IL_00a3
+M00000003_IL_009d:
+br M00000003_IL_00ae
+M00000003_IL_00a3:
+M00000003_IL_00a4:
+ldstr "Invalid local time from runtime"
+M00000003_IL_00a9:
+call System.Fault(String)
+fault "System.Fault returned unexpectedly"
+M00000003_IL_00ae:
+M00000003_IL_00af:
+M00000003_IL_00b0:
+ldloc local1
+M00000003_IL_00b1:
+ldloc local2
+M00000003_IL_00b2:
+newobj instance System.LocalDateTime::.ctor(System.Date,System.Time)
+M00000003_IL_00b7:
 ret
 .end
-.method instance readonly byref get_Time() -> System.Time
+.method instance readonly byref get_Date() -> System.Date
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
 ldarg 0
 M00000004_IL_0003:
-ldfld System.LocalDateTime::StoredTime
+ldfld System.LocalDateTime::StoredDate
 M00000004_IL_0008:
+ret
+.end
+.method instance readonly byref get_Time() -> System.Time
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.LocalDateTime::StoredTime
+M00000005_IL_0008:
 ret
 .end
 .end

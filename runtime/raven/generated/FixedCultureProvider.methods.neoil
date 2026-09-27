@@ -1,0 +1,35 @@
+; Generated from runtime/raven/src/System/Globalization/FixedCultureProvider.rvn. Regenerate with build_runtime_library.py.
+.type class System.Globalization.FixedCultureProvider
+.sealed
+.implements System.Globalization.CultureProvider
+.field private culture System.Globalization.Culture
+.property instance Current() -> System.Globalization.Culture
+.get instance System.Globalization.FixedCultureProvider::get_Current()
+.end
+.method instance .ctor(System.Globalization.Culture culture) -> noresult
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 0
+M00000001_IL_0009:
+ldarg 1
+M00000001_IL_000a:
+stfld System.Globalization.FixedCultureProvider::culture
+M00000001_IL_000f:
+ret
+.end
+.method instance get_Current() -> System.Globalization.Culture
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldfld System.Globalization.FixedCultureProvider::culture
+M00000002_IL_0008:
+ret
+.end
+.end

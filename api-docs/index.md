@@ -20,6 +20,13 @@ UTF-8 operations, with [Object content behavior](objects.md#string-through-objec
 mode. These development additions use documented Unicode simple-fold semantics,
 which can differ from .NET.
 
+Development [Calendar](xref:System.Calendar), [Culture](xref:System.Globalization.Culture),
+[Language](xref:System.Globalization.Language) and [DateTimeFormat](xref:System.Globalization.DateTimeFormat)
+provide Gregorian/Hebrew rendering. [CultureProvider](xref:System.Globalization.CultureProvider),
+[FixedCultureProvider](xref:System.Globalization.FixedCultureProvider) and
+[SystemCultureProvider](xref:System.Globalization.SystemCultureProvider) separate explicit selection
+from host discovery. See [globalization](/features/globalization/) for the tested example.
+
 [Char](xref:System.Char) now has a generated type/member reference for grapheme
 construction, equality, ordering and display; see [Object contracts](objects.md)
 for boxed behavior.

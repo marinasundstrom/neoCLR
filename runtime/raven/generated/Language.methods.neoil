@@ -1,0 +1,70 @@
+; Generated from runtime/raven/src/System/Globalization/Language.rvn. Regenerate with build_runtime_library.py.
+.type class System.Globalization.Language
+.sealed
+.field private code String
+.property static Undetermined() -> System.Globalization.Language
+.get System.Globalization.Language::get_Undetermined()
+.end
+.property static Swedish() -> System.Globalization.Language
+.get System.Globalization.Language::get_Swedish()
+.end
+.property static Hebrew() -> System.Globalization.Language
+.get System.Globalization.Language::get_Hebrew()
+.end
+.property instance Code() -> String
+.get instance System.Globalization.Language::get_Code()
+.end
+.method private instance .ctor(String code) -> noresult
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 0
+M00000001_IL_0009:
+ldarg 1
+M00000001_IL_000a:
+stfld System.Globalization.Language::code
+M00000001_IL_000f:
+ret
+.end
+.method static get_Undetermined() -> System.Globalization.Language
+M00000002_IL_0000:
+M00000002_IL_0001:
+ldstr "und"
+M00000002_IL_0006:
+newobj instance System.Globalization.Language::.ctor(String)
+M00000002_IL_000b:
+ret
+.end
+.method static get_Swedish() -> System.Globalization.Language
+M00000003_IL_0000:
+M00000003_IL_0001:
+ldstr "sv"
+M00000003_IL_0006:
+newobj instance System.Globalization.Language::.ctor(String)
+M00000003_IL_000b:
+ret
+.end
+.method static get_Hebrew() -> System.Globalization.Language
+M00000004_IL_0000:
+M00000004_IL_0001:
+ldstr "he"
+M00000004_IL_0006:
+newobj instance System.Globalization.Language::.ctor(String)
+M00000004_IL_000b:
+ret
+.end
+.method instance get_Code() -> String
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.Globalization.Language::code
+M00000005_IL_0008:
+ret
+.end
+.end

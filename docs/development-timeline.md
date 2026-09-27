@@ -8085,3 +8085,37 @@ configuration/content, not target-specific code added to Raven main.
   diagnostic is slower than the previous implementation; the old maximum fixture
   faults on its whole-input array budget. Records these tradeoffs rather than claiming
   a speedup. See [reader evidence](experiments/text-boundaries/reader-results.json).
+
+## 2026-09-27 — Calendars, language and independent localization
+
+- **Author:** asks to develop the date/time proposal into useful APIs, with an invariant
+  culture, Hebrew comparison calendar and two named cultures; requires a separate
+  worktree and a commit. Clarifies that the design is provisional and .NET-inspired,
+  favoring modernity, with rendering a date to a string as the immediate goal.
+- **Author:** asks whether Swedish and Hebrew need separate calendars and formatters,
+  names HebrewDateTimeFormat, and requests Hebrew alphabet and invariant/Latin output.
+  Points out that each culture has a language and explicitly chooses to include
+  system culture discovery now. Corrects “used” to “uses”: Israel uses both Gregorian
+  and Hebrew calendars.
+- **Assistant:** separates Gregorian/Hebrew arithmetic from Swedish/Hebrew cultural
+  presentation. Implements Gregorian as he-IL's default with an explicit Hebrew
+  override, separate internal formatter policies, Language, fixed/system providers,
+  and Hebrew numeral/month rendering. Date remains an absolute day with Gregorian
+  convenience properties. Records narrower complete-year limits and fixed profiles.
+- **Author:** clarifies that localization is separate from culture APIs; interfaces
+  should be shared across areas, while providers/sources can differ (JSON or resource
+  files). **Assistant:** records that boundary; built-in formatting data is the current
+  slice, with no resource loader or area-specific localization interface added.
+- **Outcome:** implementation and focused validation are recorded in the
+  [calendar guide](calendar-globalization.md), executable samples and .NET fixture.
+  The Rust comparison passes all 656 Hebrew year starts/month lengths; the Raven
+  consumer passes Hebrew/Latin formatting and provider checks. Unified localization
+  contracts, full locale resolution and broader formatting remain open.
+
+- **Author follow-up:** asks whether Hebrew dates can convert to Gregorian and vice
+  versa. **Assistant:** confirms both projections use the same absolute Date, with
+  1 Tishri 5784 equal to 2023-09-16 and range errors outside the Hebrew policy.
+
+- **Author:** requests globalization be featured on the website. **Assistant:** adds a dedicated feature page, homepage entry and guide/API navigation, with tested Hebrew/Latin output and a distinct future-localization section. Publication is a separate operation.
+
+- **Author:** directs a separate DateTime feature page and selects the Time API and time-zone handling as the next slice. **Assistant:** keeps the existing time route as the DateTime page, separates globalization and records the next work without implementing zones in this commit.
