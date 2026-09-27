@@ -384,12 +384,43 @@ focused tests total). Real C-ABI imports retain scalar/pointer round trips and l
 library loading. No throughput claim, full suite, API regeneration or website build
 is included; Task.Run remains a future public capability on the feature page.
 
+## Aggregate arrays across guest contexts
+
+Each heap participant now publishes the logical array payload in its private frames,
+evaluation stacks, retained completion and prepared host-call arguments before
+releasing graph access. The active VM combines its current payload with the parked
+participants' snapshots and measures shared heap storage once. Reference aliases do
+not duplicate heap charges; owned inline copies do. Participant teardown releases
+its private charge, and pressure collection still reclaims unreachable heap arrays
+before rejecting an aggregate allocation. Existing element and logical-byte limits
+apply across contexts, including contexts that receive arrays without executing an
+array-creation instruction.
+
+Snapshots contain counts rather than values or additional GC roots. Publication and
+checking use the graph gate; parked private frames must not be mutated outside that
+protocol. Detached write buffers are charged as owned copies. Host-side transient
+allocation and the copies within an instruction remain outside the exact accounting
+model, as before; these are logical payload limits, not an OS memory cap.
+
+This preserves neoCLR's bounded invocation contract while approaching .NET's familiar
+shared-reference semantics. It does not adopt a CLR process-wide memory quota or
+claim that Task.Run in .NET provides per-invocation array limits. The implementation
+adds per-participant summaries and boundary scans; existing slot caches continue to
+avoid remeasuring unchanged slot payloads at every instruction.
+
+Validation passes: two aggregate-accounting probes, fourteen VM suspension probes,
+two prepared-I/O probes, and 29 array/GC integration tests (47 focused tests total).
+Cases include native-thread admission against a parked inline array, byte-budget
+aggregation, shared aliases, collection, participant release, completed inline results
+and detached write payloads. No full suite or website build was needed. The public
+Task.Run feature page remains correctly marked as future work.
+
 ## Next prerequisite
 
-Integrate aggregate managed-array accounting before general guest work submission.
-Then establish atomic Promise/queue publication and expose the Run overloads, with
-async callback unwrapping validated at that API boundary. Instruction/live-frame
-budgets, file handles, interning, scheduler services and native memory now share an
-invocation owner. Array accounting still requires integration; a new task must not
-reset those limits. Retaining every object until invocation exit is not a substitute
-for bounded live-object accounting.
+Establish atomic Promise/queue publication, then expose the Run overloads with
+async callback unwrapping. Wire queued captures and completion handoff into the same
+root and payload-publication protocol at that API boundary; native work ownership
+alone does not publish arbitrary inline payloads. Instruction/live-frame budgets,
+file handles, interning, scheduler services, native memory and guest array accounting
+now share invocation scope. Retaining every object until invocation exit is not a
+substitute for bounded live-object accounting.

@@ -38,8 +38,11 @@ service roots, a single completion-drain owner and detached worker joins. Source
 survive the submitting context, and contenders remain cancellable. Native buffers and
 library handles now share invocation ownership and native-memory quotas. Foreign-call
 leases retain direct tracked argument buffers and reject conflicting access without
-holding the memory lock across native execution. Aggregate array accounting and atomic guest Promise/queue mutations
-(including lazy default-queue creation) remain before the Task.Run facade.
+holding the memory lock across native execution. Guest array checks now combine active
+and parked private payloads with shared heap storage, counting aliases once and
+releasing private charges on participant exit. Atomic guest Promise/queue mutations
+(including lazy default-queue creation) and wiring queued capture/completion payload
+publication remain before the Task.Run facade.
 The internal blocking probe is not a public guest API result. Green threads are recorded as a possible future backend.
 This explicit task does not reopen the finished HTTP POC or select a general
 scheduler/backend rewrite independently of the capability's requirements.

@@ -10,9 +10,11 @@ use std::{
 
 struct Registration {
     roots: Mutex<Vec<usize>>,
+    arrays: Mutex<crate::arrays::Usage>,
 }
 struct State {
     heap: ManagedHeap,
+    arrays_used: bool,
     participants: Vec<Weak<Registration>>,
     service_roots: Vec<Weak<Registration>>,
 }
@@ -67,6 +69,7 @@ impl Owner {
         Self(Arc::new(Shared {
             state: Mutex::new(State {
                 heap: ManagedHeap::default(),
+                arrays_used: false,
                 participants: Vec::new(),
                 service_roots: Vec::new(),
             }),
@@ -152,6 +155,7 @@ fn register(
     }
     let registration = Arc::new(Registration {
         roots: Mutex::new(roots),
+        arrays: Mutex::new(Default::default()),
     });
     state.participants.push(Arc::downgrade(&registration));
     Ok(Participant {
@@ -161,12 +165,42 @@ fn register(
 }
 
 impl Access<'_> {
+    pub(crate) fn arrays_used(&self) -> bool {
+        self.state.arrays_used
+    }
+
+    /// Inline payloads are private to a parked participant. Heap payloads are
+    /// measured separately once, regardless of the number of reference aliases.
+    pub(crate) fn publish_arrays(&mut self, usage: crate::arrays::Usage, enabled: bool) {
+        self.state.arrays_used |= enabled || !usage.is_empty();
+        *self.registration.arrays.lock().expect("array accounting lock poisoned") = usage;
+    }
+
+    pub(crate) fn check_arrays(
+        &self,
+        mut current: crate::arrays::Usage,
+        limits: &crate::Limits,
+    ) -> Result<(), Fault> {
+        for entry in &self.state.participants {
+            if let Some(entry) = entry.upgrade() {
+                if !std::ptr::eq(entry.as_ref(), self.registration) {
+                    current.add(
+                        *entry.arrays.lock().expect("array accounting lock poisoned"),
+                        limits,
+                    )?;
+                }
+            }
+        }
+        self.state.heap.array_usage(&mut current, limits)
+    }
+
     pub(crate) fn service_roots(&mut self) -> RootSet {
         self.state
             .service_roots
             .retain(|entry| entry.strong_count() != 0);
         let registration = Arc::new(Registration {
             roots: Mutex::new(Vec::new()),
+            arrays: Mutex::new(Default::default()),
         });
         self.state.service_roots.push(Arc::downgrade(&registration));
         RootSet {
@@ -455,5 +489,98 @@ mod tests {
     #[test]
     fn zero_participant_budget_rejects_admission() {
         assert!(Owner::new(0).participant().is_err());
+    }
+}
+
+#[cfg(test)]
+mod array_accounting_tests {
+    use super::*;
+    use crate::{Limits, Value, arrays::Usage, metadata::Type};
+
+    #[test]
+    fn aliases_count_heap_storage_once_and_collection_releases_payload() {
+        let owner = Owner::new(2);
+        let limits = Limits {
+            array_elements: 2,
+            ..Limits::default()
+        };
+        let mut first = owner.participant().unwrap();
+        let mut second = owner.participant().unwrap();
+        let id = {
+            let mut access = first.enter();
+            let id = access
+                .allocate(Value::Array {
+                    element: Type::Int32,
+                    elements: vec![Value::Int32(0); 2],
+                })
+                .unwrap();
+            access.publish(vec![id]).unwrap();
+            access.publish_arrays(Usage::default(), true);
+            id
+        };
+        {
+            let mut access = second.enter();
+            access.publish(vec![id]).unwrap();
+            access.check_arrays(Usage::default(), &limits).unwrap();
+            access
+                .collect(vec![id], CollectionReason::ExplicitRequest)
+                .unwrap();
+            let mut own = Usage::default();
+            crate::arrays::measure(
+                &Value::Array {
+                    element: Type::Byte,
+                    elements: vec![Value::Byte(1)],
+                },
+                &mut own,
+                &limits,
+            )
+            .unwrap();
+            assert!(access.check_arrays(own, &limits).is_err());
+        }
+        drop(first);
+        let mut access = second.enter();
+        access
+            .collect(vec![], CollectionReason::ExplicitRequest)
+            .unwrap();
+        access
+            .check_arrays(
+                Usage::default(),
+                &Limits {
+                    array_elements: 0,
+                    ..limits
+                },
+            )
+            .unwrap();
+    }
+
+    #[test]
+    fn parked_byte_usage_is_aggregated_and_current_publication_is_replaced() {
+        let owner = Owner::new(2);
+        let limits = Limits {
+            array_bytes: std::mem::size_of::<Value>() * 2 + 3,
+            ..Limits::default()
+        };
+        let mut usage = Usage::default();
+        crate::arrays::measure(
+            &Value::Array {
+                element: Type::String,
+                elements: vec![Value::String("ab".into())],
+            },
+            &mut usage,
+            &limits,
+        )
+        .unwrap();
+        let mut first = owner.participant().unwrap();
+        let mut second = owner.participant().unwrap();
+        first.enter().publish_arrays(usage, true);
+        {
+            let mut access = second.enter();
+            access.publish_arrays(usage, true);
+            assert!(access.check_arrays(usage, &limits).is_err());
+            access.publish_arrays(Usage::default(), true);
+            access.check_arrays(Usage::default(), &limits).unwrap();
+        }
+        drop(first);
+        second.enter().check_arrays(usage, &limits).unwrap();
     }
 }

@@ -1610,6 +1610,11 @@ fn drive_instructions(
                         "evaluation stack limit exceeded",
                     ));
                 }
+                let usage = match frame_array_usage(frames, state.invocation_result.as_ref(), &state.invocation.limits) {
+                    Ok(usage) => usage,
+                    Err(fault) => break Err(fault),
+                };
+                heap.publish_arrays(usage, state.arrays_used);
                 let dispatch = state.invocation.dispatch.lock().expect("dispatch lock poisoned");
                 if let Err(fault) = heap.publish(execution_roots(
                     frames,
@@ -1685,7 +1690,7 @@ fn execution_roots(
 }
 
 /// State that survives an instruction-boundary suspension. File handles, interning
-/// budgets and scheduler share invocation ownership; native memory integration remains.
+/// budgets, scheduler and native memory share invocation ownership.
 struct InstructionState {
     collection_threshold: usize,
     arrays_used: bool,
@@ -1729,6 +1734,31 @@ enum InstructionProgress {
     Completed(Value),
 }
 
+fn frame_array_usage(
+    frames: &[Frame],
+    result: Option<&Value>,
+    limits: &Limits,
+) -> Result<crate::arrays::Usage, Fault> {
+    let mut usage = crate::arrays::Usage::default();
+    if let Some(value) = result {
+        crate::arrays::measure(value, &mut usage, limits)?;
+    }
+    for frame in frames {
+        for cell in frame
+            .args
+            .iter()
+            .chain(&frame.locals)
+            .chain(frame.construction_storage.iter())
+        {
+            cell.borrow().array_usage(&mut usage, limits)?;
+        }
+        for value in &frame.stack {
+            crate::arrays::measure(value, &mut usage, limits)?;
+        }
+    }
+    Ok(usage)
+}
+
 #[allow(clippy::too_many_arguments)]
 fn interpret_instructions(
     module: &Module,
@@ -1746,6 +1776,8 @@ fn interpret_instructions(
     // Lock order is graph -> dispatch. Parking, joining and host I/O hold neither.
     let mut dispatch = invocation.dispatch.lock().expect("dispatch lock poisoned");
     dispatch.bind(heap)?;
+    let initial = frame_array_usage(frames, state.invocation_result.as_ref(), &invocation.limits)?;
+    heap.publish_arrays(initial, state.arrays_used);
     let result = interpret_instructions_with_dispatch(
         module,
         frames,
@@ -1759,13 +1791,50 @@ fn interpret_instructions(
         quantum,
         &mut dispatch,
     );
-    let publication = dispatch.publish(heap);
-    match result {
-        Ok(progress) => publication.map(|_| progress),
+    let publication = dispatch.publish(heap).and_then(|_| {
+        let mut usage =
+            frame_array_usage(frames, state.invocation_result.as_ref(), &invocation.limits)?;
+        if let Some(value) = &state.completion_boundary {
+            crate::arrays::measure(value, &mut usage, &invocation.limits)?;
+        }
+        match &result {
+            Ok(InstructionProgress::Completed(value)) => {
+                crate::arrays::measure(value, &mut usage, &invocation.limits)?;
+            }
+            Ok(InstructionProgress::HostCall(call)) => {
+                call.array_usage(&mut usage, &invocation.limits)?
+            }
+            _ => {}
+        }
+        heap.publish_arrays(usage, state.arrays_used);
+        if heap.check_arrays(usage, &invocation.limits).is_err() {
+            let mut roots = execution_roots(
+                frames,
+                &dispatch.scheduler,
+                dispatch.default_task_queue.as_ref(),
+                state.invocation_result.as_ref(),
+            );
+            if let Some(value) = &state.completion_boundary {
+                crate::gc::trace(value, &mut roots);
+            }
+            match &result {
+                Ok(InstructionProgress::Completed(value)) => crate::gc::trace(value, &mut roots),
+                Ok(InstructionProgress::HostCall(call)) => call.trace_roots(&mut roots),
+                _ => {}
+            }
+            heap.collect(roots, crate::CollectionReason::AllocationPressure)?;
+            heap.check_arrays(usage, &invocation.limits)?;
+        }
+        Ok(())
+    });
+    match result.and_then(|progress| publication.map(|_| progress)) {
+        Ok(progress) => Ok(progress),
         Err(fault) => {
-            if dispatch.owner.upgrade().is_some_and(|owner| {
-                std::sync::Arc::ptr_eq(&owner, &state.dispatch_identity)
-            }) {
+            if dispatch
+                .owner
+                .upgrade()
+                .is_some_and(|owner| std::sync::Arc::ptr_eq(&owner, &state.dispatch_identity))
+            {
                 dispatch.owner = std::sync::Weak::new();
             }
             Err(fault)
@@ -1937,26 +2006,10 @@ fn interpret_instructions_with_dispatch(
             )?;
         }
 
-        if *arrays_used {
-            let check = |frames: &[Frame], heap: &crate::ManagedHeap| -> Result<(), Fault> {
-                let mut usage = crate::arrays::Usage::default();
-                if let Some(value) = &invocation_result {
-                    crate::arrays::measure(value, &mut usage, &limits)?;
-                }
-                for frame in frames {
-                    for cell in frame
-                        .args
-                        .iter()
-                        .chain(&frame.locals)
-                        .chain(frame.construction_storage.iter())
-                    {
-                        cell.borrow().array_usage(&mut usage, &limits)?;
-                    }
-                    for value in &frame.stack {
-                        crate::arrays::measure(value, &mut usage, &limits)?;
-                    }
-                }
-                heap.array_usage(&mut usage, &limits)
+        if *arrays_used || heap.arrays_used() {
+            let check = |frames: &[Frame], heap: &crate::shared_heap::Access<'_>| -> Result<(), Fault> {
+                let usage = frame_array_usage(frames, invocation_result.as_ref(), &invocation.limits)?;
+                heap.check_arrays(usage, &invocation.limits)
             };
             if check(frames, heap).is_err() {
                 let mut roots = vec![];

@@ -104,6 +104,20 @@ impl HostCall {
         }
     }
 
+    pub(super) fn array_usage(
+        &self,
+        usage: &mut crate::arrays::Usage,
+        limits: &Limits,
+    ) -> Result<(), Fault> {
+        for arg in &self.args {
+            crate::arrays::measure(arg, usage, limits)?;
+        }
+        if let Some(value) = &self.immediate {
+            crate::arrays::measure(value, usage, limits)?;
+        }
+        Ok(())
+    }
+
     pub(super) fn trace_roots(&self, roots: &mut Vec<usize>) {
         if let Some((array, _)) = &self.patch {
             crate::gc::trace(&Value::ObjectReference(array.clone()), roots);
@@ -363,6 +377,9 @@ mod tests {
             7,
         )
         .unwrap();
+        let mut usage = crate::arrays::Usage::default();
+        assert!(call.array_usage(&mut usage, &Limits { array_elements: 0, ..Limits::default() }).is_err());
+        call.array_usage(&mut crate::arrays::Usage::default(), &Limits::default()).unwrap();
         reference
             .reference
             .element(0, &Type::Byte)

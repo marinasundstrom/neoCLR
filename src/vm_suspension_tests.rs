@@ -1004,3 +1004,104 @@ ret
     );
     invocation.memory.free(&pointer).unwrap();
 }
+
+#[test]
+fn parked_inline_arrays_charge_other_guest_contexts_and_release_on_exit() {
+    let module =
+        crate::assemble(".module System\n.function Hold(Int32[] value) -> Void\nldvoid\nret\n.end")
+            .unwrap();
+    let options = ExecutionOptions {
+        limits: Limits {
+            array_elements: 3,
+            ..Limits::default()
+        },
+        ..Default::default()
+    };
+    let invocation = crate::invocation::Invocation::new(options.limits);
+    let owner = Owner::new(2);
+    let array = || Value::Array {
+        element: Type::Int32,
+        elements: vec![Value::Int32(1); 2],
+    };
+    let mut first = owner.participant().unwrap();
+    let mut state = InstructionState::with_invocation(invocation.clone());
+    let mut frames = vec![Frame::new(module.functions[0].clone(), vec![array()]).unwrap()];
+    assert!(matches!(
+        interpret_instructions(
+            &module,
+            &mut frames,
+            &options,
+            &mut None,
+            &mut first.enter(),
+            &mut invocation.memory.clone(),
+            &mut vec![],
+            &mut [vec![], vec![]],
+            &mut state,
+            1
+        )
+        .unwrap(),
+        InstructionProgress::Suspended
+    ));
+    let run = || {
+        let mut participant = owner.participant().unwrap();
+        drive_instructions(
+            &module,
+            &mut vec![Frame::new(module.functions[0].clone(), vec![array()]).unwrap()],
+            &options,
+            &mut None,
+            &mut participant,
+            &mut invocation.memory.clone(),
+            &mut vec![],
+            &mut [vec![], vec![]],
+            &mut InstructionState::with_invocation(invocation.clone()),
+        )
+    };
+    assert_eq!(
+        std::thread::scope(|scope| scope.spawn(run).join().unwrap())
+            .unwrap_err()
+            .code,
+        crate::FaultCode::ArrayLimitExceeded
+    );
+    drop(frames);
+    drop(state);
+    drop(first);
+    assert_eq!(run().unwrap(), Value::Void);
+}
+
+#[test]
+fn completed_inline_array_remains_charged_until_participant_release() {
+    let module = crate::assemble(".module System\n.function Make() -> Int32[]\nldc.i4 2\nldc.i4 0\narray.create Int32\nret\n.end").unwrap();
+    let options = ExecutionOptions {
+        limits: Limits {
+            array_elements: 2,
+            ..Limits::default()
+        },
+        ..Default::default()
+    };
+    let invocation = crate::invocation::Invocation::new(options.limits);
+    let owner = Owner::new(2);
+    let run = |participant: &mut crate::shared_heap::Participant| {
+        drive_instructions(
+            &module,
+            &mut vec![Frame::new(module.functions[0].clone(), vec![]).unwrap()],
+            &options,
+            &mut None,
+            participant,
+            &mut invocation.memory.clone(),
+            &mut vec![],
+            &mut [vec![], vec![]],
+            &mut InstructionState::with_invocation(invocation.clone()),
+        )
+    };
+    let mut first = owner.participant().unwrap();
+    let result = run(&mut first).unwrap();
+    assert!(matches!(result, Value::Array { .. }));
+    let mut second = owner.participant().unwrap();
+    assert_eq!(
+        run(&mut second).unwrap_err().code,
+        crate::FaultCode::ArrayLimitExceeded
+    );
+    drop(result);
+    drop(first);
+    assert!(matches!(run(&mut second).unwrap(), Value::Array { .. }));
+}

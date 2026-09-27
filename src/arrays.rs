@@ -8,6 +8,10 @@ pub(crate) struct Usage {
 }
 
 impl Usage {
+    pub(crate) fn is_empty(&self) -> bool {
+        self.elements == 0 && self.bytes == 0
+    }
+
     pub(crate) fn add(&mut self, other: Self, limits: &Limits) -> Result<(), Fault> {
         self.elements = self.elements.saturating_add(other.elements);
         self.bytes = self.bytes.saturating_add(other.bytes);
