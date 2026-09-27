@@ -167,11 +167,13 @@ now passes its quota/snapshot/Unicode contracts, but the balanced managed builde
 slower than ordinary concatenation in both measured workloads. Keep public builder
 promotion deferred and use concatenation for this report; do not optimize the probe.
 The [Encoder acceptance/drain evaluation](../design/text-abstraction.md#encoder-progress-and-writer-evaluation--2026-09-27)
-now passes three focused runs, including a short-write consumer and synthetic final
-output. Next promote the public factory/progress contract and explicit StreamWriter
-Finish, preserving existing UTF-8/ASCII, limits and ownership behavior. Names and
-experimental bounds remain provisional until that integration; no public Encoder
-is implemented by the probe. Public scalar/range APIs, Unicode alignment,
+has been [promoted to the library](../design/text-abstraction.md#public-encoder-integration-development--2026-09-27).
+Encoding.CreateEncoder, Encoder, EncoderProgress/EncoderState and StreamWriter.Finish
+are implemented in development. Four public encoder/writer runs and three selection/line
+regressions pass, including the 65536-byte writer bound. Custom encodings must add
+the factory; output failures now stop subsequent writes. This completes the bounded
+UTF-8/ASCII foundation; additional codecs and general TextWriter completion remain
+separate consumer-driven work. Public scalar/range APIs, Unicode alignment,
 fold naming, full casing and normalization are not blanket prerequisites. A separate
 builder must justify its role alongside immutable String and Swift-style construction.
 Keep existing Sequence<char> and equality/hash contracts; HTTP remains closed.

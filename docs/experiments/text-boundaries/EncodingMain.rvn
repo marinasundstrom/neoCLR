@@ -49,12 +49,28 @@ public class ShortSink : OutputStream {
 
 // A deliberately expanding test codec proves that adapters consume decoded text.
 public class ExpandedEncoding : Encoding {
+    func CreateEncoder() -> Encoder {
+        return ExpandedEncoder()
+    }
     func Encode(text: string) -> Result<Sequence<byte>, EncodingError> {
         let bytes: Sequence<byte> = [(byte)90]
         return Ok(bytes)
     }
     func CreateDecoder() -> Decoder {
         return ExpandedDecoder()
+    }
+}
+
+public class ExpandedEncoder : Encoder {
+    private var inner: Encoder = Encodings.Ascii.CreateEncoder()
+    func Accept(text: string, final: bool) -> Result<unit, EncodingError> {
+        if final && text.IsEmpty {
+            return inner.Accept("", true)
+        }
+        return inner.Accept("Z", final)
+    }
+    func Drain(output: byte[], offset: int, count: int) -> Result<EncoderProgress, EncodingError> {
+        return inner.Drain(output, offset, count)
     }
 }
 

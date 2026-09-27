@@ -8166,3 +8166,21 @@ configuration/content, not target-specific code added to Raven main.
   review. HTTP policy and public builder promotion remain separate. See the
   [contract](design/text-abstraction.md#encoder-progress-and-writer-evaluation--2026-09-27)
   and [evidence](experiments/text-boundaries/encoder-validation.json).
+
+### 2026-09-27 — Encoder contract promoted into the library
+
+- **Author:** asked to continue after the Encoder acceptance/drain evaluation.
+- **Assistant action:** implemented Encoding.CreateEncoder, Encoder and immutable
+  public progress properties with a standard Raven EncoderState union. Connected
+  both built-ins to StreamWriter and added explicit Finish; Flush and Close retain
+  their separate stream/ownership roles. Updated the compiler bridge reference and
+  API documentation alongside the implementation.
+- **Outcome:** four focused public Encoder/writer runs and three selection/line
+  runs pass, including independent sessions, strict line rejection, custom final
+  output and the maximum writer bound. Evidence is [recorded](experiments/text-boundaries/public-encoder-validation.json).
+  No full suite, website build, runtime-default change or performance claim.
+- **Compatibility/costs:** custom development Encoding implementations need the new
+  factory. Output/drain failures make subsequent writes unusable; custom output
+  overflow may follow partial output. Accepted text remains retained until drained.
+  Bounded UTF-8/ASCII foundations are complete; broader codecs, general TextWriter
+  completion, HTTP policy and public builder promotion remain separately scoped.

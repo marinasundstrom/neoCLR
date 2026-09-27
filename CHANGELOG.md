@@ -67,12 +67,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   pass. Identical-output diagnostics favor ordinary concatenation over this managed
   implementation; defer public builder promotion and record Encoder progress as the
   next bounded candidate. No runtime/API changes or builder optimization work.
-- Validate an application-only Encoder acceptance/drain contract with UTF-8 and
-  strict ASCII: whole-text ownership, bounded encoded output, explicit progress and
-  finalization, retryable preflight errors and terminal output failures. Three
-  focused consumers and a .NET semantic comparison pass. A synthetic trailer checks
-  final bytes and Finish/Flush/Close separation. Public factory/writer integration
-  remains next; no public Encoder, new charset or performance claim is introduced.
+- Add development Encoding.CreateEncoder, Encoder, EncoderProgress/EncoderState
+  and StreamWriter.Finish after focused acceptance/drain evaluation. Standard Raven
+  state/error unions express progress and Busy. Built-ins retain valid text and
+  bounded encoded chunks; UTF-8 defaults and strict ASCII preflight remain. Finish
+  drains final bytes separately from Flush/Close. Custom Encoding implementations
+  must add the factory; drain/output failures stop later writes and Finish, while
+  input preflight failures remain retryable. Custom output-limit failure may follow
+  partial output. Refresh public metadata, API/library snapshots and feature docs;
+  focused factory/progress, short-write/finalization, maximum writer and selection
+  consumers pass. No new charset, native primitive or performance claim.
 - Record the author's focused-validation policy: only necessary checks, performance
   tests when relevant, and a full suite only when needed. Skip unrelated website builds.
 

@@ -228,3 +228,17 @@ See the [contract and integration recommendation](../../design/text-abstraction.
 Convert's UTF-16 input counts and scalar-sized output capacity with the candidate's
 whole-text acceptance and byte drains. Its tested runtime is recorded in the evidence.
 No performance comparison or public String/Char contract change is implied.
+
+## Public Encoder integration
+
+`PublicEncoderMain.rvn` uses the production Encoding.CreateEncoder, Encoder,
+EncoderProgress/EncoderState and StreamWriter.Finish APIs. Its custom trailer codec
+is a synthetic contract test, not a supported encoding. `verify_public_encoder.py`
+uses the four artifact paths plus `--runner target/release/examples/measure_async`.
+It runs progress, boundary, writer and maximum-bound checks; the boundary/65536-byte
+fixtures use the established host limits of 100000 heap objects and 500000000
+instructions. Runtime defaults are unchanged. `verify_encoding.py` covers existing
+selection/line behavior and a migrated custom Encoding implementation.
+
+[Public integration evidence](public-encoder-validation.json) is separate from the
+earlier application-only Encoder probe. No full suite or website build is needed.

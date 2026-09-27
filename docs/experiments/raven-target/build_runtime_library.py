@@ -86,6 +86,9 @@ SLICES = {
     'Void': 'System.Void',
 
     'String': 'System.String',
+    'Encoder': 'System.Text.Encoder',
+    'EncoderProgress': 'System.Text.EncoderProgress',
+    'EncoderState': 'System.Text.EncoderState',
     'Encoding': 'System.Text.Encoding',
     'Decoder': 'System.Text.Decoder',
     'EncodingError': 'System.Text.EncodingError',
@@ -235,6 +238,9 @@ SOURCES = {
     'Void': 'runtime/raven/src/System/Void.rvn',
 
     'String': 'runtime/raven/src/System/String.rvn',
+    'Encoder': 'runtime/raven/src/System/Text/Encoder.rvn',
+    'EncoderProgress': 'runtime/raven/src/System/Text/EncoderProgress.rvn',
+    'EncoderState': 'runtime/raven/src/System/Text/EncoderState.rvn',
     'Encoding': 'runtime/raven/src/System/Text/Encoding.rvn',
     'Decoder': 'runtime/raven/src/System/Text/Decoder.rvn',
     'EncodingError': 'runtime/raven/src/System/Text/EncodingError.rvn',

@@ -144,7 +144,7 @@ read that exceeded the limit; stream errors encountered earlier remain stream er
 This changes how far failing reads can advance and which error is observed first
 compared with Preview 10's decode-at-EOF implementation. A final incomplete sequence
 returns InvalidUtf8. The development [Decoder](xref:System.Text.Decoder) interface exposes incremental
-conversion. A stateful Encoder remains future work.
+conversion. The development Encoder and StreamWriter.Finish contracts are described below.
 
 StreamReader(input) owns the input; StreamReader(input, true) leaves it open when
 closed. Close is idempotent, and reads after closing return Closed. Construction
@@ -200,7 +200,8 @@ constructors keep UTF-8 defaults. Each reader owns its decoder; the encoding its
 can be reused. ReadLine recognizes LF and CRLF in decoded text and retains decoded
 suffixes supplied by a codec. Built-in codecs do not read ahead across lines.
 WriteLine encodes text plus LF together. Writer results count actual encoded bytes;
-conversion and byte snapshotting finish before output callbacks. Partial writes
+strict built-in preflight finishes before output callbacks; the writer now drains
+a bounded byte buffer before requesting further encoded bytes. Partial writes
 are retried. Conversion errors return InvalidEncoding, while malformed UTF-8 reads
 retain InvalidUtf8. Stream failures retain their existing cases.
 
@@ -217,12 +218,69 @@ Compared with .NET Encoding/Decoder, the policy/factory roles are familiar but t
 conversion boundary returns valid Unicode text instead of a UTF-16 char buffer.
 This avoids exposing storage units through character APIs, at the cost of owned
 result allocations and no destination-capacity/progress API. Strict ASCII avoids
-silent replacement at the cost of handling conversion failures. This is whole-value
-encoding plus incremental decoding; a stateful **Encoder** remains future work.
-Flush forwards stream flushing; it does not finalize an encoder. HTTP can reuse the
+silent replacement at the cost of handling conversion failures. Whole-value Encode remains available alongside the development incremental
+Encoder described below. Flush forwards stream flushing; explicit Finish finalizes
+a StreamWriter encoder. HTTP can reuse the
 conversion policy later, but charset selection, protocol validation and framing
 remain HTTP concerns. This work does not reopen the completed HTTP POC.
 
 Focused consumers: [EncodingMain.rvn](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/text-boundaries/EncodingMain.rvn)
 and [verification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/text-boundaries/verify_encoding.py), plus the
 existing reader regression fixtures. No website build or full suite is required.
+
+## Incremental encoding (development)
+
+[Encoding.CreateEncoder](xref:System.Text.Encoding) creates an independent
+[Encoder](xref:System.Text.Encoder). Accept a complete valid text chunk with
+`Accept(text, final)`, then call `Drain(buffer, offset, count)` until
+[EncoderProgress](xref:System.Text.EncoderProgress).State is Ready or Finished.
+[EncoderState](xref:System.Text.EncoderState).NeedsOutput means more bytes remain.
+The state and BytesWritten describe the same successful drain operation.
+
+Accept retains the immutable text, so callers need no character offset or mutable
+source-buffer lifetime rule. Nonfinal pending input rejects another Accept with
+EncodingError.Busy. Final accepted input rejects further input with Finished; its
+bytes must still drain before the returned progress says Finished. Empty final
+input is meaningful. Strict ASCII preflights all text before acceptance; rejected
+input can be corrected and retried. Built-in input and drain requests are bounded
+at 65536 UTF-8 source bytes and 65536 destination bytes respectively.
+
+Drain writes only BytesWritten bytes in the supplied range, does not retain the
+array and supports one-byte destinations. Fragments can split UTF-8 scalars; do not
+individually decode them as complete strings. Zero capacity may return NeedsOutput
+without progress. Invalid ranges and excessive requests leave output and state
+unchanged. Use one session per consumer; concurrent/reentrant calls are unsupported.
+Built-ins keep a pending encoded chunk of at most 256 bytes plus the accepted text;
+conversion still allocates and normal host resource limits apply.
+
+StreamWriter now drains through an independent encoder with a 256-byte buffer.
+It retries partial writes before asking for more encoded output. WriteLine preflights
+text plus LF together. Existing constructors keep UTF-8 defaults and leaveOpen
+behavior. Write/WriteLine results still count encoded bytes actually written.
+
+Call **StreamWriter.Finish()** to complete conversion and observe final output/errors,
+then **Flush()** if stream flushing is required, and **Close()** to release ownership.
+Finish returns additional bytes written; repeated successful Finish calls return zero.
+It does not flush or close. Write/WriteLine after Finish return InvalidEncoding.
+Close does not implicitly Finish or Flush. Finish is on StreamWriter; the general
+TextWriter interface has not gained a completion requirement.
+
+A drain/output failure can follow partial output and leaves the writer unusable for
+further Write/WriteLine/Finish; these return InvalidEncoding. Earlier source-limit
+and built-in ASCII preflight failures remain retryable and write no bytes. The writer
+never sends over 65536 bytes per call. For a custom encoder that expands beyond that
+output bound, detection can occur after partial output; there is no rollback or
+implicit replay. Closed is checked first. Flush remains available until Close.
+
+**Development migration:** custom Encoding implementations must now implement
+CreateEncoder and return fresh conversion state. Do not assume an arbitrary
+whole-value Encode implementation can safely be called separately for text fragments.
+Built-ins and the application custom-codec examples use the same public interface.
+EncoderProgress rejects negative byte counts and inactive states; providers must
+also respect the capacity offered to Drain. These APIs are not included in Preview 10.
+
+Compared with .NET Encoder.Convert, this design retains valid text rather than
+reporting UTF-16 char consumption. It permits arbitrarily small byte destinations,
+at the cost of retained input, two-stage usage and fragments that may split a scalar.
+The synthetic final-output test is a contract fixture, not an additional supported
+encoding. HTTP charset policy and additional codecs remain separate work.

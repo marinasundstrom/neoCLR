@@ -236,5 +236,6 @@ independent [Decoder](xref:System.Text.Decoder) instances. [Encodings](xref:Syst
 provides UTF-8 and strict ASCII. ASCII rejects unrepresentable text and bytes above
 127; it never silently substitutes characters. StreamReader/StreamWriter accept
 these policies while keeping UTF-8 defaults. See [encoding contracts](../../docs/streams.html#selected-encodings-development)
-for ownership, bounds and errors. Stateful encoding and a small builder remain
-possible next steps; these additions are not part of Preview 10.
+for ownership, bounds and errors. [Encoder](xref:System.Text.Encoder) now accepts valid text and drains bounded byte
+output, with explicit progress and finalization. A public builder and broader codecs
+remain possible next steps; these additions are not part of Preview 10.

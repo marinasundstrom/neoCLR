@@ -542,7 +542,8 @@ constructors keep UTF-8 defaults. Each reader owns its decoder; the encoding its
 can be reused. ReadLine recognizes LF and CRLF in decoded text and retains decoded
 suffixes supplied by a codec. Built-in codecs do not read ahead across lines.
 WriteLine encodes text plus LF together. Writer results count actual encoded bytes;
-conversion and byte snapshotting finish before output callbacks. Partial writes
+strict built-in preflight finishes before output callbacks; the writer now drains
+a bounded byte buffer before requesting further encoded bytes. Partial writes
 are retried. Conversion errors return InvalidEncoding, while malformed UTF-8 reads
 retain InvalidUtf8. Stream failures retain their existing cases.
 
@@ -559,9 +560,9 @@ Compared with .NET Encoding/Decoder, the policy/factory roles are familiar but t
 conversion boundary returns valid Unicode text instead of a UTF-16 char buffer.
 This avoids exposing storage units through character APIs, at the cost of owned
 result allocations and no destination-capacity/progress API. Strict ASCII avoids
-silent replacement at the cost of handling conversion failures. This is whole-value
-encoding plus incremental decoding; a stateful **Encoder** remains future work.
-Flush forwards stream flushing; it does not finalize an encoder. HTTP can reuse the
+silent replacement at the cost of handling conversion failures. Whole-value Encode remains available alongside the development incremental
+Encoder described below. Flush forwards stream flushing; explicit Finish finalizes
+a StreamWriter encoder. HTTP can reuse the
 conversion policy later, but charset selection, protocol validation and framing
 remain HTTP concerns. This work does not reopen the completed HTTP POC.
 
@@ -939,3 +940,49 @@ consumer needing that capability. Preserve UTF-8 defaults, strict ASCII prefligh
 WriteLine atomic preflight, encoded-byte counts and ownership, refresh matching
 reference/API artifacts, and reuse these focused consumers. HTTP charset policy,
 other encodings and public builder promotion remain outside this slice.
+
+### Public Encoder integration (development) — 2026-09-27
+
+The acceptance/drain contract is now implemented in System.Text. Encoding adds
+CreateEncoder; Encoder exposes Accept/Drain; EncoderProgress has read-only
+BytesWritten/State properties; EncoderState is a standard Raven union. EncodingError
+adds Busy without reordering its existing cases. Factories return independent state.
+The built-ins accept up to 65536 UTF-8 input bytes per chunk and drain requests up
+to 65536 bytes, retaining the source and at most 256 pending encoded bytes. The
+prototype's 4096/32-byte bounds are not the public contract. No String/Char semantic
+change, fallback replacement, native opcode or compiler option is introduced.
+
+StreamWriter now drives an encoder with a 256-byte output buffer, completes short
+writes before draining again, and exposes Finish on the concrete writer. Finish
+emits final bytes and returns their count; repeat success returns zero. Flush stays
+stream-only and Close stays ownership-only. Existing UTF-8 defaults and leaveOpen
+constructors remain. WriteLine preflights text plus LF as one input. Strict ASCII
+rejects unsupported input before output; positive-capacity built-in drains make
+progress even when a scalar spans several byte fragments.
+
+Material development migration: custom Encoding implementations must add
+CreateEncoder, returning independent sessions. Do not wrap arbitrary Encode calls
+as a chunk-wise codec. After an encoder-drain or output error, subsequent writes
+and Finish return InvalidEncoding; there is no replay of partly consumed input.
+Source-limit and ASCII preflight errors remain retryable. Custom output exceeding
+65536 bytes can be detected after partial output, but the writer never sends beyond
+the per-call ceiling. This differs from the previous whole-value snapshot check.
+Observe Finish and Flush before Close when final conversion output matters.
+
+EncoderProgress rejects negative counts and inactive EncoderState values. Its public
+surface is immutable; private storage follows the bridge's mutable-field profile.
+Internal encoder helper methods follow its existing public-instance dependency
+profile, without exposing the provider class. No importer admission broadening is
+needed for these implementation details. An explicit union-case match on the state
+getter establishes an active return for Raven's union-flow checks.
+
+Validation: four public Encoder/writer runs and three existing encoding/line runs
+pass against matching rebuilt reference/library artifacts. They include an
+independent factory session, one-byte drains, the 256-byte scalar boundary, custom
+final output, strict line rejection, partial-write failure, and a 65536-byte write
+with oversized input/line rejection before output. Larger boundary fixtures use
+the existing measure_async host limits; runtime defaults are unchanged. See
+[public evidence](../experiments/text-boundaries/public-encoder-validation.json).
+No full suite, website build or performance claim. This completes the bounded
+UTF-8/strict-ASCII encoding foundation; broader codecs, general TextWriter completion,
+HTTP charset policy and public builder promotion remain separately scoped work.

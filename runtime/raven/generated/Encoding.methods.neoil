@@ -2,6 +2,8 @@
 .interface System.Text.Encoding
 .method instance Encode(String text) -> System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>
 .end
+.method instance CreateEncoder() -> System.Text.Encoder
+.end
 .method instance CreateDecoder() -> System.Text.Decoder
 .end
 .end

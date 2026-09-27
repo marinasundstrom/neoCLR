@@ -4,6 +4,28 @@ ldarg source
 call instance System.String::GetUtf8ByteCount()
 ret
 .end
+.function neoCLR.Library.System.Text.Encodings.RuntimeStringSliceUtf8(String source,Int32 value0,Int32 value1) -> System.Result<String,System.Text.Utf8SliceError>
+ldarg source
+ldarg value0
+ldarg value1
+call instance System.String::SliceUtf8(Int32,Int32)
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncoderStateNewSystemTextEncoderStateNeedsOutput(System.Text.EncoderState.NeedsOutput value) -> System.Text.EncoderState
+ldarg value
+newobj instance System.Text.EncoderState::.ctor(System.Text.EncoderState.NeedsOutput)
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncoderStateNewSystemTextEncoderStateReady(System.Text.EncoderState.Ready value) -> System.Text.EncoderState
+ldarg value
+newobj instance System.Text.EncoderState::.ctor(System.Text.EncoderState.Ready)
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncoderStateNewSystemTextEncoderStateFinished(System.Text.EncoderState.Finished value) -> System.Text.EncoderState
+ldarg value
+newobj instance System.Text.EncoderState::.ctor(System.Text.EncoderState.Finished)
+ret
+.end
 .function neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorInvalidRange(System.Text.EncodingError.InvalidRange value) -> System.Text.EncodingError
 ldarg value
 newobj instance System.Text.EncodingError::.ctor(System.Text.EncodingError.InvalidRange)
@@ -34,6 +56,23 @@ ldarg value
 newobj instance System.Text.EncodingError::.ctor(System.Text.EncodingError.UnrepresentableText)
 ret
 .end
+.function neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorBusy(System.Text.EncodingError.Busy value) -> System.Text.EncodingError
+ldarg value
+newobj instance System.Text.EncodingError::.ctor(System.Text.EncodingError.Busy)
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncoderStateNeedsOutputNew() -> System.Text.EncoderState.NeedsOutput
+newobj instance System.Text.EncoderState.NeedsOutput::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncoderStateReadyNew() -> System.Text.EncoderState.Ready
+newobj instance System.Text.EncoderState.Ready::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncoderStateFinishedNew() -> System.Text.EncoderState.Finished
+newobj instance System.Text.EncoderState.Finished::.ctor()
+ret
+.end
 .function neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorInvalidRangeNew() -> System.Text.EncodingError.InvalidRange
 newobj instance System.Text.EncodingError.InvalidRange::.ctor()
 ret
@@ -58,6 +97,10 @@ ret
 newobj instance System.Text.EncodingError.UnrepresentableText::.ctor()
 ret
 .end
+.function neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorBusyNew() -> System.Text.EncodingError.Busy
+newobj instance System.Text.EncodingError.Busy::.ctor()
+ret
+.end
 .function neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError arg0) -> System.Result.Error<System.Text.EncodingError>
 ldarg arg0
 newobj instance System.Result.Error<System.Text.EncodingError>::.ctor(System.Text.EncodingError)
@@ -78,39 +121,108 @@ ldarg arg0
 newobj instance System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>::.ctor(System.Result.Ok<System.Collections.Sequence<Byte>>)
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError> arg0) -> System.Result<String,System.Text.EncodingError>
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError> arg0) -> System.Result<Void,System.Text.EncodingError>
+ldarg arg0
+newobj instance System.Result<Void,System.Text.EncodingError>::.ctor(System.Result.Error<System.Text.EncodingError>)
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion5(System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>& arg0,out(true) System.Result.Ok<System.Collections.Sequence<Byte>>& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>::TryGetValue(System.Result.Ok<System.Collections.Sequence<Byte>>&)
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion6(Void arg0) -> System.Result.Ok<Void>
+ldarg arg0
+newobj instance System.Result.Ok<Void>::.ctor(Void)
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion7(System.Result.Ok<Void> arg0) -> System.Result<Void,System.Text.EncodingError>
+ldarg arg0
+newobj instance System.Result<Void,System.Text.EncodingError>::.ctor(System.Result.Ok<Void>)
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion8(System.Result.Ok<System.Collections.Sequence<Byte>>& arg0) -> System.Collections.Sequence<Byte>
+ldarg arg0
+call instance System.Result.Ok<System.Collections.Sequence<Byte>>::get_Value()
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion9(System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>& arg0,out(true) System.Result.Error<System.Text.EncodingError>& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>::TryGetValue(System.Result.Error<System.Text.EncodingError>&)
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion10(System.Result.Error<System.Text.EncodingError>& arg0) -> System.Text.EncodingError
+ldarg arg0
+call instance System.Result.Error<System.Text.EncodingError>::get_Value()
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion11(System.Result.Error<System.Text.EncodingError> arg0) -> System.Result<System.Text.EncoderProgress,System.Text.EncodingError>
+ldarg arg0
+newobj instance System.Result<System.Text.EncoderProgress,System.Text.EncodingError>::.ctor(System.Result.Error<System.Text.EncodingError>)
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion12(System.Text.EncoderProgress arg0) -> System.Result.Ok<System.Text.EncoderProgress>
+ldarg arg0
+newobj instance System.Result.Ok<System.Text.EncoderProgress>::.ctor(System.Text.EncoderProgress)
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion13(System.Result.Ok<System.Text.EncoderProgress> arg0) -> System.Result<System.Text.EncoderProgress,System.Text.EncodingError>
+ldarg arg0
+newobj instance System.Result<System.Text.EncoderProgress,System.Text.EncodingError>::.ctor(System.Result.Ok<System.Text.EncoderProgress>)
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion14(System.Result<String,System.Text.Utf8SliceError>& arg0,out(true) System.Result.Ok<String>& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<String,System.Text.Utf8SliceError>::TryGetValue(System.Result.Ok<String>&)
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion15(System.Result.Ok<String>& arg0) -> String
+ldarg arg0
+call instance System.Result.Ok<String>::get_Value()
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion16(System.Result<String,System.Text.Utf8SliceError>& arg0,out(true) System.Result.Error<System.Text.Utf8SliceError>& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<String,System.Text.Utf8SliceError>::TryGetValue(System.Result.Error<System.Text.Utf8SliceError>&)
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion17(System.Result.Error<System.Text.Utf8SliceError>& arg0) -> System.Text.Utf8SliceError
+ldarg arg0
+call instance System.Result.Error<System.Text.Utf8SliceError>::get_Value()
+ret
+.end
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError> arg0) -> System.Result<String,System.Text.EncodingError>
 ldarg arg0
 newobj instance System.Result<String,System.Text.EncodingError>::.ctor(System.Result.Error<System.Text.EncodingError>)
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion5(System.Result<String,System.Text.InvalidUtf8Error>& arg0,out(true) System.Result.Ok<String>& arg1) -> Boolean
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion19(System.Result<String,System.Text.InvalidUtf8Error>& arg0,out(true) System.Result.Ok<String>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
 call instance System.Result<String,System.Text.InvalidUtf8Error>::TryGetValue(System.Result.Ok<String>&)
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion6(System.Result.Ok<String>& arg0) -> String
-ldarg arg0
-call instance System.Result.Ok<String>::get_Value()
-ret
-.end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion7(System.Result<String,System.Text.InvalidUtf8Error>& arg0,out(true) System.Result.Error<System.Text.InvalidUtf8Error>& arg1) -> Boolean
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion20(System.Result<String,System.Text.InvalidUtf8Error>& arg0,out(true) System.Result.Error<System.Text.InvalidUtf8Error>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
 call instance System.Result<String,System.Text.InvalidUtf8Error>::TryGetValue(System.Result.Error<System.Text.InvalidUtf8Error>&)
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion8(String arg0) -> System.Result.Ok<String>
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion21(String arg0) -> System.Result.Ok<String>
 ldarg arg0
 newobj instance System.Result.Ok<String>::.ctor(String)
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion9(System.Result.Ok<String> arg0) -> System.Result<String,System.Text.EncodingError>
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion22(System.Result.Ok<String> arg0) -> System.Result<String,System.Text.EncodingError>
 ldarg arg0
 newobj instance System.Result<String,System.Text.EncodingError>::.ctor(System.Result.Ok<String>)
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion10(System.Result.Error<System.Text.InvalidUtf8Error>& arg0) -> System.Text.InvalidUtf8Error
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion23(System.Result.Error<System.Text.InvalidUtf8Error>& arg0) -> System.Text.InvalidUtf8Error
 ldarg arg0
 call instance System.Result.Error<System.Text.InvalidUtf8Error>::get_Value()
 ret
@@ -139,6 +251,12 @@ False:
     ldc.i4 0
     ret
 .end
+.function neoCLR.Library.System.Text.Encodings.RuntimeCliCall0(Int32 arg0) -> neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572
+ldarg arg0
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
+newobj instance neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::.ctor(Boolean)
+ret
+.end
 .type internal class neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E55746638456E636F64696E67
 .sealed
 .implements System.Text.Encoding
@@ -151,50 +269,60 @@ pop
 M00000003_IL_0007:
 ret
 .end
-.method instance Encode(String text) -> System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>
+.method instance CreateEncoder() -> System.Text.Encoder
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
-ldarg 1
+ldc.i4 0
 M00000004_IL_0003:
-call neoCLR.Library.System.Text.Encodings.RuntimeStringGetUtf8ByteCount(String)
+call neoCLR.Library.System.Text.Encodings.RuntimeCliCall0(Int32)
 M00000004_IL_0008:
+ret
+.end
+.method instance Encode(String text) -> System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 1
+M00000005_IL_0003:
+call neoCLR.Library.System.Text.Encodings.RuntimeStringGetUtf8ByteCount(String)
+M00000005_IL_0008:
 ldc.i4 65536
-M00000004_IL_000d:
+M00000005_IL_000d:
 cgt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_000f:
-brtrue M00000004_IL_0019
-M00000004_IL_0014:
-br M00000004_IL_002e
-M00000004_IL_0019:
+M00000005_IL_000f:
+brtrue M00000005_IL_0019
+M00000005_IL_0014:
+br M00000005_IL_002e
+M00000005_IL_0019:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorLimitExceededNew()
-M00000004_IL_001e:
+M00000005_IL_001e:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorLimitExceeded(System.Text.EncodingError.LimitExceeded)
-M00000004_IL_0023:
+M00000005_IL_0023:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
-M00000004_IL_0028:
+M00000005_IL_0028:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion1(System.Result.Error<System.Text.EncodingError>)
-M00000004_IL_002d:
+M00000005_IL_002d:
 ret
-M00000004_IL_002e:
-M00000004_IL_002f:
-M00000004_IL_0030:
+M00000005_IL_002e:
+M00000005_IL_002f:
+M00000005_IL_0030:
 ldarg 1
-M00000004_IL_0031:
+M00000005_IL_0031:
 call System.Text.Utf8::Encode(String)
-M00000004_IL_0036:
+M00000005_IL_0036:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion2(System.Collections.Sequence<Byte>)
-M00000004_IL_003b:
+M00000005_IL_003b:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion3(System.Result.Ok<System.Collections.Sequence<Byte>>)
-M00000004_IL_0040:
+M00000005_IL_0040:
 ret
 .end
 .method instance CreateDecoder() -> System.Text.Decoder
-M00000005_IL_0000:
-M00000005_IL_0001:
+M00000006_IL_0000:
+M00000006_IL_0001:
 newobj instance neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::.ctor()
-M00000005_IL_0006:
+M00000006_IL_0006:
 ret
 .end
 .end
@@ -202,12 +330,22 @@ ret
 .sealed
 .implements System.Text.Encoding
 .method instance .ctor() -> noresult
-M00000006_IL_0000:
-M00000006_IL_0001:
+M00000007_IL_0000:
+M00000007_IL_0001:
 ldarg 0
-M00000006_IL_0002:
+M00000007_IL_0002:
 pop
-M00000006_IL_0007:
+M00000007_IL_0007:
+ret
+.end
+.method instance CreateEncoder() -> System.Text.Encoder
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldc.i4 1
+M00000008_IL_0003:
+call neoCLR.Library.System.Text.Encodings.RuntimeCliCall0(Int32)
+M00000008_IL_0008:
 ret
 .end
 .method instance Encode(String text) -> System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>
@@ -223,101 +361,1224 @@ ldloca local2
 initobj System.Collections.Iterator<Byte>
 ldc.i4 0
 stloc local3
-M00000007_IL_0000:
-M00000007_IL_0001:
-M00000007_IL_0002:
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
 ldarg 1
-M00000007_IL_0003:
+M00000009_IL_0003:
 call neoCLR.Library.System.Text.Encodings.RuntimeStringGetUtf8ByteCount(String)
-M00000007_IL_0008:
+M00000009_IL_0008:
 ldc.i4 65536
-M00000007_IL_000d:
+M00000009_IL_000d:
 cgt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M00000007_IL_000f:
-brtrue M00000007_IL_0019
-M00000007_IL_0014:
-br M00000007_IL_002e
-M00000007_IL_0019:
+M00000009_IL_000f:
+brtrue M00000009_IL_0019
+M00000009_IL_0014:
+br M00000009_IL_002e
+M00000009_IL_0019:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorLimitExceededNew()
-M00000007_IL_001e:
+M00000009_IL_001e:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorLimitExceeded(System.Text.EncodingError.LimitExceeded)
-M00000007_IL_0023:
+M00000009_IL_0023:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
-M00000007_IL_0028:
+M00000009_IL_0028:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion1(System.Result.Error<System.Text.EncodingError>)
-M00000007_IL_002d:
+M00000009_IL_002d:
 ret
-M00000007_IL_002e:
-M00000007_IL_002f:
-M00000007_IL_0030:
+M00000009_IL_002e:
+M00000009_IL_002f:
+M00000009_IL_0030:
 ldarg 1
-M00000007_IL_0031:
+M00000009_IL_0031:
 call System.Text.Utf8::Encode(String)
-M00000007_IL_0036:
+M00000009_IL_0036:
 stloc local0
-M00000007_IL_0037:
-M00000007_IL_0038:
+M00000009_IL_0037:
+M00000009_IL_0038:
 ldloc local0
-M00000007_IL_0039:
+M00000009_IL_0039:
 callvirt instance System.Collections.Iterable<Byte>::GetIterator()
-M00000007_IL_003e:
+M00000009_IL_003e:
 stloc local2
-M00000007_IL_003f:
+M00000009_IL_003f:
 ldloc local2
-M00000007_IL_0040:
+M00000009_IL_0040:
 callvirt instance System.Collections.Iterator<Byte>::MoveNext()
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M00000007_IL_0045:
-brfalse M00000007_IL_007c
-M00000007_IL_004a:
+M00000009_IL_0045:
+brfalse M00000009_IL_007c
+M00000009_IL_004a:
 ldloc local2
-M00000007_IL_004b:
+M00000009_IL_004b:
 callvirt instance System.Collections.Iterator<Byte>::get_Current()
-M00000007_IL_0050:
+M00000009_IL_0050:
 stloc local3
-M00000007_IL_0051:
+M00000009_IL_0051:
 ldloc local3
-M00000007_IL_0052:
+M00000009_IL_0052:
 conv.i4
-M00000007_IL_0053:
+M00000009_IL_0053:
 ldc.i4 127
-M00000007_IL_0055:
+M00000009_IL_0055:
 cgt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M00000007_IL_0057:
-brtrue M00000007_IL_0061
-M00000007_IL_005c:
-br M00000007_IL_0076
-M00000007_IL_0061:
+M00000009_IL_0057:
+brtrue M00000009_IL_0061
+M00000009_IL_005c:
+br M00000009_IL_0076
+M00000009_IL_0061:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorUnrepresentableTextNew()
-M00000007_IL_0066:
+M00000009_IL_0066:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorUnrepresentableText(System.Text.EncodingError.UnrepresentableText)
-M00000007_IL_006b:
+M00000009_IL_006b:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
-M00000007_IL_0070:
+M00000009_IL_0070:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion1(System.Result.Error<System.Text.EncodingError>)
-M00000007_IL_0075:
+M00000009_IL_0075:
 ret
-M00000007_IL_0076:
-M00000007_IL_0077:
-br M00000007_IL_003f
-M00000007_IL_007c:
-M00000007_IL_007d:
+M00000009_IL_0076:
+M00000009_IL_0077:
+br M00000009_IL_003f
+M00000009_IL_007c:
+M00000009_IL_007d:
 ldloc local0
-M00000007_IL_007e:
+M00000009_IL_007e:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion2(System.Collections.Sequence<Byte>)
-M00000007_IL_0083:
+M00000009_IL_0083:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion3(System.Result.Ok<System.Collections.Sequence<Byte>>)
-M00000007_IL_0088:
+M00000009_IL_0088:
 ret
 .end
 .method instance CreateDecoder() -> System.Text.Decoder
-M00000008_IL_0000:
-M00000008_IL_0001:
+M0000000a_IL_0000:
+M0000000a_IL_0001:
 newobj instance neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E41736369694465636F646572::.ctor()
-M00000008_IL_0006:
+M0000000a_IL_0006:
 ret
+.end
+.end
+.type internal class neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572
+.sealed
+.implements System.Text.Encoder
+.field private policy System.Text.Encoding
+.field private ascii Boolean
+.field private text String
+.field private sourceOffset Int32
+.field private bytes System.Collections.Sequence<Byte>
+.field private byteOffset Int32
+.field private pending Boolean
+.field private ending Boolean
+.field private finished Boolean
+.method instance .ctor(Boolean strictAscii) -> noresult
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+ldarg 0
+M0000000b_IL_0002:
+pop
+M0000000b_IL_0007:
+M0000000b_IL_0008:
+ldarg 0
+M0000000b_IL_0009:
+call System.Text.Encodings.get_Utf8()
+M0000000b_IL_000e:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::policy
+M0000000b_IL_0013:
+M0000000b_IL_0014:
+ldarg 0
+M0000000b_IL_0015:
+ldc.i4 0
+M0000000b_IL_0016:
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::ascii
+M0000000b_IL_001b:
+M0000000b_IL_001c:
+ldarg 0
+M0000000b_IL_001d:
+ldstr ""
+M0000000b_IL_0022:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::text
+M0000000b_IL_0027:
+M0000000b_IL_0028:
+ldarg 0
+M0000000b_IL_0029:
+ldc.i4 0
+M0000000b_IL_002a:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::sourceOffset
+M0000000b_IL_002f:
+M0000000b_IL_0030:
+ldarg 0
+M0000000b_IL_0031:
+newobj instance System.Collections.ArrayList<Byte>::.ctor()
+M0000000b_IL_0036:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::bytes
+M0000000b_IL_003b:
+M0000000b_IL_003c:
+ldarg 0
+M0000000b_IL_003d:
+ldc.i4 0
+M0000000b_IL_003e:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::byteOffset
+M0000000b_IL_0043:
+M0000000b_IL_0044:
+ldarg 0
+M0000000b_IL_0045:
+ldc.i4 0
+M0000000b_IL_0046:
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::pending
+M0000000b_IL_004b:
+M0000000b_IL_004c:
+ldarg 0
+M0000000b_IL_004d:
+ldc.i4 0
+M0000000b_IL_004e:
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::ending
+M0000000b_IL_0053:
+M0000000b_IL_0054:
+ldarg 0
+M0000000b_IL_0055:
+ldc.i4 0
+M0000000b_IL_0056:
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::finished
+M0000000b_IL_005b:
+M0000000b_IL_005c:
+ldarg 0
+M0000000b_IL_005d:
+ldarg 1
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_005e:
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::ascii
+M0000000b_IL_0063:
+M0000000b_IL_0064:
+ldarg 1
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_0065:
+brtrue M0000000b_IL_006f
+M0000000b_IL_006a:
+br M0000000b_IL_007b
+M0000000b_IL_006f:
+M0000000b_IL_0070:
+ldarg 0
+M0000000b_IL_0071:
+call System.Text.Encodings.get_Ascii()
+M0000000b_IL_0076:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::policy
+M0000000b_IL_007b:
+M0000000b_IL_007c:
+ret
+.end
+.method instance Accept(String text,Boolean final) -> System.Result<Void,System.Text.EncodingError>
+.local Int32 local0
+.local String local1
+.local System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError> local2
+.local System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError> local3
+.local System.Result.Ok<System.Collections.Sequence<Byte>> local4
+.local System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError> local5
+.local System.Result.Error<System.Text.EncodingError> local6
+.local Void local7
+ldc.i4 0
+stloc local0
+ldloca local2
+initobj System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>
+ldloca local3
+initobj System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>
+ldloca local4
+initobj System.Result.Ok<System.Collections.Sequence<Byte>>
+ldloca local5
+initobj System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>
+ldloca local6
+initobj System.Result.Error<System.Text.EncodingError>
+ldvoid
+stloc local7
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::finished
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0008:
+brtrue M0000000c_IL_0018
+M0000000c_IL_000d:
+ldarg 0
+M0000000c_IL_000e:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::ending
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0013:
+br M0000000c_IL_0019
+M0000000c_IL_0018:
+ldc.i4 1
+M0000000c_IL_0019:
+brtrue M0000000c_IL_0023
+M0000000c_IL_001e:
+br M0000000c_IL_0038
+M0000000c_IL_0023:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorFinishedNew()
+M0000000c_IL_0028:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorFinished(System.Text.EncodingError.Finished)
+M0000000c_IL_002d:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
+M0000000c_IL_0032:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
+M0000000c_IL_0037:
+ret
+M0000000c_IL_0038:
+M0000000c_IL_0039:
+M0000000c_IL_003a:
+ldarg 0
+M0000000c_IL_003b:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::pending
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0040:
+brtrue M0000000c_IL_004a
+M0000000c_IL_0045:
+br M0000000c_IL_005f
+M0000000c_IL_004a:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorBusyNew()
+M0000000c_IL_004f:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorBusy(System.Text.EncodingError.Busy)
+M0000000c_IL_0054:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
+M0000000c_IL_0059:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
+M0000000c_IL_005e:
+ret
+M0000000c_IL_005f:
+M0000000c_IL_0060:
+M0000000c_IL_0061:
+ldarg 1
+M0000000c_IL_0062:
+call neoCLR.Library.System.Text.Encodings.RuntimeStringGetUtf8ByteCount(String)
+M0000000c_IL_0067:
+ldc.i4 65536
+M0000000c_IL_006c:
+cgt
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_006e:
+brtrue M0000000c_IL_0078
+M0000000c_IL_0073:
+br M0000000c_IL_008d
+M0000000c_IL_0078:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorLimitExceededNew()
+M0000000c_IL_007d:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorLimitExceeded(System.Text.EncodingError.LimitExceeded)
+M0000000c_IL_0082:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
+M0000000c_IL_0087:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
+M0000000c_IL_008c:
+ret
+M0000000c_IL_008d:
+M0000000c_IL_008e:
+M0000000c_IL_008f:
+ldarg 0
+M0000000c_IL_0090:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::ascii
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0095:
+brtrue M0000000c_IL_009f
+M0000000c_IL_009a:
+br M0000000c_IL_015a
+M0000000c_IL_009f:
+M0000000c_IL_00a0:
+ldc.i4 0
+M0000000c_IL_00a1:
+stloc local0
+M0000000c_IL_00a2:
+M0000000c_IL_00a3:
+M0000000c_IL_00a4:
+ldloc local0
+M0000000c_IL_00a5:
+ldarg 1
+M0000000c_IL_00a6:
+call neoCLR.Library.System.Text.Encodings.RuntimeStringGetUtf8ByteCount(String)
+M0000000c_IL_00ab:
+clt
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_00ad:
+brtrue M0000000c_IL_00b7
+M0000000c_IL_00b2:
+br M0000000c_IL_0159
+M0000000c_IL_00b7:
+M0000000c_IL_00b8:
+ldarg 0
+M0000000c_IL_00b9:
+ldarg 1
+M0000000c_IL_00ba:
+ldloc local0
+M0000000c_IL_00bb:
+callvirt instance neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::ScalarChunk(String,Int32)
+M0000000c_IL_00c0:
+stloc local1
+M0000000c_IL_00c1:
+M0000000c_IL_00c2:
+M0000000c_IL_00c3:
+ldarg 0
+M0000000c_IL_00c4:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::policy
+M0000000c_IL_00c9:
+ldloc local1
+M0000000c_IL_00ca:
+callvirt instance System.Text.Encoding::Encode(String)
+M0000000c_IL_00cf:
+stloc local2
+M0000000c_IL_00d0:
+ldloc local2
+M0000000c_IL_00d1:
+stloc local3
+M0000000c_IL_00d2:
+ldloca local4
+M0000000c_IL_00d4:
+initobj System.Result.Ok<System.Collections.Sequence<Byte>>
+M0000000c_IL_00da:
+ldloca local3
+M0000000c_IL_00dc:
+ldloca local4
+M0000000c_IL_00de:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion5(System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>&,System.Result.Ok<System.Collections.Sequence<Byte>>&)
+M0000000c_IL_00e3:
+brfalse M0000000c_IL_0101
+M0000000c_IL_00e8:
+ldloca local4
+M0000000c_IL_00ea:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion8(System.Result.Ok<System.Collections.Sequence<Byte>>&)
+M0000000c_IL_00ef:
+pop
+M0000000c_IL_00f0:
+M0000000c_IL_00f1:
+br M0000000c_IL_00fc
+M0000000c_IL_00fc:
+br M0000000c_IL_0149
+M0000000c_IL_0101:
+M0000000c_IL_0102:
+ldloc local2
+M0000000c_IL_0103:
+stloc local5
+M0000000c_IL_0105:
+ldloca local6
+M0000000c_IL_0107:
+initobj System.Result.Error<System.Text.EncodingError>
+M0000000c_IL_010d:
+ldloca local5
+M0000000c_IL_010f:
+ldloca local6
+M0000000c_IL_0111:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion9(System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>&,System.Result.Error<System.Text.EncodingError>&)
+M0000000c_IL_0116:
+brfalse M0000000c_IL_0144
+M0000000c_IL_011b:
+ldloca local6
+M0000000c_IL_011d:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion10(System.Result.Error<System.Text.EncodingError>&)
+M0000000c_IL_0122:
+pop
+M0000000c_IL_0123:
+M0000000c_IL_0124:
+br M0000000c_IL_012f
+M0000000c_IL_012f:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorUnrepresentableTextNew()
+M0000000c_IL_0134:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorUnrepresentableText(System.Text.EncodingError.UnrepresentableText)
+M0000000c_IL_0139:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
+M0000000c_IL_013e:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
+M0000000c_IL_0143:
+ret
+M0000000c_IL_0144:
+M0000000c_IL_0145:
+M0000000c_IL_0146:
+M0000000c_IL_0147:
+M0000000c_IL_0148:
+fault "Guest program reached a terminal failure"
+M0000000c_IL_0149:
+M0000000c_IL_014a:
+M0000000c_IL_014b:
+ldloc local0
+M0000000c_IL_014c:
+ldloc local1
+M0000000c_IL_014d:
+call neoCLR.Library.System.Text.Encodings.RuntimeStringGetUtf8ByteCount(String)
+M0000000c_IL_0152:
+add
+M0000000c_IL_0153:
+stloc local0
+M0000000c_IL_0154:
+br M0000000c_IL_00a3
+M0000000c_IL_0159:
+M0000000c_IL_015a:
+M0000000c_IL_015b:
+M0000000c_IL_015c:
+ldarg 0
+M0000000c_IL_015d:
+ldarg 1
+M0000000c_IL_015e:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::text
+M0000000c_IL_0163:
+M0000000c_IL_0164:
+ldarg 0
+M0000000c_IL_0165:
+ldc.i4 0
+M0000000c_IL_0166:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::sourceOffset
+M0000000c_IL_016b:
+ldarg 0
+M0000000c_IL_016c:
+newobj instance System.Collections.ArrayList<Byte>::.ctor()
+M0000000c_IL_0171:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::bytes
+M0000000c_IL_0176:
+M0000000c_IL_0177:
+ldarg 0
+M0000000c_IL_0178:
+ldc.i4 0
+M0000000c_IL_0179:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::byteOffset
+M0000000c_IL_017e:
+M0000000c_IL_017f:
+ldarg 0
+M0000000c_IL_0180:
+ldc.i4 1
+M0000000c_IL_0181:
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::pending
+M0000000c_IL_0186:
+M0000000c_IL_0187:
+ldarg 0
+M0000000c_IL_0188:
+ldarg 2
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0189:
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::ending
+M0000000c_IL_018e:
+M0000000c_IL_018f:
+ldloca local7
+M0000000c_IL_0193:
+ldvoid
+stobj Void
+M0000000c_IL_0199:
+ldloc local7
+M0000000c_IL_019d:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion6(Void)
+M0000000c_IL_01a2:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion7(System.Result.Ok<Void>)
+M0000000c_IL_01a7:
+ret
+.end
+.method instance Drain(arrayref<Byte> output,Int32 offset,Int32 count) -> System.Result<System.Text.EncoderProgress,System.Text.EncodingError>
+.local Int32 local0
+.local String local1
+.local System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError> local2
+.local System.Collections.Sequence<Byte> local3
+.local System.Collections.Sequence<Byte> local4
+.local System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError> local5
+.local System.Result.Ok<System.Collections.Sequence<Byte>> local6
+.local System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError> local7
+.local System.Result.Error<System.Text.EncodingError> local8
+.local System.Collections.ArrayList<Byte> local9
+ldc.i4 0
+stloc local0
+ldloca local2
+initobj System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>
+ldloca local3
+initobj System.Collections.Sequence<Byte>
+ldloca local4
+initobj System.Collections.Sequence<Byte>
+ldloca local5
+initobj System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>
+ldloca local6
+initobj System.Result.Ok<System.Collections.Sequence<Byte>>
+ldloca local7
+initobj System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>
+ldloca local8
+initobj System.Result.Error<System.Text.EncodingError>
+ldloca local9
+initobj System.Collections.ArrayList<Byte>
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
+ldarg 0
+M0000000d_IL_0003:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::finished
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0008:
+brtrue M0000000d_IL_0012
+M0000000d_IL_000d:
+br M0000000d_IL_0027
+M0000000d_IL_0012:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorFinishedNew()
+M0000000d_IL_0017:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorFinished(System.Text.EncodingError.Finished)
+M0000000d_IL_001c:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
+M0000000d_IL_0021:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion11(System.Result.Error<System.Text.EncodingError>)
+M0000000d_IL_0026:
+ret
+M0000000d_IL_0027:
+M0000000d_IL_0028:
+M0000000d_IL_0029:
+ldarg 2
+M0000000d_IL_002a:
+ldc.i4 0
+M0000000d_IL_002b:
+clt
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_002d:
+ldc.i4 0
+M0000000d_IL_002e:
+ceq
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0030:
+ldc.i4 0
+M0000000d_IL_0031:
+ceq
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0033:
+brtrue M0000000d_IL_0047
+M0000000d_IL_0038:
+ldarg 3
+M0000000d_IL_0039:
+ldc.i4 0
+M0000000d_IL_003a:
+clt
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_003c:
+ldc.i4 0
+M0000000d_IL_003d:
+ceq
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_003f:
+ldc.i4 0
+M0000000d_IL_0040:
+ceq
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0042:
+br M0000000d_IL_0048
+M0000000d_IL_0047:
+ldc.i4 1
+M0000000d_IL_0048:
+brtrue M0000000d_IL_005b
+M0000000d_IL_004d:
+ldarg 2
+M0000000d_IL_004e:
+ldarg 1
+M0000000d_IL_004f:
+ldlen
+conv.i4
+M0000000d_IL_0054:
+cgt
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0056:
+br M0000000d_IL_005c
+M0000000d_IL_005b:
+ldc.i4 1
+M0000000d_IL_005c:
+brtrue M0000000d_IL_0071
+M0000000d_IL_0061:
+ldarg 3
+M0000000d_IL_0062:
+ldarg 1
+M0000000d_IL_0063:
+ldlen
+conv.i4
+M0000000d_IL_0068:
+ldarg 2
+M0000000d_IL_0069:
+sub
+M0000000d_IL_006a:
+cgt
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_006c:
+br M0000000d_IL_0072
+M0000000d_IL_0071:
+ldc.i4 1
+M0000000d_IL_0072:
+brtrue M0000000d_IL_007c
+M0000000d_IL_0077:
+br M0000000d_IL_0091
+M0000000d_IL_007c:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorInvalidRangeNew()
+M0000000d_IL_0081:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorInvalidRange(System.Text.EncodingError.InvalidRange)
+M0000000d_IL_0086:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
+M0000000d_IL_008b:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion11(System.Result.Error<System.Text.EncodingError>)
+M0000000d_IL_0090:
+ret
+M0000000d_IL_0091:
+M0000000d_IL_0092:
+M0000000d_IL_0093:
+ldarg 3
+M0000000d_IL_0094:
+ldc.i4 65536
+M0000000d_IL_0099:
+cgt
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_009b:
+brtrue M0000000d_IL_00a5
+M0000000d_IL_00a0:
+br M0000000d_IL_00ba
+M0000000d_IL_00a5:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorLimitExceededNew()
+M0000000d_IL_00aa:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorLimitExceeded(System.Text.EncodingError.LimitExceeded)
+M0000000d_IL_00af:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
+M0000000d_IL_00b4:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion11(System.Result.Error<System.Text.EncodingError>)
+M0000000d_IL_00b9:
+ret
+M0000000d_IL_00ba:
+M0000000d_IL_00bb:
+M0000000d_IL_00bc:
+ldarg 0
+M0000000d_IL_00bd:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::pending
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_00c2:
+ldc.i4 0
+M0000000d_IL_00c3:
+ceq
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_00c5:
+brtrue M0000000d_IL_00cf
+M0000000d_IL_00ca:
+br M0000000d_IL_00eb
+M0000000d_IL_00cf:
+M0000000d_IL_00d0:
+ldc.i4 0
+M0000000d_IL_00d1:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncoderStateReadyNew()
+M0000000d_IL_00d6:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncoderStateNewSystemTextEncoderStateReady(System.Text.EncoderState.Ready)
+M0000000d_IL_00db:
+newobj instance System.Text.EncoderProgress::.ctor(Int32,System.Text.EncoderState)
+M0000000d_IL_00e0:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion12(System.Text.EncoderProgress)
+M0000000d_IL_00e5:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion13(System.Result.Ok<System.Text.EncoderProgress>)
+M0000000d_IL_00ea:
+ret
+M0000000d_IL_00eb:
+M0000000d_IL_00ec:
+M0000000d_IL_00ed:
+ldc.i4 0
+M0000000d_IL_00ee:
+stloc local0
+M0000000d_IL_00ef:
+M0000000d_IL_00f0:
+M0000000d_IL_00f1:
+ldloc local0
+M0000000d_IL_00f2:
+ldarg 3
+M0000000d_IL_00f3:
+clt
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_00f5:
+brtrue M0000000d_IL_00ff
+M0000000d_IL_00fa:
+br M0000000d_IL_023d
+M0000000d_IL_00ff:
+M0000000d_IL_0100:
+ldarg 0
+M0000000d_IL_0101:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::byteOffset
+M0000000d_IL_0106:
+ldarg 0
+M0000000d_IL_0107:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::bytes
+M0000000d_IL_010c:
+callvirt instance System.Collections.Collection<Byte>::get_Count()
+M0000000d_IL_0111:
+ceq
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0113:
+brtrue M0000000d_IL_011d
+M0000000d_IL_0118:
+br M0000000d_IL_020c
+M0000000d_IL_011d:
+M0000000d_IL_011e:
+ldarg 0
+M0000000d_IL_011f:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::sourceOffset
+M0000000d_IL_0124:
+ldarg 0
+M0000000d_IL_0125:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::text
+M0000000d_IL_012a:
+call neoCLR.Library.System.Text.Encodings.RuntimeStringGetUtf8ByteCount(String)
+M0000000d_IL_012f:
+ceq
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0131:
+brtrue M0000000d_IL_013b
+M0000000d_IL_0136:
+br M0000000d_IL_0140
+M0000000d_IL_013b:
+br M0000000d_IL_023d
+M0000000d_IL_0140:
+M0000000d_IL_0141:
+M0000000d_IL_0142:
+ldarg 0
+M0000000d_IL_0143:
+ldarg 0
+M0000000d_IL_0144:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::text
+M0000000d_IL_0149:
+ldarg 0
+M0000000d_IL_014a:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::sourceOffset
+M0000000d_IL_014f:
+callvirt instance neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::ScalarChunk(String,Int32)
+M0000000d_IL_0154:
+stloc local1
+M0000000d_IL_0155:
+M0000000d_IL_0156:
+ldarg 0
+M0000000d_IL_0157:
+M0000000d_IL_0158:
+ldarg 0
+M0000000d_IL_0159:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::policy
+M0000000d_IL_015e:
+ldloc local1
+M0000000d_IL_015f:
+callvirt instance System.Text.Encoding::Encode(String)
+M0000000d_IL_0164:
+stloc local2
+M0000000d_IL_0165:
+M0000000d_IL_0166:
+ldloc local2
+M0000000d_IL_0167:
+stloc local5
+M0000000d_IL_0169:
+ldloca local6
+M0000000d_IL_016b:
+initobj System.Result.Ok<System.Collections.Sequence<Byte>>
+M0000000d_IL_0171:
+ldloca local5
+M0000000d_IL_0173:
+ldloca local6
+M0000000d_IL_0175:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion5(System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>&,System.Result.Ok<System.Collections.Sequence<Byte>>&)
+M0000000d_IL_017a:
+brfalse M0000000d_IL_019d
+M0000000d_IL_017f:
+ldloca local6
+M0000000d_IL_0181:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion8(System.Result.Ok<System.Collections.Sequence<Byte>>&)
+M0000000d_IL_0186:
+stloc local4
+M0000000d_IL_0188:
+M0000000d_IL_0189:
+br M0000000d_IL_0194
+M0000000d_IL_0194:
+M0000000d_IL_0195:
+ldloc local4
+M0000000d_IL_0197:
+stloc local3
+M0000000d_IL_0198:
+br M0000000d_IL_01e9
+M0000000d_IL_019d:
+M0000000d_IL_019e:
+ldloc local2
+M0000000d_IL_019f:
+stloc local7
+M0000000d_IL_01a1:
+ldloca local8
+M0000000d_IL_01a3:
+initobj System.Result.Error<System.Text.EncodingError>
+M0000000d_IL_01a9:
+ldloca local7
+M0000000d_IL_01ab:
+ldloca local8
+M0000000d_IL_01ad:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion9(System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>&,System.Result.Error<System.Text.EncodingError>&)
+M0000000d_IL_01b2:
+brfalse M0000000d_IL_01e4
+M0000000d_IL_01b7:
+ldloca local8
+M0000000d_IL_01b9:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion10(System.Result.Error<System.Text.EncodingError>&)
+M0000000d_IL_01be:
+pop
+M0000000d_IL_01bf:
+M0000000d_IL_01c0:
+br M0000000d_IL_01cb
+M0000000d_IL_01cb:
+ldstr "Validated text encoding failed"
+M0000000d_IL_01d0:
+call System.Fault(String)
+fault "System.Fault returned unexpectedly"
+M0000000d_IL_01e4:
+M0000000d_IL_01e5:
+M0000000d_IL_01e6:
+M0000000d_IL_01e7:
+M0000000d_IL_01e8:
+fault "Guest program reached a terminal failure"
+M0000000d_IL_01e9:
+M0000000d_IL_01ea:
+ldloc local3
+M0000000d_IL_01eb:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::bytes
+M0000000d_IL_01f0:
+M0000000d_IL_01f1:
+ldarg 0
+M0000000d_IL_01f2:
+ldarg 0
+M0000000d_IL_01f3:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::sourceOffset
+M0000000d_IL_01f8:
+ldloc local1
+M0000000d_IL_01f9:
+call neoCLR.Library.System.Text.Encodings.RuntimeStringGetUtf8ByteCount(String)
+M0000000d_IL_01fe:
+add
+M0000000d_IL_01ff:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::sourceOffset
+M0000000d_IL_0204:
+M0000000d_IL_0205:
+ldarg 0
+M0000000d_IL_0206:
+ldc.i4 0
+M0000000d_IL_0207:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::byteOffset
+M0000000d_IL_020c:
+M0000000d_IL_020d:
+M0000000d_IL_020e:
+ldarg 1
+M0000000d_IL_020f:
+ldarg 2
+M0000000d_IL_0210:
+ldloc local0
+M0000000d_IL_0211:
+add
+M0000000d_IL_0212:
+ldarg 0
+M0000000d_IL_0213:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::bytes
+M0000000d_IL_0218:
+ldarg 0
+M0000000d_IL_0219:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::byteOffset
+M0000000d_IL_021e:
+callvirt instance System.Collections.Sequence<Byte>::get_Item(Int32)
+M0000000d_IL_0223:
+stelem Byte
+M0000000d_IL_0224:
+M0000000d_IL_0225:
+ldarg 0
+M0000000d_IL_0226:
+ldarg 0
+M0000000d_IL_0227:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::byteOffset
+M0000000d_IL_022c:
+ldc.i4 1
+M0000000d_IL_022d:
+add
+M0000000d_IL_022e:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::byteOffset
+M0000000d_IL_0233:
+M0000000d_IL_0234:
+ldloc local0
+M0000000d_IL_0235:
+ldc.i4 1
+M0000000d_IL_0236:
+add
+M0000000d_IL_0237:
+stloc local0
+M0000000d_IL_0238:
+br M0000000d_IL_00f0
+M0000000d_IL_023d:
+M0000000d_IL_023e:
+M0000000d_IL_023f:
+ldarg 0
+M0000000d_IL_0240:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::sourceOffset
+M0000000d_IL_0245:
+ldarg 0
+M0000000d_IL_0246:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::text
+M0000000d_IL_024b:
+call neoCLR.Library.System.Text.Encodings.RuntimeStringGetUtf8ByteCount(String)
+M0000000d_IL_0250:
+ceq
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0252:
+brfalse M0000000d_IL_026f
+M0000000d_IL_0257:
+ldarg 0
+M0000000d_IL_0258:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::byteOffset
+M0000000d_IL_025d:
+ldarg 0
+M0000000d_IL_025e:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::bytes
+M0000000d_IL_0263:
+callvirt instance System.Collections.Collection<Byte>::get_Count()
+M0000000d_IL_0268:
+ceq
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_026a:
+br M0000000d_IL_0270
+M0000000d_IL_026f:
+ldc.i4 0
+M0000000d_IL_0270:
+brtrue M0000000d_IL_027a
+M0000000d_IL_0275:
+br M0000000d_IL_02eb
+M0000000d_IL_027a:
+M0000000d_IL_027b:
+ldarg 0
+M0000000d_IL_027c:
+ldstr ""
+M0000000d_IL_0281:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::text
+M0000000d_IL_0286:
+ldarg 0
+M0000000d_IL_0287:
+newobj instance System.Collections.ArrayList<Byte>::.ctor()
+M0000000d_IL_028c:
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::bytes
+M0000000d_IL_0291:
+M0000000d_IL_0292:
+ldarg 0
+M0000000d_IL_0293:
+ldc.i4 0
+M0000000d_IL_0294:
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::pending
+M0000000d_IL_0299:
+M0000000d_IL_029a:
+ldarg 0
+M0000000d_IL_029b:
+ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::ending
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_02a0:
+brtrue M0000000d_IL_02aa
+M0000000d_IL_02a5:
+br M0000000d_IL_02ce
+M0000000d_IL_02aa:
+M0000000d_IL_02ab:
+ldarg 0
+M0000000d_IL_02ac:
+ldc.i4 1
+M0000000d_IL_02ad:
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E54657874456E636F646572::finished
+M0000000d_IL_02b2:
+M0000000d_IL_02b3:
+ldloc local0
+M0000000d_IL_02b4:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncoderStateFinishedNew()
+M0000000d_IL_02b9:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncoderStateNewSystemTextEncoderStateFinished(System.Text.EncoderState.Finished)
+M0000000d_IL_02be:
+newobj instance System.Text.EncoderProgress::.ctor(Int32,System.Text.EncoderState)
+M0000000d_IL_02c3:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion12(System.Text.EncoderProgress)
+M0000000d_IL_02c8:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion13(System.Result.Ok<System.Text.EncoderProgress>)
+M0000000d_IL_02cd:
+ret
+M0000000d_IL_02ce:
+M0000000d_IL_02cf:
+M0000000d_IL_02d0:
+ldloc local0
+M0000000d_IL_02d1:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncoderStateReadyNew()
+M0000000d_IL_02d6:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncoderStateNewSystemTextEncoderStateReady(System.Text.EncoderState.Ready)
+M0000000d_IL_02db:
+newobj instance System.Text.EncoderProgress::.ctor(Int32,System.Text.EncoderState)
+M0000000d_IL_02e0:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion12(System.Text.EncoderProgress)
+M0000000d_IL_02e5:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion13(System.Result.Ok<System.Text.EncoderProgress>)
+M0000000d_IL_02ea:
+ret
+M0000000d_IL_02eb:
+M0000000d_IL_02ec:
+M0000000d_IL_02ed:
+ldloc local0
+M0000000d_IL_02ee:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncoderStateNeedsOutputNew()
+M0000000d_IL_02f3:
+call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncoderStateNewSystemTextEncoderStateNeedsOutput(System.Text.EncoderState.NeedsOutput)
+M0000000d_IL_02f8:
+newobj instance System.Text.EncoderProgress::.ctor(Int32,System.Text.EncoderState)
+M0000000d_IL_02fd:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion12(System.Text.EncoderProgress)
+M0000000d_IL_0302:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion13(System.Result.Ok<System.Text.EncoderProgress>)
+M0000000d_IL_0307:
+ret
+.end
+.method instance ScalarChunk(String text,Int32 start) -> String
+.local Int32 local0
+.local System.Result<String,System.Text.Utf8SliceError> local1
+.local String local2
+.local System.Result<String,System.Text.Utf8SliceError> local3
+.local System.Result.Ok<String> local4
+.local System.Result<String,System.Text.Utf8SliceError> local5
+.local System.Result.Error<System.Text.Utf8SliceError> local6
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Result<String,System.Text.Utf8SliceError>
+ldloca local3
+initobj System.Result<String,System.Text.Utf8SliceError>
+ldloca local4
+initobj System.Result.Ok<String>
+ldloca local5
+initobj System.Result<String,System.Text.Utf8SliceError>
+ldloca local6
+initobj System.Result.Error<System.Text.Utf8SliceError>
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+M0000000e_IL_0002:
+ldarg 1
+M0000000e_IL_0003:
+call neoCLR.Library.System.Text.Encodings.RuntimeStringGetUtf8ByteCount(String)
+M0000000e_IL_0008:
+ldarg 2
+M0000000e_IL_0009:
+sub
+M0000000e_IL_000a:
+stloc local0
+M0000000e_IL_000b:
+M0000000e_IL_000c:
+ldloc local0
+M0000000e_IL_000d:
+ldc.i4 256
+M0000000e_IL_0012:
+cgt
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0014:
+brtrue M0000000e_IL_001e
+M0000000e_IL_0019:
+br M0000000e_IL_0025
+M0000000e_IL_001e:
+M0000000e_IL_001f:
+ldc.i4 256
+M0000000e_IL_0024:
+stloc local0
+M0000000e_IL_0025:
+M0000000e_IL_0026:
+M0000000e_IL_0027:
+M0000000e_IL_0028:
+ldloc local0
+M0000000e_IL_0029:
+ldc.i4 0
+M0000000e_IL_002a:
+cgt
+call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_002c:
+brtrue M0000000e_IL_0036
+M0000000e_IL_0031:
+br M0000000e_IL_00b3
+M0000000e_IL_0036:
+M0000000e_IL_0037:
+M0000000e_IL_0038:
+ldarg 1
+M0000000e_IL_0039:
+ldarg 2
+M0000000e_IL_003a:
+ldloc local0
+M0000000e_IL_003b:
+call neoCLR.Library.System.Text.Encodings.RuntimeStringSliceUtf8(String,Int32,Int32)
+M0000000e_IL_0040:
+stloc local1
+M0000000e_IL_0041:
+ldloc local1
+M0000000e_IL_0042:
+stloc local3
+M0000000e_IL_0043:
+ldloca local4
+M0000000e_IL_0045:
+initobj System.Result.Ok<String>
+M0000000e_IL_004b:
+ldloca local3
+M0000000e_IL_004d:
+ldloca local4
+M0000000e_IL_004f:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion14(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Ok<String>&)
+M0000000e_IL_0054:
+brfalse M0000000e_IL_0070
+M0000000e_IL_0059:
+ldloca local4
+M0000000e_IL_005b:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion15(System.Result.Ok<String>&)
+M0000000e_IL_0060:
+stloc local2
+M0000000e_IL_0061:
+M0000000e_IL_0062:
+br M0000000e_IL_006d
+M0000000e_IL_006d:
+M0000000e_IL_006e:
+ldloc local2
+M0000000e_IL_006f:
+ret
+M0000000e_IL_0070:
+M0000000e_IL_0071:
+ldloc local1
+M0000000e_IL_0072:
+stloc local5
+M0000000e_IL_0074:
+ldloca local6
+M0000000e_IL_0076:
+initobj System.Result.Error<System.Text.Utf8SliceError>
+M0000000e_IL_007c:
+ldloca local5
+M0000000e_IL_007e:
+ldloca local6
+M0000000e_IL_0080:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion16(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Error<System.Text.Utf8SliceError>&)
+M0000000e_IL_0085:
+brfalse M0000000e_IL_00a8
+M0000000e_IL_008a:
+ldloca local6
+M0000000e_IL_008c:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion17(System.Result.Error<System.Text.Utf8SliceError>&)
+M0000000e_IL_0091:
+pop
+M0000000e_IL_0092:
+M0000000e_IL_0093:
+br M0000000e_IL_009e
+M0000000e_IL_009e:
+M0000000e_IL_009f:
+ldloc local0
+M0000000e_IL_00a0:
+ldc.i4 1
+M0000000e_IL_00a1:
+sub
+M0000000e_IL_00a2:
+stloc local0
+M0000000e_IL_00a3:
+br M0000000e_IL_00ad
+M0000000e_IL_00a8:
+M0000000e_IL_00a9:
+M0000000e_IL_00aa:
+M0000000e_IL_00ab:
+M0000000e_IL_00ac:
+fault "Guest program reached a terminal failure"
+M0000000e_IL_00ad:
+M0000000e_IL_00ae:
+br M0000000e_IL_0027
+M0000000e_IL_00b3:
+M0000000e_IL_00b4:
+M0000000e_IL_00b5:
+ldstr "Invalid internal scalar boundary"
+M0000000e_IL_00ba:
+call System.Fault(String)
+fault "System.Fault returned unexpectedly"
 .end
 .end
 .type internal class neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572
@@ -328,83 +1589,83 @@ ret
 .field private width Int32
 .field private stopped Boolean
 .method instance .ctor() -> noresult
-M00000009_IL_0000:
-M00000009_IL_0001:
+M0000000f_IL_0000:
+M0000000f_IL_0001:
 ldarg 0
-M00000009_IL_0002:
+M0000000f_IL_0002:
 pop
-M00000009_IL_0007:
-M00000009_IL_0008:
+M0000000f_IL_0007:
+M0000000f_IL_0008:
 ldarg 0
-M00000009_IL_0009:
+M0000000f_IL_0009:
 ldc.i4 4
-M00000009_IL_000a:
+M0000000f_IL_000a:
 newarr Byte
-M00000009_IL_000f:
+M0000000f_IL_000f:
 dup
-M00000009_IL_0010:
+M0000000f_IL_0010:
 ldc.i4 0
-M00000009_IL_0011:
+M0000000f_IL_0011:
 ldc.i4 0
-M00000009_IL_0012:
+M0000000f_IL_0012:
 conv.u1
-M00000009_IL_0013:
+M0000000f_IL_0013:
 stelem Byte
-M00000009_IL_0014:
+M0000000f_IL_0014:
 dup
-M00000009_IL_0015:
+M0000000f_IL_0015:
 ldc.i4 1
-M00000009_IL_0016:
+M0000000f_IL_0016:
 ldc.i4 0
-M00000009_IL_0017:
+M0000000f_IL_0017:
 conv.u1
-M00000009_IL_0018:
+M0000000f_IL_0018:
 stelem Byte
-M00000009_IL_0019:
+M0000000f_IL_0019:
 dup
-M00000009_IL_001a:
+M0000000f_IL_001a:
 ldc.i4 2
-M00000009_IL_001b:
+M0000000f_IL_001b:
 ldc.i4 0
-M00000009_IL_001c:
+M0000000f_IL_001c:
 conv.u1
-M00000009_IL_001d:
+M0000000f_IL_001d:
 stelem Byte
-M00000009_IL_001e:
+M0000000f_IL_001e:
 dup
-M00000009_IL_001f:
+M0000000f_IL_001f:
 ldc.i4 3
-M00000009_IL_0020:
+M0000000f_IL_0020:
 ldc.i4 0
-M00000009_IL_0021:
+M0000000f_IL_0021:
 conv.u1
-M00000009_IL_0022:
+M0000000f_IL_0022:
 stelem Byte
-M00000009_IL_0023:
+M0000000f_IL_0023:
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::carry
-M00000009_IL_0028:
-M00000009_IL_0029:
+M0000000f_IL_0028:
+M0000000f_IL_0029:
 ldarg 0
-M00000009_IL_002a:
+M0000000f_IL_002a:
 ldc.i4 0
-M00000009_IL_002b:
+M0000000f_IL_002b:
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::pending
-M00000009_IL_0030:
-M00000009_IL_0031:
+M0000000f_IL_0030:
+M0000000f_IL_0031:
 ldarg 0
-M00000009_IL_0032:
+M0000000f_IL_0032:
 ldc.i4 0
-M00000009_IL_0033:
+M0000000f_IL_0033:
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::width
-M00000009_IL_0038:
-M00000009_IL_0039:
+M0000000f_IL_0038:
+M0000000f_IL_0039:
 ldarg 0
-M00000009_IL_003a:
+M0000000f_IL_003a:
 ldc.i4 0
-M00000009_IL_003b:
+M0000000f_IL_003b:
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::stopped
-M00000009_IL_0040:
+M0000000f_IL_0040:
 ret
 .end
 .method instance Decode(arrayref<Byte> source,Int32 offset,Int32 count,Boolean final) -> System.Result<String,System.Text.EncodingError>
@@ -454,755 +1715,755 @@ ldloca local14
 initobj System.Result.Error<System.Text.InvalidUtf8Error>
 ldloca local15
 initobj System.Result<String,System.Text.EncodingError>
-M0000000a_IL_0000:
-M0000000a_IL_0001:
-M0000000a_IL_0002:
+M00000010_IL_0000:
+M00000010_IL_0001:
+M00000010_IL_0002:
 ldarg 0
-M0000000a_IL_0003:
+M00000010_IL_0003:
 ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::stopped
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_0008:
-brtrue M0000000a_IL_0012
-M0000000a_IL_000d:
-br M0000000a_IL_0027
-M0000000a_IL_0012:
+M00000010_IL_0008:
+brtrue M00000010_IL_0012
+M00000010_IL_000d:
+br M00000010_IL_0027
+M00000010_IL_0012:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorFinishedNew()
-M0000000a_IL_0017:
+M00000010_IL_0017:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorFinished(System.Text.EncodingError.Finished)
-M0000000a_IL_001c:
+M00000010_IL_001c:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
-M0000000a_IL_0021:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
-M0000000a_IL_0026:
+M00000010_IL_0021:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+M00000010_IL_0026:
 ret
-M0000000a_IL_0027:
-M0000000a_IL_0028:
-M0000000a_IL_0029:
+M00000010_IL_0027:
+M00000010_IL_0028:
+M00000010_IL_0029:
 ldarg 2
-M0000000a_IL_002a:
+M00000010_IL_002a:
 ldc.i4 0
-M0000000a_IL_002b:
+M00000010_IL_002b:
 clt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_002d:
+M00000010_IL_002d:
 ldc.i4 0
-M0000000a_IL_002e:
+M00000010_IL_002e:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_0030:
+M00000010_IL_0030:
 ldc.i4 0
-M0000000a_IL_0031:
+M00000010_IL_0031:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_0033:
-brtrue M0000000a_IL_0047
-M0000000a_IL_0038:
+M00000010_IL_0033:
+brtrue M00000010_IL_0047
+M00000010_IL_0038:
 ldarg 3
-M0000000a_IL_0039:
+M00000010_IL_0039:
 ldc.i4 0
-M0000000a_IL_003a:
+M00000010_IL_003a:
 clt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_003c:
+M00000010_IL_003c:
 ldc.i4 0
-M0000000a_IL_003d:
+M00000010_IL_003d:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_003f:
+M00000010_IL_003f:
 ldc.i4 0
-M0000000a_IL_0040:
+M00000010_IL_0040:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_0042:
-br M0000000a_IL_0048
-M0000000a_IL_0047:
+M00000010_IL_0042:
+br M00000010_IL_0048
+M00000010_IL_0047:
 ldc.i4 1
-M0000000a_IL_0048:
-brtrue M0000000a_IL_005b
-M0000000a_IL_004d:
+M00000010_IL_0048:
+brtrue M00000010_IL_005b
+M00000010_IL_004d:
 ldarg 2
-M0000000a_IL_004e:
+M00000010_IL_004e:
 ldarg 1
-M0000000a_IL_004f:
+M00000010_IL_004f:
 ldlen
 conv.i4
-M0000000a_IL_0054:
+M00000010_IL_0054:
 cgt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_0056:
-br M0000000a_IL_005c
-M0000000a_IL_005b:
+M00000010_IL_0056:
+br M00000010_IL_005c
+M00000010_IL_005b:
 ldc.i4 1
-M0000000a_IL_005c:
-brtrue M0000000a_IL_0071
-M0000000a_IL_0061:
+M00000010_IL_005c:
+brtrue M00000010_IL_0071
+M00000010_IL_0061:
 ldarg 3
-M0000000a_IL_0062:
+M00000010_IL_0062:
 ldarg 1
-M0000000a_IL_0063:
+M00000010_IL_0063:
 ldlen
 conv.i4
-M0000000a_IL_0068:
+M00000010_IL_0068:
 ldarg 2
-M0000000a_IL_0069:
+M00000010_IL_0069:
 sub
-M0000000a_IL_006a:
+M00000010_IL_006a:
 cgt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_006c:
-br M0000000a_IL_0072
-M0000000a_IL_0071:
+M00000010_IL_006c:
+br M00000010_IL_0072
+M00000010_IL_0071:
 ldc.i4 1
-M0000000a_IL_0072:
-brtrue M0000000a_IL_007c
-M0000000a_IL_0077:
-br M0000000a_IL_0091
-M0000000a_IL_007c:
+M00000010_IL_0072:
+brtrue M00000010_IL_007c
+M00000010_IL_0077:
+br M00000010_IL_0091
+M00000010_IL_007c:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorInvalidRangeNew()
-M0000000a_IL_0081:
+M00000010_IL_0081:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorInvalidRange(System.Text.EncodingError.InvalidRange)
-M0000000a_IL_0086:
+M00000010_IL_0086:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
-M0000000a_IL_008b:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
-M0000000a_IL_0090:
+M00000010_IL_008b:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+M00000010_IL_0090:
 ret
-M0000000a_IL_0091:
-M0000000a_IL_0092:
-M0000000a_IL_0093:
+M00000010_IL_0091:
+M00000010_IL_0092:
+M00000010_IL_0093:
 ldarg 3
-M0000000a_IL_0094:
+M00000010_IL_0094:
 ldc.i4 65536
-M0000000a_IL_0099:
+M00000010_IL_0099:
 cgt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_009b:
-brtrue M0000000a_IL_00a5
-M0000000a_IL_00a0:
-br M0000000a_IL_00ba
-M0000000a_IL_00a5:
+M00000010_IL_009b:
+brtrue M00000010_IL_00a5
+M00000010_IL_00a0:
+br M00000010_IL_00ba
+M00000010_IL_00a5:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorLimitExceededNew()
-M0000000a_IL_00aa:
+M00000010_IL_00aa:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorLimitExceeded(System.Text.EncodingError.LimitExceeded)
-M0000000a_IL_00af:
+M00000010_IL_00af:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
-M0000000a_IL_00b4:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
-M0000000a_IL_00b9:
+M00000010_IL_00b4:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+M00000010_IL_00b9:
 ret
-M0000000a_IL_00ba:
-M0000000a_IL_00bb:
-M0000000a_IL_00bc:
+M00000010_IL_00ba:
+M00000010_IL_00bb:
+M00000010_IL_00bc:
 ldarg 3
-M0000000a_IL_00bd:
+M00000010_IL_00bd:
 ldc.i4 3
-M0000000a_IL_00be:
+M00000010_IL_00be:
 add
-M0000000a_IL_00bf:
+M00000010_IL_00bf:
 newobj instance System.Collections.ArrayList<Byte>::.ctor(Int32)
-M0000000a_IL_00c4:
+M00000010_IL_00c4:
 stloc local0
-M0000000a_IL_00c5:
-M0000000a_IL_00c6:
+M00000010_IL_00c5:
+M00000010_IL_00c6:
 ldc.i4 0
-M0000000a_IL_00c7:
+M00000010_IL_00c7:
 stloc local1
-M0000000a_IL_00c8:
-M0000000a_IL_00c9:
-M0000000a_IL_00ca:
+M00000010_IL_00c8:
+M00000010_IL_00c9:
+M00000010_IL_00ca:
 ldloc local1
-M0000000a_IL_00cb:
+M00000010_IL_00cb:
 ldarg 3
-M0000000a_IL_00cc:
+M00000010_IL_00cc:
 clt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_00ce:
-brtrue M0000000a_IL_00d8
-M0000000a_IL_00d3:
-br M0000000a_IL_02ef
-M0000000a_IL_00d8:
-M0000000a_IL_00d9:
+M00000010_IL_00ce:
+brtrue M00000010_IL_00d8
+M00000010_IL_00d3:
+br M00000010_IL_02ef
+M00000010_IL_00d8:
+M00000010_IL_00d9:
 ldarg 1
-M0000000a_IL_00da:
+M00000010_IL_00da:
 ldarg 2
-M0000000a_IL_00db:
+M00000010_IL_00db:
 ldloc local1
-M0000000a_IL_00dc:
+M00000010_IL_00dc:
 add
-M0000000a_IL_00dd:
+M00000010_IL_00dd:
 ldelem Byte
-M0000000a_IL_00de:
+M00000010_IL_00de:
 stloc local2
-M0000000a_IL_00df:
-M0000000a_IL_00e0:
+M00000010_IL_00df:
+M00000010_IL_00e0:
 ldarg 0
-M0000000a_IL_00e1:
+M00000010_IL_00e1:
 ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::pending
-M0000000a_IL_00e6:
+M00000010_IL_00e6:
 ldc.i4 0
-M0000000a_IL_00e7:
+M00000010_IL_00e7:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_00e9:
-brtrue M0000000a_IL_00f3
-M0000000a_IL_00ee:
-br M0000000a_IL_01f0
-M0000000a_IL_00f3:
-M0000000a_IL_00f4:
+M00000010_IL_00e9:
+brtrue M00000010_IL_00f3
+M00000010_IL_00ee:
+br M00000010_IL_01f0
+M00000010_IL_00f3:
+M00000010_IL_00f4:
 ldloc local2
-M0000000a_IL_00f5:
+M00000010_IL_00f5:
 conv.i4
-M0000000a_IL_00f6:
+M00000010_IL_00f6:
 ldc.i4 127
-M0000000a_IL_00f8:
+M00000010_IL_00f8:
 cgt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_00fa:
+M00000010_IL_00fa:
 ldc.i4 0
-M0000000a_IL_00fb:
+M00000010_IL_00fb:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_00fd:
-brtrue M0000000a_IL_0107
-M0000000a_IL_0102:
-br M0000000a_IL_0115
-M0000000a_IL_0107:
-M0000000a_IL_0108:
+M00000010_IL_00fd:
+brtrue M00000010_IL_0107
+M00000010_IL_0102:
+br M00000010_IL_0115
+M00000010_IL_0107:
+M00000010_IL_0108:
 ldarg 0
-M0000000a_IL_0109:
+M00000010_IL_0109:
 ldc.i4 1
-M0000000a_IL_010a:
+M00000010_IL_010a:
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::width
-M0000000a_IL_010f:
-br M0000000a_IL_01e9
-M0000000a_IL_0115:
-M0000000a_IL_0116:
+M00000010_IL_010f:
+br M00000010_IL_01e9
+M00000010_IL_0115:
+M00000010_IL_0116:
 ldloc local2
-M0000000a_IL_0117:
+M00000010_IL_0117:
 conv.i4
-M0000000a_IL_0118:
+M00000010_IL_0118:
 ldc.i4 194
-M0000000a_IL_011d:
+M00000010_IL_011d:
 clt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_011f:
+M00000010_IL_011f:
 ldc.i4 0
-M0000000a_IL_0120:
+M00000010_IL_0120:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_0122:
-brfalse M0000000a_IL_0138
-M0000000a_IL_0127:
+M00000010_IL_0122:
+brfalse M00000010_IL_0138
+M00000010_IL_0127:
 ldloc local2
-M0000000a_IL_0128:
+M00000010_IL_0128:
 conv.i4
-M0000000a_IL_0129:
+M00000010_IL_0129:
 ldc.i4 223
-M0000000a_IL_012e:
+M00000010_IL_012e:
 cgt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_0130:
+M00000010_IL_0130:
 ldc.i4 0
-M0000000a_IL_0131:
+M00000010_IL_0131:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_0133:
-br M0000000a_IL_0139
-M0000000a_IL_0138:
+M00000010_IL_0133:
+br M00000010_IL_0139
+M00000010_IL_0138:
 ldc.i4 0
-M0000000a_IL_0139:
-brtrue M0000000a_IL_0143
-M0000000a_IL_013e:
-br M0000000a_IL_0151
-M0000000a_IL_0143:
-M0000000a_IL_0144:
+M00000010_IL_0139:
+brtrue M00000010_IL_0143
+M00000010_IL_013e:
+br M00000010_IL_0151
+M00000010_IL_0143:
+M00000010_IL_0144:
 ldarg 0
-M0000000a_IL_0145:
+M00000010_IL_0145:
 ldc.i4 2
-M0000000a_IL_0146:
+M00000010_IL_0146:
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::width
-M0000000a_IL_014b:
-br M0000000a_IL_01e8
-M0000000a_IL_0151:
-M0000000a_IL_0152:
+M00000010_IL_014b:
+br M00000010_IL_01e8
+M00000010_IL_0151:
+M00000010_IL_0152:
 ldloc local2
-M0000000a_IL_0153:
+M00000010_IL_0153:
 conv.i4
-M0000000a_IL_0154:
+M00000010_IL_0154:
 ldc.i4 224
-M0000000a_IL_0159:
+M00000010_IL_0159:
 clt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_015b:
+M00000010_IL_015b:
 ldc.i4 0
-M0000000a_IL_015c:
+M00000010_IL_015c:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_015e:
-brfalse M0000000a_IL_0174
-M0000000a_IL_0163:
+M00000010_IL_015e:
+brfalse M00000010_IL_0174
+M00000010_IL_0163:
 ldloc local2
-M0000000a_IL_0164:
+M00000010_IL_0164:
 conv.i4
-M0000000a_IL_0165:
+M00000010_IL_0165:
 ldc.i4 239
-M0000000a_IL_016a:
+M00000010_IL_016a:
 cgt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_016c:
+M00000010_IL_016c:
 ldc.i4 0
-M0000000a_IL_016d:
+M00000010_IL_016d:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_016f:
-br M0000000a_IL_0175
-M0000000a_IL_0174:
+M00000010_IL_016f:
+br M00000010_IL_0175
+M00000010_IL_0174:
 ldc.i4 0
-M0000000a_IL_0175:
-brtrue M0000000a_IL_017f
-M0000000a_IL_017a:
-br M0000000a_IL_018d
-M0000000a_IL_017f:
-M0000000a_IL_0180:
+M00000010_IL_0175:
+brtrue M00000010_IL_017f
+M00000010_IL_017a:
+br M00000010_IL_018d
+M00000010_IL_017f:
+M00000010_IL_0180:
 ldarg 0
-M0000000a_IL_0181:
+M00000010_IL_0181:
 ldc.i4 3
-M0000000a_IL_0182:
+M00000010_IL_0182:
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::width
-M0000000a_IL_0187:
-br M0000000a_IL_01e7
-M0000000a_IL_018d:
-M0000000a_IL_018e:
+M00000010_IL_0187:
+br M00000010_IL_01e7
+M00000010_IL_018d:
+M00000010_IL_018e:
 ldloc local2
-M0000000a_IL_018f:
+M00000010_IL_018f:
 conv.i4
-M0000000a_IL_0190:
+M00000010_IL_0190:
 ldc.i4 240
-M0000000a_IL_0195:
+M00000010_IL_0195:
 clt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_0197:
+M00000010_IL_0197:
 ldc.i4 0
-M0000000a_IL_0198:
+M00000010_IL_0198:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_019a:
-brfalse M0000000a_IL_01b0
-M0000000a_IL_019f:
+M00000010_IL_019a:
+brfalse M00000010_IL_01b0
+M00000010_IL_019f:
 ldloc local2
-M0000000a_IL_01a0:
+M00000010_IL_01a0:
 conv.i4
-M0000000a_IL_01a1:
+M00000010_IL_01a1:
 ldc.i4 244
-M0000000a_IL_01a6:
+M00000010_IL_01a6:
 cgt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_01a8:
+M00000010_IL_01a8:
 ldc.i4 0
-M0000000a_IL_01a9:
+M00000010_IL_01a9:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_01ab:
-br M0000000a_IL_01b1
-M0000000a_IL_01b0:
+M00000010_IL_01ab:
+br M00000010_IL_01b1
+M00000010_IL_01b0:
 ldc.i4 0
-M0000000a_IL_01b1:
-brtrue M0000000a_IL_01bb
-M0000000a_IL_01b6:
-br M0000000a_IL_01c9
-M0000000a_IL_01bb:
-M0000000a_IL_01bc:
+M00000010_IL_01b1:
+brtrue M00000010_IL_01bb
+M00000010_IL_01b6:
+br M00000010_IL_01c9
+M00000010_IL_01bb:
+M00000010_IL_01bc:
 ldarg 0
-M0000000a_IL_01bd:
+M00000010_IL_01bd:
 ldc.i4 4
-M0000000a_IL_01be:
+M00000010_IL_01be:
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::width
-M0000000a_IL_01c3:
-br M0000000a_IL_01e6
-M0000000a_IL_01c9:
-M0000000a_IL_01ca:
+M00000010_IL_01c3:
+br M00000010_IL_01e6
+M00000010_IL_01c9:
+M00000010_IL_01ca:
 ldarg 0
-M0000000a_IL_01cb:
+M00000010_IL_01cb:
 ldc.i4 1
-M0000000a_IL_01cc:
+M00000010_IL_01cc:
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::stopped
-M0000000a_IL_01d1:
+M00000010_IL_01d1:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorInvalidUtf8New()
-M0000000a_IL_01d6:
+M00000010_IL_01d6:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorInvalidUtf8(System.Text.EncodingError.InvalidUtf8)
-M0000000a_IL_01db:
+M00000010_IL_01db:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
-M0000000a_IL_01e0:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
-M0000000a_IL_01e5:
+M00000010_IL_01e0:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+M00000010_IL_01e5:
 ret
-M0000000a_IL_01e6:
-M0000000a_IL_01e7:
-M0000000a_IL_01e8:
-M0000000a_IL_01e9:
-M0000000a_IL_01ea:
-br M0000000a_IL_023f
-M0000000a_IL_01f0:
-M0000000a_IL_01f1:
+M00000010_IL_01e6:
+M00000010_IL_01e7:
+M00000010_IL_01e8:
+M00000010_IL_01e9:
+M00000010_IL_01ea:
+br M00000010_IL_023f
+M00000010_IL_01f0:
+M00000010_IL_01f1:
 ldloc local2
-M0000000a_IL_01f2:
+M00000010_IL_01f2:
 conv.i4
-M0000000a_IL_01f3:
+M00000010_IL_01f3:
 ldc.i4 128
-M0000000a_IL_01f8:
+M00000010_IL_01f8:
 clt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_01fa:
+M00000010_IL_01fa:
 ldc.i4 0
-M0000000a_IL_01fb:
+M00000010_IL_01fb:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_01fd:
-brfalse M0000000a_IL_0213
-M0000000a_IL_0202:
+M00000010_IL_01fd:
+brfalse M00000010_IL_0213
+M00000010_IL_0202:
 ldloc local2
-M0000000a_IL_0203:
+M00000010_IL_0203:
 conv.i4
-M0000000a_IL_0204:
+M00000010_IL_0204:
 ldc.i4 191
-M0000000a_IL_0209:
+M00000010_IL_0209:
 cgt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_020b:
+M00000010_IL_020b:
 ldc.i4 0
-M0000000a_IL_020c:
+M00000010_IL_020c:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_020e:
-br M0000000a_IL_0214
-M0000000a_IL_0213:
+M00000010_IL_020e:
+br M00000010_IL_0214
+M00000010_IL_0213:
 ldc.i4 0
-M0000000a_IL_0214:
+M00000010_IL_0214:
 ldc.i4 0
-M0000000a_IL_0215:
+M00000010_IL_0215:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_0217:
-brtrue M0000000a_IL_0221
-M0000000a_IL_021c:
-br M0000000a_IL_023e
-M0000000a_IL_0221:
-M0000000a_IL_0222:
+M00000010_IL_0217:
+brtrue M00000010_IL_0221
+M00000010_IL_021c:
+br M00000010_IL_023e
+M00000010_IL_0221:
+M00000010_IL_0222:
 ldarg 0
-M0000000a_IL_0223:
+M00000010_IL_0223:
 ldc.i4 1
-M0000000a_IL_0224:
+M00000010_IL_0224:
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::stopped
-M0000000a_IL_0229:
+M00000010_IL_0229:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorInvalidUtf8New()
-M0000000a_IL_022e:
+M00000010_IL_022e:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorInvalidUtf8(System.Text.EncodingError.InvalidUtf8)
-M0000000a_IL_0233:
+M00000010_IL_0233:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
-M0000000a_IL_0238:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
-M0000000a_IL_023d:
+M00000010_IL_0238:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+M00000010_IL_023d:
 ret
-M0000000a_IL_023e:
-M0000000a_IL_023f:
-M0000000a_IL_0240:
-M0000000a_IL_0241:
+M00000010_IL_023e:
+M00000010_IL_023f:
+M00000010_IL_0240:
+M00000010_IL_0241:
 ldarg 0
-M0000000a_IL_0242:
+M00000010_IL_0242:
 ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::carry
-M0000000a_IL_0247:
+M00000010_IL_0247:
 ldarg 0
-M0000000a_IL_0248:
+M00000010_IL_0248:
 ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::pending
-M0000000a_IL_024d:
+M00000010_IL_024d:
 ldloc local2
-M0000000a_IL_024e:
+M00000010_IL_024e:
 stelem Byte
-M0000000a_IL_024f:
-M0000000a_IL_0250:
+M00000010_IL_024f:
+M00000010_IL_0250:
 ldarg 0
-M0000000a_IL_0251:
+M00000010_IL_0251:
 ldarg 0
-M0000000a_IL_0252:
+M00000010_IL_0252:
 ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::pending
-M0000000a_IL_0257:
+M00000010_IL_0257:
 ldc.i4 1
-M0000000a_IL_0258:
+M00000010_IL_0258:
 add
-M0000000a_IL_0259:
+M00000010_IL_0259:
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::pending
-M0000000a_IL_025e:
-M0000000a_IL_025f:
+M00000010_IL_025e:
+M00000010_IL_025f:
 ldloc local1
-M0000000a_IL_0260:
+M00000010_IL_0260:
 ldc.i4 1
-M0000000a_IL_0261:
+M00000010_IL_0261:
 add
-M0000000a_IL_0262:
+M00000010_IL_0262:
 stloc local1
-M0000000a_IL_0263:
-M0000000a_IL_0264:
+M00000010_IL_0263:
+M00000010_IL_0264:
 ldarg 0
-M0000000a_IL_0265:
+M00000010_IL_0265:
 ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::pending
-M0000000a_IL_026a:
+M00000010_IL_026a:
 ldarg 0
-M0000000a_IL_026b:
+M00000010_IL_026b:
 ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::width
-M0000000a_IL_0270:
+M00000010_IL_0270:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_0272:
-brtrue M0000000a_IL_027c
-M0000000a_IL_0277:
-br M0000000a_IL_02e9
-M0000000a_IL_027c:
-M0000000a_IL_027d:
+M00000010_IL_0272:
+brtrue M00000010_IL_027c
+M00000010_IL_0277:
+br M00000010_IL_02e9
+M00000010_IL_027c:
+M00000010_IL_027d:
 ldc.i4 0
-M0000000a_IL_027e:
+M00000010_IL_027e:
 stloc local7
-M0000000a_IL_0280:
+M00000010_IL_0280:
 ldarg 0
-M0000000a_IL_0281:
+M00000010_IL_0281:
 ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::width
-M0000000a_IL_0286:
+M00000010_IL_0286:
 stloc local8
-M0000000a_IL_0288:
+M00000010_IL_0288:
 ldc.i4 1
-M0000000a_IL_0289:
+M00000010_IL_0289:
 stloc local9
-M0000000a_IL_028b:
+M00000010_IL_028b:
 ldloc local9
-M0000000a_IL_028d:
+M00000010_IL_028d:
 ldc.i4 0
-M0000000a_IL_028e:
+M00000010_IL_028e:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_0290:
-brtrue M0000000a_IL_02e1
-M0000000a_IL_0295:
+M00000010_IL_0290:
+brtrue M00000010_IL_02e1
+M00000010_IL_0295:
 ldloc local9
-M0000000a_IL_0297:
+M00000010_IL_0297:
 ldc.i4 0
-M0000000a_IL_0298:
-bgt M0000000a_IL_02aa
-M0000000a_IL_029d:
+M00000010_IL_0298:
+bgt M00000010_IL_02aa
+M00000010_IL_029d:
 ldloc local9
-M0000000a_IL_029f:
+M00000010_IL_029f:
 ldc.i4 0
-M0000000a_IL_02a0:
-blt M0000000a_IL_02b8
-M0000000a_IL_02a5:
-br M0000000a_IL_02e1
-M0000000a_IL_02aa:
+M00000010_IL_02a0:
+blt M00000010_IL_02b8
+M00000010_IL_02a5:
+br M00000010_IL_02e1
+M00000010_IL_02aa:
 ldloc local7
-M0000000a_IL_02ac:
+M00000010_IL_02ac:
 ldloc local8
-M0000000a_IL_02ae:
-bge M0000000a_IL_02e1
-M0000000a_IL_02b3:
-br M0000000a_IL_02c1
-M0000000a_IL_02b8:
+M00000010_IL_02ae:
+bge M00000010_IL_02e1
+M00000010_IL_02b3:
+br M00000010_IL_02c1
+M00000010_IL_02b8:
 ldloc local7
-M0000000a_IL_02ba:
+M00000010_IL_02ba:
 ldloc local8
-M0000000a_IL_02bc:
-ble M0000000a_IL_02e1
-M0000000a_IL_02c1:
+M00000010_IL_02bc:
+ble M00000010_IL_02e1
+M00000010_IL_02c1:
 ldloc local7
-M0000000a_IL_02c3:
+M00000010_IL_02c3:
 stloc local10
-M0000000a_IL_02c5:
-M0000000a_IL_02c6:
+M00000010_IL_02c5:
+M00000010_IL_02c6:
 ldloc local0
-M0000000a_IL_02c7:
+M00000010_IL_02c7:
 ldarg 0
-M0000000a_IL_02c8:
+M00000010_IL_02c8:
 ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::carry
-M0000000a_IL_02cd:
+M00000010_IL_02cd:
 ldloc local10
-M0000000a_IL_02cf:
+M00000010_IL_02cf:
 ldelem Byte
-M0000000a_IL_02d0:
+M00000010_IL_02d0:
 callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
-M0000000a_IL_02d5:
+M00000010_IL_02d5:
 ldloc local7
-M0000000a_IL_02d7:
+M00000010_IL_02d7:
 ldloc local9
-M0000000a_IL_02d9:
+M00000010_IL_02d9:
 add
-M0000000a_IL_02da:
+M00000010_IL_02da:
 stloc local7
-M0000000a_IL_02dc:
-br M0000000a_IL_0295
-M0000000a_IL_02e1:
-M0000000a_IL_02e2:
+M00000010_IL_02dc:
+br M00000010_IL_0295
+M00000010_IL_02e1:
+M00000010_IL_02e2:
 ldarg 0
-M0000000a_IL_02e3:
+M00000010_IL_02e3:
 ldc.i4 0
-M0000000a_IL_02e4:
+M00000010_IL_02e4:
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::pending
-M0000000a_IL_02e9:
-M0000000a_IL_02ea:
-br M0000000a_IL_00c9
-M0000000a_IL_02ef:
-M0000000a_IL_02f0:
-M0000000a_IL_02f1:
+M00000010_IL_02e9:
+M00000010_IL_02ea:
+br M00000010_IL_00c9
+M00000010_IL_02ef:
+M00000010_IL_02f0:
+M00000010_IL_02f1:
 ldarg 4
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_02f3:
-brtrue M0000000a_IL_02fd
-M0000000a_IL_02f8:
-br M0000000a_IL_0332
-M0000000a_IL_02fd:
-M0000000a_IL_02fe:
+M00000010_IL_02f3:
+brtrue M00000010_IL_02fd
+M00000010_IL_02f8:
+br M00000010_IL_0332
+M00000010_IL_02fd:
+M00000010_IL_02fe:
 ldarg 0
-M0000000a_IL_02ff:
+M00000010_IL_02ff:
 ldc.i4 1
-M0000000a_IL_0300:
+M00000010_IL_0300:
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::stopped
-M0000000a_IL_0305:
-M0000000a_IL_0306:
+M00000010_IL_0305:
+M00000010_IL_0306:
 ldarg 0
-M0000000a_IL_0307:
+M00000010_IL_0307:
 ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::pending
-M0000000a_IL_030c:
+M00000010_IL_030c:
 ldc.i4 0
-M0000000a_IL_030d:
+M00000010_IL_030d:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_030f:
+M00000010_IL_030f:
 ldc.i4 0
-M0000000a_IL_0310:
+M00000010_IL_0310:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_0312:
-brtrue M0000000a_IL_031c
-M0000000a_IL_0317:
-br M0000000a_IL_0331
-M0000000a_IL_031c:
+M00000010_IL_0312:
+brtrue M00000010_IL_031c
+M00000010_IL_0317:
+br M00000010_IL_0331
+M00000010_IL_031c:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorInvalidUtf8New()
-M0000000a_IL_0321:
+M00000010_IL_0321:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorInvalidUtf8(System.Text.EncodingError.InvalidUtf8)
-M0000000a_IL_0326:
+M00000010_IL_0326:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
-M0000000a_IL_032b:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
-M0000000a_IL_0330:
+M00000010_IL_032b:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+M00000010_IL_0330:
 ret
-M0000000a_IL_0331:
-M0000000a_IL_0332:
-M0000000a_IL_0333:
-M0000000a_IL_0334:
-M0000000a_IL_0335:
+M00000010_IL_0331:
+M00000010_IL_0332:
+M00000010_IL_0333:
+M00000010_IL_0334:
+M00000010_IL_0335:
 ldloc local0
-M0000000a_IL_0336:
+M00000010_IL_0336:
 call System.Text.Utf8::Decode(System.Collections.Sequence<Byte>)
-M0000000a_IL_033b:
+M00000010_IL_033b:
 stloc local4
-M0000000a_IL_033d:
+M00000010_IL_033d:
 ldloca local5
-M0000000a_IL_033f:
+M00000010_IL_033f:
 initobj System.Result<String,System.Text.EncodingError>
-M0000000a_IL_0345:
-M0000000a_IL_0346:
+M00000010_IL_0345:
+M00000010_IL_0346:
 ldloc local4
-M0000000a_IL_0348:
+M00000010_IL_0348:
 stloc local11
-M0000000a_IL_034a:
+M00000010_IL_034a:
 ldloca local12
-M0000000a_IL_034c:
+M00000010_IL_034c:
 initobj System.Result.Ok<String>
-M0000000a_IL_0352:
+M00000010_IL_0352:
 ldloca local11
-M0000000a_IL_0354:
+M00000010_IL_0354:
 ldloca local12
-M0000000a_IL_0356:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion5(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Ok<String>&)
-M0000000a_IL_035b:
-brfalse M0000000a_IL_0389
-M0000000a_IL_0360:
+M00000010_IL_0356:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion19(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Ok<String>&)
+M00000010_IL_035b:
+brfalse M00000010_IL_0389
+M00000010_IL_0360:
 ldloca local12
-M0000000a_IL_0362:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion6(System.Result.Ok<String>&)
-M0000000a_IL_0367:
+M00000010_IL_0362:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion15(System.Result.Ok<String>&)
+M00000010_IL_0367:
 stloc local6
-M0000000a_IL_0369:
-M0000000a_IL_036a:
-br M0000000a_IL_0375
-M0000000a_IL_0375:
-M0000000a_IL_0376:
+M00000010_IL_0369:
+M00000010_IL_036a:
+br M00000010_IL_0375
+M00000010_IL_0375:
+M00000010_IL_0376:
 ldloc local6
-M0000000a_IL_0378:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion8(String)
-M0000000a_IL_037d:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion9(System.Result.Ok<String>)
-M0000000a_IL_0382:
+M00000010_IL_0378:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion21(String)
+M00000010_IL_037d:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion22(System.Result.Ok<String>)
+M00000010_IL_0382:
 stloc local5
-M0000000a_IL_0384:
-br M0000000a_IL_03e3
-M0000000a_IL_0389:
-M0000000a_IL_038a:
+M00000010_IL_0384:
+br M00000010_IL_03e3
+M00000010_IL_0389:
+M00000010_IL_038a:
 ldloc local4
-M0000000a_IL_038c:
+M00000010_IL_038c:
 stloc local13
-M0000000a_IL_038e:
+M00000010_IL_038e:
 ldloca local14
-M0000000a_IL_0390:
+M00000010_IL_0390:
 initobj System.Result.Error<System.Text.InvalidUtf8Error>
-M0000000a_IL_0396:
+M00000010_IL_0396:
 ldloca local13
-M0000000a_IL_0398:
+M00000010_IL_0398:
 ldloca local14
-M0000000a_IL_039a:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion7(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Error<System.Text.InvalidUtf8Error>&)
-M0000000a_IL_039f:
-brfalse M0000000a_IL_03de
-M0000000a_IL_03a4:
+M00000010_IL_039a:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion20(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Error<System.Text.InvalidUtf8Error>&)
+M00000010_IL_039f:
+brfalse M00000010_IL_03de
+M00000010_IL_03a4:
 ldloca local14
-M0000000a_IL_03a6:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion10(System.Result.Error<System.Text.InvalidUtf8Error>&)
-M0000000a_IL_03ab:
+M00000010_IL_03a6:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion23(System.Result.Error<System.Text.InvalidUtf8Error>&)
+M00000010_IL_03ab:
 pop
-M0000000a_IL_03ac:
-M0000000a_IL_03ad:
-br M0000000a_IL_03b8
-M0000000a_IL_03b8:
+M00000010_IL_03ac:
+M00000010_IL_03ad:
+br M00000010_IL_03b8
+M00000010_IL_03b8:
 ldarg 0
-M0000000a_IL_03b9:
+M00000010_IL_03b9:
 ldc.i4 1
-M0000000a_IL_03ba:
+M00000010_IL_03ba:
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572::stopped
-M0000000a_IL_03bf:
+M00000010_IL_03bf:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorInvalidUtf8New()
-M0000000a_IL_03c4:
+M00000010_IL_03c4:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorInvalidUtf8(System.Text.EncodingError.InvalidUtf8)
-M0000000a_IL_03c9:
+M00000010_IL_03c9:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
-M0000000a_IL_03ce:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
-M0000000a_IL_03d3:
+M00000010_IL_03ce:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+M00000010_IL_03d3:
 stloc local15
-M0000000a_IL_03d5:
+M00000010_IL_03d5:
 ldloc local15
-M0000000a_IL_03d7:
+M00000010_IL_03d7:
 stloc local5
-M0000000a_IL_03d9:
-br M0000000a_IL_03e3
-M0000000a_IL_03de:
-M0000000a_IL_03df:
-M0000000a_IL_03e0:
-M0000000a_IL_03e1:
-M0000000a_IL_03e2:
+M00000010_IL_03d9:
+br M00000010_IL_03e3
+M00000010_IL_03de:
+M00000010_IL_03df:
+M00000010_IL_03e0:
+M00000010_IL_03e1:
+M00000010_IL_03e2:
 fault "Guest program reached a terminal failure"
-M0000000a_IL_03e3:
-M0000000a_IL_03e4:
+M00000010_IL_03e3:
+M00000010_IL_03e4:
 ldloc local5
-M0000000a_IL_03e6:
+M00000010_IL_03e6:
 ret
 .end
 .end
@@ -1211,20 +2472,20 @@ ret
 .implements System.Text.Decoder
 .field private stopped Boolean
 .method instance .ctor() -> noresult
-M0000000b_IL_0000:
-M0000000b_IL_0001:
+M00000011_IL_0000:
+M00000011_IL_0001:
 ldarg 0
-M0000000b_IL_0002:
+M00000011_IL_0002:
 pop
-M0000000b_IL_0007:
-M0000000b_IL_0008:
+M00000011_IL_0007:
+M00000011_IL_0008:
 ldarg 0
-M0000000b_IL_0009:
+M00000011_IL_0009:
 ldc.i4 0
-M0000000b_IL_000a:
+M00000011_IL_000a:
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E41736369694465636F646572::stopped
-M0000000b_IL_000f:
+M00000011_IL_000f:
 ret
 .end
 .method instance Decode(arrayref<Byte> source,Int32 offset,Int32 count,Boolean final) -> System.Result<String,System.Text.EncodingError>
@@ -1256,347 +2517,347 @@ ldloca local8
 initobj System.Result<String,System.Text.InvalidUtf8Error>
 ldloca local9
 initobj System.Result.Error<System.Text.InvalidUtf8Error>
-M0000000c_IL_0000:
-M0000000c_IL_0001:
-M0000000c_IL_0002:
+M00000012_IL_0000:
+M00000012_IL_0001:
+M00000012_IL_0002:
 ldarg 0
-M0000000c_IL_0003:
+M00000012_IL_0003:
 ldfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E41736369694465636F646572::stopped
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_0008:
-brtrue M0000000c_IL_0012
-M0000000c_IL_000d:
-br M0000000c_IL_0027
-M0000000c_IL_0012:
+M00000012_IL_0008:
+brtrue M00000012_IL_0012
+M00000012_IL_000d:
+br M00000012_IL_0027
+M00000012_IL_0012:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorFinishedNew()
-M0000000c_IL_0017:
+M00000012_IL_0017:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorFinished(System.Text.EncodingError.Finished)
-M0000000c_IL_001c:
+M00000012_IL_001c:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
-M0000000c_IL_0021:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
-M0000000c_IL_0026:
+M00000012_IL_0021:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+M00000012_IL_0026:
 ret
-M0000000c_IL_0027:
-M0000000c_IL_0028:
-M0000000c_IL_0029:
+M00000012_IL_0027:
+M00000012_IL_0028:
+M00000012_IL_0029:
 ldarg 2
-M0000000c_IL_002a:
+M00000012_IL_002a:
 ldc.i4 0
-M0000000c_IL_002b:
+M00000012_IL_002b:
 clt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_002d:
+M00000012_IL_002d:
 ldc.i4 0
-M0000000c_IL_002e:
+M00000012_IL_002e:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_0030:
+M00000012_IL_0030:
 ldc.i4 0
-M0000000c_IL_0031:
+M00000012_IL_0031:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_0033:
-brtrue M0000000c_IL_0047
-M0000000c_IL_0038:
+M00000012_IL_0033:
+brtrue M00000012_IL_0047
+M00000012_IL_0038:
 ldarg 3
-M0000000c_IL_0039:
+M00000012_IL_0039:
 ldc.i4 0
-M0000000c_IL_003a:
+M00000012_IL_003a:
 clt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_003c:
+M00000012_IL_003c:
 ldc.i4 0
-M0000000c_IL_003d:
+M00000012_IL_003d:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_003f:
+M00000012_IL_003f:
 ldc.i4 0
-M0000000c_IL_0040:
+M00000012_IL_0040:
 ceq
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_0042:
-br M0000000c_IL_0048
-M0000000c_IL_0047:
+M00000012_IL_0042:
+br M00000012_IL_0048
+M00000012_IL_0047:
 ldc.i4 1
-M0000000c_IL_0048:
-brtrue M0000000c_IL_005b
-M0000000c_IL_004d:
+M00000012_IL_0048:
+brtrue M00000012_IL_005b
+M00000012_IL_004d:
 ldarg 2
-M0000000c_IL_004e:
+M00000012_IL_004e:
 ldarg 1
-M0000000c_IL_004f:
+M00000012_IL_004f:
 ldlen
 conv.i4
-M0000000c_IL_0054:
+M00000012_IL_0054:
 cgt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_0056:
-br M0000000c_IL_005c
-M0000000c_IL_005b:
+M00000012_IL_0056:
+br M00000012_IL_005c
+M00000012_IL_005b:
 ldc.i4 1
-M0000000c_IL_005c:
-brtrue M0000000c_IL_0071
-M0000000c_IL_0061:
+M00000012_IL_005c:
+brtrue M00000012_IL_0071
+M00000012_IL_0061:
 ldarg 3
-M0000000c_IL_0062:
+M00000012_IL_0062:
 ldarg 1
-M0000000c_IL_0063:
+M00000012_IL_0063:
 ldlen
 conv.i4
-M0000000c_IL_0068:
+M00000012_IL_0068:
 ldarg 2
-M0000000c_IL_0069:
+M00000012_IL_0069:
 sub
-M0000000c_IL_006a:
+M00000012_IL_006a:
 cgt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_006c:
-br M0000000c_IL_0072
-M0000000c_IL_0071:
+M00000012_IL_006c:
+br M00000012_IL_0072
+M00000012_IL_0071:
 ldc.i4 1
-M0000000c_IL_0072:
-brtrue M0000000c_IL_007c
-M0000000c_IL_0077:
-br M0000000c_IL_0091
-M0000000c_IL_007c:
+M00000012_IL_0072:
+brtrue M00000012_IL_007c
+M00000012_IL_0077:
+br M00000012_IL_0091
+M00000012_IL_007c:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorInvalidRangeNew()
-M0000000c_IL_0081:
+M00000012_IL_0081:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorInvalidRange(System.Text.EncodingError.InvalidRange)
-M0000000c_IL_0086:
+M00000012_IL_0086:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
-M0000000c_IL_008b:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
-M0000000c_IL_0090:
+M00000012_IL_008b:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+M00000012_IL_0090:
 ret
-M0000000c_IL_0091:
-M0000000c_IL_0092:
-M0000000c_IL_0093:
+M00000012_IL_0091:
+M00000012_IL_0092:
+M00000012_IL_0093:
 ldarg 3
-M0000000c_IL_0094:
+M00000012_IL_0094:
 ldc.i4 65536
-M0000000c_IL_0099:
+M00000012_IL_0099:
 cgt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_009b:
-brtrue M0000000c_IL_00a5
-M0000000c_IL_00a0:
-br M0000000c_IL_00ba
-M0000000c_IL_00a5:
+M00000012_IL_009b:
+brtrue M00000012_IL_00a5
+M00000012_IL_00a0:
+br M00000012_IL_00ba
+M00000012_IL_00a5:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorLimitExceededNew()
-M0000000c_IL_00aa:
+M00000012_IL_00aa:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorLimitExceeded(System.Text.EncodingError.LimitExceeded)
-M0000000c_IL_00af:
+M00000012_IL_00af:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
-M0000000c_IL_00b4:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
-M0000000c_IL_00b9:
+M00000012_IL_00b4:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+M00000012_IL_00b9:
 ret
-M0000000c_IL_00ba:
-M0000000c_IL_00bb:
-M0000000c_IL_00bc:
+M00000012_IL_00ba:
+M00000012_IL_00bb:
+M00000012_IL_00bc:
 ldarg 3
-M0000000c_IL_00bd:
+M00000012_IL_00bd:
 newobj instance System.Collections.ArrayList<Byte>::.ctor(Int32)
-M0000000c_IL_00c2:
+M00000012_IL_00c2:
 stloc local0
-M0000000c_IL_00c3:
-M0000000c_IL_00c4:
+M00000012_IL_00c3:
+M00000012_IL_00c4:
 ldc.i4 0
-M0000000c_IL_00c5:
+M00000012_IL_00c5:
 stloc local1
-M0000000c_IL_00c6:
-M0000000c_IL_00c7:
-M0000000c_IL_00c8:
+M00000012_IL_00c6:
+M00000012_IL_00c7:
+M00000012_IL_00c8:
 ldloc local1
-M0000000c_IL_00c9:
+M00000012_IL_00c9:
 ldarg 3
-M0000000c_IL_00ca:
+M00000012_IL_00ca:
 clt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_00cc:
-brtrue M0000000c_IL_00d6
-M0000000c_IL_00d1:
-br M0000000c_IL_011e
-M0000000c_IL_00d6:
-M0000000c_IL_00d7:
+M00000012_IL_00cc:
+brtrue M00000012_IL_00d6
+M00000012_IL_00d1:
+br M00000012_IL_011e
+M00000012_IL_00d6:
+M00000012_IL_00d7:
 ldarg 1
-M0000000c_IL_00d8:
+M00000012_IL_00d8:
 ldarg 2
-M0000000c_IL_00d9:
+M00000012_IL_00d9:
 ldloc local1
-M0000000c_IL_00da:
+M00000012_IL_00da:
 add
-M0000000c_IL_00db:
+M00000012_IL_00db:
 ldelem Byte
-M0000000c_IL_00dc:
+M00000012_IL_00dc:
 stloc local2
-M0000000c_IL_00dd:
-M0000000c_IL_00de:
+M00000012_IL_00dd:
+M00000012_IL_00de:
 ldloc local2
-M0000000c_IL_00df:
+M00000012_IL_00df:
 conv.i4
-M0000000c_IL_00e0:
+M00000012_IL_00e0:
 ldc.i4 127
-M0000000c_IL_00e2:
+M00000012_IL_00e2:
 cgt
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_00e4:
-brtrue M0000000c_IL_00ee
-M0000000c_IL_00e9:
-br M0000000c_IL_010b
-M0000000c_IL_00ee:
-M0000000c_IL_00ef:
+M00000012_IL_00e4:
+brtrue M00000012_IL_00ee
+M00000012_IL_00e9:
+br M00000012_IL_010b
+M00000012_IL_00ee:
+M00000012_IL_00ef:
 ldarg 0
-M0000000c_IL_00f0:
+M00000012_IL_00f0:
 ldc.i4 1
-M0000000c_IL_00f1:
+M00000012_IL_00f1:
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E41736369694465636F646572::stopped
-M0000000c_IL_00f6:
+M00000012_IL_00f6:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorInvalidDataNew()
-M0000000c_IL_00fb:
+M00000012_IL_00fb:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorInvalidData(System.Text.EncodingError.InvalidData)
-M0000000c_IL_0100:
+M00000012_IL_0100:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
-M0000000c_IL_0105:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
-M0000000c_IL_010a:
+M00000012_IL_0105:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+M00000012_IL_010a:
 ret
-M0000000c_IL_010b:
-M0000000c_IL_010c:
-M0000000c_IL_010d:
+M00000012_IL_010b:
+M00000012_IL_010c:
+M00000012_IL_010d:
 ldloc local0
-M0000000c_IL_010e:
+M00000012_IL_010e:
 ldloc local2
-M0000000c_IL_010f:
+M00000012_IL_010f:
 callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
-M0000000c_IL_0114:
-M0000000c_IL_0115:
+M00000012_IL_0114:
+M00000012_IL_0115:
 ldloc local1
-M0000000c_IL_0116:
+M00000012_IL_0116:
 ldc.i4 1
-M0000000c_IL_0117:
+M00000012_IL_0117:
 add
-M0000000c_IL_0118:
+M00000012_IL_0118:
 stloc local1
-M0000000c_IL_0119:
-br M0000000c_IL_00c7
-M0000000c_IL_011e:
-M0000000c_IL_011f:
-M0000000c_IL_0120:
+M00000012_IL_0119:
+br M00000012_IL_00c7
+M00000012_IL_011e:
+M00000012_IL_011f:
+M00000012_IL_0120:
 ldarg 4
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_0122:
-brtrue M0000000c_IL_012c
-M0000000c_IL_0127:
-br M0000000c_IL_0134
-M0000000c_IL_012c:
-M0000000c_IL_012d:
+M00000012_IL_0122:
+brtrue M00000012_IL_012c
+M00000012_IL_0127:
+br M00000012_IL_0134
+M00000012_IL_012c:
+M00000012_IL_012d:
 ldarg 0
-M0000000c_IL_012e:
+M00000012_IL_012e:
 ldc.i4 1
-M0000000c_IL_012f:
+M00000012_IL_012f:
 call neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32)
 stfld neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E41736369694465636F646572::stopped
-M0000000c_IL_0134:
-M0000000c_IL_0135:
-M0000000c_IL_0136:
-M0000000c_IL_0137:
+M00000012_IL_0134:
+M00000012_IL_0135:
+M00000012_IL_0136:
+M00000012_IL_0137:
 ldloc local0
-M0000000c_IL_0138:
+M00000012_IL_0138:
 call System.Text.Utf8::Decode(System.Collections.Sequence<Byte>)
-M0000000c_IL_013d:
+M00000012_IL_013d:
 stloc local3
-M0000000c_IL_013e:
+M00000012_IL_013e:
 ldloca local4
-M0000000c_IL_0140:
+M00000012_IL_0140:
 initobj System.Result<String,System.Text.EncodingError>
-M0000000c_IL_0146:
-M0000000c_IL_0147:
+M00000012_IL_0146:
+M00000012_IL_0147:
 ldloc local3
-M0000000c_IL_0148:
+M00000012_IL_0148:
 stloc local6
-M0000000c_IL_014a:
+M00000012_IL_014a:
 ldloca local7
-M0000000c_IL_014c:
+M00000012_IL_014c:
 initobj System.Result.Ok<String>
-M0000000c_IL_0152:
+M00000012_IL_0152:
 ldloca local6
-M0000000c_IL_0154:
+M00000012_IL_0154:
 ldloca local7
-M0000000c_IL_0156:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion5(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Ok<String>&)
-M0000000c_IL_015b:
-brfalse M0000000c_IL_0189
-M0000000c_IL_0160:
+M00000012_IL_0156:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion19(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Ok<String>&)
+M00000012_IL_015b:
+brfalse M00000012_IL_0189
+M00000012_IL_0160:
 ldloca local7
-M0000000c_IL_0162:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion6(System.Result.Ok<String>&)
-M0000000c_IL_0167:
+M00000012_IL_0162:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion15(System.Result.Ok<String>&)
+M00000012_IL_0167:
 stloc local5
-M0000000c_IL_0169:
-M0000000c_IL_016a:
-br M0000000c_IL_0175
-M0000000c_IL_0175:
-M0000000c_IL_0176:
+M00000012_IL_0169:
+M00000012_IL_016a:
+br M00000012_IL_0175
+M00000012_IL_0175:
+M00000012_IL_0176:
 ldloc local5
-M0000000c_IL_0178:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion8(String)
-M0000000c_IL_017d:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion9(System.Result.Ok<String>)
-M0000000c_IL_0182:
+M00000012_IL_0178:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion21(String)
+M00000012_IL_017d:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion22(System.Result.Ok<String>)
+M00000012_IL_0182:
 stloc local4
-M0000000c_IL_0184:
-br M0000000c_IL_01d7
-M0000000c_IL_0189:
-M0000000c_IL_018a:
+M00000012_IL_0184:
+br M00000012_IL_01d7
+M00000012_IL_0189:
+M00000012_IL_018a:
 ldloc local3
-M0000000c_IL_018b:
+M00000012_IL_018b:
 stloc local8
-M0000000c_IL_018d:
+M00000012_IL_018d:
 ldloca local9
-M0000000c_IL_018f:
+M00000012_IL_018f:
 initobj System.Result.Error<System.Text.InvalidUtf8Error>
-M0000000c_IL_0195:
+M00000012_IL_0195:
 ldloca local8
-M0000000c_IL_0197:
+M00000012_IL_0197:
 ldloca local9
-M0000000c_IL_0199:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion7(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Error<System.Text.InvalidUtf8Error>&)
-M0000000c_IL_019e:
-brfalse M0000000c_IL_01d2
-M0000000c_IL_01a3:
+M00000012_IL_0199:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion20(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Error<System.Text.InvalidUtf8Error>&)
+M00000012_IL_019e:
+brfalse M00000012_IL_01d2
+M00000012_IL_01a3:
 ldloca local9
-M0000000c_IL_01a5:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion10(System.Result.Error<System.Text.InvalidUtf8Error>&)
-M0000000c_IL_01aa:
+M00000012_IL_01a5:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion23(System.Result.Error<System.Text.InvalidUtf8Error>&)
+M00000012_IL_01aa:
 pop
-M0000000c_IL_01ab:
-M0000000c_IL_01ac:
-br M0000000c_IL_01b7
-M0000000c_IL_01b7:
+M00000012_IL_01ab:
+M00000012_IL_01ac:
+br M00000012_IL_01b7
+M00000012_IL_01b7:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorInvalidDataNew()
-M0000000c_IL_01bc:
+M00000012_IL_01bc:
 call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNewSystemTextEncodingErrorInvalidData(System.Text.EncodingError.InvalidData)
-M0000000c_IL_01c1:
+M00000012_IL_01c1:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
-M0000000c_IL_01c6:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
-M0000000c_IL_01cb:
+M00000012_IL_01c6:
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+M00000012_IL_01cb:
 stloc local4
-M0000000c_IL_01cd:
-br M0000000c_IL_01d7
-M0000000c_IL_01d2:
-M0000000c_IL_01d3:
-M0000000c_IL_01d4:
-M0000000c_IL_01d5:
-M0000000c_IL_01d6:
+M00000012_IL_01cd:
+br M00000012_IL_01d7
+M00000012_IL_01d2:
+M00000012_IL_01d3:
+M00000012_IL_01d4:
+M00000012_IL_01d5:
+M00000012_IL_01d6:
 fault "Guest program reached a terminal failure"
-M0000000c_IL_01d7:
-M0000000c_IL_01d8:
+M00000012_IL_01d7:
+M00000012_IL_01d8:
 ldloc local4
-M0000000c_IL_01da:
+M00000012_IL_01da:
 ret
 .end
 .end

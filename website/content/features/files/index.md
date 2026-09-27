@@ -61,7 +61,10 @@ helpers. Console exposes the same text and byte interfaces through standard stre
 StreamReader and StreamWriter accept an [Encoding](xref:System.Text.Encoding), with
 UTF-8 as the default. `Encodings.Ascii` selects strict ASCII. Both adapters retain
 the leaveOpen option. Lines are recognized after decoding; unsupported ASCII output
-fails before writing. See [selected encoding contracts](../../docs/streams.html#selected-encodings-development).
+fails before writing. Development StreamWriter uses bounded encoder output and
+provides Finish to observe final conversion bytes/errors. Flush handles the stream;
+Close releases ownership. Call Finish and Flush explicitly when required before
+Close. See [selected encoding contracts](../../docs/streams.html#selected-encodings-development).
 Use matching development artifacts; Preview 10 does not include these overloads.
 
 ## Behavior and limits

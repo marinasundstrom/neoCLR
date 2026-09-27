@@ -1,0 +1,2 @@
+.include "generated/EncoderState.methods.neoil"
+.include "generated/EncoderState.helpers.neoil"

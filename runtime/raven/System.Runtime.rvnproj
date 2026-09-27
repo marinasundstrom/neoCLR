@@ -406,4 +406,13 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Encodings'">
     <Compile Include="src/System/Text/Encodings.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Encoder'">
+    <Compile Include="src/System/Text/Encoder.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EncoderProgress'">
+    <Compile Include="src/System/Text/EncoderProgress.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EncoderState'">
+    <Compile Include="src/System/Text/EncoderState.rvn" />
+  </ItemGroup>
 </Project>

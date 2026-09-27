@@ -13,7 +13,9 @@ simple-fold/.NET differences and invalid modes. Development StreamReader.ReadToE
 now decodes incrementally with earlier malformed-input failure; its signatures are
 unchanged and the reader guide records cursor/error-ordering implications. Encoding
 selection is implemented in development through Encoding/Decoder and Encodings.Utf8/Ascii,
-with strict typed errors, independent decoder state and reader/writer overloads. Keep generated signatures and authored guides
+with strict typed errors, independent conversion state and reader/writer overloads.
+Encoder, EncoderProgress/EncoderState, CreateEncoder and StreamWriter.Finish are
+additional development APIs; custom Encoding implementations must add the factory. Keep generated signatures and authored guides
 aligned with the matching runtime and compiler reference artifacts.
 
 ## Build and refresh

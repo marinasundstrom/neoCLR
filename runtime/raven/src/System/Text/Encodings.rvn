@@ -10,6 +10,9 @@ public static class Encodings {
 }
 
 internal class Utf8Encoding : Encoding {
+    func CreateEncoder() -> Encoder {
+        return TextEncoder(false)
+    }
     func Encode(text: string) -> Result<Sequence<byte>, EncodingError> {
         if text.GetUtf8ByteCount() > 65536 {
             return Error(EncodingError.LimitExceeded)
@@ -22,6 +25,9 @@ internal class Utf8Encoding : Encoding {
 }
 
 internal class AsciiEncoding : Encoding {
+    func CreateEncoder() -> Encoder {
+        return TextEncoder(true)
+    }
     func Encode(text: string) -> Result<Sequence<byte>, EncodingError> {
         if text.GetUtf8ByteCount() > 65536 {
             return Error(EncodingError.LimitExceeded)
@@ -133,5 +139,118 @@ internal class AsciiDecoder : Decoder {
             Ok(let text) => Ok(text)
             Error(_) => Error(EncodingError.InvalidData)
         }
+    }
+}
+
+internal class TextEncoder : Encoder {
+    private var policy: Encoding = Encodings.Utf8
+    private var ascii: bool = false
+    private var text: string = ""
+    private var sourceOffset: int = 0
+    private var bytes: Sequence<byte> = ArrayList<byte>()
+    private var byteOffset: int = 0
+    private var pending: bool = false
+    private var ending: bool = false
+    private var finished: bool = false
+
+    init(strictAscii: bool) {
+        ascii = strictAscii
+        if strictAscii {
+            policy = Encodings.Ascii
+        }
+    }
+
+    func Accept(text: string, final: bool) -> Result<unit, EncodingError> {
+        if finished || ending {
+            return Error(EncodingError.Finished)
+        }
+        if pending {
+            return Error(EncodingError.Busy)
+        }
+        if text.GetUtf8ByteCount() > 65536 {
+            return Error(EncodingError.LimitExceeded)
+        }
+        // Validate restricted encodings before acceptance or any destination write.
+        if ascii {
+            var position = 0
+            while position < text.GetUtf8ByteCount() {
+                let part = ScalarChunk(text, position)
+                match policy.Encode(part) {
+                    Ok(_) => { }
+                    Error(_) => return Error(EncodingError.UnrepresentableText)
+                }
+                position += part.GetUtf8ByteCount()
+            }
+        }
+        self.text = text
+        sourceOffset = 0
+        bytes = ArrayList<byte>()
+        byteOffset = 0
+        pending = true
+        ending = final
+        return Ok(())
+    }
+
+    func Drain(output: byte[], offset: int, count: int) -> Result<EncoderProgress, EncodingError> {
+        if finished {
+            return Error(EncodingError.Finished)
+        }
+        if !(offset >= 0) || !(count >= 0) || offset > output.Length || count > output.Length - offset {
+            return Error(EncodingError.InvalidRange)
+        }
+        if count > 65536 {
+            return Error(EncodingError.LimitExceeded)
+        }
+        if !pending {
+            return Ok(EncoderProgress(0, EncoderState.Ready))
+        }
+        var written = 0
+        while written < count {
+            if byteOffset == bytes.Count {
+                if sourceOffset == text.GetUtf8ByteCount() {
+                    break
+                }
+                let part = ScalarChunk(text, sourceOffset)
+                bytes = match policy.Encode(part) {
+                    Ok(let encoded) => encoded
+                    Error(_) => {
+                        System.Fault("Validated text encoding failed")
+                        ArrayList<byte>()
+                    }
+                }
+                sourceOffset += part.GetUtf8ByteCount()
+                byteOffset = 0
+            }
+            output[offset + written] = bytes[byteOffset]
+            byteOffset += 1
+            written += 1
+        }
+        if sourceOffset == text.GetUtf8ByteCount() && byteOffset == bytes.Count {
+            text = ""
+            bytes = ArrayList<byte>()
+            pending = false
+            if ending {
+                finished = true
+                return Ok(EncoderProgress(written, EncoderState.Finished))
+            }
+            return Ok(EncoderProgress(written, EncoderState.Ready))
+        }
+        return Ok(EncoderProgress(written, EncoderState.NeedsOutput))
+    }
+
+    // Internal provider: helper visibility follows the bridge dependency profile.
+    func ScalarChunk(text: string, start: int) -> string {
+        var count = text.GetUtf8ByteCount() - start
+        if count > 256 {
+            count = 256
+        }
+        while count > 0 {
+            match text.SliceUtf8(start, count) {
+                Ok(let part) => return part
+                Error(_) => count -= 1
+            }
+        }
+        System.Fault("Invalid internal scalar boundary")
+        return ""
     }
 }

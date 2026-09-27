@@ -1,0 +1,2 @@
+.include "generated/EncoderProgress.methods.neoil"
+.include "generated/EncoderProgress.helpers.neoil"

@@ -1,0 +1,7 @@
+; Generated from runtime/raven/src/System/Text/Encoder.rvn. Regenerate with build_runtime_library.py.
+.interface System.Text.Encoder
+.method instance Accept(String text,Boolean final) -> System.Result<Void,System.Text.EncodingError>
+.end
+.method instance Drain(arrayref<Byte> output,Int32 offset,Int32 count) -> System.Result<System.Text.EncoderProgress,System.Text.EncodingError>
+.end
+.end

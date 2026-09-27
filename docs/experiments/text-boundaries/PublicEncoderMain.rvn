@@ -1,0 +1,307 @@
+import System.*
+import System.Collections.*
+import System.IO.*
+import System.Result.*
+import System.Text.*
+import System.Console.*
+
+public class TrailerEncoding : Encoding {
+    func Encode(text: string) -> Result<Sequence<byte>, EncodingError> {
+        return Ok(Utf8.Encode(text + "<end>"))
+    }
+    func CreateDecoder() -> Decoder {
+        return Encodings.Utf8.CreateDecoder()
+    }
+    func CreateEncoder() -> Encoder {
+        return TrailerEncoder()
+    }
+}
+
+public class TrailerEncoder : Encoder {
+    private var inner: Encoder = Encodings.Utf8.CreateEncoder()
+    func Accept(text: string, final: bool) -> Result<unit, EncodingError> {
+        if final {
+            return inner.Accept(text + "<end>", true)
+        }
+        return inner.Accept(text, false)
+    }
+    func Drain(output: byte[], offset: int, count: int) -> Result<EncoderProgress, EncodingError> {
+        return inner.Drain(output, offset, count)
+    }
+}
+
+public func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+public func Accepted(result: Result<unit, EncodingError>) {
+    match result {
+        Ok(_) => { }
+        Error(_) => System.Fault("Unexpected acceptance failure")
+    }
+}
+
+public func Step(result: Result<EncoderProgress, EncodingError>) -> EncoderProgress {
+    return match result {
+        Ok(let value) => value
+        Error(_) => {
+            System.Fault("Unexpected drain failure")
+            EncoderProgress(0, EncoderState.Ready)
+        }
+    }
+}
+
+public func Wrote(result: Result<int, StreamError>, expected: int) {
+    match result {
+        Ok(let count) => Check(count == expected, "Encoded byte count")
+        Error(_) => System.Fault("Unexpected write failure")
+    }
+}
+
+public class ProbeSink : OutputStream {
+    private var bytes: ArrayList<byte> = ArrayList<byte>()
+    private var closed: bool = false
+    private var failAfter: int = -1
+    private var flushes: int = 0
+    init(failAfter: int) {
+        self.failAfter = failAfter
+    }
+    val Bytes: Sequence<byte> => bytes
+    val Closed: bool => closed
+    val Flushes: int => flushes
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if failAfter >= 0 && bytes.Count >= failAfter {
+            return Error(StreamError.AccessDenied)
+        }
+        if count == 0 {
+            return Ok(0)
+        }
+        bytes.Add(buffer[offset])
+        return Ok(1)
+    }
+    func Flush() -> Result<unit, StreamError> {
+        flushes += 1
+        return Ok(())
+    }
+    func Close() {
+        closed = true
+    }
+}
+
+public func Text(bytes: Sequence<byte>) -> string {
+    return match Utf8.Decode(bytes) {
+        Ok(let value) => value
+        Error(_) => {
+            System.Fault("Unexpected encoded bytes")
+            ""
+        }
+    }
+}
+
+public func ProgressChecks() {
+    let policy = Encodings.Utf8
+    let encoder = policy.CreateEncoder()
+    let target: byte[] = [(byte)99, (byte)99, (byte)99]
+    Check(Step(encoder.Drain(target, 1, 1)).State is EncoderState.Ready, "Initial ready")
+    var source = "é😀é"
+    Accepted(encoder.Accept(source, false))
+    source = "changed"
+    let independent = policy.CreateEncoder()
+    Accepted(independent.Accept("Q", true))
+    Check(Step(independent.Drain(target, 1, 1)).State is EncoderState.Finished && target[1] == 81, "Independent encoder factory state")
+    match encoder.Accept("other", false) {
+        Error(EncodingError.Busy) => { }
+        _ => System.Fault("Pending input cannot be overwritten")
+    }
+    match encoder.Drain(target, 3, 1) {
+        Error(EncodingError.InvalidRange) => { }
+        _ => System.Fault("Invalid destination range")
+    }
+    let zero = Step(encoder.Drain(target, 1, 0))
+    Check(zero.BytesWritten == 0 && zero.State is EncoderState.NeedsOutput, "Zero capacity explicit no progress")
+    let output = ArrayList<byte>()
+    var complete = false
+    while !complete {
+        let step = Step(encoder.Drain(target, 1, 1))
+        Check(step.BytesWritten == 1 && target[0] == 99 && target[2] == 99, "Only offered destination changes")
+        output.Add(target[1])
+        if step.State is EncoderState.Ready {
+            complete = true
+        } else {
+            Check(step.State is EncoderState.NeedsOutput, "Positive progress or ready")
+        }
+    }
+    Check(Text(output).Equals("é😀é"), "Accepted text is owned and bytes preserve order")
+    Accepted(encoder.Accept("", true))
+    Check(Step(encoder.Drain(target, 0, 0)).State is EncoderState.Finished, "Empty final drain")
+    match encoder.Accept("", false) {
+        Error(EncodingError.Finished) => { }
+        _ => System.Fault("No input after finish")
+    }
+    match encoder.Drain(target, 0, 1) {
+        Error(EncodingError.Finished) => { }
+        _ => System.Fault("No drain after finish")
+    }
+    let ascii = Encodings.Ascii.CreateEncoder()
+    match ascii.Accept("0123456789012345678901234567890123456789é", true) {
+        Error(EncodingError.UnrepresentableText) => { }
+        _ => System.Fault("Strict preflight")
+    }
+    Accepted(ascii.Accept("A", true))
+    let asciiStep = Step(ascii.Drain(target, 1, 1))
+    Check(asciiStep.BytesWritten == 1 && asciiStep.State is EncoderState.Finished && target[1] == 65, "Rejected accept leaves state reusable")
+    WriteLine("Encoder acceptance, ownership and bounded progress passed")
+}
+
+public func BoundaryChecks() {
+    var prefix = "x"
+    for index in 0..<8 {
+        prefix = String.Concat(prefix, prefix)
+    }
+    let head = match prefix.SliceUtf8(0, 255) {
+        Ok(let value) => value
+        Error(_) => ""
+    }
+    let source = head + "😀é"
+    let encoder = Encodings.Utf8.CreateEncoder()
+    Accepted(encoder.Accept(source, true))
+    let buffer: byte[] = [(byte)0, (byte)0, (byte)0]
+    let output = ArrayList<byte>()
+    var done = false
+    while !done {
+        let step = Step(encoder.Drain(buffer, 0, 3))
+        for index in 0..<step.BytesWritten {
+            output.Add(buffer[index])
+        }
+        if step.State is EncoderState.Finished {
+            done = true
+        }
+    }
+    Check(Text(output).Equals(source), "256-byte internal boundary cannot cut a scalar")
+    var excessive = "x"
+    for index in 0..<17 {
+        excessive = String.Concat(excessive, excessive)
+    }
+    let limited = Encodings.Utf8.CreateEncoder()
+    match limited.Accept(excessive, true) {
+        Error(EncodingError.LimitExceeded) => { }
+        _ => System.Fault("Accept byte limit")
+    }
+    Accepted(limited.Accept("ok", true))
+    let limitedStep = Step(limited.Drain(buffer, 0, 3))
+    Check(limitedStep.BytesWritten == 2 && limitedStep.State is EncoderState.Finished, "Limit failure leaves state reusable")
+    let trailer: Encoder = TrailerEncoder()
+    Accepted(trailer.Accept("", true))
+    Check(Step(trailer.Drain(buffer, 0, 3)).State is EncoderState.NeedsOutput, "Final acceptance is not final output")
+    let last = Step(trailer.Drain(buffer, 0, 3))
+    Check(last.BytesWritten == 2 && last.State is EncoderState.Finished, "Completion includes final output")
+    WriteLine("Encoder scalar boundaries, limits and final output passed")
+}
+
+public func WriterChecks() {
+    let sink = ProbeSink(-1)
+    let writer = StreamWriter(sink, Encodings.Utf8, true)
+    Wrote(writer.Write("é😀"), 6)
+    Wrote(writer.Write("e"), 1)
+    Wrote(writer.Write("́"), 2)
+    Wrote(writer.Finish(), 0)
+    Check(Text(sink.Bytes).Equals("é😀é"), "Short writes and cross-input graphemes")
+    writer.Close()
+    Check(!(sink.Closed), "Leave open")
+    let asciiSink = ProbeSink(-1)
+    let ascii = StreamWriter(asciiSink, Encodings.Ascii, false)
+    match ascii.Write("prefix é") {
+        Error(StreamError.InvalidEncoding) => Check(asciiSink.Bytes.Count == 0, "Reject before output")
+        _ => System.Fault("ASCII write")
+    }
+    Wrote(ascii.Write("ok"), 2)
+    match ascii.WriteLine("é") {
+        Error(StreamError.InvalidEncoding) => Check(asciiSink.Bytes.Count == 2, "Reject whole line before output")
+        _ => System.Fault("ASCII line preflight")
+    }
+    Wrote(ascii.WriteLine("A"), 2)
+    ascii.Close()
+    Check(asciiSink.Closed, "Close ownership")
+    let abandonedSink = ProbeSink(-1)
+    let abandoned = StreamWriter(abandonedSink, TrailerEncoding(), false)
+    Wrote(abandoned.Write("A"), 1)
+    abandoned.Close()
+    Check(abandonedSink.Bytes.Count == 1 && abandonedSink.Closed, "Close does not silently finalize")
+    let endingSink = ProbeSink(-1)
+    let ending = StreamWriter(endingSink, TrailerEncoding(), true)
+    Wrote(ending.Write("A"), 1)
+    _ = ending.Flush()
+    Check(endingSink.Bytes.Count == 1 && endingSink.Flushes == 1, "Flush does not finalize")
+    Wrote(ending.Finish(), 5)
+    Wrote(ending.Finish(), 0)
+    Check(Text(endingSink.Bytes).Equals("A<end>"), "Drain trailer exactly once")
+    match ending.Write("B") {
+        Error(StreamError.InvalidEncoding) => { }
+        _ => System.Fault("Write after finalization")
+    }
+    let failed = StreamWriter(ProbeSink(1), TrailerEncoding(), true)
+    Wrote(failed.Write("A"), 1)
+    match failed.Finish() {
+        Error(StreamError.AccessDenied) => { }
+        _ => System.Fault("Final output failure is observable")
+    }
+    match failed.Finish() {
+        Error(StreamError.InvalidEncoding) => { }
+        _ => System.Fault("No automatic retry after partial output failure")
+    }
+    WriteLine("Encoder writer partial transfers and finalization passed")
+}
+
+public class CountingSink : OutputStream {
+    private var total: int = 0
+    val Total: int => total
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        for index in offset..<(offset + count) {
+            Check(buffer[index] == 120, "Maximum writer content")
+        }
+        total += count
+        return Ok(count)
+    }
+    func Flush() -> Result<unit, StreamError> {
+        return Ok(())
+    }
+    func Close() { }
+}
+
+public func MaximumChecks() {
+    var text = "x"
+    for index in 0..<16 {
+        text = String.Concat(text, text)
+    }
+    let sink = CountingSink()
+    let writer = StreamWriter(sink)
+    match writer.WriteLine(text) {
+        Error(StreamError.LimitExceeded) => Check(sink.Total == 0, "Line limit before output")
+        _ => System.Fault("Maximum line must include LF")
+    }
+    match writer.Write(text + "x") {
+        Error(StreamError.LimitExceeded) => Check(sink.Total == 0, "Input limit before output")
+        _ => System.Fault("Oversized write")
+    }
+    Wrote(writer.Write(text), 65536)
+    Check(sink.Total == 65536, "Maximum writer byte count")
+    Wrote(writer.Finish(), 0)
+    WriteLine("Encoder maximum writer bound passed")
+}
+
+public func Main(args: string[]) {
+    if args[0].Equals("progress") {
+        ProgressChecks()
+    } else if args[0].Equals("boundaries") {
+        BoundaryChecks()
+    } else if args[0].Equals("maximum") {
+        MaximumChecks()
+    } else {
+        WriterChecks()
+    }
+}

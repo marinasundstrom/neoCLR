@@ -1,0 +1,28 @@
+namespace System.Text
+
+public class EncoderProgress {
+    private var bytesWritten: int = 0
+    private var state: EncoderState = EncoderState.Ready
+
+    val BytesWritten: int => bytesWritten
+    val State: EncoderState => match state {
+        EncoderState.NeedsOutput => EncoderState.NeedsOutput
+        EncoderState.Ready => EncoderState.Ready
+        EncoderState.Finished => EncoderState.Finished
+        _ => {
+            System.Fault("Inactive encoder progress state")
+            EncoderState.Ready
+        }
+    }
+
+    init(bytesWritten: int, state: EncoderState) {
+        if bytesWritten < 0 {
+            System.Fault("Encoded byte count must be non-negative")
+        }
+        if !(state.HasValue) {
+            System.Fault("Inactive encoder progress state")
+        }
+        self.bytesWritten = bytesWritten
+        self.state = state
+    }
+}

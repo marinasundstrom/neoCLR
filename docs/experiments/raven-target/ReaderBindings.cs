@@ -6,9 +6,9 @@ static class ReaderBindings
     public const string Stream = "System.IO.StreamReader";
     public const string Writer = "System.IO.TextWriter";
     public const string StreamWriter = "System.IO.StreamWriter";
-    public static bool IsContract(string name) => name is Reader or Writer or "System.Text.Encoding" or "System.Text.Decoder";
+    public static bool IsContract(string name) => name is Reader or Writer or "System.Text.Encoding" or "System.Text.Decoder" or "System.Text.Encoder";
     public static bool IsProvider(TypeDefinition type) => type.FullName is "System.IO.ConsoleInputStream" or "System.IO.ConsoleOutputStream";
-    public static bool IsName(string name) => IsContract(name) || name is Stream or StreamWriter or "System.IO.ConsoleInputStream" or "System.IO.ConsoleOutputStream";
+    public static bool IsName(string name) => IsContract(name) || name is "System.Text.EncoderProgress" or Stream or StreamWriter or "System.IO.ConsoleInputStream" or "System.IO.ConsoleOutputStream";
     public static void Project(ModuleDefinition module) {
         foreach (var type in module.Types.Where(IsProvider)) {
             type.Attributes = (type.Attributes & ~TypeAttributes.VisibilityMask) | TypeAttributes.NotPublic;
@@ -25,6 +25,16 @@ static class ReaderBindings
             public interface Encoding {
                 Result<Collections.Sequence<byte>, EncodingError> Encode(string text);
                 Decoder CreateDecoder();
+                Encoder CreateEncoder();
+            }
+            public interface Encoder {
+                Result<PropagationUnit, EncodingError> Accept(string text, bool final);
+                Result<EncoderProgress, EncodingError> Drain(byte[] output, int offset, int count);
+            }
+            public sealed class EncoderProgress {
+                public EncoderProgress(int bytesWritten, EncoderState state) { }
+                public int BytesWritten => default;
+                public EncoderState State => default;
             }
             public interface Decoder {
                 Result<string, EncodingError> Decode(byte[] source, int offset, int count, bool final);
@@ -38,6 +48,7 @@ static class ReaderBindings
                 void Close();
             }
             public sealed class StreamWriter : TextWriter {
+                public Result<int, StreamError> Finish() => default;
                 public StreamWriter(OutputStream output) { }
                 public StreamWriter(OutputStream output, bool leaveOpen) { }
                 public StreamWriter(OutputStream output, Text.Encoding encoding) { }
@@ -85,6 +96,13 @@ static class ReaderBindings
             "Write" or "WriteLine" when owner is Writer or StreamWriter => ("String", "System.Result<Int32,System.IO.StreamError>"),
             "Flush" when owner is Writer or StreamWriter => ("", "System.Result<Void,System.IO.StreamError>"),
             "Encode" when owner == "System.Text.Encoding" => ("String", "System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>"),
+            ".ctor" when owner == "System.Text.EncoderProgress" => ("Int32,System.Text.EncoderState", "noresult"),
+            "get_BytesWritten" when owner == "System.Text.EncoderProgress" => ("", "Int32"),
+            "get_State" when owner == "System.Text.EncoderProgress" => ("", "System.Text.EncoderState"),
+            "Accept" when owner == "System.Text.Encoder" => ("String,Boolean", "System.Result<Void,System.Text.EncodingError>"),
+            "Drain" when owner == "System.Text.Encoder" => ("arrayref<Byte>,Int32,Int32", "System.Result<System.Text.EncoderProgress,System.Text.EncodingError>"),
+            "Finish" when owner == StreamWriter => ("", "System.Result<Int32,System.IO.StreamError>"),
+            "CreateEncoder" when owner == "System.Text.Encoding" => ("", "System.Text.Encoder"),
             "CreateDecoder" when owner == "System.Text.Encoding" => ("", "System.Text.Decoder"),
             "Decode" when owner == "System.Text.Decoder" => ("arrayref<Byte>,Int32,Int32,Boolean", "System.Result<String,System.Text.EncodingError>"),
             "ReadLine" when owner is Reader or Stream => ("Int32", "System.Result<System.Option<String>,System.IO.TextReadError>"),
@@ -92,10 +110,12 @@ static class ReaderBindings
             "Close" when owner is Reader or Stream or Writer or StreamWriter => ("", "noresult"),
             _ => throw new InvalidDataException("Unsupported reader member.")
         };
+        var virtualMember = !construct && owner != "System.Text.EncoderProgress"
+            && !(owner == StreamWriter && reference.Name == "Finish");
         if (!definition.IsPublic || definition.IsStatic || definition.HasGenericParameters
             || definition.DeclaringType.HasGenericParameters || definition.IsConstructor != construct
-            || !reference.HasThis || definition.IsVirtual != !construct
-            || (owner is Stream or StreamWriter ? !definition.DeclaringType.IsSealed || definition.IsFinal != !construct
+            || !reference.HasThis || definition.IsVirtual != virtualMember
+            || (owner is Stream or StreamWriter or "System.Text.EncoderProgress" ? !definition.DeclaringType.IsSealed || definition.IsFinal != virtualMember
                 : !definition.DeclaringType.IsInterface || !definition.IsAbstract || definition.HasBody)
             || string.Join(',', args) != expected.Item1 || result != expected.Item2)
             throw new InvalidDataException("Unsupported reader signature.");
