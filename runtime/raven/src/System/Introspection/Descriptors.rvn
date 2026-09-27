@@ -36,6 +36,15 @@ public sealed interface MethodInfo : MemberInfo {
     val IsAbstract: bool { get }
 }
 
+public sealed interface ConstructorInfo : MemberInfo {
+    val IsStatic: bool { get }
+    val IsPublic: bool { get }
+    val IsPrivate: bool { get }
+    val IsAssembly: bool { get }
+    val DefinitionIndex: int { get }
+    func GetParameters() -> Sequence<ParameterInfo>
+}
+
 public sealed interface PropertyInfo : MemberInfo {
     val PropertyType: TypeInfo { get }
     val IsStatic: bool { get }
@@ -201,6 +210,88 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
 
 }
 
+internal class RuntimeConstructorInfo : RuntimeMemberInfo, ConstructorInfo {
+    private field StoredReturnType: TypeInfo
+    private field StoredIsStatic: bool
+    private field StoredIsPublic: bool
+    private field StoredIsPrivate: bool
+    private field StoredIsAssembly: bool
+    private field StoredIsReceiverByRef: bool
+    private field StoredDefinitionIndex: int
+    private field StoredParameters: ParameterSnapshot
+    private field StoredIsReadOnly: bool
+    private field StoredIsVirtual: bool
+    private field StoredIsOverride: bool
+    private field StoredIsAbstract: bool
+
+    private init(
+        name: string, declaringType: TypeInfo, metadataToken: int,
+        returnType: TypeInfo, isStatic: bool,
+        isPublic: bool, isPrivate: bool,
+        isAssembly: bool, isReceiverByRef: bool,
+        definitionIndex: int, parameters: ParameterSnapshot,
+        isReadOnly: bool, isVirtual: bool,
+        isOverride: bool, isAbstract: bool): base(name, declaringType, metadataToken) {
+        StoredReturnType = returnType
+        StoredIsStatic = isStatic
+        StoredIsPublic = isPublic
+        StoredIsPrivate = isPrivate
+        StoredIsAssembly = isAssembly
+        StoredIsReceiverByRef = isReceiverByRef
+        StoredDefinitionIndex = definitionIndex
+        StoredParameters = parameters
+        StoredIsReadOnly = isReadOnly
+        StoredIsVirtual = isVirtual
+        StoredIsOverride = isOverride
+        StoredIsAbstract = isAbstract
+    }
+
+    val ReturnType: TypeInfo => StoredReturnType
+    val IsStatic: bool => StoredIsStatic
+    val IsPublic: bool => StoredIsPublic
+    val IsPrivate: bool => StoredIsPrivate
+    val IsAssembly: bool => StoredIsAssembly
+    val IsReceiverByRef: bool => StoredIsReceiverByRef
+    val DefinitionIndex: int => StoredDefinitionIndex
+
+    func GetParameters() -> Sequence<ParameterInfo> {
+        let count = StoredParameters.Length
+        let result = CheckedStorage.Reserve<ParameterInfo>(count)
+        var index = 0
+        while index < count {
+            result[index] = StoredParameters.Get(index)
+            index += 1
+        }
+        return result
+    }
+    val IsReadOnly: bool => StoredIsReadOnly
+    val IsVirtual: bool => StoredIsVirtual
+    val IsOverride: bool => StoredIsOverride
+    val IsAbstract: bool => StoredIsAbstract
+
+    override func Equals(other: Object?) -> bool {
+        if other is RuntimeConstructorInfo implementation {
+            if let Some(owner) = DeclaringType {
+                if let Some(otherOwner) = implementation.DeclaringType {
+                    return owner.Equals(otherOwner) && DefinitionIndex == implementation.DefinitionIndex
+                }
+            }
+        }
+        return false
+    }
+
+    override func GetHashCode() -> int {
+        var hash = HashCode()
+        hash.Add(2)
+        if let Some(owner) = DeclaringType {
+            hash.Add(owner.FullName)
+        }
+        hash.Add(DefinitionIndex)
+        return hash.ToHashCode()
+    }
+
+}
+
 internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
     private field StoredPropertyType: TypeInfo
     private field StoredIsStatic: bool
@@ -320,6 +411,8 @@ public sealed interface TypeInfo : MemberInfo, EquatableTo<TypeInfo> {
     func GetEnumUnderlyingType() -> TypeInfo
     func GetFields() -> Sequence<FieldInfo>
     func GetFields(flags: BindingFlags) -> Sequence<FieldInfo>
+    func GetConstructors() -> Sequence<ConstructorInfo>
+    func GetConstructors(flags: BindingFlags) -> Sequence<ConstructorInfo>
     func GetMethods() -> Sequence<MethodInfo>
     func GetMethods(flags: BindingFlags) -> Sequence<MethodInfo>
     func GetProperties() -> Sequence<PropertyInfo>
@@ -363,6 +456,14 @@ internal class RuntimeTypeInfo : TypeInfo {
 
     func GetFields(flags: BindingFlags) -> Sequence<FieldInfo> {
         return RuntimeServices.TypeFields(Handle, (int)flags)
+    }
+
+    func GetConstructors() -> Sequence<ConstructorInfo> {
+        return RuntimeServices.TypeConstructors(Handle, 20)
+    }
+
+    func GetConstructors(flags: BindingFlags) -> Sequence<ConstructorInfo> {
+        return RuntimeServices.TypeConstructors(Handle, (int)flags)
     }
 
     func GetMethods() -> Sequence<MethodInfo> {

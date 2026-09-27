@@ -253,3 +253,12 @@ DateTime(LocalDateTime | ZonedDateTime). Fixed-offset civil projection covers ye
 arithmetic across DST, and validate gaps, ordered overlaps and second-level offsets.
 Formatting uses the existing separate culture APIs. No unified localization resource
 implementation or scheduling API is added.
+
+## Reflection member execution — author-selected 2026-09-27
+
+[The bounded contract](../reflection-members.md) owns constructor discovery, typed
+activation, method invocation and field access. Reflection remains an execution
+extension namespace over descriptive introspection; validation failures use Result.
+See the [source consumer](../experiments/reflection-members/README.md) and separate
+website feature page. Generic class execution, static fields and binder coercions
+remain outside this slice.

@@ -10,7 +10,7 @@ From an object’s type to an assembly’s members, one descriptive model gives 
 
 ## TypeInfo acquisition
 
-Suppose a diagnostic tool wants to describe the types and members available to a program. It needs metadata, without running the methods it discovers. Introspection is that descriptive layer; bounded construction and property execution are described separately below.
+Suppose a diagnostic tool wants to describe the types and members available to a program. It needs metadata, without running the methods it discovers. Introspection is that descriptive layer; execution belongs to the separate [Reflection feature](../reflection/).
 
 The example declares an empty `Widget` class. Its instance is held through `Object`, but `GetType()` still describes the concrete allocation. `typeof(Widget)` describes the declared type. Both return the same public contract: `System.Introspection.TypeInfo`.
 
@@ -136,15 +136,16 @@ Sequence states the collection capability without requiring an array in the publ
 - There is one loaded-program context. Dynamic assembly loading and resolution belong to future RuntimeContext work.
 - Queries cover retained metadata. Development includes application instance properties and accessor tokens; static application properties and generic method-definition reflection remain limited.
 - Open generic definitions can report identity, shape, arguments, tokens and module. Their member, base-type and interface queries require a closed type and fault otherwise.
-- General invocation, emit and offline metadata contexts remain future work. TypeInfo is part of the sealed MemberInfo hierarchy.
+- Emit and offline metadata contexts remain future work; bounded invocation is covered by [Reflection](../reflection/). TypeInfo is part of the sealed MemberInfo hierarchy.
 
-Development `System.Runtime.Reflection` extensions provide checked parameterless
-construction and instance property reads/writes. Expected validation failures return
-Result; constructor and accessor code runs normally, including virtual dispatch,
-GC rooting and terminal faults. The first iteration supports nongeneric reference
-classes and nonindexed properties with references or built-in scalar values. It has
-no binder coercion or private access. This supports the bounded [JSON object mapper](../../docs/json.html). See the [runtime reflection guide](../../docs/reflection.html)
-for signatures, null handling, limitations and source-access requirements.
+Development constructor discovery adds `GetConstructors()` and the `ConstructorInfo`
+member case. It returns declared public instance constructors by default; explicit
+BindingFlags can inspect nonpublic declarations. Constructors remain separate from
+GetMethods. Exhaustive matches over the development MemberInfo family must include
+ConstructorInfo as well as the cases shown in the Preview 10 sample above.
+
+[Reflection](../reflection/) separately supplies Result-based construction, method
+invocation and member access. Metadata discovery alone grants no execution permission.
 
 <a id="objects"></a>
 

@@ -96,6 +96,7 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/HashCode.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectTypeHandle.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ReflectionExecution.neoil')
+        result += build(ROOT / 'runtime/neoCLR/Runtime/ReflectionMembers.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectIdentity.neoil')
         result += build(ROOT / 'runtime/raven/SingleError.neoil')
         result += build(ROOT / 'runtime/raven/Linq.neoil')

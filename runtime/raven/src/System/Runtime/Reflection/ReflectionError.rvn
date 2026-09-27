@@ -8,5 +8,10 @@ public union ReflectionError {
     case UnsupportedProperty
     case MissingAccessor
     case InvalidReceiver
+    case UnsupportedMethod
+    case UnsupportedField
+    case InvalidArguments
+    case AmbiguousConstructor
+    case InvalidResultType
     case InvalidValue
 }

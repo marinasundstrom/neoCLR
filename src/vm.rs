@@ -2752,6 +2752,7 @@ fn interpret_instructions(
                         if matches!(
                             binding,
                             crate::native::Binding::ReflectionConstruct
+                                | crate::native::Binding::ReflectionMember(_)
                                 | crate::native::Binding::ReflectionProperty(_)
                         ) {
                             if frames.len() >= limits.frames {
@@ -2766,6 +2767,8 @@ fn interpret_instructions(
                                     crate::reflection_properties::adapter(
                                         module, &callee, &args, setter,
                                     )?
+                                } else if let crate::native::Binding::ReflectionMember(kind) = binding {
+                                    crate::reflection_members::adapter(module, &callee, &args, kind)?
                                 } else {
                                     crate::reflection_execution::adapter(module, &callee, &args[0])?
                                 };

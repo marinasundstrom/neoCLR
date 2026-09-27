@@ -334,3 +334,11 @@ and standard Int64ParseError now have generated type/member coverage and XML
 contracts. [Casing and decimal reporting](text-numbers.md) explains Unicode 17 full
 mappings, .NET differences, typed failures and static bounds properties. Matching
 native runtime, library and reference artifacts are required; no manual exclusions.
+
+### Reflection member checkpoint (2026-09-27)
+
+ConstructorInfo, GetConstructors, typed/argument-based CreateInstance, MethodInfo.Invoke,
+FieldInfo.GetValue/SetValue and the additional ReflectionError cases have matching
+XML contracts and selected reference coverage. The feature page is separate from
+introspection; the API guide owns signatures and restrictions. Source field access
+and read-only admission metadata require matching development artifacts.

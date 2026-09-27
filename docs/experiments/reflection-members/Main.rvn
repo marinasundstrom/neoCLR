@@ -1,0 +1,83 @@
+import System.*
+import System.Introspection.*
+import System.Runtime.Reflection.*
+import System.Result.*
+
+public class Model {
+    field Count: int = 0
+    readonly field Fixed: int = 8
+    private var secret: int = 19
+
+    init(value: int) {
+        Count = value
+    }
+
+    func Add(value: int) -> int => Count + value
+    static func Twice(value: int) -> int => value * 2
+    func Clear() {
+        Count = 0
+    }
+}
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("Reflection member contract failed")
+    }
+}
+
+func Field(name: string) -> FieldInfo {
+    for item in typeof(Model).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) {
+        if item.Name == name {
+            return item
+        }
+    }
+    System.Fault("Missing field")
+}
+
+func Method(name: string) -> MethodInfo {
+    for method in typeof(Model).GetMethods() {
+        if method.Name == name {
+            return method
+        }
+    }
+    System.Fault("Missing method: " + name)
+}
+
+func Exercise() -> Result<(), ReflectionError> {
+    let type = typeof(Model)
+    let constructors = type.GetConstructors()
+    Check(constructors.Count == 1)
+    let constructor = constructors[0]
+    Check(constructor.IsPublic && !constructor.IsStatic)
+    Check(constructor.GetParameters().Count == 1)
+    Check(constructor.GetParameters()[0].ParameterType.Equals(typeof(int)))
+    Check(constructor.MetadataToken != 0)
+    let model = type.CreateInstance<Model>(17)?
+    Check(model.Count == 17)
+    let added = Method("Add").Invoke(model, 25)?
+    Check(added is int value && value == 42)
+    Check(Model.Twice(21) == 42)
+    let doubled = Method("Twice").Invoke(null, 21)?
+    Check(doubled is int value && value == 42)
+    let _ = Field("Count").SetValue(model, 41)?
+    let count = Field("Count").GetValue(model)?
+    Check(count is int value && value == 41)
+    Check(Field("Count").SetValue(model, "wrong") is Error(ReflectionError.InvalidValue))
+    Check(Field("Fixed").SetValue(model, 9) is Error(ReflectionError.AccessDenied))
+    Check(Field("secret").GetValue(model) is Error(ReflectionError.AccessDenied))
+    Check(Field("secret").IsPrivate)
+    Check(Method("Add").Invoke(null, 1) is Error(ReflectionError.InvalidReceiver))
+    Check(Method("Add").Invoke(model, "wrong") is Error(ReflectionError.InvalidArguments))
+    Check(type.CreateInstance<string>(17) is Error(ReflectionError.InvalidResultType))
+    Check(type.CreateInstance("wrong") is Error(ReflectionError.MissingConstructor))
+    let cleared = Method("Clear").Invoke(model)?
+    Check(cleared is null && model.Count == 0)
+    return Ok(())
+}
+
+func Main() {
+    if Exercise() is Error(_) {
+        System.Fault("Reflection workflow failed")
+    }
+    Console.WriteLine("Constructor, invocation and field checks passed")
+}

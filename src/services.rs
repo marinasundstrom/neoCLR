@@ -98,8 +98,11 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::UnixTimeTicks => RuntimeService::WallClock,
             crate::native::Binding::Math(_) => RuntimeService::MathOperations,
             crate::native::Binding::ReflectionConstruct
+            | crate::native::Binding::ReflectionMember(_)
             | crate::native::Binding::ReflectionProperty(_) => RuntimeService::ReflectionExecution,
             crate::native::Binding::ReflectionConstructionCheck
+            | crate::native::Binding::ReflectionMemberCheck(_)
+            | crate::native::Binding::ReflectionAssignable
             | crate::native::Binding::ReflectionPropertyCheck(_)
             | crate::native::Binding::Reflection(_)
             | crate::native::Binding::AssemblyInfo(_)
@@ -173,6 +176,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
         if matches!(
             crate::native::bind(function)?,
             crate::native::Binding::ReflectionConstruct
+            | crate::native::Binding::ReflectionMember(_)
                 | crate::native::Binding::ReflectionProperty(_)
         ) {
             uses.extend(
@@ -213,6 +217,8 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
         if matches!(
             crate::native::bind(function)?,
             crate::native::Binding::UnixTimeToLocal
+                | crate::native::Binding::ReflectionMember(_)
+                | crate::native::Binding::ReflectionMemberCheck(_)
                 | crate::native::Binding::TimeZoneMapLocal
                 | crate::native::Binding::EnvironmentArguments
                 | crate::native::Binding::Utf8Encode

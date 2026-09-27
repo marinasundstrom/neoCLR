@@ -27,6 +27,9 @@ pub(crate) enum Binding {
     Reflection(crate::reflection::Query),
     ReflectionConstructionCheck,
     ReflectionConstruct,
+    ReflectionMember(u8),
+    ReflectionMemberCheck(u8),
+    ReflectionAssignable,
     ReflectionPropertyCheck(bool),
     ReflectionProperty(bool),
     ObjectTypeHandle,
@@ -130,6 +133,21 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             return Err(Fault::new("reflection binding signature mismatch"));
         }
         return Ok(Binding::Reflection(query));
+    }
+    if function.name == "neoCLR.Runtime.ReflectionAssignable" {
+        if function.parameters != [Type::RuntimeTypeHandle, Type::RuntimeTypeHandle] || function.returns != Type::Boolean || function.no_result { return Err(Fault::new("reflection assignability signature mismatch")); }
+        return Ok(Binding::ReflectionAssignable);
+    }
+    for (kind, name) in ["ConstructArgs", "Invoke", "FieldGet", "FieldSet"].iter().enumerate() {
+        let execution = format!("neoCLR.Runtime.Reflection{name}");
+        let check = function.name == format!("{execution}Check");
+        if function.name != execution && !check { continue; }
+        let object = Type::from_name("System.Object");
+        let expected = vec![Type::RuntimeTypeHandle, Type::Int32, object.clone(), Type::ArrayRef(Box::new(object.clone()))];
+        if function.parameters != expected || function.returns != if check {Type::Int32} else {object} || function.no_result {
+            return Err(Fault::new("reflection member signature mismatch"));
+        }
+        return Ok(if check {Binding::ReflectionMemberCheck(kind as u8)} else {Binding::ReflectionMember(kind as u8)});
     }
     if let Some((setter, check)) = match function.name.as_str() {
         "neoCLR.Runtime.ReflectionPropertyGetCheck" => Some((false, true)),
@@ -636,6 +654,8 @@ impl Binding {
             return query.invoke(module, &args, limits);
         }
         match (self, args.as_slice()) {
+            (Self::ReflectionAssignable, args) => Ok(Value::Boolean(crate::reflection_members::assignable(module,args))),
+            (Self::ReflectionMemberCheck(kind), args) => Ok(Value::Int32(crate::reflection_members::check(module,args,*kind))),
             (Self::ReflectionPropertyCheck(setter), args) => Ok(Value::Int32(
                 crate::reflection_properties::check(module, args, *setter),
             )),

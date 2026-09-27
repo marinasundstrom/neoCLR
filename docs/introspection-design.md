@@ -663,3 +663,7 @@ public extensions and correct method-accessibility queries; ordinary lowered cal
 permissions are unchanged. Older imported origins without these optional fields
 load but are denied reflective execution. The matching runtime is required to read
 new origin fields. General method invocation and field assignment remain future work.
+
+The 2026-09-27 development slice adds `ConstructorInfo` and declared-constructor
+queries to the descriptive model. Execution remains in separate Reflection
+extensions; see [the current member contract](reflection-members.md).

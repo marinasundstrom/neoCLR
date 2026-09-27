@@ -11,11 +11,12 @@ static class IntrospectionHierarchy
         ["ModuleInfo"] = ["RuntimeModuleInfo"],
         ["TypeInfo"] = ["RuntimeTypeInfo"],
         ["ParameterInfo"] = ["RuntimeParameterInfo"],
-        ["MemberInfo"] = ["FieldInfo", "MethodInfo", "PropertyInfo", "TypeInfo"],
+        ["MemberInfo"] = ["FieldInfo", "MethodInfo", "ConstructorInfo", "PropertyInfo", "TypeInfo"],
         ["FieldInfo"] = ["RuntimeFieldInfo"],
         ["MethodInfo"] = ["RuntimeMethodInfo"],
+        ["ConstructorInfo"] = ["RuntimeConstructorInfo"],
         ["PropertyInfo"] = ["RuntimePropertyInfo"],
-        ["RuntimeMemberInfo"] = ["RuntimeFieldInfo", "RuntimeMethodInfo", "RuntimePropertyInfo"],
+        ["RuntimeMemberInfo"] = ["RuntimeFieldInfo", "RuntimeMethodInfo", "RuntimeConstructorInfo", "RuntimePropertyInfo"],
     };
     public static bool IsRoot(TypeReference type) => type.Namespace == "System.Introspection" && Cases.ContainsKey(type.Name);
     public static void Project(ModuleDefinition module)

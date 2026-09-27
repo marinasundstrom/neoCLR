@@ -7,6 +7,7 @@ static class DescriptorLibrary
         ["MemberInfo"] = [("Name", "System.String"), ("DeclaringType", "System.Introspection.TypeInfo"), ("MetadataToken", "System.Int32")],
         ["FieldInfo"] = [("FieldType", "System.Introspection.TypeInfo"), ("IsPublic", "System.Boolean"), ("IsPrivate", "System.Boolean"), ("IsAssembly", "System.Boolean"), ("IsStatic", "System.Boolean"), ("DefinitionIndex", "System.Int32")],
         ["MethodInfo"] = [("ReturnType", "System.Introspection.TypeInfo"), ("IsStatic", "System.Boolean"), ("IsPublic", "System.Boolean"), ("IsPrivate", "System.Boolean"), ("IsAssembly", "System.Boolean"), ("IsReceiverByRef", "System.Boolean"), ("DefinitionIndex", "System.Int32"), ("Parameters", "System.Runtime.CompilerServices.ParameterSnapshot"), ("IsReadOnly", "System.Boolean"), ("IsVirtual", "System.Boolean"), ("IsOverride", "System.Boolean"), ("IsAbstract", "System.Boolean")],
+        ["ConstructorInfo"] = [("ReturnType", "System.Introspection.TypeInfo"), ("IsStatic", "System.Boolean"), ("IsPublic", "System.Boolean"), ("IsPrivate", "System.Boolean"), ("IsAssembly", "System.Boolean"), ("IsReceiverByRef", "System.Boolean"), ("DefinitionIndex", "System.Int32"), ("Parameters", "System.Runtime.CompilerServices.ParameterSnapshot"), ("IsReadOnly", "System.Boolean"), ("IsVirtual", "System.Boolean"), ("IsOverride", "System.Boolean"), ("IsAbstract", "System.Boolean")],
         ["PropertyInfo"] = [("PropertyType", "System.Introspection.TypeInfo"), ("IsStatic", "System.Boolean"), ("CanRead", "System.Boolean"), ("CanWrite", "System.Boolean"), ("DefinitionIndex", "System.Int32"), ("IndexParameters", "System.Runtime.CompilerServices.ParameterSnapshot"), ("Getter", "System.Option`1<System.Introspection.MethodInfo>"), ("Setter", "System.Option`1<System.Introspection.MethodInfo>")],
     };
     public static bool IsDescriptor(TypeReference type) => type.Namespace == "System.Introspection" && type.Name.StartsWith("Runtime") && Layouts.ContainsKey(type.Name[7..]);
@@ -44,6 +45,8 @@ static class DescriptorLibrary
             core.GetType("System.Introspection.RuntimeTypeInfo"), "System.Introspection.RuntimeTypeInfo"));
         result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.TypeReflectionExtensions"));
         result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.PropertyReflectionExtensions"));
+        result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.MethodReflectionExtensions"));
+        result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.FieldReflectionExtensions"));
         return result.ToArray();
     }
     static bool CoreStorage(TypeReference type, ModuleDefinition source)
@@ -57,6 +60,6 @@ static class DescriptorLibrary
     public static bool IsProvider(TypeReference type) => type.Namespace == "System.Introspection"
         && (IsDescriptor(type) || type.Name is "RuntimeTypeInfo" or "RuntimeParameterInfo" or "RuntimeAssemblyInfo" or "RuntimeModuleInfo");
     public static bool SameType(TypeReference left, TypeReference right) => (IsProvider(left)
-        || left.Namespace == "System.Introspection" && left.Name is "MemberInfo" or "FieldInfo" or "MethodInfo" or "PropertyInfo" or "TypeInfo" or "ParameterInfo" or "AssemblyInfo" or "ModuleInfo")
+        || left.Namespace == "System.Introspection" && left.Name is "MemberInfo" or "FieldInfo" or "MethodInfo" or "ConstructorInfo" or "PropertyInfo" or "TypeInfo" or "ParameterInfo" or "AssemblyInfo" or "ModuleInfo")
         && left.FullName == right.FullName && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
 }

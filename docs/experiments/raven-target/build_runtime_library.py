@@ -385,7 +385,7 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
         assert match, lines[0]
         end = lines.index('.end\n')
         body = ''.join(lines[:end + 1])
-        if (name == 'Tasks' and match[1].startswith(('System.Tasks.TaskOperators.', 'System.Tasks.TaskResultOperators.'))) or (name == 'Descriptors' and match[1].startswith(('System.Runtime.Reflection.TypeReflectionExtensions.', 'System.Runtime.Reflection.PropertyReflectionExtensions.'))):
+        if (name == 'Tasks' and match[1].startswith(('System.Tasks.TaskOperators.', 'System.Tasks.TaskResultOperators.'))) or ('<' not in match[1] and name == 'Descriptors' and match[1].startswith(('System.Runtime.Reflection.TypeReflectionExtensions.', 'System.Runtime.Reflection.PropertyReflectionExtensions.', 'System.Runtime.Reflection.MethodReflectionExtensions.', 'System.Runtime.Reflection.FieldReflectionExtensions.'))):
             operator_owner = match[1].rsplit('.', 1)[0]
             extension_owners.setdefault(operator_owner, []).append(body.replace('.function ' + operator_owner + '.', '.method static ', 1))
         elif match[1].startswith(owner + '.'):
@@ -427,6 +427,8 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
     # Retain only transitively called adapters; no application entry-point shim.
     used = set()
     pending = re.findall(r'(?m)^(?:call|ldftn) ([^(]+)\(', ''.join(methods + types))
+    if name == 'Descriptors':
+        pending.append('System.Runtime.Reflection.TypeReflectionExtensions.CreateInstanceTyped<T0>')
     if name == 'JsonValue':
         # Public generic static wrappers use the existing generic-function ABI.
         # They are application roots even when no other library method calls them.

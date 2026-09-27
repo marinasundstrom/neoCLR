@@ -29,6 +29,7 @@ relevant differences from .NET. Use the [API reference](../docs/) to look up exa
 | [Networking](../features/networking/) | Resolve a hostname and exchange bytes through a TCP client |
 | [Web and HTTP](../features/web/) | Client/server exchanges, handlers, JSON and bounded stream uploads |
 | [Introspection](../features/introspection/) | Discover types and members and understand descriptor identity |
+| [Reflection](../features/reflection/) | Construct objects, invoke methods and access fields and properties |
 
 ## Development walkthroughs
 

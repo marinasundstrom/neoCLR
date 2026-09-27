@@ -54,6 +54,11 @@ milestone is selected by completing these slices.
 M2–M6 remain candidate applications; no complete File Catalog
 or additional HTTP feature is required by the comparer slice.
 
+The author next selected [constructor discovery and Reflection execution](reflection-members.md):
+argument-based activation, invocation and field access, with Result failures and a
+separate website feature page. This is bounded library/runtime work, not selection of
+a new application milestone.
+
 ## Theme trackers
 
 Each work item has one status owner. Use that tracker for its status, remaining

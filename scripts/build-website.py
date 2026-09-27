@@ -291,6 +291,10 @@ def main():
         'GRAPHEME_ITERATION': (raven + 'library-grapheme-strings.rvn', 'func ShowCharacters', '\n}', True),
         'UTF8_ROUNDTRIP': (raven + 'library-utf8.rvn', 'func RoundTrip', '\n}', True),
     })
+    samples.update({
+        'REFLECTION_CONSTRUCTION_SAMPLE': ('docs/experiments/reflection-members/Main.rvn', '    let model =', '    let _ = Field', False),
+        'REFLECTION_FIELD_SAMPLE': ('docs/experiments/reflection-members/Main.rvn', '    let _ = Field', '    Check(Field', False),
+    })
     tour = raven + 'library-introspection-tour.rvn'
     samples.update({
         'TOUR_ACQUISITION': (tour, '    let widget:', '\n    let assembly', False),
@@ -305,6 +309,7 @@ def main():
     array_output = (ROOT / (raven + 'library-array-tour.expected.txt')).read_text().rstrip()
     downloads = OUTPUT / 'samples'
     downloads.mkdir()
+    shutil.copyfile(ROOT / "docs/experiments/reflection-members/Main.rvn", downloads / "reflection-members.rvn")
     for name in ('library-time-zones.rvn', 'library-date-formatting.rvn', 'library-comparers.rvn', 'library-array-tour.rvn', 'library-array-tour.expected.txt', 'library-task-propagation.rvn', 'library-task-result.rvn', 'library-async-default-queue.rvn', 'library-task-producer.rvn', 'library-async-cancellation.rvn', 'library-outcome-operators.rvn', 'library-outcome-operators.expected.txt', 'library-query-basics.rvn', 'library-query-basics.expected.txt', 'library-query-names.rvn', 'library-query-names.expected.txt', 'library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
         source_sample = ROOT / raven / name
         shutil.copyfile(source_sample, downloads / name)

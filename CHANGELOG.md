@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Add development ConstructorInfo/GetConstructors, Result-based method invocation,
+  instance field access and argument-taking typed/untyped CreateInstance extensions.
+  Validate typed result compatibility before construction; keep exact scalar binding
+  and report ambiguous constructor matches. Preserve source field access/read-only
+  restrictions and static method ownership; imported field execution requires new
+  admission metadata. ConstructorInfo extends the closed MemberInfo family, requiring
+  exhaustive-match updates. Refresh library/API contracts and add a dedicated Reflection
+  feature page. Generic classes, static fields, coercion and byref/out remain unsupported.
+
 - Add provisional TimeOffset, named IANA TimeZone rules, immutable ZonedDateTime and
   explicit Unique/Ambiguous/Skipped local mapping. Introduce the author-directed
   nominal parenthesized DateTime(LocalDateTime | ZonedDateTime), with typed matching

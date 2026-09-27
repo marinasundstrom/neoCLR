@@ -1,0 +1,39 @@
+.function neoCLR.Runtime.ReflectionAssignable(System.RuntimeTypeHandle source, System.RuntimeTypeHandle target) -> Boolean
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.ReflectionConstructArgs(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> System.Object
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.ReflectionConstructArgsCheck(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> Int32
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.ReflectionInvoke(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> System.Object
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.ReflectionInvokeCheck(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> Int32
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.ReflectionFieldGet(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> System.Object
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.ReflectionFieldGetCheck(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> Int32
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.ReflectionFieldSet(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> System.Object
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.ReflectionFieldSetCheck(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> Int32
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.TypeConstructors(System.RuntimeTypeHandle type, Int32 flags) -> System.Introspection.ConstructorInfo[]
+.methodimpl InternalCall
+.end

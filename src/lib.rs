@@ -41,6 +41,7 @@ mod references;
 mod reflection;
 mod reflection_execution;
 mod reflection_properties;
+mod reflection_members;
 mod string_case_folding;
 mod string_casing;
 mod string_casing_data;

@@ -8261,3 +8261,23 @@ configuration/content, not target-specific code added to Raven main.
   Unicode-version split, naming and costs. [Focused evidence](experiments/casing-integer/README.md)
   covers a runnable report and exact runtime/metadata contracts. No general culture,
   normalization, builder optimization or next milestone was inferred from this direction.
+
+## 2026-09-27 — extend Reflection beyond properties
+
+- **Author:** selected the next issue after date/time integration: constructor discovery,
+  MethodInfo.Invoke, FieldInfo.GetValue/SetValue and argument-taking typed/untyped
+  TypeInfo.CreateInstance. The author left placement in Reflection open for discussion.
+- **Assistant:** proposed GetConstructors as descriptive introspection, with invocation,
+  member access and construction as System.Runtime.Reflection extensions. Existing
+  parameterless construction/property operations already returned Result.
+- **Author clarification:** “Keep Result returns”. Later requested that Reflection have
+  its own feature page. The initially sketched direct Object/T returns are not adopted.
+- **Action:** develop the [bounded contracts](reflection-members.md), public/native
+  consumer checks, source field access metadata and a separate Reflection feature page.
+  ConstructorInfo extends the closed MemberInfo family; typed activation checks result
+  compatibility before constructor execution. Validation evidence and remaining limits
+  are maintained with the feature and its executable consumer.
+
+- **Next author-selected slice:** after Reflection, add System.Runtime.GC with basic
+  information queries and collection influence. The assistant proposed starting from
+  actual collector capabilities; no GC API is implemented by this Reflection change.

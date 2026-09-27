@@ -196,7 +196,7 @@ internal sealed class JsonClientRead {
         ["JsonSyntax::WriteMessage(String)"] = ("System.Result<String,System.Data.Json.JsonError>", true, false),
     };
     // Only the bounded serializer/content wrappers are admitted as generic methods.
-    public static bool IsGenericSerializerMethod(MethodDefinition method) => HttpJsonBindings.IsGeneric(method) ||
+    public static bool IsGenericSerializerMethod(MethodDefinition method) => ReflectionGenericBindings.IsGeneric(method) || HttpJsonBindings.IsGeneric(method) ||
         ((method.DeclaringType.FullName == Prefix + "JsonSerializer" && method.Name == "Deserialize")
             || (method.DeclaringType.FullName == Content && method.Name == "Read")) && method.IsPublic && method.IsStatic
         && !method.IsVirtual && !method.IsAbstract && !method.ExplicitThis
@@ -217,12 +217,15 @@ internal sealed class JsonClientRead {
         && RuntimeSignatures.IsCore(returned.GenericArguments[1].Scope);
 
     public static string GenericImplementationName(MethodDefinition method) =>
+        ReflectionGenericBindings.IsGeneric(method) ? ReflectionGenericBindings.Implementation :
         HttpJsonBindings.IsGeneric(method) ? HttpJsonBindings.ImplementationName(method) :
         method.DeclaringType.FullName == Content ? Content + ".ReadModel" :
         Prefix + "JsonSerializer." + (method.Parameters[0].ParameterType.MetadataType == MetadataType.String
             ? "DeserializeText" : "DeserializeStream");
 
     public static CollectionBindings.Binding? Bind(MethodReference reference, MethodDefinition definition, bool construct, bool library) {
+        if (definition.DeclaringType.FullName == "System.Runtime.Reflection.TypeReflectionExtensions" && reference is GenericInstanceMethod)
+            return ReflectionGenericBindings.Bind(reference, definition, construct, library);
         if (HttpJsonBindings.Names.Contains(definition.DeclaringType.FullName) && reference is GenericInstanceMethod)
             return HttpJsonBindings.Bind(reference, definition, construct, library);
         var owner = Type(reference.DeclaringType);

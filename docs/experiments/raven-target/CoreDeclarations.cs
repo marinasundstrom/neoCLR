@@ -159,6 +159,7 @@ static class CoreDeclarations
             // or constructing it in executable code remains unsupported.
             public class NotImplementedException { }
             public sealed class FlagsAttribute : Attribute { }
+            internal sealed class ParamArrayAttribute : Attribute { public ParamArrayAttribute() { } }
             public enum AttributeTargets { All = 32767 }
             public sealed class AttributeUsageAttribute : Attribute {
                 public AttributeUsageAttribute(AttributeTargets targets) { }

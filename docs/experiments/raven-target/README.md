@@ -1351,3 +1351,27 @@ it already does for profile-specific String methods.
 See [the focused report](../casing-integer/README.md) for source/native checks and
 [design comparisons](../../design/text-casing-integer.md) for full casing versus
 .NET behavior. These are target integration additions, not general compiler fixes.
+
+### Reflection members and typed activation (2026-09-27)
+
+ConstructorInfo extends MemberInfo; GetConstructors returns Sequence snapshots. Exact
+bridge catalogs admit method invocation, field access and params activation extensions,
+including the single generic CreateInstance<T> facade. Source method names and static
+method ownership survive import. Public nongeneric static IL methods on imported
+classes are retained for discovery; this is not a pruning/AOT retention solution.
+Public read-only fields are admitted with the existing direct-store restrictions.
+
+Source type origins now include field_access and field_readonly vectors. Cardinality
+is validated; runtime reflection denies imported field execution when this information
+is missing and denies nonpublic/read-only writes. This does not broaden guest direct
+field access. Native adapters retain ordinary constructor/call/field semantics.
+Rebuild the reference, library, bridge and runtime together. Runtime Contract settings
+are unchanged; no Raven compiler source or emission policy is modified.
+
+The private TypeHandle<T> intrinsic emits existing ldtoken to avoid typeof fallback
+while compiling TypeInfo itself; it is not a public API. The generic activation facade
+is an explicit application root in the library generator. ParamArrayAttribute is an
+internal metadata marker. [Contract](../../reflection-members.md),
+[consumer](../reflection-members/README.md) and --reflection-member-checks document
+validation and exclusions. A dedicated website Reflection page separates execution
+from metadata inspection. Generic classes, byref/out and static fields remain excluded.

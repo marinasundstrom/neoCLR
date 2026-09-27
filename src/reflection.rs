@@ -12,6 +12,7 @@ pub(crate) enum Query {
     Module,
     Fields,
     Methods,
+    Constructors,
     Properties,
     Interfaces,
     GenericArguments,
@@ -36,6 +37,7 @@ impl Query {
             "neoCLR.Runtime.TypeMetadataToken" => (Self::MetadataToken, false, "Int32"),
             "neoCLR.Runtime.TypeModule" => (Self::Module, false, "System.Introspection.ModuleInfo"),
             "neoCLR.Runtime.TypeFields" => (Self::Fields, true, "System.Introspection.FieldInfo[]"),
+            "neoCLR.Runtime.TypeConstructors" => (Self::Constructors, true, "System.Introspection.ConstructorInfo[]"),
             "neoCLR.Runtime.TypeMethods" => {
                 (Self::Methods, true, "System.Introspection.MethodInfo[]")
             }
@@ -90,7 +92,7 @@ impl Query {
             .any(|a| matches!(a.identity, TypeIdentity::GenericParameter { .. }))
             && matches!(
                 self,
-                Self::Fields | Self::Methods | Self::Properties | Self::Interfaces | Self::BaseType
+                Self::Fields | Self::Methods | Self::Constructors | Self::Properties | Self::Interfaces | Self::BaseType
             )
         {
             return Err(Fault::new(
@@ -323,7 +325,7 @@ impl Query {
                     definition
                         .into_iter()
                         .flat_map(|d| d.fields.iter().enumerate())
-                        .filter(|(_, f)| selected(argument, f.visibility, false))
+                        .filter(|(index, _)| selected(argument, if crate::metadata_origin::field_access(definition.unwrap(), *index) == SourceAccess::Public { Visibility::Public } else { Visibility::Private }, false))
                         .map(|(index, f)| {
                             Ok(member_record(
                                 module,
@@ -341,9 +343,9 @@ impl Query {
                                         module,
                                         &f.ty.substitute_type_parameters(arguments)?,
                                     )?,
-                                    Value::Boolean(f.visibility == Visibility::Public),
-                                    Value::Boolean(f.visibility == Visibility::Private),
-                                    Value::Boolean(f.visibility == Visibility::Internal),
+                                    Value::Boolean(crate::metadata_origin::field_access(definition.unwrap(), index) == SourceAccess::Public),
+                                    Value::Boolean(crate::metadata_origin::field_access(definition.unwrap(), index) == SourceAccess::Private),
+                                    Value::Boolean(crate::metadata_origin::field_access(definition.unwrap(), index) == SourceAccess::Assembly),
                                     Value::Boolean(false),
                                     index_value(index)?,
                                 ],
@@ -352,18 +354,19 @@ impl Query {
                     limits,
                 )
             }
-            Self::Methods => {
+            Self::Methods | Self::Constructors => {
+                let constructors = matches!(self, Self::Constructors);
                 validate_flags(argument)?;
                 let owner = definition.map(|d| d.open_type());
                 array(
-                    "System.Introspection.MethodInfo",
+                    if constructors { "System.Introspection.ConstructorInfo" } else { "System.Introspection.MethodInfo" },
                     module
                         .functions
                         .iter()
                         .filter(|f| {
                             owner.is_some()
                                 && f.owner == owner
-                                && !f.name.ends_with("..ctor")
+                                && f.name.ends_with("..ctor") == constructors
                                 && selected(
                                     argument,
                                     if member_access(f) == SourceAccess::Public {
@@ -684,13 +687,12 @@ fn method(
     Ok(member_record(
         module,
         crate::metadata_tokens::method(f)?,
-        "System.Introspection.MethodInfo",
+        if f.name.ends_with("..ctor") { "System.Introspection.ConstructorInfo" } else { "System.Introspection.MethodInfo" },
         vec![
             Value::String(
-                f.name
-                    .strip_prefix(&format!("{}.", owner.definition_name().unwrap_or("")))
-                    .unwrap_or(&f.name)
-                    .into(),
+                f.origin.as_ref().map(|origin| origin.name.as_str()).unwrap_or_else(||
+                    f.name.strip_prefix(&format!("{}.", owner.definition_name().unwrap_or(""))).unwrap_or(&f.name)
+                ).into(),
             ),
             type_value(module, owner)?,
             type_value(module, &f.returns.substitute_type_parameters(arguments)?)?,
@@ -826,6 +828,7 @@ pub(crate) fn materialize(
                             "System.Introspection.RuntimeParameterInfo"
                         }
                         "System.Introspection.FieldInfo" => "System.Introspection.RuntimeFieldInfo",
+                        "System.Introspection.ConstructorInfo" => "System.Introspection.RuntimeConstructorInfo",
                         "System.Introspection.MethodInfo" => {
                             "System.Introspection.RuntimeMethodInfo"
                         }

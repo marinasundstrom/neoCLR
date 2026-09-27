@@ -4,8 +4,8 @@
 
 Import `System.Runtime.Reflection.*` to execute a small set of operations on
 runtime-backed `System.Introspection` descriptors. Introspection itself remains
-descriptive. These provisional extensions support the next JSON object-mapping
-experiment; object serialization is not implemented yet.
+descriptive. These provisional extensions also support the existing bounded JSON object mapper.
+See the separate [Reflection feature page](/features/reflection/) for a walkthrough.
 
 - `TypeInfo.CreateInstance() -> Result<Object, ReflectionError>` invokes a public
   parameterless constructor on a concrete, nongeneric reference class.
@@ -41,7 +41,7 @@ remain terminal runtime Faults, including allocation and execution limits. Sette
 have side effects before a fault; operations are not transactional.
 
 Only the current loaded program is supported. Dynamic loading, separate execution
-contexts, arbitrary method invocation and field access remain future work. These
+contexts, generic-class invocation and static-field access remain future work. These
 extensions do not make every introspection descriptor executable.
 
 ## Imported artifact access information
@@ -56,3 +56,34 @@ fields are denied. Definitions without source origins use ordinary runtime acces
 Rust callers constructing MetadataOrigin literals must supply the new optional fields.
 Newly imported artifacts need the matching runtime. These host/artifact contracts
 are not additional guest APIs or permissions to bypass normal runtime access checks.
+
+## Constructor arguments, methods and fields (development)
+
+[ConstructorInfo](xref:System.Introspection.ConstructorInfo) describes a constructor
+through MemberInfo identity, accessibility and GetParameters; GetConstructors defaults
+to public instance declarations. Constructors are not inherited or included in GetMethods.
+Adding ConstructorInfo extends the closed MemberInfo family: update exhaustive matches.
+
+[TypeReflectionExtensions](xref:System.Runtime.Reflection.TypeReflectionExtensions)
+adds `CreateInstance(params Object?[])` and `CreateInstance<T>(params Object?[])` returning
+Result<Object, ReflectionError> and Result<T, ReflectionError>. The described type is
+constructed; T is a checked result view, validated before invoking user code.
+
+[MethodReflectionExtensions](xref:System.Runtime.Reflection.MethodReflectionExtensions)
+adds `Invoke(Object? receiver, params Object?[] arguments) -> Result<Object?, ReflectionError>`.
+Use null for static methods and a compatible non-null object for instance methods.
+Void-returning methods produce a successful null. Virtual calls dispatch normally.
+
+[FieldReflectionExtensions](xref:System.Runtime.Reflection.FieldReflectionExtensions)
+adds `GetValue(Object?) -> Result<Object?, ReflectionError>` and
+`SetValue(Object?, Object?) -> Result<(), ReflectionError>`. Fields must be public
+instance fields; source read-only fields cannot be assigned. Private helper visibility
+does not grant permission. New origins retain field_access and field_readonly arrays;
+old imported fields without those admission flags cannot execute through reflection.
+
+Arguments require exact boxed built-in scalars or assignable references/null. No numeric
+coercion, optional defaults, byref/out, generic-class execution, custom value payloads or
+params expansion of the selected target is provided. Multiple compatible constructors
+return AmbiguousConstructor; none returns MissingConstructor. Invalid method arguments
+return InvalidArguments. Incompatible T returns InvalidResultType. UnsupportedMethod
+and UnsupportedField distinguish unsupported metadata shapes. User Faults stay terminal.

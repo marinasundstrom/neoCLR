@@ -78,6 +78,12 @@ if (args.Length == 2 && args[0] == "--slices")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--reflection-member-checks")
+{
+    ReflectionMemberChecks.Write(args[1]);
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--globalization-signatures")
 {
     GlobalizationChecks.Write(args[1]);

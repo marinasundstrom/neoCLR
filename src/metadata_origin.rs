@@ -42,6 +42,10 @@ pub struct MetadataOrigin {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub field_tokens: Vec<u32>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub field_access: Vec<SourceAccess>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub field_readonly: Vec<bool>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub property_tokens: Vec<u32>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub parameter_tokens: Vec<u32>,
@@ -97,6 +101,8 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                 .assemblies
                 .iter()
                 .any(|a| a.full_name == origin.assembly && a.modules.contains(&origin.module))
+            || !origin.field_access.is_empty() && origin.field_access.len() != fields
+            || !origin.field_readonly.is_empty() && origin.field_readonly.len() != fields
             || origin.field_tokens.len() != fields
             || origin.property_tokens.len() != properties
             || origin.parameter_tokens.len() != parameters
@@ -197,4 +203,13 @@ pub(crate) fn reflection_public(
             .origin
             .as_ref()
             .is_none_or(|o| o.member_access == Some(SourceAccess::Public))
+}
+
+/// Source field access when retained; legacy imports retain their descriptive visibility.
+pub(crate) fn field_access(owner: &crate::metadata::TypeDef, index: usize) -> SourceAccess {
+    owner.origin.as_ref().and_then(|o|o.field_access.get(index)).copied().unwrap_or_else(|| match owner.fields[index].visibility {
+        crate::metadata::Visibility::Public => SourceAccess::Public,
+        crate::metadata::Visibility::Private => SourceAccess::Private,
+        crate::metadata::Visibility::Internal => SourceAccess::Assembly,
+    })
 }

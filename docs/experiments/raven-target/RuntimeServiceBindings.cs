@@ -101,6 +101,15 @@ static class RuntimeServiceBindings
             ("ObjectEquals", ["System.Object", "System.Object"], "Boolean"),
             ("ObjectReferenceEquals", ["System.Object", "System.Object"], "Boolean"),
             ("ObjectIdentityHash", ["System.Object"], "Int32"),
+            ("ReflectionAssignable", ["System.RuntimeTypeHandle", "System.RuntimeTypeHandle"], "Boolean"),
+            ("ReflectionConstructArgs", ["System.RuntimeTypeHandle", "Int32", "System.Object", "arrayref<System.Object>"], "System.Object"),
+            ("ReflectionConstructArgsCheck", ["System.RuntimeTypeHandle", "Int32", "System.Object", "arrayref<System.Object>"], "Int32"),
+            ("ReflectionInvoke", ["System.RuntimeTypeHandle", "Int32", "System.Object", "arrayref<System.Object>"], "System.Object"),
+            ("ReflectionInvokeCheck", ["System.RuntimeTypeHandle", "Int32", "System.Object", "arrayref<System.Object>"], "Int32"),
+            ("ReflectionFieldGet", ["System.RuntimeTypeHandle", "Int32", "System.Object", "arrayref<System.Object>"], "System.Object"),
+            ("ReflectionFieldGetCheck", ["System.RuntimeTypeHandle", "Int32", "System.Object", "arrayref<System.Object>"], "Int32"),
+            ("ReflectionFieldSet", ["System.RuntimeTypeHandle", "Int32", "System.Object", "arrayref<System.Object>"], "System.Object"),
+            ("ReflectionFieldSetCheck", ["System.RuntimeTypeHandle", "Int32", "System.Object", "arrayref<System.Object>"], "Int32"),
             ("ReflectionConstructionCheck", ["System.RuntimeTypeHandle"], "Int32"),
             ("ReflectionConstruct", ["System.RuntimeTypeHandle"], "System.Object"),
             ("ReflectionPropertyGetCheck", ["System.RuntimeTypeHandle", "Int32", "System.Object"], "Int32"),
@@ -132,6 +141,7 @@ static class RuntimeServiceBindings
             ("TypeInfo", ["System.RuntimeTypeHandle"], "System.Introspection.TypeInfo"),
             ("TypeFields", ["System.RuntimeTypeHandle", "Int32"], "arrayref<System.Introspection.FieldInfo>"),
             ("TypeMethods", ["System.RuntimeTypeHandle", "Int32"], "arrayref<System.Introspection.MethodInfo>"),
+            ("TypeConstructors", ["System.RuntimeTypeHandle", "Int32"], "arrayref<System.Introspection.ConstructorInfo>"),
             ("TypeProperties", ["System.RuntimeTypeHandle", "Int32"], "arrayref<System.Introspection.PropertyInfo>"),
             ("TypeBaseType", ["System.RuntimeTypeHandle"], "System.Option<System.Introspection.TypeInfo>"),
             ("TypeElementType", ["System.RuntimeTypeHandle"], "System.Option<System.Introspection.TypeInfo>"),
@@ -153,11 +163,20 @@ static class RuntimeServiceBindings
     };
     static bool IsProperty(string name) => name is "CurrentTaskQueue" or "DefaultTaskQueue";
     public static string Declarations => "\n#nullable enable annotations\nnamespace Runtime.CompilerServices { public static class RuntimeServices { "
-        + string.Join(" ", Members.Select(m => IsProperty(m.Name) ? $"public static {CSharp(m.Result)} {m.Name} => default;" : $"public static {CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => CSharp(t) + ((m.Name == "ObjectReferenceEquals" || m.Name == "ObjectEquals" && i == 1 || m.Name.StartsWith("ReflectionProperty") && i >= 2) ? "?" : "") + " arg" + i))}) {(m.Result == "noresult" ? "{ }" : "=> default;")}")) + " public static bool IsValue<T>(System.Value value) => default; public static T UnpackValue<T>(System.Value value) => default; } }\n#nullable restore annotations\n";
+        + string.Join(" ", Members.Select(m => IsProperty(m.Name) ? $"public static {CSharp(m.Result)} {m.Name} => default;" : $"public static {CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => (m.Name.StartsWith("Reflection") && t == "arrayref<System.Object>" ? "object?[]" : CSharp(t)) + ((m.Name == "ObjectReferenceEquals" || m.Name == "ObjectEquals" && i == 1 || m.Name.StartsWith("Reflection") && t == "System.Object" && i >= 2) ? "?" : "") + " arg" + i))}) {(m.Result == "noresult" ? "{ }" : "=> default;")}")) + " public static System.RuntimeTypeHandle TypeHandle<T>() => default; public static bool IsValue<T>(System.Value value) => default; public static T UnpackValue<T>(System.Value value) => default; } }\n#nullable restore annotations\n";
 
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
         if (reference.DeclaringType.FullName != Owner) return null;
+        if (reference.Name == "TypeHandle") {
+            if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope) || reference.HasThis || !definition.IsPublic || !definition.IsStatic || definition.IsVirtual || definition.ExplicitThis
+                || definition.CallingConvention != MethodCallingConvention.Generic || definition.GenericParameters.Count != 1
+                || definition.GenericParameters[0].HasConstraints || definition.GenericParameters[0].Attributes != GenericParameterAttributes.NonVariant
+                || definition.Parameters.Count != 0 || definition.ReturnType.FullName != "System.RuntimeTypeHandle" || !RuntimeSignatures.IsCore(definition.ReturnType.Scope)
+                || reference is not GenericInstanceMethod generic || generic.GenericArguments.Count != 1)
+                throw new InvalidDataException("Unsupported type-token service.");
+            return new("", [], "System.RuntimeTypeHandle", Instruction: "ldtoken " + RuntimeSignatures.Map(generic.GenericArguments[0], GenericUnionBindings.Type));
+        }
         if (reference.Name is "IsValue" or "UnpackValue")
             return BindValue(reference, definition);
         if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope) || reference.HasThis

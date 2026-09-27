@@ -146,3 +146,9 @@ providers, returns Result for validation failures, and preserves terminal user F
 Application instance properties and their original tokens are now projected; static
 properties remain outside the importer and init-only setters are omitted from assignment.
 Method/accessor visibility queries use retained source accessibility when available.
+
+Development constructor discovery adds `ConstructorInfo` to the `MemberInfo` family.
+`TypeInfo.GetConstructors()` selects public instance constructors declared on the
+type; the flags overload allows descriptive visibility selection. Constructors
+expose parameters and visibility, without a method return type. See the
+[Reflection API guide](reflection.md) for execution limits.

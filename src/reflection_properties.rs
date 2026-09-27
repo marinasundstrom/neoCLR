@@ -23,7 +23,7 @@ struct Accessor {
     no_result: bool,
 }
 
-fn supported_value(module: &Module, ty: &Type) -> bool {
+pub(crate) fn supported_value(module: &Module, ty: &Type) -> bool {
     module.is_object_reference_type(ty)
         || matches!(
             ty,
@@ -44,7 +44,7 @@ fn supported_value(module: &Module, ty: &Type) -> bool {
         )
 }
 
-fn value_matches(module: &Module, value: &Value, target: &Type) -> bool {
+pub(crate) fn value_matches(module: &Module, value: &Value, target: &Type) -> bool {
     match value {
         Value::NullObjectReference(_) => module.is_object_reference_type(target),
         Value::ObjectReference(object) => {

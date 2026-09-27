@@ -23,6 +23,8 @@ static class SourceMetadata
         token = type.MetadataToken.ToUInt32(),
         publicly_visible = PublicType(type),
         declaring_type_token = type.DeclaringType is { } parent ? (uint?)parent.MetadataToken.ToUInt32() : null,
+        field_access = type.Fields.Select(f => f.IsPublic ? "Public" : f.IsPrivate ? "Private" : f.IsAssembly ? "Assembly" : f.IsFamily ? "Family" : f.IsFamilyOrAssembly ? "FamilyOrAssembly" : f.IsFamilyAndAssembly ? "FamilyAndAssembly" : "CompilerControlled").ToArray(),
+        field_readonly = type.Fields.Select(f => f.IsInitOnly || f.IsLiteral).ToArray(),
         field_tokens = type.Fields.Select(f => f.MetadataToken.ToUInt32()).ToArray(),
         property_tokens = ApplicationTypes.RuntimeProperties(type).Select(p => p.MetadataToken.ToUInt32()).ToArray()
     });

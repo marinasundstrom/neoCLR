@@ -148,3 +148,6 @@ Development directional contracts: [EquatableTo&lt;T&gt;](xref:System.EquatableT
 [ComparableTo&lt;T&gt;](xref:System.ComparableTo`1) and
 [ConvertibleInto&lt;T&gt;](xref:System.ConvertibleInto`1). The former Equatable/Comparable
 identities are removed; rebuild consumers.
+
+Development [Reflection](reflection.md) adds constructor discovery, argument-based typed
+activation, method invocation and field access. See the dedicated [feature page](/features/reflection/).

@@ -138,3 +138,13 @@ ProcessEnvironment and does not read the clock. See [Time/zone boundaries](time-
 Development full String casing uses StringOperations; Int64 parsing has its own
 ParseInt64 service requirement. Int64 decimal formatting reuses the existing
 StringOperations-classified integer formatting service.
+
+### Reflection members (development, 2026-09-27)
+
+ReflectionConstructArgs, ReflectionInvoke, ReflectionFieldGet and ReflectionFieldSet
+require ReflectionExecution, managed arrays, frames and the managed heap. Their
+Check companions inspect metadata and argument arrays without executing user code;
+ReflectionAssignable uses TypeInspection. TypeConstructors returns constructor
+descriptors through the existing inspection/array machinery. These private services
+support the [public Reflection contract](reflection-members.md); they do not grant
+access to private fields or introduce CLR binder conversions.
