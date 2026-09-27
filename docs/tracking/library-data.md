@@ -127,6 +127,12 @@ API model: grapheme characters with explicit lower-level views. Preserve .NET
 familiarity where useful; neither platform's whole surface is required. This refines
 the earlier portfolio, not authorization to implement it all.
 
+**Open naming input:** the author adds [Text versus String](../design/text-abstraction.md#open-naming-discussion-text-versus-string--2026-09-27)
+to the discussion, including Text/Rune/Bytes vocabulary and namespace placement.
+This is not a rename decision or approval to remove character iteration. Compare
+source spelling, core type identity and semantics separately; retain this question
+alongside the foundation work without making it a new milestone dependency.
+
 **Boundary experiment:** [application-only prototype](../experiments/text-boundaries/README.md)
 examines scalar validation, source-bound ranges and bounded UTF-8 decoding. These
 are not System APIs. The next bounded implementation recommendation is the UTF-8

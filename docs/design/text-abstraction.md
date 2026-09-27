@@ -331,6 +331,62 @@ not by themselves imply rewriting encoded data. A source-bound position also nee
 a declared boundary view (grapheme versus scalar), source validation and retention
 rules; making its offset opaque does not settle those questions.
 
+### Open naming discussion: Text versus String — 2026-09-27
+
+**Input, not a rename decision.** The author adds a proposal favoring `Text` for an
+encoding-independent Unicode value, with explicit scalar, grapheme and encoding
+views. Its suggested vocabulary is Text / Rune / Bytes / Encoding, and it considers
+moving encoding APIs out of System.Text so that System.Text could name the value
+type. The claimed readability benefit is a hypothesis; no usability comparison or
+compiler migration has been performed.
+
+`Text` foregrounds meaning rather than storage, and pairs naturally with ReadText,
+WriteText and explicit encoded views. However, Unicode text also includes machine
+syntax, control characters and non-display data; “human-readable” must not become a
+validation requirement. `Bytes` likewise needs an ownership/mutability contract if
+introduced as a type, not merely a nicer spelling for byte arrays. Neither Rune
+nor Bytes is approved by this vocabulary discussion.
+
+The proposal's premise that the value has no default element type differs from
+neoCLR's current `String : Sequence<char>` contract and the author's grapheme Char
+direction. We must evaluate those semantics independently of spelling. Retaining
+a character view or default character iteration does not make text encoding-bound.
+Swift itself retains the name String alongside grapheme Character and explicit
+Unicode views. Conversely, renaming to Text would not by itself remove indexing,
+choose count units, settle equality or change any complexity guarantee.
+
+Primary comparisons (reviewed 2026-09-27): [C# string](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/reference-types#the-string-type)
+is a language alias for System.String; this illustrates the distinction between
+source spelling and library type identity. [Swift String/Character](https://raw.githubusercontent.com/swiftlang/swift-book/main/TSPL.docc/LanguageGuide/StringsAndCharacters.md)
+illustrates that familiar String naming can coexist with an encoding-independent
+character model. Neither precedent chooses neoCLR's vocabulary for us.
+
+| Alternative | Potential benefit | Cost and question to resolve |
+| --- | --- | --- |
+| Keep String/string; describe it as Unicode text | Familiar .NET and Swift vocabulary, unchanged type identity and consumers | Explicit views and documentation must counter code-unit/indexing assumptions. |
+| Explore Text as a source alias or preferred spelling for the same value | Test clearer vocabulary without introducing a second text representation | Requires Raven name-resolution/tooling investigation; not known to work as a built-in alias today. Two spellings can confuse signatures, diagnostics and documentation. |
+| Rename the public core type to Text | One consistent text-oriented vocabulary across APIs | Coordinate literal/interpolation typing, compiler projection, bridge bindings, metadata identity, introspection, tools, samples and references. Decide whether a legacy alias is useful; do not assume a global textual replacement is sufficient. |
+| Add a distinct Text wrapper beside String | Could express an additional invariant if a real consumer needs one | Without such an invariant it duplicates the same abstraction, adds conversions and complicates equality/overloads. Not the current recommendation. |
+
+The migration cost here is more than programmer habit. For example, the existing
+[application bridge](../experiments/raven-target/OpaqueLibrary.cs) explicitly matches
+System.String and its opaque representation. Preview status makes breaking changes
+possible, but does not remove this coordination work. These are engineering costs,
+not a requirement to preserve .NET compatibility at the expense of a better contract.
+
+Namespace placement is a separate choice. Using System.Text as a type would require
+reviewing the existing System.Text namespace, imports, documentation paths and
+compiler resolution. System.Encoding and System.Globalization are candidate
+organizational names, not selected destinations. Keeping a compact System.Text
+namespace does not commit us to implementing .NET's entire namespace.
+
+**Disposition:** keep Text as an open naming candidate and current String/Char
+behavior intact while the foundation work proceeds. If pursued, compare a tiny
+reader/decoder/construction example under both vocabularies, with names held separate
+from changes to iteration/indexing. Then test the selected spelling through Raven
+literals, interpolation, generated metadata, bridge import and introspection. Do not
+make a broad rename or namespace reorganization a prerequisite for basic encoding.
+
 ### What to bring over from System.Text
 
 This is the recommended portfolio, **not an implementation commitment**. Inventory

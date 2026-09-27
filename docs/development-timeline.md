@@ -7996,3 +7996,19 @@ configuration/content, not target-specific code added to Raven main.
   Records application bridge/fixture limitations; no compiler or System API changes.
   No full suite or website build. Public view names, position semantics and builder
   shape remain open; the supplied proposal is not implemented wholesale.
+
+## 2026-09-27 — Text versus String naming proposal
+
+- **Author:** supplies additional design discussion favoring Text for an abstract
+  Unicode value, explicit views, Text/Rune/Bytes/Encoding vocabulary and possible
+  namespace reorganization. Asks to add it to the discussion, not implement a rename.
+- **Assistant assessment:** records the semantic-readability argument and the
+  familiar String alternative. Distinguishes source aliases, public type identity,
+  namespace placement and character-sequence semantics. Notes that Swift retains
+  String naming, and that the proposal's absence of a default element type differs
+  from neoCLR's current grapheme Sequence contract. No change to Char is inferred.
+- **Action/outcome:** adds the [open naming comparison](design/text-abstraction.md#open-naming-discussion-text-versus-string--2026-09-27)
+  and links it from the existing library tracker. Records concrete bridge coupling,
+  migration costs and validation needed if the proposal advances. No code, public API,
+  compiler, namespace or milestone sequence changes; documentation consistency and
+  whitespace checks only. The preferred name and any alias remain undecided.

@@ -43,7 +43,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Record the supplied alternative design as a proposal, not an approved migration.
   Add an application-only scalar/range/bounded-decoder experiment and focused
   passing evidence; no proposed types are added to System. Track bridge limitations
-  and distinguish byte progress from grapheme semantics.
+  and distinguish byte progress from grapheme semantics. Add Text versus String
+  as an open naming discussion, separating aliases, type identity, namespaces and
+  sequence semantics; no rename or namespace migration is implemented.
 - Record the author's focused-validation policy: only necessary checks, performance
   tests when relevant, and a full suite only when needed. Skip unrelated website builds.
 
