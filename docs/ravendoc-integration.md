@@ -99,3 +99,9 @@ RavenDoc resolves open generic receivers with their type parameters and keeps
 extension containers’ own declarations visible even with `extensions=false`.
 Static classes show no inherited instance members: `Task` is the static submission
 API, while `Task<T>` is the awaitable operation type.
+
+Compact extension labels omit receiver-bound type parameters on receiver pages
+(for example, `String.Any()`), preserving independent caller-selected parameters.
+Receiver substitutions also apply inside parameter and return types, such as
+`Map<U>(selector: Func<Char, U>)` on String.
+The extension container and declaration signature keep the full generic contract.

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Update RavenDoc extension list labels to omit type parameters supplied by the
+  receiver: String shows Any() rather than Any<T>(), while caller-selected generic
+  parameters remain and nested parameter types use the receiver substitution.
+  Declaration pages retain their full signatures.
+
 - Complete the locked dependency notice inventory for chrono-tz, sys-locale,
   phf/phf_shared and siphasher, including timezone-data licensing. Copy notices
   only after verifying upstream crate archives against Cargo.lock checksums.
