@@ -3,6 +3,10 @@
 [Current thematic tracking](../tracking/toolchain-release.md) owns status and next work; the documents below provide contracts, research and evidence.
 
 
+[HTTP CPU and Raven workspace-discovery follow-up](../experiments/http-json/lookup-comparison-20260927.md)
+records the general editor fix integrated into both Raven branches, its unchanged
+Runtime Contract/emission behavior and the remaining input-loop investigation.
+
 [Documentation index](../README.md)
 
 Integration and experiment notes describe bounded supported paths; consult each page for limitations and validation.

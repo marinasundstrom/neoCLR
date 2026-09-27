@@ -6,6 +6,7 @@ from urllib.request import urlopen, Request
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--bundle', required=True, type=Path)
 parser.add_argument('--output', required=True, type=Path)
+parser.add_argument('--runner', type=Path, help='Optional candidate runner; guest sources and System stay identical')
 parser.add_argument('--idle-seconds', type=float, default=10)
 args = parser.parse_args()
 if args.idle_seconds <= 0:
@@ -13,7 +14,8 @@ if args.idle_seconds <= 0:
 root = args.bundle.resolve()
 out = args.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
-cmd = [str(root / 'tools/http-runner'), str(root / 'editable-samples/http-json/server/bin/neoclr/Debug/App.neoil'), str(root / 'lib/System.neoil'), '1024', '100000000', '--live-output', '--', '7']
+runner = args.runner.resolve() if args.runner else root / 'tools/http-runner'
+cmd = [str(runner), str(root / 'editable-samples/http-json/server/bin/neoclr/Debug/App.neoil'), str(root / 'lib/System.neoil'), '1024', '100000000', '--live-output', '--', '7']
 
 def cpu(pid):
     s = subprocess.check_output(['ps', '-p', str(pid), '-o', 'time='], text=True).strip()

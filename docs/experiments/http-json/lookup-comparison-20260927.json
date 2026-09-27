@@ -1,0 +1,267 @@
+{
+  "runners": {
+    "baseline": "02503b01a692e16000a770dd3cf5f415c1e4cd513f068466998f3ddfc3ffd027",
+    "candidate": "01331f45f92483039f1f86370f1a0fad82d9fee663a7e8bf4423e93020818585"
+  },
+  "runs": [
+    {
+      "runner": "baseline",
+      "measurement": {
+        "pid": 72171,
+        "port": 63610,
+        "startup_wall_seconds": 5.507833166,
+        "startup_cpu_seconds": 5.05,
+        "idle_before": {
+          "wall_seconds": 2.0003934999999995,
+          "cpu_seconds": 0.009999999999999787
+        },
+        "requests": [
+          {
+            "method": "GET",
+            "status": 200,
+            "body": "{\"station\":\"Caf\u00e9\"}",
+            "wall_seconds": 3.6057887500000003,
+            "cpu_seconds": 1.38
+          },
+          {
+            "method": "POST",
+            "status": 201,
+            "body": "{\"accepted\":true}",
+            "wall_seconds": 2.989095958000002,
+            "cpu_seconds": 1.6399999999999997
+          },
+          {
+            "method": "GET",
+            "status": 200,
+            "body": "{\"station\":\"Caf\u00e9\"}",
+            "wall_seconds": 1.8912388750000027,
+            "cpu_seconds": 1.5500000000000007
+          },
+          {
+            "method": "POST",
+            "status": 201,
+            "body": "{\"accepted\":true}",
+            "wall_seconds": 1.8359340420000017,
+            "cpu_seconds": 1.6500000000000004
+          },
+          {
+            "method": "GET",
+            "status": 200,
+            "body": "{\"station\":\"Caf\u00e9\"}",
+            "wall_seconds": 1.0114102500000008,
+            "cpu_seconds": 0.9499999999999993
+          },
+          {
+            "method": "POST",
+            "status": 201,
+            "body": "{\"accepted\":true}",
+            "wall_seconds": 1.2297606670000008,
+            "cpu_seconds": 1.2200000000000006
+          }
+        ],
+        "idle_after": {
+          "wall_seconds": 2.0017538749999986,
+          "cpu_seconds": 0.02999999999999936
+        },
+        "exit_code": 0
+      }
+    },
+    {
+      "runner": "candidate",
+      "measurement": {
+        "pid": 72455,
+        "port": 63640,
+        "startup_wall_seconds": 4.0436092079999995,
+        "startup_cpu_seconds": 3.81,
+        "idle_before": {
+          "wall_seconds": 2.0050666250000004,
+          "cpu_seconds": 0.0
+        },
+        "requests": [
+          {
+            "method": "GET",
+            "status": 200,
+            "body": "{\"station\":\"Caf\u00e9\"}",
+            "wall_seconds": 0.9791140420000009,
+            "cpu_seconds": 0.6900000000000004
+          },
+          {
+            "method": "POST",
+            "status": 201,
+            "body": "{\"accepted\":true}",
+            "wall_seconds": 1.391468584,
+            "cpu_seconds": 0.9500000000000002
+          },
+          {
+            "method": "GET",
+            "status": 200,
+            "body": "{\"station\":\"Caf\u00e9\"}",
+            "wall_seconds": 1.216667417,
+            "cpu_seconds": 0.8199999999999994
+          },
+          {
+            "method": "POST",
+            "status": 201,
+            "body": "{\"accepted\":true}",
+            "wall_seconds": 1.4309379169999996,
+            "cpu_seconds": 0.9900000000000002
+          },
+          {
+            "method": "GET",
+            "status": 200,
+            "body": "{\"station\":\"Caf\u00e9\"}",
+            "wall_seconds": 0.8026335840000005,
+            "cpu_seconds": 0.7500000000000009
+          },
+          {
+            "method": "POST",
+            "status": 201,
+            "body": "{\"accepted\":true}",
+            "wall_seconds": 0.9295633750000007,
+            "cpu_seconds": 0.9299999999999997
+          }
+        ],
+        "idle_after": {
+          "wall_seconds": 2.0050603749999993,
+          "cpu_seconds": 0.019999999999999574
+        },
+        "exit_code": 0
+      }
+    },
+    {
+      "runner": "candidate",
+      "measurement": {
+        "pid": 72555,
+        "port": 63651,
+        "startup_wall_seconds": 3.868180917,
+        "startup_cpu_seconds": 3.84,
+        "idle_before": {
+          "wall_seconds": 2.023470540999999,
+          "cpu_seconds": 0.009999999999999787
+        },
+        "requests": [
+          {
+            "method": "GET",
+            "status": 200,
+            "body": "{\"station\":\"Caf\u00e9\"}",
+            "wall_seconds": 1.3075832080000005,
+            "cpu_seconds": 0.75
+          },
+          {
+            "method": "POST",
+            "status": 201,
+            "body": "{\"accepted\":true}",
+            "wall_seconds": 1.3919988330000006,
+            "cpu_seconds": 0.96
+          },
+          {
+            "method": "GET",
+            "status": 200,
+            "body": "{\"station\":\"Caf\u00e9\"}",
+            "wall_seconds": 1.1467570830000007,
+            "cpu_seconds": 0.8000000000000007
+          },
+          {
+            "method": "POST",
+            "status": 201,
+            "body": "{\"accepted\":true}",
+            "wall_seconds": 1.3829037080000006,
+            "cpu_seconds": 0.9799999999999995
+          },
+          {
+            "method": "GET",
+            "status": 200,
+            "body": "{\"station\":\"Caf\u00e9\"}",
+            "wall_seconds": 0.7484313749999991,
+            "cpu_seconds": 0.7500000000000009
+          },
+          {
+            "method": "POST",
+            "status": 201,
+            "body": "{\"accepted\":true}",
+            "wall_seconds": 0.9222297920000013,
+            "cpu_seconds": 0.9199999999999999
+          }
+        ],
+        "idle_after": {
+          "wall_seconds": 2.0050564999999985,
+          "cpu_seconds": 0.019999999999999574
+        },
+        "exit_code": 0
+      }
+    },
+    {
+      "runner": "baseline",
+      "measurement": {
+        "pid": 72695,
+        "port": 63663,
+        "startup_wall_seconds": 3.8116387919999997,
+        "startup_cpu_seconds": 3.77,
+        "idle_before": {
+          "wall_seconds": 2.003181958,
+          "cpu_seconds": 0.0
+        },
+        "requests": [
+          {
+            "method": "GET",
+            "status": 200,
+            "body": "{\"station\":\"Caf\u00e9\"}",
+            "wall_seconds": 1.2269561249999992,
+            "cpu_seconds": 0.8900000000000001
+          },
+          {
+            "method": "POST",
+            "status": 201,
+            "body": "{\"accepted\":true}",
+            "wall_seconds": 1.7687068329999995,
+            "cpu_seconds": 1.2599999999999998
+          },
+          {
+            "method": "GET",
+            "status": 200,
+            "body": "{\"station\":\"Caf\u00e9\"}",
+            "wall_seconds": 1.4271802089999994,
+            "cpu_seconds": 1.0099999999999998
+          },
+          {
+            "method": "POST",
+            "status": 201,
+            "body": "{\"accepted\":true}",
+            "wall_seconds": 1.4737799159999998,
+            "cpu_seconds": 1.25
+          },
+          {
+            "method": "GET",
+            "status": 200,
+            "body": "{\"station\":\"Caf\u00e9\"}",
+            "wall_seconds": 0.9301682499999995,
+            "cpu_seconds": 0.9299999999999997
+          },
+          {
+            "method": "POST",
+            "status": 201,
+            "body": "{\"accepted\":true}",
+            "wall_seconds": 1.1884700840000022,
+            "cpu_seconds": 1.1900000000000013
+          }
+        ],
+        "idle_after": {
+          "wall_seconds": 2.0050356670000014,
+          "cpu_seconds": 0.03999999999999915
+        },
+        "exit_code": 0
+      }
+    }
+  ],
+  "fixture_sha256": {
+    "target/http-cpu-slices/editable-samples/http-json/server/bin/neoclr/Debug/App.neoil": "fdb674d231713e3cac42bdcf93e97c3f20e777f2c6ab97ebe4fcbac05af5d2cd",
+    "target/http-cpu-slices/lib/System.neoil": "b944ad08760589ffa1409403e1d6c0e1cf3c3af49312bca5e28ade6b7aba4cc1"
+  },
+  "notes": [
+    "macOS arm64 Apple M1; diagnostic runs under variable background load, not throughput certification",
+    "Order baseline, candidate, candidate, baseline; first baseline overlaps final SDK/VSIX packaging",
+    "Same compiled recovery server and System for both runners; baseline installed neoCLR 03947b07; candidate execution-scoped lookup index",
+    "2-second idle windows can include final request cleanup; see earlier 10-second investigation for steady idle",
+    "All four runs exit 0 and assert exact GET/POST status/body; raw profiles in target/http-lookup-comparison"
+  ]
+}

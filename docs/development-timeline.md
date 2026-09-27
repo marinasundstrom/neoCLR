@@ -8876,3 +8876,21 @@ See [evidence and limitations](experiments/http-json/cpu-investigation-20260927.
   reviewing this comparison when a relevant contract, limit or release changes.
   This is documentation maintenance, not a change to platform priorities or a
   claim of full .NET compatibility or superior performance.
+
+
+## 2026-09-27 — Proceed with measured HTTP CPU slices
+
+- **Author:** “Process with these slices.” This followed the request to run the
+  sample server, investigate high CPU and decide whether optimization was needed.
+- **Assistant actions:** Implemented rejected-connection recovery and an
+  execution-scoped metadata candidate index. The repeated local comparison measures
+  roughly 24% lower median GET/POST CPU, with low steady idle and unchanged limits.
+  Focused contracts and thirteen Task.Run consumers pass.
+- **Separate Raven outcome:** Managed stacks exposed repeated workspace discovery;
+  a failing regression was repaired by excluding generated output trees. The general
+  fix was integrated independently into main and neoclr. Two old hot language servers
+  were stopped after stack capture; a separate input-loop diagnosis remains open.
+- **Assistant assessment, not another author decision:** Fresh profiles justify
+  considering incremental quota aggregation next, but not weakening quotas or
+  removing locks. Startup and the remaining old editor memory/input issue are separate.
+  See [implementation, measurements and boundaries](experiments/http-json/lookup-comparison-20260927.md).

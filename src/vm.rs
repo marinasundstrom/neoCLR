@@ -62,8 +62,21 @@ pub(crate) fn resolve(
     module: &Module,
     target: &FunctionRef,
 ) -> Result<crate::metadata::Function, Fault> {
+    if let Some(indexes) = crate::runtime_lookup::functions(module, &target.name) {
+        resolve_candidates(module, target, indexes.iter().copied())
+    } else {
+        resolve_candidates(module, target, 0..module.functions.len())
+    }
+}
+
+fn resolve_candidates(
+    module: &Module,
+    target: &FunctionRef,
+    indexes: impl Iterator<Item = usize>,
+) -> Result<crate::metadata::Function, Fault> {
     let mut found = None;
-    for (index, definition) in module.functions.iter().enumerate() {
+    for index in indexes {
+        let definition = &module.functions[index];
         // Reject unrelated definitions before copying their identity strings.
         if definition.name != target.name
             || definition.instance != target.instance
@@ -1612,85 +1625,87 @@ fn drive_instructions(
     console_bytes: &mut [Vec<u8>; 2],
     state: &mut InstructionState,
 ) -> Result<Value, Fault> {
-    let result = loop {
-        if let Err(fault) = transfer_task_output(state, output, console_bytes) {
-            break Err(fault);
-        }
-        if let Some(control) = &state.work_control {
-            if let Err(fault) = control.check() {
+    crate::runtime_lookup::with_module(module, || {
+        let result = loop {
+            if let Err(fault) = transfer_task_output(state, output, console_bytes) {
                 break Err(fault);
             }
-        }
-        let mut heap = match participant.enter_cancellable(|| {
-            state.work_control.as_ref().is_some_and(|control| control.is_cancelled())
-        }) {
-            Ok(heap) => heap,
-            Err(fault) => break Err(fault),
+            if let Some(control) = &state.work_control {
+                if let Err(fault) = control.check() {
+                    break Err(fault);
+                }
+            }
+            let mut heap = match participant.enter_cancellable(|| {
+                state.work_control.as_ref().is_some_and(|control| control.is_cancelled())
+            }) {
+                Ok(heap) => heap,
+                Err(fault) => break Err(fault),
+            };
+            match interpret_instructions(
+                module,
+                frames,
+                options,
+                native_libraries,
+                &mut heap,
+                memory,
+                output,
+                console_bytes,
+                state,
+                1024,
+            ) {
+                Ok(InstructionProgress::Suspended) => continue,
+                Ok(InstructionProgress::Waiting) => {
+                    drop(heap);
+                    state.invocation.park();
+                }
+                Ok(InstructionProgress::HostCall(mut call)) => {
+                    drop(heap);
+                    if let Err(fault) = transfer_task_output(state, output, console_bytes) {
+                        break Err(fault);
+                    }
+                    let value = match call.run(
+                        module, state, native_libraries, memory, output, console_bytes, options,
+                    ) {
+                        Ok(value) => value,
+                        Err(fault) => break Err(fault),
+                    };
+                    let mut heap = match participant.enter_cancellable(|| {
+                        state.work_control.as_ref().is_some_and(|control| control.is_cancelled())
+                    }) {
+                        Ok(heap) => heap,
+                        Err(fault) => break Err(fault),
+                    };
+                    if let Err(fault) = call.resume(value, frames) {
+                        break Err(fault);
+                    }
+                    if frames.iter().any(|frame| frame.stack.len() > options.limits.stack) {
+                        break Err(Fault::coded(
+                            crate::FaultCode::EvaluationStackOverflow,
+                            "evaluation stack limit exceeded",
+                        ));
+                    }
+                    let usage = match frame_array_usage(frames, state.invocation_result.as_ref(), &state.invocation.limits) {
+                        Ok(usage) => usage,
+                        Err(fault) => break Err(fault),
+                    };
+                    heap.publish_arrays(usage, state.arrays_used);
+                    let dispatch = state.invocation.dispatch.lock().expect("dispatch lock poisoned");
+                    if let Err(fault) = heap.publish(execution_roots(
+                        frames,
+                        &dispatch.scheduler,
+                        dispatch.default_task_queue.as_ref(),
+                        state.invocation_result.as_ref(),
+                    )) {
+                        break Err(fault);
+                    }
+                }
+                Ok(InstructionProgress::Completed(value)) => break Ok(value),
+                Err(fault) => break Err(fault),
+            }
         };
-        match interpret_instructions(
-            module,
-            frames,
-            options,
-            native_libraries,
-            &mut heap,
-            memory,
-            output,
-            console_bytes,
-            state,
-            1024,
-        ) {
-            Ok(InstructionProgress::Suspended) => continue,
-            Ok(InstructionProgress::Waiting) => {
-                drop(heap);
-                state.invocation.park();
-            }
-            Ok(InstructionProgress::HostCall(mut call)) => {
-                drop(heap);
-                if let Err(fault) = transfer_task_output(state, output, console_bytes) {
-                    break Err(fault);
-                }
-                let value = match call.run(
-                    module, state, native_libraries, memory, output, console_bytes, options,
-                ) {
-                    Ok(value) => value,
-                    Err(fault) => break Err(fault),
-                };
-                let mut heap = match participant.enter_cancellable(|| {
-                    state.work_control.as_ref().is_some_and(|control| control.is_cancelled())
-                }) {
-                    Ok(heap) => heap,
-                    Err(fault) => break Err(fault),
-                };
-                if let Err(fault) = call.resume(value, frames) {
-                    break Err(fault);
-                }
-                if frames.iter().any(|frame| frame.stack.len() > options.limits.stack) {
-                    break Err(Fault::coded(
-                        crate::FaultCode::EvaluationStackOverflow,
-                        "evaluation stack limit exceeded",
-                    ));
-                }
-                let usage = match frame_array_usage(frames, state.invocation_result.as_ref(), &state.invocation.limits) {
-                    Ok(usage) => usage,
-                    Err(fault) => break Err(fault),
-                };
-                heap.publish_arrays(usage, state.arrays_used);
-                let dispatch = state.invocation.dispatch.lock().expect("dispatch lock poisoned");
-                if let Err(fault) = heap.publish(execution_roots(
-                    frames,
-                    &dispatch.scheduler,
-                    dispatch.default_task_queue.as_ref(),
-                    state.invocation_result.as_ref(),
-                )) {
-                    break Err(fault);
-                }
-            }
-            Ok(InstructionProgress::Completed(value)) => break Ok(value),
-            Err(fault) => break Err(fault),
-        }
-    };
-    let output_result = transfer_task_output(state, output, console_bytes);
-    result.and_then(|value| output_result.map(|_| value))
+        let output_result = transfer_task_output(state, output, console_bytes);
+        result.and_then(|value| output_result.map(|_| value))
+    })
 }
 
 fn completion_notification_frame(

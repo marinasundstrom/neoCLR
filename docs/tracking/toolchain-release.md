@@ -134,17 +134,15 @@ evidence, not a published release or a waiver of the open gates above.
 
 ## HTTP CPU investigation — 2026-09-27
 
-[Measured idle/request behavior](../experiments/http-json/cpu-investigation-20260927.md)
-separates two old high-CPU Raven language servers from the HTTP runtime. The fresh
-HTTP sample is cheap at steady idle, but tiny requests consume roughly 1–1.7 CPU
-seconds; 1 KB of headers costs 3.2–3.5 CPU seconds. Recommend a bounded loaded
-metadata lookup optimization, with before/after checks preserving quotas and
-identity/access contracts. First fix the sample exiting on over-limit requests.
-These are findings and proposed follow-ups, not completed fixes or a new numeric
-release threshold. Editor diagnosis belongs in Raven; do not change the HTTP
-scheduler to address those unrelated processes.
+[The follow-up](../experiments/http-json/lookup-comparison-20260927.md) records completed
+sample recovery, execution-scoped metadata candidate indexing and general Raven
+workspace-discovery repair (main 264fcc7d9 / neoclr 2a3fbb346). GET/POST median CPU
+fell approximately 24% in the local comparison; steady idle remains cheap. Oversized
+requests close their connection and the next valid request succeeds. Header bounds,
+deadlines, access/type checks and instruction-boundary quotas are unchanged.
 
-The DOM/typed sample recovery slice now passes: an oversized connection closes
-and the subsequent valid GET succeeds, with exit 0 and zero live objects. See
-[recovery evidence](../experiments/http-json/header-recovery-20260927.json).
-Runtime error contracts, header bounds and deadlines are unchanged.
+Next performance work should address repeated quota aggregation with a proven
+invalidation/ownership contract; do not remove locks or reduce checks speculatively.
+Startup remains a separate loading/verification cost. The older language server's
+JSON-RPC input-loop CPU and large memory footprint are not fully explained by the
+workspace fix. These findings do not add HTTP features or waive existing release gates.

@@ -848,11 +848,16 @@ impl Module {
             Type::ArrayRef(_) => 1,
             _ => 0,
         };
-        self.types.iter().find(|def| {
+        let matches = |def: &&TypeDef| {
             def.name == name
                 && def.generic_parameters.len() == arity
                 && (!matches!(ty, Type::ArrayRef(_)) || def.is_reference_type)
-        })
+        };
+        if let Some(indexes) = crate::runtime_lookup::types(self, name) {
+            indexes.iter().map(|&index| &self.types[index]).find(matches)
+        } else {
+            self.types.iter().find(matches)
+        }
     }
 
     /// Enumerate ordinary nested definitions owned by a type definition.

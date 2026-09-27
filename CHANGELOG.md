@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Index immutable execution metadata candidates while preserving type, signature,
+  access and duplicate-resolution checks. Focused native and Task.Run consumers
+  pass; local HTTP median CPU falls about 24%. Record remaining quota aggregation
+  cost and general Raven workspace-discovery repair integrated into both branches.
+  Quotas, locking, deadlines and public APIs are unchanged.
+
 - Add a maintained neoCLR/.NET comparison covering contracts, practical tradeoffs,
   implementation and compatibility limits, with primary .NET references. Link it
   from About, Guides and section navigation; correct stale Preview 10 status and

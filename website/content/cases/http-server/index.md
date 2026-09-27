@@ -121,7 +121,11 @@ application error union retains both HTTP and JSON causes.
 The server callback calls this operation, serializes the acknowledgement with
 `JsonContent.Create`, and completes the response. Invalid nested values such as
 `{"station":{"name":12}}`, a missing name, or null produce 400; unknown paths
-produce 404. See the [complete server](/samples/http-json/json-object-mapping/HttpServer.rvn).
+produce 404. In the development sample, protocol, limit and unsupported-request
+errors close the rejected connection and leave the server available for the next
+request. Rejected attempts count toward its configured request count. Header
+rejection occurs before a context exists, so this path does not send a 400/431
+response. See the [complete server](/samples/http-json/json-object-mapping/HttpServer.rvn).
 
 ### Run the paired case
 

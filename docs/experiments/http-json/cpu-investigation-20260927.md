@@ -1,5 +1,9 @@
 # HTTP sample CPU investigation — 2026-09-27
 
+> Follow-up: [implemented slices and fresh measurements](lookup-comparison-20260927.md).
+> The observations below describe the pre-fix installation; the current header probe
+> expects recovery and must use the rebuilt sample.
+
 The author asked to run the installed sample server, investigate high CPU and decide
 whether optimization is needed. **Steady idle is cheap; request processing merits a
 bounded optimization.** Separately, two older Raven language servers were each
