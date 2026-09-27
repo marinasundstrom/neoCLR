@@ -54,6 +54,7 @@ inherited visibility, linked generic interface origins and removal of inherited
 The final pinned publisher built and checked 1,753 website pages, and all 18
 Python website tests passed. The sidebar was verified at the top of the article
 with the notice visible, and the mobile drawer was checked. Long declaring-type
-headings wrap without widening JsonNumber at a 390px viewport. The existing
+headings and page-outline links wrap without widening JsonNumber at 390px or
+1280px viewports. The existing
 reference assembly was unchanged; only the exclusion-policy fingerprint changed.
 Local generation is not publication; deployment remains the manual website workflow.
