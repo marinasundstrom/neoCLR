@@ -1,5 +1,14 @@
 include!("support/calendar_suite.rs");
 
+fn unwrap_calendar_result(name: &str) -> (String, String) {
+    (
+        String::new(),
+        format!(
+            "call instance System.Result<System.{name},System.Invalid{name}Error>::GetOkCase()\ncall instance System.Result.Ok<System.{name}>::get_Value()"
+        ),
+    )
+}
+
 fn load_calendar_program(source: &str) -> LoadedProgram {
     let module = neoclr::assemble(source).unwrap();
     LoadedProgram::new(&neoclr::load(&serde_json::to_string(&module).unwrap()).unwrap()).unwrap()

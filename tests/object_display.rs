@@ -87,8 +87,13 @@ fn abstract_object_cannot_be_constructed_even_in_raw_il() {
 
 #[test]
 fn rootless_object_default_remains_reachable_with_an_abstract_root() {
-    let app = assemble(".module Display\n.entry Main\n.type class Plain\n.end\n.function Main() -> String\nnewobj Plain\ncallvirt instance System.Object::ToString()\nret\n.end").unwrap();
-    let program = LoadedProgram::with_library(&app, library()).unwrap();
+    // Keep this graph fixture closed: the full Raven library has open generic
+    // union overrides, which graph analysis deliberately cannot enumerate.
+    let app = neoclr::assemble(
+        ".module Display\n.entry Main\n.type class abstract System.Object\n.method instance virtual ToString() -> String\nldstr \"default\"\nret\n.end\n.end\n.type class Plain\n.end\n.function Main() -> String\nnewobj Plain\ncallvirt instance System.Object::ToString()\nret\n.end",
+    )
+    .unwrap();
+    let program = LoadedProgram::new(&app).unwrap();
     let graph = program
         .analyze_reachability(
             &[neoclr::assembler::parse_function_ref("Main()").unwrap()],

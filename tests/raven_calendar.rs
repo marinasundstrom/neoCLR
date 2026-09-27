@@ -1,5 +1,16 @@
 include!("support/calendar_suite.rs");
 
+fn unwrap_calendar_result(name: &str) -> (String, String) {
+    (
+        format!(
+            ".local System.Result<System.{name},System.Invalid{name}Error> result\n.local System.{name} value\n"
+        ),
+        format!(
+            "stloc result\nldloca result\nldloca value\ncall instance System.Result<System.{name},System.Invalid{name}Error>::TryGetOutput(System.{name}&)\nbrtrue parsed\nfault \"Expected a successful calendar result\"\nparsed:\nldloc value"
+        ),
+    )
+}
+
 fn calendar_library() -> String {
     let output = std::process::Command::new("python3")
         .current_dir(env!("CARGO_MANIFEST_DIR"))

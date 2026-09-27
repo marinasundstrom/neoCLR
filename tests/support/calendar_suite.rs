@@ -23,7 +23,8 @@ fn program() -> LoadedProgram {
             .map(|p| p.trim().split(' ').next().unwrap())
             .collect::<Vec<_>>()
             .join(",");
-        source.push_str(&format!(".function {name}{constructor}({params}) -> System.{name}\n{args}\ncall System.{name}::{constructor}({sig})\ncall instance System.Result<System.{name},System.Invalid{name}Error>::GetOkCase()\ncall instance System.Result.Ok<System.{name}>::get_Value()\nret\n.end\n"));
+        let (locals, unwrap) = unwrap_calendar_result(name);
+        source.push_str(&format!(".function {name}{constructor}({params}) -> System.{name}\n{locals}{args}\ncall System.{name}::{constructor}({sig})\n{unwrap}\nret\n.end\n"));
     }
     for (name, properties) in [
         (

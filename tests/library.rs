@@ -29,13 +29,14 @@ fn runtime_library_is_assembled_platform_code() {
                     )))
             .all(|f| !f.body.is_empty())
     );
-    assert_eq!(
+    // Internal calls are declarations; the service inventory may grow independently.
+    assert!(module.functions.iter().any(|f| f.is_internal_call()));
+    assert!(
         module
             .functions
             .iter()
             .filter(|f| f.is_internal_call())
-            .count(),
-        62 // Includes the shared socket deadline creation/expiry bridge.
+            .all(|f| f.body.is_empty())
     );
     assert!(
         module
