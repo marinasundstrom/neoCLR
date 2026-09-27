@@ -355,3 +355,13 @@ The GC/Reflection website build also exposed omitted LocalTimeMapping Unique and
 Ambiguous Deconstruct pages. Their out-parameter signatures now have explicit
 [manual member entries](time-zone-mappings.md), registered in manual-members.json;
 no public API is excluded.
+
+### Task.Run development checkpoint (2026-09-27)
+
+The static System.Tasks.Task owner and all three Run overloads have public inventory
+and XML coverage. The matching bridge/reference/library implement shared captures,
+completion-only and typed work, and async unwrapping. ScheduleTask and helper carriers
+remain private implementation details. [The callback guide](callbacks.md#taskrun-development)
+records native execution, invocation limits, default-queue behavior and current Raven
+mutable-local capture, lookup/lambda/unit-await limitations. API and library snapshots are checked; no full
+suite or website build is part of this slice.

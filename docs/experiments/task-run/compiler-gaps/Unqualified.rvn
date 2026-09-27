@@ -1,0 +1,6 @@
+import System.*
+import System.Tasks.*
+
+func Main() -> Task<int> {
+    return Task.Run(() => 42)
+}

@@ -41,6 +41,11 @@ static class TaskBindings
                 public void Drain() { }
                 public void Run(Func<PropagationUnit> callback) { }
             }
+            public static class Task {
+                public static Task<PropagationUnit> Run(Func<PropagationUnit> callback) => default;
+                public static Task<T> Run<T>(Func<T> callback) => default;
+                public static Task<T> Run<T>(Func<Task<T>> callback) => default;
+            }
             public sealed class Task<T> : Runtime.CompilerServices.ITaskAwaiter {
                 public Task(Promise<T> source) { }
                 public TaskState State => default;
@@ -129,6 +134,8 @@ static class TaskBindings
     public static CollectionBindings.Binding? Bind(MethodReference reference, MethodDefinition definition,
         bool construct, bool library)
     {
+        if (reference.DeclaringType.FullName == Prefix + "Task")
+            return BindRun(reference, definition, construct, library);
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
         var (kind, payload) = Shapes[owner];
@@ -182,4 +189,30 @@ static class TaskBindings
             ? new(args, owner, $"newobj instance {owner}::.ctor({string.Join(',', args)})")
             : new(staticMember ? args : new[] { owner }.Concat(args).ToArray(), result, $"call {(staticMember ? "" : "instance ")}{owner}::{definition.Name}({string.Join(',', args)})");
     }
+    static CollectionBindings.Binding BindRun(MethodReference reference, MethodDefinition definition,
+        bool construct, bool library)
+    {
+        if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope) || construct
+            || reference.HasThis || reference.Name != "Run" || !definition.IsPublic
+            || !definition.IsStatic || definition.IsVirtual || definition.ExplicitThis
+            || !definition.DeclaringType.IsSealed || !definition.DeclaringType.IsAbstract || definition.DeclaringType.IsInterface
+            || definition.DeclaringType.HasGenericParameters || definition.DeclaringType.HasInterfaces
+            || definition.GenericParameters.Count > 1
+            || definition.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant))
+            throw new InvalidDataException("Unsupported Task.Run contract.");
+        var generic = reference as GenericInstanceMethod;
+        if (definition.GenericParameters.Count != (generic?.GenericArguments.Count ?? 0))
+            throw new InvalidDataException("Unsupported Task.Run type arguments.");
+        var payload = generic is null ? "Void" : GenericUnionBindings.Type(generic.GenericArguments[0]);
+        if (payload is null) throw new InvalidDataException("Unsupported Task.Run payload.");
+        var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type,
+            allowOpenMethodParameters: library);
+        if (args.Length != 1 || result != Prefix + "Task<" + payload + ">"
+            || (args[0] != "System.Func<" + payload + ">"
+                && (generic is null || args[0] != "System.Func<" + result + ">")))
+            throw new InvalidDataException("Unsupported Task.Run signature.");
+        var method = "Run" + (generic is null ? "" : "<" + payload + ">");
+        return new(args, result, $"call {Prefix}Task::{method}({args[0]})");
+    }
+
 }

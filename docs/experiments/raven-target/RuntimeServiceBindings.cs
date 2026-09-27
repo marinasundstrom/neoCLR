@@ -142,6 +142,7 @@ static class RuntimeServiceBindings
             ("TypeShape", ["System.RuntimeTypeHandle", "Int32"], "Boolean"),
             ("TypeDisplayName", ["System.RuntimeTypeHandle", "Int32"], "String"),
             ("DefaultTaskQueue", [], "System.Tasks.TaskQueue"),
+            ("ScheduleTask", ["System.Func<Void>"], "noresult"),
             ("RegisterDefaultTaskQueue", ["System.Tasks.TaskQueue"], "noresult"),
             ("CurrentTaskQueue", [], "System.Tasks.TaskQueue"),
             ("ExecutingAssembly", [], "System.Introspection.AssemblyInfo"),
@@ -212,6 +213,8 @@ static class RuntimeServiceBindings
             return new("", args, result, Instruction: $"call neoCLR.Runtime.{reference.Name}({string.Join(',', args)})\npop");
         if (reference.Name == "NotifyWorker")
             return new("", args, result, Instruction: "call neoCLR.Runtime.NotifyWorker(Int32,System.Func<Void>)\npop");
+        if (reference.Name == "ScheduleTask")
+            return new("", args, result, Instruction: "call neoCLR.Runtime.ScheduleTask(System.Func<Void>)\npop");
         if (reference.Name == "RegisterDefaultTaskQueue")
             return new("", args, result, Instruction: "call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue)\npop");
         if (reference.Name == "ReflectionPropertySet")

@@ -409,6 +409,12 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
         lines = lines[end + 1:]
     for operator_owner, bodies in extension_owners.items():
         types.append('.type ' + operator_owner + '\n' + ''.join(bodies) + '.end\n')
+    if name == 'Tasks':
+        # Task and Task<T> share a source slice but have distinct nominal owners.
+        submission = [body for body in methods if body.startswith('.method ')]
+        methods = [body for body in methods if not body.startswith('.method ')]
+        if submission:
+            types.append('.type System.Tasks.Task\n' + ''.join(submission) + '.end\n')
     # Nongeneric classes can also own static factories. Merge their function roots
     # into the emitted class rather than leaving top-level method fragments.
     for body in types[:]:

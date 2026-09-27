@@ -1,0 +1,10 @@
+import System.*
+import System.Tasks.*
+alias Task = System.Tasks.Task
+
+func Main() -> Task<int> {
+    return Task.Run<int>(() => {
+        let value = 40
+        return value + 2
+    })
+}

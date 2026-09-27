@@ -9,15 +9,14 @@ or later author direction selects it.
 
 ## Author-selected Task.Run work — 2026-09-27
 
-**Active direction; public API pending.** Task.Run is the canonical submission
+**Active direction; development API implemented with compiler gaps.** Task.Run is the canonical submission
 API for work with shared lexical captures, with execution chosen by the runtime. The subsequent .NET-behavior direction leads to
 a native-thread first implementation recommendation, including progress while
 submitted work blocks and async callback unwrapping.
 The author selected shared objects for the first slice rather than limiting it to
 noncapturing transferable values. [The concurrency design](../concurrency-direction.md#taskrun-with-shared-captures--author-direction-2026-09-27)
-owns the contract, backend alternatives and focused acceptance cases. Settle the
-execution/heap ownership boundary before exposing the facade; the isolated Thread
-worker contract is not a substitute. Thread's future public role remains open.
+owns the contract, backend alternatives and focused acceptance cases. The execution/heap ownership boundary is implemented; the isolated Thread
+worker contract remains a separate API. Thread's future public role remains open.
 The [first storage prerequisite](../experiments/task-run/README.md) implements
 synchronized managed slots and tests native alias sharing. The subsequent heap coordinator registers participant roots and serializes graph
 access/collection; the root driver now admits bounded native callback participants,
@@ -54,7 +53,12 @@ output and observes host/service cancellation. Callback return bypasses the root
 root entry draining parks for native work and redrains after completion without spending
 instruction fuel during waits. The private ScheduleTask native boundary now admits
 callbacks from guest code; a generated Promise/continuation consumer and terminal-fault
-case pass. Managed Run overloads and async callback unwrapping remain before the public facade.
+case pass. Development Run overloads now submit completion-only/typed work and unwrap
+inner tasks through the existing outcome-transfer helper. The compiled capture/identity/
+unwrapping consumer passes with explicit workarounds. Next bounded work is the
+[recorded compiler gaps](../experiments/task-run/compiler-gaps/README.md): incorrect mutable-local capture sharing, direct unit
+await, short-name Task lookup and block-lambda inference. Public reference/snapshots
+cover the static Task owner; no new compiler Runtime Contract settings are used.
 The internal blocking probe is not a public guest API result. Green threads are recorded as a possible future backend.
 This explicit task does not reopen the finished HTTP POC or select a general
 scheduler/backend rewrite independently of the capability's requirements.

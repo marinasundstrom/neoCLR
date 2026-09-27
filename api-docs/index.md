@@ -75,7 +75,7 @@ walks through the compiled hostname/echo POC.
 | Time and clocks | [Dates and clocks](/features/time/) | [Date](xref:System.Date) · [Time](xref:System.Time) · [Instant](xref:System.Instant) · [Clock](xref:System.Clock) |
 | Text and encoding | [Strings](/features/strings/) | [String](xref:System.String) · [Char](xref:System.Char) · [System.Text](xref:System.Text) · [Encoding](xref:System.Text.Encoding) · [Decoder](xref:System.Text.Decoder) · [Encoder](xref:System.Text.Encoder) |
 | Mathematics and environment | [Expected outcomes](/features/outcomes/) | [System.Math](xref:System.Math) · [Environment](xref:System.Environment) |
-| Tasks and completion | [Tasks and async](/features/tasks/) · [Callbacks](callbacks.md) | [System.Tasks](xref:System.Tasks) |
+| Tasks and completion | [Tasks and async](/features/tasks/) · [Task.Run and callbacks](callbacks.md) | [System.Tasks](xref:System.Tasks) |
 | Isolated workers | [Thread and worker behavior](/features/tasks/) | [System.Concurrency](xref:System.Concurrency) |
 | HTTP messages and exchanges | [Web guide](/features/web/) | [HttpClient](xref:System.Web.Http.HttpClient) · [HttpContext](xref:System.Web.Http.HttpContext) · [HttpServer](xref:System.Web.Http.HttpServer) |
 | Storage and files | [Files and Storage](/features/files/) · [Providers](storage-provider.md) | [System.Storage](xref:System.Storage) |

@@ -1,5 +1,22 @@
 # Raven targeting neoCLR
 
+## Task.Run integration (2026-09-27)
+
+Development references expose the static System.Tasks.Task submission owner alongside
+Task<T>. The bridge admits the three exact Run signatures (unit, typed and task-returning
+callbacks); bootstrap RuntimeServices alone exposes ScheduleTask. Source export preserves
+both nominal owners and private helper types. Managed wrappers complete a default-queue
+Promise or register the existing inner-outcome transfer; the native runtime supplies
+shared-capture execution. Runtime Contract options and Raven compiler source are unchanged.
+
+Eleven focused `--task-run-signatures` checks cover admission and malformed metadata.
+The [compiled consumer](../task-run/README.md#public-overloads-and-async-unwrapping) and
+[reduced compiler gaps](../task-run/compiler-gaps/README.md) distinguish passing runtime
+behavior from mutable-local capture sharing, short-name lookup, block-lambda inference
+and direct unit-await limitations.
+No importer relaxation is made for the invalid unit stack. Existing uninitialized
+private-var constructor assignment also needs explicit-field compatibility in helpers.
+
 ## Explicit application interface integration (2026-09-27)
 
 The development bridge imports ordinary explicit instance implementations on

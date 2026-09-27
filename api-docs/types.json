@@ -277,6 +277,7 @@
   "System.StringComparison",
   "System.SystemClock",
   "System.Tasks.Promise`1",
+  "System.Tasks.Task",
   "System.Tasks.TaskOperators",
   "System.Tasks.TaskOutcome",
   "System.Tasks.TaskOutcome.Cancelled",

@@ -5,6 +5,62 @@ import System.Collections.*
 import System.Option.*
 import System.Tasks.TaskOutcome.*
 
+// Submission owns no public thread handle; all overloads use the default dispatcher.
+public static class Task {
+    static func Run(callback: Func<System.Void>) -> Task<System.Void> {
+        let source = Promise<System.Void>(TaskQueue.Default)
+        let work = TaskRunWork<System.Void>(callback, source)
+        System.Runtime.CompilerServices.RuntimeServices.ScheduleTask(work.Run)
+        return source.Task
+    }
+
+    static func Run<T>(callback: Func<T>) -> Task<T> {
+        let source = Promise<T>(TaskQueue.Default)
+        let work = TaskRunWork<T>(callback, source)
+        System.Runtime.CompilerServices.RuntimeServices.ScheduleTask(work.Run)
+        return source.Task
+    }
+
+    static func Run<T>(callback: Func<Task<T>>) -> Task<T> {
+        let source = Promise<T>(TaskQueue.Default)
+        let work = TaskRunAsyncWork<T>(callback, source)
+        System.Runtime.CompilerServices.RuntimeServices.ScheduleTask(work.Run)
+        return source.Task
+    }
+}
+
+internal class TaskRunWork<T> {
+    // Explicit fields retain bootstrap compatibility for constructor-assigned storage.
+    private field callback: Func<T>
+    private field source: Promise<T>
+
+    init(callback: Func<T>, source: Promise<T>) {
+        self.callback = callback
+        self.source = source
+    }
+
+    func Run() {
+        _ = source.Complete(callback())
+    }
+}
+
+internal class TaskRunAsyncWork<T> {
+    // Explicit fields retain bootstrap compatibility for constructor-assigned storage.
+    private field callback: Func<Task<T>>
+    private field source: Promise<T>
+
+    init(callback: Func<Task<T>>, source: Promise<T>) {
+        self.callback = callback
+        self.source = source
+    }
+
+    func Run() {
+        let inner = callback()
+        let transfer = OutcomeTransfer<T>(inner, source)
+        inner.OnCompleted(transfer.Run)
+    }
+}
+
 // Explicit, single-invocation dispatcher for the provisional Task proof of concept.
 public class TaskQueue {
     private field pending: ArrayList<Func<System.Void>>

@@ -1,6 +1,6 @@
 # Concurrency and tracked threads — post-release direction
 
-**Updated 2026-09-27. Explicit Thread implemented; shared-context Task.Run selected, implementation pending.** The author directs renaming
+**Updated 2026-09-27. Explicit Thread implemented; shared-context Task.Run implemented in development with compiler integration gaps.** The author directs renaming
 `System.Threading` to `System.Concurrency` after the async/Tasks release to express
 a broader area. `System.Concurrency` is the namespace for concurrency, including
 threading. Thread remains an explicit thread API and may be unavailable on some
@@ -20,7 +20,8 @@ behavior remain open.
 `Task.Run` is selected as the canonical API for submitting new work with lexical
 captures, including shared managed objects. The runtime selects how to execute
 that work. This direction supersedes a noncapturing/transferable-values-only first
-slice. It is **not implemented yet**. Tasks returned by I/O and Promise remain valid
+slice. Development now implements the overload family and shared native backend, with
+[compiler integration gaps](experiments/task-run/compiler-gaps/README.md). Tasks returned by I/O and Promise remain valid
 ways to represent completion; they do not need an extra Task.Run wrapper.
 
 “Context” here includes captured variables and managed object identity. It does not
@@ -28,8 +29,8 @@ yet select .NET ExecutionContext/AsyncLocal flow, thread-local inheritance, cult
 flow or caller-thread affinity. Those are separate contracts. Keep Task/Promise in
 System.Tasks. Keep completion-only work compatible with Task<unit>, alongside
 value-producing work returning Task<T>. The subsequent author direction is to align with .NET Task.Run behavior. Include
-async callback flattening in the intended overload family; exact Raven overload
-resolution and completion-only representation still require executable evidence.
+async callback flattening in the overload family. The [compiled consumer](experiments/task-run/Main.rvn)
+validates it with recorded short-name, lambda and unit-await workarounds.
 
 The author considers Thread a possible implementation primitive and leaves its
 public future open. Do not remove or repurpose its existing isolated string-worker
@@ -47,8 +48,10 @@ native sharing and the following shared-root coordinator. Existing VM collection
 uses one registered participant. The initial native work owner tests bounded
 submission and rooted result handoff. The VM now pauses at instruction boundaries,
 with a native guest-function probe validating captures/results under collection.
-General guest submission and public Run overloads are not implemented; blocking
-boundaries, shared services and Promise publication remain prerequisites.
+Those prerequisites now support guest submission and public Run overloads: blocking
+boundaries release graph access, shared services retain invocation ownership and
+Promise publication retains atomic regions. The [integration checkpoint](experiments/task-run/README.md#public-overloads-and-async-unwrapping)
+owns current evidence and remaining compiler gaps.
 The existing native workers start separate invocations. Merely
 sending a delegate or substituting Arc for Rc is insufficient: slot access, GC,
 Promise completion, task queues, cancellation and host resources also need a

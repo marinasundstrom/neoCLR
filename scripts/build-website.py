@@ -312,6 +312,7 @@ def main():
     downloads.mkdir()
     shutil.copyfile(ROOT / "docs/experiments/reflection-members/Main.rvn", downloads / "reflection-members.rvn")
     shutil.copyfile(ROOT / "docs/experiments/runtime-gc/Main.rvn", downloads / "runtime-gc.rvn")
+    shutil.copyfile(ROOT / "docs/experiments/task-run/Main.rvn", downloads / "task-run.rvn")
     for name in ('library-time-zones.rvn', 'library-date-formatting.rvn', 'library-comparers.rvn', 'library-array-tour.rvn', 'library-array-tour.expected.txt', 'library-task-propagation.rvn', 'library-task-result.rvn', 'library-async-default-queue.rvn', 'library-task-producer.rvn', 'library-async-cancellation.rvn', 'library-outcome-operators.rvn', 'library-outcome-operators.expected.txt', 'library-query-basics.rvn', 'library-query-basics.expected.txt', 'library-query-names.rvn', 'library-query-names.expected.txt', 'library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
         source_sample = ROOT / raven / name
         shutil.copyfile(source_sample, downloads / name)

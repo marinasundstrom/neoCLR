@@ -123,6 +123,30 @@
       <returns>A provider-owned File or Directory through StorageItem, or StorageLookupError such as NotFound, AccessDenied, InvalidPath or IoFailure.</returns>
       <remarks>Does not create entries or open content. An unsupported native entry kind can return WrongKind. Success does not guarantee later access or stable identity. Consumers can inspect the closed File/Directory branches without depending on concrete implementation classes.</remarks>
     </member>
+    <member name="T:System.Tasks.Task">
+      <summary>Submits work with shared captures and runtime-selected execution (development).</summary>
+      <remarks>Run currently starts bounded native-thread work in the calling invocation. Captured objects retain identity. Current Raven consumers need an explicit Task alias or fully qualified owner; direct unit await and mutable-scalar capture writes have tracked integration limitations (see the callback guide). Work uses the default dispatcher; arbitrary shared read-modify-write operations are not atomic. Invocation limits and cancellation apply. A callback Fault terminates the invocation, not a task error case.</remarks>
+    </member>
+    <member name="M:System.Tasks.Task.Run(System.Func{System.Void})">
+      <summary>Submits completion-only work with shared captures (development).</summary>
+      <param name="callback">Work to invoke at most once on a runtime-owned execution context.</param>
+      <returns>A Task of unit that completes after the callback returns.</returns>
+      <remarks>Submission is bounded by invocation quotas; admission failure or host cancellation can prevent execution. Entry draining waits for submitted work. Blocking callbacks permit caller progress; native-thread affinity is not guaranteed.</remarks>
+    </member>
+    <member name="M:System.Tasks.Task.Run``1(System.Func{``0})">
+      <summary>Submits work that produces a value with shared captures (development).</summary>
+      <typeparam name="T">The callback result type.</typeparam>
+      <param name="callback">Work producing the result. Reference results preserve identity.</param>
+      <returns>A task carrying the callback result.</returns>
+      <remarks>Uses the default dispatcher and shared invocation budgets. A callback Fault fails the invocation.</remarks>
+    </member>
+    <member name="M:System.Tasks.Task.Run``1(System.Func{System.Tasks.Task{``0}})">
+      <summary>Submits task-producing work and follows its outcome (development).</summary>
+      <typeparam name="T">The inner task result type, including unit.</typeparam>
+      <param name="callback">Work producing the inner task.</param>
+      <returns>A single task carrying the inner value or cancellation, without a nested Task payload.</returns>
+      <remarks>The callback starts on a runtime-owned context. Await continuations use existing producer-queue rules. Custom queues remain caller-driven; Run does not make an otherwise unresolved task complete.</remarks>
+    </member>
     <member name="T:System.Tasks.Task`1">
       <summary>A consumer handle for one eventual value or cancellation.</summary>
       <remarks>Obtain a task from `Promise&lt;T&gt;`.Task or an async method. Consumers cannot complete it. Expected failures belong in the result type; there is no faulted Task state. This provisional API is confined to one guest invocation. Callback methods using Func&lt;System.Void&gt; are described in the [callback guide](/docs/callbacks.html).</remarks>

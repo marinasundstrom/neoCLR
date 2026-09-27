@@ -1,0 +1,36 @@
+import System.*
+import System.Tasks.*
+alias Task = System.Tasks.Task
+
+class SharedState {
+    var Value: int = 0
+}
+
+async func Calculate() -> Task<int> {
+    let value = await Task.Run(() => 20)
+    return value + 1
+}
+
+async func Main() -> Task<()> {
+    let state = SharedState()
+    // The current compiler needs a target type for this block lambda.
+    let compute: Func<int> = () => {
+        state.Value = 40
+        return state.Value + 2
+    }
+    let result = await Task.Run(compute)
+    Console.WriteLine(result)
+    let same = await Task.Run(() => state)
+    Console.WriteLine(Object.ReferenceEquals(state, same))
+    let completion = Task.Run(() => {
+        state.Value = state.Value + 1
+    })
+    // Direct unit await is a recorded compiler/importer limitation.
+    _ = await completion.Map(_ => 0)
+    Console.WriteLine(state.Value)
+    let unwrapped = await Task.Run(Calculate)
+    Console.WriteLine(unwrapped)
+    let nested = await Task.Run(() => Task.Run(() => 7))
+    Console.WriteLine(nested)
+    return ()
+}

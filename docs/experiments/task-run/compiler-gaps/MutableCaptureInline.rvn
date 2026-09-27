@@ -1,0 +1,11 @@
+import System.*
+import System.Tasks.*
+async func Main() -> Task<int> {
+    var count = 0
+    let callback: Func<int> = () => {
+        count = 42
+        return count
+    }
+    _ = callback()
+    return count
+}

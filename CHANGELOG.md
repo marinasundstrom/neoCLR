@@ -90,8 +90,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   park entry draining for native work and redrain on completion without spending
   guest fuel while waiting. Add private ScheduleTask submission with bounded heap
   participants and validate generated Promise completion/continuation dispatch plus
-  terminal guest faults. Public Run and async callback unwrapping still need integration.
-  This is backend infrastructure, not a public Task.Run release.
+  terminal guest faults. Add development Task.Run overloads for completion-only,
+  typed and task-producing callbacks, with shared capture/result identity and async
+  outcome transfer on the default dispatcher. Refresh matching library/reference
+  artifacts and API documentation. Record required Raven workarounds for short-name
+  lookup, block-lambda typing and direct unit await. Record incorrect mutable-scalar
+  capture sharing as a semantic release blocker; explicit shared-object mutations
+  pass. This is not a published release.
 
 - Support Raven Main returning integer, Result and target Task combinations through
   target-owned startup adaptation, including optional string-array arguments and

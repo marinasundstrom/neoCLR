@@ -15,7 +15,7 @@ static class LibraryImplementation
         && method.HasThis && !method.HasParameters && method.ReturnType.MetadataType == MetadataType.String;
     public static bool IsReadonlyReceiver(MethodDefinition method) => (GenericUnionLibrary.IsCarrier(method.DeclaringType) && ApplicationTypes.IsLibrary(method.DeclaringType) && method.Name is "TryGetOutput" or "TryGetResidual" || ReadonlyReceivers.Contains(method) || OpaqueLibrary.IsByRefString(method))
         && !IsByValueReceiver(method);
-    public static MethodDefinition[] Roots(ModuleDefinition source, ModuleDefinition core, string owner)
+    public static MethodDefinition[] Roots(ModuleDefinition source, ModuleDefinition core, string owner, bool includeTaskFamily = true)
     {
         ReadonlyReceivers.Clear();
         // Bootstrap compilation can call cross-slice deadline helpers. Restore the
@@ -67,11 +67,11 @@ static class LibraryImplementation
             foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name);
             return names.SelectMany(name => InstanceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
         }
-        if (owner == "System.Tasks.Task")
+        if (owner == "System.Tasks.Task" && includeTaskFamily)
         {
             var names = new[] { "System.Tasks.TaskQueue", "System.Tasks.Task`1", "System.Tasks.Promise`1", "System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1", "System.Runtime.CompilerServices.IAsyncStateMachine", "System.Runtime.CompilerServices.ITaskAwaiter" };
             foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name.Split('`')[0]);
-            return names.SelectMany(name => source.GetType(name).IsInterface ? InterfaceRoots(source.GetType(name), core.GetType(name), name) : InstanceRoots(source.GetType(name), core.GetType(name), name.Split('`')[0])).Concat(Roots(source, core, "System.Tasks.TaskOperators")).Concat(Roots(source, core, "System.Tasks.TaskResultOperators")).ToArray();
+            return names.SelectMany(name => source.GetType(name).IsInterface ? InterfaceRoots(source.GetType(name), core.GetType(name), name) : InstanceRoots(source.GetType(name), core.GetType(name), name.Split('`')[0])).Concat(Roots(source, core, "System.Tasks.Task", includeTaskFamily: false)).Concat(Roots(source, core, "System.Tasks.TaskOperators")).Concat(Roots(source, core, "System.Tasks.TaskResultOperators")).ToArray();
         }
         if (owner == "System.Array") return InstanceRoots(source.GetType("System.Array`1") ?? throw new InvalidDataException("Missing Array implementation."), core.GetType("System.Array`1"), owner);
         if (MarkerLibrary.IsOwner(owner)) return MarkerLibrary.Roots(source, core, owner);
@@ -96,9 +96,9 @@ static class LibraryImplementation
             foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name);
             consoleProviders = names.SelectMany(name => InstanceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
         }
-        var type = source.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? source.Types.SingleOrDefault(t => t.FullName.Split('`')[0] == owner)
+        var type = source.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? source.Types.SingleOrDefault(t => t.FullName == owner) ?? source.Types.SingleOrDefault(t => t.FullName.Split('`')[0] == owner)
             ?? throw new InvalidDataException("Missing namespace implementation: " + owner);
-        var contract = core.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? core.Types.SingleOrDefault(t => t.FullName.Split('`')[0] == owner)
+        var contract = core.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? core.Types.SingleOrDefault(t => t.FullName == owner) ?? core.Types.SingleOrDefault(t => t.FullName.Split('`')[0] == owner)
             ?? throw new InvalidDataException("Missing namespace reference contract: " + owner);
         if (StandardUnionLibrary.IsCandidate(type))
             return StandardUnionLibrary.Roots(type, contract);

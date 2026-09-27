@@ -25,6 +25,31 @@ The worker callback is a named function with owned text input and output. Guest 
 
 This preview uses System.Concurrency.Thread: construct a Thread and call its instance Start(), or use Thread.Run for immediate submission. The retained Task observes completion, including native thread termination. DNS, sockets and HTTP also return Tasks without creating a thread per operation.
 
+<a id="task-run"></a>
+
+## Submitting work with shared captures (development)
+
+`Task.Run` is the canonical API for new work with captured variables and shared
+objects. The runtime chooses execution; the first backend uses bounded native
+threads. Overloads return `Task<unit>` or `Task<T>`, and a task-producing callback
+is unwrapped into one task. Run uses the default dispatcher. Captures and reference
+results preserve identity; arbitrary shared updates are not automatically atomic.
+
+A blocked host call allows other contexts to progress. Guest instruction intervals
+still share a managed graph gate, so this does not promise parallel guest CPU
+execution. Entry completion drains pending work. Expected failures remain Result
+values; a callback Fault fails the invocation and requests sibling shutdown.
+
+Current Raven limitations require an explicit `alias Task = System.Tasks.Task` for
+short Run calls and typed delegate locals for some block lambdas. Direct unit await
+has an importer limitation; the tested consumer maps completion to an integer before
+awaiting. Captured mutable scalar locals also have a semantic gap: writes can fail to reach the
+caller. Use an explicit shared object for now. These are compiler integration gaps
+and release blockers, not intended API design.
+
+[Download the compiled shared-capture example](../../samples/task-run.rvn) ·
+[Overload and lifetime reference](../../docs/callbacks.html#taskrun-development)
+
 <a id="promise"></a>
 
 ## Promise and Task composition
@@ -162,8 +187,7 @@ completion through TaskQueue. Callbacks must return for other work to progress.
 A pending await currently resumes through the producer queue; custom queue and UI
 affinity are not settled contracts. Ordinary worker joins can still block the queue.
 
-Task.Run is the selected direction for submitting work with captured variables
-and shared objects, with the runtime choosing execution. It is not implemented yet.
+Task.Run is implemented in development with the integration limits described above.
 Thread may become a backend primitive; its public future remains open. Green
 threads are a possible later runtime backend, subject to the same sharing and
 progress guarantees.

@@ -111,6 +111,12 @@ if (args.Length == 2 && args[0] == "--comparer-signatures")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--task-run-signatures")
+{
+    TaskRunChecks.Write(args[1]);
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--entry-signatures")
 {
     SignatureProbe.Write(args[1], entryOnly: true);

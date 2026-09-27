@@ -1,7 +1,9 @@
-# Task.Run prerequisites — shared managed storage
+# Task.Run — shared captures and runtime-owned submission
 
-**Development, 2026-09-27.** The public Task.Run API is not implemented by this
-slice. The [concurrency design](../../concurrency-direction.md#taskrun-with-shared-captures--author-direction-2026-09-27)
+**Development, 2026-09-27.** Public Run overloads now cover shared captures,
+completion-only and typed results, and async unwrapping. See the [public integration
+checkpoint](#public-overloads-and-async-unwrapping) and its compiler limitations.
+The sections below preserve focused evidence for each prerequisite checkpoint. The [concurrency design](../../concurrency-direction.md#taskrun-with-shared-captures--author-direction-2026-09-27)
 owns its selected sharing/progress contract, .NET comparison and future green-thread
 direction. [Runtime tracking](../../tracking/runtime-language.md#author-selected-taskrun-work--2026-09-27)
 owns implementation status.
@@ -590,10 +592,50 @@ before root exit. Its failure variant verifies propagation of a guest Fault. All
 checks and 12 runtime-service checks pass. This is internal runtime plumbing; no public
 Task.Run reference, Raven compiler policy or API snapshot changed.
 
-## Next integration slice
+## Public overloads and async unwrapping
 
-Expose the Run overloads over the private submission boundary, with managed task
-completion and async callback unwrapping. Preserve root/payload
-publication at submission and completion; validate typed/completion-only shared captures
-with a compiled Raven consumer. Update public API reference/snapshots when the facade
-lands. Public Task.Run remains unimplemented.
+The development static System.Tasks.Task owner now has three Run overloads:
+Func<unit>, Func<T> and Func<Task<T>>. They create a Promise on the default queue and
+submit a retained helper delegate through ScheduleTask. Typed results preserve
+reference identity. The async helper registers the existing OutcomeTransfer against
+the returned inner task; its completion or cancellation becomes the outer outcome.
+It neither blocks a native thread for the inner result nor adds a Task error case.
+No per-call cancellation-token overload or .NET ExecutionContext/AsyncLocal flow is
+claimed. Invocation cancellation, faults and host quotas retain the earlier contract.
+
+The selected .NET comparison is the familiar submission/result shape and one-level
+async unwrapping. The first backend uses invocation-owned native threads rather than
+.NET's process-wide thread pool. Managed instruction intervals serialize through the
+heap gate; blocked host work releases it. No CPU-parallelism or throughput claim is
+made. Shared arbitrary read/modify/write sequences still require coordination.
+
+The bridge admits exact public overload signatures and keeps ScheduleTask confined
+to bootstrap RuntimeServices. Source export keeps Task and Task<T> as distinct nominal
+owners. No Raven Runtime Contract setting or compiler source changed. Constructor-
+assigned helper storage uses explicit fields for the already-recorded private-var
+compiler limitation. Only the Tasks implementation was regenerated; other generated
+manifests refresh their shared source fingerprint while reusing unaffected artifacts.
+
+[Main.rvn](Main.rvn) exercises captures, reference identity, completion-only work,
+nested submission and an async callback that itself awaits native work. Its expected
+output is 42, True, 41, 21 and 7 on separate lines. Five compiled consumer cases
+pass: that sample, unobserved-work entry draining, unit-result async unwrapping,
+cancellation from an inner task and a terminal callback fault. The separate mutable-
+local case fails its required result and is retained as negative evidence below. Run it with matching --runtime, --bridge, --system and --reference artifacts;
+--case selects one check. Eleven bridge signature checks and 29 VM tests pass. The API
+reference includes the static owner and all overloads; matching API/library snapshot
+checks pass. Website source/downloads are updated without building the website.
+
+Four [compiler integration gaps](compiler-gaps/README.md) are reproduced and retained
+as negative evidence: short-name Task lookup, block-lambda result inference, direct
+unit await and incorrect mutable-scalar capture sharing. The latter returns 0 instead
+of 42 and is a semantic release blocker, not a passing feature check. The passing consumer uses an explicit alias, a typed callback local, and
+Map before unit await. These workarounds do not redefine the API contract.
+
+## Next bounded work
+
+Resolve mutable-local closure storage and direct unit-await lowering/metadata, then
+short-name lookup and block-lambda
+inference in isolated Raven work with independent CLI tests. Keep the negative fixtures
+until corrected; do not weaken the importer or run broader platform matrices merely
+to compensate. Public release readiness requires reviewing these integration gaps.
