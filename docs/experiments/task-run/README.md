@@ -100,10 +100,9 @@ heap requires all participants to have been released. Invalid root publication
 preserves the previous snapshot and does not partially sweep.
 
 The VM's automatic, explicit and final collections now use this coordinator. The
-current VM holds one access guard for its execution, with a one-participant budget;
-this is deliberately **not** concurrent guest execution yet. Before native guest
-callbacks can run, the interpreter must publish complete roots and release the
-guard at appropriate safepoints and blocking boundaries. No GC can make progress
+current VM uses a one-participant budget. The subsequent suspension slice below
+now publishes roots and releases access at instruction boundaries; public concurrent
+guest submission is still pending. Blocking boundaries require separate integration. No GC can make progress
 while a participant holds access, so holding that guard during a blocking host call
 is not a viable final Task.Run scheduling policy. Slot locks alone remain insufficient.
 All VM graph access must obey the gate; the internal ManagedHeap helper interface
@@ -126,8 +125,9 @@ previous storage cost check is retained, not rerun as a scheduler benchmark.
 ## First native work-submission slice
 
 `src/task_work.rs` implements an internal, bounded native work owner. It is tested
-with runtime-side callbacks and is **not yet connected to guest delegate execution
-or public Task.Run**. One dedicated native thread per admitted job is the initial
+with runtime-side callbacks and is **not yet connected to the public guest delegate
+submission path or Task.Run**. The subsequent suspension probe runs a guest function
+through this work owner. One dedicated native thread per admitted job is the initial
 backend primitive; pooling remains runtime policy. Handles are single-use and never
 reused. The bound is total submissions per owner, not a public Task.Run option.
 
@@ -154,9 +154,9 @@ also covers cleanup of a worker already waiting for that access. Public Promise
 completion, queue publication, wake notifications, shared host resources, aggregate
 instruction/frame budgets, guest safepoints and async unwrapping are not supplied
 by this component. Do not enable a public facade until these are connected and
-validated. In particular, the current full-invocation VM guard would serialize
-entire callbacks and block progress; the runtime-side blocking probe is not proof
-that guest blocking calls have already been offloaded correctly.
+validated. The VM now pauses between instruction intervals, but blocking guest
+calls and scheduler waits still hold access. The runtime-side blocking probe is
+not proof that guest blocking calls have already been offloaded correctly.
 
 ```sh
 cargo test --lib task_work::tests
@@ -170,11 +170,54 @@ mutation, parked temporary roots, fresh reference results, bounded admission,
 single-use handles, cancellation/join, fault cleanup and foreign-heap rejection.
 These are contract checks, not throughput benchmarks or Raven API examples.
 
+## Guest instruction-boundary suspension
+
+The normal interpreter now runs in internal 1,024-instruction intervals. It retains
+frames and execution state across intervals: remaining instructions, GC threshold,
+array-accounting state, file services, intern pool, scheduler, default queue,
+invocation result and entry-drain state. Before releasing graph access it publishes
+all interpreter roots. Interval resumption does not reset the instruction budget.
+A zero interval is rejected. Source teardown runs after graph access is released.
+The interval is a private runtime choice, not a new application API or promise of
+fairness, parallelism or thread identity.
+
+A native-work acceptance probe executes a guest function with a shared captured
+object and reference result. It pauses after every instruction while the caller
+forces collection, then verifies identity, mutation and reclamation. A separate
+small linked System fixture checks queue construction, explicit entry draining,
+final draining and the returned queue across the same collection-at-every-pause
+schedule. These probes do not imply Raven Task.Run overloads or general concurrent
+Promise/collection safety.
+
+```sh
+cargo test --lib vm::suspension_tests
+cargo test --test entry_results --test runtime_gc --test cancellation \
+  --test file_streams --test debugger
+```
+
+All four suspension tests and 47 selected integration tests pass. A separate run
+of the legacy `tests/tasks.rs` fixture performed its broad library preparation;
+six tests passed, and the remaining access-control test was intentionally stopped
+with SIGINT to avoid repeated unrelated whole-library verification. The focused
+queue fixture replaces that broad validation for the changed resumption behavior;
+this is not a claim that the complete legacy Task suite passed. No website build,
+full suite or API snapshot regeneration was run.
+
+The existing release-build class-field probe was reused because root publication
+now occurs during ordinary long-running execution. [Suspension observations](suspension-cost.json)
+compare the fingerprint-checked storage-slice runner at `16a4784c` with this slice.
+Medians were 0.5116 seconds and 0.5036 seconds (0.9845×). This small, noisy local
+sample shows no observed regression; it does not establish a speed improvement,
+contention behavior or Task.Run throughput. The comparison also includes the
+intervening heap-coordination commits and does not isolate a single lock cost.
+
 ## Next prerequisite
 
-Connect guest execution safepoints and shared services to native work ownership,
-then establish concurrent Promise/queue publication before exposing Run overloads.
-Validate blocking guest callbacks and async callback unwrapping at that API boundary.
-Keep instruction, frame, heap and host-resource budgets invocation-owned; a new task
-must not reset them. Retaining every object until invocation exit is not a
-substitute for bounded live-object accounting.
+Move blocking guest calls and quiescence waits outside managed graph access, and
+establish shared invocation services and aggregate budgets before general guest
+work submission. Then establish atomic Promise/queue publication and expose the
+Run overloads, with async callback unwrapping validated at that API boundary.
+The per-execution instruction budget is preserved across pauses, but not yet shared
+across multiple guest contexts. Keep frame, heap and host-resource budgets
+invocation-owned; a new task must not reset them. Retaining every object until
+invocation exit is not a substitute for bounded live-object accounting.

@@ -23,8 +23,11 @@ synchronized managed slots and tests native alias sharing. The subsequent heap c
 access/collection; the current VM uses one participant and has not yet gained
 concurrent guest execution. The first native work owner now covers bounded submission, rooted completion,
 cooperative cancellation and join-before-disposal with runtime-side callbacks.
-Guest safepoints/shared services and concurrent Promise/queue publication remain
-before the Task.Run facade; the internal blocking probe is not a guest API result. Green threads are recorded as a possible future backend.
+The VM now retains execution state and publishes roots between instruction intervals;
+a native guest-function probe and a queue/entry-drain probe force collection after
+every instruction. Blocking guest boundaries, shared invocation services/aggregate
+budgets and concurrent Promise/queue publication remain before the Task.Run facade.
+The internal blocking probe is not a public guest API result. Green threads are recorded as a possible future backend.
 This explicit task does not reopen the finished HTTP POC or select a general
 scheduler/backend rewrite independently of the capability's requirements.
 

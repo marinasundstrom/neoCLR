@@ -1506,24 +1506,34 @@ fn interpret_frames(
     options: ExecutionOptions,
     mut native_libraries: Option<crate::interop::NativeLibraries>,
 ) -> Result<Execution, Fault> {
-    // One participant today. Native Task.Run will release/reacquire this access
-    // at explicit VM safepoints after publishing all execution roots.
     let owner = crate::shared_heap::Owner::new(1);
     let mut participant = owner.participant()?;
-    let mut heap = participant.enter();
     let mut memory = crate::memory::PointerHeap::default();
     let mut output = vec![];
     let mut console_bytes = [Vec::new(), Vec::new()];
-    let result = interpret_instructions(
-        module,
-        frames,
-        &options,
-        &mut native_libraries,
-        &mut heap,
-        &mut memory,
-        &mut output,
-        &mut console_bytes,
-    );
+    let mut state = InstructionState::new(options.limits);
+    let result = loop {
+        let mut heap = participant.enter();
+        match interpret_instructions(
+            module,
+            frames,
+            &options,
+            &mut native_libraries,
+            &mut heap,
+            &mut memory,
+            &mut output,
+            &mut console_bytes,
+            &mut state,
+            1024,
+        ) {
+            Ok(InstructionProgress::Suspended) => continue,
+            Ok(InstructionProgress::Completed(value)) => break Ok(value),
+            Err(fault) => break Err(fault),
+        }
+    };
+    // Source teardown may join host workers; never hold the managed graph gate.
+    drop(state);
+    let heap = participant.enter();
     if let Some(debugger) = &options.debugger {
         let mut snapshot = debug_snapshot(module, frames, &heap, &memory, &output, result.is_err());
         if let Ok(value) = &result {
@@ -1603,6 +1613,44 @@ fn execution_roots(
     roots
 }
 
+/// State that must survive an instruction-boundary suspension. Host services are
+/// still local to this execution; sharing them is a separate integration step.
+struct InstructionState {
+    collection_threshold: usize,
+    arrays_used: bool,
+    scheduler: crate::scheduler::Scheduler,
+    files: crate::file_streams::Files,
+    interned: crate::string_interning::Pool,
+    default_task_queue: Option<Value>,
+    invocation_result: Option<Value>,
+    entry_drain_depth: Option<usize>,
+    drain_required: bool,
+    remaining_instructions: usize,
+}
+impl InstructionState {
+    fn new(limits: Limits) -> Self {
+        Self {
+            collection_threshold: limits.heap_objects.min(64),
+            arrays_used: false,
+            scheduler: Default::default(),
+            files: Default::default(),
+            interned: crate::string_interning::Pool::new(
+                limits.intern_entries,
+                limits.intern_bytes,
+            ),
+            default_task_queue: None,
+            invocation_result: None,
+            entry_drain_depth: None,
+            drain_required: true,
+            remaining_instructions: limits.instructions,
+        }
+    }
+}
+enum InstructionProgress {
+    Suspended,
+    Completed(Value),
+}
+
 #[allow(clippy::too_many_arguments)]
 fn interpret_instructions(
     module: &Module,
@@ -1613,20 +1661,27 @@ fn interpret_instructions(
     memory: &mut crate::memory::PointerHeap,
     output: &mut Vec<String>,
     console_bytes: &mut [Vec<u8>; 2],
-) -> Result<Value, Fault> {
+    state: &mut InstructionState,
+    quantum: usize,
+) -> Result<InstructionProgress, Fault> {
+    if quantum == 0 {
+        return Err(Fault::new("instruction quantum must be positive"));
+    }
     let limits = options.limits;
-    let mut collection_threshold = limits.heap_objects.min(64);
-    let mut arrays_used = false;
-    let mut scheduler = crate::scheduler::Scheduler::default();
-    let mut files = crate::file_streams::Files::default();
-    let mut interned =
-        crate::string_interning::Pool::new(limits.intern_entries, limits.intern_bytes);
-    // An invocation-local guest root; isolated workers have their own registry.
-    let mut default_task_queue: Option<Value> = None;
-    let mut invocation_result: Option<Value> = None;
-    let mut entry_drain_depth: Option<usize> = None;
-    let mut drain_required = true;
-    for _ in 0..limits.instructions {
+    let InstructionState {
+        collection_threshold,
+        arrays_used,
+        scheduler,
+        files,
+        interned,
+        default_task_queue,
+        invocation_result,
+        entry_drain_depth,
+        drain_required,
+        remaining_instructions,
+    } = state;
+    for _ in 0..quantum.min(*remaining_instructions) {
+        *remaining_instructions -= 1;
         if let (Some(debugger), Some(frame)) = (&options.debugger, frames.last()) {
             let before_host_call = matches!(frame.function.body.get(frame.pc), Some(Op::Call(target))
                 if resolve(module, target).is_ok_and(|f| f.pinvoke.is_some() || f.is_internal_call()));
@@ -1639,7 +1694,7 @@ fn interpret_instructions(
             )?;
         }
 
-        if arrays_used {
+        if *arrays_used {
             let check = |frames: &[Frame], heap: &crate::ManagedHeap| -> Result<(), Fault> {
                 let mut usage = crate::arrays::Usage::default();
                 if let Some(value) = &invocation_result {
@@ -1725,7 +1780,7 @@ fn interpret_instructions(
             && matches!(frame.stack.last(), Some(Value::String(_))))
             || matches!(op, Op::New(ty) if module.is_reference_type(ty))
             || matches!(op, Op::Construct(target) if target.owner.as_ref().is_some_and(|ty| module.is_reference_type(ty))))
-            && heap.len() >= collection_threshold
+            && heap.len() >= *collection_threshold
         {
             let roots = execution_roots(
                 frames,
@@ -1734,7 +1789,7 @@ fn interpret_instructions(
                 invocation_result.as_ref(),
             );
             heap.collect(roots, crate::CollectionReason::AllocationPressure)?;
-            collection_threshold = heap
+            *collection_threshold = heap
                 .len()
                 .saturating_mul(2)
                 .max(64)
@@ -2756,7 +2811,7 @@ fn interpret_instructions(
                                 invocation_result.as_ref(),
                             );
                             heap.collect(roots, crate::CollectionReason::ExplicitRequest)?;
-                            collection_threshold = heap
+                            *collection_threshold = heap
                                 .len()
                                 .saturating_mul(2)
                                 .max(64)
@@ -2770,8 +2825,8 @@ fn interpret_instructions(
                             if entry_drain_depth.is_some() {
                                 return Err(Fault::new("Entry task dispatch cannot be nested"));
                             }
-                            entry_drain_depth = Some(frames.len());
-                            drain_required = true;
+                            *entry_drain_depth = Some(frames.len());
+                            *drain_required = true;
                             return Ok(Some(Value::Void));
                         }
                         if matches!(
@@ -2782,7 +2837,7 @@ fn interpret_instructions(
                                 | crate::native::Binding::UnixTimeToLocal
                                 | crate::native::Binding::EnvironmentArguments
                         ) {
-                            arrays_used = true;
+                            *arrays_used = true;
                         }
                         #[cfg(test)]
                         if matches!(binding, crate::native::Binding::TestSocketReceive) {
@@ -2859,7 +2914,7 @@ fn interpret_instructions(
                                     "Default TaskQueue must be registered once with a live queue",
                                 ));
                             }
-                            default_task_queue = Some(args[0].clone());
+                            *default_task_queue = Some(args[0].clone());
                             Value::Void
                         } else if matches!(binding, crate::native::Binding::StringIntern) {
                             let text = match args.as_slice() {
@@ -3059,7 +3114,7 @@ fn interpret_instructions(
                 | Op::NewValueArray(ty)
                 | Op::NewArray(ty)
                 | Op::CreateArray(ty) => {
-                    arrays_used = true;
+                    *arrays_used = true;
                     let initial = if matches!(op, Op::CreateArray(_)) {
                         frame.pop()?.for_storage_in(module, ty)?
                     } else if matches!(op, Op::AllocateArray(_) | Op::ReserveArray(_)) {
@@ -3599,7 +3654,7 @@ fn interpret_instructions(
         // Queue/host completion frames run above it on the same instruction budget.
         let step = if matches!(step, Ok(None))
             && matches!(op, Op::Return)
-            && entry_drain_depth == Some(frames.len())
+            && *entry_drain_depth == Some(frames.len())
         {
             Ok(Some(Value::Void))
         } else {
@@ -3611,10 +3666,10 @@ fn interpret_instructions(
                 // results. A notification is transferred directly into a traced
                 // Post frame, then drained on this invocation and instruction budget.
                 if entry_drain_depth.is_none() && invocation_result.is_none() {
-                    invocation_result = Some(value.clone());
+                    *invocation_result = Some(value.clone());
                 }
-                if drain_required {
-                    drain_required = false;
+                if *drain_required {
+                    *drain_required = false;
                     if let Some(queue) = &default_task_queue {
                         let drain = resolve(
                             module,
@@ -3660,7 +3715,7 @@ fn interpret_instructions(
                         )?);
                         Ok(())
                     })?;
-                    drain_required = true;
+                    *drain_required = true;
                     continue;
                 }
                 if entry_drain_depth.take().is_some() {
@@ -3669,14 +3724,14 @@ fn interpret_instructions(
                         .ok_or_else(|| Fault::new("missing startup frame"))?
                         .stack
                         .push(Value::Void);
-                    drain_required = true;
+                    *drain_required = true;
                     continue;
                 }
                 let value = invocation_result.take().unwrap_or(value);
                 let mut roots = vec![];
                 crate::gc::trace(&value, &mut roots);
                 heap.collect(roots, crate::CollectionReason::ExecutionCompleted)?;
-                return Ok(value);
+                return Ok(InstructionProgress::Completed(value));
             }
             Err(mut fault) => {
                 fault.function = Some(context);
@@ -3733,13 +3788,23 @@ fn interpret_instructions(
             ));
         }
     }
-    if let Some(frame) = frames.last_mut() {
-        frame.trace_pc = frame.pc;
+    if *remaining_instructions == 0 {
+        if let Some(frame) = frames.last_mut() {
+            frame.trace_pc = frame.pc;
+        }
+        return Err(Fault::coded(
+            crate::FaultCode::InstructionLimitExceeded,
+            "instruction limit exceeded",
+        ));
     }
-    Err(Fault::coded(
-        crate::FaultCode::InstructionLimitExceeded,
-        "instruction limit exceeded",
-    ))
+    // Every continuation location is published before the driver releases access.
+    heap.publish(execution_roots(
+        frames,
+        scheduler,
+        default_task_queue.as_ref(),
+        invocation_result.as_ref(),
+    ))?;
+    Ok(InstructionProgress::Suspended)
 }
 
 fn source_point(
@@ -4053,3 +4118,7 @@ fn validate_attribute(
     }
     Ok(())
 }
+
+#[cfg(test)]
+#[path = "vm_suspension_tests.rs"]
+mod suspension_tests;

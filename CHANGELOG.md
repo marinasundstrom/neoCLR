@@ -47,7 +47,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   handoff, invocation provenance, cancellable heap-gate waits and cancellation/join
   cleanup that preserves the host token. Validate blocking runtime-side callbacks;
   guest execution, shared services, Promise publication and Run overloads remain
-  unconnected. This is backend infrastructure, not a public Task.Run release.
+  unconnected. Add retained VM instruction state and bounded execution intervals
+  that publish roots before releasing heap access without resetting instruction
+  fuel. Validate native guest capture/result identity and queue/entry draining with
+  collection after every instruction; record a focused ordinary-execution cost
+  comparison. Shared blocking boundaries/services and public Task.Run remain pending.
+  This is backend infrastructure, not a public Task.Run release.
 
 - Support Raven Main returning integer, Result and target Task combinations through
   target-owned startup adaptation, including optional string-array arguments and
