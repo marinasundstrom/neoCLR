@@ -174,10 +174,10 @@
   "outputs": {
     "String.methods.neoil": "f3a952f7abf4526741dae540decc897674f7db78815c7df75d8d8a587dea8e1a",
     "String.helpers.neoil": "6a5e065e0ffa59c6beae9294bc8e47d933b6ca0abb36c842ef65c190a1f60f42",
-    "String.bootstrap.methods.neoil": "20b7d69695346372a7be4da4603cae399ece551d8e84bb4cf2157424200582bf",
-    "String.bootstrap.helpers.neoil": "5b9c175fd821bc54d95795e34d4783701bea2ee65edd0170feb34ab0e722ad61"
+    "String.bootstrap.methods.neoil": "9eb271954d252f2cccd6f3bd333543af81b9a9fa5ffe13223c7e80c990f06994",
+    "String.bootstrap.helpers.neoil": "b09416560872ea0d9b3c86b907a62e4c5c2cef99fcaded18d88a9ff2c609f7ff"
   },
-  "compilerSha256": "bf60acd0061b65d5ff171eb77f485807a288fbc550925c6023cb95dd40dbe266",
+  "compilerSha256": "630d5e209d3e67e36b8df6893b19815bf44386619c43f440391a264031e35ed6",
   "coreSha256": "bf2400976b1484444097b82e39f24692da3d5213b78467a609f20588df8e8974",
   "exports": [
     "readonly byref get_Item(Int32 index) -> Char",

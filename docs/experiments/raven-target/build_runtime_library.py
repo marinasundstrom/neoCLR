@@ -428,6 +428,9 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
         methods = [re.sub(r'(?ms)^\.method static Parse\(.*?^\.end\n', '', body) if name != 'Int32' else body for body in methods]
         methods = [re.sub(r'(?m)^\.implements System\.Number<([^>]+)>', '', body) for body in methods]
     if name == 'String' and bootstrap:
+        # Object interpolation belongs to the Raven profile. The archived Neo
+        # profile has no System.Object contract; prune its adapter transitively too.
+        methods = [re.sub(r'(?ms)^\.method static Concat\(System\.Object .*?^\.end\n', '', body) for body in methods]
         # Explicit comparison modes are a Raven-profile API.
         methods = [re.sub(r'(?ms)^\.method static (?:Compare|CompareOrdinalIgnoreCase)\(.*?^\.end\n', '', body) for body in methods]
         # The archived Neo profile uses borrowed collection interfaces. Keep its

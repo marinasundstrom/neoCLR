@@ -28,6 +28,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   diagnostic fix. Preserve generic unit delegate results until the caller discards
   them, regenerate all library slices, and restore current-union signature/sample
   checks. Update matching API documentation and keep old artifacts unchanged.
+  Keep object concatenation out of the historical Neo projection, whose type
+  system has no System.Object; verify its CLI and target-layout consumers.
 
 - Restore canonical formatting and strict Clippy gates for release preparation.
   Rename the internal slot factory, name the completion observer type and simplify
