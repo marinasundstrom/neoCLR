@@ -1,7 +1,7 @@
 # Namespace overview
 
 Use this overview to find the part of the neoCLR library that fits your task.
-It describes the **Preview 10 API plus labeled development additions**. Use matching compiler, reference and runtime
+It describes the **Preview 11 API**. Use matching compiler, reference and runtime
 artifacts. Names and contracts remain experimental.
 
 The list grows as APIs are implemented. Every public reference type is inventoried, with generated pages or an explicitly

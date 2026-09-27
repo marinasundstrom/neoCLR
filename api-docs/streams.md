@@ -1,7 +1,7 @@
 # File byte streams
 
-**Preview 10.** System.IO now has blocking file input and
-output APIs. Use matching Preview 10 artifacts. These are a first working slice,
+**Preview 11.** System.IO now has blocking file input and
+output APIs. Use matching Preview 11 artifacts. These are a first working slice,
 not a finalized provider model or asynchronous I/O contract.
 
 ## Browse the API
@@ -132,7 +132,7 @@ Bounds are 0–65536 UTF-8 bytes. Negative bounds fail before reading. A zero bo
 accepts only EOF for ReadToEnd; ReadLine also accepts an empty terminated line. One excess byte may be consumed to detect overflow. Invalid UTF-8 has a
 distinct TextReadError; input error distinctions are preserved as named cases.
 Errors do not roll back the cursor. Repeated reads at EOF produce an empty string.
-In development after Preview 10, ReadToEnd decodes bounded UTF-8 chunks, retaining
+ReadToEnd decodes bounded UTF-8 chunks, retaining
 at most three incomplete sequence bytes between conversions. It still accumulates
 the returned String, so total memory is not constant. ReadLine retains its line
 buffer. Host resource budgets also apply.
@@ -165,7 +165,7 @@ its input and creating another reader; TextReader has no repositioning API.
 
 Streams and text readers now use System.IO. Update System.Streams imports and type
 names to System.IO and regenerate applications with matching artifacts. System.Storage
-continues to own providers, files, directories and Path. Use matching Preview 10
+continues to own providers, files, directories and Path. Use matching Preview 11
 compiler, reference and runtime artifacts.
 
 ## Future asynchronous reads
@@ -277,7 +277,7 @@ CreateEncoder and return fresh conversion state. Do not assume an arbitrary
 whole-value Encode implementation can safely be called separately for text fragments.
 Built-ins and the application custom-codec examples use the same public interface.
 EncoderProgress rejects negative byte counts and inactive states; providers must
-also respect the capacity offered to Drain. These APIs are not included in Preview 10.
+also respect the capacity offered to Drain. These APIs are included in Preview 11.
 
 Compared with .NET Encoder.Convert, this design retains valid text rather than
 reporting UTF-16 char consumption. It permits arbitrarily small byte destinations,

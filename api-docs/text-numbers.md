@@ -1,7 +1,7 @@
 # Casing and decimal reporting (development)
 
-These APIs require matching development runtime, System library and compiler
-references. They are not part of the published Preview 10 package.
+These APIs are included in Preview 11 and require matching runtime, System library
+and compiler references.
 
 [String](xref:System.String) provides `ToUpperInvariant()` and `ToLowerInvariant()`.
 Both return String using **Unicode 17 full default casing**. They can expand text

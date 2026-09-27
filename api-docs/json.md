@@ -3,10 +3,10 @@ title: JSON serialization
 ---
 # JSON serialization
 
-**Preview 10.** [JsonSerializer](xref:System.Data.Json.JsonSerializer)
+**Preview 11.** [JsonSerializer](xref:System.Data.Json.JsonSerializer)
 reads/writes the closed JsonValue DOM and has provisional flat-object overloads.
-**Development after Preview 10** also maps nested nongeneric reference objects, typed arrays and root String/Int32/Boolean values.
-Rebuild consumers with the matching Preview 10 reference and library; JsonError has
+It also maps nested nongeneric reference objects, typed arrays and root String/Int32/Boolean values.
+Rebuild consumers with the matching Preview 11 reference and library; JsonError has
 new mapping cases. All operations are synchronous and return Result with [JsonError](xref:System.Data.Json.JsonError).
 
 Use the explicit Node methods for the DOM boundary:
@@ -91,7 +91,7 @@ consume input before failure. Writes validate mapping and the entire encoded doc
 before touching output; a stream failure can still leave a written prefix. This is
 buffered synchronous conversion, not async stream parsing.
 
-Development builds after Preview 10 allow 1,024 UTF-8 bytes per document (Preview 10: 128),
+Documents allow 1,024 UTF-8 bytes,
 including whitespace, property names and escaped output. String and buffered HTTP input
 return LimitExceeded above that cap; stream input reads at most 1,025 bytes and returns
 Read(TextReadError.LimitExceeded), leaving the stream open. JSON number tokens use the

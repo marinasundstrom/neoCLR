@@ -1,6 +1,6 @@
 # Route matching and parameters
 
-**Development after Preview 10.** Routing is optional, reusable parsing inside an
+**Preview 11.** Routing is optional, reusable parsing inside an
 existing HttpServer handler. It does not own dispatch or response completion.
 
 | API | Result |
@@ -32,7 +32,7 @@ wording. Int32 uses the platform parser, including checked bounds. Use `Get` and
 another parser for custom types. A Uuid parser is not yet available.
 
 See [the route design](https://github.com/marinasundstrom/neoCLR/blob/main/docs/route-parsing.md)
-for policies, .NET comparison and costs. Preview 10 does not include these APIs.
+for policies, .NET comparison and costs. These APIs are included in Preview 11.
 
 
 ## Preparing a union mapper

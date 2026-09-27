@@ -1,6 +1,6 @@
 # File Transformer
 
-**Preview 10.** This example connects Storage, UTF-8
+**Preview 11.** This example connects Storage, UTF-8
 text reading and the experimental JSON document code. It reads a sensor report
 from `reports/report.json` and writes a new `reports/reply.json`.
 
@@ -21,7 +21,7 @@ first reading and constructs an acknowledgement. It does not use reflection or
 object serialization. JSON types are sample code, not part of the platform API.
 
 Download the [complete source bundle](/samples/file-transformer.zip), extract it,
-and use matching Preview 10 SDK/runtime artifacts. Create the input above in
+and use matching Preview 11 SDK/runtime artifacts. Create the input above in
 `reports/report.json`, relative to the directory where you run the app.
 
 ```sh

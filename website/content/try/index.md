@@ -4,6 +4,9 @@ Start with a saved .rvnproj project. The same project describes your source file
 
 **Published Preview 11.** These instructions use the matching macOS arm64 packages. The feature pages describe current behavior and possible future directions.
 
+[Preview 11 release notes and downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.11)
+cover included features, platform prerequisites, known limits and validation.
+
 [Set up the preview ↓](#install)
 
 <a id="install"></a>

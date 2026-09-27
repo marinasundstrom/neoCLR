@@ -10,6 +10,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Correct the website's shared banner, footer and release link to Preview 11;
   its site configuration still displayed Preview 10 after the release content update.
+  Align API-guide availability labels with the published Preview 11 surface and
+  link its release notes from setup, retaining prior-release compatibility notes.
 
 - Explain HttpServer through an application-owned accept loop, separating request
   handling models from the listener. Show the existing report-server loop directly

@@ -1,6 +1,6 @@
 # Console and standard streams
 
-Preview 10. `System.Console` is a static class. Its common
+Preview 11. `System.Console` is a static class. Its common
 methods are `Write(string/int)`, `WriteLine()`, `WriteLine(string/int/object?)` and Boolean, Char and integral overloads, `ReadByte()`
 and `ReadLine()`/`ReadLine(maxUtf8Bytes)`. Terminal key handling, colors, cursor
 movement, character-at-a-time text input and asynchronous calls are not implemented.

@@ -1,6 +1,6 @@
 # TCP sockets and listeners
 
-**Preview 10.** `System.Networking.Sockets` starts with an IPv4 TCP
+**Preview 11.** `System.Networking.Sockets` starts with an IPv4 TCP
 API. Connections can send and receive bytes; listeners accept new connections.
 The two-sided POC runs separate neoCLR server and client processes on loopback.
 This remains a provisional subset of a complete Socket API.

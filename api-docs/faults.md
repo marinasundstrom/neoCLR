@@ -1,6 +1,6 @@
 # Terminal faults and codes
 
-**Preview 10.** Every host-visible runtime `Fault` now has a
+**Preview 11.** Every host-visible runtime `Fault` now has a
 machine-readable code as well as its diagnostic message and execution location.
 This is a host API; guest programs cannot catch a Fault or select its code.
 

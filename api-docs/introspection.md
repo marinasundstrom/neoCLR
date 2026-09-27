@@ -1,6 +1,6 @@
 # Introspection and Object contracts
 
-Preview 10. [TypeInfo](xref:System.Introspection.TypeInfo) describes
+Preview 11. [TypeInfo](xref:System.Introspection.TypeInfo) describes
 a type in the current loaded program. [MemberInfo](xref:System.Introspection.MemberInfo)
 provides its name, declaring type, module and token; the type interface adds shape,
 generic arguments and member queries. The [type reference](xref:System.Introspection.TypeInfo)
@@ -160,8 +160,7 @@ expose parameters and visibility, without a method return type. See the
 For admitted application interfaces, public instance defaults are virtual and have
 bodies (`IsAbstract` is false). Ordinary static helpers report `IsStatic` true and
 `IsVirtual`/`IsAbstract` false. Private helper visibility remains private; helpers do
-not create an implementation obligation on a class. This development behavior is not
-in Preview 10. Reflection describes these methods; it does not enable general
+not create an implementation obligation on a class. This behavior is included in Preview 11. Reflection describes these methods; it does not enable general
 invocation of interface bodies or bypass their access checks.
 
 
@@ -172,7 +171,9 @@ from class virtual slots, unlike the CLI private/final/virtual emission flags. O
 public method queries exclude these private bodies. This development support does not
 add GetInterfaceMap or general reflection invocation of interface implementations.
 
-## Attribute data (development after Preview 10)
+<a id="attribute-data-development-after-preview-10"></a>
+
+## Attribute data
 
 `MemberInfo.GetCustomAttributesData()` and `ParameterInfo.GetCustomAttributesData()`
 return `Sequence<CustomAttributeData>` for directly declared, retained attributes.
