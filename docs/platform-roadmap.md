@@ -64,6 +64,9 @@ separates native support from Raven import gaps. A subsequent bounded
 [explicit class implementation slice](experiments/explicit-interface-implementations/README.md)
 adds ordinary methods on application classes/interfaces. Accessors, generic/value-type
 import, private instance helpers and broader static/default/accessibility cases remain open.
+The author also selected [Result/Task Main integration](experiments/entry-results/README.md),
+with direct async Main adoption in relevant samples after focused validation.
+This is a bounded startup integration, not a new broader milestone.
 M2–M6 remain candidate applications; no complete File Catalog
 or additional HTTP feature is required by the comparer slice.
 

@@ -5,12 +5,8 @@ import System.Console.*
 
 func Describe(input: string) -> string => input + " on a worker"
 
-async func Show() -> Task<unit> {
+async func Main() -> Task<unit> {
     let text = await Thread.Run(Describe, "Hello")
     WriteLine(text)
     return ()
-}
-
-func Main() {
-    _ = Show()
 }

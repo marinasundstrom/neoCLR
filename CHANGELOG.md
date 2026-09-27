@@ -18,7 +18,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   implied. Add exact bridge contracts, a compiled consumer, API documentation and a dedicated
   garbage collection feature page. Supply manual reference entries for existing
   LocalTimeMapping deconstruction members omitted by RavenDoc and repair numeric
-  guide links found by the combined website build.
+  guide links found by the combined website build. Integrate the concurrent Result/Task
+  entry-point dispatcher while retaining GC roots and Reflection contracts.
 
 - Add development ConstructorInfo/GetConstructors, Result-based method invocation,
   instance field access and argument-taking typed/untyped CreateInstance extensions.
@@ -29,6 +30,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   exhaustive-match updates; ReflectionError also gains five cases. Refresh library/API
   contracts and add a dedicated Reflection
   feature page. Generic classes, static fields, coercion and byref/out remain unsupported.
+
+- Support Raven Main returning integer, Result and target Task combinations through
+  target-owned startup adaptation, including optional string-array arguments and
+  pending default-queue/host completion. Result errors print to stderr and return
+  one; unit success returns zero. `neoclr run` now uses integer entry values as
+  process status (including Neo/neoIL), so scripts must account for nonzero results.
+  Preserve ordinary nonblocking Task.GetResult and .NET Raven entry behavior.
+  Update the worker/async samples and HTTP client experiment to await directly in
+  Main, document supported signatures on the website, and record independently
+  reproduced async compiler observations for separate fixes.
 
 - Import explicit interface methods on non-generic Raven application classes and
   application interfaces. Preserve private MethodImpl mappings, nominal object identity,

@@ -11,3 +11,7 @@ python3 docs/experiments/runtime-gc/verify.py \
 
 Checks collection and object counters, garbage reclamation, retained references,
 null KeepAlive and the configured heap limit. See [the contract](../../runtime-gc.md).
+
+The async consumer collects before waiting, inside a queued callback and after
+resumption. It verifies that Collect preserves captured state and does not itself
+drain callbacks through the Result/Task entry dispatcher.

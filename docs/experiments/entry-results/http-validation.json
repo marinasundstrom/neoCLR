@@ -1,0 +1,16 @@
+{
+  "source": "docs/experiments/http-client/Main.rvn",
+  "passed": true,
+  "stdout": "Handler checks passed\nOther work runs while HTTP is pending\nHTTP 200\nCaf\u00e9 \ud83c\udf0d\n",
+  "sourceSha256": {
+    "Main.rvn": "3fcf97aee8a2c38661f0de497da455d034f75898cfb4916cf863811d7d134d7d",
+    "Handlers.rvn": "28c1d79ad4dbf742b0fba9d0e3d826d155bab18a3bf88f43f2dbfe3ab95331d4"
+  },
+  "sha256": {
+    "runtime": "19fc87d99e6cfc8c6c482784d19645cd9c4acd2b3f91bbf6ab4b28c9dffef0b4",
+    "bridge": "8964846d9c2159e52344eb46ce2134105c757d6862a3303ac2d93aa6bde04e7c",
+    "system": "c1915113ebc35948e76a9b5983a01f7ea3e7702409e5b9a228506685af3ea220",
+    "reference": "dee37cfe006e173f52de5130e0c34dc9e8ba0f97540cf13a9b2ca2f4762b4d26",
+    "runner": "b71223240b5cdf9f0681e4bdfa3f1ab1e146081aa87e3f15f83c79922e21dac9"
+  }
+}

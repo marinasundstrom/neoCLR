@@ -111,6 +111,12 @@ if (args.Length == 2 && args[0] == "--comparer-signatures")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--entry-signatures")
+{
+    SignatureProbe.Write(args[1], entryOnly: true);
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--signatures")
 {
     SignatureProbe.Write(args[1]);

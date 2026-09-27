@@ -21,11 +21,12 @@ with tempfile.TemporaryDirectory(prefix='neoclr-runtime-gc-') as directory:
     (work/'Test.rvnproj').write_text(f'<Project><PropertyGroup><NeoCLRRoot>{work}</NeoCLRRoot></PropertyGroup><Import Project="{root}/build/NeoCLR.Raven.props"/><ItemGroup><Compile Include="Main.rvn"/></ItemGroup></Project>')
     for source, expected in [
         (Path(__file__).with_name('Main.rvn'), 'GC counters, collection and retained references passed'),
+        (Path(__file__).with_name('Async.rvn'), 'GC preserves queued callbacks and async entry state'),
     ]:
         (work/'Main.rvn').write_text(source.read_text())
-        subprocess.run(['dotnet',str(bridge),'--project',str(work/'Test.rvnproj'),str(work/source.parent.name)],check=True)
-        app=work/source.parent.name/'App.neoil'
-        evidence=root/'target/runtime-gc'/source.parent.name
+        subprocess.run(['dotnet',str(bridge),'--project',str(work/'Test.rvnproj'),str(work/source.stem)],check=True)
+        app=work/source.stem/'App.neoil'
+        evidence=root/'target/runtime-gc'/source.stem
         evidence.mkdir(parents=True,exist_ok=True)
         shutil.copyfile(app,evidence/'App.neoil')
         shutil.copyfile(work/'System.neoil',evidence/'System.neoil')

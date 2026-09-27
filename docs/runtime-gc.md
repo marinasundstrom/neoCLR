@@ -104,3 +104,10 @@ consumers, the GC consumer, Number/concrete parsing, interface helpers and expli
 interface consumers pass against the same regenerated library/reference boundary.
 Library and API snapshot checks pass. The integration preserves source-qualified
 interface method names and reflected static application method ownership.
+
+The final Result/Task entry integration passes five entry-dispatch native checks
+and repeats all eight GC API checks. A second GC consumer collects before awaiting,
+inside a queued callback and after async Main resumes: captured objects survive,
+and Collect itself does not pump callbacks. Pending integer and Task<Result> error
+entries also pass. The public reference assembly is byte-identical across this last
+integration; library hashes and updated website sample templates pass checks.

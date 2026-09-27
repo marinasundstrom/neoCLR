@@ -1,0 +1,15 @@
+import System.*
+import System.Tasks.*
+
+// Reproducer: no async Main is involved. Expected output is "Value 1".
+async func Work() -> Task<int> {
+    let ready = Promise<int>()
+    _ = ready.Complete(1)
+    let value = await ready.Task
+    Console.WriteLine("Value $value")
+    return value
+}
+
+func Main() {
+    _ = Work()
+}

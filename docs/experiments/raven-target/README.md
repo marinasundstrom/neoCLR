@@ -1414,3 +1414,13 @@ reachability use; no Raven Runtime Contract option or compiler emission change i
 required. Generations, byte accounting, finalization and tuning are not admitted.
 Run `--gc-checks <output>` and the runtime-gc public consumer against matching
 artifacts; see [the full contract](../../runtime-gc.md).
+
+
+### Result and Task entry points (development)
+
+The [entry-results integration](../entry-results/README.md) supports integer,
+Result and target Task return families with optional string-array arguments.
+The heap-async Raven target preserves the source entry signature; neoCLR owns
+startup adaptation and pending completion. Use a matching updated compiler,
+bridge and runtime. Public System signatures and Runtime Contract settings are
+unchanged. Integer results now become `neoclr run` process exit statuses.

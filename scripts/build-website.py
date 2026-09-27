@@ -261,7 +261,7 @@ def main():
         'STORAGE_POC_SAMPLE': ('docs/experiments/storage-poc/Main.rvn', 'func Main()', '\n}', True),
         'ARRAY_TOUR': (raven + 'library-array-tour.rvn', 'import System.*', '\n}', True),
         'TASK_AWAIT_SAMPLE': (raven + 'library-async-default-queue.rvn', 'func Describe', '\n    return ()\n}', True),
-        'TASK_WORKER_SAMPLE': (raven + 'library-async-default-queue.rvn', 'import System.*', '\nfunc Main() {\n    _ = Show()\n}', True),
+        'TASK_WORKER_SAMPLE': (raven + 'library-async-default-queue.rvn', 'import System.*', '\n    return ()\n}', True),
         'TASK_PROMISE_SAMPLE': (raven + 'library-task-producer.rvn', 'import System.*', '\n    promise.Complete(41)\n}', True),
         'TASK_PROPAGATION_SAMPLE': (raven + 'library-task-propagation.rvn', 'async func Read', '\n}\n', True),
         'TASK_RESULT_SAMPLE': (raven + 'library-task-result.rvn', 'import System.*', '\n    promise.Complete(Ok(41))\n}', True),

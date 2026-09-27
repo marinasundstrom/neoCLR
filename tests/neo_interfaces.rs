@@ -124,8 +124,9 @@ fn cli_assembles_and_runs_interface_example() {
         .output()
         .unwrap();
     std::fs::remove_file(path).unwrap();
-    assert!(
-        execution.status.success(),
+    assert_eq!(
+        execution.status.code(),
+        Some(42),
         "{}",
         String::from_utf8_lossy(&execution.stderr)
     );

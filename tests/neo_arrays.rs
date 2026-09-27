@@ -68,8 +68,9 @@ fn array_example_round_trips_through_cli_artifact() {
         .output()
         .unwrap();
     std::fs::remove_file(path).unwrap();
-    assert!(
-        execution.status.success(),
+    assert_eq!(
+        execution.status.code(),
+        Some(42),
         "{}",
         String::from_utf8_lossy(&execution.stderr)
     );

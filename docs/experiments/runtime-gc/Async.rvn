@@ -1,0 +1,31 @@
+import System.*
+import System.Runtime.GC
+import System.Tasks.*
+
+public class Item {
+    val Value: int
+    init(value: int) {
+        Value = value
+    }
+}
+
+async func Main() -> Task<()> {
+    let retained = Item(42)
+    let ready = Promise<int>()
+    TaskQueue.Default.Post(() => {
+        GC.Collect()
+        _ = ready.Complete(retained.Value)
+    })
+    GC.Collect()
+    if ready.Task.IsCompleted {
+        System.Fault("Collect must not drain callbacks")
+    }
+    let value = await ready.Task
+    GC.Collect()
+    if value != 42 {
+        System.Fault("GC lost queued state")
+    }
+    GC.KeepAlive(retained)
+    Console.WriteLine("GC preserves queued callbacks and async entry state")
+    return ()
+}

@@ -2,18 +2,13 @@ import System.*
 import System.Tasks.*
 import System.Console.*
 
-public async func PrintAnswer(input: Task<int>) -> Task<unit> {
-    let value = await input
-    WriteLine(value + 1)
-    return ()
-}
-
-func Main() {
-    let queue = TaskQueue()
-    let source = Promise<int>(queue)
-    queue.Run(() => {
-        _ = PrintAnswer(source.Task)
-        WriteLine("Suspended")
+async func Main() -> Task<unit> {
+    let source = Promise<int>()
+    TaskQueue.Default.Post(() => {
         _ = source.Complete(41)
     })
+    WriteLine("Suspended")
+    let value = await source.Task
+    WriteLine(value + 1)
+    return ()
 }

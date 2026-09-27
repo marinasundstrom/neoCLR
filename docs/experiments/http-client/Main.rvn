@@ -14,7 +14,7 @@ async func ReadGreeting(client: HttpClient, url: string) -> Task<Result<string, 
     return (await client.GetString(url)).MapError(error => error.ToString())
 }
 
-func Main() {
+async func Main() -> Task<()> {
     CheckHandlers()
     Console.WriteLine("Handler checks passed")
     // The verifier substitutes an ephemeral port and controls the peer.
@@ -22,16 +22,15 @@ func Main() {
     let client = HttpClient(RecordingHandler("transport", HttpSocketHandler(), events))
     client.BaseUri = Some("http://localhost:19091/")
     let fetching = ReadGreeting(client, "greeting")
-    fetching.OnCompleted(() => {
-        let result = fetching.GetResult()
-        Check(events.Count == 2)
-        Check(events[0] == "transport before" && events[1] == "transport after")
-        if let Ok(text) = result {
-            Console.WriteLine("HTTP 200")
-            Console.WriteLine(text)
-        } else if let Error(message) = result {
-            Console.WriteLine("HTTP error: $message")
-        }
-    })
     TaskQueue.Default.Post(() => Console.WriteLine("Other work runs while HTTP is pending"))
+    let result = await fetching
+    Check(events.Count == 2)
+    Check(events[0] == "transport before" && events[1] == "transport after")
+    if let Ok(text) = result {
+        Console.WriteLine("HTTP 200")
+        Console.WriteLine(text)
+    } else if let Error(message) = result {
+        Console.WriteLine(String.Concat("HTTP error: ", message))
+    }
+    return ()
 }

@@ -1,0 +1,15 @@
+import System.*
+import System.Tasks.*
+
+// Reproducer: no async Main is involved.
+async func Work(arguments: string[]) -> Task<int> {
+    let ready = Promise<int>()
+    TaskQueue.Default.Post(() => {
+        _ = ready.Complete(arguments.Length)
+    })
+    return await ready.Task
+}
+
+func Main() {
+    _ = Work(["one"])
+}

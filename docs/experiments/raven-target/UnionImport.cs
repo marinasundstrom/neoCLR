@@ -72,6 +72,7 @@ static class UnionImport
             : exports.Contains(method) ? (method.DeclaringType.FullName is "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators" or "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" or "System.Runtime.Reflection.MethodReflectionExtensions" or "System.Runtime.Reflection.FieldReflectionExtensions" ? method.DeclaringType.FullName : libraryOwner) + "." + LibraryImplementation.GenericName(method)
             : throw new InvalidDataException("Unexported implementation dependency: " + method.FullName);
         var entryHasArguments = entry is not null && EntryPointBindings.HasArguments(entry, collectionProfile);
+        var adaptEntry = entry is not null && (entryHasArguments || entry.ReturnType.MetadataType != MetadataType.Void);
         if (collectionProfile) { InterfaceBindings.Validate(library.MainModule); CollectionBindings.Validate(library.MainModule); ReflectionBindings.Validate(library.MainModule); NativeMemoryBindings.Validate(library.MainModule); GCBindings.Validate(library.MainModule); }
         bool InternalLibraryAccess(MethodDefinition target, MethodDefinition caller) => libraryOwner is not null
             && target.IsAssembly && target.Module == caller.Module
@@ -105,7 +106,7 @@ static class UnionImport
             GenericUnionBindings.ParameterMap = parameter => ProfileType(parameter);
             ApplicationTypes.LibraryMap = type => ProfileType(type);
         }
-        var output = new StringBuilder(entry is not null ? $".module ImportedUnion\n.entry {(entryHasArguments ? EntryPointBindings.Startup : Name(entry))}\n" : "");
+        var output = new StringBuilder(entry is not null ? $".module ImportedUnion\n.entry {(adaptEntry ? EntryPointBindings.Startup : Name(entry))}\n" : "");
         if (libraryOwner is null)
             foreach (var module in new[] { app.MainModule }.Concat(guestLibraries))
                 output.AppendLine(SourceMetadata.Assembly(module));
@@ -1033,7 +1034,7 @@ static class UnionImport
         {
             if (!ApplicationTypes.OnlyLibraryTypes) throw new InvalidDataException("Library fragments cannot introduce application type identities.");
         }
-        if (entryHasArguments) output.Append(EntryPointBindings.Adapter(Name(entry!)));
+        if (adaptEntry) output.Append(EntryPointBindings.Adapter(entry!, Name(entry!), t => ProfileType(t)));
         output.Append(ApplicationTypes.Declarations(ProfileType, instanceBodies));
         output.Append(Adapters(collectionProfile)).Append(ResultBindings.Adapters(collectionProfile)).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters(collectionProfile)).AppendLine(BooleanBindings.Adapters).AppendLine(ReflectionBindings.Adapters).AppendLine(EnumBindings.Adapters).AppendLine(EnumHelpersBindings.Adapters);
         foreach (var helper in coercions.Values) output.Append(helper.Body);

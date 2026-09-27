@@ -174,7 +174,7 @@ fn cli_runs_checks_and_compiles_neo_to_an_ordinary_artifact() {
             .output()
             .unwrap();
         assert!(
-            output.status.success(),
+            output.status.code() == Some(if command == "run" { 42 } else { 0 }),
             "{}",
             String::from_utf8_lossy(&output.stderr)
         );

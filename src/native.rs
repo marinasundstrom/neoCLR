@@ -43,6 +43,7 @@ pub(crate) enum Binding {
     CurrentTaskQueue,
     DefaultTaskQueue,
     RegisterDefaultTaskQueue,
+    DrainEntryTasks,
     StartWorker(bool),
     JoinWorker,
     JoinWorkerResult,
@@ -644,6 +645,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         {
             (Binding::NotifyWorker, Type::Void)
         }
+        ("neoCLR.Runtime.DrainEntryTasks", []) => (Binding::DrainEntryTasks, Type::Void),
         ("neoCLR.Runtime.DefaultTaskQueue", []) => (
             Binding::DefaultTaskQueue,
             Type::from_name("System.Tasks.TaskQueue"),
