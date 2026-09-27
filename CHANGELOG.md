@@ -12,7 +12,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Result/Option and Task composition methods appear on their receiver type pages,
   alongside the existing LINQ and reflection extensions. Update RavenDoc to
   resolve open generic receivers, preserve extension-container declarations under
-  the reader filter, and omit inherited members from static classes.
+  the reader filter, and omit inherited members from static classes. Correct API
+  navigation highlighting so namespace functions are selected individually.
 
 - Update RavenDoc with linked derived types, derived interfaces and implementing
   types, marking indirect relationships within the documented API surface. Add an
