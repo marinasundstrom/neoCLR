@@ -1,8 +1,9 @@
 # Release candidate validation
 
 The [toolchain/release tracker](tracking/toolchain-release.md) owns candidate status.
-Preview 10 is the completed HTTP POC release. The next candidate is not yet selected;
-first complete the [pre-release assessment](tracking/toolchain-release.md#pre-release-assessment--2026-09-27). Follow the [CI design](ci-efficiency-plan.md)
+Preview 11 extends the completed HTTP POC. Its [qualification record](preview-11-validation.json)
+records full-suite, host and package evidence, including the validator-only correction.
+For later candidates, start with the [pre-release assessment](tracking/toolchain-release.md#pre-release-assessment--2026-09-27). Follow the [CI design](ci-efficiency-plan.md)
 for validation placement and the [package procedure](experiments/raven-target/RELEASING.md)
 for the matching runtime, Raven SDK and editor assets.
 
@@ -42,8 +43,8 @@ notices, package contents and checksums before publication.
 Source CI does not certify packaged binaries. For every shipped target, archive and
 extract the matching runtime/SDK, compare payload hashes, run the bundled samples,
 check failed-build/stale-output rejection, and verify editor completion/build/run
-with the matching extension. Preview 10 ships prebuilt tools for macOS arm64 only. The next release is preparing
-a Windows x64 native-runtime ZIP as well: CI builds it, compares extracted payload
+with the matching extension. Preview 11 ships Raven tools for macOS arm64 and
+a Windows x64 native-runtime ZIP: CI builds it, compares extracted payload
 hashes and executes four direct-runtime samples using `scripts/package-native.py`.
 This package carries the library and dependency notices, but no Raven SDK/bridge.
 Do not claim Windows Raven SDK/editor qualification from native host checks.

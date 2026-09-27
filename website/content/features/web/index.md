@@ -3,10 +3,10 @@ title: Web and HTTP
 ---
 # Web and HTTP
 
-**Preview 10.** Raven client and server applications can exchange a small UTF-8
+**Preview 11.** Raven client and server applications can exchange a small UTF-8
 response through neoCLR TCP sockets, with DNS on the client. HttpClient, HttpServer, request/response types,
 content and handlers are experimental APIs in System.Web.Http. Use the matching
-Preview 10 toolchain.
+Preview 11 toolchain.
 
 ## HttpClient: call an HTTP service
 
@@ -69,8 +69,7 @@ The client fetches a report from the service, submits it, and reads the reply:
 
 The server's POST handler uses the first operation to respond with 201; malformed
 reports receive 400. `ReadReply` checks the response status and reads its JSON.
-Preview 10 handles the flat station model; development builds also support the
-nested station shown in the full case.
+Preview 11 supports the nested station model shown in the full case.
 
 [Case: Building a Http server app →](/cases/http-server/)
 The walkthrough includes the shared models, routing, client connection setup,
@@ -130,7 +129,7 @@ retries need decisions about replaying requests and safe methods.
 ## Run the controlled example
 
 [Download the client, handler checks and verifier](/samples/http-client.zip).
-The archive includes run instructions and requires matching Preview 10
+The archive includes run instructions and requires matching Preview 11
 artifacts. A local Python peer fragments headers and a `Café 🌍` body; the verifier
 also runs a .NET comparison client. The peer stays open until the client finishes,
 checking that completion follows Content-Length rather than waiting for EOF.
@@ -379,7 +378,7 @@ application fields and at most 2,048 encoded header bytes. Stream-backed content
 
 ## Other request methods
 
-Preview 10 APIs include `Put`, `Patch` and `Delete`, with string/Uri addresses and
+Preview 11 APIs include `Put`, `Patch` and `Delete`, with string/Uri addresses and
 optional cancellation tokens. They use the same BaseUri and handler pipeline as Get
 and Post. PUT/PATCH take HttpContent; DELETE has no body in this checkpoint. Non-success
 statuses remain responses, so callers choose their status policy:
@@ -411,15 +410,15 @@ cancellation-token overloads. `HttpJsonError` preserves either the HTTP or JSON
 cause. Cancellation remains task cancellation.
 
 The managed report sample fetches a typed report from a neoCLR server, posts it back,
-and reads a JSON acknowledgement. Preview 10 maps flat String, Int32 and Boolean
-properties. Development builds add nested reference objects and typed arrays with the same scalar
-rules and allow documents up to 1,024 UTF-8 bytes. Conversion is synchronous over
+and reads a JSON acknowledgement. Preview 11 maps String, Int32 and Boolean
+properties, nested reference objects and typed arrays with the same scalar
+rules, in documents up to 1,024 UTF-8 bytes. Conversion is synchronous over
 buffered HTTP content. Per-call header options, generic lists and nullable mapping
 remain later work. See [the API guide](/docs/json.html) for the exact scope.
 
 ## JSON DOM
 
-The development `System.Data.Json` API can parse, inspect, construct and write a small
+The `System.Data.Json` API can parse, inspect, construct and write a small
 JSON document through strings or streams. `JsonValue` is a closed hierarchy:
 `JsonObject` and `JsonArray` expose their own container methods; strings, numbers,
 booleans and null have distinct node types. A missing member differs from a present
@@ -436,7 +435,7 @@ StreamReader/StreamWriter and leave supplied streams open;
 the caller controls flushing and closing. The sample also runs through
 [MemoryStream](/docs/api/System/IO/MemoryStream/) using write, rewind and read.
 
-Development builds buffer complete documents up to 1,024 UTF-8 bytes (Preview 10: 128),
+Documents are buffered up to 1,024 UTF-8 bytes,
 four nested containers and 32 value occurrences. Containers admit 31 children.
 Duplicate names are rejected. A write failure can leave a partial output; cycles
 fail the depth limit. Nodes use reference identity, with shared mutable children.

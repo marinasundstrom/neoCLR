@@ -1,9 +1,10 @@
 # Source-preview packaging and audit
 
-The first public deliverable is a source archive or repository snapshot. It includes
+Every preview includes a source archive or repository snapshot. It includes
 neoCLR's tracked source, runtime IL, samples, fixtures, tests and documentation.
-Cargo.lock pins the dependencies; Cargo downloads them separately. Prebuilt binaries,
-a vendored dependency bundle and a crates.io publication are outside this target.
+Cargo.lock pins the dependencies; Cargo downloads them separately. Binary packages
+have separate target-host qualification. Vendored dependency bundles and crates.io
+publication remain outside the source-archive process.
 
 ## Audit baseline
 
@@ -17,8 +18,7 @@ private-key headers or the checked GitHub/AWS credential patterns. These are bou
 checks, not a guarantee that every possible secret or provenance issue is detectable.
 Fixture files deliberately include invalid/empty text for I/O tests and must remain.
 
-The original dependency inventory covered 20 registry packages. The current
-current inventory covers 59 locked registry packages, including Chrono and its
+The inventory covers 64 locked registry packages, including Chrono and its
 target-specific dependencies. Preserved license texts are byte-hashed in the
 [notice manifest](../third-party/manifest.json). Native libffi and its separately
 licensed build/test tooling are recorded explicitly. No dependency source is copied

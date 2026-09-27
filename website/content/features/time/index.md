@@ -2,7 +2,7 @@
 
 Date and Time describe civil fields. Instant identifies a point on the timeline,
 Duration an elapsed amount, and Clock supplies Now. **The time-zone and DateTime union
-APIs below are provisional development additions beyond Preview 10.**
+APIs below are provisional Preview 11 APIs.**
 
 ## Local or zoned
 

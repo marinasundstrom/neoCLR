@@ -6,7 +6,7 @@ toc: false
 
 neoCLR is an experimental application platform. It brings together application APIs, managed execution, language integration and development tools. Working programs guide which .NET and CLR contracts to retain and where to investigate alternatives.
 
-**Experimental POC.** Preview 10 includes typed JSON HTTP client/server applications,
+**Experimental POC.** Preview 11 includes typed JSON HTTP client/server applications,
 TCP networking, streams, Storage, Tasks and isolated workers. The project is open
 source under the MIT license.
 
@@ -52,8 +52,8 @@ Major limits include the bounded importer, bounded IPv4 networking and cleartext
 ## Roadmap
 
 The current HTTP POC exchanges typed JSON between neoCLR client and server and
-supports known-length source uploads. The bounded POC was published in Preview 10. Development now extends the Web API
-cases and assesses toolchain readiness for a future release. Current capabilities and
+supports known-length source uploads. Preview 11 adds nested Web API
+models, routing samples and foundational library capabilities. Current capabilities and
 possible extensions are summarized on the [direction page](../proposals/#http-poc).
 No date is promised for the next release.
 

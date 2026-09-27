@@ -2,7 +2,7 @@
 
 Read a line, write text, or work with the standard streams. Recoverable input errors and end-of-input are separate outcomes.
 
-**Preview 10.** Use matching references and runtime libraries. Console remains a static class in System.
+**Preview 11.** Use matching references and runtime libraries. Console remains a static class in System.
 
 <a id="input"></a>
 
@@ -50,8 +50,7 @@ Reports with input bytes, expected output and the toolchain revision help us eva
 
 [Console](xref:System.Console) · [TextReader](xref:System.IO.TextReader) · [TextWriter](xref:System.IO.TextWriter)
 
-The generated reference describes Preview 10. Use the availability
-notes above to distinguish it from the published toolchain.
+The generated reference describes Preview 11. Use matching toolchain artifacts.
 
 ## Command-line arguments
 
@@ -70,11 +69,11 @@ func Main(arguments: string[]) {
 The array contains application arguments, excluding the executable name, as in .NET.
 Without arguments it is empty. Environment.GetCommandLineArgs() includes the
 executable name. Main() without parameters continues to work. This support requires
-the managed collection profile in Preview 10.
+the managed collection profile in Preview 11.
 
 ## Displaying values
 
-Development WriteLine overloads accept Boolean, Char and integer types without
+WriteLine overloads accept Boolean, Char and integer types without
 boxing. WriteLine(object?) is the fallback: it calls the object's ToString override,
 or writes an empty line for null. Integer text uses invariant decimal digits.
 Floating-point numeric formatting and format providers remain future work.

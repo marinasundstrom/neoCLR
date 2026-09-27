@@ -8919,5 +8919,13 @@ See [evidence and limitations](experiments/http-json/cpu-investigation-20260927.
 - **New qualification finding:** Regenerating the full library with the current
   compiler exposed a delegate importer that discarded generic Void results before
   the caller's own pop. Correct the CLI contract rather than altering source callbacks.
-  Final regeneration, exact-candidate hosted checks, platform package validation and
-  publication remain pending; these notes do not claim a completed release.
+  Full regeneration and package checks pass. The hosted Linux suite passes 1,659
+  tests; macOS/Windows host checks and minimum-Rust checks pass. Later sample
+  validation exposed a stale zero-exit assumption, corrected and verified against
+  all 25 extracted source/artifact samples without repeating unaffected full tests.
+- **Release outcome prepared:** Preview 11 carries macOS arm64 Raven tools and a
+  Windows x64 native-runtime ZIP. Windows execution and extracted hashes pass;
+  PE imports require the Microsoft Visual C++ x64 Redistributable. Windows Raven
+  SDK/bridge qualification remains open. See the [release evidence](preview-11-validation.json).
+  Assets are staged in an unpublished GitHub draft pending this final documentation
+  commit and publication; this entry does not claim publication already happened.

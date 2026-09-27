@@ -2,8 +2,7 @@
 
 Create objects, invoke methods, and read or write members discovered at runtime.
 
-**Development API.** Use matching development compiler, library and runtime artifacts.
-The new constructor, method and field operations are not included in Preview 10.
+**Preview 11 API.** Use matching compiler, library and runtime artifacts.
 
 [Introspection](../introspection/) describes a program's types and members.
 Import `System.Runtime.Reflection.*` to add execution extensions to those descriptions.

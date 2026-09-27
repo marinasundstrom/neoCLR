@@ -2,7 +2,7 @@
 
 System.Storage describes provider-bound paths, files and directories. System.IO
 supplies byte streams, text readers and writers. Operations are synchronous and
-return typed Result errors. Use matching Preview 10 runtime and SDK artifacts;
+return typed Result errors. Use matching Preview 11 runtime and SDK artifacts;
 see [setup](../../try/#development) for published package availability.
 
 <a id="example"></a>
@@ -46,7 +46,7 @@ capabilities; optional seekability is separate. MemoryStream provides in-memory
 byte storage. Callers own buffers and must handle partial transfers.
 
 StreamReader decodes strict UTF-8; StreamWriter retries partial UTF-8 writes.
-In development after Preview 10, ReadToEnd decodes chunks incrementally and reports
+ReadToEnd decodes chunks incrementally and reports
 malformed input before EOF when detected. It still returns one accumulated String;
 errors return no partial text. See the [reader contract](../../docs/streams.html#text-readers).
 Callers flush and close explicitly. FileText supplies bounded whole-file text
@@ -61,11 +61,11 @@ helpers. Console exposes the same text and byte interfaces through standard stre
 StreamReader and StreamWriter accept an [Encoding](xref:System.Text.Encoding), with
 UTF-8 as the default. `Encodings.Ascii` selects strict ASCII. Both adapters retain
 the leaveOpen option. Lines are recognized after decoding; unsupported ASCII output
-fails before writing. Development StreamWriter uses bounded encoder output and
+fails before writing. StreamWriter uses bounded encoder output and
 provides Finish to observe final conversion bytes/errors. Flush handles the stream;
 Close releases ownership. Call Finish and Flush explicitly when required before
 Close. See [selected encoding contracts](../../docs/streams.html#selected-encodings-development).
-Use matching development artifacts; Preview 10 does not include these overloads.
+Use matching Preview 11 artifacts for these overloads.
 
 ## Behavior and limits
 

@@ -4,7 +4,7 @@ title: Networking
 # Networking
 
 The current POC resolves a host name, connects a
-TCP client, sends bytes and reads the reply from a separate neoCLR server. It is available with matching Preview 10
+TCP client, sends bytes and reads the reply from a separate neoCLR server. It is available with matching Preview 11
 artifacts.
 
 ## Address values

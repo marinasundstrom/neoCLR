@@ -1,6 +1,6 @@
 # Globalization: cultures, languages and calendars
 
-**Provisional development API, beyond Preview 10.** Culture describes language and
+**Provisional Preview 11 API.** Culture describes language and
 formatting preferences. Calendar defines date arithmetic and the interpretation of
 year, month and day. You can choose each independently.
 

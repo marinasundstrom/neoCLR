@@ -74,10 +74,10 @@ The neoCLR work exercises runtime contracts, metadata and library ergonomics. Ge
 Application interfaces can supply public default implementations and public or private
 static helper methods. Defaults execute on the original object, and a class's own
 implementation takes precedence. Private helpers stay private to the interface.
-This development capability is not included in Preview 10. Private instance helpers,
+These capabilities are included in Preview 11. Private instance helpers,
 static virtual defaults and broader interface accessibility remain future work.
 
-Explicit interface methods are also supported in development for non-generic
+Explicit interface methods are also supported for non-generic
 application classes and interfaces. Two interfaces can select different private
 implementations of the same-named method while the class keeps a separate public
 method. Explicit accessors, generic/value-type import and implementations of external
@@ -88,7 +88,7 @@ core-library contracts remain outside this bounded slice.
 
 ## Supported entry points
 
-**Development after Preview 10.** Use the matching development compiler, bridge
+**Preview 11.** Use the matching compiler, bridge
 and runtime. A program has one static, nongeneric `Main`, either a file-scope
 function or a static class method. Each return type below accepts no arguments
 or one `string[]` argument containing the application arguments, without the
@@ -118,5 +118,4 @@ queues remain caller-driven. Ordinary `Task.GetResult()` stays nonblocking.
 
 `neoclr run` also uses integer entry values as process status for Neo and neoIL.
 Existing scripts that previously ignored a nonzero integer result should account
-for that status. Published Preview 10 Raven entries are still limited to no-result
-Main; this table describes the development toolchain.
+for that status.

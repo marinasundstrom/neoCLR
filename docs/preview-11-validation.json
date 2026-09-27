@@ -1,0 +1,140 @@
+{
+  "version": "0.1.0-preview.11",
+  "date": "2026-09-27",
+  "status": "qualified release candidate",
+  "sourceRevision": "5731cb908f13ced7ef2b7ec50eaadc5930a430ad",
+  "macosRuntimeRevision": "3b08108bc4013ead3d7e2e600572b3986897e347",
+  "windowsRuntimeRevision": "8e5ae745de0123ecd2c286cf1089bfdf4f50578e",
+  "runtimeInputComparison": "src/, runtime/, Cargo files, build.rs and toolchain/consumer inputs are unchanged between macOS binary revision and hosted candidate; subsequent source change only corrects validator exit-code expectations and changelog.",
+  "ravenSdkRevision": "0d5aa83b9",
+  "ravenBundleRevision": "cdc4ca48b48350e338593a84168da6c149a3464e",
+  "ravenRevisionComparison": "Two RavenDoc-only commits follow the SDK build; compiler, language server, extension and packaging sources are unchanged.",
+  "ravenBranch": "neoclr",
+  "sdkVersion": "0.1.12-neoclr.preview11.20260927",
+  "binaryTargets": [
+    "osx-arm64",
+    "win-x64"
+  ],
+  "ravenToolchainTargets": [
+    "osx-arm64"
+  ],
+  "prerequisites": {
+    "ravenBuild": ".NET SDK 11.0.100-rc.1.26425.128 and Python 3.9+",
+    "windowsNative": "Microsoft Visual C++ x64 Redistributable (VCRUNTIME140.dll); no .NET required"
+  },
+  "sourceCI": {
+    "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/36348749374",
+    "revision": "8e5ae745de0123ecd2c286cf1089bfdf4f50578e",
+    "status": "1659 tests passed; subsequent archive smoke failed only on the intentional exit 42 expectation",
+    "fullTestsPassed": 1659,
+    "fullTestsFailed": 0,
+    "hostJobsPassed": 2,
+    "minimumRustJobsPassed": 3,
+    "canonicalReportStatus": "failed",
+    "canonicalReportFullTests": true,
+    "validatorCorrection": "5731cb90 changes only scripts/validate-release.py and CHANGELOG.md. Its extracted-source smoke passes all 25 samples and native integration; runtime/test code is identical to 8e5ae745."
+  },
+  "sourceArchiveSmoke": {
+    "status": "passed",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "toolchain": "stable",
+    "full_tests": false,
+    "smoke_programs": [
+      "counter",
+      "collections",
+      "outputs",
+      "reflection",
+      "reference-identity",
+      "interfaces",
+      "arrays",
+      "control-flow",
+      "typeof",
+      "ordinal-text",
+      "character-classification",
+      "math",
+      "date-time",
+      "common-interfaces",
+      "predicate-search",
+      "reflection-hierarchy",
+      "constructor-chaining",
+      "default-interfaces",
+      "explicit-interfaces",
+      "generic-functions",
+      "delegates",
+      "closures",
+      "readonly",
+      "environment",
+      "file-report"
+    ],
+    "build_profile": "release",
+    "validator_sha256": "1a2b5c1423f28950433b55608e545697e883d591bb3d9a5c7a9dfbe03919c4cc",
+    "commit": "5731cb908f13ced7ef2b7ec50eaadc5930a430ad",
+    "archive_sha256": "d9808c0eec5ba9bc241745c6f1cc2e12c8d8603477001ec348284237cd12312e",
+    "tracked_files": 3080,
+    "registry_packages": 64,
+    "notice_files": 128,
+    "raven_library_snapshot": true,
+    "rustc": "rustc 1.95.0 (59807616e 2026-04-14)\nbinary: rustc\ncommit-hash: 59807616e1fa2540724bfbac14d7976d7e4a3860\ncommit-date: 2026-04-14\nhost: aarch64-apple-darwin\nrelease: 1.95.0\nLLVM version: 22.1.2",
+    "elapsed_seconds": 43.186
+  },
+  "windowsPackage": {
+    "status": "passed",
+    "revision": "8e5ae745de0123ecd2c286cf1089bfdf4f50578e",
+    "target": "win-x64",
+    "dirty_source": false,
+    "archive": "neoclr-0.1.0-preview.11-win-x64.zip",
+    "sha256": "62c05e986fa68ef8594d1428cbd46b50a5b1c56e82a8b16ba87e4afc09f0704b",
+    "files_verified": 194,
+    "extracted_samples_passed": 4
+  },
+  "packageChecks": {
+    "msbuild": 22,
+    "routedHttp": "29 independent requests, managed pair and independent server; passed",
+    "runtimeMapper": "9 independent requests, managed 2-request pair, mixed routes and schema rejection; passed",
+    "uploads": 11,
+    "directRuntimeSamples": 4,
+    "taskRunSelected": 4,
+    "interpolation": 2,
+    "editor": "base, union and comparer completion passed",
+    "archives": "all 1196 runtime and 440 SDK files verified before extracted checks",
+    "notices": "27 NuGet and 8 bundled npm packages; all preserved notices verified; VSIX bytes match inspected input graph"
+  },
+  "focusedSourceEvidence": "experiments/release-readiness/preview11-repairs.json",
+  "localFullRun": {
+    "passed": 1653,
+    "failed": 6,
+    "repair": "Six stale fixtures corrected and passed in focused reruns; environment assertion repaired before this run. Do not describe the initial run as green."
+  },
+  "website": "18 focused renderer/reference tests passed. No local website build; publication remains separate.",
+  "assets": {
+    "neoclr-0.1.0-preview.11-osx-arm64.tar.gz": {
+      "sha256": "4df24e794c00fef88d032dde0ce205d5ecfb1f59977c8c6c9549e05dde2a22bf",
+      "bytes": 27183460
+    },
+    "neoclr-0.1.0-preview.11-source.tar.gz": {
+      "sha256": "0218810e8ae751a272dbc7df413ce7e14aaea2a0feb787ebcbdc4b465a84a474",
+      "bytes": 13227744
+    },
+    "neoclr-0.1.0-preview.11-validation-evidence.tar.gz": {
+      "sha256": "58527bd87362e05e652bd027a9f6d54a43694477b46457ace894622c18bfbc97",
+      "bytes": 93929
+    },
+    "neoclr-0.1.0-preview.11-win-x64.zip": {
+      "sha256": "62c05e986fa68ef8594d1428cbd46b50a5b1c56e82a8b16ba87e4afc09f0704b",
+      "bytes": 2905860
+    },
+    "raven-sdk-0.1.12-neoclr.preview11.20260927-osx-arm64.tar.gz": {
+      "sha256": "1dc89248e48f54a9547ea8f93530fd8f74aa311564944ab7e7239f84e5b291ba",
+      "bytes": 31052597
+    },
+    "raven-tool-notices-0.1.12-neoclr.preview11.20260927.tar.gz": {
+      "sha256": "4c5b36af72834e96fea90b4ed610e075f06c9ad0c83fd321a9c265f989912e0d",
+      "bytes": 143728
+    },
+    "raven-vscode-0.1.12-neoclr.preview11.20260927.vsix": {
+      "sha256": "6e11b12eee2ff1a21390104beeac25f0fd4c1aa8871784f80f63bab609735f2a",
+      "bytes": 10270596
+    }
+  },
+  "finalTagDelta": "The final tag adds only release documentation, website content, validation evidence and changelog promotion after source revision 5731cb90."
+}

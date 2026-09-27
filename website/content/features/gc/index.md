@@ -2,8 +2,7 @@
 
 Inspect the managed heap and request collection through `System.Runtime.GC`.
 
-**Development API.** Use matching development compiler, library and runtime artifacts.
-These APIs are not included in Preview 10.
+**Preview 11 API.** Use matching compiler, library and runtime artifacts.
 
 neoCLR uses a non-moving tracing collector. It reclaims unreachable objects under
 allocation pressure and when an execution completes. `GC.Collect()` also requests

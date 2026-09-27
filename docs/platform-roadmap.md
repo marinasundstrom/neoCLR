@@ -5,17 +5,14 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
-**Immediate author direction — release preparation (2026-09-27).**
-Continue toward Preview 11, with a Windows x64 native-runtime package alongside the
-macOS arm64 toolchain bundle if platform/package checks pass. Freeze the current
-bounded surface while resolving confirmed release blockers. The [toolchain/release assessment](tracking/toolchain-release.md#pre-release-assessment--2026-09-27)
-owns priorities and fresh evidence. Pause automatic feature expansion while this
-release is qualified; this does not reopen Preview 10 or add optional API work.
-The author explicitly requires functioning async/await for this release, including
-generic async. The bounded generic-method path now has positive suspension/capture
-coverage; generic instance async receivers also pass. The matching
-[local SDK/extension and HTTP pair](local-sdk-snapshot.md) are installed and
-validated. Remaining async defects stay ahead of optional API expansion.
+**Author-directed release — Preview 11 (2026-09-27).**
+The current bounded surface is qualified for release with macOS arm64 Raven tools
+and a Windows x64 native-runtime ZIP. See [release notes](preview-11-release-notes.md)
+and [qualification evidence](preview-11-validation.json). Generic async, shared Task.Run,
+text/number foundations, nested JSON and routing samples are included. Windows
+Raven SDK/bridge qualification remains separate. The full Linux suite passes; a
+validator-only exit-code correction has independent archive-smoke evidence.
+This closes release preparation without adding optional Web API capabilities.
 
 **Active direction — minimal Web API (author-selected 2026-09-27).** Focus on
 serving a useful Web API, nested JSON serialization/deserialization, and a
@@ -37,7 +34,8 @@ A [generated attribute-driven mapper experiment](experiments/route-union-mapper/
 validates schemas and reuses compiled patterns. The author subsequently selects
 runtime attribute reflection with cached startup mapping. Member/parameter
 [attribute data](attribute-introspection.md) is now implemented in development;
-the [runtime mapper case](experiments/runtime-route-mapper/README.md) now validates route schemas at startup and retains patterns, conversion bindings and case/carrier constructors for request handling. Source generation remains a future alternative; SDK packaging is not yet implemented.
+the [runtime mapper case](experiments/runtime-route-mapper/README.md) now validates route schemas at startup and retains patterns, conversion bindings and case/carrier constructors for request handling. Source generation remains a future alternative. The mapper ships as tested Preview 11
+sample source; it is not an installed SDK mapper API.
 Enum, Uuid and Option JSON mapping remain requested and pending.
 This explicitly supersedes the previous general useful-library priority; M2–M6
 remain candidates. Preview 10's completed POC stays closed.

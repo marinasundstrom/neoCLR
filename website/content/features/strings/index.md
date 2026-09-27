@@ -2,13 +2,13 @@
 
 String represents Unicode text. Char represents one grapheme cluster: a practical approximation of a character as a reader perceives it. UTF-8 is the canonical internal encoding; scalar and byte access are explicit.
 
-**Preview 10 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
+**Preview 11 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
 
 [See a working example ↓](#characters) · [Download the complete sample](../../samples/library-utf8.rvn)
 
 <a id="characters"></a>
 
-Development builds also support `String.Concat(Object?, Object?)`, using virtual
+The runtime also supports `String.Concat(Object?, Object?)`, using virtual
 `ToString` in left-to-right order and empty text for null. This supplies the runtime
 contract for Raven interpolation of numbers and other objects. Formatting follows
 the value's `ToString` implementation; format-provider overloads are not included.
@@ -47,7 +47,7 @@ Use patterns to extract a successful value or its error. For example, `RoundTrip
 
 <a id="try"></a>
 
-## Use the matching Preview 10 toolchain
+## Use the matching Preview 11 toolchain
 Open the prepared Raven project in VS Code, replace Main.rvn with the complete sample, save it, then run the neoCLR build/run task. Use matching reference and runtime libraries.
 
 [Download Raven source](../../samples/library-utf8.rvn) · [Download expected output](../../samples/library-utf8.expected.txt) · [Toolchain setup →](../../try/#development)
@@ -64,7 +64,7 @@ Unlike .NET’s UTF-16 Char, neoCLR’s Char can contain multiple Unicode scalar
 
 .NET offers configurable UTF-8 decoding, including a strict mode. This implementation starts with a strict Result and Sequence-based byte access. Whether those are the right long-term contracts is open for feedback.
 
-Text readers default to strict UTF-8 and support selected encodings in development;
+Text readers default to strict UTF-8 and support selected encodings;
 the [HTTP and JSON guide](../web/) describes the existing bounded document conversion.
 Future HTTP charset handling can reuse the encoding foundation.
 
@@ -125,12 +125,12 @@ See the [String API reference](xref:System.String) and
 [Object contract](../../docs/objects.html#string-through-object-development).
 
 
-Development String copies share immutable text internally. Owned text producers
+String copies share immutable text internally. Owned text producers
 transfer their buffer; Object conversions still allocate wrappers. Internal checks
 cover owner retention across conversions, storage and GC, including host results
 and fault teardown. Reference comparison and identity hashing follow that retained text owner.
 
-Development APIs include explicit ordinal comparers and full Unicode casing, described
+APIs include explicit ordinal comparers and full Unicode casing, described
 below. Culture-sensitive comparison and language-specific casing remain possible
 future directions; equality, hashing and display transformations have separate roles.
 
@@ -164,7 +164,7 @@ let separate = String(['F', 'o', 'o'])
 // Object.ReferenceEquals(text, separate) is false; text == separate is true.
 ```
 
-These development semantics are checked across Object/Sequence conversions, array
+These semantics are checked across Object/Sequence conversions, array
 storage and garbage collection. Identity hashes may collide and are not persistent IDs.
 
 
@@ -204,7 +204,7 @@ not normalize text or ignore case. Use it with the development HashMap construct
 or through `EqualityComparer<string>` and `Comparer<string>`.
 See [collections and comparer policies](../collections/#comparer-policies-development)
 for a tested example and [StringComparer](xref:System.StringComparer) for signatures.
-This addition is not included in Preview 10.
+Use matching Preview 11 artifacts for this API.
 
 
 `String.Compare(left, right, StringComparison.Ordinal)` selects exact UTF-8 ordering.
@@ -217,7 +217,7 @@ for duplicate detection and lookup. Simple folding equates `ẞ/ß` and `K/k`,
 `ß/ss`; it does not normalize text or apply language-specific rules. These results
 and folded ordering can differ from .NET's OrdinalIgnoreCase. An unknown mode faults.
 See [StringComparison](xref:System.StringComparison) and [StringComparer](xref:System.StringComparer).
-Use matching development runtime and SDK artifacts; Preview 10 lacks these additions.
+Use matching Preview 11 runtime and SDK artifacts.
 
 The [text foundation review](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/text-abstraction.md#systemtext-foundation-review--2026-09-27)
 uses Swift as the closer model for character-facing text APIs, with explicit scalar
@@ -234,7 +234,7 @@ provides UTF-8 and strict ASCII. ASCII rejects unrepresentable text and bytes ab
 these policies while keeping UTF-8 defaults. See [encoding contracts](../../docs/streams.html#selected-encodings-development)
 for ownership, bounds and errors. [Encoder](xref:System.Text.Encoder) now accepts valid text and drains bounded byte
 output, with explicit progress and finalization. A public builder and broader codecs
-remain possible next steps; these additions are not part of Preview 10.
+remain possible next steps.
 
 ## Unicode casing and decimal reports (development)
 
@@ -254,7 +254,7 @@ See the [API contract](/docs/text-numbers.html) and the tested report consumer i
 `docs/experiments/casing-integer/Main.rvn`. Matching development runtime and library
 artifacts are required.
 
-Development primitive `Parse` methods use strict whole-text grammars: decimal
+Primitive `Parse` methods use strict whole-text grammars: decimal
 integers, decimal/exponent Single and Double, and case-insensitive Boolean words.
 They return typed errors, reject whitespace and grouping, and have no ambient
 culture dependency. Number provides a separate arithmetic contract; parsing is not

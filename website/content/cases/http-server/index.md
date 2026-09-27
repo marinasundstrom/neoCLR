@@ -54,14 +54,13 @@ server handles invalid input explicitly where it chooses the HTTP response.
 [Download the client/server sample](/samples/http-json.zip). It uses the runtime
 library's JSON parser and includes checks against independent Python HTTP peers.
 Serialization is synchronous; HTTP bodies are currently buffered. The provisional
-DOM limits are 128 UTF-8 bytes in Preview 10 and 1,024 in development builds,
-with four container levels and 32 values. The development
+DOM limits are 1,024 UTF-8 bytes, four container levels and 32 values. The
 sample has an opt-in variant using the provisional [object serializer overloads](/docs/json.html).
 It maps both report and acknowledgement models through checked runtime reflection:
 constructors, getters and setters execute normally. Flat public `string`, `int` and
 `bool` properties are supported, using exact property names. Writable properties
-must be present; extra JSON fields are ignored. Preview 10 does not support nested models, null mapping or
-naming policies; the development nested case below extends the model shape. The sample's property names match its lowercase
+must be present; extra JSON fields are ignored. Nested models and typed arrays
+are supported as shown below; null mapping and naming policies remain deferred. The sample's property names match its lowercase
 wire names explicitly. Both mapped peers are checked against independent peers and each other.
 Latency under load is not characterized.
 The downloadable demo defaults to direct DOM mapping; its verifier selects this
@@ -70,7 +69,7 @@ experiment with `--mapped`.
 ## Run the client and server
 
 [Download and extract the projects](/samples/http-json.zip). From that directory,
-run with the matching Preview 10 runtime and SDK:
+run with the matching Preview 11 runtime and SDK:
 
 ```sh
 python3 http-json/verify.py \
@@ -88,12 +87,12 @@ Use `--mapped` for the flat typed-model variant, which fetches then submits a re
 
 ## Development case: a report with a nested station
 
-**Requires a matching development build after Preview 10.** The same report
+**Included in Preview 11.** The same report
 exchange now carries a station name and a description of where the sensor is
 installed and why staff use it, plus a `readings` array of integer measurements. This report exceeds the old 128-byte JSON limit. The client first fetches
 this model from GET `/report`, then submits it to POST `/reports`. The server
 reads the nested station and returns the same 201 acknowledgement. This is still
-an explicit HttpServer application. The next routing case is planned around a
+an explicit HttpServer application. The routing case below uses a
 route parser inside the handler, with named parameters and typed parsing;
 WebApplication infrastructure remains deferred.
 
@@ -131,8 +130,7 @@ response. See the [complete server](/samples/http-json/json-object-mapping/HttpS
 
 [Download the complete client/server projects](/samples/http-json.zip), extract
 them, and run from the extracted directory. Set these paths to a matching
-**development** runtime bundle and Raven SDK; the Preview 10 runtime supports
-only the flat variant.
+Preview 11 runtime bundle and Raven SDK.
 
 ```sh
 python3 http-json/verify.py \
@@ -161,7 +159,7 @@ construction, error and stream ownership contracts.
 
 ## Development case: routing with typed parameters
 
-**Requires a matching development build after Preview 10.** A station is now
+**Included in Preview 11.** A station is now
 addressed by ID: GET `/stations/42/reports` reads its report and POST to the same
 path submits it. Station 42 is the small case's known sensor. The shared nested
 JSON models above are unchanged.
@@ -211,19 +209,17 @@ are rejected. Each target/pattern allows at most 1,024 UTF-8 bytes and 16 segmen
 See the [route API guide](/docs/routes.html) for the complete contract.
 
 The [project download](/samples/http-json.zip) includes `http-routing`, the shared
-model source and verifier. With a matching development bundle, run from its root:
+model source and verifier. From the downloaded projects, select the matching runtime and SDK:
 
 ```sh
-python3 http-routing/verify.py --toolchain-root /path/to/development-bundle \
-  --runner /path/to/measure_async
 python3 http-json/verify.py --routed --case all \
-  --toolchain-root /path/to/development-bundle --runner /path/to/measure_async
+  --toolchain-root /path/to/runtime --sdk /path/to/raven-sdk \
+  --runner /path/to/runtime/tools/http-runner
 ```
 
-The checks cover direct parsing and union dispatch, 29 independent server requests,
+The HTTP checks cover route parsing and union dispatch, 29 independent server requests,
 the neoCLR client/server pair and the client against an independent server. The
-client prints `{"accepted":true}`. The examples are development source, not APIs
-included in Preview 10 or a new hosting framework.
+client prints `{"accepted":true}`. The examples are packaged sample source; they do not introduce a hosting framework.
 
 <a id="development-experiment-attributed-item-routes"></a>
 
@@ -264,14 +260,14 @@ responses; the station case above demonstrates typed JSON.
 
 The [source download](/samples/http-json.zip) includes `runtime-route-mapper`, its
 three projects, reusable mapper, typed application facade and verifier. With a
-matching development bundle, run:
+matching Preview 11 runtime and SDK, run:
 
 ```sh
-python3 runtime-route-mapper/verify.py --toolchain-root /path/to/development-bundle \
-  --runner /path/to/measure_async
+python3 runtime-route-mapper/verify.py --toolchain-root /path/to/runtime \
+  --sdk /path/to/raven-sdk --runner /path/to/runtime/tools/http-runner
 ```
 
-**Development sample source, not included in Preview 10 or installed as an SDK mapper.**
+**Preview 11 sample source; not installed as an SDK mapper.**
 One public nongeneric union, up to 16 cases and String/Int32 payloads are supported.
 Startup rejects invalid schemas and structurally overlapping patterns. Overlap
 checks conservatively ignore typed conversion domains and the total target byte

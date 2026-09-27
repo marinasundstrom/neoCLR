@@ -2,7 +2,7 @@
 
 Start with a saved .rvnproj project. The same project describes your source files and runtime references for the editor and build tools.
 
-**Published Preview 10.** These instructions use the matching macOS arm64 packages. The feature pages describe current behavior and possible future directions.
+**Published Preview 11.** These instructions use the matching macOS arm64 packages. The feature pages describe current behavior and possible future directions.
 
 [Set up the preview ↓](#install)
 
@@ -13,12 +13,12 @@ The prebuilt preview supports **macOS on Apple silicon**. For the development to
 
 **neoCLR itself and programs running on neoCLR do not depend on .NET.** The .NET requirement belongs to the surrounding tools: the Raven compiler, MSBuild, the import bridge and Raven Language Server. The VS Code extension uses that language server for editor features. Once a program is built and imported, running it with the neoCLR runtime and its matching runtime library does not require .NET.
 
-Download these four assets from [Preview 10’s downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.10):
+Download these four assets from [Preview 11’s downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.11):
 
-- `neoclr-0.1.0-preview.10-osx-arm64.tar.gz` — runtime, project and samples.
-- `raven-sdk-0.1.12-neoclr.http.20260927-osx-arm64.tar.gz` — matching compiler tools.
-- `raven-vscode-0.1.12-neoclr.http.20260927.vsix` — matching editor extension.
-- `raven-toolchain-notices.tar.gz` — companion notices.
+- `neoclr-0.1.0-preview.11-osx-arm64.tar.gz` — runtime, project and samples.
+- `raven-sdk-0.1.12-neoclr.preview11.20260927-osx-arm64.tar.gz` — matching compiler tools.
+- `raven-vscode-0.1.12-neoclr.preview11.20260927.vsix` — matching editor extension.
+- `raven-tool-notices-0.1.12-neoclr.preview11.20260927.tar.gz` — companion notices.
 
 Extract the runtime and SDK archives into separate folders. In VS Code, open Extensions, use the ⋯ menu, choose **Install from VSIX…** and select the downloaded extension. Reload any open VS Code windows afterward.
 
@@ -90,6 +90,21 @@ Meet the syntax on the [Raven language page](../raven/), then explore [Option an
 - **No debugging:** Raven source debugging on neoCLR is not implemented. Use the dedicated build/run tasks and printed output.
 
 This preview always rebuilds. It has no package restore, incremental build, Clean/Rebuild targets or multi-level project graphs. Prebuilt Raven tools are validated for macOS arm64; source checks on other hosts do not establish equivalent binary support.
+
+## Windows native runtime
+
+Download `neoclr-0.1.0-preview.11-win-x64.zip` from the same release. Extract it and
+run this command in PowerShell from the extracted folder:
+
+```powershell
+./bin/neoclr.exe run samples/neoil/type-categories.neoil --system lib/System.neoil
+```
+
+It prints 42, 7 and 9 on separate lines. This native package includes the System
+library, direct-runtime samples and notices; it requires no .NET installation.
+The executable imports `VCRUNTIME140.dll`; install the current
+[Microsoft Visual C++ x64 Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) if the runtime is absent.
+The Raven SDK, compiler bridge and editor workflow are qualified on macOS arm64 only.
 
 <a id="development"></a>
 

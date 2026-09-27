@@ -6,7 +6,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+No unreleased changes.
+
+## 0.1.0-preview.11 — 2026-09-27
+
 ### 2026-09-27
+
+- Qualify Preview 11 for macOS arm64 and Windows x64 native execution, with matching
+  macOS Raven SDK/VSIX, source, notices and checksummed evidence. Record 1,659 passing
+  Linux tests separately from the corrected archive validator's 25 passing samples;
+  refresh feature/setup pages and document the Windows Visual C++ runtime prerequisite.
 
 - Update RavenDoc extension list labels to omit type parameters supplied by the
   receiver: String shows Any() rather than Any<T>(), while caller-selected generic

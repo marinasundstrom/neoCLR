@@ -2,7 +2,7 @@
 
 Sequence provides count and indexed read access. MutableSequence adds replacement; List adds growth. Arrays and lists can be consumed through these capabilities.
 
-**Preview 10 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
+**Preview 11 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
 
 <a id="example"></a>
 
@@ -96,11 +96,11 @@ Report issues with a small program, the toolchain version, expected behavior and
 
 ## Mixed Object keys
 
-Development generic API signatures admit Object map keys and values. `HashMap<Object, Object>` uses explicit equality and hash callbacks: Path and type descriptors use their own contracts, supported boxed integers and Booleans compare by value, and ordinary classes retain allocation identity. A tested sample covers mixed keys, collisions, replacement, table growth and reference-preserving values through GC. A default comparer is not supplied. Strings use content equality and hashes through Object; callers still select the callbacks.
+Generic API signatures admit Object map keys and values. `HashMap<Object, Object>` uses explicit equality and hash callbacks: Path and type descriptors use their own contracts, supported boxed integers and Booleans compare by value, and ordinary classes retain allocation identity. A tested sample covers mixed keys, collisions, replacement, table growth and reference-preserving values through GC. A default comparer is not supplied. Strings use content equality and hashes through Object; callers still select the callbacks.
 
 ## Comparer policies (development)
 
-After Preview 10, `EqualityComparer<T>` pairs equality with hashing and `Comparer<T>`
+`EqualityComparer<T>` pairs equality with hashing and `Comparer<T>`
 supplies ordering. `StringComparer.Ordinal` implements both for exact string content.
 HashMap accepts a reusable policy; the callback constructor remains supported.
 
@@ -118,8 +118,7 @@ implement the interfaces for a named policy. Policy behavior and keys must remai
 stable while stored; callbacks must not reenter the same map. No universal default or
 culture policy is supplied. `StringComparer.OrdinalIgnoreCase` additionally uses
 Unicode simple folding consistently for equality/hash and ordering; see the
-[string comparison contract](../strings/#explicit-comparison-policies-development). The development APIs require rebuilt
-matching references and runtime library artifacts; they are not in Preview 10.
+[string comparison contract](../strings/#explicit-comparison-policies-development). Use matching Preview 11 references and runtime library artifacts.
 
 ## API reference
 

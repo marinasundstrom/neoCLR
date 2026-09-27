@@ -12,7 +12,7 @@ new release candidate. This pauses automatic expansion of the next generic-type
 slice while feature gaps and regressions are prioritized. Preview 10 remains a
 completed release. The author has now directed release continuation, with Windows
 also considered; prepare Preview 11 from the current bounded surface, not the
-unimplemented optional Web API expansion. Publication remains pending qualification. Findings and
+unimplemented optional Web API expansion. Preview 11 qualification is recorded in [the release evidence](../preview-11-validation.json). Findings and
 fresh check results are recorded in [the assessment evidence](../experiments/release-readiness/2026-09-27.json).
 
 ### Features needing an explicit finish line
@@ -30,7 +30,8 @@ fresh check results are recorded in [the assessment evidence](../experiments/rel
 
 1. **Canonical gate repair implemented.** Formatting and strict all-target Clippy
    now pass. Internal cleanup retains completion-value allocation behavior; ten
-   focused slot/alias/thread tests pass. Exact-candidate CI remains pending.
+   focused slot/alias/thread tests pass. The hosted full Linux suite passes at 8e5ae745; the later validator-only correction
+   passes extracted-source smoke checks. See the release evidence for the exact split.
 2. **Broad signature probe restored.** Standard union cases have read-only payloads;
    remove the obsolete setter assertion and validate the new object Concat overload.
    All 639 checks pass with the generic-unit delegate contract update.
@@ -84,7 +85,7 @@ of this audit; add performance checks only for a demonstrated regression or rele
 | Constructor-assigned private storage | The selected compiler reports getter-only storage for uninitialized private var/val in the new comparer slices | Comparer adapters and HashMap use explicit fields, documented in the Map contract. Revisit ordinary private storage after an independently validated compiler fix. |
 | Private Boolean constructor adaptation | A top-level CLI Boolean conversion helper cannot call a private constructor; the focused StringComparer consumer exposed this access fault | StringComparer uses an internal integer constructor argument and retains private access. Revisit the bridge’s adapter placement with a minimal independent regression; do not widen public access. |
 | Async callback parameter capture and interpolation | Interpolation now prints Value 1 after runtime object Concat repair; Raven diagnoses missing overloads. The old parameter-capture import failure no longer reproduces | [Reduced sources and observed failures](../experiments/entry-results/compiler-gaps/README.md); validate general Raven fixes independently. Direct argument use after await and explicit formatting pass. |
-| Whole-site API coverage | Entry-point website validation stops at documented `System.LocalTimeMapping.Unique.Deconstruct(System.ZonedDateTime@)` missing from generated reference | Source/reference snapshot passes and changed Raven/Tasks page links/rendering pass; reconcile this separate existing API coverage gap before claiming a full-site build. |
+| Whole-site API coverage | The earlier missing-member coverage failure no longer blocks hosted website validation | Hosted website validation passes at 3b08108b ([run](https://github.com/marinasundstrom/neoCLR/actions/runs/36347624886)). Release content edits have 18 focused renderer/reference checks; no local full-site build or publication is claimed. |
 | Task.Run source integration | Ordinary async mutable-local sharing and generic-method capture metadata are corrected in Raven. neoCLR now imports bounded ordinary generic static helpers and their constructed state-machine/closure types, with forced-suspension and cancellation evidence; generic instance async receivers also pass after independently integrated Raven owner-arity/receiver fixes. Run lookup and block-lambda inference now work without the recorded source workarounds. Direct unit await is corrected by recognizing the configured inhabited unit result | [Reduced cases and working consumer](../experiments/task-run/compiler-gaps/README.md); keep typed-stack rejection and validate general compiler fixes independently. |
 | API reference | Source changes require matching bridge/reference and useful member docs | [Maintenance procedure](../../api-docs/README.md), including explicit renderer exclusions; do not substitute a feature page for member coverage. |
 

@@ -2,7 +2,7 @@
 
 Task describes whether an operation produced a value. It does not imply a thread. Write async code around the operation you need, with expected errors as values and cancellation as a distinct outcome.
 
-**Preview 10 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
+**Preview 11 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
 
 [See a working example ↓](#await) · [Download the complete example](../../samples/library-async-default-queue.rvn)
 
@@ -10,9 +10,7 @@ Task describes whether an operation produced a value. It does not imply a thread
 
 ## Starting and awaiting a worker
 
-**Development example after Preview 10:** direct async Main requires the updated
-compiler, bridge and runtime. The published Preview 10 package starts an async
-helper from a synchronous Main. See [supported entry points](../../raven/#entry-points)
+Direct async Main uses the matching compiler, bridge and runtime. See [supported entry points](../../raven/#entry-points)
 for return types and process exit behavior.
 
 ```raven
@@ -163,8 +161,8 @@ This dispatcher is small and serialized. Worker joins can block it. An unresolve
 
 <a id="try"></a>
 
-## Use matching Preview 10 artifacts
-With the matching Preview 10 SDK, open a prepared `.rvnproj` in VS Code, replace `Main.rvn` with one of the complete downloads above, and run the neoCLR build/run task. Refresh the compiler, reference core and runtime library together. Use the runtime, SDK and editor tools from a matching build.
+## Use matching Preview 11 artifacts
+With the matching Preview 11 SDK, open a prepared `.rvnproj` in VS Code, replace `Main.rvn` with one of the complete downloads above, and run the neoCLR build/run task. Refresh the compiler, reference core and runtime library together. Use the runtime, SDK and editor tools from a matching build.
 
 neoCLR and the programs it runs do not require .NET. The Raven compiler, build tools and Raven Language Server run on .NET.
 
@@ -190,7 +188,7 @@ completion through TaskQueue. Callbacks must return for other work to progress.
 A pending await currently resumes through the producer queue; custom queue and UI
 affinity are not settled contracts. Ordinary worker joins can still block the queue.
 
-Task.Run is implemented in development with the integration limits described above.
+Task.Run is implemented with the integration limits described above.
 Thread may become a backend primitive; its public future remains open. Green
 threads are a possible later runtime backend, subject to the same sharing and
 progress guarantees.
@@ -214,5 +212,4 @@ Questions, sample programs and documentation corrections are welcome. See [how t
 
 [System.Tasks](xref:System.Tasks) · [System.Concurrency](xref:System.Concurrency)
 
-The generated reference describes Preview 10. Use the availability
-notes above to distinguish it from the published toolchain.
+The generated reference describes Preview 11. Use matching toolchain artifacts.

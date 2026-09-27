@@ -1,7 +1,7 @@
 # neoCLR
 
 [![CI](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml)
-[![Preview 10](https://img.shields.io/badge/release-v0.1.0--preview.10-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.10)
+[![Preview 11](https://img.shields.io/badge/release-v0.1.0--preview.11-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.11)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Rust 1.85+](https://img.shields.io/badge/Rust-1.85%2B-orange)](Cargo.toml)
 
@@ -42,7 +42,7 @@ output is a temporary internal format, not that final binary representation. See
 
 ## Try the runtime and Raven experiment
 
-Preview 10 demonstrates typed JSON HTTP client/server applications over TCP,
+Preview 11 demonstrates typed JSON HTTP client/server applications over TCP,
 known-length client stream uploads, files and Storage, text and JSON, reflection,
 collections, Result/Option, Tasks, cancellation and isolated workers. HTTP remains
 a bounded cleartext POC; modern protocol work is tracked separately in the
@@ -54,12 +54,12 @@ direct neoIL execution and Raven against the same library.
 The current [MSBuild workflow](docs/raven-msbuild.md) uses familiar Raven project
 files with standalone neoCLR build assets. It provides completion and explicit
 **neoCLR: Build with MSBuild** / **neoCLR: Run (MSBuild)** tasks, including a bounded
-application-plus-library example. This workflow is included in Preview 10.
+application-plus-library example. This workflow is included in Preview 11.
 The normal Raven toolbar build/run/debug commands do not implement this target.
 See [runtime API coverage](docs/raven-runtime-api-coverage.md) for supported contracts
 and importer limits, and [the packaging procedure](docs/experiments/raven-target/RELEASING.md)
-for producing a matching experimental toolchain. Preview 10 packages these entry points together; see the
-[release notes](docs/preview-10-release-notes.md) for assets, prerequisites and limits.
+for producing a matching experimental toolchain. Preview 11 packages these entry points together; see the
+[release notes](docs/preview-11-release-notes.md) for assets, prerequisites and limits.
 
 ## Release history
 
@@ -69,14 +69,16 @@ separates unreleased work from published capabilities. Every commit updates it u
 The [next-preview validation guide](docs/next-preview-validation.md) documents the
 reproducible source-archive check and exact-commit release gates.
 
-## Preview 10
+## Preview 11
 
-**Preview 10 (v0.1.0-preview.10)** is the HTTP application POC release. It includes
-a macOS arm64 runtime bundle, matching experimental Raven SDK/VSIX, examples,
+**Preview 11 (v0.1.0-preview.11)** extends the HTTP application POC with generic async,
+shared-context Task.Run, encoding foundations and nested JSON/routing. It includes
+macOS arm64 and Windows x64 native runtimes, a macOS experimental Raven SDK/VSIX, examples,
 source, attribution and validation evidence. See the
-[release notes](docs/preview-10-release-notes.md) for capabilities and limits.
+[release notes](docs/preview-11-release-notes.md) for capabilities and limits.
 Source validation uses one full Linux run, focused macOS/Windows host checks and
-minimum-Rust compilation on all three hosts. Binary toolchain support is macOS arm64.
+minimum-Rust compilation on all three hosts. The Raven SDK/bridge/editor workflow is qualified on macOS arm64; Windows x64
+has a native-runtime ZIP with direct-runtime samples.
 
 Earlier release notes remain linked from the [changelog](CHANGELOG.md).
 
@@ -237,7 +239,7 @@ cargo run -- run examples/fault.neoil
 ```
 
 `examples/fault.neoil` deliberately produces a terminal Fault and nonzero exit code.
-In development after Preview 10, `neoclr run` also uses an `Int32` entry return as
+`neoclr run` also uses an `Int32` entry return as
 its process exit status. Raven's supported Result and Task entries are adapted to
 that status; see [entry-point contracts and examples](docs/experiments/entry-results/README.md).
 
