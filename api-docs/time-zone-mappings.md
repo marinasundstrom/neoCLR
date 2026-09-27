@@ -27,3 +27,21 @@ later instant, with the same local fields and its own actual offset.
 
 Skipped has no payload. Default LocalTimeMapping is inactive. Successful MapLocal
 returns an active case. See [DateTime and zones](/features/time/) for the executed example.
+
+## Unique.Deconstruct
+
+<a id="unique-deconstruct"></a>
+
+`func Deconstruct(out value: ZonedDateTime) -> ()` writes the unique resolved value.
+The receiver is an extracted `LocalTimeMapping.Unique` case. Prefer the ordinary
+`Unique(value)` case pattern when matching a mapping.
+
+## Ambiguous.Deconstruct
+
+<a id="ambiguous-deconstruct"></a>
+
+`func Deconstruct(out earlier: ZonedDateTime, out later: ZonedDateTime) -> ()` writes
+both resolved values in chronological order. The receiver is an extracted
+`LocalTimeMapping.Ambiguous` case. The `Ambiguous(earlier, later)` case pattern uses
+the same payload order. These generated case members are omitted by RavenDoc's
+inline-case rendering and are documented here explicitly.

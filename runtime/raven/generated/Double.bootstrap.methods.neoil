@@ -1,0 +1,201 @@
+; Generated from runtime/raven/src/System/Double.rvn. Regenerate with build_runtime_library.py.
+.type System.Double
+.sealed
+
+.implements System.ComparableTo<Double>
+.property static Zero() -> Double
+.get System.Double::get_Zero()
+.end
+.property static One() -> Double
+.get System.Double::get_One()
+.end
+.method static get_Zero() -> Double
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldc.i4 0
+M00000001_IL_0003:
+conv.r8
+M00000001_IL_0004:
+ret
+.end
+.method static get_One() -> Double
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldc.i4 1
+M00000002_IL_0003:
+conv.r8
+M00000002_IL_0004:
+ret
+.end
+.method static op_Addition(Double left,Double right) -> Double
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldarg 1
+M00000003_IL_0004:
+add
+M00000003_IL_0005:
+ret
+.end
+.method static op_Subtraction(Double left,Double right) -> Double
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldarg 1
+M00000004_IL_0004:
+sub
+M00000004_IL_0005:
+ret
+.end
+.method static op_Multiply(Double left,Double right) -> Double
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldarg 1
+M00000005_IL_0004:
+mul
+M00000005_IL_0005:
+ret
+.end
+.method static op_Division(Double left,Double right) -> Double
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldarg 1
+M00000006_IL_0004:
+div
+M00000006_IL_0005:
+ret
+.end
+.method instance readonly byref CompareTo(Double other) -> Int32
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldobj Double
+M00000008_IL_0008:
+ldarg 0
+M00000008_IL_0009:
+ldobj Double
+M00000008_IL_000e:
+ceq
+call neoCLR.Library.System.Double.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0010:
+ldc.i4 0
+M00000008_IL_0011:
+ceq
+call neoCLR.Library.System.Double.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0013:
+brtrue M00000008_IL_001d
+M00000008_IL_0018:
+br M00000008_IL_0036
+M00000008_IL_001d:
+M00000008_IL_001e:
+ldarg 1
+M00000008_IL_001f:
+ldarg 1
+M00000008_IL_0020:
+ceq
+call neoCLR.Library.System.Double.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0022:
+ldc.i4 0
+M00000008_IL_0023:
+ceq
+call neoCLR.Library.System.Double.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0025:
+brtrue M00000008_IL_002f
+M00000008_IL_002a:
+br M00000008_IL_0032
+M00000008_IL_002f:
+M00000008_IL_0030:
+ldc.i4 0
+M00000008_IL_0031:
+ret
+M00000008_IL_0032:
+M00000008_IL_0033:
+M00000008_IL_0034:
+ldc.i4 -1
+M00000008_IL_0035:
+ret
+M00000008_IL_0036:
+M00000008_IL_0037:
+M00000008_IL_0038:
+ldarg 1
+M00000008_IL_0039:
+ldarg 1
+M00000008_IL_003a:
+ceq
+call neoCLR.Library.System.Double.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_003c:
+ldc.i4 0
+M00000008_IL_003d:
+ceq
+call neoCLR.Library.System.Double.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_003f:
+brtrue M00000008_IL_0049
+M00000008_IL_0044:
+br M00000008_IL_004c
+M00000008_IL_0049:
+M00000008_IL_004a:
+ldc.i4 1
+M00000008_IL_004b:
+ret
+M00000008_IL_004c:
+M00000008_IL_004d:
+M00000008_IL_004e:
+ldarg 0
+M00000008_IL_004f:
+ldobj Double
+M00000008_IL_0054:
+ldarg 1
+M00000008_IL_0055:
+clt
+call neoCLR.Library.System.Double.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0057:
+brtrue M00000008_IL_0061
+M00000008_IL_005c:
+br M00000008_IL_0064
+M00000008_IL_0061:
+M00000008_IL_0062:
+ldc.i4 -1
+M00000008_IL_0063:
+ret
+M00000008_IL_0064:
+M00000008_IL_0065:
+M00000008_IL_0066:
+ldarg 0
+M00000008_IL_0067:
+ldobj Double
+M00000008_IL_006c:
+ldarg 1
+M00000008_IL_006d:
+cgt
+call neoCLR.Library.System.Double.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_006f:
+brtrue M00000008_IL_0079
+M00000008_IL_0074:
+br M00000008_IL_007c
+M00000008_IL_0079:
+M00000008_IL_007a:
+ldc.i4 1
+M00000008_IL_007b:
+ret
+M00000008_IL_007c:
+M00000008_IL_007d:
+M00000008_IL_007e:
+ldc.i4 0
+M00000008_IL_007f:
+ret
+.end
+.end

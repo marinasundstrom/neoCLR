@@ -1,0 +1,19 @@
+{
+  "scope": "Nominal interface defaults and public/private static helpers",
+  "runs": {
+    "report": "Interface helper contracts passed",
+    "rejected": [
+      "external private static access",
+      "private instance helper outside bounded admission"
+    ]
+  },
+  "sourceSha256": {
+    "Main.rvn": "f76563b306e72b36a45f0d17db49e2d352a4b2be10cfcd7d25af9b431591d5a3"
+  },
+  "sha256": {
+    "runtime": "a5ca298f0ef2f3a11de83ec161be65d43e328b11d789b6399dc7a26b56e14152",
+    "bridge": "a17a5071575bd07f0d69f28a8d6f94f41606b5f024398b9febd9810e869bc14b",
+    "system": "ac1b6e134cf218d6516f0b80f878c2e450d554225b220963e4aa430d68e000a6",
+    "reference": "dee37cfe006e173f52de5130e0c34dc9e8ba0f97540cf13a9b2ca2f4762b4d26"
+  }
+}

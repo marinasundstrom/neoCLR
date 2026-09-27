@@ -1,0 +1,71 @@
+; Generated from runtime/raven/src/System/Runtime/GC.rvn. Regenerate with build_runtime_library.py.
+.method static get_CollectionCount() -> Int64
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+call neoCLR.Runtime.GCCollectionCount()
+M00000001_IL_0007:
+ret
+.end
+.method static get_AllocatedObjectCount() -> Int64
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+call neoCLR.Runtime.GCAllocatedObjectCount()
+M00000002_IL_0007:
+ret
+.end
+.method static get_HeapObjectCount() -> Int64
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+call neoCLR.Runtime.GCHeapObjectCount()
+M00000003_IL_0007:
+ret
+.end
+.method static get_PeakHeapObjectCount() -> Int64
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+call neoCLR.Runtime.GCPeakHeapObjectCount()
+M00000004_IL_0007:
+ret
+.end
+.method static get_ReclaimedObjectCount() -> Int64
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+call neoCLR.Runtime.GCReclaimedObjectCount()
+M00000005_IL_0007:
+ret
+.end
+.method static get_HeapObjectLimit() -> Int64
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+call neoCLR.Runtime.GCHeapObjectLimit()
+M00000006_IL_0007:
+ret
+.end
+.method static Collect() -> noresult
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+call neoCLR.Runtime.GCCollect()
+pop
+M00000007_IL_0007:
+M00000007_IL_0008:
+ret
+.end
+.method static KeepAlive(System.Object value) -> noresult
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+call neoCLR.Runtime.GCKeepAlive(System.Object)
+pop
+M00000008_IL_0008:
+M00000008_IL_0009:
+ret
+.end

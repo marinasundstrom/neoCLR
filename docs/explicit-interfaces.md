@@ -121,3 +121,34 @@ explicit mappings require this runtime; Rust Function literals need the new vect
 There is no new opcode or System descriptor layout. Existing public APIs are unchanged.
 [Default interface bodies](default-interface-implementations.md) now build on these
 mappings; record explicit implementations still cannot be abstract or class-virtual.
+
+
+## Raven application classes (development, 2026-09-27)
+
+The development bridge now imports ordinary explicit instance methods on non-generic
+application classes for non-generic application interfaces. It validates the CLI
+Private/Virtual/Final/NewSlot body and resolved MethodImpl declarations, then emits
+private runtime bodies with explicit `.override` mappings. Class virtual slots are
+not created by those CLI flags. Exact signatures and declared conformance remain
+validated; method names alone never establish a mapping.
+
+Nominal object receivers now enter explicit bodies using their original class view.
+A void-returning explicit body may update the same object observed through other
+interfaces. Ordinary private calls remain access-checked. The
+[focused Raven consumer](experiments/explicit-interface-implementations/README.md)
+checks two same-named contracts, a separate public method, shared state, explicit-only
+access and reflection. This extends the runtime's earlier managed-reference path;
+existing native lifetime and mapping rules remain in force.
+
+The .NET comparison above still applies: neoCLR adapts private/final/virtual CLI
+implementation flags to its separate mapping model, so reflection IsVirtual differs.
+The benefit is familiar explicit interface source behavior without conflating class
+and interface dispatch; the cost is checked metadata translation. No performance
+improvement or full .NET compatibility is claimed. No compiler setting or public
+System API signature changes.
+
+This admission excludes explicit property/indexer/event accessors, value-type bodies,
+generic application definitions, external core-library contracts and derived interface
+replacements. Those need separate consumers. Existing native accessor and generic
+mapping support does not imply that Raven import accepts them. No GetInterfaceMap
+or general interface reflection invocation API is added.

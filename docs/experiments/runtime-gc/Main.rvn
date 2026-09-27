@@ -1,0 +1,40 @@
+import System.*
+import System.Runtime.GC
+
+public class Item {
+    val Value: int
+    init(value: int) {
+        Value = value
+    }
+}
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fault("GC contract failed")
+    }
+}
+
+func MakeGarbage() {
+    let _ = Item(1)
+    let _ = Item(2)
+}
+
+func Main() {
+    let retained = Item(42)
+    let allocated = GC.AllocatedObjectCount
+    MakeGarbage()
+    Check(GC.AllocatedObjectCount >= allocated + 2)
+    let before = GC.HeapObjectCount
+    let collections = GC.CollectionCount
+    let reclaimed = GC.ReclaimedObjectCount
+    GC.Collect()
+    Check(GC.CollectionCount == collections + 1)
+    Check(GC.HeapObjectCount <= before - 2)
+    Check(GC.ReclaimedObjectCount >= reclaimed + 2)
+    Check(GC.PeakHeapObjectCount >= before)
+    Check(GC.HeapObjectLimit >= GC.HeapObjectCount)
+    Check(retained.Value == 42)
+    GC.KeepAlive(retained)
+    GC.KeepAlive(null)
+    Console.WriteLine("GC counters, collection and retained references passed")
+}

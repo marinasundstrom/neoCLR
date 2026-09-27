@@ -1,0 +1,128 @@
+; Generated from runtime/raven/src/System/UInt32.rvn. Regenerate with build_runtime_library.py.
+.type System.UInt32
+.sealed
+
+.implements System.ComparableTo<UInt32>
+.property static Zero() -> UInt32
+.get System.UInt32::get_Zero()
+.end
+.property static One() -> UInt32
+.get System.UInt32::get_One()
+.end
+.method static get_Zero() -> UInt32
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldc.i4 0
+M00000001_IL_0003:
+conv.u4
+M00000001_IL_0004:
+ret
+.end
+.method static get_One() -> UInt32
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldc.i4 1
+M00000002_IL_0003:
+conv.u4
+M00000002_IL_0004:
+ret
+.end
+.method static op_Addition(UInt32 left,UInt32 right) -> UInt32
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldarg 1
+M00000003_IL_0004:
+add
+M00000003_IL_0005:
+ret
+.end
+.method static op_Subtraction(UInt32 left,UInt32 right) -> UInt32
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldarg 1
+M00000004_IL_0004:
+sub
+M00000004_IL_0005:
+ret
+.end
+.method static op_Multiply(UInt32 left,UInt32 right) -> UInt32
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldarg 1
+M00000005_IL_0004:
+mul
+M00000005_IL_0005:
+ret
+.end
+.method static op_Division(UInt32 left,UInt32 right) -> UInt32
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldarg 1
+M00000006_IL_0004:
+div.un
+M00000006_IL_0005:
+ret
+.end
+.method instance readonly byref CompareTo(UInt32 other) -> Int32
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldobj UInt32
+M00000008_IL_0008:
+ldarg 1
+M00000008_IL_0009:
+clt.un
+call neoCLR.Library.System.UInt32.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_000b:
+brtrue M00000008_IL_0015
+M00000008_IL_0010:
+br M00000008_IL_0018
+M00000008_IL_0015:
+M00000008_IL_0016:
+ldc.i4 -1
+M00000008_IL_0017:
+ret
+M00000008_IL_0018:
+M00000008_IL_0019:
+M00000008_IL_001a:
+ldarg 0
+M00000008_IL_001b:
+ldobj UInt32
+M00000008_IL_0020:
+ldarg 1
+M00000008_IL_0021:
+cgt.un
+call neoCLR.Library.System.UInt32.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0023:
+brtrue M00000008_IL_002d
+M00000008_IL_0028:
+br M00000008_IL_0030
+M00000008_IL_002d:
+M00000008_IL_002e:
+ldc.i4 1
+M00000008_IL_002f:
+ret
+M00000008_IL_0030:
+M00000008_IL_0031:
+M00000008_IL_0032:
+ldc.i4 0
+M00000008_IL_0033:
+ret
+.end
+.end

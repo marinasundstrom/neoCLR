@@ -1,0 +1,24 @@
+.function neoCLR.Runtime.GCCollectionCount() -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.GCAllocatedObjectCount() -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.GCHeapObjectCount() -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.GCPeakHeapObjectCount() -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.GCReclaimedObjectCount() -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.GCHeapObjectLimit() -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.GCCollect() -> Void
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.GCKeepAlive(System.Object value) -> Void
+.methodimpl InternalCall
+.end

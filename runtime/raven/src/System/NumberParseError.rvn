@@ -1,0 +1,6 @@
+namespace System
+
+public union NumberParseError {
+    case InvalidFormat
+    case Overflow
+}

@@ -17,6 +17,8 @@ pub struct GcStatistics {
 pub enum CollectionReason {
     AllocationPressure,
     ExecutionCompleted,
+    /// Synchronous collection requested through System.Runtime.GC.
+    ExplicitRequest,
 }
 
 /// A bounded history entry; roots count incoming edges, not unique allocations.

@@ -953,21 +953,21 @@ ldarg arg0
 newobj instance System.Result<System.Data.Json.JsonNumber,System.Data.Json.JsonError>::.ctor(System.Result.Ok<System.Data.Json.JsonNumber>)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion65(System.Result<Int32,System.Int32ParseError>& arg0,out(true) System.Result.Ok<Int32>& arg1) -> Boolean
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion65(System.Result<Int32,System.NumberParseError>& arg0,out(true) System.Result.Ok<Int32>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<Int32,System.Int32ParseError>::TryGetValue(System.Result.Ok<Int32>&)
+call instance System.Result<Int32,System.NumberParseError>::TryGetValue(System.Result.Ok<Int32>&)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion66(System.Result<Int32,System.Int32ParseError>& arg0,out(true) System.Result.Error<System.Int32ParseError>& arg1) -> Boolean
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion66(System.Result<Int32,System.NumberParseError>& arg0,out(true) System.Result.Error<System.NumberParseError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<Int32,System.Int32ParseError>::TryGetValue(System.Result.Error<System.Int32ParseError>&)
+call instance System.Result<Int32,System.NumberParseError>::TryGetValue(System.Result.Error<System.NumberParseError>&)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion67(System.Result.Error<System.Int32ParseError>& arg0) -> System.Int32ParseError
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion67(System.Result.Error<System.NumberParseError>& arg0) -> System.NumberParseError
 ldarg arg0
-call instance System.Result.Error<System.Int32ParseError>::get_Value()
+call instance System.Result.Error<System.NumberParseError>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion68(System.Data.Json.JsonError arg0) -> System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>
@@ -10331,27 +10331,27 @@ M00000034_IL_003c:
 ret
 .end
 .method instance AsInt32() -> System.Result<Int32,System.Data.Json.JsonError>
-.local System.Result<Int32,System.Int32ParseError> local0
+.local System.Result<Int32,System.NumberParseError> local0
 .local System.Result<Int32,System.Data.Json.JsonError> local1
 .local Int32 local2
-.local System.Result<Int32,System.Int32ParseError> local3
+.local System.Result<Int32,System.NumberParseError> local3
 .local System.Result.Ok<Int32> local4
-.local System.Result<Int32,System.Int32ParseError> local5
-.local System.Result.Error<System.Int32ParseError> local6
+.local System.Result<Int32,System.NumberParseError> local5
+.local System.Result.Error<System.NumberParseError> local6
 ldloca local0
-initobj System.Result<Int32,System.Int32ParseError>
+initobj System.Result<Int32,System.NumberParseError>
 ldloca local1
 initobj System.Result<Int32,System.Data.Json.JsonError>
 ldc.i4 0
 stloc local2
 ldloca local3
-initobj System.Result<Int32,System.Int32ParseError>
+initobj System.Result<Int32,System.NumberParseError>
 ldloca local4
 initobj System.Result.Ok<Int32>
 ldloca local5
-initobj System.Result<Int32,System.Int32ParseError>
+initobj System.Result<Int32,System.NumberParseError>
 ldloca local6
-initobj System.Result.Error<System.Int32ParseError>
+initobj System.Result.Error<System.NumberParseError>
 M00000035_IL_0000:
 M00000035_IL_0001:
 M00000035_IL_0002:
@@ -10381,7 +10381,7 @@ ldloca local3
 M00000035_IL_0024:
 ldloca local4
 M00000035_IL_0026:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion65(System.Result<Int32,System.Int32ParseError>&,System.Result.Ok<Int32>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion65(System.Result<Int32,System.NumberParseError>&,System.Result.Ok<Int32>&)
 M00000035_IL_002b:
 brfalse M00000035_IL_0056
 M00000035_IL_0030:
@@ -10412,19 +10412,19 @@ stloc local5
 M00000035_IL_005a:
 ldloca local6
 M00000035_IL_005c:
-initobj System.Result.Error<System.Int32ParseError>
+initobj System.Result.Error<System.NumberParseError>
 M00000035_IL_0062:
 ldloca local5
 M00000035_IL_0064:
 ldloca local6
 M00000035_IL_0066:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion66(System.Result<Int32,System.Int32ParseError>&,System.Result.Error<System.Int32ParseError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion66(System.Result<Int32,System.NumberParseError>&,System.Result.Error<System.NumberParseError>&)
 M00000035_IL_006b:
 brfalse M00000035_IL_009e
 M00000035_IL_0070:
 ldloca local6
 M00000035_IL_0072:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion67(System.Result.Error<System.Int32ParseError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion67(System.Result.Error<System.NumberParseError>&)
 M00000035_IL_0077:
 pop
 M00000035_IL_0078:

@@ -44,3 +44,28 @@ frontend and original borrowed interface profile are unchanged.
 ConvertibleInto<T>.Convert() returns T through ordinary interface dispatch. The
 contract has no built-in implementations and supplies no implicit conversion or
 return-directed overload rule. See [migration and design](common-interfaces.md#directional-interface-names-development-2026-09-25).
+
+
+## Development Number integration — 2026-09-27
+
+Number<T> inherits ComparableTo<T>, with static abstract Zero/One and binary
+arithmetic operators, implemented by eight fixed-width integers, Single and Double.
+Concrete Parse is separate; no parsing interface is selected. See
+[numeric contracts](design/numeric-contracts.md) and the
+[focused consumer](experiments/numeric-contracts/README.md).
+
+Raven general fixes were validated independently on a main-based branch, then
+integrated into main and its neoCLR branch: authored static declarations and
+constrained dispatch, inherited constraint members, and semantic constraint-kind
+classification during target-metadata emission. Runtime Contract configuration is
+unchanged. The target reference projects exact static abstract CLI slots; source
+implementations must match. Placeholder reference bodies are never runtime code.
+
+The bridge closes selected static application numeric algorithms before normal
+checked import, limits specialization to the ten primitive types and 128 copies,
+and rejects other constraints. Generated helpers are internal and have no invented
+source metadata token; diagnostic maps retain the original method token. This is
+not generic runtime static dispatch, nor complete interface default/accessibility
+support. The [runtime tracker](tracking/runtime-language.md#interfaces-as-a-platform-capability)
+owns broader author-directed capabilities. Archived Neo profiles retain their
+legacy parsing boundary; new standard-union parsing belongs to the Raven library.

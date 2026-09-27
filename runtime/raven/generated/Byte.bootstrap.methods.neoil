@@ -1,0 +1,160 @@
+; Generated from runtime/raven/src/System/Byte.rvn. Regenerate with build_runtime_library.py.
+.type System.Byte
+.sealed
+
+.implements System.ComparableTo<Byte>
+.property static Zero() -> Byte
+.get System.Byte::get_Zero()
+.end
+.property static One() -> Byte
+.get System.Byte::get_One()
+.end
+.method static get_Zero() -> Byte
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldc.i4 0
+M00000001_IL_0003:
+conv.u1
+M00000001_IL_0004:
+ret
+.end
+.method static get_One() -> Byte
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldc.i4 1
+M00000002_IL_0003:
+conv.u1
+M00000002_IL_0004:
+ret
+.end
+.method static op_Addition(Byte left,Byte right) -> Byte
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+conv.i4
+M00000003_IL_0004:
+ldarg 1
+M00000003_IL_0005:
+conv.i4
+M00000003_IL_0006:
+add
+M00000003_IL_0007:
+conv.u1
+M00000003_IL_0008:
+ret
+.end
+.method static op_Subtraction(Byte left,Byte right) -> Byte
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+conv.i4
+M00000004_IL_0004:
+ldarg 1
+M00000004_IL_0005:
+conv.i4
+M00000004_IL_0006:
+sub
+M00000004_IL_0007:
+conv.u1
+M00000004_IL_0008:
+ret
+.end
+.method static op_Multiply(Byte left,Byte right) -> Byte
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+conv.i4
+M00000005_IL_0004:
+ldarg 1
+M00000005_IL_0005:
+conv.i4
+M00000005_IL_0006:
+mul
+M00000005_IL_0007:
+conv.u1
+M00000005_IL_0008:
+ret
+.end
+.method static op_Division(Byte left,Byte right) -> Byte
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+conv.i4
+M00000006_IL_0004:
+ldarg 1
+M00000006_IL_0005:
+conv.i4
+M00000006_IL_0006:
+div
+M00000006_IL_0007:
+conv.u1
+M00000006_IL_0008:
+ret
+.end
+.method instance readonly byref CompareTo(Byte other) -> Int32
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldobj Byte
+M00000008_IL_0008:
+conv.i4
+M00000008_IL_0009:
+ldarg 1
+M00000008_IL_000a:
+conv.i4
+M00000008_IL_000b:
+clt
+call neoCLR.Library.System.Byte.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_000d:
+brtrue M00000008_IL_0017
+M00000008_IL_0012:
+br M00000008_IL_001a
+M00000008_IL_0017:
+M00000008_IL_0018:
+ldc.i4 -1
+M00000008_IL_0019:
+ret
+M00000008_IL_001a:
+M00000008_IL_001b:
+M00000008_IL_001c:
+ldarg 0
+M00000008_IL_001d:
+ldobj Byte
+M00000008_IL_0022:
+conv.i4
+M00000008_IL_0023:
+ldarg 1
+M00000008_IL_0024:
+conv.i4
+M00000008_IL_0025:
+cgt
+call neoCLR.Library.System.Byte.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0027:
+brtrue M00000008_IL_0031
+M00000008_IL_002c:
+br M00000008_IL_0034
+M00000008_IL_0031:
+M00000008_IL_0032:
+ldc.i4 1
+M00000008_IL_0033:
+ret
+M00000008_IL_0034:
+M00000008_IL_0035:
+M00000008_IL_0036:
+ldc.i4 0
+M00000008_IL_0037:
+ret
+.end
+.end

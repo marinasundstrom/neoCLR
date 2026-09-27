@@ -28,6 +28,8 @@
       href: docs/storage-items.md
     - name: Introspection
       href: features/introspection/index.md
+    - name: Garbage collection
+      href: features/gc/index.md
     - name: Reflection
       href: features/reflection/index.md
 - name: API reference

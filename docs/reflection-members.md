@@ -126,6 +126,7 @@ The matching Raven compiler/target bridge executed both the new member consumer 
 the existing construction/property consumer successfully. Native construction,
 property and member suites passed 19 checks; 26 exact reference signature checks
 passed. Library source/artifact hashes, API reference fingerprints, XML member
-uniqueness and extracted feature-page examples were checked. No full website build
-or platform matrix was run. Raven integration documentation is commit `4dc15a17a`
+uniqueness and extracted feature-page examples were checked. The subsequent combined
+GC integration also built and checked the complete website; no platform matrix was
+run. Raven integration documentation is commit `4dc15a17a`
 on the `neoclr` branch; no compiler source changes were required.

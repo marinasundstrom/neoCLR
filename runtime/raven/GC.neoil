@@ -1,0 +1,5 @@
+; Raven-authored GC facade.
+.type System.Runtime.GC
+.include "generated/GC.methods.neoil"
+.end
+.include "generated/GC.helpers.neoil"

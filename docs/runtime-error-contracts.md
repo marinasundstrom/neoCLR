@@ -1,5 +1,10 @@
 # Runtime error contract review
 
+The carrier spellings below describe the archived Neo/bootstrap profile. The current
+Raven development API uses `Result<int, NumberParseError>` (and the same error union
+for all numeric Parse methods); see [numeric contracts](design/numeric-contracts.md).
+
+
 Review of the six public Result-returning methods in the current System library.
 All six methods now implement the typed contracts below. A caller must not have to parse diagnostic text to
 decide what to do next.

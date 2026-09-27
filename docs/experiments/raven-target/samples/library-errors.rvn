@@ -116,16 +116,16 @@ func Main() {
     if restored19 is Text.Utf8SliceError.InvalidBoundary {
         WriteLine("Confirmed")
     }
-    let error19 = Int32ParseError.InvalidFormat()
+    let error19 = NumberParseError.InvalidFormat()
     WriteLine(error19.ToString())
     let restored20 = error19
-    if restored20 is Int32ParseError.InvalidFormat {
+    if restored20 is NumberParseError.InvalidFormat {
         WriteLine("Confirmed")
     }
-    let error20 = Int32ParseError.Overflow()
+    let error20 = NumberParseError.Overflow()
     WriteLine(error20.ToString())
     let restored21 = error20
-    if restored21 is Int32ParseError.Overflow {
+    if restored21 is NumberParseError.Overflow {
         WriteLine("Confirmed")
     }
     let error21 = IntegerDivisionError.DivisionByZero()

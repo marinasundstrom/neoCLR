@@ -78,6 +78,12 @@ if (args.Length == 2 && args[0] == "--slices")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--gc-checks")
+{
+    GCChecks.Write(args[1]);
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--reflection-member-checks")
 {
     ReflectionMemberChecks.Write(args[1]);
@@ -91,6 +97,10 @@ if (args.Length == 2 && args[0] == "--globalization-signatures")
 }
 
 
+if (args.Length == 2 && args[0] == "--number-checks") {
+    NumberChecks.Write(args[1]);
+    return;
+}
 if (args.Length == 2 && args[0] == "--casing-integer-checks") {
     CasingIntegerChecks.Write(args[1]);
     return;

@@ -1,61 +1,35 @@
-# Raven integer parsing
+# Raven numeric parsing
 
-The experimental target exposes `System.Int32.Parse(string)` returning
-`Result<int, Int32ParseError>`. `IsInvalidFormat` and `IsOverflow` distinguish the
-error outcomes. Typed matches and `?` propagation work with this carrier:
+Development numeric `Parse(string)` methods return `Result<T, NumberParseError>`
+for SByte, Byte, Int16, UInt16, Int32, UInt32, Int64, UInt64, Single and Double.
+Int32 and Int64 use the same error union as the other numbers. Boolean has a
+separate format-only BooleanParseError. No Parsable interface is exposed.
 
-```swift
-import System.*
-func ParseInput(text: string) -> Result<int, Int32ParseError> {
-    let value = Int32.Parse(text)?
-    return Result<int, Int32ParseError>(Result.Ok<int>(value))
+Match standard Raven union cases; avoid manually wrapping carriers or comparing
+error descriptions. This excerpt comes from the [tested consumer](experiments/numeric-contracts/Main.rvn):
+
+```raven
+match Int32.Parse("2147483648") {
+    Error(NumberParseError.Overflow) => { }
+    _ => System.Fault("Int32 shared parse error")
 }
 ```
 
-The [full sample](experiments/raven-target/samples/library-parsing.rvn) prints the
-successful value or the specific error. It tests signed values, Int32 limits,
-overflow, empty/malformed text, whitespace and non-ASCII digits. Failure returns
-before the code following `?` runs. Propagating into a different error carrier is
-rejected unless the caller supplies a conversion.
+All parsers consume the complete text and reject whitespace/grouping. Integers use
+optional ASCII signs and decimal digits. Floating parsers additionally support a
+decimal point, exponent and explicit NaN/Infinity spellings. Numeric grammar errors
+are distinguished from overflow; floating underflow can round to signed zero.
+See the [API reference](../api-docs/text-numbers.md) for exact grammar and the
+[design comparison](design/numeric-contracts.md) for .NET behavior and tradeoffs.
 
-## Existing contract and .NET comparison
+Raven's .NET framework projections stay disabled for this target
+(`RavenFrameworkProjections=None`): these are direct typed-result APIs rather than
+catch-to-Result projections of .NET Parse. Number's arithmetic constraint is
+independent of parsing. The current numeric generic-import limits are documented
+alongside the [focused evidence](experiments/numeric-contracts/README.md).
 
-This projects the [existing parser](int32-parse.md); it does not change its grammar.
-Parsing is ASCII decimal, accepts an optional sign, consumes the entire string and
-does not trim whitespace. It is not culture-aware. Reuse the
-[API policy comparison](api-policy.md) and [library research](library-preview.md):
-.NET offers exception-producing Parse and Boolean/out TryParse; neoCLR returns an
-ordinary typed Result. Callers retain the familiar entry point but must adapt their
-error flow. This is intentionally not source/API equivalence to .NET parsing.
-
-Raven's normal .NET framework projections must be disabled for this target
-(`RavenFrameworkProjections=None`, already set in prepared projects). Otherwise its
-standard parsing projection expects the .NET signature and rejects this declaration.
-The bridge calls the neoCLR method directly; it does not lower a catch-to-Result
-wrapper. No changes to Raven's default .NET behavior are required.
-
-## Verification and scope
-
-```sh
-dotnet run --project docs/experiments/raven-target/Probe.csproj \
-  -p:RavenRoot=/path/to/Raven -p:BuildProjectReferences=false \
-  -- --parsing /tmp/FRESH-PARSE-PROBE
-python3 docs/experiments/raven-target/verify_parsing.py /tmp/FRESH-PARSE-PROBE \
-  --runtime /path/to/neoclr
-```
-
-The standalone probe also rejects ignored/inverted conditional extraction,
-uninitialized errors and incompatible residual propagation. The saved-project suite
-includes this sample; `verify_editor.py --parsing` checks Parse completion and that
-host TryParse does not leak into the target surface. Use these with a fresh prepared
-project as described in the [integration instructions](experiments/raven-target/README.md).
-
-This slice exposes Parse and its error predicates, not every Int32 or error-case
-member. [Error constructors, checked accessors and ToString](raven-error-api.md) are also projected.
-The [Int32 instance methods](raven-integer-api.md) are projected separately. The metadata/error catalog now
-supports this additional Int32 Result carrier while preserving existing Ok<int>
-bindings. No arbitrary generic-payload support is implied. Installed SDK/VSIX assets
-have not been refreshed.
-
-The separate [integer division slice](raven-division-api.md) projects the existing
-Result-returning Divide helper using the same carrier mechanics.
+The [archived Neo parser](int32-parse.md) retains its old compatibility carrier;
+its type names are not the current Raven API. Rebuild consumers and matching
+references when migrating old Int32ParseError/Int64ParseError patterns to
+NumberParseError. The existing Result-returning [Int32.Divide](raven-division-api.md)
+is a separate error contract.

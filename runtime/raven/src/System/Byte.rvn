@@ -1,9 +1,37 @@
 namespace System
 
-public struct Byte : ComparableTo<byte> {
+import System.Result.*
+import System.Runtime.CompilerServices.RuntimeServices
+
+public struct Byte : Number<byte> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: byte
+
+    static val Zero: byte => (byte)0
+    static val One: byte => (byte)1
+
+    static func +(left: byte, right: byte) -> byte => (byte)(left + right)
+    static func -(left: byte, right: byte) -> byte => (byte)(left - right)
+    static func *(left: byte, right: byte) -> byte => (byte)(left * right)
+    static func /(left: byte, right: byte) -> byte => (byte)(left / right)
+
+    /// Parses the complete text using the strict, culture-independent grammar.
+    static func Parse(value: string) -> Result<byte, NumberParseError> {
+        let payload = RuntimeServices.ParseByte(value)
+        if RuntimeServices.IsValue<byte>(payload) {
+            return Ok(RuntimeServices.UnpackValue<byte>(payload))
+        }
+        let status = RuntimeServices.UnpackValue<int>(payload)
+        if status == 1 {
+            return Error(NumberParseError.InvalidFormat())
+        }
+        if status == 2 {
+            return Error(NumberParseError.Overflow())
+        }
+        System.Fault("invalid native parse status")
+        return Error(NumberParseError.InvalidFormat())
+    }
 
     func CompareTo(other: byte) -> int {
         if m_value < other {

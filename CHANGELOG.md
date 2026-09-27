@@ -8,14 +8,55 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Add development System.Runtime.GC with execution-local collection, allocation,
+  retained/peak/reclaimed object counters and the host heap-object limit. Add
+  synchronous full Collect and nullable KeepAlive; share automatic/explicit root
+  tracing and expose ExplicitRequest in host collection history (exhaustive host
+  CollectionReason matches must handle the new case). Preserve task,
+  construction and interior-reference roots and existing limits. Counters describe
+  objects rather than bytes; no generations, finalizers or tuning controls are
+  implied. Add exact bridge contracts, a compiled consumer, API documentation and a dedicated
+  garbage collection feature page. Supply manual reference entries for existing
+  LocalTimeMapping deconstruction members omitted by RavenDoc and repair numeric
+  guide links found by the combined website build.
+
 - Add development ConstructorInfo/GetConstructors, Result-based method invocation,
   instance field access and argument-taking typed/untyped CreateInstance extensions.
   Validate typed result compatibility before construction; keep exact scalar binding
   and report ambiguous constructor matches. Preserve source field access/read-only
   restrictions and static method ownership; imported field execution requires new
   admission metadata. ConstructorInfo extends the closed MemberInfo family, requiring
-  exhaustive-match updates. Refresh library/API contracts and add a dedicated Reflection
+  exhaustive-match updates; ReflectionError also gains five cases. Refresh library/API
+  contracts and add a dedicated Reflection
   feature page. Generic classes, static fields, coercion and byref/out remain unsupported.
+
+- Import explicit interface methods on non-generic Raven application classes and
+  application interfaces. Preserve private MethodImpl mappings, nominal object identity,
+  void bodies and separate public methods; document qualified private reflection and
+  the existing IsVirtual difference from CLI. Add focused source/native checks and
+  narrow the recorded limitations; accessors, value/generic types and external core
+  contracts remain outside this import slice.
+
+- Admit Raven application interface defaults and public/private static helpers in
+  development. Preserve nominal receiver identity, nested dispatch, class precedence
+  and private access; exclude helpers from conformance obligations and virtual
+  reflection flags. Add focused consumer/native evidence. Private instance helpers,
+  static virtual defaults and broader accessibility remain deferred. Record explicit
+  implementation and other Raven/native gaps in the authoritative interface tracker.
+
+- Add development Number<T> for eight fixed-width integers, Single and Double:
+  inherited ordering, static Zero/One and binary arithmetic. Add strict concrete
+  Parse methods for the remaining numeric types and Boolean, using standard Raven
+  NumberParseError/BooleanParseError unions. All numeric parsers, including Int32/Int64,
+  share NumberParseError; migrate old numeric error patterns to the shared union.
+  Parsing interfaces remain on hold; document the proposed ParsableNumber<T>
+  constraint for generic T.Parse calls with the shared numeric error contract.
+  Validate nominal static contracts and admit
+  bounded closed static application numeric specialization, with explicit limits
+  on custom types/additional constraints. Integrate independently tested general
+  Raven static-interface/constraint fixes; broader static/default/interface
+  accessibility is recorded as platform direction. Refresh matching API references,
+  generated primitive slices and focused native/consumer/metadata evidence.
 
 - Add provisional TimeOffset, named IANA TimeZone rules, immutable ZonedDateTime and
   explicit Unique/Ambiguous/Skipped local mapping. Introduce the author-directed

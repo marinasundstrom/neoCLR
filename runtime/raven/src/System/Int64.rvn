@@ -3,7 +3,7 @@ namespace System
 import System.Result.*
 import System.Runtime.CompilerServices.RuntimeServices
 
-public struct Int64 : ComparableTo<long> {
+public struct Int64 : Number<long> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: long
@@ -11,25 +11,33 @@ public struct Int64 : ComparableTo<long> {
     static val MinValue: long => -9223372036854775807L - 1L
     static val MaxValue: long => 9223372036854775807L
 
-    static func Parse(value: string) -> Result<long, Int64ParseError> {
+    static func Parse(value: string) -> Result<long, NumberParseError> {
         let payload = RuntimeServices.ParseInt64(value)
         if RuntimeServices.IsValue<long>(payload) {
             return Ok(RuntimeServices.UnpackValue<long>(payload))
         }
         let status = RuntimeServices.UnpackValue<byte>(payload)
         if status == 1 {
-            return Error(Int64ParseError.InvalidFormat())
+            return Error(NumberParseError.InvalidFormat())
         }
         if status == 2 {
-            return Error(Int64ParseError.Overflow())
+            return Error(NumberParseError.Overflow())
         }
         System.Fault("invalid native parse status")
-        return Error(Int64ParseError.InvalidFormat())
+        return Error(NumberParseError.InvalidFormat())
     }
 
     func ToString() -> string {
         return RuntimeServices.Int64ToString(m_value)
     }
+
+    static val Zero: long => (long)0
+    static val One: long => (long)1
+
+    static func +(left: long, right: long) -> long => (long)(left + right)
+    static func -(left: long, right: long) -> long => (long)(left - right)
+    static func *(left: long, right: long) -> long => (long)(left * right)
+    static func /(left: long, right: long) -> long => (long)(left / right)
 
     func CompareTo(other: long) -> int {
         if m_value < other {

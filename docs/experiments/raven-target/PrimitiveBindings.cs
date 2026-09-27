@@ -12,7 +12,8 @@ static class PrimitiveBindings
     {
         foreach (var type in Types)
             source = source.Replace($"public struct {type} {{ }}", $"public struct {type} {{ public int CompareTo({type} other) => 0; "
-                + (type == "Int64" ? "public static Result<long, Int64ParseError> Parse(string value) => default; public string ToString() => default; public static long MinValue => default; public static long MaxValue => default;" : "")
+                + (type == "Int64" ? "public static Result<long, NumberParseError> Parse(string value) => default; public string ToString() => default; public static long MinValue => default; public static long MaxValue => default;" : "")
+                + (NumberBindings.HasNewParser(type) ? $"public static Result<{type}, NumberParseError> Parse(string value) => default;" : "")
                 + (type == "Char" ? "public static char FromString(string text) => default; public string ToString() => default; public bool Equals(char other) => default;" : "") + " }");
         return source;
     }
@@ -31,7 +32,7 @@ static class PrimitiveBindings
             && result == "Int32" && args.SequenceEqual(new[] { owner }))
             return new("Runtime" + owner + "CompareTo", [owner + "&", owner], result);
         if (owner == "Int64") {
-            if (!reference.HasThis && reference.Name == "Parse" && result == "System.Result<Int64,System.Int64ParseError>" && args.SequenceEqual(new[] { "String" }))
+            if (!reference.HasThis && reference.Name == "Parse" && result == "System.Result<Int64,System.NumberParseError>" && args.SequenceEqual(new[] { "String" }))
                 return new("System.Int64::Parse", args, result);
             if (!reference.HasThis && reference.Name is "get_MinValue" or "get_MaxValue" && result == "Int64" && args.Length == 0)
                 return new("System.Int64::" + reference.Name, args, result);

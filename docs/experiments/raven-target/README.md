@@ -1,5 +1,33 @@
 # Raven targeting neoCLR
 
+## Explicit application interface integration (2026-09-27)
+
+The development bridge imports ordinary explicit instance implementations on
+non-generic application classes/interfaces. CLI MethodImpl identities become private
+runtime `.override` mappings; private/final/virtual flags do not create class virtual
+slots. Nominal receiver execution, private access and reflection are covered by the
+[focused consumer and limitations](../explicit-interface-implementations/README.md).
+No Raven compiler behavior or Runtime Contract setting changes.
+
+## Interface helper integration (2026-09-27)
+
+The development bridge admits public defaults and public/private static helpers on
+non-generic application interfaces. It preserves owned static methods and private
+access rather than flattening helpers into public functions. The runtime executes
+nominal defaults on the original class receiver. No compiler setting changed; the
+[consumer and limits](../interface-helpers/README.md) distinguish this bounded path
+from private instance helpers, explicit replacements and static virtual defaults.
+
+## Number integration (2026-09-27)
+
+The current numeric slice requires Raven neoCLR commit `617efd444` or later,
+including independently integrated authored-static-interface, inherited-constraint
+and target-metadata emission fixes. No Runtime Contract setting changed. Number<T>
+and all concrete numeric parsers use matching development references; parsing
+returns the shared NumberParseError. See [numeric scope and evidence](../numeric-contracts/README.md)
+and [broader interface direction](../../tracking/runtime-language.md#interfaces-as-a-platform-capability).
+The historical probe revisions below describe their original experiments.
+
 ## Development compiler policy (2026-09-24)
 
 The shared neoCLR build props now require Raven's AllowNullableValueTypes option
@@ -1375,3 +1403,14 @@ internal metadata marker. [Contract](../../reflection-members.md),
 [consumer](../reflection-members/README.md) and --reflection-member-checks document
 validation and exclusions. A dedicated website Reflection page separates execution
 from metadata inspection. Generic classes, byref/out and static fields remain excluded.
+
+### GC facade integration — 2026-09-27
+
+`System.Runtime.GC` is a Raven static class with exact static long getters and
+no-result Collect/KeepAlive methods. The private RuntimeServices boundary retains
+inhabited Void for control calls, with the existing bridge discarding that result.
+The runtime supplies execution-local object counts, synchronous collection and
+reachability use; no Raven Runtime Contract option or compiler emission change is
+required. Generations, byte accounting, finalization and tuning are not admitted.
+Run `--gc-checks <output>` and the runtime-gc public consumer against matching
+artifacts; see [the full contract](../../runtime-gc.md).

@@ -55,6 +55,6 @@ storage or arbitrary value-type execution. Generic classes and independent execu
 contexts remain future work.
 
 [Read the API guide](../../docs/reflection.html) ·
-[Type extensions](../../docs/api/System.Runtime.Reflection.TypeReflectionExtensions.html) ·
-[Method extensions](../../docs/api/System.Runtime.Reflection.MethodReflectionExtensions.html) ·
-[Field extensions](../../docs/api/System.Runtime.Reflection.FieldReflectionExtensions.html)
+[Type extensions](xref:System.Runtime.Reflection.TypeReflectionExtensions) ·
+[Method extensions](xref:System.Runtime.Reflection.MethodReflectionExtensions) ·
+[Field extensions](xref:System.Runtime.Reflection.FieldReflectionExtensions)

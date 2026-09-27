@@ -1,0 +1,29 @@
+namespace System.Runtime
+
+import System.Runtime.CompilerServices.RuntimeServices
+
+/// Queries and controls the current execution's tracing heap.
+public static class GC {
+    /// Completed collections in this execution, including explicit requests.
+    static val CollectionCount: long => RuntimeServices.GCCollectionCount()
+    /// Total tracked objects allocated since this execution started.
+    static val AllocatedObjectCount: long => RuntimeServices.GCAllocatedObjectCount()
+    /// Tracked objects currently retained, including garbage not yet collected.
+    static val HeapObjectCount: long => RuntimeServices.GCHeapObjectCount()
+    /// Largest retained object count observed in this execution.
+    static val PeakHeapObjectCount: long => RuntimeServices.GCPeakHeapObjectCount()
+    /// Total tracked objects reclaimed by completed collections.
+    static val ReclaimedObjectCount: long => RuntimeServices.GCReclaimedObjectCount()
+    /// Host-configured maximum retained object count; collection cannot raise it.
+    static val HeapObjectLimit: long => RuntimeServices.GCHeapObjectLimit()
+
+    /// Synchronously collects unreachable objects in the current execution.
+    static func Collect() {
+        RuntimeServices.GCCollect()
+    }
+
+    /// Retains a reference through this call; null is accepted.
+    static func KeepAlive(value: object?) {
+        RuntimeServices.GCKeepAlive(value)
+    }
+}

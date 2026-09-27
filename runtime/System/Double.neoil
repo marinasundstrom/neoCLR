@@ -1,2 +1,2 @@
-.include "../raven/generated/Double.methods.neoil"
-.include "../raven/generated/Double.helpers.neoil"
+.include "../raven/generated/Double.bootstrap.methods.neoil"
+.include "../raven/generated/Double.bootstrap.helpers.neoil"

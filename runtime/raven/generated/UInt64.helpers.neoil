@@ -1,4 +1,42 @@
 ; Generated from runtime/raven/src/System/UInt64.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.UInt64.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorInvalidFormat(System.NumberParseError.InvalidFormat value) -> System.NumberParseError
+ldarg value
+newobj instance System.NumberParseError::.ctor(System.NumberParseError.InvalidFormat)
+ret
+.end
+.function neoCLR.Library.System.UInt64.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorOverflow(System.NumberParseError.Overflow value) -> System.NumberParseError
+ldarg value
+newobj instance System.NumberParseError::.ctor(System.NumberParseError.Overflow)
+ret
+.end
+.function neoCLR.Library.System.UInt64.RuntimeErrorSystemNumberParseErrorInvalidFormatNew() -> System.NumberParseError.InvalidFormat
+newobj instance System.NumberParseError.InvalidFormat::.ctor()
+ret
+.end
+.function neoCLR.Library.System.UInt64.RuntimeErrorSystemNumberParseErrorOverflowNew() -> System.NumberParseError.Overflow
+newobj instance System.NumberParseError.Overflow::.ctor()
+ret
+.end
+.function neoCLR.Library.System.UInt64.RuntimeUnion0(UInt64 arg0) -> System.Result.Ok<UInt64>
+ldarg arg0
+newobj instance System.Result.Ok<UInt64>::.ctor(UInt64)
+ret
+.end
+.function neoCLR.Library.System.UInt64.RuntimeUnion1(System.Result.Ok<UInt64> arg0) -> System.Result<UInt64,System.NumberParseError>
+ldarg arg0
+newobj instance System.Result<UInt64,System.NumberParseError>::.ctor(System.Result.Ok<UInt64>)
+ret
+.end
+.function neoCLR.Library.System.UInt64.RuntimeUnion2(System.NumberParseError arg0) -> System.Result.Error<System.NumberParseError>
+ldarg arg0
+newobj instance System.Result.Error<System.NumberParseError>::.ctor(System.NumberParseError)
+ret
+.end
+.function neoCLR.Library.System.UInt64.RuntimeUnion3(System.Result.Error<System.NumberParseError> arg0) -> System.Result<UInt64,System.NumberParseError>
+ldarg arg0
+newobj instance System.Result<UInt64,System.NumberParseError>::.ctor(System.Result.Error<System.NumberParseError>)
+ret
+.end
 .function neoCLR.Library.System.UInt64.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False

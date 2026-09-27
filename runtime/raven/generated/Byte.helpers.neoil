@@ -1,4 +1,42 @@
 ; Generated from runtime/raven/src/System/Byte.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Byte.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorInvalidFormat(System.NumberParseError.InvalidFormat value) -> System.NumberParseError
+ldarg value
+newobj instance System.NumberParseError::.ctor(System.NumberParseError.InvalidFormat)
+ret
+.end
+.function neoCLR.Library.System.Byte.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorOverflow(System.NumberParseError.Overflow value) -> System.NumberParseError
+ldarg value
+newobj instance System.NumberParseError::.ctor(System.NumberParseError.Overflow)
+ret
+.end
+.function neoCLR.Library.System.Byte.RuntimeErrorSystemNumberParseErrorInvalidFormatNew() -> System.NumberParseError.InvalidFormat
+newobj instance System.NumberParseError.InvalidFormat::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Byte.RuntimeErrorSystemNumberParseErrorOverflowNew() -> System.NumberParseError.Overflow
+newobj instance System.NumberParseError.Overflow::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Byte.RuntimeUnion0(Byte arg0) -> System.Result.Ok<Byte>
+ldarg arg0
+newobj instance System.Result.Ok<Byte>::.ctor(Byte)
+ret
+.end
+.function neoCLR.Library.System.Byte.RuntimeUnion1(System.Result.Ok<Byte> arg0) -> System.Result<Byte,System.NumberParseError>
+ldarg arg0
+newobj instance System.Result<Byte,System.NumberParseError>::.ctor(System.Result.Ok<Byte>)
+ret
+.end
+.function neoCLR.Library.System.Byte.RuntimeUnion2(System.NumberParseError arg0) -> System.Result.Error<System.NumberParseError>
+ldarg arg0
+newobj instance System.Result.Error<System.NumberParseError>::.ctor(System.NumberParseError)
+ret
+.end
+.function neoCLR.Library.System.Byte.RuntimeUnion3(System.Result.Error<System.NumberParseError> arg0) -> System.Result<Byte,System.NumberParseError>
+ldarg arg0
+newobj instance System.Result<Byte,System.NumberParseError>::.ctor(System.Result.Error<System.NumberParseError>)
+ret
+.end
 .function neoCLR.Library.System.Byte.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False

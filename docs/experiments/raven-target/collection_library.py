@@ -30,6 +30,8 @@ def adapt(text: str, name: str) -> str:
 
 
 def build(path: Path) -> str:
+    if path == ROOT / 'runtime/System/Int32ParseError.neoil':
+        return ''  # Raven parsing uses the shared NumberParseError union.
     if path.resolve().parent == ROOT / 'runtime/legacy':
         return (build(ROOT / 'runtime/raven/generated' / (path.stem + '.methods.neoil'))
                 + build(ROOT / 'runtime/raven/generated' / (path.stem + '.helpers.neoil')))
@@ -39,8 +41,8 @@ def build(path: Path) -> str:
         return build(ROOT / 'runtime/raven/FileText.neoil')
     if path == ROOT / 'runtime/System/Storage/Path.neoil':
         return build(ROOT / 'runtime/raven/Path.neoil')
-    if path == ROOT / 'runtime/System/Int64.neoil':
-        return build(ROOT / 'runtime/raven/generated/Int64.methods.neoil') + build(ROOT / 'runtime/raven/generated/Int64.helpers.neoil')
+    if path.parent == ROOT / 'runtime/System' and path.stem in {'Int16', 'Boolean', 'Double', 'UInt32', 'Int32', 'Single', 'Int64', 'UInt64', 'UInt16', 'SByte', 'Byte'}:
+        return build(ROOT / ('runtime/raven/generated/' + path.stem + '.methods.neoil')) + build(ROOT / ('runtime/raven/generated/' + path.stem + '.helpers.neoil'))
     if path == ROOT / 'runtime/System/String.neoil':
         return build(ROOT / 'runtime/raven/String.neoil')
     if path == ROOT / 'runtime/System/Clock.neoil':
@@ -94,6 +96,8 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/Object.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/EnumInspection.neoil')
         result += build(ROOT / 'runtime/raven/HashCode.neoil')
+        result += build(ROOT / 'runtime/raven/GC.neoil')
+        result += build(ROOT / 'runtime/neoCLR/Runtime/GC.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectTypeHandle.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ReflectionExecution.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ReflectionMembers.neoil')
@@ -123,7 +127,9 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/DateTimeFormat.neoil')
 
         result += build(ROOT / 'runtime/raven/Map.neoil')
-        result += build(ROOT / 'runtime/raven/Int64ParseError.neoil')
+        result += build(ROOT / 'runtime/raven/Number.neoil')
+        result += build(ROOT / 'runtime/raven/NumberParseError.neoil')
+        result += build(ROOT / 'runtime/raven/BooleanParseError.neoil')
         result += build(ROOT / 'runtime/raven/Encoder.neoil')
         result += build(ROOT / 'runtime/raven/EncoderProgress.neoil')
         result += build(ROOT / 'runtime/raven/EncoderState.neoil')

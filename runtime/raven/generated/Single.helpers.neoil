@@ -1,4 +1,42 @@
 ; Generated from runtime/raven/src/System/Single.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Single.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorInvalidFormat(System.NumberParseError.InvalidFormat value) -> System.NumberParseError
+ldarg value
+newobj instance System.NumberParseError::.ctor(System.NumberParseError.InvalidFormat)
+ret
+.end
+.function neoCLR.Library.System.Single.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorOverflow(System.NumberParseError.Overflow value) -> System.NumberParseError
+ldarg value
+newobj instance System.NumberParseError::.ctor(System.NumberParseError.Overflow)
+ret
+.end
+.function neoCLR.Library.System.Single.RuntimeErrorSystemNumberParseErrorInvalidFormatNew() -> System.NumberParseError.InvalidFormat
+newobj instance System.NumberParseError.InvalidFormat::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Single.RuntimeErrorSystemNumberParseErrorOverflowNew() -> System.NumberParseError.Overflow
+newobj instance System.NumberParseError.Overflow::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Single.RuntimeUnion0(Single arg0) -> System.Result.Ok<Single>
+ldarg arg0
+newobj instance System.Result.Ok<Single>::.ctor(Single)
+ret
+.end
+.function neoCLR.Library.System.Single.RuntimeUnion1(System.Result.Ok<Single> arg0) -> System.Result<Single,System.NumberParseError>
+ldarg arg0
+newobj instance System.Result<Single,System.NumberParseError>::.ctor(System.Result.Ok<Single>)
+ret
+.end
+.function neoCLR.Library.System.Single.RuntimeUnion2(System.NumberParseError arg0) -> System.Result.Error<System.NumberParseError>
+ldarg arg0
+newobj instance System.Result.Error<System.NumberParseError>::.ctor(System.NumberParseError)
+ret
+.end
+.function neoCLR.Library.System.Single.RuntimeUnion3(System.Result.Error<System.NumberParseError> arg0) -> System.Result<Single,System.NumberParseError>
+ldarg arg0
+newobj instance System.Result<Single,System.NumberParseError>::.ctor(System.Result.Error<System.NumberParseError>)
+ret
+.end
 .function neoCLR.Library.System.Single.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False

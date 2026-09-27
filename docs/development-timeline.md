@@ -8281,3 +8281,158 @@ configuration/content, not target-specific code added to Raven main.
 - **Next author-selected slice:** after Reflection, add System.Runtime.GC with basic
   information queries and collection influence. The assistant proposed starting from
   actual collector capabilities; no GC API is implemented by this Reflection change.
+
+## 2026-09-27 — Number and Parsable interfaces selected
+
+- **Author:** “Now add Number and Parsable interfaces and implement them for the
+  common set of types”.
+- **Assistant scope proposal:** Number<T> for basic arithmetic, ordering, Zero/One;
+  Parsable<T,TError> for static Parse returning Result; eight fixed-width integer
+  types plus Single/Double, and Boolean for parsing only.
+- **Author confirmation:** “Yes, that scope”.
+- **Investigation:** authored static abstract/operator interface contracts and
+  neoCLR generic-call import need support before the APIs can be genuinely useful.
+  General Raven work is isolated on a main-based feature branch. Implementation is
+  in progress; [numeric contract notes](design/numeric-contracts.md) distinguish
+  selected scope from completed behavior.
+
+- **Subsequent author correction:** “Put the parsable interface on hold. Focus on
+  Number interface and Parse per concrete type”. The author then suggested a
+  numeric-specific parsing interface rather than .NET-style broad Parsable. The
+  assistant keeps concrete parsing in scope and records ParsableNumber as a future
+  candidate, separate from arithmetic; no parsing interface is being implemented.
+
+- **Further author direction:** static interface members, default implementations
+  and accessibility within interfaces (including public/private) are important to
+  the intended platform. The author expects Raven to supply these language features
+  and wants neoCLR to make broader use of interfaces.
+- **Assistant response/action:** distinguish Raven semantics, emitted CLI metadata,
+  importer admission and runtime dispatch/access checks. General authored static
+  contract fixes were tested independently (13 focused cases) and integrated as
+  Raven main `d7d69fe69`, then neoCLR branch `82774c30d`. Number remains the first
+  selected consumer, not the intended ceiling on interface support. Existing native
+  default-body/explicit-mapping support does not establish complete Raven import or
+  arbitrary private interface helper support. Broader scope is recorded in the
+  [runtime/language tracker](tracking/runtime-language.md#interfaces-as-a-platform-capability).
+
+- **Numeric error correction:** the author directed use of NumberParseError for all
+  numbers unless separate errors are needed. The assistant is migrating Int32 and
+  Int64 and their current consumers to that shared union, retaining Boolean's
+  format-only error because Boolean is not numeric. Earlier plans to preserve the
+  separate numeric error types are superseded; archived Neo compatibility remains
+  isolated from the current Raven API.
+
+- **Implemented outcome:** Number/ordering/arithmetic for ten primitive numeric
+  types, concrete parsing and shared NumberParseError, with a bounded generic
+  application consumer. General Raven fixes were integrated independently; the
+  [numeric evidence](experiments/numeric-contracts/README.md) records focused
+  compiler/native/metadata/consumer checks. Parsable remains on hold. General
+  static defaults and arbitrary interface helpers/accessibility remain broader
+  follow-up work, not a claimed completion of the interface direction.
+
+- **Parsing capability clarification:** the author questioned the ergonomics of
+  Parsable<T, NumberParseError>, preferring ParsableNumber<T>, and then clarified:
+  “What we really want is to signal that a number type T has a Parse method in a
+  generic method”. The assistant initially emphasized waiting for a consumer;
+  the clarification establishes the intended generic capability itself: a
+  constraint permitting T.Parse with Result<T, NumberParseError>. The assistant
+  recorded that proposed contract separately from Number's arithmetic capability
+  in the [numeric design](design/numeric-contracts.md#proposed-numeric-parsing-capability).
+  General typed parsing does not inherently require exceptions, but associating
+  error types introduces an ergonomic choice. Implementation remains on hold under
+  the earlier explicit direction; compiler/importer admission still needs validation.
+
+
+## 2026-09-27 — Bounded general interface consumer
+
+- **Author direction:** leave the numeric parsing interface discussion and move on.
+  The assistant proposed checking a static helper, a default calling a private
+  helper and rejected external access; the author replied “Continue”.
+- **Assistant investigation:** Raven compiled the first example, but the neoCLR
+  importer admitted only abstract public instance contracts. Native nominal defaults
+  and static helper admission also needed extension. A private instance helper probe
+  emitted Private, Virtual, NewSlot; this is recorded as a general compiler candidate
+  requiring independent validation, not silently normalized by the target importer.
+- **Action:** implement the bounded public default/private static helper path,
+  preserving receiver identity, class precedence and access. Keep private instance
+  helpers and wider interface accessibility/virtual-static work deferred. Record
+  focused native and Raven validation in the [consumer evidence](experiments/interface-helpers/README.md).
+  ParsableNumber remains on hold; its intended inheritance from Number is unchanged.
+
+- **Author follow-up:** asked whether everything around interfaces works, including
+  explicit implementations. The assistant distinguished passing native explicit/default
+  tests from Raven importer admission: explicit implementation import is still rejected,
+  alongside the other deferred forms. Proposed explicit implementations as the next
+  focused boundary; did not claim general interface completion.
+
+- **Author decision:** “Record those limitations”. The assistant added an explicit
+  capability matrix to the runtime tracker and linked it from the platform roadmap,
+  separating native evidence, Raven importer restrictions and next validation needs.
+
+- **Outcome:** 16 focused native tests and the final Raven consumer pass, including
+  static-helper reflection and negative access/admission cases; API snapshot checks
+  pass. The bounded implementation is complete in development. The limitations
+  matrix remains open work, and no full suite or website build was run.
+
+
+## 2026-09-27 — Explicit interface implementation follow-up
+
+- **Author direction:** “Continue” after the bounded helper slice and recorded
+  interface limitations. The assistant selected explicit implementations through Raven,
+  including two same-named contracts and ordinary private-access rejection.
+- **Investigation/action:** Raven already emitted private/final/virtual/newslot bodies
+  and MethodImpl declarations. neoCLR's importer rejected them, and runtime validation
+  limited explicit bodies to managed-reference receivers. Add checked mapping import
+  and nominal class receivers without changing compiler semantics or target settings.
+- **Scope:** ordinary methods on non-generic application classes/interfaces; include
+  shared state, void results and private reflection. Preserve the documented IsVirtual
+  divergence from CLI. Broader explicit accessors, value/generic types, core-library
+  contracts and derived defaults remain recorded limitations, not inferred completion.
+  Commands and outcomes belong to the [focused experiment](experiments/explicit-interface-implementations/README.md).
+
+- **Coordination:** the author asked to coordinate reflection changes. The assistant
+  contacted the reflection task and the overlapping entry-point task, preserved
+  unrelated Raven and neoCLR edits, and arranged to commit this bounded interface
+  slice before their main-branch integration. Shared files are staged by owned hunks;
+  the API snapshot is checked from staged sources rather than unrelated in-progress
+  bridge edits. This does not claim that reflection has already been integrated.
+
+
+## 2026-09-27 — Result and Task entry points
+
+- **Author request:** “We need to support Main returning the Raven-supported Result
+  and Task overloads.” The assistant found the target importer restricted entries
+  to no-result methods, Raven's default bridges depended on CLR facilities, and the
+  CLI discarded integer exit statuses.
+- **Assistant decision/action:** retain target Main signatures in Raven's heap-async
+  intermediate metadata and adapt startup in neoCLR's existing importer. Reuse
+  managed Result extraction/display and the default task dispatcher. Keep .NET
+  bridges and ordinary nonblocking GetResult unchanged. Details, limits and evidence
+  are in [entry results](experiments/entry-results/README.md).
+- **Author follow-up:** after the fix is ready, update samples and experiments to
+  use async directly in Main. The assistant accepted that sequence, preserving
+  fixtures whose purpose is callback/queue behavior. This does not authorize new
+  HTTP capabilities or imply a permanent roadmap reprioritization.
+
+- **Outcome:** 15 focused native tests pass. The Raven consumer exposed encoded
+  implementation names in reflection; the assistant preserved source-qualified
+  names for explicit bodies without changing dispatch identities. Final execution
+  and both negative source cases pass. The staged-source API snapshot check passes;
+  no full suite or website build was run. Reflection integration remains coordinated
+  separately rather than included in this bounded implementation.
+
+## 2026-09-27 — Basic GC information and control
+
+- **Author:** requested the slice after Reflection: “Add System.Runtime.GC class with
+  basic capabilities for querying information from GC and influencing the GC”.
+- **Assistant proposal:** reuse actual object counters, synchronous collection and
+  KeepAlive; explain execution/worker isolation and avoid implied byte or generation
+  accounting. Put the facade in the requested namespace.
+- **Action:** implemented the [provisional contract](runtime-gc.md), shared automatic
+  and explicit collection root tracing, private exact services, Raven facade, focused
+  tests and [public consumer](experiments/runtime-gc/Main.rvn). Broader GC tuning and
+  memory diagnostics remain open; the request does not reprioritize the full roadmap.
+
+- **Author follow-up:** requested garbage collection documentation on the website.
+  **Assistant action:** add a dedicated feature page with tested examples, counter
+  meanings, lifetime semantics and limits, alongside the API reference.

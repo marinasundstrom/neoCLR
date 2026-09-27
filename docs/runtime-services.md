@@ -148,3 +148,11 @@ ReflectionAssignable uses TypeInspection. TypeConstructors returns constructor
 descriptors through the existing inspection/array machinery. These private services
 support the [public Reflection contract](reflection-members.md); they do not grant
 access to private fields or introduce CLR binder conversions.
+
+### GC information and control (development, 2026-09-27)
+
+GC counter queries, GCCollect and GCKeepAlive require ManagedHeap. The VM uses its
+existing tracing collector and budgets; these services do not imply byte accounting,
+generations, finalization, native memory release or a new host permission. Private
+control calls return inhabited Void; the public Raven class has no-result methods.
+See [the contract](runtime-gc.md).

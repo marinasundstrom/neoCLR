@@ -52,10 +52,10 @@ with tempfile.TemporaryDirectory(prefix='neoclr-union-reference-') as directory:
     legacy_core.parent.mkdir()
     run(['dotnet', bridge, '--reference-library-core', legacy_core])
     repository = Path(__file__).resolve().parents[3]
-    legacy_source = compile_source('Legacy', [repository / 'runtime/raven/src/System/Int32ParseError.rvn'], legacy_core)
-    run(['dotnet', bridge, '--library-implementation', legacy_source, legacy_core, 'System.Int32ParseError', root / 'legacy-native'])
+    legacy_source = compile_source('Legacy', [repository / 'runtime/raven/src/System/NumberParseError.rvn'], legacy_core)
+    run(['dotnet', bridge, '--library-implementation', legacy_source, legacy_core, 'System.NumberParseError', root / 'legacy-native'])
     assert '.field private Stored Value' not in (root / 'legacy-native/Implementation.neoil').read_text()
-    print('Migrated Int32ParseError implementation imports without erased storage.')
+    print('Migrated NumberParseError implementation imports without erased storage.')
     source = compile_source('Source', ['Errors.rvn'], core)
     projected = root / 'projected/NeoCLR.CoreProbe.dll'
     projected.parent.mkdir()

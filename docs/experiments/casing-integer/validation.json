@@ -4,31 +4,12 @@
     "report": "Unicode casing and Int64 report contracts passed"
   },
   "sourceSha256": {
-    "Main.rvn": "a35b220a41f3624f73609ca8cfb99962b4c85fb038ec2b051af9ecb8dd29d1f4"
+    "Main.rvn": "80a1612fef4f4b97cac389788274def4243260e8a56ebda9d8d8626d718757e7"
   },
   "sha256": {
-    "runtime": "a72be94d6831a6e984b146a59f96dae6daca9d25535c79f87f5bc4eb378ec01d",
-    "bridge": "326e6fe8879750f06a4846030cd315e910467327906209ac0d8eaadd2f395fbd",
-    "system": "118c560e0bb2b95a906a1976f3b035292699821e3ddc23199927087f6e077a71",
-    "reference": "55ab320d9ed4231293e0cd95a9ec9b1f9f0644194d3b233039498d769f94bf90"
-  },
-  "date": "2026-09-27",
-  "focusedChecks": {
-    "nativeCasing": {
-      "passed": 2,
-      "scope": "Every pinned mapping, property ranges, expansion and context"
-    },
-    "nativeProtocol": {
-      "passed": 2,
-      "scope": "Int64 payloads, service reachability and incorrect native signatures"
-    },
-    "archivedInt32Regression": {
-      "passed": 4
-    },
-    "bridgeSignatures": {
-      "passed": 16
-    },
-    "apiAndLibrarySnapshots": "passed"
-  },
-  "limits": "No full suite, website build or benchmark. Historical source checklist remains separately tracked."
+    "runtime": "0ba81775315681b28819cea94f07e8bb72893c83b2787a1a2a67db662b89a1ba",
+    "bridge": "3d7810b987e1406346bd1c30f1fc015297fa99987d1ba6730fa477077c1a77dc",
+    "system": "ac1b6e134cf218d6516f0b80f878c2e450d554225b220963e4aa430d68e000a6",
+    "reference": "dee37cfe006e173f52de5130e0c34dc9e8ba0f97540cf13a9b2ca2f4762b4d26"
+  }
 }

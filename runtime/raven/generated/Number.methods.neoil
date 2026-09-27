@@ -1,0 +1,22 @@
+; Generated from runtime/raven/src/System/Number.rvn. Regenerate with build_runtime_library.py.
+.interface System.Number<T0>
+.implements System.ComparableTo<T0>
+.method static get_Zero() -> T0
+.end
+.method static get_One() -> T0
+.end
+.method static op_Addition(T0 left,T0 right) -> T0
+.end
+.method static op_Subtraction(T0 left,T0 right) -> T0
+.end
+.method static op_Multiply(T0 left,T0 right) -> T0
+.end
+.method static op_Division(T0 left,T0 right) -> T0
+.end
+.property static Zero() -> T0
+.get System.Number<T0>::get_Zero()
+.end
+.property static One() -> T0
+.get System.Number<T0>::get_One()
+.end
+.end

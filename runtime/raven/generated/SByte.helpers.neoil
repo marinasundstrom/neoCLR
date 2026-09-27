@@ -1,4 +1,42 @@
 ; Generated from runtime/raven/src/System/SByte.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.SByte.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorInvalidFormat(System.NumberParseError.InvalidFormat value) -> System.NumberParseError
+ldarg value
+newobj instance System.NumberParseError::.ctor(System.NumberParseError.InvalidFormat)
+ret
+.end
+.function neoCLR.Library.System.SByte.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorOverflow(System.NumberParseError.Overflow value) -> System.NumberParseError
+ldarg value
+newobj instance System.NumberParseError::.ctor(System.NumberParseError.Overflow)
+ret
+.end
+.function neoCLR.Library.System.SByte.RuntimeErrorSystemNumberParseErrorInvalidFormatNew() -> System.NumberParseError.InvalidFormat
+newobj instance System.NumberParseError.InvalidFormat::.ctor()
+ret
+.end
+.function neoCLR.Library.System.SByte.RuntimeErrorSystemNumberParseErrorOverflowNew() -> System.NumberParseError.Overflow
+newobj instance System.NumberParseError.Overflow::.ctor()
+ret
+.end
+.function neoCLR.Library.System.SByte.RuntimeUnion0(SByte arg0) -> System.Result.Ok<SByte>
+ldarg arg0
+newobj instance System.Result.Ok<SByte>::.ctor(SByte)
+ret
+.end
+.function neoCLR.Library.System.SByte.RuntimeUnion1(System.Result.Ok<SByte> arg0) -> System.Result<SByte,System.NumberParseError>
+ldarg arg0
+newobj instance System.Result<SByte,System.NumberParseError>::.ctor(System.Result.Ok<SByte>)
+ret
+.end
+.function neoCLR.Library.System.SByte.RuntimeUnion2(System.NumberParseError arg0) -> System.Result.Error<System.NumberParseError>
+ldarg arg0
+newobj instance System.Result.Error<System.NumberParseError>::.ctor(System.NumberParseError)
+ret
+.end
+.function neoCLR.Library.System.SByte.RuntimeUnion3(System.Result.Error<System.NumberParseError> arg0) -> System.Result<SByte,System.NumberParseError>
+ldarg arg0
+newobj instance System.Result<SByte,System.NumberParseError>::.ctor(System.Result.Error<System.NumberParseError>)
+ret
+.end
 .function neoCLR.Library.System.SByte.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False

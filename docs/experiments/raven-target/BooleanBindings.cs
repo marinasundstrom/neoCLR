@@ -3,7 +3,7 @@ using Mono.Cecil;
 // The CLI uses Int32 stack values for Boolean. The interpreter retains Boolean.
 static class BooleanBindings
 {
-    public const string Declaration = "public struct Boolean { public int CompareTo(bool other) => 0; }";
+    public const string Declaration = "public struct Boolean { public static Result<Boolean, BooleanParseError> Parse(string value) => default; public int CompareTo(bool other) => 0; }";
     public static bool Converts(string source, string target) => source == "Int32" && target == "Boolean" || source == "Boolean" && target == "Int32";
     public static string Convert(string source, string target) => source == "Int32" && target == "Boolean"
         ? "call RuntimeBooleanFromInt32(Int32)\n" : source == "Boolean" && target == "Int32" ? "call RuntimeBooleanToInt32(Boolean)\n" : "";

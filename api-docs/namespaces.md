@@ -62,3 +62,6 @@ imposing nullable value types. Path now supplies that contract and Object overri
 
 [ConvertibleInto&lt;T&gt;](xref:System.ConvertibleInto`1) provides explicit `Convert() -> T`;
 implementations choose failure policy. No implicit conversion is introduced.
+
+`System.Runtime` also contains the development [GC](xref:System.Runtime.GC) class;
+see [garbage collection](gc.md) for object counters, explicit collection and lifetime use.

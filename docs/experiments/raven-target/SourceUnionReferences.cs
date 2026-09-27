@@ -16,8 +16,8 @@ static class SourceUnionReferences
         "System.Storage.FileWriteError",
         "System.ConsoleReadError",
         "System.Text.Utf8SliceError",
-        "System.Int32ParseError",
-        "System.Int64ParseError",
+        "System.BooleanParseError",
+        "System.NumberParseError",
         "System.Linq.SingleError",
         "System.Runtime.Reflection.ReflectionError", "System.IntegerDivisionError", "System.Web.Http.HttpError", "System.Data.Json.JsonError", "System.Web.Http.Json.HttpJsonError", "System.Option`1", "System.Result`2", "System.Tasks.TaskOutcome`1"];
 

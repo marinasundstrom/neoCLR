@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.ParseDouble(string value) -> System.Value
+    .methodimpl InternalCall
+.end

@@ -1,0 +1,156 @@
+; Generated from runtime/raven/src/System/BooleanParseError.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.BooleanParseError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.BooleanParseError.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.function neoCLR.Library.System.BooleanParseError.RuntimeReflection936F30A1978F475D(System.Object arg0) -> String
+ldarg arg0
+callvirt instance System.Object::ToString()
+ret
+.end
+.function neoCLR.Library.System.BooleanParseError.DefaultReference53797374656D2E4F626A656374() -> System.Object
+.local System.Object value
+ldloca value
+initobj System.Object
+ldloc value
+ret
+.end
+.type System.BooleanParseError.InvalidFormat
+.sealed
+.method instance byref .ctor() -> Void
+M00000007_IL_0000:
+ldarg 0
+M00000007_IL_0001:
+pop
+M00000007_IL_0007:
+M00000007_IL_0008:
+ldvoid
+ret
+.end
+.method instance override byref ToString() -> String
+M00000008_IL_0000:
+ldstr "BooleanParseError"
+M00000008_IL_0005:
+ldstr "."
+M00000008_IL_000a:
+call System.String::Concat(String,String)
+M00000008_IL_000f:
+ldstr "InvalidFormat"
+M00000008_IL_0014:
+call System.String::Concat(String,String)
+M00000008_IL_0019:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000009_IL_0000:
+ldarg 0
+M00000009_IL_0001:
+M00000009_IL_0002:
+ref.isnull
+call neoCLR.Library.System.BooleanParseError.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0004:
+brtrue M00000009_IL_000e
+M00000009_IL_0009:
+br M00000009_IL_0014
+M00000009_IL_000e:
+ldstr "null"
+M00000009_IL_0013:
+ret
+M00000009_IL_0014:
+M00000009_IL_0015:
+ldarg 0
+M00000009_IL_0016:
+isinst String
+M00000009_IL_001b:
+M00000009_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.BooleanParseError.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_001e:
+brtrue M00000009_IL_0028
+M00000009_IL_0023:
+br M00000009_IL_0043
+M00000009_IL_0028:
+ldstr "\u0022"
+M00000009_IL_002d:
+ldarg 0
+M00000009_IL_002e:
+castclass String
+M00000009_IL_0033:
+call System.String::Concat(String,String)
+M00000009_IL_0038:
+ldstr "\u0022"
+M00000009_IL_003d:
+call System.String::Concat(String,String)
+M00000009_IL_0042:
+ret
+M00000009_IL_0043:
+M00000009_IL_0044:
+ldarg 0
+M00000009_IL_0045:
+isinst Char
+M00000009_IL_004a:
+dup
+M00000009_IL_004b:
+ref.isnull
+brfalse M00000009_IL_0057
+M00000009_IL_0050:
+pop
+M00000009_IL_0051:
+ldc.i4 0
+M00000009_IL_0052:
+br M00000009_IL_005e
+M00000009_IL_0057:
+unbox.any Char
+M00000009_IL_005c:
+pop
+M00000009_IL_005d:
+ldc.i4 1
+M00000009_IL_005e:
+brtrue M00000009_IL_0068
+M00000009_IL_0063:
+br M00000009_IL_0083
+M00000009_IL_0068:
+ldstr "\u0027"
+M00000009_IL_006d:
+ldarg 0
+M00000009_IL_006e:
+call neoCLR.Library.System.BooleanParseError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000009_IL_0073:
+call System.String::Concat(String,String)
+M00000009_IL_0078:
+ldstr "\u0027"
+M00000009_IL_007d:
+call System.String::Concat(String,String)
+M00000009_IL_0082:
+ret
+M00000009_IL_0083:
+M00000009_IL_0084:
+ldarg 0
+M00000009_IL_0085:
+call neoCLR.Library.System.BooleanParseError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000009_IL_008a:
+ret
+.end
+.end

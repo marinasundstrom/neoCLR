@@ -243,3 +243,111 @@ fn accessor_contracts_map_to_private_bodies_without_public_accessor_names() {
     p.verify().unwrap();
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
+
+const NOMINAL: &str = r#"
+.module NominalExplicit
+.entry Main
+.interface Left
+.method instance Read() -> Int32
+.end
+.method instance Clear() -> noresult
+.end
+.end
+.interface Right
+.method instance Read() -> Int32
+.end
+.end
+.type class Pair
+.implements Left
+.implements Right
+.field private Value Int32
+.method instance .ctor() -> noresult
+ldarg this
+ldc.i4 21
+stfld 0
+ret
+.end
+.method private instance HiddenLeft() -> Int32
+.override instance Left::Read()
+ldarg this
+ldfld 0
+ret
+.end
+.method private instance HiddenRight() -> Int32
+.override instance Right::Read()
+ldarg this
+ldfld 0
+ldc.i4 2
+mul
+ret
+.end
+.method private instance HiddenClear() -> noresult
+.override instance Left::Clear()
+ldarg this
+ldc.i4 0
+stfld 0
+ret
+.end
+.method instance Read() -> Int32
+ldc.i4 99
+ret
+.end
+.end
+.function Main() -> Int32
+.local Pair pair
+newobj instance Pair::.ctor()
+stloc pair
+ldloc pair
+callvirt instance Left::Read()
+ldloc pair
+callvirt instance Right::Read()
+add
+ldloc pair
+callvirt instance Left::Clear()
+ldloc pair
+callvirt instance Right::Read()
+add
+ldloc pair
+callvirt instance Pair::Read()
+add
+ret
+.end
+"#;
+
+#[test]
+fn nominal_explicit_bodies_preserve_receiver_mapping_and_private_access() {
+    let module = assemble(NOMINAL).unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(162)
+    );
+    let graph = program
+        .analyze_reachability(&[parse_function_ref("Main()").unwrap()], 100)
+        .unwrap();
+    for name in ["Pair.HiddenLeft", "Pair.HiddenRight", "Pair.HiddenClear"] {
+        assert!(graph.functions.iter().any(|f| f.target.name == name));
+    }
+    for changed in [
+        NOMINAL.replace(
+            "callvirt instance Left::Read()",
+            "call instance Pair::HiddenLeft()",
+        ),
+        NOMINAL.replace(
+            ".method private instance HiddenLeft",
+            ".method instance HiddenLeft",
+        ),
+        NOMINAL.replace(
+            ".override instance Right::Read()",
+            ".override instance Left::Read()",
+        ),
+        NOMINAL.replace(".implements Right\n", ""),
+    ] {
+        assert!(
+            assemble(&changed)
+                .and_then(|m| LoadedProgram::new(&m).map(|_| ()))
+                .is_err()
+        );
+    }
+}

@@ -51,6 +51,19 @@ are implemented in development: Unicode 17 full default String casing, typed str
 Int64 parsing, decimal formatting and bounds properties. Focused consumer/native/
 metadata checks and matching API artifacts cover this bounded work. No new broader
 milestone is selected by completing these slices.
+The author next selected [Number and concrete primitive parsing](design/numeric-contracts.md).
+The bounded development slice is implemented with focused consumer/native/metadata
+evidence; all numeric parsers use NumberParseError. A parsing interface is on hold. The author also
+identified [general interface capabilities](tracking/runtime-language.md#interfaces-as-a-platform-capability)
+as important direction: static members, default bodies and member access control.
+Number is a first consumer, not a permanent numeric-only interface model.
+The next bounded interface slice adds application defaults and public/private static
+helpers through Raven, with [focused evidence](experiments/interface-helpers/README.md).
+The [interface limitations table](tracking/runtime-language.md#interface-limitations--development-checkpoint-2026-09-27)
+separates native support from Raven import gaps. A subsequent bounded
+[explicit class implementation slice](experiments/explicit-interface-implementations/README.md)
+adds ordinary methods on application classes/interfaces. Accessors, generic/value-type
+import, private instance helpers and broader static/default/accessibility cases remain open.
 M2–M6 remain candidate applications; no complete File Catalog
 or additional HTTP feature is required by the comparer slice.
 
@@ -58,6 +71,11 @@ The author next selected [constructor discovery and Reflection execution](reflec
 argument-based activation, invocation and field access, with Result failures and a
 separate website feature page. This is bounded library/runtime work, not selection of
 a new application milestone.
+
+The author selected a bounded `System.Runtime.GC` API after Reflection: execution-local
+object counters, explicit full collection and lifetime use. See the
+[GC contract](runtime-gc.md); generation/byte accounting and collector tuning remain
+outside this one-off author-directed slice.
 
 ## Theme trackers
 

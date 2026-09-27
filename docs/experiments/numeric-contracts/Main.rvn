@@ -1,0 +1,150 @@
+import System.*
+import System.Result.*
+
+public func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+public func Calculate<T>(left: T, right: T) -> T where T: Number<T> {
+    return ((left + right) * (right + T.One) - left + T.Zero) / right
+}
+
+public func CheckNumber<T>(left: T, right: T, expected: T) where T: Number<T> {
+    let actual = Calculate<T>(left, right)
+    Check(actual.CompareTo(expected) == 0, "generic numeric result")
+}
+
+public func CheckJsonNumber(number: System.Data.Json.JsonNumber, expectValue: bool) {
+    match number.AsInt32() {
+        Ok(let value) => Check(expectValue && value == 42, "JSON Int32 conversion")
+        Error(_) => Check(!expectValue, "JSON Int32 range")
+    }
+}
+
+public func Main() {
+    CheckNumber<sbyte>((sbyte)6, (sbyte)2, (sbyte)9)
+    CheckNumber<byte>((byte)6, (byte)2, (byte)9)
+    CheckNumber<short>((short)6, (short)2, (short)9)
+    CheckNumber<ushort>((ushort)6, (ushort)2, (ushort)9)
+    CheckNumber<int>(6, 2, 9)
+    CheckNumber<uint>((uint)6, (uint)2, (uint)9)
+    CheckNumber<long>(6L, 2L, 9L)
+    CheckNumber<ulong>((ulong)6, (ulong)2, (ulong)9)
+    CheckNumber<float>((float)6, (float)2, (float)9)
+    CheckNumber<double>(6.0, 2.0, 9.0)
+    match SByte.Parse("-128") {
+        Ok(let value) => Check(value == (sbyte)-128, "SByte parse")
+        Error(_) => System.Fault("SByte parse failed")
+    }
+    match Byte.Parse("255") {
+        Ok(let value) => Check(value == (byte)255, "Byte parse")
+        Error(_) => System.Fault("Byte parse failed")
+    }
+    match Int16.Parse("-32768") {
+        Ok(let value) => Check(value == (short)-32768, "Int16 parse")
+        Error(_) => System.Fault("Int16 parse failed")
+    }
+    match UInt16.Parse("65535") {
+        Ok(let value) => Check(value == (ushort)65535, "UInt16 parse")
+        Error(_) => System.Fault("UInt16 parse failed")
+    }
+    match Int32.Parse("2147483647") {
+        Ok(let value) => Check(value == 2147483647, "Int32 parse")
+        Error(_) => System.Fault("Int32 parse failed")
+    }
+    match UInt32.Parse("4294967295") {
+        Ok(let value) => Check(value == (uint)4294967295L, "UInt32 parse")
+        Error(_) => System.Fault("UInt32 parse failed")
+    }
+    match Int64.Parse("9223372036854775807") {
+        Ok(let value) => Check(value == 9223372036854775807L, "Int64 parse")
+        Error(_) => System.Fault("Int64 parse failed")
+    }
+    match UInt64.Parse("18446744073709551615") {
+        Ok(let value) => Check(value == (ulong)-1L, "UInt64 parse")
+        Error(_) => System.Fault("UInt64 parse failed")
+    }
+    match Single.Parse("1.25e2") {
+        Ok(let value) => Check(value == (float)125, "Single parse")
+        Error(_) => System.Fault("Single parse failed")
+    }
+    match Double.Parse("-2.5e-1") {
+        Ok(let value) => Check(value == -0.25, "Double parse")
+        Error(_) => System.Fault("Double parse failed")
+    }
+    match Boolean.Parse("tRuE") {
+        Ok(let value) => Check(value == true, "Boolean parse")
+        Error(_) => System.Fault("Boolean parse failed")
+    }
+    match Byte.Parse("1") {
+        Ok(let value) => Check(value == (byte)1, "Byte parse")
+        Error(_) => System.Fault("Byte parse failed")
+    }
+    match Byte.Parse("2") {
+        Ok(let value) => Check(value == (byte)2, "Byte parse")
+        Error(_) => System.Fault("Byte parse failed")
+    }
+    match SByte.Parse("128") {
+        Error(NumberParseError.Overflow) => { }
+        _ => System.Fault("SByte parse error contract")
+    }
+    match Byte.Parse("-1") {
+        Error(NumberParseError.Overflow) => { }
+        _ => System.Fault("Byte parse error contract")
+    }
+    match Int16.Parse("32768") {
+        Error(NumberParseError.Overflow) => { }
+        _ => System.Fault("Int16 parse error contract")
+    }
+    match UInt16.Parse("65536") {
+        Error(NumberParseError.Overflow) => { }
+        _ => System.Fault("UInt16 parse error contract")
+    }
+    match UInt32.Parse("4294967296") {
+        Error(NumberParseError.Overflow) => { }
+        _ => System.Fault("UInt32 parse error contract")
+    }
+    match UInt64.Parse("18446744073709551616") {
+        Error(NumberParseError.Overflow) => { }
+        _ => System.Fault("UInt64 parse error contract")
+    }
+    match Single.Parse("1e39") {
+        Error(NumberParseError.Overflow) => { }
+        _ => System.Fault("Single parse error contract")
+    }
+    match Double.Parse("1e309") {
+        Error(NumberParseError.Overflow) => { }
+        _ => System.Fault("Double parse error contract")
+    }
+    match Double.Parse(" 1") {
+        Error(NumberParseError.InvalidFormat) => { }
+        _ => System.Fault("Double parse error contract")
+    }
+    match UInt64.Parse("999999999999999999999999x") {
+        Error(NumberParseError.InvalidFormat) => { }
+        _ => System.Fault("UInt64 parse error contract")
+    }
+    match Boolean.Parse("1") {
+        Error(BooleanParseError.InvalidFormat) => { }
+        _ => System.Fault("Boolean parse error contract")
+    }
+    match Int32.Parse("2147483648") {
+        Error(NumberParseError.Overflow) => { }
+        _ => System.Fault("Int32 shared parse error")
+    }
+    match Int64.Parse("9223372036854775808") {
+        Error(NumberParseError.Overflow) => { }
+        _ => System.Fault("Int64 shared parse error")
+    }
+    match System.Data.Json.JsonNumber.Parse("42") {
+        Ok(let number) => CheckJsonNumber(number, true)
+        _ => System.Fault("JSON number parse failed")
+    }
+    match System.Data.Json.JsonNumber.Parse("2147483648") {
+        Ok(let number) => CheckJsonNumber(number, false)
+        _ => System.Fault("JSON number range parse failed")
+    }
+    System.Console.WriteLine("Number and concrete Parse contracts passed")
+}

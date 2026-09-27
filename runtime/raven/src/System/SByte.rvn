@@ -1,9 +1,37 @@
 namespace System
 
-public struct SByte : ComparableTo<sbyte> {
+import System.Result.*
+import System.Runtime.CompilerServices.RuntimeServices
+
+public struct SByte : Number<sbyte> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: sbyte
+
+    static val Zero: sbyte => (sbyte)0
+    static val One: sbyte => (sbyte)1
+
+    static func +(left: sbyte, right: sbyte) -> sbyte => (sbyte)(left + right)
+    static func -(left: sbyte, right: sbyte) -> sbyte => (sbyte)(left - right)
+    static func *(left: sbyte, right: sbyte) -> sbyte => (sbyte)(left * right)
+    static func /(left: sbyte, right: sbyte) -> sbyte => (sbyte)(left / right)
+
+    /// Parses the complete text using the strict, culture-independent grammar.
+    static func Parse(value: string) -> Result<sbyte, NumberParseError> {
+        let payload = RuntimeServices.ParseSByte(value)
+        if RuntimeServices.IsValue<sbyte>(payload) {
+            return Ok(RuntimeServices.UnpackValue<sbyte>(payload))
+        }
+        let status = RuntimeServices.UnpackValue<int>(payload)
+        if status == 1 {
+            return Error(NumberParseError.InvalidFormat())
+        }
+        if status == 2 {
+            return Error(NumberParseError.Overflow())
+        }
+        System.Fault("invalid native parse status")
+        return Error(NumberParseError.InvalidFormat())
+    }
 
     func CompareTo(other: sbyte) -> int {
         if m_value < other {

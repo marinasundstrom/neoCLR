@@ -1,5 +1,5 @@
-; Generated from runtime/raven/src/System/Int32ParseError.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.Int32ParseError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+; Generated from runtime/raven/src/System/NumberParseError.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.NumberParseError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
     ldarg value
     ldc.i4 0
     beq False
@@ -14,7 +14,7 @@ True:
     ldc.bool true
     ret
 .end
-.function neoCLR.Library.System.Int32ParseError.RuntimeBooleanToInt32(Boolean value) -> Int32
+.function neoCLR.Library.System.NumberParseError.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False
     ldc.i4 1
@@ -23,19 +23,19 @@ False:
     ldc.i4 0
     ret
 .end
-.function neoCLR.Library.System.Int32ParseError.RuntimeReflection936F30A1978F475D(System.Object arg0) -> String
+.function neoCLR.Library.System.NumberParseError.RuntimeReflection936F30A1978F475D(System.Object arg0) -> String
 ldarg arg0
 callvirt instance System.Object::ToString()
 ret
 .end
-.function neoCLR.Library.System.Int32ParseError.DefaultReference53797374656D2E4F626A656374() -> System.Object
+.function neoCLR.Library.System.NumberParseError.DefaultReference53797374656D2E4F626A656374() -> System.Object
 .local System.Object value
 ldloca value
 initobj System.Object
 ldloc value
 ret
 .end
-.type System.Int32ParseError.InvalidFormat
+.type System.NumberParseError.InvalidFormat
 .sealed
 .method instance byref .ctor() -> Void
 M00000009_IL_0000:
@@ -49,7 +49,7 @@ ret
 .end
 .method instance override byref ToString() -> String
 M0000000a_IL_0000:
-ldstr "Int32ParseError"
+ldstr "NumberParseError"
 M0000000a_IL_0005:
 ldstr "."
 M0000000a_IL_000a:
@@ -67,7 +67,7 @@ ldarg 0
 M0000000b_IL_0001:
 M0000000b_IL_0002:
 ref.isnull
-call neoCLR.Library.System.Int32ParseError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.NumberParseError.RuntimeBooleanToInt32(Boolean)
 M0000000b_IL_0004:
 brtrue M0000000b_IL_000e
 M0000000b_IL_0009:
@@ -86,7 +86,7 @@ M0000000b_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
-call neoCLR.Library.System.Int32ParseError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.NumberParseError.RuntimeBooleanToInt32(Boolean)
 M0000000b_IL_001e:
 brtrue M0000000b_IL_0028
 M0000000b_IL_0023:
@@ -136,7 +136,7 @@ ldstr "\u0027"
 M0000000b_IL_006d:
 ldarg 0
 M0000000b_IL_006e:
-call neoCLR.Library.System.Int32ParseError.RuntimeReflection936F30A1978F475D(System.Object)
+call neoCLR.Library.System.NumberParseError.RuntimeReflection936F30A1978F475D(System.Object)
 M0000000b_IL_0073:
 call System.String::Concat(String,String)
 M0000000b_IL_0078:
@@ -149,12 +149,12 @@ M0000000b_IL_0083:
 M0000000b_IL_0084:
 ldarg 0
 M0000000b_IL_0085:
-call neoCLR.Library.System.Int32ParseError.RuntimeReflection936F30A1978F475D(System.Object)
+call neoCLR.Library.System.NumberParseError.RuntimeReflection936F30A1978F475D(System.Object)
 M0000000b_IL_008a:
 ret
 .end
 .end
-.type System.Int32ParseError.Overflow
+.type System.NumberParseError.Overflow
 .sealed
 .method instance byref .ctor() -> Void
 M0000000c_IL_0000:
@@ -168,7 +168,7 @@ ret
 .end
 .method instance override byref ToString() -> String
 M0000000d_IL_0000:
-ldstr "Int32ParseError"
+ldstr "NumberParseError"
 M0000000d_IL_0005:
 ldstr "."
 M0000000d_IL_000a:
@@ -186,7 +186,7 @@ ldarg 0
 M0000000e_IL_0001:
 M0000000e_IL_0002:
 ref.isnull
-call neoCLR.Library.System.Int32ParseError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.NumberParseError.RuntimeBooleanToInt32(Boolean)
 M0000000e_IL_0004:
 brtrue M0000000e_IL_000e
 M0000000e_IL_0009:
@@ -205,7 +205,7 @@ M0000000e_IL_001c:
 ref.isnull
 ldc.bool false
 ceq
-call neoCLR.Library.System.Int32ParseError.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.NumberParseError.RuntimeBooleanToInt32(Boolean)
 M0000000e_IL_001e:
 brtrue M0000000e_IL_0028
 M0000000e_IL_0023:
@@ -255,7 +255,7 @@ ldstr "\u0027"
 M0000000e_IL_006d:
 ldarg 0
 M0000000e_IL_006e:
-call neoCLR.Library.System.Int32ParseError.RuntimeReflection936F30A1978F475D(System.Object)
+call neoCLR.Library.System.NumberParseError.RuntimeReflection936F30A1978F475D(System.Object)
 M0000000e_IL_0073:
 call System.String::Concat(String,String)
 M0000000e_IL_0078:
@@ -268,7 +268,7 @@ M0000000e_IL_0083:
 M0000000e_IL_0084:
 ldarg 0
 M0000000e_IL_0085:
-call neoCLR.Library.System.Int32ParseError.RuntimeReflection936F30A1978F475D(System.Object)
+call neoCLR.Library.System.NumberParseError.RuntimeReflection936F30A1978F475D(System.Object)
 M0000000e_IL_008a:
 ret
 .end

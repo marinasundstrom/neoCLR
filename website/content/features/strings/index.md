@@ -245,6 +245,14 @@ casing; comparison and hashing still use their separately selected policies.
 `MinValue` and `MaxValue` properties expose the bounds. Parsing rejects whitespace
 and distinguishes malformed input from overflow. These operations support reports
 and counters beyond Int32 without adding culture or format-provider APIs.
-See the [API contract](/docs/text-numbers/) and the tested report consumer in
+See the [API contract](/docs/text-numbers.html) and the tested report consumer in
 `docs/experiments/casing-integer/Main.rvn`. Matching development runtime and library
 artifacts are required.
+
+Development primitive `Parse` methods use strict whole-text grammars: decimal
+integers, decimal/exponent Single and Double, and case-insensitive Boolean words.
+They return typed errors, reject whitespace and grouping, and have no ambient
+culture dependency. Number provides a separate arithmetic contract; parsing is not
+part of it. See [numeric API contracts](/docs/text-numbers.html) for exact rules and the
+current generic-import limits. A shared numeric parsing interface remains a possible
+future direction.

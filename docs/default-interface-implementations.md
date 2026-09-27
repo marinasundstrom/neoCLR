@@ -175,3 +175,33 @@ adding method-shaped substitutes merely for the demo. GetInterfaceMap, broader N
 property/indexer declaration syntax, default base calls, static virtual members,
 interface state and method hiding remain separate work. Defaults add shared behavior;
 MemberInfo's shared storage remains appropriately served by class inheritance.
+
+## Raven nominal defaults and static helpers (development)
+
+The 2026-09-27 bounded Raven integration admits public instance defaults on
+non-generic application interfaces and ordinary public/private static helpers.
+Nominal class receivers retain their original object and concrete identity when
+entering a selected interface default. Nested interface calls still dispatch on
+that object; a concrete class implementation takes precedence. The existing
+managed-reference default path and its lifetime rules remain in effect separately.
+
+Static helpers are owned methods with direct calls, no receiver and no conformance
+obligation. Private helpers retain declaring-interface access checks through import,
+linking and execution. They cannot be reached through callvirt or treated as virtual
+reflection members. Bodyless static contracts still require implementations; static
+virtual bodies remain rejected. Defaults must be invoked through interface dispatch,
+not a direct call to a chosen default. Host invocation/delegate binding of interface
+methods is not expanded by this slice.
+
+This follows the .NET interface separation of static helpers and virtual contracts,
+reusing the existing [CLI/interface comparison](raven-interface-contract.md#netcli-comparison-and-placement).
+The benefit is shared capability behavior without class forwarding boilerplate;
+the cost is additional importer admission, receiver handling and access validation.
+No performance or compatibility improvement over .NET is claimed. No Runtime Contract
+setting, metadata format or public System signature changes.
+
+The [tested Raven consumer](experiments/interface-helpers/README.md) also checks
+void defaults, nested dispatch, class precedence and helper reflection. Private
+instance helpers, protected/internal members, static virtual dispatch and Raven
+explicit default overrides/reabstraction remain outside this admission. The existing
+native diamond/reabstraction evidence does not establish the corresponding Raven path.

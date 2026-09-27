@@ -26,11 +26,28 @@ pub(crate) fn is_bodyless(module: &Module, function: &Function) -> bool {
     function.is_abstract || (is_contract(module, function) && function.body.is_empty())
 }
 
+// Helpers have no implementation obligation and are called directly.
+pub(crate) fn is_helper(function: &Function) -> bool {
+    function.interface_implementations.is_empty()
+        && (function.visibility == Visibility::Private
+            || (!function.instance && !function.body.is_empty()))
+}
+
 pub(crate) fn validate_contract(function: &Function) -> Result<(), Fault> {
     let explicit = !function.interface_implementations.is_empty();
-    if !function.instance
+    let helper = is_helper(function);
+    if (!function.instance
+        && (function.receiver_byref
+            || function.receiver_readonly
+            || explicit
+            || (!function.body.is_empty() && function.is_virtual)))
+        || (helper
+            && (function.instance
+                || function.is_abstract
+                || function.is_virtual
+                || function.body.is_empty()))
         || function.visibility
-            != if explicit {
+            != if explicit || (helper && function.visibility == Visibility::Private) {
                 Visibility::Private
             } else {
                 Visibility::Public
@@ -41,7 +58,6 @@ pub(crate) fn validate_contract(function: &Function) -> Result<(), Fault> {
         || function.is_override
         || (function.body.is_empty() && !function.locals.is_empty())
         || (function.is_abstract && !function.body.is_empty())
-        || (!function.body.is_empty() && !function.receiver_byref)
     {
         return Err(Fault::new(
             "invalid interface declaration, default body or explicit replacement",
@@ -200,7 +216,7 @@ fn member(
             definition: None,
             name: format!("{}.{name}", owner.definition_name().unwrap()),
             owner: Some(owner.clone()),
-            instance: true,
+            instance: contract.instance,
             generic_arguments: vec![],
             parameters: contract.parameters.clone(),
         };
@@ -232,7 +248,9 @@ fn check_signature(
             .owner
             .as_ref()
             .is_some_and(|owner| !module.is_reference_type(owner));
-    if implementation.parameters != contract.parameters {
+    if implementation.instance != contract.instance
+        || implementation.parameters != contract.parameters
+    {
         return Err(Fault::new(
             "interface implementation requires exact parameter types",
         ));
@@ -295,6 +313,7 @@ pub(crate) fn ensure_implementation(
                 .and_then(|ty| module.type_definition(ty))
                 .is_some_and(|d| std::ptr::eq(d, definition))
                 && method.interface_implementations.is_empty()
+                && !is_helper(method)
             {
                 let contract =
                     method.map_types(|ty| ty.substitute_type_parameters(arguments(&inherited)))?;
@@ -483,7 +502,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             Representation::Record | Representation::Interface
         ) && !string_owner
             || !body.instance
-            || !body.receiver_byref
+            || (!body.receiver_byref && !module.is_reference_type(owner))
             || body.visibility != Visibility::Private
             || (body.is_virtual && !interface_owner)
             || body.is_override
@@ -493,7 +512,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             || body.pinvoke.is_some()
         {
             return Err(Fault::new(
-                "explicit implementations require private concrete managed IL record or readonly String methods",
+                "explicit implementations require private concrete managed IL value/class or readonly String methods",
             ));
         }
         for target in &body.interface_implementations {
@@ -539,7 +558,8 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             for interface in inherited {
                 let owner = interface_definition(module, &interface)?;
                 for method in &module.functions {
-                    if !method.interface_implementations.is_empty()
+                    if is_helper(method)
+                        || !method.interface_implementations.is_empty()
                         || !method
                             .owner
                             .as_ref()

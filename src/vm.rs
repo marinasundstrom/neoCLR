@@ -519,7 +519,6 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 || function.receiver_readonly
                 || function.is_internal_call()
                 || function.pinvoke.is_some()
-                || !function.interface_implementations.is_empty()
                 || !function.generic_parameters.is_empty())
         {
             return Err(Fault::new("class methods require ordinary IL receivers"));
@@ -533,7 +532,6 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             ));
         }
         let nominal_interface_contract = crate::interfaces::is_contract(module, function)
-            && crate::interfaces::is_bodyless(module, function)
             && !function.receiver_byref
             && !function.receiver_readonly;
         let value_receiver = function.instance
@@ -556,7 +554,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 || (function.is_abstract && !nominal_interface_contract && !class_owner)
                 || function.is_internal_call()
                 || function.pinvoke.is_some()
-                || (!value_receiver && !function.interface_implementations.is_empty()))
+                || (!value_receiver && !class_owner && !function.interface_implementations.is_empty()))
         {
             return Err(Fault::new(
                 "no-result methods require IL bodies with Void metadata and static, class or by-reference value receivers",
@@ -902,17 +900,20 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     if callee.is_abstract && !matches!(op, Op::CallVirtual(_)) {
                         return Err(Fault::new("abstract methods require virtual dispatch"));
                     }
-                    let interface_call = crate::interfaces::is_contract(module, &callee);
+                    let interface_call = crate::interfaces::is_contract(module, &callee)
+                        && !crate::interfaces::is_helper(&callee);
                     let ordinary_class_instance = callee.instance
                         && !callee.receiver_byref
                         && callee
                             .owner
                             .as_ref()
                             .is_some_and(|owner| module.is_reference_type(owner));
-                    let supports_virtual_call = interface_call
+                    let supports_virtual_call = (interface_call
                         || callee.is_virtual
                         || ordinary_class_instance
-                        || crate::delegates::is_contract(module, &callee);
+                        || crate::delegates::is_contract(module, &callee))
+                        && !(crate::interfaces::is_contract(module, &callee)
+                            && crate::interfaces::is_helper(&callee));
                     if (interface_call
                         && (!matches!(op, Op::CallVirtual(_))
                             || !callee.interface_implementations.is_empty()))
@@ -1564,6 +1565,37 @@ fn completion_notification_frame(
     Frame::new(post, vec![queue, callback])
 }
 
+// All interpreter-owned managed roots, shared by automatic and explicit collections.
+fn execution_roots(
+    frames: &[Frame],
+    scheduler: &crate::scheduler::Scheduler,
+    default_task_queue: Option<&Value>,
+    invocation_result: Option<&Value>,
+) -> Vec<usize> {
+    let mut roots = vec![];
+    scheduler.trace_roots(&mut roots);
+    for value in default_task_queue.into_iter().chain(invocation_result) {
+        crate::gc::trace(value, &mut roots);
+    }
+    for frame in frames {
+        if let Some(object) = &frame.construction_object {
+            roots.push(object.allocation_id());
+        }
+        for cell in frame
+            .args
+            .iter()
+            .chain(&frame.locals)
+            .chain(frame.construction_storage.iter())
+        {
+            cell.borrow().trace_heap(&mut roots);
+        }
+        for value in &frame.stack {
+            crate::gc::trace(value, &mut roots);
+        }
+    }
+    roots
+}
+
 #[allow(clippy::too_many_arguments)]
 fn interpret_instructions(
     module: &Module,
@@ -1687,30 +1719,12 @@ fn interpret_instructions(
             || matches!(op, Op::Construct(target) if target.owner.as_ref().is_some_and(|ty| module.is_reference_type(ty))))
             && heap.len() >= collection_threshold
         {
-            let mut roots = vec![];
-            scheduler.trace_roots(&mut roots);
-            if let Some(queue) = &default_task_queue {
-                crate::gc::trace(queue, &mut roots);
-            }
-            if let Some(value) = &invocation_result {
-                crate::gc::trace(value, &mut roots);
-            }
-            for frame in frames.iter() {
-                if let Some(object) = &frame.construction_object {
-                    roots.push(object.allocation_id());
-                }
-                for cell in frame
-                    .args
-                    .iter()
-                    .chain(&frame.locals)
-                    .chain(frame.construction_storage.iter())
-                {
-                    cell.borrow().trace_heap(&mut roots);
-                }
-                for value in &frame.stack {
-                    crate::gc::trace(value, &mut roots);
-                }
-            }
+            let roots = execution_roots(
+                frames,
+                &scheduler,
+                default_task_queue.as_ref(),
+                invocation_result.as_ref(),
+            );
             heap.collect(roots, crate::CollectionReason::AllocationPressure)?;
             collection_threshold = heap
                 .len()
@@ -2190,11 +2204,6 @@ fn interpret_instructions(
                             interface,
                             &contract,
                         )?;
-                        if crate::interfaces::is_contract(module, &callee) {
-                            return Err(Fault::new(
-                                "nominal interface dispatch requires a concrete class method",
-                            ));
-                        }
                         if callee.receiver_byref {
                             if module.is_reference_type(object.reference.target()) {
                                 return Err(Fault::new("boxed dispatch requires a value payload"));
@@ -2608,7 +2617,9 @@ fn interpret_instructions(
                 }
                 Op::Call(target) => {
                     let callee = resolve(module, target)?;
-                    if crate::interfaces::is_contract(module, &callee) {
+                    if crate::interfaces::is_contract(module, &callee)
+                        && !crate::interfaces::is_helper(&callee)
+                    {
                         return Err(Fault::new("interface declarations require callvirt"));
                     }
                     crate::access::check_call(module, Some(&function), &callee)?;
@@ -2728,6 +2739,24 @@ fn interpret_instructions(
                         frame.stack.push(value.on_stack());
                     } else if callee.is_internal_call() {
                         let binding = crate::native::bind(&callee)?;
+                        if matches!(binding, crate::native::Binding::GcCollect) {
+                            // The private service consumes no arguments; all roots remain in frames.
+                            let roots = execution_roots(
+                                frames,
+                                &scheduler,
+                                default_task_queue.as_ref(),
+                                invocation_result.as_ref(),
+                            );
+                            heap.collect(roots, crate::CollectionReason::ExplicitRequest)?;
+                            collection_threshold = heap
+                                .len()
+                                .saturating_mul(2)
+                                .max(64)
+                                .min(limits.heap_objects);
+                            frames.last_mut().unwrap().stack.push(Value::Void);
+                            return Ok(None);
+                        }
+
                         if matches!(
                             binding,
                             crate::native::Binding::Reflection(_)
@@ -2776,7 +2805,18 @@ fn interpret_instructions(
                             return Ok(None);
                         }
                         let prior_output = output.len();
-                        let value = if matches!(binding, crate::native::Binding::CurrentTaskQueue) {
+                        let value = if let crate::native::Binding::GcInfo(index) = binding {
+                            let stats = heap.statistics();
+                            let count = [
+                                stats.collections,
+                                stats.allocated_objects,
+                                stats.live_objects,
+                                stats.peak_objects,
+                                stats.reclaimed_objects,
+                                limits.heap_objects,
+                            ][index as usize];
+                            Value::Int64(i64::try_from(count).unwrap_or(i64::MAX))
+                        } else if matches!(binding, crate::native::Binding::CurrentTaskQueue) {
                             current_task_queue
                                 .clone()
                                 .or_else(|| default_task_queue.clone())

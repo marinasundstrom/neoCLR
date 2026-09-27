@@ -58,5 +58,13 @@
   "P:System.LocalTimeMapping.Ambiguous.Later": {
     "output": "docs/time-zone-mappings.html#ambiguous-later",
     "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  },
+  "M:System.LocalTimeMapping.Unique.Deconstruct": {
+    "output": "docs/time-zone-mappings.html#unique-deconstruct",
+    "reason": "RavenDoc renders union cases inline but omits their Deconstruct member pages; the manual entry records the public out-parameter signature."
+  },
+  "M:System.LocalTimeMapping.Ambiguous.Deconstruct": {
+    "output": "docs/time-zone-mappings.html#ambiguous-deconstruct",
+    "reason": "RavenDoc renders union cases inline but omits their Deconstruct member pages; the manual entry records the public out-parameter signature."
   }
 }

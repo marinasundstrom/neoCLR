@@ -1,2 +1,2 @@
-.include "../raven/generated/Byte.methods.neoil"
-.include "../raven/generated/Byte.helpers.neoil"
+.include "../raven/generated/Byte.bootstrap.methods.neoil"
+.include "../raven/generated/Byte.bootstrap.helpers.neoil"

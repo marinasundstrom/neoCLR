@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.ParseUInt32(string value) -> System.Value
+    .methodimpl InternalCall
+.end

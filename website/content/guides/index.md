@@ -47,3 +47,6 @@ See [development setup](../try/#development) for toolchain requirements. Broader
 belong in [direction and proposals](../proposals/), separate from implemented guides.
 
 [Globalization](../features/globalization/) covers culture, language, system discovery and Gregorian/Hebrew rendering (provisional development APIs).
+
+[Garbage collection](../features/gc/) — inspect execution-local object counters,
+request collection, and express reference lifetime.

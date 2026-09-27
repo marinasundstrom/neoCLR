@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'GC': 'System.Runtime.GC',
     'DateTime': 'System.DateTime',
     'ZonedDateTime': 'System.ZonedDateTime',
     'LocalTimeMapping': 'System.LocalTimeMapping',
@@ -87,8 +88,10 @@ SLICES = {
     'Propagatable': 'System.Propagatable',
     'IntegerDivisionError': 'System.IntegerDivisionError',
     'SingleError': 'System.Linq.SingleError',
-    'Int32ParseError': 'System.Int32ParseError',
-    'Int64ParseError': 'System.Int64ParseError',
+    'Number': 'System.Number',
+    'NumberParseError': 'System.NumberParseError',
+    'BooleanParseError': 'System.BooleanParseError',
+
     'Utf8SliceError': 'System.Text.Utf8SliceError',
     'ConsoleReadError': 'System.ConsoleReadError',
     'FileWriteError': 'System.Storage.FileWriteError',
@@ -168,6 +171,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'GC': 'runtime/raven/src/System/Runtime/GC.rvn',
     'DateTime': 'runtime/raven/src/System/DateTime.rvn',
     'ZonedDateTime': 'runtime/raven/src/System/ZonedDateTime.rvn',
     'LocalTimeMapping': 'runtime/raven/src/System/LocalTimeMapping.rvn',
@@ -261,8 +265,10 @@ SOURCES = {
     'Propagatable': 'runtime/raven/src/System/Propagatable.rvn',
     'IntegerDivisionError': 'runtime/raven/src/System/IntegerDivisionError.rvn',
     'SingleError': 'runtime/raven/src/System/Linq/SingleError.rvn',
-    'Int32ParseError': 'runtime/raven/src/System/Int32ParseError.rvn',
-    'Int64ParseError': 'runtime/raven/src/System/Int64ParseError.rvn',
+    'Number': 'runtime/raven/src/System/Number.rvn',
+    'NumberParseError': 'runtime/raven/src/System/NumberParseError.rvn',
+    'BooleanParseError': 'runtime/raven/src/System/BooleanParseError.rvn',
+
     'Utf8SliceError': 'runtime/raven/src/System/Text/Utf8SliceError.rvn',
     'ConsoleReadError': 'runtime/raven/src/System/ConsoleReadError.rvn',
     'FileWriteError': 'runtime/raven/src/System/Storage/FileWriteError.rvn',
@@ -409,10 +415,11 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
         if body.startswith(('.type class ' + owner + '\n', '.type class abstract ' + owner + '\n')):
             types.remove(body)
             methods = [body[:-len('.end\n')] + ''.join(methods) + '.end\n']
-    if name == 'Int64' and bootstrap:
+    if name in ('SByte', 'Byte', 'Int16', 'UInt16', 'Int32', 'UInt32', 'Int64', 'UInt64', 'Single', 'Double', 'Boolean') and bootstrap:
         # The archived Neo profile has legacy carriers. New Result APIs belong
         # to the Raven library; do not add another manual carrier to that profile.
-        methods = [re.sub(r'(?ms)^\.method static Parse\(.*?^\.end\n', '', body) for body in methods]
+        methods = [re.sub(r'(?ms)^\.method static Parse\(.*?^\.end\n', '', body) if name != 'Int32' else body for body in methods]
+        methods = [re.sub(r'(?m)^\.implements System\.Number<([^>]+)>', '', body) for body in methods]
     if name == 'String' and bootstrap:
         # Explicit comparison modes are a Raven-profile API.
         methods = [re.sub(r'(?ms)^\.method static (?:Compare|CompareOrdinalIgnoreCase)\(.*?^\.end\n', '', body) for body in methods]
@@ -424,6 +431,10 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
                    for body in methods]
         methods = [re.sub(r'(?ms)^\.property instance Metadata_[^\n]+\n\.get instance System\.String::CollectionCount\(\)\n\.end\n', '', body)
                    for body in methods]
+    if name == 'Int32' and bootstrap:
+        # Preserve the archived Neo API while the Raven API shares NumberParseError.
+        methods = [body.replace('NumberParseError', 'Int32ParseError') for body in methods]
+        helpers = {key.replace('NumberParseError', 'Int32ParseError'): body.replace('NumberParseError', 'Int32ParseError') for key, body in helpers.items()}
     # Retain only transitively called adapters; no application entry-point shim.
     used = set()
     pending = re.findall(r'(?m)^(?:call|ldftn) ([^(]+)\(', ''.join(methods + types))
@@ -447,7 +458,7 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
     prefix = name + ('.bootstrap' if bootstrap else '')
     result = {prefix + '.methods.neoil': banner + ''.join(methods),
               prefix + '.helpers.neoil': banner + ''.join(body for name, body in helpers.items() if name in used) + ''.join(types)}
-    if name in ('String', 'Path', 'Int64') and not bootstrap:
+    if name in ('String', 'Path', 'SByte', 'Byte', 'Int16', 'UInt16', 'Int32', 'UInt32', 'Int64', 'UInt64', 'Single', 'Double', 'Boolean') and not bootstrap:
         result.update(fragments(text, name, owner, bootstrap=True))
     return result
 

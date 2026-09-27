@@ -1,12 +1,12 @@
 ; Generated from runtime/raven/src/System/Int32.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorNewSystemInt32ParseErrorInvalidFormat(System.Int32ParseError.InvalidFormat value) -> System.Int32ParseError
+.function neoCLR.Library.System.Int32.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorInvalidFormat(System.NumberParseError.InvalidFormat value) -> System.NumberParseError
 ldarg value
-newobj instance System.Int32ParseError::.ctor(System.Int32ParseError.InvalidFormat)
+newobj instance System.NumberParseError::.ctor(System.NumberParseError.InvalidFormat)
 ret
 .end
-.function neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorNewSystemInt32ParseErrorOverflow(System.Int32ParseError.Overflow value) -> System.Int32ParseError
+.function neoCLR.Library.System.Int32.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorOverflow(System.NumberParseError.Overflow value) -> System.NumberParseError
 ldarg value
-newobj instance System.Int32ParseError::.ctor(System.Int32ParseError.Overflow)
+newobj instance System.NumberParseError::.ctor(System.NumberParseError.Overflow)
 ret
 .end
 .function neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorNewSystemIntegerDivisionErrorDivisionByZero(System.IntegerDivisionError.DivisionByZero value) -> System.IntegerDivisionError
@@ -19,12 +19,12 @@ ldarg value
 newobj instance System.IntegerDivisionError::.ctor(System.IntegerDivisionError.Overflow)
 ret
 .end
-.function neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorInvalidFormatNew() -> System.Int32ParseError.InvalidFormat
-newobj instance System.Int32ParseError.InvalidFormat::.ctor()
+.function neoCLR.Library.System.Int32.RuntimeErrorSystemNumberParseErrorInvalidFormatNew() -> System.NumberParseError.InvalidFormat
+newobj instance System.NumberParseError.InvalidFormat::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorOverflowNew() -> System.Int32ParseError.Overflow
-newobj instance System.Int32ParseError.Overflow::.ctor()
+.function neoCLR.Library.System.Int32.RuntimeErrorSystemNumberParseErrorOverflowNew() -> System.NumberParseError.Overflow
+newobj instance System.NumberParseError.Overflow::.ctor()
 ret
 .end
 .function neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorDivisionByZeroNew() -> System.IntegerDivisionError.DivisionByZero
@@ -40,19 +40,19 @@ ldarg arg0
 newobj instance System.Result.Ok<Int32>::.ctor(Int32)
 ret
 .end
-.function neoCLR.Library.System.Int32.RuntimeUnion1(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.Int32ParseError>
+.function neoCLR.Library.System.Int32.RuntimeUnion1(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.NumberParseError>
 ldarg arg0
-newobj instance System.Result<Int32,System.Int32ParseError>::.ctor(System.Result.Ok<Int32>)
+newobj instance System.Result<Int32,System.NumberParseError>::.ctor(System.Result.Ok<Int32>)
 ret
 .end
-.function neoCLR.Library.System.Int32.RuntimeUnion2(System.Int32ParseError arg0) -> System.Result.Error<System.Int32ParseError>
+.function neoCLR.Library.System.Int32.RuntimeUnion2(System.NumberParseError arg0) -> System.Result.Error<System.NumberParseError>
 ldarg arg0
-newobj instance System.Result.Error<System.Int32ParseError>::.ctor(System.Int32ParseError)
+newobj instance System.Result.Error<System.NumberParseError>::.ctor(System.NumberParseError)
 ret
 .end
-.function neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Error<System.Int32ParseError> arg0) -> System.Result<Int32,System.Int32ParseError>
+.function neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Error<System.NumberParseError> arg0) -> System.Result<Int32,System.NumberParseError>
 ldarg arg0
-newobj instance System.Result<Int32,System.Int32ParseError>::.ctor(System.Result.Error<System.Int32ParseError>)
+newobj instance System.Result<Int32,System.NumberParseError>::.ctor(System.Result.Error<System.NumberParseError>)
 ret
 .end
 .function neoCLR.Library.System.Int32.RuntimeUnion4(System.IntegerDivisionError arg0) -> System.Result.Error<System.IntegerDivisionError>

@@ -152,3 +152,21 @@ Development constructor discovery adds `ConstructorInfo` to the `MemberInfo` fam
 type; the flags overload allows descriptive visibility selection. Constructors
 expose parameters and visibility, without a method return type. See the
 [Reflection API guide](reflection.md) for execution limits.
+
+
+### Interface method flags (development)
+
+For admitted application interfaces, public instance defaults are virtual and have
+bodies (`IsAbstract` is false). Ordinary static helpers report `IsStatic` true and
+`IsVirtual`/`IsAbstract` false. Private helper visibility remains private; helpers do
+not create an implementation obligation on a class. This development behavior is not
+in Preview 10. Reflection describes these methods; it does not enable general
+invocation of interface bodies or bypass their access checks.
+
+
+Explicit application interface method bodies retain their qualified source names and
+private visibility. Query them using NonPublic, Instance and DeclaredOnly flags.
+Their IsVirtual flag is false: neoCLR represents explicit interface mappings separately
+from class virtual slots, unlike the CLI private/final/virtual emission flags. Ordinary
+public method queries exclude these private bodies. This development support does not
+add GetInterfaceMap or general reflection invocation of interface implementations.

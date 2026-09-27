@@ -1,2 +1,2 @@
-.include "../raven/generated/UInt16.methods.neoil"
-.include "../raven/generated/UInt16.helpers.neoil"
+.include "../raven/generated/UInt16.bootstrap.methods.neoil"
+.include "../raven/generated/UInt16.bootstrap.helpers.neoil"

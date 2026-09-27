@@ -690,9 +690,17 @@ fn method(
         if f.name.ends_with("..ctor") { "System.Introspection.ConstructorInfo" } else { "System.Introspection.MethodInfo" },
         vec![
             Value::String(
-                f.origin.as_ref().map(|origin| origin.name.as_str()).unwrap_or_else(||
-                    f.name.strip_prefix(&format!("{}.", owner.definition_name().unwrap_or(""))).unwrap_or(&f.name)
-                ).into(),
+                // Imported bodies may use escaped names. Preserve source names
+                // for display without changing dispatch identities.
+                f.origin
+                    .as_ref()
+                    .map(|origin| origin.name.as_str())
+                    .unwrap_or_else(|| {
+                        f.name
+                            .strip_prefix(&format!("{}.", owner.definition_name().unwrap_or("")))
+                            .unwrap_or(&f.name)
+                    })
+                    .into(),
             ),
             type_value(module, owner)?,
             type_value(module, &f.returns.substitute_type_parameters(arguments)?)?,
@@ -724,7 +732,11 @@ fn method(
                 limits,
             )?,
             Value::Boolean(f.receiver_readonly),
-            Value::Boolean(f.is_virtual || crate::interfaces::is_contract(module, f)),
+            Value::Boolean(
+                f.is_virtual
+                    || (crate::interfaces::is_contract(module, f)
+                        && !crate::interfaces::is_helper(f)),
+            ),
             Value::Boolean(f.is_override),
             Value::Boolean(crate::interfaces::is_bodyless(module, f)),
         ],

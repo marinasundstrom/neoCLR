@@ -1,2 +1,2 @@
-.include "../raven/generated/Boolean.methods.neoil"
-.include "../raven/generated/Boolean.helpers.neoil"
+.include "../raven/generated/Boolean.bootstrap.methods.neoil"
+.include "../raven/generated/Boolean.bootstrap.helpers.neoil"
