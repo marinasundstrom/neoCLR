@@ -1,0 +1,46 @@
+{
+  "date": "2026-09-27",
+  "status": "installed local development build, not release certification",
+  "neoclr_revision": "03947b07e6594c5dfacb95ff51e9b7feb854b7dd",
+  "raven_neoclr_revision": "b7bc6838d61d728faeb1220715c848b62998c588",
+  "raven_general_owner_fix": "70cc9dfae",
+  "raven_general_extension_fix": "768fdcd7a",
+  "sdk_version": "0.1.12-neoclr.20260927.async2",
+  "sdk_path": "/Users/robert/.raven/sdk/0.1.12-neoclr.20260927.async2",
+  "bundle_path": "/Users/robert/.neoclr/experiments/development-20260927-async",
+  "vsix_path": "/Users/robert/.neoclr/builds/async-20260927-fixed/raven-vscode.vsix",
+  "sha256": {
+    "vsix": "b1ce2b043fdf0f423ba0ec120f220981e191200038869a22499e7b88fad36c05",
+    "sdk_compiler": "bb76a8a7fb2c71b94f6802981153ce81f33a54a3923b0542bca58675b28dc316",
+    "bridge_compiler": "dc099e049fbb7620773864c1ed28a13b14b42b4672a057e49f8b95f8f7d760b3",
+    "runtime": "0bef6cd0f8a067a723e6dbdb278d55761c5a90a53cd952e19252dcfe1ebd6223",
+    "system": "b944ad08760589ffa1409403e1d6c0e1cf3c3af49312bca5e28ade6b7aba4cc1",
+    "reference": "01327a5beeb2c366246cf7c031962e9b051821612c26f561c756997b4b966429"
+  },
+  "checks": {
+    "sdk_install": "440 files compared byte-for-byte by SHA-256; rvnc --version matches",
+    "extension_install": "matching version confirmed in default and isolated neoCLR installations",
+    "editor": "installed SDK language server namespace/member completion passed over LSP",
+    "generic_consumers": [
+      "generic-owner: passed",
+      "generic-capture: passed",
+      "generic-suspension: passed"
+    ],
+    "http": "installed MSBuild projects compile/import/verify; GET 200, POST 201, malformed JSON 400, unknown route 404; Raven client GET + POST returned accepted:true",
+    "live_launch": "VS Code HTTP workspace and source files opened; Terminal server listening on loopback port 61515; Terminal Raven client returned accepted:true, final live heap objects 0"
+  },
+  "remaining": [
+    "silent target interpolation output loss",
+    "generic methods on generic owners remain a bounded importer limitation",
+    "canonical format/Clippy and stale signature-probe release gates remain open",
+    "separate Raven target-metadata async attribute lookup and generic private-var explicit assignment observations"
+  ],
+  "not_run": [
+    "full test suite",
+    "platform matrix",
+    "website build",
+    "benchmarks",
+    "release publication"
+  ],
+  "logs": "/Users/robert/.neoclr/builds/async-20260927-fixed/validation"
+}

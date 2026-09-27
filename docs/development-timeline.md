@@ -8833,3 +8833,12 @@ that emits as a nongeneric CLI container. The assistant reproduced this in two
 existing ordinary .NET tests, corrected the owner boundary and passed 29 focused
 checks. General `768fdcd7a` is integrated into Raven main and individually as
 `b7bc6838d` on neoclr. The first failed artifact attempt is not installed.
+
+**Delivery outcome:** Built and installed SDK/VSIX 0.1.12-neoclr.20260927.async2,
+with all 440 SDK files verified against build output and the extension version
+confirmed in both VS Code installations. Installed completion, three generic async
+consumers, independent HTTP requests and the Raven pair pass. Opened the HTTP
+workspace and separate server/client terminals; the client returned accepted:true
+and the server was left listening on loopback port 61515. See the
+[local snapshot](local-sdk-snapshot.md) for paths and evidence. No release was
+published; silent interpolation and canonical gate failures remain tracked.

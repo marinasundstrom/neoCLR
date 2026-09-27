@@ -12,7 +12,9 @@ owns priorities and fresh evidence. Pause automatic feature expansion while this
 assessment is completed; it does not select a release version or reopen Preview 10.
 The author explicitly requires functioning async/await for this release, including
 generic async. The bounded generic-method path now has positive suspension/capture
-coverage; remaining async defects stay ahead of optional API expansion.
+coverage; generic instance async receivers also pass. The matching
+[local SDK/extension and HTTP pair](local-sdk-snapshot.md) are installed and
+validated. Remaining async defects stay ahead of optional API expansion.
 
 **Active direction — minimal Web API (author-selected 2026-09-27).** Focus on
 serving a useful Web API, nested JSON serialization/deserialization, and a

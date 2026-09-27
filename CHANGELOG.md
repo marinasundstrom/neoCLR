@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Build and locally install matching SDK/VSIX `0.1.12-neoclr.20260927.async2`
+  with the async compiler corrections. Verify installed generic async consumers,
+  editor completion and HTTP client/server behavior; open the editable workspace
+  and launch the live pair. Record revisions, hashes and remaining release gates.
+  This is a local development build, not a published release.
+
 - Align the editable local HTTP client with the current typed JSON sample. Its
   shared application contract uses HttpJsonError; prepare the matching generic
   GET/POST client and serve both requests in the local managed-pair verifier.

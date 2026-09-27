@@ -122,3 +122,12 @@ packaging or API contract. Preserve source/package/release distinctions and exac
 artifact provenance. Issue numbers above retain the 2026-09-26 inventory; no issue
 status was refreshed or closed. Status changes belong here; implementation details
 and commands remain in the linked procedures and evidence.
+
+## Local async toolchain — 2026-09-27
+
+The author requested a matching SDK/extension installation and HTTP launch after
+the async work. [The installed snapshot](../local-sdk-snapshot.md) records neoCLR
+03947b07 and Raven b7bc6838d, three packaged generic async consumers, LSP completion,
+independent HTTP requests and the Raven pair. The server remains available in a
+Terminal window; the client returned accepted:true. This is local development
+evidence, not a published release or a waiver of the open gates above.
