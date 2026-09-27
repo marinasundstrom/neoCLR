@@ -1,7 +1,7 @@
 //! Explicit trusted native imports. No string marshalling or ownership inference.
 use crate::{
     Fault, Value,
-    memory::PointerHeap,
+    memory::SharedMemory,
     metadata::{Function, Type},
 };
 use libffi::middle::{Arg, Cif, CodePtr, Type as FfiType, arg};
@@ -58,29 +58,19 @@ pub(crate) fn validate(function: &Function) -> Result<(), Fault> {
 
 #[derive(Debug, Default)]
 pub struct NativeLibraries {
-    libraries: HashMap<String, libloading::Library>,
+    libraries: HashMap<String, std::sync::Arc<libloading::Library>>,
 }
 impl NativeLibraries {
     pub fn loaded_count(&self) -> usize {
         self.libraries.len()
     }
 
-    pub(crate) unsafe fn invoke(
-        &mut self,
-        function: &Function,
-        values: Vec<Value>,
-        memory: &PointerHeap,
-    ) -> Result<Value, Fault> {
+    pub(crate) unsafe fn prepare(&mut self, function: &Function) -> Result<NativeCall, Fault> {
         validate(function)?;
         let import = function
             .pinvoke
             .as_ref()
             .ok_or_else(|| Fault::new("missing native import"))?;
-        for value in &values {
-            if let Value::Pointer(pointer) = value {
-                memory.validate_native_pointer(pointer)?;
-            }
-        }
         if !self.libraries.contains_key(&import.library) {
             // Extensionless names use the platform prefix/suffix, preserving the directory.
             let path = Path::new(&import.library);
@@ -99,12 +89,34 @@ impl NativeLibraries {
                     path.display()
                 ))
             })?;
-            self.libraries.insert(import.library.clone(), library);
+            self.libraries
+                .insert(import.library.clone(), std::sync::Arc::new(library));
         }
         let library = self
             .libraries
             .get(&import.library)
             .ok_or_else(|| Fault::new("missing loaded library"))?;
+        Ok(NativeCall {
+            library: library.clone(),
+            function: function.clone(),
+        })
+    }
+}
+
+pub(crate) struct NativeCall {
+    library: std::sync::Arc<libloading::Library>,
+    function: Function,
+}
+impl NativeCall {
+    /// The caller holds the tracked argument borrow for the entire call.
+    pub(crate) unsafe fn invoke(
+        &self,
+        values: Vec<Value>,
+        memory: &SharedMemory,
+    ) -> Result<Value, Fault> {
+        let library = &self.library;
+        let function = &self.function;
+        let import = function.pinvoke.as_ref().expect("prepared native import");
         // SAFETY: the import's symbol and C signature are part of the caller's contract.
         let symbol =
             unsafe { library.get::<unsafe extern "C" fn()>(import.entry_point.as_bytes()) }

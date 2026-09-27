@@ -8,6 +8,8 @@ use std::sync::{Arc, Mutex};
 pub(crate) struct Invocation {
     pub(crate) dispatch: Mutex<Dispatch>,
     pub(crate) wake: Arc<crate::scheduler::Wake>,
+    pub(crate) memory: crate::memory::SharedMemory,
+    pub(crate) native_libraries: Arc<Mutex<Option<crate::interop::NativeLibraries>>>,
     pub(crate) limits: Limits,
     pub(crate) budget: Arc<Budget>,
     pub(crate) files: Mutex<crate::file_streams::Files>,
@@ -70,6 +72,8 @@ impl Invocation {
                 owner: std::sync::Weak::new(),
             }),
             wake,
+            memory: crate::memory::SharedMemory::new(limits),
+            native_libraries: Default::default(),
             limits,
             budget: Budget::new(limits),
             files: Mutex::new(Default::default()),

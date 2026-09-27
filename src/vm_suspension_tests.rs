@@ -56,7 +56,7 @@ ret
                 let mut frames = vec![Frame::new(function, vec![capture])?];
                 let options = ExecutionOptions::default();
                 let mut state = InstructionState::new(options.limits);
-                let mut memory = crate::memory::PointerHeap::default();
+                let mut memory = state.invocation.memory.clone();
                 let mut output = Vec::new();
                 let mut bytes = [Vec::new(), Vec::new()];
                 let mut libraries = None;
@@ -156,7 +156,7 @@ fn suspension_does_not_reset_instruction_budget() {
     let mut state = InstructionState::new(options.limits);
     let owner = Owner::new(1);
     let mut participant = owner.participant().unwrap();
-    let mut memory = crate::memory::PointerHeap::default();
+    let mut memory = state.invocation.memory.clone();
     let mut output = Vec::new();
     let mut bytes = [Vec::new(), Vec::new()];
     for step in 0..5 {
@@ -276,7 +276,7 @@ ret
     let owner = Owner::new(2);
     let mut participant = owner.participant().unwrap();
     let mut collector = owner.participant().unwrap();
-    let mut memory = crate::memory::PointerHeap::default();
+    let mut memory = state.invocation.memory.clone();
     let mut output = Vec::new();
     let mut bytes = [Vec::new(), Vec::new()];
     let mut pauses = 0;
@@ -471,7 +471,7 @@ ret
         .unwrap()
         .clone();
     let mut frames = vec![Frame::new(entry, vec![result.clone()]).unwrap()];
-    let mut memory = crate::memory::PointerHeap::default();
+    let mut memory = state.invocation.memory.clone();
     let mut output = Vec::new();
     let mut bytes = [Vec::new(), Vec::new()];
     let mut run = |state: &mut InstructionState, frames: &mut Vec<Frame>| {
@@ -928,4 +928,79 @@ fn contending_dispatch_context_observes_cancellation_without_stealing_ownership(
         &incumbent,
         &invocation.dispatch.lock().unwrap().owner.upgrade().unwrap()
     ));
+}
+
+#[test]
+fn guest_native_buffer_survives_submitter_and_shares_quota() {
+    let module = crate::assemble(
+        r#"
+.module System
+.function Allocate() -> Int32*
+ldc.i4 1
+heap.alloc Int32
+ret
+.end
+.function Update(Int32* captured) -> Int32
+ldarg captured
+ldc.i4 42
+stind.i4
+ldarg captured
+ldind.i4
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let options = ExecutionOptions {
+        limits: Limits {
+            pointer_bytes: 4,
+            ..Limits::default()
+        },
+        ..Default::default()
+    };
+    let invocation = crate::invocation::Invocation::new(options.limits);
+    let owner = Owner::new(1);
+    let run = |index: usize, args: Vec<Value>| {
+        let mut state = InstructionState::with_invocation(invocation.clone());
+        drive_instructions(
+            &module,
+            &mut vec![Frame::new(module.functions[index].clone(), args).unwrap()],
+            &options,
+            &mut None,
+            &mut owner.participant().unwrap(),
+            &mut invocation.memory.clone(),
+            &mut vec![],
+            &mut [vec![], vec![]],
+            &mut state,
+        )
+    };
+    let captured = run(0, vec![]).unwrap();
+    assert!(run(0, vec![]).is_err());
+    let passed = captured.clone();
+    std::thread::scope(|scope| {
+        let result = scope
+            .spawn(|| run(1, vec![passed]))
+            .join()
+            .unwrap()
+            .unwrap();
+        assert_eq!(result, Value::Int32(42));
+    });
+    let Value::Pointer(pointer) = captured else {
+        panic!()
+    };
+    assert_eq!(
+        invocation
+            .memory
+            .read(
+                &pointer,
+                &crate::memory::Layout {
+                    size: 4,
+                    alignment: 4,
+                    fields: vec![],
+                }
+            )
+            .unwrap(),
+        Value::Int32(42)
+    );
+    invocation.memory.free(&pointer).unwrap();
 }

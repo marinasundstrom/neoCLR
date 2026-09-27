@@ -208,6 +208,12 @@ struct NativeBytes {
     layout: std::alloc::Layout,
 }
 
+// SAFETY: this is the sole owner of an allocation from Rust's global allocator;
+// ownership and deallocation may move between threads. Byte access still requires
+// a heap borrow. SharedMemory serializes those borrows and excludes guest access
+// while a trusted native call borrows the allocation. This is deliberately not Sync.
+unsafe impl Send for NativeBytes {}
+
 impl NativeBytes {
     fn new(size: usize, alignment: usize) -> Result<Self, Fault> {
         let layout = std::alloc::Layout::from_size_align(size.max(1), alignment)
@@ -242,6 +248,7 @@ impl Drop for NativeBytes {
 
 #[derive(Debug)]
 struct Allocation {
+    native_borrowed: bool,
     frame_owned: bool,
     bytes: NativeBytes,
     initialized: Vec<bool>,
@@ -256,6 +263,10 @@ pub struct PointerHeap {
     live_bytes: usize,
 }
 
+#[path = "shared_memory.rs"]
+mod shared;
+pub(crate) use shared::SharedMemory;
+
 impl PointerHeap {
     pub(crate) fn debug_allocations(&self) -> Vec<crate::debugger::NativeAllocation> {
         self.allocations
@@ -266,14 +277,17 @@ impl PointerHeap {
                     id,
                     frame_owned: a.frame_owned,
                     size: a.bytes.len(),
-                    bytes: a
-                        .bytes
-                        .slice()
-                        .iter()
-                        .zip(&a.initialized)
-                        .take(128)
-                        .map(|(byte, initialized)| initialized.then_some(*byte))
-                        .collect(),
+                    bytes: if a.native_borrowed {
+                        Vec::new()
+                    } else {
+                        a.bytes
+                            .slice()
+                            .iter()
+                            .zip(&a.initialized)
+                            .take(128)
+                            .map(|(byte, initialized)| initialized.then_some(*byte))
+                            .collect()
+                    },
                 })
             })
             .take(128)
@@ -327,6 +341,7 @@ impl PointerHeap {
         let address = bytes.address();
         let id = self.allocations.len();
         self.allocations.push(Some(Allocation {
+            native_borrowed: false,
             frame_owned: false,
             bytes,
             initialized,
@@ -418,6 +433,9 @@ impl PointerHeap {
         if allocation.bytes.address().checked_add(pointer.offset) != Some(pointer.address) {
             return Err(Fault::new("native pointer tracking mismatch"));
         }
+        if allocation.native_borrowed {
+            return Err(Fault::new("native allocation is in use by a foreign call"));
+        }
         Ok(allocation)
     }
 
@@ -497,6 +515,9 @@ impl PointerHeap {
             .get_mut(id)
             .ok_or_else(|| Fault::new("invalid allocation identity"))?;
         let allocation = slot.as_ref().ok_or_else(|| Fault::new("double free"))?;
+        if allocation.native_borrowed {
+            return Err(Fault::new("native allocation is in use by a foreign call"));
+        }
         if allocation.frame_owned != frame_owned {
             return Err(Fault::new("heap.free cannot release frame-owned storage"));
         }

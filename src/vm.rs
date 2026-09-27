@@ -1510,10 +1510,12 @@ fn interpret_frames(
 ) -> Result<Execution, Fault> {
     let owner = crate::shared_heap::Owner::new(1);
     let mut participant = owner.participant()?;
-    let mut memory = crate::memory::PointerHeap::default();
     let mut output = vec![];
     let mut console_bytes = [Vec::new(), Vec::new()];
     let mut state = InstructionState::new(options.limits);
+    let mut memory = state.invocation.memory.clone();
+    let libraries = state.invocation.native_libraries.clone();
+    *libraries.lock().expect("native library lock poisoned") = native_libraries.take();
     let result = drive_instructions(
         module,
         frames,
@@ -1543,6 +1545,11 @@ fn interpret_frames(
     drop(heap);
     drop(participant);
     let heap = owner.into_heap()?;
+    let memory = memory.into_heap()?;
+    let native_libraries = std::sync::Arc::try_unwrap(libraries)
+        .map_err(|_| Fault::new("native libraries still have active contexts"))?
+        .into_inner()
+        .map_err(|_| Fault::new("native library lock poisoned"))?;
     result.map(|value| Execution {
         value,
         output,
@@ -1561,7 +1568,7 @@ fn drive_instructions(
     options: &ExecutionOptions,
     native_libraries: &mut Option<crate::interop::NativeLibraries>,
     participant: &mut crate::shared_heap::Participant,
-    memory: &mut crate::memory::PointerHeap,
+    memory: &mut crate::memory::SharedMemory,
     output: &mut Vec<String>,
     console_bytes: &mut [Vec<u8>; 2],
     state: &mut InstructionState,
@@ -1729,7 +1736,7 @@ fn interpret_instructions(
     options: &ExecutionOptions,
     _native_libraries: &mut Option<crate::interop::NativeLibraries>,
     heap: &mut crate::shared_heap::Access<'_>,
-    memory: &mut crate::memory::PointerHeap,
+    memory: &mut crate::memory::SharedMemory,
     output: &mut Vec<String>,
     console_bytes: &mut [Vec<u8>; 2],
     state: &mut InstructionState,
@@ -1773,7 +1780,7 @@ fn interpret_instructions_with_dispatch(
     options: &ExecutionOptions,
     _native_libraries: &mut Option<crate::interop::NativeLibraries>,
     heap: &mut crate::shared_heap::Access<'_>,
-    memory: &mut crate::memory::PointerHeap,
+    memory: &mut crate::memory::SharedMemory,
     output: &mut Vec<String>,
     console_bytes: &mut [Vec<u8>; 2],
     state: &mut InstructionState,
@@ -4136,7 +4143,7 @@ fn debug_snapshot(
     module: &Module,
     frames: &[Frame],
     heap: &crate::ManagedHeap,
-    memory: &crate::memory::PointerHeap,
+    memory: &crate::memory::SharedMemory,
     output: &[String],
     fault: bool,
 ) -> crate::debugger::DebugSnapshot {

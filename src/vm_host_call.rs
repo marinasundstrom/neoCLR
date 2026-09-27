@@ -143,8 +143,8 @@ impl HostCall {
         &mut self,
         module: &Module,
         state: &mut InstructionState,
-        native_libraries: &mut Option<crate::interop::NativeLibraries>,
-        memory: &crate::memory::PointerHeap,
+        _native_libraries: &mut Option<crate::interop::NativeLibraries>,
+        memory: &crate::memory::SharedMemory,
         output: &mut Vec<String>,
         bytes: &mut [Vec<u8>; 2],
         options: &ExecutionOptions,
@@ -155,12 +155,23 @@ impl HostCall {
                 return Ok(value.clone());
             }
             let value = if self.callee.pinvoke.is_some() {
-                let libraries = native_libraries.as_mut().ok_or_else(|| {
-                    Fault::new("native imports require trusted run_with_native execution")
-                })?;
-                // SAFETY: only run_with_native supplies this trusted session. Pointer
-                // ownership stays on the executing native thread across this boundary.
-                unsafe { libraries.invoke(&self.callee, self.args.clone(), memory)? }
+                let _borrow = memory.borrow_native(&self.args)?;
+                let call = {
+                    let mut libraries = state
+                        .invocation
+                        .native_libraries
+                        .lock()
+                        .expect("native library lock poisoned");
+                    let libraries = libraries.as_mut().ok_or_else(|| {
+                        Fault::new("native imports require trusted run_with_native execution")
+                    })?;
+                    // SAFETY: only run_with_native supplies this trusted session.
+                    unsafe { libraries.prepare(&self.callee)? }
+                };
+                // SAFETY: the trusted ABI contract still covers exports and indirect
+                // pointers. Tracked argument storage stays exclusively borrowed; no
+                // heap, scheduler, library-table or memory mutex is held in native code.
+                unsafe { call.invoke(self.args.clone(), memory)? }
             } else {
                 let binding = crate::native::bind(&self.callee)?;
                 let before = output.len();

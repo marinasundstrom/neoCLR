@@ -35,8 +35,10 @@ concurrent-consumer and guest-context checks. File handles and interning share t
 invocation owner, preserving positions, close state, canonical identity and quotas.
 The scheduler and registered default queue now also share that owner, with independent
 service roots, a single completion-drain owner and detached worker joins. Source roots
-survive the submitting context, and contenders remain cancellable. Native-memory
-ownership, aggregate array accounting and atomic guest Promise/queue mutations
+survive the submitting context, and contenders remain cancellable. Native buffers and
+library handles now share invocation ownership and native-memory quotas. Foreign-call
+leases retain direct tracked argument buffers and reject conflicting access without
+holding the memory lock across native execution. Aggregate array accounting and atomic guest Promise/queue mutations
 (including lazy default-queue creation) remain before the Task.Run facade.
 The internal blocking probe is not a public guest API result. Green threads are recorded as a possible future backend.
 This explicit task does not reopen the finished HTTP POC or select a general

@@ -67,8 +67,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   default-queue ownership with invocation service roots independent of submitting
   contexts. Serialize completion draining, retain cancellation while waiting, and
   detach worker joins before blocking so scheduler access remains available. Preserve
-  final-GC diagnostics after service teardown. Native-memory/array accounting, atomic
-  guest Promise/queue mutations and public Run still need integration.
+  final-GC diagnostics after service teardown. Share native-buffer identities, quotas
+  and loaded library ownership across contexts. Retain direct tracked foreign-call
+  arguments with exclusive leases; reject conflicting buffer access and omit busy
+  debugger bytes while unrelated buffers remain usable. Validate shared guest
+  buffers and native imports. Aggregate array accounting, atomic guest Promise/queue
+  mutations and public Run still need integration.
   This is backend infrastructure, not a public Task.Run release.
 
 - Support Raven Main returning integer, Result and target Task combinations through

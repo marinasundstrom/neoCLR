@@ -13,7 +13,8 @@ reference retains location identity; heap references remain weak capabilities wh
 lifetime is governed by tracing. Storage access and its write counters/payload cache
 are protected together. A whole-value read returns a coherent copy. A guest
 read/modify/write sequence is still multiple operations, not an atomic increment.
-No unsafe Send/Sync implementations are introduced.
+The managed-slot slice introduces no unsafe Send/Sync implementations; the
+native-buffer ownership slice below has a separate allocator-ownership proof.
 
 Debugger snapshots copy the slot payload before following its references, avoiding
 holding storage locks during graph traversal. Existing frame-escape, readonly,
@@ -344,13 +345,51 @@ cancellation during detached joins. Existing final-GC diagnostic counts still pa
 No whole-library fixture, full suite, API snapshot regeneration or website build was
 needed; the public Task.Run API remains unimplemented.
 
+## Shared native-memory owner and foreign-call handoff
+
+Native buffers and loaded native-library handles now belong to the invocation.
+Contexts use the same allocation identities, live-byte limit and cumulative
+allocation-identity limit; starting another context cannot reset those quotas.
+The native-buffer owner is transferable because it uniquely owns a global-allocator
+allocation. Safe byte access is serialized by the shared memory mutex; the buffer
+itself is not Sync. Execution still exports its ordinary PointerHeap after all
+contexts and foreign-call leases have released ownership.
+
+Trusted native calls borrow all directly supplied tracked allocations before leaving
+for native code. Duplicate aliases share one lease, including raw addresses that
+resolve to tracked storage. Admission validates every argument before marking any
+allocation busy. Until the lease ends, conflicting VM reads, writes, frees and
+foreign calls fault; debugger snapshots omit busy bytes. Independent buffers remain
+usable. The lease keeps storage alive and releases the borrow on return, error or
+wrapper unwinding. Prepared calls retain their library handle, and actual native
+execution holds no graph, scheduler, library-table or memory mutex. Library loading
+still serializes under the library-table lock, including trusted initializers.
+
+This protects direct tracked arguments only. Indirect/global pointers and foreign
+allocations remain the trusted unsafe ABI caller's responsibility. It does not make
+an arbitrary native library thread-safe or infer ownership of returned pointers.
+The per-operation memory lock and exclusive foreign borrow favor bounded ownership
+and diagnosable conflicts; they add synchronization overhead and reject conflicting
+access instead of waiting. This is a neoCLR implementation boundary, not a claim that
+.NET Task.Run synchronizes user buffers or that this is faster than CLR interop.
+The existing [concurrency comparison](../../concurrency-direction.md)
+continues to define the public ergonomic target.
+
+Focused validation: four native-memory tests and twelve VM suspension tests pass,
+including a guest buffer shared with a native-thread context after submitter exit,
+aggregate quota exhaustion, stale identities, borrow rollback/unwinding and unrelated
+buffer progress during a foreign borrow. The existing native-import, pointer,
+memory-operation, stack-allocation and debugger suites add 57 passing tests (73
+focused tests total). Real C-ABI imports retain scalar/pointer round trips and lazy
+library loading. No throughput claim, full suite, API regeneration or website build
+is included; Task.Run remains a future public capability on the feature page.
+
 ## Next prerequisite
 
-Integrate native allocation ownership and aggregate array/native-memory accounting
-before general guest work
-submission. Then establish atomic Promise/queue publication and expose the
-Run overloads, with async callback unwrapping validated at that API boundary.
-Instruction/live-frame budgets, file handles and interning now share an invocation
-owner. Array/native-memory and remaining host-resource accounting still require
-integration; a new task must not reset those limits. Retaining every object until
-invocation exit is not a substitute for bounded live-object accounting.
+Integrate aggregate managed-array accounting before general guest work submission.
+Then establish atomic Promise/queue publication and expose the Run overloads, with
+async callback unwrapping validated at that API boundary. Instruction/live-frame
+budgets, file handles, interning, scheduler services and native memory now share an
+invocation owner. Array accounting still requires integration; a new task must not
+reset those limits. Retaining every object until invocation exit is not a substitute
+for bounded live-object accounting.
