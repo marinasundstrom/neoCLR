@@ -45,7 +45,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   passing evidence; no proposed types are added to System. Track bridge limitations
   and distinguish byte progress from grapheme semantics. Add Text versus String
   as an open naming discussion, separating aliases, type identity, namespaces and
-  sequence semantics; no rename or namespace migration is implemented.
+  sequence semantics. Clarify the high-level text API objective and small-surface
+  constraint; no rename, new representation or namespace migration is implemented.
 - Record the author's focused-validation policy: only necessary checks, performance
   tests when relevant, and a full suite only when needed. Skip unrelated website builds.
 

@@ -8012,3 +8012,16 @@ configuration/content, not target-specific code added to Raven main.
   migration costs and validation needed if the proposal advances. No code, public API,
   compiler, namespace or milestone sequence changes; documentation consistency and
   whitespace checks only. The preferred name and any alias remain undecided.
+
+## 2026-09-27 — High-level text handling without excessive API layering
+
+- **Author:** clarifies that the objective is a high-level text API whose naming
+  challenges developer assumptions. Suggests that C# string/char could still be
+  part of lower APIs, while cautioning not to overdo the design.
+- **Assistant response:** treats Text as a candidate application-facing abstraction,
+  not merely an alias proposal. Recommends explicit lower-level views where needed
+  and avoiding redundant text types. Distinguishes C# UTF-16 char from existing
+  neoCLR grapheme Char; does not infer approval to repurpose either concept.
+- **Action/outcome:** records the [intent and scope guard](design/text-abstraction.md#high-level-text-api-intent--author-clarification)
+  in the existing design and theme tracker. Exact names, any compatibility surface
+  and migration remain open. Documentation only; no runtime/API changes.

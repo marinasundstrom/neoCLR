@@ -387,6 +387,43 @@ from changes to iteration/indexing. Then test the selected spelling through Rave
 literals, interpolation, generated metadata, bridge import and introspection. Do not
 make a broad rename or namespace reorganization a prerequisite for basic encoding.
 
+### High-level text API intent — author clarification
+
+The author clarifies the purpose of the naming discussion: a high-level API for
+handling text, with names that challenge developers' inherited assumptions, while
+keeping the design small. C#-style string/char concepts could remain in lower-level
+APIs. This is stronger than a cosmetic rename proposal, but does not select exact
+type names, authorize a second representation or decide the fate of current APIs.
+
+Evaluate `Text` as the application-facing abstraction: ordinary text construction,
+character access where useful, search and extraction should not require callers to
+reason about an encoding. Scalar and encoded operations should be explicit when a
+parser, protocol or interoperability boundary needs them. Naming is intended to
+signal these contracts; whether it actually helps developers remains to be tested
+with small consumer examples. Do not add parallel type families merely to make a
+layer diagram look complete.
+
+Compared with .NET's familiar String/Char surface, the proposed benefit is making
+text operations and representation-specific operations easier to distinguish. The
+cost is new vocabulary and potentially conversions or overlapping APIs if both
+surfaces are independently exposed. Prefer one text value with deliberate views
+or projections unless a distinct invariant justifies another type. A high-level
+abstraction need not add a wrapper allocation or duplicate text storage.
+
+The lower-level suggestion needs a precise unit: C# char is a UTF-16 code unit;
+neoCLR's current Char is a grapheme. Neither naming nor layering makes those
+interchangeable, and UTF-8 bytes are another distinct representation. If a C#-like
+UTF-16 surface is useful for interop, name its unit explicitly and decide how
+unpaired surrogates cross the valid-text boundary. Do not silently repurpose the
+existing Char or add a full compatibility layer without a consumer.
+
+**Scope guard:** begin with a coherent vocabulary for text values, basic
+encoding/decoding and minimal construction. Views or search ranges enter only as
+needed by concrete consumers. Text/Rune/Bytes, a renamed namespace hierarchy and
+separate high/low type families are options, not a required package. The earlier
+String/Char contract remains implemented behavior; the author has clarified the
+design objective, not approved an exact replacement surface.
+
 ### What to bring over from System.Text
 
 This is the recommended portfolio, **not an implementation commitment**. Inventory

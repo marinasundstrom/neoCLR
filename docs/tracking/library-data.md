@@ -132,6 +132,10 @@ to the discussion, including Text/Rune/Bytes vocabulary and namespace placement.
 This is not a rename decision or approval to remove character iteration. Compare
 source spelling, core type identity and semantics separately; retain this question
 alongside the foundation work without making it a new milestone dependency.
+The author further clarifies the [high-level API intent](../design/text-abstraction.md#high-level-text-api-intent--author-clarification):
+use naming to challenge encoding/code-unit assumptions, allow explicit lower-level
+operations where useful, and keep the surface small. This is an API design objective,
+not merely renaming; no duplicate text representation or compatibility layer is selected.
 
 **Boundary experiment:** [application-only prototype](../experiments/text-boundaries/README.md)
 examines scalar validation, source-bound ranges and bounded UTF-8 decoding. These
