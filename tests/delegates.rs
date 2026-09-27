@@ -71,9 +71,8 @@ fn frame_capture_is_rejected_without_verifier() {
 }
 
 #[test]
-fn incompatible_signature_and_invalid_default_are_rejected() {
+fn incompatible_signature_is_rejected() {
     assert!(assemble(&format!(".module Bad\n{DECL}\n.function Wrong(Int32) -> Boolean\nldc.bool true\nret\n.end\n.function Main() -> Void\ndelegate.bind Transform = Wrong(Int32)\nret\n.end")).unwrap_err().message.contains("signature"));
-    assert!(assemble(&format!(".module Bad\n{DECL}\n.function Main() -> Int32\n.local Transform d\nldloca d\ninitobj Transform\nldc.i4 0\nret\n.end")).is_err());
 }
 
 fn neo(source: &str) -> LoadedProgram {
@@ -428,4 +427,23 @@ fn class_constructor_cannot_read_a_delegate_field_before_assignment() {
             .message
             .contains("uninitialized")
     );
+}
+
+#[test]
+fn default_delegate_payload_is_null_and_cannot_be_invoked() {
+    let source = format!(
+        ".module Test\n.entry Main\n{DECL}\n.type Holder\n.field Callback Transform\n.end\n.function Main() -> Transform\n.local Holder holder\nldloca holder\ninitobj Holder\nldloc holder\nldfld Holder::Callback\nret\n.end"
+    );
+    let m = assemble(&source).unwrap();
+    verify(&m).unwrap();
+    assert_eq!(
+        run(&m, Limits::default()).unwrap().value,
+        Value::NullObjectReference(neoclr::metadata::Type::from_name("Transform"))
+    );
+    let m = module(
+        ".local Transform callback\nldloca callback\ninitobj Transform\nldloc callback\nldc.i4 42\ncallvirt instance Transform::Invoke(Int32)",
+        "",
+    );
+    verify(&m).unwrap();
+    assert!(run(&m, Limits::default()).is_err());
 }

@@ -3,303 +3,650 @@
 .sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .implements System.Propagatable<System.Result<T0,T1>,T0,T1>
-.field private Stored Value
-.property instance IsOk() -> Boolean
-.get instance System.Result<T0,T1>::get_IsOk()
+.implements System.Runtime.CompilerServices.IUnion
+.field private Metadata_V1_3C5461673E Byte
+.field private Metadata_V1_3C4F6B5061796C6F61643E System.Result.Ok<T0>
+.field private Metadata_V1_3C4572726F725061796C6F61643E System.Result.Error<T1>
+.property instance Value() -> System.Object
+.get instance System.Result<T0,T1>::get_Value()
 .end
-.property instance IsErr() -> Boolean
-.get instance System.Result<T0,T1>::get_IsErr()
+.property instance HasValue() -> Boolean
+.get instance System.Result<T0,T1>::get_HasValue()
 .end
-.method static Ok(T0 value) -> System.Result<T0,T1>
-M00000005_IL_0000:
-M00000005_IL_0001:
-M00000005_IL_0002:
+.method instance override byref ToString() -> String
+.local System.Result.Ok<T0> local0
+.local System.Result.Error<T1> local1
+ldloca local0
+initobj System.Result.Ok<T0>
+ldloca local1
+initobj System.Result.Error<T1>
+M00000001_IL_0000:
 ldarg 0
-M00000005_IL_0003:
-newobj instance System.Result.Ok<T0>::.ctor(T0)
-M00000005_IL_0008:
-newobj instance System.Result<T0,T1>::.ctor(System.Result.Ok<T0>)
-M00000005_IL_000d:
+M00000001_IL_0001:
+ldfld System.Result<T0,T1>::Metadata_V1_3C5461673E
+M00000001_IL_0006:
+conv.i4
+M00000001_IL_0007:
+ldc.i4 1
+M00000001_IL_0008:
+conv.i4
+M00000001_IL_0009:
+ceq
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_000b:
+brtrue M00000001_IL_0015
+M00000001_IL_0010:
+br M00000001_IL_0060
+M00000001_IL_0015:
+ldstr "Result"
+M00000001_IL_001a:
+ldstr "."
+M00000001_IL_001f:
+call System.String::Concat(String,String)
+M00000001_IL_0024:
+ldstr "Ok"
+M00000001_IL_0029:
+call System.String::Concat(String,String)
+M00000001_IL_002e:
+ldstr "("
+M00000001_IL_0033:
+call System.String::Concat(String,String)
+M00000001_IL_0038:
+ldarg 0
+M00000001_IL_0039:
+ldfld System.Result<T0,T1>::Metadata_V1_3C4F6B5061796C6F61643E
+M00000001_IL_003e:
+stloc local0
+M00000001_IL_003f:
+ldloca local0
+M00000001_IL_0041:
+call instance System.Result.Ok<T0>::get_Value()
+M00000001_IL_0046:
+box T0
+M00000001_IL_004b:
+call System.Result<T0,T1>::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+M00000001_IL_0050:
+call System.String::Concat(String,String)
+M00000001_IL_0055:
+ldstr ")"
+M00000001_IL_005a:
+call System.String::Concat(String,String)
+M00000001_IL_005f:
+ret
+M00000001_IL_0060:
+M00000001_IL_0061:
+ldarg 0
+M00000001_IL_0062:
+ldfld System.Result<T0,T1>::Metadata_V1_3C5461673E
+M00000001_IL_0067:
+conv.i4
+M00000001_IL_0068:
+ldc.i4 2
+M00000001_IL_0069:
+conv.i4
+M00000001_IL_006a:
+ceq
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_006c:
+brtrue M00000001_IL_0076
+M00000001_IL_0071:
+br M00000001_IL_00c1
+M00000001_IL_0076:
+ldstr "Result"
+M00000001_IL_007b:
+ldstr "."
+M00000001_IL_0080:
+call System.String::Concat(String,String)
+M00000001_IL_0085:
+ldstr "Error"
+M00000001_IL_008a:
+call System.String::Concat(String,String)
+M00000001_IL_008f:
+ldstr "("
+M00000001_IL_0094:
+call System.String::Concat(String,String)
+M00000001_IL_0099:
+ldarg 0
+M00000001_IL_009a:
+ldfld System.Result<T0,T1>::Metadata_V1_3C4572726F725061796C6F61643E
+M00000001_IL_009f:
+stloc local1
+M00000001_IL_00a0:
+ldloca local1
+M00000001_IL_00a2:
+call instance System.Result.Error<T1>::get_Value()
+M00000001_IL_00a7:
+box T1
+M00000001_IL_00ac:
+call System.Result<T0,T1>::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+M00000001_IL_00b1:
+call System.String::Concat(String,String)
+M00000001_IL_00b6:
+ldstr ")"
+M00000001_IL_00bb:
+call System.String::Concat(String,String)
+M00000001_IL_00c0:
+ret
+M00000001_IL_00c1:
+M00000001_IL_00c2:
+ldstr "\u003CUninitialized\u003E"
+M00000001_IL_00c7:
 ret
 .end
-.method static Error(T1 error) -> System.Result<T0,T1>
-M00000006_IL_0000:
-M00000006_IL_0001:
-M00000006_IL_0002:
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000002_IL_0000:
 ldarg 0
-M00000006_IL_0003:
-newobj instance System.Result.Error<T1>::.ctor(T1)
-M00000006_IL_0008:
-newobj instance System.Result<T0,T1>::.ctor(System.Result.Error<T1>)
-M00000006_IL_000d:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ref.isnull
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0004:
+brtrue M00000002_IL_000e
+M00000002_IL_0009:
+br M00000002_IL_0014
+M00000002_IL_000e:
+ldstr "null"
+M00000002_IL_0013:
+ret
+M00000002_IL_0014:
+M00000002_IL_0015:
+ldarg 0
+M00000002_IL_0016:
+isinst String
+M00000002_IL_001b:
+M00000002_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_001e:
+brtrue M00000002_IL_0028
+M00000002_IL_0023:
+br M00000002_IL_0043
+M00000002_IL_0028:
+ldstr "\u0022"
+M00000002_IL_002d:
+ldarg 0
+M00000002_IL_002e:
+castclass String
+M00000002_IL_0033:
+call System.String::Concat(String,String)
+M00000002_IL_0038:
+ldstr "\u0022"
+M00000002_IL_003d:
+call System.String::Concat(String,String)
+M00000002_IL_0042:
+ret
+M00000002_IL_0043:
+M00000002_IL_0044:
+ldarg 0
+M00000002_IL_0045:
+isinst Char
+M00000002_IL_004a:
+dup
+M00000002_IL_004b:
+ref.isnull
+brfalse M00000002_IL_0057
+M00000002_IL_0050:
+pop
+M00000002_IL_0051:
+ldc.i4 0
+M00000002_IL_0052:
+br M00000002_IL_005e
+M00000002_IL_0057:
+unbox.any Char
+M00000002_IL_005c:
+pop
+M00000002_IL_005d:
+ldc.i4 1
+M00000002_IL_005e:
+brtrue M00000002_IL_0068
+M00000002_IL_0063:
+br M00000002_IL_0083
+M00000002_IL_0068:
+ldstr "\u0027"
+M00000002_IL_006d:
+ldarg 0
+M00000002_IL_006e:
+call neoCLR.Library.System.Result.RuntimeReflection936F30A1978F475D(System.Object)
+M00000002_IL_0073:
+call System.String::Concat(String,String)
+M00000002_IL_0078:
+ldstr "\u0027"
+M00000002_IL_007d:
+call System.String::Concat(String,String)
+M00000002_IL_0082:
+ret
+M00000002_IL_0083:
+M00000002_IL_0084:
+ldarg 0
+M00000002_IL_0085:
+call neoCLR.Library.System.Result.RuntimeReflection936F30A1978F475D(System.Object)
+M00000002_IL_008a:
 ret
 .end
-.method instance .ctor(System.Result.Ok<T0> value) -> Void
-ldarg value
-value.pack System.Result.Ok<T0>
-newobj System.Result<T0,T1>
-starg this
+.method instance byref .ctor(System.Result.Ok<T0> value) -> Void
+.local Byte local0
+.local System.Result.Ok<T0> local1
+.local Byte unionDefault1_0
+.local System.Result.Ok<T0> unionDefault1_1
+.local System.Result.Error<T1> unionDefault1_2
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Result.Ok<T0>
+M00000003_IL_0000:
+ldarg 0
+M00000003_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Result<T0,T1>::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Result.Ok<T0>
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Result<T0,T1>::Metadata_V1_3C4F6B5061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Result.Error<T1>
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Result<T0,T1>::Metadata_V1_3C4572726F725061796C6F61643E
+pop
+M00000003_IL_0007:
+ldc.i4 1
+M00000003_IL_0008:
+stloc local0
+M00000003_IL_0009:
+ldarg 0
+M00000003_IL_000a:
+ldloc local0
+M00000003_IL_000b:
+conv.u1
+M00000003_IL_000c:
+stfld System.Result<T0,T1>::Metadata_V1_3C5461673E
+pop
+M00000003_IL_0011:
+ldarg 1
+M00000003_IL_0012:
+stloc local1
+M00000003_IL_0013:
+ldarg 0
+M00000003_IL_0014:
+ldloc local1
+M00000003_IL_0015:
+stfld System.Result<T0,T1>::Metadata_V1_3C4F6B5061796C6F61643E
+pop
+M00000003_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsOk() -> Boolean
-M00000008_IL_0000:
-M00000008_IL_0001:
-M00000008_IL_0002:
+.method instance byref TryGetValue(out(true) System.Result.Ok<T0>& value) -> Boolean
+M00000004_IL_0000:
 ldarg 0
-M00000008_IL_0003:
-ldfld System.Result<T0,T1>::Stored
-M00000008_IL_0008:
-value.is System.Result.Ok<T0>
+M00000004_IL_0001:
+ldfld System.Result<T0,T1>::Metadata_V1_3C5461673E
+M00000004_IL_0006:
+conv.i4
+M00000004_IL_0007:
+ldc.i4 1
+M00000004_IL_0008:
+conv.i4
+M00000004_IL_0009:
+ceq
 call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
-M00000008_IL_000d:
+M00000004_IL_000b:
+brtrue M00000004_IL_0015
+M00000004_IL_0010:
+br M00000004_IL_0023
+M00000004_IL_0015:
+ldarg 1
+M00000004_IL_0016:
+ldarg 0
+M00000004_IL_0017:
+ldfld System.Result<T0,T1>::Metadata_V1_3C4F6B5061796C6F61643E
+M00000004_IL_001c:
+stobj System.Result.Ok<T0>
+M00000004_IL_0021:
+ldc.bool true
+M00000004_IL_0022:
+ret
+M00000004_IL_0023:
+M00000004_IL_0024:
+ldc.bool false
+M00000004_IL_0025:
+ret
+.end
+.method instance byref .ctor(System.Result.Error<T1> value) -> Void
+.local Byte local0
+.local System.Result.Error<T1> local1
+.local Byte unionDefault1_0
+.local System.Result.Ok<T0> unionDefault1_1
+.local System.Result.Error<T1> unionDefault1_2
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Result.Error<T1>
+M00000005_IL_0000:
+ldarg 0
+M00000005_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Result<T0,T1>::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Result.Ok<T0>
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Result<T0,T1>::Metadata_V1_3C4F6B5061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Result.Error<T1>
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Result<T0,T1>::Metadata_V1_3C4572726F725061796C6F61643E
+pop
+M00000005_IL_0007:
+ldc.i4 2
+M00000005_IL_0008:
+stloc local0
+M00000005_IL_0009:
+ldarg 0
+M00000005_IL_000a:
+ldloc local0
+M00000005_IL_000b:
+conv.u1
+M00000005_IL_000c:
+stfld System.Result<T0,T1>::Metadata_V1_3C5461673E
+pop
+M00000005_IL_0011:
+ldarg 1
+M00000005_IL_0012:
+stloc local1
+M00000005_IL_0013:
+ldarg 0
+M00000005_IL_0014:
+ldloc local1
+M00000005_IL_0015:
+stfld System.Result<T0,T1>::Metadata_V1_3C4572726F725061796C6F61643E
+pop
+M00000005_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Result.Error<T1>& value) -> Boolean
+M00000006_IL_0000:
+ldarg 0
+M00000006_IL_0001:
+ldfld System.Result<T0,T1>::Metadata_V1_3C5461673E
+M00000006_IL_0006:
+conv.i4
+M00000006_IL_0007:
+ldc.i4 2
+M00000006_IL_0008:
+conv.i4
+M00000006_IL_0009:
+ceq
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_000b:
+brtrue M00000006_IL_0015
+M00000006_IL_0010:
+br M00000006_IL_0023
+M00000006_IL_0015:
+ldarg 1
+M00000006_IL_0016:
+ldarg 0
+M00000006_IL_0017:
+ldfld System.Result<T0,T1>::Metadata_V1_3C4572726F725061796C6F61643E
+M00000006_IL_001c:
+stobj System.Result.Error<T1>
+M00000006_IL_0021:
+ldc.bool true
+M00000006_IL_0022:
+ret
+M00000006_IL_0023:
+M00000006_IL_0024:
+ldc.bool false
+M00000006_IL_0025:
+ret
+.end
+.method instance readonly byref TryGetOutput(out T0& output) -> Boolean
+.local T0 local0
+.local T0 local1
+.local System.Result<T0,T1> local2
+.local System.Result.Ok<T0> local3
+ldloca local2
+initobj System.Result<T0,T1>
+ldloca local3
+initobj System.Result.Ok<T0>
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 1
+M00000007_IL_0003:
+ldloca local1
+M00000007_IL_0005:
+initobj T0
+M00000007_IL_000b:
+ldloc local1
+M00000007_IL_000c:
+stobj T0
+M00000007_IL_0011:
+M00000007_IL_0012:
+ldarg 0
+M00000007_IL_0013:
+ldobj System.Result<T0,T1>
+M00000007_IL_0018:
+stloc local2
+M00000007_IL_0019:
+ldloca local3
+M00000007_IL_001b:
+initobj System.Result.Ok<T0>
+M00000007_IL_0021:
+ldloca local2
+M00000007_IL_0023:
+ldloca local3
+M00000007_IL_0025:
+call instance System.Result<T0,T1>::TryGetValue(System.Result.Ok<T0>&)
+M00000007_IL_002a:
+brfalse M00000007_IL_0043
+M00000007_IL_002f:
+ldloca local3
+M00000007_IL_0031:
+call instance System.Result.Ok<T0>::get_Value()
+M00000007_IL_0036:
+stloc local0
+M00000007_IL_0037:
+M00000007_IL_0038:
+br M00000007_IL_0048
+M00000007_IL_0043:
+br M00000007_IL_0053
+M00000007_IL_0048:
+M00000007_IL_0049:
+ldarg 1
+M00000007_IL_004a:
+ldloc local0
+M00000007_IL_004b:
+stobj T0
+M00000007_IL_0050:
+M00000007_IL_0051:
+ldc.i4 1
+M00000007_IL_0052:
+call neoCLR.Library.System.Result.RuntimeBooleanFromInt32(Int32)
+ret
+M00000007_IL_0053:
+M00000007_IL_0054:
+M00000007_IL_0055:
+ldc.i4 0
+M00000007_IL_0056:
 call neoCLR.Library.System.Result.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetOkCase() -> System.Result.Ok<T0>
+.method instance readonly byref TryGetResidual(out T1& residual) -> Boolean
+.local T1 local0
+.local T1 local1
+.local System.Result<T0,T1> local2
+.local System.Result.Error<T1> local3
+ldloca local2
+initobj System.Result<T0,T1>
+ldloca local3
+initobj System.Result.Error<T1>
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 1
+M00000008_IL_0003:
+ldloca local1
+M00000008_IL_0005:
+initobj T1
+M00000008_IL_000b:
+ldloc local1
+M00000008_IL_000c:
+stobj T1
+M00000008_IL_0011:
+M00000008_IL_0012:
+ldarg 0
+M00000008_IL_0013:
+ldobj System.Result<T0,T1>
+M00000008_IL_0018:
+stloc local2
+M00000008_IL_0019:
+ldloca local3
+M00000008_IL_001b:
+initobj System.Result.Error<T1>
+M00000008_IL_0021:
+ldloca local2
+M00000008_IL_0023:
+ldloca local3
+M00000008_IL_0025:
+call instance System.Result<T0,T1>::TryGetValue(System.Result.Error<T1>&)
+M00000008_IL_002a:
+brfalse M00000008_IL_0043
+M00000008_IL_002f:
+ldloca local3
+M00000008_IL_0031:
+call instance System.Result.Error<T1>::get_Value()
+M00000008_IL_0036:
+stloc local0
+M00000008_IL_0037:
+M00000008_IL_0038:
+br M00000008_IL_0048
+M00000008_IL_0043:
+br M00000008_IL_0053
+M00000008_IL_0048:
+M00000008_IL_0049:
+ldarg 1
+M00000008_IL_004a:
+ldloc local0
+M00000008_IL_004b:
+stobj T1
+M00000008_IL_0050:
+M00000008_IL_0051:
+ldc.i4 1
+M00000008_IL_0052:
+call neoCLR.Library.System.Result.RuntimeBooleanFromInt32(Int32)
+ret
+M00000008_IL_0053:
+M00000008_IL_0054:
+M00000008_IL_0055:
+ldc.i4 0
+M00000008_IL_0056:
+call neoCLR.Library.System.Result.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static FromResidual(T1 residual) -> System.Result<T0,T1>
 M00000009_IL_0000:
 M00000009_IL_0001:
 M00000009_IL_0002:
 ldarg 0
 M00000009_IL_0003:
-ldfld System.Result<T0,T1>::Stored
+newobj instance System.Result.Error<T1>::.ctor(T1)
 M00000009_IL_0008:
-value.unpack System.Result.Ok<T0>
+newobj instance System.Result<T0,T1>::.ctor(System.Result.Error<T1>)
 M00000009_IL_000d:
 ret
 .end
-.method instance TryGet(out(true) System.Result.Ok<T0>& destination) -> Boolean
+.method instance byref get_Value() -> System.Object
 M0000000a_IL_0000:
+ldarg 0
 M0000000a_IL_0001:
-M0000000a_IL_0002:
-ldarg 0
-M0000000a_IL_0003:
-call instance System.Result<T0,T1>::get_IsOk()
-call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+ldfld System.Result<T0,T1>::Metadata_V1_3C5461673E
+M0000000a_IL_0006:
+conv.i4
+M0000000a_IL_0007:
+ldc.i4 1
 M0000000a_IL_0008:
-brtrue M0000000a_IL_0012
-M0000000a_IL_000d:
-br M0000000a_IL_0022
-M0000000a_IL_0012:
-M0000000a_IL_0013:
-ldarg 1
-M0000000a_IL_0014:
-ldarg 0
+conv.i4
+M0000000a_IL_0009:
+ceq
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_000b:
+brtrue M0000000a_IL_0015
+M0000000a_IL_0010:
+br M0000000a_IL_0021
 M0000000a_IL_0015:
-call instance System.Result<T0,T1>::GetOkCase()
-M0000000a_IL_001a:
-stobj System.Result.Ok<T0>
-M0000000a_IL_001f:
+ldarg 0
+M0000000a_IL_0016:
+ldfld System.Result<T0,T1>::Metadata_V1_3C4F6B5061796C6F61643E
+M0000000a_IL_001b:
+box System.Result.Ok<T0>
 M0000000a_IL_0020:
-ldc.bool true
+ret
 M0000000a_IL_0021:
-ret
 M0000000a_IL_0022:
+ldarg 0
 M0000000a_IL_0023:
-M0000000a_IL_0024:
-ldarg 1
-M0000000a_IL_0025:
-pop
+ldfld System.Result<T0,T1>::Metadata_V1_3C5461673E
+M0000000a_IL_0028:
+conv.i4
+M0000000a_IL_0029:
+ldc.i4 2
 M0000000a_IL_002a:
+conv.i4
 M0000000a_IL_002b:
-ldc.bool false
-M0000000a_IL_002c:
-ret
-.end
-.method instance .ctor(System.Result.Error<T1> value) -> Void
-ldarg value
-value.pack System.Result.Error<T1>
-newobj System.Result<T0,T1>
-starg this
-ldvoid
-ret
-.end
-.method instance get_IsErr() -> Boolean
-M0000000c_IL_0000:
-M0000000c_IL_0001:
-M0000000c_IL_0002:
-ldarg 0
-M0000000c_IL_0003:
-ldfld System.Result<T0,T1>::Stored
-M0000000c_IL_0008:
-value.is System.Result.Error<T1>
+ceq
 call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_000d:
+M0000000a_IL_002d:
+brtrue M0000000a_IL_0037
+M0000000a_IL_0032:
+br M0000000a_IL_0043
+M0000000a_IL_0037:
+ldarg 0
+M0000000a_IL_0038:
+ldfld System.Result<T0,T1>::Metadata_V1_3C4572726F725061796C6F61643E
+M0000000a_IL_003d:
+box System.Result.Error<T1>
+M0000000a_IL_0042:
+ret
+M0000000a_IL_0043:
+M0000000a_IL_0044:
+M0000000a_IL_0045:
+call neoCLR.Library.System.Result.DefaultReference53797374656D2E4F626A656374()
+ret
+.end
+.method instance byref get_HasValue() -> Boolean
+M0000000b_IL_0000:
+ldarg 0
+M0000000b_IL_0001:
+call instance System.Result<T0,T1>::get_Value()
+M0000000b_IL_0006:
+M0000000b_IL_0007:
+ref.isnull
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_0009:
+ldc.i4 0
+M0000000b_IL_000a:
+ceq
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_000c:
 call neoCLR.Library.System.Result.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method instance GetErrorCase() -> System.Result.Error<T1>
-M0000000d_IL_0000:
-M0000000d_IL_0001:
-M0000000d_IL_0002:
-ldarg 0
-M0000000d_IL_0003:
-ldfld System.Result<T0,T1>::Stored
-M0000000d_IL_0008:
-value.unpack System.Result.Error<T1>
-M0000000d_IL_000d:
-ret
-.end
-.method instance TryGet(out(true) System.Result.Error<T1>& destination) -> Boolean
-M0000000e_IL_0000:
-M0000000e_IL_0001:
-M0000000e_IL_0002:
-ldarg 0
-M0000000e_IL_0003:
-call instance System.Result<T0,T1>::get_IsErr()
-call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
-M0000000e_IL_0008:
-brtrue M0000000e_IL_0012
-M0000000e_IL_000d:
-br M0000000e_IL_0022
-M0000000e_IL_0012:
-M0000000e_IL_0013:
-ldarg 1
-M0000000e_IL_0014:
-ldarg 0
-M0000000e_IL_0015:
-call instance System.Result<T0,T1>::GetErrorCase()
-M0000000e_IL_001a:
-stobj System.Result.Error<T1>
-M0000000e_IL_001f:
-M0000000e_IL_0020:
-ldc.bool true
-M0000000e_IL_0021:
-ret
-M0000000e_IL_0022:
-M0000000e_IL_0023:
-M0000000e_IL_0024:
-ldarg 1
-M0000000e_IL_0025:
-pop
-M0000000e_IL_002a:
-M0000000e_IL_002b:
-ldc.bool false
-M0000000e_IL_002c:
-ret
-.end
-.method instance get_IsOkCase() -> Boolean
-M0000000f_IL_0000:
-M0000000f_IL_0001:
-M0000000f_IL_0002:
-ldarg 0
-M0000000f_IL_0003:
-call instance System.Result<T0,T1>::get_IsOk()
-call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
-M0000000f_IL_0008:
-call neoCLR.Library.System.Result.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method instance get_IsErrorCase() -> Boolean
-M00000010_IL_0000:
-M00000010_IL_0001:
-M00000010_IL_0002:
-ldarg 0
-M00000010_IL_0003:
-call instance System.Result<T0,T1>::get_IsErr()
-call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
-M00000010_IL_0008:
-call neoCLR.Library.System.Result.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method instance readonly byref TryGetOutput(out(true) T0& destination) -> Boolean
-.local System.Result.Ok<T0> local0
-M00000011_IL_0000:
-M00000011_IL_0001:
-M00000011_IL_0002:
-ldarg 0
-M00000011_IL_0003:
-call neoCLR.Library.System.Result.RuntimeCliCall0<T0,T1>(System.Result<T0,T1>&)
-call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
-M00000011_IL_0008:
-brtrue M00000011_IL_0012
-M00000011_IL_000d:
-br M00000011_IL_002a
-M00000011_IL_0012:
-M00000011_IL_0013:
-ldarg 1
-M00000011_IL_0014:
-ldarg 0
-M00000011_IL_0015:
-call neoCLR.Library.System.Result.RuntimeCliCall1<T0,T1>(System.Result<T0,T1>&)
-M00000011_IL_001a:
-stloc local0
-M00000011_IL_001b:
-ldloca local0
-M00000011_IL_001d:
-call neoCLR.Library.System.Result.RuntimeCliCall2<T0>(System.Result.Ok<T0>&)
-M00000011_IL_0022:
-stobj T0
-M00000011_IL_0027:
-M00000011_IL_0028:
-ldc.bool true
-M00000011_IL_0029:
-ret
-M00000011_IL_002a:
-M00000011_IL_002b:
-M00000011_IL_002c:
-ldarg 1
-M00000011_IL_002d:
-pop
-M00000011_IL_0032:
-M00000011_IL_0033:
-ldc.bool false
-M00000011_IL_0034:
-ret
-.end
-.method instance readonly byref TryGetResidual(out(true) T1& destination) -> Boolean
-.local System.Result.Error<T1> local0
-M00000012_IL_0000:
-M00000012_IL_0001:
-M00000012_IL_0002:
-ldarg 0
-M00000012_IL_0003:
-call neoCLR.Library.System.Result.RuntimeCliCall3<T0,T1>(System.Result<T0,T1>&)
-call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
-M00000012_IL_0008:
-brtrue M00000012_IL_0012
-M00000012_IL_000d:
-br M00000012_IL_002a
-M00000012_IL_0012:
-M00000012_IL_0013:
-ldarg 1
-M00000012_IL_0014:
-ldarg 0
-M00000012_IL_0015:
-call neoCLR.Library.System.Result.RuntimeCliCall4<T0,T1>(System.Result<T0,T1>&)
-M00000012_IL_001a:
-stloc local0
-M00000012_IL_001b:
-ldloca local0
-M00000012_IL_001d:
-call neoCLR.Library.System.Result.RuntimeCliCall5<T1>(System.Result.Error<T1>&)
-M00000012_IL_0022:
-stobj T1
-M00000012_IL_0027:
-M00000012_IL_0028:
-ldc.bool true
-M00000012_IL_0029:
-ret
-M00000012_IL_002a:
-M00000012_IL_002b:
-M00000012_IL_002c:
-ldarg 1
-M00000012_IL_002d:
-pop
-M00000012_IL_0032:
-M00000012_IL_0033:
-ldc.bool false
-M00000012_IL_0034:
-ret
-.end
-.method static FromResidual(T1 residual) -> System.Result<T0,T1>
-M00000013_IL_0000:
-M00000013_IL_0001:
-M00000013_IL_0002:
-ldarg 0
-M00000013_IL_0003:
-call System.Result<T0,T1>::Error(T1)
-M00000013_IL_0008:
 ret
 .end
 .end
@@ -310,21 +657,179 @@ ret
 .property instance Value() -> T0
 .get instance System.Result.Ok<T0>::get_Value()
 .end
-.method instance .ctor(T0 value) -> Void
-ldarg value
-newobj System.Result.Ok<T0>
-starg this
+.method instance byref .ctor(T0 value) -> Void
+.local T0 local0
+.local T0 unionDefault1_0
+M0000000c_IL_0000:
+ldarg 0
+M0000000c_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj T0
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Result.Ok<T0>::Value
+pop
+M0000000c_IL_0007:
+M0000000c_IL_0008:
+ldarg 1
+M0000000c_IL_0009:
+stloc local0
+M0000000c_IL_000a:
+ldarg 0
+M0000000c_IL_000b:
+ldloc local0
+M0000000c_IL_000c:
+stfld System.Result.Ok<T0>::Value
+pop
+M0000000c_IL_0011:
 ldvoid
 ret
 .end
-.method instance get_Value() -> T0
-M00000002_IL_0000:
-M00000002_IL_0001:
-M00000002_IL_0002:
+.method instance byref get_Value() -> T0
+M0000000d_IL_0000:
+M0000000d_IL_0001:
 ldarg 0
-M00000002_IL_0003:
+M0000000d_IL_0002:
 ldfld System.Result.Ok<T0>::Value
-M00000002_IL_0008:
+M0000000d_IL_0007:
+ret
+.end
+.method instance byref Deconstruct(out T0& Value) -> Void
+M0000000e_IL_0000:
+ldarg 1
+M0000000e_IL_0001:
+ldarg 0
+M0000000e_IL_0002:
+call instance System.Result.Ok<T0>::get_Value()
+M0000000e_IL_0007:
+stobj T0
+M0000000e_IL_000c:
+ldvoid
+ret
+.end
+.method instance override byref ToString() -> String
+M0000000f_IL_0000:
+ldstr "Result"
+M0000000f_IL_0005:
+ldstr "."
+M0000000f_IL_000a:
+call System.String::Concat(String,String)
+M0000000f_IL_000f:
+ldstr "Ok"
+M0000000f_IL_0014:
+call System.String::Concat(String,String)
+M0000000f_IL_0019:
+ldstr "("
+M0000000f_IL_001e:
+call System.String::Concat(String,String)
+M0000000f_IL_0023:
+ldarg 0
+M0000000f_IL_0024:
+call instance System.Result.Ok<T0>::get_Value()
+M0000000f_IL_0029:
+box T0
+M0000000f_IL_002e:
+call System.Result.Ok<T0>::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+M0000000f_IL_0033:
+call System.String::Concat(String,String)
+M0000000f_IL_0038:
+ldstr ")"
+M0000000f_IL_003d:
+call System.String::Concat(String,String)
+M0000000f_IL_0042:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000010_IL_0000:
+ldarg 0
+M00000010_IL_0001:
+M00000010_IL_0002:
+ref.isnull
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_0004:
+brtrue M00000010_IL_000e
+M00000010_IL_0009:
+br M00000010_IL_0014
+M00000010_IL_000e:
+ldstr "null"
+M00000010_IL_0013:
+ret
+M00000010_IL_0014:
+M00000010_IL_0015:
+ldarg 0
+M00000010_IL_0016:
+isinst String
+M00000010_IL_001b:
+M00000010_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_001e:
+brtrue M00000010_IL_0028
+M00000010_IL_0023:
+br M00000010_IL_0043
+M00000010_IL_0028:
+ldstr "\u0022"
+M00000010_IL_002d:
+ldarg 0
+M00000010_IL_002e:
+castclass String
+M00000010_IL_0033:
+call System.String::Concat(String,String)
+M00000010_IL_0038:
+ldstr "\u0022"
+M00000010_IL_003d:
+call System.String::Concat(String,String)
+M00000010_IL_0042:
+ret
+M00000010_IL_0043:
+M00000010_IL_0044:
+ldarg 0
+M00000010_IL_0045:
+isinst Char
+M00000010_IL_004a:
+dup
+M00000010_IL_004b:
+ref.isnull
+brfalse M00000010_IL_0057
+M00000010_IL_0050:
+pop
+M00000010_IL_0051:
+ldc.i4 0
+M00000010_IL_0052:
+br M00000010_IL_005e
+M00000010_IL_0057:
+unbox.any Char
+M00000010_IL_005c:
+pop
+M00000010_IL_005d:
+ldc.i4 1
+M00000010_IL_005e:
+brtrue M00000010_IL_0068
+M00000010_IL_0063:
+br M00000010_IL_0083
+M00000010_IL_0068:
+ldstr "\u0027"
+M00000010_IL_006d:
+ldarg 0
+M00000010_IL_006e:
+call neoCLR.Library.System.Result.RuntimeReflection936F30A1978F475D(System.Object)
+M00000010_IL_0073:
+call System.String::Concat(String,String)
+M00000010_IL_0078:
+ldstr "\u0027"
+M00000010_IL_007d:
+call System.String::Concat(String,String)
+M00000010_IL_0082:
+ret
+M00000010_IL_0083:
+M00000010_IL_0084:
+ldarg 0
+M00000010_IL_0085:
+call neoCLR.Library.System.Result.RuntimeReflection936F30A1978F475D(System.Object)
+M00000010_IL_008a:
 ret
 .end
 .end
@@ -334,21 +839,179 @@ ret
 .property instance Value() -> T0
 .get instance System.Result.Error<T0>::get_Value()
 .end
-.method instance .ctor(T0 value) -> Void
-ldarg value
-newobj System.Result.Error<T0>
-starg this
+.method instance byref .ctor(T0 value) -> Void
+.local T0 local0
+.local T0 unionDefault1_0
+M00000011_IL_0000:
+ldarg 0
+M00000011_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj T0
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Result.Error<T0>::Value
+pop
+M00000011_IL_0007:
+M00000011_IL_0008:
+ldarg 1
+M00000011_IL_0009:
+stloc local0
+M00000011_IL_000a:
+ldarg 0
+M00000011_IL_000b:
+ldloc local0
+M00000011_IL_000c:
+stfld System.Result.Error<T0>::Value
+pop
+M00000011_IL_0011:
 ldvoid
 ret
 .end
-.method instance get_Value() -> T0
-M00000004_IL_0000:
-M00000004_IL_0001:
-M00000004_IL_0002:
+.method instance byref get_Value() -> T0
+M00000012_IL_0000:
+M00000012_IL_0001:
 ldarg 0
-M00000004_IL_0003:
+M00000012_IL_0002:
 ldfld System.Result.Error<T0>::Value
-M00000004_IL_0008:
+M00000012_IL_0007:
+ret
+.end
+.method instance byref Deconstruct(out T0& Value) -> Void
+M00000013_IL_0000:
+ldarg 1
+M00000013_IL_0001:
+ldarg 0
+M00000013_IL_0002:
+call instance System.Result.Error<T0>::get_Value()
+M00000013_IL_0007:
+stobj T0
+M00000013_IL_000c:
+ldvoid
+ret
+.end
+.method instance override byref ToString() -> String
+M00000014_IL_0000:
+ldstr "Result"
+M00000014_IL_0005:
+ldstr "."
+M00000014_IL_000a:
+call System.String::Concat(String,String)
+M00000014_IL_000f:
+ldstr "Error"
+M00000014_IL_0014:
+call System.String::Concat(String,String)
+M00000014_IL_0019:
+ldstr "("
+M00000014_IL_001e:
+call System.String::Concat(String,String)
+M00000014_IL_0023:
+ldarg 0
+M00000014_IL_0024:
+call instance System.Result.Error<T0>::get_Value()
+M00000014_IL_0029:
+box T0
+M00000014_IL_002e:
+call System.Result.Error<T0>::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+M00000014_IL_0033:
+call System.String::Concat(String,String)
+M00000014_IL_0038:
+ldstr ")"
+M00000014_IL_003d:
+call System.String::Concat(String,String)
+M00000014_IL_0042:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000015_IL_0000:
+ldarg 0
+M00000015_IL_0001:
+M00000015_IL_0002:
+ref.isnull
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M00000015_IL_0004:
+brtrue M00000015_IL_000e
+M00000015_IL_0009:
+br M00000015_IL_0014
+M00000015_IL_000e:
+ldstr "null"
+M00000015_IL_0013:
+ret
+M00000015_IL_0014:
+M00000015_IL_0015:
+ldarg 0
+M00000015_IL_0016:
+isinst String
+M00000015_IL_001b:
+M00000015_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M00000015_IL_001e:
+brtrue M00000015_IL_0028
+M00000015_IL_0023:
+br M00000015_IL_0043
+M00000015_IL_0028:
+ldstr "\u0022"
+M00000015_IL_002d:
+ldarg 0
+M00000015_IL_002e:
+castclass String
+M00000015_IL_0033:
+call System.String::Concat(String,String)
+M00000015_IL_0038:
+ldstr "\u0022"
+M00000015_IL_003d:
+call System.String::Concat(String,String)
+M00000015_IL_0042:
+ret
+M00000015_IL_0043:
+M00000015_IL_0044:
+ldarg 0
+M00000015_IL_0045:
+isinst Char
+M00000015_IL_004a:
+dup
+M00000015_IL_004b:
+ref.isnull
+brfalse M00000015_IL_0057
+M00000015_IL_0050:
+pop
+M00000015_IL_0051:
+ldc.i4 0
+M00000015_IL_0052:
+br M00000015_IL_005e
+M00000015_IL_0057:
+unbox.any Char
+M00000015_IL_005c:
+pop
+M00000015_IL_005d:
+ldc.i4 1
+M00000015_IL_005e:
+brtrue M00000015_IL_0068
+M00000015_IL_0063:
+br M00000015_IL_0083
+M00000015_IL_0068:
+ldstr "\u0027"
+M00000015_IL_006d:
+ldarg 0
+M00000015_IL_006e:
+call neoCLR.Library.System.Result.RuntimeReflection936F30A1978F475D(System.Object)
+M00000015_IL_0073:
+call System.String::Concat(String,String)
+M00000015_IL_0078:
+ldstr "\u0027"
+M00000015_IL_007d:
+call System.String::Concat(String,String)
+M00000015_IL_0082:
+ret
+M00000015_IL_0083:
+M00000015_IL_0084:
+ldarg 0
+M00000015_IL_0085:
+call neoCLR.Library.System.Result.RuntimeReflection936F30A1978F475D(System.Object)
+M00000015_IL_008a:
 ret
 .end
 .end

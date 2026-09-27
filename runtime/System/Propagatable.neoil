@@ -1,3 +1,2 @@
-; Raven owns the existing readonly conditional-output declaration.
-.include "../raven/generated/Propagatable.methods.neoil"
-.include "../raven/generated/Propagatable.helpers.neoil"
+; Historical Neo bootstrap conditional-output contract.
+.include "../legacy/Propagatable.neoil"

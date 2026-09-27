@@ -85,7 +85,7 @@ ldfld System.Data.Json.JsonError.Syntax::Metadata_V1_3C6D6573736167653E6B5F5F426
 M0000001e_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(String& Message) -> Void
+.method instance byref Deconstruct(out String& Message) -> Void
 M0000001f_IL_0000:
 ldarg 1
 M0000001f_IL_0001:
@@ -266,7 +266,7 @@ ldfld System.Data.Json.JsonError.LimitExceeded::Metadata_V1_3C6D6573736167653E6B
 M00000023_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(String& Message) -> Void
+.method instance byref Deconstruct(out String& Message) -> Void
 M00000024_IL_0000:
 ldarg 1
 M00000024_IL_0001:
@@ -447,7 +447,7 @@ ldfld System.Data.Json.JsonError.TypeMismatch::Metadata_V1_3C65787065637465643E6
 M00000028_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(String& Expected) -> Void
+.method instance byref Deconstruct(out String& Expected) -> Void
 M00000029_IL_0000:
 ldarg 1
 M00000029_IL_0001:
@@ -628,7 +628,7 @@ ldfld System.Data.Json.JsonError.MissingField::Metadata_V1_3C6E616D653E6B5F5F426
 M0000002d_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(String& Name) -> Void
+.method instance byref Deconstruct(out String& Name) -> Void
 M0000002e_IL_0000:
 ldarg 1
 M0000002e_IL_0001:
@@ -809,7 +809,7 @@ ldfld System.Data.Json.JsonError.DuplicateField::Metadata_V1_3C6E616D653E6B5F5F4
 M00000032_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(String& Name) -> Void
+.method instance byref Deconstruct(out String& Name) -> Void
 M00000033_IL_0000:
 ldarg 1
 M00000033_IL_0001:
@@ -992,7 +992,7 @@ ldfld System.Data.Json.JsonError.InvalidIndex::Metadata_V1_3C696E6465783E6B5F5F4
 M00000037_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(Int32& Index) -> Void
+.method instance byref Deconstruct(out Int32& Index) -> Void
 M00000038_IL_0000:
 ldarg 1
 M00000038_IL_0001:
@@ -1414,7 +1414,7 @@ ldfld System.Data.Json.JsonError.Read::Metadata_V1_3C726561736F6E3E6B5F5F4261636
 M00000042_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(System.IO.TextReadError& Reason) -> Void
+.method instance byref Deconstruct(out System.IO.TextReadError& Reason) -> Void
 M00000043_IL_0000:
 ldarg 1
 M00000043_IL_0001:
@@ -1598,7 +1598,7 @@ ldfld System.Data.Json.JsonError.Write::Metadata_V1_3C726561736F6E3E6B5F5F426163
 M00000047_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(System.IO.StreamError& Reason) -> Void
+.method instance byref Deconstruct(out System.IO.StreamError& Reason) -> Void
 M00000048_IL_0000:
 ldarg 1
 M00000048_IL_0001:
@@ -1782,7 +1782,7 @@ ldfld System.Data.Json.JsonError.Reflection::Metadata_V1_3C726561736F6E3E6B5F5F4
 M0000004c_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(System.Runtime.Reflection.ReflectionError& Reason) -> Void
+.method instance byref Deconstruct(out System.Runtime.Reflection.ReflectionError& Reason) -> Void
 M0000004d_IL_0000:
 ldarg 1
 M0000004d_IL_0001:
@@ -1964,7 +1964,7 @@ ldfld System.Data.Json.JsonError.UnsupportedMapping::Metadata_V1_3C6D65737361676
 M00000051_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(String& Message) -> Void
+.method instance byref Deconstruct(out String& Message) -> Void
 M00000052_IL_0000:
 ldarg 1
 M00000052_IL_0001:

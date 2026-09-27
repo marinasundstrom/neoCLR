@@ -8,6 +8,20 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Migrate Option, Result and TaskOutcome to standard Raven unions, using Raven.Core
+  as the Option/Result reference. Generated IUnion.Value boxes the active case;
+  HasValue distinguishes inactive defaults and TryGetValue preserves unmatched outputs.
+  Rebuild consumers: manual Is*/Get* and TryGet aliases and mutable case payloads
+  are removed. Propagation output methods initialize their outputs on both branches.
+  Support default delegate storage in generated carriers and Object dispatch on
+  closed generic boxed values; open generic Object reachability remains rejected.
+  Preserve the separate Neo bootstrap ABI with frozen legacy fragments. The Raven
+  runtime audit finds no further manual union carriers. Combined union checks, 24
+  task pipeline cases, seven runtime task tests and 94 affected/prerequisite tests
+  pass, alongside ten focused Raven metadata tests. API snapshot, 18 website tests
+  and the 1,025-page build pass. Boxed Completed pattern binding retains a documented
+  compiler limitation; an explicit closed-case cast works. Package qualification remains.
+
 - Fix the socket test byte-array spelling flagged by Rust 1.98 Clippy in release CI.
   Wait for Winsock readiness before reporting a nonblocking connect as successful;
   retain portable TCP backpressure checks without assuming the kernel must short-write.

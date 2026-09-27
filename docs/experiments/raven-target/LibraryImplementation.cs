@@ -13,7 +13,7 @@ static class LibraryImplementation
         PrimitiveLibrary.IsMatched(method.DeclaringType.Resolve())
         && method.DeclaringType.FullName == "System.Int32" && method.Name == "ToString"
         && method.HasThis && !method.HasParameters && method.ReturnType.MetadataType == MetadataType.String;
-    public static bool IsReadonlyReceiver(MethodDefinition method) => (GenericUnionLibrary.IsMatched(method.DeclaringType) && method.Name is "TryGetOutput" or "TryGetResidual" || ReadonlyReceivers.Contains(method) || OpaqueLibrary.IsByRefString(method))
+    public static bool IsReadonlyReceiver(MethodDefinition method) => (GenericUnionLibrary.IsCarrier(method.DeclaringType) && ApplicationTypes.IsLibrary(method.DeclaringType) && method.Name is "TryGetOutput" or "TryGetResidual" || ReadonlyReceivers.Contains(method) || OpaqueLibrary.IsByRefString(method))
         && !IsByValueReceiver(method);
     public static MethodDefinition[] Roots(ModuleDefinition source, ModuleDefinition core, string owner)
     {
@@ -86,7 +86,10 @@ static class LibraryImplementation
             return InstanceRoots(source.GetType(provider), core.GetType(provider), provider);
         }
         if (owner is "System.Option" or "System.Result" or "System.Tasks.TaskOutcome")
-            return GenericUnionLibrary.Roots(source, core, owner, InstanceRoots);
+        {
+            var name = owner + (owner == "System.Result" ? "`2" : "`1");
+            return StandardUnionLibrary.Roots(source.GetType(name), core.GetType(name));
+        }
         var consoleProviders = Array.Empty<MethodDefinition>();
         if (owner == "System.Console") {
             var names = new[] { "System.IO.ConsoleInputStream", "System.IO.ConsoleOutputStream" };
@@ -161,7 +164,7 @@ static class LibraryImplementation
                     || !m.IsNewSlot || m.IsFinal || m.IsStatic || m.IsConstructor || m.HasBody
                     || m.HasGenericParameters || m.ExplicitThis || m.HasOverrides
                     || m.CallingConvention != MethodCallingConvention.Default
-                    || m.Parameters.Any(p => (p.IsOut || p.ParameterType.IsByReference) && !PropagationLibrary.IsConditionalOutput(m, p))))
+                    || m.Parameters.Any(p => (p.IsOut || p.ParameterType.IsByReference) && !PropagationLibrary.IsOutput(m, p))))
                 throw new InvalidDataException("Unsupported library interface contract.");
         // Self-referential interface signatures (for example EquatableTo<TypeInfo>)
         // use this explicitly selected source/reference pair during validation.

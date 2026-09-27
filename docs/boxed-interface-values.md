@@ -70,3 +70,16 @@ Five optimized reference box/unbox checks pass, including GC and null/string cas
 The corresponding C# .NET 11 generic boxing comparison preserves reference/null
 identity and the integer value. The runtime is still an interpreter with the String
 representation cost noted above.
+
+## Closed generic value overrides — 2026-09-27
+
+Closed generic value types can implement Object slots, including the ToString
+methods emitted for standard unions. Runtime dispatch closes the method against
+the actual boxed type and retains the existing managed-receiver checks, matching
+CLR boxed value dispatch. This removes the nongeneric-only admission guard.
+
+Static call-graph analysis still cannot enumerate open generic value overrides.
+It rejects affected Object dispatch queries explicitly rather than reporting an
+incomplete set of targets. Execution and typed verification support the closed
+calls; broader graph inference remains future work. The focused generic boxed
+GetHashCode test covers execution and this conservative graph boundary.

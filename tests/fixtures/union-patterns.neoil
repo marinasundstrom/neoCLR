@@ -1,0 +1,49 @@
+; Test-only pattern extraction against the generated union contract.
+.function UnwrapSome<T0>(System.Option<T0> value) -> T0
+.local System.Option.Some<T0> matched
+ldarga value
+ldloca matched
+call instance System.Option<T0>::TryGetValue(System.Option.Some<T0>&)
+brtrue Found
+fault "Expected Some"
+Found:
+ldloca matched
+call instance System.Option.Some<T0>::get_Value()
+ret
+.end
+.function UnwrapOk<T0,T1>(System.Result<T0,T1> value) -> T0
+.local System.Result.Ok<T0> matched
+ldarga value
+ldloca matched
+call instance System.Result<T0,T1>::TryGetValue(System.Result.Ok<T0>&)
+brtrue Found
+fault "Expected Ok"
+Found:
+ldloca matched
+call instance System.Result.Ok<T0>::get_Value()
+ret
+.end
+.function UnwrapError<T0,T1>(System.Result<T0,T1> value) -> T1
+.local System.Result.Error<T1> matched
+ldarga value
+ldloca matched
+call instance System.Result<T0,T1>::TryGetValue(System.Result.Error<T1>&)
+brtrue Found
+fault "Expected Error"
+Found:
+ldloca matched
+call instance System.Result.Error<T1>::get_Value()
+ret
+.end
+.function IsNone<T0>(System.Option<T0> value) -> Boolean
+.local System.Option.None matched
+ldarga value
+ldloca matched
+call instance System.Option<T0>::TryGetValue(System.Option.None&)
+brtrue Found
+ldc.bool false
+ret
+Found:
+ldc.bool true
+ret
+.end

@@ -469,9 +469,35 @@ fn unbox_reference_string_upcast_collects_before_allocation() {
 }
 
 #[test]
-fn named_struct_generic_object_overrides_are_rejected_until_reachability_is_closed() {
-    let declarations = STRUCT_KEY.replace(".type Key", ".type Key<T>");
-    assert!(run("ldc.i4 0", &declarations, "Int32", 8).is_err());
+fn named_struct_generic_object_overrides_dispatch_from_closed_boxes() {
+    let declarations = STRUCT_KEY
+        .replace(".type Key", ".type Key<T>")
+        .replace("Key::", "Key<T>::");
+    let body = "ldc.i4 42\nnewobj Key<Int32>\nbox Key<Int32>\ncallvirt instance System.Object::GetHashCode()";
+    assert_eq!(
+        run(body, &declarations, "Int32", 8).unwrap().value,
+        Value::Int32(42)
+    );
+    let source =
+        format!(".module GenericBox\n{declarations}\n.function Main() -> Int32\n{body}\nret\n.end");
+    let app = neoclr::assembler::read_modules(
+        &[neoclr::assembler::ModuleInput::Source(&source)],
+        library(),
+    )
+    .unwrap()
+    .remove(0);
+    let program = LoadedProgram::with_library(&app, library()).unwrap();
+    let fault = program
+        .analyze_reachability(
+            &[neoclr::assembler::parse_function_ref("Main()").unwrap()],
+            32,
+        )
+        .unwrap_err();
+    assert!(
+        fault
+            .message
+            .contains("cannot infer generic value overrides")
+    );
 }
 
 #[test]

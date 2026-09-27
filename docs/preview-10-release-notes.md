@@ -49,6 +49,9 @@ Raven's ordinary .NET toolbar is not the neoCLR execution path.
 - Provider-bound Storage, synchronous file/memory byte streams, text readers/writers
   and standard console streams. Tasks and cooperative cancellation tokens support
   operation completion; runtime-owned suspension remains future work.
+- Standard Raven Option, Result and TaskOutcome unions with generated IUnion,
+  boxed active cases, HasValue and typed TryGetValue. Option/Result support propagation;
+  task cancellation remains distinct from a completed error value.
 - Object/reference/value contracts, record classes/structs, shared immutable String
   storage, grapheme indexing and explicit execution-local interning; bounded metadata
   discovery and constructor/property reflection support the JSON mapper.

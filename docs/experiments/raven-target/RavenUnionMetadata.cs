@@ -37,6 +37,27 @@ static class RavenUnionMetadata
         return name;
     }
 
+    public static TypeDefinition[] Family(TypeDefinition carrier)
+    {
+        var cases = Cases(carrier);
+        if (cases.Length == 0 || cases.Where((c, i) => c.Ordinal != i).Any())
+            throw new InvalidDataException("Incomplete Raven union case metadata.");
+        var companion = carrier.HasGenericParameters
+            ? carrier.Module.Types.SingleOrDefault(t => CompanionTarget(t) == carrier.FullName)
+                ?? throw new InvalidDataException("Missing generic union companion.")
+            : carrier;
+        if (companion.HasGenericParameters || companion != carrier &&
+            (!companion.IsPublic || !companion.IsAbstract || !companion.IsSealed
+                || companion.HasFields || companion.HasMethods || companion.HasInterfaces))
+            throw new InvalidDataException("Unsupported generic union companion.");
+        if (cases.Length != companion.NestedTypes.Count)
+            throw new InvalidDataException("Union companion case count mismatch.");
+        var members = cases.Select(c => companion.NestedTypes.SingleOrDefault(t =>
+            t.FullName.Replace('/', '+') == c.MetadataName && t.Name.Split('`')[0] == c.Name)
+            ?? throw new InvalidDataException("Unresolved Raven union case metadata.")).ToArray();
+        return new[] { carrier }.Concat(companion == carrier ? [] : new[] { companion }).Concat(members).ToArray();
+    }
+
     public static Case[] ValidateNestedCases(TypeDefinition carrier)
     {
         var cases = Cases(carrier);

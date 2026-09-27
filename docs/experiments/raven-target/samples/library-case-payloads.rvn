@@ -6,16 +6,16 @@ import System.Result.*
 func Main() {
     var ok = Ok(42)
     let carrier: Result<int, string> = ok
-    ok.Value = 7
+    ok = Ok(7)
     WriteLine(ok.Value)
     match carrier {
         Ok(let value) => WriteLine(value)
         Error(_) => Fault("Expected success")
     }
     var some = Some("Before")
-    some.Value = "After"
+    some = Some("After")
     WriteLine(some.Value)
     var error = Error("Original error")
-    error.Value = "Updated error"
+    error = Error("Updated error")
     WriteLine(error.Value)
 }

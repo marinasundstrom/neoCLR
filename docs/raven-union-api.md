@@ -1,10 +1,8 @@
 # Option and Result APIs from Raven
 
-The source-built bridge projects the existing Option and Result library contracts
-through closed generic metadata. It maps admitted payload types recursively rather
-than maintaining a separate adapter for each result/error pair. Primitive values,
-String, Date/Time/LocalDateTime, error values and nested Option/Result shapes are
-supported; arbitrary application types and reference payloads remain separate work.
+The Raven library declares `Option<T>` and `Result<T,E>` with standard Raven
+`union` syntax, following Raven.Core. `Some(T)` and `None` represent presence and
+absence; `Ok(T)` and `Error(E)` represent success and recoverable failure.
 
 ```raven
 import System.*
@@ -19,40 +17,61 @@ let failure: Result<long, string> = Error("Failure")
 let missing: Option<string> = None
 ```
 
-The surface includes case constructors and Value access, carrier constructors,
-Result.Ok/Error factories, predicates, checked case getters, TryGet,
-TryGetOutput/TryGetResidual and FromResidual. Raven's TryGetValue metadata methods
-project the runtime TryGet overloads for patterns. The synthetic carrier Value
-property is a compiler recognition hook, not a callable runtime API.
+Use patterns to extract payloads and `?` to propagate absence or failure.
+[Composition operators](raven-outcome-operators.md) include Map, Then, recovery,
+branch actions and explicit iterable conversion.
 
-Case getters fault on the wrong variant. Conditional output addresses become
-readable only on the successful branch. A default carrier is not a valid case;
-construct an explicit None, Some, Ok or Error. Empty cases and cases with valid
-default payloads can be initialized; a string or message payload is not invented.
-Named Void remains a legitimate generic payload, separate from CLI void returns.
+## Generated union contract
+
+Both carriers implement `System.Runtime.CompilerServices.IUnion`. Their `Value`
+property returns the boxed active **case**, not its payload. `HasValue` distinguishes
+an active case from a default carrier. An explicitly constructed `None` is active;
+`default(Option<T>)` is inactive and is not a substitute for `None`. An inactive
+carrier has `HasValue == false`, `Value == null`, and no matching case.
+
+Generated `TryGetValue(out case)` overloads return true for the requested active
+case. A mismatch returns false and preserves the destination. For a direct call,
+qualify an explicit payload-case type with its closed carrier, for example
+`Option<int>.Some<int>`; ordinary patterns infer this association. Case types remain
+distinct when payload types coincide, including `Result<T,T>`. `Some<Void>` and
+`Ok<Void>` carry a real unit value; `Some<Void>` differs from `None`.
+
+`TryGetOutput`, `TryGetResidual` and `FromResidual` implement the ordinary Raven
+propagation contract. The first two initialize their outputs to defaults and
+report whether the corresponding success or residual case was present. Their
+output behavior differs from conditional case extraction with `TryGetValue`.
+
+The previous manual carrier predicates, checked case getters and `TryGet` aliases
+are removed from the Raven API. Rebuild applications with matching references and
+runtime libraries. Prefer case construction and patterns over representation APIs.
+The historical Neo bootstrap profile retains its separate manual carriers until
+that profile is retired or explicitly migrated.
+
+## Compiler and runtime boundary
 
 This reuses the [target contract comparison](raven-target-contracts.md) and
-[runtime error contracts](runtime-error-contracts.md). As with CLR generics,
-member signatures are closed against their declaring type and validated before
-execution. The adapter remains a bounded experiment, not a general CLR loader.
-Result/Option error flow and guarded outputs preserve neoCLR's existing contracts;
-no runtime opcode or exception behavior changes are introduced.
+[runtime error contracts](runtime-error-contracts.md). Like CLR generic metadata,
+member signatures are closed against the declaring type and checked before
+execution. Raven's companion and case attributes associate source cases at the
+bridge boundary; the VM executes ordinary fields, calls, boxing and interfaces.
+No union opcode, VM case registry or exception translation is introduced.
 
-Execution coverage is in [the union sample](experiments/raven-target/samples/library-unions.rvn)
-and the saved-project checks. Installed SDK/extension packages must be refreshed
-before their metadata includes this surface.
+The benefit is one source and metadata contract for generated unions. The cost is
+a provisional importer that follows Raven's emitted shape and requires coordinated
+compiler/reference/runtime updates. This is bounded target support, not a general
+CLR loader. See the [focused contract sample](experiments/raven-target/samples/library-union-contract.rvn)
+for the release validation cases.
 
-## Writable case payloads
+## Task outcomes
 
-The target projects the original public case Value field/property pair as a read/write
-Value property. Assigning `case.Value` mutates that case value's storage; a carrier
-previously constructed from it retains its copy. This preserves the existing runtime
-API rather than silently making payloads immutable during metadata projection.
-The [case-payload sample](experiments/raven-target/samples/library-case-payloads.rvn)
-covers Ok, Error and Some updates and carrier-copy independence.
+`System.Tasks.TaskOutcome<T>` uses the same generated union contract, with
+`Completed(T)` and `Cancelled`. Both are active cases; the default is inactive.
+`Value` boxes the case, not its payload. A completed `Result.Error` remains a
+completed task, distinct from cancellation. TaskOutcome has no Propagatable
+implementation; task/await cancellation follows the task builder contract.
 
-## Composing outcomes after Preview 8
-
-The development library adds [Option and Result operators](raven-outcome-operators.md),
-including Map, Then, recovery, branch actions and explicit iterable conversion.
-The guide lists the full bounded port and Raven.Core compatibility differences.
+The focused contract fixture uses an explicit closed-case cast to inspect a boxed
+Completed payload. In this compiler snapshot, a fully qualified Completed pattern
+over Object can retain an open payload type, while qualifying it through the closed
+carrier can fail to match the boxed case. Ordinary patterns over TaskOutcome itself
+work. This compiler binding limitation is not a missing IUnion implementation.

@@ -72,17 +72,13 @@ ret
 .end
 .function neoCLR.Library.System.Uri.RuntimeUnion0(System.Result<String,System.Text.Utf8SliceError>& arg0,out(true) System.Result.Ok<String>& arg1) -> Boolean
 ldarg arg0
-ldobj System.Result<String,System.Text.Utf8SliceError>
 ldarg arg1
-call instance System.Result<String,System.Text.Utf8SliceError>::TryGet(System.Result.Ok<String>&)
+call instance System.Result<String,System.Text.Utf8SliceError>::TryGetValue(System.Result.Ok<String>&)
 ret
 .end
-.function neoCLR.Library.System.Uri.RuntimeUnion1(System.Result.Ok<String>& receiver,out String& value) -> void
-ldarg value
-ldarg receiver
-ldobj System.Result.Ok<String>
+.function neoCLR.Library.System.Uri.RuntimeUnion1(System.Result.Ok<String>& arg0) -> String
+ldarg arg0
 call instance System.Result.Ok<String>::get_Value()
-stobj String
 ret
 .end
 .function neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError arg0) -> System.Result.Error<System.UriError>
@@ -105,13 +101,13 @@ ldarg arg0
 newobj instance System.Result<System.Uri,System.UriError>::.ctor(System.Result.Ok<System.Uri>)
 ret
 .end
-.function neoCLR.Library.System.Uri.RuntimeUnion6(System.Result<System.Uri,System.UriError>& arg0,out(true) System.Uri& arg1) -> Boolean
+.function neoCLR.Library.System.Uri.RuntimeUnion6(System.Result<System.Uri,System.UriError>& arg0,out System.Uri& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
 call instance System.Result<System.Uri,System.UriError>::TryGetOutput(System.Uri&)
 ret
 .end
-.function neoCLR.Library.System.Uri.RuntimeUnion7(System.Result<System.Uri,System.UriError>& arg0,out(true) System.UriError& arg1) -> Boolean
+.function neoCLR.Library.System.Uri.RuntimeUnion7(System.Result<System.Uri,System.UriError>& arg0,out System.UriError& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
 call instance System.Result<System.Uri,System.UriError>::TryGetResidual(System.UriError&)

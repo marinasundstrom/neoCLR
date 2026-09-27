@@ -60,6 +60,10 @@ ret
 .local System.Option<String> local1
 .local System.Option<String> local2
 .local System.EnvironmentError local3
+ldloca local1
+initobj System.Option<String>
+ldloca local2
+initobj System.Option<String>
 newobj System.EnvironmentError
 stloc local3
 M00000003_IL_0000:

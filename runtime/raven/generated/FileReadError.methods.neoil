@@ -239,15 +239,13 @@ ldfld System.Storage.FileReadError::Metadata_V1_3C496E76616C69644C696D6974506179
 M00000003_IL_001c:
 stobj System.Storage.FileReadError.InvalidLimit
 M00000003_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000003_IL_0022:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000003_IL_0023:
 M00000003_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000003_IL_0025:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Storage.FileReadError.InvalidPath value) -> Void
@@ -379,15 +377,13 @@ ldfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964506174685061796C
 M00000005_IL_001c:
 stobj System.Storage.FileReadError.InvalidPath
 M00000005_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000005_IL_0022:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000005_IL_0023:
 M00000005_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000005_IL_0025:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Storage.FileReadError.NotFound value) -> Void
@@ -519,15 +515,13 @@ ldfld System.Storage.FileReadError::Metadata_V1_3C4E6F74466F756E645061796C6F6164
 M00000007_IL_001c:
 stobj System.Storage.FileReadError.NotFound
 M00000007_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000007_IL_0022:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000007_IL_0023:
 M00000007_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000007_IL_0025:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Storage.FileReadError.AccessDenied value) -> Void
@@ -659,15 +653,13 @@ ldfld System.Storage.FileReadError::Metadata_V1_3C41636365737344656E696564506179
 M00000009_IL_001c:
 stobj System.Storage.FileReadError.AccessDenied
 M00000009_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000009_IL_0022:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000009_IL_0023:
 M00000009_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000009_IL_0025:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Storage.FileReadError.NotRegularFile value) -> Void
@@ -799,15 +791,13 @@ ldfld System.Storage.FileReadError::Metadata_V1_3C4E6F74526567756C617246696C6550
 M0000000b_IL_001c:
 stobj System.Storage.FileReadError.NotRegularFile
 M0000000b_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000b_IL_0022:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000b_IL_0023:
 M0000000b_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000b_IL_0025:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Storage.FileReadError.TooLarge value) -> Void
@@ -939,15 +929,13 @@ ldfld System.Storage.FileReadError::Metadata_V1_3C546F6F4C617267655061796C6F6164
 M0000000d_IL_001c:
 stobj System.Storage.FileReadError.TooLarge
 M0000000d_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000d_IL_0022:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000d_IL_0023:
 M0000000d_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000d_IL_0025:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Storage.FileReadError.ReadFailed value) -> Void
@@ -1079,15 +1067,13 @@ ldfld System.Storage.FileReadError::Metadata_V1_3C526561644661696C65645061796C6F
 M0000000f_IL_001c:
 stobj System.Storage.FileReadError.ReadFailed
 M0000000f_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000f_IL_0022:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000f_IL_0023:
 M0000000f_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000f_IL_0025:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Storage.FileReadError.InvalidUtf8 value) -> Void
@@ -1219,15 +1205,13 @@ ldfld System.Storage.FileReadError::Metadata_V1_3C496E76616C6964557466385061796C
 M00000011_IL_001c:
 stobj System.Storage.FileReadError.InvalidUtf8
 M00000011_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000011_IL_0022:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000011_IL_0023:
 M00000011_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000011_IL_0025:
-call neoCLR.Library.System.Storage.FileReadError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance override byref ToString() -> String

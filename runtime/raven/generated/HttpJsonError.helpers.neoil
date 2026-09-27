@@ -81,7 +81,7 @@ ldfld System.Web.Http.Json.HttpJsonError.Http::Metadata_V1_3C726561736F6E3E6B5F5
 M0000000a_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(System.Web.Http.HttpError& Reason) -> Void
+.method instance byref Deconstruct(out System.Web.Http.HttpError& Reason) -> Void
 M0000000b_IL_0000:
 ldarg 1
 M0000000b_IL_0001:
@@ -265,7 +265,7 @@ ldfld System.Web.Http.Json.HttpJsonError.Json::Metadata_V1_3C726561736F6E3E6B5F5
 M0000000f_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(System.Data.Json.JsonError& Reason) -> Void
+.method instance byref Deconstruct(out System.Data.Json.JsonError& Reason) -> Void
 M00000010_IL_0000:
 ldarg 1
 M00000010_IL_0001:

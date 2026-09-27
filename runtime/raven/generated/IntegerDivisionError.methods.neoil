@@ -191,15 +191,13 @@ ldfld System.IntegerDivisionError::Metadata_V1_3C4469766973696F6E42795A65726F506
 M00000003_IL_001c:
 stobj System.IntegerDivisionError.DivisionByZero
 M00000003_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000003_IL_0022:
-call neoCLR.Library.System.IntegerDivisionError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000003_IL_0023:
 M00000003_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000003_IL_0025:
-call neoCLR.Library.System.IntegerDivisionError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.IntegerDivisionError.Overflow value) -> Void
@@ -289,15 +287,13 @@ ldfld System.IntegerDivisionError::Metadata_V1_3C4F766572666C6F775061796C6F61643
 M00000005_IL_001c:
 stobj System.IntegerDivisionError.Overflow
 M00000005_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000005_IL_0022:
-call neoCLR.Library.System.IntegerDivisionError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000005_IL_0023:
 M00000005_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000005_IL_0025:
-call neoCLR.Library.System.IntegerDivisionError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance override byref ToString() -> String

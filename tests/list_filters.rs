@@ -1,3 +1,4 @@
+const UNION_PATTERNS: &str = include_str!("fixtures/union-patterns.neoil");
 use neoclr::{Limits, LoadedProgram, Module, Value, assemble};
 use std::{process::Command, sync::OnceLock};
 
@@ -53,6 +54,7 @@ fn program_with(body: &str, extra: &str) -> LoadedProgram {
     let source = format!(
         ".module Test\n.entry Main\n{CALLBACK}\n{extra}\n.function Main() -> Int32\n{body}\nret\n.end"
     );
+    let source = format!("{source}\n{UNION_PATTERNS}");
     let app = neoclr::assembler::read_modules(
         &[neoclr::assembler::ModuleInput::Source(&source)],
         library(),
@@ -105,7 +107,7 @@ fn scans_have_expected_direction_short_circuiting_and_outcomes() {
             let extract = if method == "FindAll" {
                 "call instance System.Collections.ArrayList<Int32>::get_Count()"
             } else {
-                "call instance System.Option<Int32>::GetSomeCase()\ncall instance System.Option.Some<Int32>::get_Value()"
+                "call UnwrapSome<Int32>(System.Option<Int32>)"
             };
             body += &assert_integer(extract, expected, "Outcome");
         }
@@ -150,7 +152,7 @@ fn missing_and_empty_sequences_have_total_outcomes_without_default_elements() {
                     )
                 }
                 _ => {
-                    body += "call instance System.Option<Int32>::get_IsNone()\nbrtrue Missing\nfault \"missing case\"\nMissing:\n"
+                    body += "call IsNone<Int32>(System.Option<Int32>)\nbrtrue Missing\nfault \"missing case\"\nMissing:\n"
                 }
             }
             let calls = if method == "TrueForAll" && !values.is_empty() {

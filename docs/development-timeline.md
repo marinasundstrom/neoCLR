@@ -7780,3 +7780,37 @@ configuration/content, not target-specific code added to Raven main.
   success; neoCLR now waits for Winsock readiness, and the backpressure test checks
   portable byte/ownership behavior. Both findings remain release gates until the
   matching hosted/package checks pass. New SDK/VSIX packaging is in progress.
+
+### 2026-09-27 — Standard Option/Result unions before publication
+
+- **Author correction:** “Result and Option aren't implementing the union contract
+  correctly.” When asked about the migration boundary, explicitly selects
+  “Migrate to standard Raven unions”, then directs the assistant to use Raven.Core's
+  implementations as the reference.
+- **Assistant findings:** current handwritten runtime carriers lack the generated
+  IUnion/Value/HasValue surface; compiler reference stubs advertise Value/TryGetValue
+  while import adapters translate only the case extraction path. Earlier generic
+  projection exceptions explain this gap but do not satisfy the requested contract.
+- **Action in progress:** publication is held. The migration starts from Raven.Core's
+  Some/None and Ok/Error declarations and propagation methods, with neoCLR's unit
+  and interface identities. Generic companion projection, actual runtime behavior,
+  matching reference/API documentation and fresh package validation remain required.
+  Prior candidate package checks are evidence for that candidate only.
+- **Author confirmation and test scope:** after noting the earlier port may have been
+  correct, the author directs “Continue. Then continue with release.” Subsequently
+  limits validation to enough tests to establish the contract and points out new
+  fixes on Raven's neoCLR branch. The assistant includes `0524da35c` (contextual
+  pattern symbols and generic completion), retains the successful prior canonical
+  CI evidence, and targets migration/packaged contract checks instead of repeating
+  unrelated suites.
+
+- **TaskOutcome correction and audit:** the author asks whether TaskOutcome is a
+  Raven union, then directs “Turn it into a Raven union” and “And look for other
+  types that need such migration”. The assistant replaces its manual carrier with
+  Completed/Cancelled cases and generated projection. A Raven runtime source audit
+  finds no remaining manual union carriers; standalone error structs and the
+  JsonValue class hierarchy retain their different contracts. Focused contract and
+  completion/cancellation validation passes: the combined contract, 24 pipeline
+  checks and seven runtime task tests. API documentation and the website are refreshed.
+  A boxed Completed pattern binding limitation is documented; an explicit case
+  cast validates the actual boxed contract. Release package qualification follows.

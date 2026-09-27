@@ -1,0 +1,102 @@
+{
+  "date": "2026-09-27",
+  "ravenRevision": "a108df82a",
+  "scope": "Focused standard library union migration validation; not a repeated full platform matrix.",
+  "unionContract": {
+    "union_contract": "passed",
+    "checks": [
+      "construction and case identity",
+      "active None versus default carrier",
+      "TryGetValue preserves outputs on mismatch",
+      "IUnion.Value boxed cases",
+      "Option/Result propagation",
+      "same-type success and error payloads",
+      "TaskOutcome completion/cancellation and inactive default",
+      "Void and nested outcomes",
+      "reference identity and value copies"
+    ]
+  },
+  "taskPipeline": {
+    "State and nested outcome patterns agree": "passed",
+    "Cancellation is terminal without a fabricated payload": "passed",
+    "Cancellation publishes before queued observers and late registration": "passed",
+    "Result failure is a completed ordinary payload": "passed",
+    "Unit and Option preserve distinct completed payloads": "passed",
+    "Cancelled outcomes survive collection": {
+      "passed": true,
+      "collections": 38
+    },
+    "Consumer identity and first completion wins": "passed",
+    "Pending, multiple and late callbacks are queued in order": "passed",
+    "Nested completion does not reenter a consumer": "passed",
+    "Returned task and producer survive collection after API returns": {
+      "passed": true,
+      "collections": 38
+    },
+    "String and Boolean payloads": "passed",
+    "Result failure is an ordinary completed payload": "passed",
+    "Unit is a normal payload": "passed",
+    "Reference payload and pending continuation survive collection": {
+      "passed": true,
+      "collections": 39
+    },
+    "Cancelled read does not fabricate a value": "faulted as expected",
+    "Pending read faults without blocking": "faulted as expected",
+    "Recursive pumping faults": "faulted as expected",
+    "Callback faults remain terminal": "faulted as expected",
+    "Consumers cannot cancel a Task": "rejected",
+    "Consumers cannot assign state": "rejected",
+    "Consumers cannot complete a Task": "rejected",
+    "Task constructor is internal": "rejected",
+    "Completion storage methods are internal": "rejected",
+    "Completion storage fields are private": "rejected"
+  },
+  "runtimeTaskTests": 7,
+  "runtimePrerequisiteAndAffectedLibraryTests": 94,
+  "ravenImportedUnionTests": 10,
+  "websiteTests": 18,
+  "apiPages": 1025,
+  "runtimeAudit": {
+    "remainingManualRavenUnionCarriers": [],
+    "notMigrationCandidates": [
+      "standalone error structs",
+      "JsonValue class hierarchy"
+    ],
+    "separateCompatibilityProfile": "Neo bootstrap retains legacy carriers"
+  },
+  "limitations": [
+    "Object-typed Completed patterns require explicit closed-case cast in this compiler snapshot.",
+    "The historical source API checklist references obsolete generated/File fragments; the on-site metadata API snapshot is refreshed and checked.",
+    "Canonical hosted CI at 1404454e predates migration; exact release packages still require qualification."
+  ],
+  "logs": [
+    {
+      "log": "raven-empty-fixed.log",
+      "sha256": "be83421bd7f1bd8b50c8987158db72fd19ff9ad0f8b85238adbcb050cfa553ba"
+    },
+    {
+      "log": "union-dependent-tests4.log",
+      "sha256": "ddc09c4226e945e2ac8b9bc1d087d69f089fd746fc269ae3c8c82451c3d75ff7"
+    },
+    {
+      "log": "task-union-contract.log",
+      "sha256": "17195d8bed11801b75f4c26ff5764d116c6cb0a2051e22833fdafb600125305c"
+    },
+    {
+      "log": "task-pipeline.log",
+      "sha256": "f0c3689bedd6bfc4dfe40ed9890151ec0705e2460114294c78e58f87dca6b726"
+    },
+    {
+      "log": "task-tests.log",
+      "sha256": "89c627fa69d782d25cbed8d05f9d5159ca372d6c9fb23518eec41034fff54527"
+    },
+    {
+      "log": "task-website.log",
+      "sha256": "abe580d2592afddd9958d5f6f16b36bf2647a39629666726cec7713f2b26e9e7"
+    },
+    {
+      "log": "task-website-tests.log",
+      "sha256": "9a825e603840abdbaba9b863c8d9cabeb96de549aca12e5b14edf6e6900d0833"
+    }
+  ]
+}

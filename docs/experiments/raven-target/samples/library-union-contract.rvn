@@ -1,0 +1,135 @@
+import System.*
+import System.Option.*
+import System.Result.*
+import System.Runtime.CompilerServices.*
+import System.Console.*
+import System.Tasks.*
+import System.Tasks.TaskOutcome.*
+
+public func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fault(message)
+    }
+}
+
+func Read(value: Option<int>) -> int {
+    return match value {
+        Some(let number) => number
+        None => -1
+    }
+}
+
+func PropagateOption(value: Option<int>) -> Option<int> {
+    return Some(value?)
+}
+
+func PropagateResult(value: Result<int, string>) -> Result<int, string> {
+    return Ok(value?)
+}
+
+func PropagateVoid(value: Result<System.Void, string>) -> Result<System.Void, string> {
+    value?
+    return Ok(())
+}
+
+class Payload {
+    var Number: int
+    init(number: int) {
+        Number = number
+    }
+}
+
+func Main() {
+    let some: Option<int> = Some(42)
+    let none: Option<int> = None
+    Check(some.HasValue, "Some must be active")
+    Check(none.HasValue, "None must be active")
+    Check(Read(PropagateOption(some)) == 42, "Some propagation")
+    Check(PropagateOption(none) is None, "None propagation")
+
+    var extracted: Option<int>.Some<int> = Some(99)
+    if some.TryGetValue(out extracted) {
+        Check(extracted.Value == 42, "Some extraction")
+    } else {
+        System.Fault("Some extraction")
+    }
+    Check(extracted.Value == 42, "Some payload")
+    if none.TryGetValue(out extracted) {
+        System.Fault("Wrong case extraction")
+    }
+    Check(extracted.Value == 42, "Wrong case must preserve output")
+
+    var output = 99
+    let hasOutput = none.TryGetOutput(out output)
+    Check(!hasOutput && output == 0, "Propagation initializes a mismatched output")
+
+    let inactive = default(Option<int>)
+    Check(!inactive.HasValue, "Default Option must be inactive")
+    Check(Object.ReferenceEquals(inactive.Value, null), "Inactive Value must be null")
+    if inactive.TryGetValue(out extracted) {
+        System.Fault("Inactive extraction")
+    }
+    Check(extracted.Value == 42, "Inactive extraction preserves output")
+
+    let view = (IUnion)(object)some
+    Check(view.Value is System.Option.Some<int>(let boxedNumber) && boxedNumber == 42, "IUnion boxed case")
+    let noneView = (IUnion)(object)none
+    Check(noneView.Value is None, "IUnion active None")
+
+    let ok: Result<int, string> = Ok(42)
+    let error: Result<int, string> = Error("failed")
+    Check(PropagateResult(ok) is Ok(let number) && number == 42, "Ok propagation")
+    Check(PropagateResult(error) is Error(let message) && message.Equals("failed"), "Error propagation")
+    let resultView = (IUnion)(object)error
+    Check(resultView.Value is System.Result.Error<string>(let boxedMessage) && boxedMessage.Equals("failed"), "Result IUnion")
+    let inactiveResult = default(Result<int, string>)
+    Check(!inactiveResult.HasValue && Object.ReferenceEquals(inactiveResult.Value, null), "Default Result")
+
+    let sameOk: Result<int, int> = Ok(7)
+    let sameError: Result<int, int> = Error(7)
+    Check(sameOk is Ok(let sameOkValue) && sameOkValue == 7, "Same-type Ok")
+    Check(sameError is Error(let sameErrorValue) && sameErrorValue == 7, "Same-type Error")
+    Check(!(sameOk is Error(_)), "Same-type cases must differ")
+
+    let unit: Option<System.Void> = Some(())
+    Check(unit.HasValue && unit is Some(_), "Some Void differs from None")
+    let completed: Result<System.Void, string> = Ok(())
+    Check(PropagateVoid(completed) is Ok(_), "Void propagation")
+    let voidError: Result<System.Void, string> = Error("failed")
+    Check(PropagateVoid(voidError) is Error(_), "Void error propagation")
+
+    let nested: Option<Result<int, string>> = Some(ok)
+    Check(nested is Some(Ok(let nestedNumber)) && nestedNumber == 42, "Nested outcomes")
+    let payload = Payload(7)
+    let reference: Option<Payload> = Some(payload)
+    payload.Number = 9
+    Check(reference is Some(let item) && item.Number == 9, "Reference identity")
+    var copy = some
+    copy = Some(8)
+    Check(Read(some) == 42 && Read(copy) == 8, "Value copy")
+    let taskCompleted: TaskOutcome<int> = Completed(42)
+    let taskCancelled: TaskOutcome<int> = Cancelled
+    Check(taskCompleted.HasValue && taskCancelled.HasValue, "Active task outcomes")
+    var taskCase: TaskOutcome<int>.Completed<int> = Completed(99)
+    if taskCompleted.TryGetValue(out taskCase) {
+        Check(taskCase.Value == 42, "Completed extraction")
+    } else {
+        System.Fault("Completed extraction")
+    }
+    if taskCancelled.TryGetValue(out taskCase) {
+        System.Fault("Cancelled cannot extract Completed")
+    }
+    Check(taskCase.Value == 42, "Task case mismatch preserves output")
+    let inactiveTask = default(TaskOutcome<int>)
+    Check(!inactiveTask.HasValue && Object.ReferenceEquals(inactiveTask.Value, null), "Default TaskOutcome")
+    let taskView = (IUnion)(object)taskCompleted
+    let boxedTaskCase = (TaskOutcome<int>.Completed<int>)taskView.Value
+    Check(boxedTaskCase.Value == 42, "TaskOutcome IUnion")
+    let cancelledView = (IUnion)(object)taskCancelled
+    Check(cancelledView.Value is Cancelled, "Boxed cancellation case")
+    let voidTask: TaskOutcome<System.Void> = Completed(())
+    Check(voidTask is Completed(_), "Completed Void")
+    let failedTask: TaskOutcome<Result<int, string>> = Completed(error)
+    Check(failedTask is Completed(Error(let taskError)) && taskError.Equals("failed"), "Completed error differs from cancellation")
+    WriteLine("Union contract passed")
+}

@@ -1,3 +1,1 @@
-; Raven owns the existing Result carrier, cases and propagation bodies.
-.include "../raven/generated/Result.methods.neoil"
-.include "../raven/generated/Result.helpers.neoil"
+.include "../legacy/Result.neoil"

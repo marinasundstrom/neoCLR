@@ -1,11 +1,11 @@
 using Mono.Cecil;
 
-// The existing conditional-output ABI is narrower than ordinary CLI out: a miss
-// leaves the destination untouched. Only the exact propagation contract admits it.
+// Raven propagation uses ordinary out on both paths. The historical Neo profile
+// retains its separate conditional-output snapshot.
 static class PropagationLibrary
 {
     public static bool IsContract(TypeDefinition type) => type.FullName == "System.Propagatable`3";
-    public static bool IsConditionalOutput(MethodDefinition method, ParameterDefinition parameter) =>
+    public static bool IsOutput(MethodDefinition method, ParameterDefinition parameter) =>
         IsContract(method.DeclaringType) && method.HasThis && !method.HasGenericParameters
         && method.ReturnType.MetadataType == MetadataType.Boolean && method.Parameters.Count == 1
         && parameter == method.Parameters[0] && parameter.IsOut && !parameter.IsIn

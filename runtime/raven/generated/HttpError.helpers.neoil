@@ -87,7 +87,7 @@ ldfld System.Web.Http.HttpError.InvalidUri::Metadata_V1_3C726561736F6E3E6B5F5F42
 M0000001c_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(System.UriError& Reason) -> Void
+.method instance byref Deconstruct(out System.UriError& Reason) -> Void
 M0000001d_IL_0000:
 ldarg 1
 M0000001d_IL_0001:
@@ -271,7 +271,7 @@ ldfld System.Web.Http.HttpError.NameResolution::Metadata_V1_3C726561736F6E3E6B5F
 M00000021_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(System.Networking.DnsError& Reason) -> Void
+.method instance byref Deconstruct(out System.Networking.DnsError& Reason) -> Void
 M00000022_IL_0000:
 ldarg 1
 M00000022_IL_0001:
@@ -455,7 +455,7 @@ ldfld System.Web.Http.HttpError.Transport::Metadata_V1_3C726561736F6E3E6B5F5F426
 M00000026_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(System.Networking.Sockets.SocketError& Reason) -> Void
+.method instance byref Deconstruct(out System.Networking.Sockets.SocketError& Reason) -> Void
 M00000027_IL_0000:
 ldarg 1
 M00000027_IL_0001:
@@ -639,7 +639,7 @@ ldfld System.Web.Http.HttpError.Content::Metadata_V1_3C726561736F6E3E6B5F5F42616
 M0000002b_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(System.IO.StreamError& Reason) -> Void
+.method instance byref Deconstruct(out System.IO.StreamError& Reason) -> Void
 M0000002c_IL_0000:
 ldarg 1
 M0000002c_IL_0001:
@@ -824,7 +824,7 @@ ldfld System.Web.Http.HttpError.UnsuccessfulStatus::Metadata_V1_3C73746174757343
 M00000030_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(System.Web.Http.HttpStatusCode& StatusCode) -> Void
+.method instance byref Deconstruct(out System.Web.Http.HttpStatusCode& StatusCode) -> Void
 M00000031_IL_0000:
 ldarg 1
 M00000031_IL_0001:
@@ -1014,7 +1014,7 @@ ldfld System.Web.Http.HttpError.InvalidRequest::Metadata_V1_3C6D6573736167653E6B
 M00000035_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(String& Message) -> Void
+.method instance byref Deconstruct(out String& Message) -> Void
 M00000036_IL_0000:
 ldarg 1
 M00000036_IL_0001:
@@ -1195,7 +1195,7 @@ ldfld System.Web.Http.HttpError.Protocol::Metadata_V1_3C6D6573736167653E6B5F5F42
 M0000003a_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(String& Message) -> Void
+.method instance byref Deconstruct(out String& Message) -> Void
 M0000003b_IL_0000:
 ldarg 1
 M0000003b_IL_0001:
@@ -1376,7 +1376,7 @@ ldfld System.Web.Http.HttpError.Unsupported::Metadata_V1_3C6D6573736167653E6B5F5
 M0000003f_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(String& Message) -> Void
+.method instance byref Deconstruct(out String& Message) -> Void
 M00000040_IL_0000:
 ldarg 1
 M00000040_IL_0001:
@@ -1557,7 +1557,7 @@ ldfld System.Web.Http.HttpError.LimitExceeded::Metadata_V1_3C6D6573736167653E6B5
 M00000044_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(String& Message) -> Void
+.method instance byref Deconstruct(out String& Message) -> Void
 M00000045_IL_0000:
 ldarg 1
 M00000045_IL_0001:
@@ -1857,7 +1857,7 @@ ldfld System.Web.Http.HttpError.Handler::Metadata_V1_3C6D6573736167653E6B5F5F426
 M0000004c_IL_0007:
 ret
 .end
-.method instance byref Deconstruct(String& Message) -> Void
+.method instance byref Deconstruct(out String& Message) -> Void
 M0000004d_IL_0000:
 ldarg 1
 M0000004d_IL_0001:

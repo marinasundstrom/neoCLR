@@ -191,15 +191,13 @@ ldfld System.Web.Http.Json.HttpJsonError::Metadata_V1_3C487474705061796C6F61643E
 M00000003_IL_001c:
 stobj System.Web.Http.Json.HttpJsonError.Http
 M00000003_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000003_IL_0022:
-call neoCLR.Library.System.Web.Http.Json.HttpJsonError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000003_IL_0023:
 M00000003_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000003_IL_0025:
-call neoCLR.Library.System.Web.Http.Json.HttpJsonError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Web.Http.Json.HttpJsonError.Json value) -> Void
@@ -289,15 +287,13 @@ ldfld System.Web.Http.Json.HttpJsonError::Metadata_V1_3C4A736F6E5061796C6F61643E
 M00000005_IL_001c:
 stobj System.Web.Http.Json.HttpJsonError.Json
 M00000005_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000005_IL_0022:
-call neoCLR.Library.System.Web.Http.Json.HttpJsonError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000005_IL_0023:
 M00000005_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000005_IL_0025:
-call neoCLR.Library.System.Web.Http.Json.HttpJsonError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance override byref ToString() -> String

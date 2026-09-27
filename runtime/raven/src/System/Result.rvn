@@ -1,88 +1,36 @@
 namespace System
 
-import System.Runtime.CompilerServices.ValueStorage
+import System.*
+import System.Result.*
 
-public static class Result {
-    public struct Ok<T> {
-        private field Stored: T
-        init(value: T) {
-            Stored = value
-        }
-        val Value: T => Stored
-    }
-    public struct Error<E> {
-        private field Stored: E
-        init(value: E) {
-            Stored = value
-        }
-        val Value: E => Stored
-    }
-}
+public union Result<T, E>: Propagatable<Result<T, E>, T, E> {
+    /// Represents a successful result value.
+    case Ok(T)
 
-public struct Result<T, E> : Propagatable<Result<T, E>, T, E> {
-    private field Stored: System.Value
+    /// Represents an error result.
+    case Error(E)
 
-    static func Ok(value: T) -> Result<T, E> {
-        return System.Result<T, E>(System.Result.Ok<T>(value))
-    }
-    static func Error(error: E) -> Result<T, E> {
-        return System.Result<T, E>(System.Result.Error<E>(error))
-    }
-
-    init(value: System.Result.Ok<T>) {
-        Stored = ValueStorage.Pack(value)
-    }
-    val IsOk: bool => ValueStorage.Is<System.Result.Ok<T>>(Stored)
-    func GetOkCase() -> System.Result.Ok<T> {
-        return ValueStorage.Unpack<System.Result.Ok<T>>(Stored)
-    }
-    func TryGet(out value: System.Result.Ok<T>) -> bool {
-        if IsOk {
-            value = GetOkCase()
-            return true
-        }
-        ValueStorage.LeaveUnassigned(out value)
-        return false
-    }
-
-    init(value: System.Result.Error<E>) {
-        Stored = ValueStorage.Pack(value)
-    }
-    val IsErr: bool => ValueStorage.Is<System.Result.Error<E>>(Stored)
-    func GetErrorCase() -> System.Result.Error<E> {
-        return ValueStorage.Unpack<System.Result.Error<E>>(Stored)
-    }
-    func TryGet(out value: System.Result.Error<E>) -> bool {
-        if IsErr {
-            value = GetErrorCase()
-            return true
-        }
-        ValueStorage.LeaveUnassigned(out value)
-        return false
-    }
-
-    val IsOkCase: bool => IsOk
-    val IsErrorCase: bool => IsErr
-
+    /// Attempts to extract the successful output used by the propagation protocol.
     func TryGetOutput(out output: T) -> bool {
-        if IsOk {
-            output = GetOkCase().Value
+        output = default
+        if self is Ok(let value) {
+            output = value
             return true
         }
-        ValueStorage.LeaveUnassigned(out output)
         return false
     }
 
+    /// Attempts to extract the residual used by the propagation protocol.
     func TryGetResidual(out residual: E) -> bool {
-        if IsErr {
-            residual = GetErrorCase().Value
+        residual = default
+        if self is Error(let error) {
+            residual = error
             return true
         }
-        ValueStorage.LeaveUnassigned(out residual)
         return false
     }
 
-    static func FromResidual(residual: E) -> Result<T, E> {
-        return System.Result<T, E>.Error(residual)
-    }
+    /// Constructs an error result from a propagated residual.
+    static func FromResidual(residual: E) -> Result<T, E> => Error(residual)
+
 }

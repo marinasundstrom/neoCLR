@@ -980,8 +980,10 @@ ret
 .local String local0
 .local System.Result<String,System.Text.Utf8SliceError> local1
 .local System.Result.Ok<String> local2
-.local System.Result.Ok<String> local3
-.local String local4
+ldloca local1
+initobj System.Result<String,System.Text.Utf8SliceError>
+ldloca local2
+initobj System.Result.Ok<String>
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -995,56 +997,48 @@ call neoCLR.Library.System.Networking.IPAddress.RuntimeStringSliceUtf8(String,In
 M00000005_IL_000a:
 stloc local1
 M00000005_IL_000b:
-ldloca local1
-M00000005_IL_000d:
 ldloca local2
-M00000005_IL_000f:
+M00000005_IL_000d:
+initobj System.Result.Ok<String>
+M00000005_IL_0013:
+ldloca local1
+M00000005_IL_0015:
+ldloca local2
+M00000005_IL_0017:
 call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion0(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Ok<String>&)
-M00000005_IL_0014:
-brfalse M00000005_IL_003f
-M00000005_IL_0019:
-ldloc local2
-M00000005_IL_001a:
-stloc local3
-M00000005_IL_001b:
-ldloca local3
-M00000005_IL_001d:
-ldloca local4
-M00000005_IL_001f:
-call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion1(System.Result.Ok<String>&,String&)
-M00000005_IL_0024:
-ldloc local4
-M00000005_IL_0026:
-stloc local0
-M00000005_IL_0027:
-ldc.i4 1
+M00000005_IL_001c:
+brfalse M00000005_IL_0035
+M00000005_IL_0021:
+ldloca local2
+M00000005_IL_0023:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion1(System.Result.Ok<String>&)
 M00000005_IL_0028:
-br M00000005_IL_002e
-M00000005_IL_002e:
-brfalse M00000005_IL_003f
-M00000005_IL_0033:
-M00000005_IL_0034:
-br M00000005_IL_0044
-M00000005_IL_003f:
-br M00000005_IL_0047
-M00000005_IL_0044:
-M00000005_IL_0045:
+stloc local0
+M00000005_IL_0029:
+M00000005_IL_002a:
+br M00000005_IL_003a
+M00000005_IL_0035:
+br M00000005_IL_003d
+M00000005_IL_003a:
+M00000005_IL_003b:
 ldloc local0
-M00000005_IL_0046:
+M00000005_IL_003c:
 ret
-M00000005_IL_0047:
-M00000005_IL_0048:
-M00000005_IL_0049:
+M00000005_IL_003d:
+M00000005_IL_003e:
+M00000005_IL_003f:
 ldstr ""
-M00000005_IL_004e:
+M00000005_IL_0044:
 ret
 .end
 .method private static Part(String text,Int32 start,Int32 count) -> String
 .local String local0
 .local System.Result<String,System.Text.Utf8SliceError> local1
 .local System.Result.Ok<String> local2
-.local System.Result.Ok<String> local3
-.local String local4
+ldloca local1
+initobj System.Result<String,System.Text.Utf8SliceError>
+ldloca local2
+initobj System.Result.Ok<String>
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
@@ -1058,48 +1052,38 @@ call neoCLR.Library.System.Networking.IPAddress.RuntimeStringSliceUtf8(String,In
 M00000006_IL_000a:
 stloc local1
 M00000006_IL_000b:
-ldloca local1
-M00000006_IL_000d:
 ldloca local2
-M00000006_IL_000f:
+M00000006_IL_000d:
+initobj System.Result.Ok<String>
+M00000006_IL_0013:
+ldloca local1
+M00000006_IL_0015:
+ldloca local2
+M00000006_IL_0017:
 call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion0(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Ok<String>&)
-M00000006_IL_0014:
-brfalse M00000006_IL_003f
-M00000006_IL_0019:
-ldloc local2
-M00000006_IL_001a:
-stloc local3
-M00000006_IL_001b:
-ldloca local3
-M00000006_IL_001d:
-ldloca local4
-M00000006_IL_001f:
-call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion1(System.Result.Ok<String>&,String&)
-M00000006_IL_0024:
-ldloc local4
-M00000006_IL_0026:
-stloc local0
-M00000006_IL_0027:
-ldc.i4 1
+M00000006_IL_001c:
+brfalse M00000006_IL_0035
+M00000006_IL_0021:
+ldloca local2
+M00000006_IL_0023:
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion1(System.Result.Ok<String>&)
 M00000006_IL_0028:
-br M00000006_IL_002e
-M00000006_IL_002e:
-brfalse M00000006_IL_003f
-M00000006_IL_0033:
-M00000006_IL_0034:
-br M00000006_IL_0044
-M00000006_IL_003f:
-br M00000006_IL_0047
-M00000006_IL_0044:
-M00000006_IL_0045:
+stloc local0
+M00000006_IL_0029:
+M00000006_IL_002a:
+br M00000006_IL_003a
+M00000006_IL_0035:
+br M00000006_IL_003d
+M00000006_IL_003a:
+M00000006_IL_003b:
 ldloc local0
-M00000006_IL_0046:
+M00000006_IL_003c:
 ret
-M00000006_IL_0047:
-M00000006_IL_0048:
-M00000006_IL_0049:
+M00000006_IL_003d:
+M00000006_IL_003e:
+M00000006_IL_003f:
 ldstr ""
-M00000006_IL_004e:
+M00000006_IL_0044:
 ret
 .end
 .method private static Digit(String text) -> Int32

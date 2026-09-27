@@ -294,7 +294,7 @@ static class UnionImport
                                 || NeedsInitialization(initializedType))
                                 throw new InvalidDataException("Only local or value-constructor receiver initialization is admitted.");
                             if (libraryOwner is not null && (StandardUnionLibrary.IsCandidate(method.DeclaringType)
-                                || method.DeclaringType.DeclaringType is { } unionOwner && StandardUnionLibrary.IsCandidate(unionOwner)))
+                                || method.DeclaringType.DeclaringType is { } unionOwner && (StandardUnionLibrary.IsCandidate(unionOwner) || RavenUnionMetadata.CompanionTarget(unionOwner) is not null)))
                             {
                                 // Native constructors hold an unpublished receiver capability.
                                 // Preserve zero-initialization as checked field writes instead of
@@ -311,7 +311,7 @@ static class UnionImport
                             else code.AppendLine("initobj " + initializedType);
                             break;
                         }
-                        if (initializedType is Carrier or Option or VoidOption or VoidResult || NeedsInitialization(initializedType))
+                        if (NeedsInitialization(initializedType))
                         {
                             if (assigned[address.Local]) throw new InvalidDataException("Resetting an initialized carrier is unsupported.");
                             // A CLI carrier default is not a valid union value. Keep it unreadable
@@ -320,7 +320,7 @@ static class UnionImport
                         }
                         else
                         {
-                            code.AppendLine((ApplicationTypes.IsType(initializedType) || ErrorBindings.IsStandard(initializedType) || ManagedArrayBindings.IsReference(initializedType) || (initializedType == CancellationBindings.Token || CalendarBindings.Types.Contains(initializedType)) || initializedType == HashCodeBindings.Owner || GenericUnionBindings.IsType(initializedType)) ? "initobj " + initializedType : Default(initializedType) + "\nstobj " + initializedType);
+                            code.AppendLine((instruction.Operand is GenericParameter || ApplicationTypes.IsType(initializedType) || ErrorBindings.IsStandard(initializedType) || ManagedArrayBindings.IsReference(initializedType) || (initializedType == CancellationBindings.Token || CalendarBindings.Types.Contains(initializedType)) || initializedType == HashCodeBindings.Owner || GenericUnionBindings.IsType(initializedType)) ? "initobj " + initializedType : Default(initializedType) + "\nstobj " + initializedType);
                             assigned[address.Local] = true;
                         }
                         break;
@@ -535,8 +535,8 @@ static class UnionImport
                         // contract. An adapter call would erase the verifier's false-path
                         // proof even though CLI represents this literal as Int32.
                         if (libraryOwner is not null && method.Parameters.Count == 1
-                            && GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[0])
-                            && number is 0 or 1 && instruction.Next?.OpCode.Code == Code.Ret)
+                            && (GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[0]) || ApplicationTypes.IsConditionalUnionOutput(method))
+                            && number is 0 or 1 && ReachesReturn(instruction.Next))
                         { Push(new("Boolean")); code.AppendLine(number == 0 ? "ldc.bool false" : "ldc.bool true"); }
                         else { Push(new("Int32")); code.AppendLine($"ldc.i4 {number}"); }
                         break;
@@ -973,7 +973,7 @@ static class UnionImport
             // Unreachable guest instructions are omitted, not admitted as executable code.
             // Library metadata keeps author-supplied parameter names for introspection.
             var declaredParameters = args.Skip(method.HasThis ? 1 : 0).Select((t, i) =>
-                libraryOwner is not null ? (GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[i]) || ApplicationTypes.IsConditionalUnionOutput(method) ? "out(true) " : "") + t + " " + OpaqueLibrary.ParameterName(method, i) : (ApplicationTypes.IsConditionalUnionOutput(method) ? "out(true) " : method.Parameters[i].IsOut ? "out " : "") + t);
+                libraryOwner is not null ? (GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[i]) || ApplicationTypes.IsConditionalUnionOutput(method) ? "out(true) " : method.Parameters[i].IsOut ? "out " : "") + t + " " + OpaqueLibrary.ParameterName(method, i) : (ApplicationTypes.IsConditionalUnionOutput(method) ? "out(true) " : method.Parameters[i].IsOut ? "out " : "") + t);
             output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "noresult" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : (DescriptorLibrary.IsBaseConstructor(method) || libraryOwner is not null && method.IsAssembly) ? "internal " : "")}instance {ApplicationTypes.Modifiers(method)}{(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "byref " : "")}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && !asyncStateMember && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
             if (OpaqueLibrary.IsExplicitStringCount(method))
                 output.AppendLine(".override instance System.Collections.Collection<Char>::get_Count()");
@@ -1023,7 +1023,7 @@ static class UnionImport
         }
         if (entryHasArguments) output.Append(EntryPointBindings.Adapter(Name(entry!)));
         output.Append(ApplicationTypes.Declarations(ProfileType, instanceBodies));
-        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters(collectionProfile)).AppendLine(BooleanBindings.Adapters).AppendLine(ReflectionBindings.Adapters).AppendLine(EnumBindings.Adapters).AppendLine(EnumHelpersBindings.Adapters);
+        output.Append(Adapters(collectionProfile)).Append(ResultBindings.Adapters(collectionProfile)).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters(collectionProfile)).AppendLine(BooleanBindings.Adapters).AppendLine(ReflectionBindings.Adapters).AppendLine(EnumBindings.Adapters).AppendLine(EnumHelpersBindings.Adapters);
         foreach (var helper in coercions.Values) output.Append(helper.Body);
         output.Append(RuntimeServiceBindings.Adapters);
         output.Append(HashCodeBindings.ConstructorAdapter);
@@ -1125,7 +1125,7 @@ static class UnionImport
             if ((file.OutArgument >= 0 && file.Result == "Boolean" || reference.Name == "FromResidual")
                 && definition.DeclaringType.FullName != "System.Tasks.TaskOutcome`1"
                 && !ErrorBindings.IsStandard(definition.DeclaringType.FullName)) ValidatePropagation(definition.DeclaringType);
-            return new(file.Name, file.Arguments, file.Result, file.OutArgument, file.Instruction, file.OutArgument >= 0 && file.Result == "Boolean");
+            return new(file.Name, file.Arguments, file.Result, file.OutArgument, file.Instruction, file.OutArgument >= 0 && file.Result == "Boolean" && file.ConditionalOutput);
         }
         if (NamespaceFunctions.Owner(reference.DeclaringType) == "System.Math" && reference.Name == "Clamp")
         {
@@ -1318,15 +1318,28 @@ static class UnionImport
             return new("RuntimeVoidOptionNone", [None], VoidOption);
         throw new InvalidDataException("Unsupported constructor: " + reference.FullName + " definition=" + key);
     }
+    static bool ReachesReturn(Instruction? instruction)
+    {
+        var visited = new HashSet<Instruction>();
+        while (instruction is not null && visited.Add(instruction))
+        {
+            if (instruction.OpCode.Code == Code.Ret) return true;
+            if (instruction.OpCode.Code == Code.Nop) instruction = instruction.Next;
+            else if (instruction.OpCode.Code is Code.Br or Code.Br_S) instruction = (Instruction)instruction.Operand;
+            else return false;
+        }
+        return false;
+    }
+
     static string Default(string type) => (EnumBindings.IsType(type) ? "ldc.i4 0\ncall " + type + "::FromValue(Int32)" : null) ?? (ErrorBindings.IsEmpty(type) ? "newobj " + type : null) ?? PrimitiveBindings.Default(type) ?? (type switch {
         VoidOk => $"ldvoid\nnewobj {VoidOk}",
         "Void" => "ldvoid",
         Overflow => "newobj System.OverflowError",
         "Double" => "ldc.r8 0", "Boolean" => "ldc.bool false", "Int32" => "ldc.i4 0", VoidSome => $"ldvoid\nnewobj {VoidSome}", Some => $"ldc.i4 0\nnewobj {Some}", None => $"newobj {None}", Ok => $"ldc.i4 0\nnewobj {Ok}",
         Error => $"newobj System.OverflowError\nnewobj {Error}",
-        _ => throw new InvalidDataException("Unsupported default.")
+        _ => throw new InvalidDataException("Unsupported default: " + type)
     });
-    static string Adapters()
+    static string Adapters(bool standardUnions)
     {
         var text = new StringBuilder();
         foreach (var (name, type) in new[] { ("Output", "Void"), ("Residual", Overflow) })
@@ -1374,6 +1387,16 @@ static class UnionImport
             text.AppendLine($".function RuntimeVoidOption{name}({type} value) -> {VoidOption}\nldarg value\nnewobj instance {VoidOption}::.ctor({type})\nret\n.end");
         foreach (var type in new[] { "Int32", "String" })
             text.AppendLine($".function RuntimeWrite{type}({type} value) -> noresult\nldarg value\ncall System.Console::WriteLine({type})\npop\nret\n.end");
-        return text.ToString();
+        return AdaptUnionHelpers(text.ToString(), standardUnions);
     }
+
+    // The archived bootstrap profile retains value receivers and TryGet. Current
+    // Raven reference families use generated byref receivers and TryGetValue.
+    internal static string AdaptUnionHelpers(string text, bool standardUnions) => !standardUnions ? text
+        : System.Text.RegularExpressions.Regex.Replace(text.Replace("::TryGet(", "::TryGetValue("),
+            @"(?m)^ldobj System\.(?:Option|Result)(?:\.[^<
+]+)?<[^
+]+>
+?
+", "");
 }

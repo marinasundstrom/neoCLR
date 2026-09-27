@@ -485,15 +485,13 @@ ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E626F756E644D6
 M00000004_IL_001c:
 stobj System.Runtime.Reflection.ReflectionError.UnboundMetadata
 M00000004_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000004_IL_0022:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000004_IL_0023:
 M00000004_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000004_IL_0025:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Runtime.Reflection.ReflectionError.UnsupportedType value) -> Void
@@ -625,15 +623,13 @@ ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F727
 M00000006_IL_001c:
 stobj System.Runtime.Reflection.ReflectionError.UnsupportedType
 M00000006_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000006_IL_0022:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000006_IL_0023:
 M00000006_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000006_IL_0025:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Runtime.Reflection.ReflectionError.AccessDenied value) -> Void
@@ -765,15 +761,13 @@ ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C41636365737344656
 M00000008_IL_001c:
 stobj System.Runtime.Reflection.ReflectionError.AccessDenied
 M00000008_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000008_IL_0022:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000008_IL_0023:
 M00000008_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000008_IL_0025:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Runtime.Reflection.ReflectionError.MissingConstructor value) -> Void
@@ -905,15 +899,13 @@ ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E67436
 M0000000a_IL_001c:
 stobj System.Runtime.Reflection.ReflectionError.MissingConstructor
 M0000000a_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000a_IL_0022:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000a_IL_0023:
 M0000000a_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000a_IL_0025:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Runtime.Reflection.ReflectionError.UnsupportedProperty value) -> Void
@@ -1045,15 +1037,13 @@ ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C556E737570706F727
 M0000000c_IL_001c:
 stobj System.Runtime.Reflection.ReflectionError.UnsupportedProperty
 M0000000c_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000c_IL_0022:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000c_IL_0023:
 M0000000c_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000c_IL_0025:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Runtime.Reflection.ReflectionError.MissingAccessor value) -> Void
@@ -1185,15 +1175,13 @@ ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C4D697373696E67416
 M0000000e_IL_001c:
 stobj System.Runtime.Reflection.ReflectionError.MissingAccessor
 M0000000e_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000e_IL_0022:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000e_IL_0023:
 M0000000e_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000e_IL_0025:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Runtime.Reflection.ReflectionError.InvalidReceiver value) -> Void
@@ -1325,15 +1313,13 @@ ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C6964526
 M00000010_IL_001c:
 stobj System.Runtime.Reflection.ReflectionError.InvalidReceiver
 M00000010_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000010_IL_0022:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000010_IL_0023:
 M00000010_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000010_IL_0025:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Runtime.Reflection.ReflectionError.InvalidValue value) -> Void
@@ -1465,15 +1451,13 @@ ldfld System.Runtime.Reflection.ReflectionError::Metadata_V1_3C496E76616C6964566
 M00000012_IL_001c:
 stobj System.Runtime.Reflection.ReflectionError.InvalidValue
 M00000012_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000012_IL_0022:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000012_IL_0023:
 M00000012_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000012_IL_0025:
-call neoCLR.Library.System.Runtime.Reflection.ReflectionError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref get_Value() -> System.Object

@@ -203,10 +203,7 @@ fn value_object_contract(
     method: &crate::metadata::Function,
 ) -> Result<Option<crate::metadata::Function>, Fault> {
     if module.type_definition(owner).is_none_or(|d| {
-        d.is_reference_type
-            || d.representation != Representation::Record
-            || d.base.is_some()
-            || !d.generic_parameters.is_empty()
+        d.is_reference_type || d.representation != Representation::Record || d.base.is_some()
     }) {
         return Ok(None);
     }
@@ -394,6 +391,15 @@ pub(crate) fn dispatch_targets(
         let owner = definition.open_type();
         // Open generic class target inference is deliberately not advertised as closed.
         if !definition.generic_parameters.is_empty() {
+            if contract.owner.as_ref() == Some(&Type::from_name("System.Object"))
+                && value_object_contract(module, &owner, contract)?.is_some()
+                && declared_method(module, &owner, contract)?
+                    .is_some_and(|method| method.is_override)
+            {
+                return Err(Fault::new(
+                    "closed Object dispatch graph cannot infer generic value overrides yet",
+                ));
+            }
             if lineage(module, &owner)?.iter().any(|t| {
                 t.definition_name() == contract.owner.as_ref().and_then(Type::definition_name)
             }) {

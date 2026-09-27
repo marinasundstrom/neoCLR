@@ -263,15 +263,13 @@ ldfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C69645572695061796C6F616
 M00000003_IL_001c:
 stobj System.Web.Http.HttpError.InvalidUri
 M00000003_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000003_IL_0022:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000003_IL_0023:
 M00000003_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000003_IL_0025:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Web.Http.HttpError.NameResolution value) -> Void
@@ -424,15 +422,13 @@ ldfld System.Web.Http.HttpError::Metadata_V1_3C4E616D655265736F6C7574696F6E50617
 M00000005_IL_001c:
 stobj System.Web.Http.HttpError.NameResolution
 M00000005_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000005_IL_0022:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000005_IL_0023:
 M00000005_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000005_IL_0025:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Web.Http.HttpError.Transport value) -> Void
@@ -585,15 +581,13 @@ ldfld System.Web.Http.HttpError::Metadata_V1_3C5472616E73706F72745061796C6F61643
 M00000007_IL_001c:
 stobj System.Web.Http.HttpError.Transport
 M00000007_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000007_IL_0022:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000007_IL_0023:
 M00000007_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000007_IL_0025:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Web.Http.HttpError.Content value) -> Void
@@ -746,15 +740,13 @@ ldfld System.Web.Http.HttpError::Metadata_V1_3C436F6E74656E745061796C6F61643E
 M00000009_IL_001c:
 stobj System.Web.Http.HttpError.Content
 M00000009_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000009_IL_0022:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000009_IL_0023:
 M00000009_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000009_IL_0025:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Web.Http.HttpError.UnsuccessfulStatus value) -> Void
@@ -907,15 +899,13 @@ ldfld System.Web.Http.HttpError::Metadata_V1_3C556E7375636365737366756C537461747
 M0000000b_IL_001c:
 stobj System.Web.Http.HttpError.UnsuccessfulStatus
 M0000000b_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000b_IL_0022:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000b_IL_0023:
 M0000000b_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000b_IL_0025:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Web.Http.HttpError.InvalidRequest value) -> Void
@@ -1068,15 +1058,13 @@ ldfld System.Web.Http.HttpError::Metadata_V1_3C496E76616C69645265717565737450617
 M0000000d_IL_001c:
 stobj System.Web.Http.HttpError.InvalidRequest
 M0000000d_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000d_IL_0022:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000d_IL_0023:
 M0000000d_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000d_IL_0025:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Web.Http.HttpError.Protocol value) -> Void
@@ -1229,15 +1217,13 @@ ldfld System.Web.Http.HttpError::Metadata_V1_3C50726F746F636F6C5061796C6F61643E
 M0000000f_IL_001c:
 stobj System.Web.Http.HttpError.Protocol
 M0000000f_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000f_IL_0022:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000f_IL_0023:
 M0000000f_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000f_IL_0025:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Web.Http.HttpError.Unsupported value) -> Void
@@ -1390,15 +1376,13 @@ ldfld System.Web.Http.HttpError::Metadata_V1_3C556E737570706F727465645061796C6F6
 M00000011_IL_001c:
 stobj System.Web.Http.HttpError.Unsupported
 M00000011_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000011_IL_0022:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000011_IL_0023:
 M00000011_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000011_IL_0025:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Web.Http.HttpError.LimitExceeded value) -> Void
@@ -1551,15 +1535,13 @@ ldfld System.Web.Http.HttpError::Metadata_V1_3C4C696D697445786365656465645061796
 M00000013_IL_001d:
 stobj System.Web.Http.HttpError.LimitExceeded
 M00000013_IL_0022:
-ldc.i4 1
+ldc.bool true
 M00000013_IL_0023:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000013_IL_0024:
 M00000013_IL_0025:
-ldc.i4 0
+ldc.bool false
 M00000013_IL_0026:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Web.Http.HttpError.TimedOut value) -> Void
@@ -1712,15 +1694,13 @@ ldfld System.Web.Http.HttpError::Metadata_V1_3C54696D65644F75745061796C6F61643E
 M00000015_IL_001d:
 stobj System.Web.Http.HttpError.TimedOut
 M00000015_IL_0022:
-ldc.i4 1
+ldc.bool true
 M00000015_IL_0023:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000015_IL_0024:
 M00000015_IL_0025:
-ldc.i4 0
+ldc.bool false
 M00000015_IL_0026:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Web.Http.HttpError.Handler value) -> Void
@@ -1873,15 +1853,13 @@ ldfld System.Web.Http.HttpError::Metadata_V1_3C48616E646C65725061796C6F61643E
 M00000017_IL_001d:
 stobj System.Web.Http.HttpError.Handler
 M00000017_IL_0022:
-ldc.i4 1
+ldc.bool true
 M00000017_IL_0023:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000017_IL_0024:
 M00000017_IL_0025:
-ldc.i4 0
+ldc.bool false
 M00000017_IL_0026:
-call neoCLR.Library.System.Web.Http.HttpError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance override byref ToString() -> String

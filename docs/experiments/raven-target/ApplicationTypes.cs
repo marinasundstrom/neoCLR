@@ -70,6 +70,7 @@ static class ApplicationTypes
         && LibraryNames.ContainsKey(type) && GenericUnionLibrary.IsFamily(type);
     public static bool LibraryUnionRequiresInitialization(string name) => (Types.TryGetValue(name, out var type) || LibraryReferences.TryGetValue(name, out type))
         && LibraryNames.ContainsKey(type) && GenericUnionLibrary.IsFamily(type)
+        && !StandardUnionLibrary.IsFamily(type)
         && (GenericUnionLibrary.IsCarrier(type) || type.HasGenericParameters);
     public static bool IsType(string name) => Types.ContainsKey(name) || LibraryReferences.ContainsKey(name);
     public static bool IsReference(string name) => (Types.TryGetValue(name, out var type) || LibraryReferences.TryGetValue(name, out type)) && !type.IsValueType;
@@ -188,7 +189,7 @@ static class ApplicationTypes
             || !type.CustomAttributes.Any(attribute =>
                 attribute.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute"
                 && RuntimeSignatures.IsCore(attribute.AttributeType.Scope))
-            || type.NestedTypes.Count == 0 || type.Fields.Count != type.NestedTypes.Count + 1
+            || type.NestedTypes.Count == 0 || type.Fields.Count != RavenUnionMetadata.Cases(type).Length + 1
             || type.Fields.Any(field => !field.IsPrivate || field.IsStatic || field.HasMarshalInfo))
             return false;
         var tag = type.Fields.SingleOrDefault(field => field.Name == "<Tag>");
@@ -200,22 +201,22 @@ static class ApplicationTypes
                 && field.Offset > 0 && field.FieldType.Resolve() == caseType) == 1);
     }
 
-    // Bounded nongeneric source-library projection. Managed payload unions use
+    // Bounded source-library projection. Managed payload unions use
     // separate sequential fields; overlapping payload layouts remain unsupported.
     // This is Raven's current bridge shape, not a platform-wide case convention.
     public static bool IsStandardLibraryUnion(TypeDefinition type)
     {
         if (IsEmptyCaseUnion(type)) return true;
         if (!type.IsValueType || !type.IsSealed || !type.IsSequentialLayout
-            || type.HasGenericParameters || type.NestedTypes.Count == 0
+            || RavenUnionMetadata.Cases(type).Length == 0
             || !type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute"
                 && RuntimeSignatures.IsCore(a.AttributeType.Scope))
-            || type.Fields.Count != type.NestedTypes.Count + 1
+            || type.Fields.Count != RavenUnionMetadata.Cases(type).Length + 1
             || type.Fields.Any(f => !f.IsPrivate || f.IsStatic || f.HasMarshalInfo)) return false;
         var tag = type.Fields.SingleOrDefault(f => f.Name == "<Tag>");
         return tag?.FieldType.MetadataType == MetadataType.Byte
-            && type.NestedTypes.All(c => c.IsNestedPublic && c.IsValueType && c.IsSequentialLayout
-                && !c.HasGenericParameters && !c.HasNestedTypes
+            && RavenUnionMetadata.Family(type).Where(c => c.IsNested).All(c => c.IsNestedPublic && c.IsValueType && c.IsSequentialLayout
+                && !c.HasNestedTypes
                 && type.Fields.Count(f => f != tag && f.FieldType.Resolve() == c) == 1);
     }
 
@@ -229,7 +230,9 @@ static class ApplicationTypes
         && !method.Parameters[0].IsIn
         && method.Parameters[0].ParameterType is ByReferenceType output
         && output.ElementType.Resolve() is { IsValueType: true } caseType
-        && caseType.DeclaringType == method.DeclaringType
+        && (caseType.DeclaringType == method.DeclaringType
+            || caseType.DeclaringType is { } companion
+                && RavenUnionMetadata.CompanionTarget(companion) == method.DeclaringType.FullName)
         && method.DeclaringType.CustomAttributes.Any(attribute =>
             attribute.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute"
             && RuntimeSignatures.IsCore(attribute.AttributeType.Scope));
@@ -303,7 +306,7 @@ static class ApplicationTypes
         methods[name] = body;
     }
     public static IEnumerable<PropertyDefinition> RuntimeProperties(TypeDefinition type) =>
-        type.Properties.Where(p => LibraryNames.ContainsKey(type) ? GenericUnionLibrary.IsRuntimeProperty(p)
+        type.Properties.Where(p => LibraryNames.ContainsKey(type) ? (!StandardUnionLibrary.IsCandidate(type) ? GenericUnionLibrary.IsRuntimeProperty(p) : true)
             : (p.GetMethod ?? p.SetMethod) is { IsStatic: false }
                 && (p.GetMethod is not null || p.SetMethod is { } setter && !IsInitSetter(setter)));
 
@@ -339,7 +342,7 @@ static class ApplicationTypes
             if (type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute") || ErrorCarrierLibrary.IsMatched(type) || GenericUnionLibrary.IsMatched(type) && GenericUnionLibrary.IsCarrier(type)) output.AppendLine(".custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()");
             foreach (var contract in type.Interfaces) output.AppendLine(".implements " + map(contract.InterfaceType, false));
             foreach (var method in type.Methods.Where(m => m.IsAbstract))
-                output.AppendLine($".method instance {(LibraryNames.ContainsKey(type) && PropagationLibrary.IsContract(type) ? "readonly byref " : "")}{(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => (LibraryNames.ContainsKey(type) && PropagationLibrary.IsConditionalOutput(method, p) ? "out(true) " : "") + map(p.ParameterType, false) + (LibraryNames.ContainsKey(type) ? " " + p.Name : "")))}) -> {map(method.ReturnType, true)}\n.end");
+                output.AppendLine($".method instance {(LibraryNames.ContainsKey(type) && PropagationLibrary.IsContract(type) ? "readonly byref " : "")}{(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => (LibraryNames.ContainsKey(type) && p.IsOut ? "out " : "") + map(p.ParameterType, false) + (LibraryNames.ContainsKey(type) ? " " + p.Name : "")))}) -> {map(method.ReturnType, true)}\n.end");
             // Defer storage initialization for the explicit async state-machine contract,
             // independent of generated names or union-case conventions.
             var deferredState = !IsLibrary(type) && !type.IsValueType && type.Interfaces.Any(i =>

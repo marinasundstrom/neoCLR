@@ -28,12 +28,16 @@ fn build_default(module: &Module, ty: &Type, allow_uninitialized: bool) -> Resul
         if module.is_object_reference_type(ty) {
             return Ok(Value::NullObjectReference(ty.clone()));
         }
-        if allow_uninitialized
-            && module.type_definition(ty).is_some_and(|definition| {
-                definition.representation == crate::metadata::Representation::Delegate
-            })
-        {
-            return Ok(Value::Uninitialized(ty.clone()));
+        if module.type_definition(ty).is_some_and(|definition| {
+            definition.representation == crate::metadata::Representation::Delegate
+        }) {
+            // Delegate payloads have the same null default as CLI delegates.
+            // This does not turn them into ordinary heap-object references.
+            return Ok(if allow_uninitialized {
+                Value::Uninitialized(ty.clone())
+            } else {
+                Value::NullObjectReference(ty.clone())
+            });
         }
         Ok(match ty {
             Type::Void => Value::Void,

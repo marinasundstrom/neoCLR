@@ -23,3 +23,15 @@ False:
     ldc.i4 0
     ret
 .end
+.function neoCLR.Library.System.Tasks.TaskOutcome.RuntimeReflection936F30A1978F475D(System.Object arg0) -> String
+ldarg arg0
+callvirt instance System.Object::ToString()
+ret
+.end
+.function neoCLR.Library.System.Tasks.TaskOutcome.DefaultReference53797374656D2E4F626A656374() -> System.Object
+.local System.Object value
+ldloca value
+initobj System.Object
+ldloc value
+ret
+.end

@@ -10,9 +10,13 @@ including independent peers, known-length uploads and the extracted-package chec
 Feature scope is frozen; do not automatically start another HTTP feature.
 
 **Active work is release preparation for this POC**, at the author's direction.
+Publication is held for the author-requested migration of Option, Result and TaskOutcome to
+standard Raven unions, using Raven.Core as the reference. This is a release
+contract correction; HTTP feature scope remains frozen.
 The [toolchain/release tracker](tracking/toolchain-release.md) owns efficient CI,
 exact-candidate qualification and known-defect disposition. The CI split is implemented;
-hosted acceptance and release readiness are not yet claimed. Preview 10 is selected for the author-requested release; publication awaits
+hosted acceptance passed all six jobs at `1404454e` (slowest 8.88 minutes);
+focused union and replacement-package qualification is still required. Preview 10 is selected for the author-requested release; publication awaits
 validation. Thematic tracking consolidation is complete; M2–M6 remain candidates.
 
 ## Theme trackers

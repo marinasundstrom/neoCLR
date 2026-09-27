@@ -54,20 +54,15 @@ static class GenericUnionBindings
         };
     }
     public static bool IsType(string type) => Shapes.ContainsKey(type);
-    static bool DefaultPayload(string type) => type is "Void" or "Int32" or "Double" or "Boolean"
-        || PrimitiveBindings.Types.Contains(type) || (type == CancellationBindings.Token || CalendarBindings.Types.Contains(type)) || ErrorBindings.IsEmpty(type)
-        || Shapes.TryGetValue(type, out var nested) && CanDefault(nested);
-    static bool CanDefault(Shape shape) => shape.Kind is "Option.None" or "Tasks.TaskOutcome.Cancelled"
-        || shape.Kind is "Result.Ok" or "Result.Error" or "Option.Some" or "Tasks.TaskOutcome.Completed" && DefaultPayload(shape.Args[0]);
-    public static bool RequiresInitialization(string type) => Shapes.TryGetValue(type, out var shape) && !CanDefault(shape);
-    static ResultBindings.Binding Helper(Shape shape, string method, string[] args, string result, bool instance, bool byref, bool construct = false, bool output = false)
+    public static bool RequiresInitialization(string type) => false;
+    static ResultBindings.Binding Helper(Shape shape, string method, string[] args, string result, bool instance, bool byref, bool construct = false, bool output = false, bool conditionalOutput = true)
     {
         var inputs = instance ? new[] { shape.Name + "&" }.Concat(args).ToArray() : args;
         var key = shape.Name + ":" + method + "(" + string.Join(',', args) + ")" + (construct ? "new" : "call");
         if (!Helpers.TryGetValue(key, out var helper))
         {
             var name = "RuntimeUnion" + Helpers.Count;
-            var declaration = inputs.Select((t, i) => (output && i == 1 ? "out(true) " : "") + t + " arg" + i);
+            var declaration = inputs.Select((t, i) => (output && i == 1 ? conditionalOutput ? "out(true) " : "out " : "") + t + " arg" + i);
             var body = new StringBuilder($".function {name}({string.Join(',', declaration)}) -> {result}\n");
             if (instance) { body.AppendLine("ldarg arg0"); if (!byref) body.AppendLine("ldobj " + shape.Name); }
             for (var i = instance ? 1 : 0; i < inputs.Length; i++) body.AppendLine("ldarg arg" + i);
@@ -76,7 +71,7 @@ static class GenericUnionBindings
             body.AppendLine("ret\n.end");
             helper = (name, body.ToString()); Helpers.Add(key, helper);
         }
-        return new(helper.Name, inputs, result, output ? 1 : -1);
+        return new(helper.Name, inputs, result, output ? 1 : -1, ConditionalOutput: conditionalOutput);
     }
     public static ResultBindings.Binding? Construct(MethodReference reference, MethodDefinition definition)
     {
@@ -99,7 +94,7 @@ static class GenericUnionBindings
         if (owner is null || !Shapes.TryGetValue(owner, out var shape)) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, Type, allowOpenMethodParameters: ParameterMap is not null);
         var name = reference.Name;
-        if (definition.IsVirtual && !definition.IsFinal) throw new InvalidDataException("Unexpected union virtual method.");
+        if (definition.IsVirtual && !definition.IsFinal && reference.Name != "ToString") throw new InvalidDataException("Unexpected union virtual method.");
         if (shape.Kind is "Result.Ok" or "Result.Error" or "Option.Some" or "Tasks.TaskOutcome.Completed")
         {
             if (reference.HasThis && name == "Deconstruct" && result == "noresult"
@@ -109,7 +104,7 @@ static class GenericUnionBindings
                 if (!Helpers.TryGetValue(key, out var helper))
                 {
                     var helperName = "RuntimeUnion" + Helpers.Count;
-                    var body = $".function {helperName}({owner}& receiver,out {shape.Args[0]}& value) -> void\nldarg value\nldarg receiver\nldobj {owner}\ncall instance {owner}::get_Value()\nstobj {shape.Args[0]}\nret\n.end\n";
+                    var body = $".function {helperName}({owner}& receiver,out {shape.Args[0]}& value) -> void\nldarg value\nldarg receiver\ncall instance {owner}::get_Value()\nstobj {shape.Args[0]}\nret\n.end\n";
                     helper = (helperName, body);
                     Helpers.Add(key, helper);
                 }
@@ -118,7 +113,7 @@ static class GenericUnionBindings
             if (reference.HasThis && name == "set_Value" && args.SequenceEqual(new[] { shape.Args[0] }) && result == "noresult")
                 return Helper(shape, name, args, result, true, true);
             if (reference.HasThis && name == "get_Value" && args.Length == 0 && result == shape.Args[0])
-                return Helper(shape, name, args, result, true, false);
+                return Helper(shape, name, args, result, true, true);
         }
         if (shape.Kind is "Result" or "Option" or "Tasks.TaskOutcome")
         {
@@ -131,18 +126,17 @@ static class GenericUnionBindings
                 return Helper(shape, name, args, result, false, false);
             if (reference.HasThis && args.Length == 0)
             {
-                var flags = shape.Kind == "Result" ? new[] { "get_IsOk", "get_IsOkCase", "get_IsErr", "get_IsErrorCase" } : shape.Kind == "Option" ? new[] { "get_IsSome", "get_IsNone" } : new[] { "get_IsCompleted", "get_IsCancelled" };
-                if (result == "Boolean" && flags.Contains(name)
-                    || name == (shape.Kind == "Result" ? "GetOkCase" : shape.Kind == "Option" ? "GetSomeCase" : "GetCompletedCase") && result == first
-                    || name == (shape.Kind == "Result" ? "GetErrorCase" : shape.Kind == "Option" ? "GetNoneCase" : "GetCancelledCase") && result == second)
-                    return Helper(shape, name, args, result, true, false);
+                if ((name == "get_Value" && result == "System.Object" || name == "get_HasValue" && result == "Boolean"
+                        || name == "ToString" && result == "String"))
+                    return Helper(shape, name, args, result, true, true);
+
             }
             if (reference.HasThis && result == "Boolean" && args.Length == 1 && definition.Parameters[0].IsOut)
             {
-                if (name is "TryGet" or "TryGetValue" && (args[0] == first + "&" || args[0] == second + "&"))
-                    return Helper(shape, "TryGet", args, result, true, false, output: true);
+                if (name == "TryGetValue" && (args[0] == first + "&" || args[0] == second + "&"))
+                    return Helper(shape, "TryGetValue", args, result, true, true, output: true);
                 if (shape.Kind != "Tasks.TaskOutcome" && (name == "TryGetOutput" && args[0] == payload + "&" || name == "TryGetResidual" && args[0] == residual + "&"))
-                    return Helper(shape, name, args, result, true, true, output: true);
+                    return Helper(shape, name, args, result, true, true, output: true, conditionalOutput: false);
             }
         }
         throw new InvalidDataException("Unsupported union member: " + reference.FullName);

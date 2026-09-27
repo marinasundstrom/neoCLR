@@ -184,7 +184,9 @@ func Main() {
     let flags = boxes.Map((value: Box) -> bool => value.Value == 42).ToList()
     if flags[0] { WriteLine("Boolean") }
     let dates = ArrayList<Date>()
-    dates.Add(Date.FromDayNumber(0).GetOkCase().Value)
+    if Date.FromDayNumber(0) is Ok(let date) {
+        dates.Add(date)
+    }
     WriteLine(dates.Map((value: Date) -> int => value.DayNumber).ToList()[0])
     let visit: Func<Box, System.Void> = (value: Box) => { WriteLine(value.Value) }
     let units = boxes.Map(visit).ToList()

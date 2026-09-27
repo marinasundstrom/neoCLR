@@ -1303,18 +1303,14 @@
     <member name="M:System.Option.Some`1.Deconstruct(`0@)"><summary>Writes the case payload to the output parameter.</summary><param name="value">The value on which this operation acts.</param></member>
 
     <member name="P:System.Option.Some`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
-    <member name="T:System.Option`1"><summary>A nominal union containing Some with a value or None without one.</summary><remarks>Prefer Some/None construction, union patterns and propagation in Raven source. The carrier accessors are metadata-facing conveniences; extraction of the wrong case faults.</remarks></member>
-    <member name="M:System.Option`1.GetSomeCase"><summary>Extracts the Some case; requesting an inactive case faults.</summary></member>
+    <member name="T:System.Option`1"><summary>A nominal union containing Some with a value or None without one.</summary><remarks>Prefer Some/None construction, union patterns and propagation in Raven source. The generated IUnion contract exposes the boxed active case. Default carriers are inactive; construct None explicitly for absence.</remarks></member>
 
-    <member name="M:System.Option`1.GetNoneCase"><summary>Extracts the None case; requesting an inactive case faults.</summary></member>
 
-    <member name="M:System.Option`1.TryGet(System.Option.Some{`0}@)"><summary>Tests the requested case and assigns its payload only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Option`1.TryGet(System.Option.None@)"><summary>Tests the requested case and assigns its payload only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Option`1.TryGetOutput(`0@)"><summary>Returns true and assigns the successful output only when the value represents success.</summary><param name="output">Receives the successful output when the method returns true.</param></member>
+    <member name="M:System.Option`1.TryGetOutput(`0@)"><summary>Returns true and assigns the successful output only when the value represents success.</summary><param name="output">Receives the successful output when the method returns true.</param><remarks>Initializes the output to its default before matching; returns false when the requested propagation case is absent.</remarks></member>
 
-    <member name="M:System.Option`1.TryGetResidual(System.Void@)"><summary>Returns true and assigns the residual only when propagation should leave the current operation.</summary><param name="residual">Receives or supplies the residual outcome used by propagation.</param></member>
+    <member name="M:System.Option`1.TryGetResidual(System.Void@)"><summary>Returns true and assigns the residual only when propagation should leave the current operation.</summary><param name="residual">Receives or supplies the residual outcome used by propagation.</param><remarks>Initializes the output to its default before matching; returns false when the requested propagation case is absent.</remarks></member>
 
     <member name="M:System.Option`1.FromResidual(System.Void)"><summary>Constructs an outcome from a propagated residual.</summary><param name="residual">Receives or supplies the residual outcome used by propagation.</param></member>
 
@@ -1326,9 +1322,9 @@
 
     <member name="M:System.Option`1.TryGetValue(System.Option.None@)"><summary>Tests the requested case and assigns its case value only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="P:System.Option`1.IsSome"><summary>Tests whether the active case is Some.</summary></member>
-    <member name="P:System.Option`1.IsNone"><summary>Tests whether the active case is None.</summary></member>
-    <member name="P:System.Option`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
+    <member name="P:System.Option`1.Value"><summary>Gets the boxed active case, or null for an inactive default carrier.</summary></member>
+    <member name="P:System.Option`1.HasValue"><summary>Reports whether a case is active, including an explicitly constructed empty case.</summary></member>
+    <member name="M:System.Option`1.ToString"><summary>Returns the generated union case representation.</summary></member>
     <member name="T:System.Result"><summary>Contains the Ok and Error cases used to construct Result values.</summary></member>
     <member name="T:System.Result.Ok`1"><summary>The Ok case of System.Result.</summary></member>
     <member name="M:System.Result.Ok`1.#ctor(`0)"><summary>Constructs Ok with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
@@ -1342,22 +1338,16 @@
     <member name="M:System.Result.Error`1.Deconstruct(`0@)"><summary>Writes the case payload to the output parameter.</summary><param name="value">The value on which this operation acts.</param></member>
 
     <member name="P:System.Result.Error`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
-    <member name="T:System.Result`2"><summary>A nominal union containing a successful value or an expected error.</summary><remarks>Prefer Ok/Error construction, union patterns and propagation in Raven source. Expected errors remain values. The carrier accessors expose the compiler representation; extraction of the wrong case faults.</remarks></member>
-    <member name="M:System.Result`2.Ok(`0)"><summary>Constructs a successful result containing the supplied value.</summary><param name="value">The value on which this operation acts.</param></member>
+    <member name="T:System.Result`2"><summary>A nominal union containing a successful value or an expected error.</summary><remarks>Prefer Ok/Error construction, union patterns and propagation in Raven source. Expected errors remain values. The generated IUnion contract exposes the boxed active case. Default carriers are inactive.</remarks></member>
 
-    <member name="M:System.Result`2.Error(`1)"><summary>Constructs an error result containing the supplied error.</summary><param name="error">The error value or error-case callback indicated by this overload.</param></member>
 
-    <member name="M:System.Result`2.GetOkCase"><summary>Extracts the Ok case; requesting an inactive case faults.</summary></member>
 
-    <member name="M:System.Result`2.GetErrorCase"><summary>Extracts the Error case; requesting an inactive case faults.</summary></member>
 
-    <member name="M:System.Result`2.TryGet(System.Result.Ok{`0}@)"><summary>Tests the requested case and assigns its payload only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Result`2.TryGet(System.Result.Error{`1}@)"><summary>Tests the requested case and assigns its payload only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Result`2.TryGetOutput(`0@)"><summary>Returns true and assigns the successful output only when the value represents success.</summary><param name="output">Receives the successful output when the method returns true.</param></member>
+    <member name="M:System.Result`2.TryGetOutput(`0@)"><summary>Returns true and assigns the successful output only when the value represents success.</summary><param name="output">Receives the successful output when the method returns true.</param><remarks>Initializes the output to its default before matching; returns false when the requested propagation case is absent.</remarks></member>
 
-    <member name="M:System.Result`2.TryGetResidual(`1@)"><summary>Returns true and assigns the residual only when propagation should leave the current operation.</summary><param name="residual">Receives or supplies the residual outcome used by propagation.</param></member>
+    <member name="M:System.Result`2.TryGetResidual(`1@)"><summary>Returns true and assigns the residual only when propagation should leave the current operation.</summary><param name="residual">Receives or supplies the residual outcome used by propagation.</param><remarks>Initializes the output to its default before matching; returns false when the requested propagation case is absent.</remarks></member>
 
     <member name="M:System.Result`2.FromResidual(`1)"><summary>Constructs an outcome from a propagated residual.</summary><param name="residual">Receives or supplies the residual outcome used by propagation.</param></member>
 
@@ -1369,11 +1359,9 @@
 
     <member name="M:System.Result`2.TryGetValue(System.Result.Error{`1}@)"><summary>Tests the requested case and assigns its case value only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="P:System.Result`2.IsOk"><summary>Tests whether the active case is Ok.</summary></member>
-    <member name="P:System.Result`2.IsOkCase"><summary>Tests whether the active case is Ok.</summary></member>
-    <member name="P:System.Result`2.IsErr"><summary>Tests whether the active case is Err.</summary></member>
-    <member name="P:System.Result`2.IsErrorCase"><summary>Tests whether the active case is Error.</summary></member>
-    <member name="P:System.Result`2.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
+    <member name="P:System.Result`2.Value"><summary>Gets the boxed active case, or null for an inactive default carrier.</summary></member>
+    <member name="P:System.Result`2.HasValue"><summary>Reports whether a case is active, including an explicitly constructed empty case.</summary></member>
+    <member name="M:System.Result`2.ToString"><summary>Returns the generated union case representation.</summary></member>
     <member name="T:System.Delegate"><summary>CLI base metadata for delegate declarations; application callbacks use the Func family.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
     <member name="T:System.MulticastDelegate"><summary>CLI delegate base metadata; its presence does not add multicast invocation to neoCLR.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
     <member name="T:System.Func`1"><summary>A single-target callback with 0 input parameters and a result.</summary><remarks>Use a compatible lambda or method group in Raven source. The metadata constructor is compiler-facing binding machinery. The current runtime supports single-target invocation, not multicast combination.</remarks></member>
@@ -1691,26 +1679,22 @@
     <member name="M:System.Tasks.TaskOutcome.Completed`1.Deconstruct(`0@)"><summary>Writes the case payload to the output parameter.</summary><param name="value">The value on which this operation acts.</param></member>
 
     <member name="P:System.Tasks.TaskOutcome.Completed`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
-    <member name="T:System.Tasks.TaskOutcome`1"><summary>A nominal union containing a completed task value or cancellation.</summary><remarks>Completed carries the task result; Cancelled carries no value. Cancellation is distinct from an expected error inside a completed Result.</remarks></member>
+    <member name="T:System.Tasks.TaskOutcome`1"><summary>A standard Raven union containing a completed task value or cancellation.</summary><remarks>Completed carries the task result; Cancelled carries no value. Cancellation is distinct from an expected error inside a completed Result. The default is inactive, with HasValue false and Value null.</remarks></member>
     <member name="M:System.Tasks.TaskOutcome`1.#ctor(System.Tasks.TaskOutcome.Completed{`0})"><summary>Constructs TaskOutcome with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
     <member name="M:System.Tasks.TaskOutcome`1.#ctor(System.Tasks.TaskOutcome.Cancelled)"><summary>Constructs TaskOutcome with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Tasks.TaskOutcome`1.GetCompletedCase"><summary>Extracts the Completed case; requesting an inactive case faults.</summary></member>
 
-    <member name="M:System.Tasks.TaskOutcome`1.GetCancelledCase"><summary>Extracts the Cancelled case; requesting an inactive case faults.</summary></member>
 
-    <member name="M:System.Tasks.TaskOutcome`1.TryGet(System.Tasks.TaskOutcome.Completed{`0}@)"><summary>Tests the requested case and assigns its payload only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Tasks.TaskOutcome`1.TryGet(System.Tasks.TaskOutcome.Cancelled@)"><summary>Tests the requested case and assigns its payload only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
 
     <member name="M:System.Tasks.TaskOutcome`1.TryGetValue(System.Tasks.TaskOutcome.Completed{`0}@)"><summary>Tests the requested case and assigns its case value only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
 
     <member name="M:System.Tasks.TaskOutcome`1.TryGetValue(System.Tasks.TaskOutcome.Cancelled@)"><summary>Tests the requested case and assigns its case value only on a successful match.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="P:System.Tasks.TaskOutcome`1.IsCompleted"><summary>Tests whether the active case is Completed.</summary></member>
-    <member name="P:System.Tasks.TaskOutcome`1.IsCancelled"><summary>Tests whether the active case is Cancelled.</summary></member>
-    <member name="P:System.Tasks.TaskOutcome`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
+    <member name="P:System.Tasks.TaskOutcome`1.Value"><summary>Gets the boxed active case, or null for an inactive default.</summary></member>
+    <member name="P:System.Tasks.TaskOutcome`1.HasValue"><summary>Reports whether a case is active, including Cancelled.</summary></member>
+    <member name="M:System.Tasks.TaskOutcome`1.ToString"><summary>Returns the generated union case representation or the inactive-default marker.</summary></member>
     <member name="T:System.Tasks.TaskResultOperators"><summary>Transforms successful results inside tasks while preserving expected errors and cancellation.</summary></member>
     <member name="M:System.Tasks.TaskResultOperators.MapResult``3(System.Tasks.Task{System.Result{``0,``1}},System.Func{``0,``2})"><summary>Transforms the successful value into the returned result or task result, preserving the enclosing absence/error/cancellation contract.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
 

@@ -193,7 +193,7 @@ pub(crate) fn record_fields(
                 && d.generic_parameters.len() == arguments.len()
                 && d.representation == Representation::Record
         })
-        .ok_or_else(|| Fault::new("expected record definition"))?;
+        .ok_or_else(|| Fault::new(format!("expected record definition for {ty:?}")))?;
     let fields = crate::inheritance::fields(module, ty)?;
     for field in &fields {
         crate::constraints::check_known_type(module, &field.ty, 0)?;

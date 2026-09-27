@@ -1,3 +1,1 @@
-; Raven owns the existing Option carrier, cases and propagation bodies.
-.include "../raven/generated/Option.methods.neoil"
-.include "../raven/generated/Option.helpers.neoil"
+.include "../legacy/Option.neoil"

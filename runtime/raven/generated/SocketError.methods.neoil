@@ -287,15 +287,13 @@ ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C436C6F7365645061796C6
 M00000003_IL_001c:
 stobj System.Networking.Sockets.SocketError.Closed
 M00000003_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000003_IL_0022:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000003_IL_0023:
 M00000003_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000003_IL_0025:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Networking.Sockets.SocketError.Busy value) -> Void
@@ -469,15 +467,13 @@ ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C427573795061796C6F616
 M00000005_IL_001c:
 stobj System.Networking.Sockets.SocketError.Busy
 M00000005_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000005_IL_0022:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000005_IL_0023:
 M00000005_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000005_IL_0025:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Networking.Sockets.SocketError.InvalidRange value) -> Void
@@ -651,15 +647,13 @@ ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C696452616E6
 M00000007_IL_001c:
 stobj System.Networking.Sockets.SocketError.InvalidRange
 M00000007_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000007_IL_0022:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000007_IL_0023:
 M00000007_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000007_IL_0025:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Networking.Sockets.SocketError.LimitExceeded value) -> Void
@@ -833,15 +827,13 @@ ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C4C696D697445786365656
 M00000009_IL_001c:
 stobj System.Networking.Sockets.SocketError.LimitExceeded
 M00000009_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000009_IL_0022:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000009_IL_0023:
 M00000009_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000009_IL_0025:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Networking.Sockets.SocketError.Cancelled value) -> Void
@@ -1015,15 +1007,13 @@ ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C43616E63656C6C6564506
 M0000000b_IL_001c:
 stobj System.Networking.Sockets.SocketError.Cancelled
 M0000000b_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000b_IL_0022:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000b_IL_0023:
 M0000000b_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000b_IL_0025:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Networking.Sockets.SocketError.InvalidAddress value) -> Void
@@ -1197,15 +1187,13 @@ ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644164647
 M0000000d_IL_001c:
 stobj System.Networking.Sockets.SocketError.InvalidAddress
 M0000000d_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000d_IL_0022:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000d_IL_0023:
 M0000000d_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000d_IL_0025:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Networking.Sockets.SocketError.ConnectionRefused value) -> Void
@@ -1379,15 +1367,13 @@ ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E5
 M0000000f_IL_001c:
 stobj System.Networking.Sockets.SocketError.ConnectionRefused
 M0000000f_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000f_IL_0022:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000f_IL_0023:
 M0000000f_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000f_IL_0025:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Networking.Sockets.SocketError.ConnectionReset value) -> Void
@@ -1561,15 +1547,13 @@ ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C436F6E6E656374696F6E5
 M00000011_IL_001c:
 stobj System.Networking.Sockets.SocketError.ConnectionReset
 M00000011_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000011_IL_0022:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000011_IL_0023:
 M00000011_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000011_IL_0025:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Networking.Sockets.SocketError.AccessDenied value) -> Void
@@ -1743,15 +1727,13 @@ ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C41636365737344656E696
 M00000013_IL_001d:
 stobj System.Networking.Sockets.SocketError.AccessDenied
 M00000013_IL_0022:
-ldc.i4 1
+ldc.bool true
 M00000013_IL_0023:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000013_IL_0024:
 M00000013_IL_0025:
-ldc.i4 0
+ldc.bool false
 M00000013_IL_0026:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Networking.Sockets.SocketError.TimedOut value) -> Void
@@ -1925,15 +1907,13 @@ ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C54696D65644F757450617
 M00000015_IL_001d:
 stobj System.Networking.Sockets.SocketError.TimedOut
 M00000015_IL_0022:
-ldc.i4 1
+ldc.bool true
 M00000015_IL_0023:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000015_IL_0024:
 M00000015_IL_0025:
-ldc.i4 0
+ldc.bool false
 M00000015_IL_0026:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Networking.Sockets.SocketError.IoFailure value) -> Void
@@ -2107,15 +2087,13 @@ ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C496F4661696C757265506
 M00000017_IL_001d:
 stobj System.Networking.Sockets.SocketError.IoFailure
 M00000017_IL_0022:
-ldc.i4 1
+ldc.bool true
 M00000017_IL_0023:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000017_IL_0024:
 M00000017_IL_0025:
-ldc.i4 0
+ldc.bool false
 M00000017_IL_0026:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Networking.Sockets.SocketError.InvalidOperation value) -> Void
@@ -2289,15 +2267,13 @@ ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C496E76616C69644F70657
 M00000019_IL_001d:
 stobj System.Networking.Sockets.SocketError.InvalidOperation
 M00000019_IL_0022:
-ldc.i4 1
+ldc.bool true
 M00000019_IL_0023:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000019_IL_0024:
 M00000019_IL_0025:
-ldc.i4 0
+ldc.bool false
 M00000019_IL_0026:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Networking.Sockets.SocketError.AddressInUse value) -> Void
@@ -2471,15 +2447,13 @@ ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C41646472657373496E557
 M0000001b_IL_001d:
 stobj System.Networking.Sockets.SocketError.AddressInUse
 M0000001b_IL_0022:
-ldc.i4 1
+ldc.bool true
 M0000001b_IL_0023:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000001b_IL_0024:
 M0000001b_IL_0025:
-ldc.i4 0
+ldc.bool false
 M0000001b_IL_0026:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Networking.Sockets.SocketError.UnsupportedAddressFamily value) -> Void
@@ -2653,15 +2627,13 @@ ldfld System.Networking.Sockets.SocketError::Metadata_V1_3C556E737570706F7274656
 M0000001d_IL_001d:
 stobj System.Networking.Sockets.SocketError.UnsupportedAddressFamily
 M0000001d_IL_0022:
-ldc.i4 1
+ldc.bool true
 M0000001d_IL_0023:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000001d_IL_0024:
 M0000001d_IL_0025:
-ldc.i4 0
+ldc.bool false
 M0000001d_IL_0026:
-call neoCLR.Library.System.Networking.Sockets.SocketError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance override byref ToString() -> String

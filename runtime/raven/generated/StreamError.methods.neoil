@@ -255,15 +255,13 @@ ldfld System.IO.StreamError::Metadata_V1_3C496E76616C6964506174685061796C6F61643
 M00000003_IL_001c:
 stobj System.IO.StreamError.InvalidPath
 M00000003_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000003_IL_0022:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000003_IL_0023:
 M00000003_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000003_IL_0025:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.IO.StreamError.NotFound value) -> Void
@@ -409,15 +407,13 @@ ldfld System.IO.StreamError::Metadata_V1_3C4E6F74466F756E645061796C6F61643E
 M00000005_IL_001c:
 stobj System.IO.StreamError.NotFound
 M00000005_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000005_IL_0022:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000005_IL_0023:
 M00000005_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000005_IL_0025:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.IO.StreamError.AccessDenied value) -> Void
@@ -563,15 +559,13 @@ ldfld System.IO.StreamError::Metadata_V1_3C41636365737344656E6965645061796C6F616
 M00000007_IL_001c:
 stobj System.IO.StreamError.AccessDenied
 M00000007_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000007_IL_0022:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000007_IL_0023:
 M00000007_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000007_IL_0025:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.IO.StreamError.WrongKind value) -> Void
@@ -717,15 +711,13 @@ ldfld System.IO.StreamError::Metadata_V1_3C57726F6E674B696E645061796C6F61643E
 M00000009_IL_001c:
 stobj System.IO.StreamError.WrongKind
 M00000009_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000009_IL_0022:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000009_IL_0023:
 M00000009_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000009_IL_0025:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.IO.StreamError.AlreadyExists value) -> Void
@@ -871,15 +863,13 @@ ldfld System.IO.StreamError::Metadata_V1_3C416C72656164794578697374735061796C6F6
 M0000000b_IL_001c:
 stobj System.IO.StreamError.AlreadyExists
 M0000000b_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000b_IL_0022:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000b_IL_0023:
 M0000000b_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000b_IL_0025:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.IO.StreamError.Closed value) -> Void
@@ -1025,15 +1015,13 @@ ldfld System.IO.StreamError::Metadata_V1_3C436C6F7365645061796C6F61643E
 M0000000d_IL_001c:
 stobj System.IO.StreamError.Closed
 M0000000d_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000d_IL_0022:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000d_IL_0023:
 M0000000d_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000d_IL_0025:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.IO.StreamError.InvalidRange value) -> Void
@@ -1179,15 +1167,13 @@ ldfld System.IO.StreamError::Metadata_V1_3C496E76616C696452616E67655061796C6F616
 M0000000f_IL_001c:
 stobj System.IO.StreamError.InvalidRange
 M0000000f_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000f_IL_0022:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000f_IL_0023:
 M0000000f_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000f_IL_0025:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.IO.StreamError.LimitExceeded value) -> Void
@@ -1333,15 +1319,13 @@ ldfld System.IO.StreamError::Metadata_V1_3C4C696D697445786365656465645061796C6F6
 M00000011_IL_001c:
 stobj System.IO.StreamError.LimitExceeded
 M00000011_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000011_IL_0022:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000011_IL_0023:
 M00000011_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000011_IL_0025:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.IO.StreamError.WrongAccess value) -> Void
@@ -1487,15 +1471,13 @@ ldfld System.IO.StreamError::Metadata_V1_3C57726F6E674163636573735061796C6F61643
 M00000013_IL_001d:
 stobj System.IO.StreamError.WrongAccess
 M00000013_IL_0022:
-ldc.i4 1
+ldc.bool true
 M00000013_IL_0023:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000013_IL_0024:
 M00000013_IL_0025:
-ldc.i4 0
+ldc.bool false
 M00000013_IL_0026:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.IO.StreamError.IoFailure value) -> Void
@@ -1641,15 +1623,13 @@ ldfld System.IO.StreamError::Metadata_V1_3C496F4661696C7572655061796C6F61643E
 M00000015_IL_001d:
 stobj System.IO.StreamError.IoFailure
 M00000015_IL_0022:
-ldc.i4 1
+ldc.bool true
 M00000015_IL_0023:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000015_IL_0024:
 M00000015_IL_0025:
-ldc.i4 0
+ldc.bool false
 M00000015_IL_0026:
-call neoCLR.Library.System.IO.StreamError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance override byref ToString() -> String

@@ -103,15 +103,16 @@ value.unpack String
 M00000002_IL_005a:
 call neoCLR.Library.System.Text.Utf8.RuntimeUnion0(String)
 M00000002_IL_005f:
-call neoCLR.Library.System.Text.Utf8.RuntimeUnion1(System.Result.Ok<String>)
+call neoCLR.Library.System.Text.Utf8.RuntimeUnion2(System.Result.Ok<String>)
 M00000002_IL_0064:
 ret
 M00000002_IL_0065:
 M00000002_IL_0066:
-M00000002_IL_0067:
 call neoCLR.Library.System.Text.Utf8.RuntimeErrorSystemTextInvalidUtf8ErrorNew()
-M00000002_IL_006c:
-call neoCLR.Library.System.Text.Utf8.RuntimeUnion2(System.Text.InvalidUtf8Error)
-M00000002_IL_0071:
+M00000002_IL_006b:
+call neoCLR.Library.System.Text.Utf8.RuntimeUnion1(System.Text.InvalidUtf8Error)
+M00000002_IL_0070:
+call neoCLR.Library.System.Text.Utf8.RuntimeUnion3(System.Result.Error<System.Text.InvalidUtf8Error>)
+M00000002_IL_0075:
 ret
 .end

@@ -47,7 +47,11 @@ It is a callable value; D& separately denotes managed delegate storage.
 
 The internal binding is a closed FunctionRef plus either no receiver or a heap-backed
 managed receiver. No-receiver is an internal alternative, not an invalid or nullable
-address. default(D), including defaults of records containing D, is rejected.
+address. Typed default initialization of D, including fields inside a default value
+record, produces a null delegate; invocation faults. This follows CLI delegate
+default semantics and permits inactive generic union payloads. It does not add
+ordinary object upcasts or multicast behavior. Class constructors retain the
+existing requirement to assign delegate fields before reading or publishing them.
 
 Signature checks include returns, parameter types, readonly, out and conditional-out
 contracts. There are no implicit signature adapters. Access is checked at binding;

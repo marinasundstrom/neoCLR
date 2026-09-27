@@ -239,8 +239,8 @@ try:
             results[expression] = labels
     if unions:
         for version, expression, expected in (
-            (23, 'result.', ('IsOk', 'IsErr', 'GetOkCase', 'GetErrorCase', 'TryGet', 'TryGetOutput', 'TryGetResidual', 'Map', 'Then', 'MapError', 'Match', 'Tap', 'TapError', 'OrElse', 'UnwrapOrElse', 'UnwrapOr', 'ToIterable')),
-            (24, 'option.', ('IsSome', 'IsNone', 'GetSomeCase', 'GetNoneCase', 'TryGet', 'Map', 'Then', 'Filter', 'OrElse', 'UnwrapOrElse', 'UnwrapOr', 'Match', 'Tap', 'TapNone', 'ToIterable', 'ThenResult', 'MapResult', 'OkOr'))):
+            (23, 'result.', ('HasValue', 'Value', 'TryGetValue', 'TryGetOutput', 'TryGetResidual', 'Map', 'Then', 'MapError', 'Match', 'Tap', 'TapError', 'OrElse', 'UnwrapOrElse', 'UnwrapOr', 'ToIterable')),
+            (24, 'option.', ('HasValue', 'Value', 'TryGetValue', 'Map', 'Then', 'Filter', 'OrElse', 'UnwrapOrElse', 'UnwrapOr', 'Match', 'Tap', 'TapNone', 'ToIterable', 'ThenResult', 'MapResult', 'OkOr'))):
             text = 'import System.*\nfunc Inspect(result: Result<long, string>, option: Option<string>) {\n\n\n    ' + expression + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},

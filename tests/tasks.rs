@@ -15,7 +15,9 @@ fn library() -> &'static Module {
 }
 fn load(body: &str) -> Result<LoadedProgram, String> {
     let source = format!(".module App\n.entry Main\n.function Main() -> Int32\n{body}\nret\n.end")
-        .replace("Tasks.", "System.Tasks.");
+        .replace("Tasks.", "System.Tasks.")
+        + "\n"
+        + include_str!("fixtures/union-patterns.neoil");
     let app = neoclr::assembler::read_modules(
         &[neoclr::assembler::ModuleInput::Source(&source)],
         library(),
@@ -159,7 +161,9 @@ fn default_queue_registration_cannot_replace_the_dispatcher() {
 #[test]
 fn cancellation_is_terminal_and_completion_cannot_replace_it() {
     let body = format!(
-        r#"{SOURCE}
+        r#".local Tasks.TaskOutcome<Int32> outcome
+.local Tasks.TaskOutcome.Cancelled cancelled
+{SOURCE}
 ldloc source
 call instance Tasks.Promise<Int32>::Cancel()
 brfalse Failed
@@ -180,9 +184,11 @@ brfalse Failed
 ldloc source
 call instance Tasks.Promise<Int32>::get_Task()
 call instance Tasks.Task<Int32>::get_Outcome()
-call instance System.Option<Tasks.TaskOutcome<Int32>>::GetSomeCase()
-call instance System.Option.Some<Tasks.TaskOutcome<Int32>>::get_Value()
-call instance Tasks.TaskOutcome<Int32>::get_IsCancelled()
+call UnwrapSome<Tasks.TaskOutcome<Int32>>(System.Option<Tasks.TaskOutcome<Int32>>)
+stloc outcome
+ldloca outcome
+ldloca cancelled
+call instance Tasks.TaskOutcome<Int32>::TryGetValue(Tasks.TaskOutcome.Cancelled&)
 brfalse Failed
 ldc.i4 1
 ret

@@ -223,3 +223,29 @@ explicit terminal-fault policy confined to its target integration. Fifty-five
 focused invocation, flow, return-path and emission-rejection tests passed; the
 selected release must also pass extracted MSBuild diagnostics/stale-output checks.
 The compiler documentation is Raven's `docs/compiler/runtime-contracts.md`.
+
+## Standard generic library unions — 2026-09-27
+
+The matching Raven neoCLR revision is `a108df82a`, incorporating contextual pattern
+symbol and generic completion fixes from `0524da35c`. General Raven fix `3c53f6da5`
+was tested independently and integrated into main before being cherry-picked: an
+imported empty case in a generic union is instantiated according to its actual CLI
+arity, not the enclosing carrier's arity. Ten focused imported-union tests pass,
+including ordinary and target-core metadata consumers. Raven's compiler
+`docs/compiler/runtime-contracts.md` records the same metadata boundary.
+
+Option, Result and TaskOutcome now compile from ordinary Raven union declarations.
+The bridge projects generic companions and case metadata, closes method/interface
+signatures, preserves generated IUnion/HasValue/Value/TryGetValue members and imports
+the actual generated implementation. System.Void remains named unit storage in
+fields, byrefs and generic arguments, while CLI void return signatures remain void.
+Propagatable outputs are ordinary initialized out parameters; generated case
+extraction retains conditional output assignment. No Runtime Contract option changes.
+
+Compared with ordinary CLR generic value types, this uses existing metadata, fields,
+boxing and interface dispatch. It introduces no VM union opcode. Default delegate
+payload storage is null, and closed generic boxed values dispatch Object overrides.
+Static Object reachability cannot infer arbitrary generic overrides and rejects
+that analysis explicitly. Arbitrary generic application unions and payload-bearing
+explicit layouts remain outside the validated subset. The separate Neo bootstrap
+profile retains its frozen legacy carrier/propagation ABI.

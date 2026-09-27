@@ -13,6 +13,7 @@ maintain a second HTTP completion checklist here.
 | Unresolved call accepted as empty body | Fixed on Raven neoCLR branch `d48bf14ba`; main already rejected the minimal case | [Integration evidence](../raven-target-compilation.md#preview-10-terminal-flow-diagnostics--2026-09-27): 55 focused tests pass. Requalify packaged MSBuild/stale-output behavior for Preview 10. |
 | Conditional expression-bodied getter emits zero | Open observation; explicit getter workaround in the upload feature | [Upload evidence](../experiments/http-stream-upload/README.md); general compiler reduction/fix remains separate. |
 | HTTP reference/library projection | Upload APIs and Disposable conversion integrated in `45b74768` | [623 signature checks and matching artifacts](../experiments/http-stream-upload/validation.json); no compiler Runtime Contract or native API change claimed. |
+| Standard library unions | Option/Result/TaskOutcome migrated; focused contract and task checks pass | [Contract evidence](../experiments/http-error-unions/standard-contract-validation.json); replace candidate packages before publication. |
 | API reference | Source changes require matching bridge/reference and useful member docs | [Maintenance procedure](../../api-docs/README.md), including explicit renderer exclusions; do not substitute a feature page for member coverage. |
 
 General Raven fixes belong on independently tested main-based feature branches;
@@ -21,13 +22,16 @@ applicable documentation/changelogs in both repositories. The
 [nine Raven issue assessments](../history/planning-20260927/issue-fix-roadmap.md#raven-issues-through-the-neoclr-lens)
 are a 2026-09-26 snapshot, not a new live inventory or authorization to fix all nine.
 
+| Boxed Completed pattern binding | Open compiler observation; explicit closed-case cast validates IUnion.Value | [Union guide](../raven-union-api.md#task-outcomes); ordinary task outcome patterns pass. |
+| Historical source API checklist | Still references obsolete generated/File fragments | Refresh the separate source checklist; current on-site metadata inventory and snapshot pass. |
+
 ## Delivery and documentation
 
 | Item | Status / owner boundary | Next action when selected |
 | --- | --- | --- |
 | HTTP evaluator package | POC acceptance complete on macOS arm64; HTTP tracker owns the evidence | [Package evidence](../experiments/http-poc-package/README.md) records the exact artifacts. Requalify the selected release candidate and shipped targets; do not treat a local POC pass as full release readiness. |
 | Next runtime release | Preview 10 selected at the author’s explicit release direction; validation in progress | [Candidate notes](../preview-10-release-notes.md). Complete reduced hosted CI, extracted runtime/SDK/editor checks and known-defect disposition, then publish; do not expand feature scope. |
-| CI efficiency | Implemented canonical/host/compile-only split; hosted acceptance pending | [CI design](../ci-efficiency-plan.md): host inventory and tradeoffs are explicit. Measure the first hosted run; retain exact-package release checks. |
+| CI efficiency | All six jobs passed; slowest 8.88 minutes, about 17.6 runner-minutes | [Hosted evidence](../experiments/ci-split/README.md). Canonical evidence precedes the union migration; validate that contract and rebuilt packages separately. |
 | [#9 RavenDoc](https://github.com/marinasundstrom/neoCLR/issues/9) | Dated inventory spans correctness/navigation and richer rendering | First reproduce a current label/navigation or coverage gap; separate small repairs from union modeling/hierarchy features. Keep linked manual coverage until rendering supports a member. |
 | Website | Local validation and manual publication are separate | [Maintenance](../design/feature-pages.md), [site procedure](../../website/README.md); successful build/push is not deployment. |
 | Tracking consolidation | Completed organization in this change | One owner per theme; keep contracts and evidence linked, archive superseded priority sequences, and update current rows instead of appending competing plans. |

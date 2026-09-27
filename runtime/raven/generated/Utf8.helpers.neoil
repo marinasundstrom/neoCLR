@@ -8,14 +8,19 @@ ldarg arg0
 newobj instance System.Result.Ok<String>::.ctor(String)
 ret
 .end
-.function neoCLR.Library.System.Text.Utf8.RuntimeUnion1(System.Result.Ok<String> arg0) -> System.Result<String,System.Text.InvalidUtf8Error>
+.function neoCLR.Library.System.Text.Utf8.RuntimeUnion1(System.Text.InvalidUtf8Error arg0) -> System.Result.Error<System.Text.InvalidUtf8Error>
+ldarg arg0
+newobj instance System.Result.Error<System.Text.InvalidUtf8Error>::.ctor(System.Text.InvalidUtf8Error)
+ret
+.end
+.function neoCLR.Library.System.Text.Utf8.RuntimeUnion2(System.Result.Ok<String> arg0) -> System.Result<String,System.Text.InvalidUtf8Error>
 ldarg arg0
 newobj instance System.Result<String,System.Text.InvalidUtf8Error>::.ctor(System.Result.Ok<String>)
 ret
 .end
-.function neoCLR.Library.System.Text.Utf8.RuntimeUnion2(System.Text.InvalidUtf8Error arg0) -> System.Result<String,System.Text.InvalidUtf8Error>
+.function neoCLR.Library.System.Text.Utf8.RuntimeUnion3(System.Result.Error<System.Text.InvalidUtf8Error> arg0) -> System.Result<String,System.Text.InvalidUtf8Error>
 ldarg arg0
-call System.Result<String,System.Text.InvalidUtf8Error>::Error(System.Text.InvalidUtf8Error)
+newobj instance System.Result<String,System.Text.InvalidUtf8Error>::.ctor(System.Result.Error<System.Text.InvalidUtf8Error>)
 ret
 .end
 .function neoCLR.Library.System.Text.Utf8.RuntimeBooleanToInt32(Boolean value) -> Int32

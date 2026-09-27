@@ -63,29 +63,25 @@ ldarg arg0
 newobj instance System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>::.ctor(System.Result.Error<System.Networking.DnsError>)
 ret
 .end
-.function neoCLR.Library.System.Networking.Dns.RuntimeUnion2(System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>& arg0,out(true) System.Result.Ok<System.Networking.IPAddress>& arg1) -> Boolean
-ldarg arg0
-ldobj System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>
-ldarg arg1
-call instance System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>::TryGet(System.Result.Ok<System.Networking.IPAddress>&)
-ret
-.end
-.function neoCLR.Library.System.Networking.Dns.RuntimeUnion3(System.Collections.Sequence<System.Networking.IPAddress> arg0) -> System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>
+.function neoCLR.Library.System.Networking.Dns.RuntimeUnion2(System.Collections.Sequence<System.Networking.IPAddress> arg0) -> System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>
 ldarg arg0
 newobj instance System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>::.ctor(System.Collections.Sequence<System.Networking.IPAddress>)
 ret
 .end
-.function neoCLR.Library.System.Networking.Dns.RuntimeUnion4(System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>> arg0) -> System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>
+.function neoCLR.Library.System.Networking.Dns.RuntimeUnion3(System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>> arg0) -> System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>
 ldarg arg0
 newobj instance System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>::.ctor(System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>)
 ret
 .end
-.function neoCLR.Library.System.Networking.Dns.RuntimeUnion5(System.Result.Ok<System.Networking.IPAddress>& receiver,out System.Networking.IPAddress& value) -> void
-ldarg value
-ldarg receiver
-ldobj System.Result.Ok<System.Networking.IPAddress>
+.function neoCLR.Library.System.Networking.Dns.RuntimeUnion4(System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>& arg0,out(true) System.Result.Ok<System.Networking.IPAddress>& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>::TryGetValue(System.Result.Ok<System.Networking.IPAddress>&)
+ret
+.end
+.function neoCLR.Library.System.Networking.Dns.RuntimeUnion5(System.Result.Ok<System.Networking.IPAddress>& arg0) -> System.Networking.IPAddress
+ldarg arg0
 call instance System.Result.Ok<System.Networking.IPAddress>::get_Value()
-stobj System.Networking.IPAddress
 ret
 .end
 .function neoCLR.Library.System.Networking.Dns.RuntimeBooleanFromInt32(Int32 value) -> Boolean
@@ -431,8 +427,6 @@ ret
 .local System.Collections.Sequence<System.Networking.IPAddress> local7
 .local System.Result<System.Networking.IPAddress,System.Networking.IPAddressError> local8
 .local System.Result.Ok<System.Networking.IPAddress> local9
-.local System.Result.Ok<System.Networking.IPAddress> local10
-.local System.Networking.IPAddress local11
 ldloca local0
 initobj System.Concurrency.CancellationRegistration
 ldloca local1
@@ -447,8 +441,10 @@ ldloca local6
 initobj System.Networking.IPAddress
 ldloca local7
 initobj System.Collections.Sequence<System.Networking.IPAddress>
-ldloca local11
-initobj System.Networking.IPAddress
+ldloca local8
+initobj System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>
+ldloca local9
+initobj System.Result.Ok<System.Networking.IPAddress>
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 M0000000b_IL_0002:
@@ -562,7 +558,7 @@ call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
 M0000000b_IL_0098:
 pop
 M0000000b_IL_0099:
-br M0000000b_IL_0173
+br M0000000b_IL_0167
 M0000000b_IL_009f:
 M0000000b_IL_00a0:
 M0000000b_IL_00a1:
@@ -594,7 +590,7 @@ call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
 M0000000b_IL_00bf:
 brtrue M0000000b_IL_00c9
 M0000000b_IL_00c4:
-br M0000000b_IL_0155
+br M0000000b_IL_0149
 M0000000b_IL_00c9:
 M0000000b_IL_00ca:
 ldloc local3
@@ -607,104 +603,94 @@ call System.Networking.IPAddress::Parse(String)
 M0000000b_IL_00d7:
 stloc local8
 M0000000b_IL_00d9:
-ldloca local8
-M0000000b_IL_00db:
 ldloca local9
-M0000000b_IL_00dd:
-call neoCLR.Library.System.Networking.Dns.RuntimeUnion2(System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>&,System.Result.Ok<System.Networking.IPAddress>&)
-M0000000b_IL_00e2:
-brfalse M0000000b_IL_0110
-M0000000b_IL_00e7:
-ldloc local9
-M0000000b_IL_00e9:
-stloc local10
-M0000000b_IL_00eb:
-ldloca local10
-M0000000b_IL_00ed:
-ldloca local11
+M0000000b_IL_00db:
+initobj System.Result.Ok<System.Networking.IPAddress>
+M0000000b_IL_00e1:
+ldloca local8
+M0000000b_IL_00e3:
+ldloca local9
+M0000000b_IL_00e5:
+call neoCLR.Library.System.Networking.Dns.RuntimeUnion4(System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>&,System.Result.Ok<System.Networking.IPAddress>&)
+M0000000b_IL_00ea:
+brfalse M0000000b_IL_0104
 M0000000b_IL_00ef:
-call neoCLR.Library.System.Networking.Dns.RuntimeUnion5(System.Result.Ok<System.Networking.IPAddress>&,System.Networking.IPAddress&)
-M0000000b_IL_00f4:
-ldloc local11
+ldloca local9
+M0000000b_IL_00f1:
+call neoCLR.Library.System.Networking.Dns.RuntimeUnion5(System.Result.Ok<System.Networking.IPAddress>&)
 M0000000b_IL_00f6:
 stloc local6
 M0000000b_IL_00f8:
-ldc.i4 1
 M0000000b_IL_00f9:
-br M0000000b_IL_00ff
-M0000000b_IL_00ff:
-brfalse M0000000b_IL_0110
+br M0000000b_IL_0109
 M0000000b_IL_0104:
-M0000000b_IL_0105:
-br M0000000b_IL_0115
-M0000000b_IL_0110:
-br M0000000b_IL_0125
-M0000000b_IL_0115:
-M0000000b_IL_0116:
+br M0000000b_IL_0119
+M0000000b_IL_0109:
+M0000000b_IL_010a:
 ldloc local4
-M0000000b_IL_0118:
+M0000000b_IL_010c:
 ldloc local6
-M0000000b_IL_011a:
+M0000000b_IL_010e:
 callvirt instance System.Collections.ArrayList<System.Networking.IPAddress>::Add(System.Networking.IPAddress)
-M0000000b_IL_011f:
-br M0000000b_IL_0148
-M0000000b_IL_0125:
-M0000000b_IL_0126:
+M0000000b_IL_0113:
+br M0000000b_IL_013c
+M0000000b_IL_0119:
+M0000000b_IL_011a:
 ldarg 0
-M0000000b_IL_0127:
+M0000000b_IL_011b:
 ldfld System.Networking.DnsCompletion::source
-M0000000b_IL_012c:
+M0000000b_IL_0120:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorLookupFailedNew()
-M0000000b_IL_0131:
+M0000000b_IL_0125:
 call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorNewSystemNetworkingDnsErrorLookupFailed(System.Networking.DnsError.LookupFailed)
-M0000000b_IL_0136:
+M0000000b_IL_012a:
 call neoCLR.Library.System.Networking.Dns.RuntimeUnion0(System.Networking.DnsError)
-M0000000b_IL_013b:
+M0000000b_IL_012f:
 call neoCLR.Library.System.Networking.Dns.RuntimeUnion1(System.Result.Error<System.Networking.DnsError>)
-M0000000b_IL_0140:
+M0000000b_IL_0134:
 call instance System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Complete(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>)
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
-M0000000b_IL_0145:
+M0000000b_IL_0139:
 pop
-M0000000b_IL_0146:
-M0000000b_IL_0147:
+M0000000b_IL_013a:
+M0000000b_IL_013b:
 ret
-M0000000b_IL_0148:
+M0000000b_IL_013c:
+M0000000b_IL_013d:
+M0000000b_IL_013e:
+ldloc local5
+M0000000b_IL_0140:
+ldc.i4 1
+M0000000b_IL_0141:
+add
+M0000000b_IL_0142:
+stloc local5
+M0000000b_IL_0144:
+br M0000000b_IL_00b4
 M0000000b_IL_0149:
 M0000000b_IL_014a:
-ldloc local5
-M0000000b_IL_014c:
-ldc.i4 1
-M0000000b_IL_014d:
-add
-M0000000b_IL_014e:
-stloc local5
-M0000000b_IL_0150:
-br M0000000b_IL_00b4
-M0000000b_IL_0155:
-M0000000b_IL_0156:
 ldloc local4
-M0000000b_IL_0158:
+M0000000b_IL_014c:
 stloc local7
-M0000000b_IL_015a:
-M0000000b_IL_015b:
+M0000000b_IL_014e:
+M0000000b_IL_014f:
 ldarg 0
-M0000000b_IL_015c:
+M0000000b_IL_0150:
 ldfld System.Networking.DnsCompletion::source
-M0000000b_IL_0161:
+M0000000b_IL_0155:
 ldloc local7
-M0000000b_IL_0163:
-call neoCLR.Library.System.Networking.Dns.RuntimeUnion3(System.Collections.Sequence<System.Networking.IPAddress>)
-M0000000b_IL_0168:
-call neoCLR.Library.System.Networking.Dns.RuntimeUnion4(System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>)
-M0000000b_IL_016d:
+M0000000b_IL_0157:
+call neoCLR.Library.System.Networking.Dns.RuntimeUnion2(System.Collections.Sequence<System.Networking.IPAddress>)
+M0000000b_IL_015c:
+call neoCLR.Library.System.Networking.Dns.RuntimeUnion3(System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>)
+M0000000b_IL_0161:
 call instance System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Complete(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>)
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
-M0000000b_IL_0172:
+M0000000b_IL_0166:
 pop
-M0000000b_IL_0173:
-M0000000b_IL_0174:
-M0000000b_IL_0175:
+M0000000b_IL_0167:
+M0000000b_IL_0168:
+M0000000b_IL_0169:
 ret
 .end
 .method instance DelegateTarget_Application_V1_M_363A6D6574686F643131343A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31373A53797374656D2E4E6574776F726B696E6731333A446E73436F6D706C6574696F6E383A436F6D706C657465343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect() -> Void

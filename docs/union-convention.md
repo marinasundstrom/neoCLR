@@ -1,195 +1,52 @@
 # Union conventions and source integration
 
-Normal Raven `union` syntax is the default for class-library unions. Per-case `Is*`
-properties and `Get*` accessors are not a required convention, including for Option
-and Result. Prefer generated construction and case matching. The runtime executes
-ordinary types and methods, without a union opcode or Raven metadata dependency.
+Use standard Raven `union` declarations for class-library unions, including unions
+with members. Prefer case construction, patterns and propagation. Per-case `Is*`
+properties and checked `Get*` accessors are not required conventions.
 
-The Preview 1 member convention retained below documents the older manual carriers;
-it does not prescribe the API of new or migrated unions. Existing unions should move
-to source syntax where supported, with concrete blockers recorded for exceptions.
+## Current Raven library contract
 
-## Raven development adapter — 2026-09-24
+`Option<T>`, `Result<T,E>` and `TaskOutcome<T>` use the generated contract.
+Option and Result follow Raven.Core's source declarations and generated
+union contract. Other migrated unions include networking, HTTP, storage, stream,
+JSON and reflection errors. Carriers implement `IUnion.Value`; generated
+`HasValue` and typed `TryGetValue` distinguish active cases from default carriers.
+`Value` boxes the active case. An unsuccessful case extraction preserves its output.
+The [Option and Result API guide](raven-union-api.md) explains propagation and defaults.
 
-Raven's `RavenUnionCaseAttribute` and `RavenUnionCompanionAttribute` are
-compiler-owned conventions. The development bridge may consume and preserve them
-in CLI reference fixtures so normal Raven union syntax and separate consumers work.
-They are not neoCLR runtime dependencies or additions to the platform union contract.
-The runtime executes imported ordinary types and methods without recognizing these
-attributes. In particular, Raven's generic companion container is not a required
-neoCLR representation.
+A union's discriminator and payload belong to its ordinary carrier representation.
+The runtime executes imported types and methods without a union opcode or a Raven
+metadata dependency. Ordinary value-copy and reference-aliasing rules apply.
 
-Compared with CLI custom-attribute metadata, this keeps source-tool association at
-the import boundary and execution in ordinary fields, calls and conditional outputs.
-The benefit is usable source unions without adopting a compiler-specific runtime ABI;
-the cost is a provisional bridge adapter that must track Raven's emitted convention.
-Do not standardize a richer platform case map yet. Reconsider that mapping later;
-finish the class-library support needed for HttpError and return to the HTTP work.
-See the [focused probe](experiments/http-error-unions/README.md) for the supported
-shapes and remaining production integration work.
+## Compiler metadata boundary
 
-## Historical Preview 1 manual-carrier contract
+Raven's `RavenUnionCaseAttribute` and `RavenUnionCompanionAttribute` associate
+source cases with carriers in CLI metadata. The bridge validates and preserves
+these associations for separate compilation. Generic carriers can use a nongeneric
+companion containing both generic payload cases and nongeneric empty cases.
+Actual CLI arity controls metadata construction; an empty case does not become
+generic merely because its carrier has type parameters.
 
-A carrier has the ordinary System.Runtime.CompilerServices.UnionAttribute marker.
-Tools resolve its constructor reference to the System definition; a similarly named
-attribute in some other module is not the marker. No new union type kind is introduced.
+Compared with CLI custom attributes and ordinary generic types, this keeps source
+association at the import boundary and execution in fields, calls, boxing and
+interfaces. The benefit is standard source syntax without a compiler-specific VM
+ABI; the cost is a provisional adapter that must track Raven's emitted convention.
+No richer platform case registry is committed. See the
+[union integration evidence](experiments/http-error-unions/README.md).
 
-The original convention used the following rules (not requirements for new unions):
+## Historical bootstrap boundary
 
-1. The carrier declares one or more public instance `.ctor(Variant) -> Void` overloads.
-   Every public constructor has exactly one parameter. Each parameter is an ordinary
-   record wrapper type and identifies a permitted variant. Private/internal helpers
-   and static factories do not add alternatives to the recognized set.
-2. Variant types must be distinct after closing the carrier's type arguments. Their
-   unqualified definition names are unique within the carrier. This final name component
-   supplies the member suffix: System.Option.Some<T> uses `Some`, independent of T.
-3. For each suffix X, the carrier declares a public instance `get_IsX() -> Boolean`
-   and an instance read-only `IsX` property associated with it, plus a public instance
-   `GetX() -> Variant` method. Both methods have zero declared parameters. Return
-   signatures match the exact closed wrapper type, not its payload or a base type.
-4. Payload wrappers expose their data through ordinary members. The supplied Some<T>,
-   Ok<T> and Err<T> have public `.ctor(T) -> Void` and read-only `Value: T` properties.
-   None has zero fields and a public `.ctor() -> Void`; it needs no payload accessor.
+The separate Neo bootstrap profile retains frozen manual carriers under
+[runtime/legacy](../runtime/legacy/README.md). Its predicate/accessor APIs are not
+the Raven API or a model for new unions. Do not mix bootstrap and Raven profile artifacts.
 
-Member IDs and signatures resolve calls; source identifier spelling alone is not
-identity. The suffix rule is a narrow authoring convention, not VM dispatch. Variants
-with colliding short names need distinct names for Preview 1; a future richer metadata
-association can relax that restriction. General generic methods, out parameters,
-inheritance and reflective member lookup are not prerequisites.
+The Raven runtime source audit found no remaining manual union carriers after the
+TaskOutcome migration. Standalone errors such as OverflowError are ordinary value
+types; JsonValue uses a polymorphic class hierarchy. Neither is a disguised union
+carrier requiring this migration.
 
-## Behavioral obligations
+## Composition
 
-The constructor installs exactly its supplied variant value. On a constructed carrier,
-exactly one IsX query is true; none of the queries changes the selected variant. GetX
-returns a value copy when X is active. Calling another accessor violates its precondition
-and raises a terminal Fault. An unsuccessful predicate returns only false and never
-exposes an uninitialized, default or null payload.
-
-Construct once, keep the same value for the predicate and accessor, and branch before
-extracting. This permits a match without a recursive dependency on Option-returning
-queries or out-parameter initialization. A language compiler can verify exhaustiveness
-over the recognized constructor set; arbitrary IL may omit branches and still be
-well-formed IL. Runtime structural validation and typed verification do not prove the
-behavioral obligations of every user-authored marked type.
-
-The IL extraction pattern mirrors modern .NET usage: query the discriminator, branch
-on it, then call the typed accessor.
-
-```text
-dup
-call instance System.Result<Int32,Error>::get_IsOk()
-brfalse WrongCase
-call instance System.Result<Int32,Error>::GetOkCase()
-call instance System.Result.Ok<Int32>::get_Value()
-```
-
-The `dup` preserves the carrier for the accessor. Calling an accessor for an inactive
-case raises a terminal Fault.
-
-Representation fields are private and public members are read-only except for
-construction. Ordinary value-copy semantics apply. Pointer payloads preserve aliasing
-and do not acquire ownership. Trusted host record construction and unsafe access remain
-outside constructor provenance guarantees; visibility is not a memory-safety sandbox.
-
-## Implemented System surface
-
-Nested generic case types are a requested next capability. The current wrappers below
-are top-level types. The selected [companion-type direction](nested-types.md) uses a
-non-generic Result owner for generic cases, separate from Result<T,E>. Name/arity
-identity and ordinary nesting must be implemented before that library migration.
-
-| Carrier | Constructor parameter types | Predicates | Checked wrapper access |
-| --- | --- | --- | --- |
-| System.Option<T> | System.Option.None, System.Option.Some<T> | IsNone, IsSome | GetNoneCase(), GetSomeCase() |
-| System.Result<T,E> | System.Result.Ok<T>, System.Result.Error<E> | IsOk, IsErr | GetOkCase(), GetErrorCase() |
-
-Some<Void> contains a real Void payload and differs from None. Ok<Void> is valid.
-Ok<T> and Err<T> remain distinct for Result<T,T>. Error parameters are unconstrained;
-they do not require an error base class. Nested carriers retain their closed type and
-copy semantics. Each carrier stores one private System.Value and composes ordinary
-constructors, fields and [explicit type-erasure operations](value-storage.md). It has
-no tag table, union-specific opcodes or runtime service binding by carrier name.
-
-Example lowering for the success arm of a Raven-like result match:
-
-```text
-ldloc result
-call instance System.Result<Int32,Int32>::get_IsOk()
-brfalse Failed
-ldloc result
-call instance System.Result<Int32,Int32>::GetOkCase()
-call instance System.Result.Ok<Int32>::get_Value()
-; The stack now contains the Int32 payload. Consume it and branch to the join.
-```
-
-Property source syntax becomes ordinary getter calls. Wrapper construction likewise
-becomes two ordinary operations, such as `newobj instance System.Result.Ok<Int32>::.ctor(Int32)`
-followed by `newobj instance System.Result<Int32,Int32>::.ctor(System.Result.Ok<Int32>)`.
-The [Raven-like program contracts](preview-1-programs.md) explain the source-level intent.
-
-## Migration boundary
-
-Use ordinary System.Option<T> and System.Result<T,E> library types. Unqualified names
-now follow ordinary type lookup, with no special signature categories or aliases.
-Format 4 rejects old artifacts and removes the six union-specific instructions.
-
-Int32.Parse now returns an ordinary carrier through a [migrated native boundary](int32-parse.md).
-Console.ReadByte, File.ReadAllText and Math.Abs now return ordinary nested cases under
-their canonical names. Console/file host bindings return explicit erased payloads and
-platform IL constructs the carriers. Divide returns ordinary IntegerDivisionError cases; slicing now returns ordinary Utf8SliceError
-cases. The public library/native result paths no longer construct bootstrap unions.
-[Host invocation now imports](erased-inputs.md) records containing
-System.Value with bounded shape checks; this does not recognize or enforce the convention.
-The library, native boundaries, host inputs and samples now use ordinary records.
-Format 4 removes the old representation; reassemble source rather than converting artifacts.
-
-```sh
-cargo run --locked -- run examples/ordinary_unions.neoil
-```
-
-Expected lines: `success`, `7`, `failure`, `7`, `Some<Void> is present`, `=> Void`.
-
-## Later composition APIs
-
-The intended consumer model is Rust-like Option/Result composition expressed through
-Raven-like source syntax. Map transforms a success payload, MapError transforms an
-error payload, and AndThen chains an operation returning another Result. On Err,
-Map/AndThen preserve the error without invoking the success callback. Option should
-offer corresponding Map/AndThen behavior that propagates None. These remain ordinary
-library methods; they require generic methods and callable values, not union opcodes.
-Broad inheritance or virtual dispatch is not inherently required, but these APIs are
-deferred until their platform prerequisites exist. The current .NET-style access model
-remains sufficient; a redesigned access model is separate future work.
-
-
-The older top-level System.None/Some/Ok/Err wrapper family and its GetNone/GetSome/
-GetOk/GetErr accessors have been removed. Constructors now accept only the nested
-case family listed above, and predicates test those same concrete identities. Rebuild
-System and applications together: this changes member/type rows as well as available
-signatures. The obsolete names are not compatibility aliases. JSON format 4 also removes the separate bootstrap VM representation.
-
-## Tagged storage and explicit try-get access
-
-A union's discriminator belongs to its ordinary carrier representation. It does not
-need a VM union category or instruction. The pointer-backed experiment stores Byte
-Tag plus Void* Payload; its two factories set distinct tags even when T equals E.
-The current System carriers instead distinguish the concrete wrapper type held by
-System.Value. They do not yet use numeric tags. Their storage will change as part of
-the System.Value retirement, not through an invisible change in copy semantics.
-
-The tag tells the implementation how to interpret the payload. It cannot establish
-pointer liveness, alignment, initialization or correctness of a tag/pointer pair
-constructed by arbitrary low-level code. Normal access checks and caller obligations
-still apply. A null pointer does not select a union case.
-
-The pointer-backed sample implements copying try-get members with managed output
-references: TryGetOk(out(true) T& destination) and TryGetError(out(true) E& destination).
-Both check the tag before reading the payload and leave the output unchanged on a
-mismatch. A matching expired or null payload faults when read. No pointer-returning
-try-get methods are provided.
-
-The general library convention is overloaded TryGet(out Case& value), extracting an
-ordinary case value. System.Option and System.Result implement this convention with
-conditional output metadata. Distinct case types keep overloads unambiguous even
-when payload types coincide. See [reference pseudocode](references-in-pseudocode.md)
-for the source projection and ordinary call/branch/load/store IL pattern.
+[Option and Result operators](raven-outcome-operators.md) are ordinary library
+methods with generic callbacks. Expected failures stay explicit return values;
+terminal runtime faults and task cancellation retain their own contracts.

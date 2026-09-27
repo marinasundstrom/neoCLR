@@ -271,15 +271,13 @@ ldfld System.Data.Json.JsonError::Metadata_V1_3C53796E7461785061796C6F61643E
 M00000003_IL_001c:
 stobj System.Data.Json.JsonError.Syntax
 M00000003_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000003_IL_0022:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000003_IL_0023:
 M00000003_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000003_IL_0025:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Data.Json.JsonError.LimitExceeded value) -> Void
@@ -439,15 +437,13 @@ ldfld System.Data.Json.JsonError::Metadata_V1_3C4C696D69744578636565646564506179
 M00000005_IL_001c:
 stobj System.Data.Json.JsonError.LimitExceeded
 M00000005_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000005_IL_0022:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000005_IL_0023:
 M00000005_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000005_IL_0025:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Data.Json.JsonError.TypeMismatch value) -> Void
@@ -607,15 +603,13 @@ ldfld System.Data.Json.JsonError::Metadata_V1_3C547970654D69736D617463685061796C
 M00000007_IL_001c:
 stobj System.Data.Json.JsonError.TypeMismatch
 M00000007_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000007_IL_0022:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000007_IL_0023:
 M00000007_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000007_IL_0025:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Data.Json.JsonError.MissingField value) -> Void
@@ -775,15 +769,13 @@ ldfld System.Data.Json.JsonError::Metadata_V1_3C4D697373696E674669656C645061796C
 M00000009_IL_001c:
 stobj System.Data.Json.JsonError.MissingField
 M00000009_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000009_IL_0022:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000009_IL_0023:
 M00000009_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000009_IL_0025:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Data.Json.JsonError.DuplicateField value) -> Void
@@ -943,15 +935,13 @@ ldfld System.Data.Json.JsonError::Metadata_V1_3C4475706C69636174654669656C645061
 M0000000b_IL_001c:
 stobj System.Data.Json.JsonError.DuplicateField
 M0000000b_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000b_IL_0022:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000b_IL_0023:
 M0000000b_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000b_IL_0025:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Data.Json.JsonError.InvalidIndex value) -> Void
@@ -1111,15 +1101,13 @@ ldfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C6964496E6465785061796C
 M0000000d_IL_001c:
 stobj System.Data.Json.JsonError.InvalidIndex
 M0000000d_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000d_IL_0022:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000d_IL_0023:
 M0000000d_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000d_IL_0025:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Data.Json.JsonError.InvalidNumber value) -> Void
@@ -1279,15 +1267,13 @@ ldfld System.Data.Json.JsonError::Metadata_V1_3C496E76616C69644E756D626572506179
 M0000000f_IL_001c:
 stobj System.Data.Json.JsonError.InvalidNumber
 M0000000f_IL_0021:
-ldc.i4 1
+ldc.bool true
 M0000000f_IL_0022:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 M0000000f_IL_0023:
 M0000000f_IL_0024:
-ldc.i4 0
+ldc.bool false
 M0000000f_IL_0025:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Data.Json.JsonError.NumberOutOfRange value) -> Void
@@ -1447,15 +1433,13 @@ ldfld System.Data.Json.JsonError::Metadata_V1_3C4E756D6265724F75744F6652616E6765
 M00000011_IL_001c:
 stobj System.Data.Json.JsonError.NumberOutOfRange
 M00000011_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000011_IL_0022:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000011_IL_0023:
 M00000011_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000011_IL_0025:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Data.Json.JsonError.Read value) -> Void
@@ -1615,15 +1599,13 @@ ldfld System.Data.Json.JsonError::Metadata_V1_3C526561645061796C6F61643E
 M00000013_IL_001d:
 stobj System.Data.Json.JsonError.Read
 M00000013_IL_0022:
-ldc.i4 1
+ldc.bool true
 M00000013_IL_0023:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000013_IL_0024:
 M00000013_IL_0025:
-ldc.i4 0
+ldc.bool false
 M00000013_IL_0026:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Data.Json.JsonError.Write value) -> Void
@@ -1783,15 +1765,13 @@ ldfld System.Data.Json.JsonError::Metadata_V1_3C57726974655061796C6F61643E
 M00000015_IL_001d:
 stobj System.Data.Json.JsonError.Write
 M00000015_IL_0022:
-ldc.i4 1
+ldc.bool true
 M00000015_IL_0023:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000015_IL_0024:
 M00000015_IL_0025:
-ldc.i4 0
+ldc.bool false
 M00000015_IL_0026:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Data.Json.JsonError.Reflection value) -> Void
@@ -1951,15 +1931,13 @@ ldfld System.Data.Json.JsonError::Metadata_V1_3C5265666C656374696F6E5061796C6F61
 M00000017_IL_001d:
 stobj System.Data.Json.JsonError.Reflection
 M00000017_IL_0022:
-ldc.i4 1
+ldc.bool true
 M00000017_IL_0023:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000017_IL_0024:
 M00000017_IL_0025:
-ldc.i4 0
+ldc.bool false
 M00000017_IL_0026:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.Data.Json.JsonError.UnsupportedMapping value) -> Void
@@ -2119,15 +2097,13 @@ ldfld System.Data.Json.JsonError::Metadata_V1_3C556E737570706F727465644D61707069
 M00000019_IL_001d:
 stobj System.Data.Json.JsonError.UnsupportedMapping
 M00000019_IL_0022:
-ldc.i4 1
+ldc.bool true
 M00000019_IL_0023:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000019_IL_0024:
 M00000019_IL_0025:
-ldc.i4 0
+ldc.bool false
 M00000019_IL_0026:
-call neoCLR.Library.System.Data.Json.JsonError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance override byref ToString() -> String

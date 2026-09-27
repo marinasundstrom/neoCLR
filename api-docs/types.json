@@ -1,5 +1,6 @@
 [
   "Raven.Runtime.CompilerServices.RavenUnionCaseAttribute",
+  "Raven.Runtime.CompilerServices.RavenUnionCompanionAttribute",
   "System.Array",
   "System.Array`1",
   "System.Attribute",

@@ -6,6 +6,10 @@
 .local System.Option<Byte> local3
 ldc.i4 0
 stloc local1
+ldloca local2
+initobj System.Option<Byte>
+ldloca local3
+initobj System.Option<Byte>
 M00000001_IL_0000:
 M00000001_IL_0001:
 M00000001_IL_0002:
@@ -21,7 +25,7 @@ call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
 M00000001_IL_000f:
 brtrue M00000001_IL_0019
 M00000001_IL_0014:
-br M00000001_IL_007f
+br M00000001_IL_008b
 M00000001_IL_0019:
 M00000001_IL_001a:
 ldloc local0
@@ -40,91 +44,93 @@ call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
 M00000001_IL_0026:
 brtrue M00000001_IL_0030
 M00000001_IL_002b:
-br M00000001_IL_0041
+br M00000001_IL_0045
 M00000001_IL_0030:
-M00000001_IL_0031:
 call neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorUnavailableNew()
-M00000001_IL_0036:
+M00000001_IL_0035:
 call neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorNewSystemConsoleReadErrorUnavailable(System.ConsoleReadError.Unavailable)
-M00000001_IL_003b:
-call neoCLR.Library.System.Console.RuntimeUnion4(System.ConsoleReadError)
-M00000001_IL_0040:
-ret
-M00000001_IL_0041:
-M00000001_IL_0042:
-M00000001_IL_0043:
-ldloc local1
+M00000001_IL_003a:
+call neoCLR.Library.System.Console.RuntimeUnion2(System.ConsoleReadError)
+M00000001_IL_003f:
+call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.ConsoleReadError>)
 M00000001_IL_0044:
-ldc.i4 2
+ret
 M00000001_IL_0045:
+M00000001_IL_0046:
+M00000001_IL_0047:
+ldloc local1
+M00000001_IL_0048:
+ldc.i4 2
+M00000001_IL_0049:
 ceq
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000001_IL_0047:
-brtrue M00000001_IL_0051
-M00000001_IL_004c:
-br M00000001_IL_0062
-M00000001_IL_0051:
-M00000001_IL_0052:
+M00000001_IL_004b:
+brtrue M00000001_IL_0055
+M00000001_IL_0050:
+br M00000001_IL_006a
+M00000001_IL_0055:
 call neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorReadFailedNew()
-M00000001_IL_0057:
+M00000001_IL_005a:
 call neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorNewSystemConsoleReadErrorReadFailed(System.ConsoleReadError.ReadFailed)
-M00000001_IL_005c:
-call neoCLR.Library.System.Console.RuntimeUnion4(System.ConsoleReadError)
-M00000001_IL_0061:
-ret
-M00000001_IL_0062:
-M00000001_IL_0063:
+M00000001_IL_005f:
+call neoCLR.Library.System.Console.RuntimeUnion2(System.ConsoleReadError)
 M00000001_IL_0064:
-ldstr "invalid native I/O status"
+call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.ConsoleReadError>)
 M00000001_IL_0069:
+ret
+M00000001_IL_006a:
+M00000001_IL_006b:
+M00000001_IL_006c:
+ldstr "invalid native I/O status"
+M00000001_IL_0071:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
-M00000001_IL_007f:
-M00000001_IL_0080:
-M00000001_IL_0081:
+M00000001_IL_008b:
+M00000001_IL_008c:
+M00000001_IL_008d:
 ldloc local0
-M00000001_IL_0082:
+M00000001_IL_008e:
 value.is Void
 call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
-M00000001_IL_0087:
-brtrue M00000001_IL_0091
-M00000001_IL_008c:
-br M00000001_IL_00a9
-M00000001_IL_0091:
-M00000001_IL_0092:
-call neoCLR.Library.System.Console.RuntimeUnion0()
-M00000001_IL_0097:
-call neoCLR.Library.System.Console.RuntimeUnion1(System.Option.None)
-M00000001_IL_009c:
-stloc local2
+M00000001_IL_0093:
+brtrue M00000001_IL_009d
+M00000001_IL_0098:
+br M00000001_IL_00b5
 M00000001_IL_009d:
-ldloc local2
 M00000001_IL_009e:
-call neoCLR.Library.System.Console.RuntimeUnion2(System.Option<Byte>)
+call neoCLR.Library.System.Console.RuntimeUnion0()
 M00000001_IL_00a3:
-call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Ok<System.Option<Byte>>)
+call neoCLR.Library.System.Console.RuntimeUnion1(System.Option.None)
 M00000001_IL_00a8:
-ret
+stloc local2
 M00000001_IL_00a9:
+ldloc local2
 M00000001_IL_00aa:
-M00000001_IL_00ab:
-ldloc local0
-M00000001_IL_00ac:
-value.unpack Byte
-M00000001_IL_00b1:
-call neoCLR.Library.System.Console.RuntimeUnion3(Byte)
+call neoCLR.Library.System.Console.RuntimeUnion3(System.Option<Byte>)
+M00000001_IL_00af:
+call neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Ok<System.Option<Byte>>)
+M00000001_IL_00b4:
+ret
+M00000001_IL_00b5:
 M00000001_IL_00b6:
-call neoCLR.Library.System.Console.RuntimeUnion6(System.Option.Some<Byte>)
-M00000001_IL_00bb:
-stloc local3
-M00000001_IL_00bc:
+M00000001_IL_00b7:
+ldloc local0
+M00000001_IL_00b8:
+value.unpack Byte
 M00000001_IL_00bd:
-ldloc local3
-M00000001_IL_00be:
-call neoCLR.Library.System.Console.RuntimeUnion2(System.Option<Byte>)
-M00000001_IL_00c3:
-call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Ok<System.Option<Byte>>)
+call neoCLR.Library.System.Console.RuntimeUnion4(Byte)
+M00000001_IL_00c2:
+call neoCLR.Library.System.Console.RuntimeUnion7(System.Option.Some<Byte>)
+M00000001_IL_00c7:
+stloc local3
 M00000001_IL_00c8:
+M00000001_IL_00c9:
+ldloc local3
+M00000001_IL_00ca:
+call neoCLR.Library.System.Console.RuntimeUnion3(System.Option<Byte>)
+M00000001_IL_00cf:
+call neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Ok<System.Option<Byte>>)
+M00000001_IL_00d4:
 ret
 .end
 .method static WriteLine(String value0) -> Void
@@ -481,36 +487,32 @@ ret
 .local System.Result<Void,System.IO.StreamError> local2
 .local System.Result<Int32,System.IO.StreamError> local3
 .local System.Result.Ok<Int32> local4
-.local System.Result.Ok<Int32> local5
-.local Int32 local6
-.local System.Result<Int32,System.IO.StreamError> local7
-.local System.Result.Error<System.IO.StreamError> local8
-.local System.Result.Error<System.IO.StreamError> local9
-.local System.IO.StreamError local10
-.local System.Result<Void,System.IO.StreamError> local11
-.local System.Result.Ok<Void> local12
-.local System.Result.Ok<Void> local13
-.local Void local14
-.local System.Result<Void,System.IO.StreamError> local15
-.local System.Result.Error<System.IO.StreamError> local16
-.local System.Result.Error<System.IO.StreamError> local17
-.local System.IO.StreamError local18
+.local System.Result<Int32,System.IO.StreamError> local5
+.local System.Result.Error<System.IO.StreamError> local6
+.local System.Result<Void,System.IO.StreamError> local7
+.local System.Result.Ok<Void> local8
+.local System.Result<Void,System.IO.StreamError> local9
+.local System.Result.Error<System.IO.StreamError> local10
+ldloca local1
+initobj System.Result<Int32,System.IO.StreamError>
+ldloca local2
+initobj System.Result<Void,System.IO.StreamError>
+ldloca local3
+initobj System.Result<Int32,System.IO.StreamError>
 ldloca local4
 initobj System.Result.Ok<Int32>
 ldloca local5
-initobj System.Result.Ok<Int32>
-ldc.i4 0
-stloc local6
+initobj System.Result<Int32,System.IO.StreamError>
+ldloca local6
+initobj System.Result.Error<System.IO.StreamError>
+ldloca local7
+initobj System.Result<Void,System.IO.StreamError>
+ldloca local8
+initobj System.Result.Ok<Void>
+ldloca local9
+initobj System.Result<Void,System.IO.StreamError>
 ldloca local10
-initobj System.IO.StreamError
-ldloca local12
-initobj System.Result.Ok<Void>
-ldloca local13
-initobj System.Result.Ok<Void>
-ldvoid
-stloc local14
-ldloca local18
-initobj System.IO.StreamError
+initobj System.Result.Error<System.IO.StreamError>
 M00000018_IL_0000:
 M00000018_IL_0001:
 M00000018_IL_0002:
@@ -532,183 +534,143 @@ ldloc local1
 M00000018_IL_0013:
 stloc local3
 M00000018_IL_0014:
-ldloca local3
-M00000018_IL_0016:
 ldloca local4
-M00000018_IL_0018:
-call neoCLR.Library.System.Console.RuntimeUnion7(System.Result<Int32,System.IO.StreamError>&,System.Result.Ok<Int32>&)
-M00000018_IL_001d:
-brfalse M00000018_IL_004f
-M00000018_IL_0022:
-ldloc local4
-M00000018_IL_0024:
-stloc local5
-M00000018_IL_0026:
-ldloca local5
-M00000018_IL_0028:
-ldloca local6
+M00000018_IL_0016:
+initobj System.Result.Ok<Int32>
+M00000018_IL_001c:
+ldloca local3
+M00000018_IL_001e:
+ldloca local4
+M00000018_IL_0020:
+call neoCLR.Library.System.Console.RuntimeUnion8(System.Result<Int32,System.IO.StreamError>&,System.Result.Ok<Int32>&)
+M00000018_IL_0025:
+brfalse M00000018_IL_0043
 M00000018_IL_002a:
-call neoCLR.Library.System.Console.RuntimeUnion8(System.Result.Ok<Int32>&,Int32&)
-M00000018_IL_002f:
-ldloc local6
+ldloca local4
+M00000018_IL_002c:
+call neoCLR.Library.System.Console.RuntimeUnion9(System.Result.Ok<Int32>&)
 M00000018_IL_0031:
 pop
 M00000018_IL_0032:
-ldc.i4 1
 M00000018_IL_0033:
-br M00000018_IL_0039
-M00000018_IL_0039:
-brfalse M00000018_IL_004f
+br M00000018_IL_003e
 M00000018_IL_003e:
-M00000018_IL_003f:
-br M00000018_IL_004a
-M00000018_IL_004a:
-br M00000018_IL_0099
-M00000018_IL_004f:
-M00000018_IL_0050:
+br M00000018_IL_0081
+M00000018_IL_0043:
+M00000018_IL_0044:
 ldloc local1
+M00000018_IL_0045:
+stloc local5
+M00000018_IL_0047:
+ldloca local6
+M00000018_IL_0049:
+initobj System.Result.Error<System.IO.StreamError>
+M00000018_IL_004f:
+ldloca local5
 M00000018_IL_0051:
-stloc local7
+ldloca local6
 M00000018_IL_0053:
-ldloca local7
-M00000018_IL_0055:
-ldloca local8
-M00000018_IL_0057:
-call neoCLR.Library.System.Console.RuntimeUnion9(System.Result<Int32,System.IO.StreamError>&,System.Result.Error<System.IO.StreamError>&)
-M00000018_IL_005c:
-brfalse M00000018_IL_0094
-M00000018_IL_0061:
-ldloc local8
-M00000018_IL_0063:
-stloc local9
-M00000018_IL_0065:
-ldloca local9
-M00000018_IL_0067:
-ldloca local10
-M00000018_IL_0069:
-call neoCLR.Library.System.Console.RuntimeUnion10(System.Result.Error<System.IO.StreamError>&,System.IO.StreamError&)
-M00000018_IL_006e:
-ldloc local10
-M00000018_IL_0070:
+call neoCLR.Library.System.Console.RuntimeUnion10(System.Result<Int32,System.IO.StreamError>&,System.Result.Error<System.IO.StreamError>&)
+M00000018_IL_0058:
+brfalse M00000018_IL_007c
+M00000018_IL_005d:
+ldloca local6
+M00000018_IL_005f:
+call neoCLR.Library.System.Console.RuntimeUnion11(System.Result.Error<System.IO.StreamError>&)
+M00000018_IL_0064:
 pop
+M00000018_IL_0065:
+M00000018_IL_0066:
+br M00000018_IL_0071
 M00000018_IL_0071:
-ldc.i4 1
 M00000018_IL_0072:
-br M00000018_IL_0078
-M00000018_IL_0078:
-brfalse M00000018_IL_0094
+ldstr "console output failed"
+M00000018_IL_0077:
+call System.Fault(String)
+fault "System.Fault returned unexpectedly"
+M00000018_IL_007c:
 M00000018_IL_007d:
 M00000018_IL_007e:
-br M00000018_IL_0089
-M00000018_IL_0089:
-M00000018_IL_008a:
-ldstr "console output failed"
-M00000018_IL_008f:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
-M00000018_IL_0094:
-M00000018_IL_0095:
-M00000018_IL_0096:
-M00000018_IL_0097:
-M00000018_IL_0098:
+M00000018_IL_007f:
+M00000018_IL_0080:
 fault "Guest program reached a terminal failure"
-M00000018_IL_0099:
-M00000018_IL_009a:
-M00000018_IL_009b:
-M00000018_IL_009c:
+M00000018_IL_0081:
+M00000018_IL_0082:
+M00000018_IL_0083:
+M00000018_IL_0084:
 ldloc local0
-M00000018_IL_009d:
+M00000018_IL_0085:
 callvirt instance System.IO.TextWriter::Flush()
-M00000018_IL_00a2:
+M00000018_IL_008a:
 stloc local2
-M00000018_IL_00a3:
+M00000018_IL_008b:
 ldloc local2
+M00000018_IL_008c:
+stloc local7
+M00000018_IL_008e:
+ldloca local8
+M00000018_IL_0090:
+initobj System.Result.Ok<Void>
+M00000018_IL_0096:
+ldloca local7
+M00000018_IL_0098:
+ldloca local8
+M00000018_IL_009a:
+call neoCLR.Library.System.Console.RuntimeUnion12(System.Result<Void,System.IO.StreamError>&,System.Result.Ok<Void>&)
+M00000018_IL_009f:
+brfalse M00000018_IL_00bd
 M00000018_IL_00a4:
-stloc local11
+ldloca local8
 M00000018_IL_00a6:
-ldloca local11
-M00000018_IL_00a8:
-ldloca local12
-M00000018_IL_00aa:
-call neoCLR.Library.System.Console.RuntimeUnion11(System.Result<Void,System.IO.StreamError>&,System.Result.Ok<Void>&)
-M00000018_IL_00af:
-brfalse M00000018_IL_00e1
-M00000018_IL_00b4:
-ldloc local12
-M00000018_IL_00b6:
-stloc local13
+call neoCLR.Library.System.Console.RuntimeUnion13(System.Result.Ok<Void>&)
+M00000018_IL_00ab:
+pop
+M00000018_IL_00ac:
+M00000018_IL_00ad:
+br M00000018_IL_00b8
 M00000018_IL_00b8:
-ldloca local13
-M00000018_IL_00ba:
-ldloca local14
-M00000018_IL_00bc:
-call neoCLR.Library.System.Console.RuntimeUnion12(System.Result.Ok<Void>&,Void&)
-M00000018_IL_00c1:
-ldloc local14
-M00000018_IL_00c3:
-pop
-M00000018_IL_00c4:
-ldc.i4 1
-M00000018_IL_00c5:
-br M00000018_IL_00cb
-M00000018_IL_00cb:
-brfalse M00000018_IL_00e1
-M00000018_IL_00d0:
-M00000018_IL_00d1:
-br M00000018_IL_00dc
-M00000018_IL_00dc:
-br M00000018_IL_012b
-M00000018_IL_00e1:
-M00000018_IL_00e2:
+br M00000018_IL_00fb
+M00000018_IL_00bd:
+M00000018_IL_00be:
 ldloc local2
-M00000018_IL_00e3:
-stloc local15
-M00000018_IL_00e5:
-ldloca local15
-M00000018_IL_00e7:
-ldloca local16
-M00000018_IL_00e9:
-call neoCLR.Library.System.Console.RuntimeUnion13(System.Result<Void,System.IO.StreamError>&,System.Result.Error<System.IO.StreamError>&)
-M00000018_IL_00ee:
-brfalse M00000018_IL_0126
-M00000018_IL_00f3:
-ldloc local16
-M00000018_IL_00f5:
-stloc local17
-M00000018_IL_00f7:
-ldloca local17
-M00000018_IL_00f9:
-ldloca local18
-M00000018_IL_00fb:
-call neoCLR.Library.System.Console.RuntimeUnion10(System.Result.Error<System.IO.StreamError>&,System.IO.StreamError&)
-M00000018_IL_0100:
-ldloc local18
-M00000018_IL_0102:
+M00000018_IL_00bf:
+stloc local9
+M00000018_IL_00c1:
+ldloca local10
+M00000018_IL_00c3:
+initobj System.Result.Error<System.IO.StreamError>
+M00000018_IL_00c9:
+ldloca local9
+M00000018_IL_00cb:
+ldloca local10
+M00000018_IL_00cd:
+call neoCLR.Library.System.Console.RuntimeUnion14(System.Result<Void,System.IO.StreamError>&,System.Result.Error<System.IO.StreamError>&)
+M00000018_IL_00d2:
+brfalse M00000018_IL_00f6
+M00000018_IL_00d7:
+ldloca local10
+M00000018_IL_00d9:
+call neoCLR.Library.System.Console.RuntimeUnion11(System.Result.Error<System.IO.StreamError>&)
+M00000018_IL_00de:
 pop
-M00000018_IL_0103:
-ldc.i4 1
-M00000018_IL_0104:
-br M00000018_IL_010a
-M00000018_IL_010a:
-brfalse M00000018_IL_0126
-M00000018_IL_010f:
-M00000018_IL_0110:
-br M00000018_IL_011b
-M00000018_IL_011b:
-M00000018_IL_011c:
+M00000018_IL_00df:
+M00000018_IL_00e0:
+br M00000018_IL_00eb
+M00000018_IL_00eb:
+M00000018_IL_00ec:
 ldstr "console output failed"
-M00000018_IL_0121:
+M00000018_IL_00f1:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
-M00000018_IL_0126:
-M00000018_IL_0127:
-M00000018_IL_0128:
-M00000018_IL_0129:
-M00000018_IL_012a:
+M00000018_IL_00f6:
+M00000018_IL_00f7:
+M00000018_IL_00f8:
+M00000018_IL_00f9:
+M00000018_IL_00fa:
 fault "Guest program reached a terminal failure"
-M00000018_IL_012b:
-M00000018_IL_012c:
-M00000018_IL_012d:
+M00000018_IL_00fb:
+M00000018_IL_00fc:
+M00000018_IL_00fd:
 ldvoid
 ret
 .end

@@ -298,14 +298,12 @@ with the generated carrier initialization. Its optional trusted `--runner` uses 
 explicit 10,000,000-instruction budget and a 256-object GC budget. Production limits
 are unchanged; this migration does not claim equal storage or execution cost.
 
-Generic Option, Result and TaskOutcome remain handwritten. The generic metadata
-probe still compiles separate consumers, but the library projector rejects generic
-families before writing a reference. It needs companion ownership, generic parameter
-substitution and generated payload-method import before those carriers can migrate.
-Option/Result also need preservation of Propagatable residual/output contracts;
-TaskOutcome needs its terminal-state/task integration checked. Per-case helpers are
-not a future requirement. Payload-bearing explicit layout is separately rejected.
-These are tracked implementation boundaries, not permanent exemptions.
+Option and Result now use standard Raven unions following Raven.Core. The bridge
+projects generic companions, closes parameter signatures and imports generated
+case methods plus Propagatable output/residual methods. Reference projection admits
+these supported generic families; arbitrary generic application-union execution is
+not implied. TaskOutcome also uses the generated contract, with Completed and
+Cancelled cases and an inactive default. Payload-bearing explicit layout remains rejected.
 
 The Enum helper slice now supplies both TypeInfo and generic overloads on
 System.Enum, typed value snapshots and boxed formatting. See the
@@ -313,11 +311,11 @@ System.Enum, typed value snapshots and boxed formatting. See the
 explicit legacy carrier/BindingFlags snapshots; the Raven profile uses the migrated
 unions. This compatibility boundary does not restore Is*/Get* requirements.
 
-The applicable nongeneric empty-case migration batch is complete. Generic Option,
-Result and TaskOutcome remain documented manual exceptions pending their specific
-projection/propagation work. Author direction on 2026-09-25 places other additions
-on hold and returns work to HTTP. The nongeneric data-bearing projection checkpoint below is complete. Public HTTP
-error bindings and string/Uri BaseUri resolution are the next integration work.
+The nongeneric empty-case migration batch is complete. The author subsequently
+selected Option/Result migration as a Preview 10 release correction. This does not
+expand the frozen HTTP POC scope. The author also selected TaskOutcome migration
+and an audit of the remaining runtime types. No other manual Raven union carriers remain.
+
 
 
 ## Nongeneric payload-bearing library projection
@@ -367,3 +365,6 @@ the public family. Projected consumer binding follows the selected core metadata
 checks signatures and preserves constructors and conditional extraction. Generic
 companion and overlapping-layout rejection remain unchanged. See the HTTP client,
 server and JSON samples for execution through the actual public API.
+
+The [standard library union contract evidence](standard-contract-validation.json)
+records the focused Option/Result/TaskOutcome checks, source audit and limitations.

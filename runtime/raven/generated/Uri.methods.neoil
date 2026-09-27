@@ -116,8 +116,10 @@ ret
 .local String local0
 .local System.Result<String,System.Text.Utf8SliceError> local1
 .local System.Result.Ok<String> local2
-.local System.Result.Ok<String> local3
-.local String local4
+ldloca local1
+initobj System.Result<String,System.Text.Utf8SliceError>
+ldloca local2
+initobj System.Result.Ok<String>
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -135,48 +137,38 @@ call neoCLR.Library.System.Uri.RuntimeStringSliceUtf8(String,Int32,Int32)
 M00000005_IL_000c:
 stloc local1
 M00000005_IL_000d:
-ldloca local1
-M00000005_IL_000f:
 ldloca local2
-M00000005_IL_0011:
+M00000005_IL_000f:
+initobj System.Result.Ok<String>
+M00000005_IL_0015:
+ldloca local1
+M00000005_IL_0017:
+ldloca local2
+M00000005_IL_0019:
 call neoCLR.Library.System.Uri.RuntimeUnion0(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Ok<String>&)
-M00000005_IL_0016:
-brfalse M00000005_IL_0041
-M00000005_IL_001b:
-ldloc local2
-M00000005_IL_001c:
-stloc local3
-M00000005_IL_001d:
-ldloca local3
-M00000005_IL_001f:
-ldloca local4
-M00000005_IL_0021:
-call neoCLR.Library.System.Uri.RuntimeUnion1(System.Result.Ok<String>&,String&)
-M00000005_IL_0026:
-ldloc local4
-M00000005_IL_0028:
-stloc local0
-M00000005_IL_0029:
-ldc.i4 1
+M00000005_IL_001e:
+brfalse M00000005_IL_0037
+M00000005_IL_0023:
+ldloca local2
+M00000005_IL_0025:
+call neoCLR.Library.System.Uri.RuntimeUnion1(System.Result.Ok<String>&)
 M00000005_IL_002a:
-br M00000005_IL_0030
-M00000005_IL_0030:
-brfalse M00000005_IL_0041
-M00000005_IL_0035:
-M00000005_IL_0036:
-br M00000005_IL_0046
-M00000005_IL_0041:
-br M00000005_IL_0049
-M00000005_IL_0046:
-M00000005_IL_0047:
+stloc local0
+M00000005_IL_002b:
+M00000005_IL_002c:
+br M00000005_IL_003c
+M00000005_IL_0037:
+br M00000005_IL_003f
+M00000005_IL_003c:
+M00000005_IL_003d:
 ldloc local0
-M00000005_IL_0048:
+M00000005_IL_003e:
 ret
-M00000005_IL_0049:
-M00000005_IL_004a:
-M00000005_IL_004b:
+M00000005_IL_003f:
+M00000005_IL_0040:
+M00000005_IL_0041:
 ldstr "Invalid internal URI boundary"
-M00000005_IL_0050:
+M00000005_IL_0046:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
 .end
@@ -184,8 +176,10 @@ fault "System.Fault returned unexpectedly"
 .local String local0
 .local System.Result<String,System.Text.Utf8SliceError> local1
 .local System.Result.Ok<String> local2
-.local System.Result.Ok<String> local3
-.local String local4
+ldloca local1
+initobj System.Result<String,System.Text.Utf8SliceError>
+ldloca local2
+initobj System.Result.Ok<String>
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
@@ -199,48 +193,38 @@ call neoCLR.Library.System.Uri.RuntimeStringSliceUtf8(String,Int32,Int32)
 M00000006_IL_000a:
 stloc local1
 M00000006_IL_000b:
-ldloca local1
-M00000006_IL_000d:
 ldloca local2
-M00000006_IL_000f:
+M00000006_IL_000d:
+initobj System.Result.Ok<String>
+M00000006_IL_0013:
+ldloca local1
+M00000006_IL_0015:
+ldloca local2
+M00000006_IL_0017:
 call neoCLR.Library.System.Uri.RuntimeUnion0(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Ok<String>&)
-M00000006_IL_0014:
-brfalse M00000006_IL_003f
-M00000006_IL_0019:
-ldloc local2
-M00000006_IL_001a:
-stloc local3
-M00000006_IL_001b:
-ldloca local3
-M00000006_IL_001d:
-ldloca local4
-M00000006_IL_001f:
-call neoCLR.Library.System.Uri.RuntimeUnion1(System.Result.Ok<String>&,String&)
-M00000006_IL_0024:
-ldloc local4
-M00000006_IL_0026:
-stloc local0
-M00000006_IL_0027:
-ldc.i4 1
+M00000006_IL_001c:
+brfalse M00000006_IL_0035
+M00000006_IL_0021:
+ldloca local2
+M00000006_IL_0023:
+call neoCLR.Library.System.Uri.RuntimeUnion1(System.Result.Ok<String>&)
 M00000006_IL_0028:
-br M00000006_IL_002e
-M00000006_IL_002e:
-brfalse M00000006_IL_003f
-M00000006_IL_0033:
-M00000006_IL_0034:
-br M00000006_IL_0044
-M00000006_IL_003f:
-br M00000006_IL_0047
-M00000006_IL_0044:
-M00000006_IL_0045:
+stloc local0
+M00000006_IL_0029:
+M00000006_IL_002a:
+br M00000006_IL_003a
+M00000006_IL_0035:
+br M00000006_IL_003d
+M00000006_IL_003a:
+M00000006_IL_003b:
 ldloc local0
-M00000006_IL_0046:
+M00000006_IL_003c:
 ret
-M00000006_IL_0047:
-M00000006_IL_0048:
-M00000006_IL_0049:
+M00000006_IL_003d:
+M00000006_IL_003e:
+M00000006_IL_003f:
 ldstr ""
-M00000006_IL_004e:
+M00000006_IL_0044:
 ret
 .end
 .method private static Alpha(String value) -> Boolean
@@ -2444,6 +2428,8 @@ ret
 .local System.Uri local1
 .local System.UriError local2
 .local System.Uri local3
+ldloca local0
+initobj System.Result<System.Uri,System.UriError>
 ldloca local1
 initobj System.Uri
 ldloca local2
@@ -2464,6 +2450,7 @@ M0000000d_IL_000b:
 ldloca local1
 M0000000d_IL_000d:
 call neoCLR.Library.System.Uri.RuntimeUnion6(System.Result<System.Uri,System.UriError>&,System.Uri&)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
 M0000000d_IL_0012:
 brfalse M0000000d_IL_001c
 M0000000d_IL_0017:
@@ -2478,6 +2465,7 @@ M0000000d_IL_0026:
 ldloca local2
 M0000000d_IL_0028:
 call neoCLR.Library.System.Uri.RuntimeUnion7(System.Result<System.Uri,System.UriError>&,System.UriError&)
+call neoCLR.Library.System.Uri.RuntimeBooleanToInt32(Boolean)
 M0000000d_IL_002d:
 brfalse M0000000d_IL_0039
 M0000000d_IL_0032:

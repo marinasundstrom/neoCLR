@@ -2,193 +2,769 @@
 .type System.Tasks.TaskOutcome<T0>
 .sealed
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
-.field private Stored Value
-.property instance IsCancelled() -> Boolean
-.get instance System.Tasks.TaskOutcome<T0>::get_IsCancelled()
+.implements System.Runtime.CompilerServices.IUnion
+.field private Metadata_V1_3C5461673E Byte
+.field private Metadata_V1_3C436F6D706C657465645061796C6F61643E System.Tasks.TaskOutcome.Completed<T0>
+.field private Metadata_V1_3C43616E63656C6C65645061796C6F61643E System.Tasks.TaskOutcome.Cancelled
+.property instance Value() -> System.Object
+.get instance System.Tasks.TaskOutcome<T0>::get_Value()
 .end
-.property instance IsCompleted() -> Boolean
-.get instance System.Tasks.TaskOutcome<T0>::get_IsCompleted()
+.property instance HasValue() -> Boolean
+.get instance System.Tasks.TaskOutcome<T0>::get_HasValue()
 .end
-.method instance .ctor(System.Tasks.TaskOutcome.Cancelled value) -> Void
-ldarg value
-value.pack System.Tasks.TaskOutcome.Cancelled
-newobj System.Tasks.TaskOutcome<T0>
-starg this
-ldvoid
-ret
-.end
-.method instance get_IsCancelled() -> Boolean
-M00000005_IL_0000:
-M00000005_IL_0001:
-M00000005_IL_0002:
+.method instance override byref ToString() -> String
+.local System.Tasks.TaskOutcome.Completed<T0> local0
+ldloca local0
+initobj System.Tasks.TaskOutcome.Completed<T0>
+M00000001_IL_0000:
 ldarg 0
-M00000005_IL_0003:
-ldfld System.Tasks.TaskOutcome<T0>::Stored
-M00000005_IL_0008:
-value.is System.Tasks.TaskOutcome.Cancelled
+M00000001_IL_0001:
+ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
+M00000001_IL_0006:
+conv.i4
+M00000001_IL_0007:
+ldc.i4 1
+M00000001_IL_0008:
+conv.i4
+M00000001_IL_0009:
+ceq
 call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_000d:
-call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method instance GetCancelledCase() -> System.Tasks.TaskOutcome.Cancelled
-M00000006_IL_0000:
-M00000006_IL_0001:
-M00000006_IL_0002:
+M00000001_IL_000b:
+brtrue M00000001_IL_0015
+M00000001_IL_0010:
+br M00000001_IL_0060
+M00000001_IL_0015:
+ldstr "TaskOutcome"
+M00000001_IL_001a:
+ldstr "."
+M00000001_IL_001f:
+call System.String::Concat(String,String)
+M00000001_IL_0024:
+ldstr "Completed"
+M00000001_IL_0029:
+call System.String::Concat(String,String)
+M00000001_IL_002e:
+ldstr "("
+M00000001_IL_0033:
+call System.String::Concat(String,String)
+M00000001_IL_0038:
 ldarg 0
-M00000006_IL_0003:
-ldfld System.Tasks.TaskOutcome<T0>::Stored
-M00000006_IL_0008:
-value.unpack System.Tasks.TaskOutcome.Cancelled
-M00000006_IL_000d:
+M00000001_IL_0039:
+ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C436F6D706C657465645061796C6F61643E
+M00000001_IL_003e:
+stloc local0
+M00000001_IL_003f:
+ldloca local0
+M00000001_IL_0041:
+call instance System.Tasks.TaskOutcome.Completed<T0>::get_Value()
+M00000001_IL_0046:
+box T0
+M00000001_IL_004b:
+call System.Tasks.TaskOutcome<T0>::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+M00000001_IL_0050:
+call System.String::Concat(String,String)
+M00000001_IL_0055:
+ldstr ")"
+M00000001_IL_005a:
+call System.String::Concat(String,String)
+M00000001_IL_005f:
 ret
-.end
-.method instance TryGet(out(true) System.Tasks.TaskOutcome.Cancelled& destination) -> Boolean
-M00000007_IL_0000:
-M00000007_IL_0001:
-M00000007_IL_0002:
+M00000001_IL_0060:
+M00000001_IL_0061:
 ldarg 0
-M00000007_IL_0003:
-call instance System.Tasks.TaskOutcome<T0>::get_IsCancelled()
+M00000001_IL_0062:
+ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
+M00000001_IL_0067:
+conv.i4
+M00000001_IL_0068:
+ldc.i4 2
+M00000001_IL_0069:
+conv.i4
+M00000001_IL_006a:
+ceq
 call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
-M00000007_IL_0008:
-brtrue M00000007_IL_0012
-M00000007_IL_000d:
-br M00000007_IL_0022
-M00000007_IL_0012:
-M00000007_IL_0013:
-ldarg 1
-M00000007_IL_0014:
-ldarg 0
-M00000007_IL_0015:
-call instance System.Tasks.TaskOutcome<T0>::GetCancelledCase()
-M00000007_IL_001a:
-stobj System.Tasks.TaskOutcome.Cancelled
-M00000007_IL_001f:
-M00000007_IL_0020:
-ldc.bool true
-M00000007_IL_0021:
+M00000001_IL_006c:
+brtrue M00000001_IL_0076
+M00000001_IL_0071:
+br M00000001_IL_0090
+M00000001_IL_0076:
+ldstr "TaskOutcome"
+M00000001_IL_007b:
+ldstr "."
+M00000001_IL_0080:
+call System.String::Concat(String,String)
+M00000001_IL_0085:
+ldstr "Cancelled"
+M00000001_IL_008a:
+call System.String::Concat(String,String)
+M00000001_IL_008f:
 ret
-M00000007_IL_0022:
-M00000007_IL_0023:
-M00000007_IL_0024:
-ldarg 1
-M00000007_IL_0025:
-pop
-M00000007_IL_002a:
-M00000007_IL_002b:
+M00000001_IL_0090:
+M00000001_IL_0091:
+ldstr "\u003CUninitialized\u003E"
+M00000001_IL_0096:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000002_IL_0000:
+ldarg 0
+M00000002_IL_0001:
+M00000002_IL_0002:
+ref.isnull
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0004:
+brtrue M00000002_IL_000e
+M00000002_IL_0009:
+br M00000002_IL_0014
+M00000002_IL_000e:
+ldstr "null"
+M00000002_IL_0013:
+ret
+M00000002_IL_0014:
+M00000002_IL_0015:
+ldarg 0
+M00000002_IL_0016:
+isinst String
+M00000002_IL_001b:
+M00000002_IL_001c:
+ref.isnull
 ldc.bool false
-M00000007_IL_002c:
+ceq
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_001e:
+brtrue M00000002_IL_0028
+M00000002_IL_0023:
+br M00000002_IL_0043
+M00000002_IL_0028:
+ldstr "\u0022"
+M00000002_IL_002d:
+ldarg 0
+M00000002_IL_002e:
+castclass String
+M00000002_IL_0033:
+call System.String::Concat(String,String)
+M00000002_IL_0038:
+ldstr "\u0022"
+M00000002_IL_003d:
+call System.String::Concat(String,String)
+M00000002_IL_0042:
+ret
+M00000002_IL_0043:
+M00000002_IL_0044:
+ldarg 0
+M00000002_IL_0045:
+isinst Char
+M00000002_IL_004a:
+dup
+M00000002_IL_004b:
+ref.isnull
+brfalse M00000002_IL_0057
+M00000002_IL_0050:
+pop
+M00000002_IL_0051:
+ldc.i4 0
+M00000002_IL_0052:
+br M00000002_IL_005e
+M00000002_IL_0057:
+unbox.any Char
+M00000002_IL_005c:
+pop
+M00000002_IL_005d:
+ldc.i4 1
+M00000002_IL_005e:
+brtrue M00000002_IL_0068
+M00000002_IL_0063:
+br M00000002_IL_0083
+M00000002_IL_0068:
+ldstr "\u0027"
+M00000002_IL_006d:
+ldarg 0
+M00000002_IL_006e:
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeReflection936F30A1978F475D(System.Object)
+M00000002_IL_0073:
+call System.String::Concat(String,String)
+M00000002_IL_0078:
+ldstr "\u0027"
+M00000002_IL_007d:
+call System.String::Concat(String,String)
+M00000002_IL_0082:
+ret
+M00000002_IL_0083:
+M00000002_IL_0084:
+ldarg 0
+M00000002_IL_0085:
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeReflection936F30A1978F475D(System.Object)
+M00000002_IL_008a:
 ret
 .end
-.method instance .ctor(System.Tasks.TaskOutcome.Completed<T0> value) -> Void
-ldarg value
-value.pack System.Tasks.TaskOutcome.Completed<T0>
-newobj System.Tasks.TaskOutcome<T0>
-starg this
+.method instance byref .ctor(System.Tasks.TaskOutcome.Completed<T0> value) -> Void
+.local Byte local0
+.local System.Tasks.TaskOutcome.Completed<T0> local1
+.local Byte unionDefault1_0
+.local System.Tasks.TaskOutcome.Completed<T0> unionDefault1_1
+.local System.Tasks.TaskOutcome.Cancelled unionDefault1_2
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Tasks.TaskOutcome.Completed<T0>
+M00000003_IL_0000:
+ldarg 0
+M00000003_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Tasks.TaskOutcome.Completed<T0>
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C436F6D706C657465645061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Tasks.TaskOutcome.Cancelled
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+M00000003_IL_0007:
+ldc.i4 1
+M00000003_IL_0008:
+stloc local0
+M00000003_IL_0009:
+ldarg 0
+M00000003_IL_000a:
+ldloc local0
+M00000003_IL_000b:
+conv.u1
+M00000003_IL_000c:
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
+pop
+M00000003_IL_0011:
+ldarg 1
+M00000003_IL_0012:
+stloc local1
+M00000003_IL_0013:
+ldarg 0
+M00000003_IL_0014:
+ldloc local1
+M00000003_IL_0015:
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C436F6D706C657465645061796C6F61643E
+pop
+M00000003_IL_001a:
 ldvoid
 ret
 .end
-.method instance get_IsCompleted() -> Boolean
-M00000009_IL_0000:
-M00000009_IL_0001:
-M00000009_IL_0002:
+.method instance byref TryGetValue(out(true) System.Tasks.TaskOutcome.Completed<T0>& value) -> Boolean
+M00000004_IL_0000:
 ldarg 0
-M00000009_IL_0003:
-ldfld System.Tasks.TaskOutcome<T0>::Stored
-M00000009_IL_0008:
-value.is System.Tasks.TaskOutcome.Completed<T0>
+M00000004_IL_0001:
+ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
+M00000004_IL_0006:
+conv.i4
+M00000004_IL_0007:
+ldc.i4 1
+M00000004_IL_0008:
+conv.i4
+M00000004_IL_0009:
+ceq
 call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
-M00000009_IL_000d:
-call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method instance GetCompletedCase() -> System.Tasks.TaskOutcome.Completed<T0>
-M0000000a_IL_0000:
-M0000000a_IL_0001:
-M0000000a_IL_0002:
-ldarg 0
-M0000000a_IL_0003:
-ldfld System.Tasks.TaskOutcome<T0>::Stored
-M0000000a_IL_0008:
-value.unpack System.Tasks.TaskOutcome.Completed<T0>
-M0000000a_IL_000d:
-ret
-.end
-.method instance TryGet(out(true) System.Tasks.TaskOutcome.Completed<T0>& destination) -> Boolean
-M0000000b_IL_0000:
-M0000000b_IL_0001:
-M0000000b_IL_0002:
-ldarg 0
-M0000000b_IL_0003:
-call instance System.Tasks.TaskOutcome<T0>::get_IsCompleted()
-call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
-M0000000b_IL_0008:
-brtrue M0000000b_IL_0012
-M0000000b_IL_000d:
-br M0000000b_IL_0022
-M0000000b_IL_0012:
-M0000000b_IL_0013:
+M00000004_IL_000b:
+brtrue M00000004_IL_0015
+M00000004_IL_0010:
+br M00000004_IL_0023
+M00000004_IL_0015:
 ldarg 1
-M0000000b_IL_0014:
+M00000004_IL_0016:
 ldarg 0
-M0000000b_IL_0015:
-call instance System.Tasks.TaskOutcome<T0>::GetCompletedCase()
-M0000000b_IL_001a:
+M00000004_IL_0017:
+ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C436F6D706C657465645061796C6F61643E
+M00000004_IL_001c:
 stobj System.Tasks.TaskOutcome.Completed<T0>
-M0000000b_IL_001f:
-M0000000b_IL_0020:
+M00000004_IL_0021:
 ldc.bool true
-M0000000b_IL_0021:
+M00000004_IL_0022:
 ret
-M0000000b_IL_0022:
-M0000000b_IL_0023:
-M0000000b_IL_0024:
-ldarg 1
-M0000000b_IL_0025:
-pop
-M0000000b_IL_002a:
-M0000000b_IL_002b:
+M00000004_IL_0023:
+M00000004_IL_0024:
 ldc.bool false
-M0000000b_IL_002c:
+M00000004_IL_0025:
+ret
+.end
+.method instance byref .ctor(System.Tasks.TaskOutcome.Cancelled value) -> Void
+.local Byte local0
+.local System.Tasks.TaskOutcome.Cancelled local1
+.local Byte unionDefault1_0
+.local System.Tasks.TaskOutcome.Completed<T0> unionDefault1_1
+.local System.Tasks.TaskOutcome.Cancelled unionDefault1_2
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Tasks.TaskOutcome.Cancelled
+M00000005_IL_0000:
+ldarg 0
+M00000005_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Tasks.TaskOutcome.Completed<T0>
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C436F6D706C657465645061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Tasks.TaskOutcome.Cancelled
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+M00000005_IL_0007:
+ldc.i4 2
+M00000005_IL_0008:
+stloc local0
+M00000005_IL_0009:
+ldarg 0
+M00000005_IL_000a:
+ldloc local0
+M00000005_IL_000b:
+conv.u1
+M00000005_IL_000c:
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
+pop
+M00000005_IL_0011:
+ldarg 1
+M00000005_IL_0012:
+stloc local1
+M00000005_IL_0013:
+ldarg 0
+M00000005_IL_0014:
+ldloc local1
+M00000005_IL_0015:
+stfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+pop
+M00000005_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Tasks.TaskOutcome.Cancelled& value) -> Boolean
+M00000006_IL_0000:
+ldarg 0
+M00000006_IL_0001:
+ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
+M00000006_IL_0006:
+conv.i4
+M00000006_IL_0007:
+ldc.i4 2
+M00000006_IL_0008:
+conv.i4
+M00000006_IL_0009:
+ceq
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_000b:
+brtrue M00000006_IL_0015
+M00000006_IL_0010:
+br M00000006_IL_0023
+M00000006_IL_0015:
+ldarg 1
+M00000006_IL_0016:
+ldarg 0
+M00000006_IL_0017:
+ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+M00000006_IL_001c:
+stobj System.Tasks.TaskOutcome.Cancelled
+M00000006_IL_0021:
+ldc.bool true
+M00000006_IL_0022:
+ret
+M00000006_IL_0023:
+M00000006_IL_0024:
+ldc.bool false
+M00000006_IL_0025:
+ret
+.end
+.method instance byref get_Value() -> System.Object
+M00000007_IL_0000:
+ldarg 0
+M00000007_IL_0001:
+ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
+M00000007_IL_0006:
+conv.i4
+M00000007_IL_0007:
+ldc.i4 1
+M00000007_IL_0008:
+conv.i4
+M00000007_IL_0009:
+ceq
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_000b:
+brtrue M00000007_IL_0015
+M00000007_IL_0010:
+br M00000007_IL_0021
+M00000007_IL_0015:
+ldarg 0
+M00000007_IL_0016:
+ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C436F6D706C657465645061796C6F61643E
+M00000007_IL_001b:
+box System.Tasks.TaskOutcome.Completed<T0>
+M00000007_IL_0020:
+ret
+M00000007_IL_0021:
+M00000007_IL_0022:
+ldarg 0
+M00000007_IL_0023:
+ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C5461673E
+M00000007_IL_0028:
+conv.i4
+M00000007_IL_0029:
+ldc.i4 2
+M00000007_IL_002a:
+conv.i4
+M00000007_IL_002b:
+ceq
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_002d:
+brtrue M00000007_IL_0037
+M00000007_IL_0032:
+br M00000007_IL_0043
+M00000007_IL_0037:
+ldarg 0
+M00000007_IL_0038:
+ldfld System.Tasks.TaskOutcome<T0>::Metadata_V1_3C43616E63656C6C65645061796C6F61643E
+M00000007_IL_003d:
+box System.Tasks.TaskOutcome.Cancelled
+M00000007_IL_0042:
+ret
+M00000007_IL_0043:
+M00000007_IL_0044:
+M00000007_IL_0045:
+call neoCLR.Library.System.Tasks.TaskOutcome.DefaultReference53797374656D2E4F626A656374()
+ret
+.end
+.method instance byref get_HasValue() -> Boolean
+M00000008_IL_0000:
+ldarg 0
+M00000008_IL_0001:
+call instance System.Tasks.TaskOutcome<T0>::get_Value()
+M00000008_IL_0006:
+M00000008_IL_0007:
+ref.isnull
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0009:
+ldc.i4 0
+M00000008_IL_000a:
+ceq
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_000c:
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .end
 .type System.Tasks.TaskOutcome
-.type Cancelled
-.sealed
-.method instance .ctor() -> Void
-M00000001_IL_0000:
-M00000001_IL_0001:
-ldarg 0
-M00000001_IL_0002:
-pop
-M00000001_IL_0007:
-ldvoid
-ret
-.end
-.end
 .type Completed<T0>
 .sealed
 .field Value T0
 .property instance Value() -> T0
 .get instance System.Tasks.TaskOutcome.Completed<T0>::get_Value()
 .end
-.method instance .ctor(T0 value) -> Void
-ldarg value
-newobj System.Tasks.TaskOutcome.Completed<T0>
-starg this
+.method instance byref .ctor(T0 value) -> Void
+.local T0 local0
+.local T0 unionDefault1_0
+M00000009_IL_0000:
+ldarg 0
+M00000009_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj T0
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Tasks.TaskOutcome.Completed<T0>::Value
+pop
+M00000009_IL_0007:
+M00000009_IL_0008:
+ldarg 1
+M00000009_IL_0009:
+stloc local0
+M00000009_IL_000a:
+ldarg 0
+M00000009_IL_000b:
+ldloc local0
+M00000009_IL_000c:
+stfld System.Tasks.TaskOutcome.Completed<T0>::Value
+pop
+M00000009_IL_0011:
 ldvoid
 ret
 .end
-.method instance get_Value() -> T0
-M00000003_IL_0000:
-M00000003_IL_0001:
-M00000003_IL_0002:
+.method instance byref get_Value() -> T0
+M0000000a_IL_0000:
+M0000000a_IL_0001:
 ldarg 0
-M00000003_IL_0003:
+M0000000a_IL_0002:
 ldfld System.Tasks.TaskOutcome.Completed<T0>::Value
-M00000003_IL_0008:
+M0000000a_IL_0007:
+ret
+.end
+.method instance byref Deconstruct(out T0& Value) -> Void
+M0000000b_IL_0000:
+ldarg 1
+M0000000b_IL_0001:
+ldarg 0
+M0000000b_IL_0002:
+call instance System.Tasks.TaskOutcome.Completed<T0>::get_Value()
+M0000000b_IL_0007:
+stobj T0
+M0000000b_IL_000c:
+ldvoid
+ret
+.end
+.method instance override byref ToString() -> String
+M0000000c_IL_0000:
+ldstr "TaskOutcome"
+M0000000c_IL_0005:
+ldstr "."
+M0000000c_IL_000a:
+call System.String::Concat(String,String)
+M0000000c_IL_000f:
+ldstr "Completed"
+M0000000c_IL_0014:
+call System.String::Concat(String,String)
+M0000000c_IL_0019:
+ldstr "("
+M0000000c_IL_001e:
+call System.String::Concat(String,String)
+M0000000c_IL_0023:
+ldarg 0
+M0000000c_IL_0024:
+call instance System.Tasks.TaskOutcome.Completed<T0>::get_Value()
+M0000000c_IL_0029:
+box T0
+M0000000c_IL_002e:
+call System.Tasks.TaskOutcome.Completed<T0>::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+M0000000c_IL_0033:
+call System.String::Concat(String,String)
+M0000000c_IL_0038:
+ldstr ")"
+M0000000c_IL_003d:
+call System.String::Concat(String,String)
+M0000000c_IL_0042:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M0000000d_IL_0000:
+ldarg 0
+M0000000d_IL_0001:
+M0000000d_IL_0002:
+ref.isnull
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0004:
+brtrue M0000000d_IL_000e
+M0000000d_IL_0009:
+br M0000000d_IL_0014
+M0000000d_IL_000e:
+ldstr "null"
+M0000000d_IL_0013:
+ret
+M0000000d_IL_0014:
+M0000000d_IL_0015:
+ldarg 0
+M0000000d_IL_0016:
+isinst String
+M0000000d_IL_001b:
+M0000000d_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_001e:
+brtrue M0000000d_IL_0028
+M0000000d_IL_0023:
+br M0000000d_IL_0043
+M0000000d_IL_0028:
+ldstr "\u0022"
+M0000000d_IL_002d:
+ldarg 0
+M0000000d_IL_002e:
+castclass String
+M0000000d_IL_0033:
+call System.String::Concat(String,String)
+M0000000d_IL_0038:
+ldstr "\u0022"
+M0000000d_IL_003d:
+call System.String::Concat(String,String)
+M0000000d_IL_0042:
+ret
+M0000000d_IL_0043:
+M0000000d_IL_0044:
+ldarg 0
+M0000000d_IL_0045:
+isinst Char
+M0000000d_IL_004a:
+dup
+M0000000d_IL_004b:
+ref.isnull
+brfalse M0000000d_IL_0057
+M0000000d_IL_0050:
+pop
+M0000000d_IL_0051:
+ldc.i4 0
+M0000000d_IL_0052:
+br M0000000d_IL_005e
+M0000000d_IL_0057:
+unbox.any Char
+M0000000d_IL_005c:
+pop
+M0000000d_IL_005d:
+ldc.i4 1
+M0000000d_IL_005e:
+brtrue M0000000d_IL_0068
+M0000000d_IL_0063:
+br M0000000d_IL_0083
+M0000000d_IL_0068:
+ldstr "\u0027"
+M0000000d_IL_006d:
+ldarg 0
+M0000000d_IL_006e:
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeReflection936F30A1978F475D(System.Object)
+M0000000d_IL_0073:
+call System.String::Concat(String,String)
+M0000000d_IL_0078:
+ldstr "\u0027"
+M0000000d_IL_007d:
+call System.String::Concat(String,String)
+M0000000d_IL_0082:
+ret
+M0000000d_IL_0083:
+M0000000d_IL_0084:
+ldarg 0
+M0000000d_IL_0085:
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeReflection936F30A1978F475D(System.Object)
+M0000000d_IL_008a:
+ret
+.end
+.end
+.type Cancelled
+.sealed
+.method instance byref .ctor() -> Void
+M0000000e_IL_0000:
+ldarg 0
+M0000000e_IL_0001:
+pop
+M0000000e_IL_0007:
+M0000000e_IL_0008:
+ldvoid
+ret
+.end
+.method instance override byref ToString() -> String
+M0000000f_IL_0000:
+ldstr "TaskOutcome"
+M0000000f_IL_0005:
+ldstr "."
+M0000000f_IL_000a:
+call System.String::Concat(String,String)
+M0000000f_IL_000f:
+ldstr "Cancelled"
+M0000000f_IL_0014:
+call System.String::Concat(String,String)
+M0000000f_IL_0019:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000010_IL_0000:
+ldarg 0
+M00000010_IL_0001:
+M00000010_IL_0002:
+ref.isnull
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_0004:
+brtrue M00000010_IL_000e
+M00000010_IL_0009:
+br M00000010_IL_0014
+M00000010_IL_000e:
+ldstr "null"
+M00000010_IL_0013:
+ret
+M00000010_IL_0014:
+M00000010_IL_0015:
+ldarg 0
+M00000010_IL_0016:
+isinst String
+M00000010_IL_001b:
+M00000010_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_001e:
+brtrue M00000010_IL_0028
+M00000010_IL_0023:
+br M00000010_IL_0043
+M00000010_IL_0028:
+ldstr "\u0022"
+M00000010_IL_002d:
+ldarg 0
+M00000010_IL_002e:
+castclass String
+M00000010_IL_0033:
+call System.String::Concat(String,String)
+M00000010_IL_0038:
+ldstr "\u0022"
+M00000010_IL_003d:
+call System.String::Concat(String,String)
+M00000010_IL_0042:
+ret
+M00000010_IL_0043:
+M00000010_IL_0044:
+ldarg 0
+M00000010_IL_0045:
+isinst Char
+M00000010_IL_004a:
+dup
+M00000010_IL_004b:
+ref.isnull
+brfalse M00000010_IL_0057
+M00000010_IL_0050:
+pop
+M00000010_IL_0051:
+ldc.i4 0
+M00000010_IL_0052:
+br M00000010_IL_005e
+M00000010_IL_0057:
+unbox.any Char
+M00000010_IL_005c:
+pop
+M00000010_IL_005d:
+ldc.i4 1
+M00000010_IL_005e:
+brtrue M00000010_IL_0068
+M00000010_IL_0063:
+br M00000010_IL_0083
+M00000010_IL_0068:
+ldstr "\u0027"
+M00000010_IL_006d:
+ldarg 0
+M00000010_IL_006e:
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeReflection936F30A1978F475D(System.Object)
+M00000010_IL_0073:
+call System.String::Concat(String,String)
+M00000010_IL_0078:
+ldstr "\u0027"
+M00000010_IL_007d:
+call System.String::Concat(String,String)
+M00000010_IL_0082:
+ret
+M00000010_IL_0083:
+M00000010_IL_0084:
+ldarg 0
+M00000010_IL_0085:
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeReflection936F30A1978F475D(System.Object)
+M00000010_IL_008a:
 ret
 .end
 .end

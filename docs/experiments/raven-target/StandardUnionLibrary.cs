@@ -1,6 +1,6 @@
 using Mono.Cecil;
 
-// Bounded bootstrap path for nongeneric standard-syntax unions. The selected
+// Bounded bootstrap path for standard-syntax unions. The selected
 // reference family must match; application namespaces alone never authorize aliasing.
 static class StandardUnionLibrary
 {
@@ -24,6 +24,10 @@ static class StandardUnionLibrary
             throw new InvalidDataException("Unsupported standard union protocol.");
     }
 
+    public static bool IsFamily(TypeDefinition type) => IsCandidate(type)
+        || RavenUnionMetadata.CompanionTarget(type) is not null
+        || type.DeclaringType is { } owner && RavenUnionMetadata.CompanionTarget(owner) is not null;
+
     public static bool IsCandidate(TypeDefinition type) => type.IsValueType
         && type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute"
             && RuntimeSignatures.IsCore(a.AttributeType.Scope));
@@ -33,7 +37,7 @@ static class StandardUnionLibrary
         if (!ApplicationTypes.IsStandardLibraryUnion(source) || !ApplicationTypes.IsStandardLibraryUnion(reference)
             || source.FullName != reference.FullName)
             throw new InvalidDataException("Unsupported standard union library shape.");
-        if (!RavenUnionMetadata.ValidateNestedCases(source).SequenceEqual(RavenUnionMetadata.ValidateNestedCases(reference)))
+        if (!RavenUnionMetadata.Cases(source).SequenceEqual(RavenUnionMetadata.Cases(reference)))
             throw new InvalidDataException("Raven union case metadata does not match reference contract.");
         const string protocolName = ProtocolName;
         var protocol = source.Interfaces.SingleOrDefault(i => i.InterfaceType.FullName == protocolName)?.InterfaceType.Resolve()
@@ -45,13 +49,17 @@ static class StandardUnionLibrary
         var ownsProtocol = protocol.Module == source.Module;
         if (!ownsProtocol && protocol != contractProtocol)
             throw new InvalidDataException("Standard union protocol must belong to the supplied core reference.");
-        var sources = new[] { source }.Concat(ownsProtocol ? new[] { protocol } : []).Concat(source.NestedTypes).ToArray();
-        var contracts = new[] { reference }.Concat(ownsProtocol ? new[] { contractProtocol } : []).Concat(reference.NestedTypes).ToArray();
+        var sources = RavenUnionMetadata.Family(source).Concat(ownsProtocol ? new[] { protocol } : []).ToArray();
+        var contracts = RavenUnionMetadata.Family(reference).Concat(ownsProtocol ? new[] { contractProtocol } : []).ToArray();
         var ownedNames = sources.Select(t => t.FullName).ToHashSet();
         string TypeKey(TypeReference type)
         {
             if (type is ByReferenceType byref) return TypeKey(byref.ElementType) + "&";
-            if (type is TypeSpecification || type is GenericParameter)
+            if (type.FullName == "System.Void" && RuntimeSignatures.IsCore(type.Scope)) return "Void";
+            if (type is GenericParameter parameter) return parameter.Type + ":" + parameter.Position;
+            if (type is GenericInstanceType generic) return TypeKey(generic.ElementType) + "<"
+                + string.Join(',', generic.GenericArguments.Select(TypeKey)) + ">";
+            if (type is TypeSpecification)
                 throw new InvalidDataException("Unsupported standard union signature.");
             if (type.MetadataType is MetadataType.Void or MetadataType.Boolean or MetadataType.Byte
                 or MetadataType.Int32 or MetadataType.String or MetadataType.Object)
@@ -72,7 +80,8 @@ static class StandardUnionLibrary
         foreach (var type in sources)
         {
             var contract = contracts.SingleOrDefault(t => t.FullName == type.FullName);
-            if (contract is null || type.Attributes != contract.Attributes || type.HasGenericParameters
+            if (contract is null || type.Attributes != contract.Attributes || type.GenericParameters.Count != contract.GenericParameters.Count
+                || type.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant)
                 || type.HasEvents || type.Properties.Any(p => p.HasParameters)
                 || type.PackingSize != contract.PackingSize || type.ClassSize != contract.ClassSize
                 || type.Interfaces.Select(i => TypeKey(i.InterfaceType)).Order().SequenceEqual(
@@ -81,8 +90,10 @@ static class StandardUnionLibrary
                     contract.Fields.Select(f => (f.Name, f.Attributes, f.Offset, TypeKey(f.FieldType))))
                 || type.Methods.Any(m => m.HasGenericParameters || m.ExplicitThis
                     || m.CallingConvention != MethodCallingConvention.Default || m.IsPInvokeImpl
-                    || m.IsStatic && m.IsConstructor || m.Overrides.Any(o => o.DeclaringType.FullName != protocolName
-                        || o.Name != m.Name || o.HasParameters || TypeKey(o.ReturnType) != TypeKey(m.ReturnType))
+                    || m.IsStatic && m.IsConstructor || m.Overrides.Any(o => o.DeclaringType.Resolve()?.IsInterface != true
+                        || o.Name != m.Name || TypeKey(RuntimeSignatures.Close(o.ReturnType, o.DeclaringType, allowOpenMethodParameters: true)) != TypeKey(m.ReturnType)
+                        || !o.Parameters.Select(p => TypeKey(RuntimeSignatures.Close(p.ParameterType, o.DeclaringType, allowOpenMethodParameters: true)))
+                            .SequenceEqual(m.Parameters.Select(p => TypeKey(p.ParameterType))))
                     || !type.IsInterface && !m.HasBody)
                 || !type.Methods.Select(MethodKey).Order().SequenceEqual(contract.Methods.Select(MethodKey).Order())
                 || !type.Properties.Select(PropertyKey).Order().SequenceEqual(contract.Properties.Select(PropertyKey).Order()))
@@ -90,7 +101,7 @@ static class StandardUnionLibrary
                     + "; source methods=[" + string.Join(';', type.Methods.Select(m => MethodKey(m) + ":overrides=" + m.HasOverrides))
                     + "]; reference methods=[" + string.Join(';', contract?.Methods.Select(MethodKey) ?? []) + "]");
         }
-        foreach (var type in sources) ApplicationTypes.BindLibrary(type, type.FullName.Replace('/', '.'));
+        foreach (var type in sources) ApplicationTypes.BindLibrary(type, type.FullName.Split('`')[0].Replace('/', '.'));
         foreach (var type in sources) _ = ApplicationTypes.Type(type);
         return sources.Where(t => !t.IsInterface).SelectMany(t => t.Methods).ToArray();
     }

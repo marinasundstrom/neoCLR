@@ -60,17 +60,13 @@ ret
 .end
 .function neoCLR.Library.System.Networking.IPAddress.RuntimeUnion0(System.Result<String,System.Text.Utf8SliceError>& arg0,out(true) System.Result.Ok<String>& arg1) -> Boolean
 ldarg arg0
-ldobj System.Result<String,System.Text.Utf8SliceError>
 ldarg arg1
-call instance System.Result<String,System.Text.Utf8SliceError>::TryGet(System.Result.Ok<String>&)
+call instance System.Result<String,System.Text.Utf8SliceError>::TryGetValue(System.Result.Ok<String>&)
 ret
 .end
-.function neoCLR.Library.System.Networking.IPAddress.RuntimeUnion1(System.Result.Ok<String>& receiver,out String& value) -> void
-ldarg value
-ldarg receiver
-ldobj System.Result.Ok<String>
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeUnion1(System.Result.Ok<String>& arg0) -> String
+ldarg arg0
 call instance System.Result.Ok<String>::get_Value()
-stobj String
 ret
 .end
 .function neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError arg0) -> System.Result.Error<System.Networking.IPAddressError>

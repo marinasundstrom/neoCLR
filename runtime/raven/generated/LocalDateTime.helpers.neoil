@@ -1,25 +1,23 @@
 ; Generated from runtime/raven/src/System/LocalDateTime.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.LocalDateTime.RuntimeUnion0(System.Result<System.Date,System.InvalidDateError>& arg0) -> System.Result.Ok<System.Date>
+.function neoCLR.Library.System.LocalDateTime.RuntimeUnion0(System.Result<System.Date,System.InvalidDateError>& arg0,out(true) System.Result.Ok<System.Date>& arg1) -> Boolean
 ldarg arg0
-ldobj System.Result<System.Date,System.InvalidDateError>
-call instance System.Result<System.Date,System.InvalidDateError>::GetOkCase()
+ldarg arg1
+call instance System.Result<System.Date,System.InvalidDateError>::TryGetValue(System.Result.Ok<System.Date>&)
 ret
 .end
 .function neoCLR.Library.System.LocalDateTime.RuntimeUnion1(System.Result.Ok<System.Date>& arg0) -> System.Date
 ldarg arg0
-ldobj System.Result.Ok<System.Date>
 call instance System.Result.Ok<System.Date>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.LocalDateTime.RuntimeUnion2(System.Result<System.Time,System.InvalidTimeError>& arg0) -> System.Result.Ok<System.Time>
+.function neoCLR.Library.System.LocalDateTime.RuntimeUnion2(System.Result<System.Time,System.InvalidTimeError>& arg0,out(true) System.Result.Ok<System.Time>& arg1) -> Boolean
 ldarg arg0
-ldobj System.Result<System.Time,System.InvalidTimeError>
-call instance System.Result<System.Time,System.InvalidTimeError>::GetOkCase()
+ldarg arg1
+call instance System.Result<System.Time,System.InvalidTimeError>::TryGetValue(System.Result.Ok<System.Time>&)
 ret
 .end
 .function neoCLR.Library.System.LocalDateTime.RuntimeUnion3(System.Result.Ok<System.Time>& arg0) -> System.Time
 ldarg arg0
-ldobj System.Result.Ok<System.Time>
 call instance System.Result.Ok<System.Time>::get_Value()
 ret
 .end

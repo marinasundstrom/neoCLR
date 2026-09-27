@@ -80,12 +80,8 @@ ret
 .local System.IO.StreamError local6
 .local System.Result<Int32,System.IO.StreamError> local7
 .local System.Result.Ok<Int32> local8
-.local System.Result.Ok<Int32> local9
-.local Int32 local10
-.local System.Result<Int32,System.IO.StreamError> local11
-.local System.Result.Error<System.IO.StreamError> local12
-.local System.Result.Error<System.IO.StreamError> local13
-.local System.IO.StreamError local14
+.local System.Result<Int32,System.IO.StreamError> local9
+.local System.Result.Error<System.IO.StreamError> local10
 ldloca local0
 initobj System.Collections.Sequence<Byte>
 ldloca local1
@@ -94,18 +90,20 @@ ldc.i4 0
 stloc local2
 ldc.i4 0
 stloc local3
+ldloca local4
+initobj System.Result<Int32,System.IO.StreamError>
 ldc.i4 0
 stloc local5
 ldloca local6
 initobj System.IO.StreamError
+ldloca local7
+initobj System.Result<Int32,System.IO.StreamError>
 ldloca local8
 initobj System.Result.Ok<Int32>
 ldloca local9
-initobj System.Result.Ok<Int32>
-ldc.i4 0
-stloc local10
-ldloca local14
-initobj System.IO.StreamError
+initobj System.Result<Int32,System.IO.StreamError>
+ldloca local10
+initobj System.Result.Error<System.IO.StreamError>
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
@@ -234,7 +232,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
 M00000003_IL_00a7:
 brtrue M00000003_IL_00b1
 M00000003_IL_00ac:
-br M00000003_IL_01ca
+br M00000003_IL_01b2
 M00000003_IL_00b1:
 M00000003_IL_00b2:
 M00000003_IL_00b3:
@@ -263,178 +261,158 @@ ldloc local4
 M00000003_IL_00cc:
 stloc local7
 M00000003_IL_00ce:
-ldloca local7
-M00000003_IL_00d0:
 ldloca local8
-M00000003_IL_00d2:
+M00000003_IL_00d0:
+initobj System.Result.Ok<Int32>
+M00000003_IL_00d6:
+ldloca local7
+M00000003_IL_00d8:
+ldloca local8
+M00000003_IL_00da:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion4(System.Result<Int32,System.IO.StreamError>&,System.Result.Ok<Int32>&)
-M00000003_IL_00d7:
-brfalse M00000003_IL_0175
-M00000003_IL_00dc:
-ldloc local8
-M00000003_IL_00de:
-stloc local9
-M00000003_IL_00e0:
-ldloca local9
-M00000003_IL_00e2:
-ldloca local10
+M00000003_IL_00df:
+brfalse M00000003_IL_0169
 M00000003_IL_00e4:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Ok<Int32>&,Int32&)
-M00000003_IL_00e9:
-ldloc local10
+ldloca local8
+M00000003_IL_00e6:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Ok<Int32>&)
 M00000003_IL_00eb:
 stloc local5
 M00000003_IL_00ed:
-ldc.i4 1
 M00000003_IL_00ee:
-br M00000003_IL_00f4
-M00000003_IL_00f4:
-brfalse M00000003_IL_0175
+br M00000003_IL_00f9
 M00000003_IL_00f9:
 M00000003_IL_00fa:
-br M00000003_IL_0105
-M00000003_IL_0105:
-M00000003_IL_0106:
 ldloc local5
-M00000003_IL_0108:
+M00000003_IL_00fc:
 ldc.i4 0
-M00000003_IL_0109:
+M00000003_IL_00fd:
 clt
 call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
-M00000003_IL_010b:
-brtrue M00000003_IL_0115
-M00000003_IL_0110:
-br M00000003_IL_0120
+M00000003_IL_00ff:
+brtrue M00000003_IL_0109
+M00000003_IL_0104:
+br M00000003_IL_0114
+M00000003_IL_0109:
+M00000003_IL_010a:
+ldstr "Invalid output write count"
+M00000003_IL_010f:
+call System.Fault(String)
+fault "System.Fault returned unexpectedly"
+M00000003_IL_0114:
 M00000003_IL_0115:
 M00000003_IL_0116:
-ldstr "Invalid output write count"
-M00000003_IL_011b:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
-M00000003_IL_0120:
-M00000003_IL_0121:
-M00000003_IL_0122:
 ldloc local5
-M00000003_IL_0124:
+M00000003_IL_0118:
 ldloc local1
-M00000003_IL_0125:
+M00000003_IL_0119:
 ldlen
 conv.i4
-M00000003_IL_012a:
+M00000003_IL_011e:
 ldloc local3
-M00000003_IL_012b:
+M00000003_IL_011f:
 sub
-M00000003_IL_012c:
+M00000003_IL_0120:
 cgt
 call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
-M00000003_IL_012e:
-brtrue M00000003_IL_0138
-M00000003_IL_0133:
-br M00000003_IL_0143
-M00000003_IL_0138:
-M00000003_IL_0139:
+M00000003_IL_0122:
+brtrue M00000003_IL_012c
+M00000003_IL_0127:
+br M00000003_IL_0137
+M00000003_IL_012c:
+M00000003_IL_012d:
 ldstr "Invalid output write count"
-M00000003_IL_013e:
+M00000003_IL_0132:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
-M00000003_IL_0143:
-M00000003_IL_0144:
-M00000003_IL_0145:
+M00000003_IL_0137:
+M00000003_IL_0138:
+M00000003_IL_0139:
 ldloc local5
-M00000003_IL_0147:
+M00000003_IL_013b:
 ldc.i4 0
-M00000003_IL_0148:
+M00000003_IL_013c:
 ceq
 call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanToInt32(Boolean)
-M00000003_IL_014a:
-brtrue M00000003_IL_0154
-M00000003_IL_014f:
-br M00000003_IL_0169
-M00000003_IL_0154:
+M00000003_IL_013e:
+brtrue M00000003_IL_0148
+M00000003_IL_0143:
+br M00000003_IL_015d
+M00000003_IL_0148:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorIoFailureNew()
-M00000003_IL_0159:
+M00000003_IL_014d:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorIoFailure(System.IO.StreamError.IoFailure)
-M00000003_IL_015e:
+M00000003_IL_0152:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
-M00000003_IL_0163:
+M00000003_IL_0157:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
-M00000003_IL_0168:
+M00000003_IL_015c:
 ret
+M00000003_IL_015d:
+M00000003_IL_015e:
+M00000003_IL_015f:
+ldloc local3
+M00000003_IL_0160:
+ldloc local5
+M00000003_IL_0162:
+add
+M00000003_IL_0163:
+stloc local3
+M00000003_IL_0164:
+br M00000003_IL_01ac
 M00000003_IL_0169:
 M00000003_IL_016a:
-M00000003_IL_016b:
-ldloc local3
-M00000003_IL_016c:
-ldloc local5
-M00000003_IL_016e:
-add
-M00000003_IL_016f:
-stloc local3
-M00000003_IL_0170:
-br M00000003_IL_01c4
-M00000003_IL_0175:
-M00000003_IL_0176:
 ldloc local4
+M00000003_IL_016c:
+stloc local9
+M00000003_IL_016e:
+ldloca local10
+M00000003_IL_0170:
+initobj System.Result.Error<System.IO.StreamError>
+M00000003_IL_0176:
+ldloca local9
 M00000003_IL_0178:
-stloc local11
+ldloca local10
 M00000003_IL_017a:
-ldloca local11
-M00000003_IL_017c:
-ldloca local12
-M00000003_IL_017e:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion6(System.Result<Int32,System.IO.StreamError>&,System.Result.Error<System.IO.StreamError>&)
-M00000003_IL_0183:
-brfalse M00000003_IL_01bf
-M00000003_IL_0188:
-ldloc local12
-M00000003_IL_018a:
-stloc local13
-M00000003_IL_018c:
-ldloca local13
-M00000003_IL_018e:
-ldloca local14
-M00000003_IL_0190:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion7(System.Result.Error<System.IO.StreamError>&,System.IO.StreamError&)
-M00000003_IL_0195:
-ldloc local14
-M00000003_IL_0197:
+M00000003_IL_017f:
+brfalse M00000003_IL_01a7
+M00000003_IL_0184:
+ldloca local10
+M00000003_IL_0186:
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion7(System.Result.Error<System.IO.StreamError>&)
+M00000003_IL_018b:
 stloc local6
+M00000003_IL_018d:
+M00000003_IL_018e:
+br M00000003_IL_0199
 M00000003_IL_0199:
-ldc.i4 1
 M00000003_IL_019a:
-br M00000003_IL_01a0
-M00000003_IL_01a0:
-brfalse M00000003_IL_01bf
-M00000003_IL_01a5:
-M00000003_IL_01a6:
-br M00000003_IL_01b1
-M00000003_IL_01b1:
-M00000003_IL_01b2:
 ldloc local6
-M00000003_IL_01b4:
+M00000003_IL_019c:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
-M00000003_IL_01b9:
+M00000003_IL_01a1:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
-M00000003_IL_01be:
+M00000003_IL_01a6:
 ret
-M00000003_IL_01bf:
-M00000003_IL_01c0:
-M00000003_IL_01c1:
-M00000003_IL_01c2:
-M00000003_IL_01c3:
+M00000003_IL_01a7:
+M00000003_IL_01a8:
+M00000003_IL_01a9:
+M00000003_IL_01aa:
+M00000003_IL_01ab:
 fault "Guest program reached a terminal failure"
-M00000003_IL_01c4:
-M00000003_IL_01c5:
+M00000003_IL_01ac:
+M00000003_IL_01ad:
 br M00000003_IL_009d
-M00000003_IL_01ca:
-M00000003_IL_01cb:
-M00000003_IL_01cc:
+M00000003_IL_01b2:
+M00000003_IL_01b3:
+M00000003_IL_01b4:
 ldloc local3
-M00000003_IL_01cd:
+M00000003_IL_01b5:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion2(Int32)
-M00000003_IL_01d2:
+M00000003_IL_01ba:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion3(System.Result.Ok<Int32>)
-M00000003_IL_01d7:
+M00000003_IL_01bf:
 ret
 .end
 .method instance WriteLine(String text) -> System.Result<Int32,System.IO.StreamError>

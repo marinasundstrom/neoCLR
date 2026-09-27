@@ -16,13 +16,13 @@ static class StandardUnionReference
         var originals = module.AssemblyReferences.ToHashSet();
         var root = source.MainModule.GetType(owner) ?? throw new InvalidDataException("Missing source union.");
         if (!ApplicationTypes.IsStandardLibraryUnion(root))
-            throw new InvalidDataException("Only supported nongeneric standard unions can be projected.");
-        RavenUnionMetadata.ValidateNestedCases(root);
-        var supportNames = new[] { StandardUnionLibrary.ProtocolName, RavenUnionMetadata.CaseAttribute };
-        var selected = new[] { root }.Concat(root.NestedTypes).Concat(supportNames
+            throw new InvalidDataException("Only supported standard unions can be projected.");
+        var family = RavenUnionMetadata.Family(root);
+        var supportNames = new[] { StandardUnionLibrary.ProtocolName, RavenUnionMetadata.CaseAttribute }.Concat(root.HasGenericParameters ? new[] { RavenUnionMetadata.CompanionAttribute } : []);
+        var selected = family.Concat(supportNames
             .Where(name => module.GetType(name) is null).Select(name => source.MainModule.GetType(name)
                 ?? throw new InvalidDataException("Missing union reference support type: " + name))).ToArray();
-        if (selected.Any(type => type.HasGenericParameters || type.HasEvents
+        if (selected.Any(type => type.HasEvents
             || type.Properties.Any(p => p.HasParameters)
             || type.Methods.Any(m => m.HasGenericParameters || m.IsPInvokeImpl || m.ExplicitThis
                 || m.CallingConvention != MethodCallingConvention.Default
@@ -34,7 +34,7 @@ static class StandardUnionReference
             var clone = module.GetType(type.FullName);
             if (clone is not null)
             {
-                if (type == root && (!clone.IsValueType || clone.HasGenericParameters
+                if (type == root && (!clone.IsValueType || clone.GenericParameters.Count != type.GenericParameters.Count
                     || !clone.NestedTypes.Select(t => t.Name).Order().SequenceEqual(root.NestedTypes.Select(t => t.Name).Order())))
                     throw new InvalidDataException("Existing union reference case identities do not match.");
                 clone.Attributes = type.Attributes;
@@ -50,13 +50,32 @@ static class StandardUnionReference
                 if (type.DeclaringType is null) module.Types.Add(clone);
                 else types[type.DeclaringType.FullName].NestedTypes.Add(clone);
             }
+            clone.GenericParameters.Clear();
+            foreach (var parameter in type.GenericParameters)
+                clone.GenericParameters.Add(new GenericParameter(parameter.Name, clone) { Attributes = parameter.Attributes });
             clone.PackingSize = type.PackingSize;
             clone.ClassSize = type.ClassSize;
             types.Add(type.FullName, clone);
         }
-        TypeReference Map(TypeReference type)
+        TypeReference Map(TypeReference type, bool storage = false)
         {
-            if (type is ByReferenceType byref) return new ByReferenceType(Map(byref.ElementType));
+            if (type is ByReferenceType byref) return new ByReferenceType(Map(byref.ElementType, storage: true));
+            if (type is GenericParameter parameter && parameter.Owner is TypeReference parameterOwner)
+            {
+                var mappedOwner = types.GetValueOrDefault(parameterOwner.FullName)
+                    ?? (RuntimeSignatures.IsCore(parameterOwner.Scope) ? module.GetType(parameterOwner.FullName) : null);
+                if (mappedOwner is null || parameter.Position >= mappedOwner.GenericParameters.Count)
+                    throw new InvalidDataException("Foreign union generic parameter: " + parameter.FullName);
+                return mappedOwner.GenericParameters[parameter.Position];
+            }
+            if (type is GenericInstanceType generic)
+            {
+                var mapped = new GenericInstanceType(Map(generic.ElementType));
+                foreach (var argument in generic.GenericArguments) mapped.GenericArguments.Add(Map(argument, storage: true));
+                return mapped;
+            }
+            if (storage && type.MetadataType == MetadataType.Void)
+                return new TypeReference("System", "Void", module, module, true);
             if (types.TryGetValue(type.FullName, out var owned)) return owned;
             // Import primitive encodings without adding a host framework dependency.
             if (type.MetadataType is MetadataType.Void or MetadataType.Boolean or MetadataType.Byte
@@ -76,13 +95,13 @@ static class StandardUnionReference
             foreach (var implemented in type.Interfaces)
                 clone.Interfaces.Add(new InterfaceImplementation(Map(implemented.InterfaceType)));
             foreach (var field in type.Fields)
-                clone.Fields.Add(new FieldDefinition(field.Name, field.Attributes, Map(field.FieldType)) { Offset = field.Offset });
+                clone.Fields.Add(new FieldDefinition(field.Name, field.Attributes, Map(field.FieldType, storage: true)) { Offset = field.Offset });
             var methods = new Dictionary<MethodDefinition, MethodDefinition>();
             foreach (var method in type.Methods)
             {
                 var copy = new MethodDefinition(method.Name, method.Attributes, Map(method.ReturnType));
                 foreach (var parameter in method.Parameters)
-                    copy.Parameters.Add(new ParameterDefinition(parameter.Name, parameter.Attributes, Map(parameter.ParameterType)));
+                    copy.Parameters.Add(new ParameterDefinition(parameter.Name, parameter.Attributes, Map(parameter.ParameterType, storage: true)));
                 if (!method.IsAbstract)
                 {
                     copy.Body.Instructions.Add(Instruction.Create(OpCodes.Ldnull));
@@ -92,7 +111,7 @@ static class StandardUnionReference
                 methods.Add(method, copy);
             }
             foreach (var property in type.Properties)
-                clone.Properties.Add(new PropertyDefinition(property.Name, property.Attributes, Map(property.PropertyType)) {
+                clone.Properties.Add(new PropertyDefinition(property.Name, property.Attributes, Map(property.PropertyType, storage: true)) {
                     GetMethod = property.GetMethod is null ? null : methods[property.GetMethod],
                     SetMethod = property.SetMethod is null ? null : methods[property.SetMethod]
                 });
@@ -104,7 +123,7 @@ static class StandardUnionReference
                     var declaration = new MethodReference(implemented.Name, Map(implemented.ReturnType), Map(implemented.DeclaringType))
                     { HasThis = implemented.HasThis, CallingConvention = implemented.CallingConvention };
                     foreach (var parameter in implemented.Parameters)
-                        declaration.Parameters.Add(new ParameterDefinition(Map(parameter.ParameterType)));
+                        declaration.Parameters.Add(new ParameterDefinition(Map(parameter.ParameterType, storage: true)));
                     types[type.FullName].Methods[index].Overrides.Add(declaration);
                 }
         _ = StandardUnionLibrary.ProtocolType(module.GetType(StandardUnionLibrary.ProtocolName));
@@ -115,13 +134,16 @@ static class StandardUnionReference
             throw new InvalidDataException("Unsupported Raven union case attribute constructor.");
         types[root.FullName].CustomAttributes.Add(new CustomAttribute(module.GetType(
             "System.Runtime.CompilerServices.UnionAttribute").Methods.Single(m => m.IsConstructor)));
-        foreach (var attribute in root.CustomAttributes.Where(a => a.AttributeType.FullName == RavenUnionMetadata.CaseAttribute))
-        {
-            var copy = new CustomAttribute(caseConstructor);
-            foreach (var argument in attribute.ConstructorArguments)
-                copy.ConstructorArguments.Add(new CustomAttributeArgument(Map(argument.Type), argument.Value));
-            types[root.FullName].CustomAttributes.Add(copy);
-        }
+        foreach (var original in family)
+            foreach (var attribute in original.CustomAttributes.Where(a => a.AttributeType.FullName is
+                RavenUnionMetadata.CaseAttribute or RavenUnionMetadata.CompanionAttribute))
+            {
+                var constructor = module.GetType(attribute.AttributeType.FullName).Methods.Single(m => m.IsConstructor);
+                var copy = new CustomAttribute(constructor);
+                foreach (var argument in attribute.ConstructorArguments)
+                    copy.ConstructorArguments.Add(new CustomAttributeArgument(Map(argument.Type), argument.Value));
+                types[original.FullName].CustomAttributes.Add(copy);
+            }
         foreach (var method in module.GetTypes().SelectMany(t => t.Methods).Where(m => m.HasBody))
         { _ = method.Body.Instructions.Count; _ = method.Body.Variables.Count; }
         foreach (var reference in module.AssemblyReferences.Where(r => !originals.Contains(r)).ToArray())

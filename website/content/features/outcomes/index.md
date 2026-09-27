@@ -83,6 +83,8 @@ Raven.Core users will recognize these operators: neoCLR calls Where **Filter** a
 <a id="limits"></a>
 
 ## Behavior and limits
+
+Option and Result are standard Raven unions. Both implement `IUnion`; `Value` returns the boxed active case, and `HasValue` reports whether a case is active. Explicit `None` is active. A default carrier is inactive and should not be used to represent absence. Typed `TryGetValue` preserves its output when the case does not match. Prefer patterns and propagation in application code.
 Unlike exception-based APIs in .NET, recoverable outcomes are in the return type. This makes handling explicit and changes caller code. Runtime faults still exist; Result does not convert every failure into a recoverable case.
 
 [Detailed contract and comparisons →](https://github.com/marinasundstrom/neoCLR/blob/main/docs/raven-union-api.md)

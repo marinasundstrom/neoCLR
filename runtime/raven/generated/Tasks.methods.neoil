@@ -109,6 +109,10 @@ ret
 .method instance get_Outcome() -> System.Option<System.Tasks.TaskOutcome<T0>>
 .local System.Tasks.TaskOutcome<T0> local0
 .local System.Tasks.TaskOutcome<T0> local1
+ldloca local0
+initobj System.Tasks.TaskOutcome<T0>
+ldloca local1
+initobj System.Tasks.TaskOutcome<T0>
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 M0000000b_IL_0002:

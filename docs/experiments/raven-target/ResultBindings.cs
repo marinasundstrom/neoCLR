@@ -35,7 +35,7 @@ static class ResultBindings
         var name = g.ElementType.FullName.Split('`')[0].Replace('/', '.') + "<" + string.Join(',', args) + ">";
         return args.All(a => a is not null) && IsType(name) ? name : null;
     }
-    public sealed record Binding(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null);
+    public sealed record Binding(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null, bool ConditionalOutput = true);
     static (string[] Args, string Result) Signature(MethodReference reference, MethodDefinition definition)
         => RuntimeSignatures.Match(reference, definition, type => CalendarBindings.Type(type) ?? Type(type)
             ?? (type is GenericInstanceType integerOk && integerOk.ElementType.FullName == "System.Result/Ok`1"
@@ -80,7 +80,7 @@ static class ResultBindings
         throw new InvalidDataException("Unsupported Result constructor: " + reference.FullName);
     }
     static string Helper(string owner, string name) => "Result_" + new string((owner + "_" + name).Select(c => char.IsLetterOrDigit(c) ? c : '_').ToArray());
-    public static string Adapters()
+    public static string Adapters(bool standardUnions = false)
     {
         var text = new StringBuilder();
         foreach (var (owner, arg) in Carriers.Select(c => (c.Type, $"System.Result.Ok<{c.Output}>" )).Concat(Successes.Select(s => (s.Case, s.Value))))
@@ -91,6 +91,6 @@ static class ResultBindings
         foreach (var (owner, output, error) in Carriers.Select(c => (c.Type, c.Output, c.Error)))
             foreach (var variant in new[] { $"System.Result.Ok<{output}>", $"System.Result.Error<{error}>" })
                 text.AppendLine($".function {Helper(owner, variant)}({owner}& source,out(true) {variant}& destination) -> Boolean\nldarg source\nldobj {owner}\nldarg destination\ncall instance {owner}::TryGet({variant}&)\nret\n.end");
-        return text.ToString();
+        return UnionImport.AdaptUnionHelpers(text.ToString(), standardUnions);
     }
 }

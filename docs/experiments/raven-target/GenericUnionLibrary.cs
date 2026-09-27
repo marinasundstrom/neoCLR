@@ -9,7 +9,9 @@ static class GenericUnionLibrary
     public static bool IsContainer(TypeDefinition? type) => type?.FullName is "System.Option" or "System.Result" or "System.Tasks.TaskOutcome";
     public static bool IsCase(TypeDefinition? type) => type?.FullName is "System.Option/None" or "System.Option/Some`1" or "System.Result/Ok`1" or "System.Result/Error`1" or "System.Tasks.TaskOutcome/Completed`1" or "System.Tasks.TaskOutcome/Cancelled";
     public static bool IsFamily(TypeDefinition type) => IsCarrier(type) || IsCase(type);
-    public static bool IsMatched(TypeDefinition type) => IsFamily(type) && ApplicationTypes.IsLibrary(type);
+    public static bool IsMatched(TypeDefinition type) => IsFamily(type) && ApplicationTypes.IsLibrary(type)
+        && !StandardUnionLibrary.IsCandidate(type)
+        && (type.DeclaringType is null || RavenUnionMetadata.CompanionTarget(type.DeclaringType) is null);
     public static bool IsByValueReceiver(MethodReference method) => IsMatched(method.DeclaringType.Resolve()) && method.HasThis
         && method.Name is not ("TryGetOutput" or "TryGetResidual");
     public static bool IsProtocol(MethodDefinition method) => IsCarrier(method.DeclaringType)
@@ -17,6 +19,7 @@ static class GenericUnionLibrary
         : IsCase(method.DeclaringType) && method.Name is "set_Value" or "Deconstruct";
     public static bool IsRuntimeProperty(PropertyDefinition property) => !(IsCarrier(property.DeclaringType) && property.Name is "Value" or "IsOkCase" or "IsErrorCase");
     public static bool IsConditionalOutput(MethodDefinition method, ParameterDefinition parameter) => IsCarrier(method.DeclaringType)
+        && !StandardUnionLibrary.IsCandidate(method.DeclaringType)
         && method.HasThis && method.Name is "TryGet" or "TryGetOutput" or "TryGetResidual"
         && method.Parameters.Count == 1 && parameter == method.Parameters[0]
         && parameter.IsOut && !parameter.IsIn && parameter.ParameterType.IsByReference

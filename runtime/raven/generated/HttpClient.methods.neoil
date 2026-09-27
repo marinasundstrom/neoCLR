@@ -128,8 +128,10 @@ ret
 .local String local0
 .local System.Option<String> local1
 .local System.Option.Some<String> local2
-.local System.Option.Some<String> local3
-.local String local4
+ldloca local1
+initobj System.Option<String>
+ldloca local2
+initobj System.Option.Some<String>
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
@@ -139,64 +141,58 @@ ldfld System.Web.Http.HttpClient::baseUri
 M00000003_IL_0008:
 stloc local1
 M00000003_IL_0009:
-ldloca local1
-M00000003_IL_000b:
 ldloca local2
-M00000003_IL_000d:
+M00000003_IL_000b:
+initobj System.Option.Some<String>
+M00000003_IL_0011:
+ldloca local1
+M00000003_IL_0013:
+ldloca local2
+M00000003_IL_0015:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion0(System.Option<String>&,System.Option.Some<String>&)
-M00000003_IL_0012:
-brfalse M00000003_IL_003d
-M00000003_IL_0017:
-ldloc local2
-M00000003_IL_0018:
-stloc local3
-M00000003_IL_0019:
-ldloca local3
-M00000003_IL_001b:
-ldloca local4
-M00000003_IL_001d:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion3(System.Option.Some<String>&,String&)
-M00000003_IL_0022:
-ldloc local4
-M00000003_IL_0024:
-stloc local0
-M00000003_IL_0025:
-ldc.i4 1
+M00000003_IL_001a:
+brfalse M00000003_IL_0033
+M00000003_IL_001f:
+ldloca local2
+M00000003_IL_0021:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion1(System.Option.Some<String>&)
 M00000003_IL_0026:
-br M00000003_IL_002c
-M00000003_IL_002c:
-brfalse M00000003_IL_003d
-M00000003_IL_0031:
-M00000003_IL_0032:
-br M00000003_IL_0042
-M00000003_IL_003d:
-br M00000003_IL_004f
-M00000003_IL_0042:
-M00000003_IL_0043:
+stloc local0
+M00000003_IL_0027:
+M00000003_IL_0028:
+br M00000003_IL_0038
+M00000003_IL_0033:
+br M00000003_IL_0045
+M00000003_IL_0038:
+M00000003_IL_0039:
 ldloc local0
-M00000003_IL_0044:
+M00000003_IL_003a:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
-M00000003_IL_0049:
+M00000003_IL_003f:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Option.Some<String>)
-M00000003_IL_004e:
+M00000003_IL_0044:
 ret
-M00000003_IL_004f:
+M00000003_IL_0045:
+M00000003_IL_0046:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion2()
+M00000003_IL_004b:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion3(System.Option.None)
 M00000003_IL_0050:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion1()
-M00000003_IL_0055:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion2(System.Option.None)
-M00000003_IL_005a:
 ret
 .end
 .method instance set_BaseUri(System.Option<String> value) -> noresult
 .local String local0
 .local System.Option<String> local1
 .local System.Option.Some<String> local2
-.local System.Option.Some<String> local3
-.local String local4
-.local System.Option<String> local5
-.local System.Option.None local6
-ldloca local6
+.local System.Option<String> local3
+.local System.Option.None local4
+ldloca local1
+initobj System.Option<String>
+ldloca local2
+initobj System.Option.Some<String>
+ldloca local3
+initobj System.Option<String>
+ldloca local4
 initobj System.Option.None
 M00000004_IL_0000:
 M00000004_IL_0001:
@@ -205,94 +201,84 @@ ldarg 1
 M00000004_IL_0003:
 stloc local1
 M00000004_IL_0004:
-ldloca local1
-M00000004_IL_0006:
 ldloca local2
-M00000004_IL_0008:
+M00000004_IL_0006:
+initobj System.Option.Some<String>
+M00000004_IL_000c:
+ldloca local1
+M00000004_IL_000e:
+ldloca local2
+M00000004_IL_0010:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion0(System.Option<String>&,System.Option.Some<String>&)
-M00000004_IL_000d:
-brfalse M00000004_IL_0038
-M00000004_IL_0012:
-ldloc local2
-M00000004_IL_0013:
-stloc local3
-M00000004_IL_0014:
-ldloca local3
-M00000004_IL_0016:
-ldloca local4
-M00000004_IL_0018:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion3(System.Option.Some<String>&,String&)
-M00000004_IL_001d:
-ldloc local4
-M00000004_IL_001f:
-stloc local0
-M00000004_IL_0020:
-ldc.i4 1
+M00000004_IL_0015:
+brfalse M00000004_IL_002e
+M00000004_IL_001a:
+ldloca local2
+M00000004_IL_001c:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion1(System.Option.Some<String>&)
 M00000004_IL_0021:
-br M00000004_IL_0027
-M00000004_IL_0027:
-brfalse M00000004_IL_0038
-M00000004_IL_002c:
-M00000004_IL_002d:
-br M00000004_IL_003d
-M00000004_IL_0038:
-br M00000004_IL_0055
-M00000004_IL_003d:
-M00000004_IL_003e:
+stloc local0
+M00000004_IL_0022:
+M00000004_IL_0023:
+br M00000004_IL_0033
+M00000004_IL_002e:
+br M00000004_IL_004b
+M00000004_IL_0033:
+M00000004_IL_0034:
 ldarg 0
-M00000004_IL_003f:
+M00000004_IL_0035:
 ldloc local0
-M00000004_IL_0040:
+M00000004_IL_0036:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(String)
-M00000004_IL_0045:
+M00000004_IL_003b:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(System.Option.Some<String>)
-M00000004_IL_004a:
+M00000004_IL_0040:
 stfld System.Web.Http.HttpClient::baseUri
-M00000004_IL_004f:
-br M00000004_IL_009d
-M00000004_IL_0055:
-M00000004_IL_0056:
-M00000004_IL_0057:
+M00000004_IL_0045:
+br M00000004_IL_0092
+M00000004_IL_004b:
+M00000004_IL_004c:
+M00000004_IL_004d:
 ldarg 1
-M00000004_IL_0058:
-stloc local5
-M00000004_IL_005a:
-ldloca local5
-M00000004_IL_005c:
-ldloca local6
-M00000004_IL_005e:
+M00000004_IL_004e:
+stloc local3
+M00000004_IL_004f:
+ldloca local3
+M00000004_IL_0051:
+ldloca local4
+M00000004_IL_0053:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion6(System.Option<String>&,System.Option.None&)
-M00000004_IL_0063:
-brfalse M00000004_IL_0077
-M00000004_IL_0068:
-ldloc local6
-M00000004_IL_006a:
+M00000004_IL_0058:
+brfalse M00000004_IL_006c
+M00000004_IL_005d:
+ldloc local4
+M00000004_IL_005f:
 pop
-M00000004_IL_006b:
+M00000004_IL_0060:
+M00000004_IL_0061:
+br M00000004_IL_0071
 M00000004_IL_006c:
-br M00000004_IL_007c
-M00000004_IL_0077:
-br M00000004_IL_0091
-M00000004_IL_007c:
+br M00000004_IL_0086
+M00000004_IL_0071:
 ldarg 0
-M00000004_IL_007d:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion1()
-M00000004_IL_0082:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion2(System.Option.None)
-M00000004_IL_0087:
+M00000004_IL_0072:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion2()
+M00000004_IL_0077:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion3(System.Option.None)
+M00000004_IL_007c:
 stfld System.Web.Http.HttpClient::baseUri
-M00000004_IL_008c:
-br M00000004_IL_009c
-M00000004_IL_0091:
-M00000004_IL_0092:
+M00000004_IL_0081:
+br M00000004_IL_0091
+M00000004_IL_0086:
+M00000004_IL_0087:
 ldstr "BaseUri requires Some or None"
-M00000004_IL_0097:
+M00000004_IL_008c:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
-M00000004_IL_009c:
-M00000004_IL_009d:
-M00000004_IL_009e:
-M00000004_IL_009f:
+M00000004_IL_0091:
+M00000004_IL_0092:
+M00000004_IL_0093:
+M00000004_IL_0094:
 ret
 .end
 .method instance .ctor() -> noresult
@@ -312,9 +298,9 @@ M00000005_IL_0013:
 M00000005_IL_0014:
 ldarg 0
 M00000005_IL_0015:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion1()
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion2()
 M00000005_IL_001a:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion2(System.Option.None)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion3(System.Option.None)
 M00000005_IL_001f:
 stfld System.Web.Http.HttpClient::baseUri
 M00000005_IL_0024:
@@ -344,9 +330,9 @@ M00000006_IL_0013:
 M00000006_IL_0014:
 ldarg 0
 M00000006_IL_0015:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion1()
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion2()
 M00000006_IL_001a:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion2(System.Option.None)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion3(System.Option.None)
 M00000006_IL_001f:
 stfld System.Web.Http.HttpClient::baseUri
 M00000006_IL_0024:
@@ -381,16 +367,12 @@ ret
 .local System.Web.Http.HttpResponse local4
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local5
 .local System.Result.Error<System.Web.Http.HttpError> local6
-.local System.Result.Error<System.Web.Http.HttpError> local7
-.local System.Web.Http.HttpError local8
-.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local9
-.local System.Result.Ok<System.Web.Http.HttpRequest> local10
-.local System.Result.Ok<System.Web.Http.HttpRequest> local11
-.local System.Web.Http.HttpRequest local12
-.local System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError> local13
-.local System.Result.Ok<System.Web.Http.HttpResponse> local14
-.local System.Result.Ok<System.Web.Http.HttpResponse> local15
-.local System.Web.Http.HttpResponse local16
+.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local7
+.local System.Result.Ok<System.Web.Http.HttpRequest> local8
+.local System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError> local9
+.local System.Result.Ok<System.Web.Http.HttpResponse> local10
+ldloca local0
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 ldloca local1
 initobj System.Web.Http.HttpError
 ldloca local2
@@ -399,12 +381,18 @@ ldloca local3
 initobj System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 ldloca local4
 initobj System.Web.Http.HttpResponse
+ldloca local5
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
+ldloca local6
+initobj System.Result.Error<System.Web.Http.HttpError>
+ldloca local7
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 ldloca local8
-initobj System.Web.Http.HttpError
-ldloca local12
-initobj System.Web.Http.HttpRequest
-ldloca local16
-initobj System.Web.Http.HttpResponse
+initobj System.Result.Ok<System.Web.Http.HttpRequest>
+ldloca local9
+initobj System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>
+ldloca local10
+initobj System.Result.Ok<System.Web.Http.HttpResponse>
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:
@@ -438,199 +426,169 @@ ldloc local0
 M00000008_IL_002a:
 stloc local5
 M00000008_IL_002c:
-ldloca local5
-M00000008_IL_002e:
 ldloca local6
-M00000008_IL_0030:
+M00000008_IL_002e:
+initobj System.Result.Error<System.Web.Http.HttpError>
+M00000008_IL_0034:
+ldloca local5
+M00000008_IL_0036:
+ldloca local6
+M00000008_IL_0038:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion7(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Error<System.Web.Http.HttpError>&)
-M00000008_IL_0035:
-brfalse M00000008_IL_0062
-M00000008_IL_003a:
-ldloc local6
-M00000008_IL_003c:
-stloc local7
-M00000008_IL_003e:
-ldloca local7
-M00000008_IL_0040:
-ldloca local8
+M00000008_IL_003d:
+brfalse M00000008_IL_0056
 M00000008_IL_0042:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion8(System.Result.Error<System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
-M00000008_IL_0047:
-ldloc local8
+ldloca local6
+M00000008_IL_0044:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion8(System.Result.Error<System.Web.Http.HttpError>&)
 M00000008_IL_0049:
 stloc local1
 M00000008_IL_004a:
-ldc.i4 1
 M00000008_IL_004b:
-br M00000008_IL_0051
-M00000008_IL_0051:
-brfalse M00000008_IL_0062
+br M00000008_IL_005b
 M00000008_IL_0056:
-M00000008_IL_0057:
-br M00000008_IL_0067
-M00000008_IL_0062:
-br M00000008_IL_006f
-M00000008_IL_0067:
-M00000008_IL_0068:
+br M00000008_IL_0063
+M00000008_IL_005b:
+M00000008_IL_005c:
 ldloc local1
-M00000008_IL_0069:
+M00000008_IL_005d:
 call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M00000008_IL_006e:
+M00000008_IL_0062:
 ret
-M00000008_IL_006f:
-M00000008_IL_0070:
-M00000008_IL_0071:
+M00000008_IL_0063:
+M00000008_IL_0064:
+M00000008_IL_0065:
 ldloc local0
+M00000008_IL_0066:
+stloc local7
+M00000008_IL_0068:
+ldloca local8
+M00000008_IL_006a:
+initobj System.Result.Ok<System.Web.Http.HttpRequest>
+M00000008_IL_0070:
+ldloca local7
 M00000008_IL_0072:
-stloc local9
+ldloca local8
 M00000008_IL_0074:
-ldloca local9
-M00000008_IL_0076:
-ldloca local10
-M00000008_IL_0078:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion9(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Ok<System.Web.Http.HttpRequest>&)
-M00000008_IL_007d:
-brfalse M00000008_IL_00aa
-M00000008_IL_0082:
-ldloc local10
-M00000008_IL_0084:
-stloc local11
-M00000008_IL_0086:
-ldloca local11
-M00000008_IL_0088:
-ldloca local12
-M00000008_IL_008a:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion10(System.Result.Ok<System.Web.Http.HttpRequest>&,System.Web.Http.HttpRequest&)
-M00000008_IL_008f:
-ldloc local12
-M00000008_IL_0091:
+M00000008_IL_0079:
+brfalse M00000008_IL_0092
+M00000008_IL_007e:
+ldloca local8
+M00000008_IL_0080:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion10(System.Result.Ok<System.Web.Http.HttpRequest>&)
+M00000008_IL_0085:
 stloc local2
+M00000008_IL_0086:
+M00000008_IL_0087:
+br M00000008_IL_0097
 M00000008_IL_0092:
-ldc.i4 1
-M00000008_IL_0093:
-br M00000008_IL_0099
-M00000008_IL_0099:
-brfalse M00000008_IL_00aa
+br M00000008_IL_009d
+M00000008_IL_0097:
+br M00000008_IL_00a8
+M00000008_IL_009d:
 M00000008_IL_009e:
-M00000008_IL_009f:
-br M00000008_IL_00af
-M00000008_IL_00aa:
-br M00000008_IL_00b5
-M00000008_IL_00af:
-br M00000008_IL_00c0
-M00000008_IL_00b5:
-M00000008_IL_00b6:
 ldstr "Request preparation returned no outcome"
-M00000008_IL_00bb:
+M00000008_IL_00a3:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
-M00000008_IL_00c0:
-M00000008_IL_00c1:
-M00000008_IL_00c2:
+M00000008_IL_00a8:
+M00000008_IL_00a9:
+M00000008_IL_00aa:
 ldarg 0
-M00000008_IL_00c3:
+M00000008_IL_00ab:
 ldfld System.Web.Http.HttpClient::handler
-M00000008_IL_00c8:
+M00000008_IL_00b0:
 ldloc local2
-M00000008_IL_00c9:
+M00000008_IL_00b1:
 ldarg 2
-M00000008_IL_00ca:
+M00000008_IL_00b2:
 callvirt instance System.Web.Http.HttpHandler::Send(System.Web.Http.HttpRequest,System.Concurrency.CancellationToken)
-M00000008_IL_00cf:
+M00000008_IL_00b7:
 stloc local3
-M00000008_IL_00d0:
-M00000008_IL_00d1:
+M00000008_IL_00b8:
+M00000008_IL_00b9:
 ldloc local3
-M00000008_IL_00d2:
+M00000008_IL_00ba:
 call instance System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_IsCompleted()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M00000008_IL_00d7:
-brtrue M00000008_IL_00e1
-M00000008_IL_00dc:
-br M00000008_IL_0148
-M00000008_IL_00e1:
-M00000008_IL_00e2:
+M00000008_IL_00bf:
+brtrue M00000008_IL_00c9
+M00000008_IL_00c4:
+br M00000008_IL_0124
+M00000008_IL_00c9:
+M00000008_IL_00ca:
 ldloc local3
-M00000008_IL_00e3:
+M00000008_IL_00cb:
 call instance System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_IsCancelled()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M00000008_IL_00e8:
+M00000008_IL_00d0:
 ldc.i4 0
-M00000008_IL_00e9:
+M00000008_IL_00d1:
 ceq
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M00000008_IL_00eb:
-brtrue M00000008_IL_00f5
-M00000008_IL_00f0:
-br M00000008_IL_0144
-M00000008_IL_00f5:
-M00000008_IL_00f6:
+M00000008_IL_00d3:
+brtrue M00000008_IL_00dd
+M00000008_IL_00d8:
+br M00000008_IL_0120
+M00000008_IL_00dd:
+M00000008_IL_00de:
 ldloc local3
-M00000008_IL_00f7:
+M00000008_IL_00df:
 call instance System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::GetResult()
-M00000008_IL_00fc:
-stloc local13
-M00000008_IL_00fe:
-ldloca local13
-M00000008_IL_0100:
-ldloca local14
-M00000008_IL_0102:
+M00000008_IL_00e4:
+stloc local9
+M00000008_IL_00e6:
+ldloca local10
+M00000008_IL_00e8:
+initobj System.Result.Ok<System.Web.Http.HttpResponse>
+M00000008_IL_00ee:
+ldloca local9
+M00000008_IL_00f0:
+ldloca local10
+M00000008_IL_00f2:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion11(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>&,System.Result.Ok<System.Web.Http.HttpResponse>&)
-M00000008_IL_0107:
-brfalse M00000008_IL_0135
-M00000008_IL_010c:
-ldloc local14
-M00000008_IL_010e:
-stloc local15
-M00000008_IL_0110:
-ldloca local15
-M00000008_IL_0112:
-ldloca local16
-M00000008_IL_0114:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion12(System.Result.Ok<System.Web.Http.HttpResponse>&,System.Web.Http.HttpResponse&)
-M00000008_IL_0119:
-ldloc local16
-M00000008_IL_011b:
+M00000008_IL_00f7:
+brfalse M00000008_IL_0111
+M00000008_IL_00fc:
+ldloca local10
+M00000008_IL_00fe:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion12(System.Result.Ok<System.Web.Http.HttpResponse>&)
+M00000008_IL_0103:
 stloc local4
-M00000008_IL_011d:
-ldc.i4 1
-M00000008_IL_011e:
-br M00000008_IL_0124
-M00000008_IL_0124:
-brfalse M00000008_IL_0135
-M00000008_IL_0129:
-M00000008_IL_012a:
-br M00000008_IL_013a
-M00000008_IL_0135:
-br M00000008_IL_0143
-M00000008_IL_013a:
-M00000008_IL_013b:
+M00000008_IL_0105:
+M00000008_IL_0106:
+br M00000008_IL_0116
+M00000008_IL_0111:
+br M00000008_IL_011f
+M00000008_IL_0116:
+M00000008_IL_0117:
 ldloc local4
-M00000008_IL_013d:
+M00000008_IL_0119:
 ldloc local2
-M00000008_IL_013e:
+M00000008_IL_011a:
 callvirt instance System.Web.Http.HttpResponse::Associate(System.Web.Http.HttpRequest)
-M00000008_IL_0143:
-M00000008_IL_0144:
-M00000008_IL_0145:
-M00000008_IL_0146:
+M00000008_IL_011f:
+M00000008_IL_0120:
+M00000008_IL_0121:
+M00000008_IL_0122:
 ldloc local3
-M00000008_IL_0147:
+M00000008_IL_0123:
 ret
-M00000008_IL_0148:
-M00000008_IL_0149:
-M00000008_IL_014a:
+M00000008_IL_0124:
+M00000008_IL_0125:
+M00000008_IL_0126:
 ldloc local3
-M00000008_IL_014b:
+M00000008_IL_0127:
 ldloc local2
-M00000008_IL_014c:
+M00000008_IL_0128:
 newobj instance System.Web.Http.HttpResponseAssociation::.ctor(System.Web.Http.HttpRequest)
-M00000008_IL_0151:
-M00000008_IL_0157:
+M00000008_IL_012d:
+M00000008_IL_0133:
 delegate.bind System.Func<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> = instance System.Web.Http.HttpResponseAssociation::DelegateTarget_Application_V1_M_363A6D6574686F643132323A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747032333A48747470526573706F6E73654173736F63696174696F6E363A417474616368343A54727565353A46616C7365313A30313A303334323A373A67656E6572696339383A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C363A53797374656D383A526573756C7460323232383A3131313A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A48747470526573706F6E73653130393A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E48747470393A487474704572726F723334363A3334323A373A67656E6572696339383A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C363A53797374656D383A526573756C7460323232383A3131313A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A48747470526573706F6E73653130393A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E48747470393A487474704572726F72Direct(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
-M00000008_IL_015c:
+M00000008_IL_0138:
 call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,System.Func<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>)
-M00000008_IL_0161:
+M00000008_IL_013d:
 ret
 .end
 .method instance Get(String url) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
@@ -653,20 +611,22 @@ ret
 .local System.UriError local2
 .local System.Result<System.Uri,System.UriError> local3
 .local System.Result.Ok<System.Uri> local4
-.local System.Result.Ok<System.Uri> local5
-.local System.Uri local6
-.local System.Result<System.Uri,System.UriError> local7
-.local System.Result.Error<System.UriError> local8
-.local System.Result.Error<System.UriError> local9
-.local System.UriError local10
+.local System.Result<System.Uri,System.UriError> local5
+.local System.Result.Error<System.UriError> local6
+ldloca local0
+initobj System.Result<System.Uri,System.UriError>
 ldloca local1
 initobj System.Uri
 ldloca local2
 initobj System.UriError
+ldloca local3
+initobj System.Result<System.Uri,System.UriError>
+ldloca local4
+initobj System.Result.Ok<System.Uri>
+ldloca local5
+initobj System.Result<System.Uri,System.UriError>
 ldloca local6
-initobj System.Uri
-ldloca local10
-initobj System.UriError
+initobj System.Result.Error<System.UriError>
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 M0000000a_IL_0002:
@@ -696,104 +656,84 @@ ldloc local0
 M0000000a_IL_0024:
 stloc local3
 M0000000a_IL_0025:
-ldloca local3
-M0000000a_IL_0027:
 ldloca local4
-M0000000a_IL_0029:
+M0000000a_IL_0027:
+initobj System.Result.Ok<System.Uri>
+M0000000a_IL_002d:
+ldloca local3
+M0000000a_IL_002f:
+ldloca local4
+M0000000a_IL_0031:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion13(System.Result<System.Uri,System.UriError>&,System.Result.Ok<System.Uri>&)
-M0000000a_IL_002e:
-brfalse M0000000a_IL_005b
-M0000000a_IL_0033:
-ldloc local4
-M0000000a_IL_0035:
-stloc local5
-M0000000a_IL_0037:
-ldloca local5
-M0000000a_IL_0039:
-ldloca local6
+M0000000a_IL_0036:
+brfalse M0000000a_IL_004f
 M0000000a_IL_003b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&,System.Uri&)
-M0000000a_IL_0040:
-ldloc local6
+ldloca local4
+M0000000a_IL_003d:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&)
 M0000000a_IL_0042:
 stloc local1
 M0000000a_IL_0043:
-ldc.i4 1
 M0000000a_IL_0044:
-br M0000000a_IL_004a
-M0000000a_IL_004a:
-brfalse M0000000a_IL_005b
+br M0000000a_IL_0054
 M0000000a_IL_004f:
-M0000000a_IL_0050:
-br M0000000a_IL_0060
-M0000000a_IL_005b:
-br M0000000a_IL_0070
-M0000000a_IL_0060:
-M0000000a_IL_0061:
+br M0000000a_IL_0064
+M0000000a_IL_0054:
+M0000000a_IL_0055:
 ldarg 0
-M0000000a_IL_0062:
+M0000000a_IL_0056:
 ldloc local1
-M0000000a_IL_0063:
+M0000000a_IL_0057:
 ldarg 2
-M0000000a_IL_0064:
+M0000000a_IL_0058:
 callvirt instance System.Web.Http.HttpClient::Get(System.Uri,System.Concurrency.CancellationToken)
-M0000000a_IL_0069:
+M0000000a_IL_005d:
 ret
-M0000000a_IL_0070:
-M0000000a_IL_0071:
+M0000000a_IL_0064:
+M0000000a_IL_0065:
 ldloc local0
+M0000000a_IL_0066:
+stloc local5
+M0000000a_IL_0068:
+ldloca local6
+M0000000a_IL_006a:
+initobj System.Result.Error<System.UriError>
+M0000000a_IL_0070:
+ldloca local5
 M0000000a_IL_0072:
-stloc local7
+ldloca local6
 M0000000a_IL_0074:
-ldloca local7
-M0000000a_IL_0076:
-ldloca local8
-M0000000a_IL_0078:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion15(System.Result<System.Uri,System.UriError>&,System.Result.Error<System.UriError>&)
-M0000000a_IL_007d:
-brfalse M0000000a_IL_00aa
-M0000000a_IL_0082:
-ldloc local8
-M0000000a_IL_0084:
-stloc local9
-M0000000a_IL_0086:
-ldloca local9
-M0000000a_IL_0088:
-ldloca local10
-M0000000a_IL_008a:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&,System.UriError&)
-M0000000a_IL_008f:
-ldloc local10
-M0000000a_IL_0091:
+M0000000a_IL_0079:
+brfalse M0000000a_IL_0092
+M0000000a_IL_007e:
+ldloca local6
+M0000000a_IL_0080:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&)
+M0000000a_IL_0085:
 stloc local2
+M0000000a_IL_0086:
+M0000000a_IL_0087:
+br M0000000a_IL_0097
 M0000000a_IL_0092:
-ldc.i4 1
-M0000000a_IL_0093:
-br M0000000a_IL_0099
-M0000000a_IL_0099:
-brfalse M0000000a_IL_00aa
-M0000000a_IL_009e:
-M0000000a_IL_009f:
-br M0000000a_IL_00af
-M0000000a_IL_00aa:
-br M0000000a_IL_00c1
-M0000000a_IL_00af:
-M0000000a_IL_00b0:
+br M0000000a_IL_00a9
+M0000000a_IL_0097:
+M0000000a_IL_0098:
 ldloc local2
-M0000000a_IL_00b1:
+M0000000a_IL_0099:
 newobj instance System.Web.Http.HttpError.InvalidUri::.ctor(System.UriError)
-M0000000a_IL_00b6:
+M0000000a_IL_009e:
 newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidUri)
-M0000000a_IL_00bb:
+M0000000a_IL_00a3:
 call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M0000000a_IL_00c0:
+M0000000a_IL_00a8:
 ret
-M0000000a_IL_00c1:
-M0000000a_IL_00c2:
-M0000000a_IL_00c3:
-M0000000a_IL_00c4:
+M0000000a_IL_00a9:
+M0000000a_IL_00aa:
+M0000000a_IL_00ab:
+M0000000a_IL_00ac:
 ldstr "URI parser returned no outcome"
-M0000000a_IL_00c9:
+M0000000a_IL_00b1:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
 .end
@@ -817,20 +757,22 @@ ret
 .local System.Web.Http.HttpError local2
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local3
 .local System.Result.Ok<System.Web.Http.HttpRequest> local4
-.local System.Result.Ok<System.Web.Http.HttpRequest> local5
-.local System.Web.Http.HttpRequest local6
-.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local7
-.local System.Result.Error<System.Web.Http.HttpError> local8
-.local System.Result.Error<System.Web.Http.HttpError> local9
-.local System.Web.Http.HttpError local10
+.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local5
+.local System.Result.Error<System.Web.Http.HttpError> local6
+ldloca local0
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 ldloca local1
 initobj System.Web.Http.HttpRequest
 ldloca local2
 initobj System.Web.Http.HttpError
+ldloca local3
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
+ldloca local4
+initobj System.Result.Ok<System.Web.Http.HttpRequest>
+ldloca local5
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 ldloca local6
-initobj System.Web.Http.HttpRequest
-ldloca local10
-initobj System.Web.Http.HttpError
+initobj System.Result.Error<System.Web.Http.HttpError>
 M0000000c_IL_0000:
 M0000000c_IL_0001:
 M0000000c_IL_0002:
@@ -862,100 +804,80 @@ ldloc local0
 M0000000c_IL_0025:
 stloc local3
 M0000000c_IL_0026:
-ldloca local3
-M0000000c_IL_0028:
 ldloca local4
-M0000000c_IL_002a:
+M0000000c_IL_0028:
+initobj System.Result.Ok<System.Web.Http.HttpRequest>
+M0000000c_IL_002e:
+ldloca local3
+M0000000c_IL_0030:
+ldloca local4
+M0000000c_IL_0032:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion9(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Ok<System.Web.Http.HttpRequest>&)
-M0000000c_IL_002f:
-brfalse M0000000c_IL_005c
-M0000000c_IL_0034:
-ldloc local4
-M0000000c_IL_0036:
-stloc local5
-M0000000c_IL_0038:
-ldloca local5
-M0000000c_IL_003a:
-ldloca local6
+M0000000c_IL_0037:
+brfalse M0000000c_IL_0050
 M0000000c_IL_003c:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion10(System.Result.Ok<System.Web.Http.HttpRequest>&,System.Web.Http.HttpRequest&)
-M0000000c_IL_0041:
-ldloc local6
+ldloca local4
+M0000000c_IL_003e:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion10(System.Result.Ok<System.Web.Http.HttpRequest>&)
 M0000000c_IL_0043:
 stloc local1
 M0000000c_IL_0044:
-ldc.i4 1
 M0000000c_IL_0045:
-br M0000000c_IL_004b
-M0000000c_IL_004b:
-brfalse M0000000c_IL_005c
+br M0000000c_IL_0055
 M0000000c_IL_0050:
-M0000000c_IL_0051:
-br M0000000c_IL_0061
-M0000000c_IL_005c:
-br M0000000c_IL_0071
-M0000000c_IL_0061:
-M0000000c_IL_0062:
+br M0000000c_IL_0065
+M0000000c_IL_0055:
+M0000000c_IL_0056:
 ldarg 0
-M0000000c_IL_0063:
+M0000000c_IL_0057:
 ldloc local1
-M0000000c_IL_0064:
+M0000000c_IL_0058:
 ldarg 2
-M0000000c_IL_0065:
+M0000000c_IL_0059:
 callvirt instance System.Web.Http.HttpClient::Send(System.Web.Http.HttpRequest,System.Concurrency.CancellationToken)
-M0000000c_IL_006a:
+M0000000c_IL_005e:
 ret
-M0000000c_IL_0071:
-M0000000c_IL_0072:
+M0000000c_IL_0065:
+M0000000c_IL_0066:
 ldloc local0
+M0000000c_IL_0067:
+stloc local5
+M0000000c_IL_0069:
+ldloca local6
+M0000000c_IL_006b:
+initobj System.Result.Error<System.Web.Http.HttpError>
+M0000000c_IL_0071:
+ldloca local5
 M0000000c_IL_0073:
-stloc local7
+ldloca local6
 M0000000c_IL_0075:
-ldloca local7
-M0000000c_IL_0077:
-ldloca local8
-M0000000c_IL_0079:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion7(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Error<System.Web.Http.HttpError>&)
-M0000000c_IL_007e:
-brfalse M0000000c_IL_00ab
-M0000000c_IL_0083:
-ldloc local8
-M0000000c_IL_0085:
-stloc local9
-M0000000c_IL_0087:
-ldloca local9
-M0000000c_IL_0089:
-ldloca local10
-M0000000c_IL_008b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion8(System.Result.Error<System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
-M0000000c_IL_0090:
-ldloc local10
-M0000000c_IL_0092:
+M0000000c_IL_007a:
+brfalse M0000000c_IL_0093
+M0000000c_IL_007f:
+ldloca local6
+M0000000c_IL_0081:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion8(System.Result.Error<System.Web.Http.HttpError>&)
+M0000000c_IL_0086:
 stloc local2
+M0000000c_IL_0087:
+M0000000c_IL_0088:
+br M0000000c_IL_0098
 M0000000c_IL_0093:
-ldc.i4 1
-M0000000c_IL_0094:
-br M0000000c_IL_009a
-M0000000c_IL_009a:
-brfalse M0000000c_IL_00ab
-M0000000c_IL_009f:
-M0000000c_IL_00a0:
-br M0000000c_IL_00b0
-M0000000c_IL_00ab:
-br M0000000c_IL_00b8
-M0000000c_IL_00b0:
-M0000000c_IL_00b1:
+br M0000000c_IL_00a0
+M0000000c_IL_0098:
+M0000000c_IL_0099:
 ldloc local2
-M0000000c_IL_00b2:
+M0000000c_IL_009a:
 call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M0000000c_IL_00b7:
+M0000000c_IL_009f:
 ret
-M0000000c_IL_00b8:
-M0000000c_IL_00b9:
-M0000000c_IL_00ba:
-M0000000c_IL_00bb:
+M0000000c_IL_00a0:
+M0000000c_IL_00a1:
+M0000000c_IL_00a2:
+M0000000c_IL_00a3:
 ldstr "Request construction returned no outcome"
-M0000000c_IL_00c0:
+M0000000c_IL_00a8:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
 .end
@@ -981,20 +903,22 @@ ret
 .local System.UriError local2
 .local System.Result<System.Uri,System.UriError> local3
 .local System.Result.Ok<System.Uri> local4
-.local System.Result.Ok<System.Uri> local5
-.local System.Uri local6
-.local System.Result<System.Uri,System.UriError> local7
-.local System.Result.Error<System.UriError> local8
-.local System.Result.Error<System.UriError> local9
-.local System.UriError local10
+.local System.Result<System.Uri,System.UriError> local5
+.local System.Result.Error<System.UriError> local6
+ldloca local0
+initobj System.Result<System.Uri,System.UriError>
 ldloca local1
 initobj System.Uri
 ldloca local2
 initobj System.UriError
+ldloca local3
+initobj System.Result<System.Uri,System.UriError>
+ldloca local4
+initobj System.Result.Ok<System.Uri>
+ldloca local5
+initobj System.Result<System.Uri,System.UriError>
 ldloca local6
-initobj System.Uri
-ldloca local10
-initobj System.UriError
+initobj System.Result.Error<System.UriError>
 M0000000e_IL_0000:
 M0000000e_IL_0001:
 M0000000e_IL_0002:
@@ -1024,106 +948,86 @@ ldloc local0
 M0000000e_IL_0024:
 stloc local3
 M0000000e_IL_0025:
-ldloca local3
-M0000000e_IL_0027:
 ldloca local4
-M0000000e_IL_0029:
+M0000000e_IL_0027:
+initobj System.Result.Ok<System.Uri>
+M0000000e_IL_002d:
+ldloca local3
+M0000000e_IL_002f:
+ldloca local4
+M0000000e_IL_0031:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion13(System.Result<System.Uri,System.UriError>&,System.Result.Ok<System.Uri>&)
-M0000000e_IL_002e:
-brfalse M0000000e_IL_005b
-M0000000e_IL_0033:
-ldloc local4
-M0000000e_IL_0035:
-stloc local5
-M0000000e_IL_0037:
-ldloca local5
-M0000000e_IL_0039:
-ldloca local6
+M0000000e_IL_0036:
+brfalse M0000000e_IL_004f
 M0000000e_IL_003b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&,System.Uri&)
-M0000000e_IL_0040:
-ldloc local6
+ldloca local4
+M0000000e_IL_003d:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&)
 M0000000e_IL_0042:
 stloc local1
 M0000000e_IL_0043:
-ldc.i4 1
 M0000000e_IL_0044:
-br M0000000e_IL_004a
-M0000000e_IL_004a:
-brfalse M0000000e_IL_005b
+br M0000000e_IL_0054
 M0000000e_IL_004f:
-M0000000e_IL_0050:
-br M0000000e_IL_0060
-M0000000e_IL_005b:
-br M0000000e_IL_0071
-M0000000e_IL_0060:
-M0000000e_IL_0061:
+br M0000000e_IL_0065
+M0000000e_IL_0054:
+M0000000e_IL_0055:
 ldarg 0
-M0000000e_IL_0062:
+M0000000e_IL_0056:
 ldloc local1
-M0000000e_IL_0063:
+M0000000e_IL_0057:
 ldarg 2
-M0000000e_IL_0064:
+M0000000e_IL_0058:
 ldarg 3
-M0000000e_IL_0065:
+M0000000e_IL_0059:
 callvirt instance System.Web.Http.HttpClient::Post(System.Uri,System.Web.Http.HttpContent,System.Concurrency.CancellationToken)
-M0000000e_IL_006a:
+M0000000e_IL_005e:
 ret
-M0000000e_IL_0071:
-M0000000e_IL_0072:
+M0000000e_IL_0065:
+M0000000e_IL_0066:
 ldloc local0
+M0000000e_IL_0067:
+stloc local5
+M0000000e_IL_0069:
+ldloca local6
+M0000000e_IL_006b:
+initobj System.Result.Error<System.UriError>
+M0000000e_IL_0071:
+ldloca local5
 M0000000e_IL_0073:
-stloc local7
+ldloca local6
 M0000000e_IL_0075:
-ldloca local7
-M0000000e_IL_0077:
-ldloca local8
-M0000000e_IL_0079:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion15(System.Result<System.Uri,System.UriError>&,System.Result.Error<System.UriError>&)
-M0000000e_IL_007e:
-brfalse M0000000e_IL_00ab
-M0000000e_IL_0083:
-ldloc local8
-M0000000e_IL_0085:
-stloc local9
-M0000000e_IL_0087:
-ldloca local9
-M0000000e_IL_0089:
-ldloca local10
-M0000000e_IL_008b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&,System.UriError&)
-M0000000e_IL_0090:
-ldloc local10
-M0000000e_IL_0092:
+M0000000e_IL_007a:
+brfalse M0000000e_IL_0093
+M0000000e_IL_007f:
+ldloca local6
+M0000000e_IL_0081:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&)
+M0000000e_IL_0086:
 stloc local2
+M0000000e_IL_0087:
+M0000000e_IL_0088:
+br M0000000e_IL_0098
 M0000000e_IL_0093:
-ldc.i4 1
-M0000000e_IL_0094:
-br M0000000e_IL_009a
-M0000000e_IL_009a:
-brfalse M0000000e_IL_00ab
-M0000000e_IL_009f:
-M0000000e_IL_00a0:
-br M0000000e_IL_00b0
-M0000000e_IL_00ab:
-br M0000000e_IL_00c2
-M0000000e_IL_00b0:
-M0000000e_IL_00b1:
+br M0000000e_IL_00aa
+M0000000e_IL_0098:
+M0000000e_IL_0099:
 ldloc local2
-M0000000e_IL_00b2:
+M0000000e_IL_009a:
 newobj instance System.Web.Http.HttpError.InvalidUri::.ctor(System.UriError)
-M0000000e_IL_00b7:
+M0000000e_IL_009f:
 newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidUri)
-M0000000e_IL_00bc:
+M0000000e_IL_00a4:
 call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M0000000e_IL_00c1:
+M0000000e_IL_00a9:
 ret
-M0000000e_IL_00c2:
-M0000000e_IL_00c3:
-M0000000e_IL_00c4:
-M0000000e_IL_00c5:
+M0000000e_IL_00aa:
+M0000000e_IL_00ab:
+M0000000e_IL_00ac:
+M0000000e_IL_00ad:
 ldstr "URI parser returned no outcome"
-M0000000e_IL_00ca:
+M0000000e_IL_00b2:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
 .end
@@ -1149,20 +1053,22 @@ ret
 .local System.Web.Http.HttpError local2
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local3
 .local System.Result.Ok<System.Web.Http.HttpRequest> local4
-.local System.Result.Ok<System.Web.Http.HttpRequest> local5
-.local System.Web.Http.HttpRequest local6
-.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local7
-.local System.Result.Error<System.Web.Http.HttpError> local8
-.local System.Result.Error<System.Web.Http.HttpError> local9
-.local System.Web.Http.HttpError local10
+.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local5
+.local System.Result.Error<System.Web.Http.HttpError> local6
+ldloca local0
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 ldloca local1
 initobj System.Web.Http.HttpRequest
 ldloca local2
 initobj System.Web.Http.HttpError
+ldloca local3
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
+ldloca local4
+initobj System.Result.Ok<System.Web.Http.HttpRequest>
+ldloca local5
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 ldloca local6
-initobj System.Web.Http.HttpRequest
-ldloca local10
-initobj System.Web.Http.HttpError
+initobj System.Result.Error<System.Web.Http.HttpError>
 M00000010_IL_0000:
 M00000010_IL_0001:
 M00000010_IL_0002:
@@ -1196,100 +1102,80 @@ ldloc local0
 M00000010_IL_0026:
 stloc local3
 M00000010_IL_0027:
-ldloca local3
-M00000010_IL_0029:
 ldloca local4
-M00000010_IL_002b:
+M00000010_IL_0029:
+initobj System.Result.Ok<System.Web.Http.HttpRequest>
+M00000010_IL_002f:
+ldloca local3
+M00000010_IL_0031:
+ldloca local4
+M00000010_IL_0033:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion9(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Ok<System.Web.Http.HttpRequest>&)
-M00000010_IL_0030:
-brfalse M00000010_IL_005d
-M00000010_IL_0035:
-ldloc local4
-M00000010_IL_0037:
-stloc local5
-M00000010_IL_0039:
-ldloca local5
-M00000010_IL_003b:
-ldloca local6
+M00000010_IL_0038:
+brfalse M00000010_IL_0051
 M00000010_IL_003d:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion10(System.Result.Ok<System.Web.Http.HttpRequest>&,System.Web.Http.HttpRequest&)
-M00000010_IL_0042:
-ldloc local6
+ldloca local4
+M00000010_IL_003f:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion10(System.Result.Ok<System.Web.Http.HttpRequest>&)
 M00000010_IL_0044:
 stloc local1
 M00000010_IL_0045:
-ldc.i4 1
 M00000010_IL_0046:
-br M00000010_IL_004c
-M00000010_IL_004c:
-brfalse M00000010_IL_005d
+br M00000010_IL_0056
 M00000010_IL_0051:
-M00000010_IL_0052:
-br M00000010_IL_0062
-M00000010_IL_005d:
-br M00000010_IL_0072
-M00000010_IL_0062:
-M00000010_IL_0063:
+br M00000010_IL_0066
+M00000010_IL_0056:
+M00000010_IL_0057:
 ldarg 0
-M00000010_IL_0064:
+M00000010_IL_0058:
 ldloc local1
-M00000010_IL_0065:
+M00000010_IL_0059:
 ldarg 3
-M00000010_IL_0066:
+M00000010_IL_005a:
 callvirt instance System.Web.Http.HttpClient::Send(System.Web.Http.HttpRequest,System.Concurrency.CancellationToken)
-M00000010_IL_006b:
+M00000010_IL_005f:
 ret
-M00000010_IL_0072:
-M00000010_IL_0073:
+M00000010_IL_0066:
+M00000010_IL_0067:
 ldloc local0
+M00000010_IL_0068:
+stloc local5
+M00000010_IL_006a:
+ldloca local6
+M00000010_IL_006c:
+initobj System.Result.Error<System.Web.Http.HttpError>
+M00000010_IL_0072:
+ldloca local5
 M00000010_IL_0074:
-stloc local7
+ldloca local6
 M00000010_IL_0076:
-ldloca local7
-M00000010_IL_0078:
-ldloca local8
-M00000010_IL_007a:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion7(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Error<System.Web.Http.HttpError>&)
-M00000010_IL_007f:
-brfalse M00000010_IL_00ac
-M00000010_IL_0084:
-ldloc local8
-M00000010_IL_0086:
-stloc local9
-M00000010_IL_0088:
-ldloca local9
-M00000010_IL_008a:
-ldloca local10
-M00000010_IL_008c:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion8(System.Result.Error<System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
-M00000010_IL_0091:
-ldloc local10
-M00000010_IL_0093:
+M00000010_IL_007b:
+brfalse M00000010_IL_0094
+M00000010_IL_0080:
+ldloca local6
+M00000010_IL_0082:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion8(System.Result.Error<System.Web.Http.HttpError>&)
+M00000010_IL_0087:
 stloc local2
+M00000010_IL_0088:
+M00000010_IL_0089:
+br M00000010_IL_0099
 M00000010_IL_0094:
-ldc.i4 1
-M00000010_IL_0095:
-br M00000010_IL_009b
-M00000010_IL_009b:
-brfalse M00000010_IL_00ac
-M00000010_IL_00a0:
-M00000010_IL_00a1:
-br M00000010_IL_00b1
-M00000010_IL_00ac:
-br M00000010_IL_00b9
-M00000010_IL_00b1:
-M00000010_IL_00b2:
+br M00000010_IL_00a1
+M00000010_IL_0099:
+M00000010_IL_009a:
 ldloc local2
-M00000010_IL_00b3:
+M00000010_IL_009b:
 call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M00000010_IL_00b8:
+M00000010_IL_00a0:
 ret
-M00000010_IL_00b9:
-M00000010_IL_00ba:
-M00000010_IL_00bb:
-M00000010_IL_00bc:
+M00000010_IL_00a1:
+M00000010_IL_00a2:
+M00000010_IL_00a3:
+M00000010_IL_00a4:
 ldstr "Request construction returned no outcome"
-M00000010_IL_00c1:
+M00000010_IL_00a9:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
 .end
@@ -1302,12 +1188,16 @@ fault "System.Fault returned unexpectedly"
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local5
 ldloca local0
 initobj System.Uri
+ldloca local1
+initobj System.Result<System.Uri,System.Web.Http.HttpError>
 ldloca local2
 initobj System.Uri
 ldloca local3
 initobj System.Web.Http.HttpError
 ldloca local4
 initobj System.Web.Http.HttpContent
+ldloca local5
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 M00000011_IL_0000:
 M00000011_IL_0001:
 M00000011_IL_0002:
@@ -1324,6 +1214,7 @@ M00000011_IL_000c:
 ldloca local2
 M00000011_IL_000e:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion17(System.Result<System.Uri,System.Web.Http.HttpError>&,System.Uri&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000011_IL_0013:
 brfalse M00000011_IL_001d
 M00000011_IL_0018:
@@ -1338,6 +1229,7 @@ M00000011_IL_0027:
 ldloca local3
 M00000011_IL_0029:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion18(System.Result<System.Uri,System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000011_IL_002e:
 brfalse M00000011_IL_003a
 M00000011_IL_0033:
@@ -1395,20 +1287,22 @@ ret
 .local System.UriError local2
 .local System.Result<System.Uri,System.UriError> local3
 .local System.Result.Ok<System.Uri> local4
-.local System.Result.Ok<System.Uri> local5
-.local System.Uri local6
-.local System.Result<System.Uri,System.UriError> local7
-.local System.Result.Error<System.UriError> local8
-.local System.Result.Error<System.UriError> local9
-.local System.UriError local10
+.local System.Result<System.Uri,System.UriError> local5
+.local System.Result.Error<System.UriError> local6
+ldloca local0
+initobj System.Result<System.Uri,System.UriError>
 ldloca local1
 initobj System.Uri
 ldloca local2
 initobj System.UriError
+ldloca local3
+initobj System.Result<System.Uri,System.UriError>
+ldloca local4
+initobj System.Result.Ok<System.Uri>
+ldloca local5
+initobj System.Result<System.Uri,System.UriError>
 ldloca local6
-initobj System.Uri
-ldloca local10
-initobj System.UriError
+initobj System.Result.Error<System.UriError>
 M00000013_IL_0000:
 M00000013_IL_0001:
 M00000013_IL_0002:
@@ -1438,106 +1332,86 @@ ldloc local0
 M00000013_IL_0024:
 stloc local3
 M00000013_IL_0025:
-ldloca local3
-M00000013_IL_0027:
 ldloca local4
-M00000013_IL_0029:
+M00000013_IL_0027:
+initobj System.Result.Ok<System.Uri>
+M00000013_IL_002d:
+ldloca local3
+M00000013_IL_002f:
+ldloca local4
+M00000013_IL_0031:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion13(System.Result<System.Uri,System.UriError>&,System.Result.Ok<System.Uri>&)
-M00000013_IL_002e:
-brfalse M00000013_IL_005b
-M00000013_IL_0033:
-ldloc local4
-M00000013_IL_0035:
-stloc local5
-M00000013_IL_0037:
-ldloca local5
-M00000013_IL_0039:
-ldloca local6
+M00000013_IL_0036:
+brfalse M00000013_IL_004f
 M00000013_IL_003b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&,System.Uri&)
-M00000013_IL_0040:
-ldloc local6
+ldloca local4
+M00000013_IL_003d:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&)
 M00000013_IL_0042:
 stloc local1
 M00000013_IL_0043:
-ldc.i4 1
 M00000013_IL_0044:
-br M00000013_IL_004a
-M00000013_IL_004a:
-brfalse M00000013_IL_005b
+br M00000013_IL_0054
 M00000013_IL_004f:
-M00000013_IL_0050:
-br M00000013_IL_0060
-M00000013_IL_005b:
-br M00000013_IL_0071
-M00000013_IL_0060:
-M00000013_IL_0061:
+br M00000013_IL_0065
+M00000013_IL_0054:
+M00000013_IL_0055:
 ldarg 0
-M00000013_IL_0062:
+M00000013_IL_0056:
 ldloc local1
-M00000013_IL_0063:
+M00000013_IL_0057:
 ldarg 2
-M00000013_IL_0064:
+M00000013_IL_0058:
 ldarg 3
-M00000013_IL_0065:
+M00000013_IL_0059:
 callvirt instance System.Web.Http.HttpClient::Put(System.Uri,System.Web.Http.HttpContent,System.Concurrency.CancellationToken)
-M00000013_IL_006a:
+M00000013_IL_005e:
 ret
-M00000013_IL_0071:
-M00000013_IL_0072:
+M00000013_IL_0065:
+M00000013_IL_0066:
 ldloc local0
+M00000013_IL_0067:
+stloc local5
+M00000013_IL_0069:
+ldloca local6
+M00000013_IL_006b:
+initobj System.Result.Error<System.UriError>
+M00000013_IL_0071:
+ldloca local5
 M00000013_IL_0073:
-stloc local7
+ldloca local6
 M00000013_IL_0075:
-ldloca local7
-M00000013_IL_0077:
-ldloca local8
-M00000013_IL_0079:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion15(System.Result<System.Uri,System.UriError>&,System.Result.Error<System.UriError>&)
-M00000013_IL_007e:
-brfalse M00000013_IL_00ab
-M00000013_IL_0083:
-ldloc local8
-M00000013_IL_0085:
-stloc local9
-M00000013_IL_0087:
-ldloca local9
-M00000013_IL_0089:
-ldloca local10
-M00000013_IL_008b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&,System.UriError&)
-M00000013_IL_0090:
-ldloc local10
-M00000013_IL_0092:
+M00000013_IL_007a:
+brfalse M00000013_IL_0093
+M00000013_IL_007f:
+ldloca local6
+M00000013_IL_0081:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&)
+M00000013_IL_0086:
 stloc local2
+M00000013_IL_0087:
+M00000013_IL_0088:
+br M00000013_IL_0098
 M00000013_IL_0093:
-ldc.i4 1
-M00000013_IL_0094:
-br M00000013_IL_009a
-M00000013_IL_009a:
-brfalse M00000013_IL_00ab
-M00000013_IL_009f:
-M00000013_IL_00a0:
-br M00000013_IL_00b0
-M00000013_IL_00ab:
-br M00000013_IL_00c2
-M00000013_IL_00b0:
-M00000013_IL_00b1:
+br M00000013_IL_00aa
+M00000013_IL_0098:
+M00000013_IL_0099:
 ldloc local2
-M00000013_IL_00b2:
+M00000013_IL_009a:
 newobj instance System.Web.Http.HttpError.InvalidUri::.ctor(System.UriError)
-M00000013_IL_00b7:
+M00000013_IL_009f:
 newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidUri)
-M00000013_IL_00bc:
+M00000013_IL_00a4:
 call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M00000013_IL_00c1:
+M00000013_IL_00a9:
 ret
-M00000013_IL_00c2:
-M00000013_IL_00c3:
-M00000013_IL_00c4:
-M00000013_IL_00c5:
+M00000013_IL_00aa:
+M00000013_IL_00ab:
+M00000013_IL_00ac:
+M00000013_IL_00ad:
 ldstr "URI parser returned no outcome"
-M00000013_IL_00ca:
+M00000013_IL_00b2:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
 .end
@@ -1563,20 +1437,22 @@ ret
 .local System.Web.Http.HttpError local2
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local3
 .local System.Result.Ok<System.Web.Http.HttpRequest> local4
-.local System.Result.Ok<System.Web.Http.HttpRequest> local5
-.local System.Web.Http.HttpRequest local6
-.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local7
-.local System.Result.Error<System.Web.Http.HttpError> local8
-.local System.Result.Error<System.Web.Http.HttpError> local9
-.local System.Web.Http.HttpError local10
+.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local5
+.local System.Result.Error<System.Web.Http.HttpError> local6
+ldloca local0
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 ldloca local1
 initobj System.Web.Http.HttpRequest
 ldloca local2
 initobj System.Web.Http.HttpError
+ldloca local3
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
+ldloca local4
+initobj System.Result.Ok<System.Web.Http.HttpRequest>
+ldloca local5
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 ldloca local6
-initobj System.Web.Http.HttpRequest
-ldloca local10
-initobj System.Web.Http.HttpError
+initobj System.Result.Error<System.Web.Http.HttpError>
 M00000015_IL_0000:
 M00000015_IL_0001:
 M00000015_IL_0002:
@@ -1610,100 +1486,80 @@ ldloc local0
 M00000015_IL_0026:
 stloc local3
 M00000015_IL_0027:
-ldloca local3
-M00000015_IL_0029:
 ldloca local4
-M00000015_IL_002b:
+M00000015_IL_0029:
+initobj System.Result.Ok<System.Web.Http.HttpRequest>
+M00000015_IL_002f:
+ldloca local3
+M00000015_IL_0031:
+ldloca local4
+M00000015_IL_0033:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion9(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Ok<System.Web.Http.HttpRequest>&)
-M00000015_IL_0030:
-brfalse M00000015_IL_005d
-M00000015_IL_0035:
-ldloc local4
-M00000015_IL_0037:
-stloc local5
-M00000015_IL_0039:
-ldloca local5
-M00000015_IL_003b:
-ldloca local6
+M00000015_IL_0038:
+brfalse M00000015_IL_0051
 M00000015_IL_003d:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion10(System.Result.Ok<System.Web.Http.HttpRequest>&,System.Web.Http.HttpRequest&)
-M00000015_IL_0042:
-ldloc local6
+ldloca local4
+M00000015_IL_003f:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion10(System.Result.Ok<System.Web.Http.HttpRequest>&)
 M00000015_IL_0044:
 stloc local1
 M00000015_IL_0045:
-ldc.i4 1
 M00000015_IL_0046:
-br M00000015_IL_004c
-M00000015_IL_004c:
-brfalse M00000015_IL_005d
+br M00000015_IL_0056
 M00000015_IL_0051:
-M00000015_IL_0052:
-br M00000015_IL_0062
-M00000015_IL_005d:
-br M00000015_IL_0072
-M00000015_IL_0062:
-M00000015_IL_0063:
+br M00000015_IL_0066
+M00000015_IL_0056:
+M00000015_IL_0057:
 ldarg 0
-M00000015_IL_0064:
+M00000015_IL_0058:
 ldloc local1
-M00000015_IL_0065:
+M00000015_IL_0059:
 ldarg 3
-M00000015_IL_0066:
+M00000015_IL_005a:
 callvirt instance System.Web.Http.HttpClient::Send(System.Web.Http.HttpRequest,System.Concurrency.CancellationToken)
-M00000015_IL_006b:
+M00000015_IL_005f:
 ret
-M00000015_IL_0072:
-M00000015_IL_0073:
+M00000015_IL_0066:
+M00000015_IL_0067:
 ldloc local0
+M00000015_IL_0068:
+stloc local5
+M00000015_IL_006a:
+ldloca local6
+M00000015_IL_006c:
+initobj System.Result.Error<System.Web.Http.HttpError>
+M00000015_IL_0072:
+ldloca local5
 M00000015_IL_0074:
-stloc local7
+ldloca local6
 M00000015_IL_0076:
-ldloca local7
-M00000015_IL_0078:
-ldloca local8
-M00000015_IL_007a:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion7(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Error<System.Web.Http.HttpError>&)
-M00000015_IL_007f:
-brfalse M00000015_IL_00ac
-M00000015_IL_0084:
-ldloc local8
-M00000015_IL_0086:
-stloc local9
-M00000015_IL_0088:
-ldloca local9
-M00000015_IL_008a:
-ldloca local10
-M00000015_IL_008c:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion8(System.Result.Error<System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
-M00000015_IL_0091:
-ldloc local10
-M00000015_IL_0093:
+M00000015_IL_007b:
+brfalse M00000015_IL_0094
+M00000015_IL_0080:
+ldloca local6
+M00000015_IL_0082:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion8(System.Result.Error<System.Web.Http.HttpError>&)
+M00000015_IL_0087:
 stloc local2
+M00000015_IL_0088:
+M00000015_IL_0089:
+br M00000015_IL_0099
 M00000015_IL_0094:
-ldc.i4 1
-M00000015_IL_0095:
-br M00000015_IL_009b
-M00000015_IL_009b:
-brfalse M00000015_IL_00ac
-M00000015_IL_00a0:
-M00000015_IL_00a1:
-br M00000015_IL_00b1
-M00000015_IL_00ac:
-br M00000015_IL_00b9
-M00000015_IL_00b1:
-M00000015_IL_00b2:
+br M00000015_IL_00a1
+M00000015_IL_0099:
+M00000015_IL_009a:
 ldloc local2
-M00000015_IL_00b3:
+M00000015_IL_009b:
 call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M00000015_IL_00b8:
+M00000015_IL_00a0:
 ret
-M00000015_IL_00b9:
-M00000015_IL_00ba:
-M00000015_IL_00bb:
-M00000015_IL_00bc:
+M00000015_IL_00a1:
+M00000015_IL_00a2:
+M00000015_IL_00a3:
+M00000015_IL_00a4:
 ldstr "Request construction returned no outcome"
-M00000015_IL_00c1:
+M00000015_IL_00a9:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
 .end
@@ -1716,12 +1572,16 @@ fault "System.Fault returned unexpectedly"
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local5
 ldloca local0
 initobj System.Uri
+ldloca local1
+initobj System.Result<System.Uri,System.Web.Http.HttpError>
 ldloca local2
 initobj System.Uri
 ldloca local3
 initobj System.Web.Http.HttpError
 ldloca local4
 initobj System.Web.Http.HttpContent
+ldloca local5
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 M00000016_IL_0000:
 M00000016_IL_0001:
 M00000016_IL_0002:
@@ -1738,6 +1598,7 @@ M00000016_IL_000c:
 ldloca local2
 M00000016_IL_000e:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion17(System.Result<System.Uri,System.Web.Http.HttpError>&,System.Uri&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000016_IL_0013:
 brfalse M00000016_IL_001d
 M00000016_IL_0018:
@@ -1752,6 +1613,7 @@ M00000016_IL_0027:
 ldloca local3
 M00000016_IL_0029:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion18(System.Result<System.Uri,System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000016_IL_002e:
 brfalse M00000016_IL_003a
 M00000016_IL_0033:
@@ -1809,20 +1671,22 @@ ret
 .local System.UriError local2
 .local System.Result<System.Uri,System.UriError> local3
 .local System.Result.Ok<System.Uri> local4
-.local System.Result.Ok<System.Uri> local5
-.local System.Uri local6
-.local System.Result<System.Uri,System.UriError> local7
-.local System.Result.Error<System.UriError> local8
-.local System.Result.Error<System.UriError> local9
-.local System.UriError local10
+.local System.Result<System.Uri,System.UriError> local5
+.local System.Result.Error<System.UriError> local6
+ldloca local0
+initobj System.Result<System.Uri,System.UriError>
 ldloca local1
 initobj System.Uri
 ldloca local2
 initobj System.UriError
+ldloca local3
+initobj System.Result<System.Uri,System.UriError>
+ldloca local4
+initobj System.Result.Ok<System.Uri>
+ldloca local5
+initobj System.Result<System.Uri,System.UriError>
 ldloca local6
-initobj System.Uri
-ldloca local10
-initobj System.UriError
+initobj System.Result.Error<System.UriError>
 M00000018_IL_0000:
 M00000018_IL_0001:
 M00000018_IL_0002:
@@ -1852,106 +1716,86 @@ ldloc local0
 M00000018_IL_0024:
 stloc local3
 M00000018_IL_0025:
-ldloca local3
-M00000018_IL_0027:
 ldloca local4
-M00000018_IL_0029:
+M00000018_IL_0027:
+initobj System.Result.Ok<System.Uri>
+M00000018_IL_002d:
+ldloca local3
+M00000018_IL_002f:
+ldloca local4
+M00000018_IL_0031:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion13(System.Result<System.Uri,System.UriError>&,System.Result.Ok<System.Uri>&)
-M00000018_IL_002e:
-brfalse M00000018_IL_005b
-M00000018_IL_0033:
-ldloc local4
-M00000018_IL_0035:
-stloc local5
-M00000018_IL_0037:
-ldloca local5
-M00000018_IL_0039:
-ldloca local6
+M00000018_IL_0036:
+brfalse M00000018_IL_004f
 M00000018_IL_003b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&,System.Uri&)
-M00000018_IL_0040:
-ldloc local6
+ldloca local4
+M00000018_IL_003d:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&)
 M00000018_IL_0042:
 stloc local1
 M00000018_IL_0043:
-ldc.i4 1
 M00000018_IL_0044:
-br M00000018_IL_004a
-M00000018_IL_004a:
-brfalse M00000018_IL_005b
+br M00000018_IL_0054
 M00000018_IL_004f:
-M00000018_IL_0050:
-br M00000018_IL_0060
-M00000018_IL_005b:
-br M00000018_IL_0071
-M00000018_IL_0060:
-M00000018_IL_0061:
+br M00000018_IL_0065
+M00000018_IL_0054:
+M00000018_IL_0055:
 ldarg 0
-M00000018_IL_0062:
+M00000018_IL_0056:
 ldloc local1
-M00000018_IL_0063:
+M00000018_IL_0057:
 ldarg 2
-M00000018_IL_0064:
+M00000018_IL_0058:
 ldarg 3
-M00000018_IL_0065:
+M00000018_IL_0059:
 callvirt instance System.Web.Http.HttpClient::Patch(System.Uri,System.Web.Http.HttpContent,System.Concurrency.CancellationToken)
-M00000018_IL_006a:
+M00000018_IL_005e:
 ret
-M00000018_IL_0071:
-M00000018_IL_0072:
+M00000018_IL_0065:
+M00000018_IL_0066:
 ldloc local0
+M00000018_IL_0067:
+stloc local5
+M00000018_IL_0069:
+ldloca local6
+M00000018_IL_006b:
+initobj System.Result.Error<System.UriError>
+M00000018_IL_0071:
+ldloca local5
 M00000018_IL_0073:
-stloc local7
+ldloca local6
 M00000018_IL_0075:
-ldloca local7
-M00000018_IL_0077:
-ldloca local8
-M00000018_IL_0079:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion15(System.Result<System.Uri,System.UriError>&,System.Result.Error<System.UriError>&)
-M00000018_IL_007e:
-brfalse M00000018_IL_00ab
-M00000018_IL_0083:
-ldloc local8
-M00000018_IL_0085:
-stloc local9
-M00000018_IL_0087:
-ldloca local9
-M00000018_IL_0089:
-ldloca local10
-M00000018_IL_008b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&,System.UriError&)
-M00000018_IL_0090:
-ldloc local10
-M00000018_IL_0092:
+M00000018_IL_007a:
+brfalse M00000018_IL_0093
+M00000018_IL_007f:
+ldloca local6
+M00000018_IL_0081:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&)
+M00000018_IL_0086:
 stloc local2
+M00000018_IL_0087:
+M00000018_IL_0088:
+br M00000018_IL_0098
 M00000018_IL_0093:
-ldc.i4 1
-M00000018_IL_0094:
-br M00000018_IL_009a
-M00000018_IL_009a:
-brfalse M00000018_IL_00ab
-M00000018_IL_009f:
-M00000018_IL_00a0:
-br M00000018_IL_00b0
-M00000018_IL_00ab:
-br M00000018_IL_00c2
-M00000018_IL_00b0:
-M00000018_IL_00b1:
+br M00000018_IL_00aa
+M00000018_IL_0098:
+M00000018_IL_0099:
 ldloc local2
-M00000018_IL_00b2:
+M00000018_IL_009a:
 newobj instance System.Web.Http.HttpError.InvalidUri::.ctor(System.UriError)
-M00000018_IL_00b7:
+M00000018_IL_009f:
 newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidUri)
-M00000018_IL_00bc:
+M00000018_IL_00a4:
 call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M00000018_IL_00c1:
+M00000018_IL_00a9:
 ret
-M00000018_IL_00c2:
-M00000018_IL_00c3:
-M00000018_IL_00c4:
-M00000018_IL_00c5:
+M00000018_IL_00aa:
+M00000018_IL_00ab:
+M00000018_IL_00ac:
+M00000018_IL_00ad:
 ldstr "URI parser returned no outcome"
-M00000018_IL_00ca:
+M00000018_IL_00b2:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
 .end
@@ -1977,20 +1821,22 @@ ret
 .local System.Web.Http.HttpError local2
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local3
 .local System.Result.Ok<System.Web.Http.HttpRequest> local4
-.local System.Result.Ok<System.Web.Http.HttpRequest> local5
-.local System.Web.Http.HttpRequest local6
-.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local7
-.local System.Result.Error<System.Web.Http.HttpError> local8
-.local System.Result.Error<System.Web.Http.HttpError> local9
-.local System.Web.Http.HttpError local10
+.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local5
+.local System.Result.Error<System.Web.Http.HttpError> local6
+ldloca local0
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 ldloca local1
 initobj System.Web.Http.HttpRequest
 ldloca local2
 initobj System.Web.Http.HttpError
+ldloca local3
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
+ldloca local4
+initobj System.Result.Ok<System.Web.Http.HttpRequest>
+ldloca local5
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 ldloca local6
-initobj System.Web.Http.HttpRequest
-ldloca local10
-initobj System.Web.Http.HttpError
+initobj System.Result.Error<System.Web.Http.HttpError>
 M0000001a_IL_0000:
 M0000001a_IL_0001:
 M0000001a_IL_0002:
@@ -2024,100 +1870,80 @@ ldloc local0
 M0000001a_IL_0026:
 stloc local3
 M0000001a_IL_0027:
-ldloca local3
-M0000001a_IL_0029:
 ldloca local4
-M0000001a_IL_002b:
+M0000001a_IL_0029:
+initobj System.Result.Ok<System.Web.Http.HttpRequest>
+M0000001a_IL_002f:
+ldloca local3
+M0000001a_IL_0031:
+ldloca local4
+M0000001a_IL_0033:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion9(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Ok<System.Web.Http.HttpRequest>&)
-M0000001a_IL_0030:
-brfalse M0000001a_IL_005d
-M0000001a_IL_0035:
-ldloc local4
-M0000001a_IL_0037:
-stloc local5
-M0000001a_IL_0039:
-ldloca local5
-M0000001a_IL_003b:
-ldloca local6
+M0000001a_IL_0038:
+brfalse M0000001a_IL_0051
 M0000001a_IL_003d:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion10(System.Result.Ok<System.Web.Http.HttpRequest>&,System.Web.Http.HttpRequest&)
-M0000001a_IL_0042:
-ldloc local6
+ldloca local4
+M0000001a_IL_003f:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion10(System.Result.Ok<System.Web.Http.HttpRequest>&)
 M0000001a_IL_0044:
 stloc local1
 M0000001a_IL_0045:
-ldc.i4 1
 M0000001a_IL_0046:
-br M0000001a_IL_004c
-M0000001a_IL_004c:
-brfalse M0000001a_IL_005d
+br M0000001a_IL_0056
 M0000001a_IL_0051:
-M0000001a_IL_0052:
-br M0000001a_IL_0062
-M0000001a_IL_005d:
-br M0000001a_IL_0072
-M0000001a_IL_0062:
-M0000001a_IL_0063:
+br M0000001a_IL_0066
+M0000001a_IL_0056:
+M0000001a_IL_0057:
 ldarg 0
-M0000001a_IL_0064:
+M0000001a_IL_0058:
 ldloc local1
-M0000001a_IL_0065:
+M0000001a_IL_0059:
 ldarg 3
-M0000001a_IL_0066:
+M0000001a_IL_005a:
 callvirt instance System.Web.Http.HttpClient::Send(System.Web.Http.HttpRequest,System.Concurrency.CancellationToken)
-M0000001a_IL_006b:
+M0000001a_IL_005f:
 ret
-M0000001a_IL_0072:
-M0000001a_IL_0073:
+M0000001a_IL_0066:
+M0000001a_IL_0067:
 ldloc local0
+M0000001a_IL_0068:
+stloc local5
+M0000001a_IL_006a:
+ldloca local6
+M0000001a_IL_006c:
+initobj System.Result.Error<System.Web.Http.HttpError>
+M0000001a_IL_0072:
+ldloca local5
 M0000001a_IL_0074:
-stloc local7
+ldloca local6
 M0000001a_IL_0076:
-ldloca local7
-M0000001a_IL_0078:
-ldloca local8
-M0000001a_IL_007a:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion7(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Error<System.Web.Http.HttpError>&)
-M0000001a_IL_007f:
-brfalse M0000001a_IL_00ac
-M0000001a_IL_0084:
-ldloc local8
-M0000001a_IL_0086:
-stloc local9
-M0000001a_IL_0088:
-ldloca local9
-M0000001a_IL_008a:
-ldloca local10
-M0000001a_IL_008c:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion8(System.Result.Error<System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
-M0000001a_IL_0091:
-ldloc local10
-M0000001a_IL_0093:
+M0000001a_IL_007b:
+brfalse M0000001a_IL_0094
+M0000001a_IL_0080:
+ldloca local6
+M0000001a_IL_0082:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion8(System.Result.Error<System.Web.Http.HttpError>&)
+M0000001a_IL_0087:
 stloc local2
+M0000001a_IL_0088:
+M0000001a_IL_0089:
+br M0000001a_IL_0099
 M0000001a_IL_0094:
-ldc.i4 1
-M0000001a_IL_0095:
-br M0000001a_IL_009b
-M0000001a_IL_009b:
-brfalse M0000001a_IL_00ac
-M0000001a_IL_00a0:
-M0000001a_IL_00a1:
-br M0000001a_IL_00b1
-M0000001a_IL_00ac:
-br M0000001a_IL_00b9
-M0000001a_IL_00b1:
-M0000001a_IL_00b2:
+br M0000001a_IL_00a1
+M0000001a_IL_0099:
+M0000001a_IL_009a:
 ldloc local2
-M0000001a_IL_00b3:
+M0000001a_IL_009b:
 call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M0000001a_IL_00b8:
+M0000001a_IL_00a0:
 ret
-M0000001a_IL_00b9:
-M0000001a_IL_00ba:
-M0000001a_IL_00bb:
-M0000001a_IL_00bc:
+M0000001a_IL_00a1:
+M0000001a_IL_00a2:
+M0000001a_IL_00a3:
+M0000001a_IL_00a4:
 ldstr "Request construction returned no outcome"
-M0000001a_IL_00c1:
+M0000001a_IL_00a9:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
 .end
@@ -2130,12 +1956,16 @@ fault "System.Fault returned unexpectedly"
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local5
 ldloca local0
 initobj System.Uri
+ldloca local1
+initobj System.Result<System.Uri,System.Web.Http.HttpError>
 ldloca local2
 initobj System.Uri
 ldloca local3
 initobj System.Web.Http.HttpError
 ldloca local4
 initobj System.Web.Http.HttpContent
+ldloca local5
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 M0000001b_IL_0000:
 M0000001b_IL_0001:
 M0000001b_IL_0002:
@@ -2152,6 +1982,7 @@ M0000001b_IL_000c:
 ldloca local2
 M0000001b_IL_000e:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion17(System.Result<System.Uri,System.Web.Http.HttpError>&,System.Uri&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M0000001b_IL_0013:
 brfalse M0000001b_IL_001d
 M0000001b_IL_0018:
@@ -2166,6 +1997,7 @@ M0000001b_IL_0027:
 ldloca local3
 M0000001b_IL_0029:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion18(System.Result<System.Uri,System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M0000001b_IL_002e:
 brfalse M0000001b_IL_003a
 M0000001b_IL_0033:
@@ -2221,20 +2053,22 @@ ret
 .local System.UriError local2
 .local System.Result<System.Uri,System.UriError> local3
 .local System.Result.Ok<System.Uri> local4
-.local System.Result.Ok<System.Uri> local5
-.local System.Uri local6
-.local System.Result<System.Uri,System.UriError> local7
-.local System.Result.Error<System.UriError> local8
-.local System.Result.Error<System.UriError> local9
-.local System.UriError local10
+.local System.Result<System.Uri,System.UriError> local5
+.local System.Result.Error<System.UriError> local6
+ldloca local0
+initobj System.Result<System.Uri,System.UriError>
 ldloca local1
 initobj System.Uri
 ldloca local2
 initobj System.UriError
+ldloca local3
+initobj System.Result<System.Uri,System.UriError>
+ldloca local4
+initobj System.Result.Ok<System.Uri>
+ldloca local5
+initobj System.Result<System.Uri,System.UriError>
 ldloca local6
-initobj System.Uri
-ldloca local10
-initobj System.UriError
+initobj System.Result.Error<System.UriError>
 M0000001d_IL_0000:
 M0000001d_IL_0001:
 M0000001d_IL_0002:
@@ -2264,104 +2098,84 @@ ldloc local0
 M0000001d_IL_0024:
 stloc local3
 M0000001d_IL_0025:
-ldloca local3
-M0000001d_IL_0027:
 ldloca local4
-M0000001d_IL_0029:
+M0000001d_IL_0027:
+initobj System.Result.Ok<System.Uri>
+M0000001d_IL_002d:
+ldloca local3
+M0000001d_IL_002f:
+ldloca local4
+M0000001d_IL_0031:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion13(System.Result<System.Uri,System.UriError>&,System.Result.Ok<System.Uri>&)
-M0000001d_IL_002e:
-brfalse M0000001d_IL_005b
-M0000001d_IL_0033:
-ldloc local4
-M0000001d_IL_0035:
-stloc local5
-M0000001d_IL_0037:
-ldloca local5
-M0000001d_IL_0039:
-ldloca local6
+M0000001d_IL_0036:
+brfalse M0000001d_IL_004f
 M0000001d_IL_003b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&,System.Uri&)
-M0000001d_IL_0040:
-ldloc local6
+ldloca local4
+M0000001d_IL_003d:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&)
 M0000001d_IL_0042:
 stloc local1
 M0000001d_IL_0043:
-ldc.i4 1
 M0000001d_IL_0044:
-br M0000001d_IL_004a
-M0000001d_IL_004a:
-brfalse M0000001d_IL_005b
+br M0000001d_IL_0054
 M0000001d_IL_004f:
-M0000001d_IL_0050:
-br M0000001d_IL_0060
-M0000001d_IL_005b:
-br M0000001d_IL_0070
-M0000001d_IL_0060:
-M0000001d_IL_0061:
+br M0000001d_IL_0064
+M0000001d_IL_0054:
+M0000001d_IL_0055:
 ldarg 0
-M0000001d_IL_0062:
+M0000001d_IL_0056:
 ldloc local1
-M0000001d_IL_0063:
+M0000001d_IL_0057:
 ldarg 2
-M0000001d_IL_0064:
+M0000001d_IL_0058:
 callvirt instance System.Web.Http.HttpClient::Delete(System.Uri,System.Concurrency.CancellationToken)
-M0000001d_IL_0069:
+M0000001d_IL_005d:
 ret
-M0000001d_IL_0070:
-M0000001d_IL_0071:
+M0000001d_IL_0064:
+M0000001d_IL_0065:
 ldloc local0
+M0000001d_IL_0066:
+stloc local5
+M0000001d_IL_0068:
+ldloca local6
+M0000001d_IL_006a:
+initobj System.Result.Error<System.UriError>
+M0000001d_IL_0070:
+ldloca local5
 M0000001d_IL_0072:
-stloc local7
+ldloca local6
 M0000001d_IL_0074:
-ldloca local7
-M0000001d_IL_0076:
-ldloca local8
-M0000001d_IL_0078:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion15(System.Result<System.Uri,System.UriError>&,System.Result.Error<System.UriError>&)
-M0000001d_IL_007d:
-brfalse M0000001d_IL_00aa
-M0000001d_IL_0082:
-ldloc local8
-M0000001d_IL_0084:
-stloc local9
-M0000001d_IL_0086:
-ldloca local9
-M0000001d_IL_0088:
-ldloca local10
-M0000001d_IL_008a:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&,System.UriError&)
-M0000001d_IL_008f:
-ldloc local10
-M0000001d_IL_0091:
+M0000001d_IL_0079:
+brfalse M0000001d_IL_0092
+M0000001d_IL_007e:
+ldloca local6
+M0000001d_IL_0080:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&)
+M0000001d_IL_0085:
 stloc local2
+M0000001d_IL_0086:
+M0000001d_IL_0087:
+br M0000001d_IL_0097
 M0000001d_IL_0092:
-ldc.i4 1
-M0000001d_IL_0093:
-br M0000001d_IL_0099
-M0000001d_IL_0099:
-brfalse M0000001d_IL_00aa
-M0000001d_IL_009e:
-M0000001d_IL_009f:
-br M0000001d_IL_00af
-M0000001d_IL_00aa:
-br M0000001d_IL_00c1
-M0000001d_IL_00af:
-M0000001d_IL_00b0:
+br M0000001d_IL_00a9
+M0000001d_IL_0097:
+M0000001d_IL_0098:
 ldloc local2
-M0000001d_IL_00b1:
+M0000001d_IL_0099:
 newobj instance System.Web.Http.HttpError.InvalidUri::.ctor(System.UriError)
-M0000001d_IL_00b6:
+M0000001d_IL_009e:
 newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidUri)
-M0000001d_IL_00bb:
+M0000001d_IL_00a3:
 call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M0000001d_IL_00c0:
+M0000001d_IL_00a8:
 ret
-M0000001d_IL_00c1:
-M0000001d_IL_00c2:
-M0000001d_IL_00c3:
-M0000001d_IL_00c4:
+M0000001d_IL_00a9:
+M0000001d_IL_00aa:
+M0000001d_IL_00ab:
+M0000001d_IL_00ac:
 ldstr "URI parser returned no outcome"
-M0000001d_IL_00c9:
+M0000001d_IL_00b1:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
 .end
@@ -2385,20 +2199,22 @@ ret
 .local System.Web.Http.HttpError local2
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local3
 .local System.Result.Ok<System.Web.Http.HttpRequest> local4
-.local System.Result.Ok<System.Web.Http.HttpRequest> local5
-.local System.Web.Http.HttpRequest local6
-.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local7
-.local System.Result.Error<System.Web.Http.HttpError> local8
-.local System.Result.Error<System.Web.Http.HttpError> local9
-.local System.Web.Http.HttpError local10
+.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local5
+.local System.Result.Error<System.Web.Http.HttpError> local6
+ldloca local0
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 ldloca local1
 initobj System.Web.Http.HttpRequest
 ldloca local2
 initobj System.Web.Http.HttpError
+ldloca local3
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
+ldloca local4
+initobj System.Result.Ok<System.Web.Http.HttpRequest>
+ldloca local5
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 ldloca local6
-initobj System.Web.Http.HttpRequest
-ldloca local10
-initobj System.Web.Http.HttpError
+initobj System.Result.Error<System.Web.Http.HttpError>
 M0000001f_IL_0000:
 M0000001f_IL_0001:
 M0000001f_IL_0002:
@@ -2430,100 +2246,80 @@ ldloc local0
 M0000001f_IL_0025:
 stloc local3
 M0000001f_IL_0026:
-ldloca local3
-M0000001f_IL_0028:
 ldloca local4
-M0000001f_IL_002a:
+M0000001f_IL_0028:
+initobj System.Result.Ok<System.Web.Http.HttpRequest>
+M0000001f_IL_002e:
+ldloca local3
+M0000001f_IL_0030:
+ldloca local4
+M0000001f_IL_0032:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion9(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Ok<System.Web.Http.HttpRequest>&)
-M0000001f_IL_002f:
-brfalse M0000001f_IL_005c
-M0000001f_IL_0034:
-ldloc local4
-M0000001f_IL_0036:
-stloc local5
-M0000001f_IL_0038:
-ldloca local5
-M0000001f_IL_003a:
-ldloca local6
+M0000001f_IL_0037:
+brfalse M0000001f_IL_0050
 M0000001f_IL_003c:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion10(System.Result.Ok<System.Web.Http.HttpRequest>&,System.Web.Http.HttpRequest&)
-M0000001f_IL_0041:
-ldloc local6
+ldloca local4
+M0000001f_IL_003e:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion10(System.Result.Ok<System.Web.Http.HttpRequest>&)
 M0000001f_IL_0043:
 stloc local1
 M0000001f_IL_0044:
-ldc.i4 1
 M0000001f_IL_0045:
-br M0000001f_IL_004b
-M0000001f_IL_004b:
-brfalse M0000001f_IL_005c
+br M0000001f_IL_0055
 M0000001f_IL_0050:
-M0000001f_IL_0051:
-br M0000001f_IL_0061
-M0000001f_IL_005c:
-br M0000001f_IL_0071
-M0000001f_IL_0061:
-M0000001f_IL_0062:
+br M0000001f_IL_0065
+M0000001f_IL_0055:
+M0000001f_IL_0056:
 ldarg 0
-M0000001f_IL_0063:
+M0000001f_IL_0057:
 ldloc local1
-M0000001f_IL_0064:
+M0000001f_IL_0058:
 ldarg 2
-M0000001f_IL_0065:
+M0000001f_IL_0059:
 callvirt instance System.Web.Http.HttpClient::Send(System.Web.Http.HttpRequest,System.Concurrency.CancellationToken)
-M0000001f_IL_006a:
+M0000001f_IL_005e:
 ret
-M0000001f_IL_0071:
-M0000001f_IL_0072:
+M0000001f_IL_0065:
+M0000001f_IL_0066:
 ldloc local0
+M0000001f_IL_0067:
+stloc local5
+M0000001f_IL_0069:
+ldloca local6
+M0000001f_IL_006b:
+initobj System.Result.Error<System.Web.Http.HttpError>
+M0000001f_IL_0071:
+ldloca local5
 M0000001f_IL_0073:
-stloc local7
+ldloca local6
 M0000001f_IL_0075:
-ldloca local7
-M0000001f_IL_0077:
-ldloca local8
-M0000001f_IL_0079:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion7(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Error<System.Web.Http.HttpError>&)
-M0000001f_IL_007e:
-brfalse M0000001f_IL_00ab
-M0000001f_IL_0083:
-ldloc local8
-M0000001f_IL_0085:
-stloc local9
-M0000001f_IL_0087:
-ldloca local9
-M0000001f_IL_0089:
-ldloca local10
-M0000001f_IL_008b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion8(System.Result.Error<System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
-M0000001f_IL_0090:
-ldloc local10
-M0000001f_IL_0092:
+M0000001f_IL_007a:
+brfalse M0000001f_IL_0093
+M0000001f_IL_007f:
+ldloca local6
+M0000001f_IL_0081:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion8(System.Result.Error<System.Web.Http.HttpError>&)
+M0000001f_IL_0086:
 stloc local2
+M0000001f_IL_0087:
+M0000001f_IL_0088:
+br M0000001f_IL_0098
 M0000001f_IL_0093:
-ldc.i4 1
-M0000001f_IL_0094:
-br M0000001f_IL_009a
-M0000001f_IL_009a:
-brfalse M0000001f_IL_00ab
-M0000001f_IL_009f:
-M0000001f_IL_00a0:
-br M0000001f_IL_00b0
-M0000001f_IL_00ab:
-br M0000001f_IL_00b8
-M0000001f_IL_00b0:
-M0000001f_IL_00b1:
+br M0000001f_IL_00a0
+M0000001f_IL_0098:
+M0000001f_IL_0099:
 ldloc local2
-M0000001f_IL_00b2:
+M0000001f_IL_009a:
 call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M0000001f_IL_00b7:
+M0000001f_IL_009f:
 ret
-M0000001f_IL_00b8:
-M0000001f_IL_00b9:
-M0000001f_IL_00ba:
-M0000001f_IL_00bb:
+M0000001f_IL_00a0:
+M0000001f_IL_00a1:
+M0000001f_IL_00a2:
+M0000001f_IL_00a3:
 ldstr "Request construction returned no outcome"
-M0000001f_IL_00c0:
+M0000001f_IL_00a8:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
 .end
@@ -2535,10 +2331,14 @@ fault "System.Fault returned unexpectedly"
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local4
 ldloca local0
 initobj System.Uri
+ldloca local1
+initobj System.Result<System.Uri,System.Web.Http.HttpError>
 ldloca local2
 initobj System.Uri
 ldloca local3
 initobj System.Web.Http.HttpError
+ldloca local4
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 M00000020_IL_0000:
 M00000020_IL_0001:
 M00000020_IL_0002:
@@ -2555,6 +2355,7 @@ M00000020_IL_000c:
 ldloca local2
 M00000020_IL_000e:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion17(System.Result<System.Uri,System.Web.Http.HttpError>&,System.Uri&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000020_IL_0013:
 brfalse M00000020_IL_001d
 M00000020_IL_0018:
@@ -2569,6 +2370,7 @@ M00000020_IL_0027:
 ldloca local3
 M00000020_IL_0029:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion18(System.Result<System.Uri,System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000020_IL_002e:
 brfalse M00000020_IL_003a
 M00000020_IL_0033:
@@ -2618,20 +2420,22 @@ ret
 .local System.UriError local2
 .local System.Result<System.Uri,System.UriError> local3
 .local System.Result.Ok<System.Uri> local4
-.local System.Result.Ok<System.Uri> local5
-.local System.Uri local6
-.local System.Result<System.Uri,System.UriError> local7
-.local System.Result.Error<System.UriError> local8
-.local System.Result.Error<System.UriError> local9
-.local System.UriError local10
+.local System.Result<System.Uri,System.UriError> local5
+.local System.Result.Error<System.UriError> local6
+ldloca local0
+initobj System.Result<System.Uri,System.UriError>
 ldloca local1
 initobj System.Uri
 ldloca local2
 initobj System.UriError
+ldloca local3
+initobj System.Result<System.Uri,System.UriError>
+ldloca local4
+initobj System.Result.Ok<System.Uri>
+ldloca local5
+initobj System.Result<System.Uri,System.UriError>
 ldloca local6
-initobj System.Uri
-ldloca local10
-initobj System.UriError
+initobj System.Result.Error<System.UriError>
 M00000022_IL_0000:
 M00000022_IL_0001:
 M00000022_IL_0002:
@@ -2661,104 +2465,84 @@ ldloc local0
 M00000022_IL_0024:
 stloc local3
 M00000022_IL_0025:
-ldloca local3
-M00000022_IL_0027:
 ldloca local4
-M00000022_IL_0029:
+M00000022_IL_0027:
+initobj System.Result.Ok<System.Uri>
+M00000022_IL_002d:
+ldloca local3
+M00000022_IL_002f:
+ldloca local4
+M00000022_IL_0031:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion13(System.Result<System.Uri,System.UriError>&,System.Result.Ok<System.Uri>&)
-M00000022_IL_002e:
-brfalse M00000022_IL_005b
-M00000022_IL_0033:
-ldloc local4
-M00000022_IL_0035:
-stloc local5
-M00000022_IL_0037:
-ldloca local5
-M00000022_IL_0039:
-ldloca local6
+M00000022_IL_0036:
+brfalse M00000022_IL_004f
 M00000022_IL_003b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&,System.Uri&)
-M00000022_IL_0040:
-ldloc local6
+ldloca local4
+M00000022_IL_003d:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&)
 M00000022_IL_0042:
 stloc local1
 M00000022_IL_0043:
-ldc.i4 1
 M00000022_IL_0044:
-br M00000022_IL_004a
-M00000022_IL_004a:
-brfalse M00000022_IL_005b
+br M00000022_IL_0054
 M00000022_IL_004f:
-M00000022_IL_0050:
-br M00000022_IL_0060
-M00000022_IL_005b:
-br M00000022_IL_0070
-M00000022_IL_0060:
-M00000022_IL_0061:
+br M00000022_IL_0064
+M00000022_IL_0054:
+M00000022_IL_0055:
 ldarg 0
-M00000022_IL_0062:
+M00000022_IL_0056:
 ldloc local1
-M00000022_IL_0063:
+M00000022_IL_0057:
 ldarg 2
-M00000022_IL_0064:
+M00000022_IL_0058:
 callvirt instance System.Web.Http.HttpClient::Head(System.Uri,System.Concurrency.CancellationToken)
-M00000022_IL_0069:
+M00000022_IL_005d:
 ret
-M00000022_IL_0070:
-M00000022_IL_0071:
+M00000022_IL_0064:
+M00000022_IL_0065:
 ldloc local0
+M00000022_IL_0066:
+stloc local5
+M00000022_IL_0068:
+ldloca local6
+M00000022_IL_006a:
+initobj System.Result.Error<System.UriError>
+M00000022_IL_0070:
+ldloca local5
 M00000022_IL_0072:
-stloc local7
+ldloca local6
 M00000022_IL_0074:
-ldloca local7
-M00000022_IL_0076:
-ldloca local8
-M00000022_IL_0078:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion15(System.Result<System.Uri,System.UriError>&,System.Result.Error<System.UriError>&)
-M00000022_IL_007d:
-brfalse M00000022_IL_00aa
-M00000022_IL_0082:
-ldloc local8
-M00000022_IL_0084:
-stloc local9
-M00000022_IL_0086:
-ldloca local9
-M00000022_IL_0088:
-ldloca local10
-M00000022_IL_008a:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&,System.UriError&)
-M00000022_IL_008f:
-ldloc local10
-M00000022_IL_0091:
+M00000022_IL_0079:
+brfalse M00000022_IL_0092
+M00000022_IL_007e:
+ldloca local6
+M00000022_IL_0080:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&)
+M00000022_IL_0085:
 stloc local2
+M00000022_IL_0086:
+M00000022_IL_0087:
+br M00000022_IL_0097
 M00000022_IL_0092:
-ldc.i4 1
-M00000022_IL_0093:
-br M00000022_IL_0099
-M00000022_IL_0099:
-brfalse M00000022_IL_00aa
-M00000022_IL_009e:
-M00000022_IL_009f:
-br M00000022_IL_00af
-M00000022_IL_00aa:
-br M00000022_IL_00c1
-M00000022_IL_00af:
-M00000022_IL_00b0:
+br M00000022_IL_00a9
+M00000022_IL_0097:
+M00000022_IL_0098:
 ldloc local2
-M00000022_IL_00b1:
+M00000022_IL_0099:
 newobj instance System.Web.Http.HttpError.InvalidUri::.ctor(System.UriError)
-M00000022_IL_00b6:
+M00000022_IL_009e:
 newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidUri)
-M00000022_IL_00bb:
+M00000022_IL_00a3:
 call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M00000022_IL_00c0:
+M00000022_IL_00a8:
 ret
-M00000022_IL_00c1:
-M00000022_IL_00c2:
-M00000022_IL_00c3:
-M00000022_IL_00c4:
+M00000022_IL_00a9:
+M00000022_IL_00aa:
+M00000022_IL_00ab:
+M00000022_IL_00ac:
 ldstr "URI parser returned no outcome"
-M00000022_IL_00c9:
+M00000022_IL_00b1:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
 .end
@@ -2782,20 +2566,22 @@ ret
 .local System.Web.Http.HttpError local2
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local3
 .local System.Result.Ok<System.Web.Http.HttpRequest> local4
-.local System.Result.Ok<System.Web.Http.HttpRequest> local5
-.local System.Web.Http.HttpRequest local6
-.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local7
-.local System.Result.Error<System.Web.Http.HttpError> local8
-.local System.Result.Error<System.Web.Http.HttpError> local9
-.local System.Web.Http.HttpError local10
+.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local5
+.local System.Result.Error<System.Web.Http.HttpError> local6
+ldloca local0
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 ldloca local1
 initobj System.Web.Http.HttpRequest
 ldloca local2
 initobj System.Web.Http.HttpError
+ldloca local3
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
+ldloca local4
+initobj System.Result.Ok<System.Web.Http.HttpRequest>
+ldloca local5
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 ldloca local6
-initobj System.Web.Http.HttpRequest
-ldloca local10
-initobj System.Web.Http.HttpError
+initobj System.Result.Error<System.Web.Http.HttpError>
 M00000024_IL_0000:
 M00000024_IL_0001:
 M00000024_IL_0002:
@@ -2827,100 +2613,80 @@ ldloc local0
 M00000024_IL_0025:
 stloc local3
 M00000024_IL_0026:
-ldloca local3
-M00000024_IL_0028:
 ldloca local4
-M00000024_IL_002a:
+M00000024_IL_0028:
+initobj System.Result.Ok<System.Web.Http.HttpRequest>
+M00000024_IL_002e:
+ldloca local3
+M00000024_IL_0030:
+ldloca local4
+M00000024_IL_0032:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion9(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Ok<System.Web.Http.HttpRequest>&)
-M00000024_IL_002f:
-brfalse M00000024_IL_005c
-M00000024_IL_0034:
-ldloc local4
-M00000024_IL_0036:
-stloc local5
-M00000024_IL_0038:
-ldloca local5
-M00000024_IL_003a:
-ldloca local6
+M00000024_IL_0037:
+brfalse M00000024_IL_0050
 M00000024_IL_003c:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion10(System.Result.Ok<System.Web.Http.HttpRequest>&,System.Web.Http.HttpRequest&)
-M00000024_IL_0041:
-ldloc local6
+ldloca local4
+M00000024_IL_003e:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion10(System.Result.Ok<System.Web.Http.HttpRequest>&)
 M00000024_IL_0043:
 stloc local1
 M00000024_IL_0044:
-ldc.i4 1
 M00000024_IL_0045:
-br M00000024_IL_004b
-M00000024_IL_004b:
-brfalse M00000024_IL_005c
+br M00000024_IL_0055
 M00000024_IL_0050:
-M00000024_IL_0051:
-br M00000024_IL_0061
-M00000024_IL_005c:
-br M00000024_IL_0071
-M00000024_IL_0061:
-M00000024_IL_0062:
+br M00000024_IL_0065
+M00000024_IL_0055:
+M00000024_IL_0056:
 ldarg 0
-M00000024_IL_0063:
+M00000024_IL_0057:
 ldloc local1
-M00000024_IL_0064:
+M00000024_IL_0058:
 ldarg 2
-M00000024_IL_0065:
+M00000024_IL_0059:
 callvirt instance System.Web.Http.HttpClient::Send(System.Web.Http.HttpRequest,System.Concurrency.CancellationToken)
-M00000024_IL_006a:
+M00000024_IL_005e:
 ret
-M00000024_IL_0071:
-M00000024_IL_0072:
+M00000024_IL_0065:
+M00000024_IL_0066:
 ldloc local0
+M00000024_IL_0067:
+stloc local5
+M00000024_IL_0069:
+ldloca local6
+M00000024_IL_006b:
+initobj System.Result.Error<System.Web.Http.HttpError>
+M00000024_IL_0071:
+ldloca local5
 M00000024_IL_0073:
-stloc local7
+ldloca local6
 M00000024_IL_0075:
-ldloca local7
-M00000024_IL_0077:
-ldloca local8
-M00000024_IL_0079:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion7(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Result.Error<System.Web.Http.HttpError>&)
-M00000024_IL_007e:
-brfalse M00000024_IL_00ab
-M00000024_IL_0083:
-ldloc local8
-M00000024_IL_0085:
-stloc local9
-M00000024_IL_0087:
-ldloca local9
-M00000024_IL_0089:
-ldloca local10
-M00000024_IL_008b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion8(System.Result.Error<System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
-M00000024_IL_0090:
-ldloc local10
-M00000024_IL_0092:
+M00000024_IL_007a:
+brfalse M00000024_IL_0093
+M00000024_IL_007f:
+ldloca local6
+M00000024_IL_0081:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion8(System.Result.Error<System.Web.Http.HttpError>&)
+M00000024_IL_0086:
 stloc local2
+M00000024_IL_0087:
+M00000024_IL_0088:
+br M00000024_IL_0098
 M00000024_IL_0093:
-ldc.i4 1
-M00000024_IL_0094:
-br M00000024_IL_009a
-M00000024_IL_009a:
-brfalse M00000024_IL_00ab
-M00000024_IL_009f:
-M00000024_IL_00a0:
-br M00000024_IL_00b0
-M00000024_IL_00ab:
-br M00000024_IL_00b8
-M00000024_IL_00b0:
-M00000024_IL_00b1:
+br M00000024_IL_00a0
+M00000024_IL_0098:
+M00000024_IL_0099:
 ldloc local2
-M00000024_IL_00b2:
+M00000024_IL_009a:
 call System.Web.Http.HttpClient::Failure(System.Web.Http.HttpError)
-M00000024_IL_00b7:
+M00000024_IL_009f:
 ret
-M00000024_IL_00b8:
-M00000024_IL_00b9:
-M00000024_IL_00ba:
-M00000024_IL_00bb:
+M00000024_IL_00a0:
+M00000024_IL_00a1:
+M00000024_IL_00a2:
+M00000024_IL_00a3:
 ldstr "Request construction returned no outcome"
-M00000024_IL_00c0:
+M00000024_IL_00a8:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
 .end
@@ -2932,10 +2698,14 @@ fault "System.Fault returned unexpectedly"
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local4
 ldloca local0
 initobj System.Uri
+ldloca local1
+initobj System.Result<System.Uri,System.Web.Http.HttpError>
 ldloca local2
 initobj System.Uri
 ldloca local3
 initobj System.Web.Http.HttpError
+ldloca local4
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 M00000025_IL_0000:
 M00000025_IL_0001:
 M00000025_IL_0002:
@@ -2952,6 +2722,7 @@ M00000025_IL_000c:
 ldloca local2
 M00000025_IL_000e:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion17(System.Result<System.Uri,System.Web.Http.HttpError>&,System.Uri&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000025_IL_0013:
 brfalse M00000025_IL_001d
 M00000025_IL_0018:
@@ -2966,6 +2737,7 @@ M00000025_IL_0027:
 ldloca local3
 M00000025_IL_0029:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion18(System.Result<System.Uri,System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000025_IL_002e:
 brfalse M00000025_IL_003a
 M00000025_IL_0033:
@@ -3137,14 +2909,18 @@ ret
 .local String local4
 .local System.Result<String,System.Text.InvalidUtf8Error> local5
 .local System.Result.Ok<String> local6
-.local System.Result.Ok<String> local7
-.local String local8
+ldloca local0
+initobj System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>
 ldloca local1
 initobj System.Web.Http.HttpResponse
 ldloca local2
 initobj System.Web.Http.HttpError
 ldloca local3
 initobj System.Web.Http.HttpResponse
+ldloca local5
+initobj System.Result<String,System.Text.InvalidUtf8Error>
+ldloca local6
+initobj System.Result.Ok<String>
 M0000002a_IL_0000:
 M0000002a_IL_0001:
 M0000002a_IL_0002:
@@ -3157,6 +2933,7 @@ M0000002a_IL_0006:
 ldloca local1
 M0000002a_IL_0008:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion20(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>&,System.Web.Http.HttpResponse&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M0000002a_IL_000d:
 brfalse M0000002a_IL_0017
 M0000002a_IL_0012:
@@ -3171,6 +2948,7 @@ M0000002a_IL_0021:
 ldloca local2
 M0000002a_IL_0023:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion21(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M0000002a_IL_0028:
 brfalse M0000002a_IL_0034
 M0000002a_IL_002d:
@@ -3263,60 +3041,50 @@ call System.Text.Utf8::Decode(System.Collections.Sequence<Byte>)
 M0000002a_IL_00b2:
 stloc local5
 M0000002a_IL_00b4:
-ldloca local5
-M0000002a_IL_00b6:
 ldloca local6
-M0000002a_IL_00b8:
+M0000002a_IL_00b6:
+initobj System.Result.Ok<String>
+M0000002a_IL_00bc:
+ldloca local5
+M0000002a_IL_00be:
+ldloca local6
+M0000002a_IL_00c0:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion25(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Ok<String>&)
-M0000002a_IL_00bd:
-brfalse M0000002a_IL_00eb
-M0000002a_IL_00c2:
-ldloc local6
-M0000002a_IL_00c4:
-stloc local7
-M0000002a_IL_00c6:
-ldloca local7
-M0000002a_IL_00c8:
-ldloca local8
+M0000002a_IL_00c5:
+brfalse M0000002a_IL_00df
 M0000002a_IL_00ca:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion26(System.Result.Ok<String>&,String&)
-M0000002a_IL_00cf:
-ldloc local8
+ldloca local6
+M0000002a_IL_00cc:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion26(System.Result.Ok<String>&)
 M0000002a_IL_00d1:
 stloc local4
 M0000002a_IL_00d3:
-ldc.i4 1
 M0000002a_IL_00d4:
-br M0000002a_IL_00da
-M0000002a_IL_00da:
-brfalse M0000002a_IL_00eb
+br M0000002a_IL_00e4
 M0000002a_IL_00df:
-M0000002a_IL_00e0:
-br M0000002a_IL_00f0
-M0000002a_IL_00eb:
-br M0000002a_IL_00fe
-M0000002a_IL_00f0:
-M0000002a_IL_00f1:
+br M0000002a_IL_00f2
+M0000002a_IL_00e4:
+M0000002a_IL_00e5:
 ldloc local4
-M0000002a_IL_00f3:
+M0000002a_IL_00e7:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion27(String)
-M0000002a_IL_00f8:
+M0000002a_IL_00ec:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion28(System.Result.Ok<String>)
-M0000002a_IL_00fd:
+M0000002a_IL_00f1:
 ret
-M0000002a_IL_00fe:
-M0000002a_IL_00ff:
-M0000002a_IL_0100:
+M0000002a_IL_00f2:
+M0000002a_IL_00f3:
+M0000002a_IL_00f4:
 ldstr "Invalid UTF-8 body"
-M0000002a_IL_0105:
+M0000002a_IL_00f9:
 newobj instance System.Web.Http.HttpError.Protocol::.ctor(String)
-M0000002a_IL_010a:
+M0000002a_IL_00fe:
 newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.Protocol)
-M0000002a_IL_010f:
+M0000002a_IL_0103:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion23(System.Web.Http.HttpError)
-M0000002a_IL_0114:
+M0000002a_IL_0108:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion24(System.Result.Error<System.Web.Http.HttpError>)
-M0000002a_IL_0119:
+M0000002a_IL_010d:
 ret
 .end
 .method private static Cancelled() -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
@@ -3352,10 +3120,14 @@ ret
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local4
 ldloca local0
 initobj System.Uri
+ldloca local1
+initobj System.Result<System.Uri,System.Web.Http.HttpError>
 ldloca local2
 initobj System.Uri
 ldloca local3
 initobj System.Web.Http.HttpError
+ldloca local4
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 M0000002c_IL_0000:
 M0000002c_IL_0001:
 M0000002c_IL_0002:
@@ -3372,6 +3144,7 @@ M0000002c_IL_000c:
 ldloca local2
 M0000002c_IL_000e:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion17(System.Result<System.Uri,System.Web.Http.HttpError>&,System.Uri&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M0000002c_IL_0013:
 brfalse M0000002c_IL_001d
 M0000002c_IL_0018:
@@ -3386,6 +3159,7 @@ M0000002c_IL_0027:
 ldloca local3
 M0000002c_IL_0029:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion18(System.Result<System.Uri,System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M0000002c_IL_002e:
 brfalse M0000002c_IL_003a
 M0000002c_IL_0033:
@@ -3426,47 +3200,57 @@ ret
 .local System.UriError local7
 .local System.Option<String> local8
 .local System.Option.Some<String> local9
-.local System.Option.Some<String> local10
-.local String local11
+.local System.Result<System.Uri,System.UriError> local10
+.local System.Result.Error<System.UriError> local11
 .local System.Result<System.Uri,System.UriError> local12
-.local System.Result.Error<System.UriError> local13
-.local System.Result.Error<System.UriError> local14
-.local System.UriError local15
-.local System.Result<System.Uri,System.UriError> local16
-.local System.Result.Ok<System.Uri> local17
+.local System.Result.Ok<System.Uri> local13
+.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local14
+.local System.Web.Http.HttpRequest local15
+.local System.Web.Http.HttpError local16
+.local System.Result<System.Uri,System.UriError> local17
 .local System.Result.Ok<System.Uri> local18
-.local System.Uri local19
-.local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local20
-.local System.Web.Http.HttpRequest local21
-.local System.Web.Http.HttpError local22
-.local System.Result<System.Uri,System.UriError> local23
-.local System.Result.Ok<System.Uri> local24
-.local System.Result.Ok<System.Uri> local25
-.local System.Uri local26
-.local System.Result<System.Uri,System.UriError> local27
-.local System.Result.Error<System.UriError> local28
-.local System.Result.Error<System.UriError> local29
-.local System.UriError local30
+.local System.Result<System.Uri,System.UriError> local19
+.local System.Result.Error<System.UriError> local20
+ldloca local0
+initobj System.Option<String>
+ldloca local2
+initobj System.Result<System.Uri,System.UriError>
 ldloca local3
 initobj System.UriError
 ldloca local4
 initobj System.Uri
+ldloca local5
+initobj System.Result<System.Uri,System.UriError>
 ldloca local6
 initobj System.Uri
 ldloca local7
 initobj System.UriError
+ldloca local8
+initobj System.Option<String>
+ldloca local9
+initobj System.Option.Some<String>
+ldloca local10
+initobj System.Result<System.Uri,System.UriError>
+ldloca local11
+initobj System.Result.Error<System.UriError>
+ldloca local12
+initobj System.Result<System.Uri,System.UriError>
+ldloca local13
+initobj System.Result.Ok<System.Uri>
+ldloca local14
+initobj System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 ldloca local15
-initobj System.UriError
-ldloca local19
-initobj System.Uri
-ldloca local21
 initobj System.Web.Http.HttpRequest
-ldloca local22
+ldloca local16
 initobj System.Web.Http.HttpError
-ldloca local26
-initobj System.Uri
-ldloca local30
-initobj System.UriError
+ldloca local17
+initobj System.Result<System.Uri,System.UriError>
+ldloca local18
+initobj System.Result.Ok<System.Uri>
+ldloca local19
+initobj System.Result<System.Uri,System.UriError>
+ldloca local20
+initobj System.Result.Error<System.UriError>
 M0000002d_IL_0000:
 M0000002d_IL_0001:
 M0000002d_IL_0002:
@@ -3481,335 +3265,287 @@ ldloc local0
 M0000002d_IL_000b:
 stloc local8
 M0000002d_IL_000d:
-ldloca local8
-M0000002d_IL_000f:
 ldloca local9
-M0000002d_IL_0011:
+M0000002d_IL_000f:
+initobj System.Option.Some<String>
+M0000002d_IL_0015:
+ldloca local8
+M0000002d_IL_0017:
+ldloca local9
+M0000002d_IL_0019:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion0(System.Option<String>&,System.Option.Some<String>&)
-M0000002d_IL_0016:
-brfalse M0000002d_IL_0043
-M0000002d_IL_001b:
-ldloc local9
-M0000002d_IL_001d:
-stloc local10
-M0000002d_IL_001f:
-ldloca local10
-M0000002d_IL_0021:
-ldloca local11
+M0000002d_IL_001e:
+brfalse M0000002d_IL_0037
 M0000002d_IL_0023:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion3(System.Option.Some<String>&,String&)
-M0000002d_IL_0028:
-ldloc local11
+ldloca local9
+M0000002d_IL_0025:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion1(System.Option.Some<String>&)
 M0000002d_IL_002a:
 stloc local1
 M0000002d_IL_002b:
-ldc.i4 1
 M0000002d_IL_002c:
-br M0000002d_IL_0032
-M0000002d_IL_0032:
-brfalse M0000002d_IL_0043
+br M0000002d_IL_003c
 M0000002d_IL_0037:
-M0000002d_IL_0038:
-br M0000002d_IL_0048
-M0000002d_IL_0043:
-br M0000002d_IL_024a
-M0000002d_IL_0048:
-M0000002d_IL_0049:
+br M0000002d_IL_020e
+M0000002d_IL_003c:
+M0000002d_IL_003d:
 ldarg 1
-M0000002d_IL_004a:
+M0000002d_IL_003e:
 call instance System.Uri::get_IsAbsolute()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M0000002d_IL_004f:
-brtrue M0000002d_IL_0069
-M0000002d_IL_0054:
+M0000002d_IL_0043:
+brtrue M0000002d_IL_005d
+M0000002d_IL_0048:
 ldarg 1
-M0000002d_IL_0055:
+M0000002d_IL_0049:
 call instance System.Uri::get_Text()
-M0000002d_IL_005a:
+M0000002d_IL_004e:
 ldstr "//"
-M0000002d_IL_005f:
+M0000002d_IL_0053:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeStringStartsWithOrdinal(String,String)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
-M0000002d_IL_0064:
-br M0000002d_IL_006a
+M0000002d_IL_0058:
+br M0000002d_IL_005e
+M0000002d_IL_005d:
+ldc.i4 1
+M0000002d_IL_005e:
+brtrue M0000002d_IL_0068
+M0000002d_IL_0063:
+br M0000002d_IL_0083
+M0000002d_IL_0068:
 M0000002d_IL_0069:
-ldc.i4 1
-M0000002d_IL_006a:
-brtrue M0000002d_IL_0074
-M0000002d_IL_006f:
-br M0000002d_IL_008f
-M0000002d_IL_0074:
-M0000002d_IL_0075:
 ldstr "A relative URL without authority is required with BaseUri"
-M0000002d_IL_007a:
+M0000002d_IL_006e:
 newobj instance System.Web.Http.HttpError.InvalidRequest::.ctor(String)
-M0000002d_IL_007f:
+M0000002d_IL_0073:
 newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidRequest)
+M0000002d_IL_0078:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion23(System.Web.Http.HttpError)
+M0000002d_IL_007d:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion31(System.Result.Error<System.Web.Http.HttpError>)
+M0000002d_IL_0082:
+ret
+M0000002d_IL_0083:
 M0000002d_IL_0084:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion23(System.Web.Http.HttpError)
-M0000002d_IL_0089:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion31(System.Result.Error<System.Web.Http.HttpError>)
-M0000002d_IL_008e:
-ret
-M0000002d_IL_008f:
-M0000002d_IL_0090:
-M0000002d_IL_0091:
+M0000002d_IL_0085:
 ldloc local1
-M0000002d_IL_0092:
+M0000002d_IL_0086:
 call System.Uri::Parse(String)
-M0000002d_IL_0097:
+M0000002d_IL_008b:
 stloc local2
+M0000002d_IL_008c:
+M0000002d_IL_008d:
+ldloc local2
+M0000002d_IL_008e:
+stloc local10
+M0000002d_IL_0090:
+ldloca local11
+M0000002d_IL_0092:
+initobj System.Result.Error<System.UriError>
 M0000002d_IL_0098:
-M0000002d_IL_0099:
-ldloc local2
+ldloca local10
 M0000002d_IL_009a:
-stloc local12
+ldloca local11
 M0000002d_IL_009c:
-ldloca local12
-M0000002d_IL_009e:
-ldloca local13
-M0000002d_IL_00a0:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion15(System.Result<System.Uri,System.UriError>&,System.Result.Error<System.UriError>&)
-M0000002d_IL_00a5:
-brfalse M0000002d_IL_00d2
-M0000002d_IL_00aa:
-ldloc local13
-M0000002d_IL_00ac:
-stloc local14
-M0000002d_IL_00ae:
-ldloca local14
-M0000002d_IL_00b0:
-ldloca local15
-M0000002d_IL_00b2:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&,System.UriError&)
-M0000002d_IL_00b7:
-ldloc local15
-M0000002d_IL_00b9:
+M0000002d_IL_00a1:
+brfalse M0000002d_IL_00ba
+M0000002d_IL_00a6:
+ldloca local11
+M0000002d_IL_00a8:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&)
+M0000002d_IL_00ad:
 stloc local3
+M0000002d_IL_00ae:
+M0000002d_IL_00af:
+br M0000002d_IL_00bf
 M0000002d_IL_00ba:
-ldc.i4 1
-M0000002d_IL_00bb:
-br M0000002d_IL_00c1
-M0000002d_IL_00c1:
-brfalse M0000002d_IL_00d2
-M0000002d_IL_00c6:
-M0000002d_IL_00c7:
-br M0000002d_IL_00d7
-M0000002d_IL_00d2:
-br M0000002d_IL_00f4
-M0000002d_IL_00d7:
-M0000002d_IL_00d8:
+br M0000002d_IL_00dc
+M0000002d_IL_00bf:
+M0000002d_IL_00c0:
 ldloc local3
-M0000002d_IL_00d9:
+M0000002d_IL_00c1:
 newobj instance System.Web.Http.HttpError.InvalidUri::.ctor(System.UriError)
-M0000002d_IL_00de:
+M0000002d_IL_00c6:
 newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidUri)
-M0000002d_IL_00e3:
+M0000002d_IL_00cb:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion23(System.Web.Http.HttpError)
-M0000002d_IL_00e8:
+M0000002d_IL_00d0:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion31(System.Result.Error<System.Web.Http.HttpError>)
-M0000002d_IL_00ed:
+M0000002d_IL_00d5:
 ret
-M0000002d_IL_00f4:
-M0000002d_IL_00f5:
+M0000002d_IL_00dc:
+M0000002d_IL_00dd:
 ldloc local2
-M0000002d_IL_00f6:
-stloc local16
-M0000002d_IL_00f8:
-ldloca local16
-M0000002d_IL_00fa:
-ldloca local17
-M0000002d_IL_00fc:
+M0000002d_IL_00de:
+stloc local12
+M0000002d_IL_00e0:
+ldloca local13
+M0000002d_IL_00e2:
+initobj System.Result.Ok<System.Uri>
+M0000002d_IL_00e8:
+ldloca local12
+M0000002d_IL_00ea:
+ldloca local13
+M0000002d_IL_00ec:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion13(System.Result<System.Uri,System.UriError>&,System.Result.Ok<System.Uri>&)
-M0000002d_IL_0101:
-brfalse M0000002d_IL_012f
-M0000002d_IL_0106:
-ldloc local17
-M0000002d_IL_0108:
-stloc local18
-M0000002d_IL_010a:
-ldloca local18
-M0000002d_IL_010c:
-ldloca local19
-M0000002d_IL_010e:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&,System.Uri&)
-M0000002d_IL_0113:
-ldloc local19
-M0000002d_IL_0115:
+M0000002d_IL_00f1:
+brfalse M0000002d_IL_010b
+M0000002d_IL_00f6:
+ldloca local13
+M0000002d_IL_00f8:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&)
+M0000002d_IL_00fd:
 stloc local4
-M0000002d_IL_0117:
-ldc.i4 1
-M0000002d_IL_0118:
-br M0000002d_IL_011e
-M0000002d_IL_011e:
-brfalse M0000002d_IL_012f
-M0000002d_IL_0123:
-M0000002d_IL_0124:
-br M0000002d_IL_0134
-M0000002d_IL_012f:
-br M0000002d_IL_0222
-M0000002d_IL_0134:
-M0000002d_IL_0135:
+M0000002d_IL_00ff:
+M0000002d_IL_0100:
+br M0000002d_IL_0110
+M0000002d_IL_010b:
+br M0000002d_IL_01e6
+M0000002d_IL_0110:
+M0000002d_IL_0111:
 ldloc local4
-M0000002d_IL_0137:
+M0000002d_IL_0113:
 call System.Web.Http.HttpRequest::Get(System.Uri)
-M0000002d_IL_013c:
-stloc local20
-M0000002d_IL_013e:
-ldloca local20
-M0000002d_IL_0140:
-ldloca local21
-M0000002d_IL_0142:
+M0000002d_IL_0118:
+stloc local14
+M0000002d_IL_011a:
+ldloca local14
+M0000002d_IL_011c:
+ldloca local15
+M0000002d_IL_011e:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion32(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Web.Http.HttpRequest&)
-M0000002d_IL_0147:
-brtrue M0000002d_IL_0164
-M0000002d_IL_014c:
-ldloca local20
-M0000002d_IL_014e:
-ldloca local22
-M0000002d_IL_0150:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
+M0000002d_IL_0123:
+brtrue M0000002d_IL_0140
+M0000002d_IL_0128:
+ldloca local14
+M0000002d_IL_012a:
+ldloca local16
+M0000002d_IL_012c:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion33(System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>&,System.Web.Http.HttpError&)
-M0000002d_IL_0155:
-brtrue M0000002d_IL_015c
-M0000002d_IL_015a:
-M0000002d_IL_015b:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
+M0000002d_IL_0131:
+brtrue M0000002d_IL_0138
+M0000002d_IL_0136:
+M0000002d_IL_0137:
 fault "Guest program reached a terminal failure"
-M0000002d_IL_015c:
-ldloc local22
-M0000002d_IL_015e:
+M0000002d_IL_0138:
+ldloc local16
+M0000002d_IL_013a:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion34(System.Web.Http.HttpError)
-M0000002d_IL_0163:
+M0000002d_IL_013f:
 ret
-M0000002d_IL_0164:
-ldloc local21
-M0000002d_IL_0166:
+M0000002d_IL_0140:
+ldloc local15
+M0000002d_IL_0142:
 pop
-M0000002d_IL_0167:
-M0000002d_IL_0168:
+M0000002d_IL_0143:
+M0000002d_IL_0144:
 ldloc local4
-M0000002d_IL_016a:
+M0000002d_IL_0146:
 ldarg 1
-M0000002d_IL_016b:
+M0000002d_IL_0147:
 call instance System.Uri::Resolve(System.Uri)
-M0000002d_IL_0170:
+M0000002d_IL_014c:
 stloc local5
+M0000002d_IL_014e:
+M0000002d_IL_014f:
+ldloc local5
+M0000002d_IL_0151:
+stloc local17
+M0000002d_IL_0153:
+ldloca local18
+M0000002d_IL_0155:
+initobj System.Result.Ok<System.Uri>
+M0000002d_IL_015b:
+ldloca local17
+M0000002d_IL_015d:
+ldloca local18
+M0000002d_IL_015f:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion13(System.Result<System.Uri,System.UriError>&,System.Result.Ok<System.Uri>&)
+M0000002d_IL_0164:
+brfalse M0000002d_IL_017e
+M0000002d_IL_0169:
+ldloca local18
+M0000002d_IL_016b:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&)
+M0000002d_IL_0170:
+stloc local6
 M0000002d_IL_0172:
 M0000002d_IL_0173:
-ldloc local5
-M0000002d_IL_0175:
-stloc local23
-M0000002d_IL_0177:
-ldloca local23
-M0000002d_IL_0179:
-ldloca local24
-M0000002d_IL_017b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion13(System.Result<System.Uri,System.UriError>&,System.Result.Ok<System.Uri>&)
-M0000002d_IL_0180:
-brfalse M0000002d_IL_01ae
-M0000002d_IL_0185:
-ldloc local24
-M0000002d_IL_0187:
-stloc local25
-M0000002d_IL_0189:
-ldloca local25
-M0000002d_IL_018b:
-ldloca local26
-M0000002d_IL_018d:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion14(System.Result.Ok<System.Uri>&,System.Uri&)
-M0000002d_IL_0192:
-ldloc local26
-M0000002d_IL_0194:
-stloc local6
-M0000002d_IL_0196:
-ldc.i4 1
-M0000002d_IL_0197:
-br M0000002d_IL_019d
-M0000002d_IL_019d:
-brfalse M0000002d_IL_01ae
-M0000002d_IL_01a2:
-M0000002d_IL_01a3:
-br M0000002d_IL_01b3
-M0000002d_IL_01ae:
-br M0000002d_IL_01c7
-M0000002d_IL_01b3:
-M0000002d_IL_01b4:
+br M0000002d_IL_0183
+M0000002d_IL_017e:
+br M0000002d_IL_0197
+M0000002d_IL_0183:
+M0000002d_IL_0184:
 ldloc local6
-M0000002d_IL_01b6:
+M0000002d_IL_0186:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion29(System.Uri)
-M0000002d_IL_01bb:
+M0000002d_IL_018b:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion30(System.Result.Ok<System.Uri>)
-M0000002d_IL_01c0:
+M0000002d_IL_0190:
 ret
-M0000002d_IL_01c7:
-M0000002d_IL_01c8:
+M0000002d_IL_0197:
+M0000002d_IL_0198:
 ldloc local5
-M0000002d_IL_01ca:
-stloc local27
-M0000002d_IL_01cc:
-ldloca local27
-M0000002d_IL_01ce:
-ldloca local28
-M0000002d_IL_01d0:
+M0000002d_IL_019a:
+stloc local19
+M0000002d_IL_019c:
+ldloca local20
+M0000002d_IL_019e:
+initobj System.Result.Error<System.UriError>
+M0000002d_IL_01a4:
+ldloca local19
+M0000002d_IL_01a6:
+ldloca local20
+M0000002d_IL_01a8:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion15(System.Result<System.Uri,System.UriError>&,System.Result.Error<System.UriError>&)
-M0000002d_IL_01d5:
-brfalse M0000002d_IL_0203
-M0000002d_IL_01da:
-ldloc local28
-M0000002d_IL_01dc:
-stloc local29
-M0000002d_IL_01de:
-ldloca local29
-M0000002d_IL_01e0:
-ldloca local30
-M0000002d_IL_01e2:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&,System.UriError&)
-M0000002d_IL_01e7:
-ldloc local30
-M0000002d_IL_01e9:
+M0000002d_IL_01ad:
+brfalse M0000002d_IL_01c7
+M0000002d_IL_01b2:
+ldloca local20
+M0000002d_IL_01b4:
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion16(System.Result.Error<System.UriError>&)
+M0000002d_IL_01b9:
 stloc local7
-M0000002d_IL_01eb:
-ldc.i4 1
-M0000002d_IL_01ec:
-br M0000002d_IL_01f2
-M0000002d_IL_01f2:
-brfalse M0000002d_IL_0203
-M0000002d_IL_01f7:
-M0000002d_IL_01f8:
-br M0000002d_IL_0208
-M0000002d_IL_0203:
-br M0000002d_IL_0220
-M0000002d_IL_0208:
-M0000002d_IL_0209:
+M0000002d_IL_01bb:
+M0000002d_IL_01bc:
+br M0000002d_IL_01cc
+M0000002d_IL_01c7:
+br M0000002d_IL_01e4
+M0000002d_IL_01cc:
+M0000002d_IL_01cd:
 ldloc local7
-M0000002d_IL_020b:
+M0000002d_IL_01cf:
 newobj instance System.Web.Http.HttpError.InvalidUri::.ctor(System.UriError)
-M0000002d_IL_0210:
+M0000002d_IL_01d4:
 newobj instance System.Web.Http.HttpError::.ctor(System.Web.Http.HttpError.InvalidUri)
-M0000002d_IL_0215:
+M0000002d_IL_01d9:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion23(System.Web.Http.HttpError)
-M0000002d_IL_021a:
+M0000002d_IL_01de:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion31(System.Result.Error<System.Web.Http.HttpError>)
-M0000002d_IL_021f:
+M0000002d_IL_01e3:
 ret
-M0000002d_IL_0220:
-M0000002d_IL_0221:
-M0000002d_IL_0222:
-M0000002d_IL_0223:
-M0000002d_IL_0224:
-M0000002d_IL_0225:
+M0000002d_IL_01e4:
+M0000002d_IL_01e5:
+M0000002d_IL_01e6:
+M0000002d_IL_01e7:
+M0000002d_IL_01e8:
+M0000002d_IL_01e9:
 ldstr "URI resolution returned no outcome"
-M0000002d_IL_022a:
+M0000002d_IL_01ee:
 call System.Fault(String)
 fault "System.Fault returned unexpectedly"
-M0000002d_IL_024a:
-M0000002d_IL_024b:
-M0000002d_IL_024c:
+M0000002d_IL_020e:
+M0000002d_IL_020f:
+M0000002d_IL_0210:
 ldarg 1
-M0000002d_IL_024d:
+M0000002d_IL_0211:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion29(System.Uri)
-M0000002d_IL_0252:
+M0000002d_IL_0216:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion30(System.Result.Ok<System.Uri>)
-M0000002d_IL_0257:
+M0000002d_IL_021b:
 ret
 .end
 .method private static Failure(System.Web.Http.HttpError reason) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>

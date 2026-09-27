@@ -38,6 +38,11 @@ This prints `42`. `Promise<T>` owns completion; its `Task` lets consumers await 
 
 ## Completion, cancellation and Fault
 
+`TaskOutcome<T>` is a standard Raven union with `Completed(T)` and `Cancelled`
+cases. Use patterns to inspect it. `HasValue` reports an active case, `Value` boxes
+that case through `IUnion`, and `TryGetValue` extracts a matching case. An inactive
+default is distinct from cancellation. `Task.Outcome` uses `None` while pending.
+
 | Situation | Meaning |
 | --- | --- |
 | `Pending` | The operation has no terminal outcome yet. |

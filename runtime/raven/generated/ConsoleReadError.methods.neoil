@@ -191,15 +191,13 @@ ldfld System.ConsoleReadError::Metadata_V1_3C556E617661696C61626C655061796C6F616
 M00000003_IL_001c:
 stobj System.ConsoleReadError.Unavailable
 M00000003_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000003_IL_0022:
-call neoCLR.Library.System.ConsoleReadError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000003_IL_0023:
 M00000003_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000003_IL_0025:
-call neoCLR.Library.System.ConsoleReadError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance byref .ctor(System.ConsoleReadError.ReadFailed value) -> Void
@@ -289,15 +287,13 @@ ldfld System.ConsoleReadError::Metadata_V1_3C526561644661696C65645061796C6F61643
 M00000005_IL_001c:
 stobj System.ConsoleReadError.ReadFailed
 M00000005_IL_0021:
-ldc.i4 1
+ldc.bool true
 M00000005_IL_0022:
-call neoCLR.Library.System.ConsoleReadError.RuntimeBooleanFromInt32(Int32)
 ret
 M00000005_IL_0023:
 M00000005_IL_0024:
-ldc.i4 0
+ldc.bool false
 M00000005_IL_0025:
-call neoCLR.Library.System.ConsoleReadError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance override byref ToString() -> String
