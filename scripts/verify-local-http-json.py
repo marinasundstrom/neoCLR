@@ -55,7 +55,7 @@ def main():
             print('HTTP/JSON server flow passed.', flush=True)
             return
         # Use a fresh server for the managed pair, matching the reference verifier.
-        server = subprocess.Popen(command('server', '1'), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        server = subprocess.Popen(command('server', '2'), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         with selectors.DefaultSelector() as selector:
             selector.register(server.stdout, selectors.EVENT_READ)
             if not selector.select(120):
@@ -66,7 +66,7 @@ def main():
                                 capture_output=True, text=True, timeout=120)
         assert client.returncode == 0, client.stdout + client.stderr
         assert json.loads(client.stdout) == {'accepted': True}, client.stdout
-        print('Raven client POST /reports:', client.stdout.strip(), flush=True)
+        print('Raven client GET /report + POST /reports:', client.stdout.strip(), flush=True)
         output, errors = server.communicate(timeout=60)
         assert server.returncode == 0 and output.strip() == 'Reports served', output + errors
         print('HTTP/JSON flow passed.', flush=True)

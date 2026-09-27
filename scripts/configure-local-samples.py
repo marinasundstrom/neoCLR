@@ -71,7 +71,7 @@ def main():
     shutil.copy2(args.http_runner, bundle / 'tools/http-runner')
     shutil.copy2(ROOT / 'scripts/verify-local-http-json.py', bundle / 'tools/verify-local-http-json.py')
     for name, arguments in [('Server', ['100']), ('Client', ['${input:serverUrl}'])]:
-        sources = {name + '.rvn': 'docs/experiments/' + ('json-object-mapping/HttpServer.rvn' if name == 'Server' else 'http-json/Client.rvn'),
+        sources = {name + '.rvn': 'docs/experiments/' + ('json-object-mapping/Http' + name + '.rvn'),
                    'Application.rvn': 'docs/experiments/json-object-mapping/HttpApplication.rvn'}
         project(http / name.lower(), name, sources, arguments)
     workspace = {'folders': [{'name': 'Server', 'path': 'server'}, {'name': 'Client', 'path': 'client'}], 'settings': settings}

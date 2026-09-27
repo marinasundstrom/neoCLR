@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Align the editable local HTTP client with the current typed JSON sample. Its
+  shared application contract uses HttpJsonError; prepare the matching generic
+  GET/POST client and serve both requests in the local managed-pair verifier.
+
 - Support bounded generic async methods on nongeneric application owners by
   importing their constructed state-machine and shared closure types. Preserve
   substituted members, callback receivers, type identity and access checks.
