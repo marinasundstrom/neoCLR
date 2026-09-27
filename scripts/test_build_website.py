@@ -109,13 +109,22 @@ class RavenDocPages(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         xrefs = {uid.replace('+', '.'): path for uid, path in
                  json.loads((output / 'xref-map.json').read_text()).items()}
-        for name in ('System.Array', 'System.Option', 'System.Result', 'System.Tasks.TaskOutcome',
-                     'System.Option.Some`1', 'System.Result.Ok`1', 'System.Tasks.TaskOutcome.Cancelled'):
+        for name in ('System.Array', 'System.Option.Some`1', 'System.Result.Ok`1',
+                     'System.Tasks.TaskOutcome.Cancelled',
+                     'Raven.Runtime.CompilerServices.RavenUnionCompanionAttribute'):
             self.assertNotIn('T:' + name, xrefs)
         for name in ('System.Array`1', 'System.Option`1', 'System.Result`2',
                      'System.Tasks.TaskOutcome`1'):
             self.assertIn('T:' + name, xrefs)
             self.assertTrue((output / xrefs['T:' + name].split('#')[0]).is_file(), name)
+        # Companion IDs remain useful aliases, but never create duplicate pages.
+        for name, arity in (('System.Option', 1), ('System.Result', 2), ('System.Tasks.TaskOutcome', 1)):
+            self.assertEqual(xrefs['T:' + name], xrefs['T:' + name + '`' + str(arity)])
+        case = (output / 'api/System/BooleanParseError/InvalidFormat/index.html').read_text()
+        self.assertNotIn('ReferenceEquals', case)
+        self.assertIn('Inherited from', case)
+        self.assertIn('id="show-inherited-members"', case)
+        self.assertIn('id="member-grouping"', case)
 
     def test_api_list_labels_and_signature_opt_in(self):
         import shutil

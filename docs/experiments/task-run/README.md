@@ -687,6 +687,17 @@ unit to a local also compiles in the reduced probe; runtime validation here cove
 statement-position awaits. No full suite, performance suite or website build is needed.
 The API snapshot update is XML-only; no public signatures change.
 
+## Main integration checkpoint
+
+The completed Task.Run slices are integrated with main's routing, typed JSON arrays,
+retained reflection constructors and RavenDoc checkpoint. Native ScheduleTask dispatch
+and reflection adapters are retained in the merged interpreter; the combined reference
+assembly is regenerated and the API snapshot refreshed. Fifteen VM suspension checks,
+nine reflection checks and eleven Task.Run signature checks pass. The shared-capture/
+identity/unwrapping consumer compiles, typed-verifies and executes with the combined
+runtime, reference and library. Source/generated-library fingerprints match. No full
+suite or website build is used for this integration.
+
 ## Next bounded work
 
 Resolve short-name lookup and block-lambda inference in isolated Raven work with

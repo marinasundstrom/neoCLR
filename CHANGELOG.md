@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Update the pinned shared RavenDoc publisher with semantic member origins,
+  inherited-member visibility and kind/declaring-type grouping. Keep static members
+  on their declaring type; show selected LINQ/reflection extensions inline with E
+  badges and linked origins. Include union case pages, companion merging, nominal
+  generic/delegate names, closed hierarchy links, authored API content support,
+  direct union/enum navigation and independent sidebar scrolling below the release
+  notice. Wrap long group headings to prevent horizontal overflow. Hide empty
+  namespaces and the compiler-owned companion marker by default. Document the general compiler symbol corrections; no
+  Runtime Contract or runtime behavior changes are part of this update.
+
 - Extend development JSON serialization/deserialization to nested nongeneric
   reference properties, with full input-tree validation before model construction
   or setters. Preserve scalar/name/null/error policies; expand the development JSON
@@ -159,7 +169,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   suspension. Promote the original failing consumer to a required 42-result regression
   and track pre-existing generic-method capture metadata separately. Integrate the
   Task.Run work with main’s route, JSON-array and reflection-constructor additions,
-  retaining native submission and refreshing the combined API reference. This is not
+  retaining native submission and refreshing the combined API reference. Include the
+  completed RavenDoc publisher/navigation checkpoint in the integration. This is not
   a published release.
 
 - Support Raven Main returning integer, Result and target Task combinations through

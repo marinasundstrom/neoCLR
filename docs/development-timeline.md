@@ -8689,6 +8689,33 @@ validation of general compiler fixes; it does not request a wholesale target mer
 
 **Validation:** The direct-await slice passes 24 Raven neighbors and three neoCLR
 compile/verify/run consumers. The combined neoCLR merge passes 15 VM suspension and
-nine reflection checks; its combined source/generated-library fingerprints and API
-snapshot are refreshed. See the [Task.Run checkpoint](experiments/task-run/README.md#direct-unit-await-checkpoint)
+nine reflection checks, eleven Task.Run signature checks and the compiled
+capture/identity/unwrapping consumer against the combined artifacts. Its combined
+source/generated-library fingerprints and API snapshot are refreshed. See the [Task.Run checkpoint](experiments/task-run/README.md#direct-unit-await-checkpoint)
 for scope and remaining lookup/inference work.
+
+## 2026-09-27 — semantic API member browsing in RavenDoc
+
+- **Author:** requested Raven-semantic reference pages with inherited/implemented
+  members, linked interface origins and default implementation information, union
+  case pages, companion merging, nominal generic/delegate labels, authored content
+  overlays and closed hierarchy relationships. Selected ArrayList as the review
+  model and requested a continuously served preview.
+- **Refinements:** initially requested separate extension sections, then selected
+  inline Methods/Properties grouping with a distinct E icon overlay. Grouping by
+  declaring type uses the extension's declaring container. Requested an inherited
+  toggle, red-ish S badges, no expandable unions/enums in the sidebar, and static
+  members only on their declaring type. These later directions supersede the
+  earlier extension-section proposal.
+- **Assistant actions:** implemented the shared generator behavior, sample and docs
+  in Raven, with separate general compiler symbol corrections. Integrated the shared
+  changes into main and neoclr. Browser testing found and corrected stale group
+  counts and generic interface labels. Confirmed ReferenceEquals is absent from
+  the refreshed InvalidFormat and ArrayList pages, retaining inherited instances.
+  The author identified the release notice as a scrolling culprit and JsonNumber
+  as an overflow example. Measured sidebar space below the actual notice/header
+  position and wrapped long declaring-type headings; verified menu-end access
+  without article scrolling and a 390px page without horizontal overflow.
+- **Evidence:** [integration and validation](ravendoc-integration.md),
+  [pinned publisher](../tools/ravendoc/version.json). The local preview is not a
+  public deployment. Separate runtime/reflection development remains independent.
