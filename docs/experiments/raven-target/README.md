@@ -1464,3 +1464,23 @@ storage), and extracts payloads before comparing values. Standalone contract che
 exercise that exact source and HTTP tests exercise match-based dispatch. Before an
 attribute mapper promises arbitrary route unions, validate scalar-only union
 admission independently. Keep any generic Raven fix separate from neoCLR policy.
+
+### Attributed route unions (development 2026-09-27)
+
+The [route mapper experiment](../route-union-mapper/README.md) consumes attributes
+on nested case types and constructor parameter names from CLI metadata. Raven's
+main fix `3179cd21e`, integrated on neoclr as `2f62361ef`, preserves and validates
+case attributes; constructors do not receive duplicates. The fix is independent
+of neoCLR and passed 16 attribute tests and 189 union tests on .NET 11. No claims
+are made for .NET Framework/NanoFramework execution. Runtime Contract settings and
+the existing semantic meaning of attributes are unchanged; previously omitted
+case attributes now appear in metadata and invalid usage produces diagnostics.
+
+ApplicationTypes now admits the bounded standard nongeneric union carrier with
+private Byte tag at offset zero, positive case slots and private Int32-only case
+fields. Empty cases may coexist. Imported execution uses logical fields, not raw
+CLR offset aliasing; references, other scalar types and arbitrary explicit-layout
+structs remain rejected. This target-specific admission policy stays in neoCLR.
+The focused metadata mutation checks and compiled copy/boxing/dispatch consumer
+are in the experiment. Nested constant patterns/static Object.Equals remain a
+separate limitation; samples extract payloads and compare normally.

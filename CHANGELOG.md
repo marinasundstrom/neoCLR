@@ -37,10 +37,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   paths with query separation and strict once-only UTF-8 segment decoding. Add a
   direct-use consumer and station client/server case with optional application union
   dispatch, API reference and tested website excerpts/download. Keep dispatch and
-  lifecycle application-owned. Record the author's proposed
-  reusable attribute-driven route-to-union mapper as the next design investigation,
-  with startup validation and Result-based no-match/error handling; it is not an
-  implemented API.
+  lifecycle application-owned. Add an experimental emitted-metadata generator for
+  attributed application union cases, with String/Int32 payload binding, build-time
+  schema checks, startup-compiled reusable patterns and Result-based no-match/error
+  handling. Include an item server/client case. Integrate Raven's independently
+  tested case-attribute emission fix and admit bounded Int32-only standard union
+  carriers through logical fields, without general CLR explicit-layout aliasing.
+  SDK generator integration and runtime custom-attribute discovery remain open.
 
 - Add development System.Runtime.GC with execution-local collection, allocation,
   retained/peak/reclaimed object counters and the host heap-object limit. Add

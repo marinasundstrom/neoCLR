@@ -71,16 +71,16 @@ Raven compiler change or Runtime Contract configuration change is required. Rebu
 matching reference/library artifacts and consumers to use the development APIs.
 
 The experiment also exposed two pre-existing target limitations: scalar-only
-payload unions can use overlapping explicit CLR layout, which the bridge does not
+payload unions can use overlapping explicit CLR layout, which the original routing slice did not
 admit, and nested constant payload patterns can emit an unsupported static
 Object.Equals call. The case uses an Unmatched string payload and ordinary payload
 extraction/comparison. These are recorded limitations, not fixes or general union
 support claims. See [integration notes](experiments/raven-target/README.md).
 
 
-## Next layer: attributed union mapping
+## Attributed union mapping experiment
 
-**Design direction, not an implemented API.** The author proposes RoutePattern
+**Implemented as a bounded development generator experiment, not an SDK API.** The author proposes RoutePattern
 attributes on application union cases, initially with an UnmatchedPattern marker,
 then suggests UnmatchedRoutePattern and explicitly asks for a reusable parser object.
 The author subsequently delegates the choice of using Result for unmatched routes.
@@ -93,15 +93,14 @@ initially. This decision does not alter the fundamental Match contract, which re
 `Result<Option<RouteMatch>, string>`, nor require the application example to change
 its existing explicit Unmatched case.
 
-Build the mapper once at startup and retain it for the server lifetime. Creation
-must read the case declarations, compile each RoutePattern, bind named parameters
-to case payload types, select conversions and validate case construction. It must
-reject malformed patterns, missing/unbound arguments, unsupported types and
-ambiguous patterns before accepting requests. Per-request work matches a target,
-converts captures and constructs one case; no attribute discovery, pattern parsing
-or handler invocation occurs there. Request captures must not be retained in the
-reusable mapper or shared between calls. Exactly how method selection participates
-is still open: the current RoutePattern primitive handles only paths.
+The [implemented experiment](experiments/route-union-mapper/README.md) selects
+build-time generation. It inspects emitted union-case attributes and constructor
+parameter names, validates String/Int32 binding and rejects structural overlap.
+Generated `Create()` compiles RoutePattern instances once at startup. Retain this
+object for the server lifetime; Parse matches, converts and constructs one case
+without retaining captures. No attribute discovery or handler invocation happens
+per request. Methods remain application-owned. This adds an explicit generation
+step; integration into the SDK and runtime late-bound discovery are not supplied.
 
 Primary-source comparison, reviewed 2026-09-27:
 
@@ -115,21 +114,26 @@ Primary-source comparison, reviewed 2026-09-27:
   Runtime metadata discovery can support late-bound route types, but needs retained
   attributes and checked value-case construction. Build-time generated mappings can
   avoid runtime discovery, at the cost of generator integration and rebuilding when
-  declarations change. Neither mechanism is selected yet; both can yield a reusable
-  startup-created mapper over the same RoutePattern primitives.
+  declarations change. This experiment selects generation; runtime discovery remains an alternative.
 
-Inspection finds that Raven's UnionDeclarationParser delegates cases to
-TypeDeclarationParser.ParseCaseDeclaration, which retains attribute lists in the
-syntax tree. This is only parser evidence, not proof of correct attribute emission,
-name resolution or neoCLR metadata preservation. The public neoCLR introspection
-surface does not currently expose general custom-attribute reading. Before adding
-an API, compile a reduced attributed union and inspect exactly where the attributes
-and payload parameter names land; check RoutePatternAttribute suffix resolution
-alongside the existing RoutePattern class. Also resolve the scalar-only union layout
-limitation recorded above rather than requiring artificial reference payloads.
+The reduced metadata probe found that Raven parsed case attributes but omitted
+them from semantic symbols and CLI metadata. The independently tested general
+compiler fix now preserves them on nested case value types and validates their
+AttributeUsage. The short RoutePattern attribute spelling resolves alongside the
+core RoutePattern class. The neoCLR-specific bridge admits Int32-only standard
+union carriers through logical fields without general explicit-layout aliasing;
+no artificial reference payload is required. Details and validation are in the
+[experiment README](experiments/route-union-mapper/README.md).
 
-The next prototype should establish that metadata contract and choose discovery or
-generation, then prove startup validation, repeated parsing, independent concurrent
-captures, typed failure versus no-match, and exhaustive application dispatch. The
-Json enum/Uuid/Option requests remain open; this mapper does not silently supply
-missing primitive or JSON support.
+The Json enum/Uuid/Option requests remain open; this mapper does not supply missing
+primitive or JSON support. Runtime custom-attribute reading, generic schemas,
+other payload conversions and automatic build integration remain future work.
+
+### Author refinement: startup reflection
+
+After reviewing the generated prototype, the author selects runtime attribute
+reflection for the immediate implementation: discover and validate metadata once
+at startup, then cache the binding and construction information. Source generation
+remains a future alternative. The completed generator is retained as experimental
+contract evidence, not the chosen application workflow. Next add bounded metadata
+reading without attribute-constructor execution, then prepare the reusable mapping.

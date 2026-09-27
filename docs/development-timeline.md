@@ -8543,3 +8543,31 @@ configuration/content, not target-specific code added to Raven main.
   Focused native, source-consumer, API/library snapshot and website checks pass.
   The website was built locally, not published. Main integration and task worktree
   cleanup are performed after these checks.
+
+## 2026-09-27 — Reusable attributed route union prototype
+
+- **Author direction:** proposed RoutePattern attributes on union cases, clarified
+  the possible unmatched marker as UnmatchedRoutePattern, and requested preparation
+  once for the server lifetime. The author then delegated whether Result should
+  signal unmatched routes and asked to continue.
+- **Assistant choice:** use Result<AppRoutes, RouteMappingError>, separating NoMatch,
+  malformed target and failed conversion; omit an unmatched attribute initially.
+  Select emitted-metadata generation above the existing primitives. Schema binding
+  is checked at build time and patterns compile once in Create; this adds a build
+  step while avoiding runtime attribute discovery. This is an experiment rather
+  than a claim of completed SDK integration.
+- **Actions:** a reduced probe exposed silently omitted Raven case attributes.
+  Fix and test this independently on Raven main (`3179cd21e`, 16 attribute tests,
+  189 union tests), then integrate only that fix onto neoclr (`2f62361ef`). Add
+  neoCLR's bounded Int32 carrier projection without arbitrary explicit-layout
+  aliasing. Implement the generator, typed Result errors and item HTTP case.
+- **Scope:** String/Int32 and empty cases, exact parameter names, rejected structural
+  overlap, reusable patterns and application-owned dispatch. Enum/Uuid/Option JSON,
+  automatic SDK integration and broader attribute reflection remain open.
+  [Executable recipe and evidence](experiments/route-union-mapper/README.md).
+
+- **Author correction:** “Perhaps we should add runtime attribute reflection,”
+  followed by the explicit preference to use reflection at application startup and
+  cache the mapped information. Source generation should be considered in future.
+  **Assistant response:** adopt startup reflection as the immediate next direction;
+  retain the generated prototype as evidence, not as the intended permanent workflow.

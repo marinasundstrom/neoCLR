@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Generator.cs" />
+    <Reference Include="Mono.Cecil">
+      <HintPath>$(NeoCLRRoot)/tools/bridge/Mono.Cecil.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,10 @@
+import System.*
+import System.Web.Http.*
+
+public union AppRoutes {
+    [RoutePattern("/items")]
+    case ListItems
+
+    [RoutePattern("/items/{id}")]
+    case GetItem(id: int)
+}

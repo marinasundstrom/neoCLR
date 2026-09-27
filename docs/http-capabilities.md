@@ -191,3 +191,13 @@ Future text-body conversion should reuse this contract while HTTP retains its me
 type/charset policy, byte-body access, framing and header validation. No new HTTP
 milestone is opened by this dependency, and no automatic charset/BOM detection or
 additional protocol support is claimed.
+
+### Attributed route mapper experiment (2026-09-27)
+
+The [item case](experiments/route-union-mapper/README.md) now generates a reusable
+parser from emitted RoutePattern attributes on union cases. It supports empty,
+Int32 and String payloads; rejects invalid/overlapping schemas during generation;
+compiles patterns once at startup; and separates NoMatch, InvalidTarget and
+InvalidParameter through Result. HTTP method policy and dispatch remain in the
+handler. This is a development experiment requiring an explicit generation step,
+not an installed SDK feature. Enum/Uuid/Option JSON support remains requested.

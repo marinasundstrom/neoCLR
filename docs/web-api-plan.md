@@ -79,18 +79,20 @@ transport and runtime resource limits together; changing one constant is insuffi
    existing cleanup. No registration table, DI, middleware, automatic delegate binding
    or new application lifecycle is needed. New public APIs require matching reference
    artifacts and API documentation. WebApplication remains deferred.
-5. **Optional route-to-union mapper — next design investigation.** The author
+5. **Optional route-to-union mapper — development generator experiment.** The author
    proposes attributes on union cases to declare route patterns. Preserve the direct
    parser as the foundation; a dedicated mapper should construct application union
    cases with parsed payloads and leave match-based dispatch to the caller. Validate
    case-attribute placement/retention, constructor parameter names, supported parsers,
    missing values and ambiguous patterns before settling public syntax. Compare
-   runtime metadata mapping with generated mapping; neither is implemented yet.
+   runtime metadata mapping with generated mapping. The first experiment selects
+   emitted-metadata generation with String/Int32 binding, rejects structural overlap,
+   and reuses startup-compiled patterns; automatic SDK integration remains open.
    The author further requires a reusable mapper built once for the server lifetime,
    and leaves unmatched handling to assistant judgment. The selected design is
    Result<AppRoutes, RouteMappingError>, with NoMatch distinct from malformed target
    and invalid parameter errors; an unmatched attribute is unnecessary initially.
-   See [the recorded design choices](route-parsing.md#next-layer-attributed-union-mapping).
+   See [the recorded design choices](route-parsing.md#attributed-union-mapping-experiment).
 6. **Optional SQL/SQLite consumer.** If selected, reduce the
    [SQL proposal](proposals/sql-data-access.md) to opening/closing a connection,
    parameterized execution, a forward reader, explicit SQL NULL/value mapping,

@@ -21,7 +21,10 @@ Typed arrays now support collection payloads; see [collection evidence](experime
 The author's route/union refinement selects the next bounded routing slice: direct
 RoutePattern/RouteMatch parsing and optional application union dispatch are now
 implemented in development; see [the case](experiments/http-routing/README.md).
-Next investigate attribute-driven route-to-union mapping above those primitives.
+A [generated attribute-driven mapper experiment](experiments/route-union-mapper/README.md)
+validates schemas and reuses compiled patterns. The author subsequently selects
+runtime attribute reflection with cached startup mapping as the next slice; source
+generation remains a future alternative.
 Enum, Uuid and Option JSON mapping remain requested and pending.
 This explicitly supersedes the previous general useful-library priority; M2–M6
 remain candidates. Preview 10's completed POC stays closed.
@@ -128,7 +131,7 @@ products; their earlier ordering is not approved API scope.
 | Milestone | Sample product | Status / scope owner |
 | --- | --- | --- |
 | M1 — Communicate | Hello Service + Hello Client, now the typed HTTP/JSON exchange | Released in Preview 10; done for now |
-| Web API increment | Nested/collection JSON + typed route-parser case | Active direction; [HTTP tracker](http-capabilities.md#active-direction--minimal-web-api); JSON and direct routing slices implemented; union attributes under investigation |
+| Web API increment | Nested/collection JSON + typed route-parser case | Active direction; [HTTP tracker](http-capabilities.md#active-direction--minimal-web-api); JSON and direct routing slices implemented; generated union mapper experiment validated |
 | M2 — Work with data | File Catalog | Candidate; library/data tracker |
 | M3 — Handle waiting and failure | Download Queue | Candidate; HTTP, library and runtime contracts must be selected together |
 | M4 — Human time and presentation | Activity Report | Candidate; library/data tracker |

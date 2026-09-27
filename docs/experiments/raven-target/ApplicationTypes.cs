@@ -109,7 +109,7 @@ static class ApplicationTypes
         var type = reference.Resolve();
         if (type is null || !Modules.Contains(type.Module) || type.FullName == "System.Unit" || type.Name == "<Module>") return null;
         if (type.HasGenericParameters && !LibraryNames.ContainsKey(type) || type.IsEnum && !FlagsLibrary.IsMatched(type)
-            || type.IsExplicitLayout && !IsEmptyCaseUnion(type) || (type.DeclaringType?.HasGenericParameters ?? false)
+            || type.IsExplicitLayout && !IsEmptyCaseUnion(type) && !IsInt32CaseUnion(type) || (type.DeclaringType?.HasGenericParameters ?? false)
             || (!type.IsInterface && !DelegateLibrary.IsMatched(type) && !FlagsLibrary.IsMatched(type) && !MarkerLibrary.IsMatched(type) && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && !IsModule(type.BaseType?.Resolve()?.Module))
             || !FlagsLibrary.IsMatched(type) && type.Fields.Any(f => f.IsStatic || f.HasMarshalInfo)
             || type.Methods.Any(m => m.IsConstructor && m.IsStatic))
@@ -247,6 +247,31 @@ static class ApplicationTypes
             && caseType.IsSequentialLayout && !caseType.HasFields && !caseType.HasGenericParameters
             && !caseType.HasNestedTypes && type.Fields.Count(field => field != tag
                 && field.Offset > 0 && field.FieldType.Resolve() == caseType) == 1);
+    }
+
+    // A bounded logical tagged-union projection, not general explicit-layout support.
+    // Scalar case payloads have no managed references or raw byte-addressable storage;
+    // neoCLR represents the private tag and case slots as ordinary value fields.
+    public static bool IsInt32CaseUnion(TypeDefinition type)
+    {
+        if (!type.IsValueType || !type.IsSealed || !type.IsExplicitLayout || type.HasGenericParameters
+            || type.Fields.Any(f => !f.IsPrivate || f.IsStatic || f.HasMarshalInfo)
+            || !StandardUnionLibrary.IsCandidate(type)) return false;
+        var cases = RavenUnionMetadata.Cases(type);
+        if (cases.Length == 0 || cases.Length != type.NestedTypes.Count || type.Fields.Count != cases.Length + 1
+            || cases.Where((c, i) => c.Ordinal != i).Any()) return false;
+        var tag = type.Fields.SingleOrDefault(f => f.Name == "<Tag>");
+        if (tag is null || tag.FieldType.MetadataType != MetadataType.Byte || tag.Offset != 0) return false;
+        return cases.All(c =>
+        {
+            var payload = type.NestedTypes.SingleOrDefault(t => t.Name == c.Name
+                && t.FullName.Replace('/', '+') == c.MetadataName);
+            return payload is { IsNestedPublic: true, IsValueType: true, IsSequentialLayout: true,
+                    HasGenericParameters: false, HasNestedTypes: false }
+                && payload.Fields.All(f => f.IsPrivate && !f.IsStatic && !f.HasMarshalInfo
+                    && f.FieldType.MetadataType == MetadataType.Int32)
+                && type.Fields.Count(f => f != tag && f.Offset > 0 && f.FieldType.Resolve() == payload) == 1;
+        });
     }
 
     // Bounded source-library projection. Managed payload unions use
