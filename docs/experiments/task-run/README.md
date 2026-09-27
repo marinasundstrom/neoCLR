@@ -631,7 +631,7 @@ checks pass. Website source/downloads are updated without building the website.
 The [original source integration failures](compiler-gaps/README.md) are corrected.
 The passing consumer now uses unqualified Task.Run, inline value-returning blocks
 and direct completion-only await. Generic-method capture metadata is repaired by the later checkpoint below; ordinary
-generic application-type import remains limited.
+generic state-machine and closure import now has the bounded positive checkpoint below.
 
 ## Shared mutable-local capture checkpoint
 
@@ -738,24 +738,51 @@ captures with value/reference substitutions and existing shared/generic closures
 The original scalar case failed metadata normalization before the fix. This is a
 normal Raven/CLI contract repair, with no neoCLR policy or Runtime Contract option.
 
-The neoCLR [generic consumer](compiler-gaps/GenericCapture.rvn) initially exposed
-the numeric-only generic application specialization guard. The subsequent
-[ordinary helper slice](../generic-helpers/README.md) removes that restriction for
-bounded unconstrained static methods. The consumer now reaches an unsupported
-constructed application async state-machine type and still cannot run. The explicit
-`generic-capture-import-gap` check tracks that next limitation. No native runtime
-failure has been established because import stops first.
-The existing shared-object/block-callback/unwrapping consumer compiles, passes
-typed-stack verification and runs with the expected output against the rebuilt
-bridge and unchanged combined runtime/library/reference.
-No public signatures or implementation APIs change, so the reference assembly is
-reused; the snapshot refresh updates XML only. No full suite or website build.
+The original neoCLR failure moved from generic-method specialization to constructed
+state-machine type import. Both are now addressed by the generic async slice below.
 
-## Next bounded work
+## Generic async application import
 
-Ordinary closed generic helpers now import; see the [focused consumer](../generic-helpers/README.md).
-Add bounded generic application-type import, starting with a holder and its fields
-before revisiting the async state-machine/display-class fixture. This follows Raven's
-normal contract in neoCLR, without a compiler workaround. The independent generic-
-containing-type async arity failure remains Raven-owned; async-lambda-owned/iterator
-captures also need their own bounded coverage.
+Development, 2026-09-27. [GenericCapture.rvn](GenericCapture.rvn) now imports,
+verifies and returns `42`, then `after`, using the normal emitted state machine and
+shared closure. [GenericSuspension.rvn](GenericSuspension.rvn) deliberately leaves
+two promises incomplete in sequence; it checks suspended state before each resume,
+int/string results, captured array identity, a `Holder<string>` result's shared
+identity and cancellation. These are positive source-to-runtime checks, not expected
+import failures.
+
+The importer admits unconstrained generic application classes/generated state types
+with one to four invariant type parameters, ordinary instance members, and
+Object/ValueType bases. It preserves assembly/type identity, validates substituted
+member signatures and retains the existing access and bounded-body checks. Static
+members, generic members on generic owners, generic inheritance/interfaces and
+nested generic owners remain outside this slice. Generic methods on nongeneric
+owners continue using bounded closed specialization; their state and closure type
+definitions are emitted once using the runtime's existing generic type support.
+
+This closes a neoCLR compatibility gap with normal CLI generic state-machine and
+closure metadata; it is not a claim of improvement over CLR async semantics. It
+adds no public APIs, runtime instructions, scheduling policy or Runtime Contract
+options. Existing heap-state policy remains the default. The native runtime and
+System library are unchanged. Costs remain checked importer limits and specialized
+kickoff bodies; no performance claim or unrelated benchmark is made.
+
+Raven's constructed-source-signature fix `4c8d60176` is independently integrated into
+main and as `4cfc75b4e` on neoclr. It recognizes a Reflection.Emit generic definition
+inside a constructed argument; the target MetadataLoadContext cannot load that
+source type. The fix uses the existing persisted signature path. All 16 focused
+ordinary .NET compiler checks pass; this does not certify Framework/NanoFramework.
+
+Run `verify.py` with matching runtime, bridge, System and reference artifacts.
+The focused evidence includes the full Task.Run consumer set, ordinary generic
+helpers, malformed generic metadata, and the ref async protocol checks. See
+[generic-async-validation.json](generic-async-validation.json) for exact results.
+The API snapshot reuses the unchanged reference assembly and refreshes importer/XML
+fingerprints. No website build or full native suite is needed for this importer slice.
+
+## Remaining release work
+
+Functioning async/await is explicitly required for the next release. The separate
+Raven generic-containing-type arity failure and silent async interpolation report
+remain open; see [release tracking](../../tracking/toolchain-release.md).
+This checkpoint does not claim every async shape is release-ready.

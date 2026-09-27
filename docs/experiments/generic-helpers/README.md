@@ -30,12 +30,11 @@ cache reuse, same-named arguments from distinct assemblies, retained visibility/
 origin and unsupported open/byref/constraint/instance shapes. `verify.py` also retains
 source checks for additional Number constraints and a class constraint.
 
-The Task.Run [generic capture fixture](../task-run/compiler-gaps/GenericCapture.rvn)
-now passes helper specialization and reaches the unsupported constructed application
-state-machine type. `verify.py` in that directory checks the specific import failure;
-that program still does not execute. The next bounded slice is generic application
-type import, starting with a small holder before synthesized state-machine/closure
-admission. Raven's independent generic-containing-type async arity bug remains separate.
+The Task.Run [generic capture fixture](../task-run/GenericCapture.rvn) now passes
+helper specialization and constructed application-type import. Its positive check
+requires `42`, then `after`; the [generic async slice](../task-run/README.md#generic-async-application-import)
+adds forced suspension and identity/cancellation coverage. Raven's independent
+generic-containing-type async arity bug remains separate.
 
 ## .NET comparison and decision
 
@@ -59,10 +58,10 @@ claimed, so no benchmark is required for this correctness slice.
 Run `verify.py --runtime ... --bridge ... --system ... --reference ...` with the
 matching development artifacts. It compiles the consumer, performs typed-stack
 verification, runs it, and checks the retained constraint rejections. Run
-`task-run/verify.py --case generic-capture-import-gap` separately to confirm the
-next unsupported contract. No website build or full test suite is required.
+`task-run/verify.py --case generic-capture --case generic-suspension` separately
+for generic async coverage. No website build or full test suite is required.
 
 Recorded result: all checks above pass with the artifacts pinned in
-[validation.json](validation.json). The async import-gap check reaches the recorded
-constructed state-machine rejection. The reference DLL is unchanged because this
+[validation.json](validation.json). That earlier checkpoint recorded a constructed state-machine rejection,
+subsequently closed by the linked generic async slice. The reference DLL is unchanged because this
 slice changes application import only; its importer/XML fingerprints are refreshed.

@@ -1,5 +1,27 @@
 # Raven application types
 
+## Generic application bodies (development, 2026-09-27)
+
+The bridge now also admits bounded unconstrained generic classes/generated async
+state types with one to four invariant type parameters and ordinary instance
+members. Constructed field/member signatures and assembly/type identity are
+preserved. This enables generic methods on nongeneric owners to use the normal
+Raven-generated state machine and shared closure. The existing native generic type
+support executes their definitions; no new VM instruction or ABI is introduced.
+
+[Focused source consumers](experiments/task-run/README.md#generic-async-application-import)
+cover two forced suspensions, shared int/string captures, arrays, a generic holder
+result and cancellation. Metadata checks retain arity, constraint, static-member and
+signature rejection. Generic inheritance/interfaces, generic members on generic
+owners and nested generic owners remain outside this bounded admission. This fills
+a CLI compatibility gap; it does not claim CLR parity or a performance improvement.
+
+Raven's general constructed-source-signature fix `4c8d60176` is integrated into
+main and individually as `4cfc75b4e` on neoclr. Sixteen focused ordinary .NET checks
+pass, including default and target-metadata modes. Runtime Contract configuration,
+semantic behavior and public API signatures do not change. Generic-containing-type
+async arity remains a separate compiler defect.
+
 ## First slice (2026-09-13)
 
 The source import bridge now admits non-generic application classes and value types,

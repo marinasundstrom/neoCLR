@@ -19,7 +19,7 @@ static class UnionImport
     const string Carrier = "System.Result<Int32,System.OverflowError>";
     const string Ok = "System.Result.Ok<Int32>";
     const string Error = "System.Result.Error<System.OverflowError>";
-    sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1, int Argument = -1, MethodDefinition? Function = null, bool VirtualFunction = false, string? FunctionReceiver = null, GenericInstanceMethod? GenericFunction = null);
+    sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1, int Argument = -1, MethodDefinition? Function = null, bool VirtualFunction = false, string? FunctionReceiver = null, GenericInstanceMethod? GenericFunction = null, MethodReference? ConstructedFunction = null);
     sealed record State(List<Slot> Stack, bool[] Assigned);
     sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null, bool ConditionalOutput = false, int[]? Outputs = null);
 
@@ -84,14 +84,14 @@ static class UnionImport
             if (result && ApplicationTypes.IsInitReturn(type)) return "noresult";
             if ((libraryOwner is not null || type is ByReferenceType { ElementType.MetadataType: MetadataType.Int32 or MetadataType.String } || type is ByReferenceType errorReference && ErrorBindings.Type(errorReference.ElementType) is not null) && type is ByReferenceType byref)
                 return ProfileType(byref.ElementType) + "&";
-            if (libraryOwner is not null && type is GenericParameter parameter)
+            if (type is GenericParameter parameter)
             {
-                if (!ApplicationTypes.IsLibraryParameter(parameter) && (parameter.Type != GenericParameterType.Method || parameter.Owner != activeLibraryMethod))
-                    throw new InvalidDataException("Foreign generic parameter in library body.");
+                if (!ApplicationTypes.IsLibraryParameter(parameter) && !ApplicationTypes.IsApplicationParameter(parameter) && (libraryOwner is null || parameter.Type != GenericParameterType.Method || parameter.Owner != activeLibraryMethod))
+                    throw new InvalidDataException("Foreign generic parameter in imported body.");
                 return "T" + parameter.Position;
             }
             if (libraryOwner is not null && ParameterSnapshotBindings.Type(type) is { } snapshot) return snapshot;
-            if (libraryOwner is not null && type is ArrayType { IsVector: true } array)
+            if (type is ArrayType { IsVector: true } array)
                 return "arrayref<" + ProfileType(array.ElementType) + ">";
             if (libraryOwner is not null && type is GenericInstanceType propagation
                 && propagation.ElementType.FullName == "System.Propagatable`3" && RuntimeSignatures.IsCore(propagation.Scope)
@@ -101,7 +101,6 @@ static class UnionImport
             if (collection is not null && collectionProfile) return collection;
             return ApplicationTypes.Type(type) ?? InterfaceBindings.Type(type, libraryOwner is null ? null : t => ProfileType(t)) ?? NativeMemoryBindings.Type(type) ?? ReflectionBindings.Type(type) ?? DelegateBindings.Type(type) ?? ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
         }
-        if (libraryOwner is not null)
         {
             GenericUnionBindings.ParameterMap = parameter => ProfileType(parameter);
             ApplicationTypes.LibraryMap = type => ProfileType(type);
@@ -208,8 +207,8 @@ static class UnionImport
             var emitOwnedStatic = OwnedApplicationStatic(method) || method.DeclaringType.IsInterface && method.IsStatic || libraryOwner is not null && method.IsStatic && !JsonBindings.IsGenericSerializerMethod(method) && ((((StorageItemBindings.IsName(method.DeclaringType.FullName) || ((IPAddressBindings.IsName(method.DeclaringType.FullName) || ((GlobalizationBindings.IsName(method.DeclaringType.FullName) || ComparerBindings.IsName(method.DeclaringType.FullName)) || UriBindings.IsName(method.DeclaringType.FullName))) || PathBindings.IsName(method.DeclaringType.FullName))) || StreamBindings.IsName(method.DeclaringType.FullName)) || (((JsonBindings.IsName(method.DeclaringType.FullName) || HttpBindings.IsName(method.DeclaringType.FullName)) || SocketBindings.IsName(method.DeclaringType.FullName)) || (CancellationBindings.IsReference(method.DeclaringType.FullName) || WorkerBindings.IsName(method.DeclaringType.FullName)))) || AsyncBindings.IsName(method.DeclaringType.FullName) || method.DeclaringType.FullName == "System.Tasks.TaskQueue" || method.DeclaringType.IsValueType || OpaqueLibrary.IsString(method.DeclaringType) || ArrayLibrary.IsMatched(method.DeclaringType) || MarkerLibrary.IsMatched(method.DeclaringType) || DescriptorLibrary.IsProvider(method.DeclaringType));
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !(libraryOwner is not null && t is "Value" or ParameterSnapshotBindings.Vector) && !(libraryOwner is not null && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !(((StorageItemBindings.IsName(t) || ((IPAddressBindings.IsName(t) || ((GlobalizationBindings.IsName(t) || ComparerBindings.IsName(t)) || UriBindings.IsName(t))) || PathBindings.IsName(t))) || StreamBindings.IsName(t)) || (((JsonBindings.IsName(t) || HttpBindings.IsName(t)) || SocketBindings.IsName(t)) || (CancellationBindings.IsReference(t) || WorkerBindings.IsName(t)))) && !ReaderBindings.IsName(t) && !EnumBindings.IsType(t) && !AsyncBindings.IsType(t) && !TaskBindings.IsType(t) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.IsReference(t) && !(t == CancellationBindings.Token || CalendarBindings.Types.Contains(t)) && t != HashCodeBindings.Owner && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
-                throw new InvalidDataException("Unsupported local default in Result profile.");
+            if (locals.Any(t => !(libraryOwner is not null && t is "Value" or ParameterSnapshotBindings.Vector) && !((libraryOwner is not null || ApplicationTypes.IsGenericApplication(method.DeclaringType)) && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !(((StorageItemBindings.IsName(t) || ((IPAddressBindings.IsName(t) || ((GlobalizationBindings.IsName(t) || ComparerBindings.IsName(t)) || UriBindings.IsName(t))) || PathBindings.IsName(t))) || StreamBindings.IsName(t)) || (((JsonBindings.IsName(t) || HttpBindings.IsName(t)) || SocketBindings.IsName(t)) || (CancellationBindings.IsReference(t) || WorkerBindings.IsName(t)))) && !ReaderBindings.IsName(t) && !EnumBindings.IsType(t) && !AsyncBindings.IsType(t) && !TaskBindings.IsType(t) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.IsReference(t) && !(t == CancellationBindings.Token || CalendarBindings.Types.Contains(t)) && t != HashCodeBindings.Owner && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+                throw new InvalidDataException("Unsupported local default in Result profile: " + method.FullName + " (" + string.Join(", ", locals) + ").");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
             var indexes = instructions.Select((i, n) => (i, n)).ToDictionary(p => p.i, p => p.n);
@@ -575,6 +574,11 @@ static class UnionImport
                             && functionTarget.HasThis && !functionTarget.HasParameters
                             && functionTarget.ReturnType.MetadataType == MetadataType.Void
                             && ApplicationTypes.Matches(functionReference, functionTarget);
+                        var genericApplicationCallback = !virtualFunction
+                            && functionReference.DeclaringType is GenericInstanceType
+                            && ApplicationTypes.IsGenericApplication(functionReference.DeclaringType)
+                            && functionTarget.HasThis && functionTarget.IsPublic
+                            && ApplicationTypes.Matches(functionReference, functionTarget);
                         var genericJsonCallback = libraryOwner == JsonBindings.Root && !virtualFunction
                             && functionReference is GenericInstanceMethod callback && HttpJsonBindings.IsGeneric(functionTarget)
                             && functionTarget.DeclaringType.FullName == HttpJsonBindings.Operations && functionTarget.Name == "Convert"
@@ -582,7 +586,7 @@ static class UnionImport
                             && callbackParameter.Owner == method && callbackParameter.Position == 0
                             && ApplicationTypes.Matches(callback.ElementMethod, functionTarget);
                         if (!genericJsonCallback) ApplicationTypes.CheckMethod(functionReference);
-                        if (!ApplicationTypes.IsModule(functionTarget.Module) || (!genericLibraryCallback && !genericJsonCallback && functionReference.FullName != functionTarget.FullName)
+                        if (!ApplicationTypes.IsModule(functionTarget.Module) || (!genericLibraryCallback && !genericApplicationCallback && !genericJsonCallback && functionReference.FullName != functionTarget.FullName)
                             || functionTarget.IsConstructor || (!functionTarget.HasBody && !virtualFunction)
                             || functionTarget.DeclaringType.IsValueType && functionTarget.HasThis)
                             throw new InvalidDataException("Only static or class application delegate targets are admitted: " + functionReference.FullName + "; " + instruction.OpCode);
@@ -599,8 +603,9 @@ static class UnionImport
                             code.AppendLine($"call {checkName}({receiverType})");
                         }
                         Push(new("FunctionAddress", Function: functionTarget, VirtualFunction: virtualFunction,
-                            FunctionReceiver: genericLibraryCallback ? ApplicationTypes.Receiver(functionReference) : null,
-                            GenericFunction: genericJsonCallback ? (GenericInstanceMethod)functionReference : null)); break;
+                            FunctionReceiver: genericLibraryCallback || genericApplicationCallback ? ApplicationTypes.Receiver(functionReference) : null,
+                            GenericFunction: genericJsonCallback ? (GenericInstanceMethod)functionReference : null,
+                            ConstructedFunction: genericApplicationCallback ? functionReference : null)); break;
                     case Code.Newobj:
                         var constructor = (MethodReference)instruction.Operand;
                         var constructorDefinition = constructor.Resolve() ?? throw new InvalidDataException("Unresolved constructor.");
@@ -653,18 +658,28 @@ static class UnionImport
                             var signature = DelegateBindings.Signature(delegateType);
                             TypeReference DelegateTargetType(TypeReference type) => addressSlot.GenericFunction is { } genericFunction
                                 ? RuntimeSignatures.Close(type, genericFunction.DeclaringType, method: genericFunction, allowOpenMethodParameters: true)
-                                : type;
+                                : addressSlot.ConstructedFunction is { } constructedFunction
+                                    ? ApplicationTypes.Close(type, constructedFunction.DeclaringType) : type;
                             var targetArguments = function.Parameters.Select(p => ProfileType(DelegateTargetType(p.ParameterType))).ToArray();
                             var targetResult = ProfileType(DelegateTargetType(function.ReturnType), true);
                             if (!targetArguments.SequenceEqual(signature[..^1]) || (targetResult != signature[^1] && !(targetResult == "noresult" && signature[^1] == "Void")))
                                 throw new InvalidDataException("Delegate target signature mismatch.");
                             if (!function.IsAbstract) pending.Enqueue(function);
+                            if (addressSlot.ConstructedFunction is not null && targetResult != "noresult")
+                            {
+                                code.AppendLine($"delegate.bind {delegateType} = instance {addressSlot.FunctionReceiver}::{ApplicationTypes.MethodName(function)}({string.Join(',', targetArguments)})");
+                                Push(new(delegateType)); break;
+                            }
                             if (function.HasThis)
                             {
                                 var owner = ProfileType(function.DeclaringType);
-                                var adapterName = "DelegateTarget_" + MetadataIdentity.FunctionName(function) + (addressSlot.VirtualFunction ? "Virtual" : "Direct");
+                                var adapterName = "DelegateTarget_" + (addressSlot.ConstructedFunction is not null
+                                    ? function.MetadataToken.ToInt32().ToString(System.Globalization.CultureInfo.InvariantCulture)
+                                    : MetadataIdentity.FunctionName(function)) + (addressSlot.VirtualFunction ? "Virtual" : "Direct");
+                                var adapterArguments = addressSlot.ConstructedFunction is not null
+                                    ? function.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray() : targetArguments;
                                 var callInstruction = addressSlot.VirtualFunction ? "callvirt" : "call";
-                                var body = new StringBuilder($".method instance {adapterName}({string.Join(',', targetArguments)}) -> {signature[^1]}\nldarg 0\n");
+                                var body = new StringBuilder($".method instance {adapterName}({string.Join(',', adapterArguments)}) -> {signature[^1]}\nldarg 0\n");
                                 var adapterOwner = owner;
                                 if (function.DeclaringType.IsInterface)
                                 {
@@ -672,7 +687,7 @@ static class UnionImport
                                     body.AppendLine($"ldfld {adapterOwner}::Target");
                                 }
                                 for (var n = 0; n < targetArguments.Length; n++) body.AppendLine($"ldarg {n + 1}");
-                                body.AppendLine($"{callInstruction} instance {owner}::{ApplicationTypes.MethodName(function)}({string.Join(',', targetArguments)})");
+                                body.AppendLine($"{callInstruction} instance {owner}::{ApplicationTypes.MethodName(function)}({string.Join(',', adapterArguments)})");
                                 if (targetResult == "noresult") body.AppendLine("ldvoid");
                                 body.AppendLine("ret\n.end");
                                 if (function.DeclaringType.IsInterface)

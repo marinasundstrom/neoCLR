@@ -191,8 +191,10 @@ The bridge enables heap states and disables implicit exception capture for this
 profile, preserves target builder metadata and admits same-module internal state
 access. Clearing an awaiter materializes a typed default reference. Source exception
 regions remain rejected. Hoisted aggregates without a default need further validation.
-Generic async methods, async lambdas and broad async
-iteration/disposal are outside the validated PoC. Two existing nested-lambda capture
+Generic async methods on nongeneric owners now have a separate
+[positive import/suspension checkpoint](experiments/task-run/README.md#generic-async-application-import).
+Async methods on generic owners, async lambdas and broad async iteration/disposal
+remain outside the established coverage. Two existing nested-lambda capture
 problems observed during development are deferred compiler candidates; the runnable
 sample uses a named async function and one ordinary callback.
 

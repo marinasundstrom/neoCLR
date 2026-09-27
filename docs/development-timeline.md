@@ -8788,3 +8788,29 @@ async import is now a pre-release requirement, rather than a recommended optiona
 limitation. The assistant will repair neoCLR’s state-machine/closure import path
 against Raven’s normal contract and keep the independent Raven generic-containing-
 type emission issue separate unless needed by that implementation.
+
+
+## 2026-09-27 — Async/await as a release requirement
+
+**Author:** “Having a functioning async await support is crucial for this release.”
+This follows the explicit request to fix generic async support.
+
+**Assistant:** Agreed to treat observable async behavior as a release gate and
+prioritize it over optional APIs. Implemented bounded generic application-type and
+callback import, preserving Raven's normal metadata. The first consumer returns
+`42` and `after`; a stronger consumer forces two suspensions and checks values,
+shared array/object identity and cancellation. Existing Task.Run regression checks
+cover unit/typed work, mutable captures, unwrapping and failures.
+
+The stronger consumer exposed a distinct Raven signature-emission defect for
+constructed source types inside imported generic types. The assistant reduced it
+against ordinary .NET, fixed it on an isolated main-based branch, verified 16 focused
+compiler checks, and integrated general commit `4c8d60176` into main and individually
+as `4cfc75b4e` on neoclr. No target-specific branch was merged wholesale.
+
+**Remaining:** This is a generic-method compatibility checkpoint, not a release
+certification. Generic-containing-type async arity and silent async interpolation
+remain open in [release tracking](tracking/toolchain-release.md). A separate
+System.Runtime target-metadata async-attribute lookup failure discovered during
+reduction is recorded in Raven's compiler documentation. See
+[the implementation/evidence](experiments/task-run/README.md#generic-async-application-import).

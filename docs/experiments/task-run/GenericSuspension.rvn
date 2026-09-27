@@ -1,0 +1,63 @@
+import System.*
+import System.Tasks.*
+import System.Option.*
+import System.Tasks.TaskOutcome.*
+
+class Holder<T> {
+    var Value: T
+
+    init(value: T) {
+        Value = value
+    }
+}
+
+async func Read<T>(initial: T, replacement: T, first: Task<int>, second: Task<int>) -> Task<T> {
+    var value = initial
+    let read: Func<T> = () => value
+    _ = await first
+    value = replacement
+    _ = await second
+    return read()
+}
+
+func Main() -> int {
+    let first = Promise<int>()
+    let second = Promise<int>()
+    let integer = Read<int>(1, 42, first.Task, second.Task)
+    let text = Read<string>("before", "after", first.Task, second.Task)
+    let initial: int[] = [1]
+    let replacement: int[] = [42]
+    let array = Read<int[]>(initial, replacement, first.Task, second.Task)
+    let holder = Holder<string>("shared")
+    let reference = Read<Holder<string>>(Holder<string>("before"), holder, first.Task, second.Task)
+    if integer.IsCompleted || text.IsCompleted || array.IsCompleted || reference.IsCompleted {
+        return 1
+    }
+    _ = first.Complete(0)
+    TaskQueue.Default.Drain()
+    if integer.IsCompleted || text.IsCompleted || array.IsCompleted || reference.IsCompleted {
+        return 2
+    }
+    _ = second.Complete(0)
+    TaskQueue.Default.Drain()
+    if integer.GetResult() != 42 || text.GetResult() != "after" {
+        return 3
+    }
+    array.GetResult()[0] = 7
+    if replacement[0] != 7 || initial[0] != 1 {
+        return 4
+    }
+    reference.GetResult().Value = "retained"
+    if holder.Value != "retained" {
+        return 5
+    }
+    let cancelled = Promise<int>()
+    let stopped = Read<string>("before", "after", cancelled.Task, second.Task)
+    _ = cancelled.Cancel()
+    TaskQueue.Default.Drain()
+    if stopped.Outcome is Some(Cancelled) {
+        Console.WriteLine("Generic suspension passed")
+        return 0
+    }
+    return 6
+}

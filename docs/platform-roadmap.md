@@ -10,6 +10,9 @@ Broaden validation and identify feature finish lines and general bugs before the
 next release. The [toolchain/release assessment](tracking/toolchain-release.md#pre-release-assessment--2026-09-27)
 owns priorities and fresh evidence. Pause automatic feature expansion while this
 assessment is completed; it does not select a release version or reopen Preview 10.
+The author explicitly requires functioning async/await for this release, including
+generic async. The bounded generic-method path now has positive suspension/capture
+coverage; remaining async defects stay ahead of optional API expansion.
 
 **Active direction — minimal Web API (author-selected 2026-09-27).** Focus on
 serving a useful Web API, nested JSON serialization/deserialization, and a
@@ -108,11 +111,11 @@ are corrected: short-name lookup and block-lambda returns use independently test
 Raven fixes integrated into both branches. Direct completion-only await
 now passes with the target compiler unit-result fix. Mutable-local
 sharing in ordinary async methods is corrected by the independently tested Raven
-closure fix. Generic-method capture metadata is also repaired in Raven; the
-[compatibility follow-up](experiments/task-run/compiler-gaps/README.md) is now neoCLR's
-generic application-type importer. [Closed ordinary static helpers](experiments/generic-helpers/README.md)
-now import with unchanged Raven output. Next establish a bounded generic holder
-before generated state-machine/closure types; do not encode that gap as compiler divergence.
+closure fix. Generic-method capture metadata is repaired in Raven.
+[Generic async application import](experiments/task-run/README.md#generic-async-application-import)
+now handles the constructed state machine, shared closure and generic holder, with
+forced suspension, identity and cancellation checks. Closed ordinary static helpers
+and their generated generic types follow normal Raven metadata.
 Async methods inside generic classes have a separately reproduced Raven arity bug.
 Thread's future public role is open.
 M2–M6 remain candidate applications; no complete File Catalog

@@ -20,32 +20,30 @@ for implementation scope and validation.
 
 <a id="separate-general-raven-follow-up-generic-method-closure-metadata"></a>
 
-## Generic captures: compiler repaired, importer gap remains
+## Corrected: generic-method captures and constructed task results
 
 Raven main `586cc8d89` (integrated as `b32459beb` on neoclr) repairs generic
-async capture metadata. Closure fields and state-machine closure references now
-use type-owned generic parameters rather than source-method parameters. Both scalar
-and array captures execute on ordinary .NET with int and string substitutions;
-all 11 focused compiler checks pass. No Runtime Contract option changes.
+async capture metadata. Closure fields and state-machine references use type-owned
+generic parameters. Raven `4c8d60176` (neoclr `4cfc75b4e`) additionally fixes imported
+signatures containing constructed source types such as `Task<Holder<string>>`.
+The latter has independent default/target-metadata .NET execution coverage; all
+16 selected signature, array and capture checks pass. No Runtime Contract options change.
 
-[GenericCapture.rvn](GenericCapture.rvn) now gets past compiler emission and closed
-method specialization. The [ordinary generic helper slice](../../generic-helpers/README.md)
-removes the former numeric-only method restriction. Import now rejects the constructed
-application async state-machine type (``NamespaceMembers/<>c__AsyncStateMachine0`1<System.Int32>``).
-That is missing neoCLR generic application-type import, not a reason to fork Raven's
-capture semantics. `verify.py --case generic-capture-import-gap` checks the specific
-rejection after a raw assembly is emitted; it does **not** claim execution succeeds.
-The intended result after type import support is `42`, then `after`.
+neoCLR now imports the bounded generic state-machine and closure definitions, keeps
+constructed field/member signatures, and binds public callbacks to their constructed
+receivers. [GenericCapture.rvn](../GenericCapture.rvn) is a positive consumer:
+`verify.py --case generic-capture` requires `42`, then `after`.
+[GenericSuspension.rvn](../GenericSuspension.rvn) forces two pending awaits and checks
+value/text results, array/object identity and cancellation. See the
+[generic async checkpoint](../README.md#generic-async-application-import) for scope and evidence.
 
-The next bounded compatibility slice should start with a closed generic application
-holder, preserve field/member signatures and type identity, then revisit the generated
-state machine and display class. Keep unsupported shapes checked; admitting ordinary
-generic helpers alone does not establish support for generated generic types.
-
-Raven also retains `docs/compiler/development/async-generic-containing-type.rvn`:
+Raven retains `docs/compiler/development/async-generic-containing-type.rvn`:
 an async method inside a generic class fails on ordinary .NET with a state-machine
-generic-arity TypeLoadException **without any capture**. That independent Raven
-issue, async-lambda-owned locals and iterator capture planning remain separate.
+generic-arity TypeLoadException without captures. That compiler defect remains a
+separate release follow-up; this fix establishes generic methods on nongeneric owners.
+A separate target-metadata async-attribute lookup failure discovered during reduction
+is recorded in Raven's runtime-contract docs. Async-lambda-owned locals and iterator
+capture planning also need their own bounded coverage.
 
 ## Corrected: direct completion-only await
 

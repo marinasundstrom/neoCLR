@@ -9,6 +9,7 @@ using AssemblyDefinition = Mono.Cecil.AssemblyDefinition;
 if (args.Length == 1 && args[0] == "--generic-helper-checks")
 {
     ApplicationSpecializationChecks.Verify();
+    GenericApplicationChecks.Verify();
     return;
 }
 

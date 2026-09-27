@@ -37,7 +37,7 @@ static class AsyncBindings
             || contract.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant)
             || (interfaceOwner && (!definition.IsAbstract || !definition.IsVirtual)))
             throw new InvalidDataException("Invalid provisional async owner.");
-        var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
+        var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type, allowOpenMethodParameters: GenericUnionBindings.ParameterMap is not null);
         var state = Prefix + "IAsyncStateMachine";
         var payload = reference.DeclaringType is GenericInstanceType g ? GenericUnionBindings.Type(g.GenericArguments[0]) : null;
         var expected = definition.Name switch {
@@ -69,7 +69,7 @@ static class AsyncBindings
     {
         if (reference is not GenericInstanceMethod generic || Type(reference.DeclaringType) is not { } owner
             || !owner.StartsWith(Prefix + "AsyncTaskMethodBuilder<")) return null;
-        _ = RuntimeSignatures.Match(reference, definition, t => map(t));
+        _ = RuntimeSignatures.Match(reference, definition, t => map(t), allowOpenMethodParameters: GenericUnionBindings.ParameterMap is not null);
         if (!definition.DeclaringType.IsSealed || definition.DeclaringType.IsValueType || definition.IsConstructor)
             throw new InvalidDataException("Invalid by-reference async builder owner.");
         var start = definition.Name == "Start";
@@ -93,9 +93,9 @@ static class AsyncBindings
         var stateType = generic.GenericArguments.Last();
         var state = map(stateType);
         var stateDefinition = stateType.Resolve();
-        if (!ApplicationTypes.IsModule(stateDefinition.Module) || stateDefinition.HasGenericParameters
+        if (!ApplicationTypes.IsModule(stateDefinition.Module) || stateDefinition.HasGenericParameters && !ApplicationTypes.IsGenericApplication(stateType)
             || !stateDefinition.Interfaces.Any(i => i.InterfaceType.FullName == Prefix + "IAsyncStateMachine" && RuntimeSignatures.IsCore(i.InterfaceType.Scope)))
-            throw new InvalidDataException("Async state must be an admitted non-generic application state machine.");
+            throw new InvalidDataException("Async state must be an admitted application state machine.");
         var machine = Prefix + "IAsyncStateMachine";
         if (start)
         {

@@ -997,8 +997,9 @@ and 1/0 hashes. This does not enable Boolean record components or typed Boolean 
 
 The application reference now exposes generic ref Start<TState> and
 AwaitOnCompleted<TAwaiter,TState>. The importer validates these exact core contracts
-and specializes them for nongeneric application state machines and target Task
-awaiters. Startup invokes MoveNext on existing storage. Pending registration retains
+and specializes them for admitted application state machines and target Task
+awaiters. The [generic-method extension](../task-run/README.md#generic-async-application-import)
+also preserves constructed state-machine and closure types. Startup invokes MoveNext on existing storage. Pending registration retains
 one state owner in the shared class builder, boxing only on the first suspension of
 a value state. Later suspensions use the same owner; completion/cancellation clears
 the builder's retained reference. No frame-backed ref escapes.
@@ -1014,8 +1015,9 @@ from the heap/value choice; ordinary .NET policy remains unchanged. RavenHeapAsy
 state when written after the neoCLR props import. The default remains true.
 
 The compiler-facing builder APIs are transitional and may be removed for runtime
-suspension. This does not add generic async methods, custom awaiters, CLR exception
-capture or a new scheduler. See [the experiment](../value-async/README.md) and the
+suspension. Generic methods on nongeneric owners now have a separate positive
+import checkpoint; custom awaiters, CLR exception capture and a new scheduler
+remain outside this protocol. See [the experiment](../value-async/README.md) and the
 [on-site protocol reference](../../../api-docs/async-builders.md).
 
 Raven target policy fix: `89a40051e` on `codex/async-preview-readiness`; six existing

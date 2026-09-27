@@ -44,9 +44,10 @@ Importing `System.Tasks.*` supports `Task.Run` alongside `Task<T>` without an al
 Inline block callbacks infer their value result; an explicitly typed delegate local
 is optional. Direct completion-only await uses the ordinary Task protocol. Mutable locals in
 ordinary async methods share storage with their callbacks,
-including across suspension. Generic async capture metadata is corrected in the
-compiler. Closed ordinary static generic helpers now import, but generated generic
-async state-machine and closure types remain outside the application's import scope.
+including across suspension. Generic async methods on nongeneric owners now support shared captures and
+constructed state-machine types. Development checks cover two suspensions,
+value/text results, array/object identity and cancellation. Async methods inside
+generic classes and broader async-lambda shapes still need further work.
 
 [Download the compiled shared-capture example](../../samples/task-run.rvn) ·
 [Overload and lifetime reference](../../docs/callbacks.html#task.run-development)

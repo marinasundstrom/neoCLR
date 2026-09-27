@@ -1,0 +1,78 @@
+{
+  "date": "2026-09-27",
+  "status": "development checkpoint, not release certification",
+  "neoclr_base": "ac19175c4dfaa9617780818d066228cb0d4935ed",
+  "raven_general_fix": "4c8d60176",
+  "raven_main": "bcc99d41eec34209d3c10b6b8b7e5a85c3f010f8",
+  "raven_neoclr": "4cfc75b4e52df12fe9d83a76336e1c9ca61d1d70",
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "sources": {
+    "docs/experiments/raven-target/ApplicationTypes.cs": "e6a1c87816008dc602685d45cfeaba479c7a7ede7ab5edff3ec4f8234ee42933",
+    "docs/experiments/raven-target/UnionImport.cs": "4c88db1490bd9c853777f5d15e7353d45a9714d1c7e7f5012879fcaf27e7a18d",
+    "docs/experiments/raven-target/AsyncBindings.cs": "0cf845c7d30b6d8903bde1ed9873cc2056468fb74ee4c6a858f5923b8e259e47",
+    "docs/experiments/raven-target/TaskBindings.cs": "b3963f59f2b665787ac676f5bd18861b0f0ff20eb287e2d86e1f7cc91aa7b9d3",
+    "docs/experiments/raven-target/GenericApplicationChecks.cs": "41a0477ff2df1e94c367dfcd3f2848d7d56b7b5ba788c107a637731cbf88e462",
+    "docs/experiments/raven-target/Program.cs": "49407c328dae36d9eb134b496087a4ca34c70f9c396637dfe5d68eff5948cbab",
+    "docs/experiments/task-run/GenericCapture.rvn": "36ff84e8fa88c37bbd74d11d3dd8a822613da0d9be4d131ffbbdfb24ded5d3df",
+    "docs/experiments/task-run/GenericSuspension.rvn": "23e81bd58ad771e41b15890b7cd909515817df8d2b41f8a0133c75344ca1505b",
+    "docs/experiments/task-run/verify.py": "9ce0b122e360291b8496f474b5894217e58ddf487df72c516cca7af724962cbc"
+  },
+  "artifacts": {
+    "runtime": "0bef6cd0f8a067a723e6dbdb278d55761c5a90a53cd952e19252dcfe1ebd6223",
+    "bridge": "1dee1ab34df1953656d53266b7fe957b89a1b3ef4c548fbfa5c9887b8e859f4c",
+    "compiler": "2c129a1cb0d35f8dfeb78b58f7ae893b604f9fc629ee55f8e387774a55ebf622",
+    "reference": "01327a5beeb2c366246cf7c031962e9b051821612c26f561c756997b4b966429",
+    "system": "b944ad08760589ffa1409403e1d6c0e1cf3c3af49312bca5e28ade6b7aba4cc1"
+  },
+  "checks": {
+    "task_run_consumers": [
+      "generic-capture: passed",
+      "generic-suspension: passed",
+      "block-lambda: passed",
+      "unqualified-run: passed",
+      "unit-await: passed",
+      "mutable-capture: passed",
+      "mutable-capture-inline: passed",
+      "capture-and-unwrap: passed",
+      "unobserved-work: passed",
+      "unwrap-unit: passed",
+      "cancelled-inner: passed",
+      "callback-fault: passed"
+    ],
+    "generic_helpers": [
+      "Generic specialization: signatures, caching, identity, visibility and rejection checks passed",
+      "Generic application types: identity, substitution and malformed/unsupported metadata checks passed",
+      "ImportedUnion: typed-stack/control-flow verification passed (4126 IL functions; maximum stack 7; runtime value checks remain)",
+      "Generic helpers: execution and reference/array identity passed",
+      "Generic helpers: unsupported constraints remain rejected"
+    ],
+    "ref_protocol": "2 valid and 4 rejected contracts passed",
+    "compiler": "16 ordinary .NET signature/array/capture checks passed; new constructed-source regression fails target-metadata mode before fix and passes both modes after fix",
+    "api_snapshot": "passed, unchanged reference DLL"
+  },
+  "scope": {
+    "generic_method_owners": "nongeneric types",
+    "application_type_parameters": "1\u20134 invariant, unconstrained",
+    "covered": [
+      "two forced suspensions",
+      "int/string captures",
+      "array identity",
+      "constructed generic object identity",
+      "cancellation",
+      "unit/typed Task.Run",
+      "task unwrapping",
+      "worker faults",
+      "foreign type parameter rejection"
+    ],
+    "remaining": [
+      "Raven generic-containing-type async arity",
+      "silent async interpolation report",
+      "separate System.Runtime target-metadata async builder attribute lookup"
+    ],
+    "not_run": [
+      "full native suite",
+      "website build",
+      "performance benchmark"
+    ]
+  }
+}

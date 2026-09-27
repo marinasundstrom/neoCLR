@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Support bounded generic async methods on nongeneric application owners by
+  importing their constructed state-machine and shared closure types. Preserve
+  substituted members, callback receivers, type identity and access checks.
+  Add positive two-suspension, capture, identity and cancellation consumers;
+  retain malformed generic/ref protocol checks. Integrate Raven's independently
+  tested general fix for constructed source types in target generic signatures.
+  Async methods inside generic classes and the reported interpolation defect
+  remain release follow-ups; no public signatures or Runtime Contract options change.
+
 - Record the author-selected pre-release assessment on main: feature finish lines,
   confirmed format/Clippy and stale union-probe gate failures, current async
   reproduction results and broader native/integration evidence. Separate supported

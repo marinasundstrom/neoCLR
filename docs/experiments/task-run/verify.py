@@ -14,6 +14,8 @@ tools = {name: getattr(args, name).resolve() for name in ('runtime', 'bridge', '
 here = Path(__file__).resolve().parent
 prefix = 'import System.*\nimport System.Tasks.*\nalias Task = System.Tasks.Task\n'
 cases = [
+    ('generic-capture', (here / 'GenericCapture.rvn').read_text(), 0, '42\nafter\n', None),
+    ('generic-suspension', (here / 'GenericSuspension.rvn').read_text(), 0, 'Generic suspension passed\n', None),
     ('block-lambda', (here / 'BlockLambda.rvn').read_text(), 42, '', None),
     ('unqualified-run', (here / 'Unqualified.rvn').read_text(), 42, '', None),
     ('unit-await', (here / 'UnitAwait.rvn').read_text(), 0, 'completed\n', None),
@@ -65,12 +67,3 @@ with tempfile.TemporaryDirectory(prefix='neoclr-task-run-') as directory:
         assert result.returncode == code and result.stdout == output, (name, result.returncode, result.stdout, result.stderr)
         assert (error in result.stderr if error else result.stderr == ''), (name, result.stderr)
         print(name + ': passed', flush=True)
-
-    if not args.case or 'generic-capture-import-gap' in args.case:
-        (root / 'Main.rvn').write_text((here / 'compiler-gaps/GenericCapture.rvn').read_text())
-        compiled = run(['dotnet', tools['bridge'], '--project', root / 'Contracts.rvnproj', root / 'generic-capture'])
-        assert (root / 'generic-capture/App.raw.dll').stat().st_size > 0
-        expected = 'Unsupported Result profile type: NamespaceMembers/<>c__AsyncStateMachine'
-        assert compiled.returncode != 0 and expected in compiled.stderr, (compiled.stdout, compiled.stderr)
-        assert '<System.Int32>' in compiled.stderr, compiled.stderr
-        print('generic-capture-import-gap: confirmed current importer limitation', flush=True)

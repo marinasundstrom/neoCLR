@@ -370,12 +370,13 @@ The static System.Tasks.Task owner and all three Run overloads have public inven
 and XML coverage. The matching bridge/reference/library implement shared captures,
 completion-only and typed work, and async unwrapping. ScheduleTask and helper carriers
 remain private implementation details. [The callback guide](callbacks.md#task.run-development)
-records native execution, invocation limits, default-queue behavior and the separate
-generic application import limitation. Inline block callbacks now infer their value result.
+records native execution, invocation limits, default-queue behavior and the bounded
+generic application import contract. Inline block callbacks now infer their value result.
 Ordinary async mutable-local sharing is corrected by the integrated Raven closure fix.
 Direct completion-only await is corrected by the target compiler unit-result fix.
 Generic capture metadata is corrected in Raven; neoCLR admits bounded ordinary closed
-static generic helpers, while constructed application async state machines remain unsupported. The XML-only API snapshot
+static generic helpers and their constructed async state-machine/closure types. Two
+forced suspensions, captures, identity and cancellation have dedicated consumers. The XML-only API snapshot
 refresh preserves the unchanged reference assembly; the
 existing library snapshot is reused. No full suite or website build is part of this slice.
 

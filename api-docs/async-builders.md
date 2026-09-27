@@ -28,8 +28,8 @@ allowing runtime-owned suspension later; it is not a prerequisite for those APIs
 The builder remains a class with shared completion storage. The development
 reference exposes `Start<TState>(ref TState)` and
 `AwaitOnCompleted<TAwaiter,TState>(ref TAwaiter, ref TState)`. The importer specializes
-these calls for admitted non-generic application state machines and target Task
-awaiters; it does not execute declaration-only reference assembly bodies.
+these calls for admitted application state machines, including the bounded generic-method path,
+and target Task awaiters; it does not execute declaration-only reference assembly bodies.
 
 Start invokes MoveNext against the existing state storage. A struct is copied into
 one box when its first await is pending; later continuations reuse that owner.
@@ -40,7 +40,8 @@ managed reference is retained in a callback or field.
 
 Bootstrap library metadata retains its by-value Start/AwaitOnCompleted helpers;
 application metadata exposes the validated ref projection. This is a bounded bridge
-protocol, not general support for arbitrary custom builders or generic async methods.
+protocol; generic methods on nongeneric owners are supported, but arbitrary custom
+builders and async methods inside generic classes remain outside the established scope.
 The heap policy remains the default until wider validation justifies changing it.
 A value state does not eliminate Promise, Task, dispatcher or continuation allocations.
 

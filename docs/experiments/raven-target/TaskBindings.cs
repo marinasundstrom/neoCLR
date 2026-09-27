@@ -182,7 +182,7 @@ static class TaskBindings
             _ => throw new InvalidDataException("Unsupported Task member: " + definition.FullName)
         };
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type,
-            allowOpenMethodParameters: library);
+            allowOpenMethodParameters: library || GenericUnionBindings.ParameterMap is not null);
         if (string.Join(',', args) != expected.Item1 || result != expected.Item2)
             throw new InvalidDataException("Unsupported Task signature.");
         return construct
@@ -206,7 +206,7 @@ static class TaskBindings
         var payload = generic is null ? "Void" : GenericUnionBindings.Type(generic.GenericArguments[0]);
         if (payload is null) throw new InvalidDataException("Unsupported Task.Run payload.");
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type,
-            allowOpenMethodParameters: library);
+            allowOpenMethodParameters: library || GenericUnionBindings.ParameterMap is not null);
         if (args.Length != 1 || result != Prefix + "Task<" + payload + ">"
             || (args[0] != "System.Func<" + payload + ">"
                 && (generic is null || args[0] != "System.Func<" + result + ">")))
