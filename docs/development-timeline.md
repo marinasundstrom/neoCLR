@@ -8842,3 +8842,22 @@ workspace and separate server/client terminals; the client returned accepted:tru
 and the server was left listening on loopback port 61515. See the
 [local snapshot](local-sdk-snapshot.md) for paths and evidence. No release was
 published; silent interpolation and canonical gate failures remain tracked.
+
+## 2026-09-27 — Investigating sample server CPU
+
+**Author:** Asked to run the sample server, investigate high CPU and determine
+whether optimization is needed. This follows the preference to optimize only when
+it materially matters.
+
+**Assistant actions:** Ran fresh installed servers, measured idle and request CPU,
+collected native sampling profiles, repeated small GET/POST requests and a header
+size sweep. Identified two older Raven language servers near one core each; did not
+terminate them or infer a managed root cause. HTTP steady idle used 0.4–0.9% over
+ten-second windows; requests used about 1–1.7 CPU seconds and 1 KB headers over
+three CPU seconds. A 2,049-byte header reproduced the sample's fatal limit error.
+
+**Assistant recommendation:** Repair per-request error handling, then profile-guided
+loaded metadata lookup caching/indexing; retain quota, identity and access contracts.
+Reassess synchronization after measuring that bounded change. This is an investigation
+and recommendation, not an implemented optimization or approval of a broad redesign.
+See [evidence and limitations](experiments/http-json/cpu-investigation-20260927.md).

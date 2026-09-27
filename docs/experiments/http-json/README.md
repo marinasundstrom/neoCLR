@@ -134,3 +134,8 @@ against Python. See [payload evidence](../json-object-mapping/payload-validation
 name values, missing names and null names return 400. See the
 [nested mapper evidence](../json-object-mapping/README.md#nested-objects--development-2026-09-27).
 The default DOM and `--mapped` flat variants keep their wire formats.
+
+See the [2026-09-27 CPU investigation](cpu-investigation-20260927.md) for measured
+idle versus request cost, header-size scaling, the sample's fatal over-limit path,
+and the proposed bounded optimization sequence. No runtime optimization is included
+in that investigation.

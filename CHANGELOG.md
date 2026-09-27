@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Investigate installed HTTP server CPU with repeatable idle/request profiles and
+  header-size measurements. Record low steady idle cost, substantial metadata/quota
+  execution overhead, and fatal sample handling of over-limit requests. Separate
+  old high-CPU Raven language servers from runtime findings; propose focused fixes
+  without changing runtime behavior, limits or scheduling.
+
 - Build and locally install matching SDK/VSIX `0.1.12-neoclr.20260927.async2`
   with the async compiler corrections. Verify installed generic async consumers,
   editor completion and HTTP client/server behavior; open the editable workspace

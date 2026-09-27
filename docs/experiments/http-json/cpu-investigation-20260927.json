@@ -1,0 +1,218 @@
+{
+  "date": "2026-09-27",
+  "status": "local diagnostic baseline; no runtime optimization applied",
+  "toolchain": "03947b07e6594c5dfacb95ff51e9b7feb854b7dd",
+  "raven": "b7bc6838d",
+  "host": "macOS arm64 Apple M1, 16 GB",
+  "method": "macOS ps cumulative process CPU time, monotonic elapsed time, sample at 1 ms; sequential requests on release runner with existing 1024-object/100000000-instruction limits",
+  "limitations": [
+    "Background load includes two older Raven language servers each near one core and mediaanalysisd; not controlled throughput qualification",
+    "ps CPU time has centisecond resolution",
+    "Short post-response idle windows can include completion cleanup; retained rather than discarded",
+    "Native language-server sample does not identify the managed source-level root cause"
+  ],
+  "baseline": {
+    "pid": 57248,
+    "port": 62205,
+    "startup_wall_seconds": 4.808382417,
+    "startup_cpu_seconds": 4.35,
+    "idle_before": {
+      "wall_seconds": 10.005140124999999,
+      "cpu_seconds": 0.040000000000000036
+    },
+    "requests": [
+      {
+        "method": "GET",
+        "status": 200,
+        "body": "{\"station\":\"Caf\u00e9\"}",
+        "wall_seconds": 1.1723672500000006,
+        "cpu_seconds": 0.9099999999999993
+      },
+      {
+        "method": "POST",
+        "status": 201,
+        "body": "{\"accepted\":true}",
+        "wall_seconds": 1.9823240830000017,
+        "cpu_seconds": 1.4000000000000004
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "body": "{\"station\":\"Caf\u00e9\"}",
+        "wall_seconds": 1.411347750000001,
+        "cpu_seconds": 1.0300000000000002
+      },
+      {
+        "method": "POST",
+        "status": 201,
+        "body": "{\"accepted\":true}",
+        "wall_seconds": 1.5528285410000002,
+        "cpu_seconds": 1.3600000000000003
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "body": "{\"station\":\"Caf\u00e9\"}",
+        "wall_seconds": 1.1372448340000005,
+        "cpu_seconds": 1.08
+      },
+      {
+        "method": "POST",
+        "status": 201,
+        "body": "{\"accepted\":true}",
+        "wall_seconds": 1.9535568750000003,
+        "cpu_seconds": 1.6500000000000004
+      }
+    ],
+    "idle_after": {
+      "wall_seconds": 10.005115166000003,
+      "cpu_seconds": 0.08999999999999986
+    },
+    "exit_code": 0
+  },
+  "repeat": {
+    "pid": 59350,
+    "port": 62355,
+    "startup_wall_seconds": 5.748334,
+    "startup_cpu_seconds": 4.78,
+    "idle_before": {
+      "wall_seconds": 2.0025904579999985,
+      "cpu_seconds": 0.009999999999999787
+    },
+    "requests": [
+      {
+        "method": "GET",
+        "status": 200,
+        "body": "{\"station\":\"Caf\u00e9\"}",
+        "wall_seconds": 2.029722999999999,
+        "cpu_seconds": 1.2199999999999998
+      },
+      {
+        "method": "POST",
+        "status": 201,
+        "body": "{\"accepted\":true}",
+        "wall_seconds": 2.1545722079999994,
+        "cpu_seconds": 1.4200000000000008
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "body": "{\"station\":\"Caf\u00e9\"}",
+        "wall_seconds": 1.5766501249999987,
+        "cpu_seconds": 1.1600000000000001
+      },
+      {
+        "method": "POST",
+        "status": 201,
+        "body": "{\"accepted\":true}",
+        "wall_seconds": 1.5374236659999987,
+        "cpu_seconds": 1.4299999999999997
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "body": "{\"station\":\"Caf\u00e9\"}",
+        "wall_seconds": 0.991768417000003,
+        "cpu_seconds": 0.9700000000000006
+      },
+      {
+        "method": "POST",
+        "status": 201,
+        "body": "{\"accepted\":true}",
+        "wall_seconds": 1.552294958000001,
+        "cpu_seconds": 1.4399999999999995
+      }
+    ],
+    "idle_after": {
+      "wall_seconds": 2.005107332999998,
+      "cpu_seconds": 0.0600000000000005
+    },
+    "exit_code": 0
+  },
+  "headers": {
+    "requests": [
+      {
+        "header_bytes": 128,
+        "wall_seconds": 0.7371778329999996,
+        "response": "HTTP/1.1 200 OK\r\nContent-Length: 19\r\nConnection: close\r\nContent-Type: application/json; charset=utf-8\r\n\r\n{\"station\":\"Caf\u00e9\"}",
+        "cpu_seconds": 0.7300000000000004
+      },
+      {
+        "header_bytes": 1024,
+        "wall_seconds": 3.2384387500000003,
+        "response": "HTTP/1.1 200 OK\r\nContent-Length: 19\r\nConnection: close\r\nContent-Type: application/json; charset=utf-8\r\n\r\n{\"station\":\"Caf\u00e9\"}",
+        "cpu_seconds": 3.209999999999999
+      },
+      {
+        "header_bytes": 2049,
+        "wall_seconds": 4.350135875000001,
+        "response": "",
+        "cpu_seconds": 4.260000000000002
+      }
+    ],
+    "exit_code": 1
+  },
+  "headers_repeat": {
+    "requests": [
+      {
+        "header_bytes": 128,
+        "wall_seconds": 0.9826296249999995,
+        "response": "HTTP/1.1 200 OK\r\nContent-Length: 19\r\nConnection: close\r\nContent-Type: application/json; charset=utf-8\r\n\r\n{\"station\":\"Caf\u00e9\"}",
+        "cpu_seconds": 0.8600000000000003
+      },
+      {
+        "header_bytes": 1024,
+        "wall_seconds": 3.626948917,
+        "response": "HTTP/1.1 200 OK\r\nContent-Length: 19\r\nConnection: close\r\nContent-Type: application/json; charset=utf-8\r\n\r\n{\"station\":\"Caf\u00e9\"}",
+        "cpu_seconds": 3.49
+      },
+      {
+        "header_bytes": 2049,
+        "wall_seconds": 4.632107292000001,
+        "response": "",
+        "cpu_seconds": 4.4399999999999995
+      }
+    ],
+    "exit_code": 1
+  },
+  "profile": {
+    "idle_main_thread_samples": 2296,
+    "idle_main_thread_park_samples": 2282,
+    "request_main_thread_samples": 3256,
+    "top_of_stack_counts": {
+      "Module::type_definition": 421,
+      "vm::resolve": 346,
+      "pthread_mutex_lock": 389,
+      "pthread_mutex_unlock": 176,
+      "Access::check_arrays": 230,
+      "Slot::array_usage": 154,
+      "frame_array_usage": 151
+    },
+    "interpretation": "repeated linear metadata resolution and per-instruction quota/slot synchronization are optimization candidates; no speedup claim"
+  },
+  "other_processes": [
+    {
+      "pid": 37889,
+      "command": "cached Raven.LanguageServer.dll b63b199630ca",
+      "cpu_percent_observed": 99.6,
+      "age_observed": "5 days 23 hours"
+    },
+    {
+      "pid": 38069,
+      "command": "cached Raven.LanguageServer.dll a7dd2984b8a1",
+      "cpu_percent_observed": 100.0,
+      "age_observed": "19 hours 56 minutes",
+      "sample_physical_footprint": "10.1 GB",
+      "sample_peak_physical_footprint": "12.8 GB"
+    }
+  ],
+  "previous_server": "PID 48203 had already exited with Request header limit exceeded; synthetic 2049-byte headers reproduce the same fatal sample path. The actual previous request headers were not captured.",
+  "artifact_sha256": {
+    "runner": "02503b01a692e16000a770dd3cf5f415c1e4cd513f068466998f3ddfc3ffd027",
+    "server": "2949bb1b0f6e6539205c4b9d8c7148f00a42535772ef94439fb1a981f1e23a03",
+    "system": "b944ad08760589ffa1409403e1d6c0e1cf3c3af49312bca5e28ade6b7aba4cc1",
+    "idle_profile": "7a8f3afb0375ca6a4d6aa9dc177a7ff1c0eb886cdb0b37541b9ec8c804e61809",
+    "request_profile": "9ca16408fdb1abcf8e4dd85bf8b271195578fffbf27ddf2ea05cfa25466ff0b0"
+  },
+  "raw_diagnostics": "/Users/robert/Projects/neoclr/target/http-cpu-investigation"
+}

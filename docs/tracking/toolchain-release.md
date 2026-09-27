@@ -131,3 +131,15 @@ the async work. [The installed snapshot](../local-sdk-snapshot.md) records neoCL
 independent HTTP requests and the Raven pair. The server remains available in a
 Terminal window; the client returned accepted:true. This is local development
 evidence, not a published release or a waiver of the open gates above.
+
+## HTTP CPU investigation — 2026-09-27
+
+[Measured idle/request behavior](../experiments/http-json/cpu-investigation-20260927.md)
+separates two old high-CPU Raven language servers from the HTTP runtime. The fresh
+HTTP sample is cheap at steady idle, but tiny requests consume roughly 1–1.7 CPU
+seconds; 1 KB of headers costs 3.2–3.5 CPU seconds. Recommend a bounded loaded
+metadata lookup optimization, with before/after checks preserving quotas and
+identity/access contracts. First fix the sample exiting on over-limit requests.
+These are findings and proposed follow-ups, not completed fixes or a new numeric
+release threshold. Editor diagnosis belongs in Raven; do not change the HTTP
+scheduler to address those unrelated processes.
