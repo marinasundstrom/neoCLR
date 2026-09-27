@@ -1046,7 +1046,7 @@
     <member name="P:System.Introspection.MethodInfo.DefinitionIndex"><summary>Gets the runtime definition index. This is not a metadata token or persistent ID; interpret it with the member kind and declaring type.</summary></member>
     <member name="P:System.Introspection.MethodInfo.IsReceiverByRef"><summary>Reports whether the instance receiver is passed by reference.</summary></member>
     <member name="P:System.Introspection.MethodInfo.IsReadOnly"><summary>Reports a read-only instance receiver.</summary></member>
-    <member name="P:System.Introspection.MethodInfo.IsVirtual"><summary>Reports a virtual method or interface contract.</summary></member>
+    <member name="P:System.Introspection.MethodInfo.IsVirtual"><summary>Reports a virtual method or interface dispatch contract. Ordinary static interface helpers are not virtual.</summary></member>
     <member name="P:System.Introspection.MethodInfo.IsOverride"><summary>Reports an override declaration.</summary></member>
     <member name="P:System.Introspection.MethodInfo.IsAbstract"><summary>Reports a bodyless method or interface contract.</summary></member>
     <member name="T:System.Introspection.PropertyInfo"><summary>Describes a retained property declaration in the loaded program.</summary><remarks>Development after Preview 9. Object equality uses descriptor kind, closed declaring type and definition index. Repeated wrappers can compare equal; Object hashes agree and ToString returns Name, not a complete signature. This API describes metadata and does not invoke, read or write application members. See the introspection guide for query and identity limitations.</remarks></member>

@@ -1,0 +1,48 @@
+import System.*
+
+interface Calculation {
+    static func Offset() -> int => 2
+
+    private static func Twice(value: int) -> int => value * 2
+
+    func Seed() -> int
+
+    func Calculate() -> int => Calculation.Twice(Seed()) + Calculation.Offset()
+
+    func Show() {
+        Console.WriteLine(Calculate())
+    }
+}
+
+class DefaultCalculation : Calculation {
+    func Seed() -> int => 20
+}
+
+class CustomCalculation : Calculation {
+    func Seed() -> int => 5
+
+    func Calculate() -> int => 99
+}
+
+func Main() {
+    let normal: Calculation = DefaultCalculation()
+    let custom: Calculation = CustomCalculation()
+    if normal.Calculate() != 42 || custom.Calculate() != 99 || Calculation.Offset() != 2 {
+        System.Fault("Interface helper contract failed")
+    }
+    var foundOffset = false
+    for member in typeof(Calculation).GetMethods() {
+        if member.Name == "Offset" {
+            foundOffset = true
+            if !member.IsStatic || member.IsVirtual || member.IsAbstract {
+                System.Fault("Static helper metadata contract failed")
+            }
+        }
+    }
+    if !foundOffset {
+        System.Fault("Static helper metadata missing")
+    }
+    normal.Show()
+    custom.Show()
+    Console.WriteLine("Interface helper contracts passed")
+}

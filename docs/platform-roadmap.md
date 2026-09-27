@@ -57,6 +57,11 @@ evidence; all numeric parsers use NumberParseError. A parsing interface is on ho
 identified [general interface capabilities](tracking/runtime-language.md#interfaces-as-a-platform-capability)
 as important direction: static members, default bodies and member access control.
 Number is a first consumer, not a permanent numeric-only interface model.
+The next bounded interface slice adds application defaults and public/private static
+helpers through Raven, with [focused evidence](experiments/interface-helpers/README.md).
+The [interface limitations table](tracking/runtime-language.md#interface-limitations--development-checkpoint-2026-09-27)
+separates native support from Raven import gaps, including explicit implementations,
+private instance helpers and broader static/default/accessibility cases.
 M2–M6 remain candidate applications; no complete File Catalog
 or additional HTTP feature is required by the comparer slice.
 

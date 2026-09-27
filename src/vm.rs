@@ -533,7 +533,6 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             ));
         }
         let nominal_interface_contract = crate::interfaces::is_contract(module, function)
-            && crate::interfaces::is_bodyless(module, function)
             && !function.receiver_byref
             && !function.receiver_readonly;
         let value_receiver = function.instance
@@ -902,17 +901,20 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     if callee.is_abstract && !matches!(op, Op::CallVirtual(_)) {
                         return Err(Fault::new("abstract methods require virtual dispatch"));
                     }
-                    let interface_call = crate::interfaces::is_contract(module, &callee);
+                    let interface_call = crate::interfaces::is_contract(module, &callee)
+                        && !crate::interfaces::is_helper(&callee);
                     let ordinary_class_instance = callee.instance
                         && !callee.receiver_byref
                         && callee
                             .owner
                             .as_ref()
                             .is_some_and(|owner| module.is_reference_type(owner));
-                    let supports_virtual_call = interface_call
+                    let supports_virtual_call = (interface_call
                         || callee.is_virtual
                         || ordinary_class_instance
-                        || crate::delegates::is_contract(module, &callee);
+                        || crate::delegates::is_contract(module, &callee))
+                        && !(crate::interfaces::is_contract(module, &callee)
+                            && crate::interfaces::is_helper(&callee));
                     if (interface_call
                         && (!matches!(op, Op::CallVirtual(_))
                             || !callee.interface_implementations.is_empty()))
@@ -2190,11 +2192,6 @@ fn interpret_instructions(
                             interface,
                             &contract,
                         )?;
-                        if crate::interfaces::is_contract(module, &callee) {
-                            return Err(Fault::new(
-                                "nominal interface dispatch requires a concrete class method",
-                            ));
-                        }
                         if callee.receiver_byref {
                             if module.is_reference_type(object.reference.target()) {
                                 return Err(Fault::new("boxed dispatch requires a value payload"));
@@ -2608,7 +2605,9 @@ fn interpret_instructions(
                 }
                 Op::Call(target) => {
                     let callee = resolve(module, target)?;
-                    if crate::interfaces::is_contract(module, &callee) {
+                    if crate::interfaces::is_contract(module, &callee)
+                        && !crate::interfaces::is_helper(&callee)
+                    {
                         return Err(Fault::new("interface declarations require callvirt"));
                     }
                     crate::access::check_call(module, Some(&function), &callee)?;

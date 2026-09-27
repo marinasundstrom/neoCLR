@@ -146,3 +146,13 @@ providers, returns Result for validation failures, and preserves terminal user F
 Application instance properties and their original tokens are now projected; static
 properties remain outside the importer and init-only setters are omitted from assignment.
 Method/accessor visibility queries use retained source accessibility when available.
+
+
+### Interface method flags (development)
+
+For admitted application interfaces, public instance defaults are virtual and have
+bodies (`IsAbstract` is false). Ordinary static helpers report `IsStatic` true and
+`IsVirtual`/`IsAbstract` false. Private helper visibility remains private; helpers do
+not create an implementation obligation on a class. This development behavior is not
+in Preview 10. Reflection describes these methods; it does not enable general
+invocation of interface bodies or bypass their access checks.

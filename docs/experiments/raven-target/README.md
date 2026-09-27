@@ -1,5 +1,14 @@
 # Raven targeting neoCLR
 
+## Interface helper integration (2026-09-27)
+
+The development bridge admits public defaults and public/private static helpers on
+non-generic application interfaces. It preserves owned static methods and private
+access rather than flattening helpers into public functions. The runtime executes
+nominal defaults on the original class receiver. No compiler setting changed; the
+[consumer and limits](../interface-helpers/README.md) distinguish this bounded path
+from private instance helpers, explicit replacements and static virtual defaults.
+
 ## Number integration (2026-09-27)
 
 The current numeric slice requires Raven neoCLR commit `617efd444` or later,

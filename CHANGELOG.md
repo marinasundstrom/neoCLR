@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Admit Raven application interface defaults and public/private static helpers in
+  development. Preserve nominal receiver identity, nested dispatch, class precedence
+  and private access; exclude helpers from conformance obligations and virtual
+  reflection flags. Add focused consumer/native evidence. Private instance helpers,
+  static virtual defaults and broader accessibility remain deferred. Record explicit
+  implementation and other Raven/native gaps in the authoritative interface tracker.
+
 - Add development Number<T> for eight fixed-width integers, Single and Double:
   inherited ordering, static Zero/One and binary arithmetic. Add strict concrete
   Parse methods for the remaining numeric types and Boolean, using standard Raven

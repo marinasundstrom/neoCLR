@@ -68,3 +68,11 @@ For the language’s ordinary .NET target, visit [Raven’s language website](ht
 The neoCLR work exercises runtime contracts, metadata and library ergonomics. General compiler improvements belong in Raven’s ordinary development; neoCLR policies remain isolated until they are ready. Both projects are open to feedback, and their APIs can change.
 
 [Explore neoCLR’s proposals →](../proposals/)
+
+## Interface bodies in development
+
+Application interfaces can supply public default implementations and public or private
+static helper methods. Defaults execute on the original object, and a class's own
+implementation takes precedence. Private helpers stay private to the interface.
+This development capability is not included in Preview 10. Private instance helpers,
+static virtual defaults and broader interface accessibility remain future work.

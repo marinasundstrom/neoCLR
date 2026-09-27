@@ -722,7 +722,11 @@ fn method(
                 limits,
             )?,
             Value::Boolean(f.receiver_readonly),
-            Value::Boolean(f.is_virtual || crate::interfaces::is_contract(module, f)),
+            Value::Boolean(
+                f.is_virtual
+                    || (crate::interfaces::is_contract(module, f)
+                        && !crate::interfaces::is_helper(f)),
+            ),
             Value::Boolean(f.is_override),
             Value::Boolean(crate::interfaces::is_bodyless(module, f)),
         ],

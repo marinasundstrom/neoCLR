@@ -8321,3 +8321,35 @@ configuration/content, not target-specific code added to Raven main.
   General typed parsing does not inherently require exceptions, but associating
   error types introduces an ergonomic choice. Implementation remains on hold under
   the earlier explicit direction; compiler/importer admission still needs validation.
+
+
+## 2026-09-27 — Bounded general interface consumer
+
+- **Author direction:** leave the numeric parsing interface discussion and move on.
+  The assistant proposed checking a static helper, a default calling a private
+  helper and rejected external access; the author replied “Continue”.
+- **Assistant investigation:** Raven compiled the first example, but the neoCLR
+  importer admitted only abstract public instance contracts. Native nominal defaults
+  and static helper admission also needed extension. A private instance helper probe
+  emitted Private, Virtual, NewSlot; this is recorded as a general compiler candidate
+  requiring independent validation, not silently normalized by the target importer.
+- **Action:** implement the bounded public default/private static helper path,
+  preserving receiver identity, class precedence and access. Keep private instance
+  helpers and wider interface accessibility/virtual-static work deferred. Record
+  focused native and Raven validation in the [consumer evidence](experiments/interface-helpers/README.md).
+  ParsableNumber remains on hold; its intended inheritance from Number is unchanged.
+
+- **Author follow-up:** asked whether everything around interfaces works, including
+  explicit implementations. The assistant distinguished passing native explicit/default
+  tests from Raven importer admission: explicit implementation import is still rejected,
+  alongside the other deferred forms. Proposed explicit implementations as the next
+  focused boundary; did not claim general interface completion.
+
+- **Author decision:** “Record those limitations”. The assistant added an explicit
+  capability matrix to the runtime tracker and linked it from the platform roadmap,
+  separating native evidence, Raven importer restrictions and next validation needs.
+
+- **Outcome:** 16 focused native tests and the final Raven consumer pass, including
+  static-helper reflection and negative access/admission cases; API snapshot checks
+  pass. The bounded implementation is complete in development. The limitations
+  matrix remains open work, and no full suite or website build was run.

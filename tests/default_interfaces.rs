@@ -189,11 +189,8 @@ fn complete_owner_selects_derived_interface_body_through_class_base_view() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 #[test]
-fn default_bodies_require_managed_receivers_and_virtual_contract_calls() {
-    for method in [
-        ".method instance Read() -> Int32\nldc.i4 42\nret\n.end",
-        ".method instance abstract byref Read() -> Int32\nldc.i4 42\nret\n.end",
-    ] {
+fn default_bodies_reject_abstract_bodies_and_require_virtual_contract_calls() {
+    for method in [".method instance abstract byref Read() -> Int32\nldc.i4 42\nret\n.end"] {
         assert!(assemble(&format!(".module App\n.interface R\n{method}\n.end")).is_err());
     }
     let source = "interface R { func Read() -> int { return 42 } }\nrecord C(): R\nfunc Main() -> int { let r: R& = new C(); return r.Read() }";

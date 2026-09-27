@@ -63,9 +63,13 @@ interface are distinct from a private explicit implementation of a public member
 
 Next evidence, following the selected [Number slice](../design/numeric-contracts.md):
 
-1. Compile and execute one ordinary static interface helper and one default body
-   calling a private helper through the Raven import path; verify rejected external
-   access as well as successful internal access.
+1. **Implemented in development:** ordinary public/private static interface helpers
+   and nominal instance defaults through the Raven path, including nested dispatch,
+   class precedence, void defaults and rejected external private access. See the
+   [focused consumer](../experiments/interface-helpers/README.md). Private instance
+   helper emission remains a deferred general Raven candidate (the probe emits
+   Private, Virtual, NewSlot); independently validate its CLI contract before fixing.
+   This slice does not claim all private helper forms.
 2. Exercise derived defaults, conflicting diamonds and reabstraction through that
    same path, reusing existing native evidence where unchanged.
 3. Add static virtual defaults and constrained selection, plus the applicable
@@ -75,3 +79,28 @@ Next evidence, following the selected [Number slice](../design/numeric-contracts
 Broader interface support is selected direction, not a completion claim or a
 reason to build the entire platform matrix. Avoid claiming an improvement over
 .NET without an observable benefit and its receiver, metadata and dispatch costs.
+
+
+### Interface limitations — development checkpoint, 2026-09-27
+
+Recorded at the author's request. A passing native test is not evidence that the
+Raven-to-neoCLR path accepts the equivalent source. This table owns the remaining
+scope; the [bounded helper experiment](../experiments/interface-helpers/README.md)
+owns its commands and evidence. None of these development additions is a claim
+about the published Preview 10 bundle.
+
+| Capability | Native runtime evidence | Raven-to-neoCLR boundary / remaining work |
+| --- | --- | --- |
+| Public instance defaults, nested calls and class precedence | Existing managed-reference tests plus the nominal-receiver slice | Bounded non-generic application consumer; not a claim of general generic-interface import. |
+| Ordinary public/private static helpers | Direct calls, private access, reachability and no conformance obligation | Admitted in the bounded application slice; external private access rejected. |
+| Explicit class interface implementations | Existing explicit mapping support and tests | Importer still rejects explicit metadata mappings outside its existing special cases. Next candidate: one explicit implementation called through the interface, including private ordinary-access rejection and two interfaces with same-named members. |
+| Derived default replacement, diamonds and reabstraction | Existing default-interface tests | Explicit replacement metadata is not admitted by this Raven slice. Need separate end-to-end consumers for most-specific selection, ambiguous diamonds and required overrides. |
+| Private instance helpers | Outside the new helper admission | Probe emits Private, Virtual, NewSlot. General Raven candidate needs independent CLI/.NET validation; importer explicitly rejects it instead of erasing flags. |
+| Static abstract members | Exact nominal conformance; Number consumer | Generic application specialization remains limited to the documented ten primitives and Number constraints. No general static interface dispatch guarantee. |
+| Static virtual defaults | Rejected by the current runtime contract | Not implemented; requires default selection and constrained-call evidence. Ordinary static helpers do not establish this capability. |
+| Protected/internal and combined interface accessibility | General member access infrastructure is not proof of these combinations | Rejected by this bounded interface importer. Define assembly/inheritance scopes and validate each selected combination. |
+| Direct invocation of a chosen default, host invocation and interface delegate binding | Existing restrictions retained | Not expanded by this slice; callers use supported guest interface dispatch. |
+
+Next work should close one row with a runnable Raven consumer and focused negative
+cases. Do not describe interfaces as fully supported or start a full platform matrix
+on the strength of the current helper slice.

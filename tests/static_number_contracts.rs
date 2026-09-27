@@ -55,10 +55,10 @@ fn static_interface_contract_requires_exact_concrete_member() {
 }
 
 #[test]
-fn static_interface_defaults_and_direct_abstract_calls_are_rejected() {
+fn static_interface_virtual_defaults_and_direct_abstract_calls_are_rejected() {
     let body = SOURCE.replace(
         ".method static Add(T left, T right) -> T\n.end",
-        ".method static Add(T left, T right) -> T\nldarg left\nret\n.end",
+        ".method static virtual Add(T left, T right) -> T\nldarg left\nret\n.end",
     );
     assert!(assemble(&body).is_err());
     let direct = SOURCE.replace("call TestInteger::Add", "call TestNumber<Int32>::Add");

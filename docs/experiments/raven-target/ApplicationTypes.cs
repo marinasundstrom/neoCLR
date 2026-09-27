@@ -158,7 +158,7 @@ static class ApplicationTypes
             if (IsModule(type.BaseType?.Resolve()?.Module)) { CheckAccess(type.BaseType!, type.Module); map(type.BaseType!, false); }
             foreach (var contract in type.Interfaces) { CheckAccess(contract.InterfaceType, type.Module); map(contract.InterfaceType, false); }
             foreach (var field in type.Fields) map(field.FieldType, false);
-            foreach (var method in type.Methods.Where(m => !m.IsStatic && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && (OpaqueLibrary.IsOmittedConstructor(m) || ArrayLibrary.OmitConstructor(m) || EmptyLibrary.OmitConstructor(m) || (ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)))))
+            foreach (var method in type.Methods.Where(m => (!m.IsStatic || type.IsInterface) && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && (OpaqueLibrary.IsOmittedConstructor(m) || ArrayLibrary.OmitConstructor(m) || EmptyLibrary.OmitConstructor(m) || (ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)))))
             {
                 CheckMethod(method);
                 if (!OpaqueLibrary.IsExplicitStringCount(method) && (method.Overrides.Any(o => !method.IsPublic || o.Name != method.Name || o.DeclaringType.Resolve()?.IsInterface != true
@@ -168,15 +168,20 @@ static class ApplicationTypes
                 map(method.ReturnType, true);
                 if (type.IsInterface)
                 {
-                    if (!method.IsAbstract || !method.IsPublic || !method.IsVirtual || method.HasBody)
-                        throw new InvalidDataException("Only abstract public interface contracts are admitted.");
+                    if (!(method.IsPublic || method.IsPrivate) || method.IsConstructor
+                        || method.HasOverrides || method.IsFinal || method.IsPrivate && !method.IsStatic
+                        || !method.IsStatic && (!method.IsVirtual || !method.IsNewSlot)
+                        || (method.IsAbstract ? !method.IsPublic || !method.IsVirtual || method.HasBody
+                            : !method.HasBody || method.IsStatic && method.IsVirtual || method.IsPrivate && method.IsVirtual))
+                        throw new InvalidDataException("Unsupported interface member: " + method.FullName);
+                    if (!method.IsAbstract) pending.Enqueue(method);
                 }
                 else if (!method.IsAbstract) pending.Enqueue(method);
             }
         }
     }
     public static string Modifiers(MethodDefinition method) => method.IsAbstract ? "abstract " :
-        method.IsVirtual && !method.IsFinal ? (method.IsNewSlot ? "virtual " : "override ") : "";
+        !method.DeclaringType.IsInterface && method.IsVirtual && !method.IsFinal ? (method.IsNewSlot ? "virtual " : "override ") : "";
     public static string MethodName(MethodDefinition method)
     {
         if (OpaqueLibrary.IsExplicitStringCount(method)) return "CollectionCount";
