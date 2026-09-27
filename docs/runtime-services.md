@@ -31,6 +31,7 @@ Duplicate entries in the supplied service set have no additional effect.
 | --- | --- |
 | PathOperations | Host-platform lexical path combination and filename extraction |
 | ProcessEnvironment | Guest arguments and host current-directory/variable reads; arguments also require ManagedArrays and erased results require ValueStorage |
+| TimeZoneRules | Pinned IANA rule lookup, offsets and local mapping; mapping also requires ManagedArrays |
 | LocalClock | Host local clock reading; its owned component array also requires ManagedArrays |
 | SlotReferences | ldloca/ldarga and the managed-reference operand path of ldflda/ldobj/stobj/initobj |
 | InterfaceDispatch | interface.borrow and callvirt: explicit borrowed view formation, receiver access and implementation selection |
@@ -125,3 +126,10 @@ support check. See the [DNS contract](socket-api-design.md#public-hostname-looku
 ### System culture discovery (development, 2026-09-27)
 
 SystemCultureProvider reaches ProcessEnvironment through the private SystemCultureName InternalCall. The host returns its preferred locale via sys-locale 0.3.2 (empty if unavailable); Raven resolves the supported culture or invariant fallback. This does not read localization resources or change host settings. See [contract and limitations](calendar-globalization.md).
+
+### Named time-zone rules (development, 2026-09-27)
+
+TimeZoneRules classifies queries against bundled IANA rules. TimeZoneMapLocal also
+requires ManagedArrays for the returned numeric mapping, while TimeZoneOffset,
+TimeZoneExists and TimeZoneDatabaseVersion do not. SystemTimeZoneName uses
+ProcessEnvironment and does not read the clock. See [Time/zone boundaries](time-zones.md).

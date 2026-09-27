@@ -52,6 +52,26 @@ public struct Time : ComparableTo<Time>, EquatableTo<Time> {
         return Ok(Time(ticks))
     }
 
+    /// Adds elapsed ticks modulo one day. Use LocalDateTime.Add to retain the date carry.
+    func Add(duration: Duration) -> Time {
+        var ticks = StoredTicks + duration.Ticks % 864000000000L
+        if ticks < 0L {
+            ticks = ticks + 864000000000L
+        }
+        if ticks >= 864000000000L {
+            ticks = ticks - 864000000000L
+        }
+        return Time(ticks)
+    }
+
+    override func ToString() -> string {
+        return ToString(System.Globalization.Culture.Current)
+    }
+
+    func ToString(culture: System.Globalization.Culture) -> string {
+        return culture.DateTimeFormat.FormatTime(self)
+    }
+
     val Ticks: long => StoredTicks
     val Hour: int => (int)(StoredTicks / 36000000000L)
     val Minute: int => (int)(StoredTicks / 600000000L % 60L)

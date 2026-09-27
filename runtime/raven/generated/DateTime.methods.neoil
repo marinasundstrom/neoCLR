@@ -1,0 +1,459 @@
+; Generated from runtime/raven/src/System/DateTime.rvn. Regenerate with build_runtime_library.py.
+.type System.DateTime
+.sealed
+.custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+.implements System.Runtime.CompilerServices.IUnion
+.field private Metadata_V1_3C5461673E Byte
+.field private Metadata_V1_3C4C6F63616C4461746554696D655061796C6F61643E System.LocalDateTime
+.field private Metadata_V1_3C5A6F6E65644461746554696D655061796C6F61643E System.ZonedDateTime
+.property instance Value() -> System.Object
+.get instance System.DateTime::get_Value()
+.end
+.property instance HasValue() -> Boolean
+.get instance System.DateTime::get_HasValue()
+.end
+.method instance override byref ToString() -> String
+M00000001_IL_0000:
+ldarg 0
+M00000001_IL_0001:
+ldfld System.DateTime::Metadata_V1_3C5461673E
+M00000001_IL_0006:
+conv.i4
+M00000001_IL_0007:
+ldc.i4 1
+M00000001_IL_0008:
+conv.i4
+M00000001_IL_0009:
+ceq
+call neoCLR.Library.System.DateTime.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_000b:
+brtrue M00000001_IL_0015
+M00000001_IL_0010:
+br M00000001_IL_0044
+M00000001_IL_0015:
+ldstr "DateTime"
+M00000001_IL_001a:
+ldstr "("
+M00000001_IL_001f:
+call System.String::Concat(String,String)
+M00000001_IL_0024:
+ldarg 0
+M00000001_IL_0025:
+ldfld System.DateTime::Metadata_V1_3C4C6F63616C4461746554696D655061796C6F61643E
+M00000001_IL_002a:
+box System.LocalDateTime
+M00000001_IL_002f:
+call System.DateTime::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+M00000001_IL_0034:
+call System.String::Concat(String,String)
+M00000001_IL_0039:
+ldstr ")"
+M00000001_IL_003e:
+call System.String::Concat(String,String)
+M00000001_IL_0043:
+ret
+M00000001_IL_0044:
+M00000001_IL_0045:
+ldarg 0
+M00000001_IL_0046:
+ldfld System.DateTime::Metadata_V1_3C5461673E
+M00000001_IL_004b:
+conv.i4
+M00000001_IL_004c:
+ldc.i4 2
+M00000001_IL_004d:
+conv.i4
+M00000001_IL_004e:
+ceq
+call neoCLR.Library.System.DateTime.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0050:
+brtrue M00000001_IL_005a
+M00000001_IL_0055:
+br M00000001_IL_0084
+M00000001_IL_005a:
+ldstr "DateTime"
+M00000001_IL_005f:
+ldstr "("
+M00000001_IL_0064:
+call System.String::Concat(String,String)
+M00000001_IL_0069:
+ldarg 0
+M00000001_IL_006a:
+ldfld System.DateTime::Metadata_V1_3C5A6F6E65644461746554696D655061796C6F61643E
+M00000001_IL_006f:
+castclass System.Object
+call System.DateTime::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+M00000001_IL_0074:
+call System.String::Concat(String,String)
+M00000001_IL_0079:
+ldstr ")"
+M00000001_IL_007e:
+call System.String::Concat(String,String)
+M00000001_IL_0083:
+ret
+M00000001_IL_0084:
+M00000001_IL_0085:
+ldstr "\u003CUninitialized\u003E"
+M00000001_IL_008a:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000002_IL_0000:
+ldarg 0
+M00000002_IL_0001:
+M00000002_IL_0002:
+ref.isnull
+call neoCLR.Library.System.DateTime.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0004:
+brtrue M00000002_IL_000e
+M00000002_IL_0009:
+br M00000002_IL_0014
+M00000002_IL_000e:
+ldstr "null"
+M00000002_IL_0013:
+ret
+M00000002_IL_0014:
+M00000002_IL_0015:
+ldarg 0
+M00000002_IL_0016:
+isinst String
+M00000002_IL_001b:
+M00000002_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.DateTime.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_001e:
+brtrue M00000002_IL_0028
+M00000002_IL_0023:
+br M00000002_IL_0043
+M00000002_IL_0028:
+ldstr "\u0022"
+M00000002_IL_002d:
+ldarg 0
+M00000002_IL_002e:
+castclass String
+M00000002_IL_0033:
+call System.String::Concat(String,String)
+M00000002_IL_0038:
+ldstr "\u0022"
+M00000002_IL_003d:
+call System.String::Concat(String,String)
+M00000002_IL_0042:
+ret
+M00000002_IL_0043:
+M00000002_IL_0044:
+ldarg 0
+M00000002_IL_0045:
+isinst Char
+M00000002_IL_004a:
+dup
+M00000002_IL_004b:
+ref.isnull
+brfalse M00000002_IL_0057
+M00000002_IL_0050:
+pop
+M00000002_IL_0051:
+ldc.i4 0
+M00000002_IL_0052:
+br M00000002_IL_005e
+M00000002_IL_0057:
+unbox.any Char
+M00000002_IL_005c:
+pop
+M00000002_IL_005d:
+ldc.i4 1
+M00000002_IL_005e:
+brtrue M00000002_IL_0068
+M00000002_IL_0063:
+br M00000002_IL_0083
+M00000002_IL_0068:
+ldstr "\u0027"
+M00000002_IL_006d:
+ldarg 0
+M00000002_IL_006e:
+call neoCLR.Library.System.DateTime.RuntimeReflection936F30A1978F475D(System.Object)
+M00000002_IL_0073:
+call System.String::Concat(String,String)
+M00000002_IL_0078:
+ldstr "\u0027"
+M00000002_IL_007d:
+call System.String::Concat(String,String)
+M00000002_IL_0082:
+ret
+M00000002_IL_0083:
+M00000002_IL_0084:
+ldarg 0
+M00000002_IL_0085:
+call neoCLR.Library.System.DateTime.RuntimeReflection936F30A1978F475D(System.Object)
+M00000002_IL_008a:
+ret
+.end
+.method instance byref .ctor(System.LocalDateTime value) -> Void
+.local Byte local0
+.local System.LocalDateTime local1
+.local Byte unionDefault1_0
+.local System.LocalDateTime unionDefault1_1
+.local System.ZonedDateTime unionDefault1_2
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.LocalDateTime
+M00000003_IL_0000:
+ldarg 0
+M00000003_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.DateTime::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.LocalDateTime
+ldarg 0
+ldloc unionDefault1_1
+stfld System.DateTime::Metadata_V1_3C4C6F63616C4461746554696D655061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.ZonedDateTime
+ldarg 0
+ldloc unionDefault1_2
+stfld System.DateTime::Metadata_V1_3C5A6F6E65644461746554696D655061796C6F61643E
+pop
+M00000003_IL_0007:
+ldc.i4 1
+M00000003_IL_0008:
+stloc local0
+M00000003_IL_0009:
+ldarg 0
+M00000003_IL_000a:
+ldloc local0
+M00000003_IL_000b:
+conv.u1
+M00000003_IL_000c:
+stfld System.DateTime::Metadata_V1_3C5461673E
+pop
+M00000003_IL_0011:
+ldarg 1
+M00000003_IL_0012:
+stloc local1
+M00000003_IL_0013:
+ldarg 0
+M00000003_IL_0014:
+ldloc local1
+M00000003_IL_0015:
+stfld System.DateTime::Metadata_V1_3C4C6F63616C4461746554696D655061796C6F61643E
+pop
+M00000003_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.LocalDateTime& value) -> Boolean
+M00000004_IL_0000:
+ldarg 0
+M00000004_IL_0001:
+ldfld System.DateTime::Metadata_V1_3C5461673E
+M00000004_IL_0006:
+conv.i4
+M00000004_IL_0007:
+ldc.i4 1
+M00000004_IL_0008:
+conv.i4
+M00000004_IL_0009:
+ceq
+call neoCLR.Library.System.DateTime.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_000b:
+brtrue M00000004_IL_0015
+M00000004_IL_0010:
+br M00000004_IL_0023
+M00000004_IL_0015:
+ldarg 1
+M00000004_IL_0016:
+ldarg 0
+M00000004_IL_0017:
+ldfld System.DateTime::Metadata_V1_3C4C6F63616C4461746554696D655061796C6F61643E
+M00000004_IL_001c:
+stobj System.LocalDateTime
+M00000004_IL_0021:
+ldc.bool true
+M00000004_IL_0022:
+ret
+M00000004_IL_0023:
+M00000004_IL_0024:
+ldc.bool false
+M00000004_IL_0025:
+ret
+.end
+.method instance byref .ctor(System.ZonedDateTime value) -> Void
+.local Byte local0
+.local System.ZonedDateTime local1
+.local Byte unionDefault1_0
+.local System.LocalDateTime unionDefault1_1
+.local System.ZonedDateTime unionDefault1_2
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.ZonedDateTime
+M00000005_IL_0000:
+ldarg 0
+M00000005_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.DateTime::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.LocalDateTime
+ldarg 0
+ldloc unionDefault1_1
+stfld System.DateTime::Metadata_V1_3C4C6F63616C4461746554696D655061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.ZonedDateTime
+ldarg 0
+ldloc unionDefault1_2
+stfld System.DateTime::Metadata_V1_3C5A6F6E65644461746554696D655061796C6F61643E
+pop
+M00000005_IL_0007:
+ldc.i4 2
+M00000005_IL_0008:
+stloc local0
+M00000005_IL_0009:
+ldarg 0
+M00000005_IL_000a:
+ldloc local0
+M00000005_IL_000b:
+conv.u1
+M00000005_IL_000c:
+stfld System.DateTime::Metadata_V1_3C5461673E
+pop
+M00000005_IL_0011:
+ldarg 1
+M00000005_IL_0012:
+stloc local1
+M00000005_IL_0013:
+ldarg 0
+M00000005_IL_0014:
+ldloc local1
+M00000005_IL_0015:
+stfld System.DateTime::Metadata_V1_3C5A6F6E65644461746554696D655061796C6F61643E
+pop
+M00000005_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.ZonedDateTime& value) -> Boolean
+M00000006_IL_0000:
+ldarg 0
+M00000006_IL_0001:
+ldfld System.DateTime::Metadata_V1_3C5461673E
+M00000006_IL_0006:
+conv.i4
+M00000006_IL_0007:
+ldc.i4 2
+M00000006_IL_0008:
+conv.i4
+M00000006_IL_0009:
+ceq
+call neoCLR.Library.System.DateTime.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_000b:
+brtrue M00000006_IL_0015
+M00000006_IL_0010:
+br M00000006_IL_001f
+M00000006_IL_0015:
+ldarg 1
+M00000006_IL_0016:
+ldarg 0
+M00000006_IL_0017:
+ldfld System.DateTime::Metadata_V1_3C5A6F6E65644461746554696D655061796C6F61643E
+M00000006_IL_001c:
+stobj System.ZonedDateTime
+M00000006_IL_001d:
+ldc.bool true
+M00000006_IL_001e:
+ret
+M00000006_IL_001f:
+M00000006_IL_0020:
+ldc.bool false
+M00000006_IL_0021:
+ret
+.end
+.method instance byref get_Value() -> System.Object
+M00000007_IL_0000:
+ldarg 0
+M00000007_IL_0001:
+ldfld System.DateTime::Metadata_V1_3C5461673E
+M00000007_IL_0006:
+conv.i4
+M00000007_IL_0007:
+ldc.i4 1
+M00000007_IL_0008:
+conv.i4
+M00000007_IL_0009:
+ceq
+call neoCLR.Library.System.DateTime.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_000b:
+brtrue M00000007_IL_0015
+M00000007_IL_0010:
+br M00000007_IL_0021
+M00000007_IL_0015:
+ldarg 0
+M00000007_IL_0016:
+ldfld System.DateTime::Metadata_V1_3C4C6F63616C4461746554696D655061796C6F61643E
+M00000007_IL_001b:
+box System.LocalDateTime
+M00000007_IL_0020:
+ret
+M00000007_IL_0021:
+M00000007_IL_0022:
+ldarg 0
+M00000007_IL_0023:
+ldfld System.DateTime::Metadata_V1_3C5461673E
+M00000007_IL_0028:
+conv.i4
+M00000007_IL_0029:
+ldc.i4 2
+M00000007_IL_002a:
+conv.i4
+M00000007_IL_002b:
+ceq
+call neoCLR.Library.System.DateTime.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_002d:
+brtrue M00000007_IL_0037
+M00000007_IL_0032:
+br M00000007_IL_003e
+M00000007_IL_0037:
+ldarg 0
+M00000007_IL_0038:
+ldfld System.DateTime::Metadata_V1_3C5A6F6E65644461746554696D655061796C6F61643E
+M00000007_IL_003d:
+castclass System.Object
+ret
+M00000007_IL_003e:
+M00000007_IL_003f:
+M00000007_IL_0040:
+call neoCLR.Library.System.DateTime.DefaultReference53797374656D2E4F626A656374()
+ret
+.end
+.method instance byref get_HasValue() -> Boolean
+M00000008_IL_0000:
+ldarg 0
+M00000008_IL_0001:
+call instance System.DateTime::get_Value()
+M00000008_IL_0006:
+M00000008_IL_0007:
+ref.isnull
+call neoCLR.Library.System.DateTime.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0009:
+ldc.i4 0
+M00000008_IL_000a:
+ceq
+call neoCLR.Library.System.DateTime.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_000c:
+call neoCLR.Library.System.DateTime.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.end

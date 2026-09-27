@@ -217,24 +217,334 @@ newobj instance System.LocalDateTime::.ctor(System.Date,System.Time)
 M00000003_IL_00b7:
 ret
 .end
-.method instance readonly byref get_Date() -> System.Date
+.method instance readonly byref Add(System.Duration duration) -> System.Result<System.LocalDateTime,System.InvalidDateError>
+.local Int64 local0
+.local Int64 local1
+.local Int64 local2
+.local System.Result<System.Date,System.InvalidDateError> local3
+.local System.Date local4
+.local System.InvalidDateError local5
+.local System.Date local6
+.local System.Time local7
+.local System.Time local8
+.local System.Date local9
+.local System.Result<System.Time,System.InvalidTimeError> local10
+.local System.Result.Ok<System.Time> local11
+ldc.i8 0
+stloc local0
+ldc.i8 0
+stloc local1
+ldc.i8 0
+stloc local2
+ldloca local3
+initobj System.Result<System.Date,System.InvalidDateError>
+ldloca local4
+initobj System.Date
+newobj System.InvalidDateError
+stloc local5
+ldloca local6
+initobj System.Date
+ldloca local7
+initobj System.Time
+ldloca local8
+initobj System.Time
+ldloca local9
+initobj System.Date
+ldloca local10
+initobj System.Result<System.Time,System.InvalidTimeError>
+ldloca local11
+initobj System.Result.Ok<System.Time>
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
+ldarga 1
+M00000004_IL_0004:
+call neoCLR.Library.System.LocalDateTime.RuntimeDurationget_Ticks(System.Duration&)
+M00000004_IL_0009:
+ldc.i8 864000000000
+M00000004_IL_0012:
+div
+M00000004_IL_0013:
+stloc local0
+M00000004_IL_0014:
+M00000004_IL_0015:
 ldarg 0
-M00000004_IL_0003:
+M00000004_IL_0016:
+ldfld System.LocalDateTime::StoredTime
+M00000004_IL_001b:
+stloc local8
+M00000004_IL_001d:
+ldloca local8
+M00000004_IL_001f:
+call neoCLR.Library.System.LocalDateTime.RuntimeTimeget_Ticks(System.Time&)
+M00000004_IL_0024:
+ldarga 1
+M00000004_IL_0026:
+call neoCLR.Library.System.LocalDateTime.RuntimeDurationget_Ticks(System.Duration&)
+M00000004_IL_002b:
+ldc.i8 864000000000
+M00000004_IL_0034:
+rem
+M00000004_IL_0035:
+add
+M00000004_IL_0036:
+stloc local1
+M00000004_IL_0037:
+M00000004_IL_0038:
+ldarg 0
+M00000004_IL_0039:
 ldfld System.LocalDateTime::StoredDate
-M00000004_IL_0008:
+M00000004_IL_003e:
+stloc local9
+M00000004_IL_0040:
+ldloca local9
+M00000004_IL_0042:
+call neoCLR.Library.System.LocalDateTime.RuntimeDateget_DayNumber(System.Date&)
+M00000004_IL_0047:
+conv.i8
+M00000004_IL_0048:
+ldloc local0
+M00000004_IL_0049:
+add
+M00000004_IL_004a:
+stloc local2
+M00000004_IL_004b:
+M00000004_IL_004c:
+ldloc local1
+M00000004_IL_004d:
+ldc.i8 0
+M00000004_IL_0056:
+clt
+call neoCLR.Library.System.LocalDateTime.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_0058:
+brtrue M00000004_IL_0062
+M00000004_IL_005d:
+br M00000004_IL_007c
+M00000004_IL_0062:
+M00000004_IL_0063:
+ldloc local1
+M00000004_IL_0064:
+ldc.i8 864000000000
+M00000004_IL_006d:
+add
+M00000004_IL_006e:
+stloc local1
+M00000004_IL_006f:
+M00000004_IL_0070:
+ldloc local2
+M00000004_IL_0071:
+ldc.i8 1
+M00000004_IL_007a:
+sub
+M00000004_IL_007b:
+stloc local2
+M00000004_IL_007c:
+M00000004_IL_007d:
+M00000004_IL_007e:
+ldloc local1
+M00000004_IL_007f:
+ldc.i8 864000000000
+M00000004_IL_0088:
+clt
+call neoCLR.Library.System.LocalDateTime.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_008a:
+ldc.i4 0
+M00000004_IL_008b:
+ceq
+call neoCLR.Library.System.LocalDateTime.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_008d:
+brtrue M00000004_IL_0097
+M00000004_IL_0092:
+br M00000004_IL_00b1
+M00000004_IL_0097:
+M00000004_IL_0098:
+ldloc local1
+M00000004_IL_0099:
+ldc.i8 864000000000
+M00000004_IL_00a2:
+sub
+M00000004_IL_00a3:
+stloc local1
+M00000004_IL_00a4:
+M00000004_IL_00a5:
+ldloc local2
+M00000004_IL_00a6:
+ldc.i8 1
+M00000004_IL_00af:
+add
+M00000004_IL_00b0:
+stloc local2
+M00000004_IL_00b1:
+M00000004_IL_00b2:
+M00000004_IL_00b3:
+ldloc local2
+M00000004_IL_00b4:
+ldc.i8 0
+M00000004_IL_00bd:
+clt
+call neoCLR.Library.System.LocalDateTime.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_00bf:
+brtrue M00000004_IL_00c9
+M00000004_IL_00c4:
+br M00000004_IL_00d9
+M00000004_IL_00c9:
+call neoCLR.Library.System.LocalDateTime.RuntimeErrorSystemInvalidDateErrorNew()
+M00000004_IL_00ce:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion4(System.InvalidDateError)
+M00000004_IL_00d3:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion5(System.Result.Error<System.InvalidDateError>)
+M00000004_IL_00d8:
+ret
+M00000004_IL_00d9:
+M00000004_IL_00da:
+M00000004_IL_00db:
+ldloc local2
+M00000004_IL_00dc:
+ldc.i8 3652058
+M00000004_IL_00e5:
+cgt
+call neoCLR.Library.System.LocalDateTime.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_00e7:
+brtrue M00000004_IL_00f1
+M00000004_IL_00ec:
+br M00000004_IL_0101
+M00000004_IL_00f1:
+call neoCLR.Library.System.LocalDateTime.RuntimeErrorSystemInvalidDateErrorNew()
+M00000004_IL_00f6:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion4(System.InvalidDateError)
+M00000004_IL_00fb:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion5(System.Result.Error<System.InvalidDateError>)
+M00000004_IL_0100:
+ret
+M00000004_IL_0101:
+M00000004_IL_0102:
+M00000004_IL_0103:
+ldloc local2
+M00000004_IL_0104:
+conv.i4
+M00000004_IL_0105:
+call System.Date::FromDayNumber(Int32)
+M00000004_IL_010a:
+stloc local3
+M00000004_IL_010b:
+ldloca local4
+M00000004_IL_010d:
+initobj System.Date
+M00000004_IL_0113:
+ldloca local3
+M00000004_IL_0115:
+ldloca local4
+M00000004_IL_0117:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion6(System.Result<System.Date,System.InvalidDateError>&,System.Date&)
+call neoCLR.Library.System.LocalDateTime.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_011c:
+brfalse M00000004_IL_0126
+M00000004_IL_0121:
+br M00000004_IL_0148
+M00000004_IL_0126:
+ldloca local5
+M00000004_IL_0128:
+newobj System.InvalidDateError
+stobj System.InvalidDateError
+M00000004_IL_012e:
+ldloca local3
+M00000004_IL_0130:
+ldloca local5
+M00000004_IL_0132:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion7(System.Result<System.Date,System.InvalidDateError>&,System.InvalidDateError&)
+call neoCLR.Library.System.LocalDateTime.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_0137:
+brfalse M00000004_IL_0144
+M00000004_IL_013c:
+ldloc local5
+M00000004_IL_013e:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion8(System.InvalidDateError)
+M00000004_IL_0143:
+ret
+M00000004_IL_0144:
+M00000004_IL_0145:
+M00000004_IL_0146:
+M00000004_IL_0147:
+fault "Guest program reached a terminal failure"
+M00000004_IL_0148:
+M00000004_IL_0149:
+ldloc local4
+M00000004_IL_014b:
+stloc local6
+M00000004_IL_014d:
+M00000004_IL_014e:
+ldloc local1
+M00000004_IL_014f:
+call System.Time::FromTicks(Int64)
+M00000004_IL_0154:
+stloc local10
+M00000004_IL_0156:
+ldloca local11
+M00000004_IL_0158:
+initobj System.Result.Ok<System.Time>
+M00000004_IL_015e:
+ldloca local10
+M00000004_IL_0160:
+ldloca local11
+M00000004_IL_0162:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion2(System.Result<System.Time,System.InvalidTimeError>&,System.Result.Ok<System.Time>&)
+M00000004_IL_0167:
+brfalse M00000004_IL_0181
+M00000004_IL_016c:
+ldloca local11
+M00000004_IL_016e:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion3(System.Result.Ok<System.Time>&)
+M00000004_IL_0173:
+stloc local7
+M00000004_IL_0175:
+M00000004_IL_0176:
+br M00000004_IL_0186
+M00000004_IL_0181:
+br M00000004_IL_018b
+M00000004_IL_0186:
+br M00000004_IL_019c
+M00000004_IL_018b:
+M00000004_IL_018c:
+call neoCLR.Library.System.LocalDateTime.RuntimeErrorSystemInvalidDateErrorNew()
+M00000004_IL_0191:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion4(System.InvalidDateError)
+M00000004_IL_0196:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion5(System.Result.Error<System.InvalidDateError>)
+M00000004_IL_019b:
+ret
+M00000004_IL_019c:
+M00000004_IL_019d:
+M00000004_IL_019e:
+ldloc local6
+M00000004_IL_01a0:
+ldloc local7
+M00000004_IL_01a2:
+newobj instance System.LocalDateTime::.ctor(System.Date,System.Time)
+M00000004_IL_01a7:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion9(System.LocalDateTime)
+M00000004_IL_01ac:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion10(System.Result.Ok<System.LocalDateTime>)
+M00000004_IL_01b1:
 ret
 .end
-.method instance readonly byref get_Time() -> System.Time
+.method instance readonly byref get_Date() -> System.Date
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
 ldarg 0
 M00000005_IL_0003:
-ldfld System.LocalDateTime::StoredTime
+ldfld System.LocalDateTime::StoredDate
 M00000005_IL_0008:
+ret
+.end
+.method instance readonly byref get_Time() -> System.Time
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.LocalDateTime::StoredTime
+M00000006_IL_0008:
 ret
 .end
 .end

@@ -1,4 +1,9 @@
 ; Generated from runtime/raven/src/System/Time.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Time.RuntimeDurationget_Ticks(System.Duration& source) -> Int64
+ldarg source
+call instance System.Duration::get_Ticks()
+ret
+.end
 .function neoCLR.Library.System.Time.RuntimeErrorSystemInvalidTimeErrorNew() -> System.InvalidTimeError
 newobj instance System.InvalidTimeError::.ctor()
 ret

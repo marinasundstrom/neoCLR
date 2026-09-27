@@ -9,6 +9,7 @@ static class ErrorBindings
         ["System.Networking.IPAddressError"] = ["InvalidFormat", "UnsupportedScope"],
         ["System.Networking.DnsError"] = ["InvalidName", "LimitExceeded", "NoAddress", "TimedOut", "Cancelled", "LookupFailed"],
         ["System.Networking.Sockets.SocketError"] = ["Closed", "Busy", "InvalidRange", "LimitExceeded", "Cancelled", "InvalidAddress", "ConnectionRefused", "ConnectionReset", "AccessDenied", "TimedOut", "IoFailure", "InvalidOperation", "AddressInUse", "UnsupportedAddressFamily"],
+        ["System.TimeZoneError"] = ["UnknownZone", "OutOfRange", "SystemZoneUnavailable"],
         ["System.UriError"] = ["InvalidFormat", "UnsupportedAuthority", "TooLong", "BaseNotAbsolute"],
         ["System.Storage.InvalidPathError"] = [],
         ["System.Storage.StorageLookupError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "IoFailure", "InvalidRange", "LimitExceeded"],

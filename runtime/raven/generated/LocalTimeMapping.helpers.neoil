@@ -1,0 +1,593 @@
+; Generated from runtime/raven/src/System/LocalTimeMapping.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.function neoCLR.Library.System.LocalTimeMapping.RuntimeReflection936F30A1978F475D(System.Object arg0) -> String
+ldarg arg0
+callvirt instance System.Object::ToString()
+ret
+.end
+.function neoCLR.Library.System.LocalTimeMapping.DefaultReference53797374656D2E4F626A656374() -> System.Object
+.local System.Object value
+ldloca value
+initobj System.Object
+ldloc value
+ret
+.end
+.type System.LocalTimeMapping.Unique
+.sealed
+.field private Metadata_V1_3C76616C75653E6B5F5F4261636B696E674669656C64 System.ZonedDateTime
+.property instance Value() -> System.ZonedDateTime
+.get instance System.LocalTimeMapping.Unique::get_Value()
+.end
+.method instance byref .ctor(System.ZonedDateTime value) -> Void
+.local System.ZonedDateTime local0
+.local System.ZonedDateTime unionDefault1_0
+ldloca local0
+initobj System.ZonedDateTime
+M0000000b_IL_0000:
+ldarg 0
+M0000000b_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj System.ZonedDateTime
+ldarg 0
+ldloc unionDefault1_0
+stfld System.LocalTimeMapping.Unique::Metadata_V1_3C76616C75653E6B5F5F4261636B696E674669656C64
+pop
+M0000000b_IL_0007:
+M0000000b_IL_0008:
+ldarg 1
+M0000000b_IL_0009:
+stloc local0
+M0000000b_IL_000a:
+ldarg 0
+M0000000b_IL_000b:
+ldloc local0
+M0000000b_IL_000c:
+stfld System.LocalTimeMapping.Unique::Metadata_V1_3C76616C75653E6B5F5F4261636B696E674669656C64
+pop
+M0000000b_IL_0011:
+ldvoid
+ret
+.end
+.method instance byref get_Value() -> System.ZonedDateTime
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+ldarg 0
+M0000000c_IL_0002:
+ldfld System.LocalTimeMapping.Unique::Metadata_V1_3C76616C75653E6B5F5F4261636B696E674669656C64
+M0000000c_IL_0007:
+ret
+.end
+.method instance byref Deconstruct(out System.ZonedDateTime& Value) -> Void
+M0000000d_IL_0000:
+ldarg 1
+M0000000d_IL_0001:
+ldarg 0
+M0000000d_IL_0002:
+call instance System.LocalTimeMapping.Unique::get_Value()
+M0000000d_IL_0007:
+stobj System.ZonedDateTime
+M0000000d_IL_0008:
+ldvoid
+ret
+.end
+.method instance override byref ToString() -> String
+M0000000e_IL_0000:
+ldstr "LocalTimeMapping"
+M0000000e_IL_0005:
+ldstr "."
+M0000000e_IL_000a:
+call System.String::Concat(String,String)
+M0000000e_IL_000f:
+ldstr "Unique"
+M0000000e_IL_0014:
+call System.String::Concat(String,String)
+M0000000e_IL_0019:
+ldstr "("
+M0000000e_IL_001e:
+call System.String::Concat(String,String)
+M0000000e_IL_0023:
+ldarg 0
+M0000000e_IL_0024:
+call instance System.LocalTimeMapping.Unique::get_Value()
+M0000000e_IL_0029:
+castclass System.Object
+call System.LocalTimeMapping.Unique::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+M0000000e_IL_002e:
+call System.String::Concat(String,String)
+M0000000e_IL_0033:
+ldstr ")"
+M0000000e_IL_0038:
+call System.String::Concat(String,String)
+M0000000e_IL_003d:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M0000000f_IL_0000:
+ldarg 0
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+ref.isnull
+call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_0004:
+brtrue M0000000f_IL_000e
+M0000000f_IL_0009:
+br M0000000f_IL_0014
+M0000000f_IL_000e:
+ldstr "null"
+M0000000f_IL_0013:
+ret
+M0000000f_IL_0014:
+M0000000f_IL_0015:
+ldarg 0
+M0000000f_IL_0016:
+isinst String
+M0000000f_IL_001b:
+M0000000f_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_001e:
+brtrue M0000000f_IL_0028
+M0000000f_IL_0023:
+br M0000000f_IL_0043
+M0000000f_IL_0028:
+ldstr "\u0022"
+M0000000f_IL_002d:
+ldarg 0
+M0000000f_IL_002e:
+castclass String
+M0000000f_IL_0033:
+call System.String::Concat(String,String)
+M0000000f_IL_0038:
+ldstr "\u0022"
+M0000000f_IL_003d:
+call System.String::Concat(String,String)
+M0000000f_IL_0042:
+ret
+M0000000f_IL_0043:
+M0000000f_IL_0044:
+ldarg 0
+M0000000f_IL_0045:
+isinst Char
+M0000000f_IL_004a:
+dup
+M0000000f_IL_004b:
+ref.isnull
+brfalse M0000000f_IL_0057
+M0000000f_IL_0050:
+pop
+M0000000f_IL_0051:
+ldc.i4 0
+M0000000f_IL_0052:
+br M0000000f_IL_005e
+M0000000f_IL_0057:
+unbox.any Char
+M0000000f_IL_005c:
+pop
+M0000000f_IL_005d:
+ldc.i4 1
+M0000000f_IL_005e:
+brtrue M0000000f_IL_0068
+M0000000f_IL_0063:
+br M0000000f_IL_0083
+M0000000f_IL_0068:
+ldstr "\u0027"
+M0000000f_IL_006d:
+ldarg 0
+M0000000f_IL_006e:
+call neoCLR.Library.System.LocalTimeMapping.RuntimeReflection936F30A1978F475D(System.Object)
+M0000000f_IL_0073:
+call System.String::Concat(String,String)
+M0000000f_IL_0078:
+ldstr "\u0027"
+M0000000f_IL_007d:
+call System.String::Concat(String,String)
+M0000000f_IL_0082:
+ret
+M0000000f_IL_0083:
+M0000000f_IL_0084:
+ldarg 0
+M0000000f_IL_0085:
+call neoCLR.Library.System.LocalTimeMapping.RuntimeReflection936F30A1978F475D(System.Object)
+M0000000f_IL_008a:
+ret
+.end
+.end
+.type System.LocalTimeMapping.Ambiguous
+.sealed
+.field private Metadata_V1_3C6561726C6965723E6B5F5F4261636B696E674669656C64 System.ZonedDateTime
+.field private Metadata_V1_3C6C617465723E6B5F5F4261636B696E674669656C64 System.ZonedDateTime
+.property instance Earlier() -> System.ZonedDateTime
+.get instance System.LocalTimeMapping.Ambiguous::get_Earlier()
+.end
+.property instance Later() -> System.ZonedDateTime
+.get instance System.LocalTimeMapping.Ambiguous::get_Later()
+.end
+.method instance byref .ctor(System.ZonedDateTime earlier,System.ZonedDateTime later) -> Void
+.local System.ZonedDateTime local0
+.local System.ZonedDateTime local1
+.local System.ZonedDateTime unionDefault1_0
+.local System.ZonedDateTime unionDefault1_1
+ldloca local0
+initobj System.ZonedDateTime
+ldloca local1
+initobj System.ZonedDateTime
+M00000010_IL_0000:
+ldarg 0
+M00000010_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj System.ZonedDateTime
+ldarg 0
+ldloc unionDefault1_0
+stfld System.LocalTimeMapping.Ambiguous::Metadata_V1_3C6561726C6965723E6B5F5F4261636B696E674669656C64
+pop
+ldloca unionDefault1_1
+initobj System.ZonedDateTime
+ldarg 0
+ldloc unionDefault1_1
+stfld System.LocalTimeMapping.Ambiguous::Metadata_V1_3C6C617465723E6B5F5F4261636B696E674669656C64
+pop
+M00000010_IL_0007:
+M00000010_IL_0008:
+ldarg 1
+M00000010_IL_0009:
+stloc local0
+M00000010_IL_000a:
+ldarg 0
+M00000010_IL_000b:
+ldloc local0
+M00000010_IL_000c:
+stfld System.LocalTimeMapping.Ambiguous::Metadata_V1_3C6561726C6965723E6B5F5F4261636B696E674669656C64
+pop
+M00000010_IL_0011:
+ldarg 2
+M00000010_IL_0012:
+stloc local1
+M00000010_IL_0013:
+ldarg 0
+M00000010_IL_0014:
+ldloc local1
+M00000010_IL_0015:
+stfld System.LocalTimeMapping.Ambiguous::Metadata_V1_3C6C617465723E6B5F5F4261636B696E674669656C64
+pop
+M00000010_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref get_Earlier() -> System.ZonedDateTime
+M00000011_IL_0000:
+M00000011_IL_0001:
+ldarg 0
+M00000011_IL_0002:
+ldfld System.LocalTimeMapping.Ambiguous::Metadata_V1_3C6561726C6965723E6B5F5F4261636B696E674669656C64
+M00000011_IL_0007:
+ret
+.end
+.method instance byref get_Later() -> System.ZonedDateTime
+M00000012_IL_0000:
+M00000012_IL_0001:
+ldarg 0
+M00000012_IL_0002:
+ldfld System.LocalTimeMapping.Ambiguous::Metadata_V1_3C6C617465723E6B5F5F4261636B696E674669656C64
+M00000012_IL_0007:
+ret
+.end
+.method instance byref Deconstruct(out System.ZonedDateTime& Earlier,out System.ZonedDateTime& Later) -> Void
+M00000013_IL_0000:
+ldarg 1
+M00000013_IL_0001:
+ldarg 0
+M00000013_IL_0002:
+call instance System.LocalTimeMapping.Ambiguous::get_Earlier()
+M00000013_IL_0007:
+stobj System.ZonedDateTime
+M00000013_IL_0008:
+ldarg 2
+M00000013_IL_0009:
+ldarg 0
+M00000013_IL_000a:
+call instance System.LocalTimeMapping.Ambiguous::get_Later()
+M00000013_IL_000f:
+stobj System.ZonedDateTime
+M00000013_IL_0010:
+ldvoid
+ret
+.end
+.method instance override byref ToString() -> String
+M00000014_IL_0000:
+ldstr "LocalTimeMapping"
+M00000014_IL_0005:
+ldstr "."
+M00000014_IL_000a:
+call System.String::Concat(String,String)
+M00000014_IL_000f:
+ldstr "Ambiguous"
+M00000014_IL_0014:
+call System.String::Concat(String,String)
+M00000014_IL_0019:
+ldstr "("
+M00000014_IL_001e:
+call System.String::Concat(String,String)
+M00000014_IL_0023:
+ldstr "Earlier"
+M00000014_IL_0028:
+call System.String::Concat(String,String)
+M00000014_IL_002d:
+ldstr "="
+M00000014_IL_0032:
+call System.String::Concat(String,String)
+M00000014_IL_0037:
+ldarg 0
+M00000014_IL_0038:
+call instance System.LocalTimeMapping.Ambiguous::get_Earlier()
+M00000014_IL_003d:
+castclass System.Object
+call System.LocalTimeMapping.Ambiguous::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+M00000014_IL_0042:
+call System.String::Concat(String,String)
+M00000014_IL_0047:
+ldstr ", "
+M00000014_IL_004c:
+call System.String::Concat(String,String)
+M00000014_IL_0051:
+ldstr "Later"
+M00000014_IL_0056:
+call System.String::Concat(String,String)
+M00000014_IL_005b:
+ldstr "="
+M00000014_IL_0060:
+call System.String::Concat(String,String)
+M00000014_IL_0065:
+ldarg 0
+M00000014_IL_0066:
+call instance System.LocalTimeMapping.Ambiguous::get_Later()
+M00000014_IL_006b:
+castclass System.Object
+call System.LocalTimeMapping.Ambiguous::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+M00000014_IL_0070:
+call System.String::Concat(String,String)
+M00000014_IL_0075:
+ldstr ")"
+M00000014_IL_007a:
+call System.String::Concat(String,String)
+M00000014_IL_007f:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000015_IL_0000:
+ldarg 0
+M00000015_IL_0001:
+M00000015_IL_0002:
+ref.isnull
+call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+M00000015_IL_0004:
+brtrue M00000015_IL_000e
+M00000015_IL_0009:
+br M00000015_IL_0014
+M00000015_IL_000e:
+ldstr "null"
+M00000015_IL_0013:
+ret
+M00000015_IL_0014:
+M00000015_IL_0015:
+ldarg 0
+M00000015_IL_0016:
+isinst String
+M00000015_IL_001b:
+M00000015_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+M00000015_IL_001e:
+brtrue M00000015_IL_0028
+M00000015_IL_0023:
+br M00000015_IL_0043
+M00000015_IL_0028:
+ldstr "\u0022"
+M00000015_IL_002d:
+ldarg 0
+M00000015_IL_002e:
+castclass String
+M00000015_IL_0033:
+call System.String::Concat(String,String)
+M00000015_IL_0038:
+ldstr "\u0022"
+M00000015_IL_003d:
+call System.String::Concat(String,String)
+M00000015_IL_0042:
+ret
+M00000015_IL_0043:
+M00000015_IL_0044:
+ldarg 0
+M00000015_IL_0045:
+isinst Char
+M00000015_IL_004a:
+dup
+M00000015_IL_004b:
+ref.isnull
+brfalse M00000015_IL_0057
+M00000015_IL_0050:
+pop
+M00000015_IL_0051:
+ldc.i4 0
+M00000015_IL_0052:
+br M00000015_IL_005e
+M00000015_IL_0057:
+unbox.any Char
+M00000015_IL_005c:
+pop
+M00000015_IL_005d:
+ldc.i4 1
+M00000015_IL_005e:
+brtrue M00000015_IL_0068
+M00000015_IL_0063:
+br M00000015_IL_0083
+M00000015_IL_0068:
+ldstr "\u0027"
+M00000015_IL_006d:
+ldarg 0
+M00000015_IL_006e:
+call neoCLR.Library.System.LocalTimeMapping.RuntimeReflection936F30A1978F475D(System.Object)
+M00000015_IL_0073:
+call System.String::Concat(String,String)
+M00000015_IL_0078:
+ldstr "\u0027"
+M00000015_IL_007d:
+call System.String::Concat(String,String)
+M00000015_IL_0082:
+ret
+M00000015_IL_0083:
+M00000015_IL_0084:
+ldarg 0
+M00000015_IL_0085:
+call neoCLR.Library.System.LocalTimeMapping.RuntimeReflection936F30A1978F475D(System.Object)
+M00000015_IL_008a:
+ret
+.end
+.end
+.type System.LocalTimeMapping.Skipped
+.sealed
+.method instance byref .ctor() -> Void
+M00000016_IL_0000:
+ldarg 0
+M00000016_IL_0001:
+pop
+M00000016_IL_0007:
+M00000016_IL_0008:
+ldvoid
+ret
+.end
+.method instance override byref ToString() -> String
+M00000017_IL_0000:
+ldstr "LocalTimeMapping"
+M00000017_IL_0005:
+ldstr "."
+M00000017_IL_000a:
+call System.String::Concat(String,String)
+M00000017_IL_000f:
+ldstr "Skipped"
+M00000017_IL_0014:
+call System.String::Concat(String,String)
+M00000017_IL_0019:
+ret
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000018_IL_0000:
+ldarg 0
+M00000018_IL_0001:
+M00000018_IL_0002:
+ref.isnull
+call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_0004:
+brtrue M00000018_IL_000e
+M00000018_IL_0009:
+br M00000018_IL_0014
+M00000018_IL_000e:
+ldstr "null"
+M00000018_IL_0013:
+ret
+M00000018_IL_0014:
+M00000018_IL_0015:
+ldarg 0
+M00000018_IL_0016:
+isinst String
+M00000018_IL_001b:
+M00000018_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.LocalTimeMapping.RuntimeBooleanToInt32(Boolean)
+M00000018_IL_001e:
+brtrue M00000018_IL_0028
+M00000018_IL_0023:
+br M00000018_IL_0043
+M00000018_IL_0028:
+ldstr "\u0022"
+M00000018_IL_002d:
+ldarg 0
+M00000018_IL_002e:
+castclass String
+M00000018_IL_0033:
+call System.String::Concat(String,String)
+M00000018_IL_0038:
+ldstr "\u0022"
+M00000018_IL_003d:
+call System.String::Concat(String,String)
+M00000018_IL_0042:
+ret
+M00000018_IL_0043:
+M00000018_IL_0044:
+ldarg 0
+M00000018_IL_0045:
+isinst Char
+M00000018_IL_004a:
+dup
+M00000018_IL_004b:
+ref.isnull
+brfalse M00000018_IL_0057
+M00000018_IL_0050:
+pop
+M00000018_IL_0051:
+ldc.i4 0
+M00000018_IL_0052:
+br M00000018_IL_005e
+M00000018_IL_0057:
+unbox.any Char
+M00000018_IL_005c:
+pop
+M00000018_IL_005d:
+ldc.i4 1
+M00000018_IL_005e:
+brtrue M00000018_IL_0068
+M00000018_IL_0063:
+br M00000018_IL_0083
+M00000018_IL_0068:
+ldstr "\u0027"
+M00000018_IL_006d:
+ldarg 0
+M00000018_IL_006e:
+call neoCLR.Library.System.LocalTimeMapping.RuntimeReflection936F30A1978F475D(System.Object)
+M00000018_IL_0073:
+call System.String::Concat(String,String)
+M00000018_IL_0078:
+ldstr "\u0027"
+M00000018_IL_007d:
+call System.String::Concat(String,String)
+M00000018_IL_0082:
+ret
+M00000018_IL_0083:
+M00000018_IL_0084:
+ldarg 0
+M00000018_IL_0085:
+call neoCLR.Library.System.LocalTimeMapping.RuntimeReflection936F30A1978F475D(System.Object)
+M00000018_IL_008a:
+ret
+.end
+.end

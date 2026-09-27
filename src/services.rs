@@ -19,6 +19,8 @@ pub enum RuntimeService {
     MathOperations,
     LocalClock,
     WallClock,
+    /// Conversions through the pinned IANA database, without reading the clock.
+    TimeZoneRules,
     ProcessEnvironment,
     PathOperations,
     FileInput,
@@ -82,10 +84,15 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::EnvironmentArguments
             | crate::native::Binding::EnvironmentCurrentDirectory
             | crate::native::Binding::EnvironmentVariable
+            | crate::native::Binding::SystemTimeZoneName
             | crate::native::Binding::SystemCultureName => RuntimeService::ProcessEnvironment,
             crate::native::Binding::PathCombine | crate::native::Binding::PathGetFileName => {
                 RuntimeService::PathOperations
             }
+            crate::native::Binding::TimeZoneExists
+            | crate::native::Binding::TimeZoneOffset
+            | crate::native::Binding::TimeZoneMapLocal
+            | crate::native::Binding::TimeZoneDatabaseVersion => RuntimeService::TimeZoneRules,
             crate::native::Binding::UnixTimeToLocal => RuntimeService::LocalClock,
             crate::native::Binding::UnixTimeTicks => RuntimeService::WallClock,
             crate::native::Binding::Math(_) => RuntimeService::MathOperations,
@@ -202,6 +209,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
         if matches!(
             crate::native::bind(function)?,
             crate::native::Binding::UnixTimeToLocal
+                | crate::native::Binding::TimeZoneMapLocal
                 | crate::native::Binding::EnvironmentArguments
                 | crate::native::Binding::Utf8Encode
                 | crate::native::Binding::Utf8Decode

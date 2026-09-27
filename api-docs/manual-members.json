@@ -46,5 +46,17 @@
   "P:System.Web.Http.Json.HttpJsonError.Json.Reason": {
     "output": "docs/json-error-payloads.html#httpjsonerror-json-reason",
     "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  },
+  "P:System.LocalTimeMapping.Unique.Value": {
+    "output": "docs/time-zone-mappings.html#unique-value",
+    "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  },
+  "P:System.LocalTimeMapping.Ambiguous.Earlier": {
+    "output": "docs/time-zone-mappings.html#ambiguous-earlier",
+    "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
+  },
+  "P:System.LocalTimeMapping.Ambiguous.Later": {
+    "output": "docs/time-zone-mappings.html#ambiguous-later",
+    "reason": "RavenDoc renders union cases inline but does not emit payload-property pages."
   }
 }

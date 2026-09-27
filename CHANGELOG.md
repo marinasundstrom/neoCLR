@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Add provisional TimeOffset, named IANA TimeZone rules, immutable ZonedDateTime and
+  explicit Unique/Ambiguous/Skipped local mapping. Introduce the author-directed
+  nominal parenthesized DateTime(LocalDateTime | ZonedDateTime), with typed matching
+  and inactive defaults; no .NET Kind flag or OffsetDateTime type. Extend the bridge's
+  validated parenthesized union and conditional extraction contracts. Add Time
+  wrapping/display, civil date carry and checked Instant arithmetic. Bundle IANA
+  2025b via chrono-tz 0.10.4, bounded to 1900–2099; expose the version and system IANA
+  discovery without silent UTC fallback. Fixed offsets retain seconds and ±18h bounds.
+  Refresh matching artifacts/API docs and the separate DateTime feature page.
+  Windows/Linux discovery, broader ranges, rule updates and scheduling remain open.
+
 - Add provisional Gregorian/Hebrew calendar policies, checked Date arithmetic,
   Date display and LocalDateTime construction. Add invariant, Swedish and Israeli
   cultures with Language, immutable calendar-selecting date/time formatters, Hebrew

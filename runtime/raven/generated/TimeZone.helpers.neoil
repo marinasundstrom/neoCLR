@@ -1,0 +1,167 @@
+; Generated from runtime/raven/src/System/TimeZone.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.TimeZone.RuntimeStringget_Length(String source) -> Int32
+ldarg source
+call instance System.String::get_Length()
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeTimeOffsetToInstant(System.TimeOffset& source,System.LocalDateTime arg0) -> System.Instant
+ldarg source
+ldarg arg0
+call instance System.TimeOffset::ToInstant(System.LocalDateTime)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeInstantget_UnixTimeTicks(System.Instant& source) -> Int64
+ldarg source
+call instance System.Instant::get_UnixTimeTicks()
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeErrorSystemTimeZoneErrorNewSystemTimeZoneErrorUnknownZone(System.TimeZoneError.UnknownZone value) -> System.TimeZoneError
+ldarg value
+newobj instance System.TimeZoneError::.ctor(System.TimeZoneError.UnknownZone)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeErrorSystemTimeZoneErrorNewSystemTimeZoneErrorOutOfRange(System.TimeZoneError.OutOfRange value) -> System.TimeZoneError
+ldarg value
+newobj instance System.TimeZoneError::.ctor(System.TimeZoneError.OutOfRange)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeErrorSystemTimeZoneErrorNewSystemTimeZoneErrorSystemZoneUnavailable(System.TimeZoneError.SystemZoneUnavailable value) -> System.TimeZoneError
+ldarg value
+newobj instance System.TimeZoneError::.ctor(System.TimeZoneError.SystemZoneUnavailable)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeErrorSystemTimeZoneErrorUnknownZoneNew() -> System.TimeZoneError.UnknownZone
+newobj instance System.TimeZoneError.UnknownZone::.ctor()
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeErrorSystemTimeZoneErrorOutOfRangeNew() -> System.TimeZoneError.OutOfRange
+newobj instance System.TimeZoneError.OutOfRange::.ctor()
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeErrorSystemTimeZoneErrorSystemZoneUnavailableNew() -> System.TimeZoneError.SystemZoneUnavailable
+newobj instance System.TimeZoneError.SystemZoneUnavailable::.ctor()
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeUnion0(System.TimeZoneError arg0) -> System.Result.Error<System.TimeZoneError>
+ldarg arg0
+newobj instance System.Result.Error<System.TimeZoneError>::.ctor(System.TimeZoneError)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeUnion1(System.Result.Error<System.TimeZoneError> arg0) -> System.Result<System.TimeZone,System.TimeZoneError>
+ldarg arg0
+newobj instance System.Result<System.TimeZone,System.TimeZoneError>::.ctor(System.Result.Error<System.TimeZoneError>)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeUnion2(System.TimeZone arg0) -> System.Result.Ok<System.TimeZone>
+ldarg arg0
+newobj instance System.Result.Ok<System.TimeZone>::.ctor(System.TimeZone)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeUnion3(System.Result.Ok<System.TimeZone> arg0) -> System.Result<System.TimeZone,System.TimeZoneError>
+ldarg arg0
+newobj instance System.Result<System.TimeZone,System.TimeZoneError>::.ctor(System.Result.Ok<System.TimeZone>)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeUnion4(System.Result<System.TimeOffset,System.InvalidTimeError>& arg0,out(true) System.Result.Ok<System.TimeOffset>& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<System.TimeOffset,System.InvalidTimeError>::TryGetValue(System.Result.Ok<System.TimeOffset>&)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeUnion5(System.Result.Ok<System.TimeOffset>& arg0) -> System.TimeOffset
+ldarg arg0
+call instance System.Result.Ok<System.TimeOffset>::get_Value()
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeUnion6(System.Result.Error<System.TimeZoneError> arg0) -> System.Result<System.TimeOffset,System.TimeZoneError>
+ldarg arg0
+newobj instance System.Result<System.TimeOffset,System.TimeZoneError>::.ctor(System.Result.Error<System.TimeZoneError>)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeUnion7(System.TimeOffset arg0) -> System.Result.Ok<System.TimeOffset>
+ldarg arg0
+newobj instance System.Result.Ok<System.TimeOffset>::.ctor(System.TimeOffset)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeUnion8(System.Result.Ok<System.TimeOffset> arg0) -> System.Result<System.TimeOffset,System.TimeZoneError>
+ldarg arg0
+newobj instance System.Result<System.TimeOffset,System.TimeZoneError>::.ctor(System.Result.Ok<System.TimeOffset>)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeUnion9(System.LocalTimeMapping arg0) -> System.Result.Ok<System.LocalTimeMapping>
+ldarg arg0
+newobj instance System.Result.Ok<System.LocalTimeMapping>::.ctor(System.LocalTimeMapping)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeUnion10(System.Result.Ok<System.LocalTimeMapping> arg0) -> System.Result<System.LocalTimeMapping,System.TimeZoneError>
+ldarg arg0
+newobj instance System.Result<System.LocalTimeMapping,System.TimeZoneError>::.ctor(System.Result.Ok<System.LocalTimeMapping>)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeUnion11(System.Result<System.ZonedDateTime,System.TimeZoneError>& arg0,out System.ZonedDateTime& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<System.ZonedDateTime,System.TimeZoneError>::TryGetOutput(System.ZonedDateTime&)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeUnion12(System.Result.Error<System.TimeZoneError> arg0) -> System.Result<System.LocalTimeMapping,System.TimeZoneError>
+ldarg arg0
+newobj instance System.Result<System.LocalTimeMapping,System.TimeZoneError>::.ctor(System.Result.Error<System.TimeZoneError>)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeUnion13(System.Result<System.ZonedDateTime,System.TimeZoneError>& arg0,out System.TimeZoneError& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<System.ZonedDateTime,System.TimeZoneError>::TryGetResidual(System.TimeZoneError&)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeUnion14(System.TimeZoneError arg0) -> System.Result<System.LocalTimeMapping,System.TimeZoneError>
+ldarg arg0
+call System.Result<System.LocalTimeMapping,System.TimeZoneError>::FromResidual(System.TimeZoneError)
+ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.function neoCLR.Library.System.TimeZone.RuntimeServiceTimeZoneMapLocal(String arg0,Int64 arg1) -> arrayref<Int64>
+.local Int64[] source
+.local arrayref<Int64> destination
+.local Int32 index
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.TimeZoneMapLocal(String,Int64)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr Int64
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem Int64
+stelem Int64
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end

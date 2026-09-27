@@ -3,6 +3,8 @@ using Mono.Cecil;
 // Bounded immutable Gregorian/invariant policies; ordinary library classes.
 static class GlobalizationBindings
 {
+    public const string Zoned = "System.ZonedDateTime";
+    public const string Zone = "System.TimeZone";
     public const string Calendar = "System.Calendar";
     public const string Culture = "System.Globalization.Culture";
     public const string Format = "System.Globalization.DateTimeFormat";
@@ -12,9 +14,32 @@ static class GlobalizationBindings
     public const string SystemProvider = "System.Globalization.SystemCultureProvider";
     public static bool IsProvider(string name) => name is Provider or FixedProvider or SystemProvider;
     public static bool Converts(string source, string target) => source is FixedProvider or SystemProvider && target == Provider;
-    public static bool IsName(string name) => name is Calendar or Culture or Format or Language or Provider or FixedProvider or SystemProvider;
+    public static bool IsName(string name) => name is Zoned or Zone or Calendar or Culture or Format or Language or Provider or FixedProvider or SystemProvider;
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
     public const string Declarations = """
+        public struct DateTime { }
+        public struct LocalTimeMapping { public struct Unique { } public struct Ambiguous { } public struct Skipped { } }
+        public sealed class ZonedDateTime {
+            private ZonedDateTime() { }
+            public static Result<ZonedDateTime,TimeZoneError> Create(Instant instant, TimeZone zone) => default;
+            public Instant Instant => default;
+            public TimeZone Zone => default;
+            public LocalDateTime LocalDateTime => default;
+            public TimeOffset Offset => default;
+        }
+        public sealed class TimeZone {
+            private TimeZone() { }
+            public static TimeZone Utc => default;
+            public static string DatabaseVersion => default;
+            public string Id => default;
+            public int MinYear => default;
+            public int MaxYear => default;
+            public static Result<TimeZone,TimeZoneError> Find(string id) => default;
+            public static Result<TimeZone,TimeZoneError> GetSystem() => default;
+            public Result<TimeOffset,TimeZoneError> GetUtcOffset(Instant instant) => default;
+            public Result<ZonedDateTime,TimeZoneError> AtInstant(Instant instant) => default;
+            public Result<LocalTimeMapping,TimeZoneError> MapLocal(LocalDateTime local) => default;
+        }
         public sealed class Calendar {
             private Calendar() { }
             public static Calendar Gregorian => default;
@@ -99,6 +124,20 @@ static class GlobalizationBindings
             (SystemProvider, "FromPreference") => ("String", SystemProvider, true),
             (SystemProvider, "get_PreferredCultureName") => ("", "String", false),
             (SystemProvider, "get_IsFallback") => ("", "Boolean", false),
+            (Zoned, "Create") => ("System.Instant,System.TimeZone", "System.Result<System.ZonedDateTime,System.TimeZoneError>", true),
+            (Zoned, "get_Instant") => ("", "System.Instant", false),
+            (Zoned, "get_Zone") => ("", Zone, false),
+            (Zoned, "get_LocalDateTime") => ("", "System.LocalDateTime", false),
+            (Zoned, "get_Offset") => ("", "System.TimeOffset", false),
+            (Zone, "get_Utc") => ("", Zone, true),
+            (Zone, "get_DatabaseVersion") => ("", "String", true),
+            (Zone, "get_Id") => ("", "String", false),
+            (Zone, "get_MinYear" or "get_MaxYear") => ("", "Int32", false),
+            (Zone, "Find") => ("String", "System.Result<System.TimeZone,System.TimeZoneError>", true),
+            (Zone, "GetSystem") => ("", "System.Result<System.TimeZone,System.TimeZoneError>", true),
+            (Zone, "GetUtcOffset") => ("System.Instant", "System.Result<System.TimeOffset,System.TimeZoneError>", false),
+            (Zone, "AtInstant") => ("System.Instant", "System.Result<System.ZonedDateTime,System.TimeZoneError>", false),
+            (Zone, "MapLocal") => ("System.LocalDateTime", "System.Result<System.LocalTimeMapping,System.TimeZoneError>", false),
             (Calendar, "get_Gregorian" or "get_Hebrew") => ("", Calendar, true),
             (Calendar, "get_Id") or (Culture, "get_Name") => ("", "String", false),
             (Calendar, "get_MinYear" or "get_MaxYear") => ("", "Int32", false),

@@ -1269,3 +1269,24 @@ introduced. The focused verifier is `verify_comparers.py`, and
 The [calendar slice](../../calendar-globalization.md) adds source declarations and strict bindings for immutable calendar/culture/formatting facades. Runtime Contract selection is unchanged. The importer admits the exact internal CalendarRules and DateTimeFormatRules interfaces only in their matching library slices; they remain internal in emitted metadata. The new private RuntimeServices.SystemCultureName InternalCall returns the host preferred locale under ProcessEnvironment. Regenerate matching reference and all library fragments after these changes; legacy bundled System is unchanged.
 
 No Raven compiler code was changed. The bootstrap source uses an explicit block/local construction for DateTimeFormat.Invariant because the expression-bodied shadow-core factory form emitted null in this experiment. The executed consumer guards the working form. Run --globalization-signatures and verify_globalization.py for signature, executable and source-visibility checks.
+
+## Time and parenthesized DateTime (2026-09-27)
+
+[Time/zone contracts](../../time-zones.md) use the existing Runtime Contract selection.
+The host adds exact TimeZoneExists, TimeZoneOffset, TimeZoneMapLocal,
+TimeZoneDatabaseVersion and SystemTimeZoneName InternalCalls. Typed Raven code owns
+validation, public error/mapping unions and resolved values. No Raven compiler source
+or backend was changed.
+
+The bridge source-projects `DateTime(LocalDateTime | ZonedDateTime)` as a nominal
+parenthesized union. Its existing-type variants are recognized through the exact
+constructor/extractor contract, not nested-case metadata. Ordinary matched fields
+remain sequential; this does not admit arbitrary explicit layouts. Both DateTime extractors
+use out(true): a failed variant match leaves the output unassigned. DateTime arrays
+admit the standard inactive default and retain a referenced ZonedDateTime through GC.
+Named mapping uses a normal body-form LocalTimeMapping union with resolved payloads.
+
+Run `--globalization-signatures` for the expanded time signatures and malformed shape
+checks, and `verify_time_zones.py --bridge ... --runtime ... --runner ...` for both
+executed examples and negative source access checks. Regenerate all library/reference
+snapshots with the same bridge. Installed SDK artifacts are not republished here.

@@ -271,6 +271,8 @@ def main():
         'INTROSPECTION_SAMPLE': (raven + 'library-introspection-tour.rvn', '    let assembly', '    for module', False),
         'UNION_SAMPLE': (raven + 'library-query-terminals.rvn', 'func PrintOptional', '\nfunc OnlyPositive', False),
         'FUNC_SAMPLE': (raven + 'application-delegates.rvn', '    var shared = 7', '    WriteLine(shared)', True),
+        'DATETIME_UNION_SAMPLE': (raven + 'library-time-zones.rvn', 'func Describe(', '\n}', True),
+        'TIME_ZONE_SAMPLE': (raven + 'library-time-zones.rvn', 'func Main()', '\n}', True),
         'DATE_FORMAT_SAMPLE': (raven + 'library-date-formatting.rvn', 'func Main()', '\n}', True),
         'DATE_SAMPLE': (raven + 'library-calendar.rvn', '    CheckDate(Date.Create(day: 29', '    CheckDate(Date.FromDayNumber(-1))', True),
         'RAVEN_SAMPLE': (raven + 'library-propagation.rvn', 'func Normalize', '\n}', True),
@@ -303,7 +305,7 @@ def main():
     array_output = (ROOT / (raven + 'library-array-tour.expected.txt')).read_text().rstrip()
     downloads = OUTPUT / 'samples'
     downloads.mkdir()
-    for name in ('library-date-formatting.rvn', 'library-comparers.rvn', 'library-array-tour.rvn', 'library-array-tour.expected.txt', 'library-task-propagation.rvn', 'library-task-result.rvn', 'library-async-default-queue.rvn', 'library-task-producer.rvn', 'library-async-cancellation.rvn', 'library-outcome-operators.rvn', 'library-outcome-operators.expected.txt', 'library-query-basics.rvn', 'library-query-basics.expected.txt', 'library-query-names.rvn', 'library-query-names.expected.txt', 'library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
+    for name in ('library-time-zones.rvn', 'library-date-formatting.rvn', 'library-comparers.rvn', 'library-array-tour.rvn', 'library-array-tour.expected.txt', 'library-task-propagation.rvn', 'library-task-result.rvn', 'library-async-default-queue.rvn', 'library-task-producer.rvn', 'library-async-cancellation.rvn', 'library-outcome-operators.rvn', 'library-outcome-operators.expected.txt', 'library-query-basics.rvn', 'library-query-basics.expected.txt', 'library-query-names.rvn', 'library-query-names.expected.txt', 'library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
         source_sample = ROOT / raven / name
         shutil.copyfile(source_sample, downloads / name)
     post_downloads = downloads / 'http-post'

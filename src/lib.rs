@@ -7,6 +7,7 @@ pub mod pe;
 pub use assembler::assemble;
 mod access;
 mod clock;
+mod time_zones;
 mod console;
 pub mod debugger;
 mod execution;

@@ -37,4 +37,7 @@
 <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Data/Json/JsonError.rvn" LogicalName="NeoCLR.JsonError.rvn" /></ItemGroup>
 <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn" LogicalName="NeoCLR.ReflectionError.rvn" /></ItemGroup>
 <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Web/Http/Json/HttpJsonError.rvn" LogicalName="NeoCLR.HttpJsonError.rvn" /></ItemGroup>
+<ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/TimeZoneError.rvn" LogicalName="NeoCLR.TimeZoneError.rvn" /></ItemGroup>
+<ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/LocalTimeMapping.rvn" LogicalName="NeoCLR.LocalTimeMapping.rvn" /></ItemGroup>
+<ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/DateTime.rvn" LogicalName="NeoCLR.DateTime.rvn" /></ItemGroup>
 </Project>

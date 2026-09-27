@@ -8119,3 +8119,33 @@ configuration/content, not target-specific code added to Raven main.
 - **Author:** requests globalization be featured on the website. **Assistant:** adds a dedicated feature page, homepage entry and guide/API navigation, with tested Hebrew/Latin output and a distinct future-localization section. Publication is a separate operation.
 
 - **Author:** directs a separate DateTime feature page and selects the Time API and time-zone handling as the next slice. **Assistant:** keeps the existing time route as the DateTime page, separates globalization and records the next work without implementing zones in this commit.
+
+## 2026-09-27 — Time offsets, named zones and parenthesized DateTime
+
+- **Author:** says “Continue” after selecting Time and time-zone handling next.
+  **Assistant:** implements civil/elapsed arithmetic, fixed offsets, named IANA rules,
+  a resolved ZonedDateTime and explicit local mapping instead of guessing through DST.
+- **Author:** asks “Isn't TimeOffset a better name?” **Assistant:** adopts TimeOffset
+  for the fixed UTC displacement, separate from TimeZone's changing rules.
+- **Author:** proposes a nominal DateTime union, initially describing local or offset
+  date-time, then specifies “Parenthesized union”. **Assistant:** first spells the
+  proposed `DateTime(LocalDateTime | OffsetDateTime)` shape without wrapper cases.
+- **Author:** clarifies that the intended second value may be “zone-id time”, leaves
+  terminology to the assistant and says offset date-time was not necessarily intended.
+  **Assistant:** chooses `DateTime(LocalDateTime | ZonedDateTime)`, retaining named
+  zone identity; leaves OffsetDateTime out. This changes the earlier proposal's
+  no-DateTime direction, without introducing .NET's Kind flag.
+- **Assistant actions:** compiles the parenthesized declaration through Raven and
+  extends the neoCLR bridge's exact supported union shape and conditional extraction
+  checks. A consumer exposed failed-match output handling; the bridge was corrected.
+  Native transition tests and a .NET 10 comparison passed. Final executable and
+  artifact validation is tracked in [the Time/zone guide](time-zones.md).
+- **Author:** directs committing the completed slice, merging into main and cleaning
+  up branches/worktrees. **Assistant:** checks main is clean and plans integration
+  with the independently completed text/encoding work; no unrelated work is removed.
+
+- **Validation outcome:** both DateTime variants, union arrays/defaults and the final
+  time/zone consumers pass. The expanded signature probe passes 122 checks; guest IL
+  cannot mutate TimeOffset storage or construct a private TimeZone. Focused reference
+  rendering confirms the pages and records the parenthesized-heading/payload-page
+  limitations explicitly. Integration and cleanup occur after these feature checks.

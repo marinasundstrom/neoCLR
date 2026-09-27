@@ -1,0 +1,8 @@
+namespace System
+
+/// A civil time can identify zero, one or two instants in a named zone.
+public union LocalTimeMapping {
+    case Unique(value: ZonedDateTime)
+    case Ambiguous(earlier: ZonedDateTime, later: ZonedDateTime)
+    case Skipped
+}

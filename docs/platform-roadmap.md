@@ -239,3 +239,12 @@ Older links are retained below and lead to dated records. Their former “curren
 The author requested useful date rendering with Gregorian/Hebrew calendars, Swedish and Hebrew cultures, invariant presentation and system discovery. The [provisional implementation and evidence](calendar-globalization.md) complete this bounded library slice without permanently reprioritizing later milestones. Unified localization stays separate, with shared interfaces and interchangeable providers/sources still to design.
 
 Author follow-up, 2026-09-27: the next slice is the Time API and time-zone handling. DateTime and globalization have separate feature pages. This records sequencing, not implemented zone support.
+
+### Time and named zones — implemented development slice, 2026-09-27
+
+The selected [Time/zone slice](time-zones.md) adds TimeOffset, ZonedDateTime, named IANA
+rules and explicit Unique/Ambiguous/Skipped mapping. DateTime is a nominal
+parenthesized union of LocalDateTime and ZonedDateTime following the author's
+clarification. Time wraps, civil addition carries the date, and elapsed Instant
+addition checks overflow. The bounded 1900–2099 named-zone range and pinned 2025b
+database are provisional. Broader rules/providers, parsing and scheduling remain open.

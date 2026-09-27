@@ -219,3 +219,13 @@ update the relevant design when a contract changes. Consolidation revalidates no
 Implemented [date arithmetic, calendars and formatting](../calendar-globalization.md), including Hebrew alphabet/Latin output and system preferred-culture discovery. Rust fixtures validate all 656 complete Hebrew year starts/month lengths against .NET; Raven consumers exercise formatting and provider fallback. Localization remains independent, with unified interfaces and differing JSON/resource sources planned. These APIs are provisional and not in Preview 10.
 
 Author follow-up, 2026-09-27: the next slice is the Time API and time-zone handling. DateTime and globalization have separate feature pages. This records sequencing, not implemented zone support.
+
+### Time/zone outcome — 2026-09-27
+
+The next author-selected slice now has [implemented contracts and evidence](../time-zones.md):
+TimeOffset, TimeZone, ZonedDateTime, LocalTimeMapping and the nominal parenthesized
+DateTime(LocalDateTime | ZonedDateTime). Fixed-offset civil projection covers years
+1–9999; pinned IANA named rules cover 1900–2099. Tests distinguish civil versus elapsed
+arithmetic across DST, and validate gaps, ordered overlaps and second-level offsets.
+Formatting uses the existing separate culture APIs. No unified localization resource
+implementation or scheduling API is added.

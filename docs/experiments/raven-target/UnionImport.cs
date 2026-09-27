@@ -484,7 +484,7 @@ static class UnionImport
                             || !referenceDestination.Type.EndsWith("&", StringComparison.Ordinal))
                             throw new InvalidDataException("Reference indirect stores require a declared instance output argument.");
                         var referenceOutput = referenceDestination.Type[..^1];
-                        if ((referenceOutput != "String" && !ApplicationTypes.IsReference(referenceOutput))
+                        if ((referenceOutput != "String" && !ApplicationTypes.IsReference(referenceOutput) && !GlobalizationBindings.IsName(referenceOutput))
                             || referenceValue.Type != referenceOutput)
                             throw new InvalidDataException("Reference output stores require an exact supported value type.");
                         code.AppendLine("stobj " + referenceOutput); break;

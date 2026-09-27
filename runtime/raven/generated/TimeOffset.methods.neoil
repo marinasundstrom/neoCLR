@@ -1,0 +1,469 @@
+; Generated from runtime/raven/src/System/TimeOffset.rvn. Regenerate with build_runtime_library.py.
+.type System.TimeOffset
+.sealed
+.implements System.EquatableTo<System.TimeOffset>
+.implements System.ComparableTo<System.TimeOffset>
+.field private StoredSeconds Int32
+.property static Zero() -> System.TimeOffset
+.get System.TimeOffset::get_Zero()
+.end
+.property instance Seconds() -> Int32
+.get instance System.TimeOffset::get_Seconds()
+.end
+.method private instance byref .ctor(Int32 seconds) -> Void
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 1
+M00000001_IL_0009:
+stloc local0
+M00000001_IL_000a:
+ldarg 0
+M00000001_IL_000b:
+ldloc local0
+M00000001_IL_000c:
+stfld System.TimeOffset::StoredSeconds
+pop
+M00000001_IL_0011:
+ldvoid
+ret
+.end
+.method static get_Zero() -> System.TimeOffset
+M00000002_IL_0000:
+M00000002_IL_0001:
+ldc.i4 0
+M00000002_IL_0002:
+newobj instance System.TimeOffset::.ctor(Int32)
+M00000002_IL_0007:
+ret
+.end
+.method static FromSeconds(Int32 seconds) -> System.Result<System.TimeOffset,System.InvalidTimeError>
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldc.i4 -64800
+M00000003_IL_0008:
+clt
+call neoCLR.Library.System.TimeOffset.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_000a:
+brtrue M00000003_IL_0014
+M00000003_IL_000f:
+br M00000003_IL_0024
+M00000003_IL_0014:
+call neoCLR.Library.System.TimeOffset.RuntimeErrorSystemInvalidTimeErrorNew()
+M00000003_IL_0019:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion0(System.InvalidTimeError)
+M00000003_IL_001e:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion1(System.Result.Error<System.InvalidTimeError>)
+M00000003_IL_0023:
+ret
+M00000003_IL_0024:
+M00000003_IL_0025:
+M00000003_IL_0026:
+ldarg 0
+M00000003_IL_0027:
+ldc.i4 64800
+M00000003_IL_002c:
+cgt
+call neoCLR.Library.System.TimeOffset.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_002e:
+brtrue M00000003_IL_0038
+M00000003_IL_0033:
+br M00000003_IL_0048
+M00000003_IL_0038:
+call neoCLR.Library.System.TimeOffset.RuntimeErrorSystemInvalidTimeErrorNew()
+M00000003_IL_003d:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion0(System.InvalidTimeError)
+M00000003_IL_0042:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion1(System.Result.Error<System.InvalidTimeError>)
+M00000003_IL_0047:
+ret
+M00000003_IL_0048:
+M00000003_IL_0049:
+M00000003_IL_004a:
+ldarg 0
+M00000003_IL_004b:
+newobj instance System.TimeOffset::.ctor(Int32)
+M00000003_IL_0050:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion2(System.TimeOffset)
+M00000003_IL_0055:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion3(System.Result.Ok<System.TimeOffset>)
+M00000003_IL_005a:
+ret
+.end
+.method instance readonly byref get_Seconds() -> Int32
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.TimeOffset::StoredSeconds
+M00000004_IL_0008:
+ret
+.end
+.method instance readonly byref AtInstant(System.Instant instant) -> System.Result<System.LocalDateTime,System.InvalidDateError>
+.local Int64 local0
+.local Int64 local1
+.local Int64 local2
+.local System.Date local3
+.local System.Time local4
+.local System.Result<System.Date,System.InvalidDateError> local5
+.local System.Result.Ok<System.Date> local6
+.local System.Result<System.Time,System.InvalidTimeError> local7
+.local System.Result.Ok<System.Time> local8
+ldc.i8 0
+stloc local0
+ldc.i8 0
+stloc local1
+ldc.i8 0
+stloc local2
+ldloca local3
+initobj System.Date
+ldloca local4
+initobj System.Time
+ldloca local5
+initobj System.Result<System.Date,System.InvalidDateError>
+ldloca local6
+initobj System.Result.Ok<System.Date>
+ldloca local7
+initobj System.Result<System.Time,System.InvalidTimeError>
+ldloca local8
+initobj System.Result.Ok<System.Time>
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarga 1
+M00000005_IL_0004:
+call neoCLR.Library.System.TimeOffset.RuntimeInstantget_UnixTimeTicks(System.Instant&)
+M00000005_IL_0009:
+stloc local0
+M00000005_IL_000a:
+M00000005_IL_000b:
+ldarg 0
+M00000005_IL_000c:
+ldfld System.TimeOffset::StoredSeconds
+M00000005_IL_0011:
+conv.i8
+M00000005_IL_0012:
+ldc.i8 10000000
+M00000005_IL_001b:
+mul
+M00000005_IL_001c:
+stloc local1
+M00000005_IL_001d:
+M00000005_IL_001e:
+ldloc local0
+M00000005_IL_001f:
+ldc.i8 -621355968000000000
+M00000005_IL_0028:
+ldloc local1
+M00000005_IL_0029:
+sub
+M00000005_IL_002a:
+clt
+call neoCLR.Library.System.TimeOffset.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_002c:
+brtrue M00000005_IL_0036
+M00000005_IL_0031:
+br M00000005_IL_0046
+M00000005_IL_0036:
+call neoCLR.Library.System.TimeOffset.RuntimeErrorSystemInvalidDateErrorNew()
+M00000005_IL_003b:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion4(System.InvalidDateError)
+M00000005_IL_0040:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion5(System.Result.Error<System.InvalidDateError>)
+M00000005_IL_0045:
+ret
+M00000005_IL_0046:
+M00000005_IL_0047:
+M00000005_IL_0048:
+ldloc local0
+M00000005_IL_0049:
+ldc.i8 2534023007999999999
+M00000005_IL_0052:
+ldloc local1
+M00000005_IL_0053:
+sub
+M00000005_IL_0054:
+cgt
+call neoCLR.Library.System.TimeOffset.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0056:
+brtrue M00000005_IL_0060
+M00000005_IL_005b:
+br M00000005_IL_0070
+M00000005_IL_0060:
+call neoCLR.Library.System.TimeOffset.RuntimeErrorSystemInvalidDateErrorNew()
+M00000005_IL_0065:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion4(System.InvalidDateError)
+M00000005_IL_006a:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion5(System.Result.Error<System.InvalidDateError>)
+M00000005_IL_006f:
+ret
+M00000005_IL_0070:
+M00000005_IL_0071:
+M00000005_IL_0072:
+ldloc local0
+M00000005_IL_0073:
+ldloc local1
+M00000005_IL_0074:
+add
+M00000005_IL_0075:
+ldc.i8 621355968000000000
+M00000005_IL_007e:
+add
+M00000005_IL_007f:
+stloc local2
+M00000005_IL_0080:
+M00000005_IL_0081:
+ldloc local2
+M00000005_IL_0082:
+ldc.i8 864000000000
+M00000005_IL_008b:
+div
+M00000005_IL_008c:
+conv.i4
+M00000005_IL_008d:
+call System.Date::FromDayNumber(Int32)
+M00000005_IL_0092:
+stloc local5
+M00000005_IL_0094:
+ldloca local6
+M00000005_IL_0096:
+initobj System.Result.Ok<System.Date>
+M00000005_IL_009c:
+ldloca local5
+M00000005_IL_009e:
+ldloca local6
+M00000005_IL_00a0:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion6(System.Result<System.Date,System.InvalidDateError>&,System.Result.Ok<System.Date>&)
+M00000005_IL_00a5:
+brfalse M00000005_IL_00be
+M00000005_IL_00aa:
+ldloca local6
+M00000005_IL_00ac:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion7(System.Result.Ok<System.Date>&)
+M00000005_IL_00b1:
+stloc local3
+M00000005_IL_00b2:
+M00000005_IL_00b3:
+br M00000005_IL_00c3
+M00000005_IL_00be:
+br M00000005_IL_00c8
+M00000005_IL_00c3:
+br M00000005_IL_00d9
+M00000005_IL_00c8:
+M00000005_IL_00c9:
+call neoCLR.Library.System.TimeOffset.RuntimeErrorSystemInvalidDateErrorNew()
+M00000005_IL_00ce:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion4(System.InvalidDateError)
+M00000005_IL_00d3:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion5(System.Result.Error<System.InvalidDateError>)
+M00000005_IL_00d8:
+ret
+M00000005_IL_00d9:
+M00000005_IL_00da:
+M00000005_IL_00db:
+ldloc local2
+M00000005_IL_00dc:
+ldc.i8 864000000000
+M00000005_IL_00e5:
+rem
+M00000005_IL_00e6:
+call System.Time::FromTicks(Int64)
+M00000005_IL_00eb:
+stloc local7
+M00000005_IL_00ed:
+ldloca local8
+M00000005_IL_00ef:
+initobj System.Result.Ok<System.Time>
+M00000005_IL_00f5:
+ldloca local7
+M00000005_IL_00f7:
+ldloca local8
+M00000005_IL_00f9:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion8(System.Result<System.Time,System.InvalidTimeError>&,System.Result.Ok<System.Time>&)
+M00000005_IL_00fe:
+brfalse M00000005_IL_0118
+M00000005_IL_0103:
+ldloca local8
+M00000005_IL_0105:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion9(System.Result.Ok<System.Time>&)
+M00000005_IL_010a:
+stloc local4
+M00000005_IL_010c:
+M00000005_IL_010d:
+br M00000005_IL_011d
+M00000005_IL_0118:
+br M00000005_IL_0122
+M00000005_IL_011d:
+br M00000005_IL_0133
+M00000005_IL_0122:
+M00000005_IL_0123:
+call neoCLR.Library.System.TimeOffset.RuntimeErrorSystemInvalidDateErrorNew()
+M00000005_IL_0128:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion4(System.InvalidDateError)
+M00000005_IL_012d:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion5(System.Result.Error<System.InvalidDateError>)
+M00000005_IL_0132:
+ret
+M00000005_IL_0133:
+M00000005_IL_0134:
+M00000005_IL_0135:
+ldloc local3
+M00000005_IL_0136:
+ldloc local4
+M00000005_IL_0138:
+call System.LocalDateTime::Create(System.Date,System.Time)
+M00000005_IL_013d:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion10(System.LocalDateTime)
+M00000005_IL_0142:
+call neoCLR.Library.System.TimeOffset.RuntimeUnion11(System.Result.Ok<System.LocalDateTime>)
+M00000005_IL_0147:
+ret
+.end
+.method instance readonly byref ToInstant(System.LocalDateTime local) -> System.Instant
+.local Int64 local0
+.local System.Date local1
+.local System.Time local2
+ldc.i8 0
+stloc local0
+ldloca local1
+initobj System.Date
+ldloca local2
+initobj System.Time
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarga 1
+M00000006_IL_0004:
+call neoCLR.Library.System.TimeOffset.RuntimeLocalDateTimeget_Date(System.LocalDateTime&)
+M00000006_IL_0009:
+stloc local1
+M00000006_IL_000a:
+ldloca local1
+M00000006_IL_000c:
+call neoCLR.Library.System.TimeOffset.RuntimeDateget_DayNumber(System.Date&)
+M00000006_IL_0011:
+conv.i8
+M00000006_IL_0012:
+ldc.i8 864000000000
+M00000006_IL_001b:
+mul
+M00000006_IL_001c:
+ldarga 1
+M00000006_IL_001e:
+call neoCLR.Library.System.TimeOffset.RuntimeLocalDateTimeget_Time(System.LocalDateTime&)
+M00000006_IL_0023:
+stloc local2
+M00000006_IL_0024:
+ldloca local2
+M00000006_IL_0026:
+call neoCLR.Library.System.TimeOffset.RuntimeTimeget_Ticks(System.Time&)
+M00000006_IL_002b:
+add
+M00000006_IL_002c:
+ldc.i8 621355968000000000
+M00000006_IL_0035:
+sub
+M00000006_IL_0036:
+stloc local0
+M00000006_IL_0037:
+M00000006_IL_0038:
+ldloc local0
+M00000006_IL_0039:
+ldarg 0
+M00000006_IL_003a:
+ldfld System.TimeOffset::StoredSeconds
+M00000006_IL_003f:
+conv.i8
+M00000006_IL_0040:
+ldc.i8 10000000
+M00000006_IL_0049:
+mul
+M00000006_IL_004a:
+sub
+M00000006_IL_004b:
+call System.Instant::FromUnixTimeTicks(Int64)
+M00000006_IL_0050:
+ret
+.end
+.method instance readonly byref Equals(System.TimeOffset other) -> Boolean
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+ldfld System.TimeOffset::StoredSeconds
+M00000007_IL_0008:
+ldarga 1
+M00000007_IL_000a:
+ldfld System.TimeOffset::StoredSeconds
+M00000007_IL_000f:
+ceq
+call neoCLR.Library.System.TimeOffset.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0011:
+call neoCLR.Library.System.TimeOffset.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance readonly byref CompareTo(System.TimeOffset other) -> Int32
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldfld System.TimeOffset::StoredSeconds
+M00000008_IL_0008:
+ldarga 1
+M00000008_IL_000a:
+ldfld System.TimeOffset::StoredSeconds
+M00000008_IL_000f:
+clt
+call neoCLR.Library.System.TimeOffset.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0011:
+brtrue M00000008_IL_001b
+M00000008_IL_0016:
+br M00000008_IL_001e
+M00000008_IL_001b:
+M00000008_IL_001c:
+ldc.i4 -1
+M00000008_IL_001d:
+ret
+M00000008_IL_001e:
+M00000008_IL_001f:
+M00000008_IL_0020:
+ldarg 0
+M00000008_IL_0021:
+ldfld System.TimeOffset::StoredSeconds
+M00000008_IL_0026:
+ldarga 1
+M00000008_IL_0028:
+ldfld System.TimeOffset::StoredSeconds
+M00000008_IL_002d:
+cgt
+call neoCLR.Library.System.TimeOffset.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_002f:
+brtrue M00000008_IL_0039
+M00000008_IL_0034:
+br M00000008_IL_003c
+M00000008_IL_0039:
+M00000008_IL_003a:
+ldc.i4 1
+M00000008_IL_003b:
+ret
+M00000008_IL_003c:
+M00000008_IL_003d:
+M00000008_IL_003e:
+ldc.i4 0
+M00000008_IL_003f:
+ret
+.end
+.end

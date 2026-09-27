@@ -1,0 +1,15 @@
+.function neoCLR.Runtime.TimeZoneExists(String) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TimeZoneOffset(String,Int64) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TimeZoneMapLocal(String,Int64) -> Int64[]
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TimeZoneDatabaseVersion() -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SystemTimeZoneName() -> String
+.methodimpl InternalCall
+.end

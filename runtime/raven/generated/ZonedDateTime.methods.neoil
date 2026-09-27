@@ -1,0 +1,237 @@
+; Generated from runtime/raven/src/System/ZonedDateTime.rvn. Regenerate with build_runtime_library.py.
+.type class System.ZonedDateTime
+.sealed
+.field private instant System.Instant
+.field private zone System.TimeZone
+.field private local System.LocalDateTime
+.field private offset System.TimeOffset
+.property instance Instant() -> System.Instant
+.get instance System.ZonedDateTime::get_Instant()
+.end
+.property instance Zone() -> System.TimeZone
+.get instance System.ZonedDateTime::get_Zone()
+.end
+.property instance LocalDateTime() -> System.LocalDateTime
+.get instance System.ZonedDateTime::get_LocalDateTime()
+.end
+.property instance Offset() -> System.TimeOffset
+.get instance System.ZonedDateTime::get_Offset()
+.end
+.method private instance .ctor(System.Instant instant,System.TimeZone zone,System.LocalDateTime local,System.TimeOffset offset) -> noresult
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 0
+M00000001_IL_0009:
+ldarg 1
+M00000001_IL_000a:
+stfld System.ZonedDateTime::instant
+M00000001_IL_000f:
+M00000001_IL_0010:
+ldarg 0
+M00000001_IL_0011:
+ldarg 2
+M00000001_IL_0012:
+stfld System.ZonedDateTime::zone
+M00000001_IL_0017:
+M00000001_IL_0018:
+ldarg 0
+M00000001_IL_0019:
+ldarg 3
+M00000001_IL_001a:
+stfld System.ZonedDateTime::local
+M00000001_IL_001f:
+M00000001_IL_0020:
+ldarg 0
+M00000001_IL_0021:
+ldarg 4
+M00000001_IL_0023:
+stfld System.ZonedDateTime::offset
+M00000001_IL_0028:
+ret
+.end
+.method static Create(System.Instant instant,System.TimeZone zone) -> System.Result<System.ZonedDateTime,System.TimeZoneError>
+.local System.Result<System.TimeOffset,System.TimeZoneError> local0
+.local System.TimeOffset local1
+.local System.TimeZoneError local2
+.local System.TimeOffset local3
+.local System.LocalDateTime local4
+.local System.Result<System.LocalDateTime,System.InvalidDateError> local5
+.local System.Result.Ok<System.LocalDateTime> local6
+ldloca local0
+initobj System.Result<System.TimeOffset,System.TimeZoneError>
+ldloca local1
+initobj System.TimeOffset
+ldloca local2
+initobj System.TimeZoneError
+ldloca local3
+initobj System.TimeOffset
+ldloca local4
+initobj System.LocalDateTime
+ldloca local5
+initobj System.Result<System.LocalDateTime,System.InvalidDateError>
+ldloca local6
+initobj System.Result.Ok<System.LocalDateTime>
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 1
+M00000002_IL_0003:
+ldarg 0
+M00000002_IL_0004:
+call instance System.TimeZone::GetUtcOffset(System.Instant)
+M00000002_IL_0009:
+stloc local0
+M00000002_IL_000a:
+ldloca local1
+M00000002_IL_000c:
+initobj System.TimeOffset
+M00000002_IL_0012:
+ldloca local0
+M00000002_IL_0014:
+ldloca local1
+M00000002_IL_0016:
+call neoCLR.Library.System.ZonedDateTime.RuntimeUnion0(System.Result<System.TimeOffset,System.TimeZoneError>&,System.TimeOffset&)
+call neoCLR.Library.System.ZonedDateTime.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_001b:
+brfalse M00000002_IL_0025
+M00000002_IL_0020:
+br M00000002_IL_0046
+M00000002_IL_0025:
+ldloca local2
+M00000002_IL_0027:
+initobj System.TimeZoneError
+M00000002_IL_002d:
+ldloca local0
+M00000002_IL_002f:
+ldloca local2
+M00000002_IL_0031:
+call neoCLR.Library.System.ZonedDateTime.RuntimeUnion1(System.Result<System.TimeOffset,System.TimeZoneError>&,System.TimeZoneError&)
+call neoCLR.Library.System.ZonedDateTime.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0036:
+brfalse M00000002_IL_0042
+M00000002_IL_003b:
+ldloc local2
+M00000002_IL_003c:
+call neoCLR.Library.System.ZonedDateTime.RuntimeUnion2(System.TimeZoneError)
+M00000002_IL_0041:
+ret
+M00000002_IL_0042:
+M00000002_IL_0043:
+M00000002_IL_0044:
+M00000002_IL_0045:
+fault "Guest program reached a terminal failure"
+M00000002_IL_0046:
+M00000002_IL_0047:
+ldloc local1
+M00000002_IL_0048:
+stloc local3
+M00000002_IL_0049:
+M00000002_IL_004a:
+ldloca local3
+M00000002_IL_004c:
+ldarg 0
+M00000002_IL_004d:
+call neoCLR.Library.System.ZonedDateTime.RuntimeTimeOffsetAtInstant(System.TimeOffset&,System.Instant)
+M00000002_IL_0052:
+stloc local5
+M00000002_IL_0054:
+ldloca local6
+M00000002_IL_0056:
+initobj System.Result.Ok<System.LocalDateTime>
+M00000002_IL_005c:
+ldloca local5
+M00000002_IL_005e:
+ldloca local6
+M00000002_IL_0060:
+call neoCLR.Library.System.ZonedDateTime.RuntimeUnion3(System.Result<System.LocalDateTime,System.InvalidDateError>&,System.Result.Ok<System.LocalDateTime>&)
+M00000002_IL_0065:
+brfalse M00000002_IL_007f
+M00000002_IL_006a:
+ldloca local6
+M00000002_IL_006c:
+call neoCLR.Library.System.ZonedDateTime.RuntimeUnion4(System.Result.Ok<System.LocalDateTime>&)
+M00000002_IL_0071:
+stloc local4
+M00000002_IL_0073:
+M00000002_IL_0074:
+br M00000002_IL_0084
+M00000002_IL_007f:
+br M00000002_IL_0089
+M00000002_IL_0084:
+br M00000002_IL_009f
+M00000002_IL_0089:
+M00000002_IL_008a:
+call neoCLR.Library.System.ZonedDateTime.RuntimeErrorSystemTimeZoneErrorOutOfRangeNew()
+M00000002_IL_008f:
+call neoCLR.Library.System.ZonedDateTime.RuntimeErrorSystemTimeZoneErrorNewSystemTimeZoneErrorOutOfRange(System.TimeZoneError.OutOfRange)
+M00000002_IL_0094:
+call neoCLR.Library.System.ZonedDateTime.RuntimeUnion5(System.TimeZoneError)
+M00000002_IL_0099:
+call neoCLR.Library.System.ZonedDateTime.RuntimeUnion6(System.Result.Error<System.TimeZoneError>)
+M00000002_IL_009e:
+ret
+M00000002_IL_009f:
+M00000002_IL_00a0:
+M00000002_IL_00a1:
+ldarg 0
+M00000002_IL_00a2:
+ldarg 1
+M00000002_IL_00a3:
+ldloc local4
+M00000002_IL_00a5:
+ldloc local3
+M00000002_IL_00a6:
+newobj instance System.ZonedDateTime::.ctor(System.Instant,System.TimeZone,System.LocalDateTime,System.TimeOffset)
+M00000002_IL_00ab:
+call neoCLR.Library.System.ZonedDateTime.RuntimeUnion7(System.ZonedDateTime)
+M00000002_IL_00b0:
+call neoCLR.Library.System.ZonedDateTime.RuntimeUnion8(System.Result.Ok<System.ZonedDateTime>)
+M00000002_IL_00b5:
+ret
+.end
+.method instance get_Instant() -> System.Instant
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.ZonedDateTime::instant
+M00000003_IL_0008:
+ret
+.end
+.method instance get_Zone() -> System.TimeZone
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.ZonedDateTime::zone
+M00000004_IL_0008:
+ret
+.end
+.method instance get_LocalDateTime() -> System.LocalDateTime
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.ZonedDateTime::local
+M00000005_IL_0008:
+ret
+.end
+.method instance get_Offset() -> System.TimeOffset
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.ZonedDateTime::offset
+M00000006_IL_0008:
+ret
+.end
+.end

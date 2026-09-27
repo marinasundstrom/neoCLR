@@ -337,7 +337,10 @@ call neoCLR.Library.System.Time.RuntimeUnion3(System.Result.Ok<System.Time>)
 M00000004_IL_0062:
 ret
 .end
-.method instance readonly byref get_Ticks() -> Int64
+.method instance readonly byref Add(System.Duration duration) -> System.Time
+.local Int64 local0
+ldc.i8 0
+stloc local0
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -345,45 +348,103 @@ ldarg 0
 M00000005_IL_0003:
 ldfld System.Time::StoredTicks
 M00000005_IL_0008:
+ldarga 1
+M00000005_IL_000a:
+call neoCLR.Library.System.Time.RuntimeDurationget_Ticks(System.Duration&)
+M00000005_IL_000f:
+ldc.i8 864000000000
+M00000005_IL_0018:
+rem
+M00000005_IL_0019:
+add
+M00000005_IL_001a:
+stloc local0
+M00000005_IL_001b:
+M00000005_IL_001c:
+ldloc local0
+M00000005_IL_001d:
+ldc.i8 0
+M00000005_IL_0026:
+clt
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0028:
+brtrue M00000005_IL_0032
+M00000005_IL_002d:
+br M00000005_IL_003f
+M00000005_IL_0032:
+M00000005_IL_0033:
+ldloc local0
+M00000005_IL_0034:
+ldc.i8 864000000000
+M00000005_IL_003d:
+add
+M00000005_IL_003e:
+stloc local0
+M00000005_IL_003f:
+M00000005_IL_0040:
+M00000005_IL_0041:
+ldloc local0
+M00000005_IL_0042:
+ldc.i8 864000000000
+M00000005_IL_004b:
+clt
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_004d:
+ldc.i4 0
+M00000005_IL_004e:
+ceq
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0050:
+brtrue M00000005_IL_005a
+M00000005_IL_0055:
+br M00000005_IL_0067
+M00000005_IL_005a:
+M00000005_IL_005b:
+ldloc local0
+M00000005_IL_005c:
+ldc.i8 864000000000
+M00000005_IL_0065:
+sub
+M00000005_IL_0066:
+stloc local0
+M00000005_IL_0067:
+M00000005_IL_0068:
+M00000005_IL_0069:
+ldloc local0
+M00000005_IL_006a:
+newobj instance System.Time::.ctor(Int64)
+M00000005_IL_006f:
 ret
 .end
-.method instance readonly byref get_Hour() -> Int32
+.method instance override readonly byref ToString() -> String
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
 ldarg 0
 M00000006_IL_0003:
-ldfld System.Time::StoredTicks
+call System.Globalization.Culture::get_Current()
 M00000006_IL_0008:
-ldc.i8 36000000000
-M00000006_IL_0011:
-div
-M00000006_IL_0012:
-conv.i4
-M00000006_IL_0013:
+call instance System.Time::ToString(System.Globalization.Culture)
+M00000006_IL_000d:
 ret
 .end
-.method instance readonly byref get_Minute() -> Int32
+.method instance readonly byref ToString(System.Globalization.Culture culture) -> String
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
-ldarg 0
+ldarg 1
 M00000007_IL_0003:
-ldfld System.Time::StoredTicks
+call instance System.Globalization.Culture::get_DateTimeFormat()
 M00000007_IL_0008:
-ldc.i8 600000000
-M00000007_IL_0011:
-div
-M00000007_IL_0012:
-ldc.i8 60
-M00000007_IL_001b:
-rem
-M00000007_IL_001c:
-conv.i4
-M00000007_IL_001d:
+ldarg 0
+M00000007_IL_0009:
+ldobj System.Time
+M00000007_IL_000e:
+call instance System.Globalization.DateTimeFormat::FormatTime(System.Time)
+M00000007_IL_0013:
 ret
 .end
-.method instance readonly byref get_Second() -> Int32
+.method instance readonly byref get_Ticks() -> Int64
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:
@@ -391,19 +452,9 @@ ldarg 0
 M00000008_IL_0003:
 ldfld System.Time::StoredTicks
 M00000008_IL_0008:
-ldc.i8 10000000
-M00000008_IL_0011:
-div
-M00000008_IL_0012:
-ldc.i8 60
-M00000008_IL_001b:
-rem
-M00000008_IL_001c:
-conv.i4
-M00000008_IL_001d:
 ret
 .end
-.method instance readonly byref get_Millisecond() -> Int32
+.method instance readonly byref get_Hour() -> Int32
 M00000009_IL_0000:
 M00000009_IL_0001:
 M00000009_IL_0002:
@@ -411,19 +462,15 @@ ldarg 0
 M00000009_IL_0003:
 ldfld System.Time::StoredTicks
 M00000009_IL_0008:
-ldc.i8 10000
+ldc.i8 36000000000
 M00000009_IL_0011:
 div
 M00000009_IL_0012:
-ldc.i8 1000
-M00000009_IL_001b:
-rem
-M00000009_IL_001c:
 conv.i4
-M00000009_IL_001d:
+M00000009_IL_0013:
 ret
 .end
-.method instance readonly byref get_FractionTicks() -> Int32
+.method instance readonly byref get_Minute() -> Int32
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 M0000000a_IL_0002:
@@ -431,15 +478,19 @@ ldarg 0
 M0000000a_IL_0003:
 ldfld System.Time::StoredTicks
 M0000000a_IL_0008:
-ldc.i8 10000000
+ldc.i8 600000000
 M0000000a_IL_0011:
-rem
+div
 M0000000a_IL_0012:
+ldc.i8 60
+M0000000a_IL_001b:
+rem
+M0000000a_IL_001c:
 conv.i4
-M0000000a_IL_0013:
+M0000000a_IL_001d:
 ret
 .end
-.method instance readonly byref Equals(System.Time other) -> Boolean
+.method instance readonly byref get_Second() -> Int32
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 M0000000b_IL_0002:
@@ -447,17 +498,19 @@ ldarg 0
 M0000000b_IL_0003:
 ldfld System.Time::StoredTicks
 M0000000b_IL_0008:
-ldarga 1
-M0000000b_IL_000a:
-ldfld System.Time::StoredTicks
-M0000000b_IL_000f:
-ceq
-call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+ldc.i8 10000000
 M0000000b_IL_0011:
-call neoCLR.Library.System.Time.RuntimeBooleanFromInt32(Int32)
+div
+M0000000b_IL_0012:
+ldc.i8 60
+M0000000b_IL_001b:
+rem
+M0000000b_IL_001c:
+conv.i4
+M0000000b_IL_001d:
 ret
 .end
-.method instance readonly byref CompareTo(System.Time other) -> Int32
+.method instance readonly byref get_Millisecond() -> Int32
 M0000000c_IL_0000:
 M0000000c_IL_0001:
 M0000000c_IL_0002:
@@ -465,48 +518,102 @@ ldarg 0
 M0000000c_IL_0003:
 ldfld System.Time::StoredTicks
 M0000000c_IL_0008:
-ldarga 1
-M0000000c_IL_000a:
-ldfld System.Time::StoredTicks
-M0000000c_IL_000f:
-clt
-call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+ldc.i8 10000
 M0000000c_IL_0011:
-brtrue M0000000c_IL_001b
-M0000000c_IL_0016:
-br M0000000c_IL_001e
+div
+M0000000c_IL_0012:
+ldc.i8 1000
 M0000000c_IL_001b:
+rem
 M0000000c_IL_001c:
-ldc.i4 -1
+conv.i4
 M0000000c_IL_001d:
 ret
-M0000000c_IL_001e:
-M0000000c_IL_001f:
-M0000000c_IL_0020:
+.end
+.method instance readonly byref get_FractionTicks() -> Int32
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
 ldarg 0
-M0000000c_IL_0021:
+M0000000d_IL_0003:
 ldfld System.Time::StoredTicks
-M0000000c_IL_0026:
+M0000000d_IL_0008:
+ldc.i8 10000000
+M0000000d_IL_0011:
+rem
+M0000000d_IL_0012:
+conv.i4
+M0000000d_IL_0013:
+ret
+.end
+.method instance readonly byref Equals(System.Time other) -> Boolean
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+M0000000e_IL_0002:
+ldarg 0
+M0000000e_IL_0003:
+ldfld System.Time::StoredTicks
+M0000000e_IL_0008:
 ldarga 1
-M0000000c_IL_0028:
+M0000000e_IL_000a:
 ldfld System.Time::StoredTicks
-M0000000c_IL_002d:
+M0000000e_IL_000f:
+ceq
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0011:
+call neoCLR.Library.System.Time.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance readonly byref CompareTo(System.Time other) -> Int32
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+ldarg 0
+M0000000f_IL_0003:
+ldfld System.Time::StoredTicks
+M0000000f_IL_0008:
+ldarga 1
+M0000000f_IL_000a:
+ldfld System.Time::StoredTicks
+M0000000f_IL_000f:
+clt
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_0011:
+brtrue M0000000f_IL_001b
+M0000000f_IL_0016:
+br M0000000f_IL_001e
+M0000000f_IL_001b:
+M0000000f_IL_001c:
+ldc.i4 -1
+M0000000f_IL_001d:
+ret
+M0000000f_IL_001e:
+M0000000f_IL_001f:
+M0000000f_IL_0020:
+ldarg 0
+M0000000f_IL_0021:
+ldfld System.Time::StoredTicks
+M0000000f_IL_0026:
+ldarga 1
+M0000000f_IL_0028:
+ldfld System.Time::StoredTicks
+M0000000f_IL_002d:
 cgt
 call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
-M0000000c_IL_002f:
-brtrue M0000000c_IL_0039
-M0000000c_IL_0034:
-br M0000000c_IL_003c
-M0000000c_IL_0039:
-M0000000c_IL_003a:
+M0000000f_IL_002f:
+brtrue M0000000f_IL_0039
+M0000000f_IL_0034:
+br M0000000f_IL_003c
+M0000000f_IL_0039:
+M0000000f_IL_003a:
 ldc.i4 1
-M0000000c_IL_003b:
+M0000000f_IL_003b:
 ret
-M0000000c_IL_003c:
-M0000000c_IL_003d:
-M0000000c_IL_003e:
+M0000000f_IL_003c:
+M0000000f_IL_003d:
+M0000000f_IL_003e:
 ldc.i4 0
-M0000000c_IL_003f:
+M0000000f_IL_003f:
 ret
 .end
 .end

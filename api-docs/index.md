@@ -27,6 +27,13 @@ provide Gregorian/Hebrew rendering. [CultureProvider](xref:System.Globalization.
 [SystemCultureProvider](xref:System.Globalization.SystemCultureProvider) separate explicit selection
 from host discovery. See [globalization](/features/globalization/) for the tested example.
 
+[DateTime](xref:System.DateTime) is a development nominal union of
+[LocalDateTime](xref:System.LocalDateTime) and [ZonedDateTime](xref:System.ZonedDateTime).
+[TimeOffset](xref:System.TimeOffset) is fixed; [TimeZone](xref:System.TimeZone) supplies
+named IANA rules. [LocalTimeMapping](xref:System.LocalTimeMapping) preserves unique,
+ambiguous and skipped local times; [TimeZoneError](xref:System.TimeZoneError) reports
+lookup/range/discovery failures. See [DateTime and zones](/features/time/) and the [exact union declaration](date-time-union.md).
+
 [Char](xref:System.Char) now has a generated type/member reference for grapheme
 construction, equality, ordering and display; see [Object contracts](objects.md)
 for boxed behavior.

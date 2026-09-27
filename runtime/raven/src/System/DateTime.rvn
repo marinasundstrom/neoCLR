@@ -1,0 +1,4 @@
+namespace System
+
+/// A civil value without a zone, or a resolved value retaining named zone rules.
+public union DateTime(LocalDateTime | ZonedDateTime)

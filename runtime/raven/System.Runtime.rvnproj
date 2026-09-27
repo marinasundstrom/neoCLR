@@ -421,4 +421,22 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'SystemCultureProvider'">
     <Compile Include="src/System/Globalization/SystemCultureProvider.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TimeOffset'">
+    <Compile Include="src/System/TimeOffset.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TimeZone'">
+    <Compile Include="src/System/TimeZone.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TimeZoneError'">
+    <Compile Include="src/System/TimeZoneError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'LocalTimeMapping'">
+    <Compile Include="src/System/LocalTimeMapping.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ZonedDateTime'">
+    <Compile Include="src/System/ZonedDateTime.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'DateTime'">
+    <Compile Include="src/System/DateTime.rvn" />
+  </ItemGroup>
 </Project>

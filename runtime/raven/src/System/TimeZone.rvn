@@ -1,0 +1,66 @@
+namespace System
+
+import System.Result.*
+import System.Runtime.CompilerServices.RuntimeServices
+
+/// Named IANA rules, separate from culture, calendar and the system clock.
+public class TimeZone {
+    private var identifier: string
+
+    private init(id: string) {
+        identifier = id
+    }
+
+    static val Utc: TimeZone => TimeZone("UTC")
+    static val DatabaseVersion: string => RuntimeServices.TimeZoneDatabaseVersion()
+    val Id: string => identifier
+    val MinYear: int => 1900
+    val MaxYear: int => 2099
+
+    static func Find(id: string) -> Result<TimeZone, TimeZoneError> {
+        if !RuntimeServices.TimeZoneExists(id) {
+            return Error(TimeZoneError.UnknownZone)
+        }
+        return Ok(TimeZone(id))
+    }
+
+    /// Reads the system's IANA name; no silent UTC fallback.
+    static func GetSystem() -> Result<TimeZone, TimeZoneError> {
+        let name = RuntimeServices.SystemTimeZoneName()
+        if name.Length == 0 {
+            return Error(TimeZoneError.SystemZoneUnavailable)
+        }
+        return Find(name)
+    }
+
+    func GetUtcOffset(instant: Instant) -> Result<TimeOffset, TimeZoneError> {
+        let seconds = RuntimeServices.TimeZoneOffset(identifier, instant.UnixTimeTicks)
+        let Ok(offset) = TimeOffset.FromSeconds(seconds) else {
+            return Error(TimeZoneError.OutOfRange)
+        }
+        return Ok(offset)
+    }
+
+    func AtInstant(instant: Instant) -> Result<ZonedDateTime, TimeZoneError> {
+        return ZonedDateTime.Create(instant, self)
+    }
+
+    /// Reports overlap candidates in increasing instant order; never chooses or shifts.
+    func MapLocal(local: LocalDateTime) -> Result<LocalTimeMapping, TimeZoneError> {
+        let ticks = TimeOffset.Zero.ToInstant(local).UnixTimeTicks
+        let values = RuntimeServices.TimeZoneMapLocal(identifier, ticks)
+        if values[0] == 0L {
+            return Ok(LocalTimeMapping.Skipped)
+        }
+        if values[0] == 1L {
+            let value = AtInstant(Instant.FromUnixTimeTicks(values[1]))?
+            return Ok(LocalTimeMapping.Unique(value))
+        }
+        if values[0] == 2L {
+            let earlier = AtInstant(Instant.FromUnixTimeTicks(values[1]))?
+            let later = AtInstant(Instant.FromUnixTimeTicks(values[2]))?
+            return Ok(LocalTimeMapping.Ambiguous(earlier, later))
+        }
+        return Error(TimeZoneError.OutOfRange)
+    }
+}

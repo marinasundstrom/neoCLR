@@ -28,6 +28,32 @@ public struct LocalDateTime {
         return LocalDateTime(date, time)
     }
 
+    /// Civil arithmetic with day carry; it does not apply timezone transition rules.
+    func Add(duration: Duration) -> Result<LocalDateTime, InvalidDateError> {
+        let days = duration.Ticks / 864000000000L
+        var ticks = StoredTime.Ticks + duration.Ticks % 864000000000L
+        var day = StoredDate.DayNumber + days
+        if ticks < 0L {
+            ticks = ticks + 864000000000L
+            day = day - 1L
+        }
+        if ticks >= 864000000000L {
+            ticks = ticks - 864000000000L
+            day = day + 1L
+        }
+        if day < 0L {
+            return Error(InvalidDateError())
+        }
+        if day > 3652058L {
+            return Error(InvalidDateError())
+        }
+        let date = System.Date.FromDayNumber((int)day)?
+        let Ok(time) = System.Time.FromTicks(ticks) else {
+            return Error(InvalidDateError())
+        }
+        return Ok(LocalDateTime(date, time))
+    }
+
     val Date: Date => StoredDate
     val Time: Time => StoredTime
 }

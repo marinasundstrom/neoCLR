@@ -37,8 +37,37 @@ static class RavenUnionMetadata
         return name;
     }
 
+    // Bounded parenthesized-union admission. Variants are existing types, not
+    // nested generated cases; validate the ordinary constructor/extractor ABI.
+    public static bool IsDateTimeUnion(TypeDefinition type)
+    {
+        if (type.FullName != "System.DateTime" || !type.IsValueType || !type.IsPublic
+            || !type.IsSealed || !type.IsSequentialLayout || type.HasNestedTypes
+            || type.HasGenericParameters || type.HasEvents || Cases(type).Length != 0
+            || !type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute"
+                && RuntimeSignatures.IsCore(a.AttributeType.Scope))
+            || type.Fields.Count != 3 || type.Fields.Any(f => !f.IsPrivate || f.IsStatic || f.HasMarshalInfo)) return false;
+        var variants = new[] { "System.LocalDateTime", "System.ZonedDateTime" };
+        var tag = type.Fields.SingleOrDefault(f => f.Name == "<Tag>");
+        if (tag?.FieldType.MetadataType != MetadataType.Byte
+            || !type.Fields.Where(f => f != tag).Select(f => f.FieldType.FullName).Order().SequenceEqual(variants.Order())
+            || type.Fields.Where(f => f != tag).Any(f => !RuntimeSignatures.IsCore(f.FieldType.Scope))) return false;
+        var constructors = type.Methods.Where(m => m.IsConstructor && m.IsPublic).ToArray();
+        var extractors = type.Methods.Where(m => m.Name == "TryGetValue").ToArray();
+        return constructors.Length == 2 && constructors.All(m => !m.IsStatic && m.Parameters.Count == 1
+                && !m.Parameters[0].ParameterType.IsByReference && RuntimeSignatures.IsCore(m.Parameters[0].ParameterType.Scope))
+            && constructors.Select(m => m.Parameters[0].ParameterType.FullName).Order().SequenceEqual(variants.Order())
+            && extractors.Length == 2 && extractors.All(m => m.IsPublic && !m.IsStatic && m.Parameters.Count == 1
+                && m.ReturnType.MetadataType == MetadataType.Boolean && m.Parameters[0].IsOut
+                && m.Parameters[0].ParameterType is ByReferenceType byref && RuntimeSignatures.IsCore(byref.ElementType.Scope))
+            && extractors.Select(m => ((ByReferenceType)m.Parameters[0].ParameterType).ElementType.FullName).Order().SequenceEqual(variants.Order())
+            && type.Properties.Any(p => p.Name == "Value" && p.PropertyType.MetadataType == MetadataType.Object
+                && p.GetMethod is { IsPublic: true, IsStatic: false } && p.SetMethod is null);
+    }
+
     public static TypeDefinition[] Family(TypeDefinition carrier)
     {
+        if (IsDateTimeUnion(carrier)) return [carrier];
         var cases = Cases(carrier);
         if (cases.Length == 0 || cases.Where((c, i) => c.Ordinal != i).Any())
             throw new InvalidDataException("Incomplete Raven union case metadata.");

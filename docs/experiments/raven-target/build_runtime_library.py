@@ -10,6 +10,12 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'DateTime': 'System.DateTime',
+    'ZonedDateTime': 'System.ZonedDateTime',
+    'LocalTimeMapping': 'System.LocalTimeMapping',
+    'TimeZoneError': 'System.TimeZoneError',
+    'TimeZone': 'System.TimeZone',
+    'TimeOffset': 'System.TimeOffset',
     "Language": "System.Globalization.Language",
     "CultureProvider": "System.Globalization.CultureProvider",
     "FixedCultureProvider": "System.Globalization.FixedCultureProvider",
@@ -154,6 +160,12 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'DateTime': 'runtime/raven/src/System/DateTime.rvn',
+    'ZonedDateTime': 'runtime/raven/src/System/ZonedDateTime.rvn',
+    'LocalTimeMapping': 'runtime/raven/src/System/LocalTimeMapping.rvn',
+    'TimeZoneError': 'runtime/raven/src/System/TimeZoneError.rvn',
+    'TimeZone': 'runtime/raven/src/System/TimeZone.rvn',
+    'TimeOffset': 'runtime/raven/src/System/TimeOffset.rvn',
     "Language": "runtime/raven/src/System/Globalization/Language.rvn",
     "CultureProvider": "runtime/raven/src/System/Globalization/CultureProvider.rvn",
     "FixedCultureProvider": "runtime/raven/src/System/Globalization/FixedCultureProvider.rvn",

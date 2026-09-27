@@ -1,4 +1,33 @@
 ; Generated from runtime/raven/src/System/Instant.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Instant.RuntimeDurationget_Ticks(System.Duration& source) -> Int64
+ldarg source
+call instance System.Duration::get_Ticks()
+ret
+.end
+.function neoCLR.Library.System.Instant.RuntimeErrorSystemOverflowErrorNew() -> System.OverflowError
+newobj instance System.OverflowError::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Instant.RuntimeUnion0(System.OverflowError arg0) -> System.Result.Error<System.OverflowError>
+ldarg arg0
+newobj instance System.Result.Error<System.OverflowError>::.ctor(System.OverflowError)
+ret
+.end
+.function neoCLR.Library.System.Instant.RuntimeUnion1(System.Result.Error<System.OverflowError> arg0) -> System.Result<System.Instant,System.OverflowError>
+ldarg arg0
+newobj instance System.Result<System.Instant,System.OverflowError>::.ctor(System.Result.Error<System.OverflowError>)
+ret
+.end
+.function neoCLR.Library.System.Instant.RuntimeUnion2(System.Instant arg0) -> System.Result.Ok<System.Instant>
+ldarg arg0
+newobj instance System.Result.Ok<System.Instant>::.ctor(System.Instant)
+ret
+.end
+.function neoCLR.Library.System.Instant.RuntimeUnion3(System.Result.Ok<System.Instant> arg0) -> System.Result<System.Instant,System.OverflowError>
+ldarg arg0
+newobj instance System.Result<System.Instant,System.OverflowError>::.ctor(System.Result.Ok<System.Instant>)
+ret
+.end
 .function neoCLR.Library.System.Instant.RuntimeBooleanFromInt32(Int32 value) -> Boolean
     ldarg value
     ldc.i4 0

@@ -10,6 +10,10 @@
       href: docs/reference-support.md
     - name: Objects and equality
       href: docs/objects.md
+    - name: DateTime and zones
+      href: features/time/index.md
+    - name: Globalization
+      href: features/globalization/index.md
     - name: Tasks and async
       href: features/tasks/index.md
     - name: Networking

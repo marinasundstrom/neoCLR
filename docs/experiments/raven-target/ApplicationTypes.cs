@@ -223,7 +223,7 @@ static class ApplicationTypes
     // This is Raven's current bridge shape, not a platform-wide case convention.
     public static bool IsStandardLibraryUnion(TypeDefinition type)
     {
-        if (IsEmptyCaseUnion(type)) return true;
+        if (IsEmptyCaseUnion(type) || RavenUnionMetadata.IsDateTimeUnion(type)) return true;
         if (!type.IsValueType || !type.IsSealed || !type.IsSequentialLayout
             || RavenUnionMetadata.Cases(type).Length == 0
             || !type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute"
@@ -246,10 +246,11 @@ static class ApplicationTypes
         && method.Parameters.Count == 1 && method.Parameters[0].IsOut
         && !method.Parameters[0].IsIn
         && method.Parameters[0].ParameterType is ByReferenceType output
-        && output.ElementType.Resolve() is { IsValueType: true } caseType
-        && (caseType.DeclaringType == method.DeclaringType
-            || caseType.DeclaringType is { } companion
-                && RavenUnionMetadata.CompanionTarget(companion) == method.DeclaringType.FullName)
+        && (RavenUnionMetadata.IsDateTimeUnion(method.DeclaringType)
+            || output.ElementType.Resolve() is { IsValueType: true } caseType
+                && (caseType.DeclaringType == method.DeclaringType
+                    || caseType.DeclaringType is { } companion
+                        && RavenUnionMetadata.CompanionTarget(companion) == method.DeclaringType.FullName))
         && method.DeclaringType.CustomAttributes.Any(attribute =>
             attribute.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute"
             && RuntimeSignatures.IsCore(attribute.AttributeType.Scope));

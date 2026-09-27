@@ -1,0 +1,31 @@
+namespace System
+
+import System.Result.*
+
+/// An immutable resolved instant and its projection under a named zone's rules.
+public class ZonedDateTime {
+    private var instant: Instant
+    private var zone: TimeZone
+    private var local: LocalDateTime
+    private var offset: TimeOffset
+
+    private init(instant: Instant, zone: TimeZone, local: LocalDateTime, offset: TimeOffset) {
+        self.instant = instant
+        self.zone = zone
+        self.local = local
+        self.offset = offset
+    }
+
+    static func Create(instant: Instant, zone: TimeZone) -> Result<ZonedDateTime, TimeZoneError> {
+        let offset = zone.GetUtcOffset(instant)?
+        let Ok(local) = offset.AtInstant(instant) else {
+            return Error(TimeZoneError.OutOfRange)
+        }
+        return Ok(ZonedDateTime(instant, zone, local, offset))
+    }
+
+    val Instant: Instant => instant
+    val Zone: TimeZone => zone
+    val LocalDateTime: LocalDateTime => local
+    val Offset: TimeOffset => offset
+}

@@ -1,0 +1,120 @@
+; Generated from runtime/raven/src/System/TimeOffset.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.TimeOffset.RuntimeInstantget_UnixTimeTicks(System.Instant& source) -> Int64
+ldarg source
+call instance System.Instant::get_UnixTimeTicks()
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeDateget_DayNumber(System.Date& source) -> Int32
+ldarg source
+call instance System.Date::get_DayNumber()
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeTimeget_Ticks(System.Time& source) -> Int64
+ldarg source
+call instance System.Time::get_Ticks()
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeLocalDateTimeget_Date(System.LocalDateTime& source) -> System.Date
+ldarg source
+call instance System.LocalDateTime::get_Date()
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeLocalDateTimeget_Time(System.LocalDateTime& source) -> System.Time
+ldarg source
+call instance System.LocalDateTime::get_Time()
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeErrorSystemInvalidDateErrorNew() -> System.InvalidDateError
+newobj instance System.InvalidDateError::.ctor()
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeErrorSystemInvalidTimeErrorNew() -> System.InvalidTimeError
+newobj instance System.InvalidTimeError::.ctor()
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeUnion0(System.InvalidTimeError arg0) -> System.Result.Error<System.InvalidTimeError>
+ldarg arg0
+newobj instance System.Result.Error<System.InvalidTimeError>::.ctor(System.InvalidTimeError)
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeUnion1(System.Result.Error<System.InvalidTimeError> arg0) -> System.Result<System.TimeOffset,System.InvalidTimeError>
+ldarg arg0
+newobj instance System.Result<System.TimeOffset,System.InvalidTimeError>::.ctor(System.Result.Error<System.InvalidTimeError>)
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeUnion2(System.TimeOffset arg0) -> System.Result.Ok<System.TimeOffset>
+ldarg arg0
+newobj instance System.Result.Ok<System.TimeOffset>::.ctor(System.TimeOffset)
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeUnion3(System.Result.Ok<System.TimeOffset> arg0) -> System.Result<System.TimeOffset,System.InvalidTimeError>
+ldarg arg0
+newobj instance System.Result<System.TimeOffset,System.InvalidTimeError>::.ctor(System.Result.Ok<System.TimeOffset>)
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeUnion4(System.InvalidDateError arg0) -> System.Result.Error<System.InvalidDateError>
+ldarg arg0
+newobj instance System.Result.Error<System.InvalidDateError>::.ctor(System.InvalidDateError)
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeUnion5(System.Result.Error<System.InvalidDateError> arg0) -> System.Result<System.LocalDateTime,System.InvalidDateError>
+ldarg arg0
+newobj instance System.Result<System.LocalDateTime,System.InvalidDateError>::.ctor(System.Result.Error<System.InvalidDateError>)
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeUnion6(System.Result<System.Date,System.InvalidDateError>& arg0,out(true) System.Result.Ok<System.Date>& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<System.Date,System.InvalidDateError>::TryGetValue(System.Result.Ok<System.Date>&)
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeUnion7(System.Result.Ok<System.Date>& arg0) -> System.Date
+ldarg arg0
+call instance System.Result.Ok<System.Date>::get_Value()
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeUnion8(System.Result<System.Time,System.InvalidTimeError>& arg0,out(true) System.Result.Ok<System.Time>& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<System.Time,System.InvalidTimeError>::TryGetValue(System.Result.Ok<System.Time>&)
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeUnion9(System.Result.Ok<System.Time>& arg0) -> System.Time
+ldarg arg0
+call instance System.Result.Ok<System.Time>::get_Value()
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeUnion10(System.LocalDateTime arg0) -> System.Result.Ok<System.LocalDateTime>
+ldarg arg0
+newobj instance System.Result.Ok<System.LocalDateTime>::.ctor(System.LocalDateTime)
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeUnion11(System.Result.Ok<System.LocalDateTime> arg0) -> System.Result<System.LocalDateTime,System.InvalidDateError>
+ldarg arg0
+newobj instance System.Result<System.LocalDateTime,System.InvalidDateError>::.ctor(System.Result.Ok<System.LocalDateTime>)
+ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.TimeOffset.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

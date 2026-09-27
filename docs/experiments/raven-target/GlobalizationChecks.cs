@@ -25,6 +25,7 @@ static class GlobalizationChecks
             return reference;
         }
         var module = core.MainModule;
+        ErrorBindings.Reset(module);
         foreach (var type in module.Types.Where(t => GlobalizationBindings.IsName(t.FullName))) {
             Check(type.Name + " has no setters", type.Properties.All(p => p.SetMethod is null));
             foreach (var method in type.Methods.Where(m => m.IsPublic)) {
@@ -46,9 +47,29 @@ static class GlobalizationChecks
         calendar.IsSealed = false;
         Reject("Calendar rejects extensible contract", () => GlobalizationBindings.Bind(Reference(project), project));
         calendar.IsSealed = true;
-        var date = module.GetType("System.Date");
-        foreach (var method in date.Methods.Where(m => m.Name is "AddDays" or "AddMonths" or "AddYears" or "ToString"))
-            Check("Date " + method.FullName, CalendarBindings.Bind(Reference(method), method) is not null);
+        foreach (var name in new[] { "Date", "Time", "Instant", "LocalDateTime", "TimeOffset" }) {
+            var type = module.GetType("System." + name);
+            foreach (var method in type.Methods.Where(m => m.IsPublic && !m.IsConstructor))
+                Check(name + " " + method.FullName, CalendarBindings.Bind(Reference(method), method) is not null);
+        }
+        var zone = module.GetType(GlobalizationBindings.Zone);
+        var mapping = zone.Methods.Single(m => m.Name == "MapLocal");
+        var wrongMapping = Reference(mapping);
+        wrongMapping.ReturnType = module.TypeSystem.String;
+        Reject("TimeZone rejects wrong mapping result", () => GlobalizationBindings.Bind(wrongMapping, mapping));
+        var offsetFactory = module.GetType("System.TimeOffset").Methods.Single(m => m.Name == "FromSeconds");
+        var badFactory = Reference(offsetFactory);
+        badFactory.HasThis = true;
+        Reject("TimeOffset rejects instance factory", () => CalendarBindings.Bind(badFactory, offsetFactory));
+        var dateTime = module.GetType("System.DateTime");
+        Check("DateTime is the exact parenthesized union", RavenUnionMetadata.IsDateTimeUnion(dateTime));
+        foreach (var extractor in dateTime.Methods.Where(m => m.Name == "TryGetValue"))
+            Check("DateTime conditional extraction " + extractor.FullName, ApplicationTypes.IsConditionalUnionOutput(extractor));
+        var variantConstructor = dateTime.Methods.First(m => m.IsConstructor && m.IsPublic);
+        var originalVariant = variantConstructor.Parameters[0].ParameterType;
+        variantConstructor.Parameters[0].ParameterType = module.GetType("System.Time");
+        Check("DateTime rejects a foreign variant", !RavenUnionMetadata.IsDateTimeUnion(dateTime));
+        variantConstructor.Parameters[0].ParameterType = originalVariant;
         Check("Implementation policies are not public reference types", module.Types.All(t => t.Name is not ("CalendarRules" or "GregorianCalendar" or "HebrewCalendar" or "HebrewDateTimeFormat")));
         File.WriteAllText(Path.Combine(output, "checks.json"), JsonSerializer.Serialize(checks, new JsonSerializerOptions { WriteIndented = true }));
         Console.WriteLine($"Passed {checks.Count} calendar/globalization signature checks");

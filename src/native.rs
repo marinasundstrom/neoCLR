@@ -11,6 +11,11 @@ pub(crate) enum Binding {
     #[cfg(test)]
     TestSocketReceive,
     SystemCultureName,
+    TimeZoneExists,
+    TimeZoneOffset,
+    TimeZoneMapLocal,
+    TimeZoneDatabaseVersion,
+    SystemTimeZoneName,
     EnvironmentArguments,
     EnvironmentCurrentDirectory,
     EnvironmentVariable,
@@ -163,6 +168,11 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Binding::ReflectionConstruct,
             Type::from_name("System.Object"),
         ),
+        ("neoCLR.Runtime.TimeZoneExists", [Type::String]) => (Binding::TimeZoneExists, Type::Boolean),
+        ("neoCLR.Runtime.TimeZoneOffset", [Type::String, Type::Int64]) => (Binding::TimeZoneOffset, Type::Int32),
+        ("neoCLR.Runtime.TimeZoneMapLocal", [Type::String, Type::Int64]) => (Binding::TimeZoneMapLocal, Type::Array(Box::new(Type::Int64))),
+        ("neoCLR.Runtime.TimeZoneDatabaseVersion", []) => (Binding::TimeZoneDatabaseVersion, Type::String),
+        ("neoCLR.Runtime.SystemTimeZoneName", []) => (Binding::SystemTimeZoneName, Type::String),
         ("neoCLR.Runtime.SystemCultureName", []) => (Binding::SystemCultureName, Type::String),
         ("neoCLR.Runtime.EnvironmentArguments", []) => (
             Binding::EnvironmentArguments,
@@ -651,6 +661,11 @@ impl Binding {
                     crate::type_identity::describe_loaded(module, &concrete)?,
                 )))
             }
+            (Self::TimeZoneExists, [Value::String(id)]) => Ok(Value::Boolean(crate::time_zones::exists(id))),
+            (Self::TimeZoneOffset, [Value::String(id), Value::Int64(ticks)]) => Ok(Value::Int32(crate::time_zones::offset(id, *ticks))),
+            (Self::TimeZoneMapLocal, [Value::String(id), Value::Int64(ticks)]) => Ok(crate::time_zones::map_local(id, *ticks)),
+            (Self::TimeZoneDatabaseVersion, []) => Ok(Value::String(chrono_tz::IANA_TZDB_VERSION.into())),
+            (Self::SystemTimeZoneName, []) => Ok(Value::String(iana_time_zone::get_timezone().unwrap_or_default().into())),
             (Self::SystemCultureName, []) => Ok(Value::String(
                 sys_locale::get_locale().unwrap_or_default().into(),
             )),

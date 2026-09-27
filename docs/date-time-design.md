@@ -208,3 +208,14 @@ The broader model remains design direction, not a frozen set of signatures.
 ## Development calendar/formatting slice (2026-09-27)
 
 The author-directed [calendar and globalization foundation](calendar-globalization.md) now implements Gregorian/Hebrew policies, date arithmetic, invariant/Swedish/Israeli formatting and host culture discovery. This is provisional development work beyond Preview 10; older deferred scope below is design history. Localization interfaces remain independent of culture, with shared contracts and interchangeable JSON/resource sources planned.
+
+## Author-directed Time/zone implementation (2026-09-27)
+
+[Time and zones](time-zones.md) implement checked elapsed/civil arithmetic, TimeOffset,
+named rules and explicit local-time mapping. The author requested the clearer name
+TimeOffset, then a nominal **parenthesized** DateTime union. After clarifying that the
+second alternative retains a zone ID, the implemented union is
+`DateTime(LocalDateTime | ZonedDateTime)`. This supersedes the earlier no-DateTime
+position while preserving it as design history. It is not .NET DateTime.Kind.
+No OffsetDateTime, Period, parser or scheduler is introduced. See the guide for pinned
+data, supported ranges and tested boundary behavior.

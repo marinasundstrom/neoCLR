@@ -1,0 +1,17 @@
+namespace System
+
+/// Lookup/discovery and bounded timezone conversion failures.
+public union TimeZoneError {
+    case UnknownZone
+    case OutOfRange
+    case SystemZoneUnavailable
+
+    override func ToString() -> string {
+        return match self {
+            UnknownZone => "UnknownZone"
+            OutOfRange => "OutOfRange"
+            SystemZoneUnavailable => "SystemZoneUnavailable"
+            _ => "Empty"
+        }
+    }
+}

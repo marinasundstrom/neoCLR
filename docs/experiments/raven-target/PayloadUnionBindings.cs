@@ -3,7 +3,7 @@ using Mono.Cecil;
 // Selected source-projected families, not a manually maintained case ABI.
 static class PayloadUnionBindings
 {
-    static readonly string[] Owners = ["System.Web.Http.HttpError", "System.Data.Json.JsonError", "System.Web.Http.Json.HttpJsonError"];
+    static readonly string[] Owners = ["System.DateTime", "System.LocalTimeMapping", "System.Web.Http.HttpError", "System.Data.Json.JsonError", "System.Web.Http.Json.HttpJsonError"];
     static readonly Dictionary<string, TypeDefinition> Types = new();
     public static void Reset(ModuleDefinition core)
     {
@@ -22,7 +22,7 @@ static class PayloadUnionBindings
         && IsType(type.FullName.Replace('/', '.')) && type.Resolve() is { IsValueType: true } definition
         && Types[type.FullName.Replace('/', '.')] == definition ? type.FullName.Replace('/', '.') : null;
     static string? Map(TypeReference type) => type.MetadataType == MetadataType.Object ? "System.Object"
-        : Type(type) ?? ErrorBindings.Type(type) ?? EnumBindings.Type(type);
+        : Type(type) ?? GlobalizationBindings.Type(type) ?? CalendarBindings.Type(type) ?? ErrorBindings.Type(type) ?? EnumBindings.Type(type);
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition, bool construct = false)
     {
         if (Type(reference.DeclaringType) is not { } owner) return null;

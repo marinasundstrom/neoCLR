@@ -307,3 +307,19 @@ payload reference as JsonError until RavenDoc produces those individual pages.
 ### Calendar/globalization checkpoint (2026-09-27)
 
 Calendar, Culture, Language, DateTimeFormat, CultureProvider, FixedCultureProvider and SystemCultureProvider are automatically selected from the matching reference. Date arithmetic/display and LocalDateTime.Create have XML coverage. Internal calendar/formatter rules are deliberately not public APIs; no public type is excluded. System discovery is a ProcessEnvironment service. The API snapshot is refreshed and checked; website source is updated without an unrelated full build.
+
+### Time and zones checkpoint (2026-09-27)
+
+DateTime, TimeOffset, TimeZone, ZonedDateTime, LocalTimeMapping and TimeZoneError are
+source-projected development APIs, automatically selected into the reference.
+DateTime is a parenthesized union of existing types, not nested wrapper cases.
+Every public addition has XML coverage; LocalTimeMapping payload properties use
+[the explicit manual member routes](time-zone-mappings.md) for the existing RavenDoc
+inline-case limitation. Time display/arithmetic and LocalDateTime/Instant arithmetic
+are documented with ranges, errors and precision. Website samples come from executed
+consumers; a full site build remains outside this focused slice.
+
+Focused RavenDoc rendering confirms the DateTime type and member pages. Its heading
+omits the parenthesized variant list; [the linked declaration supplement](date-time-union.md)
+records the exact signature. No type is excluded for this limitation. LocalTimeMapping
+payload routes were confirmed absent and are supplied by manual-members.json.

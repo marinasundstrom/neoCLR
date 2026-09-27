@@ -2,12 +2,24 @@ using Mono.Cecil;
 
 static class CalendarBindings
 {
-    public static readonly string[] Types = ["System.Date", "System.Time", "System.LocalDateTime", "System.Instant", "System.Duration"];
+    public static readonly string[] Types = ["System.TimeOffset", "System.Date", "System.Time", "System.LocalDateTime", "System.Instant", "System.Duration"];
     public static bool IsReference(string type) => type is "System.Clock" or "System.SystemClock";
     public const string DateResult = "System.Result<System.Date,System.InvalidDateError>";
     public const string TimeResult = "System.Result<System.Time,System.InvalidTimeError>";
     sealed record Member(string Owner, string Name, string[] Args, string Result, bool Instance = false);
     static readonly Member[] Members = [
+        new("TimeOffset", "get_Zero", [], "System.TimeOffset"),
+        new("TimeOffset", "get_Seconds", [], "Int32", true),
+        new("TimeOffset", "FromSeconds", ["Int32"], "System.Result<System.TimeOffset,System.InvalidTimeError>"),
+        new("TimeOffset", "AtInstant", ["System.Instant"], "System.Result<System.LocalDateTime,System.InvalidDateError>", true),
+        new("TimeOffset", "ToInstant", ["System.LocalDateTime"], "System.Instant", true),
+        new("TimeOffset", "Equals", ["System.TimeOffset"], "Boolean", true),
+        new("TimeOffset", "CompareTo", ["System.TimeOffset"], "Int32", true),
+        new("Time", "Add", ["System.Duration"], "System.Time", true),
+        new("Time", "ToString", [], "String", true),
+        new("Time", "ToString", ["System.Globalization.Culture"], "String", true),
+        new("LocalDateTime", "Add", ["System.Duration"], "System.Result<System.LocalDateTime,System.InvalidDateError>", true),
+        new("Instant", "Add", ["System.Duration"], "System.Result<System.Instant,System.OverflowError>", true),
         new("Instant", "FromUnixTimeTicks", ["Int64"], "System.Instant"),
         new("Instant", "get_UnixTimeTicks", [], "Int64", true),
         new("Instant", "Equals", ["System.Instant"], "Boolean", true),
@@ -57,13 +69,17 @@ static class CalendarBindings
         "AddMonths" => "months",
         "AddYears" => "years",
         "FromDayNumber" => "dayNumber",
+        "FromSeconds" => "seconds",
+        "AtInstant" => "instant",
+        "ToInstant" => "local",
+        "Add" => "duration",
         "FromTicks" or "FromUnixTimeTicks" => "ticks",
         "Equals" or "CompareTo" => "other",
         _ => throw new InvalidDataException("Missing calendar parameter name: " + member.Name)
     };
     public static string Declarations => "public interface Clock { Instant Now { get; } } public class SystemClock : Clock { public SystemClock() { } public Instant Now => default; }\n" + string.Join("\n", Members.GroupBy(m => m.Owner).Select(group =>
         $"public struct {group.Key} {{ " + string.Join(" ", group.Select(m =>
-            m.Name.StartsWith("get_") ? $"public {CSharp(m.Result)} {m.Name[4..]} => default;"
+            m.Name.StartsWith("get_") ? $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name[4..]} => default;"
             : $"public {(m.Name == "ToString" && m.Args.Length == 0 ? "override " : m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((a, i) => CSharp(a) + " " + ParameterName(m, i)))}) => default;")) + " }"));
     public static void ProjectLayout(ModuleDefinition module)
     {
@@ -82,7 +98,7 @@ static class CalendarBindings
         local.Fields.Add(new FieldDefinition("StoredTime", FieldAttributes.Private, module.GetType("System.Time")));
         foreach (var method in local.Methods.Where(m => m.HasThis && !m.IsConstructor))
             method.CustomAttributes.Add(new CustomAttribute(constructor));
-        foreach (var (name, field, scalar) in new[] { ("Date", "StoredDayNumber", "Int32"), ("Time", "StoredTicks", "Int64"), ("Instant", "StoredTicks", "Int64"), ("Duration", "StoredTicks", "Int64") })
+        foreach (var (name, field, scalar) in new[] { ("TimeOffset", "StoredSeconds", "Int32"), ("Date", "StoredDayNumber", "Int32"), ("Time", "StoredTicks", "Int64"), ("Instant", "StoredTicks", "Int64"), ("Duration", "StoredTicks", "Int64") })
         {
             var type = module.GetType("System." + name);
             type.PackingSize = -1;
@@ -107,10 +123,10 @@ static class CalendarBindings
             return new(owner + "::get_Now", [owner], shape.Result, Instruction: $"callvirt instance {owner}::get_Now()");
         }
         if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope) || !Members.Any(m => "System." + m.Owner == reference.DeclaringType.FullName)) return null;
-        var signature = RuntimeSignatures.Match(reference, definition, t => GlobalizationBindings.Type(t) ?? Type(t) ?? ResultBindings.Type(t));
+        var signature = RuntimeSignatures.Match(reference, definition, t => GlobalizationBindings.Type(t) ?? Type(t) ?? GenericUnionBindings.Type(t) ?? ResultBindings.Type(t));
         var member = Members.SingleOrDefault(m => "System." + m.Owner == reference.DeclaringType.FullName && m.Name == reference.Name
             && m.Instance == reference.HasThis && m.Args.SequenceEqual(signature.Args) && m.Result == signature.Result);
-        if (member is null || (definition.IsVirtual && !definition.IsFinal && !(member.Owner == "Date" && member.Name == "ToString" && member.Args.Length == 0 && !definition.IsNewSlot))) throw new InvalidDataException("Unsupported calendar member: " + reference.FullName);
+        if (member is null || (definition.IsVirtual && !definition.IsFinal && !(member.Owner is "Date" or "Time" && member.Name == "ToString" && member.Args.Length == 0 && !definition.IsNewSlot))) throw new InvalidDataException("Unsupported calendar member: " + reference.FullName);
         return new(member.Instance ? AdapterName(member) : "System." + member.Owner + "::" + member.Name,
             member.Instance ? new[] { "System." + member.Owner + "&" }.Concat(member.Args).ToArray() : member.Args, member.Result);
     }

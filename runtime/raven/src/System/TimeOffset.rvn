@@ -1,0 +1,63 @@
+namespace System
+
+import System.Result.*
+
+/// A fixed UTC displacement in whole seconds, independent of zone rules.
+public struct TimeOffset : EquatableTo<TimeOffset>, ComparableTo<TimeOffset> {
+    private var StoredSeconds: int
+
+    private init(seconds: int) {
+        StoredSeconds = seconds
+    }
+
+    static val Zero: TimeOffset => TimeOffset(0)
+
+    static func FromSeconds(seconds: int) -> Result<TimeOffset, InvalidTimeError> {
+        if seconds < -64800 {
+            return Error(InvalidTimeError())
+        }
+        if seconds > 64800 {
+            return Error(InvalidTimeError())
+        }
+        return Ok(TimeOffset(seconds))
+    }
+
+    val Seconds: int => StoredSeconds
+
+    /// Projects to the civil range 0001-01-01 through 9999-12-31.
+    func AtInstant(instant: Instant) -> Result<LocalDateTime, InvalidDateError> {
+        let ticks = instant.UnixTimeTicks
+        let delta: long = StoredSeconds * 10000000L
+        if ticks < -621355968000000000L - delta {
+            return Error(InvalidDateError())
+        }
+        if ticks > 2534023007999999999L - delta {
+            return Error(InvalidDateError())
+        }
+        let local = ticks + delta + 621355968000000000L
+        let Ok(date) = Date.FromDayNumber((int)(local / 864000000000L)) else {
+            return Error(InvalidDateError())
+        }
+        let Ok(time) = Time.FromTicks(local % 864000000000L) else {
+            return Error(InvalidDateError())
+        }
+        return Ok(LocalDateTime.Create(date, time))
+    }
+
+    func ToInstant(local: LocalDateTime) -> Instant {
+        let ticks = local.Date.DayNumber * 864000000000L + local.Time.Ticks - 621355968000000000L
+        return Instant.FromUnixTimeTicks(ticks - StoredSeconds * 10000000L)
+    }
+
+    func Equals(other: TimeOffset) -> bool => StoredSeconds == other.StoredSeconds
+
+    func CompareTo(other: TimeOffset) -> int {
+        if StoredSeconds < other.StoredSeconds {
+            return -1
+        }
+        if StoredSeconds > other.StoredSeconds {
+            return 1
+        }
+        return 0
+    }
+}

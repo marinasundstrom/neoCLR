@@ -1,6 +1,7 @@
 namespace System
 
 import System.Runtime.CompilerServices.*
+import System.Result.*
 
 public struct Instant : ComparableTo<Instant>, EquatableTo<Instant> {
     private field StoredTicks: long
@@ -15,6 +16,22 @@ public struct Instant : ComparableTo<Instant>, EquatableTo<Instant> {
 
     func ToLocalDateTime() -> LocalDateTime {
         return RuntimeServices.LocalDateTime(StoredTicks)
+    }
+
+    /// Adds exact elapsed time, independently of calendars and zones.
+    func Add(duration: Duration) -> Result<Instant, OverflowError> {
+        let amount = duration.Ticks
+        if amount > 0L {
+            if StoredTicks > 9223372036854775807L - amount {
+                return Error(OverflowError())
+            }
+        }
+        if amount < 0L {
+            if StoredTicks < -9223372036854775808L - amount {
+                return Error(OverflowError())
+            }
+        }
+        return Ok(Instant(StoredTicks + amount))
     }
 
     val UnixTimeTicks: long => StoredTicks

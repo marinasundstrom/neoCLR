@@ -1,53 +1,69 @@
-# DateTime: dates, times and clocks
+# DateTime, time offsets and time zones
 
-Date and Time represent civil values. Instant identifies a point on the timeline, Duration an elapsed amount, and Clock supplies Now. SystemClock is the current system provider.
+Date and Time describe civil fields. Instant identifies a point on the timeline,
+Duration an elapsed amount, and Clock supplies Now. **The time-zone and DateTime union
+APIs below are provisional development additions beyond Preview 10.**
 
-**Preview 10 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
+## Local or zoned
 
-<a id="example"></a>
+DateTime is a nominal parenthesized union: `DateTime(LocalDateTime | ZonedDateTime)`.
+An existing local or zoned value converts directly into it. Match the type to decide
+what information is available; there are no extra wrapper cases or .NET-style Kind flag.
+An uninitialized union is inactive, rather than an implicitly local date.
 
-## Dates, instants and clocks in Raven
 ```raven
-{{CLOCK_SAMPLE}}
+{{DATETIME_UNION_SAMPLE}}
 ```
 
-This helper reads the host clock and prints the local year and hour; those values naturally vary. The complete sample also uses a fixed Clock to check deterministic Instant and Duration comparisons.
+LocalDateTime has no zone. ZonedDateTime retains Instant, Zone, LocalDateTime and
+Offset. TimeOffset is a fixed whole-second displacement from UTC; TimeZone contains
+rules that can change that displacement over time. No OffsetDateTime type is included.
 
-[Complete executable sample →](../../samples/library-instants.rvn) · [VS Code setup →](../../try/#development)
+## Mapping a local time
 
-<a id="limits"></a>
+A local clock reading can occur once, twice or not at all. TimeZone.MapLocal returns
+Unique, Ambiguous or Skipped through LocalTimeMapping. Applications choose how to
+handle overlap candidates and gaps; the library does not silently choose or shift.
 
-## Behavior and limits
-.NET already separates DateOnly and TimeOnly and supports injectable time through TimeProvider. This API starts with those distinctions and typed validation outcomes. The current local conversion uses host settings; it is not a general timezone or calendar API.
+```raven
+{{TIME_ZONE_SAMPLE}}
+```
 
-[Detailed contract and comparisons →](https://github.com/marinasundstrom/neoCLR/blob/main/docs/date-time-design.md)
+For Stockholm on October 27, 2024, 02:30 occurs twice: first at UTC+02:00 and then
+at UTC+01:00. Both values retain the same local fields and different instants.
+TimeZone.AtInstant converts in the other direction without ambiguity.
 
-<a id="direction"></a>
+[Complete executable example →](../../samples/library-time-zones.rvn)
 
-## Planned work and open questions
+## Arithmetic and display
 
-The proposals add timezone rules, calendar-aware values and presentation through globalization. More types can make distinctions clear but bring data and conversion obligations. Formatting, parsing and culture behavior remain separate work.
+Time.Add(Duration) wraps modulo one day. LocalDateTime.Add carries into the date,
+returning an error outside years 1–9999. Instant.Add advances elapsed ticks and checks
+overflow. Adding 24 elapsed hours can produce a different local hour across DST;
+civil addition does not apply zone rules.
 
-[Related proposals and open questions →](../../proposals/#time)
+Time.ToString uses the current culture; an explicit culture gives repeatable output.
+[Globalization](../globalization/) covers culture, calendar selection and Hebrew/Latin
+rendering. Format a zoned value's LocalDateTime through those same formatters.
+The DateTime union's generated ToString is diagnostic, not a serialization format.
 
-<a id="feedback"></a>
+## Data and limits
 
-## Questions and contributions
+Named conversions bundle IANA **2025b** and support UTC/local years **1900–2099**.
+DatabaseVersion exposes the version; updating it requires rebuilding the runtime.
+It is a pinned snapshot, not a promise of the latest government rule changes.
+Find accepts case-sensitive IANA identifiers and aliases. GetSystem discovers the
+host's IANA name without falling back silently to UTC. macOS discovery was exercised;
+Windows/Linux adapters remain unverified.
 
-Questions, examples and documentation corrections are welcome. See [how to contribute](../../#feedback).
+Fixed TimeOffset conversions support civil years 1–9999, offsets up to ±18 hours and
+second-level historical offsets. Precision is 100 ns; leap seconds are unsupported.
+.NET DateTimeOffset instead restricts offsets to whole minutes and ±14 hours, so
+interop needs validation. .NET TimeZoneInfo already handles rule conversions; this API
+makes the zero/one/two mapping explicit, following the distinction also used by Noda Time.
 
-Report issues with a small program, the toolchain version, expected behavior and observed output. API proposals should identify the missing operation or contract.
+Parsing, serialization, richer resolvers, custom rule providers, broader zone ranges
+and scheduling remain future work. Resource localization remains separate from culture.
 
-[Discuss on GitHub ↗](https://github.com/marinasundstrom/neoCLR/issues)
-
-## Calendar rendering and globalization
-
-[Globalization has its own feature page](../globalization/), covering culture,
-language, system preferences and Gregorian/Hebrew rendering. DateTime remains the
-separate home for civil values, instants and clocks.
-
-## Next slice
-
-The author has selected the Time API and time-zone handling next. Their contracts,
-zone data and ambiguous or missing local-time behavior remain to be designed and
-validated; they are not implemented by the calendar/globalization slice.
+[API reference →](../../docs/namespaces.html)
+· [Detailed contracts and evidence →](https://github.com/marinasundstrom/neoCLR/blob/main/docs/time-zones.md)

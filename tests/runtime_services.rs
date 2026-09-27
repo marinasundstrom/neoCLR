@@ -351,3 +351,24 @@ fn system_culture_discovery_uses_process_environment_service() {
     };
     assert_eq!(name.as_str(), sys_locale::get_locale().unwrap_or_default());
 }
+
+#[test]
+fn named_zone_rules_and_system_discovery_have_distinct_services() {
+    let module = assemble(concat!(
+        ".module ZoneServices\n",
+        ".function neoCLR.Runtime.TimeZoneOffset(String id,Int64 ticks) -> Int32\n.methodimpl InternalCall\n.end\n",
+        ".function neoCLR.Runtime.TimeZoneMapLocal(String id,Int64 ticks) -> Int64[]\n.methodimpl InternalCall\n.end\n",
+        ".function neoCLR.Runtime.SystemTimeZoneName() -> String\n.methodimpl InternalCall\n.end\n"
+    )).unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    for (name, expected) in [
+        ("neoCLR.Runtime.TimeZoneOffset(String,Int64)", vec![Service::TimeZoneRules]),
+        ("neoCLR.Runtime.TimeZoneMapLocal(String,Int64)", vec![Service::TimeZoneRules, Service::ManagedArrays]),
+        ("neoCLR.Runtime.SystemTimeZoneName()", vec![Service::ProcessEnvironment]),
+    ] {
+        let graph = program.analyze_reachability(&[parse_function_ref(name).unwrap()], 4).unwrap();
+        assert_eq!(graph.required_services(), expected);
+    }
+    assert!(assemble(".function neoCLR.Runtime.TimeZoneOffset(String id,Int64 ticks) -> String\n.methodimpl InternalCall\n.end").is_err());
+}
