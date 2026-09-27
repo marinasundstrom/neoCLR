@@ -160,7 +160,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         if function.parameters != [Type::RuntimeTypeHandle, Type::RuntimeTypeHandle] || function.returns != Type::Boolean || function.no_result { return Err(Fault::new("reflection assignability signature mismatch")); }
         return Ok(Binding::ReflectionAssignable);
     }
-    for (kind, name) in ["ConstructArgs", "Invoke", "FieldGet", "FieldSet"].iter().enumerate() {
+    for (kind, name) in ["ConstructArgs", "Invoke", "FieldGet", "FieldSet", "ConstructorInvoke"].iter().enumerate() {
         let execution = format!("neoCLR.Runtime.Reflection{name}");
         let check = function.name == format!("{execution}Check");
         if function.name != execution && !check { continue; }

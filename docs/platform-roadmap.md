@@ -25,7 +25,7 @@ A [generated attribute-driven mapper experiment](experiments/route-union-mapper/
 validates schemas and reuses compiled patterns. The author subsequently selects
 runtime attribute reflection with cached startup mapping. Member/parameter
 [attribute data](attribute-introspection.md) is now implemented in development;
-cached dynamic union construction is next. Source generation remains a future alternative.
+retained constructor invocation and [dynamic union construction](experiments/union-construction/README.md) now supply the next prerequisite. General cached route-schema binding is next. Source generation remains a future alternative.
 Enum, Uuid and Option JSON mapping remain requested and pending.
 This explicitly supersedes the previous general useful-library priority; M2–M6
 remain candidates. Preview 10's completed POC stays closed.

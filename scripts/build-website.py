@@ -309,6 +309,7 @@ def main():
     })
     samples.update({
         'GC_SAMPLE': ('docs/experiments/runtime-gc/Main.rvn', '    let retained =', '    Check(GC.PeakHeapObjectCount', False),
+        'UNION_CONSTRUCTION_SAMPLE': ('docs/experiments/union-construction/Main.rvn', '    func Create(id:', '\n    }', True),
         'REFLECTION_CONSTRUCTION_SAMPLE': ('docs/experiments/reflection-members/Main.rvn', '    let model =', '    let _ = Field', False),
         'REFLECTION_FIELD_SAMPLE': ('docs/experiments/reflection-members/Main.rvn', '    let _ = Field', '    Check(Field', False),
     })
@@ -351,6 +352,7 @@ def main():
     json_downloads = downloads / 'http-json'
     for directory, names in (
         ('json-object-mapping', ('Mapping.rvn', 'Main.rvn', 'Public.rvn', 'JsonObjectMapping.rvnproj', 'verify.py', 'HttpApplication.rvn', 'NestedHttpApplication.rvn', 'HttpClient.rvn', 'HttpServer.rvn', 'README.md', 'cost.md', 'cost-results.json')),
+        ('union-construction', ('Main.rvn', 'Routes.rvn', 'Construction.rvnproj', 'README.md', 'verify.py', 'validation.json')),
         ('attribute-introspection', ('Main.rvn', 'Routes.rvn', 'Attributes.rvnproj', 'README.md', 'verify.py')),
         ('route-union-mapper', ('Attributes.rvn', 'Routes.rvn', 'Main.rvn', 'Server.rvn', 'Client.rvn', 'Generator.cs', 'Generator.csproj', 'verify.py', 'README.md')),
         ('http-routing', ('Direct.rvn', 'Routes.rvn', 'Main.rvn', 'Routing.rvnproj', 'Server.rvn', 'Client.rvn', 'Server.rvnproj', 'Client.rvnproj', 'verify.py', 'README.md')),

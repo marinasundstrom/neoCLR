@@ -324,7 +324,7 @@ static class ApplicationTypes
         if (method.HasThis && Type(method.DeclaringType) is null) throw new InvalidDataException("Unsupported application receiver.");
     }
     public static string Receiver(MethodReference method) => Type(method.DeclaringType)! + ((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "&" : "");
-    static string FieldName(FieldDefinition field) => FlagsLibrary.IsMatched(field.DeclaringType) ? "Bits" : LibraryNames.ContainsKey(field.DeclaringType)
+    public static string FieldName(FieldDefinition field) => FlagsLibrary.IsMatched(field.DeclaringType) ? "Bits" : LibraryNames.ContainsKey(field.DeclaringType)
         && DescriptorLibrary.IsDescriptor(field.DeclaringType) ? field.Name[6..]
         : LibraryNames.ContainsKey(field.DeclaringType) && GenericUnionLibrary.IsCase(field.DeclaringType)
             ? "Value" : MetadataIdentity.MemberName(field.Name);

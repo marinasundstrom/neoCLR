@@ -1,8 +1,8 @@
 //! Bounded dynamic calls and fields, executed through ordinary interpreter frames.
 use crate::reflection_properties::{supported_value, value_matches};
 use crate::{
-    Fault, Module, Value,
     metadata::{Function, FunctionRef, Instruction as Op, Representation, Type, Visibility},
+    Fault, Module, Value,
 };
 
 #[derive(Clone, Copy, Debug)]
@@ -54,13 +54,28 @@ fn target(f: &Function) -> FunctionRef {
         parameters: f.parameters.clone(),
     }
 }
-fn shape(module: &Module, f: &Function, constructor: bool) -> bool {
+fn constructor_value(module: &Module, ty: &Type) -> bool {
+    supported_value(module, ty)
+        || module.type_definition(ty).is_some_and(|d| {
+            !d.is_reference_type
+                && d.representation == Representation::Record
+                && d.generic_parameters.is_empty()
+                && !d.is_abstract
+        })
+}
+fn shape(module: &Module, f: &Function, constructor: bool, exact: bool) -> bool {
     f.generic_parameters.is_empty()
-        && !f.receiver_byref
+        && (!f.receiver_byref || exact && constructor)
         && !f.is_internal_call()
         && f.pinvoke.is_none()
         && !crate::interfaces::is_bodyless(module, f)
-        && f.parameters.iter().all(|t| supported_value(module, t))
+        && f.parameters.iter().all(|t| {
+            if exact {
+                constructor_value(module, t)
+            } else {
+                supported_value(module, t)
+            }
+        })
         && (constructor
             || f.no_result
             || f.returns == Type::Void
@@ -73,12 +88,13 @@ fn matches(module: &Module, f: &Function, args: &[Value]) -> bool {
             .zip(args)
             .all(|(t, v)| value_matches(module, v, t))
 }
-// kind: 0 selects a constructor, 1 invokes a method, 2 reads a field, 3 writes a field.
+// kind: 0 selects a class constructor, 1 invokes a method, 2/3 access fields,
+// 4 invokes the exact retained constructor (including value records).
 fn plan(module: &Module, args: &[Value], kind: u8) -> Result<Plan, Error> {
     let owner =
         crate::reflection_execution::bound_type(module, &args[0]).map_err(|_| Error::Unbound)?;
     let d = module.type_definition(&owner).ok_or(Error::Unsupported)?;
-    if !d.is_reference_type
+    if (!d.is_reference_type && kind != 4)
         || d.representation != Representation::Record
         || !d.generic_parameters.is_empty()
     {
@@ -95,7 +111,7 @@ fn plan(module: &Module, args: &[Value], kind: u8) -> Result<Plan, Error> {
     };
     let arguments = values(&args[3])?;
     let mut body = vec![Op::LocalAddress(0), Op::InitializeObject(object())];
-    if kind >= 2 {
+    if kind == 2 || kind == 3 {
         let index = usize::try_from(index).map_err(|_| Error::Missing)?;
         let field = d.fields.get(index).ok_or(Error::Missing)?;
         if !supported_value(module, &field.ty) {
@@ -155,8 +171,27 @@ fn plan(module: &Module, args: &[Value], kind: u8) -> Result<Plan, Error> {
             });
         }
     } else {
-        let constructor = kind == 0;
-        let f = if constructor {
+        let constructor = kind == 0 || kind == 4;
+        if constructor && d.is_abstract {
+            return Err(Error::Unsupported);
+        }
+        let f = if kind == 4 {
+            // Definition rows are local to the defining module, including after
+            // linking. Resolve the exact owner/row identity, never an overload.
+            module
+                .functions
+                .iter()
+                .find(|f| {
+                    f.owner.as_ref() == Some(&owner)
+                        && f.definition
+                            .as_ref()
+                            .is_some_and(|id| id.index == index as u32)
+                        && index >= 0
+                        && f.instance
+                        && f.name.ends_with("..ctor")
+                })
+                .ok_or(Error::Missing)?
+        } else if constructor {
             if d.is_abstract || !module.reference_assignable(&owner, &object()) {
                 return Err(Error::Unsupported);
             }
@@ -167,7 +202,7 @@ fn plan(module: &Module, args: &[Value], kind: u8) -> Result<Plan, Error> {
                     f.owner.as_ref() == Some(&owner)
                         && f.name.ends_with("..ctor")
                         && f.instance
-                        && shape(module, f, true)
+                        && shape(module, f, true, false)
                         && matches(module, f, &arguments)
                         && crate::metadata_origin::reflection_public(module, &owner, f)
                         && crate::access::check_call(module, None, f).is_ok()
@@ -190,7 +225,7 @@ fn plan(module: &Module, args: &[Value], kind: u8) -> Result<Plan, Error> {
                 })
                 .ok_or(Error::Missing)?
         };
-        if !shape(module, f, constructor) {
+        if !shape(module, f, constructor, kind == 4) {
             return Err(Error::Unsupported);
         }
         if !crate::metadata_origin::reflection_public(module, &owner, f) {
@@ -228,7 +263,11 @@ fn plan(module: &Module, args: &[Value], kind: u8) -> Result<Plan, Error> {
             Op::Call(target(f))
         });
         if constructor {
-            body.push(Op::CastClass(object()));
+            body.push(if d.is_reference_type {
+                Op::CastClass(object())
+            } else {
+                Op::BoxValue(owner.clone())
+            });
         } else if f.no_result {
             body.push(Op::Load(0));
         } else if f.returns == Type::Void {

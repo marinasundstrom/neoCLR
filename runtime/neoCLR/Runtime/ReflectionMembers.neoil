@@ -41,3 +41,11 @@
 .function neoCLR.Runtime.MemberCustomAttributes(System.Introspection.TypeInfo owner, Int32 token) -> System.Introspection.CustomAttributeData[]
 .methodimpl InternalCall
 .end
+
+.function neoCLR.Runtime.ReflectionConstructorInvoke(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> System.Object
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.ReflectionConstructorInvokeCheck(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> Int32
+.methodimpl InternalCall
+.end

@@ -73,7 +73,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and parameter targets; reject malformed targets, unsupported constants and named
   arguments. Inspection never executes constructors. Compiler-only/external framework
   annotations remain outside this bounded surface; nullable-string attribute emission
-  has a recorded Raven limitation. Match updated runtime/library/reference artifacts.
+  has a recorded Raven limitation. Add ConstructorInfo.Invoke through reflection
+  extensions for exact retained public constructors, including nongeneric value
+  records and union case/carrier construction. Retain imported value-constructor
+  metadata through checked wrappers; preserve initialized no-result value newobj
+  results. Existing TypeInfo activation remains class-only. Add a startup union
+  construction case and match updated runtime/library/reference artifacts.
 
 - Support Raven Main returning integer, Result and target Task combinations through
   target-owned startup adaptation, including optional string-array arguments and

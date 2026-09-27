@@ -3068,7 +3068,10 @@ fn interpret_instructions(
                             }
                         }
                     }
-                    let produces_value = !function.no_result || constructed_object.is_some();
+                    let produces_value = !function.no_result
+                        || constructed_object.is_some()
+                        || frame.construction_storage.is_some()
+                        || frame.constructing;
                     let value = constructed_object.map_or(value, Value::ObjectReference);
                     frames.pop();
                     if let Some(caller) = frames.last_mut() {

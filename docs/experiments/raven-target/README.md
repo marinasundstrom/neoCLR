@@ -1507,3 +1507,29 @@ Descriptors and ParameterInfo fragments are regenerated and checked. Other slice
 compile separate source groups; their output artifacts/provenance are reused while
 the shared source inventory hashes advance. The native runtime, source-library
 fragments, reference assembly and importer must be updated together.
+
+
+### Retained constructor execution (2026-09-27)
+
+The ConstructorReflectionExtensions.Invoke development API exposes exact public
+constructor execution for concrete nongeneric classes and value records. Descriptor
+indices resolve against their declaring owner after module linking. Reflection
+checks do not perform overload selection; argument and access checks still execute
+per call. Runtime Contract configuration is unchanged and no Raven compiler change
+is required. The matching bridge, library fragments and reference assembly must be
+used together.
+
+Application value constructors gain instance wrappers with original source member
+and parameter identity. Their existing helper executes against ordinary initialized
+local storage; wrappers copy completed fields through checked construction writes.
+This preserves ordinary application lowering and avoids passing construction
+capabilities to free-standing helpers. The wrapper retains constructor attributes;
+implementation helpers do not duplicate the source constructor metadata. Constructor
+faults propagate before publication. This entails a temporary value/copy and is not
+a performance claim. See [the executable consumer](../union-construction/README.md)
+and the [.NET comparison](../../reflection-members.md#retained-constructors-and-union-values-2026-09-27).
+
+Only the Descriptors implementation slice changes. Other snapshot manifests advance
+the shared ReflectionExtensions source hash while retaining their unaffected output
+hashes and compiler provenance. Constructor reflection does not add generic-owner,
+enum or private execution support, or widen TypeInfo.CreateInstance.

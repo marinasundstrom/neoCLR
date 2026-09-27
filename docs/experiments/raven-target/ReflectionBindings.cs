@@ -7,6 +7,7 @@ static class ReflectionBindings
     public static readonly string[] ReferenceTypes = ["System.Introspection.CustomAttributeData", "System.Introspection.CustomAttributeTypedArgument", "System.Introspection.AssemblyInfo", "System.Introspection.ModuleInfo", "System.Runtime.RuntimeContext", "System.Introspection.TypeInfo", "System.Introspection.ParameterInfo", "System.Introspection.MemberInfo", "System.Introspection.FieldInfo", "System.Introspection.MethodInfo", "System.Introspection.ConstructorInfo", "System.Introspection.PropertyInfo"];
     static readonly (string Owner, string Name, string[] Args, string Result, bool Static)[] Members = [
         ("System.Runtime.Reflection.TypeReflectionExtensions", "CreateInstance", ["System.Introspection.TypeInfo", "System.Object[]"], "System.Result<System.Object,System.Runtime.Reflection.ReflectionError>", true),
+        ("System.Runtime.Reflection.ConstructorReflectionExtensions", "Invoke", ["System.Introspection.ConstructorInfo", "System.Object[]"], "System.Result<System.Object,System.Runtime.Reflection.ReflectionError>", true),
         ("System.Runtime.Reflection.MethodReflectionExtensions", "Invoke", ["System.Introspection.MethodInfo", "System.Object", "System.Object[]"], "System.Result<System.Object,System.Runtime.Reflection.ReflectionError>", true),
         ("System.Runtime.Reflection.FieldReflectionExtensions", "GetValue", ["System.Introspection.FieldInfo", "System.Object"], "System.Result<System.Object,System.Runtime.Reflection.ReflectionError>", true),
         ("System.Runtime.Reflection.FieldReflectionExtensions", "SetValue", ["System.Introspection.FieldInfo", "System.Object", "System.Object"], "System.Result<Void,System.Runtime.Reflection.ReflectionError>", true),
@@ -124,6 +125,9 @@ static class ReflectionBindings
                 public static Result<T, ReflectionError> CreateInstance<T>(this Introspection.TypeInfo self, params object?[] arguments) => default;
                 public static Result<object, ReflectionError> CreateInstance(this Introspection.TypeInfo self) => default;
             }
+            public static class ConstructorReflectionExtensions {
+                public static Result<object, ReflectionError> Invoke(this Introspection.ConstructorInfo self, params object?[] arguments) => default;
+            }
             public static class MethodReflectionExtensions {
                 public static Result<object?, ReflectionError> Invoke(this Introspection.MethodInfo self, object? receiver, params object?[] arguments) => default;
             }
@@ -180,7 +184,7 @@ static class ReflectionBindings
     {
         if (type is ArrayType { IsVector: true } array && ReferenceTypes.Contains(array.ElementType.FullName)) return $"arrayref<{array.ElementType.FullName}>";
         if (!RuntimeSignatures.IsCore(type.Scope)) return null;
-        if ((ReferenceTypes.Contains(type.FullName) || type.FullName is "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" or "System.Runtime.Reflection.MethodReflectionExtensions" or "System.Runtime.Reflection.FieldReflectionExtensions") && !type.IsValueType) return type.FullName;
+        if ((ReferenceTypes.Contains(type.FullName) || type.FullName is "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" or "System.Runtime.Reflection.ConstructorReflectionExtensions" or "System.Runtime.Reflection.MethodReflectionExtensions" or "System.Runtime.Reflection.FieldReflectionExtensions") && !type.IsValueType) return type.FullName;
         return type.IsValueType && type.FullName is "System.RuntimeTypeHandle" or "System.Introspection.BindingFlags" ? type.FullName : null;
     }
     public static void Validate(ModuleDefinition module)

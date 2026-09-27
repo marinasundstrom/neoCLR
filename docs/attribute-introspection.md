@@ -23,8 +23,7 @@ This is development behavior after Preview 10, requiring matching runtime/librar
 and compiler bridge artifacts. It is not included in the published preview.
 The route mapper will resolve case metadata, pattern compilation, capture positions,
 parsers and case construction at preparation, retain the result, and avoid repeating
-metadata discovery on requests. Checked dynamic case construction still needs a
-separate implementation above current class-only reflection construction.
+metadata discovery on requests. The [retained constructor slice](experiments/union-construction/README.md) now supports checked dynamic case/carrier construction. General cached route-schema binding remains next.
 
 ## Comparison and tradeoffs (primary sources reviewed 2026-09-27)
 
@@ -70,5 +69,4 @@ The executable [consumer](experiments/attribute-introspection/README.md) covers 
 available MemberInfo categories and parameters, exact argument types, snapshots and
 non-execution. Native tests cover artifact round trips, null constants, malformed
 arguments, invalid target tokens and isolation of member/type annotations. The
-route-to-union mapper still needs cached construction binding for value cases;
-current general reflection construction supports reference classes only.
+[retained constructor case](experiments/union-construction/README.md) now binds and invokes value-case and carrier constructors. The general route mapper remains the next layer.

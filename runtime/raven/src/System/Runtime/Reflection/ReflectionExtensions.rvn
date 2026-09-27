@@ -261,3 +261,33 @@ public extension FieldReflectionExtensions for FieldInfo {
         return Error(ReflectionError.UnboundMetadata)
     }
 }
+
+public extension ConstructorReflectionExtensions for ConstructorInfo {
+    func Invoke(params arguments: Object?[]) -> Result<Object, ReflectionError> {
+        if self is RuntimeConstructorInfo implementation {
+            if let Some(owner) = implementation.DeclaringType {
+                if owner is RuntimeTypeInfo runtimeOwner {
+                    let handle = runtimeOwner.ExecutionHandle
+                    let status = RuntimeServices.ReflectionConstructorInvokeCheck(handle, implementation.DefinitionIndex, null, arguments)
+                    if status == 0 {
+                        return Ok(RuntimeServices.ReflectionConstructorInvoke(handle, implementation.DefinitionIndex, null, arguments))
+                    }
+                    if status == 1 {
+                        return Error(ReflectionError.UnboundMetadata)
+                    }
+                    if status == 2 {
+                        return Error(ReflectionError.UnsupportedType)
+                    }
+                    if status == 3 {
+                        return Error(ReflectionError.AccessDenied)
+                    }
+                    if status == 4 {
+                        return Error(ReflectionError.MissingConstructor)
+                    }
+                    return Error(ReflectionError.InvalidArguments)
+                }
+            }
+        }
+        return Error(ReflectionError.UnboundMetadata)
+    }
+}

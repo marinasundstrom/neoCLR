@@ -255,5 +255,10 @@ attributes, merge inherited attributes or expose all framework annotations. See
 [attribute data and limits](/docs/introspection.html#attribute-data-development-after-preview-10).
 
 Use these descriptions to prepare and cache a mapping before request handling.
-Dynamic union construction for that mapper remains the next slice; source generation
-is a future alternative, with a separate experimental case retained in the archive.
+Retained constructor invocation now supplies checked union construction; general
+cached schema/capture binding is next. Source generation remains a future alternative.
+
+
+The [retained constructor case](../reflection/#development-case-preparing-union-constructors-for-routes)
+uses these attribute descriptions to select case/carrier constructors once, then
+constructs ordinary union values through checked Reflection extensions.

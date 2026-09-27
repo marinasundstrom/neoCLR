@@ -1,0 +1,23 @@
+{
+  "date": "2026-09-27",
+  "platform": "macOS arm64",
+  "raven_revision": "2f62361ef",
+  "public_consumer_command": "python3 docs/experiments/union-construction/verify.py --toolchain-root target/experiments/nested-json/bundle --runner target/release/examples/measure_async",
+  "public_consumer_output": "Retained union constructor checks passed\nassembly_ms=8653 load_ms=6658 verify_ms=3287 run_ms=656\nallocated=150 live=0 peak=75 collections=3 reclaimed=150\n\n",
+  "native_command": "cargo test --quiet --test reflection_members --test reflection_construction --test constructor_chaining",
+  "native_tests": 24,
+  "native_result": "passed",
+  "bridge_signature_checks": 28,
+  "attribute_regression_output": "CatalogRoutes/ListItems => /items\nCatalogRoutes/GetItem => /items/{id}\nAttribute introspection checks passed\nassembly_ms=4507 load_ms=9280 verify_ms=2723 run_ms=3440\nallocated=563 live=0 peak=234 collections=7 reclaimed=563\n\nUnsupported Int64 attribute argument rejected at import\nNamed attribute argument rejected at import\n",
+  "route_regression_output": "Generated AppRoutesParser from 2 attributed cases.\nScalar union admission: 7 checks passed.\nAttributed route mapper checks passed\nassembly_ms=10957 load_ms=6285 verify_ms=2418 run_ms=3040\nallocated=355 live=0 peak=64 collections=7 reclaimed=355\n\nHTTP server: assembly_ms=26320 load_ms=32650 verify_ms=7287 run_ms=25191\nallocated=2545 live=0 peak=216 collections=33 reclaimed=2545\nHTTP client: assembly_ms=5059 load_ms=3557 verify_ms=1583 run_ms=6868\nallocated=521 live=0 peak=142 collections=10 reclaimed=521\nHTTP server: assembly_ms=6214 load_ms=3119 verify_ms=1420 run_ms=16155\nallocated=562 live=0 peak=180 collections=9 reclaimed=562\nHTTP checks: 9 independent requests and a 2-request neoCLR client/server pair passed.\nMixed route checks passed\nassembly_ms=5258 load_ms=3176 verify_ms=1173 run_ms=409\nallocated=178 live=0 peak=64 collections=4 reclaimed=178\n\nRejected schema: missing attribute\nRejected schema: missing argument\nRejected schema: unsupported type\nRejected schema: ambiguous patterns\nRejected schema: encoded overlap\nRejected schema: invalid UTF8 literal\nRejected schema: bad pattern\n",
+  "library_snapshot": "Descriptors regenerated and compared with --check; unaffected outputs reused with shared ReflectionExtensions source hash advanced",
+  "api_snapshot": "matching reference refreshed and checked; ConstructorReflectionExtensions added",
+  "website_tests": 18,
+  "website_api_pages": 1273,
+  "sources": {
+    "Routes.rvn": "ef8c9f00709c8a00083f52f853a32a16055794fbdbd82b6cf00cc6cf92fe8d77",
+    "Main.rvn": "5429b778507b1604a103b2c41c34d9a4671289e465933746366aba0755ef27d2",
+    "Construction.rvnproj": "fdbcf0930d1b9486da48114844a7058f21192911bedaea4e049308b0739f9258",
+    "verify.py": "f02903e97becb221556bde9f18450c37252f1550bf449c3e75ff88db3d1d1b70"
+  }
+}

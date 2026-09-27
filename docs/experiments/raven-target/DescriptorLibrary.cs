@@ -57,6 +57,7 @@ static class DescriptorLibrary
             core.GetType("System.Introspection.RuntimeTypeInfo"), "System.Introspection.RuntimeTypeInfo"));
         result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.TypeReflectionExtensions"));
         result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.PropertyReflectionExtensions"));
+        result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.ConstructorReflectionExtensions"));
         result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.MethodReflectionExtensions"));
         result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.FieldReflectionExtensions"));
         return result.ToArray();

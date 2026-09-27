@@ -460,4 +460,4 @@ automatic SDK integration remains future work.
 
 The immediate direction is runtime attribute inspection during startup, with a
 cached mapping for requests. [Attribute data is now available](/features/introspection/#development-case-inspecting-route-declarations-at-startup);
-checked dynamic union construction is the next mapper step.
+[retained constructor invocation](/features/reflection/#development-case-preparing-union-constructors-for-routes) now supplies checked union construction. General cached schema/capture binding is next.

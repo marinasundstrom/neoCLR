@@ -366,3 +366,8 @@ Attribute data (development 2026-09-27) adds MemberInfo/ParameterInfo retrieval,
 CustomAttributeData and CustomAttributeTypedArgument. All public signatures have
 XML coverage and automatic type selection; the introspection guide documents exact
 retention, constants, non-execution and source limitations. No manual exclusions.
+
+
+The 2026-09-27 constructor execution increment includes ConstructorReflectionExtensions
+and Invoke in generated type/member coverage, with exact boxing/access limitations
+in [the reflection reference](reflection.md). TypeInfo activation is unchanged.

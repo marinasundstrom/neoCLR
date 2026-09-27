@@ -8593,3 +8593,20 @@ configuration/content, not target-specific code added to Raven main.
   A nullable-string attribute constructor triggered Raven's CustomAttributeBuilder
   emission exception and is recorded for independent investigation. Source generation
   remains a future option; enum/Uuid/Option JSON requests remain pending.
+
+
+## 2026-09-27 — retained constructor invocation for startup route mapping
+
+- **Author:** asked to continue after the multiple-attribute introspection slice.
+  Earlier direction selects runtime reflection at startup and cached mapping, with
+  source generation reserved as a future alternative.
+- **Assistant:** identified class-only reflective construction and unavailable
+  application value-constructor descriptors as the next bounded prerequisites.
+  Added exact ConstructorInfo invocation, value-case/carrier boxing, and bridge
+  constructor wrappers retaining source identity. The sample prepares descriptors
+  from a route attribute once and reuses them to construct ordinary Raven unions.
+- **Scope:** descriptor selection is retained; arguments and access are checked per
+  call. There is no claim of a compiled native plan or completed general route
+  mapper. General schema validation/capture binding is next; enum/Uuid/Option JSON
+  requests remain open. Evidence and validation are recorded with the
+  [construction case](experiments/union-construction/README.md).

@@ -125,6 +125,8 @@ static class RuntimeServiceBindings
             ("ReflectionAssignable", ["System.RuntimeTypeHandle", "System.RuntimeTypeHandle"], "Boolean"),
             ("ReflectionConstructArgs", ["System.RuntimeTypeHandle", "Int32", "System.Object", "arrayref<System.Object>"], "System.Object"),
             ("ReflectionConstructArgsCheck", ["System.RuntimeTypeHandle", "Int32", "System.Object", "arrayref<System.Object>"], "Int32"),
+            ("ReflectionConstructorInvoke", ["System.RuntimeTypeHandle", "Int32", "System.Object", "arrayref<System.Object>"], "System.Object"),
+            ("ReflectionConstructorInvokeCheck", ["System.RuntimeTypeHandle", "Int32", "System.Object", "arrayref<System.Object>"], "Int32"),
             ("ReflectionInvoke", ["System.RuntimeTypeHandle", "Int32", "System.Object", "arrayref<System.Object>"], "System.Object"),
             ("ReflectionInvokeCheck", ["System.RuntimeTypeHandle", "Int32", "System.Object", "arrayref<System.Object>"], "Int32"),
             ("ReflectionFieldGet", ["System.RuntimeTypeHandle", "Int32", "System.Object", "arrayref<System.Object>"], "System.Object"),

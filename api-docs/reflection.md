@@ -87,3 +87,26 @@ params expansion of the selected target is provided. Multiple compatible constru
 return AmbiguousConstructor; none returns MissingConstructor. Invalid method arguments
 return InvalidArguments. Incompatible T returns InvalidResultType. UnsupportedMethod
 and UnsupportedField distinguish unsupported metadata shapes. User Faults stay terminal.
+
+## Retained constructor invocation (development)
+
+`ConstructorReflectionExtensions.Invoke(self: ConstructorInfo, params arguments: Object?[])
+-> Result<Object, ReflectionError>` invokes the selected constructor directly.
+Import `System.Runtime.Reflection.*` and call `constructor.Invoke(arguments)`.
+Keep the descriptor after startup discovery to avoid overload selection on each call.
+
+This extension supports concrete nongeneric reference classes and value records,
+including admitted standard union cases and carriers. Arguments accept exact boxed
+built-in scalars, exact boxed nongeneric value records, or assignable references/null.
+Values are boxed on return. Construct a union case first, then pass that boxed case
+to the selected carrier constructor. No implicit boxed case-to-carrier conversion,
+coercion, enum construction, generic value construction, optional defaults, byref/out
+arguments or private execution is supplied. The TypeInfo.CreateInstance overloads
+retain their existing reference-class-only contract.
+
+UnboundMetadata, UnsupportedType, AccessDenied, MissingConstructor and
+InvalidArguments distinguish validation failures. Argument validation precedes
+execution; constructor faults remain terminal. Descriptor identity resolves within
+the current loaded program; access and arguments are rechecked per invocation.
+This retains constructor selection, not a compiled execution plan.
+See the [tested union construction case](/features/reflection/#development-case-preparing-union-constructors-for-routes).

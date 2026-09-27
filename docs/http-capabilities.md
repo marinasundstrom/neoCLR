@@ -204,5 +204,6 @@ not an installed SDK feature. Enum/Uuid/Option JSON support remains requested.
 
 The subsequent author direction chooses runtime introspection at startup and a
 cached mapping. [Member/parameter attribute data](attribute-introspection.md) now
-supports that preparation without executing attribute constructors; dynamic union
-construction remains next. The generator remains a future alternative.
+supports that preparation without executing attribute constructors.
+[Retained constructor invocation](experiments/union-construction/README.md) now
+supplies checked union construction; general cached schema/capture binding is next. The generator remains a future alternative.
