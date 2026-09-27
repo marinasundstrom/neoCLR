@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Adopt RavenDoc’s overridable compact typography defaults (15px equivalent prose,
+  13px highlighted code/signatures), remove oversized article-title overrides and
+  balance the landing hero. Long inline code wraps within narrow-screen prose.
+  Correct Task.Run guide links to the generated heading anchor.
+
 - Update the pinned shared RavenDoc publisher with semantic member origins,
   inherited-member visibility and kind/declaring-type grouping. Keep static members
   on their declaring type; show selected LINQ/reflection extensions inline with E
