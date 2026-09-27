@@ -34,7 +34,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Record Task.Run as the author-selected canonical submission API with shared
   captures and runtime-selected execution. Document heap/scheduling prerequisites,
   backend alternatives and focused acceptance; implementation and Thread's future
-  public role remain open.
+  public role remain open. Add the first runtime prerequisite: identity-preserving
+  synchronized managed slots, weak heap handles and debugger snapshots that release
+  storage locks before following references. Cover native-thread alias mutation,
+  coherent slot reads and payload-cache invalidation. Record green threads as a
+  possible later backend; Task.Run and concurrent GC are not exposed by this slice.
 
 - Support Raven Main returning integer, Result and target Task combinations through
   target-owned startup adaptation, including optional string-array arguments and

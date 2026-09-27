@@ -164,7 +164,9 @@ affinity are not settled contracts. Ordinary worker joins can still block the qu
 
 Task.Run is the selected direction for submitting work with captured variables
 and shared objects, with the runtime choosing execution. It is not implemented yet.
-Thread may become a backend primitive; its public future remains open.
+Thread may become a backend primitive; its public future remains open. Green
+threads are a possible later runtime backend, subject to the same sharing and
+progress guarantees.
 Runtime-owned suspension and broader cleanup support remain future directions. Their scheduling, isolation and lifetime rules need design;
 no public Scheduler API is selected. See the [builder contracts](../../docs/async-builders.html)
 for the supported compiler integration.

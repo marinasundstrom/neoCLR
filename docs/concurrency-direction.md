@@ -39,9 +39,12 @@ A different backend must preserve the Task.Run sharing contract.
 
 ### Runtime prerequisites and implementation alternatives
 
-The current runtime has an invocation-owned tracing heap. Managed slots use
-`Rc<RefCell<Slot>>`, heap handles use weak references, and the root walk covers the
-active invocation. The existing native workers start separate invocations. Merely
+The runtime has an invocation-owned tracing heap. The first implementation
+prerequisite replaces `Rc<RefCell<Slot>>` with identity-preserving `Arc` storage and
+per-slot mutexes. Heap handles still use weak references, and the root walk covers
+the active invocation. [Storage evidence](experiments/task-run/README.md) covers
+native sharing at this boundary; concurrent VM execution and GC are not implemented.
+The existing native workers start separate invocations. Merely
 sending a delegate or substituting Arc for Rc is insufficient: slot access, GC,
 Promise completion, task queues, cancellation and host resources also need a
 consistent ownership/synchronization model. Do not add unsafe Send/Sync assertions
@@ -68,6 +71,18 @@ contracts before exposing Raven Run overloads and refreshing the matching API
 artifacts. This is a feature prerequisite, not an optimization project. Existing
 Result/cancellation/Fault semantics remain neoCLR's; .NET-like scheduling does not
 select exception-bearing Task outcomes.
+
+### Future green threads
+
+The author identifies runtime green threads as a possible future execution model.
+This is a direction, not an additional requirement for the first native-thread
+implementation. Keep the API independent of native thread identity so a runtime
+can later multiplex tasks while preserving shared captures and completion.
+Blocking host work must be offloaded, made interruptible/asynchronous, or otherwise
+scheduled so it does not stall the execution resources needed for caller progress.
+VM frame suspension, safepoints, root publication and wakeup are implementation
+concerns; adding green threads alone does not define synchronization or ambient
+context propagation. Do not promise transparent support before testing those cases.
 
 ### Focused acceptance before exposing the API
 

@@ -3912,11 +3912,16 @@ fn debug_snapshot(
             frame.pc
         };
         let slot = |cell: &crate::slots::Cell, budget: &mut usize| {
-            let slot = cell.borrow();
-            slot.inspect().map_or_else(
+            // Release the storage lock before following references. A value can
+            // lead back to this slot or to a concurrently inspected object.
+            let (ty, value) = {
+                let slot = cell.borrow();
+                (slot.inspect_type().clone(), slot.inspect().cloned())
+            };
+            value.as_ref().map_or_else(
                 || crate::debugger::DebugValue {
                     ty: debug_text(
-                        &crate::type_identity::signature_name(slot.inspect_type())
+                        &crate::type_identity::signature_name(&ty)
                             .unwrap_or_else(|_| "<unknown>".into()),
                     ),
                     value: "uninitialized".into(),
@@ -3991,10 +3996,11 @@ fn debug_snapshot(
             frame.args.len() > 128 || frame.locals.len() > 128 || frame.stack.len() > 128;
     }
     for (id, cell) in heap.debug_cells().take(256) {
-        if let Some(value) = cell.borrow().inspect() {
+        let value = cell.borrow().inspect().cloned();
+        if let Some(value) = value {
             snapshot
                 .heap
-                .push((*id, debug_value(module, frames, value, 0, &mut budget)));
+                .push((*id, debug_value(module, frames, &value, 0, &mut budget)));
         }
     }
     snapshot.native = memory.debug_allocations();

@@ -9,7 +9,7 @@ or later author direction selects it.
 
 ## Author-selected Task.Run work — 2026-09-27
 
-**Active direction; implementation pending.** Task.Run is the canonical submission
+**Active direction; public API pending.** Task.Run is the canonical submission
 API for work with shared lexical captures, with execution chosen by the runtime. The subsequent .NET-behavior direction leads to
 a native-thread first implementation recommendation, including progress while
 submitted work blocks and async callback unwrapping.
@@ -18,6 +18,11 @@ noncapturing transferable values. [The concurrency design](../concurrency-direct
 owns the contract, backend alternatives and focused acceptance cases. Settle the
 execution/heap ownership boundary before exposing the facade; the isolated Thread
 worker contract is not a substitute. Thread's future public role remains open.
+The [first storage prerequisite](../experiments/task-run/README.md) implements
+synchronized managed slots and tests native alias sharing. It does not yet supply
+shared collector roots, concurrent Promise/queue publication or a Task.Run facade.
+The next bounded prerequisite is coordinated heap/root ownership for queued,
+running and completed work. Green threads are recorded as a possible future backend.
 This explicit task does not reopen the finished HTTP POC or select a general
 scheduler/backend rewrite independently of the capability's requirements.
 

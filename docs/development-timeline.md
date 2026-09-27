@@ -8482,3 +8482,17 @@ configuration/content, not target-specific code added to Raven main.
   and [runtime tracker](tracking/runtime-language.md#author-selected-taskrun-work--2026-09-27).
   Runtime implementation and validation remain pending; no Task.Run API is claimed
   complete by this design record.
+
+- **Later author direction:** “In the future we might have something similar to
+  green threads in the runtime.” The assistant records this as a possible backend
+  that must preserve the selected sharing/progress contract, not a replacement of
+  the current native-thread implementation direction.
+- **Implementation follow-up:** integrates the Reflection/GC baseline and implements
+  synchronized managed storage as the first prerequisite. This preserves weak heap
+  handles and identity, and avoids holding storage locks during debugger reference
+  traversal. Public Task.Run, shared GC coordination and task publication remain
+  unfinished; native storage checks alone do not establish that full contract.
+  109 focused native/integration checks pass. A small release-build class-field
+  probe records about 4% overhead; results and limitations are retained with the
+  [storage evidence](experiments/task-run/README.md). No full suite or website build
+  was run for this prerequisite.

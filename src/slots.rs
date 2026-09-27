@@ -3,9 +3,8 @@
 //! the lifetime of the owning frame, including for interior field references.
 use crate::{Fault, Value, metadata::Type};
 use std::{
-    cell::RefCell,
     collections::HashMap,
-    rc::{Rc, Weak},
+    sync::{Arc, Mutex, MutexGuard, Weak},
 };
 
 #[derive(Debug)]
@@ -19,11 +18,27 @@ pub(crate) struct Slot {
     construction: Option<Vec<Type>>,
     replacements: HashMap<Vec<usize>, u64>,
 }
-pub(crate) type Cell = Rc<RefCell<Slot>>;
+/// One synchronized storage location. Guards must never span a traversal into
+/// another managed location (including debugger inspection of a cyclic graph).
+/// The lock protects storage, not an entire guest read/modify/write expression.
+#[derive(Debug)]
+pub(crate) struct SlotStorage(Mutex<Slot>);
+impl SlotStorage {
+    fn new(slot: Slot) -> Self {
+        Self(Mutex::new(slot))
+    }
+    pub(crate) fn borrow(&self) -> MutexGuard<'_, Slot> {
+        self.0.lock().expect("managed slot lock poisoned")
+    }
+    pub(crate) fn borrow_mut(&self) -> MutexGuard<'_, Slot> {
+        self.borrow()
+    }
+}
+pub(crate) type Cell = Arc<SlotStorage>;
 
 impl Slot {
     pub(crate) fn new(ty: Type, value: Option<Value>) -> Cell {
-        Rc::new(RefCell::new(Self {
+        Arc::new(SlotStorage::new(Self {
             ty,
             value,
             array_usage: std::cell::Cell::new(None),
@@ -74,7 +89,7 @@ impl Slot {
         Ok(value)
     }
     pub(crate) fn reset(cell: &Cell) -> Result<(), Fault> {
-        if Rc::strong_count(cell) != 1 {
+        if Arc::strong_count(cell) != 1 {
             return Err(Fault::new(
                 "cannot reset local while managed references are live",
             ));
@@ -142,7 +157,7 @@ enum Root {
     Frame(Cell),
     Heap {
         identity: usize,
-        cell: Weak<RefCell<Slot>>,
+        cell: Weak<SlotStorage>,
     },
 }
 
@@ -168,7 +183,7 @@ impl PartialEq for SlotReference {
         self.target == other.target
             && self.path == other.path
             && match (&self.root, &other.root) {
-                (Root::Frame(a), Root::Frame(b)) => Rc::ptr_eq(a, b),
+                (Root::Frame(a), Root::Frame(b)) => Arc::ptr_eq(a, b),
                 (Root::Heap { cell: a, .. }, Root::Heap { cell: b, .. }) => Weak::ptr_eq(a, b),
                 _ => false,
             }
@@ -178,7 +193,7 @@ impl SlotReference {
     pub(crate) fn new(cell: &Cell) -> Self {
         Self {
             target: cell.borrow().ty.clone(),
-            root: Root::Frame(Rc::clone(cell)),
+            root: Root::Frame(Arc::clone(cell)),
             path: vec![],
             after_write: None,
             readonly: false,
@@ -189,7 +204,7 @@ impl SlotReference {
         let mut reference = Self::new(cell);
         reference.root = Root::Heap {
             identity,
-            cell: Rc::downgrade(cell),
+            cell: Arc::downgrade(cell),
         };
         reference
     }
@@ -202,18 +217,18 @@ impl SlotReference {
         }
     }
     pub(crate) fn belongs_to_heap_cell(&self, cell: &Cell) -> bool {
-        matches!(&self.root, Root::Heap { cell: root, .. } if Weak::ptr_eq(root, &Rc::downgrade(cell)))
+        matches!(&self.root, Root::Heap { cell: root, .. } if Weak::ptr_eq(root, &Arc::downgrade(cell)))
     }
     fn cell(&self) -> Result<Cell, Fault> {
         match &self.root {
-            Root::Frame(cell) => Ok(Rc::clone(cell)),
+            Root::Frame(cell) => Ok(Arc::clone(cell)),
             Root::Heap { cell, .. } => cell
                 .upgrade()
                 .ok_or_else(|| Fault::new("managed heap reference has expired")),
         }
     }
     pub(crate) fn addresses(&self, cell: &Cell) -> bool {
-        matches!(&self.root, Root::Frame(root) if Rc::ptr_eq(root, cell))
+        matches!(&self.root, Root::Frame(root) if Arc::ptr_eq(root, cell))
     }
     pub(crate) fn debug_path(&self) -> &[usize] {
         &self.path
@@ -221,7 +236,7 @@ impl SlotReference {
     pub(crate) fn same_location(&self, other: &Self) -> bool {
         self.path == other.path
             && match (&self.root, &other.root) {
-                (Root::Frame(a), Root::Frame(b)) => Rc::ptr_eq(a, b),
+                (Root::Frame(a), Root::Frame(b)) => Arc::ptr_eq(a, b),
                 (Root::Heap { cell: a, .. }, Root::Heap { cell: b, .. }) => Weak::ptr_eq(a, b),
                 _ => false,
             }
@@ -589,6 +604,93 @@ pub(crate) fn contains(ty: &Type) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn managed_values_are_send_and_sync_without_unsafe_markers() {
+        fn require<T: Send + Sync>() {}
+        require::<crate::Value>();
+        require::<crate::SlotReference>();
+        require::<crate::ManagedHeap>();
+    }
+
+    #[test]
+    fn native_threads_mutate_the_same_heap_object_through_interior_aliases() {
+        let mut heap = crate::ManagedHeap::default();
+        let id = heap
+            .allocate(Value::Object {
+                ty: Type::from_name("Pair"),
+                fields: vec![Value::Int32(0), Value::Int32(0)],
+            })
+            .unwrap();
+        let object = heap.address(id).unwrap();
+        let first = object.field(0, Type::Int32).unwrap();
+        let second = object.field(1, Type::Int32).unwrap();
+        let start = std::sync::Barrier::new(3);
+        std::thread::scope(|scope| {
+            for field in [first, second] {
+                let start = &start;
+                scope.spawn(move || {
+                    start.wait();
+                    for n in 1..=2_000 {
+                        field.write(Value::Int32(n)).unwrap();
+                        assert_eq!(field.read().unwrap(), Value::Int32(n));
+                    }
+                    assert_eq!(field.allocation_id(), Some(id));
+                });
+            }
+            start.wait();
+        });
+        assert_eq!(object.read_field(0).unwrap(), Value::Int32(2_000));
+        assert_eq!(object.read_field(1).unwrap(), Value::Int32(2_000));
+        // Native sharing does not turn a weak heap handle into a GC root.
+        heap.collect(vec![], crate::CollectionReason::ExplicitRequest)
+            .unwrap();
+        assert!(object.read().unwrap_err().message.contains("expired"));
+    }
+
+    #[test]
+    fn concurrent_record_replacement_and_reads_do_not_observe_torn_values() {
+        let ty = Type::from_name("Pair");
+        let pair = |n| Value::Object {
+            ty: ty.clone(),
+            fields: vec![Value::Int32(n), Value::Int32(n)],
+        };
+        let cell = Slot::new(ty.clone(), Some(pair(0)));
+        let reference = crate::SlotReference::new(&cell);
+        let start = std::sync::Barrier::new(2);
+        std::thread::scope(|scope| {
+            scope.spawn(|| {
+                start.wait();
+                for n in 1..=2_000 {
+                    reference.write(pair(n)).unwrap();
+                }
+            });
+            start.wait();
+            for _ in 0..2_000 {
+                let Value::Object { fields, .. } = reference.read().unwrap() else {
+                    panic!("expected record");
+                };
+                assert_eq!(fields[0], fields[1]);
+            }
+        });
+        assert_eq!(reference.read().unwrap(), pair(2_000));
+    }
+
+    #[test]
+    fn cross_thread_array_mutation_invalidates_payload_summary() {
+        let cell = Slot::new(Type::Array(Box::new(Type::String)), Some(text_array("a")));
+        budget(&cell, 1, std::mem::size_of::<Value>() + 1).unwrap();
+        let element = crate::SlotReference::new(&cell)
+            .element(0, &Type::String)
+            .unwrap();
+        std::thread::spawn(move || {
+            element.write(Value::String("longer".into())).unwrap();
+        })
+        .join()
+        .unwrap();
+        assert!(budget(&cell, 1, std::mem::size_of::<Value>() + 1).is_err());
+        budget(&cell, 1, std::mem::size_of::<Value>() + 6).unwrap();
+    }
+
     fn text_array(text: &str) -> Value {
         Value::Array {
             element: Type::String,
@@ -734,7 +836,7 @@ mod tests {
         assert_eq!(reference.read().unwrap(), Value::Int32(7));
         reference.write(Value::Int32(42)).unwrap();
         assert_eq!(output.read().unwrap(), Value::Int32(42));
-        let observer = Rc::downgrade(&cell);
+        let observer = Arc::downgrade(&cell);
         drop(cell);
         assert_eq!(reference.read().unwrap(), Value::Int32(42));
         reference.write(Value::Int32(0)).unwrap();
@@ -749,8 +851,8 @@ mod tests {
     fn reference_replacement_releases_only_the_replaced_retention() {
         let first = Slot::new(Type::String, Some(Value::String("first".into())));
         let second = Slot::new(Type::String, Some(Value::String("second".into())));
-        let first_lifetime = Rc::downgrade(&first);
-        let second_lifetime = Rc::downgrade(&second);
+        let first_lifetime = Arc::downgrade(&first);
+        let second_lifetime = Arc::downgrade(&second);
         let alias = SlotReference::new(&first);
         let holder = Slot::new(
             Type::ByRef(Box::new(Type::String)),
