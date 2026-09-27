@@ -63,8 +63,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   release it. Validate aggregate exhaustion/admission and record a focused cost probe.
   Share the invocation file table and intern pool across VM contexts, preserving
   handle position/close state, string identity and quotas. File-table locking stays
-  outside graph access; file operations are initially serialized. Scheduler/queue,
-  array/native-memory ownership and public Run still need integration.
+  outside graph access; file operations are initially serialized. Share scheduler and
+  default-queue ownership with invocation service roots independent of submitting
+  contexts. Serialize completion draining, retain cancellation while waiting, and
+  detach worker joins before blocking so scheduler access remains available. Preserve
+  final-GC diagnostics after service teardown. Native-memory/array accounting, atomic
+  guest Promise/queue mutations and public Run still need integration.
   This is backend infrastructure, not a public Task.Run release.
 
 - Support Raven Main returning integer, Result and target Task combinations through

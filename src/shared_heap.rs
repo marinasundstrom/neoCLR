@@ -14,6 +14,7 @@ struct Registration {
 struct State {
     heap: ManagedHeap,
     participants: Vec<Weak<Registration>>,
+    service_roots: Vec<Weak<Registration>>,
 }
 struct Shared {
     state: Mutex<State>,
@@ -32,6 +33,29 @@ pub(crate) struct Participant {
     shared: Arc<Shared>,
     registration: Arc<Registration>,
 }
+/// Invocation services keep roots independently of any submitting guest context.
+/// This owner holds the heap alive but consumes no executable participant slot.
+pub(crate) struct RootSet {
+    shared: Arc<Shared>,
+    registration: Arc<Registration>,
+}
+impl RootSet {
+    pub(crate) fn publish(&self, access: &mut Access<'_>, roots: Vec<usize>) -> Result<(), Fault> {
+        if !Arc::ptr_eq(&self.shared, access.shared) {
+            return Err(Fault::new(
+                "service roots belong to another invocation heap",
+            ));
+        }
+        validate(&access.state.heap, &roots)?;
+        *self
+            .registration
+            .roots
+            .lock()
+            .expect("service root lock poisoned") = roots;
+        Ok(())
+    }
+}
+
 pub(crate) struct Access<'a> {
     shared: &'a Arc<Shared>,
     registration: &'a Registration,
@@ -44,6 +68,7 @@ impl Owner {
             state: Mutex::new(State {
                 heap: ManagedHeap::default(),
                 participants: Vec::new(),
+                service_roots: Vec::new(),
             }),
             limit,
         }))
@@ -54,11 +79,12 @@ impl Owner {
         register(&self.0, &mut state, Vec::new())
     }
 
-    /// Teardown may export the heap only after every participant has been dropped.
+    /// Teardown may export the heap only after all participants and service roots have been dropped.
     /// A rejected export leaves the heap owned by the outstanding participants.
     pub(crate) fn into_heap(self) -> Result<ManagedHeap, Fault> {
-        let shared = Arc::try_unwrap(self.0)
-            .map_err(|_| Fault::new("shared heap still has active participants"))?;
+        let shared = Arc::try_unwrap(self.0).map_err(|_| {
+            Fault::new("shared heap still has active participants or service roots")
+        })?;
         Ok(shared
             .state
             .into_inner()
@@ -135,6 +161,20 @@ fn register(
 }
 
 impl Access<'_> {
+    pub(crate) fn service_roots(&mut self) -> RootSet {
+        self.state
+            .service_roots
+            .retain(|entry| entry.strong_count() != 0);
+        let registration = Arc::new(Registration {
+            roots: Mutex::new(Vec::new()),
+        });
+        self.state.service_roots.push(Arc::downgrade(&registration));
+        RootSet {
+            shared: self.shared.clone(),
+            registration,
+        }
+    }
+
     pub(crate) fn identity(&self) -> Identity {
         Identity(Arc::downgrade(self.shared))
     }
@@ -203,6 +243,14 @@ impl Access<'_> {
         self.state.participants.retain(|entry| {
             if let Some(entry) = entry.upgrade() {
                 all.extend_from_slice(&entry.roots.lock().expect("root lock poisoned"));
+                true
+            } else {
+                false
+            }
+        });
+        self.state.service_roots.retain(|entry| {
+            if let Some(entry) = entry.upgrade() {
+                all.extend_from_slice(&entry.roots.lock().expect("service root lock poisoned"));
                 true
             } else {
                 false
@@ -392,6 +440,16 @@ mod tests {
             .collect(vec![id], CollectionReason::ExplicitRequest)
             .unwrap();
         assert_eq!(access.len(), 1);
+    }
+
+    #[test]
+    fn service_roots_prevent_export_without_consuming_a_participant_slot() {
+        let owner = Owner::new(1);
+        let mut participant = owner.participant().unwrap();
+        let roots = participant.enter().service_roots();
+        drop(participant);
+        assert!(owner.into_heap().is_err());
+        drop(roots);
     }
 
     #[test]

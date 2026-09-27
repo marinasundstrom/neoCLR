@@ -306,10 +306,48 @@ when its whole-library preparation became apparent; its partial run is not evide
 for this slice. The small System fixture validates the actual guest String.Intern
 binding across two contexts without rebuilding or verifying the entire library.
 
+## Shared scheduler and default-queue ownership
+
+The invocation owner now holds the completion scheduler and registered default queue.
+A service-root registration keeps queue, pending callbacks and staged completions
+alive independently of the context that submitted them. It is bound to one heap,
+blocks heap export until released, and does not consume an executable participant
+slot. Source/root updates follow graph-then-dispatch lock order. Collection inside
+an instruction interval still includes the current service values before their next
+published snapshot.
+
+One context owns completion draining across instruction pauses and host calls.
+Other contexts wait without consuming instructions and still observe cancellation.
+The claim is released on completion, entry-drain exit, terminal fault or context
+disposal. This protects runtime-driven draining; it does not yet make arbitrary
+concurrent guest TaskQueue.Post/Run or lazy TaskQueue.Default construction atomic.
+Those library mutations remain part of the Promise/queue publication slice.
+
+Worker joins detach their receiver and dedicated-thread ownership before waiting;
+the scheduler stays available for cancellation requests and other sources. A consumed
+handle cannot be joined twice. Detached teardown requests cancellation and joins the
+dedicated producer outside graph access. Parking uses the invocation wake directly,
+without taking the dispatch lock. Final execution collection now follows service
+teardown, preserving the existing single ExecutionCompleted collection and reclaiming
+service-only objects before heap export.
+
+Like .NET's runtime scheduler, submission lifetime does not define callback-root
+lifetime. neoCLR retains invocation-scoped limits and one completion pump, rather
+than adopting .NET's process-wide pool or promising parallel callback dispatch.
+The shared graph/dispatch locks are a correctness baseline, not a throughput claim.
+
+Focused validation passes: two dispatch-service tests, eleven VM suspension/ownership
+tests, twelve worker tests, seven heap-coordinator tests, nine scheduler tests and
+22 GC/startup/cancellation integration tests. New probes cover source roots after
+submitter exit, exact-once handoff, shared queue identity, dispatch contention and
+cancellation during detached joins. Existing final-GC diagnostic counts still pass.
+No whole-library fixture, full suite, API snapshot regeneration or website build was
+needed; the public Task.Run API remains unimplemented.
+
 ## Next prerequisite
 
-Integrate the scheduler/completion owner, shared default queue, native allocation
-ownership and aggregate array/native-memory accounting before general guest work
+Integrate native allocation ownership and aggregate array/native-memory accounting
+before general guest work
 submission. Then establish atomic Promise/queue publication and expose the
 Run overloads, with async callback unwrapping validated at that API boundary.
 Instruction/live-frame budgets, file handles and interning now share an invocation

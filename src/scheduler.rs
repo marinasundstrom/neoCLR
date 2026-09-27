@@ -138,6 +138,10 @@ impl Default for Scheduler {
     }
 }
 impl Scheduler {
+    pub(crate) fn wake(&self) -> Arc<Wake> {
+        self.wake.clone()
+    }
+
     fn progress(&mut self, heap: &ManagedHeap) -> Result<Progress, Fault> {
         let sources: &mut [&mut dyn Source] =
             &mut [&mut self.workers, &mut self.sockets, &mut self.resolver];
@@ -199,6 +203,7 @@ impl Scheduler {
     }
 
     /// No managed graph access may be held while parking.
+    #[cfg(test)]
     pub(crate) fn park(&self) {
         // Cancellation and the socket source have no wake subscription.
         self.wake.park(Duration::from_millis(10));

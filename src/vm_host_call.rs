@@ -9,6 +9,7 @@ pub(super) struct HostCall {
     pc: usize,
     patch: Option<(crate::value::ObjectReference, usize)>,
     immediate: Option<Value>,
+    join: Option<crate::workers::PendingJoin>,
 }
 
 impl HostCall {
@@ -63,7 +64,29 @@ impl HostCall {
             pc,
             patch,
             immediate,
+            join: None,
         })
+    }
+
+    pub(super) fn prepare_join(
+        &mut self,
+        scheduler: &mut crate::scheduler::Scheduler,
+    ) -> Result<(), Fault> {
+        if self.callee.pinvoke.is_none()
+            && matches!(
+                crate::native::bind(&self.callee)?,
+                crate::native::Binding::JoinWorker | crate::native::Binding::JoinWorkerResult
+            )
+        {
+            self.join = Some(scheduler.workers.prepare_join(self.args.clone()).map_err(
+                |mut fault| {
+                    fault.function = Some(self.context.clone());
+                    fault.instruction = Some(self.pc);
+                    fault
+                },
+            )?);
+        }
+        Ok(())
     }
 
     pub(super) fn supports(binding: &crate::native::Binding) -> bool {
@@ -117,7 +140,7 @@ impl HostCall {
 
     #[allow(clippy::too_many_arguments)]
     pub(super) fn run(
-        &self,
+        &mut self,
         module: &Module,
         state: &mut InstructionState,
         native_libraries: &mut Option<crate::interop::NativeLibraries>,
@@ -161,20 +184,17 @@ impl HostCall {
                         .lock()
                         .expect("file table lock poisoned")
                         .invoke(operation, &self.args, &state.invocation.limits)?,
-                    crate::native::Binding::JoinWorkerResult => {
-                        Value::Erased(Box::new(state.scheduler.workers.join_result(
-                            self.args.clone(),
-                            output,
-                            options,
-                            true,
-                        )?))
-                    }
-                    crate::native::Binding::JoinWorker => {
-                        state
-                            .scheduler
-                            .workers
-                            .join(self.args.clone(), output, options)?
-                    }
+                    crate::native::Binding::JoinWorkerResult => Value::Erased(Box::new(
+                        self.join
+                            .take()
+                            .expect("prepared worker join")
+                            .wait(output, options, true)?,
+                    )),
+                    crate::native::Binding::JoinWorker => self
+                        .join
+                        .take()
+                        .expect("prepared worker join")
+                        .wait(output, options, false)?,
                     _ => binding.invoke(
                         self.args.clone(),
                         self.assembly.as_deref(),

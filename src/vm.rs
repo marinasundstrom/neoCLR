@@ -1527,7 +1527,12 @@ fn interpret_frames(
     );
     // Source teardown may join host workers; never hold the managed graph gate.
     drop(state);
-    let heap = participant.enter();
+    let mut heap = participant.enter();
+    if let Ok(value) = &result {
+        let mut roots = Vec::new();
+        crate::gc::trace(value, &mut roots);
+        heap.collect(roots, crate::CollectionReason::ExecutionCompleted)?;
+    }
     if let Some(debugger) = &options.debugger {
         let mut snapshot = debug_snapshot(module, frames, &heap, &memory, &output, result.is_err());
         if let Ok(value) = &result {
@@ -1578,9 +1583,9 @@ fn drive_instructions(
             Ok(InstructionProgress::Suspended) => continue,
             Ok(InstructionProgress::Waiting) => {
                 drop(heap);
-                state.scheduler.park();
+                state.invocation.park();
             }
-            Ok(InstructionProgress::HostCall(call)) => {
+            Ok(InstructionProgress::HostCall(mut call)) => {
                 drop(heap);
                 let value = match call.run(
                     module, state, native_libraries, memory, output, console_bytes, options,
@@ -1598,10 +1603,11 @@ fn drive_instructions(
                         "evaluation stack limit exceeded",
                     ));
                 }
+                let dispatch = state.invocation.dispatch.lock().expect("dispatch lock poisoned");
                 if let Err(fault) = heap.publish(execution_roots(
                     frames,
-                    &state.scheduler,
-                    state.default_task_queue.as_ref(),
+                    &dispatch.scheduler,
+                    dispatch.default_task_queue.as_ref(),
                     state.invocation_result.as_ref(),
                 )) {
                     break Err(fault);
@@ -1672,18 +1678,17 @@ fn execution_roots(
 }
 
 /// State that survives an instruction-boundary suspension. File handles, interning
-/// and budgets share invocation ownership; scheduler/native memory integration remains.
+/// budgets and scheduler share invocation ownership; native memory integration remains.
 struct InstructionState {
     collection_threshold: usize,
     arrays_used: bool,
-    scheduler: crate::scheduler::Scheduler,
     invocation: std::sync::Arc<crate::invocation::Invocation>,
-    default_task_queue: Option<Value>,
     invocation_result: Option<Value>,
     entry_drain_depth: Option<usize>,
     drain_required: bool,
     budget: std::sync::Arc<crate::invocation_budget::Budget>,
     completion_boundary: Option<Value>,
+    dispatch_identity: std::sync::Arc<()>,
 }
 impl InstructionState {
     fn new(limits: Limits) -> Self {
@@ -1696,14 +1701,13 @@ impl InstructionState {
         Self {
             collection_threshold: limits.heap_objects.min(64),
             arrays_used: false,
-            scheduler: Default::default(),
             invocation,
-            default_task_queue: None,
             invocation_result: None,
             entry_drain_depth: None,
             drain_required: true,
             budget,
             completion_boundary: None,
+            dispatch_identity: std::sync::Arc::new(()),
         }
     }
 }
@@ -1731,6 +1735,51 @@ fn interpret_instructions(
     state: &mut InstructionState,
     quantum: usize,
 ) -> Result<InstructionProgress, Fault> {
+    let invocation = state.invocation.clone();
+    // Lock order is graph -> dispatch. Parking, joining and host I/O hold neither.
+    let mut dispatch = invocation.dispatch.lock().expect("dispatch lock poisoned");
+    dispatch.bind(heap)?;
+    let result = interpret_instructions_with_dispatch(
+        module,
+        frames,
+        options,
+        _native_libraries,
+        heap,
+        memory,
+        output,
+        console_bytes,
+        state,
+        quantum,
+        &mut dispatch,
+    );
+    let publication = dispatch.publish(heap);
+    match result {
+        Ok(progress) => publication.map(|_| progress),
+        Err(fault) => {
+            if dispatch.owner.upgrade().is_some_and(|owner| {
+                std::sync::Arc::ptr_eq(&owner, &state.dispatch_identity)
+            }) {
+                dispatch.owner = std::sync::Weak::new();
+            }
+            Err(fault)
+        }
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn interpret_instructions_with_dispatch(
+    module: &Module,
+    frames: &mut Vec<Frame>,
+    options: &ExecutionOptions,
+    _native_libraries: &mut Option<crate::interop::NativeLibraries>,
+    heap: &mut crate::shared_heap::Access<'_>,
+    memory: &mut crate::memory::PointerHeap,
+    output: &mut Vec<String>,
+    console_bytes: &mut [Vec<u8>; 2],
+    state: &mut InstructionState,
+    quantum: usize,
+    dispatch: &mut crate::invocation::Dispatch,
+) -> Result<InstructionProgress, Fault> {
     if quantum == 0 {
         return Err(Fault::new("instruction quantum must be positive"));
     }
@@ -1738,15 +1787,17 @@ fn interpret_instructions(
     let InstructionState {
         collection_threshold,
         arrays_used,
-        scheduler,
         invocation,
-        default_task_queue,
         invocation_result,
         entry_drain_depth,
         drain_required,
         budget,
         completion_boundary,
+        dispatch_identity,
     } = state;
+    let crate::invocation::Dispatch {
+        scheduler, default_task_queue, owner, ..
+    } = dispatch;
     let mut executed = 0;
     loop {
         // Admit new frames before they execute or become a parked continuation.
@@ -1762,6 +1813,19 @@ fn interpret_instructions(
             }
         }
         if let Some(value) = completion_boundary.take() {
+            options.check_cancellation("TaskQueue.Dispatch", 0)?;
+            if !crate::invocation::Dispatch::claim_owner(owner, dispatch_identity) {
+                let mut roots = execution_roots(
+                    frames,
+                    scheduler,
+                    default_task_queue.as_ref(),
+                    invocation_result.as_ref(),
+                );
+                crate::gc::trace(&value, &mut roots);
+                heap.publish(roots)?;
+                *completion_boundary = Some(value);
+                return Ok(InstructionProgress::Waiting);
+            }
             // Run ready default-queue work before waiting for registered host
             // results. A notification is transferred directly into a traced
             // Post frame, then drained on this invocation and instruction budget.
@@ -1833,6 +1897,7 @@ fn interpret_instructions(
                 continue;
             }
             if entry_drain_depth.take().is_some() {
+                *owner = std::sync::Weak::new();
                 frames
                     .last_mut()
                     .ok_or_else(|| Fault::new("missing startup frame"))?
@@ -1844,7 +1909,8 @@ fn interpret_instructions(
             let value = invocation_result.take().unwrap_or(value);
             let mut roots = vec![];
             crate::gc::trace(&value, &mut roots);
-            heap.collect(roots, crate::CollectionReason::ExecutionCompleted)?;
+            heap.publish(roots)?;
+            *owner = std::sync::Weak::new();
             return Ok(InstructionProgress::Completed(value));
         }
         if executed == quantum || budget.remaining() == 0 {
@@ -3805,7 +3871,7 @@ fn interpret_instructions(
             }
             Ok(None)
         })();
-        if let Some(call) = host_call {
+        if let Some(mut call) = host_call {
             let mut roots = execution_roots(
                 frames,
                 scheduler,
@@ -3814,6 +3880,7 @@ fn interpret_instructions(
             );
             call.trace_roots(&mut roots);
             heap.publish(roots)?;
+            call.prepare_join(scheduler)?;
             return Ok(InstructionProgress::HostCall(Box::new(call)));
         }
         // Keep the suspended startup frame on the ordinary traced frame stack.

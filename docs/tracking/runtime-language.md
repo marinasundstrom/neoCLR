@@ -33,8 +33,11 @@ run outside graph access, with rooted destinations and bounded buffer handoff.
 Instruction fuel and live-frame capacity now have a shared invocation owner with
 concurrent-consumer and guest-context checks. File handles and interning share that
 invocation owner, preserving positions, close state, canonical identity and quotas.
-Scheduler/default-queue and native-memory ownership, aggregate array accounting,
-and concurrent Promise/queue publication remain before the Task.Run facade.
+The scheduler and registered default queue now also share that owner, with independent
+service roots, a single completion-drain owner and detached worker joins. Source roots
+survive the submitting context, and contenders remain cancellable. Native-memory
+ownership, aggregate array accounting and atomic guest Promise/queue mutations
+(including lazy default-queue creation) remain before the Task.Run facade.
 The internal blocking probe is not a public guest API result. Green threads are recorded as a possible future backend.
 This explicit task does not reopen the finished HTTP POC or select a general
 scheduler/backend rewrite independently of the capability's requirements.

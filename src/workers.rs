@@ -1,6 +1,10 @@
 //! Isolated, invocation-owned workers. Guest references never cross OS threads.
 use crate::{CancellationToken, ExecutionOptions, Fault, Module, Value};
-use std::sync::{Arc, Mutex, mpsc};
+use std::sync::{
+    Arc, Mutex,
+    atomic::{AtomicBool, Ordering},
+    mpsc,
+};
 use std::thread::JoinHandle;
 
 // Capturing through Console checks the quota before copying each line, rather
@@ -105,6 +109,7 @@ struct WorkerResult {
     ready: Option<Outcome>,
     notification: Option<Value>,
     registered: bool,
+    joining: Arc<AtomicBool>,
 }
 #[derive(Default)]
 pub(crate) struct Workers {
@@ -219,6 +224,7 @@ impl Workers {
             ready: None,
             notification: None,
             registered: false,
+            joining: Arc::new(AtomicBool::new(false)),
         });
         Ok(Value::Int32((self.results.len() - 1) as i32))
     }
@@ -231,7 +237,10 @@ impl Workers {
             .ok()
             .and_then(|i| self.results.get_mut(i))
             .ok_or_else(|| Fault::new("Unknown worker"))?;
-        if result.receive.is_none() && result.ready.is_none() || result.cancellation.is_cancelled()
+        if (result.receive.is_none()
+            && result.ready.is_none()
+            && !result.joining.load(Ordering::Acquire))
+            || result.cancellation.is_cancelled()
         {
             return Ok(Value::Boolean(false));
         }
@@ -343,6 +352,7 @@ impl Workers {
         }
     }
 
+    #[cfg(test)]
     pub(crate) fn join(
         &mut self,
         args: Vec<Value>,
@@ -352,6 +362,7 @@ impl Workers {
         self.join_result(args, output, options, false)
     }
 
+    #[cfg(test)]
     pub(crate) fn join_result(
         &mut self,
         args: Vec<Value>,
@@ -359,6 +370,11 @@ impl Workers {
         options: &ExecutionOptions,
         cancellation_as_value: bool,
     ) -> Result<Value, Fault> {
+        self.prepare_join(args)?
+            .wait(output, options, cancellation_as_value)
+    }
+
+    pub(crate) fn prepare_join(&mut self, args: Vec<Value>) -> Result<PendingJoin, Fault> {
         let [Value::Int32(id)] = args.as_slice() else {
             return Err(Fault::new("Invalid worker handle"));
         };
@@ -372,13 +388,40 @@ impl Workers {
         if cached.is_none() && receive.is_none() {
             return Err(Fault::new("Unknown or already joined worker"));
         }
-        let mut cached = cached;
+        result.joining.store(true, Ordering::Release);
+        Ok(PendingJoin {
+            cached,
+            receive,
+            cancellation: result.cancellation.clone(),
+            joining: result.joining.clone(),
+            thread: result.thread.take(),
+        })
+    }
+}
+
+/// Detached from scheduler mutation before waiting. Dropped only outside graph
+/// access once admitted; cancellation/unwinding still joins dedicated producers.
+pub(crate) struct PendingJoin {
+    joining: Arc<AtomicBool>,
+    cached: Option<Outcome>,
+    receive: Option<mpsc::Receiver<Outcome>>,
+    cancellation: CancellationToken,
+    thread: Option<JoinHandle<()>>,
+}
+impl PendingJoin {
+    pub(crate) fn wait(
+        mut self,
+        output: &mut Vec<String>,
+        options: &ExecutionOptions,
+        cancellation_as_value: bool,
+    ) -> Result<Value, Fault> {
+        let mut cached = self.cached.take();
         loop {
             options.check_cancellation("Worker.Join", 0)?;
             let next = if let Some(outcome) = cached.take() {
                 Ok(outcome)
             } else {
-                receive
+                self.receive
                     .as_ref()
                     .unwrap()
                     .recv_timeout(std::time::Duration::from_millis(10))
@@ -390,7 +433,7 @@ impl Workers {
                 Ok(outcome) => {
                     // A dedicated thread is finished, including host cleanup, before
                     // its Task can be completed on the invoking VM.
-                    if let Some(thread) = result.thread.take() {
+                    if let Some(thread) = self.thread.take() {
                         thread
                             .join()
                             .map_err(|_| Fault::new("Worker thread panicked"))?;
@@ -398,7 +441,7 @@ impl Workers {
                     let (value, lines) = match outcome {
                         Err(fault)
                             if cancellation_as_value
-                                && result.cancellation.is_cancelled()
+                                && self.cancellation.is_cancelled()
                                 && fault.code == crate::FaultCode::ExecutionCancelled =>
                         {
                             options.check_cancellation("Worker.Join", 0)?;
@@ -427,6 +470,16 @@ impl Workers {
         }
     }
 }
+impl Drop for PendingJoin {
+    fn drop(&mut self) {
+        self.cancellation.cancel();
+        self.joining.store(false, Ordering::Release);
+        if let Some(thread) = self.thread.take() {
+            let _ = thread.join();
+        }
+    }
+}
+
 impl Drop for Workers {
     fn drop(&mut self) {
         for result in &self.results {
@@ -486,7 +539,38 @@ mod tests {
             ready: None,
             notification: Some(Value::Int32(marker)),
             registered: true,
+            joining: Arc::new(AtomicBool::new(false)),
         }
+    }
+
+    #[test]
+    fn detached_join_leaves_cancellation_and_other_workers_accessible() {
+        let (send, receive) = mpsc::channel();
+        let (_other_send, other_receive) = mpsc::channel();
+        let mut workers = Workers::default();
+        let mut waiting = pending(receive, 1);
+        waiting.notification = None;
+        waiting.registered = false;
+        workers.results = vec![waiting, pending(other_receive, 2)];
+        let wait = workers.prepare_join(vec![Value::Int32(0)]).unwrap();
+        let thread = std::thread::spawn(move || wait.wait(&mut vec![], &Default::default(), true));
+        assert!(workers.prepare_join(vec![Value::Int32(0)]).is_err());
+        assert_eq!(
+            workers.request_cancellation(vec![Value::Int32(0)]).unwrap(),
+            Value::Boolean(true)
+        );
+        assert_eq!(workers.results[1].notification, Some(Value::Int32(2)));
+        assert!(!workers.results[1].cancellation.is_cancelled());
+        send.send(Err(Fault::coded(
+            crate::FaultCode::ExecutionCancelled,
+            "cancelled",
+        )))
+        .unwrap();
+        assert_eq!(thread.join().unwrap().unwrap(), Value::Void);
+        assert_eq!(
+            workers.request_cancellation(vec![Value::Int32(0)]).unwrap(),
+            Value::Boolean(false)
+        );
     }
 
     #[test]
@@ -629,6 +713,7 @@ mod tests {
             ready: None,
             notification: None,
             registered: false,
+            joining: Arc::new(AtomicBool::new(false)),
         });
         let result = workers.join(
             vec![Value::Int32(0)],

@@ -406,6 +406,10 @@ ret
             receiver: Some(Box::new(queue.clone())),
         });
         let Value::Erased(listener) = state
+            .invocation
+            .dispatch
+            .lock()
+            .unwrap()
             .scheduler
             .sockets
             .invoke(
@@ -422,6 +426,10 @@ ret
             panic!()
         };
         let Value::Erased(port) = state
+            .invocation
+            .dispatch
+            .lock()
+            .unwrap()
             .scheduler
             .sockets
             .invoke(Operation::LocalPort, &[*listener.clone()], &heap)
@@ -431,6 +439,10 @@ ret
         };
         let Value::Int32(port) = *port else { panic!() };
         let Value::Erased(operation) = state
+            .invocation
+            .dispatch
+            .lock()
+            .unwrap()
             .scheduler
             .sockets
             .invoke(Operation::Accept, &[*listener, callback], &heap)
@@ -451,7 +463,7 @@ ret
         });
         (queue, result, port)
     };
-    state.default_task_queue = Some(queue.clone());
+    state.invocation.dispatch.lock().unwrap().default_task_queue = Some(queue.clone());
     let entry = module
         .functions
         .iter()
@@ -484,7 +496,7 @@ ret
     assert!(frames.is_empty());
     let fuel = state.budget.remaining();
     for _ in 0..3 {
-        state.scheduler.park();
+        state.invocation.park();
         assert!(matches!(
             run(&mut state, &mut frames),
             Ok(InstructionProgress::Waiting)
@@ -507,7 +519,7 @@ ret
     .unwrap();
     if cancel {
         token.cancel();
-        state.scheduler.park();
+        state.invocation.park();
         assert!(matches!(
             run(&mut state, &mut frames),
             Err(Fault {
@@ -521,7 +533,7 @@ ret
     let _peer = std::net::TcpStream::connect(("127.0.0.1", port as u16)).unwrap();
     let value = loop {
         match run(&mut state, &mut frames).unwrap() {
-            InstructionProgress::Waiting => state.scheduler.park(),
+            InstructionProgress::Waiting => state.invocation.park(),
             InstructionProgress::HostCall(_) => panic!("unexpected host call"),
             InstructionProgress::Suspended => panic!("unexpected instruction quantum"),
             InstructionProgress::Completed(value) => break value,
@@ -775,4 +787,145 @@ ret
         run("next").unwrap_err().code,
         crate::FaultCode::InternPoolLimitExceeded
     );
+}
+
+#[test]
+fn guest_contexts_observe_one_default_queue_after_submitter_exits() {
+    let module = crate::assemble(
+        r#"
+.module System
+.type class System.Tasks.TaskQueue
+.field Drains Int32
+.method instance Drain() -> noresult
+ldarg 0
+ldarg 0
+ldfld System.Tasks.TaskQueue::Drains
+ldc.i4 1
+add
+stfld System.Tasks.TaskQueue::Drains
+ret
+.end
+.end
+.function neoCLR.Runtime.DefaultTaskQueue() -> System.Tasks.TaskQueue
+.methodimpl InternalCall
+.end
+.function ReadQueue() -> System.Tasks.TaskQueue
+call neoCLR.Runtime.DefaultTaskQueue()
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let owner = Owner::new(1);
+    let options = ExecutionOptions::default();
+    let invocation = crate::invocation::Invocation::new(options.limits);
+    let queue = {
+        let mut participant = owner.participant().unwrap();
+        let mut heap = participant.enter();
+        let id = heap
+            .allocate(Value::Object {
+                ty: Type::from_name("System.Tasks.TaskQueue"),
+                fields: vec![Value::Int32(0)],
+            })
+            .unwrap();
+        let queue = Value::ObjectReference(crate::value::ObjectReference {
+            reference: heap.address(id).unwrap(),
+            view: None,
+        });
+        let mut dispatch = invocation.dispatch.lock().unwrap();
+        dispatch.bind(&mut heap).unwrap();
+        dispatch.default_task_queue = Some(queue.clone());
+        dispatch.publish(&mut heap).unwrap();
+        queue
+    };
+    for _ in 0..2 {
+        let mut participant = owner.participant().unwrap();
+        participant
+            .enter()
+            .collect(vec![], CollectionReason::ExplicitRequest)
+            .unwrap();
+        let mut state = InstructionState::with_invocation(invocation.clone());
+        let entry = module
+            .functions
+            .iter()
+            .find(|f| f.name == "ReadQueue")
+            .unwrap()
+            .clone();
+        let result = drive_instructions(
+            &module,
+            &mut vec![Frame::new(entry, vec![]).unwrap()],
+            &options,
+            &mut None,
+            &mut participant,
+            &mut Default::default(),
+            &mut vec![],
+            &mut [vec![], vec![]],
+            &mut state,
+        )
+        .unwrap();
+        assert_eq!(result, queue);
+    }
+    let Value::ObjectReference(queue) = queue else {
+        panic!()
+    };
+    assert_eq!(queue.reference.read_field(0).unwrap(), Value::Int32(2));
+    drop(invocation);
+    let mut participant = owner.participant().unwrap();
+    participant
+        .enter()
+        .collect(vec![], CollectionReason::ExplicitRequest)
+        .unwrap();
+    assert!(participant.enter().is_empty());
+}
+
+#[test]
+fn contending_dispatch_context_observes_cancellation_without_stealing_ownership() {
+    let module =
+        crate::assemble(".module System\n.function Finish() -> Void\nldvoid\nret\n.end")
+            .unwrap();
+    let token = crate::CancellationToken::new();
+    let options = ExecutionOptions {
+        cancellation: Some(token.clone()),
+        ..Default::default()
+    };
+    let invocation = crate::invocation::Invocation::new(options.limits);
+    let incumbent = std::sync::Arc::new(());
+    invocation.dispatch.lock().unwrap().owner = std::sync::Arc::downgrade(&incumbent);
+    let mut state = InstructionState::with_invocation(invocation.clone());
+    let owner = Owner::new(1);
+    let mut participant = owner.participant().unwrap();
+    let mut frames = vec![Frame::new(module.functions[0].clone(), vec![]).unwrap()];
+    let mut step = |state: &mut InstructionState, frames: &mut Vec<Frame>| {
+        interpret_instructions(
+            &module,
+            frames,
+            &options,
+            &mut None,
+            &mut participant.enter(),
+            &mut Default::default(),
+            &mut vec![],
+            &mut [vec![], vec![]],
+            state,
+            1024,
+        )
+    };
+    assert!(matches!(
+        step(&mut state, &mut frames),
+        Ok(InstructionProgress::Waiting)
+    ));
+    assert!(frames.is_empty());
+    let remaining = state.budget.remaining();
+    token.cancel();
+    assert!(matches!(
+        step(&mut state, &mut frames),
+        Err(Fault {
+            code: crate::FaultCode::ExecutionCancelled,
+            ..
+        })
+    ));
+    assert_eq!(state.budget.remaining(), remaining);
+    assert!(std::sync::Arc::ptr_eq(
+        &incumbent,
+        &invocation.dispatch.lock().unwrap().owner.upgrade().unwrap()
+    ));
 }
