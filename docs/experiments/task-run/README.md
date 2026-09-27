@@ -628,9 +628,9 @@ now has separate positive regressions below. Run with matching --runtime, --brid
 reference includes the static owner and all overloads; matching API/library snapshot
 checks pass. Website source/downloads are updated without building the website.
 
-The [block-lambda inference gap](compiler-gaps/README.md) remains. The passing
-consumer uses a typed callback local; Task.Run no longer needs an explicit alias.
-The workaround does not redefine the API contract.
+The [original source integration failures](compiler-gaps/README.md) are corrected.
+The passing consumer now uses unqualified Task.Run, inline value-returning blocks
+and direct completion-only await. Generic-method capture metadata remains separate.
 
 ## Shared mutable-local capture checkpoint
 
@@ -712,9 +712,26 @@ Both compile, pass typed-stack verification and run with the existing developmen
 reference/library and rebuilt bridge. No public signatures or library implementations
 change; the API snapshot refresh updates XML only. No website or full-suite build.
 
+## Inline block-callback checkpoint
+
+Raven main `6cc4fed66`, integrated independently as `a01fb6245` on neoclr, fixes
+value-returning synchronous block callbacks. Initial overload binding could impose
+an Action/unit return hint and report RAV1503 before selecting Func<int>. The fix
+retains parameter hints but lets an unannotated callback infer its return when a
+value-returning candidate also exists. Unique targets and explicit return annotations
+remain authoritative; async rules and Runtime Contract settings are unchanged.
+
+All 64 focused CLR regression/inference/async/expression-tree checks pass.
+[BlockLambda.rvn](BlockLambda.rvn) requires exit 42 and Main passes its capturing
+block directly to Task.Run without a typed Func local. Both compile, typed-verify
+and run against the unchanged development reference/library and rebuilt bridge.
+API reference and feature pages describe the current behavior; the snapshot refresh
+is XML-only. No full suite or website build is part of this slice.
+
 ## Next bounded work
 
-Resolve block-lambda inference in isolated Raven work with independent CLI tests.
-Keep the remaining negative fixture until corrected. Public release readiness still
-requires reviewing these integration gaps and the separate generic-method capture candidate;
-no broader platform matrix or website build is required for this correction.
+Review the separate generic-method capture candidate against the bounded release
+scope. The reduced Task.Run lookup, block-return, ordinary mutable-capture and unit-await
+failures are now positive regressions. Broader async-lambda-owned/iterator capture
+coverage remains separate; these slices do not claim every generic capture shape
+or select a new scheduler/backend feature.

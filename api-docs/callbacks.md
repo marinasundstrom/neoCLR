@@ -69,10 +69,10 @@ runtime-owned, invocation-scoped backend differs from .NET's process-wide thread
 See the [task feature page](/features/tasks/#task-run) for the compiled example.
 
 Importing `System.Tasks.*` supports `Task.Run` alongside `Task<T>` without an alias.
-For the remaining Raven inference limitation, give multi-statement value callbacks a
-`Func<T>` local type when overload inference reports a void conversion. These are
-tracked limitations, not intended API semantics. Direct `Task<unit>` awaits, typed awaits and async unwrapping use
-the ordinary Task protocol with the matching development compiler.
+Inline multi-statement value callbacks infer their result with or without explicit
+Run type arguments; a typed `Func<T>` local is optional. Direct `Task<unit>` awaits,
+typed awaits and async unwrapping use the ordinary Task protocol with the matching
+development compiler.
 
 Mutable scalar locals in ordinary async callers share storage with their callbacks
 across suspension; awaiting the writer exposes its updated value to the caller.

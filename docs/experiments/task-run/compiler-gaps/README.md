@@ -1,19 +1,12 @@
-# Task.Run compiler integration gaps
+# Task.Run compiler integration status
 
-Observed 2026-09-27 with Raven `2f62361ef` on `neoclr`, freshly built compiler/bridge,
-and the matching development Task.Run reference. These are current limitations, not
-selected API semantics or evidence of a runtime failure. No Raven source was changed
-in the submission slice. General fixes need isolated Raven branches, independent CLI
-contract tests and extraction to main before target integration.
-
-- `BlockLambda.rvn`: block callbacks can report RAV1503 (int to void), including an
-  explicit Run<int> call. An independently target-typed `Func<int>` local works.
-
-Reproduce by copying one source to Main.rvn beside the existing
-[entry contract project](../../entry-results/Contracts.rvnproj) and a matching
-NeoCLR.CoreProbe.dll, then invoking `Probe.dll --project <project> <new-output>`.
-The focused public consumer script also checks the reduced failures. Keep negative
-observations distinct from passing implementation evidence.
+The original submission failures recorded on 2026-09-27 are corrected by the
+compiler changes below. Their reduced sources are now positive consumers beside
+[Main.rvn](../Main.rvn), checked by `verify.py`. General fixes have independent CLR
+validation and individual integration into Raven main and neoclr. Unit-representation
+handling stays target-specific. Importer stack checks remain intact. Generic-method
+closure metadata is a separate follow-up; these passing cases do not establish all
+possible capture shapes.
 
 ## Corrected: ordinary async mutable-local sharing
 
@@ -57,3 +50,14 @@ an ordinary C# reference assembly; all 28 focused CLR checks pass after the fix.
 shared-capture example no longer uses an explicit alias. The change preserves
 local/parameter/alias precedence and explicit generic annotations. No target policy
 or importer relaxation is introduced.
+
+## Corrected: inline value-returning block callbacks
+
+Raven main `6cc4fed66`, integrated as `a01fb6245` on neoclr, corrects an initial
+completion-only delegate hint being imposed before overload selection. Parameter
+hints remain available while unannotated synchronous callbacks infer their returns
+when another candidate can return a value. All 64 focused ordinary CLR checks pass,
+including explicit/inferred Task.Run results, completion-only work, parameter hints,
+async callbacks, expression trees and required diagnostics for a unique Action target.
+[BlockLambda.rvn](../BlockLambda.rvn) is now a positive 42-result consumer. Main
+passes its capturing block directly, without a typed Func local or Task alias.

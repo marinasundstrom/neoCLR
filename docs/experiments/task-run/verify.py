@@ -8,12 +8,13 @@ import tempfile
 parser = argparse.ArgumentParser(description=__doc__)
 for name in ('runtime', 'bridge', 'system', 'reference'):
     parser.add_argument('--' + name, type=Path, required=True)
-parser.add_argument('--case', action='append', help='Run only selected consumer or compiler-gap cases')
+parser.add_argument('--case', action='append', help='Run only selected consumer cases')
 args = parser.parse_args()
 tools = {name: getattr(args, name).resolve() for name in ('runtime', 'bridge', 'system', 'reference')}
 here = Path(__file__).resolve().parent
 prefix = 'import System.*\nimport System.Tasks.*\nalias Task = System.Tasks.Task\n'
 cases = [
+    ('block-lambda', (here / 'BlockLambda.rvn').read_text(), 42, '', None),
     ('unqualified-run', (here / 'Unqualified.rvn').read_text(), 42, '', None),
     ('unit-await', (here / 'UnitAwait.rvn').read_text(), 0, 'completed\n', None),
     ('mutable-capture', (here / 'MutableCapture.rvn').read_text(), 42, '', None),
@@ -64,11 +65,3 @@ with tempfile.TemporaryDirectory(prefix='neoclr-task-run-') as directory:
         assert result.returncode == code and result.stdout == output, (name, result.returncode, result.stdout, result.stderr)
         assert (error in result.stderr if error else result.stderr == ''), (name, result.stderr)
         print(name + ': passed', flush=True)
-
-    for name, diagnostic in [('BlockLambda', 'RAV1503')]:
-        if args.case and name not in args.case:
-            continue
-        (root / 'Main.rvn').write_text((here / 'compiler-gaps' / (name + '.rvn')).read_text())
-        result = run(['dotnet', tools['bridge'], '--project', root / 'Contracts.rvnproj', root / name])
-        assert result.returncode != 0 and diagnostic in result.stderr, (name, result.stdout, result.stderr)
-        print(name + ': recorded compiler limitation reproduced', flush=True)

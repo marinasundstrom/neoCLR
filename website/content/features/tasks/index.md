@@ -41,12 +41,11 @@ execution. Entry completion drains pending work. Expected failures remain Result
 values; a callback Fault fails the invocation and requests sibling shutdown.
 
 Importing `System.Tasks.*` supports `Task.Run` alongside `Task<T>` without an alias.
-Some block lambdas still need typed delegate locals with the current Raven compiler.
-Direct completion-only
-await uses the ordinary Task protocol in the tested consumer. Mutable locals in
+Inline block callbacks infer their value result; an explicitly typed delegate local
+is optional. Direct completion-only await uses the ordinary Task protocol. Mutable locals in
 ordinary async methods share storage with their callbacks,
 including across suspension. Generic-method closure metadata remains a separate
-Raven limitation. The block-lambda inference gap remains release work.
+Raven limitation.
 
 [Download the compiled shared-capture example](../../samples/task-run.rvn) ·
 [Overload and lifetime reference](../../docs/callbacks.html#taskrun-development)

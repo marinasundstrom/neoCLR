@@ -97,9 +97,9 @@ This is a bounded startup integration, not a new broader milestone.
 The author next selected [Task.Run with shared captured objects](tracking/runtime-language.md#author-selected-taskrun-work--2026-09-27)
 as the canonical work-submission API, with runtime-selected execution. Development
 now has native shared captures, typed/completion-only overloads and task unwrapping.
-[Compiler integration gaps](experiments/task-run/compiler-gaps/README.md) remain,
-with block-lambda inference still open. Short-name Task.Run lookup is corrected by
-the independently tested Raven type-family lookup fix. Direct completion-only await
+The [original Task.Run compiler integration failures](experiments/task-run/compiler-gaps/README.md)
+are corrected: short-name lookup and block-lambda returns use independently tested
+Raven fixes integrated into both branches. Direct completion-only await
 now passes with the target compiler unit-result fix. Mutable-local
 sharing in ordinary async methods is corrected by the independently tested Raven
 closure fix; generic-method capture metadata remains a separate Raven limitation.

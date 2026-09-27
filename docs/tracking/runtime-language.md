@@ -55,13 +55,12 @@ instruction fuel during waits. The private ScheduleTask native boundary now admi
 callbacks from guest code; a generated Promise/continuation consumer and terminal-fault
 case pass. Development Run overloads now submit completion-only/typed work and unwrap
 inner tasks through the existing outcome-transfer helper. The compiled capture/identity/
-unwrapping consumer passes with explicit workarounds. Ordinary async methods now
+unwrapping consumer passes with direct callbacks and awaits. Ordinary async methods now
 share mutable locals with their callbacks through the integrated Raven closure fix.
-Next bounded work is the [recorded compiler gaps](../experiments/task-run/compiler-gaps/README.md):
-block-lambda inference. Short-name Task.Run lookup now selects the nongeneric owner
-independently of metadata order, through the general Raven lookup fix. Direct
-completion-only await now
-uses the ordinary protocol with the target compiler unit-result fix. Generic-method
+The [original compiler gaps](../experiments/task-run/compiler-gaps/README.md) are
+corrected. Short-name lookup selects the nongeneric owner independently of metadata
+order; block callbacks infer value returns without a typed delegate local. Direct
+completion-only await uses the ordinary protocol with the target unit-result fix. Generic-method
 closure metadata is a separate pre-existing Raven follow-up. Public reference/snapshots
 cover the static Task owner; no new compiler Runtime Contract settings are used.
 The internal blocking probe is not a public guest API result. Green threads are recorded as a possible future backend.

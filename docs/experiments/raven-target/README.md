@@ -12,8 +12,10 @@ Raven capture fix below corrects compiler storage planning without importer rela
 
 Eleven focused `--task-run-signatures` checks cover admission and malformed metadata.
 The [compiled consumer](../task-run/README.md#public-overloads-and-async-unwrapping) and
-[reduced compiler gaps](../task-run/compiler-gaps/README.md) distinguish passing runtime
-behavior from the remaining block-lambda inference limitation. Short-name lookup is
+[compiler integration record](../task-run/compiler-gaps/README.md) cover corrected
+lookup, block-return and unit-await behavior. Block-return inference is corrected
+by Raven main 6cc4fed66, integrated as a01fb6245 on neoclr; all 64 focused CLR checks
+pass. Short-name lookup is
 corrected by Raven main f1a3792b8, integrated as 09f584523 on neoclr; 28 ordinary
 CLR regression/import/alias/constructor checks pass. Direct unit
 await now discards the configured inhabited unit result correctly with Raven

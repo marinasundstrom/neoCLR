@@ -12,12 +12,10 @@ async func Calculate() -> Task<int> {
 
 async func Main() -> Task<()> {
     let state = SharedState()
-    // The current compiler needs a target type for this block lambda.
-    let compute: Func<int> = () => {
+    let result = await Task.Run(() => {
         state.Value = 40
         return state.Value + 2
-    }
-    let result = await Task.Run(compute)
+    })
     Console.WriteLine(result)
     let same = await Task.Run(() => state)
     Console.WriteLine(Object.ReferenceEquals(state, same))
