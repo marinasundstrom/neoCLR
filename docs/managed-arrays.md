@@ -119,7 +119,8 @@ is checked before allocation. The interpreter checks aggregate payload at instru
 boundaries and collects unreachable heap arrays before rejecting aggregate pressure.
 Development shared-context execution also includes parked participants, retained
 results and prepared I/O payloads; shared heap aliases count once while owned copies
-count separately. See [Task.Run prerequisite evidence](experiments/task-run/README.md#aggregate-arrays-across-guest-contexts).
+count separately. Owned delegate receivers also contribute their inline array payload;
+managed-reference receivers retain the usual single heap charge. See [Task.Run prerequisite evidence](experiments/task-run/README.md#aggregate-arrays-across-guest-contexts).
 These are payload budgets, not exact process-memory limits; metadata, host allocator
 overhead and transient instruction copies are not fully represented. Accounting and
 copying remain preview implementations.

@@ -25,6 +25,7 @@ pub(crate) struct Context {
     participant: Participant,
     identity: Identity,
     control: Control,
+    limits: crate::Limits,
 }
 impl Context {
     /// Intermediate execution intervals must publish their complete roots before
@@ -45,19 +46,21 @@ impl Context {
                 .participant
                 .enter_cancellable(|| self.control.is_cancelled())?;
             let value = operation(&mut access)?;
-            access.publish_value(&value)?;
+            access.publish_payload(&value, &self.limits)?;
             value
         };
         Ok(Completion {
             value,
             participant: self.participant,
             identity: self.identity,
+            limits: self.limits,
         })
     }
 }
 
 pub(crate) struct Completion {
     value: Value,
+    limits: crate::Limits,
     // Ownership retains registered result roots even after native thread exit.
     participant: Participant,
     identity: Identity,
@@ -68,13 +71,12 @@ impl Completion {
     pub(crate) fn receive(
         self,
         access: &mut Access<'_>,
-        mut roots: Vec<usize>,
+        roots: Vec<usize>,
     ) -> Result<Value, Fault> {
         if !self.identity.matches(access) {
             return Err(Fault::new("task completion belongs to another invocation"));
         }
-        crate::gc::trace(&self.value, &mut roots);
-        access.publish(roots)?;
+        access.receive_payload(&self.participant, &self.value, roots, &self.limits)?;
         let Self {
             value, participant, ..
         } = self;
@@ -88,9 +90,15 @@ pub(crate) struct Work {
     cancellation: Control,
     jobs: Vec<Option<JoinHandle<Outcome>>>,
     limit: usize,
+    limits: crate::Limits,
 }
 impl Work {
-    pub(crate) fn new(access: &Access<'_>, limit: usize, cancellation: CancellationToken) -> Self {
+    pub(crate) fn new(
+        access: &Access<'_>,
+        limit: usize,
+        cancellation: CancellationToken,
+        limits: crate::Limits,
+    ) -> Self {
         Self {
             identity: access.identity(),
             cancellation: Control {
@@ -99,17 +107,12 @@ impl Work {
             },
             jobs: Vec::new(),
             limit,
+            limits,
         }
     }
 
-    /// The initial bound is total submissions for this owner, like isolated workers.
-    /// Joined slots are not reused, so a stale handle can never name a later job.
-    pub(crate) fn submit(
-        &mut self,
-        access: &mut Access<'_>,
-        captures: Vec<usize>,
-        callback: impl FnOnce(Context, &Control) -> Outcome + Send + 'static,
-    ) -> Result<usize, Fault> {
+    // Bound total submissions; consumed handles are never reused.
+    fn admit(&self, access: &Access<'_>) -> Result<(), Fault> {
         if !self.identity.matches(access) {
             return Err(Fault::new("task submission belongs to another invocation"));
         }
@@ -117,7 +120,44 @@ impl Work {
         if self.jobs.len() >= self.limit {
             return Err(Fault::new("native task submission limit exceeded"));
         }
+        Ok(())
+    }
+
+    /// Publish owned captures before spawning. Callback receives those same values;
+    /// shared references retain identity and owned inline payload is charged once.
+    pub(crate) fn submit(
+        &mut self,
+        access: &mut Access<'_>,
+        captures: Vec<Value>,
+        callback: impl FnOnce(Context, Vec<Value>, &Control) -> Outcome + Send + 'static,
+    ) -> Result<usize, Fault> {
+        self.admit(access)?;
+        let participant = access.fork_values(&captures, &self.limits)?;
+        self.spawn(participant, move |context, control| {
+            callback(context, captures, control)
+        })
+    }
+
+    // Older coordinator probes explicitly manipulate IDs; production submission
+    // must use the value-carrying entry point above.
+    #[cfg(test)]
+    pub(crate) fn submit_roots(
+        &mut self,
+        access: &mut Access<'_>,
+        captures: Vec<usize>,
+        callback: impl FnOnce(Context, &Control) -> Outcome + Send + 'static,
+    ) -> Result<usize, Fault> {
+        self.admit(access)?;
         let participant = access.fork(captures)?;
+        self.spawn(participant, callback)
+    }
+
+    fn spawn(
+        &mut self,
+        participant: Participant,
+        callback: impl FnOnce(Context, &Control) -> Outcome + Send + 'static,
+    ) -> Result<usize, Fault> {
+        let limits = self.limits;
         let cancellation = self.cancellation.clone();
         let identity = self.identity.clone();
         let worker = thread::Builder::new()
@@ -128,6 +168,7 @@ impl Work {
                     Context {
                         participant,
                         identity,
+                        limits,
                         control: cancellation.clone(),
                     },
                     &cancellation,
@@ -218,9 +259,14 @@ mod tests {
         let (mut work, id, job) = {
             let mut access = parent.enter();
             let id = access.allocate(Value::Int32(1)).unwrap();
-            let mut work = Work::new(&access, 1, CancellationToken::new());
+            let mut work = Work::new(
+                &access,
+                1,
+                CancellationToken::new(),
+                crate::Limits::default(),
+            );
             let job = work
-                .submit(&mut access, vec![id], move |mut context, token| {
+                .submit_roots(&mut access, vec![id], move |mut context, token| {
                     {
                         let mut access = context.enter()?;
                         let scratch = access.allocate(Value::String("suspended local".into()))?;
@@ -290,9 +336,14 @@ mod tests {
         let mut parent = owner.participant().unwrap();
         let (mut work, job) = {
             let mut access = parent.enter();
-            let mut work = Work::new(&access, 1, CancellationToken::new());
+            let mut work = Work::new(
+                &access,
+                1,
+                CancellationToken::new(),
+                crate::Limits::default(),
+            );
             let job = work
-                .submit(&mut access, vec![], |context, _| {
+                .submit_roots(&mut access, vec![], |context, _| {
                     context.complete(|access| {
                         let id = access.allocate(Value::String("result".into()))?;
                         Ok(Value::SlotReference(access.address(id)?))
@@ -321,14 +372,19 @@ mod tests {
         let mut parent = owner.participant().unwrap();
         let (mut work, job) = {
             let mut access = parent.enter();
-            let mut work = Work::new(&access, 1, CancellationToken::new());
+            let mut work = Work::new(
+                &access,
+                1,
+                CancellationToken::new(),
+                crate::Limits::default(),
+            );
             let job = work
-                .submit(&mut access, vec![], |context, _| {
+                .submit_roots(&mut access, vec![], |context, _| {
                     context.complete(|_| Ok(Value::Void))
                 })
                 .unwrap();
             assert!(
-                work.submit(&mut access, vec![], |_, _| panic!("must not run"))
+                work.submit_roots(&mut access, vec![], |_, _| panic!("must not run"))
                     .is_err()
             );
             (work, job)
@@ -337,7 +393,7 @@ mod tests {
         {
             let mut access = parent.enter();
             assert!(
-                work.submit(&mut access, vec![], |_, _| panic!("must not run"))
+                work.submit_roots(&mut access, vec![], |_, _| panic!("must not run"))
                     .is_err()
             );
         }
@@ -353,9 +409,9 @@ mod tests {
         let (started_tx, started_rx) = mpsc::channel();
         let mut work = {
             let mut access = parent.enter();
-            let mut work = Work::new(&access, 1, host.clone());
+            let mut work = Work::new(&access, 1, host.clone(), crate::Limits::default());
             let stopped = stopped.clone();
-            work.submit(&mut access, vec![], move |context, token| {
+            work.submit_roots(&mut access, vec![], move |context, token| {
                 started_tx.send(()).unwrap();
                 while !token.is_cancelled() {
                     thread::yield_now();
@@ -381,14 +437,19 @@ mod tests {
         let (ready_tx, ready_rx) = mpsc::channel();
         let mut work = {
             let mut access = parent.enter();
-            let mut work = Work::new(&access, 2, CancellationToken::new());
+            let mut work = Work::new(
+                &access,
+                2,
+                CancellationToken::new(),
+                crate::Limits::default(),
+            );
             let failed_tx = ready_tx.clone();
-            work.submit(&mut access, vec![], move |_, _| {
+            work.submit_roots(&mut access, vec![], move |_, _| {
                 failed_tx.send(()).unwrap();
                 Err(Fault::coded(FaultCode::UserFault, "callback failed"))
             })
             .unwrap();
-            work.submit(&mut access, vec![], move |context, token| {
+            work.submit_roots(&mut access, vec![], move |context, token| {
                 ready_tx.send(()).unwrap();
                 while !token.is_cancelled() {
                     thread::yield_now();
@@ -415,9 +476,14 @@ mod tests {
         let mut foreign = second.participant().unwrap();
         let (mut work, job) = {
             let mut access = parent.enter();
-            let mut work = Work::new(&access, 1, CancellationToken::new());
+            let mut work = Work::new(
+                &access,
+                1,
+                CancellationToken::new(),
+                crate::Limits::default(),
+            );
             let job = work
-                .submit(&mut access, vec![], |context, _| {
+                .submit_roots(&mut access, vec![], |context, _| {
                     context.complete(|_| Ok(Value::Int32(42)))
                 })
                 .unwrap();
@@ -427,7 +493,7 @@ mod tests {
         {
             let mut access = foreign.enter();
             assert!(
-                work.submit(&mut access, vec![], |_, _| panic!("must not run"))
+                work.submit_roots(&mut access, vec![], |_, _| panic!("must not run"))
                     .is_err()
             );
             assert!(completion.receive(&mut access, vec![]).is_err());
@@ -450,9 +516,14 @@ mod tests {
             let mut access = parent.enter();
             let id = access.allocate(Value::Int32(1)).unwrap();
             access.publish(vec![id]).unwrap();
-            let mut work = Work::new(&access, 1, CancellationToken::new());
+            let mut work = Work::new(
+                &access,
+                1,
+                CancellationToken::new(),
+                crate::Limits::default(),
+            );
             let job = work
-                .submit(&mut access, vec![], move |context, _| {
+                .submit_roots(&mut access, vec![], move |context, _| {
                     context.complete(|_| Ok(value))
                 })
                 .unwrap();
@@ -470,8 +541,13 @@ mod tests {
         let mut parent = owner.participant().unwrap();
         let (ready_tx, ready_rx) = mpsc::channel();
         let mut access = parent.enter();
-        let mut work = Work::new(&access, 1, CancellationToken::new());
-        work.submit(&mut access, vec![], move |context, _| {
+        let mut work = Work::new(
+            &access,
+            1,
+            CancellationToken::new(),
+            crate::Limits::default(),
+        );
+        work.submit_roots(&mut access, vec![], move |context, _| {
             ready_tx.send(()).unwrap();
             context.complete(|_| Ok(Value::Void))
         })
@@ -492,12 +568,144 @@ mod tests {
         let host = CancellationToken::new();
         host.cancel();
         let mut access = parent.enter();
-        let mut work = Work::new(&access, 1, host);
+        let mut work = Work::new(&access, 1, host, crate::Limits::default());
         assert_eq!(
-            work.submit(&mut access, vec![], |_, _| panic!("must not run"))
+            work.submit_roots(&mut access, vec![], |_, _| panic!("must not run"))
                 .unwrap_err()
                 .code,
             FaultCode::ExecutionCancelled
         );
+    }
+}
+
+#[cfg(test)]
+mod payload_tests {
+    use super::*;
+    use crate::{Limits, arrays::Usage, metadata::Type, shared_heap::Owner};
+
+    fn array(length: usize) -> Value {
+        Value::Array {
+            element: Type::Byte,
+            elements: vec![Value::Byte(42); length],
+        }
+    }
+
+    #[test]
+    fn capture_and_completed_result_remain_charged_then_transfer_without_double_counting() {
+        let limits = Limits {
+            array_elements: 2,
+            ..Limits::default()
+        };
+        let owner = Owner::new(2);
+        let mut parent = owner.participant().unwrap();
+        let (tx, rx) = std::sync::mpsc::channel();
+        let (mut work, job) = {
+            let mut access = parent.enter();
+            let mut work = Work::new(&access, 1, CancellationToken::new(), limits);
+            let job = work
+                .submit(
+                    &mut access,
+                    vec![array(2)],
+                    move |context, mut values, _| {
+                        rx.recv().unwrap();
+                        context.complete(|_| Ok(values.pop().unwrap()))
+                    },
+                )
+                .unwrap();
+            (work, job)
+        };
+        let mut extra = Usage::default();
+        crate::arrays::measure(&array(1), &mut extra, &limits).unwrap();
+        assert!(parent.enter().check_arrays(extra, &limits).is_err());
+        tx.send(()).unwrap();
+        let completion = work.join(job).unwrap();
+        assert!(parent.enter().check_arrays(extra, &limits).is_err());
+        let value = completion.receive(&mut parent.enter(), vec![]).unwrap();
+        assert_eq!(value, array(2));
+        // Another participant sees the charge on the receiver after native exit.
+        let mut observer = owner.participant().unwrap();
+        assert!(observer.enter().check_arrays(extra, &limits).is_err());
+        drop(value);
+        parent.enter().publish_arrays(Usage::default(), false);
+        observer.enter().check_arrays(extra, &limits).unwrap();
+    }
+
+    #[test]
+    fn rejected_capture_admission_releases_participant_and_submission_capacity() {
+        let limits = Limits {
+            array_elements: 2,
+            ..Limits::default()
+        };
+        let owner = Owner::new(2);
+        let mut parent = owner.participant().unwrap();
+        let (mut work, job) = {
+            let mut access = parent.enter();
+            access.publish_payload(&array(1), &limits).unwrap();
+            let mut work = Work::new(&access, 1, CancellationToken::new(), limits);
+            let error = work
+                .submit(&mut access, vec![array(2)], |_, _, _| {
+                    panic!("rejected work ran")
+                })
+                .unwrap_err();
+            assert_eq!(error.code, FaultCode::ArrayLimitExceeded);
+            let job = work
+                .submit(&mut access, vec![array(1)], |context, mut captures, _| {
+                    context.complete(|_| Ok(captures.pop().unwrap()))
+                })
+                .unwrap();
+            (work, job)
+        };
+        let completion = work.join(job).unwrap();
+        completion.receive(&mut parent.enter(), vec![]).unwrap();
+    }
+
+    #[test]
+    fn foreign_capture_is_rejected_before_native_execution() {
+        let owner = Owner::new(2);
+        let foreign = Owner::new(1);
+        let mut foreign_participant = foreign.participant().unwrap();
+        let value = {
+            let mut access = foreign_participant.enter();
+            let id = access.allocate(Value::Int32(42)).unwrap();
+            Value::SlotReference(access.address(id).unwrap())
+        };
+        let mut parent = owner.participant().unwrap();
+        let mut access = parent.enter();
+        access.allocate(Value::Int32(0)).unwrap(); // Colliding numeric ID is insufficient.
+        let mut work = Work::new(&access, 1, CancellationToken::new(), Limits::default());
+        assert!(
+            work.submit(&mut access, vec![value], |_, _, _| panic!(
+                "foreign capture ran"
+            ))
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn oversized_result_releases_completion_charge_on_failure() {
+        let limits = Limits {
+            array_elements: 1,
+            ..Limits::default()
+        };
+        let owner = Owner::new(2);
+        let mut parent = owner.participant().unwrap();
+        let (mut work, job) = {
+            let mut access = parent.enter();
+            let mut work = Work::new(&access, 1, CancellationToken::new(), limits);
+            let job = work
+                .submit(&mut access, vec![], |context, _, _| {
+                    context.complete(|_| Ok(array(2)))
+                })
+                .unwrap();
+            (work, job)
+        };
+        assert_eq!(
+            work.join(job).err().unwrap().code,
+            FaultCode::ArrayLimitExceeded
+        );
+        let mut usage = Usage::default();
+        crate::arrays::measure(&array(1), &mut usage, &limits).unwrap();
+        parent.enter().check_arrays(usage, &limits).unwrap();
+        assert!(owner.participant().is_ok());
     }
 }

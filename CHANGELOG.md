@@ -77,8 +77,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   mutations and state snapshots atomic across instruction quanta, including Promise
   completion/registration, queue bookkeeping and lazy Default creation. Yield outside
   those regions for queue callbacks; preserve cancellation and instruction limits.
-  Test the generated library with forced interleaving. Public Run with queued
-  capture/result handoff still needs integration.
+  Test the generated library with forced interleaving. Submit actual captured values
+  with provenance, roots and payload admission before native execution. Retain completed
+  results and transfer their private charge without double-counting; release rejected
+  work capacity. Include inline arrays in owned delegate receivers in array budgets,
+  closing previously omitted payload accounting. Invocation scheduling and public Run
+  still need integration.
   This is backend infrastructure, not a public Task.Run release.
 
 - Support Raven Main returning integer, Result and target Task combinations through

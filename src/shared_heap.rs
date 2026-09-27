@@ -215,7 +215,7 @@ impl Access<'_> {
 
     /// Validate native result provenance, including nested values and delegates.
     /// Allocation IDs alone cannot distinguish two invocations with the same ID.
-    pub(crate) fn publish_value(&mut self, value: &crate::Value) -> Result<(), Fault> {
+    fn value_roots(&self, value: &crate::Value) -> Result<Vec<usize>, Fault> {
         use crate::Value;
         value.ensure_heap_references()?;
         let mut pending = vec![value];
@@ -250,11 +250,112 @@ impl Access<'_> {
                 roots.push(reference.allocation_id().expect("checked heap reference"));
             }
         }
-        self.publish(roots)
+        Ok(roots)
+    }
+
+    /// Captures must be actual values so provenance and inline payload cannot be
+    /// omitted by a submitting VM. Its own roots/usage must already be current.
+    pub(crate) fn fork_values(
+        &mut self,
+        values: &[crate::Value],
+        limits: &crate::Limits,
+    ) -> Result<Participant, Fault> {
+        let mut roots = Vec::new();
+        let mut usage = crate::arrays::Usage::default();
+        for value in values {
+            roots.extend(self.value_roots(value)?);
+            crate::arrays::measure(value, &mut usage, limits)?;
+        }
+        let participant = register(self.shared, &mut self.state, roots)?;
+        *participant
+            .registration
+            .arrays
+            .lock()
+            .expect("array accounting lock poisoned") = usage;
+        self.state.arrays_used |= !usage.is_empty();
+        let current = *self
+            .registration
+            .arrays
+            .lock()
+            .expect("array accounting lock poisoned");
+        self.check_arrays_collecting(current, limits)?;
+        Ok(participant)
+    }
+
+    pub(crate) fn publish_payload(
+        &mut self,
+        value: &crate::Value,
+        limits: &crate::Limits,
+    ) -> Result<(), Fault> {
+        let roots = self.value_roots(value)?;
+        let mut usage = crate::arrays::Usage::default();
+        crate::arrays::measure(value, &mut usage, limits)?;
+        self.publish(roots)?;
+        self.publish_arrays(usage, false);
+        self.check_arrays_collecting(usage, limits)
+    }
+
+    fn check_arrays_collecting(
+        &mut self,
+        usage: crate::arrays::Usage,
+        limits: &crate::Limits,
+    ) -> Result<(), Fault> {
+        if self.check_arrays(usage, limits).is_err() {
+            let roots = self
+                .registration
+                .roots
+                .lock()
+                .expect("root lock poisoned")
+                .clone();
+            self.collect(roots, CollectionReason::AllocationPressure)?;
+            self.check_arrays(usage, limits)?;
+        }
+        Ok(())
+    }
+
+    /// Move a completion's private charge without counting it twice. The caller
+    /// must publish its current private usage before receiving, just as for roots.
+    pub(crate) fn receive_payload(
+        &mut self,
+        producer: &Participant,
+        value: &crate::Value,
+        mut roots: Vec<usize>,
+        limits: &crate::Limits,
+    ) -> Result<(), Fault> {
+        if !Arc::ptr_eq(&producer.shared, self.shared)
+            || std::ptr::eq(producer.registration.as_ref(), self.registration)
+        {
+            return Err(Fault::new(
+                "completion requires a distinct participant in the same heap",
+            ));
+        }
+        roots.extend(self.value_roots(value)?);
+        let current = *self
+            .registration
+            .arrays
+            .lock()
+            .expect("array accounting lock poisoned");
+        let transferred = *producer
+            .registration
+            .arrays
+            .lock()
+            .expect("array accounting lock poisoned");
+        let mut combined = current;
+        combined.add(transferred, limits)?;
+        self.publish(roots)?;
+        self.check_arrays_collecting(current, limits)?;
+        self.publish_arrays(combined, false);
+        *producer
+            .registration
+            .arrays
+            .lock()
+            .expect("array accounting lock poisoned") = Default::default();
+        Ok(())
     }
 
     /// Publish queued captures before the submitting participant can release them.
     /// Dropping a rejected/unsubmitted participant never reacquires the heap lock.
+    #[cfg(test)]
     pub(crate) fn fork(&mut self, roots: Vec<usize>) -> Result<Participant, Fault> {
         register(self.shared, &mut self.state, roots)
     }

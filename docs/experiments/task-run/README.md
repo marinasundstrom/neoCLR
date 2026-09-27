@@ -460,11 +460,49 @@ isolation, instruction exhaustion, cancellation and forbidden host suspension. T
 older queue suspension probe now expects bookkeeping to remain within one interval.
 No public signature, API snapshot or website build changed.
 
-## Next prerequisite
+## Rooted, accounted capture and result handoff
 
-Wire queued captures and completion handoff into the same root and payload-publication
-protocol, then expose the Run overloads with async callback unwrapping. Native work
-ownership alone does not publish arbitrary inline payloads. Instruction/live-frame
-budgets, file handles, interning, scheduler services, native memory and guest array
-accounting now share invocation scope. Task-library mutation regions are implemented;
-public Task.Run and end-to-end shared-capture acceptance remain pending.
+Production submission now takes owned capture values and passes those same values
+to the native callback. Under graph access, admission validates heap provenance,
+walks nested captures (including delegate receivers), registers their roots and
+charges inline array payload before spawning. Failed quota/provenance admission
+starts no worker and consumes neither participant capacity nor a submission handle.
+The older raw-ID submission helper is now restricted to coordinator tests.
+
+Completion replaces the worker's private roots and payload charge with its result.
+The completion registration retains them after native-thread exit. Receiving the
+result publishes its roots into the receiver and transfers the private charge under
+one graph-access interval, so the result is neither temporarily unaccounted nor
+counted twice. Oversized results fail and release the worker registration. Pressure
+collection may reclaim unreachable heap arrays before rejecting aggregate usage.
+Callers must publish current private roots and usage before submission/receipt and
+republish after changing their live values; the future public driver must enforce
+that protocol. No public host ownership transfer is implied.
+
+Array measurement now follows owned delegate receivers as well as records, erased
+values and arrays. This closes an omission for inline arrays inside captured value
+receivers; managed-reference aliases still charge only the heap-owned payload.
+Such payloads can now reach the existing ArrayLimitExceeded boundary where they were
+previously omitted. This remains logical accounting rather than exact host memory.
+
+The .NET comparison remains shared reference identity with retained captures/results,
+as described in the [selected concurrency contract](../../concurrency-direction.md).
+neoCLR additionally enforces its invocation budgets and heap provenance. Moving owned
+values avoids a serialization/deep-copy substitute, while validation/publication adds
+boundary work. No throughput claim or general-purpose host sharing API is introduced.
+
+Validation: thirteen native-work tests, four array-measurement tests, one guest
+native-callback/forced-GC probe and 26 delegate integration tests pass (44 focused
+tests). New cases cover parked captures, completed-but-unreceived results, exact-limit
+transfer, rejected admission rollback, foreign captures, oversized-result cleanup and
+inline delegate-receiver payloads. No whole-library rebuild, full suite or website
+build was needed; public API signatures and snapshots are unchanged.
+
+## Next integration slice
+
+Connect the shared work owner to invocation scheduling and guest callback execution,
+then expose the Run overloads with async callback unwrapping. Root/payload handoff,
+aggregate services and atomic task-library mutation regions are implemented. The
+public driver must still own task shutdown, connect terminal faults/cancellation and
+validate end-to-end typed/completion-only shared captures. Public Task.Run remains
+unimplemented.

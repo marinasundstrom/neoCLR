@@ -61,6 +61,10 @@ pub(crate) fn measure(value: &Value, usage: &mut Usage, limits: &Limits) -> Resu
             }
             Value::Object { fields, .. } => Some((fields.as_slice(), inside)),
             Value::Erased(v) => Some((std::slice::from_ref(v.as_ref()), inside)),
+            Value::Delegate(delegate) => delegate
+                .receiver
+                .as_deref()
+                .map(|receiver| (std::slice::from_ref(receiver), inside)),
             _ => None,
         };
         usage.check(limits)?;
@@ -254,6 +258,42 @@ mod tests {
         measure(&Value::String("outside".into()), &mut usage, &limits).unwrap();
         assert_eq!(usage.elements, 12);
         assert_eq!(usage.bytes, 2 * (9 * std::mem::size_of::<Value>() + 14));
+    }
+
+    #[test]
+    fn delegate_receiver_inline_payload_counts_toward_budget() {
+        let value = Value::Delegate(crate::Delegate {
+            ty: Type::from_name("Callback"),
+            target: crate::metadata::FunctionRef {
+                definition: None,
+                name: "Receiver.Invoke".into(),
+                owner: None,
+                instance: true,
+                generic_arguments: vec![],
+                parameters: vec![],
+            },
+            receiver: Some(Box::new(nested_payload())),
+        });
+        let limits = Limits::default();
+        let mut direct = Usage::default();
+        measure(&nested_payload(), &mut direct, &limits).unwrap();
+        let mut captured = Usage::default();
+        measure(&value, &mut captured, &limits).unwrap();
+        assert_eq!(
+            (captured.elements, captured.bytes),
+            (direct.elements, direct.bytes)
+        );
+        assert!(
+            measure(
+                &value,
+                &mut Usage::default(),
+                &Limits {
+                    array_elements: direct.elements - 1,
+                    ..limits
+                }
+            )
+            .is_err()
+        );
     }
 
     #[test]

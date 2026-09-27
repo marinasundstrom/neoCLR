@@ -44,8 +44,10 @@ releasing private charges on participant exit. Selected System.Tasks mutations a
 state snapshots now retain graph access across quanta, including lazy default-queue
 creation. Queue callbacks yield outside the enclosing mutation region. Generated
 Promise/queue probes cover terminal-transition races, registration, queue identity
-and posts during drain. Wiring queued capture/completion payload publication and
-end-to-end callback execution remain before the Task.Run facade.
+and posts during drain. Submission now validates actual capture values and publishes
+roots/payload before spawning; completion retains and transfers the result charge
+without double-counting. Invocation scheduling, shutdown and end-to-end callback
+execution still need connection before the Task.Run facade.
 The internal blocking probe is not a public guest API result. Green threads are recorded as a possible future backend.
 This explicit task does not reopen the finished HTTP POC or select a general
 scheduler/backend rewrite independently of the capability's requirements.

@@ -49,9 +49,10 @@ ret
             reference: heap.address(id).unwrap(),
             view: None,
         });
-        let mut work = Work::new(&heap, 1, crate::CancellationToken::new());
+        let mut work = Work::new(&heap, 1, crate::CancellationToken::new(), Limits::default());
         let job = work
-            .submit(&mut heap, vec![id], move |mut context, control| {
+            .submit(&mut heap, vec![capture], move |mut context, mut captures, control| {
+                let capture = captures.pop().unwrap();
                 // Frame metadata and native resources are created on the worker itself.
                 let mut frames = vec![Frame::new(function, vec![capture])?];
                 let options = ExecutionOptions::default();
