@@ -111,7 +111,7 @@ for name in ('LICENSE', 'THIRD-PARTY-NOTICES.txt'):
 # HTTP checks must be runnable from the extracted layout, with no checkout imports.
 if args.http_runner:
     shutil.copy2(args.http_runner, output / 'tools/http-runner')
-    for folder in ('http-json', 'json-object-mapping', 'http-stream-upload'):
+    for folder in ('http-json', 'json-object-mapping', 'http-stream-upload', 'http-routing', 'runtime-route-mapper'):
         source = 'docs/experiments/' + folder
         for relative in git(ROOT, 'ls-files', source).splitlines():
             path = Path(relative)

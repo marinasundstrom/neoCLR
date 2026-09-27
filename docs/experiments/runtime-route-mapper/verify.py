@@ -24,6 +24,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--toolchain-root', type=Path, required=True)
     parser.add_argument('--runner', type=Path, required=True)
+    parser.add_argument('--sdk', type=Path, help='Separate extracted SDK; defaults to TOOLCHAIN_ROOT/raven-sdk')
     parser.add_argument('--consumer-only', action='store_true')
     parser.add_argument('--schemas-only', action='store_true')
     parser.add_argument('--schema', action='append', help='Only check this named invalid schema')
@@ -31,7 +32,7 @@ def main():
     bundle = args.toolchain_root.resolve()
     runner = args.runner.resolve()
     here = Path(__file__).resolve().parent
-    env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(bundle / 'raven-sdk'))
+    env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(args.sdk.resolve() if args.sdk else bundle / 'raven-sdk'))
     with tempfile.TemporaryDirectory(prefix='neoclr-route-mapper-') as folder:
         root = Path(folder)
         for name in ('Routes.rvn', 'Mapper.rvn', 'Main.rvn'):

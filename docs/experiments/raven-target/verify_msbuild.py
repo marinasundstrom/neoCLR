@@ -74,7 +74,7 @@ with tempfile.TemporaryDirectory(prefix='neoCLR MSBuild ') as directory:
     run(artifact, '42\nSaved\nCompleted\nOverflow\nValue found\n42\nAbsent\n')
     source.write_text((bundle / 'tools/samples/library-array-foreach.rvn').read_text())
     artifact = build('Changed source rebuild')
-    run(artifact, 'Parse\nDivide\nEquals\nToString\nCompareTo\n42\n1\n2\n3\n')
+    run(artifact, 'Parse\nDivide\nEquals\nToString\nget_Zero\nget_One\nop_Addition\nop_Subtraction\nop_Multiply\nop_Division\nCompareTo\n42\n1\n2\n3\n')
 
     source.write_text('func Main() { missing() }\n')
     build('Compiler diagnostics and stale output', expected=False, error='RAV')
