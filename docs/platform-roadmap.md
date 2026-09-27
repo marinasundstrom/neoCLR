@@ -38,9 +38,11 @@ constructors accept encoding selection with UTF-8 defaults and strict ASCII, bac
 by focused consumer checks. The [bounded report construction evaluation](design/text-abstraction.md#bounded-report-construction-evaluation--2026-09-27)
 passes its contracts but does not justify promoting the managed builder: ordinary
 concatenation is faster for the tested report sizes. Keep public builder promotion
-deferred; do not start a builder optimization project. The next bounded candidate
-is the author-requested Encoder progress contract with a writer consumer. Broader
-codecs remain separate follow-ups. General
+deferred; do not start a builder optimization project. The [Encoder acceptance/drain evaluation](design/text-abstraction.md#encoder-progress-and-writer-evaluation--2026-09-27)
+now passes with a bounded writer consumer and explicit final-output checks. Next
+promote the factory/progress contract and integrate explicit StreamWriter finishing,
+with matching API artifacts and focused regression checks. This is not yet a public
+Encoder API. Broader codecs remain separate follow-ups. General
 scalar/range APIs and the broader portfolio are not prerequisites. Experimental
 types and proposed names are not adopted System APIs.
 M2–M6 remain candidate applications; no complete File Catalog

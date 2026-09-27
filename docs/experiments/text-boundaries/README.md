@@ -204,3 +204,27 @@ See the [design decision](../../design/text-abstraction.md#bounded-report-constr
 project. It confirms immutable snapshots and reuse while distinguishing 21 UTF-16
 units, 22 UTF-8 bytes and 20 graphemes for the same report. It is not a cross-runtime
 performance comparison; its exact tested version is in the evidence.
+
+## Encoder acceptance/drain evaluation
+
+`Encoder.rvn` and `EncoderMain.rvn` test whole-text acceptance followed by bounded
+byte draining. UTF-8/strict ASCII keep at most 32 pending encoded bytes while retaining the
+accepted String; the experimental source/request ceiling is 4096 bytes. This is not
+a public Encoder API and does not make arbitrary Encoding.Encode implementations
+incrementally composable. A synthetic trailer provider tests final output only.
+
+Run `verify_encoder.py` with `--runtime`, `--bridge`, `--system`, `--reference` and
+optional `--evidence`. Three separate focused invocations cover acceptance/progress,
+scalar boundaries/limits/final output, and a short-write OutputStream consumer.
+[Evidence](encoder-validation.json) records matching artifact and source hashes.
+
+The writer distinguishes Finish (conversion completion), Flush (stream flush) and
+Close (ownership). Failed output is not automatically retried by a later Write;
+caller input may already be accepted and output partial. Finish and Flush errors
+must be observed before Close. One-byte drain fragments may split a UTF-8 scalar.
+See the [contract and integration recommendation](../../design/text-abstraction.md#encoder-progress-and-writer-evaluation--2026-09-27).
+
+`EncoderBaseline.cs`, run as a temporary net11.0 console project, compares .NET
+Convert's UTF-16 input counts and scalar-sized output capacity with the candidate's
+whole-text acceptance and byte drains. Its tested runtime is recorded in the evidence.
+No performance comparison or public String/Char contract change is implied.

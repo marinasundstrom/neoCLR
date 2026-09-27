@@ -8144,3 +8144,25 @@ configuration/content, not target-specific code added to Raven main.
   probe. Recommend the already requested Encoder progress contract with a writer
   consumer as the next bounded task. This is not a new author naming decision or
   a permanent priority change. No runtime/public API, website or release change.
+
+### 2026-09-27 — Encoder progress tested with a writer
+
+- **Author context:** continued the foundation work after the builder evaluation;
+  the earlier request for an Encoder adapted to neoCLR text remains the direction.
+  No new public API spelling or lifecycle policy was explicitly selected by the author.
+- **Assistant proposal/action:** test whole-text Accept followed by bounded Drain,
+  returning bytes written and a Ready/NeedsOutput/Finished state. The application
+  provider retains valid immutable input and converts scalar-safe chunks for UTF-8
+  or strict ASCII. A real short-write OutputStream consumer tests explicit Finish,
+  stream-only Flush and ownership-only Close.
+- **Outcome:** three focused runs and a .NET semantic comparison pass. Checks cover
+  one-byte buffers, source ownership, retryable preflight errors, chunk boundaries,
+  partial writes and final-output failure. A synthetic trailer proves completion
+  must wait for final bytes; it is not a new supported encoding. No runtime/public
+  API or compiler change, benchmark, full suite or website build.
+- **Assistant recommendation/open work:** promote the factory/progress roles next,
+  integrate explicit StreamWriter Finish and document migration for custom Encoding
+  implementations. Keep general TextWriter completion, names and exact bounds under
+  review. HTTP policy and public builder promotion remain separate. See the
+  [contract](design/text-abstraction.md#encoder-progress-and-writer-evaluation--2026-09-27)
+  and [evidence](experiments/text-boundaries/encoder-validation.json).

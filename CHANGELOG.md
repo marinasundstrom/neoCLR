@@ -67,6 +67,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   pass. Identical-output diagnostics favor ordinary concatenation over this managed
   implementation; defer public builder promotion and record Encoder progress as the
   next bounded candidate. No runtime/API changes or builder optimization work.
+- Validate an application-only Encoder acceptance/drain contract with UTF-8 and
+  strict ASCII: whole-text ownership, bounded encoded output, explicit progress and
+  finalization, retryable preflight errors and terminal output failures. Three
+  focused consumers and a .NET semantic comparison pass. A synthetic trailer checks
+  final bytes and Finish/Flush/Close separation. Public factory/writer integration
+  remains next; no public Encoder, new charset or performance claim is introduced.
 - Record the author's focused-validation policy: only necessary checks, performance
   tests when relevant, and a full suite only when needed. Skip unrelated website builds.
 

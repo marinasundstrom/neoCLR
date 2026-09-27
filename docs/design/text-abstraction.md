@@ -846,3 +846,96 @@ first settle text-input progress, output-byte capacity and completion semantics 
 a writer consumer. This remains a follow-up, not authorization for a .NET fallback
 hierarchy or new HTTP feature. The shared Encoding/Decoder APIs remain implemented;
 public builder promotion and String/Text naming remain deferred.
+
+### Encoder progress and writer evaluation — 2026-09-27
+
+**Problem.** The current Encoding.Encode returns all encoded bytes at once. A
+writer-facing Encoder needs bounded output, observable finalization and a clear
+answer to what input it has accepted. String/Char must not acquire UTF-16 buffer
+semantics to provide this. The [application probe](../experiments/text-boundaries/Encoder.rvn)
+now exercises a candidate with a real OutputStream consumer; it is not yet a public
+System.Text API or a production StreamWriter change.
+
+**.NET baseline.** [Encoder.Convert](https://learn.microsoft.com/en-us/dotnet/api/system.text.encoder.convert?view=net-10.0)
+(primary documentation retrieved 2026-09-27) separates input consumed, output written
+and completion, with final-input signaling and retained state. Its source is a char
+buffer; those units cannot be relabeled as neoCLR graphemes. The
+[.NET semantic fixture](../experiments/text-boundaries/EncoderBaseline.cs) consumes
+five UTF-16 units to produce nine UTF-8 bytes for `é😀é`. A one-byte destination
+cannot hold the first encoded scalar and is rejected by the tested .NET 11 encoder.
+This is a behavioral comparison, not a performance comparison or a criticism of
+.NET's different contract.
+
+**Candidate: whole-text acceptance followed by byte draining.**
+
+- `Accept(text, final)` accepts the complete immutable String on success. It retains
+  that value until drained; the caller may reassign its variable. There is no
+  character-consumption count or caller-managed source offset. Only one accepted
+  chunk can be pending. A nonfinal pending chunk rejects another Accept with Busy.
+- `Drain(output, offset, count)` returns one immutable step containing BytesWritten
+  and a standard union state: NeedsOutput, Ready or Finished. Writes affect only
+  that many bytes in the offered range. A positive capacity makes progress for
+  pending built-in output; zero capacity can return NeedsOutput with zero bytes.
+- Ready means the accepted chunk is fully drained and another may be accepted.
+  Finished means final input **and every final byte** have drained. An accepted
+  final chunk rejects further input even while its bytes remain pending. Empty
+  final input is meaningful; draining it may finish immediately or produce bytes.
+- Byte fragments need not be independently valid text: even a one-byte destination
+  works by splitting encoded scalars across drains. This simplifies byte sinks but
+  requires downstream text consumers to decode incrementally rather than treat
+  every output fragment as a complete UTF-8 string.
+
+The prototype uses a 4096-byte input quota and a 4096-byte maximum drain request;
+these are experimental bounds, not a new platform limit. Invalid ranges/capacities
+fail before state or destination mutation. Unsupported text and oversized input
+fail before acceptance and are retryable. UTF-8 accepts valid String directly;
+strict ASCII preflights the entire text before accepting it, including non-ASCII
+content beyond the first internal chunk. No replacement fallback is added.
+
+Internally the provider retains the immutable source and a pending encoded chunk
+of at most 32 bytes, using scalar-safe String slices for conversion. It does not allocate an encoded
+copy of the entire input. This is bounded encoded buffering, **not constant total
+memory**: the source and destination remain owned values, conversions allocate,
+and normal host budgets still apply. ASCII performs a validation pass followed by
+conversion. No throughput or allocation reduction has been benchmarked or claimed.
+The provider deliberately supports only UTF-8/ASCII. Arbitrary Encoding.Encode
+implementations must not be assumed composable across chunks or stateful sessions.
+
+**Writer/lifetime evidence.** The consumer pumps into a four-byte buffer, retries
+one-byte short writes, and drains again only after all returned bytes have been
+written. Counts represent actual bytes sent. An output error can follow partial
+output; the writer then rejects further Write/Finish operations because it cannot
+safely replay the accepted text. Expected ASCII preflight failure leaves it reusable.
+
+Finish explicitly accepts final empty input and drains it; repeated successful
+Finish calls emit nothing. Flush only invokes OutputStream.Flush. Close retains
+its existing ownership role and does not silently finalize conversion. A synthetic
+trailer provider proves that final output may need several drains and may fail;
+it is a protocol test double, not a new supported character encoding. Callers must
+Finish, then Flush if required, and observe both results before Close. Close/failed
+writers do not promise immediate collection of retained encoder state.
+
+**Validation.** Three focused executable runs pass for owned input, Busy/Finished,
+zero and one-byte capacities, untouched destination sentinels, invalid range retry,
+strict rejection after a valid prefix, source limits, scalar boundaries at the
+internal chunk edge, cross-input grapheme composition, short writes, leaveOpen,
+final bytes, idempotent Finish, Flush/Close separation and final-output errors.
+The .NET semantic comparison passes separately. See [evidence](../experiments/text-boundaries/encoder-validation.json).
+No benchmark, full suite, website build, compiler change or public API addition.
+
+**Recommendation and integration boundary.** Prefer this acceptance/drain role to
+exposing grapheme progress or raw UTF-8 source offsets. Its costs are retained input,
+two-stage usage and byte fragments that can split a scalar. The alternative is a
+resumable source-bound position with stricter lifetime/identity machinery; that is
+unnecessary for this bounded writer. Keep names and prototype bounds provisional.
+
+The next bounded implementation should add the public Encoder factory alongside
+Encoding.CreateDecoder, promote a coherent progress/error result, and connect it
+to StreamWriter with explicit Finish. Adding Encoding.CreateEncoder requires a
+migration for custom development Encoding implementations; do not silently wrap any
+arbitrary whole-value codec as an incremental one. Initially Finish can live on
+StreamWriter; extending the general TextWriter interface is separate work for a
+consumer needing that capability. Preserve UTF-8 defaults, strict ASCII preflight,
+WriteLine atomic preflight, encoded-byte counts and ownership, refresh matching
+reference/API artifacts, and reuse these focused consumers. HTTP charset policy,
+other encodings and public builder promotion remain outside this slice.
