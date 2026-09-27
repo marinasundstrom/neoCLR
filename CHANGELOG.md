@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Update RavenDoc with linked derived types, derived interfaces and implementing
+  types, marking indirect relationships within the documented API surface. Add an
+  independent, persisted Show extension members toggle with accurate group counts.
+  Preserve the project dark palette when Auto follows a dark system theme.
+  Include the publisher fix for literal generic names in XML documentation prose.
+
 - Adopt RavenDoc’s overridable compact typography defaults (15px equivalent prose,
   13px highlighted code/signatures), remove oversized article-title overrides and
   balance the landing hero. Long inline code wraps within narrow-screen prose.

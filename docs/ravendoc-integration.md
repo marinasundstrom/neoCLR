@@ -70,3 +70,15 @@ code blocks retain internal horizontal scrolling and syntax highlighting.
 
 The typography review covered the landing page, guides, a code-heavy HTTP guide
 and API reference at desktop and narrow widths in light and dark themes.
+
+Type pages now link documented derived types; interface pages separate derived
+interfaces from implementing types. Indirect relationships are marked, and generic
+contracts match their original definitions. Selection/exclusions still apply.
+The Show extension members toggle defaults on and persists independently of the
+inherited-member toggle, updating group counts and the outline in either mode.
+Validation covers source and imported metadata, selection filtering, generic
+contracts and browser interaction with the ArrayList page.
+
+Validation for this publisher update: 36 focused RavenDoc/site-builder tests,
+a targeted two-case source/imported XML-text regression rerun, 18 website tests,
+and a clean website build validating 1,755 generated pages and local links.

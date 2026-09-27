@@ -8733,3 +8733,15 @@ for scope and remaining lookup/inference work.
 - Review: light/dark desktop and narrow-screen checks preserved highlighting;
   a long inline expression exposed mobile overflow, addressed by wrapping inline
   code while keeping code-block scrolling.
+
+### 2026-09-27 — Reverse type relationships and extension visibility
+
+- Author requested links to types inheriting or implementing the current type,
+  clarifying that interfaces inherit interfaces whereas classes implement them.
+- Assistant implemented separate Derived interfaces and Implementing types
+  sections, plus Derived types for classes, scoped to the documented surface.
+  Generic and indirect relationships are included; indirect entries are marked.
+- Author then requested a Show extension members toggle. The assistant added
+  a persisted, initially enabled filter independent of inherited-member visibility.
+  Browser checks on ArrayList confirmed both grouping modes, counts, persistence
+  and independence; source/imported documentation tests cover type relationships.
