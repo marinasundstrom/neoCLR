@@ -1,0 +1,39 @@
+import System.*
+import System.Tasks.*
+
+class Reader<T> {
+    private var value: T
+
+    init(initial: T) {
+        value = initial
+    }
+
+    async func Read(replacement: T, gate: Task<int>) -> Task<T> {
+        _ = await gate
+        value = replacement
+        return value
+    }
+
+    val Value: T => value
+}
+
+func Main() -> int {
+    let gate = Promise<int>()
+    let integer = Reader<int>(1)
+    let text = Reader<string>("before")
+    let integerTask = integer.Read(42, gate.Task)
+    let textTask = text.Read("after", gate.Task)
+    if integerTask.IsCompleted || textTask.IsCompleted {
+        return 1
+    }
+    _ = gate.Complete(0)
+    TaskQueue.Default.Drain()
+    if integerTask.GetResult() != 42 || textTask.GetResult() != "after" {
+        return 2
+    }
+    if integer.Value != 42 || text.Value != "after" {
+        return 3
+    }
+    Console.WriteLine("Generic async receiver passed")
+    return 0
+}

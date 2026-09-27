@@ -8814,3 +8814,15 @@ remain open in [release tracking](tracking/toolchain-release.md). A separate
 System.Runtime target-metadata async-attribute lookup failure discovered during
 reduction is recorded in Raven's compiler documentation. See
 [the implementation/evidence](experiments/task-run/README.md#generic-async-application-import).
+
+**Follow-up action:** Fixed Raven's enclosing generic state arguments and implicit
+field receiver after await, with 35 focused ordinary .NET checks; integrated general
+`70cc9dfae` into main and individually as `7f35ba31c` on neoclr. The neoCLR
+GenericOwner consumer now suspends and updates original int/string receivers.
+Generic methods on generic owners remain an importer boundary. A distinct generic
+private-var explicit assignment diagnostic is recorded in Raven.
+
+**Author delivery request:** After finishing, build and locally install the matching
+SDK and VS Code extension, then launch an HTTP client/server application. The
+assistant will use fresh versioned local artifacts and validate the installed pair.
+This requests local installation; it does not certify or publish a release.

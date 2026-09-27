@@ -28,7 +28,7 @@ The [ordinary generic helper importer](../generic-helpers/README.md) admits boun
 unconstrained static helpers without compiler changes. The async consumer now reaches
 an unsupported constructed application state-machine type: a neoCLR import gap. See the
 [generic capture checkpoint](../task-run/README.md#generic-capture-contract-checkpoint)
-for the retained importer fixture and independent generic-containing-type Raven bug.
+for the positive generic async consumers and retained importer boundaries.
 The unit-result correction preserves importer stack checks. Existing uninitialized
 private-var constructor assignment also needs explicit-field compatibility in helpers.
 

@@ -34,7 +34,9 @@ The Task.Run [generic capture fixture](../task-run/GenericCapture.rvn) now passe
 helper specialization and constructed application-type import. Its positive check
 requires `42`, then `after`; the [generic async slice](../task-run/README.md#generic-async-application-import)
 adds forced suspension and identity/cancellation coverage. Raven's independent
-generic-containing-type async arity bug remains separate.
+generic-containing-type async arity bug is corrected in Raven `70cc9dfae`
+(neoclr `7f35ba31c`); generic instance async methods have a separate positive
+GenericOwner consumer. The static helper owner limit remains unchanged.
 
 ## .NET comparison and decision
 

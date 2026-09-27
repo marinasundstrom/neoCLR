@@ -47,7 +47,8 @@ ordinary async methods share storage with their callbacks,
 including across suspension. Generic async methods on nongeneric owners now support shared captures and
 constructed state-machine types. Development checks cover two suspensions,
 value/text results, array/object identity and cancellation. Async methods inside
-generic classes and broader async-lambda shapes still need further work.
+generic classes are supported for ordinary nongeneric instance methods. Generic
+methods on generic owners and broader async-lambda shapes need further work.
 
 [Download the compiled shared-capture example](../../samples/task-run.rvn) ·
 [Overload and lifetime reference](../../docs/callbacks.html#task.run-development)

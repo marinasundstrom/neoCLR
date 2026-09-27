@@ -13,14 +13,17 @@ support executes their definitions; no new VM instruction or ABI is introduced.
 cover two forced suspensions, shared int/string captures, arrays, a generic holder
 result and cancellation. Metadata checks retain arity, constraint, static-member and
 signature rejection. Generic inheritance/interfaces, generic members on generic
-owners and nested generic owners remain outside this bounded admission. This fills
+owners and arbitrary nested generic owners remain outside this bounded admission.
+Generated async state types nested under admitted generic owners are supported. This fills
 a CLI compatibility gap; it does not claim CLR parity or a performance improvement.
 
 Raven's general constructed-source-signature fix `4c8d60176` is integrated into
 main and individually as `4cfc75b4e` on neoclr. Sixteen focused ordinary .NET checks
 pass, including default and target-metadata modes. Runtime Contract configuration,
 semantic behavior and public API signatures do not change. Generic-containing-type
-async arity remains a separate compiler defect.
+async arity and implicit receiver writes are corrected by Raven `70cc9dfae`
+(neoclr `7f35ba31c`); 35 focused .NET checks pass. The GenericOwner consumer
+verifies pending suspension and original int/string receiver mutation on neoCLR.
 
 ## First slice (2026-09-13)
 

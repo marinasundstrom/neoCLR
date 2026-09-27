@@ -37,10 +37,11 @@ receivers. [GenericCapture.rvn](../GenericCapture.rvn) is a positive consumer:
 value/text results, array/object identity and cancellation. See the
 [generic async checkpoint](../README.md#generic-async-application-import) for scope and evidence.
 
-Raven retains `docs/compiler/development/async-generic-containing-type.rvn`:
-an async method inside a generic class fails on ordinary .NET with a state-machine
-generic-arity TypeLoadException without captures. That compiler defect remains a
-separate release follow-up; this fix establishes generic methods on nongeneric owners.
+Raven main `70cc9dfae` (neoclr `7f35ba31c`) now fixes the generic-containing-type
+arity and implicit instance-field receiver defects, with 35 focused CLR checks.
+[GenericOwner.rvn](../GenericOwner.rvn) also passes on neoCLR after admitting nested
+state types under bounded generic owners. Generic methods on generic owners remain
+an importer limit, independently of the corrected general compiler behavior.
 A separate target-metadata async-attribute lookup failure discovered during reduction
 is recorded in Raven's runtime-contract docs. Async-lambda-owned locals and iterator
 capture planning also need their own bounded coverage.

@@ -14,8 +14,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add positive two-suspension, capture, identity and cancellation consumers;
   retain malformed generic/ref protocol checks. Integrate Raven's independently
   tested general fix for constructed source types in target generic signatures.
-  Async methods inside generic classes and the reported interpolation defect
-  remain release follow-ups; no public signatures or Runtime Contract options change.
+  Support ordinary instance async methods inside bounded generic classes;
+  integrate Raven owner-arity and implicit-field-receiver fixes with 35 focused
+  CLR checks and a pending-await int/string receiver consumer. The reported
+  interpolation defect remains a release follow-up; no public signatures or Runtime Contract options change.
 
 - Record the author-selected pre-release assessment on main: feature finish lines,
   confirmed format/Clippy and stale union-probe gate failures, current async

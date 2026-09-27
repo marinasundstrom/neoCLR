@@ -67,7 +67,7 @@ static class ApplicationTypes
         return type is not null && IsModule(type.Module) && !IsLibrary(type)
             && type.GenericParameters.Count is > 0 and <= 4
             && !type.IsInterface && !type.IsAbstract && !type.IsEnum
-            && !(type.DeclaringType?.HasGenericParameters ?? false)
+            && (!(type.DeclaringType?.HasGenericParameters ?? false) || IsGenericApplication(type.DeclaringType!))
             && type.BaseType?.FullName is "System.Object" or "System.ValueType"
             && type.GenericParameters.All(p => !p.HasConstraints && p.Attributes == GenericParameterAttributes.NonVariant)
             && type.Methods.All(m => !m.IsStatic && !m.HasGenericParameters);
@@ -149,7 +149,7 @@ static class ApplicationTypes
         var type = reference.Resolve();
         if (type is null || !Modules.Contains(type.Module) || type.FullName == "System.Unit" || type.Name == "<Module>") return null;
         if (type.HasGenericParameters && !LibraryNames.ContainsKey(type) && !IsGenericApplication(type) || type.IsEnum && !FlagsLibrary.IsMatched(type)
-            || type.IsExplicitLayout && !IsEmptyCaseUnion(type) && !IsInt32CaseUnion(type) || (type.DeclaringType?.HasGenericParameters ?? false)
+            || type.IsExplicitLayout && !IsEmptyCaseUnion(type) && !IsInt32CaseUnion(type) || (type.DeclaringType?.HasGenericParameters ?? false) && !IsGenericApplication(type.DeclaringType!)
             || (!type.IsInterface && !DelegateLibrary.IsMatched(type) && !FlagsLibrary.IsMatched(type) && !MarkerLibrary.IsMatched(type) && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && !(type.BaseType?.FullName == "System.Attribute" && RuntimeSignatures.IsCore(type.BaseType.Scope)) && !IsModule(type.BaseType?.Resolve()?.Module))
             || !FlagsLibrary.IsMatched(type) && type.Fields.Any(f => f.IsStatic || f.HasMarshalInfo)
             || type.Methods.Any(m => m.IsConstructor && m.IsStatic))

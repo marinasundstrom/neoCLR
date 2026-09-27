@@ -41,7 +41,9 @@ managed reference is retained in a callback or field.
 Bootstrap library metadata retains its by-value Start/AwaitOnCompleted helpers;
 application metadata exposes the validated ref projection. This is a bounded bridge
 protocol; generic methods on nongeneric owners are supported, but arbitrary custom
-builders and async methods inside generic classes remain outside the established scope.
+builders remain outside the established scope. Nongeneric instance async methods
+inside bounded generic classes are also supported; generic methods on generic
+owners remain an importer limit.
 The heap policy remains the default until wider validation justifies changing it.
 A value state does not eliminate Promise, Task, dispatcher or continuation allocations.
 

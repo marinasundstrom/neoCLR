@@ -756,7 +756,8 @@ with one to four invariant type parameters, ordinary instance members, and
 Object/ValueType bases. It preserves assembly/type identity, validates substituted
 member signatures and retains the existing access and bounded-body checks. Static
 members, generic members on generic owners, generic inheritance/interfaces and
-nested generic owners remain outside this slice. Generic methods on nongeneric
+arbitrary nested generic owners remain outside this slice; nested generated state
+types under admitted generic classes are supported. Generic methods on nongeneric
 owners continue using bounded closed specialization; their state and closure type
 definitions are emitted once using the runtime's existing generic type support.
 
@@ -783,6 +784,22 @@ fingerprints. No website build or full native suite is needed for this importer 
 ## Remaining release work
 
 Functioning async/await is explicitly required for the next release. The separate
-Raven generic-containing-type arity failure and silent async interpolation report
-remain open; see [release tracking](../../tracking/toolchain-release.md).
+silent async interpolation report remains open; see [release tracking](../../tracking/toolchain-release.md).
 This checkpoint does not claim every async shape is release-ready.
+
+## Generic instance async receiver — development, 2026-09-27
+
+[GenericOwner.rvn](GenericOwner.rvn) starts `Reader<int>` and `Reader<string>`
+against a pending promise. Both remain incomplete until the gate opens, then
+return replacement values and update the original receiver's private storage.
+The importer admits the nested generated state under an admitted generic owner.
+Generic methods on generic owners and static members remain outside this slice.
+
+Raven main `70cc9dfae` (neoclr `7f35ba31c`) preserves enclosing type arguments
+in state-machine locals and generic await-registration signatures. It also directs
+implicit instance field writes after await through the original receiver. All 35
+focused ordinary .NET checks pass, including nested owners, captures and both
+explicit/implicit field receivers. This repairs normal CLI contract compatibility;
+no Runtime Contract options or public signatures change. The separate explicit
+`self.value` assignment diagnostic for generic `private var` storage is recorded
+in Raven's compiler docs; the consumer uses ordinary unqualified field access.

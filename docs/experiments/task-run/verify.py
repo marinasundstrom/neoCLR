@@ -14,6 +14,7 @@ tools = {name: getattr(args, name).resolve() for name in ('runtime', 'bridge', '
 here = Path(__file__).resolve().parent
 prefix = 'import System.*\nimport System.Tasks.*\nalias Task = System.Tasks.Task\n'
 cases = [
+    ('generic-owner', (here / 'GenericOwner.rvn').read_text(), 0, 'Generic async receiver passed\n', None),
     ('generic-capture', (here / 'GenericCapture.rvn').read_text(), 0, '42\nafter\n', None),
     ('generic-suspension', (here / 'GenericSuspension.rvn').read_text(), 0, 'Generic suspension passed\n', None),
     ('block-lambda', (here / 'BlockLambda.rvn').read_text(), 42, '', None),

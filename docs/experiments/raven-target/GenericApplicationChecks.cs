@@ -36,6 +36,11 @@ static class GenericApplicationChecks
         if (integerName == ApplicationTypes.Type(text) || integerName == ApplicationTypes.Type(Construct(other, second.TypeSystem.Int32))
             || !ApplicationTypes.IsType(integerName!) || !ApplicationTypes.IsReference(integerName!))
             throw new Exception("Constructed application identity changed.");
+        var nested = new TypeDefinition("", "State", TypeAttributes.NestedPrivate, first.TypeSystem.Object);
+        holder.NestedTypes.Add(nested);
+        nested.GenericParameters.Add(new GenericParameter("T", nested));
+        if (ApplicationTypes.Type(Construct(nested, first.TypeSystem.Int32)) is null)
+            throw new Exception("Nested generic application state was not admitted.");
         var read = holder.Methods[0];
         var reference = new MethodReference("Read", holder.GenericParameters[0], integer) { HasThis = true };
         if (!ApplicationTypes.Matches(reference, read)
