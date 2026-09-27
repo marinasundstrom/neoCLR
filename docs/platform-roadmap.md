@@ -35,8 +35,9 @@ The [library tracker](tracking/library-data.md#string-design-review-before-furth
 owns the boundary experiment, [paired text API sketch](design/text-abstraction.md#consumer-api-sketch-identical-behavior-two-vocabularies)
 and the internal incremental UTF-8 integration in StreamReader.ReadToEnd. The next
 bounded step is the author-required reader/writer encoding selection contract, with
-UTF-8 as the default and conversion adapted to neoCLR text. Current constructors
-remain UTF-8-only. Minimal text construction remains a companion candidate. General
+UTF-8 as the default and author-selected strict ASCII support. A shared-interface
+reader/writer probe passes; public integration is next. Current constructors remain
+UTF-8-only. Minimal text construction remains a companion candidate. General
 scalar/range APIs and the broader portfolio are not prerequisites. Experimental
 types and proposed names are not adopted System APIs.
 M2–M6 remain candidate applications; no complete File Catalog

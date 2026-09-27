@@ -560,6 +560,77 @@ Keep this bounded: selection, independent conversion state, precise progress/lim
 and one reader plus one writer consumer. General code-page registries, provider
 hierarchies, automatic detection and a full System.Text clone are not implied.
 
+### Shared encoding selection probe — UTF-8 and strict ASCII
+
+**Author choice, 2026-09-27:** start with UTF-8 and strict ASCII, rather than the
+assistant's suggested UTF-16 little-endian. The author stresses that this is shared
+infrastructure for many APIs, including HTTP. The assistant initially considered
+built-in modes, then chose to test an interface rather than prescribe a closed enum
+that consumers would switch over. No enum or public selection API was implemented.
+
+[Selection.rvn](../experiments/text-boundaries/Selection.rvn) is an executable,
+application-only contract probe. It provides one encoding interface for whole-text
+Encode and CreateDecoder; each factory call returns independent mutable decoding
+state. The same selected-reader and selected-writer implementations use either codec,
+with UTF-8 default constructors. They do not inspect codec names or contain encoding
+switches. Text is still the existing valid String; no UTF-16 char array is introduced.
+Exact public names and compiler reference projection remain unselected.
+
+The decoder variant accepts the complete offered byte range on success and owns any
+incomplete UTF-8 carry. That is an explicit alternative to exposing low-level output
+buffer exhaustion: this high-level operation returns an owned String, including empty
+text when more input is needed. Final input succeeds once or returns a typed error;
+subsequent use returns Finished. Range/limit errors are retryable, malformed input is
+terminal. Failure does not expose prefix recovery or a consumed count. These simpler
+semantics do not replace the separate bounded-buffer experiment's contract.
+
+ASCII decoding rejects bytes above 127; encoding rejects unrepresentable text before
+any output call. NUL and DEL are valid ASCII values; ASCII conversion is not a
+printability or protocol-grammar validator. In contrast, default
+[.NET ASCIIEncoding](https://learn.microsoft.com/en-us/dotnet/api/system.text.asciiencoding?view=net-10.0)
+uses replacement for unrepresentable characters, with configurable fallback available.
+Strict typed failure avoids silent data loss at the cost of explicit error handling;
+we do not need to copy that fallback class hierarchy. Source reviewed 2026-09-27.
+
+Writer results count actual encoded bytes, and short writes are retried. Encoded data
+is snapshotted before invoking output callbacks. WriteLine encodes text plus LF through
+the selected codec; Flush forwards to the stream and does not finalize a codec. The
+prototype uses stateless whole-value encoding, so it does **not** prove future stateful
+Encoder flush/close behavior. One selected encoding value can be reused; decoder
+state is never shared between readers.
+
+The fixture uses 256 offered bytes per decoder call and 4096 total/source/text bytes,
+plus a four-byte reader/writer scratch buffer. These are experiment limits, not public
+platform recommendations. For valid UTF-8 and ASCII, encoded bytes and UTF-8 text
+bytes have equal lengths, so preserving maxUtf8Bytes is demonstrable. This equality
+must not become a generic encoding-interface assumption: other encodings need
+separate source-byte and decoded-text quotas. The probe checks both counts but uses
+the same numeric limit for each; it does not establish a policy for expanding codecs.
+
+Two focused runs prove default/explicit selection, strict ASCII rejection in both
+directions, independent UTF-8 carry after caller mutation, finalization, retryable
+invalid ranges, byte limits, empty EOF, partial writes, encoded-byte counts, newline
+encoding and ownership close. It omits ReadLine, leaveOpen overloads, destination
+fault injection and stateful encoders. These are explicit integration tasks before
+promoting the contract into production StreamReader/StreamWriter; existing constructors
+remain UTF-8-only. No .NET/Raven reference or runtime API changed in this probe.
+
+**HTTP dependency:** keep conversion in the shared text foundation. A future HTTP
+text-body adapter selects an encoding according to media type/charset policy and
+keeps byte-body access available; codec defaults do not silently become protocol
+rules. [RFC 9110, Content-Type](https://www.rfc-editor.org/rfc/rfc9110.html#name-content-type)
+is the primary basis for representation metadata (reviewed 2026-09-27). Transfer
+framing, compression, header validation and content-length accounting stay in their
+own HTTP layers. ASCII includes control bytes, so choosing ASCII cannot establish
+safe field syntax. This records a dependency, not new HTTP implementation scope.
+
+**Next bounded step:** promote the shared encoding/decoder roles with matching
+reference metadata and both stream adapters, retaining UTF-8 defaults and adding
+strict ASCII. Cover line reads and ownership compatibility, choose typed conversion
+errors without silently changing existing cases, and make quotas explicit. Add a
+stateful Encoder when its writer consumer requires it; avoid a registry or general
+inheritance hierarchy solely for .NET surface parity.
+
 ### What to bring over from System.Text
 
 This is the recommended portfolio, **not an implementation commitment**. Inventory
@@ -643,14 +714,12 @@ The prototype should demonstrate that:
    equality and hash coherence remain intact. Runtime enforcement, metadata and
    Raven projection agree on any new value/range type, including invalid defaults.
 
-**Next bounded implementation recommendation:** improve the existing UTF-8 codec
-with the progress, final-input and error contract needed by one chunked reader.
-Keep text output encoding-independent and encoded input explicit. Evaluate minimal
-append/materialization against an actual report consumer next, comparing a separate
-builder with Swift-style construction. A builder must preserve immutable snapshots
-and allow concatenation to resegment graphemes; no complete search API, new scalar
-public type, normalization or comparison-policy migration is required first.
-Unicode-version alignment and comparison naming remain tracked separately.
+**Next bounded implementation recommendation:** the internal UTF-8 reader integration
+is complete and the shared selection probe passes. Promote the selected encoding
+contract into both stream adapters with UTF-8 defaults and strict ASCII, covering
+line reads, ownership and error/limit semantics. A builder remains a companion
+candidate; no complete search API, new scalar public type or String/Text rename is
+required first. Unicode-version alignment and comparison naming remain separate.
 
 The proposed improvements over .NET are clearer unit boundaries, fewer accidental
 culture defaults, valid-text invariants and coherent typed failures. The present

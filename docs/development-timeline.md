@@ -8085,3 +8085,23 @@ configuration/content, not target-specific code added to Raven main.
   diagnostic is slower than the previous implementation; the old maximum fixture
   faults on its whole-input array budget. Records these tradeoffs rather than claiming
   a speedup. See [reader evidence](experiments/text-boundaries/reader-results.json).
+
+## 2026-09-27 — UTF-8 and strict ASCII as a shared encoding foundation
+
+- **Author:** directs continuation of reader/writer encoding selection. In response
+  to an optional choice between UTF-16 interchange and ASCII, selects “UTF-8 + strict
+  ASCII”. Stresses that the foundation will affect many APIs, including HTTP.
+- **Assistant response:** moves from considering built-in modes toward a shared
+  codec interface; avoids prescribing an enum that every consumer must switch on.
+  Distinguishes text conversion from HTTP charset policy, framing and field validation.
+- **Action:** adds an application-only selected encoding/decoder contract and both
+  reader/writer consumers. Default and explicit UTF-8, strict ASCII, decoder isolation,
+  owned carry, byte limits/counts, finalization, partial writes and pre-write rejection
+  pass in two focused executions. Public System APIs are not modified.
+- **Findings and remaining work:** whole-input acceptance with returned String is a
+  viable high-level alternative to output-buffer progress. ReadLine, leaveOpen, public
+  metadata and typed-error migration remain necessary before production integration;
+  future stateful Encoder finalization remains open. Records the shared foundation
+  and HTTP dependency in existing trackers without reopening HTTP POC scope.
+- **Evidence:** [selection source and results](experiments/text-boundaries/README.md#shared-encoding-selection-application-contract-probe).
+  No full suite, website build, runtime/compiler changes or performance claims.

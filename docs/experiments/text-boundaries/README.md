@@ -147,3 +147,21 @@ were unchanged. Guest fixture work is included in timings. Faster construction a
 codec traversal remain concrete follow-up questions, not reasons to claim that this
 slice reduces total allocations. The old-library maximum fault is explicitly allowed
 and recorded by the diagnostic runner; it is not reported as a successful old read.
+
+## Shared encoding selection — application contract probe
+
+`Selection.rvn` and `SelectionMain.rvn` test a codec interface, separate decoder
+instances and reader/writer selection. UTF-8 is the default; strict ASCII is the
+second implementation selected by the author. This is not an enum switch, a second
+text representation or a public System API. Two runs pass in `selection-results.json`.
+Use `verify_selection.py` with the same runtime/bridge/system/reference arguments;
+it compiles only these two sources to stay within the application's method budget.
+
+The [design discussion](../../design/text-abstraction.md#shared-encoding-selection-probe-utf-8-and-strict-ascii)
+records all-input acceptance on successful decoding, owned carry, strict errors,
+byte counts, fixture bounds, comparison with .NET, integration gaps and future HTTP
+reuse. The writer prevalidates ASCII and snapshots bytes before output; no partial
+write occurs for unrepresentable text. The prototype owns its stream and has no
+ReadLine or leaveOpen overload yet. A stateful Encoder, public reference projection
+and actual production stream constructor integration remain outstanding. Tests do
+not claim to establish performance or arbitrary expanding-codec quota semantics.

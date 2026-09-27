@@ -58,6 +58,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Encoder abstraction without adopting .NET's UTF-16 char-buffer surface. Record
   author-required reader/writer encoding selection with UTF-8 as default as the next
   foundation contract; selectable encodings are not implemented by this slice.
+  Add a passing application-only shared encoding selection probe with author-selected
+  UTF-8 and strict ASCII, isolated decoder state and reader/writer consumers. Track
+  public integration gaps and future HTTP reuse; production constructors remain
+  UTF-8-only and no fixed encoding enum is introduced.
 - Record the author's focused-validation policy: only necessary checks, performance
   tests when relevant, and a full suite only when needed. Skip unrelated website builds.
 

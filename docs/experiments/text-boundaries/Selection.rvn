@@ -1,0 +1,312 @@
+import System.*
+import System.Collections.*
+import System.IO.*
+import System.Result.*
+import System.Text.*
+
+// Application contract probe, not System API declarations.
+public union CodecFailure {
+    case InvalidRange
+    case LimitExceeded
+    case Finished
+    case InvalidData(description: string)
+    case UnrepresentableText
+}
+
+public interface SelectedEncoding {
+    func Encode(text: string) -> Result<Sequence<byte>, CodecFailure>
+    func CreateDecoder() -> SelectedDecoder
+}
+
+public interface SelectedDecoder {
+    // On success the entire offered range is accepted; carry is owned by this decoder.
+    func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, CodecFailure>
+}
+
+public class Utf8Selection : SelectedEncoding {
+    func Encode(text: string) -> Result<Sequence<byte>, CodecFailure> {
+        if text.GetUtf8ByteCount() > 4096 {
+            return Error(CodecFailure.LimitExceeded)
+        }
+        return Ok(Utf8.Encode(text))
+    }
+    func CreateDecoder() -> SelectedDecoder {
+        return Utf8SelectedDecoder()
+    }
+}
+
+public class AsciiSelection : SelectedEncoding {
+    func Encode(text: string) -> Result<Sequence<byte>, CodecFailure> {
+        if text.GetUtf8ByteCount() > 4096 {
+            return Error(CodecFailure.LimitExceeded)
+        }
+        let bytes = Utf8.Encode(text)
+        for value in bytes {
+            if value > 127 {
+                return Error(CodecFailure.UnrepresentableText)
+            }
+        }
+        return Ok(bytes)
+    }
+    func CreateDecoder() -> SelectedDecoder {
+        return AsciiSelectedDecoder()
+    }
+}
+
+public class Utf8SelectedDecoder : SelectedDecoder {
+    private var carry: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0]
+    private var pending: int = 0
+    private var width: int = 0
+    private var accepted: int = 0
+    private var stopped: bool = false
+
+    func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, CodecFailure> {
+        if stopped {
+            return Error(CodecFailure.Finished)
+        }
+        if !(offset >= 0) || !(count >= 0) || offset > source.Length || count > source.Length - offset {
+            return Error(CodecFailure.InvalidRange)
+        }
+        if count > 256 || count > 4096 - accepted {
+            return Error(CodecFailure.LimitExceeded)
+        }
+        let output = ArrayList<byte>(count + 3)
+        var index = 0
+        while index < count {
+            let value = source[offset + index]
+            if pending == 0 {
+                if value <= 127 {
+                    width = 1
+                } else if value >= 194 && value <= 223 {
+                    width = 2
+                } else if value >= 224 && value <= 239 {
+                    width = 3
+                } else if value >= 240 && value <= 244 {
+                    width = 4
+                } else {
+                    stopped = true
+                    return Error(CodecFailure.InvalidData("Invalid UTF-8 lead"))
+                }
+            } else if !(value >= 128 && value <= 191) {
+                stopped = true
+                return Error(CodecFailure.InvalidData("Invalid UTF-8 continuation"))
+            }
+            carry[pending] = value
+            pending += 1
+            index += 1
+            if pending == width {
+                for slot in 0..<width {
+                    output.Add(carry[slot])
+                }
+                pending = 0
+            }
+        }
+        accepted += count
+        if final {
+            stopped = true
+            if pending != 0 {
+                return Error(CodecFailure.InvalidData("Truncated UTF-8"))
+            }
+        }
+        return match Utf8.Decode(output) {
+            Ok(let text) => Ok(text)
+            Error(_) => {
+                stopped = true
+                Error(CodecFailure.InvalidData("Malformed UTF-8 scalar"))
+            }
+        }
+    }
+}
+
+public class AsciiSelectedDecoder : SelectedDecoder {
+    private var stopped: bool = false
+    private var accepted: int = 0
+
+    func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, CodecFailure> {
+        if stopped {
+            return Error(CodecFailure.Finished)
+        }
+        if !(offset >= 0) || !(count >= 0) || offset > source.Length || count > source.Length - offset {
+            return Error(CodecFailure.InvalidRange)
+        }
+        if count > 256 || count > 4096 - accepted {
+            return Error(CodecFailure.LimitExceeded)
+        }
+        let bytes = ArrayList<byte>(count)
+        var index = 0
+        while index < count {
+            let value = source[offset + index]
+            if value > 127 {
+                stopped = true
+                return Error(CodecFailure.InvalidData("Non-ASCII byte"))
+            }
+            bytes.Add(value)
+            index += 1
+        }
+        accepted += count
+        if final {
+            stopped = true
+        }
+        return match Utf8.Decode(bytes) {
+            Ok(let text) => Ok(text)
+            Error(_) => Error(CodecFailure.InvalidData("Invalid ASCII fixture"))
+        }
+    }
+}
+
+public union SelectionFailure {
+    case Codec(reason: CodecFailure)
+    case Stream(reason: StreamError)
+    case InvalidRange
+    case LimitExceeded
+    case Closed
+}
+
+public class SelectedReader {
+    private var input: InputStream
+    private var decoder: SelectedDecoder
+    private var closed: bool = false
+    private var eof: bool = false
+
+    init(input: InputStream) {
+        self.input = input
+        decoder = Utf8Selection().CreateDecoder()
+    }
+    init(input: InputStream, encoding: SelectedEncoding) {
+        self.input = input
+        decoder = encoding.CreateDecoder()
+    }
+    func ReadToEnd(maxUtf8Bytes: int) -> Result<string, SelectionFailure> {
+        if closed {
+            return Error(SelectionFailure.Closed)
+        }
+        if maxUtf8Bytes < 0 {
+            return Error(SelectionFailure.InvalidRange)
+        }
+        if maxUtf8Bytes > 4096 {
+            return Error(SelectionFailure.LimitExceeded)
+        }
+        if eof {
+            return Ok("")
+        }
+        let buffer: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0]
+        var sourceBytes = 0
+        var text = ""
+        while true {
+            var request = maxUtf8Bytes - sourceBytes + 1
+            if request > buffer.Length {
+                request = buffer.Length
+            }
+            let count = match input.Read(buffer, 0, request) {
+                Ok(let value) => value
+                Error(let reason) => return Error(SelectionFailure.Stream(reason))
+            }
+            if !(count >= 0) || count > request {
+                System.Fault("Invalid selected reader input count")
+            }
+            if count > maxUtf8Bytes - sourceBytes {
+                return Error(SelectionFailure.LimitExceeded)
+            }
+            sourceBytes += count
+            match decoder.Decode(buffer, 0, count, count == 0) {
+                Ok(let part) => {
+                    if part.GetUtf8ByteCount() > maxUtf8Bytes - text.GetUtf8ByteCount() {
+                        return Error(SelectionFailure.LimitExceeded)
+                    }
+                    text = String.Concat(text, part)
+                }
+                Error(let reason) => return Error(SelectionFailure.Codec(reason))
+            }
+            if count == 0 {
+                eof = true
+                return Ok(text)
+            }
+        }
+        return Error(SelectionFailure.LimitExceeded)
+    }
+    func Close() {
+        if !closed {
+            closed = true
+            input.Close()
+        }
+    }
+}
+
+public class SelectedWriter {
+    private var output: OutputStream
+    private var encoding: SelectedEncoding
+    private var closed: bool = false
+
+    init(output: OutputStream) {
+        self.output = output
+        encoding = Utf8Selection()
+    }
+    init(output: OutputStream, encoding: SelectedEncoding) {
+        self.output = output
+        self.encoding = encoding
+    }
+    func Write(text: string) -> Result<int, SelectionFailure> {
+        if closed {
+            return Error(SelectionFailure.Closed)
+        }
+        let bytes = match encoding.Encode(text) {
+            Ok(let value) => value
+            Error(let reason) => return Error(SelectionFailure.Codec(reason))
+        }
+        let count = bytes.Count
+        if count > 4096 {
+            return Error(SelectionFailure.LimitExceeded)
+        }
+        // Snapshot before the first output callback; caller-owned sequences cannot change it.
+        let snapshot = ArrayList<byte>(count)
+        for index in 0..<count {
+            snapshot.Add(bytes[index])
+        }
+        let buffer: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0]
+        var written = 0
+        while written < count {
+            var size = count - written
+            if size > buffer.Length {
+                size = buffer.Length
+            }
+            for index in 0..<size {
+                buffer[index] = snapshot[written + index]
+            }
+            var offset = 0
+            while offset < size {
+                match output.Write(buffer, offset, size - offset) {
+                    Ok(let accepted) => {
+                        if !(accepted >= 0) || accepted > size - offset {
+                            System.Fault("Invalid selected writer output count")
+                        }
+                        if accepted == 0 {
+                            return Error(SelectionFailure.Stream(StreamError.IoFailure))
+                        }
+                        offset += accepted
+                    }
+                    Error(let reason) => return Error(SelectionFailure.Stream(reason))
+                }
+            }
+            written += size
+        }
+        return Ok(written)
+    }
+    func WriteLine(text: string) -> Result<int, SelectionFailure> {
+        return self.Write(String.Concat(text, "\n"))
+    }
+    func Flush() -> Result<unit, SelectionFailure> {
+        if closed {
+            return Error(SelectionFailure.Closed)
+        }
+        return match output.Flush() {
+            Ok(_) => Ok(())
+            Error(let reason) => Error(SelectionFailure.Stream(reason))
+        }
+    }
+    func Close() {
+        if !closed {
+            closed = true
+            output.Close()
+        }
+    }
+}

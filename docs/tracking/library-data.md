@@ -153,15 +153,18 @@ this does not expand the current internal UTF-8 reader slice into a public hiera
 **Author-required stream selection:** [StreamReader and StreamWriter must accept a
 specific encoding with UTF-8 as default](../design/text-abstraction.md#selected-stream-encoding-with-utf-8-default--author-requirement).
 Current constructors are still UTF-8-only. The internal reader helper does not
-complete this requirement. Next establish selection and independent per-stream
-conversion state, with explicit byte-limit/count semantics, and prove it through
-both reader and writer consumers. Do not silently reinterpret maxUtf8Bytes.
+complete this requirement. The author selects UTF-8 plus strict ASCII first and
+emphasizes reuse by HTTP and other APIs. The [shared-interface selection probe](../design/text-abstraction.md#shared-encoding-selection-probe-utf-8-and-strict-ascii)
+passes two focused reader/writer runs, including independent decoder state and strict
+rejection before output. Next promote the contract with matching public metadata,
+ReadLine/leaveOpen compatibility and typed error/limit semantics. The probe's names
+and bounds are not shipped APIs; do not silently reinterpret maxUtf8Bytes.
 
 **Boundary experiment:** [application-only prototype](../experiments/text-boundaries/README.md)
 examines scalar validation, source-bound ranges and bounded UTF-8 decoding. These
-are not System APIs. The next bounded implementation recommendation is the UTF-8
-progress/error contract for a chunked reader, followed by evaluating minimal text
-construction for a report consumer. Public scalar/range APIs, Unicode alignment,
+are not System APIs. The internal UTF-8 reader slice is complete; encoding selection
+for both stream adapters is next, followed by evaluating minimal text construction
+for a report consumer. Public scalar/range APIs, Unicode alignment,
 fold naming, full casing and normalization are not blanket prerequisites. A separate
 builder must justify its role alongside immutable String and Swift-style construction.
 Keep existing Sequence<char> and equality/hash contracts; HTTP remains closed.
