@@ -1527,6 +1527,10 @@ fn interpret_frames(
             1024,
         ) {
             Ok(InstructionProgress::Suspended) => continue,
+            Ok(InstructionProgress::Waiting) => {
+                drop(heap);
+                state.scheduler.park();
+            }
             Ok(InstructionProgress::Completed(value)) => break Ok(value),
             Err(fault) => break Err(fault),
         }
@@ -1626,6 +1630,7 @@ struct InstructionState {
     entry_drain_depth: Option<usize>,
     drain_required: bool,
     remaining_instructions: usize,
+    completion_boundary: Option<Value>,
 }
 impl InstructionState {
     fn new(limits: Limits) -> Self {
@@ -1643,11 +1648,13 @@ impl InstructionState {
             entry_drain_depth: None,
             drain_required: true,
             remaining_instructions: limits.instructions,
+            completion_boundary: None,
         }
     }
 }
 enum InstructionProgress {
     Suspended,
+    Waiting,
     Completed(Value),
 }
 
@@ -1679,8 +1686,100 @@ fn interpret_instructions(
         entry_drain_depth,
         drain_required,
         remaining_instructions,
+        completion_boundary,
     } = state;
-    for _ in 0..quantum.min(*remaining_instructions) {
+    let mut executed = 0;
+    loop {
+        if let Some(value) = completion_boundary.take() {
+            // Run ready default-queue work before waiting for registered host
+            // results. A notification is transferred directly into a traced
+            // Post frame, then drained on this invocation and instruction budget.
+            if entry_drain_depth.is_none() && invocation_result.is_none() {
+                *invocation_result = Some(value.clone());
+            }
+            if *drain_required {
+                *drain_required = false;
+                if let Some(queue) = &default_task_queue {
+                    let drain = resolve(
+                        module,
+                        &FunctionRef {
+                            definition: None,
+                            name: "System.Tasks.TaskQueue.Drain".into(),
+                            owner: Some(Type::from_name("System.Tasks.TaskQueue")),
+                            instance: true,
+                            generic_arguments: vec![],
+                            parameters: vec![],
+                        },
+                    )?;
+                    if !drain.no_result
+                        || drain
+                            .definition
+                            .as_ref()
+                            .is_none_or(|id| id.module != "System")
+                    {
+                        return Err(Fault::new("Invalid default TaskQueue dispatch contract"));
+                    }
+                    if frames.len() >= limits.frames {
+                        return Err(Fault::coded(
+                            crate::FaultCode::StackOverflow,
+                            "frame limit exceeded",
+                        ));
+                    }
+                    frames.push(Frame::new(drain, vec![queue.clone()])?);
+                    continue;
+                }
+            }
+            let completion =
+                scheduler.completion_state(heap, default_task_queue.as_ref(), options)?;
+            if completion == crate::scheduler::CompletionState::Pending {
+                let mut roots = execution_roots(
+                    frames,
+                    scheduler,
+                    default_task_queue.as_ref(),
+                    invocation_result.as_ref(),
+                );
+                crate::gc::trace(&value, &mut roots);
+                heap.publish(roots)?;
+                *completion_boundary = Some(value);
+                return Ok(InstructionProgress::Waiting);
+            }
+            if completion == crate::scheduler::CompletionState::Ready {
+                scheduler.install_ready(|queue, callback| {
+                    if frames.len() >= limits.frames {
+                        return Err(Fault::coded(
+                            crate::FaultCode::StackOverflow,
+                            "frame limit exceeded",
+                        ));
+                    }
+                    frames.push(completion_notification_frame(
+                        module,
+                        queue.clone(),
+                        callback.clone(),
+                    )?);
+                    Ok(())
+                })?;
+                *drain_required = true;
+                continue;
+            }
+            if entry_drain_depth.take().is_some() {
+                frames
+                    .last_mut()
+                    .ok_or_else(|| Fault::new("missing startup frame"))?
+                    .stack
+                    .push(Value::Void);
+                *drain_required = true;
+                continue;
+            }
+            let value = invocation_result.take().unwrap_or(value);
+            let mut roots = vec![];
+            crate::gc::trace(&value, &mut roots);
+            heap.collect(roots, crate::CollectionReason::ExecutionCompleted)?;
+            return Ok(InstructionProgress::Completed(value));
+        }
+        if executed == quantum || *remaining_instructions == 0 {
+            break;
+        }
+        executed += 1;
         *remaining_instructions -= 1;
         if let (Some(debugger), Some(frame)) = (&options.debugger, frames.last()) {
             let before_host_call = matches!(frame.function.body.get(frame.pc), Some(Op::Call(target))
@@ -3662,76 +3761,8 @@ fn interpret_instructions(
         };
         match step {
             Ok(Some(value)) => {
-                // Run ready default-queue work before waiting for registered host
-                // results. A notification is transferred directly into a traced
-                // Post frame, then drained on this invocation and instruction budget.
-                if entry_drain_depth.is_none() && invocation_result.is_none() {
-                    *invocation_result = Some(value.clone());
-                }
-                if *drain_required {
-                    *drain_required = false;
-                    if let Some(queue) = &default_task_queue {
-                        let drain = resolve(
-                            module,
-                            &FunctionRef {
-                                definition: None,
-                                name: "System.Tasks.TaskQueue.Drain".into(),
-                                owner: Some(Type::from_name("System.Tasks.TaskQueue")),
-                                instance: true,
-                                generic_arguments: vec![],
-                                parameters: vec![],
-                            },
-                        )?;
-                        if !drain.no_result
-                            || drain
-                                .definition
-                                .as_ref()
-                                .is_none_or(|id| id.module != "System")
-                        {
-                            return Err(Fault::new("Invalid default TaskQueue dispatch contract"));
-                        }
-                        if frames.len() >= limits.frames {
-                            return Err(Fault::coded(
-                                crate::FaultCode::StackOverflow,
-                                "frame limit exceeded",
-                            ));
-                        }
-                        frames.push(Frame::new(drain, vec![queue.clone()])?);
-                        continue;
-                    }
-                }
-                if scheduler.wait(heap, default_task_queue.as_ref(), options)? {
-                    scheduler.install_ready(|queue, callback| {
-                        if frames.len() >= limits.frames {
-                            return Err(Fault::coded(
-                                crate::FaultCode::StackOverflow,
-                                "frame limit exceeded",
-                            ));
-                        }
-                        frames.push(completion_notification_frame(
-                            module,
-                            queue.clone(),
-                            callback.clone(),
-                        )?);
-                        Ok(())
-                    })?;
-                    *drain_required = true;
-                    continue;
-                }
-                if entry_drain_depth.take().is_some() {
-                    frames
-                        .last_mut()
-                        .ok_or_else(|| Fault::new("missing startup frame"))?
-                        .stack
-                        .push(Value::Void);
-                    *drain_required = true;
-                    continue;
-                }
-                let value = invocation_result.take().unwrap_or(value);
-                let mut roots = vec![];
-                crate::gc::trace(&value, &mut roots);
-                heap.collect(roots, crate::CollectionReason::ExecutionCompleted)?;
-                return Ok(InstructionProgress::Completed(value));
+                *completion_boundary = Some(value);
+                continue;
             }
             Err(mut fault) => {
                 fault.function = Some(context);

@@ -109,6 +109,13 @@ struct Ready {
     destination: Value,
 }
 
+#[derive(Debug, PartialEq)]
+pub(crate) enum CompletionState {
+    Ready,
+    Pending,
+    Idle,
+}
+
 pub(crate) struct Scheduler {
     pub(crate) workers: crate::workers::Workers,
     pub(crate) sockets: crate::socket_io::Sockets,
@@ -168,29 +175,48 @@ impl Scheduler {
         Ok(self.ready.is_some())
     }
 
-    pub(crate) fn wait(
+    /// Poll under graph access; Pending requires publishing VM roots before parking.
+    pub(crate) fn completion_state(
+        &mut self,
+        heap: &ManagedHeap,
+        destination: Option<&Value>,
+        options: &ExecutionOptions,
+    ) -> Result<CompletionState, Fault> {
+        options.check_cancellation("Worker.Completion", 0)?;
+        if self.ready.is_some() {
+            return Ok(CompletionState::Ready);
+        }
+        match self.progress(heap)? {
+            Progress::Ready(callback) => {
+                let destination =
+                    destination.ok_or_else(|| Fault::new("Missing default TaskQueue"))?;
+                self.stage(callback, destination);
+                Ok(CompletionState::Ready)
+            }
+            Progress::Idle => Ok(CompletionState::Idle),
+            Progress::Pending => Ok(CompletionState::Pending),
+        }
+    }
+
+    /// No managed graph access may be held while parking.
+    pub(crate) fn park(&self) {
+        // Cancellation and the socket source have no wake subscription.
+        self.wake.park(Duration::from_millis(10));
+    }
+
+    #[cfg(test)]
+    fn wait(
         &mut self,
         heap: &ManagedHeap,
         destination: Option<&Value>,
         options: &ExecutionOptions,
     ) -> Result<bool, Fault> {
         loop {
-            options.check_cancellation("Worker.Completion", 0)?;
-            if self.ready.is_some() {
-                return Ok(true);
+            match self.completion_state(heap, destination, options)? {
+                CompletionState::Ready => return Ok(true),
+                CompletionState::Idle => return Ok(false),
+                CompletionState::Pending => self.park(),
             }
-            match self.progress(heap)? {
-                Progress::Ready(callback) => {
-                    let destination =
-                        destination.ok_or_else(|| Fault::new("Missing default TaskQueue"))?;
-                    self.stage(callback, destination);
-                    return Ok(true);
-                }
-                Progress::Idle => return Ok(false),
-                Progress::Pending => {}
-            }
-            // Cancellation and the socket source have no wake subscription.
-            self.wake.park(Duration::from_millis(10));
         }
     }
 

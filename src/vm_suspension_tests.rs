@@ -78,6 +78,7 @@ ret
                     };
                     match progress {
                         InstructionProgress::Completed(value) => break value,
+                        InstructionProgress::Waiting => panic!("unexpected host wait"),
                         InstructionProgress::Suspended => {
                             step_tx
                                 .send(())
@@ -297,6 +298,7 @@ ret
         };
         match progress {
             InstructionProgress::Completed(value) => break value,
+            InstructionProgress::Waiting => panic!("unexpected host wait"),
             InstructionProgress::Suspended => {
                 pauses += 1;
                 collector
@@ -318,4 +320,218 @@ ret
             fields: vec![Value::Int32(2)],
         }
     );
+}
+
+#[test]
+fn completion_wait_releases_graph_and_resumes_once() {
+    completion_wait_probe(false);
+}
+
+#[test]
+fn completion_wait_observes_cancellation_without_a_guest_frame() {
+    completion_wait_probe(true);
+}
+
+fn completion_wait_probe(cancel: bool) {
+    use crate::socket_io::Operation;
+    let module = crate::assemble(
+        r#"
+.module System
+.delegate System.Func<T>
+.method instance Invoke() -> T
+.end
+.end
+.type class System.Tasks.TaskQueue
+.field Posts Int32
+.field Drains Int32
+.method instance Post(System.Func<Void> callback) -> noresult
+ldarg 0
+ldarg 0
+ldfld System.Tasks.TaskQueue::Posts
+ldc.i4 1
+add
+stfld System.Tasks.TaskQueue::Posts
+ret
+.end
+.method instance Drain() -> noresult
+ldarg 0
+ldarg 0
+ldfld System.Tasks.TaskQueue::Drains
+ldc.i4 1
+add
+stfld System.Tasks.TaskQueue::Drains
+ret
+.end
+.end
+.type class Result
+.field Number Int32
+.field Queue System.Tasks.TaskQueue
+.end
+.function Main(Result result) -> Result
+ldarg result
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let token = crate::CancellationToken::new();
+    let options = ExecutionOptions {
+        cancellation: Some(token.clone()),
+        ..Default::default()
+    };
+    let mut state = InstructionState::new(options.limits);
+    let owner = Owner::new(2);
+    let mut participant = owner.participant().unwrap();
+    let mut collector = owner.participant().unwrap();
+    let (queue, result, port) = {
+        let mut heap = participant.enter();
+        let id = heap
+            .allocate(Value::Object {
+                ty: Type::from_name("System.Tasks.TaskQueue"),
+                fields: vec![Value::Int32(0), Value::Int32(0)],
+            })
+            .unwrap();
+        let queue = Value::ObjectReference(crate::value::ObjectReference {
+            reference: heap.address(id).unwrap(),
+            view: None,
+        });
+        let callback = Value::Delegate(crate::Delegate {
+            ty: crate::assembler::parse_type("System.Func<Void>").unwrap(),
+            target: crate::assembler::parse_function_ref(
+                "instance System.Tasks.TaskQueue::Drain()",
+            )
+            .unwrap(),
+            receiver: Some(Box::new(queue.clone())),
+        });
+        let Value::Erased(listener) = state
+            .scheduler
+            .sockets
+            .invoke(
+                Operation::Listen,
+                &[
+                    Value::String("127.0.0.1".into()),
+                    Value::Int32(0),
+                    Value::Int32(1),
+                ],
+                &heap,
+            )
+            .unwrap()
+        else {
+            panic!()
+        };
+        let Value::Erased(port) = state
+            .scheduler
+            .sockets
+            .invoke(Operation::LocalPort, &[*listener.clone()], &heap)
+            .unwrap()
+        else {
+            panic!()
+        };
+        let Value::Int32(port) = *port else { panic!() };
+        let Value::Erased(operation) = state
+            .scheduler
+            .sockets
+            .invoke(Operation::Accept, &[*listener, callback], &heap)
+            .unwrap()
+        else {
+            panic!()
+        };
+        assert!(matches!(*operation, Value::Int64(_)));
+        let result_id = heap
+            .allocate(Value::Object {
+                ty: Type::from_name("Result"),
+                fields: vec![Value::Int32(42), queue.clone()],
+            })
+            .unwrap();
+        let result = Value::ObjectReference(crate::value::ObjectReference {
+            reference: heap.address(result_id).unwrap(),
+            view: None,
+        });
+        (queue, result, port)
+    };
+    state.default_task_queue = Some(queue.clone());
+    let entry = module
+        .functions
+        .iter()
+        .find(|f| f.name == "Main")
+        .unwrap()
+        .clone();
+    let mut frames = vec![Frame::new(entry, vec![result.clone()]).unwrap()];
+    let mut memory = crate::memory::PointerHeap::default();
+    let mut output = Vec::new();
+    let mut bytes = [Vec::new(), Vec::new()];
+    let mut run = |state: &mut InstructionState, frames: &mut Vec<Frame>| {
+        let mut heap = participant.enter();
+        interpret_instructions(
+            &module,
+            frames,
+            &options,
+            &mut None,
+            &mut heap,
+            &mut memory,
+            &mut output,
+            &mut bytes,
+            state,
+            1024,
+        )
+    };
+    assert!(matches!(
+        run(&mut state, &mut frames),
+        Ok(InstructionProgress::Waiting)
+    ));
+    assert!(frames.is_empty());
+    let fuel = state.remaining_instructions;
+    for _ in 0..3 {
+        state.scheduler.park();
+        assert!(matches!(
+            run(&mut state, &mut frames),
+            Ok(InstructionProgress::Waiting)
+        ));
+        assert_eq!(state.remaining_instructions, fuel);
+    }
+    // Exercise access from another native participant while no guest frame exists.
+    let observed = queue.clone();
+    std::thread::spawn(move || {
+        let mut heap = collector.enter();
+        heap.collect(vec![], CollectionReason::ExplicitRequest)
+            .unwrap();
+        let Value::ObjectReference(queue) = observed else {
+            panic!()
+        };
+        assert_eq!(queue.reference.read_field(1).unwrap(), Value::Int32(1));
+        assert_eq!(heap.len(), 2);
+    })
+    .join()
+    .unwrap();
+    if cancel {
+        token.cancel();
+        state.scheduler.park();
+        assert!(matches!(
+            run(&mut state, &mut frames),
+            Err(Fault {
+                code: crate::FaultCode::ExecutionCancelled,
+                ..
+            })
+        ));
+        assert_eq!(state.remaining_instructions, fuel);
+        return;
+    }
+    let _peer = std::net::TcpStream::connect(("127.0.0.1", port as u16)).unwrap();
+    let value = loop {
+        match run(&mut state, &mut frames).unwrap() {
+            InstructionProgress::Waiting => state.scheduler.park(),
+            InstructionProgress::Suspended => panic!("unexpected instruction quantum"),
+            InstructionProgress::Completed(value) => break value,
+        }
+    };
+    assert_eq!(value, result);
+    let Value::ObjectReference(result) = value else {
+        panic!()
+    };
+    assert_eq!(result.reference.read_field(0).unwrap(), Value::Int32(42));
+    let Value::ObjectReference(queue) = queue else {
+        panic!()
+    };
+    assert_eq!(queue.reference.read_field(0).unwrap(), Value::Int32(1));
+    assert_eq!(queue.reference.read_field(1).unwrap(), Value::Int32(2));
 }

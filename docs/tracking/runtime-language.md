@@ -25,7 +25,10 @@ concurrent guest execution. The first native work owner now covers bounded submi
 cooperative cancellation and join-before-disposal with runtime-side callbacks.
 The VM now retains execution state and publishes roots between instruction intervals;
 a native guest-function probe and a queue/entry-drain probe force collection after
-every instruction. Blocking guest boundaries, shared invocation services/aggregate
+every instruction. Completion waits now publish roots and park outside graph access,
+retaining returned values and instruction fuel while allowing another participant
+to collect; focused socket-completion/cancellation probes cover resumption.
+Ordinary blocking guest boundaries, shared invocation services/aggregate
 budgets and concurrent Promise/queue publication remain before the Task.Run facade.
 The internal blocking probe is not a public guest API result. Green threads are recorded as a possible future backend.
 This explicit task does not reopen the finished HTTP POC or select a general

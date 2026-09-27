@@ -51,7 +51,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   that publish roots before releasing heap access without resetting instruction
   fuel. Validate native guest capture/result identity and queue/entry draining with
   collection after every instruction; record a focused ordinary-execution cost
-  comparison. Shared blocking boundaries/services and public Task.Run remain pending.
+  comparison. Release graph access during scheduler completion waits, retaining the
+  dispatch boundary and all roots without consuming guest instruction fuel; validate
+  collection by another participant, exactly-once notification posting and cancellation.
+  Ordinary blocking guest boundaries, shared services and public Task.Run remain pending.
   This is backend infrastructure, not a public Task.Run release.
 
 - Support Raven Main returning integer, Result and target Task combinations through

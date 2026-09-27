@@ -154,8 +154,8 @@ also covers cleanup of a worker already waiting for that access. Public Promise
 completion, queue publication, wake notifications, shared host resources, aggregate
 instruction/frame budgets, guest safepoints and async unwrapping are not supplied
 by this component. Do not enable a public facade until these are connected and
-validated. The VM now pauses between instruction intervals, but blocking guest
-calls and scheduler waits still hold access. The runtime-side blocking probe is
+validated. The VM now pauses between instruction intervals and releases graph
+access during scheduler waits. Ordinary blocking guest calls still hold access. The runtime-side blocking probe is
 not proof that guest blocking calls have already been offloaded correctly.
 
 ```sh
@@ -211,9 +211,38 @@ sample shows no observed regression; it does not establish a speed improvement,
 contention behavior or Task.Run throughput. The comparison also includes the
 intervening heap-coordination commits and does not isolate a single lock cost.
 
+## Completion waits outside graph access
+
+Completion dispatch now retains its boundary value when registered host work is
+pending. The scheduler polls under graph access; the driver releases that access
+before parking, then resumes dispatch even when the last guest frame has returned.
+The pending boundary, invocation result, queue and source callbacks remain rooted.
+Waiting does not consume guest instruction fuel. The existing wake latch covers a
+notification between poll and park; cancellation and sockets retain bounded polling.
+
+This removes one obstacle to .NET-like caller progress during Task.Run work. It
+is not a thread-pool implementation or a promise that arbitrary guest/native blocking
+calls already permit concurrent managed progress. Serial graph access remains the
+correctness baseline, with sharing and budgets still requiring integration.
+
+```sh
+cargo test --lib vm::suspension_tests
+cargo test --lib scheduler::tests
+cargo test --test entry_results --test cancellation
+```
+
+Six suspension tests, nine scheduler tests and eleven entry/cancellation tests pass.
+The pending loopback-accept probe permits another native participant to collect
+while no guest frame exists, preserves an independent reference result, verifies
+unchanged fuel across repeated waits, and resumes with exactly one notification
+post and the final queue drain. A separate cancellation case checks a parked
+completion boundary. Existing wake tests cover poll/park notification races.
+No public signature changed; the website's future Task.Run status remains accurate.
+No website build, API snapshot regeneration, full suite or new benchmark was needed.
+
 ## Next prerequisite
 
-Move blocking guest calls and quiescence waits outside managed graph access, and
+Move ordinary blocking guest calls outside managed graph access, and
 establish shared invocation services and aggregate budgets before general guest
 work submission. Then establish atomic Promise/queue publication and expose the
 Run overloads, with async callback unwrapping validated at that API boundary.
