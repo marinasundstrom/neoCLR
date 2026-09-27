@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Include System and System.Tasks extension namespaces in the API reference so
+  Result/Option and Task composition methods appear on their receiver type pages,
+  alongside the existing LINQ and reflection extensions. Update RavenDoc to
+  resolve open generic receivers, preserve extension-container declarations under
+  the reader filter, and omit inherited members from static classes. Correct API
+  navigation highlighting so namespace functions are selected individually.
+
 - Update RavenDoc with linked derived types, derived interfaces and implementing
   types, marking indirect relationships within the documented API surface. Add an
   independent, persisted Show extension members toggle with accurate group counts.

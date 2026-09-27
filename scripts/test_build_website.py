@@ -103,9 +103,10 @@ class RavenDocPages(unittest.TestCase):
         import json
         repo = Path(__file__).resolve().parent.parent
         exclusions = json.loads((repo / 'api-docs/exclusions.json').read_text())
+        site = json.loads((repo / 'website/site.json').read_text())
         result, output = self.publish('# Reference', extra=dict(
             api=str(repo / 'api-docs/reference/NeoCLR.CoreProbe.dll'),
-            excludedMembers=list(exclusions)))
+            excludedMembers=list(exclusions), extensionNamespaces=site['extensionNamespaces']))
         self.assertEqual(result.returncode, 0, result.stderr)
         xrefs = {uid.replace('+', '.'): path for uid, path in
                  json.loads((output / 'xref-map.json').read_text()).items()}
@@ -125,6 +126,20 @@ class RavenDocPages(unittest.TestCase):
         self.assertIn('Inherited from', case)
         self.assertIn('id="show-inherited-members"', case)
         self.assertIn('id="member-grouping"', case)
+        factory = (output / 'api/System/Tasks/Task/index.html').read_text()
+        self.assertNotIn('data-member-inherited="true"', factory)
+        self.assertIn('Run', factory)
+        for receiver, container, methods in (
+                ('System/Tasks/Task`1', 'TaskOperators', ('Map', 'Then')),
+                ('System/Result`2', 'ResultOperators', ('Map', 'Then', 'MapError')),
+                ('System/Option`1', 'OptionOperators', ('Map',))):
+            page = (output / 'api' / receiver / 'index.html').read_text()
+            self.assertIn('data-member-extension="true"', page, receiver)
+            self.assertNotIn('Number&lt;T&gt;.op_', page, receiver)
+            for method in methods:
+                self.assertIn(container + '/method_' + method + '.html', page, receiver)
+                self.assertIn(container + '.' + method, page, receiver)
+
 
     def test_api_list_labels_and_signature_opt_in(self):
         import shutil
