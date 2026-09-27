@@ -628,9 +628,9 @@ now has separate positive regressions below. Run with matching --runtime, --brid
 reference includes the static owner and all overloads; matching API/library snapshot
 checks pass. Website source/downloads are updated without building the website.
 
-Three [compiler integration gaps](compiler-gaps/README.md) remain: short-name Task
-lookup, block-lambda result inference and direct unit await. The passing consumer
-uses an explicit alias, a typed callback local and Map before unit await. These
+Two [compiler integration gaps](compiler-gaps/README.md) remain: short-name Task
+lookup and block-lambda result inference. The passing consumer
+uses an explicit alias and a typed callback local. These
 workarounds do not redefine the API contract.
 
 ## Shared mutable-local capture checkpoint
@@ -668,10 +668,29 @@ fix on ordinary Raven/.NET. It is [retained as a compiler follow-up](compiler-ga
 not hidden by lowering the required result or weakening the importer. This slice
 does not establish async-lambda-owned locals or iterator capture planning.
 
+## Direct unit-await checkpoint
+
+Raven `c08f343b1` on `neoclr` now recognizes the configured inhabited unit representation
+when an imported generic method returns it. Previously `Task<System.Void>.GetResult()`
+left a value on the stack because the compiler classified it as a no-result call.
+The correction discards that value once in statement position. Unlike CLR's `void`,
+neoCLR's configured System.Void is a unit value in generic storage; ordinary CLI
+no-result returns keep their existing treatment. No Runtime Contract setting, runtime
+API, or importer stack check changes. This target-specific correction stays on
+Raven's `neoclr` branch; it is not a general main-branch extraction.
+
+[UnitAwait.rvn](UnitAwait.rvn) is now a positive regression. Main and MutableCapture
+also await completion directly, without Map. Focused checks compile, typed-verify
+and execute these three consumers against the unchanged development library/reference.
+Twenty-four neighboring Raven async/unit contract tests pass. Assignment of an awaited
+unit to a local also compiles in the reduced probe; runtime validation here covers
+statement-position awaits. No full suite, performance suite or website build is needed.
+The API snapshot update is XML-only; no public signatures change.
+
 ## Next bounded work
 
-Resolve direct unit-await lowering/metadata next, then short-name lookup and
-block-lambda inference in isolated Raven work with independent CLI tests. Keep the
+Resolve short-name lookup and block-lambda inference in isolated Raven work with
+independent CLI tests. Keep the
 remaining negative fixtures until corrected. Public release readiness still requires
 reviewing these integration gaps and the separate generic-method capture candidate;
 no broader platform matrix or website build is required for this correction.

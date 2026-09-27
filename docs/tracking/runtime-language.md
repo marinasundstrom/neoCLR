@@ -58,7 +58,8 @@ inner tasks through the existing outcome-transfer helper. The compiled capture/i
 unwrapping consumer passes with explicit workarounds. Ordinary async methods now
 share mutable locals with their callbacks through the integrated Raven closure fix.
 Next bounded work is the [recorded compiler gaps](../experiments/task-run/compiler-gaps/README.md):
-direct unit await, short-name Task lookup and block-lambda inference. Generic-method
+short-name Task lookup and block-lambda inference. Direct completion-only await now
+uses the ordinary protocol with the target compiler unit-result fix. Generic-method
 closure metadata is a separate pre-existing Raven follow-up. Public reference/snapshots
 cover the static Task owner; no new compiler Runtime Contract settings are used.
 The internal blocking probe is not a public guest API result. Green threads are recorded as a possible future backend.

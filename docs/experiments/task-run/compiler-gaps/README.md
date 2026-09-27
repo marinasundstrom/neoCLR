@@ -11,19 +11,12 @@ contract tests and extraction to main before target integration.
   the alias also permits Task<T> result annotations in the compiled consumer.
 - `BlockLambda.rvn`: block callbacks can report RAV1503 (int to void), including an
   explicit Run<int> call. An independently target-typed `Func<int>` local works.
-- `UnitAwait.rvn`: direct completion-only await leaves a Void value at a no-result
-  return and fails importer stack validation. The larger consumer also exposes
-  a branch merge between empty and Void-valued stacks. Assigning the result to a local instead encounters
-  the unsupported CLI VOID storage marker. Do not weaken typed-stack validation to
-  admit it. The working consumer maps Task<unit> to an integer before awaiting;
-  the completion-only Task.Run overload itself executes and completes correctly.
 
 Reproduce by copying one source to Main.rvn beside the existing
 [entry contract project](../../entry-results/Contracts.rvnproj) and a matching
 NeoCLR.CoreProbe.dll, then invoking `Probe.dll --project <project> <new-output>`.
-The focused public consumer script also checks the reduced failures. Unit-await
-lowering/metadata should be resolved before advertising friction-free completion-only
-await. Keep negative observations distinct from passing implementation evidence.
+The focused public consumer script also checks the reduced failures. Keep negative
+observations distinct from passing implementation evidence.
 
 ## Corrected: ordinary async mutable-local sharing
 
@@ -46,3 +39,13 @@ method/type-parameter ownership fix. This is not a new Runtime Contract setting 
 a reason to relax importer validation. Its neoCLR-specific impact has not yet been
 established. Async-lambda-owned locals and iterator capture planning also need their
 own bounded coverage; the source-method fix does not establish every capture shape.
+
+## Corrected: direct completion-only await
+
+The target compiler now recognizes the configured unit representation when discarding
+an imported generic result. `Task<System.Void>.GetResult()` produces an inhabited
+value; it is not a CLI no-result call. The positive [UnitAwait.rvn](../UnitAwait.rvn)
+regression replaces the former negative fixture. Main and MutableCapture now await
+completion directly, without mapping to an integer. Importer stack checks remain
+unchanged. See the [unit-await checkpoint](../README.md#direct-unit-await-checkpoint)
+for the exact validation scope.

@@ -94,7 +94,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   typed and task-producing callbacks, with shared capture/result identity and async
   outcome transfer on the default dispatcher. Refresh matching library/reference
   artifacts and API documentation. Record required Raven workarounds for short-name
-  lookup, block-lambda typing and direct unit await. Correct ordinary async mutable-local
+  lookup and block-lambda typing. Correct direct completion-only await in the target
+  compiler by recognizing the configured inhabited unit result; remove the integer-map
+  workaround and promote the failing fixture to a positive consumer. Correct ordinary
+  async mutable-local
   sharing through the independently validated Raven closure fix (main dc7b87eff,
   experimental integration 08815ceaf), retaining one closure per invocation across
   suspension. Promote the original failing consumer to a required 42-result regression

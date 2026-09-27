@@ -70,10 +70,9 @@ See the [task feature page](/features/tasks/#task-run) for the compiled example.
 
 Current Raven integration limitations: use `alias Task = System.Tasks.Task` (or the
 fully qualified owner) for Run lookup. Give multi-statement value callbacks a
-`Func<T>` local type when overload inference reports a void conversion. Direct await
-of `Task<unit>` currently fails importer stack validation; the consumer uses
-`completion.Map(_ => 0)` before awaiting. These are tracked limitations, not intended
-API semantics. Typed awaits and async unwrapping use the ordinary Task protocol.
+`Func<T>` local type when overload inference reports a void conversion. These are
+tracked limitations, not intended API semantics. Direct `Task<unit>` awaits, typed awaits and async unwrapping use
+the ordinary Task protocol with the matching development compiler.
 
 Mutable scalar locals in ordinary async callers share storage with their callbacks
 across suspension; awaiting the writer exposes its updated value to the caller.

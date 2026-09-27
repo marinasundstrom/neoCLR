@@ -25,8 +25,7 @@ async func Main() -> Task<()> {
     let completion = Task.Run(() => {
         state.Value = state.Value + 1
     })
-    // Direct unit await is a recorded compiler/importer limitation.
-    _ = await completion.Map(_ => 0)
+    await completion
     Console.WriteLine(state.Value)
     let unwrapped = await Task.Run(Calculate)
     Console.WriteLine(unwrapped)

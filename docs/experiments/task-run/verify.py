@@ -14,6 +14,7 @@ tools = {name: getattr(args, name).resolve() for name in ('runtime', 'bridge', '
 here = Path(__file__).resolve().parent
 prefix = 'import System.*\nimport System.Tasks.*\nalias Task = System.Tasks.Task\n'
 cases = [
+    ('unit-await', (here / 'UnitAwait.rvn').read_text(), 0, 'completed\n', None),
     ('mutable-capture', (here / 'MutableCapture.rvn').read_text(), 42, '', None),
     ('mutable-capture-inline', (here / 'MutableCaptureInline.rvn').read_text(), 42, '', None),
     ('capture-and-unwrap', (here / 'Main.rvn').read_text(), 0, '42\nTrue\n41\n21\n7\n', None),
@@ -63,8 +64,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-task-run-') as directory:
         assert (error in result.stderr if error else result.stderr == ''), (name, result.stderr)
         print(name + ': passed', flush=True)
 
-    for name, diagnostic in [('Unqualified', 'RAV0117'), ('BlockLambda', 'RAV1503'),
-                             ('UnitAwait', 'remaining Void')]:
+    for name, diagnostic in [('Unqualified', 'RAV0117'), ('BlockLambda', 'RAV1503')]:
         if args.case and name not in args.case:
             continue
         (root / 'Main.rvn').write_text((here / 'compiler-gaps' / (name + '.rvn')).read_text())

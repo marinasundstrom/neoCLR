@@ -13,12 +13,14 @@ Raven capture fix below corrects compiler storage planning without importer rela
 Eleven focused `--task-run-signatures` checks cover admission and malformed metadata.
 The [compiled consumer](../task-run/README.md#public-overloads-and-async-unwrapping) and
 [reduced compiler gaps](../task-run/compiler-gaps/README.md) distinguish passing runtime
-behavior from short-name lookup, block-lambda inference and direct unit-await
-limitations. Mutable-local storage in ordinary async methods is corrected by Raven
+behavior from short-name lookup and block-lambda inference limitations. Direct unit
+await now discards the configured inhabited unit result correctly with Raven
+`c08f343b1` on `neoclr`.
+Mutable-local storage in ordinary async methods is corrected by Raven
 main dc7b87eff, integrated individually as 08815ceaf on its neoclr branch. Seventeen
 independent .NET capture checks pass. Generic-method closure metadata remains a
 pre-existing general compiler follow-up; see the [capture checkpoint](../task-run/README.md#shared-mutable-local-capture-checkpoint).
-No importer relaxation is made for the invalid unit stack. Existing uninitialized
+The unit-result correction preserves importer stack checks. Existing uninitialized
 private-var constructor assignment also needs explicit-field compatibility in helpers.
 
 ## Explicit application interface integration (2026-09-27)
