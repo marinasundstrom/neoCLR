@@ -30,7 +30,7 @@ are a 2026-09-26 snapshot, not a new live inventory or authorization to fix all 
 | Item | Status / owner boundary | Next action when selected |
 | --- | --- | --- |
 | HTTP evaluator package | POC acceptance complete on macOS arm64; HTTP tracker owns the evidence | [Package evidence](../experiments/http-poc-package/README.md) records the exact artifacts. Requalify the selected release candidate and shipped targets; do not treat a local POC pass as full release readiness. |
-| Next runtime release | Preview 10 qualified; publication is the remaining step | [Candidate notes](../preview-10-release-notes.md). Publish the qualified assets; no new feature milestone is selected. |
+| Next runtime release | [Preview 10 published](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.10) on 2026-09-27; all eight remote asset digests verified | [Candidate notes](../preview-10-release-notes.md). Release work is complete; no new feature milestone is selected. |
 | CI efficiency | All six jobs passed; slowest 8.88 minutes, about 17.6 runner-minutes | [Hosted evidence](../experiments/ci-split/README.md). Canonical evidence precedes the union migration; validate that contract and rebuilt packages separately. |
 | [#9 RavenDoc](https://github.com/marinasundstrom/neoCLR/issues/9) | Dated inventory spans correctness/navigation and richer rendering | First reproduce a current label/navigation or coverage gap; separate small repairs from union modeling/hierarchy features. Keep linked manual coverage until rendering supports a member. |
 | Website | Local validation and manual publication are separate | [Maintenance](../design/feature-pages.md), [site procedure](../../website/README.md); successful build/push is not deployment. |

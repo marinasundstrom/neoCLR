@@ -7,6 +7,8 @@ record, subordinate to the [platform roadmap](platform-roadmap.md).
 **POC scope:** two neoCLR programs exchange typed JSON using bounded HTTP/1.1;
 client/server cancellation, explicit resource lifetime, independent interoperability
 and the current known-length upload increment. The bounded POC is complete on macOS arm64 as of 2026-09-27; feature scope is frozen.
+[Preview 10](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.10)
+is published with the qualified runtime, SDK and editor packages.
 The author intends to release it after separate release qualification. Modern HTTP capabilities are tracked below without becoming automatic
 completion requirements. POC completion is distinct from release qualification.
 

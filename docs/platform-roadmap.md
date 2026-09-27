@@ -9,8 +9,9 @@ The bounded HTTP POC is [complete on macOS arm64](http-capabilities.md#finish-th
 including independent peers, known-length uploads and the extracted-package check.
 Feature scope is frozen; do not automatically start another HTTP feature.
 
-**The POC and Preview 10 qualification are complete.** Publication is the final
-release step; no further feature milestone is automatically selected. Option, Result
+**The POC is released and done for now:**
+[Preview 10](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.10),
+published 2026-09-27. No further feature milestone is automatically selected. Option, Result
 and TaskOutcome use standard Raven unions, and the native reflection boundary uses
 the matching Option layout. See [release evidence](preview-10-validation.json).
 

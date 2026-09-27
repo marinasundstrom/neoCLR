@@ -7830,3 +7830,10 @@ configuration/content, not target-specific code added to Raven main.
   evidence at `1404454e` precedes migration; subsequent changes have focused checks.
   The assistant prepares Preview 10 assets, notes and [evidence](preview-10-validation.json)
   for publication and leaves later HTTP features tracked rather than starting them.
+
+- **Publication outcome:** [Preview 10](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.10)
+  is published as a prerelease at tag `v0.1.0-preview.10` (`2879df22`). All eight
+  remote asset digests match the reviewed local files. The source archive matches
+  all 2,620 tracked files and compiles after extraction. The roadmap now records the
+  POC as released and done for now; client/server HTTP directions remain tracked.
+  Website publication uses its separate manual workflow.

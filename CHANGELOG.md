@@ -6,7 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
-No changes yet.
+### 2026-09-27
+
+- Record Preview 10 publication, verified remote asset digests and POC completion
+  in the roadmap, HTTP and release trackers. No new feature milestone is selected.
 
 ## 0.1.0-preview.10 — 2026-09-27
 
