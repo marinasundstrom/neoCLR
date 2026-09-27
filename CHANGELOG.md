@@ -9,7 +9,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 ### 2026-09-27
 
 - Record Preview 10 publication, verified remote asset digests and POC completion
-  in the roadmap, HTTP and release trackers. No new feature milestone is selected.
+  in the roadmap, HTTP and release trackers.
+- Select useful library API coverage as the next author-directed work. Record a
+  proposed comparer-first sequence, earlier text/casing/StringBuilder/time requests,
+  bounded companion tasks and focused validation in the existing theme trackers.
+  This is planning; no new API is implemented.
 
 ## 0.1.0-preview.10 — 2026-09-27
 

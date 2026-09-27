@@ -7837,3 +7837,23 @@ configuration/content, not target-specific code added to Raven main.
   all 2,620 tracked files and compiles after extraction. The roadmap now records the
   POC as released and done for now; client/server HTTP directions remain tracked.
   Website publication uses its separate manual workflow.
+
+## 2026-09-27 — Useful APIs after the released POC
+
+- **Author direction:** “Next is filling the gap of useful APIs, some that I have
+  mentioned”. This selects library coverage after Preview 10 publication.
+- **Assistant review:** recovers the earlier requests for consistent System.Text,
+  general/string comparers, casing/comparison methods, StringBuilder and better time
+  APIs. Current Raven HashMap still takes separate equality/hash callbacks; String
+  already exposes exact equality and ordinal operations.
+- **Assistant recommendation:** start with paired equality/hash policies and an
+  ordinal string comparer consumed by HashMap, followed by text construction,
+  explicit casing and scenario-driven parsing/time coverage. Keep at most one small
+  independent companion task and retain feature work ahead of optional optimization.
+  This ordering is the assistant’s proposal, not a quoted author selection of an API.
+- **Action/outcome:** updates the authoritative roadmap and existing library/runtime
+  trackers, correcting the stale M1 release-preparation status. The
+  [library sequence](tracking/library-data.md#active-direction--useful-api-gaps)
+  records the next bounded contract and validation requirements. No new API is
+  implemented by this planning change; exact signatures remain open. HTTP stays
+  done for now, with future client/server capabilities retained in its own tracker.

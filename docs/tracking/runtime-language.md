@@ -2,8 +2,10 @@
 
 **Consolidated 2026-09-27.** [Platform priorities](../platform-roadmap.md) govern
 selection. This is the status owner for runtime/type-system work, not an active
-foundation sweep. HTTP POC release preparation remains selected; expansion below is deferred
-unless a concrete blocker or later author direction selects it.
+foundation sweep. Useful API coverage is now selected in the
+[library/data tracker](library-data.md#active-direction--useful-api-gaps); runtime
+expansion below remains deferred unless that work exposes a concrete dependency
+or later author direction selects it.
 
 ## Recorded checkpoints and open scope
 
