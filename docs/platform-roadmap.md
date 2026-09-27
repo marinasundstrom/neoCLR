@@ -5,6 +5,12 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Immediate author direction — release-readiness assessment (2026-09-27).**
+Broaden validation and identify feature finish lines and general bugs before the
+next release. The [toolchain/release assessment](tracking/toolchain-release.md#pre-release-assessment--2026-09-27)
+owns priorities and fresh evidence. Pause automatic feature expansion while this
+assessment is completed; it does not select a release version or reopen Preview 10.
+
 **Active direction — minimal Web API (author-selected 2026-09-27).** Focus on
 serving a useful Web API, nested JSON serialization/deserialization, and a
 route parser used within an existing HttpServer handler, including named and typed

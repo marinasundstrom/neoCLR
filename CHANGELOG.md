@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Record the author-selected pre-release assessment on main: feature finish lines,
+  confirmed format/Clippy and stale union-probe gate failures, current async
+  reproduction results and broader native/integration evidence. Separate supported
+  behavior defects from explicit generic import limits and deferred capabilities;
+  retain one canonical full candidate suite plus focused host/package checks.
+
 - Include System and System.Tasks extension namespaces in the API reference so
   Result/Option and Task composition methods appear on their receiver type pages,
   alongside the existing LINQ and reflection extensions. Update RavenDoc to

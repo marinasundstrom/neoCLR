@@ -1,0 +1,156 @@
+{
+  "date": "2026-09-27",
+  "revision": "a79d0b34",
+  "host": "macOS arm64",
+  "rust": "1.95.0",
+  "dotnetSdk": "11.0.100-rc.1.26425.128",
+  "scope": "Pre-release assessment, not candidate certification",
+  "nativeLibrary": {
+    "passed": 213,
+    "failed": 0,
+    "seconds": 471.99,
+    "command": "cargo test --locked --lib"
+  },
+  "integration": {
+    "entry_results": 5,
+    "explicit_interfaces": 13,
+    "reflection_construction": 8,
+    "runtime_gc": 8,
+    "static_number_contracts": 2,
+    "failed": 0
+  },
+  "hostValidatorTests": 2,
+  "apiSnapshot": "passed",
+  "generatedLibraryMatchesCurrentSources": true,
+  "format": {
+    "status": "failed",
+    "files": [
+      "src/lib.rs",
+      "src/metadata_origin.rs",
+      "src/native.rs",
+      "src/reflection_members.rs",
+      "src/services.rs",
+      "src/shared_heap.rs",
+      "src/vm.rs",
+      "src/vm_host_call.rs",
+      "src/vm_suspension_tests.rs",
+      "tests/calendar_globalization.rs",
+      "tests/reflection_members.rs",
+      "tests/runtime_services.rs"
+    ]
+  },
+  "clippy": {
+    "status": "failed",
+    "diagnostics": 8,
+    "locations": [
+      "src/vm_suspension_tests.rs:94 unneeded unit",
+      "src/task_work.rs:110 type complexity",
+      "src/slots.rs:40 new not returning Self",
+      "src/vm_host_call.rs:94 match-like matches",
+      "src/vm.rs:1806 large enum variant",
+      "src/vm.rs:2188 needless borrow",
+      "src/vm.rs:3219 needless borrow",
+      "src/vm_suspension_tests.rs:214 redundant pattern matching"
+    ]
+  },
+  "metadata": [
+    {
+      "check": "signatures",
+      "code": -6,
+      "stdout": "",
+      "stderr": "Unhandled exception. System.InvalidOperationException: Sequence contains no matching element\n   at System.Linq.ThrowHelper.ThrowNoMatchException()\n   at System.Linq.Enumerable.Single[TSource](IEnumerable`1 source, Func`2 predicate)\n   at SignatureProbe.Write(String output, Boolean entryOnly) in /Users/robert/.codex/worktrees/http-poc-package/neoclr/docs/experiments/raven-target/SignatureProbe.cs:line 219\n   at Program.<Main>$(String[] args) in /Users/robert/.codex/worktrees/http-poc-package/neoclr/docs/experiments/raven-target/Program.cs:line 140\n"
+    },
+    {
+      "check": "task-run-signatures",
+      "code": 0,
+      "stdout": "11 Task.Run signature checks passed\n",
+      "stderr": ""
+    },
+    {
+      "check": "entry-signatures",
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "check": "number-checks",
+      "code": 0,
+      "stdout": "210 number signature checks passed\n",
+      "stderr": ""
+    },
+    {
+      "check": "reflection-member-checks",
+      "code": 0,
+      "stdout": "30 reflection member signature checks passed\n",
+      "stderr": ""
+    },
+    {
+      "check": "gc-checks",
+      "code": 0,
+      "stdout": "16 GC signature checks passed\n",
+      "stderr": ""
+    },
+    {
+      "check": "comparer-signatures",
+      "code": 0,
+      "stdout": "11 comparer signature checks passed\n",
+      "stderr": ""
+    },
+    {
+      "check": "globalization-signatures",
+      "code": 0,
+      "stdout": "Passed 122 calendar/globalization signature checks\n",
+      "stderr": ""
+    }
+  ],
+  "metadataPassingChecks": 422,
+  "asyncObservations": [
+    {
+      "case": "AsyncInterpolation",
+      "compile": 0,
+      "stdout": "",
+      "stderr": "",
+      "run": {
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "case": "AsyncParameterCapture",
+      "compile": 0,
+      "stdout": "",
+      "stderr": "",
+      "run": {
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    }
+  ],
+  "parameterCaptureObservableExit": {
+    "compile": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "expected_exit": 1,
+    "exit": 1,
+    "stdout": "",
+    "stderr": ""
+  },
+  "interpolationRawIL": "No WriteLine call or Value literal in App.raw.dll; independent ordinary CLR reduction still required",
+  "notRun": [
+    "complete native integration suite",
+    "full source archive validation",
+    "cross-host matrix",
+    "fresh SDK/runtime package extraction",
+    "website build",
+    "benchmarks"
+  ],
+  "sha256": {
+    "target/debug/neoclr": "2734fc5840d61ec6e6997d6e0245107398677220131171c9a8eee3efac4e339e",
+    "target/task-run/Merged.System.neoil": "b944ad08760589ffa1409403e1d6c0e1cf3c3af49312bca5e28ade6b7aba4cc1",
+    "target/task-run/Merged.CoreProbe.dll": "01327a5beeb2c366246cf7c031962e9b051821612c26f561c756997b4b966429",
+    "docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll": "6cd929623fe0415e418bfabcbfa26aa902fbddda1c9356583f31334c1aed6022",
+    "docs/experiments/raven-target/bin/Debug/net11.0/Raven.CodeAnalysis.dll": "93d10b23a7ce91e71e7eee6038019fa6c1489e699bfc70fd849f279e68cd7f55"
+  }
+}

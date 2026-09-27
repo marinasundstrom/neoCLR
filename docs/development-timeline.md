@@ -8767,3 +8767,24 @@ and validation outcomes; broader .NET library parity is not inferred from this d
   space permits, and for the grouping and both toggle values to be shareable in
   the URL. The assistant implemented wrapping controls and URL precedence over
   saved preferences, preserving unrelated query parameters and page anchors.
+
+## 2026-09-27 — Release-readiness review before further expansion
+
+**Author:** Asked to run more tests in anticipation of a release, first identifying
+features needing more work and general bugs. Clarified that main is now the working
+branch.
+
+**Assistant:** Selected main a79d0b34 as the assessment baseline, broadened native
+and integration checks, rechecked old compiler observations and separated feature
+scope decisions from confirmed gate failures. Tests initially ran in the clean
+Task.Run checkout at the same commit; the assessment is maintained on main. Proposed
+fixing canonical gate/probe failures and silent wrong behavior before adding optional
+features, retaining one canonical full-suite run and focused host/package checks.
+See the [release tracker](tracking/toolchain-release.md#pre-release-assessment--2026-09-27)
+for findings and evidence. No new release version or publication was selected.
+
+**Follow-up author decision:** “We should fix the generic async support.” Generic
+async import is now a pre-release requirement, rather than a recommended optional
+limitation. The assistant will repair neoCLR’s state-machine/closure import path
+against Raven’s normal contract and keep the independent Raven generic-containing-
+type emission issue separate unless needed by that implementation.

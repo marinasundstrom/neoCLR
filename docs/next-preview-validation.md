@@ -1,7 +1,8 @@
 # Release candidate validation
 
 The [toolchain/release tracker](tracking/toolchain-release.md) owns candidate status.
-Preview 10 is the selected HTTP POC release. Follow the [CI design](ci-efficiency-plan.md)
+Preview 10 is the completed HTTP POC release. The next candidate is not yet selected;
+first complete the [pre-release assessment](tracking/toolchain-release.md#pre-release-assessment--2026-09-27). Follow the [CI design](ci-efficiency-plan.md)
 for validation placement and the [package procedure](experiments/raven-target/RELEASING.md)
 for the matching runtime, Raven SDK and editor assets.
 

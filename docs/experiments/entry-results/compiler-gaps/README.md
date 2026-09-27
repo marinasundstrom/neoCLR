@@ -16,3 +16,16 @@ These are deferred general compiler candidates. Reduce and test them independent
 against ordinary CLR metadata before proposing Raven-main fixes; do not integrate
 neoCLR policy wholesale. No claim of a fix is made here. The entry examples use
 established target operations and test observable output, not compilation alone.
+
+## Current-main reassessment — 2026-09-27
+
+At neoCLR a79d0b34 with the current bridge and matching reference/library,
+AsyncInterpolation still compiles and exits 0 with empty output. Inspection of the
+raw compiler DLL finds no WriteLine call or `Value ` literal, before neoCLR import.
+Treat this as a compiler emission candidate; ordinary .NET reproduction is still
+needed to decide general versus target-specific ownership. AsyncParameterCapture
+now compiles and runs with exit 0; its historical MoveNext import rejection no
+longer reproduces. See the [release assessment](../../../tracking/toolchain-release.md#pre-release-assessment--2026-09-27)
+for current checks. A strengthened Main returning the helper Task exits 1 for one
+argument, confirming the captured length reaches the result. This does not certify all
+async callback/capture shapes.
