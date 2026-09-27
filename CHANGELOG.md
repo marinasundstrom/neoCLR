@@ -10,7 +10,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Prepare Preview 11 from the bounded current surface, with Windows x64 native
   runtime packaging and extracted-sample smoke checks alongside focused host CI.
-  Windows Raven SDK/bridge distribution remains unqualified.
+  Windows Raven SDK/bridge distribution remains unqualified. Include generic async,
+  unit-delegate and interpolation consumers in the extracted toolchain bundle.
 - Repair numeric/object interpolation with String.Concat(Object?, Object?), using
   virtual ToString and empty text for null; integrate Raven's general missing-member
   diagnostic fix. Preserve generic unit delegate results until the caller discards

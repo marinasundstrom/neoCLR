@@ -59,6 +59,16 @@ for name in ('run_project.py', 'runner_options.py', 'configure_tasks.py', 'verif
 for name in ('verify_tasks.py', 'verify_composition.py', 'verify_async.py',
              'verify_default_queue.py', 'verify_workers.py', 'verify_map_result.py', 'verify_editor.py'):
     shutil.copyfile(HERE.parent / 'task-contract' / name, output / 'tools/task-contract' / name)
+# Carry the release-critical generic async and interpolation consumers with the tools.
+for folder in ('task-run', 'entry-results'):
+    source = ROOT / 'docs/experiments' / folder
+    for relative in git(ROOT, 'ls-files', str(source.relative_to(ROOT))).splitlines():
+        path = Path(relative)
+        if path.suffix not in ('.rvn', '.rvnproj', '.py'):
+            continue
+        destination = output / 'tools' / folder / path.relative_to(source.relative_to(ROOT))
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / path, destination)
 shutil.copytree(ROOT / 'examples/preview', output / 'samples/neoil')
 shutil.copytree(HERE / 'samples', output / 'tools/samples')
 shutil.copytree(HERE / 'samples', output / 'docs/experiments/raven-target/samples')
