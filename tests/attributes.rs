@@ -91,3 +91,73 @@ fn attribute_owner_is_closed_even_on_a_generic_definition() {
         );
     }
 }
+
+#[test]
+fn scalar_attribute_arguments_roundtrip_without_constructor_execution() {
+    let source = r#".module Attributes
+.entry Main
+.type Marker
+.method instance .ctor(String text,Int32 number,Boolean flag) -> Void
+fault "attribute constructor must not execute"
+.end
+.end
+.type Target
+.custom instance Marker::.ctor(String,Int32,Boolean) = [{"String":"Café = /items/{id}"},{"Int32":42},{"Boolean":true}]
+.custom instance Marker::.ctor(String,Int32,Boolean) = [{"String":null},{"Int32":-7},{"Boolean":false}]
+.end
+.function Main() -> Int32
+ldc.i4 42
+ret
+.end
+"#;
+    let module = assemble(source).unwrap();
+    let json = serde_json::to_value(&module).unwrap();
+    let loaded = load(&json.to_string()).unwrap();
+    assert_eq!(json, serde_json::to_value(&loaded).unwrap());
+    assert_eq!(
+        run(&loaded, Limits::default()).unwrap().value,
+        neoclr::Value::Int32(42)
+    );
+    for arguments in [
+        serde_json::json!([]),
+        serde_json::json!([{"Int32":42},{"Int32":42},{"Boolean":true}]),
+        serde_json::json!([{"String":"ok"},{"Int32":42},{"Boolean":true},{"Int32":0}]),
+    ] {
+        let mut altered = json.clone();
+        altered["types"][1]["custom_attributes"][0]["arguments"] = arguments;
+        assert!(load(&altered.to_string()).is_err());
+    }
+    let mut altered = json;
+    altered["types"][1]["custom_attributes"][0]["target_token"] = serde_json::json!(0x08000001);
+    assert!(load(&altered.to_string()).is_err());
+}
+
+#[test]
+fn member_target_tokens_cannot_be_reused_as_type_annotations() {
+    let source = r#".module App
+.assembly {"name":"App","full_name":"App","modules":["App.dll"],"references":[]}
+.entry Main
+.type Target
+.origin {"assembly":"App","module":"App.dll","name":"Target","token":33554433,"field_tokens":[67108865],"property_tokens":[],"parameter_tokens":[]}
+.field Number Int32
+.custom token 67108865 instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+.end
+.function Main() -> Boolean
+ldtoken Target
+ldc.i4 10
+call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+ret
+.end
+"#;
+    let module = assemble(source).unwrap();
+    assert_eq!(
+        run(&module, Limits::default()).unwrap().value,
+        neoclr::Value::Boolean(false)
+    );
+    let original = serde_json::to_value(&module).unwrap();
+    for token in [0, 0x04000002, 0x08000001, 0x02000001] {
+        let mut altered = original.clone();
+        altered["types"][0]["custom_attributes"][0]["target_token"] = serde_json::json!(token);
+        assert!(load(&altered.to_string()).is_err(), "{token}");
+    }
+}

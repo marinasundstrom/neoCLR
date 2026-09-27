@@ -135,5 +135,6 @@ After reviewing the generated prototype, the author selects runtime attribute
 reflection for the immediate implementation: discover and validate metadata once
 at startup, then cache the binding and construction information. Source generation
 remains a future alternative. The completed generator is retained as experimental
-contract evidence, not the chosen application workflow. Next add bounded metadata
-reading without attribute-constructor execution, then prepare the reusable mapping.
+contract evidence, not the chosen application workflow. Bounded [member and parameter metadata reading](attribute-introspection.md) is
+implemented without attribute-constructor execution. Next prepare the reusable
+mapping, including checked dynamic construction of union cases.

@@ -23,8 +23,9 @@ RoutePattern/RouteMatch parsing and optional application union dispatch are now
 implemented in development; see [the case](experiments/http-routing/README.md).
 A [generated attribute-driven mapper experiment](experiments/route-union-mapper/README.md)
 validates schemas and reuses compiled patterns. The author subsequently selects
-runtime attribute reflection with cached startup mapping as the next slice; source
-generation remains a future alternative.
+runtime attribute reflection with cached startup mapping. Member/parameter
+[attribute data](attribute-introspection.md) is now implemented in development;
+cached dynamic union construction is next. Source generation remains a future alternative.
 Enum, Uuid and Option JSON mapping remain requested and pending.
 This explicitly supersedes the previous general useful-library priority; M2–M6
 remain candidates. Preview 10's completed POC stays closed.

@@ -225,3 +225,35 @@ See [Enum API reference](/docs/api/System/Enum/) for both overload families.
 
 EquatableTo&lt;T&gt; and ComparableTo&lt;T&gt; describe equality and comparison.
 ConvertibleInto&lt;T&gt; supplies an explicit Convert() contract with an implementation-defined policy.
+
+## Development case: inspecting route declarations at startup
+
+A server can describe routes with attributes on union cases, then inspect those
+declarations once during startup. This example reads the catalog routes:
+
+```raven
+{{ATTRIBUTE_ROUTE_DECLARATION}}
+```
+
+`RoutePatternAttribute` is an application attribute with a String constructor
+argument. Introspection reads its data without constructing the attribute:
+
+```raven
+{{ATTRIBUTE_ROUTE_READING}}
+```
+
+`MemberInfo.GetCustomAttributesData()` also works for fields, properties,
+constructors and methods. `ParameterInfo` exposes the same method. Multiple
+attributes are returned individually in metadata order, including repeated
+attributes allowed by their declarations. Each description identifies its type,
+constructor and typed arguments.
+
+The [tested source archive](/samples/http-json.zip) includes `attribute-introspection`
+and its verifier. This development slice supports retained application attributes
+with String, Int32 and Boolean constructor constants. It does not instantiate
+attributes, merge inherited attributes or expose all framework annotations. See
+[attribute data and limits](/docs/introspection.html#attribute-data-development-after-preview-10).
+
+Use these descriptions to prepare and cache a mapping before request handling.
+Dynamic union construction for that mapper remains the next slice; source generation
+is a future alternative, with a separate experimental case retained in the archive.

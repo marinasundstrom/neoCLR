@@ -1114,12 +1114,24 @@ impl Function {
     }
 }
 
-/// Marker-only subset of CLI custom attributes. The constructor is metadata,
+/// Bounded custom attribute data. The constructor is metadata,
 /// not an instruction to execute when loading the annotated definition.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct CustomAttribute {
     pub constructor: FunctionRef,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub arguments: Vec<AttributeArgument>,
+    /// None annotates the enclosing definition; otherwise a source metadata token.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub target_token: Option<u32>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum AttributeArgument {
+    String(Option<String>),
+    Int32(i32),
+    Boolean(bool),
 }
 
 /// Module-local function-definition row, not a durable identifier across rebuilds.

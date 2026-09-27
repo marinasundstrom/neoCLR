@@ -110,7 +110,7 @@ static class ApplicationTypes
         if (type is null || !Modules.Contains(type.Module) || type.FullName == "System.Unit" || type.Name == "<Module>") return null;
         if (type.HasGenericParameters && !LibraryNames.ContainsKey(type) || type.IsEnum && !FlagsLibrary.IsMatched(type)
             || type.IsExplicitLayout && !IsEmptyCaseUnion(type) && !IsInt32CaseUnion(type) || (type.DeclaringType?.HasGenericParameters ?? false)
-            || (!type.IsInterface && !DelegateLibrary.IsMatched(type) && !FlagsLibrary.IsMatched(type) && !MarkerLibrary.IsMatched(type) && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && !IsModule(type.BaseType?.Resolve()?.Module))
+            || (!type.IsInterface && !DelegateLibrary.IsMatched(type) && !FlagsLibrary.IsMatched(type) && !MarkerLibrary.IsMatched(type) && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && !(type.BaseType?.FullName == "System.Attribute" && RuntimeSignatures.IsCore(type.BaseType.Scope)) && !IsModule(type.BaseType?.Resolve()?.Module))
             || !FlagsLibrary.IsMatched(type) && type.Fields.Any(f => f.IsStatic || f.HasMarshalInfo)
             || type.Methods.Any(m => m.IsConstructor && m.IsStatic))
             throw new InvalidDataException("Unsupported application type: " + type.FullName);
@@ -157,6 +157,7 @@ static class ApplicationTypes
             if (DelegateLibrary.IsMatched(type) || FlagsLibrary.IsMatched(type) || MarkerLibrary.IsMatched(type)) continue;
             if (IsModule(type.BaseType?.Resolve()?.Module)) { CheckAccess(type.BaseType!, type.Module); map(type.BaseType!, false); }
             foreach (var contract in type.Interfaces) { CheckAccess(contract.InterfaceType, type.Module); map(contract.InterfaceType, false); }
+            AttributeMetadata.Discover(type, pending);
             foreach (var field in type.Fields) map(field.FieldType, false);
             foreach (var method in type.Methods.Where(m => (!m.IsStatic || type.IsInterface || !IsLibrary(type) && m.IsPublic && !m.IsConstructor && !m.HasGenericParameters && m.HasBody) && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && (OpaqueLibrary.IsOmittedConstructor(m) || ArrayLibrary.OmitConstructor(m) || EmptyLibrary.OmitConstructor(m) || (ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)))))
             {
@@ -408,10 +409,13 @@ static class ApplicationTypes
             if (type.IsSealed) output.AppendLine(".sealed");
             if (type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.ClosedHierarchyAttribute"))
                 output.AppendLine(".closedhierarchy");
-            if (!IsLibrary(type)) output.AppendLine(SourceMetadata.Type(type));
+            if (!IsLibrary(type)) {
+                output.AppendLine(SourceMetadata.Type(type));
+                foreach (var attribute in AttributeMetadata.Type(type, map)) output.AppendLine(attribute);
+            }
             if (IsModule(type.BaseType?.Resolve()?.Module)) output.AppendLine(".extends " + map(type.BaseType, false));
             else if ((!IsLibrary(type) || type.Methods.Any(m => m.IsVirtual && !m.IsNewSlot)) && !type.IsValueType && !type.IsInterface
-                && type.BaseType?.FullName == "System.Object" && RuntimeSignatures.IsCore(type.BaseType.Scope))
+                && type.BaseType?.FullName is "System.Object" or "System.Attribute" && RuntimeSignatures.IsCore(type.BaseType.Scope))
                 output.AppendLine(".extends System.Object");
             if (type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute") || ErrorCarrierLibrary.IsMatched(type) || GenericUnionLibrary.IsMatched(type) && GenericUnionLibrary.IsCarrier(type)) output.AppendLine(".custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()");
             foreach (var contract in type.Interfaces) output.AppendLine(".implements " + map(contract.InterfaceType, false));

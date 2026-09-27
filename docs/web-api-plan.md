@@ -92,6 +92,9 @@ transport and runtime resource limits together; changing one constant is insuffi
    and leaves unmatched handling to assistant judgment. The selected design is
    Result<AppRoutes, RouteMappingError>, with NoMatch distinct from malformed target
    and invalid parameter errors; an unmatched attribute is unnecessary initially.
+   Subsequent author direction selects startup reflection with a cached mapping.
+   Member/parameter attribute data is implemented; checked dynamic union construction
+   remains the next binding step. Source generation remains a future alternative.
    See [the recorded design choices](route-parsing.md#attributed-union-mapping-experiment).
 6. **Optional SQL/SQLite consumer.** If selected, reduce the
    [SQL proposal](proposals/sql-data-access.md) to opening/closing a connection,

@@ -201,3 +201,8 @@ compiles patterns once at startup; and separates NoMatch, InvalidTarget and
 InvalidParameter through Result. HTTP method policy and dispatch remain in the
 handler. This is a development experiment requiring an explicit generation step,
 not an installed SDK feature. Enum/Uuid/Option JSON support remains requested.
+
+The subsequent author direction chooses runtime introspection at startup and a
+cached mapping. [Member/parameter attribute data](attribute-introspection.md) now
+supports that preparation without executing attribute constructors; dynamic union
+construction remains next. The generator remains a future alternative.

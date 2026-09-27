@@ -223,6 +223,10 @@ included in Preview 10 or a new hosting framework.
 
 ## Development experiment: attributed item routes
 
+This generator prototype is retained as a future alternative. The current direction
+is [startup introspection with cached mappings](/features/introspection/#development-case-inspecting-route-declarations-at-startup);
+attribute reading is implemented, while dynamic union construction is the next slice.
+
 For a small catalog API, the route declaration can describe the case you want
 back. The generator reads these attributes from the compiled union:
 

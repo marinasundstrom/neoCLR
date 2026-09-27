@@ -284,10 +284,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     return Ok(());
                 }
                 if word == ".custom" {
-                    def.custom_attributes
-                        .push(crate::metadata::CustomAttribute {
-                            constructor: parse_function_ref(rest)?,
-                        });
+                    def.custom_attributes.push(parse_custom_attribute(rest)?);
                     return Ok(());
                 }
                 if word == ".pack" {
@@ -419,9 +416,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     pending
                         .function
                         .custom_attributes
-                        .push(crate::metadata::CustomAttribute {
-                            constructor: parse_function_ref(rest)?,
-                        });
+                        .push(parse_custom_attribute(rest)?);
                 } else if word == ".pinvoke" {
                     if pending.function.pinvoke.is_some()
                         || !pending.function.body.is_empty()
@@ -1502,4 +1497,35 @@ pub(crate) fn bind_parameters(ty: Type, names: &[Option<String>], method: bool) 
         Type::Ptr(t) => Type::Ptr(Box::new(bind_parameters(*t, names, method))),
         other => other,
     }
+}
+
+fn parse_custom_attribute(text: &str) -> Result<crate::metadata::CustomAttribute, Fault> {
+    let (target_token, text) = if let Some(rest) = text.strip_prefix("token ") {
+        let (token, rest) = rest
+            .split_once(' ')
+            .ok_or_else(|| Fault::new("missing attribute target"))?;
+        (
+            Some(
+                token
+                    .parse::<u32>()
+                    .map_err(|_| Fault::new("invalid attribute target token"))?,
+            ),
+            rest,
+        )
+    } else {
+        (None, text)
+    };
+    let (constructor, arguments) = match text.split_once(" = ") {
+        Some((constructor, arguments)) => (
+            constructor,
+            serde_json::from_str(arguments)
+                .map_err(|e| Fault::new(format!("invalid attribute arguments: {e}")))?,
+        ),
+        None => (text, vec![]),
+    };
+    Ok(crate::metadata::CustomAttribute {
+        constructor: parse_function_ref(constructor)?,
+        arguments,
+        target_token,
+    })
 }

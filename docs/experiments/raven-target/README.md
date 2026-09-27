@@ -1484,3 +1484,26 @@ structs remain rejected. This target-specific admission policy stays in neoCLR.
 The focused metadata mutation checks and compiled copy/boxing/dispatch consumer
 are in the experiment. Nested constant patterns/static Object.Equals remain a
 separate limitation; samples extract payloads and compare normally.
+
+### Member and parameter attribute data (development 2026-09-27)
+
+[Attribute introspection](../../attribute-introspection.md) preserves directly
+applied user attributes from imported application modules on type/case, field,
+property, method/constructor and parameter metadata. Retained attributes identify
+an admitted constructor and exact String/Int32/Boolean constants. Unsupported
+constants and named arguments fail import. Nullable and Raven union-case/companion
+compiler annotations remain governed by their existing contracts; external framework
+attributes without runtime definitions are not silently advertised as available.
+
+Type/member/parameter discovery returns snapshots through MemberInfo and ParameterInfo.
+No constructor executes. Attribute classes use the existing Object foundation in the
+executable projection; this does not introduce System.Attribute instance APIs.
+The case-attribute compiler fix described above is reused; Runtime Contract settings
+are unchanged. No further Raven compiler modification is part of this slice.
+A reduced nullable-string attribute constructor currently throws in Raven emission's
+CustomAttributeBuilder, so null constants are validated at the native metadata level.
+
+Descriptors and ParameterInfo fragments are regenerated and checked. Other slices
+compile separate source groups; their output artifacts/provenance are reused while
+the shared source inventory hashes advance. The native runtime, source-library
+fragments, reference assembly and importer must be updated together.

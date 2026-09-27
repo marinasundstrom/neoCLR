@@ -130,6 +130,8 @@
   "System.Introspection.AssemblyInfo",
   "System.Introspection.BindingFlags",
   "System.Introspection.ConstructorInfo",
+  "System.Introspection.CustomAttributeData",
+  "System.Introspection.CustomAttributeTypedArgument",
   "System.Introspection.FieldInfo",
   "System.Introspection.MemberInfo",
   "System.Introspection.MethodInfo",

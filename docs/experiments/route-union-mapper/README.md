@@ -90,4 +90,6 @@ adds a build step and rebuilds when declarations change. See the
 
 The author selected startup runtime reflection and cached mappings after this
 prototype. This generator remains experimental evidence and a future alternative;
-it is not the chosen immediate application workflow.
+it is not the chosen immediate application workflow. Member/parameter attribute
+reading is now available in the [introspection slice](../../attribute-introspection.md);
+checked dynamic union construction remains next.

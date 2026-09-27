@@ -112,7 +112,8 @@ There is no public Member property yet. .NET ParameterInfo exposes Member and Po
 but its base class does not define owner-based Object equality; this is a deliberate
 neoCLR snapshot contract. A future Member property needs direct, scoped resolution
 without recursively materializing member/parameter graphs or enumerating unrelated
-members. Return parameters, optional/default values and custom attributes remain absent.
+members. Return parameters and optional/default values remain absent. Development attribute
+inspection is described below.
 
 The native layout changed: rebuild the development runtime, library and SDK together.
 Mixing new parameter fragments with an older runtime is unsupported. The archived
@@ -170,3 +171,32 @@ Their IsVirtual flag is false: neoCLR represents explicit interface mappings sep
 from class virtual slots, unlike the CLI private/final/virtual emission flags. Ordinary
 public method queries exclude these private bodies. This development support does not
 add GetInterfaceMap or general reflection invocation of interface implementations.
+
+## Attribute data (development after Preview 10)
+
+`MemberInfo.GetCustomAttributesData()` and `ParameterInfo.GetCustomAttributesData()`
+return `Sequence<CustomAttributeData>` for directly declared, retained attributes.
+Types inherit this method through MemberInfo; fields, properties, constructors and
+methods use the same contract. No constructor or setter runs, and attributes are
+not inherited or merged. Multiple declarations retain metadata order; retrieval
+does not deduplicate them. Raven validates AttributeUsage on source declarations. An unannotated member/parameter returns an empty sequence.
+
+[CustomAttributeData](xref:System.Introspection.CustomAttributeData) exposes
+`AttributeType: TypeInfo`, `Constructor: ConstructorInfo` and
+`GetConstructorArguments() -> Sequence<CustomAttributeTypedArgument>`.
+[CustomAttributeTypedArgument](xref:System.Introspection.CustomAttributeTypedArgument)
+exposes `ArgumentType: TypeInfo` and `Value: Object?`, with an exact boxed String,
+Int32 or Boolean value (or null String). The argument sequence preserves constructor
+order and is copied on every call; descriptor objects expose no mutation.
+
+Retention currently covers application-defined attributes in imported modules and
+the existing union marker. Compiler-only annotations and external framework
+attributes without admitted runtime definitions are not exposed. Unsupported user
+attribute constants and named arguments fail import. Attribute constructor bodies
+still need normal bridge admission. Runtime null constants are supported; Raven's
+nullable-string attribute constructor emission remains a known source limitation.
+There is no `GetCustomAttributes` instantiation API or inheritance option yet.
+
+Cache validated descriptions during startup for repeated mappings. Dynamic union
+case construction is a separate next step; this API alone does not install a route
+mapper. Rebuild the runtime, library, bridge and reference together.

@@ -245,6 +245,8 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'ATTRIBUTE_ROUTE_DECLARATION': ('docs/experiments/attribute-introspection/Routes.rvn', 'public union CatalogRoutes {', '\n}', True),
+        'ATTRIBUTE_ROUTE_READING': ('docs/experiments/attribute-introspection/Routes.rvn', 'func ReadRouteDeclarations()', '\n}', True),
         'COMPARER_MAP_SAMPLE': (raven + 'library-comparers.rvn', '    let files = HashMap<string, int>(StringComparer.Ordinal)', '\n    files.Set', False),
         'JSON_DOM_SAMPLE': ('docs/experiments/json-dom/Sample.rvn', 'func AddAcknowledgement(', '\n}', True),
         'HTTP_CONTEXT_SAMPLE': ('docs/experiments/http-context/Sample.rvn', 'async func ReplyToNext(', '\n}', True),
@@ -349,6 +351,7 @@ def main():
     json_downloads = downloads / 'http-json'
     for directory, names in (
         ('json-object-mapping', ('Mapping.rvn', 'Main.rvn', 'Public.rvn', 'JsonObjectMapping.rvnproj', 'verify.py', 'HttpApplication.rvn', 'NestedHttpApplication.rvn', 'HttpClient.rvn', 'HttpServer.rvn', 'README.md', 'cost.md', 'cost-results.json')),
+        ('attribute-introspection', ('Main.rvn', 'Routes.rvn', 'Attributes.rvnproj', 'README.md', 'verify.py')),
         ('route-union-mapper', ('Attributes.rvn', 'Routes.rvn', 'Main.rvn', 'Server.rvn', 'Client.rvn', 'Generator.cs', 'Generator.csproj', 'verify.py', 'README.md')),
         ('http-routing', ('Direct.rvn', 'Routes.rvn', 'Main.rvn', 'Routing.rvnproj', 'Server.rvn', 'Client.rvn', 'Server.rvnproj', 'Client.rvnproj', 'verify.py', 'README.md')),
         ('http-json', ('Client.rvn', 'Server.rvn', 'Application.rvn', 'Client.rvnproj', 'Server.rvnproj', 'README.md', 'limitations.md', 'verify.py')),

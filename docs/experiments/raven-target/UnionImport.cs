@@ -865,10 +865,10 @@ static class UnionImport
                         }
                         else if (targetMethod.Module == library.MainModule)
                         {
-                            if (targetMethod.IsConstructor && targetMethod.DeclaringType.FullName is "System.Object" or "System.ValueType" && targetMethod.Parameters.Count == 0 && method.IsConstructor && method.DeclaringType.BaseType?.FullName == targetMethod.DeclaringType.FullName && instruction.OpCode.Code == Code.Call)
+                            if (targetMethod.IsConstructor && targetMethod.DeclaringType.FullName is "System.Object" or "System.ValueType" or "System.Attribute" && targetMethod.Parameters.Count == 0 && method.IsConstructor && method.DeclaringType.BaseType?.FullName == targetMethod.DeclaringType.FullName && instruction.OpCode.Code == Code.Call)
                             {
                                 Expect(ApplicationTypes.Receiver(method));
-                                code.AppendLine((libraryOwner is null || method.DeclaringType.Methods.Any(m => m.IsVirtual && !m.IsNewSlot)) && !method.DeclaringType.IsValueType && targetMethod.DeclaringType.FullName == "System.Object"
+                                code.AppendLine((libraryOwner is null || method.DeclaringType.Methods.Any(m => m.IsVirtual && !m.IsNewSlot)) && !method.DeclaringType.IsValueType && targetMethod.DeclaringType.FullName is "System.Object" or "System.Attribute"
                                     ? "call instance System.Object::.ctor()" : "pop");
                                 break;
                             }
@@ -991,6 +991,8 @@ static class UnionImport
             if (OpaqueLibrary.IsExplicitStringCount(method))
                 output.AppendLine(".override instance System.Collections.Collection<Char>::get_Count()");
             if (libraryOwner is null && !numericSpecialization.IsSpecialized(method)) output.AppendLine(SourceMetadata.Method(method, explicitReceiver: method.HasThis && !emitInstance));
+            if (libraryOwner is null)
+                foreach (var attribute in AttributeMetadata.Method(method, (type, _) => ProfileType(type))) output.AppendLine(attribute);
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             // Adapter temporaries are declared before code and assigned explicitly;
             // in particular, ref-protocol temporaries must never be default roots.

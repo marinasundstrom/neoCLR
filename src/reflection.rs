@@ -7,6 +7,7 @@ use crate::{
 
 #[derive(Clone, Copy)]
 pub(crate) enum Query {
+    CustomAttributes,
     DeclaringType,
     MetadataToken,
     Module,
@@ -29,6 +30,11 @@ pub(crate) enum Query {
 impl Query {
     pub(crate) fn binding(name: &str) -> Option<(Self, bool, Type)> {
         let (query, integer, result) = match name {
+            "neoCLR.Runtime.MemberCustomAttributes" => (
+                Self::CustomAttributes,
+                true,
+                "System.Introspection.CustomAttributeData[]",
+            ),
             "neoCLR.Runtime.TypeDeclaringType" => (
                 Self::DeclaringType,
                 false,
@@ -37,7 +43,11 @@ impl Query {
             "neoCLR.Runtime.TypeMetadataToken" => (Self::MetadataToken, false, "Int32"),
             "neoCLR.Runtime.TypeModule" => (Self::Module, false, "System.Introspection.ModuleInfo"),
             "neoCLR.Runtime.TypeFields" => (Self::Fields, true, "System.Introspection.FieldInfo[]"),
-            "neoCLR.Runtime.TypeConstructors" => (Self::Constructors, true, "System.Introspection.ConstructorInfo[]"),
+            "neoCLR.Runtime.TypeConstructors" => (
+                Self::Constructors,
+                true,
+                "System.Introspection.ConstructorInfo[]",
+            ),
             "neoCLR.Runtime.TypeMethods" => {
                 (Self::Methods, true, "System.Introspection.MethodInfo[]")
             }
@@ -75,7 +85,25 @@ impl Query {
         args: &[Value],
         limits: &Limits,
     ) -> Result<Value, Fault> {
-        let Some(Value::RuntimeTypeHandle(handle)) = args.first() else {
+        let snapshot;
+        let descriptor = if matches!(self, Self::CustomAttributes) {
+            let Some(Value::ObjectReference(reference)) = args.first() else {
+                return Err(Fault::new("attribute query requires TypeInfo"));
+            };
+            snapshot = reference.reference.read()?;
+            let Value::Object { ty, fields } = &snapshot else {
+                return Err(Fault::new("invalid TypeInfo snapshot"));
+            };
+            if ty.definition_name() != Some("System.Introspection.RuntimeTypeInfo")
+                || fields.len() != 1
+            {
+                return Err(Fault::new("invalid TypeInfo provider"));
+            }
+            fields.first()
+        } else {
+            args.first()
+        };
+        let Some(Value::RuntimeTypeHandle(handle)) = descriptor else {
             return Err(Fault::new("reflection requires type handle"));
         };
         let ty = from_identity(module, &handle.identity)?;
@@ -92,7 +120,12 @@ impl Query {
             .any(|a| matches!(a.identity, TypeIdentity::GenericParameter { .. }))
             && matches!(
                 self,
-                Self::Fields | Self::Methods | Self::Constructors | Self::Properties | Self::Interfaces | Self::BaseType
+                Self::Fields
+                    | Self::Methods
+                    | Self::Constructors
+                    | Self::Properties
+                    | Self::Interfaces
+                    | Self::BaseType
             )
         {
             return Err(Fault::new(
@@ -102,6 +135,40 @@ impl Query {
         let definition = module.type_definition(&ty);
         let arguments = type_arguments(&ty);
         match self {
+            Self::CustomAttributes => {
+                let mut attributes = Vec::new();
+                if let Some(d) = definition {
+                    let token = u32::try_from(argument)
+                        .map_err(|_| Fault::new("invalid attribute target"))?;
+                    if token != 0 {
+                        let own =
+                            crate::metadata_tokens::type_token(module, &handle.identity)? as u32;
+                        attributes.extend(d.custom_attributes.iter().filter(|a| {
+                            a.target_token == Some(token)
+                                || a.target_token.is_none() && token == own
+                        }));
+                        for f in &module.functions {
+                            if let (Some(origin), Some(owner)) = (&f.origin, &d.origin) {
+                                if origin.assembly == owner.assembly
+                                    && origin.module == owner.module
+                                {
+                                    attributes.extend(f.custom_attributes.iter().filter(|a| {
+                                        a.target_token == Some(token)
+                                            || a.target_token.is_none() && token == origin.token
+                                    }));
+                                }
+                            }
+                        }
+                    }
+                }
+                array(
+                    "System.Introspection.CustomAttributeData",
+                    attributes
+                        .into_iter()
+                        .map(|a| attribute_data(module, a, limits)),
+                    limits,
+                )
+            }
             Self::DeclaringType => {
                 let parent = match &handle.identity {
                     TypeIdentity::Definition { .. } => {
@@ -154,12 +221,13 @@ impl Query {
                 9 => definition.is_some_and(|d| d.is_closed_hierarchy),
                 10 => definition.is_some_and(|d| {
                     d.custom_attributes.iter().any(|attribute| {
-                        attribute
-                            .constructor
-                            .owner
-                            .as_ref()
-                            .and_then(Type::definition_name)
-                            == Some("System.Runtime.CompilerServices.UnionAttribute")
+                        attribute.target_token.is_none()
+                            && attribute
+                                .constructor
+                                .owner
+                                .as_ref()
+                                .and_then(Type::definition_name)
+                                == Some("System.Runtime.CompilerServices.UnionAttribute")
                     })
                 }),
                 6 => definition.is_some_and(|d| d.enum_info.is_some()),
@@ -325,7 +393,19 @@ impl Query {
                     definition
                         .into_iter()
                         .flat_map(|d| d.fields.iter().enumerate())
-                        .filter(|(index, _)| selected(argument, if crate::metadata_origin::field_access(definition.unwrap(), *index) == SourceAccess::Public { Visibility::Public } else { Visibility::Private }, false))
+                        .filter(|(index, _)| {
+                            selected(
+                                argument,
+                                if crate::metadata_origin::field_access(definition.unwrap(), *index)
+                                    == SourceAccess::Public
+                                {
+                                    Visibility::Public
+                                } else {
+                                    Visibility::Private
+                                },
+                                false,
+                            )
+                        })
                         .map(|(index, f)| {
                             Ok(member_record(
                                 module,
@@ -343,9 +423,24 @@ impl Query {
                                         module,
                                         &f.ty.substitute_type_parameters(arguments)?,
                                     )?,
-                                    Value::Boolean(crate::metadata_origin::field_access(definition.unwrap(), index) == SourceAccess::Public),
-                                    Value::Boolean(crate::metadata_origin::field_access(definition.unwrap(), index) == SourceAccess::Private),
-                                    Value::Boolean(crate::metadata_origin::field_access(definition.unwrap(), index) == SourceAccess::Assembly),
+                                    Value::Boolean(
+                                        crate::metadata_origin::field_access(
+                                            definition.unwrap(),
+                                            index,
+                                        ) == SourceAccess::Public,
+                                    ),
+                                    Value::Boolean(
+                                        crate::metadata_origin::field_access(
+                                            definition.unwrap(),
+                                            index,
+                                        ) == SourceAccess::Private,
+                                    ),
+                                    Value::Boolean(
+                                        crate::metadata_origin::field_access(
+                                            definition.unwrap(),
+                                            index,
+                                        ) == SourceAccess::Assembly,
+                                    ),
                                     Value::Boolean(false),
                                     index_value(index)?,
                                 ],
@@ -359,7 +454,11 @@ impl Query {
                 validate_flags(argument)?;
                 let owner = definition.map(|d| d.open_type());
                 array(
-                    if constructors { "System.Introspection.ConstructorInfo" } else { "System.Introspection.MethodInfo" },
+                    if constructors {
+                        "System.Introspection.ConstructorInfo"
+                    } else {
+                        "System.Introspection.MethodInfo"
+                    },
                     module
                         .functions
                         .iter()
@@ -507,6 +606,50 @@ fn record(name: &str, fields: Vec<Value>) -> Value {
         fields,
     }
 }
+fn attribute_data(
+    module: &Module,
+    attribute: &crate::metadata::CustomAttribute,
+    limits: &Limits,
+) -> Result<Value, Fault> {
+    use crate::metadata::AttributeArgument as A;
+    let owner = attribute
+        .constructor
+        .owner
+        .as_ref()
+        .ok_or_else(|| Fault::new("missing attribute type"))?;
+    let constructor = crate::vm::resolve(module, &attribute.constructor)?;
+    let arguments = array(
+        "System.Introspection.CustomAttributeTypedArgument",
+        attribute
+            .arguments
+            .iter()
+            .zip(&attribute.constructor.parameters)
+            .map(|(argument, ty)| {
+                let value = match argument {
+                    A::String(Some(value)) => {
+                        Value::Erased(Box::new(Value::String(value.clone().into())))
+                    }
+                    A::String(None) => Value::NullObjectReference(Type::from_name("System.Object")),
+                    A::Int32(value) => Value::Erased(Box::new(Value::Int32(*value))),
+                    A::Boolean(value) => Value::Erased(Box::new(Value::Boolean(*value))),
+                };
+                Ok(record(
+                    "System.Introspection.CustomAttributeTypedArgument",
+                    vec![type_value(module, ty)?, value],
+                ))
+            }),
+        limits,
+    )?;
+    Ok(record(
+        "System.Introspection.CustomAttributeData",
+        vec![
+            type_value(module, owner)?,
+            method(module, owner, &constructor, &[], limits)?,
+            arguments,
+        ],
+    ))
+}
+
 fn member_record(module: &Module, token: i32, name: &str, mut fields: Vec<Value>) -> Value {
     if type_contract(module) == "System.Introspection.TypeInfo" {
         fields.insert(2, Value::Int32(token));
@@ -687,7 +830,11 @@ fn method(
     Ok(member_record(
         module,
         crate::metadata_tokens::method(f)?,
-        if f.name.ends_with("..ctor") { "System.Introspection.ConstructorInfo" } else { "System.Introspection.MethodInfo" },
+        if f.name.ends_with("..ctor") {
+            "System.Introspection.ConstructorInfo"
+        } else {
+            "System.Introspection.MethodInfo"
+        },
         vec![
             Value::String(
                 // Imported bodies may use escaped names. Preserve source names
@@ -814,6 +961,24 @@ pub(crate) fn materialize(
                     view: Some(Type::from_name("System.Object")),
                 }))
             }
+            Value::Erased(value)
+                if matches!(
+                    &*value,
+                    Value::String(_) | Value::Int32(_) | Value::Boolean(_)
+                ) =>
+            {
+                if heap.len() >= limits.heap_objects {
+                    return Err(Fault::coded(
+                        crate::FaultCode::HeapLimitExceeded,
+                        "heap object limit exceeded",
+                    ));
+                }
+                let index = heap.allocate(*value)?;
+                Ok(Value::ObjectReference(crate::value::ObjectReference {
+                    reference: heap.address(index)?,
+                    view: Some(Type::from_name("System.Object")),
+                }))
+            }
             Value::Object { ty, fields } => {
                 // Native snapshots name the descriptive contract. The Raven profile
                 // realizes it with an internal provider; the legacy value profile
@@ -840,7 +1005,9 @@ pub(crate) fn materialize(
                             "System.Introspection.RuntimeParameterInfo"
                         }
                         "System.Introspection.FieldInfo" => "System.Introspection.RuntimeFieldInfo",
-                        "System.Introspection.ConstructorInfo" => "System.Introspection.RuntimeConstructorInfo",
+                        "System.Introspection.ConstructorInfo" => {
+                            "System.Introspection.RuntimeConstructorInfo"
+                        }
                         "System.Introspection.MethodInfo" => {
                             "System.Introspection.RuntimeMethodInfo"
                         }
@@ -859,10 +1026,36 @@ pub(crate) fn materialize(
                 } else {
                     ty
                 };
+                let layout = crate::inheritance::fields(module, &ty)?;
+                if fields.len() != layout.len() {
+                    return Err(Fault::new("reflection snapshot field count mismatch"));
+                }
                 let fields = fields
                     .into_iter()
-                    .map(|v| build(module, heap, limits, v, depth + 1))
-                    .collect::<Result<Vec<_>, _>>()?;
+                    .zip(&layout)
+                    .map(|(v, field)| {
+                        let v = build(module, heap, limits, v, depth + 1)?;
+                        if let (Value::Array { element, .. }, Type::ArrayRef(expected)) =
+                            (&v, &field.ty)
+                        {
+                            if element != expected.as_ref() {
+                                return Err(Fault::new("reflection array element mismatch"));
+                            }
+                            if heap.len() >= limits.heap_objects {
+                                return Err(Fault::coded(
+                                    crate::FaultCode::HeapLimitExceeded,
+                                    "heap object limit exceeded",
+                                ));
+                            }
+                            let index = heap.allocate(v)?;
+                            return Ok(Value::ObjectReference(crate::value::ObjectReference {
+                                reference: heap.address(index)?,
+                                view: Some(field.ty.clone()),
+                            }));
+                        }
+                        Ok(v)
+                    })
+                    .collect::<Result<Vec<_>, Fault>>()?;
                 let value = Value::Object {
                     ty: ty.clone(),
                     fields,

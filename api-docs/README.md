@@ -361,3 +361,8 @@ RoutePattern and RouteMatch (development 2026-09-27) add four public methods.
 All have XML contracts and automatic RavenDoc selection; the [routing guide](routes.md)
 covers direct matching, typed parameters, errors and optional application unions.
 There are no manual exclusions. Match their reference snapshot to the HTTP library.
+
+Attribute data (development 2026-09-27) adds MemberInfo/ParameterInfo retrieval,
+CustomAttributeData and CustomAttributeTypedArgument. All public signatures have
+XML coverage and automatic type selection; the introspection guide documents exact
+retention, constants, non-execution and source limitations. No manual exclusions.

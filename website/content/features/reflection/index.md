@@ -58,3 +58,7 @@ contexts remain future work.
 [Type extensions](xref:System.Runtime.Reflection.TypeReflectionExtensions) ·
 [Method extensions](xref:System.Runtime.Reflection.MethodReflectionExtensions) ·
 [Field extensions](xref:System.Runtime.Reflection.FieldReflectionExtensions)
+
+Development attribute inspection belongs to [Introspection](../introspection/#development-case-inspecting-route-declarations-at-startup):
+MemberInfo and ParameterInfo expose constructor data without executing attribute
+constructors. Read it once during startup and cache the validated mapping.

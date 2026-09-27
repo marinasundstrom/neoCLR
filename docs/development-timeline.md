@@ -8571,3 +8571,25 @@ configuration/content, not target-specific code added to Raven main.
   cache the mapped information. Source generation should be considered in future.
   **Assistant response:** adopt startup reflection as the immediate next direction;
   retain the generated prototype as evidence, not as the intended permanent workflow.
+
+## 2026-09-27 — Member and parameter attribute data
+
+- **Author:** asked to add attribute retrieval to the introspection model for members
+  and parameters, similar to .NET, then asked whether multiple attribute declarations
+  are handled. This refines the startup-reflection direction for route mapping.
+- **Assistant choice/action:** add GetCustomAttributesData on MemberInfo and
+  ParameterInfo, immutable type/constructor/typed-argument descriptions and source
+  token retention. Read data without executing attribute constructors; preserve
+  multiple declarations and repeated allowed attributes in metadata order. The
+  initial application attribute constants are String/Int32/Boolean, with unsupported
+  constants and named arguments rejected explicitly rather than silently omitted.
+- **Validation:** the public consumer checks every available member category,
+  parameters, union cases, separate/grouped/repeated attributes, repeated reads and
+  snapshot copies. Attribute constructors deliberately Fault. Native tests cover
+  serialization, malformed data and token ownership. A real catalog-route declaration
+  is inspected once at startup for the website example.
+- **Remaining:** cached dynamic union construction is the next mapper slice. Broad
+  framework/CLI attribute coverage and named/type/enum/array arguments are not claimed.
+  A nullable-string attribute constructor triggered Raven's CustomAttributeBuilder
+  emission exception and is recorded for independent investigation. Source generation
+  remains a future option; enum/Uuid/Option JSON requests remain pending.

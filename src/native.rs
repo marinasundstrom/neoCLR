@@ -110,7 +110,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         return Ok(Binding::AssemblyInfo(query));
     }
     if let Some((query, integer, returns)) = crate::reflection::Query::binding(&function.name) {
-        let expected = if integer {
+        let expected = if function.name == "neoCLR.Runtime.MemberCustomAttributes" {
+            vec![Type::from_name("System.Introspection.TypeInfo"), Type::Int32]
+        } else if integer {
             vec![Type::RuntimeTypeHandle, Type::Int32]
         } else {
             vec![Type::RuntimeTypeHandle]

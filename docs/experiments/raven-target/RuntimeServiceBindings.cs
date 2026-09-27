@@ -160,6 +160,7 @@ static class RuntimeServiceBindings
             ("TypeDeclaringType", ["System.RuntimeTypeHandle"], "System.Option<System.Introspection.TypeInfo>"),
             ("TypeModule", ["System.RuntimeTypeHandle"], "System.Introspection.ModuleInfo"),
             ("TypeInfo", ["System.RuntimeTypeHandle"], "System.Introspection.TypeInfo"),
+            ("MemberCustomAttributes", ["System.Introspection.TypeInfo", "Int32"], "arrayref<System.Introspection.CustomAttributeData>"),
             ("TypeFields", ["System.RuntimeTypeHandle", "Int32"], "arrayref<System.Introspection.FieldInfo>"),
             ("TypeMethods", ["System.RuntimeTypeHandle", "Int32"], "arrayref<System.Introspection.MethodInfo>"),
             ("TypeConstructors", ["System.RuntimeTypeHandle", "Int32"], "arrayref<System.Introspection.ConstructorInfo>"),

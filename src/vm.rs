@@ -554,7 +554,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 || (function.is_abstract && !nominal_interface_contract && !class_owner)
                 || function.is_internal_call()
                 || function.pinvoke.is_some()
-                || (!value_receiver && !class_owner && !function.interface_implementations.is_empty()))
+                || (!value_receiver
+                    && !class_owner
+                    && !function.interface_implementations.is_empty()))
         {
             return Err(Fault::new(
                 "no-result methods require IL bodies with Void metadata and static, class or by-reference value receivers",
@@ -1072,13 +1074,35 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             }
         }
     }
-    for attributes in module
+    for (attributes, origin) in module
         .types
         .iter()
-        .map(|d| &d.custom_attributes)
-        .chain(module.functions.iter().map(|f| &f.custom_attributes))
+        .map(|d| (&d.custom_attributes, &d.origin))
+        .chain(
+            module
+                .functions
+                .iter()
+                .map(|f| (&f.custom_attributes, &f.origin)),
+        )
     {
         for attribute in attributes {
+            if let Some(token) = attribute.target_token {
+                let origin = origin
+                    .as_ref()
+                    .ok_or_else(|| Fault::new("attribute target requires source origin"))?;
+                if token == 0
+                    || !origin
+                        .field_tokens
+                        .iter()
+                        .chain(&origin.property_tokens)
+                        .chain(&origin.parameter_tokens)
+                        .any(|t| *t == token)
+                {
+                    return Err(Fault::new(
+                        "attribute target is not a member of its source definition",
+                    ));
+                }
+            }
             validate_attribute(module, attribute)?;
         }
     }
@@ -2758,7 +2782,6 @@ fn interpret_instructions(
                             return Ok(None);
                         }
 
-
                         if matches!(binding, crate::native::Binding::DrainEntryTasks) {
                             if entry_drain_depth.is_some() {
                                 return Err(Fault::new("Entry task dispatch cannot be nested"));
@@ -2807,10 +2830,16 @@ fn interpret_instructions(
                                     crate::reflection_properties::adapter(
                                         module, &callee, &args, setter,
                                     )?
-                                } else if let crate::native::Binding::ReflectionArray(kind) = binding {
+                                } else if let crate::native::Binding::ReflectionArray(kind) =
+                                    binding
+                                {
                                     crate::reflection_arrays::adapter(module, &callee, &args, kind)?
-                                } else if let crate::native::Binding::ReflectionMember(kind) = binding {
-                                    crate::reflection_members::adapter(module, &callee, &args, kind)?
+                                } else if let crate::native::Binding::ReflectionMember(kind) =
+                                    binding
+                                {
+                                    crate::reflection_members::adapter(
+                                        module, &callee, &args, kind,
+                                    )?
                                 } else {
                                     crate::reflection_execution::adapter(module, &callee, &args[0])?
                                 };
@@ -4032,10 +4061,24 @@ fn validate_attribute(
         Type::Constructed { definition, .. } => definition,
         _ => return Err(Fault::new("attribute owner must be a record type")),
     };
-    if !target.instance || !target.parameters.is_empty() || target.name != format!("{name}..ctor") {
+    if !target.instance
+        || target.parameters.len() != attribute.arguments.len()
+        || target.name != format!("{name}..ctor")
+    {
         return Err(Fault::new(
-            "marker attribute requires instance Type::.ctor()",
+            "attribute requires an instance constructor and matching arguments",
         ));
+    }
+    for (ty, argument) in target.parameters.iter().zip(&attribute.arguments) {
+        use crate::metadata::AttributeArgument as A;
+        if !matches!(
+            (ty, argument),
+            (Type::String, A::String(_))
+                | (Type::Int32, A::Int32(_))
+                | (Type::Boolean, A::Boolean(_))
+        ) {
+            return Err(Fault::new("unsupported or mismatched attribute argument"));
+        }
     }
     let constructor = resolve(module, target)?;
     if constructor.returns != Type::Void {

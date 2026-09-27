@@ -1,0 +1,20 @@
+{
+  "date": "2026-09-27",
+  "platform": "macOS arm64",
+  "raven_revision": "2f62361ef",
+  "public_consumer_command": "python3 docs/experiments/attribute-introspection/verify.py --toolchain-root target/experiments/nested-json/bundle --runner target/release/examples/measure_async",
+  "native_command": "cargo test --quiet --test attributes --test reflection --test reflection_members --test reflection_construction",
+  "native_tests": 29,
+  "public_consumer_output": "CatalogRoutes/ListItems => /items\nCatalogRoutes/GetItem => /items/{id}\nAttribute introspection checks passed\nassembly_ms=4470 load_ms=2798 verify_ms=1323 run_ms=1446\nallocated=563 live=0 peak=234 collections=7 reclaimed=563\n\nUnsupported Int64 attribute argument rejected at import\nNamed attribute argument rejected at import\n",
+  "library_snapshot": "Descriptors and ParameterInfo regenerated and compared with --check; unaffected slice outputs reused, shared input hashes updated",
+  "api_snapshot": "checked matching freshly generated reference; two public types added",
+  "website_tests": 18,
+  "website_api_pages": 1271,
+  "route_regression_output": "Generated AppRoutesParser from 2 attributed cases.\nScalar union admission: 7 checks passed.\nAttributed route mapper checks passed\nassembly_ms=5900 load_ms=4268 verify_ms=1124 run_ms=872\nallocated=355 live=0 peak=64 collections=7 reclaimed=355\n\nHTTP server: assembly_ms=5092 load_ms=3091 verify_ms=1353 run_ms=13687\nallocated=2545 live=0 peak=216 collections=33 reclaimed=2545\nHTTP client: assembly_ms=5035 load_ms=3240 verify_ms=1326 run_ms=5628\nallocated=521 live=0 peak=142 collections=10 reclaimed=521\nHTTP server: assembly_ms=5294 load_ms=3271 verify_ms=1336 run_ms=14439\nallocated=562 live=0 peak=180 collections=9 reclaimed=562\nHTTP checks: 9 independent requests and a 2-request neoCLR client/server pair passed.\nMixed route checks passed\nassembly_ms=4445 load_ms=2654 verify_ms=1151 run_ms=408\nallocated=178 live=0 peak=64 collections=4 reclaimed=178\n\nRejected schema: missing attribute\nRejected schema: missing argument\nRejected schema: unsupported type\nRejected schema: ambiguous patterns\nRejected schema: encoded overlap\nRejected schema: invalid UTF8 literal\nRejected schema: bad pattern\n",
+  "sources": {
+    "Routes.rvn": "8ed042c229c51c363e6e0c9be5964e2f244719d1fd449a54ce98be4e19e62285",
+    "Attributes.rvnproj": "fdbcf0930d1b9486da48114844a7058f21192911bedaea4e049308b0739f9258",
+    "Main.rvn": "9f999481fee42a26b4c7072add81f686e62b6ef03f970421cda49797e7e850fd",
+    "verify.py": "081505d2d7e40ed85c61939f1c06327c453fff6e5a26942099d005cb6834d6d8"
+  }
+}

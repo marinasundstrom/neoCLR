@@ -34,6 +34,42 @@ ldarg arg0
 callvirt instance System.Introspection.TypeInfo::get_FullName()
 ret
 .end
+.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeServiceMemberCustomAttributes(System.Introspection.TypeInfo arg0,Int32 arg1) -> arrayref<System.Introspection.CustomAttributeData>
+.local System.Introspection.CustomAttributeData[] source
+.local arrayref<System.Introspection.CustomAttributeData> destination
+.local Int32 index
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.MemberCustomAttributes(System.Introspection.TypeInfo,Int32)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr System.Introspection.CustomAttributeData
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem System.Introspection.CustomAttributeData
+stelem System.Introspection.CustomAttributeData
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
 .function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeNewHashCode() -> System.HashCode
 newobj instance System.HashCode::.ctor()
 ret
@@ -169,89 +205,105 @@ stfld System.Introspection.RuntimeParameterInfo::StoredMemberIndex
 M00000001_IL_0067:
 ret
 .end
-.method instance get_MetadataToken() -> Int32
+.method instance GetCustomAttributesData() -> System.Collections.Sequence<System.Introspection.CustomAttributeData>
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
 ldarg 0
 M00000002_IL_0003:
-ldfld System.Introspection.RuntimeParameterInfo::StoredMetadataToken
+ldfld System.Introspection.RuntimeParameterInfo::StoredDeclaringType
 M00000002_IL_0008:
+ldarg 0
+M00000002_IL_0009:
+callvirt instance System.Introspection.RuntimeParameterInfo::get_MetadataToken()
+M00000002_IL_000e:
+call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeServiceMemberCustomAttributes(System.Introspection.TypeInfo,Int32)
+M00000002_IL_0013:
 ret
 .end
-.method instance get_Module() -> System.Introspection.ModuleInfo
+.method instance get_MetadataToken() -> Int32
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
 ldarg 0
 M00000003_IL_0003:
-ldfld System.Introspection.RuntimeParameterInfo::StoredModule
+ldfld System.Introspection.RuntimeParameterInfo::StoredMetadataToken
 M00000003_IL_0008:
 ret
 .end
-.method instance get_Name() -> String
+.method instance get_Module() -> System.Introspection.ModuleInfo
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
 ldarg 0
 M00000004_IL_0003:
-ldfld System.Introspection.RuntimeParameterInfo::StoredName
+ldfld System.Introspection.RuntimeParameterInfo::StoredModule
 M00000004_IL_0008:
 ret
 .end
-.method instance get_Position() -> Int32
+.method instance get_Name() -> String
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
 ldarg 0
 M00000005_IL_0003:
-ldfld System.Introspection.RuntimeParameterInfo::StoredPosition
+ldfld System.Introspection.RuntimeParameterInfo::StoredName
 M00000005_IL_0008:
 ret
 .end
-.method instance get_ParameterType() -> System.Introspection.TypeInfo
+.method instance get_Position() -> Int32
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
 ldarg 0
 M00000006_IL_0003:
-ldfld System.Introspection.RuntimeParameterInfo::StoredParameterType
+ldfld System.Introspection.RuntimeParameterInfo::StoredPosition
 M00000006_IL_0008:
 ret
 .end
-.method instance get_IsOut() -> Boolean
+.method instance get_ParameterType() -> System.Introspection.TypeInfo
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
 ldarg 0
 M00000007_IL_0003:
-ldfld System.Introspection.RuntimeParameterInfo::StoredIsOut
-call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanToInt32(Boolean)
+ldfld System.Introspection.RuntimeParameterInfo::StoredParameterType
 M00000007_IL_0008:
-call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance get_IsOutWhenTrue() -> Boolean
+.method instance get_IsOut() -> Boolean
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:
 ldarg 0
 M00000008_IL_0003:
-ldfld System.Introspection.RuntimeParameterInfo::StoredIsOutWhenTrue
+ldfld System.Introspection.RuntimeParameterInfo::StoredIsOut
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanToInt32(Boolean)
 M00000008_IL_0008:
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance get_IsReadOnly() -> Boolean
+.method instance get_IsOutWhenTrue() -> Boolean
 M00000009_IL_0000:
 M00000009_IL_0001:
 M00000009_IL_0002:
 ldarg 0
 M00000009_IL_0003:
-ldfld System.Introspection.RuntimeParameterInfo::StoredIsReadOnly
+ldfld System.Introspection.RuntimeParameterInfo::StoredIsOutWhenTrue
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanToInt32(Boolean)
 M00000009_IL_0008:
+call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_IsReadOnly() -> Boolean
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+ldfld System.Introspection.RuntimeParameterInfo::StoredIsReadOnly
+call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0008:
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanFromInt32(Int32)
 ret
 .end
@@ -259,97 +311,97 @@ ret
 .local System.Introspection.RuntimeParameterInfo local0
 ldloca local0
 initobj System.Introspection.RuntimeParameterInfo
-M0000000a_IL_0000:
-M0000000a_IL_0001:
-M0000000a_IL_0002:
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
 ldarg 1
-M0000000a_IL_0003:
+M0000000b_IL_0003:
 isinst System.Introspection.RuntimeParameterInfo
-M0000000a_IL_0008:
+M0000000b_IL_0008:
 dup
-M0000000a_IL_0009:
+M0000000b_IL_0009:
 stloc local0
-M0000000a_IL_000a:
-M0000000a_IL_000b:
+M0000000b_IL_000a:
+M0000000b_IL_000b:
 ref.isnull
 ldc.bool false
 ceq
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_000d:
-brtrue M0000000a_IL_0017
-M0000000a_IL_0012:
-br M0000000a_IL_0075
-M0000000a_IL_0017:
-M0000000a_IL_0018:
+M0000000b_IL_000d:
+brtrue M0000000b_IL_0017
+M0000000b_IL_0012:
+br M0000000b_IL_0075
+M0000000b_IL_0017:
+M0000000b_IL_0018:
 ldarg 0
-M0000000a_IL_0019:
+M0000000b_IL_0019:
 ldfld System.Introspection.RuntimeParameterInfo::StoredDeclaringType
-M0000000a_IL_001e:
+M0000000b_IL_001e:
 ldloc local0
-M0000000a_IL_001f:
+M0000000b_IL_001f:
 ldfld System.Introspection.RuntimeParameterInfo::StoredDeclaringType
-M0000000a_IL_0024:
+M0000000b_IL_0024:
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeReflectionE17E607E4769A07C(System.Introspection.TypeInfo,System.Introspection.TypeInfo)
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_0029:
-brfalse M0000000a_IL_0073
-M0000000a_IL_002e:
+M0000000b_IL_0029:
+brfalse M0000000b_IL_0073
+M0000000b_IL_002e:
 ldarg 0
-M0000000a_IL_002f:
+M0000000b_IL_002f:
 ldfld System.Introspection.RuntimeParameterInfo::StoredMemberKind
-M0000000a_IL_0034:
+M0000000b_IL_0034:
 ldloc local0
-M0000000a_IL_0035:
+M0000000b_IL_0035:
 ldfld System.Introspection.RuntimeParameterInfo::StoredMemberKind
-M0000000a_IL_003a:
+M0000000b_IL_003a:
 ceq
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_003c:
-brfalse M0000000a_IL_006d
-M0000000a_IL_0041:
+M0000000b_IL_003c:
+brfalse M0000000b_IL_006d
+M0000000b_IL_0041:
 ldarg 0
-M0000000a_IL_0042:
+M0000000b_IL_0042:
 ldfld System.Introspection.RuntimeParameterInfo::StoredMemberIndex
-M0000000a_IL_0047:
+M0000000b_IL_0047:
 ldloc local0
-M0000000a_IL_0048:
+M0000000b_IL_0048:
 ldfld System.Introspection.RuntimeParameterInfo::StoredMemberIndex
-M0000000a_IL_004d:
+M0000000b_IL_004d:
 ceq
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_004f:
-brfalse M0000000a_IL_0067
-M0000000a_IL_0054:
+M0000000b_IL_004f:
+brfalse M0000000b_IL_0067
+M0000000b_IL_0054:
 ldarg 0
-M0000000a_IL_0055:
+M0000000b_IL_0055:
 callvirt instance System.Introspection.RuntimeParameterInfo::get_Position()
-M0000000a_IL_005a:
+M0000000b_IL_005a:
 ldloc local0
-M0000000a_IL_005b:
+M0000000b_IL_005b:
 callvirt instance System.Introspection.RuntimeParameterInfo::get_Position()
-M0000000a_IL_0060:
+M0000000b_IL_0060:
 ceq
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanToInt32(Boolean)
-M0000000a_IL_0062:
-br M0000000a_IL_0068
-M0000000a_IL_0067:
+M0000000b_IL_0062:
+br M0000000b_IL_0068
+M0000000b_IL_0067:
 ldc.i4 0
-M0000000a_IL_0068:
-br M0000000a_IL_006e
-M0000000a_IL_006d:
+M0000000b_IL_0068:
+br M0000000b_IL_006e
+M0000000b_IL_006d:
 ldc.i4 0
-M0000000a_IL_006e:
-br M0000000a_IL_0074
-M0000000a_IL_0073:
+M0000000b_IL_006e:
+br M0000000b_IL_0074
+M0000000b_IL_0073:
 ldc.i4 0
-M0000000a_IL_0074:
+M0000000b_IL_0074:
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanFromInt32(Int32)
 ret
-M0000000a_IL_0075:
-M0000000a_IL_0076:
-M0000000a_IL_0077:
+M0000000b_IL_0075:
+M0000000b_IL_0076:
+M0000000b_IL_0077:
 ldc.i4 0
-M0000000a_IL_0078:
+M0000000b_IL_0078:
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanFromInt32(Int32)
 ret
 .end
@@ -357,69 +409,69 @@ ret
 .local System.HashCode local0
 ldloca local0
 initobj System.HashCode
-M0000000b_IL_0000:
-M0000000b_IL_0001:
+M0000000c_IL_0000:
+M0000000c_IL_0001:
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeNewHashCode()
-M0000000b_IL_0006:
+M0000000c_IL_0006:
 stloc local0
-M0000000b_IL_0007:
-M0000000b_IL_0008:
+M0000000c_IL_0007:
+M0000000c_IL_0008:
 ldloca local0
-M0000000b_IL_000a:
+M0000000c_IL_000a:
 ldarg 0
-M0000000b_IL_000b:
+M0000000c_IL_000b:
 ldfld System.Introspection.RuntimeParameterInfo::StoredDeclaringType
-M0000000b_IL_0010:
+M0000000c_IL_0010:
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeReflectionF572EF30E2C7291B(System.Introspection.TypeInfo)
-M0000000b_IL_0015:
+M0000000c_IL_0015:
 call instance System.HashCode::Add(String)
 pop
-M0000000b_IL_001a:
-M0000000b_IL_001b:
+M0000000c_IL_001a:
+M0000000c_IL_001b:
 ldloca local0
-M0000000b_IL_001d:
+M0000000c_IL_001d:
 ldarg 0
-M0000000b_IL_001e:
+M0000000c_IL_001e:
 ldfld System.Introspection.RuntimeParameterInfo::StoredMemberKind
-M0000000b_IL_0023:
+M0000000c_IL_0023:
 call instance System.HashCode::Add(Int32)
 pop
-M0000000b_IL_0028:
-M0000000b_IL_0029:
+M0000000c_IL_0028:
+M0000000c_IL_0029:
 ldloca local0
-M0000000b_IL_002b:
+M0000000c_IL_002b:
 ldarg 0
-M0000000b_IL_002c:
+M0000000c_IL_002c:
 ldfld System.Introspection.RuntimeParameterInfo::StoredMemberIndex
-M0000000b_IL_0031:
+M0000000c_IL_0031:
 call instance System.HashCode::Add(Int32)
 pop
-M0000000b_IL_0036:
-M0000000b_IL_0037:
+M0000000c_IL_0036:
+M0000000c_IL_0037:
 ldloca local0
-M0000000b_IL_0039:
+M0000000c_IL_0039:
 ldarg 0
-M0000000b_IL_003a:
+M0000000c_IL_003a:
 callvirt instance System.Introspection.RuntimeParameterInfo::get_Position()
-M0000000b_IL_003f:
+M0000000c_IL_003f:
 call instance System.HashCode::Add(Int32)
 pop
-M0000000b_IL_0044:
-M0000000b_IL_0045:
+M0000000c_IL_0044:
+M0000000c_IL_0045:
 ldloca local0
-M0000000b_IL_0047:
+M0000000c_IL_0047:
 call instance System.HashCode::ToHashCode()
-M0000000b_IL_004c:
+M0000000c_IL_004c:
 ret
 .end
 .method instance override ToString() -> String
-M0000000c_IL_0000:
-M0000000c_IL_0001:
-M0000000c_IL_0002:
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
 ldarg 0
-M0000000c_IL_0003:
+M0000000d_IL_0003:
 callvirt instance System.Introspection.RuntimeParameterInfo::get_Name()
-M0000000c_IL_0008:
+M0000000d_IL_0008:
 ret
 .end
 .end

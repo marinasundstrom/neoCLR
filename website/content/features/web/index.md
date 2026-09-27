@@ -452,8 +452,12 @@ nodes from buffered content on either peer. They preserve Result errors and leav
 status handling and exchange completion to the application. Reads are synchronous
 and do not consume the content; creation sets the JSON UTF-8 media type.
 
-A further development experiment maps `[RoutePattern]` attributes on union cases
+An earlier development experiment maps `[RoutePattern]` attributes on union cases
 into a generated reusable parser, with String/Int32 payloads and Result-based
 no-match/errors. See the [attributed item API case](/cases/http-server/#development-experiment-attributed-item-routes)
 for the server and connecting client. It requires an explicit generation step;
 automatic SDK integration remains future work.
+
+The immediate direction is runtime attribute inspection during startup, with a
+cached mapping for requests. [Attribute data is now available](/features/introspection/#development-case-inspecting-route-declarations-at-startup);
+checked dynamic union construction is the next mapper step.
