@@ -1586,6 +1586,7 @@ fn interpret_instructions(
     // An invocation-local guest root; isolated workers have their own registry.
     let mut default_task_queue: Option<Value> = None;
     let mut invocation_result: Option<Value> = None;
+    let mut entry_drain_depth: Option<usize> = None;
     let mut drain_required = true;
     for _ in 0..limits.instructions {
         if let (Some(debugger), Some(frame)) = (&options.debugger, frames.last()) {
@@ -2726,6 +2727,14 @@ fn interpret_instructions(
                         frame.stack.push(value.on_stack());
                     } else if callee.is_internal_call() {
                         let binding = crate::native::bind(&callee)?;
+                        if matches!(binding, crate::native::Binding::DrainEntryTasks) {
+                            if entry_drain_depth.is_some() {
+                                return Err(Fault::new("Entry task dispatch cannot be nested"));
+                            }
+                            entry_drain_depth = Some(frames.len());
+                            drain_required = true;
+                            return Ok(Some(Value::Void));
+                        }
                         if matches!(
                             binding,
                             crate::native::Binding::Reflection(_)
@@ -3533,12 +3542,22 @@ fn interpret_instructions(
             }
             Ok(None)
         })();
+        // Keep the suspended startup frame on the ordinary traced frame stack.
+        // Queue/host completion frames run above it on the same instruction budget.
+        let step = if matches!(step, Ok(None))
+            && matches!(op, Op::Return)
+            && entry_drain_depth == Some(frames.len())
+        {
+            Ok(Some(Value::Void))
+        } else {
+            step
+        };
         match step {
             Ok(Some(value)) => {
                 // Run ready default-queue work before waiting for registered host
                 // results. A notification is transferred directly into a traced
                 // Post frame, then drained on this invocation and instruction budget.
-                if invocation_result.is_none() {
+                if entry_drain_depth.is_none() && invocation_result.is_none() {
                     invocation_result = Some(value.clone());
                 }
                 if drain_required {
@@ -3563,12 +3582,24 @@ fn interpret_instructions(
                         {
                             return Err(Fault::new("Invalid default TaskQueue dispatch contract"));
                         }
+                        if frames.len() >= limits.frames {
+                            return Err(Fault::coded(
+                                crate::FaultCode::StackOverflow,
+                                "frame limit exceeded",
+                            ));
+                        }
                         frames.push(Frame::new(drain, vec![queue.clone()])?);
                         continue;
                     }
                 }
                 if scheduler.wait(heap, default_task_queue.as_ref(), options)? {
                     scheduler.install_ready(|queue, callback| {
+                        if frames.len() >= limits.frames {
+                            return Err(Fault::coded(
+                                crate::FaultCode::StackOverflow,
+                                "frame limit exceeded",
+                            ));
+                        }
                         frames.push(completion_notification_frame(
                             module,
                             queue.clone(),
@@ -3576,6 +3607,15 @@ fn interpret_instructions(
                         )?);
                         Ok(())
                     })?;
+                    drain_required = true;
+                    continue;
+                }
+                if entry_drain_depth.take().is_some() {
+                    frames
+                        .last_mut()
+                        .ok_or_else(|| Fault::new("missing startup frame"))?
+                        .stack
+                        .push(Value::Void);
                     drain_required = true;
                     continue;
                 }

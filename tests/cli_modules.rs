@@ -38,9 +38,12 @@ fn cli(args: &[&str]) -> Output {
         .unwrap()
 }
 fn success(args: &[&str]) -> String {
+    exits(args, 0)
+}
+fn exits(args: &[&str], status: i32) -> String {
     let output = cli(args);
     assert!(
-        output.status.success(),
+        output.status.code() == Some(status),
         "{args:?}: {}",
         String::from_utf8_lossy(&output.stderr)
     );
@@ -138,11 +141,14 @@ fn cli_uses_selected_system_for_initial_resolution() {
     let app = fixture.write("app.neoil", ".module App\n.references (System#custom-1)\n.entry Main\n.function Main() -> Int32\ncall CustomAnswer()\nret\n.end");
     assert!(!cli(&["run", &app]).status.success());
     for command in ["run", "check", "verify"] {
-        success(&[command, &app, "--system", &system]);
+        exits(
+            &[command, &app, "--system", &system],
+            if command == "run" { 42 } else { 0 },
+        );
     }
     let compiled_system = fixture.path("System.neo.json");
     success(&["assemble", &system, &compiled_system]);
-    assert_eq!(success(&["run", &app, &compiled_system]), "");
+    assert_eq!(exits(&["run", &app, &compiled_system], 42), "");
     let compiled_app = fixture.path("app.neo.json");
     success(&[
         "assemble",
@@ -152,7 +158,7 @@ fn cli_uses_selected_system_for_initial_resolution() {
         &compiled_system,
     ]);
     assert_eq!(
-        success(&["run", &compiled_app, "--system", &compiled_system]),
+        exits(&["run", &compiled_app, "--system", &compiled_system], 42),
         ""
     );
 }

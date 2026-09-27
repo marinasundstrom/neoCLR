@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Support Raven Main returning integer, Result and target Task combinations through
+  target-owned startup adaptation, including optional string-array arguments and
+  pending default-queue/host completion. Result errors print to stderr and return
+  one; unit success returns zero. `neoclr run` now uses integer entry values as
+  process status (including Neo/neoIL), so scripts must account for nonzero results.
+  Preserve ordinary nonblocking Task.GetResult and .NET Raven entry behavior.
+  Update the worker/async samples and HTTP client experiment to await directly in
+  Main, document supported signatures on the website, and record independently
+  reproduced async compiler observations for separate fixes.
+
 - Import explicit interface methods on non-generic Raven application classes and
   application interfaces. Preserve private MethodImpl mappings, nominal object identity,
   void bodies and separate public methods; document qualified private reflection and

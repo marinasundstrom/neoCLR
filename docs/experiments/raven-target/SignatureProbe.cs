@@ -3,7 +3,7 @@ using System.Text.Json;
 
 static class SignatureProbe
 {
-    public static void Write(string output)
+    public static void Write(string output, bool entryOnly = false)
     {
         output = Path.GetFullPath(output);
         if (Directory.Exists(output)) throw new IOException("Output directory must not exist.");
@@ -51,10 +51,37 @@ static class SignatureProbe
         Reject("Instance entry", () => EntryPointBindings.HasArguments(entry, true));
         entry.IsStatic = true;
         entry.ReturnType = module.TypeSystem.Int32;
-        Reject("Value-returning entry", () => EntryPointBindings.HasArguments(entry, true));
+        Check("Integer entry", EntryPointBindings.HasArguments(entry, true));
+        entry.ReturnType = module.TypeSystem.Boolean;
+        Reject("Boolean entry", () => EntryPointBindings.HasArguments(entry, true));
+        GenericInstanceType EntryGeneric(string name, params TypeReference[] arguments) {
+            var type = new GenericInstanceType(module.GetType(name));
+            foreach (var argument in arguments) type.GenericArguments.Add(argument);
+            return type;
+        }
+        foreach (var entryResult in new TypeReference[] {
+            EntryGeneric("System.Result`2", module.TypeSystem.Int32, module.TypeSystem.String),
+            EntryGeneric("System.Tasks.Task`1", module.TypeSystem.Int32),
+            EntryGeneric("System.Tasks.Task`1", EntryGeneric("System.Result`2", module.TypeSystem.Int32, module.TypeSystem.String)) }) {
+            entry.ReturnType = entryResult;
+            Check("Entry return " + entryResult.FullName, EntryPointBindings.HasArguments(entry, true));
+            Reject("Entry return outside collection profile " + entryResult.FullName, () => EntryPointBindings.HasArguments(entry, false));
+        }
+        foreach (var invalidResult in new TypeReference[] {
+            EntryGeneric("System.Result`2", module.TypeSystem.String, module.TypeSystem.String),
+            EntryGeneric("System.Tasks.Task`1", module.TypeSystem.String),
+            EntryGeneric("System.Tasks.Task`1", EntryGeneric("System.Tasks.Task`1", module.TypeSystem.Int32)),
+            new ByReferenceType(module.TypeSystem.Int32) }) {
+            entry.ReturnType = invalidResult;
+            Reject("Invalid entry return " + invalidResult.FullName, () => EntryPointBindings.HasArguments(entry, true));
+        }
         entry.ReturnType = module.TypeSystem.Void;
         entry.GenericParameters.Add(new GenericParameter("T", entry));
         Reject("Generic entry", () => EntryPointBindings.HasArguments(entry, true));
+        if (entryOnly) {
+            File.WriteAllText(Path.Combine(output, "entry-signatures.json"), JsonSerializer.Serialize(checks, new JsonSerializerOptions { WriteIndented = true }));
+            return;
+        }
         var cancellationToken = module.GetType(CancellationBindings.Token);
         Check("Cancellation token source-reference layout", CancellationBindings.IsTokenLayout(cancellationToken));
         cancellationToken.Fields[0].FieldType = module.TypeSystem.Int32;

@@ -55,7 +55,7 @@ fn emit_il(args: &[String]) -> Result<Vec<String>, String> {
     }
 }
 
-fn execute(args: &[String]) -> Result<Vec<String>, String> {
+fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String> {
     let command = args.first().map(String::as_str).ok_or(USAGE)?;
     if command == "emit-il" {
         return emit_il(args);
@@ -228,6 +228,9 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
                 writeln!(io::stderr().lock(), "=> {:?}", execution.value)
                     .map_err(|error| format!("Result diagnostics output failed: {error}"))?;
             }
+            if let neoclr::Value::Int32(value) = execution.value {
+                *exit_status = value;
+            }
             Ok(execution.output)
         }
     }
@@ -235,7 +238,8 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
 
 fn main() -> ExitCode {
     let args: Vec<_> = env::args().skip(1).collect();
-    match execute(&args) {
+    let mut exit_status = 0;
+    match execute(&args, &mut exit_status) {
         Ok(lines) => {
             let mut stdout = io::stdout().lock();
             for line in lines {
@@ -244,7 +248,8 @@ fn main() -> ExitCode {
                     return ExitCode::from(2);
                 }
             }
-            ExitCode::SUCCESS
+            drop(stdout);
+            std::process::exit(exit_status)
         }
         Err(message) => {
             eprintln!("{message}");

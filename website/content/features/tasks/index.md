@@ -10,6 +10,11 @@ Task describes whether an operation produced a value. It does not imply a thread
 
 ## Starting and awaiting a worker
 
+**Development example after Preview 10:** direct async Main requires the updated
+compiler, bridge and runtime. The published Preview 10 package starts an async
+helper from a synchronous Main. See [supported entry points](../../raven/#entry-points)
+for return types and process exit behavior.
+
 ```raven
 {{TASK_WORKER_SAMPLE}}
 ```

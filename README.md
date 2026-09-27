@@ -237,6 +237,9 @@ cargo run -- run examples/fault.neoil
 ```
 
 `examples/fault.neoil` deliberately produces a terminal Fault and nonzero exit code.
+In development after Preview 10, `neoclr run` also uses an `Int32` entry return as
+its process exit status. Raven's supported Result and Task entries are adapted to
+that status; see [entry-point contracts and examples](docs/experiments/entry-results/README.md).
 
 Declarations and calls carry parameter signatures, for example
 `.function Describe(int32) -> string` and

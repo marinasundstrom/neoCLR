@@ -159,12 +159,15 @@ never hand-edit generated neoIL.
 ## Generated async and queue selection
 
 See [library-async.rvn](experiments/raven-target/samples/library-async.rvn) for the
-complete runnable source. It starts PrintAnswer inside queue.Run, awaits a pending
-Task<int>, prints “Suspended”, completes the producer and then resumes to print 42.
+complete development source. Its async Main posts completion on the default queue,
+prints “Suspended”, awaits the pending Task<int>, then resumes to print 42. This
+requires the new entry-result integration; Preview 10's version used a synchronous
+Main to start PrintAnswer inside queue.Run.
 Ordinary async functions return Task<T>; use Task<unit> for no payload. Even an
 awaitless async function uses the builder. It selects the nearest active queue or
 the invocation default. The runtime dispatches default-queue work automatically
-after the entry function returns; see the default-dispatch slice below. Explicit
+after entry kickoff returns (and before reading an async Main result); see the
+default-dispatch and direct-Main slices below. Explicit
 queues still allow controlled Run/Drain for tests and custom orchestration.
 
 Task completion queues registered continuations. The producer's queue controls
@@ -522,3 +525,15 @@ wake hints, and pending roots are traced through the driver. TaskQueue affinity 
 public Task behavior remain unchanged. See the
 [implementation scope](runtime-scheduling-design.md#initial-native-host-driver--implemented-2026-09-24)
 for polling fallbacks and the remaining ownership/migration gates.
+
+
+## Direct async Main — 2026-09-27 development
+
+The [entry-results integration](experiments/entry-results/README.md) now permits
+Main to return Task<unit>, Task<int> and Task<Result<unit|int,E>>, with optional
+string-array arguments. The worker and introductory async samples await directly
+in Main. The HTTP client experiment likewise awaits its response directly; queue,
+cancellation and concurrency probes keep callbacks where those are the subject
+of the test. This supersedes the earlier entry-signature restriction for matching
+development toolchains only. GetResult itself remains nonblocking, and explicit
+private queues remain caller-driven.

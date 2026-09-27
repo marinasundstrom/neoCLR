@@ -82,3 +82,41 @@ application classes and interfaces. Two interfaces can select different private
 implementations of the same-named method while the class keeps a separate public
 method. Explicit accessors, generic/value-type import and implementations of external
 core-library contracts remain outside this bounded slice.
+
+
+<a id="entry-points"></a>
+
+## Supported entry points
+
+**Development after Preview 10.** Use the matching development compiler, bridge
+and runtime. A program has one static, nongeneric `Main`, either a file-scope
+function or a static class method. Each return type below accepts no arguments
+or one `string[]` argument containing the application arguments, without the
+executable name.
+
+| Main return type | Successful process exit status |
+| --- | --- |
+| `()` (or omitted) | `0` |
+| `int` | Returned integer |
+| `Result<int, E>` | Integer in `Ok` |
+| `Result<(), E>` | `0` for `Ok` |
+| `Task<()>` | `0` after completion |
+| `Task<int>` | Integer after completion |
+| `Task<Result<int, E>>` | Integer in `Ok` after completion |
+| `Task<Result<(), E>>` | `0` for `Ok` after completion |
+
+A Result `Error` prints its payload to standard error and returns status `1`.
+Cancelled tasks and tasks still pending after available work drains produce a
+runtime failure. `unit` is another spelling of `()`; neoCLR uses `Task<unit>`
+instead of a separate nongeneric .NET `Task` type.
+
+An async Main can await directly. The runtime drives the default task queue and
+registered host operations before obtaining its result. Explicit private task
+queues remain caller-driven. Ordinary `Task.GetResult()` stays nonblocking.
+
+[See a tested async Main awaiting a worker →](../features/tasks/#await)
+
+`neoclr run` also uses integer entry values as process status for Neo and neoIL.
+Existing scripts that previously ignored a nonzero integer result should account
+for that status. Published Preview 10 Raven entries are still limited to no-result
+Main; this table describes the development toolchain.

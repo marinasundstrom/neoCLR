@@ -1379,3 +1379,13 @@ it already does for profile-specific String methods.
 See [the focused report](../casing-integer/README.md) for source/native checks and
 [design comparisons](../../design/text-casing-integer.md) for full casing versus
 .NET behavior. These are target integration additions, not general compiler fixes.
+
+
+### Result and Task entry points (development)
+
+The [entry-results integration](../entry-results/README.md) supports integer,
+Result and target Task return families with optional string-array arguments.
+The heap-async Raven target preserves the source entry signature; neoCLR owns
+startup adaptation and pending completion. Use a matching updated compiler,
+bridge and runtime. Public System signatures and Runtime Contract settings are
+unchanged. Integer results now become `neoclr run` process exit statuses.

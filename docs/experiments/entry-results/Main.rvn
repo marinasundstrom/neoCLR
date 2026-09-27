@@ -1,0 +1,13 @@
+import System.*
+import System.Tasks.*
+
+async func Main(arguments: string[]) -> Task<Result<int, string>> {
+    let ready = Promise<int>()
+    TaskQueue.Default.Post(() => {
+        _ = ready.Complete(1)
+    })
+    _ = await ready.Task
+    let count = arguments.Length
+    Console.WriteLine(String.Concat("Completed with ", count.ToString()))
+    return .Ok(0)
+}

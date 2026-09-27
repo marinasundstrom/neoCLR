@@ -153,3 +153,9 @@ objects after collection. Chunked UTF-8 passes byte-at-a-time fragmentation, inc
 splits within the UTF-8 scalar; close-delimited content completes only on EOF.
 The existing `missing length` case now expects a valid empty close-delimited response.
 See [current limits](../../http-client-design.md#bounded-response-framing-and-head--2026-09-25).
+
+
+Development update (2026-09-27): the client now uses async Main directly and awaits
+ReadGreeting. It requires the matching [entry-results toolchain](../entry-results/README.md).
+The ready-work marker is still posted before awaiting, preserving the observable
+ordering checked by this experiment. HTTP framing and handler behavior are unchanged.

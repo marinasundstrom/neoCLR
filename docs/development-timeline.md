@@ -8377,6 +8377,13 @@ configuration/content, not target-specific code added to Raven main.
   the API snapshot is checked from staged sources rather than unrelated in-progress
   bridge edits. This does not claim that reflection has already been integrated.
 
+- **Outcome:** 15 focused native tests pass. The Raven consumer exposed encoded
+  implementation names in reflection; the assistant preserved source-qualified
+  names for explicit bodies without changing dispatch identities. Final execution
+  and both negative source cases pass. The staged-source API snapshot check passes;
+  no full suite or website build was run. Reflection integration remains coordinated
+  separately rather than included in this bounded implementation.
+
 
 ## 2026-09-27 — Result and Task entry points
 
@@ -8394,9 +8401,14 @@ configuration/content, not target-specific code added to Raven main.
   fixtures whose purpose is callback/queue behavior. This does not authorize new
   HTTP capabilities or imply a permanent roadmap reprioritization.
 
-- **Outcome:** 15 focused native tests pass. The Raven consumer exposed encoded
-  implementation names in reflection; the assistant preserved source-qualified
-  names for explicit bodies without changing dispatch identities. Final execution
-  and both negative source cases pass. The staged-source API snapshot check passes;
-  no full suite or website build was run. Reflection integration remains coordinated
-  separately rather than included in this bounded implementation.
+- **Author delivery direction:** commit the completed changes and document supported
+  entry points on the website. The assistant added a development-only signature
+  table and exit/cancellation behavior to the Raven page, linked from Tasks.
+
+- **Validation/outcome:** the author explicitly required updated samples to build
+  and run. Both async samples and the HTTP client do so; 25 entry cases and focused
+  compiler/native tests pass. Raven's target fix is committed as `d6f04b751` on
+  `neoclr`. The affected website pages and API snapshot pass checks; a full website
+  build encounters an existing unrelated LocalTimeMapping API coverage mismatch.
+  Two independently reproduced async compiler gaps are recorded for separate work.
+  No website publication or general interface/reflection completion is implied.

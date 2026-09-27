@@ -1,6 +1,6 @@
 # Managed entry arguments
 
-The development Raven collection profile accepts a static, nongeneric, no-result
+The development Raven collection profile accepts a static, nongeneric
 entry with no parameters or one string array: `func Main(arguments: string[])`.
 
 The bridge emits a parameterless startup adapter that copies the host argument
@@ -14,8 +14,9 @@ Main excludes the executable; Environment.GetCommandLineArgs includes it.
 The host continues to supply that full vector. The adapter reuses managed arrays
 and GC tracking at the cost of one extra array and startup copy. The runtime's
 parameterless entry ABI and Runtime Contract configuration remain unchanged.
-The restricted legacy importer remains parameterless. Direct integer-, Result-
-and Task-returning entries remain outside this slice.
+The restricted legacy importer remains parameterless. Integer-, Result- and
+Task-returning entries are covered by the subsequent
+[entry-results integration](../entry-results/README.md).
 
 Run `python3 docs/experiments/entry-arguments/verify.py --toolchain-root BUNDLE --runner target/release/examples/measure_async`.
 The three cases cover empty host startup, executable-only startup, mixed values,
