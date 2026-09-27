@@ -13,7 +13,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Parse methods for the remaining numeric types and Boolean, using standard Raven
   NumberParseError/BooleanParseError unions. All numeric parsers, including Int32/Int64,
   share NumberParseError; migrate old numeric error patterns to the shared union.
-  Parsing interfaces remain on hold. Validate nominal static contracts and admit
+  Parsing interfaces remain on hold; document the proposed ParsableNumber<T>
+  constraint for generic T.Parse calls with the shared numeric error contract.
+  Validate nominal static contracts and admit
   bounded closed static application numeric specialization, with explicit limits
   on custom types/additional constraints. Integrate independently tested general
   Raven static-interface/constraint fixes; broader static/default/interface

@@ -8309,3 +8309,15 @@ configuration/content, not target-specific code added to Raven main.
   compiler/native/metadata/consumer checks. Parsable remains on hold. General
   static defaults and arbitrary interface helpers/accessibility remain broader
   follow-up work, not a claimed completion of the interface direction.
+
+- **Parsing capability clarification:** the author questioned the ergonomics of
+  Parsable<T, NumberParseError>, preferring ParsableNumber<T>, and then clarified:
+  “What we really want is to signal that a number type T has a Parse method in a
+  generic method”. The assistant initially emphasized waiting for a consumer;
+  the clarification establishes the intended generic capability itself: a
+  constraint permitting T.Parse with Result<T, NumberParseError>. The assistant
+  recorded that proposed contract separately from Number's arithmetic capability
+  in the [numeric design](design/numeric-contracts.md#proposed-numeric-parsing-capability).
+  General typed parsing does not inherently require exceptions, but associating
+  error types introduces an ergonomic choice. Implementation remains on hold under
+  the earlier explicit direction; compiler/importer admission still needs validation.

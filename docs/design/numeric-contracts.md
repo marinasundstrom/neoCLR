@@ -56,6 +56,34 @@ abstracted: Rust's [FromStr](https://doc.rust-lang.org/std/str/trait.FromStr.htm
 uses an associated error type. Raven's available contract mechanisms and actual
 consumers should determine whether such generality is useful here.
 
+### Proposed numeric parsing capability
+
+The author clarified the purpose of ParsableNumber<T>: let a generic method
+require that its numeric type parameter supplies a static Parse method. The
+proposed contract associates T with Number<T> and exposes Parse(text) returning
+Result<T, NumberParseError>. A constrained method could then call T.Parse(text)
+and handle known numeric errors without repeating an error-type parameter.
+This is a proposal; the interface is still on hold and is not implemented.
+
+This capability is useful even when the generic method only parses: it establishes
+the available operation and its result contract. Number<T> alone intentionally
+does not promise parsing. Keeping the capability separate also lets arithmetic
+algorithms accept numeric types without requiring a text representation.
+
+Compared with .NET IParsable<T>, the proposed interface fixes the domain and typed
+error contract rather than adopting exception/out-parameter failure conventions.
+Compared with Parsable<T, TError>, it avoids carrying a redundant error parameter
+through numeric consumers. The cost is a domain-specific interface that cannot
+describe arbitrary parsers or numeric parsers with different errors. General typed
+parsing remains possible in principle; the question is how to associate its error
+type ergonomically, not whether exceptions are required.
+
+Before implementation, validate constrained T.Parse calls and the relationship
+to Number<T> through Raven and the importer. The current specialization path admits
+only Number<T> constraints, so documenting this proposal does not establish target
+support for ParsableNumber<T>. A focused generic parsing consumer should prove
+successful parsing, shared error handling and rejection of missing implementations.
+
 Unlike [default .NET Double.Parse](https://learn.microsoft.com/en-us/dotnet/api/system.double.parse?view=net-10.0),
 this grammar has no ambient culture or grouping, uses typed errors rather than
 exceptions, and rejects numeric overflow instead of producing infinity. The benefit
