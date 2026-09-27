@@ -3,7 +3,6 @@
 use super::*;
 use std::sync::Arc;
 
-#[allow(dead_code)]
 pub(super) fn submit(
     module: Arc<Module>,
     invocation: Arc<crate::invocation::Invocation>,
@@ -166,6 +165,78 @@ ret
             }
             assert!(Instant::now() < deadline, "guest callback did not finish");
             invocation.park();
+        }
+    }
+
+    #[test]
+    fn native_submission_completes_generated_promise_and_drains_its_continuation() {
+        let system = super::super::task_atomic_tests::library();
+        let source = r#"
+.module App
+.entry Main
+.type class Job
+.field Source System.Tasks.Promise<Int32>
+.field Observed Int32
+.method instance .ctor() -> noresult
+ldarg 0
+newobj instance System.Tasks.Promise<Int32>::.ctor()
+stfld Job::Source
+ret
+.end
+.method instance Run() -> Void
+ldarg 0
+ldfld Job::Source
+ldc.i4 42
+callvirt instance System.Tasks.Promise<Int32>::Complete(Int32)
+pop
+ldvoid
+ret
+.end
+.method instance Observe() -> Void
+ldarg 0
+ldarg 0
+ldfld Job::Source
+callvirt instance System.Tasks.Promise<Int32>::get_Task()
+callvirt instance System.Tasks.Task<Int32>::GetResult()
+stfld Job::Observed
+ldvoid
+ret
+.end
+.end
+.function Main() -> Job
+.local Job job
+newobj instance Job::.ctor()
+stloc job
+ldloc job
+ldfld Job::Source
+callvirt instance System.Tasks.Promise<Int32>::get_Task()
+ldloc job
+delegate.bind System.Func<Void> = instance Job::Observe()
+callvirt instance System.Tasks.Task<Int32>::OnCompleted(System.Func<Void>)
+ldloc job
+delegate.bind System.Func<Void> = instance Job::Run()
+call neoCLR.Runtime.ScheduleTask(System.Func<Void>)
+pop
+ldloc job
+ret
+.end
+"#;
+        for (body, fails) in [(source.to_owned(), false),
+            (source.replace("ldc.i4 42\ncallvirt instance System.Tasks.Promise<Int32>::Complete(Int32)",
+                "fault \"submitted guest failure\"\nldc.i4 42\ncallvirt instance System.Tasks.Promise<Int32>::Complete(Int32)"), true)] {
+            let app = crate::assembler::read_modules(
+                &[crate::assembler::ModuleInput::Source(&body)], &system,
+            ).unwrap().remove(0);
+            let program = crate::LoadedProgram::with_library(&app, &system).unwrap();
+            program.verify().unwrap();
+            let execution = program.run(Limits::default());
+            if fails {
+                assert!(execution.err().unwrap().message.contains("submitted guest failure"));
+            } else {
+                let execution = execution.unwrap();
+                let Value::ObjectReference(result) = execution.value else { panic!() };
+                assert_eq!(result.reference.read_field(1).unwrap(), Value::Int32(42));
+            }
         }
     }
 

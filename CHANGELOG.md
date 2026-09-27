@@ -88,7 +88,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   with shared captures/services/budgets, linked host/service cancellation and bounded
   captured-output forwarding. Keep callback return independent of the root pump;
   park entry draining for native work and redrain on completion without spending
-  guest fuel while waiting. Public Run and async callback unwrapping still need integration.
+  guest fuel while waiting. Add private ScheduleTask submission with bounded heap
+  participants and validate generated Promise completion/continuation dispatch plus
+  terminal guest faults. Public Run and async callback unwrapping still need integration.
   This is backend infrastructure, not a public Task.Run release.
 
 - Support Raven Main returning integer, Result and target Task combinations through

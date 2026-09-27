@@ -574,10 +574,26 @@ after native completion. Existing VM, native-work/lifecycle, linked cancellation
 console/GC/cancellation checks pass. No full suite or website build was needed. No
 public API signatures or snapshots changed.
 
+## Private native submission boundary
+
+The VM now admits `neoCLR.Runtime.ScheduleTask(Func<Void>)`, classified as the
+existing TaskDispatch service. It publishes the submitting frame's roots/payload
+before creating the native context. The root heap allows one caller plus the existing
+bounded total job count (Limits.frames); finished jobs retain their registration until
+invocation shutdown. This is conservative retention, not a pool or a live-job quota.
+Callbacks cannot invoke the entry-drain service recursively. A terminal guest callback
+fault fails the invocation rather than becoming a successful task outcome.
+
+The focused generated-library probe schedules a captured guest receiver through the
+actual native binding, completes Promise<int>, and observes its registered continuation
+before root exit. Its failure variant verifies propagation of a guest Fault. All 29 VM
+checks and 12 runtime-service checks pass. This is internal runtime plumbing; no public
+Task.Run reference, Raven compiler policy or API snapshot changed.
+
 ## Next integration slice
 
-Bind this adapter to library task completion and expose the Run overloads, with bounded
-heap participant admission and async callback unwrapping. Preserve root/payload
+Expose the Run overloads over the private submission boundary, with managed task
+completion and async callback unwrapping. Preserve root/payload
 publication at submission and completion; validate typed/completion-only shared captures
 with a compiled Raven consumer. Update public API reference/snapshots when the facade
 lands. Public Task.Run remains unimplemented.

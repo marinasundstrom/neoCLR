@@ -1510,7 +1510,7 @@ fn interpret_frames(
     options: ExecutionOptions,
     mut native_libraries: Option<crate::interop::NativeLibraries>,
 ) -> Result<Execution, Fault> {
-    let owner = crate::shared_heap::Owner::new(1);
+    let owner = crate::shared_heap::Owner::new(options.limits.frames.saturating_add(1));
     let mut participant = owner.participant()?;
     let mut output = vec![];
     let mut console_bytes = [Vec::new(), Vec::new()];
@@ -3207,9 +3207,31 @@ fn interpret_instructions_with_dispatch(
                         }
 
 
+                        if matches!(binding, crate::native::Binding::ScheduleTask) {
+                            // Publish the caller after consuming the argument; the
+                            // child registers the callback before any pressure GC.
+                            heap.publish(execution_roots(
+                                frames,
+                                scheduler,
+                                default_task_queue.as_ref(),
+                                invocation_result.as_ref(),
+                            ))?;
+                            let usage = frame_array_usage(frames, invocation_result.as_ref(), &limits)?;
+                            heap.publish_arrays(usage, *arrays_used);
+                            guest_work::submit(
+                                std::sync::Arc::new(module.clone()),
+                                invocation.clone(),
+                                heap,
+                                args.remove(0),
+                                options.clone(),
+                            )?;
+                            frames.last_mut().unwrap().stack.push(Value::Void);
+                            return Ok(None);
+                        }
+
                         if matches!(binding, crate::native::Binding::DrainEntryTasks) {
-                            if entry_drain_depth.is_some() {
-                                return Err(Fault::new("Entry task dispatch cannot be nested"));
+                            if entry_drain_depth.is_some() || work_control.is_some() {
+                                return Err(Fault::new("Entry task dispatch cannot be nested or run by a task callback"));
                             }
                             *entry_drain_depth = Some(frames.len());
                             *drain_required = true;

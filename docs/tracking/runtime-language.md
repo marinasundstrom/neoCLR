@@ -20,8 +20,8 @@ execution/heap ownership boundary before exposing the facade; the isolated Threa
 worker contract is not a substitute. Thread's future public role remains open.
 The [first storage prerequisite](../experiments/task-run/README.md) implements
 synchronized managed slots and tests native alias sharing. The subsequent heap coordinator registers participant roots and serializes graph
-access/collection; the public driver still admits one participant, while the internal
-guest adapter now exercises concurrent contexts. The first native work owner now covers bounded submission, rooted completion,
+access/collection; the root driver now admits bounded native callback participants,
+and the internal guest adapter exercises concurrent contexts. The first native work owner now covers bounded submission, rooted completion,
 cooperative cancellation and join-before-disposal with runtime-side callbacks.
 The VM now retains execution state and publishes roots between instruction intervals;
 a native guest-function probe and a queue/entry-drain probe force collection after
@@ -52,8 +52,9 @@ locks before service disposal, including root-driver unwinding. An internal gues
 delegate adapter now shares captures, budgets and services, forwards bounded captured
 output and observes host/service cancellation. Callback return bypasses the root pump;
 root entry draining parks for native work and redrains after completion without spending
-instruction fuel during waits. Public participant admission, task completion binding
-and async callback unwrapping remain before the Task.Run facade.
+instruction fuel during waits. The private ScheduleTask native boundary now admits
+callbacks from guest code; a generated Promise/continuation consumer and terminal-fault
+case pass. Managed Run overloads and async callback unwrapping remain before the public facade.
 The internal blocking probe is not a public guest API result. Green threads are recorded as a possible future backend.
 This explicit task does not reopen the finished HTTP POC or select a general
 scheduler/backend rewrite independently of the capability's requirements.

@@ -44,6 +44,7 @@ pub(crate) enum Binding {
     DefaultTaskQueue,
     RegisterDefaultTaskQueue,
     DrainEntryTasks,
+    ScheduleTask,
     StartWorker(bool),
     JoinWorker,
     JoinWorkerResult,
@@ -644,6 +645,11 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             if *callback == crate::assembler::parse_type("System.Func<Void>")? =>
         {
             (Binding::NotifyWorker, Type::Void)
+        }
+        ("neoCLR.Runtime.ScheduleTask", [callback])
+            if *callback == crate::assembler::parse_type("System.Func<Void>")? =>
+        {
+            (Binding::ScheduleTask, Type::Void)
         }
         ("neoCLR.Runtime.DrainEntryTasks", []) => (Binding::DrainEntryTasks, Type::Void),
         ("neoCLR.Runtime.DefaultTaskQueue", []) => (

@@ -1,7 +1,7 @@
 use super::*;
 use crate::shared_heap::Owner;
 
-fn library() -> Module {
+pub(super) fn library() -> Module {
     let mut source = String::from(
         ".module System\n.type class abstract System.Object\n.method instance virtual ToString() -> String\nfault \"Object formatting is outside the task fixture\"\n.end\n.end\n",
     );
